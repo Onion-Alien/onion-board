@@ -6,7 +6,7 @@ doing. It looks and works as the voice changer's card: the same big ON/OFF switc
 next to its name, the same picture cards (or list) under chips: All (a heading per kind),
 Favorites, Men, Women, In between & fun, Mine. Picking one turns it on, and the voice
 that's on gets the same bar under the cards: Edit voice (its pitch), Make your own
-voice (ui/aivoicebrowser.py), Hear it. Settings
+voice (ui/voice/aivoicebrowser.py), Hear it. Settings
 are a plain dict (`changed`) the Voice tab keeps in the speech settings under "ai".
 """
 from __future__ import annotations
@@ -31,15 +31,15 @@ from soundboard.addons import modules as mods
 from soundboard.i18n import _, ngettext
 from soundboard.speech import aivoice
 from soundboard.speech import aivoicelist as avl
-from soundboard.ui import art
+from soundboard.ui.voice import art
 from soundboard.ui.kit import busy, fit, icons
-from soundboard.ui.aivoicebrowser import AiVoiceEditor, Previewer, hear_button
+from soundboard.ui.voice.aivoicebrowser import AiVoiceEditor, Previewer, hear_button
 from soundboard.ui.bunnywidget import BunnyWidget
-from soundboard.ui.effectspopup import place_over
+from soundboard.ui.voice.effectspopup import place_over
 from soundboard.ui.kit.panel import (Flow, UndoBar, ViewToggle, fold_button, hint_label,
                                      section_label)
-from soundboard.ui.voicefxpanel import (LIST_MIN_W, MAX_COLS, PICKED_ART, TILE_ART, TILE_GAP,
-                                        TILE_MIN_W, BigSwitch, VoiceTile)
+from soundboard.ui.voice.voicefxpanel import (LIST_MIN_W, MAX_COLS, PICKED_ART, TILE_ART,
+                                              TILE_GAP, TILE_MIN_W, BigSwitch, VoiceTile)
 from soundboard.ui.kit.widgets import LoadingBar
 from soundboard.ui.kit.wheelguard import no_wheel
 
@@ -83,7 +83,7 @@ def art_key(voice: dict) -> str:
 
 
 def voice_icon(voice: dict, size: int = TILE_ART) -> QIcon:
-    """A voice's card picture: its drawing (ui/art.py) when there is one, else its emoji."""
+    """A voice's card picture: its drawing (ui/voice/art.py) when there is one, else its emoji."""
     key = art_key(voice)
     pic = art.icon(key) if key else None
     return pic or emoji_icon(str(voice.get("emoji") or ""), size)

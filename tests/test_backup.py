@@ -335,7 +335,7 @@ def test_apply_settings_drops_unknown_speech_models_and_languages():
 
 
 def test_speech_model_allowlist_matches_the_voice_panel():
-    from soundboard.ui import speechpanel
+    from soundboard.ui.voice import speechpanel
     assert set(backup.SPEECH_MODELS) == {key for _, key in speechpanel.MODELS}
 
 

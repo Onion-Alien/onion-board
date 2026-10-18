@@ -2,7 +2,7 @@
 
 Hear it plays a short sample in your headphones (soundboard.speech.aipreview). Your
 own voices (soundboard.speech.aivoicelist.Store) are blends of the others; the card
-(ui/aivoicepanel.py) lists them with the rest, to change, delete or make another.
+(ui/voice/aivoicepanel.py) lists them with the rest, to change, delete or make another.
 """
 from __future__ import annotations
 

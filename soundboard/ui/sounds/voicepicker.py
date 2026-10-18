@@ -20,7 +20,7 @@ from soundboard.audio import soundfx
 from soundboard.i18n import _
 from soundboard.ui.kit import fit, icons
 from soundboard.ui.kit.panel import Flow, card, hint_label
-from soundboard.ui.voicefxpanel import TILE_ART, TILE_MIN_W, VoiceTile
+from soundboard.ui.voice.voicefxpanel import TILE_ART, TILE_MIN_W, VoiceTile
 
 COLS = 4
 FAVS, MINE, ALL = "favs", "mine", "all"
@@ -116,7 +116,7 @@ class VoicePicker(QDialog):
         if cat.ai_ready and cat.ai:
             self.ai_chips = self._chips(cv, self._show_ai, bool(cat.ai_favs), False)
             self.ai_grid = self._grid(cv)
-            from soundboard.ui.aivoicepanel import voice_icon
+            from soundboard.ui.voice.aivoicepanel import voice_icon
             for vo in cat.ai:
                 t = self._tile(vo["name"], voice_icon(vo))
                 t.setToolTip(str(vo.get("description") or ""))
@@ -234,7 +234,7 @@ class VoicePicker(QDialog):
         if ai:
             vo = next((v for v in self.cat.ai if v["id"] == ai["id"]), None)
             if vo is not None:
-                from soundboard.ui.aivoicepanel import voice_icon
+                from soundboard.ui.voice.aivoicepanel import voice_icon
                 return voice_icon(vo)
         name = voice.get("fx") or self._fx_name_for(voice)
         pic = next((p for n, _s, _e, p, _m in self.cat.fx if n == name), None)

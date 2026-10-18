@@ -21,7 +21,7 @@ from soundboard import voicefx
 from soundboard.i18n import _
 from soundboard.ui.kit import fit, icons
 from soundboard.ui.kit.panel import hint_label, reset_button
-from soundboard.ui.voicefxpanel import EffectRow, ParamSlider
+from soundboard.ui.voice.voicefxpanel import EffectRow, ParamSlider
 from soundboard.voicefx import Param, backdrop
 
 VAL_W = 52

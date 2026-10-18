@@ -39,7 +39,7 @@ def test_settings_videos_folder_is_an_icon_button(window):  # noqa: F811
 
 
 def test_addons_folder_is_an_icon_button(qapp):
-    from soundboard.ui.voicepanel import ModulesList
+    from soundboard.ui.voice.voicepanel import ModulesList
     listed = ModulesList()
     folder = [b for b in listed.findChildren(QPushButton)
               if b.objectName() == "iconbutton"]
@@ -66,7 +66,7 @@ def _assert_reset(btn: QPushButton):
 
 
 def test_resets_are_one_family(window):  # noqa: F811
-    from soundboard.ui.voicepanel import EffectRow
+    from soundboard.ui.voice.voicepanel import EffectRow
     _assert_reset(panel.reset_button("Back to how it was"))
     pop = window.speed_btn.pop
     resets = [b for b in pop.findChildren(QPushButton) if b.text() == "Reset"]

@@ -81,7 +81,7 @@ from soundboard.ui.triggershost import BoardHost
 from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.radiopanel import RadioOff, RadioTab
 from soundboard.ui.storetab import PREVIEW as STORE_PREVIEW, StoreTab
-from soundboard.ui.voicepanel import VoicePanel
+from soundboard.ui.voice.voicepanel import VoicePanel
 from soundboard.ui.kit.widgets import Meter, Pad, expand_dropped
 from soundboard.control.winkeys import Hotkeys
 from soundboard.i18n import _
@@ -551,7 +551,7 @@ class MainWindow(QMainWindow):
         with theme.styled_after(QApplication.instance()):
             self.builder._build_ui()
         restyled.again()   # what measured text, in the theme's fonts now
-        from soundboard.ui.livesetups import LiveSetups
+        from soundboard.ui.voice.livesetups import LiveSetups
         self.livesetups = LiveSetups(self)   # My setups in the three Live controls
         splash.pump()
         self.devctl._init_devices()

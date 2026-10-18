@@ -31,8 +31,8 @@ from soundboard.speech.live import SpeechController, clean_settings
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import bar, fold_button, hint_label, icon_label, section_label
 from soundboard.ui.kit.restyled import measured, on_restyle
-from soundboard.ui.livevoice import MODELS, LiveVoice
-from soundboard.ui.speechinstall import SpeechInstalls
+from soundboard.ui.voice.livevoice import MODELS, LiveVoice
+from soundboard.ui.voice.speechinstall import SpeechInstalls
 from soundboard.ui.kit.widgets import fit_placeholder
 from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.core import errors

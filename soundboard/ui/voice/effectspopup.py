@@ -21,12 +21,12 @@ from soundboard.core import usage
 from soundboard import voicefx
 from soundboard.i18n import _
 from soundboard.ui.kit import fit, icons
-from soundboard.ui.backdroprow import _row_slider
+from soundboard.ui.voice.backdroprow import _row_slider
 from soundboard.ui.kit.panel import Flow, hint_label
 from soundboard.voicefx import Param, backdrop
 
 if TYPE_CHECKING:
-    from soundboard.ui.voicefxpanel import VoiceFxPanel
+    from soundboard.ui.voice.voicefxpanel import VoiceFxPanel
 
 # the extras and the setting their one slider moves (Radio has no mix: how hard it drives)
 EXTRAS = (("extra_robot", "mix"), ("extra_radio", "drive"), ("extra_echo", "mix"),

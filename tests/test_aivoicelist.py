@@ -190,7 +190,7 @@ class FakePreviewer:
 
 
 def test_make_your_own_voice_from_two_others(qapp, app_dir):
-    from soundboard.ui.aivoicebrowser import AiVoiceEditor
+    from soundboard.ui.voice.aivoicebrowser import AiVoiceEditor
     d = AiVoiceEditor(avl.BUILT_IN, None, FakePreviewer())
     try:
         d.ed_name.setText("Gravel Nova")
@@ -218,7 +218,7 @@ def ready_panel(app_dir, monkeypatch, settings=None):
     """The AI voices card with the add-on installed (yours: you can make voices)."""
     from soundboard.addons import aiaddon
     from soundboard.speech.aivoice import AiVoiceController
-    from soundboard.ui.aivoicepanel import AiVoicePanel
+    from soundboard.ui.voice.aivoicepanel import AiVoicePanel
     from soundboard.voicefx import VoiceChain
     folder = addon_copy(app_dir, all_speakers())
     (folder / ".venv" / "Scripts").mkdir(parents=True)
@@ -298,7 +298,7 @@ def test_card_favorites_are_kept_in_the_order_starred(qapp, app_dir, monkeypatch
 
 
 def test_card_makes_changes_and_deletes_your_own_voices(qapp, app_dir, monkeypatch):
-    from soundboard.ui import aivoicebrowser
+    from soundboard.ui.voice import aivoicebrowser
     p = ready_panel(app_dir, monkeypatch, {"voice": "nova"})
     made = mine("Robo", tags=["Man"], pitch_hz=100)
     monkeypatch.setattr(aivoicebrowser.AiVoiceEditor, "exec", lambda self: 1)
@@ -333,7 +333,7 @@ def test_voices_sort_into_who_and_how_high():
 
 def test_a_built_in_voice_shows_its_picture_when_there_is_one(qapp, monkeypatch):
     from PySide6.QtGui import QIcon, QPixmap
-    from soundboard.ui import aivoicepanel, art
+    from soundboard.ui.voice import aivoicepanel, art
     pic = QIcon(QPixmap(8, 8))
     asked = []
     monkeypatch.setattr(art, "icon",
@@ -348,7 +348,7 @@ def test_card_works_like_the_voice_changer(qapp, app_dir, monkeypatch):
     """The voice changer's switch, cards-or-list and voice bar, with Edit voice's pitch
     in a pop-up; the switch can't be turned on before the add-on is there."""
     from soundboard.speech.aivoice import AiVoiceController
-    from soundboard.ui.aivoicepanel import AiVoicePanel
+    from soundboard.ui.voice.aivoicepanel import AiVoicePanel
     from soundboard.voicefx import VoiceChain
     bare = AiVoicePanel(AiVoiceController(VoiceChain(), lambda e: None), {}, [])
     try:

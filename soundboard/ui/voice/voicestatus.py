@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QPushBut
 from soundboard.i18n import _
 from soundboard.ui.kit import icons
 from soundboard.ui.kit.panel import Flow, icon_label
-from soundboard.ui.voicefxpanel import BigSwitch
+from soundboard.ui.voice.voicefxpanel import BigSwitch
 from soundboard.ui.kit.widgets import Meter, widget_at
 
 GAP = 16            # between the mic half and the chips, side by side

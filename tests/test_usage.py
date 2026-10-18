@@ -1057,7 +1057,7 @@ def test_voice_tabs_and_recovery_actions_match_the_ui():
 
     from soundboard.ui import audiorecovery
     assert set(audiorecovery.INSTALLS) <= set(usage.RECOVERY)
-    from soundboard.ui import voicepanel
+    from soundboard.ui.voice import voicepanel
     src = Path(voicepanel.__file__).read_text(encoding="utf-8")
     assert set(re.findall(r'self\._section\("([a-z]+)"', src)) == set(usage.VOICE_TABS)
 

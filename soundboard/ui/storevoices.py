@@ -27,7 +27,7 @@ from soundboard.ui.kit.panel import HoverCard
 from soundboard.ui.storetab import SoundRow
 
 if TYPE_CHECKING:
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicepanel import VoicePanel
 
 log = logging.getLogger(__name__)
 

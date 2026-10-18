@@ -16,12 +16,12 @@ from soundboard.core import langnames
 from soundboard.speech import spoken, translation
 from soundboard.ui.kit import icons
 from soundboard.ui.kit.panel import hint_label
-from soundboard.ui.voicefxpanel import _enable
+from soundboard.ui.voice.voicefxpanel import _enable
 from soundboard.core import errors
 from soundboard.i18n import _
 
 if TYPE_CHECKING:
-    from soundboard.ui.speechpanel import SpeechPanel
+    from soundboard.ui.voice.speechpanel import SpeechPanel
 
 IDLE_HINT = _("Press Start, then just talk.")
 MODELS = [(_("Fast (base.en)"), "base.en"), (_("Fastest (tiny.en)"), "tiny.en"),

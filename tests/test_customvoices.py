@@ -163,7 +163,7 @@ def test_voice_set_lists_and_routes_custom_voices(vdir, server, monkeypatch):
 def test_voice_tab_lists_custom_voices_and_bad_files(vdir, qapp, monkeypatch):
     from tests.conftest import process_events
     from tests.test_voicepanel import FakeEngine
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicepanel import VoicePanel
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
     customvoices.save_server("Kokoro", "http://127.0.0.1:8880/v1/audio/speech", "af_bella")
     (vdir / "broken.json").write_text("{nope", encoding="utf-8")
@@ -210,7 +210,7 @@ def test_custom_voices_are_found_from_the_voice_list_and_from_settings(window): 
 
 def test_a_saved_custom_tab_opens_add_ons(qapp):
     """Someone who last had the old Custom tab open lands on Add-ons, where it went."""
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicepanel import VoicePanel
     from tests.test_voicepanel import FakeEngine
     vp = VoicePanel(FakeEngine(), None, {"tab": "custom"})
     try:

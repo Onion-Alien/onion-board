@@ -126,7 +126,7 @@ _DL_HOSTS = (("youtube", ("youtube.com", "youtu.be", "youtube-nocookie.com")),
              ("instagram", ("instagram.com",)), ("x", ("x.com", "twitter.com")),
              ("reddit", ("reddit.com", "redd.it")), ("twitch", ("twitch.tv",)),
              ("myinstants", ("myinstants.com",)))
-# the Voice tab's tabs (ui/voicepanel.py VoicePanel._section keys)
+# the Voice tab's tabs (ui/voice/voicepanel.py VoicePanel._section keys)
 VOICE_TABS = ("fx", "ai", "speak", "addons")
 # Audio recovery's actions (ui/audiorecovery.py; "cleanup-none" counts as cleanup)
 RECOVERY = ("install", "repair", "update", "reinstall", "cleanup", "remove")
@@ -143,7 +143,7 @@ PRESS_MODES = ("overlap", "toggle", "solo", "queue")
 ADDONS = ("ai-voices", "live-voice", "other")
 # the free sound packs (soundboard.sounds.packs BUILT_IN ids); any other is "other"
 PACKS = ("streamer", "esports", "general", "podcast", "halloween", "gm-starter", "other")
-# the Live controls' tabs (ui/livesetups.py)
+# the Live controls' tabs (ui/voice/livesetups.py)
 LIVE_TABS = ("sounds", "radio", "apps")
 # Bun's games (ui/bunpong.py games()); any other is "other"
 BUN_GAMES = ("pong", "draw", "rps", "ttt", "other")

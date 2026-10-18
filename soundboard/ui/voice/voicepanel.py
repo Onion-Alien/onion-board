@@ -26,12 +26,12 @@ from soundboard.speech import spoken, translation
 from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController
 from soundboard.ui.kit import a11y, appstate, busy, icons
-from soundboard.ui import art
+from soundboard.ui.voice import art
 from soundboard.ui.kit.panel import Flow, card, hint_label, icon_button, section_label
 from soundboard.ui.responsive import FitWidth
-from soundboard.ui.speechpanel import LIVE_MODULE, SpeechPanel
-from soundboard.ui.voicefxpanel import CUSTOM, EffectRow, VoiceFxPanel, on_top
-from soundboard.ui.voicestatus import VoiceStatusBar
+from soundboard.ui.voice.speechpanel import LIVE_MODULE, SpeechPanel
+from soundboard.ui.voice.voicefxpanel import CUSTOM, EffectRow, VoiceFxPanel, on_top
+from soundboard.ui.voice.voicestatus import VoiceStatusBar
 from soundboard.i18n import _
 from soundboard.ui.kit.pixels import snap_to_pixels
 
@@ -289,7 +289,7 @@ class VoicePanel(QWidget):
         self.speech.clip_ready.connect(self.clip_ready)
         self.speech.live_changed.connect(lambda _on: self._emit_active())
         # AI voices: the live voice changer
-        from soundboard.ui.aivoicepanel import AiVoicePanel
+        from soundboard.ui.voice.aivoicepanel import AiVoicePanel
         self.ai_controller = AiVoiceController(self.chain, lambda ev: None)
         saved = speech.get("ai") if isinstance(speech, dict) else None   # may be damaged
         self.ai = AiVoicePanel(self.ai_controller, saved, self.modules, engine)
@@ -314,7 +314,7 @@ class VoicePanel(QWidget):
         self._section("addons", self.addons, self.addons.title)
         self.show_tab(self._tab if self._tabs[self._tab].isVisibleTo(self) else "fx")
 
-        from soundboard.ui.voicesetupsbar import SetupsBar
+        from soundboard.ui.voice.voicesetupsbar import SetupsBar
         self.setups_bar = SetupsBar(self.setups, self.current_setup, self.use_setup,
                                     self.setup_icon, self.setup_words,
                                     copy_code=self.copy_setup_code,
@@ -455,7 +455,7 @@ class VoicePanel(QWidget):
         ai = setup.get("ai")
         vo = next((v for v in self.ai.voices if ai and v.get("id") == ai["id"]), None)
         if vo is not None:
-            from soundboard.ui.aivoicepanel import voice_icon
+            from soundboard.ui.voice.aivoicepanel import voice_icon
             return voice_icon(vo)
         pic = art.icon(art.voice_key(setup["fx"])) if setup.get("fx") else None
         return pic or icons.icon("sliders" if setup.get("effects") else "browser", "muted")
@@ -1015,7 +1015,7 @@ class VoicePanel(QWidget):
 
         def work():
             from soundboard.speech import aivoice
-            from soundboard.ui.aivoicepanel import read_voices
+            from soundboard.ui.voice.aivoicepanel import read_voices
             found = voices = None
             try:
                 found = mods.discover()

@@ -28,9 +28,9 @@ from soundboard.mic import savedvoices
 from soundboard.ui.kit import theme
 from soundboard import voicefx
 from soundboard.speech import aipreview
-from soundboard.ui import art
+from soundboard.ui.voice import art
 from soundboard.ui.kit import busy, icons
-from soundboard.ui.aivoicebrowser import HEAR, MAKING, hear_button
+from soundboard.ui.voice.aivoicebrowser import HEAR, MAKING, hear_button
 from soundboard.ui.kit.widgets import take_out
 from soundboard.ui.kit.panel import (Flow, UndoBar, ViewToggle, hint_label, reset_button,
                                      section_label, steady_number)
@@ -40,7 +40,7 @@ from soundboard.ui.kit.pixels import snap_to_pixels
 
 
 CUSTOM = "Custom"
-TILE_ART = 48     # px: a voice card's picture (when there is one, see ui/art.py)
+TILE_ART = 48     # px: a voice card's picture (when there is one, see ui/voice/art.py)
 TILE_MIN_W = 124  # px: a voice card at its narrowest (the row holds as many as fit)
 TILE_GAP = 8      # px: between voice cards
 LIST_MIN_W = 190  # px: a voice row at its narrowest (the list view)
@@ -828,7 +828,7 @@ class VoiceFxPanel(QWidget):
         hh = QHBoxLayout(self.head)
         hh.setContentsMargins(0, 0, 0, 0)
         hh.addWidget(self.btn_power)
-        # your mic level is in the tab's status bar (ui/voicestatus.py), over every card
+        # your mic level is in the tab's status bar (ui/voice/voicestatus.py), over every card
         # (to hear it: the mixer's "Hear what they hear", the one switch on every tab)
         v.addWidget(hint_label(_("Change your mic live for whoever you send sounds to (Discord, "
                                  "a game, OBS). Pick a voice to turn it on, then use Hear what "
@@ -1252,21 +1252,21 @@ class VoiceFxPanel(QWidget):
 
     def _backdrop_row(self):
         """The Background's card (None before it's made, or an add-on took its place)."""
-        from soundboard.ui.backdroprow import BackdropRow
+        from soundboard.ui.voice.backdroprow import BackdropRow
         row = self.rows.get("backdrop")
         return row if isinstance(row, BackdropRow) else None
 
     def open_effects(self):
         """The Effects pop-up, over the voice bar's button."""
         if self.effects_pop is None:
-            from soundboard.ui.effectspopup import EffectsPopup
+            from soundboard.ui.voice.effectspopup import EffectsPopup
             self.effects_pop = EffectsPopup(self)
         self.effects_pop.open_for(self.btn_effects)
 
     def on_top_state(self) -> dict:
         """What the Effects pop-up shows: {"layers": {layer: level}, "sounds": [(id,
         name, level)], "extras": {type: its slider's value}} (only what's on)."""
-        from soundboard.ui.effectspopup import EXTRAS
+        from soundboard.ui.voice.effectspopup import EXTRAS
         from soundboard.voicefx import backdrop
         out: dict = {"layers": {}, "sounds": [], "extras": {}}
         row = self._backdrop_row()
@@ -1309,7 +1309,7 @@ class VoiceFxPanel(QWidget):
         if value is None:
             self._extras.pop(key, None)
         else:
-            from soundboard.ui.effectspopup import EXTRAS
+            from soundboard.ui.voice.effectspopup import EXTRAS
             cfg = self._extras.get(key) or {"on": True, **voicefx.defaults(key)}
             cfg[dict(EXTRAS)[key]] = value
             self._extras[key] = cfg
@@ -1494,7 +1494,7 @@ class VoiceFxPanel(QWidget):
         self.pick(name)
 
     def _make_tile(self, name: str, title: str, pic, line_icon: str) -> VoiceTile:
-        """A checkable voice card: its picture (ui/art.py), else a line icon, with the
+        """A checkable voice card: its picture (ui/voice/art.py), else a line icon, with the
         name under it."""
         b = VoiceTile(title)
         if self._listed:
@@ -1913,7 +1913,7 @@ class VoiceFxPanel(QWidget):
                 # mic clean-up starts on: it only makes changed voices sound better
                 cfg = {"on": True} if etype == "cleanup" else {}
             if etype == "backdrop":
-                from soundboard.ui.backdroprow import BackdropRow
+                from soundboard.ui.voice.backdroprow import BackdropRow
                 r = BackdropRow(cls, cfg, lambda: self.sound_list())
             else:
                 r = EffectRow(cls, cfg, hero=etype in HERO)

@@ -22,12 +22,12 @@ from soundboard.online import net, netlog
 from soundboard.speech import translation, winvoices
 from soundboard.ui.kit import busy, icons
 from soundboard.ui.kit.panel import hint_label, icon_button
-from soundboard.ui.voicefxpanel import _enable
+from soundboard.ui.voice.voicefxpanel import _enable
 from soundboard.core import errors
 from soundboard.i18n import _, ngettext
 
 if TYPE_CHECKING:
-    from soundboard.ui.speechpanel import SpeechPanel
+    from soundboard.ui.voice.speechpanel import SpeechPanel
 
 
 class SpeechInstalls(QObject):

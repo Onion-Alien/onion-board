@@ -30,7 +30,7 @@ from soundboard.ui.sounds import sourcedialog
 from soundboard.ui.kit.panel import (EqPanel, hint_label, icon_button, reset_button,
                                      section_label, steady_number)
 from soundboard.ui.sounds.trim import TrimPanel
-from soundboard.ui.voicefxpanel import EffectRow, ParamSlider
+from soundboard.ui.voice.voicefxpanel import EffectRow, ParamSlider
 from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.control.winkeys import Hotkeys
 from soundboard.i18n import _

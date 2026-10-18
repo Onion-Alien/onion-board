@@ -185,7 +185,7 @@ def test_a_setup_can_be_renamed_to_any_name_in_its_place(app_dir):
 def test_the_setup_menu_renames_and_says_when_the_name_is_taken(window, app_dir, monkeypatch):  # noqa: F811
     if not window.tabctl.tab_on("voice"):
         return
-    from soundboard.ui import voicesetupsbar
+    from soundboard.ui.voice import voicesetupsbar
     vp = window.voice
     vp.setups.put("Robo", {"fx": "Robot", "effects": ROBOT})
     vp.setups.put("Echo", {"effects": ECHO})

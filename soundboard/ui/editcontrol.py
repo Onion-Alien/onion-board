@@ -176,7 +176,7 @@ class EditControl(Controller):
         voices and your saved ones, the AI voices (when that add-on is set up), your
         setups, and the Voice tab's Favorites (a star here is a star there)."""
         from soundboard.speech import soundvoice
-        from soundboard.ui import art
+        from soundboard.ui.voice import art
         from soundboard.ui.sounds.voicepicker import Catalog
         mw = self.mw
         cat = Catalog()

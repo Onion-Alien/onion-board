@@ -23,7 +23,7 @@ from soundboard.ui.buncontrol import BUN_TIP
 from soundboard.ui.controller import Controller
 from soundboard.ui.livedot import set_tab_live
 from soundboard.ui.storetab import StoreTab
-from soundboard.ui.voicepanel import VoicePanel
+from soundboard.ui.voice.voicepanel import VoicePanel
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow

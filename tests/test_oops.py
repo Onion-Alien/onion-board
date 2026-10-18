@@ -97,7 +97,7 @@ def test_a_site_thats_down_gets_no_restart_the_app_advice(qapp, monkeypatch):
 
 def test_the_voice_strip_shows_while_the_voice_cant_work():
     """Logic only: problem() says why the voice that's on can't work, "" when it can."""
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicepanel import VoicePanel
 
     class Fake:
         def __init__(self):

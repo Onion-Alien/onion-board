@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QBoxLayout
 
 from soundboard import i18n
 from soundboard.ui.kit import theme
-from soundboard.ui.voicestatus import VoiceStatusBar
+from soundboard.ui.voice.voicestatus import VoiceStatusBar
 
 
 @pytest.fixture(autouse=True)

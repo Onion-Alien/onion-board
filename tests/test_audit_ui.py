@@ -26,7 +26,7 @@ from tests.test_voicepanel import FakeEngine
 @pytest.fixture
 def speech(qapp, monkeypatch):
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
-    from soundboard.ui.voicepanel import VoicePanel
+    from soundboard.ui.voice.voicepanel import VoicePanel
     p = VoicePanel(FakeEngine(), {}, {"voice": "Microsoft Zira Desktop"})
     yield p.speech
     p.shutdown()
