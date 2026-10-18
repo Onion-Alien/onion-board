@@ -371,7 +371,7 @@ def test_card_lists_the_voices_once_installed(qapp, tmp_path, monkeypatch):
         p._tile[first].click()
         process_events(qapp, lambda: bool(saved))
         assert saved[-1]["voice"] == first
-        assert p.is_on() and starts == [first] and p.power_label.text() == "On"
+        assert p.is_on() and starts == [first] and p.b_start.text() == "On"
         # the voice changer's bar: the voice that's on, under the cards
         assert not p.picked.isHidden() and p.picked_name.text() == p.voices[0]["name"]
         # while it's on, another card switches voice without starting it again

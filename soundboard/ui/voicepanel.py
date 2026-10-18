@@ -632,7 +632,7 @@ class VoicePanel(QWidget):
     def _section(self, key: str, panel: QWidget, title: QLabel,
                  beside: QWidget | None = None) -> QFrame:
         """A tab and its card: the card's head is the panel's own title (`title`, shown
-        there instead) with its emblem; `beside` goes at the head's right end."""
+        there instead) with its emblem; `beside` (an on/off switch) goes right after it."""
         f, v = card(roomy=True)
         v.setContentsMargins(18, 14, 18, 18)   # no section label's top padding here
         v.setSpacing(12)
@@ -643,14 +643,17 @@ class VoicePanel(QWidget):
         lbl = section_label(title.text())
         lbl.setProperty("head", True)   # no top padding: centred on the emblem
         head.addWidget(lbl, 0, Qt.AlignmentFlag.AlignVCenter)
-        head.addStretch(1)
+        # the on/off switch right after the card's name: at the far end of the head it
+        # sat a whole window away from the name it switches (on a wide window)
+        if beside is not None:
+            head.addSpacing(4)
+            head.addWidget(beside, 0, Qt.AlignmentFlag.AlignVCenter)
         state = QLabel("")
         state.setObjectName("pill")
         state.setProperty("on", True)
         state.hide()
         head.addWidget(state, 0, Qt.AlignmentFlag.AlignVCenter)
-        if beside is not None:
-            head.addWidget(beside, 0, Qt.AlignmentFlag.AlignVCenter)
+        head.addStretch(1)
         title.hide()                      # the head shows it
         v.addLayout(head)
         # any height the card gets beyond what it needs (wrapped text measured at

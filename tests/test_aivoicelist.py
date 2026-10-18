@@ -351,7 +351,7 @@ def test_card_works_like_the_voice_changer(qapp, app_dir, monkeypatch):
     from soundboard.voicefx import VoiceChain
     bare = AiVoicePanel(AiVoiceController(VoiceChain(), lambda e: None), {}, [])
     try:
-        assert not bare.b_start.isEnabled() and bare.power_label.text() == "Off"
+        assert not bare.b_start.isEnabled() and bare.b_start.text() == "Off"
         assert bare.b_start.toolTip() == bare.lbl_missing.text() != ""
     finally:
         bare.deleteLater()
@@ -361,7 +361,7 @@ def test_card_works_like_the_voice_changer(qapp, app_dir, monkeypatch):
     try:
         assert p.b_start.isEnabled() and p.lbl_state.isHidden() and p.picked.isHidden()
         p.b_start.setChecked(True)                    # the switch starts the picked voice
-        assert p.is_on() and p.power_label.text() == "On"
+        assert p.is_on() and p.b_start.text() == "On"
         assert not p.picked.isHidden() and p.picked_name.text() == "Bear"
         assert not p.lbl_state.isHidden()             # starting…: says so under the words
         p.btn_tweak.click()                           # Edit voice: the pitch, in a pop-up
@@ -372,8 +372,13 @@ def test_card_works_like_the_voice_changer(qapp, app_dir, monkeypatch):
         assert all(b.listed for b in p._tile.values()) and p.make_tile.listed
         assert p.view_toggle.view() == "list"
         p.b_start.setChecked(False)
-        assert not p.is_on() and p.power_label.text() == "Off"
+        assert not p.is_on() and p.b_start.text() == "Off"
         assert p.picked.isHidden() and p.lbl_state.isHidden()
         assert not any(b.isChecked() for b in p._tile.values())
+        p._tile["bear"].click()                       # a card: on with that voice
+        assert p.is_on() and p._tile["bear"].isChecked() and p.b_start.text() == "On"
+        p._tile["bear"].click()                       # the lit one again: off
+        assert not p.is_on() and not p._tile["bear"].isChecked()
+        assert p.b_start.text() == "Off" and p.picked.isHidden()
     finally:
         p.deleteLater()

@@ -135,10 +135,10 @@ def test_power_switch(panel):
     p, _ = panel
     seen = []
     p.fx_changed.connect(seen.append)
-    assert not p.fx.btn_power.isChecked() and p.fx.power_label.text() == "Off"
+    assert not p.fx.btn_power.isChecked() and p.fx.btn_power.text() == "Off"
     assert "OFF" in p.fx.btn_power.accessibleName()
     p.fx.pick("Deep voice")                  # picking a voice turns it on
-    assert p.fx.btn_power.isChecked() and p.fx.power_label.text() == "On"
+    assert p.fx.btn_power.isChecked() and p.fx.btn_power.text() == "On"
     assert "ON" in p.fx.btn_power.accessibleName()
     assert p.fx._tile["Deep voice"].isChecked()
     p.fx.btn_power.setChecked(False)         # the switch turns it off, voice kept
@@ -1974,3 +1974,17 @@ def test_ai_voices_card_has_the_voice_changers_switch_bar_and_view(panel, qapp, 
     assert not p.fx._listed and not p.ai._listed and p.ai.view_toggle.view() == "grid"
     p.set_view("list")
     assert p.fx._listed and p.ai._listed
+
+
+def test_clicking_the_lit_voice_again_turns_the_voice_changer_off(panel):
+    """A second click on the voice that's on turns it off; another voice switches."""
+    p, eng = panel
+    p.fx._tile["Robot"].click()
+    assert p.fx.btn_power.isChecked() and p.fx.btn_power.text() == "On"
+    p.fx._tile["Ghost"].click()                 # another one: switches, stays on
+    assert p.fx.btn_power.isChecked() and p.fx.preset == "Ghost"
+    p.fx._tile["Ghost"].click()                 # the lit one again: off
+    assert not p.fx.btn_power.isChecked() and p.fx.btn_power.text() == "Off"
+    assert not p.fx._tile["Ghost"].isChecked() and not eng.voice_chain.enabled
+    p.fx._tile["Ghost"].click()                 # and on again
+    assert p.fx.btn_power.isChecked() and eng.voice_chain.enabled

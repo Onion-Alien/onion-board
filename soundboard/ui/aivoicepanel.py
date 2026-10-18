@@ -2,8 +2,8 @@
 
 The add-on (modules/ai-voices) does the converting in its own process; this card
 installs it, starts and stops it (soundboard.speech.aivoice) and shows how it's
-doing. It looks and works as the voice changer's card: the same on/off switch at the
-top right, the same picture cards (or list) under chips: All (a heading per kind),
+doing. It looks and works as the voice changer's card: the same big ON/OFF switch
+next to its name, the same picture cards (or list) under chips: All (a heading per kind),
 Favorites, Men, Women, In between & fun, Mine. Picking one turns it on, and the voice
 that's on gets the same bar under the cards: Edit voice (its pitch), Make your own
 voice (ui/aivoicebrowser.py), Hear it. Settings
@@ -35,7 +35,7 @@ from soundboard.ui.effectspopup import place_over
 from soundboard.ui.panel import (Flow, UndoBar, ViewToggle, fold_button, hint_label,
                                  section_label)
 from soundboard.ui.voicefxpanel import (LIST_MIN_W, MAX_COLS, PICKED_ART, TILE_ART, TILE_GAP,
-                                        TILE_MIN_W, Switch, VoiceTile)
+                                        TILE_MIN_W, BigSwitch, VoiceTile)
 from soundboard.ui.widgets import LoadingBar
 from soundboard.wheelguard import no_wheel
 
@@ -199,18 +199,15 @@ class AiVoicePanel(QWidget):
         self.title = section_label(_("AI voices"))
         v.addWidget(self.title)
 
-        # ---- the switch, as the voice changer's: the Voice tab puts `head` in its
-        # card's title row, right. Picking a voice turns it on too
-        self.b_start = Switch(_("AI voices"), hover=False)
+        # ---- the big ON/OFF, as the voice changer's: the Voice tab puts `head` right
+        # after its card's name. Picking a voice turns it on too
+        self.b_start = BigSwitch(_("AI voices"))
+        self.b_start.setText(_("Off"))
         self.b_start.toggled.connect(self._toggle)
-        self.power_label = QLabel(_("Off"))
-        self.power_label.setObjectName("muted")
         self.head = QWidget()
         hh = QHBoxLayout(self.head)
         hh.setContentsMargins(0, 0, 0, 0)
-        hh.setSpacing(8)
         hh.addWidget(self.b_start)
-        hh.addWidget(self.power_label)
         self.intro = hint_label(_("Your words and tone, a different voice. Live on this PC."))
         self.intro.setToolTip(_("Talk, and others hear a different person: your words and "
                                  "tone, another voice, live. It runs on this PC (about one "
@@ -615,7 +612,7 @@ class AiVoicePanel(QWidget):
             tags = avl.tag_line(vo)
             about = str(vo.get("about") or vo.get("description") or "")
             b.setToolTip(f"{tags}. {about}" if tags and about else tags or about)
-            b.clicked.connect(lambda __=False, i=vid: self.use(i))
+            b.clicked.connect(lambda __=False, i=vid: self._tile_clicked(i))
             b.star.setChecked(vid in self._favs)
             b.star.toggled.connect(lambda on, i=vid: self.set_favorite(i, on))
             if avl.is_mine(vo):
@@ -761,6 +758,14 @@ class AiVoicePanel(QWidget):
         if self.tweak_pop is None:
             self.tweak_pop = EditPopup(self)
         self.tweak_pop.open_for(self.btn_tweak)
+
+    def _tile_clicked(self, vid: str):
+        """A voice card: that voice, on; the one that's on already: off (as the voice
+        changer's cards)."""
+        if self.is_on() and vid == self.current_voice():
+            self.stop()
+            return
+        self.use(vid)
 
     def use(self, vid: str):
         """A card was clicked: that voice, on now (like the voice changer's cards)."""
@@ -949,7 +954,7 @@ class AiVoicePanel(QWidget):
         self.b_start.blockSignals(True)
         self.b_start.setChecked(on)
         self.b_start.blockSignals(False)
-        self.power_label.setText(_("On") if on else _("Off"))
+        self.b_start.setText(_("On") if on else _("Off"))
         self._mark_tile()
         self.b_update.setEnabled(not on)
         self._state(state)
