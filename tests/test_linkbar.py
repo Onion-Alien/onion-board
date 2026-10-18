@@ -361,3 +361,18 @@ def test_the_switched_off_line_follows_the_switches(qapp):
         assert bar.info.text() == "" and not bar._shown
     finally:
         net.configure_features()
+
+
+def test_play_now_plays_over_a_link_playing_and_play_once_waits(qapp):
+    """The Store's Play: over the link that's playing, not after it (its Play next is
+    Play once: Up next)."""
+    bar, eng = _bar()
+    data = np.zeros((480, 2), np.int16)
+    bar._got = (URL, None, data, 1.0)
+    eng.now = {"__link__": (0.3, False)}   # another link plays
+    bar.play_once()
+    assert eng.played == [] and bar.up_next() == ["Link"]
+    bar.drop_up_next()
+    bar.play_now()
+    assert eng.played == [("__link__", 480, 1.0)] and bar.up_next() == []
+    assert bar.playing_url == URL

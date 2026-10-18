@@ -90,6 +90,8 @@ class LinkBar(QFrame):
         # (title, int16 audio, gain, url) of Plays that finished downloading while
         # another link was playing: they wait their turn instead of cutting it off
         self._up_next: list[tuple] = []
+        self._now = ""                # a link whose Play plays over the one playing (play_now)
+        self.playing_url = ""         # the link the player last started
         # is one of the board's own songs playing? (MainWindow sets it): a Play waits
         # for it too, it never plays over it
         self.board_busy: Callable[[], bool] = lambda: False
@@ -260,6 +262,16 @@ class LinkBar(QFrame):
         self._start("play")
         return True
 
+    def play_now(self) -> bool:
+        """Play it now: over a link that's playing, not after it (Play once queues). A
+        download already running for another link finishes first, then this one's goes."""
+        if not self.url:
+            return False
+        self._now = self.url
+        ok = self.play_once()
+        self.move_to_front(self.url)
+        return ok
+
     def _queue_same(self, kind: str):
         """Add and Play on the link that's downloading: the other one runs after it."""
         self._queued = kind
@@ -421,6 +433,9 @@ class LinkBar(QFrame):
         title = self.title if title is None else title
         gain = gain if self.cfg.level_volumes else 1.0
         url = url or self.url
+        if url == self._now:   # (play_now) it takes the player's place at once
+            self._now = ""
+            return self._start_playing(data, gain, title, url)
         if self._in_player() or self._up_next or self.board_busy():
             # another link or one of your sounds is playing (or paused): never play over
             # it, play this after it
@@ -489,6 +504,7 @@ class LinkBar(QFrame):
             busy.toast(self, html.escape(_("No audio device is open, pick one in Setup.")),
                        "warn")
             return False
+        self.playing_url = url
         self.played.emit(title or _("Link"), data, gain, url)
         if title == self.title:
             name = html.escape(title or _("it"))

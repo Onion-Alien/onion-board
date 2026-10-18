@@ -14,8 +14,8 @@ from pathlib import Path
 
 from PySide6.QtCore import QEvent, QPoint, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QFileDialog, QHBoxLayout,
-                               QLabel, QLineEdit, QMenu, QPushButton, QScrollArea,
+from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QFileDialog, QGridLayout,
+                               QHBoxLayout, QLabel, QLineEdit, QMenu, QPushButton, QScrollArea,
                                QSizePolicy, QStackedWidget, QVBoxLayout, QWidget)
 
 from soundboard import errors, library, net, store, usage, wheelguard
@@ -30,13 +30,13 @@ log = logging.getLogger(__name__)
 
 PREVIEW = "__store_preview"   # the store's "hear it first" voice (headphones only)
 SEARCH_WAIT_MS = 400          # typing pauses this long before the store is searched
-ROW_MAX_W = 820               # the list stays a readable column, centred, on a wide window
+ROW_MAX_W = 1060              # the cards stay a column, centred, on a wide window
 COUNT_W = "9.9k"              # the widest vote count kept room for
-PLAY_ROOM = 520               # a narrower list shows no play button (its picture plays)
-LIST_GAP = 8                  # between the rows and the scroll bar (DESIGN.md, *Breathing room*)
-CAT_W = 110                   # the table's Category column
-ADDED_W = 100                 # its Added column ("3 days ago")
+CARD_MIN_W = 400              # a card's narrowest: two side by side when two fit
+CARD_GAP = 8                  # between the cards
+LIST_GAP = 8                  # between the cards and the scroll bar (DESIGN.md, *Breathing room*)
 ONE_ROW = 720                 # a narrower tab puts the toolbar on two rows
+LINK_TICK_MS = 250            # how often the cards look at what the player is doing
 
 
 def meta_line(s: store.Sound) -> str:
@@ -56,95 +56,145 @@ def count_text(n: int) -> str:
     return f"{n / 1000:.1f}k".replace(".0k", "k") if n >= 1000 else str(n)
 
 
-def add_cells(row, cat: str, created: int):
-    """A sound's or voice's row gets the table's Category and Added columns, just before
-    its votes."""
-    h = row.layout()
-    row.cell_cat = QLabel(cat)
-    row.cell_cat.setTextFormat(Qt.TextFormat.PlainText)
-    row.cell_cat.setFixedWidth(CAT_W)
-    row.cell_added = QLabel(ago(created) if created else "")
-    row.cell_added.setFixedWidth(ADDED_W)
-    row.cell_added.setAlignment(Qt.AlignmentFlag.AlignCenter)
-    for lbl in (row.cell_cat, row.cell_added):
-        lbl.setObjectName("hint")
-    i = h.indexOf(row.btn_up)
-    h.insertWidget(i, row.cell_added)
-    h.insertWidget(i, row.cell_cat)
-
-
 class SoundRow(HoverCard):
-    """One sound: play it, vote on it, add it to your board, or report it."""
-    cell_cat: QLabel     # the table's Category and Added columns (add_cells)
-    cell_added: QLabel
+    """One sound's card: its picture, name and votes, where it's from and when it came,
+    then Play, Stop, Play next, Add and Report. A link's Play plays it now (over a link
+    that's playing) and turns Pause while it plays; Play next waits for what's playing."""
 
     def __init__(self, s: store.Sound, tab: StoreTab):
         super().__init__()
+        self._build(s, tab, meta_line(s), self.btn_play_tip(s), _("Add it to your Sounds"),
+                    _("Report this sound"))
+        self.btn_queue.setVisible(s.is_link)   # (a file of the store's plays to you only)
+
+    def _build(self, s, tab, meta: str, play_tip: str, add_tip: str, report_tip: str):
+        """The card's parts (a voice's card too: storevoices.VoiceRow)."""
         self.sound = s
-        self.setMaximumWidth(ROW_MAX_W)
-        h = QHBoxLayout(self)
-        h.setContentsMargins(8, 8, 12, 8)
-        h.setSpacing(8)
-        # its picture: an emoji for what it is, on its category's colour
+        self.state = ""   # its link in the player: "", "loading", "playing", "paused"
+        self._compact = False
+        self._play_tip = play_tip
+        g = QGridLayout(self)
+        g.setContentsMargins(10, 10, 10, 10)
+        g.setHorizontalSpacing(10)
+        g.setVerticalSpacing(4)
+        # its picture: an emoji for what it is, on its category's colour (a click plays)
         self.tile = storelook.SoundTile(s, lambda: self.btn_play.click())
-        self.tile.setToolTip(self.btn_play_tip(s))
-        h.addWidget(self.tile)
-        self.btn_play = icon_button("play", self.btn_play_tip(s))
-        self.btn_play.setCheckable(True)
-        icons.set_icon(self.btn_play, "play", checked_color="accent")   # (playing_look)
-        self.btn_play.setFixedSize(32, 32)
-        self.btn_play.toggled.connect(lambda on: tab.hear(self, on))
-        h.addWidget(self.btn_play)
-        words = QVBoxLayout()
-        words.setSpacing(0)
-        # one line each, ending in "…" when the row is narrow (the whole text on hover)
+        self.tile.setToolTip(play_tip)
+        g.addWidget(self.tile, 0, 0, 2, 1, Qt.AlignmentFlag.AlignTop)
+        # the name and the votes; where it's from, then its category and when it came
+        # (one line each, ending in "…" when the card is narrow: the whole text on hover)
         self.name = ClampLabel(s.name, lines=1)
         self.name.set_full(s.name, s.name)
-        meta = meta_line(s)
         self.meta = ClampLabel(meta, lines=1, bold=False)
         self.meta.setObjectName("hint")
         self.meta.set_full(meta, meta)
-        for lbl in (self.name, self.meta):
+        for lbl in (self.name, self.meta):   # (they paint their text: never markup)
             lbl.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
             lbl.setMinimumWidth(40)
-        words.addWidget(self.name)
-        words.addWidget(self.meta)
-        h.addLayout(words, 1)
+        self.where = QLabel()
+        self.where.setObjectName("hint")
+        self.where.setTextFormat(Qt.TextFormat.PlainText)
         self.btn_up = self._vote_button("like", _("I like it"))
         self.btn_up.clicked.connect(lambda: tab.vote(self, 1))
         self.btn_down = self._vote_button("dislike", _("Not for me"))
         self.btn_down.clicked.connect(lambda: tab.vote(self, -1))
-        h.addWidget(self.btn_up)
-        h.addWidget(self.btn_down)
-        self.btn_add = icon_button("plus", _("Add it to your Sounds"), quiet=False)
-        self.btn_add.setFixedSize(32, 32)
+        top = QHBoxLayout()
+        top.setSpacing(4)
+        top.addWidget(self.name, 1)
+        top.addWidget(self.btn_up)
+        top.addWidget(self.btn_down)
+        g.addLayout(top, 0, 1)
+        mid = QHBoxLayout()
+        mid.setSpacing(8)
+        mid.addWidget(self.meta, 1)
+        mid.addWidget(self.where)
+        g.addLayout(mid, 1, 1)
+        # what you can do with it
+        self.btn_play = QPushButton(_("Play"))
+        self.btn_play.setCheckable(True)   # (switched on while it plays)
+        self.btn_play.setToolTip(play_tip)
+        self.btn_play.setAccessibleName(_("Play"))
+        icons.set_icon(self.btn_play, "play", "text", "on_accent")
+        self.btn_play.clicked.connect(lambda: tab.play_clicked(self))
+        self.btn_stop = icon_button("stop", _("Stop"), quiet=False)
+        self.btn_stop.setFixedSize(32, 32)
+        self.btn_stop.clicked.connect(lambda: tab.stop_clicked(self))
+        self.btn_stop.hide()   # (while its link plays)
+        self.btn_queue = QPushButton(_("Play next"))
+        self.btn_queue.setToolTip(_("Queue: waits for the sounds playing to finish"))
+        self.btn_queue.setAccessibleName(_("Play next"))
+        icons.set_icon(self.btn_queue, "next")
+        self.btn_queue.clicked.connect(lambda: tab.queue(self))
+        self.btn_add = QPushButton(_("Add"))
+        self.btn_add.setToolTip(add_tip)
+        self.btn_add.setAccessibleName(add_tip)
+        icons.set_icon(self.btn_add, "plus")
         self.btn_add.clicked.connect(lambda: tab.add(self))
-        h.addWidget(self.btn_add)
-        self.btn_report = icon_button("flag", _("Report this sound"))
+        self.btn_report = icon_button("flag", report_tip)
         self.btn_report.clicked.connect(lambda: tab.report_menu(self))
-        h.addWidget(self.btn_report)
+        acts = QHBoxLayout()
+        acts.setSpacing(6)
+        for b in (self.btn_play, self.btn_stop, self.btn_queue, self.btn_add):
+            acts.addWidget(b)
+        acts.addStretch(1)
+        acts.addWidget(self.btn_report)
+        g.addLayout(acts, 2, 0, 1, 2)
+        g.setColumnStretch(1, 1)
         self.show_votes()
 
-    def show_play(self, wide: bool):
-        """Narrow (the smallest window): the picture is the play button, so the name
-        keeps some room and Report stays on the row. The list decides, from its own
-        width: the row's can't go below its play button's room."""
-        if self.btn_play.isVisibleTo(self) != wide:
-            self.btn_play.setVisible(wide)
-            self.tile.set_badge(not wide)
+    def set_where(self, cat: str, created: int):
+        """Its category and when it came: "Memes · 3 days ago"."""
+        self.where.setText(" · ".join(w for w in (cat, ago(created) if created else "") if w))
+
+    def compact(self, on: bool):
+        """A narrow card: Play, Play next and Add show their pictures only (the words
+        their tooltips), so Report never goes past the card's edge."""
+        if on == self._compact:
+            return
+        self._compact = on
+        for b, text in ((self.btn_play, self._play_word()), (self.btn_queue, _("Play next")),
+                        (self.btn_add, _("Add"))):
+            b.setText("" if on else text)
+        self.btn_queue.setToolTip(_("Play next") if on
+                                  else _("Queue: waits for the sounds playing to finish"))
 
     @staticmethod
     def btn_play_tip(s: store.Sound) -> str:
-        return _("Play it once (from the site)") if s.is_link else _("Hear it (only you)")
+        return _("Play it now") if s.is_link else _("Hear it (only you)")
+
+    def _play_word(self) -> str:
+        if self.state == "playing":
+            return _("Pause")
+        if self.state == "paused":
+            return _("Resume")
+        return _("Stop") if self.btn_play.isChecked() and not self.state else _("Play")
 
     def playing_look(self, on: bool):
-        """Play turned stop (and the picture's bars bounce) while its sample plays. The
-        switched-on button stays clear on the row (a quiet icon button in a card), so the
-        square is drawn in the accent, as the Apps rows' eye: on_accent there was black on
-        near-black (1.05:1) in Amber Terminal."""
-        icons.set_icon(self.btn_play, "stop" if on else "play", checked_color="accent")
-        self.btn_play.setToolTip(_("Stop") if on else _("Hear it (only you)"))
+        """A sample to your headphones: Play turns Stop (and the picture's bars bounce)
+        while it plays. The switched-on button is drawn in the accent with on_accent ink
+        (a quiet one on the card was black on near-black in Amber Terminal)."""
+        with _blocked(self.btn_play):
+            self.btn_play.setChecked(on)
+        icons.set_icon(self.btn_play, "stop" if on else "play", "text", "on_accent")
+        self.btn_play.setText("" if self._compact else _("Stop") if on else _("Play"))
+        self.btn_play.setToolTip(_("Stop") if on else self._play_tip)
         self.tile.set_playing(on)
+
+    def link_look(self, state: str):
+        """Its link in the player: Play is switched on while it loads and plays, says
+        Pause while it plays and Resume while it's paused, and Stop shows beside it."""
+        self.state = state
+        live = state in ("playing", "paused")
+        with _blocked(self.btn_play):
+            self.btn_play.setChecked(bool(state))
+        icons.set_icon(self.btn_play, "pause" if state == "playing" else "play", "text",
+                       "on_accent")
+        word = self._play_word()
+        self.btn_play.setText("" if self._compact else word)
+        self.btn_play.setToolTip(word if live else self._play_tip)
+        self.btn_play.setAccessibleName(word)
+        self.btn_stop.setVisible(live)
+        self.tile.set_playing(state == "playing")
 
     def _vote_button(self, icon: str, tip: str) -> QPushButton:
         b = QPushButton()
@@ -163,7 +213,7 @@ class SoundRow(HoverCard):
         for b, n, on in ((self.btn_up, s.up, s.mine == 1), (self.btn_down, s.down, s.mine == -1)):
             b.setText(count_text(n))
             b.setChecked(on)
-            if not b.property("steady"):   # room for the widest count, so rows line up
+            if not b.property("steady"):   # room for the widest count, so cards line up
                 b.setProperty("steady", True)
                 was = b.text()
                 b.setText(COUNT_W)
@@ -189,14 +239,17 @@ class StoreTab(QWidget):
                  play: Callable[[object, float], bool], open_privacy: Callable[[], object],
                  save: Callable[[], None] = lambda: None,
                  link: Callable[[str, str, str], None] = lambda url, name, kind: None,
-                 voices=None):
+                 voices=None, link_state: Callable[[str], str] = lambda url: ""):
         super().__init__()
         self.cfg = cfg
         self.voices = voices   # ui.storevoices.VoiceHooks: the Voices list (None: Sounds only)
         self._mode = "sounds"  # or "voices": community voices instead of sounds
         self._kind = ""        # the Voices list's kind ("" all)
         self._save = save
-        self._link = link   # (url, name, "play" / "add"): the window's link downloader
+        # (url, name, kind): the window's link downloader and player. "now" plays it over
+        # a link that's playing, "play" after it, "add"; "pause" (or resume) and "stop"
+        self._link = link
+        self._link_state = link_state   # a link's state in the player (SoundRow.link_look)
         self._add_file = add_file
         self._play = play
         self._open_privacy = open_privacy
@@ -214,6 +267,8 @@ class StoreTab(QWidget):
         self._voted.connect(self._on_voted)
         self._decoded.connect(self._on_decoded)
         self._cats.connect(self._on_cats)
+        self._link_tick = QTimer(self, interval=LINK_TICK_MS)   # (while the tab shows)
+        self._link_tick.timeout.connect(self._follow_links)
         net.on_change(self._net_changed)   # Settings > Privacy's switch, Offline mode
         self._cat = ""            # the category picked ("" all)
 
@@ -322,19 +377,19 @@ class StoreTab(QWidget):
         self._one_row: bool | None = None
         self._lay_toolbar(False)
         col.addWidget(head)
-        # the table's header, over its columns; Added and Votes sort the list (the
-        # words are placed over the first row's cells: _align_head)
+        # the order, over the cards' right edge: Votes (the best voted first) or Added
+        # (the newest first)
         self.table_head = QWidget()
-        self.head_name = QLabel(_("Sound"), self.table_head)
-        self.head_cat = QLabel(_("Category"), self.table_head)
-        for lbl in (self.head_name, self.head_cat):
-            lbl.setObjectName("hint")
-            lbl.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
+        hh = QHBoxLayout(self.table_head)
+        hh.setContentsMargins(0, 0, LIST_GAP, 0)
+        hh.setSpacing(4)
+        hh.addStretch(1)
         self._sort = "top"
         self.sort_btns: dict[str, QPushButton] = {}
-        for key, text, tip in (("new", _("Added"), _("The newest first")),
-                               ("top", _("Votes"), _("The best voted first"))):
-            b = QPushButton(text, self.table_head)
+        for key, text, tip in (("top", _("Votes"), _("The best voted first")),
+                               ("new", _("Added"), _("The newest first"))):
+            b = QPushButton(text)
+            hh.addWidget(b)
             b.setObjectName("small")   # header-sized; the arrow after the words says
             b.setProperty("quiet", True)   # which one sorts (not checkable: no filled pill)
             b.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
@@ -356,8 +411,12 @@ class StoreTab(QWidget):
         scroll.viewport().installEventFilter(self)   # resized: the columns line up again
         body = QWidget()
         self._list = QVBoxLayout(body)
-        self._list.setContentsMargins(0, 0, LIST_GAP, 0)   # rows end before the scroll bar
-        self._list.setSpacing(6)
+        self._list.setContentsMargins(0, 0, LIST_GAP, 0)   # cards end before the scroll bar
+        self._list.setSpacing(CARD_GAP)
+        self._grid = QGridLayout()   # the cards: two a row when two fit (_fit_columns)
+        self._grid.setSpacing(CARD_GAP)
+        self._cols = 0
+        self._list.addLayout(self._grid)
         self._fill_cats([])
         self.btn_more = QPushButton(_("Show more"))
         self.btn_more.clicked.connect(self.more)
@@ -427,6 +486,7 @@ class StoreTab(QWidget):
     def shutdown(self):
         self._closed = True
         self._search_wait.stop()
+        self._link_tick.stop()
         self._stop_preview()
 
     def resizeEvent(self, e):
@@ -540,67 +600,37 @@ class StoreTab(QWidget):
             else:
                 b.setIcon(QIcon())
 
-    def _fit_columns(self):
-        """Every column when the rows fit the list; no Category in a narrower one (the
-        dropdown still picks one); in the smallest no Added either (its header still
-        sorts) and tighter rows, so Report is never under the scroll bar. Measured on the
-        first row, so longer words or other fonts move the steps, never cut a row off.
-        Then the header's words over their columns again."""
+    def _fit_columns(self, force: bool = False):
+        """Two cards side by side when two fit the list, else one. A card narrower than
+        its buttons with their words (measured on the first, so longer words or other
+        fonts move the step, never cut a card off): every card shows their pictures only."""
         if not self._rows:
             return
         w = self.list_area.viewport().width() - LIST_GAP
+        cols = 2 if w >= 2 * CARD_MIN_W + CARD_GAP else 1
+        if force or cols != self._cols:
+            self._cols = cols
+            for r in self._rows:
+                self._grid.removeWidget(r)
+            for i, r in enumerate(self._rows):
+                self._grid.addWidget(r, i // cols, i % cols)
+            for c in range(2):
+                self._grid.setColumnStretch(c, 1 if c < cols else 0)
+        room = (w - CARD_GAP * (cols - 1)) // cols
+        first = self._rows[0]
+        first.compact(False)
+        compact = self._needs(first) > room
         for r in self._rows:
-            r.show_play(w >= PLAY_ROOM)
-        level = 2
-        for level in range(3):
-            self._set_level(self._rows[0], level)
-            if self._needs(self._rows[0]) <= w:
-                break
-        for r in self._rows:
-            self._set_level(r, level)
-        self.head_cat.setVisible(level == 0)
-        self.head_name.setVisible(level < 2)   # (the smallest: Added's header there)
-        QTimer.singleShot(0, self, self._align_head)
-
-    @staticmethod
-    def _set_level(r, level: int):
-        """0: every column, 1: no Category, 2: no Added either, tighter."""
-        r.cell_cat.setVisible(level == 0)
-        r.cell_added.setVisible(level < 2)
-        if (lay := r.layout()) is not None:
-            lay.setSpacing(8 if level < 2 else 4)
-            lay.invalidate()
-        for lbl in (r.name, r.meta):
-            lbl.setMinimumWidth(40 if level < 2 else 28)
+            r.compact(compact)
 
     @staticmethod
     def _needs(r) -> int:
-        """The row's smallest width, as its columns are now (its own frame included)."""
+        """The card's smallest width, as its buttons are now (its own frame included)."""
         lay = r.layout()
+        if lay is not None:
+            lay.invalidate()
         return max(lay.minimumSize().width() if lay is not None else 0,
                    r.minimumSizeHint().width())
-
-    def _align_head(self):
-        """The header's words over the first row's cells (rows and header share one
-        column, so the header follows the rows whatever their width)."""
-        if self._closed or not self._rows:
-            return
-        r = self._rows[0]
-        h = max(b.sizeHint().height() for b in self.sort_btns.values())
-        self.table_head.setFixedHeight(h)
-        head_x = self.table_head.mapTo(self, QPoint(0, 0)).x()
-
-        def x_of(w) -> int:   # (the row's cell, in the header: both mapped to the tab)
-            return w.mapTo(self, QPoint(0, 0)).x() - head_x
-        left = x_of(r.btn_up)
-        # (no Added column: its header just before Votes, over the names' end)
-        added = x_of(r.cell_added) if r.cell_added.isVisible() else left - 8 - ADDED_W
-        end = x_of(r.cell_cat) if r.cell_cat.isVisible() else added
-        self.head_name.setGeometry(x_of(r.tile), 0, max(0, end - x_of(r.tile) - 8), h)
-        self.head_cat.setGeometry(x_of(r.cell_cat), 0, CAT_W, h)
-        self.sort_btns["new"].setGeometry(added, 0, ADDED_W, h)
-        self.sort_btns["top"].setGeometry(left, 0, x_of(r.btn_down) + r.btn_down.width() - left,
-                                          h)
 
     def showEvent(self, e):
         super().showEvent(e)
@@ -609,6 +639,7 @@ class StoreTab(QWidget):
         if not self._loaded or (self._off and net.allowed(store.FEATURE)):
             self._loaded = True
             QTimer.singleShot(0, self, self.reload)
+        self._link_tick.start()
 
     def _net_changed(self):
         QTimer.singleShot(0, self, self._follow_switch)   # (any thread)
@@ -628,7 +659,8 @@ class StoreTab(QWidget):
                            key="store-switch")
 
     def hideEvent(self, e):
-        self._stop_preview()   # another tab: the sample stops
+        self._stop_preview()   # another tab: the sample stops (a link plays on)
+        self._link_tick.stop()
         super().hideEvent(e)
 
     # ------------------------------------------------------------------ the list
@@ -670,7 +702,6 @@ class StoreTab(QWidget):
         self._share_look()
         self.search.setPlaceholderText(_("Search the voices") if voices
                                        else _("Search sounds"))
-        self.head_name.setText(_("Voice") if voices else _("Sound"))
         self._show_cats()
         self.reload()
 
@@ -829,15 +860,14 @@ class StoreTab(QWidget):
             self._clear()
         self._offset += len(found)
         from soundboard.storevoices import Voice
-        from soundboard.ui.storevoices import VoiceRow, kind_name
+        from soundboard.ui.storevoices import VoiceRow
         for s in found:
             if isinstance(s, Voice):
                 r = VoiceRow(s, self)
-                add_cells(r, kind_name(s.kind), s.created)
+                r.set_where("", s.created)   # (its kind starts its second line)
             else:
                 r = SoundRow(s, self)
-                add_cells(r, store.cat_name(s.cat), s.created)
-            self._list.insertWidget(self._list.indexOf(self.btn_more), r)
+                r.set_where(store.cat_name(s.cat), s.created)
             self._rows.append(r)
         self.btn_more.setVisible(more)
         if not self._rows:
@@ -867,14 +897,22 @@ class StoreTab(QWidget):
         self._fit_buns()
         self.stack.setCurrentWidget(self.list_area)
         self.table_head.show()
-        self._fit_columns()
+        self._fit_columns(force=True)
+        self._follow_links()
+        if replace:   # a new list starts at its top (the order bar coming in above it
+            QTimer.singleShot(0, self, self._to_top)   # moved it: _hold_rows followed)
+
+    def _to_top(self):
+        self._list_top = None
+        self.list_area.verticalScrollBar().setValue(0)
 
     def _clear(self):
         self._stop_preview()
         for r in self._rows:
-            self._list.removeWidget(r)
+            self._grid.removeWidget(r)
             r.deleteLater()
         self._rows.clear()
+        self._cols = 0
         self.btn_more.hide()
 
     def _row_alive(self, row: SoundRow) -> bool:
@@ -956,6 +994,53 @@ class StoreTab(QWidget):
                 busy.emit(self._decoded, row, None, 1.0, serial)
         threading.Thread(target=run, daemon=True, name="store-voice-sample").start()
 
+    def _is_link(self, row) -> bool:
+        return not self._is_voice(row) and row.sound.is_link
+
+    def play_clicked(self, row: SoundRow):
+        """The card's Play. A link (from its site, as a search hit): played now, over a
+        link that's playing; while it plays, Pause (and Resume). Else its sample, to you."""
+        if not self._is_link(row):
+            self.hear(row, row is not self._playing)
+            return
+        s = row.sound
+        state = self._link_state(s.link)
+        if state in ("playing", "paused"):
+            self._link(s.link, s.name, "pause")
+        elif state != "loading":
+            self._stop_preview()
+            usage.used("store-heard")
+            self._link(s.link, s.name, "now")
+        self._follow_links()
+        if not row.state:   # (the click switched it on: off until the player has it)
+            row.link_look("")
+
+    def stop_clicked(self, row: SoundRow):
+        if self._is_link(row):
+            self._link(row.sound.link, row.sound.name, "stop")
+            self._follow_links()
+        else:
+            self._stop_preview()
+
+    def queue(self, row: SoundRow):
+        """Play next: a link plays after what's playing (Up next), at once if nothing is."""
+        if self._is_link(row):
+            self._stop_preview()
+            usage.used("store-heard")
+            self._link(row.sound.link, row.sound.name, "play")
+            self._follow_links()
+
+    def _follow_links(self):
+        """Every link card shows what the player is doing with it (the bottom strip and
+        Up next stop, pause and start it too)."""
+        if self._closed:
+            return
+        for r in self._rows:
+            if self._is_link(r):
+                state = self._link_state(r.sound.link)
+                if state != r.state:
+                    r.link_look(state)
+
     def hear(self, row: SoundRow, on: bool):
         if self._is_voice(row):
             if self._playing is not None and self._playing is not row:
@@ -967,14 +1052,6 @@ class StoreTab(QWidget):
             self._playing = row
             row.playing_look(True)
             self._hear_voice(row)
-            return
-        if row.sound.is_link:   # the site's own download, played once (as a search hit)
-            with _blocked(row.btn_play):
-                row.btn_play.setChecked(False)
-            if on:
-                self._stop_preview()
-                usage.used("store-heard")
-                self._link(row.sound.link, row.sound.name, "play")
             return
         if self._playing is not None and self._playing is not row:
             self._stop_preview()

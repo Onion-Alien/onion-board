@@ -9,7 +9,6 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from PySide6.QtCore import QPoint
 from conftest import process_events
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 
@@ -479,7 +478,7 @@ def test_a_link_row_goes_through_the_link_downloader(qapp, fake):
     r = t._rows[0]
     r.btn_play.click()
     r.btn_add.click()
-    assert links == [("https://youtube.com/watch?v=abc", "Clip", "play"),
+    assert links == [("https://youtube.com/watch?v=abc", "Clip", "now"),
                      ("https://youtube.com/watch?v=abc", "Clip", "add")]
     assert not r.btn_play.isChecked()   # (nothing plays in the tab itself)
     assert not any(c[1].endswith("/file") for c in fake.calls)
@@ -566,38 +565,68 @@ def test_no_categories_only_all(qapp, fake):
     t.shutdown()
 
 
-def test_the_table_header_sits_over_its_columns(qapp, fake):
+def test_cards_go_two_a_row_when_two_fit(qapp, fake):
     fake.sounds = {f"{i:012x}": _sound(i, cat="games", created=int(time.time()) - 3 * 86400)
-                   for i in (1, 2)}
+                   for i in (1, 2, 3)}
     t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
-    # wide: every column; narrower: no Category; the smallest: no Added either (its
-    # header still sorts, just before Votes)
-    for width, cat_shown, added_shown in ((800, True, True), (620, False, True),
-                                          (420, False, False)):
-        t.resize(width, 700)
-        t.show()
-        assert _wait(qapp, lambda: len(t._rows) == 2 and t.table_head.isVisible())
-        process_events(qapp, lambda: False, timeout=0.3)
-        r, head = t._rows[0], t.table_head
-
-        def x_of(w, head=head):
-            return w.mapTo(t, QPoint(0, 0)).x() - head.mapTo(t, QPoint(0, 0)).x()
-        assert r.cell_added.text() == "3 days ago" and r.cell_cat.text() == "Games"
-        assert r.cell_cat.isVisible() is cat_shown and t.head_cat.isVisible() is cat_shown
-        assert r.cell_added.isVisible() is added_shown and t.sort_btns["new"].isVisible()
-        assert t.sort_btns["top"].x() == x_of(r.btn_up)
-        assert r.width() <= t.list_area.viewport().width() - storetab.LIST_GAP   # nothing cut off
-        if added_shown:
-            assert t.sort_btns["new"].x() == x_of(r.cell_added)
-        else:
-            assert t.sort_btns["new"].geometry().right() < x_of(r.btn_up)
-        if cat_shown:
-            assert t.head_cat.x() == x_of(r.cell_cat)
-    # every width in between: a row never wider than the list (no column cut off)
-    for width in range(900, 419, -20):   # (down to the smallest window's tab)
+    t.resize(1100, 700)
+    t.show()
+    assert _wait(qapp, lambda: len(t._rows) == 3 and t.table_head.isVisible())
+    process_events(qapp, lambda: False, timeout=0.3)
+    a, b, c = t._rows
+    assert a.where.text() == "Games · 3 days ago"
+    assert a.y() == b.y() and b.x() > a.x() and c.y() > a.y()   # two a row
+    assert a.btn_play.text() and a.btn_add.text()
+    t.resize(620, 700)
+    process_events(qapp, lambda: False, timeout=0.3)
+    assert a.x() == b.x() and b.y() > a.y()   # one a row
+    # every width down to the smallest window's tab: a card never wider than the list,
+    # its buttons' words going (their pictures stay) before Report would be cut off
+    for width in range(1100, 419, -20):
         t.resize(width, 700)
         process_events(qapp, lambda: False, timeout=0.05)
-        assert t._rows[0].width() <= t.list_area.viewport().width() - storetab.LIST_GAP, width
+        room = t.list_area.viewport().width() - storetab.LIST_GAP
+        for r in t._rows:
+            assert r.geometry().right() < room, width
+            assert r.btn_report.mapTo(r, r.btn_report.rect().topRight()).x() < r.width(), width
+    t.shutdown()
+
+
+def test_a_link_card_plays_now_pauses_stops_and_queues(qapp, fake):
+    """Play plays a link now (over one that's playing), then turns Pause, Resume while
+    it's paused, with Stop beside it; Play next waits for what's playing. The card follows
+    the player, which the bottom strip stops and pauses too."""
+    url = "https://www.myinstants.com/en/instant/bruh/"
+    fake.sounds = {f"{9:012x}": _sound(9, ext="link", link=url, name="BRUH")}
+    links, state = [], {"now": ""}
+    t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None,
+                          link=lambda u, name, kind: links.append(kind),
+                          link_state=lambda u: state["now"] if u == url else "")
+    t.show()
+    assert _wait(qapp, lambda: len(t._rows) == 1)
+    r = t._rows[0]
+    assert r.btn_queue.isVisibleTo(r) and not r.btn_stop.isVisibleTo(r)
+    r.btn_play.click()
+    assert links == ["now"] and not r.btn_play.isChecked()
+    state["now"] = "loading"
+    assert _wait(qapp, lambda: r.btn_play.isChecked())
+    r.btn_play.click()   # (still downloading: nothing more)
+    assert links == ["now"]
+    state["now"] = "playing"
+    assert _wait(qapp, lambda: r.btn_stop.isVisibleTo(r))
+    assert r.btn_play.text() == "Pause" and r.tile.playing
+    r.btn_play.click()
+    assert links[-1] == "pause"
+    state["now"] = "paused"
+    assert _wait(qapp, lambda: r.btn_play.text() == "Resume")
+    assert not r.tile.playing
+    r.btn_stop.click()
+    assert links[-1] == "stop"
+    state["now"] = ""   # (stopped, or ended)
+    assert _wait(qapp, lambda: not r.btn_stop.isVisibleTo(r))
+    assert r.btn_play.text() == "Play" and not r.btn_play.isChecked()
+    r.btn_queue.click()
+    assert links[-1] == "play"
     t.shutdown()
 
 
@@ -625,7 +654,7 @@ def test_a_sound_from_myinstants_is_voted_on_and_comes_from_the_site(qapp, fake)
     t.show()
     assert _wait(qapp, lambda: len(t._rows) == 1)
     r = t._rows[0]
-    assert r.meta.full == "From Myinstants" and r.cell_cat.text() == "Memes"
+    assert r.meta.full == "From Myinstants" and r.where.text().startswith("Memes")
     assert r.btn_up.isVisibleTo(r) and r.btn_report.isVisibleTo(r)
     r.btn_up.click()
     assert _wait(qapp, lambda: any(c[1].endswith("/vote") for c in fake.calls))
@@ -692,8 +721,8 @@ def test_every_sound_gets_a_picture_from_its_name_tags_or_category():
 
 
 def test_a_row_plays_from_its_picture_and_shows_it_playing(qapp, fake):
-    """A click on a row's picture is its play; while the sample plays the picture's bars
-    bounce, and a narrow row keeps only the picture as its play button."""
+    """A click on a card's picture is its play; while the sample plays the picture's
+    bars bounce."""
     from PySide6.QtCore import QPointF, Qt
     from PySide6.QtGui import QMouseEvent
     added, played = [], []
@@ -708,12 +737,6 @@ def test_a_row_plays_from_its_picture_and_shows_it_playing(qapp, fake):
     assert _wait(qapp, lambda: played and played[-1] is not None)
     t._stop_preview()
     assert not r.tile.playing and not r.btn_play.isChecked()
-    t.resize(440, 600)
-    assert _wait(qapp, lambda: not r.btn_play.isVisibleTo(r))
-    assert r.tile._badge
-    t.resize(900, 600)
-    assert _wait(qapp, lambda: r.btn_play.isVisibleTo(r))
-    assert not r.tile._badge
     t.shutdown()
 
 
