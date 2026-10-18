@@ -334,7 +334,7 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             *(f"splash-{k}" for k in SPLASH_RARES), "bun-talk", "hoot-talk",
             # a game run as admin in front with hotkeys set: the note, its Restart as admin
             "admin-game", "admin-restart",
-            # the red "didn't work" card (ui/oops.py): Try again, Report a problem
+            # the red "didn't work" card (ui/kit/oops.py): Try again, Report a problem
             "oops-retry", "oops-report",
             # the Community tab's "store's down" page, and its down-for-maintenance one; a
             # web search's site down or turning requests away
@@ -359,7 +359,7 @@ ROUTES = ("cable", "device", "off", "mic")   # library.ROUTES
 # the Apps tab's own categories (ui/approw.py APP_CATEGORIES + "Other"): any other
 # name in Config.apps_categories is one the user made (counted as apps-own-categories)
 APPS_BUILT_IN = ("Browsers", "Music & media", "Calls & chat", "Games", "Other")
-# the feedback box's "What would you improve?" picks (ui/feedbackdialog.py)
+# the feedback box's "What would you improve?" picks (ui/kit/feedbackdialog.py)
 IMPROVE = ("sounds", "setup", "voice-chat", "voice-changer", "speed", "looks", "bugs",
            "other")
 OTHER_MAX = 100   # characters of what was typed under Other, as dashed words

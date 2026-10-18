@@ -608,7 +608,7 @@ class SetupWizard(QDialog):
         starts on the cable step and welcomes them back."""
         super().__init__(win)
         self._resumed = resumed
-        fit.watch(self)   # grows to fit its text (ui/fit.py)
+        fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
         self.win = win
         self.setWindowTitle(_("Onion Board: quick setup"))
         # as wide as a row of tiles plus the margins: the tiles' right edge lines up
@@ -2205,7 +2205,7 @@ class SteamGuide(QDialog):
 
     def __init__(self, parent, mic_name: str):
         super().__init__(parent)
-        fit.watch(self)   # grows to fit its text (ui/fit.py)
+        fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
         self.setWindowTitle(_("Steam games: set your mic"))
         self.setMinimumWidth(600)
         v = QVBoxLayout(self)

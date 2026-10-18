@@ -34,7 +34,7 @@ INPUT_MIN = 360     # an ask-for-a-name box's width
 
 
 def badge(name: str, tone: str, ratio: float = 1.0) -> QPixmap:
-    """`name` (ui/icons.py) in the theme's `tone` on a circle of the same tone, faint."""
+    """`name` (ui/kit/icons.py) in the theme's `tone` on a circle of the same tone, faint."""
     from soundboard.ui.kit import theme
     from soundboard.ui.kit import icons
     col = QColor(theme.T.get(tone, tone))

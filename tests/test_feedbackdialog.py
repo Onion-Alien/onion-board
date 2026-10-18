@@ -1,4 +1,4 @@
-"""Send feedback's "What would you improve?" box (ui/feedbackdialog.py) and what it
+"""Send feedback's "What would you improve?" box (ui/kit/feedbackdialog.py) and what it
 sends (usage.improve / other_tag)."""
 from types import SimpleNamespace
 

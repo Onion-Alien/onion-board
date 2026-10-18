@@ -163,7 +163,7 @@ class MainWindow(QMainWindow):
     apps: Any
     _attach_release: Any
     _attaching: bool
-    attach_glow: Any   # ui/glow.py Glow on btn_attach
+    attach_glow: Any   # ui/kit/glow.py Glow on btn_attach
     _banner_fx: QGraphicsOpacityEffect
     _body_lay: Any
     btn_about: QPushButton
@@ -173,7 +173,7 @@ class MainWindow(QMainWindow):
     btn_bin: QPushButton
     btn_cablefix: QPushButton
     _cable_started: bool   # Install the free virtual cable was clicked (check again shows)
-    install_glow: Any      # ui/glow.py Glow on btn_install (the mic route's main button)
+    install_glow: Any      # ui/kit/glow.py Glow on btn_install (the mic route's main button)
     ways_or: Any           # the "or" before the cable's buttons on the Setup tab
     btn_chat: QPushButton
     btn_check: QPushButton
@@ -828,7 +828,7 @@ class MainWindow(QMainWindow):
         return None if bar is None else bar.mapTo(self, QPoint(0, 0)).y()
 
     def toast_mode(self) -> str:
-        """How the corner cards show (ui/toast.py): as cards in the window; as icons on
+        """How the corner cards show (ui/kit/toast.py): as cards in the window; as icons on
         top of the mini player's pads; not at all in the mini player with no pads (a
         remote: errors wait for the window to grow)."""
         if not self.fitctl.is_mini():

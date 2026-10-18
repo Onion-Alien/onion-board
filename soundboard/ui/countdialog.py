@@ -30,7 +30,7 @@ def rows() -> list[tuple[str, str, str]]:
 class CountDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        fit.watch(self)   # grows to fit its text (ui/fit.py)
+        fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
         self.setWindowTitle(_("What Count me in sends"))
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         v = QVBoxLayout(self)

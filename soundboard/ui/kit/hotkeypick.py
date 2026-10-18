@@ -102,7 +102,7 @@ class HotkeyDialog(QDialog):
 
     def __init__(self, hotkeys: Hotkeys, parent=None, pads: bool = True):
         super().__init__(parent)
-        fit.watch(self)   # grows to fit its text (ui/fit.py)
+        fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
         self.setWindowTitle(_("Set hotkey"))
         self.result_combo = None
         self._midi = hotkeys.midi if pads else None

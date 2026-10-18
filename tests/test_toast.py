@@ -1,4 +1,4 @@
-"""Toasts (ui/toast.py), the import's summary and See why (ui/importreport.py), and the
+"""Toasts (ui/kit/toast.py), the import's summary and See why (ui/importreport.py), and the
 drop veil (ui/dropveil.py)."""
 import numpy as np
 import pytest

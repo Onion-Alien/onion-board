@@ -377,7 +377,7 @@ def _enable(w, on: bool, why: str = ""):
     w.setToolTip(w.property("_tip") if on or not why else why)
 
 
-# the app's own line icons (ui/icons.py), like everywhere else
+# the app's own line icons (ui/kit/icons.py), like everywhere else
 FX_ICONS = {"cleanup": "shield", "pitch": "mic", "growl": "wave", "robot": "keyboard",
             "compressor": "volume", "tone": "sliders", "radio": "radio", "distortion": "live",
             "shout": "speech", "helmet": "voice", "chorus": "shuffle", "echo": "history",

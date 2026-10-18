@@ -133,7 +133,7 @@ class BunControl(Controller):
         return True
 
     def toast_seen(self, text: str, kind: str):
-        """Every toast on the window (ui/toast.py): Bun says it while he's up."""
+        """Every toast on the window (ui/kit/toast.py): Bun says it while he's up."""
         b = self.bun_mode
         if b is not None and b.isVisible():
             b.say(text, kind)

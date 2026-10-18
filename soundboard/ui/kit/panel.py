@@ -1033,7 +1033,7 @@ class EqPanel(QWidget):
 
 class UndoBar(QWidget):
     """"Deleted X · Undo" for a few seconds after something is thrown away, as a corner
-    card (ui/toast.py) with an Undo button; this widget itself is never seen.
+    card (ui/kit/toast.py) with an Undo button; this widget itself is never seen.
     show_for(text, undo, done): Undo calls `undo`; the card timing out, being closed,
     or showing something else calls `done` (if given) instead."""
     SECONDS = 10

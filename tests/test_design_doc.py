@@ -33,7 +33,7 @@ def test_every_colour_token_it_names_is_in_every_theme():
 
 def test_every_code_path_it_names_exists():
     paths = set(re.findall(r"`(soundboard/[\w/]+\.py)`", DOC))
-    paths |= {f"soundboard/{p}" for p in re.findall(r"`(ui/[\w]+\.py)`", DOC)}
+    paths |= {f"soundboard/{p}" for p in re.findall(r"`(ui/[\w/]+\.py)`", DOC)}
     assert paths
     missing = sorted(p for p in paths if not (ROOT / p).exists())
     # files from UI work still in review are allowed while their PRs are open

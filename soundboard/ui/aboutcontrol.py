@@ -48,7 +48,7 @@ class AboutControl(Controller):
             feedback.problem_url(__version__))), "warn")
 
     def ask_feedback(self):
-        """*Send feedback*: "What would you improve?" (ui/feedbackdialog.py)."""
+        """*Send feedback*: "What would you improve?" (ui/kit/feedbackdialog.py)."""
         mw = self.mw
         from soundboard.ui.kit import feedbackdialog
         mw.show_from_tray()

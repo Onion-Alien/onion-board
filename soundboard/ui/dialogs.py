@@ -336,7 +336,7 @@ class EditDialog(QDialog):
         slow render, shown here: show_render); stop_render(sid): its ✕."""
         super().__init__(parent)
         self.save_hook, self.stop_cb = save_hook, stop_render
-        fit.watch(self)   # grows to fit its text (ui/fit.py)
+        fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
         self.setWindowTitle(_("Edit sound"))
         self.meta = meta
         self.others = others   # () -> every sound on the board, for the same-name warning

@@ -35,7 +35,7 @@ def issue_url(title: str) -> str:
 class CrashDialog(QDialog):
     def __init__(self, rep, log_path: Path | None, parent=None):
         super().__init__(parent)
-        fit.watch(self)   # grows to fit its text (ui/fit.py)
+        fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
         self.rep, self.log_path = rep, log_path
         self.setWindowTitle(_("Onion Board hit a problem"))
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)

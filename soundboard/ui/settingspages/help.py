@@ -188,6 +188,6 @@ class HelpPage(Page):
         return card
 
     def _ask_feedback(self):
-        """*Send feedback*: "What would you improve?" (ui/feedbackdialog.py)."""
+        """*Send feedback*: "What would you improve?" (ui/kit/feedbackdialog.py)."""
         from soundboard.ui.kit import feedbackdialog
         self.dlg.feedback_box = feedbackdialog.ask(self.mw.cfg, self.dlg)

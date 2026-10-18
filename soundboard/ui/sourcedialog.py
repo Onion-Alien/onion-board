@@ -39,7 +39,7 @@ class SourceDialog(QDialog):
         super().__init__(parent, Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
         self.setProperty("popover", True)   # its edge (theme.py)
         usage.used("source-details")
-        fit.watch(self)   # grows to fit its text (ui/fit.py)
+        fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
         self.meta = meta
         self.src = sourceinfo.clean(meta.source)
         site = sourceinfo.site_name(self.src)

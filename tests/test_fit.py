@@ -1,4 +1,4 @@
-"""Dialogs grow to fit their wrapped text (ui/fit.py) instead of clipping it."""
+"""Dialogs grow to fit their wrapped text (ui/kit/fit.py) instead of clipping it."""
 from PySide6.QtWidgets import QDialog, QLabel, QPushButton, QVBoxLayout
 
 from conftest import process_events

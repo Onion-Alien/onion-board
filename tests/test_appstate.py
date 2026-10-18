@@ -1,4 +1,4 @@
-"""Meters that keep running behind a game tick less often there (ui/appstate.py)."""
+"""Meters that keep running behind a game tick less often there (ui/kit/appstate.py)."""
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import QWidget
 

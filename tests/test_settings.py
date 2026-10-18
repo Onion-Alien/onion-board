@@ -502,7 +502,8 @@ def test_a_saved_plain_choice_stays_plain():
     assert library.Config.from_raw({}).theme_texture is True
 
 
-@pytest.mark.parametrize("kind", sorted(__import__("soundboard.ui.kit.theme").theme.TEXTURES))
+@pytest.mark.parametrize("kind", sorted(
+    __import__("soundboard.ui.kit.theme", fromlist=["TEXTURES"]).TEXTURES))
 def test_every_texture_tile_is_see_through(qapp, kind):
     """Each tile lies over the card's own colour, so hover shades still show."""
     from soundboard.ui.kit import theme
