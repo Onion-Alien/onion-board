@@ -119,7 +119,8 @@ def test_check_last_counts_it_and_saves_a_report_not_counted_twice(app_dir, monk
     exitwatch.start(app_dir)   # this run's black box replaces the files...
     assert exitwatch.read_last(app_dir)[1] == ""
     event, path = exitwatch.check_last(app_dir, state, native, "unclean-exit/1.9.8")
-    assert event == "unclean-exit/1.9.8/native-crash/access-violation@soundboard/audio/engine.py:1090"
+    assert event == ("unclean-exit/1.9.8/native-crash/access-violation"
+                     "@soundboard/audio/engine.py:1090")
     text = path.read_text(encoding="utf-8")
     assert "Why:      native-crash" in text and "Closing:  yes" in text
     assert "last words" in text and "this run" not in text   # the last run's log only
