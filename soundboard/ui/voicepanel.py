@@ -226,7 +226,7 @@ class VoicePanel(QWidget):
         pv.addLayout(head)
         self._card_box = QVBoxLayout()
         self._card_box.setContentsMargins(0, 0, 0, 0)
-        pv.addLayout(self._card_box)
+        pv.addLayout(self._card_box, 1)   # all spare height here, none to the head
         # spare height goes under the card: each card is held at the top of its box
         # (_section), at its height for the width. Not pv.addStretch(): with a stretch
         # under it the card got its one-line height instead, so a card with wrapped text

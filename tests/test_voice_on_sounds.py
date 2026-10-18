@@ -210,3 +210,21 @@ def test_the_voice_tabs_and_my_setups_scroll_away_with_the_card(window, qapp):  
     page = v._scroll.widget()
     assert page.isAncestorOf(v.setups_bar) and page.isAncestorOf(v._tabs["fx"])
     assert not page.isAncestorOf(v.speech.say_bar) and not page.isAncestorOf(v.bar)
+
+
+def test_a_short_voice_tab_on_a_tall_window_leaves_no_gap_above_it(window, qapp):  # noqa: F811
+    """The spare height of a tall window went to the tabs and My setups (a 200 px gap
+    under the tabs, My setups 200 px tall): it goes under the card."""
+    from tests.conftest import process_events
+    w = window
+    w.show()
+    w.tabs.setCurrentWidget(w.voice)
+    w.resize(1400, 1100)
+    v = w.voice
+    for key in ("addons", "speak"):
+        v.show_tab(key)
+        process_events(qapp, lambda: False, 0.3)
+        bar = v.setups_bar
+        assert bar.height() <= bar.sizeHint().height() + 4, key
+        tabs_bottom = v._tabs[key].mapTo(v._body, v._tabs[key].rect().bottomLeft()).y()
+        assert bar.mapTo(v._body, bar.rect().topLeft()).y() - tabs_bottom < 40, key
