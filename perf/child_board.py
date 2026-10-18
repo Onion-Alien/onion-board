@@ -335,8 +335,10 @@ class Child:
         """In front (one of its windows has focus) or behind another program."""
         from PySide6.QtCore import Qt
 
+        from soundboard.style import appstate as kit_appstate
         from soundboard.ui import appstate
-        appstate.active = (lambda: True) if front else (lambda: False)
+        # (both: Hoot and the style kit ask their own)
+        appstate.active = kit_appstate.active = (lambda: True) if front else (lambda: False)
         self.app.applicationStateChanged.emit(Qt.ApplicationActive if front
                                               else Qt.ApplicationInactive)
 
@@ -700,7 +702,12 @@ class Child:
                                                title="Fake player")]
             self._tab("apps")
         else:
-            i = TAB_INDEX[key]   # (Triggers without the add-on: Hoot's page)
+            i = TAB_INDEX[key]
+            if key == "triggers":   # off at first (+ More tabs): on, as a user would turn
+                w.tabctl.set_tab_on(key, True)   # it on (no add-on: Hoot's page, which
+                online = w.tabctl.needs_online   # offline mode, the run's, would hide)
+                w.tabctl.needs_online = lambda k: k != "triggers" and online(k)
+                w.tabs.setTabVisible(i, w.tabctl.tab_shown(key))
             if not w.tabs.isTabVisible(i):
                 return {"skipped": True}
             w.tabs.setCurrentIndex(i)

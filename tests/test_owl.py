@@ -266,3 +266,105 @@ def test_wave_raises_one_wing_and_swings_it(qapp):
     # only the wing on your left moves: his right half is as it was
     right = [(x, y) for x in range(52, 100, 3) for y in range(0, 120, 3)]
     assert all(a.pixelColor(x, y) == still.pixelColor(x, y) for x, y in right)
+
+
+class _Clock:
+    def __init__(self):
+        self.now = 1000.0
+
+    def monotonic(self):
+        return self.now
+
+
+def _resting_owl(qapp, monkeypatch, **kw):
+    """A shown Hoot with rest_after_s=30, in front, the mouse away, on a pretend clock."""
+    clock = _Clock()
+    monkeypatch.setattr(owl, "time", clock)
+    monkeypatch.setattr(owl.appstate, "active", lambda: True)
+    w = owl.OwlWidget(80, rest_after_s=30.0, **kw)
+    w._mouse = lambda: None
+    w.clock = clock
+    w.resize(w.sizeHint())
+    w.show()
+    qapp.processEvents()
+    return w
+
+
+def _ticks(w, secs):
+    for _ in range(round(secs * 30)):
+        if w.resting:
+            return
+        w.clock.now += 1 / 30
+        w._tick()
+
+
+def test_hoot_moves_for_a_while_then_holds_still(qapp, monkeypatch):
+    """The Triggers tab's Hoot (no add-on yet) swayed at 30 fps for as long as the tab
+    was open; now he settles after 30 s with nothing going on."""
+    w = _resting_owl(qapp, monkeypatch)
+    assert w._timer.isActive()
+    _ticks(w, 29)
+    assert not w.resting                       # the whole first 30 s
+    _ticks(w, 20)
+    assert w.resting and not w._timer.isActive() and w._peek.isActive()
+    assert w._calm() and w.act is None and not w.say
+    frozen = paint(w)
+    w.clock.now += 3
+    assert paint(w) == frozen                  # a parent's repaint shows the kept pose
+    w.close()
+
+
+def test_the_mouse_a_click_or_a_sound_wakes_hoot(qapp, monkeypatch):
+    w = _resting_owl(qapp, monkeypatch)
+    _ticks(w, 50)
+    assert w.resting
+    w._peek_mouse()                            # the mouse far away: still resting
+    assert w.resting
+    w._mouse = lambda: (0.4, 0.1)              # ... comes near him
+    w._peek_mouse()
+    assert not w.resting and w._timer.isActive() and not w._peek.isActive()
+    assert w._rest_t > w.t + 25                # another 30 s
+    w._mouse = lambda: None
+    _ticks(w, 50)
+    assert w.resting
+    w.set_groove(None)                         # silence: still resting
+    assert w.resting
+    w.set_groove(object())                     # something plays
+    assert not w.resting and w._timer.isActive()
+    w.set_groove(None)
+    _ticks(w, 50)
+    assert w.resting
+    w.cheer()                                  # a click
+    assert not w.resting and w._timer.isActive()
+    w.close()
+
+
+def test_showing_hoot_again_and_the_background_pace(qapp, monkeypatch):
+    w = _resting_owl(qapp, monkeypatch)
+    _ticks(w, 50)
+    assert w.resting
+    w._pause()                                 # behind a game: no mouse checks either
+    assert not w._peek.isActive() and not w._timer.isActive()
+    w._resume()                                # back in front: still resting, watching
+    assert w.resting and w._peek.isActive() and not w._timer.isActive()
+    w.hide()
+    w.show()
+    qapp.processEvents()
+    assert not w.resting and w._timer.isActive()
+    w.close()
+
+
+def test_hoot_without_rest_after_s_never_rests(qapp, monkeypatch):
+    w = _resting_owl(qapp, monkeypatch)
+    w.rest_after_s = None
+    _ticks(w, 60)
+    assert not w.resting and w._timer.isActive()
+    w.close()
+
+
+def test_the_triggers_tabs_hoot_rests_after_30_s():
+    import inspect
+
+    from soundboard.ui import triggerstab
+    assert triggerstab.HOOT_REST_S == 30.0
+    assert "rest_after_s=HOOT_REST_S" in inspect.getsource(triggerstab)
