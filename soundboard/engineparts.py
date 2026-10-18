@@ -9,6 +9,7 @@ reads the device list (those stay in engine.py, where tests swap them).
 from __future__ import annotations
 
 import functools
+import math
 import logging
 import queue
 import threading
@@ -599,15 +600,37 @@ def loud_boost(x: np.ndarray, vol: float, ceiling: float = 1.0) -> np.ndarray:
 
 
 def peak(x: np.ndarray) -> float:
-    return float(np.max(np.abs(x))) if len(x) else 0.0
+    return float(np.abs(x).max()) if len(x) else 0.0
 
 
 def finite(x: np.ndarray) -> np.ndarray:
     """`x` with any NaN / Inf sample made silent (in place). One such sample would stay
     in the send chain's filters for good: the call would hear nothing until a restart."""
-    if len(x) and not np.isfinite(np.max(np.abs(x))):
-        np.nan_to_num(x, copy=False, nan=0.0, posinf=0.0, neginf=0.0)
+    finite_peak(x)
     return x
+
+
+def finite_peak(x: np.ndarray) -> float:
+    """finite(x), then peak(x): one pass over |x| for both, unless it had to clean."""
+    if not len(x):
+        return 0.0
+    pk = float(np.abs(x).max())
+    if not math.isfinite(pk):
+        np.nan_to_num(x, copy=False, nan=0.0, posinf=0.0, neginf=0.0)
+        pk = peak(x)
+    return pk
+
+
+def limit_peak(x: np.ndarray, knee: float = 0.89) -> float:
+    """soft_limit(x), then peak(x): one pass over |x| for both while nothing is over
+    the knee (always, after a Limiter)."""
+    if not len(x):
+        return 0.0
+    pk = float(np.abs(x).max())
+    if pk > knee:
+        soft_limit(x, knee)
+        pk = peak(x)
+    return pk
 
 
 def is_xrun(status) -> bool:

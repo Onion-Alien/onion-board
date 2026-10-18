@@ -252,3 +252,56 @@ def test_quiet_headphones_at_any_rate_write_silence(rate):
     for _ in range(100):
         e._mon(buf, 441)
     assert not buf.any() and e.level_mon < 1e-6
+
+
+
+def test_merged_peak_passes_match_the_separate_ones():
+    """finite_peak / limit_peak (one pass over |x|) give the same samples and level
+    as finite + peak and soft_limit + peak, NaNs and peaks over the knee included."""
+    from soundboard.engineparts import finite, finite_peak, limit_peak, peak, soft_limit
+    rng = np.random.default_rng(2)
+    for i in range(400):
+        x = (rng.standard_normal((N, 2)) * (0.05, 0.5, 1.5)[i % 3]).astype(np.float32)
+        if i % 7 == 0:
+            x[rng.integers(N), rng.integers(2)] = (np.nan, np.inf, -np.inf)[i % 3]
+        a, b = x.copy(), x.copy()
+        pa = peak(finite(a))
+        assert finite_peak(b) == pa and np.array_equal(a, b)
+        pa = peak(soft_limit(a))
+        assert limit_peak(b) == pa and np.array_equal(a, b)
+    empty = np.zeros((0, 2), np.float32)
+    assert finite_peak(empty) == limit_peak(empty) == 0.0
+
+
+def test_mono_and_stereo_mics_go_out_the_same_as_before(monkeypatch):
+    """The mic callback's merged level pass: a mono mic, and a stereo one with a dead
+    channel, with a NaN now and then, give the level and samples sent they did with
+    the separate passes."""
+    from soundboard import engine as eng
+    from soundboard.engineparts import finite, peak
+
+    def run(ch, merged):
+        if not merged:
+            monkeypatch.setattr(eng, "finite_peak", lambda x: peak(finite(x)))
+        e = Engine()
+        e.main_stream, e.mon_stream = FakeStream(), FakeStream()
+        rng = np.random.default_rng(ch)
+        sent, levels = [], []
+        for b in range(120):
+            x = (rng.standard_normal((N, ch)) * 0.1).astype(np.float32)
+            if ch == 2:
+                x[:, 1] *= 0.001   # (a dead channel: the live one is copied over it)
+            if b % 13 == 5:
+                x[3, 0] = np.nan
+            e._mic(x)
+            buf = np.zeros((N, 2), np.float32)
+            e._main(buf, N)
+            sent.append(buf)
+            levels.append((e.level_mic, e.level_main))
+        monkeypatch.undo()
+        return np.concatenate(sent), levels
+
+    for ch in (1, 2):
+        a, la = run(ch, True)
+        b, lb = run(ch, False)
+        assert np.array_equal(a, b) and la == lb and np.isfinite(a).all()

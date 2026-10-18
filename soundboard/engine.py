@@ -54,12 +54,13 @@ from soundboard.soundcache import CACHE_BUDGET, resample  # noqa: F401
 from soundboard.engineparts import (
     SR, CH, I16_SCALE, DEVICES, start_or_close, is_fixed, DeviceWorker, loop_xf,
     loop_wrap, span, _aa_taps, START_FADE_S, _hard_start, Ring, DirectFifo,
-    StreamResampler, soft_limit, loud_boost, peak, finite, is_xrun, _add, LivePitch,
+    StreamResampler, loud_boost, peak, finite, finite_peak, limit_peak, is_xrun, _add, LivePitch,
     AuxSource, Voice,
 )
 # not used here any more, still imported from here elsewhere
 from soundboard.engineparts import (  # noqa: F401
     STALL_S, RETRY_S, BUFFER, _holding_devices, close_quietly, FIXED_SIDS, LOOP_XF_S, AA_DB,
+    soft_limit,
     _AA_CACHE,
 )
 
@@ -1184,9 +1185,9 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
             outdata.fill(0)
             self.level_main *= 0.85
         else:
-            soft_limit(mix)
+            pk = limit_peak(mix)   # (soft_limit, and the peak it leaves)
             outdata[:] = mix
-            self.level_main = max(peak(mix), self.level_main * 0.85)
+            self.level_main = max(pk, self.level_main * 0.85)
         cable = self.tap
         if cable is not None and self.main_direct:
             cable.write(mix)
@@ -1429,7 +1430,8 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
             if shape:
                 mix = self._dest(out, mix)
         if shape and (self.duck_db < 0 or (out, "Ducker") in self._send):
-            g = self._stage(out, Ducker).process(m if mic_on else None, len(mix), self.duck_db)
+            g = self._stage(out, Ducker).process(m if mic_on else None, len(mix), self.duck_db,
+                                                 ramp=not silent)
             if not isinstance(g, float) and not silent:
                 mix = mix * g
         # a mode that already made the bus mono (every built-in one) needs no second pass
@@ -1584,7 +1586,7 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
     def _mic(self, indata, direct: bool = False):
         x = indata
         two = x.shape[1] >= 2
-        x = np.repeat(x, 2, axis=1) if x.shape[1] == 1 else x[:, :2]
+        x = np.concatenate((x, x), axis=1) if x.shape[1] == 1 else x[:, :2]   # (np.repeat's 3x)
         x = np.ascontiguousarray(x, dtype=np.float32)
         if two and np.shares_memory(x, indata):   # a copy: it's written to below
             x = x.copy()   # (it may still be a view of PortAudio's buffer)
@@ -1592,10 +1594,12 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         # file, which anyone signed in can write) broke voice effects for the session
         # (bypassed: the real voice went out), and stuck in what's sent and in the
         # dead-channel check's averages
-        x = finite(x)
-        if two:
-            x = self._mic_channels(x)
-        self.level_mic = max(peak(x), self.level_mic * 0.85)
+        if two:   # (the dead-channel fix can change the peak: measured after it)
+            x = self._mic_channels(finite(x))
+            pk = peak(x)
+        else:
+            pk = finite_peak(x)
+        self.level_mic = max(pk, self.level_mic * 0.85)
         rec = self._mic_rec
         raw = x[:, 0].copy() if rec is not None and self._rec_buf is not None else None
         take = self._take   # Record a sound: one copy and one append, nothing more

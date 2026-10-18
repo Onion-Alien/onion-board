@@ -10,6 +10,7 @@ this file, and Onion Board's Triggers tab shows him until the add-on is installe
 """
 from __future__ import annotations
 
+import functools
 import math
 import random
 import time
@@ -183,6 +184,9 @@ def _shade(p: QPainter, shape: QPainterPath, x, y, r, col: QColor, alpha: int):
     p.restore()
 
 
+# his outline, tufts, wings and face mask never change: built once, kept (only ever
+# drawn or clipped to, never changed)
+@functools.cache
 def body_path() -> QPainterPath:
     """His round, egg-shaped body (owls are all head), with two soft feather points
     on each cheek."""
@@ -202,6 +206,7 @@ def body_path() -> QPainterPath:
     return path
 
 
+@functools.cache
 def _tuft(sx: int, style: str = "point") -> QPainterPath:
     """An ear tuft on his `sx` side (TUFTS): "point", a soft curved point with a little
     notch; "round", a soft round nub; "tall", a long point; "swept", a point swept out
@@ -273,6 +278,7 @@ def _belly_marks(p: QPainter, kind: str, col: QColor):
         p.fillPath(shape, col)
 
 
+@functools.cache
 def _wing(sx: int) -> QPainterPath:
     """A wing in its own frame (upright, its top at 0, 0): round at the shoulder,
     ending in three soft feather points."""
@@ -290,6 +296,7 @@ def _wing(sx: int) -> QPainterPath:
     return path
 
 
+@functools.cache
 def _face_path() -> QPainterPath:
     """The cream mask round his eyes: two joined discs, the feathers dipping in
     between them on top, meeting in a soft point under his beak."""
