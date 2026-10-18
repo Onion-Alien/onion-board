@@ -1520,7 +1520,6 @@
   "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "PC에서 실행되는 텍스트 음성 변환 서버. 대부분은 /v1/audio/speech로 끝나는 OpenAI 스타일 주소를 가지고 있습니다. 주소의 텍스트를 취하는 것은 대신에 {text} 사용할 수 있습니다.",
   "AI voices": "AI 목소리",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "AI 음성은 선택적인 추가 기능입니다(약 55MB, 음성 모델 및 해당 런타임). AI 음성 가져오기를 누르기 전까지는 아무것도 다운로드되지 않습니다.",
-  "AI voices are installed. Pick a voice and press Start.": "AI 음성이 설치되었습니다. 음성을 선택하고 시작을 누릅니다.",
   "AI voices are removed.": "AI 음성이 제거됩니다.",
   "AI voices aren't available to download yet (GitHub says it can't find it). Try again later.": "AI 음성은 아직 다운로드할 수 없습니다(GitHub에서는 찾을 수 없다고 합니다). 나중에 다시 시도하세요.",
   "API key": "API 키",
@@ -2292,8 +2291,6 @@
   "⚠ Couldn't play a sample: {error}": "⚠ 샘플을 재생할 수 없습니다: {error}",
   "⚠ Couldn't start translating: {error}": "⚠ 번역을 시작할 수 없습니다: {error}",
   "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, run install.bat in the add-on's folder to see why.": "⚠ 설치 실패: {error} . 다시 시도하려면 다시 누르세요. 계속 실패하면 추가 기능 폴더에서 install.bat를 실행하여 이유를 확인하세요.",
-  "⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ AI 음성이 멈췄습니다. 다른 사람들은 이제 {backup} 듣습니다. 중지를 누른 다음 시작을 눌러 다시 시도하세요.",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ AI 음성이 중지되었습니다: {error} . 다른 사람들은 이제 {backup} 듣습니다. 중지를 누른 다음 시작을 눌러 다시 시도하세요.",
   "⚠ This PC is slow for AI voices: games may stutter. A voice changer preset (left) is much lighter.": "⚠ 이 PC는 AI 음성 처리가 느려 게임이 끊길 수 있습니다. 보이스 체인저 프리셋(왼쪽)은 훨씬 더 가볍습니다.",
   "⚠ Translating stopped: {error}": "⚠ 번역이 중지되었습니다: {error}",
   "⚠ Turned off after an error: {error}": "⚠ 오류 발생 후 꺼짐: {error}",
@@ -2706,8 +2703,6 @@
   "Streaming": "방송",
   "What will you use Onion Board for?": "Onion Board를 어디에 쓰실 건가요?",
   "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "<b>앱</b> 탭(음악이나 게임 소리를 방송으로 보내기)을 추가해요. 마지막 단계에 <b>스트리머 가이드</b>(Stream Deck 키, 채팅 명령어) 링크가 있어요.",
-  "Start AI voice": "AI 음성 시작",
-  "Stop AI voice": "AI 음성 중지",
   "Your words and tone, a different voice. Live on this PC.": "말과 말투는 그대로, 목소리만 다르게. 이 PC에서 실시간으로.",
   "Mic on": "마이크 켜짐",
   "Output": "출력",
@@ -3293,7 +3288,6 @@
   "The programs the app uses to download and play sounds. They update with the app, to the exact versions it was tested with. Only yt-dlp can update sooner, if you let it.": "앱이 사운드를 다운로드하고 재생하는 데 쓰는 프로그램이에요. 앱과 함께, 테스트를 거친 바로 그 버전으로 업데이트돼요. 허락하면 yt-dlp만 더 일찍 업데이트할 수 있어요.",
   "Used when Connection is set to Tor. It's up to date, and updates with the app.": "연결이 Tor로 설정되었을 때 사용해요. 최신 상태이며 앱과 함께 업데이트돼요.",
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "다운로더(yt-dlp)가 설치되어 있지 않아요. 설정 → 업데이트 → 도우미 프로그램 → yt-dlp → 재설치.",
-  "No voices of your own yet: press Make your own voice below.": "아직 내 목소리가 없어요. 아래의 '자신의 목소리를 내세요'을(를) 누르세요.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "지금 Windows가 <b>{mic}</b>을(를) 찾지 못합니다. 연결하거나, 무선이라면 켜세요. 마이크가 아예 없나요? 아래의 <b>가상 케이블</b>을 쓰세요. 마이크 없이도 됩니다.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "지금 마이크에서 소리가 오지 않습니다(꺼짐, 음소거 또는 마이크 연결 안 됨). 그래서 다른 사람들에게는 사운드만 들립니다. 내 목소리도 들리게 하려면 마이크를 켜거나 음소거를 해제하세요.",
   "A {language} computer voice, once it's on this PC (below).": "{language} 컴퓨터 음성 (이 PC에 설치되면, 아래 참고).",
@@ -4030,5 +4024,8 @@
   "Play it now": "지금 재생",
   "Space or a double-click plays it for you, Enter plays it through your mic, Esc stops, F2 renames, right-click for more.": "스페이스나 더블클릭으로 나에게 재생, Enter로 마이크로 재생, Esc로 정지, F2로 이름 변경, 더 보려면 우클릭하세요.",
   "Today {time}": "오늘 {time}",
-  "Yesterday": "어제"
+  "Yesterday": "어제",
+  "AI voices are installed. Pick a voice to turn it on.": "AI 음성이 설치되었습니다. 음성을 고르면 켜집니다.",
+  "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ AI 음성이 멈췄습니다. 이제 다른 사람들에게는 {backup}이(가) 들립니다. 다시 시도하려면 껐다가 다시 켜세요.",
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ AI 음성이 멈췄습니다: {error}. 이제 다른 사람들에게는 {backup}이(가) 들립니다. 다시 시도하려면 껐다가 다시 켜세요."
 }

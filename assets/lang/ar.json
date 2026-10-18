@@ -1735,7 +1735,6 @@
   "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "خادم تحويل النص إلى كلام يعمل على جهاز الكمبيوتر الخاص بك. تحتوي معظمها على عنوان على نمط OpenAI ينتهي بـ /v1/audio/speech؛ يمكن للشخص الذي يأخذ النص الموجود في العنوان استخدام {text} فيه بدلاً من ذلك.",
   "AI voices": "أصوات الذكاء الاصطناعي",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "تعد أصوات الذكاء الاصطناعي بمثابة وظيفة إضافية اختيارية (حوالي 55 ميجابايت، للنموذج الصوتي ووقت تشغيله). لا يتم تنزيل أي شيء حتى تضغط على Get AI voices.",
-  "AI voices are installed. Pick a voice and press Start.": "تم تثبيت أصوات الذكاء الاصطناعي. اختر صوتًا واضغط على ابدأ.",
   "AI voices are removed.": "تتم إزالة أصوات الذكاء الاصطناعي.",
   "AI voices aren't available to download yet (GitHub says it can't find it). Try again later.": "أصوات الذكاء الاصطناعي ليست متاحة للتنزيل بعد (يقول GitHub أنه لا يمكنه العثور عليها). حاول مرة أخرى لاحقًا.",
   "API key": "مفتاح واجهة برمجة التطبيقات",
@@ -2542,8 +2541,6 @@
   "⚠ Couldn't play a sample: {error}": "⚠ تعذر تشغيل العينة: {error}",
   "⚠ Couldn't start translating: {error}": "⚠ تعذر بدء الترجمة: {error}",
   "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, run install.bat in the add-on's folder to see why.": "⚠ فشل التثبيت: {error} . اضغط عليه مرة أخرى لإعادة المحاولة؛ إذا استمر الفشل، قم بتشغيل install.bat في مجلد الوظيفة الإضافية لمعرفة السبب.",
-  "⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ توقف صوت الذكاء الاصطناعي. يسمع الآخرون الآن {backup} . اضغط على إيقاف، ثم ابدأ للمحاولة مرة أخرى.",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ توقف صوت الذكاء الاصطناعي: {error} . يسمع الآخرون الآن {backup} . اضغط على إيقاف، ثم ابدأ للمحاولة مرة أخرى.",
   "⚠ This PC is slow for AI voices: games may stutter. A voice changer preset (left) is much lighter.": "⚠ هذا الكمبيوتر بطيء بالنسبة لأصوات الذكاء الاصطناعي: قد تتلعثم الألعاب. يعد الإعداد المسبق لمغير الصوت (يسار) أخف بكثير.",
   "⚠ Translating stopped: {error}": "⚠ توقفت الترجمة: {error}",
   "⚠ Turned off after an error: {error}": "⚠ تم الإيقاف بعد حدوث خطأ: {error}",
@@ -3016,8 +3013,6 @@
   "Streaming": "البث",
   "What will you use Onion Board for?": "لماذا ستستخدم Onion Board؟",
   "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "يضيف تبويب <b>التطبيقات</b> (أرسل الموسيقى أو لعبة إلى بثّك). الخطوة الأخيرة فيها رابط إلى <b>دليل البث</b> (أزرار Stream Deck وأوامر الدردشة).",
-  "Start AI voice": "ابدأ صوت الذكاء الاصطناعي",
-  "Stop AI voice": "أوقف صوت الذكاء الاصطناعي",
   "Your words and tone, a different voice. Live on this PC.": "كلماتك ونبرتك بصوت مختلف. مباشرة على هذا الكمبيوتر.",
   "Mic on": "الميكروفون يعمل",
   "Output": "الإخراج",
@@ -3658,7 +3653,6 @@
   "The programs the app uses to download and play sounds. They update with the app, to the exact versions it was tested with. Only yt-dlp can update sooner, if you let it.": "البرامج التي يستخدمها التطبيق لتنزيل الأصوات وتشغيلها. تتحدّث مع التطبيق، إلى النسخ نفسها التي اختُبر بها. فقط yt-dlp يمكنه التحديث قبل ذلك، إن سمحت له.",
   "Used when Connection is set to Tor. It's up to date, and updates with the app.": "يُستخدم عندما يكون الاتصال مضبوطًا على تور. إنه محدّث ويتحدّث مع التطبيق.",
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "أداة التنزيل (yt-dlp) غير مثبتة، الإعدادات ← التحديثات ← البرامج المساعدة ← yt-dlp ← أعد التثبيت.",
-  "No voices of your own yet: press Make your own voice below.": "لا توجد أصوات خاصة بك بعد: اضغط «اصنع صوتك الخاص» في الأسفل.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "لا يجد Windows <b>{mic}</b> الآن. صِلها، أو شغّلها إن كانت لاسلكية. لا يوجد ميكروفون أصلًا؟ استخدم <b>الكابل الافتراضي</b> بالأسفل: يعمل بدون ميكروفون.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "ميكروفونك لا يرسل أي صوت الآن (مطفأ، أو مكتوم، أو لا يوجد ميكروفون موصول)، لذا يسمع الآخرون أصواتك فقط. تريدهم أن يسمعوك أيضًا؟ شغّله أو ألغِ كتمه.",
   "A {language} computer voice, once it's on this PC (below).": "صوت حاسوب باللغة {language}، بعد تثبيته على هذا الكمبيوتر (في الأسفل).",
@@ -4425,5 +4419,8 @@
   "Play it now": "شغّله الآن",
   "Space or a double-click plays it for you, Enter plays it through your mic, Esc stops, F2 renames, right-click for more.": "المسافة أو النقر المزدوج يشغّله لك، وEnter يشغّله عبر الميكروفون، وEsc يوقفه، وF2 يعيد التسمية، وانقر بزر الماوس الأيمن للمزيد.",
   "Today {time}": "اليوم {time}",
-  "Yesterday": "أمس"
+  "Yesterday": "أمس",
+  "AI voices are installed. Pick a voice to turn it on.": "تم تثبيت أصوات الذكاء الاصطناعي. اختر صوتًا لتشغيله.",
+  "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ توقف صوت الذكاء الاصطناعي. يسمع الآخرون الآن {backup}. أطفئه ثم شغّله مرة أخرى للمحاولة من جديد.",
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ توقف صوت الذكاء الاصطناعي: {error}. يسمع الآخرون الآن {backup}. أطفئه ثم شغّله مرة أخرى للمحاولة من جديد."
 }

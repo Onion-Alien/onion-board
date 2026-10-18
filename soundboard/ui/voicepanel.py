@@ -285,7 +285,7 @@ class VoicePanel(QWidget):
         self.ai.live_changed.connect(self._ai_live)
         self.ai.modules_changed.connect(self.rescan_modules)
         self.ai._event.connect(lambda _ev: self._update_bar())   # starting -> on / failed
-        self._ai_card = self._section("ai", self.ai, self.ai.title)
+        self._ai_card = self._section("ai", self.ai, self.ai.title, self.ai.head)
         net.on_change(self._ai_net_changed)
         self._ai_follow_offline()
         self.speech.live_changed.connect(self._speech_live)
@@ -321,15 +321,19 @@ class VoicePanel(QWidget):
         self.oops.hide()
         outer.insertWidget(1, self.oops)
         self._oops_for = ""
-        # the picked voice's bar, pinned under the cards while the voice changer shows:
-        # its Hear what they hear and Edit voice never scroll out of sight
-        fx_lay = self.fx.layout()
-        assert fx_lay is not None   # made in VoiceFxPanel.__init__
-        fx_lay.removeWidget(self.fx.picked)
-        outer.addWidget(self.fx.picked)
-        self.fx.picked.setProperty("pinned", True)
-        self.fx.show_picked_row(self._tab == "fx")
+        # the picked voice's bar, pinned under the cards while the voice changer (or AI
+        # voices) shows: its Edit voice and Hear it never scroll out of sight
+        for key, panel in self._barred():
+            lay = panel.layout()
+            assert lay is not None   # made in the panel's __init__
+            lay.removeWidget(panel.picked)
+            outer.addWidget(panel.picked)
+            panel.picked.setProperty("pinned", True)
+            panel.show_picked_row(self._tab == key)
         outer.addWidget(self.bar)
+        # cards or a list: one setting for both (the window keeps the voice changer's)
+        self.fx.view_toggle.changed.connect(self.ai.set_view)
+        self.ai.view_toggle.changed.connect(self.fx.view_toggle.changed)
         self.fx.sound_list = lambda: [(m.id, m.name, list(m.tags)) for m in self.board_sounds()]
         self.chain.configure(self.fx.spec())
         self._update_backdrop(self.fx.spec())
@@ -481,24 +485,37 @@ class VoicePanel(QWidget):
                 # there, under them) rather than the window turning into the mini player
                 (45, "h", self._pin_picked_off)]
 
+    def _barred(self):
+        """The cards with a picked voice's bar: (tab key, panel)."""
+        return (("fx", self.fx), ("ai", self.ai))
+
+    def set_view(self, view: str):
+        """The voices as picture cards or a list, in both cards."""
+        self.fx.set_view(view)
+        self.ai.set_view(view)
+
     def _pin_picked_off(self, compact: bool):
-        """Pinned under the scrolling card, or (`compact`) at the end of the voice
-        changer's card, scrolling with it."""
-        picked = self.fx.picked
-        if bool(picked.property("pinned")) != compact:
-            return
-        outer, fx_lay = self.layout(), self.fx.layout()
-        assert isinstance(outer, QVBoxLayout) and isinstance(fx_lay, QVBoxLayout)
-        outer.removeWidget(picked)
-        fx_lay.removeWidget(picked)
-        if compact:
-            fx_lay.addWidget(picked)
-        else:
-            outer.insertWidget(outer.indexOf(self.bar), picked)
-        picked.setProperty("pinned", not compact)
-        picked.style().unpolish(picked)
-        picked.style().polish(picked)
-        self.fx.show_picked_row(compact or self._tab == "fx")
+        """Pinned under the scrolling card, or (`compact`) at the end of its card (the
+        voice changer's, AI voices' before More options), scrolling with it."""
+        outer = self.layout()
+        assert isinstance(outer, QVBoxLayout)
+        for key, panel in self._barred():
+            picked = panel.picked
+            if bool(picked.property("pinned")) != compact:
+                continue
+            own = panel.layout()
+            assert isinstance(own, QVBoxLayout)
+            outer.removeWidget(picked)
+            own.removeWidget(picked)
+            if compact:
+                at = own.indexOf(self.ai.btn_opts) if panel is self.ai else own.count()
+                own.insertWidget(at, picked)
+            else:
+                outer.insertWidget(outer.indexOf(self.bar), picked)
+            picked.setProperty("pinned", not compact)
+            picked.style().unpolish(picked)
+            picked.style().polish(picked)
+            panel.show_picked_row(compact or self._tab == key)
 
     def stack_steps(self):
         return []   # one card at a time: nothing to stack when narrow
@@ -663,8 +680,9 @@ class VoicePanel(QWidget):
         self._tab = key
         for k, f in self._cards.items():
             f.setVisible(k == key)
-        if self.fx.picked.property("pinned"):   # (in its card when not: shown with it)
-            self.fx.show_picked_row(key == "fx")
+        for k, panel in self._barred():
+            if panel.picked.property("pinned"):   # (in its card when not: shown with it)
+                panel.show_picked_row(key == k)
         self._tabs[key].setChecked(True)
         self._update_heads()
         if asked and key in usage.VOICE_TABS:
@@ -745,9 +763,9 @@ class VoicePanel(QWidget):
         late = _("in {language}, a few seconds late", language=lang) if lang else ""
         fx, ai, tts = (self.fx.btn_power.isChecked(), self.ai.is_on(),
                        self.speech.livevoice.b_live.isChecked())
-        # the voice changer's switch already says On: its head only adds the language
+        # the switches already say On: their heads only add the language
         self._set_state("fx", fx, late if fx and not ai and not tts else "", say_on=False)
-        self._set_state("ai", ai, late if ai and not tts else "")
+        self._set_state("ai", ai, late if ai and not tts else "", say_on=False)
         self._set_state("speak", tts, lang if tts else "")
 
     def _set_state(self, key: str, on: bool, note: str, say_on: bool = True):

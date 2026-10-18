@@ -1559,7 +1559,6 @@
   "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Isang text-to-speech server na tumatakbo sa iyong PC. Karamihan ay mayroong OpenAI-style na address na nagtatapos sa /v1/audio/speech; ang isa na kumukuha ng teksto sa address ay maaaring gumamit ng {text} dito sa halip.",
   "AI voices": "Mga boses ng AI",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "Ang mga boses ng AI ay isang opsyonal na add-on (mga 55 MB, ang modelo ng boses at ang runtime nito). Walang nada-download hanggang sa pindutin mo ang Get AI voices.",
-  "AI voices are installed. Pick a voice and press Start.": "Naka-install ang mga boses ng AI. Pumili ng boses at pindutin ang Start.",
   "AI voices are removed.": "Tinatanggal ang mga boses ng AI.",
   "AI voices aren't available to download yet (GitHub says it can't find it). Try again later.": "Ang mga boses ng AI ay hindi pa magagamit upang i-download (sinabi ng GitHub na hindi ito mahahanap). Subukan ulit mamaya.",
   "API key": "API key",
@@ -2342,8 +2341,6 @@
   "⚠ Couldn't play a sample: {error}": "⚠ Hindi makapagpatugtog ng sample: {error}",
   "⚠ Couldn't start translating: {error}": "⚠ Hindi masimulan ang pagsasalin: {error}",
   "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, run install.bat in the add-on's folder to see why.": "⚠ Nabigo ang pag-install: {error} . Pindutin itong muli upang subukang muli; kung patuloy itong nabigo, patakbuhin ang install.bat sa folder ng add-on upang makita kung bakit.",
-  "⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ Tumigil ang boses ng AI. Naririnig na ngayon ng iba {backup} . Pindutin ang Stop, pagkatapos ay Magsimula upang subukang muli.",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ Huminto ang boses ng AI: {error} . Naririnig na ngayon ng iba {backup} . Pindutin ang Stop, pagkatapos ay Magsimula upang subukang muli.",
   "⚠ This PC is slow for AI voices: games may stutter. A voice changer preset (left) is much lighter.": "⚠ Mabagal ang PC na ito para sa mga boses ng AI: maaaring mautal ang mga laro. Ang isang voice changer preset (kaliwa) ay mas magaan.",
   "⚠ Translating stopped: {error}": "⚠ Nahinto ang pagsasalin: {error}",
   "⚠ Turned off after an error: {error}": "⚠ Naka-off pagkatapos ng isang error: {error}",
@@ -2768,8 +2765,6 @@
   "Streaming": "Streaming",
   "What will you use Onion Board for?": "Para saan mo gagamitin ang Onion Board?",
   "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Idinadagdag ang <b>Apps</b> tab (ipadala ang musika o laro sa stream mo). May link ang huling hakbang sa <b>Streamer guide</b> (mga key ng Stream Deck, chat command).",
-  "Start AI voice": "Simulan ang boses ng AI",
-  "Stop AI voice": "Itigil ang boses ng AI",
   "Your words and tone, a different voice. Live on this PC.": "Mga salita at tono mo, ibang boses. Live sa PC na ito.",
   "Mic on": "Naka-on ang mic",
   "Output": "Output",
@@ -3366,7 +3361,6 @@
   "The programs the app uses to download and play sounds. They update with the app, to the exact versions it was tested with. Only yt-dlp can update sooner, if you let it.": "Ang mga program na ginagamit ng app para mag-download at magpatugtog ng mga tunog. Nag-a-update sila kasabay ng app, sa eksaktong mga bersyong ginamit sa pag-test nito. Ang yt-dlp lang ang puwedeng mag-update nang mas maaga, kung papayagan mo.",
   "Used when Connection is set to Tor. It's up to date, and updates with the app.": "Ginagamit kapag naka-Tor ang Connection. Updated ito at nag-a-update kasabay ng app.",
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "Hindi naka-install ang downloader (yt-dlp), Settings → Mga update → Mga helper program → yt-dlp → I-reinstall.",
-  "No voices of your own yet: press Make your own voice below.": "Wala ka pang sariling boses: pindutin ang “Gumawa ng sarili mong boses” sa ibaba.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Hindi mahanap ng Windows ang <b>{mic}</b> ngayon. Isaksak ito, o i-on kung wireless ito. Walang mic talaga? Gamitin ang <b>virtual cable</b> sa ibaba: gumagana ito kahit walang mic.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Walang tunog na pinapadala ang mic mo ngayon (naka-off, naka-mute o walang mic na nakasaksak), kaya mga sound mo lang ang naririnig ng iba. Gusto mong marinig ka rin nila? I-on ito o i-unmute.",
   "A {language} computer voice, once it's on this PC (below).": "Isang computer voice sa {language}, kapag nasa PC na ito (sa ibaba).",
@@ -4109,5 +4103,8 @@
   "Play it now": "I-play ngayon",
   "Space or a double-click plays it for you, Enter plays it through your mic, Esc stops, F2 renames, right-click for more.": "Space o double-click para i-play ito para sa'yo, Enter para i-play sa mic mo, Esc para ihinto, F2 para palitan ang pangalan, right-click para sa iba pa.",
   "Today {time}": "Ngayon {time}",
-  "Yesterday": "Kahapon"
+  "Yesterday": "Kahapon",
+  "AI voices are installed. Pick a voice to turn it on.": "Naka-install na ang mga boses ng AI. Pumili ng boses para i-on ito.",
+  "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Tumigil ang boses ng AI. Naririnig na ngayon ng iba ang {backup}. I-off ito at i-on ulit para subukang muli.",
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Tumigil ang boses ng AI: {error}. Naririnig na ngayon ng iba ang {backup}. I-off ito at i-on ulit para subukang muli."
 }

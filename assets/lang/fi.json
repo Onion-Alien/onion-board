@@ -1559,7 +1559,6 @@
   "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Tekstistä puheeksi -palvelin, joka toimii tietokoneellasi. Useimmissa on OpenAI-tyylinen osoite, joka päättyy /v1/audio/speech; joka ottaa osoitteen tekstin, voi käyttää sen sijaan {text} .",
   "AI voices": "AI äänet",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "AI-äänet ovat valinnainen lisäosa (noin 55 Mt, äänimalli ja sen suoritusaika). Mitään ei ladata, ennen kuin painat Hanki tekoälyäänet.",
-  "AI voices are installed. Pick a voice and press Start.": "AI-äänet on asennettu. Valitse ääni ja paina Aloita.",
   "AI voices are removed.": "AI-äänet poistetaan.",
   "AI voices aren't available to download yet (GitHub says it can't find it). Try again later.": "AI-ääniä ei ole vielä ladattavissa (GitHub sanoo, ettei se löydä sitä). Yritä myöhemmin uudelleen.",
   "API key": "API-avain",
@@ -2342,8 +2341,6 @@
   "⚠ Couldn't play a sample: {error}": "⚠ Näytettä ei voitu toistaa: {error}",
   "⚠ Couldn't start translating: {error}": "⚠ Kääntämistä ei voitu aloittaa: {error}",
   "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, run install.bat in the add-on's folder to see why.": "⚠ Asennus epäonnistui: {error} . Yritä uudelleen painamalla sitä uudelleen; Jos se epäonnistuu jatkuvasti, suorita asennus.bat lisäosan kansiossa nähdäksesi syyn.",
-  "⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ AI-ääni pysähtyi. Muut kuulevat nyt {backup} . Paina Stop ja sitten Start yrittääksesi uudelleen.",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ AI-ääni pysähtyi: {error} . Muut kuulevat nyt {backup} . Paina Stop ja sitten Start yrittääksesi uudelleen.",
   "⚠ This PC is slow for AI voices: games may stutter. A voice changer preset (left) is much lighter.": "⚠ Tämä tietokone on hidas tekoälyäänille: pelit voivat pätkiä. Äänenvaihtajan esiasetus (vasemmalla) on paljon kevyempi.",
   "⚠ Translating stopped: {error}": "⚠ Kääntäminen keskeytetty: {error}",
   "⚠ Turned off after an error: {error}": "⚠ Pois päältä virheen jälkeen: {error}",
@@ -2768,8 +2765,6 @@
   "Streaming": "Striimaus",
   "What will you use Onion Board for?": "Mihin käytät Onion Boardia?",
   "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Lisää <b>Sovellukset</b>-välilehden (lähetä musiikkia tai peli streamiisi). Viimeisessä vaiheessa on linkki: <b>Streamaajan opas</b> (Stream Deck -näppäimet, chat-komennot).",
-  "Start AI voice": "Käynnistä AI-ääni",
-  "Stop AI voice": "Pysäytä tekoälyn ääni",
   "Your words and tone, a different voice. Live on this PC.": "Sanasi ja äänensävysi, eri ääni. Suorana tällä tietokoneella.",
   "Mic on": "Mikki päällä",
   "Output": "Ulostulo",
@@ -3366,7 +3361,6 @@
   "The programs the app uses to download and play sounds. They update with the app, to the exact versions it was tested with. Only yt-dlp can update sooner, if you let it.": "Ohjelmat, joilla sovellus lataa ja soittaa ääniä. Ne päivittyvät sovelluksen mukana, juuri niihin versioihin, joilla se testattiin. Vain yt-dlp voi päivittyä aiemmin, jos annat sen.",
   "Used when Connection is set to Tor. It's up to date, and updates with the app.": "Käytetään, kun Yhteys on asetettu Toriin. Se on ajan tasalla ja päivittyy sovelluksen mukana.",
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "Lataajaa (yt-dlp) ei ole asennettu, Asetukset → Päivitykset → Apuohjelmat → yt-dlp → Asenna uudelleen.",
-  "No voices of your own yet: press Make your own voice below.": "Ei vielä omia ääniä: paina alta ”Tee oma äänesi”.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows ei löydä laitetta <b>{mic}</b> juuri nyt. Kytke se kiinni, tai laita se päälle, jos se on langaton. Eikö mikkiä ole ollenkaan? Käytä alla olevaa <b>virtuaalikaapelia</b>: se toimii ilman mikkiä.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Mikkisi ei lähetä ääntä juuri nyt (pois päältä, mykistetty tai mikkiä ei ole kytketty), joten muut kuulevat vain äänesi. Haluatko, että sinutkin kuullaan? Laita se päälle tai poista mykistys.",
   "A {language} computer voice, once it's on this PC (below).": "Tietokoneääni kielelle {language}, kun se on tällä PC:llä (alla).",
@@ -4109,5 +4103,8 @@
   "Play it now": "Soita nyt",
   "Space or a double-click plays it for you, Enter plays it through your mic, Esc stops, F2 renames, right-click for more.": "Välilyönti tai tuplaklikkaus soittaa sen sinulle, Enter soittaa sen mikrofonisi kautta, Esc pysäyttää, F2 nimeää uudelleen, oikea klikkaus näyttää lisää.",
   "Today {time}": "Tänään {time}",
-  "Yesterday": "Eilen"
+  "Yesterday": "Eilen",
+  "AI voices are installed. Pick a voice to turn it on.": "AI-äänet on asennettu. Valitse ääni, niin se menee päälle.",
+  "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ AI-ääni pysähtyi. Muut kuulevat nyt {backup}. Kytke se pois ja takaisin päälle yrittääksesi uudelleen.",
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ AI-ääni pysähtyi: {error}. Muut kuulevat nyt {backup}. Kytke se pois ja takaisin päälle yrittääksesi uudelleen."
 }

@@ -56,6 +56,19 @@ def item_name(key: str) -> str:
     return voicefx.shown(voicefx.REGISTRY[key].name)
 
 
+def place_over(pop: QWidget, under: QWidget):
+    """A pop-up above `under` (the voice bar sits at the bottom of the window); below
+    it when there's no room above."""
+    top = under.mapToGlobal(QPoint(0, 0))
+    screen = (QApplication.screenAt(top) or under.screen()).availableGeometry()
+    h = pop.sizeHint().height()
+    x = min(max(screen.left(), top.x()), screen.right() - pop.width() + 1)
+    y = top.y() - h - 6
+    if y < screen.top():
+        y = min(top.y() + under.height() + 6, screen.bottom() - h + 1)
+    pop.setGeometry(x, max(screen.top(), y), pop.width(), h)
+
+
 class EffectsPopup(QDialog):
     """Over the voice bar, above its Effects button. Built again on every add or ✕;
     a slider only changes its own value (the rows stay put while you drag)."""
@@ -332,11 +345,4 @@ class EffectsPopup(QDialog):
         self.show()
 
     def _place(self, under: QWidget):
-        top = under.mapToGlobal(QPoint(0, 0))
-        screen = (QApplication.screenAt(top) or under.screen()).availableGeometry()
-        h = self.sizeHint().height()
-        x = min(max(screen.left(), top.x()), screen.right() - self.width() + 1)
-        y = top.y() - h - 6
-        if y < screen.top():
-            y = min(top.y() + under.height() + 6, screen.bottom() - h + 1)
-        self.setGeometry(x, max(screen.top(), y), self.width(), h)
+        place_over(self, under)

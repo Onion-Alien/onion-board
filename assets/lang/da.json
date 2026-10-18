@@ -1559,7 +1559,6 @@
   "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "En tekst-til-tale-server, der kører på din pc. De fleste har en OpenAI-lignende adresse, der ender på /v1/audio/speech; en, der tager teksten i adressen, kan bruge {text} i den i stedet.",
   "AI voices": "AI-stemmer",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "AI-stemmer er en valgfri tilføjelse (ca. 55 MB, stemmemodellen og dens køretid). Intet downloades, før du trykker på Hent AI-stemmer.",
-  "AI voices are installed. Pick a voice and press Start.": "AI-stemmer er installeret. Vælg en stemme, og tryk på Start.",
   "AI voices are removed.": "AI-stemmer fjernes.",
   "AI voices aren't available to download yet (GitHub says it can't find it). Try again later.": "AI-stemmer er ikke tilgængelige til download endnu (GitHub siger, at den ikke kan finde den). Prøv igen senere.",
   "API key": "API nøgle",
@@ -2342,8 +2341,6 @@
   "⚠ Couldn't play a sample: {error}": "⚠ Kunne ikke afspille et eksempel: {error}",
   "⚠ Couldn't start translating: {error}": "⚠ Kunne ikke begynde at oversætte: {error}",
   "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, run install.bat in the add-on's folder to see why.": "⚠ Installationen mislykkedes: {error} . Tryk igen for at prøve igen; hvis det bliver ved med at fejle, skal du køre install.bat i tilføjelsesprogrammets mappe for at se hvorfor.",
-  "⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ AI-stemmen stoppede. Andre hører nu {backup} . Tryk på Stop og derefter på Start for at prøve igen.",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ AI-stemmen stoppede: {error} . Andre hører nu {backup} . Tryk på Stop og derefter på Start for at prøve igen.",
   "⚠ This PC is slow for AI voices: games may stutter. A voice changer preset (left) is much lighter.": "⚠ Denne pc er langsom til AI-stemmer: spil kan stamme. En forudindstillet stemmeskifter (venstre) er meget lettere.",
   "⚠ Translating stopped: {error}": "⚠ Oversættelse stoppet: {error}",
   "⚠ Turned off after an error: {error}": "⚠ Slukket efter en fejl: {error}",
@@ -2768,8 +2765,6 @@
   "Streaming": "Streaming",
   "What will you use Onion Board for?": "Hvad skal du bruge Onion Board til?",
   "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Tilføjer fanen <b>Apps</b> (send musik eller et spil til dit stream). Sidste trin linker til <b>Streamerguide</b> (Stream Deck-knapper, chatkommandoer).",
-  "Start AI voice": "Start AI-stemmen",
-  "Stop AI voice": "Stop AI-stemmen",
   "Your words and tone, a different voice. Live on this PC.": "Dine ord og din tone, en anden stemme. Live på denne pc.",
   "Mic on": "Mikrofon slået til",
   "Output": "Output",
@@ -3366,7 +3361,6 @@
   "The programs the app uses to download and play sounds. They update with the app, to the exact versions it was tested with. Only yt-dlp can update sooner, if you let it.": "De programmer, appen bruger til at downloade og afspille lyde. De opdateres med appen, til præcis de versioner, den blev testet med. Kun yt-dlp kan opdatere før, hvis du lader den.",
   "Used when Connection is set to Tor. It's up to date, and updates with the app.": "Bruges, når Forbindelse er sat til Tor. Den er opdateret og opdateres med appen.",
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "Downloaderen (yt-dlp) er ikke installeret, Indstillinger → Opdateringer → Hjælpeprogrammer → yt-dlp → Geninstallér.",
-  "No voices of your own yet: press Make your own voice below.": "Ingen egne stemmer endnu: tryk på “Lav din egen stemme” nedenfor.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows kan ikke finde <b>{mic}</b> lige nu. Sæt det i, eller tænd det, hvis det er trådløst. Ingen mikrofon overhovedet? Brug det <b>virtuelle kabel</b> nedenfor: det virker uden en.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Din mikrofon sender ingen lyd lige nu (slukket, slået fra eller ingen mikrofon sat i), så andre hører kun dine lyde. Vil du have, at de også hører dig? Tænd den, eller slå lyden til.",
   "A {language} computer voice, once it's on this PC (below).": "En computerstemme på {language}, når den er på denne pc (nedenfor).",
@@ -4109,5 +4103,8 @@
   "Play it now": "Afspil nu",
   "Space or a double-click plays it for you, Enter plays it through your mic, Esc stops, F2 renames, right-click for more.": "Mellemrum eller dobbeltklik afspiller den for dig, Enter afspiller den gennem din mikrofon, Esc stopper, F2 omdøber, højreklik for mere.",
   "Today {time}": "I dag {time}",
-  "Yesterday": "I går"
+  "Yesterday": "I går",
+  "AI voices are installed. Pick a voice to turn it on.": "AI-stemmer er installeret. Vælg en stemme for at tænde den.",
+  "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ AI-stemmen stoppede. Andre hører nu {backup}. Slå den fra og til igen for at prøve igen.",
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ AI-stemmen stoppede: {error}. Andre hører nu {backup}. Slå den fra og til igen for at prøve igen."
 }

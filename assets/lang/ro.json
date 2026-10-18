@@ -1602,7 +1602,6 @@
   "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Un server de text în vorbire care rulează pe computerul dvs. Majoritatea au o adresă în stil OpenAI care se termină în /v1/audio/speech; unul care preia textul în adresă poate folosi {text} în el.",
   "AI voices": "voci AI",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "Vocile AI sunt un add-on opțional (aproximativ 55 MB, modelul de voce și durata de funcționare a acestuia). Nu se descarcă nimic până când apăsați Obține voci AI.",
-  "AI voices are installed. Pick a voice and press Start.": "Vocile AI sunt instalate. Alegeți o voce și apăsați pe Start.",
   "AI voices are removed.": "Vocile AI sunt eliminate.",
   "AI voices aren't available to download yet (GitHub says it can't find it). Try again later.": "Vocile AI nu sunt încă disponibile pentru descărcare (GitHub spune că nu le poate găsi). Încercați din nou mai târziu.",
   "API key": "cheie API",
@@ -2392,8 +2391,6 @@
   "⚠ Couldn't play a sample: {error}": "⚠ Nu s-a putut reda o mostră: {error}",
   "⚠ Couldn't start translating: {error}": "⚠ Nu s-a putut începe traducerea: {error}",
   "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, run install.bat in the add-on's folder to see why.": "⚠ Instalarea a eșuat: {error} . Apăsați din nou pentru a reîncerca; dacă continuă să eșueze, rulați install.bat în folderul programului de completare pentru a vedea de ce.",
-  "⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ Vocea AI sa oprit. Alții aud acum {backup} . Apăsați Stop, apoi Start pentru a încerca din nou.",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ Vocea AI sa oprit: {error} . Alții aud acum {backup} . Apăsați pe Stop, apoi pe Start pentru a încerca din nou.",
   "⚠ This PC is slow for AI voices: games may stutter. A voice changer preset (left) is much lighter.": "⚠ Acest computer este lent pentru vocile AI: jocurile pot bâlbâi. Un schimbător de voce presetat (stânga) este mult mai ușor.",
   "⚠ Translating stopped: {error}": "⚠ Traducerea s-a oprit: {error}",
   "⚠ Turned off after an error: {error}": "⚠ Dezactivat după o eroare: {error}",
@@ -2830,8 +2827,6 @@
   "Streaming": "Streaming",
   "What will you use Onion Board for?": "Pentru ce vei folosi Onion Board?",
   "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Adaugă fila <b>Aplicații</b> (trimite muzică sau un joc pe stream). Ultimul pas duce la <b>Ghid pentru streameri</b> (taste Stream Deck, comenzi în chat).",
-  "Start AI voice": "Porniți vocea AI",
-  "Stop AI voice": "Opriți vocea AI",
   "Your words and tone, a different voice. Live on this PC.": "Cuvintele și tonul tău, o altă voce. În direct pe acest PC.",
   "Mic on": "Microfon activ",
   "Output": "Ieșire",
@@ -3439,7 +3434,6 @@
   "The programs the app uses to download and play sounds. They update with the app, to the exact versions it was tested with. Only yt-dlp can update sooner, if you let it.": "Programele pe care aplicația le folosește ca să descarce și să redea sunete. Se actualizează odată cu aplicația, la exact versiunile cu care a fost testată. Doar yt-dlp se poate actualiza mai devreme, dacă îl lași.",
   "Used when Connection is set to Tor. It's up to date, and updates with the app.": "Folosit când Conexiune e setată pe Tor. E la zi și se actualizează odată cu aplicația.",
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "Programul de descărcare (yt-dlp) nu e instalat, Setări → Actualizări → Programe ajutătoare → yt-dlp → Reinstalează.",
-  "No voices of your own yet: press Make your own voice below.": "Încă nu ai voci proprii: apasă „Fă-ți propria voce” mai jos.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows nu găsește <b>{mic}</b> acum. Conectează-le sau pornește-le, dacă sunt wireless. N-ai deloc microfon? Folosește <b>cablul virtual</b> de mai jos: merge și fără.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Microfonul tău nu trimite niciun sunet acum (oprit, pe mut sau niciun microfon conectat), așa că ceilalți aud doar sunetele tale. Vrei să te audă și pe tine? Pornește-l sau scoate-l de pe mut.",
   "A {language} computer voice, once it's on this PC (below).": "O voce de calculator în {language}, după ce e pe acest PC (mai jos).",
@@ -4188,5 +4182,8 @@
   "Play it now": "Redă acum",
   "Space or a double-click plays it for you, Enter plays it through your mic, Esc stops, F2 renames, right-click for more.": "Spațiu sau dublu clic îl redă pentru tine, Enter îl redă prin microfon, Esc oprește, F2 redenumește, clic dreapta pentru mai multe.",
   "Today {time}": "Azi {time}",
-  "Yesterday": "Ieri"
+  "Yesterday": "Ieri",
+  "AI voices are installed. Pick a voice to turn it on.": "Vocile AI sunt instalate. Alege o voce ca să o pornești.",
+  "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Vocea AI s-a oprit. Ceilalți aud acum {backup}. Oprește-o și pornește-o din nou ca să încerci iar.",
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Vocea AI s-a oprit: {error}. Ceilalți aud acum {backup}. Oprește-o și pornește-o din nou ca să încerci iar."
 }

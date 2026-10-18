@@ -1559,7 +1559,6 @@
   "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "En text-till-tal-server som körs på din PC. De flesta har en adress i OpenAI-stil som slutar på /v1/audio/speech; en som tar texten i adressen kan använda {text} i den istället.",
   "AI voices": "AI-röster",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "AI-röster är ett valfritt tillägg (cirka 55 MB, röstmodellen och dess körtid). Ingenting laddas ner förrän du trycker på Get AI voices.",
-  "AI voices are installed. Pick a voice and press Start.": "AI-röster är installerade. Välj en röst och tryck på Start.",
   "AI voices are removed.": "AI-röster tas bort.",
   "AI voices aren't available to download yet (GitHub says it can't find it). Try again later.": "AI-röster är inte tillgängliga att ladda ner ännu (GitHub säger att den inte kan hitta den). Försök igen senare.",
   "API key": "API-nyckel",
@@ -2342,8 +2341,6 @@
   "⚠ Couldn't play a sample: {error}": "⚠ Det gick inte att spela upp ett prov: {error}",
   "⚠ Couldn't start translating: {error}": "⚠ Det gick inte att börja översätta: {error}",
   "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, run install.bat in the add-on's folder to see why.": "⚠ Installationen misslyckades: {error} . Tryck på den igen för att försöka igen; om det fortsätter att misslyckas, kör install.bat i tilläggets mapp för att se varför.",
-  "⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ AI-rösten stannade. Andra hör nu {backup} . Tryck på Stopp och sedan på Start för att försöka igen.",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ AI-rösten stannade: {error} . Andra hör nu {backup} . Tryck på Stopp och sedan på Start för att försöka igen.",
   "⚠ This PC is slow for AI voices: games may stutter. A voice changer preset (left) is much lighter.": "⚠ Den här datorn är långsam för AI-röster: spel kan stamma. En förinställning för röstväxlare (vänster) är mycket lättare.",
   "⚠ Translating stopped: {error}": "⚠ Översättning stoppad: {error}",
   "⚠ Turned off after an error: {error}": "⚠ Avstängd efter ett fel: {error}",
@@ -2768,8 +2765,6 @@
   "Streaming": "Streaming",
   "What will you use Onion Board for?": "Vad ska du använda Onion Board till?",
   "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Lägger till fliken <b>Appar</b> (skicka musik eller ett spel till din stream). Sista steget länkar till <b>Streamerguide</b> (Stream Deck-knappar, chattkommandon).",
-  "Start AI voice": "Starta AI-rösten",
-  "Stop AI voice": "Stoppa AI-rösten",
   "Your words and tone, a different voice. Live on this PC.": "Dina ord och ditt tonfall, en annan röst. Live på den här datorn.",
   "Mic on": "Mikrofon på",
   "Output": "Utgång",
@@ -3366,7 +3361,6 @@
   "The programs the app uses to download and play sounds. They update with the app, to the exact versions it was tested with. Only yt-dlp can update sooner, if you let it.": "Programmen appen använder för att ladda ned och spela upp ljud. De uppdateras med appen, till exakt de versioner den testades med. Bara yt-dlp kan uppdateras tidigare, om du låter den.",
   "Used when Connection is set to Tor. It's up to date, and updates with the app.": "Används när Anslutning är inställd på Tor. Den är uppdaterad och uppdateras med appen.",
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "Nedladdaren (yt-dlp) är inte installerad, Inställningar → Uppdateringar → Hjälpprogram → yt-dlp → Installera om.",
-  "No voices of your own yet: press Make your own voice below.": "Inga egna röster än: tryck på ”Gör din egen röst” nedanför.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows hittar inte <b>{mic}</b> just nu. Anslut det, eller slå på det om det är trådlöst. Ingen mikrofon alls? Använd den <b>virtuella kabeln</b> nedan: den fungerar utan.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Din mikrofon skickar inget ljud just nu (avstängd, ljudlös eller ingen mikrofon ansluten), så andra hör bara dina ljud. Vill du att de hör dig också? Slå på den eller stäng av ljudlöst.",
   "A {language} computer voice, once it's on this PC (below).": "En datorröst på {language}, när den finns på den här datorn (nedan).",
@@ -4109,5 +4103,8 @@
   "Play it now": "Spela nu",
   "Space or a double-click plays it for you, Enter plays it through your mic, Esc stops, F2 renames, right-click for more.": "Mellanslag eller dubbelklick spelar den för dig, Enter spelar den genom din mikrofon, Esc stoppar, F2 byter namn, högerklicka för mer.",
   "Today {time}": "I dag {time}",
-  "Yesterday": "I går"
+  "Yesterday": "I går",
+  "AI voices are installed. Pick a voice to turn it on.": "AI-röster är installerade. Välj en röst för att slå på den.",
+  "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ AI-rösten stannade. Andra hör nu {backup}. Slå av och på den igen för att försöka igen.",
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ AI-rösten stannade: {error}. Andra hör nu {backup}. Slå av och på den igen för att försöka igen."
 }

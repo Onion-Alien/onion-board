@@ -1563,7 +1563,6 @@
   "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "आपके पीसी पर चलने वाला टेक्स्ट-टू-स्पीच सर्वर। अधिकांश का OpenAI-शैली का पता /v1/ऑडियो/स्पीच में समाप्त होता है; जो पते में पाठ लेता है वह इसके स्थान पर {text} उपयोग कर सकता है।",
   "AI voices": "एआई आवाजें",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "एआई आवाजें एक वैकल्पिक ऐड-ऑन हैं (लगभग 55 एमबी, आवाज मॉडल और इसका रनटाइम)। जब तक आप Get AI वॉइस नहीं दबाते, कुछ भी डाउनलोड नहीं होता।",
-  "AI voices are installed. Pick a voice and press Start.": "एआई आवाजें स्थापित हैं। एक आवाज चुनें और स्टार्ट दबाएँ।",
   "AI voices are removed.": "AI आवाजें हटा दी जाती हैं।",
   "AI voices aren't available to download yet (GitHub says it can't find it). Try again later.": "AI आवाजें अभी तक डाउनलोड करने के लिए उपलब्ध नहीं हैं (GitHub का कहना है कि वह इसे नहीं ढूंढ सकता)। बाद में पुन: प्रयास।",
   "API key": "एपीआई कुंजी",
@@ -2342,8 +2341,6 @@
   "⚠ Couldn't play a sample: {error}": "⚠ एक ​​नमूना नहीं चलाया जा सका: {error}",
   "⚠ Couldn't start translating: {error}": "⚠ अनुवाद प्रारंभ नहीं हो सका: {error}",
   "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, run install.bat in the add-on's folder to see why.": "⚠ इंस्टॉल विफल: {error} । पुनः प्रयास करने के लिए इसे दोबारा दबाएँ; यदि यह विफल रहता है, तो कारण जानने के लिए ऐड-ऑन के फ़ोल्डर में install.bat चलाएँ।",
-  "⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start to try again.": "⚠एआई की आवाज बंद हो गई। अन्य लोग अब {backup} सुनते हैं। रोकें दबाएँ, फिर पुनः प्रयास करना प्रारंभ करें।",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ AI आवाज बंद हो गई: {error} । अन्य लोग अब {backup} सुनते हैं। रोकें दबाएँ, फिर पुनः प्रयास करना प्रारंभ करें।",
   "⚠ This PC is slow for AI voices: games may stutter. A voice changer preset (left) is much lighter.": "⚠ यह पीसी AI आवाजों के लिए धीमा है: गेम रुक सकते हैं। वॉइस चेंजर प्रीसेट (बाएं) बहुत हल्का है।",
   "⚠ Translating stopped: {error}": "⚠ अनुवाद रुक गया: {error}",
   "⚠ Turned off after an error: {error}": "⚠ एक ​​त्रुटि के बाद बंद कर दिया गया: {error}",
@@ -2768,8 +2765,6 @@
   "Streaming": "स्ट्रीमिंग",
   "What will you use Onion Board for?": "आप Onion Board किस लिए इस्तेमाल करेंगे?",
   "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "<b>ऐप्स</b> टैब जोड़ता है (अपनी स्ट्रीम में म्यूज़िक या गेम भेजें)। आख़िरी स्टेप में <b>स्ट्रीमर गाइड</b> का लिंक है (Stream Deck की कीज़, चैट कमांड)।",
-  "Start AI voice": "एआई आवाज प्रारंभ करें",
-  "Stop AI voice": "एआई आवाज बंद करो",
   "Your words and tone, a different voice. Live on this PC.": "आपके शब्द और लहजा, एक अलग आवाज़। इसी पीसी पर लाइव।",
   "Mic on": "माइक चालू है",
   "Output": "आउटपुट",
@@ -3366,7 +3361,6 @@
   "The programs the app uses to download and play sounds. They update with the app, to the exact versions it was tested with. Only yt-dlp can update sooner, if you let it.": "वे प्रोग्राम जिनसे ऐप साउंड डाउनलोड और प्ले करता है। ये ऐप के साथ अपडेट होते हैं, ठीक उन्हीं वर्ज़न पर जिनसे ऐप को टेस्ट किया गया था। आप चाहें तो सिर्फ़ yt-dlp पहले अपडेट हो सकता है।",
   "Used when Connection is set to Tor. It's up to date, and updates with the app.": "जब संबंध Tor पर सेट हो तब इस्तेमाल होता है। यह अप टू डेट है और ऐप के साथ अपडेट होता है।",
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "डाउनलोडर (yt-dlp) इंस्टॉल नहीं है, सेटिंग्स → अपडेट → सहायक प्रोग्राम → yt-dlp → पुनर्स्थापित।",
-  "No voices of your own yet: press Make your own voice below.": "अभी आपकी अपनी कोई आवाज़ नहीं: नीचे “अपनी आवाज खुद बनाओ” दबाएँ।",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows को अभी <b>{mic}</b> नहीं मिल रहा। उसे लगाएँ, या वायरलेस हो तो चालू करें। माइक है ही नहीं? नीचे दी गई <b>वर्चुअल केबल</b> इस्तेमाल करें: यह बिना माइक के भी चलती है।",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "आपका माइक अभी कोई आवाज़ नहीं भेज रहा (बंद है, म्यूट है या कोई माइक लगा नहीं है), इसलिए दूसरों को सिर्फ़ आपकी साउंड सुनाई देती हैं। चाहते हैं कि वे आपको भी सुनें? उसे चालू करें या अनम्यूट करें।",
   "A {language} computer voice, once it's on this PC (below).": "{language} की कंप्यूटर आवाज़, जब वह इस PC पर आ जाए (नीचे)।",
@@ -4109,5 +4103,8 @@
   "Play it now": "अभी चलाएँ",
   "Space or a double-click plays it for you, Enter plays it through your mic, Esc stops, F2 renames, right-click for more.": "Space या डबल-क्लिक से यह आपके लिए बजेगा, Enter से आपके माइक में बजेगा, Esc रोकता है, F2 नाम बदलता है, और विकल्पों के लिए राइट-क्लिक करें।",
   "Today {time}": "आज {time}",
-  "Yesterday": "कल"
+  "Yesterday": "कल",
+  "AI voices are installed. Pick a voice to turn it on.": "एआई आवाज़ें इंस्टॉल हो गई हैं। चालू करने के लिए एक आवाज़ चुनें।",
+  "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ एआई आवाज़ बंद हो गई। अब दूसरे लोग {backup} सुनते हैं। फिर से कोशिश करने के लिए इसे बंद करके दोबारा चालू करें।",
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ एआई आवाज़ बंद हो गई: {error}। अब दूसरे लोग {backup} सुनते हैं। फिर से कोशिश करने के लिए इसे बंद करके दोबारा चालू करें।"
 }

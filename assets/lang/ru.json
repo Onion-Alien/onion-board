@@ -1526,7 +1526,6 @@
   "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Сервер преобразования текста в речь, работающий на вашем компьютере. Большинство из них имеют адрес в стиле OpenAI, заканчивающийся на /v1/audio/speech; тот, который принимает текст адреса, может вместо этого использовать {text} .",
   "AI voices": "голоса ИИ",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "Голоса AI являются дополнительным дополнением (около 55 МБ, модель голоса и время ее выполнения). Ничего не будет загружено, пока вы не нажмете «Получить голоса AI».",
-  "AI voices are installed. Pick a voice and press Start.": "Установлены голоса AI. Выберите голос и нажмите «Старт».",
   "AI voices are removed.": "Голоса ИИ удалены.",
   "AI voices aren't available to download yet (GitHub says it can't find it). Try again later.": "Голоса ИИ пока недоступны для загрузки (GitHub сообщает, что не может их найти). Повторите попытку позже.",
   "API key": "API-ключ",
@@ -2306,8 +2305,6 @@
   "⚠ Couldn't play a sample: {error}": "⚠ Не удалось воспроизвести сэмпл: {error}",
   "⚠ Couldn't start translating: {error}": "⚠ Не удалось начать перевод: {error}",
   "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, run install.bat in the add-on's folder to see why.": "⚠ Установка не удалась: {error} . Нажмите еще раз, чтобы повторить попытку; если ошибка продолжает работать, запустите install.bat в папке надстройки, чтобы понять, почему.",
-  "⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ Голос ИИ остановился. Другие теперь слышат {backup} . Нажмите «Стоп», затем «Старт», чтобы повторить попытку.",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ Голос ИИ остановился: {error} . Другие теперь слышат {backup} . Нажмите «Стоп», затем «Старт», чтобы повторить попытку.",
   "⚠ This PC is slow for AI voices: games may stutter. A voice changer preset (left) is much lighter.": "⚠ Этот компьютер медленно обрабатывает голоса ИИ: игры могут тормозить. Предустановка смены голоса (слева) намного легче.",
   "⚠ Translating stopped: {error}": "⚠ Перевод остановлен: {error}",
   "⚠ Turned off after an error: {error}": "⚠ Выключено после ошибки: {error}",
@@ -2830,8 +2827,6 @@
   "Streaming": "Стриминг",
   "What will you use Onion Board for?": "Для чего ты будешь использовать Onion Board?",
   "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Добавляет вкладку <b>Программы</b> (отправляй музыку или игру на стрим). На последнем шаге есть ссылка: <b>Гайд для стримеров</b> (кнопки Stream Deck, команды в чате).",
-  "Start AI voice": "Запустите голос ИИ",
-  "Stop AI voice": "Остановите голос ИИ",
   "Your words and tone, a different voice. Live on this PC.": "Твои слова и интонация, другой голос. Вживую на этом ПК.",
   "Mic on": "Микрофон включён",
   "Output": "Выход",
@@ -3439,7 +3434,6 @@
   "The programs the app uses to download and play sounds. They update with the app, to the exact versions it was tested with. Only yt-dlp can update sooner, if you let it.": "Программы, с помощью которых приложение скачивает и воспроизводит звуки. Они обновляются вместе с приложением, ровно до тех версий, с которыми его проверяли. Только yt-dlp может обновиться раньше, если ты разрешишь.",
   "Used when Connection is set to Tor. It's up to date, and updates with the app.": "Используется, когда в Подключении выбран Tor. Он актуален и обновляется вместе с приложением.",
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "Загрузчик (yt-dlp) не установлен, Настройки → Обновления → Вспомогательные программы → yt-dlp → Переустановить.",
-  "No voices of your own yet: press Make your own voice below.": "Своих голосов пока нет: нажми «Сделайте свой собственный голос» ниже.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows сейчас не видит <b>{mic}</b>. Подключи его или включи, если он беспроводной. Микрофона нет совсем? Используй <b>виртуальный кабель</b> ниже: он работает и без микрофона.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Твой микрофон сейчас не передаёт звук (выключен, заглушён или не подключён), поэтому другие слышат только твои звуки. Хочешь, чтобы слышали и тебя? Включи его или сними заглушку.",
   "A {language} computer voice, once it's on this PC (below).": "Компьютерный голос ({language}), когда он появится на этом ПК (ниже).",
@@ -4188,5 +4182,8 @@
   "Play it now": "Включить сейчас",
   "Space or a double-click plays it for you, Enter plays it through your mic, Esc stops, F2 renames, right-click for more.": "Пробел или двойной щелчок проигрывает его тебе, Enter проигрывает в твой микрофон, Esc останавливает, F2 переименовывает, правый щелчок покажет ещё.",
   "Today {time}": "Сегодня {time}",
-  "Yesterday": "Вчера"
+  "Yesterday": "Вчера",
+  "AI voices are installed. Pick a voice to turn it on.": "Голоса ИИ установлены. Выберите голос, чтобы включить его.",
+  "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Голос ИИ остановился. Другие теперь слышат {backup}. Выключите и снова включите его, чтобы попробовать ещё раз.",
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Голос ИИ остановился: {error}. Другие теперь слышат {backup}. Выключите и снова включите его, чтобы попробовать ещё раз."
 }

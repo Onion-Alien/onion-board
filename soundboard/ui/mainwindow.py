@@ -888,7 +888,7 @@ class MainWindow(QMainWindow):
             v.fx.keys = dict(self.cfg.voice_hotkeys)
             v.board_sounds = lambda: self.cfg.sounds   # the Background's "from my board"
             v.board_changed()
-            v.fx.set_view(self.cfg.voice_view)
+            v.set_view(self.cfg.voice_view)   # both cards: Voice changer and AI voices
             v.fx.view_toggle.changed.connect(lambda view: self.set_option("voice_view", view))
             v.fx.tip_dismissed.connect(
                 lambda: self.set_option("voice_discord_tip_shown", True))

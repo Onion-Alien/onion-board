@@ -1602,7 +1602,6 @@
   "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Server pro převod textu na řeč běžící na vašem PC. Většina z nich má adresu ve stylu OpenAI končící na /v1/audio/speech; ten, který přebírá text v adrese, v něm může místo toho použít {text} .",
   "AI voices": "hlasy AI",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "AI hlasy jsou volitelným doplňkem (asi 55 MB, hlasový model a jeho běh). Nic se nestáhne, dokud nestisknete tlačítko Získat hlasy AI.",
-  "AI voices are installed. Pick a voice and press Start.": "Hlasy AI jsou nainstalovány. Vyberte hlas a stiskněte Start.",
   "AI voices are removed.": "Hlasy AI jsou odstraněny.",
   "AI voices aren't available to download yet (GitHub says it can't find it). Try again later.": "Hlasy AI zatím nejsou k dispozici ke stažení (GitHub říká, že je nemůže najít). Zkuste to znovu později.",
   "API key": "API klíč",
@@ -2392,8 +2391,6 @@
   "⚠ Couldn't play a sample: {error}": "⚠ Nelze přehrát ukázku: {error}",
   "⚠ Couldn't start translating: {error}": "⚠ Nelze spustit překlad: {error}",
   "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, run install.bat in the add-on's folder to see why.": "⚠ Instalace se nezdařila: {error} . Chcete-li to zkusit znovu, stiskněte jej znovu; pokud stále selhává, spusťte install.bat ve složce doplňku a zjistěte proč.",
-  "⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ Hlas AI se zastavil. Ostatní nyní slyší {backup} . Stiskněte Stop a potom Start a zkuste to znovu.",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ Hlas AI se zastavil: {error} . Ostatní nyní slyší {backup} . Stiskněte Stop a potom Start a zkuste to znovu.",
   "⚠ This PC is slow for AI voices: games may stutter. A voice changer preset (left) is much lighter.": "⚠ Tento počítač je pomalý pro hlasy AI: hry mohou koktat. Přednastavený měnič hlasu (vlevo) je mnohem lehčí.",
   "⚠ Translating stopped: {error}": "⚠ Překlad zastaven: {error}",
   "⚠ Turned off after an error: {error}": "⚠ Vypnuto po chybě: {error}",
@@ -2830,8 +2827,6 @@
   "Streaming": "Streamování",
   "What will you use Onion Board for?": "K čemu budeš Onion Board používat?",
   "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Přidá kartu <b>Aplikace</b> (pošli hudbu nebo hru do streamu). Poslední krok odkazuje na <b>Průvodce pro streamery</b> (tlačítka Stream Decku, příkazy v chatu).",
-  "Start AI voice": "Spusťte hlas AI",
-  "Stop AI voice": "Zastavte hlas AI",
   "Your words and tone, a different voice. Live on this PC.": "Tvoje slova a tón, jiný hlas. Živě na tomto počítači.",
   "Mic on": "Mikrofon zapnut",
   "Output": "Výstup",
@@ -3439,7 +3434,6 @@
   "The programs the app uses to download and play sounds. They update with the app, to the exact versions it was tested with. Only yt-dlp can update sooner, if you let it.": "Programy, které aplikace používá ke stahování a přehrávání zvuků. Aktualizují se s aplikací, přesně na verze, se kterými byla otestovaná. Jen yt-dlp se může aktualizovat dřív, pokud mu to dovolíš.",
   "Used when Connection is set to Tor. It's up to date, and updates with the app.": "Používá se, když je Připojení nastavené na Tor. Je aktuální a aktualizuje se s aplikací.",
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "Stahovač (yt-dlp) není nainstalovaný, Nastavení → Aktualizace → Pomocné programy → yt-dlp → Přeinstalovat.",
-  "No voices of your own yet: press Make your own voice below.": "Zatím nemáš vlastní hlasy: stiskni „Vytvořte svůj vlastní hlas“ níže.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows teď nenacházejí <b>{mic}</b>. Připoj je, nebo je zapni, jestli jsou bezdrátová. Nemáš mikrofon vůbec? Použij <b>virtuální kabel</b> níže: funguje i bez něj.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Tvůj mikrofon teď neposílá žádný zvuk (vypnutý, ztlumený nebo žádný mikrofon nepřipojený), takže ostatní slyší jen tvoje zvuky. Chceš, aby slyšeli i tebe? Zapni ho nebo zruš ztlumení.",
   "A {language} computer voice, once it's on this PC (below).": "Počítačový hlas pro {language}, až bude v tomto PC (níže).",
@@ -4188,5 +4182,8 @@
   "Play it now": "Přehrát hned",
   "Space or a double-click plays it for you, Enter plays it through your mic, Esc stops, F2 renames, right-click for more.": "Mezerník nebo dvojklik to přehraje tobě, Enter do mikrofonu, Esc zastaví, F2 přejmenuje, pravé tlačítko pro víc.",
   "Today {time}": "Dnes {time}",
-  "Yesterday": "Včera"
+  "Yesterday": "Včera",
+  "AI voices are installed. Pick a voice to turn it on.": "Hlasy AI jsou nainstalované. Vyberte hlas a zapne se.",
+  "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Hlas AI se zastavil. Ostatní teď slyší {backup}. Vypněte ho a znovu zapněte a zkuste to znovu.",
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Hlas AI se zastavil: {error}. Ostatní teď slyší {backup}. Vypněte ho a znovu zapněte a zkuste to znovu."
 }

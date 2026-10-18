@@ -1563,7 +1563,6 @@
   "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Ein Text-to-Speech-Server, der auf Ihrem PC läuft. Die meisten haben eine Adresse im OpenAI-Stil, die auf /v1/audio/speech endet; jemand, der den Text in der Adresse übernimmt, kann stattdessen {text} darin verwenden.",
   "AI voices": "KI-Stimmen",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "KI-Stimmen sind ein optionales Add-on (ca. 55 MB, das Sprachmodell und seine Laufzeit). Es wird nichts heruntergeladen, bis Sie auf „KI-Stimmen abrufen“ klicken.",
-  "AI voices are installed. Pick a voice and press Start.": "KI-Stimmen sind installiert. Wählen Sie eine Stimme und drücken Sie Start.",
   "AI voices are removed.": "KI-Stimmen werden entfernt.",
   "AI voices aren't available to download yet (GitHub says it can't find it). Try again later.": "KI-Stimmen können noch nicht heruntergeladen werden (GitHub sagt, dass es sie nicht finden kann). Versuchen Sie es später noch einmal.",
   "API key": "API-Schlüssel",
@@ -2342,8 +2341,6 @@
   "⚠ Couldn't play a sample: {error}": "⚠ Ein Sample konnte nicht abgespielt werden: {error}",
   "⚠ Couldn't start translating: {error}": "⚠ Die Übersetzung konnte nicht gestartet werden: {error}",
   "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, run install.bat in the add-on's folder to see why.": "⚠ Installation fehlgeschlagen: {error} . Drücken Sie die Taste erneut, um es erneut zu versuchen. Wenn es weiterhin fehlschlägt, führen Sie install.bat im Ordner des Add-ons aus, um herauszufinden, warum.",
-  "⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ Die KI-Stimme verstummte. Andere hören jetzt {backup} . Drücken Sie Stopp und dann Start, um es erneut zu versuchen.",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ Die KI-Stimme verstummte: {error} . Andere hören jetzt {backup} . Drücken Sie Stopp und dann Start, um es erneut zu versuchen.",
   "⚠ This PC is slow for AI voices: games may stutter. A voice changer preset (left) is much lighter.": "⚠ Dieser PC ist langsam für KI-Stimmen: Spiele können stottern. Eine Sprachwechsler-Voreinstellung (links) ist viel einfacher.",
   "⚠ Translating stopped: {error}": "⚠ Übersetzung gestoppt: {error}",
   "⚠ Turned off after an error: {error}": "⚠ Nach einem Fehler ausgeschaltet: {error}",
@@ -2768,8 +2765,6 @@
   "Streaming": "Streamen",
   "What will you use Onion Board for?": "Wofür nutzt du Onion Board?",
   "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Fügt den Tab <b>Apps</b> hinzu (schick Musik oder ein Spiel in deinen Stream). Der letzte Schritt verlinkt die <b>Streamer-Anleitung</b> (Stream-Deck-Tasten, Chat-Befehle).",
-  "Start AI voice": "Starten Sie die KI-Stimme",
-  "Stop AI voice": "Stoppen Sie die KI-Stimme",
   "Your words and tone, a different voice. Live on this PC.": "Deine Worte und dein Ton, eine andere Stimme. Live auf diesem PC.",
   "Mic on": "Mikro an",
   "Output": "Ausgabe",
@@ -3366,7 +3361,6 @@
   "The programs the app uses to download and play sounds. They update with the app, to the exact versions it was tested with. Only yt-dlp can update sooner, if you let it.": "Die Programme, mit denen die App Sounds herunterlädt und abspielt. Sie werden mit der App aktualisiert, auf genau die Versionen, mit denen sie getestet wurde. Nur yt-dlp kann früher aktualisiert werden, wenn du es lässt.",
   "Used when Connection is set to Tor. It's up to date, and updates with the app.": "Wird genutzt, wenn Verbindung auf Tor steht. Es ist aktuell und wird mit der App aktualisiert.",
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "Der Downloader (yt-dlp) ist nicht installiert, Einstellungen → Updates → Hilfsprogramme → yt-dlp → Neu installieren.",
-  "No voices of your own yet: press Make your own voice below.": "Noch keine eigenen Stimmen: Drück unten auf „Machen Sie Ihre eigene Stimme“.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows findet <b>{mic}</b> gerade nicht. Steck es ein, oder schalte es ein, wenn es kabellos ist. Gar kein Mikro? Nimm das <b>virtuelle Kabel</b> unten: Es geht auch ohne.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Dein Mikro sendet gerade keinen Ton (aus, stummgeschaltet oder kein Mikro eingesteckt), deshalb hören andere nur deine Sounds. Sie sollen dich auch hören? Schalte es ein oder heb die Stummschaltung auf.",
   "A {language} computer voice, once it's on this PC (below).": "Eine Computerstimme für {language}, sobald sie auf diesem PC ist (unten).",
@@ -4109,5 +4103,8 @@
   "Play it now": "Jetzt abspielen",
   "Space or a double-click plays it for you, Enter plays it through your mic, Esc stops, F2 renames, right-click for more.": "Leertaste oder Doppelklick spielt es für dich ab, Enter spielt es über dein Mikro, Esc stoppt, F2 benennt um, Rechtsklick für mehr.",
   "Today {time}": "Heute {time}",
-  "Yesterday": "Gestern"
+  "Yesterday": "Gestern",
+  "AI voices are installed. Pick a voice to turn it on.": "KI-Stimmen sind installiert. Wähle eine Stimme, um sie einzuschalten.",
+  "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Die KI-Stimme ist ausgefallen. Andere hören jetzt {backup}. Schalte sie aus und wieder ein, um es erneut zu versuchen.",
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Die KI-Stimme ist ausgefallen: {error}. Andere hören jetzt {backup}. Schalte sie aus und wieder ein, um es erneut zu versuchen."
 }

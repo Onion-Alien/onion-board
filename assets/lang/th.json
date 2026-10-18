@@ -1520,7 +1520,6 @@
   "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "เซิร์ฟเวอร์ข้อความเป็นคำพูดที่ทำงานบนพีซีของคุณ ส่วนใหญ่มีที่อยู่สไตล์ OpenAI ที่ลงท้ายด้วย /v1/audio/speech; อันที่รับข้อความในที่อยู่สามารถใช้ {text} ในนั้นแทนได้",
   "AI voices": "เสียงเอไอ",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "เสียง AI เป็นส่วนเสริมเสริม (ประมาณ 55 MB, โมเดลเสียงและรันไทม์) ไม่มีการดาวน์โหลดใดๆ จนกว่าคุณจะกดรับเสียง AI",
-  "AI voices are installed. Pick a voice and press Start.": "ติดตั้งเสียง AI แล้ว เลือกเสียงแล้วกดเริ่ม",
   "AI voices are removed.": "เสียง AI จะถูกลบออก",
   "AI voices aren't available to download yet (GitHub says it can't find it). Try again later.": "เสียง AI ยังไม่พร้อมให้ดาวน์โหลด (GitHub บอกว่าหาไม่พบ) ลองอีกครั้งในภายหลัง",
   "API key": "คีย์เอพีไอ",
@@ -2292,8 +2291,6 @@
   "⚠ Couldn't play a sample: {error}": "⚠ ไม่สามารถเล่นตัวอย่าง: {error}",
   "⚠ Couldn't start translating: {error}": "⚠ ไม่สามารถเริ่มการแปล: {error}",
   "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, run install.bat in the add-on's folder to see why.": "⚠ การติดตั้งล้มเหลว: {error} กดอีกครั้งเพื่อลองอีกครั้ง หากยังคงล้มเหลว ให้เรียกใช้ install.bat ในโฟลเดอร์ของส่วนเสริมเพื่อดูว่าเหตุใด",
-  "⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ เสียง AI หยุดลง ตอนนี้คนอื่นได้ยิน {backup} กด Stop จากนั้น Start เพื่อลองอีกครั้ง",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ เสียง AI หยุดลง: {error} ตอนนี้คนอื่นได้ยิน {backup} กด Stop จากนั้น Start เพื่อลองอีกครั้ง",
   "⚠ This PC is slow for AI voices: games may stutter. A voice changer preset (left) is much lighter.": "PC พีซีเครื่องนี้ช้าสำหรับเสียง AI: เกมอาจพูดติดอ่าง พรีเซ็ตโปรแกรมเปลี่ยนเสียง (ซ้าย) เบากว่ามาก",
   "⚠ Translating stopped: {error}": "⚠ การแปลหยุดลง: {error}",
   "⚠ Turned off after an error: {error}": "⚠ ปิดหลังจากเกิดข้อผิดพลาด: {error}",
@@ -2706,8 +2703,6 @@
   "Streaming": "สตรีมมิ่ง",
   "What will you use Onion Board for?": "คุณจะใช้ Onion Board ทำอะไร?",
   "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "เพิ่มแท็บ <b>แอป</b> (ส่งเพลงหรือเกมเข้าสตรีมของคุณ) ขั้นตอนสุดท้ายมีลิงก์ไปยัง<b>คู่มือสตรีมเมอร์</b> (ปุ่ม Stream Deck, คำสั่งในแชท)",
-  "Start AI voice": "เริ่มเสียง AI",
-  "Stop AI voice": "หยุดเสียง AI",
   "Your words and tone, a different voice. Live on this PC.": "คำพูดและน้ำเสียงของคุณ ด้วยเสียงที่ต่างออกไป แบบสดบนพีซีเครื่องนี้",
   "Mic on": "เปิดไมค์",
   "Output": "เอาต์พุต",
@@ -3293,7 +3288,6 @@
   "The programs the app uses to download and play sounds. They update with the app, to the exact versions it was tested with. Only yt-dlp can update sooner, if you let it.": "โปรแกรมที่แอปใช้ดาวน์โหลดและเล่นเสียง อัปเดตไปพร้อมกับแอป เป็นเวอร์ชันที่แอปทดสอบมาแล้วพอดี มีแค่ yt-dlp ที่อัปเดตก่อนได้ ถ้าคุณอนุญาต",
   "Used when Connection is set to Tor. It's up to date, and updates with the app.": "ใช้เมื่อการเชื่อมต่อตั้งเป็น Tor เป็นเวอร์ชันล่าสุดและอัปเดตไปพร้อมกับแอป",
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "ไม่ได้ติดตั้งตัวดาวน์โหลด (yt-dlp) การตั้งค่า → อัพเดท → โปรแกรมช่วยเหลือ → yt-dlp → ติดตั้งใหม่",
-  "No voices of your own yet: press Make your own voice below.": "ยังไม่มีเสียงของคุณเอง: กด “สร้างเสียงของคุณเอง” ด้านล่าง",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "ตอนนี้ Windows หา <b>{mic}</b> ไม่เจอ เสียบมัน หรือเปิดมันถ้าเป็นแบบไร้สาย ไม่มีไมค์เลยเหรอ? ใช้ <b>สายเสมือน</b> ด้านล่าง: ใช้ได้แม้ไม่มีไมค์",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "ตอนนี้ไมค์ของคุณไม่ส่งเสียงเลย (ปิดอยู่ ปิดเสียงอยู่ หรือไม่ได้เสียบไมค์) คนอื่นจึงได้ยินแค่เสียงเอฟเฟกต์ของคุณ อยากให้เขาได้ยินคุณด้วยไหม? เปิดไมค์หรือเลิกปิดเสียง",
   "A {language} computer voice, once it's on this PC (below).": "เสียงคอมพิวเตอร์ภาษา{language} เมื่อมีในพีซีนี้แล้ว (ด้านล่าง)",
@@ -4030,5 +4024,8 @@
   "Play it now": "เล่นตอนนี้",
   "Space or a double-click plays it for you, Enter plays it through your mic, Esc stops, F2 renames, right-click for more.": "กด Space หรือดับเบิลคลิกเพื่อเล่นให้คุณฟัง กด Enter เพื่อเล่นผ่านไมค์ Esc หยุด F2 เปลี่ยนชื่อ คลิกขวาเพื่อดูเพิ่มเติม",
   "Today {time}": "วันนี้ {time}",
-  "Yesterday": "เมื่อวาน"
+  "Yesterday": "เมื่อวาน",
+  "AI voices are installed. Pick a voice to turn it on.": "ติดตั้งเสียง AI แล้ว เลือกเสียงเพื่อเปิดใช้งาน",
+  "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ เสียง AI หยุดทำงาน ตอนนี้คนอื่นได้ยิน {backup} ปิดแล้วเปิดใหม่อีกครั้งเพื่อลองใหม่",
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ เสียง AI หยุดทำงาน: {error} ตอนนี้คนอื่นได้ยิน {backup} ปิดแล้วเปิดใหม่อีกครั้งเพื่อลองใหม่"
 }

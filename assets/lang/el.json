@@ -1559,7 +1559,6 @@
   "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Ένας διακομιστής μετατροπής κειμένου σε ομιλία που εκτελείται στον υπολογιστή σας. Τα περισσότερα έχουν μια διεύθυνση τύπου OpenAI που τελειώνει σε /v1/audio/speech. κάποιος που παίρνει το κείμενο στη διεύθυνση μπορεί να χρησιμοποιήσει {text} σε αυτό.",
   "AI voices": "φωνές AI",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "Οι φωνές AI είναι ένα προαιρετικό πρόσθετο (περίπου 55 MB, το μοντέλο φωνής και ο χρόνος εκτέλεσης του). Δεν γίνεται λήψη τίποτα μέχρι να πατήσετε Λήψη φωνών AI.",
-  "AI voices are installed. Pick a voice and press Start.": "Οι φωνές AI έχουν εγκατασταθεί. Επιλέξτε μια φωνή και πατήστε Έναρξη.",
   "AI voices are removed.": "Οι φωνές AI καταργούνται.",
   "AI voices aren't available to download yet (GitHub says it can't find it). Try again later.": "Οι φωνές AI δεν είναι ακόμη διαθέσιμες για λήψη (το GitHub λέει ότι δεν μπορεί να τις βρει). Δοκιμάστε ξανά αργότερα.",
   "API key": "Κλειδί API",
@@ -2342,8 +2341,6 @@
   "⚠ Couldn't play a sample: {error}": "⚠ Δεν ήταν δυνατή η αναπαραγωγή ενός δείγματος: {error}",
   "⚠ Couldn't start translating: {error}": "⚠ Δεν ήταν δυνατή η έναρξη της μετάφρασης: {error}",
   "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, run install.bat in the add-on's folder to see why.": "⚠ Η εγκατάσταση απέτυχε: {error} . Πατήστε το ξανά για να προσπαθήσετε ξανά. Εάν εξακολουθεί να αποτυγχάνει, εκτελέστε το install.bat στο φάκελο του πρόσθετου για να δείτε γιατί.",
-  "⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ Η φωνή AI σταμάτησε. Άλλοι ακούνε τώρα {backup} . Πατήστε Διακοπή και μετά Έναρξη για να προσπαθήσετε ξανά.",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ Η φωνή AI σταμάτησε: {error} . Άλλοι ακούνε τώρα {backup} . Πατήστε Διακοπή και μετά Έναρξη για να προσπαθήσετε ξανά.",
   "⚠ This PC is slow for AI voices: games may stutter. A voice changer preset (left) is much lighter.": "⚠ Αυτός ο υπολογιστής είναι αργός για φωνές AI: τα παιχνίδια μπορεί να τραυλίζουν. Μια προεπιλογή αλλαγής φωνής (αριστερά) είναι πολύ πιο ελαφριά.",
   "⚠ Translating stopped: {error}": "⚠ Η μετάφραση σταμάτησε: {error}",
   "⚠ Turned off after an error: {error}": "⚠ Απενεργοποιήθηκε μετά από σφάλμα: {error}",
@@ -2768,8 +2765,6 @@
   "Streaming": "Streaming",
   "What will you use Onion Board for?": "Για τι θα χρησιμοποιείς το Onion Board;",
   "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Προσθέτει την καρτέλα <b>Εφαρμογές</b> (στείλε μουσική ή ένα παιχνίδι στο stream σου). Το τελευταίο βήμα έχει σύνδεσμο στον <b>Οδηγός για streamers</b> (πλήκτρα Stream Deck, εντολές στο chat).",
-  "Start AI voice": "Ξεκινήστε τη φωνή AI",
-  "Stop AI voice": "Σταματήστε τη φωνή AI",
   "Your words and tone, a different voice. Live on this PC.": "Τα λόγια και ο τόνος σου, με άλλη φωνή. Ζωντανά σε αυτόν τον υπολογιστή.",
   "Mic on": "Μικρόφωνο ενεργό",
   "Output": "Έξοδος",
@@ -3366,7 +3361,6 @@
   "The programs the app uses to download and play sounds. They update with the app, to the exact versions it was tested with. Only yt-dlp can update sooner, if you let it.": "Τα προγράμματα που χρησιμοποιεί η εφαρμογή για να κατεβάζει και να παίζει ήχους. Ενημερώνονται μαζί με την εφαρμογή, ακριβώς στις εκδόσεις με τις οποίες δοκιμάστηκε. Μόνο το yt-dlp μπορεί να ενημερωθεί νωρίτερα, αν το αφήσεις.",
   "Used when Connection is set to Tor. It's up to date, and updates with the app.": "Χρησιμοποιείται όταν η Σύνδεση είναι ρυθμισμένη σε Tor. Είναι ενημερωμένο και ενημερώνεται μαζί με την εφαρμογή.",
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "Το πρόγραμμα λήψης (yt-dlp) δεν είναι εγκατεστημένο, Ρυθμίσεις → Ενημερώσεις → Βοηθητικά προγράμματα → yt-dlp → Επανεγκατάσταση.",
-  "No voices of your own yet: press Make your own voice below.": "Δεν έχεις ακόμα δικές σου φωνές: πάτα «Κάντε τη δική σας φωνή» παρακάτω.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Τα Windows δεν βρίσκουν το <b>{mic}</b> αυτή τη στιγμή. Σύνδεσέ το ή άνοιξέ το αν είναι ασύρματο. Δεν έχεις καθόλου μικρόφωνο; Χρησιμοποίησε το <b>εικονικό καλώδιο</b> παρακάτω: δουλεύει και χωρίς.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Το μικρόφωνό σου δεν στέλνει ήχο αυτή τη στιγμή (κλειστό, σε σίγαση ή δεν είναι συνδεδεμένο), οπότε οι άλλοι ακούν μόνο τους ήχους σου. Θες να ακούν και εσένα; Άνοιξέ το ή βγάλ' το από τη σίγαση.",
   "A {language} computer voice, once it's on this PC (below).": "Μια φωνή υπολογιστή στα {language}, μόλις υπάρχει σε αυτόν τον υπολογιστή (παρακάτω).",
@@ -4109,5 +4103,8 @@
   "Play it now": "Παίξ' το τώρα",
   "Space or a double-click plays it for you, Enter plays it through your mic, Esc stops, F2 renames, right-click for more.": "Το Space ή το διπλό κλικ το παίζει για σένα, το Enter το παίζει μέσα από το μικρόφωνό σου, το Esc σταματά, το F2 μετονομάζει, δεξί κλικ για περισσότερα.",
   "Today {time}": "Σήμερα {time}",
-  "Yesterday": "Χθες"
+  "Yesterday": "Χθες",
+  "AI voices are installed. Pick a voice to turn it on.": "Οι φωνές AI εγκαταστάθηκαν. Επιλέξτε μια φωνή για να την ενεργοποιήσετε.",
+  "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Η φωνή AI σταμάτησε. Οι άλλοι ακούνε τώρα {backup}. Απενεργοποιήστε την και ενεργοποιήστε την ξανά για να δοκιμάσετε ξανά.",
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Η φωνή AI σταμάτησε: {error}. Οι άλλοι ακούνε τώρα {backup}. Απενεργοποιήστε την και ενεργοποιήστε την ξανά για να δοκιμάσετε ξανά."
 }

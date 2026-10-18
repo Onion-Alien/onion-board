@@ -1520,7 +1520,6 @@
   "A text-to-speech server running on your PC. Most have an OpenAI-style address ending in /v1/audio/speech; one that takes the text in the address can use {text} in it instead.": "Máy chủ chuyển văn bản thành giọng nói chạy trên PC của bạn. Hầu hết đều có địa chỉ kiểu OpenAI kết thúc bằng /v1/audio/speech; thay vào đó, một địa chỉ lấy văn bản trong địa chỉ có thể sử dụng {text} trong đó.",
   "AI voices": "Giọng nói AI",
   "AI voices are an optional add-on (about 55 MB, the voice model and its runtime). Nothing is downloaded until you press Get AI voices.": "Giọng nói AI là một tiện ích bổ sung tùy chọn (khoảng 55 MB, mẫu giọng nói và thời gian chạy của nó). Không có gì được tải xuống cho đến khi bạn nhấn Nhận giọng nói AI.",
-  "AI voices are installed. Pick a voice and press Start.": "Giọng nói AI được cài đặt. Chọn một giọng nói và nhấn Bắt đầu.",
   "AI voices are removed.": "Giọng nói AI bị loại bỏ.",
   "AI voices aren't available to download yet (GitHub says it can't find it). Try again later.": "Hiện chưa có sẵn giọng nói AI để tải xuống (GitHub cho biết họ không thể tìm thấy nó). Hãy thử lại sau.",
   "API key": "Khóa API",
@@ -2292,8 +2291,6 @@
   "⚠ Couldn't play a sample: {error}": "⚠ Không thể phát mẫu: {error}",
   "⚠ Couldn't start translating: {error}": "⚠ Không thể bắt đầu dịch: {error}",
   "⚠ Install failed: {error}. Press it again to retry; if it keeps failing, run install.bat in the add-on's folder to see why.": "⚠ Cài đặt không thành công: {error} . Nhấn lại lần nữa để thử lại; nếu nó vẫn bị lỗi, hãy chạy install.bat trong thư mục của tiện ích bổ sung để xem lý do.",
-  "⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ Giọng AI dừng lại. Bây giờ những người khác nghe thấy {backup} . Nhấn Dừng, sau đó Bắt đầu để thử lại.",
-  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, then Start to try again.": "⚠ Giọng AI dừng lại: {error} . Bây giờ những người khác nghe thấy {backup} . Nhấn Dừng, sau đó Bắt đầu để thử lại.",
   "⚠ This PC is slow for AI voices: games may stutter. A voice changer preset (left) is much lighter.": "⚠ PC này xử lý giọng nói AI chậm: trò chơi có thể bị giật. Cài đặt trước của bộ thay đổi giọng nói (trái) nhẹ hơn nhiều.",
   "⚠ Translating stopped: {error}": "⚠ Đã dừng dịch: {error}",
   "⚠ Turned off after an error: {error}": "⚠ Tắt sau lỗi: {error}",
@@ -2706,8 +2703,6 @@
   "Streaming": "Phát trực tiếp",
   "What will you use Onion Board for?": "Bạn sẽ dùng Onion Board để làm gì?",
   "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Thêm tab <b>Ứng dụng</b> (gửi nhạc hoặc âm thanh game vào stream). Bước cuối có liên kết tới <b>Hướng dẫn truyền phát</b> (phím Stream Deck, lệnh chat).",
-  "Start AI voice": "Bắt đầu giọng nói AI",
-  "Stop AI voice": "Dừng giọng nói AI",
   "Your words and tone, a different voice. Live on this PC.": "Lời nói và ngữ điệu của bạn, một giọng khác. Trực tiếp trên PC này.",
   "Mic on": "Mic đang bật",
   "Output": "Đầu ra",
@@ -3293,7 +3288,6 @@
   "The programs the app uses to download and play sounds. They update with the app, to the exact versions it was tested with. Only yt-dlp can update sooner, if you let it.": "Các chương trình ứng dụng dùng để tải và phát âm thanh. Chúng cập nhật cùng ứng dụng, đúng các phiên bản ứng dụng đã được thử. Chỉ yt-dlp có thể cập nhật sớm hơn, nếu bạn cho phép.",
   "Used when Connection is set to Tor. It's up to date, and updates with the app.": "Dùng khi Sự liên quan đặt là Tor. Nó đã mới nhất và cập nhật cùng ứng dụng.",
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "Trình tải xuống (yt-dlp) chưa được cài, Cài đặt → Cập nhật → Chương trình hỗ trợ → yt-dlp → Cài đặt lại.",
-  "No voices of your own yet: press Make your own voice below.": "Chưa có giọng của riêng bạn: bấm “Tạo giọng nói của riêng bạn” bên dưới.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows hiện không tìm thấy <b>{mic}</b>. Hãy cắm vào, hoặc bật lên nếu là loại không dây. Không có mic nào cả? Dùng <b>cáp ảo</b> bên dưới: nó chạy được mà không cần mic.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Mic của bạn hiện không gửi âm thanh (đang tắt, đang tắt tiếng hoặc chưa cắm mic), nên người khác chỉ nghe thấy âm thanh của bạn. Muốn họ nghe cả giọng bạn? Bật mic lên hoặc bỏ tắt tiếng.",
   "A {language} computer voice, once it's on this PC (below).": "Một giọng máy tiếng {language}, khi đã có trên PC này (bên dưới).",
@@ -4030,5 +4024,8 @@
   "Play it now": "Phát ngay",
   "Space or a double-click plays it for you, Enter plays it through your mic, Esc stops, F2 renames, right-click for more.": "Phím cách hoặc nhấp đúp để phát cho bạn nghe, Enter để phát qua mic, Esc để dừng, F2 để đổi tên, nhấp chuột phải để xem thêm.",
   "Today {time}": "Hôm nay {time}",
-  "Yesterday": "Hôm qua"
+  "Yesterday": "Hôm qua",
+  "AI voices are installed. Pick a voice to turn it on.": "Đã cài đặt giọng AI. Chọn một giọng để bật.",
+  "⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Giọng AI đã dừng. Giờ những người khác nghe thấy {backup}. Tắt rồi bật lại để thử lại.",
+  "⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it off and on again to try again.": "⚠ Giọng AI đã dừng: {error}. Giờ những người khác nghe thấy {backup}. Tắt rồi bật lại để thử lại."
 }
