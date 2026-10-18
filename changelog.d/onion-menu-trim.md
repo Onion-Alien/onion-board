@@ -1,0 +1,1 @@
+- The onion menu at the foot of the tab rail is down to Join the Discord, Send feedback and Report a problem (What's new is the version under the app's name).
