@@ -242,7 +242,6 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/fit.py` | dialogs grow to fit their wrapped text instead of clipping it (`fit.watch(self)` in every dialog's `__init__`) |
 | `soundboard/ui/setupwizard.py` | the first-run guide with Bun (mic, headphones, where your sounds go: straight into your mic, or the cable or another way out, then Discord; on the first launch, then a language and a look) and the Steam help |
 | `soundboard/ui/setupbackdrop.py` | the first launch's plain backdrop behind the guide: the loading screen hands over to its logo, which glides to the corner, and it fades to the app when the guide closes |
-| `soundboard/starter.py` | The 25 starter sounds that ship in `assets/starter` (about 0.8 MB, CC0): added to a new board when the first-run tour ends with the board still empty; no download, once only |
 | `soundboard/ui/coach.py` | Guided tours: the dimmed window, the yellow ring, one card with Bun and the step's button; holds clicks outside until the action step's Not now; something failing turns the card red (Try again, Close, Report a problem) and lets the window go |
 | `soundboard/ui/oops.py` | The red "didn't work" card: sad Bun, what went wrong, what to do, Try again and Report a problem (search results, the store, the radio map, the voice tab) |
 | `soundboard/ui/firsttour.py` | Bun's first-run tour of the empty board after that guide: the search box (or offline the Add button), the results, then "Nice" once a sound is added |

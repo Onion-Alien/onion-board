@@ -2,7 +2,6 @@
 offscreen: once only, one card, clicks outside do nothing until the search step's
 Not now, a sound added finishes it, the Add button instead of the search box in
 Offline mode, and never with tutorials switched off."""
-from pathlib import Path
 
 import pytest
 from conftest import process_events
@@ -11,7 +10,7 @@ from PySide6.QtGui import QKeyEvent
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QDialog
 
-from soundboard import __version__, engine, net, starter, usage, winkeys
+from soundboard import __version__, engine, net, usage, winkeys
 from soundboard.library import Config, SoundMeta
 from soundboard.ui import coach, firsttour
 from soundboard.ui import mainwindow as main
@@ -25,19 +24,8 @@ def counted(monkeypatch):
     return seen
 
 
-REAL_ADD_TO = starter.add_to   # (the fixture below stubs it)
-
-
 @pytest.fixture
-def added(monkeypatch):
-    """The windows the starter sounds were handed to (not really imported)."""
-    seen = []
-    monkeypatch.setattr(starter, "add_to", lambda win: seen.append(win) or True)
-    return seen
-
-
-@pytest.fixture
-def window(qapp, app_dir, monkeypatch, counted, added):
+def window(qapp, app_dir, monkeypatch, counted):
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
         monkeypatch.setattr(engine.Engine, name, lambda self, n, _k=name: None)
     monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
@@ -136,7 +124,7 @@ def test_spam_clicking_its_button_doesnt_race_through(window):
     assert tour.step.extra["name"] == "search"
 
 
-def test_esc_doesnt_skip_until_not_now_shows(window, qapp, counted, added):
+def test_esc_doesnt_skip_until_not_now_shows(window, qapp, counted):
     tour = firsttour.start(window)
     QApplication.sendEvent(window.grid, esc())
     assert firsttour._current is tour
@@ -148,15 +136,15 @@ def test_esc_doesnt_skip_until_not_now_shows(window, qapp, counted, added):
                           coach.SKIP_MS / 1000 + 2)
     QApplication.sendEvent(window.search, esc())
     assert firsttour._current is None and "tour-skipped" in counted
-    assert added == [window]   # and the board isn't left bare
+    assert window.cfg.sounds == []   # nothing gets added for them
 
 
-def test_not_now_puts_it_off(window, counted, added):
+def test_not_now_puts_it_off(window, counted):
     tour = to_search(window)
     tour._show_skip(tour.step)
     tour.card.btn_skip.click()
     assert firsttour._current is None and "tour-skipped" in counted
-    assert added == [window] and firsttour.start(window) is None
+    assert window.cfg.sounds == [] and firsttour.start(window) is None
 
 
 def test_typing_goes_into_the_search_box(window):
@@ -165,13 +153,13 @@ def test_typing_goes_into_the_search_box(window):
     assert window.search.text() == "meme" and firsttour._current is tour
 
 
-def test_a_sound_added_finishes_it(window, qapp, counted, added):
+def test_a_sound_added_finishes_it(window, qapp, counted):
     tour = to_search(window)
     window.cfg.sounds = [SoundMeta(id="a", name="A", file="a.wav")]
     assert process_events(qapp, lambda: tour.step.extra["name"] == "nice", 2)
     assert "tour-added" in counted
     QTest.mouseClick(window.grid, Qt.MouseButton.LeftButton, pos=QPoint(10, 10))
-    assert firsttour._current is None and added == []
+    assert firsttour._current is None
     assert "tour-skipped" not in counted
 
 
@@ -195,11 +183,10 @@ def test_offline_it_points_at_add(window, qapp, monkeypatch):
     assert firsttour._current is tour
 
 
-def test_turning_tutorials_off_ends_it(window, added):
+def test_turning_tutorials_off_ends_it(window):
     firsttour.start(window)
     window.tipctl.set_tutorials_on(False)
     assert firsttour._current is None and not window.cfg.tutorials_on
-    assert added == [window]
 
 
 def test_the_guide_hands_over_to_the_tour(window, qapp):
@@ -214,45 +201,9 @@ def test_the_guide_hands_over_to_the_tour(window, qapp):
     wiz.deleteLater()
 
 
-# ---- the starter sounds: added by themselves when the tour ends on a bare board -------
-
-def test_skipping_the_tour_adds_the_starter_sounds(window, added):
-    tour = firsttour.start(window)
-    tour.end("skipped")
-    assert added == [window]
-
-
-def test_the_window_going_adds_them_too(window, added):
-    tour = firsttour.start(window)
-    tour.end("left")
-    assert added == [window]
-
-
-def test_a_board_with_sounds_gets_none(window, added):
-    tour = firsttour.start(window)
-    window.cfg.sounds = [SoundMeta(id="a", name="A", file="a.wav")]
-    tour.end("skipped")
-    assert added == []
-
-
-def test_the_starter_sounds_ship_small_and_come_once(window, monkeypatch, added):
-    # the real starter.add_to, not the stub (undo() would drop the window's stubs too)
-    monkeypatch.setattr(starter, "add_to", REAL_ADD_TO)
-    found = starter.files()
-    assert len(found) == 25
-    assert sum(Path(f).stat().st_size for f in found) < 1_000_000   # about 0.8 MB
-    got = []
-    monkeypatch.setattr(window.impctl, "import_files",
-                        lambda files, extras=None: got.append((files, extras)))
-    assert starter.add_to(window) and got[0][0] == found
-    assert {e.tags[0] for e in got[0][1].values()} == {"Starter"}   # a tab of their own
-    assert starter.KEY in window.cfg.tips_seen
-    assert not starter.add_to(window) and len(got) == 1   # once only
-
-
-def test_a_search_that_fails_shows_the_red_card(window, qapp, counted, added):
+def test_a_search_that_fails_shows_the_red_card(window, qapp, counted):
     """A search that can't get through: the card goes red and says so; Try again goes
-    back to the search box, Close lets them go (and the board isn't bare)."""
+    back to the search box, Close lets them go."""
     to_search(window)
     tour = firsttour._current
     window.ytresults.failed = True
@@ -268,7 +219,7 @@ def test_a_search_that_fails_shows_the_red_card(window, qapp, counted, added):
     tour._step_at = 0
     tour.card.btn_skip.click()   # Close
     assert firsttour._current is None
-    assert "tour-failed" in counted and added == [window]
+    assert "tour-failed" in counted and window.cfg.sounds == []
 
 
 def test_an_error_card_ends_it(window, counted):
