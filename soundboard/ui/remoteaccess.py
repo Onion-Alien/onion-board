@@ -53,7 +53,7 @@ class RemoteAccess(Controller):
         """The add-on's object, or None (the reason noted on `info`)."""
         mw = self.mw
         from soundboard.addons import modules
-        from soundboard.ui.remotehost import RemoteHost
+        from soundboard.ui.settings.remotehost import RemoteHost
         if info.error:
             return None
         try:

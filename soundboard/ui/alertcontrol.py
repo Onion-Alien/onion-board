@@ -135,7 +135,7 @@ class AlertControl(Controller):
         settings already have their line (Studio, Bypass)."""
         raw = self.raw_watch.culprits
         if raw and self.discord_problems():
-            from soundboard.ui.chatguide import DISCORD_EXES
+            from soundboard.ui.setup.chatguide import DISCORD_EXES
             raw = [a for a in raw if a.exe.lower() not in DISCORD_EXES]
         return raw
 
@@ -189,7 +189,7 @@ class AlertControl(Controller):
         mw = self.mw
         if not self.discord_found:
             return []
-        from soundboard.ui.chatguide import raw_skips
+        from soundboard.ui.setup.chatguide import raw_skips
         return self.discord_found[0].problems(raw_skips(mw))
 
     def _discord_tick(self):
@@ -205,7 +205,7 @@ class AlertControl(Controller):
         def run():
             found, sig, talk = [], None, {}
             try:
-                from soundboard.ui.chatguide import DISCORD_EXES
+                from soundboard.ui.setup.chatguide import DISCORD_EXES
                 names = {n for _p, n in appaudio._process_table().values()}
                 if names & set(DISCORD_EXES):
                     sig = discordcfg.signature()

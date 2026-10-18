@@ -5,7 +5,7 @@ from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QComboBox, QMenu, QPushButton, QWidget
 
 from soundboard.ui.kit import wheelguard
-from soundboard.ui.langpick import LanguageDialog
+from soundboard.ui.settings.langpick import LanguageDialog
 
 
 @pytest.mark.parametrize("kind", ["language", "menu", "combo"])

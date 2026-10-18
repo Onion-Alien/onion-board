@@ -224,7 +224,8 @@ def selftest() -> int:
         __import__(mod)
     from PySide6.QtMultimedia import QMediaPlayer
     _app = QApplication(sys.argv)   # kept until the checks below have run
-    from soundboard.ui import mainwindow, setupwizard  # noqa: F401
+    from soundboard.ui import mainwindow  # noqa: F401
+    from soundboard.ui.setup import setupwizard  # noqa: F401
     from soundboard.ui.kit import crashdialog  # noqa: F401
     from soundboard.audio import engine  # noqa: F401
     from soundboard.ui.kit import theme  # noqa: F401
@@ -617,7 +618,7 @@ def main():
     server = listen_for_second_launch(app, lambda: holder.get("w"))
     app.instance_server = server   # pyright: ignore[reportAttributeAccessIssue]  # kept alive on the app
     from soundboard.core.autostart import TRAY_ARG
-    from soundboard.ui import splash
+    from soundboard.ui.bun import splash
     if TRAY_ARG not in sys.argv:   # a cold start can take seconds: show Bun meanwhile
         splash.show()
     from soundboard.online import ffmpegget

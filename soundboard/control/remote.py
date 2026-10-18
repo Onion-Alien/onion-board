@@ -66,7 +66,7 @@ the URL wins); /api/event also reads the JSON Twitch EventSub, StreamElements,
 Streamlabs and Ko-fi send.
 
 The same server, given `lan=True`, is what "remote" add-ons such as Onion Pocket
-get (soundboard.ui.remotehost): it listens on this PC's address on the home network
+get (soundboard.ui.settings.remotehost): it listens on this PC's address on the home network
 instead, with the add-on's own key, a shorter list of actions, and a page served at
 / without a key (the page holds nothing; Onion Pocket hands the phone its key in the
 link's #fragment, which browsers never send). It answers only addresses on the local
@@ -1184,7 +1184,7 @@ def dispatch_mode(mw: MainWindow, params: dict) -> tuple[int, object]:
     destination mode, which is Advanced (or Clean, for Off). Both apply and save, and
     the Sounds tab's dropdown and the Setup tab's picker show it."""
     from soundboard.mic import destination, profiles
-    from soundboard.ui import destpanel
+    from soundboard.ui.setup import destpanel
     if "simple" in params:
         want = params["simple"].strip().lower()
         p = next((q for q in profiles.PROFILES if want in (q.key, q.label.lower())), None)
@@ -1292,7 +1292,7 @@ def dispatch_setups(mw: MainWindow, action: str, params: dict) -> tuple[int, obj
 def set_mic_gate(mw: MainWindow, on: bool):
     """Mute my mic while a sound plays: saved, on the engine, and the Who's listening
     boxes showing it."""
-    from soundboard.ui import destpanel
+    from soundboard.ui.setup import destpanel
     mw.cfg.mic_gate = on
     destpanel.apply_send(mw.cfg, mw.engine)
     for panel in mw.findChildren(destpanel.DestPanel):

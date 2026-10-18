@@ -161,7 +161,7 @@ fixed gap (`HEADER_GAP`) to what's below; the parts under it share one gap
 | Removing something a person made | do it at once, then offer **Undo** (`panel.UndoBar` or `toast(..., action=(_("Undo"), fn))`), into Recently deleted | "Are you sure?" for something that can be undone |
 | Something that can't be undone (delete for good, reset everything) | a small modal dialog: the consequence in words, `[Delete for good] [Cancel]`, the verb on a `#danger` button | `QMessageBox.question` with Yes/No |
 | Explain how something works | an ⓘ icon button opening an anchored help pop-up; Esc / click outside closes | a paragraph on the card, a modal |
-| Walk a new user through a tab once (do the thing) | `coach.Tour` with `coach.Step`s (`ui/coach.py`): the window dims, what to use sits in the yellow ring, one card (Bun, step dots, title, one line, its button) points at it; `Not now` only on the action step | two bubbles or panels at once, a tour that any click dismisses |
+| Walk a new user through a tab once (do the thing) | `coach.Tour` with `coach.Step`s (`ui/setup/coach.py`): the window dims, what to use sits in the yellow ring, one card (Bun, step dots, title, one line, its button) points at it; `Not now` only on the action step | two bubbles or panels at once, a tour that any click dismisses |
 | A card's few extra actions | quiet buttons in the card's own button row | a ⋯ menu that hides two or three options |
 | Many actions on an item in a list | right-click `QMenu`, plus a ⋯ icon button (`widgets.DropdownMenu`) with the same actions | actions only on right-click |
 | Ask a short question or a choice | a small `QDialog` (the dialog recipe below) | a chain of message boxes |
@@ -325,7 +325,7 @@ These are the current reference points. Copy their structure before inventing a 
 | Screen | What it gets right |
 | --- | --- |
 | Sounds tab board (`ui/mainwindow.py`, pads) | Fixed-size tiles in a grid that scrolls down; picture, name, hotkey badge, length; one accent main button (*Add*, a menu of every way in), the rest quiet. |
-| Setup guide (`ui/setupwizard.py`) | One question per step in a big title, a short plain explanation, choices as large icon rows, the mascot for warmth, one main button. |
+| Setup guide (`ui/setup/setupwizard.py`) | One question per step in a big title, a short plain explanation, choices as large icon rows, the mascot for warmth, one main button. |
 | Setup tab cards | A grid: your mic and Who's listening side by side in one row (always the same height, titles on one line), Devices and Connect your chat under your mic, Equalizer and volume under Who's listening. Every card open, built with `card()` (heading from `heading_row()`): they fit the screen, so nothing folds away. |
 | Left tab rail (`ui/sidebar.py`) | Icons only when closed, names when open, the selected tab a soft accent fill, settings at the foot. |
 | Send feedback box (`ui/kit/feedbackdialog.py`) | The small-dialog pattern: title question, hint, tick boxes, buttons bottom-right with the main one first, a second page instead of a second dialog. |

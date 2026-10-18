@@ -1,7 +1,7 @@
-"""The start-up splash (ui/splash.py): up while starting, pumped by imports, gone after."""
+"""The start-up splash (ui/bun/splash.py): up while starting, pumped by imports, gone after."""
 import sys
 
-from soundboard.ui import splash
+from soundboard.ui.bun import splash
 
 
 def test_pump_without_splash_does_nothing(qapp):
@@ -79,7 +79,7 @@ def _frame(t):
 def test_bun_acts_while_the_text_stays_put(qapp, monkeypatch):
     """Bun moves (his act), the name and status don't, and nothing he does reaches
     the text below him."""
-    from soundboard.ui import splashacts
+    from soundboard.ui.bun import splashacts
     monkeypatch.setattr(splash, "_animate", True)
     for act in splashacts.ACTS:
         monkeypatch.setattr(splash, "_show", splashacts.Show(act=act))
@@ -96,7 +96,7 @@ def test_pick_rare_and_seasonal():
     import random
 
     from soundboard.style import bunnyfit
-    from soundboard.ui import splashacts
+    from soundboard.ui.bun import splashacts
     day = datetime.datetime(2026, 6, 1, 14)
     seen = {splashacts.pick(day, random.Random(i)).act for i in range(400)}
     assert seen == set(splashacts.ACTS)   # every act turns up
@@ -205,7 +205,7 @@ def test_windows_animation_preference(monkeypatch):
 def test_rare_launch_glows_and_shows_its_drop_rate(qapp, monkeypatch):
     """A rare launch: a glow round the panel (in the margin a plain one leaves clear)
     and its tier and drop rate under the dots, on a taller card; each tier its own look."""
-    from soundboard.ui import splashacts
+    from soundboard.ui.bun import splashacts
     monkeypatch.setattr(splash, "_animate", True)
     plain = _frame(0.3)
     assert plain.pixelColor(4, splash.CARD_H // 2).alpha() == 0
@@ -225,7 +225,7 @@ def test_rare_launch_glows_and_shows_its_drop_rate(qapp, monkeypatch):
 
 def test_rare_tiers_sit_end_to_end():
     """Each tier is exactly 1/odds of the roll: its edges, and nothing past the last."""
-    from soundboard.ui import splashacts
+    from soundboard.ui.bun import splashacts
     edge = 0.0
     for name, (odds, *_) in splashacts.RARES.items():
         start, edge = edge, edge + 1 / odds
@@ -243,7 +243,7 @@ def test_rare_odds_hold_over_millions_of_launches():
     import math
     import random
 
-    from soundboard.ui import splashacts
+    from soundboard.ui.bun import splashacts
     n = 2_000_000
     rng = random.Random(20261018)
     counts = dict.fromkeys(splashacts.RARES, 0)
@@ -260,7 +260,7 @@ def test_panel_has_the_themes_soft_glow(qapp, monkeypatch):
     """The panel isn't one flat colour: the theme's accent glows behind Bun and fades
     out lower down. High Contrast keeps its flat panel."""
     from soundboard.ui.kit import theme
-    from soundboard.ui import splashacts
+    from soundboard.ui.bun import splashacts
     monkeypatch.setattr(splash, "_show", splashacts.Show(act="hop"))
     try:
         for name, glows in (("Dark", True), ("High Contrast", False)):

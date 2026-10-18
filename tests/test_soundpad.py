@@ -282,7 +282,7 @@ def test_the_installers_box_waits_for_the_setup_guide_and_says_where_from(
         main_window, qapp, tmp_path, monkeypatch):  # noqa: F811
     """The first start opens the setup guide: the import only starts once it's closed
     (its card was stuck over the guide), and the card names the other soundboard."""
-    from soundboard.ui import setupwizard
+    from soundboard.ui.setup import setupwizard
     w = main_window
     monkeypatch.setenv("APPDATA", str(tmp_path))
     _board(tmp_path)

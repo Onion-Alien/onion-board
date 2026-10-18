@@ -1,4 +1,4 @@
-from soundboard.ui.logowidget import LogoWidget
+from soundboard.ui.bun.logowidget import LogoWidget
 
 
 def test_idle_paints_without_embers(qapp):
@@ -25,7 +25,7 @@ def test_sound_flares_and_throws_embers_then_settles(qapp):
 
 
 def test_idle_breathing_keeps_the_full_frame_rate(qapp):
-    from soundboard.ui import logowidget
+    from soundboard.ui.bun import logowidget
     w = LogoWidget()
     w._timer.start(logowidget.FAST_MS)
     w._t0 = logowidget.time.monotonic() - logowidget.SHEEN_TIME - 0.5   # between sheens
@@ -36,7 +36,7 @@ def test_idle_breathing_keeps_the_full_frame_rate(qapp):
 
 def test_glow_icon_is_the_plain_icon_at_rest_and_glows_warm_with_sound(qapp):
     from soundboard.ui.kit import theme
-    from soundboard.ui.logowidget import glow_icon
+    from soundboard.ui.bun.logowidget import glow_icon
     rest = glow_icon(*theme.BRAND, 0.0).pixmap(32).toImage()
     loud = glow_icon(*theme.BRAND, 1.0).pixmap(32).toImage()
     assert glow_icon(*theme.BRAND, 1.0) is glow_icon(*theme.BRAND, 1.0)   # cached

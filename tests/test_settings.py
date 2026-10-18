@@ -11,7 +11,7 @@ from PySide6.QtWidgets import QApplication, QFrame, QLabel, QPushButton, QScroll
 
 from conftest import process_events
 from soundboard.online import net
-from soundboard.settings import SettingsDialog, ThemeCard
+from soundboard.ui.settings.settings import SettingsDialog, ThemeCard
 from soundboard.ui.kit import busy
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
@@ -316,7 +316,7 @@ def test_all_settings_pages_fit_their_window(window, qapp):  # noqa: F811
 
 
 def test_theme_previews_reflow_when_settings_is_resized(window, qapp):  # noqa: F811
-    from soundboard.settings import ThemeGrid
+    from soundboard.ui.settings.settings import ThemeGrid
 
     d = _open_in_window(window, qapp, "appearance")
     try:
@@ -710,7 +710,7 @@ def test_search_hides_cards_and_pages_without_the_word(window, qapp):  # noqa: F
 
 @pytest.mark.parametrize("name", ["Synthwave", "Cherry Blossom", "Paper"])
 def test_search_finds_painted_theme_names(window, qapp, name):  # noqa: F811
-    from soundboard.settings import ThemeCard
+    from soundboard.ui.settings.settings import ThemeCard
 
     d = SettingsDialog(window, "general", lazy=True)
     try:
@@ -730,7 +730,7 @@ def test_search_finds_painted_theme_names(window, qapp, name):  # noqa: F811
 
 @pytest.mark.parametrize("query", ["theme", "themes", "color", "colors", "colour", "colours"])
 def test_search_theme_and_colour_terms_shows_every_theme(window, qapp, query):  # noqa: F811
-    from soundboard.settings import ThemeGrid
+    from soundboard.ui.settings.settings import ThemeGrid
 
     d = _open_in_window(window, qapp, "general", width=1020)
     try:
@@ -799,7 +799,7 @@ def test_switching_count_me_in_off_sends_one_opt_out_first(window, qapp, monkeyp
 def test_count_me_in_eye_opens_the_table(window):  # noqa: F811
     """Count me in's hint stays short; its eye opens the table of what's sent, with
     an example and a reason on every row, and it never touches the switch."""
-    from soundboard.ui import countdialog
+    from soundboard.ui.settings import countdialog
     d = SettingsDialog(window)
     try:
         box = d.net_boxes["usage_stats"]
@@ -1000,7 +1000,7 @@ def test_theme_cards_and_sliders_have_a_name_a_screen_reader_can_say(window):  #
     """A theme card draws its name and the Overlay sliders sat beside plain labels: a
     screen reader said nothing on any of them."""
     from PySide6.QtWidgets import QSlider
-    from soundboard.settings import ThemeCard
+    from soundboard.ui.settings.settings import ThemeCard
     for page in ("appearance", "overlay"):
         d = SettingsDialog(window, page)
         body = d.tabs.currentWidget().widget()
@@ -1039,7 +1039,7 @@ def test_update_check_keeps_focus_and_blocks_repeat_clicks(window, qapp, monkeyp
 @pytest.mark.parametrize("index", [0, 1])
 @pytest.mark.parametrize("error", [False, True])
 def test_downloader_actions_keep_focus_and_block_overlap(window, qapp, monkeypatch, index, error):  # noqa: F811
-    from soundboard.ui.settingspages import connection
+    from soundboard.ui.settings import connection
     monkeypatch.setattr(net, "allowed", lambda key: True)
     workers = []
 
@@ -1084,7 +1084,7 @@ def test_downloader_actions_keep_focus_and_block_overlap(window, qapp, monkeypat
 
 def test_search_words_skip_widgets_kept_as_a_name(qapp):
     from PySide6.QtWidgets import QLabel, QWidget
-    from soundboard.settings import SettingsDialog
+    from soundboard.ui.settings.settings import SettingsDialog
     card = QWidget()
     holder = QWidget(card)
     holder.name = QLabel("Speaker", holder)   # a widget's own label kept as `name`
@@ -1162,7 +1162,7 @@ def test_helper_lookup_finishing_after_window_closed(qapp):
 
     import shiboken6
 
-    from soundboard.ui.settingspages.privacy import PrivacyPage
+    from soundboard.ui.settings.privacy import PrivacyPage
     mw = QObject()
     shown, go = [], threading.Event()
     page = SimpleNamespace(mw=mw, _helpers_show=shown.append)

@@ -151,7 +151,7 @@ class AppSetupControl(Controller):
             return
         what, app = act
         if what == "switch":
-            from soundboard.ui.destpanel import set_simple
+            from soundboard.ui.setup.destpanel import set_simple
             self._setup_undo = copy.deepcopy(d)
             set_simple(mw, app.simple)
             log.info("app setup: %s -> %s mode (remembered)", app.exe, app.simple)
@@ -167,7 +167,7 @@ class AppSetupControl(Controller):
         """Undo on "Game mode for X": the mode goes back to how it was."""
         mw = self.mw
         if self._setup_undo is not None:
-            from soundboard.ui.destpanel import _refresh_views
+            from soundboard.ui.setup.destpanel import _refresh_views
             mw.cfg.dest = self._setup_undo
             self._setup_undo = None
             mw.mode_why = ""
@@ -236,7 +236,7 @@ class AppSetupControl(Controller):
         if app is None:
             return
         if state == "offer":
-            from soundboard.ui.destpanel import set_simple
+            from soundboard.ui.setup.destpanel import set_simple
             appsetup.remember(mw.cfg, app.exe, app.simple)
             set_simple(mw, app.simple)
             log.info("app setup: %s -> %s mode (set up)", app.exe, app.simple)

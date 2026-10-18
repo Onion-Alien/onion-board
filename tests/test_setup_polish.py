@@ -102,7 +102,7 @@ def test_working_mic_card_offers_reinstall_and_remove(window, monkeypatch):  # n
     recovery, same are-you-sure box); not on the mic, they go."""
     from PySide6.QtWidgets import QDialog, QPushButton
 
-    from soundboard.ui import audiorecovery
+    from soundboard.ui.setup import audiorecovery
     w = window
     _mic_works(w, monkeypatch)
     w.routectl._show_route()

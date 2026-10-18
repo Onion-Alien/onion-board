@@ -188,7 +188,7 @@ def test_quoted_cuts_long_text_short():
 
 
 def test_the_view_shows_simple_and_detailed(qapp):
-    from soundboard.ui.netactivity import NetActivity
+    from soundboard.ui.settings.netactivity import NetActivity
     w = NetActivity()
     assert "Nothing has gone online" in w.summary.text() and not w.copy.isEnabled()
     netlog.cause(F, "You clicked Check now")
@@ -222,7 +222,7 @@ def test_the_view_updates_its_rows_in_place(qapp):
     """A new connection goes in as a row at the top: the rows below move down with
     their cells, the pick stays on the same connection, and only rows still open are
     redrawn. Tooltips are plain text (a reason can quote a server)."""
-    from soundboard.ui.netactivity import _TONE, NetActivity
+    from soundboard.ui.settings.netactivity import _TONE, NetActivity
     w = NetActivity()
     w.detailed.setChecked(True)
     a = netlog.begin(F, "a.example.com", 443)
@@ -274,7 +274,7 @@ def test_radio_switched_off_lists_what_it_refused(qapp, tmp_path):
 
 
 def test_activity_columns_stay_bounded_and_last_column_is_reachable(qapp):
-    from soundboard.ui.netactivity import _put, _table
+    from soundboard.ui.settings.netactivity import _put, _table
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QAbstractItemView
 

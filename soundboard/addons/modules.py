@@ -38,7 +38,7 @@ The kinds:
 
   "remote"   Another way to control the board, such as the phone remote. Packaged
              like "triggers" (`package`, `entry`, `api_version`, `imports`), but
-             `create(host)` gets soundboard.ui.remotehost.RemoteHost (version
+             `create(host)` gets soundboard.ui.settings.remotehost.RemoteHost (version
              REMOTE_API) and returns an object with `card(parent)` (its card on
              Settings → Remote) and `stop()`. Loaded at start-up.
 

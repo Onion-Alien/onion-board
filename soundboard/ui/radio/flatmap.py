@@ -117,7 +117,7 @@ class _Loading(QFrame):
     (which can be dragged and zoomed meanwhile) until the stations come."""
 
     def __init__(self, parent: QWidget):
-        from soundboard.ui.bunnywidget import BunnyWidget
+        from soundboard.ui.bun.bunnywidget import BunnyWidget
         super().__init__(parent)
         self.setObjectName("maploader")
         self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)

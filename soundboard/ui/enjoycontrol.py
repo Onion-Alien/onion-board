@@ -21,7 +21,7 @@ from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPlainTextEdit, QPus
 from soundboard.core import enjoy, tips, usage
 from soundboard.i18n import _
 from soundboard.ui.kit import busy, icons
-from soundboard.ui.bunnywidget import BunnyWidget
+from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.controller import Controller
 
 if TYPE_CHECKING:
@@ -186,7 +186,7 @@ class EnjoyControl(Controller):
             return False
         if mw.overlay.is_open or tips.fullscreen_in_front():
             return False
-        from soundboard.ui import firsttour, tabtours
+        from soundboard.ui.setup import firsttour, tabtours
         if firsttour._current is not None or tabtours._current is not None:
             return False
         return not any(getattr(mw, n) is not self.bar and not getattr(mw, n).isHidden()

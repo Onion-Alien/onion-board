@@ -1,4 +1,4 @@
-"""Render the installer's artwork (Bun the mascot, from soundboard/bunny.py) into
+"""Render the installer's artwork (Bun the mascot, from soundboard/ui/bun/bunny.py) into
 installer/. build.ps1 runs this before compiling the installer.
 
     .venv\\Scripts\\python scripts\\pictures\\make_bunny.py            # installer images
@@ -23,7 +23,7 @@ OUT = ROOT / "installer"
 
 def side_panel(w: int, h: int) -> QImage:
     """The tall picture on the installer's Welcome and Finish pages."""
-    from soundboard.bunny import draw_bunny
+    from soundboard.ui.bun.bunny import draw_bunny
     from soundboard.style.bunnyfit import VANILLA
     img = QImage(w, h, QImage.Format_RGB32)
     p = QPainter(img)
@@ -52,7 +52,7 @@ def side_panel(w: int, h: int) -> QImage:
 
 def small_corner(s: int) -> QImage:
     """The little picture in the top-right corner of the other installer pages."""
-    from soundboard.bunny import draw_bunny
+    from soundboard.ui.bun.bunny import draw_bunny
     from soundboard.style.bunnyfit import VANILLA
     img = QImage(s, s, QImage.Format_RGB32)
     img.fill(QColor("white"))
@@ -71,7 +71,7 @@ def main():
         small_corner(55 * k).save(str(OUT / f"wizard-small-{k}x.bmp"))
     print(f"wrote installer artwork to {OUT}")
     if "--preview" in sys.argv:
-        from soundboard.bunny import PROPS, draw_bunny
+        from soundboard.ui.bun.bunny import PROPS, draw_bunny
         from soundboard.style.bunnyfit import VANILLA
         sheet = QImage(200 * len(PROPS), 240, QImage.Format_RGB32)
         sheet.fill(QColor("#1e1b2e"))

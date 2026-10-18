@@ -48,7 +48,7 @@ def test_ui_scale_startup(tmp_path, monkeypatch):
 
 
 def test_interface_size_card_offers_restart(window, monkeypatch):  # noqa: F811
-    from soundboard.settings import SettingsDialog
+    from soundboard.ui.settings.settings import SettingsDialog
     monkeypatch.delenv("QT_SCALE_FACTOR", raising=False)
     restarts = []
     monkeypatch.setattr(window, "restart_app", lambda: restarts.append(1))

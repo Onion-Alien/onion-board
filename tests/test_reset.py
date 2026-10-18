@@ -124,8 +124,8 @@ def test_a_broken_pending_file_or_point_doesnt_stop_start_up(app_dir):
 
 
 def test_guide_picks_parts_and_restarts(window, monkeypatch, qapp):  # noqa: F811
-    from soundboard.settings import SettingsDialog
-    from soundboard.ui.resetguide import ResetGuide, RestorePoints
+    from soundboard.ui.settings.settings import SettingsDialog
+    from soundboard.ui.settings.resetguide import ResetGuide, RestorePoints
     d = SettingsDialog(window, "general")
     assert any(b.text() == "Reset" for b in d.findChildren(QPushButton))
     restarts = []

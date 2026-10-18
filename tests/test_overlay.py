@@ -292,7 +292,7 @@ def test_main_window_hotkey_opens_overlay_and_claims_keys(window, monkeypatch): 
 def test_settings_overlay_tab_saves_changes(window):  # noqa: F811
     from PySide6.QtWidgets import QComboBox
 
-    from soundboard.settings import SettingsDialog
+    from soundboard.ui.settings.settings import SettingsDialog
     d = SettingsDialog(window, "overlay")
     assert d.tabs.tabText(d.tabs.currentIndex()).endswith("Overlay")
     page = d.tabs.currentWidget()
@@ -373,7 +373,7 @@ def test_dragging_the_window_moves_it_and_a_click_on_a_tile_still_plays(make, qa
 
 
 def test_settings_overlay_tab_shows_a_drag(window):  # noqa: F811
-    from soundboard.settings import SettingsDialog
+    from soundboard.ui.settings.settings import SettingsDialog
     d = SettingsDialog(window, "overlay")
     try:
         assert d.ov_monitor.findData("game") >= 0 and d.ov_monitor.findData("primary") >= 0

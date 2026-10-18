@@ -55,7 +55,7 @@ RUN_ALL = {
 # to one runs the whole suite rather than trust the imports to find every test
 HUBS = {
     "soundboard/ui/mainwindow.py", "soundboard/audio/engine.py", "soundboard/sounds/library.py",
-    "soundboard/settings.py",
+    "soundboard/ui/settings/settings.py",
 }
 # too common to say which test is about it
 VAGUE_NAMES = {"__init__.py", "README.md", "LICENSE", ".gitignore", "requirements.txt"}

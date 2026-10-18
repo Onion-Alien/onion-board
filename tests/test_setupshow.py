@@ -3,7 +3,7 @@ either plays (ok) or blows up (not ok), he scoots off and the show hides itself.
 
 import time
 
-from soundboard.ui.setupshow import PARTS, SetupShow
+from soundboard.ui.setup.setupshow import PARTS, SetupShow
 
 
 def _run(b, secs, paint_every=0):

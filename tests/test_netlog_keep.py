@@ -170,7 +170,7 @@ def test_only_the_last_max_entries_are_listed(path, monkeypatch):
 
 
 def test_the_view_says_whether_its_kept(qapp, path):
-    from soundboard.ui.netactivity import NOTE, NOTE_KEPT, NetActivity, _when
+    from soundboard.ui.settings.netactivity import NOTE, NOTE_KEPT, NetActivity, _when
     w = NetActivity()
     assert w.note.text() == NOTE
     netlog.keep(path)
@@ -221,7 +221,7 @@ def test_totals_without_a_history_are_this_runs_list():
 
 
 def test_the_view_has_totals_and_open_log(qapp, path):
-    from soundboard.ui.netactivity import NetActivity, TotalsDialog
+    from soundboard.ui.settings.netactivity import NetActivity, TotalsDialog
     w = NetActivity()
     assert not w.totals.isEnabled() and not w.open_log.isEnabled()
     done("a.example.com")
@@ -232,7 +232,7 @@ def test_the_view_has_totals_and_open_log(qapp, path):
     assert w.totals.isEnabled() and w.open_log.isEnabled()
     assert "Keep a history" in w.open_log.toolTip()
     w._open_log()
-    from soundboard.ui.netactivity import LogDialog
+    from soundboard.ui.settings.netactivity import LogDialog
     shown = [d for d in qapp.topLevelWidgets() if isinstance(d, LogDialog)]
     assert shown and "c.example.net" in shown[-1].text.toPlainText()
     assert netlog.kept_file() is None
@@ -264,7 +264,7 @@ def _hold_the_file_thread():
 
 
 def test_totals_read_the_file_off_the_ui_thread(qapp, path, monkeypatch):
-    from soundboard.ui.netactivity import TotalsDialog
+    from soundboard.ui.settings.netactivity import TotalsDialog
     netlog.keep(path)
     done("a.example.com")
     done("b.example.net")
@@ -290,7 +290,7 @@ def test_totals_read_the_file_off_the_ui_thread(qapp, path, monkeypatch):
 
 def test_totals_arriving_after_the_window_closed_are_dropped(qapp, path):
     from shiboken6 import delete
-    from soundboard.ui.netactivity import TotalsDialog
+    from soundboard.ui.settings.netactivity import TotalsDialog
     netlog.keep(path)
     done()
     go = _hold_the_file_thread()

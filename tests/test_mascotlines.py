@@ -6,7 +6,7 @@ from PySide6.QtGui import QMouseEvent
 
 from soundboard.ui.kit import theme
 from soundboard.style import mascotlines, owl
-from soundboard.ui.bunnywidget import BunnyWidget
+from soundboard.ui.bun.bunnywidget import BunnyWidget
 
 
 def test_every_theme_has_its_own_lines():

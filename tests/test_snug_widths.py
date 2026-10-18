@@ -7,7 +7,7 @@ from PySide6.QtCore import QEvent
 from PySide6.QtWidgets import (QApplication, QComboBox, QGridLayout, QHBoxLayout, QVBoxLayout,
                                QWidget)
 
-from soundboard.settings import SettingsDialog
+from soundboard.ui.settings.settings import SettingsDialog
 from soundboard.ui.kit.wheelguard import AppStyle
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 

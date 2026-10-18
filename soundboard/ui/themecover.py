@@ -17,7 +17,7 @@ from PySide6.QtWidgets import QWidget
 
 from soundboard.ui.kit import theme
 from soundboard.style import cover as kit
-from soundboard.ui import lite
+from soundboard.ui.settings import lite
 
 # Lite mode: the cover is up and gone without fading
 kit.animate = lambda: not lite.on()   # pyright: ignore[reportAttributeAccessIssue]
@@ -29,7 +29,7 @@ class ThemeCover(kit.Cover):
     def __init__(self, window: QWidget, name: str | None = None):
         # the theme being switched to (`name`; None: the current one), so the cover
         # already shows where it's going
-        from soundboard.bunny import bunny_pixmap
+        from soundboard.ui.bun.bunny import bunny_pixmap
         dpr = window.devicePixelRatioF() or 1.0
         with theme.previewing(name or theme.current_name):
             scrim = QColor(theme.T["bg"])

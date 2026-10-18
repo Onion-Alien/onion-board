@@ -12,7 +12,7 @@ from test_mainwindow import window as main_window  # noqa: F401 - the real windo
 from soundboard.core import hangwatch
 from soundboard.ui.kit import theme
 from soundboard.sounds.library import SoundMeta
-from soundboard.settings import SettingsDialog
+from soundboard.ui.settings.settings import SettingsDialog
 import pytest
 
 # ~0.5 s on a real PC. Hosted CI runners take 1.2-2.5 s for the same unchanged code
@@ -152,7 +152,7 @@ def test_a_switch_shows_a_still_with_bun_then_fades_to_the_new_theme(settings, m
 def test_the_cover_shows_bun_in_the_theme_being_switched_to(main_window):  # noqa: F811
     """Bun and the dimming on the cover were drawn in the theme being left (his
     headphones in its accent): they're the new theme's, and the current one stays."""
-    from soundboard.bunny import bunny_image
+    from soundboard.ui.bun.bunny import bunny_image
     from soundboard.ui.themecover import BUNNY_H, ThemeCover
     old, new = "Dark", "Royal"   # different accents and bg, and Royal dresses Bun up
     theme.set_current(old)

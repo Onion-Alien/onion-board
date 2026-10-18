@@ -1071,7 +1071,7 @@ def test_voice_tabs_and_recovery_actions_match_the_ui():
     import re
     from pathlib import Path
 
-    from soundboard.ui import audiorecovery
+    from soundboard.ui.setup import audiorecovery
     assert set(audiorecovery.INSTALLS) <= set(usage.RECOVERY)
     from soundboard.ui.voice import voicepanel
     src = Path(voicepanel.__file__).read_text(encoding="utf-8")
@@ -1130,7 +1130,7 @@ def test_views_hotkeys_leveler_and_sound_voices_count_every_day():
 
 
 def test_bun_games_are_counted_by_a_fixed_name():
-    from soundboard.ui import bunpong
+    from soundboard.ui.bun import bunpong
     assert set(bunpong.games()) <= set(usage.BUN_GAMES)
     assert usage.game_tag("ttt") == "ttt" and usage.game_tag("chess") == "other"
     assert all(f"egg-game-{g}" in usage.FEATURES for g in usage.BUN_GAMES)
@@ -1249,7 +1249,7 @@ def test_packs_settings_pages_and_ytdlp_buttons_count_by_fixed_names():
     their key, yt-dlp's buttons by their job: every name is in FEATURES."""
     from soundboard.sounds import packs
     from soundboard.online import ytdl
-    from soundboard.ui.settingspages import connection
+    from soundboard.ui.settings import connection
     ids = {p.id for p in packs.built_in()}
     assert ids and ids <= set(usage.PACKS)
     assert {usage.pack_tag(i) for i in ids} == ids
@@ -1264,7 +1264,7 @@ def test_settings_pages_match_the_dialog():
     """A page added to Settings needs its name in SETTINGS_PAGES, or it's never counted."""
     import re
     from pathlib import Path
-    from soundboard import settings
+    from soundboard.ui.settings import settings
     src = Path(settings.__file__).read_text(encoding="utf-8")
     start = src.index("        pages = ((")
     block = src[start:src.index("        self.categories = QListWidget()", start)]
@@ -1314,7 +1314,7 @@ def test_a_freeze_on_a_pc_short_of_memory_says_so(tmp_path):
 def test_a_rare_loading_screen_is_counted_by_its_tier(monkeypatch):
     """Golden, Ice, Galaxy and Rainbow Bun: each has its name in FEATURES (one per key of
     splashacts.RARES), and a launch that showed one notes it; a plain one notes none."""
-    from soundboard.ui import splash, splashacts
+    from soundboard.ui.bun import splash, splashacts
     assert tuple(splashacts.RARES) == ("rainbow", "galaxy", "ice", "gold")
     assert set(usage.SPLASH_RARES) == set(splashacts.RARES)
     assert {f"splash-{k}" for k in usage.SPLASH_RARES} <= set(usage.FEATURES)

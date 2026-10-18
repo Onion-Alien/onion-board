@@ -129,7 +129,7 @@ def test_unticked_or_found_later_it_only_offers(window, boxes, qapp, monkeypatch
 
 def test_found_behind_the_loading_screen_it_installs_before_the_window(
         window, boxes, qapp, monkeypatch, installer):
-    from soundboard.ui import splash
+    from soundboard.ui.bun import splash
     said = []
     monkeypatch.setattr(splash, "set_status", lambda text="", progress=None:
                         said.append((text, progress)))
@@ -211,7 +211,8 @@ def test_behind_the_loading_screen_the_mark_comes_first(window, boxes, qapp, mon
 
 def test_nothing_new_or_slow_the_app_opens_as_usual(window, qapp, monkeypatch, installer):
     import threading
-    from soundboard.ui import splash, updatecontrol
+    from soundboard.ui.bun import splash
+    from soundboard.ui import updatecontrol
     said = []
     monkeypatch.setattr(splash, "set_status", lambda text="", progress=None:
                         said.append(text))
@@ -247,7 +248,7 @@ def test_unticked_nothing_is_asked_at_start(window, monkeypatch, installer):
 
 
 def test_the_loading_screen_says_updated_after_an_update():
-    from soundboard.ui import splash
+    from soundboard.ui.bun import splash
     splash._updated(__version__)
     assert splash._status == f"Updated to {__version__}"
     splash.set_status()

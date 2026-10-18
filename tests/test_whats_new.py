@@ -1,4 +1,4 @@
-"""What's new after an update (ui/whatsnew.py) and the privacy settings surviving an
+"""What's new after an update (ui/setup/whatsnew.py) and the privacy settings surviving an
 older version (library.Config: privacy.json). The real MainWindow, offscreen."""
 import json
 
@@ -8,7 +8,7 @@ from soundboard import __version__
 from soundboard.sounds import library
 from soundboard.online import net
 from soundboard.sounds.library import Config
-from soundboard.ui import whatsnew
+from soundboard.ui.setup import whatsnew
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
 

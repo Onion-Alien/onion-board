@@ -9,7 +9,7 @@ from PySide6.QtGui import QImage, QPainter
 
 from soundboard.ui.kit import theme
 from soundboard.style import owl
-from soundboard.ui import bunnywidget as bw
+from soundboard.ui.bun import bunnywidget as bw
 from test_bunnywidget import _Clock
 
 THEMES = ("Dark", "Light", "Ocean", "Vampire", "Hacker")

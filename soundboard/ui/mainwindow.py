@@ -70,9 +70,12 @@ from soundboard.ui.importcontrol import ImportControl
 from soundboard.ui.updatecontrol import UpdateControl
 from soundboard.ui.kit import toast as toastmod
 from soundboard.ui.kit import a11y, appstate, busy, icons
-from soundboard.ui import lite, livesize, responsive, splash, taboff, tabtours
+from soundboard.ui.settings import lite
+from soundboard.ui import livesize, responsive, taboff
+from soundboard.ui.bun import splash
+from soundboard.ui.setup import tabtours
 from soundboard.ui.sounds.linkbar import PLAY_ID as LINK_ID
-from soundboard.ui.logowidget import glow_icon
+from soundboard.ui.bun.logowidget import glow_icon
 from soundboard.ui import sidebar
 from soundboard.ui.spacekey import SpaceKey
 from soundboard.ui.sounds.overlay import Overlay
@@ -111,15 +114,15 @@ if TYPE_CHECKING:
     from soundboard.core import tips
     from soundboard.ui import moretabs
     from soundboard.ui.apps.appspanel import ElidedLabel
-    from soundboard.ui.destpanel import DestPanel, ModeButton
+    from soundboard.ui.setup.destpanel import DestPanel, ModeButton
     from soundboard.ui.downloadbar import DownloadBar
     from soundboard.ui.dropveil import DropVeil
     from soundboard.ui.sounds.linkbar import LinkBar
-    from soundboard.ui.logowidget import LogoWidget
+    from soundboard.ui.bun.logowidget import LogoWidget
     from soundboard.ui.sounds.padbatch import PadSelection
     from soundboard.ui.kit.panel import EqPanel, Flow, TileRow, ViewToggle, VolumeControl
     from soundboard.ui.kit.playbutton import PlayButton
-    from soundboard.ui.setupshow import SetupShow
+    from soundboard.ui.setup.setupshow import SetupShow
     from soundboard.ui.sidebar import SideTabs
     from soundboard.ui.sounds.speedpitch import SpeedPitchButton
     from soundboard.ui.kit.widgets import (DropdownMenu, EdgeMatch, NameAndSeek, PadGrid,
@@ -385,7 +388,7 @@ class MainWindow(QMainWindow):
     wordmark: QLabel
     ytresults: SearchResults
 
-    # ---- kept by Settings → Remote across openings (ui/settingspages/addons.py)
+    # ---- kept by Settings → Remote across openings (ui/settings/addons.py)
     pocket_card: Any
     pocket_checked: float
     pocket_offer: Any
@@ -763,14 +766,14 @@ class MainWindow(QMainWindow):
         done (nothing behind the guide but the theme and the logo). Put up before the
         window first shows (app.py), so the app never flashes up before the guide."""
         if self._backdrop is None and not self.cfg.use_mode:
-            from soundboard.ui.setupbackdrop import Backdrop
+            from soundboard.ui.setup.setupbackdrop import Backdrop
             self._backdrop = Backdrop(self)
         return self._backdrop
 
     def run_setup(self, resumed: bool = False):
         """The quick-setup guide (first launch, or the Setup tab's Step-by-step guide).
         `resumed`: reopened by itself after the restart the virtual cable needed."""
-        from soundboard.ui.setupwizard import SetupWizard
+        from soundboard.ui.setup.setupwizard import SetupWizard
         backdrop = self.setup_backdrop()
         if backdrop is not None:
             backdrop.settle()   # its logo to the corner as the guide comes in

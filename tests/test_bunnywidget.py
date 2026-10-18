@@ -6,8 +6,8 @@ import time
 from PySide6.QtCore import QRectF
 from PySide6.QtGui import QColor, QImage, QPainter
 
-from soundboard.bunny import PROPS, draw_bunny
-from soundboard.ui.bunnywidget import BunnyWidget
+from soundboard.ui.bun.bunny import PROPS, draw_bunny
+from soundboard.ui.bun.bunnywidget import BunnyWidget
 
 
 def _run(qapp, b, steps, level=None):
@@ -120,7 +120,7 @@ def test_sad_bun_begs_in_a_bubble_and_cheers_when_clicked(qapp):
     assert b.pose()["sad"] < 0.3             # happy while cheering
 
 def test_idle_bob_runs_at_the_same_frame_rate_as_the_twitches(qapp):
-    from soundboard.ui import bunnywidget
+    from soundboard.ui.bun import bunnywidget
     b = BunnyWidget("plug")
     b._timer.start(bunnywidget.FAST_MS)   # as if on screen
     far = time.monotonic() + 60
@@ -141,7 +141,7 @@ def test_headphones_trickle_calm_notes(qapp):
 
 
 def test_robot_bunny_widget_build_and_props(qapp):
-    from soundboard.bunny import bunny_image
+    from soundboard.ui.bun.bunny import bunny_image
     img = bunny_image(100, "wrench", robot=True)
     assert not img.isNull()
     b = BunnyWidget(robot=True)
@@ -172,7 +172,7 @@ def _top_ink_row(img: QImage) -> int:
 
 
 def test_sad_ears_fold_down_from_the_middle(qapp):
-    from soundboard.bunny import bunny_image
+    from soundboard.ui.bun.bunny import bunny_image
     tops = []
     for sad in (0.0, 1.0):
         img = QImage(100, 140, QImage.Format_ARGB32_Premultiplied)   # (room above: an
@@ -224,7 +224,7 @@ def test_rummaging_tosses_junk_out_of_the_cloud(qapp):
 
 
 def test_hammering_builds_a_speaker_and_success_finishes_it(qapp):
-    from soundboard.ui import bunnywidget as bw
+    from soundboard.ui.bun import bunnywidget as bw
     b = BunnyWidget("plug")
     b.resize(b.sizeHint())
     b.build()
@@ -237,7 +237,7 @@ def test_hammering_builds_a_speaker_and_success_finishes_it(qapp):
 
 
 def test_a_failed_build_snaps_then_he_droops_and_sighs(qapp):
-    from soundboard.ui import bunnywidget as bw
+    from soundboard.ui.bun import bunnywidget as bw
     b = BunnyWidget("plug")
     b.resize(b.sizeHint())
     b.build()
@@ -257,7 +257,7 @@ def test_a_failed_build_snaps_then_he_droops_and_sighs(qapp):
 
 
 def test_robo_bun_sparks_pulses_and_shorts_out(qapp):
-    from soundboard.ui import bunnywidget as bw
+    from soundboard.ui.bun import bunnywidget as bw
     b = BunnyWidget(robot=True)
     b.resize(b.sizeHint())
     b.build()
@@ -278,8 +278,8 @@ def test_robo_bun_sparks_pulses_and_shorts_out(qapp):
 
 def test_robo_gadget_and_notes_read_on_dark_themes(qapp):
     from soundboard.ui.kit import theme
-    from soundboard.bunny import GADGET
-    from soundboard.ui.bunnywidget import NOTE_COLORS, _luma, note_colors
+    from soundboard.ui.bun.bunny import GADGET
+    from soundboard.ui.bun.bunnywidget import NOTE_COLORS, _luma, note_colors
 
     def contrast(a, b):
         la, lb = _luma(a), _luma(b)
@@ -307,7 +307,7 @@ def test_a_click_cheer_hops_high_with_a_happy_face_and_squashes(qapp):
 
 
 def test_idle_fidgets_now_and_then(qapp, monkeypatch):
-    from soundboard.ui import bunnywidget as bw
+    from soundboard.ui.bun import bunnywidget as bw
     monkeypatch.setattr(bw.bunskits, "NEXT_PROB", 0.0)   # (a fidget, not his skit)
     b = BunnyWidget("headphones")
     b.resize(b.sizeHint())
@@ -328,7 +328,7 @@ def test_idle_fidgets_now_and_then(qapp, monkeypatch):
 
 
 def test_a_napping_bun_stays_up_for_the_end_of_his_act(qapp, monkeypatch):
-    from soundboard.ui import bunnywidget as bw
+    from soundboard.ui.bun import bunnywidget as bw
     monkeypatch.setattr(bw, "local_hour", lambda: bw.NAP_HOURS[0])
     b = BunnyWidget(naps=True)
     b.resize(b.sizeHint())
@@ -342,7 +342,7 @@ def test_a_napping_bun_stays_up_for_the_end_of_his_act(qapp, monkeypatch):
 
 
 def test_a_blink_shuts_fast_and_opens_slowly():
-    from soundboard.ui import bunnywidget as bw
+    from soundboard.ui.bun import bunnywidget as bw
     assert bw.blink_amount(-0.1) == 0 and bw.blink_amount(1.0) == 0
     assert bw.blink_amount(bw.BLINK_SHUT) == 1
     assert bw.blink_amount(bw.BLINK_SHUT * 0.5) < 0.5               # speeding up as it shuts
@@ -392,7 +392,7 @@ def test_ears_trail_behind_and_settle(qapp):
 
 def test_bun_mode_keeps_going_behind_a_game_at_a_slower_pace(qapp):
     from soundboard.ui.kit import appstate
-    from soundboard.ui import bunnywidget as bw
+    from soundboard.ui.bun import bunnywidget as bw
     b = BunnyWidget("plug", in_background=True)
     b._resume()
     assert b._timer.interval() == appstate.interval(bw.FAST_MS, bw.BACK_MS)
@@ -430,7 +430,7 @@ class _Song:
 
 
 def _dance(monkeypatch, style, height=110, voice=0.5):
-    from soundboard.ui import bunnywidget
+    from soundboard.ui.bun import bunnywidget
     clock = _Clock()
     monkeypatch.setattr(bunnywidget, "time", clock)
     b = BunnyWidget("headphones", height=height)
@@ -528,7 +528,7 @@ def test_his_mouth_stays_shut_to_music_and_only_talks_to_speech(qapp, monkeypatc
 
 def test_every_themes_skit_plays_through_and_ends_clean(qapp, monkeypatch):
     from soundboard.ui.kit import theme
-    from soundboard.ui import bunnywidget, bunskits
+    from soundboard.ui.bun import bunnywidget, bunskits
     clock = _Clock()
     monkeypatch.setattr(bunnywidget, "time", clock)
     was = theme.current_name
@@ -559,7 +559,7 @@ def test_every_themes_skit_plays_through_and_ends_clean(qapp, monkeypatch):
 
 def test_blood_moon_bun_bites_the_moon_and_its_cheese(qapp, monkeypatch):
     from soundboard.ui.kit import theme
-    from soundboard.ui import bunnywidget, bunskits
+    from soundboard.ui.bun import bunnywidget, bunskits
     clock = _Clock()
     monkeypatch.setattr(bunnywidget, "time", clock)
     was = theme.current_name
@@ -577,7 +577,7 @@ def test_blood_moon_bun_bites_the_moon_and_its_cheese(qapp, monkeypatch):
 
 
 def test_a_skit_only_starts_when_hes_idle_and_stops_for_anything_else(qapp, monkeypatch):
-    from soundboard.ui import bunnywidget
+    from soundboard.ui.bun import bunnywidget
     clock = _Clock()
     monkeypatch.setattr(bunnywidget, "time", clock)
     monkeypatch.setattr(bunnywidget.bunskits, "NEXT_PROB", 1.0)
@@ -610,7 +610,7 @@ def test_hiphop_nods_on_the_808_hits_themselves(qapp, monkeypatch):
 
 
 def test_a_sad_bun_on_an_empty_page_cheers_up_and_dances_to_what_plays(qapp, monkeypatch):
-    from soundboard.ui import bunnywidget
+    from soundboard.ui.bun import bunnywidget
     clock = _Clock()
     monkeypatch.setattr(bunnywidget, "time", clock)
     b = BunnyWidget(height=110, sad=0.9, lines=("add a sound?",), dances=True)
@@ -678,7 +678,7 @@ def test_pictures_of_bun_leave_room_for_an_upright_ear_and_a_wide_collar(qapp):
     """bunny_image's canvas cut the tip off an upright ear (Light) and the sides off
     Vampire's collar: they're inside the picture now, with clear edges."""
     from soundboard.ui.kit import theme
-    from soundboard.bunny import bunny_image
+    from soundboard.ui.bun.bunny import bunny_image
 
     for name, edge in (("Light", "top"), ("Vampire", "sides")):
         with theme.previewing(name):
@@ -695,7 +695,7 @@ def test_bits_of_bun_drawn_outside_draw_bunny_wear_his_theme_fur(qapp):
     """A skit's paw was always plain white fur, even on Mocha's brown Bun."""
     from soundboard.ui.kit import theme
     from soundboard.style import bunnyfit
-    from soundboard.ui import bunskits
+    from soundboard.ui.bun import bunskits
 
     with theme.previewing("Mocha"):
         img = QImage(40, 40, QImage.Format.Format_ARGB32_Premultiplied)
@@ -710,8 +710,8 @@ def test_bits_of_bun_drawn_outside_draw_bunny_wear_his_theme_fur(qapp):
 def test_a_small_bun_widget_has_room_above_him_for_an_upright_ear(qapp):
     """The setup guide's 74 px Bun had 5 px above him: an upright ear's tip was cut off
     at the top of every bob."""
-    from soundboard.bunny import ROOM_TOP, H
-    from soundboard.ui.bunnywidget import BOB_UP
+    from soundboard.ui.bun.bunny import ROOM_TOP, H
+    from soundboard.ui.bun.bunnywidget import BOB_UP
 
     b = BunnyWidget("star", height=74, pad=5)
     b.resize(b.sizeHint())
@@ -721,7 +721,7 @@ def test_a_small_bun_widget_has_room_above_him_for_an_upright_ear(qapp):
 
 def _still_bun(qapp, monkeypatch, **kw):
     """A shown Bun with rest_after_s, in front, awake, on a pretend clock (b.clock)."""
-    from soundboard.ui import bunnywidget as bw
+    from soundboard.ui.bun import bunnywidget as bw
     clock = _Clock()
     monkeypatch.setattr(bw, "time", clock)
     monkeypatch.setattr(bw, "local_hour", lambda: 12)
@@ -836,7 +836,7 @@ def test_the_apps_tabs_empty_bun_rests_after_30_s():
 def test_a_skit_paw_gets_his_arm_on_its_side_instead_of_a_third_paw(qapp):
     """A skit's paw held his prop with no arm while both arms still rested at his
     sides: held_paws hands draw_bunny where it is, so that arm reaches out to it."""
-    from soundboard.ui import bunskits
+    from soundboard.ui.bun import bunskits
 
     kit = bunskits.Kit()
     kit.front.append(lambda p: bunskits.paw(p, 78, 96))
@@ -848,7 +848,7 @@ def test_a_skit_paw_gets_his_arm_on_its_side_instead_of_a_third_paw(qapp):
 
 def _still_kind(qapp, monkeypatch, prop=None, sad=0.0, sulk=False):
     """A shown resting Bun of a given kind (the Store's headphones one, a sulking one)."""
-    from soundboard.ui import bunnywidget as bw
+    from soundboard.ui.bun import bunnywidget as bw
     clock = _Clock()
     monkeypatch.setattr(bw, "time", clock)
     monkeypatch.setattr(bw, "local_hour", lambda: 12)
@@ -882,7 +882,7 @@ def test_the_headphones_bun_stops_his_notes_and_rests(qapp, monkeypatch):
 def test_a_sulking_bun_rests_with_his_foot_down(qapp, monkeypatch):
     """The red card's Bun kicks at the ground over and over: after his 30 s he stops
     between two kicks, the dust settled."""
-    from soundboard.ui import bunnywidget as bw
+    from soundboard.ui.bun import bunnywidget as bw
     b = _still_kind(qapp, monkeypatch, sad=1.0, sulk=True)
     b.clock.now = b._rest_at + 0.1
     _settle(qapp, b, 15)

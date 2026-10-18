@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QApplication
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 from soundboard.online import net
-from soundboard.settings import SettingsDialog
+from soundboard.ui.settings.settings import SettingsDialog
 from soundboard.ui.tabcontrol import TAB_INDEX
 
 

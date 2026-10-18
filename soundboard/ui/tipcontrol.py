@@ -42,7 +42,7 @@ class TipControl(Controller):
     @staticmethod
     def _touring() -> bool:
         """A tutorial is up: the tip waits (one thing at a time)."""
-        from soundboard.ui import firsttour, tabtours
+        from soundboard.ui.setup import firsttour, tabtours
         return firsttour._current is not None or tabtours._current is not None
 
     def _maybe_tip(self) -> bool:
@@ -103,7 +103,7 @@ class TipControl(Controller):
         mw = self.mw
         mw.cfg.tutorials_on = bool(on)
         if not on:
-            from soundboard.ui import firsttour, tabtours
+            from soundboard.ui.setup import firsttour, tabtours
             firsttour.stop(mw)
             tabtours.stop(mw)
         mw._save_later()

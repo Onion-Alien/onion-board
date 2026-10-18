@@ -16,7 +16,7 @@ from soundboard.online import store
 from soundboard.ui.kit import theme
 
 if TYPE_CHECKING:
-    from soundboard.ui.bunnywidget import BunnyWidget
+    from soundboard.ui.bun.bunnywidget import BunnyWidget
 
 TILE = 44        # a row's picture, px square
 BUN_ROOM = 470   # the tab hides Bun below this width (the title and buttons need it)
@@ -245,7 +245,7 @@ def make_bun(height: int = 62) -> BunnyWidget:
     the tab cheers him up (`cheer`) or saddens him (his `sad`) as things happen. With
     nothing going on he holds still after BUN_REST_S (a sound, a click, a burst or
     showing the tab again wakes him)."""
-    from soundboard.ui.bunnywidget import BunnyWidget
+    from soundboard.ui.bun.bunnywidget import BunnyWidget
 
     class StoreBun(BunnyWidget):
         def minimumSizeHint(self) -> QSize:

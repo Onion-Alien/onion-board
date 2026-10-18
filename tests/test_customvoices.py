@@ -187,7 +187,7 @@ def test_custom_voices_are_found_from_the_voice_list_and_from_settings(window): 
     Add voices beside the Voice list, and Settings → Audio's card, both open it (from
     any other tab)."""
     from PySide6.QtWidgets import QPushButton
-    from soundboard.settings import SettingsDialog
+    from soundboard.ui.settings.settings import SettingsDialog
     w = window
     s = w.voice.speech
     vp = w.voice

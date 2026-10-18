@@ -42,7 +42,7 @@ from soundboard.ui.apps.approw import (APP_CATEGORIES, APP_DRAG_MIME,  # noqa: F
                                        AppCategoryHeading, AppGrid, AppRow, ElidedLabel,
                                        _Lister, _route, app_category, category_label,
                                        is_path_key, path_key, saved_volume)
-from soundboard.ui.bunnywidget import BunnyWidget
+from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.apps.clipeditor import WAVE_H
 from soundboard.ui.apps.clipshelf import ClipShelf
 from soundboard.ui.kit.panel import UndoBar, ViewToggle, hint_label

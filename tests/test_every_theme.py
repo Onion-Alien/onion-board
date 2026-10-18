@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (QAbstractButton, QApplication, QFrame, QPushButto
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
 from soundboard.ui.kit import theme
-from soundboard.settings import ThemeCard
+from soundboard.ui.settings.settings import ThemeCard
 from soundboard.ui.kit import icons
 
 
@@ -230,8 +230,8 @@ def test_switched_on_icon_buttons_in_a_card_show_their_icon(qapp, name):
 def test_each_theme_card_shows_bun_as_he_looks_in_that_theme(qapp):
     """The card's Bun is that theme's (headphones, outfit, look), not the current one's,
     drawing him leaves the current theme as it was, and an upright ear isn't cut off."""
-    from soundboard.bunny import ROOM_TOP, H
-    from soundboard.ui.settingspages import appearance
+    from soundboard.ui.bun.bunny import ROOM_TOP, H
+    from soundboard.ui.settings import appearance
 
     before = dict(theme.T)
     royal, dark = appearance._bun("Royal", 1.0), appearance._bun("Dark", 1.0)
@@ -251,7 +251,7 @@ def test_hovering_a_theme_card_makes_bun_wave(qapp, monkeypatch):
     from PySide6.QtGui import QEnterEvent
 
     from soundboard.ui.kit import toast
-    from soundboard.ui.settingspages import appearance
+    from soundboard.ui.settings import appearance
 
     clock = [10.0]
     monkeypatch.setattr(appearance.time, "monotonic", lambda: clock[0])

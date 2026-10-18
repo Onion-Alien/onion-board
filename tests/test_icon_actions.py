@@ -7,7 +7,7 @@ it; one that adds something (the crash report's) leads with the name."""
 from PySide6.QtWidgets import QLabel, QPushButton
 
 from soundboard.ui.kit import panel
-from soundboard.settings import SettingsDialog
+from soundboard.ui.settings.settings import SettingsDialog
 from test_mainwindow import window  # noqa: F401 - the real window, offscreen
 
 

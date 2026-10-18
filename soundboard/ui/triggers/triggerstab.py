@@ -35,7 +35,7 @@ from soundboard.ui.kit import theme
 from soundboard.core import updates, usage
 from soundboard.i18n import _, ngettext
 from soundboard.ui.voice import art
-from soundboard.ui import lite
+from soundboard.ui.settings import lite
 from soundboard.ui.kit import busy, icons
 from soundboard.style.owl import OwlWidget
 from soundboard.ui.kit.panel import Flow, HoverCard, ShownStack, hint_label

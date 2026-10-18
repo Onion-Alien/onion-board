@@ -1,0 +1,116 @@
+"""Onion Board as the host of a "remote" add-on (soundboard.addons.modules), such as Onion
+Pocket (modules/onion-pocket, the pads on your phone): the one interface it talks to,
+version REMOTE_API. The add-on's `create(host)` returns an object with `card(parent)`,
+its card on Settings → Remote, and `stop()`, called when the app closes.
+
+What the host gives it:
+
+  settings / save()   its own settings, kept in Config.remote_addons[<its id>]: on
+                      this PC only, never in a backup (they hold keys)
+  actions             every control API action (soundboard.control.remote.ACTIONS)
+  server(actions, page, name)
+                      a control API server for other devices on the home network
+                      (RemoteControl with lan=True: local peers only, wrong keys
+                      locked out) offering `actions`, serving `page` at /
+  new_token()         a fresh random key
+  warn(text)          a warning on the main window's status line
+  allow_firewall(name, port)
+                      Windows Firewall rule `name` for `port` and this app, Private
+                      networks and local subnet only, after Windows' admin prompt,
+                      which names Onion Board (soundboard.online.firewall). Waits; True if
+                      added. Newer than REMOTE_API 1's first hosts: check for it
+  signed_requests     True: its server takes X-Sig, a signature made with the key,
+                      so a phone page needn't send the key itself (soundboard.control.remote)
+  card(), button_row(), flash(), icon(), no_wheel()
+                      Settings' own look, so the add-on's card matches the rest
+"""
+from __future__ import annotations
+
+import html
+import logging
+
+from soundboard.control import remote
+from soundboard.addons.modules import REMOTE_API
+
+log = logging.getLogger(__name__)
+
+
+class RemoteHost:
+    api_version = REMOTE_API[1]
+    name = "Onion Board"
+    actions = remote.ACTIONS
+    signed_requests = True
+
+    def __init__(self, win, module_id: str):
+        """`win` is the MainWindow: cfg, status, and remote.dispatch on it."""
+        self.win = win
+        self.module_id = module_id
+        if not isinstance(win.cfg.remote_addons, dict):
+            win.cfg.remote_addons = {}
+
+    @property
+    def app_version(self) -> str:
+        from soundboard import __version__
+        return __version__
+
+    # ------------------------------------------------------------------ settings
+    @property
+    def settings(self) -> dict:
+        d = self.win.cfg.remote_addons.get(self.module_id)
+        if not isinstance(d, dict):
+            d = self.win.cfg.remote_addons[self.module_id] = {}
+        return d
+
+    def save(self):
+        self.win.cfg.save()   # now, not later: a new key must outlive a crash
+
+    # ------------------------------------------------------------------ the board
+    def dispatch(self, action: str, params: dict):
+        return remote.dispatch(self.win, action, params)
+
+    def server(self, actions, page=None, name: str = "remote add-on") -> remote.RemoteControl:
+        unknown = set(actions) - set(remote.ACTIONS)
+        if unknown:
+            raise ValueError(f"no such actions: {', '.join(sorted(unknown))}")
+        srv = remote.RemoteControl(self.dispatch, self.win, actions=actions, page=page,
+                                   lan=True, name=name)
+        srv.closed.connect(lambda why: self.warn(f"{name} is off: {why}."))
+        return srv
+
+    @staticmethod
+    def new_token() -> str:
+        return remote.new_token()
+
+    def warn(self, text: str):
+        self.win.toast(html.escape(text), "warn")
+
+    @staticmethod
+    def allow_firewall(name: str, port: int) -> bool:
+        from soundboard.online import firewall
+        return firewall.allow(name, port)
+
+    # ------------------------------------------------------------------ Settings' look
+    @staticmethod
+    def card(title: str, hint: str = ""):
+        from soundboard.ui.settings.settings import SettingsDialog
+        return SettingsDialog._card(title, hint)
+
+    @staticmethod
+    def button_row():
+        from soundboard.ui.settings.settings import _button_row
+        return _button_row()
+
+    @staticmethod
+    def flash(button, text: str):
+        from soundboard.ui.kit import busy
+        busy.flash(button, text)
+
+    @staticmethod
+    def icon(button, name: str):
+        from soundboard.ui.kit import icons
+        icons.set_icon(button, name)
+
+    @staticmethod
+    def no_wheel(widget):
+        from soundboard.ui.kit.wheelguard import no_wheel
+        no_wheel(widget)

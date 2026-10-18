@@ -132,7 +132,7 @@ class UpdateControl(Controller):
         if not (cfg.update_check and cfg.update_auto and updates.can_install()
                 and net.allowed(updates.FEATURE)):
             return False
-        from soundboard.ui import splash
+        from soundboard.ui.bun import splash
         netlog.cause(updates.FEATURE, "Update check as the app starts")
         splash.set_status(_("Checking for updates…"))
         got: dict = {}
@@ -217,7 +217,7 @@ class UpdateControl(Controller):
         its own)."""
         import threading
 
-        from soundboard.ui import splash
+        from soundboard.ui.bun import splash
         t = threading.Thread(target=fn, daemon=True, name=name)
         t.start()
         while t.is_alive():
@@ -611,7 +611,7 @@ class UpdateControl(Controller):
     def show_whats_new(self):
         """The header's version, clicked: the newest release's notes, any time."""
         mw = self.mw
-        from soundboard.ui import whatsnew
+        from soundboard.ui.setup import whatsnew
         dlg = whatsnew.WhatsNewDialog(mw, [whatsnew.notes()[0]])
         dlg.exec()
         page = dlg.page
@@ -620,12 +620,12 @@ class UpdateControl(Controller):
             mw.setctl.open_settings(page)
 
     def whats_new(self, updated: bool = False):
-        """What's new in this version (ui/whatsnew.py), if they haven't seen it: once,
+        """What's new in this version (ui/setup/whatsnew.py), if they haven't seen it: once,
         with a button to the settings it's about. Waits while the window is in the tray
         or the setup guide is about to run. `updated`: the app updated itself."""
         mw = self.mw
         from soundboard import __version__
-        from soundboard.ui import whatsnew
+        from soundboard.ui.setup import whatsnew
         if not mw.cfg.setup_done:   # the guide comes first; this waits for next time
             return
         if not mw.isVisible():   # started with Windows, in the tray: when it's opened

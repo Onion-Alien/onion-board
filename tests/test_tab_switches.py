@@ -7,7 +7,7 @@ from test_mainwindow import window as main_window  # noqa: F401  (the real MainW
 
 from soundboard.control import remote
 from soundboard.sounds.library import Config, clean_setting
-from soundboard.settings import SettingsDialog
+from soundboard.ui.settings.settings import SettingsDialog
 from soundboard.ui import mainwindow as main
 from soundboard.ui import taboff
 from soundboard.ui.apps.appspanel import AppsTab

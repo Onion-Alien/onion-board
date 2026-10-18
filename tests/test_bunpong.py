@@ -11,10 +11,10 @@ from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QStackedWidget, QVBoxLayout, QWidget
 
 from soundboard.core import usage
-from soundboard.ui import bunnywidget as bw
-from soundboard.ui import bunpong
-from soundboard.ui.bunnywidget import BunnyWidget
-from soundboard.ui.bunpong import WIN_AT, BunPong
+from soundboard.ui.bun import bunnywidget as bw
+from soundboard.ui.bun import bunpong
+from soundboard.ui.bun.bunnywidget import BunnyWidget
+from soundboard.ui.bun.bunpong import WIN_AT, BunPong
 
 
 def _frames(b, n, dt=0.035):

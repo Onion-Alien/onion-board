@@ -1,4 +1,4 @@
-"""Bun's first-run tour of the empty board (ui/firsttour.py), on the real MainWindow
+"""Bun's first-run tour of the empty board (ui/setup/firsttour.py), on the real MainWindow
 offscreen: once only, one card, clicks outside do nothing until the search step's
 Not now, a sound added finishes it, the Add button instead of the search box in
 Offline mode, and never with tutorials switched off."""
@@ -16,9 +16,9 @@ from soundboard.core import usage
 from soundboard.online import net
 from soundboard.control import winkeys
 from soundboard.sounds.library import Config, SoundMeta
-from soundboard.ui import coach, firsttour
+from soundboard.ui.setup import coach, firsttour
 from soundboard.ui import mainwindow as main
-from soundboard.ui import setupwizard
+from soundboard.ui.setup import setupwizard
 
 
 @pytest.fixture

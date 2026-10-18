@@ -5,7 +5,7 @@ import pytest
 from PySide6.QtCore import QRectF, Qt
 from PySide6.QtGui import QImage, QPainter
 
-from soundboard import bunny
+from soundboard.ui.bun import bunny
 from soundboard.ui.kit import theme
 from soundboard.style import bunnyfit
 
@@ -72,7 +72,7 @@ def test_every_prop_and_look_is_the_same_kept_or_fresh(qapp, monkeypatch, cleare
 
 def test_every_skit_frame_is_the_same_kept_or_fresh(qapp, monkeypatch, cleared):
     """Whole frames of the live widget (his skits hold things, so his arms reach)."""
-    from soundboard.ui import bunnywidget, bunskits
+    from soundboard.ui.bun import bunnywidget, bunskits
 
     class Clock:
         now = 1000.0
