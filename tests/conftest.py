@@ -489,15 +489,26 @@ def _never_update_for_real(monkeypatch, tmp_path):
 @pytest.fixture(autouse=True)
 def _never_use_the_real_store(monkeypatch):
     """No test reaches the real sound store (it has a daily allowance, and whether it was
-    up decided some tests): its address is a closed port here, so every call is refused
-    at once, as when offline. Tests fake store._request or net.urlopen for answers."""
-    global _STORE_PORT
-    from soundboard import store
-    _STORE_PORT = _STORE_PORT or closed_port()   # one for the whole run
-    monkeypatch.setattr(store, "BASE", f"http://127.0.0.1:{_STORE_PORT}")
+    up decided some tests): a call to it gets an empty store at once, never the network.
+    Tests that need other answers fake store._request or net.urlopen themselves."""
+    import io
 
+    from soundboard import net, store
+    real = net.urlopen
 
-_STORE_PORT = 0
+    class Empty(io.BytesIO):
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_a):
+            return False
+
+    def urlopen(req, *a, **k):
+        if str(getattr(req, "full_url", req)).startswith(store.BASE):
+            return Empty(b'{"sounds": [], "voices": [], "categories": [], "links": [], '
+                         b'"more": false, "total": 0}')
+        return real(req, *a, **k)
+    monkeypatch.setattr(net, "urlopen", urlopen)
 
 
 @pytest.fixture(autouse=True)
