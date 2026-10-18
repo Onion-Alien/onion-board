@@ -26,7 +26,8 @@ dialog in front. ``busy.toast`` is the same call; most code uses that.
   nothing. Hidden or not, they time out as cards do; errors wait for the window to grow.
 
 Child widgets of the window, never their own windows, so they never take focus from a
-game. Animations are skipped when Windows' "Animation effects" setting is off.
+game. Animations are skipped when Windows' "Animation effects" setting is off, and in
+lite mode (ui/lite.py).
 """
 from __future__ import annotations
 
@@ -46,7 +47,7 @@ from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QGraphicsDropShado
 
 from soundboard import theme
 from soundboard.i18n import _
-from soundboard.ui import icons
+from soundboard.ui import icons, lite
 from soundboard.ui.pixels import snap_to_pixels
 
 log = logging.getLogger(__name__)
@@ -78,6 +79,8 @@ KINDS = {
 
 
 def animations_on() -> bool:
+    if lite.on():   # Settings > Appearance > Lite mode: never
+        return False
     if ANIMATE is not None:
         return ANIMATE
     app = QApplication.instance()

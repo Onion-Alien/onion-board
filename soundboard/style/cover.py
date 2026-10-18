@@ -31,6 +31,12 @@ FADE_MS = 260       # then the picture fades to the restyled window
 SCRIM_ALPHA = 150   # how far the picture dims (0..255) once it's in
 
 
+def animate() -> bool:
+    """Fade at all? The app swaps in its own (a calmer mode): without, the cover is
+    up dimmed at once and gone at once."""
+    return True
+
+
 class Cover(QWidget):
     """A picture of `window` over it: `scrim` (dimming) and `mascot` (a picture in the
     middle) fade in with cover(); uncover() fades it all to what's under it. Both
@@ -76,6 +82,9 @@ class Cover(QWidget):
     def uncover(self):
         """Fade to the restyled window, then go."""
         self.raise_()
+        if not animate():
+            self.deleteLater()
+            return
         effect = QGraphicsOpacityEffect(self)
         self.setGraphicsEffect(effect)
         fade = self._fade = QPropertyAnimation(effect, b"opacity", self)
@@ -96,6 +105,11 @@ def _fade_in(covers: list[Cover]):
         c.repaint()
     dims = [c for c in covers if c.scrim is not None or c.mascot is not None]
     if not dims:
+        return
+    if not animate():   # (dimmed at once)
+        for c in dims:
+            c.k = 1.0
+            c.repaint()
         return
     for i in range(1, FADE_IN_STEPS + 1):
         time.sleep(FADE_IN_MS / 1000 / FADE_IN_STEPS)

@@ -38,7 +38,7 @@ from PySide6.QtWidgets import (
 from soundboard import backup, destination, engine, net, otherboards, remote, theme, usage
 from soundboard.i18n import _
 from soundboard.library import PAD_COLORS
-from soundboard.ui import a11y, alsosend, busy, icons, sidebar, taboff
+from soundboard.ui import a11y, alsosend, busy, icons, lite, sidebar, taboff
 from soundboard.ui.appspanel import ElidedLabel
 from soundboard.ui.buncontrol import BUN_TIP
 from soundboard.ui.controller import Controller
@@ -240,7 +240,7 @@ class Pulse(QObject):
         self._apply()
 
     def _apply(self):
-        run = self.on and self.live
+        run = self.on and self.live and not lite.on()   # (Lite mode: still)
         if run == self.timer.isActive():
             return
         if run:

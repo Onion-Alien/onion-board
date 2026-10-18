@@ -255,6 +255,7 @@ def write_config(conf: dict):
     c.tabs_off = []
     c.tutorials_on = False   # a tab's one-time how-to (its Bun animates) isn't steady state
     c.tray = not conf.get("real_window")
+    c.lite_mode = os.environ.get("PERF_LITE") == "1"   # --env PERF_LITE=1: lite mode on
     if conf.get("triggers") is not None:
         c.screen = conf["triggers"]
     c.save()

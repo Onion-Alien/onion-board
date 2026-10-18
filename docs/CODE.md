@@ -262,6 +262,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/langpick.py` | the language picker (Settings → Appearance → Language): a drop-down of languages, each with its letter coin and its own name, with a search |
 | `soundboard/ui/sidebar.py` | the tab rail down the main window's left: one icon per tab, opened out to show their names (the tab widget's own bar is hidden) |
 | `soundboard/ui/moretabs.py` | *+ More tabs*' dropdown: a card for each switched-off tab (its picture, what it's good for, Add) |
+| `soundboard/ui/lite.py` | lite mode (Settings > Appearance): the switch the animations, Bun, the logo and the textures ask, and whether this PC looks slow enough to suggest it |
 | `soundboard/ui/livesize.py` | the window's edge being dragged (Windows' WM_ENTERSIZEMOVE / WM_EXITSIZEMOVE): each step fits with Qt's cached sizes, letting go measures it all fresh |
 | `soundboard/ui/livedot.py` | marks a tab whose feature is live (a highlight-coloured icon, with the rail's bar beside it, or a small dot), e.g. the Voice tab while your voice is being changed |
 | `soundboard/ui/glow.py` | `Glow(button)`: a slow accent glow round the one button a step wants pressed (the setup card's mic button) |
