@@ -903,8 +903,9 @@ class StoreTab(QWidget):
             QTimer.singleShot(0, self, self._to_top)   # moved it: _hold_rows followed)
 
     def _to_top(self):
-        self._list_top = None
+        """(Where the list is now is where _hold_rows keeps it from here on.)"""
         self.list_area.verticalScrollBar().setValue(0)
+        self._list_top = self.list_area.viewport().mapTo(self.window(), QPoint(0, 0)).y()
 
     def _clear(self):
         self._stop_preview()
