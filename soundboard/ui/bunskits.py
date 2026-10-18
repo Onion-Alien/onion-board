@@ -22,7 +22,8 @@ import math
 from collections.abc import Callable
 
 from PySide6.QtCore import QPointF, QRectF, Qt
-from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPen, QRadialGradient
+from PySide6.QtGui import (QColor, QFont, QPainter, QPainterPath, QPen, QPicture,
+                           QRadialGradient)
 
 from soundboard import theme
 from soundboard.bunny import INK, look_colour, music_note, sparkle
@@ -110,9 +111,39 @@ def _oval(p: QPainter, x, y, w, h, fill, pen: QPen | None = None, angle: float =
     p.restore()
 
 
+_found: list[tuple[float, float]] | None = None   # (held_paws collecting, not drawing)
+
+
 def paw(p: QPainter, x: float, y: float, angle: float = 0.0):
-    """One of his paws (they're only drawn when they hold something), in his theme's fur."""
+    """One of his paws (they're only drawn when they hold something), in his theme's fur.
+    His arm out to it is draw_bunny's (`hold`, from held_paws)."""
+    if _found is not None:
+        q = p.transform().map(QPointF(x, y))
+        _found.append((q.x(), q.y()))
+        return
     _oval(p, x, y, 12, 10.5, look_colour("fur"), _ink(), angle)
+
+
+def held_paws(kit: Kit) -> tuple | None:
+    """Where this frame's drawings put his paws, on his canvas, as draw_bunny's `hold`
+    (left, right): those arms leave his sides and reach out to them. None: no paw out.
+    (`world` paws count too: the DJ's, over his desk, with no dx / dy.)"""
+    global _found
+    _found = []
+    pic = QPicture()
+    p = QPainter(pic)
+    try:
+        for fn in kit.front + kit.world:
+            fn(p)
+    finally:
+        p.end()
+        found, _found = _found, None
+    if not found:
+        return None
+    found = sorted(found[:2])
+    if len(found) == 1:   # the arm on its side of him
+        return (found[0], None) if found[0][0] < 50 else (None, found[0])
+    return found[0], found[1]
 
 
 def mark(p: QPainter, x: float, y: float, kind: str = "!", k: float = 1.0):

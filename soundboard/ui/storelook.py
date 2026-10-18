@@ -236,9 +236,14 @@ class StoreBanner(QFrame):
         p.end()
 
 
+BUN_REST_S = 30.0   # the banner's Bun moves this long, then holds still until a sound
+
+
 def make_bun(height: int = 62) -> BunnyWidget:
     """Bun in his headphones for the banner: he bobs and fidgets, hops when clicked, and
-    the tab cheers him up (`cheer`) or saddens him (his `sad`) as things happen."""
+    the tab cheers him up (`cheer`) or saddens him (his `sad`) as things happen. With
+    nothing going on he holds still after BUN_REST_S (a sound, a click, a burst or
+    showing the tab again wakes him)."""
     from soundboard.ui.bunnywidget import BunnyWidget
 
     class StoreBun(BunnyWidget):
@@ -252,7 +257,7 @@ def make_bun(height: int = 62) -> BunnyWidget:
                 self.cheer()
             super().mousePressEvent(ev)
 
-    bun = StoreBun("headphones", height=height, pad=12, dances=True)
+    bun = StoreBun("headphones", height=height, pad=12, dances=True, rest_after_s=BUN_REST_S)
     bun.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
     bun.setCursor(Qt.CursorShape.PointingHandCursor)
     return bun
