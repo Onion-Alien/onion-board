@@ -261,9 +261,17 @@ class ChatCheck(QObject):
 
     def _find(self, run: int):
         """On the worker: listing the programs walks every process and window, and
-        making the test sound takes a moment too."""
-        app = find_discord()
-        self._emit(self._found, app, chatcheck.test_signal() if app is not None else None, run)
+        making the test sound takes a moment too. Anything raising here ends the
+        check with its error: left alone, the check stayed 'running' for good."""
+        try:
+            app = find_discord()
+            sig = chatcheck.test_signal() if app is not None else None
+        except Exception as ex:  # noqa: BLE001
+            log.exception("discord check couldn't start")
+            self._emit(self._analyzed, {"issues": [], "error": _(
+                "The check couldn't start: {error}", error=errors.plain(ex))}, run)
+            return
+        self._emit(self._found, app, sig, run)
 
     def _emit(self, signal, *args):
         busy.emit(signal, *args)   # (on the UI thread: the dialog may close meanwhile)
