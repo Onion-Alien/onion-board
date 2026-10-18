@@ -24,13 +24,15 @@ import subprocess
 import time
 
 import numpy as np
-from PySide6.QtCore import QEvent, QPointF, QRectF, QSize, Qt, QTimer, Signal
+from PySide6.QtCore import (QEasingCurve, QEvent, QEventLoop, QPointF, QRectF, QSize, Qt,
+                            QTimer, QVariantAnimation, Signal)
 from PySide6.QtGui import QColor, QPainter, QPen
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QDialog, QFrame,
+                               QGraphicsOpacityEffect,
                                QGridLayout, QHBoxLayout, QLabel, QMessageBox, QProgressBar,
                                QPushButton, QScrollArea, QVBoxLayout, QWidget)
 
-from soundboard import directmic, discordcfg, michelper
+from soundboard import autostart, directmic, discordcfg, michelper
 from soundboard import engine as eng
 from soundboard import theme
 from soundboard.engine import SR
@@ -46,6 +48,7 @@ from soundboard.ui.choicetile import ChoiceTile, FoldPill
 from soundboard import errors
 from soundboard.i18n import _
 from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.toast import animations_on
 
 log = logging.getLogger(__name__)
 
@@ -63,6 +66,17 @@ DISCORD_READ_MS = 2000  # the last step re-reads Discord's own settings this oft
 _DISCORD_POLL = PollThread("setup-discord-read")
 # the device steps by name, for the count of where the guide was closed (usage.py)
 PAGE_NAMES = ("mic", "headphones", "send", "last")
+# the first launch's "Make it yours" page: nine looks to start from (the rest: Settings).
+# Row one the plain pair and a seasonal one, then the best three dark and three light.
+SEASONAL, SEASONAL_OFF = "Halloween", "Midnight"   # (Midnight once Halloween's gone)
+LOOK_ROWS = (("Light", "Dark", SEASONAL),
+             ("Ocean", "Toxic", "Synthwave"),
+             ("Mint", "Paper", "Cherry Blossom"))
+
+
+def look_themes() -> list[str]:
+    seasonal = SEASONAL if theme.offered(SEASONAL) else SEASONAL_OFF
+    return [seasonal if n == SEASONAL else n for row in LOOK_ROWS for n in row]
 
 # install-vbcable.ps1 -StatusFile writes "<step>|<text>"; these are the steps as the
 # guide shows them, in order ("wake" only happens if the cable needs a nudge)
@@ -183,6 +197,12 @@ SECTION_GAP = 16              # between a step's parts (a card, a list, the foot
 # two lines of words: the header ends where its text does, so the gap under every
 # step's words is HEADER_GAP and nothing more (a taller Bun left a band under them)
 BUN_H, BUN_PAD = 74, 5
+# the guide's motion (only with Windows' Animation effects on: toast.animations_on)
+ENTER_MS, ENTER_DELAY_MS, RISE = 340, 360, 24   # in: fades up from RISE px lower, once
+# the backdrop's logo is nearly in its corner (setupbackdrop.SETTLE_MS)
+LEAVE_MS, SINK = 180, 12                         # out: fades, sinking a little
+PAGE_MS = 220                                    # a new step fades in
+STEP_MS = 260                                    # the step bar fills to the new step
 TITLE_CSS = "font-size:17pt; font-weight:800;"   # DESIGN.md Standard kit: Display
 BODY_CSS = "font-size:11pt;"                      # ... Large (a full-page guide's body)
 
@@ -195,10 +215,25 @@ class StepBar(QWidget):
     def __init__(self, steps: int):
         super().__init__()
         self.steps, self.current = steps, 0
+        self._shown = 0.0   # where the fill is (it slides to `current`)
+        self._anim = QVariantAnimation(self)
+        self._anim.setDuration(STEP_MS)
+        self._anim.setEasingCurve(QEasingCurve.Type.OutCubic)
+        self._anim.valueChanged.connect(self._slide)
         self.setFixedSize(steps * self.SEG_W + (steps - 1) * self.GAP, self.SEG_H)
 
     def set_step(self, i: int):
         self.current = i
+        self._anim.stop()
+        if animations_on() and self.isVisible():
+            self._anim.setStartValue(self._shown)
+            self._anim.setEndValue(float(i))
+            self._anim.start()
+        else:
+            self._slide(float(i))
+
+    def _slide(self, v):
+        self._shown = float(v)
         self.update()
 
     def paintEvent(self, ev):
@@ -208,9 +243,13 @@ class StepBar(QWidget):
         p.setPen(Qt.PenStyle.NoPen)
         t = theme.T
         for i in range(self.steps):
-            p.setBrush(QColor(t["accent"] if i <= self.current else t["card_hi"]))
-            p.drawRoundedRect(QRectF(i * (self.SEG_W + self.GAP), 0, self.SEG_W, self.SEG_H),
-                              2, 2)
+            seg = QRectF(i * (self.SEG_W + self.GAP), 0, self.SEG_W, self.SEG_H)
+            p.setBrush(QColor(t["card_hi"]))
+            p.drawRoundedRect(seg, 2, 2)
+            fill = min(1.0, max(0.0, self._shown + 1 - i))   # the step on: full
+            if fill > 0:
+                p.setBrush(QColor(t["accent"]))
+                p.drawRoundedRect(QRectF(seg.x(), 0, seg.width() * fill, self.SEG_H), 2, 2)
 
 
 def uses() -> tuple[tuple[str, str, str, str], ...]:
@@ -409,7 +448,24 @@ class _PageStack(QWidget):
         # fit the two (to the screen's height, moved up) before it shrank back
         if old is not None:
             old.hide()
-        self._pages[i].show()
+            if old.graphicsEffect() is not None:   # (left mid-fade)
+                old.setGraphicsEffect(None)   # pyright: ignore[reportArgumentType]
+        page = self._pages[i]
+        page.show()
+        if animations_on() and self.isVisible():
+            fx = QGraphicsOpacityEffect(page)
+            fx.setOpacity(0.0)
+            page.setGraphicsEffect(fx)
+            anim = QVariantAnimation(fx)
+            anim.setDuration(PAGE_MS)
+            anim.setStartValue(0.0)
+            anim.setEndValue(1.0)
+            anim.setEasingCurve(QEasingCurve.Type.OutCubic)
+            anim.valueChanged.connect(fx.setOpacity)
+            # (the effect off once it's in: it paints the page through a picture)
+            anim.finished.connect(lambda p=page, f=fx: p.graphicsEffect() is f
+                                  and p.setGraphicsEffect(None))  # pyright: ignore[reportArgumentType]
+            anim.start()
         self.currentChanged.emit(i)
 
 
@@ -573,7 +629,9 @@ class SetupWizard(QDialog):
         self._ask_use = win.cfg.use_mode == ""
         self._use = "normal"
         self.base = 1 if self._ask_use else 0
-        self.PAGES = SetupWizard.PAGES + self.base
+        # ...and once the devices are done, a last "Make it yours" page (language, theme)
+        self.PAGES = SetupWizard.PAGES + self.base + (1 if self._ask_use else 0)
+        self._lang_pending = False   # a language picked there: Finish restarts into it
         # Discord's own settings, read live on the last step (discordcfg)
         self._discord_sig: tuple | None = None
         self._discord_found: list | None = None   # None: not read (or no Discord)
@@ -600,6 +658,8 @@ class SetupWizard(QDialog):
         self.stack.addWidget(self._page_headphones())
         self.stack.addWidget(self._page_cable())
         self.stack.addWidget(self._page_discord())
+        if self._ask_use:
+            self.stack.addWidget(self._page_look())
         for i in range(self.stack.count()):   # the pages' edges are the dialog's: their
             page = self.stack.widget(i)          # cards line up with Back / Next
             if page is not None and (lay := page.layout()) is not None:
@@ -739,6 +799,87 @@ class SetupWizard(QDialog):
         self.use_group.buttonClicked.connect(lambda b: self._pick_use(b.property("use")))
         self._pick_use(self._use)
         return p
+
+    def _discord_heading(self) -> str:
+        # the first launch has one more page after it ("Make it yours")
+        return (_("Tell Discord or your game") if self._ask_use
+                else _("Last step: tell Discord or your game"))
+
+    def _page_look(self) -> QWidget:
+        """First launch only: the language, a theme, and starting with Windows."""
+        from soundboard import i18n
+        from soundboard.ui.langpick import LangButton
+        from soundboard.ui.settingspages.appearance import ThemeCard, ThemeGrid
+        p = QWidget()
+        v = QVBoxLayout(p)
+        v.addLayout(_header(_("All set! Last thing: make it yours"),
+                            _label(_("Pick a language and a look. Change them any time in "
+                                     "<b>Settings</b> → <b>Appearance</b>.")),
+                            BunnyWidget("star", height=BUN_H, pad=BUN_PAD)))
+        v.addSpacing(HEADER_GAP)
+        card, cl = _card(14, 10, roomy=False)
+        row = QHBoxLayout()
+        row.setSpacing(10)
+        row.addWidget(_label(_("<b>Language</b>")))
+        self.lang_button = LangButton()
+        langs = dict(i18n.available())
+        code = self.win.cfg.language if self.win.cfg.language in langs else i18n.current()
+        self.lang_button.show_language(code, langs.get(code, code))
+        row.addWidget(self.lang_button)
+        row.addStretch(1)
+        cl.addLayout(row)
+        self.lang_note = _label("", "")
+        self.lang_note.setObjectName("hint")
+        self.lang_note.hide()
+        cl.addWidget(self.lang_note)
+
+        def open_picker():
+            from soundboard.ui.langpick import LanguageDialog
+            dlg = LanguageDialog(self, code)
+            dlg.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+            dlg.chosen.connect(self._pick_language)
+            dlg.open_under(self.lang_button)
+        self.lang_button.clicked.connect(open_picker)
+        v.addWidget(card)
+        v.addSpacing(12)
+        self.look_cards: list = []
+        for name in look_themes():
+            c = ThemeCard(name)
+            c.setChecked(name == theme.current_name)
+            c.clicked.connect(lambda __=False, n=name: self._pick_look(n))
+            self.look_cards.append(c)
+        v.addWidget(ThemeGrid(self.look_cards, max_columns=len(LOOK_ROWS[0])))
+        more = QLabel(_("{n} more themes in Settings.", n=len(theme.THEMES) - len(look_themes())))
+        more.setObjectName("hint")
+        v.addWidget(more)
+        v.addSpacing(6)
+        self.chk_autostart = QCheckBox(_("Start Onion Board when I sign in to Windows "
+                                         "(quietly, in the tray)"))
+        self.chk_autostart.setChecked(autostart.is_enabled())
+        self.chk_autostart.setEnabled(autostart.available())
+        v.addWidget(self.chk_autostart)
+        v.addStretch(1)
+        return p
+
+    def _pick_language(self, code: str):
+        from soundboard import i18n
+        self.win.langctl.switch_language(code, restart=False)
+        self.lang_button.show_language(code, i18n.name_of(code))
+        later = self._lang_pending = code != i18n.current()
+        if later:
+            self.lang_note.setText(i18n.in_language(code, lambda: _(
+                "Onion Board restarts in {name} when you press Finish.",
+                name=i18n.name_of(code))))
+        self.lang_note.setVisible(later)
+
+    def _pick_look(self, name: str):
+        if name != theme.current_name:
+            self.win.themectl.apply_theme(name)
+            backdrop = self.win.findChild(QWidget, "setupbackdrop")
+            if backdrop is not None:
+                backdrop.update()
+        for c in self.look_cards:
+            c.setChecked(c.name == name)
 
     def _pick_use(self, key: str):
         self._use = key
@@ -1045,7 +1186,7 @@ class SetupWizard(QDialog):
         v = QVBoxLayout(p)
         v.setSpacing(8)
         self.discord_text = _label("")
-        self.discord_title = _label(_("Last step: tell Discord or your game"), TITLE_CSS)
+        self.discord_title = _label(self._discord_heading(), TITLE_CSS)
         head = _header(self.discord_title, self.discord_text,
                        BunnyWidget("star", celebrate=True, height=BUN_H, pad=BUN_PAD))
         v.addLayout(head)
@@ -1165,9 +1306,41 @@ class SetupWizard(QDialog):
         self._settle_size()
         QTimer.singleShot(SETTLE_MS, self, self._settle_size)
 
+    _rise = 0.0   # how far below its place the guide is, coming in or going out
+    _left = False
+
     def showEvent(self, ev):
         super().showEvent(ev)
         QTimer.singleShot(SETTLE_MS, self, self._settle_size)   # the first step's height
+        if animations_on() and not ev.spontaneous():
+            self.setWindowOpacity(0.0)
+            QTimer.singleShot(ENTER_DELAY_MS, self, lambda: self._move_in(
+                0.0, 1.0, ENTER_MS, RISE, QEasingCurve.Type.OutCubic))
+
+    def _move_in(self, a: float, b: float, ms: int, travel: int, curve, wait: bool = False):
+        """Fade from opacity `a` to `b`, `travel` px below its place at 0 (the fade in,
+        or out). `wait`: return once it's done (the way out, before done carries on)."""
+        home = self.pos()
+        anim = QVariantAnimation(self)
+        anim.setDuration(ms)
+        anim.setStartValue(a)
+        anim.setEndValue(b)
+        anim.setEasingCurve(curve)
+
+        def step(v):
+            self.setWindowOpacity(v)
+            self._rise = (1 - v) * travel
+            self.move(home.x(), home.y() + round(self._rise))
+        step(a)
+        anim.valueChanged.connect(step)
+        if wait:
+            loop = QEventLoop()
+            anim.finished.connect(loop.quit)
+            anim.start()
+            loop.exec(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
+        else:
+            anim.finished.connect(lambda: (setattr(self, "_rise", 0.0), self.move(home)))
+            anim.start()
 
     _settle_due = False
 
@@ -1289,7 +1462,11 @@ class SetupWizard(QDialog):
         self.win.chk_mic.setChecked(cfg.mic_enabled)
         cfg.save()
         self.win.devctl._reopen_devices()   # refresh the window's device boxes from the choices
+        if self._ask_use and self.chk_autostart.isChecked() != autostart.is_enabled():
+            self.win.set_autostart(self.chk_autostart.isChecked())
         self.accept()
+        if self._lang_pending:   # text already on screen can't change language
+            QTimer.singleShot(0, self.win.restart_app)
 
     def reject(self):
         """Esc / the window's X. Mid-install, check first: the install carries on
@@ -1311,6 +1488,10 @@ class SetupWizard(QDialog):
         super().reject()
 
     def done(self, r):
+        if animations_on() and self.isVisible() and not self._left:
+            self._left = True   # out: a short fade, then the rest (still at once for callers)
+            self._move_in(self.windowOpacity(), 0.0, LEAVE_MS, SINK,
+                          QEasingCurve.Type.InCubic, wait=True)
         self.timer.stop()
         self.discord_timer.stop()
         if self.setup_show.on:
@@ -1796,14 +1977,13 @@ class SetupWizard(QDialog):
         self._live_kept: bool | None = None   # (_fill_discord_text: Discord's settings count)
         self._fill_discord_text()
         self._show_live()
-        from soundboard.ui import firsttour
+        # (the first launch's "Make it yours" page comes next: Press Finish is said there)
         self.closing.setText(
-            _("That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You "
-              "can open this guide again any time from the <b>Setup</b> tab "
-              "(<b>Step-by-step guide</b>).") if self._ask_use and firsttour.will_run(self.win)
-            else _("That's it. Add sounds by dragging files onto the window, then click one "
-                   "to play it. You can open this guide again any time from the <b>Setup</b> "
-                   "tab (<b>Step-by-step guide</b>)."))
+            _("Press <b>Next</b> for the last bit: your language and a look.")
+            if self._ask_use else
+            _("That's it. Add sounds by dragging files onto the window, then click one "
+              "to play it. You can open this guide again any time from the <b>Setup</b> "
+              "tab (<b>Step-by-step guide</b>)."))
         games = not self.btn_steam.isHidden()
         self.games_label.setVisible(games)
         streamer = self.win.cfg.use_mode == "streamer"
@@ -1825,7 +2005,7 @@ class SetupWizard(QDialog):
         self.discord_title.setText(
             _("Last step: nothing to tell") if cfg.route == "off" else
             _("Last step: pick it up where it arrives") if cfg.route == "device" and dev
-            and not name else _("Last step: tell Discord or your game"))
+            and not name else self._discord_heading())
         if cfg.route == "off":
             self.discord_text.setText(
                 _("Your sounds play only for you: in your headphones, where OBS's <b>Desktop "
@@ -1873,7 +2053,7 @@ class SetupWizard(QDialog):
         cfg = self.win.cfg
         self.btn_copy.hide()
         if not directmic.works(directmic.status(cfg.mic_device)):
-            self.discord_title.setText(_("Last step: tell Discord or your game"))
+            self.discord_title.setText(self._discord_heading())
             self.discord_text.setText(
                 _("<span style='color:{colour}'>Onion Board isn't on your mic yet, so only "
                   "you will hear your sounds.</span> Go <b>Back</b> and press <b>Put my sounds "

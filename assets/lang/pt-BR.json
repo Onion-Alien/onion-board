@@ -3298,7 +3298,6 @@
   "Put my sounds in my mic  →": "Pôr meus sons no meu microfone  →",
   "Repair my mic  →": "Consertar meu microfone  →",
   "Skip: only I'll hear my sounds": "Pular: só eu vou ouvir meus sons",
-  "That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "Pronto! Aperte <b>Concluir</b> e o Bun mostra onde achar sons. Você pode abrir este guia de novo quando quiser na aba <b>Configurar</b> (<b>Guia passo a passo</b>).",
   "Try anything: a song, a meme, a game sound.": "Tente qualquer coisa: uma música, um meme, um som de jogo.",
   "Type a song you love, then press Enter": "Digite uma música que você ama e aperte Enter",
   "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Seus sons estão em <b style='color:{colour}'>{mic}</b> agora, então não tem nada para escolher no Discord ou nos seus jogos. Só uma coisa ainda pode bloquear: o filtro de ruído do próprio Discord, que vem ligado por padrão.",
@@ -4112,5 +4111,13 @@
   "Turns on: {voices}": "Liga: {voices}",
   "Voice changer: {voice}.": "Mudador de voz: {voice}.",
   "Voices on or off": "Vozes ligadas ou desligadas",
-  "What you say is said in {language}.": "O que você diz é dito em {language}."
+  "What you say is said in {language}.": "O que você diz é dito em {language}.",
+  "<b>Language</b>": "<b>Idioma</b>",
+  "All set! Last thing: make it yours": "Tudo pronto! Última coisa: deixe do seu jeito",
+  "Onion Board restarts in {name} when you press Finish.": "O Onion Board reinicia em {name} quando você clicar em Concluir.",
+  "Pick a language and a look. Change them any time in <b>Settings</b> → <b>Appearance</b>.": "Escolha um idioma e um visual. Mude quando quiser em <b>Configurações</b> → <b>Aparência</b>.",
+  "Press <b>Next</b> for the last bit: your language and a look.": "Clique em <b>Avançar</b> para a última parte: seu idioma e um visual.",
+  "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Iniciar o Onion Board quando eu entrar no Windows (discretamente, na bandeja)",
+  "Tell Discord or your game": "Avise o Discord ou seu jogo",
+  "{n} more themes in Settings.": "Mais {n} temas em Configurações."
 }

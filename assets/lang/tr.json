@@ -3298,7 +3298,6 @@
   "Put my sounds in my mic  →": "Seslerimi mikrofonuma koy →",
   "Repair my mic  →": "Mikrofonumu onar →",
   "Skip: only I'll hear my sounds": "Atla: seslerimi sadece ben duyarım",
-  "That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "İşte bu kadar! <b>Bitir</b>'e bas, Bun sana ses nerede bulacağını göstersin. Bu rehberi istediğin zaman <b>Kurulum</b> sekmesinden yeniden açabilirsin (<b>Adım adım rehber</b>).",
   "Try anything: a song, a meme, a game sound.": "Ne istersen dene: bir şarkı, bir meme, bir oyun sesi.",
   "Type a song you love, then press Enter": "Sevdiğin bir şarkıyı yaz, sonra Enter'a bas",
   "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Seslerin artık <b style='color:{colour}'>{mic}</b> içinde, yani Discord'da ya da oyunlarında seçecek bir şey yok. Onları hâlâ durdurabilecek tek şey: Discord'un varsayılan olarak açık olan kendi gürültü filtresi.",
@@ -4112,5 +4111,13 @@
   "Turns on: {voices}": "Açar: {voices}",
   "Voice changer: {voice}.": "Ses değiştirici: {voice}.",
   "Voices on or off": "Sesler açık ya da kapalı",
-  "What you say is said in {language}.": "Söylediğin şey {language} dilinde söylenir."
+  "What you say is said in {language}.": "Söylediğin şey {language} dilinde söylenir.",
+  "<b>Language</b>": "<b>Dil</b>",
+  "All set! Last thing: make it yours": "Her şey hazır! Son olarak: kendine göre ayarla",
+  "Onion Board restarts in {name} when you press Finish.": "Bitir'e bastığında Onion Board {name} diliyle yeniden başlar.",
+  "Pick a language and a look. Change them any time in <b>Settings</b> → <b>Appearance</b>.": "Bir dil ve görünüm seç. İstediğin zaman <b>Ayarlar</b> → <b>Dış görünüş</b> bölümünden değiştir.",
+  "Press <b>Next</b> for the last bit: your language and a look.": "Son kısım için <b>Sonraki</b>'ye bas: dilin ve görünümün.",
+  "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Windows'ta oturum açtığımda Onion Board'u başlat (sessizce, tepside)",
+  "Tell Discord or your game": "Discord'a veya oyununa söyle",
+  "{n} more themes in Settings.": "Ayarlar'da {n} tema daha var."
 }

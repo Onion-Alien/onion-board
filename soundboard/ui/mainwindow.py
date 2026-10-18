@@ -748,13 +748,30 @@ class MainWindow(QMainWindow):
     SETTLE_S = 20.0        # after setting it up: how long Windows gets to load it
     MIC_SILENT_S = 20.0    # the mic sent only exact zeros this long: it's stuck (or muted)
 
+    _backdrop: Any = None
+
+    def setup_backdrop(self):
+        """The very first launch: a plain backdrop over the window until the guide is
+        done (nothing behind the guide but the theme and the logo). Put up before the
+        window first shows (app.py), so the app never flashes up before the guide."""
+        if self._backdrop is None and not self.cfg.use_mode:
+            from soundboard.ui.setupbackdrop import Backdrop
+            self._backdrop = Backdrop(self)
+        return self._backdrop
+
     def run_setup(self, resumed: bool = False):
         """The quick-setup guide (first launch, or the Setup tab's Step-by-step guide).
         `resumed`: reopened by itself after the restart the virtual cable needed."""
         from soundboard.ui.setupwizard import SetupWizard
+        backdrop = self.setup_backdrop()
+        if backdrop is not None:
+            backdrop.settle()   # its logo to the corner as the guide comes in
         wiz = SetupWizard(self, resumed=resumed)
         wiz.exec()
         free_dialog(wiz)
+        if backdrop is not None:
+            self._backdrop = None
+            backdrop.reveal()
         self.routectl._prepare_all()
         # the installer's "from Soundpad" box waits for this, so its progress card
         # isn't stuck over the guide (a no-op once it's done)
