@@ -46,6 +46,8 @@ EYES = (34, 66)
 EYE_Y = 53.0
 FPS = 30
 FAST_MS = 1000 // FPS
+NEAR = 2.2           # the mouse this close (owl heights from his face): he perks up
+REST_PEEK_MS = 250   # resting: how often he checks for the mouse coming near
 
 # each theme's own Hoot, like Bun's (bunnyfit.LOOKS): his feathers ("feather"; "wing":
 # the darker wings and shading, None: a shade of the feathers), the colour low in his eyes
@@ -661,15 +663,24 @@ class OwlWidget(QWidget):
     (default: wait_lines() / joy_lines()).
     `left` / `right` are the room beside him, px (default: plenty both sides, for
     the speech bubble up to his right and the zzz). The timer only runs while he's
-    on screen."""
+    on screen.
+
+    `rest_after_s=N`: with nothing going on he only moves for N seconds after he's
+    shown, then finishes what he's doing and holds still (the timer stops, the last
+    pose stays). The mouse coming near (looked at 4 times a second, nothing drawn),
+    a click, something playing or showing him again sets him off again."""
 
     clicked = Signal()
     # the ones made with dances=True: the host hands each one on screen what's playing
     dancers: weakref.WeakSet = weakref.WeakSet()
 
     def __init__(self, height: int = 96, lines=None, joy=None, parent=None, *,
-                 left: int | None = None, right: int | None = None, dances: bool = False):
+                 left: int | None = None, right: int | None = None, dances: bool = False,
+                 rest_after_s: float | None = None):
         super().__init__(parent)
+        self.rest_after_s = rest_after_s
+        self.resting = False       # holding still: the timer's off until a stir
+        self._rest_t = rest_after_s or 0.0   # (his own time, `t`) settles down from then
         if dances:
             OwlWidget.dancers.add(self)
         self.groove = None         # what's playing (set_groove): he dances to it
@@ -715,7 +726,11 @@ class OwlWidget(QWidget):
         self._timer = QTimer(self)
         self._timer.setInterval(FAST_MS)
         self._timer.timeout.connect(self._tick)
-        appstate.pause_in_background(self, self._resume, self._timer.stop)
+        # resting: is the mouse coming near? (no repaints)
+        self._peek = QTimer(self)
+        self._peek.setInterval(REST_PEEK_MS)
+        self._peek.timeout.connect(self._peek_mouse)
+        appstate.pause_in_background(self, self._resume, self._pause)
 
     def sizeHint(self) -> QSize:
         return QSize(round(self.owl_h * W / H) + self.left + self.right,
@@ -725,17 +740,58 @@ class OwlWidget(QWidget):
         return QSize(round(self.owl_h * W / H) + 8, self.owl_h + self.top + 8)
 
     def showEvent(self, ev):
+        if self.rest_after_s is not None:   # shown again: another rest_after_s to move
+            self.resting = False
+            self._peek.stop()
+            self._rest_t = self.t + self.rest_after_s
         if appstate.active():   # behind a game it waits until the app is back in front
             self._resume()
         super().showEvent(ev)
 
     def _resume(self):
+        if self.resting:   # (back in front: still, until the mouse or a sound stirs him)
+            self._peek.start()
+            return
         self._last = time.monotonic()
         self._timer.start(FAST_MS)
 
-    def hideEvent(self, ev):
+    def _pause(self):
         self._timer.stop()
+        self._peek.stop()
+
+    def hideEvent(self, ev):
+        self._pause()
         super().hideEvent(ev)
+
+    def stir(self):
+        """Something happened (the mouse came near, a click, a sound): with
+        `rest_after_s` he moves again and keeps moving for another rest_after_s."""
+        if self.rest_after_s is None:
+            return
+        self._rest_t = self.t + self.rest_after_s
+        if self.resting:
+            self.resting = False
+            self._peek.stop()
+            if self.isVisible() and appstate.active():
+                self._resume()
+
+    def _peek_mouse(self):
+        m = self._mouse()
+        if m and math.hypot(*m) < NEAR:
+            self.stir()
+
+    def _calm(self) -> bool:
+        """Nothing on the go, so stopping here keeps a pose he could hold: no act,
+        line, hop, blink or dance, the mouse away, his eyes and the springy layer
+        settled."""
+        return not (
+            self.act or self._was is not None or self._joy_t >= 0 or self.say
+            or self.groove is not None or self._dance > 0.01 or self._near > 0.02
+            or (self._blink_t >= 0 and self.t - self._blink_t < 0.2)
+            or abs(self._look[0] - self._glance[0]) > 0.01
+            or abs(self._look[1] - self._glance[1]) > 0.01
+            or abs(self._squash_s.v) > 0.05 or abs(self._tufts_s.v) > 0.5
+            or abs(self._wing_s.v) > 0.05)
 
     def mousePressEvent(self, ev):
         if ev.button() == Qt.MouseButton.LeftButton:
@@ -747,6 +803,8 @@ class OwlWidget(QWidget):
         """What's playing, as a soundboard.groove.Groove (its beat, style and hits), or
         None. He bobs his head to it."""
         self.groove = groove
+        if groove is not None:
+            self.stir()
 
     @staticmethod
     def _accent(g, now: float) -> float:
@@ -768,6 +826,7 @@ class OwlWidget(QWidget):
     def cheer(self):
         """A happy hop with sparkles (what a click does)."""
         self._joy_t = 0.0
+        self.stir()
         self._stop_act()
         # his own lines for where he is, and his theme's character (mascotlines.py)
         self.say = (mascotlines.pick(self._rng, self.joy_lines + mascotlines.hoot(), self.say)
@@ -786,6 +845,10 @@ class OwlWidget(QWidget):
         self.step(min(0.1, now - self._last))
         self._last = now
         self.update()   # always 30 fps: a slower idle pace made the sway judder
+        if self.rest_after_s is not None and self.t >= self._rest_t and self._calm():
+            self._timer.stop()   # (this frame is the one he keeps)
+            self.resting = True
+            self._peek.start()
 
     def _mouse(self) -> tuple[float, float] | None:
         """The cursor relative to his face, in owl heights, if it's in this window."""
@@ -819,7 +882,10 @@ class OwlWidget(QWidget):
                 self._was = None
         m = self._mouse() if mouse is ... else mouse
         dist = math.hypot(*m) if m else 99.0
-        near = 1.0 if dist < 2.2 else 0.0
+        near = 1.0 if dist < NEAR else 0.0
+        if near:
+            self.stir()
+        settling = self.rest_after_s is not None and self.t >= self._rest_t
         self._near += (near - self._near) * min(1.0, dt * (5 if near else 1.5))
         if self._joy_t >= 0:
             self._joy_t += dt
@@ -838,9 +904,14 @@ class OwlWidget(QWidget):
                 self._next_act = self.t + self._rng.uniform(3.5, 7.0)
             elif self._near > 0.6:
                 self._stop_act()
+        elif settling:   # nothing new starts; what's going on plays out (_calm)
+            self._next_act = max(self._next_act, self.t + 1.0)
         elif (self._joy_t < 0 and self._near < 0.3 and self.t >= self._next_act
               and self._dance < 0.3):
             self.start(self._rng.choice(list(ACTS)))
+        if settling:
+            self._next_blink = max(self._next_blink, self.t + 1.0)
+            self._next_glance = max(self._next_glance, self.t + 1.0)
         if self.t >= self._next_blink:
             self._blink_t = self.t
             self._next_blink = self.t + self._rng.uniform(2.0, 5.0)

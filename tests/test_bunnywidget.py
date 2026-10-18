@@ -829,3 +829,59 @@ def test_the_apps_tabs_empty_bun_rests_after_30_s():
     import inspect
     assert ap.BUN_REST_S == 30.0
     assert "rest_after_s=BUN_REST_S" in inspect.getsource(ap)
+
+
+def _still_kind(qapp, monkeypatch, prop=None, sad=0.0, sulk=False):
+    """A shown resting Bun of a given kind (the Store's headphones one, a sulking one)."""
+    from soundboard.ui import bunnywidget as bw
+    clock = _Clock()
+    monkeypatch.setattr(bw, "time", clock)
+    monkeypatch.setattr(bw, "local_hour", lambda: 12)
+    monkeypatch.setattr(bw.appstate, "active", lambda: True)
+    b = BunnyWidget(prop, height=72, pad=12, sad=sad, rest_after_s=30.0)
+    b.sulk = sulk
+    b.clock = clock
+    b.resize(b.sizeHint())
+    b.show()
+    qapp.processEvents()
+    return b
+
+
+def test_the_headphones_bun_stops_his_notes_and_rests(qapp, monkeypatch):
+    """The Community tab's Bun: notes float out of his headphones nonstop, so he never
+    held still (60 repaints a second of the whole banner, for as long as it's open)."""
+    b = _still_kind(qapp, monkeypatch, "headphones")
+    _tick(b, round(10 / 0.035))
+    assert b.notes and not b.resting                # his idle notes, while he moves
+    b.clock.now = b._rest_at + 0.1
+    _settle(qapp, b, 15)
+    assert b.resting and not b._timer.isActive() and not b.notes
+    b.close()
+
+
+def test_a_sulking_bun_rests_with_his_foot_down(qapp, monkeypatch):
+    """The red card's Bun kicks at the ground over and over: after his 30 s he stops
+    between two kicks, the dust settled."""
+    from soundboard.ui import bunnywidget as bw
+    b = _still_kind(qapp, monkeypatch, sad=1.0, sulk=True)
+    b.clock.now = b._rest_at + 0.1
+    _settle(qapp, b, 15)
+    assert b.resting and not b._timer.isActive() and not b.puffs
+    kick, u = bw.sulk_kick(b._still_at - b._t0)
+    assert kick == 0.0 and u >= 0.75
+    b.stir()                                         # a new problem: he sulks again
+    assert not b.resting and b._timer.isActive()
+    b.close()
+
+
+def test_the_store_and_oops_buns_rest_after_30_s(qapp):
+    from soundboard.ui import oops, storelook
+    bun = storelook.make_bun(72)
+    assert bun.rest_after_s == storelook.BUN_REST_S == 30.0
+    card = oops.OopsPanel()
+    assert card.bun.rest_after_s == oops.BUN_REST_S == 30.0
+    card.bun.resting = True
+    card.show_problem("Store's down", "try later")
+    assert not card.bun.resting                      # a new problem stirs him
+    bun.deleteLater()
+    card.deleteLater()
