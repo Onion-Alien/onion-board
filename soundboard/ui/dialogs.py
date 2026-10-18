@@ -19,7 +19,7 @@ from soundboard import errors, net, soundfx, sourceinfo, theme, thumbs, usage, v
 from soundboard.eq import PRESETS as EQ_PRESETS
 from soundboard.library import (MAX_COOLDOWN_S, MAX_DELAY_S, MAX_FADE_S, PAD_COLORS,
                                 SoundMeta, original_peaks)
-from soundboard.settings import HotkeyDialog, pretty_key
+from soundboard.ui.hotkeypick import HotkeyDialog, pretty_key
 from soundboard.ui import busy, fit, icons, sourcedialog, toast
 from soundboard.ui.panel import (EqPanel, hint_label, icon_button, reset_button,
                                  section_label, steady_number)

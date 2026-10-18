@@ -471,7 +471,7 @@ class ClipShelf(QWidget):
             self._cleanup_timer.start()
         self.title.toggled.connect(self._fold)
         self.reload()
-        QTimer.singleShot(0, self._maintain)
+        QTimer.singleShot(0, self, self._maintain)
 
     def _icon_button(self, icon: str, tip: str, parent: QWidget | None = None) -> QPushButton:
         """A quiet icon-only button (no background until hover); its words are the
@@ -550,10 +550,11 @@ class ClipShelf(QWidget):
 
     def eventFilter(self, obj, event):
         if obj is self.list.viewport():
+            # (with self as the context: dropped if the shelf goes first)
             if event.type() == QEvent.Type.Leave:
-                QTimer.singleShot(0, self._left)
+                QTimer.singleShot(0, self, self._left)
             elif event.type() == QEvent.Type.Resize:
-                QTimer.singleShot(0, self._place_actions)
+                QTimer.singleShot(0, self, self._place_actions)
         return super().eventFilter(obj, event)
 
     def _left(self):

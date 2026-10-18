@@ -269,7 +269,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/logoduel.py` | a silent laser exchange between the Board and Watch logos when clicked on the Triggers tab |
 | `soundboard/ui/overlay.py` | the in-game overlay: a panel of pads that never takes focus, driven by number keys or clicks, on a chosen monitor and spot (or wherever it was dragged) |
 | `soundboard/ui/voicepanel.py` | the Voice tab: lays out its cards and bottom bar, the add-ons list |
-| `soundboard/ui/voicefxpanel.py` | the Voice tab's voice changer card: voice tiles, effect rows and their sliders |
+| `soundboard/ui/voicefxpanel.py` | the Voice tab's voice changer card: voice tiles, effect rows and their sliders. |
 | `soundboard/ui/backdroprow.py` | the voice changer's Background card (built-in sounds and board sounds behind your voice) and its Speed and pitch pop-up |
 | `soundboard/ui/effectspopup.py` | the voice bar's Effects pop-up: bundled CC0 background sounds, board sounds and the extra Robot, Radio, Echo and Reverb on top of any voice, one slider and a ✕ each |
 | `soundboard/ui/voicepicker.py` | Edit sound → Effects → Voice: picture cards of the voice changer's voices, the AI voices and your setups, to lay a voice over a sound |
@@ -361,7 +361,8 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/enjoy.py` | when *Enjoying Onion Board?* is due: open time per day (`enjoy_days`, fed by `usage.open_tick`), due after `DAYS_NEEDED` days of `DAY_S` or more, `enjoy_state` done once it has shown |
 | `soundboard/ui/countdialog.py` | *What Count me in sends*: the table behind the eye button by Settings' *Count me in* (keep it in step with `usage.py` and SECURITY.md) |
 | `soundboard/theme.py` | the current theme (its colours from the style kit's `palettes.py` → stylesheet, also read by the painted widgets) and the logo |
-| `soundboard/settings.py` | Settings (a page inside the main window: `MainWindow.open_settings`): the dialog, its search and its card helpers; the pages are in `ui/settingspages/` (`HOTKEY_ACTIONS`, `HotkeyDialog` and `pretty_key` still import from here) |
+| `soundboard/settings.py` | Settings (a page inside the main window: `MainWindow.open_settings`): the dialog, its search and its card helpers; the pages are in `ui/settingspages/` (`HOTKEY_ACTIONS`, `HotkeyDialog` and `pretty_key` still import from here, for older code) |
+| `soundboard/ui/hotkeypick.py` | hotkey names and the key picker: the global hotkey actions (`HOTKEY_GROUPS`, `HOTKEY_ACTIONS`), how a combo reads (`pretty_key`) and the window asking for one (`HotkeyDialog`). Pads, menus, Edit sound and Settings import them from here, so none of them loads the Settings window |
 | `soundboard/ui/settingspages/` | Settings' pages, one module each (`help.py`: Add-ons and About, `audio.py`, `appearance.py` (with the theme cards), `keys.py`: Hotkeys and Overlay (with the hotkey capture dialog), `general.py`, `connection.py`: Connection and Updates, `privacy.py`: Privacy, Data and Offline mode, `addons.py`: Add-ons and Remote, `heading.py`: the heading row). Each is a QObject the dialog owns (`SettingsDialog.<page>`, `Page` in `__init__.py`); the widgets they build stay on the dialog (declared on `Built`, which it inherits) |
 | `soundboard/ui/audiorecovery.py` | Settings audio recovery card, confirmation dialogs and background mic-effect repair, clean reinstall and removal |
 | `soundboard/wheelguard.py` | mouse wheel scrolls the page instead of changing sliders / dropdowns (installed per widget); the app style (`AppStyle`): snug dropdowns, and submenus that open just outside their menu |

@@ -47,7 +47,7 @@ from soundboard.library import (
     import_file,
     loose_sounds,
 )
-from soundboard.settings import HOTKEY_ACTIONS, pretty_key
+from soundboard.ui.hotkeypick import HOTKEY_ACTIONS, pretty_key
 from soundboard.ui import busy, importreport, taboff, worker
 from soundboard.ui import toast as toastmod
 from soundboard.ui.controller import Controller

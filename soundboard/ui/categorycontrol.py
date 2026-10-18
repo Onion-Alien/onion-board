@@ -26,7 +26,7 @@ from PySide6.QtWidgets import (
 from soundboard import catswitch, library, usage
 from soundboard.i18n import _, ngettext
 from soundboard.library import SoundMeta
-from soundboard.settings import pretty_key
+from soundboard.ui.hotkeypick import pretty_key
 from soundboard.ui import icons
 from soundboard.ui.controller import Controller
 from soundboard.ui.padbatch import fill_colour_menu
