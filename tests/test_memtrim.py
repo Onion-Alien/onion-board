@@ -9,7 +9,7 @@ import pytest
 from test_mainwindow import window  # noqa: F401 - the real window, offscreen
 
 from soundboard.audio import mapped, soundcache
-from soundboard import memtrim
+from soundboard.core import memtrim
 from soundboard.sounds import thumbs
 from soundboard.speech import aipreview
 

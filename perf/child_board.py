@@ -843,7 +843,7 @@ class Child:
         self.w.hide()
         tick = self.w.tickctl
         try:
-            from soundboard import memtrim
+            from soundboard.core import memtrim
             self.run_until(lambda: getattr(tick, "_given_back", False),
                            memtrim.AFTER_S + 5, 0.25)
         except ImportError:   # (a checkout from before it)
