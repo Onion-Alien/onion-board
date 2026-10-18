@@ -3297,7 +3297,6 @@
   "Put my sounds in my mic  →": "मेरे साउंड मेरे माइक में डालें →",
   "Repair my mic  →": "मेरा माइक ठीक करें →",
   "Skip: only I'll hear my sounds": "छोड़ें: मेरे साउंड सिर्फ़ मैं सुनूँगा",
-  "That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "बस! <b>समाप्त</b> दबाएँ, और Bun दिखाएगा कि साउंड कहाँ मिलते हैं। यह गाइड आप कभी भी <b>सेटअप</b> टैब से फिर खोल सकते हैं (<b>स्टेप-बाय-स्टेप गाइड</b>)।",
   "Try anything: a song, a meme, a game sound.": "कुछ भी आज़माएँ: गाना, मीम, गेम साउंड।",
   "Type a song you love, then press Enter": "अपना पसंदीदा गाना लिखें, फिर Enter दबाएँ",
   "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "आपके साउंड अब <b style='color:{colour}'>{mic}</b> में हैं, इसलिए Discord या गेम्स में कुछ चुनना नहीं है। बस एक चीज़ अब भी उन्हें रोक सकती है: Discord का अपना नॉइज़ फ़िल्टर, जो डिफ़ॉल्ट रूप से चालू रहता है।",
@@ -4111,5 +4110,13 @@
   "Voice changer: {voice}.": "आवाज परिवर्तक: {voice}।",
   "Voices on or off": "आवाज़ें चालू या बंद",
   "What you say is said in {language}.": "आप जो कहते हैं वह {language} में कहा जाता है।",
-  "Onion Board closed unexpectedly, so it started again.": "Onion Board अचानक बंद हो गया, इसलिए यह फिर से शुरू हुआ।"
+  "Onion Board closed unexpectedly, so it started again.": "Onion Board अचानक बंद हो गया, इसलिए यह फिर से शुरू हुआ।",
+  "<b>Language</b>": "<b>भाषा</b>",
+  "All set! Last thing: make it yours": "सब तैयार! आख़िरी बात: इसे अपना बनाएँ",
+  "Onion Board restarts in {name} when you press Finish.": "समाप्त दबाते ही Onion Board {name} में फिर से शुरू होगा।",
+  "Pick a language and a look. Change them any time in <b>Settings</b> → <b>Appearance</b>.": "एक भाषा और एक लुक चुनें। इन्हें कभी भी <b>सेटिंग्स</b> → <b>दिखावट</b> में बदलें।",
+  "Press <b>Next</b> for the last bit: your language and a look.": "आख़िरी हिस्से के लिए <b>अगला</b> दबाएँ: आपकी भाषा और लुक।",
+  "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Windows में साइन इन करने पर Onion Board शुरू करें (चुपचाप, ट्रे में)",
+  "Tell Discord or your game": "डिस्कोर्ड या अपने गेम को बताएं",
+  "{n} more themes in Settings.": "सेटिंग्स में {n} और थीम।"
 }

@@ -3297,7 +3297,6 @@
   "Put my sounds in my mic  →": "Βάλε τους ήχους μου στο μικρόφωνο  →",
   "Repair my mic  →": "Επισκεύασε το μικρόφωνό μου  →",
   "Skip: only I'll hear my sounds": "Παράλειψη: μόνο εγώ θα ακούω τους ήχους μου",
-  "That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "Αυτό ήταν! Πάτα <b>Τέλος</b> και ο Bun θα σου δείξει πού θα βρεις ήχους. Μπορείς να ανοίξεις ξανά αυτόν τον οδηγό όποτε θες από την καρτέλα <b>Διαμόρφωση</b> (<b>Οδηγός βήμα-βήμα</b>).",
   "Try anything: a song, a meme, a game sound.": "Δοκίμασε οτιδήποτε: ένα τραγούδι, ένα meme, έναν ήχο από παιχνίδι.",
   "Type a song you love, then press Enter": "Γράψε ένα τραγούδι που αγαπάς και πάτα Enter",
   "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Οι ήχοι σου είναι τώρα στο <b style='color:{colour}'>{mic}</b>, οπότε δεν έχεις τίποτα να διαλέξεις στο Discord ή στα παιχνίδια σου. Ένα πράγμα μπορεί ακόμα να τους σταματήσει: το φίλτρο θορύβου του ίδιου του Discord, που είναι ανοιχτό από προεπιλογή.",
@@ -4111,5 +4110,13 @@
   "Voice changer: {voice}.": "Αλλαγη φωνης: {voice}.",
   "Voices on or off": "Φωνές ανοιχτές ή κλειστές",
   "What you say is said in {language}.": "Ό,τι λες ακούγεται στα {language}.",
-  "Onion Board closed unexpectedly, so it started again.": "Το Onion Board έκλεισε απροσδόκητα, οπότε ξεκίνησε ξανά."
+  "Onion Board closed unexpectedly, so it started again.": "Το Onion Board έκλεισε απροσδόκητα, οπότε ξεκίνησε ξανά.",
+  "<b>Language</b>": "<b>Γλώσσα</b>",
+  "All set! Last thing: make it yours": "Όλα έτοιμα! Τελευταίο: κάν' το δικό σου",
+  "Onion Board restarts in {name} when you press Finish.": "Το Onion Board θα ξεκινήσει ξανά στα {name} όταν πατήσεις Τέλος.",
+  "Pick a language and a look. Change them any time in <b>Settings</b> → <b>Appearance</b>.": "Διάλεξε γλώσσα και εμφάνιση. Άλλαξέ τα όποτε θες από <b>Ρυθμίσεις</b> → <b>Εμφάνιση</b>.",
+  "Press <b>Next</b> for the last bit: your language and a look.": "Πάτα <b>Επόμενο</b> για το τελευταίο: γλώσσα και εμφάνιση.",
+  "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Εκκίνηση του Onion Board όταν συνδέομαι στα Windows (αθόρυβα, στο tray)",
+  "Tell Discord or your game": "Πες το στο Discord ή στο παιχνίδι σου",
+  "{n} more themes in Settings.": "Ακόμα {n} θέματα στις Ρυθμίσεις."
 }

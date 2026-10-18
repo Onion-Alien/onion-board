@@ -677,6 +677,8 @@ def main():
         from PySide6.QtCore import QTimer   # them behind, so a while after sign-in
         QTimer.singleShot(TRAY_PRELOAD_MS, w.setctl.preload_dialogs)
     if show and not w.bunctl.start_as_bun():   # quit as Bun last time: Bun, not the window
+        if not w.cfg.setup_done:
+            w.setup_backdrop()   # the first launch: the guide's backdrop from the first frame
         w.show()
         if TRAY_ARG not in sys.argv:
             first_paint(app, w)

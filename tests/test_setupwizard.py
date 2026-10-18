@@ -2,7 +2,8 @@
 the config and engine, the cable page reacts to the cable being there or not, and
 finishing marks setup done (only when the cable exists)."""
 import pytest
-from PySide6.QtWidgets import QDialog
+from PySide6.QtCore import QEvent
+from PySide6.QtWidgets import QApplication, QDialog
 
 from soundboard import engine, library, winkeys
 from soundboard.library import Config
@@ -1032,9 +1033,9 @@ def test_picking_what_its_for_never_resizes_the_guide(mic_wizard, qapp):
 
 def test_the_first_launch_asks_what_its_for_first(mic_wizard):
     w, wiz = mic_wizard
-    assert wiz._ask_use and wiz.PAGES == 5 and wiz.stack.currentIndex() == 0
+    assert wiz._ask_use and wiz.PAGES == 6 and wiz.stack.currentIndex() == 0
     assert wiz.use_buttons["normal"].isChecked()
-    assert "Step 1 of 5" in wiz.progress.text()
+    assert "Step 1 of 6" in wiz.progress.text()
     wiz.use_buttons["games"].click()
     assert "Triggers" in wiz.use_hint.text()
     assert not w.tabctl.tab_on("triggers")   # nothing changes until Next
@@ -1239,3 +1240,127 @@ def test_discord_reads_keep_one_thread(mic_wizard, monkeypatch, qapp):
         assert process_events(qapp, lambda: not wiz._discord_reading)
     assert len(threads) == 3 and len(set(threads)) == 1
     assert threading.main_thread() not in threads
+
+
+def test_the_first_launch_ends_on_make_it_yours(mic_wizard):
+    w, wiz = mic_wizard
+    last = wiz.PAGES - 1
+    assert wiz.stack.widget(last).isAncestorOf(wiz.lang_button)
+    assert [c.name for c in wiz.look_cards] == setupwizard.look_themes()
+    assert len(wiz.look_cards) == 9
+    # the Discord step isn't the last one any more: it says Next, and so does its text
+    wiz.go(wiz.base + 3)
+    assert "Last step" not in wiz.discord_title.text()
+    assert "Next" in wiz.closing.text() and "Finish" not in wiz.btn_next.text()
+    wiz.go(last)
+    assert "Finish" in wiz.btn_next.text()
+
+
+def test_a_later_guide_has_no_make_it_yours_page(wizard):
+    w, _wiz = wizard
+    w.cfg.use_mode = "normal"   # "What's it for?" answered long ago
+    again = setupwizard.SetupWizard(w)
+    try:
+        assert not hasattr(again, "look_cards")
+        assert again.PAGES == setupwizard.SetupWizard.PAGES
+        assert "Last step" in again.discord_title.text()
+    finally:
+        again.done(0)
+        again.deleteLater()
+
+
+def test_the_seasonal_look_gives_way_once_its_over(monkeypatch):
+    from soundboard import theme
+    monkeypatch.setattr(theme, "offered", lambda name, today=None: name != "Halloween")
+    looks = setupwizard.look_themes()
+    assert "Halloween" not in looks and setupwizard.SEASONAL_OFF in looks
+    assert len(looks) == len(set(looks)) == 9
+
+
+def test_picking_a_look_switches_the_theme(mic_wizard):
+    from soundboard import theme
+    w, wiz = mic_wizard
+    wiz.go(wiz.PAGES - 1)
+    wiz._pick_look("Ocean")
+    assert theme.current_name == "Ocean" and w.cfg.theme == "Ocean"
+    assert [c.name for c in wiz.look_cards if c.isChecked()] == ["Ocean"]
+    wiz._pick_look("Dark")
+
+
+def test_a_new_language_restarts_into_it_on_finish(mic_wizard, monkeypatch):
+    w, wiz = mic_wizard
+    picked, restarts = [], []
+    monkeypatch.setattr(w.langctl, "switch_language",
+                        lambda code, restart=True: picked.append(code))
+    monkeypatch.setattr(w, "restart_app", lambda: restarts.append(1))
+    monkeypatch.setattr(w, "set_autostart", lambda on: True)
+    wiz.go(wiz.PAGES - 1)
+    wiz._pick_language("de")
+    assert picked == ["de"] and not wiz.lang_note.isHidden() and wiz.lang_note.text()
+    wiz.finish()
+    QApplication.processEvents()
+    assert restarts == [1]
+
+
+def test_finish_only_touches_windows_startup_when_the_box_changed(mic_wizard, monkeypatch):
+    from soundboard import autostart
+    w, wiz = mic_wizard
+    calls = []
+    monkeypatch.setattr(autostart, "is_enabled", lambda: False)
+    monkeypatch.setattr(w, "set_autostart", lambda on: calls.append(on) or True)
+    wiz.go(wiz.PAGES - 1)
+    wiz.chk_autostart.setChecked(True)
+    wiz.chk_autostart.setChecked(False)   # ticked and unticked: still as it was
+    wiz.finish()
+    assert calls == []   # Windows' Run key isn't written
+
+
+def test_finish_turns_on_windows_startup_when_ticked(mic_wizard, monkeypatch):
+    from soundboard import autostart
+    w, wiz = mic_wizard
+    calls = []
+    monkeypatch.setattr(autostart, "is_enabled", lambda: False)
+    monkeypatch.setattr(w, "set_autostart", lambda on: calls.append(on) or True)
+    wiz.go(wiz.PAGES - 1)
+    wiz.chk_autostart.setChecked(True)
+    wiz.finish()
+    assert calls == [True]
+
+
+def test_the_first_launch_backdrop(qapp, app_dir, devices):
+    from soundboard.ui.setupbackdrop import Backdrop
+    w = main.MainWindow()
+    try:
+        w.cfg.use_mode = ""   # the very first launch
+        w.resize(900, 600)
+        bd = w.setup_backdrop()   # (app.py: before the window first shows)
+        w.show()
+        assert isinstance(bd, Backdrop) and w.setup_backdrop() is bd   # one, kept
+        assert bd.geometry() == w.rect()
+        w.resize(1000, 700)
+        assert bd.geometry() == w.rect()   # follows the window's size
+        bd.settle()   # animations off (offscreen): straight to the corner
+        assert bd._k == 1.0
+        bd.grab()     # paints, in the corner, without the rail's logo shown
+        bd.reveal()   # ...and goes at once
+        qapp.sendPostedEvents(None, QEvent.Type.DeferredDelete)
+        assert w.findChild(Backdrop) is None
+        w._backdrop = None
+        w.cfg.use_mode = "normal"   # anyone who's been through it: no backdrop
+        assert w.setup_backdrop() is None
+    finally:
+        w.soundctl._load_thread.join(15)
+        w.close()
+        w.deleteLater()
+        qapp.sendPostedEvents(None, QEvent.Type.DeferredDelete)
+
+
+def test_the_theme_grid_keeps_to_its_columns(qapp):
+    from soundboard.ui.settingspages.appearance import ThemeCard, ThemeGrid
+    cards = [ThemeCard(n) for n in setupwizard.look_themes()]
+    grid = ThemeGrid(cards, max_columns=3)
+    grid.resize(900, 400)   # room for five across
+    grid.show()
+    QApplication.processEvents()
+    assert grid.columns == 3
+    grid.deleteLater()

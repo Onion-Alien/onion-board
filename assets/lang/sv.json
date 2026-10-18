@@ -3297,7 +3297,6 @@
   "Put my sounds in my mic  →": "Lägg mina ljud i min mikrofon  →",
   "Repair my mic  →": "Laga min mikrofon  →",
   "Skip: only I'll hear my sounds": "Hoppa över: bara jag hör mina ljud",
-  "That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "Klart! Tryck på <b>Avsluta</b> så visar Bun var du hittar ljud. Du kan öppna guiden igen när du vill från fliken <b>Konfiguration</b> (<b>Steg-för-steg-guide</b>).",
   "Try anything: a song, a meme, a game sound.": "Testa vad som helst: en låt, en meme, ett spelljud.",
   "Type a song you love, then press Enter": "Skriv en låt du älskar och tryck på Enter",
   "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Dina ljud är i <b style='color:{colour}'>{mic}</b> nu, så det finns inget att välja i Discord eller dina spel. En sak kan fortfarande stoppa dem: Discords eget brusfilter, som är på som standard.",
@@ -4111,5 +4110,13 @@
   "Voice changer: {voice}.": "Röstvändare: {voice}.",
   "Voices on or off": "Röster på eller av",
   "What you say is said in {language}.": "Det du säger sägs på {language}.",
-  "Onion Board closed unexpectedly, so it started again.": "Onion Board stängdes oväntat, så det startade igen."
+  "Onion Board closed unexpectedly, so it started again.": "Onion Board stängdes oväntat, så det startade igen.",
+  "<b>Language</b>": "<b>Språk</b>",
+  "All set! Last thing: make it yours": "Klart! Sista grejen: gör den till din",
+  "Onion Board restarts in {name} when you press Finish.": "Onion Board startar om på {name} när du trycker på Avsluta.",
+  "Pick a language and a look. Change them any time in <b>Settings</b> → <b>Appearance</b>.": "Välj ett språk och ett utseende. Ändra dem när du vill under <b>Inställningar</b> → <b>Utseende</b>.",
+  "Press <b>Next</b> for the last bit: your language and a look.": "Tryck på <b>Nästa</b> för det sista: ditt språk och ett utseende.",
+  "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Starta Onion Board när jag loggar in i Windows (tyst, i systemfältet)",
+  "Tell Discord or your game": "Berätta för Discord eller ditt spel",
+  "{n} more themes in Settings.": "{n} teman till i Inställningar."
 }

@@ -216,11 +216,13 @@ class ThemeCard(QPushButton):
 
 
 class ThemeGrid(QWidget):
-    """Keep previews their readable size, using as many columns as fit."""
+    """Keep previews their readable size, using as many columns as fit (at most
+    `max_columns`: the setup guide's rows are picked to be three across)."""
 
-    def __init__(self, cards):
+    def __init__(self, cards, max_columns: int = 0):
         super().__init__()
         self.cards = cards
+        self.max_columns = max_columns
         self.columns = 0
         self.grid = QGridLayout(self)
         self.grid.setContentsMargins(0, 0, 0, 0)
@@ -237,6 +239,8 @@ class ThemeGrid(QWidget):
         # the same columns and gaps and they line up (a short group spread its few
         # cards over the whole width, out of line with the groups above and below)
         columns = max(1, (self.width() + 12) // 162)
+        if self.max_columns:
+            columns = min(columns, self.max_columns)
         self._reflow(columns)
         # the cards widen to share the width left over, first on the left edge and a full
         # row's last on the right, with the same 12 px gap across as down (sharing it out

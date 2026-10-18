@@ -3370,7 +3370,6 @@
   "Put my sounds in my mic  →": "Звуки в мій мікрофон →",
   "Repair my mic  →": "Полагодити мій мікрофон →",
   "Skip: only I'll hear my sounds": "Пропустити: свої звуки чую лише я",
-  "That's it! Press <b>Finish</b>, and Bun shows you where to find sounds. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "Готово! Натисни <b>Фініш</b>, і Bun покаже, де знайти звуки. Цю інструкцію можна відкрити знову будь-коли на вкладці <b>Підключення</b> (<b>Покрокова інструкція</b>).",
   "Try anything: a song, a meme, a game sound.": "Пробуй що завгодно: пісню, мем, звук із гри.",
   "Type a song you love, then press Enter": "Напиши пісню, яку любиш, і натисни Enter",
   "Your sounds are in <b style='color:{colour}'>{mic}</b> now, so there's nothing to pick in Discord or your games. One thing can still stop them: Discord's own noise filter, which is on by default.": "Тепер твої звуки в <b style='color:{colour}'>{mic}</b>, тож у Discord та іграх нічого вибирати не треба. Зупинити їх може лише одне: власний шумоподавлювач Discord, увімкнений за замовчуванням.",
@@ -4190,5 +4189,13 @@
   "Voice changer: {voice}.": "Зміна голосу: {voice}.",
   "Voices on or off": "Голоси увімк. або вимк.",
   "What you say is said in {language}.": "Те, що ти кажеш, звучить мовою: {language}.",
-  "Onion Board closed unexpectedly, so it started again.": "Onion Board неочікувано закрився, тому запустився знову."
+  "Onion Board closed unexpectedly, so it started again.": "Onion Board неочікувано закрився, тому запустився знову.",
+  "<b>Language</b>": "<b>Мова</b>",
+  "All set! Last thing: make it yours": "Усе готово! Останнє: зроби під себе",
+  "Onion Board restarts in {name} when you press Finish.": "Onion Board перезапуститься мовою {name}, коли ти натиснеш Фініш.",
+  "Pick a language and a look. Change them any time in <b>Settings</b> → <b>Appearance</b>.": "Обери мову й вигляд. Змінити їх можна будь-коли: <b>Налаштування</b> → <b>Зовнішній вигляд</b>.",
+  "Press <b>Next</b> for the last bit: your language and a look.": "Натисни <b>Далі</b> для останнього кроку: мова й вигляд.",
+  "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Запускати Onion Board під час входу в Windows (тихо, у треї)",
+  "Tell Discord or your game": "Повідом Discord або гру",
+  "{n} more themes in Settings.": "Ще теми в налаштуваннях: {n}"
 }
