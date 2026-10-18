@@ -44,7 +44,8 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from soundboard import errors, library, net
+from soundboard import errors, library
+from soundboard.online import net
 from soundboard.i18n import _
 
 log = logging.getLogger(__name__)

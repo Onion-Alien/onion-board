@@ -1,4 +1,4 @@
-"""Settings > Connection > Network activity: the list soundboard.netlog keeps of every
+"""Settings > Connection > Network activity: the list soundboard.online.netlog keeps of every
 connection the app makes, to check for yourself where it goes.
 
 Simple: one row per server (what it was for, why, how often, how much). Detailed: one
@@ -24,7 +24,8 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QButtonGroup, QC
                                QRadioButton, QSizePolicy, QStackedWidget, QTableWidget,
                                QTableWidgetItem, QVBoxLayout, QWidget)
 
-from soundboard import netlog, theme
+from soundboard.online import netlog
+from soundboard import theme
 from soundboard.ui import busy, fit
 from soundboard.ui.panel import Flow, hint_label
 from soundboard.i18n import _, ngettext

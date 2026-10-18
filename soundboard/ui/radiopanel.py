@@ -20,11 +20,12 @@ from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QFrame, QHBox
                                QLineEdit, QPushButton, QSizePolicy, QSplitter, QVBoxLayout,
                                QWidget)
 
-from soundboard import library, radio, theme, usage
+from soundboard import library, theme, usage
+from soundboard.online import radio
 from soundboard.i18n import _, ngettext
 from soundboard.engine import SR
 from soundboard.library import MAX_SECONDS, trim_silence
-from soundboard.radio import RadioDirectory, RadioPlayer, Station
+from soundboard.online.radio import RadioDirectory, RadioPlayer, Station
 from soundboard.ui import appstate, busy, icons
 from soundboard.ui.panel import EmptyList, RoundedFrame, VolumeControl, bar, icon_label, vsep
 # the station list and its filters live in radiolist.py; their names stay importable here

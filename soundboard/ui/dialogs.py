@@ -15,7 +15,8 @@ from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QColorDial
                                QPushButton, QScrollArea, QSlider, QTabWidget, QVBoxLayout,
                                QWidget)
 
-from soundboard import errors, net, soundfx, sourceinfo, theme, thumbs, usage, voicefx
+from soundboard import errors, soundfx, sourceinfo, theme, thumbs, usage, voicefx
+from soundboard.online import net
 from soundboard.eq import PRESETS as EQ_PRESETS
 from soundboard.library import (MAX_COOLDOWN_S, MAX_DELAY_S, MAX_FADE_S, PAD_COLORS,
                                 SoundMeta, original_peaks)

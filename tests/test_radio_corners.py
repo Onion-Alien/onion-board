@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QWidget
 
 from soundboard import theme
 from soundboard.library import Config
-from soundboard.radio import RadioDirectory
+from soundboard.online.radio import RadioDirectory
 from soundboard.ui.radiopanel import RadioTab
 from test_radio import FakeEngine, FakeMeter
 

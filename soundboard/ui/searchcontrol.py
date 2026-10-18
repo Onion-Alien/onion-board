@@ -10,7 +10,8 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtCore import Qt
 
-from soundboard import library, net, sourceinfo, ytdl
+from soundboard import library, sourceinfo
+from soundboard.online import net, ytdl
 from soundboard.engine import SR
 from soundboard.i18n import _
 from soundboard.library import SoundMeta

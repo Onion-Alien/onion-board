@@ -347,7 +347,7 @@ def test_add_with_save_video_says_why_no_video_was_kept(qapp, monkeypatch, tmp_p
 def test_the_switched_off_line_follows_the_switches(qapp):
     """Offline mode's line stayed up after Offline mode was switched off and only the
     sounds switch was: the line is redone whenever a switch changes."""
-    from soundboard import net
+    from soundboard.online import net
     try:
         net.configure_features(offline=True)
         bar, __ = _bar()

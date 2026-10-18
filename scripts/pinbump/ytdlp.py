@@ -1,5 +1,5 @@
 """Add the newest yt-dlp release to pins/yt-dlp.json, the list of yt-dlp versions the
-app's "Update now" (soundboard/ytdl.py) may install. Unlike the other pins this one
+app's "Update now" (soundboard/online/ytdl.py) may install. Unlike the other pins this one
 isn't built into the app: the app reads the list from the repo's main branch, so a
 merged PR here is what approves a version. Before proposing one it checks:
 
@@ -34,7 +34,7 @@ KEEP = 6            # versions kept in the list: older ones to fall back on
 WHEEL_HOST = "https://files.pythonhosted.org/"
 WHEEL_MAX = 30_000_000
 REPOS = {"yt-dlp": "yt-dlp/yt-dlp", "yt-dlp-ejs": "yt-dlp/ejs"}   # who must have signed
-ABOUT = ("yt-dlp versions Onion Board's Update now may install (soundboard/ytdl.py). "
+ABOUT = ("yt-dlp versions Onion Board's Update now may install (soundboard/online/ytdl.py). "
          "Added by scripts/pinbump/ytdlp.py, which checks each wheel against PyPI's "
          "SHA-256 and its attestation from the yt-dlp GitHub repos; a merged PR approves "
          "a version. The app waits until a version has been on PyPI for 3 days.")

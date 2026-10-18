@@ -8,7 +8,8 @@ import time
 import pytest
 from conftest import process_events, said
 
-from soundboard import ffmpegget, net, quality, usage
+from soundboard.online import ffmpegget, net
+from soundboard import quality, usage
 from soundboard.ui import ffmpegcontrol, mainwindow
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 

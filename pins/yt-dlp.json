@@ -1,5 +1,5 @@
 {
-  "about": "yt-dlp versions Onion Board's Update now may install (soundboard/ytdl.py). Added by scripts/pinbump/ytdlp.py, which checks each wheel against PyPI's SHA-256 and its attestation from the yt-dlp GitHub repos; a merged PR approves a version. The app waits until a version has been on PyPI for 3 days.",
+  "about": "yt-dlp versions Onion Board's Update now may install (soundboard/online/ytdl.py). Added by scripts/pinbump/ytdlp.py, which checks each wheel against PyPI's SHA-256 and its attestation from the yt-dlp GitHub repos; a merged PR approves a version. The app waits until a version has been on PyPI for 3 days.",
   "versions": [
     {
       "version": "2026.8.19",

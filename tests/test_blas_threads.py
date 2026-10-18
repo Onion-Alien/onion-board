@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 import soundboard
-from soundboard import net
+from soundboard.online import net
 
 ROOT = Path(__file__).resolve().parent.parent
 PROBE = ("import os, sys; sys.path.insert(0, {root!r}); import {mod}; import numpy; "

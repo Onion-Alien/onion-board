@@ -30,7 +30,8 @@ from PySide6.QtWidgets import (QBoxLayout, QHBoxLayout, QLabel, QMessageBox, QPr
                                QPushButton, QVBoxLayout, QWidget)
 
 from soundboard.addons import modules, watchaddon
-from soundboard import net, netlog, theme, updates, usage
+from soundboard.online import net, netlog
+from soundboard import theme, updates, usage
 from soundboard.i18n import _, ngettext
 from soundboard.ui import art, busy, icons, lite
 from soundboard.style.owl import OwlWidget

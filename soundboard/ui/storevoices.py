@@ -1,5 +1,5 @@
 """The Store tab's Voices: community voice changer voices, AI voices and setups
-(soundboard.storevoices), one row each, and the Share a voice window.
+(soundboard.online.storevoices), one row each, and the Share a voice window.
 
 Everything a row shows comes from storevoices.voice_from (checked plain text and
 in-range numbers) and is put on labels as plain text, never markup."""
@@ -16,7 +16,8 @@ from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import (QComboBox, QDialog, QHBoxLayout, QLabel, QLineEdit,
                                QPushButton, QVBoxLayout, QWidget)
 
-from soundboard import errors, savedvoices, store, storevoices as sv, usage, voicefx, voicesetups
+from soundboard import errors, savedvoices, usage, voicefx, voicesetups
+from soundboard.online import store, storevoices as sv
 from soundboard.i18n import _
 from soundboard.speech import aivoicelist as avl
 from soundboard.ui import busy, fit, icons

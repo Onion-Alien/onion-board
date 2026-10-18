@@ -25,7 +25,8 @@ import logging
 from PySide6.QtCore import QRect
 from PySide6.QtWidgets import QApplication, QWidget
 
-from soundboard import net, tips, usage
+from soundboard.online import net
+from soundboard import tips, usage
 from soundboard.i18n import _
 from soundboard.ui import coach
 from soundboard.ui.ytsearch import SearchResults

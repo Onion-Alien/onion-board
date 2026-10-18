@@ -1,6 +1,6 @@
-"""Get Tor (soundboard.torget): the download goes through net.urlopen, is checked
+"""Get Tor (soundboard.online.torget): the download goes through net.urlopen, is checked
 against the pinned SHA-256, and only the kept files are unpacked into
-%APPDATA%\\OnionBoard\\tor\\bin, where soundboard.tor then finds tor.exe. Also the
+%APPDATA%\\OnionBoard\\tor\\bin, where soundboard.online.tor then finds tor.exe. Also the
 Settings button and `OnionBoard.exe --get-tor` (the installer's Tor box). No
 network: the tarball is made here and served by a stand-in for net.urlopen."""
 import hashlib
@@ -10,7 +10,7 @@ import tarfile
 import pytest
 
 from conftest import process_events
-from soundboard import net, tor, torget
+from soundboard.online import net, tor, torget
 
 
 def make_tarball(extra: dict[str, bytes] | None = None, drop: str = "") -> bytes:
@@ -247,7 +247,8 @@ def test_a_tor_from_an_older_app_follows_the_app_update(served, app_dir, monkeyp
     """At start-up an older downloaded Tor is replaced by the one this release names,
     but never while Connection is set to Tor (it's carrying the traffic), and nothing
     is fetched for someone who never got Tor."""
-    from soundboard import app, ffmpegget
+    from soundboard import app
+    from soundboard.online import ffmpegget
     monkeypatch.setattr(ffmpegget, "update_own", lambda: None)
     assert not torget.outdated()
     app.helpers_follow_app()

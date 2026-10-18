@@ -1,4 +1,4 @@
-"""Bump soundboard/pyget.py to the newest patch release of the pinned Python minor
+"""Bump soundboard/online/pyget.py to the newest patch release of the pinned Python minor
 (3.12.x stays 3.12.x: a minor bump changes what the add-ons run on, so it's a hand
 job) from the PSF's "python" package on NuGet, once the package's bytes match the
 SHA-512 NuGet's catalog lists for it and the Python in it starts, with ssl, sqlite3
@@ -18,7 +18,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import common  # noqa: E402
 
-SRC = common.ROOT / "soundboard" / "pyget.py"
+SRC = common.ROOT / "soundboard" / "online" / "pyget.py"
 VERSIONS = "https://api.nuget.org/v3-flatcontainer/python/index.json"
 LEAF = "https://api.nuget.org/v3/registration5-semver1/python/{v}.json"
 PACKAGE = "https://api.nuget.org/v3-flatcontainer/python/{v}/python.{v}.nupkg"
@@ -84,7 +84,7 @@ def main() -> int:
     common.open_pr(
         "python", new, [SRC], f"Add-ons' Python: pin {new}",
         f"Weekly pin bump: the Python add-ons download, {current} -> {new} "
-        "(`soundboard/pyget.py`). Patch releases only; a new minor stays a hand job.\n\n"
+        "(`soundboard/online/pyget.py`). Patch releases only; a new minor stays a hand job.\n\n"
         f"- `python.{new}.nupkg` (authors: {AUTHOR}) matches the SHA-512 in NuGet's "
         "catalog.\n"
         f"- SHA-256 `{digest}`, {len(data):,} bytes.\n"

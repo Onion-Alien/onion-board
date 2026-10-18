@@ -6,7 +6,7 @@ Voice tab's *Get AI voices* button downloads it (`AiVoices-module.zip` from this
 project's `ai-voices` release, checked against GitHub's SHA-256) and
 *Remove AI voices* deletes it again. Its install (`install.bat` does the same) uses
 the PC's own Python 3.12 or 3.13, or one the app downloads into the add-on's `.python`
-folder (`soundboard/pyget.py`), and makes its own `.venv` with the pinned
+folder (`soundboard/online/pyget.py`), and makes its own `.venv` with the pinned
 `onnxruntime` and `numpy`; nothing of it runs inside the app.
 
 ## How it works

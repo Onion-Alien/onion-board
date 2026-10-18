@@ -19,7 +19,8 @@ import pytest
 from conftest import process_events
 from fakeproxy import Socks5, no_leaks
 from soundboard.addons import modules
-from soundboard import net, updates
+from soundboard.online import net
+from soundboard import updates
 from soundboard.engine import SR
 from test_net_leaks import REAL_GET, REAL_OPEN, NAMES, Sites
 from test_radio import wav_bytes
@@ -64,7 +65,7 @@ def reachable(sites, mode, name, path):
 # ---------------------------------------------------------------- each feature, off
 
 def try_sounds_web(sites, mode, monkeypatch):
-    from soundboard import ytdl
+    from soundboard.online import ytdl
     monkeypatch.setattr(ytdl, "MYINSTANTS", url(sites, mode, "myinstants", "").rstrip("/"))
     with pytest.raises(ytdl.SwitchedOff, match="sounds online is switched off"):
         ytdl.search("bruh", source="myinstants")
@@ -75,7 +76,7 @@ def try_sounds_web(sites, mode, monkeypatch):
 
 
 def try_ytdlp_update(sites, mode, monkeypatch):
-    from soundboard import ytdl
+    from soundboard.online import ytdl
     with pytest.raises(ytdl.SwitchedOff, match="yt-dlp"):
         ytdl.update()
     with pytest.raises(ytdl.SwitchedOff, match="yt-dlp"):
@@ -165,7 +166,7 @@ def test_a_switched_off_feature_makes_no_connection(feature, mode, sites, socks,
 @pytest.mark.parametrize("mode", MODES)
 def test_a_switched_off_site_is_refused_and_the_others_still_search(mode, sites, socks,
                                                                      monkeypatch, app_dir):
-    from soundboard import ytdl
+    from soundboard.online import ytdl
     net.configure(mode, socks.url())
     net.configure_features(["sounds_web.youtube", "sounds_web.other"])
     with no_leaks(monkeypatch) as leaks:
@@ -283,7 +284,7 @@ def test_qt_in_direct_mode_goes_nowhere_while_its_feature_is_off(feature, qapp, 
 
 
 def play(qapp, u, timeout=15):
-    from soundboard.radio import RadioPlayer, Station
+    from soundboard.online.radio import RadioPlayer, Station
     p = RadioPlayer()
     chunks, errors = [], []
     p.audio.connect(chunks.append)
@@ -359,7 +360,7 @@ def test_a_station_redirecting_to_this_pc_is_refused(mode, qapp, sites, socks, l
 
 
 def test_the_radio_directory_asks_nobody_while_off(qapp, sites, tmp_path):
-    from soundboard.radio import RadioDirectory
+    from soundboard.online.radio import RadioDirectory
     net.configure_features(["radio"])
     d = RadioDirectory(tmp_path, bases=(f"http://radio.test:{sites.port}",))
     failed = []

@@ -9,7 +9,8 @@ import numpy as np
 import pytest
 import soundfile as sf
 
-from soundboard import library, sourceinfo, trash, ytdl
+from soundboard import library, sourceinfo, trash
+from soundboard.online import ytdl
 from soundboard.engine import SR
 from soundboard.library import Config, SoundMeta
 

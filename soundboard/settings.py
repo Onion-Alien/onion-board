@@ -670,7 +670,7 @@ class SettingsDialog(QDialog, Built):
         cv.addWidget(h)
         return box
 
-    # what each switch contacts, and when (soundboard.net.FEATURES)
+    # what each switch contacts, and when (soundboard.online.net.FEATURES)
     NET_HINTS = {
         "sounds_web": _("Searches and pasted links on the Sounds tab go to that site, and "
                         "search results show its thumbnails. Off: the search bar only "
@@ -713,7 +713,7 @@ class SettingsDialog(QDialog, Built):
 
     @classmethod
     def _offline_pages(cls) -> tuple[str, ...]:
-        from soundboard import net
+        from soundboard.online import net
         return cls.OFFLINE_PAGES if net.offline() else ()
 
     def done(self, r):

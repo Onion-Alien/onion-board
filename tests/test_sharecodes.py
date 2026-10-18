@@ -130,7 +130,7 @@ def test_long_and_empty_names():
 # ------------------------------------------------- any voice or setup (storevoices)
 
 def test_a_setup_comes_back_from_its_code_whole():
-    from soundboard import storevoices as sv
+    from soundboard.online import storevoices as sv
     mine = {"id": "my-abc", "name": "Gravel", "emoji": "🪨", "mix": [[171, 1.0]],
             "formant": -1.0, "pitch_hz": 90}
     setup = {"name": "x", "fx": "Robot", "effects": {"pitch": {"on": True, "semitones": 3.0}},
@@ -148,7 +148,7 @@ def test_a_setup_comes_back_from_its_code_whole():
 
 
 def test_ai_voice_and_voice_changer_codes():
-    from soundboard import storevoices as sv
+    from soundboard.online import storevoices as sv
     ai = sv.read_code(sv.share_code(sv.pack_ai(
         {"name": "Gravel", "emoji": "🪨", "mix": [[171, 1.0]], "formant": 0.0,
          "pitch_hz": 90})))[0]
@@ -169,7 +169,7 @@ def test_ai_voice_and_voice_changer_codes():
     {"n": "x", "d": []}, {"k": "setup", "d": {}}, [1, 2],
 ])
 def test_a_code_that_cant_be_a_voice_says_so(data):
-    from soundboard import storevoices as sv
+    from soundboard.online import storevoices as sv
     with pytest.raises(CodeError):
         sv.read_code(_code(data, prefix="OB2-"))
     with pytest.raises(CodeError, match="newer version"):

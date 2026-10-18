@@ -1,4 +1,4 @@
-"""Test helpers for soundboard.net: a minimal SOCKS5 server and an HTTP CONNECT proxy
+"""Test helpers for soundboard.online.net: a minimal SOCKS5 server and an HTTP CONNECT proxy
 on 127.0.0.1 that map made-up host names (*.test) to local test servers and log every
 target they're asked for, and a guard that fails any connection or DNS lookup that
 leaves this PC without going through them."""

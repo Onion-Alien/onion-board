@@ -1,11 +1,11 @@
-"""soundboard.firewall: the admin copy that adds a remote add-on's firewall rule, so
+"""soundboard.online.firewall: the admin copy that adds a remote add-on's firewall rule, so
 Windows' prompt names Onion Board. Nothing here runs netsh or asks for admin."""
 import subprocess
 import sys
 
 import pytest
 
-from soundboard import firewall
+from soundboard.online import firewall
 
 
 @pytest.mark.parametrize("name, port", [("OnionPocket", 7475), ("A-b9", "1024"), ("x", 65535)])

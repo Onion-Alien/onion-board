@@ -276,7 +276,7 @@ def hear_lines(lang: Lang, mono: np.ndarray, rate: int,
     """What's said in `mono` (float32 at `rate`), translated into `lang`: (when it
     starts, in seconds; the line), by the live-voice helper. Raises RuntimeError when
     it can't, library.Cancelled once `cancel()`. Slow: off the UI thread."""
-    from soundboard import net
+    from soundboard.online import net
     from soundboard.speech.service import QUEUE_BLOCKS, ServiceHost
     events: queue.Queue[dict] = queue.Queue()
     mod = lang.module

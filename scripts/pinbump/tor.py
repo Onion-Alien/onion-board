@@ -1,4 +1,4 @@
-"""Bump soundboard/torget.py to the newest stable Tor Expert Bundle on
+"""Bump soundboard/online/torget.py to the newest stable Tor Expert Bundle on
 dist.torproject.org, once its signature checks out against the Tor Browser
 developers' key named in torget.py's docstring and its tor.exe bootstraps a real
 connection to the Tor network. See common.py.
@@ -18,7 +18,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import common  # noqa: E402
 
-SRC = common.ROOT / "soundboard" / "torget.py"
+SRC = common.ROOT / "soundboard" / "online" / "torget.py"
 DIST = "https://dist.torproject.org/torbrowser/"
 KEY_URL = "https://keys.openpgp.org/vks/v1/by-fingerprint/{fpr}"
 BOOTSTRAP_S = 180          # a cold start usually reaches 100% in under 30 s
@@ -117,7 +117,8 @@ def main() -> int:
     common.set_pins(SRC, {"VERSION": new, "SHA256": digest})
     common.open_pr(
         "tor", new, [SRC], f"Tor: pin the Expert Bundle to {new}",
-        f"Weekly pin bump: Tor Expert Bundle {current} -> {new} (`soundboard/torget.py`).\n\n"
+        f"Weekly pin bump: Tor Expert Bundle {current} -> {new} "
+        f"(`soundboard/online/torget.py`).\n\n"
         f"- `{tarball}.asc` is a good signature by the key in torget.py's docstring "
         f"(`{fpr}`).\n- SHA-256 `{digest}`, {len(data):,} bytes.\n"
         "- Smoke test: on a Windows runner its tor.exe bootstrapped to 100%.\n\n"

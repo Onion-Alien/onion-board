@@ -56,7 +56,7 @@ class ServiceHost:
         for speech recognition; the AI voice uses soundboard.speech.resample)."""
         self.argv, self.cwd, self.log_path, self.name = argv, cwd, log_path, name
         self.on_audio, self.make_resampler = on_audio, make_resampler
-        self.env = env          # None: this process's (soundboard.net.child_env makes one)
+        self.env = env          # None: this process's (soundboard.online.net.child_env makes one)
         self.on_event = on_event
         self._proc: subprocess.Popen | None = None
         self._sock: socket.socket | None = None

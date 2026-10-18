@@ -14,7 +14,7 @@ It comes with Onion Board (in the `modules` folder next to `OnionBoard.exe`).
 1. In Onion Board, open the **Voice** tab and press **Install speech recognition**
    (or tick the installer's *live voice* box). It uses the PC's own Python 3.12 or
    3.13, or downloads one into this folder's `.python` when there's none
-   (`soundboard/pyget.py`), makes a private environment in `.venv` and downloads the
+   (`soundboard/online/pyget.py`), makes a private environment in `.venv` and downloads the
    speech model (about 300 MB in all). `install.bat` here does the same with a
    Python already on the PC.
 2. Press **Start talking as the voice**.

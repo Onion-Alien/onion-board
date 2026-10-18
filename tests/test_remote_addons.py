@@ -221,7 +221,7 @@ def test_never_on_a_network_windows_calls_public(qapp, window, loaded,  # noqa: 
                                                  monkeypatch):
     """A café's Wi-Fi: no server, whatever Windows Firewall would let in; and one
     already listening stops when its network turns Public, saying so."""
-    from soundboard import netcategory
+    from soundboard.online import netcategory
     srv = loaded.server
     monkeypatch.setattr(netcategory, "category", lambda ip: netcategory.PUBLIC)
     assert not srv.start(0, "add-on-key", "127.0.0.1") and not srv.running
@@ -248,7 +248,7 @@ def test_never_on_a_network_windows_calls_public(qapp, window, loaded,  # noqa: 
 
 
 def test_the_network_category_never_raises():
-    from soundboard import netcategory
+    from soundboard.online import netcategory
     assert netcategory.category("203.0.113.9") is None   # no adapter has it
     assert netcategory.category("not an address") is None
 
@@ -360,7 +360,8 @@ def test_add_ons_card_checks_reinstalls_and_reports(qapp, window,  # noqa: F811
     Update to X when GitHub has a newer one, Reinstall swaps in a fresh copy, and
     Report a problem opens a bug report naming the add-on and its version."""
 
-    from soundboard import feedback, library, net
+    from soundboard import feedback, library
+    from soundboard.online import net
     from soundboard.addons import pocketaddon
     from soundboard.ui import busy
     base = library.APP_DIR / "modules"

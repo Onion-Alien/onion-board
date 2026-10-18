@@ -10,7 +10,8 @@ import zipfile
 
 import pytest
 
-from soundboard import backup, net, packs, updates
+from soundboard import backup, packs, updates
+from soundboard.online import net
 from soundboard.ui import packsdialog
 from conftest import process_events
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen

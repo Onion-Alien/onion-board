@@ -6,7 +6,7 @@ import pytest
 from PySide6.QtGui import QColor, QImage
 
 from soundboard import library, thumbs
-from soundboard import net as thumbs_net
+from soundboard.online import net as thumbs_net
 from soundboard.library import SR, Config, SoundMeta
 from soundboard.ui.widgets import Pad, loudness, spectrum
 
@@ -220,7 +220,7 @@ from conftest import process_events  # noqa: E402
 
 
 def test_download_asks_for_the_thumbnail_and_never_returns_it(monkeypatch, tmp_path):
-    from soundboard import ytdl
+    from soundboard.online import ytdl
     seen = fake_yt_dlp(monkeypatch, {"title": "Boom", "duration": 3})
     path, _ = ytdl.download_audio("https://youtu.be/x", tmp_path)
     assert seen["writethumbnail"]
@@ -234,7 +234,7 @@ def test_download_asks_for_the_thumbnail_and_never_returns_it(monkeypatch, tmp_p
 
 
 def test_link_add_uses_the_video_thumbnail(qapp, window, monkeypatch, tmp_path):  # noqa: F811
-    from soundboard import ytdl
+    from soundboard.online import ytdl
     fake_link_download(monkeypatch, tmp_path)
     real = ytdl.download_audio
 
@@ -397,7 +397,7 @@ def test_a_youtube_picture_link_is_refused_with_youtube_switched_off(qapp, tmp_p
                                                                      monkeypatch):
     """Switching YouTube off stops its pictures too: a YouTube link, i.ytimg.com itself,
     or a page (another site, still allowed) whose preview picture is on i.ytimg.com."""
-    from soundboard import netlog
+    from soundboard.online import netlog
     png = png_bytes(tmp_path)
     page = b'<html><meta property="og:image" content="https://i.ytimg.com/vi/x/a.jpg"></html>'
     asked = fake_web(monkeypatch, {"https://i.ytimg.com/vi/HEXWRTEbj1I/hqdefault.jpg":

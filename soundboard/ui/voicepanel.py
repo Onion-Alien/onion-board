@@ -17,7 +17,8 @@ from PySide6.QtWidgets import (QButtonGroup, QFrame, QHBoxLayout, QLabel, QPushB
                                QScrollArea, QVBoxLayout, QWidget)
 
 from soundboard.addons import modules as mods
-from soundboard import langnames, net, savedvoices, theme, usage, voicefx, voicesetups
+from soundboard import langnames, savedvoices, theme, usage, voicefx, voicesetups
+from soundboard.online import net
 from soundboard.speech import spoken, translation
 from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController
@@ -413,7 +414,7 @@ class VoicePanel(QWidget):
         too, as nobody else has it). False if there's nothing in it to share."""
         from PySide6.QtGui import QGuiApplication
 
-        from soundboard import storevoices
+        from soundboard.online import storevoices
         setup = self.setups.setups.get(name)
         if setup is None:
             return False

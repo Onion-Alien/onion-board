@@ -4,7 +4,7 @@ it's offline in the header, and brings it all back when it's switched off."""
 from PySide6.QtWidgets import QApplication
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
-from soundboard import net
+from soundboard.online import net
 from soundboard.settings import SettingsDialog
 from soundboard.ui.tabcontrol import TAB_INDEX
 
@@ -141,7 +141,7 @@ def test_addons_without_one_installed_goes_offline(window):  # noqa: F811
 
 
 def test_on_air_card_says_proxy_and_tor(window, monkeypatch):  # noqa: F811
-    from soundboard import tor
+    from soundboard.online import tor
 
     def line():
         lines = window.rail.output._lines

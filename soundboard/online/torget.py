@@ -31,7 +31,8 @@ import urllib.request
 from collections.abc import Callable
 from pathlib import Path
 
-from soundboard import library, net
+from soundboard import library
+from soundboard.online import net
 from soundboard import errors
 from soundboard.i18n import _
 
@@ -60,7 +61,7 @@ KEEP = {
     "docs/zlib.txt": "docs/zlib.txt",
 }
 STAMP = "VERSION"
-FEATURE = "tor_download"   # soundboard.net's switch for this download
+FEATURE = "tor_download"   # soundboard.online.net's switch for this download
 
 
 def blocked_hint() -> str:
@@ -201,7 +202,7 @@ def get(progress: Callable[[int, int], None] | None = None,
     """Download, check and unpack Tor into the bin folder; the folder. Raises GetError.
     `before_unpack` runs between the two (the app stops a running Tor there, which may
     have carried the download)."""
-    from soundboard import tor   # it imports this module
+    from soundboard.online import tor  # it imports this module
     if not net.allowed(FEATURE):
         raise GetError(net.off_message(FEATURE))
     if net.mode() == net.TOR and not tor.available():

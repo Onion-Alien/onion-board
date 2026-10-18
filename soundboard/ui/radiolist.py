@@ -21,7 +21,7 @@ from PySide6.QtWidgets import (QButtonGroup, QComboBox, QFrame, QHBoxLayout, QLa
 
 from soundboard import theme
 from soundboard.i18n import _, ngettext
-from soundboard.radio import Station
+from soundboard.online.radio import Station
 from soundboard.ui import icons
 from soundboard.ui.panel import Flow as _Flow
 from soundboard.ui.panel import EmptyList, RoundedFrame

@@ -200,7 +200,7 @@ Rebuilds are incremental: PyInstaller reuses its analysis cache in `build\`.
 `-Clean` starts from scratch (do this for a release, or if a build misbehaves).
 `-NoInstaller` stops after the app folder and skips the Inno Setup compression.
 
-Tor isn't part of the build: the app downloads it when asked (`soundboard\torget.py`,
+Tor isn't part of the build: the app downloads it when asked (`soundboard\online\torget.py`,
 which pins the version and SHA-256 and says how to move to a newer Tor; the
 installer's *Private connection (Tor)* box runs `OnionBoard.exe --get-tor`). To try
 Tor mode from source without pressing *Get Tor*, `scripts\fetch_tor.py` unpacks the

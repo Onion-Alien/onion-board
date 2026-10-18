@@ -8,7 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from soundboard import app, applog, library, net
+from soundboard import app, applog, library
+from soundboard.online import net
 
 
 @pytest.fixture

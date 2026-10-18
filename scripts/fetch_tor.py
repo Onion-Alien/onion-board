@@ -1,6 +1,6 @@
 """Download the Tor Expert Bundle and unpack the parts Onion Board runs into
 vendor/tor/ (gitignored), for trying Tor mode from source without pressing Get Tor.
-The app itself doesn't ship Tor: it downloads it on request (soundboard/torget.py,
+The app itself doesn't ship Tor: it downloads it on request (soundboard/online/torget.py,
 which holds the pinned version and SHA-256 this uses, and says how to move to a
 newer Tor).
 
@@ -15,7 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from soundboard import torget  # noqa: E402
+from soundboard.online import torget  # noqa: E402
 
 DEST = ROOT / "vendor" / "tor"
 
