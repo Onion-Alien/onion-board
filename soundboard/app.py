@@ -474,6 +474,7 @@ def ui_scale_startup(app_dir: Path) -> int:
 
 LOAD_WAIT_S = 3.0    # longest the loading screen waits for the sounds (a big first load)
 PAINT_WAIT_S = 0.5   # ...and for Windows to put the window on screen for its first paint
+TRAY_PRELOAD_MS = 20_000   # started into the tray: Settings and Edit sound built after this
 
 
 def wait_for_sounds(app, w, cap_s: float = LOAD_WAIT_S):
@@ -671,6 +672,9 @@ def main():
     if TRAY_ARG not in sys.argv and not updating:   # Bun is up: the sounds load behind it
         wait_for_sounds(app, w)
         w.setctl.preload_dialogs()   # Settings and Edit sound, built behind it too
+    elif not updating:   # started with Windows into the tray: no loading screen to hide
+        from PySide6.QtCore import QTimer   # them behind, so a while after sign-in
+        QTimer.singleShot(TRAY_PRELOAD_MS, w.setctl.preload_dialogs)
     if show and not w.bunctl.start_as_bun():   # quit as Bun last time: Bun, not the window
         w.show()
         if TRAY_ARG not in sys.argv:
