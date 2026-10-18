@@ -1201,10 +1201,26 @@ def app_filter(app, f: QObject) -> None:
     _router.add(f, getattr(f, "EVENTS", None))
 
 
+def _style_when_shown(app) -> None:
+    """Leave the app's closed windows (Edit voice, Live controls, a menu: a few hundred
+    widgets never shown yet) out of the next restyle: Qt restyles only the widgets it
+    has polished, and a widget not polished is polished in the sheet of the day when
+    it's shown. A third of a theme switch, which froze the app on slower PCs. Only
+    windows with an owner: the main window hidden in the tray restyles as before."""
+    from PySide6.QtWidgets import QWidget
+    polished = Qt.WidgetAttribute.WA_WState_Polished
+    for top in app.topLevelWidgets():
+        if top.isVisible() or top.parentWidget() is None:
+            continue
+        for w in (top, *top.findChildren(QWidget)):
+            w.setAttribute(polished, False)
+
+
 def _restyle(app, css: str) -> None:
     live = _router if _router is not None and qt_valid(_router) else None
     if live is not None:
         app.removeEventFilter(live)
+    _style_when_shown(app)
     try:
         # cleared first: Qt swapping one app-wide sheet straight for another re-styles
         # every widget the slow way (3 s against 0.6 s with ~2000 widgets); empty and

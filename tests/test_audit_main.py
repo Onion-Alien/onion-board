@@ -368,13 +368,18 @@ def test_settings_and_edit_built_behind_the_loading_screen(window, qapp):
 
 def test_a_new_theme_builds_the_spare_edit_sound_again(window, qapp, monkeypatch):
     """A new theme drops the made-ahead Edit sound (it was styled in the old one) and
-    builds it again under the theme cover: the next Edit opens it, not a new build (it
+    builds it again a moment later, on its own (inside the switch it made the switch's
+    wait longer: freezes on slower PCs): the next Edit opens it, not a new build (it
     was left for the first click, ~1 s on a slower PC). Not while one is open: that
     one's kept when it closes."""
+    from soundboard.ui import themecontrol
+    monkeypatch.setattr(themecontrol, "SPARE_AFTER_MS", 0)
     sc = window.setctl
     sc.preload_dialogs()
     old = sc._spare_editor
     window.themectl.apply_theme("Light" if window.cfg.theme != "Light" else "Dark")
+    assert sc._spare_editor is None   # not part of the switch itself
+    qapp.processEvents()
     spare = sc._spare_editor
     assert spare is not None and spare is not old
     made = []

@@ -215,3 +215,60 @@ def test_the_cover_fades_in_instead_of_dimming_in_one_frame(main_window):  # noq
     assert ks[0] == 0.0 and ks[-2] == 1.0          # up first as it is, then faded in
     assert max(b - a for a, b in zip(ks[:-1], ks[1:-1])) < 0.7   # never one jump
     assert ks[-1] == 0.0                           # the blend: no dimming at all
+
+
+def _closed_window(owner):
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import (QComboBox, QDialog, QLabel, QPushButton, QVBoxLayout,
+                                   QWidget)
+    d = QDialog(owner)
+    lay = QVBoxLayout(d)
+    for w in (QLabel("Edit voice"), QPushButton("Randomize"), QComboBox()):
+        lay.addWidget(w)
+    b = QPushButton("Save")
+    b.setObjectName("primary")
+    lay.addWidget(b)
+    for w in d.findChildren(QWidget):   # no focus ring on the one shown last
+        w.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+    d.resize(240, 160)
+    return d
+
+
+def test_a_closed_window_sits_out_the_restyle_and_opens_in_the_new_theme(main_window):  # noqa: F811
+    """The closed windows the app keeps (Edit voice, Live controls: ~700 widgets) were
+    restyled on every switch, a third of its wait. They're left for their next show,
+    which styles them in the theme of the day: it looks the same as one made in it."""
+    from PySide6.QtCore import Qt
+    app = QApplication.instance()
+    start = theme.current_name
+    other = "Light" if start != "Light" else "Dark"
+    kept = _closed_window(main_window)
+    kept.ensurePolished()   # styled once in the first theme, like a window made ahead
+    theme.apply(app, other)
+    polished = Qt.WidgetAttribute.WA_WState_Polished
+    assert not any(w.testAttribute(polished) for w in (kept, *kept.findChildren(QObject))
+                   if hasattr(w, "testAttribute"))
+    fresh = _closed_window(main_window)
+    try:
+        for d in (kept, fresh):
+            d.show()
+            QApplication.processEvents()
+        assert kept.grab().toImage() == fresh.grab().toImage()
+    finally:
+        for d in (kept, fresh):
+            d.close()
+            d.deleteLater()
+        theme.apply(app, start)
+
+
+def test_the_main_window_still_restyles_while_hidden(main_window):  # noqa: F811
+    """In the tray (no owner): restyled with the rest, as before."""
+    from PySide6.QtCore import Qt
+    main_window.hide()
+    main_window.ensurePolished()
+    start = theme.current_name
+    try:
+        theme.apply(QApplication.instance(), "Light" if start != "Light" else "Dark")
+        assert main_window.testAttribute(Qt.WidgetAttribute.WA_WState_Polished)
+    finally:
+        theme.apply(QApplication.instance(), start)
