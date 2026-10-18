@@ -26,7 +26,7 @@ from soundboard.audio.shuffle import ShuffleBag
 from soundboard.ui.kit import icons, worker
 from soundboard.ui import sidebar
 from soundboard.ui.controller import Controller
-from soundboard.ui.linkbar import PLAY_ID as LINK_ID
+from soundboard.ui.sounds.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.upnext import UpNextChip, UpNextPopup, Waiting
 from soundboard.ui.kit.widgets import fmt_pos
 

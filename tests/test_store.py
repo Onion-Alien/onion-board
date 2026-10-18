@@ -500,7 +500,7 @@ def test_share_window_on_a_link(qapp, fake):
 
 
 def test_card_tooltips_never_read_html(qapp):
-    from soundboard.ui.ytsearch import ClampLabel, plain_tip
+    from soundboard.ui.sounds.ytsearch import ClampLabel, plain_tip
     lbl = ClampLabel('<img src="x"><b>Loud</b> & proud')
     assert lbl.toolTip() == plain_tip('<img src="x"><b>Loud</b> & proud')
     assert "<img" not in lbl.toolTip() and "&lt;img" in lbl.toolTip()

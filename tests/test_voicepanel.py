@@ -859,7 +859,7 @@ def test_delete_a_saved_voice_then_undo_or_bring_it_back(panel, monkeypatch):
     p.fx.delete_voice("One")
     p.fx.undo_bar.finish()
     assert not p.fx.btn_bin.isHidden()
-    from soundboard.ui import deleted
+    from soundboard.ui.sounds import deleted
     seen = []
 
     def fake_exec(dlg):

@@ -4,7 +4,7 @@ from PySide6.QtCore import QEvent, QObject
 from PySide6.QtWidgets import QWidget
 
 from soundboard.online.ytdl import Result
-from soundboard.ui.ytsearch import ResultRow
+from soundboard.ui.sounds.ytsearch import ResultRow
 
 
 @pytest.mark.parametrize("wide", [False, True])

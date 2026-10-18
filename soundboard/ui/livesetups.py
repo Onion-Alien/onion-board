@@ -44,7 +44,7 @@ from soundboard.ui.controller import Controller
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
-    from soundboard.ui.speedpitch import SpeedPitchButton
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
 
 log = logging.getLogger(__name__)
 

@@ -7,7 +7,7 @@ from soundboard.control import winkeys
 from soundboard.sounds.library import Config
 from soundboard.ui import hotkeycontrol, tickcontrol
 from soundboard.ui import mainwindow as main
-from soundboard.ui.dialogs import TabHelpPopup
+from soundboard.ui.sounds.dialogs import TabHelpPopup
 
 
 def registered(window, monkeypatch):  # noqa: F811

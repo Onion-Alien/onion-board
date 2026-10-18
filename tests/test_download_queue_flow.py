@@ -9,8 +9,8 @@ import numpy as np
 import pytest
 
 from soundboard.sounds.library import SoundMeta
-from soundboard.ui import linkbar as linkbar_mod
-from soundboard.ui.linkbar import PLAY_ID
+from soundboard.ui.sounds import linkbar as linkbar_mod
+from soundboard.ui.sounds.linkbar import PLAY_ID
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 
 A = "https://www.youtube.com/watch?v=aaaaaaaaaaa"

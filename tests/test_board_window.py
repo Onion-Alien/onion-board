@@ -4,7 +4,7 @@ from pathlib import Path
 
 from conftest import process_events, said, unsay
 from soundboard.core import backup
-from soundboard.ui.dialogs import EditDialog
+from soundboard.ui.sounds.dialogs import EditDialog
 import pytest
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 

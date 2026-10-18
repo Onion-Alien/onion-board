@@ -53,10 +53,10 @@ from soundboard.ui.downloadbar import DownloadBar
 from soundboard.ui.dropveil import DropVeil
 from soundboard.ui.fitcontrol import BODY_SIDE, SEARCH_MIN_W
 from soundboard.ui.kit.iconrow import CapIcon
-from soundboard.ui.linkbar import LinkBar
+from soundboard.ui.sounds.linkbar import LinkBar
 from soundboard.ui.livedot import set_tint as set_live_tint
 from soundboard.ui.logowidget import LogoWidget
-from soundboard.ui.padbatch import PadSelection
+from soundboard.ui.sounds.padbatch import PadSelection
 from soundboard.ui.kit.panel import (
     ViewToggle,
     BAR_H,
@@ -80,7 +80,7 @@ from soundboard.ui.playbackcontrol import CHIPS_GAP
 from soundboard.ui.kit.playbutton import PlayButton
 from soundboard.ui.setupshow import SetupShow
 from soundboard.ui.sidebar import SHUT_W, SideTabs
-from soundboard.ui.speedpitch import SpeedPitchButton
+from soundboard.ui.sounds.speedpitch import SpeedPitchButton
 from soundboard.ui.tabcontrol import TAB_INDEX, TAB_KEYS, TABS, rail_order
 from soundboard.ui import cableconfirm
 from soundboard.ui.kit.glow import Glow
@@ -95,7 +95,7 @@ from soundboard.ui.kit.widgets import (
     WindowRoot,
     fit_placeholder,
 )
-from soundboard.ui.ytsearch import SearchResults
+from soundboard.ui.sounds.ytsearch import SearchResults
 from soundboard.ui.kit.wheelguard import AppStyle, no_wheel
 
 if TYPE_CHECKING:

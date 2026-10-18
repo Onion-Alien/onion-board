@@ -144,19 +144,19 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/kit/restyled.py` | sizes worked out from a widget's text (`measured`, `on_restyle`), worked out again when its style or font changes: the window is built with the app's style sheet off (`theme.styled_after`) and `again()` re-runs them all once it's back on |
 | `soundboard/ui/kit/iconrow.py` | label icons aligned to the first line's capital ink using the current font metrics |
 | `soundboard/ui/kit/panel.py` | volume boxes, the equalizer panel (emit values; the window applies them) a wrapping row layout (`Flow`) and a grid of equal-width cards (`CardGrid`) |
-| `soundboard/ui/dialogs.py` | per-sound Edit dialog: the Sound tab (name, volume, hotkey, fades…) and the Effects tab |
+| `soundboard/ui/sounds/dialogs.py` | per-sound Edit dialog: the Sound tab (name, volume, hotkey, fades…) and the Effects tab |
 | `soundboard/ui/languagecontrol.py` | the main window's language (`MainWindow.langctl`): offering Windows' language once, turning it down, switching |
 | `soundboard/ui/miccontrol.py` | straight into the mic and the virtual cable in the main window (`MainWindow.micctl`): the mic effect's status, putting it on the mic (and back by itself), the mic helper, its update offer, falling back to the cable; installing, removing and fixing the cable; Windows' mic settings |
 | `soundboard/ui/netcontrol.py` | the main window following the network and privacy switches (`MainWindow.netctl`): Offline mode, a feature switched off, the proxy / Tor and remote-control lines on the output card, how far Tor is |
 | `soundboard/ui/padcontrol.py` | a pad's own controls in the main window (`MainWindow.padctl`): its right-click menu, volume slider and nudges, its picture, and the View menu (sort, grid or list, row size, pad size) |
 | `soundboard/ui/routecontrol.py` | where the main window's sounds go (`MainWindow.routectl`): the device pickers, the route (the mic, a cable, or only you), the extra send outputs and OBS's device, what the mic button and mute do |
 | `soundboard/ui/removecontrol.py` | taking sounds off the board (`MainWindow.rmctl`): asking first, removing one or several, the Undo bar, the Recently deleted bin and restoring from it |
-| `soundboard/ui/padbatch.py` | picking several pads (Ctrl / Shift+click, Ctrl+A) and changing them together: delete with one Undo, colour, volume, fades, categories |
+| `soundboard/ui/sounds/padbatch.py` | picking several pads (Ctrl / Shift+click, Ctrl+A) and changing them together: delete with one Undo, colour, volume, fades, categories |
 | `soundboard/ui/kit/busy.py` | click feedback for buttons: a greyed-out *Scanning…* while the work runs, then a short *✓ done* on the button (`run_busy`, `hold`, `flash`) |
 | `soundboard/ui/cableconfirm.py` | the are-you-sure box before the virtual cable: what it means (CABLE Output in every app), and the mic as its main button |
 | `soundboard/ui/kit/worker.py` | `run(fn, signal, name, error=…)`: work on a thread whose answer always comes back to the UI, the error value when it raises (so no busy flag or button stays stuck), nothing when its owner is gone |
 | `soundboard/ui/kit/toast.py` | the result cards in the window's bottom corner (`busy.toast` / `MainWindow.toast`): green / yellow / red, up to three stacked above the player, a repeat counted as ×2, an action button (Undo, See why), Copy on problems, a bar for progress |
-| `soundboard/ui/importreport.py` | what an import skipped and why, sorted into plain groups: the toast's summary line and the *See why* list you can copy |
+| `soundboard/ui/sounds/importreport.py` | what an import skipped and why, sorted into plain groups: the toast's summary line and the *See why* list you can copy |
 | `soundboard/ui/aboutcontrol.py` | the main window's About menu (`MainWindow.aboutctl`): the version, Join the Discord, Send feedback, the website |
 | `soundboard/ui/alertcontrol.py` | the urgent bar in the main window (`MainWindow.alertctl`): an important fix for Onion Board or Onion Watch, Discord's own settings hurting your sounds, apps recording your mic around the mic effect; one at a time, each can be hidden |
 | `soundboard/ui/appsetupcontrol.py` | set up for the app you're using, in the main window (`MainWindow.appsetctl`): noticing the voice app or game in front, the bar offering to set up for it (Yes / Not now / x, Undo), its checks once done, picking where sounds go by itself |
@@ -196,22 +196,22 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/remoteaccess.py` | remote control in the main window (`MainWindow.remctl`): the control API started / stopped to match the settings, and the phone-remote add-ons (Onion Pocket): starting, updating in place, removing, stopping them at quit |
 | `soundboard/ui/remotehost.py` | Onion Board as the host of a "remote" add-on such as Onion Pocket: its settings (never in a backup), a lan server offering a list of actions, and Settings' look for its card on Settings → Remote |
 | `soundboard/ui/pocketcard.py` | Onion Pocket's card on the Setup tab (`MainWindow.pocket_card`), only while it's installed: on the left in Connect your chat's place (that moves right); shut it says if phones can reach the board, its fold opens the add-on's own controls |
-| `soundboard/ui/linkbar.py` | the Sounds tab's link bar: a link pasted into *Search sounds* is looked up with yt-dlp, then added as a sound or played once |
+| `soundboard/ui/sounds/linkbar.py` | the Sounds tab's link bar: a link pasted into *Search sounds* is looked up with yt-dlp, then added as a sound or played once |
 | `soundboard/ui/downloadbar.py` | persistent top download bar across tabs and in mini player mode: parsing, download progress with live percentage, processing stages, queue badge, and cancel button |
-| `soundboard/ui/ytsearch.py` | the Sounds tab's web search: Enter in *Search sounds* shows YouTube or SoundCloud hits as a grid of cards (thumbnail, title, length) in place of the pads; *Play* / *Add* hand one to the link bar; the one in the player shows a bouncing equalizer and *Play* becomes *Pause* |
+| `soundboard/ui/sounds/ytsearch.py` | the Sounds tab's web search: Enter in *Search sounds* shows YouTube or SoundCloud hits as a grid of cards (thumbnail, title, length) in place of the pads; *Play* / *Add* hand one to the link bar; the one in the player shows a bouncing equalizer and *Play* becomes *Pause* |
 | `soundboard/sounds/sourceinfo.py` | where a sound added from a web link came from: link, channel, upload date, length and views picked from the download's own yt-dlp reply, kept as `SoundMeta.source` and as a text file next to its audio |
-| `soundboard/ui/sourcedialog.py` | the pad menu's *Details* for a downloaded sound: its picture, title, channel and dates, with *Open on YouTube*, *Copy link* and *Delete info* |
+| `soundboard/ui/sounds/sourcedialog.py` | the pad menu's *Details* for a downloaded sound: its picture, title, channel and dates, with *Open on YouTube*, *Copy link* and *Delete info* |
 | `soundboard/ui/spacekey.py` | Space plays / pauses on the Sounds and Radio tabs wherever the focus is (not in text boxes, or on a button reached with Tab) |
-| `soundboard/ui/speedpitch.py` | live controls pop-ups: speed, pitch and effects for Sounds, and pitch and effects for Radio and Apps; the speed gauge turns red at 8x |
+| `soundboard/ui/sounds/speedpitch.py` | live controls pop-ups: speed, pitch and effects for Sounds, and pitch and effects for Radio and Apps; the speed gauge turns red at 8x |
 | `soundboard/audio/livefx.py` | live effects on every playing sound (the speed & pitch popup): bass, treble, muffle, reverb, echo, distortion and presets; not saved |
 | `soundboard/mic/livesetup.py` | a voice setup from Live controls on a live stream (the radio, a captured program): its voice changer at once, its AI voice once its helper is ready |
 | `soundboard/audio/soundfx.py` | per-sound effects: trim, speed / pitch (phase vocoder + soxr), EQ, boost, reverse and any voice effect, rendered off the audio thread a piece at a time (`render_into`; `library.render_cached` writes it straight into the cache file, so a long sound is never all in memory); the presets |
 | `soundboard/i18n.py` | translations: `_()` / `ngettext()` look the English up in the language picked (`assets/lang/<code>.json`) and fall back to it; Windows' language, plural rules, the pseudo-language `xx` and `unwrapped_texts` for layout checks (see [TRANSLATING.md](TRANSLATING.md)); `scripts/i18n_extract.py` lists missing / unused texts |
 | `soundboard/core/langnames.py`, `langnames_data.py` | language names in the app's language for the *Speak in* list; the data file is generated from Unicode CLDR by `scripts/make_langnames.py` (don't edit it) |
 | `soundboard/core/tips.py` | *Did you know?* tips: the list (each with where *Show me* goes), which one is due (after setup, once a day, never during a game), and the fullscreen-in-front check; the main window shows the bar |
-| `soundboard/ui/recordmic.py` | the Sounds tab's *Record a sound* window: a mic take (`Engine.start_mic_take`) or what's playing (`Engine.start_play_take`: sounds + radio, no mic), spooled by `recorder.MicTake`, raw or through the voice changer, trimmed and added as a pad; not modal |
+| `soundboard/ui/sounds/recordmic.py` | the Sounds tab's *Record a sound* window: a mic take (`Engine.start_mic_take`) or what's playing (`Engine.start_play_take`: sounds + radio, no mic), spooled by `recorder.MicTake`, raw or through the voice changer, trimmed and added as a pad; not modal |
 | `soundboard/sounds/catswitch.py` | Switch category when a program is in front: `Switcher.poll()` (one foreground lookup a second, only while a rule exists; back to the old category when the program closes) |
-| `soundboard/ui/trim.py` | the Effects tab's trim control: waveform with start / end handles and exact-time boxes |
+| `soundboard/ui/sounds/trim.py` | the Effects tab's trim control: waveform with start / end handles and exact-time boxes |
 | `soundboard/core/backup.py` | export / import of the board as a plain zip (JSON + original audio + pictures), sound packs and single sounds; see [BACKUP-FORMAT.md](BACKUP-FORMAT.md) |
 | `soundboard/sounds/packs.py` | free sound packs: the list (`packs/catalog.json` in this repo, with a built-in copy for offline) of ready-made boards in the backup format, added in one click; each pack's preview zip (`samples`) |
 | `soundboard/online/store.py` | the sound store (Store tab): the list, fetching a sound, votes, reports and uploads, talking to the project's own server (`server/store/`) |
@@ -220,7 +220,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/online/storevoices.py` | the Store's community voices: packing your voice changer voices, AI voices and setups to share (settings only), checking every voice from the store again, taking one into your own lists, its *Hear it* sample, and share codes for any of them (`OB2-…`, read back through the same checks; old `OB1-…` voice codes still read) |
 | `soundboard/ui/storevoices.py` | the Store tab's *Voices*: a row per community voice and the *Share a voice* window |
 | `server/store/` | the sound store's server: a Cloudflare Worker (`src/index.js`), its review page (`src/admin.js`) and database (`schema.sql`); its README says how to put it online |
-| `soundboard/ui/packsdialog.py` | the *Free sound packs* window (Sounds tab → Backup): the packs to add, a few of each one's sounds to hear first, and where to share your own |
+| `soundboard/ui/sounds/packsdialog.py` | the *Free sound packs* window (Sounds tab → Backup): the packs to add, a few of each one's sounds to hear first, and where to share your own |
 | `soundboard/otherboards/` | Import from another soundboard. `__init__.py`: what the readers share (Entry rows, the list of sources, the installer's queued-import note); only when the user asks (Backup menu, setup guide, the installer's boxes, or a dropped board file) |
 | `soundboard/otherboards/soundpad.py`, `resanance.py`, `soundux.py`, `expboard.py` | the readers: Soundpad's `soundlist.spl` XML, Resanance's LiteDB 5 `Resanance.db` (read page by page, no LiteDB needed), Soundux's `config.json`, EXP Soundboard's board JSON (found through Java's Preferences in the registry) |
 | `soundboard/control/adminfront.py` | games run as admin: notices a full-screen admin window in front (Windows keeps its keys from the board) so the hotkeys can say why they're quiet and offer *Restart as admin* (`ui/hotkeycontrol.py`); starts the board again through Windows' admin prompt |
@@ -268,12 +268,12 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/kit/glow.py` | `Glow(button)`: a slow accent glow round the one button a step wants pressed (the setup card's mic button) |
 | `soundboard/ui/logowidget.py` | the header logo animated: a breathing glow and sheen, flaring with embers while sounds play |
 | `soundboard/ui/logoduel.py` | a silent laser exchange between the Board and Watch logos when clicked on the Triggers tab |
-| `soundboard/ui/overlay.py` | the in-game overlay: a panel of pads that never takes focus, driven by number keys or clicks, on a chosen monitor and spot (or wherever it was dragged) |
+| `soundboard/ui/sounds/overlay.py` | the in-game overlay: a panel of pads that never takes focus, driven by number keys or clicks, on a chosen monitor and spot (or wherever it was dragged) |
 | `soundboard/ui/voicepanel.py` | the Voice tab: lays out its cards and bottom bar, the add-ons list |
 | `soundboard/ui/voicefxpanel.py` | the Voice tab's voice changer card: voice tiles, effect rows and their sliders. |
 | `soundboard/ui/backdroprow.py` | the voice changer's Background card (built-in sounds and board sounds behind your voice) and its Speed and pitch pop-up |
 | `soundboard/ui/effectspopup.py` | the voice bar's Effects pop-up: bundled CC0 background sounds, board sounds and the extra Robot, Radio, Echo and Reverb on top of any voice, one slider and a ✕ each |
-| `soundboard/ui/voicepicker.py` | Edit sound → Effects → Voice: picture cards of the voice changer's voices, the AI voices and your setups, to lay a voice over a sound |
+| `soundboard/ui/sounds/voicepicker.py` | Edit sound → Effects → Voice: picture cards of the voice changer's voices, the AI voices and your setups, to lay a voice over a sound |
 | `soundboard/ui/voicesetupsbar.py` | the Voice tab's My setups row: save what's on, turn a setup back on, delete with Undo |
 | `soundboard/ui/speechpanel.py` | the Voice tab's Languages card: text-to-speech, live voice-to-speech, translation |
 | `soundboard/ui/livevoice.py` | the Languages card's live voice: Start, translating for the AI voice or voice changer, the helper's events |
@@ -299,8 +299,8 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/online/ytworker.py` | yt-dlp's look-ups and downloads in a helper process, so its long GIL-holding parsing never makes a sound stutter |
 | `soundboard/audio/renderworker.py` | a slow effects render (a song said in an AI voice, a long sound) in a helper process at low priority, with progress and cancel, so it never stutters the audio or lags the window |
 | `soundboard/sounds/thumbs.py` | pad pictures: a link's video thumbnail, a file's cover art / first frame (ffmpeg), or a picture you pick or drop on a pad, scaled into `%APPDATA%\OnionBoard\thumbs` |
-| `soundboard/sounds/videos.py` | which pads came from a video (an imported video file, or a link added with *Also save the video*), in `videos.json` beside the config; `ui/videowindow.py` is the player's **Video** window, muted and kept in step with the pad's sound |
-| `soundboard/ui/videowindow.py` | the player's *Video* window: a video pad's picture, following the pad's own audio (play, pause, seek, speed) |
+| `soundboard/sounds/videos.py` | which pads came from a video (an imported video file, or a link added with *Also save the video*), in `videos.json` beside the config; `ui/sounds/videowindow.py` is the player's **Video** window, muted and kept in step with the pad's sound |
+| `soundboard/ui/sounds/videowindow.py` | the player's *Video* window: a video pad's picture, following the pad's own audio (play, pause, seek, speed) |
 | `soundboard/mic/savedvoices.py` | the voice changer's saved voices and their bin, in `%APPDATA%\OnionBoard\voices.json` (not the config, so older versions can't drop them), and their share codes (`OB1-…`: name + effect numbers, checked and clamped on import; the packing every code uses) |
 | `soundboard/mic/voicesetups.py` | voice setups (a voice changer voice, an AI voice and a language under one name), in `%APPDATA%\OnionBoard\voice-setups.json` |
 | `soundboard/core/trash.py` | Recently deleted: removed sounds (files and pad) and forgotten programs, kept 30 days in `%APPDATA%\OnionBoard\deleted` so they can be brought back |
@@ -380,7 +380,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/mic/profiles.py` | the simple sound modes over *Who's listening*: Game, Voice chat, Clean, Advanced. Each is a family of destination modes and picks one from detector `Hint`s (what voicesdk sees); a later per-program list would be one more detector. Stored as `dest["simple"]` beside `dest["mode"]` |
 | `soundboard/mic/appsetup.py` | the *Looks like you're using Discord. Set up for it?* bar: when a voice chat app or a game starts listening, offers the simple mode that suits it once, then switches by itself the next time (with Undo) |
 | `soundboard/mic/voicesdk.py` | which *Who's listening* mode suits: first the program recording what others hear (`Listeners`: your mic on the mic route, plus the virtual cable's far end; Discord, TeamSpeak and Mumble by name, a game by its files), else the voice engine of the game in front, from the voice libraries in its install folder (the exe path is read with the least access Windows has; nothing touches the game). A suggestion, switched to by itself only when the picker's box says so |
-| `soundboard/ui/deleted.py` | the Recently deleted window (Bring back / Delete for good) |
+| `soundboard/ui/sounds/deleted.py` | the Recently deleted window (Bring back / Delete for good) |
 | `soundboard/ui/resetguide.py` | the Reset guide (pick → check → reset and restart) and the Restore points window |
 | `soundboard/ui/destpanel.py` | the mode picker and the custom-modes editor |
 | `soundboard/sim/codecsim.py` | development bench: runs audio through Discord's and ~20 game voice stacks' Opus pipelines (ffmpeg's libopus, plus Discord's ~94 Hz capture high-pass, measured in a real call) and measures what's lost, including a frame-by-frame spectral distance that hears noise fill and warble |

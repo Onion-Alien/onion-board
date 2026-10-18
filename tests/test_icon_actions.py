@@ -80,7 +80,7 @@ def test_resets_are_one_family(window):  # noqa: F811
     rows = window.voice.fx.findChildren(EffectRow) or window.voice.findChildren(EffectRow)
     assert rows
     _assert_reset(rows[0].btn_reset)
-    from soundboard.ui.dialogs import EditDialog
+    from soundboard.ui.sounds.dialogs import EditDialog
     d = EditDialog(window.meta("s1"), window.hotkeys, window.playctl.preview, window, tab="effects")
     resets = [b for b in d.findChildren(QPushButton) if b.text() == "Reset"]
     assert resets

@@ -5,7 +5,7 @@ from PySide6.QtGui import QImage
 from PySide6.QtWidgets import QDialog, QFileDialog, QLabel
 
 from soundboard.sounds import library, thumbs
-from soundboard.ui.dialogs import EditDialog
+from soundboard.ui.sounds.dialogs import EditDialog
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 from test_thumbs import make_image
 
@@ -76,7 +76,7 @@ def test_save_as_new_sound_puts_the_picture_on_the_copy(window, tmp_path,  # noq
 
 
 def test_a_downloaded_sound_says_where_it_came_from(window, monkeypatch):  # noqa: F811
-    from soundboard.ui import sourcedialog
+    from soundboard.ui.sounds import sourcedialog
     window.meta("s0").source = dict(SRC)
     d = _dialog(window)
     texts = {lab.text() for lab in d.findChildren(QLabel)}
@@ -90,7 +90,7 @@ def test_a_downloaded_sound_says_where_it_came_from(window, monkeypatch):  # noq
 
 def test_delete_info_from_edit_hides_the_line_and_saves(window, monkeypatch):  # noqa: F811
     from PySide6.QtWidgets import QMessageBox
-    from soundboard.ui import sourcedialog
+    from soundboard.ui.sounds import sourcedialog
     window.meta("s0").source = dict(SRC)
     d = _dialog(window)
     opened = []

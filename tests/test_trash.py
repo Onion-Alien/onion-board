@@ -12,7 +12,7 @@ from test_mainwindow import window  # noqa: F401 - the real MainWindow, offscree
 from soundboard.sounds import library
 from soundboard.core import trash
 from soundboard.sounds.library import SoundMeta
-from soundboard.ui.deleted import DeletedDialog
+from soundboard.ui.sounds.deleted import DeletedDialog
 
 
 def _sound(tmp: Path, sid: str) -> SoundMeta:

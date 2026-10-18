@@ -5,7 +5,7 @@ hits (thumbnail, title, channel, length) from the site searches in ytdl.SOURCES
 and no video. While one runs the list makes way for a loading view: Bun or Hoot
 (picked at random each time) over a sliding bar and "Searching YouTube for ...".
 Play plays one once and Add adds it as a
-pad; both hand the page to the link bar (ui/linkbar.py), which downloads just its
+pad; both hand the page to the link bar (ui/sounds/linkbar.py), which downloads just its
 audio. Sites without a search (Instagram, X…) work by pasting a link into the
 search box instead.
 """

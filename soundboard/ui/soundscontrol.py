@@ -32,7 +32,7 @@ from soundboard.sounds.library import (
 from soundboard.ui.kit import worker
 from soundboard.ui.controller import Controller
 from soundboard.ui.kit.crashdialog import free_dialog
-from soundboard.ui.linkbar import PLAY_ID as LINK_ID
+from soundboard.ui.sounds.linkbar import PLAY_ID as LINK_ID
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
@@ -143,7 +143,7 @@ class SoundsControl(Controller):
         still work while it's open (to play what's being recorded). `quick` (the Voice
         tab's Record): it starts recording your voice straight away."""
         mw = self.mw
-        from soundboard.ui.recordmic import RecordDialog
+        from soundboard.ui.sounds.recordmic import RecordDialog
         d = getattr(self, "_record_dlg", None)
         if d is not None:   # already open: bring it forward
             d.raise_()

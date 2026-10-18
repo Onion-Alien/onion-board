@@ -329,7 +329,7 @@ QFrame#chip QPushButton#chipname { font-weight:600; }
 QFrame#chip QPushButton#chipstop { border-radius:12px; padding:0; }
 QFrame#chip QPushButton#chipstop:hover { background:$danger_bg; }
 QLabel#iconlabel { background:transparent; }
-QFrame#card QLabel#sourcepic { background:$inset; border-radius:8px; }   /* ui/sourcedialog.py: no thumbnail */
+QFrame#card QLabel#sourcepic { background:$inset; border-radius:8px; }   /* ui/sounds/sourcedialog.py: no thumbnail */
 QPushButton#pill { border-radius:15px; padding:5px 14px; font-weight:600; }
 QPushButton#pill[state="ok"] { color:$live_text; background:transparent; }
 QPushButton#onair { border-radius:15px; padding:5px 14px; font-weight:700;

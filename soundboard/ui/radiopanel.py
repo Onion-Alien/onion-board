@@ -35,7 +35,7 @@ from soundboard.ui.kit.panel import (EmptyList, RoundedFrame, VolumeControl, bar
 from soundboard.ui.radiolist import (GENRE_LABELS, GENRES, LIST_MAX,  # noqa: F401
                                      MAP_CACHE, QUALITIES, ROW_H, SORTS, StationList,
                                      _FilterRow, _StationDelegate, in_genre)
-from soundboard.ui.speedpitch import SpeedPitchButton
+from soundboard.ui.sounds.speedpitch import SpeedPitchButton
 from soundboard.ui.kit.widgets import paint_now_playing
 from soundboard.ui.kit.pixels import snap_to_pixels
 from soundboard.ui.kit.restyled import on_restyle

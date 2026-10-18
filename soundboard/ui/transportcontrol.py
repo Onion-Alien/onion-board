@@ -17,7 +17,7 @@ from soundboard.audio.engine import SR
 from soundboard.i18n import _
 from soundboard.ui.kit import worker
 from soundboard.ui.controller import Controller
-from soundboard.ui.linkbar import PLAY_ID as LINK_ID
+from soundboard.ui.sounds.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.kit.widgets import fmt_pos
 
 if TYPE_CHECKING:
@@ -204,7 +204,7 @@ class TransportControl(Controller):
             return
         if mw._video_win is None:
             try:   # imported here: a build missing QtMultimediaWidgets must still start
-                from soundboard.ui.videowindow import VideoWindow
+                from soundboard.ui.sounds.videowindow import VideoWindow
             except ImportError:
                 log.exception("can't show videos")
                 mw.btn_video.hide()

@@ -3,7 +3,7 @@ game's monitor (GDI device name + native rectangle) to Qt's screens. Pure functi
 stand-in screens, no windows."""
 from PySide6.QtCore import QRect
 
-from soundboard.ui.overlay import pick_screen
+from soundboard.ui.sounds.overlay import pick_screen
 
 
 class Screen:
@@ -68,7 +68,7 @@ def test_no_match_returns_none():
 
 from PySide6.QtCore import QSize  # noqa: E402
 
-from soundboard.ui.overlay import (OverlaySettings, find_screen, monitor_choices,  # noqa: E402
+from soundboard.ui.sounds.overlay import (OverlaySettings, find_screen, monitor_choices,  # noqa: E402
                                    place, screen_key)
 
 

@@ -214,7 +214,7 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # before the end, won or lost; sleepy Bun woken
             "egg-pong-opened", "egg-pong-quit", "egg-pong-won", "egg-pong-lost",
             "egg-bun-woken",
-            # sounds fetched from a link or a web search (ui/linkbar.py): the site
+            # sounds fetched from a link or a web search (ui/sounds/linkbar.py): the site
             # (DL_SITES), a pasted link or a search pick, Add as sound or Play once, one
             # waiting in the queue, a pick already in the library, and the sites that
             # failed. Never the link, title or search words
@@ -516,7 +516,7 @@ def download_bucket(n: int) -> str:
 
 
 def downloaded(cfg, url: str, via: str, kind: str, ok: bool) -> None:
-    """A link or web-search pick finished (ui/linkbar.py): `via` "link" or "search",
+    """A link or web-search pick finished (ui/sounds/linkbar.py): `via` "link" or "search",
     `kind` "add" or "play". Counted as used() names, and one more for the next daily
     `downloads/` when it worked (only while the count is on, like open_tick)."""
     site = download_site(url)

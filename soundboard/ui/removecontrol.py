@@ -192,7 +192,7 @@ class RemoveControl(Controller):
     def show_deleted(self):
         """Library → Recently deleted sounds"""
         mw = self.mw
-        from soundboard.ui.deleted import DeletedDialog
+        from soundboard.ui.sounds.deleted import DeletedDialog
         self._finish_removals()   # the ones on the Undo bar are listed too
         self._wait_bin()
         d = DeletedDialog(trash.SOUND, "sounds", self._restore_deleted, mw)

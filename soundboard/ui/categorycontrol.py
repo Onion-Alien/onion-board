@@ -30,7 +30,7 @@ from soundboard.sounds.library import SoundMeta
 from soundboard.ui.kit.hotkeypick import pretty_key
 from soundboard.ui.kit import icons
 from soundboard.ui.controller import Controller
-from soundboard.ui.padbatch import fill_colour_menu
+from soundboard.ui.sounds.padbatch import fill_colour_menu
 from soundboard.ui.kit.panel import Flow
 from soundboard.ui.kit.widgets import InlineNameBox
 

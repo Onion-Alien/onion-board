@@ -23,7 +23,7 @@ from soundboard.ui.kit import appstate
 from soundboard.style.owl import OwlWidget
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.controller import Controller
-from soundboard.ui.linkbar import PLAY_ID as LINK_ID
+from soundboard.ui.sounds.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.livedot import set_tab_live
 from soundboard.ui.kit.widgets import loudness, spectrum
 

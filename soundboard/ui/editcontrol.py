@@ -29,7 +29,7 @@ from soundboard.sounds.library import SoundMeta, cache_keep, duplicate, load_sou
 from soundboard.ui.kit import worker
 from soundboard.ui.controller import Controller
 from soundboard.ui.kit.crashdialog import free_dialog, rehome_crash_reports
-from soundboard.ui.dialogs import EditDialog
+from soundboard.ui.sounds.dialogs import EditDialog
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
@@ -177,7 +177,7 @@ class EditControl(Controller):
         setups, and the Voice tab's Favorites (a star here is a star there)."""
         from soundboard.speech import soundvoice
         from soundboard.ui import art
-        from soundboard.ui.voicepicker import Catalog
+        from soundboard.ui.sounds.voicepicker import Catalog
         mw = self.mw
         cat = Catalog()
         cat.fx = [(n, voicefx.shown(n), {t: {"on": True, **c} for t, c in fx.items()},
@@ -215,7 +215,7 @@ class EditControl(Controller):
 
     def pick_voice(self, voice: dict, parent=None) -> dict | None:
         """Edit sound → Effects → Voice: the picker on `voice`; the new voice, or None."""
-        from soundboard.ui.voicepicker import VoicePicker
+        from soundboard.ui.sounds.voicepicker import VoicePicker
         d = VoicePicker(self.voice_catalog(), voice,
                         lambda name, v: self._setups().put(name, v), parent)
         try:

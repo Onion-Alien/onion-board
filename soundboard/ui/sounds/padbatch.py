@@ -61,7 +61,7 @@ def fill_colour_menu(menu: QMenu, current: str | None, pick, none: bool = False)
     "Custom colour…" (a colour wheel; a custom current colour shows ticked above it).
     With `none`, a "No colour" item too (ticked when there's none). The Sounds menus
     share it: the bulk Colour menu and a category tab's."""
-    from soundboard.ui.dialogs import COLOUR_NAMES
+    from soundboard.ui.sounds.dialogs import COLOUR_NAMES
     group = QActionGroup(menu)
     group.setExclusive(True)
     cur = (current or "").lower()

@@ -5,8 +5,8 @@ from PySide6.QtGui import QPixmap
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QDialogButtonBox
 
-from soundboard.ui.deleted import DeletedDialog
-from soundboard.ui.dialogs import TabHelpPopup
+from soundboard.ui.sounds.deleted import DeletedDialog
+from soundboard.ui.sounds.dialogs import TabHelpPopup
 from test_mainwindow import window  # noqa: F401
 
 

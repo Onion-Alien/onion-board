@@ -1825,7 +1825,7 @@ class VoiceFxPanel(QWidget):
         return name
 
     def show_deleted(self):
-        from soundboard.ui.deleted import DeletedDialog
+        from soundboard.ui.sounds.deleted import DeletedDialog
         self.undo_bar.finish()
 
         def back(item) -> bool:   # DeletedDialog has taken it out of the bin already

@@ -47,7 +47,7 @@ from soundboard.ui.clipeditor import WAVE_H
 from soundboard.ui.clipshelf import ClipShelf
 from soundboard.ui.kit.panel import UndoBar, ViewToggle, hint_label
 from soundboard.ui.responsive import FitWidth
-from soundboard.ui.speedpitch import SpeedPitchButton
+from soundboard.ui.sounds.speedpitch import SpeedPitchButton
 from soundboard.ui.kit.wheelguard import no_wheel
 
 log = logging.getLogger(__name__)
@@ -838,7 +838,7 @@ class AppsTab(QWidget):
             self._unforget(it)
 
     def show_forgotten(self):
-        from soundboard.ui.deleted import DeletedDialog
+        from soundboard.ui.sounds.deleted import DeletedDialog
         self.undo_bar.finish()
         DeletedDialog(trash.APP, "programs", self._unforget, self).exec()
         self._label_bin()

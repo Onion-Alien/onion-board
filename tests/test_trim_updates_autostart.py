@@ -56,7 +56,7 @@ def test_original_peaks_read_the_cache_without_effects(app_dir):
 
 
 def test_trim_panel_values(qapp):
-    from soundboard.ui.trim import TrimPanel
+    from soundboard.ui.sounds.trim import TrimPanel
     p = TrimPanel(np.zeros(10, np.float32), 10.0)
     assert p.values() == (0.0, 0.0)
     p.set_values(2.0, 4.0)

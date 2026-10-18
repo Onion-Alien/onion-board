@@ -11,7 +11,7 @@ from PySide6.QtGui import QImage
 from conftest import process_events
 from soundboard.online import quality
 from soundboard.online import ytdl
-from soundboard.ui import ytsearch
+from soundboard.ui.sounds import ytsearch
 
 
 def png_bytes() -> bytes:

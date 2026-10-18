@@ -438,7 +438,7 @@ def test_picture_from_a_link_goes_on_the_pad(qapp, window, tmp_path, monkeypatch
     """Edit… → Picture → the link button: fetched off the UI thread, shown, and put on
     the pad only on Save; a link with no picture says so and changes nothing."""
     from PySide6.QtWidgets import QInputDialog
-    from soundboard.ui.dialogs import EditDialog
+    from soundboard.ui.sounds.dialogs import EditDialog
     img = QImage(str(make_image(tmp_path / "a.png")))
     monkeypatch.setattr(thumbs, "fetch", lambda url: img if url == "https://ex.com/a" else
                         (_ for _ in ()).throw(thumbs.LinkError("There's no picture at that link.")))

@@ -789,7 +789,7 @@ class Pad(QAbstractButton):
     """One sound's button, painted by hand. It's a QAbstractButton so screen readers
     see a button with the sound's name, and it works from the keyboard: Tab / arrows
     to move, Enter or Space to play, Ctrl+Space to pick, the Menu key for its menu,
-    F2 to rename it, Alt+Enter to edit it (Delete removes it: ui/padbatch.py)."""
+    F2 to rename it, Alt+Enter to edit it (Delete removes it: ui/sounds/padbatch.py)."""
     activated = Signal(str)     # play it (a double-click, Enter, a screen reader's press)
     rename = Signal(str)        # F2: ask for a new name
     edit = Signal(str)          # Alt+Enter: the Edit window

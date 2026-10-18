@@ -19,7 +19,7 @@ from soundboard.settings import SettingsDialog
 from soundboard.ui import routewarn
 from soundboard.ui.controller import Controller
 from soundboard.ui.kit.crashdialog import free_dialog, rehome_crash_reports
-from soundboard.ui.dialogs import EditDialog
+from soundboard.ui.sounds.dialogs import EditDialog
 from soundboard.ui.routecontrol import ROUTE_DEVICE
 from soundboard.ui.triggerstab import TriggersTab
 

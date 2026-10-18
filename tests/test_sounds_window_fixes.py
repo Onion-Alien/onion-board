@@ -19,7 +19,7 @@ from soundboard.control import winkeys
 from soundboard.sounds.library import SR, Config, SoundMeta
 from soundboard.ui import hotkeycontrol
 from soundboard.ui import mainwindow as main
-from soundboard.ui.dialogs import EditDialog
+from soundboard.ui.sounds.dialogs import EditDialog
 
 
 def _tone(path, seconds=0.1):

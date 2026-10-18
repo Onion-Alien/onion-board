@@ -15,7 +15,7 @@ from soundboard.sounds import library
 from soundboard.online import net
 from soundboard.ui import chatguide, responsive
 from soundboard.ui import importcontrol, playbackcontrol
-from soundboard.ui.dialogs import EditDialog
+from soundboard.ui.sounds.dialogs import EditDialog
 from soundboard.ui import mainwindow as main
 from soundboard.ui.kit import worker
 from test_trim_updates_autostart import FakeReg
@@ -295,7 +295,7 @@ def test_link_bar_new_text_keeps_a_queued_pick(qapp):
     """Typing the next search while a download runs doesn't drop the Add or Play
     clicked on that downloading link: it still runs once the download is over."""
     from soundboard.sounds.library import Config
-    from soundboard.ui.linkbar import LinkBar
+    from soundboard.ui.sounds.linkbar import LinkBar
     bar = LinkBar(engine=None, cfg=Config(), color_for=lambda: "#fff", known_for=dict)
     bar.open("https://www.youtube.com/watch?v=abc", "Clip")
     bar._busy, bar._busy_url = "play", bar.url

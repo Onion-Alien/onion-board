@@ -11,7 +11,7 @@ from shiboken6 import isValid as qt_valid
 
 from soundboard.i18n import _
 from soundboard.ui.kit import icons
-from soundboard.ui import overlay as ovl
+from soundboard.ui.sounds import overlay as ovl
 # the actions, how a combo reads and the key picker live in ui/kit/hotkeypick.py (pads and
 # menus use them without loading Settings); here for the page and older imports
 from soundboard.ui.kit.hotkeypick import (HOTKEY_ACTIONS, HOTKEY_GROUP_ICONS, HOTKEY_GROUPS,

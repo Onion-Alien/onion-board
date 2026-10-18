@@ -122,7 +122,7 @@ def test_source_details_follow_a_theme_switch_while_open(qapp):
     """Left open across Light -> Dark, the details kept Light's inner-area colour behind
     the missing picture and Light's dark icons on Open and Copy link."""
     from soundboard.sounds.library import SoundMeta
-    from soundboard.ui import sourcedialog
+    from soundboard.ui.sounds import sourcedialog
     src = dict(link="https://www.youtube.com/watch?v=dQw4w9WgXcQ", title="Song",
                channel="Someone", channel_link="https://www.youtube.com/@someone")
     app = qapp

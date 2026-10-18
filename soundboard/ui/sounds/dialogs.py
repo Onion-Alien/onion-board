@@ -26,10 +26,10 @@ from soundboard.sounds.library import (MAX_COOLDOWN_S, MAX_DELAY_S, MAX_FADE_S, 
                                        SoundMeta, original_peaks)
 from soundboard.ui.kit.hotkeypick import HotkeyDialog, pretty_key
 from soundboard.ui.kit import busy, fit, icons, toast
-from soundboard.ui import sourcedialog
+from soundboard.ui.sounds import sourcedialog
 from soundboard.ui.kit.panel import (EqPanel, hint_label, icon_button, reset_button,
                                      section_label, steady_number)
-from soundboard.ui.trim import TrimPanel
+from soundboard.ui.sounds.trim import TrimPanel
 from soundboard.ui.voicefxpanel import EffectRow, ParamSlider
 from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.control.winkeys import Hotkeys
@@ -256,7 +256,7 @@ class EffectsPanel(QWidget):
         self._boost_hint()
 
     def _show_voice(self):
-        from soundboard.ui.voicepicker import describe
+        from soundboard.ui.sounds.voicepicker import describe
         self.voice.setText(describe(self._voice) if self._voice else _("Pick a voice"))
         self.voice_off.setVisible(bool(self._voice))
 

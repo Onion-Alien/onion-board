@@ -7,8 +7,8 @@ from soundboard.sounds import library
 from soundboard.audio import recorder
 from soundboard.audio.engine import SR, Engine
 from soundboard.audio.recorder import MicTake
-from soundboard.ui import recordmic
-from soundboard.ui.recordmic import RecordDialog, next_name, quiet_bounds
+from soundboard.ui.sounds import recordmic
+from soundboard.ui.sounds.recordmic import RecordDialog, next_name, quiet_bounds
 
 from test_mainwindow import window  # noqa: F401  (the real MainWindow)
 

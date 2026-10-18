@@ -14,7 +14,7 @@ from PySide6.QtWidgets import QDialog, QWidget
 from soundboard.core import tips
 from soundboard.i18n import _
 from soundboard.ui.controller import Controller
-from soundboard.ui.dialogs import TabHelpPopup
+from soundboard.ui.sounds.dialogs import TabHelpPopup
 from soundboard.ui.tabcontrol import TAB_INDEX
 
 if TYPE_CHECKING:

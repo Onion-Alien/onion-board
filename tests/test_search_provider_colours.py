@@ -3,7 +3,7 @@ from PySide6.QtGui import QIcon
 
 from soundboard.ui.kit import theme
 from soundboard.ui.kit import icons
-from soundboard.ui.ytsearch import SearchResults
+from soundboard.ui.sounds.ytsearch import SearchResults
 
 
 def test_provider_menu_icons_follow_theme_changes(qapp):

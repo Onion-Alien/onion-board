@@ -7,8 +7,8 @@ from soundboard.audio import soundfx
 from soundboard import voicefx
 from soundboard.mic import voicesetups
 from soundboard.speech import soundvoice
-from soundboard.ui.dialogs import EffectsPanel
-from soundboard.ui.voicepicker import ALL, FAVS, Catalog, VoicePicker, describe
+from soundboard.ui.sounds.dialogs import EffectsPanel
+from soundboard.ui.sounds.voicepicker import ALL, FAVS, Catalog, VoicePicker, describe
 
 ROBOT = {"robot": {"on": True, "freq": 100, "noise": 0.2, "mix": 1}}
 ECHO = {"echo": {"on": True, "delay": 200, "feedback": 0.3, "mix": 0.3}}

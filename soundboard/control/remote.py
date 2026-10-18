@@ -1095,7 +1095,7 @@ def live_state(mw: MainWindow) -> dict:
 
 def dispatch_live(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
     from soundboard.audio import livefx
-    from soundboard.ui import speedpitch as sp
+    from soundboard.ui.sounds import speedpitch as sp
     b = mw.speed_btn
     speed, pitch, keep = b.values()
     if action == "reset":

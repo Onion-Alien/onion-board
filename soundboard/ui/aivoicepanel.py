@@ -847,7 +847,7 @@ class AiVoicePanel(QWidget):
             self._resync()
 
     def show_deleted(self):
-        from soundboard.ui.deleted import DeletedDialog
+        from soundboard.ui.sounds.deleted import DeletedDialog
         self.undo_bar.finish()
 
         def back(item) -> bool:

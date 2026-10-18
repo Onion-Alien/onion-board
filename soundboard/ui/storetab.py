@@ -28,7 +28,7 @@ from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui import storelook
 from soundboard.core.trash import ago
 from soundboard.ui.kit.panel import HoverCard, hint_label, icon_button, section_label
-from soundboard.ui.ytsearch import ClampLabel
+from soundboard.ui.sounds.ytsearch import ClampLabel
 
 log = logging.getLogger(__name__)
 

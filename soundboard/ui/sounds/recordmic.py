@@ -21,7 +21,7 @@ from soundboard.sounds.library import MAX_SECONDS
 from soundboard.audio.recorder import BothTake, MicTake
 from soundboard.ui.kit import fit, icons
 from soundboard.ui.kit.panel import hint_label
-from soundboard.ui.trim import TrimPanel
+from soundboard.ui.sounds.trim import TrimPanel
 from soundboard.ui.kit.widgets import Meter
 from soundboard.i18n import _
 

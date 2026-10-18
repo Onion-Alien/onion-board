@@ -17,7 +17,7 @@ from soundboard.i18n import _
 from soundboard.sounds.library import SoundMeta
 from soundboard.ui.kit import busy, icons
 from soundboard.ui.controller import Controller
-from soundboard.ui.linkbar import PLAY_ID as LINK_ID
+from soundboard.ui.sounds.linkbar import PLAY_ID as LINK_ID
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow

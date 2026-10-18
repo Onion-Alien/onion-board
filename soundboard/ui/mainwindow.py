@@ -71,11 +71,11 @@ from soundboard.ui.updatecontrol import UpdateControl
 from soundboard.ui.kit import toast as toastmod
 from soundboard.ui.kit import a11y, appstate, busy, icons
 from soundboard.ui import lite, livesize, responsive, splash, taboff, tabtours
-from soundboard.ui.linkbar import PLAY_ID as LINK_ID
+from soundboard.ui.sounds.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.logowidget import glow_icon
 from soundboard.ui import sidebar
 from soundboard.ui.spacekey import SpaceKey
-from soundboard.ui.overlay import Overlay
+from soundboard.ui.sounds.overlay import Overlay
 from soundboard.ui.appspanel import AppsTab
 from soundboard.ui.triggershost import BoardHost
 from soundboard.ui.triggerstab import TriggersTab
@@ -114,18 +114,18 @@ if TYPE_CHECKING:
     from soundboard.ui.destpanel import DestPanel, ModeButton
     from soundboard.ui.downloadbar import DownloadBar
     from soundboard.ui.dropveil import DropVeil
-    from soundboard.ui.linkbar import LinkBar
+    from soundboard.ui.sounds.linkbar import LinkBar
     from soundboard.ui.logowidget import LogoWidget
-    from soundboard.ui.padbatch import PadSelection
+    from soundboard.ui.sounds.padbatch import PadSelection
     from soundboard.ui.kit.panel import EqPanel, Flow, TileRow, ViewToggle, VolumeControl
     from soundboard.ui.kit.playbutton import PlayButton
     from soundboard.ui.setupshow import SetupShow
     from soundboard.ui.sidebar import SideTabs
-    from soundboard.ui.speedpitch import SpeedPitchButton
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
     from soundboard.ui.kit.widgets import (DropdownMenu, EdgeMatch, NameAndSeek, PadGrid,
                                            SeekSlider, WindowRoot)
     from soundboard.ui.windowbuild import BannerButton, Pulse
-    from soundboard.ui.ytsearch import SearchResults
+    from soundboard.ui.sounds.ytsearch import SearchResults
 
 class Bridge(QObject):
     loaded = Signal(str, object, str)          # id, data|None, error
