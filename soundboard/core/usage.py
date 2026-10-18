@@ -757,7 +757,7 @@ def tab_opened(cfg, key: str) -> None:
         cfg.stats_tabs = [*tabs, key]
 
 
-# a stack line in a report: `File "...\soundboard\engine.py", line 1090, in ...`; only
+# a stack line in a report: `File "...\soundboard\audio\engine.py", line 1090, in ...`; only
 # our own files count, named from the package folder down (never the folder above it)
 _OUR_FRAME = re.compile(r'^\s*File "(?:[^"]*[\\/])?(soundboard(?:[\\/][a-z0-9_]+)?'
                         r'[\\/][a-z0-9_]+\.py)", line (\d+)', re.M)

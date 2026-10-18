@@ -15,7 +15,7 @@ def app_dir(tmp_path, monkeypatch):
     exitwatch.stopped()
 
 
-def _native(stack_file=r"D:\Apps\OnionBoard\soundboard\engine.py"):
+def _native(stack_file=r"D:\Apps\OnionBoard\soundboard\audio\engine.py"):
     return ("Windows fatal exception: access violation\n\n"
             "Thread 0x0000aaaa (most recent call first):\n"
             '  File "soundboard\\online\\radio.py", line 12 in run\n\n'
