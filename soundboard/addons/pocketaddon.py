@@ -32,7 +32,7 @@ from pathlib import Path
 
 from soundboard.addons import modules
 from soundboard.online import net
-from soundboard import updates
+from soundboard.core import updates
 from soundboard.addons.modules import ModuleInfo
 
 log = logging.getLogger(__name__)

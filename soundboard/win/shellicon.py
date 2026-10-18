@@ -237,7 +237,7 @@ def relaunch_command() -> str:
         exe = Path(sys.executable)
         gui = exe.with_name("pythonw.exe")
         return subprocess.list2cmdline([str(gui if gui.exists() else exe), str(launcher)])
-    from soundboard import autostart
+    from soundboard.core import autostart
     return autostart.command(hidden=False)
 
 

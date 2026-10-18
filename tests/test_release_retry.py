@@ -6,7 +6,7 @@ import urllib.error
 import pytest
 
 from soundboard.online import net
-from soundboard import updates
+from soundboard.core import updates
 from soundboard.addons import watchaddon
 
 REAL_GET = updates._get

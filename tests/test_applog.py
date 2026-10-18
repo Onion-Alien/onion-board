@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from conftest import own_time
-from soundboard import applog
+from soundboard.core import applog
 
 
 @pytest.fixture(autouse=True)
@@ -63,7 +63,7 @@ def test_a_saved_report_takes_the_start_up_breadcrumb_with_it(fresh):
     behind (counted as error/): the start-up breadcrumb (bootmark.py) must go with
     it, or the next start would count the same crash again as startup-failed."""
     log_path, _ = fresh
-    from soundboard import bootmark
+    from soundboard.core import bootmark
     bootmark.mark("1.9.28", log_path.parent)   # the start is under way
     rep = applog.report(_raise(ValueError("boom")), where="starting up")
     assert rep.path is not None
@@ -350,7 +350,7 @@ def test_app_commands_under_test_never_log_into_the_real_app_folder():
     in the real app folder (%APPDATA%), and every later test's lines went there."""
     import os
 
-    from soundboard import app, updates
+    from soundboard.core import app, updates
     from soundboard.sounds import library
     real = Path(os.environ.get("APPDATA", Path.home())) / "OnionBoard"
     for d in (app.APP_DIR, updates.APP_DIR, library.APP_DIR):

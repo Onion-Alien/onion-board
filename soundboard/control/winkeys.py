@@ -402,7 +402,7 @@ class Hotkeys(QObject):
                 except Exception:  # noqa: BLE001 - one bad message mustn't end hotkeys
                     log.exception("hotkey thread: handling message 0x%x failed", msg.message)
         except Exception:  # noqa: BLE001
-            from soundboard import applog
+            from soundboard.core import applog
             applog.report(where="hotkey thread")
         finally:
             self._tid = 0            # `alive` now tells the truth

@@ -866,7 +866,7 @@ def test_callback_keeps_pace_beside_busy_python():
     import sys
     import threading
 
-    from soundboard.app import SWITCH_S
+    from soundboard.core.app import SWITCH_S
     e = engine_with("main", send_stage=True)
     for i in range(3):
         e.play(f"s{i}", (tone(5.0) * 20000).astype(np.int16), 0.5, mode="overlap")

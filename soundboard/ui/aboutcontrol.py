@@ -37,7 +37,8 @@ class AboutControl(Controller):
         """The onion at the rail's foot: where to talk to us. Only those three: What's new
         is the version under the app's name."""
         mw = self.mw
-        from soundboard import __version__, feedback
+        from soundboard import __version__
+        from soundboard.core import feedback
         m = mw.about_menu
         m.clear()
         icons.set_icon(m.addAction(_("Join the Discord"), lambda: self._open_page(

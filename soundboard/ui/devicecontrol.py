@@ -18,7 +18,7 @@ from soundboard import appaudio, directmic, theme
 from soundboard import engine as eng
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard.i18n import _, ngettext
-from soundboard.pollthread import PollThread
+from soundboard.core.pollthread import PollThread
 from soundboard.ui import busy
 from soundboard.ui.controller import Controller
 

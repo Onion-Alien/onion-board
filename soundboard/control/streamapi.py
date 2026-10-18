@@ -36,7 +36,7 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QTimer
 
-from soundboard import usage
+from soundboard.core import usage
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow

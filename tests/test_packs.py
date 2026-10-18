@@ -10,7 +10,7 @@ import zipfile
 
 import pytest
 
-from soundboard import backup, updates
+from soundboard.core import backup, updates
 from soundboard.sounds import packs
 from soundboard.online import net
 from soundboard.ui import packsdialog

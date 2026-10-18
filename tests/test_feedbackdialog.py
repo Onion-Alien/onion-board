@@ -4,7 +4,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from soundboard import __version__, feedback, usage
+from soundboard import __version__
+from soundboard.core import feedback, usage
 from soundboard.ui import busy, feedbackdialog
 
 

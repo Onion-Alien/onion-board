@@ -137,7 +137,7 @@ def test_tor_mode_without_tor_asks_for_another_connection(monkeypatch, app_dir):
 
 def test_get_tor_command_line(served, app_dir, monkeypatch):
     """The installer's box: OnionBoard.exe --get-tor, exit code 0 once Tor is there."""
-    from soundboard import app, applog
+    from soundboard.core import app, applog
     monkeypatch.setattr(app, "APP_DIR", app_dir)
     monkeypatch.setattr(applog, "setup", lambda d: d / "log")
     assert app.get_tor() == 0
@@ -247,7 +247,7 @@ def test_a_tor_from_an_older_app_follows_the_app_update(served, app_dir, monkeyp
     """At start-up an older downloaded Tor is replaced by the one this release names,
     but never while Connection is set to Tor (it's carrying the traffic), and nothing
     is fetched for someone who never got Tor."""
-    from soundboard import app
+    from soundboard.core import app
     from soundboard.online import ffmpegget
     monkeypatch.setattr(ffmpegget, "update_own", lambda: None)
     assert not torget.outdated()

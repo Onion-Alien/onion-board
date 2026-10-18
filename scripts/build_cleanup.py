@@ -1,4 +1,4 @@
-"""Build the cleanup tool (soundboard/cleanup.py) into dist/OnionBoardCleanup.exe: one
+"""Build the cleanup tool (soundboard/core/cleanup.py) into dist/OnionBoardCleanup.exe: one
 file people download from the `cleanup-tool` release to take everything of Onion Board
 off their PC. Like the mic helper it carries only the admin part of the mic effect (no
 Qt, no numpy, no effect DLL: it only ever removes it).
@@ -53,7 +53,7 @@ def build(clean: bool = False) -> int:
     env = {**os.environ, "PATH": os.pathsep.join(
         str(Path(os.environ.get("SystemRoot", r"C:\Windows")) / p)
         for p in ("System32", "", r"System32\Wbem"))}
-    r = subprocess.run([*cmd, str(ROOT / "soundboard" / "cleanup.py")], cwd=ROOT, env=env)
+    r = subprocess.run([*cmd, str(ROOT / "soundboard" / "core" / "cleanup.py")], cwd=ROOT, env=env)
     if r.returncode:
         return r.returncode
     exe = OUT / f"{NAME}.exe"

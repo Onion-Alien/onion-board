@@ -24,7 +24,7 @@ import threading
 
 from PySide6.QtCore import QObject, QTimer, Signal
 
-from soundboard.pollthread import PollThread
+from soundboard.core.pollthread import PollThread
 
 log = logging.getLogger(__name__)
 

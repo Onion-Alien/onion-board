@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import QPoint, Qt, QTimer
 from PySide6.QtWidgets import QDialog, QWidget
 
-from soundboard import tips
+from soundboard.core import tips
 from soundboard.i18n import _
 from soundboard.ui.controller import Controller
 from soundboard.ui.dialogs import TabHelpPopup

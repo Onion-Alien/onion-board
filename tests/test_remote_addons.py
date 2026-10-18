@@ -13,7 +13,7 @@ import pytest
 from PySide6.QtWidgets import QLabel
 
 from conftest import process_events, said
-from soundboard import backup
+from soundboard.core import backup
 from soundboard.control import remote
 from soundboard.addons import modules
 from soundboard.settings import SettingsDialog
@@ -360,7 +360,7 @@ def test_add_ons_card_checks_reinstalls_and_reports(qapp, window,  # noqa: F811
     Update to X when GitHub has a newer one, Reinstall swaps in a fresh copy, and
     Report a problem opens a bug report naming the add-on and its version."""
 
-    from soundboard import feedback
+    from soundboard.core import feedback
     from soundboard.sounds import library
     from soundboard.online import net
     from soundboard.addons import pocketaddon

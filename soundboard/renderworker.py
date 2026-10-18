@@ -206,7 +206,7 @@ def child_main() -> int:
     except library.Cancelled:
         result = ("cancelled", "")
     except BaseException as e:  # noqa: BLE001 - sent back for the app to word
-        from soundboard import errors
+        from soundboard.core import errors
         result = ("err", errors.plain(e))
     try:
         conn.send(result)

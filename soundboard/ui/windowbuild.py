@@ -35,7 +35,8 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from soundboard import backup, destination, engine, otherboards, theme, usage
+from soundboard.core import backup, usage
+from soundboard import destination, engine, otherboards, theme
 from soundboard.online import net
 from soundboard.control import remote
 from soundboard.i18n import _
@@ -421,7 +422,7 @@ class WindowBuilder(Controller):
         mw.urgent_bar.hide()
         rv.addWidget(mw.urgent_bar)
 
-        # "Did you know?": one tip per start (soundboard.tips), with a Show me
+        # "Did you know?": one tip per start (soundboard.core.tips), with a Show me
         mw.tip_bar = QFrame()
         mw.tip_bar.setObjectName("tipbar")
         th = QHBoxLayout(mw.tip_bar)

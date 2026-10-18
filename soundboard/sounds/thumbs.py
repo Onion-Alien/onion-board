@@ -162,7 +162,7 @@ def fetch(url: str) -> QImage:
     """The picture at a link: an image's own address, or a web page (a YouTube video,
     a post…) whose preview picture is taken. Blocks (call it off the UI thread);
     raises LinkError, or net.FeatureOff when links are switched off."""
-    from soundboard import errors
+    from soundboard.core import errors
     from soundboard.online import net, netlog, ytdl
     url = url.strip()
     if url and "://" not in url:

@@ -10,7 +10,7 @@ from test_appspanel import tab as apps_tab  # noqa: F401 - the Apps tab with fak
 from test_mainwindow import window  # noqa: F401 - the real MainWindow, offscreen
 
 from soundboard.sounds import library
-from soundboard import trash
+from soundboard.core import trash
 from soundboard.sounds.library import SoundMeta
 from soundboard.ui.deleted import DeletedDialog
 

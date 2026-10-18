@@ -775,7 +775,7 @@ class PrivacyPage(Page):
 
     def _set_feature(self, key: str, on: bool):
         from soundboard.online import net
-        from soundboard import usage
+        from soundboard.core import usage
         cfg = self.mw.cfg
         was_on = key not in cfg.net_off
         off = [k for k in cfg.net_off if k != key] + ([] if on else [key])
@@ -832,7 +832,7 @@ class PrivacyPage(Page):
         cv.addWidget(remote)
         full = QPushButton(_("Network details"))
         full.setToolTip(_("Opens the full list (SECURITY.md) on GitHub, in your browser"))
-        from soundboard.updates import REPO
+        from soundboard.core.updates import REPO
         full.clicked.connect(lambda: busy.open_url(
             f"https://github.com/{REPO}/blob/main/SECURITY.md#what-the-app-does-on-the-network",
             full, self.dlg))

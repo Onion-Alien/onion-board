@@ -4,7 +4,8 @@ and the Setup tab, the header pill and the setup guide count either as set up.""
 import numpy as np
 import pytest
 
-from soundboard import backup, engine, reset
+from soundboard.core import backup, reset
+from soundboard import engine
 from soundboard.sounds.library import Config
 from soundboard.settings import SettingsDialog
 from soundboard.ui import mainwindow as main

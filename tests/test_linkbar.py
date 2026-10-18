@@ -289,7 +289,7 @@ def test_play_now_goes_before_adds_after_waiting_plays(qapp, monkeypatch):
 
 
 def test_downloads_are_counted_by_site_and_how_they_were_picked(qapp, monkeypatch):
-    from soundboard import usage
+    from soundboard.core import usage
     calls = []
     monkeypatch.setattr(usage, "downloaded", lambda cfg, *a: calls.append(a))
     monkeypatch.setattr(usage, "_used", set())

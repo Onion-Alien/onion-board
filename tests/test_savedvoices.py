@@ -2,7 +2,8 @@
 import json
 import time
 
-from soundboard import backup, savedvoices
+from soundboard.core import backup
+from soundboard import savedvoices
 from soundboard.sounds import library
 from soundboard.savedvoices import Store
 

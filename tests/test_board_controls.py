@@ -13,7 +13,7 @@ from PySide6.QtWidgets import QApplication, QLabel, QPushButton
 from soundboard import voicefx
 
 from soundboard.ui import responsive, toast
-from soundboard import backup
+from soundboard.core import backup
 from soundboard.win import thumbbar
 from soundboard.sounds.library import Config, SoundMeta
 from soundboard.ui.widgets import Pad

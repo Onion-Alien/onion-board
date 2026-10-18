@@ -4,7 +4,8 @@ import time
 
 import pytest
 
-from soundboard import __version__, applog, exitwatch, usage
+from soundboard import __version__
+from soundboard.core import applog, exitwatch, usage
 
 
 @pytest.fixture
@@ -21,7 +22,7 @@ def _native(stack_file=r"D:\Apps\OnionBoard\soundboard\engine.py"):
             "Current thread 0x0000bbbb (most recent call first):\n"
             '  File "PySide6\\QtCore.py", line 3 in exec\n'
             f'  File "{stack_file}", line 1090 in _callback\n'
-            '  File "soundboard\\app.py", line 500 in main\n')
+            '  File "soundboard\\core\\app.py", line 500 in main\n')
 
 
 def test_a_clean_quit_leaves_nothing_to_explain(app_dir):

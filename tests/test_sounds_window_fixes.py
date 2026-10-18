@@ -12,7 +12,8 @@ from conftest import process_events, said
 from PySide6.QtCore import QEvent
 from PySide6.QtWidgets import QMessageBox
 
-from soundboard import backup, engine, errors
+from soundboard.core import backup, errors
+from soundboard import engine
 from soundboard.sounds import library
 from soundboard.control import winkeys
 from soundboard.sounds.library import SR, Config, SoundMeta

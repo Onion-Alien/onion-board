@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 import soundfile as sf
 
-from soundboard import errors
+from soundboard.core import errors
 from soundboard.sounds import library
 from soundboard.win import winpath
 

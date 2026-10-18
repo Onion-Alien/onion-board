@@ -1002,7 +1002,7 @@ def test_a_program_remembered_by_name_only_takes_the_first_folder_seen(tab):
 
 
 def test_forgetting_and_bringing_back_a_second_program_of_a_name(tab, monkeypatch):
-    from soundboard import trash
+    from soundboard.core import trash
     put = []
 
     def fake_put(exe, spec, name, hidden=False, path=""):

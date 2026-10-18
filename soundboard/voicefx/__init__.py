@@ -22,7 +22,7 @@ from collections.abc import Callable
 
 import numpy as np
 
-from soundboard import errors
+from soundboard.core import errors
 
 log = logging.getLogger(__name__)
 

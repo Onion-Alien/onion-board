@@ -11,7 +11,8 @@ import re
 import time
 from typing import TYPE_CHECKING
 
-from soundboard import directmic, michelper, theme, usage
+from soundboard import directmic, michelper, theme
+from soundboard.core import usage
 from soundboard.online import net
 from soundboard import engine as eng
 from soundboard.i18n import _, ngettext

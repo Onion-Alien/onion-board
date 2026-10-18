@@ -21,11 +21,11 @@ from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QPush
 
 from soundboard.sim import chatcheck
 from soundboard import directmic, discordcfg, theme
-from soundboard.pollthread import PollThread
+from soundboard.core.pollthread import PollThread
 from soundboard.ui import busy, fit, icons
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.crashdialog import free_dialog
-from soundboard import errors
+from soundboard.core import errors
 from soundboard.i18n import _
 
 log = logging.getLogger(__name__)

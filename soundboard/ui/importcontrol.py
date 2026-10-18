@@ -23,13 +23,15 @@ from PySide6.QtCore import QFileSystemWatcher, Qt, QTimer, QUrl, QVariantAnimati
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QApplication, QFileDialog, QMenu, QMessageBox
 
-from soundboard import (
+from soundboard.core import (
     backup,
-    bunny,
     errors,
+    usage,
+)
+from soundboard import (
+    bunny,
     otherboards,
     soundfx,
-    usage,
 )
 from soundboard.sounds import (
     catswitch,
@@ -476,7 +478,7 @@ class ImportControl(Controller):
             a.valueChanged.connect(lambda v, pad=pad: pad.hover or pad._on_hover_k(v))
             a.start(QVariantAnimation.DeletionPolicy.DeleteWhenStopped)
 
-    # Export / import: see soundboard/backup.py and docs/BACKUP-FORMAT.md. The file
+    # Export / import: see soundboard/core/backup.py and docs/BACKUP-FORMAT.md. The file
     # work runs on a thread; the result comes back through the bridge.
     @staticmethod
     def _is_package(path: str) -> bool:

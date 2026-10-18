@@ -20,13 +20,13 @@ import offwindows  # noqa: E402
 
 offwindows.install()
 
-# Garbage collection on the main thread only, as in the app (soundboard.uigc): a
+# Garbage collection on the main thread only, as in the app (soundboard.core.uigc): a
 # collection on a test server's or the relay's thread freed a leftover Qt object with
 # a running timer there, and its next tick crashed the worker (access violation).
 # The same for what a finished thread lets go of (its target, often a tab's method).
 import gc  # noqa: E402
 
-from soundboard import uigc  # noqa: E402
+from soundboard.core import uigc  # noqa: E402
 
 gc.disable()
 uigc.hand_threads_to_ui()
@@ -236,7 +236,7 @@ def qapp():
         from soundboard.sounds.library import Config  # text in Qt's plain font, and the
         theme.apply(app, Config().theme)   # ones after a window in the app's
     if not hasattr(app, "_collector"):   # collects while a test spins the event loop
-        from soundboard.uigc import UiCollector
+        from soundboard.core.uigc import UiCollector
         app._collector = UiCollector(parent=app, freeze=False)
     return app
 
@@ -351,13 +351,13 @@ def _never_touch_real_appdata(monkeypatch, tmp_path):
     # modules that took their own copy of APP_DIR at import: app.py's commands set up
     # the log there, and a test of one sent every later test's log lines (and crash
     # reports) into the developer's real onionboard.log
-    for mod in ("soundboard.app", "soundboard.updates"):
+    for mod in ("soundboard.core.app", "soundboard.core.updates"):
         m = sys.modules.get(mod)
         if m is not None and Path(m.APP_DIR).is_relative_to(real):
             monkeypatch.setattr(m, "APP_DIR", tmp_path / "guard" / "app_dir")
-    # ...and a test that first imports soundboard.app in its own body gets the real
+    # ...and a test that first imports soundboard.core.app in its own body gets the real
     # folder (the loop above ran before): applog.setup itself never takes it in a test
-    from soundboard import applog
+    from soundboard.core import applog
     real_setup = applog.setup
 
     def setup(app_dir, *a, **k):
@@ -456,7 +456,7 @@ def _never_count_for_real(monkeypatch):
     events riding on it) would land in the project's real stats. Tests that send one
     point usage.ENDPOINT at their own stand-in server; anything else that slips
     through (a test faking sys.frozen that builds a window) hits a closed local port."""
-    from soundboard import usage
+    from soundboard.core import usage
     monkeypatch.setattr(usage, "ENDPOINT", f"http://127.0.0.1:{closed_port()}/api/v0/count")
 
 
@@ -472,7 +472,7 @@ def _never_touch_real_shortcuts(monkeypatch):
 def _never_update_for_real(monkeypatch, tmp_path):
     """The update check is on by default: no test asks GitHub, downloads an installer
     into %APPDATA% or runs one. Tests fake the parts they exercise."""
-    from soundboard import updates
+    from soundboard.core import updates
 
     def offline(*_a, **_k):
         raise OSError("tests don't go online")
@@ -563,8 +563,8 @@ def _never_look_at_the_real_foreground():
     from soundboard import appaudio, voicesdk
     with pytest.MonkeyPatch.context() as mp:
         mp.setattr(voicesdk, "foreground_process", lambda: (0, ""))
-        # ...nor whether it fills the screen (no tip during a game, soundboard.tips)
-        from soundboard import tips
+        # ...nor whether it fills the screen (no tip during a game, soundboard.core.tips)
+        from soundboard.core import tips
         mp.setattr(tips, "fullscreen_in_front", lambda: False)
         # ...nor which output Windows has as its default (the headphones follow it)
         mp.setattr(appaudio, "default_output_name", lambda: None)
@@ -586,7 +586,7 @@ def _never_touch_real_autostart(monkeypatch):
     """Building a MainWindow re-points an existing "start with Windows" entry at this
     copy of the app; in tests that would rewrite the developer's real Run key. Tests
     that exercise autostart put their own fake winreg in."""
-    from soundboard import autostart
+    from soundboard.core import autostart
     monkeypatch.setattr(autostart, "winreg", None)
 
 
@@ -632,7 +632,7 @@ def _fail_on_swallowed_exceptions(monkeypatch):
     the user would get the crash dialog. Collect them and fail the test instead."""
     import threading
 
-    from soundboard import applog
+    from soundboard.core import applog
     seen = []
     monkeypatch.setattr(sys, "excepthook", lambda t, v, tb: seen.append((t, v, tb)))
     monkeypatch.setattr(threading, "excepthook",

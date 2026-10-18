@@ -124,7 +124,7 @@ class Watcher(QObject):
         self._stop.set()
 
     def _loop(self):
-        from soundboard.tips import fullscreen_in_front
+        from soundboard.core.tips import fullscreen_in_front
         from soundboard.ui import busy
         me = os.getpid()
         admin: dict[int, bool] = {}   # pid -> runs as admin (asked once each)

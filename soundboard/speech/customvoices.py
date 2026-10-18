@@ -40,7 +40,7 @@ import soundfile as sf
 from soundboard.sounds import library
 from soundboard.online import net, netlog
 from soundboard.speech.tts import TTS_RATE, SapiTTS
-from soundboard import errors
+from soundboard.core import errors
 
 log = logging.getLogger(__name__)
 

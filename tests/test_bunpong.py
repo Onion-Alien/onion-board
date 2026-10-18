@@ -10,7 +10,7 @@ from PySide6.QtCore import QPointF, Qt
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QStackedWidget, QVBoxLayout, QWidget
 
-from soundboard import usage
+from soundboard.core import usage
 from soundboard.ui import bunnywidget as bw
 from soundboard.ui import bunpong
 from soundboard.ui.bunnywidget import BunnyWidget

@@ -21,7 +21,8 @@ from PySide6.QtWidgets import (QApplication, QBoxLayout, QFrame, QHBoxLayout, QL
                                QSizePolicy, QSpacerItem, QStyle, QStyleOptionTabWidgetFrame,
                                QTabWidget, QToolButton, QVBoxLayout, QWidget)
 
-from soundboard import theme, usage
+from soundboard import theme
+from soundboard.core import usage
 from soundboard.i18n import _, ngettext
 from soundboard.ui import icons
 from soundboard.ui.panel import keep_focus_off

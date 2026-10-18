@@ -58,7 +58,8 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from soundboard import errors, without_app_blas
+from soundboard.core import errors
+from soundboard import without_app_blas
 from soundboard.online import netlog
 from soundboard.i18n import _
 

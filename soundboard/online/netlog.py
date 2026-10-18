@@ -17,7 +17,7 @@ netlog_keep), when each connection is also added to FILE_NAME in the app's folde
 it ends, and the next start lists them again (see keep()). The file is only read and
 written on one background thread (_io), never on the thread that asked. The list isn't
 written to the app's log (though the log can name a site something failed on, unless "Keep an
-app log" is off: soundboard.applog). Never recorded: proxy passwords, the relay's per-launch
+app log" is off: soundboard.core.applog). Never recorded: proxy passwords, the relay's per-launch
 secret, request headers and bodies. Query values that look like keys or tokens are
 masked (see redact()).
 

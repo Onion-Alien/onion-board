@@ -15,7 +15,7 @@ CHILD = textwrap.dedent("""
     import threading, time
     from PySide6.QtCore import QTimer
     from PySide6.QtWidgets import QApplication, QWidget
-    from soundboard.app import end_process
+    from soundboard.core.app import end_process
 
     app = QApplication([])
     w = QWidget(); w.show()

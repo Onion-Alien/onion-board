@@ -168,7 +168,8 @@ def test_audio_page_picks_input_and_output_through_the_window(window, monkeypatc
 
 
 def test_feedback_and_problem_buttons_only_open_the_browser(window, monkeypatch):  # noqa: F811
-    from soundboard import __version__, feedback
+    from soundboard import __version__
+    from soundboard.core import feedback
     opened = []
     monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
     d = SettingsDialog(window, "about")
@@ -188,7 +189,7 @@ def test_feedback_and_problem_buttons_only_open_the_browser(window, monkeypatch)
 
 
 def test_join_the_discord_comes_first_and_only_opens_the_browser(window, monkeypatch):  # noqa: F811
-    from soundboard import feedback
+    from soundboard.core import feedback
     opened = []
     monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
     d = SettingsDialog(window, "about")
@@ -774,7 +775,7 @@ def test_search_shows_the_look_tab_with_the_words(window, qapp, query, tab,  # n
 def test_switching_count_me_in_off_sends_one_opt_out_first(window, qapp, monkeypatch):  # noqa: F811
     """Count me in on -> off: the anonymous opt-out goes while the count is still
     allowed, and the switch takes hold right after; other switches never send it."""
-    from soundboard import usage
+    from soundboard.core import usage
     calls = []
     monkeypatch.setattr(usage, "opt_out",
                         lambda where: calls.append((where, net.allowed("usage_stats"))))

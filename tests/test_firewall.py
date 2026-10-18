@@ -71,4 +71,4 @@ def test_main_py_hands_the_flag_to_the_cli_without_starting_the_app():
     from pathlib import Path
     src = (Path(__file__).resolve().parent.parent / "main.py").read_text(encoding="utf-8")
     flag_at = src.index('["--firewall-rule"]')
-    assert flag_at < src.index("from soundboard.app import main")
+    assert flag_at < src.index("from soundboard.core.app import main")

@@ -12,7 +12,8 @@ import logging
 import sys
 from typing import TYPE_CHECKING
 
-from soundboard import errors, theme
+from soundboard.core import errors
+from soundboard import theme
 from soundboard.control import remote
 from soundboard.i18n import _
 from soundboard.ui.controller import Controller

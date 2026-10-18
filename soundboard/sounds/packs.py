@@ -25,7 +25,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from soundboard import backup, updates
+from soundboard.core import backup, updates
 from soundboard.sounds import library
 from soundboard.online import net, netlog
 from soundboard.i18n import _
@@ -311,7 +311,7 @@ def _samples(pack: Pack, cancelled: Callable[[], bool] | None) -> list[Sample]:
                               f"{netlog.quoted(pack.name)} to try")
     updates.fetch(pack.preview_url, pack.preview_sha256, zpath, (updates.DOWNLOADS,),
                   PREVIEW_MAX, "pack", pack.preview_size, None, cancelled, feature=FEATURE)
-    from soundboard import backup   # it imports the library's heavier parts
+    from soundboard.core import backup  # it imports the library's heavier parts
     try:
         pkg = backup.read(zpath)
     except backup.BackupError as e:

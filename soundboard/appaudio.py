@@ -36,7 +36,7 @@ else:
     except ImportError:   # the mic helper (soundboard/michelper.py) ships without numpy:
         np = None         # it only uses mic_is_silent(), which never needs it
 
-from soundboard import errors
+from soundboard.core import errors
 from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
@@ -1381,7 +1381,7 @@ class AppCapture:
             self.sink(x)
             return True
         except Exception:  # noqa: BLE001
-            from soundboard import applog
+            from soundboard.core import applog
             applog.report(where=f"sending {self.name}'s audio")
             # surfaces on the Apps tab, which stops the capture and shows this
             self.error = _("Sending this program's sound failed. "

@@ -33,7 +33,7 @@ import numpy as np
 import soxr
 
 from soundboard.speech import protocol
-from soundboard import errors
+from soundboard.core import errors
 
 log = logging.getLogger(__name__)
 

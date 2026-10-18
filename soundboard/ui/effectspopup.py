@@ -17,7 +17,8 @@ from PySide6.QtCore import QEvent, QPoint, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QPushButton,
                                QVBoxLayout, QWidget)
 
-from soundboard import usage, voicefx
+from soundboard.core import usage
+from soundboard import voicefx
 from soundboard.i18n import _
 from soundboard.ui import fit, icons
 from soundboard.ui.backdroprow import _row_slider

@@ -21,9 +21,9 @@ from soundboard.win import winpath
 
 NAME = "starting.txt"
 
-# the installer's mark and the one-off commands: soundboard/installmark.py (main.py
+# the installer's mark and the one-off commands: soundboard/core/installmark.py (main.py
 # reads them before anything else of the app is imported)
-from soundboard.installmark import (  # noqa: E402,F401
+from soundboard.core.installmark import (  # noqa: E402,F401
     INSTALLING, INSTALLING_STALE_S, ONE_OFF, installing)
 
 _VERSION_RE = re.compile(r"[0-9][0-9A-Za-z.\-]{0,20}")

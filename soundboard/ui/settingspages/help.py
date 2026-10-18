@@ -55,7 +55,7 @@ class ProblemsLine(QWidget):
         self.refresh()
 
     def refresh(self):
-        from soundboard import applog
+        from soundboard.core import applog
         n = len(applog.recent())
         self.text.setText(ngettext("Onion Board hit {n} problem since it started.",
                                    "Onion Board hit {n} problems since it started.", n))
@@ -68,7 +68,7 @@ class ProblemsLine(QWidget):
         super().showEvent(e)
 
     def _see(self):
-        from soundboard import applog
+        from soundboard.core import applog
         reps = applog.recent()
         if reps:
             applog.show(reps[-1], self.window())
@@ -107,7 +107,7 @@ class HelpPage(Page):
         """The version (as the title bar shows it), and where the app and its licences
         live."""
         from soundboard.ui.mainwindow import version_text
-        from soundboard.updates import REPO
+        from soundboard.core.updates import REPO
         card, cv = self._card("Onion Board", icon="onion")
         ver = self.dlg.about_version = QLabel(_("Version {version}", version=version_text()))
         ver.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
@@ -129,8 +129,9 @@ class HelpPage(Page):
     def _contact_card(self):
         """Ways to reach the author. All of them only open a page in the browser:
         nothing is sent from the app (feedback.py)."""
-        from soundboard import __version__, feedback
-        from soundboard.updates import REPO
+        from soundboard import __version__
+        from soundboard.core import feedback
+        from soundboard.core.updates import REPO
         card, cv = self._card(_("Get in touch"),
                               _("The Discord is where to chat, ask for help and hear about new "
                                 "versions. The feedback form needs no account. Found a security "
@@ -169,7 +170,7 @@ class HelpPage(Page):
         """A link to the GitHub page's Support section: the ways to donate live there,
         not in the app, so they can change without a release and a copy of the app
         with someone else's details swapped in is easy to spot."""
-        from soundboard.updates import REPO
+        from soundboard.core.updates import REPO
         card, cv = self._card(_("Support Onion Board"),
                               _("Onion Board is free, with no ads and no account. If it made "
                                 "your games or calls more fun, you can chip in. Entirely "

@@ -17,7 +17,8 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QObject
 
-from soundboard import appaudio, errors, usage
+from soundboard import appaudio
+from soundboard.core import errors, usage
 from soundboard.sounds import library
 from soundboard.sounds.clipedit import LiveBuffer
 from soundboard.engine import SR

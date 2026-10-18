@@ -21,7 +21,7 @@ import soundfile as sf
 from conftest import closed_port, process_events
 from fakeproxy import Socks5, no_leaks
 from soundboard.online import net
-from soundboard import updates
+from soundboard.core import updates
 from soundboard.engine import SR
 from test_radio import wav_bytes
 
@@ -219,7 +219,7 @@ def counter(sites, monkeypatch):
     GoatCounter that only the fake proxy / Tor can reach."""
     import sys
 
-    from soundboard import usage
+    from soundboard.core import usage
     sites.routes["/api/v0/count"] = (b"", "")
     monkeypatch.setattr(usage, "ENDPOINT", sites.url("counter", "/api/v0/count"))
     monkeypatch.setattr(usage, "TOKEN", "count-only-key")

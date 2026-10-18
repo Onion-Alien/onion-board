@@ -8,7 +8,8 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QHBoxLayout, QLabel, QPushB
                                QWidget)
 from shiboken6 import isValid as qt_valid
 
-from soundboard import errors, theme, usage
+from soundboard.core import errors, usage
+from soundboard import theme
 from soundboard.online import ytdl
 from soundboard.i18n import _
 from soundboard.ui import busy
@@ -355,7 +356,7 @@ class ConnectionPage(Page):
         return card
 
     def _set_app_log(self, on: bool):
-        from soundboard import applog
+        from soundboard.core import applog
         self.mw.set_option("app_log", on)
         applog.keep(on)
 
@@ -375,7 +376,8 @@ class ConnectionPage(Page):
 
     # ------------------------------------------------------------------ app updates
     def _updates_card(self):
-        from soundboard import __version__, updates
+        from soundboard import __version__
+        from soundboard.core import updates
         hint = (_("This is Onion Board {version}. With the box ticked it asks GitHub whether "
                   "a newer version is out each time it starts and every hour after, and tells "
                   "you (with a banner if it's an important fix). Every update is checked "

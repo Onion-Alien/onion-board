@@ -15,15 +15,15 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import QObject, Qt, QTimer, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QMessageBox, QPushButton, QVBoxLayout
 
-from soundboard import applog
+from soundboard.core import applog
 from soundboard.addons import modules as mods
-from soundboard import langnames
+from soundboard.core import langnames
 from soundboard.online import net, netlog
 from soundboard.speech import translation, winvoices
 from soundboard.ui import busy, icons
 from soundboard.ui.panel import hint_label, icon_button
 from soundboard.ui.voicefxpanel import _enable
-from soundboard import errors
+from soundboard.core import errors
 from soundboard.i18n import _, ngettext
 
 if TYPE_CHECKING:

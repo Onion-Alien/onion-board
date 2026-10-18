@@ -2,7 +2,7 @@
 foreground window, and the board following it."""
 import pytest
 
-from soundboard import backup
+from soundboard.core import backup
 from soundboard.sounds.catswitch import Switcher
 from soundboard.sounds.library import Config, clean_programs
 

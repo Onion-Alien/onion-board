@@ -1,5 +1,5 @@
-"""One download job, one bar that only goes forward (soundboard/jobprogress.py)."""
-from soundboard.jobprogress import FETCHED, LOOKED_UP, JobProgress, batch
+"""One download job, one bar that only goes forward (soundboard/core/jobprogress.py)."""
+from soundboard.core.jobprogress import FETCHED, LOOKED_UP, JobProgress, batch
 
 
 def _run(*payloads) -> list[float]:

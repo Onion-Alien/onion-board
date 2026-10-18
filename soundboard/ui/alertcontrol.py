@@ -11,9 +11,10 @@ import logging
 import time
 from typing import TYPE_CHECKING
 
-from soundboard import appaudio, directmic, discordcfg, rawmic, updates
+from soundboard import appaudio, directmic, discordcfg, rawmic
+from soundboard.core import updates
 from soundboard.i18n import _
-from soundboard.pollthread import PollThread
+from soundboard.core.pollthread import PollThread
 from soundboard.ui import busy
 from soundboard.ui.controller import Controller
 from soundboard.ui.triggerstab import TriggersTab

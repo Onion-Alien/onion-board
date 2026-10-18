@@ -134,7 +134,7 @@ Type: files; Name: "{app}\{#AppExeName}.exe.old*"
 ; In this order, for an app started while the files are replaced (a double-click during
 ; an update): first Python itself (the .dll / .pyd files at the top of _internal and
 ; base_library.zip), so a start gets past the launcher and Python's start-up hooks to
-; main.py's check (soundboard/installmark.py) and quits quietly; then the rest;
+; main.py's check (soundboard/core/installmark.py) and quits quietly; then the rest;
 ; OnionBoard.exe last, after closing any copy running from {app} and moving the old exe
 ; aside (MoveOldExeAside). A copy stuck on the launcher's error box kept the exe open: the
 ; silent update gave up (Abort) and rolled back, leaving no _internal and an app that
@@ -169,7 +169,7 @@ Filename: "{app}\{#AppExeName}.exe"; Parameters: "--set-offline"; \
 Filename: "{app}\{#AppExeName}.exe"; Parameters: "--keep-netlog"; \
   StatusMsg: "Switching on the network activity history..."; \
   Check: KeepNetlogParam; Flags: runhidden waituntilterminated
-; "Count me in" (soundboard/usage.py): unticked, it's switched off before the first
+; "Count me in" (soundboard/core/usage.py): unticked, it's switched off before the first
 ; start; the only thing ever sent is one anonymous "opt-out/installer" (no ID). Ticked on a page the user saw, it's switched on (an
 ; old install had it off); a silent update never switches it on.
 Filename: "{app}\{#AppExeName}.exe"; Parameters: "--usage-count off"; \
@@ -184,7 +184,7 @@ Filename: "{app}\{#AppExeName}.exe"; Parameters: "--usage-count on{code:HeardArg
 ; FFmpeg, live voice and Tor download from CurStepChanged in [Code] (RunExtra), so the
 ; window keeps working and Cancel can stop them.
 Filename: "{app}\{#AppExeName}.exe"; Description: "Open Onion Board now"; Flags: nowait postinstall skipifsilent; BeforeInstall: EndInstallingMark
-; The app's own updater (soundboard/updates.py) runs this silently with /RELAUNCH=1 after
+; The app's own updater (soundboard/core/updates.py) runs this silently with /RELAUNCH=1 after
 ; closing itself: open it again once the new version is in place.
 ; Through Explorer, so the app starts with the user's own environment like a
 ; double-click does: the updater that started setup is a frozen Python app whose
@@ -236,7 +236,7 @@ var
   ImportTop: Integer;          // where the next box goes
   HeardPage: TWizardPage;      // "Where did you hear about Onion Board?": new installs
   HeardRadios: array of TNewRadioButton;
-  HeardKeys: array of String;  // what each one sends (soundboard/usage.py's HEARD)
+  HeardKeys: array of String;  // what each one sends (soundboard/core/usage.py's HEARD)
   HeardOther: TNewEdit;        // Other's own answer
   DiscordLink: TNewStaticText; // the Finished page's "Join the Onion Board Discord"
 
@@ -513,7 +513,7 @@ begin
 end;
 
 // The last page of a new install with Count me in ticked: where they heard about the
-// app, sent once with the first-start count (soundboard/usage.py heard_tag, which
+// app, sent once with the first-start count (soundboard/core/usage.py heard_tag, which
 // drops a typed answer that doesn't look like a name). "Rather not say" is picked.
 procedure CreateHeardPage;
 var
@@ -814,7 +814,7 @@ begin
             FileExists(ExpandConstant('{commonpf64}\WinGet\Links\ffmpeg.exe'));
 end;
 
-// installing.txt beside the exe while the files are replaced (soundboard/bootmark.py
+// installing.txt beside the exe while the files are replaced (soundboard/core/bootmark.py
 // INSTALLING): the app started meanwhile (a double-click mid-update) quits quietly
 // instead of loading half-copied libraries ("Unhandled exception in script", one box per
 // click). Gone before the app is opened again, and whatever way setup ends.
@@ -1027,7 +1027,7 @@ var
   Code, Default: Integer;
 begin
   // Done: one optional question, never in a silent uninstall. Only the browser opens
-  // the page (soundboard/feedback.py's form); nothing is sent unless they submit it.
+  // the page (soundboard/core/feedback.py's form); nothing is sent unless they submit it.
   if (CurUninstallStep = usPostUninstall) and not UninstallSilent then
   begin
     // "--direct-mic remove" above couldn't take it off the mic (Windows' prompt was
@@ -1047,7 +1047,7 @@ begin
   end;
   if CurUninstallStep <> usUninstall then
     exit;
-  // the anonymous usage count's "uninstall/<version>" (soundboard/usage.py): the app
+  // the anonymous usage count's "uninstall/<version>" (soundboard/core/usage.py): the app
   // sends it only if the count is switched on, and gives up after 15 s offline
   Exec(ExpandConstant('{app}\{#AppExeName}.exe'), '--uninstall-count', '', SW_HIDE,
        ewWaitUntilTerminated, Code);

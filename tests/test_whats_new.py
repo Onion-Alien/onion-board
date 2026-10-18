@@ -122,7 +122,7 @@ def test_an_update_never_opens_the_setup_guide_again(qapp, app_dir, monkeypatch)
 
 
 def test_a_first_start_still_gets_the_setup_guide(app_dir):
-    from soundboard import reset
+    from soundboard.core import reset
     assert not reset.is_update(Config(stats_version=""))
     assert not reset.is_update(Config(stats_version=__version__))
     assert reset.is_update(Config(stats_version="2.2.2"))
@@ -150,7 +150,7 @@ def _write(raw: dict):
 
 
 def test_a_small_discord_link_sits_under_the_notes(window):
-    from soundboard import feedback
+    from soundboard.core import feedback
     dlg = whatsnew.WhatsNewDialog(window, whatsnew.NOTES[:1])
     link = dlg.discord_link
     assert f'href="{feedback.DISCORD_URL}"' in link.text()

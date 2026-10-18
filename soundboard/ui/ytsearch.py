@@ -26,7 +26,8 @@ from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequ
 from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QMenu,
                                QPushButton, QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 
-from soundboard import jobprogress, quality, theme, usage
+from soundboard.core import jobprogress, usage
+from soundboard import quality, theme
 from soundboard.online import net, netlog, ytdl
 from soundboard.bunny import H as BUN_H
 from soundboard.bunny import W as BUN_W
@@ -38,7 +39,7 @@ from soundboard.style.owl import OwlWidget
 from soundboard.ui.panel import CardGrid, Flow, HoverCard, RoundedFrame
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.widgets import LoadingBar, fmt_time, paint_now_playing
-from soundboard import errors
+from soundboard.core import errors
 from soundboard.i18n import _, ngettext
 from soundboard.ui.pixels import snap_to_pixels
 

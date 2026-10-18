@@ -10,7 +10,8 @@ from PySide6.QtGui import QKeyEvent
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QDialog
 
-from soundboard import __version__, engine, usage
+from soundboard import __version__, engine
+from soundboard.core import usage
 from soundboard.online import net
 from soundboard.control import winkeys
 from soundboard.sounds.library import Config, SoundMeta

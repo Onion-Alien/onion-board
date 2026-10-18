@@ -17,7 +17,7 @@ import shiboken6
 
 from soundboard.ui import fit, quietbox
 from soundboard.ui.panel import icon_button
-from soundboard.updates import REPO
+from soundboard.core.updates import REPO
 from soundboard.i18n import _
 
 ISSUE_URL = f"https://github.com/{REPO}/issues/new"

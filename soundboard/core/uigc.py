@@ -38,7 +38,7 @@ from collections.abc import Callable
 
 from PySide6.QtCore import QObject, QTimer
 
-from soundboard import overridepin
+from soundboard.core import overridepin
 
 INTERVAL_MS = 100
 YOUNG = 5_000         # new objects before a gen-0 collection (~1 ms each)

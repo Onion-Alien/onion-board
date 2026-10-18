@@ -1,4 +1,4 @@
-"""The anonymous usage count (soundboard/usage.py): on for new installs, off for
+"""The anonymous usage count (soundboard/core/usage.py): on for new installs, off for
 copies from before it existed, off when the installer's box is unticked, never sent
 from source, without a key or while switched off, and it says only what SECURITY.md
 says it does."""
@@ -10,7 +10,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from soundboard import __version__, app, applog, reset, usage
+from soundboard import __version__
+from soundboard.core import app, applog, reset, usage
 from soundboard.sounds import library
 from soundboard.online import net
 from soundboard.sounds.library import Config
@@ -241,7 +242,7 @@ def test_no_opt_out_in_tor_mode(sent, monkeypatch):
 
 
 def test_update_now_fetches_its_own_copy_of_the_installer():
-    from soundboard import updates
+    from soundboard.core import updates
 
     def asset(name, sha):
         return {"name": name, "browser_download_url": updates.DOWNLOADS + "v9/" + name,
@@ -395,14 +396,14 @@ def test_a_freeze_says_where_the_window_was_never_another_thread(tmp_path):
                  "What it was doing\n-----------------\n"
                  '  File "main.py", line 22, in <module>\n'
                  '  File "soundboard\\ui\\mainwindow.py", line 5898, in tick\n'
-                 '  File "soundboard\\threadnames.py", line 70, in named_start\n'
+                 '  File "soundboard\\core\\threadnames.py", line 70, in named_start\n'
                  '  File "threading.py", line 999, in start\n'
                  "\nOther threads\n-------------\n"
                  'Thread "audio" (12):\n'
-                 '  File "soundboard\\threadnames.py", line 68, in named_run\n'
+                 '  File "soundboard\\core\\threadnames.py", line 68, in named_run\n'
                  '  File "soundboard\\engine.py", line 400, in _loop\n'
                  'Thread "x" (13):\n'
-                 '  File "soundboard\\threadnames.py", line 70, in named_start\n',
+                 '  File "soundboard\\core\\threadnames.py", line 70, in named_start\n',
                  encoding="utf-8")
     assert usage._report_event(f) == ("freeze/1.9.20@soundboard/ui/mainwindow.py:5898"
                                       "~threading.start")
@@ -413,7 +414,7 @@ def _freeze(f, lasted, window_cpu, others, inner='  File "threading.py", line 35
                  + (f"Lasted:   {lasted}\n" if lasted else "") + "\n"
                  "What it was doing\n-----------------\n"
                  '  File "D:\\private\\code\\soundboard\\ui\\mainwindow.py", line 50, in tick\n'
-                 '  File "soundboard\\threadnames.py", line 70, in named_start\n'
+                 '  File "soundboard\\core\\threadnames.py", line 70, in named_start\n'
                  '  File "soundboard\\voicesdk.py", line 80, in listen\n' + inner
                  + (f"\nWindow CPU: {window_cpu}%\n" if window_cpu is not None else "")
                  + "\nOther threads\n-------------\n" + others, encoding="utf-8")
@@ -425,7 +426,7 @@ def test_a_freeze_says_its_caller_what_it_waited_in_how_long_and_who_was_busy(tm
     window was working itself, waiting on a busy thread, or everyone was waiting."""
     f = tmp_path / "crash-x.txt"
     hog = ('Thread "radio" (12), 95% CPU:\n'
-           '  File "soundboard\\threadnames.py", line 68, in named_run\n'
+           '  File "soundboard\\core\\threadnames.py", line 68, in named_run\n'
            '  File "soundboard\\online\\radio.py", line 400, in _decode\n'
            'Thread "calm" (13), 0% CPU:\n'
            '  File "soundboard\\engine.py", line 9, in _loop\n')
@@ -454,7 +455,7 @@ def test_a_freeze_says_its_caller_what_it_waited_in_how_long_and_who_was_busy(tm
 
 def test_a_freeze_end_is_noted_without_counting_the_report_again(tmp_path, monkeypatch):
     import os
-    from soundboard import applog
+    from soundboard.core import applog
     monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
     path = applog.save_freeze(5, '  File "soundboard\\engine.py", line 9, in f\n')
     assert usage._report_event(path).endswith("/never-ended")
@@ -538,7 +539,7 @@ def test_a_start_that_never_finished_is_counted_never_the_message(monkeypatch):
     """A run whose breadcrumb was left (bootmark.py) died during start-up: counted as
     startup-failed/<version>, with the native stacks faulthandler caught when there are
     any, or Windows' own error for that process."""
-    from soundboard import exitwatch
+    from soundboard.core import exitwatch
     monkeypatch.setattr(exitwatch, "windows_events", lambda pid: [])
     assert usage.startup_failed("/x", "1.9.28", 42, _NATIVE) == (
         "startup-failed/1.9.28/access-violation@soundboard/engine.py:1090")
@@ -576,7 +577,7 @@ def test_a_handled_problem_is_counted_once_with_our_line_never_the_message():
 
 
 def test_errors_counts_a_reportable_problem_but_not_the_pc_situation(monkeypatch):
-    from soundboard import errors
+    from soundboard.core import errors
     counted = []
     monkeypatch.setattr(usage, "warned", counted.append)
     errors.html(TypeError("boom in our code"))     # a bug: counted, offered a report
@@ -921,7 +922,7 @@ def test_closing_the_window_sends_what_waits_and_saves(window, sent):  # noqa: F
 def test_a_slow_quit_is_out_of_sight_and_no_freeze(window, sent, qapp):  # noqa: F811
     # 2.3.1: a quit taking over 5 s, the window still showing, came in as a freeze
     # stuck in the quit count's wait
-    from soundboard.hangwatch import HangWatch
+    from soundboard.core.hangwatch import HangWatch
     window.show()
     qapp.hangwatch = HangWatch(hang_s=60)
     try:
@@ -999,7 +1000,8 @@ def test_every_name_the_app_counts_is_in_features():
     dropped: catch the typo here."""
     import re
     from pathlib import Path
-    root = Path(usage.__file__).parent
+    import soundboard
+    root = Path(soundboard.__file__).parent
     names = set()
     for f in root.rglob("*.py"):
         names |= set(re.findall(r'usage\.used\("([a-z0-9-]+)"', f.read_text(encoding="utf-8")))
@@ -1023,7 +1025,8 @@ def test_every_name_in_a_used_call_is_in_features():
     and the f-string families' keys."""
     import re
     from pathlib import Path
-    root = Path(usage.__file__).parent
+    import soundboard
+    root = Path(soundboard.__file__).parent
     names = set()
     for f in root.rglob("*.py"):
         for call in re.findall(r'usage\.used\(((?:[^()]|\([^()]*\))*)\)',
@@ -1054,7 +1057,8 @@ def test_voice_tabs_and_recovery_actions_match_the_ui():
 
     from soundboard.ui import audiorecovery
     assert set(audiorecovery.INSTALLS) <= set(usage.RECOVERY)
-    src = (Path(usage.__file__).parent / "ui" / "voicepanel.py").read_text(encoding="utf-8")
+    from soundboard.ui import voicepanel
+    src = Path(voicepanel.__file__).read_text(encoding="utf-8")
     assert set(re.findall(r'self\._section\("([a-z]+)"', src)) == set(usage.VOICE_TABS)
 
 
@@ -1121,7 +1125,8 @@ def test_addon_installs_are_counted_by_a_fixed_name(monkeypatch):
     from pathlib import Path
 
     from soundboard.addons import modules
-    shipped = Path(usage.__file__).parent.parent / "modules"
+    import soundboard
+    shipped = Path(soundboard.__file__).parent.parent / "modules"
     with_steps = {m.id for m in modules.discover([shipped]) if m.install_steps}
     assert with_steps and with_steps <= set(usage.ADDONS)
     seen = []
@@ -1243,7 +1248,8 @@ def test_settings_pages_match_the_dialog():
     """A page added to Settings needs its name in SETTINGS_PAGES, or it's never counted."""
     import re
     from pathlib import Path
-    src = (Path(usage.__file__).parent / "settings.py").read_text(encoding="utf-8")
+    from soundboard import settings
+    src = Path(settings.__file__).read_text(encoding="utf-8")
     start = src.index("        pages = ((")
     block = src[start:src.index("        self.categories = QListWidget()", start)]
     keys = set(re.findall(r'\("([a-z]+)", _\(', block))

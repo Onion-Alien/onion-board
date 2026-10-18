@@ -179,7 +179,7 @@ def test_a_failed_get_ends_the_install_with_its_reason(tmp_path, frozen, monkeyp
 
 
 def test_install_addon_from_the_installer(tmp_path, monkeypatch, capsys):
-    from soundboard import app
+    from soundboard.core import app
     m = service(tmp_path)
     monkeypatch.setattr(app.applog, "setup", lambda d: None)
     monkeypatch.setattr(modules, "discover", lambda dirs=None: [m])

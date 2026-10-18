@@ -1318,7 +1318,7 @@ def test_a_download_shows_its_progress_and_leaves_the_other_cards_free(qapp, mon
     assert not any(busy.is_busy(x) for r in (b, c) for x in (r.btn_play, r.btn_add))
     panel.queued(hits[1].url, "add")
     assert b.btn_add.text() == _("Queued") and busy.is_busy(b.btn_add)
-    from soundboard import jobprogress
+    from soundboard.core import jobprogress
     panel.progress(hits[0].url, 0.42)   # the download's stretch of the one bar
     got = jobprogress.LOOKED_UP + (jobprogress.FETCHED - jobprogress.LOOKED_UP) * 0.42
     assert a.fill == pytest.approx(got) and f"{got * 100:.0f}%" in a.btn_add.text()

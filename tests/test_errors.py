@@ -1,10 +1,10 @@
-"""Other libraries' errors in plain words, reported to us (soundboard.errors)."""
+"""Other libraries' errors in plain words, reported to us (soundboard.core.errors)."""
 from urllib.parse import unquote
 
 import pytest
 from yt_dlp.utils import DownloadError, bug_reports_message
 
-from soundboard import errors
+from soundboard.core import errors
 
 
 def test_yt_dlp_known_errors_are_plain_and_not_for_reporting():
@@ -107,7 +107,7 @@ def test_details_are_scrubbed(monkeypatch):
 def test_the_original_error_is_kept_for_reports_and_the_log(caplog):
     import logging
     e = DownloadError("ERROR: [youtube] dQw4w9WgXcQ: Private video. Use --cookies for it.")
-    with caplog.at_level(logging.INFO, logger="soundboard.errors"):
+    with caplog.at_level(logging.INFO, logger="soundboard.core.errors"):
         p = errors.describe(e)
     assert p.text == "That video is private."
     assert "Private video. Use --cookies for it." in p.detail   # what a report carries

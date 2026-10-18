@@ -10,7 +10,7 @@ from PySide6.QtCore import QObject, QTimer, Qt, Signal
 from PySide6.QtWidgets import QCheckBox, QGridLayout, QHBoxLayout, QLabel, QPushButton, QWidget
 from shiboken6 import isValid as qt_valid
 
-from soundboard import errors
+from soundboard.core import errors
 from soundboard.i18n import _
 from soundboard.ui import busy, icons
 from soundboard.ui.settingspages import Page, _button_row
@@ -155,7 +155,8 @@ class AddonsPage(Page):
                 s.isVisibleTo(card) for s in self.dlg._addon_titles if qt_valid(s)))
 
     def _addon_report(self, btn, what: str):
-        from soundboard import __version__, feedback
+        from soundboard import __version__
+        from soundboard.core import feedback
         busy.open_url(feedback.problem_url(__version__, what), btn,
                       opened=_("✓ Opened in your browser"),
                       failed=_("Couldn't open your browser. The page is"))
@@ -164,7 +165,7 @@ class AddonsPage(Page):
         """Check for updates: asks GitHub on a thread (`latest()` -> offer or None);
         a newer one calls `on_offer(offer)`, else the button says it's up to date."""
         from soundboard.online import net, netlog
-        from soundboard import updates
+        from soundboard.core import updates
         if not net.allowed(feature):
             busy.toast(self.dlg, html.escape(_("Add-on downloads are off (Privacy)")), "warn")
             return
@@ -313,7 +314,7 @@ class AddonsPage(Page):
     # ---- Onion Pocket (the phone remote, soundboard.addons.pocketaddon)
     def _pocket_block(self, grid):
         from soundboard.addons import pocketaddon
-        from soundboard import updates
+        from soundboard.core import updates
         status, b = self._addon_block(grid, "Onion Pocket", _("your pads on your phone"))
         self.dlg.pocket_remove_addons = b["remove"]
         self.dlg.pocket_buttons = b
@@ -653,7 +654,7 @@ class AddonsPage(Page):
         all; then its new card takes this one's place. Optional and quiet: if anything
         fails, the old copy keeps running and the button just says it didn't work."""
         from soundboard.online import net, netlog
-        from soundboard import updates
+        from soundboard.core import updates
         from soundboard.addons import pocketaddon
         mw = self.mw
         lay = card.layout()

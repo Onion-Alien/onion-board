@@ -8,7 +8,7 @@ import pytest
 
 from conftest import own_time
 from soundboard.sounds import library, videos
-from soundboard import reset, trash
+from soundboard.core import reset, trash
 from soundboard.otherboards import resanance, soundux
 from soundboard.sounds.library import Config, SoundMeta
 

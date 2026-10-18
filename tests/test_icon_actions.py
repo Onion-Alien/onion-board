@@ -49,7 +49,7 @@ def test_addons_folder_is_an_icon_button(qapp):
 
 
 def test_crash_report_folder_is_an_icon_button(qapp):
-    from soundboard import applog
+    from soundboard.core import applog
     from soundboard.ui import crashdialog
     dlg = crashdialog.CrashDialog(applog.Report(title="ValueError: x", text="BODY"), None)
     _assert_icon_only_folder(dlg.folder_btn, more=True)

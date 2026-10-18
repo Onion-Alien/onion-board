@@ -20,7 +20,8 @@ from PySide6.QtWidgets import (QAbstractItemView, QComboBox, QHBoxLayout, QLabel
                                QMenu, QPushButton, QStyle, QStyledItemDelegate,
                                QToolTip, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
 
-from soundboard import errors, theme
+from soundboard.core import errors
+from soundboard import theme
 from soundboard.sounds.clipshelf import Clip, Shelf, VoiceClip
 from soundboard.i18n import _, ngettext
 from soundboard.ui import busy, clipeditor, icons

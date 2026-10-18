@@ -29,9 +29,9 @@ from pathlib import Path
 
 from soundboard.addons import modules
 from soundboard.online import net
-from soundboard import updates
+from soundboard.core import updates
 from soundboard.addons.modules import ModuleInfo
-from soundboard import errors
+from soundboard.core import errors
 from soundboard.i18n import _
 
 log = logging.getLogger(__name__)

@@ -49,7 +49,7 @@ def glyph(code: str, own: str) -> str:
 def other_name(code: str) -> str:
     """`code`'s name in the language showing ("German" in English), "" when that's
     its own name anyway."""
-    from soundboard import langnames
+    from soundboard.core import langnames
     name = langnames.name(code)
     if name == code:   # not in the CLDR table: Qt's English name
         from PySide6.QtCore import QLocale
@@ -64,7 +64,7 @@ def _fold(s: str) -> str:
 
 
 def search_words(code: str, own: str) -> str:
-    from soundboard import langnames_data
+    from soundboard.core import langnames_data
     english = langnames_data.NAMES["en"].get(code, "")
     return _fold(" ".join((own, other_name(code), english, code)))
 

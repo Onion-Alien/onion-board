@@ -19,7 +19,7 @@ import tempfile
 from pathlib import Path
 
 from soundboard.online import net
-from soundboard import errors
+from soundboard.core import errors
 
 INSTALL_TIMEOUT_S = 30 * 60      # a slow Windows Update download
 ERROR_CANCELLED = 1223           # the UAC prompt was answered No

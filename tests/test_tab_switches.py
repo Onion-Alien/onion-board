@@ -236,7 +236,7 @@ def test_an_ai_voices_download_that_fails_is_said_not_reported(window, qapp, mon
     import threading
 
     from soundboard.addons import aiaddon
-    from soundboard import applog, updates
+    from soundboard.core import applog, updates
     reported, ran = [], []
 
     def offline(*_a, **_k):
@@ -526,7 +526,7 @@ def test_right_click_hides_a_tab_and_more_tabs_brings_it_back(window, monkeypatc
 
 
 def test_more_tabs_counts_opened_added_and_closed(window, qapp, monkeypatch):
-    from soundboard import usage
+    from soundboard.core import usage
     w = window
     seen = []
     monkeypatch.setattr(usage, "used", seen.append)

@@ -41,7 +41,7 @@ from soundboard.sounds import library, videos
 from soundboard.sounds.library import (AUDIO_EXTS, Config, SoundMeta, clean_fade,
                                        clean_setting, clean_tags, fits_type)
 from soundboard.speech.live import clean_settings as clean_speech_settings
-from soundboard import errors
+from soundboard.core import errors
 from soundboard.i18n import _
 
 log = logging.getLogger(__name__)

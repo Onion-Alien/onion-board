@@ -780,8 +780,9 @@ def test_repo_ships_the_translation_addons_not_downloaded():
 
 def test_every_speak_language_has_a_name_in_every_app_language():
     """langnames_data.py is current: rerun scripts/make_langnames.py when this fails."""
-    from soundboard import i18n, langnames
-    from soundboard.langnames_data import NAMES
+    from soundboard import i18n
+    from soundboard.core import langnames
+    from soundboard.core.langnames_data import NAMES
     apps = {"en"} | {p.stem for p in (ROOT / "assets" / "lang").glob("*.json")}
     assert set(NAMES) == apps
     assert all(set(names) == LANGS and all(names.values()) for names in NAMES.values())

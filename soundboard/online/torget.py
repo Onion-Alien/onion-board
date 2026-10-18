@@ -33,7 +33,7 @@ from pathlib import Path
 
 from soundboard.sounds import library
 from soundboard.online import net
-from soundboard import errors
+from soundboard.core import errors
 from soundboard.i18n import _
 
 log = logging.getLogger(__name__)

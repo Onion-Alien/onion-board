@@ -20,12 +20,14 @@ from PySide6.QtWidgets import (QApplication, QDialog, QMainWindow, QMenu, QMessa
 from soundboard import theme
 from soundboard.online import ytworker
 from soundboard.engine import SR, Engine
-from soundboard import exitwatch
-from soundboard import appaudio, autostart, howl, reset, trash, voicesdk
+from soundboard.core import exitwatch
+from soundboard import appaudio, howl, voicesdk
+from soundboard.core import autostart, reset, trash
 from soundboard.sounds import library
 from soundboard.control import remote
 from soundboard.online import ffmpegget, net, netlog, tor
-from soundboard import profiles, quality, usage
+from soundboard import profiles, quality
+from soundboard.core import usage
 from soundboard.win import shellicon, thumbbar
 from soundboard.addons import watchaddon
 from soundboard.replay import InstantReplay
@@ -104,7 +106,7 @@ if TYPE_CHECKING:
     from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGraphicsOpacityEffect,
                                    QGridLayout, QHBoxLayout, QLabel, QLineEdit, QProgressBar,
                                    QStackedWidget, QVBoxLayout, QWidget)
-    from soundboard import tips
+    from soundboard.core import tips
     from soundboard.ui import moretabs
     from soundboard.ui.appspanel import ElidedLabel
     from soundboard.ui.destpanel import DestPanel, ModeButton
@@ -1242,7 +1244,7 @@ class MainWindow(QMainWindow):
         self._tray_voices.aboutToShow.connect(self._fill_tray_voices)
         menu.addSeparator()
         # the Discord opens in the browser (feedback.py); Send feedback asks first
-        from soundboard import feedback
+        from soundboard.core import feedback
         icons.set_icon(menu.addAction(_("Join the Discord"), lambda: self.aboutctl._open_page(
             feedback.DISCORD_URL)), "speech")
         icons.set_icon(menu.addAction(_("Send feedback"), self.aboutctl.ask_feedback), "edit")
@@ -1322,7 +1324,7 @@ class MainWindow(QMainWindow):
 
     def restart_app(self):
         """Quit and start again (a reset or restore point runs at start-up: see
-        soundboard.reset). The new copy waits for this one to be gone first."""
+        soundboard.core.reset). The new copy waits for this one to be gone first."""
         for w in QApplication.topLevelWidgets():   # Settings, the guide
             if isinstance(w, QDialog) and w.isVisible():
                 w.reject()

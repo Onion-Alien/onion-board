@@ -1,4 +1,4 @@
-"""Export / import (soundboard.backup): a board round-trips through a zip, sound packs
+"""Export / import (soundboard.core.backup): a board round-trips through a zip, sound packs
 and single sound folders import too, and a crafted archive can't write outside the
 library, smuggle in opt-ins or blow up the disk."""
 import json
@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 import soundfile as sf
 
-from soundboard import backup
+from soundboard.core import backup
 from soundboard.sounds import library
 from soundboard.sounds.library import SR, Config, SoundMeta
 

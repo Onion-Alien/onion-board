@@ -1,4 +1,4 @@
-"""Write soundboard/langnames_data.py: the name of every "Speak in" language, in every
+"""Write soundboard/core/langnames_data.py: the name of every "Speak in" language, in every
 app language, from Unicode CLDR (so nobody translates language names by hand).
 
 Run it after adding a translate-xx add-on or an app language (assets/lang/*.json):
@@ -17,7 +17,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 CLDR = "https://cdn.jsdelivr.net/npm/cldr-localenames-full@46.0.0/main/{loc}/{what}.json"
-OUT = ROOT / "soundboard" / "langnames_data.py"
+OUT = ROOT / "soundboard" / "core" / "langnames_data.py"
 
 # app language -> CLDR locale, where they differ
 UI_TO_CLDR = {"zh-CN": "zh", "zh-TW": "zh-Hant", "pt-BR": "pt"}

@@ -30,7 +30,7 @@ def test_off_by_default_and_old_settings_load_without_it():
 
 
 def test_it_stays_on_this_pc_in_a_settings_export():
-    from soundboard import backup
+    from soundboard.core import backup
     assert {"lite_mode", "lite_hint_done"} <= backup.LOCAL_SETTINGS
 
 

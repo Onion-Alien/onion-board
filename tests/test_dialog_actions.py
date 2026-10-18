@@ -5,7 +5,7 @@ from types import SimpleNamespace
 from PySide6.QtCore import QPoint
 from PySide6.QtWidgets import QPushButton
 
-from soundboard import usage
+from soundboard.core import usage
 from soundboard.sounds.library import SoundMeta
 from soundboard.ui import countdialog, feedbackdialog, sourcedialog
 

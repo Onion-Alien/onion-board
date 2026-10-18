@@ -31,14 +31,15 @@ from PySide6.QtWidgets import (QBoxLayout, QHBoxLayout, QLabel, QMessageBox, QPr
 
 from soundboard.addons import modules, watchaddon
 from soundboard.online import net, netlog
-from soundboard import theme, updates, usage
+from soundboard import theme
+from soundboard.core import updates, usage
 from soundboard.i18n import _, ngettext
 from soundboard.ui import art, busy, icons, lite
 from soundboard.style.owl import OwlWidget
 from soundboard.ui.panel import Flow, HoverCard, ShownStack, hint_label
 from soundboard.ui.widgets import LoadingBar
 from soundboard.ui.logoduel import LogoDuel
-from soundboard import errors
+from soundboard.core import errors
 
 log = logging.getLogger(__name__)
 

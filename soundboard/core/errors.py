@@ -79,7 +79,7 @@ def _short(text: str, n: int = 160) -> str:
 
 def _scrub(text: str) -> str:
     try:
-        from soundboard.applog import scrub
+        from soundboard.core.applog import scrub
         return scrub(text)
     except Exception:  # noqa: BLE001 - a report without scrubbing is still not sent
         return text
@@ -335,7 +335,7 @@ def report_url(p: Problem, where: str = "") -> str:
     """A new issue on this app's GitHub, filled in with the version and the problem.
     The user sees it in the browser and decides what to send."""
     from soundboard import __version__
-    from soundboard.feedback import ISSUE_URL
+    from soundboard.core.feedback import ISSUE_URL
     title = f"Problem: {where}" if where else "Problem: " + _short(p.text, 70)
     body = (f"**Onion Board version:** {__version__}\n"
             + _extra_versions(p.detail)
@@ -380,7 +380,7 @@ def _count(p: Problem, e) -> None:
     if not p.reportable:
         return
     try:
-        from soundboard import usage
+        from soundboard.core import usage
         usage.warned(e)
     except Exception:  # noqa: BLE001 - counting must never raise in a warning
         log.debug("couldn't count the problem", exc_info=True)

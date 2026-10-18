@@ -16,7 +16,8 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import QApplication, QMessageBox
 
-from soundboard import directmic, errors, michelper, theme, usage, voicesdk
+from soundboard import directmic, michelper, theme, voicesdk
+from soundboard.core import errors, usage
 from soundboard.online import net
 from soundboard import engine as eng
 from soundboard.i18n import _

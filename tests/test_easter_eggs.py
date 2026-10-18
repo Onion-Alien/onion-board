@@ -7,7 +7,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QHBoxLayout, QWidget
 
-from soundboard import usage
+from soundboard.core import usage
 from soundboard.ui import bunnywidget as bw
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.logowidget import LogoWidget

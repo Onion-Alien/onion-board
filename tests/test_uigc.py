@@ -1,11 +1,11 @@
-"""Garbage collection runs on the UI thread only (soundboard.uigc)."""
+"""Garbage collection runs on the UI thread only (soundboard.core.uigc)."""
 import gc
 import threading
 import weakref
 
 from PySide6.QtCore import QObject, QTimer
 
-from soundboard import uigc
+from soundboard.core import uigc
 
 
 def dropped_cycle():

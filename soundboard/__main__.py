@@ -1,4 +1,4 @@
 """`python -m soundboard`"""
-from soundboard.app import main
+from soundboard.core.app import main
 
 main()

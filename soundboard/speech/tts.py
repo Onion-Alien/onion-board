@@ -31,7 +31,7 @@ from collections.abc import Callable
 import numpy as np
 import soundfile as sf
 
-from soundboard import errors
+from soundboard.core import errors
 
 log = logging.getLogger(__name__)
 

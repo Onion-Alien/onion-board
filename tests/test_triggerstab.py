@@ -11,7 +11,7 @@ import pytest
 from conftest import process_events
 from test_triggers_module import make_module, zip_of
 
-from soundboard import updates
+from soundboard.core import updates
 from soundboard.addons import watchaddon
 from soundboard.sounds.library import SoundMeta
 from soundboard.ui import triggershost

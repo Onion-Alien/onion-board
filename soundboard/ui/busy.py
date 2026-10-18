@@ -23,7 +23,7 @@ from PySide6.QtGui import QDesktopServices, QIcon, QKeyEvent
 from PySide6.QtWidgets import QApplication, QWidget
 from shiboken6 import isValid as qt_valid
 
-from soundboard import errors
+from soundboard.core import errors
 from soundboard.i18n import _
 from soundboard.ui import toast as toastmod
 

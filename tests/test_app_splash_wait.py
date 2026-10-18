@@ -2,7 +2,7 @@
 import threading
 import time
 
-from soundboard import app as sbapp
+from soundboard.core import app as sbapp
 
 
 class FakeApp:

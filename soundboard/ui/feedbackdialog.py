@@ -14,7 +14,8 @@ from PySide6.QtWidgets import (QCheckBox, QDialog, QHBoxLayout, QLabel, QLineEdi
                                QPushButton, QSizePolicy, QStackedWidget, QVBoxLayout, QWidget)
 import shiboken6
 
-from soundboard import __version__, feedback, usage
+from soundboard import __version__
+from soundboard.core import feedback, usage
 from soundboard.i18n import _
 from soundboard.ui import busy, fit, icons
 

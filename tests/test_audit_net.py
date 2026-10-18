@@ -15,7 +15,7 @@ import pytest
 
 from fakeproxy import Socks5
 from soundboard.online import net, tor, torget
-from soundboard import updates
+from soundboard.core import updates
 from test_tor import FakeTor, _wait, fake_tor  # noqa: F401 - fake_tor is a fixture
 from test_torget import Response, make_tarball, served  # noqa: F401 - served is a fixture
 

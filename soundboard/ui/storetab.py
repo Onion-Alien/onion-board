@@ -18,13 +18,14 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QFileDialog, QGrid
                                QHBoxLayout, QLabel, QLineEdit, QMenu, QPushButton, QScrollArea,
                                QSizePolicy, QStackedWidget, QVBoxLayout, QWidget)
 
-from soundboard import errors, usage, wheelguard
+from soundboard.core import errors, usage
+from soundboard import wheelguard
 from soundboard.sounds import library
 from soundboard.online import net, store
 from soundboard.engine import SR
 from soundboard.i18n import _
 from soundboard.ui import busy, fit, icons, storelook
-from soundboard.trash import ago
+from soundboard.core.trash import ago
 from soundboard.ui.panel import HoverCard, hint_label, icon_button, section_label
 from soundboard.ui.ytsearch import ClampLabel
 

@@ -80,7 +80,7 @@ else:
         np = None         # it only runs the admin part, which never needs it
 
 from soundboard.i18n import _
-from soundboard.pollthread import PollThread
+from soundboard.core.pollthread import PollThread
 
 log = logging.getLogger(__name__)
 

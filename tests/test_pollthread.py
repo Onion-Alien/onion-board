@@ -2,7 +2,7 @@
 thread each time (the UI thread waited in Thread.start: 2.0.4's freezes)."""
 import threading
 
-from soundboard.pollthread import PollThread
+from soundboard.core.pollthread import PollThread
 
 
 def test_every_job_runs_in_order_on_one_thread():

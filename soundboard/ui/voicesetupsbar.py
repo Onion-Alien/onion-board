@@ -12,7 +12,8 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QInputDialog, QLabel, QMenu, QPushButton,
                                QVBoxLayout, QWidget)
 
-from soundboard import usage, voicesetups
+from soundboard.core import usage
+from soundboard import voicesetups
 from soundboard.i18n import _
 from soundboard.ui import icons
 from soundboard.ui.panel import Flow

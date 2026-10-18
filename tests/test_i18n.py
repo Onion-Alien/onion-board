@@ -253,14 +253,14 @@ def test_modules_imported_before_the_language_is_picked_translate_on_use():
     import sys
     from pathlib import Path
     root = Path(__file__).resolve().parent.parent
-    tree = ast.parse((root / "soundboard" / "app.py").read_text(encoding="utf-8"))
+    tree = ast.parse((root / "soundboard" / "core" / "app.py").read_text(encoding="utf-8"))
     main = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "main")
     startup = next(n.lineno for n in ast.walk(main) if isinstance(n, ast.Call)
                    and isinstance(n.func, ast.Attribute) and n.func.attr == "startup")
     early = [n for n in tree.body if isinstance(n, (ast.Import, ast.ImportFrom))]
     early += [n for n in ast.walk(main) if isinstance(n, (ast.Import, ast.ImportFrom))
               and n.lineno < startup]
-    wanted = {"soundboard.app"}
+    wanted = {"soundboard.core.app"}
     for n in early:
         if isinstance(n, ast.Import):
             wanted.update(a.name for a in n.names)
@@ -280,7 +280,8 @@ def test_modules_imported_before_the_language_is_picked_translate_on_use():
                          cwd=root, env=env, timeout=120)
     assert out.returncode == 0, out.stderr
     mods = out.stdout.split()
-    assert "soundboard.sounds.library" in mods and "soundboard.errors" in mods   # it found them
+    # it found them
+    assert "soundboard.sounds.library" in mods and "soundboard.core.errors" in mods
     bad = {}
     for name in mods:
         path = root / Path(*name.split("."))

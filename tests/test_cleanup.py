@@ -1,4 +1,4 @@
-"""The cleanup tool (soundboard/cleanup.py): it removes only Onion Board's own things,
+"""The cleanup tool (soundboard/core/cleanup.py): it removes only Onion Board's own things,
 keeps the user's sounds unless asked, and never drops the mic notes while the effect
 is still on a mic."""
 from __future__ import annotations
@@ -10,7 +10,8 @@ import pytest
 pytestmark = pytest.mark.skipif(sys.platform != "win32", reason="Windows only")
 
 if sys.platform == "win32":
-    from soundboard import cleanup, directmic as dm, michelper
+    from soundboard.core import cleanup
+    from soundboard import directmic as dm, michelper
 
 
 def _app(d):

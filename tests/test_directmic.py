@@ -1340,7 +1340,7 @@ def _feed_beside_busy_ui(ring_file, taker, seconds, poll_every=None):
     feed thread looks that often instead (how it was: every 2 ms)."""
     import sys
 
-    from soundboard.app import SWITCH_S
+    from soundboard.core.app import SWITCH_S
     block, block_s = dm.BLOCK, dm.BLOCK / dm.RATE
     seen = {}   # block number -> when the board took it
 
@@ -2552,7 +2552,7 @@ def test_why_a_set_up_failed_is_counted_as_its_word(window, monkeypatch, auto, c
                                                     counted):
     """The worker's install() result carries the word; the window counts it for a click
     and for the fix-by-itself (the signal in between hands over a plain str)."""
-    from soundboard import usage
+    from soundboard.core import usage
     w = window
     _routes(w, monkeypatch, "missing")
     monkeypatch.setattr(usage, "enabled", lambda: True)
@@ -3747,7 +3747,7 @@ def test_no_such_mic_says_why_as_a_fixed_word(monkeypatch, picked, why):
 
 
 def test_every_fail_word_is_counted():
-    from soundboard import usage
+    from soundboard.core import usage
     assert set(dm.FAIL_KINDS) == set(usage.MIC_FAILS)
 
 
