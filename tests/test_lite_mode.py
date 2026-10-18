@@ -18,17 +18,6 @@ def lite_off():
     lite.set_on(False)
 
 
-@pytest.fixture
-def win(window):  # noqa: F811
-    """The window, its saved settings back to lite mode off afterwards (the next test's
-    window loads them)."""
-    yield window
-    window._save_timer.stop()
-    window.cfg.lite_mode = window.cfg.lite_hint_done = False
-    window.cfg.theme_texture = True
-    window.cfg.save()
-
-
 # ------------------------------------------------------------------ the setting
 
 def test_off_by_default_and_old_settings_load_without_it():
@@ -67,8 +56,7 @@ def test_slow_pc():
 
 # ------------------------------------------------------------------ Settings
 
-def test_settings_switch_applies_at_once_and_keeps_textured(win, qapp):
-    window = win
+def test_settings_switch_applies_at_once_and_keeps_textured(window, qapp):  # noqa: F811
     window.themectl.apply_theme("Amber Terminal")
     assert window.cfg.theme_texture and theme.textures_on
     d = SettingsDialog(window, "appearance")
@@ -88,8 +76,7 @@ def test_settings_switch_applies_at_once_and_keeps_textured(win, qapp):
     d.close()
 
 
-def test_a_slower_pc_is_told_once_and_never_switched_on_by_itself(win, monkeypatch):
-    window = win
+def test_a_slower_pc_is_told_once_and_never_switched_on_by_itself(window, monkeypatch):  # noqa: F811
     monkeypatch.setattr(lite, "slow_pc", lambda: True)
     window.cfg.setup_done = True
     window.cfg.lite_mode = window.cfg.lite_hint_done = False
@@ -105,8 +92,7 @@ def test_a_slower_pc_is_told_once_and_never_switched_on_by_itself(win, monkeypat
     assert window.cfg.lite_mode and lite.on()
 
 
-def test_a_fast_pc_is_not_told(win, monkeypatch):
-    window = win
+def test_a_fast_pc_is_not_told(window, monkeypatch):  # noqa: F811
     monkeypatch.setattr(lite, "slow_pc", lambda: False)
     window.cfg.setup_done = True
     window.cfg.lite_hint_done = False

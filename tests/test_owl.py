@@ -370,7 +370,6 @@ def test_the_triggers_tabs_hoot_rests_after_30_s():
     assert "rest_after_s=lite.rest_s(HOOT_REST_S)" in inspect.getsource(triggerstab)
 
 
-
 def test_his_kept_shapes_are_the_ones_built_fresh(qapp):
     """His outline, tufts, wings and face mask are built once and kept: the same
     shapes as building them again."""
