@@ -1,5 +1,5 @@
 """A stand-in for tor.exe in tests: reads the torrc it's given, writes its control port
-and cookie where the torrc says, and answers the few control commands soundboard.tor
+and cookie where the torrc says, and answers the few control commands soundboard.online.tor
 sends. How it behaves comes from FAKETOR_MODE:
 
   ok     bootstraps 0 -> 100% over a few polls

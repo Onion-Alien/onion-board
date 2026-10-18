@@ -7,7 +7,8 @@ from conftest import process_events
 from PySide6.QtCore import QEvent, QPoint, Qt
 from PySide6.QtTest import QTest
 
-from soundboard import __version__, engine, net, usage
+from soundboard import __version__, engine, usage
+from soundboard.online import net
 from soundboard.control import winkeys
 from soundboard.library import Config, SoundMeta
 from soundboard.ui import coach, firsttour, tabtours
@@ -304,7 +305,7 @@ def test_not_nows_far_apart_keep_them_on(window, qapp):
 def test_the_page_red_card_speaks_and_its_try_again_carries_on(window, qapp, monkeypatch):
     """The store's own red card is up: the tour's card steps aside (one message), and
     the page's Try again carries the tour on."""
-    from soundboard import store
+    from soundboard.online import store
     assert open_tab(window, qapp, "store")
     tour = tabtours._current
     tab = window.store

@@ -223,7 +223,7 @@ def test_the_rail_keeps_up_with_the_tabs(qapp, win, monkeypatch):
     highlight colour change, a tab switched off / on / swapped, offline mode, Ctrl+Tab."""
     from PySide6.QtTest import QTest
 
-    from soundboard import net
+    from soundboard.online import net
     tabs, rail = win.tabs, win.rail
     win.show()
 

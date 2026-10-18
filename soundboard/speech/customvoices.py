@@ -37,7 +37,8 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
-from soundboard import library, net, netlog
+from soundboard import library
+from soundboard.online import net, netlog
 from soundboard.speech.tts import TTS_RATE, SapiTTS
 from soundboard import errors
 

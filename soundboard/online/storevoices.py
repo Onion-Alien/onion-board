@@ -26,7 +26,8 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
-from soundboard import netlog, savedvoices, store, voicefx, voicesetups
+from soundboard.online import netlog, store
+from soundboard import savedvoices, voicefx, voicesetups
 from soundboard.i18n import _
 from soundboard.speech import aivoicelist as avl
 

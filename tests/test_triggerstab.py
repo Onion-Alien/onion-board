@@ -792,7 +792,7 @@ def test_addon_download_keeps_focus(qapp, tmp_path, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
 
-    from soundboard import net
+    from soundboard.online import net
     from soundboard.ui import busy, triggerstab
     monkeypatch.setattr(net, "allowed", lambda key: True)
     tab = TriggersTab(FakeHost(), [tmp_path / "modules"])

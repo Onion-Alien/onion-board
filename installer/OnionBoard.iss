@@ -20,14 +20,14 @@
 ;       * live voice-to-speech's set-up (its module itself always ships, like the
 ;         other add-on modules in ..\modules but ai-voices): OnionBoard.exe
 ;         --install-addon live-voice, which gets the add-on a Python of its own
-;         (soundboard/pyget.py) when the PC has no good one
+;         (soundboard/online/pyget.py) when the PC has no good one
 ;       * Tor, unticked: the installer doesn't carry it. A ticked box runs
 ;         OnionBoard.exe --get-tor, which downloads the Tor Project's Expert Bundle
-;         (soundboard/torget.py: SHA-256 pinned, the saved proxy used) into
+;         (soundboard/online/torget.py: SHA-256 pinned, the saved proxy used) into
 ;         %APPDATA%\OnionBoard\tor\bin (Settings > Connection's "Get Tor" button does
 ;         the same). A failed download says so and leaves the app working without it
 ;       * Keep a history of network activity, unticked: runs OnionBoard.exe
-;         --keep-netlog (config netlog_keep; soundboard/netlog.py keep())
+;         --keep-netlog (config netlog_keep; soundboard/online/netlog.py keep())
 ;       * a Desktop shortcut
 ;   - a "Bring your sounds over" page (ImportPage in [Code]), only when another
 ;     soundboard's board is on this PC: Soundpad's %APPDATA%\Leppsoft\soundlist.spl,
@@ -1172,7 +1172,7 @@ end;
 
 // The live voice box: the app sets the add-on up itself (OnionBoard.exe --install-addon,
 // the same as the Voice tab's Install button), getting a Python of its own into the
-// add-on's folder first when the PC has no good one (soundboard/pyget.py).
+// add-on's folder first when the PC has no good one (soundboard/online/pyget.py).
 procedure GetLiveVoice;
 var
   Code: Integer;

@@ -294,7 +294,7 @@ class PrivacyPage(Page):
         """The FFmpeg row: whether it works, how far its download is, and Reinstall /
         Get FFmpeg / Fix it. It shows the main window's state (FfmpegControl.news
         calls this), so it and the bar always agree."""
-        from soundboard import ffmpegget
+        from soundboard.online import ffmpegget
         self._video_hint_sync()
         button = getattr(self.dlg, "btn_ffmpeg", None)
         if button is None or not qt_valid(button):
@@ -348,7 +348,7 @@ class PrivacyPage(Page):
 
     def _video_hint_sync(self):
         """Data & quality's "Also save the video" hint says what FFmpeg changes."""
-        from soundboard import ffmpegget
+        from soundboard.online import ffmpegget
         hint = getattr(self.dlg, "_save_video_hint", None)
         h = ffmpegget.last()
         if hint is None or not qt_valid(hint) or h is None:
@@ -398,7 +398,7 @@ class PrivacyPage(Page):
         """yt-dlp, the JavaScript engine and Tor (only once it's here). Their versions
         are looked up on workers (_helpers_refresh); the buttons run the Connection
         page's jobs (ConnectionPage._ytdlp_run, _tor_get)."""
-        from soundboard import torget, ytdl
+        from soundboard.online import torget, ytdl
         d = self.dlg
         d._ytdlp_msg = d._tor_msg = ""
         left = Qt.AlignmentFlag.AlignLeft   # buttons sit left
@@ -459,7 +459,7 @@ class PrivacyPage(Page):
     def _ytdlp_force_ask(self):
         """Force update's warning: the newest yt-dlp isn't approved yet. Install anyway
         runs ytdl.force_newest like Update now runs ytdl.update."""
-        from soundboard import ytdl
+        from soundboard.online import ytdl
         from soundboard.ui import fit
         d = self.dlg
         if any(busy.is_busy(b) for b in d.connection._ytdlp_buttons()):
@@ -534,7 +534,7 @@ class PrivacyPage(Page):
     def _files_now() -> dict:
         """yt-dlp's version, and Tor's: (version, a newer one is ready), None if it isn't
         here. Worker thread."""
-        from soundboard import tor, torget, ytdl
+        from soundboard.online import tor, torget, ytdl
         found: dict = {"ytdlp": ytdl.active_version(), "tor": None}
         if tor.available():
             where = tor.bundle_dir()
@@ -548,12 +548,12 @@ class PrivacyPage(Page):
     @staticmethod
     def _engine_now() -> dict:
         """The JavaScript engine yt-dlp gets, or None. Worker thread."""
-        from soundboard import jsengine
+        from soundboard.online import jsengine
         engines = jsengine.picked()
         return {"js": engines[0] if engines else None}
 
     def _helpers_show(self, found: dict):
-        from soundboard import jsengine, net, torget
+        from soundboard.online import jsengine, net, torget
         d = self.dlg
         state = getattr(d, "ytdlp_state", None)
         if state is None or not qt_valid(state):
@@ -608,7 +608,7 @@ class PrivacyPage(Page):
 
     def _helpers_offline(self):
         """Offline mode: the buttons that would go online are hidden."""
-        from soundboard import net
+        from soundboard.online import net
         tor = getattr(self.dlg, "tor_row_btn", None)
         for b in (*getattr(self.dlg, "ytdlp_btns", ()), tor):
             if b is not None and qt_valid(b):
@@ -641,7 +641,7 @@ class PrivacyPage(Page):
     def _get_ffmpeg(self):
         """Get FFmpeg, fix it or reinstall it (MainWindow.fix_ffmpeg_clicked: on a worker,
         winget then the app's own download)."""
-        from soundboard import ffmpegget
+        from soundboard.online import ffmpegget
         h = ffmpegget.last()
         self.mw.fix_ffmpeg_clicked(self.dlg.btn_ffmpeg,
                                    force=h is not None and h.state == ffmpegget.OK)
@@ -664,10 +664,10 @@ class PrivacyPage(Page):
         return eye
 
     def _switches_card(self, v=None):
-        """Every feature that goes online, each with its own switch (soundboard.net
+        """Every feature that goes online, each with its own switch (soundboard.online.net
         enforces them: off means no connection at all, in any Connection mode), and
         Offline mode over all of them."""
-        from soundboard import net
+        from soundboard.online import net
         cfg = self.mw.cfg
         card, cv = self._card(
             _("What goes online"),
@@ -737,7 +737,7 @@ class PrivacyPage(Page):
 
     def _net_sub_options(self, key: str, sl):
         """The options that belong to one switch, indented under it."""
-        from soundboard import net
+        from soundboard.online import net
         cfg = self.mw.cfg
         if key == "sounds_web":
             row = QGridLayout()
@@ -773,7 +773,8 @@ class PrivacyPage(Page):
             sl.addWidget(go, 0, Qt.AlignmentFlag.AlignLeft)
 
     def _set_feature(self, key: str, on: bool):
-        from soundboard import net, usage
+        from soundboard.online import net
+        from soundboard import usage
         cfg = self.mw.cfg
         was_on = key not in cfg.net_off
         off = [k for k in cfg.net_off if k != key] + ([] if on else [key])
@@ -792,7 +793,7 @@ class PrivacyPage(Page):
     def _opt_out_wait(self, t, cfg, dlg):
         """The switch takes hold even when Settings closed meanwhile; only the page
         that's still open shows it."""
-        from soundboard import net
+        from soundboard.online import net
         if t.is_alive():
             QTimer.singleShot(100, lambda: self._opt_out_wait(t, cfg, dlg))
             return
@@ -801,7 +802,7 @@ class PrivacyPage(Page):
             dlg.connection._net_sync()
 
     def _set_offline(self, on: bool):
-        from soundboard import net
+        from soundboard.online import net
         cfg = self.mw.cfg
         self.mw.set_option("net_offline", on)
         net.configure_features(cfg.net_off, cfg.net_offline)
@@ -852,7 +853,7 @@ class PrivacyPage(Page):
 
     @staticmethod
     def _offline_says(online_only) -> bool:
-        from soundboard import net
+        from soundboard.online import net
         return net.offline() and online_only()
 
     @staticmethod
@@ -866,7 +867,7 @@ class PrivacyPage(Page):
 
     def _offline_sync(self):
         """Offline mode on or off: its pages, cards and tab boxes follow."""
-        from soundboard import net
+        from soundboard.online import net
         offline = net.offline()
         self._helpers_offline()
         for card, online_only in list(getattr(self.dlg, "_offline_cards", {}).items()):

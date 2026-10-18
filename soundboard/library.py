@@ -165,8 +165,8 @@ VOLUME_MAX = 10.0             # the mixer's volume boxes take up to 1000 %
 PAD_WIDTH_RANGE = (110, 240)  # the Sounds tab's pad-size slider
 # settings shown on a control with a fixed range: a value from a hand-edited config or
 # someone's backup is brought into it (Qt raises OverflowError on one past an int)
-NET_MODES = ("direct", "proxy", "tor")   # soundboard.net.MODES
-TOR_BRIDGES = ("", "snowflake", "obfs4")   # soundboard.tor.BRIDGES
+NET_MODES = ("direct", "proxy", "tor")   # soundboard.online.net.MODES
+TOR_BRIDGES = ("", "snowflake", "obfs4")   # soundboard.online.tor.BRIDGES
 # where what others hear goes (Config.route; Setup -> Devices -> Send my sounds to):
 #   cable  - a virtual cable, whose other end Discord / the game uses as its mic
 #   device - any output picked by hand (Voicemeeter, a mixer, a second sound card, a
@@ -462,7 +462,7 @@ class Config:
     # Settings > Tabs: the tabs switched off ("radio", "apps", "triggers", "voice"), gone
     # from the window and never built (a new user starts with BASIC_TABS_OFF)
     tabs_off: list[str] = field(default_factory=list)
-    # the Store tab's random id for this install (soundboard.store: one vote per sound);
+    # the Store tab's random id for this install (soundboard.online.store: one vote per sound);
     # "" until the store is first used
     store_id: str = ""
     # the Chat tab's rules version this user accepted, from 2.3.0 and 2.3.1 (the tab is gone
@@ -569,15 +569,15 @@ class Config:
     # "remote" add-ons' own settings (soundboard.ui.remotehost), by add-on id: Onion
     # Pocket's on / off, port and key
     remote_addons: dict = field(default_factory=dict)
-    # Settings > Connection (soundboard.net): "direct", "proxy" through
-    # net_proxy (socks5h://host:port or http://host:port), or "tor" (soundboard.tor)
+    # Settings > Connection (soundboard.online.net): "direct", "proxy" through
+    # net_proxy (socks5h://host:port or http://host:port), or "tor" (soundboard.online.tor)
     net_mode: str = "direct"
     net_proxy: str = ""
-    # Settings > Privacy & security, the switches (soundboard.net.FEATURES): the
+    # Settings > Privacy & security, the switches (soundboard.online.net.FEATURES): the
     # features switched off (opt-out: everything's on by default), and Offline mode
     net_off: list[str] = field(default_factory=list)
     net_offline: bool = False
-    # Network activity's "Keep a history" (soundboard.netlog.keep): off = memory only
+    # Network activity's "Keep a history" (soundboard.online.netlog.keep): off = memory only
     netlog_keep: bool = False
     # "Keep an app log" (soundboard.applog.keep): off = onionboard.log isn't written
     app_log: bool = True

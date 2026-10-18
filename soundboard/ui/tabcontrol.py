@@ -13,7 +13,8 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import QSignalBlocker, Qt, QTimer
 from PySide6.QtWidgets import QMenu
 
-from soundboard import net, usage
+from soundboard.online import net
+from soundboard import usage
 from soundboard.i18n import _
 from soundboard.ui import icons, taboff
 from soundboard.ui.appspanel import AppsTab

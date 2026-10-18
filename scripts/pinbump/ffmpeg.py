@@ -1,4 +1,4 @@
-"""Bump soundboard/ffmpegget.py to the newest FFmpeg essentials build from gyan.dev,
+"""Bump soundboard/online/ffmpegget.py to the newest FFmpeg essentials build from gyan.dev,
 once the builder's published SHA-256, GitHub's digest of the GyanD/codexffmpeg release
 file and the bytes from every source in URLS all agree, and its ffmpeg and ffprobe
 encode and read back a second of MP3 and M4A. See common.py.
@@ -21,7 +21,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import common  # noqa: E402
 
-SRC = common.ROOT / "soundboard" / "ffmpegget.py"
+SRC = common.ROOT / "soundboard" / "online" / "ffmpegget.py"
 NEWEST = "https://www.gyan.dev/ffmpeg/builds/release-version"
 SHA_URL = "https://www.gyan.dev/ffmpeg/builds/packages/{zip}.sha256"
 REPO = "GyanD/codexffmpeg"
@@ -126,7 +126,7 @@ def main() -> int:
             common.open_pr(
                 "ffmpeg", new, [SRC], f"FFmpeg: pin the essentials build to {new}",
                 f"Weekly pin bump: FFmpeg essentials {current} -> {new} "
-                "(`soundboard/ffmpegget.py`).\n\n"
+                "(`soundboard/online/ffmpegget.py`).\n\n"
                 f"- `{zip_name}`: the builder's published SHA-256, GitHub's digest of the "
                 f"{REPO} release file and the bytes from both URLS all match.\n"
                 f"- SHA-256 `{digest}`, {len(data):,} bytes; the zip holds every KEEP "

@@ -891,7 +891,7 @@ class _Endless:
 
 
 def test_an_endless_download_is_cut_off_at_the_cap(tmp_path, monkeypatch):
-    from soundboard import net
+    from soundboard.online import net
     from soundboard.speech import translation
     info = translation_info(tmp_path, "0" * 64, 100_000)    # listed 100 kB: cap 150 kB
     reply = _Endless()
@@ -903,7 +903,7 @@ def test_an_endless_download_is_cut_off_at_the_cap(tmp_path, monkeypatch):
 
 
 def test_a_listed_size_over_the_cap_is_refused_before_reading(tmp_path, monkeypatch):
-    from soundboard import net
+    from soundboard.online import net
     from soundboard.speech import translation
     info = translation_info(tmp_path, "0" * 64, 0)          # no size listed: 300 MB cap
     assert translation.max_bytes(info) == translation.DEFAULT_CAP

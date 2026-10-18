@@ -4,7 +4,7 @@ For slow, capped or mobile connections: smaller downloads, lower-bitrate radio
 stations, more patience before a stream counts as dead, and no result pictures in
 Sounds from the web. Also whether "Add as sound" keeps the video.
 
-`current` is what the rest of the app reads (soundboard.ytdl, soundboard.radio,
+`current` is what the rest of the app reads (soundboard.online.ytdl, soundboard.online.radio,
 ui.ytsearch); the Settings window changes it with change() and the config keeps it
 as `Config.data` (a plain dict, like `radio` and `overlay`).
 """

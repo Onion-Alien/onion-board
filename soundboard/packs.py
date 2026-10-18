@@ -25,12 +25,13 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from soundboard import backup, library, net, netlog, updates
+from soundboard import backup, library, updates
+from soundboard.online import net, netlog
 from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
-FEATURE = "sound_packs"   # its switch in Settings > Privacy & security (soundboard.net)
+FEATURE = "sound_packs"   # its switch in Settings > Privacy & security (soundboard.online.net)
 CATALOG_URL = (f"https://raw.githubusercontent.com/{updates.REPO}/main/packs/catalog.json")
 # where people share a pack: a GitHub form that asks for the link and the licence
 SHARE_URL = f"https://github.com/{updates.REPO}/issues/new?template=sound-pack.yml"

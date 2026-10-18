@@ -31,7 +31,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from soundboard.addons import modules
-from soundboard import net, updates
+from soundboard.online import net
+from soundboard import updates
 from soundboard.addons.modules import ModuleInfo
 
 log = logging.getLogger(__name__)
@@ -47,7 +48,7 @@ MODULE_ID = "onion-pocket"
 KIND = "remote"
 LOCAL_ENV = "ONIONBOARD_ONION_POCKET_ZIP"
 MAX_SIZE = 5 << 20       # the zip is ~40 KB
-FEATURE = "addons"       # its switch in Settings > Privacy & security (soundboard.net)
+FEATURE = "addons"       # its switch in Settings > Privacy & security (soundboard.online.net)
 
 
 @dataclass

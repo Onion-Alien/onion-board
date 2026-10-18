@@ -351,7 +351,7 @@ def _extra_versions(detail: str) -> str:
     if "yt_dlp" not in detail:
         return ""
     try:
-        from soundboard import ytdl
+        from soundboard.online import ytdl
         return f"**yt-dlp version:** {ytdl.active_version()[0]}\n"
     except Exception:  # noqa: BLE001
         return ""

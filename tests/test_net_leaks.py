@@ -20,7 +20,8 @@ import soundfile as sf
 
 from conftest import closed_port, process_events
 from fakeproxy import Socks5, no_leaks
-from soundboard import net, updates
+from soundboard.online import net
+from soundboard import updates
 from soundboard.engine import SR
 from test_radio import wav_bytes
 
@@ -147,7 +148,7 @@ def test_add_on_release_check(sites, socks, guard, monkeypatch, app_dir):
 
 
 def test_ytdlp_updater_and_myinstants(sites, socks, guard, monkeypatch, app_dir):
-    from soundboard import ytdl
+    from soundboard.online import ytdl
     # Update now, for real through the proxy / Tor: the approved list, then its wheels
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w") as z:
@@ -306,7 +307,7 @@ def test_ai_voice_model_download_goes_through_the_relay(sites, socks, tmp_path):
 # ---------------------------------------------------------------- yt-dlp (the real one)
 
 def test_ytdlp_probes_and_downloads_through_the_proxy(sites, socks, guard, app_dir):
-    from soundboard import ytdl
+    from soundboard.online import ytdl
     sites.routes["/clip.wav"] = (wav_bytes(1.0), "audio/wav")
     url = sites.url("media", "/clip.wav")
     title, _secs = ytdl.probe(url)
@@ -317,7 +318,7 @@ def test_ytdlp_probes_and_downloads_through_the_proxy(sites, socks, guard, app_d
 
 
 def test_ytdlp_search_goes_to_the_proxy_even_when_it_fails(socks, guard, app_dir):
-    from soundboard import ytdl
+    from soundboard.online import ytdl
     with pytest.raises(ytdl.DownloadError):
         ytdl.search("what is love", count=3)        # the fake proxy can't reach YouTube
     assert any("youtube" in h for h in socks.hosts_asked())
@@ -326,7 +327,7 @@ def test_ytdlp_search_goes_to_the_proxy_even_when_it_fails(socks, guard, app_dir
 # ---------------------------------------------------------------- Qt
 
 def test_radio_directory_through_the_proxy(qapp, sites, socks, tmp_path):
-    from soundboard.radio import RadioDirectory
+    from soundboard.online.radio import RadioDirectory
     from test_radio import api_station
     sites.routes["/json/stations/search"] = (json.dumps([api_station(1)]).encode(),
                                              "application/json")
@@ -342,7 +343,8 @@ def test_search_thumbnails_through_the_proxy(qapp, sites, socks, monkeypatch):
     from PySide6.QtCore import QBuffer, QByteArray
     from PySide6.QtGui import QImage
 
-    from soundboard import quality, ytdl
+    from soundboard import quality
+    from soundboard.online import ytdl
     from soundboard.ui.ytsearch import ResultRow, SearchResults
     shown = []
     monkeypatch.setattr(ResultRow, "set_thumb", lambda row, pm: shown.append(pm.size().toTuple()))
@@ -371,7 +373,7 @@ def test_search_thumbnails_through_the_proxy(qapp, sites, socks, monkeypatch):
 
 
 def play(qapp, url, timeout=20):
-    from soundboard.radio import RadioPlayer, Station
+    from soundboard.online.radio import RadioPlayer, Station
     p = RadioPlayer()
     chunks, errors = [], []
     p.audio.connect(chunks.append)
@@ -413,7 +415,7 @@ def test_radio_fails_closed_with_a_readable_reason(qapp, sites, monkeypatch):
     dead = closed_port()
     # FFmpeg can be slow to start on a busy machine: a 3 s watchdog said "the
     # station didn't answer" before the relay knew why.
-    monkeypatch.setattr("soundboard.radio.CONNECT_S", 12.0)
+    monkeypatch.setattr("soundboard.online.radio.CONNECT_S", 12.0)
     net.configure(net.PROXY, f"socks5h://127.0.0.1:{dead}")
     try:
         sites.routes["/stream.wav"] = (wav_bytes(), "audio/wav")
@@ -426,7 +428,7 @@ def test_radio_fails_closed_with_a_readable_reason(qapp, sites, monkeypatch):
 
 
 def test_a_stream_sent_into_the_home_network_is_refused(qapp, sites, socks, monkeypatch):
-    monkeypatch.setattr("soundboard.radio.CONNECT_S", 12.0)   # the refusal says why first
+    monkeypatch.setattr("soundboard.online.radio.CONNECT_S", 12.0)   # the refusal says why first
     p, chunks, errors = play(qapp, f"http://127.0.0.2:{sites.port}/stream.wav")
     p.stop()
     assert not chunks and errors and "home network" in errors[0]

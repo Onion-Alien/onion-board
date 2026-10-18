@@ -28,7 +28,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from soundboard.addons import modules
-from soundboard import net, updates
+from soundboard.online import net
+from soundboard import updates
 from soundboard.addons.modules import ModuleInfo
 from soundboard import errors
 from soundboard.i18n import _
@@ -45,7 +46,7 @@ MODULE_ID = "onion-watch"
 KIND = "triggers"
 LOCAL_ENV = "ONIONBOARD_ONION_WATCH_ZIP"
 MAX_SIZE = 20 << 20      # the zip is ~70 KB
-FEATURE = "addons"       # its switch in Settings > Privacy & security (soundboard.net)
+FEATURE = "addons"       # its switch in Settings > Privacy & security (soundboard.online.net)
 
 
 @dataclass

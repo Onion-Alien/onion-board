@@ -359,7 +359,7 @@ def test_off_on_cycles_leave_nothing_behind(window, qapp, fake_watch):
 
     from PySide6.QtWidgets import QApplication
 
-    from soundboard import net
+    from soundboard.online import net
     from soundboard.ui.aivoicepanel import AiVoicePanel
     from soundboard.ui.radiopanel import RadioOff
     from soundboard.ui.triggershost import BoardHost

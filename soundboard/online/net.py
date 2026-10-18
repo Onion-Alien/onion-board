@@ -6,10 +6,10 @@ Modes:
   "proxy"   everything goes through the proxy in cfg.net_proxy:
             socks5h://host:port (socks5:// and a bare host:port mean the same) or
             http://host:port, either with user:password@ if it needs one.
-  "tor"     everything goes through the app's own Tor (soundboard.tor), a SOCKS port
+  "tor"     everything goes through the app's own Tor (soundboard.online.tor), a SOCKS port
             on 127.0.0.1 that's only there once Tor has connected. A connection
             made before that waits for it (up to TOR_WAIT_S), then fails: it never
-            goes direct. soundboard.tor plugs itself in with set_tor_gate().
+            goes direct. soundboard.online.tor plugs itself in with set_tor_gate().
 
 How each kind of traffic gets here:
   * urllib (updates, yt-dlp updater, Myinstants, translation models, add-ons, custom
@@ -31,7 +31,7 @@ doesn't, or names one that's off, is refused with FeatureOff before anything is
 looked up or connected, in every mode. That's why the relay runs in Direct mode too:
 FFmpeg and Qt connect from C++, and the relay is the only place they can be stopped.
 
-Every connection made here, and every one refused, is listed in soundboard.netlog
+Every connection made here, and every one refused, is listed in soundboard.online.netlog
 (Settings > Connection > Network activity), in memory only.
 """
 from __future__ import annotations
@@ -58,7 +58,8 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from soundboard import errors, netlog, without_app_blas
+from soundboard import errors, without_app_blas
+from soundboard.online import netlog
 from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
@@ -258,7 +259,7 @@ _off: frozenset[str] = frozenset()   # cfg.net_off: the features switched off
 _offline = False                     # cfg.net_offline: all of them
 _generation = 0                      # bumped by every change of the Connection setting
 _last_failure: tuple[float, str] = (0.0, "")
-_tor_gate: Callable[[float], Proxy] | None = None   # soundboard.tor: waits, then its port
+_tor_gate: Callable[[float], Proxy] | None = None   # soundboard.online.tor: waits, then its port
 # urlopen()'s open sockets to sites -> the feature: a change of the setting (or a
 # switch) cuts them off, as it does the relay's
 _live: weakref.WeakKeyDictionary = weakref.WeakKeyDictionary()
@@ -442,7 +443,7 @@ def check(feature) -> None:
 
 
 def set_tor_gate(fn: Callable[[float], Proxy] | None) -> None:
-    """soundboard.tor's gate: given a timeout, starts Tor if needed, waits for it to
+    """soundboard.online.tor's gate: given a timeout, starts Tor if needed, waits for it to
     connect and returns its SOCKS port as a Proxy, or raises ProxyError."""
     global _tor_gate
     _tor_gate = fn

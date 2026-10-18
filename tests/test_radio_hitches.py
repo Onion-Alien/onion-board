@@ -9,7 +9,7 @@ import numpy as np
 import pytest
 
 from conftest import process_events, real_pc_timing
-from soundboard import radio
+from soundboard.online import radio
 from soundboard.ui import flatmap
 from soundboard.ui.flatmap import LAND_PART, FlatMap
 

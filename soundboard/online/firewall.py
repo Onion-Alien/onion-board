@@ -66,7 +66,7 @@ def relaunch_params(name: str, port: int) -> str:
     from source."""
     parts = []
     if not getattr(sys, "frozen", False):
-        parts.append(f'"{Path(__file__).resolve().parent.parent / "main.py"}"')
+        parts.append(f'"{Path(__file__).resolve().parents[2] / "main.py"}"')
     parts += [FLAG, name, str(int(port))]
     return " ".join(parts)
 

@@ -35,7 +35,8 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from soundboard import backup, destination, engine, net, otherboards, theme, usage
+from soundboard import backup, destination, engine, otherboards, theme, usage
+from soundboard.online import net
 from soundboard.control import remote
 from soundboard.i18n import _
 from soundboard.library import PAD_COLORS

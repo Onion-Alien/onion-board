@@ -178,7 +178,7 @@ def start_ytdlp_check(cfg):
     the app's own FFmpeg and Tor brought to the versions this release names."""
     import threading
 
-    from soundboard import netlog, ytdl
+    from soundboard.online import netlog, ytdl
     netlog.cause(ytdl.UPDATE_FEATURE, "Automatic daily check for a newer downloader "
                                       "(yt-dlp), after start-up")
     threading.Thread(target=ytdl.auto_update, args=(cfg.ytdlp_auto_optin,), daemon=True,
@@ -191,7 +191,7 @@ def helpers_follow_app():
     version of itself is replaced by the one this version names (pinned and checked
     against its SHA-256, so it's as safe as the app update itself). Tor waits while
     Connection is set to Tor (it's carrying the app's traffic); Update Tor does it."""
-    from soundboard import ffmpegget, net, netlog, tor, torget
+    from soundboard.online import ffmpegget, net, netlog, tor, torget
     try:
         netlog.cause(ffmpegget.FEATURE, "FFmpeg follows the app update (its own copy)")
         h = ffmpegget.update_own()
@@ -224,10 +224,11 @@ def selftest() -> int:
     from PySide6.QtMultimedia import QMediaPlayer
     _app = QApplication(sys.argv)   # kept until the checks below have run
     from soundboard.ui import mainwindow, setupwizard, crashdialog  # noqa: F401
-    from soundboard import engine, radio, theme  # noqa: F401
+    from soundboard import engine, theme  # noqa: F401
+    from soundboard.online import radio  # noqa: F401
     theme.app_icon()
     QMediaPlayer()   # loads the FFmpeg multimedia plugin
-    from soundboard import jsengine   # YouTube's player challenge (build.ps1 bundles it)
+    from soundboard.online import jsengine  # YouTube's player challenge (build.ps1 bundles it)
     if getattr(sys, "frozen", False) and jsengine.bundled() is None:
         print("FAIL: the bundled QuickJS (qjs.exe) is missing or won't start",
               file=sys.stderr)
@@ -238,12 +239,13 @@ def selftest() -> int:
 
 def get_tor() -> int:
     """`OnionBoard.exe --get-tor`: the installer's "Private connection (Tor)" box.
-    Downloads Tor into %APPDATA%\\OnionBoard\\tor\\bin (soundboard.torget, the same
+    Downloads Tor into %APPDATA%\\OnionBoard\\tor\\bin (soundboard.online.torget, the same
     routine as Settings' Get Tor button) the way the saved Connection setting says, so
     a proxy set there is used. No window. Returns 0 when Tor is there (already, or
     now), 1 if it couldn't be got."""
     applog.setup(APP_DIR)
-    from soundboard import library, net, tor, torget
+    from soundboard import library
+    from soundboard.online import net, tor, torget
     if torget.installed():
         return 0
     cfg = library.Config.load()
@@ -265,10 +267,11 @@ def install_addon(module_id: str) -> int:
     """`OnionBoard.exe --install-addon live-voice`: the installer's live voice box. Runs
     the add-on's install (soundboard.addons.modules.install, the same as the Voice tab's
     Install button), getting a Python for it first when the PC has no good one
-    (soundboard.pyget), the way the saved Connection setting says. No window. Returns
+    (soundboard.online.pyget), the way the saved Connection setting says. No window. Returns
     0 when it's set up (already, or now), 1 if it couldn't be."""
     applog.setup(APP_DIR)
-    from soundboard import library, net, tor
+    from soundboard import library
+    from soundboard.online import net, tor
     from soundboard.addons import modules
     info = next((m for m in modules.discover() if m.id == module_id), None)
     if info is None or info.error:
@@ -351,7 +354,8 @@ def set_usage_count(on: bool, heard: str = "") -> int:
         return 1
     if not on and "usage_stats" not in cfg.net_off:   # on until now: say so once
         try:
-            from soundboard import net, usage
+            from soundboard.online import net
+            from soundboard import usage
             net.configure_from(cfg)
             if net.mode() != net.TOR:   # Tor isn't running: don't start it
                 log.info("--usage-count off: opt-out %s",
@@ -376,7 +380,8 @@ def uninstall_count() -> int:
     never waits on, or fails for, this."""
     try:
         applog.setup(APP_DIR)
-        from soundboard import library, net, usage
+        from soundboard import library, usage
+        from soundboard.online import net
         cfg = library.Config.load()
         if not cfg.stats_id:   # never counted (switched off, or from before the count)
             return 0
@@ -563,7 +568,7 @@ def main():
     for msg in MIGRATION_ERRORS:
         log.error("%s", msg)
     tune_runtime_for_audio()
-    from soundboard import ytworker
+    from soundboard.online import ytworker
     ytworker.enabled = True   # web searches and downloads off the audio's GIL
     from soundboard import renderworker
     renderworker.enabled = True   # slow effects renders (an AI voice) too
@@ -611,7 +616,7 @@ def main():
     from soundboard.ui import splash
     if TRAY_ARG not in sys.argv:   # a cold start can take seconds: show Bun meanwhile
         splash.show()
-    from soundboard import ffmpegget
+    from soundboard.online import ffmpegget
     ffmpegget.start_check()   # meanwhile: is FFmpeg there and does it start? (never waited on)
     from soundboard.wheelguard import AppStyle
     app.setStyle(AppStyle("Fusion"))   # also: the wheel never changes a dropdown or tab

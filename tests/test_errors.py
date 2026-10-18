@@ -64,7 +64,7 @@ def test_bugs_are_reportable_but_dont_show_python_jargon():
 
 
 def test_our_own_messages_are_kept():
-    from soundboard.ytdl import DownloadError as OurError
+    from soundboard.online.ytdl import DownloadError as OurError
     p = errors.describe(OurError("That's a playlist — open one video and try again."))
     assert p.text == "That's a playlist — open one video and try again."
     assert not p.reportable

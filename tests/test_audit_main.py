@@ -9,7 +9,8 @@ from PySide6.QtCore import QEvent, QSize
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QWidget
 
 from conftest import own_module, said
-from soundboard import appaudio, autostart, library, net
+from soundboard import appaudio, autostart, library
+from soundboard.online import net
 from soundboard.ui import chatguide, responsive
 from soundboard.ui import importcontrol, playbackcontrol
 from soundboard.ui.dialogs import EditDialog

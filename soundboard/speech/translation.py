@@ -21,7 +21,8 @@ import zipfile
 from collections.abc import Callable
 from pathlib import Path, PurePosixPath
 
-from soundboard import library, net
+from soundboard import library
+from soundboard.online import net
 from soundboard import errors
 from soundboard.i18n import _
 

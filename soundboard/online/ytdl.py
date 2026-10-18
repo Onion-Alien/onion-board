@@ -55,7 +55,8 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from soundboard import jsengine, library, net, quality, sourceinfo, updates, ytworker
+from soundboard.online import jsengine, net, ytworker
+from soundboard import library, quality, sourceinfo, updates
 from soundboard.library import MAX_SECONDS
 from soundboard import errors
 from soundboard.i18n import _
@@ -132,7 +133,7 @@ class SwitchedOff(DownloadError):
     & security: nothing was looked up or sent. The message says so."""
 
 
-FEATURE = "sounds_web"           # soundboard.net's switch for all of this
+FEATURE = "sounds_web"           # soundboard.online.net's switch for all of this
 UPDATE_FEATURE = "ytdlp_update"  # ...and for updating yt-dlp (the list + PyPI)
 
 
@@ -212,7 +213,7 @@ def _over_tor[T](fn: Callable[[], T], target: str) -> T:
     that."""
     if net.mode() != net.TOR:
         return fn()
-    from soundboard import tor
+    from soundboard.online import tor
     for attempt in range(TOR_TRIES + 1):
         try:
             return fn()

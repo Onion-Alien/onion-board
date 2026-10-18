@@ -4,7 +4,8 @@ import json
 
 import pytest
 
-from soundboard import __version__, library, net
+from soundboard import __version__, library
+from soundboard.online import net
 from soundboard.library import Config
 from soundboard.ui import whatsnew
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen

@@ -1,4 +1,4 @@
-"""The app's own Tor (soundboard.tor) and Tor mode in soundboard.net / ytdl, without
+"""The app's own Tor (soundboard.online.tor) and Tor mode in soundboard.online.net / ytdl, without
 the Tor network: torrc, the control-port client against a fake control server, the
 process manager with a stand-in tor.exe (tests/faketor.py), the job object, failing
 closed before Tor is ready, YouTube's Tor blocks, and that nothing leaks around Tor.
@@ -19,7 +19,7 @@ import pytest
 
 from conftest import process_events
 from fakeproxy import Socks5, no_leaks
-from soundboard import net, tor, ytdl
+from soundboard.online import net, tor, ytdl
 from test_net_leaks import NAMES, REAL_GET, Sites   # imported before conftest stubs updates
 
 HERE = Path(__file__).resolve().parent
@@ -384,7 +384,7 @@ def test_tor_dies_when_the_app_crashes(tmp_path):
     script.write_text(
         "import os, subprocess, sys\n"
         f"sys.path.insert(0, {str(HERE.parent)!r})\n"
-        "from soundboard.tor import JobObject\n"
+        "from soundboard.online.tor import JobObject\n"
         "job = JobObject()\n"
         "p = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(60)'])\n"
         "job.assign(p)\n"
@@ -510,7 +510,7 @@ def test_ytdlp_goes_through_tor(tor_socks, monkeypatch, app_dir):
 
 
 def test_qt_goes_through_tor(qapp, tor_socks, tmp_path):
-    from soundboard.radio import RadioDirectory
+    from soundboard.online.radio import RadioDirectory
     from test_radio import api_station
     sites, p = tor_socks
     sites.routes["/json/stations/search"] = (json.dumps([api_station(1)]).encode(),

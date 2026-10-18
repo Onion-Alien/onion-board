@@ -3,7 +3,7 @@ import pytest
 from PySide6.QtCore import QUrl
 from PySide6.QtGui import QDesktopServices
 
-from soundboard import net
+from soundboard.online import net
 from soundboard.ui import weblinks
 
 

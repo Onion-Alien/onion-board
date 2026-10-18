@@ -24,7 +24,8 @@ from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QCheckBox, QComboBox, Q
                                QSlider, QVBoxLayout, QWidget)
 
 from soundboard.addons import aiaddon
-from soundboard import applog, errors, net, theme, updates, usage
+from soundboard import applog, errors, theme, updates, usage
+from soundboard.online import net
 from soundboard.addons import modules as mods
 from soundboard.i18n import _, ngettext
 from soundboard.speech import aivoice
@@ -520,7 +521,7 @@ class AiVoicePanel(QWidget):
             self.lbl_missing.setText(_(
                 "AI voices are an optional add-on (about 55 MB, the voice model and its "
                 "runtime). Nothing is downloaded until you press Get AI voices."))
-        elif m.broken:   # the Python they were set up with is gone (soundboard.pyget)
+        elif m.broken:   # the Python they were set up with is gone (soundboard.online.pyget)
             self.lbl_missing.setText(_("AI voices stopped working: the Python they were set "
                                        "up with is gone from this PC. Press Repair to set "
                                        "them up again."))

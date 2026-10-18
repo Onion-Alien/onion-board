@@ -49,7 +49,7 @@ def test_bun_goes_when_theres_no_room(qapp):
 def test_a_failed_search_shows_the_red_card_and_try_again_runs_it(qapp, monkeypatch):
     """The search can't get through: the red card says why, Try again searches the same
     words once more, and the results take its place."""
-    from soundboard import ytdl
+    from soundboard.online import ytdl
     from soundboard.ui.ytsearch import SearchResults
     calls = []
 
@@ -73,7 +73,7 @@ def test_a_failed_search_shows_the_red_card_and_try_again_runs_it(qapp, monkeypa
 def test_a_site_thats_down_gets_no_restart_the_app_advice(qapp, monkeypatch):
     """The site answered 5xx: waiting fixes that, closing Onion Board doesn't, so the
     card says only the site's trouble and Try again (no "close and open it again")."""
-    from soundboard import ytdl
+    from soundboard.online import ytdl
     from soundboard.ui.ytsearch import SearchResults
     calls = []
 
@@ -128,7 +128,7 @@ def test_a_narrow_short_store_card_never_squeezes_its_words(window, qapp,  # noq
                                                             monkeypatch):
     """The Store tab narrow and short: Bun steps out, and the words keep the lines
     they wrap to (they were drawn on top of each other); with the room back, Bun too."""
-    from soundboard import store
+    from soundboard.online import store
 
     def down(*_a, **_k):
         raise store.StoreError("Couldn't reach the sound store.")

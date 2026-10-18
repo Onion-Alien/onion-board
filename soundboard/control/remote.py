@@ -73,7 +73,7 @@ link's #fragment, which browsers never send). It answers only addresses on the l
 network, takes the key only in a header (never ?token=, which would end up in a
 browser's history), and an address that gets the key wrong FAIL_LIMIT times in a row
 is ignored for LOCK_S seconds. It never listens on a network Windows calls Public
-(a café's Wi-Fi), whatever Windows Firewall says (soundboard.netcategory). Either
+(a café's Wi-Fi), whatever Windows Firewall says (soundboard.online.netcategory). Either
 server keeps at most MAX_CONNECTIONS open at once (PEER_CONNECTIONS from one address).
 
 On the home network the key needn't travel at all: a request can instead carry
@@ -117,7 +117,8 @@ from urllib.parse import parse_qs, urlsplit
 
 from PySide6.QtCore import QCoreApplication, QEvent, QObject, Qt, QTimer, Signal
 
-from soundboard import errors, netcategory, usage
+from soundboard import errors, usage
+from soundboard.online import netcategory
 from soundboard.control import streamapi
 from soundboard.pollthread import PollThread
 from soundboard.i18n import _
@@ -1362,7 +1363,7 @@ def dispatch_radio(mw: MainWindow, action: str, params: dict) -> tuple[int, obje
             if on is None:
                 return 400, BAD_ON
             if on and not r.is_active():
-                from soundboard.radio import Station
+                from soundboard.online.radio import Station
                 s = Station.from_saved(r.cfg.radio.get("last") or {})
                 if s is None:
                     return 404, {"error": "no station has played yet: pick one"}
