@@ -863,7 +863,8 @@ class BunnyWidget(QWidget):
             while self._note_debt >= 1:
                 self._note_debt -= 1
                 self._spawn(max(0.3, loud))
-        elif self.prop == "headphones" and self.sad < 0.5:   # sad: the music's gone
+        elif (self.prop == "headphones" and self.sad < 0.5   # sad: the music's gone
+              and not (self.rest_after_s is not None and now >= self._rest_at)):
             self._note_debt += dt * 0.7   # something's always playing in his headphones
             if self._note_debt >= 1:
                 self._note_debt = 0.0
@@ -942,7 +943,9 @@ class BunnyWidget(QWidget):
             or going(self._blink_at, BLINK_SHUT + BLINK_HOLD + BLINK_OPEN)
             or going(self._flick_at, 0.5) or going(self._sigh_at, 1.6)
             or going(self._beg_at, BEG) or going(self._joy_at, 1.9)   # (+ the wobble)
-            or going(self._kick_at, KICK_HOP) or abs(self._squash_s.v) > 0.05)
+            or going(self._kick_at, KICK_HOP) or abs(self._squash_s.v) > 0.05
+            # sulking: he stops with his foot back down, between two kicks
+            or (self.sulk and not self.asleep and sulk_kick(now - self._t0)[1] < 0.75))
 
     def _step_groove(self, now: float, dt: float) -> bool:
         """Dancing to the song (set_groove): fades the dance in or out, follows the

@@ -25,6 +25,7 @@ log = logging.getLogger(__name__)
 
 BUN_H = 72        # sad Bun's height on the card
 COMPACT_BUN_H = 56   # ... and beside the words (compact)
+BUN_REST_S = 30.0    # he sulks this long, then holds still
 MAX_W = 420       # the card's width at most
 MIN_W = 320       # ... and at least, when it's only a title and a line
 
@@ -78,8 +79,11 @@ class OopsPanel(QFrame):
         self._retry: Callable[[], object] | None = None
         self._report_url = ""
         self._room: int | None = None   # its page's height, once it's in one (fit_height)
+        # he sulks for BUN_REST_S, then holds still with his foot down (it's a card
+        # that can sit there for hours: Try again, a new problem or showing it again
+        # sets him off again)
         self.bun = BunnyWidget(height=COMPACT_BUN_H if compact else BUN_H, pad=10 if compact
-                               else 14, sad=1.0)
+                               else 14, sad=1.0, rest_after_s=BUN_REST_S)
         self.bun.sulk = True
         self.bun.setMinimumSize(1, 1)   # (no say in its holder's minimum size)
         self.bun.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
@@ -153,6 +157,7 @@ class OopsPanel(QFrame):
         (`button` to word it otherwise) doing `retry`. `fixable=False`: nothing the user
         can do (a server that's down), so no "close and open it again" and no Report."""
         self.set_tone(tone)
+        self.bun.stir()   # a new problem: he sulks again
         if not fixable:
             self.what.hide()
             self.btn_report.hide()

@@ -41,6 +41,7 @@ from soundboard import errors
 log = logging.getLogger(__name__)
 
 HOOT_PX = 130
+HOOT_REST_S = 30.0   # he moves this long, then holds still until the mouse or a sound
 # what Hoot says while he waits to be installed, and when he's clicked
 HOOT_BEGS = (_("pleeease?"), _("install me?"), _("one click!"), _("hoo? hoo…?"),
              _("I'd watch for you…"), _("so… bored…"))
@@ -232,7 +233,7 @@ class TriggersTab(QWidget):
         # Enough room for Hoot's speech bubble without squeezing the card's text.
         side = 16
         self.hoot = OwlWidget(HOOT_PX, HOOT_BEGS, HOOT_JOY, left=side, right=side,
-                              dances=True)
+                              dances=True, rest_after_s=HOOT_REST_S)
         self.hoot.clicked.connect(lambda: (usage.used("hoot-talk"),
                                            self.btn_get.setFocus(Qt.FocusReason.OtherFocusReason)))
         row.addWidget(self.hoot, 0, Qt.AlignmentFlag.AlignCenter)
