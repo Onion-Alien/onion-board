@@ -58,11 +58,26 @@ EMAIL_OK = re.compile(r"(?i)^(?:noreply|no-reply)@|@anthropic\.com$"
                       r"|^onionboard\.contact@proton\.me$")  # the project's public contact
 
 
+def private_patterns() -> Path:
+    """This checkout's .sensitive-patterns, or in a git worktree (which doesn't have the
+    ignored file) the main checkout's, so work in a worktree is scanned the same."""
+    if PRIVATE_PATTERNS.exists():
+        return PRIVATE_PATTERNS
+    try:
+        common = subprocess.run(["git", "rev-parse", "--git-common-dir"], cwd=ROOT,
+                                capture_output=True, text=True, check=True).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        return PRIVATE_PATTERNS
+    main = (ROOT / common).resolve().parent / PRIVATE_PATTERNS.name
+    return main if main.exists() else PRIVATE_PATTERNS
+
+
 def load_private_rules() -> list[tuple[str, re.Pattern[str]]]:
-    if not PRIVATE_PATTERNS.exists():
+    path = private_patterns()
+    if not path.exists():
         return []
     out = []
-    for n, line in enumerate(PRIVATE_PATTERNS.read_text(encoding="utf-8").splitlines(), 1):
+    for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
         line = line.strip()
         if line and not line.startswith("#"):
             try:

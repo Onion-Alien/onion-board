@@ -291,7 +291,7 @@ def test_settings_showing_draws_its_cog_in_the_accent(window):  # noqa: F811
 
 def test_a_tab_switch_doesnt_lay_the_rail_out_again(window, monkeypatch):  # noqa: F811
     """Switching tabs recomputed the audio status and laid the rail's status out again
-    (~15 ms of each switch on a slow laptop) though nothing on it changed: now only
+    (~15 ms of each switch on a slower PC) though nothing on it changed: now only
     Setup (whose hints those are) brings it up to date, and the same words put on a
     status button again change nothing. New words still show."""
     from soundboard.ui import sidebar

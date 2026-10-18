@@ -241,7 +241,7 @@ class SettingsControl(Controller):
         self.prebuild_editor()
 
     def prebuild_editor(self):
-        """A closed Edit sound made ahead (~250 ms, ~1 s on a slow laptop), unless one is
+        """A closed Edit sound made ahead (~250 ms, ~1 s on a slower PC), unless one is
         kept or open already (closing it keeps it), there's no sound to show, or the
         window is going. Behind the loading screen, or the theme cover."""
         mw = self.mw
