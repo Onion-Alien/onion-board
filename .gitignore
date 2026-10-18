@@ -77,4 +77,4 @@ vendor/
 !assets/starter/*.ogg
 
 # Redistributable CC0 voice backgrounds, with source and license credits.
-!assets/backgrounds/*.flac
+!assets/backgrounds/*.ogg

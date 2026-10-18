@@ -129,7 +129,7 @@ def recording(layer: str) -> np.ndarray:
     import soundfile as sf
     if layer not in LAYERS:
         raise ValueError("unknown background layer")
-    audio, rate = sf.read(AUDIO_DIR / (layer + ".flac"), dtype="float32")
+    audio, rate = sf.read(AUDIO_DIR / (layer + ".ogg"), dtype="float32")
     if rate != SR or audio.ndim != 1 or not len(audio) or not np.isfinite(audio).all():
         raise ValueError("invalid background recording")
     # Sparse drops can have high crest factors. Keep their natural dynamics
