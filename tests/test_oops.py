@@ -1,6 +1,7 @@
 """The red "didn't work" card (ui/oops.py) and the places that show it."""
 from conftest import process_events
 from soundboard.ui import oops
+from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 
 def test_the_card_says_what_and_what_to_do(qapp):
@@ -120,3 +121,28 @@ def test_the_voice_strip_shows_while_the_voice_cant_work():
     assert VoicePanel.problem(f).startswith("No mic is open")
     f.on = False
     assert VoicePanel.problem(f) == ""
+
+
+
+def test_a_narrow_short_store_card_never_squeezes_its_words(window, qapp,  # noqa: F811
+                                                            monkeypatch):
+    """The Store tab narrow and short: Bun steps out, and the words keep the lines
+    they wrap to (they were drawn on top of each other); with the room back, Bun too."""
+    from soundboard import store
+
+    def down(*_a, **_k):
+        raise store.StoreError("Couldn't reach the sound store.")
+    monkeypatch.setattr(store, "_request", down)
+    w = window
+    w.show()
+    w.tabs.setCurrentWidget(w.store)
+    w.store._problem("Couldn't open the store",
+                     "Couldn't reach the sound store. Check your internet and try again.")
+    card = w.store.oops
+    for height, bun in ((640, True), (470, False)):
+        w.resize(440, height)
+        process_events(qapp, lambda: False, 0.3)
+        assert w.store.stack.currentWidget() is w.store.oops_page
+        for label in (card.title, card.line, card.what):
+            assert label.height() >= label.heightForWidth(label.width()), (height, label.text())
+        assert card.bun.isVisibleTo(card) == bun

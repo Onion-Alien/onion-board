@@ -77,6 +77,7 @@ class OopsPanel(QFrame):
             self.setMaximumWidth(MAX_W)
         self._retry: Callable[[], object] | None = None
         self._report_url = ""
+        self._room: int | None = None   # its page's height, once it's in one (fit_height)
         self.bun = BunnyWidget(height=COMPACT_BUN_H if compact else BUN_H, pad=10 if compact
                                else 14, sad=1.0)
         self.bun.sulk = True
@@ -164,16 +165,33 @@ class OopsPanel(QFrame):
         self._retry = retry
         self.btn_retry.setText(button or _("Try again"))
         self.btn_retry.setVisible(retry is not None)
+        if self._room is not None:   # new words: fitted again in the same page
+            self.fit_height(self._room)
 
     def fit_height(self, room: int):
         """Bun only when `room` (the holder's height) has space for him and the words."""
+        self._room = room
         bun = self.bun.sizeHint().height() + self._lay.spacing()
         self.bun.setVisible(room >= self._words_h() + bun)
+        # at least as tall as its words wrap at its width: centred in a page, a card
+        # got the height of its size hint (the words on fewer, wider lines), and narrow
+        # they were drawn on top of each other once Bun stepped out. The words only:
+        # Bun is squeezed out first, so a shorter page still fits.
+        self.setMinimumHeight(0)
+        self.setMinimumHeight(self._words_h() if self.width() > 0 else 0)
+
+    def resizeEvent(self, e):   # noqa: N802 - Qt
+        super().resizeEvent(e)
+        try:   # a new width wraps the words again: Bun and the height fitted to it
+            if self._room is not None and e.size().width() != e.oldSize().width():
+                self.fit_height(self._room)
+        except Exception:  # noqa: BLE001 - never raise from a Qt override (AGENT-RULES)
+            log.exception("oops: card resize")
 
     def _words_h(self) -> int:
         w = max(200, min(MAX_W, self.width() or MAX_W))
         h = self.height_for(w)
-        if self.bun.isVisible():
+        if not self.bun.isHidden():   # (shown, or will be with the card)
             h -= self.bun.sizeHint().height() + self._lay.spacing()
         return h
 
