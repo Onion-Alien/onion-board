@@ -17,6 +17,16 @@ id = "30ae4ae2184e43b5833d37116a390286"
 [triggers]
 crons = ["17 3 * * *", "*/10 * * * *"]   # the daily clean-up; a site sync step
 
+# list pages and files: 90 a minute per address (index.js throttle()), so no one loop can use
+# up the free plan's daily reads (D1 rows, KV files) for everyone
+[[ratelimits]]
+name = "READS"
+namespace_id = "1001"
+
+  [ratelimits.simple]
+  limit = 90
+  period = 60
+
 # Secrets (never in this file): `npx wrangler secret put ADMIN_TOKEN` and `... SALT`
 
 # the Chat tab's room was a Durable Object; it's retired, and v2 deletes it (the v1

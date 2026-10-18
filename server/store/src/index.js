@@ -19,6 +19,9 @@ const UPLOADS_PER_IP_DAY = 20;
 const VOTES_PER_IP_DAY = 400;
 const VOTES_PER_IP_SOUND_DAY = 6;    // one address can't stuff one sound's votes with made-up installs
 const INSTALLS_PER_IP_SOUND = 3;     // ... nor over days: installs from one address that ever voted on it
+const OFFSET_MAX = 2000;             // how far down a list pages go (a page reads every row above it)
+const SEARCH_MAX = 2000;             // the most matches a search sorts
+const SHORT_SCAN = 1000;             // a search of only 1-2 letter words looks through this many
 const REPORTS_PER_IP_DAY = 30;
 const REPORTS_TO_HIDE = 3;
 const LOG_DAYS = 90;                 // the action log keeps this many days           // reports from different addresses: back to review
@@ -107,12 +110,17 @@ async function route(req, env) {
     const r = await voicesRoute(req, env, url, p, VOICE_TOOLS);
     if (r) return r;
   }
-  if (p === "/v1/sounds" && m === "GET") return list(url, req, env);
+  if (p === "/v1/sounds" && m === "GET") {
+    await throttle(req, env, "read");
+    return list(url, req, env);
+  }
   if (p === "/v1/categories" && m === "GET") return categories(env);
   if (p === "/v1/sounds" && m === "POST") return upload(req, env);
   if (p === "/v1/links" && m === "POST") return shareLink(req, env);
-  if ((g = p.match(/^\/v1\/sounds\/([0-9a-f]{12})\/file$/)) && m === "GET")
+  if ((g = p.match(/^\/v1\/sounds\/([0-9a-f]{12})\/file$/)) && m === "GET") {
+    await throttle(req, env, "file");
     return file(env, g[1], false);
+  }
   if ((g = p.match(/^\/v1\/sounds\/([0-9a-f]{12})\/vote$/)) && m === "POST")
     return vote(req, env, g[1]);
   if ((g = p.match(/^\/v1\/sounds\/([0-9a-f]{12})\/report$/)) && m === "POST")
@@ -155,9 +163,55 @@ async function installHash(req, env, required = true) {
   return sha256(`${env.SALT || ""}:install:${id}`);
 }
 
-async function ipHash(req, env) {
-  const ip = req.headers.get("cf-connecting-ip") || "local";
+// The part of an address one person holds: all of an IPv4 one, the first `bits` of an IPv6
+// one. A home or a phone gets a whole /64 and may use any address in it, so counting
+// whole IPv6 addresses would give one person billions; some get a /48 (reports use that).
+export function addressKey(ip, bits = 64) {
+  ip = String(ip || "").trim().toLowerCase().split("%")[0];
+  if (!ip.includes(":")) return ip;
+  const [head, tail] = ip.split("::");
+  const h = head ? head.split(":") : [], t = tail ? tail.split(":") : [];
+  const last = (t.length ? t : h).at(-1) || "";
+  if (last.includes(".")) return last;   // ::ffff:1.2.3.4 is an IPv4 address
+  const all = tail === undefined ? h
+    : [...h, ...Array(Math.max(0, 8 - h.length - t.length)).fill("0"), ...t];
+  return all.slice(0, bits / 16).map(g => (parseInt(g, 16) || 0).toString(16)).join(":") +
+    `::/${bits}`;
+}
+
+async function ipHash(req, env, bits = 64) {
+  const ip = addressKey(req.headers.get("cf-connecting-ip") || "local", bits);
   return sha256(`${env.SALT || ""}:ip:${ip}`);
+}
+
+// List pages and files: 90 a minute per address (Cloudflare's rate limiter, the
+// READS binding in wrangler.toml). Each one reads D1 rows or a KV file, and the free plan's
+// daily allowance of those is all the store has: without this one loop could use it up.
+async function throttle(req, env, what) {
+  if (!env.READS) return;   // (no binding: the tests, a local run)
+  const { success } = await env.READS.limit({ key: `${what}:${await ipHash(req, env)}` });
+  if (!success) fail("slow down", 429);
+}
+
+// A search's part of a list's query. Words of 3 letters or more are looked up in `fts` (an
+// index of every 3 letters of the names and tags, schema.sql), so a search reads the rows it
+// finds, not every row; 1-2 letter words are matched in `cols` of those. With only short
+// words there's nothing to look up: `bounded` says to look through the first SHORT_SCAN rows
+// of the list's order only.
+function searchParts(q, alias, fts, cols) {
+  const where = [], args = [];
+  const words = q ? q.split(" ").filter(Boolean).slice(0, 5) : [];
+  const long = words.filter(w => [...w].length >= 3);
+  if (long.length) {
+    where.push(`${alias}.id IN (SELECT id FROM ${fts} WHERE ${fts} MATCH ? LIMIT ${SEARCH_MAX})`);
+    args.push(long.map(w => `"${w.replace(/"/g, '""')}"`).join(" "));
+  }
+  for (const word of words.filter(w => [...w].length < 3)) {
+    where.push("(" + cols.map(c => `${c} LIKE ? ESCAPE '\\'`).join(" OR ") + ")");
+    const like = `%${word.replace(/[\\%_]/g, c => "\\" + c)}%`;
+    args.push(...cols.map(() => like));
+  }
+  return { where, args, bounded: words.length > 0 && !long.length };
 }
 
 // counts one more `what` for `who` today; false (and not counted) once `limit` is reached
@@ -245,10 +299,11 @@ function shown(r) {
            ...(r.mine !== undefined ? { mine: r.mine || 0 } : {}) };
 }
 
-const TOOLS = { sha256, linkKey, cleanName, now, logAction };
+const TOOLS = { sha256, linkKey, cleanName, now, logAction, refuse };
 // what voices.js shares with the sounds' routes (one vote, report and limit system)
 const VOICE_TOOLS = { json, fail, body, installHash, ipHash, allow, logAction, sha256, now,
-                      cleanTags, refuse, vote, report };
+                      cleanTags, refuse, vote, report, throttle, searchParts,
+                      OFFSET_MAX, SHORT_SCAN };
 // a sound under review is "pending"; a voice has no review, so reports hide it
 const TABLES = { sounds: "pending", voices: "hidden" };
 
@@ -259,18 +314,12 @@ async function list(url, req, env) {
     ? url.searchParams.get("sort") : "top";
   const cat = url.searchParams.get("cat") || "";
   const q = cleanName(url.searchParams.get("q")).toLowerCase();
-  const offset = Math.max(0, Math.min(10000, parseInt(url.searchParams.get("offset")) || 0));
+  const offset = Math.max(0, Math.min(OFFSET_MAX, parseInt(url.searchParams.get("offset")) || 0));
   const voter = await installHash(req, env, false);
   const where = ["s.status = 'live'"];
   const args = [];
   if (CATS.includes(cat)) { where.push("s.cat = ?"); args.push(cat); }
-  if (q) {
-    for (const word of q.split(" ").slice(0, 5)) {
-      where.push("(lower(s.name) LIKE ? ESCAPE '\\' OR s.tags LIKE ? ESCAPE '\\')");
-      const like = `%${word.replace(/[\\%_]/g, c => "\\" + c)}%`;
-      args.push(like, like);
-    }
-  }
+  const search = searchParts(q, "s", "sounds_fts", ["lower(s.name)", "s.tags"]);
   // Top: votes, then how popular it is where it came from (the store's own sounds sit
   // mid-way); Trending: what's hot on the sites now plus this week's 👍 here. Each order
   // matches an index in schema.sql word for word, so a page reads only its own rows.
@@ -279,10 +328,14 @@ async function list(url, req, env) {
     : "(s.up - s.down) DESC, s.up DESC, (CASE WHEN s.source = '' THEN 500 ELSE s.pop END) DESC, " +
       "s.created DESC";
   const mine = voter ? ", (SELECT value FROM votes v WHERE v.sound = s.id AND v.voter = ?) AS mine" : "";
-  const sql = `SELECT s.*${mine} FROM sounds s WHERE ${where.join(" AND ")} ` +
+  // only 1-2 letter words: matched in the first SHORT_SCAN of the list, not the whole table
+  const from = search.bounded ? `(SELECT * FROM sounds s WHERE ${where.join(" AND ")} ` +
+    `ORDER BY ${order} LIMIT ${SHORT_SCAN}) s` : "sounds s";
+  const all = search.bounded ? search.where : [...where, ...search.where];
+  const sql = `SELECT s.*${mine} FROM ${from} WHERE ${all.join(" AND ")} ` +
               `ORDER BY ${order} LIMIT ? OFFSET ?`;
   const rows = await env.DB.prepare(sql)
-    .bind(...(voter ? [voter] : []), ...args, PAGE + 1, offset).all();
+    .bind(...(voter ? [voter] : []), ...args, ...search.args, PAGE + 1, offset).all();
   const res = rows.results || [];
   return json({ sounds: res.slice(0, PAGE).map(shown), more: res.length > PAGE,
                 agreement: AGREEMENT, max_bytes: MAX_BYTES });
@@ -481,8 +534,10 @@ async function report(req, env, id, table = "sounds") {
   if (!row || row.status !== "live") fail("not found", 404);
   const ip = await ipHash(req, env);
   if (!await allow(env, "report-ip", ip, REPORTS_PER_IP_DAY)) fail("slow down", 429);
+  // one report per IPv4 address, and per IPv6 /48 (some people are handed a whole one)
+  const from = await ipHash(req, env, 48);
   await env.DB.prepare("INSERT OR IGNORE INTO reports (sound, voter, reason, created) " +
-    "VALUES (?, ?, ?, ?)").bind(id, "ip:" + ip, why, now()).run();
+    "VALUES (?, ?, ?, ?)").bind(id, "ip:" + from, why, now()).run();
   const n = (await env.DB.prepare("SELECT count(*) AS n FROM reports WHERE sound = ?")
     .bind(id).first()).n;
   // enough reports: off the store until the owner looks at it again

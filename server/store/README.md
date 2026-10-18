@@ -29,7 +29,12 @@ and neither needs a payment card on the account.
 The app sends a random id it made itself (`X-Onion-Install`); the server keeps only a
 salted hash of it, and of the address, for one vote per install and the daily limits
 (10 uploads per install, 20 per address, 400 votes per address, and at most 3 installs
-from one address ever counted on one sound). The review queue takes 1,000 sounds or 300 MB
+from one address ever counted on one sound). An IPv6 address counts as its /64 (one home or
+phone gets a whole /64), and a report as its /48, so new addresses from one place don't get
+around a limit or take a sound off alone. List pages and files are limited to 90 a minute
+per address (Cloudflare's rate limiter, `READS` in `wrangler.toml`), lists page at most
+2,000 deep, and a search looks words of 3 letters or more up in an index of every 3 letters
+(`sounds_fts`, `voices_fts`), so no one can use up the free plan's daily reads for everyone. The review queue takes 1,000 sounds or 300 MB
 of files, then refuses more until some are reviewed. Files (MP3, OGG, WAV, FLAC, up to
 4 MB) are walked from end to end in `src/audio.js`: every MP3 frame, WAV chunk, Ogg page
 and FLAC header block has to be in place, tags and cover art may take 2 MB at most, and
@@ -46,7 +51,7 @@ number finite and pulled into range, an AI voice's 1–4 speakers, a language co
 drops everything else. Names (32 characters) and abouts (140) become one plain line: no
 control or format characters (bidi overrides, zero-width joiners), no piles of combining
 marks, and the owner's blocked words and links are refused. The same settings can't be
-shared twice. 20 a day per install, 40 per address. The app checks every voice again
+shared twice. 20 a day per install, 40 per address, and 300 a day from everyone. The app checks every voice again
 when it takes one in.
 
 **Sounds from other sites.** Every 10 minutes a cron step (`src/sync.js`) reads Myinstants'
@@ -54,7 +59,9 @@ trending page and one page of one of its categories (5 pages of 10 categories, a
 about every 8 hours) and adds what's new as live *links*: the name, the link and the
 category, never the file (the app plays and downloads it from Myinstants, as a pasted link).
 They're voted on, reported and reviewed like any other sound, and a later sync never brings
-back one that was rejected or taken off by reports.
+back one that was rejected or taken off by reports. Anyone can put a sound on Myinstants, so
+a name with a link or one of the owner's blocked words is left out, as it would be from
+someone sharing it here.
 
 Every action is logged with its time and those hashes (never the address or id itself),
 for the owner to see who did what. A daily cron (`wrangler.toml`) deletes log lines older
@@ -93,6 +100,8 @@ Node's built-in SQLite standing in for D1 and a `Map` for KV.
 `schema.sql` is the whole schema for a new database, and safe to run again. A change to
 an existing table goes in `migrations/` too, numbered: run each new file once, before
 `schema.sql` (`npx wrangler d1 execute onion-board-store --remote --file migrations/<file>`).
+A file that says so runs after `schema.sql` instead (`0003-search.sql` fills the search
+index the schema makes with the sounds and voices already there).
 
 D1's free plan reads at most 5 million rows a day, and every row a query looks at counts.
 A list page goes through an index made for its order (`sounds_top`, `sounds_trend`, ... in
