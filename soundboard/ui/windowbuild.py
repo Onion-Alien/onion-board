@@ -86,6 +86,7 @@ from soundboard.ui.widgets import (
     SeekSlider,
     SteadyTabs,
     WindowRoot,
+    fit_placeholder,
 )
 from soundboard.ui.ytsearch import SearchResults
 from soundboard.wheelguard import AppStyle, no_wheel
@@ -1019,7 +1020,8 @@ class WindowBuilder(Controller):
         mw.search.setObjectName("soundssearch")
         # short, so it isn't cut to "Search sounds… …" at normal widths; the tooltip
         # has the rest
-        mw.search.setPlaceholderText(_("Search sounds or paste a link"))
+        fit_placeholder(mw.search, _("Search sounds or paste a link"), _("Search sounds"),
+                        _("Search"))
         mw._search_tip = _("Type to filter your sounds; Enter searches the web (YouTube, "
                              "TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, "
                              "TikTok, most media sites) to see it, then play or add it")
