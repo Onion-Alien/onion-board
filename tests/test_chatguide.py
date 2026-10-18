@@ -100,6 +100,26 @@ def test_check_without_discord_explains(wizard, monkeypatch):
     w.engine.main_stream = None
 
 
+def test_check_that_fails_to_start_says_so_and_can_run_again(wizard, monkeypatch):
+    """Making the test sound (or finding Discord) raising on the worker: the check
+    reports it instead of staying 'running' with nothing left to finish it."""
+    w, _ = wizard
+    w.engine.main_stream = object()
+    monkeypatch.setattr(appaudio, "supported", lambda: (True, ""))
+    monkeypatch.setattr(chatguide, "find_discord", lambda: object())
+
+    def broken():
+        raise ImportError("DLL load failed while importing _generator")
+    monkeypatch.setattr(chatcheck, "test_signal", broken)
+    got = []
+    c = chatguide.ChatCheck(w.engine)
+    c.done.connect(got.append)
+    c.start()
+    assert process_events(chatguide.QApplication.instance(), lambda: got, timeout=5)
+    assert "_generator" in got[0]["error"] and not c.running
+    w.engine.main_stream = None
+
+
 class _FakeCapture:
     """Plays Discord: 'captures' whatever the engine tapped, 0.3 s late, halved."""
 
