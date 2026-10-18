@@ -243,6 +243,7 @@ def write_config(conf: dict):
     c.setup_done = True
     c.net_offline = True
     c.tabs_off = []
+    c.tutorials_on = False   # a tab's one-time how-to (its Bun animates) isn't steady state
     c.tray = not conf.get("real_window")
     if conf.get("triggers") is not None:
         c.screen = conf["triggers"]
