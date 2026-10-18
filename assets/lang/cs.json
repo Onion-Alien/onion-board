@@ -4191,5 +4191,6 @@
   "Turns on: {voices}": "Zapne: {voices}",
   "Voice changer: {voice}.": "Měnič hlasu: {voice}.",
   "Voices on or off": "Hlasy zap. nebo vyp.",
-  "What you say is said in {language}.": "Co řekneš, zazní v jazyce {language}."
+  "What you say is said in {language}.": "Co řekneš, zazní v jazyce {language}.",
+  "Onion Board closed unexpectedly, so it started again.": "Onion Board se nečekaně zavřel, a tak se znovu spustil."
 }

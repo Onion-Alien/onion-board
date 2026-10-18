@@ -4112,5 +4112,6 @@
   "Turns on: {voices}": "Enciende: {voices}",
   "Voice changer: {voice}.": "Cambiador de voz: {voice}.",
   "Voices on or off": "Voces activadas o desactivadas",
-  "What you say is said in {language}.": "Lo que dices se dice en {language}."
+  "What you say is said in {language}.": "Lo que dices se dice en {language}.",
+  "Onion Board closed unexpectedly, so it started again.": "Onion Board se cerró de forma inesperada, así que se volvió a abrir."
 }

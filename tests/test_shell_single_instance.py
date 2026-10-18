@@ -53,6 +53,7 @@ def test_window_comes_to_front_on_a_normal_start_only():
     assert si.comes_to_front(["main.py", "--resume-setup"], False)
     assert not si.comes_to_front(["main.py", TRAY_ARG], False)
     assert si.comes_to_front(["main.py", TRAY_ARG], True)   # launched again meanwhile
+    assert not si.comes_to_front(["main.py", "--restarted"], False)   # after a crash
 
 
 def test_bring_to_front_raises_and_activates(qapp, monkeypatch):

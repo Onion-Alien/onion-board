@@ -4033,5 +4033,6 @@
   "Turns on: {voices}": "켜는 것: {voices}",
   "Voice changer: {voice}.": "보이스 체인저: {voice}.",
   "Voices on or off": "목소리 켬 또는 끔",
-  "What you say is said in {language}.": "말한 내용이 {language}(으)로 나갑니다."
+  "What you say is said in {language}.": "말한 내용이 {language}(으)로 나갑니다.",
+  "Onion Board closed unexpectedly, so it started again.": "Onion Board가 예기치 않게 종료되어 다시 시작했습니다."
 }

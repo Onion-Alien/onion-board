@@ -4191,5 +4191,6 @@
   "Turns on: {voices}": "Включит: {voices}",
   "Voice changer: {voice}.": "Смена голоса: {voice}.",
   "Voices on or off": "Голоса вкл. или выкл.",
-  "What you say is said in {language}.": "То, что ты говоришь, звучит на языке: {language}."
+  "What you say is said in {language}.": "То, что ты говоришь, звучит на языке: {language}.",
+  "Onion Board closed unexpectedly, so it started again.": "Onion Board неожиданно закрылся, поэтому запустился снова."
 }
