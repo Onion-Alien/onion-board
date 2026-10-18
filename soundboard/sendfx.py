@@ -61,6 +61,9 @@ class Limiter:
         self.fhist = np.ones(self.hold - 1, F32)        # the box filter's last outputs
         self.rel = RELEASE_DB_S / rate                 # dB per sample
         self.reduction_db = 0.0                        # deepest gain cut in the last block
+        self._ones = np.ones(2 * self.la, F32)         # `need` at rest (never written to)
+        self._ones.flags.writeable = False
+        self._open = True   # gain 1 and every history above all 1s: nothing to check
         self._resting = 0   # zeros fed through the gain-1 fast path since anything else
         self._fast = False  # the last block took that path
 
@@ -83,18 +86,20 @@ class Limiter:
         if n == 0:
             return x
         la = self.la
-        if (self.env_db == 0.0 and float(self.need.min()) == 1.0
-                and float(self.box.min()) == 1.0 and float(self.fhist.min(initial=1.0)) == 1.0
-                and float(np.abs(x).max()) <= self.ceiling):
+        at_rest = self._open or (self.env_db == 0.0 and float(self.need.min()) == 1.0
+                                 and float(self.box.min()) == 1.0
+                                 and float(self.fhist.min(initial=1.0)) == 1.0)
+        if at_rest and float(np.abs(x).max()) <= self.ceiling:
             # Nothing near the ceiling now or in the lookahead (the delay line's
             # samples are covered by `need`): the gain is exactly 1, so the block
             # only goes through the delay. Most of the time, e.g. just the mic.
             buf = np.concatenate([self.delay, x.astype(F32, copy=False)])
             self.delay = buf[n:]
-            self.need = np.ones(2 * la, F32)
+            self.need = self._ones
             self.reduction_db = 0.0
-            self._fast = True
+            self._fast = self._open = True   # (box and fhist were all 1s and still are)
             return buf[:n]
+        self._open = False
         pk = np.max(np.abs(x), axis=1)
         need = np.minimum(F32(1), self.ceiling / np.maximum(pk, F32(1e-9))).astype(F32)
         # all needed gains so far: [older history | this block]
@@ -128,6 +133,13 @@ class Limiter:
         out = buf[:n] * g[:, None]
         self.delay = buf[n:]
         return np.minimum(np.maximum(out, -self.ceiling), self.ceiling)
+
+
+def _mean_square(x: np.ndarray) -> float:
+    """float(np.mean(np.square(x, dtype=np.float64))), the same sum and division
+    without np.mean's wrapper (this runs on the audio thread every block)."""
+    sq = np.square(x, dtype=np.float64)
+    return float(np.add.reduce(sq, axis=None)) / sq.size
 
 
 def _forward_min(x: np.ndarray, la: int) -> np.ndarray:
@@ -254,12 +266,15 @@ class Ducker:
         self.held = 0.0          # seconds of hold left
         self.talking = False
 
-    def process(self, mic: np.ndarray | None, n: int, depth_db: float) -> np.ndarray | float:
+    def process(self, mic: np.ndarray | None, n: int, depth_db: float,
+                ramp: bool = True) -> np.ndarray | float:
         """The gain for the sounds bus this block: a float 1.0 when there's nothing to
-        do, else an (n, 1) ramp. `mic` is this block of the mic as sent, or None."""
+        do, else an (n, 1) ramp, or (1, 1) when the gain holds still. `mic` is this
+        block of the mic as sent, or None. Not `ramp`: the gain isn't wanted this block
+        (the bus is silence), only kept moving: 1.0."""
         dt = n / self.rate
         if mic is not None and len(mic):
-            lvl = 10 * np.log10(float(np.mean(np.square(mic, dtype=np.float64))) + 1e-12)
+            lvl = 10 * np.log10(_mean_square(mic) + 1e-12)
             # the floor follows quiet stretches down fast and creeps up slowly
             if lvl < self.floor_db:
                 self.floor_db += (lvl - self.floor_db) * min(1.0, dt / 0.2)
@@ -281,8 +296,12 @@ class Ducker:
         if abs(g1 - target) < 0.05:
             g1 = target
         self.gain_db = g1
-        ramp = np.linspace(g0, g1, n + 1, dtype=np.float64)[1:]
-        return (10 ** (ramp / 20)).astype(F32)[:, None]
+        if not ramp:
+            return 1.0
+        if g1 == g0:   # (held down while you talk: the same gain all block)
+            return (10 ** (np.full((1, 1), g1) / 20)).astype(F32)
+        steps = np.linspace(g0, g1, n + 1, dtype=np.float64)[1:]
+        return (10 ** (steps / 20)).astype(F32)[:, None]
 
 
 class VoiceLeveler:
@@ -322,7 +341,7 @@ class VoiceLeveler:
         if not n:
             return x
         dt = n / self.rate
-        p = float(np.mean(np.square(x, dtype=np.float64)))
+        p = _mean_square(x)
         lvl = 10 * math.log10(p + 1e-12)
         if lvl < self.floor_db:
             self.floor_db += (lvl - self.floor_db) * min(1.0, dt / 0.2)
@@ -342,7 +361,7 @@ class VoiceLeveler:
             up = self.UP_DB_S * (4.0 if want - g0 > 3.0 else 1.0)
             step = (up if want > g0 else self.DOWN_DB_S) * dt
             g1 = g0 + max(-step, min(step, want - g0))
-        pk = float(np.max(np.abs(x)))
+        pk = float(np.abs(x).max())
         if pk > 0:   # a shout: down at once, whatever the average says
             cap = max(self.PEAK_DB - 20 * math.log10(pk), self.MAX_DOWN_DB - 12.0)
             if cap < g1:
