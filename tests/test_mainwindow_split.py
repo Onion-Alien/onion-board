@@ -4,13 +4,14 @@ out must not come back, and the window must still make each controller: a QObjec
 owns, so timers and signals aimed at the controller stop with the window."""
 import pytest
 
-from soundboard.ui import (aboutcontrol, alertcontrol, appsetupcontrol, buncontrol, categorycontrol,
-                           devicecontrol, editcontrol, ffmpegcontrol, fitcontrol, hotkeycontrol,
-                           importcontrol, languagecontrol, mainwindow, miccontrol, netcontrol,
-                           padcontrol, playbackcontrol, remoteaccess, removecontrol, routecontrol,
-                           searchcontrol, settingscontrol, soundscontrol, statuscontrol, tabcontrol,
-                           themecontrol, tickcontrol, tipcontrol, transportcontrol, updatecontrol,
-                           windowbuild)
+from soundboard.ui.window import (aboutcontrol, alertcontrol, appsetupcontrol, buncontrol,
+                                  categorycontrol, devicecontrol, editcontrol, ffmpegcontrol,
+                                  fitcontrol, hotkeycontrol, importcontrol, languagecontrol,
+                                  mainwindow, miccontrol, netcontrol, padcontrol,
+                                  playbackcontrol, remoteaccess, removecontrol, routecontrol,
+                                  searchcontrol, settingscontrol, soundscontrol, statuscontrol,
+                                  tabcontrol, themecontrol, tickcontrol, tipcontrol,
+                                  transportcontrol, updatecontrol, windowbuild)
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 # (window attribute, controller class, methods that live there now)

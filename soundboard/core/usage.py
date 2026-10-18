@@ -864,7 +864,7 @@ def _memory(window: str) -> list[str]:
 
 def _freeze_tag(head: str, window: str, others: str) -> str:
     """`@<deepest line><<its caller>~<stuck in>/<how long>/<who was busy>`, e.g.
-    `@soundboard/ui/mainwindow.py:5898<soundboard/core/app.py:100~threading.wait/
+    `@soundboard/ui/window/mainwindow.py:5898<soundboard/core/app.py:100~threading.wait/
     lasted-10-30s/idle`: each part only when the report has it."""
     ours = _ours(window)
     tag = f"@{ours[-1]}" if ours else ""
@@ -1284,7 +1284,7 @@ SURVEY = ("shown", "dismissed", "positive", "negative")   # feedback/<one of the
 
 
 def survey(sid: str, what: str, said: str = "") -> bool:
-    """*Enjoying Onion Board?* (ui/enjoycontrol.py): `feedback/<what>` (SURVEY names
+    """*Enjoying Onion Board?* (ui/window/enjoycontrol.py): `feedback/<what>` (SURVEY names
     only), with what they typed as `feedback/<what>/<words>` (other_tag). `sid` is a
     random session the bar made, never this PC's stats_id. False when nothing can be
     sent (usage count off, offline, running from source)."""

@@ -125,7 +125,7 @@ def test_the_drag_veil_sits_out_the_restyle_too(settings, main_window):  # noqa:
 def test_a_switch_shows_a_still_with_bun_then_fades_to_the_new_theme(settings, main_window):  # noqa: F811
     """Never a half-styled frame: the window is covered by a picture of itself while
     every widget restyles, then that fades. A quick second click never stacks two."""
-    from soundboard.ui.themecover import ThemeCover
+    from soundboard.ui.window.themecover import ThemeCover
     seen = []
     real = main_window.themectl._apply_theme
 
@@ -153,7 +153,7 @@ def test_the_cover_shows_bun_in_the_theme_being_switched_to(main_window):  # noq
     """Bun and the dimming on the cover were drawn in the theme being left (his
     headphones in its accent): they're the new theme's, and the current one stays."""
     from soundboard.ui.bun.bunny import bunny_image
-    from soundboard.ui.themecover import BUNNY_H, ThemeCover
+    from soundboard.ui.window.themecover import BUNNY_H, ThemeCover
     old, new = "Dark", "Royal"   # different accents and bg, and Royal dresses Bun up
     theme.set_current(old)
     main_window.show()   # covers only go over a window on screen
@@ -201,7 +201,7 @@ def test_the_cover_fades_in_instead_of_dimming_in_one_frame(main_window):  # noq
     """It goes up as the window is (nothing changes on screen), then the dimming and
     Bun come in over a few frames; a highlight colour change is a plain blend."""
     from soundboard.style import cover as kit
-    from soundboard.ui import themecover
+    from soundboard.ui.window import themecover
     main_window.show()
     ks = []
     real = kit.Cover.repaint
@@ -279,7 +279,7 @@ def test_the_fade_out_paints_the_board_once_not_every_frame(settings, main_windo
     """The cover fades out as two pictures, old over new, and stays opaque. A
     see-through cover (an opacity effect) made Qt paint every widget under it on each
     frame of the fade: ~18 paints of every pad per switch."""
-    from soundboard.ui.themecover import ThemeCover
+    from soundboard.ui.window.themecover import ThemeCover
     from soundboard.ui.kit.widgets import Pad
 
     class Paints(QObject):

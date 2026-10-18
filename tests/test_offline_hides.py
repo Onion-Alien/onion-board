@@ -6,7 +6,7 @@ from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 from soundboard.online import net
 from soundboard.ui.settings.settings import SettingsDialog
-from soundboard.ui.tabcontrol import TAB_INDEX
+from soundboard.ui.window.tabcontrol import TAB_INDEX
 
 
 def offline(mw, on: bool):

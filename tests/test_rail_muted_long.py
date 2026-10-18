@@ -3,7 +3,7 @@ forgotten mute isn't taken for a broken app (the time only on the open rail). Li
 again: both go."""
 from PySide6.QtWidgets import QPushButton, QWidget
 
-from soundboard.ui import sidebar
+from soundboard.ui.window import sidebar
 
 
 def test_long_mute_shows_ring_and_time(qapp, monkeypatch):

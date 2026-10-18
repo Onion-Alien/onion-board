@@ -751,7 +751,7 @@ class RadioTab(QWidget):
         self._report_active()
 
     def toggle_play(self):
-        """The Play / Stop button, and Space on this tab (ui/spacekey.py)."""
+        """The Play / Stop button, and Space on this tab (ui/window/spacekey.py)."""
         if self.player.station is not None:
             self.stop()
             return
@@ -946,8 +946,8 @@ class RadioTab(QWidget):
                    "cities…  (or click a dot on the map)"))
 
     def fit_steps(self):
-        """What the main window may hide here when it gets small (ui/responsive.py)."""
-        from soundboard.ui import responsive as r
+        """What the main window may hide here when it gets small (ui/window/responsive.py)."""
+        from soundboard.ui.window import responsive as r
         def star_only(compact):
             self.btn_favs.setText("" if compact else _("Favorites"))
             self.btn_favs.setToolTip(_("Favorites") if compact else "")

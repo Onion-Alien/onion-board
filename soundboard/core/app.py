@@ -224,7 +224,7 @@ def selftest() -> int:
         __import__(mod)
     from PySide6.QtMultimedia import QMediaPlayer
     _app = QApplication(sys.argv)   # kept until the checks below have run
-    from soundboard.ui import mainwindow  # noqa: F401
+    from soundboard.ui.window import mainwindow  # noqa: F401
     from soundboard.ui.setup import setupwizard  # noqa: F401
     from soundboard.ui.kit import crashdialog  # noqa: F401
     from soundboard.audio import engine  # noqa: F401
@@ -634,7 +634,7 @@ def main():
 
     from soundboard.core import reset
     reset_note = reset.run_pending()   # a reset / restore asked for: before the settings load
-    from soundboard.ui.mainwindow import MainWindow   # after the QApplication exists
+    from soundboard.ui.window.mainwindow import MainWindow  # after the QApplication exists
     try:
         w = holder["w"] = MainWindow()
     except Exception:  # noqa: BLE001 - tell the user why nothing appeared, then quit

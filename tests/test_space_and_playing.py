@@ -1,5 +1,5 @@
 """Space plays / pauses on the Sounds and Radio tabs wherever the focus is
-(ui/spacekey.py), and the web result in the player shows that it's playing."""
+(ui/window/spacekey.py), and the web result in the player shows that it's playing."""
 import numpy as np
 import pytest
 from PySide6.QtCore import QEvent, Qt

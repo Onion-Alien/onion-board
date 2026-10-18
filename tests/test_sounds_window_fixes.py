@@ -17,8 +17,8 @@ from soundboard.audio import engine
 from soundboard.sounds import library
 from soundboard.control import winkeys
 from soundboard.sounds.library import SR, Config, SoundMeta
-from soundboard.ui import hotkeycontrol
-from soundboard.ui import mainwindow as main
+from soundboard.ui.window import hotkeycontrol
+from soundboard.ui.window import mainwindow as main
 from soundboard.ui.sounds.dialogs import EditDialog
 
 

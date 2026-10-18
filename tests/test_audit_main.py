@@ -14,10 +14,10 @@ from soundboard.core import autostart
 from soundboard.sounds import library
 from soundboard.online import net
 from soundboard.ui.setup import chatguide
-from soundboard.ui import responsive
-from soundboard.ui import importcontrol, playbackcontrol
+from soundboard.ui.window import responsive
+from soundboard.ui.window import importcontrol, playbackcontrol
 from soundboard.ui.sounds.dialogs import EditDialog
-from soundboard.ui import mainwindow as main
+from soundboard.ui.window import mainwindow as main
 from soundboard.ui.kit import worker
 from test_trim_updates_autostart import FakeReg
 
@@ -376,7 +376,7 @@ def test_a_new_theme_builds_the_spare_edit_sound_again(window, qapp, monkeypatch
     wait longer: freezes on slower PCs): the next Edit opens it, not a new build (it
     was left for the first click, ~1 s on a slower PC). Not while one is open: that
     one's kept when it closes."""
-    from soundboard.ui import themecontrol
+    from soundboard.ui.window import themecontrol
     monkeypatch.setattr(themecontrol, "SPARE_AFTER_MS", 0)
     sc = window.setctl
     sc.preload_dialogs()
@@ -406,7 +406,7 @@ def test_settings_made_ahead_again_after_a_page_it_cant_keep(window, qapp, monke
     busy PC)."""
     import time
     from tests.conftest import process_events
-    from soundboard.ui import settingscontrol
+    from soundboard.ui.window import settingscontrol
     monkeypatch.setattr(settingscontrol, "REBUILD_MS", 0, raising=False)
     sc = window.setctl
     sc.preload_dialogs()

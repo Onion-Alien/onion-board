@@ -2,7 +2,7 @@
 
 Its own Start (a computer voice says what you say), and translating in the background
 for the AI voice or the voice changer (`translate_for`, VoicePanel decides who). A
-QObject the panel owns, like ui/controller.py's: the helper's events stop with the
+QObject the panel owns, like ui/window/controller.py's: the helper's events stop with the
 panel. It builds the Start row and the translation note; the panel places them.
 """
 from __future__ import annotations

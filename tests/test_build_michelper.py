@@ -65,9 +65,9 @@ def test_the_build_stops_if_the_helper_itself_would_be_left_out(monkeypatch):
 
     import pytest
     monkeypatch.setattr(bm.subprocess, "run", lambda *a, **k: subprocess.CompletedProcess(
-        a, 0, "soundboard.ui.mainwindow\nsoundboard.audio.appaudio\n", ""))
+        a, 0, "soundboard.ui.window.mainwindow\nsoundboard.audio.appaudio\n", ""))
     with pytest.raises(RuntimeError, match="soundboard.audio.appaudio"):
         bm.unloadable()
     monkeypatch.setattr(bm.subprocess, "run", lambda *a, **k: subprocess.CompletedProcess(
-        a, 0, "soundboard.ui.mainwindow\n", ""))
-    assert bm.unloadable() == ["soundboard.ui.mainwindow"]
+        a, 0, "soundboard.ui.window.mainwindow\n", ""))
+    assert bm.unloadable() == ["soundboard.ui.window.mainwindow"]

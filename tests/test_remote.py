@@ -210,7 +210,7 @@ def test_start_up_waits_answer_requests_and_nothing_else(qapp, ctl):
     without running timers or anything else early."""
     from PySide6.QtCore import QTimer
 
-    from soundboard.ui.updatecontrol import UpdateControl
+    from soundboard.ui.window.updatecontrol import UpdateControl
     fired = []
     QTimer.singleShot(0, lambda: fired.append(1))
     out = {}

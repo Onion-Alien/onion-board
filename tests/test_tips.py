@@ -10,7 +10,7 @@ def cfg(**kw):
 
 
 def test_about_twenty_tips_each_with_a_known_place():
-    from soundboard.ui.tabcontrol import TAB_INDEX
+    from soundboard.ui.window.tabcontrol import TAB_INDEX
     pages = {"privacy", "connection", "data", "general", "tabs", "appearance", "audio",
              "hotkeys", "overlay", "updates", "help", "remote", "about"}
     assert 18 <= len(tips.TIPS) <= 26 and len(tips.BY_KEY) == len(tips.TIPS)

@@ -124,7 +124,7 @@ from soundboard.core.pollthread import PollThread
 from soundboard.i18n import _
 
 if TYPE_CHECKING:
-    from soundboard.ui.mainwindow import MainWindow
+    from soundboard.ui.window.mainwindow import MainWindow
 
 log = logging.getLogger(__name__)
 
@@ -980,7 +980,7 @@ def voice_names(mw: MainWindow) -> list[str]:
 
 def _voice_tab(mw: MainWindow):
     """The Voice tab, for a caller that checked mw.tabctl.tab_on("voice")."""
-    from soundboard.ui.taboff import VoiceOff
+    from soundboard.ui.window.taboff import VoiceOff
     voice = mw.voice
     assert not isinstance(voice, VoiceOff)   # switched on: the real tab
     return voice

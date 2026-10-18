@@ -144,7 +144,7 @@ def _close(qapp, w):
 
 @pytest.fixture
 def window(qapp, app_dir, monkeypatch):
-    from soundboard.ui import mainwindow as main
+    from soundboard.ui.window import mainwindow as main
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
         monkeypatch.setattr(engine.Engine, name, lambda self, n, _k=name: None)
     monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)

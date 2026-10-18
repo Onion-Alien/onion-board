@@ -4,7 +4,7 @@ from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QLabel, QPushButton, QVBoxLayout, QWidget
 
 from soundboard.ui.kit import theme
-from soundboard.ui.sidebar import SideRail, SideTabs
+from soundboard.ui.window.sidebar import SideRail, SideTabs
 from test_mainwindow import window  # noqa: F401  (the real MainWindow)
 
 

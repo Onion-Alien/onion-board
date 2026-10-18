@@ -6,7 +6,7 @@ from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QLabel, QPushButton, QVBoxLayout, QWidget
 
 from soundboard.sounds.library import Config
-from soundboard.ui.sidebar import SideRail, SideTabs
+from soundboard.ui.window.sidebar import SideRail, SideTabs
 
 
 @pytest.fixture

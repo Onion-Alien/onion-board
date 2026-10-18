@@ -12,7 +12,7 @@ from soundboard.audio import engine
 from soundboard.ui.kit import theme
 from soundboard.win import shellicon
 from soundboard.control import winkeys
-from soundboard.ui import mainwindow as main
+from soundboard.ui.window import mainwindow as main
 from soundboard.ui.setup import setupwizard
 
 

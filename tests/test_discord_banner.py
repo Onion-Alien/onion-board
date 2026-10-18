@@ -128,7 +128,7 @@ def test_guide_reads_discords_files_off_the_ui_thread(window, monkeypatch):
 def test_every_problem_has_words():
     for p in dc.ORDER:
         assert p in chatguide.SETTING_FIXES
-        from soundboard.ui.alertcontrol import DISCORD_URGENT
+        from soundboard.ui.window.alertcontrol import DISCORD_URGENT
         assert "{name}" in DISCORD_URGENT[p]
 
 

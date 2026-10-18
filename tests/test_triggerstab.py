@@ -15,8 +15,8 @@ from soundboard.core import updates
 from soundboard.addons import watchaddon
 from soundboard.sounds.library import SoundMeta
 from soundboard.ui.triggers import triggershost
-from soundboard.ui.livedot import is_tab_live
-from soundboard.ui.tabcontrol import TAB_INDEX
+from soundboard.ui.window.livedot import is_tab_live
+from soundboard.ui.window.tabcontrol import TAB_INDEX
 from soundboard.ui.triggers.triggershost import BoardHost
 from soundboard.ui.triggers.triggerstab import TriggersTab
 
@@ -202,7 +202,7 @@ def test_the_window_loads_onion_watch_while_it_is_built(qapp, app_dir, monkeypat
     from soundboard.audio import engine
     from soundboard.control import winkeys
     from soundboard.sounds.library import Config
-    from soundboard.ui import mainwindow as main
+    from soundboard.ui.window import mainwindow as main
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
         monkeypatch.setattr(engine.Engine, name, lambda self, n: None)
     monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
@@ -227,7 +227,7 @@ def watch_window(qapp, app_dir, monkeypatch, pkg, screen):
     from soundboard.audio import engine
     from soundboard.control import winkeys
     from soundboard.sounds.library import Config
-    from soundboard.ui import mainwindow as main
+    from soundboard.ui.window import mainwindow as main
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
         monkeypatch.setattr(engine.Engine, name, lambda self, n: None)
     monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
@@ -291,7 +291,7 @@ def test_without_onion_watch_the_tab_is_not_shown_behind_the_loading_screen(
     from soundboard.audio import engine
     from soundboard.control import winkeys
     from soundboard.sounds.library import Config
-    from soundboard.ui import mainwindow as main
+    from soundboard.ui.window import mainwindow as main
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
         monkeypatch.setattr(engine.Engine, name, lambda self, n: None)
     monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)

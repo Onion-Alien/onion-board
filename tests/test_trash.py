@@ -237,7 +237,7 @@ def _restart(qapp):
     """Start the app again on the same settings (the window fixture's fakes still on)."""
     from PySide6.QtCore import QEvent
 
-    from soundboard.ui import mainwindow as main
+    from soundboard.ui.window import mainwindow as main
     w = main.MainWindow()
     w.soundctl._load_thread.join(15)
     ids = [m.id for m in w.cfg.sounds]

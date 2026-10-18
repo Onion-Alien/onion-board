@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QApplication, QBoxLayout, QLabel, QPushButton, QWi
 
 from test_mainwindow import window  # noqa: F401
 
-from soundboard.ui.sidebar import SideRail, SideTabs
+from soundboard.ui.window.sidebar import SideRail, SideTabs
 
 
 def _rail(qapp, is_open):
@@ -53,7 +53,7 @@ def test_settings_is_its_icon_only_and_selected_round_it(qapp):
     """Open or shut, Settings is just the cog (its name for screen readers); showing its page,
     it gets the current tab's fill and the tabs lose theirs. The arrow stays at the
     far side of the open rail."""
-    from soundboard.ui.sidebar import BUTTON_W
+    from soundboard.ui.window.sidebar import BUTTON_W
     rail, _alert, _live, gear = _rail(qapp, True)
     gear.setProperty("railtext", "Settings")
     rail.set_open(False)
@@ -77,7 +77,7 @@ def test_the_line_over_settings_has_the_same_gap_on_both_sides(qapp):
     """Stop all's icon over the line and Settings' icon under it sit as far from it,
     open and shut (the cog is as tall as the buttons over it: its square is painted)."""
     from PySide6.QtWidgets import QFrame
-    from soundboard.ui.sidebar import ICON
+    from soundboard.ui.window.sidebar import ICON
     tabs = SideTabs()
     tabs.addTab(QWidget(), "One")
     stop, gear = QPushButton("Stop all"), QPushButton()
@@ -230,7 +230,7 @@ def test_a_button_between_settings_and_the_arrow_sits_exactly_in_the_middle(qapp
 def test_the_foot_never_overlaps_at_any_width(qapp):
     """Dragged from open to shut and back: the three never overlap or leave the rail,
     side by side they stay evenly spaced, stacked they stay in one column."""
-    from soundboard.ui.sidebar import BUTTON_W, OPEN_W, SHUT_W
+    from soundboard.ui.window.sidebar import BUTTON_W, OPEN_W, SHUT_W
     rail, gear, onion = _foot_three(qapp)
     for x in [*range(OPEN_W, SHUT_W - 1, -3), SHUT_W, *range(SHUT_W, OPEN_W + 1, 3)]:
         rail.drag_width(x)
@@ -294,8 +294,8 @@ def test_a_tab_switch_doesnt_lay_the_rail_out_again(window, monkeypatch):  # noq
     (~15 ms of each switch on a slower PC) though nothing on it changed: now only
     Setup (whose hints those are) brings it up to date, and the same words put on a
     status button again change nothing. New words still show."""
-    from soundboard.ui import sidebar
-    from soundboard.ui.tabcontrol import TAB_INDEX
+    from soundboard.ui.window import sidebar
+    from soundboard.ui.window.tabcontrol import TAB_INDEX
     window.resize(1200, 800)
     window.show()
     QApplication.processEvents()

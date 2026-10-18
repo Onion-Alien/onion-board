@@ -151,7 +151,7 @@ def main():
     if not screenshots.install_onion_watch():   # the Triggers tab is the Onion Watch add-on
         raise SystemExit("set ONIONBOARD_ONION_WATCH_ZIP to an OnionWatch-module.zip first")
 
-    from soundboard.ui import mainwindow
+    from soundboard.ui.window import mainwindow
     w = mainwindow.MainWindow()
     w.soundctl._load_thread.join(15)
     w.setWindowFlags(Qt.Tool | Qt.FramelessWindowHint | Qt.WindowDoesNotAcceptFocus)

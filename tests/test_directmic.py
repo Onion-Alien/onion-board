@@ -2824,7 +2824,7 @@ def test_setting_up_the_mic_shows_it_and_takes_one_click(window, monkeypatch):  
 def test_a_mic_left_silent_by_the_set_up_never_cheers(window, monkeypatch):  # noqa: F811
     """The effect went on, but the mic still sends only silence after every audio
     restart: Bun's show ends badly, no "Done" toast, and a box says what to do."""
-    from soundboard.ui import mainwindow as mw
+    from soundboard.ui.window import mainwindow as mw
     w = window
     _routes(w, monkeypatch, "missing")
     w.cfg.mic_device = "My mic"
@@ -2849,7 +2849,7 @@ def test_a_failed_mic_update_never_cheers(window, monkeypatch):  # noqa: F811
     """The optional update fails (No to Windows' prompt) while the older mic part still
     works: the status reads fine, but it mustn't be cheered. Bun's show is only for the
     first set-up (the update says it in the card), so it never starts here."""
-    from soundboard.ui import mainwindow as mw
+    from soundboard.ui.window import mainwindow as mw
     w = window
     _routes(w, monkeypatch, "outdated")
     monkeypatch.setattr(w.engine, "main_stream", object())   # the old part's running
@@ -2997,7 +2997,7 @@ def test_a_worker_that_raises_still_clears_the_busy_state(window, monkeypatch): 
     "already asking" flags go back instead of staying busy until a restart."""
     from soundboard.mic import cableremove
     from soundboard.ui.kit import busy
-    from soundboard.ui import mainwindow as mw
+    from soundboard.ui.window import mainwindow as mw
     w = window
     _working_on_the_mic(w, monkeypatch)
     said = []
@@ -3241,7 +3241,7 @@ def test_window_starts_on_the_mic_with_the_cable_copy(qapp, app_dir, monkeypatch
     from soundboard.audio import engine as eng
     from soundboard.sounds import library
     from soundboard.control import winkeys
-    from soundboard.ui import mainwindow as main
+    from soundboard.ui.window import mainwindow as main
     monkeypatch.setattr(dm, "status", lambda name=None: "outdated")
     monkeypatch.setattr(eng, "virtual_outputs", lambda: [CABLE_IN])
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
@@ -3536,7 +3536,7 @@ def test_a_failing_helper_check_backs_off(window, monkeypatch):  # noqa: F811
 
     from conftest import process_events
     from soundboard.mic import michelper
-    from soundboard.ui import miccontrol
+    from soundboard.ui.window import miccontrol
     w = window
     _routes(w, monkeypatch, "missing")
     w.cfg.mic_device = "My mic"

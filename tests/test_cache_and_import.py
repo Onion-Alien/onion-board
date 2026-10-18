@@ -107,7 +107,7 @@ def test_two_writers_of_one_cache_leave_a_whole_file_and_no_temp(app_dir, monkey
 def test_load_all_skips_sounds_an_earlier_load_is_still_decoding(app_dir, monkeypatch):
     """_load_all again while the first is still on a slow sound (a pack import, Undo)
     doesn't decode that sound a second time; its thread ends after the first one's."""
-    from soundboard.ui import soundscontrol as mw
+    from soundboard.ui.window import soundscontrol as mw
     slow, other = (SoundMeta(id="slow", name="slow", file="slow.wav"),
                     SoundMeta(id="other", name="other", file="o.wav"))
     started, go = threading.Event(), threading.Event()

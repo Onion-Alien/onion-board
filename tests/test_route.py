@@ -8,9 +8,9 @@ from soundboard.core import backup, reset
 from soundboard.audio import engine
 from soundboard.sounds.library import Config
 from soundboard.ui.settings.settings import SettingsDialog
-from soundboard.ui import mainwindow as main
+from soundboard.ui.window import mainwindow as main
 from soundboard.ui.setup import setupwizard
-from soundboard.ui.routecontrol import ROUTE_DEVICE
+from soundboard.ui.window.routecontrol import ROUTE_DEVICE
 from conftest import devices_done
 from test_setupwizard import devices, resume, wizard  # noqa: F401  (fake devices)
 

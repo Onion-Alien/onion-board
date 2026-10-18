@@ -324,10 +324,10 @@ These are the current reference points. Copy their structure before inventing a 
 
 | Screen | What it gets right |
 | --- | --- |
-| Sounds tab board (`ui/mainwindow.py`, pads) | Fixed-size tiles in a grid that scrolls down; picture, name, hotkey badge, length; one accent main button (*Add*, a menu of every way in), the rest quiet. |
+| Sounds tab board (`ui/window/mainwindow.py`, pads) | Fixed-size tiles in a grid that scrolls down; picture, name, hotkey badge, length; one accent main button (*Add*, a menu of every way in), the rest quiet. |
 | Setup guide (`ui/setup/setupwizard.py`) | One question per step in a big title, a short plain explanation, choices as large icon rows, the mascot for warmth, one main button. |
 | Setup tab cards | A grid: your mic and Who's listening side by side in one row (always the same height, titles on one line), Devices and Connect your chat under your mic, Equalizer and volume under Who's listening. Every card open, built with `card()` (heading from `heading_row()`): they fit the screen, so nothing folds away. |
-| Left tab rail (`ui/sidebar.py`) | Icons only when closed, names when open, the selected tab a soft accent fill, settings at the foot. |
+| Left tab rail (`ui/window/sidebar.py`) | Icons only when closed, names when open, the selected tab a soft accent fill, settings at the foot. |
 | Send feedback box (`ui/kit/feedbackdialog.py`) | The small-dialog pattern: title question, hint, tick boxes, buttons bottom-right with the main one first, a second page instead of a second dialog. |
 | Bottom strip / player bar | One slim bar: icon, slider, steady number. No boxes around each part. |
 
@@ -398,7 +398,7 @@ These are the current reference points. Copy their structure before inventing a 
 ## 4. Icons and pop-ups instead of long buttons
 
 - **Icon and text alignment** (Fluent 2, Material 3 and Apple's lists agree on this).
-  Model: the sidebar's Sound output card (`OutputBlock` in `ui/sidebar.py`).
+  Model: the sidebar's Sound output card (`OutputBlock` in `ui/window/sidebar.py`).
   - **One icon column.** Icons in a stack of rows share one fixed-width column (16 px
     in cards, the tab icon size on the rail), centred on one line. A card inside a
     column of nav items puts its icons on the nav icons' centre line.
@@ -682,7 +682,7 @@ The rules above are Onion Board's take on what the big design systems agree on n
 | Dialogs that grow to fit their text | `soundboard/ui/kit/fit.py` |
 | Wrapping button rows (`Flow`), undo bar, steady numbers | `soundboard/ui/kit/panel.py`, `settings._button_row` |
 | Settings cards | `settings.SettingsDialog._card` |
-| Left tab rail | `soundboard/ui/sidebar.py` |
+| Left tab rail | `soundboard/ui/window/sidebar.py` |
 | Wheel guard, dropdown widths, the gap under a dropdown | `soundboard/ui/kit/wheelguard.py` |
 
 ## 13. UI workflow for agents and reviewers

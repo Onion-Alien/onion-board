@@ -3,7 +3,7 @@ when it grows."""
 from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QHBoxLayout, QPushButton, QVBoxLayout, QWidget
 
-from soundboard.ui import responsive
+from soundboard.ui.window import responsive
 
 LONG = "Your mic in Discord / games: a long device name here"
 SHORT = "Connected"
@@ -155,7 +155,7 @@ def test_only_the_page_on_show_says_how_tall_it_is(qapp):
     it is at the new width, and the hidden tabs' wrapped text was laid out again on
     every step (~10 frames a second on the Radio, Triggers and Voice tabs)."""
     from soundboard.ui.kit.panel import ShownStack
-    from soundboard.ui.sidebar import SideTabs
+    from soundboard.ui.window.sidebar import SideTabs
     for make, add, show in ((ShownStack, ShownStack.addWidget, ShownStack.setCurrentWidget),
                             (SideTabs, lambda t, p: t.addTab(p, ""), SideTabs.setCurrentWidget)):
         holder = make()

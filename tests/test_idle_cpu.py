@@ -8,7 +8,7 @@ from test_mainwindow import window  # noqa: F401 - the real window, offscreen
 
 from soundboard.audio import appaudio
 from soundboard.mic import directmic
-from soundboard.ui import tickcontrol, windowbuild
+from soundboard.ui.window import tickcontrol, windowbuild
 
 
 def test_windows_default_output_is_only_asked_while_followed(window, monkeypatch, qapp):  # noqa: F811
@@ -100,7 +100,7 @@ def test_mic_check_pulse_runs_only_while_shown_in_front(window, monkeypatch, qap
     minimised or behind a game (there it stands still, fully bright)."""
     from PySide6.QtCore import Qt
 
-    from soundboard.ui import mainwindow as main
+    from soundboard.ui.window import mainwindow as main
     monkeypatch.setattr(main.appstate, "active", lambda: True)
     window._ui_live = True
     window.on_mic_check(True)
@@ -160,7 +160,7 @@ def test_ui_tick_goes_over_only_the_pads_showing_a_sound(window, monkeypatch):  
 
 
 def test_the_ui_tick_slows_down_while_nothing_moves(window, monkeypatch, qapp):  # noqa: F811
-    from soundboard.ui import mainwindow as main
+    from soundboard.ui.window import mainwindow as main
     assert process_events(qapp, lambda: "s0" in window.audio)
     e = window.engine
     playing = {}
@@ -193,7 +193,7 @@ def test_the_ui_tick_slows_down_while_nothing_moves(window, monkeypatch, qapp): 
 def test_unfocused_playback_keeps_visible_meters_at_full_pace(window, monkeypatch, qapp):  # noqa: F811
     from PySide6.QtCore import Qt
 
-    from soundboard.ui import mainwindow as main
+    from soundboard.ui.window import mainwindow as main
 
     monkeypatch.setattr(window, "isVisible", lambda: True)
     monkeypatch.setattr(window, "isMinimized", lambda: False)
@@ -220,7 +220,7 @@ def test_unfocused_playback_keeps_visible_meters_at_full_pace(window, monkeypatc
 
 
 def test_waiting_queues_do_not_keep_paused_playback_busy(window, monkeypatch):  # noqa: F811
-    from soundboard.ui import mainwindow as main
+    from soundboard.ui.window import mainwindow as main
 
     playing = {"s0": (0.5, True)}
     monkeypatch.setattr(window.engine, "playing", lambda: dict(playing))

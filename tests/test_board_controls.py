@@ -12,7 +12,7 @@ from PySide6.QtWidgets import QApplication, QLabel, QPushButton
 
 from soundboard import voicefx
 
-from soundboard.ui import responsive
+from soundboard.ui.window import responsive
 from soundboard.ui.kit import toast
 from soundboard.core import backup
 from soundboard.win import thumbbar
@@ -561,7 +561,7 @@ def test_up_next_is_one_chip_whose_list_reaches_every_queued_sound(window, monke
     """13 queued: the row used to show five cut-off names and "+8 more", so the 10th
     couldn't be taken out. Now one chip says how many wait; its list has them all,
     whole names, each with its ✕, and Clear."""
-    from soundboard.ui.upnext import UpNextChip
+    from soundboard.ui.window.upnext import UpNextChip
     from uicheck import assert_breathing_room
     w = window
     w.resize(1200, 760)
@@ -677,7 +677,7 @@ def menu_pick(monkeypatch, path):
     """Make the pad menu pick the action at `path` (texts, through submenus); returns
     the top-level menu's texts as it was shown."""
     from PySide6.QtWidgets import QMenu
-    from soundboard.ui import mainwindow, padcontrol
+    from soundboard.ui.window import mainwindow, padcontrol
     shown = []
 
     class Menu(QMenu):
@@ -824,7 +824,7 @@ def test_duplicate_and_show_file(window, monkeypatch):
     assert Path(new.file).is_file()
     runs = []
     monkeypatch.setattr(subprocess, "Popen", lambda args, **k: runs.append(args))
-    from soundboard.ui import mainwindow as mwmod
+    from soundboard.ui.window import mainwindow as mwmod
     monkeypatch.setattr(mwmod.sys, "platform", "win32")
     w.editctl.show_sound_file("s0")
     assert runs and runs[-1][0] == "explorer" and runs[-1][-1] == w.meta("s0").file

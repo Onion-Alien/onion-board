@@ -2,7 +2,7 @@
 alone, each with a *Show me* that opens the right place. Shown only after the setup
 guide is done, at most once a day, never while a game is up (the overlay open or a
 fullscreen program in front), and never again once seen. Settings → General →
-*Show tips* turns them off. The window (ui/mainwindow.py) shows the bar and does
+*Show tips* turns them off. The window (ui/window/mainwindow.py) shows the bar and does
 the *Show me*; this module only picks."""
 from __future__ import annotations
 

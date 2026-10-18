@@ -23,7 +23,7 @@ from soundboard.ui.kit.widgets import DropdownMenu
 from soundboard.i18n import _, ngettext
 
 if TYPE_CHECKING:
-    from soundboard.ui.mainwindow import MainWindow
+    from soundboard.ui.window.mainwindow import MainWindow
 
 
 def swatch(color: str, size: int = 14) -> QIcon:

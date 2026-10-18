@@ -105,7 +105,7 @@ def test_an_update_never_opens_the_setup_guide_again(qapp, app_dir, monkeypatch)
     the setup guide."""
     from soundboard.audio import engine
     from soundboard.control import winkeys
-    from soundboard.ui import mainwindow as main
+    from soundboard.ui.window import mainwindow as main
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
         monkeypatch.setattr(engine.Engine, name, lambda self, n, _k=name: None)
     monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)

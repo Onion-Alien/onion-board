@@ -38,7 +38,7 @@ from soundboard.style.owl import H as OWL_H
 from soundboard.style.owl import W as OWL_W
 from soundboard.style.owl import OwlWidget
 from soundboard.ui.kit.panel import CardGrid, Flow, HoverCard, RoundedFrame
-from soundboard.ui.responsive import FitWidth
+from soundboard.ui.window.responsive import FitWidth
 from soundboard.ui.kit.widgets import LoadingBar, fmt_time, paint_now_playing
 from soundboard.core import errors
 from soundboard.i18n import _, ngettext

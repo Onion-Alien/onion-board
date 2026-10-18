@@ -3,7 +3,8 @@ import pytest
 from PySide6.QtCore import QEvent, QPointF, Qt
 from PySide6.QtGui import QMouseEvent
 from PySide6.QtWidgets import QLabel, QPushButton, QWidget
-from soundboard.ui.sidebar import FULL_W, OPEN_W, SHUT_W, SNAP_W, SideRail, SideTabs, _Arrow
+from soundboard.ui.window.sidebar import (FULL_W, OPEN_W, SHUT_W, SNAP_W, SideRail, SideTabs,
+                                          _Arrow)
 
 
 def _event(qapp, handle, kind, x):

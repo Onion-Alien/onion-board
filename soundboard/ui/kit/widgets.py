@@ -804,7 +804,8 @@ class Pad(QAbstractButton):
 
     def __init__(self, meta: SoundMeta, width: int):
         super().__init__()
-        self.setProperty("own_space", True)   # Space pauses / plays this pad (ui/spacekey.py)
+        # Space pauses / plays this pad (ui/window/spacekey.py)
+        self.setProperty("own_space", True)
         self.meta = meta
         self.progress: float | None = None     # None = not playing
         self.paused = False
