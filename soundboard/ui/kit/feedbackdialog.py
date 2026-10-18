@@ -17,7 +17,7 @@ import shiboken6
 from soundboard import __version__
 from soundboard.core import feedback, usage
 from soundboard.i18n import _
-from soundboard.ui import busy, fit, icons
+from soundboard.ui.kit import busy, fit, icons
 
 
 def picks() -> list[tuple[str, str]]:

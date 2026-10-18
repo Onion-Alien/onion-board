@@ -5,7 +5,7 @@ import pytest
 from PySide6.QtCore import QPoint, Qt
 from PySide6.QtTest import QTest
 
-from soundboard.ui import numberbox
+from soundboard.ui.kit import numberbox
 from soundboard.ui.speedpitch import SpeedPitchButton
 
 

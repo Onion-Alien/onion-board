@@ -22,8 +22,8 @@ from soundboard import voicefx
 from soundboard.online import store, storevoices as sv
 from soundboard.i18n import _
 from soundboard.speech import aivoicelist as avl
-from soundboard.ui import busy, fit, icons
-from soundboard.ui.panel import HoverCard
+from soundboard.ui.kit import busy, fit, icons
+from soundboard.ui.kit.panel import HoverCard
 from soundboard.ui.storetab import SoundRow
 
 if TYPE_CHECKING:
@@ -192,7 +192,7 @@ class ShareVoiceDialog(QDialog):
         self.error.setWordWrap(True)
         self.error.setTextFormat(Qt.TextFormat.PlainText)
         self.error.hide()
-        from soundboard import theme
+        from soundboard.ui.kit import theme
         theme.set_tone(self.error, "error")
         v.addWidget(self.error)
         row = QHBoxLayout()

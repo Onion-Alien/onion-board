@@ -3,7 +3,7 @@ exists, so agents following it don't reach for things that aren't there."""
 import re
 from pathlib import Path
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 
 ROOT = Path(__file__).resolve().parent.parent
 DOC = (ROOT / "docs" / "DESIGN.md").read_text(encoding="utf-8")
@@ -37,7 +37,7 @@ def test_every_code_path_it_names_exists():
     assert paths
     missing = sorted(p for p in paths if not (ROOT / p).exists())
     # files from UI work still in review are allowed while their PRs are open
-    pending = {"soundboard/ui/sidebar.py", "soundboard/ui/feedbackdialog.py"}
+    pending = {"soundboard/ui/sidebar.py", "soundboard/ui/kit/feedbackdialog.py"}
     assert not [p for p in missing if p not in pending], missing
 
 

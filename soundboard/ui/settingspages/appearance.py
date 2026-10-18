@@ -11,12 +11,13 @@ from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QColorDialog, QComboBox,
                                QGridLayout, QHBoxLayout, QLabel, QLayout, QPushButton, QRadioButton,
                                QSlider, QVBoxLayout, QWidget)
 
-from soundboard import i18n, theme
+from soundboard import i18n
+from soundboard.ui.kit import theme
 from soundboard.i18n import _
-from soundboard.ui import busy
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit import busy
+from soundboard.ui.kit.pixels import snap_to_pixels
 from soundboard.ui.settingspages import Page, _button_row
-from soundboard.wheelguard import no_wheel
+from soundboard.ui.kit.wheelguard import no_wheel
 
 
 _tiles: dict[str, QBrush | None] = {}
@@ -146,7 +147,7 @@ class ThemeCard(QPushButton):
 
     def enterEvent(self, e):
         super().enterEvent(e)
-        from soundboard.ui.toast import animations_on
+        from soundboard.ui.kit.toast import animations_on
         if self._hello is None and animations_on():   # (once per visit: no restart)
             self._hello = time.monotonic()
             self._tick.start()
@@ -255,7 +256,7 @@ class ThemeGrid(QWidget):
             return
         for col in range(self.columns + 1):
             self.grid.setColumnStretch(col, 0)
-        from soundboard.ui.widgets import take_out   # (it imports this module)
+        from soundboard.ui.kit.widgets import take_out  # (it imports this module)
         while self.grid.count():
             take_out(self.grid)
         for i, card in enumerate(self.cards):
@@ -283,7 +284,7 @@ class AppearancePage(Page):
         tv.setSpacing(6)
         tv.addWidget(self._section(self._texture_card()))
         tv.addSpacing(14)
-        from soundboard.ui.panel import heading_row
+        from soundboard.ui.kit.panel import heading_row
         group_icons = {"Classic": "star", "Colourful": "palette", "Wild": "shuffle",
                        "Meme": "like"}
         for group, names in theme.groups():
@@ -335,7 +336,7 @@ class AppearancePage(Page):
         bv.addLayout(row)
         group = QButtonGroup(box)
         tabs = []
-        from soundboard.ui.widgets import widget_at   # (it imports this module)
+        from soundboard.ui.kit.widgets import widget_at  # (it imports this module)
         for i, (name, card) in enumerate(pages):
             card.setObjectName("lookpage")   # not a card of its own: flat inside the box
             lay = card.layout()

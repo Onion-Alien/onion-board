@@ -35,7 +35,7 @@ from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QDialog, Q
 from soundboard.core import autostart
 from soundboard.mic import directmic, discordcfg, michelper
 from soundboard.audio import engine as eng
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.audio.engine import SR
 from soundboard.sounds import library
 from soundboard.core import usage
@@ -43,15 +43,15 @@ from soundboard.online import net
 from soundboard.sounds.library import RESOURCE_DIR
 from soundboard.core.pollthread import PollThread
 from soundboard.ui import cableconfirm
-from soundboard.ui.glow import Glow
-from soundboard.ui import busy, fit, icons, panel
+from soundboard.ui.kit.glow import Glow
+from soundboard.ui.kit import busy, fit, icons, panel
 from soundboard.ui.bunnywidget import TALK, BunnyWidget
 from soundboard.ui.setupshow import SetupShow
-from soundboard.ui.choicetile import ChoiceTile, FoldPill
+from soundboard.ui.kit.choicetile import ChoiceTile, FoldPill
 from soundboard.core import errors
 from soundboard.i18n import _
-from soundboard.ui.pixels import snap_to_pixels
-from soundboard.ui.toast import animations_on
+from soundboard.ui.kit.pixels import snap_to_pixels
+from soundboard.ui.kit.toast import animations_on
 
 log = logging.getLogger(__name__)
 
@@ -1832,7 +1832,7 @@ class SetupWizard(QDialog):
 
     def _tell_us(self):
         """The driver let them down: the feedback box, over the guide."""
-        from soundboard.ui import feedbackdialog
+        from soundboard.ui.kit import feedbackdialog
         self._feedback = feedbackdialog.ask(self.win.cfg, self)
 
     def attach_mic(self):
@@ -2133,7 +2133,7 @@ class SetupWizard(QDialog):
         self.show_guide("steam")
 
     def show_streamer_guide(self):
-        from soundboard.ui.crashdialog import free_dialog
+        from soundboard.ui.kit.crashdialog import free_dialog
         from soundboard.ui.streamguide import StreamerGuide
         g = StreamerGuide(self, self.win)
         g.exec()

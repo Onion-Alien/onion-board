@@ -48,7 +48,7 @@ def test_picture_is_cropped_square_with_round_corners(qapp, art_dir):
 def test_tab_icon_accepts_a_picture(qapp, art_dir):
     from PySide6.QtWidgets import QTabWidget, QWidget
 
-    from soundboard.ui import icons
+    from soundboard.ui.kit import icons
     _png(art_dir, "voice-robot")
     tabs = QTabWidget()
     tabs.addTab(QWidget(), "")

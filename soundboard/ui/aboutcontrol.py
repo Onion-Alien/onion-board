@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import QPoint
 
 from soundboard.i18n import _
-from soundboard.ui import busy, icons
+from soundboard.ui.kit import busy, icons
 from soundboard.ui.controller import Controller
 
 if TYPE_CHECKING:
@@ -50,7 +50,7 @@ class AboutControl(Controller):
     def ask_feedback(self):
         """*Send feedback*: "What would you improve?" (ui/feedbackdialog.py)."""
         mw = self.mw
-        from soundboard.ui import feedbackdialog
+        from soundboard.ui.kit import feedbackdialog
         mw.show_from_tray()
         self.feedback_box = feedbackdialog.ask(mw.cfg, mw)
 

@@ -12,7 +12,7 @@ from PySide6.QtWidgets import QApplication, QFrame, QLabel, QPushButton, QScroll
 from conftest import process_events
 from soundboard.online import net
 from soundboard.settings import SettingsDialog, ThemeCard
-from soundboard.ui import busy
+from soundboard.ui.kit import busy
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 
@@ -481,7 +481,7 @@ def test_theme_style_switches_textured_and_plain(window, qapp):  # noqa: F811
     """Textured (a new install's default) puts the theme's pattern on; Plain leaves the
     panels flat."""
     from soundboard.sounds import library
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     assert library.Config().theme_texture is True
     window.themectl.apply_theme("Amber Terminal")
     d = SettingsDialog(window, "appearance")
@@ -502,10 +502,10 @@ def test_a_saved_plain_choice_stays_plain():
     assert library.Config.from_raw({}).theme_texture is True
 
 
-@pytest.mark.parametrize("kind", sorted(__import__("soundboard.theme").theme.TEXTURES))
+@pytest.mark.parametrize("kind", sorted(__import__("soundboard.ui.kit.theme").theme.TEXTURES))
 def test_every_texture_tile_is_see_through(qapp, kind):
     """Each tile lies over the card's own colour, so hover shades still show."""
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     for name in ("Dark", "Light"):
         img = theme.texture_image(kind, theme.THEMES[name])
         assert not img.isNull()
@@ -519,7 +519,7 @@ def test_textured_paints_the_glow_and_the_theme_cards_preview_it(qapp, window, m
     can copy it) and each theme card shows its own pattern. Plain: flat, no pattern."""
     from PySide6.QtCore import QPointF, QRect
     from PySide6.QtGui import QImage, QPainter
-    from soundboard import theme
+    from soundboard.ui.kit import theme
 
     def corner(textured):
         img = QImage(400, 300, QImage.Format.Format_ARGB32)
@@ -573,7 +573,7 @@ def test_card_headings_line_up_with_the_text_under_them(qapp, window):  # noqa: 
 
 
 def test_highlight_colour_slides_saves_and_resets(window, qapp, monkeypatch):  # noqa: F811
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     d = SettingsDialog(window, "appearance")
     # a colour change restyles only what's drawn in it: the whole app took seconds
     real_stylesheet = theme.stylesheet
@@ -956,7 +956,7 @@ def test_live_tabs_choices_side_by_side_like_connection(window, qapp):  # noqa: 
     """Comparable short choices look alike: Live tabs' two sit in one wrapping row,
     as Connection's and Network activity's do (offscreen fonts here are too wide to
     compare positions: the pictures check that)."""
-    from soundboard.ui.panel import Flow
+    from soundboard.ui.kit.panel import Flow
     d = SettingsDialog(window, "appearance")
     card = d.live_green.parentWidget()
     flows = [f for f in card.layout().findChildren(Flow)

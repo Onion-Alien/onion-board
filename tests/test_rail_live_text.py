@@ -4,7 +4,7 @@ read on its own box when it's switched on, as Stop all's beside it do (the gener
 import pytest
 from PySide6.QtWidgets import QFrame, QPushButton, QVBoxLayout
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 
 
 def _ink(b: QPushButton) -> float:

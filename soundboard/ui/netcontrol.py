@@ -12,11 +12,12 @@ from typing import TYPE_CHECKING
 from soundboard.online import net, tor
 from soundboard.control import remote
 from soundboard.i18n import _
-from soundboard.ui import busy, sidebar
+from soundboard.ui.kit import busy
+from soundboard.ui import sidebar
 from soundboard.ui.controller import Controller
 from soundboard.ui.radiopanel import RadioTab
 from soundboard.ui.tabcontrol import TAB_INDEX
-from soundboard.ui.widgets import fit_placeholder
+from soundboard.ui.kit.widgets import fit_placeholder
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow

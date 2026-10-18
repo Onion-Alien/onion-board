@@ -363,7 +363,7 @@ def _show_plain(v):
         from PySide6.QtWidgets import QApplication
 
         from soundboard.core import errors
-        from soundboard.ui import busy
+        from soundboard.ui.kit import busy
         if QApplication.instance() is None or not _app_in_front():
             return   # never over a game: the log has it
         busy.toast(QApplication.activeWindow(), html.escape(errors.plain(v)), "error")
@@ -589,7 +589,7 @@ def _offer(rep: Report):
 def show(rep: Report, parent=None):
     """The report dialog for `rep`, the others this run listed on it (Settings'
     *See report*)."""
-    from soundboard.ui.crashdialog import CrashDialog
+    from soundboard.ui.kit.crashdialog import CrashDialog
     for other in _state["recent"]:
         if other is not rep and other.title not in rep.extra:
             _add_extra(rep, other.title)
@@ -607,7 +607,7 @@ def _show_dialog(rep: Report):
         if QApplication.instance() is None:
             _native_box(rep)
             return
-        from soundboard.ui.crashdialog import CrashDialog
+        from soundboard.ui.kit.crashdialog import CrashDialog
         dlg = CrashDialog(rep, _state["log_path"], parent=QApplication.activeWindow())
         _state["dialog"] = dlg   # keep it alive while it's shown
         dlg.exec()

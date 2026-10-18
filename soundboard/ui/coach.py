@@ -42,9 +42,9 @@ from PySide6.QtGui import QColor, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import (QApplication, QFrame, QGraphicsDropShadowEffect, QHBoxLayout,
                                QLabel, QPushButton, QVBoxLayout, QWidget)
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.i18n import _
-from soundboard.ui import oops, toast
+from soundboard.ui.kit import oops, toast
 from soundboard.ui.bunnywidget import BunnyWidget
 
 log = logging.getLogger(__name__)

@@ -401,7 +401,7 @@ def test_a_late_answer_after_shutdown_is_dropped(qapp, fake):
 
 
 def test_share_needs_a_file_a_name_and_the_tick(qapp, fake, tmp_path):
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     p = tmp_path / "my horn.wav"
     p.write_bytes(_wav())
     d = storetab.ShareDialog("id-1234567890abcdef")
@@ -486,7 +486,7 @@ def test_a_link_row_goes_through_the_link_downloader(qapp, fake):
 
 
 def test_share_window_on_a_link(qapp, fake):
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     d = storetab.ShareDialog("id-1234567890abcdef", None, "https://youtu.be/xyz", "Bruh")
     assert d.mode == "link" and d.name.text() == "Bruh" and not d.agree.isVisibleTo(d)
     assert not busy.is_busy(d.btn_send)   # a link needs no tick

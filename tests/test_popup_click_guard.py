@@ -4,7 +4,7 @@ from PySide6.QtCore import QPoint, Qt
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QComboBox, QMenu, QPushButton, QWidget
 
-from soundboard import wheelguard
+from soundboard.ui.kit import wheelguard
 from soundboard.ui.langpick import LanguageDialog
 
 

@@ -603,7 +603,7 @@ class RadioDirectory(QObject):
                 after = bad
             # emitted on the UI thread: the Radio tab switched off during an emit from
             # here freed this mid-emit (an access violation, issue #339)
-            from soundboard.ui import busy
+            from soundboard.ui.kit import busy
             busy.emit(self._call, after)
         _start_for(self, run, "radio-directory")
 
@@ -1060,7 +1060,7 @@ class RadioPlayer(QObject):
         except ValueError:   # a name: where it leads is looked up first, off the UI thread
             self._set_state("connecting")
             gen = self._gen
-            from soundboard.ui import busy   # (emitted on the UI thread, as above)
+            from soundboard.ui.kit import busy  # (emitted on the UI thread, as above)
             _start_for(self, lambda: busy.emit(self._looked_up, gen, _name_is_local(host)),
                        "radio-lookup")
             return

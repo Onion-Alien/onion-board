@@ -7,7 +7,8 @@ from PySide6.QtWidgets import QPushButton
 
 from soundboard.core import usage
 from soundboard.sounds.library import SoundMeta
-from soundboard.ui import countdialog, feedbackdialog, sourcedialog
+from soundboard.ui import countdialog, sourcedialog
+from soundboard.ui.kit import feedbackdialog
 
 from test_sourceinfo import SRC
 

@@ -15,8 +15,8 @@ from PySide6.QtWidgets import (QFrame, QHBoxLayout, QInputDialog, QLabel, QMenu,
 from soundboard.core import usage
 from soundboard.mic import voicesetups
 from soundboard.i18n import _
-from soundboard.ui import icons
-from soundboard.ui.panel import Flow
+from soundboard.ui.kit import icons
+from soundboard.ui.kit.panel import Flow
 
 UNDO_MS = 10000
 NOTE_MS = 6000   # a "Saved" / "is on" line goes again after this

@@ -224,9 +224,10 @@ def selftest() -> int:
         __import__(mod)
     from PySide6.QtMultimedia import QMediaPlayer
     _app = QApplication(sys.argv)   # kept until the checks below have run
-    from soundboard.ui import mainwindow, setupwizard, crashdialog  # noqa: F401
+    from soundboard.ui import mainwindow, setupwizard  # noqa: F401
+    from soundboard.ui.kit import crashdialog  # noqa: F401
     from soundboard.audio import engine  # noqa: F401
-    from soundboard import theme  # noqa: F401
+    from soundboard.ui.kit import theme  # noqa: F401
     from soundboard.online import radio  # noqa: F401
     theme.app_icon()
     QMediaPlayer()   # loads the FFmpeg multimedia plugin
@@ -421,7 +422,7 @@ def _selftest_addon_in(path, tmp) -> int:
     import importlib
 
     from soundboard.addons import modules
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     info = modules.install_zip(path, "onion-watch", "triggers", tmp / "modules")
     entry = modules.load_package(info)
 
@@ -588,7 +589,7 @@ def main():
     if i18n.is_rtl():   # Arabic: the whole app mirrored, add-on tabs included
         from PySide6.QtCore import Qt as _Qt
         app.setLayoutDirection(_Qt.LayoutDirection.RightToLeft)
-    from soundboard import theme as _theme
+    from soundboard.ui.kit import theme as _theme
     i18n.use_fonts(_theme.font_families())
     # same-width digits everywhere, so a number that changes doesn't make its text jump
     from PySide6.QtGui import QFont as _QFont
@@ -596,11 +597,11 @@ def main():
     _font.setFeature(_QFont.Tag("tnum"), 1)
     app.setFont(_font)
     i18n.translate_qt_buttons(app)   # OK, Cancel, Yes… in Qt's own dialogs
-    from soundboard.ui import quietbox
+    from soundboard.ui.kit import quietbox
     quietbox.install(app)   # no Windows ding from tips and warnings
-    from soundboard.ui.widgets import install_click_focus
+    from soundboard.ui.kit.widgets import install_click_focus
     install_click_focus(app)   # a click leaves no focus ring: that's for the keyboard
-    from soundboard.ui import weblinks
+    from soundboard.ui.kit import weblinks
     weblinks.install()   # links open the browser without the relay's proxy settings
     applog.ui_ready()
     if "--restart-after" in sys.argv:   # restarted by the app (Settings > Reset)
@@ -621,13 +622,13 @@ def main():
         splash.show()
     from soundboard.online import ffmpegget
     ffmpegget.start_check()   # meanwhile: is FFmpeg there and does it start? (never waited on)
-    from soundboard.wheelguard import AppStyle
+    from soundboard.ui.kit.wheelguard import AppStyle
     app.setStyle(AppStyle("Fusion"))   # also: the wheel never changes a dropdown or tab
-    from soundboard.ui import a11y
+    from soundboard.ui.kit import a11y
     a11y.install(app)   # screen-reader names for icon-only controls, as focus moves
-    from soundboard.ui import numberbox
+    from soundboard.ui.kit import numberbox
     numberbox.install(app)   # a typed number counts without Enter; Enter presses no button
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     app.setWindowIcon(theme.app_icon())   # every window, and the taskbar button
 
     from soundboard.core import reset

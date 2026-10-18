@@ -399,7 +399,7 @@ def test_one_click_voice_install_then_its_picked_up(panel, qapp, monkeypatch):
                                                             "ok")[-1])
     _huihui_arrives(monkeypatch)
     s.installs.b_voice_install.click()
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     assert busy.is_busy(s.installs.b_voice_install) and "Installing" in s.lbl_tr.text()
     s.installs.b_voice_install.click()             # a second click does nothing
     go.set()
@@ -470,11 +470,11 @@ def test_update_shows_progress_and_blocks_a_second_install(panel, qapp, monkeypa
     reported = []
     monkeypatch.setattr(applog, "report", lambda **k: reported.append(k))
     s.installs._install()
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     assert busy.is_busy(s.installs.b_update) and busy.is_busy(s.installs.b_install)
     s.installs._install()                          # a double-click: still one pip
     assert process_events(qapp, lambda: not busy.is_busy(s.installs.b_update))
-    from soundboard.ui import toast
+    from soundboard.ui.kit import toast
     [t] = [t for t in toast.shown(s) if "disk full" in t.words()]
     assert len(started) == 1 and t.kind == "error" and "again" in t.words()
     assert s.installs.b_update.text() == "Update speech recognition"
@@ -998,7 +998,7 @@ def test_effects_that_never_delay_the_voice_arent_built_to_ask(panel, monkeypatc
 def test_add_ons_refresh_scans_the_disk_off_the_ui_thread(panel, qapp, monkeypatch):
     import threading
 
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     from soundboard.ui import voicepanel as vp
     p, _ = panel
     real, where = vp.mods.discover, []
@@ -1014,7 +1014,7 @@ def test_add_ons_refresh_scans_the_disk_off_the_ui_thread(panel, qapp, monkeypat
 
 
 def test_add_ons_refresh_lets_go_of_the_button_when_the_scan_fails(panel, monkeypatch):
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     p, _ = panel
 
     def boom(*a):
@@ -1359,7 +1359,7 @@ def test_copy_and_import_a_share_code(panel, monkeypatch, qapp):
 def test_importing_junk_says_why_and_adds_nothing(panel, monkeypatch):
     from PySide6.QtWidgets import QMessageBox
 
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     p, _ = panel
     said = []
     monkeypatch.setattr(busy, "toast", lambda *a, **k: said.append(a[1]))
@@ -1377,7 +1377,7 @@ def test_importing_junk_says_why_and_adds_nothing(panel, monkeypatch):
 def test_import_with_an_empty_box_says_so_and_cancel_says_nothing(panel, monkeypatch):
     import html
 
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     p, _ = panel
     said = []
     monkeypatch.setattr(busy, "toast", lambda *a, **k: said.append(a[1]))
@@ -1395,7 +1395,7 @@ def test_copy_from_a_tile_with_the_window_closed_says_so(panel, monkeypatch):
     p.fx.save_voice()
     p.fx.save_voice()
     p.fx.copy_code("Mine")
-    from soundboard.ui import toast
+    from soundboard.ui.kit import toast
     [t] = [t for t in toast.shown(p.fx) if "share code" in t.text()]
     assert t.kind == "ok" and t.card.action.isHidden() and not p.fx.undo_bar.active()
     p.fx.delete_voice("Mine")                        # a real Undo has its button
@@ -1690,7 +1690,7 @@ def test_say_bar_has_no_volume_of_its_own(qapp, monkeypatch):
     """A typed line plays like a sound: the bottom bar's volumes set its loudness, so
     the Say bar has no slider and an old saved gain no longer turns it down (it stays
     in the settings for older versions)."""
-    from soundboard.ui.panel import VolumeControl
+    from soundboard.ui.kit.panel import VolumeControl
     from soundboard.ui.voicepanel import VoicePanel
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
     p = VoicePanel(FakeEngine(), {"enabled": False, "effects": {}},
@@ -1707,7 +1707,8 @@ def test_say_bar_has_no_volume_of_its_own(qapp, monkeypatch):
 def test_voice_reload_and_install_keep_focus(panel, qapp, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
-    from soundboard.ui import busy, speechinstall
+    from soundboard.ui.kit import busy
+    from soundboard.ui import speechinstall
     p, _ = panel
     s = p.speech
     _chinese_without_a_voice(s, qapp)
@@ -1736,7 +1737,8 @@ def test_voice_reload_and_install_keep_focus(panel, qapp, monkeypatch):
 def test_speech_install_and_cancel_keep_focus(panel, qapp, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
-    from soundboard.ui import busy, speechinstall
+    from soundboard.ui.kit import busy
+    from soundboard.ui import speechinstall
     p, _ = panel
     s = p.speech
     assert process_events(qapp, lambda: not s.installs._loading())
@@ -1772,7 +1774,8 @@ def test_translation_download_keeps_focus(panel, qapp, monkeypatch):
     from PySide6.QtTest import QTest
     from soundboard.online import net
     from soundboard.speech import translation
-    from soundboard.ui import busy, speechinstall
+    from soundboard.ui.kit import busy
+    from soundboard.ui import speechinstall
     monkeypatch.setattr(net, "allowed", lambda key: True)
     monkeypatch.setattr(net, "offline", lambda: False)
     p, _ = panel
@@ -1945,7 +1948,7 @@ def aipreview_text():
 
 def test_hear_it_failing_says_why_and_comes_back(panel, monkeypatch):
     from soundboard.speech import aipreview
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     p, _ = panel
     said = []
     monkeypatch.setattr(busy, "toast", lambda w, text, kind="", *a, **k: said.append(text))
@@ -1966,7 +1969,7 @@ def test_a_setup_goes_to_a_friend_as_a_code_and_comes_back(panel, monkeypatch):
     from PySide6.QtGui import QGuiApplication
     from PySide6.QtWidgets import QMessageBox
 
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     p, _ = panel
     bar = p.setups_bar
     assert bar.btn_import.isVisibleTo(bar) and bar.btn_import.parentWidget() is bar.chips

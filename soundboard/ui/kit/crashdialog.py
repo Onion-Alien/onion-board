@@ -15,8 +15,8 @@ from PySide6.QtWidgets import (QDialog, QHBoxLayout, QLabel, QPlainTextEdit, QPu
                                QVBoxLayout)
 import shiboken6
 
-from soundboard.ui import fit, quietbox
-from soundboard.ui.panel import icon_button
+from soundboard.ui.kit import fit, quietbox
+from soundboard.ui.kit.panel import icon_button
 from soundboard.core.updates import REPO
 from soundboard.i18n import _
 

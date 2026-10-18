@@ -23,18 +23,18 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QDialogButtonBox,
 
 from soundboard.addons import modules as mods
 from soundboard.core import langnames, usage
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.sounds import library
 from soundboard.online import net
 from soundboard.speech import customvoices, spoken, translation, tts, winvoices
 from soundboard.speech.live import SpeechController, clean_settings
-from soundboard.ui import busy, fit, icons
-from soundboard.ui.panel import bar, fold_button, hint_label, icon_label, section_label
-from soundboard.ui.restyled import measured, on_restyle
+from soundboard.ui.kit import busy, fit, icons
+from soundboard.ui.kit.panel import bar, fold_button, hint_label, icon_label, section_label
+from soundboard.ui.kit.restyled import measured, on_restyle
 from soundboard.ui.livevoice import MODELS, LiveVoice
 from soundboard.ui.speechinstall import SpeechInstalls
-from soundboard.ui.widgets import fit_placeholder
-from soundboard.wheelguard import no_wheel
+from soundboard.ui.kit.widgets import fit_placeholder
+from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.core import errors
 from soundboard.i18n import _, ngettext
 

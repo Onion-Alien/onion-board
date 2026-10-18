@@ -11,10 +11,10 @@ from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QGridLayout, QHBox
                                QLabel, QMessageBox, QPushButton, QVBoxLayout)
 
 from soundboard.sounds import sourceinfo
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.core import usage
 from soundboard.i18n import _
-from soundboard.ui import busy, fit, icons
+from soundboard.ui.kit import busy, fit, icons
 
 PIC_W, PIC_H = 160, 90   # a video's 16:9 thumbnail
 

@@ -15,7 +15,7 @@ from __future__ import annotations
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QWidget
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.style import cover as kit
 from soundboard.ui import lite
 

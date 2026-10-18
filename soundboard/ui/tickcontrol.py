@@ -19,13 +19,13 @@ from soundboard.control import winkeys
 from soundboard.audio.groove import Groove
 from soundboard.audio.sendfx import CEILING_DB
 from soundboard.i18n import _
-from soundboard.ui import appstate
+from soundboard.ui.kit import appstate
 from soundboard.style.owl import OwlWidget
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.controller import Controller
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.livedot import set_tab_live
-from soundboard.ui.widgets import loudness, spectrum
+from soundboard.ui.kit.widgets import loudness, spectrum
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow

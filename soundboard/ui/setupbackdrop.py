@@ -14,9 +14,9 @@ from PySide6.QtCore import QEasingCurve, QEvent, QPoint, QPointF, QRectF, QVaria
 from PySide6.QtGui import QColor, QFont, QFontMetricsF, QPainter
 from PySide6.QtWidgets import QGraphicsOpacityEffect, QWidget
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.ui import splash
-from soundboard.ui.toast import animations_on
+from soundboard.ui.kit.toast import animations_on
 
 REVEAL_MS = 320   # the fade to the app once the guide is gone
 SETTLE_MS = 520   # the logo's glide from the middle to the corner

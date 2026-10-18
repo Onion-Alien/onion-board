@@ -19,14 +19,15 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QFileDialog, QGrid
                                QSizePolicy, QStackedWidget, QVBoxLayout, QWidget)
 
 from soundboard.core import errors, usage
-from soundboard import wheelguard
+from soundboard.ui.kit import wheelguard
 from soundboard.sounds import library
 from soundboard.online import net, store
 from soundboard.audio.engine import SR
 from soundboard.i18n import _
-from soundboard.ui import busy, fit, icons, storelook
+from soundboard.ui.kit import busy, fit, icons
+from soundboard.ui import storelook
 from soundboard.core.trash import ago
-from soundboard.ui.panel import HoverCard, hint_label, icon_button, section_label
+from soundboard.ui.kit.panel import HoverCard, hint_label, icon_button, section_label
 from soundboard.ui.ytsearch import ClampLabel
 
 log = logging.getLogger(__name__)
@@ -453,7 +454,7 @@ class StoreTab(QWidget):
         self._msg_do: Callable[[], object] | None = None
         self.stack.addWidget(self.message)
         # the list couldn't be had (the store's down, no connection): sad Bun says so
-        from soundboard.ui import oops
+        from soundboard.ui.kit import oops
         self.oops = oops.OopsPanel()
         self.oops_page = oops.centred(self.oops)
         self.stack.addWidget(self.oops_page)
@@ -1404,7 +1405,7 @@ class ShareDialog(QDialog):
         self.error.setText(text)
         self.error.setVisible(bool(text))
         if text:
-            from soundboard import theme
+            from soundboard.ui.kit import theme
             theme.set_tone(self.error, "error")
 
     def _ready(self):

@@ -16,7 +16,7 @@ from soundboard.mic import directmic, discordcfg, rawmic
 from soundboard.core import updates
 from soundboard.i18n import _
 from soundboard.core.pollthread import PollThread
-from soundboard.ui import busy
+from soundboard.ui.kit import busy
 from soundboard.ui.controller import Controller
 from soundboard.ui.triggerstab import TriggersTab
 

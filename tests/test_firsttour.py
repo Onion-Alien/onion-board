@@ -227,7 +227,7 @@ def test_a_search_that_fails_shows_the_red_card(window, qapp, counted):
 
 
 def test_an_error_card_ends_it(window, counted):
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     firsttour.start(window)
     tour = firsttour._current
     busy.toast(window, "Couldn't do the thing", "error")

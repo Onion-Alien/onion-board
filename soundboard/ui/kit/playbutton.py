@@ -3,8 +3,8 @@ from PySide6.QtCore import QRectF
 from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPen
 from PySide6.QtWidgets import QPushButton, QStyle, QStyleOptionButton
 
-from soundboard import theme
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit import theme
+from soundboard.ui.kit.pixels import snap_to_pixels
 
 
 class PlayButton(QPushButton):

@@ -27,9 +27,9 @@ from PySide6.QtCore import QPointF, QRectF, QSize, Qt, QTimer
 from PySide6.QtGui import QColor, QPainter, QPainterPath, QPen, QPixmap
 from PySide6.QtWidgets import QSizePolicy, QWidget
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.bunny import H, INK, W, WOOD, draw_bunny, look_colour, sparkle
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit.pixels import snap_to_pixels
 
 SLOT_W, SLOT_H = 56, 59          # about the old thumbnail's size: Bun's head over the scroll
 BUN_SCALE = 0.41                 # Bun's canvas (100 x 120) to pixels

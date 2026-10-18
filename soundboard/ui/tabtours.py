@@ -26,7 +26,8 @@ from PySide6.QtWidgets import QApplication, QWidget
 from soundboard.core import usage
 from soundboard.sounds.library import TOUR_TABS
 from soundboard.i18n import _
-from soundboard.ui import busy, coach
+from soundboard.ui.kit import busy
+from soundboard.ui import coach
 
 log = logging.getLogger(__name__)
 

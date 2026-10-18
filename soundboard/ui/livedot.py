@@ -10,8 +10,8 @@ from __future__ import annotations
 
 from PySide6.QtWidgets import QTabBar, QTabWidget
 
-from soundboard import theme
-from soundboard.ui import icons
+from soundboard.ui.kit import theme
+from soundboard.ui.kit import icons
 
 TINT_ICON = "live_text"   # a tinted live tab's icon: the theme's live colour
 

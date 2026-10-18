@@ -4,7 +4,7 @@ from PySide6.QtCore import QEvent, Qt
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QCheckBox, QPushButton, QVBoxLayout, QWidget
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 
 
 @pytest.mark.parametrize("name", theme.THEMES)

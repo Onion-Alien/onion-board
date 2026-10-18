@@ -18,7 +18,7 @@ from contextlib import contextmanager
 from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QBoxLayout, QLayout, QPushButton, QWidget
 
-from soundboard.ui import icons
+from soundboard.ui.kit import icons
 
 Step = tuple[int, str, Callable[[bool], object]]   # (priority, "w" / "h", apply(compact))
 

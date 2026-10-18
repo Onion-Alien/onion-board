@@ -21,23 +21,24 @@ from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QFrame, QHBox
                                QWidget)
 
 from soundboard.sounds import library
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.core import usage
 from soundboard.online import radio
 from soundboard.i18n import _, ngettext
 from soundboard.audio.engine import SR
 from soundboard.sounds.library import MAX_SECONDS, trim_silence
 from soundboard.online.radio import RadioDirectory, RadioPlayer, Station
-from soundboard.ui import appstate, busy, icons
-from soundboard.ui.panel import EmptyList, RoundedFrame, VolumeControl, bar, icon_label, vsep
+from soundboard.ui.kit import appstate, busy, icons
+from soundboard.ui.kit.panel import (EmptyList, RoundedFrame, VolumeControl, bar, icon_label,
+                                     vsep)
 # the station list and its filters live in radiolist.py; their names stay importable here
 from soundboard.ui.radiolist import (GENRE_LABELS, GENRES, LIST_MAX,  # noqa: F401
                                      MAP_CACHE, QUALITIES, ROW_H, SORTS, StationList,
                                      _FilterRow, _StationDelegate, in_genre)
 from soundboard.ui.speedpitch import SpeedPitchButton
-from soundboard.ui.widgets import paint_now_playing
-from soundboard.ui.pixels import snap_to_pixels
-from soundboard.ui.restyled import on_restyle
+from soundboard.ui.kit.widgets import paint_now_playing
+from soundboard.ui.kit.pixels import snap_to_pixels
+from soundboard.ui.kit.restyled import on_restyle
 
 log = logging.getLogger(__name__)
 

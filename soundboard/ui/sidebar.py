@@ -21,12 +21,12 @@ from PySide6.QtWidgets import (QApplication, QBoxLayout, QFrame, QHBoxLayout, QL
                                QSizePolicy, QSpacerItem, QStyle, QStyleOptionTabWidgetFrame,
                                QTabWidget, QToolButton, QVBoxLayout, QWidget)
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.core import usage
 from soundboard.i18n import _, ngettext
-from soundboard.ui import icons
-from soundboard.ui.panel import keep_focus_off
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit import icons
+from soundboard.ui.kit.panel import keep_focus_off
+from soundboard.ui.kit.pixels import snap_to_pixels
 
 ICON = 20          # a tab's icon on the rail
 SHUT_W = 43        # the rail's width, shut: its 1 px edge, 4, a 34 px button, 4...

@@ -676,14 +676,14 @@ The rules above are Onion Board's take on what the big design systems agree on n
 
 | Piece | Code |
 | --- | --- |
-| Colour tokens, themes, the app style sheet, object names (`#card`, `#primary`, `#hint`, `#section`, `#danger`, `#chip`, `#pill`, `[quiet]`, `[busy]`, `[tone]`) | `soundboard/theme.py` |
-| Painted icons | `soundboard/ui/icons.py` |
-| Busy states, opening links, toasts | `soundboard/ui/busy.py` |
-| Dialogs that grow to fit their text | `soundboard/ui/fit.py` |
-| Wrapping button rows (`Flow`), undo bar, steady numbers | `soundboard/ui/panel.py`, `settings._button_row` |
+| Colour tokens, themes, the app style sheet, object names (`#card`, `#primary`, `#hint`, `#section`, `#danger`, `#chip`, `#pill`, `[quiet]`, `[busy]`, `[tone]`) | `soundboard/ui/kit/theme.py` |
+| Painted icons | `soundboard/ui/kit/icons.py` |
+| Busy states, opening links, toasts | `soundboard/ui/kit/busy.py` |
+| Dialogs that grow to fit their text | `soundboard/ui/kit/fit.py` |
+| Wrapping button rows (`Flow`), undo bar, steady numbers | `soundboard/ui/kit/panel.py`, `settings._button_row` |
 | Settings cards | `settings.SettingsDialog._card` |
 | Left tab rail | `soundboard/ui/sidebar.py` |
-| Wheel guard, dropdown widths, the gap under a dropdown | `soundboard/wheelguard.py` |
+| Wheel guard, dropdown widths, the gap under a dropdown | `soundboard/ui/kit/wheelguard.py` |
 
 ## 13. UI workflow for agents and reviewers
 

@@ -1,7 +1,7 @@
 """An empty list says so in its middle (ui.panel.EmptyList), not in a fake first row."""
 from PySide6.QtGui import QImage
 
-from soundboard.ui.panel import EmptyList
+from soundboard.ui.kit.panel import EmptyList
 
 
 def _ink(lst: EmptyList) -> int:

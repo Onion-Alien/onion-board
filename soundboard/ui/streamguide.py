@@ -14,8 +14,8 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QDialog, QFrame, QHBoxLa
                                QPushButton, QScrollArea, QVBoxLayout, QWidget)
 
 from soundboard.control import remote
-from soundboard import theme
-from soundboard.ui import busy, fit, icons
+from soundboard.ui.kit import theme
+from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.chatguide import _bun, _header, _label
 from soundboard.i18n import _
 

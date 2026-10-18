@@ -126,7 +126,7 @@ def _rows(bar):
 def test_download_bar_gradient_follows_how_it_ended(qapp):
     """The banner's gradient: tinted green when added, red when it failed, back to the
     accent for the next pick; the outlined theme keeps it flat."""
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     from soundboard.ui.downloadbar import DownloadBar
     was = theme.current_name
     try:
@@ -355,7 +355,7 @@ def test_download_bar_folds_for_room(qapp):
 def test_download_bar_glow_follows_the_theme(qapp):
     """Full accent glow only where the theme's cards are its accent's colour; half
     elsewhere, and always half for the green and red endings."""
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     from soundboard.ui import downloadbar as db
     was = theme.current_name
     try:

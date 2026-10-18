@@ -9,7 +9,7 @@ from soundboard.win import winshot
 from soundboard.audio.appaudio import App
 from soundboard.ui import windowview
 from soundboard.ui.appspanel import AppRow
-from soundboard.ui.widgets import Meter
+from soundboard.ui.kit.widgets import Meter
 
 
 @pytest.fixture
@@ -177,7 +177,7 @@ def test_restore_only_minimised_source_without_activation(monkeypatch):
 
 
 def test_view_runs_without_focus_but_pauses_when_board_minimised(qapp, fake_win, monkeypatch):
-    from soundboard.ui import appstate
+    from soundboard.ui.kit import appstate
 
     monkeypatch.setattr(appstate, "active", lambda: False)
     row = shown_row(qapp, App(5, "music.exe", title="Music Thing"))

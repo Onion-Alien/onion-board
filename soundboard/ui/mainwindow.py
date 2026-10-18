@@ -17,7 +17,7 @@ from PySide6.QtCore import (QEvent, QObject, QPoint, QSignalBlocker,
 from PySide6.QtWidgets import (QApplication, QDialog, QMainWindow, QMenu, QMessageBox, QPushButton,
                                QSystemTrayIcon)
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.online import ytworker
 from soundboard.audio.engine import SR, Engine
 from soundboard.core import exitwatch
@@ -34,8 +34,8 @@ from soundboard.win import shellicon, thumbbar
 from soundboard.addons import watchaddon
 from soundboard.audio.replay import InstantReplay
 from soundboard.sounds.library import Config, SoundMeta
-from soundboard.ui.crashdialog import free_dialog
-from soundboard.ui import restyled, worker
+from soundboard.ui.kit.crashdialog import free_dialog
+from soundboard.ui.kit import restyled, worker
 from soundboard.ui.ffmpegcontrol import FfmpegControl
 from soundboard.ui.netcontrol import NetControl
 from soundboard.ui.soundscontrol import SoundsControl
@@ -68,9 +68,9 @@ from soundboard.ui.alertcontrol import AlertControl
 from soundboard.ui.categorycontrol import CategoryControl
 from soundboard.ui.importcontrol import ImportControl
 from soundboard.ui.updatecontrol import UpdateControl
-from soundboard.ui import toast as toastmod
-from soundboard.ui import (a11y, appstate, busy, icons, lite, livesize, responsive,
-                           splash, taboff, tabtours)
+from soundboard.ui.kit import toast as toastmod
+from soundboard.ui.kit import a11y, appstate, busy, icons
+from soundboard.ui import lite, livesize, responsive, splash, taboff, tabtours
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.logowidget import glow_icon
 from soundboard.ui import sidebar
@@ -82,7 +82,7 @@ from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.radiopanel import RadioOff, RadioTab
 from soundboard.ui.storetab import PREVIEW as STORE_PREVIEW, StoreTab
 from soundboard.ui.voicepanel import VoicePanel
-from soundboard.ui.widgets import (Meter, Pad, expand_dropped)
+from soundboard.ui.kit.widgets import Meter, Pad, expand_dropped
 from soundboard.control.winkeys import Hotkeys
 from soundboard.i18n import _
 
@@ -117,13 +117,13 @@ if TYPE_CHECKING:
     from soundboard.ui.linkbar import LinkBar
     from soundboard.ui.logowidget import LogoWidget
     from soundboard.ui.padbatch import PadSelection
-    from soundboard.ui.panel import EqPanel, Flow, TileRow, ViewToggle, VolumeControl
-    from soundboard.ui.playbutton import PlayButton
+    from soundboard.ui.kit.panel import EqPanel, Flow, TileRow, ViewToggle, VolumeControl
+    from soundboard.ui.kit.playbutton import PlayButton
     from soundboard.ui.setupshow import SetupShow
     from soundboard.ui.sidebar import SideTabs
     from soundboard.ui.speedpitch import SpeedPitchButton
-    from soundboard.ui.widgets import (DropdownMenu, EdgeMatch, NameAndSeek, PadGrid, SeekSlider,
-                                       WindowRoot)
+    from soundboard.ui.kit.widgets import (DropdownMenu, EdgeMatch, NameAndSeek, PadGrid,
+                                           SeekSlider, WindowRoot)
     from soundboard.ui.windowbuild import BannerButton, Pulse
     from soundboard.ui.ytsearch import SearchResults
 

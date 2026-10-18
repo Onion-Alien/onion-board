@@ -20,9 +20,9 @@ from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QPush
 from soundboard.core import usage
 from soundboard import voicefx
 from soundboard.i18n import _
-from soundboard.ui import fit, icons
+from soundboard.ui.kit import fit, icons
 from soundboard.ui.backdroprow import _row_slider
-from soundboard.ui.panel import Flow, hint_label
+from soundboard.ui.kit.panel import Flow, hint_label
 from soundboard.voicefx import Param, backdrop
 
 if TYPE_CHECKING:

@@ -153,7 +153,8 @@ def test_the_link_bar_keeps_the_source_on_the_new_sound(qapp, monkeypatch, tmp_p
 
 def test_details_box_shows_the_fields_and_opens_the_link(qapp, monkeypatch):
     from PySide6.QtWidgets import QLabel
-    from soundboard.ui import busy, sourcedialog
+    from soundboard.ui.kit import busy
+    from soundboard.ui import sourcedialog
     opened = []
     monkeypatch.setattr(busy, "open_url", lambda url, **kw: opened.append(url) or True)
     music = "https://music.youtube.com/watch?v=dQw4w9WgXcQ"

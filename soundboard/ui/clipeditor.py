@@ -21,14 +21,14 @@ from PySide6.QtGui import QAction, QColor, QKeySequence, QPainter, QPen
 from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QMenu, QPushButton,
                                QSizePolicy, QVBoxLayout, QWidget)
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.sounds.clipedit import BIN, LiveBuffer, Take, bin_peaks
 from soundboard.audio.engine import SR
 from soundboard.i18n import _
 from soundboard.sounds.library import level_gain
-from soundboard.ui import appstate, busy, icons
-from soundboard.ui.panel import CONTROL_H, Flow
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit import appstate, busy, icons
+from soundboard.ui.kit.panel import CONTROL_H, Flow
+from soundboard.ui.kit.pixels import snap_to_pixels
 
 PAD = 4                 # the waveform's inner margin, px
 EDGE_PX = 6             # how close to a selection edge a press grabs it

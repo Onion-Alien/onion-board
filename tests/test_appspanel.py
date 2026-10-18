@@ -11,7 +11,7 @@ from soundboard.audio.engine import Engine
 from soundboard.sounds.library import Config
 from soundboard.ui import appcapture, appspanel
 from soundboard.ui.appspanel import AppsTab
-from soundboard.ui.widgets import Meter
+from soundboard.ui.kit.widgets import Meter
 
 
 class FakeCapture:
@@ -796,7 +796,7 @@ def test_record_waits_for_sound_then_keeps_a_clip_without_sending(tab, monkeypat
     data, name = c.audio(), c.name
     assert name.startswith("Music ")
     assert 0.9 * appcapture.SR < len(data) < 1.4 * appcapture.SR   # the silence isn't in it
-    from soundboard.ui import toast
+    from soundboard.ui.kit import toast
     assert cap.stopped and row.capture is None
     assert any("Saved" in t.words() and t.kind == "ok" for t in toast.shown(tab))
     assert not list(tmp_path.glob("app-recording-*.tmp.wav"))  # the spool file is gone
@@ -814,7 +814,7 @@ def test_record_that_never_hears_anything_saves_nothing(tab, monkeypatch, tmp_pa
     row.btn_rec.setChecked(True)
     row.capture.sink(np.zeros((4800, 2), np.float32))
     row.btn_rec.setChecked(False)
-    from soundboard.ui import toast
+    from soundboard.ui.kit import toast
     assert clips == []
     assert any("didn't make a sound" in t.words() for t in toast.shown(tab))
 
@@ -828,7 +828,7 @@ def test_failed_record_save_does_not_claim_success(tab, monkeypatch):
     row.btn_rec.setChecked(True)
     row.capture.sink(np.full((48000, 2), 0.3, np.float32))
     row.btn_rec.setChecked(False)
-    from soundboard.ui import toast
+    from soundboard.ui.kit import toast
     assert not tab.shelf.shelf.clips
     assert any("Couldn't save the clip" in t.words() for t in toast.shown(tab))
 

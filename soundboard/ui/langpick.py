@@ -13,9 +13,10 @@ from PySide6.QtGui import QColor, QFont, QFontMetrics, QIcon, QPainter, QPen, QP
 from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QLabel, QLineEdit,
                                QPushButton, QScrollArea, QVBoxLayout, QWidget)
 
-from soundboard import i18n, theme
+from soundboard import i18n
+from soundboard.ui.kit import theme
 from soundboard.i18n import _
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit.pixels import snap_to_pixels
 
 WIDTH = 380            # the drop-down: as wide as the longest name, no wider
 ROW_H = 46

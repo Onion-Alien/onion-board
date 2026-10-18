@@ -45,10 +45,11 @@ from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QGraphicsDropShado
                                QGraphicsOpacityEffect, QHBoxLayout, QLabel, QPushButton,
                                QVBoxLayout, QWidget)
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.i18n import _
-from soundboard.ui import icons, lite
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit import icons
+from soundboard.ui import lite
+from soundboard.ui.kit.pixels import snap_to_pixels
 
 log = logging.getLogger(__name__)
 

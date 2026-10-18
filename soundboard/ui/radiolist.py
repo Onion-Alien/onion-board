@@ -19,13 +19,13 @@ from PySide6.QtWidgets import (QButtonGroup, QComboBox, QFrame, QHBoxLayout, QLa
                                QStyledItemDelegate, QStyleOptionComboBox, QVBoxLayout,
                                QWidget)
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.i18n import _, ngettext
 from soundboard.online.radio import Station
-from soundboard.ui import icons
-from soundboard.ui.panel import Flow as _Flow
-from soundboard.ui.panel import EmptyList, RoundedFrame
-from soundboard.ui.widgets import paint_now_playing, take_out
+from soundboard.ui.kit import icons
+from soundboard.ui.kit.panel import Flow as _Flow
+from soundboard.ui.kit.panel import EmptyList, RoundedFrame
+from soundboard.ui.kit.widgets import paint_now_playing, take_out
 
 if TYPE_CHECKING:
     from soundboard.ui.radiopanel import RadioTab

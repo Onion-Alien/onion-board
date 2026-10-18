@@ -12,12 +12,13 @@ import time
 from typing import TYPE_CHECKING
 
 from soundboard.mic import directmic, michelper
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.core import usage
 from soundboard.online import net
 from soundboard.audio import engine as eng
 from soundboard.i18n import _, ngettext
-from soundboard.ui import busy, icons, reveal, sidebar
+from soundboard.ui.kit import busy, icons, reveal
+from soundboard.ui import sidebar
 from soundboard.ui.controller import Controller
 
 if TYPE_CHECKING:

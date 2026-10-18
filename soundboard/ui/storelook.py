@@ -13,7 +13,7 @@ from PySide6.QtGui import QColor, QFont, QLinearGradient, QPainter, QPainterPath
 from PySide6.QtWidgets import QFrame, QSizePolicy, QWidget
 
 from soundboard.online import store
-from soundboard import theme
+from soundboard.ui.kit import theme
 
 if TYPE_CHECKING:
     from soundboard.ui.bunnywidget import BunnyWidget

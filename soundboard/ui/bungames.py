@@ -8,7 +8,7 @@ import math
 from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPainterPath, QPen, QRadialGradient
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.bunny import INK
 from soundboard.i18n import _
 from soundboard.ui.bunpong import BUN_PINK, GO_KEYS, Game, _alpha, _mix

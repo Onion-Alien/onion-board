@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QHBoxLayout, QLabe
 
 from soundboard.core import errors
 from soundboard.i18n import _, ngettext
-from soundboard.ui import fit, icons
+from soundboard.ui.kit import fit, icons
 
 LONG = 140   # a reason longer than this is a tool's log: say it plainly instead
 

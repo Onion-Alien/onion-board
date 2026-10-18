@@ -6,7 +6,7 @@ and an icon button there. No tooltip that only says "Open folder": the picture s
 it; one that adds something (the crash report's) leads with the name."""
 from PySide6.QtWidgets import QLabel, QPushButton
 
-from soundboard.ui import panel
+from soundboard.ui.kit import panel
 from soundboard.settings import SettingsDialog
 from test_mainwindow import window  # noqa: F401 - the real window, offscreen
 
@@ -50,7 +50,7 @@ def test_addons_folder_is_an_icon_button(qapp):
 
 def test_crash_report_folder_is_an_icon_button(qapp):
     from soundboard.core import applog
-    from soundboard.ui import crashdialog
+    from soundboard.ui.kit import crashdialog
     dlg = crashdialog.CrashDialog(applog.Report(title="ValueError: x", text="BODY"), None)
     _assert_icon_only_folder(dlg.folder_btn, more=True)
     dlg.close()

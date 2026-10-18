@@ -3,7 +3,7 @@ from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import QWidget
 
 from soundboard.style import appstate as kitstate
-from soundboard.ui import appstate
+from soundboard.ui.kit import appstate
 
 
 def test_a_running_timer_slows_down_behind_a_game_and_back(qapp, monkeypatch):

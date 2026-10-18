@@ -4,7 +4,7 @@ from PySide6.QtCore import QEvent, QPoint, QRect, QSize, Qt
 from PySide6.QtGui import QPainter, QTextDocument
 from PySide6.QtWidgets import QLabel, QSizePolicy
 
-from soundboard.ui import icons
+from soundboard.ui.kit import icons
 
 
 class CapIcon(QLabel):

@@ -403,7 +403,7 @@ def warn(parent, title: str, e: BaseException | str | None, before: str = "",
     from PySide6.QtCore import QUrl
     from PySide6.QtGui import QDesktopServices
 
-    from soundboard.ui import busy, toast
+    from soundboard.ui.kit import busy, toast
     p = describe(e)
     _count(p, e)
     action = None

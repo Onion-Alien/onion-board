@@ -23,17 +23,18 @@ from shiboken6 import invalidate as qt_invalidate
 from shiboken6 import isValid as qt_valid
 
 from soundboard.sounds import library, thumbs
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.control import midi
 from soundboard.audio.eq import MAX_DB as EQ_MAX_DB
 from soundboard.audio.eq import response_db as eq_response
 from soundboard.audio.engine import SR
 from soundboard.sounds.library import AUDIO_EXTS, SoundMeta
-from soundboard.ui.hotkeypick import pretty_key
-from soundboard.ui import icons, lite
+from soundboard.ui.kit.hotkeypick import pretty_key
+from soundboard.ui.kit import icons
+from soundboard.ui import lite
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.i18n import _
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit.pixels import snap_to_pixels
 
 PAD_MIME = "application/x-soundboard-pad"
 

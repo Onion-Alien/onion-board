@@ -18,16 +18,16 @@ from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, Q
                                QSizePolicy, QSlider, QSpinBox, QStackedWidget, QStyle, QTabWidget,
                                QVBoxLayout, QWidget)
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.audio.eq import BAND_LABELS as EQ_LABELS
 from soundboard.audio.eq import MAX_DB as EQ_MAX_DB
 from soundboard.audio.eq import PRESETS as EQ_PRESETS
-from soundboard.ui import icons
-from soundboard.ui.widgets import CrispSlider, EqCurve, Meter
-from soundboard.wheelguard import no_wheel
+from soundboard.ui.kit import icons
+from soundboard.ui.kit.widgets import CrispSlider, EqCurve, Meter
+from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.i18n import _
-from soundboard.ui.pixels import snap_to_pixels
-from soundboard.ui.restyled import measured
+from soundboard.ui.kit.pixels import snap_to_pixels
+from soundboard.ui.kit.restyled import measured
 
 # the two heights the main window's controls and bars share (DESIGN.md "size")
 CONTROL_H = 36   # a toolbar button, the search box, the player's buttons
@@ -1051,7 +1051,7 @@ class UndoBar(QWidget):
         return self._undo is not None or self._done is not None
 
     def show_for(self, text: str, undo, done=None):
-        from soundboard.ui import busy
+        from soundboard.ui.kit import busy
         self.finish()
         self.text = text
         self._undo, self._done = undo, done
@@ -1061,7 +1061,7 @@ class UndoBar(QWidget):
             t.card.action.setToolTip(self.tip)
 
     def _take_down(self):
-        from soundboard.ui import toast
+        from soundboard.ui.kit import toast
         toast.close(self, self._key)
 
     def undo(self):

@@ -6,7 +6,8 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QLabel
 from test_mainwindow import window as main_window  # noqa: F401
 
-from soundboard import i18n, theme
+from soundboard import i18n
+from soundboard.ui.kit import theme
 from soundboard.ui.appspanel import ElidedLabel
 
 

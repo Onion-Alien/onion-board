@@ -13,9 +13,9 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QGridLayout, QHBoxLayout, Q
                                QPushButton, QWidget)
 
 from soundboard.audio import engine as eng
-from soundboard.ui import icons
-from soundboard.ui.panel import VolumeControl, icon_label
-from soundboard.wheelguard import no_wheel
+from soundboard.ui.kit import icons
+from soundboard.ui.kit.panel import VolumeControl, icon_label
+from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.i18n import _
 
 LABEL = _("Also play on")

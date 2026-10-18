@@ -723,7 +723,7 @@ def pack_tag(pack_id: str) -> str:
 def theme_tag(name: str) -> str:
     """A built-in theme's name as a count's word ("Midnight Blue" -> midnight-blue);
     anything else (a newer version's) is "other"."""
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     if name not in theme.THEMES:
         return "other"
     return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-") or "other"

@@ -8,8 +8,8 @@ from PySide6.QtCore import QEvent, QObject, QPoint, QPointF, Qt, QTimer
 from PySide6.QtGui import QColor, QPainter, QPen
 from PySide6.QtWidgets import QWidget
 
-from soundboard import theme
-from soundboard.ui import appstate
+from soundboard.ui.kit import theme
+from soundboard.ui.kit import appstate
 from soundboard.ui.splash import _animations_enabled
 
 FRAME_MS = 33

@@ -7,9 +7,9 @@ from __future__ import annotations
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QDialog, QGridLayout, QHBoxLayout, QLabel, QPushButton, QVBoxLayout
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.i18n import _
-from soundboard.ui import busy, fit
+from soundboard.ui.kit import busy, fit
 
 PRIVACY_URL = ("https://github.com/Onion-Alien/onion-board/blob/main/SECURITY.md"
                "#what-the-app-does-on-the-network")

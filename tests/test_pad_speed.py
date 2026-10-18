@@ -13,8 +13,8 @@ from PySide6.QtTest import QTest
 from soundboard.control import midi
 from soundboard.sounds import thumbs
 from soundboard.sounds.library import SoundMeta
-from soundboard.ui import widgets
-from soundboard.ui.widgets import Pad, PadGrid
+from soundboard.ui.kit import widgets
+from soundboard.ui.kit.widgets import Pad, PadGrid
 
 from conftest import process_events
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
@@ -211,7 +211,7 @@ def test_the_grid_is_opaque_in_the_page_colour(qapp):
     step. It paints the page colour itself, so a scroll copies what's on screen; Qt
     clears the flag when a scroll area adopts it and on a theme change."""
     from PySide6.QtWidgets import QScrollArea
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     grid = grid_of(2)
     area = QScrollArea()
     area.setWidget(grid)
@@ -234,7 +234,7 @@ def test_window_background_is_solid_and_near_the_page_colour(qapp):
     near the page colour, Textured (a new install's default) its accent glow over it."""
     from PySide6.QtCore import QRect
     from PySide6.QtGui import QPainter
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     old = theme.current_name
     try:
         for name in theme.THEMES:
@@ -265,7 +265,7 @@ def test_window_background_never_touches_the_disk(qapp, monkeypatch):
 
     from PySide6.QtCore import QRect
     from PySide6.QtGui import QPainter
-    from soundboard import theme
+    from soundboard.ui.kit import theme
 
     def no_disk(*_a, **_k):
         raise AssertionError("painting asked the disk")
@@ -450,7 +450,7 @@ def test_pad_footer_is_worked_out_only_when_it_changes(qapp, monkeypatch):
 
 
 def test_pad_colours_follow_the_theme(qapp, monkeypatch):
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     first = widgets.pad_colours()
     assert widgets.pad_colours() is first          # made once, not on every paint
     monkeypatch.setitem(theme.T, "card", "#123456")

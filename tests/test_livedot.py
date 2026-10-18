@@ -4,9 +4,9 @@ import pytest
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QPushButton, QTabWidget, QWidget
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.speech import tts
-from soundboard.ui import icons
+from soundboard.ui.kit import icons
 from soundboard.ui.livedot import is_tab_live, live_color, set_tab_live, set_tint
 
 

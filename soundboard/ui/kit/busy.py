@@ -25,7 +25,7 @@ from shiboken6 import isValid as qt_valid
 
 from soundboard.core import errors
 from soundboard.i18n import _
-from soundboard.ui import toast as toastmod
+from soundboard.ui.kit import toast as toastmod
 
 FLASH_MS = 2200
 _IDLE = "_busy_idle_text"

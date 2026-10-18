@@ -95,7 +95,7 @@ def _ink_box(img, rect, bg=None, tol=90):
 @pytest.mark.parametrize("direction", [Qt.LeftToRight, Qt.RightToLeft])
 def test_collapsed_output_has_equal_visible_vertical_gaps(window, qapp, theme_name,  # noqa: F811
                                                          direction):
-    from soundboard import theme
+    from soundboard.ui.kit import theme
 
     theme.apply(qapp, theme_name)
     window.setLayoutDirection(direction)

@@ -12,16 +12,17 @@ from typing import TYPE_CHECKING
 from PySide6.QtWidgets import QCheckBox, QMessageBox
 
 from soundboard.audio import appaudio
-from soundboard import bunny, theme
+from soundboard import bunny
+from soundboard.ui.kit import theme
 from soundboard.mic import directmic
 from soundboard.core import usage
 from soundboard.sounds import library
 from soundboard.audio import engine as eng
 from soundboard.audio.engine import is_virtual as is_virtual_cable
 from soundboard.i18n import _
-from soundboard.ui import worker
+from soundboard.ui.kit import worker
 from soundboard.ui.controller import Controller
-from soundboard.ui.crashdialog import free_dialog
+from soundboard.ui.kit.crashdialog import free_dialog
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow

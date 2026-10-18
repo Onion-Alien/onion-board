@@ -29,9 +29,9 @@ from soundboard.sounds.library import (
     prune_cache,
     save_clip,
 )
-from soundboard.ui import worker
+from soundboard.ui.kit import worker
 from soundboard.ui.controller import Controller
-from soundboard.ui.crashdialog import free_dialog
+from soundboard.ui.kit.crashdialog import free_dialog
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 
 if TYPE_CHECKING:

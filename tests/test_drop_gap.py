@@ -5,8 +5,8 @@ import pytest
 from PySide6.QtCore import QPoint
 from PySide6.QtWidgets import QApplication, QComboBox, QMenu, QPushButton, QWidget
 
-from soundboard.ui.widgets import DropdownMenu
-from soundboard.wheelguard import DROP_GAP
+from soundboard.ui.kit.widgets import DropdownMenu
+from soundboard.ui.kit.wheelguard import DROP_GAP
 
 
 def _pump():

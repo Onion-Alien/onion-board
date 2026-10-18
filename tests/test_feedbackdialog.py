@@ -6,7 +6,7 @@ import pytest
 
 from soundboard import __version__
 from soundboard.core import feedback, usage
-from soundboard.ui import busy, feedbackdialog
+from soundboard.ui.kit import busy, feedbackdialog
 
 
 def test_other_tag_keeps_the_words_and_drops_anything_personal():

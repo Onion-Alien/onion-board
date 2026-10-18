@@ -328,7 +328,7 @@ def test_built_in_category_names_show_in_the_language_and_save_in_english(qapp, 
     from soundboard import i18n
     from soundboard.audio.engine import Engine
     from soundboard.sounds.library import Config
-    from soundboard.ui.widgets import Meter
+    from soundboard.ui.kit.widgets import Meter
     monkeypatch.setattr(appspanel.appaudio, "list_apps", lambda strict=False, **_: [])
     i18n.set_language("de")
     try:

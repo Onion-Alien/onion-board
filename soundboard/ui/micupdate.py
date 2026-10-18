@@ -15,11 +15,11 @@ from PySide6.QtWidgets import (QFrame, QGraphicsDropShadowEffect, QHBoxLayout, Q
                                QPushButton, QStyle, QVBoxLayout, QWidget)
 
 from soundboard.mic import michelper
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.i18n import _
-from soundboard.ui import icons
+from soundboard.ui.kit import icons
 from soundboard.ui.bunnywidget import BunnyWidget
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit.pixels import snap_to_pixels
 
 WIDTH = 460
 RADIUS = 12      # a card's corners (DESIGN.md: radius.card)

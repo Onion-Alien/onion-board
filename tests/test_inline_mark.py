@@ -8,7 +8,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont, QFontDatabase, QFontMetricsF, QImage, QPainter, QTextDocument
 
 from soundboard.style.palettes import font_families
-from soundboard.ui import icons
+from soundboard.ui.kit import icons
 
 
 def _rows(img: QImage, x0: int, x1: int) -> list[int]:

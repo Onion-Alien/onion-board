@@ -39,7 +39,7 @@ from soundboard.mic import livesetup, voicesetups
 from soundboard.audio import renderworker, soundfx
 from soundboard.sounds import library
 from soundboard.i18n import _
-from soundboard.ui import worker
+from soundboard.ui.kit import worker
 from soundboard.ui.controller import Controller
 
 if TYPE_CHECKING:

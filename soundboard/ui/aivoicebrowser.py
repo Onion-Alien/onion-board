@@ -17,9 +17,9 @@ from soundboard.core import errors
 from soundboard.i18n import _
 from soundboard.speech import aipreview
 from soundboard.speech import aivoicelist as avl
-from soundboard.ui import busy, fit, icons
-from soundboard.ui.panel import hint_label, steady_number
-from soundboard.wheelguard import no_wheel
+from soundboard.ui.kit import busy, fit, icons
+from soundboard.ui.kit.panel import hint_label, steady_number
+from soundboard.ui.kit.wheelguard import no_wheel
 
 HEAR, MAKING = _("Hear it"), _("Making a sample…")
 

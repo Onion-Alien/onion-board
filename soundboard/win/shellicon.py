@@ -47,7 +47,7 @@ def ico_bytes(c1: str, c2: str, sizes=ICO_SIZES) -> bytes:
     Windows reads at every size since Vista."""
     from PySide6.QtCore import QBuffer, QIODevice
 
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     pngs = []
     for sz in sizes:
         buf = QBuffer()

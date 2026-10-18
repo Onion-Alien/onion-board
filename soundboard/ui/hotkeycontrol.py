@@ -18,15 +18,15 @@ from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QMenu
 
 from soundboard.control import adminfront, midi, winkeys
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.core import usage
 from soundboard.audio.engine import SR
 from soundboard.i18n import _, ngettext
 from soundboard.sounds.library import SoundMeta
-from soundboard.ui.hotkeypick import HOTKEY_ACTIONS, HotkeyDialog, pretty_key
-from soundboard.ui import busy, icons
+from soundboard.ui.kit.hotkeypick import HOTKEY_ACTIONS, HotkeyDialog, pretty_key
+from soundboard.ui.kit import busy, icons
 from soundboard.ui.controller import Controller
-from soundboard.ui.crashdialog import free_dialog
+from soundboard.ui.kit.crashdialog import free_dialog
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow

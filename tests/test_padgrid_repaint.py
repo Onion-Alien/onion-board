@@ -2,7 +2,7 @@ from PySide6.QtCore import QPoint
 from PySide6.QtGui import QColor, QImage, QPainter, QRegion
 from PySide6.QtWidgets import QWidget
 
-from soundboard.ui.widgets import PadGrid
+from soundboard.ui.kit.widgets import PadGrid
 
 
 class _Plain(QWidget):

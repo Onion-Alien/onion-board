@@ -310,7 +310,7 @@ class AlienNote(QWidget):
 
     # -- painting
     def paintEvent(self, ev):
-        from soundboard import theme
+        from soundboard.ui.kit import theme
         t = theme.tokens()
         p = QPainter(self)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)

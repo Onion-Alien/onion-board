@@ -102,15 +102,15 @@ class RemoteHost:
 
     @staticmethod
     def flash(button, text: str):
-        from soundboard.ui import busy
+        from soundboard.ui.kit import busy
         busy.flash(button, text)
 
     @staticmethod
     def icon(button, name: str):
-        from soundboard.ui import icons
+        from soundboard.ui.kit import icons
         icons.set_icon(button, name)
 
     @staticmethod
     def no_wheel(widget):
-        from soundboard.wheelguard import no_wheel
+        from soundboard.ui.kit.wheelguard import no_wheel
         no_wheel(widget)

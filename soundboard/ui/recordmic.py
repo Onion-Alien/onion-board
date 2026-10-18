@@ -19,10 +19,10 @@ from soundboard.sounds import library
 from soundboard.audio.engine import SR
 from soundboard.sounds.library import MAX_SECONDS
 from soundboard.audio.recorder import BothTake, MicTake
-from soundboard.ui import fit, icons
-from soundboard.ui.panel import hint_label
+from soundboard.ui.kit import fit, icons
+from soundboard.ui.kit.panel import hint_label
 from soundboard.ui.trim import TrimPanel
-from soundboard.ui.widgets import Meter
+from soundboard.ui.kit.widgets import Meter
 from soundboard.i18n import _
 
 log = logging.getLogger(__name__)

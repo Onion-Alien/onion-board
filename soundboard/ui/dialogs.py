@@ -17,19 +17,21 @@ from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QColorDial
 
 from soundboard.core import errors, usage
 from soundboard.audio import soundfx
-from soundboard import theme, voicefx
+from soundboard.ui.kit import theme
+from soundboard import voicefx
 from soundboard.sounds import sourceinfo, thumbs
 from soundboard.online import net
 from soundboard.audio.eq import PRESETS as EQ_PRESETS
 from soundboard.sounds.library import (MAX_COOLDOWN_S, MAX_DELAY_S, MAX_FADE_S, PAD_COLORS,
                                        SoundMeta, original_peaks)
-from soundboard.ui.hotkeypick import HotkeyDialog, pretty_key
-from soundboard.ui import busy, fit, icons, sourcedialog, toast
-from soundboard.ui.panel import (EqPanel, hint_label, icon_button, reset_button,
-                                 section_label, steady_number)
+from soundboard.ui.kit.hotkeypick import HotkeyDialog, pretty_key
+from soundboard.ui.kit import busy, fit, icons, toast
+from soundboard.ui import sourcedialog
+from soundboard.ui.kit.panel import (EqPanel, hint_label, icon_button, reset_button,
+                                     section_label, steady_number)
 from soundboard.ui.trim import TrimPanel
 from soundboard.ui.voicefxpanel import EffectRow, ParamSlider
-from soundboard.wheelguard import no_wheel
+from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.control.winkeys import Hotkeys
 from soundboard.i18n import _
 

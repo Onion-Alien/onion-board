@@ -25,7 +25,7 @@ from soundboard.audio.engine import SR
 from soundboard.i18n import _
 from soundboard.sounds.library import MAX_SECONDS, trim_silence
 from soundboard.audio.recorder import ArmedRecorder
-from soundboard.ui import appstate, busy
+from soundboard.ui.kit import appstate, busy
 from soundboard.ui.approw import AppRow, _route, is_path_key
 from soundboard.ui.clipeditor import ClipEditor
 

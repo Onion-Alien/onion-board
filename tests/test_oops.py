@@ -1,6 +1,6 @@
 """The red "didn't work" card (ui/oops.py) and the places that show it."""
 from conftest import process_events
-from soundboard.ui import oops
+from soundboard.ui.kit import oops
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 

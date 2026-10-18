@@ -27,7 +27,8 @@ from PySide6.QtGui import (QColor, QGradient, QLinearGradient, QPainterPath,  # 
                            QPainterPathStroker, QPen, QRadialGradient, QTransform)
 
 from site_themes import DEFAULT, SITE_THEMES, slug  # noqa: E402
-from soundboard import bunny, theme  # noqa: E402
+from soundboard import bunny  # noqa: E402
+from soundboard.ui.kit import theme  # noqa: E402
 from soundboard.style import bunnyfit, owl  # noqa: E402
 
 PAGE = ROOT / "site" / "index.html"

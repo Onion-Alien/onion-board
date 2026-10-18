@@ -13,10 +13,10 @@ from PySide6.QtWidgets import (QDoubleSpinBox, QHBoxLayout, QLabel, QPushButton,
                                QWidget)
 
 from soundboard.audio import soundfx
-from soundboard import theme
-from soundboard.wheelguard import no_wheel
+from soundboard.ui.kit import theme
+from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.i18n import _
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit.pixels import snap_to_pixels
 
 HANDLE_PX = 8   # how close to a handle a press grabs it
 

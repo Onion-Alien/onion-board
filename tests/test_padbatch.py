@@ -8,7 +8,7 @@ from PySide6.QtWidgets import QApplication, QColorDialog, QMenu
 
 from soundboard.i18n import _
 from soundboard.sounds.library import PAD_COLORS, SoundMeta
-from soundboard.ui.widgets import Pad
+from soundboard.ui.kit.widgets import Pad
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 
 
@@ -179,7 +179,7 @@ def test_batch_delete_asks_first_then_undoes_in_one_go(window, monkeypatch):
     w.selection.picked = {"s1", "x1"}
     w.selection.delete()
     assert [m.id for m in w.cfg.sounds] == ["s0", "x0"]
-    from soundboard.ui import toast
+    from soundboard.ui.kit import toast
     assert any("2 sounds" in t.text() for t in toast.shown(w)) and not w.selection.picked
     w.rmctl.undo_remove()
     assert [m.id for m in w.cfg.sounds] == before

@@ -413,7 +413,7 @@ def caption(p: QPainter, r: QRectF, text: str, size: float, alpha: float = 1.0,
 
 
 def draw_logo(p: QPainter, c: QPointF, size: float):
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     pm = theme.app_icon("#7c5cff", "#ff5c8a").pixmap(int(size), int(size))
     p.drawPixmap(QPointF(c.x() - size / 2, c.y() - size / 2), pm)
 

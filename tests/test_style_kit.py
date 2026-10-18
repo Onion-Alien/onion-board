@@ -4,7 +4,7 @@ import ast
 import sys
 from pathlib import Path
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.style import KIT_VERSION, bunnyfit, hooks, owl, palettes
 
 KIT = Path(__file__).resolve().parent.parent / "soundboard" / "style"

@@ -56,7 +56,7 @@ def report(window: QWidget | None, url: str = ""):
     with what went wrong), with the app's version."""
     from soundboard import __version__
     from soundboard.core import feedback, usage
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     usage.used("oops-report")
     busy.open_url(url or feedback.problem_url(__version__), window=window,
                   failed=_("Couldn't open your browser. The page is"))

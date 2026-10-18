@@ -26,12 +26,12 @@ from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
 
 from soundboard.sounds import library, sourceinfo, thumbs, videos
 from soundboard.online import quality
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.core import usage
 from soundboard.online import net, netlog, ytdl
 from soundboard.sounds.library import SR, decode_int16, fingerprint, import_file, site_folder
-from soundboard.ui import busy
-from soundboard.ui.widgets import fmt_time
+from soundboard.ui.kit import busy
+from soundboard.ui.kit.widgets import fmt_time
 from soundboard.core import errors
 from soundboard.i18n import _
 

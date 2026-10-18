@@ -40,13 +40,13 @@ from PySide6.QtCore import QPoint, QPointF, QRect, QRectF, QSize, Qt, QTimer, Si
 from PySide6.QtGui import QColor, QFont, QFontMetrics, QGuiApplication, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import QApplication, QFrame, QHBoxLayout, QMenu, QPushButton, QWidget
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.audio.groove import Groove
 from soundboard.bunny import H, INK, W
 from soundboard.i18n import _
-from soundboard.ui import a11y, icons
+from soundboard.ui.kit import a11y, icons
 from soundboard.ui.bunnywidget import BUBBLE, BunnyWidget
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit.pixels import snap_to_pixels
 
 MIN_H, START_H = 32, 130   # Bun's own height, px; as big as the screen has room for
 FONT_MAX = 16          # the bubble's text stops growing here

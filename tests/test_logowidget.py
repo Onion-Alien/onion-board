@@ -35,7 +35,7 @@ def test_idle_breathing_keeps_the_full_frame_rate(qapp):
 
 
 def test_glow_icon_is_the_plain_icon_at_rest_and_glows_warm_with_sound(qapp):
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     from soundboard.ui.logowidget import glow_icon
     rest = glow_icon(*theme.BRAND, 0.0).pixmap(32).toImage()
     loud = glow_icon(*theme.BRAND, 1.0).pixmap(32).toImage()

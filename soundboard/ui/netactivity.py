@@ -25,9 +25,9 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QButtonGroup, QC
                                QTableWidgetItem, QVBoxLayout, QWidget)
 
 from soundboard.online import netlog
-from soundboard import theme
-from soundboard.ui import busy, fit
-from soundboard.ui.panel import Flow, hint_label
+from soundboard.ui.kit import theme
+from soundboard.ui.kit import busy, fit
+from soundboard.ui.kit.panel import Flow, hint_label
 from soundboard.i18n import _, ngettext
 
 REFRESH_MS = 1000

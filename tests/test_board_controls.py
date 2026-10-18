@@ -12,11 +12,12 @@ from PySide6.QtWidgets import QApplication, QLabel, QPushButton
 
 from soundboard import voicefx
 
-from soundboard.ui import responsive, toast
+from soundboard.ui import responsive
+from soundboard.ui.kit import toast
 from soundboard.core import backup
 from soundboard.win import thumbbar
 from soundboard.sounds.library import Config, SoundMeta
-from soundboard.ui.widgets import Pad
+from soundboard.ui.kit.widgets import Pad
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 
 
@@ -713,7 +714,8 @@ def test_pad_menu_has_the_sites_entries_only_for_downloads(window, monkeypatch):
     """A sound from YouTube (TikTok, SoundCloud) gets Open on YouTube, Copy link and
     Details under the site's name; any other sound doesn't."""
     LINK = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-    from soundboard.ui import busy, sourcedialog
+    from soundboard.ui.kit import busy
+    from soundboard.ui import sourcedialog
     w = window
     shown = menu_pick(monkeypatch, ["Duplicate"])
     monkeypatch.setattr(w.editctl, "duplicate_sound", lambda sid: None)
@@ -763,7 +765,7 @@ def test_a_key_taken_from_another_sound_or_action_says_so(window):
 def test_a_global_hotkey_taken_off_a_sound_is_said_out_loud(window, monkeypatch):
     """Settings → Hotkeys: giving Stop everything a key a pad had takes it off the
     pad (a combo does one thing) and a warn toast names what lost it."""
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     toasts = []
     monkeypatch.setattr(busy, "toast", lambda win, text, kind="", ms=0: toasts.append((text, kind)))
     w = window
@@ -827,7 +829,7 @@ def test_duplicate_and_show_file(window, monkeypatch):
     w.editctl.show_sound_file("s0")
     assert runs and runs[-1][0] == "explorer" and runs[-1][-1] == w.meta("s0").file
     toasts = []
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     monkeypatch.setattr(busy, "toast", lambda win, text, kind="", ms=0: toasts.append(kind))
     w.meta("s0").file = str(Path(w.meta("s0").file).with_name("gone.wav"))
     w.editctl.show_sound_file("s0")

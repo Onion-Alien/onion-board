@@ -169,5 +169,5 @@ class Page(QObject):
 def _button_row():
     """Buttons side by side at their own width, wrapping onto a second line only when
     Settings is too narrow (stacked full-width buttons looked like a form)."""
-    from soundboard.ui.panel import Flow   # panel imports this module
+    from soundboard.ui.kit.panel import Flow  # panel imports this module
     return Flow(gap=8)

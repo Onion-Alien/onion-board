@@ -4,7 +4,7 @@ import random
 from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import QMouseEvent
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.style import mascotlines, owl
 from soundboard.ui.bunnywidget import BunnyWidget
 

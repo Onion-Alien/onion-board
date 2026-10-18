@@ -25,22 +25,23 @@ from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QCheckBox, QComboBox, Q
 
 from soundboard.addons import aiaddon
 from soundboard.core import applog, errors, updates, usage
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.online import net
 from soundboard.addons import modules as mods
 from soundboard.i18n import _, ngettext
 from soundboard.speech import aivoice
 from soundboard.speech import aivoicelist as avl
-from soundboard.ui import art, busy, fit, icons
+from soundboard.ui import art
+from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.aivoicebrowser import AiVoiceEditor, Previewer, hear_button
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.effectspopup import place_over
-from soundboard.ui.panel import (Flow, UndoBar, ViewToggle, fold_button, hint_label,
-                                 section_label)
+from soundboard.ui.kit.panel import (Flow, UndoBar, ViewToggle, fold_button, hint_label,
+                                     section_label)
 from soundboard.ui.voicefxpanel import (LIST_MIN_W, MAX_COLS, PICKED_ART, TILE_ART, TILE_GAP,
                                         TILE_MIN_W, BigSwitch, VoiceTile)
-from soundboard.ui.widgets import LoadingBar
-from soundboard.wheelguard import no_wheel
+from soundboard.ui.kit.widgets import LoadingBar
+from soundboard.ui.kit.wheelguard import no_wheel
 
 log = logging.getLogger(__name__)
 

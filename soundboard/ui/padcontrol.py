@@ -28,10 +28,11 @@ from PySide6.QtWidgets import (
 from soundboard.sounds import library, sourceinfo, thumbs
 from soundboard.i18n import _, ngettext
 from soundboard.sounds.library import SoundMeta
-from soundboard.ui.hotkeypick import pretty_key
-from soundboard.ui import clipeditor, icons, responsive, sourcedialog
+from soundboard.ui.kit.hotkeypick import pretty_key
+from soundboard.ui import clipeditor, responsive, sourcedialog
+from soundboard.ui.kit import icons
 from soundboard.ui.controller import Controller
-from soundboard.ui.panel import icon_label, steady_number
+from soundboard.ui.kit.panel import icon_label, steady_number
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow

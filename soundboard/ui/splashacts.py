@@ -24,7 +24,7 @@ from dataclasses import dataclass
 from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import QColor, QImage, QPainter, QPainterPath, QPen
 
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.bunny import PAW_R, draw_bunny, look_colour, music_note, sparkle
 from soundboard.style import bunnyfit
 

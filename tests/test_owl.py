@@ -81,7 +81,7 @@ def _hoot(k: int = 1, **kw) -> QImage:
 
 
 def test_every_look_names_a_theme_and_known_keys(qapp):
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     for name, kit in owl.LOOKS.items():
         assert name in theme.THEMES, name
         assert set(kit) <= set(owl.VANILLA), name
@@ -93,7 +93,7 @@ def test_every_look_names_a_theme_and_known_keys(qapp):
 
 
 def test_every_theme_but_the_plain_ones_has_its_own_hoot(qapp):
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     plain = {"Dark", "High Contrast"}      # the default (artwork) and accessibility
     for name in theme.THEMES:
         assert (name in owl.LOOKS) == (name not in plain), name
@@ -141,7 +141,7 @@ def test_belly_marks_stay_on_his_belly(qapp):
 
 
 def test_his_look_follows_the_theme(qapp, monkeypatch):
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     monkeypatch.setattr(theme, "current_name", "Mocha")
     assert _hoot(outfit=()) == _hoot(outfit=(), kit=owl.look("Mocha"))
     assert _hoot(outfit=()) != _hoot(outfit=(), kit=owl.VANILLA)

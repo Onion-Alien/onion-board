@@ -10,9 +10,9 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QFrame, QGridLayou
 from shiboken6 import isValid as qt_valid
 
 from soundboard.i18n import _
-from soundboard.ui import busy, icons
+from soundboard.ui.kit import busy, icons
 from soundboard.ui.settingspages import Page, _button_row
-from soundboard.wheelguard import no_wheel
+from soundboard.ui.kit.wheelguard import no_wheel
 
 log = logging.getLogger(__name__)
 
@@ -46,7 +46,7 @@ class PrivacyPage(Page):
 
         from soundboard.sounds import library
         from soundboard.online import quality
-        from soundboard.ui.panel import icon_button
+        from soundboard.ui.kit.panel import icon_button
         q = quality.current
         w, v = self._page()
         self.dlg._data_widgets = {}
@@ -118,7 +118,7 @@ class PrivacyPage(Page):
               "Videos use a lot more data: about 5 to 25 MB a minute. Without ffmpeg "
               "installed only lower-quality videos can be saved (usually 360p)."),
             q.save_video, lambda b: self._data_set(save_video=b))
-        from soundboard.ui.widgets import widget_at   # (it imports this module)
+        from soundboard.ui.kit.widgets import widget_at  # (it imports this module)
         hint_lbl = widget_at(cv, cv.count() - 1)   # _option's hint: its words follow FFmpeg
         assert isinstance(hint_lbl, QLabel)
         self.dlg._save_video_hint = hint_lbl
@@ -258,7 +258,7 @@ class PrivacyPage(Page):
         """Settings > Updates: the programs the app downloads and plays sounds with
         (FFmpeg, yt-dlp, the JavaScript engine, Tor), each with how it is, how it
         updates and its button."""
-        from soundboard.ui.panel import heading_row
+        from soundboard.ui.kit.panel import heading_row
         card, cv = self._card(_("Helper programs"),
                               _("The programs the app uses to download and play sounds. "
                                 "They update with the app, to the exact versions it was "
@@ -378,7 +378,7 @@ class PrivacyPage(Page):
     def _helper_row(self, cv, name: str, icon: str):
         """A helper program's row: its icon, name and a status pill, one hint line, then
         (added by the caller) a button on the left. Returns (row, its column, pill, hint)."""
-        from soundboard.ui.panel import heading_row
+        from soundboard.ui.kit.panel import heading_row
         box = QWidget()
         col = QVBoxLayout(box)
         col.setContentsMargins(0, 0, 0, 0)
@@ -461,7 +461,7 @@ class PrivacyPage(Page):
         """Force update's warning: the newest yt-dlp isn't approved yet. Install anyway
         runs ytdl.force_newest like Update now runs ytdl.update."""
         from soundboard.online import ytdl
-        from soundboard.ui import fit
+        from soundboard.ui.kit import fit
         d = self.dlg
         if any(busy.is_busy(b) for b in d.connection._ytdlp_buttons()):
             return

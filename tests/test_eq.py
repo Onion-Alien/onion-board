@@ -181,7 +181,7 @@ def test_turning_bands_flat_fades_back_to_the_dry_signal():
 def test_eq_panel_copes_with_damaged_gains(qapp):
     """A NaN, a string or a huge number in eq_gains made int(round(g * 2)) raise while
     the main window was built, on every launch."""
-    from soundboard.ui.panel import EqPanel
+    from soundboard.ui.kit.panel import EqPanel
     p = EqPanel(True, "voice", "Custom", [float("nan"), "x", 1e308, None, True, -3, 2.5])
     assert p.gains() == [0.0, 0.0, eq.MAX_DB, 0.0, 0.0, -3.0, 2.5]
     for bad in ([1, 2], None, 5, "flat"):

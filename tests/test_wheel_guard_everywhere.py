@@ -68,7 +68,7 @@ def test_style_has_no_python_style_hint():
     """Qt asks the style for hints tens of thousands of times per theme switch; a
     Python styleHint makes each one wait for Python's lock (theme switch freezes of
     11 s and 36 s while audio ran). The wheel / slider changes are event filters."""
-    from soundboard.wheelguard import AppStyle
+    from soundboard.ui.kit.wheelguard import AppStyle
     assert "styleHint" not in AppStyle.__dict__
     assert "pixelMetric" not in AppStyle.__dict__
 
@@ -80,7 +80,7 @@ def test_click_on_a_slider_jumps_there_and_drags(qapp):
     from PySide6.QtTest import QTest
     from PySide6.QtWidgets import QSlider
 
-    from soundboard.ui.widgets import SeekSlider
+    from soundboard.ui.kit.widgets import SeekSlider
     for cls in (QSlider, SeekSlider):
         s = cls(Qt.Orientation.Horizontal)
         s.setRange(0, 100)
@@ -109,7 +109,7 @@ def test_a_menu_opening_skips_buttons_whose_menu_is_something_else(qapp):
     from PySide6.QtCore import QPoint, Signal
     from PySide6.QtWidgets import QAbstractButton, QMenu, QPushButton
 
-    from soundboard import wheelguard
+    from soundboard.ui.kit import wheelguard
 
     class PadLike(QAbstractButton):
         menu = Signal(str, QPoint)   # like widgets.Pad

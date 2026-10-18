@@ -16,8 +16,9 @@ from PySide6.QtWidgets import (QAbstractButton, QApplication, QCheckBox, QComboB
 from shiboken6 import isValid as qt_valid
 
 
-from soundboard.ui import busy, icons, onionalien
-from soundboard import theme
+from soundboard.ui.kit import busy, icons
+from soundboard.ui import onionalien
+from soundboard.ui.kit import theme
 from soundboard.core import usage
 from soundboard.i18n import _
 from soundboard.ui.settingspages import Built, _button_row as _button_row
@@ -528,7 +529,7 @@ class SettingsDialog(QDialog, Built):
         v.setContentsMargins(14, 12, 14, 14)
         v.setSpacing(8)
         if icon:
-            from soundboard.ui.panel import heading_row
+            from soundboard.ui.kit.panel import heading_row
             row, t, _marks = heading_row(title, icon)
             # the title takes the room the row has, so it only wraps when it doesn't
             # fit (sharing it with the row's stretch, it wrapped at half the width)

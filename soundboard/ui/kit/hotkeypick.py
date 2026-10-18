@@ -7,9 +7,9 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QDialog, QHBoxLayout, QLabel, QPushButton, QVBoxLayout
 
 from soundboard.control import midi, winkeys
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.i18n import _
-from soundboard.ui import fit
+from soundboard.ui.kit import fit
 from soundboard.control.winkeys import Hotkeys
 
 

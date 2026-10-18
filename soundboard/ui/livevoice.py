@@ -14,8 +14,8 @@ from PySide6.QtWidgets import QHBoxLayout, QLabel, QProgressBar, QPushButton, QV
 
 from soundboard.core import langnames
 from soundboard.speech import spoken, translation
-from soundboard.ui import icons
-from soundboard.ui.panel import hint_label
+from soundboard.ui.kit import icons
+from soundboard.ui.kit.panel import hint_label
 from soundboard.ui.voicefxpanel import _enable
 from soundboard.core import errors
 from soundboard.i18n import _

@@ -10,7 +10,8 @@ from soundboard.sounds import library
 from soundboard.control import winkeys
 from soundboard.sounds.library import Config
 from soundboard.ui import mainwindow as main
-from soundboard.ui import busy, setupwizard
+from soundboard.ui.kit import busy
+from soundboard.ui import setupwizard
 
 INS = ["Headset Mic (USB)", "Desk Mic", "CABLE Output (VB-Audio Virtual Cable)"]
 OUTS = ["Headphones (USB)", "Speakers", "CABLE Input (VB-Audio Virtual Cable)"]
@@ -156,7 +157,7 @@ def test_steam_guide_names_the_cable_mic(wizard, monkeypatch, tmp_path):
     w, wiz = wizard
     wiz.go(3)
     opened = []
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     monkeypatch.setattr(busy.QDesktopServices, "openUrl",
                         lambda url: opened.append(url.toString()) or True)
     g = setupwizard.SteamGuide(wiz, wiz._vm)
@@ -628,7 +629,7 @@ def test_mic_attach_plays_show_in_wizard_without_blocking_buttons(mic_wizard, mo
     assert not busy.is_busy(wiz.btn_next)
     assert wiz.btn_next.text().startswith("Next")
 
-    from soundboard.ui.busy import _Toast
+    from soundboard.ui.kit.busy import _Toast
     toast = wiz.findChild(_Toast)
     assert toast is None or toast.isHidden()
 
@@ -726,7 +727,7 @@ def test_back_and_next_never_stretch_the_guide(mic_wizard, qapp):
     a moment made the window as tall as the screen (and moved it up) until it
     shrank back, a flash on every Back / Next."""
     from PySide6.QtCore import QEvent, QObject
-    from soundboard.ui import fit
+    from soundboard.ui.kit import fit
     _, wiz = mic_wizard
     wiz.show()
     wiz.go(wiz.base + 3)
@@ -757,7 +758,7 @@ def test_a_fold_shut_again_puts_the_guide_back(mic_wizard, qapp, monkeypatch):
     """Near the screen's bottom, opening the Discord tip moves the guide up to fit;
     shutting it puts it back where it was (it walked up the screen click by click)."""
     from soundboard.mic import directmic
-    from soundboard.ui import fit
+    from soundboard.ui.kit import fit
     monkeypatch.setattr(directmic, "works", lambda *a: True)
     w, wiz = mic_wizard
     w.cfg.route = "mic"
@@ -817,7 +818,7 @@ def test_switching_off_a_working_driver_asks_first(mic_wizard, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
     from soundboard.mic import directmic
-    from soundboard.ui import feedbackdialog
+    from soundboard.ui.kit import feedbackdialog
     w, wiz = mic_wizard
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     wiz.show()
@@ -901,7 +902,7 @@ def test_no_empty_band_after_a_step_grows_the_window(mic_wizard, qapp):
     """fit.watch only grows the window; a step switch could leave it far taller than
     any step needs (an empty band under the last step). It settles back."""
     from PySide6.QtTest import QTest
-    from soundboard.ui import fit
+    from soundboard.ui.kit import fit
     _, wiz = mic_wizard
     wiz.show()
     wiz.go(wiz.base + 3)
@@ -964,7 +965,7 @@ def test_tiles_are_as_tall_as_their_names_need(mic_wizard, qapp):
     """One-line names get short tiles (no empty band above and below), long ones get
     room for every line; a list's tiles share one height. A picked name keeps its
     weight, so picking never needs more room."""
-    from soundboard.ui.choicetile import ChoiceTile
+    from soundboard.ui.kit.choicetile import ChoiceTile
     _, wiz = mic_wizard
     wiz.show()
     qapp.processEvents()
@@ -1272,7 +1273,7 @@ def test_a_later_guide_has_no_make_it_yours_page(wizard):
 
 
 def test_the_seasonal_look_gives_way_once_its_over(monkeypatch):
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     monkeypatch.setattr(theme, "offered", lambda name, today=None: name != "Halloween")
     looks = setupwizard.look_themes()
     assert "Halloween" not in looks and setupwizard.SEASONAL_OFF in looks
@@ -1280,7 +1281,7 @@ def test_the_seasonal_look_gives_way_once_its_over(monkeypatch):
 
 
 def test_picking_a_look_switches_the_theme(mic_wizard):
-    from soundboard import theme
+    from soundboard.ui.kit import theme
     w, wiz = mic_wizard
     wiz.go(wiz.PAGES - 1)
     wiz._pick_look("Ocean")

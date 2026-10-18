@@ -7,9 +7,9 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QHBoxLayout, QLabel, QPushB
 from soundboard.mic import appsetup, profiles
 from soundboard.core import autostart
 from soundboard.i18n import _
-from soundboard.ui import busy, icons
+from soundboard.ui.kit import busy, icons
 from soundboard.ui.settingspages import Page
-from soundboard.wheelguard import no_wheel
+from soundboard.ui.kit.wheelguard import no_wheel
 
 
 class GeneralPage(Page):

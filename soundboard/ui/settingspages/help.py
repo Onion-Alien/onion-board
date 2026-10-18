@@ -6,7 +6,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
 
 from soundboard.i18n import _, ngettext
-from soundboard.ui import busy, icons
+from soundboard.ui.kit import busy, icons
 from soundboard.ui.settingspages import Page, _button_row
 
 
@@ -189,5 +189,5 @@ class HelpPage(Page):
 
     def _ask_feedback(self):
         """*Send feedback*: "What would you improve?" (ui/feedbackdialog.py)."""
-        from soundboard.ui import feedbackdialog
+        from soundboard.ui.kit import feedbackdialog
         self.dlg.feedback_box = feedbackdialog.ask(self.mw.cfg, self.dlg)

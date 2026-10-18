@@ -5,7 +5,8 @@ from PySide6.QtCore import QEvent, QPoint, Qt
 from PySide6.QtTest import QTest
 
 from soundboard.audio import engine
-from soundboard import settings, theme
+from soundboard import settings
+from soundboard.ui.kit import theme
 from soundboard.control import winkeys
 from soundboard.ui import fitcontrol, settingscontrol, setupwizard
 from soundboard.ui import mainwindow as main
@@ -194,7 +195,7 @@ def test_too_small_closes_settings_and_the_mini_player_grows_for_them(qapp, win)
 
 def test_a_crash_report_open_over_a_dialog_outlives_it(qapp, win):
     from soundboard.core import applog
-    from soundboard.ui.crashdialog import CrashDialog
+    from soundboard.ui.kit.crashdialog import CrashDialog
     dlg = win.setctl.open_settings()
     kept = CrashDialog(applog.Report(title="E: x", text="t"), None, dlg)
     dlg.done(0)
@@ -496,7 +497,7 @@ def test_a_click_leaves_no_focus_ring(qapp, win):
     control ringed until something else was clicked. The ring is for the Tab key."""
     from PySide6.QtWidgets import QComboBox, QPushButton, QSlider, QVBoxLayout, QWidget
 
-    from soundboard.ui.widgets import install_click_focus
+    from soundboard.ui.kit.widgets import install_click_focus
     install_click_focus(qapp)
     page = QWidget(win)
     lay = QVBoxLayout(page)

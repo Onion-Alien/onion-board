@@ -176,7 +176,7 @@ def test_try_again_on_the_red_card_runs_the_step_again(window, qapp):
 
 
 def test_report_on_the_red_card_opens_the_bug_form(window, qapp, monkeypatch):
-    from soundboard.ui import busy
+    from soundboard.ui.kit import busy
     opened = []
     monkeypatch.setattr(busy, "open_url", lambda url, *a, **k: opened.append(url))
     assert open_tab(window, qapp, "store")

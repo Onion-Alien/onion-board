@@ -3,7 +3,7 @@ from PySide6.QtCore import QEvent, QPoint
 from PySide6.QtGui import QEnterEvent, QHelpEvent
 from PySide6.QtWidgets import QApplication, QPushButton
 
-from soundboard import wheelguard
+from soundboard.ui.kit import wheelguard
 
 
 def test_a_tooltip_waits_and_restarts_on_each_control(qapp, monkeypatch):

@@ -5,9 +5,9 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QCheckBox, QComboBox, QGridLayout, QLabel, QPushButton
 
 from soundboard.i18n import _, ngettext
-from soundboard.ui import busy, icons
+from soundboard.ui.kit import busy, icons
 from soundboard.ui.settingspages import Page, _button_row
-from soundboard.wheelguard import no_wheel
+from soundboard.ui.kit.wheelguard import no_wheel
 
 
 class AudioPage(Page):

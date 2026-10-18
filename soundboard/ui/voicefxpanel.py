@@ -25,16 +25,18 @@ from shiboken6 import isValid as qt_valid
 
 from soundboard.core import errors, usage
 from soundboard.mic import savedvoices
-from soundboard import theme, voicefx
+from soundboard.ui.kit import theme
+from soundboard import voicefx
 from soundboard.speech import aipreview
-from soundboard.ui import art, busy, icons
+from soundboard.ui import art
+from soundboard.ui.kit import busy, icons
 from soundboard.ui.aivoicebrowser import HEAR, MAKING, hear_button
-from soundboard.ui.widgets import take_out
-from soundboard.ui.panel import (Flow, UndoBar, ViewToggle, hint_label, reset_button, section_label,
-                                 steady_number)
-from soundboard.wheelguard import no_wheel
+from soundboard.ui.kit.widgets import take_out
+from soundboard.ui.kit.panel import (Flow, UndoBar, ViewToggle, hint_label, reset_button,
+                                     section_label, steady_number)
+from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.i18n import _, ngettext
-from soundboard.ui.pixels import snap_to_pixels
+from soundboard.ui.kit.pixels import snap_to_pixels
 
 
 CUSTOM = "Custom"
@@ -1673,7 +1675,7 @@ class VoiceFxPanel(QWidget):
     def _tile_menu(self, name: str, at):
         """A voice card's right-click menu: its hotkey, and for a saved voice rename,
         share and delete."""
-        from soundboard.ui.hotkeypick import pretty_key
+        from soundboard.ui.kit.hotkeypick import pretty_key
         m = QMenu(self)
         if self.play_sample is not None:
             m.addAction(icons.icon("headphones"), HEAR, lambda: self.hear(name))

@@ -1,8 +1,8 @@
-"""No Windows ding from everyday message boxes (soundboard.ui.quietbox)."""
+"""No Windows ding from everyday message boxes (soundboard.ui.kit.quietbox)."""
 import pytest
 from PySide6.QtWidgets import QMessageBox
 
-from soundboard.ui import quietbox
+from soundboard.ui.kit import quietbox
 
 
 @pytest.fixture

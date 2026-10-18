@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 from soundboard.sounds import pongsounds as ps
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.audio.engine import SR
 
 

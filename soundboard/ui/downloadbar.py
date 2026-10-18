@@ -25,13 +25,14 @@ from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QScroll
                                QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
 
 from soundboard.core import jobprogress, usage
-from soundboard import theme
+from soundboard.ui.kit import theme
 from soundboard.i18n import _, ngettext
-from soundboard.ui import icons, responsive
+from soundboard.ui.kit import icons
+from soundboard.ui import responsive
 from soundboard.ui.scribebun import ScribeBunny
-from soundboard.ui.widgets import fmt_time
-from soundboard.ui.pixels import snap_to_pixels
-from soundboard.ui.restyled import measured, on_restyle
+from soundboard.ui.kit.widgets import fmt_time
+from soundboard.ui.kit.pixels import snap_to_pixels
+from soundboard.ui.kit.restyled import measured, on_restyle
 
 
 BAR_W = 480   # the progress bar's length in the banner
