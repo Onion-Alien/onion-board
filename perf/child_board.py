@@ -722,11 +722,18 @@ class Child:
         bun = getattr(getattr(self.w, "store", None), "bun", None)
         return {"bun_resting": getattr(bun, "resting", None)}
 
+    def sc_wait_triggers(self):
+        """... and the Triggers tab past Hoot's (tab_triggers_rested)."""
+        from soundboard.ui import triggerstab
+        self.run_for(getattr(triggerstab, "HOOT_REST_S", 30.0) + 2)
+        hoot = getattr(getattr(self.w, "triggers", None), "hoot", None)
+        return {"hoot_resting": getattr(hoot, "resting", None)}
+
     def _sit(self, key: str) -> dict:
         self.run_for(self.secs)
         out = {"page": key, "settings_open": self.w.setctl.settings_open()}
-        if key == "store_rested":
-            key = "store"
+        if key.endswith("_rested"):
+            key = key[:-len("_rested")]
         if key == "apps_card":
             out["cards"] = len(getattr(self.w.apps, "rows", {}))
         return out
@@ -854,7 +861,7 @@ class Child:
 
 def _tab_scenarios():
     from perf.runner import TAB_KEYS
-    for key in [*TAB_KEYS, "triggers", "store_rested"]:
+    for key in [*TAB_KEYS, "store_rested", "triggers_rested"]:
         setattr(Child, f"sc_open_{key}", lambda self, k=key: self._open_page(k))
         setattr(Child, f"sc_tab_{key}", lambda self, k=key: self._sit(k))
 

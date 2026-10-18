@@ -31,10 +31,12 @@ WATCH = ["ow_shown", "ow_tray", "ow_watching_tray"]
 # each tab left open: open_<tab> lets its first build and first seconds pass (not
 # compared), tab_<tab> measures it sitting there. idle_front first: right after start
 # (the add-on's own Triggers tab: TRIGGERS_TABS, in the triggers runs; here it's Hoot's
-# page). store_rested: the Community tab again after its Bun's moving time (wait_store)
+# page). <tab>_rested: the Community / Triggers tab again after its mascot's moving
+# time (wait_<tab>)
 TAB_KEYS = ["sounds", "radio", "voice", "store", "setup", "settings", "apps_card", "triggers"]
 BOARD_TABS = (["idle_front"] + [f"{p}_{k}" for k in TAB_KEYS for p in ("open", "tab")]
               + ["open_store", "wait_store", "tab_store_rested",
+                 "open_triggers", "wait_triggers", "tab_triggers_rested",
                  "open_sounds", "tab_sounds_behind", "idle_end"])
 TRIGGERS_TABS = ["open_triggers", "tab_triggers", "open_sounds", "tab_sounds"]
 
