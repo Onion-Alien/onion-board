@@ -130,7 +130,23 @@ menu shortcuts point at (a reinstall resets them; the next start re-themes them)
 ## Code layout
 
 Run from source with `scripts\run.bat` (or `python -m soundboard`); `main.py` at the root is
-the launcher the shortcuts and PyInstaller use. The app is the `soundboard` package:
+the launcher the shortcuts and PyInstaller use. The app is the `soundboard` package, a
+folder per part of the app:
+
+- `core/`: start-up and the plumbing: logs and errors, updates, backups, the usage count
+- `audio/`: the real-time engine, effects and filters, replay and recording
+- `mic/`: getting sounds into voice chat: the mic effect and its helper, routes, voice setups
+- `sounds/`: the library, packs, pad pictures and videos, saved clips
+- `online/`: every connection, Tor, downloads, radio, the store
+- `addons/`, `control/` (the local API, MIDI, hotkeys), `win/` (Windows-only helpers),
+  `sim/` (voice-chat simulators), `speech/`, `voicefx/`, `style/`, `otherboards/`
+- `ui/`: `window/` (the main window and its controllers), `kit/` (shared widgets, the
+  theme), one folder per tab (`sounds/`, `voice/`, `apps/`, `radio/`, `store/`,
+  `triggers/`), `setup/`, `settings/`, `bun/`
+- `i18n.py` stays at the top: add-ons look it up by that name
+
+Problem reports count a file as ours up to two folders below `soundboard/`
+(`ui/window/x.py`); `tests/test_usage.py` fails if a module sits deeper.
 
 | file | what it does |
 |---|---|
