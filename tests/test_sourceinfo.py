@@ -10,7 +10,7 @@ import pytest
 import soundfile as sf
 
 from soundboard.sounds import library, sourceinfo
-from soundboard import trash
+from soundboard.core import trash
 from soundboard.online import ytdl
 from soundboard.engine import SR
 from soundboard.sounds.library import Config, SoundMeta

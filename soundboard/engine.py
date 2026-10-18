@@ -44,7 +44,7 @@ from soundboard.dsp import hermite
 from soundboard.eq import EQ
 from soundboard.sendfx import (CEILING_DB, SAFETY_DB, Ducker, Limiter, SafetyLimiter, SmartMono,
                                VoiceLeveler)
-from soundboard import errors
+from soundboard.core import errors
 from soundboard.i18n import _
 from soundboard.enginedevices import EngineDevices
 from soundboard.enginetakes import EngineTakes

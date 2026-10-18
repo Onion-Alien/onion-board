@@ -8,7 +8,7 @@ from collections.abc import Callable
 
 from PySide6.QtWidgets import QDialog, QHBoxLayout, QLabel, QPushButton, QVBoxLayout
 
-from soundboard import usage
+from soundboard.core import usage
 from soundboard.i18n import _
 from soundboard.ui import fit, icons
 

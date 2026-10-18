@@ -117,10 +117,10 @@ from urllib.parse import parse_qs, urlsplit
 
 from PySide6.QtCore import QCoreApplication, QEvent, QObject, Qt, QTimer, Signal
 
-from soundboard import errors, usage
+from soundboard.core import errors, usage
 from soundboard.online import netcategory
 from soundboard.control import streamapi
-from soundboard.pollthread import PollThread
+from soundboard.core.pollthread import PollThread
 from soundboard.i18n import _
 
 if TYPE_CHECKING:

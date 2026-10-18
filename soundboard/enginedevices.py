@@ -15,7 +15,8 @@ from typing import TYPE_CHECKING
 
 import sounddevice as sd
 
-from soundboard import directmic, errors
+from soundboard import directmic
+from soundboard.core import errors
 from soundboard.engineparts import (
     BUFFER, CH, MIC_BUFFER, RETRY_S, SR, STALL_S, DEVICES, StreamResampler, _holding_devices,
     close_quietly, start_or_close,

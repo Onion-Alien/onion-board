@@ -34,7 +34,7 @@ def command(hidden: bool) -> str:
     else:
         exe = Path(sys.executable)
         gui = exe.with_name("pythonw.exe")   # no console window
-        main = Path(__file__).resolve().parent.parent / "main.py"
+        main = Path(__file__).resolve().parents[2] / "main.py"
         parts = [str(gui if gui.exists() else exe), str(main)]
     if hidden:
         parts.append(TRAY_ARG)

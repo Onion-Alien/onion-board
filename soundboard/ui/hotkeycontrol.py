@@ -18,7 +18,8 @@ from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QMenu
 
 from soundboard.control import adminfront, midi, winkeys
-from soundboard import theme, usage
+from soundboard import theme
+from soundboard.core import usage
 from soundboard.engine import SR
 from soundboard.i18n import _, ngettext
 from soundboard.sounds.library import SoundMeta

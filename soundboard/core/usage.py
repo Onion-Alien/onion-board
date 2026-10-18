@@ -84,7 +84,8 @@ import urllib.request
 import uuid
 from pathlib import Path
 
-from soundboard import __version__, enjoy
+from soundboard import __version__
+from soundboard.core import enjoy
 from soundboard.online import net, netlog
 
 log = logging.getLogger(__name__)
@@ -773,7 +774,7 @@ def _ours(stack: str) -> list[str]:
     wraps Thread.start / run, so its lines are left out: they name their caller."""
     frames = [f"{file.replace(chr(92), '/')}:{line}"
               for file, line in _OUR_FRAME.findall(stack)]
-    return [f for f in frames if not f.startswith("soundboard/threadnames.py:")] or frames
+    return [f for f in frames if not f.startswith("soundboard/core/threadnames.py:")] or frames
 
 
 def _where(stack: str) -> str:
@@ -790,7 +791,7 @@ def _tb_where(tb) -> str:
     while tb is not None:
         name = str(tb.tb_frame.f_code.co_filename).replace(chr(92), "/")
         m = _OUR_FILE.search(name)
-        if m and not m.group(0).startswith("soundboard/threadnames.py"):
+        if m and not m.group(0).startswith("soundboard/core/threadnames.py"):
             where = f"{m.group(0)}:{tb.tb_lineno}"
         tb = tb.tb_next
     return where
@@ -863,7 +864,7 @@ def _memory(window: str) -> list[str]:
 
 def _freeze_tag(head: str, window: str, others: str) -> str:
     """`@<deepest line><<its caller>~<stuck in>/<how long>/<who was busy>`, e.g.
-    `@soundboard/ui/mainwindow.py:5898<soundboard/app.py:100~threading.wait/
+    `@soundboard/ui/mainwindow.py:5898<soundboard/core/app.py:100~threading.wait/
     lasted-10-30s/idle`: each part only when the report has it."""
     ours = _ours(window)
     tag = f"@{ours[-1]}" if ours else ""
@@ -941,7 +942,7 @@ def problems(app_dir: Path, since: float,
     """Events for the crash / freeze reports saved in app_dir after `since` (a file
     time), and the newest such time. Only the kind and version are read out. Past
     MAX_PROBLEMS the rest aren't read: how many is added to `skipped`."""
-    from soundboard.applog import REPORTS_DIR
+    from soundboard.core.applog import REPORTS_DIR
     out, newest, over = [], since, 0
     try:
         files = sorted((f.stat().st_mtime, f.name, f)
@@ -996,7 +997,7 @@ def startup_failed(app_dir: Path, version: str, pid: int = 0, native: str = "") 
     report and no running.txt. Adds what ended it when it's known -- the native stacks
     faulthandler caught, or Windows' own error for that process -- as names and our own
     file:line only, never a message. Runs wevtutil (call it off the UI thread)."""
-    from soundboard import exitwatch
+    from soundboard.core import exitwatch
     event = f"startup-failed/{version}"
     err, where = exitwatch.native_summary(native)
     if err or where:

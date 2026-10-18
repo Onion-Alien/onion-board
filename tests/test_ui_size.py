@@ -5,7 +5,7 @@ import json
 import pytest
 from PySide6.QtWidgets import QApplication, QFrame
 
-from soundboard import app
+from soundboard.core import app
 from soundboard.ui.panel import BAR_H, CONTROL_H
 from test_mainwindow import window  # noqa: F401
 

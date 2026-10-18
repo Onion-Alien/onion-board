@@ -57,9 +57,10 @@ from pathlib import Path
 
 from soundboard.online import jsengine, net, ytworker
 from soundboard.sounds import library, sourceinfo
-from soundboard import quality, updates
+from soundboard import quality
+from soundboard.core import updates
 from soundboard.sounds.library import MAX_SECONDS
-from soundboard import errors
+from soundboard.core import errors
 from soundboard.i18n import _
 
 log = logging.getLogger(__name__)

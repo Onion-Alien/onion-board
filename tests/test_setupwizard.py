@@ -550,7 +550,7 @@ def test_new_users_are_offered_their_mic_first(mic_wizard, monkeypatch):
 
 
 def test_next_on_the_send_step_puts_the_sounds_in_the_mic(mic_wizard, monkeypatch):
-    from soundboard import usage
+    from soundboard.core import usage
     w, wiz = mic_wizard
     calls, counted = [], []
     monkeypatch.setattr(w.micctl, "attach_mic", lambda *a, **k: calls.append(1))
@@ -1305,7 +1305,7 @@ def test_a_new_language_restarts_into_it_on_finish(mic_wizard, monkeypatch):
 
 
 def test_finish_only_touches_windows_startup_when_the_box_changed(mic_wizard, monkeypatch):
-    from soundboard import autostart
+    from soundboard.core import autostart
     w, wiz = mic_wizard
     calls = []
     monkeypatch.setattr(autostart, "is_enabled", lambda: False)
@@ -1318,7 +1318,7 @@ def test_finish_only_touches_windows_startup_when_the_box_changed(mic_wizard, mo
 
 
 def test_finish_turns_on_windows_startup_when_ticked(mic_wizard, monkeypatch):
-    from soundboard import autostart
+    from soundboard.core import autostart
     w, wiz = mic_wizard
     calls = []
     monkeypatch.setattr(autostart, "is_enabled", lambda: False)

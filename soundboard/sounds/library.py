@@ -478,7 +478,7 @@ class Config:
     # ui/setupwizard.py). "" = not asked yet: only a brand-new install starts so
     # (first_start), so the question comes once, on the first launch
     use_mode: str = "normal"
-    # "Did you know?" tips (soundboard.tips): on / off, the ones shown, the day of the last
+    # "Did you know?" tips (soundboard.core.tips): on / off, the ones shown, the day of the last
     tips_on: bool = True
     # each tab's quick how-to the first time it's opened, and the first-run tour
     # (ui/tabtours.py, ui/firsttour.py); seen ones are in tips_seen
@@ -516,7 +516,7 @@ class Config:
     hidden_from_all: list[str] = field(default_factory=list)   # categories All leaves out
     tray: bool = True                 # closing the window keeps the app in the tray
     autostart_hidden: bool = True     # started with Windows: straight to the tray
-    # look at GitHub Releases for a newer version, at most every 6 hours (soundboard.updates).
+    # look at GitHub Releases for a newer version, at most every 6 hours (soundboard.core.updates).
     # Was the opt-in update_check_optin, off by default: renamed so every config starts on
     update_check: bool = True
     update_checked: float = 0.0       # time.time() of the last check
@@ -580,11 +580,11 @@ class Config:
     net_offline: bool = False
     # Network activity's "Keep a history" (soundboard.online.netlog.keep): off = memory only
     netlog_keep: bool = False
-    # "Keep an app log" (soundboard.applog.keep): off = onionboard.log isn't written
+    # "Keep an app log" (soundboard.core.applog.keep): off = onionboard.log isn't written
     app_log: bool = True
     # "Hide that I'm using Tor": "" (off), "snowflake" or "obfs4" bridges
     tor_bridges: str = ""
-    # the anonymous usage count (soundboard.usage; its switch is "usage_stats" in
+    # the anonymous usage count (soundboard.core.usage; its switch is "usage_stats" in
     # net_off): this PC's random ID, made on the first send, and when the last daily
     # one went. A config without stats_id is from before the count existed.
     stats_id: str = ""
@@ -611,7 +611,7 @@ class Config:
     stats_launches: int = 0
     stats_version: str = ""
     stats_pending: list[str] = field(default_factory=list)
-    # *Enjoying Onion Board?* (soundboard.enjoy): seconds open per date, "" / "done"
+    # *Enjoying Onion Board?* (soundboard.core.enjoy): seconds open per date, "" / "done"
     enjoy_days: dict = field(default_factory=dict)
     enjoy_state: str = ""
     # an observed FFmpeg startup/get failure awaiting a verified working copy
@@ -1544,7 +1544,7 @@ def _ffmpeg_source(path: str, cause: BaseException | None = None):
     its output at once). The process is gone when this ends, however it ends."""
     ff = _ffmpeg()
     if not ff:
-        from soundboard import usage   # the name only, never the file
+        from soundboard.core import usage  # the name only, never the file
         usage.used("needs-ffmpeg")
         raise RuntimeError(_("This file needs FFmpeg to play. Get it in "
                              "Settings > Data & quality.")) from cause
@@ -2241,7 +2241,7 @@ def import_file(src: str, color: str, name: str = "",
     (stored_ext()): a 300 MB video used to be copied whole, and the library stays
     playable if ffmpeg goes away. So is a file libsndfile reads under a name outside
     AUDIO_EXTS (.au, .caf, .w64…): only those come back in from a backup
-    (soundboard.backup)."""
+    (soundboard.core.backup)."""
     sid = uuid.uuid4().hex[:10]
     srcp = Path(src)
     name = name.strip() or srcp.stem.replace("_", " ").strip()

@@ -18,7 +18,8 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QGraphicsOpac
                                QHBoxLayout, QLabel,
                                QLayout, QMenu, QPushButton, QSizePolicy, QVBoxLayout, QWidget)
 
-from soundboard import appaudio, theme, usage
+from soundboard import appaudio, theme
+from soundboard.core import usage
 from soundboard.win import exeicon
 from soundboard.sounds.clipedit import LiveBuffer
 from soundboard.i18n import _

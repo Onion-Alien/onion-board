@@ -11,7 +11,7 @@ from shiboken6 import isValid as qt_valid
 from conftest import process_events
 from soundboard.addons import modules, pocketaddon
 from soundboard.online import net
-from soundboard import updates
+from soundboard.core import updates
 from soundboard.settings import SettingsDialog
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 from test_remote_addons import ADDON, _module

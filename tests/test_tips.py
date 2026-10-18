@@ -1,7 +1,7 @@
 """*Did you know?* tips: when one is due, which one, and the bar's Show me."""
 from test_mainwindow import window  # noqa: F401  (the real MainWindow)
 
-from soundboard import tips
+from soundboard.core import tips
 from soundboard.sounds.library import Config
 
 
@@ -44,7 +44,7 @@ def test_never_during_a_game_and_skips_switched_off_tabs():
 
 
 def test_tip_settings_survive_save_and_stay_out_of_backups(app_dir):
-    from soundboard import backup
+    from soundboard.core import backup
     Config(tips_on=False, tips_seen=["effects", "newer-tip"], tip_day="2026-10-07").save()
     c = Config.load()
     assert c.tips_on is False and c.tips_seen == ["effects", "newer-tip"]

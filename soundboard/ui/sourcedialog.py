@@ -11,7 +11,8 @@ from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QGridLayout, QHBox
                                QLabel, QMessageBox, QPushButton, QVBoxLayout)
 
 from soundboard.sounds import sourceinfo
-from soundboard import theme, usage
+from soundboard import theme
+from soundboard.core import usage
 from soundboard.i18n import _
 from soundboard.ui import busy, fit, icons
 

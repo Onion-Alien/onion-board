@@ -39,7 +39,8 @@ import soundfile as sf  # noqa: E402
 from PySide6.QtCore import QEventLoop  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from soundboard import appaudio, autostart, engine, tips  # noqa: E402
+from soundboard import appaudio, engine  # noqa: E402
+from soundboard.core import autostart, tips  # noqa: E402
 from soundboard.sounds import library  # noqa: E402
 from soundboard.control import winkeys  # noqa: E402
 

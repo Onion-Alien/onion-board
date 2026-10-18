@@ -192,7 +192,7 @@ def test_too_small_closes_settings_and_the_mini_player_grows_for_them(qapp, win)
 
 
 def test_a_crash_report_open_over_a_dialog_outlives_it(qapp, win):
-    from soundboard import applog
+    from soundboard.core import applog
     from soundboard.ui.crashdialog import CrashDialog
     dlg = win.setctl.open_settings()
     kept = CrashDialog(applog.Report(title="E: x", text="t"), None, dlg)

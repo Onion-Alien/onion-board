@@ -6,7 +6,7 @@ from __future__ import annotations
 import unicodedata
 
 from soundboard import i18n
-from soundboard.langnames_data import NAMES
+from soundboard.core.langnames_data import NAMES
 
 
 def name(code: str, fallback: str = "") -> str:

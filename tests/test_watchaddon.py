@@ -8,7 +8,7 @@ import zipfile
 
 import pytest
 
-from soundboard import updates
+from soundboard.core import updates
 from soundboard.addons import watchaddon
 from test_triggers_module import make_module, zip_of
 

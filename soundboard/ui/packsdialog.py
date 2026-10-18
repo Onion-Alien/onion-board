@@ -17,7 +17,7 @@ from PySide6.QtWidgets import (QDialog, QDialogButtonBox, QFrame, QGridLayout, Q
                                QLabel, QPushButton, QScrollArea, QSizePolicy, QVBoxLayout,
                                QWidget)
 
-from soundboard import errors, updates
+from soundboard.core import errors, updates
 from soundboard.sounds import library, packs
 from soundboard.online import net
 from soundboard.engine import SR

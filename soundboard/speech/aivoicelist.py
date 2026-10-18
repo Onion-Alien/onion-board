@@ -22,7 +22,7 @@ import uuid
 from pathlib import Path
 
 from soundboard.sounds import library
-from soundboard import trash
+from soundboard.core import trash
 
 log = logging.getLogger(__name__)
 
@@ -418,7 +418,7 @@ class Store:
         self.save()
         return v
 
-    # (shaped like soundboard.trash, for ui.deleted.DeletedDialog)
+    # (shaped like soundboard.core.trash, for ui.deleted.DeletedDialog)
     def items(self, kind: str | None = None) -> list[trash.Item]:
         return [i for i in reversed(self.deleted) if kind in (None, KIND)]
 

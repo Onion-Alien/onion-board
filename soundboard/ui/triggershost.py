@@ -53,7 +53,7 @@ class BoardHost:
         """The add-on's feature `key` was used or is set up (onionwatch/usage.py
         FEATURES): `used/triggers-<key>` with the next daily usage count, when Count me
         in is on. Names outside usage.FEATURES are dropped (usage.used)."""
-        from soundboard import usage
+        from soundboard.core import usage
         usage.used(f"triggers-{key}")
 
     def tab_info(self, title: str, text: str):

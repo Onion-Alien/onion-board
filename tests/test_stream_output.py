@@ -97,7 +97,7 @@ def test_window_never_streams_to_the_cable_or_headphones(window, monkeypatch):  
 
 
 def test_stream_settings_are_saved_but_never_exported(app_dir):
-    from soundboard import backup
+    from soundboard.core import backup
     cfg = Config(obs_device="CABLE-A Input", obs_vol=50.0, obs_voice=False)
     cfg.save()
     back = Config.load()

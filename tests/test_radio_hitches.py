@@ -179,7 +179,7 @@ def test_drawing_the_world_lets_the_audio_threads_run(qapp):
     sounds playing skipped (it happened as a station started: the map flies to it)."""
     import sys
 
-    from soundboard.app import SWITCH_S
+    from soundboard.core.app import SWITCH_S
     rings, labels = outlines()
 
     def worst_gap():
@@ -220,7 +220,7 @@ def audio_late_while(work):
 
     import sounddevice as sd
 
-    from soundboard.app import SWITCH_S
+    from soundboard.core.app import SWITCH_S
     from soundboard.engine import Engine
     e = Engine()
     e.main_stream = e.mon_stream = object()    # stands in for open outputs: no device

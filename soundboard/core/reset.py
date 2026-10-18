@@ -12,7 +12,7 @@ A restore point is a folder in %APPDATA%\\OnionBoard\\restore-points\\:
     config.json     the settings, hotkeys and pad list as they were
     sounds/         the sounds a reset took off the board (audio)
     thumbs/         ...and their pad pictures
-    deleted/        Recently deleted, if the reset emptied it (soundboard.trash)
+    deleted/        Recently deleted, if the reset emptied it (soundboard.core.trash)
 
 so restoring one puts back what the reset took away, files and all. The newest
 MAX_POINTS are kept; an older point's audio goes to the Windows Recycle Bin.
@@ -31,7 +31,8 @@ import uuid
 from dataclasses import dataclass, field, fields
 from pathlib import Path
 
-from soundboard import __version__, trash
+from soundboard import __version__
+from soundboard.core import trash
 from soundboard.sounds import library
 from soundboard.i18n import _
 from soundboard.sounds.library import Config
@@ -148,7 +149,7 @@ def run_pending() -> str:
         if isinstance(raw, dict) and isinstance(raw.get("restore"), str):
             said = restore(raw["restore"])
             if last_ok:   # counted for the daily usage count (usage.py: that it was used)
-                from soundboard import usage
+                from soundboard.core import usage
                 usage.used("restore-point-used")
             return said
     except Exception:  # noqa: BLE001 - start up anyway, on the settings as they are

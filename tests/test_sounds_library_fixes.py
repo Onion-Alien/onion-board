@@ -9,7 +9,7 @@ import numpy as np
 import pytest
 import soundfile as sf
 
-from soundboard import backup
+from soundboard.core import backup
 from soundboard.sounds import library
 from soundboard.sounds.library import SR, Config, SoundMeta
 

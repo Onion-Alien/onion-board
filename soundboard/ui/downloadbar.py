@@ -24,7 +24,8 @@ from PySide6.QtGui import (QColor, QFontMetricsF, QLinearGradient, QPainter,
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QScrollArea,
                                QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
 
-from soundboard import jobprogress, theme, usage
+from soundboard.core import jobprogress, usage
+from soundboard import theme
 from soundboard.i18n import _, ngettext
 from soundboard.ui import icons, responsive
 from soundboard.ui.scribebun import ScribeBunny
@@ -38,7 +39,7 @@ LINE_GAP = 6  # between line 1 (the title) and line 2 (the bar); the mini player
 
 
 class SmoothProgressBar(QWidget):
-    """A sleek 6px progress bar that only fills forward (soundboard/jobprogress.py). While
+    """A sleek 6px progress bar that only fills forward (soundboard/core/jobprogress.py). While
     a step has nothing to measure (the link looked up, the audio converted) a faint glint
     runs along the empty part, so it's plainly busy, never a block that looks full."""
 

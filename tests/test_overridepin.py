@@ -2,7 +2,7 @@ import sys
 
 from PySide6.QtWidgets import QVBoxLayout, QWidget
 
-from soundboard import overridepin
+from soundboard.core import overridepin
 
 
 def test_an_override_raising_cannot_free_another_widgets_method(qapp):

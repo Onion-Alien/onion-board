@@ -460,7 +460,7 @@ def tor_socks():
 
 
 def test_every_python_connection_goes_through_tor(tor_socks, monkeypatch, app_dir):
-    from soundboard import updates
+    from soundboard.core import updates
     sites, p = tor_socks
     monkeypatch.setattr(updates, "_get", REAL_GET)
     sites.routes["/releases/latest"] = (b'{"tag_name": "v1"}', "application/json")
@@ -483,7 +483,7 @@ def test_usage_count_goes_through_tor(tor_socks, monkeypatch, app_dir):
     the counter only through Tor's SOCKS port, never looked up or connected here."""
     import types
 
-    from soundboard import usage
+    from soundboard.core import usage
     from soundboard.sounds.library import Config
     sites, p = tor_socks
     sites.routes["/api/v0/count"] = (b"", "")

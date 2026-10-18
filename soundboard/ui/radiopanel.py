@@ -21,7 +21,8 @@ from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QFrame, QHBox
                                QWidget)
 
 from soundboard.sounds import library
-from soundboard import theme, usage
+from soundboard import theme
+from soundboard.core import usage
 from soundboard.online import radio
 from soundboard.i18n import _, ngettext
 from soundboard.engine import SR

@@ -23,7 +23,8 @@ from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QCheckBox, QDialog, QFr
                                QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
 
-from soundboard import errors, savedvoices, theme, usage, voicefx
+from soundboard.core import errors, usage
+from soundboard import savedvoices, theme, voicefx
 from soundboard.speech import aipreview
 from soundboard.ui import art, busy, icons
 from soundboard.ui.aivoicebrowser import HEAR, MAKING, hear_button

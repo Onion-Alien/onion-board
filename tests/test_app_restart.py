@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from soundboard.app import restart_cmdline
+from soundboard.core.app import restart_cmdline
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -37,7 +37,7 @@ def test_windows_accepts_the_registration():
         import ctypes, sys
         from ctypes import wintypes
         sys.argv = [sys.argv[0], "--tray"]
-        from soundboard import app
+        from soundboard.core import app
         app.register_restart()
         k = ctypes.windll.kernel32
         k.GetCurrentProcess.restype = wintypes.HANDLE

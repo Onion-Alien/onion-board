@@ -17,7 +17,8 @@ from shiboken6 import isValid as qt_valid
 
 
 from soundboard.ui import busy, icons, onionalien
-from soundboard import theme, usage
+from soundboard import theme
+from soundboard.core import usage
 from soundboard.i18n import _
 from soundboard.ui.settingspages import Built, _button_row as _button_row
 from soundboard.ui.settingspages.help import HelpPage

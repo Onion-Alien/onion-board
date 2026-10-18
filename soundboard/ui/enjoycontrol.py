@@ -1,6 +1,6 @@
 """*Enjoying Onion Board?*: a slim bar over the tabs (never a window, so it's safe while a
 game is up) with Bun holding up a survey clipboard and a thumb up and down, shown once
-ever (enjoy.asked), after a few days of heavy use (soundboard.enjoy says when). A thumb
+ever (enjoy.asked), after a few days of heavy use (soundboard.core.enjoy says when). A thumb
 is sent at once (usage.survey); the bar then asks "What do you like most?" or "What
 should we fix?" over a box that wraps and grows, and Send. The ✕ just closes it.
 
@@ -18,7 +18,7 @@ from PySide6.QtGui import QTextCursor
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPlainTextEdit, QPushButton,
                                QVBoxLayout, QWidget)
 
-from soundboard import enjoy, tips, usage
+from soundboard.core import enjoy, tips, usage
 from soundboard.i18n import _
 from soundboard.ui import busy, icons
 from soundboard.ui.bunnywidget import BunnyWidget

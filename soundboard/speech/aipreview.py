@@ -14,7 +14,7 @@ import subprocess
 
 import numpy as np
 
-from soundboard import errors
+from soundboard.core import errors
 from soundboard.online import net
 from soundboard.addons.modules import ModuleInfo
 

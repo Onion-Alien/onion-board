@@ -359,7 +359,7 @@ gitleaks, ruff and pytest:
 4. **Publish** a GitHub Release `vX.Y.Z`, not marked pre-release, with two assets:
    - `OnionBoardSetup.exe`, named exactly that. The README's download button links to
      `releases/latest/download/OnionBoardSetup.exe`, and installed copies update from
-     it (`soundboard/updates.py` installs it only when GitHub lists its SHA-256, and
+     it (`soundboard/core/updates.py` installs it only when GitHub lists its SHA-256, and
      runs it with `/RELAUNCH=1`, see `installer/OnionBoard.iss`).
    - The same file again as `OnionBoardSetup-update.exe` (copy it to that name first:
      `gh release upload` with `#name` doesn't rename the file). *Update now* fetches

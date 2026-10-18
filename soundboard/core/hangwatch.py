@@ -92,7 +92,7 @@ class HangWatch(QObject):
             if self._ui in cpu:
                 stack += f"\nWindow CPU: {cpu[self._ui]:.0%}\n"
             stack += self._pc_memory(faults)
-            from soundboard import applog
+            from soundboard.core import applog
             self.saved = applog.save_freeze(stuck, stack + self._others(frames, cpu))
             self.reports += 1           # last: a report counts once it's logged and saved
             self._wait_end(since)
@@ -102,7 +102,7 @@ class HangWatch(QObject):
         """Once the window beats again, note in the report how long it was stuck."""
         while not self._stop.wait(min(1.0, self.hang_s / 4)):
             if self.beat != since:
-                from soundboard import applog
+                from soundboard.core import applog
                 applog.note_freeze_end(self.saved, self.beat - since)
                 return
 

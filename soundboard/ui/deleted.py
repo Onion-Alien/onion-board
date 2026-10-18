@@ -1,4 +1,4 @@
-"""The "Recently deleted" window: what's in the bin (soundboard.trash, or another bin
+"""The "Recently deleted" window: what's in the bin (soundboard.core.trash, or another bin
 shaped like it, such as the saved voices' in soundboard.savedvoices), newest first,
 with Bring back and Delete for good."""
 from __future__ import annotations
@@ -11,7 +11,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QDialog, QDialogButtonBox, QHB
                                QLabel, QListWidgetItem, QMessageBox, QPushButton,
                                QVBoxLayout)
 
-from soundboard import trash
+from soundboard.core import trash
 from soundboard.ui import busy, fit, icons, toast
 from soundboard.ui.panel import EmptyList, hint_label
 from soundboard.i18n import _, ngettext

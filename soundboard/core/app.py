@@ -16,10 +16,11 @@ from pathlib import Path
 # the ordinary way again.)
 from PySide6.QtWidgets import QApplication
 
-from soundboard import __version__, applog
+from soundboard import __version__
+from soundboard.core import applog
 from soundboard.sounds.library import APP_DIR, migrate_from_soundboard
-from soundboard.singleinstance import (bring_to_front, claim_single_instance,
-                                      comes_to_front, listen_for_second_launch)
+from soundboard.core.singleinstance import (bring_to_front, claim_single_instance,
+                                            comes_to_front, listen_for_second_launch)
 
 log = logging.getLogger(__name__)
 
@@ -58,7 +59,7 @@ def restart_cmdline(argv: list[str], frozen: bool) -> str:
     """What Windows starts the app again with after an installer closed it: the same
     arguments, minus the one-off ones (as in MainWindow.restart_app), and with the
     window shown: it was most likely open, and coming back hidden looks like it's gone."""
-    from soundboard.autostart import TRAY_ARG
+    from soundboard.core.autostart import TRAY_ARG
     args = list(argv[1:] if frozen else argv)
     if not frozen and args:   # python main.py: the script by full path, any cwd works
         args[0] = os.path.abspath(args[0])
@@ -157,7 +158,7 @@ def clean_temp_leftovers(now: float | None = None) -> int:
 def packs_dedupe():
     """Free packs an older version stored twice (backup.drop_duplicate_packs), off the
     UI thread."""
-    from soundboard import backup
+    from soundboard.core import backup
     try:
         backup.drop_duplicate_packs()
     except Exception:  # noqa: BLE001 - tidying up must never hurt the running app
@@ -355,7 +356,7 @@ def set_usage_count(on: bool, heard: str = "") -> int:
     if not on and "usage_stats" not in cfg.net_off:   # on until now: say so once
         try:
             from soundboard.online import net
-            from soundboard import usage
+            from soundboard.core import usage
             net.configure_from(cfg)
             if net.mode() != net.TOR:   # Tor isn't running: don't start it
                 log.info("--usage-count off: opt-out %s",
@@ -381,7 +382,7 @@ def uninstall_count() -> int:
     try:
         applog.setup(APP_DIR)
         from soundboard.sounds import library
-        from soundboard import usage
+        from soundboard.core import usage
         from soundboard.online import net
         cfg = library.Config.load()
         if not cfg.stats_id:   # never counted (switched off, or from before the count)
@@ -558,7 +559,7 @@ def main():
     for flag, run in ONE_OFF_COMMANDS.items():   # first match wins, in this order
         if flag in sys.argv:
             sys.exit(run(sys.argv[sys.argv.index(flag) + 1:]))
-    from soundboard import bootmark, exitwatch, threadnames
+    from soundboard.core import bootmark, exitwatch, threadnames
     threadnames.install()   # first: every thread after this has its name in Windows too
     migrate_from_soundboard()
     last_run = exitwatch.read_last(APP_DIR)   # the last run's black box, before arming wipes it
@@ -613,7 +614,7 @@ def main():
     holder = {}
     server = listen_for_second_launch(app, lambda: holder.get("w"))
     app.instance_server = server   # pyright: ignore[reportAttributeAccessIssue]  # kept alive on the app
-    from soundboard.autostart import TRAY_ARG
+    from soundboard.core.autostart import TRAY_ARG
     from soundboard.ui import splash
     if TRAY_ARG not in sys.argv:   # a cold start can take seconds: show Bun meanwhile
         splash.show()
@@ -628,7 +629,7 @@ def main():
     from soundboard import theme
     app.setWindowIcon(theme.app_icon())   # every window, and the taskbar button
 
-    from soundboard import reset
+    from soundboard.core import reset
     reset_note = reset.run_pending()   # a reset / restore asked for: before the settings load
     from soundboard.ui.mainwindow import MainWindow   # after the QApplication exists
     try:
@@ -641,7 +642,7 @@ def main():
     # Windows logging off / shutting down while the window is hidden in the tray never
     # calls closeEvent: still let go of push-to-talk and save the settings
     app.aboutToQuit.connect(w.shutdown)
-    from soundboard import updates, usage
+    from soundboard.core import updates, usage
     unclean = usage.mark_running(APP_DIR)   # the last run ended without closing itself?
     usage.started(w.cfg)   # this launch, and updated/<from>-to-<to> after an update
     if splash.rare():   # a rare loading screen came up (Golden Bun and the rest)
@@ -743,10 +744,10 @@ def main():
     problem_send.setInterval(60_000)
     problem_send.timeout.connect(w.send_usage)
     applog.on_problem(lambda _rep: problem_send.isActive() or problem_send.start())
-    from soundboard.hangwatch import HangWatch
+    from soundboard.core.hangwatch import HangWatch
     # a frozen window gets its stack logged
     app.hangwatch = HangWatch(parent=app)   # pyright: ignore[reportAttributeAccessIssue]  # kept alive on the app
-    from soundboard.uigc import UiCollector
+    from soundboard.core.uigc import UiCollector
     # garbage collection on this thread only
     app.collector = UiCollector(parent=app, quiet=w.engine.quiet)   # pyright: ignore[reportAttributeAccessIssue]  # kept alive on the app
     code = app.exec()

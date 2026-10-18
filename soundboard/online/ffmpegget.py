@@ -44,7 +44,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from soundboard import errors
+from soundboard.core import errors
 from soundboard.sounds import library
 from soundboard.online import net
 from soundboard.i18n import _

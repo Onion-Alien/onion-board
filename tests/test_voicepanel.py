@@ -94,7 +94,7 @@ def test_voices_switch_off_remembers_every_voice_and_on_brings_exactly_those(
     started = []
     monkeypatch.setattr(type(p.speech), "translating",
                         lambda self: object() if self.cb_lang.currentData() else None)
-    monkeypatch.setattr("soundboard.langnames.of", lambda m: "Chinese")
+    monkeypatch.setattr("soundboard.core.langnames.of", lambda m: "Chinese")
     p.fx.pick("Robot")
     p.speech.cb_lang.blockSignals(True)
     p.speech.cb_lang.setCurrentIndex(p.speech.cb_lang.findData("zh"))
@@ -452,7 +452,7 @@ def test_new_voice_is_used_mid_talk_without_a_restart(panel, qapp, monkeypatch):
 
 
 def test_update_shows_progress_and_blocks_a_second_install(panel, qapp, monkeypatch):
-    from soundboard import applog
+    from soundboard.core import applog
     from soundboard.addons import modules as mods
     p, _ = panel
     s = p.speech

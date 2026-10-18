@@ -16,7 +16,8 @@ from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import (QComboBox, QDialog, QHBoxLayout, QLabel, QLineEdit,
                                QPushButton, QVBoxLayout, QWidget)
 
-from soundboard import errors, savedvoices, usage, voicefx, voicesetups
+from soundboard.core import errors, usage
+from soundboard import savedvoices, voicefx, voicesetups
 from soundboard.online import store, storevoices as sv
 from soundboard.i18n import _
 from soundboard.speech import aivoicelist as avl
@@ -50,7 +51,7 @@ def meta_line(v: sv.Voice) -> str:
         if v.ai:
             used.append(v.ai.get("name", ""))
         if v.language:
-            from soundboard import langnames
+            from soundboard.core import langnames
             used.append(langnames.name(v.language, v.language))
         if used:
             parts.append(" + ".join(u for u in used if u))

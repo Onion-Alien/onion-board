@@ -16,7 +16,8 @@ from PySide6.QtWidgets import QApplication, QFrame, QHBoxLayout, QLabel, QPushBu
 from shiboken6 import isValid as qt_valid
 
 from soundboard.sounds import library
-from soundboard import soundfx, theme, usage
+from soundboard import soundfx, theme
+from soundboard.core import usage
 from soundboard.engine import SR
 from soundboard.i18n import _
 from soundboard.sounds.library import PRESS_MODE, load_original

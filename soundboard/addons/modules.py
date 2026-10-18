@@ -69,7 +69,7 @@ from pathlib import Path, PurePosixPath
 from soundboard import voicefx
 from soundboard.sounds import library
 from soundboard.online import net
-from soundboard import errors
+from soundboard.core import errors
 from soundboard.i18n import _, ngettext
 
 log = logging.getLogger(__name__)
@@ -613,7 +613,7 @@ def install(info: ModuleInfo, on_line: Callable[[str], object],
             on_note: Callable[[str], object] | None = None) -> bool:
     """Run the module's "install" steps (see _install), counting how it went for the
     daily usage count (usage.py: the add-on's name from a fixed list, nothing else)."""
-    from soundboard import usage
+    from soundboard.core import usage
     repair = info.broken
     ok = _install(info, on_line, on_note)
     usage.used(f"addon-{'installed' if ok else 'failed'}-{usage.addon_tag(info.id)}")

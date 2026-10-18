@@ -1,4 +1,4 @@
-"""The measured process: the real Onion Board, started the way soundboard.app.main
+"""The measured process: the real Onion Board, started the way soundboard.core.app.main
 starts it, on a throwaway profile, with stand-in devices, stepped through the
 scenarios the runner asked for. Started by perf.runner, never by hand:
 
@@ -174,7 +174,7 @@ def isolate(conf: dict):
         raise RuntimeError("perf run: no admin steps")
     directmic._elevated = no_admin
 
-    from soundboard import updates
+    from soundboard.core import updates
 
     def offline(*_a, **_k):
         raise OSError("perf run: offline")
@@ -201,14 +201,16 @@ def isolate(conf: dict):
             pass
     midi.WinMM = NoMidi
 
-    from soundboard import autostart, cableformat
+    from soundboard.core import autostart
+    from soundboard import cableformat
     from soundboard.win import shellicon
     autostart.winreg = None
     shellicon.shortcut_folders = lambda: []
     cableformat.cable_ends = lambda names_hint=None: []
     cableformat.set_rate = lambda end, rate=None: False
 
-    from soundboard import appaudio, tips, voicesdk
+    from soundboard import appaudio, voicesdk
+    from soundboard.core import tips
     voicesdk.foreground_process = lambda: (0, "")
     tips.fullscreen_in_front = lambda: False
     appaudio.default_output_name = lambda: None
@@ -428,8 +430,9 @@ class Child:
 
     # -- start
     def start_app(self):
-        from soundboard import app as sbapp
-        from soundboard import applog, i18n
+        from soundboard.core import app as sbapp
+        from soundboard.core import applog
+        from soundboard import i18n
         from soundboard.sounds import library
         applog.setup(library.APP_DIR)
         sbapp.tune_runtime_for_audio()
@@ -437,7 +440,8 @@ class Child:
         from PySide6.QtWidgets import QApplication
         link.mark("app_start")
         self.app = app = QApplication([sys.argv[0]])
-        from soundboard.singleinstance import claim_single_instance, listen_for_second_launch
+        from soundboard.core.singleinstance import (claim_single_instance,
+                                                    listen_for_second_launch)
         claim_single_instance()
         app.instance_server = listen_for_second_launch(app, lambda: self.w)
         from soundboard.ui import a11y, quietbox
@@ -459,15 +463,15 @@ class Child:
             w.setAttribute(Qt.WA_ShowWithoutActivating)
             w.move(-9000, 200)
         w.show()
-        from soundboard.hangwatch import HangWatch
-        from soundboard.uigc import UiCollector
+        from soundboard.core.hangwatch import HangWatch
+        from soundboard.core.uigc import UiCollector
         app.hangwatch = HangWatch(parent=app)
         app.collector = UiCollector(parent=app)
         self.foreground(True)
         loaded = self.run_until(lambda: not w.soundctl._load_thread.is_alive(), 60)
         if self.conf.get("watch_zip") and w.triggers.needed_now():
             self.run_until(lambda: not w.triggers.pending, 30)
-        # what soundboard.app.main builds behind the loading screen: Settings and a
+        # what soundboard.core.app.main builds behind the loading screen: Settings and a
         # spare Edit sound, then their first show (without it every Edit measured a build)
         w.setctl.preload_dialogs()
         w.setctl.warm_settings()

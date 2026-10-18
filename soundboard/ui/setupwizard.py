@@ -32,22 +32,23 @@ from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QDialog, Q
                                QGridLayout, QHBoxLayout, QLabel, QMessageBox, QProgressBar,
                                QPushButton, QScrollArea, QVBoxLayout, QWidget)
 
-from soundboard import autostart, directmic, discordcfg, michelper
+from soundboard.core import autostart
+from soundboard import directmic, discordcfg, michelper
 from soundboard import engine as eng
 from soundboard import theme
 from soundboard.engine import SR
 from soundboard.sounds import library
-from soundboard import usage
+from soundboard.core import usage
 from soundboard.online import net
 from soundboard.sounds.library import RESOURCE_DIR
-from soundboard.pollthread import PollThread
+from soundboard.core.pollthread import PollThread
 from soundboard.ui import cableconfirm
 from soundboard.ui.glow import Glow
 from soundboard.ui import busy, fit, icons, panel
 from soundboard.ui.bunnywidget import TALK, BunnyWidget
 from soundboard.ui.setupshow import SetupShow
 from soundboard.ui.choicetile import ChoiceTile, FoldPill
-from soundboard import errors
+from soundboard.core import errors
 from soundboard.i18n import _
 from soundboard.ui.pixels import snap_to_pixels
 from soundboard.ui.toast import animations_on

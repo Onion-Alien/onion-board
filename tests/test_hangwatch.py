@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 from PySide6.QtCore import QCoreApplication, QEvent
 
-from soundboard.hangwatch import HangWatch
+from soundboard.core.hangwatch import HangWatch
 
 # Long enough that a busy machine (the full suite on every core) or another test's
 # leftover events can't pass for a freeze; the freeze below is twice as long.
@@ -41,9 +41,9 @@ def beat_for(qapp, seconds):
 
 
 def test_a_frozen_window_logs_what_it_was_doing_once(qapp, caplog, tmp_path, monkeypatch):
-    from soundboard import applog
+    from soundboard.core import applog
     monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
-    caplog.set_level(logging.WARNING, logger="soundboard.hangwatch")
+    caplog.set_level(logging.WARNING, logger="soundboard.core.hangwatch")
     settle(qapp)
     hw = HangWatch(hang_s=HANG_S)
     try:
@@ -65,7 +65,7 @@ def test_a_frozen_window_logs_what_it_was_doing_once(qapp, caplog, tmp_path, mon
 @pytest.mark.skipif(sys.platform != "win32", reason="thread CPU times are read on Windows")
 def test_a_freeze_report_says_how_busy_each_thread_was(qapp, tmp_path, monkeypatch):
     """A window asleep (waiting) uses no CPU; a thread spinning uses a whole core."""
-    from soundboard import applog
+    from soundboard.core import applog
     monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
     go = threading.Event()
 
@@ -98,7 +98,7 @@ class Dialog:
 
 
 def test_a_freeze_report_shows_the_other_threads_too(qapp, tmp_path, monkeypatch):
-    from soundboard import applog
+    from soundboard.core import applog
     monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
     go = threading.Event()
     worker = threading.Thread(target=waiting_in_a_worker, args=(go,), name="busy-worker",
@@ -121,7 +121,7 @@ def test_a_freeze_report_shows_the_other_threads_too(qapp, tmp_path, monkeypatch
 
 
 def test_a_freeze_inside_a_dialogs_exec_says_so(qapp, tmp_path, monkeypatch):
-    from soundboard import applog
+    from soundboard.core import applog
     monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
     settle(qapp)
     hw = HangWatch(hang_s=HANG_S)
@@ -135,7 +135,7 @@ def test_a_freeze_inside_a_dialogs_exec_says_so(qapp, tmp_path, monkeypatch):
 
 
 def test_a_responsive_window_logs_nothing(qapp, caplog):
-    caplog.set_level(logging.WARNING, logger="soundboard.hangwatch")
+    caplog.set_level(logging.WARNING, logger="soundboard.core.hangwatch")
     settle(qapp)
     hw = HangWatch(hang_s=HANG_S)
     try:
@@ -167,7 +167,7 @@ class SleepingPC:
 def test_time_the_pc_slept_is_no_freeze(qapp, tmp_path, monkeypatch):
     """2.0.4 counted every sleep with the app open as a freeze of the whole sleep,
     stuck wherever the window happened to be."""
-    from soundboard import applog
+    from soundboard.core import applog
     monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
     settle(qapp)
     pc = SleepingPC()
@@ -185,7 +185,7 @@ def test_time_the_pc_slept_is_no_freeze(qapp, tmp_path, monkeypatch):
 
 
 def test_the_awake_clock_moves_with_time():
-    from soundboard.hangwatch import awake_clock
+    from soundboard.core.hangwatch import awake_clock
     clock = awake_clock()
     a = clock()
     time.sleep(0.2)
@@ -198,7 +198,7 @@ def test_a_freeze_that_held_every_thread_says_so(qapp, tmp_path, monkeypatch):
     tells that apart from the window alone being stuck."""
     import ctypes
 
-    from soundboard import applog, hangwatch
+    from soundboard.core import applog, hangwatch
     monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
     settle(qapp)
     hw = HangWatch(hang_s=HANG_S)
@@ -218,7 +218,7 @@ def test_a_freeze_report_says_how_full_the_pcs_memory_was(qapp, tmp_path, monkey
     """An idle window stuck at random lines for 10-30 s, over and over on one PC, looked
     like Windows swapping the app to disk: the report now says how full memory was and
     how fast the app page-faulted while it was stuck."""
-    from soundboard import applog, hangwatch
+    from soundboard.core import applog, hangwatch
     monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
     faults = iter([1000, 1000 + 3000])   # before and after the half-second sample
     monkeypatch.setattr(hangwatch, "memory_load", lambda: 93)
@@ -236,6 +236,6 @@ def test_a_freeze_report_says_how_full_the_pcs_memory_was(qapp, tmp_path, monkey
 
 @pytest.mark.skipif(sys.platform != "win32", reason="Windows' own figures")
 def test_the_memory_figures_read_on_windows():
-    from soundboard import hangwatch
+    from soundboard.core import hangwatch
     load, faults = hangwatch.memory_load(), hangwatch.page_faults()
     assert 0 <= load <= 100 and faults > 0

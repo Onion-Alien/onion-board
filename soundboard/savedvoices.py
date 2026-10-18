@@ -24,7 +24,8 @@ import zlib
 from pathlib import Path
 
 from soundboard.sounds import library
-from soundboard import trash, voicefx
+from soundboard.core import trash
+from soundboard import voicefx
 from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
@@ -373,7 +374,7 @@ class Store:
         return added
 
     # ------------------------------------------------------------ the bin
-    # (shaped like soundboard.trash, for ui.deleted.DeletedDialog)
+    # (shaped like soundboard.core.trash, for ui.deleted.DeletedDialog)
     def items(self, kind: str | None = None) -> list[trash.Item]:
         return [i for i in reversed(self.deleted) if kind in (None, VOICE)]
 

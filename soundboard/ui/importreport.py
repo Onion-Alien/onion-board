@@ -14,7 +14,7 @@ from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QHBoxLayout, QLabel,
                                QPushButton, QScrollArea, QVBoxLayout, QWidget)
 
-from soundboard import errors
+from soundboard.core import errors
 from soundboard.i18n import _, ngettext
 from soundboard.ui import fit, icons
 

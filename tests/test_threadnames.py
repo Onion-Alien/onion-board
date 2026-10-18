@@ -1,11 +1,11 @@
-"""Python threads carry their names in Windows too (soundboard.threadnames)."""
+"""Python threads carry their names in Windows too (soundboard.core.threadnames)."""
 import ctypes
 import sys
 import threading
 
 import pytest
 
-from soundboard import threadnames
+from soundboard.core import threadnames
 
 
 def _windows_name(native_id: int) -> str:

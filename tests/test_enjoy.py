@@ -5,7 +5,7 @@ import time
 from conftest import own_module
 from test_mainwindow import window  # noqa: F401  (the real MainWindow)
 
-from soundboard import enjoy, usage
+from soundboard.core import enjoy, usage
 from soundboard.sounds.library import Config
 
 DAY = 86400.0

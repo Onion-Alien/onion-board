@@ -456,7 +456,7 @@ def board_running() -> bool:
     if sys.platform != "win32":
         return False
     import ctypes
-    from soundboard.singleinstance import INSTANCE_NAME
+    from soundboard.core.singleinstance import INSTANCE_NAME
     k32 = ctypes.WinDLL("kernel32", use_last_error=True)
     k32.OpenMutexW.restype = ctypes.c_void_p
     h = k32.OpenMutexW(0x00100000, False, f"Local\\{INSTANCE_NAME}")   # SYNCHRONIZE
@@ -501,7 +501,7 @@ def cli(_rest: list[str]) -> int:
     """`--discord-restore`: says Discord is still set for sounds (a notification), then
     puts it back as soon as it closes. Ends when that's done, when Onion Board opens
     again (it takes over), or after HELPER_MAX_S."""
-    from soundboard.bootmark import app_dir
+    from soundboard.core.bootmark import app_dir
     app = app_dir()
     logging.basicConfig(filename=str(app / "discord-restore.log"), filemode="w",
                         level=logging.INFO, format="%(asctime)s %(message)s")

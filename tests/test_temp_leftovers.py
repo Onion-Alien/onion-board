@@ -4,7 +4,7 @@ import os
 import tempfile
 import time
 
-from soundboard import app
+from soundboard.core import app
 
 
 def test_only_our_old_temp_folders_are_removed(tmp_path, monkeypatch):

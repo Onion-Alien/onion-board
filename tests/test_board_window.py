@@ -3,7 +3,7 @@ categories, undo after Remove, export / import, the trim control, the tray."""
 from pathlib import Path
 
 from conftest import process_events, said, unsay
-from soundboard import backup
+from soundboard.core import backup
 from soundboard.ui.dialogs import EditDialog
 import pytest
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
@@ -347,7 +347,8 @@ def test_the_tray_menu_offers_the_discord_and_feedback(window, monkeypatch):
     """Near the bottom, above Quit; both only open a page in the browser."""
     from PySide6.QtWidgets import QApplication, QSystemTrayIcon
 
-    from soundboard import __version__, feedback
+    from soundboard import __version__
+    from soundboard.core import feedback
     from soundboard.ui import busy
     opened = []
     monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))

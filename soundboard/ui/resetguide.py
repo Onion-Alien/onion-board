@@ -1,6 +1,6 @@
 """Settings > General > Reset: a two-step guide that puts the parts the user picks
 back to how they started, and the Restore points list that undoes it
-(soundboard.reset does the work, at the next start-up)."""
+(soundboard.core.reset does the work, at the next start-up)."""
 from __future__ import annotations
 
 from PySide6.QtCore import QSize, Qt, QTimer
@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QCheckBox, QDialog, QFrame, QH
                                QLabel, QListWidget, QListWidgetItem, QMessageBox, QPushButton,
                                QVBoxLayout, QWidget)
 
-from soundboard import reset, trash
+from soundboard.core import reset, trash
 from soundboard.ui import fit, icons
 from soundboard.ui.panel import hint_label, icon_label
 from soundboard.i18n import _

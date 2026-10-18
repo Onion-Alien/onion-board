@@ -4,7 +4,7 @@
         --tag pack-horror-night [--about "..."] [--author "..."] [--emoji 👻]
         [--preview "Door creak" --preview Scream ...]
 
-It reads the zip the way the app does (soundboard.backup), so a pack that passes here
+It reads the zip the way the app does (soundboard.core.backup), so a pack that passes here
 imports. It refuses a pack the app wouldn't take (unreadable, too big, no sounds) and
 one that carries settings (a pack must never change someone's theme or hotkeys), and
 lists every sound so the licences can be checked against the submission. Then:
@@ -28,7 +28,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from soundboard import backup, updates  # noqa: E402
+from soundboard.core import backup, updates  # noqa: E402
 from soundboard.sounds import library, packs  # noqa: E402
 
 SAMPLE_S = 7.0   # a preview's sounds: at most this long,

@@ -428,8 +428,8 @@ def run_elevated(args: list[str], wait_s: float = 600.0) -> int | None:
 
     if getattr(sys, "frozen", False):
         exe, params = sys.executable, args
-    else:   # from source: python -m soundboard.cleanup
-        exe, params = sys.executable, ["-m", "soundboard.cleanup", *args]
+    else:   # from source: python -m soundboard.core.cleanup
+        exe, params = sys.executable, ["-m", "soundboard.core.cleanup", *args]
     info = Info(cbSize=ctypes.sizeof(Info), fMask=0x40,   # SEE_MASK_NOCLOSEPROCESS
                 lpVerb="runas", lpFile=exe, lpParameters=subprocess.list2cmdline(params),
                 lpDirectory=str(Path(exe).parent), nShow=0)

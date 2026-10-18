@@ -1,6 +1,6 @@
 # Backup and sound pack format
 
-What *Backup → Export* writes and *Import* reads (`soundboard/backup.py`). It's a
+What *Backup → Export* writes and *Import* reads (`soundboard/core/backup.py`). It's a
 plain `.zip` of JSON files and the original audio, so it can be opened, edited,
 made or taken apart with any zip tool or script — no Onion Board needed.
 
@@ -100,7 +100,7 @@ Only `name` and `audio` are needed; everything else falls back to the defaults.
 
 The app's settings (`Config` in `soundboard/sounds/library.py`) minus anything that
 belongs to one PC or that must only be switched on by hand (`LOCAL_SETTINGS` in
-`soundboard/backup.py`): audio devices, where sounds are sent (straight into the mic,
+`soundboard/core/backup.py`): audio devices, where sounds are sent (straight into the mic,
 the cable, another device or nowhere), the setup-guide state, per-program Apps
 settings, the Triggers tab's screen settings, category hotkeys, the remote-control
 switch, port and key, remote add-ons' settings (Onion Pocket), the network settings

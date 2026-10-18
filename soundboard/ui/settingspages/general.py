@@ -4,7 +4,8 @@ from __future__ import annotations
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
                                QWidget)
 
-from soundboard import appsetup, autostart, profiles
+from soundboard import appsetup, profiles
+from soundboard.core import autostart
 from soundboard.i18n import _
 from soundboard.ui import busy, icons
 from soundboard.ui.settingspages import Page

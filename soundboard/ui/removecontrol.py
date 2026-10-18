@@ -15,7 +15,7 @@ import numpy as np
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QMessageBox
 
-from soundboard import backup, trash
+from soundboard.core import backup, trash
 from soundboard.sounds import library
 from soundboard.i18n import _, ngettext
 from soundboard.sounds.library import SoundMeta
@@ -147,7 +147,7 @@ class RemoveControl(Controller):
 
     def _finish_removals(self):
         """The undo window is over: the removed sounds go to Recently deleted
-        (soundboard.trash), where they can still be brought back for a while."""
+        (soundboard.core.trash), where they can still be brought back for a while."""
         # let go of their audio first: Windows won't delete a mapped cache file
         # (soundboard.mapped) while an array still points into it
         mw = self.mw

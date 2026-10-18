@@ -6,7 +6,7 @@ import uuid
 import pytest
 
 from conftest import own_time
-from soundboard import singleinstance as si
+from soundboard.core import singleinstance as si
 
 pytestmark = pytest.mark.windows   # Windows' named mutex
 
@@ -48,7 +48,7 @@ def test_window_comes_to_front_on_a_normal_start_only():
     """The splash never takes the focus, so a normal start (the installer's "Open Onion
     Board now") must bring the window forward itself, or it lands behind the browser;
     a start with Windows (--tray) must not take the focus from a game."""
-    from soundboard.autostart import TRAY_ARG
+    from soundboard.core.autostart import TRAY_ARG
     assert si.comes_to_front(["main.py"], False)
     assert si.comes_to_front(["main.py", "--resume-setup"], False)
     assert not si.comes_to_front(["main.py", TRAY_ARG], False)

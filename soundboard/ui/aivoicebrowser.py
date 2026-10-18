@@ -13,7 +13,7 @@ from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (QComboBox, QDialog, QDialogButtonBox, QGridLayout, QHBoxLayout,
                                QLabel, QLineEdit, QPushButton, QSlider, QVBoxLayout, QWidget)
 
-from soundboard import errors
+from soundboard.core import errors
 from soundboard.i18n import _
 from soundboard.speech import aipreview
 from soundboard.speech import aivoicelist as avl

@@ -28,7 +28,7 @@ def run(mod: str, **env) -> list[str]:
 
 
 @pytest.mark.windows   # starts the app in a child process
-@pytest.mark.parametrize("entry", ["main", "soundboard.app", "soundboard.directmic"])
+@pytest.mark.parametrize("entry", ["main", "soundboard.core.app", "soundboard.directmic"])
 def test_starting_the_app_caps_the_maths_threads(entry):
     # main.py (the shortcuts, the frozen exe), python -m soundboard, the admin helpers
     assert run(entry) == [soundboard.BLAS_THREADS, "1"]
@@ -36,7 +36,7 @@ def test_starting_the_app_caps_the_maths_threads(entry):
 
 @pytest.mark.windows   # starts the app in a child process
 def test_a_cap_the_user_set_is_kept():
-    assert run("soundboard.app", OPENBLAS_NUM_THREADS="8") == ["8", "None"]
+    assert run("soundboard.core.app", OPENBLAS_NUM_THREADS="8") == ["8", "None"]
 
 
 def test_a_restarted_app_still_knows_the_cap_was_its_own():

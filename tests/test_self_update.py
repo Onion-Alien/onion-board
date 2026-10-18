@@ -6,7 +6,8 @@ from PySide6.QtWidgets import QMessageBox
 
 from conftest import process_events
 from soundboard.ui import toast
-from soundboard import __version__, updates
+from soundboard import __version__
+from soundboard.core import updates
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
 
@@ -148,7 +149,7 @@ def test_found_behind_the_loading_screen_it_installs_before_the_window(
 
 def _closing_marks(monkeypatch):
     """exitwatch's "an installer closes the app" mark, as calls: "closing" / "staying"."""
-    from soundboard import exitwatch
+    from soundboard.core import exitwatch
     marks = []
     monkeypatch.setattr(exitwatch, "closed_by_windows", lambda: marks.append("closing"))
     monkeypatch.setattr(exitwatch, "staying", lambda: marks.append("staying"), raising=False)

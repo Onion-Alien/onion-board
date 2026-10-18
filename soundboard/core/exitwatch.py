@@ -395,7 +395,7 @@ def _plain(kind: str) -> str:
 def _prev_log(app_dir: Path) -> str:
     """The last LOG_LINES lines of the previous run in onionboard.log (before this
     run's "starting" line), or ""."""
-    from soundboard import applog
+    from soundboard.core import applog
     try:
         with open(Path(app_dir) / applog.LOG_NAME, "rb") as f:
             f.seek(0, os.SEEK_END)
@@ -436,7 +436,7 @@ def check_last(app_dir: Path, state: dict, native: str, unclean_event: str):
     it to the usage event, and save a report beside the crash reports. Runs off the UI
     thread (wevtutil takes a moment). Returns (event, report path); ("", None) when it
     wasn't the app's problem (NOT_PROBLEMS)."""
-    from soundboard import applog
+    from soundboard.core import applog
     events = windows_events(int(state.get("pid") or 0))
     kind, tag = diagnose(state, native, events, boot_time())
     if kind in NOT_PROBLEMS:   # Windows or the power ended it: nothing to count or report

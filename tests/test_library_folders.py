@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
-from soundboard import backup, reset, trash
+from soundboard.core import backup, reset, trash
 from soundboard.sounds import library
 from soundboard.engine import SR
 from soundboard.sounds.library import Config, SoundMeta

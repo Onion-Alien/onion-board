@@ -70,7 +70,8 @@ from PySide6.QtCore import QPointF, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QFont, QImage, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import QSizePolicy, QWidget
 
-from soundboard import theme, usage
+from soundboard import theme
+from soundboard.core import usage
 from soundboard.bunny import (
     FUR,
     GADGET_SCREEN,

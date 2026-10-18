@@ -12,12 +12,12 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import QObject, Qt, Signal
 from PySide6.QtWidgets import QHBoxLayout, QLabel, QProgressBar, QPushButton, QVBoxLayout, QWidget
 
-from soundboard import langnames
+from soundboard.core import langnames
 from soundboard.speech import spoken, translation
 from soundboard.ui import icons
 from soundboard.ui.panel import hint_label
 from soundboard.ui.voicefxpanel import _enable
-from soundboard import errors
+from soundboard.core import errors
 from soundboard.i18n import _
 
 if TYPE_CHECKING:

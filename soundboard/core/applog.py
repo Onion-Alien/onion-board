@@ -313,7 +313,7 @@ def _clear_bootmark(app_dir) -> None:
     count that one crash twice -- `error/` and `startup-failed/`. Mid-run the
     breadcrumb is already gone: a no-op. Never raises."""
     try:
-        from soundboard import bootmark
+        from soundboard.core import bootmark
         bootmark.clear(app_dir)
     except Exception:  # noqa: BLE001 - never let this break the reporter
         log.debug("couldn't clear the start-up breadcrumb", exc_info=True)
@@ -362,7 +362,7 @@ def _show_plain(v):
 
         from PySide6.QtWidgets import QApplication
 
-        from soundboard import errors
+        from soundboard.core import errors
         from soundboard.ui import busy
         if QApplication.instance() is None or not _app_in_front():
             return   # never over a game: the log has it

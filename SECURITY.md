@@ -148,7 +148,7 @@ names the next count would send, never the daily count itself, and the close wai
 
 **Where and how:** one HTTPS POST to `onionalien.goatcounter.com/api/v0/count`
 (GoatCounter, a privacy-friendly counter; the website counts its visits there too). The
-key in `soundboard/usage.py` can only add counts, not read them.
+key in `soundboard/core/usage.py` can only add counts, not read them.
 
 **Always in it:** the path `/app/<version>`, a random ID made on this PC (`stats_id` in
 `config.json`) and a short tag made from it (`u-` and 12 letters of its hash, as the
@@ -192,7 +192,7 @@ account or anything else about you.
   the exact version), the app's language (`lang/de`) and theme (`theme/dark`: a
   built-in theme's name, else `other`);
 - **which features you used or have set up since then**, as `used/<name>`: only the
-  names in `FEATURES` in `soundboard/usage.py`, each a yes or no for the day, never how
+  names in `FEATURES` in `soundboard/core/usage.py`, each a yes or no for the day, never how
   many times or what you did with them. Some examples by area:
   - tabs: `used/more-tabs-opened`, `used/more-tabs-added-radio`, `used/more-tabs-closed`,
     a tab hidden from its right-click menu (`used/tab-hidden-voice`), Ctrl+1 to 9 or
@@ -375,7 +375,7 @@ account or anything else about you.
 **Send feedback** ("What would you improve?") sends your picks right away, with a
 one-off random session instead of this PC's ID, so they can't be linked to you or to the
 daily count: `improve/sounds`, `improve/looks`… (only the names in `IMPROVE` in
-`soundboard/usage.py`), the follow-up ticks that open under a pick
+`soundboard/core/usage.py`), the follow-up ticks that open under a pick
 (`improve/sounds/memes`, only the names in `IMPROVE_MORE`), and what you typed under
 *Something else* or *Fewer bugs* as dashed words (`improve/other/more-anime-sounds`,
 `improve/bugs/said/crashes-when-i-alt-tab`, at most 100 and 200 characters; anything

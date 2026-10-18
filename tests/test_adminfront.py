@@ -7,14 +7,14 @@ from PySide6.QtWidgets import QApplication
 from test_mainwindow import window  # noqa: F401  (the real MainWindow)
 
 from soundboard.control import adminfront
-from soundboard import autostart
+from soundboard.core import autostart
 from soundboard.ui import toast
 
 
 def run_loop(monkeypatch, fronts, admins, fullscreen=lambda pid: True):
     """Drive Watcher._loop over `fronts` (the pid in front at each look); the
     programs in `admins` run as admin. What it reported, in order."""
-    from soundboard import tips
+    from soundboard.core import tips
     w = adminfront.Watcher()
     seen, asked, left = [], [], list(fronts)
     w.found.connect(seen.append)

@@ -96,7 +96,7 @@ def test_a_sound_brought_back_gives_up_a_key_an_action_took_meanwhile(window, qa
     the pad comes back without it, rather than showing a key that never plays it."""
     from conftest import process_events
 
-    from soundboard import trash
+    from soundboard.core import trash
     assert process_events(qapp, lambda: all(m.id in window.audio for m in window.cfg.sounds))
     for sid, done in (("s0", window.rmctl.undo_remove), ("s1", None)):
         window.meta(sid).hotkey = "f9"

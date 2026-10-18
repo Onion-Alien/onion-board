@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (QApplication, QColorDialog, QFrame, QHBoxLayout, 
                                QLabel, QMenu, QPushButton, QWidget)
 
 from soundboard.sounds import library
-from soundboard import usage
+from soundboard.core import usage
 from soundboard.sounds.library import MAX_FADE_S, PAD_COLORS, SoundMeta
 from soundboard.ui import icons
 from soundboard.ui.widgets import DropdownMenu

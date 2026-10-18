@@ -11,7 +11,8 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtWidgets import QCheckBox, QMessageBox
 
-from soundboard import appaudio, bunny, directmic, theme, usage
+from soundboard import appaudio, bunny, directmic, theme
+from soundboard.core import usage
 from soundboard.sounds import library
 from soundboard import engine as eng
 from soundboard.engine import is_virtual as is_virtual_cable

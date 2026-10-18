@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from urllib.parse import quote, urlencode
 
-from soundboard.updates import REPO
+from soundboard.core.updates import REPO
 
 # the Onion Board Discord server: chat, help, and new versions (a permanent invite)
 DISCORD_URL = "https://discord.gg/FhKGaWCWHM"

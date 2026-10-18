@@ -54,7 +54,8 @@ def split_report(rich: str) -> tuple[str, str]:
 def report(window: QWidget | None, url: str = ""):
     """Report a problem: the bug form in the browser (`url`: one already filled in
     with what went wrong), with the app's version."""
-    from soundboard import __version__, feedback, usage
+    from soundboard import __version__
+    from soundboard.core import feedback, usage
     from soundboard.ui import busy
     usage.used("oops-report")
     busy.open_url(url or feedback.problem_url(__version__), window=window,
@@ -210,7 +211,7 @@ class OopsPanel(QFrame):
     def _pressed_retry(self):
         if self._retry is None:
             return
-        from soundboard import usage
+        from soundboard.core import usage
         usage.used("oops-retry")
         try:
             self._retry()

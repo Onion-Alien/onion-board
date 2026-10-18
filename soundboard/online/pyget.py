@@ -39,7 +39,7 @@ import zipfile
 from collections.abc import Callable
 from pathlib import Path, PurePosixPath
 
-from soundboard import errors
+from soundboard.core import errors
 from soundboard.online import net
 from soundboard.i18n import _
 
@@ -197,7 +197,7 @@ def for_module(module_dir: Path, on_line: Callable[[str], object]) -> str:
     found = pc_python()
     if found is not None:
         return found
-    from soundboard import usage
+    from soundboard.core import usage
     try:
         exe = get(module_dir, on_line)
     except GetError:
