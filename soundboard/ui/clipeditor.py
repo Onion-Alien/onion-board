@@ -23,7 +23,7 @@ from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QMenu, QPushBu
 
 from soundboard import theme
 from soundboard.sounds.clipedit import BIN, LiveBuffer, Take, bin_peaks
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 from soundboard.i18n import _
 from soundboard.sounds.library import level_gain
 from soundboard.ui import appstate, busy, icons

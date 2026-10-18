@@ -167,7 +167,7 @@ class ThumbBar:
             log.warning("taskbar buttons not updated", exc_info=True)
 
     def _push(self, slot: int):
-        from soundboard.appaudio import Com
+        from soundboard.audio.appaudio import Com
         btns, old = self.buttons(), self._icons
         self._icons = [b.hIcon for b in btns]
         arr = (THUMBBUTTON * len(btns))(*btns)
@@ -206,7 +206,7 @@ class ThumbBar:
             ctypes.windll.user32.DestroyIcon(wintypes.HICON(h))
         self._icons = []
         if self._tb is not None:
-            from soundboard.appaudio import Com
+            from soundboard.audio.appaudio import Com
             Com(self._tb).release()
             self._tb = None
         self._added = False
@@ -214,14 +214,14 @@ class ThumbBar:
 
 def _taskbar_list() -> int:
     """A new ITaskbarList3, initialised. Qt's UI thread is already in an STA."""
-    from soundboard.appaudio import GUID
+    from soundboard.audio.appaudio import GUID
     ole = ctypes.windll.ole32
     clsid, iid = GUID.of(CLSID_TaskbarList), GUID.of(IID_ITaskbarList3)
     out = c_void_p()
     hr = ole.CoCreateInstance(byref(clsid), None, 1, byref(iid), byref(out))   # INPROC_SERVER
     if hr < 0 or not out.value:
         raise OSError(f"CoCreateInstance(TaskbarList) failed: {hr & 0xFFFFFFFF:#x}")
-    from soundboard.appaudio import Com
+    from soundboard.audio.appaudio import Com
     Com(out.value).call(SLOT_HRINIT, (), what="HrInit")
     return out.value
 

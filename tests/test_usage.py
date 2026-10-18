@@ -370,12 +370,12 @@ def _real_report(where_from: str) -> str:
 
 def test_problem_events_say_where_in_our_code_never_the_message(tmp_path):
     f = tmp_path / "crash-x.txt"
-    src = "D:\\private\\code\\soundboard\\engine.py"
+    src = "D:\\private\\code\\soundboard\\audio\\engine.py"
     f.write_text(_real_report(src) + "\n\nLast 60 log lines\n------\n"
                  '  File "C:\\soundboard\\ui\\other.py", line 7, in g\nOSError: x\n',
                  encoding="utf-8")
-    assert usage._report_event(f) == ("error/1.9.8/KeyError@soundboard/engine.py:2"
-                                      "<soundboard/engine.py:3")   # and its caller
+    assert usage._report_event(f) == ("error/1.9.8/KeyError@soundboard/audio/engine.py:2"
+                                      "<soundboard/audio/engine.py:3")   # and its caller
     # the freeze from a real 1.9.7 report: its deepest line of our own code
     f.write_text("Onion Board froze for 6 s\nVersion:  1.9.7\nTime:  x\n\n"
                  "What it was doing\n-----------------\n"
@@ -401,7 +401,7 @@ def test_a_freeze_says_where_the_window_was_never_another_thread(tmp_path):
                  "\nOther threads\n-------------\n"
                  'Thread "audio" (12):\n'
                  '  File "soundboard\\core\\threadnames.py", line 68, in named_run\n'
-                 '  File "soundboard\\engine.py", line 400, in _loop\n'
+                 '  File "soundboard\\audio\\engine.py", line 400, in _loop\n'
                  'Thread "x" (13):\n'
                  '  File "soundboard\\core\\threadnames.py", line 70, in named_start\n',
                  encoding="utf-8")
@@ -429,7 +429,7 @@ def test_a_freeze_says_its_caller_what_it_waited_in_how_long_and_who_was_busy(tm
            '  File "soundboard\\core\\threadnames.py", line 68, in named_run\n'
            '  File "soundboard\\online\\radio.py", line 400, in _decode\n'
            'Thread "calm" (13), 0% CPU:\n'
-           '  File "soundboard\\engine.py", line 9, in _loop\n')
+           '  File "soundboard\\audio\\engine.py", line 9, in _loop\n')
     _freeze(f, "42 s", 1, hog)
     assert usage._report_event(f) == (
         "freeze/1.9.28@soundboard/mic/voicesdk.py:80<soundboard/ui/mainwindow.py:50"
@@ -437,7 +437,7 @@ def test_a_freeze_says_its_caller_what_it_waited_in_how_long_and_who_was_busy(tm
     _freeze(f, "7 s", 100, hog)
     assert usage._report_event(f).endswith("/lasted-under-10s/busy-window")
     _freeze(f, "still frozen", 0, 'Thread "calm" (13), 2% CPU:\n'
-            '  File "soundboard\\engine.py", line 9, in _loop\n')
+            '  File "soundboard\\audio\\engine.py", line 9, in _loop\n')
     assert usage._report_event(f).endswith("~threading.wait/never-ended/idle")
     # stuck in our own line (time.sleep has no frame): no library part
     _freeze(f, "12 s", 0, "", inner="")
@@ -457,7 +457,7 @@ def test_a_freeze_end_is_noted_without_counting_the_report_again(tmp_path, monke
     import os
     from soundboard.core import applog
     monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
-    path = applog.save_freeze(5, '  File "soundboard\\engine.py", line 9, in f\n')
+    path = applog.save_freeze(5, '  File "soundboard\\audio\\engine.py", line 9, in f\n')
     assert usage._report_event(path).endswith("/never-ended")
     os.utime(path, (1_000_000, 1_000_000))
     applog.note_freeze_end(path, 23.4)
@@ -532,7 +532,7 @@ def test_a_run_that_never_closed_itself_is_an_unclean_exit(sent, app_dir):
 
 _NATIVE = ("Windows fatal exception: access violation\n\n"
            "Current thread 0x1 (most recent call first):\n"
-           '  File "soundboard\\engine.py", line 1090 in _callback\n')
+           '  File "soundboard\\audio\\engine.py", line 1090 in _callback\n')
 
 
 def test_a_start_that_never_finished_is_counted_never_the_message(monkeypatch):
@@ -542,7 +542,7 @@ def test_a_start_that_never_finished_is_counted_never_the_message(monkeypatch):
     from soundboard.core import exitwatch
     monkeypatch.setattr(exitwatch, "windows_events", lambda pid: [])
     assert usage.startup_failed("/x", "1.9.28", 42, _NATIVE) == (
-        "startup-failed/1.9.28/access-violation@soundboard/engine.py:1090")
+        "startup-failed/1.9.28/access-violation@soundboard/audio/engine.py:1090")
     monkeypatch.setattr(exitwatch, "windows_events", lambda pid: [
         {"kind": "windows-error", "code": "access-violation", "module": "Qt6Core.dll"}])
     event = usage.startup_failed("/x", "1.9.28", 42)   # (split: not an e-mail address)
@@ -560,11 +560,11 @@ def test_a_handled_problem_is_counted_once_with_our_line_never_the_message():
     per run, as the error's type and the deepest line of our own code it came from."""
     try:
         exec(compile("def f():\n    raise KeyError('D:/private/secret.wav')\nf()",
-                     "D:\\private\\code\\soundboard\\engine.py", "exec"), {})
+                     "D:\\private\\code\\soundboard\\audio\\engine.py", "exec"), {})
     except KeyError as e:
         usage.warned(e)
         usage.warned(e)   # the same (type, place) again: once
-    assert usage._pending == [f"warned/{__version__}/KeyError@soundboard/engine.py:2"]
+    assert usage._pending == [f"warned/{__version__}/KeyError@soundboard/audio/engine.py:2"]
     assert "secret" not in usage._pending[0]
     # a problem whose traceback is all another library's: the type only
     try:
@@ -980,7 +980,7 @@ def test_open_time_is_a_rough_bucket(seconds, b):
 
 
 def test_settings_that_are_set_count_every_day(monkeypatch):
-    from soundboard import quality
+    from soundboard.online import quality
     monkeypatch.setattr(quality, "current", quality.Prefs(keep_source=False))
     cfg = Config(sidebar_open=False, apps_categories=["Games", "Other", "Stream stuff"])
     assert {"source-off", "rail-shut", "apps-own-categories"} <= set(usage.features_now(cfg))

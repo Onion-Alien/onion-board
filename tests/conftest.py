@@ -532,9 +532,9 @@ def _switches_back_on():
 
 @pytest.fixture(autouse=True)
 def _data_prefs_back_to_default(monkeypatch):
-    """Settings > Data & quality (soundboard.quality.current) is process-wide too: a
+    """Settings > Data & quality (soundboard.online.quality.current) is process-wide too: a
     test that turns on Low data mode doesn't leave the next one without thumbnails."""
-    quality = sys.modules.get("soundboard.quality")
+    quality = sys.modules.get("soundboard.online.quality")
     if quality is not None:
         monkeypatch.setattr(quality, "current", quality.Prefs())
 
@@ -560,7 +560,7 @@ def _never_look_at_the_real_foreground():
     """The main window asks which game is in front (soundboard.mic.voicesdk) to suggest a
     Who's listening mode: in tests nothing is, whatever the developer is playing.
     For the whole session: test windows outlive their test, timers and all."""
-    from soundboard import appaudio
+    from soundboard.audio import appaudio
     from soundboard.mic import voicesdk
     with pytest.MonkeyPatch.context() as mp:
         mp.setattr(voicesdk, "foreground_process", lambda: (0, ""))

@@ -91,7 +91,7 @@ Only `name` and `audio` are needed; everything else falls back to the defaults.
 | `delay` | seconds between the press and the sound (0–10) |
 | `cooldown` | seconds after it starts during which presses are ignored (0–60) |
 | `color` | `#rrggbb` |
-| `fx` | the sound's effects, as in `soundboard/soundfx.py`: `start` / `end` (trim, seconds into the audio; `end` 0 = to the end), `speed`, `pitch` (semitones), `tape`, `eq` (7 dB values), `gain_db`, `reverse`, `effects` (voice effects by type) |
+| `fx` | the sound's effects, as in `soundboard/audio/soundfx.py`: `start` / `end` (trim, seconds into the audio; `end` 0 = to the end), `speed`, `pitch` (semitones), `tape`, `eq` (7 dB values), `gain_db`, `reverse`, `effects` (voice effects by type) |
 | `tags` | the categories the sound is in |
 | `level_gain` | the loudness-levelling gain (recomputed if missing) |
 | `duration`, `fingerprint` | informational; the fingerprint is how duplicates are spotted |

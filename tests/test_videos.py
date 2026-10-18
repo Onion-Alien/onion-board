@@ -12,7 +12,7 @@ from PySide6.QtCore import QEvent
 from PySide6.QtMultimedia import QMediaPlayer
 
 from conftest import process_events
-from soundboard import engine
+from soundboard.audio import engine
 from soundboard.sounds import library, videos
 from soundboard.control import winkeys
 from soundboard.sounds.library import SR, Config, SoundMeta

@@ -28,7 +28,7 @@ from soundboard.ui import busy, clipeditor, icons
 from soundboard.ui.clipeditor import fmt
 from soundboard.ui.panel import CONTROL_H, UndoBar, fold_button
 from soundboard.ui.restyled import on_restyle
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 from soundboard.sounds.library import level_gain
 from soundboard.wheelguard import no_wheel
 

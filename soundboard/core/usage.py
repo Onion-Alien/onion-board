@@ -11,7 +11,7 @@ last one (their names only). Soon after a start: how many problems there were si
 last send, as counts, never the report itself: a crash report or a freeze saved
 (`crash/<version>`, `error/<version>`, `freeze/<version>`, with the error's type and
 the file and line of this app's own code it happened in, e.g. `error/1.9.8/KeyError@
-soundboard/engine.py:1090`; also the line that called it and the library function it
+soundboard/audio/engine.py:1090`; also the line that called it and the library function it
 was raised or stuck in, and for a freeze how long it lasted and whether the window or
 another thread was busy:
 never its message or anything else from the report), an error the app caught itself and
@@ -666,7 +666,7 @@ def features_now(cfg) -> list[str]:
         out.append("also-send")
     if not cfg.theme_texture:
         out.append("textures-off")
-    from soundboard import quality
+    from soundboard.online import quality
     if not quality.current.keep_source:
         out.append("source-off")
     if set(cfg.apps_categories or ()) - set(APPS_BUILT_IN):
@@ -757,7 +757,7 @@ def tab_opened(cfg, key: str) -> None:
         cfg.stats_tabs = [*tabs, key]
 
 
-# a stack line in a report: `File "...\soundboard\engine.py", line 1090, in ...`; only
+# a stack line in a report: `File "...\soundboard\audio\engine.py", line 1090, in ...`; only
 # our own files count, named from the package folder down (never the folder above it)
 _OUR_FRAME = re.compile(r'^\s*File "(?:[^"]*[\\/])?(soundboard(?:[\\/][a-z0-9_]+)?'
                         r'[\\/][a-z0-9_]+\.py)", line (\d+)', re.M)
@@ -769,7 +769,7 @@ _OUR_FILE = re.compile(r"soundboard(?:[\\/][a-z0-9_]+)?[\\/][a-z0-9_]+\.py")
 
 
 def _ours(stack: str) -> list[str]:
-    """Our own lines in a stack, outermost first, as `soundboard/engine.py:1090` (the
+    """Our own lines in a stack, outermost first, as `soundboard/audio/engine.py:1090` (the
     same file and line anyone can look up in the public source). threadnames.py only
     wraps Thread.start / run, so its lines are left out: they name their caller."""
     frames = [f"{file.replace(chr(92), '/')}:{line}"
@@ -785,7 +785,7 @@ def _where(stack: str) -> str:
 
 def _tb_where(tb) -> str:
     """The deepest of our own lines in a caught exception's traceback, as
-    `soundboard/engine.py:1090` (deeper frames can be another library's: only ours
+    `soundboard/audio/engine.py:1090` (deeper frames can be another library's: only ours
     count), or ""."""
     where = ""
     while tb is not None:
@@ -898,7 +898,7 @@ def _error_type(stack: str) -> str:
 def _report_event(path: Path) -> str:
     """`crash/1.9.6`, `error/1.9.6` or `freeze/1.9.6` for a saved report (applog.py),
     then where it happened when the stack shows it: `error/1.9.6/KeyError@
-    soundboard/engine.py:1090`, `freeze/1.9.6@soundboard/mic/directmic.py:184` (a freeze
+    soundboard/audio/engine.py:1090`, `freeze/1.9.6@soundboard/mic/directmic.py:184` (a freeze
     with more: _freeze_tag)."""
     try:
         with open(path, encoding="utf-8", errors="replace") as f:

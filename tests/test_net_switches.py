@@ -21,7 +21,7 @@ from fakeproxy import Socks5, no_leaks
 from soundboard.addons import modules
 from soundboard.online import net
 from soundboard.core import updates
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 from test_net_leaks import REAL_GET, REAL_OPEN, NAMES, Sites
 from test_radio import wav_bytes
 

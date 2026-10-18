@@ -15,7 +15,7 @@ ZOOM = appsetup.Seen("zoom.exe", "Zoom", profiles.VOICE.key)
 
 @pytest.fixture
 def window(main_window, monkeypatch):  # noqa: F811
-    from soundboard import engine as eng
+    from soundboard.audio import engine as eng
     monkeypatch.setattr(eng, "virtual_mic_for", lambda name: "CABLE Output (fake)")
     main_window.cfg.setup_done = True
     main_window.voice_watch = None

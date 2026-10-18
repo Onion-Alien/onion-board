@@ -22,7 +22,7 @@ from soundboard.core import errors, usage
 from soundboard import wheelguard
 from soundboard.sounds import library
 from soundboard.online import net, store
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 from soundboard.i18n import _
 from soundboard.ui import busy, fit, icons, storelook
 from soundboard.core.trash import ago

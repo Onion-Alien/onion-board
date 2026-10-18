@@ -57,7 +57,7 @@ from pathlib import Path
 
 from soundboard.online import jsengine, net, ytworker
 from soundboard.sounds import library, sourceinfo
-from soundboard import quality
+from soundboard.online import quality
 from soundboard.core import updates
 from soundboard.sounds.library import MAX_SECONDS
 from soundboard.core import errors

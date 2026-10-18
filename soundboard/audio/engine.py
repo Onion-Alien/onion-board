@@ -23,8 +23,8 @@ their data at a fractional rate (like a tape), and a pitch shifter on the sounds
 bus corrects the pitch back (`sound_keep_pitch`) and adds `sound_pitch`. The
 app's own playback (test recording, cue beeps, the setup tune, previews) is
 `fixed`: played at speed 1 and mixed in after the pitch shifter. The live
-effects (`sound_fx`: bass, reverb, echo… soundboard.livefx) come after the pitch.
-Per-sound effects are baked in ahead of time instead (soundboard.soundfx).
+effects (`sound_fx`: bass, reverb, echo… soundboard.audio.livefx) come after the pitch.
+Per-sound effects are baked in ahead of time instead (soundboard.audio.soundfx).
 """
 from __future__ import annotations
 
@@ -39,27 +39,49 @@ import numpy as np
 import sounddevice as sd
 
 from soundboard.mic import destination, directmic
-from soundboard import livefx, mapped
-from soundboard.howl import HowlGuard
-from soundboard.dsp import hermite
-from soundboard.eq import EQ
-from soundboard.sendfx import (CEILING_DB, SAFETY_DB, Ducker, Limiter, SafetyLimiter, SmartMono,
-                               VoiceLeveler)
+from soundboard.audio import livefx, mapped
+from soundboard.audio.howl import HowlGuard
+from soundboard.audio.dsp import hermite
+from soundboard.audio.eq import EQ
+from soundboard.audio.sendfx import (CEILING_DB, SAFETY_DB, Ducker, Limiter, SafetyLimiter,
+                                     SmartMono, VoiceLeveler)
 from soundboard.core import errors
 from soundboard.i18n import _
-from soundboard.enginedevices import EngineDevices
-from soundboard.enginetakes import EngineTakes
-from soundboard.soundcache import SoundCache
+from soundboard.audio.enginedevices import EngineDevices
+from soundboard.audio.enginetakes import EngineTakes
+from soundboard.audio.soundcache import SoundCache
 # moved with the cache, still imported from here elsewhere
-from soundboard.soundcache import CACHE_BUDGET, resample  # noqa: F401
-from soundboard.engineparts import (
-    SR, CH, I16_SCALE, DEVICES, start_or_close, is_fixed, DeviceWorker, loop_xf,
-    loop_wrap, span, _aa_taps, START_FADE_S, _hard_start, Ring, DirectFifo,
-    StreamResampler, loud_boost, peak, finite, finite_peak, limit_peak, is_xrun, _add, LivePitch,
-    AuxSource, Voice,
+from soundboard.audio.soundcache import CACHE_BUDGET, resample  # noqa: F401
+from soundboard.audio.engineparts import (
+    SR,
+    CH,
+    I16_SCALE,
+    DEVICES,
+    start_or_close,
+    is_fixed,
+    DeviceWorker,
+    loop_xf,
+    loop_wrap,
+    span,
+    _aa_taps,
+    START_FADE_S,
+    _hard_start,
+    Ring,
+    DirectFifo,
+    StreamResampler,
+    loud_boost,
+    peak,
+    finite,
+    finite_peak,
+    limit_peak,
+    is_xrun,
+    _add,
+    LivePitch,
+    AuxSource,
+    Voice,
 )
 # not used here any more, still imported from here elsewhere
-from soundboard.engineparts import (  # noqa: F401
+from soundboard.audio.engineparts import (  # noqa: F401
     STALL_S, RETRY_S, BUFFER, _holding_devices, close_quietly, FIXED_SIDS, LOOP_XF_S, AA_DB,
     soft_limit,
     _AA_CACHE,
@@ -303,7 +325,7 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         self._howl: HowlGuard | None = None   # listens for a squeal while mic_check is on
         self.howl_stopped = False  # it squealed: mic_check was switched off (the UI tells)
         self.voice_chain = None   # voicefx.VoiceChain: voice changer / live speech tap on the mic
-        # the send stage (soundboard.sendfx): what makes the mix survive voice chat
+        # the send stage (soundboard.audio.sendfx): what makes the mix survive voice chat
         self.send_mono = True     # phase-aware mono into the send device (every voice chat is mono)
         self.duck_db = 0.0        # lower the sounds this much while you talk (0 = off)
         self.mic_gate = False     # mute your mic while a sound plays (only the sounds go out)
@@ -1572,7 +1594,7 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
 
     def _howling(self, heard) -> bool:
         """Hear what they hear on speakers: the mic picks the speakers up, and loud
-        enough the loop squeals (soundboard.howl). Once it does, mic_check goes off
+        enough the loop squeals (soundboard.audio.howl). Once it does, mic_check goes off
         here, at once; the UI sees howl_stopped, unticks the switch and says why."""
         g = self._howl
         if g is None or g.rate != self.rates["mic"]:

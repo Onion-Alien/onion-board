@@ -1,7 +1,7 @@
 """The listener's half of game_roundtrip.py: record what a game plays, and nothing else.
 
 Runs on the listener's PC (a second PC or a laptop in the same lobby) and needs only
-numpy and soundboard/appaudio.py next to it (the same per-program capture as the
+numpy and soundboard/audio/appaudio.py next to it (the same per-program capture as the
 app's Apps tab), so music, Discord and system sounds stay out of the recording:
 
     python game_listener.py VALORANT-Win64-Shipping.exe --out listener
@@ -25,7 +25,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from soundboard import appaudio  # noqa: E402
+from soundboard.audio import appaudio  # noqa: E402
 
 SR = 48000
 

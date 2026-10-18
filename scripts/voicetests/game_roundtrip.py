@@ -53,7 +53,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 import discord_roundtrip as rt  # noqa: E402  (same folder: its signals and analysis)
 from soundboard.mic import destination  # noqa: E402
 from soundboard.control import winkeys  # noqa: E402
-from soundboard.engine import Engine  # noqa: E402
+from soundboard.audio.engine import Engine  # noqa: E402
 from soundboard.sounds.library import decode, level_gain  # noqa: E402
 
 SR = rt.SR

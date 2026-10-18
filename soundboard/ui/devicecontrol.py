@@ -14,10 +14,11 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QTimer
 
-from soundboard import appaudio, theme
+from soundboard.audio import appaudio
+from soundboard import theme
 from soundboard.mic import directmic
-from soundboard import engine as eng
-from soundboard.engine import is_virtual as is_virtual_cable
+from soundboard.audio import engine as eng
+from soundboard.audio.engine import is_virtual as is_virtual_cable
 from soundboard.i18n import _, ngettext
 from soundboard.core.pollthread import PollThread
 from soundboard.ui import busy

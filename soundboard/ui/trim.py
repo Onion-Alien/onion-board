@@ -12,7 +12,8 @@ from PySide6.QtGui import QColor, QPainter, QPen
 from PySide6.QtWidgets import (QDoubleSpinBox, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
                                QWidget)
 
-from soundboard import soundfx, theme
+from soundboard.audio import soundfx
+from soundboard import theme
 from soundboard.wheelguard import no_wheel
 from soundboard.i18n import _
 from soundboard.ui.pixels import snap_to_pixels

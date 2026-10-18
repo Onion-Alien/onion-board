@@ -25,9 +25,9 @@ from shiboken6 import isValid as qt_valid
 from soundboard.sounds import library, thumbs
 from soundboard import theme
 from soundboard.control import midi
-from soundboard.eq import MAX_DB as EQ_MAX_DB
-from soundboard.eq import response_db as eq_response
-from soundboard.engine import SR
+from soundboard.audio.eq import MAX_DB as EQ_MAX_DB
+from soundboard.audio.eq import response_db as eq_response
+from soundboard.audio.engine import SR
 from soundboard.sounds.library import AUDIO_EXTS, SoundMeta
 from soundboard.ui.hotkeypick import pretty_key
 from soundboard.ui import icons, lite

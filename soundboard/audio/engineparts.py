@@ -2,8 +2,8 @@
 stream resampler, the sounds' Voice, the captured programs' AuxSource, the live pitch
 shifter, the device thread, and the small sample helpers the mix uses.
 
-Moved out of soundboard.engine as they were; that module still imports every name, so
-`from soundboard.engine import Ring` keeps working. Nothing here opens a device or
+Moved out of soundboard.audio.engine as they were; that module still imports every name, so
+`from soundboard.audio.engine import Ring` keeps working. Nothing here opens a device or
 reads the device list (those stay in engine.py, where tests swap them).
 """
 from __future__ import annotations
@@ -20,11 +20,11 @@ import numpy as np
 import soxr
 
 from soundboard.mic import destination
-from soundboard.dsp import hermite
+from soundboard.audio.dsp import hermite
 from soundboard.voicefx.builtin import PitchShift
 
 # the engine's logger, as before the move (log lines and filters keep their name)
-log = logging.getLogger("soundboard.engine")
+log = logging.getLogger("soundboard.audio.engine")
 
 SR = 48000  # library storage rate
 CH = 2

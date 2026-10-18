@@ -18,7 +18,7 @@ from PySide6.QtWidgets import QInputDialog
 
 from soundboard.core import errors, trash, usage
 from soundboard.sounds import library, thumbs
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 from soundboard.i18n import _
 from soundboard.sounds.library import (
     PAD_COLORS,

@@ -41,8 +41,9 @@ import math
 import numpy as np
 import soxr
 
-from soundboard import dsp, eq, voicefx
-from soundboard.engine import SR
+from soundboard.audio import dsp, eq
+from soundboard import voicefx
+from soundboard.audio.engine import SR
 
 log = logging.getLogger(__name__)
 

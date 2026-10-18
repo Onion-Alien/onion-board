@@ -18,7 +18,7 @@ from PySide6.QtCore import QTimer
 
 from soundboard.mic import appsetup, destination, profiles, voicesdk
 from soundboard import i18n
-from soundboard import engine as eng
+from soundboard.audio import engine as eng
 from soundboard.i18n import _
 from soundboard.ui.controller import Controller
 

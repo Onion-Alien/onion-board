@@ -1,8 +1,8 @@
-"""The song's beat and style, as it plays (soundboard/groove.py): what Bun dances to."""
+"""The song's beat and style, as it plays (soundboard/audio/groove.py): what Bun dances to."""
 import numpy as np
 
-from soundboard.groove import STYLES, Groove
-from soundboard.engine import SR
+from soundboard.audio.groove import STYLES, Groove
+from soundboard.audio.engine import SR
 
 TICK = 1 / 30
 

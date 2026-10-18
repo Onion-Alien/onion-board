@@ -38,7 +38,7 @@ from PySide6.QtCore import QEventLoop, QPointF, QRectF, Qt  # noqa: E402
 from PySide6.QtGui import QColor, QFont, QImage, QPainter  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from soundboard import engine  # noqa: E402
+from soundboard.audio import engine  # noqa: E402
 
 FPS = 15
 OUT_W = 1100            # the GIF's width (the MP4 keeps the window's full size)

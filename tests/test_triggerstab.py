@@ -199,7 +199,7 @@ def test_the_window_loads_onion_watch_while_it_is_built(qapp, app_dir, monkeypat
     """Behind the loading screen, so the tab's first click is instant."""
     from PySide6.QtCore import QEvent
 
-    from soundboard import engine
+    from soundboard.audio import engine
     from soundboard.control import winkeys
     from soundboard.sounds.library import Config
     from soundboard.ui import mainwindow as main
@@ -224,7 +224,7 @@ def test_the_window_loads_onion_watch_while_it_is_built(qapp, app_dir, monkeypat
 
 def watch_window(qapp, app_dir, monkeypatch, pkg, screen):
     """The real MainWindow with a made-up Onion Watch installed and `screen` saved."""
-    from soundboard import engine
+    from soundboard.audio import engine
     from soundboard.control import winkeys
     from soundboard.sounds.library import Config
     from soundboard.ui import mainwindow as main
@@ -288,7 +288,7 @@ def test_the_tab_is_shown_once_behind_the_loading_screen(qapp, app_dir, monkeypa
 def test_without_onion_watch_the_tab_is_not_shown_behind_the_loading_screen(
         qapp, app_dir, monkeypatch):
     """No add-on installed (Hoot's page): warm_triggers leaves the tabs alone."""
-    from soundboard import engine
+    from soundboard.audio import engine
     from soundboard.control import winkeys
     from soundboard.sounds.library import Config
     from soundboard.ui import mainwindow as main

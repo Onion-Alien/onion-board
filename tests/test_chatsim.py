@@ -5,8 +5,8 @@ import numpy as np
 import pytest
 
 from soundboard.sim import chatcheck, chatsim, codecsim
-from soundboard.engine import soft_limit
-from soundboard.sendfx import Limiter, SmartMono
+from soundboard.audio.engine import soft_limit
+from soundboard.audio.sendfx import Limiter, SmartMono
 
 SR = 48000
 needs_ffmpeg = pytest.mark.skipif(codecsim.available() is None,

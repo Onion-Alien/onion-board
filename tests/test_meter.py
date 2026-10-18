@@ -52,7 +52,7 @@ def test_meter_colours_are_independent(qapp):
 
 def test_meter_tops_out_at_its_ceiling(qapp):
     """What others hear is held at the send limiter's ceiling: that's full and red."""
-    from soundboard.sendfx import CEILING_DB
+    from soundboard.audio.sendfx import CEILING_DB
     meter = Meter()
     meter.top_db = CEILING_DB
     meter.set_level(10 ** (CEILING_DB / 20))

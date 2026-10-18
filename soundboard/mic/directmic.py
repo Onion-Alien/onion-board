@@ -821,7 +821,7 @@ def mic_lookup(name: str | None) -> tuple[str | None, str]:
 def _engine_name(name: str) -> str | None:
     """The name of the recording device the engine opens for the saved `name`."""
     try:
-        from soundboard import engine
+        from soundboard.audio import engine
         idx = engine.find_device("input", name)
         return None if idx is None else engine.list_name(idx)
     except Exception:  # noqa: BLE001 - no audio devices to ask: the registry's answer stands
@@ -1814,7 +1814,7 @@ def _remember_silent(mics: Sequence[str]) -> None:
 
 def _mic_is_silent(guid: str) -> bool | None:
     """appaudio.mic_is_silent: True when the mic sends only exact zeros."""
-    from soundboard import appaudio
+    from soundboard.audio import appaudio
     return appaudio.mic_is_silent(guid)
 
 

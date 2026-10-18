@@ -166,7 +166,7 @@ def test_deleting_a_category_takes_its_subcategories_with_it(window, monkeypatch
 def test_the_window_starts_on_a_category_with_subcategories(qapp, app_dir, monkeypatch):
     """The category bar is built before the pads: starting on a tab with chips once tried
     to line the toolbar up with a grid that wasn't there yet (2.1.0 start-up crash)."""
-    from soundboard import engine
+    from soundboard.audio import engine
     from soundboard.control import winkeys
     from soundboard.ui import mainwindow as main
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):

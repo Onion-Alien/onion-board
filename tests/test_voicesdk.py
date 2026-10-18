@@ -133,7 +133,7 @@ def test_is_system_never_touches_the_disk(monkeypatch):
 
 
 def test_listeners_name_voice_apps_first_and_scan_each_game_once():
-    from soundboard.appaudio import App
+    from soundboard.audio.appaudio import App
     apps = [App(1, "game.exe", r"C:\Games\Thing\game.exe", active=True),
             App(2, "Discord.exe", r"C:\Apps\Discord\Discord.exe", active=True),
             App(3, "obs64.exe", r"C:\Apps\obs\obs64.exe", active=True)]

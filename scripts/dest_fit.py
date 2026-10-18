@@ -41,7 +41,7 @@ import codec_bench as cb  # noqa: E402  (same folder: its sources and the chat's
 from soundboard.sim import codecsim, proxsim  # noqa: E402
 from soundboard.sim.codecsim import PROFILES, analyze, roundtrip  # noqa: E402
 from soundboard.mic.destination import BUILTIN, Processor, cut_shares, makeup  # noqa: E402
-from soundboard.sendfx import Limiter, SmartMono  # noqa: E402
+from soundboard.audio.sendfx import Limiter, SmartMono  # noqa: E402
 
 SR = codecsim.SR
 DISCORD = ("discord", "discord_low", "discord_128")

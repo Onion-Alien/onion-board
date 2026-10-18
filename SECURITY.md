@@ -349,7 +349,7 @@ account or anything else about you.
 - `crash/<version>`, `error/<version>` or `freeze/<version>` for each crash or freeze
   report saved in `crash-reports\` since the last send, with where it happened in
   Onion Board's own code: the error's type (such as `KeyError`) and the file and line
-  (such as `soundboard/engine.py:1090`, which anyone can look up in the public source),
+  (such as `soundboard/audio/engine.py:1090`, which anyone can look up in the public source),
   the line that called it and the Python library function it was raised or stuck in
   (such as `threading.wait`). A freeze also says how long it lasted
   (`lasted-under-10s`, `lasted-10-30s`, `lasted-30s-2m`, `lasted-2m-plus` or

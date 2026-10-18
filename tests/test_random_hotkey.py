@@ -5,7 +5,7 @@ import random
 import numpy as np
 
 from soundboard.sounds.library import SoundMeta
-from soundboard.shuffle import ShuffleBag
+from soundboard.audio.shuffle import ShuffleBag
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 
 

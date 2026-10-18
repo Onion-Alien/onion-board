@@ -3,7 +3,7 @@ import math
 import numpy as np
 import pytest
 
-from soundboard import dsp
+from soundboard.audio import dsp
 
 
 def _direct_sos(sos, x):

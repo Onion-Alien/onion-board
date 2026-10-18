@@ -16,9 +16,9 @@ from PySide6.QtWidgets import (QButtonGroup, QDialog, QFrame, QHBoxLayout, QLabe
                                QMessageBox, QPushButton, QRadioButton, QVBoxLayout, QWidget)
 
 from soundboard.sounds import library
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 from soundboard.sounds.library import MAX_SECONDS
-from soundboard.recorder import BothTake, MicTake
+from soundboard.audio.recorder import BothTake, MicTake
 from soundboard.ui import fit, icons
 from soundboard.ui.panel import hint_label
 from soundboard.ui.trim import TrimPanel

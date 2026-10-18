@@ -9,10 +9,10 @@ import threading
 import numpy as np
 import soundfile as sf
 
-from soundboard.engine import SR, resample
+from soundboard.audio.engine import SR, resample
 from soundboard.sounds import library
 from soundboard.sounds.library import MAX_SECONDS
-from soundboard.sendfx import Ducker
+from soundboard.audio.sendfx import Ducker
 
 log = logging.getLogger(__name__)
 

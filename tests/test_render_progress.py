@@ -13,7 +13,7 @@ from PySide6.QtTest import QTest
 from test_mainwindow import window  # noqa: F401
 
 from soundboard.sounds import library
-from soundboard import renderworker, soundfx
+from soundboard.audio import renderworker, soundfx
 from soundboard.sounds.library import SR, SoundMeta
 from soundboard.ui import editcontrol
 

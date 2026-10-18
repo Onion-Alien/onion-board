@@ -34,12 +34,13 @@ import numpy as np
 import soundfile as sf
 import soxr
 
-from soundboard import __version__, mapped
+from soundboard import __version__
+from soundboard.audio import mapped
 from soundboard.sounds import sourceinfo
 from soundboard.win import winpath
-from soundboard.engine import SR
-from soundboard.eq import BANDS as EQ_BANDS
-from soundboard.eq import MAX_DB as EQ_MAX_DB
+from soundboard.audio.engine import SR
+from soundboard.audio.eq import BANDS as EQ_BANDS
+from soundboard.audio.eq import MAX_DB as EQ_MAX_DB
 from soundboard.i18n import _, ngettext
 
 log = logging.getLogger(__name__)
@@ -354,7 +355,7 @@ class SoundMeta:
     level_gain: float = 1.0   # computed loudness-levelling gain
     duration: float = 0.0
     fingerprint: str = ""     # of the source file, to notice a re-import of the same file
-    fx: dict = field(default_factory=dict)   # speed, pitch, EQ, boost… (soundboard.soundfx)
+    fx: dict = field(default_factory=dict)   # speed, pitch, EQ, boost… (soundboard.audio.soundfx)
     image: str = ""           # pad picture, absolute path (usually inside THUMBS_DIR)
     tags: list[str] = field(default_factory=list)   # the categories it's in (Config.categories)
     fade_in: float = 0.0      # seconds: rises from silence when it starts
@@ -495,7 +496,7 @@ class Config:
     bun: dict = field(default_factory=dict)        # Bun mode: on, size, pos (ui.bunmode)
     window_maximized: bool = False   # the window was maximised last time: it opens that way
     radio: dict = field(default_factory=dict)      # Radio tab: vol, monitor, favorites, last
-    data: dict = field(default_factory=dict)       # Settings > Data & quality (soundboard.quality)
+    data: dict = field(default_factory=dict)       # Settings > Data & quality (online.quality)
     apps: dict = field(default_factory=dict)       # Apps tab: exe -> {vol, monitor, to, path}
     # Apps tab: a second program with the same .exe name in another folder, by its path
     # (appspanel.path_key) -> {vol, monitor, to, exe}. Its own key, so older versions
@@ -554,7 +555,7 @@ class Config:
     # category}, set by the user from a category's menu; and the switch for all of it
     category_programs: dict = field(default_factory=dict)
     category_programs_on: bool = True
-    # instant replay (soundboard.replay): while this hotkey is set, the last
+    # instant replay (soundboard.audio.replay): while this hotkey is set, the last
     # replay_seconds of everything you hear (except Onion Board's own sounds) are kept
     # in memory, and the key saves them as a new pad
     replay_hotkey: str = ""
@@ -1649,7 +1650,7 @@ def _stream(pieces, rate: int, sid: str, store: Path | None, via_ffmpeg: bool) -
     goes over full scale down with the limiter (_under_full_scale, run a second at a
     time from the start), else only rounds it. Which one is known only at the end, so
     both are written and the right one kept."""
-    from soundboard.sendfx import Limiter
+    from soundboard.audio.sendfx import Limiter
     rs = soxr.ResampleStream(rate, SR, 2, dtype="float32", quality="VHQ") if rate != SR else None
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     dest = cache_path(sid)
@@ -1737,7 +1738,7 @@ def to_int16(data: np.ndarray) -> np.ndarray:
 def _under_full_scale(data: np.ndarray, chunk: int = SR) -> np.ndarray:
     """(n, 2) audio through a lookahead limiter just under 0 dBFS (sendfx.Limiter: no
     distortion, the level elsewhere untouched), a second at a time."""
-    from soundboard.sendfx import Limiter
+    from soundboard.audio.sendfx import Limiter
     if data.ndim != 2 or data.shape[1] != 2:
         return data              # (only stereo is stored; anything else just clips)
     lim = Limiter(SR, ceiling_db=-0.05)
@@ -1775,7 +1776,7 @@ def cache_path(sid: str, fx_key: str = "") -> Path:
 
 def load_cached(sid: str, fx_key: str = "") -> np.ndarray | None:
     """The cached int16 audio for a sound, or None if there is none (or it's damaged).
-    A long one stays on disk, memory-mapped (soundboard.mapped)."""
+    A long one stays on disk, memory-mapped (soundboard.audio.mapped)."""
     p = cache_path(sid, fx_key)
     if not p.exists():
         return None
@@ -1791,7 +1792,7 @@ def load_cached(sid: str, fx_key: str = "") -> np.ndarray | None:
 
 def store_cached(sid: str, data: np.ndarray, fx_key: str = "") -> np.ndarray:
     """Write a sound's audio to the cache (atomically) and return it as int16 (a long
-    one mapped from the file written, soundboard.mapped)."""
+    one mapped from the file written, soundboard.audio.mapped)."""
     i16 = to_int16(data)
     try:
         CACHE_DIR.mkdir(parents=True, exist_ok=True)
@@ -1837,7 +1838,7 @@ def load_sound(meta: SoundMeta, cancel: Callable[[], bool] | None = None,
     """int16 audio for a library sound as it plays, effects included. The first
     load after its effects change renders them (slow for long sounds); after that
     it is one file read. cancel, progress: see render_cached."""
-    from soundboard import soundfx
+    from soundboard.audio import soundfx
     key = soundfx.key(meta.fx)
     if not key:
         return load_original(meta)
@@ -1870,14 +1871,14 @@ def render_cached(sid: str, data: np.ndarray, fx: dict | None,
                   cancel: Callable[[], bool] | None = None,
                   progress: Callable[[float], None] | None = None) -> np.ndarray:
     """Render a sound's effects (soundfx.render_into) straight into its cache file for
-    these effects and return it as int16 (a long one mapped, soundboard.mapped). Only
+    these effects and return it as int16 (a long one mapped, soundboard.audio.mapped). Only
     a few seconds of it are in memory at a time, however long it is. If the file
     can't be written it's rendered in memory instead, like store_cached does.
     cancel: asked between pieces; True stops the render (raises Cancelled, nothing
     kept). A 2-hour song's pitch shift takes minutes, and each edit saved meanwhile
     started another one alongside it. progress(frac): how far it is, 0..1, now and
     then (from the rendering thread)."""
-    from soundboard import soundfx
+    from soundboard.audio import soundfx
     key = soundfx.key(fx)
     if not key:
         return to_int16(data)   # nothing to render (never trimmed either)
@@ -1924,7 +1925,7 @@ def render_cached(sid: str, data: np.ndarray, fx: dict | None,
 
 def cache_keep(sounds: list[SoundMeta]) -> set[str]:
     """Cache file stems still in use: every original, and each sound's current effects."""
-    from soundboard import soundfx
+    from soundboard.audio import soundfx
     keep = set()
     for m in sounds:
         keep.add(m.id)
@@ -2211,7 +2212,7 @@ MP3_QUALITY = 0.2   # libsndfile's compression_level: 0 best .. 1 smallest
 
 
 def stored_ext() -> str:
-    from soundboard import quality
+    from soundboard.online import quality
     return ".mp3" if quality.current.save_format == "mp3" and _CAN_MP3 else ".flac"
 
 

@@ -1,4 +1,4 @@
-"""Per-program capture (soundboard.appaudio). The COM parts only exist on Windows;
+"""Per-program capture (soundboard.audio.appaudio). The COM parts only exist on Windows;
 the real capture test needs a virtual cable to play a tone into (silent to you)
 and is opt-in (SOUNDBOARD_TEST_APP_CAPTURE=1), since it does put a very quiet
 tone into the cable for a couple of seconds."""
@@ -10,8 +10,8 @@ import time
 import numpy as np
 import pytest
 
-from soundboard import appaudio
-from soundboard.appaudio import GUID, WAVEFORMATEX, App, to_stereo_f32
+from soundboard.audio import appaudio
+from soundboard.audio.appaudio import GUID, WAVEFORMATEX, App, to_stereo_f32
 
 WIN = sys.platform == "win32"
 SR = appaudio.SR

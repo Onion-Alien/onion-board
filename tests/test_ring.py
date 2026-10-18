@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from soundboard.engine import CH, SR, Ring
+from soundboard.audio.engine import CH, SR, Ring
 
 
 def frames(start, n):

@@ -38,14 +38,14 @@ class PrivacyPage(Page):
 
     # ------------------------------------------------------------------ data & quality
     def _data(self):
-        """Settings > Data & quality (soundboard.quality): download size, keeping the
+        """Settings > Data & quality (soundboard.online.quality): download size, keeping the
         video, radio bitrate and patience, search extras. Each applies at once."""
         from PySide6.QtCore import QUrl
         from PySide6.QtGui import QDesktopServices
         from PySide6.QtWidgets import QFileDialog, QSizePolicy
 
         from soundboard.sounds import library
-        from soundboard import quality
+        from soundboard.online import quality
         from soundboard.ui.panel import icon_button
         q = quality.current
         w, v = self._page()
@@ -213,7 +213,7 @@ class PrivacyPage(Page):
         return w
 
     def _data_set(self, **kw):
-        from soundboard import quality
+        from soundboard.online import quality
         if self.dlg._data_syncing:
             return
         self.mw.set_option("data", quality.change(**kw))
@@ -222,7 +222,7 @@ class PrivacyPage(Page):
     def _data_radio(self, kbps):
         """A new bitrate cap: the map's list follows (a lower cap trims the saved list,
         a higher one fetches it again)."""
-        from soundboard import quality
+        from soundboard.online import quality
         if self.dlg._data_syncing:
             return
         old = quality.current.radio_kbps
@@ -234,7 +234,7 @@ class PrivacyPage(Page):
 
     def _data_sync(self):
         """Every control on the page shows quality.current."""
-        from soundboard import quality
+        from soundboard.online import quality
         q = quality.current
         self.dlg._data_syncing = True
         try:

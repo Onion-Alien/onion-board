@@ -2,7 +2,7 @@
 main button is the mic, and the mic button glows."""
 from PySide6.QtWidgets import QApplication, QGraphicsDropShadowEffect, QLabel
 
-from soundboard import engine as eng
+from soundboard.audio import engine as eng
 from soundboard.ui import cableconfirm
 from soundboard.ui.cableconfirm import ask
 from test_mainwindow import window  # noqa: F401  (the real MainWindow)

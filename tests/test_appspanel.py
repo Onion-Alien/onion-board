@@ -5,9 +5,9 @@ says so and isn't remembered."""
 import numpy as np
 import pytest
 
-from soundboard import appaudio
-from soundboard.appaudio import App
-from soundboard.engine import Engine
+from soundboard.audio import appaudio
+from soundboard.audio.appaudio import App
+from soundboard.audio.engine import Engine
 from soundboard.sounds.library import Config
 from soundboard.ui import appcapture, appspanel
 from soundboard.ui.appspanel import AppsTab
@@ -849,7 +849,7 @@ def test_record_and_send_share_one_capture(tab, monkeypatch, tmp_path):
 
 
 def test_armed_recorder_keeps_a_short_preroll(tmp_path):
-    from soundboard.recorder import ArmedRecorder
+    from soundboard.audio.recorder import ArmedRecorder
     rec = ArmedRecorder(tmp_path / "r.wav")
     for _ in range(100):
         rec.push(np.zeros((480, 2), np.float32))

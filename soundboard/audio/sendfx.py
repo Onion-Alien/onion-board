@@ -28,7 +28,7 @@ import math
 
 import numpy as np
 
-from soundboard.dsp import butter, running_min, sosfilt_bank
+from soundboard.audio.dsp import butter, running_min, sosfilt_bank
 
 F32 = np.float32
 CEILING_DB = -3.0          # peak level sent to others (room for the codec's overshoot)

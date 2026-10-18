@@ -331,7 +331,7 @@ def only_harmless(native: str) -> bool:
 
 def native_summary(native: str) -> tuple[str, str]:
     """From faulthandler's output: the error (`access-violation`) and the deepest of
-    our own lines on the crashing thread (`soundboard/engine.py:1090`)."""
+    our own lines on the crashing thread (`soundboard/audio/engine.py:1090`)."""
     if not native:
         return "", ""
     err = ""

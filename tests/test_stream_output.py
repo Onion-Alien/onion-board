@@ -2,7 +2,7 @@
 import numpy as np
 
 from soundboard.sounds.library import Config
-from soundboard.sendfx import SafetyLimiter
+from soundboard.audio.sendfx import SafetyLimiter
 from conftest import devices_done
 from test_engine import engine_with, tone
 from test_mainwindow import window  # noqa: F401  (the real MainWindow)
@@ -107,7 +107,7 @@ def test_stream_settings_are_saved_but_never_exported(app_dir):
 
 
 def test_another_end_of_the_cable_in_use_is_never_the_stream_output(window, monkeypatch):  # noqa: F811
-    from soundboard import engine
+    from soundboard.audio import engine
     assert engine.same_cable("CABLE In 16ch (VB-Audio Virtual Cable)",
                              "CABLE Input (VB-Audio Virtual Cable)")
     assert not engine.same_cable("CABLE-A Input (VB-Audio Cable A)",

@@ -269,7 +269,7 @@ def test_mascots_on_screen_dance_to_the_radio(qapp):
 
     import numpy as np
 
-    from soundboard.groove import SR, Groove
+    from soundboard.audio.groove import SR, Groove
     from soundboard.ui.bunnywidget import BunnyWidget
     from soundboard.ui.tickcontrol import TickControl
     on = [True]

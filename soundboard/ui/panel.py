@@ -19,9 +19,9 @@ from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, Q
                                QVBoxLayout, QWidget)
 
 from soundboard import theme
-from soundboard.eq import BAND_LABELS as EQ_LABELS
-from soundboard.eq import MAX_DB as EQ_MAX_DB
-from soundboard.eq import PRESETS as EQ_PRESETS
+from soundboard.audio.eq import BAND_LABELS as EQ_LABELS
+from soundboard.audio.eq import MAX_DB as EQ_MAX_DB
+from soundboard.audio.eq import PRESETS as EQ_PRESETS
 from soundboard.ui import icons
 from soundboard.ui.widgets import CrispSlider, EqCurve, Meter
 from soundboard.wheelguard import no_wheel

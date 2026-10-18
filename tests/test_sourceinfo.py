@@ -12,7 +12,7 @@ import soundfile as sf
 from soundboard.sounds import library, sourceinfo
 from soundboard.core import trash
 from soundboard.online import ytdl
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 from soundboard.sounds.library import Config, SoundMeta
 
 INFO = {"id": "dQw4w9WgXcQ", "title": "Never Gonna Give You Up (Official Video)",
@@ -171,7 +171,7 @@ def test_switched_off_new_downloads_keep_nothing_and_old_info_stays(qapp, monkey
                                                                     tmp_path):
     """Settings > Data & quality > Remember where it came from, off: a new download
     keeps no source or text file; one kept before stays, just not shown."""
-    from soundboard import quality
+    from soundboard.online import quality
     from soundboard.ui import linkbar
     monkeypatch.setattr(quality, "current", quality.Prefs(keep_source=False))
     old = SoundMeta(id="o", name="Old", file=str(tmp_path / "old.mp3"), source=dict(SRC))

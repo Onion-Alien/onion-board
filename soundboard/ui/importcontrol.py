@@ -31,8 +31,8 @@ from soundboard.core import (
 from soundboard import (
     bunny,
     otherboards,
-    soundfx,
 )
+from soundboard.audio import soundfx
 from soundboard.sounds import (
     catswitch,
     library,

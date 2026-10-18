@@ -5,9 +5,9 @@ from types import SimpleNamespace
 from PySide6.QtWidgets import QApplication
 from test_mainwindow import window  # noqa: F401
 
-from soundboard import appaudio
-from soundboard import engine as eng
-from soundboard.appaudio import App
+from soundboard.audio import appaudio
+from soundboard.audio import engine as eng
+from soundboard.audio.appaudio import App
 from soundboard.ui.tabcontrol import TAB_INDEX
 
 

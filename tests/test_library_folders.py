@@ -10,7 +10,7 @@ import soundfile as sf
 
 from soundboard.core import backup, reset, trash
 from soundboard.sounds import library
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 from soundboard.sounds.library import Config, SoundMeta
 
 

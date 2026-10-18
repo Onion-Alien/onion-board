@@ -396,7 +396,7 @@ def preview(v: Voice, ai_module=None) -> tuple[np.ndarray, bool]:
     """The sample line said in `v`, ready for engine.play (float32 stereo, 48 kHz, peak
     0.8 at most), and whether its AI voice was left out (no AI voices add-on).
     Raises aipreview.PreviewError. Call off the UI thread: it takes a moment."""
-    from soundboard.engine import SR, resample
+    from soundboard.audio.engine import SR, resample
     from soundboard.speech import aipreview
     line = aipreview.sample()                         # 16 kHz mono
     blend = {k: v.ai[k] for k in ("mix", "formant", "pitch_hz") if k in v.ai}

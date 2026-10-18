@@ -2,7 +2,7 @@
 a pop-up with the sliders (a click outside closes it). It changes what's playing
 right now and isn't saved; to keep a version of a sound, use its Edit → Effects tab instead.
 
-Two columns: speed & pitch on the left, the live effects (soundboard.livefx: bass,
+Two columns: speed & pitch on the left, the live effects (soundboard.audio.livefx: bass,
 treble, muffle, reverb, echo, distortion, and presets that set several) on the right.
 
 The sane range (0.25–2x, ±12 st) is always there. The greyed-out **Redline**
@@ -20,7 +20,8 @@ from PySide6.QtWidgets import (QAbstractSpinBox, QApplication, QCheckBox, QDialo
                                QDoubleSpinBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
                                QProgressBar, QPushButton, QVBoxLayout, QWidget)
 
-from soundboard import livefx, theme, voicefx
+from soundboard.audio import livefx
+from soundboard import theme, voicefx
 from soundboard.ui import bunskits, fit, icons
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.panel import Flow, hint_label, reset_button, section_label

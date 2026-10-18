@@ -20,7 +20,7 @@ MIC, CABLE = 1, 2   # finished() codes past Rejected (0, = keep it)
 def needs_warning(route: str, device: str | None, headphones: str | None) -> bool:
     """A device that isn't a virtual cable gets the question; the cable never does.
     The headphones have their own hint in Setup (nothing is sent there at all)."""
-    from soundboard.engine import is_virtual
+    from soundboard.audio.engine import is_virtual
     return route == "device" and bool(device) and not is_virtual(device) \
         and device != headphones
 

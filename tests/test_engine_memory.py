@@ -8,7 +8,7 @@ import weakref
 import numpy as np
 
 from soundboard.core import uigc
-from soundboard.engine import SR, Engine
+from soundboard.audio.engine import SR, Engine
 from tests.test_engine import FakeStream
 
 

@@ -40,9 +40,10 @@ ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4
                13: "2b9a8b2aa795c38c77edac07e71c306a9011b81e2df7e37c9137d5699167b47c",
                14: "d4c592e4156e26c16ab50fa4674833da0e125264091e8ac31bc52c69abec9c3b",
                15: "ea2dc4a0f029bf08234ab38dbcd610cff162e69fa15c42aabdb293dc3f368abd",
-               # 16 again when the modules moved into soundboard/mic/: only import paths
-               # and comments changed, so installed helpers needn't update (no UAC prompt)
-               16: "87b27454c47ca0169def26818f4ed3be117eb6ef69f19c99f4e323dc2d54d823"}
+               # 16 again when the modules moved into soundboard/mic/ and audio/: only
+               # import paths and comments changed, so installed helpers needn't update
+               # (no UAC prompt)
+               16: "a2a527eac56c925cb570e59e1a27d37eb452e95809fd921783dedb9a58257c46"}
 
 
 def _queue():
@@ -731,7 +732,7 @@ def test_the_admin_part_runs_without_numpy():
             "from soundboard.mic import directmic as dm, michelper as mh\n"
             "assert dm.np is None and len(dm.new_ring_bytes()) == dm.FILE_BYTES\n"
             "assert mh.allowed(['uninstall'])\n"
-            "from soundboard import appaudio\n"
+            "from soundboard.audio import appaudio\n"
             "assert appaudio.np is None and callable(appaudio.mic_is_silent)\n")
     r = subprocess.run([sys.executable, "-c", code], cwd=ROOT, capture_output=True,
                        text=True, timeout=60)

@@ -209,7 +209,7 @@ def isolate(conf: dict):
     cableformat.cable_ends = lambda names_hint=None: []
     cableformat.set_rate = lambda end, rate=None: False
 
-    from soundboard import appaudio
+    from soundboard.audio import appaudio
     from soundboard.mic import voicesdk
     from soundboard.core import tips
     voicesdk.foreground_process = lambda: (0, "")
@@ -572,7 +572,7 @@ class Child:
         self.run_for(1.0)
 
     def sc_fx_preview(self):
-        from soundboard import soundfx
+        from soundboard.audio import soundfx
         w = self.w
         presets = [p for p in soundfx.PRESETS if p != "None (original)"]
         for k, sid in enumerate(self._sids()[:5]):
@@ -722,7 +722,7 @@ class Child:
             w.bunctl.enter_bun_mode()
         elif key == "apps_card":
             # one program card (the way the owner usually has the tab): a quiet player
-            from soundboard import appaudio
+            from soundboard.audio import appaudio
             self.state["apps"] = [appaudio.App(48_000, "fakeplayer.exe",
                                                title="Fake player")]
             self._tab("apps")
@@ -790,7 +790,7 @@ class Child:
         return {"route_was": route}
 
     def sc_leak_loop(self):
-        from soundboard import soundfx
+        from soundboard.audio import soundfx
         w = self.w
         sids = self._sids()
         n = int(self.conf.get("leak_iterations", 6))
@@ -843,7 +843,7 @@ class Child:
         self.w.hide()
         tick = self.w.tickctl
         try:
-            from soundboard import memtrim
+            from soundboard.core import memtrim
             self.run_until(lambda: getattr(tick, "_given_back", False),
                            memtrim.AFTER_S + 5, 0.25)
         except ImportError:   # (a checkout from before it)
@@ -859,7 +859,7 @@ class Child:
 
         import numpy as np
 
-        from soundboard import mapped
+        from soundboard.audio import mapped
         from soundboard.sounds import thumbs
         mb = 1 << 20
         w = self.w

@@ -83,7 +83,7 @@ def test_a_switched_off_tab_is_never_built(qapp, app_dir, monkeypatch):
     """Off from the last run: the real tab's class isn't even called."""
     from PySide6.QtCore import QEvent
 
-    from soundboard import engine
+    from soundboard.audio import engine
     from soundboard.control import winkeys
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
         monkeypatch.setattr(engine.Engine, name, lambda self, n: None)
@@ -447,7 +447,7 @@ def test_the_onion_watch_nudge_is_hooked_once(window, monkeypatch):
 def test_off_from_the_start_then_on_and_off_again(qapp, app_dir, monkeypatch, fake_watch):
     from PySide6.QtCore import QEvent
 
-    from soundboard import engine
+    from soundboard.audio import engine
     from soundboard.control import winkeys
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
         monkeypatch.setattr(engine.Engine, name, lambda self, n: None)

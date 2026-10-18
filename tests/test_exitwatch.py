@@ -15,7 +15,7 @@ def app_dir(tmp_path, monkeypatch):
     exitwatch.stopped()
 
 
-def _native(stack_file=r"D:\Apps\OnionBoard\soundboard\engine.py"):
+def _native(stack_file=r"D:\Apps\OnionBoard\soundboard\audio\engine.py"):
     return ("Windows fatal exception: access violation\n\n"
             "Thread 0x0000aaaa (most recent call first):\n"
             '  File "soundboard\\online\\radio.py", line 12 in run\n\n'
@@ -54,9 +54,9 @@ def test_faulthandler_is_armed_early_and_exitwatch_takes_over(app_dir):
 
 def test_a_native_crash_names_the_error_and_our_deepest_line():
     assert exitwatch.native_summary(_native()) == ("access-violation",
-                                                   "soundboard/engine.py:1090")
+                                                   "soundboard/audio/engine.py:1090")
     assert exitwatch.diagnose({}, _native(), [], 0) == (
-        "native-crash", "access-violation@soundboard/engine.py:1090")
+        "native-crash", "access-violation@soundboard/audio/engine.py:1090")
     assert exitwatch.native_summary(
         "Windows fatal exception: code 0xc0000409\n\nCurrent thread 0x1 (most recent "
         "call first):\n  <no Python frame>\n") == ("fast-fail", "")
@@ -119,7 +119,8 @@ def test_check_last_counts_it_and_saves_a_report_not_counted_twice(app_dir, monk
     exitwatch.start(app_dir)   # this run's black box replaces the files...
     assert exitwatch.read_last(app_dir)[1] == ""
     event, path = exitwatch.check_last(app_dir, state, native, "unclean-exit/1.9.8")
-    assert event == "unclean-exit/1.9.8/native-crash/access-violation@soundboard/engine.py:1090"
+    assert event == ("unclean-exit/1.9.8/native-crash/access-violation"
+                     "@soundboard/audio/engine.py:1090")
     text = path.read_text(encoding="utf-8")
     assert "Why:      native-crash" in text and "Closing:  yes" in text
     assert "last words" in text and "this run" not in text   # the last run's log only

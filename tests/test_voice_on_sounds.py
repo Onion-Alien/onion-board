@@ -3,7 +3,8 @@ laid over a sound, picked from cards (ui.voicepicker)."""
 import numpy as np
 from test_mainwindow import window  # noqa: F401  (the real MainWindow)
 
-from soundboard import soundfx, voicefx
+from soundboard.audio import soundfx
+from soundboard import voicefx
 from soundboard.mic import voicesetups
 from soundboard.speech import soundvoice
 from soundboard.ui.dialogs import EffectsPanel

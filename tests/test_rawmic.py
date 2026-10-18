@@ -7,7 +7,7 @@ from types import SimpleNamespace
 import pytest
 
 from soundboard.mic import rawmic
-from soundboard.appaudio import App
+from soundboard.audio.appaudio import App
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
 ME = 100
@@ -139,7 +139,7 @@ def test_off_the_mic_route_it_clears(window, monkeypatch):
 
 def test_the_tick_lists_on_a_worker(window, monkeypatch, qapp):
     from conftest import process_events
-    from soundboard import appaudio
+    from soundboard.audio import appaudio
     seen = []
     monkeypatch.setattr(appaudio, "recording_apps",
                         lambda dev, mine=False: seen.append((dev, mine)) or [BOARD])
@@ -156,7 +156,7 @@ def test_the_tick_keeps_one_thread(window, monkeypatch, qapp):
     # a new thread every 2 s kept the window waiting in Thread.start (2.2.0's freeze
     # at worker.py:45 < alertcontrol.py:146): every look runs on the same kept thread
     from conftest import process_events
-    from soundboard import appaudio
+    from soundboard.audio import appaudio
     threads = []
     monkeypatch.setattr(appaudio, "recording_apps",
                         lambda dev, mine=False: threads.append(threading.current_thread())

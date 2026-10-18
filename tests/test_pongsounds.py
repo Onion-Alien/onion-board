@@ -7,7 +7,7 @@ import pytest
 
 from soundboard.sounds import pongsounds as ps
 from soundboard import theme
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 
 
 @pytest.mark.parametrize("style", ps.KINDS)

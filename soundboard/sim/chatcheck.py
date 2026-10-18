@@ -8,7 +8,7 @@ None of that happens in our app, so our own tests can't hear it.
 
 Discord's Mic Test ("Let's Check") plays your mic back to you through all of
 that processing. The check plays TEST_SIGNAL into the cable while the Mic Test
-runs, captures what Discord plays back (per-program capture, soundboard.appaudio)
+runs, captures what Discord plays back (per-program capture, soundboard.audio.appaudio)
 and compares the two:
 
     sig = test_signal()                    # what we send (played into the cable)

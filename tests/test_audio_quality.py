@@ -4,7 +4,7 @@ problem it guards against (on synthesised audio), so a regression shows as a num
 import numpy as np
 import pytest
 
-from soundboard.engine import SR, Engine
+from soundboard.audio.engine import SR, Engine
 
 BLOCK = 480
 
@@ -115,7 +115,7 @@ def test_live_pitch_keeps_left_and_right_lined_up():
     # music with stereo width: the right channel 0.3 ms behind the left. Each channel
     # spliced on its own moved that gap around at every splice (a smeared image, and
     # flanging once a call folds it to mono); linked, it stays where it was.
-    from soundboard.engine import LivePitch
+    from soundboard.audio.engine import LivePitch
     rng = np.random.default_rng(1)
     t = np.arange(SR * 2) / SR
     mono = sum(np.sin(2 * np.pi * f * t + rng.uniform(0, 6)) for f in (196, 247, 294, 392, 523))
@@ -136,7 +136,7 @@ def test_live_pitch_keeps_left_and_right_lined_up():
 def test_live_pitch_resampler_keeps_the_top_end():
     # 9 kHz shifted down an octave. Linear interpolation lost 0.8 dB of it and left an
     # image at -27.5 dB; cubic: 0.2 dB and -40 dB.
-    from soundboard.engine import LivePitch
+    from soundboard.audio.engine import LivePitch
     x = np.stack([np.sin(2 * np.pi * 9000 * np.arange(SR) / SR)] * 2, 1).astype(np.float32)
     lp = LivePitch(SR)
     y = np.concatenate([lp.process(x[i:i + BLOCK] * np.float32(0.5), -12.0)
@@ -163,7 +163,7 @@ def thd_db(y, f0):
 def test_limiter_holds_through_bass_instead_of_riding_it():
     # a 45 Hz bass 6 dB over the ceiling: without a hold the gain crept back up between
     # its peaks and came down at each one, -38.5 dB of distortion (gritty 808s)
-    from soundboard.sendfx import Limiter
+    from soundboard.audio.sendfx import Limiter
     t = np.arange(SR * 2) / SR
     x = np.stack([np.sin(2 * np.pi * 45 * t) * 1.4] * 2, 1).astype(np.float32)
     lim = Limiter(SR)
@@ -194,8 +194,8 @@ def test_headphones_turn_overlapping_loud_sounds_down_instead_of_bending_them():
 def test_headphones_over_100_percent_get_louder_not_just_limited():
     # at 300 % the limiter alone turned a song down at every peak: it came out barely
     # louder than at 100 %. Over 100 % the peaks are rounded off first, so it's loud.
-    from soundboard.engine import loud_boost
-    from soundboard.sendfx import SafetyLimiter
+    from soundboard.audio.engine import loud_boost
+    from soundboard.audio.sendfx import SafetyLimiter
     rng = np.random.default_rng(1)
     song = np.clip(rng.normal(0, 0.15, (SR * 2, 2)), -1, 1).astype(np.float32)
 
@@ -216,8 +216,8 @@ def test_headphones_over_100_percent_get_louder_not_just_limited():
 
 def test_sounds_at_1000_percent_go_out_louder_than_at_300():
     # what others get ended in the send limiter: 300 % and 1000 % came out the same
-    from soundboard.engine import LOUD_SEND, loud_boost
-    from soundboard.sendfx import Limiter
+    from soundboard.audio.engine import LOUD_SEND, loud_boost
+    from soundboard.audio.sendfx import Limiter
     rng = np.random.default_rng(2)
     song = np.clip(rng.normal(0, 0.15, (SR * 2, 2)), -1, 1).astype(np.float32)
 
@@ -237,7 +237,7 @@ def test_sounds_over_100_percent_go_out_louder_on_every_send_path(path):
     # the peaks were rounded before the voice chat shaping (mono, destination), whose
     # filters built them back up: on the cable, the mic and Hear what they hear the
     # limiter turned 1000 % down to 300 % again (only the stream output got louder)
-    from soundboard.engine import LOUD_SEND
+    from soundboard.audio.engine import LOUD_SEND
     rng = np.random.default_rng(4)
     song = np.clip(rng.normal(0, 0.15, (SR * 2, 2)), -1, 1).astype(np.float32)
 

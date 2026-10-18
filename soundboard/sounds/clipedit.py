@@ -9,7 +9,7 @@ import threading
 
 import numpy as np
 
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 from soundboard.sounds.library import MAX_SECONDS
 
 LISTEN_S = 60            # how far back a listening card can go

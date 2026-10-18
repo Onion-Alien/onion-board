@@ -22,7 +22,7 @@ from conftest import closed_port, process_events
 from fakeproxy import Socks5, no_leaks
 from soundboard.online import net
 from soundboard.core import updates
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 from test_radio import wav_bytes
 
 
@@ -343,7 +343,7 @@ def test_search_thumbnails_through_the_proxy(qapp, sites, socks, monkeypatch):
     from PySide6.QtCore import QBuffer, QByteArray
     from PySide6.QtGui import QImage
 
-    from soundboard import quality
+    from soundboard.online import quality
     from soundboard.online import ytdl
     from soundboard.ui.ytsearch import ResultRow, SearchResults
     shown = []

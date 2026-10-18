@@ -6,9 +6,10 @@ import numpy as np
 import pytest
 import soxr
 
-from soundboard import dsp, eq, soundfx, voicefx
+from soundboard.audio import dsp, eq, soundfx
+from soundboard import voicefx
 from soundboard.sounds import library
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 
 EXTRA = {
     "trim+pitch+eq": {"start": 0.1, "end": 1.3, "pitch": 3, "eq": [3, 0, -2, 0, 4, 0, 1]},

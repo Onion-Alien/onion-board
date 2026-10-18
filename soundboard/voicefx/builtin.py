@@ -1,4 +1,4 @@
-"""Built-in voice effects: plain numpy DSP (filters from soundboard.dsp), cheap enough
+"""Built-in voice effects: plain numpy DSP (filters from soundboard.audio.dsp), cheap enough
 for the mic callback.
 
 Every effect works on 1-D float32 blocks and keeps its own memory between blocks.
@@ -16,8 +16,8 @@ import collections
 from typing import TYPE_CHECKING
 
 import numpy as np
-from soundboard.dsp import (SmoothSos, butter, hermite, lfilter, matched_biquad,
-                             running_min, sosfilt, sosfilt_bank)
+from soundboard.audio.dsp import (SmoothSos, butter, hermite, lfilter, matched_biquad,
+                                  running_min, sosfilt, sosfilt_bank)
 from soundboard.i18n import _
 from soundboard.voicefx import Effect, Param, register
 

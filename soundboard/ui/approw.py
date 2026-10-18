@@ -18,12 +18,13 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QGraphicsOpac
                                QHBoxLayout, QLabel,
                                QLayout, QMenu, QPushButton, QSizePolicy, QVBoxLayout, QWidget)
 
-from soundboard import appaudio, theme
+from soundboard.audio import appaudio
+from soundboard import theme
 from soundboard.core import usage
 from soundboard.win import exeicon
 from soundboard.sounds.clipedit import LiveBuffer
 from soundboard.i18n import _
-from soundboard.recorder import ArmedRecorder
+from soundboard.audio.recorder import ArmedRecorder
 from soundboard.ui import icons
 from soundboard.ui.clipeditor import ClipEditor
 from soundboard.ui.panel import CardGrid, HoverCard, VolumeControl, icon_button

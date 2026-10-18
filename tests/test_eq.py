@@ -1,6 +1,6 @@
 import numpy as np
 
-from soundboard import dsp, eq
+from soundboard.audio import dsp, eq
 
 
 def test_flat_designs_to_nothing():
@@ -117,7 +117,7 @@ def test_turning_the_eq_off_and_on_fades_instead_of_clicking():
 
 
 def test_the_engine_fades_its_eq_out_before_dropping_it():
-    from soundboard.engine import Engine
+    from soundboard.audio.engine import Engine
     e = Engine.__new__(Engine)
     e._eqs, e.rates = {}, {"main": 48000}
     e.eq_gains, e.eq_target = [12, 12, 0, 0, 0, 0, 0], "all"

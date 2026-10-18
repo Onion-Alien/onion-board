@@ -5,8 +5,8 @@ import numpy as np
 import pytest
 
 from soundboard.mic import destination
-from soundboard.engine import SR, Engine
-from soundboard.sendfx import Limiter, SafetyLimiter
+from soundboard.audio.engine import SR, Engine
+from soundboard.audio.sendfx import Limiter, SafetyLimiter
 
 N = 480   # one 10 ms block
 
@@ -258,7 +258,7 @@ def test_quiet_headphones_at_any_rate_write_silence(rate):
 def test_merged_peak_passes_match_the_separate_ones():
     """finite_peak / limit_peak (one pass over |x|) give the same samples and level
     as finite + peak and soft_limit + peak, NaNs and peaks over the knee included."""
-    from soundboard.engineparts import finite, finite_peak, limit_peak, peak, soft_limit
+    from soundboard.audio.engineparts import finite, finite_peak, limit_peak, peak, soft_limit
     rng = np.random.default_rng(2)
     for i in range(400):
         x = (rng.standard_normal((N, 2)) * (0.05, 0.5, 1.5)[i % 3]).astype(np.float32)
@@ -277,8 +277,8 @@ def test_mono_and_stereo_mics_go_out_the_same_as_before(monkeypatch):
     """The mic callback's merged level pass: a mono mic, and a stereo one with a dead
     channel, with a NaN now and then, give the level and samples sent they did with
     the separate passes."""
-    from soundboard import engine as eng
-    from soundboard.engineparts import finite, peak
+    from soundboard.audio import engine as eng
+    from soundboard.audio.engineparts import finite, peak
 
     def run(ch):
         e = Engine()

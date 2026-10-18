@@ -21,7 +21,7 @@ import time
 
 import numpy as np
 
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 
 HOP = SR // 100          # one frame every 10 ms
 WIN = 1024               # FFT size

@@ -27,7 +27,8 @@ from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QMenu,
                                QPushButton, QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 
 from soundboard.core import jobprogress, usage
-from soundboard import quality, theme
+from soundboard.online import quality
+from soundboard import theme
 from soundboard.online import net, netlog, ytdl
 from soundboard.bunny import H as BUN_H
 from soundboard.bunny import W as BUN_W

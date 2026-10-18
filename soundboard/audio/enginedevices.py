@@ -4,7 +4,7 @@ stream that stalled or failed to open (on the device thread, DeviceWorker).
 
 A mixin Engine inherits, so every `self.` lookup is the same as before. Nothing here
 runs per audio block: the stream callbacks and what they call stay in engine.py.
-`find_device` and `CableTap` are looked up in soundboard.engine when called (tests
+`find_device` and `CableTap` are looked up in soundboard.audio.engine when called (tests
 swap them there).
 """
 from __future__ import annotations
@@ -17,9 +17,18 @@ import sounddevice as sd
 
 from soundboard.mic import directmic
 from soundboard.core import errors
-from soundboard.engineparts import (
-    BUFFER, CH, MIC_BUFFER, RETRY_S, SR, STALL_S, DEVICES, StreamResampler, _holding_devices,
-    close_quietly, start_or_close,
+from soundboard.audio.engineparts import (
+    BUFFER,
+    CH,
+    MIC_BUFFER,
+    RETRY_S,
+    SR,
+    STALL_S,
+    DEVICES,
+    StreamResampler,
+    _holding_devices,
+    close_quietly,
+    start_or_close,
 )
 from soundboard.i18n import _
 
@@ -27,10 +36,10 @@ if TYPE_CHECKING:
     import threading
     from typing import Any
     import numpy as np
-    from soundboard.engineparts import AuxSource, DeviceWorker, DirectFifo, Ring, Voice
+    from soundboard.audio.engineparts import AuxSource, DeviceWorker, DirectFifo, Ring, Voice
 
 # the engine's logger, as before the move (log lines and filters keep their name)
-log = logging.getLogger("soundboard.engine")
+log = logging.getLogger("soundboard.audio.engine")
 
 
 class EngineDevices:
@@ -556,4 +565,4 @@ class EngineDevices:
 
 # last, so either module can be imported first: engine imports this one for the
 # mixin, this one only needs engine's names when a method runs
-from soundboard import engine as _eng  # noqa: E402
+from soundboard.audio import engine as _eng  # noqa: E402

@@ -54,7 +54,7 @@ from soundboard.sim.codecsim import (BANDS, PROFILES, SIGNALS, analyze, band_lab
                                  mono_loss_db, roundtrip)
 from soundboard.sim import chatsim, proxsim, realproc  # noqa: E402
 from soundboard.mic.destination import (BUILTIN_BY_KEY, Processor, cut_shares, makeup)  # noqa: E402
-from soundboard.sendfx import Limiter, SmartMono  # noqa: E402
+from soundboard.audio.sendfx import Limiter, SmartMono  # noqa: E402
 
 MAX_S = 20.0   # longest stretch of a file to analyse (the middle of it)
 

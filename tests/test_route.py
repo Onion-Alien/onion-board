@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from soundboard.core import backup, reset
-from soundboard import engine
+from soundboard.audio import engine
 from soundboard.sounds.library import Config
 from soundboard.settings import SettingsDialog
 from soundboard.ui import mainwindow as main
@@ -353,7 +353,7 @@ def test_a_missing_cable_is_warned_about_once_not_every_retry(monkeypatch, caplo
     monkeypatch.setattr(engine, "CableTap", FakeTap)
     e = engine.Engine()
     try:
-        with caplog.at_level(logging.INFO, logger="soundboard.engine"):
+        with caplog.at_level(logging.INFO, logger="soundboard.audio.engine"):
             for _ in range(5):
                 e.set_tap_device("CABLE")
                 e._open_copy("CABLE")
@@ -377,7 +377,7 @@ def test_an_unplugged_output_is_warned_about_once_while_retried(monkeypatch, cap
         raise RuntimeError("device not found")
     monkeypatch.setattr(e, "_open_out", gone)
     try:
-        with caplog.at_level(logging.INFO, logger="soundboard.engine"):
+        with caplog.at_level(logging.INFO, logger="soundboard.audio.engine"):
             for _ in range(4):
                 e.set_mon_device("Headset")
             warned = [r for r in caplog.records if r.levelno >= logging.WARNING]

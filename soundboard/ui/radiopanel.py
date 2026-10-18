@@ -25,7 +25,7 @@ from soundboard import theme
 from soundboard.core import usage
 from soundboard.online import radio
 from soundboard.i18n import _, ngettext
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 from soundboard.sounds.library import MAX_SECONDS, trim_silence
 from soundboard.online.radio import RadioDirectory, RadioPlayer, Station
 from soundboard.ui import appstate, busy, icons
@@ -189,7 +189,7 @@ class RadioTab(QWidget):
         self.player.state.connect(self._on_state)
         self.player.error.connect(self._on_error)
         self.player.now_playing.connect(self._on_now_playing)
-        from soundboard.recorder import Recorder
+        from soundboard.audio.recorder import Recorder
         self.recorder = Recorder(library.APP_DIR / "radio-recording.tmp.wav", seconds=0)
 
         self._want_globe = globe   # a map at all (tests run without one)

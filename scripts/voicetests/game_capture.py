@@ -43,10 +43,10 @@ import soxr
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from soundboard import appaudio  # noqa: E402
+from soundboard.audio import appaudio  # noqa: E402
 from soundboard.mic import cableformat  # noqa: E402
 from soundboard.sim import codecsim  # noqa: E402
-from soundboard.appaudio import GUID, Com, ComError, _co_init, _device_name, _enumerator  # noqa: E402
+from soundboard.audio.appaudio import (GUID, Com, ComError, _co_init, _device_name, _enumerator)  # noqa: E402
 
 SR = 48000
 E_RENDER, E_CAPTURE = 0, 1
@@ -108,7 +108,7 @@ def report() -> dict:
 
 
 def appaudio_is_virtual(name: str) -> bool:
-    from soundboard.engine import is_virtual
+    from soundboard.audio.engine import is_virtual
     return is_virtual(name)
 
 

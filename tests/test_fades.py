@@ -1,7 +1,7 @@
 """Per-sound fade in / fade out in the engine (Voice.fade_in / fade_out)."""
 import numpy as np
 
-from soundboard.engine import SR, START_FADE_S
+from soundboard.audio.engine import SR, START_FADE_S
 from tests.test_engine import engine_with
 
 

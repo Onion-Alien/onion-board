@@ -8,8 +8,8 @@ from conftest import said
 from test_engine import engine_with
 from test_mainwindow import window  # noqa: F401  (the real MainWindow)
 
-from soundboard import howl
-from soundboard.howl import HowlGuard
+from soundboard.audio import howl
+from soundboard.audio.howl import HowlGuard
 
 SR = 48000
 T = np.arange(SR * 3) / SR
@@ -122,7 +122,7 @@ def test_the_window_unticks_the_switch_and_says_why(window):  # noqa: F811
 
 
 def test_turning_it_on_with_speakers_warns(window, monkeypatch, qapp):  # noqa: F811
-    from soundboard import appaudio
+    from soundboard.audio import appaudio
     monkeypatch.setattr(appaudio, "output_form_factors", lambda: {"Speakers (Realtek)": 1})
     window.engine.names["mon"] = "Speakers (Realtek)"
     window.btn_check.setChecked(True)

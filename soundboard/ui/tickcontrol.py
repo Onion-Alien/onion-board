@@ -13,11 +13,11 @@ from typing import TYPE_CHECKING
 import numpy as np
 from shiboken6 import isValid
 
-from soundboard import memtrim
+from soundboard.core import memtrim
 from soundboard.sounds import thumbs
 from soundboard.control import winkeys
-from soundboard.groove import Groove
-from soundboard.sendfx import CEILING_DB
+from soundboard.audio.groove import Groove
+from soundboard.audio.sendfx import CEILING_DB
 from soundboard.i18n import _
 from soundboard.ui import appstate
 from soundboard.style.owl import OwlWidget
@@ -120,7 +120,7 @@ class TickControl(Controller):
             elif mw.cfg.route == "mic" and mw.micctl._direct_health() != mw._direct_shown:
                 mw.statusctl._update_flow()
             mw.voice.poll()
-        if e.howl_stopped:   # the mic squealed through the speakers (soundboard.howl)
+        if e.howl_stopped:   # the mic squealed through the speakers (soundboard.audio.howl)
             e.howl_stopped = False
             mw._howl_stopped()
         playing = e.playing()

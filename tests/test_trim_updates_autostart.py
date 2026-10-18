@@ -9,7 +9,7 @@ import numpy as np
 import pytest
 
 from soundboard.core import autostart, updates
-from soundboard import soundfx
+from soundboard.audio import soundfx
 from soundboard.sounds import library
 from soundboard.sounds.library import SR, Config, SoundMeta
 

@@ -22,7 +22,7 @@ import numpy as np
 import soundfile as sf
 
 from soundboard.sounds import library
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 
 log = logging.getLogger(__name__)
 

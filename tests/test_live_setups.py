@@ -11,7 +11,7 @@ from test_mainwindow import window  # noqa: F401  (the real MainWindow)
 
 from soundboard.sounds import library
 from soundboard.mic import livesetup, voicesetups
-from soundboard import renderworker
+from soundboard.audio import renderworker
 from soundboard.sounds.library import SR
 from soundboard.ui import toast
 

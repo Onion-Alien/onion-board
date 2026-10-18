@@ -299,7 +299,7 @@ class DestPanel(QWidget):
         sig = getattr(mw, "voice_engine", None)
         if sig is not None:
             sig.connect(self._on_voice_engine)   # a bound slot: gone with the panel
-        # the send stage (soundboard.sendfx), whatever the mode
+        # the send stage (soundboard.audio.sendfx), whatever the mode
         self.chk_mono = QCheckBox(_("Send in mono (recommended)"))
         self.chk_mono.setToolTip(
             _("Every voice chat sends one channel. Onion Board makes it, smarter than Discord or "

@@ -12,7 +12,7 @@ from PySide6.QtCore import Qt
 
 from soundboard.sounds import library, sourceinfo
 from soundboard.online import net, ytdl
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 from soundboard.i18n import _
 from soundboard.sounds.library import SoundMeta
 from soundboard.ui import busy, icons

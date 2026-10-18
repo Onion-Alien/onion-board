@@ -20,7 +20,7 @@ from soundboard.mic import directmic, michelper, voicesdk
 from soundboard import theme
 from soundboard.core import errors, usage
 from soundboard.online import net
-from soundboard import engine as eng
+from soundboard.audio import engine as eng
 from soundboard.i18n import _
 from soundboard.sounds.library import RESOURCE_DIR
 from soundboard.ui import busy, icons, reveal, worker

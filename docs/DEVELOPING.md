@@ -55,7 +55,7 @@ and the download), `ui/triggershost.py` (the host interface the add-on talks to;
 - **It can only import what the built app ships** (it has no pip): the standard
   library, numpy, soxr, PySide6's QtCore / QtGui / QtWidgets, and of scipy only
   `scipy.fft` and `scipy.ndimage` (why: the comment above the PyInstaller call in
-  `build.ps1`). The app itself never imports scipy; its filters are `soundboard/dsp.py`.
+  `build.ps1`). The app itself never imports scipy; its filters are `soundboard/audio/dsp.py`.
 - **Never drop a part a released Onion Watch lists in its `imports`**: everyone still
   on that version would lose the tab. `RELEASED_WATCH_IMPORTS` in
   `tests/test_triggers_module.py` fails if `build.ps1` stops shipping one; add each

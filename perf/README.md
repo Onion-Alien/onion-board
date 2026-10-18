@@ -79,7 +79,7 @@ on it or runs it.
 | route_mic | sending through the mic effect instead of the cable |
 | leak_loop | plays, preview, Settings, tab switches, pad rebuild: 5 warm-up rounds (things built once, ~40 MB), then N measured; growth per loop of private MB, handles, threads, Python and Qt objects. Private MB steps up now and then as the heap settles (~0.1-0.3 MB a round on average); a steady climb in handles or object counts is the real sign of a leak |
 | idle_end | tray idle at the end: does it settle back down? `memory_parts`: MB of sounds in RAM / mapped, resampled copies, pictures, Python |
-| tray_rested, shown_after_rest | in the tray until the app gave its memory back (`soundboard/memtrim.py`, ~30 s): RAM (WS) should fall to a few tens of MB; then shown again, `first_paint_ms` with the pages read back |
+| tray_rested, shown_after_rest | in the tray until the app gave its memory back (`soundboard/core/memtrim.py`, ~30 s): RAM (WS) should fall to a few tens of MB; then shown again, `first_paint_ms` with the pages read back |
 
 With `--watch-src` (an Onion Watch checkout; its add-on zip is built with that
 checkout's `scripts/build_module.py`): `triggers-N/…` runs the board with the

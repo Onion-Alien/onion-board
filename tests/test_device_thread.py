@@ -10,9 +10,9 @@ import time
 import pytest
 
 from conftest import process_events
-from soundboard import appaudio
-from soundboard import engine as eng
-from soundboard.engine import Engine
+from soundboard.audio import appaudio
+from soundboard.audio import engine as eng
+from soundboard.audio.engine import Engine
 from test_default_output import OUTS
 from test_default_output import window as default_window  # noqa: F401
 from test_mainwindow import window as main_window  # noqa: F401

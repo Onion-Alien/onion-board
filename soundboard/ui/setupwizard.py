@@ -34,9 +34,9 @@ from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QDialog, Q
 
 from soundboard.core import autostart
 from soundboard.mic import directmic, discordcfg, michelper
-from soundboard import engine as eng
+from soundboard.audio import engine as eng
 from soundboard import theme
-from soundboard.engine import SR
+from soundboard.audio.engine import SR
 from soundboard.sounds import library
 from soundboard.core import usage
 from soundboard.online import net
