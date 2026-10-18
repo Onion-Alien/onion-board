@@ -319,7 +319,7 @@ class AiVoicePanel(QWidget):
         self.picked_box.addWidget(self._picked_btns, 1)   # the buttons start mid-bar
         self.btn_tweak = QPushButton(_("Edit voice"))
         icons.set_icon(self.btn_tweak, "sliders")
-        self.btn_tweak.clicked.connect(lambda: (usage.used("ai-voice-tweak"), self.open_tweak()))
+        self.btn_tweak.clicked.connect(lambda: self.open_tweak())
         bflow.addWidget(self.btn_tweak)
         self.b_make = QPushButton(_("Make your own voice"))
         icons.set_icon(self.b_make, "plus")
