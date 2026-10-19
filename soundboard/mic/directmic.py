@@ -240,9 +240,19 @@ def make_ring(path: Path | None = None) -> bool:
                 pass
             raise
         return True
-    except OSError:
-        log.info("can't make the mic effect's ring at %s", path, exc_info=True)
+    except OSError as e:
+        # status() asks every few seconds: the same failure is logged in full once, not
+        # a traceback each time (a missing folder is the admin step's to make: a repair)
+        key = (str(path), type(e).__name__, e.errno)
+        if key in _ring_failed:
+            log.debug("still can't make the mic effect's ring at %s: %s", path, e)
+        else:
+            _ring_failed.add(key)
+            log.info("can't make the mic effect's ring at %s", path, exc_info=True)
         return False
+
+
+_ring_failed: set = set()   # make_ring's failures logged in full already
 
 
 class RingWriter:

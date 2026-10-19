@@ -1310,9 +1310,13 @@ end;
 // is deleted, check the folder can be renamed: Windows refuses that while a file inside
 // is open. Not in PrepareToInstall: that runs before CloseApplications has closed a
 // running Onion Board, which would wrongly fail a normal update.
-// An Onion Board still open after that is closed here (asked first, unless silent):
-// reinstalling is what people try when it's broken, and a silent install over a running
-// one used to just stop (exit code 3) with nothing changed.
+// A running Onion Board doesn't stop the rename (its loaded DLLs aren't open files), so
+// it's looked for by itself: one CloseApplications couldn't close (another Windows
+// session) passed the check, the delete took what it could, replacing its DLLs failed,
+// and the abort left a broken install whose every start hung on the launcher's error.
+// It's closed here (asked first, unless silent): reinstalling is what people try when
+// it's broken, and a silent install over a running one used to just stop (exit code 3)
+// with nothing changed.
 procedure CheckInternalNotInUse;
 var
   Moved: Boolean;
@@ -1320,7 +1324,7 @@ begin
   if not DirExists(ExpandConstant('{app}\_internal')) then
     exit;
   // a scanner often lets go within a second or two, so try for ~10 s
-  Moved := InternalFree(20);
+  Moved := (BoardProcesses(False) = 0) and InternalFree(20);
   if not Moved and (BoardProcesses(False) > 0) then
   begin
     Log('Onion Board is still running from ' + ExpandConstant('{app}'));
@@ -1329,7 +1333,7 @@ begin
          mbConfirmation, MB_YESNO, IDYES) = IDYES then
     begin
       Log('Closing it: ' + IntToStr(BoardProcesses(True)) + ' process(es)');
-      Moved := InternalFree(20);
+      Moved := (BoardProcesses(False) = 0) and InternalFree(20);
     end;
   end;
   if not Moved then
