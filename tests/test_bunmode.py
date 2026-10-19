@@ -232,7 +232,7 @@ def test_tray_item_brings_the_window_back_while_bun_is_up(window, qapp):
     window.tabs.setCurrentWidget(window.sounds_page)   # the mini player's pads
     window.current = None                                # nothing loaded to play
     window.mini_bun.setFocus(Qt.FocusReason.MouseFocusReason)
-    QTest.keyClick(window.mini_bun, Qt.Key.Key_Space)    # Space: not a press of Bun's
+    QTest.keyClick(window.windowHandle(), Qt.Key.Key_Space)   # Space: not a press of Bun's
     assert not window.bunctl.bun_up() and window.isVisible()
     window.bunctl.tray_bun()                             # Bun not up: turns into him
     assert window.bunctl.bun_up()

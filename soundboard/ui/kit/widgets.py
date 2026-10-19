@@ -323,28 +323,24 @@ def _clicked_kind(w) -> bool:
     return isinstance(w, (QAbstractButton, QAbstractSlider, QTabBar))
 
 
-class ClickFocusFilter(QObject):
+def click_focus(w) -> None:
     """The focus ring is for the keyboard: a click, a drag or a pick from a drop-down
     left the control it touched ringed until something else was clicked. Those
     controls take the focus from the Tab key only, so a click never rings them (and
     never moves the focus off whatever had it)."""
-    EVENTS = (QEvent.Type.Polish,)   # all it reads (theme.app_filter)
-
-    def eventFilter(self, obj, event):   # noqa: N802 - Qt API
-        if event.type() == QEvent.Type.Polish and _clicked_kind(obj):
-            policy = obj.focusPolicy()
-            if policy in (Qt.FocusPolicy.StrongFocus, Qt.FocusPolicy.WheelFocus):
-                obj.setFocusPolicy(Qt.FocusPolicy.TabFocus)
-            elif policy == Qt.FocusPolicy.ClickFocus:
-                obj.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        return False
+    if _clicked_kind(w):
+        policy = w.focusPolicy()
+        if policy in (Qt.FocusPolicy.StrongFocus, Qt.FocusPolicy.WheelFocus):
+            w.setFocusPolicy(Qt.FocusPolicy.TabFocus)
+        elif policy == Qt.FocusPolicy.ClickFocus:
+            w.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
 
 def install_click_focus(app: QApplication) -> None:
-    """ClickFocusFilter on every widget the app shows from now on."""
-    f = ClickFocusFilter(app)
-    app._click_focus_filter = f   # pyright: ignore[reportAttributeAccessIssue]  # kept alive with the app
-    theme.app_filter(app, f)
+    """click_focus() on every widget the app shows from now on, as the app style
+    polishes it (wheelguard.on_polish: no application-wide event filter)."""
+    from soundboard.ui.kit import wheelguard
+    wheelguard.on_polish(click_focus)
 
 
 class CrispSlider(QSlider):

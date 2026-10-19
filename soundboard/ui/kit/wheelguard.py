@@ -10,6 +10,7 @@ measurable idle cost.
 """
 from __future__ import annotations
 
+import logging
 import time
 
 from PySide6.QtCore import QEvent, QObject, QPoint, QPointF, Qt, QTimer
@@ -19,6 +20,8 @@ from PySide6.QtWidgets import (QAbstractButton, QAbstractScrollArea, QAbstractSl
                                QGridLayout, QLayout, QMenu, QProxyStyle, QPushButton,
                                QScrollBar, QSizePolicy, QSlider, QTabBar, QToolButton,
                                QWidget)
+
+log = logging.getLogger(__name__)
 
 QWIDGETSIZE_MAX = (1 << 24) - 1
 
@@ -56,6 +59,11 @@ class AppStyle(QProxyStyle):
     """
 
     COMBO_CAP = 360
+    # more work on each widget as it's polished, from other modules (the click focus,
+    # the quiet message boxes): here, where Qt already calls into Python, instead of
+    # an application-wide event filter, which Qt calls for every event of every object
+    # (an eighth of building Settings, a fifth of each step of a window resize)
+    hooks: list = []
 
     def polish(self, arg):
         if not isinstance(arg, (QWidget, QApplication, QPalette)):
@@ -75,6 +83,19 @@ class AppStyle(QProxyStyle):
             arg.installEventFilter(_submenu_edge())
         if isinstance(arg, (QAbstractButton, QComboBox)):
             arg.installEventFilter(_popup_click_guard())
+        if isinstance(arg, QWidget):
+            for hook in self.hooks:
+                try:
+                    hook(arg)
+                except Exception:  # noqa: BLE001 - nothing raises out of Qt's own call
+                    log.warning("polish hook %r failed", hook, exc_info=True)
+
+
+def on_polish(hook) -> None:
+    """Call `hook(widget)` for every widget AppStyle polishes from now on (again on
+    each restyle, so it must not mind a second call). Once per hook."""
+    if hook not in AppStyle.hooks:
+        AppStyle.hooks.append(hook)
 
 
 

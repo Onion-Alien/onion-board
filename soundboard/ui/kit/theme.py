@@ -13,11 +13,10 @@ from contextlib import contextmanager
 from pathlib import Path
 from string import Template
 
-from PySide6.QtCore import QObject, QPointF, QRectF, Qt
+from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import (QColor, QIcon, QImage, QLinearGradient, QPainter,
                            QPainterPath, QPen, QPixmap, QPolygonF, QRadialGradient,
                            QTransform)
-from shiboken6 import isValid as qt_valid
 
 from soundboard.i18n import _
 from soundboard.style import hooks, palettes, textures
@@ -1082,7 +1081,7 @@ _HELD = (("QPushButton", ":pressed"), ("QToolButton", ":pressed"), ("QComboBox",
 
 
 def held_rings(css: str) -> str:
-    """Click controls take the focus from the Tab key only (widgets.ClickFocusFilter),
+    """Click controls take the focus from the Tab key only (widgets.click_focus),
     so their :focus ring is the keyboard's. A mouse gets the same ring while it holds
     the control down (a drop-down or a button's menu: while it's open), gone as it
     lets go: every :focus rule again as :pressed (:on for a drop-down)."""
@@ -1142,66 +1141,6 @@ def _recolour_inline(widgets, old: dict[str, str]) -> None:
             pass
 
 
-# App-wide event filters written in Python (Space plays, quiet message boxes) are called
-# for every event of every widget, and restyling sends each widget ~10 (font, palette
-# and style changes: 20,000+ with Settings open) that none of them wants: a third of a
-# theme switch went on them. Installed with app_filter(), they sit out each restyle.
-# They also share one filter on the app (_Router) that hands an event only to those
-# that asked for its type: Qt calling into Python once an event instead of once a
-# filter. Resizing the window sends ~300 events a step: 1-2 ms of each on three filters.
-_app_filters: list[QObject] = []
-
-
-class _Router(QObject):
-    """The one app-wide filter: each event goes to the filters that want its type,
-    newest first, as Qt asks its own filters."""
-
-    def __init__(self, parent: QObject):
-        super().__init__(parent)
-        self._wants: dict[int, frozenset | None] = {}   # id(filter) -> its types (None: all)
-        self._by_type: dict = {}                        # event type -> filters, newest first
-        self._every: list[QObject] = []                 # what other types go to
-
-    def add(self, f: QObject, kinds) -> None:
-        self._wants[id(f)] = None if kinds is None else frozenset(kinds)
-        key = id(f)
-        # gone with its owner (a closed window): out of the table, as Qt does with its own
-        f.destroyed.connect(lambda *_a: self._drop(key))
-        self._build()
-
-    def _drop(self, key: int) -> None:
-        if self._wants.pop(key, False) is not False:
-            self._build()
-
-    def _build(self) -> None:
-        live = [f for f in reversed(_app_filters)
-                if id(f) in self._wants and qt_valid(f)]
-        self._every = [f for f in live if self._wants[id(f)] is None]
-        kinds = set().union(*(k for k in self._wants.values() if k is not None))
-        self._by_type = {k: [f for f in live if self._wants[id(f)] is None
-                             or k in self._wants[id(f)]] for k in kinds}
-
-    def eventFilter(self, obj, ev):   # noqa: N802 - Qt API
-        for f in self._by_type.get(ev.type(), self._every):
-            if f.eventFilter(obj, ev):
-                return True
-        return False
-
-
-_router: _Router | None = None
-
-
-def app_filter(app, f: QObject) -> None:
-    """app.installEventFilter(f), but `f` is left out while apply() restyles, and it's
-    only asked about the event types in its EVENTS (all of them without one)."""
-    global _router
-    if _router is None or not qt_valid(_router):
-        _router = _Router(app)
-        app.installEventFilter(_router)
-    _app_filters[:] = [g for g in _app_filters if qt_valid(g)] + [f]
-    _router.add(f, getattr(f, "EVENTS", None))
-
-
 def _style_when_shown(app) -> None:
     """Leave the app's closed windows (Edit voice, Live controls, a menu: a few hundred
     widgets never shown yet) out of the next restyle: Qt restyles only the widgets it
@@ -1218,19 +1157,12 @@ def _style_when_shown(app) -> None:
 
 
 def _restyle(app, css: str) -> None:
-    live = _router if _router is not None and qt_valid(_router) else None
-    if live is not None:
-        app.removeEventFilter(live)
     _style_when_shown(app)
-    try:
-        # cleared first: Qt swapping one app-wide sheet straight for another re-styles
-        # every widget the slow way (3 s against 0.6 s with ~2000 widgets); empty and
-        # then the new sheet gives the same look. No paint happens in between.
-        app.setStyleSheet("")
-        app.setStyleSheet(css)
-    finally:
-        if live is not None:
-            app.installEventFilter(live)
+    # cleared first: Qt swapping one app-wide sheet straight for another re-styles
+    # every widget the slow way (3 s against 0.6 s with ~2000 widgets); empty and
+    # then the new sheet gives the same look. No paint happens in between.
+    app.setStyleSheet("")
+    app.setStyleSheet(css)
 
 
 @contextmanager
