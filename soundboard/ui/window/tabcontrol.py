@@ -14,7 +14,7 @@ from PySide6.QtCore import QSignalBlocker, Qt, QTimer
 from PySide6.QtWidgets import QMenu
 
 from soundboard.online import net
-from soundboard.core import usage
+from soundboard.core import achievements, usage
 from soundboard.i18n import _
 from soundboard.ui.kit import icons
 from soundboard.ui.window import taboff
@@ -71,6 +71,7 @@ class TabControl(Controller):
 
     def _radio_live(self, on: bool):
         mw = self.mw
+        achievements.live("radio", on)
         set_tab_live(mw.tabs, mw.tabs.indexOf(mw.radio_page), on,
                      mw.radio.live_tip(), "radio")
 
@@ -202,6 +203,7 @@ class TabControl(Controller):
     def _tab_live(self, key: str, on: bool):
         """The live badge on the Voice, Triggers or Apps tab (Store has none)."""
         mw = self.mw
+        achievements.live(key, on)   # (voice and apps count time: Settings > Achievements)
         if key == "store":
             return
         page = getattr(mw, key)

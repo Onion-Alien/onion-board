@@ -31,6 +31,7 @@ from soundboard.ui.settings.keys import (KeysPage, HOTKEY_ACTIONS as HOTKEY_ACTI
 from soundboard.ui.settings.general import GeneralPage
 from soundboard.ui.settings.connection import ConnectionPage
 from soundboard.ui.settings.privacy import PrivacyPage
+from soundboard.ui.settings.achievements import AchievementsPage
 from soundboard.ui.settings.addons import AddonsPage
 from soundboard.ui.settings.heading import Heading, _BackArrow, _Mark
 
@@ -93,6 +94,7 @@ class SettingsDialog(QDialog, Built):
         self.connection = ConnectionPage(self)
         self.privacy = PrivacyPage(self)
         self.addons = AddonsPage(self)
+        self.achievements = AchievementsPage(self)
         self.heading = Heading(self)
         self.setWindowFlags(Qt.WindowType.Widget)
         self.setObjectName("settingspage")   # the window's own background
@@ -124,7 +126,8 @@ class SettingsDialog(QDialog, Built):
                  ("data", _("Data && quality"), "wave", self.privacy._data),
                  ("updates", _("Updates"), "reload", self.connection._updates),
                  ("help", _("Add-ons"), "plus", self.help._help),
-                 ("remote", _("Remote"), "cable", self.addons._remote))
+                 ("remote", _("Remote"), "cable", self.addons._remote),
+                 ("achievements", _("Achievements"), "trophy", self.achievements._achievements))
         self.categories = QListWidget()
         self.categories.setObjectName("settingscategories")
         self.categories.setAccessibleName(_("Settings categories"))

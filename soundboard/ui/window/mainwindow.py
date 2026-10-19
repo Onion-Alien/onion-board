@@ -23,7 +23,7 @@ from soundboard.audio.engine import SR, Engine
 from soundboard.core import exitwatch
 from soundboard.audio import appaudio, howl
 from soundboard.mic import voicesdk
-from soundboard.core import autostart, reset, trash
+from soundboard.core import achievements, autostart, reset, trash
 from soundboard.sounds import library
 from soundboard import voicefx
 from soundboard.control import remote
@@ -458,6 +458,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(self.title)
         self.setAcceptDrops(True)   # files dropped outside the pad grid: see dropEvent
         self.cfg = Config.load()
+        achievements.attach(self.cfg)   # Settings > Achievements counts from here
+        achievements.set_goal("rainbow_road", len(theme.THEMES))
         # sounds left on the Undo bar by a crash: into Recently deleted (before the
         # sounds folder is scanned, or their audio joins the board again bare)
         trash.finish_held({m.id for m in self.cfg.sounds})
@@ -1426,6 +1428,7 @@ class MainWindow(QMainWindow):
     def _voice_fx_changed(self, spec: dict):
         if spec.get("enabled"):
             usage.used("voice-changer")
+            achievements.add("voices", str(spec.get("preset") or ""))
         self.set_option("voice_fx", spec)
         # off, a voice changer decides whether your mic still goes out: the switch says so
         # (tied to the button: a window closing meanwhile drops it)
@@ -1445,6 +1448,11 @@ class MainWindow(QMainWindow):
 
     def tick_usage(self):   # every usage.OPEN_TICK_S: how long the app has been open
         usage.open_tick(self.cfg)
+        cfg = self.cfg
+        if achievements.tick(tor=net.mode() == net.TOR, offline=net.offline(),
+                             hotkeys=sum(1 for m in cfg.sounds if m.hotkey),
+                             sounds=len(cfg.sounds)):
+            self._save_later()
 
     def _mark_stopped(self):
         usage.mark_stopped(library.APP_DIR)

@@ -11,7 +11,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QDialog, QDialogButtonBox, QHB
                                QLabel, QListWidgetItem, QMessageBox, QPushButton,
                                QVBoxLayout)
 
-from soundboard.core import trash
+from soundboard.core import achievements, trash
 from soundboard.ui.kit import busy, fit, icons, toast
 from soundboard.ui.kit.panel import EmptyList, hint_label
 from soundboard.i18n import _, ngettext
@@ -116,6 +116,8 @@ class DeletedDialog(QDialog):
             it = self.source.take(iid)
             if it is None or not self.restore(it):
                 failed.append(it.name if it else _("One of them"))
+            else:
+                achievements.bump("restored")
         self.fill()
         if failed:
             busy.toast(self, toast.titled(_("Couldn't bring it back"), _(

@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QApplication
 
+from soundboard.core import achievements
 from soundboard.win import shellicon
 from soundboard.ui.kit import theme
 from soundboard.i18n import _
@@ -37,6 +38,7 @@ class ThemeControl(Controller):
         # a still of the window with Bun over it while every widget restyles: no frame
         # of a half-styled window, and it fades to the new theme (ui/window/themecover.py)
         mw = self.mw
+        achievements.add("themes", name)
         with themecover.covered(mw, name):
             self._apply_theme(name)
 

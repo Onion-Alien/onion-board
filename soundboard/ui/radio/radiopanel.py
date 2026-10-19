@@ -22,7 +22,7 @@ from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QFrame, QHBox
 
 from soundboard.sounds import library
 from soundboard.ui.kit import theme
-from soundboard.core import usage
+from soundboard.core import achievements, usage
 from soundboard.online import radio
 from soundboard.i18n import _, ngettext
 from soundboard.audio.engine import SR
@@ -766,6 +766,8 @@ class RadioTab(QWidget):
         self.recorder.push(x)
 
     def _on_state(self, st: str):
+        if st == "playing" and self.player.station is not None:   # (Settings > Achievements)
+            achievements.station(self.player.station.uuid, self.player.station.country)
         if st == "stopped":        # what the engine still had queued doesn't play out
             self.engine.stop_radio()
         self._flash_until = 0.0    # what's playing matters more than an older notice
