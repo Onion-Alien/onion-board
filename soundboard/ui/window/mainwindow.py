@@ -812,16 +812,16 @@ class MainWindow(QMainWindow):
         return c == "on" or (c == "auto" and self.cfg.lite_mode)
 
     def apply_light_voice(self):
-        """The effects (next mic block) and the voice changer card's switch follow
-        light_voice_on(); the speech helper takes it at its next start."""
+        """The effects (next mic block) and the Voice tab's switch follow
+        light_voice_on(); the speech helpers take it at their next start."""
         on = self.light_voice_on()
         voicefx.set_light(on)
-        fx = getattr(getattr(self, "voice", None), "fx", None)   # (the tab can be off)
-        if fx is not None and hasattr(fx, "set_light"):
-            fx.set_light(on)
+        v = getattr(self, "voice", None)   # (the tab can be off)
+        if v is not None and hasattr(v, "set_light"):
+            v.set_light(on)
 
     def set_light_voice(self, on: bool):
-        """The voice changer card's Use less CPU switch: the user's own choice from now
+        """The Voice tab's Use less CPU switch: the user's own choice from now
         on, whatever lite mode says."""
         self.set_option("light_voice", "on" if on else "off")
         self.apply_light_voice()
@@ -938,8 +938,8 @@ class MainWindow(QMainWindow):
             v.bar.record_button.clicked.connect(
                 lambda: self.soundctl.record_dialog(quick=True))
             v.fx.hotkey_cleared.connect(lambda n: self.hkctl.set_voice_hotkey(n, ""))
-            v.fx.set_light(self.light_voice_on())
-            v.fx.light_changed.connect(self.set_light_voice)
+            v.set_light(self.light_voice_on())
+            v.light_changed.connect(self.set_light_voice)
             v.fx.renamed.connect(self.hkctl.voice_renamed)
             v.fx.keys = dict(self.cfg.voice_hotkeys)
             v.board_sounds = lambda: self.cfg.sounds   # the Background's "from my board"
