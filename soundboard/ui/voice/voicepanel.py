@@ -920,7 +920,10 @@ class VoicePanel(QWidget):
         # the switches already say On: their heads only add the language
         self._set_state("fx", fx, late if fx and not ai and not tts else "", say_on=False)
         self._set_state("ai", ai, late if ai and not tts else "", say_on=False)
-        self._set_state("speak", tts, lang if tts else "")
+        # another language spoken for the AI voice or the voice changer is on here too:
+        # its tab lights up beside theirs (it only did while the computer voice spoke)
+        speaking = tts or (m is not None and spoken.heard())
+        self._set_state("speak", speaking, lang if speaking else "")
 
     def _set_state(self, key: str, on: bool, note: str, say_on: bool = True):
         text = " · ".join(t for t in (_("On") if on and say_on else "", note) if t)

@@ -1102,6 +1102,25 @@ def test_every_value_a_slider_shows_fits_its_label(panel):
                 assert fm.horizontalAdvance(param_text(s.q, v)) <= room, (s.q.key, v)
 
 
+def test_every_tab_thats_on_lights_up_at_once(panel, monkeypatch):
+    """The AI voice on and another language spoken for it: both tabs light up, not
+    just one (Languages lit only while the computer voice spoke)."""
+    p, _ = panel
+    monkeypatch.setattr("soundboard.speech.spoken.heard", lambda: True)
+    monkeypatch.setattr(type(p.speech), "translating", lambda self: self._lang())
+    monkeypatch.setattr(p.ai, "is_on", lambda: True)
+    p.speech.cb_lang.blockSignals(True)
+    p.speech.cb_lang.setCurrentIndex(p.speech.cb_lang.findData("zh"))
+    p.speech.cb_lang.blockSignals(False)
+    p.fx.pick("Robot")
+    p._update_heads()
+    assert not p.speech.livevoice.b_live.isChecked()
+    assert all(p._tabs[k].property("live") for k in ("fx", "ai", "speak"))
+    p.speech.stop_translating()
+    p._update_heads()
+    assert not p._tabs["speak"].property("live") and p._tabs["ai"].property("live")
+
+
 def test_a_tab_thats_on_says_so_from_another_tab(panel):
     """The voice changer on, another tab showing: its tab still says it's on."""
     p, _ = panel
