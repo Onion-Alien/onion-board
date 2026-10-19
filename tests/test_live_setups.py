@@ -339,6 +339,20 @@ def test_a_stream_says_its_translation_is_starting(window, app_dir, monkeypatch)
         live.pick("radio", "")
 
 
+def test_a_setups_ai_voice_that_crashes_says_why_once(window, monkeypatch):  # noqa: F811
+    live = window.livesetups
+    monkeypatch.setattr(live, "_check_streams", lambda: None)
+    shown = []
+    monkeypatch.setattr(window, "toast", lambda text, *a, **k: shown.append(text))
+    live._on_event("radio", {"type": "stopped", "text": "ai-voices stopped (code 1): boom"})
+    assert len(shown) == 1 and "The AI voice stopped" in shown[0] and "boom" in shown[0]
+    # one it explained itself is toasted once, not again for its "stopped"
+    live._on_event("radio", {"type": "error", "text": "no model"})
+    live._on_event("radio", {"type": "stopped", "text": "no model"})
+    live._on_event("radio", {"type": "stopped", "text": ""})        # stopped by hand
+    assert len(shown) == 2 and "no model" in shown[1]
+
+
 def test_a_setups_language_runs_with_the_voice_tabs_downloads(window, app_dir):  # noqa: F811
     live = window.livesetups
     speech = window.voice.speech

@@ -64,6 +64,7 @@ class LiveSetups(Controller):
         super().__init__(mw)
         self.names = {t: "" for t in TABS}   # the setup on each, "" = none
         self._before = dict(self.names)      # what Cancel puts back
+        self._ai_said = ""                   # the AI voice's last error (toasted once)
         self._ai: dict | None = None         # the sounds' AI voice
         self._lang: livesetup.Lang | None = None   # the sounds' language
         self._ready: dict[tuple[str, str], object] = {}   # (sid, fx key) -> rendered
@@ -276,8 +277,15 @@ class LiveSetups(Controller):
                 self.mw.toast(_("Couldn't translate: {why}", why=html.escape(text or "?")),
                               "error")
         elif t == "error" and text:
+            self._ai_said = text
             self.mw.toast(_("Couldn't start the AI voice: {why}",
                             why=html.escape(text)), "error")
+        elif t == "stopped" and text and text != self._ai_said:
+            # it crashed without a word (its log's last line is the reason); an error
+            # it sent is toasted above already
+            self.mw.toast(_("The AI voice stopped: {why}", why=html.escape(text)), "error")
+        if t == "stopped":
+            self._ai_said = ""
         self._check_streams()
 
     # ------------------------------------------------------------ sounds

@@ -285,6 +285,67 @@ def test_service_that_exits_early_is_reported():
     h.stop()
 
 
+def test_a_crash_before_connecting_shows_its_logs_last_line(tmp_path):
+    log_path = tmp_path / "module-x.log"
+    log_path.write_text("2026-01-01 10:00:00,000 INFO an older run's line\n", encoding="utf-8")
+    events = []
+    h = ServiceHost([sys.executable, "-c", "import no_such_module_here"], events.append,
+                    name="x", log_path=log_path)
+    h.start()
+    try:
+        assert wait_for(lambda: any(e["type"] == "stopped" for e in events), 20)
+        text = events[-1]["text"]
+        assert "exited before connecting (code 1): " in text
+        assert text.endswith("ModuleNotFoundError: No module named 'no_such_module_here'")
+    finally:
+        h.stop()
+    # a run that printed nothing doesn't borrow an older run's line
+    events.clear()
+    h = ServiceHost([sys.executable, "-c", "import sys; sys.exit(2)"], events.append,
+                    name="x", log_path=log_path)
+    h.start()
+    try:
+        assert wait_for(lambda: any(e["type"] == "stopped" for e in events), 20)
+        assert events[-1]["text"] == "x exited before connecting (code 2)"
+    finally:
+        h.stop()
+
+
+CONNECT_THEN = ("import json,socket,struct,sys\n"
+                "a=sys.argv; p=int(a[a.index('--port')+1]); t=a[a.index('--token')+1]\n"
+                "s=socket.create_connection(('127.0.0.1',p))\n"
+                "def fr(o): b=json.dumps(o).encode(); s.sendall(b'J'+struct.pack('<I',len(b))+b)\n"
+                "fr({'type':'hello','token':t})\n")
+
+
+def test_a_crash_after_connecting_shows_its_logs_last_line(tmp_path):
+    log_path = tmp_path / "module-y.log"
+    events = []
+    mod = CONNECT_THEN + "fr({'type':'ready'})\nraise RuntimeError('the model file is damaged')\n"
+    h = ServiceHost([sys.executable, "-c", mod], events.append, name="y", log_path=log_path)
+    h.start()
+    try:
+        assert wait_for(lambda: any(e["type"] == "stopped" for e in events), 20)
+        assert events[-1]["text"] == ("y stopped (code 1): RuntimeError: the model file is "
+                                      "damaged")
+    finally:
+        h.stop()
+
+
+def test_a_module_that_said_why_isnt_given_its_log_line_too(tmp_path):
+    events = []
+    mod = CONNECT_THEN + ("fr({'type':'error','text':'no model'})\n"
+                          "print('some noise'); sys.exit(1)\n")
+    h = ServiceHost([sys.executable, "-c", mod], events.append, name="z",
+                    log_path=tmp_path / "module-z.log")
+    h.start()
+    try:
+        assert wait_for(lambda: any(e["type"] == "stopped" for e in events), 20)
+        assert events[-1]["text"] == ""          # its "error" already said it
+    finally:
+        h.stop()
+
+
 def test_a_module_that_called_then_quit_before_it_was_accepted_is_heard():
     # a busy PC: the module said hello, sent its error and exited before the serving
     # thread got to accept(); its reason must not turn into "exited before connecting"
