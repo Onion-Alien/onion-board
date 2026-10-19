@@ -109,6 +109,7 @@ class SpeechPanel(QWidget):
         self.module = next((m for m in module_list if m.id == LIVE_MODULE and not m.error),
                            None)
         self.langs = translations(module_list)
+        self._ready: dict[int, bool] = {}   # see _is_ready
         self._last_said = ""   # Save as sound with the box empty keeps this line
         # a typed line plays like a sound, so the bottom bar's volumes set how loud it
         # is; its own volume on the Say bar was one more to find (the saved "gain"
@@ -733,6 +734,7 @@ class SpeechPanel(QWidget):
         return next((m for m in self.langs if m.language == code), None)
 
     def _fill_langs(self):
+        self._ready.clear()   # called after every download, removal and module rescan
         self.cb_lang.blockSignals(True)
         self.cb_lang.clear()
         self.cb_lang.addItem(_("Don't translate"), "")
@@ -1039,8 +1041,18 @@ class SpeechPanel(QWidget):
     def translating(self) -> mods.ModuleInfo | None:
         """The language picked under Speak in, switched on, downloaded and ready."""
         m = self._lang_on()
-        ok = self.module is not None and self.module.installed
-        return m if ok and m is not None and m.installed else None
+        ok = self.module is not None and self._is_ready(self.module)
+        return m if ok and m is not None and self._is_ready(m) else None
+
+    def _is_ready(self, m: mods.ModuleInfo) -> bool:
+        """m.installed, remembered until the next install, download or rescan. The
+        Voice tab asks on every click (Voices ON / OFF, its chips); while an add-on
+        installs, the disk is so busy that one check held the window for seconds,
+        and the sounds playing with it."""
+        key = id(m)   # the list it's from is kept until the next rescan, which clears this
+        if key not in self._ready:
+            self._ready[key] = m.installed
+        return self._ready[key]
 
     def _voice_for(self, m: mods.ModuleInfo) -> str:
         return self.ctl.tts.voice_for(m.language, self.s["voice"])

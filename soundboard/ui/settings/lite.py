@@ -9,8 +9,11 @@ It turns off what only decorates and still costs CPU while the app is open:
   sound, the mic, a click still move him, then he settles again), and so does Hoot;
 - the themes' textures (Plain, whatever Theme style says; that choice is kept).
 - the window's full-pace tick for the mic alone: with nothing playing, the mic
-  meters follow 10 times a second instead of 30 (most mics hear the room, which
-  kept it at full pace for as long as the window was open).
+  meters follow 5 times a second instead of 24 (most mics hear the room, which
+  kept it at full pace for as long as the window was open);
+- the meters and the playing screen while something plays: 15 updates a second
+  instead of 24 (`tickcontrol.TICK_LITE_MS`). Each meter update also repaints the
+  window behind it, so this is most of what the window costs while it's quiet.
 
 Everything still works the same; it only looks calmer. `on()` is read wherever one
 of those starts, so turning it on or off applies at once (`set_on`), except Hoot's
