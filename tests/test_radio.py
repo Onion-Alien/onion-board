@@ -1082,6 +1082,26 @@ def test_tab_lists_popular_stations_and_starts_off_air(tab):
     assert tab.engine.radio_vol == pytest.approx(0.5)
 
 
+def test_hiding_the_refresh_button_keeps_the_search_row_height(tab):
+    """A narrow window hides the refresh button beside the search box; the box was
+    4 px shorter, so the row shrank and the whole page under it jumped up at that
+    width (and down again a few pixels wider)."""
+    from soundboard.ui.window import responsive
+    hide = responsive.hide(tab.btn_refresh)
+    tab.resize(900, 700)
+    tab.show()
+    tab.layout().activate()
+    assert tab.search.height() == tab.btn_refresh.height()
+    below = tab.search.parentWidget()   # the row is a layout: measure what's under it
+    top = tab.globe_box.mapTo(below, tab.globe_box.rect().topLeft()).y()
+    hide(True)
+    tab.layout().activate()
+    try:
+        assert tab.globe_box.mapTo(below, tab.globe_box.rect().topLeft()).y() == top
+    finally:
+        hide(False)
+
+
 def test_the_station_list_never_says_it_needs_less_than_its_tabs(tab):
     """A plain setMinimumWidth(220) overrode what the Popular / Favorites / Recent row
     needs, so the window kept the map beside a list squashed to "Favorit" (the map

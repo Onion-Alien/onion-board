@@ -28,6 +28,10 @@ MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
 MINI_PAD_ROWS = 1             # ...which has the pads above it when this many rows fit
 SEARCH_MIN_W = 220    # the Sounds tab's search box, until the window gets narrow
 SEARCH_TIGHT_W = 130  # ...then this, until it gets very narrow
+# ...and its most: a few words go in it, so past this it's only a longer empty bar
+# (456 px at 1180x720, so normal windows are unchanged). The seek bar, the levels and
+# the drop box still follow the window: wider is useful there.
+SEARCH_MAX_W = 480
 
 
 class FitControl(Controller):
@@ -49,12 +53,39 @@ class FitControl(Controller):
         # last: opened out, the rail stays open until nothing else can give (it shut
         # again at once when opened in a mid-sized window)
         f.add(90, "w", self._squeeze_rail)
-        f.add(10, "w", mw.padctl._fit_size_picker)
-        f.add(17, "w", r.icon_only(mw.btn_yt))   # "Search online": its words first
-        f.add(18, "w", r.icon_only(mw.btn_view))   # its tooltip says what it is
+        # the Sounds toolbar's steps (bar_step): the search box beside them must never
+        # grow as the window narrows, see size_search below
+        bar_tight: set[int] = set()
+
+        def bar_step(step: int, apply):
+            def run(tight: bool):
+                (bar_tight.add if tight else bar_tight.discard)(step)
+                apply(tight)
+                size_search()
+            return run
+
+        def size_search():
+            """The search box keeps room to type in until the buttons beside it have
+            shrunk, then some room ("Search..." was all that was left once their words
+            came back beside a box allowed down to nothing), and only at the very
+            narrowest none. And it never grows as the window narrows: the room a button's
+            words (or the card size) gave up went to the box, so a narrower window had a
+            wider box. Once anything beside it has given way it stops at the size it had
+            then, and the spare room goes after the search button, as past SEARCH_MAX_W."""
+            low = (0 if 66 in bar_tight else SEARCH_TIGHT_W if 62 in bar_tight
+                   else SEARCH_MIN_W)
+            most = (SEARCH_MAX_W if not bar_tight else SEARCH_TIGHT_W
+                    if bar_tight & {63, 64, 65} else SEARCH_MIN_W)
+            mw.search.setMinimumWidth(low)
+            mw.search.setMaximumWidth(max(low, most))
+            r.touch(mw.search)
+
+        f.add(10, "w", bar_step(10, mw.padctl._fit_size_picker))
+        f.add(17, "w", bar_step(17, r.icon_only(mw.btn_yt)))   # "Search online": its words first
+        f.add(18, "w", bar_step(18, r.icon_only(mw.btn_view)))   # its tooltip says what it is
         # cards / list: only the other view's icon, one click away
-        f.add(19, "w", lambda tight: (mw.pad_view_toggle.set_compact(tight),
-                                      r.touch(mw.pad_view_toggle)))
+        f.add(19, "w", bar_step(19, lambda tight: (mw.pad_view_toggle.set_compact(tight),
+                                                   r.touch(mw.pad_view_toggle))))
         # the label and the dropdown go together: a lone "Clean" said nothing (the full
         # picker is on the Setup tab)
         # the ear button shrinks to its icon first: the level bar is the live part
@@ -67,30 +98,19 @@ class FitControl(Controller):
         f.add(52, "w", self._fit_mixer)
         f.add(40, "w", r.hide(*mw._transport_vol))
         f.add(50, "w", r.hide(mw.np_name))
-        f.add(60, "w", r.icon_only(mw.btn_add))
-        # the search box keeps room to type in until the buttons beside it have shrunk,
-        # then some room ("Search..." was all that was left once their words came back
-        # beside a box allowed down to nothing), and only at the very narrowest none
-        search_tight = {62: False, 65: False}
-
-        def search_room(step: int):
-            def apply(tight: bool):
-                search_tight[step] = tight
-                mw.search.setMinimumWidth(0 if search_tight[65] else SEARCH_TIGHT_W
-                                          if search_tight[62] else SEARCH_MIN_W)
-                r.touch(mw.search)
-            return apply
-        f.add(62, "w", search_room(62))
-        f.add(65, "w", search_room(65))
+        f.add(60, "w", bar_step(60, r.icon_only(mw.btn_add)))
+        f.add(62, "w", bar_step(62, lambda tight: None))   # the box down to SEARCH_TIGHT_W
         # very narrow: the search button (and its site menu) goes; Enter still searches
         # the site picked last
-        f.add(63, "w", lambda tight: (
+        f.add(63, "w", bar_step(63, lambda tight: (
             mw.btn_yt.setVisible(not tight and mw.ytresults.available()),
-            r.touch(mw.btn_yt)))
-        f.add(64, "w", r.icon_only(mw.btn_more))
+            r.touch(mw.btn_yt))))
+        f.add(64, "w", bar_step(64, r.icon_only(mw.btn_more)))
         # the very narrowest: the cards / list switch steps aside too (as the search
-        # button does); the mini player is only a little further
-        f.add(66, "w", r.hide(mw.pad_view_toggle))
+        # button does), before the box gives up the last of its room; the mini player
+        # is only a little further
+        f.add(65, "w", bar_step(65, r.hide(mw.pad_view_toggle)))
+        f.add(66, "w", bar_step(66, lambda tight: None))   # the box down to nothing
         mw._radio_steps = mw.radio.fit_steps()   # swapped with the tab (Privacy)
         f.extend(mw._radio_steps)
         self._tab_steps = {k: getattr(mw, k).fit_steps() for k in ("voice", "triggers")}

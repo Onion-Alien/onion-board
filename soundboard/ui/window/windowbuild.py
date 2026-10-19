@@ -53,7 +53,7 @@ from soundboard.ui.window.buncontrol import BUN_TIP
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.window.downloadbar import DownloadBar
 from soundboard.ui.window.dropveil import DropVeil
-from soundboard.ui.window.fitcontrol import BODY_SIDE, SEARCH_MIN_W
+from soundboard.ui.window.fitcontrol import BODY_SIDE, SEARCH_MAX_W, SEARCH_MIN_W
 from soundboard.ui.kit.iconrow import CapIcon
 from soundboard.ui.sounds.linkbar import LinkBar
 from soundboard.ui.window.livedot import set_tint as set_live_tint
@@ -111,10 +111,6 @@ PULSE_FRAME_MS = 60  # ...a step this often (~16 a second still reads as a smoot
 SEARCH_WAIT_MS = 100     # typing in the search box filters the pads once it pauses this long
 LINK_WAIT_MS = 400       # a link in the search box is looked up once it stays this long
 PAD_SIZE_WAIT_MS = 50    # dragging Pad size re-lays the pads at most this often
-# ...and its most: a few words go in it, so past this it's only a longer empty bar
-# (456 px at 1180x720, so normal windows are unchanged). The seek bar, the levels and
-# the drop box still follow the window: wider is useful there.
-SEARCH_MAX_W = 480
 # Setup -> Devices -> Send my sounds to (Config.route, library.ROUTES): the mic, nobody,
 # or one of the output devices by name (ROUTE_DEVICE + its name: "cable" for a virtual
 # cable, "device" for anything else)
