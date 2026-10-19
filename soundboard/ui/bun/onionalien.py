@@ -510,9 +510,9 @@ def _ease(u: float) -> float:
 
 class OnionGulp(QWidget):
     """The 100-click easter egg, laid over the whole window: he hops out of his note
-    into the middle, sucks the window in piece by piece (the Settings page first, then
-    the rest), sits on an empty window for BLANK_MS, then spits every piece back to
-    where it was and hops home. It only paints over a picture of the window: nothing
+    into the middle, sucks the whole window in piece by piece (nearest first), sits on
+    the empty window for BLANK_MS, then spits every piece back to where it was and hops
+    home. It only paints over a picture of the window: nothing
     underneath is touched, and the window's clicks wait until he's done.
 
     `t` is how far it's got (ms); set_t() steps it by hand (tests, pictures)."""
@@ -523,9 +523,10 @@ class OnionGulp(QWidget):
     EAT_MS = 3400       # the pieces going in, one after another
     FLY_MS = 650        # one piece's trip
     SHUT_MS = 500       # mouth shut, a gulp
-    BLANK_MS = 60_000   # the empty window
+    BLANK_MS = 60_000   # the empty window (cut short by typing MAGIC)
     OPEN_MS = 450       # mouth open again
     HOME_MS = 600       # back into the note
+    MAGIC = "onionalienplease"   # typed while he's out (spaces and case don't matter)
 
     def __init__(self, note: AlienNote, win: QWidget):
         super().__init__(win)
@@ -541,7 +542,6 @@ class OnionGulp(QWidget):
         side = max(120.0, min(self.height() * 0.42, self.width() * 0.3, 300.0))
         self.big = QRectF(0, 0, side * W / H, side)
         self.big.moveCenter(QPointF(self.width() / 2, self.height() / 2))
-        first = self._settings_rect(note, win)
         mouth = self._mouth(self.big)
         pieces = []
         for y in range(0, self.height(), self.TILE):
@@ -550,11 +550,10 @@ class OnionGulp(QWidget):
                            min(self.TILE, self.height() - y))
                 c = r.center()
                 near = math.hypot(c.x() - mouth.x(), c.y() - mouth.y())
-                later = 0 if first is not None and first.contains(c) else 1
                 pix = self.shot.copy(round(x * dpr), round(y * dpr),
                                      math.ceil(r.width() * dpr), math.ceil(r.height() * dpr))
                 pix.setDevicePixelRatio(dpr)
-                pieces.append(((later, near), r, pix))
+                pieces.append((near, r, pix))
         pieces.sort(key=lambda piece: piece[0])
         self.pieces = [(r, pix) for __, r, pix in pieces]
         spread = self.EAT_MS - self.FLY_MS
@@ -568,21 +567,12 @@ class OnionGulp(QWidget):
         self._clock = QElapsedTimer()
         self._timer = QTimer(self)
         self._timer.setInterval(16)
-        self._timer.timeout.connect(lambda: self.set_t(float(self._clock.elapsed())))
+        self.skipped = 0.0          # ms jumped ahead by "onionalien please"
+        self.typed = ""
+        self._timer.timeout.connect(
+            lambda: self.set_t(self._clock.elapsed() + self.skipped))
         self.win = win
         win.installEventFilter(self)
-
-    @staticmethod
-    def _settings_rect(note: QWidget, win: QWidget) -> QRectF | None:
-        """The Settings page round the note, in the window's coordinates (eaten first)."""
-        found, w = None, note.parentWidget()
-        while w is not None and w is not win:
-            if "Settings" in type(w).__name__:
-                found = w
-            w = w.parentWidget()
-        if found is None:
-            return None
-        return QRectF(found.mapTo(win, found.rect().topLeft()), found.size().toSizeF())
 
     @staticmethod
     def _mouth(rect: QRectF) -> QPointF:
@@ -594,11 +584,13 @@ class OnionGulp(QWidget):
         self.raise_()
         self._clock.start()
         self._timer.start()
+        self.grabKeyboard()     # the keys are his until he's done
 
     def stop(self):
         """Everything back at once (the window was resized or closed under him)."""
         if self._timer.isActive() or self.isVisible():
             self._timer.stop()
+            self.releaseKeyboard()
             self.win.removeEventFilter(self)
             self.hide()
             self.deleteLater()
@@ -608,6 +600,20 @@ class OnionGulp(QWidget):
         if ev.type() in (QEvent.Type.Resize, QEvent.Type.Close):
             self.stop()
         return False
+
+    def keyPressEvent(self, ev):
+        letters = "".join(c for c in ev.text().lower() if c.isalpha())
+        if letters:
+            self.typed = (self.typed + letters)[-len(self.MAGIC):]
+            if self.typed == self.MAGIC:
+                self.please()
+
+    def please(self):
+        """He gives it all back now: straight on to spitting it out."""
+        spit = self.spit_at - self.OPEN_MS
+        if self.t < spit:
+            self.skipped += spit - self.t
+            self.set_t(spit)
 
     def set_t(self, t: float):
         self.t = t

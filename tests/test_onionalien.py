@@ -3,6 +3,7 @@ time it's shown, a click shows it all, and its height is the whole text's from t
 first letter. Offscreen, stepped by hand: no timers are waited on."""
 from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import QImage, QMouseEvent
+from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
 
 from soundboard.ui.bun.onionalien import AlienNote, alien_image
@@ -96,6 +97,11 @@ def test_clicks_make_him_cry_then_eat_the_window(qapp):
         gulp.render(img)
     gulp.set_t(gulp.blank_at + 10)
     assert all(gulp._piece_at(i) is None for i in range(len(gulp.pieces)))   # all gone
+    gulp.set_t(gulp.blank_at + 1000)
+    QTest.keyClicks(gulp, "onion")
+    assert gulp.t == gulp.blank_at + 1000         # not yet
+    QTest.keyClicks(gulp, "Alien Please")         # "onionalien please": give it back
+    assert gulp.t == gulp.spit_at - gulp.OPEN_MS
     gulp.set_t(gulp.end)                          # spat back, home again
     assert note.gulp is None and not note.hidden_alien and not gulp.isVisible()
     win.close()
