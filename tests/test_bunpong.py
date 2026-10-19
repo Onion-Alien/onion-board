@@ -62,6 +62,21 @@ def test_pokes_spread_out_never_add_up(qapp, monkeypatch):
         clock[0] += bw.ANNOY_WINDOW   # one poke every few seconds: just happy hops
 
 
+def test_once_cross_five_more_pokes_fetch_the_bat(qapp, monkeypatch):
+    _stack, _page, _other, bun = _page_with_bun()
+    clock = [1000.0]
+    monkeypatch.setattr(bw.time, "monotonic", lambda: clock[0])
+    for _ in range(bw.GRUMPY_AT):
+        bun.poke()
+        clock[0] += 0.2
+    assert bun.say and not bun.building   # cross now
+    for _ in range(4):
+        clock[0] += 2.0   # slower pokes still count while he's cross
+        assert bun.poke() and not bun.building
+    clock[0] += 2.0
+    assert bun.poke() and bun.building   # the fifth: off for his bat
+
+
 def test_a_plain_bun_never_plays(qapp):
     bun = BunnyWidget(joy_lines=("hehe!",))
     for _ in range(bw.ANNOY_CLICKS + 3):

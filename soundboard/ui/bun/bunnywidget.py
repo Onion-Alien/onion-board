@@ -180,9 +180,10 @@ SWAY = {"blink": 14.0, "mouth": 12.0, "ears": 1.2, "sad": 70.0, "angry": 40.0,
 EAR_DRAG = 9.0     # how far his ears trail behind, degrees per Bun-height a second
 BUBBLE = QColor("#fffaf0")
 BEG = 2.8          # how long a begging line stays up, seconds
-# the Pong Easter egg: this many clicks inside ANNOY_WINDOW seconds and he fetches
-# his bat; from GRUMPY_AT on he's already getting cross
-ANNOY_CLICKS, ANNOY_WINDOW, GRUMPY_AT = 7, 3.0, 4
+# the Pong Easter egg: GRUMPY_AT clicks inside ANNOY_WINDOW seconds make him cross,
+# and once he's cross (each poke keeps him so for ANNOY_WINDOW) five more fetch his bat
+ANNOY_WINDOW, GRUMPY_AT = 3.0, 4
+ANNOY_CLICKS = GRUMPY_AT + 5
 TAUNT = 1.5        # how long he taps the bat before the game opens, seconds
 NAP_HOURS = (2, 3, 4)   # local hours (2:00 to 4:59) he's asleep, with naps=True
 WOKEN_S = 30.0     # how long a click keeps him awake
@@ -632,7 +633,9 @@ class BunnyWidget(QWidget):
         if self.building:
             return True   # mid-act: more clicks do nothing
         now = time.monotonic()
-        self._pokes = [t for t in self._pokes if now - t < ANNOY_WINDOW] + [now]
+        if now >= self._cross_until:   # while he's cross, every poke still counts
+            self._pokes = [t for t in self._pokes if now - t < ANNOY_WINDOW]
+        self._pokes.append(now)
         n = len(self._pokes)
         if n < GRUMPY_AT:
             return False
