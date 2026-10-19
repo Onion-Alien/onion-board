@@ -324,15 +324,17 @@ def run() -> int:
     saved = dm._run, dm._services_stopped
     dm._run = lambda cmd, timeout=60.0: ran.append(cmd) or 0
     dm._services_stopped = lambda: stopped[0]
+    saved_wait, dm.STOP_WAIT_S = dm.STOP_WAIT_S, 0.0
     try:
         check("False when it won't stop", dm._audio_service(False) is False)
         check("stop retried", [c[2] for c in ran] ==
-              ["audiosrv", "AudioEndpointBuilder", "AudioEndpointBuilder"], ran)
+              ["audiosrv", "AudioEndpointBuilder", "audiosrv", "AudioEndpointBuilder"], ran)
         ran.clear()
         stopped[0] = True
         check("True when it stops", dm._audio_service(False) is True and len(ran) == 2, ran)
     finally:
         dm._run, dm._services_stopped = saved
+        dm.STOP_WAIT_S = saved_wait
 
     print("== 8. the mic helper killed at every step: the next request still works")
     helper_kills()

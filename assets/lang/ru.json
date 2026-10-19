@@ -3385,7 +3385,6 @@
   "Working: {engine}": "Работает: {engine}",
   "Working: {engine} {version} (faster)": "Работает: {engine} {version} (быстрее)",
   "YouTube downloads still work, but with fewer formats.": "Загрузки с YouTube всё равно работают, но форматов меньше.",
-  "Is your headset on?": "Гарнитура включена?",
   "Is your headset plugged in?": "Гарнитура подключена?",
   "Unplugged": "Отключён",
   "The download was cut off before the end. Try again.": "Загрузка оборвалась, не дойдя до конца. Попробуйте ещё раз.",
@@ -4420,5 +4419,7 @@
   "Lite mode: no animations, for slower PCs": "Облегчённый режим: без анимаций, для слабых ПК",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Облегчённый режим: без анимаций, для слабых ПК (рекомендуем для этого ПК)",
   "No thanks, finish": "Нет, спасибо, готово",
-  "Yes, set up Discord": "Да, настроить Discord"
+  "Yes, set up Discord": "Да, настроить Discord",
+  "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows больше не знает выбранный микрофон, поэтому Onion Board встал на {mic} (микрофон Windows по умолчанию).",
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Твои звуки идут в микрофон, но сам микрофон сейчас не передаёт звук. Гарнитура выключена или на беззвучном?"
 }

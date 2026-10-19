@@ -3239,7 +3239,6 @@
   "Working: {engine}": "Berfungsi: {engine}",
   "Working: {engine} {version} (faster)": "Berfungsi: {engine} {version} (lebih cepat)",
   "YouTube downloads still work, but with fewer formats.": "Unduhan YouTube tetap jalan, tapi dengan format lebih sedikit.",
-  "Is your headset on?": "Apakah headset-mu menyala?",
   "Is your headset plugged in?": "Apakah headset-mu tersambung?",
   "Unplugged": "Tidak tersambung",
   "The download was cut off before the end. Try again.": "Unduhan terputus sebelum selesai. Coba lagi.",
@@ -4262,5 +4261,7 @@
   "Lite mode: no animations, for slower PCs": "Mode ringan: tanpa animasi, untuk PC yang lebih lambat",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Mode ringan: tanpa animasi, untuk PC yang lebih lambat (disarankan untuk PC ini)",
   "No thanks, finish": "Tidak, selesai",
-  "Yes, set up Discord": "Ya, atur Discord"
+  "Yes, set up Discord": "Ya, atur Discord",
+  "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows tidak lagi mengenali mik pilihanmu, jadi Onion Board pindah ke {mic} (mik default Windows).",
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Suaramu sudah ada di mik, tapi mikmu sendiri tidak mengirim suara sekarang. Apakah headset-mu mati atau di-mute?"
 }

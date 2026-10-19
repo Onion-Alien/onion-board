@@ -3312,7 +3312,6 @@
   "Working: {engine}": "Funcionando: {engine}",
   "Working: {engine} {version} (faster)": "Funcionando: {engine} {version} (mais rápido)",
   "YouTube downloads still work, but with fewer formats.": "Os downloads do YouTube ainda funcionam, mas com menos formatos.",
-  "Is your headset on?": "Seu headset está ligado?",
   "Is your headset plugged in?": "Seu headset está conectado?",
   "Unplugged": "Desconectado",
   "The download was cut off before the end. Try again.": "O download foi interrompido antes do fim. Tente de novo.",
@@ -4341,5 +4340,7 @@
   "Lite mode: no animations, for slower PCs": "Modo leve: sem animações, para PCs mais lentos",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Modo leve: sem animações, para PCs mais lentos (sugerido para este PC)",
   "No thanks, finish": "Não, obrigado, concluir",
-  "Yes, set up Discord": "Sim, configurar o Discord"
+  "Yes, set up Discord": "Sim, configurar o Discord",
+  "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "O Windows não reconhece mais o microfone que você escolheu, então o Onion Board foi para {mic} (o microfone padrão do Windows).",
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Seus sons estão no seu microfone, mas o microfone em si não está mandando som agora. Seu headset está desligado ou no mudo?"
 }

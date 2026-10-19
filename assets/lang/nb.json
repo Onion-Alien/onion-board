@@ -3312,7 +3312,6 @@
   "Working: {engine}": "Virker: {engine}",
   "Working: {engine} {version} (faster)": "Virker: {engine} {version} (raskere)",
   "YouTube downloads still work, but with fewer formats.": "YouTube-nedlastinger virker fortsatt, men med færre formater.",
-  "Is your headset on?": "Er headsettet på?",
   "Is your headset plugged in?": "Er headsettet koblet til?",
   "Unplugged": "Ikke tilkoblet",
   "The download was cut off before the end. Try again.": "Nedlastingen ble avbrutt før slutten. Prøv igjen.",
@@ -4341,5 +4340,7 @@
   "Lite mode: no animations, for slower PCs": "Lett modus: ingen animasjoner, for tregere PC-er",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Lett modus: ingen animasjoner, for tregere PC-er (foreslått for denne PC-en)",
   "No thanks, finish": "Nei takk, fullfør",
-  "Yes, set up Discord": "Ja, sett opp Discord"
+  "Yes, set up Discord": "Ja, sett opp Discord",
+  "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows kjenner ikke lenger mikrofonen du valgte, så Onion Board gikk på {mic} (Windows' standardmikrofon) i stedet.",
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Lydene dine er i mikrofonen, men selve mikrofonen sender ingen lyd akkurat nå. Er headsettet ditt av eller dempet?"
 }

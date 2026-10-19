@@ -1620,6 +1620,7 @@ class WindowBuilder(Controller):
         mw._attaching = False
         mw._attach_release = None   # busy.hold on btn_install while it's being set up
         mw._settle_until = 0.0      # just set up: Windows is still loading it
+        mw._settle_more = False     # ...and the one longer wait after that has begun
         mw._done_toast = None   # "done" / "updated": said once it works
         icons.set_icon(mw.btn_install, "cable", "on_accent")
         mw.ways_or.setAlignment(Qt.AlignmentFlag.AlignVCenter)

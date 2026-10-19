@@ -3312,7 +3312,6 @@
   "Working: {engine}": "Çalışıyor: {engine}",
   "Working: {engine} {version} (faster)": "Çalışıyor: {engine} {version} (daha hızlı)",
   "YouTube downloads still work, but with fewer formats.": "YouTube indirmeleri yine çalışır ama daha az biçimle.",
-  "Is your headset on?": "Kulaklığın açık mı?",
   "Is your headset plugged in?": "Kulaklığın takılı mı?",
   "Unplugged": "Takılı değil",
   "The download was cut off before the end. Try again.": "İndirme bitmeden kesildi. Tekrar deneyin.",
@@ -4341,5 +4340,7 @@
   "Lite mode: no animations, for slower PCs": "Hafif mod: animasyon yok, daha yavaş PC'ler için",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Hafif mod: animasyon yok, daha yavaş PC'ler için (bu PC için önerilir)",
   "No thanks, finish": "Hayır, teşekkürler, bitir",
-  "Yes, set up Discord": "Evet, Discord'u ayarla"
+  "Yes, set up Discord": "Evet, Discord'u ayarla",
+  "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows seçtiğin mikrofonu artık tanımıyor, bu yüzden Onion Board onun yerine {mic} (Windows'un varsayılan mikrofonu) üzerine geçti.",
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Seslerin mikrofonunda, ama mikrofonun kendisi şu an ses göndermiyor. Kulaklığın kapalı ya da sessizde mi?"
 }

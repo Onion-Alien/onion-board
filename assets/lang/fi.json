@@ -3312,7 +3312,6 @@
   "Working: {engine}": "Toimii: {engine}",
   "Working: {engine} {version} (faster)": "Toimii: {engine} {version} (nopeampi)",
   "YouTube downloads still work, but with fewer formats.": "YouTube-lataukset toimivat yhä, mutta vähemmillä muodoilla.",
-  "Is your headset on?": "Ovatko kuulokkeesi päällä?",
   "Is your headset plugged in?": "Ovatko kuulokkeesi kiinni?",
   "Unplugged": "Irrotettu",
   "The download was cut off before the end. Try again.": "Lataus katkesi ennen loppua. Yritä uudelleen.",
@@ -4341,5 +4340,7 @@
   "Lite mode: no animations, for slower PCs": "Kevyt tila: ei animaatioita, hitaammille koneille",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Kevyt tila: ei animaatioita, hitaammille koneille (suositellaan tälle koneelle)",
   "No thanks, finish": "Ei kiitos, valmis",
-  "Yes, set up Discord": "Kyllä, säädä Discord"
+  "Yes, set up Discord": "Kyllä, säädä Discord",
+  "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows ei enää tunne valitsemaasi mikkiä, joten Onion Board meni sen sijaan mikkiin {mic} (Windowsin oletusmikki).",
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Äänesi ovat mikissäsi, mutta mikki itse ei lähetä nyt ääntä. Onko kuulokkeesi pois päältä tai mykistetty?"
 }

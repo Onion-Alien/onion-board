@@ -3239,7 +3239,6 @@
   "Working: {engine}": "Đang hoạt động: {engine}",
   "Working: {engine} {version} (faster)": "Đang hoạt động: {engine} {version} (nhanh hơn)",
   "YouTube downloads still work, but with fewer formats.": "Tải từ YouTube vẫn được, nhưng ít định dạng hơn.",
-  "Is your headset on?": "Tai nghe của bạn đã bật chưa?",
   "Is your headset plugged in?": "Tai nghe của bạn đã cắm chưa?",
   "Unplugged": "Chưa cắm",
   "The download was cut off before the end. Try again.": "Tải xuống bị ngắt trước khi xong. Hãy thử lại.",
@@ -4262,5 +4261,7 @@
   "Lite mode: no animations, for slower PCs": "Chế độ nhẹ: không có hiệu ứng động, cho PC chậm hơn",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Chế độ nhẹ: không có hiệu ứng động, cho PC chậm hơn (gợi ý cho PC này)",
   "No thanks, finish": "Không, cảm ơn, hoàn tất",
-  "Yes, set up Discord": "Có, thiết lập Discord"
+  "Yes, set up Discord": "Có, thiết lập Discord",
+  "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows không còn nhận ra mic bạn đã chọn, nên Onion Board chuyển sang {mic} (mic mặc định của Windows).",
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Âm thanh của bạn đã vào mic, nhưng mic của bạn hiện không tự gửi âm thanh nào. Tai nghe của bạn đang tắt hay bị tắt tiếng?"
 }

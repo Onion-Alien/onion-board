@@ -3312,7 +3312,6 @@
   "Working: {engine}": "Gumagana: {engine}",
   "Working: {engine} {version} (faster)": "Gumagana: {engine} {version} (mas mabilis)",
   "YouTube downloads still work, but with fewer formats.": "Gumagana pa rin ang mga YouTube download, pero mas kaunti ang format.",
-  "Is your headset on?": "Naka-on ba ang headset mo?",
   "Is your headset plugged in?": "Nakasaksak ba ang headset mo?",
   "Unplugged": "Hindi nakasaksak",
   "The download was cut off before the end. Try again.": "Naputol ang download bago matapos. Subukan ulit.",
@@ -4341,5 +4340,7 @@
   "Lite mode: no animations, for slower PCs": "Lite mode: walang animation, para sa mas mabagal na PC",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Lite mode: walang animation, para sa mas mabagal na PC (inirerekomenda para sa PC na ito)",
   "No thanks, finish": "Hindi na, tapusin",
-  "Yes, set up Discord": "Oo, i-set up ang Discord"
+  "Yes, set up Discord": "Oo, i-set up ang Discord",
+  "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Hindi na kilala ng Windows ang mic na pinili mo, kaya pumunta ang Onion Board sa {mic} (ang default na mic ng Windows).",
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Nasa mic mo ang mga tunog mo, pero walang tunog na pinapadala ang mic mo ngayon. Naka-off ba o naka-mute ang headset mo?"
 }

@@ -3239,7 +3239,6 @@
   "Working: {engine}": "작동 중: {engine}",
   "Working: {engine} {version} (faster)": "작동 중: {engine} {version} (더 빠름)",
   "YouTube downloads still work, but with fewer formats.": "YouTube 다운로드는 여전히 되지만 형식이 더 적어요.",
-  "Is your headset on?": "헤드셋이 켜져 있나요?",
   "Is your headset plugged in?": "헤드셋이 연결되어 있나요?",
   "Unplugged": "연결 안 됨",
   "The download was cut off before the end. Try again.": "다운로드가 끝나기 전에 끊겼습니다. 다시 시도하세요.",
@@ -4262,5 +4261,7 @@
   "Lite mode: no animations, for slower PCs": "라이트 모드: 애니메이션 없음, 느린 PC용",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "라이트 모드: 애니메이션 없음, 느린 PC용 (이 PC에 추천)",
   "No thanks, finish": "괜찮아요, 마치기",
-  "Yes, set up Discord": "네, Discord 설정하기"
+  "Yes, set up Discord": "네, Discord 설정하기",
+  "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows가 선택한 마이크를 더 이상 인식하지 않아서 Onion Board가 대신 {mic}(Windows 기본 마이크)에 들어갔어요.",
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "사운드는 마이크에 들어가 있지만, 지금 마이크 자체에서는 소리가 나오지 않아요. 헤드셋이 꺼져 있거나 음소거되어 있나요?"
 }

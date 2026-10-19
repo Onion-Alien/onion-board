@@ -11,6 +11,8 @@ import re
 import time
 from typing import TYPE_CHECKING
 
+from PySide6.QtCore import QTimer
+
 from soundboard.mic import directmic, michelper
 from soundboard.ui.kit import theme
 from soundboard.core import usage
@@ -157,6 +159,19 @@ class StatusControl(Controller):
                      kind, 10000, key="audio")
         else:
             mw.unsay("audio")
+
+    def _no_load_why(self, route: str, direct: str) -> str:
+        """Why it's still not working when the wait after a set-up ran out, as one of
+        usage.MIC_NO_LOAD (never a name): sent elsewhere since, Windows took it off
+        again, not on the mic, the board's sending into it not open, or open but the
+        effect never ran (another app has the mic to itself, a driver skipping it)."""
+        if route != "mic":
+            return "off-route"
+        if directmic.needs_repair(direct):
+            return "wiped"
+        if not directmic.works(direct):
+            return "not-on"
+        return "no-stream" if self.mw.engine.main_stream is None else "not-running"
 
     def _update_flow(self, talking=False):
         mw = self.mw
@@ -355,6 +370,17 @@ class StatusControl(Controller):
         # setting up, or Windows still loading it: the button stays "Setting up…" and
         # takes no clicks (attach_mic holds it) until it works or the wait is over
         mic_busy = route == "mic" and (mw._attaching or (settling and state != "ok"))
+        if (mw._done_toast and not mic_busy and route == "mic" and state != "ok"
+                and not mw._settle_more):
+            # not working yet when the wait ran out: after Windows' audio restart the
+            # board's own streams come back on their next retry, and a slow PC takes
+            # longer to load it. One longer wait before it counts as not working
+            mw._settle_more = True
+            mw._settle_until = time.monotonic() + mw.SETTLE_MORE_S
+            QTimer.singleShot(int(mw.SETTLE_MORE_S * 1000) + 200, mw,
+                              self._update_status)
+            self._update_flow()
+            return
         if mw._attach_release is not None and not mic_busy:
             release, mw._attach_release = mw._attach_release, None
             release()
@@ -374,8 +400,11 @@ class StatusControl(Controller):
         said = mw._done_toast
         if said and not mic_busy:
             mw._done_toast = None
+            mw._settle_more = False
             if route != "mic" or state != "ok":
-                usage.used("mic-effect-no-load")   # set up, not working when the wait ran out
+                # set up, not working when the wait ran out, and why (one word)
+                usage.used("mic-effect-no-load")
+                usage.used(f"mic-effect-no-load-{self._no_load_why(route, direct)}")
             if route == "mic" and state == "ok":   # (the wait ran out: no "Done")
                 mw.toast(_("Mic updated: games, calls and browsers hear your sounds.")
                            if said == "updated" else
