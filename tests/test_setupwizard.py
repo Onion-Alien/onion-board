@@ -642,6 +642,29 @@ def test_mic_attach_plays_show_in_wizard_without_blocking_buttons(mic_wizard, mo
     assert wiz.btn_attach.isHidden()
 
 
+def test_the_mic_step_does_not_jump_when_the_set_up_works(mic_wizard, monkeypatch):
+    """While it sets up, the status card already has the room its "Working" words
+    take: on success nothing under it moves (it used to drop a line or two)."""
+    from soundboard.mic import directmic
+    w, wiz = mic_wizard
+    w.cfg.mic_device = "Microphone (Some Long Gaming Headset Name)"
+    wiz.resize(780, wiz.height())
+    wiz.show()
+    wiz.go(wiz.base + 2)
+    monkeypatch.setattr(directmic, "install", lambda name, **k: "")
+    wiz.btn_next.click()
+    QApplication.processEvents()
+    assert wiz.setup_show.on and wiz.status_card.tone == "busy"
+    busy_y = wiz.setup_show.y()
+    monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
+    w._attaching = False
+    w.mic_attached.emit(w.cfg.mic_device, "")
+    QApplication.processEvents()
+    assert wiz.status_card.tone == "ok"
+    assert wiz.setup_show.y() == busy_y
+    wiz.setup_show._stop()
+
+
 def test_the_guide_stays_open_while_the_mic_is_set_up(mic_wizard, monkeypatch):
     """While Bun puts the sounds into the mic, Back, Next, Esc and the X do nothing:
     closed or moved on mid-way, they couldn't tell how it went. Esc and the X say why
@@ -1342,9 +1365,9 @@ def test_the_first_launch_backdrop(qapp, app_dir, devices):
         assert bd.geometry() == w.rect()
         w.resize(1000, 700)
         assert bd.geometry() == w.rect()   # follows the window's size
-        bd.settle()   # animations off (offscreen): straight to the corner
+        bd.settle()   # animations off (offscreen): faded out at once
         assert bd._k == 1.0
-        bd.grab()     # paints, in the corner, without the rail's logo shown
+        bd.grab()     # paints, the logo and name gone
         bd.reveal()   # ...and goes at once
         qapp.sendPostedEvents(None, QEvent.Type.DeferredDelete)
         assert w.findChild(Backdrop) is None

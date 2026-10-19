@@ -131,7 +131,10 @@ class ChoiceTile(QRadioButton):
         on, hover = self.isChecked(), self.underMouse()
         r = QRectF(self.rect()).adjusted(1, 1, -1, -1)
         p.setPen(Qt.PenStyle.NoPen)
-        p.setBrush(QColor(t["card_hi"] if hover and not on else t["panel"]))
+        # the keyboard's spot shows as a hover does: a dotted ring around it read as a
+        # stray dashed border, and clicking a tile took it away for good
+        lit = (hover or self._ring()) and not on
+        p.setBrush(QColor(t["card_hi"] if lit else t["panel"]))
         p.drawRoundedRect(r, RADIUS, RADIUS)
         if on:   # the accent tint and ring
             tint = QColor(t["accent"])
@@ -141,14 +144,6 @@ class ChoiceTile(QRadioButton):
             p.setBrush(Qt.BrushStyle.NoBrush)
             p.setPen(QPen(QColor(t["accent"]), 2))
             p.drawRoundedRect(r.adjusted(1, 1, -1, -1), RADIUS - 1, RADIUS - 1)
-        elif self._ring():   # the keyboard's ring
-            p.setBrush(Qt.BrushStyle.NoBrush)
-            p.setPen(QPen(QColor(t["text"]), 1.5, Qt.PenStyle.DotLine))
-            p.drawRoundedRect(r.adjusted(1, 1, -1, -1), RADIUS - 1, RADIUS - 1)
-        if on and self._ring():
-            p.setBrush(Qt.BrushStyle.NoBrush)
-            p.setPen(QPen(QColor(t["text_hi"]), 1, Qt.PenStyle.DotLine))
-            p.drawRoundedRect(r.adjusted(4, 4, -4, -4), RADIUS - 4, RADIUS - 4)
 
         text = self.title or self.text().replace("&&", "&")
         p.setFont(self._name_font())
