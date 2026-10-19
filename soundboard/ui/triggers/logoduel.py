@@ -10,7 +10,7 @@ from PySide6.QtWidgets import QWidget
 
 from soundboard.ui.kit import theme
 from soundboard.ui.kit import appstate
-from soundboard.ui.bun.splash import _animations_enabled
+from soundboard.ui.settings import lite
 
 FRAME_MS = 1000 // 24
 SHOT_S = 0.48
@@ -49,7 +49,7 @@ class LogoDuel(QObject):
         elif (obj in self.logos and event.type() == QEvent.Type.MouseButtonPress
               and event.button() == Qt.MouseButton.LeftButton
               and self.tab.isVisible() and all(w.isVisible() for w in self.logos)
-              and _animations_enabled()):
+              and not lite.on()):   # (not Windows' Animation effects: off on many PCs)
             if self.overlay is None:
                 self.overlay = _Lasers(self, self.tab.window())
             self.overlay.start(self.logos.index(obj))
