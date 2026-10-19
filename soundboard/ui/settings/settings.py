@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (QAbstractButton, QApplication, QCheckBox, QComboB
                                QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem,
                                QPushButton, QScrollArea, QStyledItemDelegate, QTabWidget,
                                QVBoxLayout, QWidget)
+import shiboken6
 from shiboken6 import isValid as qt_valid
 
 
@@ -130,14 +131,19 @@ class SettingsDialog(QDialog, Built):
         self.categories.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.categories.setFixedWidth(196)
         self._unbuilt: dict[int, Callable[[], QWidget]] = {}   # tab index -> its page's builder
+        self._builders: dict[int, Callable[[], QWidget]] = {}  # every page's (mark_stale)
+        self._page_attrs: dict[int, set[str]] = {}   # what each page keeps on the dialog
+        self._stale: set[int] = set()   # built, to be built afresh when next shown
         for i, (key, title, icon, build) in enumerate(pages):
             sa = self._scroll()
+            if build is not None:
+                self._builders[i] = build
             if build is None:   # (the Show advanced row: nothing to show)
                 self._fill(sa, QWidget())
             elif lazy and key != page:
                 self._unbuilt[i] = build
             else:
-                self._fill(sa, build())
+                self._fill(sa, self._make(i))
             self.tabs.addTab(sa, title)
             icons.set_tab_icon(self.tabs, i, icon)
             item = QListWidgetItem(icons.icon(icon), title.replace("&&", "&"))
@@ -392,7 +398,9 @@ class SettingsDialog(QDialog, Built):
         if words:
             self._searching = True
             try:
-                for i in list(self._unbuilt):   # a page not built yet can't be searched
+                # a page not built yet can't be searched (nor a stale one trusted: and
+                # built afresh when shown, it would lose what the search hid)
+                for i in [*self._unbuilt, *sorted(self._stale)]:
                     self._build_page(i)
             finally:
                 self._searching = False
@@ -501,10 +509,54 @@ class SettingsDialog(QDialog, Built):
         sa.setWidget(page)
 
     def _build_page(self, i: int):
-        """A lazy page, the first time it's shown."""
-        build = self._unbuilt.pop(i, None)
-        if build is not None:
-            self._fill(self._tab_area(i), build())
+        """A lazy page, the first time it's shown; a stale one (mark_stale) afresh."""
+        if i in self._stale:
+            self._rebuild_page(i)
+        elif self._unbuilt.pop(i, None) is not None:
+            self._fill(self._tab_area(i), self._make(i))
+
+    def _make(self, i: int) -> QWidget:
+        """Page i built, noting the attributes it keeps on the dialog (its widgets, its
+        callbacks) for _rebuild_page."""
+        before = set(vars(self))
+        page = self._builders[i]()
+        self._page_attrs[i] = set(vars(self)) - before
+        return page
+
+    def mark_stale(self, keys) -> None:
+        """Those pages (the ones built) are built afresh the next time they're shown or
+        searched: they show state from outside the config (downloads, add-ons, updates).
+        A closed Settings that showed one is kept, not built again from scratch (a
+        few hundred ms on a slower PC, and every page loaded again behind it)."""
+        self._stale |= {i for i, k in enumerate(self._page_keys)
+                        if k in keys and i in self._builders and i not in self._unbuilt}
+
+    def _rebuild_page(self, i: int):
+        """A stale page built afresh, in one go: what the old one kept on the dialog
+        goes first (lists and dicts several pages fill stay), the new one is filled in,
+        then the old one is freed. Until now the old one was alive, hidden, so anything
+        still holding it (a download's answer) found it as it was; after, its widgets
+        are gone, as when a whole Settings was freed (and out of those lists)."""
+        self._stale.discard(i)
+        for name in self._page_attrs.pop(i, ()):
+            if not isinstance(vars(self).get(name), (dict, list)):
+                vars(self).pop(name, None)
+        sa = self._tab_area(i)
+        old = sa.takeWidget()
+        self._fill(sa, self._make(i))
+        if old is not None:
+            shiboken6.delete(old)
+
+        def gone(x) -> bool:
+            if isinstance(x, tuple):
+                return any(gone(y) for y in x)
+            return isinstance(x, QObject) and not qt_valid(x)
+        for v in list(vars(self).values()):
+            if isinstance(v, dict):
+                for k in [k for k, w in v.items() if gone(k) or gone(w)]:
+                    del v[k]
+            elif isinstance(v, list):
+                v[:] = [x for x in v if not gone(x)]
 
     def _tab_area(self, i: int) -> QScrollArea:
         """Page i's scroll area (each tab is one)."""

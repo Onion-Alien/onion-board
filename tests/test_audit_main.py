@@ -399,12 +399,13 @@ def test_a_new_theme_builds_the_spare_edit_sound_again(window, qapp, monkeypatch
     assert sc._spare_editor is d
 
 
-def test_settings_made_ahead_again_after_a_page_it_cant_keep(window, qapp, monkeypatch):
-    """About (or Updates, Help...) shows live state, so that Settings isn't kept when it
-    closes: a new one is made ahead while nothing's going on, and the next open of the
-    cog builds nothing (it rebuilt all of Settings each time: 80-140 ms, seconds on a
-    busy PC)."""
+def test_settings_kept_after_a_live_page_only_that_page_built_again(window, qapp, monkeypatch):
+    """About (or Updates, Help...) shows live state. Closing Settings after one threw
+    the whole Settings away: the next open built it all again (450 ms on a slower PC)
+    and every page was loaded again behind it. Now the same Settings is kept, and only
+    that page is built afresh, when it's shown again."""
     import time
+    from shiboken6 import isValid as qt_valid
     from tests.conftest import process_events
     from soundboard.ui.window import settingscontrol
     monkeypatch.setattr(settingscontrol, "REBUILD_MS", 0, raising=False)
@@ -414,19 +415,78 @@ def test_settings_made_ahead_again_after_a_page_it_cant_keep(window, qapp, monke
     qapp.processEvents()
     first = sc._settings_kept
     assert sc.open_settings("about") is first
+    i = first._page_keys.index("about")
+    old_page, old_version = first._tab_page(i), first.about_version
     sc.close_settings()
-    assert process_events(qapp, lambda: sc._settings_kept not in (None, first), timeout=5)
-    kept = sc._settings_kept
+    process_events(qapp, lambda: False, timeout=0.3)
+    assert sc._settings_kept is first
     made = []
     real = settingscontrol.SettingsDialog
     monkeypatch.setattr(settingscontrol, "SettingsDialog",
                         lambda *a, **k: made.append(a) or real(*a, **k))
     t0 = time.perf_counter()
-    assert sc.open_settings() is kept and sc.settings_open()
+    assert sc.open_settings() is first and sc.settings_open()
     ms = (time.perf_counter() - t0) * 1000
     assert not made
+    assert first._tab_page(i) is old_page   # not shown: not built yet
+    first.show_page("about")
+    qapp.processEvents()
+    assert first._tab_page(i) is not old_page and not qt_valid(old_page)
+    assert first.about_version is not old_version and qt_valid(first.about_version)
+    assert first._tab_page(i).isVisibleTo(first)
     sc.close_settings()
     qapp.processEvents()
-    assert sc._settings_kept is kept   # nothing live shown: kept as it was
+    assert sc._settings_kept is first
     if not os.environ.get("CI"):   # (wall clock: hosted runners stall on their own)
-        assert ms < 100, f"opening the made-ahead Settings took {ms:.0f} ms"
+        assert ms < 100, f"opening the kept Settings took {ms:.0f} ms"
+
+
+def test_a_live_page_built_again_drops_what_the_old_one_kept(window, qapp):
+    """The old page's widgets go from the dialog's lists (they'd pile up, freed, with
+    every visit), and the Updates page hooks the window's update signals once more,
+    after closing unhooked them."""
+    from shiboken6 import isValid as qt_valid
+    sc = window.setctl
+    sc.preload_dialogs()
+    window.show()
+    qapp.processEvents()
+    dlg = sc.open_settings("updates")
+    assert dlg._upd_wired
+    sc.close_settings()
+    qapp.processEvents()
+    assert sc._settings_kept is dlg and not dlg._upd_wired
+    dlg = sc.open_settings("updates")
+    assert dlg._upd_wired
+    dlg.connection._updates_state()   # the new page's label
+    assert qt_valid(dlg.upd_label)
+    for v in vars(dlg).values():
+        items = v.items() if isinstance(v, dict) else (v if isinstance(v, list) else ())
+        for x in items:
+            for y in (x if isinstance(x, tuple) else (x,)):
+                assert not hasattr(y, "isWidgetType") or qt_valid(y)
+    sc.close_settings()
+    qapp.processEvents()
+
+
+def test_a_search_builds_a_stale_page_afresh_and_keeps_its_hits(window, qapp):
+    """Searching a kept Settings: a live page shown last time is built afresh before
+    the search, so landing on it doesn't build it again (and lose what the search
+    hid)."""
+    sc = window.setctl
+    sc.preload_dialogs()
+    window.show()
+    qapp.processEvents()
+    dlg = sc.open_settings("about")
+    sc.close_settings()
+    qapp.processEvents()
+    dlg = sc.open_settings()
+    i = dlg._page_keys.index("about")
+    assert i in dlg._stale
+    dlg._apply_search("version")
+    assert i not in dlg._stale
+    page = dlg._tab_page(i)
+    dlg.tabs.setCurrentIndex(i)
+    assert dlg._tab_page(i) is page
+    dlg._apply_search("")
+    sc.close_settings()
+    qapp.processEvents()

@@ -1084,7 +1084,7 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------------------------ language
     # ------------------------------------------------------------------ tips
     # Settings pages showing state from outside the config (downloads, add-ons, Tor,
-    # updates, the remote's add-ons): a kept Settings with one of them built is rebuilt
+    # updates, the remote's add-ons): built afresh in a kept Settings when shown again
     SETTINGS_LIVE_PAGES = ("data", "connection", "help", "updates", "remote", "about")
     # config that changes without Settings showing it (counts, tips, the tab shown, the
     # Voice tab's speech) or that it keeps up to date itself (app_setup_changed)
