@@ -1,0 +1,1 @@
+- The onion on Settings > About has a secret. Try clicking him. A lot.

@@ -9,7 +9,8 @@ from __future__ import annotations
 
 import math
 
-from PySide6.QtCore import QPointF, QRectF, QSize, Qt, QTimer
+from PySide6.QtCore import (QElapsedTimer, QEvent, QPointF, QRectF, QSize, Qt, QTimer,
+                            Signal)
 from PySide6.QtGui import (QColor, QFont, QFontMetricsF, QImage, QPainter, QPainterPath, QPen,
                            QPixmap, QRadialGradient, QTextLayout, QTextOption)
 from PySide6.QtWidgets import QSizePolicy, QWidget
@@ -28,6 +29,8 @@ IRIS = QColor("#8fd14f")
 MOUTH = QColor("#c2413b")
 TONGUE = QColor("#ff8fae")
 CHEEK = QColor(255, 128, 160, 120)
+TEAR = QColor("#8fd3ff")
+THROAT = QColor("#3a1028")
 EYES = (36.0, 64.0)
 EYE_Y = 70.0
 
@@ -75,9 +78,38 @@ def _leaf(sx: int, length: float) -> QPainterPath:
     return leaf
 
 
-def draw_alien(p: QPainter, rect: QRectF, mouth_open: float = 1.0):
+def _tear(p: QPainter, x: float, t: float):
+    """A tear out of the eye at `x`, `t` 0..1 through its life: it wells up under the
+    eye, then runs down his cheek and fades."""
+    grow = min(1.0, t / 0.25)
+    run = max(0.0, (t - 0.25) / 0.75)
+    cy = EYE_Y + 12 + run * run * 28
+    r = 2.6 + 3.0 * grow
+    drop = QPainterPath(QPointF(x, cy - r * 2.4))
+    drop.cubicTo(QPointF(x + r * 0.4, cy - r * 1.2), QPointF(x + r, cy - r * 0.4),
+                 QPointF(x + r, cy))
+    drop.cubicTo(QPointF(x + r, cy + r * 1.3), QPointF(x - r, cy + r * 1.3),
+                 QPointF(x - r, cy))
+    drop.cubicTo(QPointF(x - r, cy - r * 0.4), QPointF(x - r * 0.4, cy - r * 1.2),
+                 QPointF(x, cy - r * 2.4))
+    alpha = 1.0 if run < 0.7 else max(0.0, 1 - (run - 0.7) / 0.3)
+    fill, ink = QColor(TEAR), QColor(INK)
+    fill.setAlphaF(alpha)
+    ink.setAlphaF(alpha)
+    p.setPen(QPen(ink, 1.4))
+    p.setBrush(fill)
+    p.drawPath(drop)
+    shine = QColor("white")
+    shine.setAlphaF(alpha * 0.9)
+    _e(p, x - r * 0.35, cy - r * 0.2, r * 0.55, r * 0.7, shine)
+
+
+def draw_alien(p: QPainter, rect: QRectF, mouth_open: float = 1.0,
+               tears: tuple = (), gape: float = 0.0):
     """Draw him fitted (aspect kept, centred) into `rect`. `mouth_open` 0..1: his
-    smile, from shut to wide (talking flaps it)."""
+    smile, from shut to wide (talking flaps it). `tears`: (eye 0/1, 0..1 through
+    it) for each tear running down; any makes him frown. `gape` 0..1: his mouth
+    opened into a big round hole (the eating easter egg)."""
     s = min(rect.width() / W, rect.height() / H)
     p.save()
     p.setRenderHint(QPainter.RenderHint.Antialiasing)
@@ -152,7 +184,26 @@ def draw_alien(p: QPainter, rect: QRectF, mouth_open: float = 1.0):
     pen = QPen(INK, 1.8, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap,
                Qt.PenJoinStyle.RoundJoin)
     mouth = QPainterPath(QPointF(45.5, 85))
-    if o < 0.15:
+    g = max(0.0, min(1.0, gape))
+    if g > 0.05:
+        # wide open: a round dark hole, his tongue at the bottom
+        mw, mh = 9 + 15 * g, 4 + 13 * g
+        hole = QPainterPath()
+        hole.addEllipse(QRectF(50 - mw / 2, 90 - mh / 2, mw, mh))
+        p.setPen(pen)
+        p.setBrush(THROAT)
+        p.drawPath(hole)
+        p.save()
+        p.setClipPath(hole)
+        _e(p, 50, 90 + mh * 0.42, mw * 0.6, mh * 0.45, TONGUE)
+        p.restore()
+    elif tears:
+        mouth = QPainterPath(QPointF(45.5, 88))
+        mouth.quadTo(QPointF(50, 84), QPointF(54.5, 88))
+        p.setPen(pen)
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        p.drawPath(mouth)
+    elif o < 0.15:
         mouth.quadTo(QPointF(50, 89), QPointF(54.5, 85))
         p.setPen(pen)
         p.setBrush(Qt.BrushStyle.NoBrush)
@@ -167,6 +218,9 @@ def draw_alien(p: QPainter, rect: QRectF, mouth_open: float = 1.0):
         p.setClipPath(mouth)
         _e(p, 50, 85 + 6.5 * o, 5.4, 3.6, TONGUE)
         p.restore()
+    for eye, t in tears:
+        if 0.0 <= t <= 1.0:
+            _tear(p, EYES[eye] + (2.5 if eye else -2.5), t)
     p.restore()
 
 
@@ -187,6 +241,12 @@ class AlienNote(QWidget):
     TICK_MS = 28     # one letter
     PAUSE = {".": 9, "?": 9, "!": 9, ",": 4, "\n": 6}   # extra ticks after these
 
+    # the easter egg: clicks on him. One tear at TEAR_1, two at TEAR_2, and at GULP he
+    # eats the whole window and spits it back out a minute later (OnionGulp)
+    TEAR_1, TEAR_2, GULP = 10, 50, 100
+    TEAR_MS = 1800       # one tear's life
+    TEAR_GAP_MS = 250    # the second of two tears starts this much later
+
     def __init__(self, text: str, parent=None):
         super().__init__(parent)
         self.text = text
@@ -195,6 +255,15 @@ class AlienNote(QWidget):
         self._timer = QTimer(self)
         self._timer.setInterval(self.TICK_MS)
         self._timer.timeout.connect(self._tick)
+        self.clicks = 0
+        self.tear_ms = -1.0       # how far the tears have got, -1 = none
+        self.tear_count = 0
+        self.hidden_alien = False  # he's out of his spot, eating the window
+        self.gulp: OnionGulp | None = None
+        self._tear_clock = QElapsedTimer()
+        self._tear_timer = QTimer(self)
+        self._tear_timer.setInterval(16)
+        self._tear_timer.timeout.connect(self._tear_tick)
         self.setAccessibleName(text)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         pol = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
@@ -237,6 +306,65 @@ class AlienNote(QWidget):
 
     def mousePressEvent(self, ev):
         self.finish()
+        if ev.position().x() <= self._alien_w():
+            self.poke()
+
+    # -- the easter egg
+    def poke(self):
+        """One click on him (none count while he's out eating the window)."""
+        if self.gulp is not None:
+            return
+        self.clicks += 1
+        if self.clicks == self.TEAR_1:
+            self.cry(1)
+        elif self.clicks == self.TEAR_2:
+            self.cry(2)
+        elif self.clicks >= self.GULP:
+            self.clicks = 0
+            self.eat_window()
+
+    def cry(self, count: int):
+        self.tear_count = count
+        self.tear_ms = 0.0
+        self._tear_clock.start()
+        self._tear_timer.start()
+        self.update()
+
+    def tears(self) -> tuple:
+        """(eye, 0..1) for each tear running now."""
+        if self.tear_ms < 0:
+            return ()
+        if self.tear_count == 1:
+            return ((1, self.tear_ms / self.TEAR_MS),)
+        return ((0, self.tear_ms / self.TEAR_MS),
+                (1, (self.tear_ms - self.TEAR_GAP_MS) / self.TEAR_MS))
+
+    def set_tear_ms(self, ms: float):
+        total = self.TEAR_MS + (self.TEAR_GAP_MS if self.tear_count > 1 else 0)
+        self.tear_ms = ms if ms < total else -1.0
+        if self.tear_ms < 0:
+            self._tear_timer.stop()
+        self.update()
+
+    def _tear_tick(self):
+        self.set_tear_ms(float(self._tear_clock.elapsed()))
+
+    def alien_rect(self) -> QRectF:
+        return QRectF(0, (self.height() - self.ALIEN_H) / 2, self._alien_w(), self.ALIEN_H)
+
+    def eat_window(self) -> OnionGulp | None:
+        win = self.window()
+        if win is self or not self.isVisible():
+            return None
+        self.gulp = OnionGulp(self, win)
+        self.gulp.done.connect(self._gulp_done)
+        self.gulp.start()
+        return self.gulp
+
+    def _gulp_done(self):
+        self.gulp = None
+        self.hidden_alien = False
+        self.update()
 
     # -- layout. The bubble is drawn PIX times smaller with no smoothing, then blown up,
     # so its border, tail and letters come out in chunky pixels, like an old game's
@@ -318,7 +446,8 @@ class AlienNote(QWidget):
         ay = (self.height() - self.ALIEN_H) / 2
         # his mouth flaps open and shut as each letter comes out
         talk = 1.0 if not self.typing else (0.0 if self.shown % 4 < 2 else 0.85)
-        draw_alien(p, QRectF(0, ay, aw, self.ALIEN_H), talk)
+        if not self.hidden_alien:
+            draw_alien(p, QRectF(0, ay, aw, self.ALIEN_H), talk, self.tears())
 
         tw = self._text_w(self.width())
         bw, bh = tw + 2 * (self.PAD_S + self.EDGE_S), self._box_h(tw)
@@ -373,6 +502,212 @@ class AlienNote(QWidget):
         top = (self.height() - bh * self.PIX) / 2
         p.drawImage(QRectF(left, round(top), img.width() * self.PIX, bh * self.PIX), img)
         p.end()
+
+def _ease(u: float) -> float:
+    u = max(0.0, min(1.0, u))
+    return u * u * (3 - 2 * u)
+
+
+class OnionGulp(QWidget):
+    """The 100-click easter egg, laid over the whole window: he hops out of his note
+    into the middle, sucks the window in piece by piece (the Settings page first, then
+    the rest), sits on an empty window for BLANK_MS, then spits every piece back to
+    where it was and hops home. It only paints over a picture of the window: nothing
+    underneath is touched, and the window's clicks wait until he's done.
+
+    `t` is how far it's got (ms); set_t() steps it by hand (tests, pictures)."""
+
+    done = Signal()
+    TILE = 44           # one piece of the window, px
+    HOP_MS = 700        # out of the note to the middle, mouth opening
+    EAT_MS = 3400       # the pieces going in, one after another
+    FLY_MS = 650        # one piece's trip
+    SHUT_MS = 500       # mouth shut, a gulp
+    BLANK_MS = 60_000   # the empty window
+    OPEN_MS = 450       # mouth open again
+    HOME_MS = 600       # back into the note
+
+    def __init__(self, note: AlienNote, win: QWidget):
+        super().__init__(win)
+        self.note = note
+        self.t = 0.0
+        note.hidden_alien = True
+        note.repaint()
+        self.shot = win.grab()           # the window without him in it
+        self.setGeometry(win.rect())
+        dpr = self.shot.devicePixelRatio()
+        home = note.alien_rect()
+        self.home = QRectF(note.mapTo(win, home.topLeft().toPoint()), home.size())
+        side = max(120.0, min(self.height() * 0.42, self.width() * 0.3, 300.0))
+        self.big = QRectF(0, 0, side * W / H, side)
+        self.big.moveCenter(QPointF(self.width() / 2, self.height() / 2))
+        first = self._settings_rect(note, win)
+        mouth = self._mouth(self.big)
+        pieces = []
+        for y in range(0, self.height(), self.TILE):
+            for x in range(0, self.width(), self.TILE):
+                r = QRectF(x, y, min(self.TILE, self.width() - x),
+                           min(self.TILE, self.height() - y))
+                c = r.center()
+                near = math.hypot(c.x() - mouth.x(), c.y() - mouth.y())
+                later = 0 if first is not None and first.contains(c) else 1
+                pix = self.shot.copy(round(x * dpr), round(y * dpr),
+                                     math.ceil(r.width() * dpr), math.ceil(r.height() * dpr))
+                pix.setDevicePixelRatio(dpr)
+                pieces.append(((later, near), r, pix))
+        pieces.sort(key=lambda piece: piece[0])
+        self.pieces = [(r, pix) for __, r, pix in pieces]
+        spread = self.EAT_MS - self.FLY_MS
+        n = max(1, len(self.pieces) - 1)
+        self.starts = [spread * i / n for i in range(len(self.pieces))]
+        self.ate = self.HOP_MS + self.EAT_MS
+        self.blank_at = self.ate + self.SHUT_MS
+        self.spit_at = self.blank_at + self.BLANK_MS + self.OPEN_MS
+        self.home_at = self.spit_at + self.EAT_MS
+        self.end = self.home_at + self.HOME_MS
+        self._clock = QElapsedTimer()
+        self._timer = QTimer(self)
+        self._timer.setInterval(16)
+        self._timer.timeout.connect(lambda: self.set_t(float(self._clock.elapsed())))
+        self.win = win
+        win.installEventFilter(self)
+
+    @staticmethod
+    def _settings_rect(note: QWidget, win: QWidget) -> QRectF | None:
+        """The Settings page round the note, in the window's coordinates (eaten first)."""
+        found, w = None, note.parentWidget()
+        while w is not None and w is not win:
+            if "Settings" in type(w).__name__:
+                found = w
+            w = w.parentWidget()
+        if found is None:
+            return None
+        return QRectF(found.mapTo(win, found.rect().topLeft()), found.size().toSizeF())
+
+    @staticmethod
+    def _mouth(rect: QRectF) -> QPointF:
+        s = min(rect.width() / W, rect.height() / H)
+        return QPointF(rect.center().x(), rect.center().y() + (90 - H / 2) * s)
+
+    def start(self):
+        self.show()
+        self.raise_()
+        self._clock.start()
+        self._timer.start()
+
+    def stop(self):
+        """Everything back at once (the window was resized or closed under him)."""
+        if self._timer.isActive() or self.isVisible():
+            self._timer.stop()
+            self.win.removeEventFilter(self)
+            self.hide()
+            self.deleteLater()
+            self.done.emit()
+
+    def eventFilter(self, obj, ev):
+        if ev.type() in (QEvent.Type.Resize, QEvent.Type.Close):
+            self.stop()
+        return False
+
+    def set_t(self, t: float):
+        self.t = t
+        if t >= self.end:
+            self.stop()
+        else:
+            self.update()
+
+    # where he is and how he looks at `t`
+    def _pose(self) -> tuple[QRectF, float, float]:
+        """(his rect, gape 0..1, belly 0..1)."""
+        t = self.t
+        eaten = sum(1 for s in self.starts if t >= self.HOP_MS + s + self.FLY_MS / 2)
+        full = eaten / max(1, len(self.starts))
+        if t < self.HOP_MS:
+            u = _ease(t / self.HOP_MS)
+            return self._between(self.home, self.big, u), u, 0.0
+        if t < self.ate:
+            return self.big, 1.0, full
+        if t < self.blank_at:
+            u = (t - self.ate) / self.SHUT_MS
+            return self.big, 1 - _ease(u * 2), 1.0
+        if t < self.spit_at - self.OPEN_MS:
+            return self.big, 0.0, 1.0
+        if t < self.spit_at:
+            return self.big, _ease((t - self.spit_at + self.OPEN_MS) / self.OPEN_MS), 1.0
+        if t < self.home_at:
+            out = sum(1 for s in self.starts if t >= self.spit_at + s + self.FLY_MS / 2)
+            return self.big, 1.0, 1 - out / max(1, len(self.starts))
+        u = _ease((t - self.home_at) / self.HOME_MS)
+        return self._between(self.big, self.home, u), 1 - u, 0.0
+
+    @staticmethod
+    def _between(a: QRectF, b: QRectF, u: float) -> QRectF:
+        return QRectF(a.x() + (b.x() - a.x()) * u, a.y() + (b.y() - a.y()) * u,
+                      a.width() + (b.width() - a.width()) * u,
+                      a.height() + (b.height() - a.height()) * u)
+
+    def _piece_at(self, i: int) -> float | None:
+        """Piece `i`'s trip: 0 = in its place, 1 = in his mouth (None: not drawn)."""
+        t = self.t
+        if t < self.HOP_MS + self.starts[i]:
+            return 0.0
+        if t < self.blank_at:
+            u = (t - self.HOP_MS - self.starts[i]) / self.FLY_MS
+            return None if u >= 1 else u * u
+        if t < self.spit_at:
+            return None
+        # spat out last-in first-out
+        j = len(self.starts) - 1 - i
+        u = (t - self.spit_at - self.starts[j]) / self.FLY_MS
+        if u <= 0:
+            return None
+        return 0.0 if u >= 1 else 1 - (1 - (1 - u) ** 2)
+
+    def paintEvent(self, ev):
+        from soundboard.ui.kit import theme
+        p = QPainter(self)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
+        p.fillRect(self.rect(), QColor(theme.tokens()["bg"]))
+        rect, gape, belly = self._pose()
+        mouth = self._mouth(rect)
+        moving = []
+        for i, (r, pix) in enumerate(self.pieces):
+            k = self._piece_at(i)
+            if k is None:
+                continue
+            if k == 0.0:
+                p.drawPixmap(r.topLeft(), pix)
+            else:
+                moving.append((k, r, pix))
+        for k, r, pix in sorted(moving, key=lambda m: m[0]):
+            # swirl in: round the mouth, shrinking and spinning as it goes
+            c = r.center()
+            vx, vy = c.x() - mouth.x(), c.y() - mouth.y()
+            a = k * 1.4
+            shrink = 1 - k
+            x = mouth.x() + (vx * math.cos(a) - vy * math.sin(a)) * shrink
+            y = mouth.y() + (vx * math.sin(a) + vy * math.cos(a)) * shrink
+            p.save()
+            p.translate(x, y)
+            p.rotate(k * 220)
+            p.scale(max(0.05, shrink), max(0.05, shrink))
+            p.drawPixmap(QRectF(-r.width() / 2, -r.height() / 2, r.width(), r.height()),
+                         pix, QRectF(pix.rect()))
+            p.restore()
+        # fatter the more he's eaten, bobbing while he sits full
+        bob = math.sin(self.t / 260) * 0.03 * belly
+        sx, sy = 1 + 0.22 * belly + bob, 1 + 0.06 * belly - bob
+        c = QPointF(rect.center().x(), rect.bottom())
+        p.translate(c)
+        p.scale(sx, sy)
+        p.translate(-c)
+        draw_alien(p, rect, 1.0, (), gape)
+        p.end()
+
+    def mousePressEvent(self, ev):
+        ev.accept()     # the window waits until he's done
+
 
 def alien_image(height: int) -> QImage:
     h = max(1, height)

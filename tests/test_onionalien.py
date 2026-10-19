@@ -56,3 +56,47 @@ def test_height_fits_whole_text_and_wraps_narrow(qapp):
     assert narrow > wide              # wraps onto more lines, so taller
     note.resize(300, narrow)
     paint(note)
+
+
+def test_clicks_make_him_cry_then_eat_the_window(qapp):
+    from PySide6.QtWidgets import QVBoxLayout, QWidget
+    win = QWidget()
+    win.resize(500, 400)
+    note = AlienNote("Hi.")
+    QVBoxLayout(win).addWidget(note)
+    win.show()
+    QApplication.processEvents()
+    for _ in range(9):
+        note.poke()
+    assert note.tears() == ()
+    note.poke()                                   # 10: one tear
+    assert len(note.tears()) == 1
+    note.set_tear_ms(900)
+    paint(note)
+    note.set_tear_ms(5000)                        # dried up
+    assert note.tears() == () and not note._tear_timer.isActive()
+    for _ in range(40):
+        note.poke()                               # 50: two tears
+    assert len(note.tears()) == 2
+    note.set_tear_ms(99_999)
+    for _ in range(49):
+        note.poke()
+    assert note.gulp is None
+    note.poke()                                   # 100: he eats the window
+    gulp = note.gulp
+    assert gulp is not None and gulp.isVisible() and note.hidden_alien
+    assert note.clicks == 0
+    note.poke()                                   # clicks while he's out do nothing
+    assert note.clicks == 0
+    gulp._timer.stop()
+    for t in (0, gulp.HOP_MS / 2, gulp.HOP_MS + 1000, gulp.blank_at + 10,
+              gulp.spit_at + 1000, gulp.home_at + 100):
+        gulp.set_t(t)
+        img = QImage(gulp.size(), QImage.Format.Format_ARGB32)
+        gulp.render(img)
+    gulp.set_t(gulp.blank_at + 10)
+    assert all(gulp._piece_at(i) is None for i in range(len(gulp.pieces)))   # all gone
+    gulp.set_t(gulp.end)                          # spat back, home again
+    assert note.gulp is None and not note.hidden_alien and not gulp.isVisible()
+    win.close()
+    QApplication.processEvents()
