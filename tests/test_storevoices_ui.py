@@ -88,7 +88,7 @@ def test_voices_list_hear_vote_get_and_report(qapp, fake):
         "", "fx", "ai", "setup"]
     fx, ai, setup = t._rows
     assert fx.meta.full.startswith("Voice changer") and "for fun" in fx.meta.full
-    assert setup.meta.full.startswith("Setup · ") and "Bear" in setup.meta.full
+    assert setup.meta.full.startswith("Voice combo · ") and "Bear" in setup.meta.full
     # hear it: the sample line through the voice, to the headphones only
     fx.btn_play.click()
     assert process_events(qapp, lambda: played and played[-1] is not None, timeout=20)
@@ -156,5 +156,5 @@ def test_voice_tab_menus_open_the_share_window(main_window, qapp, monkeypatch): 
     vp.share_asked.connect(window.share_voice)
     vp.fx.share_asked.emit("Squeaky")
     vp.setups_bar.share("Combo")
-    assert asked == ["Voice changer: Squeaky", "Setup: Combo"]
+    assert asked == ["Voice changer: Squeaky", "Voice combo: Combo"]
     assert isinstance(window.store, storetab.StoreTab) and window.store.voices is not None

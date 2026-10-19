@@ -237,7 +237,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/online/store.py` | the sound store (Store tab): the list, fetching a sound, votes, reports and uploads, talking to the project's own server |
 | `soundboard/ui/store/storetab.py` | the *Store* tab: free CC0 sounds to hear, add, vote on or report, and the *Share a sound* window |
 | `soundboard/ui/store/storelook.py` | the *Store* tab's pictures: a sound's emoji tile (from its name, tags and category; bars bounce while it plays), the banner with Bun |
-| `soundboard/online/storevoices.py` | the Store's community voices: packing your voice changer voices, AI voices and setups to share (settings only), checking every voice from the store again, taking one into your own lists, its *Hear it* sample, and share codes for any of them (`OB2-…`, read back through the same checks; old `OB1-…` voice codes still read) |
+| `soundboard/online/storevoices.py` | the Store's community voices: packing your voice changer voices, AI voices and voice combos to share (settings only), checking every voice from the store again, taking one into your own lists, its *Hear it* sample, and share codes for any of them (`OB2-…`, read back through the same checks; old `OB1-…` voice codes still read) |
 | `soundboard/ui/store/storevoices.py` | the Store tab's *Voices*: a row per community voice and the *Share a voice* window |
 | `streamdeck/` | the Stream Deck plugin (plain Node 24, no libraries): `bin/onionboard.js` finds the control API's port and key in `config.json` and draws the keys, `bin/actions.js` the keys (Play sound, Stop all, Random, Switch), `ui/` a key's settings panel; its README says how to try and pack it. Pictures: `scripts/pictures/make_streamdeck_icons.py` |
 | `soundboard/ui/sounds/packsdialog.py` | the *Free sound packs* window (Sounds tab → Backup): the packs to add, a few of each one's sounds to hear first, and where to share your own |
@@ -294,10 +294,10 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/voice/backdroprow.py` | the voice changer's Background card (built-in sounds and board sounds behind your voice) and its Speed and pitch pop-up |
 | `soundboard/ui/voice/effectspopup.py` | the voice bar's Effects pop-up: bundled CC0 background sounds, board sounds and the extra Robot, Radio, Echo and Reverb on top of any voice, one slider and a ✕ each |
 | `soundboard/ui/sounds/voicepicker.py` | Edit sound → Effects → Voice: picture cards of the voice changer's voices, the AI voices and your setups, to lay a voice over a sound |
-| `soundboard/ui/voice/voicesetupsbar.py` | the Voice tab's My setups row: save what's on, turn a setup back on, delete with Undo |
+| `soundboard/ui/voice/voicesetupsbar.py` | the Voice tab's My voice combos row: save what's on, turn a setup back on, delete with Undo |
 | `soundboard/ui/voice/speechpanel.py` | the Voice tab's Languages card: text-to-speech, live voice-to-speech, translation |
 | `soundboard/ui/voice/livevoice.py` | the Languages card's live voice: Start, translating for the AI voice or voice changer, the helper's events |
-| `soundboard/ui/voice/livesetups.py` | My setups in the three Live controls (`MainWindow.livesetups`): picks a setup, makes a sound again in its AI voice before it plays, Cancel |
+| `soundboard/ui/voice/livesetups.py` | My voice combos in the three Live controls (`MainWindow.livesetups`): picks a setup, makes a sound again in its AI voice before it plays, Cancel |
 | `soundboard/ui/voice/speechinstall.py` | the Languages card's downloads and installs: Windows voices, translation models, speech recognition |
 | `soundboard/ui/voice/voicestatus.py` | the Voice tab's status bar: your mic level and a chip for everything changing what others hear |
 | `soundboard/voicefx/` | the voice-effect chain and the built-in effects (pitch, robot, radio, …); `backdrop.py` makes the Background's loops |

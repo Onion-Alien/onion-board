@@ -2120,9 +2120,9 @@ def test_a_setup_goes_to_a_friend_as_a_code_and_comes_back(panel, monkeypatch):
     monkeypatch.setattr(QMessageBox, "question", lambda *a: asked.append(a[2]) or QMessageBox.Yes)
     monkeypatch.setattr(busy, "toast", lambda *a, **k: said.append(a[1]))
     _ask(monkeypatch, code)
-    bar.btn_import.click()          # the My setups row's own Import a code
+    bar.btn_import.click()          # the My voice combos row's own Import a code
     assert "Chip" in asked[0] and list(p.setups.setups) == ["Chip", "Chip (2)"]
-    assert "Chip (2)" in bar.buttons and "My setups" in said[-1]
+    assert "Chip (2)" in bar.buttons and "My voice combos" in said[-1]
     # the voice changer's Import a code takes a setup code too
     assert p.fx.import_code(code) == "Chip (3)"
     assert not p.fx.store.voices                 # (a setup, not a saved voice)

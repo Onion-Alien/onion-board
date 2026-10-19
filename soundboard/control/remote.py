@@ -54,7 +54,7 @@ Every endpoint takes GET or POST and answers JSON (ENDPOINTS below is the list;
     /api/apps                    the Apps tab's programs; /api/app?name=…&send=1|0|toggle
                                  [&volume=0-1000] sends one to whoever's listening
     /api/setups, /api/setup?name=…[&tab=sounds|radio|apps]
-                                 My setups (saved on the Voice tab) on the live controls
+                                 My voice combos (saved on the Voice tab) on the live controls
     /api/hotkeys[?on=1|0|toggle] every global hotkey off (to type) or on
     /api/mic_gate[?on=…]         mute my mic while a sound plays
     /api/chat, /api/chat_rules, /api/event, /api/alerts, /api/feed
@@ -213,9 +213,9 @@ ENDPOINTS = {
     "apps": "the Apps tab's programs: [{name, exe, running, sending, volume}]",
     "app": "send one program's sound to whoever's listening: ?name=Spotify (its name or "
            "its .exe) &send=1 / 0 / toggle, &volume=0-1000 (%)",
-    "setups": "My setups (voice setups saved on the Voice tab) and the one on each live "
+    "setups": "My voice combos (saved on the Voice tab) and the one on each live "
               "control (sounds, radio, apps)",
-    "setup": "put one of My setups on everything playing: ?name=… (name= blank: none) "
+    "setup": "put one of My voice combos on everything playing: ?name=… (name= blank: none) "
              "&tab=sounds (default) / radio / apps",
     "hotkeys": "every global hotkey off (so the keys type normally) or back on: "
                "?on=1 / 0 / toggle",
@@ -1266,7 +1266,7 @@ def setups_state(mw: MainWindow) -> dict:
 
 
 def dispatch_setups(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
-    """My setups on a live control, as its chips pick them (without the question an AI
+    """My voice combos on a live control, as its chips pick them (without the question an AI
     voice or a language asks first: a button can't answer it)."""
     ls = mw.livesetups
     if action == "setups":

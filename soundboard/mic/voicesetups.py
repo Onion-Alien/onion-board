@@ -1,5 +1,5 @@
 """Voice setups: what the Voice tab has on (a voice changer voice, an AI voice, a
-language to speak), saved under a name. One click on the Voice tab's My setups row
+language to speak), saved under a name. One click on the Voice tab's My voice combos row
 turns the whole mix on for your mic, and Edit sound → Effects → Voice puts it on a
 sound (ui.voicepicker).
 
@@ -77,7 +77,7 @@ def clean_list(raw) -> list[tuple[str, dict]]:
 
 
 class Store:
-    """The saved setups, read once; every change is written straight away and told to
+    """The saved voice combos, read once; every change is written straight away and told to
     `listeners` (the Voice tab's row and an open sound picker share one Store). A file
     that couldn't be read is never written over this run."""
 

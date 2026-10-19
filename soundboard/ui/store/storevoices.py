@@ -32,13 +32,13 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 def kind_name(kind: str) -> str:
-    return {"fx": _("Voice changer"), "ai": _("AI voice"), "setup": _("Setup")}.get(kind, "")
+    return {"fx": _("Voice changer"), "ai": _("AI voice"), "setup": _("Voice combo")}.get(kind, "")
 
 
 def kind_chips() -> list[tuple[str, str]]:
     """The Voices list's filter chips: (kind, text); "" is all of them."""
     return [("", _("All")), ("fx", _("Voice changer")), ("ai", _("AI voices")),
-            ("setup", _("Setups"))]
+            ("setup", _("Voice combos"))]
 
 
 def meta_line(v: sv.Voice) -> str:
@@ -117,10 +117,10 @@ class VoiceHooks:
             return _("Added “{name}” to your AI voices (Mine).", name=got["name"])
         name = self.last = sv.take_setup(v, setups, ai_store)
         if not name:
-            return _("Couldn't keep that setup (100 setups at most).")
+            return _("Couldn't keep that voice combo (100 at most).")
         if p is not None and v.ai.get("mix"):
             p.ai._resync()   # noqa: SLF001
-        return _("Added “{name}” to My setups.", name=name)
+        return _("Added “{name}” to My voice combos.", name=name)
 
     def shareable(self) -> list[tuple[str, dict]]:
         """Your own voices that can be shared: (what the list shows, the payload)."""
@@ -287,7 +287,7 @@ def open_share(parent: QWidget, install: str, hooks: VoiceHooks, pick: str = "")
     if not items:
         busy.toast(parent, html.escape(_("Make a voice of your own first: Voice tab → "
                                          "Voice changer → Edit voice, or Save what's "
-                                         "on under My setups.")), "warn", 8000)
+                                         "on under My voice combos.")), "warn", 8000)
         return None
     dlg = ShareVoiceDialog(install, items, parent, pick)
     dlg.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)

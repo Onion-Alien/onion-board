@@ -430,6 +430,7 @@ class Config:
     # Lite mode (ui/settings/lite.py): animations, Bun's idle moves and the textures off
     lite_mode: bool = False
     lite_hint_done: bool = False   # a slower PC was told about lite mode once
+    store_seen: bool = False   # the Community tab was opened once: its "New" mark is gone
     # Use less CPU for the voice features (the voice changer card): "on", "off", or
     # "auto" = on while lite mode is (soundboard.voicefx.set_light)
     light_voice: str = "auto"

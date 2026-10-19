@@ -322,7 +322,7 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "store-sort-new", "store-sort-trending", "store-category",
             # the voice changer's Background on, with board sounds in it (features_now)
             "voice-background", "voice-background-sounds",
-            # a category hidden from All (features_now); a My setups share code copied
+            # a category hidden from All (features_now); a My voice combos share code copied
             "hidden-from-all", "setup-code-shared",
             # the control API / a phone remote add-on actually answered a request; the
             # API's chat commands and alerts set up (features_now) and used: a chat

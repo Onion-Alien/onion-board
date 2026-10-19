@@ -248,7 +248,7 @@
   var FX_PRESETS = [["Bass boosted", { bass: 12 }], ["Blown out", { bass: 15, crunch: 0.7 }], ["Concert hall", { reverb: 0.55 }],
     ["Canyon", { echo: 0.6, reverb: 0.2 }], ["Underwater", { muffle: 0.8, reverb: 0.3, bass: 4 }],
     ["Phone call", { bass: -12, treble: -4, muffle: 0.45, crunch: 0.15 }]];
-  var SETUPS = [{ name: "Deep demon", voice: "Demon" }, { name: "Tiny robot", voice: "Robot" }];   // the Voice tab's My setups
+  var SETUPS = [{ name: "Deep demon", voice: "Demon" }, { name: "Tiny robot", voice: "Robot" }];   // the Voice tab's My voice combos
   function liveState() { return { pitch: 0, keep: true, red: false, fx: {}, preset: "", setup: "" }; }
   var LIVE = { sounds: liveState(), radio: liveState(), apps: liveState() };
   function xs(v) { return (+v.toFixed(2)) + "x"; }
@@ -349,7 +349,7 @@
       el.appendChild(h("div", { class: "lhead" }, [h("b", { text: "Live controls" }),
         h("span", { class: "lsub", text: { radio: "The radio", apps: "All programs" }[what] || "All sounds" }), reset]));
       el.appendChild(h("hr"));
-      // My setups: the Voice tab's saved voices, on everything here
+      // My voice combos: the Voice tab's saved voices, on everything here
       var chips = h("div", { class: "lchips" });
       [{ name: "" }].concat(SETUPS).forEach(function (s) {
         chips.appendChild(h("button", { type: "button", class: "chip", "aria-pressed": L.setup === s.name ? "true" : "false", text: s.name || "No voice",
@@ -360,7 +360,7 @@
       });
       chips.appendChild(h("button", { type: "button", class: "chip ghost", onclick: function () { closeLive(); voiceTab = "changer"; go("voice"); } },
         [icon("plus", "s"), "Make one on the Voice tab"]));
-      el.appendChild(h("div", { class: "lsetups" }, [h("b", { text: "My setups" }), chips]));
+      el.appendChild(h("div", { class: "lsetups" }, [h("b", { text: "My voice combos" }), chips]));
       el.appendChild(h("hr"));
       // left: speed & pitch, then Redline; right: the effects
       var left = h("div", { class: "lcol" }), right = h("div", { class: "lcol fx" });
@@ -1445,7 +1445,7 @@
 
   // ------------------------------------------------------------------ Voice
   // The Voice tab (ui/voicepanel.py): Say, its four parts (Voice changer, AI voices,
-  // Languages, Add-ons), My setups over them, and the voice changer's cards in the app's
+  // Languages, Add-ons), My voice combos over them, and the voice changer's cards in the app's
   // groups (ui/voicefxpanel.py VOICE_GROUPS). The voice picked shows in a bar under the
   // cards with Effects (what goes on top of any voice) and Edit voice (the full editor).
   var VGROUPS = [["funny", "Funny", ["Chipmunk", "High voice", "Hothead", "Singing monk", "Underwater", "Drunk", "Choir", "Goblin", "Fairy"]],
@@ -1499,8 +1499,8 @@
         tabs.appendChild(b);
       });
     }
-    function drawSetups() {     // My setups: under the tabs, whichever part is showing
-      setups.replaceChildren(h("b", { text: "My setups" }));
+    function drawSetups() {     // My voice combos: under the tabs, whichever part is showing
+      setups.replaceChildren(h("b", { text: "My voice combos" }));
       SETUPS.forEach(function (s) {
         setups.appendChild(h("button", { type: "button", class: "chip", "aria-pressed": pickedVoice === s.voice ? "true" : "false", title: s.voice + "\nRight-click for more",
           onclick: function () { pickedVoice = pickedVoice === s.voice ? null : s.voice; drawAll(); if (pickedVoice) tryIt("Turning on your “" + s.name + "” setup"); },
