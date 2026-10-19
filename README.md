@@ -167,7 +167,9 @@ It's also Onion Board's *Triggers* tab.
 
 [MIT with the Commons Clause](LICENSE): use it anywhere, monetized streams included, change it and share
 your version for free. Nobody may sell it; if you paid for Onion Board, you were ripped off. The name
-and logo aren't covered, so your own version needs its own name.
+and logo aren't covered, so your own version needs its own name. Forking it?
+[docs/FORKING.md](docs/FORKING.md) lists what to swap for your own (usage counts, the sound store,
+update checks, links, name and logo).
 
 Onion Board comes with no sounds: only play what you have the right to use. It isn't affiliated with
 YouTube, SoundCloud, Myinstants, Discord, VB-Audio or any other service it mentions.
