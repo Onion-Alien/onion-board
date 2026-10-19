@@ -150,6 +150,17 @@ def test_make_ring_replaces_an_old_layout(tmp_path):
     assert not dm.make_ring(tmp_path / "no" / "such" / "dir" / "ring2.bin")
 
 
+def test_make_ring_logs_a_missing_folder_once(tmp_path, caplog):
+    """The folder gone (a broken uninstall): status() asks every few seconds, and each
+    ask logged a whole traceback (hundreds an hour). Once in full, then a short line."""
+    p = tmp_path / "gone" / "ring2.bin"
+    with caplog.at_level("DEBUG", logger=dm.__name__):
+        for _ in range(5):
+            assert not dm.make_ring(p)
+    assert sum(r.exc_info is not None for r in caplog.records) == 1
+    assert len(caplog.records) == 5
+
+
 def test_make_ring_ok_while_a_board_writes(tmp_path):
     """A writing board locks a few bytes of the ring (claim). Checking the file must not
     read over them: a buffered read did, so the board's own ring looked bad (status
