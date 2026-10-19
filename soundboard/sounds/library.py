@@ -631,6 +631,9 @@ class Config:
     enjoy_state: str = ""
     # an observed FFmpeg startup/get failure awaiting a verified working copy
     stats_ffmpeg_failed: bool = False
+    # Settings > Achievements' counts, sets and what's earned (soundboard.core.achievements):
+    # this PC's own, never sent or exported
+    achievements: dict = field(default_factory=dict)
     sounds: list[SoundMeta] = field(default_factory=list)
 
     # set by load() when the settings weren't read cleanly, for the window to tell the

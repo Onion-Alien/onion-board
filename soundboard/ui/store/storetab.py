@@ -18,7 +18,7 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QFileDialog, QGrid
                                QHBoxLayout, QLabel, QLineEdit, QMenu, QPushButton, QScrollArea,
                                QSizePolicy, QStackedWidget, QVBoxLayout, QWidget)
 
-from soundboard.core import errors, usage
+from soundboard.core import achievements, errors, usage
 from soundboard.ui.kit import wheelguard
 from soundboard.sounds import library
 from soundboard.online import net, store
@@ -1180,6 +1180,7 @@ class StoreTab(QWidget):
                                                     error=err)), "error")
         else:
             usage.used("store-voted")
+            achievements.voted(row.sound.id, row.sound.mine)
 
     def report_menu(self, row: SoundRow):
         m = QMenu(self)

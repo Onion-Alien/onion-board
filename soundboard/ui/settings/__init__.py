@@ -26,6 +26,8 @@ class Built:
     inherits it; it has nothing at run time."""
 
     about_version: Any
+    ach_count: Any
+    ach_tiles: Any
     addon_label: Any
     addon_remove: Any
     _addon_titles: Any

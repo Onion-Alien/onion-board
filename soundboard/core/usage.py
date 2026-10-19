@@ -85,7 +85,7 @@ import uuid
 from pathlib import Path
 
 from soundboard import __version__
-from soundboard.core import enjoy
+from soundboard.core import achievements, enjoy
 from soundboard.online import net, netlog
 
 log = logging.getLogger(__name__)
@@ -152,7 +152,7 @@ SPLASH_RARES = ("gold", "ice", "galaxy", "rainbow")
 # Settings' pages (settings.SettingsDialog's page keys, without Show advanced)
 SETTINGS_PAGES = ("audio", "appearance", "hotkeys", "tabs", "general", "about",
                   "overlay", "privacy", "connection", "data", "updates", "help",
-                  "remote")
+                  "remote", "achievements")
 # what else is counted, only ever these names (see the docstring)
 FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-board",
             "voice-changer", "text-to-speech", "hotkeys", "phone-remote", "also-send",
@@ -594,7 +594,9 @@ def addon_tag(module_id: str) -> str:
 
 
 def used(key: str) -> None:
-    """Feature `key` (one of FEATURES) was used, for the next daily count."""
+    """Feature `key` (one of FEATURES) was used, for the next daily count (and for
+    Settings > Achievements, which never sends anything)."""
+    achievements.event(key)
     if key in FEATURES:
         _used.add(key)
 

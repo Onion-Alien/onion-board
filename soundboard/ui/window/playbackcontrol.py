@@ -18,7 +18,7 @@ from shiboken6 import isValid as qt_valid
 from soundboard.sounds import library
 from soundboard.audio import soundfx
 from soundboard.ui.kit import theme
-from soundboard.core import usage
+from soundboard.core import achievements, usage
 from soundboard.audio.engine import SR
 from soundboard.i18n import _
 from soundboard.sounds.library import PRESS_MODE, load_original
@@ -124,6 +124,7 @@ class PlaybackControl(Controller):
         self._last_sid = sid
         if sid != LINK_ID:
             m.plays += 1   # Most played
+            achievements.played()
             if not self._count_save.isActive():
                 self._count_save.start()
         v = mw.engine.play(sid, data, mw.gain_for(m), loop=m.loop,
