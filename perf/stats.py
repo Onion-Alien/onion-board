@@ -217,7 +217,8 @@ def markdown(report: dict, before: dict | None = None) -> str:
                 extra.append("growth per " + m.get("slope_unit", "step") + ": " + ", ".join(
                     f"{k} {v}" for k, v in m["slopes"].items() if v is not None))
             if m.get("stalls_top_ms"):
-                extra.append("longest UI stalls ms " + ", ".join(map(str, m["stalls_top_ms"]))
+                top = m.get("stalls_top_where") or map(str, m["stalls_top_ms"])
+                extra.append("longest UI stalls ms " + ", ".join(top)
                              + f" (over 100 ms: {m.get('stalls_over_100', 0)})")
             for k in ("first_sound_p50_ms", "first_sound_max_ms"):
                 if m.get(k) is not None:

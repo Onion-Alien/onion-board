@@ -306,7 +306,8 @@ class StallMeter:
     """How long the UI thread went without running its event loop: a 4 ms precise timer
     notes the gap between its ticks, and a gap past the tick is a stall (a click, a
     key or a repaint that came in then waited that long). Its own timer events aren't
-    in Counts' timers_per_s."""
+    in Counts' timers_per_s. `label`: the step a scenario is on (Child.step), noted
+    with each stall."""
 
     EVERY_MS = 4
     BIG_MS = (50, 100, 250)
@@ -322,19 +323,23 @@ class StallMeter:
 
     def reset(self):
         self.last = time.perf_counter()
-        self.stalls: list[float] = []   # ms past the tick, each over 16 ms (a frame)
+        self.label = ""
+        self.stalls: list[tuple[float, str]] = []   # ms past the tick (over 16 ms: a
+                                                    # frame), and the step it was in
 
     def _tick(self):
         now = time.perf_counter()
         late = (now - self.last) * 1000 - self.EVERY_MS
         self.last = now
         if late > 16:
-            self.stalls.append(late)
+            self.stalls.append((late, self.label))
 
     def summary(self) -> dict:
-        s = sorted(self.stalls, reverse=True)
+        top = sorted(self.stalls, reverse=True)
+        s = [x for x, _label in top]
         out = {"stall_max_ms": round(s[0]) if s else 0,
                "stalls_top_ms": [round(x) for x in s[:5]],
+               "stalls_top_where": [f"{x:.0f} {label}".strip() for x, label in top[:8]],
                "stall_total_ms": round(sum(s))}
         for b in self.BIG_MS:
             out[f"stalls_over_{b}"] = sum(1 for x in s if x > b)
@@ -469,6 +474,11 @@ class Child:
                 return False
             self.run_for(step)
         return True
+
+    def step(self, label: str):
+        """What the scenario does next, noted with any UI stall it causes (StallMeter)."""
+        if self.meter is not None:
+            self.meter.label = label
 
     def close_dialogs_soon(self, after_ms: int):
         """A modal dialog's exec() is about to block: close it after a while."""
@@ -772,6 +782,7 @@ class Child:
         order = [i for i in range(w.tabs.count()) if w.tabs.isTabVisible(i) and i != 0] + [0]
         for i in order:
             name = TAB_KEYS[i] if i < len(TAB_KEYS) else type(w.tabs.widget(i)).__name__
+            self.step(name)
             t0 = time.perf_counter()
             w.tabs.setCurrentIndex(i)
             t1 = time.perf_counter()
@@ -787,6 +798,7 @@ class Child:
         w = self.w
         took = {}
         for k in range(2):   # Settings is a page in the window: opened, drawn, closed
+            self.step("settings")
             t0 = time.perf_counter()
             w.setctl.open_settings("privacy" if k == 0 else "devices")
             QApplication.processEvents()
@@ -796,6 +808,7 @@ class Child:
             self.run_for(0.3)
         sids = self._sids()
         for k in range(2):   # Edit isn't modal: each one is shown, drawn, then closed
+            self.step("edit")
             t0 = time.perf_counter()
             d = w.editctl.edit(sids[k % len(sids)])
             QApplication.processEvents()
@@ -804,6 +817,7 @@ class Child:
             d.reject()
             self.run_for(0.3)
         # two at once: the second one has no spare to take, so it's built (~250 ms here)
+        self.step("edit_second")
         first = w.editctl.edit(sids[0])
         self.run_for(0.3)
         t0 = time.perf_counter()
@@ -817,14 +831,17 @@ class Child:
         self.run_for(0.5)
         # after a theme change (the spare is made again for the new theme)
         was = w.cfg.theme
+        self.step("theme_switch")
         w.themectl.apply_theme("Light" if was != "Light" else "Dark")
         self.run_for(1.0)
+        self.step("edit_after_theme")
         t0 = time.perf_counter()
         d = w.editctl.edit(sids[0])
         QApplication.processEvents()
         took["edit_after_theme"] = round(time.perf_counter() - t0, 2)
         self.run_for(0.3)
         d.reject()
+        self.step("theme_back")
         w.themectl.apply_theme(was)
         self.run_for(1.0)
         # the spare Edit made again after the switch (themecontrol.SPARE_AFTER_MS): it's
@@ -862,11 +879,13 @@ class Child:
         pads = self._pads()
         heard = []
         for k in range(10):
+            self.step("pad_click")
             fakeaudio.listen()
             self._click(pads[(k * 7) % len(pads)])
             self.run_until(lambda: fakeaudio.heard_ms() is not None, 1.5, 0.002)
             heard.append(fakeaudio.heard_ms())
             self.run_for(0.4)
+            self.step("stop_all")
             self.w.playctl.stop_all()
             self.run_for(0.2)
         got = sorted(h for h in heard if h is not None)
@@ -898,6 +917,7 @@ class Child:
         took: dict[str, list[int]] = {}
 
         def timed(key, fn):
+            self.step(key)
             t0 = time.perf_counter()
             out = fn()
             QApplication.processEvents()
@@ -933,6 +953,7 @@ class Child:
                 if isinstance(tl, QMenu) and tl.isVisible():
                     tl.close()
         pads = self._pads()
+        self.step("pad_menu")
         for k in range(4):
             QTimer.singleShot(0, up)
             t0[0] = time.perf_counter()
@@ -940,6 +961,7 @@ class Child:
             self.run_for(0.2)
 
         def timed(key, fn):
+            self.step(key)
             t = time.perf_counter()
             fn()
             QApplication.processEvents()
@@ -950,14 +972,17 @@ class Child:
             self.run_for(0.3)
             btn.pop.hide()
             self.run_for(0.2)
+        self.step("open_settings")
         dlg = w.setctl.open_settings("audio")
         self.run_for(0.3)
         combos = [c for c in dlg.findChildren(QComboBox) if c.isVisibleTo(dlg) and c.count() > 1]
         for c in combos[:4]:
             timed("dropdown", c.showPopup)
             self.run_for(0.25)
+            self.step("dropdown_hide")
             c.hidePopup()
             self.run_for(0.2)
+        self.step("close_settings")
         w.setctl.close_settings()
         self.run_for(0.3)
         return {"menu_ms": took, "dropdowns": len(combos[:4])}
@@ -1029,6 +1054,7 @@ class Child:
         dragged = []
 
         def drag(sl):
+            self.step(sl.accessibleName() or sl.objectName() or "slider")
             lo, hi, was = sl.minimum(), sl.maximum(), sl.value()
             step = max(1, (hi - lo) // 60)
             sl.setSliderDown(True)
