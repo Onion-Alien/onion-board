@@ -4093,12 +4093,9 @@
   "What you say is said in {language}.": "O que você diz é dito em {language}.",
   "Onion Board closed unexpectedly, so it started again.": "O Onion Board fechou de forma inesperada, então abriu de novo.",
   "<b>Language</b>": "<b>Idioma</b>",
-  "All set! Last thing: make it yours": "Tudo pronto! Última coisa: deixe do seu jeito",
   "Onion Board restarts in {name} when you press Finish.": "O Onion Board reinicia em {name} quando você clicar em Concluir.",
   "Pick a language and a look. Change them any time in <b>Settings</b> → <b>Appearance</b>.": "Escolha um idioma e um visual. Mude quando quiser em <b>Configurações</b> → <b>Aparência</b>.",
-  "Press <b>Next</b> for the last bit: your language and a look.": "Clique em <b>Avançar</b> para a última parte: seu idioma e um visual.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Iniciar o Onion Board quando eu entrar no Windows (discretamente, na bandeja)",
-  "Tell Discord or your game": "Avise o Discord ou seu jogo",
   "{n} more themes in Settings.": "Mais {n} temas em Configurações.",
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Para PCs mais lentos: sem animações, o Bun fica parado e os temas ficam simples. Tudo continua funcionando.",
   "Lite mode": "Modo leve",
@@ -4209,5 +4206,12 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "O Discord voltou do jeito que você fala: supressão de ruído, cancelamento de eco e volume automático ligados de novo.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Resolva problemas ao enviar sons para seu microfone após uma atualização, ou volte o Discord para conversa.",
   "Put Discord back": "Voltar o Discord",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Liga de novo a supressão de ruído, o cancelamento de eco e o volume automático do Discord como estavam antes de você prepará-lo para sons. Para conversar sem o Onion Board: seus sons podem voltar a cortar nas chamadas."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Liga de novo a supressão de ruído, o cancelamento de eco e o volume automático do Discord como estavam antes de você prepará-lo para sons. Para conversar sem o Onion Board: seus sons podem voltar a cortar nas chamadas.",
+  "All set! Now make it yours": "Tudo pronto! Agora deixe do seu jeito",
+  "Discord is open. Your sounds are already in your mic, but Discord's noise filter (on by default) can chop them up. Bun shows you the one setting to change, and checks it for you.": "O Discord está aberto. Seus sons já estão no seu microfone, mas o filtro de ruído do Discord (ligado por padrão) pode picotá-los. O Bun mostra a única configuração que você precisa mudar e confere ela para você.",
+  "Last step: set up Discord?": "Último passo: configurar o Discord?",
+  "Lite mode: no animations, for slower PCs": "Modo leve: sem animações, para PCs mais lentos",
+  "Lite mode: no animations, for slower PCs (suggested for this PC)": "Modo leve: sem animações, para PCs mais lentos (sugerido para este PC)",
+  "No thanks, finish": "Não, obrigado, concluir",
+  "Yes, set up Discord": "Sim, configurar o Discord"
 }

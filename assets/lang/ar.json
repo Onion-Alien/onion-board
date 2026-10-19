@@ -4409,12 +4409,9 @@
   "What you say is said in {language}.": "ما تقوله يُقال بـ{language}.",
   "Onion Board closed unexpectedly, so it started again.": "أُغلق Onion Board بشكل غير متوقع، لذا فُتح من جديد.",
   "<b>Language</b>": "<b>اللغة</b>",
-  "All set! Last thing: make it yours": "كل شيء جاهز! آخر شيء: اجعله على ذوقك",
   "Onion Board restarts in {name} when you press Finish.": "سيُعاد تشغيل Onion Board باللغة {name} عند الضغط على إنهاء.",
   "Pick a language and a look. Change them any time in <b>Settings</b> → <b>Appearance</b>.": "اختر لغة ومظهرًا. يمكنك تغييرهما في أي وقت من <b>الإعدادات</b> ← <b>مظهر</b>.",
-  "Press <b>Next</b> for the last bit: your language and a look.": "اضغط <b>التالي</b> للجزء الأخير: لغتك ومظهرك.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "شغّل Onion Board عند تسجيل الدخول إلى Windows (بهدوء، في الدرج)",
-  "Tell Discord or your game": "أخبر Discord أو لعبتك",
   "{n} more themes in Settings.": "مظاهر أخرى في الإعدادات: {n}",
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "للأجهزة الأبطأ: بلا حركات، يبقى Bun ثابتًا والسمات بسيطة. كل شيء يعمل كما هو.",
   "Lite mode": "الوضع الخفيف",
@@ -4525,5 +4522,12 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "عاد ديسكورد كما تتكلم: قمع الضوضاء وإلغاء الصدى والصوت التلقائي تعمل من جديد.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "أصلح مشاكل إرسال الأصوات إلى الميكروفون بعد التحديث، أو أعد ديسكورد للكلام.",
   "Put Discord back": "أعد ديسكورد",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "يعيد تشغيل قمع الضوضاء وإلغاء الصدى والصوت التلقائي في ديسكورد كما كانت قبل ضبطه للأصوات. للكلام بدون Onion Board: قد تنقطع أصواتك في المكالمات مجددًا."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "يعيد تشغيل قمع الضوضاء وإلغاء الصدى والصوت التلقائي في ديسكورد كما كانت قبل ضبطه للأصوات. للكلام بدون Onion Board: قد تنقطع أصواتك في المكالمات مجددًا.",
+  "All set! Now make it yours": "كل شيء جاهز! الآن اجعله على ذوقك",
+  "Discord is open. Your sounds are already in your mic, but Discord's noise filter (on by default) can chop them up. Bun shows you the one setting to change, and checks it for you.": "Discord مفتوح. أصواتك موجودة في المايك بالفعل، لكن فلتر الضوضاء في Discord (مفعّل افتراضيًا) قد يقطّعها. Bun يريك الإعداد الوحيد الذي تحتاج لتغييره، ويتحقق منه لك.",
+  "Last step: set up Discord?": "الخطوة الأخيرة: ضبط Discord؟",
+  "Lite mode: no animations, for slower PCs": "الوضع الخفيف: بلا حركات، للأجهزة الأبطأ",
+  "Lite mode: no animations, for slower PCs (suggested for this PC)": "الوضع الخفيف: بلا حركات، للأجهزة الأبطأ (مقترح لهذا الجهاز)",
+  "No thanks, finish": "لا شكرًا، إنهاء",
+  "Yes, set up Discord": "نعم، اضبط Discord"
 }

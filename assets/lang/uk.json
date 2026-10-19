@@ -4172,12 +4172,9 @@
   "What you say is said in {language}.": "Те, що ти кажеш, звучить мовою: {language}.",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board неочікувано закрився, тому запустився знову.",
   "<b>Language</b>": "<b>Мова</b>",
-  "All set! Last thing: make it yours": "Усе готово! Останнє: зроби під себе",
   "Onion Board restarts in {name} when you press Finish.": "Onion Board перезапуститься мовою {name}, коли ти натиснеш Фініш.",
   "Pick a language and a look. Change them any time in <b>Settings</b> → <b>Appearance</b>.": "Обери мову й вигляд. Змінити їх можна будь-коли: <b>Налаштування</b> → <b>Зовнішній вигляд</b>.",
-  "Press <b>Next</b> for the last bit: your language and a look.": "Натисни <b>Далі</b> для останнього кроку: мова й вигляд.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Запускати Onion Board під час входу в Windows (тихо, у треї)",
-  "Tell Discord or your game": "Повідом Discord або гру",
   "{n} more themes in Settings.": "Ще теми в налаштуваннях: {n}",
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Для повільніших ПК: без анімацій, Bun стоїть на місці, а теми прості. Усе працює як і раніше.",
   "Lite mode": "Полегшений режим",
@@ -4288,5 +4285,12 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord знову як для розмови: шумозаглушення, придушення відлуння й автоматична гучність знову ввімкнені.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Виправ проблеми з передаванням звуків у мікрофон після оновлення або поверни Discord для розмови.",
   "Put Discord back": "Повернути Discord",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Знову вмикає шумозаглушення, придушення відлуння й автоматичну гучність у Discord, як було до налаштування для звуків. Для розмови без Onion Board: звуки в дзвінках знову можуть обриватися."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Знову вмикає шумозаглушення, придушення відлуння й автоматичну гучність у Discord, як було до налаштування для звуків. Для розмови без Onion Board: звуки в дзвінках знову можуть обриватися.",
+  "All set! Now make it yours": "Усе готово! Тепер зроби під себе",
+  "Discord is open. Your sounds are already in your mic, but Discord's noise filter (on by default) can chop them up. Bun shows you the one setting to change, and checks it for you.": "Discord відкрито. Твої звуки вже в мікрофоні, але шумозаглушення Discord (увімкнене за замовчуванням) може їх обрізати. Bun покаже єдине налаштування, яке треба змінити, і сам його перевірить.",
+  "Last step: set up Discord?": "Останній крок: налаштувати Discord?",
+  "Lite mode: no animations, for slower PCs": "Полегшений режим: без анімацій, для слабших ПК",
+  "Lite mode: no animations, for slower PCs (suggested for this PC)": "Полегшений режим: без анімацій, для слабших ПК (радимо для цього ПК)",
+  "No thanks, finish": "Ні, дякую, готово",
+  "Yes, set up Discord": "Так, налаштувати Discord"
 }

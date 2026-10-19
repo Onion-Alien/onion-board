@@ -4093,12 +4093,9 @@
   "What you say is said in {language}.": "Ang sinasabi mo ay sinasabi sa {language}.",
   "Onion Board closed unexpectedly, so it started again.": "Hindi inaasahang nagsara ang Onion Board, kaya nagsimula itong muli.",
   "<b>Language</b>": "<b>Wika</b>",
-  "All set! Last thing: make it yours": "Ayos na! Huling bagay: gawin mong sa'yo",
   "Onion Board restarts in {name} when you press Finish.": "Magre-restart ang Onion Board sa {name} pag pinindot mo ang Tapusin.",
   "Pick a language and a look. Change them any time in <b>Settings</b> → <b>Appearance</b>.": "Pumili ng wika at itsura. Palitan kahit kailan sa <b>Settings</b> → <b>Itsura</b>.",
-  "Press <b>Next</b> for the last bit: your language and a look.": "Pindutin ang <b>Susunod</b> para sa huli: wika at itsura mo.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Simulan ang Onion Board pag nag-sign in ako sa Windows (tahimik, sa tray)",
-  "Tell Discord or your game": "Sabihan ang Discord o game mo",
   "{n} more themes in Settings.": "{n} pang theme sa Settings.",
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Para sa mas mabagal na PC: walang animation, hindi gumagalaw si Bun at simple ang mga theme. Gumagana pa rin ang lahat.",
   "Lite mode": "Lite mode",
@@ -4209,5 +4206,12 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Balik na ang Discord sa paraan ng pagsasalita mo: naka-on ulit ang noise suppression, echo cancellation at awtomatikong volume.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Ayusin ang mga problema sa pagpapadala ng tunog sa mic mo pagkatapos ng update, o ibalik ang Discord para sa pag-uusap.",
   "Put Discord back": "Ibalik ang Discord",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Ibinabalik ang noise suppression, echo cancellation at awtomatikong volume ng Discord gaya ng dati bago mo ito i-set up para sa mga sound. Para sa pag-uusap nang walang Onion Board: puwedeng maputol ulit ang mga sound mo sa tawag."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Ibinabalik ang noise suppression, echo cancellation at awtomatikong volume ng Discord gaya ng dati bago mo ito i-set up para sa mga sound. Para sa pag-uusap nang walang Onion Board: puwedeng maputol ulit ang mga sound mo sa tawag.",
+  "All set! Now make it yours": "Ayos na! Ngayon, gawin mong sa'yo",
+  "Discord is open. Your sounds are already in your mic, but Discord's noise filter (on by default) can chop them up. Bun shows you the one setting to change, and checks it for you.": "Bukas ang Discord. Nasa mic mo na ang mga sound mo, pero puwedeng putul-putulin ang mga ito ng noise filter ng Discord (naka-on bilang default). Ipapakita ni Bun ang iisang setting na kailangang palitan, at titingnan niya ito para sa'yo.",
+  "Last step: set up Discord?": "Huling hakbang: i-set up ang Discord?",
+  "Lite mode: no animations, for slower PCs": "Lite mode: walang animation, para sa mas mabagal na PC",
+  "Lite mode: no animations, for slower PCs (suggested for this PC)": "Lite mode: walang animation, para sa mas mabagal na PC (inirerekomenda para sa PC na ito)",
+  "No thanks, finish": "Hindi na, tapusin",
+  "Yes, set up Discord": "Oo, i-set up ang Discord"
 }

@@ -4014,12 +4014,9 @@
   "What you say is said in {language}.": "말한 내용이 {language}(으)로 나갑니다.",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board가 예기치 않게 종료되어 다시 시작했습니다.",
   "<b>Language</b>": "<b>언어</b>",
-  "All set! Last thing: make it yours": "준비 완료! 마지막: 나만의 스타일로",
   "Onion Board restarts in {name} when you press Finish.": "마침을 누르면 Onion Board가 {name}(으)로 다시 시작됩니다.",
   "Pick a language and a look. Change them any time in <b>Settings</b> → <b>Appearance</b>.": "언어와 모습을 고르세요. <b>설정</b> → <b>모습</b>에서 언제든 바꿀 수 있어요.",
-  "Press <b>Next</b> for the last bit: your language and a look.": "<b>다음</b>을 눌러 마지막 단계로: 언어와 모습.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Windows에 로그인하면 Onion Board 시작 (조용히, 트레이에서)",
-  "Tell Discord or your game": "Discord 또는 게임에 알리기",
   "{n} more themes in Settings.": "설정에 테마가 {n}개 더 있어요.",
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "느린 PC용: 애니메이션 없이 Bun은 가만히 있고 테마는 단순해져요. 기능은 모두 그대로예요.",
   "Lite mode": "라이트 모드",
@@ -4130,5 +4127,12 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord가 평소 말하던 대로 돌아왔어요. 노이즈 억제, 에코 제거, 자동 볼륨이 다시 켜졌어요.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "업데이트 후 마이크로 소리가 전송되지 않는 문제를 해결하거나 Discord를 대화용으로 되돌리세요.",
   "Put Discord back": "Discord 되돌리기",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Discord의 노이즈 억제, 에코 제거, 자동 볼륨을 사운드용으로 설정하기 전처럼 다시 켜요. Onion Board 없이 대화할 때용이에요. 통화에서 사운드가 다시 끊길 수 있어요."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Discord의 노이즈 억제, 에코 제거, 자동 볼륨을 사운드용으로 설정하기 전처럼 다시 켜요. Onion Board 없이 대화할 때용이에요. 통화에서 사운드가 다시 끊길 수 있어요.",
+  "All set! Now make it yours": "준비 완료! 이제 나만의 스타일로",
+  "Discord is open. Your sounds are already in your mic, but Discord's noise filter (on by default) can chop them up. Bun shows you the one setting to change, and checks it for you.": "Discord가 열려 있어요. 사운드는 이미 마이크에 들어가 있지만, Discord의 소음 필터(기본으로 켜짐)가 사운드를 끊을 수 있어요. Bun이 바꿔야 할 설정 하나를 보여 주고 대신 확인해 줘요.",
+  "Last step: set up Discord?": "마지막 단계: Discord를 설정할까요?",
+  "Lite mode: no animations, for slower PCs": "라이트 모드: 애니메이션 없음, 느린 PC용",
+  "Lite mode: no animations, for slower PCs (suggested for this PC)": "라이트 모드: 애니메이션 없음, 느린 PC용 (이 PC에 추천)",
+  "No thanks, finish": "괜찮아요, 마치기",
+  "Yes, set up Discord": "네, Discord 설정하기"
 }
