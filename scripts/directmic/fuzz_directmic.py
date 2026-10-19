@@ -1,8 +1,9 @@
-"""Fuzz the mic effect: run native/directmic/fuzzhost.cpp against obmic_fuzz.dll (both
-built by `scripts/build_directmic.py --fuzz`) on a few workers, each with its own seed
-and folder, and sum up. Exit 0 = no crash, hang, caught fault or bad sample.
+"""Fuzz the mic effect: run native/directmic/fuzzhost.cpp against obmic_fuzz.dll
+(both built by `scripts/directmic/build_directmic.py --fuzz`) on a few workers, each
+with its own seed and folder, and sum up. Exit 0 = no crash, hang, caught fault or bad sample.
 
-    .venv\\Scripts\\python scripts\\fuzz_directmic.py [seconds=120] [workers=2] [seed=1] [--low]
+    .venv\\Scripts\\python scripts\\directmic\\fuzz_directmic.py \
+        [seconds=120] [workers=2] [seed=1] [--low]
 
 --low runs the workers at below-normal priority (for a PC that's busy with a game).
 A finding prints its case seed: `fuzzhost <dll> <dir> --replay <seed>` runs that case
@@ -17,7 +18,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 BUILD = ROOT / "build" / "directmic"
 HOST = BUILD / "fuzzhost.exe"
 DLL = BUILD / "obmic_fuzz.dll"
@@ -52,7 +53,7 @@ def main(argv: list[str]) -> int:
     workers = int(args[1]) if len(args) > 1 else 2
     seed = int(args[2]) if len(args) > 2 else 1
     if not (HOST.is_file() and DLL.is_file()):
-        print("build it first: scripts/build_directmic.py --fuzz", file=sys.stderr)
+        print("build it first: scripts/directmic/build_directmic.py --fuzz", file=sys.stderr)
         return 2
     flags = BELOW_NORMAL if low and sys.platform == "win32" else 0
     with tempfile.TemporaryDirectory(prefix="obfuzz-") as tmp:

@@ -2,9 +2,9 @@
 // files at the effect and drives it the way the audio engine does, many thousands of
 // blocks a second, checking that it never crashes, hangs, faults (even a fault its own
 // guard catches counts as a finding here) or lets anything but the mic, or sound in
-// range, out. Built with the effect by `scripts/build_directmic.py --fuzz`, which also
+// range, out. Built with the effect by `scripts/directmic/build_directmic.py --fuzz`, which also
 // builds obmic_fuzz.dll: the effect with sanitizer traps (any undefined behaviour is a
-// fault) and a test switch for --selftest. scripts/fuzz_directmic.py runs it.
+// fault) and a test switch for --selftest. scripts/directmic/fuzz_directmic.py runs it.
 //
 //   fuzzhost <obmic_fuzz.dll> <workdir> <seconds> <seed>      fuzz; exit 0 = clean
 //   fuzzhost <obmic_fuzz.dll> <workdir> --selftest            the guard puts the mic back

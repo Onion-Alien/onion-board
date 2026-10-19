@@ -2,7 +2,7 @@
 with MinGW-w64's g++ (no Visual Studio needed). `--testhost` also builds testhost.exe,
 which loads the DLL like Windows' audio engine does (tests/test_directmic.py runs it).
 `--fuzz` also builds obmic_fuzz.dll (sanitizer traps on, a test switch for the guard)
-and fuzzhost.exe, which scripts/fuzz_directmic.py runs.
+and fuzzhost.exe, which scripts/directmic/fuzz_directmic.py runs.
 
 g++ is found on PATH, or set MINGW_GXX to its full path. The DLL links everything
 statically, so it needs only DLLs every Windows 10/11 PC has.
@@ -21,7 +21,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "native" / "directmic"
 OUT = ROOT / "build" / "directmic"
 # the resource strings: the same names the app's own OnionBoard.exe carries

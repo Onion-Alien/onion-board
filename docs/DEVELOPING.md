@@ -21,7 +21,7 @@ winget install JRSoftware.InnoSetup    # for OnionBoardSetup.exe
 ```
 
 *Straight into my mic* runs from source too once the effect is built:
-`.venv\Scripts\python scripts\build_directmic.py` writes `build\directmic\obmic.dll`
+`.venv\Scripts\python scripts\directmic\build_directmic.py` writes `build\directmic\obmic.dll`
 (g++ on `PATH`, winget's WinLibs folder, or `MINGW_GXX`); `--testhost` also builds
 `testhost.exe` for the tests.
 
@@ -89,10 +89,10 @@ own. CI's `mic-effect` job runs the first three on a PR that touches the effect:
 
 | Command | What it checks |
 |---|---|
-| `scripts\build_directmic.py --testhost`, then `pytest tests\test_directmic.py` | the real DLL in `testhost.exe`, loaded the way Windows does; never a real mic or the registry (the DLL tests are skipped until it's built) |
-| `scripts\check_directmic.py` | the C++ without running it: g++ warnings as errors, GCC's static analyzer, cppcheck (WinLibs ships it). Run it before pushing C++ changes |
-| `scripts\build_directmic.py --fuzz`, then `scripts\fuzz_directmic.py [seconds] [workers]` | `fuzzhost.exe` (sanitizer traps on) throws hostile and half-written ring files at the effect; `fuzzhost --lead` replays a late board block by block and checks the effect's lead grows just enough and comes back |
-| `scripts\sim_directmic.py` | the admin install / uninstall against a fake registry, killed at every write (and the mic helper at every step): the mic must always end up as it started. **Run it after changing the install / uninstall or the ring layout** |
+| `scripts\directmic\build_directmic.py --testhost`, then `pytest tests\test_directmic.py` | the real DLL in `testhost.exe`, loaded the way Windows does; never a real mic or the registry (the DLL tests are skipped until it's built) |
+| `scripts\directmic\check_directmic.py` | the C++ without running it: g++ warnings as errors, GCC's static analyzer, cppcheck (WinLibs ships it). Run it before pushing C++ changes |
+| `scripts\directmic\build_directmic.py --fuzz`, then `scripts\directmic\fuzz_directmic.py [seconds] [workers]` | `fuzzhost.exe` (sanitizer traps on) throws hostile and half-written ring files at the effect; `fuzzhost --lead` replays a late board block by block and checks the effect's lead grows just enough and comes back |
+| `scripts\directmic\sim_directmic.py` | the admin install / uninstall against a fake registry, killed at every write (and the mic helper at every step): the mic must always end up as it started. **Run it after changing the install / uninstall or the ring layout** |
 
 **Not on Windows?** The suite also runs on Linux and macOS: `tests/offwindows.py`
 stands in for Windows' registry (every key missing) and DLLs (every call fails), so the
@@ -213,7 +213,7 @@ programs, some of them malware; that build is then `-Clean`. Without gcc this st
 warns and the build falls back to the stock bootloader, so a dev build still works —
 install gcc for a clean release build),
 `scripts\version_info.py` (the .exe's version resource),
-`scripts\build_directmic.py` (the mic effect; the build stops
+`scripts\directmic\build_directmic.py` (the mic effect; the build stops
 if g++ is missing), `scripts\fetch_qjs.py` (QuickJS for YouTube, bundled in
 `_internal\qjs\`), `scripts\build_michelper.py` (the mic helper `obmichelper.exe`,
 a `--console` build whose Python archive sits beside the .exe rather than appended to
