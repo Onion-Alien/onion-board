@@ -412,11 +412,15 @@ class ImportControl(Controller):
         self._import_total = 0
         busy.set_busy(mw.btn_add, False)
         mw.triggers.import_done()   # a trigger's sound that failed to import
+        boards = list(self._boards)
         self._drop_empty_boards()
         if not n and not skipped:
             mw.toast(_("Nothing new to add"), key="import")
             return
         text, kind = importreport.summary(n, skipped)
+        if len(boards) == 1 and not skipped:   # another soundboard's: say where they went
+            text = _("✓ Added {count} to {name}", count=ngettext("{n} sound", "{n} sounds", n),
+                     name=html.escape(boards[0]))
         if skipped:
             usage.used("import-skipped")
             action = (_("See why"), lambda: self._show_skipped(skipped))

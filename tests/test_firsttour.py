@@ -107,6 +107,18 @@ def test_one_card_for_every_step(window):
     assert window.findChildren(coach.Card) == [card]
 
 
+def test_the_card_follows_a_resize_at_once(window, qapp):
+    """Made narrow, the card moves into the window straight away: it used to wait for
+    the next tick on the old size's spot, off the right edge of a 440 px window."""
+    tour = firsttour.start(window)
+    tour.timer.stop()   # (only the resize moves it)
+    for size in [(560, 640), (440, 700), (1700, 1000), (440, 700)]:
+        window.resize(*size)
+        qapp.processEvents()
+        g = tour.card.geometry()
+        assert window.rect().contains(g), (size, g)
+
+
 def test_clicks_outside_do_nothing(window, qapp):
     """Spam-clicking the dimmed window doesn't get rid of it or move it on."""
     tour = firsttour.start(window)

@@ -212,11 +212,16 @@ def test_a_board_gets_its_own_category_shown_from_the_start(
             at_first.append((w.cfg.category, w.catctl.cat_tabs.tabText(
                 w.catctl.cat_tabs.currentIndex())))
         real(meta, data, err)
+    toasts = []
+    real_toast = w.toast
+    monkeypatch.setattr(w, "toast", lambda text, *a, **k: (toasts.append(text),
+                                                         real_toast(text, *a, **k))[1])
     w.bridge.imported.disconnect()
     w.bridge.imported.connect(first)
     w.impctl.import_other(soundpad.SOURCE)
     assert process_events(qapp, lambda: not w.impctl._pending_imports and len(w.cfg.sounds) == 5)
     assert at_first == [("Soundpad", "Soundpad")]
+    assert "✓ Added 3 sounds to Soundpad" in toasts   # the end says where they went
     new = w.cfg.sounds[2:]
     assert all("Soundpad" in m.tags and "Old stuff" not in m.tags for m in new)
     assert w.cfg.category == "Soundpad" and not w.impctl._boards
