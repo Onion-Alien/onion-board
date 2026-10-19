@@ -115,7 +115,7 @@ if ($LASTEXITCODE -ne 0) { throw "PyInstaller failed" }
 if ($LASTEXITCODE -ne 0) { throw "vc_runtime.py failed" }
 # ...which can swap a runtime DLL in the bundled mic helper too: list its files again,
 # as shipped (soundboard\mic\michelper.py install_helper refuses a build that doesn't match)
-& $py -c "import sys; from pathlib import Path; sys.path.insert(0, '.'); from soundboard import michelper; michelper.write_manifest(Path(r'dist\OnionBoard\_internal\michelper'))"
+& $py -c "import sys; from pathlib import Path; sys.path.insert(0, '.'); from soundboard.mic import michelper; michelper.write_manifest(Path(r'dist\OnionBoard\_internal\michelper'))"
 if ($LASTEXITCODE -ne 0) { throw "listing the mic helper's files failed" }
 
 # PyInstaller ships all of Qt (QML, 3D, Charts, dev tools, 186 translations...).

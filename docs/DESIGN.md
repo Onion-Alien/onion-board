@@ -201,7 +201,7 @@ reviews their lifecycle.
 from PySide6.QtWidgets import QDialog, QHBoxLayout, QLabel, QPushButton, QVBoxLayout
 
 from soundboard.i18n import _
-from soundboard.ui import fit, panel
+from soundboard.ui.kit import fit, panel
 
 
 class RenameDialog(QDialog):
