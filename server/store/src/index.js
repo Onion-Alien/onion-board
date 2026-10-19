@@ -106,6 +106,11 @@ async function route(req, env) {
       "content-security-policy": "default-src 'self'; style-src 'unsafe-inline'; " +
         "script-src 'unsafe-inline'; media-src 'self' blob:; frame-ancestors 'none'",
       "x-frame-options": "DENY", "referrer-policy": "no-referrer", "cache-control": "no-store" } });
+  // checked before any database read, so even refused calls can't use up the free plan's
+  // daily reads: /admin calls (and guesses at its token) as many as list pages, every
+  // change (uploads, links, shares, votes, reports) fewer
+  if (p.startsWith("/v1/admin/")) await throttle(req, env, "admin");
+  else if (m === "POST") await throttle(req, env, "write", env.WRITES);
   if (p.startsWith("/v1/voices")) {
     const r = await voicesRoute(req, env, url, p, VOICE_TOOLS);
     if (r) return r;
@@ -185,11 +190,12 @@ async function ipHash(req, env, bits = 64) {
 }
 
 // List pages and files: 90 a minute per address (Cloudflare's rate limiter, the
-// READS binding in wrangler.toml). Each one reads D1 rows or a KV file, and the free plan's
-// daily allowance of those is all the store has: without this one loop could use it up.
-async function throttle(req, env, what) {
-  if (!env.READS) return;   // (no binding: the tests, a local run)
-  const { success } = await env.READS.limit({ key: `${what}:${await ipHash(req, env)}` });
+// READS binding in wrangler.toml), /admin calls too; changes: 30 a minute (WRITES). Each one
+// reads D1 rows or a KV file, and the free plan's daily allowance of those is all the store
+// has: without this one loop could use it up.
+async function throttle(req, env, what, limiter = env.READS) {
+  if (!limiter) return;   // (no binding: the tests, a local run)
+  const { success } = await limiter.limit({ key: `${what}:${await ipHash(req, env)}` });
   if (!success) fail("slow down", 429);
 }
 
@@ -256,9 +262,9 @@ function cleanName(s) {
 }
 
 // a shared name or tags are shown to everyone: a link or a blocked word (the owner's
-// CHAT_BLOCK list, words.js) in them is refused
+// BLOCKED_WORDS list, words.js) in them is refused
 function checkWords(env, ...texts) {
-  const blocked = String(env.CHAT_BLOCK || "").split(",");
+  const blocked = String(env.BLOCKED_WORDS || "").split(",");
   for (const t of texts) if (t && refuse(t.slice(0, 200), blocked)) fail("not allowed", 422);
 }
 
