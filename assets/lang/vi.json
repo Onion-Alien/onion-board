@@ -4116,5 +4116,6 @@
   "What changed in {name}": "Những gì đã đổi trong {name}",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Khi Onion Board đóng, nó bật lại giảm tiếng ồn, khử tiếng vọng và âm lượng tự động của Discord để nói chuyện. Không muốn vậy? Bỏ chọn <b>Đưa Discord về chế độ nói chuyện khi đóng</b> ở thẻ Thiết lập.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Giờ âm thanh của bạn đến tai bạn bè rõ ràng, không bị nghẹt hay đứt quãng.",
-  "{name} is set up for your sounds": "{name} đã được thiết lập cho âm thanh của bạn"
+  "{name} is set up for your sounds": "{name} đã được thiết lập cho âm thanh của bạn",
+  "What's popular right now": "Đang thịnh hành lúc này"
 }

@@ -4116,5 +4116,6 @@
   "What changed in {name}": "สิ่งที่เปลี่ยนใน {name}",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "เมื่อ Onion Board ปิด จะเปิดการลดเสียงรบกวน การตัดเสียงสะท้อน และระดับเสียงอัตโนมัติของ Discord กลับสำหรับการพูด ไม่ต้องการแบบนั้น? เอาเครื่องหมายออกจาก <b>คืนค่า Discord สำหรับการพูดเมื่อปิด</b> ในแท็บเซ็ตอัป",
   "Your sounds reach your friends clean now, not muffled or cut off.": "ตอนนี้เสียงของคุณไปถึงเพื่อนอย่างชัดเจน ไม่อู้อี้หรือขาดหาย",
-  "{name} is set up for your sounds": "{name} ตั้งค่าสำหรับเสียงของคุณแล้ว"
+  "{name} is set up for your sounds": "{name} ตั้งค่าสำหรับเสียงของคุณแล้ว",
+  "What's popular right now": "สิ่งที่กำลังฮิตตอนนี้"
 }

@@ -4274,5 +4274,6 @@
   "What changed in {name}": "Ce s-a schimbat în {name}",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Când Onion Board se închide, repornește suprimarea zgomotului, anularea ecoului și volumul automat din Discord pentru vorbit. Nu vrei asta? Debifează <b>Readu Discord pe vorbit la închidere</b> în fila Configurare.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Sunetele tale ajung acum curate la prieteni, nu înfundate sau tăiate.",
-  "{name} is set up for your sounds": "{name} e configurat pentru sunetele tale"
+  "{name} is set up for your sounds": "{name} e configurat pentru sunetele tale",
+  "What's popular right now": "Ce e popular acum"
 }

@@ -388,9 +388,11 @@ class StoreTab(QWidget):
         hh.setContentsMargins(0, 0, LIST_GAP, 0)
         hh.setSpacing(4)
         hh.addStretch(1)
-        self._sort = "top"
+        self._sort = "trending"   # the default: what people are adding now
         self.sort_btns: dict[str, QPushButton] = {}
-        for key, text, tip in (("top", _("Votes"), _("The best voted first")),
+        for key, text, tip in (("trending", _("Trending"),
+                                _("What's popular right now")),
+                               ("top", _("Votes"), _("The best voted first")),
                                ("new", _("Added"), _("The newest first"))):
             b = QPushButton(text)
             hh.addWidget(b)
@@ -400,7 +402,7 @@ class StoreTab(QWidget):
             b.setToolTip(tip)
             b.setCursor(Qt.CursorShape.PointingHandCursor)
             b.clicked.connect(lambda _c=False, k=key: (
-                k != "top" and usage.used(f"store-sort-{k}"), self.set_sort(k)))
+                k != "trending" and usage.used(f"store-sort-{k}"), self.set_sort(k)))
             self.sort_btns[key] = b
         self._sort_look()
         self.table_head.hide()
@@ -672,8 +674,9 @@ class StoreTab(QWidget):
         return self._sort
 
     def set_sort(self, key: str):
-        """Votes (the best voted first, "top") or Added (the newest first, "new")."""
-        self._sort = "new" if key == "new" else "top"
+        """Trending (popular right now, the default), Votes (the best voted first, "top")
+        or Added (the newest first, "new")."""
+        self._sort = key if key in ("top", "new") else "trending"
         self._sort_look()
         self.reload()
 

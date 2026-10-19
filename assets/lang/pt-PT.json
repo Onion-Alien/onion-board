@@ -4195,5 +4195,6 @@
   "What changed in {name}": "O que mudou no {name}",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Quando o Onion Board fecha, volta a ligar a supressão de ruído, o cancelamento de eco e o volume automático do Discord para conversa. Não queres isso? Desmarca <b>Repor o Discord para conversa ao fechar</b> no separador Configurar.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Os teus sons chegam agora limpos aos teus amigos, sem ficarem abafados ou cortados.",
-  "{name} is set up for your sounds": "{name} está pronto para os teus sons"
+  "{name} is set up for your sounds": "{name} está pronto para os teus sons",
+  "What's popular right now": "O que está popular agora"
 }

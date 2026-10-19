@@ -4116,5 +4116,6 @@
   "What changed in {name}": "Yang berubah di {name}",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Saat Onion Board ditutup, peredam bising, pembatalan gema, dan volume otomatis Discord dinyalakan lagi untuk bicara. Tidak mau? Hapus centang <b>Kembalikan Discord untuk bicara saat ditutup</b> di tab Penyiapan.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Suaramu sekarang sampai ke teman-temanmu dengan jernih, tidak teredam atau terputus.",
-  "{name} is set up for your sounds": "{name} sudah siap untuk suaramu"
+  "{name} is set up for your sounds": "{name} sudah siap untuk suaramu",
+  "What's popular right now": "Yang lagi populer sekarang"
 }

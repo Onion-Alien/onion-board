@@ -4195,5 +4195,6 @@
   "What changed in {name}": "{name} içinde ne değişti",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Onion Board kapanınca Discord'un gürültü bastırma, yankı engelleme ve otomatik ses seviyesini konuşma için yeniden açar. İstemiyor musun? Kurulum sekmesinde <b>Kapanınca Discord'u konuşmaya geri al</b> işaretini kaldır.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Seslerin artık arkadaşlarına boğuk ya da kesik değil, temiz ulaşıyor.",
-  "{name} is set up for your sounds": "{name} seslerin için ayarlandı"
+  "{name} is set up for your sounds": "{name} seslerin için ayarlandı",
+  "What's popular right now": "Şu an popüler olanlar"
 }

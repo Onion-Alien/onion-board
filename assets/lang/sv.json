@@ -4195,5 +4195,6 @@
   "What changed in {name}": "Det här ändrades i {name}",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "När Onion Board stängs slår det på Discords brusreducering, ekoeliminering och automatiska volym igen för prat. Vill du inte det? Avmarkera <b>Ställ tillbaka Discord för prat vid stängning</b> på fliken Konfiguration.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Dina ljud når nu fram rena till dina vänner, inte dova eller avhuggna.",
-  "{name} is set up for your sounds": "{name} är inställt för dina ljud"
+  "{name} is set up for your sounds": "{name} är inställt för dina ljud",
+  "What's popular right now": "Det som är populärt just nu"
 }

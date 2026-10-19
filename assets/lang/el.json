@@ -4195,5 +4195,6 @@
   "What changed in {name}": "Τι άλλαξε στο {name}",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Όταν κλείνει το Onion Board, ξανανοίγει την καταστολή θορύβου, την ακύρωση ηχούς και την αυτόματη ένταση του Discord για ομιλία. Δεν το θέλεις; Βγάλε το τικ από το <b>Επαναφορά του Discord για ομιλία στο κλείσιμο</b> στην καρτέλα Διαμόρφωση.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Οι ήχοι σου φτάνουν τώρα καθαροί στους φίλους σου, όχι πνιχτοί ή κομμένοι.",
-  "{name} is set up for your sounds": "Το {name} είναι ρυθμισμένο για τους ήχους σου"
+  "{name} is set up for your sounds": "Το {name} είναι ρυθμισμένο για τους ήχους σου",
+  "What's popular right now": "Τι είναι δημοφιλές τώρα"
 }

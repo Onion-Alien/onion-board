@@ -4116,5 +4116,6 @@
   "What changed in {name}": "{name} 改了哪些設定",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "關閉 Onion Board 時，它會把 Discord 的噪音抑制、回音消除和自動音量重新打開，方便聊天。不想這樣？在設置分頁取消勾選<b>關閉時把 Discord 恢復成聊天設定</b>。",
   "Your sounds reach your friends clean now, not muffled or cut off.": "你的聲音現在能清楚地傳給朋友，不再悶悶的或斷斷續續。",
-  "{name} is set up for your sounds": "{name} 已為你的聲音設定好"
+  "{name} is set up for your sounds": "{name} 已為你的聲音設定好",
+  "What's popular right now": "現在流行的"
 }

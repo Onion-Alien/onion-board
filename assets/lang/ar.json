@@ -4511,5 +4511,6 @@
   "What changed in {name}": "ما الذي تغيّر في {name}",
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "عند إغلاق Onion Board، يعيد تشغيل قمع الضوضاء وإلغاء الصدى والصوت التلقائي في ديسكورد للكلام. لا تريد ذلك؟ ألغِ تحديد <b>أعد ديسكورد للكلام عند الإغلاق</b> في تبويب التهيئة.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "تصل أصواتك إلى أصدقائك نقية الآن، بلا كتم أو تقطيع.",
-  "{name} is set up for your sounds": "{name} جاهز لأصواتك"
+  "{name} is set up for your sounds": "{name} جاهز لأصواتك",
+  "What's popular right now": "الرائج الآن"
 }
