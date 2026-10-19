@@ -843,21 +843,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "Забудьте про поточний список (і збережену історію, якщо вона зберігається)",
   "Forgets Apps tab volumes and hidden programs.": "Забуває томи вкладки «Програми» та приховані програми.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Забуває мікрофон, навушники, куди надсилаються ваші звуки та вихід потоку; швидке налаштування запускається знову.",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "Знайдено звук <b>{n}</b> у {name} із {categories} і {hotkeys} .",
-    "Знайдено <b>{n}</b> звуків у {name} з {categories} і {hotkeys} .",
-    "Знайдено <b>{n}</b> звуків у {name} з {categories} і {hotkeys} ."
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "Знайдено <b>{n}</b> звук у {name} з {what} .",
-    "Знайдено <b>{n}</b> звуків у {name} з {what} .",
-    "Знайдено <b>{n}</b> звуків у {name} з {what} ."
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "Знайдено <b>{n}</b> звук у {name} .",
-    "Знайдено <b>{n}</b> звуків у {name} .",
-    "Знайдено <b>{n}</b> звуків у {name} ."
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Безкоштовні доповнення від GitHub. Видалення або перевстановлення одного з них збереже тригери та спарені телефони.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Безкоштовно, без реклами та облікового запису. Зроблено OnionAlien. Ліцензія Массачусетського технологічного інституту із застереженням Commons: використовуйте її для чого завгодно, поділіться нею безкоштовно, ніколи не продавайте.",
   "Frequencies": "Частоти",
@@ -1259,7 +1244,6 @@
   "Theme, audio, voice, overlay and privacy options.": "Параметри теми, аудіо, голосу, накладання та конфіденційності.",
   "Then Ctrl+click picks a pad without playing it": "Потім Ctrl+клацання вибирає пэд без відтворення",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Вони вважають музику фоновим шумом і обрізають ваші звуки. Onion Board вже очищає ваш голос.",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Вони скопійовані в Onion Board; {name} зберігає своє. Ті, які вже тут, пропускаються, а гаряча клавіша, яку тут уже використовує, не працює.",
   "This desktop has no system tray, so closing the window quits.": "Цей робочий стіл не має системного лотка, тому закриття вікна припиняє роботу.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Це цибулева дошка {version} . Якщо прапорець позначено, він кожні кілька годин запитує GitHub, чи вийшла новіша версія, і повідомляє вас (з банером, якщо це важливе виправлення). Ця копія запускається з джерела, тому вона лише повідомляє вам: оновіть її за допомогою git pull.",
   "Through a proxy": "Через проксі",
@@ -1481,11 +1465,6 @@
     "{n} заблоковано",
     "{n} заблоковано"
   ],
-  "{n} category": [
-    "{n} категорія",
-    "{n} категорій",
-    "{n} категорій"
-  ],
   "{n} connection to {places}": [
     "{n} підключення до {places}",
     "{n} сполучення з {places}",
@@ -1515,11 +1494,6 @@
     "{n} не вдалося",
     "{n} не вдалося",
     "{n} не вдалося"
-  ],
-  "{n} hotkey": [
-    "{n} гаряча клавіша",
-    "{n} гарячих клавіш",
-    "{n} гарячих клавіш"
   ],
   "{n} more can't be brought over (the file was moved or deleted, or isn't a sound): {names}": [
     "{n} більше не можна перенести (файл переміщено чи видалено, або не є звуком): {names}",
@@ -3396,7 +3370,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows залишає {key} собі й ніколи не передає застосункам, тож ця гаряча клавіша ніколи не спрацює: вибери іншу клавішу.",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} — твоя клавіша «Зупини все», тому вона лишається за нею. Вибери іншу клавішу або спершу дай «Зупини все» нову в Налаштування → Гарячі клавіші.",
   "Names can be up to {n} characters, so it's “{name}”.": "Назва може мати до {n} символів, тому вийшло «{name}».",
-  "They go in a category called “{name}”.": "Вони потраплять у категорію «{name}».",
   "Type a name first.": "Спершу введіть назву.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Перейменовано на «{new}». Інший звук теж так називається.",
   "Disguise": "Маскування",

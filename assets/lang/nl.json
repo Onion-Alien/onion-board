@@ -826,18 +826,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "Vergeet de lijst tot nu toe (en de opgeslagen geschiedenis, als deze wordt bewaard)",
   "Forgets Apps tab volumes and hidden programs.": "Vergeet de volumes van het tabblad Apps en verborgen programma's.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Vergeet je microfoon, koptelefoon, waar je geluiden naartoe worden gestuurd en de stream-uitvoer; de snelle installatie wordt opnieuw uitgevoerd.",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "Ik heb <b>{n}</b> geluid gevonden in {name} met {categories} en {hotkeys} .",
-    "Ik heb <b>{n}</b> geluiden gevonden in {name} met {categories} en {hotkeys} ."
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "Ik heb <b>{n}</b> geluid gevonden in {name} met {what} .",
-    "<b>{n}</b> geluiden gevonden in {name} met {what} ."
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "<b>{n}</b> geluid gevonden in {name} .",
-    "<b>{n}</b> geluiden gevonden in {name} ."
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Gratis add-ons van GitHub. Als u er één verwijdert of opnieuw installeert, blijven uw triggers en gekoppelde telefoons behouden.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Gratis, zonder advertenties en zonder account. Gemaakt door OnionAlien. MIT-licentie met de Commons-clausule: gebruik het voor alles, deel het gratis, verkoop het nooit.",
   "Frequencies": "Frequenties",
@@ -1236,7 +1224,6 @@
   "Theme, audio, voice, overlay and privacy options.": "Thema-, audio-, stem-, overlay- en privacyopties.",
   "Then Ctrl+click picks a pad without playing it": "Vervolgens kiest Ctrl+klik een pad zonder deze te bespelen",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Ze denken dat muziek achtergrondgeluid is en zetten je geluiden harder. Onion Board zuivert je stem al.",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Ze worden gekopieerd naar Onion Board; {name} behoudt zijn eigen naam. Degene die hier al staan, worden overgeslagen en een sneltoets die hier al wordt gebruikt, wordt weggelaten.",
   "This desktop has no system tray, so closing the window quits.": "Deze desktop heeft geen systeemvak, dus het sluiten van het venster wordt afgesloten.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Dit is Onion Board {version} . Als het vakje is aangevinkt, wordt GitHub elke paar uur gevraagd of er een nieuwere versie beschikbaar is en wordt het je verteld (met een banner als het een belangrijke oplossing is). Deze kopie draait vanaf de broncode, dus het vertelt je alleen: update het met git pull.",
   "Through a proxy": "Via een proxy",
@@ -1450,10 +1437,6 @@
     "{n} geblokkeerd",
     "{n} geblokkeerd"
   ],
-  "{n} category": [
-    "{n} categorie",
-    "{n} categorieën"
-  ],
   "{n} connection to {places}": [
     "{n} verbinding met {places}",
     "{n} verbindingen naar {places}"
@@ -1477,10 +1460,6 @@
   "{n} failed": [
     "{n} is mislukt",
     "{n} is mislukt"
-  ],
-  "{n} hotkey": [
-    "{n} sneltoets",
-    "{n} sneltoetsen"
   ],
   "{n} more can't be brought over (the file was moved or deleted, or isn't a sound): {names}": [
     "{n} meer kunnen niet worden overgebracht (het bestand is verplaatst of verwijderd, of is geen geluid): {names}",
@@ -3323,7 +3302,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows houdt {key} voor zichzelf en geeft hem nooit door aan een app, dus die sneltoets zou nooit spelen: kies een andere toets.",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} is je toets voor Stop met alles, dus die blijft daar. Kies een andere toets, of geef Stop met alles eerst een nieuwe bij Instellingen → Sneltoetsen.",
   "Names can be up to {n} characters, so it's “{name}”.": "Namen mogen tot {n} tekens zijn, dus het wordt “{name}”.",
-  "They go in a category called “{name}”.": "Ze komen in een categorie met de naam “{name}”.",
   "Type a name first.": "Typ eerst een naam.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Hernoemd naar “{new}”. Een ander geluid heet ook zo.",
   "Disguise": "Vermomming",

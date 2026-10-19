@@ -826,18 +826,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "अब तक की सूची भूल जाएं (और सहेजा गया इतिहास, यदि रखा हो तो)",
   "Forgets Apps tab volumes and hidden programs.": "ऐप्स टैब वॉल्यूम और छिपे हुए प्रोग्राम भूल जाते हैं।",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "अपना माइक, हेडफ़ोन भूल जाता है, जहाँ आपकी ध्वनियाँ भेजी जाती हैं और स्ट्रीम आउटपुट होता है; त्वरित सेटअप फिर से चलता है.",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "{name} में {categories} और {hotkeys} के साथ <b>{n}</b> ध्वनि मिली।",
-    "{name} में {categories} और {hotkeys} के साथ <b>{n}</b> ध्वनियाँ मिलीं।"
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "{name} में {what} के साथ <b>{n}</b> ध्वनि मिली।",
-    "{name} में {what} के साथ <b>{n}</b> ध्वनियाँ मिलीं।"
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "{name} में <b>{n}</b> ध्वनि मिली।",
-    "{name} में <b>{n}</b> ध्वनियाँ मिलीं।"
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "GitHub से निःशुल्क ऐड-ऑन। किसी को हटाने या पुनः इंस्टॉल करने से आपके ट्रिगर और युग्मित फ़ोन बने रहते हैं।",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "निःशुल्क, बिना किसी विज्ञापन और बिना किसी खाते के। ओनियनएलियन द्वारा निर्मित। कॉमन्स क्लॉज के साथ एमआईटी लाइसेंस: इसे किसी भी चीज़ के लिए उपयोग करें, इसे मुफ्त में साझा करें, इसे कभी न बेचें।",
   "Frequencies": "आवृत्तियों",
@@ -1236,7 +1224,6 @@
   "Theme, audio, voice, overlay and privacy options.": "थीम, ऑडियो, आवाज, ओवरले और गोपनीयता विकल्प।",
   "Then Ctrl+click picks a pad without playing it": "फिर Ctrl+क्लिक किसी पैड को बिना चलाए चुन लेता है",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "वे सोचते हैं कि संगीत पृष्ठभूमि शोर है और आपकी आवाज़ को काट देता है। अनियन बोर्ड पहले से ही आपकी आवाज को साफ कर देता है।",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "उन्हें प्याज बोर्ड में कॉपी किया गया है; {name} अपना रखता है। यहां पहले से मौजूद हॉटकी को छोड़ दिया जाता है, और यहां पहले से ही उपयोग की जाने वाली हॉटकी को छोड़ दिया जाता है।",
   "This desktop has no system tray, so closing the window quits.": "इस डेस्कटॉप में कोई सिस्टम ट्रे नहीं है, इसलिए विंडो बंद करना बंद हो जाता है।",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "यह प्याज बोर्ड {version} है। बॉक्स पर टिक लगाने पर यह हर कुछ घंटों में GitHub से पूछता है कि क्या कोई नया संस्करण आ गया है और आपको बताता है (एक बैनर के साथ यदि यह एक महत्वपूर्ण सुधार है)। यह प्रतिलिपि स्रोत से चलती है, इसलिए यह आपको केवल यह बताती है: इसे गिट पुल के साथ अपडेट करें।",
   "Through a proxy": "एक प्रॉक्सी के माध्यम से",
@@ -1450,10 +1437,6 @@
     "{n} अवरुद्ध",
     "{n} अवरुद्ध"
   ],
-  "{n} category": [
-    "{n} श्रेणी",
-    "{n} श्रेणियाँ"
-  ],
   "{n} connection to {places}": [
     "{n} {places} से कनेक्शन",
     "{n} {places} से कनेक्शन"
@@ -1477,10 +1460,6 @@
   "{n} failed": [
     "{n} असफल",
     "{n} असफल"
-  ],
-  "{n} hotkey": [
-    "{n} हॉटकी",
-    "{n} हॉटकीज़"
   ],
   "{n} more can't be brought over (the file was moved or deleted, or isn't a sound): {names}": [
     "{n} और अधिक नहीं लाया जा सकता (फ़ाइल को स्थानांतरित या हटा दिया गया था, या कोई ध्वनि नहीं है): {names}",
@@ -3323,7 +3302,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows {key} को अपने पास रखता है और किसी ऐप को कभी नहीं देता, इसलिए यह हॉटकी कभी नहीं बजेगी: कोई दूसरी की चुनें।",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} आपकी सब कुछ बंद करो की है, इसलिए यह उसी पर रहेगी। कोई दूसरी की चुनें, या पहले सेटिंग्स → हॉटकी में सब कुछ बंद करो को नई की दें।",
   "Names can be up to {n} characters, so it's “{name}”.": "नाम में ज़्यादा से ज़्यादा {n} अक्षर हो सकते हैं, इसलिए यह “{name}” है।",
-  "They go in a category called “{name}”.": "ये “{name}” नाम की कैटेगरी में जाएँगे।",
   "Type a name first.": "पहले एक नाम लिखें।",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ नाम बदलकर “{new}” किया। एक और साउंड का भी यही नाम है।",
   "Disguise": "भेस",

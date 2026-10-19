@@ -412,18 +412,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "Glöm listan hittills (och den sparade historiken, om den sparas)",
   "Forgets Apps tab volumes and hidden programs.": "Glömmer volymer och dolda program i fliken Appar.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Glömmer din mikrofon, dina hörlurar, vart dina ljud skickas och streamutgången; snabbinställningen körs igen.",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "Hittade <b>{n}</b> ljud i {name} med {categories} och {hotkeys}.",
-    "Hittade <b>{n}</b> ljud i {name} med {categories} och {hotkeys}."
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "Hittade <b>{n}</b> ljud i {name} med {what}.",
-    "Hittade <b>{n}</b> ljud i {name} med {what}."
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "Hittade <b>{n}</b> ljud i {name}.",
-    "Hittade <b>{n}</b> ljud i {name}."
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Gratis tillägg från GitHub. Att ta bort eller installera om ett behåller dina triggers och parkopplade telefoner.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Gratis, utan reklam och utan konto. Gjord av OnionAlien. MIT-licens med Commons Clause: använd den till vad som helst, dela den gratis, sälj den aldrig.",
   "Frequencies": "Frekvenser",
@@ -1112,7 +1100,6 @@
   "There are no sounds yet. Export just your settings?": "Det finns inga ljud än. Exportera bara dina inställningar?",
   "There's already a “{new}”.": "Det finns redan en ”{new}”.",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "De tror att musik är bakgrundsbrus och hackar sönder dina ljud. Onion Board rensar redan din röst.",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "De kopieras till Onion Board; {name} behåller sina egna. De som redan finns här hoppas över, och en snabbtangent som redan används här lämnas bort.",
   "This desktop has no system tray, so closing the window quits.": "Det här skrivbordet har inget systemfält, så att stänga fönstret avslutar.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Det här är Onion Board {version}. Med rutan ikryssad frågar den GitHub med några timmars mellanrum om en nyare version är ute och säger till (med en banderoll om det är en viktig fix). Den här kopian körs från källkoden, så den säger bara till: uppdatera den med git pull.",
   "This sound's video isn't there any more": "Det här ljudets video finns inte kvar",
@@ -1405,10 +1392,6 @@
     "{n} blockerad",
     "{n} blockerade"
   ],
-  "{n} category": [
-    "{n} kategori",
-    "{n} kategorier"
-  ],
   "{n} connection to {places}": [
     "{n} anslutning till {places}",
     "{n} anslutningar till {places}"
@@ -1436,10 +1419,6 @@
   "{n} failed": [
     "{n} misslyckad",
     "{n} misslyckade"
-  ],
-  "{n} hotkey": [
-    "{n} snabbtangent",
-    "{n} snabbtangenter"
   ],
   "{n} hour ago": [
     "för {n} timme sedan",
@@ -3323,7 +3302,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows behåller {key} för sig själv och skickar den aldrig vidare till en app, så snabbtangenten skulle aldrig spela: välj en annan tangent.",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} är din tangent för Stoppa allt, så den stannar där. Välj en annan tangent, eller ge först Stoppa allt en ny under Inställningar → Snabbtangenter.",
   "Names can be up to {n} characters, so it's “{name}”.": "Namn kan ha upp till {n} tecken, så det blir ”{name}”.",
-  "They go in a category called “{name}”.": "De hamnar i en kategori som heter ”{name}”.",
   "Type a name first.": "Skriv ett namn först.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Bytte namn till ”{new}”. Ett annat ljud heter också så.",
   "Disguise": "Förklädnad",

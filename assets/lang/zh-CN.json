@@ -809,15 +809,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "清空目前的列表（以及保存的历史，如果有保留的话）",
   "Forgets Apps tab volumes and hidden programs.": "忘记“应用”标签页的音量和隐藏的程序。",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "忘记你的麦克风、耳机、音效发送到哪里以及直播输出；重新运行快速设置。",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "在{name}中使用{categories}和{hotkeys}找到了<b>{n}</b>个声音。"
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "在{name}中使用{what}找到了<b>{n}</b>个声音。"
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "在{name}中找到<b>{n}</b>个声音。"
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "来自 GitHub 的免费插件。移除或重装插件会保留你的触发器和已配对的手机。",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "免费，无广告，无需账号。由 OnionAlien 制作。MIT 许可证附加 Commons Clause：可用于任何用途，可免费分享，但绝不能出售。",
   "Frequencies": "频率",
@@ -1212,7 +1203,6 @@
   "Theme, audio, voice, overlay and privacy options.": "主题、音频、语音、悬浮窗和隐私选项。",
   "Then Ctrl+click picks a pad without playing it": "这样 Ctrl+点击可以选中按钮而不播放",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "它们会把音乐当成背景噪音，把你的音效切碎。Onion Board 已经帮你处理好你的声音了。",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "它们会被复制到 Onion Board；{name} 里的保持不变。已经有的会跳过，已被这里占用的快捷键不会设置。",
   "This desktop has no system tray, so closing the window quits.": "这个桌面没有系统托盘，所以关闭窗口就会退出。",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "这是 Onion Board {version}。勾选后，它每隔几小时会向 GitHub 查询有没有新版本，并告诉你（如果是重要修复，会显示横幅）。这个副本是从源码运行的，所以只会通知你：用 git pull 更新。",
   "Through a proxy": "通过代理",
@@ -1418,9 +1408,6 @@
   "{n} blocked": [
     "{n}被阻止"
   ],
-  "{n} category": [
-    "{n}个类别"
-  ],
   "{n} connection to {places}": [
     "与{places}的{n}连接"
   ],
@@ -1438,9 +1425,6 @@
   ],
   "{n} failed": [
     "{n}失败"
-  ],
-  "{n} hotkey": [
-    "{n}热键"
   ],
   "{n} more can't be brought over (the file was moved or deleted, or isn't a sound): {names}": [
     "还有{n}个无法带过来（文件已移动或删除，或者不是声音）： {names}"
@@ -3250,7 +3234,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "{key} 被 Windows 自己占用，永远不会交给任何应用，所以这个快捷键永远不会播放：请换一个键。",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} 是你的“全部停止”键，所以它保持不变。请换一个键，或者先在 设置 → 快捷键 里给“全部停止”设一个新键。",
   "Names can be up to {n} characters, so it's “{name}”.": "名称最多 {n} 个字符，所以是“{name}”。",
-  "They go in a category called “{name}”.": "它们会放进名为“{name}”的分类。",
   "Type a name first.": "请先输入名称。",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ 已重命名为“{new}”。另一个声音也叫这个名字。",
   "Disguise": "伪装",

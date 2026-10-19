@@ -418,21 +418,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "Zapomenout dosavadní seznam (a uloženou historii, pokud se uchovává)",
   "Forgets Apps tab volumes and hidden programs.": "Zapomene hlasitosti a skryté programy karty Aplikace.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Zapomene tvůj mikrofon, sluchátka, kam se posílají zvuky a výstup pro stream; rychlé nastavení proběhne znovu.",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "V {name} je <b>{n}</b> zvuk ({categories}, {hotkeys}).",
-    "V {name} jsou <b>{n}</b> zvuky ({categories}, {hotkeys}).",
-    "V {name} je <b>{n}</b> zvuků ({categories}, {hotkeys})."
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "V {name} je <b>{n}</b> zvuk ({what}).",
-    "V {name} jsou <b>{n}</b> zvuky ({what}).",
-    "V {name} je <b>{n}</b> zvuků ({what})."
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "V {name} je <b>{n}</b> zvuk.",
-    "V {name} jsou <b>{n}</b> zvuky.",
-    "V {name} je <b>{n}</b> zvuků."
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Doplňky zdarma z GitHubu. Odebrání nebo přeinstalování doplňku zachová tvoje spouštěče a spárované telefony.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Zdarma, bez reklam a bez účtu. Vytvořil OnionAlien. Licence MIT s Commons Clause: použij na cokoli, sdílej zdarma, nikdy neprodávej.",
   "Frequencies": "Frekvence",
@@ -1128,7 +1113,6 @@
   "There are no sounds yet. Export just your settings?": "Zatím tu nejsou žádné zvuky. Exportovat jen nastavení?",
   "There's already a “{new}”.": "„{new}“ už existuje.",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Myslí si, že hudba je šum v pozadí, a rozsekají tvoje zvuky. Onion Board už tvůj hlas čistí.",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Zkopírují se do Onion Board; {name} si nechá svoje. Ty, které už tu jsou, se přeskočí, a zkratka, kterou tu už něco používá, se vynechá.",
   "This desktop has no system tray, so closing the window quits.": "Tohle prostředí nemá oznamovací oblast, takže zavření okna aplikaci ukončí.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Tohle je Onion Board {version}. Se zaškrtnutým políčkem se každých pár hodin zeptá GitHubu, jestli nevyšla novější verze, a řekne ti to (s bannerem, pokud jde o důležitou opravu). Tahle kopie běží ze zdrojového kódu, takže ti to jen řekne: aktualizuj ji přes git pull.",
   "This sound's video isn't there any more": "Video tohoto zvuku už tu není",
@@ -1431,11 +1415,6 @@
     "{n} blokována",
     "{n} blokováno"
   ],
-  "{n} category": [
-    "{n} kategorie",
-    "{n} kategorie",
-    "{n} kategorií"
-  ],
   "{n} connection to {places}": [
     "{n} spojení do {places}",
     "{n} spojení do {places}",
@@ -1470,11 +1449,6 @@
     "{n} selhalo",
     "{n} selhala",
     "{n} selhalo"
-  ],
-  "{n} hotkey": [
-    "{n} zkratka",
-    "{n} zkratky",
-    "{n} zkratek"
   ],
   "{n} hour ago": [
     "před {n} hodinou",
@@ -3396,7 +3370,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows si {key} nechává pro sebe a nikdy ji nepředá aplikaci, takže by ta zkratka nikdy nehrála: vyber jinou klávesu.",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} je tvoje klávesa pro Zastavit všechno, takže zůstává u ní. Vyber jinou klávesu, nebo nejdřív dej Zastavit všechno novou v Nastavení → Zkratky.",
   "Names can be up to {n} characters, so it's “{name}”.": "Názvy mohou mít nejvýš {n} znaků, takže je to „{name}“.",
-  "They go in a category called “{name}”.": "Přijdou do kategorie „{name}“.",
   "Type a name first.": "Nejdřív napište název.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Přejmenováno na „{new}“. Stejně se jmenuje i jiný zvuk.",
   "Disguise": "Převlek",

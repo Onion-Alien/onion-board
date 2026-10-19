@@ -412,18 +412,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "Unohda tähänastinen lista (ja tallennettu historia, jos se säilytetään)",
   "Forgets Apps tab volumes and hidden programs.": "Unohtaa Sovellukset-välilehden äänenvoimakkuudet ja piilotetut ohjelmat.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Unohtaa mikkisi, kuulokkeesi, minne äänesi lähetetään ja stream-ulostulon; pika-asennus ajetaan uudelleen.",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "Löytyi <b>{n}</b> ääni ({name}), mukana {categories} ja {hotkeys}.",
-    "Löytyi <b>{n}</b> ääntä ({name}), mukana {categories} ja {hotkeys}."
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "Löytyi <b>{n}</b> ääni ({name}), mukana {what}.",
-    "Löytyi <b>{n}</b> ääntä ({name}), mukana {what}."
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "Löytyi <b>{n}</b> ääni ({name}).",
-    "Löytyi <b>{n}</b> ääntä ({name})."
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Ilmaisia lisäosia GitHubista. Lisäosan poistaminen tai uudelleenasentaminen säilyttää laukaisimesi ja paritetut puhelimet.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Ilmainen, ei mainoksia eikä tiliä. Tekijä OnionAlien. MIT-lisenssi Commons Clause -ehdolla: käytä mihin tahansa, jaa ilmaiseksi, älä koskaan myy.",
   "Frequencies": "Taajuudet",
@@ -1112,7 +1100,6 @@
   "There are no sounds yet. Export just your settings?": "Ääniä ei vielä ole. Viedäänkö vain asetuksesi?",
   "There's already a “{new}”.": "“{new}” on jo olemassa.",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Ne pitävät musiikkia taustamelunä ja pilkkovat äänesi. Onion Board siivoaa jo puheesi.",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Ne kopioidaan Onion Boardiin; {name} pitää omansa. Jo täällä olevat ohitetaan, ja pikanäppäin, jota jokin täällä jo käyttää, jätetään pois.",
   "This desktop has no system tray, so closing the window quits.": "Tällä työpöydällä ei ole ilmoitusaluetta, joten ikkunan sulkeminen lopettaa sovelluksen.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Tämä on Onion Board {version}. Kun ruutu on ruksattu, se kysyy GitHubilta muutaman tunnin välein, onko uudempi versio julkaistu, ja kertoo sinulle (palkilla, jos kyse on tärkeästä korjauksesta). Tämä kopio ajetaan lähdekoodista, joten se vain kertoo: päivitä se komennolla git pull.",
   "This sound's video isn't there any more": "Tämän äänen videota ei enää ole",
@@ -1405,10 +1392,6 @@
     "{n} estetty",
     "{n} estetty"
   ],
-  "{n} category": [
-    "{n} luokka",
-    "{n} luokkaa"
-  ],
   "{n} connection to {places}": [
     "{n} yhteys kohteeseen {places}",
     "{n} yhteyttä {places}"
@@ -1436,10 +1419,6 @@
   "{n} failed": [
     "{n} epäonnistui",
     "{n} epäonnistui"
-  ],
-  "{n} hotkey": [
-    "{n} pikanäppäin",
-    "{n} pikanäppäintä"
   ],
   "{n} hour ago": [
     "{n} tunti sitten",
@@ -3323,7 +3302,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows pitää {key} itsellään eikä anna sitä koskaan sovellukselle, joten tämä pikanäppäin ei soisi koskaan: valitse toinen näppäin.",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} on Pysäytä kaikki -näppäimesi, joten se pysyy siinä. Valitse toinen näppäin tai anna ensin Pysäytä kaikki -toiminnolle uusi kohdassa Asetukset → Pikanäppäimet.",
   "Names can be up to {n} characters, so it's “{name}”.": "Nimessä voi olla enintään {n} merkkiä, joten se on “{name}”.",
-  "They go in a category called “{name}”.": "Ne menevät luokkaan nimeltä “{name}”.",
   "Type a name first.": "Kirjoita ensin nimi.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Uudelleennimetty \"{new}\". Toisellakin äänellä on sama nimi.",
   "Disguise": "Naamioituminen",

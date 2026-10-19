@@ -613,8 +613,9 @@ class ImportControl(Controller):
 
     def import_other(self, src: otherboards.Source, path: str = "", ask: bool = True):
         """Bring another soundboard's board over: its sound files (copied, it keeps its
-        own), names, categories and the hotkeys nothing here uses yet. `ask`: False
-        when they already said yes (the installer's box): no questions or pop-ups."""
+        own), names, categories and the hotkeys nothing here uses yet. Never asks
+        "are you sure?": picking it was the yes. `ask`: False for the installer's box
+        (no file picker or pop-ups, only toasts)."""
         usage.used("import-board")
         self._read_board(src, path, ask)
 
@@ -640,7 +641,7 @@ class ImportControl(Controller):
                    error=lambda e: (src, where[0], ask, e), owner=mw)
 
     def _board_read(self, src: otherboards.Source, path: str, ask: bool, result):
-        """import_other's read is back: the question, then the import, here on the UI
+        """import_other's read is back: the import, here on the UI
         thread (the window may have closed in the meantime)."""
         mw = self.mw
         if mw._shut_down:
@@ -675,39 +676,14 @@ class ImportControl(Controller):
             return
         for e in ok:   # all in a category named after it too, so they're easy to find
             e.tags = [src.name, *(t for t in e.tags if t != src.name)]
-        if ask:
-            keys = sum(1 for e in ok if e.hotkey)
-            cats = {t for e in ok for t in e.tags}
-            n_cats = ngettext("{n} category", "{n} categories", len(cats))
-            n_keys = ngettext("{n} hotkey", "{n} hotkeys", keys)
-            if cats and keys:
-                found = ngettext("Found <b>{n}</b> sound in {name} with {categories} and "
-                                 "{hotkeys}.", "Found <b>{n}</b> sounds in {name} with "
-                                 "{categories} and {hotkeys}.", len(ok), name=src.name,
-                                 categories=n_cats, hotkeys=n_keys)
-            elif cats or keys:
-                found = ngettext("Found <b>{n}</b> sound in {name} with {what}.",
-                                 "Found <b>{n}</b> sounds in {name} with {what}.", len(ok),
-                                 name=src.name, what=n_cats if cats else n_keys)
-            else:
-                found = ngettext("Found <b>{n}</b> sound in {name}.",
-                                 "Found <b>{n}</b> sounds in {name}.", len(ok), name=src.name)
-            lines = [found,
-                     _("They're copied into Onion Board; {name} keeps its own. Ones "
-                       "already here are skipped, and a hotkey something here already "
-                       "uses is left off.", name=src.name),
-                     _("They go in a category called “{name}”.", name=html.escape(src.name))]
-            if bad:
-                lines.append(ngettext(
-                    "{n} more can't be brought over (the file was moved or deleted, or isn't "
-                    "a sound): {names}", "{n} more can't be brought over (the file was moved "
-                    "or deleted, or isn't a sound): {names}", len(bad),
-                    names=html.escape(", ".join(e.name for e in bad[:5]))
-                    + ("…" if len(bad) > 5 else "")))
-            if QMessageBox.question(mw, title, "<br><br>".join(lines),
-                                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-                                    ) != QMessageBox.StandardButton.Yes:
-                return
+        # picking "Import from …" was their yes: no "are you sure?" box, it just imports
+        if bad and ask:
+            mw.toast(ngettext(
+                "{n} more can't be brought over (the file was moved or deleted, or isn't "
+                "a sound): {names}", "{n} more can't be brought over (the file was moved "
+                "or deleted, or isn't a sound): {names}", len(bad),
+                names=html.escape(", ".join(e.name for e in bad[:5]))
+                + ("…" if len(bad) > 5 else "")), "warn")
         self._show_board(src.name)
         self.import_files([e.path for e in ok], {e.path: e for e in ok})
 
