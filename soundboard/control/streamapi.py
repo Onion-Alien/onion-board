@@ -2,10 +2,11 @@
 commands, alerts (follows, subs, bits, raids, donations, channel points, TikTok gifts…)
 and a feed of what they did.
 
-Onion Board never connects to Twitch, YouTube, Kick, TikTok or a donation site itself:
-the streamer's own bot or alert tool (Streamer.bot, Firebot, Mix It Up, SAMMI, TikFinity,
-Touch Portal…) already gets those events, and sends them here like any other request
-to 127.0.0.1.
+This module never connects anywhere: the streamer's own bot or alert tool
+(Streamer.bot, Firebot, Mix It Up, SAMMI, TikFinity, Touch Portal…) gets the events from
+YouTube, Kick, TikTok or a donation site and sends them here like any other request to
+127.0.0.1. Twitch's come from Settings → Remote's *Connect Twitch* too
+(soundboard.control.twitchlink hands them to chat() and event()).
 
     /api/chat?user=…&message=…[&mod=1&sub=1&vip=1&broadcaster=1]
         one chat line. Lines starting with the prefix (!) are commands: !sound <name>,
@@ -94,7 +95,7 @@ ALIASES = {
     "tiktok_gift": "gift", "giftsent": "gift",
     "likes": "like", "hypetrain": "hype_train", "channel.hype_train.begin": "hype_train",
 }
-RULE_KEYS = ("sound", "category", "say", "voice", "voice_seconds", "min", "on")
+RULE_KEYS = ("sound", "category", "say", "voice", "voice_seconds", "min", "on", "reward")
 FIELDS = ("user", "amount", "currency", "message", "reward", "tier", "months", "count",
           "type", "platform")
 TEST_EVENT = {"user": "TestViewer", "amount": 5.0, "currency": "USD",
@@ -267,22 +268,30 @@ def set_alerts(mw: MainWindow, params: dict) -> tuple[int, object]:
         # ?type=raid alone (or with &min=): that type's rules read back, nothing changed
         return 200, {**alerts_answer(mw), "type": kind, "rules": have}
     low = _number(params.get("min") or "0", 0, 1e9) or 0.0
+    # a channel point rule may be for one reward (&reward=its title): each its own sound
+    reward = " ".join((params.get("reward") or "").split())[:TEXT_MAX] if kind == "redeem" else ""
+
+    def same(r: dict) -> bool:
+        return float(r.get("min") or 0) == low and reward_of(r) == reward.casefold()
     if (params.get("clear") or "").strip() not in ("", "0"):
-        rules[kind] = ([r for r in have if float(r.get("min") or 0) != low]
-                       if "min" in params else [])
+        rules[kind] = ([r for r in have if not same(r)]
+                       if "min" in params or reward else [])
         if not rules[kind]:
             rules.pop(kind)
         _stream(mw)["alerts"] = rules
         mw._save_later()
         return 200, alerts_answer(mw)
-    rule = next((r for r in have if float(r.get("min") or 0) == low), None)
-    rule = dict(rule) if rule is not None else {"min": low}
+    rule = next((r for r in have if same(r)), None)
+    if rule is not None:
+        rule = dict(rule)
+    else:
+        rule = {"min": low, **({"reward": reward} if reward else {})}
     err = _rule_from(mw, params, rule)
     if err:
         return err
     if not any(rule.get(k) for k in ("sound", "category", "say", "voice")):
         return 400, {"error": "say what it does: &sound=… / &category=… / &say=… / &voice=…"}
-    rules[kind] = sorted([r for r in have if float(r.get("min") or 0) != low] + [rule],
+    rules[kind] = sorted([r for r in have if not same(r)] + [rule],
                          key=lambda r: float(r.get("min") or 0))
     _stream(mw)["alerts"] = rules
     mw._save_later()
@@ -736,11 +745,18 @@ def normalize(params: dict) -> dict:
     return out
 
 
-def pick_rule(rules: list[dict], amount: float | None) -> dict | None:
-    """The rule with the highest `min` the amount reaches (switched-off ones skipped)."""
-    a = amount or 0.0
-    good = [r for r in rules if r.get("on", True) is not False and float(r.get("min") or 0) <= a]
-    return max(good, key=lambda r: float(r.get("min") or 0), default=None)
+def reward_of(rule: dict) -> str:
+    """The channel point reward a rule is for, to compare ("" for every reward)."""
+    return " ".join(str(rule.get("reward") or "").split()).casefold()
+
+
+def pick_rule(rules: list[dict], amount: float | None, reward: str = "") -> dict | None:
+    """The rule with the highest `min` the amount reaches (switched-off ones skipped);
+    one made for this reward before one for every reward."""
+    a, want = amount or 0.0, " ".join(reward.split()).casefold()
+    good = [r for r in rules if r.get("on", True) is not False and float(r.get("min") or 0) <= a
+            and reward_of(r) in ("", want)]
+    return max(good, key=lambda r: (reward_of(r) != "", float(r.get("min") or 0)), default=None)
 
 
 def event(mw: MainWindow, params: dict) -> tuple[int, object]:
@@ -772,7 +788,7 @@ def event(mw: MainWindow, params: dict) -> tuple[int, object]:
     else:
         if not alerts_on(mw) and not test:
             return 200, {"handled": False, "reason": "alerts are off", "event": ev}
-        found = pick_rule(alert_rules(mw).get(ev["type"], []), ev["amount"])
+        found = pick_rule(alert_rules(mw).get(ev["type"], []), ev["amount"], ev["reward"])
         if found is None:
             return 200, {"handled": False, "reason": f"nothing is set for {ev['type']} "
                          "(set it with /api/alerts)", "event": ev}

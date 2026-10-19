@@ -519,9 +519,9 @@ class SettingsDialog(QDialog, Built):
         return page
 
     @staticmethod
-    def _card(title: str, hint: str = "", icon: str = ""):
+    def _card(title: str, hint: str = "", icon: str = "", end=()):
         """A Settings card: `icon` in front of the title (panel.heading_row, centred on
-        its cap height), the hint under it."""
+        its cap height), `end` at the far end of it (a status pill), the hint under it."""
         card = QFrame()
         card.setObjectName("setcard")
         v = QVBoxLayout(card)
@@ -529,7 +529,7 @@ class SettingsDialog(QDialog, Built):
         v.setSpacing(8)
         if icon:
             from soundboard.ui.kit.panel import heading_row
-            row, t, _marks = heading_row(title, icon)
+            row, t, _marks = heading_row(title, icon, end=end)
             # the title takes the room the row has, so it only wraps when it doesn't
             # fit (sharing it with the row's stretch, it wrapped at half the width)
             row.setStretch(row.count() - 1, 0)

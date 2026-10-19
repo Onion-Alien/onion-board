@@ -586,6 +586,10 @@ class MainWindow(QMainWindow):
         self.remote = remote.RemoteControl(lambda a, p: remote.dispatch(self, a, p), self)
         self.remctl.apply_remote()
         self.remctl.remote_addons = self.remctl._load_remote_addons()
+        # Settings → Remote's Connect Twitch: listens only once the streamer has connected
+        from soundboard.control.twitchlink import TwitchLink
+        self.twitch = TwitchLink(self)
+        self.twitch.apply()
         self.pocket_card.refresh()   # its own card on Setup, if it's installed
         a11y.label_tree(self, force=True)   # names for the icon-only buttons
 
@@ -1603,7 +1607,7 @@ class MainWindow(QMainWindow):
                      self.alertctl.discord_quit,
                      self._remember_usage, self._count_at_quit, self.cfg.save,
                      self.overlay.shutdown,
-                     self.hotkeys.stop, self.replay.stop, self.remote.stop,
+                     self.hotkeys.stop, self.replay.stop, self.remote.stop, self.twitch.quit,
                      self.remctl._stop_remote_addons,
                      self._finish_count_at_quit,   # sent meanwhile; before Tor stops
                      self.radio.shutdown, tor.shutdown, self.apps.shutdown,

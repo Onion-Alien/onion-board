@@ -412,7 +412,11 @@ class AddonsPage(Page):
                          daemon=True, name="onion-pocket-addons").start()
 
     def _remote(self):
+        from soundboard.ui.settings.twitchcard import twitch_card
         w, v = self._page()
+        twitch = twitch_card(self)
+        if twitch is not None:
+            v.addWidget(twitch)
         v.addWidget(self._remote_card())
         for card in self._remote_addon_cards():
             v.addWidget(card)
