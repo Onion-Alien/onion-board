@@ -23,7 +23,7 @@ from collections.abc import Callable
 
 from PySide6.QtCore import (QEvent, QPoint, QRect, QRectF, QSize, Qt, QTimer, QVariantAnimation,
                             Signal)
-from PySide6.QtGui import (QColor, QFontMetricsF, QLinearGradient, QPainter,
+from PySide6.QtGui import (QColor, QCursor, QFontMetricsF, QLinearGradient, QPainter,
                            QPainterPath, QPalette, QPen, QPixmap)
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QScrollArea,
                                QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
@@ -296,6 +296,7 @@ CARD_GAP = 8                  # from the page's bottom: the player bar under it
 PILL_BAR_W = 64               # the summary's bar in the pill
 FOLD_MS = 4000                # everything added: the card folds to its pill after this
 FOLDED_MS = 6000              # and the pill goes after this (hovering waits)
+ENDED_MS = 1500               # a Play's sound stopped: the card goes after this
 
 
 AUDIO_EXTS = (".mp3", ".wav", ".ogg", ".flac", ".m4a", ".aac", ".opus", ".webm", ".mp4")
@@ -1051,13 +1052,19 @@ class DownloadBar(QFrame):
         """Everything's over: the bar goes after `ms`; the corner card first folds to its
         pill (FOLDED_MS later it goes), so it's seen how it ended without covering the
         page."""
-        if self._corner and self.underMouse():
+        if self._corner and self._mouse_on():
             self._paused_ms = ms
             return
         if self._corner and not self._collapsed:
             self._auto_fold.start(ms)
         else:
             self._auto_hide.start(FOLDED_MS if self._corner else ms)
+
+    def _mouse_on(self) -> bool:
+        """The pointer is on the card now. Not underMouse(): that flag only clears on
+        the next mouse move, so after the card folded to its pill away from a still
+        pointer it said "hovered" and the pill never went."""
+        return self.isVisible() and self.rect().contains(self.mapFromGlobal(QCursor.pos()))
 
     def _stop_wind_down(self):
         self._auto_fold.stop()
@@ -1446,6 +1453,20 @@ class DownloadBar(QFrame):
         self._sync_head()
         if not self._up_next and not self._others_failed():
             self._wind_down(7000)
+
+    def play_ended(self, url: str):
+        """The link player has stopped (the sound ended, or Stop): a card that says
+        `url` is Playing goes now, not seconds after, folded down to a pill that stayed."""
+        if (url != self.url or self.kind != "play" or self.stage != "done" or not self.isVisible()
+                or self._queue or self._up_next or self._failed or self._waits()):
+            return
+        if self._auto_hide.isActive() and self._auto_hide.remainingTime() <= ENDED_MS:
+            return
+        self._auto_fold.stop()
+        if self._corner and self._mouse_on():
+            self._paused_ms = ENDED_MS
+            return
+        self._auto_hide.start(ENDED_MS)
 
     def _retry(self, url: str):
         """Retry: the failed pick is picked again (it starts, or waits its turn)."""
