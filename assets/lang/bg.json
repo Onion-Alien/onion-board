@@ -4176,5 +4176,6 @@
   "Play it, as its pad would": "Пусни го, както би го пуснал бутонът му",
   "Show its pad on the Sounds tab": "Покажи бутона му в раздел Звуци",
   "For slower PCs: the voices use less CPU. The voice changer skips hiss removal and its robot voices and echoes are a little simpler. Speech recognition uses the smaller model if it's downloaded (other languages are heard a little less well) and translations are simpler. AI voices stay as they are: they can't get lighter without sounding worse. On by itself in lite mode.": "За по-бавни компютри: гласовете използват по-малко процесор. Промяната на гласа пропуска премахването на шума, а роботските гласове и ехото са малко по-прости. Разпознаването на реч използва по-малкия модел, ако е изтеглен (другите езици се чуват малко по-зле), а преводите са по-прости. AI гласовете остават същите: не могат да станат по-леки, без да звучат по-зле. Включва се само в олекотен режим.",
-  "The AI voice stopped: {why}": "AI гласът спря: {why}"
+  "The AI voice stopped: {why}": "AI гласът спря: {why}",
+  "What's popular right now": "Какво е популярно в момента"
 }

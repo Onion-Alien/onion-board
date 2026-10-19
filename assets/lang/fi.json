@@ -4176,5 +4176,6 @@
   "Play it, as its pad would": "Toista se kuten sen painike tekisi",
   "Show its pad on the Sounds tab": "Näytä sen painike Äänet-välilehdellä",
   "For slower PCs: the voices use less CPU. The voice changer skips hiss removal and its robot voices and echoes are a little simpler. Speech recognition uses the smaller model if it's downloaded (other languages are heard a little less well) and translations are simpler. AI voices stay as they are: they can't get lighter without sounding worse. On by itself in lite mode.": "Hitaammille tietokoneille: äänet käyttävät vähemmän suoritinta. Äänenmuunnin ohittaa kohinanpoiston, ja sen robottiäänet ja kaiut ovat hieman yksinkertaisempia. Puheentunnistus käyttää pienempää mallia, jos se on ladattu (muut kielet kuullaan hieman huonommin), ja käännökset ovat yksinkertaisempia. Tekoälyäänet pysyvät ennallaan: ne eivät voi keventyä kuulostamatta huonommilta. Menee itsestään päälle kevyessä tilassa.",
-  "The AI voice stopped: {why}": "AI-ääni pysähtyi: {why}"
+  "The AI voice stopped: {why}": "AI-ääni pysähtyi: {why}",
+  "What's popular right now": "Mikä on suosittua juuri nyt"
 }

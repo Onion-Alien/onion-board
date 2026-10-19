@@ -4492,5 +4492,6 @@
   "Play it, as its pad would": "شغّله كما يفعل زرّه",
   "Show its pad on the Sounds tab": "اعرض زرّه في تبويب الأصوات",
   "For slower PCs: the voices use less CPU. The voice changer skips hiss removal and its robot voices and echoes are a little simpler. Speech recognition uses the smaller model if it's downloaded (other languages are heard a little less well) and translations are simpler. AI voices stay as they are: they can't get lighter without sounding worse. On by itself in lite mode.": "لأجهزة الكمبيوتر الأبطأ: تستخدم الأصوات وحدة معالجة أقل. مغيّر الصوت يتخطى إزالة الهسهسة، وأصوات الروبوت والصدى أبسط قليلاً. يستخدم التعرّف على الكلام النموذج الأصغر إذا كان مُنزّلاً (تُسمع اللغات الأخرى بدقة أقل قليلاً) والترجمات أبسط. تبقى أصوات الذكاء الاصطناعي كما هي: لا يمكن أن تصبح أخف دون أن يسوء صوتها. يعمل تلقائياً في الوضع الخفيف.",
-  "The AI voice stopped: {why}": "توقف صوت الذكاء الاصطناعي: {why}"
+  "The AI voice stopped: {why}": "توقف صوت الذكاء الاصطناعي: {why}",
+  "What's popular right now": "الرائج الآن"
 }

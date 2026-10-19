@@ -4097,5 +4097,6 @@
   "Play it, as its pad would": "버튼을 누른 것처럼 재생",
   "Show its pad on the Sounds tab": "사운드 탭에서 버튼 보기",
   "For slower PCs: the voices use less CPU. The voice changer skips hiss removal and its robot voices and echoes are a little simpler. Speech recognition uses the smaller model if it's downloaded (other languages are heard a little less well) and translations are simpler. AI voices stay as they are: they can't get lighter without sounding worse. On by itself in lite mode.": "느린 PC용: 음성이 CPU를 덜 씁니다. 음성 변조기는 잡음 제거를 건너뛰고 로봇 목소리와 에코가 조금 더 단순해집니다. 음성 인식은 다운로드되어 있으면 더 작은 모델을 쓰고(다른 언어는 조금 덜 잘 알아듣습니다) 번역도 더 단순해집니다. AI 음성은 그대로입니다: 소리가 나빠지지 않고는 더 가벼워질 수 없습니다. 라이트 모드에서는 자동으로 켜집니다.",
-  "The AI voice stopped: {why}": "AI 음성이 멈췄습니다: {why}"
+  "The AI voice stopped: {why}": "AI 음성이 멈췄습니다: {why}",
+  "What's popular right now": "지금 인기 있는 것"
 }

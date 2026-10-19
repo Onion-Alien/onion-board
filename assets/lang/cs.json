@@ -4255,5 +4255,6 @@
   "Play it, as its pad would": "Přehrát, jako by to udělalo jeho tlačítko",
   "Show its pad on the Sounds tab": "Ukázat jeho tlačítko na kartě Zvuky",
   "For slower PCs: the voices use less CPU. The voice changer skips hiss removal and its robot voices and echoes are a little simpler. Speech recognition uses the smaller model if it's downloaded (other languages are heard a little less well) and translations are simpler. AI voices stay as they are: they can't get lighter without sounding worse. On by itself in lite mode.": "Pro pomalejší počítače: hlasy berou méně CPU. Měnič hlasu vynechá odstranění šumu a jeho robotické hlasy a ozvěny jsou o něco jednodušší. Rozpoznávání řeči použije menší model, pokud je stažený (jiné jazyky slyší o něco hůř), a překlady jsou jednodušší. AI hlasy zůstávají, jak jsou: lehčí být nemohou, aniž by zněly hůř. V odlehčeném režimu se zapne samo.",
-  "The AI voice stopped: {why}": "Hlas AI se zastavil: {why}"
+  "The AI voice stopped: {why}": "Hlas AI se zastavil: {why}",
+  "What's popular right now": "Co je teď populární"
 }

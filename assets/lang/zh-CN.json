@@ -4097,5 +4097,6 @@
   "Play it, as its pad would": "像按它的按钮一样播放",
   "Show its pad on the Sounds tab": "在声音标签页中显示它的按钮",
   "For slower PCs: the voices use less CPU. The voice changer skips hiss removal and its robot voices and echoes are a little simpler. Speech recognition uses the smaller model if it's downloaded (other languages are heard a little less well) and translations are simpler. AI voices stay as they are: they can't get lighter without sounding worse. On by itself in lite mode.": "适合较慢的电脑：语音占用更少 CPU。变声器跳过去嘶声，机器人声和回声稍微简化。语音识别在已下载时使用较小的模型（其他语言听得稍差一些），翻译也更简单。AI 语音保持不变：变轻就会变难听。轻量模式下自动开启。",
-  "The AI voice stopped: {why}": "AI 声音已停止：{why}"
+  "The AI voice stopped: {why}": "AI 声音已停止：{why}",
+  "What's popular right now": "现在流行的"
 }

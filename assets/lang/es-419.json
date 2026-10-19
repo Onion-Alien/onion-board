@@ -4176,5 +4176,6 @@
   "Play it, as its pad would": "Reprodúcelo como lo haría su botón",
   "Show its pad on the Sounds tab": "Mostrar su botón en la pestaña Sonidos",
   "For slower PCs: the voices use less CPU. The voice changer skips hiss removal and its robot voices and echoes are a little simpler. Speech recognition uses the smaller model if it's downloaded (other languages are heard a little less well) and translations are simpler. AI voices stay as they are: they can't get lighter without sounding worse. On by itself in lite mode.": "Para PCs más lentas: las voces usan menos CPU. El cambiador de voz omite la eliminación del siseo y sus voces de robot y ecos son un poco más simples. El reconocimiento de voz usa el modelo más pequeño si está descargado (los otros idiomas se entienden un poco peor) y las traducciones son más simples. Las voces de IA se quedan como están: no pueden ser más ligeras sin sonar peor. Se activa solo en el modo ligero.",
-  "The AI voice stopped: {why}": "La voz de IA se detuvo: {why}"
+  "The AI voice stopped: {why}": "La voz de IA se detuvo: {why}",
+  "What's popular right now": "Lo más popular ahora mismo"
 }
