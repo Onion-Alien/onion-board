@@ -848,6 +848,12 @@ class Child:
         # this scenario's, and left to the next one it looked like the voice changer's
         # UI cost (~1 s on a slower PC)
         self.run_until(lambda: w.setctl._spare_editor is not None, 5.0)
+        # ...and the closed Settings made again with its pages (SETTINGS_AFTER_MS; a
+        # checkout from before it never makes one: 10 s, then on)
+        self.step("settings_made_again")
+        ctl = w.setctl
+        self.run_until(lambda: ctl._settings_kept is not None
+                       and not getattr(ctl, "_preload_pages", [None]), 10.0, 0.1)
         self.run_for(0.2)
         return {"dialog_s": took}
 
