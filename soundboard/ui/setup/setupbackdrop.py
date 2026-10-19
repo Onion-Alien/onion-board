@@ -1,16 +1,16 @@
 """The first launch's plain backdrop: while the quick-setup guide is up, the window
-behind it shows just the theme's background and the logo, not a board that isn't set
-up yet. When the guide closes (finished or not) it fades away and the app shows.
+behind it shows just the theme's background, not a board that isn't set up yet. When
+the guide closes (finished or not) it fades away and the app shows.
 
 It's up before the window first shows, the logo big in the middle where the loading
 screen was, so the loading screen hands over to it without the app flashing up first.
-As the guide comes in, the logo glides up to the corner, out of its way.
+As the guide comes in, the logo and name fade out: the title bar already says them.
 
 A child of the window, over everything in it: no window of its own appears.
 """
 from __future__ import annotations
 
-from PySide6.QtCore import QEasingCurve, QEvent, QPoint, QPointF, QRectF, QVariantAnimation, Qt
+from PySide6.QtCore import QEasingCurve, QEvent, QPointF, QRectF, QVariantAnimation, Qt
 from PySide6.QtGui import QColor, QFont, QFontMetricsF, QPainter
 from PySide6.QtWidgets import QGraphicsOpacityEffect, QWidget
 
@@ -19,19 +19,13 @@ from soundboard.ui.bun import splash
 from soundboard.ui.kit.toast import animations_on
 
 REVEAL_MS = 320   # the fade to the app once the guide is gone
-SETTLE_MS = 520   # the logo's glide from the middle to the corner
+SETTLE_MS = 520   # the logo and name fading out as the guide comes in
 NAME = "Onion Board"
 # In the middle the logo stands where Bun stood on the loading screen and the name where
 # its name was (splash.py: the card's centred on the screen, as the window is), so as the
 # loading screen fades the name stays put and Bun gives way to the logo.
 BIG, BIG_DY = 80, 78 - splash.CARD_H / 2      # the logo: Bun's size and centre (_bun_rect)
 BIG_PX, NAME_DY = 18, 155 - splash.CARD_H / 2  # the name: its pixel size and centre
-SMALL, SMALL_PX = 40, 21   # in the corner
-CORNER, GAP = 28, 12       # the corner logo's inset; between a logo and its name
-
-
-def _lerp(a: float, b: float, k: float) -> float:
-    return a + (b - a) * k
 
 
 class Backdrop(QWidget):
@@ -39,7 +33,7 @@ class Backdrop(QWidget):
         super().__init__(window)
         self.setObjectName("setupbackdrop")
         self.setAttribute(Qt.WidgetAttribute.WA_OpaquePaintEvent)
-        self._k = 0.0   # 0: the logo big in the middle, 1: small in the corner
+        self._k = 0.0   # 0: the logo and name in the middle, 1: faded out
         self._settle: QVariantAnimation | None = None
         self._fade: QVariantAnimation | None = None
         window.installEventFilter(self)
@@ -58,39 +52,19 @@ class Backdrop(QWidget):
         theme.paint_window_bg(p, r, QPointF(0, 0), r.width(), r.height())
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         p.setRenderHint(QPainter.RenderHint.TextAntialiasing)
-        k = self._k
+        # the logo and name stay where the loading screen had them and fade out as the
+        # guide comes in. They used to glide to the top corner, right under the title
+        # bar's own logo and name: the same thing twice
+        alpha = 1.0 - self._k
+        if alpha <= 0:
+            return
         cx, cy = r.width() / 2, r.height() / 2
-        # the logo glides from the middle to the corner, shrinking; the name doesn't
-        # travel with it (it would cross the logo on the way): it fades out under the
-        # logo and back in beside it in the corner
-        (end_x, end_y, small), name_at = self._corner()
-        size = _lerp(BIG, small, k)
-        logo_x = _lerp(cx, end_x, k)
-        logo_y = _lerp(cy + BIG_DY, end_y, k)
-        theme.paint_logo(p, QRectF(logo_x - size / 2, logo_y - size / 2, size, size),
+        p.setOpacity(alpha)
+        theme.paint_logo(p, QRectF(cx - BIG / 2, cy + BIG_DY - BIG / 2, BIG, BIG),
                          theme.T["accent"], theme.T["accent2"])
+        p.setOpacity(1.0)
         p.setPen(QColor(theme.T["text_hi"]))
-        self._name(p, BIG_PX, cx, cy + NAME_DY, max(0.0, 1 - k / 0.35), centred=True)
-        if name_at is not None:
-            font, x, y = name_at
-            self._name(p, font, x, y, max(0.0, (k - 0.65) / 0.35))
-
-    def _corner(self):
-        """Where the logo ends up: ((centre x, centre y, size), (font, x, y) of the
-        name or None), on the window's own logo and name on the tab rail, so as the
-        backdrop fades they're already where the app has them. A window without them
-        (a test's stand-in): the plain corner."""
-        win = self.parent()
-        logo, mark = getattr(win, "logo", None), getattr(win, "wordmark", None)
-        if logo is None or not logo.isVisible():
-            return ((CORNER + SMALL / 2, CORNER + SMALL / 2, SMALL),
-                    (self._font(SMALL_PX), CORNER + SMALL + GAP, CORNER + SMALL / 2))
-        at = logo.mapTo(win, QPoint(0, 0))
-        spot = (at.x() + logo.width() / 2, at.y() + logo.height() / 2, logo.mark * 0.86)
-        if mark is None or not mark.isVisible():   # (the rail shut: the onion alone)
-            return spot, None
-        m = mark.mapTo(win, QPoint(0, 0))
-        return spot, (mark.font(), m.x(), m.y() + mark.height() / 2)
+        self._name(p, BIG_PX, cx, cy + NAME_DY, alpha, centred=True)
 
     @staticmethod
     def _font(px: int) -> QFont:
@@ -121,7 +95,7 @@ class Backdrop(QWidget):
         self.update()
 
     def settle(self):
-        """The guide is coming in: the logo to the corner."""
+        """The guide is coming in: the logo and name fade out."""
         if self._settle is not None or self._k >= 1:
             return
         if not animations_on():

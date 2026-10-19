@@ -202,7 +202,7 @@ SECTION_GAP = 16              # between a step's parts (a card, a list, the foot
 BUN_H, BUN_PAD = 74, 5
 # the guide's motion (only with Windows' Animation effects on: toast.animations_on)
 ENTER_MS, ENTER_DELAY_MS, RISE = 340, 360, 24   # in: fades up from RISE px lower, once
-# the backdrop's logo is nearly in its corner (setupbackdrop.SETTLE_MS)
+# the backdrop's logo has nearly faded out (setupbackdrop.SETTLE_MS)
 LEAVE_MS, SINK = 180, 12                         # out: fades, sinking a little
 PAGE_MS = 220                                    # a new step fades in
 STEP_MS = 260                                    # the step bar fills to the new step
@@ -470,6 +470,10 @@ class _PageStack(QWidget):
                                   and p.setGraphicsEffect(None))  # pyright: ignore[reportArgumentType]
             anim.start()
         self.currentChanged.emit(i)
+
+
+def _working_title() -> str:   # (a call: translated in the language picked by then)
+    return _("Working: your sounds go into your mic")
 
 
 class StatusCard(QFrame):
@@ -1612,6 +1616,8 @@ class SetupWizard(QDialog):
         self.mic_done.show()
 
     def recheck_cable(self, rescan: bool = True):
+        for label in (self.status_card.title, self.cable_status):
+            label.setMinimumHeight(0)   # (held only while the mic sets up)
         if rescan:
             self.win.devctl.refresh_devices()   # picks up a driver installed while we're open
         self.btn_restart.hide()
@@ -1664,6 +1670,7 @@ class SetupWizard(QDialog):
                     self.status_card.set_state("busy", _("Setting up"), _("Setting up…"))
                     self.cable_status.setText(_("Click Yes when Windows asks.")
                                               if attaching and ask else "")
+                    self._hold_working_room()
                 self.btn_cable.hide()
                 self.btn_recheck.hide()
                 self.btn_other.hide()
@@ -1810,14 +1817,30 @@ class SetupWizard(QDialog):
         self._update_next()
         QTimer.singleShot(SETTLE_MS, self, self._settle_size)   # a shorter state: no band
 
+    def _working_words(self) -> str:
+        mic = self.win.cfg.mic_device or _("your mic")
+        return _("Onion Board's audio driver is on <b>{mic}</b>. Discord and games hear "
+                 "your sounds through it: press Next.", mic=html.escape(mic))
+
+    def _hold_working_room(self):
+        """While the mic sets up, keep the room the "Working" title and words will take,
+        so the card doesn't grow on success and push everything under it down."""
+        for label, text in ((self.status_card.title, _working_title()),
+                            (self.cable_status, self._working_words())):
+            w = label.width()
+            if w <= 0:
+                continue
+            probe = QLabel(text)
+            probe.setFont(label.font())
+            probe.setStyleSheet(label.styleSheet())
+            probe.setWordWrap(True)
+            label.setMinimumHeight(probe.heightForWidth(w))
+            probe.deleteLater()
+
     def _show_working(self):
         """On the mic and working: said in plain words, a green card and a pill."""
-        mic = self.win.cfg.mic_device or _("your mic")
-        self.status_card.set_state("ok", _("Installed"),
-                                   _("Working: your sounds go into your mic"))
-        self.cable_status.setText(_("Onion Board's audio driver is on <b>{mic}</b>. Discord "
-                                    "and games hear your sounds through it: press Next.",
-                                    mic=html.escape(mic)))
+        self.status_card.set_state("ok", _("Installed"), _working_title())
+        self.cable_status.setText(self._working_words())
 
     def _alt_cable(self):
         """Use the cable, from the optional card. With the driver working on the mic,
