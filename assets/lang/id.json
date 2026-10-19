@@ -4263,5 +4263,10 @@
   "No thanks, finish": "Tidak, selesai",
   "Yes, set up Discord": "Ya, atur Discord",
   "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows tidak lagi mengenali mik pilihanmu, jadi Onion Board pindah ke {mic} (mik default Windows).",
-  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Suaramu sudah ada di mik, tapi mikmu sendiri tidak mengirim suara sekarang. Apakah headset-mu mati atau di-mute?"
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Suaramu sudah ada di mik, tapi mikmu sendiri tidak mengirim suara sekarang. Apakah headset-mu mati atau di-mute?",
+  "Earned": "Didapat",
+  "Every rarity": "Semua kelangkaan",
+  "Not yet": "Belum",
+  "Nothing here yet. Try another filter.": "Belum ada apa-apa di sini. Coba filter lain.",
+  "Rarity": "Kelangkaan"
 }

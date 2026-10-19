@@ -4263,5 +4263,10 @@
   "No thanks, finish": "不用了，完成",
   "Yes, set up Discord": "好，设置 Discord",
   "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows 已不认识你选的麦克风，所以 Onion Board 改为装在 {mic}（Windows 默认麦克风）上。",
-  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "你的音效已进入麦克风，但麦克风本身现在没有发出声音。你的耳机是关着还是静音了？"
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "你的音效已进入麦克风，但麦克风本身现在没有发出声音。你的耳机是关着还是静音了？",
+  "Earned": "已获得",
+  "Every rarity": "全部稀有度",
+  "Not yet": "未获得",
+  "Nothing here yet. Try another filter.": "这里还没有内容。换个筛选试试。",
+  "Rarity": "稀有度"
 }

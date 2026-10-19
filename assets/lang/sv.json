@@ -4342,5 +4342,10 @@
   "No thanks, finish": "Nej tack, slutför",
   "Yes, set up Discord": "Ja, ställ in Discord",
   "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows känner inte längre igen mikrofonen du valde, så Onion Board gick på {mic} (Windows standardmikrofon) i stället.",
-  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Dina ljud är i mikrofonen, men själva mikrofonen skickar inget ljud just nu. Är ditt headset avstängt eller tystat?"
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Dina ljud är i mikrofonen, men själva mikrofonen skickar inget ljud just nu. Är ditt headset avstängt eller tystat?",
+  "Earned": "Uppnådda",
+  "Every rarity": "Alla sällsyntheter",
+  "Not yet": "Inte än",
+  "Nothing here yet. Try another filter.": "Inget här än. Testa ett annat filter.",
+  "Rarity": "Sällsynthet"
 }

@@ -4342,5 +4342,10 @@
   "No thanks, finish": "Hayır, teşekkürler, bitir",
   "Yes, set up Discord": "Evet, Discord'u ayarla",
   "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows seçtiğin mikrofonu artık tanımıyor, bu yüzden Onion Board onun yerine {mic} (Windows'un varsayılan mikrofonu) üzerine geçti.",
-  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Seslerin mikrofonunda, ama mikrofonun kendisi şu an ses göndermiyor. Kulaklığın kapalı ya da sessizde mi?"
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Seslerin mikrofonunda, ama mikrofonun kendisi şu an ses göndermiyor. Kulaklığın kapalı ya da sessizde mi?",
+  "Earned": "Kazanılanlar",
+  "Every rarity": "Her nadirlik",
+  "Not yet": "Henüz değil",
+  "Nothing here yet. Try another filter.": "Burada henüz bir şey yok. Başka bir filtre dene.",
+  "Rarity": "Nadirlik"
 }

@@ -15,6 +15,6 @@ Only artwork made for this project goes here (no third-party images).
 | `voice-chipmunk.png` … `voice-podcast-voice.png` | the voice changer's tiles, and the Voice tab while that voice is on. The name is the voice's name in lowercase with dashes: `voice-deep-voice`, `voice-walkie-talkie`, `voice-old-telephone`, `voice-stadium-announcer` |
 | `voice-custom.png` | the "My own mix" tile, and your saved voices' tiles |
 | `ai-voice-bear.png` … `ai-voice-bean.png` | the AI voices' cards, by the voice's id in `modules/ai-voices/voices.json` (`ai-voice-titan`, `ai-voice-squeak`); without one the card shows the voice's emoji |
-| `achievement-first_blood.png` … `achievement-no_life.png` | Settings > Achievements' badges, by the achievement's id in `soundboard/core/achievements.py` `ALL`; shown round at 44 px, greyed while locked. Without one the badge is drawn (a medal in the rarity's colour) |
+| `achievement-first_blood.png` … `achievement-no_life.png` | Settings > Achievements' badges, by the achievement's id in `soundboard/core/achievements.py` `ALL`; shown round at 44 px, greyed while locked. Without one (the usual case) the badge is Bun drawn in code (`soundboard/ui/settings/badges.py`) |
 | `voice-random.png` | the "Random voice" tile (without it, a die painted in code) |
 | `onion-watch.png` | the Onion Watch logo on the Triggers tab before the add-on is installed (192 px, drawn by Onion Watch's own `theme.logo_image`; without it the card has no logo) |

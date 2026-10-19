@@ -4342,5 +4342,10 @@
   "No thanks, finish": "Nee bedankt, afronden",
   "Yes, set up Discord": "Ja, Discord instellen",
   "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows kent je gekozen microfoon niet meer, dus Onion Board is in plaats daarvan op {mic} (de standaardmicrofoon van Windows) gegaan.",
-  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Je geluiden zitten in je microfoon, maar je microfoon zelf stuurt nu geen geluid. Staat je headset uit of gedempt?"
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Je geluiden zitten in je microfoon, maar je microfoon zelf stuurt nu geen geluid. Staat je headset uit of gedempt?",
+  "Earned": "Behaald",
+  "Every rarity": "Elke zeldzaamheid",
+  "Not yet": "Nog niet",
+  "Nothing here yet. Try another filter.": "Hier is nog niets. Probeer een ander filter.",
+  "Rarity": "Zeldzaamheid"
 }

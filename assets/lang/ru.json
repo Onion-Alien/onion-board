@@ -4421,5 +4421,10 @@
   "No thanks, finish": "Нет, спасибо, готово",
   "Yes, set up Discord": "Да, настроить Discord",
   "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows больше не знает выбранный микрофон, поэтому Onion Board встал на {mic} (микрофон Windows по умолчанию).",
-  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Твои звуки идут в микрофон, но сам микрофон сейчас не передаёт звук. Гарнитура выключена или на беззвучном?"
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Твои звуки идут в микрофон, но сам микрофон сейчас не передаёт звук. Гарнитура выключена или на беззвучном?",
+  "Earned": "Получены",
+  "Every rarity": "Любая редкость",
+  "Not yet": "Ещё нет",
+  "Nothing here yet. Try another filter.": "Здесь пока ничего нет. Попробуй другой фильтр.",
+  "Rarity": "Редкость"
 }

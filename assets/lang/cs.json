@@ -4421,5 +4421,10 @@
   "No thanks, finish": "Ne, díky, dokončit",
   "Yes, set up Discord": "Ano, nastavit Discord",
   "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows už tvůj vybraný mikrofon nezná, takže Onion Board přešel na {mic} (výchozí mikrofon Windows).",
-  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Tvoje zvuky jsou v mikrofonu, ale mikrofon sám teď neposílá žádný zvuk. Nemáš headset vypnutý nebo ztlumený?"
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Tvoje zvuky jsou v mikrofonu, ale mikrofon sám teď neposílá žádný zvuk. Nemáš headset vypnutý nebo ztlumený?",
+  "Earned": "Získané",
+  "Every rarity": "Každá vzácnost",
+  "Not yet": "Zatím ne",
+  "Nothing here yet. Try another filter.": "Zatím tu nic není. Zkus jiný filtr.",
+  "Rarity": "Vzácnost"
 }

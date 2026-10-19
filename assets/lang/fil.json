@@ -4342,5 +4342,10 @@
   "No thanks, finish": "Hindi na, tapusin",
   "Yes, set up Discord": "Oo, i-set up ang Discord",
   "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Hindi na kilala ng Windows ang mic na pinili mo, kaya pumunta ang Onion Board sa {mic} (ang default na mic ng Windows).",
-  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Nasa mic mo ang mga tunog mo, pero walang tunog na pinapadala ang mic mo ngayon. Naka-off ba o naka-mute ang headset mo?"
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Nasa mic mo ang mga tunog mo, pero walang tunog na pinapadala ang mic mo ngayon. Naka-off ba o naka-mute ang headset mo?",
+  "Earned": "Nakuha na",
+  "Every rarity": "Lahat ng rarity",
+  "Not yet": "Hindi pa",
+  "Nothing here yet. Try another filter.": "Wala pa rito. Subukan ang ibang filter.",
+  "Rarity": "Rarity"
 }

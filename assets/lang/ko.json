@@ -4263,5 +4263,10 @@
   "No thanks, finish": "괜찮아요, 마치기",
   "Yes, set up Discord": "네, Discord 설정하기",
   "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows가 선택한 마이크를 더 이상 인식하지 않아서 Onion Board가 대신 {mic}(Windows 기본 마이크)에 들어갔어요.",
-  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "사운드는 마이크에 들어가 있지만, 지금 마이크 자체에서는 소리가 나오지 않아요. 헤드셋이 꺼져 있거나 음소거되어 있나요?"
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "사운드는 마이크에 들어가 있지만, 지금 마이크 자체에서는 소리가 나오지 않아요. 헤드셋이 꺼져 있거나 음소거되어 있나요?",
+  "Earned": "획득함",
+  "Every rarity": "모든 희귀도",
+  "Not yet": "아직",
+  "Nothing here yet. Try another filter.": "아직 여기에 아무것도 없어요. 다른 필터를 써 보세요.",
+  "Rarity": "희귀도"
 }

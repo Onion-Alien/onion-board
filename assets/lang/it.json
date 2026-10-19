@@ -4342,5 +4342,10 @@
   "No thanks, finish": "No grazie, fine",
   "Yes, set up Discord": "Sì, configura Discord",
   "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows non riconosce più il microfono che hai scelto, quindi Onion Board è passato a {mic} (il microfono predefinito di Windows).",
-  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "I tuoi suoni sono nel microfono, ma il microfono stesso ora non manda nessun suono. Le cuffie sono spente o silenziate?"
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "I tuoi suoni sono nel microfono, ma il microfono stesso ora non manda nessun suono. Le cuffie sono spente o silenziate?",
+  "Earned": "Ottenuti",
+  "Every rarity": "Ogni rarità",
+  "Not yet": "Non ancora",
+  "Nothing here yet. Try another filter.": "Qui non c'è ancora niente. Prova un altro filtro.",
+  "Rarity": "Rarità"
 }
