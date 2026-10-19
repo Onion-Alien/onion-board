@@ -242,6 +242,34 @@ def test_a_typed_value_survives_enter(qapp):
     b.pop.hide()
 
 
+def test_a_typed_value_past_the_range_is_capped(qapp):
+    """A number past the range kept only its first digit (20 into Bass gave +2 dB, 1.5
+    gave +1 dB): Qt refused the keystroke that went past. Now it's capped on Enter."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
+    b = SpeedPitchButton()
+    b.click()
+    bass = b.fx["bass"]
+    for text, want, shown in (("999", 18.0, "+18 dB"), ("20", 18.0, "+18 dB"),
+                              ("-999", -12.0, "-12 dB"), ("1.5", 2.0, "+2 dB"),
+                              ("18", 18.0, "+18 dB")):
+        box = bass.val
+        box.setFocus()
+        box.selectAll()
+        QTest.keyClicks(box, text)
+        assert box.lineEdit().text().startswith(text)   # every key went in
+        QTest.keyClick(box, Qt.Key.Key_Return)
+        assert bass.value() == want and box.lineEdit().text() == shown, text
+    box = b.speed.val                                    # clicked away, not Enter
+    box.setFocus()
+    box.selectAll()
+    QTest.keyClicks(box, "9")
+    b.pitch.val.setFocus()
+    assert b.speed.value() == box.maximum()
+    b.pop.hide()
+
+
 def test_a_lit_preset_clicked_again_puts_the_knobs_back(qapp):
     """Clicked again, a lit preset turned every knob off, a tweak made before it too."""
     from soundboard.audio import livefx
