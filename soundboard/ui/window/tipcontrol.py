@@ -135,6 +135,27 @@ class TipControl(Controller):
         box.body.setTextFormat(Qt.TextFormat.RichText)   # (the setting names in bold)
         self._show_help(box, mw.btn_mictips)
 
+    def _show_cable_tips(self):
+        """The cable tile's ⓘ: who's better off with the virtual cable than the mic."""
+        mw = self.mw
+        box = TabHelpPopup(
+            _("When to use the cable"),
+            _("Most people don't need it: your sounds go into the mic you already use. "
+              "The cable is the better pick if:<br><br>"
+              "• <b>You have no mic</b>, or it's often unplugged. The cable works without "
+              "one, so you can still play sounds to others.<br>"
+              "• <b>You'd rather Onion Board didn't touch your mic.</b> Putting sounds into "
+              "your mic adds Onion Board's audio driver to it, and Windows asks you to "
+              "allow that. The cable is VB-Audio's own free driver instead (its installer "
+              "asks Windows too), and Onion Board leaves your mic as it is.<br>"
+              "• <b>A game or app skips Onion Board's driver</b>, so others hear your "
+              "voice but not your sounds.<br><br>"
+              "With the cable, pick <b>CABLE Output</b> as the mic in Discord and in each "
+              "game. If you have a mic, your voice goes along with your sounds."),
+            parent=mw)
+        box.body.setTextFormat(Qt.TextFormat.RichText)   # (the bold and the list)
+        self._show_help(box, mw.btn_cableinfo)
+
     def _show_help(self, box: QDialog, beside: QWidget):
         """Open a help card to the right of `beside` (a rail button), inside the
         window: never off its left edge."""

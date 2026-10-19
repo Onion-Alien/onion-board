@@ -4117,5 +4117,7 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "關閉 Onion Board 時，它會把 Discord 的噪音抑制、回音消除和自動音量重新打開，方便聊天。不想這樣？在設置分頁取消勾選<b>關閉時把 Discord 恢復成聊天設定</b>。",
   "Your sounds reach your friends clean now, not muffled or cut off.": "你的聲音現在能清楚地傳給朋友，不再悶悶的或斷斷續續。",
   "{name} is set up for your sounds": "{name} 已為你的聲音設定好",
-  "What's popular right now": "現在流行的"
+  "What's popular right now": "現在流行的",
+  "Most people don't need it: your sounds go into the mic you already use. The cable is the better pick if:<br><br>• <b>You have no mic</b>, or it's often unplugged. The cable works without one, so you can still play sounds to others.<br>• <b>You'd rather Onion Board didn't touch your mic.</b> Putting sounds into your mic adds Onion Board's audio driver to it, and Windows asks you to allow that. The cable is VB-Audio's own free driver instead (its installer asks Windows too), and Onion Board leaves your mic as it is.<br>• <b>A game or app skips Onion Board's driver</b>, so others hear your voice but not your sounds.<br><br>With the cable, pick <b>CABLE Output</b> as the mic in Discord and in each game. If you have a mic, your voice goes along with your sounds.": "大多數人用不到：你的音效會進入你正在用的麥克風。以下情況用音源線比較好：<br><br>• <b>你沒有麥克風</b>，或常常拔掉。音源線沒有麥克風也能用，你照樣可以放音效給別人聽。<br>• <b>你不想讓 Onion Board 動你的麥克風。</b>把音效送進麥克風會替它加上 Onion Board 的音訊驅動程式，Windows 會請你允許。音源線則是 VB-Audio 自己的免費驅動程式（它的安裝程式也會請 Windows 允許），Onion Board 不會動你的麥克風。<br>• <b>某個遊戲或應用程式跳過了 Onion Board 的驅動程式</b>，別人聽得到你的聲音，卻聽不到音效。<br><br>用音源線時，在 Discord 和每個遊戲裡把 <b>CABLE Output</b> 選為麥克風。如果你有麥克風，你的聲音會和音效一起傳過去。",
+  "When to use the cable": "什麼時候用音源線"
 }

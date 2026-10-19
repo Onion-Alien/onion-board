@@ -1672,8 +1672,12 @@ class WindowBuilder(Controller):
         head.setProperty("head", True)
         al.addWidget(head)
         tiles = mw.mic_alt_tiles = TileRow()   # stacked when narrow, never clipped
+        # when the cable is the better pick, behind an ⓘ beside its button
+        mw.btn_cableinfo = info_button(_("When to use the cable"))
+        mw.btn_cableinfo.clicked.connect(mw.tipctl._show_cable_tips)
         mw.alt_cable, mw.alt_cable_words = alt_tile(
-            "cable", _("Virtual cable"), "", mw.btn_usecable, mw.btn_rmcable)
+            "cable", _("Virtual cable"), "", mw.btn_usecable, mw.btn_cableinfo,
+            mw.btn_rmcable)
         tiles.addTile(mw.alt_cable)
         mw.btn_pickdev = QPushButton(_("Pick a device"))
         icons.set_icon(mw.btn_pickdev, "sliders")

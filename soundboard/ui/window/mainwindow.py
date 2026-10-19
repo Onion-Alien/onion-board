@@ -192,6 +192,7 @@ class MainWindow(QMainWindow):
     btn_micoff: QPushButton
     btn_micredo: QPushButton
     btn_mictips: Any
+    btn_cableinfo: Any
     btn_micupdate: QPushButton
     btn_more: QPushButton
     btn_more_tabs: QPushButton

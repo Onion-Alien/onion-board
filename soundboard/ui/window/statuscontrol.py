@@ -411,6 +411,7 @@ class StatusControl(Controller):
         reveal.set_shown(mw.mic_alt, route == "mic" and not mic_busy)   # also when it works
         mw.alt_cable.setVisible(not mw._cable_gone)   # (back after a restart)
         mw.btn_usecable.setVisible(route == "mic" and not mic_busy and not mw._cable_gone)
+        mw.btn_cableinfo.setVisible(mw.btn_usecable.isVisibleTo(mw.alt_cable))
         spare = route == "mic" and state == "ok" and mw.micctl._spare_cable()
         mw.btn_rmcable.setVisible(spare)
         # installed and spare: say why there's a Use and a Remove, not two puzzles
