@@ -70,6 +70,26 @@ def test_rich_text_and_one_paragraph_boxes_keep_their_text(quiet):
         one.close()
 
 
+def test_long_text_is_left_free_to_wrap(quiet):
+    """A fixed minimum on a long line hid its width from QMessageBox, which then left
+    it unwrapped (on a wide screen) and cut it off. Only short text gets the room."""
+    from PySide6.QtWidgets import QLabel
+    short = QMessageBox(QMessageBox.Icon.Question, "T", "Remove it?")
+    long_ = QMessageBox(QMessageBox.Icon.Question, "T",
+                        "Bulgarian isn't downloaded yet. Download and install it now? It's a "
+                        "one-time 42 MB download, and Windows may ask to add its voice too.")
+    for box in (short, long_):
+        box.show()
+    try:
+        assert short.findChild(QLabel, "qt_msgbox_label").minimumWidth() == quietbox.TEXT_MIN
+        label = long_.findChild(QLabel, "qt_msgbox_label")
+        assert label.minimumWidth() == 0
+        assert label.wordWrap() and label.height() >= label.heightForWidth(label.width())
+    finally:
+        short.close()
+        long_.close()
+
+
 def test_name_boxes_get_room_and_a_main_button(quiet):
     from PySide6.QtWidgets import QDialogButtonBox, QInputDialog
     dlg = QInputDialog()

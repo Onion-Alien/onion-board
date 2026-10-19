@@ -86,7 +86,14 @@ def tidy(box: QMessageBox) -> None:
             f.setBold(True)
             f.setPointSizeF(f.pointSizeF() * 1.1)
             label.setFont(f)
-        label.setMinimumWidth(TEXT_MIN)
+        # Only text shorter than TEXT_MIN gets the minimum: QMessageBox measures the
+        # unwrapped label to decide whether to wrap it, and a fixed minimum hides a
+        # long line's width, so on a wide screen it stayed one line and was cut off.
+        wrap = label.wordWrap()
+        label.setWordWrap(False)
+        if label.sizeHint().width() < TEXT_MIN:
+            label.setMinimumWidth(TEXT_MIN)
+        label.setWordWrap(wrap)
     icon = box.findChild(QLabel, "qt_msgboxex_icon_label")
     if icon is not None:
         icon.setContentsMargins(0, 0, 6, 0)
