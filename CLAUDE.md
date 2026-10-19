@@ -28,6 +28,14 @@ On top of those, for agents:
 - Run `python scripts/check_sensitive.py` (part of `scripts\precommit.ps1`) and fix what
   it reports. Don't add `# sensitive-scan: allow` to silence it without telling the user why.
 
+## Working in a fork or clone
+
+A copy of this repo still sends its usage counts to Onion Board's GoatCounter, reads Onion
+Board's sound store, takes Onion Board's updates and carries its name and logo. If the
+user's repo isn't `Onion-Alien/onion-board`, go through
+[docs/FORKING.md](docs/FORKING.md) before building or releasing anything, and tell the
+user which of those still point here.
+
 ## Text the app shows: every language, in the same change
 
 Onion Board ships in every language in `assets/lang/`. Any change that adds or edits text
