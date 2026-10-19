@@ -1,0 +1,1 @@
+- Developers: a source copy run from the temp folder (a throwaway worktree) keeps its own profile, `%APPDATA%\OnionBoard-dev`, so a branch under test can't empty the real sound cache or change the real settings.

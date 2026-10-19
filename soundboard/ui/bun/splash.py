@@ -20,11 +20,9 @@ import atexit
 import json
 import logging
 import math
-import os
 import sys
 import threading
 import time
-from pathlib import Path
 
 from PySide6.QtCore import QEventLoop, QPointF, QRectF, Qt
 from PySide6.QtGui import (QColor, QCursor, QFont, QGuiApplication, QImage, QPainter,
@@ -32,6 +30,7 @@ from PySide6.QtGui import (QColor, QCursor, QFont, QGuiApplication, QImage, QPai
 from PySide6.QtWidgets import QApplication, QWidget
 
 from soundboard import __version__
+from soundboard.core import profile
 from soundboard.ui.kit import theme
 from soundboard.ui.bun.bunny import sparkle
 from soundboard.i18n import _
@@ -51,7 +50,7 @@ NATIVE_FPS = 30
 # takes the GIL dozens of times, and a busy UI thread would otherwise hold it 5 ms each
 SWITCH_S = 0.0005
 # library.CONFIG_PATH, without importing library (numpy, soundfile...) this early
-CONFIG = Path(os.environ.get("APPDATA", Path.home())) / "OnionBoard" / "config.json"
+CONFIG = profile.base() / "config.json"
 
 _splash: Splash | NativeSplash | None = None
 _last = 0.0
