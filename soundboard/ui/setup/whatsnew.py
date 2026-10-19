@@ -52,7 +52,7 @@ def recent() -> tuple[Note, ...]:
              _("The voice bar's Effects button puts rain, a crowd, a fire or a sound from "
                "your board behind your voice.")),
             ("sounds", _("Community"),
-             _("Share your voices and setups with everyone, and get theirs.")),
+             _("Share your voices and voice combos with everyone, and get theirs.")),
             ("plus", _("19 new voices"),
              _("13 new voice changer voices and 6 new AI voices.")),
             ("play", _("Bun and Hoot redrawn"),
@@ -61,7 +61,7 @@ def recent() -> tuple[Note, ...]:
         Note("2.4.0", _("Voices on your sounds, and hotkeys in games"), (
             ("voice", _("Say any sound in a voice"),
              _("Right-click a pad, open Effects and pick a Voice: any voice changer voice, "
-               "AI voice or saved setup. Your original file is never changed.")),
+               "AI voice or saved voice combo. Your original file is never changed.")),
             ("check", _("Hotkeys work in your game"),
              _("Press a hotkey in a game and the game still gets the key while your sound "
                "plays. Settings → Hotkeys → Keys in games turns that off.")),

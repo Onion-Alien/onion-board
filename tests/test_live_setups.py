@@ -1,4 +1,4 @@
-"""My setups in Live controls (ui.livesetups, soundboard.mic.livesetup): a voice setup on
+"""My voice combos in Live controls (ui.livesetups, soundboard.mic.livesetup): a voice setup on
 every sound, the radio or the programs the Apps tab sends. The voice changer part is on
 at once; an AI voice is made first (sounds) or started first (streams), with a Cancel."""
 import sys

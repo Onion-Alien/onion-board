@@ -1,4 +1,4 @@
-"""Edit sound → Effects → Voice: a voice changer voice, an AI voice or a saved setup
+"""Edit sound → Effects → Voice: a voice changer voice, an AI voice or a saved voice combo
 laid over a sound, picked from cards (ui.voicepicker)."""
 import numpy as np
 from test_mainwindow import window  # noqa: F401  (the real MainWindow)
@@ -128,7 +128,7 @@ def test_the_catalog_has_every_built_in_voice(window):  # noqa: F811
     assert all(c["on"] for c in cat.fx[0][2].values())
 
 
-# ---------------------------------------------------------------- the Voice tab's My setups
+# ---------------------------------------------------------------- the Voice tab's My voice combos
 
 def test_the_voice_tab_saves_whats_on_and_turns_a_setup_back_on(window, app_dir):  # noqa: F811
     if not window.tabctl.tab_on("voice"):
@@ -199,7 +199,7 @@ def test_the_setup_menu_renames_and_says_when_the_name_is_taken(window, app_dir,
 
 
 def test_the_voice_tabs_and_my_setups_scroll_away_with_the_card(window, qapp):  # noqa: F811
-    """On a short window the voice list had a sliver: the part tabs and My setups were
+    """On a short window the voice list had a sliver: the part tabs and My voice combos were
     pinned above it. They're the top of the scrolling part now; the Say bar and the
     bottom bar stay."""
     from tests.conftest import process_events
@@ -215,8 +215,8 @@ def test_the_voice_tabs_and_my_setups_scroll_away_with_the_card(window, qapp):  
 
 
 def test_a_short_voice_tab_on_a_tall_window_leaves_no_gap_above_it(window, qapp):  # noqa: F811
-    """The spare height of a tall window went to the tabs and My setups (a 200 px gap
-    under the tabs, My setups 200 px tall): it goes under the card."""
+    """The spare height of a tall window went to the tabs and My voice combos (a 200 px gap
+    under the tabs, My voice combos 200 px tall): it goes under the card."""
     from tests.conftest import process_events
     w = window
     w.show()

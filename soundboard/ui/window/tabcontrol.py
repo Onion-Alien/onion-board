@@ -22,6 +22,7 @@ from soundboard.ui.apps.appspanel import AppsTab
 from soundboard.ui.window.buncontrol import BUN_TIP
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.window.livedot import set_tab_live
+from soundboard.ui.window.sidebar import set_tab_new
 from soundboard.ui.store.storetab import StoreTab
 from soundboard.ui.voice.voicepanel import VoicePanel
 
@@ -179,6 +180,24 @@ class TabControl(Controller):
         usage.used(f"tab-hidden-{key}")
         mw.toast(_("{tab} hidden. Bring it back with + More tabs or Settings > Tabs.",
                      tab=TABS[TAB_INDEX[key]][0]))
+
+    def mark_store_new(self):
+        """A "New" pill on the Store tab until it's first opened (Config.store_seen):
+        people who never looked in it find it; once opened, never again."""
+        mw = self.mw
+        i = TAB_INDEX["store"]
+
+        def seen(cur: int):
+            if cur != i:
+                return
+            mw.tabs.currentChanged.disconnect(seen)
+            mw.set_option("store_seen", True)
+            set_tab_new(mw.tabs, i, False)
+        if mw.cfg.store_seen:
+            return
+        set_tab_new(mw.tabs, i, True)
+        mw.tabs.currentChanged.connect(seen)
+        seen(mw.tabs.currentIndex())
 
     def _tab_live(self, key: str, on: bool):
         """The live badge on the Voice, Triggers or Apps tab (Store has none)."""

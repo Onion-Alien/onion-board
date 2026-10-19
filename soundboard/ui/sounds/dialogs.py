@@ -143,7 +143,7 @@ class EffectsPanel(QWidget):
         self.voice = QPushButton()
         self.voice.setToolTip(_("Says this sound in a voice from the Voice tab, the way your "
                                 "mic sounds with it: a voice changer voice, an AI voice or "
-                                "your own setup"))
+                                "your own voice combo"))
         self.voice.setAccessibleName(_("Voice"))
         icons.set_icon(self.voice, "voice", "muted")
         self.voice.clicked.connect(self._open_voices)

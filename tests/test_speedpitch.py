@@ -237,7 +237,7 @@ def test_a_lit_preset_clicked_again_puts_the_knobs_back(qapp):
 
 
 def test_my_setups_label_lines_up_with_its_chips(qapp):
-    """"My setups" sat a few pixels below "No voice": the section label's top padding."""
+    """"My voice combos" sat a few pixels below "No voice": the section label's top padding."""
     from soundboard.ui.sounds.speedpitch import SpeedPitchButton
     b = SpeedPitchButton()
     b.set_setups([], "")

@@ -304,13 +304,13 @@ class SpeedPitchButton(QPushButton):
         v.addLayout(head)
         v.addWidget(self._rule())
 
-        # --- a voice setup (the Voice tab's My setups) on everything here
+        # --- a voice setup (the Voice tab's My voice combos) on everything here
         self.setup_name = ""
         self._setup_chips: dict[str, QPushButton] = {}
         srow = QGridLayout()   # the name, then its chips with the progress under them
         srow.setHorizontalSpacing(12)
         srow.setVerticalSpacing(6)
-        lab = self._setups_lab = section_label(_("My setups"))
+        lab = self._setups_lab = section_label(_("My voice combos"))
         # on the chips' first row: as tall as a chip, its text centred in that (no
         # padding above, which pushed it below the chips' words)
         lab.setProperty("head", True)
