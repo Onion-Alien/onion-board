@@ -183,3 +183,28 @@ def test_prepare_art_knows_every_badge():
     spec.loader.exec_module(mod)
     assert mod.key_for("achievement-gamer_bun (2).png") == "achievement-gamer_bun"
     assert {f"achievement-{a.id}" for a in ach.ALL} <= set(mod.KEYS)
+
+
+def test_every_badge_has_a_scene_from_buns_own_kit(qapp):
+    """Each badge is Bun drawn in a scene: only props, outfit pieces, rare looks and
+    icons that exist (a typo would quietly draw plain Bun, or nothing)."""
+    from soundboard.style import bunnyfit
+    from soundboard.ui.bun import bunny, splashacts
+    from soundboard.ui.kit import icons
+    from soundboard.ui.settings import badges
+    assert set(badges.SCENES) == set(ach.BY_ID)
+    for aid, scene in badges.SCENES.items():
+        assert scene.get("prop") in bunny.PROPS, aid
+        assert all(piece in bunnyfit.PIECES for piece in scene.get("outfit", ())), aid
+        assert scene.get("rare") in (None, *splashacts.RARES), aid
+        assert scene.get("glyph") in (None, *icons.SHAPES), aid
+
+
+def test_a_badge_is_drawn_and_locked_ones_are_grey(qapp):
+    from soundboard.ui.settings import badges
+    on = badges.badge("golden_bun", "uncommon", 56).toImage()
+    off = badges.badge("golden_bun", "uncommon", 56, locked=True).toImage()
+    mid = on.pixelColor(28, 30)
+    assert mid.alpha() == 255 and mid.saturation() > 40   # gold, Bun on it
+    grey = off.pixelColor(28, 30)
+    assert grey.saturation() < 10 and grey.alpha() < 160  # grey and faded

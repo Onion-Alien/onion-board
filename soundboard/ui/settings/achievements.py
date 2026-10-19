@@ -2,7 +2,7 @@
 in its rarity's colour (the rare loading screens' colours), hidden ones as ??? until
 earned. The counting is soundboard.core.achievements; this page only shows it.
 
-A badge is drawn (a medal in the rarity's colour with an icon on it) until a picture
+A badge is Bun drawn in a scene for it (badges.py) unless a picture
 for it is in assets/art/achievement-<id>.png (art.ART_DIR, which the installed build
 carries): then that's shown, greyed while locked."""
 from __future__ import annotations
@@ -19,22 +19,12 @@ from soundboard.i18n import _
 from soundboard.ui.kit import icons, theme
 from soundboard.ui.kit.panel import hint_label
 from soundboard.ui.settings import Page
+from soundboard.ui.settings import badges
+from soundboard.ui.settings.badges import TIER_SPLASH, tier_colour
 from soundboard.ui.voice import art
 
-# a rarity's loading screen (ui/bun/splashacts.py RARES), for its colour and name
-TIER_SPLASH = {"uncommon": "gold", "rare": "ice", "legendary": "galaxy", "super": "rainbow"}
 TILE_W = 250   # the narrowest a tile gets; they share each row's width
-COMMON = "#a3a9b6"   # Common's silver
-BADGE = 48
-
-
-def tier_colour(tier: str) -> QColor:
-    """A rarity's colour: its rare loading screen's glow; Common, silver (a theme's
-    accent can be any of them: purple read as Legendary)."""
-    if tier in TIER_SPLASH:
-        from soundboard.ui.bun import splashacts
-        return QColor(splashacts.RARES[TIER_SPLASH[tier]][2])
-    return QColor(COMMON)
+BADGE = 56
 
 
 def tier_name(tier: str) -> str:
@@ -126,9 +116,9 @@ def _picture(ach_id: str, size: int, grey: bool) -> QPixmap | None:
 
 
 class Badge(QWidget):
-    """A medal: earned, filled with its rarity's colour; locked, the card's grey with a
-    ring of that colour (so a hidden one still says how rare it is) and the icon faint;
-    hidden and locked, a question mark."""
+    """The achievement's badge: Bun in its scene (badges.py), in colour when earned,
+    grey and faded while locked; a secret one still locked is a question mark in a ring
+    of its rarity's colour. A picture in assets/art (achievement-<id>.png) wins."""
 
     def __init__(self, a: ach.Ach):
         super().__init__()
@@ -137,32 +127,28 @@ class Badge(QWidget):
         self.setFixedSize(BADGE, BADGE)
 
     def paintEvent(self, _e):
-        tk = theme.tokens()
         p = QPainter(self)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(2, 2, BADGE - 4, BADGE - 4)
         colour = tier_colour(self.a.tier)
-        circle = QPainterPath()
-        circle.addEllipse(r)
-        pic = _picture(self.a.id, BADGE - 4, not self.earned)
-        if pic is not None and (self.earned or not self.a.hidden):
-            p.setClipPath(circle)
-            p.drawPixmap(2, 2, pic)
-            p.setClipping(False)
-        else:
-            p.fillPath(circle, colour if self.earned else QColor(tk["card_hi"]))
-            name = "question" if self.a.hidden and not self.earned else self.a.icon
-            ink = (QColor("#1b1b1f") if self.earned and colour.lightnessF() > 0.6
-                   else QColor("#ffffff") if self.earned else QColor(tk["faint"]))
+        if self.a.hidden and not self.earned:   # a secret: ? in its rarity's ring
+            circle = QPainterPath()
+            circle.addEllipse(r)
+            p.fillPath(circle, QColor(theme.tokens()["card_hi"]))
             g = 22
             p.drawPixmap(int((BADGE - g) / 2), int((BADGE - g) / 2),
-                         icons.pixmap(name, g, ink.name()))
-        ring = QColor(colour)
-        if self.earned:
-            ring = ring.lighter(130)
-        p.setPen(QPen(ring, 2.5))   # the same ring earned or not: the same size
-        p.setBrush(Qt.BrushStyle.NoBrush)
-        p.drawEllipse(r)
+                         icons.pixmap("question", g, theme.tokens()["faint"]))
+            p.setPen(QPen(colour, 2.5))
+            p.setBrush(Qt.BrushStyle.NoBrush)
+            p.drawEllipse(r)
+        elif (pic := _picture(self.a.id, BADGE - 4, not self.earned)) is not None:
+            circle = QPainterPath()
+            circle.addEllipse(r)
+            p.setClipPath(circle)
+            p.drawPixmap(2, 2, pic)
+        else:
+            p.drawPixmap(0, 0, badges.badge(self.a.id, self.a.tier, BADGE, not self.earned,
+                                            self.devicePixelRatioF()))
         p.end()
 
 
