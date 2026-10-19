@@ -150,3 +150,36 @@ def test_the_rarity_line_never_has_a_number_beside_it(window):  # noqa: F811
     assert "140" in tiles["spammer"].toolTip() and "1" in tiles["spammer"].toolTip()
     assert tiles["first_blood"].status.text() == tier_name("common")
     ach.detach()
+
+
+def test_a_badge_picture_in_the_art_folder_is_used(qapp, tmp_path, monkeypatch):
+    """Badge pictures live in assets/art (achievement-<id>.png): the installed build
+    carries that folder, not a new one of their own."""
+    from PySide6.QtGui import QColor, QImage
+    from soundboard.ui.settings import achievements as page
+    from soundboard.ui.voice import art
+    img = QImage(64, 64, QImage.Format.Format_ARGB32)
+    img.fill(QColor("#ff0000"))
+    img.save(str(tmp_path / "achievement-first_blood.png"))
+    monkeypatch.setattr(art, "ART_DIR", tmp_path)
+    page._picture.cache_clear()
+    try:
+        b = page.Badge(ach.BY_ID["first_blood"])
+        b.earned = True
+        shot = b.grab().toImage()
+        mid = shot.pixelColor(shot.width() // 2, shot.height() // 2)
+        assert mid.red() > 200 and mid.green() < 60
+        assert page._picture("menace", 44, False) is None   # none for it: drawn
+    finally:
+        page._picture.cache_clear()
+
+
+def test_prepare_art_knows_every_badge():
+    import importlib.util
+    from pathlib import Path
+    script = Path(__file__).resolve().parents[1] / "scripts" / "pictures" / "prepare_art.py"
+    spec = importlib.util.spec_from_file_location("prepare_art", script)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    assert mod.key_for("achievement-gamer_bun (2).png") == "achievement-gamer_bun"
+    assert {f"achievement-{a.id}" for a in ach.ALL} <= set(mod.KEYS)
