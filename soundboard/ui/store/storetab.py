@@ -312,7 +312,7 @@ class StoreTab(QWidget):
         words.addLayout(title_row)
         # (one line for Sounds and Voices: the same words as the tab's tooltip)
         self.tagline = hint_label(_("Sounds and voices players share, voted on by everyone: "
-                                    "add them or share your own"))
+                                    "add them to your board or share your own"))
         words.addWidget(self.tagline)
         words.addStretch(1)
         top.addLayout(words, 1)

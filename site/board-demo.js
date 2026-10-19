@@ -1840,7 +1840,7 @@
       h("div", { class: "ob-shero" }, [
         h("div", { class: "top" }, [bun, h("div", { class: "tt" }, [
           h("div", { class: "ln1" }, [h("b", { text: "Community" }), h("span", { class: "ob-beta", text: "Beta", title: "The Community tab is new and still changing." })]),
-          h("span", { class: "hint", text: "Sounds and voices players share, voted on by everyone: add them or share your own" })])]),
+          h("span", { class: "hint", text: "Sounds and voices players share, voted on by everyone: add them to your board or share your own" })])]),
         h("div", { class: "row" }, [seg, h("label", { class: "field" }, [icon("search", "s"), find]), catSel, share,
           btn("flat icon", null, "reload", function () { draw(); }, { "aria-label": "Refresh", title: "Refresh" })])]),
       list
