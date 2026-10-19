@@ -621,7 +621,7 @@
   "A little (-6 dB)": "少し（-6 dB）",
   "A lot (-20 dB)": "たくさん（-20 dB）",
   "A message for ChatGPT / Claude that explains Onion Board's links and lists your sounds, so it can set up your tools with you": "ChatGPT / Claude 向けのメッセージ。Onion Board のリンクの説明とサウンドの一覧が入っていて、一緒にツールを設定できます",
-  "A mode describes what the listener's voice codec does to your sounds, so the app can pre-shape them: which frequencies it cuts, how much sub-bass to turn into harmonics that survive, how much to even out the level, and whether it's mono. The built-in modes were measured; to measure another service, run scripts/codec_bench.py from the source tree.": "モードは、相手のボイスコーデックがサウンドに何をするかを表します。それに合わせてアプリが事前にサウンドを整えます: どの周波数をカットするか、サブベースをどれだけ残る倍音に変えるか、レベルをどれだけ揃えるか、モノラルかどうか。組み込みのモードは測定済みです。ほかのサービスを測るには、ソースツリーから scripts/codec_bench.py を実行してください。",
+  "A mode describes what the listener's voice codec does to your sounds, so the app can pre-shape them: which frequencies it cuts, how much sub-bass to turn into harmonics that survive, how much to even out the level, and whether it's mono. The built-in modes were measured; to measure another service, run scripts/voicetests/codec_bench.py from the source tree.": "モードは、相手のボイスコーデックがサウンドに何をするかを表します。それに合わせてアプリが事前にサウンドを整えます: どの周波数をカットするか、サブベースをどれだけ残る倍音に変えるか、レベルをどれだけ揃えるか、モノラルかどうか。組み込みのモードは測定済みです。ほかのサービスを測るには、ソースツリーから scripts/voicetests/codec_bench.py を実行してください。",
   "A newer Tor ({version}) is ready to download.": "新しい Tor（{version}）をダウンロードできます。",
   "A note from me": "作者からのひとこと",
   "A proxy of your own (or one your VPN app offers)": "自分のプロキシ（または VPN アプリが提供するもの）",

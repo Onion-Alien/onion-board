@@ -509,7 +509,7 @@ class CustomDestDialog(QDialog):
               "can pre-shape them: which frequencies it cuts, how much sub-bass to turn into "
               "harmonics that survive, how much to even out the level, and whether it's mono. "
               "The built-in modes were measured; to measure another service, run "
-              "scripts/codec_bench.py from the source tree."))
+              "scripts/voicetests/codec_bench.py from the source tree."))
         head = QHBoxLayout()
         head.setSpacing(8)
         title = QLabel(_("Custom destination modes"))

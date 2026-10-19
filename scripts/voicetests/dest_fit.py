@@ -1,9 +1,11 @@
 """Which "Who's listening" mode suits each game? Tries every built-in destination mode
 against every game profile.
 
-    python scripts/dest_fit.py                          # test signals, every game profile
-    python scripts/dest_fit.py --library --level        # your own sounds
-    python scripts/dest_fit.py --profiles photon fivem_radio --json fit.json
+    python scripts/voicetests/dest_fit.py [arguments], from the repo root:
+
+      (nothing)                                      test signals, every game profile
+      --library --level                              your own sounds
+      --profiles photon fivem_radio --json fit.json
 
 Each sound goes: the mode (soundboard.mic.destination, as the engine runs it) -> the
 send stage (phase-aware mono + limiter) -> the game's own cleanup and voice gate
@@ -33,7 +35,7 @@ from pathlib import Path
 
 import numpy as np
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 

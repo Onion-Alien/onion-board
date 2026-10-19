@@ -621,7 +621,7 @@
   "A little (-6 dB)": "一點點（-6 dB）",
   "A lot (-20 dB)": "很多（-20 dB）",
   "A message for ChatGPT / Claude that explains Onion Board's links and lists your sounds, so it can set up your tools with you": "給 ChatGPT／Claude 的訊息，說明 Onion Board 的連結並列出你的音效，讓它可以和你一起設定你的工具",
-  "A mode describes what the listener's voice codec does to your sounds, so the app can pre-shape them: which frequencies it cuts, how much sub-bass to turn into harmonics that survive, how much to even out the level, and whether it's mono. The built-in modes were measured; to measure another service, run scripts/codec_bench.py from the source tree.": "模式描述了對方的語音編解碼器會對你的音效做什麼，讓程式可以預先調整：它會切掉哪些頻率、要把多少超低音轉成能保留下來的泛音、要把音量拉平多少，以及是不是單聲道。內建模式都經過實測；要測量其他服務，請從原始碼執行 scripts/codec_bench.py。",
+  "A mode describes what the listener's voice codec does to your sounds, so the app can pre-shape them: which frequencies it cuts, how much sub-bass to turn into harmonics that survive, how much to even out the level, and whether it's mono. The built-in modes were measured; to measure another service, run scripts/voicetests/codec_bench.py from the source tree.": "模式描述了對方的語音編解碼器會對你的音效做什麼，讓程式可以預先調整：它會切掉哪些頻率、要把多少超低音轉成能保留下來的泛音、要把音量拉平多少，以及是不是單聲道。內建模式都經過實測；要測量其他服務，請從原始碼執行 scripts/voicetests/codec_bench.py。",
   "A newer Tor ({version}) is ready to download.": "有新版 Tor（{version}）可以下載。",
   "A note from me": "我想說的話",
   "A proxy of your own (or one your VPN app offers)": "你自己的代理伺服器（或你的 VPN 應用程式提供的）",

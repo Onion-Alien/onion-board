@@ -154,17 +154,17 @@ isn't part of pytest. Tiers, scenarios and how to read it:
 
 ### What voice chat does to the sounds (the bench)
 
-`scripts\codec_bench.py` runs sounds through each voice chat's codec, and with
+`scripts\voicetests\codec_bench.py` runs sounds through each voice chat's codec, and with
 `--defaults` through its own mic cleanup and voice gate as the game ships it
 (`--list` shows every profile: the games it covers, its settings and whether
-they're measured, sourced or estimated). `scripts\dest_fit.py` ranks the
+they're measured, sourced or estimated). `scripts\voicetests\dest_fit.py` ranks the
 *Who's listening* modes for each game. The cleanup is the real WebRTC / RNNoise
 code, which lives in a separate environment so the app's stays lean:
 
 ```powershell
 py -3.13 -m venv .venv-bench
 .venv-bench\Scripts\pip install -r requirements-bench.txt
-.venv-bench\Scripts\python scripts\codec_bench.py --library --defaults
+.venv-bench\Scripts\python scripts\voicetests\codec_bench.py --library --defaults
 ```
 
 The real-world checks play test signals into the virtual cable (they need it
