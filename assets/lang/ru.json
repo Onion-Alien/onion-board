@@ -785,21 +785,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "Забыть текущий список (и сохранённую историю, если она хранится)",
   "Forgets Apps tab volumes and hidden programs.": "Забывает громкость на вкладке «Программы» и скрытые программы.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Забывает микрофон, наушники, то, куда отправляются звуки, и выход для стрима; быстрая настройка запустится снова.",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "Найден звук <b>{n}</b> в {name} с помощью {categories} и {hotkeys} .",
-    "Найдено <b>{n}</b> звуков в {name} с помощью {categories} и {hotkeys} .",
-    "Найдено <b>{n}</b> звуков в {name} с помощью {categories} и {hotkeys} ."
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "Найден звук <b>{n}</b> в {name} с помощью {what} .",
-    "Найдено <b>{n}</b> звуков в {name} с помощью {what} .",
-    "Найдено <b>{n}</b> звуков в {name} с помощью {what} ."
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "Найден звук <b>{n}</b> в {name} .",
-    "Найдено <b>{n}</b> звуков в {name} .",
-    "Найдено <b>{n}</b> звуков в {name} ."
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Бесплатные дополнения с GitHub. Удаление или переустановка дополнения сохраняет твои триггеры и привязанные телефоны.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Бесплатно, без рекламы и без аккаунта. Сделал OnionAlien. Лицензия MIT с Commons Clause: используй как хочешь, делись бесплатно, никогда не продавай.",
   "Frequencies": "Частоты",
@@ -1183,7 +1168,6 @@
   "Theme, audio, voice, overlay and privacy options.": "Тема, аудио, голос, оверлей и конфиденциальность.",
   "Then Ctrl+click picks a pad without playing it": "Тогда Ctrl+клик выделяет кнопку, не играя её",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Они считают музыку фоновым шумом и кромсают твои звуки. Onion Board уже очищает твой голос.",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Они копируются в Onion Board; в {name} всё остаётся. Те, что уже есть, пропускаются, а горячая клавиша, которая здесь уже занята, не назначается.",
   "This desktop has no system tray, so closing the window quits.": "У этого рабочего стола нет трея, поэтому закрытие окна завершает приложение.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Это Onion Board {version}. С галочкой он каждые несколько часов спрашивает GitHub, не вышла ли новая версия, и сообщает тебе (с баннером, если это важное исправление). Эта копия запущена из исходников, поэтому он только сообщает: обновляй через git pull.",
   "Through a proxy": "Через прокси",
@@ -1404,11 +1388,6 @@
     "{n} заблокировано",
     "{n} заблокировано"
   ],
-  "{n} category": [
-    "{n} категория",
-    "{n} категорий",
-    "{n} категорий"
-  ],
   "{n} connection to {places}": [
     "{n} соединение с {places}",
     "{n} соединений с {places}",
@@ -1438,11 +1417,6 @@
     "{n} не удалось",
     "{n} не удалось",
     "{n} не удалось"
-  ],
-  "{n} hotkey": [
-    "{n} горячая клавиша",
-    "{n} горячих клавиш",
-    "{n} горячих клавиш"
   ],
   "{n} more can't be brought over (the file was moved or deleted, or isn't a sound): {names}": [
     "Больше {n} невозможно перенести (файл был перемещен или удален, или не является звуком): {names}",
@@ -3396,7 +3370,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows оставляет {key} себе и никогда не передаёт приложениям, так что эта горячая клавиша никогда не сработает: выбери другую клавишу.",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} — твоя клавиша «Остановить всё», поэтому она остаётся за ней. Выбери другую клавишу или сначала дай «Остановить всё» новую в Настройки → Горячие клавиши.",
   "Names can be up to {n} characters, so it's “{name}”.": "В названии может быть до {n} символов, поэтому получилось «{name}».",
-  "They go in a category called “{name}”.": "Они попадут в категорию «{name}».",
   "Type a name first.": "Сначала введите название.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Переименовано в «{new}». Другой звук тоже так называется.",
   "Disguise": "Маскировка",

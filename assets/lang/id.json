@@ -809,15 +809,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "Lupakan daftarnya sejauh ini (dan riwayat yang disimpan, jika disimpan)",
   "Forgets Apps tab volumes and hidden programs.": "Lupa volume tab Aplikasi dan program tersembunyi.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Lupa mikrofon, headphone, ke mana suara Anda dikirim, dan keluaran streaming; pengaturan cepat berjalan lagi.",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "Ditemukan suara <b>{n}</b> di {name} dengan {categories} dan {hotkeys} ."
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "Ditemukan suara <b>{n}</b> di {name} dengan {what} ."
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "Ditemukan <b>{n}</b> suara di {name} ."
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Add-on gratis dari GitHub. Menghapus atau menginstal ulang add-on tetap menyimpan pemicu dan HP yang sudah dipasangkan.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Gratis, tanpa iklan dan tanpa akun. Dibuat oleh OnionAlien. Lisensi MIT dengan Commons Clause: pakai untuk apa saja, bagikan gratis, jangan pernah dijual.",
   "Frequencies": "Frekuensi",
@@ -1212,7 +1203,6 @@
   "Theme, audio, voice, overlay and privacy options.": "Opsi tema, audio, suara, overlay, dan privasi.",
   "Then Ctrl+click picks a pad without playing it": "Lalu Ctrl+klik memilih pad tanpa memutarnya",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Mereka mengira musik adalah kebisingan latar belakang dan memotong suara Anda. Onion Board sudah membersihkan suara Anda.",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Mereka disalin ke Onion Board; {name} menyimpannya sendiri. Yang sudah ada di sini dilewati, dan hotkey yang sudah digunakan di sini tidak disertakan.",
   "This desktop has no system tray, so closing the window quits.": "Desktop ini tidak memiliki baki sistem, jadi menutup jendela akan berhenti.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Ini adalah Papan Bawang {version} . Dengan mencentang kotaknya, ia menanyakan GitHub setiap beberapa jam apakah versi yang lebih baru telah keluar dan memberi tahu Anda (dengan spanduk apakah ini merupakan perbaikan penting). Salinan ini dijalankan dari sumber, jadi hanya memberitahu Anda: perbarui dengan git pull.",
   "Through a proxy": "Melalui proksi",
@@ -1418,9 +1408,6 @@
   "{n} blocked": [
     "{n} diblokir"
   ],
-  "{n} category": [
-    "{n} kategori"
-  ],
   "{n} connection to {places}": [
     "{n} koneksi ke {places}"
   ],
@@ -1438,9 +1425,6 @@
   ],
   "{n} failed": [
     "{n} gagal"
-  ],
-  "{n} hotkey": [
-    "{n} tombol pintas"
   ],
   "{n} more can't be brought over (the file was moved or deleted, or isn't a sound): {names}": [
     "{n} lagi tidak dapat dibawa (file telah dipindahkan atau dihapus, atau tidak ada suara): {names}"
@@ -3250,7 +3234,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows menyimpan {key} untuk dirinya sendiri dan tidak pernah meneruskannya ke aplikasi, jadi hotkey itu tidak akan pernah memutar suara: pilih tombol lain.",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} adalah tombol Hentikan semuanya milikmu, jadi tetap di situ. Pilih tombol lain, atau beri Hentikan semuanya tombol baru dulu di Pengaturan → Hotkey.",
   "Names can be up to {n} characters, so it's “{name}”.": "Nama bisa sampai {n} karakter, jadi namanya “{name}”.",
-  "They go in a category called “{name}”.": "Semuanya masuk ke kategori bernama “{name}”.",
   "Type a name first.": "Ketik nama dulu.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Nama diganti jadi “{new}”. Ada suara lain dengan nama yang sama.",
   "Disguise": "Penyamaran",

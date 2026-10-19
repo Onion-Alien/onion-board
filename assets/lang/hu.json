@@ -412,18 +412,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "A lista eddigi részének elfelejtése (és a mentett előzményeké, ha meg vannak tartva)",
   "Forgets Apps tab volumes and hidden programs.": "Elfelejti az Appok lap hangerőit és rejtett programjait.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Elfelejti a mikrofonodat, a fejhallgatódat, hogy hová mennek a hangjaid, és a stream-kimenetet; a gyors beállítás újra lefut.",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "<b>{n}</b> hang található itt: {name}, ezekkel: {categories} és {hotkeys}.",
-    "<b>{n}</b> hang található itt: {name}, ezekkel: {categories} és {hotkeys}."
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "<b>{n}</b> hang található itt: {name}, ezzel: {what}.",
-    "<b>{n}</b> hang található itt: {name}, ezzel: {what}."
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "<b>{n}</b> hang található itt: {name}.",
-    "<b>{n}</b> hang található itt: {name}."
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Ingyenes bővítmények a GitHubról. Egy bővítmény eltávolítása vagy újratelepítése megtartja a triggereidet és a párosított telefonjaidat.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Ingyenes, reklámok és fiók nélkül. Készítette: OnionAlien. MIT licenc a Commons Clause-zal: használd bármire, oszd meg ingyen, de soha ne add el.",
   "Frequencies": "Frekvenciák",
@@ -1112,7 +1100,6 @@
   "There are no sounds yet. Export just your settings?": "Még nincsenek hangok. Csak a beállításaidat exportálod?",
   "There's already a “{new}”.": "Már van ilyen: „{new}”.",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Háttérzajnak veszik a zenét, és szétszaggatják a hangjaidat. Az Onion Board már tisztítja a beszédhangodat.",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Átmásolódnak az Onion Boardba; a(z) {name} megtartja a sajátjait. A már itt lévőket kihagyja, és egy itt már használt gyorsbillentyű kimarad.",
   "This desktop has no system tray, so closing the window quits.": "Ezen az asztalon nincs tálca, így az ablak bezárása kilép.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Ez az Onion Board {version}. Bepipálva néhány óránként megkérdezi a GitHubot, megjelent-e újabb verzió, és szól (sávval, ha fontos javítás). Ez a példány forrásból fut, ezért csak szól: frissítsd git pull-lal.",
   "This sound's video isn't there any more": "Ennek a hangnak a videója már nincs meg",
@@ -1405,10 +1392,6 @@
     "{n} blokkolva",
     "{n} blokkolva"
   ],
-  "{n} category": [
-    "{n} kategória",
-    "{n} kategória"
-  ],
   "{n} connection to {places}": [
     "{n} kapcsolat a következővel: {places}",
     "{n} kapcsolat a következőkkel: {places}"
@@ -1436,10 +1419,6 @@
   "{n} failed": [
     "{n} sikertelen",
     "{n} sikertelen"
-  ],
-  "{n} hotkey": [
-    "{n} gyorsbillentyű",
-    "{n} gyorsbillentyű"
   ],
   "{n} hour ago": [
     "{n} órája",
@@ -3323,7 +3302,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "A Windows a(z) {key} billentyűt magának tartja, és sosem adja át egy alkalmazásnak, így ez a gyorsbillentyű sosem szólalna meg: válassz másik billentyűt.",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "A(z) {key} a Minden leállítása billentyűd, ezért ott marad. Válassz másik billentyűt, vagy előbb adj újat a Minden leállításának itt: Beállítások → Gyorsbillentyűk.",
   "Names can be up to {n} characters, so it's “{name}”.": "A név legfeljebb {n} karakter lehet, így „{name}” lett.",
-  "They go in a category called “{name}”.": "Egy „{name}” nevű kategóriába kerülnek.",
   "Type a name first.": "Előbb írj be egy nevet.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ átnevezve erre: „{new}”. Egy másik hang neve is ez.",
   "Disguise": "Álca",

@@ -809,15 +809,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "これまでのリストを消去（保存している履歴も）",
   "Forgets Apps tab volumes and hidden programs.": "アプリタブの音量と非表示にしたプログラムを忘れます。",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "マイク、ヘッドホン、サウンドの送信先、配信出力を忘れます。クイックセットアップがまた始まります。",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "{name}で{categories}と{hotkeys}を含む<b>{n}</b>個のサウンドが見つかりました。"
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "{name}で{what}の<b>{n}</b>個の音が見つかりました。"
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "{name}で<b>{n}</b>個の音が見つかりました。"
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "GitHub からの無料のアドオン。削除または再インストールしても、トリガーとペアリングされた電話は保持されます。",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "無料、広告なし、アカウントなし。オニオンエイリアン製。コモンズ条項付きの MIT ライセンス: 何にでも使用し、無料で共有し、決して販売しないでください。",
   "Frequencies": "周波数",
@@ -1213,7 +1204,6 @@
   "Theme, audio, voice, overlay and privacy options.": "テーマ、オーディオ、音声、オーバーレイ、プライバシーのオプション。",
   "Then Ctrl+click picks a pad without playing it": "次に、Ctrl キーを押しながらクリックすると、パッドを再生せずに選択します",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "彼らは音楽を背景雑音だと考え、あなたの音をカットしてしまいます。 Onion Board はすでにあなたの声をクリーンアップしています。",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "それらは Onion Board にコピーされます。 {name}は独自のものを保持します。すでにここにあるホットキーはスキップされ、ここですでに使用されているホットキーはオフのままになります。",
   "This desktop has no system tray, so closing the window quits.": "このデスクトップにはシステム トレイがないため、ウィンドウを閉じると終了します。",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "これは Onion Board {version}です。チェックボックスをオンにすると、新しいバージョンがリリースされているかどうかを数時間ごとに GitHub に問い合わせて、(重要な修正の場合はバナーを表示して) 通知します。このコピーはソースから実行されるため、「git pull で更新する」ということだけが通知されます。",
   "Through a proxy": "プロキシ経由",
@@ -1419,9 +1409,6 @@
   "{n} blocked": [
     "{n}ブロックされました"
   ],
-  "{n} category": [
-    "{n}カテゴリ"
-  ],
   "{n} connection to {places}": [
     "{places}への{n}の接続"
   ],
@@ -1439,9 +1426,6 @@
   ],
   "{n} failed": [
     "{n}が失敗しました"
-  ],
-  "{n} hotkey": [
-    "{n}のホットキー"
   ],
   "{n} more can't be brought over (the file was moved or deleted, or isn't a sound): {names}": [
     "あと{n}個は引き継げません (ファイルが移動または削除されたか、サウンドではありません): {names}"
@@ -3250,7 +3234,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "{key} は Windows 自身が使うキーで、アプリには渡されないため、このホットキーは鳴りません。別のキーを選んでください。",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} は「すべてをやめてください」のキーなので、そのままにします。別のキーを選ぶか、先に 設定 → ホットキー で「すべてをやめてください」に新しいキーを設定してください。",
   "Names can be up to {n} characters, so it's “{name}”.": "名前は{n}文字までなので、「{name}」になりました。",
-  "They go in a category called “{name}”.": "「{name}」というカテゴリに入ります。",
   "Type a name first.": "まず名前を入力してください。",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ 「{new}」に名前を変更しました。同じ名前のサウンドがほかにもあります。",
   "Disguise": "変装",

@@ -809,15 +809,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "지금까지의 목록(그리고 보관된 경우 저장된 기록)을 잊어버립니다.",
   "Forgets Apps tab volumes and hidden programs.": "앱 탭 볼륨과 숨겨진 프로그램을 잊어버립니다.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "사운드가 전송되는 마이크, 헤드폰 및 스트림 출력을 잊어버리세요. 빠른 설정이 다시 실행됩니다.",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "{categories} 및 {hotkeys} 를 사용하여 {name} 에서 <b>{n}</b> 개의 사운드를 찾았습니다."
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "{name} 에서 {what} 을(를) 사용하여 <b>{n}</b> 개의 소리를 찾았습니다."
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "{name} 에서 <b>{n}</b> 개의 소리를 찾았습니다."
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "GitHub의 무료 추가 기능. 제거하거나 다시 설치하면 트리거와 페어링된 휴대폰이 유지됩니다.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "무료이며 광고도 없고 계정도 없습니다. OnionAlien이 제작했습니다. Commons 조항이 포함된 MIT 라이선스: 무엇이든 사용하고, 무료로 공유하고, 절대 판매하지 마세요.",
   "Frequencies": "주파수",
@@ -1213,7 +1204,6 @@
   "Theme, audio, voice, overlay and privacy options.": "테마, 오디오, 음성, 오버레이 및 개인 정보 보호 옵션.",
   "Then Ctrl+click picks a pad without playing it": "그런 다음 Ctrl+클릭을 하면 패드를 연주하지 않고 패드를 선택할 수 있습니다.",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "그들은 음악이 배경 소음이라고 생각하고 소리를 줄입니다. 어니언보드는 이미 당신의 목소리를 깨끗하게 만들어줍니다.",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Onion Board에 복사됩니다. {name} 은(는) 자체적으로 유지합니다. 여기에 이미 있는 단축키는 건너뛰고, 여기서 이미 사용하고 있는 단축키는 생략합니다.",
   "This desktop has no system tray, so closing the window quits.": "이 바탕 화면에는 시스템 트레이가 없으므로 창 닫기가 종료됩니다.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "어니언보드 {version} 입니다. 확인란을 선택하면 몇 시간마다 GitHub에 최신 버전이 있는지 묻고 알려줍니다(중요한 수정 사항인 경우 배너와 함께). 이 복사본은 소스에서 실행되므로 git pull로 업데이트하라는 내용만 알려줍니다.",
   "Through a proxy": "프록시를 통해",
@@ -1419,9 +1409,6 @@
   "{n} blocked": [
     "{n} 이 차단되었습니다"
   ],
-  "{n} category": [
-    "{n} 카테고리"
-  ],
   "{n} connection to {places}": [
     "{places} 에 대한 {n} 연결"
   ],
@@ -1439,9 +1426,6 @@
   ],
   "{n} failed": [
     "{n} 실패"
-  ],
-  "{n} hotkey": [
-    "{n} 단축키"
   ],
   "{n} more can't be brought over (the file was moved or deleted, or isn't a sound): {names}": [
     "{n} 개를 더 가져올 수 없습니다(파일이 이동 또는 삭제되었거나 소리가 나지 않음): {names}"
@@ -3250,7 +3234,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "{key}는 Windows가 직접 쓰는 키라 앱에 전달되지 않아요. 그래서 이 단축키는 절대 재생되지 않아요: 다른 키를 고르세요.",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key}는 '모든 것을 멈춰라' 키라서 그대로 둬요. 다른 키를 고르거나, 먼저 설정 → 단축키에서 '모든 것을 멈춰라'에 새 키를 지정하세요.",
   "Names can be up to {n} characters, so it's “{name}”.": "이름은 최대 {n}자라서 “{name}”(으)로 했어요.",
-  "They go in a category called “{name}”.": "“{name}” 카테고리에 들어가요.",
   "Type a name first.": "먼저 이름을 입력하세요.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ “{new}”(으)로 이름 변경함. 같은 이름의 다른 사운드도 있어요.",
   "Disguise": "변장",

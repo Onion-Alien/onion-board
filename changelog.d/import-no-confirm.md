@@ -1,0 +1,1 @@
+- Importing from another soundboard (Soundpad, Resanance and others) no longer asks "are you sure?" first: picking it is enough. Sounds that can't be brought over are listed in a short note instead.

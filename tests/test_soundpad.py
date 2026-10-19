@@ -101,13 +101,14 @@ def test_import_brings_the_board_over(main_window, qapp, tmp_path, monkeypatch):
     _board(tmp_path)
     w.cfg.sounds[0].hotkey = "alt+shift+f1"    # already used here: left off the import
     w.cfg.copy_local_sounds = False   # "Copy into library" off: linked to its files
-    asked = []
-    monkeypatch.setattr(QMessageBox, "question",
-                        lambda _p, _t, text, *a: asked.append(text) or QMessageBox.Yes)
+    asked, toasts = [], []
+    monkeypatch.setattr(QMessageBox, "question", lambda *a: asked.append(a) or QMessageBox.No)
+    monkeypatch.setattr(w, "toast", lambda text, *a, **k: toasts.append(text))
     w.impctl.import_other(soundpad.SOURCE)
-    assert process_events(qapp, lambda: asked)               # read on a thread
-    assert "<b>3</b> sounds" in asked[0] and "3 categories" in asked[0]   # + "Soundpad"
-    assert "2 hotkeys" in asked[0] and "Gone" in asked[0]
+    # picking "Import from Soundpad" was the yes: no "are you sure?" box, the missing
+    # file is a toast
+    assert process_events(qapp, lambda: any("Gone" in t for t in toasts))   # read on a thread
+    assert not asked
     assert process_events(qapp, lambda: not w.impctl._pending_imports and len(w.cfg.sounds) == 5)
     new = {m.name: m for m in w.cfg.sounds[2:]}
     assert set(new) == {"Bruh", "Vine - Boom", "airhorn"}
@@ -133,7 +134,7 @@ def test_reading_the_board_doesnt_block_the_window(
         main_window, qapp, tmp_path, monkeypatch):  # noqa: F811
     """The board file can be tens of MB and its sounds on a network drive that's gone
     (seconds a file): import_other returns at once, the entries come back through a
-    signal, and only the question and the import run on the UI thread."""
+    signal, and only the import runs on the UI thread."""
     w = main_window
     wav = _wav(tmp_path / "far" / "bruh.wav", 300)
     release, threads = threading.Event(), []
@@ -143,17 +144,16 @@ def test_reading_the_board_doesnt_block_the_window(
         release.wait(3)
         return [otherboards.Entry(name="Bruh", path=str(wav), exists=True)]
     src = otherboards.Source("slow", "Slowpad", (".slow",), lambda: None, slow_read)
-    got, asked = [], []
-    monkeypatch.setattr(QMessageBox, "question",
-                        lambda _p, _t, text, *a: asked.append(text) or QMessageBox.Yes)
+    got = []
+    monkeypatch.setattr(QMessageBox, "question", lambda *a: pytest.fail("asked"))
     start = time.monotonic()
     w.impctl.import_other(src, str(tmp_path / "board.slow"))
-    assert time.monotonic() - start < 1 and not asked   # didn't wait for the read
+    assert time.monotonic() - start < 1   # didn't wait for the read
     w.board_read.connect(lambda *a: got.append(a))   # it comes back through this
     release.set()
     assert process_events(qapp, lambda: not w.impctl._pending_imports and len(w.cfg.sounds) == 3)
     assert threads and threads[0] is not threading.main_thread()
-    assert len(got) == 1 and "<b>1</b> sound in Slowpad" in asked[0]
+    assert len(got) == 1
     assert w.cfg.sounds[-1].name == "Bruh"
 
 
@@ -203,7 +203,7 @@ def test_a_board_gets_its_own_category_shown_from_the_start(
     _board(tmp_path)
     w.cfg.categories.append("Old stuff")
     w.catctl.set_category("Old stuff")
-    monkeypatch.setattr(QMessageBox, "question", lambda *a: QMessageBox.Yes)
+    monkeypatch.setattr(QMessageBox, "question", lambda *a: pytest.fail("asked"))
     at_first = []
     real = w.impctl.on_imported
 
@@ -228,9 +228,9 @@ def test_a_board_with_nothing_new_leaves_no_empty_category(
     w = main_window
     monkeypatch.setenv("APPDATA", str(tmp_path))
     _board(tmp_path)
-    monkeypatch.setattr(QMessageBox, "question", lambda *a: QMessageBox.Yes)
     w.impctl.import_other(soundpad.SOURCE)
     assert process_events(qapp, lambda: not w.impctl._pending_imports and len(w.cfg.sounds) == 5)
+    monkeypatch.setattr(QMessageBox, "question", lambda *a: QMessageBox.Yes)   # the delete's
     w.catctl.delete_category("Soundpad")   # the sounds stay, the tab goes
     assert "Soundpad" not in w.cfg.categories
     w.impctl.import_other(soundpad.SOURCE)   # all already here: nothing to add
@@ -245,7 +245,7 @@ def test_an_import_from_the_menu_is_not_asked_again(
     w = main_window
     monkeypatch.setenv("APPDATA", str(tmp_path))
     _board(tmp_path)
-    monkeypatch.setattr(QMessageBox, "question", lambda *a: QMessageBox.Yes)
+    monkeypatch.setattr(QMessageBox, "question", lambda *a: pytest.fail("asked"))
     monkeypatch.setattr(QMessageBox, "exec", lambda box: pytest.fail("asked to keep"))
     w.impctl.import_other(soundpad.SOURCE)
     assert process_events(qapp, lambda: not w.impctl._pending_imports and len(w.cfg.sounds) == 5)
@@ -263,7 +263,7 @@ def test_no_keep_box_when_they_imported_it_themselves(
     note = library.APP_DIR / otherboards.QUEUED_NAME
     note.parent.mkdir(parents=True, exist_ok=True)
     note.write_text("soundpad", encoding="utf-8")
-    monkeypatch.setattr(QMessageBox, "question", lambda *a: QMessageBox.Yes)
+    monkeypatch.setattr(QMessageBox, "question", lambda *a: pytest.fail("asked"))
     monkeypatch.setattr(QMessageBox, "exec", lambda box: pytest.fail("asked to keep"))
     if first == "menu":
         w.impctl.import_other(soundpad.SOURCE)

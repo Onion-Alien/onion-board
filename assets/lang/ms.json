@@ -406,15 +406,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "Lupakan senarai setakat ini (dan sejarah yang disimpan, jika disimpan)",
   "Forgets Apps tab volumes and hidden programs.": "Melupakan kelantangan dan program tersembunyi tab Aplikasi.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Melupakan mikrofon, fon kepala anda, ke mana bunyi anda dihantar dan output strim; persediaan pantas berjalan semula.",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "<b>{n}</b> bunyi ditemui dalam {name} dengan {categories} dan {hotkeys}."
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "<b>{n}</b> bunyi ditemui dalam {name} dengan {what}."
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "<b>{n}</b> bunyi ditemui dalam {name}."
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Add-on percuma dari GitHub. Membuang atau memasang semula satu add-on mengekalkan pencetus dan telefon yang dipasangkan.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Percuma, tanpa iklan dan tanpa akaun. Dibuat oleh OnionAlien. Lesen MIT dengan Commons Clause: gunakan untuk apa saja, kongsi secara percuma, jangan sesekali jual.",
   "Frequencies": "Frekuensi",
@@ -1096,7 +1087,6 @@
   "There are no sounds yet. Export just your settings?": "Belum ada bunyi. Eksport tetapan anda sahaja?",
   "There's already a “{new}”.": "Sudah ada “{new}”.",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Ia menganggap muzik sebagai hingar latar dan memotong bunyi anda. Onion Board sudah membersihkan suara anda.",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Ia disalin ke dalam Onion Board; {name} mengekalkan miliknya sendiri. Yang sudah ada di sini dilangkau, dan hotkey yang sudah digunakan di sini tidak ditetapkan.",
   "This desktop has no system tray, so closing the window quits.": "Desktop ini tiada dulang sistem, jadi menutup tetingkap akan keluar.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Ini Onion Board {version}. Dengan kotak ditanda, ia bertanya GitHub setiap beberapa jam sama ada versi baharu sudah keluar dan memberitahu anda (dengan sepanduk jika ia pembaikan penting). Salinan ini berjalan dari kod sumber, jadi ia hanya memberitahu anda: kemas kininya dengan git pull.",
   "This sound's video isn't there any more": "Video bunyi ini sudah tiada",
@@ -1379,9 +1369,6 @@
   "{n} blocked": [
     "{n} disekat"
   ],
-  "{n} category": [
-    "{n} kategori"
-  ],
   "{n} connection to {places}": [
     "{n} sambungan ke {places}"
   ],
@@ -1402,9 +1389,6 @@
   ],
   "{n} failed": [
     "{n} gagal"
-  ],
-  "{n} hotkey": [
-    "{n} hotkey"
   ],
   "{n} hour ago": [
     "{n} jam lalu"
@@ -3250,7 +3234,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows menyimpan {key} untuk dirinya sendiri dan tidak pernah menghantarnya ke apl, jadi hotkey itu tidak akan pernah berbunyi: pilih kekunci lain.",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} ialah kekunci Hentikan semua anda, jadi ia kekal di situ. Pilih kekunci lain, atau beri Hentikan semua kekunci baharu dahulu di Tetapan → Hotkey.",
   "Names can be up to {n} characters, so it's “{name}”.": "Nama boleh sampai {n} aksara, jadi namanya “{name}”.",
-  "They go in a category called “{name}”.": "Semuanya masuk ke kategori bernama “{name}”.",
   "Type a name first.": "Taip nama dahulu.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Dinamakan semula kepada “{new}”. Ada bunyi lain dengan nama yang sama.",
   "Disguise": "Penyamaran",
