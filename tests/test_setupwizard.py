@@ -1033,8 +1033,7 @@ def test_tiles_are_as_tall_as_their_names_need(mic_wizard, qapp):
 
 
 def test_test_sound_card_and_a_lone_option_span_the_page(mic_wizard, monkeypatch, qapp):
-    """The test sound's card is the page's width (it ended at a spot nothing lined up
-    with), and with the device list open the cable's tile fills the optional card's
+    """The test sound's button lines up with the tiles above it, and with the device list open the cable's tile fills the optional card's
     row instead of sitting at half width beside a hole."""
     from soundboard.mic import directmic
     _, wiz = mic_wizard
@@ -1042,9 +1041,11 @@ def test_test_sound_card_and_a_lone_option_span_the_page(mic_wizard, monkeypatch
     wiz.show()
     wiz.go(wiz.dev_index)
     qapp.processEvents()
-    # the test sound's button ends on Next's edge, beside the headphones' title
-    right = wiz.btn_test.mapTo(wiz, wiz.btn_test.rect().topRight()).x()
-    assert right == wiz.btn_next.mapTo(wiz, wiz.btn_next.rect().topRight()).x()
+    # the test sound's button starts on the tiles' edge, under the headphones (Back
+    # isn't shown on step 1)
+    def left(wd):
+        return wd.mapTo(wiz, wd.rect().topLeft()).x()
+    assert left(wiz.btn_test) == left(wiz.mic_group.buttons()[0])
     wiz.go(wiz.send_index)
     wiz._show_other(True)
     wiz.alt_fold.setChecked(True)   # its card open (measured shut, the sizes are old)

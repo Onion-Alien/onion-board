@@ -979,31 +979,31 @@ class SetupWizard(QDialog):
         row.addWidget(self.chk_send, 0, Qt.AlignmentFlag.AlignTop)
         v.addLayout(row)
         v.addSpacing(SECTION_GAP + 4)
-        # the headphones, the test sound's button beside their title
-        head = QHBoxLayout()
-        head.setSpacing(10)
-        head.addWidget(_section(_("Headphones or speakers")))
-        head.addStretch(1)
-        self.test_hint = _label("", "font-size:10pt;")
-        self.test_hint.setObjectName("muted")
-        head.addWidget(self.test_hint)
+        # the headphones, then the test sound's button under them (beside their title,
+        # a long title or button in some languages made the step wider than the tiles)
+        v.addWidget(_section(_("Headphones or speakers")))
+        v.addSpacing(6)
+        outs = [d["name"] for d in eng.list_devices("output") if not eng.is_virtual(d["name"])]
+        cur = self.win.cfg.mon_device if self.win.cfg.mon_device in outs else             (outs[0] if outs else None)
+        if cur and cur != self.win.cfg.mon_device:   # the saved one is missing
+            self._pick_headphones(cur)
+        lst, __ = self._choice_list(outs, cur,
+                                   lambda n: self._pick_headphones(n, by_user=True))
+        v.addWidget(lst)
+        v.addSpacing(8)
+        row = QHBoxLayout()
+        row.setSpacing(12)
         play = self.btn_test = QPushButton(_test_title())
         icons.set_icon(play, "volume")
         play.setToolTip(_("Only you hear it. Didn't hear it? Pick another one and try again."))
         play.setAccessibleName(_test_title())
         play.setAutoDefault(False)   # (Enter is Next's)
         play.clicked.connect(self.test_sound)
-        head.addWidget(play)
-        v.addLayout(head)
-        v.addSpacing(6)
-        outs = [d["name"] for d in eng.list_devices("output") if not eng.is_virtual(d["name"])]
-        cur = self.win.cfg.mon_device if self.win.cfg.mon_device in outs else \
-            (outs[0] if outs else None)
-        if cur and cur != self.win.cfg.mon_device:   # the saved one is missing
-            self._pick_headphones(cur)
-        lst, __ = self._choice_list(outs, cur,
-                                   lambda n: self._pick_headphones(n, by_user=True))
-        v.addWidget(lst)
+        row.addWidget(play)
+        self.test_hint = _label("", "font-size:10pt;")
+        self.test_hint.setObjectName("muted")
+        row.addWidget(self.test_hint, 1)
+        v.addLayout(row)
         v.addStretch(1)
         self._mic_peak_seen = False
         return p
