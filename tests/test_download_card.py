@@ -134,6 +134,37 @@ def test_when_all_added_it_folds_then_goes(window, qapp, monkeypatch):
     bar._clear_and_hide()
 
 
+def test_a_play_goes_once_its_sound_stops(window, qapp, monkeypatch):
+    """A Play (a Community card's, say) says Playing; once its sound has stopped the
+    card goes, folded or not, and whatever is playing on the board besides."""
+    monkeypatch.setattr(db, "ENDED_MS", 100)
+    window.resize(1200, 800)
+    window.show()
+    bar = window.download_bar
+    playing = {"__link__": (0.1, False), "song": (0.5, False)}   # a board song plays too
+    monkeypatch.setattr(window.engine, "playing", lambda: dict(playing))
+    monkeypatch.setattr(window.linkbar, "playing_url", LINKS[0])
+    bar.set_active(LINKS[0], "FINISH HIM!", "play", None, "", 3)
+    bar.set_done(LINKS[0], "play", True)
+    QTest.qWait(db.Outcome.SHOW_MS + 100)
+    window.tickctl.tick()
+    assert bar.isVisible() and bar.h_text.text() == "Playing"
+    bar.btn_min.click()   # folded to its pill
+    del playing["__link__"]   # the sound ended
+    window.tickctl.tick()
+    QTest.qWait(300)
+    assert not bar.isVisible()
+
+    # one that isn't the card's (an older Play's url) leaves it be
+    bar.set_active(LINKS[1], "Other", "play", None, "", 3)
+    bar.set_done(LINKS[1], "play", True)
+    QTest.qWait(db.Outcome.SHOW_MS + 100)
+    window.tickctl.tick()
+    QTest.qWait(300)
+    assert bar.isVisible()
+    bar._clear_and_hide()
+
+
 def test_a_failure_keeps_the_pill_red_and_up(window, qapp, monkeypatch):
     """A pick that failed waits for Retry: no folding away, and minimised the pill still
     says how many failed."""

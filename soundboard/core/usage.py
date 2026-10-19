@@ -318,8 +318,8 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "whats-new-shown", "whats-new-page",
             # Bun's games: which one was opened (BUN_GAMES; egg-pong-opened is any game)
             *(f"egg-game-{k}" for k in BUN_GAMES),
-            # the Store tab's order (Top is the default) and a category picked
-            "store-sort-new", "store-sort-trending", "store-category",
+            # the Store tab's order (Trending is the default) and a category picked
+            "store-sort-new", "store-sort-top", "store-sort-trending", "store-category",
             # the voice changer's Background on, with board sounds in it (features_now)
             "voice-background", "voice-background-sounds",
             # a category hidden from All (features_now); a My voice combos share code copied
