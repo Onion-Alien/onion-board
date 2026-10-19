@@ -37,6 +37,10 @@ KEYS = ["voice-chipmunk", "voice-deep-voice", "voice-demon", "voice-robot", "voi
 # the AI voices' cards: one per built-in voice in the add-on's list ("ai-voice-bear")
 KEYS += ["ai-voice-" + v["id"] for v in json.loads(
     (ROOT / "modules" / "ai-voices" / "voices.json").read_text(encoding="utf-8"))["voices"]]
+# Settings > Achievements' badges, one per achievement ("achievement-gamer_bun")
+sys.path.insert(0, str(ROOT))
+from soundboard.core.achievements import ALL as _ACHIEVEMENTS  # noqa: E402
+KEYS += ["achievement-" + a.id for a in _ACHIEVEMENTS]
 
 
 def key_for(name: str) -> str:

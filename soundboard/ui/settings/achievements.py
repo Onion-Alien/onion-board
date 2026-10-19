@@ -3,11 +3,11 @@ in its rarity's colour (the rare loading screens' colours), hidden ones as ??? u
 earned. The counting is soundboard.core.achievements; this page only shows it.
 
 A badge is drawn (a medal in the rarity's colour with an icon on it) until a picture
-for it is in assets/achievements/<id>.png: then that's shown, greyed while locked."""
+for it is in assets/art/achievement-<id>.png (art.ART_DIR, which the installed build
+carries): then that's shown, greyed while locked."""
 from __future__ import annotations
 
 from functools import lru_cache
-from pathlib import Path
 
 from PySide6.QtCore import QDateTime, QLocale, QRectF, QSize, Qt
 from PySide6.QtGui import QColor, QImage, QPainter, QPainterPath, QPen, QPixmap
@@ -19,8 +19,8 @@ from soundboard.i18n import _
 from soundboard.ui.kit import icons, theme
 from soundboard.ui.kit.panel import hint_label
 from soundboard.ui.settings import Page
+from soundboard.ui.voice import art
 
-PICTURES = Path(__file__).resolve().parents[3] / "assets" / "achievements"
 # a rarity's loading screen (ui/bun/splashacts.py RARES), for its colour and name
 TIER_SPLASH = {"uncommon": "gold", "rare": "ice", "legendary": "galaxy", "super": "rainbow"}
 TILE_W = 250   # the narrowest a tile gets; they share each row's width
@@ -110,8 +110,8 @@ def texts() -> dict[str, tuple[str, str]]:
 
 @lru_cache(maxsize=128)
 def _picture(ach_id: str, size: int, grey: bool) -> QPixmap | None:
-    """assets/achievements/<id>.png in a circle, greyed while locked, or None."""
-    path = PICTURES / f"{ach_id}.png"
+    """assets/art/achievement-<id>.png in a circle, greyed while locked, or None."""
+    path = art.ART_DIR / f"achievement-{ach_id}.png"
     if not path.is_file():
         return None
     img = QImage(str(path))
