@@ -4327,5 +4327,10 @@
   "Nothing here yet. Try another filter.": "Τίποτα εδώ ακόμα. Δοκίμασε άλλο φίλτρο.",
   "Rarity": "Σπανιότητα",
   "Achievement unlocked": "Ξεκλείδωσες επίτευγμα",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Δεν βρέθηκε τίποτα για «{text}».",
+  "Search AI voices": "Αναζήτηση φωνών AI",
+  "Search voices": "Αναζήτηση φωνών",
+  "Which languages show": "Ποιες γλώσσες εμφανίζονται",
+  "Which voices show": "Ποιες φωνές εμφανίζονται"
 }

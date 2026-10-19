@@ -4253,5 +4253,10 @@
   "Nothing here yet. Try another filter.": "這裡還沒有內容。換個篩選試試。",
   "Rarity": "稀有度",
   "Achievement unlocked": "成就已解鎖",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "沒有符合「{text}」的結果。",
+  "Search AI voices": "搜尋 AI 語音",
+  "Search voices": "搜尋語音",
+  "Which languages show": "顯示哪些語言",
+  "Which voices show": "顯示哪些語音"
 }

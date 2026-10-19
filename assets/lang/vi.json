@@ -4253,5 +4253,10 @@
   "Nothing here yet. Try another filter.": "Chưa có gì ở đây. Thử bộ lọc khác nhé.",
   "Rarity": "Độ hiếm",
   "Achievement unlocked": "Đã mở khóa thành tựu",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Không có kết quả cho “{text}”.",
+  "Search AI voices": "Tìm giọng AI",
+  "Search voices": "Tìm giọng",
+  "Which languages show": "Ngôn ngữ được hiển thị",
+  "Which voices show": "Giọng được hiển thị"
 }

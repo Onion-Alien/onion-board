@@ -4327,5 +4327,10 @@
   "Nothing here yet. Try another filter.": "Още няма нищо. Опитай друг филтър.",
   "Rarity": "Рядкост",
   "Achievement unlocked": "Отключено постижение",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Няма съвпадения за „{text}“.",
+  "Search AI voices": "Търсене на AI гласове",
+  "Search voices": "Търсене на гласове",
+  "Which languages show": "Кои езици да се показват",
+  "Which voices show": "Кои гласове да се показват"
 }

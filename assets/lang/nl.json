@@ -4327,5 +4327,10 @@
   "Nothing here yet. Try another filter.": "Hier is nog niets. Probeer een ander filter.",
   "Rarity": "Zeldzaamheid",
   "Achievement unlocked": "Prestatie ontgrendeld",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Niets gevonden voor “{text}”.",
+  "Search AI voices": "AI-stemmen zoeken",
+  "Search voices": "Stemmen zoeken",
+  "Which languages show": "Welke talen je ziet",
+  "Which voices show": "Welke stemmen je ziet"
 }

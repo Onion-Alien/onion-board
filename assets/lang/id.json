@@ -4253,5 +4253,10 @@
   "Nothing here yet. Try another filter.": "Belum ada apa-apa di sini. Coba filter lain.",
   "Rarity": "Kelangkaan",
   "Achievement unlocked": "Pencapaian terbuka",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Tidak ada yang cocok dengan “{text}”.",
+  "Search AI voices": "Cari suara AI",
+  "Search voices": "Cari suara",
+  "Which languages show": "Bahasa yang ditampilkan",
+  "Which voices show": "Suara yang ditampilkan"
 }

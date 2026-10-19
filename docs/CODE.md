@@ -293,6 +293,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/sounds/overlay.py` | the in-game overlay: a panel of pads that never takes focus, driven by number keys or clicks, on a chosen monitor and spot (or wherever it was dragged) |
 | `soundboard/ui/voice/voicepanel.py` | the Voice tab: lays out its cards and bottom bar, the add-ons list |
 | `soundboard/ui/voice/voicefxpanel.py` | the Voice tab's voice changer card: voice tiles, effect rows and their sliders. |
+| `soundboard/ui/voice/groupbar.py` | the bar over the voice cards on the Voice changer, AI voices and Languages cards: the group dropdown (with counts), the search box and the cards / list switch |
 | `soundboard/ui/voice/backdroprow.py` | the voice changer's Background card (built-in sounds and board sounds behind your voice) and its Speed and pitch pop-up |
 | `soundboard/ui/voice/effectspopup.py` | the voice bar's Effects pop-up: bundled CC0 background sounds, board sounds and the extra Robot, Radio, Echo and Reverb on top of any voice, one slider and a ✕ each |
 | `soundboard/ui/sounds/voicepicker.py` | Edit sound → Effects → Voice: picture cards of the voice changer's voices, the AI voices and your setups, to lay a voice over a sound |

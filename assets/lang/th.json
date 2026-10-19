@@ -4253,5 +4253,10 @@
   "Nothing here yet. Try another filter.": "ยังไม่มีอะไรที่นี่ ลองตัวกรองอื่นดู",
   "Rarity": "ความหายาก",
   "Achievement unlocked": "ปลดล็อกความสำเร็จแล้ว",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "ไม่พบสิ่งที่ตรงกับ “{text}”",
+  "Search AI voices": "ค้นหาเสียง AI",
+  "Search voices": "ค้นหาเสียง",
+  "Which languages show": "ภาษาที่แสดง",
+  "Which voices show": "เสียงที่แสดง"
 }

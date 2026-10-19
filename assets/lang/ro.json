@@ -4401,5 +4401,10 @@
   "Nothing here yet. Try another filter.": "Încă nu e nimic aici. Încearcă alt filtru.",
   "Rarity": "Raritate",
   "Achievement unlocked": "Realizare deblocată",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Nimic nu se potrivește cu „{text}”.",
+  "Search AI voices": "Căutați voci AI",
+  "Search voices": "Căutați voci",
+  "Which languages show": "Ce limbi se afișează",
+  "Which voices show": "Ce voci se afișează"
 }

@@ -4327,5 +4327,10 @@
   "Nothing here yet. Try another filter.": "Rien ici pour l'instant. Essaie un autre filtre.",
   "Rarity": "Rareté",
   "Achievement unlocked": "Succès débloqué",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Aucun résultat pour « {text} ».",
+  "Search AI voices": "Rechercher des voix IA",
+  "Search voices": "Rechercher des voix",
+  "Which languages show": "Langues affichées",
+  "Which voices show": "Voix affichées"
 }

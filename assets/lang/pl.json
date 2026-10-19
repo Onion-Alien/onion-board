@@ -4401,5 +4401,10 @@
   "Nothing here yet. Try another filter.": "Na razie nic tu nie ma. Spróbuj innego filtra.",
   "Rarity": "Rzadkość",
   "Achievement unlocked": "Osiągnięcie odblokowane",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Nic nie pasuje do „{text}”.",
+  "Search AI voices": "Wyszukaj głosy AI",
+  "Search voices": "Wyszukaj głosy",
+  "Which languages show": "Które języki pokazać",
+  "Which voices show": "Które głosy pokazać"
 }

@@ -4401,5 +4401,10 @@
   "Nothing here yet. Try another filter.": "Здесь пока ничего нет. Попробуй другой фильтр.",
   "Rarity": "Редкость",
   "Achievement unlocked": "Достижение получено",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Ничего не найдено по запросу «{text}».",
+  "Search AI voices": "Поиск ИИ-голосов",
+  "Search voices": "Поиск голосов",
+  "Which languages show": "Какие языки показывать",
+  "Which voices show": "Какие голоса показывать"
 }

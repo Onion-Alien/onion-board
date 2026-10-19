@@ -4327,5 +4327,10 @@
   "Nothing here yet. Try another filter.": "अभी यहाँ कुछ नहीं है। कोई और फ़िल्टर आज़माएँ।",
   "Rarity": "दुर्लभता",
   "Achievement unlocked": "उपलब्धि अनलॉक हुई",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "“{text}” से कुछ नहीं मिला।",
+  "Search AI voices": "AI आवाज़ें खोजें",
+  "Search voices": "आवाज़ें खोजें",
+  "Which languages show": "कौन-सी भाषाएँ दिखें",
+  "Which voices show": "कौन-सी आवाज़ें दिखें"
 }

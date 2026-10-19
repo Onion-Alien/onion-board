@@ -4327,5 +4327,10 @@
   "Nothing here yet. Try another filter.": "Täällä ei ole vielä mitään. Kokeile toista suodatinta.",
   "Rarity": "Harvinaisuus",
   "Achievement unlocked": "Saavutus avattu",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Mikään ei vastaa hakua ”{text}”.",
+  "Search AI voices": "Hae tekoälyääniä",
+  "Search voices": "Hae ääniä",
+  "Which languages show": "Mitkä kielet näytetään",
+  "Which voices show": "Mitkä äänet näytetään"
 }

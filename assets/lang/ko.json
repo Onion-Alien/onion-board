@@ -4253,5 +4253,10 @@
   "Nothing here yet. Try another filter.": "아직 여기에 아무것도 없어요. 다른 필터를 써 보세요.",
   "Rarity": "희귀도",
   "Achievement unlocked": "업적 달성",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "“{text}”와(과) 일치하는 항목이 없습니다.",
+  "Search AI voices": "AI 목소리 검색",
+  "Search voices": "목소리 검색",
+  "Which languages show": "표시할 언어",
+  "Which voices show": "표시할 목소리"
 }

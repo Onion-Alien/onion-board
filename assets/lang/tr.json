@@ -4327,5 +4327,10 @@
   "Nothing here yet. Try another filter.": "Burada henüz bir şey yok. Başka bir filtre dene.",
   "Rarity": "Nadirlik",
   "Achievement unlocked": "Başarım kazanıldı",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "“{text}” ile eşleşen bir şey yok.",
+  "Search AI voices": "Yapay zekâ seslerini ara",
+  "Search voices": "Sesleri ara",
+  "Which languages show": "Hangi diller gösterilsin",
+  "Which voices show": "Hangi sesler gösterilsin"
 }

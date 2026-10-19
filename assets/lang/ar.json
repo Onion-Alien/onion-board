@@ -4623,5 +4623,10 @@
   "Nothing here yet. Try another filter.": "لا شيء هنا بعد. جرّب عامل تصفية آخر.",
   "Rarity": "الندرة",
   "Achievement unlocked": "تم فتح إنجاز",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "لا شيء يطابق «{text}».",
+  "Search AI voices": "بحث في أصوات الذكاء الاصطناعي",
+  "Search voices": "بحث في الأصوات",
+  "Which languages show": "اللغات المعروضة",
+  "Which voices show": "الأصوات المعروضة"
 }

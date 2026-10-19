@@ -4327,5 +4327,10 @@
   "Nothing here yet. Try another filter.": "Itt még nincs semmi. Próbálj másik szűrőt.",
   "Rarity": "Ritkaság",
   "Achievement unlocked": "Teljesítmény feloldva",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Semmi sem felel meg ennek: „{text}”.",
+  "Search AI voices": "AI-hangok keresése",
+  "Search voices": "Hangok keresése",
+  "Which languages show": "Mely nyelvek látszanak",
+  "Which voices show": "Mely hangok látszanak"
 }

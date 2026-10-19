@@ -4327,5 +4327,10 @@
   "Nothing here yet. Try another filter.": "Ingenting her ennå. Prøv et annet filter.",
   "Rarity": "Sjeldenhet",
   "Achievement unlocked": "Prestasjon låst opp",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Ingenting samsvarer med «{text}».",
+  "Search AI voices": "Søk etter AI-stemmer",
+  "Search voices": "Søk etter stemmer",
+  "Which languages show": "Hvilke språk som vises",
+  "Which voices show": "Hvilke stemmer som vises"
 }

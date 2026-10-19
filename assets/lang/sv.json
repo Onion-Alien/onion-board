@@ -4327,5 +4327,10 @@
   "Nothing here yet. Try another filter.": "Inget här än. Testa ett annat filter.",
   "Rarity": "Sällsynthet",
   "Achievement unlocked": "Prestation upplåst",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Inget matchar ”{text}”.",
+  "Search AI voices": "Sök efter AI-röster",
+  "Search voices": "Sök efter röster",
+  "Which languages show": "Vilka språk som visas",
+  "Which voices show": "Vilka röster som visas"
 }

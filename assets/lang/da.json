@@ -4327,5 +4327,10 @@
   "Nothing here yet. Try another filter.": "Intet her endnu. Prøv et andet filter.",
   "Rarity": "Sjældenhed",
   "Achievement unlocked": "Præstation låst op",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Intet matcher “{text}”.",
+  "Search AI voices": "Søg efter AI-stemmer",
+  "Search voices": "Søg efter stemmer",
+  "Which languages show": "Hvilke sprog der vises",
+  "Which voices show": "Hvilke stemmer der vises"
 }

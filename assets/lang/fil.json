@@ -4327,5 +4327,10 @@
   "Nothing here yet. Try another filter.": "Wala pa rito. Subukan ang ibang filter.",
   "Rarity": "Rarity",
   "Achievement unlocked": "Na-unlock ang achievement",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Walang tumugma sa “{text}”.",
+  "Search AI voices": "Maghanap ng mga AI voice",
+  "Search voices": "Maghanap ng mga voice",
+  "Which languages show": "Aling mga wika ang ipapakita",
+  "Which voices show": "Aling mga voice ang ipapakita"
 }

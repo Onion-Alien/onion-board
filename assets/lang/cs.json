@@ -4401,5 +4401,10 @@
   "Nothing here yet. Try another filter.": "Zatím tu nic není. Zkus jiný filtr.",
   "Rarity": "Vzácnost",
   "Achievement unlocked": "Úspěch odemčen",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Nic neodpovídá „{text}“.",
+  "Search AI voices": "Hledat AI hlasy",
+  "Search voices": "Hledat hlasy",
+  "Which languages show": "Které jazyky se zobrazí",
+  "Which voices show": "Které hlasy se zobrazí"
 }

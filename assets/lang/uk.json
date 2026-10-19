@@ -4401,5 +4401,10 @@
   "Nothing here yet. Try another filter.": "Тут поки нічого немає. Спробуй інший фільтр.",
   "Rarity": "Рідкісність",
   "Achievement unlocked": "Досягнення отримано",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Нічого не знайдено за запитом «{text}».",
+  "Search AI voices": "Пошук ШІ-голосів",
+  "Search voices": "Пошук голосів",
+  "Which languages show": "Які мови показувати",
+  "Which voices show": "Які голоси показувати"
 }

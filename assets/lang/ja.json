@@ -4253,5 +4253,10 @@
   "Nothing here yet. Try another filter.": "まだ何もありません。別のフィルターを試してください。",
   "Rarity": "レア度",
   "Achievement unlocked": "実績解除",
-  "{points}G - {name}": "{points}G - {name}"
+  "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "「{text}」に一致するものはありません。",
+  "Search AI voices": "AI ボイスを検索",
+  "Search voices": "ボイスを検索",
+  "Which languages show": "表示する言語",
+  "Which voices show": "表示するボイス"
 }
