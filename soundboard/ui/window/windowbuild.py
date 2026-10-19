@@ -28,6 +28,7 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QSizePolicy,
     QSlider,
+    QSpacerItem,
     QStyle,
     QStyleOptionButton,
     QStylePainter,
@@ -115,6 +116,8 @@ PAD_SIZE_WAIT_MS = 50    # dragging Pad size re-lays the pads at most this often
 # (456 px at 1180x720, so normal windows are unchanged). The seek bar, the levels and
 # the drop box still follow the window: wider is useful there.
 SEARCH_MAX_W = 480
+WIDE_TOOLBAR_W = 1500   # the Sounds toolbar this wide (about full screen) spreads out...
+WIDE_GAP = 8            # ...its library tools by this much more each side
 # Setup -> Devices -> Send my sounds to (Config.route, library.ROUTES): the mic, nobody,
 # or one of the output devices by name (ROUTE_DEVICE + its name: "cable" for a virtual
 # cable, "device" for anything else)
@@ -214,6 +217,31 @@ class _Moved(QObject):
     def eventFilter(self, obj, e):
         if e.type() in (QEvent.Type.Resize, QEvent.Type.Move, QEvent.Type.Show):
             QTimer.singleShot(0, self, self._fn)
+        return False
+
+
+class _WideGaps(QObject):
+    """The Sounds toolbar's library tools get WIDE_GAP more room each side once the bar
+    is WIDE_TOOLBAR_W wide: full screen, they sat squeezed together beside a big empty
+    middle. Narrower, the gaps are 0 again and the fitter works as before."""
+
+    def __init__(self, bar: QWidget, gaps: list[QSpacerItem]):
+        super().__init__(bar)
+        self._gaps = gaps
+        self._wide: bool | None = None
+        bar.installEventFilter(self)
+
+    def eventFilter(self, obj, e):
+        if e.type() == QEvent.Type.Resize:
+            wide = obj.width() >= WIDE_TOOLBAR_W
+            if wide != self._wide:
+                self._wide = wide
+                for gap in self._gaps:
+                    gap.changeSize(WIDE_GAP if wide else 0, 0,
+                                   QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+                lay = obj.layout()
+                if lay is not None:
+                    lay.invalidate()
         return False
 
 
@@ -1125,9 +1153,18 @@ class WindowBuilder(Controller):
         tb.addWidget(mw.search, 1)
         tb.addWidget(mw.btn_yt)
         tb.addStretch(0)   # past SEARCH_MAX_W: the room goes here, the library tools stay right
+        gaps: list[QSpacerItem] = []
+
+        def gap():   # more room here when the bar is wide (_WideGaps)
+            gaps.append(QSpacerItem(0, 0, QSizePolicy.Policy.Fixed,
+                                    QSizePolicy.Policy.Minimum))
+            tb.addItem(gaps[-1])
         tb.addWidget(vsep())
+        gap()
         tb.addWidget(more)
+        gap()
         tb.addWidget(vsep())
+        gap()
         # the pads' order (as dragged, A-Z, newest, most played)
         mw.btn_view = QPushButton()
         mw.btn_view.setAccessibleName(_("Sort by"))
@@ -1138,10 +1175,13 @@ class WindowBuilder(Controller):
         mw.btn_view.setProperty("toolbarMenu", True)
         mw.padctl._label_view()
         tb.addWidget(mw.btn_view)
+        gap()
         # cards or a list, the same switch as the Apps and Voice tabs
         mw.pad_view_toggle = ViewToggle(c.pad_view, _("Sounds"))
         mw.pad_view_toggle.changed.connect(mw.padctl.set_pad_view)
         tb.addWidget(mw.pad_view_toggle)
+        gap()
+        _WideGaps(mw.sounds_toolbar, gaps)   # the toolbar owns it
         # Creation actions have their own surfaces; library tools stay quiet.
         for b in (mw.btn_folder, more, mw.btn_bin, mw.btn_keys,
                   mw.btn_yt, mw.btn_view):
