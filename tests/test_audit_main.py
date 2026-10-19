@@ -399,6 +399,36 @@ def test_a_new_theme_builds_the_spare_edit_sound_again(window, qapp, monkeypatch
     assert sc._spare_editor is d
 
 
+def test_a_new_theme_builds_the_kept_settings_again(window, qapp, monkeypatch):
+    """A theme picked outside Settings (the setup guide) dropped the closed Settings
+    kept for the cog, and nothing made another: the next open built it all (~300 ms on
+    a slower PC). Now one is made again a little after the switch, on its own. Picked
+    in Settings, the open one just restyles: nothing more is built."""
+    from soundboard.ui.window import settingscontrol, themecontrol
+    monkeypatch.setattr(themecontrol, "SPARE_AFTER_MS", 0)
+    monkeypatch.setattr(themecontrol, "SETTINGS_AFTER_MS", 0)
+    sc = window.setctl
+    sc.preload_dialogs()
+    window.show()
+    qapp.processEvents()
+    old = sc._settings_kept
+    window.themectl.apply_theme("Light" if window.cfg.theme != "Light" else "Dark")
+    assert sc._settings_kept is None   # not part of the switch itself
+    qapp.processEvents()
+    kept = sc._settings_kept
+    assert kept is not None and kept is not old
+    made = []
+    real = settingscontrol.SettingsDialog
+    monkeypatch.setattr(settingscontrol, "SettingsDialog",
+                        lambda *a, **k: made.append(a) or real(*a, **k))
+    assert sc.open_settings() is kept and not made
+    window.themectl.apply_theme("Light" if window.cfg.theme != "Light" else "Dark")
+    qapp.processEvents()
+    assert sc.settings_open() and sc._settings_dlg is kept and not made
+    sc.close_settings()
+    qapp.processEvents()
+
+
 def test_settings_kept_after_a_live_page_only_that_page_built_again(window, qapp, monkeypatch):
     """About (or Updates, Help...) shows live state. Closing Settings after one threw
     the whole Settings away: the next open built it all again (450 ms on a slower PC)
