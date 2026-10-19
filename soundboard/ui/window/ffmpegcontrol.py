@@ -11,15 +11,16 @@ import html
 import threading
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
+from PySide6.QtWidgets import QProgressBar, QPushButton
 from shiboken6 import isValid as qt_valid
 
 from soundboard.core import errors, usage
 from soundboard.online import quality
 from soundboard.online import ffmpegget, net, netlog
 from soundboard.i18n import _
-from soundboard.ui.kit import busy, icons, worker
+from soundboard.ui.kit import busy, worker
+from soundboard.ui.kit.topbar import TopBar
+from soundboard.ui.window import sidebar
 from soundboard.ui.window.controller import Controller
 
 if TYPE_CHECKING:
@@ -45,40 +46,31 @@ class FfmpegControl(Controller):
         self.auto_now = False     # the get running now is that one (for the count)
         self.done = False         # the last fix worked (Settings says so)
 
-    def build_bar(self) -> QFrame:
+    def build_bar(self) -> TopBar:
         """Its download's progress with Stop, or, when the app couldn't get it by itself,
         what stops working and Fix it. The same slim bar as the Discord offer, never a
         window"""
-        self.bar = QFrame()
-        self.bar.setObjectName("tipbar")
-        fh = QHBoxLayout(self.bar)
-        fh.setContentsMargins(12, 6, 6, 6)
-        fh.setSpacing(8)
-        self.lbl = QLabel()
-        self.lbl.setTextFormat(Qt.TextFormat.PlainText)   # winget's own words may be in it
-        self.lbl.setWordWrap(True)
-        fh.addWidget(self.lbl, 1)
-        self.fix_btn = QPushButton(_("Fix it"))
-        self.fix_btn.setObjectName("primary")
-        self.fix_btn.clicked.connect(self._fix_clicked)
-        fh.addWidget(self.fix_btn)
-        self.stop_btn = QPushButton(_("Stop"))
-        self.stop_btn.setObjectName("small")
-        self.stop_btn.clicked.connect(self._stop)
-        fh.addWidget(self.stop_btn)
-        self.never_btn = QPushButton(_("Don't ask again"))
-        self.never_btn.setObjectName("small")
+        self.bar = TopBar("video", "warn")
+        self.prog = QProgressBar()
+        self.prog.setObjectName("updatebar")
+        self.prog.setRange(0, 100)
+        self.prog.setTextVisible(False)
+        self.prog.setFixedHeight(sidebar.UpdateCard.BAR_H)
+        self.prog.hide()
+        self.bar.add_row(self.prog)
+        self.never_btn = self.bar.add_button(_("Don't ask again"))
         self.never_btn.setToolTip(_("Settings → Data & quality still has it"))
         self.never_btn.clicked.connect(self._never)
-        fh.addWidget(self.never_btn)
-        hide = QPushButton()
-        hide.setObjectName("urgenthide")
+        self.stop_btn = self.bar.add_button(_("Stop"))
+        self.stop_btn.clicked.connect(self._stop)
+        self.fix_btn = self.bar.add_button(_("Fix it"), primary=True)
+        self.fix_btn.clicked.connect(self._fix_clicked)
+        hide = self.bar.close_btn
         hide.setAccessibleName(_("Hide"))
         hide.setToolTip(_("Hide until Onion Board starts again"))
-        icons.close_button(hide, 28)
         hide.clicked.connect(self._not_now)
-        fh.addWidget(hide)
         self.hide_btn = hide
+        self.lbl = self.bar.words
         self.bar.hide()
         return self.bar
 
@@ -239,7 +231,15 @@ class FfmpegControl(Controller):
             why = (self.error or ffmpegget.why_not()
                    or (_("Low data mode is on, so it wasn't downloaded by itself (about "
                          "110 MB).") if quality.current.low_data else ""))
-        self.lbl.setText("\n".join(t for t in (text, why) if t))
+        # winget's own words may be in it: plain text, never HTML
+        self.bar.set_tone("info" if self.getting else "warn",
+                          "download" if self.getting else "video")
+        if why:
+            self.bar.set_text(text, why)
+        else:
+            self.bar.set_message(text)
+        self.prog.setVisible(self.getting and self.percent >= 0)
+        self.prog.setValue(max(0, self.percent))
         for b, on in ((self.fix_btn, not self.getting), (self.never_btn, not self.getting),
                       (self.stop_btn, self.getting)):
             if not on and b.hasFocus():

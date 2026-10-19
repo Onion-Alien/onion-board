@@ -40,7 +40,7 @@ from PySide6.QtCore import QEventLoop  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
 from soundboard.audio import appaudio, engine  # noqa: E402
-from soundboard.core import autostart, tips  # noqa: E402
+from soundboard.core import autostart  # noqa: E402
 from soundboard.sounds import library  # noqa: E402
 from soundboard.control import winkeys  # noqa: E402
 
@@ -155,8 +155,7 @@ def demo_config(tmp: Path, theme: str, texture: bool):
                    screen={"triggers": demo_triggers(tmp)},
                    route="mic", mic_first=True,
                    # like someone who's used it: no tab how-tos (or their "got it" toast)
-                   # and today's "Did you know?" tip already shown
-                   tips_seen=[f"tour-{t}" for t in library.TOUR_TABS], tip_day=tips.today()).save()
+                   tips_seen=[f"tour-{t}" for t in library.TOUR_TABS]).save()
 
 
 def pad_picture(tmp: Path, name: str) -> str:

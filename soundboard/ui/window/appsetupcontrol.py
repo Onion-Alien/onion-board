@@ -191,14 +191,17 @@ class AppSetupControl(Controller):
         mw.setup_x.setAccessibleName(_("Hide"))
         mw.setup_no.setVisible(state == "offer")
         if state == "offer":
-            mw.setup_lbl.setText(_("Looks like you're using <b>{name}</b>. Set up for it?",
-                                     name=name))
+            mw.setup_bar.set_tone("info", "chat")
+            mw.setup_bar.set_message(_("Looks like you're using <b>{name}</b>. Set up for it?",
+                                       name=name), rich=True)
             mw.setup_yes.setText(_("Set up"))
             mw.setup_x.setToolTip(_("Don't ask about {name} again", name=app.name))
             mw.setup_x.setAccessibleName(mw.setup_x.toolTip())
         else:
             lines, button = self._setup_checks(app)
-            mw.setup_lbl.setText("<br>".join(lines))
+            warn = any("⚠" in line for line in lines)
+            mw.setup_bar.set_tone("warn" if warn else "ok", "warn" if warn else "check")
+            mw.setup_bar.set_message("<br>".join(lines), rich=True)
             mw.setup_yes.setText(button)
             if not button:
                 self._setup_hide.start(SETUP_DONE_MS)
@@ -213,8 +216,9 @@ class AppSetupControl(Controller):
         ok = "<span style='color:#3fb950'>✓</span>"
         warn = "<span style='color:#d29922'>⚠</span>"
         mode = profiles.BY_KEY[app.simple].name
+        # (its ✓ is the bar's own icon)
         lines = [_("{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.",
-                   ok=ok, mode=mode, name=html.escape(app.name))]
+                   ok="", mode=mode, name=html.escape(app.name)).strip()]
         guide = app.guide
         if guide == "discord":
             if mw.alertctl.discord_problems():
