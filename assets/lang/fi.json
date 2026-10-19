@@ -2886,7 +2886,6 @@
   "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Pois: linkitä alkuperäiseen tiedostoon. Ota käyttöön, jotta äänet säilyvät, jos alkuperäinen siirretään, poistetaan tai on irrotetulla asemalla. Vie lisää levytilaa. Koskee vain uusia paikallisia tuonteja.",
   "Audio recovery": "Äänen palautus",
   "Clean reinstall": "Puhdas uudelleenasennus",
-  "Fix problems sending sounds into your mic after an update.": "Korjaa päivityksen jälkeiset ongelmat äänten lähettämisessä mikrofoniin.",
   "Mic effect reinstalled. Test it in your voice chat.": "Mikrofonitehoste asennettu uudelleen. Testaa sitä äänichatissa.",
   "Mic effect removed": "Mikrofonitehoste poistettu",
   "Reinstall Onion Board's mic effect on your selected microphone.": "Asenna Onion Boardin mikrofonitehoste uudelleen valittuun mikrofoniin.",
@@ -4200,5 +4199,13 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Kun Onion Board sulkeutuu, se laittaa Discordin kohinanvaimennuksen, kaiunpoiston ja automaattisen äänenvoimakkuuden takaisin päälle puhetta varten. Etkö halua sitä? Poista valinta <b>Palauta Discord puhetta varten suljettaessa</b> Käyttöönotto-välilehdeltä.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Äänesi menevät nyt kavereillesi puhtaina, eivät vaimeina tai katkonaisina.",
   "{name} is set up for your sounds": "{name} on valmis äänillesi",
-  "What's popular right now": "Mikä on suosittua juuri nyt"
+  "What's popular right now": "Mikä on suosittua juuri nyt",
+  "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Audio recovery</b>:": "Muutitko mielesi? <b>Palauta Discord</b> laittaa sen puheen siistimisen taas päälle. Se on kohdassa <b>Asetukset → Ääni → Äänen palautus</b>:",
+  "Close Discord and it's put back right away: Discord doesn't take changes while it's open.": "Sulje Discord, niin se palautetaan heti: Discord ei ota muutoksia vastaan, kun se on auki.",
+  "Couldn't put Discord back. Turn on Noise Suppression, Echo Cancellation and Automatic Gain Control in its Voice & Video settings.": "Discordia ei voitu palauttaa. Laita Kohinanvaimennus, Kaiunpoisto ja Automaattinen vahvistuksen säätö päälle sen Ääni ja video -asetuksista.",
+  "Discord is already set up for talking.": "Discord on jo valmis puhetta varten.",
+  "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord on taas niin kuin puhut: kohinanvaimennus, kaiunpoisto ja automaattinen äänenvoimakkuus ovat taas päällä.",
+  "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Korjaa päivityksen jälkeiset ongelmat äänten lähettämisessä mikrofoniin tai palauta Discord puhetta varten.",
+  "Put Discord back": "Palauta Discord",
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Laittaa Discordin kohinanvaimennuksen, kaiunpoiston ja automaattisen äänenvoimakkuuden takaisin päälle niin kuin ne olivat ennen kuin säädit sen äänille. Puheeseen ilman Onion Boardia: äänesi voivat taas katkeilla puheluissa."
 }

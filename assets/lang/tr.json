@@ -2886,7 +2886,6 @@
   "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Kapalı: özgün dosyaya bağlanır. Özgün dosya taşınırsa, silinirse veya bağlantısı kesilmiş bir sürücüdeyse sesleri korumak için açın. Ek disk alanı kullanır. Yalnızca yeni yerel içe aktarmalara uygulanır.",
   "Audio recovery": "Ses kurtarma",
   "Clean reinstall": "Temiz kurulum",
-  "Fix problems sending sounds into your mic after an update.": "Güncellemeden sonra sesleri mikrofonuna gönderirken yaşanan sorunları düzelt.",
   "Mic effect reinstalled. Test it in your voice chat.": "Mikrofon efekti yeniden kuruldu. Sesli sohbetinde dene.",
   "Mic effect removed": "Mikrofon efekti kaldırıldı",
   "Reinstall Onion Board's mic effect on your selected microphone.": "Onion Board mikrofon efektini seçtiğin mikrofona yeniden kur.",
@@ -4200,5 +4199,13 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Onion Board kapanınca Discord'un gürültü bastırma, yankı engelleme ve otomatik ses seviyesini konuşma için yeniden açar. İstemiyor musun? Kurulum sekmesinde <b>Kapanınca Discord'u konuşmaya geri al</b> işaretini kaldır.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Seslerin artık arkadaşlarına boğuk ya da kesik değil, temiz ulaşıyor.",
   "{name} is set up for your sounds": "{name} seslerin için ayarlandı",
-  "What's popular right now": "Şu an popüler olanlar"
+  "What's popular right now": "Şu an popüler olanlar",
+  "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Audio recovery</b>:": "Fikrini mi değiştirdin? <b>Discord'u geri al</b> ses temizliğini yeniden açar. Şurada: <b>Ayarlar → Ses → Ses kurtarma</b>:",
+  "Close Discord and it's put back right away: Discord doesn't take changes while it's open.": "Discord'u kapat, hemen geri alınır: Discord açıkken değişiklik kabul etmez.",
+  "Couldn't put Discord back. Turn on Noise Suppression, Echo Cancellation and Automatic Gain Control in its Voice & Video settings.": "Discord geri alınamadı. Ses ve Görüntü ayarlarında Gürültü Bastırma, Yankı Engelleme ve Otomatik Kazanç Kontrolü'nü aç.",
+  "Discord is already set up for talking.": "Discord zaten konuşma için ayarlı.",
+  "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord konuştuğun haline döndü: gürültü bastırma, yankı engelleme ve otomatik ses seviyesi yeniden açık.",
+  "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Güncellemeden sonra sesleri mikrofonuna gönderirken yaşanan sorunları düzelt ya da Discord'u konuşmaya geri al.",
+  "Put Discord back": "Discord'u geri al",
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Discord'un gürültü bastırma, yankı engelleme ve otomatik ses seviyesini, sesler için ayarlamadan önceki gibi yeniden açar. Onion Board olmadan konuşmak için: seslerin aramalarda yine kesilebilir."
 }

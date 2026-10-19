@@ -2818,7 +2818,6 @@
   "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "オフ：元のファイルにリンクします。元のファイルを移動・削除したり、保存先のドライブを取り外したりしても音声を残すにはオンにします。追加のディスク容量を使います。新しく追加するローカルファイルにのみ適用されます。",
   "Audio recovery": "オーディオの復旧",
   "Clean reinstall": "クリーン再インストール",
-  "Fix problems sending sounds into your mic after an update.": "アップデート後にサウンドがマイクに送れない問題を修復します。",
   "Mic effect reinstalled. Test it in your voice chat.": "マイクエフェクトを再インストールしました。ボイスチャットで試してください。",
   "Mic effect removed": "マイクエフェクトを削除しました",
   "Reinstall Onion Board's mic effect on your selected microphone.": "選択したマイクにOnion Boardのマイクエフェクトを再インストールします。",
@@ -4121,5 +4120,13 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Onion Boardを閉じると、Discordのノイズ抑制・エコー除去・自動音量を通話用にオンに戻します。戻したくない場合は、セットアップタブで<b>閉じたらDiscordを通話用に戻す</b>のチェックを外してください。",
   "Your sounds reach your friends clean now, not muffled or cut off.": "サウンドがこもったり途切れたりせず、きれいに友だちに届くようになりました。",
   "{name} is set up for your sounds": "{name}がサウンド用に設定されました",
-  "What's popular right now": "今人気のもの"
+  "What's popular right now": "今人気のもの",
+  "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Audio recovery</b>:": "気が変わったら？ <b>Discordを元に戻す</b>で音声のクリーンアップがオンに戻ります。場所は<b>設定 → オーディオ → オーディオの復旧</b>です：",
+  "Close Discord and it's put back right away: Discord doesn't take changes while it's open.": "Discordを閉じるとすぐに戻します。Discordは開いている間は変更を受け付けません。",
+  "Couldn't put Discord back. Turn on Noise Suppression, Echo Cancellation and Automatic Gain Control in its Voice & Video settings.": "Discordを元に戻せませんでした。Discordの「音声・ビデオ」設定でノイズ抑制、エコー除去、自動ゲイン調整をオンにしてください。",
+  "Discord is already set up for talking.": "Discordはすでに通話用に設定されています。",
+  "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discordを通話用に戻しました。ノイズ抑制、エコー除去、自動音量が再びオンです。",
+  "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "アップデート後にサウンドがマイクに送れない問題を修復したり、Discordを通話用に戻したりします。",
+  "Put Discord back": "Discordを元に戻す",
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Discordのノイズ抑制・エコー除去・自動音量を、サウンド用に設定する前の状態でオンに戻します。Onion Boardなしで話す場合に。通話でサウンドがまた途切れることがあります。"
 }

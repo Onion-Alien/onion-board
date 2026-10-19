@@ -421,9 +421,35 @@ def running_clients() -> set[str]:
     return {c for c, exe in EXES.items() if exe in names}
 
 
+def installed(appdata: Path | None = None) -> bool:
+    """A Discord has a settings folder on this PC (any client)."""
+    for client_dir, _n in discordcfg.CLIENTS:
+        f = discordcfg._folder(client_dir, appdata)
+        if f is not None and f.is_dir():
+            return True
+    return False
+
+
+def to_restore(saved: dict, appdata: Path | None = None) -> list[str]:
+    """The Discord folders where putting how you talk back (`saved`, else Discord's
+    defaults) would change something: Audio recovery's Put Discord back."""
+    out = []
+    for client_dir, name in discordcfg.CLIENTS:
+        try:
+            s = discordcfg.read_client(client_dir, name, appdata)
+            store = read_store(client_dir, appdata)
+            if (s is not None and store is not None
+                    and apply(store, target(saved.get(client_dir), store)) != store):
+                out.append(client_dir)
+        except Exception:  # noqa: BLE001 - one unreadable client doesn't stop the rest
+            log.warning("reading %s failed", client_dir, exc_info=True)
+    return out
+
+
 def restore(saved: dict, backup_root: Path, appdata: Path | None = None,
-            running: set[str] | None = None, only=None) -> list[str]:
+            running: set[str] | None = None, only=None, always: bool = False) -> list[str]:
     """Put back each Discord left set for sounds (or just the folder names in `only`).
+    `always`: also one that's partly set for talking (asked for, not on quit).
     Returns the ones still to do because they're running."""
     if running is None:
         running = running_clients()
@@ -437,7 +463,8 @@ def restore(saved: dict, backup_root: Path, appdata: Path | None = None,
             if s is None or store is None:
                 continue
             talk = target(saved.get(client_dir), store)
-            if not needs_restore(s, store, talk):
+            if (apply(store, talk) == store if always
+                    else not needs_restore(s, store, talk)):
                 continue
             if client_dir in running:
                 pending.append(client_dir)

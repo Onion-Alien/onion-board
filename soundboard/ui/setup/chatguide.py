@@ -207,12 +207,27 @@ def changes_html(changes: list[tuple[str, str, str]]) -> str:
     return f"<table cellspacing='0'>{rows}</table>"
 
 
+def _row_picture(parent, width: int = 420):
+    """Audio recovery's Put Discord back row, drawn as a picture (never shown itself)."""
+    from soundboard.ui.setup.audiorecovery import DiscordRow
+    row = DiscordRow(parent)
+    row.hide()
+    row.ensurePolished()
+    for w in row.findChildren(QLabel) + row.findChildren(QPushButton):
+        w.ensurePolished()
+    row.resize(width, fit.needed_height(row, width))
+    row.layout().activate()   # pyright: ignore[reportOptionalMemberAccess] - it has one
+    pm = row.grab()
+    row.deleteLater()
+    return pm
+
+
 class DiscordFixed(QDialog):
     """Discord's settings came right while its guide was open: Bun celebrates, and the
     table says exactly which settings changed, from what to what."""
 
     def __init__(self, parent, client: str, changes: list[tuple[str, str, str]],
-                 restore: bool):
+                 restore: bool, show_me=None):
         super().__init__(parent)
         title = _("{name} is set up for your sounds", name=client)
         self.setWindowTitle(title)
@@ -249,6 +264,15 @@ class DiscordFixed(QDialog):
                 "Untick <b>Put Discord back for talking on close</b> on the Setup tab."))
             lbl.setTextFormat(Qt.TextFormat.RichText)
             v.addWidget(lbl)
+        # where to undo it, with a picture of the very button (this theme, this language)
+        back = panel.hint_label(_(
+            "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. "
+            "It's in <b>Settings → Audio → Audio recovery</b>:"))
+        back.setTextFormat(Qt.TextFormat.RichText)
+        v.addWidget(back)
+        self.picture = QLabel(self)
+        self.picture.setPixmap(_row_picture(self))
+        v.addWidget(self.picture, 0, Qt.AlignmentFlag.AlignLeft)
         row = QHBoxLayout()
         row.setSpacing(8)
         row.addStretch(1)
@@ -257,6 +281,10 @@ class DiscordFixed(QDialog):
         ok.setDefault(True)
         ok.clicked.connect(self.accept)
         row.addWidget(ok)
+        if show_me is not None:
+            where = QPushButton(_("Show me"))
+            where.clicked.connect(lambda: (self.accept(), show_me()))
+            row.addWidget(where)
         v.addLayout(row)
         fit.watch(self)
 
@@ -626,8 +654,10 @@ class DiscordGuide(QDialog):
 
     def _show_fixed(self, client: str, changes: list):
         cfg = getattr(self.mw, "cfg", None)
-        self.fixed = DiscordFixed(self, client, changes,
-                                  bool(getattr(cfg, "discord_restore", False)))
+        setctl = getattr(self.mw, "setctl", None)
+        self.fixed = DiscordFixed(
+            self, client, changes, bool(getattr(cfg, "discord_restore", False)),
+            (lambda: setctl.open_settings("audio")) if setctl is not None else None)
         self.fixed.finished.connect(self.accept)   # nothing left to do in the guide
         self.fixed.open()
 

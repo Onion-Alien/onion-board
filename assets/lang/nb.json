@@ -2886,7 +2886,6 @@
   "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Av: lenk til originalfilen. Slå på for å beholde lydene hvis originalen flyttes, slettes eller ligger på en frakoblet disk. Bruker ekstra diskplass. Gjelder bare nye lokale importer.",
   "Audio recovery": "Lydgjenoppretting",
   "Clean reinstall": "Ren reinstallasjon",
-  "Fix problems sending sounds into your mic after an update.": "Løs problemer med å sende lyder til mikrofonen din etter en oppdatering.",
   "Mic effect reinstalled. Test it in your voice chat.": "Mikrofoneffekten er installert på nytt. Test den i talechatten din.",
   "Mic effect removed": "Mikrofoneffekt fjernet",
   "Reinstall Onion Board's mic effect on your selected microphone.": "Installer Onion Boards mikrofoneffekt på nytt på den valgte mikrofonen.",
@@ -4200,5 +4199,13 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Når Onion Board lukkes, slår det på igjen støydemping, ekkoreduksjon og automatisk volum i Discord for prat. Vil du ikke det? Fjern haken ved <b>Sett Discord tilbake til prat ved lukking</b> på Oppsett-fanen.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Lydene dine når nå rene fram til vennene dine, ikke dempet eller hakkete.",
   "{name} is set up for your sounds": "{name} er satt opp for lydene dine",
-  "What's popular right now": "Det som er populært akkurat nå"
+  "What's popular right now": "Det som er populært akkurat nå",
+  "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Audio recovery</b>:": "Ombestemt deg? <b>Sett Discord tilbake</b> slår på stemmerensingen igjen. Den ligger i <b>Innstillinger → Lyd → Lydgjenoppretting</b>:",
+  "Close Discord and it's put back right away: Discord doesn't take changes while it's open.": "Lukk Discord, så settes den tilbake med en gang: Discord tar ikke imot endringer mens den er åpen.",
+  "Couldn't put Discord back. Turn on Noise Suppression, Echo Cancellation and Automatic Gain Control in its Voice & Video settings.": "Klarte ikke å sette Discord tilbake. Slå på Støydemping, Ekkoreduksjon og Automatisk forsterkningskontroll i Tale og video-innstillingene.",
+  "Discord is already set up for talking.": "Discord er allerede satt opp for prat.",
+  "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord er tilbake slik du prater: støydemping, ekkoreduksjon og automatisk volum er på igjen.",
+  "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Løs problemer med å sende lyder til mikrofonen din etter en oppdatering, eller sett Discord tilbake til prat.",
+  "Put Discord back": "Sett Discord tilbake",
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Slår på igjen Discords støydemping, ekkoreduksjon og automatiske volum slik du hadde dem før du satte den opp for lyder. For prat uten Onion Board: lydene dine kan bli hakkete i samtaler igjen."
 }

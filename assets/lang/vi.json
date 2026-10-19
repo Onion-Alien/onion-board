@@ -2818,7 +2818,6 @@
   "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Tắt: liên kết đến tệp gốc. Bật để giữ âm thanh nếu tệp gốc bị di chuyển, xóa hoặc nằm trên ổ đĩa đã ngắt kết nối. Dùng thêm dung lượng đĩa. Chỉ áp dụng cho lần nhập tệp trên máy mới.",
   "Audio recovery": "Khôi phục âm thanh",
   "Clean reinstall": "Cài lại hoàn toàn",
-  "Fix problems sending sounds into your mic after an update.": "Khắc phục lỗi gửi âm thanh vào mic sau khi cập nhật.",
   "Mic effect reinstalled. Test it in your voice chat.": "Đã cài lại hiệu ứng mic. Hãy thử trong cuộc trò chuyện thoại.",
   "Mic effect removed": "Đã gỡ hiệu ứng mic",
   "Reinstall Onion Board's mic effect on your selected microphone.": "Cài lại hiệu ứng mic của Onion Board trên micro đã chọn.",
@@ -4121,5 +4120,13 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Khi Onion Board đóng, nó bật lại giảm tiếng ồn, khử tiếng vọng và âm lượng tự động của Discord để nói chuyện. Không muốn vậy? Bỏ chọn <b>Đưa Discord về chế độ nói chuyện khi đóng</b> ở thẻ Thiết lập.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Giờ âm thanh của bạn đến tai bạn bè rõ ràng, không bị nghẹt hay đứt quãng.",
   "{name} is set up for your sounds": "{name} đã được thiết lập cho âm thanh của bạn",
-  "What's popular right now": "Đang thịnh hành lúc này"
+  "What's popular right now": "Đang thịnh hành lúc này",
+  "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Audio recovery</b>:": "Đổi ý? <b>Đưa Discord về</b> bật lại tính năng làm sạch giọng của nó. Nằm ở <b>Cài đặt → Âm thanh → Khôi phục âm thanh</b>:",
+  "Close Discord and it's put back right away: Discord doesn't take changes while it's open.": "Đóng Discord là được đưa về ngay: Discord không nhận thay đổi khi đang mở.",
+  "Couldn't put Discord back. Turn on Noise Suppression, Echo Cancellation and Automatic Gain Control in its Voice & Video settings.": "Không đưa Discord về được. Hãy bật Giảm tiếng ồn, Khử tiếng vọng và Điều khiển khuếch đại tự động trong cài đặt Giọng nói & Video của nó.",
+  "Discord is already set up for talking.": "Discord đã được thiết lập để nói chuyện rồi.",
+  "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord đã trở lại như khi bạn nói chuyện: giảm tiếng ồn, khử tiếng vọng và âm lượng tự động đã bật lại.",
+  "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Khắc phục lỗi gửi âm thanh vào mic sau khi cập nhật, hoặc đưa Discord về chế độ nói chuyện.",
+  "Put Discord back": "Đưa Discord về",
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Bật lại giảm tiếng ồn, khử tiếng vọng và âm lượng tự động của Discord như trước khi bạn thiết lập cho âm thanh. Để nói chuyện không cần Onion Board: âm thanh của bạn có thể lại bị ngắt trong cuộc gọi."
 }

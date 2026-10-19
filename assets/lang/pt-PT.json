@@ -2886,7 +2886,6 @@
   "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Desativado: liga ao ficheiro original. Ative para manter os sons se o original for movido, eliminado ou estiver numa unidade desligada. Usa espaço extra em disco. Aplica-se apenas a novas importações locais.",
   "Audio recovery": "Recuperação de áudio",
   "Clean reinstall": "Reinstalação limpa",
-  "Fix problems sending sounds into your mic after an update.": "Resolve problemas ao enviar sons para o teu microfone após uma atualização.",
   "Mic effect reinstalled. Test it in your voice chat.": "Efeito do microfone reinstalado. Testa-o no teu chat de voz.",
   "Mic effect removed": "Efeito do microfone removido",
   "Reinstall Onion Board's mic effect on your selected microphone.": "Reinstala o efeito de microfone do Onion Board no microfone selecionado.",
@@ -4200,5 +4199,13 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Quando o Onion Board fecha, volta a ligar a supressão de ruído, o cancelamento de eco e o volume automático do Discord para conversa. Não queres isso? Desmarca <b>Repor o Discord para conversa ao fechar</b> no separador Configurar.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Os teus sons chegam agora limpos aos teus amigos, sem ficarem abafados ou cortados.",
   "{name} is set up for your sounds": "{name} está pronto para os teus sons",
-  "What's popular right now": "O que está popular agora"
+  "What's popular right now": "O que está popular agora",
+  "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Audio recovery</b>:": "Mudaste de ideias? <b>Repor o Discord</b> volta a ligar a limpeza de voz dele. Está em <b>Definições → Áudio → Recuperação de áudio</b>:",
+  "Close Discord and it's put back right away: Discord doesn't take changes while it's open.": "Fecha o Discord e é reposto logo: o Discord não aceita alterações enquanto está aberto.",
+  "Couldn't put Discord back. Turn on Noise Suppression, Echo Cancellation and Automatic Gain Control in its Voice & Video settings.": "Não foi possível repor o Discord. Liga Supressão de ruído, Cancelamento de eco e Controlo automático de ganho nas definições de Voz e vídeo dele.",
+  "Discord is already set up for talking.": "O Discord já está pronto para conversa.",
+  "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "O Discord voltou à forma como falas: supressão de ruído, cancelamento de eco e volume automático estão ligados outra vez.",
+  "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Resolve problemas ao enviar sons para o teu microfone após uma atualização, ou repõe o Discord para conversa.",
+  "Put Discord back": "Repor o Discord",
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Volta a ligar a supressão de ruído, o cancelamento de eco e o volume automático do Discord como os tinhas antes de o preparares para sons. Para falar sem o Onion Board: os teus sons podem voltar a cortar nas chamadas."
 }

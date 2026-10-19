@@ -2886,7 +2886,6 @@
   "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Ανενεργό: σύνδεση με το αρχικό αρχείο. Ενεργοποιήστε για να διατηρούνται οι ήχοι αν το αρχικό μετακινηθεί, διαγραφεί ή βρίσκεται σε αποσυνδεδεμένο δίσκο. Χρησιμοποιεί επιπλέον χώρο. Ισχύει μόνο για νέες τοπικές εισαγωγές.",
   "Audio recovery": "Ανάκτηση ήχου",
   "Clean reinstall": "Καθαρή εγκατάσταση",
-  "Fix problems sending sounds into your mic after an update.": "Διόρθωσε προβλήματα αποστολής ήχων στο μικρόφωνο μετά από ενημέρωση.",
   "Mic effect reinstalled. Test it in your voice chat.": "Το εφέ μικροφώνου εγκαταστάθηκε ξανά. Δοκίμασέ το στη φωνητική συνομιλία.",
   "Mic effect removed": "Το εφέ μικροφώνου αφαιρέθηκε",
   "Reinstall Onion Board's mic effect on your selected microphone.": "Εγκατάστησε ξανά το εφέ μικροφώνου του Onion Board στο επιλεγμένο μικρόφωνο.",
@@ -4200,5 +4199,13 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Όταν κλείνει το Onion Board, ξανανοίγει την καταστολή θορύβου, την ακύρωση ηχούς και την αυτόματη ένταση του Discord για ομιλία. Δεν το θέλεις; Βγάλε το τικ από το <b>Επαναφορά του Discord για ομιλία στο κλείσιμο</b> στην καρτέλα Διαμόρφωση.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Οι ήχοι σου φτάνουν τώρα καθαροί στους φίλους σου, όχι πνιχτοί ή κομμένοι.",
   "{name} is set up for your sounds": "Το {name} είναι ρυθμισμένο για τους ήχους σου",
-  "What's popular right now": "Τι είναι δημοφιλές τώρα"
+  "What's popular right now": "Τι είναι δημοφιλές τώρα",
+  "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Audio recovery</b>:": "Το μετάνιωσες; Το <b>Επαναφορά του Discord</b> ξανανοίγει τον καθαρισμό φωνής του. Είναι στις <b>Ρυθμίσεις → Ήχος → Ανάκτηση ήχου</b>:",
+  "Close Discord and it's put back right away: Discord doesn't take changes while it's open.": "Κλείσε το Discord και επανέρχεται αμέσως: το Discord δεν δέχεται αλλαγές όσο είναι ανοιχτό.",
+  "Couldn't put Discord back. Turn on Noise Suppression, Echo Cancellation and Automatic Gain Control in its Voice & Video settings.": "Δεν έγινε επαναφορά του Discord. Άνοιξε Καταστολή θορύβου, Ακύρωση ηχούς και Αυτόματο έλεγχο ενίσχυσης στις ρυθμίσεις Φωνή και βίντεο.",
+  "Discord is already set up for talking.": "Το Discord είναι ήδη ρυθμισμένο για ομιλία.",
+  "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Το Discord είναι ξανά όπως μιλάς: καταστολή θορύβου, ακύρωση ηχούς και αυτόματη ένταση είναι πάλι ανοιχτά.",
+  "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Διόρθωσε προβλήματα αποστολής ήχων στο μικρόφωνο μετά από ενημέρωση ή επανέφερε το Discord για ομιλία.",
+  "Put Discord back": "Επαναφορά του Discord",
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Ξανανοίγει την καταστολή θορύβου, την ακύρωση ηχούς και την αυτόματη ένταση του Discord όπως ήταν πριν το ρυθμίσεις για ήχους. Για ομιλία χωρίς το Onion Board: οι ήχοι σου μπορεί να κόβονται ξανά στις κλήσεις."
 }

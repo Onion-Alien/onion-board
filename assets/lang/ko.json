@@ -2818,7 +2818,6 @@
   "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "끄기: 원본 파일에 연결합니다. 원본이 이동 또는 삭제되거나 드라이브 연결이 끊겨도 사운드를 유지하려면 켜세요. 추가 디스크 공간을 사용합니다. 새 로컬 가져오기에만 적용됩니다.",
   "Audio recovery": "오디오 복구",
   "Clean reinstall": "완전히 재설치",
-  "Fix problems sending sounds into your mic after an update.": "업데이트 후 마이크로 소리가 전송되지 않는 문제를 해결하세요.",
   "Mic effect reinstalled. Test it in your voice chat.": "마이크 효과를 재설치했어요. 음성 채팅에서 테스트해 보세요.",
   "Mic effect removed": "마이크 효과 제거됨",
   "Reinstall Onion Board's mic effect on your selected microphone.": "선택한 마이크에 Onion Board의 마이크 효과를 재설치합니다.",
@@ -4121,5 +4120,13 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Onion Board를 닫으면 Discord의 노이즈 억제, 에코 제거, 자동 볼륨을 대화용으로 다시 켭니다. 원하지 않으면 셋업 탭에서 <b>닫을 때 Discord를 대화용으로 되돌리기</b>의 체크를 해제하세요.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "이제 사운드가 먹먹하거나 끊기지 않고 친구들에게 깨끗하게 전달돼요.",
   "{name} is set up for your sounds": "{name}이(가) 사운드용으로 설정됐어요",
-  "What's popular right now": "지금 인기 있는 것"
+  "What's popular right now": "지금 인기 있는 것",
+  "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Audio recovery</b>:": "마음이 바뀌었나요? <b>Discord 되돌리기</b>를 누르면 음성 정리가 다시 켜져요. <b>설정 → 오디오 → 오디오 복구</b>에 있어요:",
+  "Close Discord and it's put back right away: Discord doesn't take changes while it's open.": "Discord를 닫으면 바로 되돌려요. Discord는 열려 있는 동안 변경을 받지 않아요.",
+  "Couldn't put Discord back. Turn on Noise Suppression, Echo Cancellation and Automatic Gain Control in its Voice & Video settings.": "Discord를 되돌리지 못했어요. Discord의 음성 및 비디오 설정에서 노이즈 억제, 에코 제거, 자동 게인 제어를 켜세요.",
+  "Discord is already set up for talking.": "Discord가 이미 대화용으로 설정돼 있어요.",
+  "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord가 평소 말하던 대로 돌아왔어요. 노이즈 억제, 에코 제거, 자동 볼륨이 다시 켜졌어요.",
+  "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "업데이트 후 마이크로 소리가 전송되지 않는 문제를 해결하거나 Discord를 대화용으로 되돌리세요.",
+  "Put Discord back": "Discord 되돌리기",
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Discord의 노이즈 억제, 에코 제거, 자동 볼륨을 사운드용으로 설정하기 전처럼 다시 켜요. Onion Board 없이 대화할 때용이에요. 통화에서 사운드가 다시 끊길 수 있어요."
 }
