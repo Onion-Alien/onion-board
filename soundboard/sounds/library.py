@@ -247,6 +247,8 @@ def clean_setting(k: str, v):
         return v if v in ROUTES else "cable"
     if k == "pad_sort":
         return v if v in PAD_SORTS else "custom"
+    if k == "light_voice":
+        return v if v in ("auto", "on", "off") else "auto"
     if k in ("pad_view", "app_view", "voice_view"):
         return v if v in PAD_VIEWS else "grid"
     if k == "list_rows":
@@ -426,6 +428,9 @@ class Config:
     # Lite mode (ui/settings/lite.py): animations, Bun's idle moves and the textures off
     lite_mode: bool = False
     lite_hint_done: bool = False   # a slower PC was told about lite mode once
+    # Use less CPU for the voice features (the voice changer card): "on", "off", or
+    # "auto" = on while lite mode is (soundboard.voicefx.set_light)
+    light_voice: str = "auto"
     eq_enabled: bool = False
     eq_target: str = "voice"          # voice | sounds | all
     eq_preset: str = "Flat (off)"

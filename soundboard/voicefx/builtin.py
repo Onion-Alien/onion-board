@@ -356,7 +356,7 @@ class Cleanup(Effect):
         self.creep = 1.0
 
     def latency(self) -> float:
-        if self.p["hiss"] <= 0:
+        if self.p["hiss"] <= 0 or self.light:
             return 0.0
         return (self.stft.n if self.stft else _stft_size(self.rate, self.FRAME_S)) / self.rate
 
@@ -448,7 +448,7 @@ class Cleanup(Effect):
             y = self._gate(y, rate)
         else:
             self.open = True
-        want = self.p["hiss"] > 0
+        want = self.p["hiss"] > 0 and not self.light   # (Use less CPU: no hiss removal)
         if want and self.stft is None:
             self.stft = _Stage(_stft_size(rate, self.FRAME_S), int(rate * 0.01))
             # per frame, so the rise is CREEP_DB a second at any rate
@@ -928,19 +928,14 @@ class Robot(Effect):
               Param("mix", "Mix", 0, 1, 1))
 
     BANDS = 16
+    LIGHT_BANDS = 8   # Use less CPU: half the bands, each twice as wide (a little coarser)
     LO_HZ, HI_HZ = 120.0, 7500.0
     ENV_HZ = 40.0
 
     def __init__(self, rate, values=None):
         super().__init__(rate, values)
-        rate = rate or 48000                    # the chain builds effects before the mic opens
-        hi = min(self.HI_HZ, rate * 0.42)
-        edges = np.geomspace(self.LO_HZ, hi, self.BANDS + 1)
-        self.bank = np.stack([butter(2, [edges[i], edges[i + 1]], btype="band", fs=rate)
-                              for i in range(self.BANDS)]).astype(F32)
-        self.state = None        # the bank's memory, for (voice, carrier)
-        self.env_sos = butter(1, self.ENV_HZ, btype="low", fs=rate).astype(F32)
-        self.env_zi = np.zeros((1, 2 * self.BANDS, 2), F32)
+        self.env_sos = butter(1, self.ENV_HZ, btype="low", fs=rate or 48000).astype(F32)
+        self._bands(self.BANDS)
         self.tables: dict[int, np.ndarray] = {}   # harmonics -> one cycle of the buzz
         self.phase = 0.0
         self.rng = np.random.default_rng(1)
@@ -968,6 +963,22 @@ class Robot(Effect):
                 self.tables.clear()
             self.tables[k] = t
         return t
+
+    def _bands(self, n: int):
+        rate = self.rate or 48000               # the chain builds effects before the mic opens
+        hi = min(self.HI_HZ, rate * 0.42)
+        edges = np.geomspace(self.LO_HZ, hi, n + 1)
+        self.bank = np.stack([butter(2, [edges[i], edges[i + 1]], btype="band", fs=rate)
+                              for i in range(n)]).astype(F32)
+        self.bands = n
+        self.state = None        # the bank's memory, for (voice, carrier)
+        self.env_zi = np.zeros((1, 2 * n, 2), F32)
+
+    def set_light(self, on: bool):
+        super().set_light(on)
+        want = self.LIGHT_BANDS if self.light else self.BANDS
+        if want != self.bands:   # (a few ms on the mic thread, once, when it flips)
+            self._bands(want)
 
     def _carrier(self, n: int, rate: int) -> np.ndarray:
         f, nz = self.f, self.p["noise"]
@@ -997,8 +1008,9 @@ class Robot(Effect):
         y, self.state = sosfilt_bank(self.bank, pair, self.state)   # (bands, 2, n)
         bands = np.concatenate([y[:, 0], y[:, 1]])                 # voice's, then carrier's
         env, self.env_zi = sosfilt(self.env_sos, np.abs(bands), zi=self.env_zi)
-        gain = np.minimum(env[:self.BANDS] / (env[self.BANDS:] + F32(2e-3)), F32(20))
-        wet = (gain * bands[self.BANDS:]).sum(0).astype(F32)
+        k = self.bands
+        gain = np.minimum(env[:k] / (env[k:] + F32(2e-3)), F32(20))
+        wet = (gain * bands[k:]).sum(0).astype(F32)
         mix = F32(self.p["mix"])
         return wet if mix >= 1 else x * (1 - mix) + wet * mix
 
@@ -1811,6 +1823,7 @@ class Reverb(Effect):
              (0.0572, 0.22), (0.0587, -0.2), (0.0595, 0.18), (0.0612, 0.17))
     EARLY_LEVEL = 0.35
     PRE_MAX_S = 0.1
+    LIGHT_COMBS, LIGHT_ALLPASSES = 4, 2   # Use less CPU: half the reverb's delay lines
 
     def __init__(self, rate, values=None):
         super().__init__(rate, values)
@@ -1869,16 +1882,33 @@ class Reverb(Effect):
         self.combs[k] = hist
         return out
 
+    def set_light(self, on: bool):
+        if self.light and not on:   # the lines that sat out start from silence, not
+            for k in range(self.LIGHT_COMBS, len(self.combs)):   # from an old tail
+                self.combs[k][:] = 0
+                self.damp[k][:] = 0
+            for k in range(self.LIGHT_ALLPASSES, len(self.aps)):
+                xh, yh = self.aps[k]
+                self.aps[k] = (np.zeros_like(xh), np.zeros_like(yh))
+        super().set_light(on)
+
+    def _in_use(self) -> tuple[int, int]:
+        """How many combs and allpasses run (fewer with Use less CPU)."""
+        if self.light:
+            return self.LIGHT_COMBS, self.LIGHT_ALLPASSES
+        return len(self.combs), len(self.aps)
+
     def _all_combs(self, x, g, a):
         """All the combs at once, for a block no longer than the shortest delay (the
         usual case): each one's feedback is then already in its history, so the
         eight damping filters run as one call over an (8, n) array."""
         n = len(x)
-        fed, zf = lfilter([1 - a], [1, -a], np.stack([h[:n] for h in self.combs]),
-                          zi=np.stack(self.damp))
+        used = self._in_use()[0]
+        fed, zf = lfilter([1 - a], [1, -a], np.stack([h[:n] for h in self.combs[:used]]),
+                          zi=np.stack(self.damp[:used]))
         v = x[None] + F32(g) * fed.astype(F32)
-        for k, h in enumerate(self.combs):
-            self.combs[k] = np.concatenate([h[n:], v[k]])
+        for k in range(used):
+            self.combs[k] = np.concatenate([self.combs[k][n:], v[k]])
             self.damp[k] = zf[k]
         return v.sum(axis=0)
 
@@ -1888,14 +1918,18 @@ class Reverb(Effect):
         g = 0.7 + 0.28 * self.p["size"]
         a = float(np.exp(-2 * np.pi * self.p["tone"] / rate))
         dry, early = self._room(x, rate)
+        combs, aps = self._in_use()
         if len(x) <= min(len(h) for h in self.combs):
             wet = self._all_combs(dry, g, a)
         else:
             wet = np.zeros_like(x)
-            for k in range(len(self.combs)):
+            for k in range(combs):
                 wet += self._comb(dry, k, g, a)
-        wet *= F32(0.25 * np.sqrt(1 - g * g))     # same loudness at every size
-        for k, (xh, yh) in enumerate(self.aps):
+        # same loudness at every size (and with half the combs: their sum is about
+        # sqrt(2) quieter, their echoes being unrelated)
+        wet *= F32(0.25 * np.sqrt(1 - g * g) * np.sqrt(len(self.combs) / combs))
+        for k in range(aps):
+            xh, yh = self.aps[k]
             wet, xh, yh = _allpass(wet, xh, yh, 0.5)
             self.aps[k] = (xh, yh)
         wet += early * F32(self.EARLY_LEVEL)

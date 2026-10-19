@@ -239,3 +239,32 @@ def test_switching_skips_a_bun_qt_already_freed(qapp):
     lite.set_on(False)
     BunnyWidget.lite_changed()
     del b
+
+
+# ------------------------------------------------------------------ Use less CPU (voice)
+
+def test_use_less_cpu_is_auto_by_default_and_stays_on_this_pc():
+    from soundboard.core import backup
+    assert library.Config().light_voice == "auto"
+    assert library.Config.from_raw({"light_voice": "on"}).light_voice == "on"
+    assert library.Config.from_raw({"light_voice": "maybe"}).light_voice == "auto"
+    assert "light_voice" in backup.LOCAL_SETTINGS
+
+
+def test_use_less_cpu_follows_lite_mode_until_switched_by_hand(window):  # noqa: F811
+    from soundboard import voicefx
+    try:
+        box = window.voice.fx.chk_light
+        assert not voicefx.light() and not box.isChecked()
+        window.themectl.set_lite_mode(True)
+        assert voicefx.light() and box.isChecked()
+        box.setChecked(False)          # by hand: kept, whatever lite mode does
+        assert window.cfg.light_voice == "off" and not voicefx.light()
+        window.themectl.set_lite_mode(False)
+        window.themectl.set_lite_mode(True)
+        assert not voicefx.light() and not box.isChecked()
+        box.setChecked(True)
+        window.themectl.set_lite_mode(False)
+        assert window.cfg.light_voice == "on" and voicefx.light()
+    finally:
+        voicefx.set_light(False)

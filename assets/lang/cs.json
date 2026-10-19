@@ -4200,5 +4200,7 @@
   "{n} more themes in Settings.": "Další motivy v Nastavení: {n}",
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Pro pomalejší PC: žádné animace, Bun stojí v klidu a motivy jsou jednoduché. Všechno dál funguje.",
   "Lite mode": "Lehký režim",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Onion Board může na tomto PC běžet lehčeji: Lehký režim vypne animace. Najdeš ho i v Nastavení > Vzhled."
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Onion Board může na tomto PC běžet lehčeji: Lehký režim vypne animace. Najdeš ho i v Nastavení > Vzhled.",
+  "For slower PCs: the voice changer and live voice use about a third less CPU. Hiss removal is off and the robot voices and echoes are a little simpler. On by itself in lite mode.": "Pro pomalejší počítače: měnič hlasu a živý hlas berou asi o třetinu méně CPU. Odstranění syčení je vypnuté a robotické hlasy a ozvěny jsou o něco jednodušší. V lehkém režimu se zapne samo.",
+  "Use less CPU": "Méně zatěžovat CPU"
 }

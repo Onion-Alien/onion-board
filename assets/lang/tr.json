@@ -4121,5 +4121,7 @@
   "{n} more themes in Settings.": "Ayarlar'da {n} tema daha var.",
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Daha yavaş bilgisayarlar için: animasyon yok, Bun yerinde durur ve temalar sade olur. Her şey yine çalışır.",
   "Lite mode": "Hafif mod",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Onion Board bu bilgisayarda daha hafif çalışabilir: Hafif mod animasyonları kapatır. Ayarlar > Dış görünüş içinde de var."
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Onion Board bu bilgisayarda daha hafif çalışabilir: Hafif mod animasyonları kapatır. Ayarlar > Dış görünüş içinde de var.",
+  "For slower PCs: the voice changer and live voice use about a third less CPU. Hiss removal is off and the robot voices and echoes are a little simpler. On by itself in lite mode.": "Daha yavaş bilgisayarlar için: ses değiştirici ve canlı ses yaklaşık üçte bir daha az CPU kullanır. Tıslama giderme kapalıdır, robot sesleri ve yankılar biraz daha basittir. Hafif modda kendiliğinden açılır.",
+  "Use less CPU": "Daha az CPU kullan"
 }

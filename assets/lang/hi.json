@@ -4121,5 +4121,7 @@
   "{n} more themes in Settings.": "सेटिंग्स में {n} और थीम।",
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "धीमे PC के लिए: कोई एनिमेशन नहीं, Bun स्थिर रहता है और थीम सादी रहती हैं। सब कुछ पहले जैसा काम करता है।",
   "Lite mode": "लाइट मोड",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Onion Board इस PC पर हल्का चल सकता है: लाइट मोड एनिमेशन बंद कर देता है। यह सेटिंग्स > दिखावट में भी है।"
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Onion Board इस PC पर हल्का चल सकता है: लाइट मोड एनिमेशन बंद कर देता है। यह सेटिंग्स > दिखावट में भी है।",
+  "For slower PCs: the voice changer and live voice use about a third less CPU. Hiss removal is off and the robot voices and echoes are a little simpler. On by itself in lite mode.": "धीमे पीसी के लिए: वॉइस चेंजर और लाइव आवाज़ लगभग एक तिहाई कम CPU लेते हैं। हिस हटाना बंद रहता है और रोबोट आवाज़ें और गूँज थोड़ी सरल होती हैं। लाइट मोड में अपने-आप चालू।",
+  "Use less CPU": "कम CPU इस्तेमाल करें"
 }

@@ -4042,5 +4042,7 @@
   "{n} more themes in Settings.": "설정에 테마가 {n}개 더 있어요.",
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "느린 PC용: 애니메이션 없이 Bun은 가만히 있고 테마는 단순해져요. 기능은 모두 그대로예요.",
   "Lite mode": "라이트 모드",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "이 PC에서는 Onion Board를 더 가볍게 쓸 수 있어요: 라이트 모드가 애니메이션을 꺼요. 설정 > 모습에도 있어요."
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "이 PC에서는 Onion Board를 더 가볍게 쓸 수 있어요: 라이트 모드가 애니메이션을 꺼요. 설정 > 모습에도 있어요.",
+  "For slower PCs: the voice changer and live voice use about a third less CPU. Hiss removal is off and the robot voices and echoes are a little simpler. On by itself in lite mode.": "느린 PC용: 음성 변조기와 라이브 음성이 CPU를 약 3분의 1 덜 씁니다. 히스 제거가 꺼지고 로봇 목소리와 메아리가 조금 단순해집니다. 라이트 모드에서는 자동으로 켜집니다.",
+  "Use less CPU": "CPU 덜 쓰기"
 }

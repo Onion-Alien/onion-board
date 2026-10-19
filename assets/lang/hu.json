@@ -4121,5 +4121,7 @@
   "{n} more themes in Settings.": "További témák a Beállításokban: {n}",
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Lassabb gépekre: nincs animáció, Bun nyugton marad, a témák egyszerűek. Minden ugyanúgy működik.",
   "Lite mode": "Könnyített mód",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Az Onion Board könnyebben is futhat ezen a gépen: a Könnyített mód kikapcsolja az animációkat. A Beállítások > Megjelenés alatt is megtalálod."
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Az Onion Board könnyebben is futhat ezen a gépen: a Könnyített mód kikapcsolja az animációkat. A Beállítások > Megjelenés alatt is megtalálod.",
+  "For slower PCs: the voice changer and live voice use about a third less CPU. Hiss removal is off and the robot voices and echoes are a little simpler. On by itself in lite mode.": "Lassabb gépekre: a hangváltó és az élő hang körülbelül harmadával kevesebb CPU-t használ. A sziszegés eltávolítása ki van kapcsolva, a robothangok és a visszhangok kicsit egyszerűbbek. Könnyített módban magától bekapcsol.",
+  "Use less CPU": "Kevesebb CPU használata"
 }

@@ -4042,5 +4042,7 @@
   "{n} more themes in Settings.": "设置中还有 {n} 个主题。",
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "适合较慢的电脑：没有动画，Bun 保持静止，主题变为纯色。所有功能照常可用。",
   "Lite mode": "轻量模式",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Onion Board 在这台电脑上可以更轻快：轻量模式会关闭动画。也可以在 设置 > 外观 里找到。"
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Onion Board 在这台电脑上可以更轻快：轻量模式会关闭动画。也可以在 设置 > 外观 里找到。",
+  "For slower PCs: the voice changer and live voice use about a third less CPU. Hiss removal is off and the robot voices and echoes are a little simpler. On by itself in lite mode.": "适合较慢的电脑：变声器和实时语音的 CPU 占用减少约三分之一。消除嘶嘶声会关闭，机器人声音和回声会稍微简单一些。轻量模式下会自动开启。",
+  "Use less CPU": "降低 CPU 占用"
 }
