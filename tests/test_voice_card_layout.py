@@ -114,8 +114,9 @@ def test_ai_status_sits_over_the_voices_and_wraps(qapp, monkeypatch, tmp_path, w
 
 
 def test_no_empty_language_frame_before_speech_recognition_is_in(qapp, monkeypatch):
-    """Not installed yet: Speak in is hidden, and so is the frame around it (alone it
-    was an empty box under Install speech recognition)."""
+    """Not installed yet: the language cards are hidden, and so is the frame under them
+    (alone it was an empty box under Install speech recognition). Installed: the cards,
+    and the frame only once a language is on."""
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
     panel = VoicePanel(FakeEngine(), {}, {"tab": "speak"})
     speech = panel.speech
@@ -125,7 +126,11 @@ def test_no_empty_language_frame_before_speech_recognition_is_in(qapp, monkeypat
         assert speech.installs.missing.isVisibleTo(speech)
         assert not speech.lang_box.isVisibleTo(speech)
         assert not speech.settings_box.isVisibleTo(speech)
+        assert not speech.cards.isVisibleTo(speech)
         speech.show_lang_box(True)
+        assert speech.cards.isVisibleTo(speech)
+        assert not speech.settings_box.isVisibleTo(speech)   # no language on: no box
+        speech.cb_lang.setCurrentIndex(speech.cb_lang.findData("de"))
         assert speech.settings_box.isVisibleTo(speech)
     finally:
         panel.shutdown()
@@ -135,8 +140,8 @@ def test_no_empty_language_frame_before_speech_recognition_is_in(qapp, monkeypat
 
 @pytest.mark.parametrize("name", ["Dark", "Light"])
 @pytest.mark.parametrize("width", [340, 580])
-def test_languages_card_reads_language_then_who_then_start(qapp, monkeypatch, tmp_path,
-                                                        name, width):
+def test_languages_card_reads_cards_then_who_says_it(qapp, monkeypatch, tmp_path,
+                                                   name, width):
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
     old = theme.current_name
     theme.apply(qapp, name)
@@ -147,20 +152,22 @@ def test_languages_card_reads_language_then_who_then_start(qapp, monkeypatch, tm
         speech.title.show()
         speech.livevoice.start_box.show()
         speech.show_lang_box(True)
+        speech.cb_lang.setCurrentIndex(speech.cb_lang.findData("de"))
         speech.setFixedWidth(width)
         live = speech.livevoice
         live.lbl_state.setText("Starting: the computer voice is getting ready to speak "
                                "your words in the selected language.")
         speech.show()
         qapp.processEvents()
-        # in the order you use it: the words, the language box, then Start
-        assert at(speech.lbl_intro, speech).bottom() < at(speech.settings_box, speech).top()
-        assert at(speech.settings_box, speech).bottom() < at(live.start_box, speech).top()
-        assert live.b_live.geometry().left() == 0
-        assert live.b_live.geometry().right() < live.lbl_state.geometry().left()
+        # as AI voices: the words, how it's doing, the cards, then who says it
+        assert at(speech.lbl_intro, speech).bottom() < at(live.start_box, speech).top()
+        assert at(live.start_box, speech).bottom() < at(speech.cards, speech).top()
+        assert at(speech.cards, speech).bottom() < at(speech.settings_box, speech).top()
         assert live.start_box.rect().contains(live.lbl_state.geometry())
-        assert live.start_box.rect().contains(live.b_live.geometry())
         assert live.lbl_state.wordWrap()
+        # the computer voice's own Start: under More options, not a big button
+        assert live.b_live.parentWidget() is speech.opts
+        assert speech.cb_lang.isHidden() and speech.lbl_lang.isHidden()
         speech.grab().save(str(tmp_path / f"computer-voice-{name}-{width}.png"))
     finally:
         speech.close()

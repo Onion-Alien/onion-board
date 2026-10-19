@@ -24,7 +24,7 @@ from soundboard.i18n import _
 if TYPE_CHECKING:
     from soundboard.ui.voice.speechpanel import SpeechPanel
 
-IDLE_HINT = _("Press Start, then just talk.")
+IDLE_HINT = ""   # nothing to say while it's off: the language cards say the rest
 MODELS = [(_("Fast (base.en)"), "base.en"), (_("Fastest (tiny.en)"), "tiny.en"),
           (_("Accurate (small.en)"), "small.en"), (_("Any language (base)"), "base"),
           (_("Any language, accurate (small)"), "small")]
@@ -64,13 +64,15 @@ class LiveVoice(QObject):
         action = QHBoxLayout()
         sv.addLayout(action)
         action.setSpacing(14)
+        # the computer voice's own Start: a language card starts it by itself, so the
+        # button lives under More options (SpeechPanel puts it there) for talking as the
+        # computer voice in your own language
         self.b_live = QPushButton(_("Start the computer voice"))
         icons.set_icon(self.b_live, "mic", "on_accent", "on_accent")
         self.b_live.setCheckable(True)
         self.b_live.setMinimumHeight(40)
         self.b_live.setObjectName("primary")
         self.b_live.toggled.connect(self._toggle_live)
-        action.addWidget(self.b_live, 0, Qt.AlignmentFlag.AlignTop)
         self.lbl_state = QLabel(IDLE_HINT)
         self.lbl_state.setTextFormat(Qt.TextFormat.PlainText)   # shows the module's error text
         self.lbl_state.setObjectName("muted")
