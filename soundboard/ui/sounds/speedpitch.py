@@ -218,6 +218,11 @@ class ValueBox(QDoubleSpinBox):
     def wheelEvent(self, e):
         e.ignore()   # the popup scrolls, the value doesn't change under the mouse
 
+    def keyPressEvent(self, e):
+        super().keyPressEvent(e)
+        if e.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            e.accept()   # the value is in: Enter went on to the popup's Reset and undid it
+
     def setText(self, _text: str):
         if self._q is not self.s.q:
             self.blockSignals(True)
