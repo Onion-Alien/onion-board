@@ -617,3 +617,25 @@ def test_read_capped_check_can_stop_it():
     with pytest.raises(Stop):
         net.read_capped(_Reply(b"x" * 10), out, 30, check=check)
     assert out.getvalue() == b""
+
+
+def test_one_tls_context_is_shared_and_made_again_later(monkeypatch):
+    """Making a TLS context reads Windows' certificate store (~20 ms of CPU): it was
+    made for every request. Now one is shared, and made again after TLS_KEEP_S."""
+    import ssl
+    made = []
+    real = ssl.create_default_context
+    monkeypatch.setattr(net.ssl, "create_default_context",
+                        lambda *a, **k: made.append(1) or real(*a, **k))
+    monkeypatch.setattr(net, "_tls", (None, 0.0))
+    clock = [1000.0]
+    monkeypatch.setattr(net.time, "monotonic", lambda: clock[0])
+    a = net._opener("sounds_web")
+    b = net._opener("radio")
+    ctx = net._tls_context()
+    assert len(made) == 1
+    assert ctx.post_handshake_auth and ctx.verify_mode == ssl.CERT_REQUIRED
+    assert all(h._context is ctx for o in (a, b) for h in o.handlers
+               if isinstance(h, net._HTTPSHandler))
+    clock[0] += net.TLS_KEEP_S + 1
+    assert net._tls_context() is not ctx and len(made) == 2
