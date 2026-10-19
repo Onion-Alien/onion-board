@@ -129,7 +129,9 @@ not to your PC, so let Streamer.bot or Firebot receive them and forward them her
 - **Firebot:** the *HTTP Request* effect on events and commands.
 - **TikFinity:** *Actions → Call webhook*: `/api/event?type=gift&user={nickname}&reward={giftname}&count={repeatcount}`.
 - **Mix It Up, SAMMI:** their web request command.
-- **Stream Deck:** *System → Website*, ticking *GET request in background*.
+- **Stream Deck:** the [Onion Board plugin](https://github.com/Onion-Alien/onion-board/releases/latest/download/com.onionalien.onionboard.streamDeckPlugin) (`streamdeck/`,
+  on every release) needs no links at all. Without it: *System → Website*, ticking *GET
+  request in background*.
 
 URL-encode anything a viewer typed (a space is `%20`).
 

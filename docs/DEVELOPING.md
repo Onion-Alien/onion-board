@@ -192,6 +192,7 @@ This produces:
 |---|---|
 | `dist\OnionBoard\OnionBoard.exe` | the one-folder app (PyInstaller), with `LICENSE.txt` and `THIRD-PARTY-NOTICES.txt` beside it |
 | `dist\OnionBoardSetup.exe` | the installer (Inno Setup). Skipped with a warning if Inno Setup isn't installed |
+| `dist\com.onionalien.onionboard.streamDeckPlugin` | the Stream Deck plugin (`streamdeck/`), packed by Elgato's CLI through `npx` (`scriptsuildtools\pack_streamdeck.py`, after the installer). Skipped with a warning without Node.js |
 
 `-AppDir <dir>` and `-InstallerDir <dir>` also copy those results elsewhere,
 e.g. `build.ps1 -AppDir ..\App -InstallerDir ..\Installer`.
@@ -357,10 +358,11 @@ gitleaks, ruff and pytest:
    for an urgent fix when CI itself is broken.
 2. **Bump:** `.venv\Scripts\python scripts\release.py X.Y.Z` (bumps `__version__`,
    moves the `changelog.d/` entries into the CHANGELOG under the version, checks the
-   translations, refreshes the README's release line; `--dry-run` checks only).
+   translations, refreshes the README's release line, sets the Stream Deck plugin's
+   manifest `Version` to `X.Y.Z.0`; `--dry-run` checks only).
 3. **Build** (`build.ps1 -Clean`, section 4) and **install the built installer over
    your own copy** first: a broken installer reaches everyone who clicks *Update now*.
-4. **Publish** a GitHub Release `vX.Y.Z`, not marked pre-release, with two assets:
+4. **Publish** a GitHub Release `vX.Y.Z`, not marked pre-release, with three assets:
    - `OnionBoardSetup.exe`, named exactly that. The README's download button links to
      `releases/latest/download/OnionBoardSetup.exe`, and installed copies update from
      it (`soundboard/core/updates.py` installs it only when GitHub lists its SHA-256, and
@@ -369,13 +371,18 @@ gitleaks, ruff and pytest:
      `gh release upload` with `#name` doesn't rename the file). *Update now* fetches
      this one when a release has it, so the download counts tell updates apart from
      new downloads.
+   - `com.onionalien.onionboard.streamDeckPlugin`, named exactly that: the app's
+     Streamer guide and the README link to
+     `releases/latest/download/com.onionalien.onionboard.streamDeckPlugin`.
+     Double-clicking it installs the plugin; Stream Deck offers an update only when its
+     version goes up, which `release.py` sees to.
 5. Run `python scripts/check_sensitive.py --history` once more before pushing the
    release. Never commit build output.
 
 **Or let GitHub build it:** after the bump is merged, `git tag vX.Y.Z <main's sha>` and
 `git push origin vX.Y.Z`. The `release` workflow builds the installer from the tag
 (`build.ps1 -Clean`), scans it and the mic helper on VirusTotal (when the `VT_API_KEY`
-secret is set) and makes a **draft** release with both assets, the SHA-256 and the scan
+secret is set) and makes a **draft** release with all three assets, the SHA-256 and the scan
 line. Write the headline, install the draft's installer over your own copy, then
 publish. A tag that already has a release is left alone.
 

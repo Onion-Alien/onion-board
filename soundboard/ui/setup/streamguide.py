@@ -17,7 +17,12 @@ from soundboard.control import remote
 from soundboard.ui.kit import theme
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.setup.chatguide import _bun, _header, _label
+from soundboard.core.updates import REPO
 from soundboard.i18n import _
+
+# build.ps1 packs streamdeck/ into this, and every release carries it (DEVELOPING.md)
+STREAM_DECK_PLUGIN = (f"https://github.com/{REPO}/releases/latest/download/"
+                      "com.onionalien.onionboard.streamDeckPlugin")
 
 
 def link(cfg, action: str, query: str = "") -> str:
@@ -68,10 +73,17 @@ class StreamerGuide(QDialog):
               "into your web browser's address bar and press Enter. You hear a random sound "
               "and the page shows <span style='color:{ok_colour}'>\"playing\"</span>. It "
               "works!", ok_colour=ok),
-            _("<b>A Stream Deck key.</b> In the Stream Deck app drag <b>System → Website</b> "
-              "onto a key. Pick a sound below, click <b>Copy</b> and paste the link into the "
-              "URL box. Tick <b>GET request in background</b> so no browser window opens. "
-              "One key per sound."),
+            _("<b>A Stream Deck key.</b> Get the <a href='{url}'>Onion Board plugin for "
+              "Stream Deck</a> and double-click the file: Stream Deck installs it. Then drag "
+              "<b>Onion Board → Play sound</b> onto a key and pick a sound from its list. "
+              "Nothing to copy: the key takes the sound's colour and lights up while it "
+              "plays. <b>Stop all sounds</b>, <b>Random sound</b> and <b>Switch</b> (Live / "
+              "Muted, the voice changer…) are there too.", url=STREAM_DECK_PLUGIN),
+            _("<b>Other buttons and tools</b> (Touch Portal, Loupedeck, a Stream Deck without "
+              "the plugin): use a link. Pick a sound below, click <b>Copy</b> and paste it "
+              "into the tool's <i>website</i> or <i>web request</i> action. In Stream Deck "
+              "that's <b>System → Website</b>, with <b>GET request in background</b> ticked "
+              "so no browser window opens."),
             _("<b>Channel points and chat commands</b> (Twitch, YouTube, Kick). Get the free "
               "<b>Streamer.bot</b>. Under <b>Actions</b>, add an action, then right-click → "
               "<b>Core → Network → Fetch URL</b> and paste a link. Under <b>Triggers</b> pick "
@@ -97,7 +109,9 @@ class StreamerGuide(QDialog):
         ]
         steps = _label(
             "<ol style='margin-left:-20px'>"
-            + "".join(li.format(t) for t in items)
+            # links in the theme's colour (Qt's default blue is unreadable on dark themes)
+            + "".join(li.format(t) for t in items).replace(
+                "<a href=", f"<a style='color:{theme.T['accent_link']}' href=")
             + "<li>" + _("<b>Keep the key secret.</b> Every link holds your key. Don't show "
                          "it on stream or paste it into chat. If it leaks, click <b>New "
                          "key</b> in Settings → Remote: the old links stop working and you "
@@ -107,7 +121,9 @@ class StreamerGuide(QDialog):
                 "every new follower, AutoHotkey)? Click <b>Copy AI prompt</b> and paste it "
                 "into ChatGPT or Claude: it knows how Onion Board's links work and which "
                 "sounds you have, and walks you through it.") + "</span>")
-        steps.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        steps.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse
+                                      | Qt.TextInteractionFlag.LinksAccessibleByMouse)
+        steps.linkActivated.connect(lambda url: busy.open_url(url, window=self))
         body = QWidget()
         bl = QVBoxLayout(body)
         bl.setContentsMargins(0, 0, 8, 0)
