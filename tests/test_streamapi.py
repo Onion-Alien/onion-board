@@ -233,6 +233,7 @@ def test_newer_features_endpoints(qapp, window):
 
     assert d(w, "mic_gate", on="1") == (200, {"mic_gate": True})
     assert w.cfg.mic_gate and w.engine.mic_gate
+    assert d(w, "status")[1]["mic_gate"] is True   # a phone shows the switch as it is
     assert d(w, "mic_gate", on="0")[1] == {"mic_gate": False} and not w.engine.mic_gate
 
     st, body = d(w, "setups")
