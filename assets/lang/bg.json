@@ -3312,7 +3312,6 @@
   "Working: {engine}": "Работи: {engine}",
   "Working: {engine} {version} (faster)": "Работи: {engine} {version} (по-бързо)",
   "YouTube downloads still work, but with fewer formats.": "Изтеглянията от YouTube пак работят, но с по-малко формати.",
-  "Is your headset on?": "Слушалките пуснати ли са?",
   "Is your headset plugged in?": "Слушалките включени ли са?",
   "Unplugged": "Изключен",
   "The download was cut off before the end. Try again.": "Изтеглянето прекъсна преди края. Опитайте отново.",
@@ -4341,5 +4340,7 @@
   "Lite mode: no animations, for slower PCs": "Лек режим: без анимации, за по-бавни компютри",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Лек режим: без анимации, за по-бавни компютри (препоръчан за този компютър)",
   "No thanks, finish": "Не, благодаря, край",
-  "Yes, set up Discord": "Да, настрой Discord"
+  "Yes, set up Discord": "Да, настрой Discord",
+  "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows вече не познава избрания от теб микрофон, затова Onion Board мина на {mic} (микрофонът по подразбиране на Windows).",
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Звуците ти са в микрофона, но самият микрофон не праща звук в момента. Слушалките ти изключени ли са или заглушени?"
 }

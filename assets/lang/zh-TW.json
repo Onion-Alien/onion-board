@@ -3239,7 +3239,6 @@
   "Working: {engine}": "正常運作：{engine}",
   "Working: {engine} {version} (faster)": "正常運作：{engine} {version}（更快）",
   "YouTube downloads still work, but with fewer formats.": "YouTube 下載仍然可用，但格式會少一些。",
-  "Is your headset on?": "耳機開著嗎？",
   "Is your headset plugged in?": "耳機插好了嗎？",
   "Unplugged": "未連接",
   "The download was cut off before the end. Try again.": "下載在完成前中斷了。請再試一次。",
@@ -4262,5 +4261,7 @@
   "Lite mode: no animations, for slower PCs": "輕量模式：無動畫，適合較慢的電腦",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "輕量模式：無動畫，適合較慢的電腦（建議這台電腦使用）",
   "No thanks, finish": "不用了，完成",
-  "Yes, set up Discord": "好，設定 Discord"
+  "Yes, set up Discord": "好，設定 Discord",
+  "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows 已不認得你選的麥克風，所以 Onion Board 改為裝在 {mic}（Windows 預設麥克風）上。",
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "你的音效已進入麥克風，但麥克風本身現在沒有發出聲音。你的耳機是關著還是靜音了？"
 }

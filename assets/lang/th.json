@@ -3239,7 +3239,6 @@
   "Working: {engine}": "ใช้งานได้: {engine}",
   "Working: {engine} {version} (faster)": "ใช้งานได้: {engine} {version} (เร็วกว่า)",
   "YouTube downloads still work, but with fewer formats.": "การดาวน์โหลดจาก YouTube ยังใช้ได้ แต่ได้รูปแบบน้อยลง",
-  "Is your headset on?": "หูฟังเปิดอยู่หรือเปล่า",
   "Is your headset plugged in?": "เสียบหูฟังอยู่หรือเปล่า",
   "Unplugged": "ไม่ได้เสียบ",
   "The download was cut off before the end. Try again.": "การดาวน์โหลดถูกตัดก่อนเสร็จ ลองอีกครั้ง",
@@ -4262,5 +4261,7 @@
   "Lite mode: no animations, for slower PCs": "โหมดเบา: ไม่มีแอนิเมชัน สำหรับพีซีที่ช้ากว่า",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "โหมดเบา: ไม่มีแอนิเมชัน สำหรับพีซีที่ช้ากว่า (แนะนำสำหรับพีซีเครื่องนี้)",
   "No thanks, finish": "ไม่เป็นไร เสร็จสิ้น",
-  "Yes, set up Discord": "ใช่ ตั้งค่า Discord"
+  "Yes, set up Discord": "ใช่ ตั้งค่า Discord",
+  "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows ไม่รู้จักไมค์ที่คุณเลือกแล้ว Onion Board จึงไปใช้ {mic} (ไมค์เริ่มต้นของ Windows) แทน",
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "เสียงของคุณอยู่ในไมค์แล้ว แต่ตอนนี้ตัวไมค์เองไม่ได้ส่งเสียงออกมา หูฟังของคุณปิดอยู่หรือปิดเสียงไว้หรือเปล่า?"
 }

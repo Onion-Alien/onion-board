@@ -818,6 +818,23 @@ def mic_lookup(name: str | None) -> tuple[str | None, str]:
     return None, "gone"
 
 
+def fallback_mic(name: str | None) -> str | None:
+    """The mic to set up instead when the picked `name` isn't one Windows knows (none
+    picked, an old mic, renamed): Windows' default recording device, the one the board
+    records then too. Never a virtual cable (our own sounds fed back in), never `name`
+    itself, and None unless Windows has it on now. An unplugged or switched-off mic
+    isn't swapped: it's the one meant, and it's back when it's plugged in."""
+    try:
+        from soundboard.audio import engine
+        other = engine.default_device_name("input")
+    except Exception:  # noqa: BLE001 - no audio devices to ask: nothing to fall back on
+        log.debug("default mic lookup failed", exc_info=True)
+        return None
+    if not other or other == name or engine.is_virtual(other):
+        return None
+    return other if endpoint_for(other) is not None else None
+
+
 def _engine_name(name: str) -> str | None:
     """The name of the recording device the engine opens for the saved `name`."""
     try:
@@ -1338,13 +1355,31 @@ def _audio_service(start: bool, dependents: Sequence[str] = ()) -> bool:
         return True
     _run(["net", "stop", "audiosrv", "/y"])
     _run(["net", "stop", "AudioEndpointBuilder", "/y"])
-    if _services_stopped():
+    if _stopped_soon():
         return True
-    _run(["net", "stop", "AudioEndpointBuilder", "/y"])   # a dependency held it: once more
-    if _services_stopped():
+    # a dependency held it, or net gave up while it was still stopping: once more
+    _run(["net", "stop", "audiosrv", "/y"])
+    _run(["net", "stop", "AudioEndpointBuilder", "/y"])
+    if _stopped_soon():
         return True
     log.warning("Windows' audio wouldn't stop: the mic effect may need a restart to take")
     return False
+
+
+STOP_WAIT_S = 10.0   # how long a service still "stopping" gets before it counts as stuck
+
+
+def _stopped_soon(wait_s: float | None = None) -> bool:
+    """_services_stopped(), given up to STOP_WAIT_S: a slow sound-card driver keeps the
+    audio "stopping" for seconds after net stop has returned (exit code 6 on a PC
+    where it would have stopped a moment later)."""
+    give_up = time.monotonic() + (STOP_WAIT_S if wait_s is None else wait_s)
+    while True:
+        if _services_stopped():
+            return True
+        if time.monotonic() >= give_up:
+            return False
+        time.sleep(1.0)
 
 
 def _register_com(dll: Path):
@@ -1871,7 +1906,17 @@ def admin_install(guid: str, slot: str | None = None, source: Path | None = None
     if not dll.is_file():
         log.error("no effect DLL at %s", dll)
         return 3
-    return _audio_off(lambda: _put_on(guid, slot, dll), also=(guid,))
+
+    def work() -> int:
+        # a file Windows' audio hasn't let go of yet, a registry key still being
+        # written: such a failure is gone a moment later, so it's tried once more
+        result = _try_put_on(guid, dll, slot)
+        if result:
+            log.warning("the mic effect didn't go on (%s): trying once more", result)
+            time.sleep(2)
+            result = _try_put_on(guid, dll, slot)
+        return result
+    return _audio_off(work, also=(guid,))
 
 
 def _put_on(guid: str, slot: str | None, dll: Path) -> int:
@@ -1880,9 +1925,13 @@ def _put_on(guid: str, slot: str | None, dll: Path) -> int:
     digest = hashlib.sha256(dll.read_bytes()).hexdigest()[:12]
     target = install_dir() / f"obmic-{digest}.dll"
     target.parent.mkdir(parents=True, exist_ok=True)
-    tmp = target.with_suffix(".new")
-    shutil.copyfile(dll, tmp)   # whole, then in place: never a half-copied effect
-    os.replace(tmp, target)
+    # this version is there already (a set-up again, a repair): kept as it is. Writing
+    # over it failed while a program that hadn't let go of Windows' audio yet still
+    # had it loaded (exit code 1)
+    if _digest(target) != _digest(dll):
+        tmp = target.with_suffix(".new")
+        shutil.copyfile(dll, tmp)   # whole, then in place: never a half-copied effect
+        os.replace(tmp, target)
     _register_com(target)
     for old in [*install_dir().glob("obmic*.dll"), *_old_install_dirs()]:
         if old != target:
@@ -1954,10 +2003,10 @@ def admin_reinstall(guid: str) -> int:
             _remove(backup)
 
 
-def _try_put_on(guid: str, dll: Path) -> int:
+def _try_put_on(guid: str, dll: Path, slot: str | None = None) -> int:
     """_put_on(), an exception counted as a failure (1)."""
     try:
-        return _put_on(guid, None, dll)
+        return _put_on(guid, slot, dll)
     except Exception:  # noqa: BLE001 - reported by the caller, which tries again
         log.exception("mic effect install failed")
         return 1

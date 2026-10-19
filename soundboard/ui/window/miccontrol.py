@@ -371,6 +371,14 @@ class MicControl(Controller):
 
     def _attach_mic_work(self, mic: str, clean: bool = False, auto: bool = False):
         err = directmic.install(mic, clean=clean, ask_windows=not auto) or ""
+        if err and not auto and directmic.fail_kind(err) == "no-mic-gone":
+            # Windows doesn't know the picked mic any more (an old headset, renamed):
+            # the default mic, which the board records meanwhile, is set up instead of
+            # a dead end (_mic_attached switches to it)
+            other = directmic.fallback_mic(mic)
+            if other:
+                log.info("the picked mic is gone: setting up Windows' default mic instead")
+                mic, err = other, directmic.install(other, clean=clean) or ""
         # its reason word, kept here: the signal hands _mic_attached a plain str
         self._mic_fail_kind = directmic.fail_kind(err) if err else ""
         return mic, err
@@ -382,6 +390,12 @@ class MicControl(Controller):
         updating, self._mic_updating = self._mic_updating, False
         auto, self._autofixing = self._autofixing, False
         directmic.forget_status()
+        # on the mic, but the mic itself came back from the audio restart sending
+        # nothing: the effect still sends the sounds on that silence (the card says
+        # the mic is silent), so it's set up, not failed
+        silent = err == directmic.mic_silent()
+        if silent:
+            err, self._mic_fail_kind = "", ""
         if err:
             if mw._attach_release is not None:
                 release, mw._attach_release = mw._attach_release, None
@@ -406,10 +420,6 @@ class MicControl(Controller):
                 # No to the optional update: the old part keeps working, no box needed
                 mw.toast(_("Update cancelled. Your mic part is still the old one: "
                              "update it from the Setup tab."), "warn")
-            elif err == directmic.mic_silent():
-                # it's on the mic, but the mic came back from the audio restart dead
-                usage.used("mic-silent-after-setup")
-                mw.tell(_("Is your headset on?"), err, "warn")
             else:
                 # the route stays on the mic: until it's set up, the cable carries the
                 # sounds meanwhile (_main_name), and the one-click stays on offer
@@ -419,9 +429,22 @@ class MicControl(Controller):
             log.info("on the mic now: %s", mic)
             usage.used("mic-effect-updated" if updating else
                        "mic-effect-fixed" if auto else "mic-effect-on")
+            if mic != mw.cfg.mic_device:
+                # the picked mic was gone: set up on Windows' default one instead
+                mw.cfg.mic_device = mic
+                mw._save_now()
+                mw.devctl._reopen_devices()
+                mw.toast(_("Windows doesn't know your picked mic any more, so Onion Board "
+                           "went on {mic} (Windows' default mic) instead.",
+                           mic=html.escape(mic)), "warn")
+            if silent:
+                usage.used("mic-silent-after-setup")
+                mw.toast(_("Your sounds are in your mic, but your mic sends no sound itself "
+                           "right now. Is your headset switched off or muted?"), "warn")
             # Windows takes a few seconds to load it: "starting…" meanwhile, then a
             # redraw when the wait is over (it works by then, or Repair comes back)
             mw._settle_until = time.monotonic() + mw.SETTLE_S
+            mw._settle_more = False
             QTimer.singleShot(int(mw.SETTLE_S * 1000) + 200, mw.statusctl._update_status)
             mw.cfg.route = "cable"   # so set_route() applies "mic" in full
             mw.routectl.set_route("mic", attached=True)

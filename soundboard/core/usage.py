@@ -137,6 +137,10 @@ RECOVERY = ("install", "repair", "update", "reinstall", "cleanup", "remove")
 MIC_FAILS = ("unanswered", "no-start", "stuck", "silent", "no-helper", "no-mic",
              "no-mic-off", "no-mic-unsure", "no-mic-gone", "no-effect", "code-1", "code-2",
              "code-3", "code-4", "code-5", "code-6", "code-other")
+# why the mic effect still wasn't working when the wait after its set-up ran out
+# (statuscontrol._no_load_why): sent elsewhere since, Windows took it off, not on the
+# mic, the board's sending into it not open, or open but the effect never ran
+MIC_NO_LOAD = ("off-route", "wiped", "not-on", "no-stream", "not-running")
 # a pad's "On press" modes other than the default (library.MODES, without "restart")
 PRESS_MODES = ("overlap", "toggle", "solo", "queue")
 # the add-ons with install steps (their module.json id); any other is "other"
@@ -233,7 +237,7 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "mic-effect-on", "mic-effect-fixed", "mic-effect-updated", "mic-effect-said-no",
             "mic-effect-failed", *(f"mic-effect-failed-{k}" for k in MIC_FAILS),
             "mic-effect-fix-failed", *(f"mic-effect-fix-failed-{k}" for k in MIC_FAILS),
-            "mic-effect-no-load",
+            "mic-effect-no-load", *(f"mic-effect-no-load-{k}" for k in MIC_NO_LOAD),
             "mic-effect-taken-off", "mic-helper",
             # Onion Board's own update: the download cancelled or failed, the installer
             # wouldn't start, Copy error, Later at "Restart now", one that didn't finish,

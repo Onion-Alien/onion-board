@@ -234,7 +234,9 @@ account or anything else about you.
     admin prompt, a set-up or fix-by-itself that failed, not working when its wait ran
     out, Windows having taken it off (`used/mic-effect-on`, `mic-effect-fixed`,
     `mic-effect-updated`, `mic-effect-said-no`, `mic-effect-failed`,
-    `mic-effect-fix-failed`, `mic-effect-no-load`, `mic-effect-taken-off`), and why a
+    `mic-effect-fix-failed`, `mic-effect-no-load`, `mic-effect-taken-off`), why it
+    wasn't working when the wait ran out as one word (`mic-effect-no-load-<why>`:
+    `off-route`, `wiped`, `not-on`, `no-stream`, `not-running`), and why a
     set-up or fix failed as one word (`mic-effect-failed-<why>` /
     `mic-effect-fix-failed-<why>`: `unanswered` (the admin prompt left open),
     `no-start`, `stuck`, `silent`, `no-helper`, `no-mic`, `no-mic-off` (unplugged or

@@ -3312,7 +3312,6 @@
   "Working: {engine}": "Δουλεύει: {engine}",
   "Working: {engine} {version} (faster)": "Δουλεύει: {engine} {version} (πιο γρήγορο)",
   "YouTube downloads still work, but with fewer formats.": "Οι λήψεις από YouTube δουλεύουν ακόμα, αλλά με λιγότερες μορφές.",
-  "Is your headset on?": "Είναι ανοιχτά τα ακουστικά σου;",
   "Is your headset plugged in?": "Είναι συνδεδεμένα τα ακουστικά σου;",
   "Unplugged": "Αποσυνδεδεμένο",
   "The download was cut off before the end. Try again.": "Η λήψη διακόπηκε πριν τελειώσει. Δοκιμάστε ξανά.",
@@ -4341,5 +4340,7 @@
   "Lite mode: no animations, for slower PCs": "Ελαφριά λειτουργία: χωρίς κινήσεις, για πιο αργά PC",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Ελαφριά λειτουργία: χωρίς κινήσεις, για πιο αργά PC (προτείνεται για αυτό το PC)",
   "No thanks, finish": "Όχι, ευχαριστώ, τέλος",
-  "Yes, set up Discord": "Ναι, ρύθμισε το Discord"
+  "Yes, set up Discord": "Ναι, ρύθμισε το Discord",
+  "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Τα Windows δεν αναγνωρίζουν πια το μικρόφωνο που διάλεξες, οπότε το Onion Board μπήκε στο {mic} (το προεπιλεγμένο μικρόφωνο των Windows).",
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Οι ήχοι σου είναι στο μικρόφωνο, αλλά το ίδιο το μικρόφωνο δεν στέλνει ήχο αυτή τη στιγμή. Είναι τα ακουστικά σου κλειστά ή σε σίγαση;"
 }

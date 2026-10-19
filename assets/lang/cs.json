@@ -3385,7 +3385,6 @@
   "Working: {engine}": "Funguje: {engine}",
   "Working: {engine} {version} (faster)": "Funguje: {engine} {version} (rychlejší)",
   "YouTube downloads still work, but with fewer formats.": "Stahování z YouTube pořád funguje, ale s méně formáty.",
-  "Is your headset on?": "Jsou sluchátka zapnutá?",
   "Is your headset plugged in?": "Jsou sluchátka připojená?",
   "Unplugged": "Odpojený",
   "The download was cut off before the end. Try again.": "Stahování se přerušilo před koncem. Zkuste to znovu.",
@@ -4420,5 +4419,7 @@
   "Lite mode: no animations, for slower PCs": "Lehký režim: bez animací, pro pomalejší PC",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Lehký režim: bez animací, pro pomalejší PC (doporučeno pro tohle PC)",
   "No thanks, finish": "Ne, díky, dokončit",
-  "Yes, set up Discord": "Ano, nastavit Discord"
+  "Yes, set up Discord": "Ano, nastavit Discord",
+  "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows už tvůj vybraný mikrofon nezná, takže Onion Board přešel na {mic} (výchozí mikrofon Windows).",
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Tvoje zvuky jsou v mikrofonu, ale mikrofon sám teď neposílá žádný zvuk. Nemáš headset vypnutý nebo ztlumený?"
 }

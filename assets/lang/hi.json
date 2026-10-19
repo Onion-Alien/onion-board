@@ -3312,7 +3312,6 @@
   "Working: {engine}": "काम कर रहा है: {engine}",
   "Working: {engine} {version} (faster)": "काम कर रहा है: {engine} {version} (तेज़)",
   "YouTube downloads still work, but with fewer formats.": "YouTube डाउनलोड अब भी चलते हैं, पर कम फ़ॉर्मेट के साथ।",
-  "Is your headset on?": "क्या आपका हेडसेट चालू है?",
   "Is your headset plugged in?": "क्या आपका हेडसेट लगा है?",
   "Unplugged": "प्लग नहीं है",
   "The download was cut off before the end. Try again.": "डाउनलोड पूरा होने से पहले ही कट गया। फिर से कोशिश करें।",
@@ -4341,5 +4340,7 @@
   "Lite mode: no animations, for slower PCs": "लाइट मोड: कोई एनिमेशन नहीं, धीमे PC के लिए",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "लाइट मोड: कोई एनिमेशन नहीं, धीमे PC के लिए (इस PC के लिए सुझाया गया)",
   "No thanks, finish": "नहीं, धन्यवाद, खत्म करें",
-  "Yes, set up Discord": "हाँ, Discord सेट करें"
+  "Yes, set up Discord": "हाँ, Discord सेट करें",
+  "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows अब आपका चुना हुआ माइक नहीं पहचानता, इसलिए Onion Board उसकी जगह {mic} (Windows का डिफ़ॉल्ट माइक) पर लग गया।",
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "आपकी आवाज़ें आपके माइक में हैं, लेकिन आपका माइक अभी खुद कोई आवाज़ नहीं भेज रहा। क्या आपका हेडसेट बंद या म्यूट है?"
 }

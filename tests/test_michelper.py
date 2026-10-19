@@ -43,7 +43,8 @@ ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4
                # 16 again when the modules moved into soundboard/mic/ and audio/: only
                # import paths and comments changed, so installed helpers needn't update
                # (no UAC prompt)
-               16: "a88bc311c59231f8598a2af1f7bfa639e3221e6a1d24f67ad4f319e558dbc675"}
+               16: "a88bc311c59231f8598a2af1f7bfa639e3221e6a1d24f67ad4f319e558dbc675",
+               17: "f493b9f566da540a98e44f595f0ccd60c26dc71570206c58d0b2262e34ce2234"}
 
 
 def _queue():

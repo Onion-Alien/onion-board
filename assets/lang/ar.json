@@ -3604,7 +3604,6 @@
   "Working: {engine}": "يعمل: {engine}",
   "Working: {engine} {version} (faster)": "يعمل: {engine} {version} (أسرع)",
   "YouTube downloads still work, but with fewer formats.": "تنزيلات YouTube ما زالت تعمل، لكن بصيغ أقل.",
-  "Is your headset on?": "هل السماعة مشغّلة؟",
   "Is your headset plugged in?": "هل السماعة موصولة؟",
   "Unplugged": "غير موصول",
   "The download was cut off before the end. Try again.": "انقطع التنزيل قبل اكتماله. حاول مرة أخرى.",
@@ -4657,5 +4656,7 @@
   "Lite mode: no animations, for slower PCs": "الوضع الخفيف: بلا حركات، للأجهزة الأبطأ",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "الوضع الخفيف: بلا حركات، للأجهزة الأبطأ (مقترح لهذا الجهاز)",
   "No thanks, finish": "لا شكرًا، إنهاء",
-  "Yes, set up Discord": "نعم، اضبط Discord"
+  "Yes, set up Discord": "نعم، اضبط Discord",
+  "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "لم يعد Windows يعرف الميكروفون الذي اخترته، لذلك انتقل Onion Board إلى {mic} (ميكروفون Windows الافتراضي) بدلاً منه.",
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "أصواتك في الميكروفون، لكن الميكروفون نفسه لا يرسل أي صوت الآن. هل سماعتك مطفأة أو مكتومة؟"
 }

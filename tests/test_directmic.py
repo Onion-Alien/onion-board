@@ -612,9 +612,69 @@ def test_a_failed_set_up_puts_the_mic_back(fake_reg, monkeypatch, tmp_path):
         real(guid, slot)
         raise OSError("disk went away")
     monkeypatch.setattr(dm, "_install_endpoint", broken)
-    with pytest.raises(OSError):
-        dm.admin_install(GUID)
+    monkeypatch.setattr(dm.time, "sleep", lambda s: None)
+    assert dm.admin_install(GUID) == 1   # (tried twice, then exit code 1)
     assert fake_reg.mics() == before and not fake_reg.installed_on()
+
+
+def _put_on_kit(fake_reg, monkeypatch, tmp_path):
+    dll = tmp_path / "obmic.dll"
+    dll.write_bytes(b"dll")
+    monkeypatch.setattr(dm, "bundled_dll", lambda: dll)
+    monkeypatch.setattr(dm, "install_dir", lambda: tmp_path / "pf")
+    for name in ("_enable_privileges", "_register_com", "_make_ring"):
+        monkeypatch.setattr(dm, name, lambda *a: None)
+    monkeypatch.setattr(dm, "_running_dependents", lambda: [])
+    monkeypatch.setattr(dm, "_audio_comes_back", lambda deps: None)
+    monkeypatch.setattr(dm, "_audio_service", lambda start, deps=(): True)
+    monkeypatch.setattr(dm, "_mic_is_silent", lambda guid: False)
+    monkeypatch.setattr(dm.time, "sleep", lambda s: None)
+    _mic(fake_reg, MICS["a stream effect"])
+    return dll
+
+
+def test_a_set_up_failing_once_is_tried_again(fake_reg, monkeypatch, tmp_path):
+    """Something Windows' audio hadn't let go of yet failed the step (exit code 1):
+    gone a moment later, so it's tried once more instead of failing the set-up."""
+    _put_on_kit(fake_reg, monkeypatch, tmp_path)
+    real, tries = dm._put_on, []
+
+    def flaky(guid, slot, dll):
+        tries.append(slot)
+        if len(tries) == 1:
+            raise PermissionError("in use")
+        return real(guid, slot, dll)
+    monkeypatch.setattr(dm, "_put_on", flaky)
+    assert dm.admin_install(GUID) == 0 and len(tries) == 2
+    assert GUID in fake_reg.installed_on()
+
+
+def test_the_same_effect_already_there_is_kept_not_written_over(fake_reg, monkeypatch,
+                                                                 tmp_path):
+    """Setting it up again with the same version: its file is there already, maybe still
+    loaded by a program that hadn't let go of the audio, so writing over it failed
+    (exit code 1). The file that's there is kept as it is."""
+    _put_on_kit(fake_reg, monkeypatch, tmp_path)
+    assert dm.admin_install(GUID) == 0
+
+    def locked(*a):
+        raise PermissionError("the file is in use")
+    monkeypatch.setattr(dm.shutil, "copyfile", locked)
+    monkeypatch.setattr(dm.os, "replace", locked)
+    assert dm.admin_install(GUID) == 0
+    assert len(list((tmp_path / "pf").glob("obmic-*.dll"))) == 1
+
+
+def test_a_stop_still_pending_is_waited_for(monkeypatch):
+    """net stop gave up while a slow driver kept the audio "stopping": it's waited for
+    (exit code 6 came on PCs where it stopped a moment later)."""
+    ran, checks, now = [], [False, False, True], [0.0]
+    monkeypatch.setattr(dm, "_run", lambda cmd, timeout=60.0: ran.append(cmd) or 0)
+    monkeypatch.setattr(dm, "_services_stopped", lambda: checks.pop(0))
+    monkeypatch.setattr(dm.time, "monotonic", lambda: now[0])
+    monkeypatch.setattr(dm.time, "sleep", lambda s: now.__setitem__(0, now[0] + s))
+    assert dm._audio_service(False) is True
+    assert [c[2] for c in ran] == ["audiosrv", "AudioEndpointBuilder"]   # no second stop
 
 
 def test_audio_restart_brings_back_what_depended_on_it(monkeypatch):
@@ -631,8 +691,10 @@ def test_a_stop_that_wont_take_is_retried_then_reported(monkeypatch):
     ran, stopped = [], [False]
     monkeypatch.setattr(dm, "_run", lambda cmd, timeout=60.0: ran.append(cmd) or 0)
     monkeypatch.setattr(dm, "_services_stopped", lambda: stopped[0])
+    monkeypatch.setattr(dm, "STOP_WAIT_S", 0.0)
     assert dm._audio_service(False) is False
-    assert [c[2] for c in ran] == ["audiosrv", "AudioEndpointBuilder", "AudioEndpointBuilder"]
+    assert [c[2] for c in ran] == ["audiosrv", "AudioEndpointBuilder",
+                                    "audiosrv", "AudioEndpointBuilder"]
     ran.clear()
     stopped[0] = True
     assert dm._audio_service(False) is True
@@ -2546,7 +2608,7 @@ def test_an_unfinished_prompt_isnt_called_a_no(window, monkeypatch):  # noqa: F8
     (False, dm.NO_ANSWER, "mic-effect-failed-unanswered"),
     (False, 6, "mic-effect-failed-code-6"),
     (True, None, "mic-effect-fix-failed-no-helper"),
-    (True, dm.MIC_SILENT, "mic-effect-fix-failed-silent"),
+    (True, dm.MIC_SILENT, None),   # on the mic, the mic itself silent: not a failure
     (False, None, None)])   # a No: counted as said-no only
 def test_why_a_set_up_failed_is_counted_as_its_word(window, monkeypatch, auto, code,  # noqa: F811
                                                     counted):
@@ -2815,34 +2877,33 @@ def test_setting_up_the_mic_shows_it_and_takes_one_click(window, monkeypatch):  
     assert "starting" in w.flow_out.text() and busy.is_busy(w.btn_install)
     assert "Repair" not in w.btn_install.text() and w.btn_usecable.isHidden()
     assert w.setup_show.on   # still at it while Windows loads it
-    w._settle_until = 0.0   # the wait is over: the button is a button again
+    w._settle_until, w._settle_more = 0.0, True   # the wait is over: the button is a button again
     w.statusctl._update_flow()
     assert not busy.is_busy(w.btn_install) and w._attach_release is None
     assert not w.setup_show.on   # (off screen here, so no ending to watch)
 
 
-def test_a_mic_left_silent_by_the_set_up_never_cheers(window, monkeypatch):  # noqa: F811
-    """The effect went on, but the mic still sends only silence after every audio
-    restart: Bun's show ends badly, no "Done" toast, and a box says what to do."""
-    from soundboard.ui.window import mainwindow as mw
+def test_a_mic_left_silent_by_the_set_up_is_still_set_up(window, monkeypatch):  # noqa: F811
+    """The effect went on, but the mic itself sends only silence after every audio
+    restart (a headset switched off): the effect still sends the sounds on that
+    silence, so it's set up and the sounds go into the mic, with a warning, not a
+    failed set-up and its error box."""
+    from soundboard.core import usage
     w = window
     _routes(w, monkeypatch, "missing")
     w.cfg.mic_device = "My mic"
     _no_threads(monkeypatch)
-    monkeypatch.setattr(type(w.setup_show), "isVisible", lambda self: True)   # watched
-    monkeypatch.setattr(mw.QMessageBox, "warning", lambda *a, **k: None)
-    told, said = [], []
+    told, said, counted = [], [], []
     monkeypatch.setattr(w, "tell", lambda *a, **k: told.append(a))
     monkeypatch.setattr(w, "toast", lambda text, kind="", *a, **k: said.append((text, kind)))
+    monkeypatch.setattr(usage, "used", counted.append)
     w.micctl.attach_mic()
-    assert w.setup_show.on
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")   # (it is on the mic)
     w.micctl._mic_attached("My mic", dm.mic_silent())
-    w.statusctl._update_flow()
-    assert w.setup_show._result is False
-    assert told and told[0][0] == "Is your headset on?" and "Restart your PC" in told[0][1]
-    assert told[0][2] == "warn"   # most likely switched off: not an error
-    assert not [k for _t, k in said if k == "ok"]
+    assert not told and w.cfg.route == "mic"
+    assert [k for t, k in said if "sends no sound" in t] == ["warn"]
+    assert "mic-effect-on" in counted and "mic-silent-after-setup" in counted
+    assert not [c for c in counted if c.startswith("mic-effect-failed")]
 
 
 def test_a_failed_mic_update_never_cheers(window, monkeypatch):  # noqa: F811
@@ -2883,7 +2944,7 @@ def test_setting_up_the_mic_shows_no_device_error_for_the_audio_restart(window, 
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")
     w.micctl._mic_attached("My mic", "")
     assert "problem" not in said(w)
-    w._settle_until = 0.0
+    w._settle_until, w._settle_more = 0.0, True
     w.statusctl._update_status()
     assert "headphones: Device unavailable" in said(w)
     assert "mon:" not in said(w)
@@ -3084,7 +3145,7 @@ def test_no_done_when_windows_never_loads_it(window, monkeypatch):  # noqa: F811
     monkeypatch.setattr(dm, "status", lambda name=None: "ready")
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: False)
     w.micctl._mic_attached("My mic", "")
-    w._settle_until = 0.0   # the wait ran out and it still isn't running
+    w._settle_until, w._settle_more = 0.0, True   # the wait ran out and it still isn't running
     w.statusctl._update_flow()
     assert not w.setup_show.on or w.setup_show._result is False
     assert not [t for t in said if t.startswith("Done")] and w._done_toast is None
@@ -3092,6 +3153,83 @@ def test_no_done_when_windows_never_loads_it(window, monkeypatch):  # noqa: F811
     monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
     w.statusctl._update_flow()
     assert not [t for t in said if t.startswith("Done")]   # (no stale "Done" then)
+
+
+def test_a_slow_load_gets_one_longer_wait(window, monkeypatch):  # noqa: F811
+    """Not running yet when the wait ran out (the board's sending into the mic comes
+    back on its next retry after the audio restart): one longer wait, still
+    "starting..." and not counted, before it counts as not working, with why."""
+    from soundboard.core import usage
+    w = window
+    _routes(w, monkeypatch, "missing")
+    w.cfg.mic_device = "My mic"
+    _no_threads(monkeypatch)
+    _toasts(w, monkeypatch)
+    counted = []
+    monkeypatch.setattr(usage, "used", counted.append)
+    w.micctl.attach_mic()
+    monkeypatch.setattr(dm, "status", lambda name=None: "ready")
+    monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: False)
+    w.micctl._mic_attached("My mic", "")
+    monkeypatch.setattr(w.engine, "main_stream", None)
+    w._settle_until = 0.0   # the first wait ran out: not reopened yet
+    w.statusctl._update_flow()
+    assert w._settle_more and w._settle_until > 0 and "starting" in w.flow_out.text()
+    assert not [c for c in counted if c.startswith("mic-effect-no-load")]
+    w._settle_until = 0.0   # the longer one too
+    w.statusctl._update_flow()
+    assert "mic-effect-no-load" in counted and "mic-effect-no-load-no-stream" in counted
+    assert not w._settle_more
+
+
+def test_a_set_up_on_a_mic_windows_forgot_uses_the_default(window, monkeypatch):  # noqa: F811
+    """The picked mic is gone (an old headset, renamed): Windows' default mic, which the
+    board records meanwhile, is set up instead of failing, and becomes the picked mic."""
+    w = window
+    _routes(w, monkeypatch, "missing")
+    w.cfg.mic_device = "Old headset"
+    _no_threads(monkeypatch)
+    said = _toasts(w, monkeypatch)
+    reopened = []
+    monkeypatch.setattr(w.devctl, "_reopen_devices", lambda: reopened.append(1))
+    tried = []
+
+    def install(mic, clean=False, ask_windows=True):
+        tried.append(mic)
+        return dm.Failure(dm.mic_gone(), "no-mic-gone") if mic == "Old headset" else None
+    monkeypatch.setattr(dm, "install", install)
+    monkeypatch.setattr(dm, "fallback_mic", lambda name: "Microphone (USB)")
+    mic, err = w.micctl._attach_mic_work("Old headset")
+    assert (mic, err) == ("Microphone (USB)", "") and tried == ["Old headset", mic]
+    w.micctl._mic_attached(mic, err)
+    assert w.cfg.mic_device == "Microphone (USB)" and reopened
+    assert [t for t in said if "Microphone (USB)" in t]
+
+
+@pytest.mark.parametrize("kind", ["no-mic-off", "no-mic-unsure"])
+def test_an_unplugged_or_unclear_mic_is_never_swapped(window, monkeypatch, kind):  # noqa: F811
+    """Unplugged, or two alike: that's still the mic meant, so no other one is set up."""
+    w = window
+    monkeypatch.setattr(dm, "install",
+                        lambda mic, clean=False, ask_windows=True: dm.Failure("x", kind))
+    monkeypatch.setattr(dm, "fallback_mic", lambda name: pytest.fail("swapped"))
+    assert w.micctl._attach_mic_work("My headset") == ("My headset", "x")
+
+
+def test_the_fallback_mic_is_windows_default_never_a_cable(monkeypatch):
+    from soundboard.audio import engine as eng
+    default = ["Microphone (USB)"]
+    monkeypatch.setattr(eng, "default_device_name", lambda kind: default[0])
+    monkeypatch.setattr(dm, "endpoint_for", lambda name: "{g}" if name else None)
+    assert dm.fallback_mic("Old headset") == "Microphone (USB)"
+    assert dm.fallback_mic("Microphone (USB)") is None   # (that one is gone)
+    default[0] = "CABLE Output (VB-Audio Virtual Cable)"
+    assert dm.fallback_mic("Old headset") is None
+    default[0] = None
+    assert dm.fallback_mic("Old headset") is None
+    default[0] = "Microphone (USB)"
+    monkeypatch.setattr(dm, "endpoint_for", lambda name: None)   # Windows has it off
+    assert dm.fallback_mic("Old headset") is None
 
 
 def test_bun_stays_on_while_it_starts(window, monkeypatch):  # noqa: F811
@@ -3109,7 +3247,7 @@ def test_bun_stays_on_while_it_starts(window, monkeypatch):  # noqa: F811
     w.setup_show._stop()   # (what finish() does while it can't be seen)
     assert w.setup_show.on and "starting" in w.flow_out.text()
     assert w.btn_install.isHidden() and busy.is_busy(w.btn_install)
-    w._settle_until = 0.0   # over: the button's back, and Bun's off for good
+    w._settle_until, w._settle_more = 0.0, True   # over: the button's back, and Bun's off for good
     w.statusctl._update_flow()
     assert not w.setup_show.on and not busy.is_busy(w.btn_install)
 
@@ -3593,7 +3731,7 @@ def test_a_failed_fix_asks_once_and_never_loops(window, monkeypatch):  # noqa: F
     w.btn_install.click()
     assert threads.setups()[-1] == ("My mic", False, False)
     w.micctl._mic_attached("My mic", "")   # "worked", but it's still (or again) off
-    w._settle_until = 0.0
+    w._settle_until, w._settle_more = 0.0, True
     w.statusctl._update_flow()
     _qt_run()
     assert len(threads.setups()) == 2

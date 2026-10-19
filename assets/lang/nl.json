@@ -3312,7 +3312,6 @@
   "Working: {engine}": "Werkt: {engine}",
   "Working: {engine} {version} (faster)": "Werkt: {engine} {version} (sneller)",
   "YouTube downloads still work, but with fewer formats.": "YouTube-downloads werken nog steeds, maar met minder formaten.",
-  "Is your headset on?": "Staat je headset aan?",
   "Is your headset plugged in?": "Zit je headset erin?",
   "Unplugged": "Niet aangesloten",
   "The download was cut off before the end. Try again.": "De download werd voor het einde afgebroken. Probeer het opnieuw.",
@@ -4341,5 +4340,7 @@
   "Lite mode: no animations, for slower PCs": "Lichte modus: geen animaties, voor tragere pc's",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Lichte modus: geen animaties, voor tragere pc's (aangeraden voor deze pc)",
   "No thanks, finish": "Nee bedankt, afronden",
-  "Yes, set up Discord": "Ja, Discord instellen"
+  "Yes, set up Discord": "Ja, Discord instellen",
+  "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows kent je gekozen microfoon niet meer, dus Onion Board is in plaats daarvan op {mic} (de standaardmicrofoon van Windows) gegaan.",
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Je geluiden zitten in je microfoon, maar je microfoon zelf stuurt nu geen geluid. Staat je headset uit of gedempt?"
 }

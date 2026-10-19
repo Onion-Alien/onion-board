@@ -3239,7 +3239,6 @@
   "Working: {engine}": "動作中: {engine}",
   "Working: {engine} {version} (faster)": "動作中: {engine} {version} (高速)",
   "YouTube downloads still work, but with fewer formats.": "YouTube のダウンロードはできますが、形式が少なくなります。",
-  "Is your headset on?": "ヘッドセットの電源は入っていますか？",
   "Is your headset plugged in?": "ヘッドセットは接続されていますか？",
   "Unplugged": "未接続",
   "The download was cut off before the end. Try again.": "ダウンロードが途中で切れました。もう一度試してください。",
@@ -4262,5 +4261,7 @@
   "Lite mode: no animations, for slower PCs": "軽量モード：アニメーションなし、遅めのPC向け",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "軽量モード：アニメーションなし、遅めのPC向け（このPCにおすすめ）",
   "No thanks, finish": "いいえ、完了する",
-  "Yes, set up Discord": "はい、Discord を設定する"
+  "Yes, set up Discord": "はい、Discord を設定する",
+  "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "選んだマイクを Windows が認識しなくなったため、Onion Board は代わりに {mic}（Windows の既定のマイク）に入りました。",
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "サウンドはマイクに入っていますが、マイク自体は今音を送っていません。ヘッドセットの電源がオフかミュートになっていませんか？"
 }

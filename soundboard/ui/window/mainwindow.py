@@ -326,6 +326,7 @@ class MainWindow(QMainWindow):
     seek: SeekSlider
     selection: PadSelection
     _settle_until: Any
+    _settle_more: bool
     setup_bar: QFrame
     _setup_cols: QGridLayout
     setup_connection: QLabel
@@ -786,6 +787,7 @@ class MainWindow(QMainWindow):
 
     DIRECT_GRACE_S = 4.0   # the board's own mic open this long, and still no sign of it
     SETTLE_S = 20.0        # after setting it up: how long Windows gets to load it
+    SETTLE_MORE_S = 25.0   # ...and once more, if it isn't working when that runs out
     MIC_SILENT_S = 20.0    # the mic sent only exact zeros this long: it's stuck (or muted)
 
     _backdrop: Any = None
