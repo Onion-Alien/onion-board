@@ -46,6 +46,7 @@ BOARD_TABS = (["idle_front"] + [f"{p}_{k}" for k in TAB_KEYS for p in ("open", "
                  "open_sounds", "tab_sounds_behind", "idle_end"])
 # using the app (the use tier, on a big board): each thing a user does, with the
 # longest UI-thread stall (child_board.StallMeter) and the pads' time to first sound
+# (no paint counter: an app-wide Python event filter, it made each build ~15% slower)
 BOARD_USE = ["settle", "idle_settled", "pad_click", "pad_spam", "tabs_tour", "tabs_again",
              "settings_pages", "dialogs", "menus", "voice_preset", "search_typing",
              "resize_sweep", "scroll_board", "sliders"]
@@ -57,7 +58,7 @@ TIERS = {
     "full": {"secs": 8.0, "sounds": 100, "leak_iterations": 20, "trigger_counts": [0, 10, 50],
              "board": BOARD_FULL, "timeout_s": 600},
     "use": {"secs": 4.0, "sounds": 200, "leak_iterations": 0, "trigger_counts": [],
-            "board": BOARD_USE, "stalls": True, "timeout_s": 420},
+            "board": BOARD_USE, "stalls": True, "event_counts": False, "timeout_s": 420},
     "tabs": {"secs": 9.0, "sounds": 20, "leak_iterations": 0, "trigger_counts": [50],
              "board": BOARD_TABS, "triggers": TRIGGERS_TABS, "timeout_s": 360},
 }
@@ -322,7 +323,7 @@ def board_run(name: str, out: Path, args, tier: dict, hz: float, scenarios: list
         "import_files": inputs.import_sounds(data / "import"),
         "mic_channels": 1,
         "real_window": args.real_window,
-        "event_counts": not args.no_event_counts,
+        "event_counts": not args.no_event_counts and tier.get("event_counts", True),
         "soak_minutes": args.minutes,
         "stalls": bool(tier.get("stalls")),
     }

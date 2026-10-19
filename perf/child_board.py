@@ -761,20 +761,25 @@ class Child:
         return {"fx_cache_mb": None if held is None else round(held / 2**20, 1)}
 
     def sc_tabs_tour(self):
+        """Every tab shown once, then back to Sounds. tab_open_ms: the switch and its
+        first paint; tab_switch_ms: the switch alone (the rest is Qt drawing it)."""
         from PySide6.QtWidgets import QApplication
+
+        from soundboard.ui.window.tabcontrol import TAB_KEYS
         w = self.w
-        first = {}
-        for i in range(w.tabs.count()):
-            if not w.tabs.isTabVisible(i):
-                continue
+        first, switch = {}, {}
+        order = [i for i in range(w.tabs.count()) if w.tabs.isTabVisible(i) and i != 0] + [0]
+        for i in order:
+            name = TAB_KEYS[i] if i < len(TAB_KEYS) else type(w.tabs.widget(i)).__name__
             t0 = time.perf_counter()
             w.tabs.setCurrentIndex(i)
+            t1 = time.perf_counter()
             QApplication.processEvents()
-            first[type(w.tabs.widget(i)).__name__] = round((time.perf_counter() - t0) * 1000)
+            first[name] = round((time.perf_counter() - t0) * 1000)
+            switch[name] = round((t1 - t0) * 1000)
             self.run_for(max(0.6, self.secs / 4))
-        w.tabs.setCurrentIndex(0)
         self.run_for(0.5)
-        return {"tab_open_ms": first}
+        return {"tab_open_ms": first, "tab_switch_ms": switch}
 
     def sc_dialogs(self):
         from PySide6.QtWidgets import QApplication
@@ -881,7 +886,8 @@ class Child:
 
     def sc_tabs_again(self):
         """Every tab once more (tabs_tour opened them the first time)."""
-        return {"tab_again_ms": self.sc_tabs_tour()["tab_open_ms"]}
+        out = self.sc_tabs_tour()
+        return {"tab_again_ms": out["tab_open_ms"], "tab_again_switch_ms": out["tab_switch_ms"]}
 
     def sc_settings_pages(self):
         """Settings opened, each page shown in turn, closed; twice."""
