@@ -40,18 +40,21 @@ def test_card_sits_in_the_corner_and_folds_to_a_pill(window, qapp, monkeypatch):
     bar.set_active(LINKS[0], "One", "add", None, "Someone", 90)
     bar.set_queue([{"url": u, "title": "x", "kind": "add"} for u in LINKS[1:]])
     QTest.qWait(50)
-    assert bar.isVisibleTo(window) and bar.parentWidget() is box
+    host = bar.parentWidget()   # holds the page, the Now playing row and the player
+    assert bar.isVisibleTo(window) and host.isAncestorOf(box)
+    assert host.isAncestorOf(window.transport)
+    page = bar._in_host(box)
     # the page under it didn't move
     assert window.sounds_toolbar.mapTo(window, window.sounds_toolbar.rect().topLeft()) == top_before
     g = bar.geometry()
     assert g.width() == db.CARD_W
-    assert g.right() == box.width() - 1 - db.CARD_MARGIN
+    assert g.right() == page.right() - db.CARD_MARGIN
     # standing on the player (or what's over it), which can overlap the page's foot
-    floor = bar._floor()
+    floor = bar._floor(g.left(), g.right() + 1)
     for under in (window.playing_row, window.transport, window.mixer):
         if under.isVisible():
-            assert floor <= under.mapTo(box, under.rect().topLeft()).y()
-    assert floor <= box.height() and g.bottom() == floor - 1 - db.CARD_GAP
+            assert floor <= bar._in_host(under).top()
+    assert floor <= host.height() and g.bottom() == floor - 1 - db.CARD_GAP
     open_h = g.height()
 
     bar.btn_min.click()
@@ -60,21 +63,33 @@ def test_card_sits_in_the_corner_and_folds_to_a_pill(window, qapp, monkeypatch):
     assert bar.property("pill") and not bar.panel.isVisibleTo(bar)
     assert g.height() < open_h   # as wide as its line needs (the fonts decide)
     assert g.width() == min(db.CARD_W, bar.summary.sizeHint().width() + 20)
-    assert g.right() == box.width() - 1 - db.CARD_MARGIN   # still in the corner
+    assert g.right() == page.right() - db.CARD_MARGIN   # still in the corner
     assert bar.s_bar.isVisibleTo(bar)                      # how far it's got, still
 
     bar.btn_min.click()
     QTest.qWait(50)
     assert not bar.property("pill") and bar.geometry().height() == open_h
 
-    # a sound playing shows Now playing over the player: the card moves up onto it
+    # a sound playing shows Now playing over the player, its chips on the left: the
+    # card stays down on the player beside them...
     window.playctl._update_chips({window.cfg.sounds[0].id})
     # (nothing really plays: the app's tick would take the row down again)
     monkeypatch.setattr(window.playctl, "_update_chips", lambda *a, **k: None)
     QTest.qWait(50)
     row = window.playing_row
     assert row.isVisible()
-    assert bar.geometry().bottom() < row.mapTo(box, row.rect().topLeft()).y()
+    row_top = bar._in_host(row).top()
+    chips_right = bar._in_host(row).left() + row.childrenRect().right()
+    assert chips_right < bar.x()
+    lowest = min([host.height()] + [bar._in_host(u).top()
+                                    for u in (window.transport, window.mixer) if u.isVisible()])
+    assert bar.geometry().bottom() == lowest - 1 - db.CARD_GAP   # down beside the chips
+    # ...and stands on the row where its chips reach under it (a narrow window)
+    window.resize(560, 800)
+    QTest.qWait(100)
+    row_top = bar._in_host(row).top()
+    assert bar._in_host(row).left() + row.childrenRect().right() >= bar.x()
+    assert bar.geometry().bottom() < row_top
     bar._clear_and_hide()
 
 

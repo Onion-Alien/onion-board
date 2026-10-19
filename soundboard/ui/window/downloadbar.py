@@ -21,7 +21,7 @@ import time
 import urllib.parse
 from collections.abc import Callable
 
-from PySide6.QtCore import (QEvent, QPoint, QRectF, QSize, Qt, QTimer, QVariantAnimation,
+from PySide6.QtCore import (QEvent, QPoint, QRect, QRectF, QSize, Qt, QTimer, QVariantAnimation,
                             Signal)
 from PySide6.QtGui import (QColor, QFontMetricsF, QLinearGradient, QPainter,
                            QPainterPath, QPalette, QPen, QPixmap)
@@ -466,7 +466,8 @@ class DownloadBar(QFrame):
         self._mini = False
         self._tight = False   # _fit_tight: a narrow banner (or the mini player's)
         self._corner = False  # float_in: a card over its host's bottom-right corner
-        self._host: QWidget | None = None
+        self._host: QWidget | None = None   # float_in: its parent, and the page
+        self._area: QWidget | None = None
         self._under: tuple[QWidget, ...] = ()   # what it stands on (float_in)
         self._collapsed = False
         self._room = "open"   # place: what the page has room for
@@ -934,17 +935,19 @@ class DownloadBar(QFrame):
 
     # ------------------------------------------------------------------ the corner
 
-    def float_in(self, host: QWidget, under: tuple[QWidget, ...] = ()):
-        """A card over `host`'s bottom-right corner (bottom-left right to left), above
-        the page rather than in its layout, so nothing under it moves when it comes and
-        goes. A child of the host: it's hidden with it (the mini player). It stands on
-        the highest of `under` that shows (the player bar and what's over it, which
-        can overlap the host's bottom), else on the host's bottom."""
+    def float_in(self, host: QWidget, area: QWidget, under: tuple[QWidget, ...] = ()):
+        """A card over the bottom-right corner of `area` (the page; bottom-left right to
+        left), above it rather than in its layout, so nothing under it moves when it
+        comes and goes. A child of `host`, which holds the page and what's under it:
+        it's hidden with it (the mini player). It stands on the highest of `under` that
+        shows and has something under it (the Now playing row's chips, the player bar),
+        else on the host's bottom; its top never goes past the page's."""
         self._corner = True
         self._host = host
+        self._area = area
         self._under = under
         self.setParent(host)
-        for w in (host, *under):
+        for w in (host, area, *under):
             w.installEventFilter(self)
         self.room_changed.connect(self._place_soon)
         self._tight = True   # makes _fit_tight apply the card's own rule
@@ -952,25 +955,42 @@ class DownloadBar(QFrame):
         self._fold_icon()
         self.hide()
 
-    _MOVES = (QEvent.Type.Resize, QEvent.Type.Move, QEvent.Type.Show, QEvent.Type.Hide)
+    # (LayoutRequest: chips came or went on the Now playing row)
+    _MOVES = (QEvent.Type.Resize, QEvent.Type.Move, QEvent.Type.Show, QEvent.Type.Hide,
+              QEvent.Type.LayoutRequest)
 
     def eventFilter(self, obj, ev):
-        if (ev.type() in self._MOVES and (obj is self._host or obj in self._under)
-                and self._host is not None and self.isVisibleTo(self._host)):
+        if (ev.type() in self._MOVES and self._host is not None
+                and (obj is self._host or obj is self._area or obj in self._under)
+                and self.isVisibleTo(self._host)):
             self._place_soon()
         return False
 
-    def _floor(self) -> int:
-        """The host y the card stands on: above the highest of `under` that shows."""
+    def _in_host(self, w: QWidget) -> QRect:
+        """`w`'s rectangle in the host's coordinates."""
+        host = self._host
+        assert host is not None
+        win = host.window()
+        return QRect(w.mapTo(win, QPoint(0, 0)) - host.mapTo(win, QPoint(0, 0)), w.size())
+
+    def _floor(self, left: int, right: int) -> int:
+        """The host y the card stands on, given its host x span: above the highest of
+        `under` that shows and has something under it. The Now playing row's chips sit
+        on the left: past them the card goes down onto the player."""
         host = self._host
         if host is None:
             return 0
-        win = host.window()
         floor = host.height()
         for w in self._under:
-            if w.isVisibleTo(win) and w.height() > 0:
-                floor = min(floor, w.mapTo(win, QPoint(0, 0)).y()
-                            - host.mapTo(win, QPoint(0, 0)).y())
+            if not w.isVisibleTo(host) or w.height() <= 0:
+                continue
+            r = self._in_host(w)
+            used = w.childrenRect()   # what's drawn on it (a row's chips), else all of it
+            if not used.isEmpty():
+                x0, x1 = r.x() + used.left(), r.x() + used.right()
+                if x1 < left - CARD_GAP or x0 > right + CARD_GAP:
+                    continue   # nothing under the card
+            floor = min(floor, r.y())
         return floor
 
     def _place_soon(self):
@@ -978,19 +998,25 @@ class DownloadBar(QFrame):
             self._place_due.start(0)
 
     def card_width(self) -> int:
-        host = self._host
-        return max(200, min(CARD_W, host.width() - 2 * CARD_MARGIN)) if host else CARD_W
+        area = self._area
+        return max(200, min(CARD_W, area.width() - 2 * CARD_MARGIN)) if area else CARD_W
+
+    def _card_x(self, w: int) -> int:
+        page = self._in_host(self._area) if self._area is not None else QRect()
+        return (page.left() + CARD_MARGIN if self.isRightToLeft()
+                else page.right() + 1 - w - CARD_MARGIN)
 
     def place(self):
         """Its size and spot in the corner: the whole list if the page has the height,
         else the running row, else the summary line; minimised, a pill as wide as the
         summary line needs."""
-        host = self._host
-        if host is None or not self._corner:
+        host, area = self._host, self._area
+        if host is None or area is None or not self._corner:
             return
         w = self.card_width()
-        floor = self._floor()
-        room_h = floor - 2 * CARD_GAP
+        x = self._card_x(w)
+        floor = self._floor(x, x + w)
+        room_h = floor - self._in_host(area).top() - 2 * CARD_GAP
         lay = self._outer
         h = 0
         for room in ("open", "row", "line"):
@@ -1002,7 +1028,7 @@ class DownloadBar(QFrame):
         if self._collapsed:   # the pill: as wide as its line, never wider than the card
             w = min(w, self.summary.sizeHint().width() + 20)
         h = max(0, min(h, room_h))
-        x = CARD_MARGIN if self.isRightToLeft() else host.width() - w - CARD_MARGIN
+        x = self._card_x(w)
         self.setGeometry(x, floor - h - CARD_GAP, w, h)
         self.raise_()
         self.placed.emit()

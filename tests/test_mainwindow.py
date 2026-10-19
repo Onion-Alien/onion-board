@@ -349,9 +349,11 @@ def test_long_download_list_folds_before_the_mini_player(window, qapp):
     QTest.qWait(50)
     assert not window.fitctl.is_mini() and bar.isVisibleTo(window)
     box = window._tabs_box
-    assert bar.parentWidget() is box
-    assert bar.geometry().bottom() < box.height() and bar.y() >= 0   # it fits the page
-    assert bar.geometry().right() == box.width() - 1 - db.CARD_MARGIN   # in the corner
+    page = bar._in_host(box)
+    assert bar.parentWidget().isAncestorOf(box)
+    assert bar.geometry().bottom() < bar.parentWidget().height()
+    assert bar.y() >= page.top()                                       # it fits the page
+    assert bar.geometry().right() == page.right() - db.CARD_MARGIN     # in the corner
     need = window._full.minimumSizeHint()
     assert need.height() <= 600
     window.resize(1400, 1000)

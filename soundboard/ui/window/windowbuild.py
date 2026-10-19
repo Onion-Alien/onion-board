@@ -707,7 +707,7 @@ class WindowBuilder(Controller):
         # ---- mixer strip: the things that apply whatever tab you're on
         rv.addWidget(self._build_mixer())
         # the download card stands on what shows at the page's foot
-        mw.download_bar.float_in(mw._tabs_box, (mw.playing_row, mw.transport, mw.mixer))
+        mw.download_bar.float_in(body, mw._tabs_box, (mw.playing_row, mw.transport, mw.mixer))
 
         mw.drop_veil = DropVeil(mw)   # "Drop to add 4 files" while files are dragged in
         mw._pages.addWidget(self._build_mini())
