@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import logging
 import sys
-import time
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QEvent, QObject, QSize, Qt, QTimer
@@ -18,7 +17,6 @@ from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
     QFrame,
-    QGraphicsOpacityEffect,
     QGridLayout,
     QHBoxLayout,
     QLabel,
@@ -47,7 +45,6 @@ from soundboard.i18n import _
 from soundboard.sounds.library import PAD_COLORS
 from soundboard.ui.kit import a11y, busy, icons
 from soundboard.ui.setup import alsosend
-from soundboard.ui.settings import lite
 from soundboard.ui.window import sidebar, taboff
 from soundboard.ui.apps.appspanel import ElidedLabel
 from soundboard.ui.window.buncontrol import BUN_TIP
@@ -56,6 +53,7 @@ from soundboard.ui.window.downloadbar import DownloadBar
 from soundboard.ui.window.dropveil import DropVeil
 from soundboard.ui.window.fitcontrol import BODY_SIDE, SEARCH_MIN_W
 from soundboard.ui.kit.iconrow import CapIcon
+from soundboard.ui.kit.topbar import TopBar
 from soundboard.ui.sounds.linkbar import LinkBar
 from soundboard.ui.window.livedot import set_tint as set_live_tint
 from soundboard.ui.bun.logowidget import LogoWidget
@@ -106,9 +104,6 @@ if TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 
-PULSE_MS = 1200      # the mic-check banner's throb: bright, dimmer, bright again
-PULSE_LOW = 0.55     # ...down to this opacity
-PULSE_FRAME_MS = 60  # ...a step this often (~16 a second still reads as a smooth pulse)
 SEARCH_WAIT_MS = 100     # typing in the search box filters the pads once it pauses this long
 LINK_WAIT_MS = 400       # a link in the search box is looked up once it stays this long
 PAD_SIZE_WAIT_MS = 50    # dragging Pad size re-lays the pads at most this often
@@ -156,30 +151,6 @@ class WidthScroll(QScrollArea):
                    else page.minimumSizeHint().width())
         need = content + self.verticalScrollBar().sizeHint().width()
         return QSize(max(m.width(), need), m.height()) if need <= self._room() else m
-
-
-class BannerButton(QPushButton):
-    """A one-line button that never makes the window wider: in less room it shows
-    `short`, and in less than that its text is cut with "…". A banner as wide as its
-    whole text pushed a ~750 px window into the mini player, banner and all."""
-
-    def __init__(self, text: str, short: str):
-        super().__init__(text)
-        self._full, self._short = text, short
-        self.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
-        self.setAccessibleName(text)
-
-    def resizeEvent(self, e):
-        super().resizeEvent(e)
-        room = self.width() - self.iconSize().width() - 48   # icon, padding, gap
-        fm = self.fontMetrics()
-        if fm.horizontalAdvance(self._full) <= room:
-            text = self._full
-        else:
-            text = fm.elidedText(self._short, Qt.TextElideMode.ElideRight, max(0, room))
-        if text != self.text():
-            self.setText(text)
-            self.setToolTip("" if text == self._full else self._full)   # only when cut
 
 
 class CutPill(QPushButton):
@@ -243,57 +214,6 @@ class _WideGaps(QObject):
                 if lay is not None:
                     lay.invalidate()
         return False
-
-
-class Pulse(QObject):
-    """The mic-check banner's throb: its opacity goes from 1 down to PULSE_LOW and back
-    every PULSE_MS, a step every PULSE_FRAME_MS. Each step draws the whole banner again
-    off-screen, so it runs only while it's on and the window can be seen in front
-    (set_live); otherwise the banner stands still, fully bright. An animation did this
-    at 60 frames a second, behind a game too."""
-
-    def __init__(self, fx: QGraphicsOpacityEffect, parent: QObject):
-        super().__init__(parent)
-        self.fx = fx
-        fx.setOpacity(1.0)     # (Qt's own start is 0.7)
-        fx.setEnabled(False)   # a still banner is drawn straight, not through the effect
-        self.on, self.live = False, True
-        self._t0 = 0.0
-        self.timer = QTimer(self)
-        self.timer.setInterval(PULSE_FRAME_MS)
-        self.timer.timeout.connect(self._step)
-
-    def running(self) -> bool:
-        return self.timer.isActive()
-
-    def set_on(self, on: bool):
-        self.on = on
-        self._apply()
-
-    def set_live(self, live: bool):
-        self.live = live
-        self._apply()
-
-    def _apply(self):
-        run = self.on and self.live and not lite.on()   # (Lite mode: still)
-        if run == self.timer.isActive():
-            return
-        if run:
-            self._t0 = time.monotonic()
-            self.fx.setEnabled(True)
-            self._step()
-            self.timer.start()
-        else:
-            self.timer.stop()
-            self.fx.setOpacity(1.0)
-            self.fx.setEnabled(False)
-
-    def opacity_at(self, ms: float) -> float:
-        t = (ms % PULSE_MS) / PULSE_MS   # 0..1 through one throb
-        return PULSE_LOW + (1.0 - PULSE_LOW) * abs(2.0 * t - 1.0)
-
-    def _step(self):
-        self.fx.setOpacity(self.opacity_at((time.monotonic() - self._t0) * 1000.0))
 
 
 class WindowBuilder(Controller):
@@ -397,31 +317,13 @@ class WindowBuilder(Controller):
         mw.btn_about.clicked.connect(mw.aboutctl._show_about_menu)
         mw.themectl._paint_logo()
 
-        # only a sign: the one switch is "Hear what they hear" in the mixer at the bottom
-        mw.mic_banner = BannerButton(_("You're hearing your mic output: mic + sounds, "
-                                         "exactly what others hear"),
-                                       _("Hearing your mic output"))
-        mw.mic_banner.setObjectName("micbanner")
-        mw.mic_banner.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        mw.mic_banner.hide()
-        icons.set_icon(mw.mic_banner, "ear", "#ffffff", size=20)
-        # pulse: an opacity animation, not a stylesheet rewrite 30x a second (each
-        # setStyleSheet re-parses and re-polishes the widget)
-        mw._banner_fx = QGraphicsOpacityEffect(mw.mic_banner)
-        mw.mic_banner.setGraphicsEffect(mw._banner_fx)
-        mw._pulse = Pulse(mw._banner_fx, mw)
-        rv.addWidget(mw.mic_banner)
-
-        # an urgent fix (a release whose notes say "Urgent: …", updates.urgent): a bar
-        # across the window, not only the small Update pill. Hidden only until next start.
-        mw.urgent_bar = QFrame()
-        mw.urgent_bar.setObjectName("urgentbar")
-        uh = QHBoxLayout(mw.urgent_bar)
-        uh.setContentsMargins(12, 6, 6, 6)
-        uh.setSpacing(8)
-        mw.urgent_lbl = QLabel()
-        mw.urgent_lbl.setTextFormat(Qt.TextFormat.PlainText)   # the reason is release-note text
-        mw.urgent_lbl.setWordWrap(True)   # never makes the window wider
+        # the bars across the top: one look for all of them (ui/kit/topbar.py), and only
+        # one shows at a time
+        # an urgent fix (a release whose notes say "Urgent: …", updates.urgent), a chat
+        # app setting that eats the sounds, an app using the mic raw: a bar across the
+        # window, not only the small Update pill. Hidden only until next start.
+        mw.urgent_bar = TopBar("warn", "warn")
+        mw.urgent_lbl = mw.urgent_bar.words
         # Onion Board's fix downloading: the update card's bar and words, not new ones
         mw.urgent_prog = QProgressBar()
         mw.urgent_prog.setObjectName("updatebar")
@@ -429,80 +331,31 @@ class WindowBuilder(Controller):
         mw.urgent_prog.setTextVisible(False)
         mw.urgent_prog.setFixedHeight(sidebar.UpdateCard.BAR_H)
         mw.urgent_prog.hide()
+        mw.urgent_bar.add_row(mw.urgent_prog)
         mw.urgent_sub = QLabel()
         mw.urgent_sub.setObjectName("hint")
         mw.urgent_sub.setTextFormat(Qt.TextFormat.PlainText)
         mw.urgent_sub.setWordWrap(True)
         mw.urgent_sub.hide()
-        uv = QVBoxLayout()
-        uv.setSpacing(4)
-        uv.addWidget(mw.urgent_lbl)
-        uv.addWidget(mw.urgent_prog)
-        uv.addWidget(mw.urgent_sub)
-        uh.addLayout(uv, 1)
-        mw.urgent_btn = QPushButton()
-        mw.urgent_btn.setObjectName("primary")
+        mw.urgent_bar.add_row(mw.urgent_sub)
+        mw.urgent_btn = mw.urgent_bar.add_button(primary=True)
         mw.urgent_btn.clicked.connect(mw.alertctl._urgent_clicked)
-        uh.addWidget(mw.urgent_btn)
-        hide = QPushButton()
-        hide.setObjectName("urgenthide")
-        hide.setAccessibleName(_("Hide"))
-        hide.setToolTip(_("Hide until Onion Board starts again"))
-        icons.close_button(hide, 28, "warn_text")
-        hide.clicked.connect(mw.alertctl._hide_urgent)
-        uh.addWidget(hide)
+        mw.urgent_bar.close_btn.setAccessibleName(_("Hide"))
+        mw.urgent_bar.close_btn.setToolTip(_("Hide until Onion Board starts again"))
+        mw.urgent_bar.close_btn.clicked.connect(mw.alertctl._hide_urgent)
         mw.urgent_bar.hide()
         rv.addWidget(mw.urgent_bar)
 
-        # "Did you know?": one tip per start (soundboard.core.tips), with a Show me
-        mw.tip_bar = QFrame()
-        mw.tip_bar.setObjectName("tipbar")
-        th = QHBoxLayout(mw.tip_bar)
-        th.setContentsMargins(12, 6, 6, 6)
-        th.setSpacing(8)
-        mw.tip_lbl = QLabel()
-        mw.tip_lbl.setTextFormat(Qt.TextFormat.PlainText)
-        mw.tip_lbl.setWordWrap(True)
-        th.addWidget(mw.tip_lbl, 1)
-        mw.tip_btn = QPushButton(_("Show me"))
-        mw.tip_btn.setObjectName("small")
-        mw.tip_btn.clicked.connect(mw.tipctl._tip_show_me)
-        th.addWidget(mw.tip_btn)
-        hide = QPushButton()
-        hide.setObjectName("urgenthide")
-        hide.setAccessibleName(_("Hide the tip"))
-        hide.setToolTip(_("Hide this tip (Settings → General turns tips off)"))
-        icons.close_button(hide, 28)
-        hide.clicked.connect(mw.tip_bar.hide)
-        th.addWidget(hide)
-        mw.tip_bar.hide()
-        mw.tip = None
-        rv.addWidget(mw.tip_bar)
-
         # "Looks like you're using Discord. Set up for it?" (appsetup, _app_setup): one
         # slim bar, never a window, so it's safe while a game is up
-        mw.setup_bar = QFrame()
-        mw.setup_bar.setObjectName("tipbar")
-        sh = QHBoxLayout(mw.setup_bar)
-        sh.setContentsMargins(12, 6, 6, 6)
-        sh.setSpacing(8)
-        mw.setup_lbl = QLabel()
-        mw.setup_lbl.setTextFormat(Qt.TextFormat.RichText)
-        mw.setup_lbl.setWordWrap(True)
-        sh.addWidget(mw.setup_lbl, 1)
-        mw.setup_yes = QPushButton()
-        mw.setup_yes.setObjectName("primary")
-        mw.setup_yes.clicked.connect(mw.appsetctl._setup_yes_clicked)
-        sh.addWidget(mw.setup_yes)
-        mw.setup_no = QPushButton(_("Not now"))
-        mw.setup_no.setObjectName("small")
+        mw.setup_bar = TopBar("chat")
+        mw.setup_lbl = mw.setup_bar.words
+        mw.setup_no = mw.setup_bar.add_button(_("Not now"))
         mw.setup_no.clicked.connect(mw.appsetctl._setup_not_now)
-        sh.addWidget(mw.setup_no)
-        mw.setup_x = QPushButton()
-        mw.setup_x.setObjectName("urgenthide")
-        icons.close_button(mw.setup_x, 28)
+        mw.setup_yes = mw.setup_bar.add_button(primary=True)
+        mw.setup_yes.clicked.connect(mw.appsetctl._setup_yes_clicked)
+        mw.setup_x = mw.setup_bar.close_btn
         mw.setup_x.clicked.connect(mw.appsetctl._setup_x_clicked)
-        sh.addWidget(mw.setup_x)
         mw.setup_bar.hide()
         rv.addWidget(mw.setup_bar)
 
@@ -511,25 +364,12 @@ class WindowBuilder(Controller):
 
         # Windows is in a language the board has but isn't showing: offered in that
         # language, so someone who can't read English finds it (_offer_language)
-        mw.lang_bar = QFrame()
-        mw.lang_bar.setObjectName("tipbar")
-        lh = QHBoxLayout(mw.lang_bar)
-        lh.setContentsMargins(12, 6, 6, 6)
-        lh.setSpacing(8)
-        mw.lang_lbl = QLabel()
-        mw.lang_lbl.setTextFormat(Qt.TextFormat.PlainText)
-        mw.lang_lbl.setWordWrap(True)
-        lh.addWidget(mw.lang_lbl, 1)
-        mw.lang_btn = QPushButton()
-        mw.lang_btn.setObjectName("small")
+        mw.lang_bar = TopBar("speech")
+        mw.lang_lbl = mw.lang_bar.words
+        mw.lang_btn = mw.lang_bar.add_button(primary=True)
         mw.lang_btn.clicked.connect(lambda: mw.langctl.switch_language(mw._lang_offered))
-        lh.addWidget(mw.lang_btn)
-        hide = QPushButton()
-        hide.setObjectName("urgenthide")
-        icons.close_button(hide, 28)
-        hide.clicked.connect(mw.langctl._no_language)
-        lh.addWidget(hide)
-        mw.lang_hide = hide
+        mw.lang_hide = mw.lang_bar.close_btn
+        mw.lang_hide.clicked.connect(mw.langctl._no_language)
         mw.lang_bar.hide()
         mw._lang_offered = ""
         rv.addWidget(mw.lang_bar)
@@ -570,8 +410,7 @@ class WindowBuilder(Controller):
         av = QVBoxLayout(area)
         av.setContentsMargins(0, 0, 0, 0)
         av.setSpacing(rv.spacing())
-        for strip in (mw.mic_banner, mw.urgent_bar, mw.tip_bar, mw.setup_bar,
-                      mw.ff_bar, mw.lang_bar, mw.enjoy_bar):
+        for strip in (mw.urgent_bar, mw.setup_bar, mw.ff_bar, mw.lang_bar, mw.enjoy_bar):
             rv.removeWidget(strip)
             av.addWidget(strip)
         av.addWidget(tabs_box, 1)
@@ -1003,7 +842,7 @@ class WindowBuilder(Controller):
         mw.btn_check.setProperty("short_text", _("Listen"))   # a narrow window's word
         mw.btn_check.setCheckable(True)
         mw.btn_check.setToolTip(_("Plays your mic into your headphones on top of the sounds, "
-                                    "exactly what others hear. A red banner shows while it's on."))
+                                    "exactly what others hear."))
         mw.btn_check.toggled.connect(mw.on_mic_check)
         icons.set_icon(mw.btn_check, "ear", checked_color="#ffffff")
         row.addWidget(mw.btn_check)

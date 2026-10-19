@@ -369,24 +369,26 @@ QSpinBox#stepper::down-arrow:disabled, QSpinBox#stepper::down-arrow:off { image:
 QSlider::groove:vertical { width:4px; background:$groove; border-radius:2px; }
 QSlider::add-page:vertical { background:$muted; border-radius:2px; }
 QSlider::handle:vertical { background:$text_hi; border:1px solid transparent; width:14px; height:14px; margin:0 -5px; border-radius:7px; }
-QPushButton#micbanner { background:#d32f2f; color:white; font-weight:700; font-size:11pt;
-    border:none; border-radius:10px; padding:10px; }
-QFrame#urgentbar { background:$warn_bg; border:1px solid $warn_text; border-radius:10px; }
 QFrame#tipbar { background:$panel; border:1px solid $border_hi; border-radius:10px; }
 QFrame#tipbar QLabel { background:transparent; color:$text; }
-QFrame#tipbar QPushButton#primary { padding:2px 8px; font-size:8pt; }   /* as small as Not now */
-QFrame#tipbar QLabel#hint { color:$muted; }
-QFrame#tipbar QPlainTextEdit#enjoysaid { background:$field; color:$text; border:1px solid $border;
+QFrame#tipbar QPushButton#primary { padding:2px 8px; font-size:8pt; }   /* as small as Just me */
+/* the bars across the top of the window (ui/kit/topbar.py, DESIGN.md "Top bars") */
+QFrame#topbar { background:$panel; border:1px solid $border; border-left:4px solid $accent_text;
+    border-radius:8px; }
+QFrame#topbar[tone="warn"] { border-left-color:$warn_text; }
+QFrame#topbar[tone="ok"] { border-left-color:$ok_text; }
+QFrame#topbar QLabel { background:transparent; color:$text; }
+QFrame#topbar QLabel#topbarwords { font-size:9pt; }
+QFrame#topbar QPushButton#primary, QFrame#topbar QPushButton#topbarbtn {
+    min-height:28px; max-height:28px; padding:0 12px; font-size:9pt; font-weight:600; border-radius:6px; }
+QFrame#topbar QPushButton#primary[roomy="true"] { min-height:0; max-height:16777215px; }   /* beside a text box, as tall as its line */
+QFrame#topbar QPushButton#topbarbtn { background:$btn; color:$text; border:1px solid $border; }
+QFrame#topbar QPushButton#topbarbtn:hover { background:$btn_hover; }
+QFrame#topbar QPushButton#topbarclose { background:transparent; border:none; border-radius:13px; padding:0; }
+QFrame#topbar QPushButton#topbarclose:hover { background:$btn_hover; }
+QFrame#topbar QPlainTextEdit#enjoysaid { background:$field; color:$text; border:1px solid $border;
     border-radius:8px; padding:4px 6px 1px 6px; }   /* the words centred on their cap height */
-QFrame#tipbar QPlainTextEdit#enjoysaid:focus { border-color:$accent; }
-QFrame#tipbar QPushButton#primary[roomy="true"] { padding:0 14px; font-size:9pt; }   /* beside a text box, as tall as it */
-QFrame#tipbar QPushButton#urgenthide { background:transparent; color:$muted; border:none;
-                                       border-radius:6px; font-weight:700; font-size:12pt; }
-QFrame#tipbar QPushButton#urgenthide:hover { background:$btn_hover; }
-QFrame#urgentbar QLabel { background:transparent; color:$warn_text; font-weight:600; }
-QFrame#urgentbar QPushButton#urgenthide { background:transparent; color:$warn_text; border:none;
-    border-radius:14px; padding:0; font-size:12pt; }
-QFrame#urgentbar QPushButton#urgenthide:hover { background:$danger_bg; }
+QFrame#topbar QPlainTextEdit#enjoysaid:focus { border-color:$accent; }
 QPushButton#miccheck:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; }
 QDialog#transport QLabel, QDialog#transport QCheckBox, QDialog#transport QSlider,
 QFrame#transport QLabel, QFrame#transport QCheckBox, QFrame#transport QSlider,

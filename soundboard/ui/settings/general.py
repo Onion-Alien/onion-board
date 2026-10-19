@@ -28,11 +28,7 @@ class GeneralPage(Page):
                            _("Otherwise, double-click to play. Ctrl+click selects without "
                              "playing."), self.mw.cfg.single_click, self.mw.set_single_click)
         one.setToolTip(_("Then Ctrl+click picks a pad without playing it"))
-        if hasattr(getattr(self.mw, "tipctl", None), "set_tips_on"):
-            self.dlg.box_tips = self._option(
-                cv, _("Show tips"),
-                _("A short “Did you know?” about a feature, at most once a day, never while a "
-                  "game is up."), self.mw.cfg.tips_on, self.mw.tipctl.set_tips_on)
+        if hasattr(getattr(self.mw, "tipctl", None), "set_tutorials_on"):
             self.dlg.box_tutorials = self._option(
                 cv, _("Show tutorials"),
                 _("A quick how-to the first time you open each tab."),

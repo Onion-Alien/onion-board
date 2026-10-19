@@ -487,7 +487,8 @@ class Config:
     # ui/setup/setupwizard.py). "" = not asked yet: only a brand-new install starts so
     # (first_start), so the question comes once, on the first launch
     use_mode: str = "normal"
-    # "Did you know?" tips (soundboard.core.tips): on / off, the ones shown, the day of the last
+    # the old "Did you know?" tips' switch and day (no longer shown; kept so settings from
+    # older versions load as they were). tips_seen: what was shown once (tours, offers)
     tips_on: bool = True
     # each tab's quick how-to the first time it's opened, and the first-run tour
     # (ui/setup/tabtours.py, ui/setup/firsttour.py); seen ones are in tips_seen
