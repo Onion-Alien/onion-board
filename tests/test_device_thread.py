@@ -13,6 +13,7 @@ from conftest import process_events
 from soundboard.audio import appaudio
 from soundboard.audio import engine as eng
 from soundboard.audio.engine import Engine
+from soundboard.audio.engineparts import LITE_BLOCK_S
 from test_default_output import OUTS
 from test_default_output import window as default_window  # noqa: F401
 from test_mainwindow import window as main_window  # noqa: F401
@@ -218,8 +219,9 @@ def recording(calls, key):
 
 def test_latency_and_stream_output_changes_never_wait_on_the_ui_thread(
         main_window, monkeypatch, qapp):  # noqa: F811
-    """Audio buffering (reopens every stream) and Also play on's stream output were
-    opened on the UI thread: a recovery holding the devices froze the window."""
+    """Audio buffering and lite mode's block (each reopens every stream) and Also play
+    on's stream output were opened on the UI thread: a recovery holding the devices
+    froze the window."""
     from conftest import devices_done
     w = main_window
     devices_done(w)
@@ -230,9 +232,12 @@ def test_latency_and_stream_output_changes_never_wait_on_the_ui_thread(
     with held_elsewhere():
         quick(w.devctl.set_latency, "high" if w.cfg.latency != "high" else "low")
         quick(w.routectl.set_obs_device, "Speakers")
+        quick(w.devctl.set_lite_block, True)     # lite mode's audio block
         assert calls == []                       # waiting their turn, off the UI thread
+        assert w.engine.block_s == 0.0
     devices_done(w)
-    assert [c[0] for c in calls].count("set_obs_device") == 2   # reopened, then picked
+    assert [c[0] for c in calls].count("set_obs_device") == 3   # reopened, picked, reopened
+    assert w.engine.block_s == LITE_BLOCK_S
     assert ("set_obs_device", w.routectl._obs_name("Speakers")) in calls
 
 

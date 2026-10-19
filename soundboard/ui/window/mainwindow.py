@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (QApplication, QDialog, QMainWindow, QMenu, QMessa
 from soundboard.ui.kit import theme
 from soundboard.online import ytworker
 from soundboard.audio.engine import SR, Engine
+from soundboard.audio.engineparts import LITE_BLOCK_S
 from soundboard.core import exitwatch
 from soundboard.audio import appaudio, howl
 from soundboard.mic import voicesdk
@@ -540,6 +541,7 @@ class MainWindow(QMainWindow):
         self.start_frac = 0.0             # where ▶ starts if it isn't playing
         self._ui_live = True              # the window is on screen (see _set_tick_rate)
         self.engine.latency = self.cfg.latency if self.cfg.latency in ("low", "high") else "low"
+        self.engine.set_block(LITE_BLOCK_S if self.cfg.lite_mode else 0.0)   # (lite.py)
         self._save_timer = QTimer(self)
         self._save_timer.setSingleShot(True)
         self._save_timer.timeout.connect(self._save_now)

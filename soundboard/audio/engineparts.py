@@ -44,6 +44,17 @@ CUT_KEEP_S = 30.0
 BUFFER = {"low": 0.15, "high": 0.25}
 # ...and for the mic: what's queued there is your voice's delay, so it stays short
 MIC_BUFFER = {"low": "low", "high": 0.04}
+# Lite mode's audio block (Engine.set_block): every stream calls back every 20 ms
+# instead of the driver's 10, so the audio callbacks run half as often. Each call
+# costs about the same at either size (it's mostly Python's per-call overhead), so
+# that's most of what they cost with nothing playing. Your voice goes out ~20 ms later
+# (the bigger block, and the mic rings' bigger cushion below).
+LITE_BLOCK_S = 0.02
+# ...and the mic rings at that block: their fill steps a whole block at a time, so they
+# need a bigger cushion (at 15 or 20 ms a mic clock 0.2% off ran them dry now and
+# then), a higher ceiling (at 80 ms a fast one skipped ahead before tracking started)
+# and a longer clock fit (the step is twice the noise in it). (cushion, ceiling) s:
+MIC_RING_S, MIC_RING_BIG_S = (0.015, 0.08), (0.025, 0.1)
 # the app's own playback: the test recording, cue beeps, the setup wizard's tune, the
 # Pong game's sounds (ui/bun/bunpong.py). With
 # previews ("<sid>:preview", "<sid>~fx:preview") they ignore the live speed / pitch
@@ -285,6 +296,7 @@ class Ring:
         self.grow_to_s = grow_to_s
         self.underruns = 0   # ran dry while playing (a gap)
         self.overflows = 0   # skipped ahead to cut latency (a jump)
+        self.est_scale = 1.0   # auto_drift's fits take this many times longer (set_block)
         self.configure(rate)
 
     def configure(self, rate: int):
@@ -311,14 +323,15 @@ class Ring:
         self._wrote = 0          # frames written since the estimate started
         self._ex = 0             # frames read since then (the reader's clock)
         self._sums = [0.0] * 6   # n, Σx, Σd, Σxx, Σxd, Σdd with d = written - read
-        self._est_next = int(self.rate * self.EST_MIN_S)
+        self._est_next = int(self.rate * self.EST_MIN_S * self.est_scale)
         self._est_side = 0       # the side the last fit came out on (+1 fast, -1 slow)
         self.drift_est = 1.0     # the last fit's writer/reader clock ratio
 
     def _mic_err(self, n: int) -> float:
         """The drift controller's error for a mic ring, aimed at the fill a read finds
         right after priming: the cushion plus the read (aimed at the bare cushion, it
-        read the ring dry again and again: the mic's is only 1.5 blocks). The fill a
+        read the ring dry again and again: the mic's is only 1.5 blocks, 1.25 at lite
+        mode's 20 ms blocks). The fill a
         read finds swings by a whole block as the two clocks' blocks slide past each
         other (every 20 s at 0.05% apart), so the mic's gains are gentler than the
         radio's: with those it wobbled by up to 1% (now 0.05%, 0.35% at worst). (Averaging
@@ -344,7 +357,7 @@ class Ring:
         sm[5] += d * d
         if self._ex < self._est_next:
             return
-        self._est_next = self._ex + int(self.rate * self.EST_CHECK_S)
+        self._est_next = self._ex + int(self.rate * self.EST_CHECK_S * self.est_scale)
         k, sx, sd, sxx, sxd, sdd = sm
         vxx, vxd, vdd = sxx - sx * sx / k, sxd - sx * sd / k, sdd - sd * sd / k
         if k < 8 or vxx <= 0:

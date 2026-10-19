@@ -291,3 +291,21 @@ def test_the_mic_alone_keeps_the_tick_quiet_in_lite_mode(window, monkeypatch):  
     assert tick_with_room_noise() == tickcontrol.TICK_MS
     assert tickcontrol.TICK_LITE_QUIET_MS > tickcontrol.TICK_QUIET_MS
     assert tickcontrol.TICK_LITE_MS > tickcontrol.TICK_MS
+
+
+def test_the_audio_runs_in_bigger_blocks_in_lite_mode(window, monkeypatch):  # noqa: F811
+    """Lite mode: every stream reopens with 20 ms blocks (half the audio callbacks), and
+    back to the driver's own when it's switched off."""
+    from conftest import devices_done
+    from soundboard.audio.engineparts import LITE_BLOCK_S
+    w = window
+    devices_done(w)
+    reopened = []
+    monkeypatch.setattr(w.engine, "reopen_all", lambda: reopened.append(w.engine.block_s))
+    assert w.engine.block_s == 0.0
+    w.themectl.set_lite_mode(True)
+    devices_done(w)
+    assert reopened == [LITE_BLOCK_S] and w.engine.ring_main.est_scale == 2.0
+    w.themectl.set_lite_mode(False)
+    devices_done(w)
+    assert reopened == [LITE_BLOCK_S, 0.0] and w.engine.ring_main.est_scale == 1.0
