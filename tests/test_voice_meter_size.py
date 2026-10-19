@@ -76,7 +76,9 @@ def test_many_chips_wrap_and_meter_recovers(qapp):
             for _ in range(4):
                 qapp.processEvents()
             if width == 320:
-                assert bar._box.direction() == QBoxLayout.TopToBottom
+                assert bar._box.direction() == QBoxLayout.BottomToTop
+                # the chips above the switch row: the switch stays put at the bottom
+                assert bar._right.geometry().bottom() < bar._mic.geometry().top()
                 assert bar._right.maximumWidth() > width
             else:
                 assert bar.meter.width() >= width // 2
