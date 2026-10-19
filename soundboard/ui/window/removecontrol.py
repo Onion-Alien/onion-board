@@ -83,6 +83,7 @@ class RemoveControl(Controller):
         for m in gone:
             mw.engine.stop(m.id)
             mw.engine.stop(f"{m.id}:preview")
+            mw.playctl.drop_pending(m.id)   # off Up next (its count and list) too
             index = mw.cfg.sounds.index(m)
             mw.cfg.sounds.remove(m)
             self._removed.append((m, index, mw.audio.pop(m.id, None)))
@@ -95,6 +96,7 @@ class RemoveControl(Controller):
         trash.hold([(m, i) for m, i, _d in self._removed])
         mw._save_now()
         mw._rebuild_pads()
+        mw.playctl._update_chips(mw.engine.playing())
         mw.catctl._fill_categories()
         mw.hkctl.register_hotkeys()
         # "Removed X · Undo" for a while; after that they're in Recently deleted
