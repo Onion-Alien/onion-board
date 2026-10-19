@@ -134,34 +134,21 @@ def test_when_all_added_it_folds_then_goes(window, qapp, monkeypatch):
     bar._clear_and_hide()
 
 
-def test_a_play_goes_once_its_sound_stops(window, qapp, monkeypatch):
-    """A Play (a Community card's, say) says Playing; once its sound has stopped the
-    card goes, folded or not, and whatever is playing on the board besides."""
-    monkeypatch.setattr(db, "ENDED_MS", 100)
+def test_a_play_goes_once_it_plays_unless_more_is_listed(window, qapp):
+    """A Play (a Community card's, say) that starts playing with nothing else on the
+    list goes at once: the player bar says what plays. With more waiting it stays."""
     window.resize(1200, 800)
     window.show()
     bar = window.download_bar
-    playing = {"__link__": (0.1, False), "song": (0.5, False)}   # a board song plays too
-    monkeypatch.setattr(window.engine, "playing", lambda: dict(playing))
-    monkeypatch.setattr(window.linkbar, "playing_url", LINKS[0])
     bar.set_active(LINKS[0], "FINISH HIM!", "play", None, "", 3)
     bar.set_done(LINKS[0], "play", True)
-    QTest.qWait(db.Outcome.SHOW_MS + 100)
-    window.tickctl.tick()
-    assert bar.isVisible() and bar.h_text.text() == "Playing"
-    bar.btn_min.click()   # folded to its pill
-    del playing["__link__"]   # the sound ended
-    window.tickctl.tick()
-    QTest.qWait(300)
     assert not bar.isVisible()
 
-    # one that isn't the card's (an older Play's url) leaves it be
     bar.set_active(LINKS[1], "Other", "play", None, "", 3)
+    bar.set_queue([{"url": LINKS[2], "title": "Next", "kind": "add"}])
     bar.set_done(LINKS[1], "play", True)
     QTest.qWait(db.Outcome.SHOW_MS + 100)
-    window.tickctl.tick()
-    QTest.qWait(300)
-    assert bar.isVisible()
+    assert bar.isVisible() and bar._queue
     bar._clear_and_hide()
 
 
