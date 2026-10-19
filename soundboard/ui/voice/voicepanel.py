@@ -230,7 +230,7 @@ class VoicePanel(QWidget):
         pv.setSpacing(12)
         # a row of tabs, one card under it: the voice changer, AI voices, another
         # language, custom voices, add-ons (they wrap onto two lines when narrow).
-        # They and My setups scroll away with the card: pinned above it, on a short
+        # They and My voice combos scroll away with the card: pinned above it, on a short
         # window they left the voices a sliver (the Say bar and the bottom bar stay)
         tab_row = QWidget()
         self._tab_flow = Flow(tab_row, gap=8)
@@ -239,7 +239,7 @@ class VoicePanel(QWidget):
         self._tabs: dict[str, QPushButton] = {}
         self._cards: dict[str, QFrame] = {}
         self._states: dict[str, QLabel] = {}
-        head = self._head = QVBoxLayout()   # the tabs, then My setups (placed below)
+        head = self._head = QVBoxLayout()   # the tabs, then My voice combos (placed below)
         head.setContentsMargins(0, 0, 0, 0)
         head.setSpacing(8)
         pv.addLayout(head)
@@ -286,7 +286,7 @@ class VoicePanel(QWidget):
         rule.setFixedHeight(1)
         th.addWidget(rule)
         head.addWidget(tab_head)
-        # My setups: under the tabs, so it's there whichever part is showing
+        # My voice combos: under the tabs, so it's there whichever part is showing
         self.setups = voicesetups.Store()   # (its bar is placed once the panels are made)
         outer.addWidget(scroll, 1)
 
@@ -386,7 +386,7 @@ class VoicePanel(QWidget):
         super().showEvent(e)
         self._meter_timer.start(appstate.interval(50))
 
-    # ---- My setups (voicesetups)
+    # ---- My voice combos (voicesetups)
     def current_setup(self) -> dict:
         """What's on now as a setup: the voice changer's voice, the AI voice, the
         language spoken; {} when none of them is on. Its "name" is a suggestion."""

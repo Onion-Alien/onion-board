@@ -558,7 +558,7 @@ class MainWindow(QMainWindow):
             self.builder._build_ui()
         restyled.again()   # what measured text, in the theme's fonts now
         from soundboard.ui.voice.livesetups import LiveSetups
-        self.livesetups = LiveSetups(self)   # My setups in the three Live controls
+        self.livesetups = LiveSetups(self)   # My voice combos in the three Live controls
         splash.pump()
         self.devctl._init_devices()
         splash.pump()
