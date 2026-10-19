@@ -1,4 +1,4 @@
-"""My setups in Live controls: a voice setup (soundboard.mic.voicesetups) on every sound, on
+"""My voice combos in Live controls: a voice setup (soundboard.mic.voicesetups) on every sound, on
 the radio or on the programs the Apps tab sends.
 
 Its voice changer part is live, so it's on at once. Its AI voice takes a while:
@@ -97,7 +97,7 @@ class LiveSetups(Controller):
         return getattr(owner, "fx_btn", None)
 
     def setups(self) -> dict[str, dict]:
-        """The saved setups, read again each time (a new one saved on the Voice tab
+        """The saved voice combos, read again each time (a new one saved on the Voice tab
         shows, as does one saved by the Voice tab's own copy)."""
         return dict(voicesetups.Store().setups)
 

@@ -1,4 +1,4 @@
-"""The Voice tab's My setups row, above every part of the tab: your saved mixes of a
+"""The Voice tab's My voice combos row, above every part of the tab: your saved mixes of a
 voice changer voice, an AI voice and a language (voicesetups). Click one to turn the
 whole mix on; Save what's on keeps what you have on now, Import a code adds one a
 friend sent (any share code). The same setups go on sounds from Edit sound → Effects →
@@ -53,7 +53,7 @@ class SetupsBar(QWidget):
         v.setSpacing(4)
         row = QHBoxLayout()
         row.setSpacing(10)
-        title = QLabel(_("My setups"))
+        title = QLabel(_("My voice combos"))
         title.setObjectName("setupstitle")
         row.addWidget(title, 0, Qt.AlignmentFlag.AlignVCenter)
         self.chips = QWidget()
@@ -78,6 +78,13 @@ class SetupsBar(QWidget):
         if import_code is not None:
             self.btn_import.clicked.connect(lambda: import_code())
         self._importing = import_code is not None
+        # one of them to everyone (the store) or to a friend (a code): last in the row
+        self.btn_share = QPushButton(_("Share"), self.chips)
+        self.btn_share.setObjectName("voicecat")
+        icons.set_icon(self.btn_share, "upload", "muted")
+        self.btn_share.setToolTip(_("Share one of your voice combos: to the store for "
+                                    "everyone, or as a code to send a friend"))
+        self.btn_share.clicked.connect(self._share_menu)
         under = QHBoxLayout()
         under.setSpacing(8)
         self.note = QLabel()
@@ -115,6 +122,7 @@ class SetupsBar(QWidget):
         self.buttons = {}
         self.flow.removeWidget(self.btn_save)
         self.flow.removeWidget(self.btn_import)
+        self.flow.removeWidget(self.btn_share)
         for name, setup in self.store.setups.items():
             b = QPushButton(name.replace("&", "&&"))
             b.setObjectName("voicecat")
@@ -136,6 +144,8 @@ class SetupsBar(QWidget):
             self.btn_import.show()
         else:
             self.btn_import.hide()
+        self.flow.addWidget(self.btn_share)
+        self.btn_share.show()
 
     def _say(self, text: str, keep: bool = False):
         """A line under the row; it goes again after NOTE_MS unless `keep`."""
@@ -164,7 +174,7 @@ class SetupsBar(QWidget):
         if saved:
             usage.used("voice-setup-saved")
         self._say(_("Saved “{name}”.", name=saved) if saved
-                  else _("Couldn't save it (100 setups at most)."))
+                  else _("Couldn't save it (100 voice combos at most)."))
 
     def _menu(self, name: str, at):
         m = QMenu(self)
@@ -176,6 +186,21 @@ class SetupsBar(QWidget):
                         lambda: self.share and self.share(name))
         m.addAction(_("Delete"), lambda: self._delete(name))
         m.exec(at)
+
+    def _share_menu(self):
+        """Share's menu: each voice combo, with to the store and as a code under it."""
+        m = QMenu(self)
+        for name, setup in self.store.setups.items():
+            sub = m.addMenu(self.icon_for(setup), name.replace("&", "&&"))
+            if self.share is not None:
+                sub.addAction(icons.icon("upload"), _("Share to the store…"),
+                              lambda n=name: self.share and self.share(n))
+            if self.copy_code is not None:
+                sub.addAction(icons.icon("copy"), _("Copy share code"),
+                              lambda n=name: self._copy(n))
+        if m.isEmpty():
+            m.addAction(_("Save what's on first, then share it here.")).setEnabled(False)
+        m.exec(self.btn_share.mapToGlobal(self.btn_share.rect().bottomLeft()))
 
     def _copy(self, name: str):
         if self.copy_code is not None and self.copy_code(name):
@@ -190,7 +215,7 @@ class SetupsBar(QWidget):
         if not ok or not new or new == name:
             return
         if self.store.taken(new, but=name):
-            self._say(_("You already have a setup called “{name}”.", name=new))
+            self._say(_("You already have a voice combo called “{name}”.", name=new))
             return
         if self.store.rename(name, new):
             usage.used("voice-setup-renamed")

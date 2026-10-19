@@ -1,7 +1,7 @@
 """Edit sound → Effects → Voice: pick the voice a sound is said in, from picture cards
 (no names to remember). Three kinds, any of them together:
 
-- My setups: your saved mixes (voicesetups), one click puts the whole mix on;
+- My voice combos: your saved mixes (voicesetups), one click puts the whole mix on;
 - Voice changer: the Voice tab's voices, Favorites and your own first;
 - AI voice: the AI voices add-on's voices (only when it's installed).
 
@@ -86,7 +86,7 @@ class VoicePicker(QDialog):
 
         self.setup_tiles: dict[str, VoiceTile] = {}
         if cat.setups:
-            c, cv = card(_("My setups"), icon="star_filled")
+            c, cv = card(_("My voice combos"), icon="star_filled")
             grid = self._grid(cv)
             for i, (name, voice) in enumerate(cat.setups):
                 t = self._tile(name, self._setup_icon(voice), star=False)
@@ -143,7 +143,7 @@ class VoicePicker(QDialog):
         self.btn_use.setDefault(True)
         self.btn_use.clicked.connect(self.accept)
         row.addWidget(self.btn_use)
-        self.btn_save = QPushButton(_("Save as a setup"))
+        self.btn_save = QPushButton(_("Save as a voice combo"))
         self.btn_save.setToolTip(_("Keep this mix under a name, to put it on other sounds "
                                    "with one click"))
         self.btn_save.clicked.connect(self._save)
@@ -315,7 +315,7 @@ class VoicePicker(QDialog):
     def _save(self):
         if not self.voice or self.save_setup is None:
             return
-        name, ok = QInputDialog.getText(self, _("Save as a setup"), _("Name"),
+        name, ok = QInputDialog.getText(self, _("Save as a voice combo"), _("Name"),
                                         text=self.voice.get("name", ""))
         if not ok or not name.strip():
             return
@@ -325,5 +325,5 @@ class VoicePicker(QDialog):
                 (saved, {**self.voice, "name": saved})]
             self._setup = saved
             self._refresh()
-            self.summary.setText(_("Saved as “{name}”: it's under My setups here and on the "
+            self.summary.setText(_("Saved as “{name}”: it's under My voice combos here and on the "
                                    "Voice tab.", name=saved))

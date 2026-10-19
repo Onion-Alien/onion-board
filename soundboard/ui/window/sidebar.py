@@ -162,6 +162,8 @@ class RailTab(QToolButton):
         if self.isChecked():   # the current tab: a soft accent fill under the icon
             self._fill(r, *theme.rail_tint())
         super().paintEvent(e)
+        if self.is_new():
+            self._paint_new()
         if self.hasFocus() and self._kbd_focus:
             p = QPainter(self)
             snap_to_pixels(p)
@@ -234,6 +236,34 @@ class RailTab(QToolButton):
             b.setFocus(Qt.FocusReason.TabFocusReason)
             b.click()
 
+    def is_new(self) -> bool:
+        return bool(self.rail.tabs.tabBar().property(f"_new{self.index}"))
+
+    def _paint_new(self):
+        """A small "New" pill (set_tab_new): shut, across the foot of the icon; open,
+        at the end of the row."""
+        p = QPainter(self)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        f = QFont(self.font())
+        f.setBold(True)
+        f.setPixelSize(8 if not self.rail.is_open() else 10)
+        p.setFont(f)
+        text = _("New")
+        fm = QFontMetrics(f)
+        w, h = fm.horizontalAdvance(text) + 8, fm.height() + 1
+        if self.rail.is_open():
+            x = 8 if self.isRightToLeft() else self.width() - w - 8
+            y = (self.height() - h) / 2
+        else:
+            x, y = (self.width() - w) / 2, self.height() - h - 1
+        r = QRectF(x, y, w, h)
+        p.setPen(QPen(QColor(theme.T["bg"]), 1.5))   # a thin gap from the icon under it
+        p.setBrush(QColor(theme.T["accent"]))
+        p.drawRoundedRect(r, h / 2, h / 2)
+        p.setPen(QColor(theme.T["on_accent"]))
+        p.drawText(r, Qt.AlignmentFlag.AlignCenter, text)
+        p.end()
+
     def is_live(self) -> bool:
         return bool(self.rail.tabs.tabBar().property(f"_live{self.index}"))
 
@@ -245,6 +275,14 @@ class RailTab(QToolButton):
         p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(c)
         p.drawRoundedRect(r, 8, 8)
+
+
+def set_tab_new(tabs: QTabWidget, index: int, on: bool):
+    """Mark tab `index` on the rail with a small "New" pill (or take it off)."""
+    tabs.tabBar().setProperty(f"_new{index}", bool(on))
+    changed = getattr(tabs, "changed", None)
+    if changed is not None:
+        changed.emit()
 
 
 def put(w: QPushButton, text: str, full: str = "", tip: str = ""):

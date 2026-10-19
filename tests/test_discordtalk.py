@@ -164,3 +164,37 @@ def test_quitting_hands_an_open_discord_to_the_helper(window, monkeypatch):  # n
     window.cfg.discord_restore = True
     window.alertctl.discord_quit()
     assert started == [["discord"]]
+
+
+def test_put_back_by_hand_also_does_a_half_set_discord(tmp_path):
+    """Audio recovery's Put Discord back: quitting leaves a Discord with some clean-up
+    on alone, the button puts the rest back too."""
+    assert not dt.installed()
+    half = dict(SOUND, noiseCancellation=True)
+    make_db(half)
+    assert dt.installed()
+    assert dt.to_restore({}) == ["discord"]
+    dt.restore({}, tmp_path / "bk", running=set())
+    assert not settings().echo                         # on quit: left alone
+    assert dt.restore({}, tmp_path / "bk", running=set(), only={"discord"}, always=True) == []
+    s = settings()
+    assert s.krisp and s.echo and s.agc
+    assert dt.to_restore({}) == []                     # nothing left to put back
+
+
+def test_put_back_waits_for_an_open_discord_to_close(window, monkeypatch, tmp_path):  # noqa: F811
+    """Discord open: the card leaves it to the window, which puts it back once Discord's
+    gone and says so."""
+    from soundboard.ui.setup.audiorecovery import RecoveryCard
+    toasts = []
+    monkeypatch.setattr(window, "toast", lambda text, kind="", *a, **k: toasts.append(text))
+    card = RecoveryCard(window)
+    card._discord_back(["discord"], ["discord"])
+    assert window.alertctl.discord_pending == {"discord"}
+    assert "Close Discord" in toasts[-1]
+    window.alertctl._on_discord(([], None, {}, ["discord"]))
+    assert window.alertctl.discord_pending == set()
+    assert "back the way you talk" in toasts[-1]
+    card._discord_back([], [])
+    assert "already" in toasts[-1]
+    card.deleteLater()
