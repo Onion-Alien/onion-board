@@ -137,8 +137,6 @@ class WidthScroll(QScrollArea):
     enough (`room()`: the page's width with the rail shut): wider content scrolls
     sideways rather than turn the window into the mini player."""
 
-    dl_column: QWidget | None = None   # the column the download bar lines up with
-
     def __init__(self, room, narrowest=None):
         super().__init__()
         self._room = room
@@ -525,17 +523,11 @@ class WindowBuilder(Controller):
         tv.setContentsMargins(0, 0, 0, 0)
         tv.setSpacing(0)
         mw._tabs_lay = tv
-        # in a box of its own, so its edges can follow the page's cards (_fit_dl_bar)
-        dl_box = QWidget()
-        mw._dl_lay = QHBoxLayout(dl_box)
-        mw._dl_lay.setContentsMargins(0, 0, 0, 0)
+        # downloads: a card over the page's bottom-right corner, on every tab, never
+        # pushing the page down; the toasts stand on it (toast_floor)
         mw.download_bar = DownloadBar(mw)
-        mw._dl_lay.addWidget(mw.download_bar)
-        tv.addWidget(dl_box)
-        mw.download_bar.shown_changed.connect(mw.fitctl._dl_bar_gap)
-        # (the controller's own slot, not a lambda: Qt drops it with the window)
-        mw.download_bar.shown_changed.connect(mw.fitctl._refit_dl_bar)
-        mw.download_bar.room_changed.connect(mw.fitctl._refit_dl_bar)
+        # (the window's own slot, not a lambda: Qt drops it with the window)
+        mw.download_bar.placed.connect(mw._relayout_toasts)
 
         # ---- tabs
         mw.tab_info = {}   # page attr -> (title, text) for ⓘ
@@ -682,7 +674,6 @@ class WindowBuilder(Controller):
         mw.tabs.setCurrentIndex(tab if mw.tabs.isTabVisible(tab) else 0)
         mw.tabctl._focus_open_tab()
         mw.tabs.currentChanged.connect(lambda i: mw.set_option("tab", i))
-        mw.tabs.currentChanged.connect(lambda _i: mw.fitctl._fit_dl_bar())
         mw.tabs.currentChanged.connect(mw.tabctl._count_tab)   # names only (usage.py)
         mw.tabctl._count_tab(mw.tabs.currentIndex())
         # Setup's hints and flow, fresh as it's opened (only there: on every tab it was
@@ -715,6 +706,8 @@ class WindowBuilder(Controller):
 
         # ---- mixer strip: the things that apply whatever tab you're on
         rv.addWidget(self._build_mixer())
+        # the download card stands on what shows at the page's foot
+        mw.download_bar.float_in(mw._tabs_box, (mw.playing_row, mw.transport, mw.mixer))
 
         mw.drop_veil = DropVeil(mw)   # "Drop to add 4 files" while files are dragged in
         mw._pages.addWidget(self._build_mini())
@@ -744,6 +737,9 @@ class WindowBuilder(Controller):
         mw.mini_download_bar.stop_all_requested.connect(mw.linkbar.cancel_all)
         for b in (mw.download_bar, mw.mini_download_bar):
             b.thumb_lookup = mw.ytresults.thumb_for   # (typed in downloadbar.py)
+            b.sound_for = mw._added_sound
+        mw.download_bar.play_sound.connect(mw.playctl.play)
+        mw.download_bar.show_sound.connect(mw._show_sound)
         mw.linkbar.queued.connect(mw.ytresults.queued)
         mw.ytresults.thumb_ready.connect(mw.download_bar.set_thumb)
         mw.ytresults.thumb_ready.connect(mw.mini_download_bar.set_thumb)
@@ -1379,10 +1375,8 @@ class WindowBuilder(Controller):
         page.setFrameShape(QFrame.Shape.NoFrame)
         a11y.scroll_stop(page, _("Setup"))
         body = QWidget()
-        page.dl_column = body   # the download bar lines up with these cards
-        _Moved(body, mw.fitctl._fit_dl_bar)
         inner = capped(body, margins=(0, 12, 12, 12))   # not a 900 px wide card at full screen; the
-        # cards' left edge lines up with the download bar and the other tabs
+        # cards' left edge lines up with the other tabs
         sections = QVBoxLayout(body)
         sections.setContentsMargins(0, 0, 0, 0)
         sections.setSpacing(16)

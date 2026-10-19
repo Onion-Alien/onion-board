@@ -329,7 +329,7 @@ def test_a_play_that_waits_its_turn_says_up_next_until_it_plays(net):
     net.end()                                         # A ends: C, the bar's own, plays
     assert net.played() == [480, 1440]
     assert net.bar().head == "Playing" and net.bar().status == "▶ Playing"
-    assert bar._auto_hide.isActive()
+    assert bar._auto_fold.isActive()   # it winds down: folds to its pill, then goes
 
 
 def test_now_playing_and_up_next_show_on_every_tab(net):

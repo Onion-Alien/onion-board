@@ -328,10 +328,12 @@ def test_window_shrinks_and_still_fits(window, size, qapp):
 
 
 def test_long_download_list_folds_before_the_mini_player(window, qapp):
-    """A queue of picks makes the download list tall: at 800x600 it folds (to its running
-    row, then its summary line) instead of the window turning into the mini player,
-    and it opens again once the window is big enough."""
+    """A queue of picks makes the download card tall: at 800x600 it folds (to its running
+    row, then its summary line) to fit over the page, the window stays the whole board,
+    and it opens again once the window is big enough. It's a card in the page's
+    bottom-right corner, never in the page's layout."""
     from PySide6.QtTest import QTest
+    from soundboard.ui.window import downloadbar as db
     window.show()
     window.tabs.setCurrentWidget(window.sounds_page)
     bar = window.download_bar
@@ -344,12 +346,17 @@ def test_long_download_list_folds_before_the_mini_player(window, qapp):
     assert bar._room == "open" and bar.scroll_area.isVisibleTo(bar)
     window.resize(800, 600)
     window.fitctl._refit()
+    QTest.qWait(50)
     assert not window.fitctl.is_mini() and bar.isVisibleTo(window)
-    assert bar._room in ("row", "line")
+    box = window._tabs_box
+    assert bar.parentWidget() is box
+    assert bar.geometry().bottom() < box.height() and bar.y() >= 0   # it fits the page
+    assert bar.geometry().right() == box.width() - 1 - db.CARD_MARGIN   # in the corner
     need = window._full.minimumSizeHint()
     assert need.height() <= 600
     window.resize(1400, 1000)
     window.fitctl._refit()
+    QTest.qWait(50)
     assert bar._room == "open" and bar.scroll_area.isVisibleTo(bar)
     bar._clear_and_hide()
 

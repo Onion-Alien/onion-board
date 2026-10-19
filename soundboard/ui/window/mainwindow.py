@@ -54,7 +54,7 @@ from soundboard.ui.window.hotkeycontrol import HotkeyControl
 from soundboard.ui.window.aboutcontrol import AboutControl
 from soundboard.ui.window.themecontrol import ThemeControl
 from soundboard.ui.window.settingscontrol import SettingsControl
-from soundboard.ui.window.tabcontrol import TabControl
+from soundboard.ui.window.tabcontrol import TAB_INDEX, TabControl
 from soundboard.ui.window.statuscontrol import StatusControl
 from soundboard.ui.window.miccontrol import MIC_OFFER_MS, MicControl
 from soundboard.ui.window.routecontrol import RouteControl
@@ -228,7 +228,6 @@ class MainWindow(QMainWindow):
     _decks: list[tuple[QWidget, ...]]
     dest_panel: DestPanel
     dev_card: Any
-    _dl_lay: QHBoxLayout
     _done_toast: str | None
     download_bar: DownloadBar
     drop_veil: DropVeil
@@ -698,6 +697,27 @@ class MainWindow(QMainWindow):
         self.download_bar.set_active(url, title, kind, pm, channel, secs or card_secs)
         self.mini_download_bar.set_active(url, title, kind, pm, channel, secs or card_secs)
 
+    def _added_sound(self, url: str) -> str | None:
+        """The pad a download was added as, while it's still a sound (the download
+        card's ▶ and Show)."""
+        sid = self.linkbar.added_ids.get(url)
+        return sid if sid and self.meta(sid) is not None else None
+
+    def _show_sound(self, sid: str):
+        """The download card's Show: the Sounds tab, the pad picked and scrolled to."""
+        self.tabs.setCurrentIndex(TAB_INDEX["sounds"])
+        self.playctl.select(sid)
+
+        def reveal():   # once the tab has laid its pads out
+            pad = self.pads.get(sid)
+            if pad is not None:
+                self._pads_scroll.ensureWidgetVisible(pad)
+        QTimer.singleShot(0, self._pads_scroll, reveal)
+
+    def _relayout_toasts(self):
+        """The download card came, went or changed size: the toasts stand on it."""
+        toastmod.relayout(self)
+
     def _mini_setup(self):
         self.resize(max(800, self.width()), max(600, self.height()))
         self.tabs.setCurrentWidget(self.setup_page)
@@ -854,7 +874,12 @@ class MainWindow(QMainWindow):
         """Where toasts stand (window y): just above the player, or the mixer strip
         when the player's hidden."""
         bar = next((w for w in (self.transport, self.mixer) if w.isVisible()), None)
-        return None if bar is None else bar.mapTo(self, QPoint(0, 0)).y()
+        y = None if bar is None else bar.mapTo(self, QPoint(0, 0)).y()
+        card = self.download_bar   # the download card in the corner: on top of it
+        if card.isVisible():
+            top = card.mapTo(self, QPoint(0, 0)).y() - 4
+            y = top if y is None else min(y, top)
+        return y
 
     def toast_mode(self) -> str:
         """How the corner cards show (ui/kit/toast.py): as cards in the window; as icons on

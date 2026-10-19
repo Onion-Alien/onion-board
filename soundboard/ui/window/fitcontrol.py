@@ -9,8 +9,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
-import shiboken6
-from PySide6.QtCore import QPoint, QSize, QTimer
+from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QBoxLayout, QWidgetItem
 
 from soundboard.ui.window import responsive
@@ -102,10 +101,6 @@ class FitControl(Controller):
         f.add(40, "h", lambda tight: r.hide(mw.mixer)(
             tight and (mw.height() < 520 or mw.width() < 760)))
         f.add(50, "h", self._cat_bar_step)   # the overlay's category key still works
-        # the download list folds to its running row, then to its summary line, before
-        # the mixer goes (a long queue at 800x600 isn't a reason for the mini player)
-        self._dl_steps = mw.download_bar.fit_steps()
-        f.extend(self._dl_steps)
         self._stack_cols = (self._stack_setup,
                             *mw.voice.stack_steps())
         mw.setMinimumSize(responsive.MIN_SIZE)
@@ -429,45 +424,6 @@ class FitControl(Controller):
             title.setVisible(not on)   # the icon beside it (and its tooltip) says which
             # the shown group takes the room (what others hear, with all three)
             mw._mixer_layout.setStretchFactor(deck, int(i == (mw._mixer_focus if on else 1)))
-
-    def _fit_dl_bar(self):
-        """A page whose cards stop short of the edges (Setup: room for its scroll bar,
-        and centred past the width cap on a wide window) names that column `dl_column`:
-        the download bar then takes the cards' own left and right edges."""
-        mw = self.mw
-        col = getattr(mw.tabs.currentWidget(), "dl_column", None)
-        left = right = 0
-        if col is not None and col.isVisible():
-            x = col.mapTo(mw._tabs_box, QPoint(0, 0)).x()
-            left, right = max(0, x), max(0, mw._tabs_box.width() - x - col.width())
-        m = mw._dl_lay.contentsMargins()
-        if (m.left(), m.right()) != (left, right):
-            mw._dl_lay.setContentsMargins(left, 0, right, 0)
-
-    def _refit_dl_bar(self, *_shown):
-        """The download bar came, went or needs another height (rows added, opened):
-        fit the window again for it, once the change is laid out. The bar also hides
-        while the window is being deleted (its C++ side already gone): nothing to fit."""
-        mw = self.mw
-        if (getattr(self, "_dl_refit_due", False) or not hasattr(self, "_dl_steps")
-                or not shiboken6.isValid(mw)):
-            return
-        self._dl_refit_due = True
-
-        def run():
-            self._dl_refit_due = False
-            self._fit.retry(self._dl_steps)   # open again if it fits now
-            self._refit()
-        QTimer.singleShot(0, mw, run)   # with the window: not after it's gone
-
-    def _dl_bar_gap(self, shown: bool):
-        """Under the download bar: its own 8 px (so a page's scroll bar doesn't touch it)
-        and none from the Sounds page, whose first row then sits 8 px down like the rest."""
-        mw = self.mw
-        if not shiboken6.isValid(mw):   # hidden as the window is deleted
-            return
-        mw._tabs_lay.setSpacing(8 if shown else 0)
-        mw._sounds_lay.setContentsMargins(0, 0 if shown else 8, 0, 0)
 
     def _stack_setup(self, compact: bool):
         """Setup's cards in two columns, or in one column in setup order."""
