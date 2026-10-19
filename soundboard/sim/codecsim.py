@@ -9,7 +9,7 @@ to the engine can be judged in numbers instead of by ear.
     back = roundtrip(x, PROFILES["discord"])
     analyze(x, back)  ->  level / bandwidth / per-band loss / waveform SNR
 
-Nothing here runs in the app; it's a development tool (scripts/codec_bench.py
+Nothing here runs in the app; it's a development tool (scripts/voicetests/codec_bench.py
 and tests/test_codecsim.py). Profiles are what the public record says each
 service uses; where a number is an estimate the profile says so.
 """

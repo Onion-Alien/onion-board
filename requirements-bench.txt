@@ -1,5 +1,5 @@
 -r requirements-dev.txt
-# the game-voice bench (scripts/codec_bench.py --real, scripts/voicetests/game_capture.py):
+# the game-voice bench (scripts/voicetests/codec_bench.py --real, scripts/voicetests/game_capture.py):
 # the real WebRTC audio processing (LiveKit ships it) and RNNoise. Not shipped.
 livekit==1.1.20
 pyrnnoise==0.4.5

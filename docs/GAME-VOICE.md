@@ -1,6 +1,6 @@
 # What game voice chat does to your sounds
 
-Reference for the bench profiles in `soundboard/sim/codecsim.py` (`scripts/codec_bench.py
+Reference for the bench profiles in `soundboard/sim/codecsim.py` (`scripts/voicetests/codec_bench.py
 --list` prints them) and what the bench found. Discord was measured in a real call
 (`scripts/voicetests/discord_roundtrip.py`); the game profiles come from each stack's source
 code or SDK docs where those are public, and are marked *estimate* where not.

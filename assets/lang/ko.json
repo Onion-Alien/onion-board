@@ -621,7 +621,7 @@
   "A little (-6 dB)": "약간(-6dB)",
   "A lot (-20 dB)": "많이(-20dB)",
   "A message for ChatGPT / Claude that explains Onion Board's links and lists your sounds, so it can set up your tools with you": "Onion Board의 링크를 설명하고 사운드를 나열하여 도구를 설정할 수 있도록 ChatGPT/Claude를 위한 메시지",
-  "A mode describes what the listener's voice codec does to your sounds, so the app can pre-shape them: which frequencies it cuts, how much sub-bass to turn into harmonics that survive, how much to even out the level, and whether it's mono. The built-in modes were measured; to measure another service, run scripts/codec_bench.py from the source tree.": "모드는 청취자의 음성 코덱이 사운드에 어떤 영향을 미치는지 설명하므로 앱은 잘라낼 주파수, 생존하는 고조파로 전환할 하위 베이스의 양, 레벨을 균등하게 할 정도, 모노인지 여부 등을 사전에 형성할 수 있습니다. 내장 모드가 측정되었습니다. 다른 서비스를 측정하려면 소스 트리에서 scripts/codec_bench.py를 실행하세요.",
+  "A mode describes what the listener's voice codec does to your sounds, so the app can pre-shape them: which frequencies it cuts, how much sub-bass to turn into harmonics that survive, how much to even out the level, and whether it's mono. The built-in modes were measured; to measure another service, run scripts/voicetests/codec_bench.py from the source tree.": "모드는 청취자의 음성 코덱이 사운드에 어떤 영향을 미치는지 설명하므로 앱은 잘라낼 주파수, 생존하는 고조파로 전환할 하위 베이스의 양, 레벨을 균등하게 할 정도, 모노인지 여부 등을 사전에 형성할 수 있습니다. 내장 모드가 측정되었습니다. 다른 서비스를 측정하려면 소스 트리에서 scripts/voicetests/codec_bench.py를 실행하세요.",
   "A newer Tor ({version}) is ready to download.": "최신 Tor({version})를 다운로드할 준비가 되었습니다.",
   "A note from me": "내가 쓴 메모",
   "A proxy of your own (or one your VPN app offers)": "자체 프록시(또는 VPN 앱이 제공하는 프록시)",

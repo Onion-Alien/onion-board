@@ -1,18 +1,20 @@
 """Run audio through what Discord / a game does to it and print what's lost.
 
-    python scripts/codec_bench.py                       # built-in test signals, every profile
-    python scripts/codec_bench.py --library             # every sound in the library
-    python scripts/codec_bench.py clip.wav other.mp3    # these files
-    python scripts/codec_bench.py --profiles discord steam
-    python scripts/codec_bench.py --json out.json       # also save the numbers
-    python scripts/codec_bench.py --dest steam --profiles steam   # with the app's mode on
-    python scripts/codec_bench.py --send                # through the app's send stage first
-    python scripts/codec_bench.py --processing suppress agc gate   # voice cleanup left on
-    python scripts/codec_bench.py --processing webrtc_ns webrtc_agc  # the real WebRTC code
-    python scripts/codec_bench.py --list                # every profile: games, confidence
-    python scripts/codec_bench.py --defaults            # each chat's own cleanup + voice gate
-    python scripts/codec_bench.py --profiles svc lethal --defaults --at 10   # 10 m away
-    python scripts/codec_bench.py --profiles dissonance --situation lethal:walkie
+    python scripts/voicetests/codec_bench.py [arguments], from the repo root:
+
+      (nothing)                                        built-in test signals, every profile
+      --library                                        every sound in the library
+      clip.wav other.mp3                               these files
+      --profiles discord steam
+      --json out.json                                  also save the numbers
+      --dest steam --profiles steam                    with the app's mode on
+      --send                                           through the app's send stage first
+      --processing suppress agc gate                   voice cleanup left on
+      --processing webrtc_ns webrtc_agc                the real WebRTC code
+      --list                                           every profile: games, confidence
+      --defaults                                       each chat's own cleanup + voice gate
+      --profiles svc lethal --defaults --at 10         10 m away
+      --profiles dissonance --situation lethal:walkie
 
 With --dest the "level" and band columns compare the codec's output against the
 *shaped* input, so read the mode's own effect from the <100 and 100-300 columns
@@ -45,7 +47,7 @@ from pathlib import Path
 
 import numpy as np
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
