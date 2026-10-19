@@ -2074,3 +2074,19 @@ def test_clicking_the_lit_voice_again_turns_the_voice_changer_off(panel):
     assert not p.fx._tile["Ghost"].isChecked() and not eng.voice_chain.enabled
     p.fx._tile["Ghost"].click()                 # and on again
     assert p.fx.btn_power.isChecked() and eng.voice_chain.enabled
+
+
+def test_use_less_cpu_asks_for_the_small_speech_model_if_it_is_there(panel):
+    """With Use less CPU the helper is told it may use tiny.en in place of base.en
+    (it does only when that's downloaded already: modules/live-voice --lighter)."""
+    from soundboard import voicefx
+    p, _ = panel
+    lv = p.speech.livevoice
+    assert "--lighter" not in lv._live_args()
+    voicefx.set_light(True)
+    try:
+        args = lv._live_args()
+        assert args[:2] == ["--model", "base.en"]
+        assert args[args.index("--lighter") + 1] == "tiny.en"
+    finally:
+        voicefx.set_light(False)

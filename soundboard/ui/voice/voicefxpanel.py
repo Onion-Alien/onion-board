@@ -831,10 +831,10 @@ class VoiceFxPanel(QWidget):
         hh.addWidget(self.btn_power)
         # Use less CPU: on by itself in lite mode (the main window says which)
         self.chk_light = QCheckBox(_("Use less CPU"))
-        self.chk_light.setToolTip(_("For slower PCs: the voice changer and live voice use "
-                                    "about a third less CPU. Hiss removal is off and the "
-                                    "robot voices and echoes are a little simpler. On by "
-                                    "itself in lite mode."))
+        self.chk_light.setToolTip(_("For slower PCs: the voice changer and live voice use less "
+                                    "CPU. Hiss removal is off, the robot voices and echoes are a "
+                                    "little simpler, and live voice uses the smaller speech "
+                                    "model if it's downloaded. On by itself in lite mode."))
         self.chk_light.toggled.connect(self.light_changed)
         hh.addWidget(self.chk_light)
         # your mic level is in the tab's status bar (ui/voice/voicestatus.py), over every card

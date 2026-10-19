@@ -4122,6 +4122,6 @@
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "För långsammare datorer: inga animationer, Bun står still och teman är enkla. Allt fungerar ändå.",
   "Lite mode": "Lätt läge",
   "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Onion Board kan gå lättare på den här datorn: Lätt läge stänger av animationerna. Det finns också under Inställningar > Utseende.",
-  "For slower PCs: the voice changer and live voice use about a third less CPU. Hiss removal is off and the robot voices and echoes are a little simpler. On by itself in lite mode.": "För långsammare datorer: röstförvrängaren och liverösten använder ungefär en tredjedel mindre CPU. Borttagning av väsande är av, och robotröster och ekon är lite enklare. Slås på av sig själv i lätt läge.",
-  "Use less CPU": "Använd mindre CPU"
+  "Use less CPU": "Använd mindre CPU",
+  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "För långsammare datorer: röstförvrängaren och liverösten använder mindre CPU. Borttagning av väsande är av, robotröster och ekon är lite enklare, och liverösten använder den mindre talmodellen om den är nedladdad. Slås på av sig själv i lätt läge."
 }

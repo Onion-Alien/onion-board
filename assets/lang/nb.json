@@ -4122,6 +4122,6 @@
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "For tregere PC-er: ingen animasjoner, Bun står stille og temaene er enkle. Alt virker fortsatt.",
   "Lite mode": "Lett modus",
   "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Onion Board kan kjøre lettere på denne PC-en: Lett modus slår av animasjonene. Den finnes også under Innstillinger > Utseende.",
-  "For slower PCs: the voice changer and live voice use about a third less CPU. Hiss removal is off and the robot voices and echoes are a little simpler. On by itself in lite mode.": "For tregere PC-er: stemmeendreren og direktestemmen bruker omtrent en tredjedel mindre CPU. Fjerning av sus er av, og robotstemmer og ekko er litt enklere. Slås på av seg selv i lett modus.",
-  "Use less CPU": "Bruk mindre CPU"
+  "Use less CPU": "Bruk mindre CPU",
+  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "For tregere PC-er: stemmeendreren og direktestemmen bruker mindre CPU. Fjerning av sus er av, robotstemmer og ekko er litt enklere, og direktestemmen bruker den mindre talemodellen hvis den er lastet ned. Slås på av seg selv i lett modus."
 }

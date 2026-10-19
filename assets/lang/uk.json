@@ -4201,6 +4201,6 @@
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Для повільніших ПК: без анімацій, Bun стоїть на місці, а теми прості. Усе працює як і раніше.",
   "Lite mode": "Полегшений режим",
   "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Onion Board може працювати легше на цьому ПК: полегшений режим вимикає анімації. Він є і в Налаштування > Зовнішній вигляд.",
-  "For slower PCs: the voice changer and live voice use about a third less CPU. Hiss removal is off and the robot voices and echoes are a little simpler. On by itself in lite mode.": "Для слабших ПК: зміна голосу та живий голос навантажують процесор приблизно на третину менше. Видалення шипіння вимкнене, а голоси роботів і луна трохи простіші. Вмикається саме в полегшеному режимі.",
-  "Use less CPU": "Менше навантажувати процесор"
+  "Use less CPU": "Менше навантажувати процесор",
+  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "Для слабших ПК: зміна голосу та живий голос менше навантажують процесор. Видалення шипіння вимкнене, голоси роботів і луна трохи простіші, а живий голос використовує меншу модель мовлення, якщо її завантажено. Вмикається саме в полегшеному режимі."
 }

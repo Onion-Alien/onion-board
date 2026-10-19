@@ -4043,6 +4043,6 @@
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Dành cho PC chậm hơn: không có hiệu ứng động, Bun đứng yên và giao diện đơn giản. Mọi thứ vẫn hoạt động.",
   "Lite mode": "Chế độ nhẹ",
   "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Onion Board có thể chạy nhẹ hơn trên PC này: Chế độ nhẹ tắt các hiệu ứng động. Nó cũng có trong Cài đặt > Vẻ bề ngoài.",
-  "For slower PCs: the voice changer and live voice use about a third less CPU. Hiss removal is off and the robot voices and echoes are a little simpler. On by itself in lite mode.": "Cho máy chậm hơn: bộ đổi giọng và giọng nói trực tiếp dùng ít CPU hơn khoảng một phần ba. Loại bỏ tiếng rít được tắt, giọng robot và tiếng vang đơn giản hơn một chút. Tự bật trong chế độ nhẹ.",
-  "Use less CPU": "Dùng ít CPU hơn"
+  "Use less CPU": "Dùng ít CPU hơn",
+  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "Cho máy chậm hơn: bộ đổi giọng và giọng nói trực tiếp dùng ít CPU hơn. Loại bỏ tiếng rít được tắt, giọng robot và tiếng vang đơn giản hơn một chút, và giọng nói trực tiếp dùng mô hình giọng nói nhỏ hơn nếu đã tải về. Tự bật trong chế độ nhẹ."
 }
