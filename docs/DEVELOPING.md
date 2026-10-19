@@ -305,6 +305,10 @@ Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
   `ONIONBOARD_DEBUG=1` for more detail. Module logs: `module-<id>.log` beside it.
 - Config: `%APPDATA%\OnionBoard\config.json`, with backups `config.json.1`–`.3`.
 - Decoded-audio cache: `%APPDATA%\OnionBoard\cache\` (safe to delete).
+- A source copy run from inside the temp folder (a throwaway git worktree) uses
+  `%APPDATA%\OnionBoard-dev` instead, so a branch under test can't touch the real
+  settings, sounds or cache. `ONIONBOARD_PROFILE_DIR` names the folder outright
+  (`soundboard/core/profile.py`).
 - Themed app icons: `%APPDATA%\OnionBoard\icons\` (the shortcuts point at one;
   deleting it leaves them blank until the next start writes it again).
 - Straight into my mic: the admin step logs to

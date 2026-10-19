@@ -17,6 +17,7 @@ import os
 import re
 from pathlib import Path
 
+from soundboard.core import profile
 from soundboard.win import winpath
 
 NAME = "starting.txt"
@@ -33,7 +34,7 @@ def app_dir() -> Path:
     """%APPDATA%\\OnionBoard, the same folder as `library.APP_DIR` (spelled out
     through a folder link Windows won't follow). Kept here, small: main.py writes the
     breadcrumb before the sound library is imported."""
-    return winpath.usable_dir(Path(os.environ.get("APPDATA", Path.home())) / "OnionBoard")
+    return winpath.usable_dir(profile.base())
 
 
 _previous: tuple[str, int] = ("", 0)

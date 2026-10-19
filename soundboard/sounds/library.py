@@ -37,6 +37,7 @@ import soxr
 from soundboard import __version__
 from soundboard.audio import mapped
 from soundboard.sounds import sourceinfo
+from soundboard.core import profile
 from soundboard.win import winpath
 from soundboard.audio.engine import SR
 from soundboard.audio.eq import BANDS as EQ_BANDS
@@ -46,7 +47,8 @@ from soundboard.i18n import _, ngettext
 log = logging.getLogger(__name__)
 
 # usable_dir: spelled out through any folder link Windows won't follow (soundboard.win.winpath)
-APP_DIR = winpath.usable_dir(Path(os.environ.get("APPDATA", Path.home())) / "OnionBoard")
+# %APPDATA%\OnionBoard, or OnionBoard-dev for a source copy in the temp folder (core/profile.py)
+APP_DIR = winpath.usable_dir(profile.base())
 # from when this app was called Soundboard; see migrate_from_soundboard() below
 OLD_APP_DIR = winpath.usable_dir(Path(os.environ.get("APPDATA", Path.home())) / "Soundboard")
 SOUNDS_DIR = winpath.usable_dir(APP_DIR / "sounds")
