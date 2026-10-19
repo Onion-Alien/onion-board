@@ -171,6 +171,9 @@ jobs:
           node-version: "24"
       - name: Store server tests
         run: node --test "server/store/test/*.test.mjs"
+      # the Stream Deck plugin (streamdeck/): same runner, Node 24 like Stream Deck's own
+      - name: Stream Deck plugin tests
+        run: node --test "streamdeck/test/*.test.mjs"
 
   # pyright over the whole repo: errors not in scripts/checks/pyright_baseline.json fail
   # (it's empty now, so any type error does). On Windows: Linux's PySide6 has no
