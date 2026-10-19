@@ -53,7 +53,7 @@ async function page(url, fetcher) {
 // the cycle. `tools` = index.js's helpers (sha256, linkKey, cleanName, now, logAction, refuse).
 export async function syncStep(env, tools, fetcher = fetch) {
   const { sha256, linkKey, cleanName, now, logAction, refuse } = tools;
-  const blocked = String(env.CHAT_BLOCK || "").split(",");
+  const blocked = String(env.BLOCKED_WORDS || "").split(",");
   const state = await env.DB.prepare("SELECT value FROM sync WHERE key = 'myinstants'").first();
   const [cursor, cycles] = (state?.value || "0:0").split(":").map(n => parseInt(n) || 0);
   const all = jobs();
