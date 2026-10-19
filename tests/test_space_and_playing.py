@@ -50,7 +50,8 @@ def player(window, monkeypatch):
 def key(w, k, text=""):
     """A key pressed in `w`'s window, the way Qt delivers it: to the window's own
     QWindow first (where Space is watched), which hands it to the focused widget."""
-    QApplication.sendEvent(w.window().windowHandle(), QKeyEvent(QEvent.KeyPress, k, Qt.NoModifier, text))
+    QApplication.sendEvent(w.window().windowHandle(),
+                           QKeyEvent(QEvent.KeyPress, k, Qt.NoModifier, text))
 
 
 def focus(w, reason):

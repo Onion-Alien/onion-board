@@ -11,9 +11,9 @@ from __future__ import annotations
 
 from pathlib import PurePath
 
-from PySide6.QtCore import QEvent, QObject, QRectF, Qt, QTimer
+from PySide6.QtCore import QEvent, QRectF, Qt, QTimer
 from PySide6.QtGui import QColor, QCursor, QDragEnterEvent, QFont, QFontMetrics, QPainter, QPen
-from PySide6.QtWidgets import QApplication, QWidget
+from PySide6.QtWidgets import QWidget
 
 from soundboard.ui.kit import theme
 from soundboard.i18n import _, ngettext

@@ -13,7 +13,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from string import Template
 
-from PySide6.QtCore import QObject, QPointF, QRectF, Qt
+from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import (QColor, QIcon, QImage, QLinearGradient, QPainter,
                            QPainterPath, QPen, QPixmap, QPolygonF, QRadialGradient,
                            QTransform)
