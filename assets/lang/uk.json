@@ -2102,7 +2102,7 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "Tor усе ще підключається ({percent}%). Без нього нічого не було надіслано: спробуйте ще раз за мить.",
   "Tor isn't connected, so there's no identity to change.": "Tor не підключено, тому не потрібно змінювати ідентифікатор.",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tor ще немає на цьому комп’ютері: натисніть Отримати Tor (Налаштування > З’єднання), щоб завантажити його.",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tor ще немає на цьому комп’ютері: натисніть Отримати Tor (Налаштування > З’єднання), щоб завантажити його. З джерела також працює scripts/fetch_tor.py.",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor ще немає на цьому комп’ютері: натисніть Отримати Tor (Налаштування > З’єднання), щоб завантажити його. З джерела також працює scripts/buildtools/fetch_tor.py.",
   "Tor isn't running.": "Tor не працює.",
   "Tor starts the next time the app goes online.": "Tor запускається наступного разу, коли програма підключається до мережі.",
   "Track": "Трек",

@@ -1,10 +1,10 @@
-"""scripts/vc_runtime.py: older copies of the C++ runtime are overwritten by the
+"""scripts/buildtools/vc_runtime.py: older copies of the C++ runtime are overwritten by the
 newest, on a fake tree with fake file versions (no pefile, no real DLLs)."""
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT / "scripts"))
+sys.path.insert(0, str(ROOT / "scripts" / "buildtools"))
 import vc_runtime as vr  # noqa: E402
 
 OLD, NEW = (14, 29, 30133, 0), (14, 44, 35211, 0)

@@ -4,7 +4,7 @@ process manager with a stand-in tor.exe (tests/faketor.py), the job object, fail
 closed before Tor is ready, YouTube's Tor blocks, and that nothing leaks around Tor.
 
 Set ONIONBOARD_TEST_TOR=1 to also run the live test (needs Tor, from Get Tor or
-scripts/fetch_tor.py's vendor/tor, and the internet): real Tor, check.torproject.org.
+scripts/buildtools/fetch_tor.py's vendor/tor, and the internet): real Tor, check.torproject.org.
 Getting Tor itself is tests/test_torget.py."""
 import json
 import os
@@ -74,7 +74,7 @@ def test_torrc_refuses_a_bridge_kind_it_has_no_lines_for(tmp_path):
 def test_the_shipped_pt_config_has_both_kinds_of_bridges():
     pt = tor.load_pt_config()
     if not pt:
-        pytest.skip("vendor/tor isn't here (scripts/fetch_tor.py)")
+        pytest.skip("vendor/tor isn't here (scripts/buildtools/fetch_tor.py)")
     for kind in ("snowflake", "obfs4"):
         assert tor.bridge_config(kind, pt)[0] == "UseBridges 1"
 

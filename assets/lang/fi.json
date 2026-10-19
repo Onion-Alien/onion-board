@@ -2056,7 +2056,7 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "Tor muodostaa edelleen yhteyttä ({percent}%). Mitään ei lähetetty ilman sitä: yritä hetken kuluttua uudelleen.",
   "Tor isn't connected, so there's no identity to change.": "Tor ei ole yhteydessä, joten identiteettiä ei voi muuttaa.",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tor ei ole vielä tällä tietokoneella: lataa se painamalla Get Tor (Asetukset > Yhteys).",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tor ei ole vielä tällä tietokoneella: lataa se painamalla Get Tor (Asetukset > Yhteys). Myös scripts/fetch_tor.py toimii lähteestä.",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor ei ole vielä tällä tietokoneella: lataa se painamalla Get Tor (Asetukset > Yhteys). Myös scripts/buildtools/fetch_tor.py toimii lähteestä.",
   "Tor isn't running.": "Tor ei ole käynnissä.",
   "Tor starts the next time the app goes online.": "Tor käynnistyy seuraavan kerran, kun sovellus tulee verkkoon.",
   "Track": "Seurata",

@@ -2010,7 +2010,7 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "Tor masih menyambung ({percent}%). Tiada apa-apa dihantar tanpanya: cuba sebentar lagi.",
   "Tor isn't connected, so there's no identity to change.": "Tor tidak disambungkan, jadi tiada identiti untuk diubah.",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tor belum ada pada PC ini lagi: tekan Dapatkan Tor (Tetapan > Sambungan) untuk memuat turunnya.",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tor belum ada pada PC ini lagi: tekan Dapatkan Tor (Tetapan > Sambungan) untuk memuat turunnya. Dari sumber, skrip/fetch_tor.py juga berfungsi.",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor belum ada pada PC ini lagi: tekan Dapatkan Tor (Tetapan > Sambungan) untuk memuat turunnya. Dari sumber, skrip/fetch_tor.py juga berfungsi.",
   "Tor isn't running.": "Tor tidak berjalan.",
   "Tor starts the next time the app goes online.": "Tor bermula pada kali seterusnya apl masuk dalam talian.",
   "Track": "Jejak",

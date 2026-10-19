@@ -496,7 +496,7 @@ closed, DNS through Tor, loopback stays direct), with Tor's SOCKS port on
 `127.0.0.1` as the proxy. Off by default. The app doesn't ship Tor: it's only
 on your PC once you press *Get Tor* or tick *Private connection (Tor)* in the
 installer (see *Get Tor* in the table above); a source checkout can also use
-`scripts/fetch_tor.py`. Uninstalling leaves it in `%APPDATA%\OnionBoard\tor\bin\`
+`scripts/buildtools/fetch_tor.py`. Uninstalling leaves it in `%APPDATA%\OnionBoard\tor\bin\`
 with your settings; delete that folder to remove it.
 
 | When | Where | Why |

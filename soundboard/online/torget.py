@@ -9,7 +9,7 @@ checked against the SHA-256 pinned below before anything is unpacked, and only t
 parts the app runs are kept, in %APPDATA%\\OnionBoard\\tor\\bin (about 28 MB):
 tor.exe, lyrebird.exe (obfs4 / Snowflake bridges), pt_config.json (the built-in
 bridge lines) and the licence texts. Skipped: the GeoIP databases (only needed to pick
-exit countries), conjure-client.exe and tor-gencert.exe. scripts/fetch_tor.py unpacks
+exit countries), conjure-client.exe and tor-gencert.exe. scripts/buildtools/fetch_tor.py unpacks
 the same files into vendor/tor for running from source.
 
 To move to a newer Tor release: take the new tarball's line from that release's

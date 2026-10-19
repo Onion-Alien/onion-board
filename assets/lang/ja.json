@@ -2010,7 +2010,7 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "Tor はまだ接続中です ({percent}%)。これがなければ何も送信されませんでした。しばらくしてからもう一度試してください。",
   "Tor isn't connected, so there's no identity to change.": "Tor は接続されていないため、変更する ID はありません。",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tor はまだこの PC にありません: Get Tor ([設定] > [接続]) を押してダウンロードします。",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tor はまだこの PC にありません: Get Tor ([設定] > [接続]) を押してダウンロードします。ソースからは、script/fetch_tor.py も機能します。",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor はまだこの PC にありません: Get Tor ([設定] > [接続]) を押してダウンロードします。ソースからは、script/fetch_tor.py も機能します。",
   "Tor isn't running.": "Tor が実行されていません。",
   "Tor starts the next time the app goes online.": "次回アプリがオンラインになったときに Tor が開始されます。",
   "Track": "追跡",

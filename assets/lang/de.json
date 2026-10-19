@@ -2056,7 +2056,7 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "Tor stellt immer noch eine Verbindung her ({percent}%). Ohne diese Angabe wurde nichts gesendet. Versuchen Sie es gleich noch einmal.",
   "Tor isn't connected, so there's no identity to change.": "Tor ist nicht verbunden, daher gibt es keine Identität, die geändert werden könnte.",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tor ist noch nicht auf diesem PC: Klicken Sie auf „Get Tor“ (Einstellungen > Verbindung), um es herunterzuladen.",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tor ist noch nicht auf diesem PC: Klicken Sie auf „Get Tor“ (Einstellungen > Verbindung), um es herunterzuladen. Von der Quelle aus funktioniert auch scripts/fetch_tor.py.",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor ist noch nicht auf diesem PC: Klicken Sie auf „Get Tor“ (Einstellungen > Verbindung), um es herunterzuladen. Von der Quelle aus funktioniert auch scripts/buildtools/fetch_tor.py.",
   "Tor isn't running.": "Tor läuft nicht.",
   "Tor starts the next time the app goes online.": "Tor startet, wenn die App das nächste Mal online geht.",
   "Track": "Schiene",

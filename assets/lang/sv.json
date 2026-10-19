@@ -2056,7 +2056,7 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "Tor ansluter fortfarande ({percent}%). Ingenting skickades utan det: försök igen om ett ögonblick.",
   "Tor isn't connected, so there's no identity to change.": "Tor är inte ansluten, så det finns ingen identitet att ändra.",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tor finns inte på den här datorn än: tryck på Hämta Tor (Inställningar > Anslutning) för att ladda ner den.",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tor finns inte på den här datorn än: tryck på Hämta Tor (Inställningar > Anslutning) för att ladda ner den. Från källan fungerar scripts/fetch_tor.py också.",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor finns inte på den här datorn än: tryck på Hämta Tor (Inställningar > Anslutning) för att ladda ner den. Från källan fungerar scripts/buildtools/fetch_tor.py också.",
   "Tor isn't running.": "Tor kör inte.",
   "Tor starts the next time the app goes online.": "Tor startar nästa gång appen går online.",
   "Track": "Spåra",

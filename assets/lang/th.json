@@ -2010,7 +2010,7 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "Tor ยังคงเชื่อมต่ออยู่ ({percent}%) ไม่มีการส่งสิ่งใดหากไม่มีสิ่งนี้ โปรดลองอีกครั้งในอีกสักครู่",
   "Tor isn't connected, so there's no identity to change.": "Tor ไม่ได้เชื่อมต่อ ดังนั้นจึงไม่มีข้อมูลประจำตัวให้เปลี่ยนแปลง",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tor ยังไม่ได้อยู่บนพีซีเครื่องนี้: กด Get Tor (การตั้งค่า > การเชื่อมต่อ) เพื่อดาวน์โหลด",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tor ยังไม่ได้อยู่บนพีซีเครื่องนี้: กด Get Tor (การตั้งค่า > การเชื่อมต่อ) เพื่อดาวน์โหลด จากแหล่งที่มา scripts/fetch_tor.py ก็ใช้งานได้เช่นกัน",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor ยังไม่ได้อยู่บนพีซีเครื่องนี้: กด Get Tor (การตั้งค่า > การเชื่อมต่อ) เพื่อดาวน์โหลด จากแหล่งที่มา scripts/buildtools/fetch_tor.py ก็ใช้งานได้เช่นกัน",
   "Tor isn't running.": "ทอร์ไม่ทำงาน",
   "Tor starts the next time the app goes online.": "Tor จะเริ่มทำงานในครั้งถัดไปที่แอปออนไลน์",
   "Track": "ติดตาม",

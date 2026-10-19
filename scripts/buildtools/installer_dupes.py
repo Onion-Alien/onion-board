@@ -16,7 +16,7 @@ Every file still lands where it was, byte for byte: only the installer's payload
 shrinks. Files are compared by contents (size, then SHA-256), never by name. build.ps1
 runs this right before Inno Setup, so the lists always match what's in dist\\.
 
-Usage: python scripts/installer_dupes.py dist\\OnionBoard build\\installer
+Usage: python scripts/buildtools/installer_dupes.py dist\\OnionBoard build\\installer
 """
 from __future__ import annotations
 
@@ -94,7 +94,7 @@ def write(root: Path, out: Path) -> tuple[int, int]:
     out.mkdir(parents=True, exist_ok=True)
     excludes = "".join(",\\" + str(copy) for copy, _ in pairs)   # each after a comma
     (out / "dupes.iss").write_text(
-        "; written by scripts/installer_dupes.py for installer/OnionBoard.iss\n"
+        "; written by scripts/buildtools/installer_dupes.py for installer/OnionBoard.iss\n"
         f'#define DupExcludes "{excludes}"\n' + "".join(entry(c, k) for c, k in pairs),
         encoding="utf-8")
     return len(pairs), sum((root / c).stat().st_size for c, _ in pairs)

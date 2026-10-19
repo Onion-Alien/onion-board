@@ -2240,7 +2240,7 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "لا يزال تور متصلاً ({percent}%). لم يتم إرسال أي شيء بدونه: حاول مرة أخرى بعد قليل.",
   "Tor isn't connected, so there's no identity to change.": "Tor غير متصل، لذلك ليس هناك هوية لتغييرها.",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tor ليس موجودًا على هذا الكمبيوتر بعد: اضغط على Get Tor (الإعدادات > الاتصال) لتنزيله.",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tor ليس موجودًا على هذا الكمبيوتر بعد: اضغط على Get Tor (الإعدادات > الاتصال) لتنزيله. من المصدر، تعمل scripts/fetch_tor.py أيضًا.",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor ليس موجودًا على هذا الكمبيوتر بعد: اضغط على Get Tor (الإعدادات > الاتصال) لتنزيله. من المصدر، تعمل scripts/buildtools/fetch_tor.py أيضًا.",
   "Tor isn't running.": "تور لا يعمل.",
   "Tor starts the next time the app goes online.": "يبدأ Tor في المرة التالية التي يتصل فيها التطبيق بالإنترنت.",
   "Track": "مسار",

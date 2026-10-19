@@ -1,4 +1,4 @@
-"""Bump scripts/fetch_qjs.py to the newest QuickJS-ng release (the JavaScript engine
+"""Bump scripts/buildtools/fetch_qjs.py to the newest QuickJS-ng release (the JavaScript engine
 yt-dlp uses for YouTube's player challenge), once the Windows file's bytes match the
 SHA-256 GitHub computed for the release asset and it runs a line of JavaScript.
 See common.py.
@@ -15,7 +15,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import common  # noqa: E402
 
-SRC = common.ROOT / "scripts" / "fetch_qjs.py"
+SRC = common.ROOT / "scripts" / "buildtools" / "fetch_qjs.py"
 REPO = "quickjs-ng/quickjs"
 ASSET = "qjs-windows-x86_64.exe"
 
@@ -61,7 +61,7 @@ def main() -> int:
     common.set_pins(SRC, {"VERSION": new, "SHA256": digest})
     common.open_pr(
         "qjs", new, [SRC], f"QuickJS: pin the Windows build to {new}",
-        f"Weekly pin bump: QuickJS-ng {current} -> {new} (`scripts/fetch_qjs.py`).\n\n"
+        f"Weekly pin bump: QuickJS-ng {current} -> {new} (`scripts/buildtools/fetch_qjs.py`).\n\n"
         f"- `{ASSET}` hashes to the SHA-256 GitHub computed for the release file: "
         f"`{digest}`, {len(data):,} bytes.\n"
         "- Smoke test: it ran a line of JavaScript on a Windows runner.\n"

@@ -1,4 +1,4 @@
-"""scripts/version_info.py: OnionBoard.exe's version resource names the app "Onion
+"""scripts/buildtools/version_info.py: OnionBoard.exe's version resource names the app "Onion
 Board" (Windows Firewall's prompt shows it) and carries soundboard's real version."""
 import ast
 import sys
@@ -9,7 +9,7 @@ import pytest
 import soundboard
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT / "scripts"))
+sys.path.insert(0, str(ROOT / "scripts" / "buildtools"))
 import version_info as vi  # noqa: E402
 
 
@@ -49,5 +49,5 @@ def test_version_numbers():
 
 def test_build_ps1_uses_it():
     build = (ROOT / "build.ps1").read_text(encoding="utf-8")
-    assert "scripts\\version_info.py" in build
+    assert "scripts\\buildtools\\version_info.py" in build
     assert "--version-file installer\\version_info.txt" in build

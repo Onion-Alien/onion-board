@@ -2056,7 +2056,7 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "Το Tor εξακολουθεί να συνδέεται ({percent}%). Δεν στάλθηκε τίποτα χωρίς αυτό: δοκιμάστε ξανά σε λίγο.",
   "Tor isn't connected, so there's no identity to change.": "Το Tor δεν είναι συνδεδεμένο, επομένως δεν υπάρχει ταυτότητα για αλλαγή.",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Το Tor δεν είναι ακόμα σε αυτόν τον υπολογιστή: πατήστε Get Tor (Ρυθμίσεις > Σύνδεση) για να το κατεβάσετε.",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Το Tor δεν είναι ακόμα σε αυτόν τον υπολογιστή: πατήστε Get Tor (Ρυθμίσεις > Σύνδεση) για να το κατεβάσετε. Από την πηγή, το scripts/fetch_tor.py λειτουργεί επίσης.",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Το Tor δεν είναι ακόμα σε αυτόν τον υπολογιστή: πατήστε Get Tor (Ρυθμίσεις > Σύνδεση) για να το κατεβάσετε. Από την πηγή, το scripts/buildtools/fetch_tor.py λειτουργεί επίσης.",
   "Tor isn't running.": "Το Tor δεν τρέχει.",
   "Tor starts the next time the app goes online.": "Το Tor ξεκινά την επόμενη φορά που η εφαρμογή θα συνδεθεί στο διαδίκτυο.",
   "Track": "Τροχιά",

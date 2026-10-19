@@ -26,7 +26,7 @@ winget install JRSoftware.InnoSetup    # for OnionBoardSetup.exe
 `testhost.exe` for the tests.
 
 YouTube's player challenge uses Deno, Node or Bun if one is installed; otherwise a
-source run uses the QuickJS the build ships once `.venv\Scripts\python scripts\fetch_qjs.py`
+source run uses the QuickJS the build ships once `.venv\Scripts\python scripts\buildtools\fetch_qjs.py`
 has put it in `build\qjs\` (pinned release, SHA-256-checked). Without either, yt-dlp
 goes without (fewer YouTube formats).
 
@@ -203,30 +203,30 @@ Rebuilds are incremental: PyInstaller reuses its analysis cache in `build\`.
 Tor isn't part of the build: the app downloads it when asked (`soundboard\online\torget.py`,
 which pins the version and SHA-256 and says how to move to a newer Tor; the
 installer's *Private connection (Tor)* box runs `OnionBoard.exe --get-tor`). To try
-Tor mode from source without pressing *Get Tor*, `scripts\fetch_tor.py` unpacks the
+Tor mode from source without pressing *Get Tor*, `scripts\buildtools\fetch_tor.py` unpacks the
 same files into the gitignored `vendor\tor`.
 
-Build steps, in order: `scripts\build_bootloader.ps1` (only when `.venv` has
+Build steps, in order: `scripts\buildtools\build_bootloader.ps1` (only when `.venv` has
 PyInstaller's stock bootloader: rebuilds PyInstaller with one compiled here by
 MinGW-w64's gcc, as virus scanners flag the stock one, which is in thousands of
 programs, some of them malware; that build is then `-Clean`. Without gcc this step
 warns and the build falls back to the stock bootloader, so a dev build still works —
 install gcc for a clean release build),
-`scripts\version_info.py` (the .exe's version resource),
+`scripts\buildtools\version_info.py` (the .exe's version resource),
 `scripts\directmic\build_directmic.py` (the mic effect; the build stops
-if g++ is missing), `scripts\fetch_qjs.py` (QuickJS for YouTube, bundled in
-`_internal\qjs\`), `scripts\build_michelper.py` (the mic helper `obmichelper.exe`,
+if g++ is missing), `scripts\buildtools\fetch_qjs.py` (QuickJS for YouTube, bundled in
+`_internal\qjs\`), `scripts\buildtools\build_michelper.py` (the mic helper `obmichelper.exe`,
 a `--console` build whose Python archive sits beside the .exe rather than appended to
 it — both to avoid antivirus false positives; it warns, but still builds, on the stock
 bootloader), PyInstaller (bundles `installer\install-vbcable.ps1` and
 `assets\onionboard.ico` as data, both at the root of `_internal\`, and `obmic.dll` in
 `_internal\directmic\`),
-`scripts\vc_runtime.py` (overwrites any older copy of the C++ runtime, `msvcp140.dll`
+`scripts\buildtools\vc_runtime.py` (overwrites any older copy of the C++ runtime, `msvcp140.dll`
 and the rest, with the newest, PySide6's own: an older one from the build PC stops the
 app at start with "The specified procedure could not be found"; it also deletes any
 ICU DLL another program on PATH slipped in, as Qt uses Windows' own; PyInstaller
 itself runs with only Windows' folders on PATH),
-`scripts\prune_build.py` (removes the parts of Qt the app never loads — QML, 3D,
+`scripts\buildtools\prune_build.py` (removes the parts of Qt the app never loads — QML, 3D,
 charts, the web engine, unused image formats, translations — by walking the DLL import tables, and
 sounddevice's PortAudio builds for other systems; the build fails if a kept file would lose
 an import), `OnionBoard.exe --selftest` (the
@@ -234,15 +234,15 @@ trimmed app loads Qt, Multimedia and the audio stack headless, no window
 or device), licence files,
 the add-ons in `modules\` copied into `dist\OnionBoard\modules\` (all but
 `ai-voices`, which has its own release), `scripts\pictures\make_bunny.py` (renders the installer artwork
-`installer\wizard*.bmp`, gitignored), `scripts\installer_dupes.py` (files with the
+`installer\wizard*.bmp`, gitignored), `scripts\buildtools\installer_dupes.py` (files with the
 same bytes as another, mostly the mic helper's own Python, go into the installer once;
 every copy still installs where it was), then `ISCC` with `/DAppVersion` taken from
 `soundboard/__init__.py`. Bump `__version__` there for a release.
 
 **When to build.** Not to try a change: `scripts\run.bat` runs from source. Build for a
 release, or to check something only the built app shows: `build.ps1`, `installer\`
-(including `install-vbcable.ps1`), PyInstaller hooks, `scripts\prune_build.py`,
-`scripts\vc_runtime.py`, `scripts\pictures\make_bunny.py` or bundled data (then
+(including `install-vbcable.ps1`), PyInstaller hooks, `scripts\buildtools\prune_build.py`,
+`scripts\buildtools\vc_runtime.py`, `scripts\pictures\make_bunny.py` or bundled data (then
 `build.ps1 -NoInstaller` and start it once). An existing `dist\` or install is out of
 date after any change under `soundboard\`, `main.py`, `native\`, `assets\`,
 `installer\` or `modules\` (the build copies the add-ons from there); docs, tests and
@@ -314,7 +314,7 @@ Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
   click with no prompt), so that file only appears once the helper has done something
   (helper: `%ProgramFiles%\Onion Board Mic Helper\`, task `\Onion Board\Mic helper`,
   `schtasks /query /tn "\Onion Board\Mic helper"`; from source it's built by
-  `scripts\build_michelper.py` after `build_directmic.py`); the ring shared with the effect is
+  `scripts\buildtools\build_michelper.py` after `build_directmic.py`); the ring shared with the effect is
   `%ProgramData%\OnionBoard\MicPlugin\ring2.bin`, and what the set-up changed is noted
   under `HKLM\SOFTWARE\OnionBoard\MicPlugin`. `directmic.status()` says where it
   stands on a mic (missing / other / wiped / outdated / ready).

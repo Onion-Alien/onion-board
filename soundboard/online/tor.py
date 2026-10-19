@@ -2,7 +2,7 @@
 
 tor.exe (the Tor Expert Bundle, which the app doesn't ship: soundboard.online.torget downloads
 it into %APPDATA%\\OnionBoard\\tor\\bin when the user presses Get Tor or ticks the
-installer's box; from source, scripts/fetch_tor.py's vendor/tor works too) runs only
+installer's box; from source, scripts/buildtools/fetch_tor.py's vendor/tor works too) runs only
 while the Connection setting is Tor and something has needed the network. It's a
 SOCKS proxy on 127.0.0.1 that soundboard.online.net hands every connection to
 (net.set_tor_gate); until Tor has finished connecting ("bootstrapping") a connection
@@ -72,7 +72,7 @@ def updating() -> str:
 
 def bundle_dirs() -> list[Path]:
     """Where tor.exe may be, in order: the downloaded copy, then (from source only)
-    vendor/tor from scripts/fetch_tor.py."""
+    vendor/tor from scripts/buildtools/fetch_tor.py."""
     dirs = [torget.bin_dir()]
     if not hasattr(sys, "_MEIPASS"):
         dirs.append(Path(__file__).resolve().parents[2] / "vendor" / "tor")
@@ -102,7 +102,7 @@ def not_installed() -> str:
         return _("Tor isn't on this PC yet: press Get Tor (Settings > Connection) to "
                  "download it.")
     return _("Tor isn't on this PC yet: press Get Tor (Settings > Connection) to "
-             "download it. From source, scripts/fetch_tor.py also works.")
+             "download it. From source, scripts/buildtools/fetch_tor.py also works.")
 
 
 def data_root() -> Path:

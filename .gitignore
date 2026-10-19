@@ -70,7 +70,7 @@ TODO*.md
 BUG-REPORT*.md
 *-AUDIT.md
 
-# Tor Expert Bundle, unpacked by scripts/fetch_tor.py (never committed)
+# Tor Expert Bundle, unpacked by scripts/buildtools/fetch_tor.py (never committed)
 vendor/
 
 # Redistributable CC0 voice backgrounds, with source and license credits.

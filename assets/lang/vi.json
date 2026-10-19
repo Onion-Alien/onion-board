@@ -2010,7 +2010,7 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "Tor vẫn đang kết nối ({percent}%). Không có gì được gửi mà không có nó: hãy thử lại sau giây lát.",
   "Tor isn't connected, so there's no identity to change.": "Tor không được kết nối nên không có danh tính nào để thay đổi.",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tor chưa có trên PC này: nhấn Get Tor (Cài đặt > Kết nối) để tải xuống.",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tor chưa có trên PC này: nhấn Get Tor (Cài đặt > Kết nối) để tải xuống. Từ nguồn, scripts/fetch_tor.py cũng hoạt động.",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor chưa có trên PC này: nhấn Get Tor (Cài đặt > Kết nối) để tải xuống. Từ nguồn, scripts/buildtools/fetch_tor.py cũng hoạt động.",
   "Tor isn't running.": "Tor không chạy.",
   "Tor starts the next time the app goes online.": "Tor bắt đầu vào lần tiếp theo ứng dụng trực tuyến.",
   "Track": "Theo dõi",

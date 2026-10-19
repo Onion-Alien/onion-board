@@ -25,7 +25,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "native" / "directmic"
 OUT = ROOT / "build" / "directmic"
 # the resource strings: the same names the app's own OnionBoard.exe carries
-# (scripts/version_info.py), so Windows shows one consistent publisher
+# (scripts/buildtools/version_info.py), so Windows shows one consistent publisher
 NAME = "Onion Board"
 PUBLISHER = "Onion Alien"
 COPYRIGHT = "Copyright (C) Onion Board contributors"

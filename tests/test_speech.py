@@ -779,7 +779,7 @@ def test_repo_ships_the_translation_addons_not_downloaded():
 
 
 def test_every_speak_language_has_a_name_in_every_app_language():
-    """langnames_data.py is current: rerun scripts/make_langnames.py when this fails."""
+    """langnames_data.py is current: rerun scripts/buildtools/make_langnames.py when this fails."""
     from soundboard import i18n
     from soundboard.core import langnames
     from soundboard.core.langnames_data import NAMES

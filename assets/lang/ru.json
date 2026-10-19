@@ -2017,7 +2017,7 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "Tor все еще подключается ({percent} %). Без него ничего не было отправлено. Повторите попытку через минуту.",
   "Tor isn't connected, so there's no identity to change.": "Tor не подключен, поэтому менять личность не нужно.",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tor еще нет на этом компьютере: нажмите «Получить Tor» («Настройки» > «Подключение»), чтобы загрузить его.",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tor еще нет на этом компьютере: нажмите «Получить Tor» («Настройки» > «Подключение»), чтобы загрузить его. Из исходного кода также работает scripts/fetch_tor.py.",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor еще нет на этом компьютере: нажмите «Получить Tor» («Настройки» > «Подключение»), чтобы загрузить его. Из исходного кода также работает scripts/buildtools/fetch_tor.py.",
   "Tor isn't running.": "Тор не запускается.",
   "Tor starts the next time the app goes online.": "Tor запустится, когда приложение выйдет в сеть в следующий раз.",
   "Track": "Отслеживать",

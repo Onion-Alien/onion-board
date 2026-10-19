@@ -14,7 +14,7 @@ It finds and removes, after asking once:
 
 VB-CABLE is left alone (it's VB-Audio's: Installed apps removes it, and other programs
 may use it). The machine-wide part needs admin: the program asks Windows once and runs
-itself again elevated with ADMIN_PART. Built by scripts/build_cleanup.py.
+itself again elevated with ADMIN_PART. Built by scripts/buildtools/build_cleanup.py.
 
 Usage: OnionBoardCleanup.exe [--yes] [--remove-sounds] [--dry-run]
 """

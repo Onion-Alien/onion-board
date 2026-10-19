@@ -2102,7 +2102,7 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "Tor încă se conectează ({percent}%). Nu s-a trimis nimic fără el: încercați din nou peste un moment.",
   "Tor isn't connected, so there's no identity to change.": "Tor nu este conectat, deci nu trebuie schimbată identitatea.",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tor nu este încă pe acest computer: apăsați pe Obține Tor (Setări > Conexiune) pentru a-l descărca.",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tor nu este încă pe acest computer: apăsați pe Obține Tor (Setări > Conexiune) pentru a-l descărca. Din sursă, funcționează și scripts/fetch_tor.py.",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor nu este încă pe acest computer: apăsați pe Obține Tor (Setări > Conexiune) pentru a-l descărca. Din sursă, funcționează și scripts/buildtools/fetch_tor.py.",
   "Tor isn't running.": "Tor nu rulează.",
   "Tor starts the next time the app goes online.": "Tor pornește data viitoare când aplicația este online.",
   "Track": "Urmări",

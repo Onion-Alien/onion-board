@@ -2010,7 +2010,7 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "Tor 仍在連接 ({percent}%)。沒有它就沒有發送任何內容：稍後再試。",
   "Tor isn't connected, so there's no identity to change.": "Tor 未連接，因此無需更改身分。",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tor 尚未在此電腦上：按 Get Tor（設定 > 連接）下載它。",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tor 尚未在此電腦上：按 Get Tor（設定 > 連接）下載它。從原始碼來看，scripts/fetch_tor.py 也可以工作。",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor 尚未在此電腦上：按 Get Tor（設定 > 連接）下載它。從原始碼來看，scripts/buildtools/fetch_tor.py 也可以工作。",
   "Tor isn't running.": "Tor 沒有運作。",
   "Tor starts the next time the app goes online.": "Tor 會在應用程式下次上線時啟動。",
   "Track": "追蹤",

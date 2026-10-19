@@ -5,7 +5,8 @@ none, so the app ships QuickJS-ng's Windows build (MIT, licenses/QuickJS-ng-MIT.
 The repo has no binaries: this downloads the pinned release file and refuses one
 whose SHA-256 doesn't match. A copy already there and matching isn't fetched again.
 
-    python scripts/fetch_qjs.py [folder]     (default: build/qjs; a source run uses it too)
+    python scripts/buildtools/fetch_qjs.py [folder]
+        (default: build/qjs; a source run uses it too)
 """
 
 from __future__ import annotations
@@ -16,7 +17,7 @@ import sys
 import urllib.request
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 VERSION = "v0.17.0"
 URL = ("https://github.com/quickjs-ng/quickjs/releases/download/"
        f"{VERSION}/qjs-windows-x86_64.exe")

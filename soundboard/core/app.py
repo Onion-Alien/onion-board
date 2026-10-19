@@ -212,7 +212,7 @@ def helpers_follow_app():
 def selftest() -> int:
     """`OnionBoard.exe --selftest`: prove a (pruned) build can load everything it
     ships, without a window, a device, a hotkey or a network request. build.ps1
-    runs it after trimming Qt (scripts/prune_build.py), so a missing DLL fails the
+    runs it after trimming Qt (scripts/buildtools/prune_build.py), so a missing DLL fails the
     build instead of a user's first launch. Prints OK and returns 0."""
     os.environ["QT_QPA_PLATFORM"] = "offscreen"
     # scipy.fft: the app itself doesn't use scipy, but Onion Watch's matcher does, and

@@ -3,7 +3,7 @@
 YouTube hides its streams behind a puzzle in its player script. yt-dlp solves it with a
 JavaScript engine (yt-dlp-ejs); without one it sees fewer formats and warns that this
 way is deprecated. Most PCs have no engine, so the app ships QuickJS
-(scripts/fetch_qjs.py, bundled by build.ps1). Deno, Node and Bun solve it several times
+(scripts/buildtools/fetch_qjs.py, bundled by build.ps1). Deno, Node and Bun solve it several times
 faster, so one installed at a version yt-dlp supports comes first: Deno, Node, Bun, then
 the app's QuickJS. The engine only runs on this PC: nothing it does goes online.
 
@@ -31,7 +31,7 @@ QJS_EXE = "qjs.exe"
 VERSION_TIMEOUT_S = 5
 _NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 # the frozen app's _internal folder (build.ps1 bundles qjs\ there); from source, where
-# scripts/fetch_qjs.py leaves it (a source run without it simply goes without QuickJS)
+# scripts/buildtools/fetch_qjs.py leaves it (a source run without it simply goes without QuickJS)
 QJS_DIR = (Path(sys._MEIPASS) / "qjs" if hasattr(sys, "_MEIPASS")   # pyright: ignore[reportAttributeAccessIssue]
            else Path(__file__).resolve().parents[2] / "build" / "qjs")
 

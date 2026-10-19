@@ -2102,7 +2102,7 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "Tor nadal się łączy ({percent}%). Bez tego nic nie zostało wysłane: spróbuj ponownie za chwilę.",
   "Tor isn't connected, so there's no identity to change.": "Tor nie jest podłączony, więc nie ma możliwości zmiany tożsamości.",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tora nie ma jeszcze na tym komputerze: naciśnij Pobierz Tor (Ustawienia > Połączenie), aby go pobrać.",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tora nie ma jeszcze na tym komputerze: naciśnij Pobierz Tor (Ustawienia > Połączenie), aby go pobrać. Ze źródła działa również scripts/fetch_tor.py.",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tora nie ma jeszcze na tym komputerze: naciśnij Pobierz Tor (Ustawienia > Połączenie), aby go pobrać. Ze źródła działa również scripts/buildtools/fetch_tor.py.",
   "Tor isn't running.": "Tor nie działa.",
   "Tor starts the next time the app goes online.": "Tor uruchomi się przy następnym przejściu aplikacji do trybu online.",
   "Track": "Ścieżka",

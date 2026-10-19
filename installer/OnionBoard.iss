@@ -143,7 +143,7 @@ Source: "..\dist\OnionBoard\_internal\*.dll"; DestDir: "{app}\_internal"; Flags:
 Source: "..\dist\OnionBoard\_internal\*.pyd"; DestDir: "{app}\_internal"; Flags: ignoreversion
 Source: "..\dist\OnionBoard\_internal\base_library.zip"; DestDir: "{app}\_internal"; Flags: ignoreversion
 ; Files with the same bytes as another (mostly the mic helper's own copy of Python) are
-; stored once: scripts\installer_dupes.py gives each copy an entry of its own naming the
+; stored once: scripts\buildtools\installer_dupes.py gives each copy an entry of its own naming the
 ; file kept, which MergeDuplicateFiles stores once, and lists it in DupExcludes for the
 ; entry below to skip. Every file still lands where it was. build.ps1 writes the list.
 #include "..\build\installer\dupes.iss"

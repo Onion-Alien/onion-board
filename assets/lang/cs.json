@@ -2102,7 +2102,7 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "Tor se stále připojuje ({percent}%). Bez toho nebylo nic odesláno: zkuste to znovu za chvíli.",
   "Tor isn't connected, so there's no identity to change.": "Tor není připojen, takže není možné změnit identitu.",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tor ještě není na tomto počítači: stáhněte si jej stisknutím Získat Tor (Nastavení > Připojení).",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tor ještě není na tomto počítači: stáhněte si jej stisknutím Získat Tor (Nastavení > Připojení). Ze zdroje funguje také scripts/fetch_tor.py.",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor ještě není na tomto počítači: stáhněte si jej stisknutím Získat Tor (Nastavení > Připojení). Ze zdroje funguje také scripts/buildtools/fetch_tor.py.",
   "Tor isn't running.": "Tor neběží.",
   "Tor starts the next time the app goes online.": "Tor se spustí při příštím připojení aplikace online.",
   "Track": "Dráha",

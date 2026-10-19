@@ -1,4 +1,4 @@
-"""scripts/installer_dupes.py: identical files go into the installer once, and every
+"""scripts/buildtools/installer_dupes.py: identical files go into the installer once, and every
 copy still installs where it was."""
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import sys
 from pathlib import Path, PureWindowsPath
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT / "scripts"))
+sys.path.insert(0, str(ROOT / "scripts" / "buildtools"))
 import installer_dupes as dupes  # noqa: E402
 
 

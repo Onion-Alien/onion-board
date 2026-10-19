@@ -19,7 +19,7 @@ none of which this app touches. This removes what the app never loads:
 - sounddevice's PortAudio builds for other systems (32-bit and ARM64 Windows, macOS):
   the x64 one (and its ASIO twin) stays
 
-Usage: python scripts/prune_build.py dist/OnionBoard [--dry-run]
+Usage: python scripts/buildtools/prune_build.py dist/OnionBoard [--dry-run]
 Exit 1 if a kept file imports a DLL that would be missing afterwards, so a change in
 Qt's layout fails the build instead of shipping an app that can't start.
 """

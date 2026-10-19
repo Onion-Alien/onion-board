@@ -2056,7 +2056,7 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "टोर अभी भी कनेक्ट हो रहा है ({percent}%)। इसके बिना कुछ भी नहीं भेजा गया: एक क्षण में पुनः प्रयास करें।",
   "Tor isn't connected, so there's no identity to change.": "टोर कनेक्ट नहीं है, इसलिए बदलने की कोई पहचान नहीं है।",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tor अभी इस पीसी पर नहीं है: इसे डाउनलोड करने के लिए Get Tor (सेटिंग्स > कनेक्शन) दबाएँ।",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tor अभी इस पीसी पर नहीं है: इसे डाउनलोड करने के लिए Get Tor (सेटिंग्स > कनेक्शन) दबाएँ। स्रोत से,scripts/fetch_tor.py भी काम करता है।",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor अभी इस पीसी पर नहीं है: इसे डाउनलोड करने के लिए Get Tor (सेटिंग्स > कनेक्शन) दबाएँ। स्रोत से,scripts/buildtools/fetch_tor.py भी काम करता है।",
   "Tor isn't running.": "टोर नहीं चल रहा है.",
   "Tor starts the next time the app goes online.": "अगली बार ऐप ऑनलाइन होने पर टोर प्रारंभ हो जाता है।",
   "Track": "रास्ता",

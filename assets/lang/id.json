@@ -2010,7 +2010,7 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "Tor masih terhubung ({percent}%). Tidak ada yang terkirim tanpanya: coba lagi sebentar lagi.",
   "Tor isn't connected, so there's no identity to change.": "Tor tidak terhubung, jadi tidak ada identitas yang perlu diubah.",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tor belum ada di PC ini: tekan Dapatkan Tor (Pengaturan > Koneksi) untuk mengunduhnya.",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tor belum ada di PC ini: tekan Dapatkan Tor (Pengaturan > Koneksi) untuk mengunduhnya. Dari sumber, scripts/fetch_tor.py juga berfungsi.",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor belum ada di PC ini: tekan Dapatkan Tor (Pengaturan > Koneksi) untuk mengunduhnya. Dari sumber, scripts/buildtools/fetch_tor.py juga berfungsi.",
   "Tor isn't running.": "Tor tidak berjalan.",
   "Tor starts the next time the app goes online.": "Tor dimulai saat aplikasi online lagi.",
   "Track": "Melacak",

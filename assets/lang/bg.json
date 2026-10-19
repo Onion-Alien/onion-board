@@ -1971,7 +1971,7 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "Tor все още се свързва ({percent} %). Нищо не е изпратено без него: опитайте отново след малко.",
   "Tor isn't connected, so there's no identity to change.": "Tor не е свързан, така че няма самоличност за промяна.",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tor все още не е на този компютър: натиснете Get Tor (Настройки > Връзка), за да го изтеглите.",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tor все още не е на този компютър: натиснете Get Tor (Настройки > Връзка), за да го изтеглите. От източника, scripts/fetch_tor.py също работи.",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor все още не е на този компютър: натиснете Get Tor (Настройки > Връзка), за да го изтеглите. От източника, scripts/buildtools/fetch_tor.py също работи.",
   "Tor isn't running.": "Tor не работи.",
   "Tor starts the next time the app goes online.": "Tor стартира следващия път, когато приложението стане онлайн.",
   "Track": "Писта",

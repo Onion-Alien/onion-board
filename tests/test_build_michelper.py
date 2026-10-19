@@ -1,10 +1,10 @@
-"""scripts/build_michelper.py: telling PyInstaller's stock bootloader from one compiled
+"""scripts/buildtools/build_michelper.py: telling PyInstaller's stock bootloader from one compiled
 here, on fake bootloader files (no PyInstaller build)."""
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT / "scripts"))
+sys.path.insert(0, str(ROOT / "scripts" / "buildtools"))
 import build_michelper as bm  # noqa: E402
 
 
@@ -38,7 +38,8 @@ def test_the_shipped_helper_is_listed_after_the_runtime_clean_up():
     shipped build never matches its manifest and the helper is never set up."""
     text = (ROOT / "build.ps1").read_text(encoding="utf-8")
     assert "write_manifest" in text
-    assert text.index("write_manifest") > text.index(r"scripts\vc_runtime.py dist\OnionBoard")
+    assert text.index("write_manifest") > text.index(
+        r"scripts\buildtools\vc_runtime.py dist\OnionBoard")
 
 
 def test_the_probe_lists_modules_that_need_what_the_helper_leaves_out(tmp_path):

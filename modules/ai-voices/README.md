@@ -63,7 +63,7 @@ Needs torch + torchaudio and a [beatrice-trainer] checkout (with its LFS weights
 ```
 set BEATRICE_TRAINER=path\to\beatrice-trainer
 python tools\export_model.py --out path\to\model          # stream.onnx, speaker.onnx, voices.npz
-python ..\..\scripts\make_ai_voices_zip.py --model path\to\model
+python ..\..\scripts\buildtools\make_ai_voices_zip.py --model path\to\model
 ```
 
 `export_model.py --checkpoint my.pt.gz` exports a model you trained yourself with

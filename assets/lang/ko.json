@@ -2010,7 +2010,7 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "Tor가 아직 연결 중입니다({percent}%). 이 정보 없이는 아무 것도 전송되지 않았습니다. 잠시 후 다시 시도해 주세요.",
   "Tor isn't connected, so there's no identity to change.": "Tor가 연결되어 있지 않으므로 변경할 ID가 없습니다.",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tor는 아직 이 PC에 없습니다. Tor 다운로드(설정 > 연결)를 눌러 다운로드하세요.",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tor는 아직 이 PC에 없습니다. Tor 다운로드(설정 > 연결)를 눌러 다운로드하세요. 소스에서는 scripts/fetch_tor.py도 작동합니다.",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor는 아직 이 PC에 없습니다. Tor 다운로드(설정 > 연결)를 눌러 다운로드하세요. 소스에서는 scripts/buildtools/fetch_tor.py도 작동합니다.",
   "Tor isn't running.": "토르가 실행되고 있지 않습니다.",
   "Tor starts the next time the app goes online.": "다음에 앱이 온라인 상태가 되면 Tor가 시작됩니다.",
   "Track": "길",

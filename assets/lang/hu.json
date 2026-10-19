@@ -2056,7 +2056,7 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "A Tor még mindig csatlakozik ({percent}%). Anélkül semmit sem küldtek el: próbálja újra egy pillanat múlva.",
   "Tor isn't connected, so there's no identity to change.": "A Tor nem csatlakozik, így nincs megváltoztatható személyazonosság.",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "A Tor még nincs ezen a számítógépen: a letöltéshez nyomja meg a Get Tor (Beállítások > Kapcsolat) gombot.",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "A Tor még nincs ezen a számítógépen: a letöltéshez nyomja meg a Get Tor (Beállítások > Kapcsolat) gombot. A forrásból a scripts/fetch_tor.py is működik.",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "A Tor még nincs ezen a számítógépen: a letöltéshez nyomja meg a Get Tor (Beállítások > Kapcsolat) gombot. A forrásból a scripts/buildtools/fetch_tor.py is működik.",
   "Tor isn't running.": "A Tor nem fut.",
   "Tor starts the next time the app goes online.": "A Tor akkor indul el, amikor az alkalmazás legközelebb online lesz.",
   "Track": "Pálya",
