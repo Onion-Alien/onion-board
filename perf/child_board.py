@@ -348,7 +348,8 @@ class UiSampler:
 
     EVERY_S = 0.002
 
-    STALL_S = 0.030   # a sample this long after the stall meter's last tick: in a stall
+    # a sample this long after the stall meter's last tick is in a stall
+    STALL_S = float(os.environ.get("PERF_STALL_MS", "30")) / 1000
 
     def __init__(self, meter: StallMeter | None = None):
         from collections import Counter
