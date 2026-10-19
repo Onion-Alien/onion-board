@@ -99,7 +99,7 @@ class VoiceStatusBar(QFrame):
         super().__init__()
         self.setObjectName("voicebar")
         # never what holds the window wide (below ~520 px it became the mini player):
-        # narrow, it goes to two rows and the chips wrap (_fit)
+        # narrow, it goes to two rows (the chips above) and they wrap (_fit)
         self.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
         box = self._box = QBoxLayout(QBoxLayout.Direction.LeftToRight, self)
         box.setContentsMargins(14, 10, 14, 10)
@@ -276,8 +276,10 @@ class VoiceStatusBar(QFrame):
                  - self.record_button.width() + 1) // 2
         need = max(160, meter + mic_labels) + GAP + line
         need = max(need, self._mic_min() + GAP + line)   # never squeeze the mic row
-        d = QBoxLayout.Direction.LeftToRight if room >= need else QBoxLayout.Direction.TopToBottom
-        # beside the meter the chips keep to one line; under it they wrap
+        # Stacked, the chips go above the switch row: the bar sits at the bottom of the
+        # tab, so the switch stays put when a click takes the chips' second row away.
+        d = QBoxLayout.Direction.LeftToRight if room >= need else QBoxLayout.Direction.BottomToTop
+        # beside the meter the chips keep to one line; above it they wrap
         self._right.setMinimumWidth(line if d == QBoxLayout.Direction.LeftToRight else 0)
         # Flow's hint remembers its last width. Without a cap it takes the spare
         # room on the next layout pass and squeezes the mic meter to its minimum.
