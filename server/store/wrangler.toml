@@ -27,14 +27,15 @@ namespace_id = "1001"
   limit = 90
   period = 60
 
-# Secrets (never in this file): `npx wrangler secret put ADMIN_TOKEN` and `... SALT`
+# uploads, links, shares, votes and reports: 30 a minute per address, checked before any
+# database read (index.js route()); /admin calls count as READS
+[[ratelimits]]
+name = "WRITES"
+namespace_id = "1002"
 
-# the Chat tab's room was a Durable Object; it's retired, and v2 deletes it (the v1
-# migration that made it has to stay listed for that)
-[[migrations]]
-tag = "v1"
-new_sqlite_classes = ["ChatRoom"]
+  [ratelimits.simple]
+  limit = 30
+  period = 60
 
-[[migrations]]
-tag = "v2"
-deleted_classes = ["ChatRoom"]
+# Secrets (never in this file): `npx wrangler secret put ADMIN_TOKEN`, `... SALT` and
+# `... BLOCKED_WORDS` (words refused in shared names, tags and descriptions, comma-separated)

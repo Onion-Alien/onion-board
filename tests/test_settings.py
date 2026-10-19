@@ -564,9 +564,9 @@ def test_card_headings_line_up_with_the_text_under_them(qapp, window):  # noqa: 
     d.show()
     process_events(qapp, lambda: False, timeout=0.2)
     page = d.tabs.currentWidget().widget()
-    # (shown ones: Twitch's Channel points and Alerts wait for a sign-in)
+    # (the ones shown only later, like Twitch's once it's connected, aren't drawn yet)
     heads = [lb for lb in page.findChildren(QLabel)
-             if lb.objectName() == "section" and lb.isVisibleTo(d)]
+             if lb.objectName() == "section" and lb.isVisibleTo(page)]
     assert heads
     for h in heads:
         h.setText("HELLO")                     # one shape: no letter's own bearing to compare

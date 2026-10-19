@@ -620,7 +620,7 @@ test("an upload with code inside is refused; names lose markup and hidden charac
 });
 
 test("a shared sound's or link's name and tags can't hold a link or a blocked word", async () => {
-  const env = store({ CHAT_BLOCK: "badword" });
+  const env = store({ BLOCKED_WORDS: "badword" });
   const up = (name, tags = "") => call(env, "/v1/sounds", { method: "POST",
     form: { file: mp3(), name, tags, agree: "own-cc0-v1" } });
   const link = (name, tags = "") => call(env, "/v1/links", { method: "POST",
@@ -851,8 +851,9 @@ test("lists page only so far down", async () => {
 
 test("list pages and files are rate limited per address (the READS binding)", async () => {
   const keys = [];
-  const env = store({ READS: { async limit({ key }) { keys.push(key); return { success: keys.length <= 2 }; } } });
-  const id = await live(env);
+  const env = store();
+  const id = await live(env);   // (its /admin calls count too: the limiter comes after)
+  env.READS = { async limit({ key }) { keys.push(key); return { success: keys.length <= 2 }; } };
   assert.equal((await call(env, "/v1/sounds")).status, 200);
   assert.equal((await call(env, `/v1/sounds/${id}/file`)).status, 200);
   const r = await call(env, "/v1/sounds");
@@ -863,8 +864,26 @@ test("list pages and files are rate limited per address (the READS binding)", as
   assert.match(keys[1], /^file:[0-9a-f]{64}$/);
 });
 
+test("changes and admin calls are rate limited per address before the database is read", async () => {
+  const keys = [];
+  const limiter = { async limit({ key }) { keys.push(key); return { success: false }; } };
+  const env = store({ READS: limiter, WRITES: limiter });
+  const id = await live(store());   // (a sound id; the env above never reaches the database)
+  const from = env.DB.seen.length;
+  for (const [path, opts] of [[`/v1/sounds/${id}/vote`, { json: { value: 1 } }],
+                              [`/v1/sounds/${id}/report`, { json: { reason: "other" } }],
+                              ["/v1/links", { json: { link: "https://youtu.be/abcdefghijk" } }],
+                              ["/v1/voices", { json: { kind: "fx" } }],
+                              ["/v1/admin/queue", { method: "GET", admin: "wrong" }]]) {
+    const r = await call(env, path, { method: "POST", ...opts });
+    assert.equal(r.status, 429, path);
+  }
+  assert.equal(env.DB.seen.length, from);   // nothing read
+  assert.deepEqual(keys.map(k => k.split(":")[0]), ["write", "write", "write", "write", "admin"]);
+});
+
 test("a synced sound whose name has a blocked word or a link is left out", async () => {
-  const env = store({ CHAT_BLOCK: "oof" });
+  const env = store({ BLOCKED_WORDS: "oof" });
   PAGES.games += button("spam", "free robux at scam.com");
   try {
     await step(env);
