@@ -78,8 +78,9 @@ class _PlaceholderFit(QObject):
 
     def eventFilter(self, obj, e):   # noqa: N802 - Qt
         try:
+            # Show too: a box resized while hidden (the mini player) kept its old hint
             if e.type() in (QEvent.Type.Resize, QEvent.Type.FontChange,
-                            QEvent.Type.StyleChange):
+                            QEvent.Type.StyleChange, QEvent.Type.Show):
                 _refit_placeholder(obj)
         except Exception:  # noqa: BLE001 - never raise from a Qt override (AGENT-RULES)
             pass

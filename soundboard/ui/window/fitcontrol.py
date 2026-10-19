@@ -56,12 +56,14 @@ class FitControl(Controller):
         # the Sounds toolbar's steps (bar_step): the search box beside them must never
         # grow as the window narrows, see size_search below
         bar_tight: set[int] = set()
+        self._bar_steps = []   # (search_button_changed)
 
         def bar_step(step: int, apply):
             def run(tight: bool):
                 (bar_tight.add if tight else bar_tight.discard)(step)
                 apply(tight)
                 size_search()
+            self._bar_steps.append((step, "w", run))
             return run
 
         def size_search():
@@ -74,8 +76,10 @@ class FitControl(Controller):
             then, and the spare room goes after the search button, as past SEARCH_MAX_W."""
             low = (0 if 66 in bar_tight else SEARCH_TIGHT_W if 62 in bar_tight
                    else SEARCH_MIN_W)
-            most = (SEARCH_MAX_W if not bar_tight else SEARCH_TIGHT_W
-                    if bar_tight & {63, 64, 65} else SEARCH_MIN_W)
+            # the search button's steps gave nothing up while it's away (Offline mode)
+            gave = bar_tight - ({17, 63} if not mw.ytresults.available() else set())
+            most = (SEARCH_MAX_W if not gave else SEARCH_TIGHT_W
+                    if gave & {63, 64, 65} else SEARCH_MIN_W)
             mw.search.setMinimumWidth(low)
             mw.search.setMaximumWidth(max(low, most))
             r.touch(mw.search)
@@ -124,6 +128,15 @@ class FitControl(Controller):
         self._stack_cols = (self._stack_setup,
                             *mw.voice.stack_steps())
         mw.setMinimumSize(responsive.MIN_SIZE)
+
+    def search_button_changed(self):
+        """The search button came or went (Offline mode): the toolbar's steps are tried
+        again, so the room it gave up brings back what fits (the card size), and the
+        search box is sized for what's beside it now."""
+        if not hasattr(self, "_fit"):
+            return   # (before _init_fit: the first fit sizes it all)
+        self._fit.retry(self._bar_steps)
+        self._refit()
 
     def live(self, dragging: bool):
         """The window's edge is being dragged (MainWindow.nativeEvent): each step fits
