@@ -23,8 +23,8 @@ log = logging.getLogger(__name__)
 
 FEATURE = "twitch"
 # Onion Board's app on dev.twitch.tv: a public client (no secret; the device code flow
-# is made for apps like this). Empty: *Connect Twitch* isn't offered.
-CLIENT_ID = ""
+# is made for apps like this). Public by design: every copy of the app carries it.
+CLIENT_ID = "hmy51yc60hgmas5swt19ov963s83h3"
 AUTH = "https://id.twitch.tv/oauth2"
 HELIX = "https://api.twitch.tv/helix"
 EVENTSUB_WS = "wss://eventsub.wss.twitch.tv/ws?keepalive_timeout_seconds=30"
