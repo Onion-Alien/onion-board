@@ -44,9 +44,9 @@ chest under his chin (`bunny._poof`: pointed tufts, no ink outline), two short s
 body (tucked under his head) to round paws, two long oval feet, sparkle eyes (a dark eye,
 a coloured iris glowing up from the bottom, one big shine and two little ones), little
 resting brows, a pink nose over a soft double smile, and his ears as his theme's look
-says (plain Bun: one up, its top half curving softly out and down, `bunny.DROOP`; the
-other flopped right over a little below the middle, its pink running on to the tip and
-round the bend; `bunny.REST_FOLD`, `REST_HINGE`). An ear is three colours at most: the
+says (plain Bun: both up, their top halves curving softly out and down, `bunny.DROOP`;
+a floppy ear, in the looks that have one, flops right over a little below the middle, its
+pink running on to the tip and round the bend; `bunny.REST_FOLD`, `REST_HINGE`). An ear is three colours at most: the
 ink outline, his fur and the inner colour, no shading. No fur lines inside him (no toe
 or finger lines, no leg creases). Lines are round-capped ink; shading is a couple of soft
 fades (`_shade`), never texture.
