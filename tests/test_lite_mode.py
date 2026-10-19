@@ -268,3 +268,35 @@ def test_use_less_cpu_follows_lite_mode_until_switched_by_hand(window):  # noqa:
         assert window.cfg.light_voice == "on" and voicefx.light()
     finally:
         voicefx.set_light(False)
+
+
+def test_the_mic_alone_keeps_the_tick_quiet_in_lite_mode(window, monkeypatch):  # noqa: F811
+    """Most mics hear the room above the meters' floor: that kept the window's tick at
+    full pace for as long as it was open. In lite mode the mic meters follow at the
+    quiet pace; a sound playing still gets the full pace."""
+    from soundboard.ui.window import mainwindow as main
+    from soundboard.ui.window import tickcontrol
+    e = window.engine
+    playing = {}
+    monkeypatch.setattr(e, "playing", lambda: dict(playing))
+    monkeypatch.setattr(main.appstate, "active", lambda: True)
+    monkeypatch.setattr(window, "isVisible", lambda: True)
+    monkeypatch.setattr(e, "mic_stream", object())
+    window._ui_live = True
+
+    def tick_with_room_noise():
+        e.level_play = 0.0
+        e.level_mic = e.level_main = 0.01   # -40 dB: a quiet room, nobody talking
+        window.tickctl.tick()
+        return window.timer.interval()
+
+    assert tick_with_room_noise() == tickcontrol.TICK_MS            # lite mode off
+    lite.set_on(True)
+    assert tick_with_room_noise() == tickcontrol.TICK_QUIET_MS      # 10 a second
+    assert window.mic_meter.level == pytest.approx(0.01)             # (still followed)
+    playing["s0"] = (0.5, False)                                     # a sound plays
+    assert tick_with_room_noise() == tickcontrol.TICK_MS
+    playing.clear()
+    e.level_play = 0.5                                               # ...its tail
+    window.tickctl.tick()
+    assert window.timer.interval() == tickcontrol.TICK_MS

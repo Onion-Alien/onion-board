@@ -233,6 +233,18 @@ def _package_error(info: ModuleInfo) -> str:
     return ""
 
 
+def dirs_stamp(dirs: list[Path] | None = None) -> tuple:
+    """When each add-on folder last changed (an add-on put in or taken out changes
+    it): what discover() found still holds while this is the same."""
+    out = []
+    for base in dirs if dirs is not None else search_dirs():
+        try:
+            out.append((str(base), base.stat().st_mtime_ns))
+        except OSError:
+            out.append((str(base), None))
+    return tuple(out)
+
+
 def discover(dirs: list[Path] | None = None) -> list[ModuleInfo]:
     """Every module found; the first folder wins when two have the same id."""
     found: dict[str, ModuleInfo] = {}
