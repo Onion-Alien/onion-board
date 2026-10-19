@@ -16,6 +16,10 @@ def offline(mw, on: bool):
 
 
 def test_main_window_hides_the_online_tabs_and_says_offline(window, monkeypatch):  # noqa: F811
+    # shown and roomy: the search box only takes the room the toolbar can spare (a
+    # never-shown window measures as too narrow, and test fonts run wide)
+    window.resize(1920, 1080)
+    window.show()
     for key in ("radio", "triggers", "apps"):
         window.tabctl.set_tab_on(key, True)
     bar = window.tabs

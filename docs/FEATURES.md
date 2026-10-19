@@ -206,7 +206,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   sound equally loud.
 - **7-band equalizer** on your voice, your sounds, or both, with presets.
 - **Test mode:** *Hear what they hear* plays your mic plus the sounds exactly as others
-  get them (a red banner shows while it's on).
+  get them (its button stays lit while it's on).
 - **Connect your chat** (Setup tab): *Make it sound clean in Discord* (Bun sets Discord
   up himself, see *Discord set-up* below), *Set up game voice chat*, *Zoom, Teams or a
   browser call*, *Game has no microphone setting?*, and the *Step-by-step guide* with Bun
@@ -232,10 +232,6 @@ The full list. The [README](../README.md) has the short version and how to get s
   away, after a warning that it isn't approved yet. FFmpeg and
   Tor copies the app downloaded follow the app: an app update that names a newer
   version fetches it (checked against its SHA-256) at the next start.
-- **"Did you know?" tips:** after the setup guide, a short tip about one feature at
-  most once a day, with a *Show me* button that opens the right place. Never while a
-  game is up (the overlay open or a fullscreen program in front), each one only once;
-  *Show tips* in Settings → General turns them off.
 - **Discord check:** while it runs, Onion Board reads Discord's own voice settings
   and shows a bar across the window when one would cut your sounds out (Noise
   Suppression, the Studio profile on your mic, Echo Cancellation, automatic input

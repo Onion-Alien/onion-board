@@ -23,7 +23,7 @@ import time
 
 from PySide6.QtCore import QEvent, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QFont, QGuiApplication, QIcon, QPainter, QPixmap
-from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QDialogButtonBox,
+from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QDialogButtonBox,
                                QFormLayout, QFrame, QGridLayout, QHBoxLayout, QLabel,
                                QLineEdit, QMessageBox, QPlainTextEdit, QPushButton,
                                QScrollArea, QSlider, QVBoxLayout, QWidget)
@@ -36,11 +36,12 @@ from soundboard.online import net
 from soundboard.speech import customvoices, spoken, translation, tts, winvoices
 from soundboard.speech.live import SpeechController, clean_settings
 from soundboard.ui.kit import busy, fit, icons
-from soundboard.ui.kit.panel import (Flow, ViewToggle, bar, fold_button, hint_label,
+from soundboard.ui.kit.panel import (ViewToggle, bar, fold_button, hint_label,
                                      icon_label, section_label)
 from soundboard.ui.kit.restyled import measured, on_restyle
 from soundboard.ui.voice.livevoice import MODELS, LiveVoice
 from soundboard.ui.voice.speechinstall import SpeechInstalls
+from soundboard.ui.voice.groupbar import GroupBar, no_match
 from soundboard.ui.voice.voicefxpanel import (LIST_MIN_W, MAX_COLS, TILE_ART, TILE_GAP,
                                               TILE_MIN_W, BigSwitch, VoiceTile)
 from soundboard.ui.kit.widgets import fit_placeholder
@@ -109,6 +110,7 @@ class SpeechPanel(QWidget):
         self.module = next((m for m in module_list if m.id == LIVE_MODULE and not m.error),
                            None)
         self.langs = translations(module_list)
+        self._ready: dict[int, bool] = {}   # see _is_ready
         self._last_said = ""   # Save as sound with the box empty keeps this line
         # a typed line plays like a sound, so the bottom bar's volumes set how loud it
         # is; its own volume on the Say bar was one more to find (the saved "gain"
@@ -159,31 +161,17 @@ class SpeechPanel(QWidget):
         cv = QVBoxLayout(self.cards)
         cv.setContentsMargins(0, 0, 0, 0)
         cv.setSpacing(12)
-        cats = QWidget()
-        cflow = Flow(cats, gap=6)
-        self._cat_group = QButtonGroup(self)
-        self._cat_btns: dict[str, QPushButton] = {}
-        for key, text in ((ALL, _("All")), (FAVS, _("Favorites")), (READY, _("Downloaded"))):
-            b = QPushButton(text)
-            b.setObjectName("voicecat")
-            b.setAccessibleName(text)
-            b.setCheckable(True)
-            b.setCursor(Qt.CursorShape.PointingHandCursor)
-            if key == FAVS:
-                icons.set_icon(b, "star_filled", "accent")
-            b.clicked.connect(lambda __=False, k=key: self.show_group(k))
-            self._cat_group.addButton(b)
-            self._cat_btns[key] = b
-            cflow.addWidget(b)
-        self._cat_btns[ALL].setChecked(True)
         self._listed = False
         self.view_toggle = ViewToggle("grid", _("Languages"))
         self.view_toggle.changed.connect(self.set_view)
-        chips = QHBoxLayout()
-        chips.setSpacing(12)
-        chips.addWidget(cats, 1)
-        chips.addWidget(self.view_toggle, 0, Qt.AlignmentFlag.AlignTop)
-        cv.addLayout(chips)
+        self.bar = GroupBar(
+            [(ALL, _("All"), "sounds"), (FAVS, _("Favorites"), "star_filled"),
+             (READY, _("Downloaded"), "download")],
+            self.view_toggle, self._group_count,
+            (_("Search languages"), _("Search")), _("Which languages show"))
+        self.bar.picked.connect(self.show_group)
+        self.bar.searched.connect(lambda _t: self._place_tiles())
+        cv.addWidget(self.bar)
         self._heads = {}
         for key, text in ((READY, _("Downloaded")), ("get", _("Not downloaded yet"))):
             lbl = QLabel(text)
@@ -202,6 +190,9 @@ class SpeechPanel(QWidget):
         self.no_ready = hint_label(_("None downloaded yet. Click a grey language to get it."))
         self.no_ready.hide()
         cv.addWidget(self.no_ready)
+        self.no_match = hint_label("")
+        self.no_match.hide()
+        cv.addWidget(self.no_match)
         v.addWidget(self.cards)
         self._lang_ready = False   # speech recognition is in and there are languages
         # Speak in belongs to every voice on the tab (VoicePanel._sync_translate).
@@ -733,6 +724,7 @@ class SpeechPanel(QWidget):
         return next((m for m in self.langs if m.language == code), None)
 
     def _fill_langs(self):
+        self._ready.clear()   # called after every download, removal and module rescan
         self.cb_lang.blockSignals(True)
         self.cb_lang.clear()
         self.cb_lang.addItem(_("Don't translate"), "")
@@ -809,6 +801,10 @@ class SpeechPanel(QWidget):
             rows = [("", [c for c in self._favs if c in self._tile])]
         else:
             rows = [("", ready)]
+        found = self.bar.text()
+        if found:
+            rows = [(k, [c for c in cs if self.bar.matches(self._tile[c].title, c)])
+                    for k, cs in rows]
         shown: set[str] = set()
         r = 0
         for head, group in rows:
@@ -826,8 +822,9 @@ class SpeechPanel(QWidget):
                 (READY if c in ready else "get") == k for c in shown))
         for code, b in self._tile.items():
             b.setVisible(code in shown)
-        self.no_favs.setVisible(self._group == FAVS and not shown)
-        self.no_ready.setVisible(self._group == READY and not shown)
+        self.no_favs.setVisible(self._group == FAVS and not shown and not found)
+        self.no_ready.setVisible(self._group == READY and not shown and not found)
+        no_match(self.no_match, found, shown)
         for c in range(MAX_COLS):
             g.setColumnStretch(c, 1 if c < cols else 0)
 
@@ -841,8 +838,14 @@ class SpeechPanel(QWidget):
     def show_group(self, key: str):
         """Show one chip's languages (ALL, FAVS or READY)."""
         self._group = key
-        self._cat_btns[key].setChecked(True)
+        self.bar.set_group(key)
         self._place_tiles()
+
+    def _group_count(self, key: str) -> int:
+        """How many languages a group holds (the dropdown's numbers)."""
+        if key == FAVS:
+            return sum(c in self._tile for c in self._favs)
+        return sum(1 for m in self.langs if key == ALL or m.installed)
 
     @property
     def favorites(self) -> list[str]:
@@ -1039,8 +1042,18 @@ class SpeechPanel(QWidget):
     def translating(self) -> mods.ModuleInfo | None:
         """The language picked under Speak in, switched on, downloaded and ready."""
         m = self._lang_on()
-        ok = self.module is not None and self.module.installed
-        return m if ok and m is not None and m.installed else None
+        ok = self.module is not None and self._is_ready(self.module)
+        return m if ok and m is not None and self._is_ready(m) else None
+
+    def _is_ready(self, m: mods.ModuleInfo) -> bool:
+        """m.installed, remembered until the next install, download or rescan. The
+        Voice tab asks on every click (Voices ON / OFF, its chips); while an add-on
+        installs, the disk is so busy that one check held the window for seconds,
+        and the sounds playing with it."""
+        key = id(m)   # the list it's from is kept until the next rescan, which clears this
+        if key not in self._ready:
+            self._ready[key] = m.installed
+        return self._ready[key]
 
     def _voice_for(self, m: mods.ModuleInfo) -> str:
         return self.ctl.tts.voice_for(m.language, self.s["voice"])

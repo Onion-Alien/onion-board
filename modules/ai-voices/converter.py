@@ -10,7 +10,9 @@ FFTs run here in numpy:
        ir amplitude/phase, aperiodicity, post filter, f0 per 10 ms frame ┘
                                     ─ Synth (pulse train + shaped noise + filter) ─ 24 kHz
 
-Frames are 10 ms: 160 samples in, 240 out. Converter.process() takes 20 ms.
+Frames are 10 ms: 160 samples in, 240 out. Converter.process() takes 20 ms, or 40 ms
+with the lighter model (LIGHT_MODEL, the same weights exported 4 frames a call: the
+model's cost is mostly per call, so it uses about a third less CPU, 20 ms later).
 Only numpy and onnxruntime: this runs in the add-on's own environment.
 """
 from __future__ import annotations
@@ -23,6 +25,7 @@ import numpy as np
 HOP_IN, HOP_OUT = 160, 240
 IN_RATE, OUT_RATE = 16000, 24000
 T = 2                        # frames per call (20 ms)
+LIGHT_MODEL, LIGHT_T = "stream4.onnx", 4   # the lighter model: 4 frames per call (40 ms)
 W_ATTN = 400                 # self-attention history in frames (the model's 4 s training clips)
 WIN, CORR_WIN, CUT = 560, 304, 64
 _COS_WIN = np.sin(np.pi * (np.arange(WIN) + 0.5) / WIN)
@@ -60,7 +63,7 @@ class PitchFeatures:
 class Synth:
     """The vocoder's signal part, streaming: a pulse train (one shaped impulse response
     per pitch period), plus noise shaped by the aperiodicity, both through the
-    per-frame post filter. feed() returns T*240 finished samples."""
+    per-frame post filter. feed() returns 240 finished samples per frame given."""
 
     def __init__(self, ir_window: np.ndarray, rng: np.random.Generator):
         self.rng = rng
@@ -174,9 +177,13 @@ class Converter:
          "pitch_hz": the voice's own pitch (auto pitch aims for it), "pitch": extra semitones}
     """
 
-    def __init__(self, model_dir: Path, voice: dict, threads: int = 1, seed: int | None = None):
+    def __init__(self, model_dir: Path, voice: dict, threads: int = 1, seed: int | None = None,
+                 light: bool = False):
+        """`light`: the 40 ms model, when it's there (an older download hasn't it)."""
         self.dir = Path(model_dir)
-        self.sess = _session(self.dir / "stream.onnx", threads)
+        self.t = LIGHT_T if light and (self.dir / LIGHT_MODEL).is_file() else T
+        self.sess = _session(self.dir / (LIGHT_MODEL if self.t == LIGHT_T else "stream.onnx"),
+                             threads)
         self.spk_sess = _session(self.dir / "speaker.onnx", 1)
         tab = np.load(self.dir / "voices.npz")
         self.tab = {k: tab[k] for k in tab.files}
@@ -230,7 +237,7 @@ class Converter:
         self.cache_idx = np.full(W_ATTN, -10 ** 9)
         self.ring_pos = 0
         self.p0 = 0
-        self.buf = np.zeros(560 + HOP_IN * T, np.float32)
+        self.buf = np.zeros(560 + HOP_IN * self.t, np.float32)
         self.pf = PitchFeatures()
         self.synth = Synth(self.tab["ir_window"], self.rng)
         self.tracker = PitchTracker()
@@ -238,18 +245,18 @@ class Converter:
         self._guessed = False
 
     def process(self, x16: np.ndarray) -> np.ndarray:
-        """320 new samples (16 kHz, float) -> 480 samples (24 kHz)."""
+        """160 * self.t new samples (16 kHz, float) -> 240 * self.t samples (24 kHz)."""
         x16 = np.asarray(x16, np.float32)
-        if len(x16) != HOP_IN * T:
-            raise ValueError(f"process() takes {HOP_IN * T} samples")
-        self.buf = np.concatenate([self.buf[HOP_IN * T:], x16])
+        if len(x16) != HOP_IN * self.t:
+            raise ValueError(f"process() takes {HOP_IN * self.t} samples")
+        self.buf = np.concatenate([self.buf[HOP_IN * self.t:], x16])
         n = len(self.buf)
-        # buf[-1] ends the newest phone frame's window: frames p0..p0+T-1 need samples
-        # [160 p0 - 40, 160 (p0+T-1) + 200); pitch frames p0-1+j need [160k-200, 160k+360)
-        wav = self.buf[n - (240 + HOP_IN * (T - 1)):]
-        fr = np.stack([self.buf[n + HOP_IN * (j - T) - 400:n + HOP_IN * (j - T) + 160]
-                       for j in range(T)])
-        t = np.arange(self.p0, self.p0 + T)
+        # buf[-1] ends the newest phone frame's window: frames p0..p0+T-1 (T = self.t) need
+        # samples [160 p0 - 40, 160 (p0+T-1) + 200); pitch frames p0-1+j need [160k-200, 160k+360)
+        wav = self.buf[n - (240 + HOP_IN * (self.t - 1)):]
+        fr = np.stack([self.buf[n + HOP_IN * (j - self.t) - 400:n + HOP_IN * (j - self.t) + 160]
+                       for j in range(self.t)])
+        t = np.arange(self.p0, self.p0 + self.t)
         keys = np.concatenate([self.cache_idx, t])
         ok = (keys[None] >= 0) & (keys[None] % 4 == t[:, None] % 4) & (keys[None] <= t[:, None])
         feed = {"wav": wav[None, None], "pfeat": self.pf(fr),
@@ -261,12 +268,12 @@ class Converter:
         for name in self.state_names:
             val = out["n" + name]
             if name in ("s_attn_k", "s_attn_v"):        # only the new frames: into the ring
-                self.states[name][:, self.ring_pos:self.ring_pos + T] = val
+                self.states[name][:, self.ring_pos:self.ring_pos + self.t] = val
             else:
                 self.states[name] = val
-        self.cache_idx[self.ring_pos:self.ring_pos + T] = t
-        self.ring_pos = (self.ring_pos + T) % W_ATTN
-        self.p0 += T
+        self.cache_idx[self.ring_pos:self.ring_pos + self.t] = t
+        self.ring_pos = (self.ring_pos + self.t) % W_ATTN
+        self.p0 += self.t
         # your own pitch: the output's f0 less the shift in use
         voiced = out["uv"] < 0.5
         if voiced.any():
@@ -276,20 +283,20 @@ class Converter:
                 self.settle_pitch(force=True)
         if not self.started:          # the first call's vocoder frames come before the start
             self.started = True
-            return np.zeros(HOP_OUT * T, np.float32)
+            return np.zeros(HOP_OUT * self.t, np.float32)
         return self.synth.feed(out["ir_amp"], out["ir_phase"], out["aper"], out["post"], out["hz"])
 
 
-def self_test(model_dir: Path, voice: dict, seconds: float = 2.0) -> float:
+def self_test(model_dir: Path, voice: dict, seconds: float = 2.0, light: bool = False) -> float:
     """Real-time factor on this PC (compute time / audio time, median chunk) for a
-    synthetic voice."""
+    synthetic voice (`light`: with the model Converter(light=True) would use)."""
     import time
-    c = Converter(model_dir, voice, seed=0)
+    c = Converter(model_dir, voice, seed=0, light=light)
     c.user_hz = 120.0
     t = np.arange(int(IN_RATE * seconds)) / IN_RATE
     f0 = 120 + 20 * np.sin(2 * np.pi * 0.5 * t)
     x = (0.2 * np.sign(np.sin(2 * np.pi * np.cumsum(f0) / IN_RATE))).astype(np.float32)
-    step = HOP_IN * T
+    step = HOP_IN * c.t
     for i in range(0, step * 10, step):        # warm up (first calls allocate)
         c.process(x[i:i + step])
     times = []

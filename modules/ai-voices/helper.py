@@ -9,6 +9,11 @@ voice:
 
 While you're quiet nothing arrives and this sleeps in recv(): no CPU at all.
 
+With ONIONBOARD_LESS_CPU=1 (the app's Use less CPU) it converts 40 ms a call with the
+lighter model (model/stream4.onnx, the same voices), about a third less CPU for 20 ms
+more delay; "ready" says the chunk length (chunk_s) so the app sizes its buffer. An
+older app never sets it; a download without stream4.onnx carries on at 20 ms.
+
     helper.py --download     fetch the model (install step), check its SHA-256
     helper.py --self-test    how fast this PC runs it (real-time factor)
 
@@ -21,6 +26,7 @@ import argparse
 import hashlib
 import json
 import logging
+import os
 import socket
 import sys
 import tempfile
@@ -35,9 +41,10 @@ import protocol
 
 log = logging.getLogger("ai-voices")
 HERE = Path(__file__).resolve().parent
-VERSION = "0.1.0"
+VERSION = "0.2.0"
 OUT_RATE = 24000
-CHUNK = 320                       # 20 ms at 16 kHz
+CHUNK = 320                       # 20 ms at 16 kHz (40 ms with the lighter model)
+LIGHT = os.environ.get("ONIONBOARD_LESS_CPU") == "1"   # the app's Use less CPU
 TOO_SLOW = 0.5                    # real-time factor above which gaming will suffer
 MODEL_FILES = ("stream.onnx", "speaker.onnx", "voices.npz")
 
@@ -105,9 +112,10 @@ def download(on_line=print) -> int:
 class FakeConverter:
     """For tests: no model, no onnxruntime. Your voice, resampled to 24 kHz."""
 
-    def __init__(self, *_a, **_k):
+    def __init__(self, *_a, light: bool = False, **_k):
         self.shift_st = 0.0
         self.auto_pitch = True
+        self.t = 4 if light else 2            # 10 ms frames per call, like Converter
 
     def set_voice(self, voice):
         self.extra = float(voice.get("pitch", 0.0))
@@ -116,7 +124,8 @@ class FakeConverter:
         pass
 
     def process(self, x):
-        t = np.arange(480) * (len(x) / 480)
+        n = len(x) * 3 // 2
+        t = np.arange(n) * (len(x) / n)
         return np.interp(t, np.arange(len(x)), x).astype(np.float32)
 
 
@@ -175,7 +184,7 @@ def main(argv=None) -> int:
         return download(lambda s: print(s, flush=True))
     if args.self_test:
         from converter import self_test
-        rtf = self_test(model_dir(), pick(voices, args.voice))
+        rtf = self_test(model_dir(), pick(voices, args.voice), light=LIGHT)
         print(f"real-time factor {rtf:.3f}")
         return 0
     if args.port is None or not args.token:
@@ -201,7 +210,7 @@ def main(argv=None) -> int:
     voice["pitch"] = float(voice.get("pitch", 0.0)) + args.pitch
     rtf = 0.0
     if args.fake:
-        conv = FakeConverter()
+        conv = FakeConverter(light=LIGHT)
         conv.set_voice(voice)
     else:
         if not model_ready():
@@ -209,8 +218,8 @@ def main(argv=None) -> int:
         link.send(type="status", text="loading the voice…")
         try:
             from converter import Converter, self_test
-            rtf = self_test(model_dir(), voice, seconds=1.0)
-            conv = Converter(model_dir(), voice)
+            rtf = self_test(model_dir(), voice, seconds=1.0, light=LIGHT)
+            conv = Converter(model_dir(), voice, light=LIGHT)
         except Exception as e:  # noqa: BLE001
             log.exception("model load failed")
             if _out_of_memory(e):
@@ -221,8 +230,11 @@ def main(argv=None) -> int:
             return fail(f"couldn't load the voice model ({e}); press Update under More options")
         log.info("self-test: real-time factor %.3f", rtf)
     conv.auto_pitch = not args.no_auto_pitch
+    chunk = CHUNK * conv.t // 2
+    if conv.t != 2:
+        log.info("lighter model: %d ms a call", chunk // 16)
     link.send(type="ready", rate=OUT_RATE, rtf=round(rtf, 3), slow=rtf > TOO_SLOW,
-              voice=voice.get("id", ""))
+              voice=voice.get("id", ""), chunk_s=chunk / 16000)
 
     buf = np.zeros(0, np.float32)
     busy = 0.0                     # seconds spent converting since the last stats
@@ -259,17 +271,18 @@ def main(argv=None) -> int:
         if kind != protocol.AUDIO:
             continue
         buf = np.concatenate([buf, np.frombuffer(payload, "<i2").astype(np.float32) / 32768.0])
-        while len(buf) >= CHUNK:
+        while len(buf) >= chunk:
             t0 = time.perf_counter()
-            y = conv.process(buf[:CHUNK])
+            y = conv.process(buf[:chunk])
             busy += time.perf_counter() - t0
             done += 1
-            buf = buf[CHUNK:]
+            buf = buf[chunk:]
             link.audio(y)
         now = time.monotonic()
         if now - wall0 >= 2.0:
             cpu = time.process_time()
-            link.send(type="stats", rtf=round(busy / max(done * 0.02, 1e-9), 3) if done else 0.0,
+            rtf = round(busy / max(done * chunk / 16000, 1e-9), 3) if done else 0.0
+            link.send(type="stats", rtf=rtf,
                       cpu=round((cpu - cpu0) / (now - wall0) * 100, 1),
                       shift=round(float(getattr(conv, "shift_st", 0.0)), 1))
             busy, done, cpu0, wall0 = 0.0, 0, cpu, now

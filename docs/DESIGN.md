@@ -165,7 +165,23 @@ fixed gap (`HEADER_GAP`) to what's below; the parts under it share one gap
 | A card's few extra actions | quiet buttons in the card's own button row | a ⋯ menu that hides two or three options |
 | Many actions on an item in a list | right-click `QMenu`, plus a ⋯ icon button (`widgets.DropdownMenu`) with the same actions | actions only on right-click |
 | Ask a short question or a choice | a small `QDialog` (the dialog recipe below) | a chain of message boxes |
+| Something about the whole app that needs a click (an urgent fix, "Set up for it?", a missing helper, the language offer, the survey) | a **top bar**: `TopBar` (`ui/kit/topbar.py`), see *Top bars* below | a hand-built `QFrame` bar, a banner without ✕, two bars at once |
 | A long editor or tuning panel | a retained **modeless** `QDialog`: create once, `show()` + `raise_()`, changes apply live, `[Done]` closes | a modal that blocks sounds and hotkeys |
+
+### Top bars
+
+Every bar across the top of the window is a `TopBar`, so they all look the same:
+
+- The panel's surface, 8 px corners, a 4 px stripe on the left in the bar's **tone**:
+  `info` (the accent), `warn` (amber: something stops sounds working), `ok` (green: done).
+  The icon on the left is drawn in the same colour.
+- The words: `set_message(text)` makes the first sentence a **bold heading** and the rest
+  quieter text after a gap, wrapping onto more lines when the window is narrow. However
+  many lines, the icon, the buttons and the ✕ stay centred on the bar. Put anything else
+  (a progress bar, a text box) under the words with `add_row`.
+- Buttons from `add_button`, all 28 px tall: at most one primary, last before the ✕.
+  Every bar has a ✕ (`bar.close_btn`); it hides the bar.
+- One bar at a time (`MainWindow.TOP_BARS`), and none while a game is in front.
 
 **Modal or not:** modeless (`show()`) is the default, so sounds keep playing and
 hotkeys keep working. Modal (`open()` + the `finished` signal) only when the app can't
@@ -680,6 +696,7 @@ The rules above are Onion Board's take on what the big design systems agree on n
 | Painted icons | `soundboard/ui/kit/icons.py` |
 | Busy states, opening links, toasts | `soundboard/ui/kit/busy.py` |
 | Dialogs that grow to fit their text | `soundboard/ui/kit/fit.py` |
+| The bars across the top of the window (`TopBar`) | `soundboard/ui/kit/topbar.py` |
 | Wrapping button rows (`Flow`), undo bar, steady numbers | `soundboard/ui/kit/panel.py`, `settings._button_row` |
 | Settings cards | `settings.SettingsDialog._card` |
 | Left tab rail | `soundboard/ui/window/sidebar.py` |

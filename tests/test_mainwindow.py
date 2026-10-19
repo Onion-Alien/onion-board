@@ -142,15 +142,13 @@ def test_reorder_moves_without_recreating(window):
     assert [p.meta.id for p in window.grid.pads] == ["s1", "s0"]
 
 
-def test_mic_check_pulse_runs_only_while_on(window):
+def test_mic_check_puts_no_bar_over_the_tabs(window):
+    """Its sign is the mixer's own lit button and red mic label, never a bar on top."""
     window.on_mic_check(True)
-    assert window._pulse.on
-    assert window.mic_banner.isVisibleTo(window)
-    window.mic_banner.click()             # only a sign: the mixer's button is the switch
     assert window.engine.mic_check
+    assert all(getattr(window, n).isHidden() for n in window.TOP_BARS)
     window.on_mic_check(False)
-    assert not window._pulse.on and not window._pulse.running()
-    assert window._banner_fx.opacity() == 1.0
+    assert not window.engine.mic_check
 
 
 def test_tick_runs_without_devices(window):
@@ -1088,23 +1086,27 @@ def test_new_pads_never_flash_up_as_windows_of_their_own(qapp):
         qapp.removeEventFilter(watch)
 
 
-def test_the_mic_banner_and_a_row_of_playing_sounds_dont_force_the_mini_player(window):
-    """Both used to be as wide as all their text: the banner ~780 px, four
+def test_a_top_bar_and_a_row_of_playing_sounds_dont_force_the_mini_player(window):
+    """Both used to be as wide as all their text: a banner ~780 px, four
     overlapping sounds' chips ~900 px, so a window a bit narrower became the mini
-    player in the middle of a session. The chips wrap onto more lines."""
+    player in the middle of a session. The bar's words and the chips wrap onto more
+    lines."""
     window.show()
     window.tabs.setCurrentWidget(window.sounds_page)
     window.resize(800, 600)
     window.fitctl._refit()
     assert not window.fitctl.is_mini()
-    window.mic_banner.show()
+    window.urgent_bar.set_message("Discord's noise suppression (Krisp) is wiping out your "
+                                  "sounds. Set Noise Suppression to None. " * 3)
+    window.urgent_btn.setText("Fix Discord")
+    window.urgent_bar.show()
     ids = list(window.pads)
     window.playctl._queue[:] = ids * 3
     window.playctl._update_chips(set(ids))
     window.fitctl._refit()
     assert window.playing_row.isVisibleTo(window)
     assert not window.fitctl.is_mini()
-    assert window.mic_banner.width() <= 800 and window.mic_banner.text()
+    assert window.urgent_bar.width() <= 800 and window.urgent_bar.text()
     # every playing sound keeps its chip (to stop it): the row wraps instead
     assert set(window._chips) == set(ids)
     row = window.playing_row.rect()
@@ -1136,9 +1138,9 @@ def test_windows_language_is_offered_in_that_language(window, monkeypatch):
     monkeypatch.setattr(window, "restart_app", lambda: restarts.append(1))
     window.langctl._offer_language()
     assert window.lang_bar.isVisibleTo(window)
-    assert window.lang_lbl.text() == ("Onion Board gibt es auch auf Deutsch. Du kannst die "
-                                      "Sprache jederzeit unter Einstellungen → Aussehen → "
-                                      "Sprache ändern.")
+    assert window.lang_bar.text() == ("Onion Board gibt es auch auf Deutsch. Du kannst die "
+                                       "Sprache jederzeit unter Einstellungen → Aussehen → "
+                                       "Sprache ändern.")
     assert window.lang_btn.text() == "Zu Deutsch wechseln"
     window.lang_btn.click()
     assert window.cfg.language == "de" and restarts == [1]
@@ -1423,6 +1425,29 @@ def test_a_long_name_stays_on_one_line(window, qapp):
     assert flags & Qt.AlignmentFlag.AlignTop
     pad.meta.name = "Boom"
     assert pad._fit_name(QRectF(0, 0, 120, 60))[2] == "Boom" and not pad.name_cut
+
+
+def test_the_search_box_never_grows_as_the_window_narrows(window, qapp):
+    """Narrowing the window drops the card size and the toolbar buttons' words one by
+    one; the room they gave up went to the search box, so at some widths a narrower
+    window had a wider box (and it shrank again a few pixels later). Swept both ways
+    in 5 px steps, the box only ever gets wider with the window."""
+    from soundboard.ui.window.fitcontrol import SEARCH_MIN_W
+    window.show()
+    window.tabs.setCurrentIndex(0)
+    seen = []
+    for wd in [*range(1500, 659, -5), *range(660, 1501, 5)]:
+        window.resize(wd, 860)
+        qapp.processEvents()
+        window.fitctl._refit()
+        seen.append((window.width(), window.search.width()))
+    for (w1, s1), (w2, s2) in zip(seen, seen[1:]):
+        if w2 < w1:
+            assert s2 <= s1, f"{w1} -> {w2} px: the search box grew {s1} -> {s2}"
+        elif w2 > w1:
+            assert s2 >= s1, f"{w1} -> {w2} px: the search box shrank {s1} -> {s2}"
+    # both ends were reached: room to spare, and the box below its usual least
+    assert max(s for _w, s in seen) > SEARCH_MIN_W > min(s for _w, s in seen)
 
 
 def test_full_screen_caps_only_the_search_box(window, qapp):

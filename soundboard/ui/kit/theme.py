@@ -207,7 +207,10 @@ QFrame#soundstoolbar QPushButton:hover { background:$btn_hover; }
 QFrame#soundstoolbar QPushButton:pressed { background:$btn_press; }
 QFrame#soundstoolbar QPushButton:focus { border-color:$accent; }
 QFrame#soundstoolbar QPushButton#soundadd { color:$accent_link; font-weight:600; }
-QFrame#soundstoolbar QPushButton[toolbarMenu="true"] { padding-right:22px; }
+/* Qt centres a menu button's icon + words in the room left of the arrow, which left
+   18px blank before the icon (Search online looked far from the search box) and 6px
+   after the arrow; no left padding brings that to 12px */
+QFrame#soundstoolbar QPushButton[toolbarMenu="true"] { padding-left:0; padding-right:20px; }
 QFrame#viewtoggle { background:$field; border:1px solid $border; border-radius:10px; }
 QFrame#viewtoggle QPushButton#viewbtn, QFrame#soundstoolbar QFrame#viewtoggle QPushButton#viewbtn {
     background:transparent; border:1px solid transparent; border-radius:7px; padding:0;
@@ -366,24 +369,26 @@ QSpinBox#stepper::down-arrow:disabled, QSpinBox#stepper::down-arrow:off { image:
 QSlider::groove:vertical { width:4px; background:$groove; border-radius:2px; }
 QSlider::add-page:vertical { background:$muted; border-radius:2px; }
 QSlider::handle:vertical { background:$text_hi; border:1px solid transparent; width:14px; height:14px; margin:0 -5px; border-radius:7px; }
-QPushButton#micbanner { background:#d32f2f; color:white; font-weight:700; font-size:11pt;
-    border:none; border-radius:10px; padding:10px; }
-QFrame#urgentbar { background:$warn_bg; border:1px solid $warn_text; border-radius:10px; }
 QFrame#tipbar { background:$panel; border:1px solid $border_hi; border-radius:10px; }
 QFrame#tipbar QLabel { background:transparent; color:$text; }
-QFrame#tipbar QPushButton#primary { padding:2px 8px; font-size:8pt; }   /* as small as Not now */
-QFrame#tipbar QLabel#hint { color:$muted; }
-QFrame#tipbar QPlainTextEdit#enjoysaid { background:$field; color:$text; border:1px solid $border;
+QFrame#tipbar QPushButton#primary { padding:2px 8px; font-size:8pt; }   /* as small as Just me */
+/* the bars across the top of the window (ui/kit/topbar.py, DESIGN.md "Top bars") */
+QFrame#topbar { background:$panel; border:1px solid $border; border-left:4px solid $accent_text;
+    border-radius:8px; }
+QFrame#topbar[tone="warn"] { border-left-color:$warn_text; }
+QFrame#topbar[tone="ok"] { border-left-color:$ok_text; }
+QFrame#topbar QLabel { background:transparent; color:$text; }
+QFrame#topbar QLabel#topbarwords { font-size:9pt; }
+QFrame#topbar QPushButton#primary, QFrame#topbar QPushButton#topbarbtn {
+    min-height:28px; max-height:28px; padding:0 12px; font-size:9pt; font-weight:600; border-radius:6px; }
+QFrame#topbar QPushButton#primary[roomy="true"] { min-height:0; max-height:16777215px; }   /* beside a text box, as tall as its line */
+QFrame#topbar QPushButton#topbarbtn { background:$btn; color:$text; border:1px solid $border; }
+QFrame#topbar QPushButton#topbarbtn:hover { background:$btn_hover; }
+QFrame#topbar QPushButton#topbarclose { background:transparent; border:none; border-radius:13px; padding:0; }
+QFrame#topbar QPushButton#topbarclose:hover { background:$btn_hover; }
+QFrame#topbar QPlainTextEdit#enjoysaid { background:$field; color:$text; border:1px solid $border;
     border-radius:8px; padding:4px 6px 1px 6px; }   /* the words centred on their cap height */
-QFrame#tipbar QPlainTextEdit#enjoysaid:focus { border-color:$accent; }
-QFrame#tipbar QPushButton#primary[roomy="true"] { padding:0 14px; font-size:9pt; }   /* beside a text box, as tall as it */
-QFrame#tipbar QPushButton#urgenthide { background:transparent; color:$muted; border:none;
-                                       border-radius:6px; font-weight:700; font-size:12pt; }
-QFrame#tipbar QPushButton#urgenthide:hover { background:$btn_hover; }
-QFrame#urgentbar QLabel { background:transparent; color:$warn_text; font-weight:600; }
-QFrame#urgentbar QPushButton#urgenthide { background:transparent; color:$warn_text; border:none;
-    border-radius:14px; padding:0; font-size:12pt; }
-QFrame#urgentbar QPushButton#urgenthide:hover { background:$danger_bg; }
+QFrame#topbar QPlainTextEdit#enjoysaid:focus { border-color:$accent; }
 QPushButton#miccheck:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; }
 QDialog#transport QLabel, QDialog#transport QCheckBox, QDialog#transport QSlider,
 QFrame#transport QLabel, QFrame#transport QCheckBox, QFrame#transport QSlider,
@@ -543,6 +548,15 @@ QFrame#card QFrame#picked { background:$inset; border-radius:10px; }
 QFrame#card QPushButton#voicecat { border-radius:12px; padding:4px 12px; min-height:16px; font-size:8.5pt; background:$btn; border:1px solid transparent; color:$text; }
 QFrame#card QPushButton#voicecat:hover:!checked { background:$btn_hover; }
 QFrame#card QPushButton#voicecat:checked { background:$accent; border-color:$accent_hi; color:$on_accent; font-weight:600; }
+QFrame#card QPushButton#voicepick { background:$field; border:1px solid $border; border-radius:10px;
+    padding:0 28px 0 12px; text-align:left; font-weight:600; color:$text_hi; }
+QFrame#card QPushButton#voicepick:hover, QFrame#card QLineEdit#voicesearch:hover { border-color:$border_hi; }
+QFrame#card QPushButton#voicepick:focus, QFrame#card QPushButton#voicepick:open,
+QFrame#card QLineEdit#voicesearch:focus { border-color:$accent; }
+QFrame#card QPushButton#voicepick::menu-indicator { right:10px; }
+QFrame#card QLineEdit#voicesearch { background:$field; border:1px solid $border; border-radius:10px;
+    padding:0 8px 0 2px; }
+QMenu#voicepickmenu::item { padding:8px 16px 8px 12px; min-width:170px; }
 QFrame#card QToolButton#voicestar { background:transparent; border:none; border-radius:11px; padding:0; }
 QFrame#card QToolButton#voicestar:hover { background:$card; border:1px solid $border_hi; }
 QFrame#card QToolButton#voicestar[picked="true"]:hover { background:$btn_hover; border:none; }

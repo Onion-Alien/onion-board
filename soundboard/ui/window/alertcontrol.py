@@ -295,7 +295,7 @@ class AlertControl(Controller):
             mw.urgent_bar.hide()
             return
         key, text, button = now
-        mw.urgent_lbl.setText(text)
+        mw.urgent_bar.set_message(text)
         mw.urgent_btn.setText(button)
         mw.urgent_btn.setVisible(bool(button))   # a warning with nothing to click
         # Onion Board's own fix: the update card's progress and words, under the reason

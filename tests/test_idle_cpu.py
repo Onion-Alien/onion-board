@@ -6,9 +6,10 @@ import time
 from conftest import process_events
 from test_mainwindow import window  # noqa: F401 - the real window, offscreen
 
+from soundboard.ui.kit import appstate
 from soundboard.audio import appaudio
 from soundboard.mic import directmic
-from soundboard.ui.window import tickcontrol, windowbuild
+from soundboard.ui.window import tickcontrol
 
 
 def test_windows_default_output_is_only_asked_while_followed(window, monkeypatch, qapp):  # noqa: F811
@@ -95,43 +96,6 @@ def test_whos_listening_poll_slows_down_while_hidden(window, monkeypatch):  # no
     assert len(polls) == 3                            # it switches by itself: keeps up
 
 
-def test_mic_check_pulse_runs_only_while_shown_in_front(window, monkeypatch, qapp):  # noqa: F811
-    """The banner's throb draws the whole banner again on each step: not in the tray,
-    minimised or behind a game (there it stands still, fully bright)."""
-    from PySide6.QtCore import Qt
-
-    from soundboard.ui.window import mainwindow as main
-    monkeypatch.setattr(main.appstate, "active", lambda: True)
-    window._ui_live = True
-    window.on_mic_check(True)
-    window.tickctl._set_tick_rate()                           # not shown (offscreen): not live
-    assert not window._pulse.running()
-    assert window._banner_fx.opacity() == 1.0 and not window._banner_fx.isEnabled()
-    window.show()
-    assert window._pulse.running() and window._banner_fx.isEnabled()
-    monkeypatch.setattr(main.appstate, "active", lambda: False)
-    qapp.applicationStateChanged.emit(Qt.ApplicationInactive)    # a game in front
-    assert not window._pulse.running() and window._banner_fx.opacity() == 1.0
-    monkeypatch.setattr(main.appstate, "active", lambda: True)
-    qapp.applicationStateChanged.emit(Qt.ApplicationActive)      # back in front
-    assert window._pulse.running()
-    window.hide()
-    assert not window._pulse.running()
-    window.on_mic_check(False)
-    window.show()
-    assert not window._pulse.running()                # off: shown again, still off
-    window.hide()
-
-
-def test_mic_check_pulse_steps_about_16_times_a_second_along_the_same_curve(window):  # noqa: F811
-    pulse = window._pulse
-    assert 1000 / pulse.timer.interval() <= 20        # the animation ran at 60
-    assert pulse.opacity_at(0) == 1.0
-    assert abs(pulse.opacity_at(windowbuild.PULSE_MS / 2) - windowbuild.PULSE_LOW) < 1e-9
-    assert abs(pulse.opacity_at(windowbuild.PULSE_MS / 4) - (1 + windowbuild.PULSE_LOW) / 2) < 1e-9
-    assert pulse.opacity_at(windowbuild.PULSE_MS) == 1.0     # and round again
-
-
 def test_ui_tick_goes_over_only_the_pads_showing_a_sound(window, monkeypatch):  # noqa: F811
     """Nothing playing: no pad is looked at (all of them, 30 times a second, cost more
     than the rest of the tick on a big board). One that stops is cleared on the next
@@ -160,12 +124,11 @@ def test_ui_tick_goes_over_only_the_pads_showing_a_sound(window, monkeypatch):  
 
 
 def test_the_ui_tick_slows_down_while_nothing_moves(window, monkeypatch, qapp):  # noqa: F811
-    from soundboard.ui.window import mainwindow as main
     assert process_events(qapp, lambda: "s0" in window.audio)
     e = window.engine
     playing = {}
     monkeypatch.setattr(e, "playing", lambda: dict(playing))
-    monkeypatch.setattr(main.appstate, "active", lambda: True)   # the app is in front
+    monkeypatch.setattr(appstate, "active", lambda: True)   # the app is in front
     monkeypatch.setattr(window, "isVisible", lambda: True)
     window._ui_live = True
     e.level_play = e.level_main = e.level_mic = 0.0
@@ -193,17 +156,16 @@ def test_the_ui_tick_slows_down_while_nothing_moves(window, monkeypatch, qapp): 
 def test_unfocused_playback_keeps_visible_meters_at_full_pace(window, monkeypatch, qapp):  # noqa: F811
     from PySide6.QtCore import Qt
 
-    from soundboard.ui.window import mainwindow as main
 
     monkeypatch.setattr(window, "isVisible", lambda: True)
     monkeypatch.setattr(window, "isMinimized", lambda: False)
-    monkeypatch.setattr(main.appstate, "active", lambda: True)
+    monkeypatch.setattr(appstate, "active", lambda: True)
     window._ui_live = True
     window.tickctl._tick_busy = True
     window.tickctl._set_tick_rate()
     assert window.timer.interval() == tickcontrol.TICK_MS
 
-    monkeypatch.setattr(main.appstate, "active", lambda: False)
+    monkeypatch.setattr(appstate, "active", lambda: False)
     qapp.applicationStateChanged.emit(Qt.ApplicationInactive)
     assert window.timer.interval() == tickcontrol.TICK_MS
     window.tickctl._tick_busy = False
@@ -220,13 +182,12 @@ def test_unfocused_playback_keeps_visible_meters_at_full_pace(window, monkeypatc
 
 
 def test_waiting_queues_do_not_keep_paused_playback_busy(window, monkeypatch):  # noqa: F811
-    from soundboard.ui.window import mainwindow as main
 
     playing = {"s0": (0.5, True)}
     monkeypatch.setattr(window.engine, "playing", lambda: dict(playing))
     monkeypatch.setattr(window.radio, "is_active", lambda: False)
     monkeypatch.setattr(window.linkbar, "up_next", lambda: ["https://example.com/song"])
-    monkeypatch.setattr(main.appstate, "active", lambda: True)
+    monkeypatch.setattr(appstate, "active", lambda: True)
     window.playctl._queue[:] = ["s1"]
     window.engine.level_play = window.engine.level_main = window.engine.level_mic = 0.0
     monkeypatch.setattr(window.engine, "aux", ())

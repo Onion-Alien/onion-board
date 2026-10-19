@@ -337,6 +337,7 @@ class SpeechInstalls(QObject):
 
     def _refresh_module(self):
         p = self.p
+        p._ready.clear()   # installed, repaired or rescanned: ask the disk again
         m = p.module
         ok = m is not None and m.installed
         p.show_lang_box(ok and bool(p.langs))

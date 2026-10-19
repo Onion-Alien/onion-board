@@ -31,6 +31,7 @@ from soundboard.speech import aipreview
 from soundboard.ui.voice import art
 from soundboard.ui.kit import busy, icons
 from soundboard.ui.voice.aivoicebrowser import HEAR, MAKING, hear_button
+from soundboard.ui.voice.groupbar import GroupBar, no_match
 from soundboard.ui.kit.widgets import take_out
 from soundboard.ui.kit.panel import (Flow, UndoBar, ViewToggle, hint_label, reset_button,
                                      section_label, steady_number)
@@ -596,6 +597,9 @@ VOICE_GROUPS = (
                                      "Drive-thru speaker", "Old film", "Cathedral")),
 )
 MINE = "mine"
+# the group dropdown's pictures
+GROUP_ICONS = {"funny": "laugh", "scary": "ghost", "scifi": "robot", "disguise": "voice",
+               "places": "radio"}
 FAVS = "favs"
 ALL = ""
 STAR = 22   # px: the favorite star in a voice card's corner
@@ -864,33 +868,18 @@ class VoiceFxPanel(QWidget):
         favs = spec.get("favorites")
         self._favs: list[str] = list(favs) if isinstance(favs, list) else []
         self._group = ALL
-        self.cats = QWidget()
-        cflow = Flow(self.cats, gap=6)
-        self._cat_group = QButtonGroup(self)
-        self._cat_btns: dict[str, QPushButton] = {}
-        for key, text in ((ALL, _("All")), (FAVS, _("Favorites")),
-                          *((k, t) for k, t, _n in VOICE_GROUPS), (MINE, _("Mine"))):
-            b = QPushButton(text.replace("&", "&&"))
-            b.setObjectName("voicecat")
-            b.setAccessibleName(text)
-            b.setCheckable(True)
-            b.setCursor(Qt.CursorShape.PointingHandCursor)
-            if key == FAVS:
-                icons.set_icon(b, "star_filled", "accent")
-            b.clicked.connect(lambda __=False, k=key: (usage.used("voice-group"),
-                                                     self.show_group(k)))
-            self._cat_group.addButton(b)
-            self._cat_btns[key] = b
-            cflow.addWidget(b)
-        self._cat_btns[ALL].setChecked(True)
         self._listed = False
         self.view_toggle = ViewToggle("grid", _("Voices"))
         self.view_toggle.changed.connect(self.set_view)
-        chips = QHBoxLayout()
-        chips.setSpacing(12)
-        chips.addWidget(self.cats, 1)
-        chips.addWidget(self.view_toggle, 0, Qt.AlignmentFlag.AlignTop)
-        v.addLayout(chips)
+        self.bar = GroupBar(
+            [(ALL, _("All"), "sounds"), (FAVS, _("Favorites"), "star_filled"),
+             *((k, t, GROUP_ICONS[k]) for k, t, _n in VOICE_GROUPS),
+             (MINE, _("Mine"), "mic")],
+            self.view_toggle, self._group_count,
+            (_("Search voices"), _("Search")), _("Which voices show"))
+        self.bar.picked.connect(lambda k: (usage.used("voice-group"), self.show_group(k)))
+        self.bar.searched.connect(lambda _t: self._place_tiles())
+        v.addWidget(self.bar)
         self._heads: dict[str, QLabel] = {}
         for key, text in (*((k, t) for k, t, _n in VOICE_GROUPS), (MINE, _("Mine"))):
             lbl = QLabel(text)
@@ -900,6 +889,8 @@ class VoiceFxPanel(QWidget):
         self.no_favs = hint_label(_("No favorites yet. Click the star in a voice's corner "
                                     "to keep it here."))
         self.no_favs.hide()
+        self.no_match = hint_label("")
+        self.no_match.hide()
 
         # ---- pick a voice: picture cards, as many a row as the width holds
         grid = self._tile_grid = QGridLayout()
@@ -934,6 +925,7 @@ class VoiceFxPanel(QWidget):
             grid.setColumnStretch(c, 1)
         v.addLayout(grid)
         v.addWidget(self.no_favs)
+        v.addWidget(self.no_match)
         self.undo_bar = UndoBar(_("Bring the voice back, as it was"))
         v.addWidget(self.undo_bar)
 
@@ -1551,6 +1543,10 @@ class VoiceFxPanel(QWidget):
             rows = [("", [n for n in self._favs if n in self._tile])]
         else:
             rows = [("", [n for n in names if voice_group(n) == self._group])]
+        found = self.bar.text()
+        if found:
+            rows = [(k, [n for n in ns if self.bar.matches(self._tile[n].title, n)])
+                    for k, ns in rows]
         shown: set[str] = set()
         self._shown = []
         r = last = last_n = 0
@@ -1567,7 +1563,7 @@ class VoiceFxPanel(QWidget):
             shown.update(group)
             self._shown += group
         # the die, right after the last card, while there are two voices to pick from
-        rolls = len(self._roll_pool(on="")) >= 2
+        rolls = not found and len(self._roll_pool(on="")) >= 2
         if rolls:
             g.addWidget(self.random_tile, last + last_n // cols, last_n % cols)
         self.random_tile.setVisible(rolls)
@@ -1575,7 +1571,8 @@ class VoiceFxPanel(QWidget):
             lbl.setVisible(self._group == ALL and any(voice_group(n) == k for n in shown))
         for n, b in self._tile.items():
             b.setVisible(n in shown)
-        self.no_favs.setVisible(self._group == FAVS and not shown)
+        self.no_favs.setVisible(self._group == FAVS and not shown and not found)
+        no_match(self.no_match, found, shown)
         for c in range(MAX_COLS):
             g.setColumnStretch(c, 1 if c < cols else 0)
 
@@ -1591,8 +1588,17 @@ class VoiceFxPanel(QWidget):
     def show_group(self, key: str):
         """Show one chip's voices (ALL, FAVS, MINE or a VOICE_GROUPS key)."""
         self._group = key
-        self._cat_btns[key].setChecked(True)
+        self.bar.set_group(key)
         self._place_tiles()
+
+    def _group_count(self, key: str) -> int:
+        """How many voices a group holds (the dropdown's numbers)."""
+        names = [*voicefx.PRESETS, CUSTOM, *(n for n in self.store.voices if n in self._tile)]
+        if key == ALL:
+            return len(names)
+        if key == FAVS:
+            return sum(n in self._tile for n in self._favs)
+        return sum(voice_group(n) == key for n in names)
 
     @property
     def favorites(self) -> list[str]:
