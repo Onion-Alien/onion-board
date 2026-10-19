@@ -220,7 +220,7 @@ async function share(req, env, t) {
   const name = plain(raw.name, MAX_NAME);
   if (!name) t.fail("name");
   const about = plain(raw.about, MAX_ABOUT);
-  const blocked = String(env.CHAT_BLOCK || "").split(",");
+  const blocked = String(env.BLOCKED_WORDS || "").split(",");
   for (const text of [name, about, t.cleanTags(raw.tags)])
     if (text && t.refuse(text.slice(0, 200), blocked)) t.fail("not allowed", 422);
   const emoji = EMOJI_RE.test(String(raw.emoji ?? "")) ? raw.emoji : "";

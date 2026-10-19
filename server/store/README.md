@@ -32,7 +32,9 @@ salted hash of it, and of the address, for one vote per install and the daily li
 from one address ever counted on one sound). An IPv6 address counts as its /64 (one home or
 phone gets a whole /64), and a report as its /48, so new addresses from one place don't get
 around a limit or take a sound off alone. List pages and files are limited to 90 a minute
-per address (Cloudflare's rate limiter, `READS` in `wrangler.toml`), lists page at most
+per address (Cloudflare's rate limiter, `READS` in `wrangler.toml`), `/admin` calls
+the same, and every change (upload, link, share, vote, report) to 30 a minute (`WRITES`),
+all checked before the database is read, so refused calls can't use up the reads either; lists page at most
 2,000 deep, and a search looks words of 3 letters or more up in an index of every 3 letters
 (`sounds_fts`, `voices_fts`), so no one can use up the free plan's daily reads for everyone. The review queue takes 1,000 sounds or 300 MB
 of files, then refuses more until some are reviewed. Files (MP3, OGG, WAV, FLAC, up to
@@ -78,6 +80,7 @@ npx wrangler kv namespace create FILES            # paste its id into wrangler.t
 npx wrangler d1 execute onion-board-store --remote --file schema.sql
 npx wrangler secret put ADMIN_TOKEN               # a long random password for /admin
 npx wrangler secret put SALT                      # another long random string, never changed
+npx wrangler secret put BLOCKED_WORDS             # optional: words refused in names, comma-separated
 npx wrangler deploy
 ```
 
