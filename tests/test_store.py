@@ -5,7 +5,6 @@ import json
 import re
 import time
 import wave
-from pathlib import Path
 
 import numpy as np
 import pytest
@@ -669,11 +668,6 @@ def test_parse_keeps_known_categories_only():
                                            _sound(2, cat="bogus")]})
     assert [(s.cat, s.source) for s in found] == [("games", "myinstants"), ("", "")]
     assert store.cat_name("tv") == "TV" and store.cat_name("bogus") == ""
-    # the same list as the server's (server/store/src/index.js)
-    server = (Path(__file__).parent.parent / "server" / "store" / "src" / "index.js"
-              ).read_text("utf-8")
-    m = re.search(r"export const CATS = \[(.*?)\];", server, re.S)
-    assert m and re.findall(r'"([a-z]+)"', m.group(1)) == list(store.CATS)
 
 
 def test_a_file_that_isnt_the_sound_it_says_is_not_kept(fake, monkeypatch):

@@ -1,8 +1,8 @@
 """Community voices in the Store tab: voice changer voices, AI voices and voice setups
 people share, as settings (never a recording).
 
-The store's server rebuilds every voice from fields it checked (server/store/src/voices.js),
-and this side checks every one again before showing or keeping it: a voice from the
+The store's server rebuilds every voice from fields it checked, and this side checks
+every one again before showing or keeping it: a voice from the
 store is only ever numbers put into their sliders' ranges and short lines of plain text
 (no control or format characters, no piles of combining marks), the same cleaning a
 voice saved on this PC gets (savedvoices, aivoicelist, voicesetups). Nothing in a voice
