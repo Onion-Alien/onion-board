@@ -530,6 +530,11 @@ class Tour(QWidget):
         # (never raises: PySide keeps an exception from an override for later, and
         # it can free another class's override meanwhile, AGENT-RULES)
         try:
+            if obj is self.win and ev.type() == QEvent.Type.Resize and not self._ended:
+                # the card follows at once: until the next tick it sat on the old size's
+                # spot, off the right edge of a window just made narrow
+                QTimer.singleShot(0, self, self._place)
+                return False
             return self._input(obj, ev)
         except Exception:  # noqa: BLE001 - a broken tour lets go at once
             log.exception("tour: input")
