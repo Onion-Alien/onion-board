@@ -1,14 +1,14 @@
 """Type check with pyright, failing only on errors that aren't in the baseline.
 
 The code had thousands of lines before it was type checked, so today's errors are
-recorded in scripts/pyright_baseline.json and only new ones fail. An error is matched
+recorded in scripts/checks/pyright_baseline.json and only new ones fail. An error is matched
 by file, rule and message (not line), so an edit that moves code doesn't trip it.
 
-    python scripts/check_types.py                # files changed since origin/main
-    python scripts/check_types.py --base X       # ... since branch X
-    python scripts/check_types.py FILE ...       # just these files
-    python scripts/check_types.py --all          # whole repo (what CI runs)
-    python scripts/check_types.py --update       # whole repo: rewrite the baseline
+    python scripts/checks/check_types.py                # files changed since origin/main
+    python scripts/checks/check_types.py --base X       # ... since branch X
+    python scripts/checks/check_types.py FILE ...       # just these files
+    python scripts/checks/check_types.py --all          # whole repo (what CI runs)
+    python scripts/checks/check_types.py --update       # whole repo: rewrite the baseline
 
 Fixed an old error? Run --update so the baseline shrinks and it can't come back.
 """
@@ -20,8 +20,8 @@ import os
 import subprocess
 import sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BASELINE = os.path.join(ROOT, "scripts", "pyright_baseline.json")
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+BASELINE = os.path.join(ROOT, "scripts", "checks", "pyright_baseline.json")
 CHECKED = ("soundboard/", "main.py")   # as [tool.pyright] include
 
 

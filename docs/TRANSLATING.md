@@ -26,7 +26,7 @@ ngettext("{n} sound", "{n} sounds", n)
 - Menus, pop-ups and text set later (status lines, toasts) don't show up in a
   screenshot sweep: check them in the code too.
 - Don't use `_` as a throwaway name (`path, _ = …`) in a function that calls `_()`:
-  write `path, __ = …`. `scripts/i18n_extract.py` and the tests catch it.
+  write `path, __ = …`. `scripts/checks/i18n_extract.py` and the tests catch it.
 
 ## The catalogs
 
@@ -51,7 +51,7 @@ ngettext("{n} sound", "{n} sounds", n)
 - Keep the app's tone: short, plain, friendly words. Keep `{placeholders}`, `<b>…</b>`
   and `&amp;` as they are.
 
-`python scripts/i18n_extract.py` lists, per language, what's missing and what's no
+`python scripts/checks/i18n_extract.py` lists, per language, what's missing and what's no
 longer used; `--update` adds the missing texts (empty) to every catalog and drops the
 unused ones; `--check` exits 1 if anything is off. The tests check that every
 translation keeps the placeholders and has the right plural forms. CI's pick job runs

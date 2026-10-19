@@ -30,7 +30,7 @@ Once it's checked, it shows up in everyone's Free sound packs window. No app upd
 ## Checking a pack (maintainers)
 
 ```
-python scripts/check_pack.py pack.zip --id short-name --name "Pack name" --tag pack-short-name --about "..." --author "..." --preview "Sound one" --preview "Sound two" ...
+python scripts/checks/check_pack.py pack.zip --id short-name --name "Pack name" --tag pack-short-name --about "..." --author "..." --preview "Sound one" --preview "Sound two" ...
 gh release create pack-short-name pack.zip short-name-preview.zip --prerelease --title "Pack name (free sound pack)"
 ```
 

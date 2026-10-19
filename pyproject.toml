@@ -69,8 +69,8 @@ ignore = [
 "tests/*" = ["BLE"]
 
 # ---------------------------------------------------------------- pyright
-# Type checking, basic mode. Old errors are in scripts/pyright_baseline.json and only
-# new ones fail: scripts/check_types.py (precommit: changed files; CI: the whole repo).
+# Type checking, basic mode. Old errors are in scripts/checks/pyright_baseline.json and only
+# new ones fail: scripts/checks/check_types.py (precommit: changed files; CI: the whole repo).
 [tool.pyright]
 include = ["soundboard", "main.py"]
 exclude = ["**/.venv", "build", "dist", "modules"]

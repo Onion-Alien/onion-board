@@ -5,14 +5,14 @@
 # The merge is made here, in a throwaway worktree, and pushed to main; GitHub then
 # marks the PR merged by itself.
 #   sh scripts/merge_pr.sh N [--delete-branch]
-# Needs: the PR's required checks green, its commits in UTC (scripts/utc_fix.sh on
+# Needs: the PR's required checks green, its commits in UTC (scripts/checks/utc_fix.sh on
 # the branch if not), and a merge with main that needs no hand-fixing (else merge
 # main into the PR branch first, push, wait for CI, then run this again).
 set -e
 n=$1
 [ -n "$n" ] || { echo "usage: sh scripts/merge_pr.sh N [--delete-branch]" >&2; exit 2; }
 root=$(git rev-parse --show-toplevel)
-here=$(cd "$(dirname "$0")" && pwd)   # check_utc.sh beside this script (it can run from any repo)
+here=$(cd "$(dirname "$0")" && pwd)   # checks/check_utc.sh is beside it (it can run from any repo)
 cd "$root"
 
 state=$(gh pr view "$n" --json state,baseRefName,headRefName,headRefOid,headRepositoryOwner,title \
@@ -47,7 +47,7 @@ trap cleanup EXIT
 git fetch -q origin main "+refs/pull/$n/head:refs/remotes/origin/pr/$n"
 head=$(git rev-parse "origin/pr/$n")
 [ "$head" = "$head_oid" ] || { echo "PR #$n changed while checking it; run this again." >&2; exit 1; }
-sh "$here/check_utc.sh" "origin/main..$head"
+sh "$here/checks/check_utc.sh" "origin/main..$head"
 
 tmp=$(mktemp -d "${TMPDIR:-/tmp}/merge_pr_$n.XXXXXX")
 git worktree add -q --detach "$tmp" origin/main
@@ -63,7 +63,7 @@ while :; do
         echo "PR #$n doesn't merge cleanly with main: merge main into $branch first." >&2
         exit 1
     fi
-    (cd "$tmp" && sh "$here/check_utc.sh" -1 HEAD)
+    (cd "$tmp" && sh "$here/checks/check_utc.sh" -1 HEAD)
     if [ -n "$MERGE_PR_DRY_RUN" ]; then   # everything but the push
         (cd "$tmp" && git log -1 --format="Would push %h (%ad | %cd): %s" --date=raw)
         exit 0

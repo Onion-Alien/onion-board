@@ -9,7 +9,7 @@ never edit the same lines of CHANGELOG.md and conflict). It:
 2. checks changelog.d/ has entries, writes them into CHANGELOG.md under
    "## <version> <long dash> <today, UTC>" (newest first) and deletes the files;
 3. sets __version__ in soundboard/__init__.py;
-4. runs `scripts/i18n_extract.py --check` (missing translations fail it) and
+4. runs `scripts/checks/i18n_extract.py --check` (missing translations fail it) and
    `scripts/docs.py --no-shots` (the README and website release line).
 
 Before any of that it refuses unless the checkout is origin/main exactly and main's
@@ -177,7 +177,7 @@ def main(argv: list[str] | None = None) -> int:
         p.unlink()
     print(f"{old} -> {args.version}: CHANGELOG.md ({len(frags)} entries from "
           "changelog.d/), soundboard/__init__.py")
-    for cmd in (["scripts/i18n_extract.py", "--check"], ["scripts/docs.py", "--no-shots"]):
+    for cmd in (["scripts/checks/i18n_extract.py", "--check"], ["scripts/docs.py", "--no-shots"]):
         if subprocess.run([sys.executable, *cmd], cwd=ROOT).returncode:
             raise SystemExit(f"{' '.join(cmd)} failed: fix it, then run it again")
     print("next: build, VirusTotal scan (the installer and "
