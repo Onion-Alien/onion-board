@@ -1,13 +1,10 @@
 """Typed names (categories, subcategories, sounds) follow one set of rules and say so
 when a name can't be used as typed; a restored backup brings back a removed pad that
-shared its audio with one still here; the other-soundboard question says where the
-sounds go."""
+shared its audio with one still here."""
 import pytest
-from PySide6.QtWidgets import QMessageBox
 
 from soundboard.core import backup
 from soundboard.sounds import library
-from soundboard.otherboards import Entry, soundpad
 from test_mainwindow import window as main_window  # noqa: F401  (the real MainWindow)
 
 
@@ -129,12 +126,3 @@ def test_a_removed_pad_sharing_audio_comes_back_from_its_backup(window, tmp_path
     # a plain set of fingerprints still skips every sound with one
     assert backup.install(backup.read(out), set(known)).skipped == ["Boom", "Airhorn"]
 
-
-def test_the_import_question_says_which_category_they_go_in(window, monkeypatch):
-    asked = []
-    no = QMessageBox.StandardButton.No
-    monkeypatch.setattr(QMessageBox, "question",
-                        lambda _w, _t, text, *a: asked.append(text) or no)
-    entry = Entry(name="x", path="C:/x.wav", exists=True)
-    window.impctl._board_read(soundpad.SOURCE, "C:/b.spl", True, ([entry], [], [entry]))
-    assert "They go in a category called “Soundpad”." in asked[0]

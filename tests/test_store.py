@@ -594,24 +594,28 @@ def test_no_categories_only_all(qapp, fake):
     t.shutdown()
 
 
-def test_cards_go_two_a_row_when_two_fit(qapp, fake):
+def test_cards_fill_the_tab_as_many_a_row_as_fit(qapp, fake):
     fake.sounds = {f"{i:012x}": _sound(i, cat="games", created=int(time.time()) - 3 * 86400)
-                   for i in (1, 2, 3)}
+                   for i in range(1, 7)}
     t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
-    t.resize(1100, 700)
+    t.resize(1800, 700)   # a wide window: the cards use its whole width, 5 a row
     t.show()
-    assert _wait(qapp, lambda: len(t._rows) == 3 and t.table_head.isVisible())
+    assert _wait(qapp, lambda: len(t._rows) == 6 and t.table_head.isVisible())
     process_events(qapp, lambda: False, timeout=0.3)
-    a, b, c = t._rows
+    assert len({r.y() for r in t._rows[:5]}) == 1 and t._rows[5].y() > t._rows[0].y()
+    assert t._rows[4].geometry().right() > 1600
+    t.resize(700, 700)
+    process_events(qapp, lambda: False, timeout=0.3)
+    a, b, c = t._rows[:3]
     assert a.where.text() == "Games · 3 days ago"
     assert a.y() == b.y() and b.x() > a.x() and c.y() > a.y()   # two a row
     assert a.btn_play.text() and a.btn_add.text()
-    t.resize(620, 700)
+    t.resize(560, 700)
     process_events(qapp, lambda: False, timeout=0.3)
     assert a.x() == b.x() and b.y() > a.y()   # one a row
     # every width down to the smallest window's tab: a card never wider than the list,
     # its buttons' words going (their pictures stay) before Report would be cut off
-    for width in range(1100, 419, -20):
+    for width in range(1900, 419, -20):
         t.resize(width, 700)
         process_events(qapp, lambda: False, timeout=0.05)
         room = t.list_area.viewport().width() - storetab.LIST_GAP

@@ -109,7 +109,7 @@ def test_the_bar_names_the_app(window, monkeypatch):
     assert window.urgent_bar.isHidden()
     look(window, monkeypatch, [BOARD, CHAT], 1, 1000.0 + G)
     assert not window.urgent_bar.isHidden()
-    text = window.urgent_lbl.text()
+    text = window.urgent_bar.text()
     assert text.startswith("Voicechat is using your mic without Onion Board")
     assert "bypass processing" in text and window.urgent_btn.isHidden()
     look(window, monkeypatch, [BOARD, CHAT], 2, 1000.0 + G + 2)   # fixed in the app
@@ -119,7 +119,7 @@ def test_the_bar_names_the_app(window, monkeypatch):
 def test_hiding_it_lasts_for_that_app(window, monkeypatch):
     look(window, monkeypatch, [BOARD, CHAT], 1, 0.0)
     look(window, monkeypatch, [BOARD, CHAT], 1, G)
-    window.urgent_bar.findChild(type(window.urgent_btn), "urgenthide").click()
+    window.urgent_bar.close_btn.click()
     assert window.urgent_bar.isHidden()
     look(window, monkeypatch, [BOARD, CHAT], 1, G + 2)
     assert window.urgent_bar.isHidden()

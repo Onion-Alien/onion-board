@@ -974,15 +974,30 @@ class _HTTPSHandler(urllib.request.HTTPSHandler):
                             feature=self.feature, direct=self.direct)
 
 
+TLS_KEEP_S = 3600   # the shared TLS context is made again after this long
+_tls: tuple[ssl.SSLContext | None, float] = (None, 0.0)   # (context, made at)
+_tls_lock = threading.Lock()
+
+
 def _tls_context() -> ssl.SSLContext:
     """The TLS settings stock urllib uses (http.client._create_https_context): ALPN
     http/1.1 and post-handshake auth on top of the defaults. Without them the
     handshake looks different, and Cloudflare (in front of Myinstants) answered every
-    search with 403 though the request itself was the same."""
-    ctx = ssl.create_default_context()
-    ctx.set_alpn_protocols(["http/1.1"])
-    ctx.post_handshake_auth = True
-    return ctx
+    search with 403 though the request itself was the same.
+
+    One context for every request, made again after TLS_KEEP_S (so a certificate
+    Windows adds is picked up): making one reads Windows' certificate store, ~20 ms of
+    CPU on a fast PC, and it was made for every request (ten downloads, a search)."""
+    global _tls
+    with _tls_lock:
+        ctx, at = _tls
+        now = time.monotonic()
+        if ctx is None or not 0 <= now - at < TLS_KEEP_S:
+            ctx = ssl.create_default_context()
+            ctx.set_alpn_protocols(["http/1.1"])
+            ctx.post_handshake_auth = True
+            _tls = (ctx, now)
+        return ctx
 
 
 def _refuse_home(feature: str, u: urllib.parse.SplitResult) -> ProxyError:

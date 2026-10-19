@@ -50,3 +50,21 @@ def test_only_qt_methods_are_pinned(qapp):
     overridepin.pin()
     assert sys.getrefcount(Own.__dict__["resizeEvent"]) > overridepin.PIN
     assert sys.getrefcount(Own.__dict__["helper"]) < 10
+
+
+def test_new_classes_are_walked_for_only_after_an_import_or_a_while(qapp, monkeypatch):
+    """The collector asks on every tick: the walk over every Qt class runs only when a
+    module came in since, or WALK_S later (a class made in a function), not 10 times a
+    second (about 1% of a core with nothing else going on)."""
+    walks = []
+    monkeypatch.setattr(overridepin, "pin", lambda: walks.append(1) or 0)
+    monkeypatch.setattr(overridepin, "_walked", (-1, 0.0))
+    overridepin.pin_new(now=100.0)
+    overridepin.pin_new(now=100.1)
+    overridepin.pin_new(now=100.5)
+    assert len(walks) == 1
+    monkeypatch.setitem(sys.modules, "an_add_on_just_imported", object())
+    overridepin.pin_new(now=100.6)
+    assert len(walks) == 2
+    overridepin.pin_new(now=100.6 + overridepin.WALK_S)
+    assert len(walks) == 3
