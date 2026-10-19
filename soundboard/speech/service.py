@@ -184,6 +184,12 @@ class ServiceHost:
             while conn is None:
                 if self._stop.is_set() or not self.running:
                     code = None if self._proc is None else self._proc.poll()
+                    # it may have called, said why it's giving up and quit before this
+                    # thread looked (a busy or short-of-memory PC): hear it out first
+                    late = None if code is None else _late_call(srv, token)
+                    if late is not None:
+                        conn, hello = late
+                        break
                     if code is None:
                         reason = ""
                     elif rejected:
@@ -303,6 +309,22 @@ def _handshake(conn: socket.socket, token: str, timeout: float) -> dict | None:
             str(hello.get("token", "")).encode(), token.encode()):
         return None
     return hello
+
+
+def _late_call(srv: socket.socket, token: str) -> tuple[socket.socket, dict] | None:
+    """A connection the module made before it exited, still waiting to be accepted
+    (its hello and last messages are buffered in it), or None."""
+    srv.settimeout(0)
+    for _ in range(16):          # the backlog is small; strangers are dropped
+        try:
+            c, _addr = srv.accept()
+        except OSError:          # nobody left waiting
+            return None
+        hello = _handshake(c, token, 0.5)
+        if hello is not None:
+            return c, hello
+        c.close()
+    return None
 
 
 def _send_timeout(sock: socket.socket, seconds: float):

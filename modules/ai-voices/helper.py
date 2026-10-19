@@ -148,6 +148,16 @@ def pick(voices: dict, vid: str) -> dict:
     return voices["voices"][0]
 
 
+def _out_of_memory(e: BaseException) -> bool:
+    """A load that failed for want of memory: MemoryError, onnxruntime's "bad
+    allocation", or Windows' "paging file is too small" when a DLL won't load."""
+    if isinstance(e, MemoryError):
+        return True
+    text = str(e).lower()
+    return any(s in text for s in ("bad allocation", "bad_alloc", "paging file",
+                                   "not enough memory", "out of memory"))
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int)
@@ -179,6 +189,7 @@ def main(argv=None) -> int:
     link.send(type="hello", token=args.token, name="ai-voices", version=VERSION)
 
     def fail(text: str) -> int:
+        log.error("%s", text)          # the module log says why, too
         link.send(type="error", text=text)
         try:
             sock.shutdown(socket.SHUT_RDWR)
@@ -200,10 +211,13 @@ def main(argv=None) -> int:
             from converter import Converter, self_test
             rtf = self_test(model_dir(), voice, seconds=1.0)
             conv = Converter(model_dir(), voice)
-        except ImportError:
-            return fail("AI voices aren't fully installed: press Update under More options")
         except Exception as e:  # noqa: BLE001
             log.exception("model load failed")
+            if _out_of_memory(e):
+                return fail("not enough free memory to load the voice: close a big program "
+                            "and try again")
+            if isinstance(e, ImportError):
+                return fail("AI voices aren't fully installed: press Update under More options")
             return fail(f"couldn't load the voice model ({e}); press Update under More options")
         log.info("self-test: real-time factor %.3f", rtf)
     conv.auto_pitch = not args.no_auto_pitch

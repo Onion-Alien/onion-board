@@ -1002,9 +1002,10 @@ class AiVoicePanel(QWidget):
                 self._status = "starting"
                 self._state(self._starting_text(retry=True))
         elif t == "stopped" and self.ctl.running:
+            if text or self._status != "failed":   # keep the helper's own reason
+                self._failure_error = text
             self._status = "failed"
-            self._failure_error = text
-            self._state(self.failure_text(text))
+            self._state(self.failure_text(self._failure_error))
 
     # ------------------------------------------------------------ get / remove
     def _get(self):

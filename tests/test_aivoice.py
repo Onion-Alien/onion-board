@@ -420,6 +420,13 @@ def test_card_tries_once_more_when_the_helper_never_calls_back(qapp, tmp_path, m
         p._on_event({"type": "hello"})
         p._on_event({"type": "stopped", "text": "broke"})
         assert len(starts) == 3 and "broke" in p.lbl_state.text()
+        # the helper's own reason stays when its link then just closes
+        p.b_start.setChecked(False)
+        p.b_start.setChecked(True)
+        p._on_event({"type": "hello"})
+        p._on_event({"type": "error", "text": "not enough free memory"})
+        p._on_event({"type": "stopped", "text": ""})
+        assert "not enough free memory" in p.lbl_state.text()
     finally:
         p.shutdown()
         p.deleteLater()
@@ -574,3 +581,11 @@ def test_ai_voice_install_keeps_focus(qapp, tmp_path, monkeypatch):
     finally:
         p.shutdown()
         p.deleteLater()
+
+
+def test_a_load_that_ran_out_of_memory_says_so(addon_code):
+    _conv, helper = addon_code
+    assert helper._out_of_memory(MemoryError())
+    assert helper._out_of_memory(RuntimeError("[ONNXRuntimeError] : 6 : bad allocation"))
+    assert helper._out_of_memory(ImportError("DLL load failed: The paging file is too small"))
+    assert not helper._out_of_memory(ImportError("No module named 'onnxruntime'"))

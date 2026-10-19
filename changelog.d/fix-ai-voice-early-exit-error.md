@@ -1,0 +1,1 @@
+- AI voices: when the AI voice can't start, it now says why (for example "not enough free memory") instead of "exited before connecting (code 1)".

@@ -285,6 +285,34 @@ def test_service_that_exits_early_is_reported():
     h.stop()
 
 
+def test_a_module_that_called_then_quit_before_it_was_accepted_is_heard():
+    # a busy PC: the module said hello, sent its error and exited before the serving
+    # thread got to accept(); its reason must not turn into "exited before connecting"
+    from soundboard.speech import protocol, service
+    srv = socket.socket()
+    srv.bind(("127.0.0.1", 0))
+    srv.listen(8)
+    try:
+        stranger = socket.create_connection(srv.getsockname())
+        stranger.sendall(b"junk")
+        stranger.close()
+        mod = socket.create_connection(srv.getsockname())
+        protocol.send_json(mod, {"type": "hello", "token": "tok"})
+        protocol.send_json(mod, {"type": "error", "text": "not enough free memory"})
+        mod.close()
+        late = service._late_call(srv, "tok")
+        assert late is not None
+        conn, hello = late
+        assert hello["type"] == "hello"
+        conn.settimeout(2)
+        kind, payload = protocol.recv(conn)
+        assert protocol.decode_json(payload)["text"] == "not enough free memory"
+        conn.close()
+        assert service._late_call(srv, "tok") is None        # nobody else waiting
+    finally:
+        srv.close()
+
+
 def test_a_message_that_breaks_the_reader_still_reports_stopped():
     # JSON nested too deep raises RecursionError: the UI must not stay on "listening"
     mod = ("import json,socket,struct,sys,time\n"
