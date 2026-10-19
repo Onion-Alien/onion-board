@@ -4347,5 +4347,7 @@
   "Every rarity": "Minden ritkaság",
   "Not yet": "Még nem",
   "Nothing here yet. Try another filter.": "Itt még nincs semmi. Próbálj másik szűrőt.",
-  "Rarity": "Ritkaság"
+  "Rarity": "Ritkaság",
+  "Achievement unlocked": "Teljesítmény feloldva",
+  "{points}G - {name}": "{points}G - {name}"
 }

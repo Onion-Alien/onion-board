@@ -4426,5 +4426,7 @@
   "Every rarity": "Будь-яка рідкісність",
   "Not yet": "Ще ні",
   "Nothing here yet. Try another filter.": "Тут поки нічого немає. Спробуй інший фільтр.",
-  "Rarity": "Рідкісність"
+  "Rarity": "Рідкісність",
+  "Achievement unlocked": "Досягнення отримано",
+  "{points}G - {name}": "{points}G - {name}"
 }

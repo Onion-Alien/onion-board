@@ -4426,5 +4426,7 @@
   "Every rarity": "Orice raritate",
   "Not yet": "Încă nu",
   "Nothing here yet. Try another filter.": "Încă nu e nimic aici. Încearcă alt filtru.",
-  "Rarity": "Raritate"
+  "Rarity": "Raritate",
+  "Achievement unlocked": "Realizare deblocată",
+  "{points}G - {name}": "{points}G - {name}"
 }

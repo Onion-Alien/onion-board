@@ -4663,5 +4663,7 @@
   "Every rarity": "كل الندرات",
   "Not yet": "ليس بعد",
   "Nothing here yet. Try another filter.": "لا شيء هنا بعد. جرّب عامل تصفية آخر.",
-  "Rarity": "الندرة"
+  "Rarity": "الندرة",
+  "Achievement unlocked": "تم فتح إنجاز",
+  "{points}G - {name}": "{points}G - {name}"
 }

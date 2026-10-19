@@ -4347,5 +4347,7 @@
   "Every rarity": "Всяка рядкост",
   "Not yet": "Още не",
   "Nothing here yet. Try another filter.": "Още няма нищо. Опитай друг филтър.",
-  "Rarity": "Рядкост"
+  "Rarity": "Рядкост",
+  "Achievement unlocked": "Отключено постижение",
+  "{points}G - {name}": "{points}G - {name}"
 }

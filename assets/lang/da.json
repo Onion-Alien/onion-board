@@ -4347,5 +4347,7 @@
   "Every rarity": "Alle sjældenheder",
   "Not yet": "Ikke endnu",
   "Nothing here yet. Try another filter.": "Intet her endnu. Prøv et andet filter.",
-  "Rarity": "Sjældenhed"
+  "Rarity": "Sjældenhed",
+  "Achievement unlocked": "Præstation låst op",
+  "{points}G - {name}": "{points}G - {name}"
 }

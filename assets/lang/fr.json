@@ -4347,5 +4347,7 @@
   "Every rarity": "Toutes les raretés",
   "Not yet": "Pas encore",
   "Nothing here yet. Try another filter.": "Rien ici pour l'instant. Essaie un autre filtre.",
-  "Rarity": "Rareté"
+  "Rarity": "Rareté",
+  "Achievement unlocked": "Succès débloqué",
+  "{points}G - {name}": "{points}G - {name}"
 }

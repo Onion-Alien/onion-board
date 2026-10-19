@@ -4347,5 +4347,7 @@
   "Every rarity": "Alle sjeldenheter",
   "Not yet": "Ikke ennå",
   "Nothing here yet. Try another filter.": "Ingenting her ennå. Prøv et annet filter.",
-  "Rarity": "Sjeldenhet"
+  "Rarity": "Sjeldenhet",
+  "Achievement unlocked": "Prestasjon låst opp",
+  "{points}G - {name}": "{points}G - {name}"
 }

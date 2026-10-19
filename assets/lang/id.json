@@ -4268,5 +4268,7 @@
   "Every rarity": "Semua kelangkaan",
   "Not yet": "Belum",
   "Nothing here yet. Try another filter.": "Belum ada apa-apa di sini. Coba filter lain.",
-  "Rarity": "Kelangkaan"
+  "Rarity": "Kelangkaan",
+  "Achievement unlocked": "Pencapaian terbuka",
+  "{points}G - {name}": "{points}G - {name}"
 }

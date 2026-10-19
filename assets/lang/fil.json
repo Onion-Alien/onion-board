@@ -4347,5 +4347,7 @@
   "Every rarity": "Lahat ng rarity",
   "Not yet": "Hindi pa",
   "Nothing here yet. Try another filter.": "Wala pa rito. Subukan ang ibang filter.",
-  "Rarity": "Rarity"
+  "Rarity": "Rarity",
+  "Achievement unlocked": "Na-unlock ang achievement",
+  "{points}G - {name}": "{points}G - {name}"
 }

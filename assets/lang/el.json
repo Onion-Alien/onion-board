@@ -4347,5 +4347,7 @@
   "Every rarity": "Κάθε σπανιότητα",
   "Not yet": "Όχι ακόμα",
   "Nothing here yet. Try another filter.": "Τίποτα εδώ ακόμα. Δοκίμασε άλλο φίλτρο.",
-  "Rarity": "Σπανιότητα"
+  "Rarity": "Σπανιότητα",
+  "Achievement unlocked": "Ξεκλείδωσες επίτευγμα",
+  "{points}G - {name}": "{points}G - {name}"
 }
