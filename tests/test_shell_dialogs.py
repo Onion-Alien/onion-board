@@ -66,10 +66,15 @@ def test_settings_opened_again_is_the_kept_one_unless_its_config_changed(qapp, w
     assert fresh is not d and win.setctl.settings_open()
     fresh.accept()
     qapp.processEvents()
-    d2 = win.setctl.open_settings("updates")   # shows live state: never kept
+    d2 = win.setctl.open_settings("updates")   # shows live state: kept, that page
+    page = d2._tab_page(d2._page_keys.index("updates"))   # built afresh when shown
     d2.accept()
     qapp.processEvents()
-    assert win.setctl.open_settings() is not d2
+    assert win.setctl.open_settings() is d2
+    d2.show_page("updates")
+    assert d2._tab_page(d2._page_keys.index("updates")) is not page
+    d2.accept()
+    qapp.processEvents()
 
 
 def test_settings_open_as_a_page_in_place_of_the_tabs(qapp, win):
@@ -101,9 +106,9 @@ def test_settings_open_as_a_page_in_place_of_the_tabs(qapp, win):
     assert win._tabs_area.isVisible() and win.tabs.currentWidget() is win.radio_page
     assert not win.gear.isChecked()
     assert _rail_button(win, win.radio_page).isChecked()
-    assert win.findChildren(settings.SettingsDialog) == []
-    again = win.setctl.open_settings()                              # a new one after closing
-    assert again.isVisible()
+    assert win.findChildren(settings.SettingsDialog) == [d]          # kept, hidden
+    again = win.setctl.open_settings()                              # opened again as it was
+    assert again is d and again.isVisible()
     again.done(0)
     qapp.processEvents()
 

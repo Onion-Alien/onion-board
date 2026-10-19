@@ -140,9 +140,13 @@ class Fitter:
         # invalidating every layout made Qt measure the whole window again on each
         # mouse move; a fit with live off, on release, measures it all fresh
         self.live = False
+        # bumped when the steps change or some are tried again: what applied() gave
+        # before may not fit any more (FitControl._fit_setup_tab)
+        self.changes = 0
 
     def add(self, priority: int, axis: str, apply: Callable[[bool], object]):
         self.reset()
+        self.changes += 1
         self.steps.append((priority, axis, apply))
         self.steps.sort(key=lambda s: s[0])   # stable: same priority keeps its order
 
@@ -155,6 +159,7 @@ class Fitter:
         Everything is undone first, so call it while the old panel still exists."""
         gone = {id(s[2]) for s in steps}
         self.reset()
+        self.changes += 1
         self.steps = [s for s in self.steps if id(s[2]) not in gone]
 
     def retry(self, steps: list[Step]):
@@ -162,6 +167,7 @@ class Fitter:
         fit() applies them again only if they're still needed: for a part whose own
         size changed without the window's (the download bar showing a longer list)."""
         again = {id(s[2]) for s in steps}
+        self.changes += 1
         for i in sorted(self._at, reverse=True):
             if id(self.steps[i][2]) in again:
                 self.steps[i][2](False)
@@ -173,6 +179,25 @@ class Fitter:
         for i in sorted(self._at, reverse=True):
             self.steps[i][2](False)
         self._at.clear()
+
+    def applied(self) -> dict[int, tuple[int, int, bool]]:
+        """What has given way now, for restore(): each step (its apply function's id)
+        and the size it was applied at."""
+        return {id(self.steps[i][2]): at for i, at in self._at.items()}
+
+    def restore(self, applied: dict[int, tuple[int, int, bool]]):
+        """Back to what applied() gave, on the same steps: the others undone, the
+        missing ones applied, nothing measured (fit() checks it after)."""
+        where = {id(s[2]): i for i, s in enumerate(self.steps)}
+        for i in sorted(self._at, reverse=True):
+            if id(self.steps[i][2]) not in applied:
+                self.steps[i][2](False)
+                del self._at[i]
+        for i in sorted(where[k] for k in applied if k in where):
+            if i not in self._at:
+                self.steps[i][2](True)
+            self._at[i] = applied[id(self.steps[i][2])]
+        self._known = None
 
     def need(self) -> QSize:
         """The smallest size the root's content fits now, measured fresh: a step that

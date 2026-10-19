@@ -164,6 +164,8 @@ class SettingsControl(Controller):
             if not _holds_focus(mw._tabs_area):
                 mw.tabs.currentWidget().setFocus(Qt.FocusReason.OtherFocusReason)
         if self._settings_reusable(dlg):   # opened again as it is: no 100-300 ms rebuild
+            # (pages with live state shown: each built afresh when it's shown again)
+            dlg.mark_stale(mw.SETTINGS_LIVE_PAGES)
             rehome_crash_reports(dlg)
             old, self._settings_kept = self._settings_kept, dlg
             self._settings_kept_print = self._settings_print()
@@ -171,18 +173,15 @@ class SettingsControl(Controller):
                 QTimer.singleShot(0, lambda: free_dialog(old))
         else:   # freed once its finished signal is over (deleting it inside that crashed)
             QTimer.singleShot(0, lambda: free_dialog(dlg))
-            # a page with live state was shown: built again while nothing's going on, or
-            # every later open built Settings from scratch (80-140 ms, seconds on a busy PC)
+            # built again while nothing's going on, or every later open built Settings
+            # from scratch (80-140 ms, seconds on a busy PC)
             QTimer.singleShot(REBUILD_MS, self._prebuild_settings)
         mw.hkctl.register_hotkeys()   # in case a capture was cancelled
         self._check_route_pick()
 
-    def _settings_reusable(self, dlg) -> bool:
-        mw = self.mw
-        if not qt_valid(dlg) or dlg.search_box.text():
-            return False
-        built = [k for i, k in enumerate(dlg._page_keys) if i not in dlg._unbuilt]
-        return not any(k in mw.SETTINGS_LIVE_PAGES for k in built)
+    @staticmethod
+    def _settings_reusable(dlg) -> bool:
+        return qt_valid(dlg) and not dlg.search_box.text()
 
     def _settings_print(self) -> str:
         """What a kept Settings shows: the config (less what it doesn't show) and the
