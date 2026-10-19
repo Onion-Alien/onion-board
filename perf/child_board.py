@@ -987,16 +987,20 @@ class Child:
         return {"pads_shown": shown}
 
     def sc_resize_sweep(self):
-        """The window dragged narrower and wider: 1700 -> 440 -> 1700 px wide, a step
-        every frame (16 ms)."""
+        """The window's edge dragged narrower and wider: 1700 -> 440 -> 1700 px wide, a
+        step every frame (16 ms), then let go (fitcontrol.live: what Windows' drag
+        messages switch on)."""
         w = self.w
         self._home()
         was = w.size()
         h = max(720, was.height())
         widths = list(range(1700, 439, -40)) + list(range(440, 1701, 40))
+        w.fitctl.live(True)
         for x in widths:
             w.resize(x, h)
             self.run_for(0.016)
+        w.fitctl.live(False)
+        self.run_for(0.3)
         w.resize(was)
         self.run_for(0.5)
         return {"steps": len(widths)}
