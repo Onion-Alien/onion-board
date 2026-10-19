@@ -105,6 +105,7 @@ FEATURES = {
     "tor_download": "Download Tor from the app",
     "ffmpeg_download": "Install FFmpeg from the app",
     "usage_stats": "Anonymous usage count",
+    "twitch": "Twitch: channel points, chat and alerts",
 }
 # "sounds_web.<site>": the sites sounds come from, each with its own switch under it
 SITES = {"youtube": "YouTube", "soundcloud": "SoundCloud", "myinstants": "Myinstants",
@@ -131,6 +132,7 @@ def feature_name(key: str) -> str:
         "tor_download": _("Download Tor from the app"),
         "ffmpeg_download": _("Install FFmpeg from the app"),
         "usage_stats": _("Anonymous usage count"),
+        "twitch": _("Twitch: channel points, chat and alerts"),
     }.get(key, FEATURES.get(key, key))
 
 
@@ -167,6 +169,7 @@ def _off_sentence(main: str) -> str:
                              "Settings > Privacy & security."),
         "usage_stats": _("The anonymous usage count is switched off in "
                          "Settings > Privacy & security."),
+        "twitch": _("Twitch is switched off in Settings > Privacy & security."),
     }[main]
 
 

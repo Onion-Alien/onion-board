@@ -838,6 +838,23 @@ def _tiktok(p, fill):
     fill(note)
 
 
+def _twitch(p, fill):
+    # Twitch's speech box: square, cut corner, a tail at the bottom, two bars in it
+    box = QPainterPath(QPointF(5, 2))
+    box.lineTo(21, 2)
+    box.lineTo(21, 14)
+    box.lineTo(16, 19)
+    box.lineTo(12, 19)
+    box.lineTo(9, 22)
+    box.lineTo(9, 19)
+    box.lineTo(3, 19)
+    box.lineTo(3, 6)
+    box.closeSubpath()
+    box.addRect(QRectF(10, 6, 2, 6))   # (the default odd-even fill: holes)
+    box.addRect(QRectF(15, 6, 2, 6))
+    fill(box)
+
+
 def _myinstants(p, fill):
     p.drawEllipse(QRectF(2, 12, 20, 8))
     button = QPainterPath(QPointF(5, 15))
@@ -1034,7 +1051,7 @@ SHAPES = {
     "ghost": _ghost, "robot": _robot,
     "bun": _bun,
     "youtube": _youtube, "ytmusic": _ytmusic, "soundcloud": _soundcloud,
-    "tiktok": _tiktok, "myinstants": _myinstants,
+    "tiktok": _tiktok, "myinstants": _myinstants, "twitch": _twitch,
     "shuffle": _shuffle, "star": _star,
     "star_filled": lambda p, fill: _star(p, fill, True), "like": _like, "copy": _copy,
     "dislike": _dislike,

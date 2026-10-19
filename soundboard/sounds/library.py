@@ -573,6 +573,12 @@ class Config:
     # "alerts": {type: [rule, ...]}, "alerts_on": bool}; set through /api/chat_rules
     # and /api/alerts
     api_stream: dict = field(default_factory=dict)
+    # Settings → Remote's *Connect Twitch* (soundboard.control.twitchlink): the sign-in, empty
+    # when not connected. The tokens are passwords: never exported with a backup or logged
+    twitch_token: str = ""
+    twitch_refresh: str = ""
+    twitch_login: str = ""
+    twitch_user_id: str = ""
     # "remote" add-ons' own settings (soundboard.ui.settings.remotehost), by add-on id: Onion
     # Pocket's on / off, port and key
     remote_addons: dict = field(default_factory=dict)

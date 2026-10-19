@@ -34,6 +34,7 @@ from pathlib import Path
 # Everything else's .pyd goes.
 KEEP_MODULES = frozenset({
     "QtCore", "QtGui", "QtWidgets", "QtNetwork", "QtMultimedia", "QtMultimediaWidgets",
+    "QtWebSockets",   # Connect Twitch's EventSub socket (soundboard.control.twitchlink)
 })
 # platform plugins: the real one, and offscreen for `OnionBoard.exe --selftest`
 KEEP_PLATFORMS = frozenset({"qwindows.dll", "qoffscreen.dll"})

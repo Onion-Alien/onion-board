@@ -126,6 +126,29 @@ def test_alerts_pick_the_rule_for_the_amount_and_play_each_event_once(qapp, wind
     assert d(w, "alerts", type="follow", sound="nope")[0] == 404
 
 
+def test_each_channel_point_reward_can_play_its_own_sound(qapp, window):
+    w = window
+    assert d(w, "alerts", type="redeem", sound="boom")[0] == 200                 # any reward
+    st, body = d(w, "alerts", type="channel_points", reward="  Honk  the horn ", sound="Airhorn")
+    assert st == 200
+    assert [(r["min"], r.get("reward")) for r in body["alerts"]["redeem"]] == [
+        (0, None), (0, "Honk the horn")]
+    assert d(w, "event", type="redeem", reward="honk THE horn")[1]["name"] == "Airhorn"
+    assert d(w, "event", type="redeem", reward="Hydrate")[1]["name"] == "Boom"
+    # Twitch's own message for it
+    body = {"subscription": {"type": "channel.channel_points_custom_reward_redemption.add"},
+            "event": {"id": "r-1", "user_name": "Ann", "reward": {"title": "Honk the horn"}}}
+    assert d(w, "event", _body=body)[1]["name"] == "Airhorn"
+    # changing / clearing one reward's rule leaves the others alone
+    d(w, "alerts", type="redeem", reward="Honk the horn", sound="boom")
+    assert [r["sound"] for r in streamapi.alert_rules(w)["redeem"]] == ["boom", "boom"]
+    left = d(w, "alerts", type="redeem", reward="Honk the horn", clear="1")[1]["alerts"]["redeem"]
+    assert left == [{"min": 0, "sound": "boom"}]
+    # reward= means nothing for other types
+    d(w, "alerts", type="follow", reward="x", sound="boom")
+    assert "reward" not in streamapi.alert_rules(w)["follow"][0]
+
+
 def test_test_alerts_fill_in_a_viewer(qapp, window):
     w = window
     d(w, "alerts", type="sub", say="{user} subbed for {months} months")
