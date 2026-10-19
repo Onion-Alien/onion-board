@@ -42,6 +42,19 @@ def devices(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def shown_window(monkeypatch):
+    """The guide is a card inside the window: as in the app, the window is up first."""
+    real = setupwizard.SetupWizard.__init__
+
+    def init(self, win, *a, **kw):
+        if not win.isVisible():
+            win.resize(1200, 900)
+            win.show()
+        real(self, win, *a, **kw)
+    monkeypatch.setattr(setupwizard.SetupWizard, "__init__", init)
+
+
+@pytest.fixture(autouse=True)
 def resume(monkeypatch):
     """Never touch the real RunOnce key: record what the guide asks for instead."""
     calls = []
@@ -771,12 +784,10 @@ def test_back_and_next_never_stretch_the_guide(mic_wizard, qapp):
     shrank back, a flash on every Back / Next."""
     from PySide6.QtCore import QEvent, QObject
     from soundboard.ui.kit import fit
-    _, wiz = mic_wizard
+    w, wiz = mic_wizard
     wiz.show()
     wiz.go(wiz.base + 3)
     _settle(qapp)
-    top = wiz.screen().availableGeometry().y() + 10   # room below for every step
-    wiz.move(100, top)
     heights = []
 
     class Spy(QObject):
@@ -793,13 +804,14 @@ def test_back_and_next_never_stretch_the_guide(mic_wizard, qapp):
         assert wiz.height() >= fit.needed_height(wiz, wiz.width())
         _settle(qapp)
         tall[i] = wiz.height()
-        assert wiz.y() == top   # never moved
+        assert wiz.geometry().center().x() in range(w.width() // 2 - 1, w.width() // 2 + 2)
     assert heights and max(heights) <= max(tall.values()), (heights, tall)
 
 
-def test_a_fold_shut_again_puts_the_guide_back(mic_wizard_again, qapp, monkeypatch):
-    """Near the screen's bottom, opening the Discord tip moves the guide up to fit;
-    shutting it puts it back where it was (it walked up the screen click by click)."""
+def test_the_guide_stays_in_the_middle_of_the_window(mic_wizard_again, qapp, monkeypatch):
+    """The guide is a card inside the window, not a window of its own: it stays in
+    the middle as a fold opens and shuts and as the window changes size, and shut
+    again it's its size at once (no empty band)."""
     from soundboard.mic import directmic
     from soundboard.ui.kit import fit
     monkeypatch.setattr(directmic, "works", lambda *a: True)
@@ -807,31 +819,28 @@ def test_a_fold_shut_again_puts_the_guide_back(mic_wizard_again, qapp, monkeypat
     w.cfg.route = "mic"
     w.cfg.mic_device = w.cfg.mic_device or "Mic"
     wiz.show()
+    assert not wiz.isWindow() and wiz.parentWidget() is w and not wiz.btn_close.isHidden()
     wiz.go(wiz.discord_index)
     _settle(qapp)
-    assert wiz.discord_fold.isVisible()
-    wiz.discord_fold.click()   # (it starts open: shut first)
-    _settle(qapp)
-    avail = wiz.screen().availableGeometry()
-    wiz.move(100, avail.bottom() - wiz.frameGeometry().height() - 5)
-    _settle(qapp)
-    home = wiz.y()
-    for _ in range(3):
-        wiz.discord_fold.click()
-        _settle(qapp)
-        assert wiz.y() < home   # open: up to fit
-        wiz.discord_fold.click()
-        # shut: its size at once, no empty band (opening can widen it a little, for
-        # a long button: then it's a bit shorter than before)
+
+    def centred():
+        c, m = wiz.geometry().center(), w.rect().center()
+        return abs(c.x() - m.x()) <= 1 and abs(c.y() - m.y()) <= 1
+
+    assert wiz.discord_fold.isVisible() and centred()
+    for _ in range(2):
+        wiz.discord_fold.click()   # (it starts open: shut first)
         assert wiz.height() == fit.needed_height(wiz, wiz.width())
         _settle(qapp)
-        assert wiz.y() == home   # and back where it was
-    wiz.discord_fold.click()   # dragged by them meanwhile: it stays where they put it
+        assert centred()
+        wiz.discord_fold.click()
+        _settle(qapp)
+        assert centred()
+    w.resize(w.width() + 200, w.height() + 100)
     _settle(qapp)
-    wiz.move(100, 50)
-    wiz.discord_fold.click()
-    _settle(qapp)
-    assert wiz.y() == 50
+    assert centred()
+    wiz.btn_close.click()   # its own close button: the window has the only title bar
+    assert not wiz.isVisible()
 
 
 def test_other_ways_card_explains_and_works(mic_wizard, monkeypatch):
@@ -1039,6 +1048,8 @@ def test_test_sound_card_and_a_lone_option_span_the_page(mic_wizard, monkeypatch
     assert card.width() == wiz.btn_next.geometry().right() - wiz.btn_back.x() + 1
     wiz.go(wiz.base + 2)
     wiz._show_other(True)
+    wiz.alt_fold.setChecked(True)   # its card open (measured shut, the sizes are old)
+    wiz.alt_card.show()
     qapp.processEvents()
     assert wiz.alt_other_row.isHidden()
     inner = wiz.alt_cable_row.parentWidget().contentsRect().width() - 2 * 14

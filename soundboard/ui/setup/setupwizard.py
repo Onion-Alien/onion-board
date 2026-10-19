@@ -632,6 +632,15 @@ class SetupWizard(QDialog):
         fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
         self.win = win
         self.setWindowTitle(_("Onion Board: quick setup"))
+        # inside the window, not a window of its own: a card in the middle of the
+        # plain backdrop (run_setup), kept there as the window changes size; its own
+        # close button, as there's no title bar (a second one under the window's read
+        # like two apps)
+        self.setWindowFlags(Qt.WindowType.Widget)
+        self.setObjectName("setupcard")
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground)
+        self.setProperty(fit.MARGIN, 2 * self.EDGE)
+        win.installEventFilter(self)
         # as wide as a row of tiles plus the margins: the tiles' right edge lines up
         # with Next's (DESIGN.md: everything on the same edges)
         self.setMinimumWidth(CONTENT_W + 2 * MARGIN)   # (the height follows each step)
@@ -677,6 +686,14 @@ class SetupWizard(QDialog):
         self.progress.setObjectName("hint")
         top.addWidget(self.progress)
         top.addStretch(1)
+        self.btn_close = QPushButton()
+        self.btn_close.setProperty("quiet", True)
+        icons.set_icon(self.btn_close, "close", size=16)
+        self.btn_close.setToolTip(_("Close"))
+        self.btn_close.setAccessibleName(_("Close"))
+        self.btn_close.setAutoDefault(False)   # (Enter is Next's)
+        self.btn_close.clicked.connect(self.reject)
+        top.addWidget(self.btn_close, 0, Qt.AlignmentFlag.AlignVCenter)
         v.addLayout(top)
         self.stack = _PageStack()
         v.addWidget(self.stack, 1)
@@ -1365,16 +1382,72 @@ class SetupWizard(QDialog):
 
     def showEvent(self, ev):
         super().showEvent(ev)
+        self.raise_()   # over the backdrop
+        self._centre()
         QTimer.singleShot(SETTLE_MS, self, self._settle_size)   # the first step's height
         if animations_on() and not ev.spontaneous():
-            self.setWindowOpacity(0.0)
+            self._set_opacity(0.0)
             QTimer.singleShot(ENTER_DELAY_MS, self, lambda: self._move_in(
                 0.0, 1.0, ENTER_MS, RISE, QEasingCurve.Type.OutCubic))
+
+    EDGE = 24   # the least room around the card, inside the window
+
+    def eventFilter(self, obj, ev):
+        if obj is self.win and ev.type() == QEvent.Type.Resize:
+            self._centre()
+        return False
+
+    def resizeEvent(self, ev):
+        super().resizeEvent(ev)
+        self._centre()
+
+    def _centre(self):
+        """In the middle of the window (`_rise` below it, coming in or going out). A
+        card taller or wider than the window grows the window, as far as the screen
+        lets it."""
+        if self.isWindow() or not self.isVisible():
+            return
+        p = self.parentWidget()
+        if p is None:
+            return
+        need_w, need_h = self.width() + 2 * self.EDGE, self.height() + 2 * self.EDGE
+        if (p.isWindow() and p.isVisible() and not (p.isMaximized() or p.isFullScreen())
+                and (need_w > p.width() or need_h > p.height())):
+            screen = p.screen() or QApplication.primaryScreen()
+            avail = screen.availableGeometry()
+            frame_h = p.frameGeometry().height() - p.height()
+            p.resize(min(max(p.width(), need_w), avail.width()),
+                     min(max(p.height(), need_h), avail.height() - frame_h))
+        x = max(0, (p.width() - self.width()) // 2)
+        y = max(0, (p.height() - self.height()) // 2) + round(self._rise)
+        if (x, y) != (self.x(), self.y()):
+            self.move(x, y)
+
+    def _set_opacity(self, v: float):
+        """The card's opacity (a window's own, for a guide shown as a window)."""
+        if self.isWindow():
+            self.setWindowOpacity(v)
+            return
+        fx = self.graphicsEffect()
+        if v >= 1.0:
+            if fx is not None:
+                # (none at rest: nothing drawn twice; Qt takes None, its stubs say no)
+                self.setGraphicsEffect(None)  # pyright: ignore[reportArgumentType]
+            return
+        if not isinstance(fx, QGraphicsOpacityEffect):
+            fx = QGraphicsOpacityEffect(self)
+            self.setGraphicsEffect(fx)
+        fx.setOpacity(v)
+
+    def _opacity(self) -> float:
+        if self.isWindow():
+            return self.windowOpacity()
+        fx = self.graphicsEffect()
+        return fx.opacity() if isinstance(fx, QGraphicsOpacityEffect) else 1.0
 
     def _move_in(self, a: float, b: float, ms: int, travel: int, curve, wait: bool = False):
         """Fade from opacity `a` to `b`, `travel` px below its place at 0 (the fade in,
         or out). `wait`: return once it's done (the way out, before done carries on)."""
-        home = self.pos()
         anim = QVariantAnimation(self)
         anim.setDuration(ms)
         anim.setStartValue(a)
@@ -1382,9 +1455,9 @@ class SetupWizard(QDialog):
         anim.setEasingCurve(curve)
 
         def step(v):
-            self.setWindowOpacity(v)
+            self._set_opacity(v)
             self._rise = (1 - v) * travel
-            self.move(home.x(), home.y() + round(self._rise))
+            self._centre()
         step(a)
         anim.valueChanged.connect(step)
         if wait:
@@ -1393,7 +1466,7 @@ class SetupWizard(QDialog):
             anim.start()
             loop.exec(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
         else:
-            anim.finished.connect(lambda: (setattr(self, "_rise", 0.0), self.move(home)))
+            anim.finished.connect(lambda: (setattr(self, "_rise", 0.0), self._centre()))
             anim.start()
 
     _settle_due = False
@@ -1559,7 +1632,7 @@ class SetupWizard(QDialog):
     def done(self, r):
         if animations_on() and self.isVisible() and not self._left:
             self._left = True   # out: a short fade, then the rest (still at once for callers)
-            self._move_in(self.windowOpacity(), 0.0, LEAVE_MS, SINK,
+            self._move_in(self._opacity(), 0.0, LEAVE_MS, SINK,
                           QEasingCurve.Type.InCubic, wait=True)
         self.timer.stop()
         self.discord_timer.stop()

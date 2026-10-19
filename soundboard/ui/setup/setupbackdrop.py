@@ -29,11 +29,13 @@ BIG_PX, NAME_DY = 18, 155 - splash.CARD_H / 2  # the name: its pixel size and ce
 
 
 class Backdrop(QWidget):
-    def __init__(self, window: QWidget):
+    def __init__(self, window: QWidget, logo: bool = True):
+        """`logo`: start with the logo and name (the first launch, after the loading
+        screen); without, just the background (the guide opened again)."""
         super().__init__(window)
         self.setObjectName("setupbackdrop")
         self.setAttribute(Qt.WidgetAttribute.WA_OpaquePaintEvent)
-        self._k = 0.0   # 0: the logo and name in the middle, 1: faded out
+        self._k = 0.0 if logo else 1.0   # 0: the logo and name in the middle, 1: gone
         self._settle: QVariantAnimation | None = None
         self._fade: QVariantAnimation | None = None
         window.installEventFilter(self)
