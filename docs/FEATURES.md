@@ -207,11 +207,10 @@ The full list. The [README](../README.md) has the short version and how to get s
 - **7-band equalizer** on your voice, your sounds, or both, with presets.
 - **Test mode:** *Hear what they hear* plays your mic plus the sounds exactly as others
   get them (a red banner shows while it's on).
-- **Connect your chat** (Setup tab): *Make it sound clean in Discord* (the Discord
-  settings that stop it chopping up your sounds, with a check that listens to what
-  Discord does to them), *Set up game voice chat*, *Zoom, Teams or a browser call*,
-  *Game has no microphone setting?*, and the *Step-by-step guide* with Bun (mic,
-  headphones, where your sounds go, then Discord). **Also play on** (Setup → Devices)
+- **Connect your chat** (Setup tab): *Make it sound clean in Discord* (Bun sets Discord
+  up himself, see *Discord set-up* below), *Set up game voice chat*, *Zoom, Teams or a
+  browser call*, *Game has no microphone setting?*, and the *Step-by-step guide* with Bun
+  (your mic and headphones, where your sounds go, then Discord). **Also play on** (Setup → Devices)
   gives extra outputs a copy of what others hear, each with a − to remove it.
 - **Search the web for sounds** from the Sounds tab: Enter in *Search sounds* lists
   results (thumbnail, title, length) in place of the pads, from YouTube, YouTube
@@ -240,8 +239,14 @@ The full list. The [README](../README.md) has the short version and how to get s
 - **Discord check:** while it runs, Onion Board reads Discord's own voice settings
   and shows a bar across the window when one would cut your sounds out (Noise
   Suppression, the Studio profile on your mic, Echo Cancellation, automatic input
-  sensitivity, Advanced Voice Activity); *Fix Discord* opens the steps, each setting
-  with a ✓ or what to switch. With *Straight into my mic*, an app that opens your mic
+  sensitivity, Advanced Voice Activity); *Fix Discord* has Bun set it up.
+- **Discord set-up:** Bun saves how Discord is set for talking, then switches off what
+  chops up your sounds (Custom profile, noise suppression, echo cancellation, automatic
+  gain and sensitivity off). Discord has to be closed while he writes: if it's open, he
+  asks first, closes it, and opens it again on its voice settings. A copy of its settings
+  folder is kept first. *Put Discord back* (Settings → Audio → Audio recovery) undoes it,
+  and *Put Discord back for talking on close* does it whenever Onion Board closes. On the
+  virtual cable you still pick *CABLE Output* as Discord's mic; its guide shows where. With *Straight into my mic*, an app that opens your mic
   in "raw" mode (and so skips your sounds) is named in a warning bar too.
 - **Your language:** Settings → Appearance → *Language* opens a searchable list of English
   and 32 other languages, each in its own name (Arabic right to left). Windows set to one of them

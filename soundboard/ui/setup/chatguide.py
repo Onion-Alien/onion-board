@@ -511,13 +511,138 @@ class ChatCheck(QObject):
 
 # --------------------------------------------------------------------------- dialogs
 
+class DiscordSetUp(QObject):
+    """Bun sets Discord up for your sounds (discordtalk.set_up), every Discord button's
+    one way to do it: the setup guide's last step, the Setup tab, the Fix Discord bar
+    and the Discord guide. How you talk there is saved first: it goes back by itself
+    when Onion Board closes (if that's on), and Settings → Audio → Audio recovery's Put
+    Discord back does it any time. Discord's settings can only be written while it's
+    closed: open, it's asked first, closed, and opened again on its voice settings."""
+    _done = Signal(object)
+
+    def __init__(self, mw, parent=None, then=None):
+        """`then`: called once it's over (set up, already right, or left), on the UI
+        thread: what comes next (the cable still has to be picked in Discord)."""
+        super().__init__(mw)
+        self.mw, self.parent_w, self.then = mw, parent or mw, then
+        self._on_mic = raw_skips(mw)
+        self._closed: list[str] = []   # the Discords closed here: opened again after
+        self._done.connect(self._finished)
+
+    def start(self):
+        if getattr(self.mw, "_discord_setup", None) is not None:
+            return   # one at a time (a double click)
+        self.mw._discord_setup = self
+        busy.toast(self.parent_w, _("Bun is setting up Discord…"), "busy", 4000,
+                   key="discord-setup")
+        self._go([])
+
+    def _go(self, close: list[str]):
+        saved = dict(self.mw.cfg.discord_talk)
+        threading.Thread(target=self._run, args=(saved, close), daemon=True,
+                         name="discord-setup").start()
+
+    def _run(self, saved: dict, close: list[str]):
+        """On a thread: Discord's files and processes."""
+        from soundboard.mic import discordtalk
+        from soundboard.sounds.library import APP_DIR
+        try:
+            if close and not discordtalk.close_clients(close):
+                res: dict = {"stuck": True}
+            else:
+                res = discordtalk.set_up(saved, APP_DIR / "discord-backup", self._on_mic)
+                res["installed"] = discordtalk.installed()
+        except Exception as e:  # noqa: BLE001 - said, never a stuck "setting up"
+            log.exception("setting up Discord failed")
+            res = {"error": errors.plain(e)}
+        busy.emit(self._done, res)
+
+    def _finished(self, res: dict):
+        mw = self.mw
+        if res.get("running") and not self._closed:
+            if not self._ask_to_close():
+                return self._end()
+            self._closed = list(res["running"])
+            self._go(self._closed)
+            return
+        talk = res.get("talk") or {}
+        if talk:   # how they talk, from before: what goes back (discordtalk.restore)
+            mw.cfg.discord_talk = {**mw.cfg.discord_talk, **talk}
+            mw.cfg.save()
+        done = res.get("done") or []
+        if res.get("error") or res.get("stuck") or res.get("failed") or res.get("running"):
+            busy.toast(self.parent_w, _(
+                "Bun couldn't change Discord's settings, so here's how to do it yourself."),
+                "warn", 6000, key="discord-setup")
+            self.then = None   # the guide is what comes next
+            self._end()
+            show_guide("discord", self.parent_w, mw, self._vm())
+            return
+        if not res.get("installed"):
+            busy.toast(self.parent_w, _("Discord isn't installed on this PC."), "warn", 5000,
+                       key="discord-setup")
+            return self._end()
+        if self._closed or done:   # back on its voice settings, as they'd left it
+            busy.open_url(DISCORD_VOICE_URL, None, self.parent_w,
+                          failed=_("Couldn't open Discord. The link was"))
+        if not done:
+            busy.toast(self.parent_w, _("Discord is already set up for your sounds."), "ok",
+                       4000, key="discord-setup")
+            return self._end()
+        name, before, after = done[0]
+        cfg, setctl = mw.cfg, getattr(mw, "setctl", None)
+        box = DiscordFixed(self.parent_w, name, setting_changes(before, after),
+                           bool(cfg.discord_restore),
+                           (lambda: setctl.open_settings("audio")) if setctl else None)
+        box.exec()
+        free_dialog(box)
+        self._end()
+
+    def close_box(self):
+        """The question before Discord is closed: (the box, its yes button)."""
+        from PySide6.QtWidgets import QMessageBox
+        box = QMessageBox(QMessageBox.Icon.Question, _("Close Discord for a moment?"), _(
+            "Discord has to close for a few seconds while Bun changes its settings. It "
+            "drops any call you're in. Bun opens it again right after."), parent=self.parent_w)
+        yes = box.addButton(_("Close Discord and set it up"), QMessageBox.ButtonRole.AcceptRole)
+        box.addButton(_("Not now"), QMessageBox.ButtonRole.RejectRole)
+        box.setDefaultButton(yes)
+        return box, yes
+
+    def _ask_to_close(self) -> bool:
+        box, yes = self.close_box()
+        box.exec()
+        box.deleteLater()
+        return box.clickedButton() is yes
+
+    def _vm(self) -> str:
+        statusctl = getattr(self.mw, "statusctl", None)
+        return getattr(statusctl, "virtual_mic", None) or "CABLE Output"
+
+    def _end(self):
+        self.mw._discord_setup = None
+        then, self.then = self.then, None
+        if then is not None:
+            then()
+        self.deleteLater()
+
+
+def set_up_discord(mw, parent=None, then=None):
+    """Set Discord up for sounds (DiscordSetUp). On the cable or a virtual mic, Discord
+    still has to be told which mic: its guide follows, saying which."""
+    if then is None and not on_mic(mw):
+        statusctl = getattr(mw, "statusctl", None)
+        vm = getattr(statusctl, "virtual_mic", None)
+        if vm:
+            then = lambda: show_guide("discord", parent or mw, mw, vm)  # noqa: E731
+    DiscordSetUp(mw, parent, then).start()
+
+
 class DiscordGuide(QDialog):
     """The Discord settings that matter for sounds, with the check built in."""
     _settings_read = Signal(object, object)   # (signature, [Settings] or None = unchanged)
 
-    def __init__(self, parent, mw, vm: str, kept: bool = False, open_app: bool = False):
-        """`open_app`: open Discord on its voice settings as the guide shows (the setup
-        guide's "Set up Discord when I finish")."""
+    def __init__(self, parent, mw, vm: str, kept: bool = False):
         super().__init__(parent)
         fit.watch(self)
         self.mw, self.vm, self.kept = mw, vm, kept
@@ -591,12 +716,19 @@ class DiscordGuide(QDialog):
             failed=_("Couldn't open Discord: is it installed? Open it yourself: ⚙ User "
                      "Settings → Voice & Video. The link was")))
         row.addWidget(opn)
-        if open_app:   # once it's up, so a failure's note has a window to sit on
-            QTimer.singleShot(0, self, opn.click)
         ptt = QPushButton(_("Auto push-to-talk"))
         ptt.clicked.connect(lambda: mw.setctl.open_settings("hotkeys"))
         row.addWidget(ptt)
         row.addStretch(1)
+        # Bun does it all: the same as every other Discord button (DiscordSetUp)
+        auto = self.btn_auto = QPushButton(_("Set it up for me"))
+        icons.set_icon(auto, "star")
+        auto.setToolTip(_("Bun saves how Discord is set now, then switches off what chops "
+                          "up your sounds. Settings → Audio recovery puts it back."))
+        # (the guide stays: on the cable its Input Device step is still to do, and its
+        # live list ticks the settings off as Bun changes them)
+        auto.clicked.connect(lambda: set_up_discord(mw, self, then=lambda: None))
+        row.addWidget(auto)
         self.btn_check = QPushButton(_("Check Discord"))
         self.btn_check.setObjectName("primary")
         self.btn_check.clicked.connect(self.check)
@@ -800,10 +932,9 @@ class MeetingGuide(QDialog):
         v.addLayout(row)
 
 
-def show_guide(which: str, parent, mw, vm: str, open_app: bool = False):
+def show_guide(which: str, parent, mw, vm: str):
     """Open one guide modally: 'discord', 'game', 'meeting' or 'steam'. Straight into
-    the mic, the guides name the user's own mic (there's nothing to switch to).
-    `open_app`: the Discord guide opens Discord on its voice settings too."""
+    the mic, the guides name the user's own mic (there's nothing to switch to)."""
     kept = on_mic(mw)
     if kept:
         vm = mw.cfg.mic_device or _("your mic")
@@ -815,6 +946,6 @@ def show_guide(which: str, parent, mw, vm: str, open_app: bool = False):
     elif which == "meeting":
         g = MeetingGuide(parent, mw, vm, kept)
     else:
-        g = DiscordGuide(parent, mw, vm, kept, open_app)
+        g = DiscordGuide(parent, mw, vm, kept)
     g.exec()
     free_dialog(g)

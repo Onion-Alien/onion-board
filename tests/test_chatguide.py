@@ -305,3 +305,109 @@ def test_guide_cheers_with_what_changed_once_discord_is_fixed(wizard, monkeypatc
     shown.accept()
     assert g.result() == chatguide.QDialog.DialogCode.Accepted
     g.done(0)
+
+
+# ---------------------------------------------------------------- Bun sets Discord up
+
+class _Setup:
+    """discordtalk stood in: what set_up finds, and what was asked of it."""
+
+    def __init__(self, monkeypatch, first, then=None):
+        from soundboard.mic import discordtalk
+        from soundboard.ui.kit import busy
+        self.calls, self.closed, self.opened, self.fixed, self.toasts = [], [], [], [], []
+        answers = [first, then or first]
+
+        def set_up(saved, root, on_mic, **k):
+            self.calls.append(saved)
+            return dict(answers[min(len(self.calls) - 1, 1)])
+        monkeypatch.setattr(discordtalk, "set_up", set_up)
+        monkeypatch.setattr(discordtalk, "installed", lambda: True)
+        monkeypatch.setattr(discordtalk, "close_clients",
+                            lambda dirs: self.closed.append(list(dirs)) or True)
+        monkeypatch.setattr(busy, "open_url", lambda url, *a, **k: self.opened.append(url))
+        monkeypatch.setattr(busy, "toast", lambda w, text, *a, **k: self.toasts.append(text))
+        monkeypatch.setattr(chatguide.DiscordFixed, "exec",
+                            lambda box: self.fixed.append(box.table.text()) or 0)
+
+
+def _talking():
+    from soundboard.mic import discordcfg
+    return discordcfg.Settings(client="Discord", profile="CUSTOM", krisp=True,
+                               suppression=False, echo=True, agc=True, bypass=False,
+                               vad=False, input_device="default", stamp=0.0)
+
+
+def _sound():
+    from dataclasses import replace
+    return replace(_talking(), krisp=False, echo=False, agc=False)
+
+
+def _run(qapp, monkeypatch, wiz_window, first, then=None, close=True):
+    w = wiz_window
+    fake = _Setup(monkeypatch, first, then)
+    asked = []
+    monkeypatch.setattr(chatguide.DiscordSetUp, "_ask_to_close",
+                        lambda self: asked.append(1) or close)
+    done = []
+    chatguide.set_up_discord(w, then=lambda: done.append(1))
+    assert process_events(qapp, lambda: done, timeout=5)
+    return fake, asked
+
+
+def test_set_up_discord_saves_talk_writes_and_shows_what_changed(qapp, wizard, monkeypatch):
+    w, _wiz = wizard
+    w.cfg.discord_talk = {}
+    fake, asked = _run(qapp, monkeypatch, w, {
+        "done": [("Discord", _talking(), _sound())], "running": [], "failed": [],
+        "talk": {"discord": {"noiseCancellation": True}}})
+    assert not asked and fake.closed == []
+    assert w.cfg.discord_talk == {"discord": {"noiseCancellation": True}}   # to put back
+    assert fake.opened == [chatguide.DISCORD_VOICE_URL]   # Discord, on its voice page
+    assert fake.fixed and "Echo" in fake.fixed[0]          # exactly what changed
+
+
+def test_an_open_discord_is_asked_about_then_closed_and_set(qapp, wizard, monkeypatch):
+    w, _wiz = wizard
+    fake, asked = _run(qapp, monkeypatch, w,
+                       {"done": [], "running": ["discord"], "failed": [], "talk": {}},
+                       {"done": [("Discord", _talking(), _sound())], "running": [],
+                        "failed": [], "talk": {}})
+    assert asked == [1] and fake.closed == [["discord"]] and len(fake.calls) == 2
+    assert fake.opened == [chatguide.DISCORD_VOICE_URL] and fake.fixed
+
+
+def test_not_now_leaves_an_open_discord_alone(qapp, wizard, monkeypatch):
+    w, _wiz = wizard
+    fake, asked = _run(qapp, monkeypatch, w,
+                       {"done": [], "running": ["discord"], "failed": [], "talk": {}},
+                       close=False)
+    assert asked == [1] and fake.closed == [] and len(fake.calls) == 1
+    assert fake.opened == [] and fake.fixed == []
+    assert getattr(w, "_discord_setup", None) is None   # can be asked again
+
+
+def test_an_already_right_discord_just_says_so(qapp, wizard, monkeypatch):
+    w, _wiz = wizard
+    fake, _asked = _run(qapp, monkeypatch, w,
+                        {"done": [], "running": [], "failed": [], "talk": {}})
+    assert fake.opened == [] and fake.fixed == []
+    assert any("already set up" in t for t in fake.toasts)
+
+
+def test_a_failed_set_up_falls_back_to_the_guide(qapp, wizard, monkeypatch):
+    w, _wiz = wizard
+    shown = []
+    monkeypatch.setattr(chatguide, "show_guide", lambda which, *a: shown.append(which))
+    fake = _Setup(monkeypatch, {"done": [], "running": [], "failed": ["Discord"],
+                                "talk": {}})
+    chatguide.set_up_discord(w, then=lambda: shown.append("then"))
+    assert process_events(qapp, lambda: shown, timeout=5)
+    assert shown == ["discord"] and fake.fixed == []   # the guide, not then on top
+
+
+def test_the_discord_guide_offers_to_do_it(wizard):
+    w, wiz = wizard
+    g = chatguide.DiscordGuide(wiz, w, "CABLE Output")
+    assert g.btn_auto.text() == "Set it up for me" and g.btn_auto.toolTip()
+    g.done(0)

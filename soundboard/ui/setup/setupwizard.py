@@ -69,11 +69,12 @@ DISCORD_READ_MS = 2000  # the last step re-reads Discord's own settings this oft
 _DISCORD_POLL = PollThread("setup-discord-read")
 # the device steps by name, for the count of where the guide was closed (usage.py)
 PAGE_NAMES = ("mic", "send", "last")   # (the mic and headphones share step 1: "mic")
-# the first launch's "Make it yours" page: three looks to start from, the plain pair and
-# a seasonal one (the rest: Settings; one row, so the step with the tabs and Discord on
-# it still fits a 720 px window)
+# the first launch's "Make it yours" page: nine looks to start from (the rest: Settings).
+# Row one the plain pair and a seasonal one, then the best three dark and three light.
 SEASONAL, SEASONAL_OFF = "Halloween", "Midnight"   # (Midnight once Halloween's gone)
-LOOK_ROWS = (("Light", "Dark", SEASONAL),)
+LOOK_ROWS = (("Light", "Dark", SEASONAL),
+             ("Ocean", "Toxic", "Synthwave"),
+             ("Mint", "Paper", "Cherry Blossom"))
 
 
 def look_themes() -> list[str]:
@@ -191,7 +192,10 @@ def test_tune() -> np.ndarray:
 TILE_W = 138                  # a device tile; TILE_COLS of them fill the page's width
 TILE_MIN_H = 72               # a tile's least height (as tall as its names need: tile_h)
 TILE_COLS, TILE_GAP = 4, 12
-TAB_TILE_H = 48               # the last step's tab tiles (icon beside the name)
+# the first launch's last step, in two columns: the choices, then the 3 x 3 looks
+LOOK_CARD_W, LOOK_CARD_H, LOOK_CARD_GAP = 150, 112, 12   # a look (ThemeCard's own size)
+LOOK_LEFT_W, LOOK_GAP = 300, 28
+LOOK_RIGHT_W = 3 * LOOK_CARD_W + 2 * LOOK_CARD_GAP
 CONTENT_W = TILE_COLS * TILE_W + (TILE_COLS - 1) * TILE_GAP   # a page's width: one row
 MARGIN = 24                   # the dialog's sides: the step bar, pages and Back / Next
 HEADER_GAP = 20               # every step: between the title + words and what's below
@@ -786,52 +790,94 @@ class SetupWizard(QDialog):
         look, starting with Windows, Lite mode, and the "Set up Discord" switch."""
         from soundboard import i18n
         from soundboard.ui.settings.langpick import LangButton
-        from soundboard.ui.settings.appearance import ThemeCard, ThemeGrid
-        from soundboard.ui.window.moretabs import PITCH
+        from soundboard.ui.settings.appearance import ThemeCard
         p = QWidget()
         v = QVBoxLayout(p)
         v.addLayout(_header(_("All set! Now make it yours"),
-                            _label(_("Pick your tabs and a look. Change them any time in "
+                            # two lines, as every step's: the header ends level with Bun
+                            _label(_("Tick the tabs you want and pick a look.<br>Not sure what "
+                                     "a tab does? Click its ⓘ. Change any of it later in "
                                      "<b>Settings</b>.")),
                             BunnyWidget("star", celebrate=True, height=BUN_H, pad=BUN_PAD)))
         v.addSpacing(HEADER_GAP)
-        # the tabs: tick the ones to start with (Sounds and Setup are always there)
-        v.addWidget(_section(_("Your tabs")))
-        v.addSpacing(6)
-        box = QWidget()
-        grid = QGridLayout(box)   # one row, like the device tiles
-        grid.setContentsMargins(0, 0, 0, 0)
-        grid.setSpacing(TILE_GAP)
-        self.tab_buttons: dict[str, ChoiceTile] = {}
+        # one grid, so everything lines up: the headings on one line, then each block on
+        # the left level with a row of looks on the right (tabs | row 1, Discord | row 2,
+        # language and the two switches | row 3). Two columns, so the nine looks fit a
+        # 720 px window (one under another it was ~900 px tall)
+        g = QGridLayout()
+        g.setContentsMargins(0, 0, 0, 0)
+        g.setHorizontalSpacing(LOOK_CARD_GAP)
+        g.setVerticalSpacing(LOOK_CARD_GAP)
+        g.setColumnMinimumWidth(0, LOOK_LEFT_W)
+        # the gap's column (empty: Qt puts one spacing beside it, not two)
+        g.setColumnMinimumWidth(1, LOOK_GAP - LOOK_CARD_GAP)
+        g.setColumnStretch(5, 1)   # spare width after the looks, never between
+        v.addLayout(g)
+        top = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
+        g.addWidget(_section(_("Your tabs")), 0, 0, top)
+        g.addWidget(_section(_("Look")), 0, 2, 1, 3, top)
+        # the tabs (row 1): one tick box each (an opt-in reads as one), with its tab's icon
+        # and an ⓘ that drops down what the tab is for (+ More tabs' words); four rows
+        # as tall as a look
+        tabs = QWidget()
+        tabs.setFixedSize(LOOK_LEFT_W, LOOK_CARD_H)
+        tl = QVBoxLayout(tabs)
+        tl.setContentsMargins(0, 0, 0, 0)
+        tl.setSpacing(0)
+        self.tab_buttons: dict[str, QCheckBox] = {}
+        self.tab_infos: dict[str, QPushButton] = {}
         names = tab_names()
-        for i, key in enumerate(OPTIONAL_TABS):
-            # the icon beside the name: shorter than a device's tile, so the step fits
-            tile = ChoiceTile(names[key], key, TILE_W, TAB_TILE_H, stacked=False)
-            tile.setAutoExclusive(False)   # any number of them
-            tile.setChecked(self.win.tabctl.tab_on(key))
-            tile.setToolTip(PITCH.get(key, ""))
-            tile.setProperty("tab", key)
-            grid.addWidget(tile, 0, i)
-            self.tab_buttons[key] = tile
-        grid.setColumnStretch(len(OPTIONAL_TABS), 1)
-        v.addWidget(box)
-        v.addSpacing(SECTION_GAP)
-        # the look: a few themes, the language beside its title
+        for key in OPTIONAL_TABS:
+            row = QHBoxLayout()
+            row.setSpacing(4)
+            chk = QCheckBox(names[key])
+            icons.set_icon(chk, key)
+            chk.setChecked(self.win.tabctl.tab_on(key))   # Voice on, the rest opt-in
+            chk.setProperty("tab", key)
+            row.addWidget(chk)
+            info = panel.info_button(_("What's {name}?", name=names[key]))
+            info.clicked.connect(lambda __=False, k=key: self._tab_info(k))
+            row.addWidget(info)
+            row.addStretch(1)
+            tl.addLayout(row, 1)   # (each a quarter of the look's height)
+            self.tab_buttons[key] = chk
+            self.tab_infos[key] = info
+        g.addWidget(tabs, 1, 0, top)
+        # Discord (row 2): an opt-in, done after Finish (Bun sets it:
+        # chatguide.set_up_discord), as tall as a look
+        card, cl = _card(14, 6, roomy=False)
+        card.setFixedWidth(LOOK_LEFT_W)
+        card.setMinimumHeight(LOOK_CARD_H)
+        self.chk_discord = QCheckBox(_("Set up Discord for me"))
+        self.chk_discord.setStyleSheet("font-weight:700;")
+        cl.addWidget(self.chk_discord)
+        self.discord_why = _label("", "font-size:10pt;")
+        self.discord_why.setObjectName("muted")
+        cl.addWidget(self.discord_why)
+        cl.addStretch(1)
+        g.addWidget(card, 2, 0, top)
+        self._discord_touched = False   # ticked or unticked by them: keep it so
+        self.chk_discord.clicked.connect(lambda: setattr(self, "_discord_touched", True))
+        # the language, starting with Windows and Lite mode (row 3)
+        more_box = QWidget()
+        more_box.setFixedWidth(LOOK_LEFT_W)
+        ml = QVBoxLayout(more_box)
+        ml.setContentsMargins(0, 0, 0, 0)
+        ml.setSpacing(8)
         row = QHBoxLayout()
         row.setSpacing(10)
-        row.addWidget(_section(_("Look")))
-        row.addStretch(1)
         row.addWidget(QLabel(_("Language")))
         self.lang_button = LangButton()
         langs = dict(i18n.available())
         code = self.win.cfg.language if self.win.cfg.language in langs else i18n.current()
         self.lang_button.show_language(code, langs.get(code, code))
         row.addWidget(self.lang_button)
-        v.addLayout(row)
-        self.lang_note = _label("", "")
+        row.addStretch(1)
+        ml.addLayout(row)
+        self.lang_note = _label("", "font-size:10pt;")
         self.lang_note.setObjectName("hint")
         self.lang_note.hide()
-        v.addWidget(self.lang_note)
+        ml.addWidget(self.lang_note)
 
         def open_picker():
             from soundboard.ui.settings.langpick import LanguageDialog
@@ -840,48 +886,55 @@ class SetupWizard(QDialog):
             dlg.chosen.connect(self._pick_language)
             dlg.open_under(self.lang_button)
         self.lang_button.clicked.connect(open_picker)
-        v.addSpacing(6)
+        self.chk_autostart = QCheckBox(_("Start with Windows"))
+        self.chk_autostart.setToolTip(_("Start Onion Board when I sign in to Windows "
+                                        "(quietly, in the tray)"))
+        self.chk_autostart.setChecked(autostart.is_enabled())
+        self.chk_autostart.setEnabled(autostart.available())
+        ml.addWidget(self.chk_autostart)
+        # Lite mode, as in Settings > Appearance: applied at once, so they see it
+        from soundboard.ui.settings import lite
+        self.chk_lite = QCheckBox(_("Lite mode (suggested for this PC)") if lite.slow_pc()
+                                  else _("Lite mode"))
+        self.chk_lite.setToolTip(_("Lite mode: no animations, for slower PCs"))
+        self.chk_lite.setChecked(self.win.cfg.lite_mode)
+        self.chk_lite.toggled.connect(self.win.themectl.set_lite_mode)
+        ml.addWidget(self.chk_lite)
+        g.addWidget(more_box, 3, 0, top)
+        # the looks: three rows of three, each card in its own cell (rows 1 to 3)
         self.look_cards: list = []
-        for name in look_themes():
+        for i, name in enumerate(look_themes()):
             c = ThemeCard(name)
+            c.setFixedSize(LOOK_CARD_W, LOOK_CARD_H)
             c.setChecked(name == theme.current_name)
             c.clicked.connect(lambda __=False, n=name: self._pick_look(n))
             self.look_cards.append(c)
-        grid = ThemeGrid(self.look_cards, max_columns=len(LOOK_ROWS[0]))
-        grid.setMaximumWidth(CONTENT_W)   # (its cards' widths would widen the guide)
-        v.addWidget(grid)
+            g.addWidget(c, 1 + i // 3, 2 + i % 3, top)
         more = QLabel(_("{n} more themes in Settings.", n=len(theme.THEMES) - len(look_themes())))
         more.setObjectName("hint")
-        v.addWidget(more)
-        v.addSpacing(SECTION_GAP)
-        # Discord: an opt-in, done after Finish (the Discord guide over the board, and
-        # Discord opened on its voice settings), so the guide itself stays short
-        card, cl = _card(14, 6, roomy=False)
-        self.chk_discord = QCheckBox(_("Set up Discord when I finish"))
-        self.chk_discord.setStyleSheet("font-weight:700;")
-        cl.addWidget(self.chk_discord)
-        self.discord_why = _label("", "font-size:10pt;")
-        self.discord_why.setObjectName("muted")
-        cl.addWidget(self.discord_why)
-        v.addWidget(card)
-        self._discord_touched = False   # ticked or unticked by them: keep it so
-        self.chk_discord.clicked.connect(lambda: setattr(self, "_discord_touched", True))
-        v.addSpacing(6)
-        self.chk_autostart = QCheckBox(_("Start Onion Board when I sign in to Windows "
-                                         "(quietly, in the tray)"))
-        self.chk_autostart.setChecked(autostart.is_enabled())
-        self.chk_autostart.setEnabled(autostart.available())
-        v.addWidget(self.chk_autostart)
-        # Lite mode, as in Settings > Appearance: applied at once, so they see it
-        from soundboard.ui.settings import lite
-        self.chk_lite = QCheckBox(
-            _("Lite mode: no animations, for slower PCs (suggested for this PC)")
-            if lite.slow_pc() else _("Lite mode: no animations, for slower PCs"))
-        self.chk_lite.setChecked(self.win.cfg.lite_mode)
-        self.chk_lite.toggled.connect(self.win.themectl.set_lite_mode)
-        v.addWidget(self.chk_lite)
+        g.addWidget(more, 4, 2, 1, 3, top)
         v.addStretch(1)
         return p
+
+    def _tab_info(self, key: str):
+        """A tab's ⓘ: what it's for, dropped down under the ⓘ (inside the window)."""
+        from PySide6.QtCore import QPoint
+        from soundboard.ui.sounds.dialogs import TabHelpPopup
+        from soundboard.ui.window.moretabs import PITCH
+        btn = self.tab_infos[key]
+        box = TabHelpPopup(tab_names()[key], PITCH.get(key, ""), owl=key == "triggers",
+                           parent=self.win)   # (Triggers is the owl's, as on its tab)
+        lay = box.layout()
+        if lay is not None:
+            lay.activate()   # wrapped text: as tall as the words need
+        box.resize(box.width(), box.heightForWidth(box.width()) if box.hasHeightForWidth()
+                   else box.sizeHint().height())
+        at = btn.mapToGlobal(QPoint(0, btn.height() + 6))
+        area = self.win.geometry()
+        box.move(max(area.left(), min(at.x() - 24, area.right() - box.width() + 1)),
+                 max(area.top(), min(at.y(), area.bottom() - box.height() + 1)))
+        box.exec()
+        box.deleteLater()
 
     def _discord_needed(self) -> bool:
         """Discord has to be told something: on the cable or a virtual mic it must pick
@@ -893,20 +946,16 @@ class SetupWizard(QDialog):
     def _fill_discord_choice(self):
         """The "Set up Discord" switch's words (and, until they touch it, whether it's
         ticked) follow the send step: on by itself only when Discord must pick a mic."""
-        cfg = self.win.cfg
         need = self._discord_needed()
         if not self._discord_touched:
             self.chk_discord.setChecked(need)
         if need:
-            why = _("Discord has to be told to use your new mic. Bun opens Discord on the "
-                    "right page and shows you what to pick.")
-        elif cfg.route == "mic" and self.route_ok():
-            why = _("Your sounds are already in your mic. Bun opens Discord and checks its "
-                    "noise filter, which can chop sounds up. Skip it if you don't use "
-                    "Discord.")
+            mic = eng.virtual_mic_for(self.win.routectl._main_name()) or "CABLE Output"
+            why = _("Bun turns off Discord's noise filter, then shows you where to pick "
+                    "<b>{mic}</b> as your mic.", mic=html.escape(mic))
         else:
-            why = _("Bun opens Discord on its voice settings and shows you what to change. "
-                    "Skip it if you don't use Discord.")
+            why = _("Bun turns off Discord's noise filter so your sounds don't get cut off. "
+                    "Undo it any time in Settings.")
         self.discord_why.setText(why)
 
     def _pick_language(self, code: str):
@@ -967,17 +1016,17 @@ class SetupWizard(QDialog):
         lst, self.mic_group = self._choice_list(
             mics, cur, lambda n: self._pick_mic(n, by_user=True), "input")
         v.addWidget(lst)   # the picked mic's tile shows your voice's level along its foot
+        # under the tiles, on their left edge: what the mic hears, then its one option
+        # (on the far right it sat apart from the mic it's about)
         v.addSpacing(8)
-        row = QHBoxLayout()
-        row.setSpacing(12)
         self.mic_heard = _label("", "font-size:10pt;")
-        row.addWidget(self.mic_heard, 1)
+        v.addWidget(self.mic_heard)
+        v.addSpacing(4)
         self.chk_send = QCheckBox(_("Send my voice too"))
         self.chk_send.setToolTip(_("Send my voice too (untick if you only want your sounds to "
                                    "go out, not your mic)"))
         self.chk_send.setChecked(self.win.cfg.mic_enabled)
-        row.addWidget(self.chk_send, 0, Qt.AlignmentFlag.AlignTop)
-        v.addLayout(row)
+        v.addWidget(self.chk_send, 0, Qt.AlignmentFlag.AlignLeft)
         v.addSpacing(SECTION_GAP + 4)
         # the headphones, then the test sound's button under them (beside their title,
         # a long title or button in some languages made the step wider than the tiles)
@@ -1263,7 +1312,7 @@ class SetupWizard(QDialog):
         self.btn_discord.setObjectName("primary")
         self.btn_discord.setToolTip(_("The Discord settings that stop it chopping up your "
                                       "sounds, and a check that listens to what Discord does"))
-        self.btn_discord.clicked.connect(lambda: self.show_guide("discord"))
+        self.btn_discord.clicked.connect(self._set_up_discord)
         body.addWidget(self.btn_discord, 0, Qt.AlignmentFlag.AlignLeft)
         v.addSpacing(8)
         v.addWidget(self.discord_body)
@@ -1336,7 +1385,15 @@ class SetupWizard(QDialog):
             self.discord_timer.stop()
         self._update_next()
         # to the new step's size now, before it's drawn: drawn first at the old size,
-        # a taller step showed squeezed for a moment
+        # a taller step showed squeezed for a moment. Its width too: the first launch's
+        # last step is wider (two columns), and back from it the others are their own
+        # width again (fit only grows), their tiles' edges on Back's and Next's
+        lay = self.layout()
+        if lay is not None and self.isVisible():
+            lay.activate()   # (the new step's own least width, straight to it)
+            want = max(self.minimumWidth(), lay.totalMinimumSize().width())
+            if self.width() != want:
+                self.resize(want, self.height())
         fit.fit(self)
         self._settle_size()
         QTimer.singleShot(SETTLE_MS, self, self._settle_size)
@@ -1544,8 +1601,8 @@ class SetupWizard(QDialog):
         self.go(self.stack.currentIndex() + 1)
 
     def finish(self, discord: bool = False):
-        """`discord`: then the Discord guide, over the window (the setup guide is gone),
-        with Discord opened on its voice settings."""
+        """`discord`: then Bun sets Discord up for sounds, over the window (the setup
+        guide is gone): chatguide.set_up_discord, as every Discord button does."""
         cfg = self.win.cfg
         # Finish means done, sending set up or not: like closing it, the guide doesn't
         # open by itself again (the Setup tab's Step-by-step guide still opens it, and
@@ -1562,11 +1619,10 @@ class SetupWizard(QDialog):
         if self._lang_pending:   # text already on screen can't change language
             QTimer.singleShot(0, self.win.restart_app)
         elif discord:
-            from soundboard.ui.setup.chatguide import show_guide
-            win, vm = self.win, self._vm
+            from soundboard.ui.setup.chatguide import set_up_discord
+            win = self.win
             usage.used("setup-discord")
-            QTimer.singleShot(0, win, lambda: show_guide("discord", win, win, vm,
-                                                         open_app=True))
+            QTimer.singleShot(0, win, lambda: set_up_discord(win))
 
     def reject(self):
         """Esc / the window's X. Mid-install, check first: the install carries on
@@ -2243,6 +2299,12 @@ class SetupWizard(QDialog):
         self.discord_live.setVisible(bool(text))
         self.discord_tip.setVisible(bool(self.discord_tip.text()) and not text)
         self._show_discord_body()
+
+    def _set_up_discord(self):
+        """The Discord step's button: Bun sets it (as every Discord button does); this
+        step's own words say what's left to pick on the cable."""
+        from soundboard.ui.setup.chatguide import set_up_discord
+        set_up_discord(self.win, self, then=lambda: None)
 
     def show_steam_guide(self):
         self.show_guide("steam")

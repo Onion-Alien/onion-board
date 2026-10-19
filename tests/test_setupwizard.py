@@ -1099,6 +1099,29 @@ def test_the_last_step_picks_the_tabs(mic_wizard):
     assert not w.tabctl.tab_on("radio") and w.cfg.use_mode == "custom"
 
 
+def test_each_tab_has_an_info_button_saying_what_it_is(mic_wizard, monkeypatch):
+    """Voice starts ticked, Radio, Apps and Triggers are opt-in; each ⓘ drops down
+    what its tab is for (+ More tabs' words), under the ⓘ."""
+    from soundboard.ui.sounds import dialogs
+    from soundboard.ui.window.moretabs import PITCH
+    w, wiz = mic_wizard
+    wiz.go(wiz.look_index)
+    assert [k for k, b in wiz.tab_buttons.items() if b.isChecked()] == ["voice"]
+    shown = []
+    monkeypatch.setattr(dialogs.TabHelpPopup, "exec",
+                        lambda box: shown.append((box.heading.text(), box.body.text(),
+                                                  box.y())) or 0)
+    for key in setupwizard.OPTIONAL_TABS:
+        info = wiz.tab_infos[key]
+        assert info.toolTip()
+        info.click()
+        title, body, y = shown[-1]
+        assert title == setupwizard.tab_names()[key] and body == PITCH[key]
+        assert 12 <= len(body.split()) <= 25   # a short line, not a page
+        assert y >= info.mapToGlobal(info.rect().bottomLeft()).y()   # dropped down
+    assert not w.tabctl.tab_on("radio")   # looking never ticks it
+
+
 def test_unticking_a_tab_switches_it_off(mic_wizard):
     w, wiz = mic_wizard
     assert w.tabctl.tab_on("voice")
@@ -1306,7 +1329,7 @@ def test_the_first_launch_ends_on_make_it_yours(mic_wizard, monkeypatch):
     assert wiz.PAGES - 1 == wiz.look_index == wiz.stack.currentIndex()
     assert wiz.stack.widget(wiz.look_index).isAncestorOf(wiz.lang_button)
     assert [c.name for c in wiz.look_cards] == setupwizard.look_themes()
-    assert len(wiz.look_cards) == 3
+    assert len(wiz.look_cards) == 9
     assert "Finish" in wiz.btn_next.text()
     assert "Last thing" not in wiz.stack.widget(wiz.look_index).findChild(
         setupwizard.QLabel).text()
@@ -1314,30 +1337,29 @@ def test_the_first_launch_ends_on_make_it_yours(mic_wizard, monkeypatch):
     assert wiz.stack.currentIndex() == wiz.look_index
 
 
-def test_set_up_discord_finishes_into_the_discord_guide(mic_wizard, monkeypatch):
-    """Ticked, Finish opens the Discord guide over the board, which opens Discord on
-    its voice settings; unticked, it just finishes."""
+def test_set_up_discord_finishes_into_bun_setting_it_up(mic_wizard, monkeypatch):
+    """Ticked, Finish hands over to Bun setting Discord up (the same as every Discord
+    button: chatguide.set_up_discord); unticked, it just finishes."""
     from soundboard.mic import directmic
     from soundboard.ui.setup import chatguide
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
-    opened = []
-    monkeypatch.setattr(chatguide, "show_guide",
-                        lambda which, *a, **k: opened.append((which, k.get("open_app"))))
+    started = []
+    monkeypatch.setattr(chatguide, "set_up_discord", lambda mw, *a, **k: started.append(mw))
     w, wiz = mic_wizard
     wiz.go(wiz.look_index)
-    assert not wiz.chk_discord.isChecked()   # on the mic: Discord needs nothing picked
-    assert "already in your mic" in wiz.discord_why.text()
+    assert not wiz.chk_discord.isChecked()   # on the mic: an opt-in
+    assert "noise filter" in wiz.discord_why.text() and "Undo" in wiz.discord_why.text()
     wiz.chk_discord.click()
     assert "Finish" in wiz.btn_next.text()
     wiz.next_clicked()
     QApplication.processEvents()
-    assert w.cfg.setup_done and opened == [("discord", True)]
+    assert w.cfg.setup_done and started == [w]
 
 
 def test_no_discord_just_finishes(mic_wizard, monkeypatch):
     from soundboard.ui.setup import chatguide
     opened = []
-    monkeypatch.setattr(chatguide, "show_guide", lambda which, *a, **k: opened.append(which))
+    monkeypatch.setattr(chatguide, "set_up_discord", lambda *a, **k: opened.append(1))
     w, wiz = mic_wizard
     wiz.go(wiz.look_index)
     wiz.next_clicked()
@@ -1352,7 +1374,7 @@ def test_on_the_cable_set_up_discord_starts_ticked(mic_wizard):
     w.routectl.set_route("cable")
     wiz.go(wiz.look_index)
     assert wiz.PAGES == 3 and wiz.chk_discord.isChecked()
-    assert "new mic" in wiz.discord_why.text()
+    assert "CABLE Output" in wiz.discord_why.text()   # the mic to pick, by name
     wiz.chk_discord.click()   # off by hand
     wiz.go(wiz.send_index)
     wiz.go(wiz.look_index)
@@ -1387,16 +1409,16 @@ def test_the_seasonal_look_gives_way_once_its_over(monkeypatch):
     monkeypatch.setattr(theme, "offered", lambda name, today=None: name != "Halloween")
     looks = setupwizard.look_themes()
     assert "Halloween" not in looks and setupwizard.SEASONAL_OFF in looks
-    assert len(looks) == len(set(looks)) == 3
+    assert len(looks) == len(set(looks)) == 9
 
 
 def test_picking_a_look_switches_the_theme(mic_wizard):
     from soundboard.ui.kit import theme
     w, wiz = mic_wizard
     wiz.go(wiz.PAGES - 1)
-    wiz._pick_look("Light")
-    assert theme.current_name == "Light" and w.cfg.theme == "Light"
-    assert [c.name for c in wiz.look_cards if c.isChecked()] == ["Light"]
+    wiz._pick_look("Ocean")
+    assert theme.current_name == "Ocean" and w.cfg.theme == "Ocean"
+    assert [c.name for c in wiz.look_cards if c.isChecked()] == ["Ocean"]
     wiz._pick_look("Dark")
 
 
@@ -1477,3 +1499,44 @@ def test_the_theme_grid_keeps_to_its_columns(qapp):
     QApplication.processEvents()
     assert grid.columns == 3
     grid.deleteLater()
+
+
+def test_the_last_step_lines_up(mic_wizard, qapp, monkeypatch):
+    """Make it yours is one grid: Your tabs' and Look's headings on one line, each
+    block on the left level with a row of looks (the tabs with row 1, Discord with
+    row 2, the language and switches with row 3), the left edge on Back's and the
+    right on Finish's, and no wider than that (a widened guide left bands)."""
+    from PySide6.QtCore import QPoint
+    from soundboard.mic import directmic
+    w, wiz = mic_wizard
+    monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
+    wiz.show()
+    qapp.processEvents()
+    for route in ("mic", "cable"):   # (the cable's Discord words are longer)
+        w.cfg.route = route
+        wiz.go(wiz.look_index)
+        for _ in range(4):
+            qapp.processEvents()
+        page = wiz.stack.currentWidget()
+
+        def at(wd, right=False):
+            return wd.mapTo(wiz, QPoint(wd.width() if right else 0, 0))
+        heads = {lbl.text(): at(lbl).y() for lbl in page.findChildren(setupwizard.QLabel)
+                 if lbl.text() in ("<b>Your tabs</b>", "<b>Look</b>")}
+        assert len(heads) == 2 and len(set(heads.values())) == 1, heads
+        cards = wiz.look_cards
+        rows = [at(cards[i]).y() for i in (0, 3, 6)]
+        assert at(wiz.tab_buttons["voice"].parentWidget()).y() == rows[0]
+        assert at(wiz.chk_discord.parentWidget()).y() == rows[1]
+        # ...and as tall as a look, so the rows' gaps stay even
+        assert wiz.chk_discord.parentWidget().height() == setupwizard.LOOK_CARD_H, route
+        assert rows[2] - rows[1] == rows[1] - rows[0]
+        assert at(wiz.lang_button.parentWidget()).y() == rows[2]
+        # the tabs fill row 1: the last one's bottom inside the looks' first row
+        last = wiz.tab_infos["triggers"]
+        assert at(last).y() + last.height() <= rows[0] + setupwizard.LOOK_CARD_H
+        assert at(wiz.tab_buttons["voice"]).x() == at(wiz.btn_back).x()
+        assert at(cards[2], right=True).x() == at(wiz.btn_next, right=True).x()
+        need = (setupwizard.LOOK_LEFT_W + setupwizard.LOOK_GAP + setupwizard.LOOK_RIGHT_W
+                + 2 * setupwizard.MARGIN)
+        assert wiz.width() == need
