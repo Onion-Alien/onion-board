@@ -34,7 +34,7 @@ FLAME = QColor("#ff8a2b")
 EMBER_COLORS = ("#ffcf40", "#ff8a2b", "#ff5a36")
 SHEEN_PERIOD = 4.5   # seconds between sheen sweeps
 SHEEN_TIME = 0.9     # how long one sweep takes
-FAST_MS = 33         # frame interval, ~30 fps
+FAST_MS = 1000 // 24  # frame interval, 24 fps (it runs whenever the window is in front)
 
 
 def _mix(a: QColor, b: QColor, t: float) -> QColor:

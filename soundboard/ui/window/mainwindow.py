@@ -1518,7 +1518,7 @@ class MainWindow(QMainWindow):
                    "down."), "warn", ms=12000, key="howl")
 
     # ------------------------------------------------------------------ tick
-    # The window's visibility sets the UI timer's pace: 30/s for the meters and
+    # The window's visibility sets the UI timer's pace: 24/s for the meters and
     # visualisers while it's on screen, even behind another program, TICK_IDLE_MS while it's
     # hidden in the tray or minimised (nothing to paint, but push-to-talk, the stream
     # watchdog must go on). Qt tells us through these three

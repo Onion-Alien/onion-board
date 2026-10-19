@@ -298,7 +298,7 @@ class FlatMap(QWidget):
                                                  # dots done popping in, drawn once
         self._delay = np.zeros(0)                # ...and each one's turn to pop in
         self._reveal = QTimer(self)
-        self._reveal.setInterval(16)
+        self._reveal.setInterval(1000 // 24)   # a short pop-in: 24 fps is plenty
         self._reveal.timeout.connect(self._reveal_step)
         self._settle = QTimer(self)       # running while the wheel is still zooming
         self._settle.setSingleShot(True)

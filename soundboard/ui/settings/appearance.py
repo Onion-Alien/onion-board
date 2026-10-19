@@ -142,7 +142,7 @@ class ThemeCard(QPushButton):
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self._hello = None   # when Bun started waving (time.monotonic), None: he isn't
         self._tick = QTimer(self)
-        self._tick.setInterval(33)
+        self._tick.setInterval(1000 // 24)
         self._tick.timeout.connect(self._step)
 
     def enterEvent(self, e):
