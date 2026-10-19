@@ -15,7 +15,7 @@ import math
 import time
 
 from PySide6.QtCore import QEvent, QPoint, QPointF, QRectF, Qt, Signal
-from PySide6.QtGui import QColor, QFont, QPainter, QPen
+from PySide6.QtGui import QColor, QFont, QPainter, QPen, QValidator
 from PySide6.QtWidgets import (QAbstractSpinBox, QApplication, QCheckBox, QDialog,
                                QDoubleSpinBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
                                QProgressBar, QPushButton, QVBoxLayout, QWidget)
@@ -209,11 +209,29 @@ class ValueBox(QDoubleSpinBox):
     def valueFromText(self, text: str) -> float:
         return super().valueFromText(text.lstrip("+"))
 
+    def _number(self, text: str):
+        """The number typed in `text` (sign, suffix and spaces off), or None."""
+        t = text.strip()
+        if self.suffix() and t.endswith(self.suffix().strip()):
+            t = t[:-len(self.suffix().strip())]
+        v, ok = self.locale().toDouble(t.strip().lstrip("+"))
+        return v if ok else None
+
     def validate(self, text: str, pos: int):
         if text.startswith("+"):
-            state, t, p = super().validate(text[1:], max(pos - 1, 0))
+            state, t, p = self.validate(text[1:], max(pos - 1, 0))
             return state, "+" + t, p + 1
-        return super().validate(text, pos)
+        state, t, p = super().validate(text, pos)
+        if state == QValidator.State.Invalid and self._number(text) is not None:
+            state = QValidator.State.Intermediate   # 20 past +18 dB, 1.5 with no decimals:
+        return state, t, p                          # kept, fixup() caps it on Enter
+
+    def fixup(self, text: str) -> str:
+        v = self._number(text)
+        if v is None:
+            return super().fixup(text)
+        v = round(min(max(v, self.minimum()), self.maximum()), self.decimals())
+        return self.textFromValue(v) + self.suffix()
 
     def wheelEvent(self, e):
         e.ignore()   # the popup scrolls, the value doesn't change under the mouse
