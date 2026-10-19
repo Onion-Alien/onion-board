@@ -4370,14 +4370,17 @@
   "Lite mode (suggested for this PC)": "Zjednodušený režim (doporučeno pro tento počítač)",
   "Set up Discord for me": "Nastavte mi Discord",
   "Start with Windows": "Začněte s Windows",
-  "Bun turns off Discord's noise filter so your sounds don't get cut off. Undo it any time in Settings.": "Bun vypne šumový filtr Discordu, takže vaše zvuky nebudou oříznuty. Tuto akci můžete kdykoli vrátit zpět v Nastavení.",
   "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "Zaškrtněte požadované karty a vyberte vzhled.<br> Nejste si jisti, co karta dělá? Klikněte na jeho ⓘ. Změňte cokoli později v <b>Nastavení</b> .",
-  "Bun turns off Discord's noise filter, then shows you where to pick <b>{mic}</b> as your mic.": "Bun vypne filtr hluku Discordu a poté vám ukáže, kde vybrat <b>{mic}</b> jako mikrofon.",
   "Nothing matches “{text}”.": "Nic neodpovídá „{text}“.",
   "Search AI voices": "Hledat AI hlasy",
   "Search voices": "Hledat hlasy",
   "Which languages show": "Které jazyky se zobrazí",
   "Which voices show": "Které hlasy se zobrazí",
   "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Zvuky a hlasy, které hráči sdílejí a všichni hodnotí: přidej si je, nebo sdílej své",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Pouští tvůj mikrofon do sluchátek přes zvuky, přesně to, co slyší ostatní."
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Pouští tvůj mikrofon do sluchátek přes zvuky, přesně to, co slyší ostatní.",
+  "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Audio recovery → Put Discord back.": "Bun uloží, jak je nyní Discord nastaven, a poté vypne potlačení šumu, potlačení ozvěny a automatickou hlasitost, které rozsekají vaše zvuky. Pokud je Discord otevřený, na několik sekund se zavře. Kdykoli to můžete vrátit zpět: Nastavení → Zvuk → Obnovení zvuku → Vrátit Discord zpět.",
+  "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun vypne šumový filtr Discordu, takže vaše zvuky nebudou oříznuty.",
+  "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun vypne šumový filtr Discordu a poté vám ukáže, který mikrofon vybrat.",
+  "Then pick {mic} as your mic in Discord: Bun shows you where.": "Poté vyberte {mic} , protože váš mikrofon v Discord: Bun vám ukáže, kde.",
+  "What does Bun change in Discord?": "Co změní Bun v Discordu?"
 }

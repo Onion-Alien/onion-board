@@ -4222,14 +4222,17 @@
   "Lite mode (suggested for this PC)": "Lite 模式（建議用於此 PC）",
   "Set up Discord for me": "為我設定 Discord",
   "Start with Windows": "從 Windows 開始",
-  "Bun turns off Discord's noise filter so your sounds don't get cut off. Undo it any time in Settings.": "Bun 會關閉 Discord 的噪音過濾器，這樣您的聲音就不會被切斷。隨時在“設定”中撤消它。",
   "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "勾選您想要的選項卡並選擇查看。<br>不確定選項卡的作用是什麼？點選其 ⓘ。稍後在<b>“設定”</b>中更改其中任何一項。",
-  "Bun turns off Discord's noise filter, then shows you where to pick <b>{mic}</b> as your mic.": "Bun 會關閉 Discord 的噪音過濾器，然後向您展示在哪裡選擇<b>{mic}</b>作為麥克風。",
   "Nothing matches “{text}”.": "沒有符合「{text}」的結果。",
   "Search AI voices": "搜尋 AI 語音",
   "Search voices": "搜尋語音",
   "Which languages show": "顯示哪些語言",
   "Which voices show": "顯示哪些語音",
   "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "玩家分享、大家投票的音效和聲音：加入它們或分享你自己的",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "把你的麥克風疊加在音效上，播到你的耳機裡，完全就是別人聽到的。"
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "把你的麥克風疊加在音效上，播到你的耳機裡，完全就是別人聽到的。",
+  "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Audio recovery → Put Discord back.": "Bun 會儲存 Discord 現在的設定方式，然後關閉其噪音抑制、迴聲消除和自動音量，這些功能會削弱您的聲音。如果 Discord 打開，它會關閉幾秒鐘。隨時撤銷：設定→音訊→音訊恢復→放回Discord。",
+  "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun 會關閉 Discord 的噪音過濾器，這樣您的聲音就不會被切斷。",
+  "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun 會關閉 Discord 的噪音過濾器，然後向您顯示要選擇的麥克風。",
+  "Then pick {mic} as your mic in Discord: Bun shows you where.": "然後在 Discord 中選擇{mic}作為您的麥克風：Bun 會告訴您位置。",
+  "What does Bun change in Discord?": "Bun 在 Discord 中發生了什麼變化？"
 }

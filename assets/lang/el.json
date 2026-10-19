@@ -4296,14 +4296,17 @@
   "Lite mode (suggested for this PC)": "Λειτουργία Lite (προτείνεται για αυτόν τον υπολογιστή)",
   "Set up Discord for me": "Ρύθμισε το Discord για μένα",
   "Start with Windows": "Ξεκινήστε με τα Windows",
-  "Bun turns off Discord's noise filter so your sounds don't get cut off. Undo it any time in Settings.": "Το Bun απενεργοποιεί το φίλτρο θορύβου του Discord για να μην κόβονται οι ήχοι σας. Αναιρέστε το ανά πάσα στιγμή στις Ρυθμίσεις.",
   "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "Επιλέξτε τις καρτέλες που θέλετε και επιλέξτε μια ματιά.<br> Δεν είστε σίγουροι τι κάνει μια καρτέλα; Κάντε κλικ στο ⓘ του. Αλλάξτε οποιοδήποτε από αυτά αργότερα στις <b>Ρυθμίσεις</b> .",
-  "Bun turns off Discord's noise filter, then shows you where to pick <b>{mic}</b> as your mic.": "Το Bun απενεργοποιεί το φίλτρο θορύβου του Discord και, στη συνέχεια, σας δείχνει πού να επιλέξετε <b>{mic}</b> ως μικρόφωνό σας.",
   "Nothing matches “{text}”.": "Δεν βρέθηκε τίποτα για «{text}».",
   "Search AI voices": "Αναζήτηση φωνών AI",
   "Search voices": "Αναζήτηση φωνών",
   "Which languages show": "Ποιες γλώσσες εμφανίζονται",
   "Which voices show": "Ποιες φωνές εμφανίζονται",
   "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Ήχοι και φωνές που μοιράζονται οι παίκτες και ψηφίζουν όλοι: πρόσθεσέ τους ή μοιράσου τους δικούς σου",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Παίζει το μικρόφωνό σου στα ακουστικά σου πάνω από τους ήχους, ακριβώς ό,τι ακούν οι άλλοι."
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Παίζει το μικρόφωνό σου στα ακουστικά σου πάνω από τους ήχους, ακριβώς ό,τι ακούν οι άλλοι.",
+  "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Audio recovery → Put Discord back.": "Το Bun αποθηκεύει τον τρόπο ρύθμισης του Discord τώρα και, στη συνέχεια, απενεργοποιεί την καταστολή θορύβου, την ακύρωση ηχούς και την αυτόματη ένταση ήχου, που μειώνουν τους ήχους σας. Εάν το Discord είναι ανοιχτό, κλείνει για λίγα δευτερόλεπτα. Αναιρέστε το ανά πάσα στιγμή: Ρυθμίσεις → Ήχος → Ανάκτηση ήχου → Επαναφέρετε το Discord.",
+  "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Το Bun απενεργοποιεί το φίλτρο θορύβου του Discord για να μην κόβονται οι ήχοι σας.",
+  "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Το Bun απενεργοποιεί το φίλτρο θορύβου του Discord και, στη συνέχεια, σας δείχνει ποιο μικρόφωνο να επιλέξετε.",
+  "Then pick {mic} as your mic in Discord: Bun shows you where.": "Στη συνέχεια, επιλέξτε {mic} ως μικρόφωνό σας στο Discord: Το Bun σας δείχνει πού.",
+  "What does Bun change in Discord?": "Τι αλλάζει το Bun στο Discord;"
 }

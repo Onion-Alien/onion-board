@@ -4370,14 +4370,17 @@
   "Lite mode (suggested for this PC)": "Облегченный режим (предлагается для этого ПК)",
   "Set up Discord for me": "Настройте Discord для меня",
   "Start with Windows": "Начните с Windows",
-  "Bun turns off Discord's noise filter so your sounds don't get cut off. Undo it any time in Settings.": "Бан отключает шумовой фильтр Discord, чтобы ваши звуки не прерывались. Отмените его в любое время в настройках.",
   "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "Отметьте нужные вкладки и выберите вид.<br> Не знаете, что делает вкладка? Нажмите на него ⓘ. Измените все это позже в <b>настройках</b> .",
-  "Bun turns off Discord's noise filter, then shows you where to pick <b>{mic}</b> as your mic.": "Бан отключает шумовой фильтр Discord, а затем показывает, где выбрать <b>{mic}</b> в качестве микрофона.",
   "Nothing matches “{text}”.": "Ничего не найдено по запросу «{text}».",
   "Search AI voices": "Поиск ИИ-голосов",
   "Search voices": "Поиск голосов",
   "Which languages show": "Какие языки показывать",
   "Which voices show": "Какие голоса показывать",
   "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Звуки и голоса, которыми делятся игроки, с оценками всех: добавь их или поделись своими",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Звук с микрофона воспроизводится в наушниках поверх звуков, именно то, что слышат другие."
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Звук с микрофона воспроизводится в наушниках поверх звуков, именно то, что слышат другие.",
+  "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Audio recovery → Put Discord back.": "Бан сохраняет текущие настройки Discord, затем отключает шумоподавление, эхоподавление и автоматическую громкость, которые прерывают ваши звуки. Если Discord открыт, он закрывается на несколько секунд. Отмените это в любое время: Настройки → Аудио → Восстановление аудио → Верните Discord обратно.",
+  "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Бан отключает шумовой фильтр Discord, чтобы ваши звуки не прерывались.",
+  "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Бан отключает шумовой фильтр Discord, а затем показывает, какой микрофон выбрать.",
+  "Then pick {mic} as your mic in Discord: Bun shows you where.": "Затем выберите {mic} в качестве микрофона в Discord: Бан покажет вам, где именно.",
+  "What does Bun change in Discord?": "Что меняет Бун в Discord?"
 }

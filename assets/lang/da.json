@@ -4296,14 +4296,17 @@
   "Lite mode (suggested for this PC)": "Lite-tilstand (foreslået til denne pc)",
   "Set up Discord for me": "Indstil Discord for mig",
   "Start with Windows": "Start med Windows",
-  "Bun turns off Discord's noise filter so your sounds don't get cut off. Undo it any time in Settings.": "Bun slår Discords støjfilter fra, så dine lyde ikke bliver afskåret. Fortryd det når som helst i Indstillinger.",
   "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "Sæt kryds ved de faner, du ønsker, og vælg et look.<br> Ikke sikker på, hvad en fane gør? Klik på dens ⓘ. Skift noget af det senere i <b>Indstillinger</b> .",
-  "Bun turns off Discord's noise filter, then shows you where to pick <b>{mic}</b> as your mic.": "Bun slår Discords støjfilter fra og viser dig derefter, hvor du skal vælge <b>{mic}</b> som din mikrofon.",
   "Nothing matches “{text}”.": "Intet matcher “{text}”.",
   "Search AI voices": "Søg efter AI-stemmer",
   "Search voices": "Søg efter stemmer",
   "Which languages show": "Hvilke sprog der vises",
   "Which voices show": "Hvilke stemmer der vises",
   "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Lyde og stemmer, som spillere deler, og alle stemmer på: tilføj dem, eller del dine egne",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Afspiller din mikrofon i dine hovedtelefoner oven i lydene, præcis det, andre hører."
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Afspiller din mikrofon i dine hovedtelefoner oven i lydene, præcis det, andre hører.",
+  "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Audio recovery → Put Discord back.": "Bun gemmer, hvordan Discord er indstillet nu, og slukker derefter dens støjundertrykkelse, ekkoannullering og automatisk lydstyrke, som skærer dine lyde op. Hvis Discord er åben, lukker den i et par sekunder. Fortryd det når som helst: Indstillinger → Lyd → Lygendannelse → Sæt Discord tilbage.",
+  "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun slår Discords støjfilter fra, så dine lyde ikke bliver afskåret.",
+  "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun slår Discords støjfilter fra og viser dig derefter, hvilken mikrofon du skal vælge.",
+  "Then pick {mic} as your mic in Discord: Bun shows you where.": "Vælg derefter {mic} som din mikrofon i Discord: Bun viser dig hvor.",
+  "What does Bun change in Discord?": "Hvad ændrer Bun i Discord?"
 }

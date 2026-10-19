@@ -4222,14 +4222,17 @@
   "Lite mode (suggested for this PC)": "Mode ringan (disarankan untuk PC ini)",
   "Set up Discord for me": "Siapkan Discord untuk saya",
   "Start with Windows": "Mulailah dengan Windows",
-  "Bun turns off Discord's noise filter so your sounds don't get cut off. Undo it any time in Settings.": "Bun matikan filter suara Discord agar suaramu tidak terpotong. Batalkan kapan saja di Pengaturan.",
   "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "Centang tab yang Anda inginkan dan pilih tampilan.<br> Tidak yakin apa fungsi tab? Klik ⓘ-nya. Ubah semua itu nanti di <b>Pengaturan</b> .",
-  "Bun turns off Discord's noise filter, then shows you where to pick <b>{mic}</b> as your mic.": "Bun mematikan filter kebisingan Discord, lalu menunjukkan tempat untuk memilih <b>{mic}</b> sebagai mikrofon Anda.",
   "Nothing matches “{text}”.": "Tidak ada yang cocok dengan “{text}”.",
   "Search AI voices": "Cari suara AI",
   "Search voices": "Cari suara",
   "Which languages show": "Bahasa yang ditampilkan",
   "Which voices show": "Suara yang ditampilkan",
   "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Suara dan voice yang dibagikan pemain, di-vote semua orang: tambahkan atau bagikan milikmu",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Memutar mic-mu ke headphone bersama suara-suaranya, persis yang didengar orang lain."
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Memutar mic-mu ke headphone bersama suara-suaranya, persis yang didengar orang lain.",
+  "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Audio recovery → Put Discord back.": "Bun menyimpan cara Discord diatur sekarang, lalu mematikan peredam bising, pembatalan gema, dan volume otomatis, yang memotong suara Anda. Jika Discord terbuka, maka akan ditutup selama beberapa detik. Batalkan kapan saja: Pengaturan → Audio → Pemulihan audio → Kembalikan Discord.",
+  "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun matikan filter suara Discord agar suaramu tidak terpotong.",
+  "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun mematikan filter kebisingan Discord, lalu menunjukkan mikrofon mana yang harus dipilih.",
+  "Then pick {mic} as your mic in Discord: Bun shows you where.": "Lalu pilih {mic} sebagai mikrofon Anda di Discord: Bun menunjukkan tempatnya.",
+  "What does Bun change in Discord?": "Apa yang Bun ubah di Discord?"
 }

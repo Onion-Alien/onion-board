@@ -4296,14 +4296,17 @@
   "Lite mode (suggested for this PC)": "Modo Lite (sugerido para este PC)",
   "Set up Discord for me": "Configure o Discord para mim",
   "Start with Windows": "Comece com o Windows",
-  "Bun turns off Discord's noise filter so your sounds don't get cut off. Undo it any time in Settings.": "Bun desativa o filtro de ruído do Discord para que os seus sons não sejam cortados. Desfaça-o a qualquer momento em Definições.",
   "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "Marque as guias desejadas e escolha uma aparência.<br> Não tem a certeza do que faz uma guia? Clique em ⓘ. Altere qualquer uma delas posteriormente em <b>Definições</b> .",
-  "Bun turns off Discord's noise filter, then shows you where to pick <b>{mic}</b> as your mic.": "Bun desativa o filtro de ruído do Discord e mostra-lhe onde escolher <b>{mic}</b> como microfone.",
   "Nothing matches “{text}”.": "Nada corresponde a “{text}”.",
   "Search AI voices": "Pesquisar vozes de IA",
   "Search voices": "Pesquisar vozes",
   "Which languages show": "Que idiomas mostrar",
   "Which voices show": "Que vozes mostrar",
   "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Sons e vozes que os jogadores partilham, votados por todos: adiciona-os ou partilha os teus",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Toca o teu microfone nos teus auscultadores junto com os sons, exatamente o que os outros ouvem."
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Toca o teu microfone nos teus auscultadores junto com os sons, exatamente o que os outros ouvem.",
+  "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Audio recovery → Put Discord back.": "Bun guarda como o Discord está agora configurado e, em seguida, desativa a supressão de ruído, o cancelamento de eco e o volume automático, que cortam os seus sons. Se o Discord estiver aberto, fecha durante alguns segundos. Desfaça a qualquer momento: Definições → Áudio → Recuperação de áudio → Volte a colocar o Discord.",
+  "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun desativa o filtro de ruído do Discord para que os seus sons não sejam cortados.",
+  "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun desativa o filtro de ruído do Discord e mostra qual o microfone a escolher.",
+  "Then pick {mic} as your mic in Discord: Bun shows you where.": "Em seguida, escolha {mic} como microfone no Discord: Bun mostra-lhe onde.",
+  "What does Bun change in Discord?": "O que muda o Bun no Discord?"
 }

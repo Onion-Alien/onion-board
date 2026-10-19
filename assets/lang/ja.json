@@ -4222,14 +4222,17 @@
   "Lite mode (suggested for this PC)": "ライト モード (この PC に推奨)",
   "Set up Discord for me": "Discord をセットアップしてください",
   "Start with Windows": "Windows から始める",
-  "Bun turns off Discord's noise filter so your sounds don't get cut off. Undo it any time in Settings.": "Bun は Discord のノイズ フィルターをオフにして、音が途切れないようにします。設定でいつでも元に戻せます。",
   "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "必要なタブにチェックを入れて、外観を選択します。<br>タブの役割がわからない場合は、そのⓘをクリックします。後で<b>[設定]</b>で変更します。",
-  "Bun turns off Discord's noise filter, then shows you where to pick <b>{mic}</b> as your mic.": "Bun は Discord のノイズ フィルターをオフにし、マイクとして<b>{mic}</b>を選択する場所を示します。",
   "Nothing matches “{text}”.": "「{text}」に一致するものはありません。",
   "Search AI voices": "AI ボイスを検索",
   "Search voices": "ボイスを検索",
   "Which languages show": "表示する言語",
   "Which voices show": "表示するボイス",
   "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "プレイヤーが共有し、みんなが投票したサウンドと声。追加するか、自分のものを共有しよう",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "サウンドに重ねてマイクの音をヘッドホンで再生します、相手に聞こえるそのままの音です。"
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "サウンドに重ねてマイクの音をヘッドホンで再生します、相手に聞こえるそのままの音です。",
+  "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Audio recovery → Put Discord back.": "Bun は Discord の現在の設定を保存し、サウンドを切り刻んでしまうノイズ抑制、エコー キャンセル、自動音量をオフにします。 Discord が開いている場合は、数秒間閉じます。いつでも元に戻せます: 設定 → オーディオ → オーディオ回復 → Discord を元に戻します。",
+  "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun は Discord のノイズ フィルターをオフにして、音が途切れないようにします。",
+  "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun は Discord のノイズ フィルターをオフにして、どのマイクを選択すればよいかを示します。",
+  "Then pick {mic} as your mic in Discord: Bun shows you where.": "次に、Discord でマイクとして{mic}を選択します。Bun が場所を示します。",
+  "What does Bun change in Discord?": "Bun は Discord で何を変更しますか?"
 }

@@ -4296,14 +4296,17 @@
   "Lite mode (suggested for this PC)": "लाइट मोड (इस पीसी के लिए सुझाया गया)",
   "Set up Discord for me": "मेरे लिए कलह स्थापित करें",
   "Start with Windows": "विंडो के साथ शुरू करें",
-  "Bun turns off Discord's noise filter so your sounds don't get cut off. Undo it any time in Settings.": "बन डिस्कॉर्ड के शोर फ़िल्टर को बंद कर देता है ताकि आपकी आवाज़ें बंद न हों। इसे सेटिंग्स में किसी भी समय पूर्ववत करें।",
   "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "अपने इच्छित टैब पर निशान लगाएं और एक लुक चुनें।<br> निश्चित नहीं कि टैब क्या करता है? इसके ⓘ पर क्लिक करें. बाद में इसमें से कोई भी <b>सेटिंग्स</b> में बदलें।",
-  "Bun turns off Discord's noise filter, then shows you where to pick <b>{mic}</b> as your mic.": "बन डिस्कॉर्ड के शोर फ़िल्टर को बंद कर देता है, फिर आपको दिखाता है कि अपने माइक के रूप में <b>{mic}</b> कहाँ चुनना है।",
   "Nothing matches “{text}”.": "“{text}” से कुछ नहीं मिला।",
   "Search AI voices": "AI आवाज़ें खोजें",
   "Search voices": "आवाज़ें खोजें",
   "Which languages show": "कौन-सी भाषाएँ दिखें",
   "Which voices show": "कौन-सी आवाज़ें दिखें",
   "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "खिलाड़ियों के शेयर किए साउंड और आवाज़ें, सबके वोट से: उन्हें जोड़ें या अपने शेयर करें",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "साउंड के साथ आपका माइक भी हेडफ़ोन में चलाता है, ठीक वही जो दूसरे सुनते हैं।"
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "साउंड के साथ आपका माइक भी हेडफ़ोन में चलाता है, ठीक वही जो दूसरे सुनते हैं।",
+  "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Audio recovery → Put Discord back.": "बन बचाता है कि अब डिस्कॉर्ड कैसे सेट किया गया है, फिर इसके शोर दमन, इको रद्दीकरण और स्वचालित वॉल्यूम को बंद कर देता है, जो आपकी आवाज़ को काट देता है। यदि डिस्कॉर्ड खुला है, तो यह कुछ सेकंड के लिए बंद हो जाता है। इसे किसी भी समय पूर्ववत करें: सेटिंग्स → ऑडियो → ऑडियो रिकवरी → डिस्कॉर्ड को वापस रखें।",
+  "Bun turns off Discord's noise filter so your sounds don't get cut off.": "बन डिस्कॉर्ड के शोर फ़िल्टर को बंद कर देता है ताकि आपकी आवाज़ें बंद न हों।",
+  "Bun turns off Discord's noise filter, then shows you which mic to pick.": "बन डिस्कॉर्ड के शोर फ़िल्टर को बंद कर देता है, फिर आपको दिखाता है कि कौन सा माइक चुनना है।",
+  "Then pick {mic} as your mic in Discord: Bun shows you where.": "फिर डिस्कॉर्ड में अपने माइक के रूप में {mic} चुनें: बन आपको दिखाता है कि कहां है।",
+  "What does Bun change in Discord?": "बन कलह में क्या बदलता है?"
 }

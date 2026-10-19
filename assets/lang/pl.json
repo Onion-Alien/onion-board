@@ -4370,14 +4370,17 @@
   "Lite mode (suggested for this PC)": "Tryb Lite (zalecany dla tego komputera)",
   "Set up Discord for me": "Skonfiguruj dla mnie Discorda",
   "Start with Windows": "Zacznij od Windowsa",
-  "Bun turns off Discord's noise filter so your sounds don't get cut off. Undo it any time in Settings.": "Bun wyłącza filtr szumów Discorda, aby Twoje dźwięki nie zostały obcięte. Cofnij tę czynność w dowolnym momencie w Ustawieniach.",
   "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "Zaznacz wybrane karty i wybierz wygląd.<br> Nie wiesz, do czego służy zakładka? Kliknij ⓘ. Zmień dowolne z nich później w <b>Ustawieniach</b> .",
-  "Bun turns off Discord's noise filter, then shows you where to pick <b>{mic}</b> as your mic.": "Bun wyłącza filtr szumów Discorda, a następnie pokazuje, gdzie wybrać <b>{mic}</b> jako mikrofon.",
   "Nothing matches “{text}”.": "Nic nie pasuje do „{text}”.",
   "Search AI voices": "Wyszukaj głosy AI",
   "Search voices": "Wyszukaj głosy",
   "Which languages show": "Które języki pokazać",
   "Which voices show": "Które głosy pokazać",
   "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Dźwięki i głosy udostępniane przez graczy, oceniane przez wszystkich: dodaj je albo udostępnij własne",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Gra twój mikrofon w słuchawkach razem z dźwiękami, dokładnie to, co słyszą inni."
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Gra twój mikrofon w słuchawkach razem z dźwiękami, dokładnie to, co słyszą inni.",
+  "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Audio recovery → Put Discord back.": "Bun zapisuje teraz ustawienie Discord, a następnie wyłącza tłumienie szumów, eliminację echa i automatyczną głośność, które tną Twoje dźwięki. Jeśli Discord jest otwarty, zamyka się na kilka sekund. Cofnij tę operację w dowolnym momencie: Ustawienia → Dźwięk → Odzyskiwanie dźwięku → Odłóż Discorda.",
+  "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun wyłącza filtr szumów Discorda, aby Twoje dźwięki nie zostały obcięte.",
+  "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun wyłącza filtr szumów Discorda, a następnie pokazuje, który mikrofon wybrać.",
+  "Then pick {mic} as your mic in Discord: Bun shows you where.": "Następnie wybierz {mic} jako swój mikrofon w Discord: Bun pokaże Ci, gdzie.",
+  "What does Bun change in Discord?": "Co Bun zmienia w Discordzie?"
 }

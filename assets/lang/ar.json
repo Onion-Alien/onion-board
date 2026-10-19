@@ -4592,14 +4592,17 @@
   "Lite mode (suggested for this PC)": "الوضع البسيط (مقترح لهذا الكمبيوتر)",
   "Set up Discord for me": "قم بإعداد Discord من أجلي",
   "Start with Windows": "ابدأ مع ويندوز",
-  "Bun turns off Discord's noise filter so your sounds don't get cut off. Undo it any time in Settings.": "يقوم Bun بإيقاف تشغيل مرشح الضوضاء في Discord حتى لا تنقطع الأصوات. يمكنك التراجع عن ذلك في أي وقت في الإعدادات.",
   "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "حدد علامات التبويب التي تريدها واختر مظهرًا.<br> لست متأكدا ما تفعله علامة التبويب؟ انقر فوق ⓘ. قم بتغيير أي منها لاحقًا في <b>الإعدادات</b> .",
-  "Bun turns off Discord's noise filter, then shows you where to pick <b>{mic}</b> as your mic.": "يقوم Bun بإيقاف تشغيل مرشح الضوضاء في Discord، ثم يوضح لك مكان اختيار <b>{mic}</b> ليكون ميكروفونك.",
   "Nothing matches “{text}”.": "لا شيء يطابق «{text}».",
   "Search AI voices": "بحث في أصوات الذكاء الاصطناعي",
   "Search voices": "بحث في الأصوات",
   "Which languages show": "اللغات المعروضة",
   "Which voices show": "الأصوات المعروضة",
   "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "أصوات ومؤثرات صوتية يشاركها اللاعبون ويصوّت عليها الجميع: أضفها أو شارك ما لديك",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "يشغّل الميكروفون في سماعاتك فوق الأصوات, تمامًا ما يسمعه الآخرون."
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "يشغّل الميكروفون في سماعاتك فوق الأصوات, تمامًا ما يسمعه الآخرون.",
+  "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Audio recovery → Put Discord back.": "يحفظ Bun كيفية ضبط Discord الآن، ثم يقوم بإيقاف تشغيل ميزة إلغاء الضوضاء وإلغاء الصدى ومستوى الصوت التلقائي، مما يؤدي إلى تقطيع أصواتك. إذا كان Discord مفتوحًا، فسيتم إغلاقه لبضع ثوان. يمكنك التراجع عن ذلك في أي وقت: الإعدادات ← الصوت ← استعادة الصوت ← إعادة Discord.",
+  "Bun turns off Discord's noise filter so your sounds don't get cut off.": "يقوم Bun بإيقاف تشغيل مرشح الضوضاء في Discord حتى لا تنقطع الأصوات.",
+  "Bun turns off Discord's noise filter, then shows you which mic to pick.": "يقوم Bun بإيقاف تشغيل مرشح الضوضاء في Discord، ثم يظهر لك أي ميكروفون تختاره.",
+  "Then pick {mic} as your mic in Discord: Bun shows you where.": "ثم اختر {mic} باعتباره الميكروفون الخاص بك في Discord: يوضح لك Bun مكانه.",
+  "What does Bun change in Discord?": "ماذا تغير بون في Discord؟"
 }

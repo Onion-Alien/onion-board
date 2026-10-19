@@ -4370,14 +4370,17 @@
   "Lite mode (suggested for this PC)": "Спрощений режим (рекомендується для цього ПК)",
   "Set up Discord for me": "Налаштуйте Discord для мене",
   "Start with Windows": "Почати з Windows",
-  "Bun turns off Discord's noise filter so your sounds don't get cut off. Undo it any time in Settings.": "Bun вимикає шумовий фільтр Discord, щоб ваші звуки не були обрізані. Скасуйте це будь-коли в налаштуваннях.",
   "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "Відзначте потрібні вкладки та виберіть вигляд.<br> Не знаєте, що робить вкладка? Натисніть його ⓘ. Змініть це пізніше в <b>налаштуваннях</b> .",
-  "Bun turns off Discord's noise filter, then shows you where to pick <b>{mic}</b> as your mic.": "Bun вимикає шумовий фільтр Discord, а потім показує, де вибрати мікрофон <b>{mic}</b> .",
   "Nothing matches “{text}”.": "Нічого не знайдено за запитом «{text}».",
   "Search AI voices": "Пошук ШІ-голосів",
   "Search voices": "Пошук голосів",
   "Which languages show": "Які мови показувати",
   "Which voices show": "Які голоси показувати",
   "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Звуки й голоси, якими діляться гравці, з оцінками всіх: додай їх або поділися своїми",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Грає твій мікрофон у навушники поверх звуків: саме те, що чують інші."
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Грає твій мікрофон у навушники поверх звуків: саме те, що чують інші.",
+  "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Audio recovery → Put Discord back.": "Bun зберігає налаштування Discord, а потім вимикає придушення шуму, ехоподавлення та автоматичну гучність, які подрібнюють ваші звуки. Якщо Discord відкритий, він закривається на кілька секунд. Скасуйте це будь-коли: Налаштування → Аудіо → Відновлення аудіо → Відновити Discord.",
+  "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun вимикає шумовий фільтр Discord, щоб ваші звуки не були обрізані.",
+  "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun вимикає шумовий фільтр Discord, а потім показує, який мікрофон вибрати.",
+  "Then pick {mic} as your mic in Discord: Bun shows you where.": "Потім виберіть {mic} своїм мікрофоном у Discord: Bun покаже вам, де.",
+  "What does Bun change in Discord?": "Що Bun змінює в Discord?"
 }

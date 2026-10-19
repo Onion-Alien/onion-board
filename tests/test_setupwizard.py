@@ -1348,7 +1348,11 @@ def test_set_up_discord_finishes_into_bun_setting_it_up(mic_wizard, monkeypatch)
     w, wiz = mic_wizard
     wiz.go(wiz.look_index)
     assert not wiz.chk_discord.isChecked()   # on the mic: an opt-in
-    assert "noise filter" in wiz.discord_why.text() and "Undo" in wiz.discord_why.text()
+    assert "noise filter" in wiz.discord_why.text()
+    shown = []   # its ⓘ: what Bun changes, and where it's undone
+    monkeypatch.setattr(wiz, "_drop_down", lambda btn, title, text, **k: shown.append(text))
+    wiz.discord_info.click()
+    assert "Put Discord back" in shown[0] and "CABLE" not in shown[0]
     wiz.chk_discord.click()
     assert "Finish" in wiz.btn_next.text()
     wiz.next_clicked()
@@ -1374,7 +1378,11 @@ def test_on_the_cable_set_up_discord_starts_ticked(mic_wizard):
     w.routectl.set_route("cable")
     wiz.go(wiz.look_index)
     assert wiz.PAGES == 3 and wiz.chk_discord.isChecked()
-    assert "CABLE Output" in wiz.discord_why.text()   # the mic to pick, by name
+    assert "which mic" in wiz.discord_why.text()
+    shown = []   # its ⓘ names the mic to pick
+    wiz._drop_down = lambda btn, title, text, **k: shown.append(text)
+    wiz.discord_info.click()
+    assert "CABLE Output" in shown[0]
     wiz.chk_discord.click()   # off by hand
     wiz.go(wiz.send_index)
     wiz.go(wiz.look_index)

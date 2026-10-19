@@ -845,12 +845,20 @@ class SetupWizard(QDialog):
         g.addWidget(tabs, 1, 0, top)
         # Discord (row 2): an opt-in, done after Finish (Bun sets it:
         # chatguide.set_up_discord), as tall as a look
+        # (exactly a look's height in every language: one short line, the whole story
+        # behind its ⓘ, as the tabs' are)
         card, cl = _card(14, 6, roomy=False)
-        card.setFixedWidth(LOOK_LEFT_W)
-        card.setMinimumHeight(LOOK_CARD_H)
+        card.setFixedSize(LOOK_LEFT_W, LOOK_CARD_H)
+        head = QHBoxLayout()
+        head.setSpacing(4)
         self.chk_discord = QCheckBox(_("Set up Discord for me"))
         self.chk_discord.setStyleSheet("font-weight:700;")
-        cl.addWidget(self.chk_discord)
+        head.addWidget(self.chk_discord)
+        self.discord_info = panel.info_button(_("What does Bun change in Discord?"))
+        self.discord_info.clicked.connect(self._discord_more)
+        head.addWidget(self.discord_info)
+        head.addStretch(1)
+        cl.addLayout(head)
         self.discord_why = _label("", "font-size:10pt;")
         self.discord_why.setObjectName("muted")
         cl.addWidget(self.discord_why)
@@ -916,14 +924,31 @@ class SetupWizard(QDialog):
         v.addStretch(1)
         return p
 
+    def _discord_more(self):
+        """Set up Discord's ⓘ: what Bun changes, how it goes back, and on the cable which
+        mic Discord still needs picked."""
+        text = _("Bun saves how Discord is set now, then turns off its noise suppression, "
+                 "echo cancellation and automatic volume, which chop up your sounds. If "
+                 "Discord is open, it closes for a few seconds. Undo it any time: Settings → "
+                 "Audio → Audio recovery → Put Discord back.")
+        if self._discord_needed():
+            mic = eng.virtual_mic_for(self.win.routectl._main_name()) or "CABLE Output"
+            text += " " + _("Then pick {mic} as your mic in Discord: Bun shows you where.",
+                            mic=mic)
+        self._drop_down(self.discord_info, _("Set up Discord for me"), text)
+
     def _tab_info(self, key: str):
         """A tab's ⓘ: what it's for, dropped down under the ⓘ (inside the window)."""
+        from soundboard.ui.window.moretabs import PITCH
+        # (Triggers is the owl's, as on its tab)
+        self._drop_down(self.tab_infos[key], tab_names()[key], PITCH.get(key, ""),
+                        owl=key == "triggers")
+
+    def _drop_down(self, btn: QPushButton, title: str, text: str, owl: bool = False):
+        """A help card dropped down under an ⓘ (inside the window)."""
         from PySide6.QtCore import QPoint
         from soundboard.ui.sounds.dialogs import TabHelpPopup
-        from soundboard.ui.window.moretabs import PITCH
-        btn = self.tab_infos[key]
-        box = TabHelpPopup(tab_names()[key], PITCH.get(key, ""), owl=key == "triggers",
-                           parent=self.win)   # (Triggers is the owl's, as on its tab)
+        box = TabHelpPopup(title, text, owl=owl, parent=self.win)
         lay = box.layout()
         if lay is not None:
             lay.activate()   # wrapped text: as tall as the words need
@@ -950,12 +975,10 @@ class SetupWizard(QDialog):
         if not self._discord_touched:
             self.chk_discord.setChecked(need)
         if need:
-            mic = eng.virtual_mic_for(self.win.routectl._main_name()) or "CABLE Output"
-            why = _("Bun turns off Discord's noise filter, then shows you where to pick "
-                    "<b>{mic}</b> as your mic.", mic=html.escape(mic))
+            why = _("Bun turns off Discord's noise filter, then shows you which mic to "
+                    "pick.")
         else:
-            why = _("Bun turns off Discord's noise filter so your sounds don't get cut off. "
-                    "Undo it any time in Settings.")
+            why = _("Bun turns off Discord's noise filter so your sounds don't get cut off.")
         self.discord_why.setText(why)
 
     def _pick_language(self, code: str):

@@ -4296,14 +4296,17 @@
   "Lite mode (suggested for this PC)": "Lite-Modus (empfohlen für diesen PC)",
   "Set up Discord for me": "Richte Discord für mich ein",
   "Start with Windows": "Beginnen Sie mit Windows",
-  "Bun turns off Discord's noise filter so your sounds don't get cut off. Undo it any time in Settings.": "Bun schaltet den Geräuschfilter von Discord aus, damit Ihre Sounds nicht abgeschnitten werden. Sie können es jederzeit in den Einstellungen rückgängig machen.",
   "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "Markieren Sie die gewünschten Registerkarten und wählen Sie einen Look aus.<br> Sie sind sich nicht sicher, was ein Tab bewirkt? Klicken Sie auf das Symbol ⓘ. Ändern Sie alles später in <b>den Einstellungen</b> .",
-  "Bun turns off Discord's noise filter, then shows you where to pick <b>{mic}</b> as your mic.": "Bun schaltet den Rauschfilter von Discord aus und zeigt Ihnen dann, wo Sie <b>{mic}</b> als Ihr Mikrofon auswählen können.",
   "Nothing matches “{text}”.": "Nichts passt zu „{text}“.",
   "Search AI voices": "KI-Stimmen suchen",
   "Search voices": "Stimmen suchen",
   "Which languages show": "Welche Sprachen angezeigt werden",
   "Which voices show": "Welche Stimmen angezeigt werden",
   "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Sounds und Stimmen, die Spieler teilen und alle bewerten: füge sie hinzu oder teile deine eigenen",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Spielt dein Mikro zusammen mit den Sounds in deine Kopfhörer, genau das, was andere hören."
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Spielt dein Mikro zusammen mit den Sounds in deine Kopfhörer, genau das, was andere hören.",
+  "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Audio recovery → Put Discord back.": "Bun speichert, wie Discord jetzt eingestellt ist, und schaltet dann die Geräuschunterdrückung, die Echounterdrückung und die automatische Lautstärke aus, die Ihre Sounds zerhacken. Wenn Discord geöffnet ist, wird es für einige Sekunden geschlossen. Sie können es jederzeit rückgängig machen: Einstellungen → Audio → Audiowiederherstellung → Discord zurücksetzen.",
+  "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun schaltet den Geräuschfilter von Discord aus, damit Ihre Sounds nicht abgeschnitten werden.",
+  "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun schaltet den Rauschfilter von Discord aus und zeigt Ihnen dann, welches Mikrofon Sie auswählen müssen.",
+  "Then pick {mic} as your mic in Discord: Bun shows you where.": "Dann wähle {mic} als dein Mikrofon in Discord: Bun zeigt dir wo.",
+  "What does Bun change in Discord?": "Was ändert Bun in Discord?"
 }

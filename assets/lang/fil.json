@@ -4296,14 +4296,17 @@
   "Lite mode (suggested for this PC)": "Lite mode (iminumungkahi para sa PC na ito)",
   "Set up Discord for me": "I-set up ang Discord para sa akin",
   "Start with Windows": "Magsimula sa Windows",
-  "Bun turns off Discord's noise filter so your sounds don't get cut off. Undo it any time in Settings.": "Ino-off ng Bun ang noise filter ng Discord para hindi maputol ang iyong mga tunog. I-undo ito anumang oras sa Mga Setting.",
   "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "Lagyan ng tsek ang mga tab na gusto mo at pumili ng hitsura.<br> Hindi sigurado kung ano ang ginagawa ng tab? I-click ang ⓘ. Baguhin ang alinman sa mga ito sa ibang pagkakataon sa <b>Mga Setting</b> .",
-  "Bun turns off Discord's noise filter, then shows you where to pick <b>{mic}</b> as your mic.": "In-off ng Bun ang noise filter ng Discord, pagkatapos ay ipapakita sa iyo kung saan pipiliin <b>{mic}</b> bilang iyong mikropono.",
   "Nothing matches “{text}”.": "Walang tumugma sa “{text}”.",
   "Search AI voices": "Maghanap ng mga AI voice",
   "Search voices": "Maghanap ng mga voice",
   "Which languages show": "Aling mga wika ang ipapakita",
   "Which voices show": "Aling mga voice ang ipapakita",
   "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Mga tunog at boses na ibinabahagi ng mga manlalaro, binotohan ng lahat: idagdag ang mga ito o i-share ang sa iyo",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Pine-play ang mic mo sa headphones mo kasabay ng mga sound, eksaktong naririnig ng iba."
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Pine-play ang mic mo sa headphones mo kasabay ng mga sound, eksaktong naririnig ng iba.",
+  "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Audio recovery → Put Discord back.": "Sine-save ng Bun kung paano itinatakda ngayon ang Discord, pagkatapos ay i-off nito ang pagpigil sa ingay, pagkansela ng echo at awtomatikong volume, na pumuputol sa iyong mga tunog. Kung bukas ang Discord, magsasara ito ng ilang segundo. I-undo ito anumang oras: Mga Setting → Audio → Pagbawi ng audio → Ibalik ang Discord.",
+  "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Ino-off ng Bun ang noise filter ng Discord para hindi maputol ang iyong mga tunog.",
+  "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Ino-off ng Bun ang noise filter ng Discord, pagkatapos ay ipapakita sa iyo kung aling mikropono ang pipiliin.",
+  "Then pick {mic} as your mic in Discord: Bun shows you where.": "Pagkatapos ay piliin ang {mic} bilang iyong mikropono sa Discord: Ipinapakita sa iyo ng Bun kung saan.",
+  "What does Bun change in Discord?": "Ano ang binabago ng Bun sa Discord?"
 }

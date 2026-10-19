@@ -4296,14 +4296,17 @@
   "Lite mode (suggested for this PC)": "Lite-modus (aanbevolen voor deze pc)",
   "Set up Discord for me": "Stel Discord voor mij in",
   "Start with Windows": "Begin met Windows",
-  "Bun turns off Discord's noise filter so your sounds don't get cut off. Undo it any time in Settings.": "Bun schakelt het ruisfilter van Discord uit, zodat je geluiden niet worden onderbroken. Je kunt dit op elk gewenst moment ongedaan maken via Instellingen.",
   "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "Vink de gewenste tabbladen aan en kies een look.<br> Weet u niet zeker wat een tabblad doet? Klik op de ⓘ. Wijzig dit later in <b>Instellingen</b> .",
-  "Bun turns off Discord's noise filter, then shows you where to pick <b>{mic}</b> as your mic.": "Bun schakelt het ruisfilter van Discord uit en laat je vervolgens zien waar je <b>{mic}</b> als microfoon moet kiezen.",
   "Nothing matches “{text}”.": "Niets gevonden voor “{text}”.",
   "Search AI voices": "AI-stemmen zoeken",
   "Search voices": "Stemmen zoeken",
   "Which languages show": "Welke talen je ziet",
   "Which voices show": "Welke stemmen je ziet",
   "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Geluiden en stemmen die spelers delen, beoordeeld door iedereen: voeg ze toe of deel je eigen",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Speelt je mic af in je koptelefoon bovenop de geluiden, precies wat anderen horen."
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Speelt je mic af in je koptelefoon bovenop de geluiden, precies wat anderen horen.",
+  "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Audio recovery → Put Discord back.": "Bun slaat op hoe Discord nu is ingesteld en schakelt vervolgens de ruisonderdrukking, echo-onderdrukking en het automatische volume uit, waardoor je geluiden worden onderbroken. Als Discord open is, wordt deze een paar seconden gesloten. Je kunt het op elk gewenst moment ongedaan maken: Instellingen → Audio → Audioherstel → Zet Discord terug.",
+  "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun schakelt het ruisfilter van Discord uit, zodat je geluiden niet worden onderbroken.",
+  "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun schakelt het ruisfilter van Discord uit en laat je vervolgens zien welke microfoon je moet kiezen.",
+  "Then pick {mic} as your mic in Discord: Bun shows you where.": "Kies vervolgens {mic} als je microfoon in Discord: Bun laat je zien waar.",
+  "What does Bun change in Discord?": "Wat verandert Bun in Discord?"
 }

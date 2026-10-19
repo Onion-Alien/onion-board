@@ -4222,14 +4222,17 @@
   "Lite mode (suggested for this PC)": "Mod ringkas (disyorkan untuk PC ini)",
   "Set up Discord for me": "Sediakan Discord untuk saya",
   "Start with Windows": "Mulakan dengan Windows",
-  "Bun turns off Discord's noise filter so your sounds don't get cut off. Undo it any time in Settings.": "Bun mematikan penapis hingar Discord supaya bunyi anda tidak terputus. Buat asalnya pada bila-bila masa dalam Tetapan.",
   "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "Tandai tab yang anda mahu dan pilih lihat.<br> Tidak pasti apa yang dilakukan oleh tab? Klik ⓘ. Tukar mana-mana daripadanya kemudian dalam <b>Tetapan</b> .",
-  "Bun turns off Discord's noise filter, then shows you where to pick <b>{mic}</b> as your mic.": "Bun mematikan penapis hingar Discord, kemudian menunjukkan tempat untuk memilih <b>{mic}</b> sebagai mikrofon anda.",
   "Nothing matches “{text}”.": "Tiada yang sepadan dengan “{text}”.",
   "Search AI voices": "Cari suara AI",
   "Search voices": "Cari suara",
   "Which languages show": "Bahasa yang ditunjukkan",
   "Which voices show": "Suara yang ditunjukkan",
   "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Bunyi dan suara yang dikongsi pemain, diundi semua orang: tambahkannya atau kongsi milik anda",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Memainkan mikrofon anda ke dalam fon kepala anda di atas bunyi, tepat seperti yang orang lain dengar."
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Memainkan mikrofon anda ke dalam fon kepala anda di atas bunyi, tepat seperti yang orang lain dengar.",
+  "Bun saves how Discord is set now, then turns off its noise suppression, echo cancellation and automatic volume, which chop up your sounds. If Discord is open, it closes for a few seconds. Undo it any time: Settings → Audio → Audio recovery → Put Discord back.": "Bun menyimpan cara Discord ditetapkan sekarang, kemudian mematikan penindasan hingar, pembatalan gema dan kelantangan automatiknya, yang memotong bunyi anda. Jika Discord dibuka, ia ditutup selama beberapa saat. Buat asalnya pada bila-bila masa: Tetapan → Audio → Pemulihan audio → Letakkan semula Discord.",
+  "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun mematikan penapis hingar Discord supaya bunyi anda tidak terputus.",
+  "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun mematikan penapis hingar Discord, kemudian menunjukkan kepada anda mikrofon yang hendak dipilih.",
+  "Then pick {mic} as your mic in Discord: Bun shows you where.": "Kemudian pilih {mic} sebagai mikrofon anda dalam Discord: Bun menunjukkan kepada anda tempat.",
+  "What does Bun change in Discord?": "Apakah perubahan Bun dalam Discord?"
 }
