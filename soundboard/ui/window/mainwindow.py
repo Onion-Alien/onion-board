@@ -802,16 +802,17 @@ class MainWindow(QMainWindow):
     def run_setup(self, resumed: bool = False):
         """The quick-setup guide (first launch, or the Setup tab's Step-by-step guide).
         `resumed`: reopened by itself after the restart the virtual cable needed."""
+        from soundboard.ui.setup.setupbackdrop import Backdrop
         from soundboard.ui.setup.setupwizard import SetupWizard
         backdrop = self.setup_backdrop()
-        if backdrop is not None:
-            backdrop.settle()   # its logo to the corner as the guide comes in
+        if backdrop is None:   # opened again: the guide's a card in the window, so the
+            backdrop = Backdrop(self, logo=False)   # board behind it goes plain too
+        backdrop.settle()   # its logo fades as the guide comes in
         wiz = SetupWizard(self, resumed=resumed)
         wiz.exec()
         free_dialog(wiz)
-        if backdrop is not None:
-            self._backdrop = None
-            backdrop.reveal()
+        self._backdrop = None
+        backdrop.reveal()
         self.routectl._prepare_all()
         # the installer's "from Soundpad" box waits for this, so its progress card
         # isn't stuck over the guide (a no-op once it's done)

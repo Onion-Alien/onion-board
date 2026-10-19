@@ -4093,12 +4093,9 @@
   "What you say is said in {language}.": "Amit mondasz, {language} nyelven hangzik el.",
   "Onion Board closed unexpectedly, so it started again.": "Az Onion Board váratlanul bezárult, ezért újraindult.",
   "<b>Language</b>": "<b>Nyelv</b>",
-  "All set! Last thing: make it yours": "Kész! Utolsó lépés: tedd a magadévá",
   "Onion Board restarts in {name} when you press Finish.": "Az Onion Board {name} nyelven indul újra, amikor a Befejezésre kattintasz.",
   "Pick a language and a look. Change them any time in <b>Settings</b> → <b>Appearance</b>.": "Válassz nyelvet és megjelenést. Bármikor módosíthatod: <b>Beállítások</b> → <b>Megjelenés</b>.",
-  "Press <b>Next</b> for the last bit: your language and a look.": "Nyomd meg a <b>Tovább</b> gombot az utolsó részhez: nyelv és megjelenés.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Az Onion Board indítása a Windowsba való bejelentkezéskor (csendben, a tálcán)",
-  "Tell Discord or your game": "Szólj a Discordnak vagy a játékodnak",
   "{n} more themes in Settings.": "További témák a Beállításokban: {n}",
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Lassabb gépekre: nincs animáció, Bun nyugton marad, a témák egyszerűek. Minden ugyanúgy működik.",
   "Lite mode": "Könnyített mód",
@@ -4337,5 +4334,12 @@
   "{n} of {total} earned. The badge's colour is its rarity, like the rare loading screens.": "{n}/{total} megszerezve. A jelvény színe a ritkasága, mint a ritka betöltő képernyőknél.",
   "Earned {date}": "Megszerezve: {date}",
   "You're at {have} of {goal}": "Itt tartasz: {have}/{goal}",
-  "You're at {have} of {goal} hours": "Itt tartasz: {have}/{goal} óra"
+  "You're at {have} of {goal} hours": "Itt tartasz: {have}/{goal} óra",
+  "All set! Now make it yours": "Kész! Most tedd a magadévá",
+  "Discord is open. Your sounds are already in your mic, but Discord's noise filter (on by default) can chop them up. Bun shows you the one setting to change, and checks it for you.": "A Discord nyitva van. A hangjaid már a mikrofonodban vannak, de a Discord zajszűrője (alapból bekapcsolva) feldarabolhatja őket. Bun megmutatja azt az egy beállítást, amit módosítani kell, és ellenőrzi helyetted.",
+  "Last step: set up Discord?": "Utolsó lépés: beállítod a Discordot?",
+  "Lite mode: no animations, for slower PCs": "Könnyített mód: nincs animáció, lassabb gépekhez",
+  "Lite mode: no animations, for slower PCs (suggested for this PC)": "Könnyített mód: nincs animáció, lassabb gépekhez (ehhez a géphez ajánlott)",
+  "No thanks, finish": "Nem, köszönöm, kész",
+  "Yes, set up Discord": "Igen, Discord beállítása"
 }

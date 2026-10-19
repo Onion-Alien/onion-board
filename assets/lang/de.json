@@ -4093,12 +4093,9 @@
   "What you say is said in {language}.": "Was du sagst, wird auf {language} gesagt.",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board wurde unerwartet geschlossen und hat sich deshalb neu gestartet.",
   "<b>Language</b>": "<b>Sprache</b>",
-  "All set! Last thing: make it yours": "Alles bereit! Zum Schluss: mach es zu deinem",
   "Onion Board restarts in {name} when you press Finish.": "Onion Board startet auf {name} neu, wenn du auf Fertig drückst.",
   "Pick a language and a look. Change them any time in <b>Settings</b> → <b>Appearance</b>.": "Wähle eine Sprache und einen Look. Ändern kannst du sie jederzeit unter <b>Einstellungen</b> → <b>Aussehen</b>.",
-  "Press <b>Next</b> for the last bit: your language and a look.": "Drück <b>Weiter</b> für den letzten Teil: deine Sprache und ein Look.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Onion Board beim Anmelden bei Windows starten (leise, im Infobereich)",
-  "Tell Discord or your game": "Sag es Discord oder deinem Spiel",
   "{n} more themes in Settings.": "{n} weitere Themes in den Einstellungen.",
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Für langsamere PCs: keine Animationen, Bun hält still und die Themes sind schlicht. Alles funktioniert weiter.",
   "Lite mode": "Lite-Modus",
@@ -4337,5 +4334,12 @@
   "{n} of {total} earned. The badge's colour is its rarity, like the rare loading screens.": "{n} von {total} erreicht. Die Farbe des Abzeichens ist seine Seltenheit, wie bei den seltenen Ladebildschirmen.",
   "Earned {date}": "Erreicht am {date}",
   "You're at {have} of {goal}": "Du bist bei {have} von {goal}",
-  "You're at {have} of {goal} hours": "Du bist bei {have} von {goal} Stunden"
+  "You're at {have} of {goal} hours": "Du bist bei {have} von {goal} Stunden",
+  "All set! Now make it yours": "Alles bereit! Jetzt mach es zu deinem",
+  "Discord is open. Your sounds are already in your mic, but Discord's noise filter (on by default) can chop them up. Bun shows you the one setting to change, and checks it for you.": "Discord ist offen. Deine Sounds sind schon in deinem Mikro, aber Discords Rauschfilter (standardmäßig an) kann sie zerhacken. Bun zeigt dir die eine Einstellung, die du ändern musst, und prüft sie für dich.",
+  "Last step: set up Discord?": "Letzter Schritt: Discord einrichten?",
+  "Lite mode: no animations, for slower PCs": "Lite-Modus: keine Animationen, für langsamere PCs",
+  "Lite mode: no animations, for slower PCs (suggested for this PC)": "Lite-Modus: keine Animationen, für langsamere PCs (für diesen PC empfohlen)",
+  "No thanks, finish": "Nein danke, fertig",
+  "Yes, set up Discord": "Ja, Discord einrichten"
 }

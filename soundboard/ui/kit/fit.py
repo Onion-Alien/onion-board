@@ -26,6 +26,7 @@ from shiboken6 import isValid as qt_valid
 
 WIDEN_STEP = 80
 LIFTED = "fit_lifted"   # (how far fit() moved a window up, the y it left it at)
+MARGIN = "fit_margin"   # a card inside a window: the room it keeps around itself (px)
 WATCHED = (QEvent.Type.Show, QEvent.Type.LayoutRequest, QEvent.Type.Resize)
 
 
@@ -51,6 +52,12 @@ def fit(w: QWidget) -> bool:
     extra_w = frame.width() - w.width()
     max_h = avail.height() - extra_h
     max_w = avail.width() - extra_w
+    if not w.isWindow():   # a card inside a window: as big as the window is or can grow
+        top = w.window()   # to (its owner grows it), less the room kept around the card
+        margin = int(w.property(MARGIN) or 0)
+        tf = top.frameGeometry()
+        max_h = max(top.height(), avail.height() - (tf.height() - top.height())) - margin
+        max_w = max(top.width(), avail.width() - (tf.width() - top.width())) - margin
     width = w.width()
     lay = w.layout()
     if lay is not None:   # a row of buttons (longer in other languages) is never cut
@@ -64,6 +71,8 @@ def fit(w: QWidget) -> bool:
     if (width, height) == (w.width(), w.height()):
         return False
     w.resize(width, height)
+    if not w.isWindow():   # a card inside a window: its owner places it
+        return True
     # keep it on screen: move up / left just enough
     g = w.frameGeometry()
     x = min(g.x(), avail.right() - g.width() + 1)
@@ -82,6 +91,8 @@ def shrink(w: QWidget, height: int):
     a taller step on screen (only while it's still where fit() left it: a window the
     user dragged stays put)."""
     w.resize(w.width(), height)
+    if not w.isWindow():   # (a card inside a window: its owner places it)
+        return
     lifted, at = w.property(LIFTED) or (0, 0)
     w.setProperty(LIFTED, None)
     g = w.frameGeometry()

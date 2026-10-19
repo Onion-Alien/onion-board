@@ -136,6 +136,7 @@ def previewing(name: str):
 STYLE = Template("""
 QWidget { background:$bg; color:$text; font-family:'$font'; font-size:10pt; }
 QDialog { background:$bg; }
+QDialog#setupcard { border:1px solid $border; border-radius:16px; }
 QFrame#card { background:$panel; border-radius:12px; }
 QFrame#card QWidget { background:transparent; }
 QFrame#card[interactive="true"] { border:1px solid transparent; }

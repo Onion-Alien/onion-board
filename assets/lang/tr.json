@@ -4093,12 +4093,9 @@
   "What you say is said in {language}.": "Söylediğin şey {language} dilinde söylenir.",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board beklenmedik şekilde kapandı, bu yüzden yeniden başladı.",
   "<b>Language</b>": "<b>Dil</b>",
-  "All set! Last thing: make it yours": "Her şey hazır! Son olarak: kendine göre ayarla",
   "Onion Board restarts in {name} when you press Finish.": "Bitir'e bastığında Onion Board {name} diliyle yeniden başlar.",
   "Pick a language and a look. Change them any time in <b>Settings</b> → <b>Appearance</b>.": "Bir dil ve görünüm seç. İstediğin zaman <b>Ayarlar</b> → <b>Dış görünüş</b> bölümünden değiştir.",
-  "Press <b>Next</b> for the last bit: your language and a look.": "Son kısım için <b>Sonraki</b>'ye bas: dilin ve görünümün.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Windows'ta oturum açtığımda Onion Board'u başlat (sessizce, tepside)",
-  "Tell Discord or your game": "Discord'a veya oyununa söyle",
   "{n} more themes in Settings.": "Ayarlar'da {n} tema daha var.",
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Daha yavaş bilgisayarlar için: animasyon yok, Bun yerinde durur ve temalar sade olur. Her şey yine çalışır.",
   "Lite mode": "Hafif mod",
@@ -4337,5 +4334,12 @@
   "{n} of {total} earned. The badge's colour is its rarity, like the rare loading screens.": "{total} başarımdan {n} tanesi kazanıldı. Rozetin rengi, nadir yükleme ekranlarındaki gibi nadirliğini gösterir.",
   "Earned {date}": "{date} tarihinde kazanıldı",
   "You're at {have} of {goal}": "Şu an {have}/{goal}",
-  "You're at {have} of {goal} hours": "Şu an {have}/{goal} saat"
+  "You're at {have} of {goal} hours": "Şu an {have}/{goal} saat",
+  "All set! Now make it yours": "Her şey hazır! Şimdi kendine göre ayarla",
+  "Discord is open. Your sounds are already in your mic, but Discord's noise filter (on by default) can chop them up. Bun shows you the one setting to change, and checks it for you.": "Discord açık. Seslerin zaten mikrofonunda, ama Discord'un gürültü filtresi (varsayılan olarak açık) onları kesik kesik yapabilir. Bun değiştirmen gereken tek ayarı gösterir ve senin yerine kontrol eder.",
+  "Last step: set up Discord?": "Son adım: Discord'u ayarlayalım mı?",
+  "Lite mode: no animations, for slower PCs": "Hafif mod: animasyon yok, daha yavaş PC'ler için",
+  "Lite mode: no animations, for slower PCs (suggested for this PC)": "Hafif mod: animasyon yok, daha yavaş PC'ler için (bu PC için önerilir)",
+  "No thanks, finish": "Hayır, teşekkürler, bitir",
+  "Yes, set up Discord": "Evet, Discord'u ayarla"
 }

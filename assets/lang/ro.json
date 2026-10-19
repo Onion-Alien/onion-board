@@ -4172,12 +4172,9 @@
   "What you say is said in {language}.": "Ce spui se spune în {language}.",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board s-a închis neașteptat, așa că a pornit din nou.",
   "<b>Language</b>": "<b>Limbă</b>",
-  "All set! Last thing: make it yours": "Totul e gata! Ultimul lucru: fă-l al tău",
   "Onion Board restarts in {name} when you press Finish.": "Onion Board repornește în {name} când apeși Termină.",
   "Pick a language and a look. Change them any time in <b>Settings</b> → <b>Appearance</b>.": "Alege o limbă și un aspect. Le poți schimba oricând din <b>Setări</b> → <b>Aspect</b>.",
-  "Press <b>Next</b> for the last bit: your language and a look.": "Apasă <b>Înainte</b> pentru ultima parte: limba ta și un aspect.",
   "Start Onion Board when I sign in to Windows (quietly, in the tray)": "Pornește Onion Board când mă conectez la Windows (discret, în tray)",
-  "Tell Discord or your game": "Spune-i lui Discord sau jocului",
   "{n} more themes in Settings.": "Încă {n} teme în Setări.",
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Pentru PC-uri mai lente: fără animații, Bun stă pe loc și temele sunt simple. Totul funcționează în continuare.",
   "Lite mode": "Mod ușor",
@@ -4416,5 +4413,12 @@
   "{n} of {total} earned. The badge's colour is its rarity, like the rare loading screens.": "{n} din {total} obținute. Culoarea insignei arată raritatea ei, ca la ecranele de încărcare rare.",
   "Earned {date}": "Obținută pe {date}",
   "You're at {have} of {goal}": "Ai ajuns la {have} din {goal}",
-  "You're at {have} of {goal} hours": "Ai ajuns la {have} din {goal} ore"
+  "You're at {have} of {goal} hours": "Ai ajuns la {have} din {goal} ore",
+  "All set! Now make it yours": "Totul e gata! Acum fă-l al tău",
+  "Discord is open. Your sounds are already in your mic, but Discord's noise filter (on by default) can chop them up. Bun shows you the one setting to change, and checks it for you.": "Discord este deschis. Sunetele tale sunt deja în microfon, dar filtrul de zgomot din Discord (pornit implicit) le poate tăia. Bun îți arată singura setare de schimbat și o verifică pentru tine.",
+  "Last step: set up Discord?": "Ultimul pas: configurezi Discord?",
+  "Lite mode: no animations, for slower PCs": "Mod ușor: fără animații, pentru PC-uri mai lente",
+  "Lite mode: no animations, for slower PCs (suggested for this PC)": "Mod ușor: fără animații, pentru PC-uri mai lente (recomandat pentru acest PC)",
+  "No thanks, finish": "Nu, mulțumesc, termină",
+  "Yes, set up Discord": "Da, configurează Discord"
 }
