@@ -104,7 +104,8 @@ TEST_EVENT = {"user": "TestViewer", "amount": 5.0, "currency": "USD",
 
 _LINK = re.compile(r"(?i)\b(?:https?://|www\.)\S+|\b[\w-]+\.(?:com|net|org|tv|gg|io|ly|me|co|xyz)"
                    r"(?:/\S*)?\b")
-_CONTROL = re.compile(r"[\x00-\x1f\x7f]")
+# control characters, and the bidi overrides that flip how a name or a line is shown
+_CONTROL = re.compile(r"[\x00-\x1f\x7f‪-‮⁦-⁩]")
 _FIELD = re.compile(r"\{(\w+)\}")
 _TYPE_NAME = re.compile(r"[a-z0-9_.:-]{1,64}")
 
@@ -115,6 +116,8 @@ class _State:
     def __init__(self):
         self.user_last: dict[str, float] = {}
         self.last = 0.0
+        self.list_user: dict[str, float] = {}   # !sounds keeps its own turn: asking for
+        self.list_last = 0.0                    # the list doesn't hold up the !sound after
         self.feed: collections.deque = collections.deque(maxlen=FEED_MAX)
         self.ids = itertools.count(1)
         self.seen: collections.OrderedDict = collections.OrderedDict()
@@ -495,8 +498,9 @@ def chat(mw: MainWindow, params: dict) -> tuple[int, object]:
     """One chat line: a command, or (with tts on) read out."""
     from soundboard.control import remote
     rules = chat_rules(mw)
-    user = " ".join(str(params.get("user") or params.get("username") or params.get("name")
-                        or "someone").split())[:40] or "someone"
+    user = " ".join(_CONTROL.sub(" ", str(params.get("user") or params.get("username")
+                                          or params.get("name") or "someone")).split()
+                    )[:40] or "someone"
     raw = params.get("message") or params.get("msg") or params.get("text") or ""
     if not isinstance(raw, str) or not raw.strip():
         return 400, {"error": "say what they wrote: ?user=…&message=…"}
@@ -530,7 +534,11 @@ def chat(mw: MainWindow, params: dict) -> tuple[int, object]:
     if not _allowed(rules, cmd, rank):
         return 200, {**out, "reason": "not allowed"}
     pool = _chat_pool(mw, rules)
-    if cmd == "sounds":
+    if cmd == "sounds":   # the reply goes to chat: one viewer can't flood it
+        wait = _cooldown(mw, rules, user, rank, listing=True)
+        if wait:
+            return 200, {**out, "reason": "cooldown", "wait": wait}
+        _used(mw, user, listing=True)
         names = [m.name for m in pool]
         text = ", ".join(names)
         if len(text) > REPLY_MAX - 40:
@@ -539,13 +547,14 @@ def chat(mw: MainWindow, params: dict) -> tuple[int, object]:
         return 200, {**out, "handled": True, "count": len(names),
                      "reply": fill(str(rules["reply_list"]), {"list": text or "(none)",
                                                               "user": user})}
-    if cmd == "stop":
-        mw.playctl.stop_all()
-        _log(mw, "chat", user=user, command="stop")
-        return 200, {**out, "handled": True, "stopped": "all"}
-    wait = _cooldown(mw, rules, user, rank)
+    wait = _cooldown(mw, rules, user, rank)   # mods don't wait, so their !stop stays free
     if wait:
         return 200, {**out, "reason": "cooldown", "wait": wait}
+    if cmd == "stop":
+        mw.playctl.stop_all()
+        _used(mw, user)
+        _log(mw, "chat", user=user, command="stop")
+        return 200, {**out, "handled": True, "stopped": "all"}
     if cmd == "sound":
         if not rest:
             return 200, {**out, "reason": "no sound named",
@@ -600,23 +609,30 @@ def _chat_pool(mw: MainWindow, rules: dict) -> list:
     return [m for m in mw.cfg.sounds if not cat or cat in m.tags]
 
 
-def _cooldown(mw: MainWindow, rules: dict, user: str, rank: int) -> float:
-    """Seconds left before `user` may use a command again (0: now). Mods and the
-    broadcaster don't wait."""
+def _cooldown(mw: MainWindow, rules: dict, user: str, rank: int,
+              listing: bool = False) -> float:
+    """Seconds left before `user` may use a command (`listing`: !sounds) again (0: now).
+    Mods and the broadcaster don't wait."""
     if rank >= ROLES.index("mods"):
         return 0.0
     st, now = state(mw), time.monotonic()
-    left = max(st.last + float(rules["cooldown"]) - now,
-               st.user_last.get(user.casefold(), -1e9) + float(rules["user_cooldown"]) - now)
+    last, users = (st.list_last, st.list_user) if listing else (st.last, st.user_last)
+    left = max(last + float(rules["cooldown"]) - now,
+               users.get(user.casefold(), -1e9) + float(rules["user_cooldown"]) - now)
     return round(left, 1) if left > 0 else 0.0
 
 
-def _used(mw: MainWindow, user: str):
+def _used(mw: MainWindow, user: str, listing: bool = False):
     st, now = state(mw), time.monotonic()
-    st.last = now
-    st.user_last[user.casefold()] = now
-    if len(st.user_last) > 5000:   # a huge chat: forget the ones long done
-        st.user_last = {u: t for u, t in st.user_last.items() if now - t < 3600}
+    if listing:
+        st.list_last = now
+    else:
+        st.last = now
+    users = st.list_user if listing else st.user_last
+    users[user.casefold()] = now
+    if len(users) > 5000:   # a huge chat: forget the ones long done
+        for u in [u for u, t in users.items() if now - t >= 3600]:
+            del users[u]
 
 
 # --------------------------------------------------------------------------- alerts
