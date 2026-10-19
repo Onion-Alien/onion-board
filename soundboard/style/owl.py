@@ -58,7 +58,16 @@ HOLD_PX = 0.25
 # (100 x 120; tufts: per degree)
 SWAY = {"look": 8.0, "look_y": 8.0, "blink": 24.0, "sad": 30.0, "tufts": 0.6,
         "clasp": 40.0, "flap": 40.0, "plead": 20.0, "tear": 40.0, "beak": 15.0}
-EXTRAS = ("puff", "ask", "zzz", "startle", "joy")   # drawn round him, fresh every frame
+EXTRAS = ("puff", "ask", "zzz", "startle", "joy", "sleep")   # drawn round him, fresh every frame
+# his bed (OwlWidget sleeps=True): headboard, pillow, blanket and its polka dots
+BED_WOOD = QColor("#b07a58")
+BED_WOOD_DARK = QColor("#8a5a40")
+PILLOW = QColor("#fffaf0")
+BLANKET = QColor("#8f7cf0")
+BLANKET_DOT = QColor("#c9bfff")
+SHEET = QColor("#fdf8ee")
+SLEEP_Z = QColor("#e6ddff")
+WAKE_S = 0.9   # seconds his jolt awake takes
 
 # each theme's own Hoot, like Bun's (bunnyfit.LOOKS): his feathers ("feather"; "wing":
 # the darker wings and shading, None: a shade of the feathers), the colour low in his eyes
@@ -685,7 +694,11 @@ class OwlWidget(QWidget):
     `rest_after_s=N`: with nothing going on he only moves for N seconds after he's
     shown, then finishes what he's doing and holds still (the timer stops, the last
     pose stays). The mouse coming near (looked at 4 times a second, nothing drawn),
-    a click, something playing or showing him again sets him off again."""
+    a click, something playing or showing him again sets him off again.
+
+    `sleeps=True`: he starts asleep in a little bed, breathing, z's floating up. A
+    click wakes him (a jolt, the bed goes) and he's his waiting self until he's
+    hidden (his tab left), when he goes back to bed."""
 
     clicked = Signal()
     # the ones made with dances=True: the host hands each one on screen what's playing
@@ -693,8 +706,14 @@ class OwlWidget(QWidget):
 
     def __init__(self, height: int = 96, lines=None, joy=None, parent=None, *,
                  left: int | None = None, right: int | None = None, dances: bool = False,
-                 rest_after_s: float | None = None):
+                 rest_after_s: float | None = None, sleeps: bool = False):
         super().__init__(parent)
+        # sleeps: he starts asleep in his bed, z's floating up; a click wakes him and
+        # he idles, until he's hidden (the tab left) and goes back to bed
+        self.sleeps = sleeps
+        self.asleep = sleeps
+        self._bed = 1.0 if sleeps else 0.0   # 0..1, how much of his bed shows
+        self._wake_t = -1.0        # seconds since he was woken, or -1
         self.rest_after_s = rest_after_s
         self.resting = False       # holding still: the timer's off until a stir
         self._rest_t = rest_after_s or 0.0   # (his own time, `t`) settles down from then
@@ -781,6 +800,8 @@ class OwlWidget(QWidget):
         self._peek.stop()
 
     def hideEvent(self, ev):
+        if self.sleeps and not ev.spontaneous():   # (his tab left, not the app minimised)
+            self.fall_asleep()
         self._pause()
         self._kept_img = self._kept_pose = None
         super().hideEvent(ev)
@@ -813,11 +834,35 @@ class OwlWidget(QWidget):
             or abs(self._look[0] - self._glance[0]) > 0.01
             or abs(self._look[1] - self._glance[1]) > 0.01
             or abs(self._squash_s.v) > 0.05 or abs(self._tufts_s.v) > 0.5
-            or abs(self._wing_s.v) > 0.05)
+            or abs(self._wing_s.v) > 0.05
+            or 0.01 < self._bed < 0.99 or self._wake_t >= 0)
+
+    def wake(self):
+        """Asleep: he jolts awake, his bed goes, and he waits like always."""
+        if not self.asleep:
+            return
+        self.asleep = False
+        self._wake_t = 0.0
+        self.say = ""
+        self._next_act = self.t + self._rng.uniform(3.5, 7.0)
+        self._next_blink = self.t + self._rng.uniform(1.5, 3.0)
+        self.stir()
+
+    def fall_asleep(self):
+        """Back to bed (sleeps=True), as he was at the start."""
+        self.asleep = True
+        self._bed = 1.0
+        self._wake_t = self._joy_t = -1.0
+        self.act = self._was = None
+        self.say = ""
+        self._kept_img = self._kept_pose = None
 
     def mousePressEvent(self, ev):
         if ev.button() == Qt.MouseButton.LeftButton:
-            self.cheer()
+            if self.asleep:
+                self.wake()
+            else:
+                self.cheer()
             self.clicked.emit()
         super().mousePressEvent(ev)
 
@@ -906,8 +951,17 @@ class OwlWidget(QWidget):
         m = self._mouse() if mouse is ... else mouse
         dist = math.hypot(*m) if m else 99.0
         near = 1.0 if dist < NEAR else 0.0
-        if near:
+        if near:   # (asleep: only a click wakes him, but the z's keep floating)
             self.stir()
+        if self.asleep:
+            near = 0.0
+        if self._wake_t >= 0:
+            self._wake_t += dt
+            if self._wake_t > WAKE_S:
+                self._wake_t = -1.0
+        self._bed += (float(self.asleep) - self._bed) * min(1.0, dt * 5)
+        if self._bed < 0.01 and not self.asleep:
+            self._bed = 0.0
         settling = self.rest_after_s is not None and self.t >= self._rest_t
         self._near += (near - self._near) * min(1.0, dt * (5 if near else 1.5))
         if self._joy_t >= 0:
@@ -929,7 +983,8 @@ class OwlWidget(QWidget):
                 self._stop_act()
         elif settling:   # nothing new starts; what's going on plays out (_calm)
             self._next_act = max(self._next_act, self.t + 1.0)
-        elif (self._joy_t < 0 and self._near < 0.3 and self.t >= self._next_act
+        elif (not self.asleep and self._joy_t < 0 and self._near < 0.3
+              and self.t >= self._next_act
               and self._dance < 0.3):
             self.start(self._rng.choice(list(ACTS)))
         if settling:
@@ -1010,6 +1065,12 @@ class OwlWidget(QWidget):
     def base_pose(self) -> dict:
         """The pose this moment before the springy layer (see pose())."""
         t, near = self.t, self._near
+        if self.asleep:   # tucked in: breathing slow, tufts down, head tipped
+            br = math.sin(t * 1.7)
+            return {"look": 0.0, "look_y": 0.3, "blink": 1.0, "sad": 0.0,
+                    "tufts": 18 + 3 * br, "clasp": 0.0, "flap": 0.0, "plead": 0.0,
+                    "tear": 0.0, "beak": 0.0, "dy": 1.6 * br,
+                    "rot": -4 + 1.2 * math.sin(t * 0.6), "sleep": t}
         sad = 0.85 * (1 - near)
         tufts = 24 * sad - 10 * near + 3 * math.sin(t * 1.1)
         dy = -1.2 * math.sin(t * 2.0) - 4 * near * abs(math.sin(t * 5)) * 0.5
@@ -1074,6 +1135,14 @@ class OwlWidget(QWidget):
             plead = max(plead, 0.6 * e)
             beak = max(beak, e)
             extra["joy"] = j
+        if self._wake_t >= 0:   # woken: a jump, tufts straight up, a "!"
+            j = self._wake_t / WAKE_S
+            e = _soft(min(1.0, j * 1.4))
+            dy -= 12 * e
+            tufts -= 28 * e
+            sad *= 1 - _bell(j)
+            beak = max(beak, 0.5 * e)
+            extra["startle"], extra["startle_a"] = j, 1.0
         return {"look": self._look[0], "look_y": self._look[1], "blink": blink, "sad": sad,
                 "tufts": tufts, "clasp": clasp, "flap": flap, "plead": plead, "tear": tear,
                 "beak": beak,
@@ -1192,15 +1261,22 @@ class OwlWidget(QWidget):
         # a soft shadow on the floor, shrinking as he rises
         lift = max(0.0, -pose["dy"])
         sw = r.width() * (0.6 - lift * 0.01)
+        bed = self._bed
+        if bed > 0:
+            self._bed_back(p, r, bed)
         p.setPen(Qt.PenStyle.NoPen)
-        p.setBrush(QColor(0, 0, 0, max(18, 60 - int(lift * 4))))
+        p.setBrush(QColor(0, 0, 0, round(max(18, 60 - int(lift * 4)) * (1 - bed))))
         p.drawEllipse(QRectF(r.center().x() - sw / 2, r.bottom() - 3, sw, 7))
         if HOLD:   # (only he is kept: what's round him is this frame's)
             p.drawImage(QPointF(0, 0), self._picture(self._held(pose, dpr), r, dpr))
         else:
             self._draw_owl(p, pose, r)
+        if bed > 0:
+            self._bed_front(p, r, bed)
         body = r.translated(0, pose["dy"])
         head = QPointF(body.center().x(), body.top() + 18 * u)
+        if "sleep" in pose:
+            self._sleep_z(p, pose["sleep"], head, u)
         if "puff" in pose:
             k = pose["puff"]
             if 0.25 < k < 0.95:
@@ -1243,6 +1319,78 @@ class OwlWidget(QWidget):
             self._bubble(p, self.say, body)
         p.end()
         self._painted_say = self.say
+
+    def _bed_frame(self, p: QPainter, r: QRectF, bed: float) -> float:
+        """Set up for drawing his bed: faded and sunk as it goes; returns one canvas
+        unit, px."""
+        u = self.owl_h / H
+        p.setOpacity(bed)
+        p.translate(r.center().x(), r.top() + 14 * u * (1 - bed))
+        pen = QPen(INK, 2.4 * u)
+        pen.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
+        p.setPen(pen)
+        return u
+
+    def _bed_back(self, p: QPainter, r: QRectF, bed: float):
+        """The headboard, its two round-topped posts and the pillow, behind him (in
+        canvas units from the middle of his top)."""
+        p.save()
+        u = self._bed_frame(p, r, bed)
+        board = QPainterPath()
+        board.addRoundedRect(QRectF(-50 * u, 44 * u, 100 * u, (H - 40) * u), 22 * u, 22 * u)
+        p.setBrush(BED_WOOD)
+        p.drawPath(board)
+        for sx in (-1, 1):
+            post = QPainterPath()
+            post.addRoundedRect(QRectF(sx * 52 * u - 5 * u, 40 * u, 10 * u, (H - 36) * u),
+                                5 * u, 5 * u)
+            p.setBrush(BED_WOOD_DARK)
+            p.drawPath(post)
+            p.setBrush(BED_WOOD)
+            p.drawEllipse(QPointF(sx * 52 * u, 37 * u), 6.5 * u, 6.5 * u)
+        p.setBrush(PILLOW)
+        p.drawRoundedRect(QRectF(-42 * u, 56 * u, 84 * u, 26 * u), 13 * u, 13 * u)
+        p.restore()
+
+    def _bed_front(self, p: QPainter, r: QRectF, bed: float):
+        """The blanket tucked up to his belly, a sheet folded over its top, polka dots."""
+        p.save()
+        u = self._bed_frame(p, r, bed)
+        top, bottom = 90 * u, (H + 2) * u
+        blanket = QPainterPath()
+        blanket.addRoundedRect(QRectF(-56 * u, top, 112 * u, bottom - top), 10 * u, 10 * u)
+        p.setBrush(BLANKET)
+        p.drawPath(blanket)
+        p.save()
+        p.setClipPath(blanket)
+        p.setPen(Qt.PenStyle.NoPen)
+        p.setBrush(BLANKET_DOT)
+        for i, x in enumerate(range(-46, 50, 13)):
+            p.drawEllipse(QPointF(x * u, (110 + 5 * (i % 2)) * u), 2.6 * u, 2.6 * u)
+        p.restore()
+        p.setBrush(SHEET)
+        p.drawRoundedRect(QRectF(-58 * u, top - 3 * u, 116 * u, 11 * u), 5.5 * u, 5.5 * u)
+        p.restore()
+
+    def _sleep_z(self, p: QPainter, t: float, head: QPointF, u: float):
+        """Three fat z's drifting up and away from his head, growing as they go, each
+        fading in and out in turn (there's always one or two in the air)."""
+        f = QFont(self.font())
+        f.setBold(True)
+        for i in range(3):
+            q = (t * 0.42 + i / 3) % 1.0
+            px = (12 + 11 * q) * u
+            if px < 1:
+                continue
+            f.setPixelSize(max(1, round(px)))
+            path = QPainterPath()
+            path.addText(QPointF(head.x() + (22 + 24 * q + 4 * math.sin(q * 6.3)) * u,
+                                 head.y() - (4 + 42 * q) * u), f, "z")
+            p.setOpacity(_bell(q) ** 0.5)
+            p.setPen(QPen(INK, 1.3 * u))
+            p.setBrush(SLEEP_Z)
+            p.drawPath(path)
+        p.setOpacity(1.0)
 
     def _text(self, p: QPainter, text: str, x: float, y: float, px: float, col: QColor):
         if px < 1:
