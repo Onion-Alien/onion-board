@@ -3,5 +3,3 @@
   slower PC), and only those pages are now refreshed when you open them again.
 - Switching to and from the Setup tab no longer works out the whole window's layout from
   scratch each time (about a tenth of a second each way on a slower PC).
-- After picking a theme in the setup guide, the first Settings open is quick too: a new
-  Settings is made ahead a few seconds after a theme change.

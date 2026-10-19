@@ -25,7 +25,6 @@ if TYPE_CHECKING:
     from soundboard.ui.window.mainwindow import MainWindow
 
 SPARE_AFTER_MS = 1500   # after a theme switch, the spare Edit sound is made again
-SETTINGS_AFTER_MS = 3000   # ...and a closed Settings (each on its own, not together)
 
 
 class ThemeControl(Controller):
@@ -65,10 +64,6 @@ class ThemeControl(Controller):
         # the next Edit opens at once: a spare made again a moment later, on its own
         # (~250 ms, ~1 s on a slower PC), not added to this restyle's wait
         QTimer.singleShot(SPARE_AFTER_MS, mw, mw.setctl.prebuild_editor)
-        # and Settings too, if it isn't open (picked in it, the open one restyles): the
-        # kept one went with the old theme, and the first open after a theme picked in
-        # the setup guide built it all (~300 ms on a slower PC)
-        QTimer.singleShot(SETTINGS_AFTER_MS, mw, mw.setctl._prebuild_settings)
         mw._save_later()
 
     def keep_limited(self, save: bool = True):
