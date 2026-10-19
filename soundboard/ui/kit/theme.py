@@ -546,7 +546,7 @@ QFrame#card QPushButton#voicecat { border-radius:12px; padding:4px 12px; min-hei
 QFrame#card QPushButton#voicecat:hover:!checked { background:$btn_hover; }
 QFrame#card QPushButton#voicecat:checked { background:$accent; border-color:$accent_hi; color:$on_accent; font-weight:600; }
 QFrame#card QPushButton#voicepick { background:$field; border:1px solid $border; border-radius:10px;
-    padding:0 28px 0 10px; text-align:left; font-weight:600; color:$text_hi; }
+    padding:0 28px 0 12px; text-align:left; font-weight:600; color:$text_hi; }
 QFrame#card QPushButton#voicepick:hover, QFrame#card QLineEdit#voicesearch:hover { border-color:$border_hi; }
 QFrame#card QPushButton#voicepick:focus, QFrame#card QPushButton#voicepick:open,
 QFrame#card QLineEdit#voicesearch:focus { border-color:$accent; }

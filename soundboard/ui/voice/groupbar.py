@@ -6,9 +6,10 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QAction, QActionGroup
-from PySide6.QtWidgets import QHBoxLayout, QLineEdit, QPushButton, QWidget
+from PySide6.QtCore import QRect, Qt, Signal
+from PySide6.QtGui import QAction, QActionGroup, QIcon
+from PySide6.QtWidgets import (QHBoxLayout, QLineEdit, QPushButton, QStyle,
+                               QStyleOptionButton, QStylePainter, QWidget)
 
 from soundboard.i18n import _
 from soundboard.ui.kit import icons
@@ -18,6 +19,32 @@ from soundboard.ui.kit.widgets import DropdownMenu, fit_placeholder
 BAR_H = 32        # px: the dropdown, the search box and the view switch (26 + 2 * 3)
 PICK_MIN_W = 190  # px: the dropdown's width, so the search box starts in one place
 PICK_NARROW = 120  # px: its least, in a narrow window (the name ends in "…")
+PICK_PAD = 8      # px: its icon from the left edge, level with the search box's magnifier
+
+
+class PickButton(QPushButton):
+    """The group dropdown's button. Its icon and name are drawn here, PICK_PAD from the
+    left edge: with a menu arrow and text-align:left, Qt put the icon 3 px from the edge
+    whatever the style sheet's padding said."""
+
+    def paintEvent(self, _e):
+        opt = QStyleOptionButton()
+        self.initStyleOption(opt)
+        icon, text = self.icon(), opt.text
+        opt.icon, opt.text = QIcon(), ""
+        p = QStylePainter(self)
+        p.drawControl(QStyle.ControlElement.CE_PushButton, opt)   # the box and its arrow
+        sz = self.iconSize()
+        x = PICK_PAD
+        if not icon.isNull():
+            p.drawPixmap(x, (self.height() - sz.height()) // 2,
+                         icon.pixmap(sz, self.devicePixelRatioF()))
+            x += sz.width() + 3   # the name starts where the search box's words do
+        p.setPen(opt.palette.buttonText().color())
+        p.drawText(QRect(x, 0, self.width() - x - 28, self.height()),
+                   Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
+                   | Qt.TextFlag.TextShowMnemonic, text)
+        p.end()
 
 
 class GroupBar(QWidget):
@@ -38,7 +65,7 @@ class GroupBar(QWidget):
         h.setContentsMargins(0, 0, 0, 0)
         h.setSpacing(8)
 
-        b = self.button = QPushButton()
+        b = self.button = PickButton()
         b.setObjectName("voicepick")
         b.setFixedHeight(BAR_H)
         b.setCursor(Qt.CursorShape.PointingHandCursor)
