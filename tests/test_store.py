@@ -516,6 +516,9 @@ def test_categories_filter_the_list(qapp, fake):
     assert _wait(qapp, lambda: len(t._rows) == 2 and pick.count() == 3)
     assert [pick.itemText(i) for i in range(3)] == ["All categories", "Games  3", "Memes  1"]
     assert pick.currentIndex() == 0
+    # it opens on Trending: what's popular right now, its header with the arrow
+    assert "sort=trending" in next(c[1] for c in fake.calls if c[1].startswith("/v1/sounds"))
+    assert not t.sort_btns["trending"].icon().isNull()
     pick.activated.emit(pick.findData("games"))
     assert _wait(qapp, lambda: "cat=games" in fake.calls[-1][1])
     assert pick.currentData() == "games"

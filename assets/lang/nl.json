@@ -4176,5 +4176,6 @@
   "Play it, as its pad would": "Afspelen zoals de knop het zou doen",
   "Show its pad on the Sounds tab": "De knop tonen op het tabblad Geluiden",
   "For slower PCs: the voices use less CPU. The voice changer skips hiss removal and its robot voices and echoes are a little simpler. Speech recognition uses the smaller model if it's downloaded (other languages are heard a little less well) and translations are simpler. AI voices stay as they are: they can't get lighter without sounding worse. On by itself in lite mode.": "Voor tragere pc's: de stemmen gebruiken minder CPU. De stemvervormer slaat ruisonderdrukking over en de robotstemmen en echo's zijn iets eenvoudiger. Spraakherkenning gebruikt het kleinere model als het gedownload is (andere talen worden iets minder goed verstaan) en vertalingen zijn eenvoudiger. AI-stemmen blijven zoals ze zijn: lichter kan niet zonder dat ze slechter klinken. Gaat vanzelf aan in de lichte modus.",
-  "The AI voice stopped: {why}": "De AI-stem is gestopt: {why}"
+  "The AI voice stopped: {why}": "De AI-stem is gestopt: {why}",
+  "What's popular right now": "Wat nu populair is"
 }

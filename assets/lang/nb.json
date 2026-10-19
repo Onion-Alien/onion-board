@@ -4176,5 +4176,6 @@
   "Play it, as its pad would": "Spill den av slik knappen dens ville gjort",
   "Show its pad on the Sounds tab": "Vis knappen dens på fanen Lyder",
   "For slower PCs: the voices use less CPU. The voice changer skips hiss removal and its robot voices and echoes are a little simpler. Speech recognition uses the smaller model if it's downloaded (other languages are heard a little less well) and translations are simpler. AI voices stay as they are: they can't get lighter without sounding worse. On by itself in lite mode.": "For tregere PC-er: stemmene bruker mindre CPU. Stemmeendreren hopper over susfjerning, og robotstemmene og ekkoene er litt enklere. Talegjenkjenning bruker den mindre modellen hvis den er lastet ned (andre språk høres litt dårligere), og oversettelsene er enklere. AI-stemmer forblir som de er: de kan ikke bli lettere uten å låte verre. Slås på av seg selv i lett modus.",
-  "The AI voice stopped: {why}": "AI-stemmen stoppet: {why}"
+  "The AI voice stopped: {why}": "AI-stemmen stoppet: {why}",
+  "What's popular right now": "Det som er populært akkurat nå"
 }

@@ -4097,5 +4097,6 @@
   "Play it, as its pad would": "Putar seperti tombolnya memutarnya",
   "Show its pad on the Sounds tab": "Tampilkan tombolnya di tab Suara",
   "For slower PCs: the voices use less CPU. The voice changer skips hiss removal and its robot voices and echoes are a little simpler. Speech recognition uses the smaller model if it's downloaded (other languages are heard a little less well) and translations are simpler. AI voices stay as they are: they can't get lighter without sounding worse. On by itself in lite mode.": "Untuk PC yang lebih lambat: suara memakai lebih sedikit CPU. Pengubah suara melewati penghapusan desis, dan suara robot serta gemanya sedikit lebih sederhana. Pengenalan suara memakai model yang lebih kecil jika sudah diunduh (bahasa lain terdengar sedikit kurang baik) dan terjemahan lebih sederhana. Suara AI tetap seperti adanya: tidak bisa lebih ringan tanpa terdengar lebih buruk. Menyala sendiri di mode ringan.",
-  "The AI voice stopped: {why}": "Suara AI berhenti: {why}"
+  "The AI voice stopped: {why}": "Suara AI berhenti: {why}",
+  "What's popular right now": "Yang lagi populer sekarang"
 }

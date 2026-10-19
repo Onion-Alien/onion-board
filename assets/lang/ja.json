@@ -4097,5 +4097,6 @@
   "Play it, as its pad would": "ボタンと同じように再生",
   "Show its pad on the Sounds tab": "サウンドタブでそのボタンを表示",
   "For slower PCs: the voices use less CPU. The voice changer skips hiss removal and its robot voices and echoes are a little simpler. Speech recognition uses the smaller model if it's downloaded (other languages are heard a little less well) and translations are simpler. AI voices stay as they are: they can't get lighter without sounding worse. On by itself in lite mode.": "遅めのPC向け：ボイスのCPU使用量を減らします。ボイスチェンジャーはノイズ除去を省き、ロボット声とエコーが少しシンプルになります。音声認識はダウンロード済みなら小さいモデルを使い（他の言語の聞き取りが少し落ちます）、翻訳もシンプルになります。AIボイスはそのままです：音質を落とさずに軽くはできません。ライトモードでは自動でオン。",
-  "The AI voice stopped: {why}": "AI音声が停止しました：{why}"
+  "The AI voice stopped: {why}": "AI音声が停止しました：{why}",
+  "What's popular right now": "今人気のもの"
 }

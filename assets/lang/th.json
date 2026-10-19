@@ -4097,5 +4097,6 @@
   "Play it, as its pad would": "เล่นเหมือนกดปุ่มของมัน",
   "Show its pad on the Sounds tab": "แสดงปุ่มของมันในแท็บเสียง",
   "For slower PCs: the voices use less CPU. The voice changer skips hiss removal and its robot voices and echoes are a little simpler. Speech recognition uses the smaller model if it's downloaded (other languages are heard a little less well) and translations are simpler. AI voices stay as they are: they can't get lighter without sounding worse. On by itself in lite mode.": "สำหรับพีซีที่ช้ากว่า: เสียงใช้ CPU น้อยลง ตัวเปลี่ยนเสียงข้ามการลบเสียงซ่า และเสียงหุ่นยนต์กับเสียงก้องจะเรียบง่ายขึ้นเล็กน้อย การรู้จำเสียงพูดใช้โมเดลที่เล็กกว่าถ้าดาวน์โหลดไว้แล้ว (ภาษาอื่นจะฟังออกน้อยลงเล็กน้อย) และการแปลจะเรียบง่ายขึ้น เสียง AI คงเดิม: ทำให้เบาลงไม่ได้โดยไม่ให้เสียงแย่ลง เปิดเองในโหมดเบา",
-  "The AI voice stopped: {why}": "เสียง AI หยุดทำงาน: {why}"
+  "The AI voice stopped: {why}": "เสียง AI หยุดทำงาน: {why}",
+  "What's popular right now": "สิ่งที่กำลังฮิตตอนนี้"
 }

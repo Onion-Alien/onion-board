@@ -4176,5 +4176,6 @@
   "Play it, as its pad would": "Abspielen, wie es seine Taste tun würde",
   "Show its pad on the Sounds tab": "Seine Taste im Tab Sounds zeigen",
   "For slower PCs: the voices use less CPU. The voice changer skips hiss removal and its robot voices and echoes are a little simpler. Speech recognition uses the smaller model if it's downloaded (other languages are heard a little less well) and translations are simpler. AI voices stay as they are: they can't get lighter without sounding worse. On by itself in lite mode.": "Für langsamere PCs: Die Stimmen brauchen weniger CPU. Der Stimmverzerrer lässt die Rauschunterdrückung weg, Roboterstimmen und Echos sind etwas einfacher. Die Spracherkennung nutzt das kleinere Modell, wenn es heruntergeladen ist (andere Sprachen werden etwas schlechter verstanden), und Übersetzungen sind einfacher. KI-Stimmen bleiben, wie sie sind: Leichter geht nicht, ohne dass sie schlechter klingen. Im Lite-Modus automatisch an.",
-  "The AI voice stopped: {why}": "Die KI-Stimme ist ausgefallen: {why}"
+  "The AI voice stopped: {why}": "Die KI-Stimme ist ausgefallen: {why}",
+  "What's popular right now": "Was gerade beliebt ist"
 }

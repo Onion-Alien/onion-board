@@ -4255,5 +4255,6 @@
   "Play it, as its pad would": "Redă-l cum l-ar reda butonul lui",
   "Show its pad on the Sounds tab": "Arată-i butonul în fila Sunete",
   "For slower PCs: the voices use less CPU. The voice changer skips hiss removal and its robot voices and echoes are a little simpler. Speech recognition uses the smaller model if it's downloaded (other languages are heard a little less well) and translations are simpler. AI voices stay as they are: they can't get lighter without sounding worse. On by itself in lite mode.": "Pentru PC-uri mai lente: vocile folosesc mai puțin procesor. Modificatorul de voce sare peste eliminarea fâșâitului, iar vocile de robot și ecourile sunt puțin mai simple. Recunoașterea vorbirii folosește modelul mai mic dacă e descărcat (celelalte limbi sunt auzite puțin mai prost), iar traducerile sunt mai simple. Vocile AI rămân cum sunt: nu pot deveni mai ușoare fără să sune mai rău. Pornește singur în modul ușor.",
-  "The AI voice stopped: {why}": "Vocea AI s-a oprit: {why}"
+  "The AI voice stopped: {why}": "Vocea AI s-a oprit: {why}",
+  "What's popular right now": "Ce e popular acum"
 }
