@@ -557,6 +557,23 @@ def test_switched_back_on_the_store_says_so(qapp, fake):
         t.shutdown()
 
 
+def test_onion_board_category_lists_the_stores_own_sounds(qapp, fake):
+    # the server puts it first; picking it asks for the store's own sounds only
+    fake.cats = [("onionboard", 2), ("games", 3)]
+    fake.sounds["000000000002"]["cat"] = "onionboard"   # never a sound's own category
+    t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
+    t.show()
+    pick = t.cat_pick
+    assert _wait(qapp, lambda: len(t._rows) == 2 and pick.count() == 3)
+    assert [pick.itemText(i) for i in range(3)] == ["All categories", "Onion Board  2",
+                                                    "Games  3"]
+    pick.activated.emit(pick.findData("onionboard"))
+    assert _wait(qapp, lambda: "cat=onionboard" in fake.calls[-1][1])
+    assert _wait(qapp, lambda: len(t._rows) == 2)
+    assert [s.cat for s in store.parse({"sounds": list(fake.sounds.values())})[0]] == ["", ""]
+    t.shutdown()
+
+
 def test_no_categories_only_all(qapp, fake):
     fake.fail_cats = True
     t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
