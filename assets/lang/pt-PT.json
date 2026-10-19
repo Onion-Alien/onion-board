@@ -4121,5 +4121,7 @@
   "{n} more themes in Settings.": "Mais {n} temas nas Definições.",
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Para PCs mais lentos: sem animações, o Bun fica quieto e os temas são simples. Tudo continua a funcionar.",
   "Lite mode": "Modo leve",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "O Onion Board pode correr mais leve neste PC: o Modo leve desliga as animações. Também está em Definições > Aspeto."
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "O Onion Board pode correr mais leve neste PC: o Modo leve desliga as animações. Também está em Definições > Aspeto.",
+  "Use less CPU": "Usar menos CPU",
+  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "Para PCs mais lentos: o modificador de voz e a voz em direto usam menos CPU. A remoção de ruído fica desligada, as vozes de robô e os ecos ficam um pouco mais simples, e a voz em direto usa o modelo de fala mais pequeno se estiver transferido. Liga-se sozinho no modo leve."
 }

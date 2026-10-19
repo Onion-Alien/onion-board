@@ -146,6 +146,16 @@ MODEL_BYTES = {"tiny": 75_500_000, "tiny.en": 75_500_000, "base": 147_400_000,
                "base.en": 147_400_000, "small": 485_800_000, "small.en": 485_800_000}
 
 
+def have_model(name: str) -> bool:
+    """The speech model is on this PC already (looked up without going online)."""
+    try:
+        from faster_whisper.utils import download_model
+        download_model(name, local_files_only=True)
+        return True
+    except Exception:  # noqa: BLE001  (not there, or not whole)
+        return False
+
+
 def fetch_model(name: str, progress) -> str:
     """The speech model's folder, downloaded first when it isn't on this PC yet;
     `progress(done, total)` (bytes) every half second meanwhile. The download's own
@@ -268,6 +278,9 @@ def main(argv=None) -> int:
     ap.add_argument("--device", default="cpu", help="cpu or cuda")
     ap.add_argument("--translate", metavar="FOLDER",
                     help="a downloaded translation model: speak each line in its language")
+    ap.add_argument("--lighter", metavar="MODEL",
+                    help="Use less CPU: this smaller model instead, if it's already on "
+                         "this PC (never downloaded for it)")
     ap.add_argument("--fake", action="store_true", help=argparse.SUPPRESS)
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -307,6 +320,9 @@ def main(argv=None) -> int:
         quit_.start()
 
     def transcribe_loop():
+        if args.lighter and not args.fake and have_model(args.lighter):
+            log.info("Use less CPU: %s in place of %s", args.lighter, args.model)
+            args.model = args.lighter
         link.send(type="status", text=f"loading speech model ({args.model})…")
         try:
             t = FakeTranscriber() if args.fake else WhisperTranscriber(

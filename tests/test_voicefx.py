@@ -1155,3 +1155,71 @@ def test_hiss_removal_all_frames_at_once_matches_one_at_a_time():
         got, want = a._dehiss(spec), _dehiss_one_frame_at_a_time(b, spec)
         np.testing.assert_allclose(got, want, rtol=1e-5, atol=1e-9)
         np.testing.assert_allclose(a.noise, b.noise, rtol=1e-9)
+
+
+@pytest.fixture
+def light_off():
+    yield
+    voicefx.set_light(False)
+
+
+def test_use_less_cpu_reaches_every_effect_on_the_next_block(light_off):
+    """Use less CPU (lite mode's): the chain tells its effects on the next mic block,
+    and back again; the robot then has half the bands, the reverb half its lines and
+    Clean up no hiss removal (so no delay from it either)."""
+    chain = VoiceChain()
+    chain.configure(spec_for(cleanup={}, robot={"freq": 100}, reverb={"mix": 0.3}))
+    x = np.stack([_vowel(secs=0.2)] * 2, 1)[:480]
+    chain.process(x, SR)
+    eff = {e.type: e for e in chain._effects}
+    assert eff["robot"].bands == 16 and eff["reverb"]._in_use() == (8, 4)
+    assert eff["cleanup"].latency() > 0
+    voicefx.set_light(True)
+    y = chain.process(x, SR)
+    assert all(e.light for e in chain._effects)
+    assert eff["robot"].bands == 8 and eff["reverb"]._in_use() == (4, 2)
+    assert eff["cleanup"].latency() == 0
+    assert np.all(np.isfinite(y)) and not chain.errors
+    voicefx.set_light(False)
+    chain.process(x, SR)
+    assert eff["robot"].bands == 16 and not any(e.light for e in chain._effects)
+
+
+def test_an_add_on_effect_without_the_switch_keeps_running(light_off):
+    class Old:   # an add-on's effect written before Use less CPU (not an Effect)
+        type, name, params = "old", "Old", ()
+
+        def __init__(self, rate, values=None):
+            self.rate = rate
+
+        def run(self, x, rate):
+            return x * 0.5
+
+        def latency(self):
+            return 0.0
+    voicefx.REGISTRY["old"] = Old   # pyright: ignore[reportArgumentType]
+    try:
+        chain = VoiceChain()
+        chain.configure(spec_for(old={}))
+        voicefx.set_light(True)
+        y = chain.process(np.full((480, 2), 0.2, np.float32), SR)
+        assert not chain.errors and np.allclose(y, 0.1)
+    finally:
+        del voicefx.REGISTRY["old"]
+
+
+def test_use_less_cpu_keeps_every_voice_about_as_loud(light_off):
+    x = _vowel(secs=1.5)
+    for name in ("Robot", "Talkbox", "Cathedral", "Cave", "Demon", "Mecha"):
+        out = []
+        for light in (False, True):
+            voicefx.set_light(light)
+            chain = VoiceChain()
+            chain.configure({"enabled": True, "effects": {
+                "cleanup": {"on": True},
+                **{t: {"on": True, **c} for t, c in voicefx.PRESETS[name].items()}}})
+            y = np.concatenate([chain.process(np.stack([x[i:i + 480]] * 2, 1), SR)[:, 0]
+                                for i in range(0, len(x) - 479, 480)])
+            assert np.all(np.isfinite(y))
+            out.append(20 * np.log10(np.sqrt(np.mean(y[SR // 2:] ** 2)) + 1e-9))
+        assert abs(out[0] - out[1]) < 2.5, name

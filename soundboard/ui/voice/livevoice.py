@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import QObject, Qt, Signal
 from PySide6.QtWidgets import QHBoxLayout, QLabel, QProgressBar, QPushButton, QVBoxLayout, QWidget
 
+from soundboard import voicefx
 from soundboard.core import langnames
 from soundboard.speech import spoken, translation
 from soundboard.ui.kit import icons
@@ -94,6 +95,8 @@ class LiveVoice(QObject):
         lang = spoken.spoken(p.s)
         # an English-only model can't hear another language: its "Any language" one
         args = ["--model", spoken.model_for(model, lang), "--language", lang]
+        if voicefx.light() and args[1] == "base.en":   # Use less CPU: the smaller one,
+            args += ["--lighter", "tiny.en"]            # when it's downloaded already
         m = p._lang_on()
         p.ctl.live_voice = None
         if m is not None and m.installed:

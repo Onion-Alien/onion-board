@@ -25,6 +25,7 @@ from soundboard.audio import appaudio, howl
 from soundboard.mic import voicesdk
 from soundboard.core import autostart, reset, trash
 from soundboard.sounds import library
+from soundboard import voicefx
 from soundboard.control import remote
 from soundboard.online import ffmpegget, net, netlog, tor
 from soundboard.mic import profiles
@@ -467,6 +468,7 @@ class MainWindow(QMainWindow):
         tor.qt_status().changed.connect(self.netctl._on_tor)
         app = QApplication.instance()
         lite.set_on(self.cfg.lite_mode)   # (before anything that animates is built)
+        voicefx.set_light(self.light_voice_on())
         # before the UI is built, so everything polishes in-theme
         if isinstance(app, QApplication):
             theme.textures_on = self.cfg.theme_texture and not self.cfg.lite_mode
@@ -800,6 +802,26 @@ class MainWindow(QMainWindow):
             setattr(self.engine, attr, v)
         self._save_later()
 
+    def light_voice_on(self) -> bool:
+        """Use less CPU for the voice features: the switch's choice, or lite mode's."""
+        c = self.cfg.light_voice
+        return c == "on" or (c == "auto" and self.cfg.lite_mode)
+
+    def apply_light_voice(self):
+        """The effects (next mic block) and the voice changer card's switch follow
+        light_voice_on(); the speech helper takes it at its next start."""
+        on = self.light_voice_on()
+        voicefx.set_light(on)
+        fx = getattr(getattr(self, "voice", None), "fx", None)   # (the tab can be off)
+        if fx is not None and hasattr(fx, "set_light"):
+            fx.set_light(on)
+
+    def set_light_voice(self, on: bool):
+        """The voice changer card's Use less CPU switch: the user's own choice from now
+        on, whatever lite mode says."""
+        self.set_option("light_voice", "on" if on else "off")
+        self.apply_light_voice()
+
     def _save_later(self):
         self._save_timer.start(100)   # short: a crash loses at most this much
 
@@ -912,6 +934,8 @@ class MainWindow(QMainWindow):
             v.bar.record_button.clicked.connect(
                 lambda: self.soundctl.record_dialog(quick=True))
             v.fx.hotkey_cleared.connect(lambda n: self.hkctl.set_voice_hotkey(n, ""))
+            v.fx.set_light(self.light_voice_on())
+            v.fx.light_changed.connect(self.set_light_voice)
             v.fx.renamed.connect(self.hkctl.voice_renamed)
             v.fx.keys = dict(self.cfg.voice_hotkeys)
             v.board_sounds = lambda: self.cfg.sounds   # the Background's "from my board"

@@ -73,6 +73,14 @@ class Effect:
     def set_values(self, values: dict):
         self.p = self._values(values)      # one atomic swap, read once per block
 
+    # Use less CPU (the Voice tab, on by itself in lite mode): an effect that has a
+    # cheaper way (fewer bands, a smaller reverb, no hiss removal) takes it. Set by the
+    # chain on the audio thread after the effect is made, and again when it flips.
+    light = False
+
+    def set_light(self, on: bool):
+        self.light = bool(on)
+
     def run(self, x: np.ndarray, rate: int) -> np.ndarray:
         raise NotImplementedError
 
@@ -89,6 +97,18 @@ class Effect:
 
 
 REGISTRY: dict[str, type[Effect]] = {}
+
+_light = False   # Use less CPU: read by every chain on its next mic block
+
+
+def set_light(on: bool):
+    """(Any thread.) Use less CPU on or off for every voice chain (one write)."""
+    global _light
+    _light = bool(on)
+
+
+def light() -> bool:
+    return _light
 
 
 def register[E: Effect](cls: type[E]) -> type[E]:
@@ -187,6 +207,7 @@ class VoiceChain:
         # process() then never rebuilt, or undo the mic thread's bypass of a broken one.)
         self._gen = 0
         self._built = 0
+        self._light = False   # Use less CPU as the effects were last told
         self.tap: Callable[[np.ndarray, int], None] | None = None
         self.replace = False
         self.source = None
@@ -229,6 +250,23 @@ class VoiceChain:
                 e.beds = self.beds  # pyright: ignore[reportAttributeAccessIssue] - the Background's
             new.append(e)
         self._effects = tuple(new)
+        self._light = _light
+        self._tell_light()
+
+    def _tell_light(self):
+        """(Audio thread.) Each effect told whether to use less CPU; one that fails
+        is bypassed, like a failing run()."""
+        for e in self._effects:
+            tell = getattr(e, "set_light", None)   # (an add-on's own class may not have it)
+            if tell is None or getattr(e, "light", False) == self._light:
+                continue
+            try:
+                tell(self._light)
+            except Exception as ex:  # noqa: BLE001
+                self.errors[e.type] = errors.plain(ex)
+                self._effects = tuple(f for f in self._effects if f is not e)
+                log.error("voice effect %r failed to switch Use less CPU; bypassed", e.type,
+                          exc_info=ex)
 
     def set_beds(self, beds):
         """(Any thread.) The Background's loops, made by voicefx.backdrop.Maker: handed
@@ -333,6 +371,9 @@ class VoiceChain:
             # (the bump is read before the spec: a configure meanwhile rebuilds next block)
             self._rate, self._built = rate, gen
             self._rebuild(rate)
+        if self._light != _light:
+            self._light = _light
+            self._tell_light()
         tap, replace, src = self.tap, self.replace, self.source
         effects = self._effects if self.enabled else ()
         if not effects and tap is None and not replace and src is None:

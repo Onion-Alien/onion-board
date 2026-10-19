@@ -4121,5 +4121,7 @@
   "{n} more themes in Settings.": "{n} pang theme sa Settings.",
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Para sa mas mabagal na PC: walang animation, hindi gumagalaw si Bun at simple ang mga theme. Gumagana pa rin ang lahat.",
   "Lite mode": "Lite mode",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Puwedeng gumaan ang Onion Board sa PC na ito: pinapatay ng Lite mode ang mga animation. Nasa Settings > Itsura rin ito."
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Puwedeng gumaan ang Onion Board sa PC na ito: pinapatay ng Lite mode ang mga animation. Nasa Settings > Itsura rin ito.",
+  "Use less CPU": "Gumamit ng mas kaunting CPU",
+  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "Para sa mas mabagal na PC: mas kaunting CPU ang gamit ng voice changer at live voice. Naka-off ang pagtanggal ng sitsit, medyo mas simple ang mga robot na boses at echo, at ginagamit ng live voice ang mas maliit na speech model kung na-download na. Kusang naka-on sa lite mode."
 }

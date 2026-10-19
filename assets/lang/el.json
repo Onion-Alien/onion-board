@@ -4121,5 +4121,7 @@
   "{n} more themes in Settings.": "Ακόμα {n} θέματα στις Ρυθμίσεις.",
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Για πιο αργούς υπολογιστές: χωρίς κινούμενα εφέ, ο Bun μένει ακίνητος και τα θέματα είναι απλά. Όλα δουλεύουν κανονικά.",
   "Lite mode": "Ελαφριά λειτουργία",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Το Onion Board μπορεί να τρέχει πιο ελαφριά σε αυτόν τον υπολογιστή: η Ελαφριά λειτουργία κλείνει τα κινούμενα εφέ. Υπάρχει και στις Ρυθμίσεις > Εμφάνιση."
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Το Onion Board μπορεί να τρέχει πιο ελαφριά σε αυτόν τον υπολογιστή: η Ελαφριά λειτουργία κλείνει τα κινούμενα εφέ. Υπάρχει και στις Ρυθμίσεις > Εμφάνιση.",
+  "Use less CPU": "Λιγότερη χρήση CPU",
+  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "Για πιο αργούς υπολογιστές: η αλλαγή φωνής και η ζωντανή φωνή χρησιμοποιούν λιγότερη CPU. Η αφαίρεση συριγμού είναι κλειστή, οι ρομποτικές φωνές και οι αντηχήσεις είναι λίγο πιο απλές, και η ζωντανή φωνή χρησιμοποιεί το μικρότερο μοντέλο ομιλίας αν έχει κατέβει. Ανοίγει μόνο του στην ελαφριά λειτουργία."
 }

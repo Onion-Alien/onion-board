@@ -4200,5 +4200,7 @@
   "{n} more themes in Settings.": "Încă {n} teme în Setări.",
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Pentru PC-uri mai lente: fără animații, Bun stă pe loc și temele sunt simple. Totul funcționează în continuare.",
   "Lite mode": "Mod ușor",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Onion Board poate merge mai ușor pe acest PC: Modul ușor oprește animațiile. Îl găsești și în Setări > Aspect."
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Onion Board poate merge mai ușor pe acest PC: Modul ușor oprește animațiile. Îl găsești și în Setări > Aspect.",
+  "Use less CPU": "Folosește mai puțin CPU",
+  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "Pentru PC-uri mai lente: schimbătorul de voce și vocea live folosesc mai puțin CPU. Îndepărtarea șuieratului e oprită, vocile de robot și ecourile sunt puțin mai simple, iar vocea live folosește modelul de vorbire mai mic dacă e descărcat. Pornește singur în modul ușor."
 }

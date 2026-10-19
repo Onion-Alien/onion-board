@@ -29,6 +29,7 @@ from soundboard.addons.modules import ModuleInfo
 from soundboard.speech.customvoices import VoiceSet
 from soundboard.speech.service import ServiceHost
 from soundboard.speech.tts import Speaker
+from soundboard import voicefx
 from soundboard.voicefx import VoiceChain
 
 if TYPE_CHECKING:
@@ -61,6 +62,17 @@ def clean_settings(raw) -> dict:
         else:
             out[k] = min(max(round(v) if k == "rate" else float(v), lo), hi)
     return out
+
+
+def helper_env(env: dict[str, str]) -> dict[str, str]:
+    """The speech helper's maths threads (CTranslate2's OpenMP) sleep as soon as a
+    sentence is done instead of spinning for ~200 ms: speech comes in bursts, and the
+    spinning was a third of its CPU (on a slower PC 123 -> 86 % of a core, the
+    sentences ~0.05 s slower). With Use less CPU, two threads instead of one per core."""
+    env = {**env, "OMP_WAIT_POLICY": "PASSIVE", "KMP_BLOCKTIME": "0"}
+    if voicefx.light():
+        env["OMP_NUM_THREADS"] = "2"
+    return env
 
 
 class SpeechController:
@@ -138,7 +150,7 @@ class SpeechController:
                            name=module.id,
                            # its speech model download goes through the relay as
                            # "voices"; switched off, it uses only the model it has
-                           env=net.child_env("voices"))
+                           env=helper_env(net.child_env("voices")))
         holder.append(host)
         self._ready = False
         self.host = host        # before start(): its first events must not look stale

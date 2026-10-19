@@ -785,6 +785,7 @@ class VoiceFxPanel(QWidget):
     hotkey_cleared = Signal(str)
     renamed = Signal(str, str)     # a saved voice's old and new name
     share_asked = Signal(str)      # right-click a saved voice -> Share to the store: its name
+    light_changed = Signal(bool)   # Use less CPU switched by hand
     # an imported code holding an AI voice or a setup (storevoices.Voice, notes) -> the
     # name it was added as, "" if not (the Voice tab adds those; None: not taken here)
     take_code: Callable[[object, list], str] | None = None
@@ -828,6 +829,14 @@ class VoiceFxPanel(QWidget):
         hh = QHBoxLayout(self.head)
         hh.setContentsMargins(0, 0, 0, 0)
         hh.addWidget(self.btn_power)
+        # Use less CPU: on by itself in lite mode (the main window says which)
+        self.chk_light = QCheckBox(_("Use less CPU"))
+        self.chk_light.setToolTip(_("For slower PCs: the voice changer and live voice use less "
+                                    "CPU. Hiss removal is off, the robot voices and echoes are a "
+                                    "little simpler, and live voice uses the smaller speech "
+                                    "model if it's downloaded. On by itself in lite mode."))
+        self.chk_light.toggled.connect(self.light_changed)
+        hh.addWidget(self.chk_light)
         # your mic level is in the tab's status bar (ui/voice/voicestatus.py), over every card
         # (to hear it: the mixer's "Hear what they hear", the one switch on every tab)
         v.addWidget(hint_label(_("Change your mic live for whoever you send sounds to (Discord, "
@@ -1896,6 +1905,12 @@ class VoiceFxPanel(QWidget):
             self.delay.setProperty("slow", slow)
             self.delay.style().unpolish(self.delay)
             self.delay.style().polish(self.delay)
+
+    def set_light(self, on: bool):
+        """Show Use less CPU as on or off (the main window decides; no signal)."""
+        self.chk_light.blockSignals(True)
+        self.chk_light.setChecked(bool(on))
+        self.chk_light.blockSignals(False)
 
     def set_tip_enabled(self, on: bool):
         """Whether the Discord notice may show (False once it's been dismissed)."""

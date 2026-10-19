@@ -963,3 +963,15 @@ def test_voice_listing_and_picking_a_voice_for_a_language():
     assert t.voice_for("zh-TW", prefer="Microsoft Huihui") == "Microsoft Hanhan"
     assert t.voice_for("zh") == "Microsoft Huihui"
     assert t.voice_for("de-AT") == "Microsoft Katja"
+
+
+def test_the_speech_helper_sleeps_between_sentences_and_uses_two_threads_when_light():
+    from soundboard.speech import live
+    env = live.helper_env({"PATH": "x"})
+    assert env["OMP_WAIT_POLICY"] == "PASSIVE" and env["KMP_BLOCKTIME"] == "0"
+    assert "OMP_NUM_THREADS" not in env and env["PATH"] == "x"
+    voicefx.set_light(True)
+    try:
+        assert live.helper_env({})["OMP_NUM_THREADS"] == "2"
+    finally:
+        voicefx.set_light(False)
