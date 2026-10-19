@@ -29,7 +29,7 @@ Useful flags: `--out DIR` (default: a new folder under `%TEMP%\onionboard-perf`)
 (the board's sounds and the triggers-N runs instead of the tier's), `--env KEY=VALUE` (extra environment
 for the measured app, e.g. `OPENBLAS_NUM_THREADS=1`), `--no-event-counts` (leaves
 out the in-app paint/timer counter, which costs a little CPU itself). `--env PERF_LITE=1`
-measures with lite mode on (Settings > Appearance).
+measures with lite mode on (Settings > Appearance). `--env PERF_CPROFILE=idle_front` writes those scenarios' Python profile to `logs\cprofile-<name>.txt` (every thread's); `--env PERF_SAMPLE=idle_front` samples the UI thread's stack every 2 ms instead (`logs\samples-<name>.txt`: what the UI thread alone was in).
 
 Measure on a quiet PC: another test suite or a game running at the same time
 moves the CPU and audio-lateness numbers a lot. RAM, threads and handles are steady.
@@ -69,6 +69,7 @@ on it or runs it.
 |---|---|
 | cold_start | process start → window ready with the sounds loaded |
 | idle_front / idle_behind | idle on the Sounds tab, in front / behind another program |
+| settle / idle_settled | the start-up's background work waited out (the kept Settings' pages, built one at a time: most of idle_front), then the Sounds tab in front: what an open window costs for as long as it's open |
 | minimised, tray, shown_again | the window minimised, hidden in the tray, shown again (`first_paint_ms`: one paint of the whole window) |
 | import_sounds | imports 8 short and 2 long (150 s) generated sounds; disk writes |
 | play_overlap, play_rapid | 3 sounds at once; 20 rapid hotkey-style plays |

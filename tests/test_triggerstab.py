@@ -813,3 +813,21 @@ def test_addon_download_keeps_focus(qapp, tmp_path, monkeypatch):
     assert tab.focusWidget() is tab.btn_get and not busy.is_busy(tab.btn_get)
     tab.shutdown()
     tab.close()
+
+
+def test_has_addon_reads_the_add_ons_once_until_a_folder_changes(qapp, tmp_path, pkg,
+                                                                  monkeypatch):
+    """Offline mode asks has_addon a few times for each tab box: without Onion Watch,
+    each ask read every add-on's module.json again, on the UI thread."""
+    (tmp_path / "modules").mkdir()
+    looks = []
+    real = watchaddon.installed
+    monkeypatch.setattr(watchaddon, "installed", lambda d: looks.append(1) or real(d))
+    monkeypatch.delenv(watchaddon.LOCAL_ENV, raising=False)
+    tab = TriggersTab(FakeHost(), [tmp_path / "modules"], defer=True)
+    assert not tab.has_addon() and not tab.has_addon() and not tab.has_addon()
+    assert looks == [1]
+    make_module(tmp_path / "modules" / "onion-watch", package=pkg, board=PANEL)
+    assert tab.has_addon() and looks == [1, 1]      # put in: seen at once
+    assert tab.has_addon() and looks == [1, 1]
+    tab.shutdown()

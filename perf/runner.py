@@ -20,9 +20,9 @@ HERE = Path(__file__).resolve().parent
 SAMPLE_S = 0.25
 CENSUS_EVERY = 4          # thread census every 4th sample (~1 s)
 
-BOARD_QUICK = ["idle_front", "idle_behind", "minimised", "tray", "shown_again",
-               "import_sounds", "play_overlap", "play_rapid", "fx_preview", "tabs_tour",
-               "dialogs", "voice_preset", "mic_check_front", "mic_check_behind",
+BOARD_QUICK = ["idle_front", "idle_behind", "settle", "idle_settled", "minimised", "tray",
+               "shown_again", "import_sounds", "play_overlap", "play_rapid", "fx_preview",
+               "tabs_tour", "dialogs", "voice_preset", "mic_check_front", "mic_check_behind",
                "apps_tab_shown", "apps_tab_wait",
                "apps_tab_rested", "apps_tab_left", "route_mic", "leak_loop", "idle_end",
                "tray_rested", "shown_after_rest"]
@@ -30,6 +30,9 @@ BOARD_FULL = BOARD_QUICK[:-3] + ["stereo_mic", "voice_heavy", "idle_end", "tray_
                                  "shown_after_rest"]
 TRIGGERS = ["trig_idle_off", "trig_watch_hidden", "trig_tab_shown", "trig_tray_watching"]
 WATCH = ["ow_shown", "ow_tray", "ow_watching_tray"]
+# idle_front is the first seconds after start (the kept Settings' pages being built,
+# on purpose); settle waits that out (not compared), idle_settled is the Sounds tab
+# in front after it: what an open window costs for as long as it's open
 # each tab left open: open_<tab> lets its first build and first seconds pass (not
 # compared), tab_<tab> measures it sitting there. idle_front first: right after start
 # (the add-on's own Triggers tab: TRIGGERS_TABS, in the triggers runs; here it's Hoot's

@@ -20,6 +20,7 @@ from soundboard.audio.groove import Groove
 from soundboard.audio.sendfx import CEILING_DB
 from soundboard.i18n import _
 from soundboard.ui.kit import appstate
+from soundboard.ui.settings import lite
 from soundboard.style.owl import OwlWidget
 from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.window.controller import Controller
@@ -77,13 +78,19 @@ class TickControl(Controller):
 
     def _busy(self, playing) -> bool:
         """Something on screen moves with the tick: a sound playing (not paused), the
-        radio, a meter or the mic level still showing."""
+        radio, a meter or the mic level still showing. In lite mode the mic alone
+        doesn't count: its meters follow at the quiet pace (most mics hear the room
+        above LEVEL_QUIET, which kept the tick at full pace for as long as the window
+        was open)."""
         mw = self.mw
         e = mw.engine
-        return (any(not paused for _p, paused in playing.values())
-                or mw.radio.is_active() or bool(e.aux)
-                or max(e.level_play, e.level_main,
-                       e.level_mic if e.mic_stream is not None else 0.0) > LEVEL_QUIET)
+        if (any(not paused for _p, paused in playing.values())
+                or mw.radio.is_active() or bool(e.aux)):
+            return True
+        if lite.on():   # (what others hear is the mic too, with nothing playing)
+            return e.level_play > LEVEL_QUIET
+        return max(e.level_play, e.level_main,
+                   e.level_mic if e.mic_stream is not None else 0.0) > LEVEL_QUIET
 
     def _set_tick_rate(self, *__):
         mw = self.mw

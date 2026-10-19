@@ -101,6 +101,7 @@ class TriggersTab(QWidget):
         self.panel = None                  # the add-on's tab, once loaded
         self.logo_duel = LogoDuel(self)
         self.info: modules.ModuleInfo | None = None
+        self._none_at: tuple | None = None   # the add-on folders when it wasn't there
         self.offer: watchaddon.Offer | None = None   # a newer version to update to
         self._busy = False
         self._closed = False
@@ -341,7 +342,12 @@ class TriggersTab(QWidget):
         """Whether Onion Watch is installed, or a local zip is there to install it from
         (Offline mode hides the tab when it's neither: it's only the Get button)."""
         if self.info is None:
-            self.info = watchaddon.installed(self._dirs)
+            # not there: every add-on's module.json read again on each ask (Offline mode
+            # asks a few times for each tab box), unless one of the folders changed
+            stamp = modules.dirs_stamp(self._dirs)
+            if stamp != self._none_at:
+                self.info = watchaddon.installed(self._dirs)
+                self._none_at = None if self.info is not None else stamp
         return self.info is not None or watchaddon.local_zip() is not None
 
     def needed_now(self) -> bool:
