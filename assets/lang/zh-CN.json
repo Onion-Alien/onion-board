@@ -2818,7 +2818,6 @@
   "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "关闭：链接到原始文件。开启后，即使原文件被移动、删除或所在驱动器断开连接，也能保留音效。会占用额外磁盘空间。仅适用于新导入的本地文件。",
   "Audio recovery": "音频恢复",
   "Clean reinstall": "全新安装",
-  "Fix problems sending sounds into your mic after an update.": "修复更新后无法将声音发送到麦克风的问题。",
   "Mic effect reinstalled. Test it in your voice chat.": "已重新安装麦克风效果。请在语音聊天中测试。",
   "Mic effect removed": "已移除麦克风效果",
   "Reinstall Onion Board's mic effect on your selected microphone.": "在所选麦克风上重新安装 Onion Board 的麦克风效果。",
@@ -4117,5 +4116,13 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "关闭 Onion Board 时，它会把 Discord 的噪音抑制、回声消除和自动音量重新打开，方便聊天。不想这样？在向导标签页取消勾选<b>关闭时把 Discord 恢复成聊天设置</b>。",
   "Your sounds reach your friends clean now, not muffled or cut off.": "你的声音现在能清楚地传给朋友，不再发闷或断断续续。",
   "{name} is set up for your sounds": "{name} 已为你的声音设置好",
-  "What's popular right now": "现在流行的"
+  "What's popular right now": "现在流行的",
+  "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Audio recovery</b>:": "改主意了？<b>恢复 Discord</b> 会重新打开它的语音清理。在<b>设置 → 音频 → 音频恢复</b>里：",
+  "Close Discord and it's put back right away: Discord doesn't take changes while it's open.": "关闭 Discord 后会立刻恢复：Discord 开着时不接受更改。",
+  "Couldn't put Discord back. Turn on Noise Suppression, Echo Cancellation and Automatic Gain Control in its Voice & Video settings.": "无法恢复 Discord。请在它的语音和视频设置里打开噪音抑制、回声消除和自动增益控制。",
+  "Discord is already set up for talking.": "Discord 已经是聊天设置了。",
+  "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord 已恢复成聊天设置：噪音抑制、回声消除和自动音量都重新打开了。",
+  "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "修复更新后无法将声音发送到麦克风的问题，或把 Discord 恢复成聊天设置。",
+  "Put Discord back": "恢复 Discord",
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "把 Discord 的噪音抑制、回声消除和自动音量重新打开，恢复成你为声音设置之前的样子。适合不用 Onion Board 聊天：通话中你的声音可能又会被切断。"
 }

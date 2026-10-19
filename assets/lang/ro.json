@@ -2954,7 +2954,6 @@
   "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Dezactivat: legătură către fișierul original. Activează pentru a păstra sunetele dacă originalul este mutat, șters sau se află pe o unitate deconectată. Folosește spațiu suplimentar. Se aplică doar importurilor locale noi.",
   "Audio recovery": "Recuperare audio",
   "Clean reinstall": "Reinstalare curată",
-  "Fix problems sending sounds into your mic after an update.": "Rezolvă problemele de trimitere a sunetelor în microfon după o actualizare.",
   "Mic effect reinstalled. Test it in your voice chat.": "Efectul de microfon a fost reinstalat. Testează-l în chatul vocal.",
   "Mic effect removed": "Efect de microfon eliminat",
   "Reinstall Onion Board's mic effect on your selected microphone.": "Reinstalează efectul de microfon Onion Board pe microfonul selectat.",
@@ -4275,5 +4274,13 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Când Onion Board se închide, repornește suprimarea zgomotului, anularea ecoului și volumul automat din Discord pentru vorbit. Nu vrei asta? Debifează <b>Readu Discord pe vorbit la închidere</b> în fila Configurare.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Sunetele tale ajung acum curate la prieteni, nu înfundate sau tăiate.",
   "{name} is set up for your sounds": "{name} e configurat pentru sunetele tale",
-  "What's popular right now": "Ce e popular acum"
+  "What's popular right now": "Ce e popular acum",
+  "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Audio recovery</b>:": "Te-ai răzgândit? <b>Readu Discord</b> repornește curățarea vocii lui. E în <b>Setări → Audio → Recuperare audio</b>:",
+  "Close Discord and it's put back right away: Discord doesn't take changes while it's open.": "Închide Discord și e readus imediat: Discord nu primește schimbări cât e deschis.",
+  "Couldn't put Discord back. Turn on Noise Suppression, Echo Cancellation and Automatic Gain Control in its Voice & Video settings.": "Nu s-a putut readuce Discord. Pornește Suprimarea zgomotului, Anularea ecoului și Controlul automat al amplificării în setările lui Voce și video.",
+  "Discord is already set up for talking.": "Discord e deja setat pentru vorbit.",
+  "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord e iar cum vorbești: suprimarea zgomotului, anularea ecoului și volumul automat sunt pornite din nou.",
+  "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Rezolvă problemele de trimitere a sunetelor în microfon după o actualizare sau readu Discord pe vorbit.",
+  "Put Discord back": "Readu Discord",
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Repornește suprimarea zgomotului, anularea ecoului și volumul automat din Discord cum le aveai înainte să-l setezi pentru sunete. Pentru vorbit fără Onion Board: sunetele tale se pot tăia iar în apeluri."
 }

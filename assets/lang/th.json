@@ -2818,7 +2818,6 @@
   "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "ปิด: ลิงก์ไปยังไฟล์ต้นฉบับ เปิดเพื่อเก็บเสียงไว้แม้ต้นฉบับถูกย้าย ลบ หรืออยู่บนไดรฟ์ที่ไม่ได้เชื่อมต่อ ใช้พื้นที่ดิสก์เพิ่ม มีผลกับการนำเข้าไฟล์ในเครื่องใหม่เท่านั้น",
   "Audio recovery": "กู้คืนเสียง",
   "Clean reinstall": "ติดตั้งใหม่ทั้งหมด",
-  "Fix problems sending sounds into your mic after an update.": "แก้ปัญหาการส่งเสียงเข้าไมค์หลังอัปเดต",
   "Mic effect reinstalled. Test it in your voice chat.": "ติดตั้งเอฟเฟกต์ไมค์ใหม่แล้ว ลองทดสอบในแชทเสียง",
   "Mic effect removed": "ลบเอฟเฟกต์ไมค์แล้ว",
   "Reinstall Onion Board's mic effect on your selected microphone.": "ติดตั้งเอฟเฟกต์ไมค์ของ Onion Board ใหม่บนไมโครโฟนที่เลือก",
@@ -4117,5 +4116,13 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "เมื่อ Onion Board ปิด จะเปิดการลดเสียงรบกวน การตัดเสียงสะท้อน และระดับเสียงอัตโนมัติของ Discord กลับสำหรับการพูด ไม่ต้องการแบบนั้น? เอาเครื่องหมายออกจาก <b>คืนค่า Discord สำหรับการพูดเมื่อปิด</b> ในแท็บเซ็ตอัป",
   "Your sounds reach your friends clean now, not muffled or cut off.": "ตอนนี้เสียงของคุณไปถึงเพื่อนอย่างชัดเจน ไม่อู้อี้หรือขาดหาย",
   "{name} is set up for your sounds": "{name} ตั้งค่าสำหรับเสียงของคุณแล้ว",
-  "What's popular right now": "สิ่งที่กำลังฮิตตอนนี้"
+  "What's popular right now": "สิ่งที่กำลังฮิตตอนนี้",
+  "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Audio recovery</b>:": "เปลี่ยนใจเหรอ? <b>คืนค่า Discord</b> จะเปิดการล้างเสียงพูดกลับมา อยู่ที่ <b>การตั้งค่า → เสียง → กู้คืนเสียง</b>:",
+  "Close Discord and it's put back right away: Discord doesn't take changes while it's open.": "ปิด Discord แล้วจะคืนค่าทันที: Discord ไม่รับการเปลี่ยนแปลงระหว่างที่เปิดอยู่",
+  "Couldn't put Discord back. Turn on Noise Suppression, Echo Cancellation and Automatic Gain Control in its Voice & Video settings.": "คืนค่า Discord ไม่ได้ ให้เปิดการลดเสียงรบกวน การตัดเสียงสะท้อน และการควบคุมเกนอัตโนมัติในการตั้งค่าเสียงและวิดีโอของ Discord",
+  "Discord is already set up for talking.": "Discord ตั้งค่าสำหรับการพูดอยู่แล้ว",
+  "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord กลับมาเหมือนตอนคุณพูดแล้ว: การลดเสียงรบกวน การตัดเสียงสะท้อน และระดับเสียงอัตโนมัติเปิดอีกครั้ง",
+  "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "แก้ปัญหาการส่งเสียงเข้าไมค์หลังอัปเดต หรือคืนค่า Discord สำหรับการพูด",
+  "Put Discord back": "คืนค่า Discord",
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "เปิดการลดเสียงรบกวน การตัดเสียงสะท้อน และระดับเสียงอัตโนมัติของ Discord กลับเหมือนก่อนที่คุณตั้งค่าสำหรับเสียงเอฟเฟกต์ สำหรับการพูดโดยไม่ใช้ Onion Board: เสียงของคุณอาจขาดหายในการโทรอีกครั้ง"
 }

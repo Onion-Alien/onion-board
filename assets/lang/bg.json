@@ -2886,7 +2886,6 @@
   "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Изключено: връзка към оригиналния файл. Включете, за да запазите звуците, ако оригиналът бъде преместен, изтрит или е на изключен диск. Използва допълнително място. Важи само за нови локални импорти.",
   "Audio recovery": "Възстановяване на звука",
   "Clean reinstall": "Чиста инсталация",
-  "Fix problems sending sounds into your mic after an update.": "Отстрани проблеми с изпращането на звуци към микрофона след актуализация.",
   "Mic effect reinstalled. Test it in your voice chat.": "Ефектът за микрофона е преинсталиран. Пробвай го в гласовия чат.",
   "Mic effect removed": "Ефектът за микрофона е премахнат",
   "Reinstall Onion Board's mic effect on your selected microphone.": "Преинсталирай ефекта за микрофона на Onion Board на избрания микрофон.",
@@ -4196,5 +4195,13 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Когато Onion Board се затвори, той пак включва потискането на шума, премахването на ехото и автоматичната сила на звука в Discord за говорене. Не искаш това? Махни отметката от <b>Върни Discord за говорене при затваряне</b> в раздел Свързване.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Звуците ти вече стигат до приятелите ти чисти, не заглушени или накъсани.",
   "{name} is set up for your sounds": "{name} е настроен за звуците ти",
-  "What's popular right now": "Какво е популярно в момента"
+  "What's popular right now": "Какво е популярно в момента",
+  "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Audio recovery</b>:": "Размисли ли? <b>Върни Discord</b> пак включва изчистването на гласа. Ще го намериш в <b>Настройки → Аудио → Възстановяване на звука</b>:",
+  "Close Discord and it's put back right away: Discord doesn't take changes while it's open.": "Затвори Discord и веднага се връща: Discord не приема промени, докато е отворен.",
+  "Couldn't put Discord back. Turn on Noise Suppression, Echo Cancellation and Automatic Gain Control in its Voice & Video settings.": "Discord не можа да се върне. Включи Потискане на шума, Премахване на ехото и Автоматичен контрол на усилването в настройките му Глас и видео.",
+  "Discord is already set up for talking.": "Discord вече е настроен за говорене.",
+  "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord е както говориш: потискането на шума, премахването на ехото и автоматичната сила на звука пак са включени.",
+  "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Отстрани проблеми с изпращането на звуци към микрофона след актуализация или върни Discord за говорене.",
+  "Put Discord back": "Върни Discord",
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Пак включва потискането на шума, премахването на ехото и автоматичната сила на звука в Discord, както бяха, преди да го настроиш за звуци. За говорене без Onion Board: звуците ти пак може да се накъсват в разговори."
 }

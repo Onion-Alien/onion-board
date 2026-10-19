@@ -2886,7 +2886,6 @@
   "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Naka-off: i-link sa orihinal na file. I-on para manatili ang mga tunog kung inilipat o binura ang orihinal, o nasa drive na hindi nakakonekta. Gumagamit ng dagdag na espasyo. Para lang sa mga bagong lokal na import.",
   "Audio recovery": "Pag-ayos ng audio",
   "Clean reinstall": "Malinis na reinstall",
-  "Fix problems sending sounds into your mic after an update.": "Ayusin ang mga problema sa pagpapadala ng tunog sa mic mo pagkatapos ng update.",
   "Mic effect reinstalled. Test it in your voice chat.": "Na-reinstall ang mic effect. Subukan ito sa voice chat mo.",
   "Mic effect removed": "Naalis ang mic effect",
   "Reinstall Onion Board's mic effect on your selected microphone.": "I-reinstall ang mic effect ng Onion Board sa pinili mong mikropono.",
@@ -4196,5 +4195,13 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Pagsara ng Onion Board, ibinabalik nito ang noise suppression, echo cancellation at awtomatikong volume ng Discord para sa pag-uusap. Ayaw mo nun? Alisin ang tsek sa <b>Ibalik ang Discord para sa pag-uusap pagsara</b> sa tab na Setup.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Malinis nang naririnig ng mga kaibigan mo ang mga sound mo, hindi mahina o putol-putol.",
   "{name} is set up for your sounds": "Naka-set up na ang {name} para sa mga sound mo",
-  "What's popular right now": "Ang sikat ngayon"
+  "What's popular right now": "Ang sikat ngayon",
+  "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Audio recovery</b>:": "Nagbago ang isip mo? Ibinabalik ng <b>Ibalik ang Discord</b> ang paglilinis nito ng boses. Nasa <b>Settings → Audio → Pag-ayos ng audio</b> ito:",
+  "Close Discord and it's put back right away: Discord doesn't take changes while it's open.": "Isara ang Discord at ibabalik agad: hindi tumatanggap ng pagbabago ang Discord habang bukas ito.",
+  "Couldn't put Discord back. Turn on Noise Suppression, Echo Cancellation and Automatic Gain Control in its Voice & Video settings.": "Hindi naibalik ang Discord. I-on ang Noise Suppression, Echo Cancellation at Automatic Gain Control sa Voice & Video settings nito.",
+  "Discord is already set up for talking.": "Naka-set na ang Discord para sa pag-uusap.",
+  "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Balik na ang Discord sa paraan ng pagsasalita mo: naka-on ulit ang noise suppression, echo cancellation at awtomatikong volume.",
+  "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Ayusin ang mga problema sa pagpapadala ng tunog sa mic mo pagkatapos ng update, o ibalik ang Discord para sa pag-uusap.",
+  "Put Discord back": "Ibalik ang Discord",
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Ibinabalik ang noise suppression, echo cancellation at awtomatikong volume ng Discord gaya ng dati bago mo ito i-set up para sa mga sound. Para sa pag-uusap nang walang Onion Board: puwedeng maputol ulit ang mga sound mo sa tawag."
 }

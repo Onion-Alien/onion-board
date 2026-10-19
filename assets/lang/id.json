@@ -2818,7 +2818,6 @@
   "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Nonaktif: tautkan ke file asli. Aktifkan agar suara tetap tersedia jika file asli dipindahkan, dihapus, atau berada di drive yang terputus. Memakai ruang disk tambahan. Hanya berlaku untuk impor lokal baru.",
   "Audio recovery": "Pemulihan audio",
   "Clean reinstall": "Instal ulang bersih",
-  "Fix problems sending sounds into your mic after an update.": "Atasi masalah pengiriman suara ke mikrofon setelah pembaruan.",
   "Mic effect reinstalled. Test it in your voice chat.": "Efek mikrofon sudah diinstal ulang. Coba di obrolan suara.",
   "Mic effect removed": "Efek mikrofon dihapus",
   "Reinstall Onion Board's mic effect on your selected microphone.": "Instal ulang efek mikrofon Onion Board pada mikrofon pilihanmu.",
@@ -4117,5 +4116,13 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Saat Onion Board ditutup, peredam bising, pembatalan gema, dan volume otomatis Discord dinyalakan lagi untuk bicara. Tidak mau? Hapus centang <b>Kembalikan Discord untuk bicara saat ditutup</b> di tab Penyiapan.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Suaramu sekarang sampai ke teman-temanmu dengan jernih, tidak teredam atau terputus.",
   "{name} is set up for your sounds": "{name} sudah siap untuk suaramu",
-  "What's popular right now": "Yang lagi populer sekarang"
+  "What's popular right now": "Yang lagi populer sekarang",
+  "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Audio recovery</b>:": "Berubah pikiran? <b>Kembalikan Discord</b> menyalakan lagi pembersih suaranya. Ada di <b>Pengaturan → Audio → Pemulihan audio</b>:",
+  "Close Discord and it's put back right away: Discord doesn't take changes while it's open.": "Tutup Discord dan langsung dikembalikan: Discord tidak menerima perubahan saat masih terbuka.",
+  "Couldn't put Discord back. Turn on Noise Suppression, Echo Cancellation and Automatic Gain Control in its Voice & Video settings.": "Discord tidak bisa dikembalikan. Nyalakan Penekanan Kebisingan, Pembatalan Gema, dan Kontrol Penguatan Otomatis di pengaturan Suara & Video-nya.",
+  "Discord is already set up for talking.": "Discord sudah siap untuk bicara.",
+  "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord kembali seperti caramu bicara: peredam bising, pembatalan gema, dan volume otomatis menyala lagi.",
+  "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Atasi masalah pengiriman suara ke mikrofon setelah pembaruan, atau kembalikan Discord untuk bicara.",
+  "Put Discord back": "Kembalikan Discord",
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Menyalakan lagi peredam bising, pembatalan gema, dan volume otomatis Discord seperti sebelum kamu menyiapkannya untuk suara. Untuk bicara tanpa Onion Board: suaramu bisa terputus lagi saat panggilan."
 }

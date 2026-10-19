@@ -79,6 +79,9 @@ class AlertControl(Controller):
         self._discord_reading = False
         self._discord_poll = PollThread("discord-settings")
         self._talk_seen: set[str] = set()   # Discord folders looked at for how you talk
+        # Audio recovery's Put Discord back, asked while Discord was open: done the
+        # moment it closes (it won't take changes while it runs)
+        self.discord_pending: set[str] = set()
         # straight into my mic: an app recording the mic in raw mode skips Onion Board
         # and hears none of the sounds (rawmic)
         self.raw_watch = rawmic.BypassWatch()
@@ -201,26 +204,38 @@ class AlertControl(Controller):
         self._discord_reading = True
         last = self._discord_sig
         seen = set(self._talk_seen)
+        pending, saved = set(self.discord_pending), dict(mw.cfg.discord_talk)
 
         def run():
-            found, sig, talk = [], None, {}
+            found, sig, talk, restored = [], None, {}, []
             try:
                 from soundboard.ui.setup.chatguide import DISCORD_EXES
                 names = {n for _p, n in appaudio._process_table().values()}
+                from soundboard.mic import discordtalk
+                if pending and not names & {discordtalk.EXES[c] for c in pending}:
+                    from soundboard.sounds.library import APP_DIR
+                    left = discordtalk.restore(saved, APP_DIR / "discord-backup",
+                                               only=pending, always=True)
+                    restored = sorted(pending - set(left))
                 if names & set(DISCORD_EXES):
                     sig = discordcfg.signature()
                     found = None if sig == last else discordcfg.read()
                     talk = _talk_snapshots(found or [], seen)
             except Exception:  # noqa: BLE001 - a check that can't run shows nothing
                 log.debug("reading Discord's settings failed", exc_info=True)
-            mw.bridge.discord.emit((found, sig, talk))
+            mw.bridge.discord.emit((found, sig, talk, restored))
         self._discord_poll.run(run)
 
     def _on_discord(self, res):
         mw = self.mw
-        found, sig, *more = res   # (found, sig, talk snapshots)
+        found, sig, *more = res   # (found, sig, talk snapshots, put back)
         talk = more[0] if more else {}
+        restored = more[1] if len(more) > 1 else []
         self._discord_reading = False
+        if restored:
+            self.discord_pending -= set(restored)
+            mw.toast(_("Discord is back the way you talk: its noise suppression, echo "
+                       "cancellation and automatic volume are on again."), "ok")
         self._discord_sig = sig
         if found is None:   # unchanged
             return

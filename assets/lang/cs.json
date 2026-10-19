@@ -2954,7 +2954,6 @@
   "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Vypnuto: odkaz na původní soubor. Zapněte pro zachování zvuků, pokud je původní soubor přesunut, smazán nebo na odpojeném disku. Zabere více místa. Platí jen pro nově přidané místní soubory.",
   "Audio recovery": "Obnovení zvuku",
   "Clean reinstall": "Čistá instalace",
-  "Fix problems sending sounds into your mic after an update.": "Oprav problémy s posíláním zvuků do mikrofonu po aktualizaci.",
   "Mic effect reinstalled. Test it in your voice chat.": "Efekt mikrofonu byl přeinstalován. Vyzkoušej ho v hlasovém chatu.",
   "Mic effect removed": "Efekt mikrofonu odstraněn",
   "Reinstall Onion Board's mic effect on your selected microphone.": "Přeinstaluj efekt mikrofonu Onion Board na vybraném mikrofonu.",
@@ -4275,5 +4274,13 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Když se Onion Board zavře, zapne v Discordu zpátky potlačení šumu, potlačení ozvěny a automatickou hlasitost pro mluvení. Nechceš to? Zruš <b>Při zavření vrátit Discord na mluvení</b> na kartě Zapojení.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Tvoje zvuky teď dorazí ke kamarádům čisté, ne tlumené ani useknuté.",
   "{name} is set up for your sounds": "{name} je nastavený pro tvoje zvuky",
-  "What's popular right now": "Co je teď populární"
+  "What's popular right now": "Co je teď populární",
+  "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Audio recovery</b>:": "Rozmyslel ses? <b>Vrátit Discord</b> zase zapne jeho čištění hlasu. Najdeš to v <b>Nastavení → Zvuk → Obnovení zvuku</b>:",
+  "Close Discord and it's put back right away: Discord doesn't take changes while it's open.": "Zavři Discord a hned se to vrátí: Discord nebere změny, dokud je otevřený.",
+  "Couldn't put Discord back. Turn on Noise Suppression, Echo Cancellation and Automatic Gain Control in its Voice & Video settings.": "Discord se nepodařilo vrátit. Zapni v jeho nastavení Hlas a video Potlačení šumu, Potlačení ozvěny a Automatické řízení zisku.",
+  "Discord is already set up for talking.": "Discord už je nastavený na mluvení.",
+  "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord je zpátky, jak mluvíš: potlačení šumu, potlačení ozvěny a automatická hlasitost jsou zase zapnuté.",
+  "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Oprav problémy s posíláním zvuků do mikrofonu po aktualizaci, nebo vrať Discord na mluvení.",
+  "Put Discord back": "Vrátit Discord",
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Zase zapne v Discordu potlačení šumu, potlačení ozvěny a automatickou hlasitost, jak jsi je měl, než jsi ho nastavil pro zvuky. Pro mluvení bez Onion Board: zvuky se ti v hovorech můžou zase sekat."
 }

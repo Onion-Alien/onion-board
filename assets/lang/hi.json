@@ -2886,7 +2886,6 @@
   "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "बंद: मूल फ़ाइल से लिंक करें। मूल फ़ाइल हटने, दूसरी जगह जाने या ड्राइव डिस्कनेक्ट होने पर भी ध्वनियाँ रखने के लिए चालू करें। अतिरिक्त डिस्क स्थान लगता है। केवल नए स्थानीय इंपोर्ट पर लागू होता है।",
   "Audio recovery": "ऑडियो सुधार",
   "Clean reinstall": "साफ़ इंस्टॉल",
-  "Fix problems sending sounds into your mic after an update.": "अपडेट के बाद माइक में आवाज़ भेजने की समस्याएँ ठीक करें।",
   "Mic effect reinstalled. Test it in your voice chat.": "माइक इफ़ेक्ट फिर से इंस्टॉल हो गया। इसे अपने वॉइस चैट में आज़माएँ।",
   "Mic effect removed": "माइक इफ़ेक्ट हट गया",
   "Reinstall Onion Board's mic effect on your selected microphone.": "चुने हुए माइक्रोफ़ोन पर Onion Board का माइक इफ़ेक्ट फिर से इंस्टॉल करें।",
@@ -4196,5 +4195,13 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Onion Board बंद होने पर Discord का शोर दमन, इको कैंसलेशन और अपने आप वॉल्यूम बात करने के लिए फिर से चालू कर देता है। यह नहीं चाहिए? सेटअप टैब पर <b>बंद करने पर Discord को बात करने के लिए वापस करें</b> से टिक हटाएँ।",
   "Your sounds reach your friends clean now, not muffled or cut off.": "अब आपकी आवाज़ें दोस्तों तक साफ़ पहुँचती हैं, दबी या कटी हुई नहीं।",
   "{name} is set up for your sounds": "{name} आपकी आवाज़ों के लिए तैयार है",
-  "What's popular right now": "अभी क्या लोकप्रिय है"
+  "What's popular right now": "अभी क्या लोकप्रिय है",
+  "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Audio recovery</b>:": "मन बदल गया? <b>Discord वापस करें</b> उसकी आवाज़ की सफ़ाई फिर से चालू कर देता है। यह <b>सेटिंग्स → ऑडियो → ऑडियो सुधार</b> में है:",
+  "Close Discord and it's put back right away: Discord doesn't take changes while it's open.": "Discord बंद करें और यह तुरंत वापस हो जाएगा: Discord खुले रहते बदलाव नहीं लेता।",
+  "Couldn't put Discord back. Turn on Noise Suppression, Echo Cancellation and Automatic Gain Control in its Voice & Video settings.": "Discord वापस नहीं हो सका। उसकी Voice & Video सेटिंग्स में शोर दमन, इको कैंसलेशन और ऑटोमैटिक गेन कंट्रोल चालू करें।",
+  "Discord is already set up for talking.": "Discord पहले से बात करने के लिए सेट है।",
+  "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord वापस वैसा है जैसे आप बात करते हैं: शोर दमन, इको कैंसलेशन और अपने आप वॉल्यूम फिर से चालू हैं।",
+  "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "अपडेट के बाद माइक में आवाज़ भेजने की समस्याएँ ठीक करें, या Discord को बात करने के लिए वापस करें।",
+  "Put Discord back": "Discord वापस करें",
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Discord का शोर दमन, इको कैंसलेशन और अपने आप वॉल्यूम वैसे ही फिर से चालू करता है जैसे आवाज़ों के लिए सेट करने से पहले थे। Onion Board के बिना बात करने के लिए: कॉल में आपकी आवाज़ें फिर से कट सकती हैं।"
 }

@@ -3158,7 +3158,6 @@
   "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "عند الإيقاف: ربط بالملف الأصلي. فعّل للاحتفاظ بالأصوات إذا نُقل الأصل أو حُذف أو كان على قرص غير متصل. يستخدم مساحة إضافية. ينطبق فقط على الملفات المحلية المضافة حديثًا.",
   "Audio recovery": "استعادة الصوت",
   "Clean reinstall": "إعادة تثبيت نظيفة",
-  "Fix problems sending sounds into your mic after an update.": "أصلح مشاكل إرسال الأصوات إلى الميكروفون بعد التحديث.",
   "Mic effect reinstalled. Test it in your voice chat.": "أُعيد تثبيت مؤثر الميكروفون. جرّبه في الدردشة الصوتية.",
   "Mic effect removed": "أُزيل مؤثر الميكروفون",
   "Reinstall Onion Board's mic effect on your selected microphone.": "أعد تثبيت مؤثر الميكروفون من Onion Board على الميكروفون المحدد.",
@@ -4512,5 +4511,13 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "عند إغلاق Onion Board، يعيد تشغيل قمع الضوضاء وإلغاء الصدى والصوت التلقائي في ديسكورد للكلام. لا تريد ذلك؟ ألغِ تحديد <b>أعد ديسكورد للكلام عند الإغلاق</b> في تبويب التهيئة.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "تصل أصواتك إلى أصدقائك نقية الآن، بلا كتم أو تقطيع.",
   "{name} is set up for your sounds": "{name} جاهز لأصواتك",
-  "What's popular right now": "الرائج الآن"
+  "What's popular right now": "الرائج الآن",
+  "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Audio recovery</b>:": "غيّرت رأيك؟ <b>أعد ديسكورد</b> يعيد تشغيل تنظيف الصوت للكلام. تجده في <b>الإعدادات ← صوتي ← استعادة الصوت</b>:",
+  "Close Discord and it's put back right away: Discord doesn't take changes while it's open.": "أغلق ديسكورد وستتم الإعادة فورًا: ديسكورد لا يقبل التغييرات وهو مفتوح.",
+  "Couldn't put Discord back. Turn on Noise Suppression, Echo Cancellation and Automatic Gain Control in its Voice & Video settings.": "تعذّرت إعادة ديسكورد. شغّل قمع الضوضاء وإلغاء الصدى والتحكم التلقائي في الكسب في إعدادات الصوت والفيديو فيه.",
+  "Discord is already set up for talking.": "ديسكورد مضبوط للكلام بالفعل.",
+  "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "عاد ديسكورد كما تتكلم: قمع الضوضاء وإلغاء الصدى والصوت التلقائي تعمل من جديد.",
+  "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "أصلح مشاكل إرسال الأصوات إلى الميكروفون بعد التحديث، أو أعد ديسكورد للكلام.",
+  "Put Discord back": "أعد ديسكورد",
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "يعيد تشغيل قمع الضوضاء وإلغاء الصدى والصوت التلقائي في ديسكورد كما كانت قبل ضبطه للأصوات. للكلام بدون Onion Board: قد تنقطع أصواتك في المكالمات مجددًا."
 }

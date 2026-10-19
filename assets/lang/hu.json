@@ -2886,7 +2886,6 @@
   "Off: link to the original file. Turn on to keep sounds if the original is moved, deleted or on a disconnected drive. Uses extra disk space. Applies to new local imports only.": "Kikapcsolva: hivatkozás az eredeti fájlra. Kapcsold be, hogy a hangok megmaradjanak, ha az eredetit áthelyezed, törlöd vagy leválasztott meghajtón van. Több tárhelyet használ. Csak az új helyi importokra vonatkozik.",
   "Audio recovery": "Hang helyreállítása",
   "Clean reinstall": "Tiszta újratelepítés",
-  "Fix problems sending sounds into your mic after an update.": "Javítsd ki a hangok mikrofonba küldésének frissítés utáni hibáit.",
   "Mic effect reinstalled. Test it in your voice chat.": "A mikrofoneffekt újratelepítve. Próbáld ki a hangcsevegésben.",
   "Mic effect removed": "Mikrofoneffekt eltávolítva",
   "Reinstall Onion Board's mic effect on your selected microphone.": "Telepítsd újra az Onion Board mikrofoneffektjét a kiválasztott mikrofonra.",
@@ -4196,5 +4195,13 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Amikor az Onion Board bezárul, a Discord zajszűrését, visszhangszűrését és automatikus hangerejét visszakapcsolja beszédhez. Nem kéred? Vedd ki a pipát a <b>Bezáráskor a Discord vissza beszédre</b> elől a Beüzemelés lapon.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "A hangjaid most tisztán érnek el a barátaidhoz, nem tompán vagy szaggatva.",
   "{name} is set up for your sounds": "{name} be van állítva a hangjaidhoz",
-  "What's popular right now": "Ami most népszerű"
+  "What's popular right now": "Ami most népszerű",
+  "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. It's in <b>Settings → Audio → Audio recovery</b>:": "Meggondoltad magad? A <b>Discord visszaállítása</b> újra bekapcsolja a hangtisztítását. Itt találod: <b>Beállítások → Hang → Hang helyreállítása</b>:",
+  "Close Discord and it's put back right away: Discord doesn't take changes while it's open.": "Zárd be a Discordot, és azonnal visszaáll: a Discord nyitva nem fogad változtatást.",
+  "Couldn't put Discord back. Turn on Noise Suppression, Echo Cancellation and Automatic Gain Control in its Voice & Video settings.": "Nem sikerült visszaállítani a Discordot. Kapcsold be a Zajszűrést, a Visszhangszűrést és az Automatikus erősítésszabályozást a Hang és videó beállításaiban.",
+  "Discord is already set up for talking.": "A Discord már beszédre van állítva.",
+  "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "A Discord újra úgy szól, ahogy beszélsz: a zajszűrés, a visszhangszűrés és az automatikus hangerő újra be van kapcsolva.",
+  "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Javítsd ki a hangok mikrofonba küldésének frissítés utáni hibáit, vagy állítsd vissza a Discordot beszédre.",
+  "Put Discord back": "Discord visszaállítása",
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Újra bekapcsolja a Discord zajszűrését, visszhangszűrését és automatikus hangerejét úgy, ahogy a hangokhoz állítás előtt voltak. Onion Board nélküli beszédhez: hívásban a hangjaid újra szaggathatnak."
 }
