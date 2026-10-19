@@ -12,7 +12,7 @@ from soundboard.ui.kit import theme
 from soundboard.ui.kit import appstate
 from soundboard.ui.bun.splash import _animations_enabled
 
-FRAME_MS = 33
+FRAME_MS = 1000 // 24
 SHOT_S = 0.48
 ROUNDS = 4
 

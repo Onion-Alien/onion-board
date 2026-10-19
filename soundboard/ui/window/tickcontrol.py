@@ -1,5 +1,5 @@
 """The main window's tick: the timer that moves its meters, the now-playing time and the
-pads' progress, how fast it runs (30 a second while something moves and the window is
+pads' progress, how fast it runs (24 a second while something moves and the window is
 seen, slower when quiet, hidden or behind a game), waking it, and what it updates.
 
 MainWindow makes one ``TickControl`` (``MainWindow.tickctl``); everything here runs on the
@@ -31,9 +31,10 @@ from soundboard.ui.kit.widgets import loudness, spectrum
 if TYPE_CHECKING:
     from soundboard.ui.window.mainwindow import MainWindow
 
-TICK_MS = 33         # the UI timer while the window is on screen (meters, visualisers)
+TICK_MS = 1000 // 24  # the UI timer while the window is on screen (meters, visualisers)
 TICK_QUIET_MS = 100  # on screen with nothing moving: no sound, radio, recording or level
 TICK_IDLE_MS = 250   # ...and while it's in the tray or minimised (push-to-talk, watchdog)
+LEVEL_FALL = 0.88     # what the levels keep a tick (at 24 a second: as fast a fall as 0.9 at 30)
 LEVEL_QUIET = 0.003  # a level below this (-50 dB) shows as nothing on the meters
 RADIO_LAG = 0.1      # seconds between the radio's audio arriving and it being heard
 
@@ -57,7 +58,7 @@ class TickControl(Controller):
         mw = self.mw
         if not mw._ui_live and not mw.overlay.is_open and not mw.bunctl.bun_up():
             return TICK_IDLE_MS
-        if not self._tick_busy:   # nothing moves: 10 ticks a second instead of 30
+        if not self._tick_busy:   # nothing moves: 10 ticks a second instead of 24
             return TICK_QUIET_MS
         # Visible and busy: meters stay smooth even when a game has focus.
         return TICK_MS
@@ -172,9 +173,9 @@ class TickControl(Controller):
                 paused=any(paused for sid, (_p, paused) in playing.items()
                            if sid in mw._meta or sid == LINK_ID),
                 downloading=bar.running(), failed=bar.failed_count())
-        e.level_play *= 0.9
-        e.level_main *= 0.9
-        e.level_mic *= 0.9
+        e.level_play *= LEVEL_FALL
+        e.level_main *= LEVEL_FALL
+        e.level_mic *= LEVEL_FALL
 
         self._sync_ptt()
 

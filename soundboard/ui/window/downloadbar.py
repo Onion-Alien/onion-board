@@ -55,7 +55,7 @@ class SmoothProgressBar(QWidget):
         self._progress = 0.0          # 0.0 .. 1.0
         self._t0 = time.monotonic()
         self._timer = QTimer(self)
-        self._timer.setInterval(1000 // 30)
+        self._timer.setInterval(1000 // 24)
         self._timer.timeout.connect(self.update)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 

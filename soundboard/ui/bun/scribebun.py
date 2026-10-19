@@ -59,7 +59,7 @@ WIDTH = {1: 5.6, 2: 4.6, 4: 3.6, 8: 2.8, 12: 2.5, 16: 2.3}
 BEATS = {1: 4.0, 2: 2.0, 4: 1.0, 8: 0.5, 12: 1 / 3, 16: 0.25}
 HOP_S = 0.45                     # the finishing act: roll up, tie it and hop
 OPEN_S = 0.35                    # the next download: the tied scroll unrolls (a droop lifts)
-FPS = 30
+FPS = 24
 
 # The openings of well-known pieces, all old enough to be free for anyone, written out
 # a little simplified. Bars of `beats` quarter notes, then the notes: a note is its
