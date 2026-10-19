@@ -69,8 +69,8 @@ jobs:
           AFTER: ${{ github.event.after }}
         run: |
           if [ "$EVENT" = pull_request ]; then
-            sh scripts/check_utc.sh "$PR_HEAD" --not origin/main
-          elif ! sh scripts/check_utc.sh "$BEFORE..$AFTER"; then
+            sh scripts/checks/check_utc.sh "$PR_HEAD" --not origin/main
+          elif ! sh scripts/checks/check_utc.sh "$BEFORE..$AFTER"; then
             echo "::warning::A merge on main isn't in UTC: merge with scripts/merge_pr.sh, not gh pr merge or the button"
           fi
       # The CLI rather than gitleaks-action: the action scans `<first commit>^..`,
@@ -142,14 +142,14 @@ jobs:
           # main after a merge); the nightly and a manual run always
           mic=true
           if [ "$changed" != ALL ] && ! grep -qE \
-              '^(native/directmic/|scripts/(build|check|fuzz)_directmic\.py|tests/test_directmic\.py|soundboard/mic/directmic\.py|\.github/workflows/checks\.yml)' <<< "$changed"; then
+              '^(native/directmic/|scripts/directmic/(build|check|fuzz)_directmic\.py|tests/test_directmic\.py|soundboard/mic/directmic\.py|\.github/workflows/checks\.yml)' <<< "$changed"; then
             mic=false
           fi
           echo "mic=$mic" >> "$GITHUB_OUTPUT"
           # the type check: a change to any Python, or to what pyright reads
           py=true
           if [ "$changed" != ALL ] && ! grep -qE \
-              '(\.pyi?$|^pyproject\.toml$|^requirements|^scripts/pyright_baseline\.json$|^\.github/workflows/checks\.yml$)' <<< "$changed"; then
+              '(\.pyi?$|^pyproject\.toml$|^requirements|^scripts/checks/pyright_baseline\.json$|^\.github/workflows/checks\.yml$)' <<< "$changed"; then
             py=false
           fi
           echo "py=$py" >> "$GITHUB_OUTPUT"
@@ -162,9 +162,9 @@ jobs:
           ruff check .
       # every text the app shows is in every catalog, none left over (CLAUDE.md)
       - name: Translations complete
-        run: python scripts/i18n_extract.py --check
+        run: python scripts/checks/i18n_extract.py --check
       - name: CODE.md lists every module
-        run: python scripts/check_code_doc.py
+        run: python scripts/checks/check_code_doc.py
       # the Store tab's server (server/store): Node's own test runner, SQLite as its D1
       - uses: actions/setup-node@v7
         with:
@@ -172,7 +172,7 @@ jobs:
       - name: Store server tests
         run: node --test "server/store/test/*.test.mjs"
 
-  # pyright over the whole repo: errors not in scripts/pyright_baseline.json fail
+  # pyright over the whole repo: errors not in scripts/checks/pyright_baseline.json fail
   # (it's empty now, so any type error does). On Windows: Linux's PySide6 has no
   # Windows-only APIs (QImage.fromHICON), so pyright there flags code that's fine.
   # Same venv cache as the Windows test jobs. Only when Python changed (pick job).
@@ -196,7 +196,7 @@ jobs:
         run: |
           python -m venv .venv
           .venv\Scripts\python -m pip install -r requirements.txt -r requirements-dev.txt
-      - run: .venv\Scripts\python scripts/check_types.py --all
+      - run: .venv\Scripts\python scripts/checks/check_types.py --all
 
   # The Windows tests, as the pick job split them: a long run (main, or a PR that needs
   # most of the suite) in up to six jobs side by side (pick_tests.py, SHARDS).
@@ -290,7 +290,7 @@ jobs:
   # jobs skip its end-to-end tests, which need the effect and its test hosts built.
   # Here they're built with the runner's MinGW, in two jobs side by side: "tests" runs
   # them (the `host` tests of tests/test_directmic.py; the test jobs run the rest of
-  # it), "checks" checks the C++ (scripts/check_directmic.py: warnings as errors, GCC's
+  # it), "checks" checks the C++ (scripts/directmic/check_directmic.py: warnings as errors, GCC's
   # analyzer, cppcheck) and fuzzes it for a minute. Only when the pick job says the
   # change touches it.
   mic-effect:
@@ -342,9 +342,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
       - name: Check the C++
         if: matrix.part == 'checks'
-        run: .venv\Scripts\python scripts/check_directmic.py --need-cppcheck
+        run: .venv\Scripts\python scripts/directmic/check_directmic.py --need-cppcheck
       - name: Build
-        run: .venv\Scripts\python scripts/build_directmic.py ${{ matrix.part == 'tests' && '--testhost --fuzz' || '--fuzz' }}
+        run: .venv\Scripts\python scripts/directmic/build_directmic.py ${{ matrix.part == 'tests' && '--testhost --fuzz' || '--fuzz' }}
       # one at a time (-n 0): side by side, the effect in its host misses real time
       - name: Tests (the real effect in the test host)
         if: matrix.part == 'tests'
@@ -353,7 +353,7 @@ jobs:
         run: .venv\Scripts\python -m pytest -n 0 -m host --durations=10 --reruns 2 -rfER tests/test_directmic.py
       - name: Fuzz (60 s)
         if: matrix.part == 'checks'
-        run: .venv\Scripts\python scripts/fuzz_directmic.py 60 2
+        run: .venv\Scripts\python scripts/directmic/fuzz_directmic.py 60 2
 
   # The nightly's flaky tests (passed on a rerun) against the last nightly's: a new one
   # fails this job, so a flake shows up the night it starts instead of hiding behind
@@ -425,7 +425,7 @@ jobs:
             echo "ruff or the test pick failed: see the pick job"; exit 1
           fi
           if [ "$TYPES" != success ] && [ "$TYPES" != skipped ]; then
-            echo "new type errors: see the types job (scripts/check_types.py)"; exit 1
+            echo "new type errors: see the types job (scripts/checks/check_types.py)"; exit 1
           fi
           if [ "$MIC" != success ] && [ "$MIC" != skipped ]; then
             echo "the mic effect's checks failed: see the mic-effect job"; exit 1

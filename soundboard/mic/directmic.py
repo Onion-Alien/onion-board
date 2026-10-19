@@ -177,7 +177,7 @@ def _old_install_dirs() -> list[Path]:
 
 def bundled_dll() -> Path:
     """This app's own copy of the effect: next to the frozen app, or the one
-    scripts/build_directmic.py built when run from source."""
+    scripts/directmic/build_directmic.py built when run from source."""
     if getattr(sys, "frozen", False):
         return Path(getattr(sys, "_MEIPASS", Path(sys.executable).parent)) / "directmic" / DLL_NAME
     return Path(__file__).resolve().parents[2] / "build" / "directmic" / DLL_NAME

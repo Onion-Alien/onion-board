@@ -60,7 +60,7 @@ if ($LASTEXITCODE -ne 0) { throw "version_info.py failed" }
 # an import of one fails as it would on any PC without them.
 # Straight into my mic: the Windows audio effect (native\directmic), built with
 # MinGW-w64 (winget install BrechtSanders.WinLibs.POSIX.UCRT), bundled as directmic\.
-& $py scripts\build_directmic.py
+& $py scripts\directmic\build_directmic.py
 if ($LASTEXITCODE -ne 0) { throw "build_directmic.py failed (is MinGW-w64's g++ installed?)" }
 # Its mic helper (soundboard\mic\michelper.py): the admin part alone, frozen with the effect
 # DLL, so after the first admin prompt the app sets the effect up without asking.

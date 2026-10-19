@@ -154,7 +154,8 @@ def test_extract_finds_texts_plurals_and_a_shadowed_translator(tmp_path):
     import importlib.util
     from pathlib import Path
     spec = importlib.util.spec_from_file_location(
-        "i18n_extract", Path(__file__).resolve().parent.parent / "scripts" / "i18n_extract.py")
+        "i18n_extract",
+        Path(__file__).resolve().parent.parent / "scripts" / "checks" / "i18n_extract.py")
     ex = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(ex)
     src = tmp_path / "pkg"
@@ -180,7 +181,8 @@ def test_the_app_source_has_no_shadowed_translator():
     import importlib.util
     from pathlib import Path
     spec = importlib.util.spec_from_file_location(
-        "i18n_extract", Path(__file__).resolve().parent.parent / "scripts" / "i18n_extract.py")
+        "i18n_extract",
+        Path(__file__).resolve().parent.parent / "scripts" / "checks" / "i18n_extract.py")
     ex = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(ex)
     _texts, _plural, problems = ex.scan()
@@ -343,7 +345,8 @@ def extract_script():
     import importlib.util
     from pathlib import Path
     spec = importlib.util.spec_from_file_location(
-        "i18n_extract", Path(__file__).resolve().parent.parent / "scripts" / "i18n_extract.py")
+        "i18n_extract",
+        Path(__file__).resolve().parent.parent / "scripts" / "checks" / "i18n_extract.py")
     ex = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(ex)
     return ex

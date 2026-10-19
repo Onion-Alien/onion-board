@@ -1,6 +1,6 @@
 """Git merge driver for the translation catalogs (`assets/lang/*.json`).
 
-`scripts/i18n_extract.py --update` adds every new text at the end of each catalog, so
+`scripts/checks/i18n_extract.py --update` adds every new text at the end of each catalog, so
 two branches that both add texts always clash on the last lines of all of them, though
 they never touch the same text. This merges by key instead: a text added on either
 side is kept (ours first, then theirs in their order), a translation changed on one

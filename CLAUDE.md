@@ -37,7 +37,7 @@ a user can see (labels, buttons, tooltips, dialogs, toasts, errors) does all of 
 1. Wrap it: `_("…")` / `ngettext("…", "…", n)` from `soundboard.i18n`. Whole sentences with
    `{placeholders}`: never an f-string, `+`, or an English word passed into a
    placeholder ("{what}" = "sounds" can't be translated).
-2. `python scripts/i18n_extract.py --update`: adds the new texts (empty) to every
+2. `python scripts/checks/i18n_extract.py --update`: adds the new texts (empty) to every
    catalog and drops the unused ones.
 3. Translate every text you added or changed into **every** catalog: plain, short,
    friendly words for gamers, the same words the catalog already uses (and Onion Watch
@@ -85,7 +85,7 @@ repo says where the author lives. The enforcement:
   (the `gh` merge command, the API's merge call, the Merge button) or *Update branch*:
   GitHub writes those commits in your local time zone, and no hook can touch them.
 - Bring main into a branch with a local `git merge origin/main` (the hook stamps it).
-- A branch whose commits aren't UTC: `sh scripts/utc_fix.sh`, then
+- A branch whose commits aren't UTC: `sh scripts/checks/utc_fix.sh`, then
   `git push --force-with-lease`.
 - The same goes for anything else that records where you are: never write your time
   zone, locale, city or machine names into commits, PR text or files.

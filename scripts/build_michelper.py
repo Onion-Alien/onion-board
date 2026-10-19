@@ -1,7 +1,7 @@
 """Build the mic helper (soundboard/mic/michelper.py) into build/michelper/obmichelper/:
 obmichelper.exe, a small PyInstaller build of the mic effect's admin part only (no Qt,
 no numpy), with its own copy of the effect DLL and stamp.txt saying which. build.ps1
-runs it after scripts/build_directmic.py and bundles the folder with the app as
+runs it after scripts/directmic/build_directmic.py and bundles the folder with the app as
 michelper\\; from source, soundboard.mic.michelper finds it here.
 
 Usage: python scripts/build_michelper.py [--clean]
@@ -106,7 +106,7 @@ def version_file() -> Path:
 
 def build(clean: bool = False) -> int:
     if not DLL.is_file():
-        print(f"no {DLL}: run scripts/build_directmic.py first", file=sys.stderr)
+        print(f"no {DLL}: run scripts/directmic/build_directmic.py first", file=sys.stderr)
         return 1
     if stock := stock_bootloader():
         # Not fatal: a dev build (or one on a machine without MinGW-w64's gcc) should
