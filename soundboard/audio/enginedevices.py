@@ -21,6 +21,8 @@ from soundboard.audio.engineparts import (
     BUFFER,
     CH,
     MIC_BUFFER,
+    MIC_RING_BIG_S,
+    MIC_RING_S,
     RETRY_S,
     SR,
     STALL_S,
@@ -49,6 +51,7 @@ class EngineDevices:
         lock: threading.Lock
         voices: tuple[Voice, ...]
         latency: str
+        block_s: float
         names: dict[str, Any]
         rates: dict[str, int]
         errors: dict[str, str]
@@ -89,6 +92,23 @@ class EngineDevices:
     _close_quietly = staticmethod(close_quietly)
 
     # ----------------------------------------------------------------- streams
+    def set_block(self, seconds: float):
+        """Every stream's block from the next (re)open: `seconds` (lite mode's
+        LITE_BLOCK_S), or 0 for the driver's own (10 ms on Windows). The mic rings get
+        the cushion, ceiling and clock fits that block needs (MIC_RING_BIG_S); they
+        start over empty, as at any reopen. Call reopen_all after, on the device
+        thread."""
+        self.block_s = seconds
+        big = seconds > 0.01
+        for r in (self.ring_main, self.ring_mon, self.ring_obs):
+            r.prefill_s, r.max_s = MIC_RING_BIG_S if big else MIC_RING_S
+            r.est_scale = seconds / 0.01 if big else 1.0
+            r.configure(r.rate)
+
+    def _blocksize(self, rate: int) -> int:
+        """sounddevice's blocksize for a stream at `rate` (0: whatever the driver gives)."""
+        return round(rate * self.block_s)
+
     @staticmethod
     def _native_rate(idx: int) -> int:
         return int(sd.query_devices(idx)["default_samplerate"])
@@ -104,7 +124,8 @@ class EngineDevices:
         if chans < CH:
             raise RuntimeError(_("mono output devices aren't supported"))
         s = sd.OutputStream(device=idx, samplerate=rate, channels=CH, dtype="float32",
-                            latency=BUFFER.get(self.latency, "low"), callback=callback)
+                            latency=BUFFER.get(self.latency, "low"),
+                            blocksize=self._blocksize(rate), callback=callback)
         self._last_cb[key] = time.monotonic()
         start_or_close(s, key)
         # committed only now, so a failed open leaves the rate and the rings alone.
@@ -356,6 +377,7 @@ class EngineDevices:
                 chans = min(2, sd.query_devices(idx)["max_input_channels"])
                 s = sd.InputStream(device=idx, samplerate=rate, channels=chans, dtype="float32",
                                    latency=MIC_BUFFER.get(self.latency, "low"),
+                                   blocksize=self._blocksize(rate),
                                    callback=self._cb_mic)
                 # the mic callback resamples with these from its first block, so they're
                 # set before start (cheap: no ring is touched) and undone if it fails
@@ -380,7 +402,8 @@ class EngineDevices:
 
     @_holding_devices
     def reopen_all(self):
-        """Close and reopen every stream with the same devices (after a latency change)."""
+        """Close and reopen every stream with the same devices (after a latency or
+        block change)."""
         self.set_mic_device(self.names["mic"])
         self.set_main_device(self.names["main"])
         self.set_tap_device(self.tap_name)

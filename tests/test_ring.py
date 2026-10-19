@@ -208,3 +208,41 @@ def test_a_tracking_mic_ring_holds_its_small_cushion():
     for off in (0.0005, -0.0005):
         r = Ring(auto_drift=True, track_drift=True)
         assert clocks(r, off, 120) == 0 and r.underruns == r.overflows == 0
+
+
+def lite_ring():
+    """A mic ring as lite mode's 20 ms block sets it up (Engine.set_block)."""
+    from soundboard.audio.engine import Engine
+    from soundboard.audio.engineparts import LITE_BLOCK_S
+    e = Engine()
+    e.set_block(LITE_BLOCK_S)
+    return e.ring_main, round(SR * LITE_BLOCK_S)
+
+
+def test_lite_blocks_ride_out_drift_without_a_click():
+    """Lite mode's 20 ms blocks move the fill a whole 20 ms at a time: at the 10 ms
+    block's 15 ms cushion, 80 ms ceiling and 2 s clock fit a mic 0.2% off ran it dry."""
+    for off in (0.0005, -0.0005, 0.002, -0.002):
+        for seed in range(3):
+            r, block = lite_ring()
+            speed = []
+            assert clocks(r, off, 60, block=block, seed=seed, ratios=speed) == 0, (off, seed)
+            assert r.underruns == 0 and r.overflows == 0, (off, seed)
+            assert r.track_drift
+            assert np.std(speed[-1500:]) < 0.002                  # no audible wobble
+            assert np.mean(speed[-1500:]) == pytest.approx(1 + off, abs=0.0005)
+    r, block = lite_ring()
+    assert clocks(r, 0.0, 60, block=block, jitter=0.004) == 0
+    assert not r.track_drift and r.underruns == r.overflows == 0
+
+
+def test_lite_block_off_puts_the_mic_rings_back():
+    from soundboard.audio.engine import Engine
+    e = Engine()
+    plain = (e.ring_main.prefill, e.ring_main.max_fill, e.ring_main.est_scale)
+    e.set_block(0.02)
+    assert e.ring_mon.prefill > plain[0] and e.ring_mon.max_fill > plain[1]
+    assert e.ring_obs.est_scale == 2.0
+    e.set_block(0.0)
+    rings = (e.ring_main, e.ring_mon, e.ring_obs)
+    assert all((r.prefill, r.max_fill, r.est_scale) == plain for r in rings)

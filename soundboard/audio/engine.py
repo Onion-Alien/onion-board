@@ -296,6 +296,7 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         self._ahead_on = False   # the read-ahead thread is running (_read_ahead)
 
         self.latency = "low"      # sounddevice latency: 'low' or 'high' (safer)
+        self.block_s = 0.0        # every stream's block (set_block); 0: the driver's own
         keys: list[str] = ["main", "mon", "mic", "obs"]
         self.names = dict.fromkeys(keys)          # device names for reopening
         self._last_cb = dict.fromkeys(keys, 0.0)  # monotonic time of last callback
@@ -1337,7 +1338,8 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
             if mic is None or out is None:
                 return None
             # one-way streams: a float each (a tuple is for duplex ones)
-            return float(mic.latency) + float(out.latency) + 0.015   # pyright: ignore[reportArgumentType]
+            return (float(mic.latency) + float(out.latency)   # pyright: ignore[reportArgumentType]
+                    + self.ring_main.prefill_s)
         except Exception:  # noqa: BLE001 - a stream closing meanwhile
             return None
 

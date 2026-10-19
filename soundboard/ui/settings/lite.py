@@ -14,8 +14,14 @@ It turns off what only decorates and still costs CPU while the app is open:
 - the meters and the playing screen while something plays: 15 updates a second
   instead of 24 (`tickcontrol.TICK_LITE_MS`). Each meter update also repaints the
   window behind it, so this is most of what the window costs while it's quiet.
+- the audio's block: every stream (mic, send device, headphones, stream output) calls
+  back every 20 ms instead of 10 (`engineparts.LITE_BLOCK_S`), so the audio
+  callbacks cost about half; your voice goes out ~20 ms later. The streams reopen
+  when it's switched (`DeviceControl.set_lite_block`), a short gap like an Audio
+  buffering change. Straight into my mic keeps its own 10 ms.
 
-Everything still works the same; it only looks calmer. `on()` is read wherever one
+Everything still works the same; it only looks calmer (and your voice is that little
+bit later). `on()` is read wherever one
 of those starts, so turning it on or off applies at once (`set_on`), except Hoot's
 rest, which takes the next start of the Triggers tab.
 

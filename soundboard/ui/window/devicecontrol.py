@@ -19,6 +19,7 @@ from soundboard.ui.kit import theme
 from soundboard.mic import directmic
 from soundboard.audio import engine as eng
 from soundboard.audio.engine import is_virtual as is_virtual_cable
+from soundboard.audio.engineparts import LITE_BLOCK_S
 from soundboard.i18n import _, ngettext
 from soundboard.core.pollthread import PollThread
 from soundboard.ui.kit import busy
@@ -213,6 +214,21 @@ class DeviceControl(Controller):
             mw.statusctl._update_status()
             self._say_back_on_mic()
         self._device_job(lambda: e.reopen_all, reopened)   # (on the device thread)
+
+    def set_lite_block(self, on: bool):
+        """Lite mode's bigger audio block (engineparts.LITE_BLOCK_S) on or off: every
+        stream reopens with it, as after an audio buffering change."""
+        e = self.mw.engine
+        seconds = LITE_BLOCK_S if on else 0.0
+        if seconds == e.block_s:
+            return
+
+        def plan():
+            def work():
+                e.set_block(seconds)
+                e.reopen_all()
+            return work
+        self._device_job(plan, lambda _: self.mw.statusctl._update_status())
 
     def _say_back_on_mic(self):
         """After a restart or an audio buffering change: tell them the board is on the

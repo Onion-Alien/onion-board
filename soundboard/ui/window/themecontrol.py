@@ -109,6 +109,7 @@ class ThemeControl(Controller):
         mw.set_option("lite_mode", on)
         lite.set_on(on)
         mw.apply_light_voice()   # (Use less CPU follows it, unless picked by hand)
+        mw.devctl.set_lite_block(on)
         BunnyWidget.lite_changed()
         mw.logo.lite_changed()
         setctl = mw.setctl

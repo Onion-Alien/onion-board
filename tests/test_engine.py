@@ -1103,3 +1103,16 @@ def test_whos_listening_shapes_what_is_sent_not_your_own_playback():
     shaped = heard(game, check=True)                             # hear what they hear
     assert np.allclose(shaped[:, 0], shaped[:, 1])               # the mode's mono
     assert not np.allclose(shaped, plain, atol=1e-3)
+
+
+def test_lite_block_opens_every_stream_with_it(monkeypatch):
+    # lite mode: 20 ms blocks, so the callbacks run half as often; off: the driver's own
+    made = fake_devices(monkeypatch, rate=44100)
+    e = Engine()
+    e.set_main_device("cable")
+    assert made[0].kw["blocksize"] == 0
+    e.set_block(0.02)
+    e.set_main_device("cable")
+    e.set_mon_device("headphones")
+    e.set_mic_device("mic")
+    assert [s.kw["blocksize"] for s in made[1:]] == [882, 882, 882]
