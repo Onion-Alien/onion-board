@@ -324,8 +324,9 @@ class AlertControl(Controller):
         if now is None:
             return
         if now[0].startswith("discord"):
-            mw.statusctl.show_chat_guide("discord")
-            self._show_urgent()   # fixed meanwhile, or still to do
+            # Bun sets it (the same as every Discord button), then the bar re-checks
+            from soundboard.ui.setup.chatguide import set_up_discord
+            set_up_discord(mw, then=self._show_urgent)
             return
         if now[0].startswith("board"):
             if mw.updctl._downloading:

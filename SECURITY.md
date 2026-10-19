@@ -198,13 +198,15 @@ account or anything else about you.
   - tabs: `used/more-tabs-opened`, `used/more-tabs-added-radio`, `used/more-tabs-closed`,
     a tab hidden from its right-click menu (`used/tab-hidden-voice`), Ctrl+1 to 9 or
     Ctrl+Tab (`used/tab-keys`);
-  - the first start's answer to "What's it for?" (`used/use-normal`, `use-streamer`,
-    `use-games`, `use-all`, or `use-skipped` when the guide was closed there), the
-    setup guide closed on a later step, its send step skipped, or finished with or
-    without your sounds going out (`used/setup-closed-mic`, `setup-closed-headphones`,
-    `setup-closed-send`, `setup-closed-last`, `setup-skipped-send`, `setup-finished`,
-    `setup-finished-not-sending`), the Setup tab's *Step-by-step guide*
-    (`used/setup-guide-opened`);
+  - the tabs the first start began with, as one of a few names (`used/use-normal`: no
+    extra tabs, `use-streamer`: Apps, `use-games`: Triggers, `use-all`: Radio, Apps and
+    Triggers, `use-custom`: any other mix, or `use-skipped` when the guide was closed
+    before its last step), the setup guide closed on a step, its send step skipped, or
+    finished with or without your sounds going out (`used/setup-closed-mic`,
+    `setup-closed-headphones` from older versions, `setup-closed-send`,
+    `setup-closed-last`, `setup-skipped-send`, `setup-finished`,
+    `setup-finished-not-sending`), its *Set up Discord* ticked (`used/setup-discord`),
+    the Setup tab's *Step-by-step guide* (`used/setup-guide-opened`);
   - Bun's first-run tour of the empty board shown, searched from, a first sound added
     (`tour-files` in the version for Offline mode), put off, or ended by an error
     (`used/tour-shown`, `tour-searched`, `tour-added`, `tour-files`, `tour-skipped`,

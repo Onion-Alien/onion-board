@@ -59,8 +59,6 @@ def resume(monkeypatch):
     """Never touch the real RunOnce key: record what the guide asks for instead."""
     calls = []
     monkeypatch.setattr(setupwizard, "resume_after_restart", calls.append)
-    # whether Discord happens to be open on this PC never decides a test
-    monkeypatch.setattr(setupwizard, "_discord_open", lambda: False)
     return calls
 
 
@@ -91,17 +89,17 @@ def test_picks_reach_config_and_engine(wizard, devices):
     assert mics == ["Headset Mic (USB)", "Desk Mic"]
     wiz.mic_group.buttons()[1].click()
     assert w.cfg.mic_device == "Desk Mic" and devices["picked"]["set_mic_device"] == "Desk Mic"
-    wiz.go(1)
+    wiz.go(0)   # (the headphones share the mic's step)
     wiz._pick_headphones("Speakers")
     assert w.cfg.mon_device == "Speakers"
 
 
 def test_cable_present_routes_output_and_finishes(wizard, devices):
     w, wiz = wizard
-    wiz.go(2)
+    wiz.go(1)
     assert w.cfg.main_device.startswith("CABLE Input")
     assert "Installed" in wiz.cable_status.text() and wiz.btn_next.text().startswith("Next")
-    wiz.go(3)
+    wiz.go(2)
     assert "CABLE Output (VB-Audio Virtual Cable)" in wiz.discord_text.text()
     wiz.next_clicked()
     assert library.Config.load().setup_done
@@ -114,7 +112,7 @@ def test_a_working_cable_offers_the_mic_as_a_plain_option(wizard, monkeypatch):
     from soundboard.mic import directmic
     w, wiz = wizard
     wiz.show()
-    wiz.go(2)
+    wiz.go(1)
     assert w.cfg.route == "cable" and "Installed and" in wiz.cable_status.text()
     assert wiz.btn_attach.isHidden() and not wiz.btn_mic_instead.isHidden()
     monkeypatch.setattr(w.micctl, "attach_mic", lambda: None)
@@ -137,7 +135,7 @@ def test_mic_already_set_up_is_used_not_offered_again(wizard, monkeypatch):
     monkeypatch.setattr(w.micctl, "attach_mic", lambda: asked.append(1))
     w.cfg.route = "cable"
     wiz.show()
-    wiz.go(2)
+    wiz.go(1)
     assert w.cfg.route == "mic" and not asked
     assert wiz.status_card.tone == "ok" and "Working" in wiz.status_card.title.text()
     assert wiz.btn_mic_instead.isHidden()
@@ -151,10 +149,10 @@ def test_missing_cable_offers_install_and_finish_is_done(wizard, devices):
     # Finish without sending set up opened the guide again on every start
     devices["cable"] = False
     w, wiz = wizard
-    wiz.go(2)
+    wiz.go(1)
     assert not wiz.btn_cable.isHidden()
     assert wiz.btn_next.text().startswith("Skip")
-    wiz.go(3)
+    wiz.go(2)
     wiz.next_clicked()
     assert library.Config.load().setup_done   # Finish: not shown again by itself
 
@@ -163,14 +161,14 @@ def test_closing_the_guide_stops_it_opening_every_launch(wizard, devices):
     # closed with the X (or Esc), setup_done stayed False, so it popped up every start
     devices["cable"] = False
     w, wiz = wizard
-    wiz.go(2)
+    wiz.go(1)
     wiz.reject()
     assert library.Config.load().setup_done
 
 
 def test_steam_guide_names_the_cable_mic(wizard, monkeypatch, tmp_path):
     w, wiz = wizard
-    wiz.go(3)
+    wiz.go(2)
     opened = []
     from soundboard.ui.kit import busy
     monkeypatch.setattr(busy.QDesktopServices, "openUrl",
@@ -190,7 +188,7 @@ def test_steam_guide_names_the_cable_mic(wizard, monkeypatch, tmp_path):
 def test_finish_keeps_the_send_my_voice_choice(wizard, devices):
     w, wiz = wizard
     wiz.chk_send.setChecked(False)
-    wiz.go(3)
+    wiz.go(2)
     wiz.next_clicked()
     assert library.Config.load().mic_enabled is False
     assert not w.chk_mic.isChecked() and w.engine.mic_enabled is False
@@ -207,7 +205,7 @@ class _DoneProc:
 def test_installer_needing_a_restart_offers_restart_not_reinstall(wizard, devices):
     devices["cable"] = False
     w, wiz = wizard
-    wiz.go(2)
+    wiz.go(1)
     wiz._cable_tries, wiz._proc = 1, _DoneProc(setupwizard.RESTART_NEEDED)
     wiz._tick()
     assert "restart" in wiz.cable_status.text()
@@ -217,7 +215,7 @@ def test_installer_needing_a_restart_offers_restart_not_reinstall(wizard, device
 def test_failed_install_offers_to_try_again(wizard, devices):
     devices["cable"] = False
     w, wiz = wizard
-    wiz.go(2)
+    wiz.go(1)
     wiz._cable_tries, wiz._proc = 1, _DoneProc(1)
     wiz._tick()
     assert "didn't work" in wiz.cable_status.text()
@@ -234,7 +232,7 @@ def test_restart_marker_counts_only_until_the_pc_restarts(wizard, devices, app_d
     marker = app_dir / "cable-restart-pending"
     marker.write_text("x")
     assert setupwizard.cable_restart_pending()       # written this boot
-    wiz.go(2)
+    wiz.go(1)
     wiz.recheck_cable()
     # restart, or have the installer try waking it once more (never a reinstall)
     assert not wiz.btn_restart.isHidden() and "without restarting" in wiz.btn_cable.text()
@@ -263,7 +261,7 @@ class _RunningProc:
 def test_install_shows_bun_building_and_each_step(wizard, devices, app_dir, monkeypatch):
     devices["cable"] = False
     w, wiz = wizard
-    wiz.go(2)
+    wiz.go(1)
     proc, argv = _RunningProc(), []
     monkeypatch.setattr(setupwizard.subprocess, "Popen",
                         lambda a, **kw: (argv.extend(a), proc)[1])
@@ -298,7 +296,7 @@ def test_install_shows_bun_building_and_each_step(wizard, devices, app_dir, monk
 def test_install_that_still_needs_a_restart_stops_bun(wizard, devices, monkeypatch):
     devices["cable"] = False
     w, wiz = wizard
-    wiz.go(2)
+    wiz.go(1)
     proc = _RunningProc()
     monkeypatch.setattr(setupwizard.subprocess, "Popen", lambda a, **kw: proc)
     wiz.install_cable()
@@ -313,7 +311,7 @@ def test_install_that_still_needs_a_restart_stops_bun(wizard, devices, monkeypat
 def test_restart_needed_reopens_the_guide_after_it_then_clears(wizard, devices, resume):
     devices["cable"] = False
     w, wiz = wizard
-    wiz.go(2)
+    wiz.go(1)
     wiz._cable_tries, wiz._proc = 1, _DoneProc(setupwizard.RESTART_NEEDED)
     wiz._tick()
     assert resume[-1] is True          # come back by itself after the restart
@@ -326,7 +324,7 @@ def test_resumed_guide_starts_on_the_cable_and_welcomes_them_back(qapp, app_dir,
     w = main.MainWindow()
     wiz = setupwizard.SetupWizard(w, resumed=True)
     try:
-        assert wiz.stack.currentIndex() == 2
+        assert wiz.stack.currentIndex() == 1
         assert "Welcome back" in wiz.cable_status.text()
         assert wiz.bun_cable.celebrate
     finally:
@@ -371,7 +369,7 @@ def test_mid_install_the_guide_stays_put_and_a_reopened_one_picks_it_up(
         qapp, wizard, devices, monkeypatch):
     devices["cable"] = False
     w, wiz = wizard
-    wiz.go(2)
+    wiz.go(1)
     proc, starts = _RunningProc(), []
     monkeypatch.setattr(setupwizard.subprocess, "Popen",
                         lambda a, **kw: (starts.append(a), proc)[1])
@@ -384,7 +382,7 @@ def test_mid_install_the_guide_stays_put_and_a_reopened_one_picks_it_up(
     assert asked and wiz.result() == 0 and wiz._proc is proc
     again = setupwizard.SetupWizard(w)             # closed anyway, then reopened
     try:
-        assert again._proc is proc and again.stack.currentIndex() == 2
+        assert again._proc is proc and again.stack.currentIndex() == 1
         again.install_cable()
         assert len(starts) == 1                    # never a second install
         proc.rc = 0
@@ -412,7 +410,7 @@ def test_resumed_guide_with_the_cable_still_missing_offers_to_install_again(
 def test_installer_that_cant_start_says_what_to_do(wizard, devices, monkeypatch):
     devices["cable"] = False
     w, wiz = wizard
-    wiz.go(2)
+    wiz.go(1)
 
     def fail(*a, **kw):
         raise OSError(2, "The system cannot find the file specified")
@@ -475,7 +473,7 @@ def test_cancelling_keeps_a_device_they_did_pick(qapp, app_dir, devices):
 
 def test_steam_guide_is_freed_after_it_closes(wizard, monkeypatch):
     _, wiz = wizard
-    wiz.go(3)
+    wiz.go(2)
     monkeypatch.setattr(setupwizard.SteamGuide, "exec", lambda self: 0)
     for _ in range(3):
         wiz.show_steam_guide()
@@ -506,7 +504,7 @@ def test_only_the_mic_page_ticks_fast_and_the_folder_is_made_once(wizard, device
     following the cable installer doesn't make its folder again on every tick."""
     w, wiz = wizard
     assert wiz.stack.currentIndex() == 0 and wiz.timer.interval() == setupwizard.TICK_MS
-    wiz.go(3)
+    wiz.go(2)
     assert wiz.timer.interval() == setupwizard.SLOW_TICK_MS
     wiz.go(0)
     assert wiz.timer.interval() == setupwizard.TICK_MS
@@ -561,7 +559,7 @@ def test_new_users_are_offered_their_mic_first(mic_wizard_again, monkeypatch):
     from soundboard.mic import directmic
     w, wiz = mic_wizard_again
     assert w.cfg.route == "mic"
-    wiz.go(wiz.base + 2)
+    wiz.go(wiz.send_index)
     # the step's one thing to do is Next itself; leaving without it is the quiet Skip
     # that says what it means, and the card has no second button saying the same
     assert "Put my sounds in my mic" in wiz.btn_next.text()
@@ -589,11 +587,11 @@ def test_next_on_the_send_step_puts_the_sounds_in_the_mic(mic_wizard, monkeypatc
     calls, counted = [], []
     monkeypatch.setattr(w.micctl, "attach_mic", lambda *a, **k: calls.append(1))
     monkeypatch.setattr(usage, "used", counted.append)
-    wiz.go(wiz.base + 2)
+    wiz.go(wiz.send_index)
     wiz.next_clicked()
-    assert calls == [1] and wiz.stack.currentIndex() == wiz.base + 2
+    assert calls == [1] and wiz.stack.currentIndex() == wiz.send_index
     wiz.skip_clicked()   # the quiet way past: counted, and on to the last step
-    assert wiz.stack.currentIndex() == wiz.base + 3
+    assert wiz.stack.currentIndex() == wiz.look_index
     assert "setup-skipped-send" in counted and wiz.btn_skip.isHidden()
 
 
@@ -601,7 +599,7 @@ def test_a_repair_is_offered_as_one(mic_wizard, monkeypatch):
     from soundboard.mic import directmic
     _, wiz = mic_wizard
     monkeypatch.setattr(directmic, "status", lambda name=None: "wiped")
-    wiz.go(wiz.base + 2)
+    wiz.go(wiz.send_index)
     wiz.recheck_cable(rescan=False)
     assert "Repair" in wiz.btn_next.text() and "repair" in wiz.cable_status.text()
 
@@ -610,7 +608,7 @@ def test_cable_instead_doesnt_reinstall_a_cable_that_is_there(mic_wizard, monkey
     w, wiz = mic_wizard
     monkeypatch.setattr(setupwizard.subprocess, "Popen",
                         lambda *a, **k: pytest.fail("installed the cable again"))
-    wiz.go(wiz.base + 2)
+    wiz.go(wiz.send_index)
     wiz.install_cable()
     assert w.cfg.route == "cable" and wiz._proc is None
 
@@ -640,7 +638,7 @@ def test_mic_attach_plays_show_in_wizard_without_blocking_buttons(mic_wizard, mo
     from soundboard.mic import directmic
     w, wiz = mic_wizard
     wiz.show()
-    wiz.go(wiz.base + 2)
+    wiz.go(wiz.send_index)
     assert "Put my sounds in my mic" in wiz.btn_next.text()
     assert wiz.setup_show.isHidden()
 
@@ -683,7 +681,7 @@ def test_the_mic_step_does_not_jump_when_the_set_up_works(mic_wizard, monkeypatc
     w.cfg.mic_device = "Microphone (Some Long Gaming Headset Name)"
     wiz.resize(780, wiz.height())
     wiz.show()
-    wiz.go(wiz.base + 2)
+    wiz.go(wiz.send_index)
     monkeypatch.setattr(directmic, "install", lambda name, **k: "")
     wiz.btn_next.click()
     QApplication.processEvents()
@@ -707,13 +705,13 @@ def test_the_guide_stays_open_while_the_mic_is_set_up(mic_wizard, monkeypatch):
     notes = []
     monkeypatch.setattr(busy, "toast", lambda win, text, *a, **kw: notes.append(text))
     wiz.show()
-    wiz.go(wiz.base + 2)
+    wiz.go(wiz.send_index)
     w._attaching = True   # the set-up is running
     wiz._update_next()
     assert busy.is_busy(wiz.btn_next) and busy.is_busy(wiz.btn_back)
     for press in (wiz.next_clicked, wiz.back_clicked, wiz.reject, wiz.close):
         press()
-        assert wiz.isVisible() and wiz.stack.currentIndex() == wiz.base + 2
+        assert wiz.isVisible() and wiz.stack.currentIndex() == wiz.send_index
     assert notes == ["Bun's almost done, one moment."] * 2   # Esc and the X, not Back / Next
     w._attaching = False   # done
     wiz._tick()
@@ -744,7 +742,7 @@ def test_the_real_mic_set_up_holds_the_guide_until_it_ends(mic_wizard, qapp, mon
     monkeypatch.setattr(directmic, "status",
                         lambda name=None: "missing" if err or not release.is_set() else "ready")
     wiz.show()
-    wiz.go(wiz.base + 2)
+    wiz.go(wiz.send_index)
     page = wiz.stack.currentIndex()
     wiz.btn_attach.click()
     assert w._attaching and wiz.setup_show.on
@@ -786,7 +784,7 @@ def test_back_and_next_never_stretch_the_guide(mic_wizard, qapp):
     from soundboard.ui.kit import fit
     w, wiz = mic_wizard
     wiz.show()
-    wiz.go(wiz.base + 3)
+    wiz.go(wiz.look_index)
     _settle(qapp)
     heights = []
 
@@ -798,7 +796,7 @@ def test_back_and_next_never_stretch_the_guide(mic_wizard, qapp):
     spy = Spy(wiz)
     wiz.installEventFilter(spy)
     tall = {}
-    for i in (wiz.base + 2, wiz.base + 3) * 2:
+    for i in (wiz.send_index, wiz.look_index) * 2:
         wiz.go(i)
         # its size already, before anything's drawn (not squeezed at the old one)
         assert wiz.height() >= fit.needed_height(wiz, wiz.width())
@@ -849,7 +847,7 @@ def test_other_ways_card_explains_and_works(mic_wizard, monkeypatch):
     from soundboard.mic import directmic
     w, wiz = mic_wizard
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
-    wiz.go(wiz.base + 2)
+    wiz.go(wiz.send_index)
     assert wiz.status_card.tone == "ok" and "Working" in wiz.status_card.title.text()
     assert wiz.alt_card.isHidden()   # folded under its pill
     wiz.alt_fold.click()
@@ -874,7 +872,7 @@ def test_switching_off_a_working_driver_asks_first(mic_wizard, monkeypatch):
     w, wiz = mic_wizard
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     wiz.show()
-    wiz.go(wiz.base + 2)
+    wiz.go(wiz.send_index)
     wiz.btn_alt_cable.click()
     dlg = wiz._cable_confirm
     assert dlg.isVisible() and dlg.btn_keep.isDefault()
@@ -895,7 +893,7 @@ def test_cable_without_a_working_driver_isnt_questioned(mic_wizard, monkeypatch)
     from soundboard.mic import directmic
     w, wiz = mic_wizard
     monkeypatch.setattr(directmic, "status", lambda name=None: "missing")
-    wiz.go(wiz.base + 2)
+    wiz.go(wiz.send_index)
     wiz.btn_alt_cable.click()   # nothing to give up: straight to the cable
     assert getattr(wiz, "_cable_confirm", None) is None and w.cfg.route == "cable"
 
@@ -905,7 +903,7 @@ def test_status_card_says_each_state_plainly(mic_wizard, monkeypatch):
     _, wiz = mic_wizard
     state = {"s": "missing"}
     monkeypatch.setattr(directmic, "status", lambda name=None: state["s"])
-    wiz.go(wiz.base + 2)
+    wiz.go(wiz.send_index)
     for s, tone in (("missing", ""), ("wiped", "warn"), ("ready", "ok")):
         state["s"] = s
         wiz.recheck_cable(rescan=False)
@@ -957,11 +955,11 @@ def test_no_empty_band_after_a_step_grows_the_window(mic_wizard, qapp):
     from soundboard.ui.kit import fit
     _, wiz = mic_wizard
     wiz.show()
-    wiz.go(wiz.base + 3)
+    wiz.go(wiz.look_index)
     QTest.qWait(setupwizard.SETTLE_MS + 100)
     need = fit.needed_height(wiz, wiz.width())
     wiz.resize(wiz.width(), need + 200)
-    wiz.go(wiz.base + 3)
+    wiz.go(wiz.look_index)
     QTest.qWait(setupwizard.SETTLE_MS + 100)
     assert wiz.height() <= max(need, wiz.minimumHeight()) + 2
 
@@ -974,7 +972,7 @@ def test_cards_line_up_with_back_and_next(mic_wizard, monkeypatch, qapp):
     _, wiz = mic_wizard
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     wiz.show()
-    wiz.go(wiz.base + 2)
+    wiz.go(wiz.send_index)
     wiz.alt_fold.click()   # the other ways' card, open
     qapp.processEvents()
 
@@ -984,7 +982,7 @@ def test_cards_line_up_with_back_and_next(mic_wizard, monkeypatch, qapp):
     left, right = edges(wiz.btn_back)[0], edges(wiz.btn_next)[1]
     for card in (wiz.status_card, wiz.alt_card):
         assert edges(card) == (left, right)
-    wiz.go(wiz.base)   # the mic tiles: the first one starts on the same edge
+    wiz.go(wiz.dev_index)   # the mic tiles: the first one starts on the same edge
     qapp.processEvents()
     tiles = wiz.mic_group.buttons()
     assert edges(tiles[0])[0] == left
@@ -999,8 +997,8 @@ def test_header_ends_where_its_words_do(mic_wizard, qapp):
     _, wiz = mic_wizard
     wiz.show()
     qapp.processEvents()
-    page = wiz.stack.currentWidget()   # "What's it for?"
-    title, words = page.findChildren(setupwizard.QLabel)[:2]
+    page = wiz.stack.currentWidget()   # the mic and headphones
+    title, words, section = page.findChildren(setupwizard.QLabel)[:3]
     bun = page.findChildren(setupwizard.BunnyWidget)[0]
 
     def y(wd, at_bottom=False):
@@ -1009,8 +1007,8 @@ def test_header_ends_where_its_words_do(mic_wizard, qapp):
     # (+ the room he keeps above him so an upright ear isn't cut at the top of his bob)
     assert bun.height() <= setupwizard.BUN_H + 2 * setupwizard.BUN_PAD + bun._head()
     bottom = max(y(words, True), y(bun, True))
-    tiles = y(wiz.use_buttons["normal"])
-    assert tiles - bottom <= setupwizard.HEADER_GAP + 8   # (+ the page's own spacing)
+    assert "Microphone" in section.text()
+    assert y(section) - bottom <= setupwizard.HEADER_GAP + 8   # (+ the page's own spacing)
 
 
 def test_tiles_are_as_tall_as_their_names_need(mic_wizard, qapp):
@@ -1021,7 +1019,7 @@ def test_tiles_are_as_tall_as_their_names_need(mic_wizard, qapp):
     _, wiz = mic_wizard
     wiz.show()
     qapp.processEvents()
-    short = list(wiz.use_buttons.values())
+    short = list(wiz.mic_group.buttons())
     assert len({t.height() for t in short}) == 1
     assert short[0].height() == max(setupwizard.TILE_MIN_H,
                                     max(t.needed_height() for t in short))
@@ -1035,18 +1033,21 @@ def test_tiles_are_as_tall_as_their_names_need(mic_wizard, qapp):
 
 
 def test_test_sound_card_and_a_lone_option_span_the_page(mic_wizard, monkeypatch, qapp):
-    """The test sound's card is the page's width (it ended at a spot nothing lined up
-    with), and with the device list open the cable's tile fills the optional card's
-    row instead of sitting at half width beside a hole."""
+    """The test sound's button lines up with the tiles above it, and with the device
+    list open the cable's tile fills the optional card's row instead of sitting at half
+    width beside a hole."""
     from soundboard.mic import directmic
     _, wiz = mic_wizard
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     wiz.show()
-    wiz.go(wiz.base + 1)
+    wiz.go(wiz.dev_index)
     qapp.processEvents()
-    card = wiz.btn_test.parentWidget()
-    assert card.width() == wiz.btn_next.geometry().right() - wiz.btn_back.x() + 1
-    wiz.go(wiz.base + 2)
+    # the test sound's button starts on the tiles' edge, under the headphones (Back
+    # isn't shown on step 1)
+    def left(wd):
+        return wd.mapTo(wiz, wd.rect().topLeft()).x()
+    assert left(wiz.btn_test) == left(wiz.mic_group.buttons()[0])
+    wiz.go(wiz.send_index)
     wiz._show_other(True)
     wiz.alt_fold.setChecked(True)   # its card open (measured shut, the sizes are old)
     wiz.alt_card.show()
@@ -1065,71 +1066,90 @@ def test_step_bar_follows_the_pages(mic_wizard):
 
 def test_only_a_brand_new_install_is_asked_what_its_for(wizard, app_dir):
     _, wiz = wizard   # an older config (use_mode saved or missing): no question
-    assert not wiz._ask_use and wiz.base == 0 and wiz.PAGES == 4
+    assert not wiz._ask_use and wiz.look_index == -1 and wiz.PAGES == 3
     assert Config.from_raw({"version": 2}).use_mode == "normal"
     assert FIRST_START.__func__(Config).use_mode == ""
 
 
-def test_picking_what_its_for_never_resizes_the_guide(mic_wizard, qapp):
-    """The words under the tiles are one line for some answers and two for others:
-    the guide keeps room for the longest, so clicking between them (spamming
-    included) never makes the window grow, shrink and jump around."""
-    _, wiz = mic_wizard
-    wiz.show()
-    qapp.processEvents()
-    wiz._settle_size()
-    sizes = set()
-    for _round in range(2):
-        for key in ("normal", "streamer", "games", "all"):
-            wiz.use_buttons[key].click()
-            qapp.processEvents()
-            wiz._settle_size()
-            sizes.add((wiz.height(), wiz.use_hint.y(), wiz.btn_next.y()))
-    assert len(sizes) == 1, sizes
-
-
-def test_the_first_launch_asks_what_its_for_first(mic_wizard):
+def test_the_first_launch_is_three_steps(mic_wizard):
+    """The mic and headphones share step 1, then where the sounds go, then "Make it
+    yours": nothing is asked before the devices."""
     w, wiz = mic_wizard
-    # (no Discord open: "Make it yours" is the last of five)
-    assert wiz._ask_use and wiz.PAGES == 5 and wiz.stack.currentIndex() == 0
-    assert wiz.use_buttons["normal"].isChecked()
-    assert "Step 1 of 5" in wiz.progress.text()
-    wiz.use_buttons["games"].click()
-    assert "Triggers" in wiz.use_hint.text()
-    assert not w.tabctl.tab_on("triggers")   # nothing changes until Next
-    wiz.next_clicked()
-    assert w.cfg.use_mode == "games" and w.tabctl.tab_on("triggers")
-    assert not w.tabctl.tab_on("apps") and not w.tabctl.tab_on("radio")
-    assert wiz.stack.currentIndex() == wiz.base   # on to the mic
+    assert wiz._ask_use and wiz.PAGES == 3 and wiz.stack.currentIndex() == wiz.dev_index
+    assert "Step 1 of 3" in wiz.progress.text()
+    page = wiz.stack.widget(wiz.dev_index)
+    assert page.isAncestorOf(wiz.mic_group.buttons()[0]) and page.isAncestorOf(wiz.btn_test)
+    assert wiz.look_index == wiz.PAGES - 1
 
 
-def test_streaming_adds_the_apps_tab_and_the_streamer_guide(mic_wizard):
+def test_the_last_step_picks_the_tabs(mic_wizard):
+    """The tabs are ticked as they are (Voice on, the rest off for a new user) and
+    only change when the guide ends there: Finish, or closed on that step."""
     w, wiz = mic_wizard
-    wiz.use_buttons["streamer"].click()
-    wiz.next_clicked()
-    assert w.tabctl.tab_on("apps") and not w.tabctl.tab_on("triggers")
-    wiz.go(wiz.PAGES - 1)
-    assert not wiz.btn_streamer.isHidden() and wiz.btn_streamer.toolTip()
+    wiz.go(wiz.look_index)
+    assert set(wiz.tab_buttons) == set(setupwizard.OPTIONAL_TABS)
+    assert {k for k, b in wiz.tab_buttons.items() if b.isChecked()} == {
+        k for k in setupwizard.OPTIONAL_TABS if w.tabctl.tab_on(k)}
+    wiz.tab_buttons["triggers"].click()
+    wiz.tab_buttons["apps"].click()   # any number of them: not one or the other
+    assert wiz.tab_buttons["triggers"].isChecked() and wiz.tab_buttons["apps"].isChecked()
+    assert not w.tabctl.tab_on("triggers")   # nothing changes until the guide ends
+    wiz.finish()
+    assert w.tabctl.tab_on("triggers") and w.tabctl.tab_on("apps")
+    assert not w.tabctl.tab_on("radio") and w.cfg.use_mode == "custom"
 
 
-def test_just_sounds_changes_nothing(mic_wizard):
+def test_each_tab_has_an_info_button_saying_what_it_is(mic_wizard, monkeypatch):
+    """Voice starts ticked, Radio, Apps and Triggers are opt-in; each ⓘ drops down
+    what its tab is for (+ More tabs' words), under the ⓘ."""
+    from soundboard.ui.sounds import dialogs
+    from soundboard.ui.window.moretabs import PITCH
+    w, wiz = mic_wizard
+    wiz.go(wiz.look_index)
+    assert [k for k, b in wiz.tab_buttons.items() if b.isChecked()] == ["voice"]
+    shown = []
+    monkeypatch.setattr(dialogs.TabHelpPopup, "exec",
+                        lambda box: shown.append((box.heading.text(), box.body.text(),
+                                                  box.y())) or 0)
+    for key in setupwizard.OPTIONAL_TABS:
+        info = wiz.tab_infos[key]
+        assert info.toolTip()
+        info.click()
+        title, body, y = shown[-1]
+        assert title == setupwizard.tab_names()[key] and body == PITCH[key]
+        assert 12 <= len(body.split()) <= 25   # a short line, not a page
+        assert y >= info.mapToGlobal(info.rect().bottomLeft()).y()   # dropped down
+    assert not w.tabctl.tab_on("radio")   # looking never ticks it
+
+
+def test_unticking_a_tab_switches_it_off(mic_wizard):
+    w, wiz = mic_wizard
+    assert w.tabctl.tab_on("voice")
+    wiz.go(wiz.look_index)
+    wiz.tab_buttons["voice"].click()
+    wiz.done(0)   # closed on the last step: kept as ticked
+    assert not w.tabctl.tab_on("voice") and w.cfg.use_mode == "normal"
+
+
+@pytest.mark.parametrize("tabs, use", [
+    (set(), "normal"), ({"voice"}, "normal"), ({"apps"}, "streamer"),
+    ({"triggers", "voice"}, "games"), ({"radio", "apps", "triggers"}, "all"),
+    ({"radio"}, "custom")])
+def test_the_tabs_count_as_the_old_answers(tabs, use):
+    from soundboard.core import usage
+    assert setupwizard.use_for(tabs) == use
+    assert f"use-{use}" in usage.FEATURES
+
+
+def test_closing_before_the_last_step_never_asks_again(mic_wizard):
     w, wiz = mic_wizard
     off = list(w.cfg.tabs_off)
-    wiz.next_clicked()
-    assert w.cfg.use_mode == "normal" and w.cfg.tabs_off == off
-    wiz.go(wiz.PAGES - 1)
-    assert wiz.btn_streamer.isHidden()
-
-
-def test_closing_on_the_question_never_asks_again(mic_wizard):
-    w, wiz = mic_wizard
     wiz.done(0)
-    assert w.cfg.use_mode == "normal"
+    assert w.cfg.use_mode == "normal" and w.cfg.tabs_off == off   # tabs as they were
     again = setupwizard.SetupWizard(w)
     assert not again._ask_use
     again.done(0)
     again.deleteLater()
-
 
 
 def test_picks_open_the_device_off_the_ui_thread(wizard, devices, monkeypatch, qapp):
@@ -1271,7 +1291,7 @@ def test_the_send_step_says_the_mic_works_before_what_is_missing(mic_wizard, mon
     monkeypatch.setattr(directmic, "status", lambda name=None: "missing")
     monkeypatch.setattr(w.engine, "mic_stream", _S())
     wiz.show()
-    wiz.go(wiz.base + 2)
+    wiz.go(wiz.send_index)
     wiz.recheck_cable(rescan=False)
     assert not wiz.mic_done.isHidden() and "Your mic works" in wiz.mic_done.text()
     assert wiz.status_card.title.text() == "Your sounds aren't in your mic yet"
@@ -1317,50 +1337,56 @@ def test_the_first_launch_ends_on_make_it_yours(mic_wizard, monkeypatch):
     assert wiz.stack.currentIndex() == wiz.look_index
 
 
-def test_the_first_launch_asks_about_discord_last_when_its_open(mic_wizard, monkeypatch):
-    """Discord open and the sounds in the mic: after "Make it yours", one question.
-    Yes finishes and opens the Discord guide; No just finishes."""
+def test_set_up_discord_finishes_into_bun_setting_it_up(mic_wizard, monkeypatch):
+    """Ticked, Finish hands over to Bun setting Discord up (the same as every Discord
+    button: chatguide.set_up_discord); unticked, it just finishes."""
     from soundboard.mic import directmic
     from soundboard.ui.setup import chatguide
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
-    monkeypatch.setattr(setupwizard, "_discord_open", lambda: True)
-    opened = []
-    monkeypatch.setattr(chatguide, "show_guide", lambda which, *a: opened.append(which))
+    started = []
+    monkeypatch.setattr(chatguide, "set_up_discord", lambda mw, *a, **k: started.append(mw))
     w, wiz = mic_wizard
     wiz.go(wiz.look_index)
-    assert wiz.PAGES == 6 and "Next" in wiz.btn_next.text()
-    wiz.next_clicked()
-    assert wiz.stack.currentIndex() == wiz.discord_index == wiz.PAGES - 1
-    assert "set up Discord?" in wiz.discord_title.text()
-    assert "Yes, set up Discord" in wiz.btn_next.text()
-    assert not wiz.btn_skip.isHidden() and "No thanks" in wiz.btn_skip.text()
-    assert wiz.discord_body.isHidden() and wiz.help_card.isHidden()
+    assert not wiz.chk_discord.isChecked()   # on the mic: an opt-in
+    assert "noise filter" in wiz.discord_why.text()
+    shown = []   # its ⓘ: what Bun changes, and where it's undone
+    monkeypatch.setattr(wiz, "_drop_down", lambda btn, title, text, **k: shown.append(text))
+    wiz.discord_info.click()
+    assert "Put Discord back" in shown[0] and "CABLE" not in shown[0]
+    wiz.chk_discord.click()
+    assert "Finish" in wiz.btn_next.text()
     wiz.next_clicked()
     QApplication.processEvents()
-    assert w.cfg.setup_done and opened == ["discord"]
+    assert w.cfg.setup_done and started == [w]
 
 
-def test_no_thanks_to_discord_just_finishes(mic_wizard, monkeypatch):
-    from soundboard.mic import directmic
+def test_no_discord_just_finishes(mic_wizard, monkeypatch):
     from soundboard.ui.setup import chatguide
-    monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
-    monkeypatch.setattr(setupwizard, "_discord_open", lambda: True)
     opened = []
-    monkeypatch.setattr(chatguide, "show_guide", lambda which, *a: opened.append(which))
+    monkeypatch.setattr(chatguide, "set_up_discord", lambda *a, **k: opened.append(1))
     w, wiz = mic_wizard
-    wiz.go(wiz.discord_index)
-    wiz.skip_clicked()
+    wiz.go(wiz.look_index)
+    wiz.next_clicked()
     QApplication.processEvents()
     assert w.cfg.setup_done and opened == []
 
 
-def test_on_the_cable_the_first_launch_still_ends_on_discord(mic_wizard):
-    """The cable has to be picked in Discord: its full step stays, after the look."""
+def test_on_the_cable_set_up_discord_starts_ticked(mic_wizard):
+    """The cable has to be picked in Discord: the switch starts on, and says why; once
+    they've touched it, it stays as they left it."""
     w, wiz = mic_wizard
     w.routectl.set_route("cable")
-    wiz.go(wiz.discord_index)
-    assert wiz.PAGES == 6 and wiz.stack.currentIndex() == wiz.discord_index
-    assert not wiz._asking and "Finish" in wiz.btn_next.text()
+    wiz.go(wiz.look_index)
+    assert wiz.PAGES == 3 and wiz.chk_discord.isChecked()
+    assert "which mic" in wiz.discord_why.text()
+    shown = []   # its ⓘ names the mic to pick
+    wiz._drop_down = lambda btn, title, text, **k: shown.append(text)
+    wiz.discord_info.click()
+    assert "CABLE Output" in shown[0]
+    wiz.chk_discord.click()   # off by hand
+    wiz.go(wiz.send_index)
+    wiz.go(wiz.look_index)
+    assert not wiz.chk_discord.isChecked()
 
 
 def test_lite_mode_on_make_it_yours(mic_wizard):
@@ -1481,3 +1507,44 @@ def test_the_theme_grid_keeps_to_its_columns(qapp):
     QApplication.processEvents()
     assert grid.columns == 3
     grid.deleteLater()
+
+
+def test_the_last_step_lines_up(mic_wizard, qapp, monkeypatch):
+    """Make it yours is one grid: Your tabs' and Look's headings on one line, each
+    block on the left level with a row of looks (the tabs with row 1, Discord with
+    row 2, the language and switches with row 3), the left edge on Back's and the
+    right on Finish's, and no wider than that (a widened guide left bands)."""
+    from PySide6.QtCore import QPoint
+    from soundboard.mic import directmic
+    w, wiz = mic_wizard
+    monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
+    wiz.show()
+    qapp.processEvents()
+    for route in ("mic", "cable"):   # (the cable's Discord words are longer)
+        w.cfg.route = route
+        wiz.go(wiz.look_index)
+        for _ in range(4):
+            qapp.processEvents()
+        page = wiz.stack.currentWidget()
+
+        def at(wd, right=False):
+            return wd.mapTo(wiz, QPoint(wd.width() if right else 0, 0))
+        heads = {lbl.text(): at(lbl).y() for lbl in page.findChildren(setupwizard.QLabel)
+                 if lbl.text() in ("<b>Your tabs</b>", "<b>Look</b>")}
+        assert len(heads) == 2 and len(set(heads.values())) == 1, heads
+        cards = wiz.look_cards
+        rows = [at(cards[i]).y() for i in (0, 3, 6)]
+        assert at(wiz.tab_buttons["voice"].parentWidget()).y() == rows[0]
+        assert at(wiz.chk_discord.parentWidget()).y() == rows[1]
+        # ...and as tall as a look, so the rows' gaps stay even
+        assert wiz.chk_discord.parentWidget().height() == setupwizard.LOOK_CARD_H, route
+        assert rows[2] - rows[1] == rows[1] - rows[0]
+        assert at(wiz.lang_button.parentWidget()).y() == rows[2]
+        # the tabs fill row 1: the last one's bottom inside the looks' first row
+        last = wiz.tab_infos["triggers"]
+        assert at(last).y() + last.height() <= rows[0] + setupwizard.LOOK_CARD_H
+        assert at(wiz.tab_buttons["voice"]).x() == at(wiz.btn_back).x()
+        assert at(cards[2], right=True).x() == at(wiz.btn_next, right=True).x()
+        need = (setupwizard.LOOK_LEFT_W + setupwizard.LOOK_GAP + setupwizard.LOOK_RIGHT_W
+                + 2 * setupwizard.MARGIN)
+        assert wiz.width() == need

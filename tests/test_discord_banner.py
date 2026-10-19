@@ -34,10 +34,11 @@ def test_studio_on_the_mic_gets_the_urgent_bar(window, monkeypatch):
     assert not window.urgent_bar.isHidden()
     assert "Studio" in window.urgent_lbl.text() and "Custom" in window.urgent_lbl.text()
     assert window.urgent_btn.text() == "Fix Discord"
-    guides = []
-    monkeypatch.setattr(window.statusctl, "show_chat_guide", guides.append)
+    started = []   # Fix Discord: Bun sets it up (chatguide.set_up_discord), then re-checks
+    monkeypatch.setattr(chatguide, "set_up_discord",
+                        lambda mw, *a, **k: started.append((mw, k.get("then"))))
     window.urgent_btn.click()
-    assert guides == ["discord"]
+    assert [mw for mw, _then in started] == [window] and started[0][1] is not None
     window.alertctl._on_discord((found(), ("sig2",)))          # fixed in Discord
     assert window.urgent_bar.isHidden()
 

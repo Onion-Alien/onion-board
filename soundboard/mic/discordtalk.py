@@ -1,10 +1,12 @@
-"""Puts Discord back the way you talk once Onion Board is closed.
+"""Sets Discord up for sounds, and puts it back the way you talk once Onion Board is
+closed.
 
 To let sounds through, Discord's voice clean-up has to be off (discordcfg: noise
-suppression, echo cancellation, automatic gain, automatic input sensitivity). Left
-that way after Onion Board closes, a plain voice comes through noisy and up and down.
-So the board remembers how Discord was set while you only talked (`snapshot`, saved
-in the config), and on quit puts those settings back (`restore`).
+suppression, echo cancellation, automatic gain, automatic input sensitivity). `set_up`
+switches it off (SOUND), after remembering how Discord was set while you only talked
+(`snapshot`, saved in the config). Left that way after Onion Board closes, a plain
+voice comes through noisy and up and down, so on quit those settings go back
+(`restore`; Settings → Audio recovery's Put Discord back does it by hand).
 
 Discord keeps its settings in memory while it runs and writes over its files, so they
 can only be changed while it's closed. On quit: Discord closed, they're put back at
@@ -44,6 +46,7 @@ FULL, FIRST, MIDDLE, LAST = 1, 2, 3, 4
 BACKUPS = 3          # copies of each client's folder kept
 HELPER_MAX_S = 12 * 3600
 HELPER_POLL_S = 3.0
+CLOSE_WAIT_S = 10.0   # set_up's Discord closing: how long it may take to go
 VOICE_URL = "discord://-/settings/voice"   # opens Discord's Voice settings
 EXES = dict(zip((c for c, _n in discordcfg.CLIENTS),
                 ("discord.exe", "discordptb.exe", "discordcanary.exe",
@@ -57,6 +60,13 @@ TALK_KEYS = ("activeInputProfile", "noiseCancellation", "noiseSuppression",
 DEFAULT_TALK = {"noiseCancellation": True, "echoCancellation": True,
                 "automaticGainControl": True, "bypassSystemInputProcessing": False,
                 "modeOptions.autoThreshold": True, "modeOptions.vadUseKrisp": True}
+# what sounds need (discordcfg's measurements): the Custom profile with every clean-up
+# off, and Voice Activity's sensitivity set by hand (Push to Talk is left as it is).
+# Clean both straight into the mic and on the cable.
+SOUND = {"activeInputProfile": "CUSTOM", "noiseCancellation": False,
+         "noiseSuppression": False, "echoCancellation": False,
+         "automaticGainControl": False, "bypassSystemInputProcessing": False,
+         "modeOptions.autoThreshold": False, "modeOptions.vadUseKrisp": False}
 
 
 # ---------------------------------------------------------------- what "talking" is
@@ -347,7 +357,7 @@ def _backup(folder: Path, client_dir: str, backup_root: Path) -> Path:
 
 
 def write_store(client_dir: str, store: dict, backup_root: Path,
-                appdata: Path | None = None) -> bool:
+                appdata: Path | None = None, what: str = "talking settings put back") -> bool:
     """Put `store` in as Discord's MediaEngineStore. True once it's in and reads back;
     raises Locked while Discord has the folder open; False (nothing written, or put
     back from the backup) on anything unexpected."""
@@ -386,7 +396,7 @@ def write_store(client_dir: str, store: dict, backup_root: Path,
                 f.truncate(len(data))
             log.warning("%s: the written settings didn't read back; undone", client_dir)
             return False
-        log.info("%s: talking settings put back (sequence %d)", client_dir, seq)
+        log.info("%s: %s (sequence %d)", client_dir, what, seq)
         return True
     except (OSError, ValueError, IndexError):
         log.warning("%s: couldn't put its settings back", client_dir, exc_info=True)
@@ -476,6 +486,68 @@ def restore(saved: dict, backup_root: Path, appdata: Path | None = None,
         except Exception:  # noqa: BLE001 - never let one client stop the rest
             log.warning("putting %s back failed", client_dir, exc_info=True)
     return pending
+
+
+def set_up(saved: dict, backup_root: Path, on_mic: bool, appdata: Path | None = None,
+           running: set[str] | None = None) -> dict:
+    """Set every installed Discord that needs it for sounds (SOUND). First, how each one
+    is set while you talk is remembered (unless `saved` already has it), so it can go
+    back on quit. Returns {"done": [(name, before, after)], "running": [folders still
+    open, nothing written], "talk": {folder: snapshot to save}, "failed": [names]}."""
+    if running is None:
+        running = running_clients()
+    out: dict = {"done": [], "running": [], "talk": {}, "failed": []}
+    for client_dir, name in discordcfg.CLIENTS:
+        try:
+            s = discordcfg.read_client(client_dir, name, appdata)
+            store = read_store(client_dir, appdata)
+            if s is None or store is None or not s.problems(on_mic):
+                continue   # not installed, unreadable, or already right for sounds
+            if client_dir in running:
+                out["running"].append(client_dir)
+                continue
+            if talking(s) and not saved.get(client_dir):
+                out["talk"][client_dir] = snapshot(store)
+            new = apply(store, SOUND)
+            try:
+                ok = write_store(client_dir, new, backup_root, appdata,
+                                 what="set up for sounds")
+            except Locked:
+                out["running"].append(client_dir)
+                continue
+            if ok:
+                out["done"].append((name, s, discordcfg.parse(new, name)))
+            else:
+                out["failed"].append(name)
+        except Exception:  # noqa: BLE001 - never let one client stop the rest
+            log.warning("setting up %s failed", client_dir, exc_info=True)
+            out["failed"].append(name)
+    return out
+
+
+def close_clients(client_dirs, wait_s: float = CLOSE_WAIT_S) -> bool:
+    """Close these Discords (every process of theirs, by its id: Discord only hides in
+    the tray when its window's closed) and wait until they're gone. Asked first by
+    the caller: it ends any call. True once none of them runs."""
+    import subprocess
+
+    from soundboard.audio import appaudio
+    exes = {EXES[c] for c in client_dirs if c in EXES}
+    for pid, (_parent, exe) in appaudio._process_table().items():
+        if exe in exes:
+            try:
+                subprocess.run(["taskkill", "/F", "/PID", str(pid)], capture_output=True,
+                               timeout=5, creationflags=getattr(subprocess,
+                                                                "CREATE_NO_WINDOW", 0))
+            except (OSError, subprocess.SubprocessError):
+                log.warning("closing %s (%d) failed", exe, pid, exc_info=True)
+    end = time.monotonic() + wait_s
+    while time.monotonic() < end:
+        if not running_clients() & set(client_dirs):
+            time.sleep(0.5)   # its files let go a moment after the process ends
+            return True
+        time.sleep(0.25)
+    return False
 
 
 def board_running() -> bool:

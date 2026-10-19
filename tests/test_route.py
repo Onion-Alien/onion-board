@@ -165,7 +165,7 @@ def test_the_guide_can_send_to_another_device(wizard, devices):  # noqa: F811
     w, wiz = wizard
     devices["cable"] = False
     w.devctl.refresh_devices()
-    wiz.go(2)
+    wiz.go(wiz.send_index)
     assert wiz.btn_next.text().startswith("Skip")
     wiz.btn_other.click()
     assert not wiz.other_box.isHidden()
@@ -175,7 +175,7 @@ def test_the_guide_can_send_to_another_device(wizard, devices):  # noqa: F811
     assert w.cfg.route == "device" and devices["picked"]["set_main_device"] == "Speakers"
     assert "Sending to Speakers" in wiz.cable_status.text()
     assert wiz.btn_next.text().startswith("Next")
-    wiz.go(3)
+    wiz.go(wiz.discord_index)
     assert "Audio Output Capture" in wiz.discord_text.text()
     assert wiz.btn_discord.isHidden() and wiz.btn_steam.isHidden()
     wiz.finish()
@@ -184,14 +184,14 @@ def test_the_guide_can_send_to_another_device(wizard, devices):  # noqa: F811
 
 def test_the_guide_can_send_nowhere_and_go_back_to_the_cable(wizard, devices):  # noqa: F811
     w, wiz = wizard
-    wiz.go(2)
+    wiz.go(wiz.send_index)
     wiz.btn_other.click()
     wiz._pick_route(setupwizard.NOWHERE)
     assert w.cfg.route == "off" and wiz.route_ok()
     assert not wiz.btn_use_cable.isHidden()
-    wiz.go(3)
+    wiz.go(wiz.discord_index)
     assert "Nothing to change" in wiz.discord_text.text() and wiz.btn_copy.isHidden()
-    wiz.go(2)
+    wiz.go(wiz.send_index)
     wiz.btn_use_cable.click()
     assert w.cfg.route == "cable" and w.cfg.main_device == CABLE
     assert wiz.other_box.isHidden() and wiz.btn_use_cable.isHidden()

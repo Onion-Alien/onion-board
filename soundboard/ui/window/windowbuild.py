@@ -115,6 +115,12 @@ WIDE_GAP = 8            # ...its library tools by this much more each side
 SEND_TO = _("Send my sounds to")
 
 
+def _set_up_discord(mw):
+    """The Setup tab's Discord button: Bun sets Discord up (chatguide.set_up_discord)."""
+    from soundboard.ui.setup.chatguide import set_up_discord
+    set_up_discord(mw)
+
+
 def version_text() -> str:
     """The version, as the title bar and header show it: "1.5.5", or "1.5.5 from
     source" when run with Python rather than the installed app."""
@@ -1571,10 +1577,10 @@ class WindowBuilder(Controller):
         hv.addWidget(hint_label(_("Choose your app for the recommended microphone settings.")))
         chat = Flow(gap=8)   # at their own size, wrapping, not five full-width bars
         mw.btn_chat = QPushButton(_("Make it sound clean in Discord"))
-        mw.btn_chat.setToolTip(_("The Discord settings that stop it chopping up your sounds, "
-                                   "and a check that listens to what Discord does to them"))
+        mw.btn_chat.setToolTip(_("Bun saves how Discord is set now, then switches off what "
+                                 "chops up your sounds. Settings → Audio recovery puts it back."))
         icons.set_icon(mw.btn_chat, "headphones")
-        mw.btn_chat.clicked.connect(lambda: mw.statusctl.show_chat_guide("discord"))
+        mw.btn_chat.clicked.connect(lambda: _set_up_discord(mw))   # Bun does it
         chat.addWidget(mw.btn_chat)
         mw.btn_game = QPushButton(_("Set up game voice chat"))
         mw.btn_game.clicked.connect(lambda: mw.statusctl.show_chat_guide("game"))

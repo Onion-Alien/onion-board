@@ -198,3 +198,53 @@ def test_put_back_waits_for_an_open_discord_to_close(window, monkeypatch, tmp_pa
     card._discord_back([], [])
     assert "already" in toasts[-1]
     card.deleteLater()
+
+
+# ---------------------------------------------------------------- setting it up for sounds
+
+TALK = {"activeInputProfile": "CUSTOM", "noiseCancellation": True, "echoCancellation": True,
+        "automaticGainControl": True, "bypassSystemInputProcessing": False,
+        "mode": "VOICE_ACTIVITY", "inputDeviceId": "default",
+        "modeOptions": {"vadUseKrisp": True, "autoThreshold": True, "threshold": -50}}
+
+
+def test_set_up_saves_how_you_talk_then_clears_what_chops_sounds(tmp_path):
+    """Discord set for talking: the talking settings are handed back to be saved,
+    then every clean-up that chops sounds goes off; the rest (the mic, the
+    threshold) stays, and a copy of the folder is kept first."""
+    make_db(TALK)
+    res = dt.set_up({}, tmp_path / "bk", on_mic=True, running=set())
+    assert [n for n, _b, _a in res["done"]] == ["Discord"]
+    assert res["talk"]["discord"]["noiseCancellation"] is True   # how they talk, saved
+    s = settings()
+    assert not s.problems(True) and s.profile == "CUSTOM"
+    store = dt.read_store("discord")
+    assert store["default"]["inputDeviceId"] == "default"
+    assert store["default"]["modeOptions"]["threshold"] == -50
+    assert list((tmp_path / "bk" / "discord").iterdir())
+    # ...and putting it back gives the talking settings again (Audio recovery)
+    dt.restore(res["talk"], tmp_path / "bk", running=set(), always=True)
+    assert dt.talking(settings())
+
+
+def test_set_up_keeps_talking_settings_already_saved(tmp_path):
+    make_db(TALK)
+    res = dt.set_up({"discord": {"echoCancellation": True}}, tmp_path / "bk", on_mic=True,
+                    running=set())
+    assert res["talk"] == {} and res["done"]
+
+
+def test_set_up_leaves_a_right_discord_alone(tmp_path):
+    f = make_db(SOUND)
+    before = (f / "000003.log").read_bytes()
+    res = dt.set_up({}, tmp_path / "bk", on_mic=True, running=set())
+    assert res["done"] == [] and res["running"] == []
+    assert (f / "000003.log").read_bytes() == before
+
+
+def test_set_up_never_writes_into_a_running_discord(tmp_path):
+    f = make_db(TALK)
+    before = (f / "000003.log").read_bytes()
+    res = dt.set_up({}, tmp_path / "bk", on_mic=True, running={"discord"})
+    assert res["running"] == ["discord"] and res["done"] == []
+    assert (f / "000003.log").read_bytes() == before
