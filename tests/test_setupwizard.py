@@ -803,7 +803,7 @@ def test_other_ways_card_explains_and_works(mic_wizard, monkeypatch):
     wiz.alt_fold.click()
     assert not wiz.alt_card.isHidden()
     texts = " ".join(lbl.text() for lbl in wiz.alt_card.findChildren(setupwizard.QLabel))
-    assert "driver" in texts and "Voicemeeter" in texts
+    assert "No mic" in texts and "touch yours" in texts and "Voicemeeter" in texts
     wiz.btn_alt_other.click()
     assert not wiz.other_box.isHidden() and wiz.alt_other_row.isHidden()
     wiz.btn_alt_cable.click()   # the driver works: asked first

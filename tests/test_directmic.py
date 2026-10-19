@@ -3654,6 +3654,7 @@ def test_the_working_card_is_one_line(window, monkeypatch):  # noqa: F811
     for b in (w.btn_install, w.step_lbl, w.mic_flow, w.mic_update_note):
         assert b.isHidden()
     assert not w.btn_usecable.isHidden() and not w.mic_alt.isHidden()   # the tiles
+    assert not w.btn_cableinfo.isHidden()   # (its ⓘ: when the cable is the better pick)
     assert w.btn_guide.isHidden() and not w.helpcard.isHidden()   # (it has the guide)
 
 

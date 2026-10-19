@@ -411,14 +411,15 @@ class StatusControl(Controller):
         reveal.set_shown(mw.mic_alt, route == "mic" and not mic_busy)   # also when it works
         mw.alt_cable.setVisible(not mw._cable_gone)   # (back after a restart)
         mw.btn_usecable.setVisible(route == "mic" and not mic_busy and not mw._cable_gone)
+        mw.btn_cableinfo.setVisible(mw.btn_usecable.isVisibleTo(mw.alt_cable))
         spare = route == "mic" and state == "ok" and mw.micctl._spare_cable()
         mw.btn_rmcable.setVisible(spare)
         # installed and spare: say why there's a Use and a Remove, not two puzzles
         mw.alt_cable_words.setText(
             _("It's installed, but your sounds go into your mic now. Use it if a game skips "
               "your mic, or remove it if nothing else needs it.") if spare else
-            _("If you'd rather not add Onion Board's audio driver to your mic, or a game "
-              "skips it: a free virtual cable you pick as the mic in Discord and games."))
+            _("No mic, or you'd rather Onion Board didn't touch yours? Use a free virtual "
+              "cable instead: you pick it as the mic in Discord and games."))
         mw.rmcable_note.hide()   # (its tooltip says it)
         if route == "mic":
             mw._direct_shown = mw.micctl._direct_health()
