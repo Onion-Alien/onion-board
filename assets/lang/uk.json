@@ -4421,5 +4421,10 @@
   "No thanks, finish": "Ні, дякую, готово",
   "Yes, set up Discord": "Так, налаштувати Discord",
   "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows більше не знає вибраний мікрофон, тому Onion Board став на {mic} (мікрофон Windows за замовчуванням).",
-  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Твої звуки йдуть у мікрофон, але сам мікрофон зараз не передає звук. Гарнітура вимкнена чи без звуку?"
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Твої звуки йдуть у мікрофон, але сам мікрофон зараз не передає звук. Гарнітура вимкнена чи без звуку?",
+  "Earned": "Отримані",
+  "Every rarity": "Будь-яка рідкісність",
+  "Not yet": "Ще ні",
+  "Nothing here yet. Try another filter.": "Тут поки нічого немає. Спробуй інший фільтр.",
+  "Rarity": "Рідкісність"
 }

@@ -259,6 +259,7 @@ class TileGrid(QWidget):
     def __init__(self, tiles: list[Tile]):
         super().__init__()
         self.tiles = tiles
+        self.shown = set(tiles)
         self.grid = QGridLayout(self)
         self.grid.setContentsMargins(0, 0, 0, 0)
         self.grid.setSpacing(self.GAP)
@@ -270,17 +271,26 @@ class TileGrid(QWidget):
         self._place(1)   # (resizeEvent picks how many; a wider start would set the
                          # page's minimum width and keep it from ever getting narrow)
 
-    def _place(self, cols: int):
-        if cols == self.cols:
+    def _place(self, cols: int, force: bool = False):
+        if cols == self.cols and not force:
             return
         for t in self.tiles:
             self.grid.removeWidget(t)
         for c in range(max(cols, self.cols)):
             self.grid.setColumnStretch(c, 1 if c < cols else 0)
         self.cols = cols
-        for i, t in enumerate(self.tiles):
+        shown = [t for t in self.tiles if t in self.shown]
+        for i, t in enumerate(shown):
             self.grid.addWidget(t, i // cols, i % cols)
+        for t in self.tiles:
+            t.setVisible(t in self.shown)
         self.updateGeometry()
+
+    def show_only(self, tiles) -> int:
+        """Show just `tiles` (the filters' picks), closed up; how many there are."""
+        self.shown = set(tiles) & set(self.tiles)
+        self._place(self.cols, force=True)
+        return len(self.shown)
 
     def minimumSizeHint(self):
         return QSize(TILE_W, self.grid.minimumSize().height())
@@ -315,6 +325,8 @@ class AchievementsPage(Page):
         ach.sounds_now(len(self.mw.cfg.sounds))   # (sounds added since the last tick)
         words = texts()
         self.dlg.ach_tiles = []
+        self.dlg.ach_cards = []
+        v.addWidget(self._filters())
         for hidden, title, hint, icon in (
                 (False, _("Achievements"), "", "trophy"),
                 (True, _("Secret achievements"),
@@ -325,11 +337,64 @@ class AchievementsPage(Page):
                 cv.addWidget(self.dlg.ach_count)
             tiles = [Tile(a, *words[a.id]) for a in ach.ALL if a.hidden == hidden]
             self.dlg.ach_tiles += tiles
-            cv.addWidget(TileGrid(tiles))
+            grid = TileGrid(tiles)
+            cv.addWidget(grid)
             v.addWidget(card)
+            self.dlg.ach_cards.append((card, grid))
+        self.dlg.ach_none = hint_label(_("Nothing here yet. Try another filter."))
+        self.dlg.ach_none.hide()
+        v.addWidget(self.dlg.ach_none)
         v.addStretch(1)
         self._count()
         return w
+
+    # the filters: which ones (all, earned, not yet) and which rarity
+    SHOW = ("all", "earned", "todo")
+
+    def _filters(self) -> QWidget:
+        from PySide6.QtWidgets import QButtonGroup, QComboBox, QPushButton
+        from soundboard.ui.kit.panel import Flow
+        from soundboard.ui.kit.wheelguard import no_wheel
+        row = QWidget()
+        flow = Flow(row, gap=8)
+        group = QButtonGroup(row)
+        group.setExclusive(True)
+        self.dlg.ach_show = {}
+        for key, words in zip(self.SHOW, (_("All"), _("Earned"), _("Not yet"))):
+            b = QPushButton(words)
+            b.setObjectName("voicetab")   # (the page-tab chips: checkable, one at a time)
+            b.setCheckable(True)
+            b.setChecked(key == "all")
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            b.clicked.connect(self.apply_filters)
+            group.addButton(b)
+            flow.addWidget(b)
+            self.dlg.ach_show[key] = b
+        rarity = QComboBox()
+        rarity.setAccessibleName(_("Rarity"))
+        rarity.addItem(_("Every rarity"), "")
+        for tier in ach.TIERS:
+            rarity.addItem(tier_name(tier), tier)
+        no_wheel(rarity)
+        rarity.currentIndexChanged.connect(self.apply_filters)
+        flow.addWidget(rarity)
+        self.dlg.ach_rarity = rarity
+        return row
+
+    def apply_filters(self, *_):
+        """Show only what the filters pick; a section with none of it goes, and a
+        line says so when nothing at all is left."""
+        show = next((k for k, b in self.dlg.ach_show.items() if b.isChecked()), "all")
+        tier = self.dlg.ach_rarity.currentData() or ""
+        left = 0
+        for card, grid in self.dlg.ach_cards:
+            picked = [t for t in grid.tiles
+                      if (not tier or t.a.tier == tier)
+                      and (show == "all" or (show == "earned") == bool(ach.got(t.a.id)))]
+            n = grid.show_only(picked)
+            card.setVisible(bool(n))
+            left += n
+        self.dlg.ach_none.setVisible(not left)
 
     def _count(self):
         n, total = ach.earned(), len(ach.ALL)
@@ -344,3 +409,4 @@ class AchievementsPage(Page):
                 t.refresh()
         if isValid(self.dlg.ach_count):
             self._count()
+            self.apply_filters()   # (one may have been earned meanwhile)

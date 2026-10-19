@@ -208,3 +208,26 @@ def test_a_badge_is_drawn_and_locked_ones_are_grey(qapp):
     assert mid.alpha() == 255 and mid.saturation() > 40   # gold, Bun on it
     grey = off.pixelColor(28, 30)
     assert grey.saturation() < 10 and grey.alpha() < 160  # grey and faded
+
+
+def test_the_filters_pick_earned_not_yet_and_a_rarity(window):  # noqa: F811
+    from soundboard.ui.settings.settings import SettingsDialog
+    ach.attach(window.cfg, today="2026-10-19")
+    usage.used("egg-bun-woken")   # Rise and Shine: an Uncommon secret
+    ach.played(hour=12)           # First Blood: Common
+    d = SettingsDialog(window, "achievements")
+    d.show()
+    shown = lambda: {t.a.id for t in d.ach_tiles if t.isVisibleTo(d)}  # noqa: E731
+    assert len(shown()) == len(ach.ALL)
+    d.ach_show["earned"].click()
+    assert shown() == {"first_blood", "rise_and_shine"}
+    d.ach_rarity.setCurrentIndex(d.ach_rarity.findData("uncommon"))
+    assert shown() == {"rise_and_shine"}
+    assert not d.ach_cards[0][0].isVisibleTo(d)   # no earned Uncommon milestone: it goes
+    d.ach_show["todo"].click()
+    assert "rise_and_shine" not in shown() and "spammer" in shown()
+    d.ach_rarity.setCurrentIndex(d.ach_rarity.findData("super"))
+    d.ach_show["earned"].click()
+    assert not shown() and d.ach_none.isVisibleTo(d)   # nothing: the line says so
+    d.close()
+    ach.detach()

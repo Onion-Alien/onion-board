@@ -4263,5 +4263,10 @@
   "No thanks, finish": "Không, cảm ơn, hoàn tất",
   "Yes, set up Discord": "Có, thiết lập Discord",
   "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows không còn nhận ra mic bạn đã chọn, nên Onion Board chuyển sang {mic} (mic mặc định của Windows).",
-  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Âm thanh của bạn đã vào mic, nhưng mic của bạn hiện không tự gửi âm thanh nào. Tai nghe của bạn đang tắt hay bị tắt tiếng?"
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Âm thanh của bạn đã vào mic, nhưng mic của bạn hiện không tự gửi âm thanh nào. Tai nghe của bạn đang tắt hay bị tắt tiếng?",
+  "Earned": "Đã đạt",
+  "Every rarity": "Mọi độ hiếm",
+  "Not yet": "Chưa đạt",
+  "Nothing here yet. Try another filter.": "Chưa có gì ở đây. Thử bộ lọc khác nhé.",
+  "Rarity": "Độ hiếm"
 }

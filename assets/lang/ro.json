@@ -4421,5 +4421,10 @@
   "No thanks, finish": "Nu, mulțumesc, termină",
   "Yes, set up Discord": "Da, configurează Discord",
   "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows nu mai recunoaște microfonul ales, așa că Onion Board a trecut pe {mic} (microfonul implicit din Windows).",
-  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Sunetele tale sunt în microfon, dar microfonul în sine nu trimite niciun sunet acum. Căștile sunt oprite sau pe mut?"
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Sunetele tale sunt în microfon, dar microfonul în sine nu trimite niciun sunet acum. Căștile sunt oprite sau pe mut?",
+  "Earned": "Obținute",
+  "Every rarity": "Orice raritate",
+  "Not yet": "Încă nu",
+  "Nothing here yet. Try another filter.": "Încă nu e nimic aici. Încearcă alt filtru.",
+  "Rarity": "Raritate"
 }

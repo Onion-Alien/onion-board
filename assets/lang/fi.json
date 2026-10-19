@@ -4342,5 +4342,10 @@
   "No thanks, finish": "Ei kiitos, valmis",
   "Yes, set up Discord": "Kyllä, säädä Discord",
   "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows ei enää tunne valitsemaasi mikkiä, joten Onion Board meni sen sijaan mikkiin {mic} (Windowsin oletusmikki).",
-  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Äänesi ovat mikissäsi, mutta mikki itse ei lähetä nyt ääntä. Onko kuulokkeesi pois päältä tai mykistetty?"
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Äänesi ovat mikissäsi, mutta mikki itse ei lähetä nyt ääntä. Onko kuulokkeesi pois päältä tai mykistetty?",
+  "Earned": "Ansaitut",
+  "Every rarity": "Kaikki harvinaisuudet",
+  "Not yet": "Ei vielä",
+  "Nothing here yet. Try another filter.": "Täällä ei ole vielä mitään. Kokeile toista suodatinta.",
+  "Rarity": "Harvinaisuus"
 }

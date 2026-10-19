@@ -4342,5 +4342,10 @@
   "No thanks, finish": "नहीं, धन्यवाद, खत्म करें",
   "Yes, set up Discord": "हाँ, Discord सेट करें",
   "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows अब आपका चुना हुआ माइक नहीं पहचानता, इसलिए Onion Board उसकी जगह {mic} (Windows का डिफ़ॉल्ट माइक) पर लग गया।",
-  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "आपकी आवाज़ें आपके माइक में हैं, लेकिन आपका माइक अभी खुद कोई आवाज़ नहीं भेज रहा। क्या आपका हेडसेट बंद या म्यूट है?"
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "आपकी आवाज़ें आपके माइक में हैं, लेकिन आपका माइक अभी खुद कोई आवाज़ नहीं भेज रहा। क्या आपका हेडसेट बंद या म्यूट है?",
+  "Earned": "हासिल किए",
+  "Every rarity": "हर दुर्लभता",
+  "Not yet": "अभी नहीं",
+  "Nothing here yet. Try another filter.": "अभी यहाँ कुछ नहीं है। कोई और फ़िल्टर आज़माएँ।",
+  "Rarity": "दुर्लभता"
 }

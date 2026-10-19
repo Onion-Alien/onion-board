@@ -4342,5 +4342,10 @@
   "No thanks, finish": "Não, obrigado, terminar",
   "Yes, set up Discord": "Sim, configurar o Discord",
   "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "O Windows já não reconhece o microfone que escolheste, por isso o Onion Board passou para {mic} (o microfone predefinido do Windows).",
-  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Os teus sons estão no microfone, mas o próprio microfone não está a enviar som agora. Os teus auscultadores estão desligados ou em silêncio?"
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "Os teus sons estão no microfone, mas o próprio microfone não está a enviar som agora. Os teus auscultadores estão desligados ou em silêncio?",
+  "Earned": "Conquistadas",
+  "Every rarity": "Todas as raridades",
+  "Not yet": "Ainda não",
+  "Nothing here yet. Try another filter.": "Ainda não há nada aqui. Experimenta outro filtro.",
+  "Rarity": "Raridade"
 }

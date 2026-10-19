@@ -4263,5 +4263,10 @@
   "No thanks, finish": "ไม่เป็นไร เสร็จสิ้น",
   "Yes, set up Discord": "ใช่ ตั้งค่า Discord",
   "Windows doesn't know your picked mic any more, so Onion Board went on {mic} (Windows' default mic) instead.": "Windows ไม่รู้จักไมค์ที่คุณเลือกแล้ว Onion Board จึงไปใช้ {mic} (ไมค์เริ่มต้นของ Windows) แทน",
-  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "เสียงของคุณอยู่ในไมค์แล้ว แต่ตอนนี้ตัวไมค์เองไม่ได้ส่งเสียงออกมา หูฟังของคุณปิดอยู่หรือปิดเสียงไว้หรือเปล่า?"
+  "Your sounds are in your mic, but your mic sends no sound itself right now. Is your headset switched off or muted?": "เสียงของคุณอยู่ในไมค์แล้ว แต่ตอนนี้ตัวไมค์เองไม่ได้ส่งเสียงออกมา หูฟังของคุณปิดอยู่หรือปิดเสียงไว้หรือเปล่า?",
+  "Earned": "ได้แล้ว",
+  "Every rarity": "ทุกความหายาก",
+  "Not yet": "ยังไม่ได้",
+  "Nothing here yet. Try another filter.": "ยังไม่มีอะไรที่นี่ ลองตัวกรองอื่นดู",
+  "Rarity": "ความหายาก"
 }
