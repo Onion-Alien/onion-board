@@ -101,6 +101,7 @@ class LinkBar(QFrame):
         self.board_busy: Callable[[], bool] = lambda: False
         self._via: dict[str, str] = {}   # url -> "link" (pasted) or "search", for usage
         self._dups: set[str] = set()     # urls refused as already in the library
+        self.added_ids: dict[str, str] = {}   # url -> the sound it was added as (this run)
         self._msg.connect(self._on_msg)
         self._shown = False           # the line says something wrong (_say)
         self._off_said = False        # ...and it's net.off_message: redone on a switch
@@ -656,6 +657,7 @@ class LinkBar(QFrame):
         if kind == "added":
             self._added = url
             self._added_id = payload[0].id
+            self.added_ids[url] = payload[0].id
         self._buttons()
         if kind in ("added", "play"):
             self._count(url, "add" if kind == "added" else "play", True)

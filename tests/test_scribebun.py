@@ -327,8 +327,8 @@ def test_download_bar_in_a_narrow_window_drops_what_it_can(qapp):
 
 
 def test_download_bar_folds_for_room(qapp):
-    """The window's fitter folds the list to its running row, then to its summary
-    line (with a thin bar), and opens it again: three states, no squashed steps."""
+    """Short of room the list folds to its running row, then to its summary line (with
+    a thin bar), and opens it again: three states, no squashed steps."""
     from soundboard.ui.window.downloadbar import DownloadBar
     bar = DownloadBar()
     links = [f"https://www.youtube.com/watch?v={c}" for c in "abc"]
@@ -337,17 +337,15 @@ def test_download_bar_folds_for_room(qapp):
     bar.set_progress(links[0], 0.4)
     bar.show()
     qapp.processEvents()
-    rows, line = (step[2] for step in bar.fit_steps())
     assert bar.scroll_area.isVisibleTo(bar) and bar.btn_min.isVisibleTo(bar)
-    rows(True)
+    bar._set_room("row")
     assert bar.cur_row.isVisibleTo(bar) and not bar.scroll_area.isVisibleTo(bar)
-    line(True)
+    bar._set_room("line")
     assert not bar.panel.isVisibleTo(bar) and bar.s_bar.isVisibleTo(bar)
     # the whole list's bar: 1 of 3 picks running, 39% of the way (jobprogress)
     assert bar.s_text.text() == f"{bar.progress_frac / 3 * 100:.0f}%" == "13%"
     assert not bar.btn_min.isVisibleTo(bar)   # it can't open: no button for it
-    line(False)
-    rows(False)
+    bar._set_room("open")
     assert bar.scroll_area.isVisibleTo(bar) and bar.s_bar.isVisibleTo(bar)   # open too
     bar.close()
 

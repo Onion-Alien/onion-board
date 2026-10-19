@@ -1,6 +1,8 @@
-"""The global download progress bar: sits at the top of the main window above all tabs
-(and in the mini player), showing real-time download and preparation progress for
-web links and search cards clicked by the user.
+"""The download card: floats over the bottom-right corner of the page on every tab
+(and sits in the mini player as a bar), showing real-time download and preparation
+progress for web links and search cards clicked by the user. Minimised, it's a pill
+with the summary line; once everything is added it folds to that pill by itself, then
+goes.
 
 Shows:
 - A summary line: "Adding 3 sounds", how many failed (a red pill), Stop all, minimise
@@ -8,7 +10,8 @@ Shows:
   - the one downloading now: its picture (or Bun), title, what it'll do ("Adding to
     sounds"), a smooth bar (a gliding shimmer while it's parsed or converted) and how far
   - the ones waiting ("Waiting to add"; a click makes one next up), each with its ✕
-  - the ones that failed, each with Retry, and the ones added already
+  - the ones that failed, each with Retry, and the ones added already, each with ▶
+    (plays it as its pad would) and Show (the pad, on the Sounds tab)
 """
 from __future__ import annotations
 
@@ -18,7 +21,8 @@ import time
 import urllib.parse
 from collections.abc import Callable
 
-from PySide6.QtCore import QRectF, QSize, Qt, QTimer, QVariantAnimation, Signal
+from PySide6.QtCore import (QEvent, QPoint, QRect, QRectF, QSize, Qt, QTimer, QVariantAnimation,
+                            Signal)
 from PySide6.QtGui import (QColor, QFontMetricsF, QLinearGradient, QPainter,
                            QPainterPath, QPalette, QPen, QPixmap)
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QScrollArea,
@@ -285,6 +289,13 @@ WIDE_AT = 720                 # the banner is this wide or more: the uploader an
 TIGHT_BELOW = 640             # narrower: the rows drop their pictures (as in the mini player)
 BAR_MIN_W = 48                # the progress bar never shrinks past this
 QUEUE_ROWS = 5                # queue rows shown before the list scrolls
+CARD_W = 420                  # the corner card's width (narrower windows: less 32)
+CARD_TIGHT = 320              # a corner card narrower than this drops its pictures
+CARD_MARGIN = 16              # from the page's side, as the toasts (ui/kit/toast.py)
+CARD_GAP = 8                  # from the page's bottom: the player bar under it
+PILL_BAR_W = 64               # the summary's bar in the pill
+FOLD_MS = 4000                # everything added: the card folds to its pill after this
+FOLDED_MS = 6000              # and the pill goes after this (hovering waits)
 
 
 AUDIO_EXTS = (".mp3", ".wav", ".ogg", ".flac", ".m4a", ".aac", ".opus", ".webm", ".mp4")
@@ -368,6 +379,7 @@ def _placeholder(w: int, h: int, radius: int, dpr: float) -> QPixmap:
     return out
 
 
+PILL_R = 20  # the minimised corner card's corners: half its height
 SOFT = 0.5   # the glow's strength when the theme's cards aren't its accent's colour
 
 
@@ -438,6 +450,9 @@ class DownloadBar(QFrame):
     retry_requested = Signal(dict)  # a pick that failed: {url, title, kind, seconds}
     front_requested = Signal(str)   # a waiting pick clicked in the list: it's next up
     up_next_drop = Signal(str)      # ✕ on an Up next row: that Play won't play after all
+    play_sound = Signal(str)        # ▶ on an added row: the pad's sound id
+    show_sound = Signal(str)        # Show on an added row: the pad's sound id
+    placed = Signal()               # the corner card moved or changed size (toasts go above)
 
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
@@ -450,9 +465,12 @@ class DownloadBar(QFrame):
         self._job = jobprogress.JobProgress()
         self._mini = False
         self._tight = False   # _fit_tight: a narrow banner (or the mini player's)
+        self._corner = False  # float_in: a card over its host's bottom-right corner
+        self._host: QWidget | None = None   # float_in: its parent, and the page
+        self._area: QWidget | None = None
+        self._under: tuple[QWidget, ...] = ()   # what it stands on (float_in)
         self._collapsed = False
-        self._room = "open"   # fit_steps: what the window has room for
-        self._room_folds: set[str] = set()
+        self._room = "open"   # place: what the page has room for
         self._shown_rows = 0   # rows under the running one the list is tall for
         self._queue: list[dict] = []
         self._failed: list[dict] = []   # picks that couldn't download, to retry
@@ -472,10 +490,19 @@ class DownloadBar(QFrame):
         self._source = ("browser", "")
         # set by the window: url -> picture (or None), url -> (uploader, seconds)
         self.thumb_lookup: Callable[[str], QPixmap | None] = lambda url: None
+        # url -> the sound id it was added as (None: not a pad, or not any more)
+        self.sound_for: Callable[[str], str | None] = lambda url: None
 
         self._auto_hide = QTimer(self)
         self._auto_hide.setSingleShot(True)
         self._auto_hide.timeout.connect(self._clear_and_hide)
+        self._auto_fold = QTimer(self)   # the corner card: to its pill first (_wind_down)
+        self._auto_fold.setSingleShot(True)
+        self._auto_fold.timeout.connect(self._fold_when_done)
+        self._paused_ms = 0   # the mouse came onto the card while it was winding down
+        self._place_due = QTimer(self)
+        self._place_due.setSingleShot(True)
+        self._place_due.timeout.connect(self.place)
 
         self._build_ui()
         self.outcome = Outcome(self)
@@ -650,6 +677,10 @@ class DownloadBar(QFrame):
         self.btn_retry.clicked.connect(lambda: self._retry(self.url))
         self.btn_retry.hide()
         h.addWidget(self.btn_retry, 0, Qt.AlignmentFlag.AlignVCenter)
+        # added: play it, or go to its pad
+        self.btn_play, self.btn_show = self._sound_buttons(lambda: self.url)
+        h.addWidget(self.btn_play, 0, Qt.AlignmentFlag.AlignVCenter)
+        h.addWidget(self.btn_show, 0, Qt.AlignmentFlag.AlignVCenter)
         self.btn_cancel = self._icon_button("close", _("Cancel download"), 24)
         self.btn_cancel.clicked.connect(self._on_cancel)
         h.addWidget(self.btn_cancel, 0, Qt.AlignmentFlag.AlignVCenter)
@@ -669,6 +700,33 @@ class DownloadBar(QFrame):
         self.scroll_area.hide()
         pv.addWidget(self.scroll_area)
         outer.addWidget(self.panel)
+
+    def _sound_buttons(self, url: Callable[[], str]) -> tuple[QPushButton, QPushButton]:
+        """▶ and Show for an added pick (`url()` says which): hidden until it's a pad."""
+        play = self._icon_button("play", _("Play"), 24)
+        play.setToolTip(_("Play it, as its pad would"))
+        play.clicked.connect(lambda: self._to_sound(url(), self.play_sound))
+        show = QPushButton(_("Show"))
+        show.setObjectName("retrybutton")
+        show.setCursor(Qt.CursorShape.PointingHandCursor)
+        show.setToolTip(_("Show its pad on the Sounds tab"))
+        show.clicked.connect(lambda: self._to_sound(url(), self.show_sound))
+        play.hide()
+        show.hide()
+        return play, show
+
+    def _to_sound(self, url: str, signal):
+        sid = self.sound_for(url)
+        if sid:
+            signal.emit(sid)
+
+    def _sync_sound_buttons(self):
+        """The running row's ▶ and Show: once its pick is added as a pad."""
+        on = (self.stage == "done" and self.kind == "add" and not self._mini
+              and any(a["url"] == self.url for a in self._added)
+              and bool(self.sound_for(self.url)))
+        self.btn_play.setVisible(on)
+        self.btn_show.setVisible(on)
 
     # ------------------------------------------------------------------ looks
 
@@ -715,6 +773,8 @@ class DownloadBar(QFrame):
             f"QFrame#queuerow:hover {{ background:{theme.mix(row_bg, T['text'], 0.06)}; "
             f"border-color:{T['border_hi']}; }}"
             + self._row_gradient_css(row_bg)
+            # minimised in the corner: a pill (its height is the summary line's, 40)
+            + f"QFrame#downloadbar[pill=\"true\"] {{ border-radius:{PILL_R}px; }}"
         )
         self.bar.update()
         self._fold_icon()
@@ -821,14 +881,16 @@ class DownloadBar(QFrame):
             p.setPen(QPen(edge, 1.5))
             p.setBrush(fill)
             # the same rounded corners as the bar's own border
-            p.drawRoundedRect(QRectF(self.rect()).adjusted(0.75, 0.75, -0.75, -0.75), 12, 12)
+            r = PILL_R if self.property("pill") else 12
+            p.drawRoundedRect(QRectF(self.rect()).adjusted(0.75, 0.75, -0.75, -0.75), r, r)
             p.end()
 
     # ------------------------------------------------------------------ the summary line
 
     def set_collapsed(self, on: bool):
-        """Minimised: just the summary line (and a thin bar) so the page below gets the
-        room back; its chevron, or a click anywhere on it, opens it again."""
+        """Minimised: just the summary line (and a thin bar), in the corner a pill, so the
+        page under it shows again; its chevron, or a click anywhere on it, opens it
+        again."""
         self._collapsed = on and not self._mini
         self._apply_fold()
         self.room_changed.emit()
@@ -839,6 +901,12 @@ class DownloadBar(QFrame):
 
     def _apply_fold(self):
         folded = self._folded()
+        pill = self._corner and folded
+        if bool(self.property("pill")) != pill:
+            self.setProperty("pill", pill)
+            self.style().unpolish(self)
+            self.style().polish(self)
+            self.s_bar.setMaximumWidth(PILL_BAR_W if pill else 160)
         self.panel.setVisible(not folded)
         self.scroll_area.setVisible(self.rows.count() > 1 and self._room == "open")
         self._outer.setContentsMargins(8, 6 if folded else 8, 8, 6 if folded else 8)
@@ -851,26 +919,154 @@ class DownloadBar(QFrame):
 
     # How much shows is one of three states, never a squashed step between them: the
     # whole list ("open"), just the running row ("row") or just the summary line
-    # ("line"). The window's fitter picks it (fit_steps): a short window folds the bar
-    # before anything else gives way, and long before it turns into the mini player.
+    # ("line"). In the corner the card picks the most its page has height for (place).
 
-    def fit_steps(self) -> list:
-        """(priority, "h", apply) steps for the window's responsive.Fitter."""
-        return [(20, "h", lambda tight: self._fold_for_room("rows", tight)),
-                (25, "h", lambda tight: self._fold_for_room("line", tight))]
-
-    def _fold_for_room(self, what: str, tight: bool):
-        self._room_folds = ({*self._room_folds, what} if tight
-                            else self._room_folds - {what})
-        room = ("line" if "line" in self._room_folds
-                else "row" if "rows" in self._room_folds else "open")
+    def _set_room(self, room: str):
         if room != self._room:
             self._room = room
             self._apply_fold()
 
     def _fold_icon(self):
         self.btn_min.setAccessibleName(_("Show more") if self._folded() else _("Hide"))
-        icons.set_icon(self.btn_min, "fold_open" if self._folded() else "fold_up", "muted")
+        # the corner card folds down into its pill and opens upwards; the mini
+        # player's bar the other way round
+        opens, folds = ("fold_up", "fold_open") if self._corner else ("fold_open", "fold_up")
+        icons.set_icon(self.btn_min, opens if self._folded() else folds, "muted")
+
+    # ------------------------------------------------------------------ the corner
+
+    def float_in(self, host: QWidget, area: QWidget, under: tuple[QWidget, ...] = ()):
+        """A card over the bottom-right corner of `area` (the page; bottom-left right to
+        left), above it rather than in its layout, so nothing under it moves when it
+        comes and goes. A child of `host`, which holds the page and what's under it:
+        it's hidden with it (the mini player). It stands on the highest of `under` that
+        shows and has something under it (the Now playing row's chips, the player bar),
+        else on the host's bottom; its top never goes past the page's."""
+        self._corner = True
+        self._host = host
+        self._area = area
+        self._under = under
+        self.setParent(host)
+        for w in (host, area, *under):
+            w.installEventFilter(self)
+        self.room_changed.connect(self._place_soon)
+        self._tight = True   # makes _fit_tight apply the card's own rule
+        self._fit_tight()
+        self._fold_icon()
+        self.hide()
+
+    # (LayoutRequest: chips came or went on the Now playing row)
+    _MOVES = (QEvent.Type.Resize, QEvent.Type.Move, QEvent.Type.Show, QEvent.Type.Hide,
+              QEvent.Type.LayoutRequest)
+
+    def eventFilter(self, obj, ev):
+        if (ev.type() in self._MOVES and self._host is not None
+                and (obj is self._host or obj is self._area or obj in self._under)
+                and self.isVisibleTo(self._host)):
+            self._place_soon()
+        return False
+
+    def _in_host(self, w: QWidget) -> QRect:
+        """`w`'s rectangle in the host's coordinates."""
+        host = self._host
+        assert host is not None
+        win = host.window()
+        return QRect(w.mapTo(win, QPoint(0, 0)) - host.mapTo(win, QPoint(0, 0)), w.size())
+
+    def _floor(self, left: int, right: int) -> int:
+        """The host y the card stands on, given its host x span: above the highest of
+        `under` that shows and has something under it. The Now playing row's chips sit
+        on the left: past them the card goes down onto the player."""
+        host = self._host
+        if host is None:
+            return 0
+        floor = host.height()
+        for w in self._under:
+            if not w.isVisibleTo(host) or w.height() <= 0:
+                continue
+            r = self._in_host(w)
+            used = w.childrenRect()   # what's drawn on it (a row's chips), else all of it
+            if not used.isEmpty():
+                x0, x1 = r.x() + used.left(), r.x() + used.right()
+                if x1 < left - CARD_GAP or x0 > right + CARD_GAP:
+                    continue   # nothing under the card
+            floor = min(floor, r.y())
+        return floor
+
+    def _place_soon(self):
+        if self._corner:
+            self._place_due.start(0)
+
+    def card_width(self) -> int:
+        area = self._area
+        return max(200, min(CARD_W, area.width() - 2 * CARD_MARGIN)) if area else CARD_W
+
+    def _card_x(self, w: int) -> int:
+        page = self._in_host(self._area) if self._area is not None else QRect()
+        return (page.left() + CARD_MARGIN if self.isRightToLeft()
+                else page.right() + 1 - w - CARD_MARGIN)
+
+    def place(self):
+        """Its size and spot in the corner: the whole list if the page has the height,
+        else the running row, else the summary line; minimised, a pill as wide as the
+        summary line needs."""
+        host, area = self._host, self._area
+        if host is None or area is None or not self._corner:
+            return
+        w = self.card_width()
+        x = self._card_x(w)
+        floor = self._floor(x, x + w)
+        room_h = floor - self._in_host(area).top() - 2 * CARD_GAP
+        lay = self._outer
+        h = 0
+        for room in ("open", "row", "line"):
+            self._set_room(room)
+            lay.activate()
+            h = self.heightForWidth(w) if self.hasHeightForWidth() else self.sizeHint().height()
+            if h <= room_h:
+                break
+        if self._collapsed:   # the pill: as wide as its line, never wider than the card
+            w = min(w, self.summary.sizeHint().width() + 20)
+        h = max(0, min(h, room_h))
+        x = self._card_x(w)
+        self.setGeometry(x, floor - h - CARD_GAP, w, h)
+        self.raise_()
+        self.placed.emit()
+
+    def enterEvent(self, ev):
+        """The mouse on the card holds it as it is: no folding or going while it's read."""
+        super().enterEvent(ev)
+        for t in (self._auto_fold, self._auto_hide):
+            if t.isActive():
+                self._paused_ms = max(self._paused_ms, t.remainingTime(), 2500)
+                t.stop()
+
+    def leaveEvent(self, ev):
+        super().leaveEvent(ev)
+        if self._paused_ms:
+            ms, self._paused_ms = self._paused_ms, 0
+            self._wind_down(ms)
+
+    def _wind_down(self, ms: int):
+        """Everything's over: the bar goes after `ms`; the corner card first folds to its
+        pill (FOLDED_MS later it goes), so it's seen how it ended without covering the
+        page."""
+        if self._corner and self.underMouse():
+            self._paused_ms = ms
+            return
+        if self._corner and not self._collapsed:
+            self._auto_fold.start(ms)
+        else:
+            self._auto_hide.start(FOLDED_MS if self._corner else ms)
+
+    def _stop_wind_down(self):
+        self._auto_fold.stop()
+        self._auto_hide.stop()
+        self._paused_ms = 0
+
+    def _fold_when_done(self):
+        self.set_collapsed(True)
+        self._auto_hide.start(FOLDED_MS)
 
     def _running(self) -> bool:
         return bool(self.url) and self.stage != "done"
@@ -923,7 +1119,8 @@ class DownloadBar(QFrame):
         self.btn_stop_all.setVisible(bool(self._queue) or (running and batch))
         self.btn_close.setVisible(over)
         # folded for room, it can't open: no button that does nothing
-        self.btn_min.setVisible(not over and not self._mini
+        # (the corner card keeps it to the end: its pill opens again to see what came)
+        self.btn_min.setVisible((not over or self._corner) and not self._mini
                                 and (self._collapsed or self._room == "open"))
         # also between two picks (the one that ended shows its tick, the next waits): the
         # bar staying up there is what makes the hand-over look like one job
@@ -942,11 +1139,15 @@ class DownloadBar(QFrame):
 
     def showEvent(self, ev):
         super().showEvent(ev)
+        if self._corner:
+            self.place()
         self.shown_changed.emit(True)
 
     def hideEvent(self, ev):
         super().hideEvent(ev)
         self.shown_changed.emit(False)
+        if self._corner:
+            self.placed.emit()
 
     def resizeEvent(self, ev):
         super().resizeEvent(ev)
@@ -958,7 +1159,7 @@ class DownloadBar(QFrame):
         """In a narrow window (and the mini player) the rows drop their pictures, and the
         running row its picture (or Bun) and "Adding to sounds" (the summary line says
         what the list is doing)."""
-        tight = self._mini or self.width() < TIGHT_BELOW
+        tight = self._mini or self.width() < (CARD_TIGHT if self._corner else TIGHT_BELOW)
         if tight == self._tight:
             return
         self._tight = tight
@@ -1004,7 +1205,7 @@ class DownloadBar(QFrame):
         self.show()
 
     def _show_card(self, url, title, kind, thumb_pm, channel, seconds):
-        self._auto_hide.stop()
+        self._stop_wind_down()
         self.outcome.stop()
         self._raw = (title, seconds)
         self.url = url
@@ -1028,6 +1229,7 @@ class DownloadBar(QFrame):
         self.pill.set_kind(kind)
         self._show_pill()
         self.bar.show()
+        self._sync_sound_buttons()
         theme.set_tone(self.lbl_status, "")
         self._update_thumb()
 
@@ -1040,7 +1242,7 @@ class DownloadBar(QFrame):
             # says "Processing audio…" under the tick and never goes. Only set_active
             # starts it again.
             return
-        self._auto_hide.stop()
+        self._stop_wind_down()
         # every step on one bar that only goes forward (jobprogress): it used to fill
         # for the download, then again (a gliding block) while converting
         self.progress_frac = self._job.update(payload)
@@ -1086,8 +1288,9 @@ class DownloadBar(QFrame):
 
     def _apply_art(self):
         """Bun at his scroll, then the sound's picture (the placeholder if it has none):
-        both always, except in a narrow banner."""
-        self.thumb.setVisible(not self._tight)
+        both always, except in a narrow banner. The corner card has room for Bun only
+        (the rows' pictures line up under him)."""
+        self.thumb.setVisible(not self._tight and not self._corner)
         self._scribe_box.setVisible(not self._tight)
 
     # ------------------------------------------------------------------ the rest of the list
@@ -1148,7 +1351,8 @@ class DownloadBar(QFrame):
         rl.setContentsMargins(8, 6, 6, 6)
         rl.setSpacing(12)
         if not self._tight:   # centred under the running row's picture, titles in line
-            rl.addSpacing(THUMB_W)   # under Bun's column
+            if not self._corner:
+                rl.addSpacing(THUMB_W)   # under Bun's column (the card's: under Bun)
             pic = QLabel()
             pic.setFixedSize(THUMB_W, ROW_THUMB[1])
             pic.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -1187,6 +1391,12 @@ class DownloadBar(QFrame):
             again.setCursor(Qt.CursorShape.PointingHandCursor)
             again.clicked.connect(lambda _c=False, u=q["url"]: self._retry(u))
             rl.addWidget(again, 0, Qt.AlignmentFlag.AlignVCenter)
+        if how == "added" and not self._mini and self.sound_for(q["url"]):
+            play, show = self._sound_buttons(lambda u=q["url"]: u)
+            play.show()
+            show.show()
+            rl.addWidget(play, 0, Qt.AlignmentFlag.AlignVCenter)
+            rl.addWidget(show, 0, Qt.AlignmentFlag.AlignVCenter)
         if how != "added":
             x = self._icon_button("close", _("Remove"), 24)
             x.clicked.connect(lambda _c=False, u=q["url"], h=how:
@@ -1222,9 +1432,9 @@ class DownloadBar(QFrame):
         if self.kind == "play" and self.stage == "done" and self.url not in self._failed_urls():
             self._say_play()
         if self._up_next:
-            self._auto_hide.stop()
+            self._stop_wind_down()
         elif self.stage == "done" and not self._others_failed() and (was or self.url):
-            self._auto_hide.start(4000)   # (its Play starting says so: set_playing)
+            self._wind_down(FOLD_MS)   # (its Play starting says so: set_playing)
         self._fill_rows()
         self._sync_head()
 
@@ -1235,7 +1445,7 @@ class DownloadBar(QFrame):
         self._say_play()
         self._sync_head()
         if not self._up_next and not self._others_failed():
-            self._auto_hide.start(7000)
+            self._wind_down(7000)
 
     def _retry(self, url: str):
         """Retry: the failed pick is picked again (it starts, or waits its turn)."""
@@ -1253,7 +1463,7 @@ class DownloadBar(QFrame):
         if url == self.url and self.stage == "done":   # the running row's own ✕ / Retry
             self.btn_retry.hide()
             if not self._failed and not self._queue:
-                self._auto_hide.start(4000)
+                self._wind_down(FOLD_MS)
 
     # ------------------------------------------------------------------ how it ends
 
@@ -1304,11 +1514,12 @@ class DownloadBar(QFrame):
                 self._added = [a for a in self._added if a["url"] != url] + [{
                     "url": url, "title": self._raw[0], "kind": kind, "seconds": self._raw[1]}]
             if not self._others_failed() and not self._up_next:   # those stay up
-                self._auto_hide.start(7000 if kind == "play" else 4000)
+                self._wind_down(7000 if kind == "play" else FOLD_MS)
         else:
             self._failed = [f for f in self._failed if f["url"] != url] + [{
                 "url": url, "title": self._raw[0], "kind": kind, "seconds": self._raw[1]}]
             self._show_failed_state()
+        self._sync_sound_buttons()
         self._fill_rows()
         self._sync_head()
 
@@ -1369,7 +1580,7 @@ class DownloadBar(QFrame):
         self._clear_and_hide()
 
     def _clear_and_hide(self):
-        self._auto_hide.stop()
+        self._stop_wind_down()
         self._hold.stop()
         self._held = None
         self.outcome.stop()
@@ -1384,6 +1595,7 @@ class DownloadBar(QFrame):
         self._pm = None
         self._meta = ""
         self.btn_retry.hide()
+        self._sync_sound_buttons()
         self._fill_rows()
         self.set_collapsed(False)   # the next download opens full size again
         self.hide()
