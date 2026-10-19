@@ -2102,7 +2102,6 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "Tor nadal się łączy ({percent}%). Bez tego nic nie zostało wysłane: spróbuj ponownie za chwilę.",
   "Tor isn't connected, so there's no identity to change.": "Tor nie jest podłączony, więc nie ma możliwości zmiany tożsamości.",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tora nie ma jeszcze na tym komputerze: naciśnij Pobierz Tor (Ustawienia > Połączenie), aby go pobrać.",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tora nie ma jeszcze na tym komputerze: naciśnij Pobierz Tor (Ustawienia > Połączenie), aby go pobrać. Ze źródła działa również scripts/fetch_tor.py.",
   "Tor isn't running.": "Tor nie działa.",
   "Tor starts the next time the app goes online.": "Tor uruchomi się przy następnym przejściu aplikacji do trybu online.",
   "Track": "Ścieżka",
@@ -4202,5 +4201,6 @@
   "Lite mode": "Tryb lekki",
   "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Onion Board może działać lżej na tym komputerze: Tryb lekki wyłącza animacje. Znajdziesz go też w Ustawienia > Wygląd.",
   "Use less CPU": "Mniej obciążaj CPU",
-  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "Dla wolniejszych komputerów: zmieniacz głosu i głos na żywo zużywają mniej CPU. Usuwanie syku jest wyłączone, głosy robota i echa są trochę prostsze, a głos na żywo używa mniejszego modelu mowy, jeśli jest pobrany. Włącza się samo w trybie lekkim."
+  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "Dla wolniejszych komputerów: zmieniacz głosu i głos na żywo zużywają mniej CPU. Usuwanie syku jest wyłączone, głosy robota i echa są trochę prostsze, a głos na żywo używa mniejszego modelu mowy, jeśli jest pobrany. Włącza się samo w trybie lekkim.",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tora nie ma jeszcze na tym komputerze: naciśnij Pobierz Tor (Ustawienia > Połączenie), aby go pobrać. Ze źródła działa również scripts/buildtools/fetch_tor.py."
 }

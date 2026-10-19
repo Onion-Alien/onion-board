@@ -1,6 +1,7 @@
 """Pack the optional AI voices add-on for its GitHub release (soundboard/addons/aiaddon.py).
 
-    python scripts/make_ai_voices_zip.py --model <folder from export_model.py> [--out dist]
+    python scripts/buildtools/make_ai_voices_zip.py
+        --model <folder from export_model.py> [--out dist]
 
 AiVoices-module.zip holds one ai-voices/ folder: the add-on's code from
 modules/ai-voices (no .venv, caches or dev tools' output) plus the voice model in
@@ -14,7 +15,7 @@ import hashlib
 import zipfile
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "modules" / "ai-voices"
 MODEL_FILES = ("stream.onnx", "speaker.onnx", "voices.npz")
 SKIP_DIRS = {".venv", "__pycache__", "model"}

@@ -542,7 +542,7 @@ class PrivacyPage(Page):
             try:
                 version = (where / torget.STAMP).read_text("ascii").split()[0]
             except (OSError, IndexError):
-                version = ""   # (from source: scripts/fetch_tor.py's copy may not say)
+                version = ""   # (from source: scripts/buildtools/fetch_tor.py's copy may not say)
             found["tor"] = (version, where == torget.bin_dir() and not torget.installed())
         return found
 

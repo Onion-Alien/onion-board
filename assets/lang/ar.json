@@ -2240,7 +2240,6 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "لا يزال تور متصلاً ({percent}%). لم يتم إرسال أي شيء بدونه: حاول مرة أخرى بعد قليل.",
   "Tor isn't connected, so there's no identity to change.": "Tor غير متصل، لذلك ليس هناك هوية لتغييرها.",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tor ليس موجودًا على هذا الكمبيوتر بعد: اضغط على Get Tor (الإعدادات > الاتصال) لتنزيله.",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tor ليس موجودًا على هذا الكمبيوتر بعد: اضغط على Get Tor (الإعدادات > الاتصال) لتنزيله. من المصدر، تعمل scripts/fetch_tor.py أيضًا.",
   "Tor isn't running.": "تور لا يعمل.",
   "Tor starts the next time the app goes online.": "يبدأ Tor في المرة التالية التي يتصل فيها التطبيق بالإنترنت.",
   "Track": "مسار",
@@ -4439,5 +4438,6 @@
   "Lite mode": "الوضع الخفيف",
   "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "يمكن لـ Onion Board أن يعمل بخفة أكبر على هذا الجهاز: الوضع الخفيف يوقف الحركات. تجده أيضًا في الإعدادات > مظهر.",
   "Use less CPU": "استخدام معالج أقل",
-  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "لأجهزة الكمبيوتر الأبطأ: يستخدم مغيّر الصوت والصوت المباشر معالجًا أقل. إزالة الهسهسة متوقفة، وأصوات الروبوت والصدى أبسط قليلًا، ويستخدم الصوت المباشر نموذج الكلام الأصغر إن كان مُنزّلًا. يعمل تلقائيًا في الوضع الخفيف."
+  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "لأجهزة الكمبيوتر الأبطأ: يستخدم مغيّر الصوت والصوت المباشر معالجًا أقل. إزالة الهسهسة متوقفة، وأصوات الروبوت والصدى أبسط قليلًا، ويستخدم الصوت المباشر نموذج الكلام الأصغر إن كان مُنزّلًا. يعمل تلقائيًا في الوضع الخفيف.",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor ليس موجودًا على هذا الكمبيوتر بعد: اضغط على Get Tor (الإعدادات > الاتصال) لتنزيله. من المصدر، تعمل scripts/buildtools/fetch_tor.py أيضًا."
 }

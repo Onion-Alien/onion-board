@@ -2102,7 +2102,6 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "Tor încă se conectează ({percent}%). Nu s-a trimis nimic fără el: încercați din nou peste un moment.",
   "Tor isn't connected, so there's no identity to change.": "Tor nu este conectat, deci nu trebuie schimbată identitatea.",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tor nu este încă pe acest computer: apăsați pe Obține Tor (Setări > Conexiune) pentru a-l descărca.",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tor nu este încă pe acest computer: apăsați pe Obține Tor (Setări > Conexiune) pentru a-l descărca. Din sursă, funcționează și scripts/fetch_tor.py.",
   "Tor isn't running.": "Tor nu rulează.",
   "Tor starts the next time the app goes online.": "Tor pornește data viitoare când aplicația este online.",
   "Track": "Urmări",
@@ -4202,5 +4201,6 @@
   "Lite mode": "Mod ușor",
   "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Onion Board poate merge mai ușor pe acest PC: Modul ușor oprește animațiile. Îl găsești și în Setări > Aspect.",
   "Use less CPU": "Folosește mai puțin CPU",
-  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "Pentru PC-uri mai lente: schimbătorul de voce și vocea live folosesc mai puțin CPU. Îndepărtarea șuieratului e oprită, vocile de robot și ecourile sunt puțin mai simple, iar vocea live folosește modelul de vorbire mai mic dacă e descărcat. Pornește singur în modul ușor."
+  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "Pentru PC-uri mai lente: schimbătorul de voce și vocea live folosesc mai puțin CPU. Îndepărtarea șuieratului e oprită, vocile de robot și ecourile sunt puțin mai simple, iar vocea live folosește modelul de vorbire mai mic dacă e descărcat. Pornește singur în modul ușor.",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor nu este încă pe acest computer: apăsați pe Obține Tor (Setări > Conexiune) pentru a-l descărca. Din sursă, funcționează și scripts/buildtools/fetch_tor.py."
 }

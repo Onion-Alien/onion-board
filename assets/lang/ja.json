@@ -2010,7 +2010,6 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "Tor はまだ接続中です ({percent}%)。これがなければ何も送信されませんでした。しばらくしてからもう一度試してください。",
   "Tor isn't connected, so there's no identity to change.": "Tor は接続されていないため、変更する ID はありません。",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tor はまだこの PC にありません: Get Tor ([設定] > [接続]) を押してダウンロードします。",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tor はまだこの PC にありません: Get Tor ([設定] > [接続]) を押してダウンロードします。ソースからは、script/fetch_tor.py も機能します。",
   "Tor isn't running.": "Tor が実行されていません。",
   "Tor starts the next time the app goes online.": "次回アプリがオンラインになったときに Tor が開始されます。",
   "Track": "追跡",
@@ -4044,5 +4043,6 @@
   "Lite mode": "軽量モード",
   "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "このPCではOnion Boardをもっと軽く動かせます: 軽量モードでアニメーションをオフにできます。設定 > 外観 にもあります。",
   "Use less CPU": "CPU使用率を下げる",
-  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "遅めのPC向け：ボイスチェンジャーとライブ音声のCPU使用量が減ります。ヒスノイズの除去はオフになり、ロボット声とエコーが少しシンプルになり、ライブ音声はダウンロード済みなら小さい音声モデルを使います。軽量モードでは自動でオンになります。"
+  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "遅めのPC向け：ボイスチェンジャーとライブ音声のCPU使用量が減ります。ヒスノイズの除去はオフになり、ロボット声とエコーが少しシンプルになり、ライブ音声はダウンロード済みなら小さい音声モデルを使います。軽量モードでは自動でオンになります。",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor はまだこの PC にありません: Get Tor ([設定] > [接続]) を押してダウンロードします。ソースからは、script/fetch_tor.py も機能します。"
 }

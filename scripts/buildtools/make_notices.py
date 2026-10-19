@@ -6,7 +6,7 @@ travel with the binaries. This walks the runtime dependencies installed in the
 current environment and copies every licence file each one ships, then adds the
 texts PySide6 doesn't include itself.
 
-    python scripts/make_notices.py [output path]
+    python scripts/buildtools/make_notices.py [output path]
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 ROOTS = ["PySide6", "numpy", "scipy", "sounddevice", "soundfile", "soxr",
          "yt-dlp", "yt-dlp-ejs", "curl_cffi"]
 LICENSE_FILE = re.compile(r"(?i)^(licen[cs]e|copying|notice|authors)|licen[cs]e")

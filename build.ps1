@@ -28,17 +28,17 @@ if (-not (Test-Path $py)) { throw "No .venv - run scripts\install.bat first." }
 
 # PyInstaller's stock bootloader is in thousands of programs, some of them malware, so
 # virus scanners flag what's built with it (the mic helper got two VirusTotal hits):
-# compile one here first (scripts\build_bootloader.ps1, MinGW-w64's gcc), once per .venv.
-& $py -c "import sys; sys.path.insert(0, 'scripts'); import build_michelper; sys.exit(bool(build_michelper.stock_bootloader()))"
+# compile one here first (scripts\buildtools\build_bootloader.ps1, MinGW-w64's gcc), once per .venv.
+& $py -c "import sys; sys.path.insert(0, 'scripts/buildtools'); import build_michelper; sys.exit(bool(build_michelper.stock_bootloader()))"
 if ($LASTEXITCODE -ne 0) {
     Write-Host "PyInstaller's stock bootloader: compiling one here first" -ForegroundColor Yellow
-    & powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_bootloader.ps1 -Python $py
+    & powershell -NoProfile -ExecutionPolicy Bypass -File scripts\buildtools\build_bootloader.ps1 -Python $py
     if ($LASTEXITCODE -ne 0) {
         # Not fatal: fall back to the stock bootloader so a build without MinGW-w64's gcc
         # still works. Such a build may draw antivirus false positives; a release build
         # should install gcc (winget install BrechtSanders.WinLibs.POSIX.UCRT) so this
         # step produces a clean bootloader.
-        Write-Warning "scripts\build_bootloader.ps1 failed (is MinGW-w64's gcc installed?): building with PyInstaller's stock bootloader, which may draw antivirus false positives."
+        Write-Warning "scripts\buildtools\build_bootloader.ps1 failed (is MinGW-w64's gcc installed?): building with PyInstaller's stock bootloader, which may draw antivirus false positives."
     } else {
         $Clean = $true
     }
@@ -47,7 +47,7 @@ $cleanArg = @()
 if ($Clean) { $cleanArg = @("--clean") }
 # The .exe's version info: Windows names the app by it (the firewall prompt, Task
 # Manager, Properties), so it says "Onion Board" and the real version.
-& $py scripts\version_info.py
+& $py scripts\buildtools\version_info.py
 if ($LASTEXITCODE -ne 0) { throw "version_info.py failed" }
 # Of scipy only scipy.fft and scipy.ndimage ship (with the linalg and special they
 # import): the app doesn't use scipy, but Onion Watch (the Triggers tab add-on) does
@@ -64,12 +64,12 @@ if ($LASTEXITCODE -ne 0) { throw "version_info.py failed" }
 if ($LASTEXITCODE -ne 0) { throw "build_directmic.py failed (is MinGW-w64's g++ installed?)" }
 # Its mic helper (soundboard\mic\michelper.py): the admin part alone, frozen with the effect
 # DLL, so after the first admin prompt the app sets the effect up without asking.
-& $py scripts\build_michelper.py @cleanArg
+& $py scripts\buildtools\build_michelper.py @cleanArg
 if ($LASTEXITCODE -ne 0) { throw "build_michelper.py failed" }
 # YouTube's player challenge needs a JavaScript engine and most PCs have none: QuickJS,
 # fetched from its pinned release and SHA-256-checked (the repo has no binaries),
 # bundled as qjs\ with its licence (soundboard\online\jsengine.py).
-& $py scripts\fetch_qjs.py build\qjs
+& $py scripts\buildtools\fetch_qjs.py build\qjs
 if ($LASTEXITCODE -ne 0) { throw "fetch_qjs.py failed" }
 # PyInstaller looks for the DLLs it bundles on PATH too, so a folder there with another
 # program's copy (an AI tool's ICU, an older C++ runtime) ends up in the app and Qt
@@ -111,16 +111,16 @@ if ($LASTEXITCODE -ne 0) { throw "PyInstaller failed" }
 # the newer one PySide6 ships, and if Windows loads the older one Qt can't start ("DLL
 # load failed while importing QtWidgets: The specified procedure could not be found").
 # It also deletes any bundled ICU DLL (same error): Qt uses Windows' own.
-& $py scripts\vc_runtime.py dist\OnionBoard
+& $py scripts\buildtools\vc_runtime.py dist\OnionBoard
 if ($LASTEXITCODE -ne 0) { throw "vc_runtime.py failed" }
 # ...which can swap a runtime DLL in the bundled mic helper too: list its files again,
 # as shipped (soundboard\mic\michelper.py install_helper refuses a build that doesn't match)
-& $py -c "import sys; from pathlib import Path; sys.path.insert(0, '.'); from soundboard import michelper; michelper.write_manifest(Path(r'dist\OnionBoard\_internal\michelper'))"
+& $py -c "import sys; from pathlib import Path; sys.path.insert(0, '.'); from soundboard.mic import michelper; michelper.write_manifest(Path(r'dist\OnionBoard\_internal\michelper'))"
 if ($LASTEXITCODE -ne 0) { throw "listing the mic helper's files failed" }
 
 # PyInstaller ships all of Qt (QML, 3D, Charts, dev tools, 186 translations...).
 # Drop what the app never loads, then prove the trimmed app still starts.
-& $py scripts\prune_build.py dist\OnionBoard
+& $py scripts\buildtools\prune_build.py dist\OnionBoard
 if ($LASTEXITCODE -ne 0) { throw "prune_build.py failed" }
 & "dist\OnionBoard\OnionBoard.exe" --selftest | Out-Host
 if ($LASTEXITCODE -ne 0) { throw "the built app failed its self-test (see above)" }
@@ -134,16 +134,16 @@ if ($env:ONIONBOARD_ONION_WATCH_ZIP) {
 # Add-ons ship with the app (source only; a module's own .venv is made on the user's PC
 # by its Install button). modules.py looks for them in the folder next to the exe.
 # AI voices don't: they're an optional download (soundboard\addons\aiaddon.py,
-# scripts\make_ai_voices_zip.py).
+# scripts\buildtools\make_ai_voices_zip.py).
 foreach ($m in Get-ChildItem modules -Directory | Where-Object Name -ne "ai-voices") {
     robocopy $m.FullName "dist\OnionBoard\modules\$($m.Name)" /E /XD .venv .python __pycache__ /XF *.pyc /NFL /NDL /NJH /NJS /NP | Out-Null
     if ($LASTEXITCODE -ge 8) { throw "copying module $($m.Name) failed" }
 }
 $global:LASTEXITCODE = 0
 
-# Licences travel with the binaries (Qt is LGPL; see scripts\make_notices.py)
+# Licences travel with the binaries (Qt is LGPL; see scripts\buildtools\make_notices.py)
 Copy-Item LICENSE "dist\OnionBoard\LICENSE.txt"
-& $py scripts\make_notices.py "dist\OnionBoard\THIRD-PARTY-NOTICES.txt"
+& $py scripts\buildtools\make_notices.py "dist\OnionBoard\THIRD-PARTY-NOTICES.txt"
 if ($LASTEXITCODE -ne 0) { throw "make_notices.py failed" }
 
 function Publish-Build {
@@ -186,7 +186,7 @@ if (-not $iscc) {
 # Files with the same bytes as another (the mic helper's own Python, mostly) go into the
 # installer once; every copy still installs where it was. Written now, so the list
 # always matches dist\ (installer\OnionBoard.iss includes it).
-& $py scripts\installer_dupes.py dist\OnionBoard build\installer
+& $py scripts\buildtools\installer_dupes.py dist\OnionBoard build\installer
 if ($LASTEXITCODE -ne 0) { throw "installer_dupes.py failed" }
 $version = & $py -c "import soundboard; print(soundboard.__version__)"
 & $iscc /Q "/DAppVersion=$version" installer\OnionBoard.iss

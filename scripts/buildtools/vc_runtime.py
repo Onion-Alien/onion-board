@@ -21,7 +21,7 @@ PC's PATH holding another program's ICU (a newer one, with other function names)
 bundled in its place, and the app fails at start with the same "DLL load failed while
 importing QtWidgets" error.
 
-Usage: python scripts/vc_runtime.py dist/OnionBoard [--dry-run]
+Usage: python scripts/buildtools/vc_runtime.py dist/OnionBoard [--dry-run]
 """
 from __future__ import annotations
 

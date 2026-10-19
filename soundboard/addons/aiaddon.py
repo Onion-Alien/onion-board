@@ -9,7 +9,7 @@ SHA-256 GitHub lists for it (updates.fetch). It holds the add-on's code and the 
 model; modules.install then makes its own Python environment (onnxruntime).
 
 ONIONBOARD_AI_VOICES_ZIP=<path to an AiVoices-module.zip> uses that file instead of
-GitHub, to try a build before it's released (scripts/make_ai_voices_zip.py makes one).
+GitHub, to try a build before it's released (scripts/buildtools/make_ai_voices_zip.py makes one).
 
 "Get and update add-ons" switched off in Settings > Privacy & security stops it
 (net.FeatureOff).

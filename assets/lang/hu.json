@@ -2056,7 +2056,6 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "A Tor még mindig csatlakozik ({percent}%). Anélkül semmit sem küldtek el: próbálja újra egy pillanat múlva.",
   "Tor isn't connected, so there's no identity to change.": "A Tor nem csatlakozik, így nincs megváltoztatható személyazonosság.",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "A Tor még nincs ezen a számítógépen: a letöltéshez nyomja meg a Get Tor (Beállítások > Kapcsolat) gombot.",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "A Tor még nincs ezen a számítógépen: a letöltéshez nyomja meg a Get Tor (Beállítások > Kapcsolat) gombot. A forrásból a scripts/fetch_tor.py is működik.",
   "Tor isn't running.": "A Tor nem fut.",
   "Tor starts the next time the app goes online.": "A Tor akkor indul el, amikor az alkalmazás legközelebb online lesz.",
   "Track": "Pálya",
@@ -4123,5 +4122,6 @@
   "Lite mode": "Könnyített mód",
   "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Az Onion Board könnyebben is futhat ezen a gépen: a Könnyített mód kikapcsolja az animációkat. A Beállítások > Megjelenés alatt is megtalálod.",
   "Use less CPU": "Kevesebb CPU használata",
-  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "Lassabb gépekre: a hangváltó és az élő hang kevesebb CPU-t használ. A sziszegés eltávolítása ki van kapcsolva, a robothangok és a visszhangok kicsit egyszerűbbek, az élő hang pedig a kisebb beszédmodellt használja, ha le van töltve. Könnyített módban magától bekapcsol."
+  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "Lassabb gépekre: a hangváltó és az élő hang kevesebb CPU-t használ. A sziszegés eltávolítása ki van kapcsolva, a robothangok és a visszhangok kicsit egyszerűbbek, az élő hang pedig a kisebb beszédmodellt használja, ha le van töltve. Könnyített módban magától bekapcsol.",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "A Tor még nincs ezen a számítógépen: a letöltéshez nyomja meg a Get Tor (Beállítások > Kapcsolat) gombot. A forrásból a scripts/buildtools/fetch_tor.py is működik."
 }

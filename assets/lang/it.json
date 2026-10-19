@@ -2056,7 +2056,6 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "Tor è ancora connesso ({percent}%). Senza di esso non è stato inviato nulla: riprova tra un attimo.",
   "Tor isn't connected, so there's no identity to change.": "Tor non è connesso, quindi non c'è identità da cambiare.",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tor non è ancora su questo PC: premi Ottieni Tor (Impostazioni > Connessione) per scaricarlo.",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tor non è ancora su questo PC: premi Ottieni Tor (Impostazioni > Connessione) per scaricarlo. Dal sorgente funziona anche scripts/fetch_tor.py.",
   "Tor isn't running.": "Tor non è in esecuzione.",
   "Tor starts the next time the app goes online.": "Tor si avvia la prossima volta che l'app va online.",
   "Track": "Traccia",
@@ -4123,5 +4122,6 @@
   "Lite mode": "Modalità leggera",
   "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Onion Board può girare più leggero su questo PC: la modalità leggera spegne le animazioni. La trovi anche in Impostazioni > Aspetto.",
   "Use less CPU": "Usa meno CPU",
-  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "Per PC più lenti: il modificatore di voce e la voce dal vivo usano meno CPU. La rimozione del sibilo è spenta, le voci robot e gli echi sono un po' più semplici e la voce dal vivo usa il modello vocale più piccolo se è scaricato. Si attiva da solo in modalità leggera."
+  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "Per PC più lenti: il modificatore di voce e la voce dal vivo usano meno CPU. La rimozione del sibilo è spenta, le voci robot e gli echi sono un po' più semplici e la voce dal vivo usa il modello vocale più piccolo se è scaricato. Si attiva da solo in modalità leggera.",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor non è ancora su questo PC: premi Ottieni Tor (Impostazioni > Connessione) per scaricarlo. Dal sorgente funziona anche scripts/buildtools/fetch_tor.py."
 }

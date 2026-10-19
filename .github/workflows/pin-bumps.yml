@@ -22,7 +22,7 @@ on:
       - soundboard/online/torget.py      # a hand-edited pin gets checked too
       - soundboard/online/ffmpegget.py
       - soundboard/online/pyget.py
-      - scripts/fetch_qjs.py
+      - scripts/buildtools/fetch_qjs.py
       - pins/yt-dlp.json
 
 permissions:

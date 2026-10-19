@@ -1,10 +1,10 @@
-"""scripts/prune_build.py: what's cut from the PyInstaller output, on a fake tree
+"""scripts/buildtools/prune_build.py: what's cut from the PyInstaller output, on a fake tree
 with a fake import table (no pefile, no real DLLs)."""
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT / "scripts"))
+sys.path.insert(0, str(ROOT / "scripts" / "buildtools"))
 import prune_build as pb  # noqa: E402
 
 # who imports whom, by file name (lower-case), standing in for the PE import table

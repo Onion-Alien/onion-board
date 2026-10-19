@@ -4,7 +4,7 @@ no numpy), with its own copy of the effect DLL and stamp.txt saying which. build
 runs it after scripts/directmic/build_directmic.py and bundles the folder with the app as
 michelper\\; from source, soundboard.mic.michelper finds it here.
 
-Usage: python scripts/build_michelper.py [--clean]
+Usage: python scripts/buildtools/build_michelper.py [--clean]
 """
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 DLL = ROOT / "build" / "directmic" / "obmic.dll"
 OUT = ROOT / "build" / "michelper"
 WORK = ROOT / "build" / "michelper-work"
@@ -76,7 +76,7 @@ def bootloader_hashes(folder: Path) -> str:
 
 def stock_bootloader(folder: Path | None = None) -> str:
     """PyInstaller's version when its bootloader wasn't compiled here
-    (scripts/build_bootloader.ps1), else ''."""
+    (scripts/buildtools/build_bootloader.ps1), else ''."""
     import PyInstaller
     folder = folder or Path(PyInstaller.__file__).parent / "bootloader" / "Windows-64bit-intel"
     try:
@@ -91,7 +91,7 @@ def version_file() -> Path:
     """The .exe's version resource: Windows (and security tools) see what it is."""
     sys.path.insert(0, str(ROOT))
     import soundboard
-    from scripts import version_info
+    from scripts.buildtools import version_info
     text = version_info.render(soundboard.__version__)
     text = text.replace("StringStruct('FileDescription', 'Onion Board')",
                         "StringStruct('FileDescription', 'Onion Board mic helper')")
@@ -114,8 +114,9 @@ def build(clean: bool = False) -> int:
         # we get here, so release builds are clean; only direct/no-compiler builds fall
         # back to the stock one, with this warning.
         print(f"warning: PyInstaller {stock} has its stock bootloader, which some virus"
-              " scanners flag as a false positive. Run scripts/build_bootloader.ps1 for a"
-              " clean build (needs MinGW-w64's gcc).", file=sys.stderr)
+              " scanners flag as a false positive. Run"
+              " scripts/buildtools/build_bootloader.ps1 for a clean build (needs"
+              " MinGW-w64's gcc).", file=sys.stderr)
     sys.path.insert(0, str(ROOT))
     from soundboard.mic import michelper
     # --console, not --windowed: a windowed build still drew a couple of antivirus false

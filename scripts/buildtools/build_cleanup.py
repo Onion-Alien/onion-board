@@ -3,7 +3,7 @@ file people download from the `cleanup-tool` release to take everything of Onion
 off their PC. Like the mic helper it carries only the admin part of the mic effect (no
 Qt, no numpy, no effect DLL: it only ever removes it).
 
-Usage: python scripts/build_cleanup.py [--clean]
+Usage: python scripts/buildtools/build_cleanup.py [--clean]
 Then: gh release upload cleanup-tool dist/OnionBoardCleanup.exe --clobber
 """
 from __future__ import annotations
@@ -13,18 +13,18 @@ import subprocess
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "dist"
 WORK = ROOT / "build" / "cleanup-work"
 NAME = "OnionBoardCleanup"
-sys.path.insert(0, str(ROOT / "scripts"))
+sys.path.insert(0, str(ROOT / "scripts" / "buildtools"))
 from build_michelper import EXCLUDE, stock_bootloader  # noqa: E402
 
 
 def version_file() -> Path:
     sys.path.insert(0, str(ROOT))
     import soundboard
-    from scripts import version_info
+    from scripts.buildtools import version_info
     text = version_info.render(soundboard.__version__)
     text = text.replace("StringStruct('FileDescription', 'Onion Board')",
                         "StringStruct('FileDescription', 'Onion Board cleanup')")
@@ -40,7 +40,7 @@ def version_file() -> Path:
 def build(clean: bool = False) -> int:
     if stock := stock_bootloader():
         print(f"warning: PyInstaller {stock} has its stock bootloader, which some virus"
-              " scanners flag. Run scripts/build_bootloader.ps1 first.", file=sys.stderr)
+              " scanners flag. Run scripts/buildtools/build_bootloader.ps1 first.", file=sys.stderr)
     cmd = [sys.executable, "-m", "PyInstaller", "--noconfirm", "--onefile", "--console",
            "--name", NAME, "--distpath", str(OUT), "--workpath", str(WORK),
            "--specpath", str(WORK), "--version-file", str(version_file()),

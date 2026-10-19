@@ -1,5 +1,5 @@
 """Language names in the app's language ("Japanisch" in German), for the "Speak in"
-list. The names come from Unicode CLDR via scripts/make_langnames.py, so adding a
+list. The names come from Unicode CLDR via scripts/buildtools/make_langnames.py, so adding a
 language never needs a translator: add its translate-xx add-on and rerun the script."""
 from __future__ import annotations
 

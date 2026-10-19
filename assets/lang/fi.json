@@ -2056,7 +2056,6 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "Tor muodostaa edelleen yhteyttä ({percent}%). Mitään ei lähetetty ilman sitä: yritä hetken kuluttua uudelleen.",
   "Tor isn't connected, so there's no identity to change.": "Tor ei ole yhteydessä, joten identiteettiä ei voi muuttaa.",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tor ei ole vielä tällä tietokoneella: lataa se painamalla Get Tor (Asetukset > Yhteys).",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tor ei ole vielä tällä tietokoneella: lataa se painamalla Get Tor (Asetukset > Yhteys). Myös scripts/fetch_tor.py toimii lähteestä.",
   "Tor isn't running.": "Tor ei ole käynnissä.",
   "Tor starts the next time the app goes online.": "Tor käynnistyy seuraavan kerran, kun sovellus tulee verkkoon.",
   "Track": "Seurata",
@@ -4123,5 +4122,6 @@
   "Lite mode": "Kevyt tila",
   "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Onion Board voi toimia kevyemmin tällä koneella: Kevyt tila sammuttaa animaatiot. Se löytyy myös kohdasta Asetukset > Ulkoasu.",
   "Use less CPU": "Käytä vähemmän suoritinta",
-  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "Hitaammille koneille: äänenmuunnin ja live-ääni käyttävät vähemmän suoritinta. Suhinan poisto on pois päältä, robottiäänet ja kaiut ovat hieman yksinkertaisempia, ja live-ääni käyttää pienempää puhemallia, jos se on ladattu. Päälle itsestään kevyessä tilassa."
+  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "Hitaammille koneille: äänenmuunnin ja live-ääni käyttävät vähemmän suoritinta. Suhinan poisto on pois päältä, robottiäänet ja kaiut ovat hieman yksinkertaisempia, ja live-ääni käyttää pienempää puhemallia, jos se on ladattu. Päälle itsestään kevyessä tilassa.",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor ei ole vielä tällä tietokoneella: lataa se painamalla Get Tor (Asetukset > Yhteys). Myös scripts/buildtools/fetch_tor.py toimii lähteestä."
 }

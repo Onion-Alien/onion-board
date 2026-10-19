@@ -102,7 +102,7 @@ def results_dir() -> Path:
 
 def bundled_helper() -> Path:
     """The helper build this app carries: in the frozen app, or what
-    scripts/build_michelper.py built when run from source."""
+    scripts/buildtools/build_michelper.py built when run from source."""
     if getattr(sys, "frozen", False):
         return Path(getattr(sys, "_MEIPASS", Path(sys.executable).parent)) / "michelper"
     return Path(__file__).resolve().parents[2] / "build" / "michelper" / "obmichelper"
@@ -834,7 +834,7 @@ def _sha256(path: Path) -> str:
 
 
 def write_manifest(folder: Path):
-    """scripts/build_michelper.py: every file of the build in `folder` with its sha256,
+    """scripts/buildtools/build_michelper.py: every file of the build in `folder` with its sha256,
     so a changed, added or missing file is noticed before it runs as SYSTEM."""
     files = {k: v for k, v in _build_files(folder).items() if k != MANIFEST}
     (folder / MANIFEST).write_text(
@@ -953,8 +953,9 @@ def remove_helper():
 
 
 def main(argv: list[str]) -> int:
-    """obmichelper.exe: `--serve` (the task), or `--selftest` (scripts/build_michelper.py:
-    the build loads the admin part and carries its effect DLL; 0 if so)."""
+    """obmichelper.exe: `--serve` (the task), or `--selftest`
+    (scripts/buildtools/build_michelper.py: the build loads the admin part and carries its
+    effect DLL; 0 if so)."""
     if argv == ["--selftest"]:
         from soundboard.mic import directmic
         return 0 if directmic.bundled_dll().is_file() and is_helper() else 3

@@ -2102,7 +2102,6 @@
   "Tor is still connecting ({percent}%). Nothing was sent without it: try again in a moment.": "Tor усе ще підключається ({percent}%). Без нього нічого не було надіслано: спробуйте ще раз за мить.",
   "Tor isn't connected, so there's no identity to change.": "Tor не підключено, тому не потрібно змінювати ідентифікатор.",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it.": "Tor ще немає на цьому комп’ютері: натисніть Отримати Tor (Налаштування > З’єднання), щоб завантажити його.",
-  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/fetch_tor.py also works.": "Tor ще немає на цьому комп’ютері: натисніть Отримати Tor (Налаштування > З’єднання), щоб завантажити його. З джерела також працює scripts/fetch_tor.py.",
   "Tor isn't running.": "Tor не працює.",
   "Tor starts the next time the app goes online.": "Tor запускається наступного разу, коли програма підключається до мережі.",
   "Track": "Трек",
@@ -4202,5 +4201,6 @@
   "Lite mode": "Полегшений режим",
   "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Onion Board може працювати легше на цьому ПК: полегшений режим вимикає анімації. Він є і в Налаштування > Зовнішній вигляд.",
   "Use less CPU": "Менше навантажувати процесор",
-  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "Для слабших ПК: зміна голосу та живий голос менше навантажують процесор. Видалення шипіння вимкнене, голоси роботів і луна трохи простіші, а живий голос використовує меншу модель мовлення, якщо її завантажено. Вмикається саме в полегшеному режимі."
+  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "Для слабших ПК: зміна голосу та живий голос менше навантажують процесор. Видалення шипіння вимкнене, голоси роботів і луна трохи простіші, а живий голос використовує меншу модель мовлення, якщо її завантажено. Вмикається саме в полегшеному режимі.",
+  "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor ще немає на цьому комп’ютері: натисніть Отримати Tor (Налаштування > З’єднання), щоб завантажити його. З джерела також працює scripts/buildtools/fetch_tor.py."
 }

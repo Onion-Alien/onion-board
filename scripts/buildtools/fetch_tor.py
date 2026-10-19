@@ -4,7 +4,7 @@ The app itself doesn't ship Tor: it downloads it on request (soundboard/online/t
 which holds the pinned version and SHA-256 this uses, and says how to move to a
 newer Tor).
 
-    python scripts/fetch_tor.py [--force]
+    python scripts/buildtools/fetch_tor.py [--force]
 """
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ import argparse
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 from soundboard.online import torget  # noqa: E402
