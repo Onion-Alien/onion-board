@@ -24,6 +24,11 @@ app: voice chain <- jitter buffer <- 24 kHz  <───  b"B" frames, 20 ms each
   numpy.
 - The helper uses no CPU while you're quiet: the app sends nothing, so it sleeps.
 - About 75 ms behind you: 20 ms chunks, ~32 ms of model look-ahead, a 20 ms buffer.
+- With the app's *Use less CPU* (on in lite mode) the helper gets
+  `ONIONBOARD_LESS_CPU=1` and uses `model/stream4.onnx`: the same weights exported to
+  take 40 ms a call. The model's cost is mostly per call, so it uses about a third
+  less CPU, and you're ~40 ms further behind. A download without that file carries
+  on at 20 ms.
 - If the helper stops, the app covers you with a built-in voice preset (or your
   own voice / silence: *More options*).
 - `helper.py --self-test` prints this PC's real-time factor; above 0.5 the Voice tab
@@ -63,6 +68,7 @@ Needs torch + torchaudio and a [beatrice-trainer] checkout (with its LFS weights
 ```
 set BEATRICE_TRAINER=path\to\beatrice-trainer
 python tools\export_model.py --out path\to\model          # stream.onnx, speaker.onnx, voices.npz
+python tools\export_model.py --out path\to\model --frames 4   # stream4.onnx (Use less CPU)
 python ..\..\scripts\buildtools\make_ai_voices_zip.py --model path\to\model
 ```
 

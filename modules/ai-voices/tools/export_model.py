@@ -1,10 +1,12 @@
 """Export the AI voices model for the add-on (dev tool: needs torch + a trainer checkout).
 
     set BEATRICE_TRAINER=path\\to\\beatrice-trainer
-    python export_model.py [--checkpoint my_voices.pt.gz] [--out model]
+    python export_model.py [--checkpoint my_voices.pt.gz] [--out model] [--frames 4]
 
 Writes into --out:
-    stream.onnx   the streaming converter (fp32, ~38 MB)
+    stream.onnx   the streaming converter (fp32, ~38 MB), 2 frames (20 ms) a call;
+                  with --frames 4, stream4.onnx instead: the lighter model (40 ms a
+                  call, the same weights) the helper uses with Use less CPU
     speaker.onnx  speaker embedding -> the vocoder's attention keys/values
     voices.npz    only the speakers voices.json uses, plus the formant table
 and model.zip of all three, printing its size and SHA-256 for voices.json's "model".
@@ -32,6 +34,8 @@ def main():
     ap.add_argument("--checkpoint", type=Path)
     ap.add_argument("--out", type=Path, default=HERE / "model")
     ap.add_argument("--voices", type=Path, default=HERE.parent / "voices.json")
+    ap.add_argument("--frames", type=int, default=2, choices=(2, 4),
+                    help="10 ms frames per call: 2 (stream.onnx) or 4 (stream4.onnx)")
     a = ap.parse_args()
     a.out.mkdir(parents=True, exist_ok=True)
     net, pe, pi = load(a.checkpoint)
@@ -40,7 +44,7 @@ def main():
     pi.merge_weights()
     stream_model.MERGED = True
     sn, spkn = StreamNet(net).eval(), SpeakerNet(net).eval()
-    T = 2
+    T = a.frames
     states = sn.state_names()
     with torch.inference_mode():
         kv = spkn(net.key_value_speaker_embedding.weight[0].view(384, 128))
@@ -48,7 +52,7 @@ def main():
             torch.zeros(T, W_ATTN + T), torch.zeros(256), kv, net.vq.codebooks[0].float(),
             torch.tensor(0.0), *sn.zero_states())
     with torch.no_grad():
-        torch.onnx.export(sn, args, str(a.out / "stream.onnx"),
+        torch.onnx.export(sn, args, str(a.out / ("stream.onnx" if T == 2 else f"stream{T}.onnx")),
                           input_names=["wav", "pfeat", "mask", "spk", "spk_kv", "codebook",
                                        "shift"] + states,
                           output_names=["ir_amp", "ir_phase", "aper", "post", "hz", "uv"]

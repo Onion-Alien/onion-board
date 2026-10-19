@@ -250,6 +250,48 @@ def test_settings_are_cleaned():
     assert aivoice.clean_settings({"pitch": float("nan")})["pitch"] == 0.0
 
 
+def test_the_jitter_buffer_follows_the_helpers_chunk():
+    """The lighter model sends 40 ms at a time, each a little late now and then (its
+    compute time). With the buffer sized for 20 ms chunks that ran dry ~80 times in 12 s
+    and skipped ahead ~40 times; sized to the chunk, it plays through."""
+    assert aivoice.buffer_limits(aivoice.CHUNK_S) == (
+        aivoice.JITTER_S, aivoice.MAX_BUFFER_S, aivoice.TRIM_TO_S)
+    src, _fed, _q = make_source(backup="mute")
+    src.chunk_s = 0.04
+    drops = []
+    real_drop = src._drop
+    src._drop = lambda k: drops.append(k) or real_drop(k)
+    tone = (0.3 * np.sin(np.arange(960) * 0.05)).astype(np.float32)
+    pcm = np.rint(tone * 32767).astype("<i2").tobytes()
+    rng = np.random.default_rng(0)
+    # chunk k is ready after its 40 ms are in, plus 0-30 ms of compute
+    arrive = sorted(4 * k + 4 + int(rng.integers(0, 4)) for k in range(300))
+    src.process(np.zeros(BLOCK, np.float32), RATE)       # learns the rate
+    j = 0
+    for b in range(1200):
+        while j < len(arrive) and arrive[j] <= b:
+            src.push(pcm)
+            j += 1
+        src.process(noise(0.01, 0.2, seed=b), RATE)
+    assert src.underruns <= 3 and not drops
+    assert src.latency() == pytest.approx(aivoice.LATENCY_S + 0.04)
+
+
+def test_the_helpers_chunk_comes_from_its_ready_and_an_older_one_means_20_ms():
+    ctl = AiVoiceController(VoiceChain(), lambda ev: seen.append(ev))
+    seen = []
+    host = ctl.host = object()
+    for ready, want in (({}, 0.02), ({"chunk_s": 0.04}, 0.04), ({"chunk_s": "x"}, 0.02),
+                        ({"chunk_s": float("nan")}, 0.02), ({"chunk_s": 9}, 0.1)):
+        ctl.source, _f, _q = make_source()
+        ctl._event({"type": "ready", **ready}, host)
+        assert ctl.source.chunk_s == want
+    ctl.source.chunk_s = 0.04
+    ctl._event({"type": "stats", "cpu": 20}, host)
+    assert seen[-1]["latency_s"] == pytest.approx(aivoice.LATENCY_S + 0.04)
+    ctl.host = None
+
+
 # ---------------------------------------------------------------- helper round trip
 
 def fake_module() -> modules.ModuleInfo:
@@ -258,11 +300,17 @@ def fake_module() -> modules.ModuleInfo:
                               command=[sys.executable, str(ADDON / "helper.py"), "--fake"])
 
 
-def test_your_voice_goes_to_the_helper_and_comes_back_converted(app_dir):
+@pytest.mark.parametrize("light", [False, True])
+def test_your_voice_goes_to_the_helper_and_comes_back_converted(app_dir, light):
+    """Use less CPU: the helper is told (ONIONBOARD_LESS_CPU) and converts 40 ms a call."""
     chain = VoiceChain()
     events = []
     ctl = AiVoiceController(chain, events.append)
-    ctl.start(fake_module(), "nova")
+    voicefx.set_light(light)
+    try:
+        ctl.start(fake_module(), "nova")
+    finally:
+        voicefx.set_light(False)
     try:
         assert chain.source is ctl.source
         end = time.monotonic() + 15
@@ -271,6 +319,7 @@ def test_your_voice_goes_to_the_helper_and_comes_back_converted(app_dir):
             time.sleep(0.01)
         assert ctl.source.ready
         assert any(e.get("type") == "ready" and e.get("rate") == 24000 for e in events)
+        assert ctl.source.chunk_s == (0.04 if light else 0.02)
         x = noise(2.0, 0.2, seed=5)
         out = []
         for i in range(0, len(x), BLOCK):
