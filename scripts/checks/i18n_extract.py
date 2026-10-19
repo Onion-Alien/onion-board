@@ -1,11 +1,11 @@
 """Find every text wrapped for translation (`_("…")`, `ngettext("…", "…", n)`) in
 soundboard/ and compare it with the language catalogs in assets/lang/.
 
-    python scripts/i18n_extract.py            report, per language: missing / unused
-    python scripts/i18n_extract.py --update   add missing texts to every catalog (empty,
+    python scripts/checks/i18n_extract.py            report, per language: missing / unused
+    python scripts/checks/i18n_extract.py --update   add missing texts to every catalog (empty,
                                               so English shows until translated) and
                                               drop unused ones
-    python scripts/i18n_extract.py --check    exit 1 if anything is missing, unused,
+    python scripts/checks/i18n_extract.py --check    exit 1 if anything is missing, unused,
                                               or `_` is shadowed (for CI)
 
 It also reports functions that both call `_()` and assign `_` (`path, _ = …`): there
@@ -20,7 +20,7 @@ import json
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "soundboard"
 LANG = ROOT / "assets" / "lang"
 SKIP = {"en", "xx"}   # English is the source; xx is generated

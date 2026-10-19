@@ -6,7 +6,7 @@ Catalogs are JSON files, one per language, in `assets/lang/<code>.json` (shipped
 `lang/` beside the app): English text → translation. A text with a number in it
 (`ngettext`) maps to a list of forms, in the order the language's plural rule
 (PLURALS) numbers them. `_meta` holds the language's own name. See
-docs/TRANSLATING.md; `scripts/i18n_extract.py` lists what's missing or unused.
+docs/TRANSLATING.md; `scripts/checks/i18n_extract.py` lists what's missing or unused.
 
 `{name}` placeholders are filled from keyword arguments after the lookup, so a
 translation can move them around: `_("Added “{name}”", name=m.name)`.

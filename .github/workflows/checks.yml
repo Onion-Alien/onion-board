@@ -69,8 +69,8 @@ jobs:
           AFTER: ${{ github.event.after }}
         run: |
           if [ "$EVENT" = pull_request ]; then
-            sh scripts/check_utc.sh "$PR_HEAD" --not origin/main
-          elif ! sh scripts/check_utc.sh "$BEFORE..$AFTER"; then
+            sh scripts/checks/check_utc.sh "$PR_HEAD" --not origin/main
+          elif ! sh scripts/checks/check_utc.sh "$BEFORE..$AFTER"; then
             echo "::warning::A merge on main isn't in UTC: merge with scripts/merge_pr.sh, not gh pr merge or the button"
           fi
       # The CLI rather than gitleaks-action: the action scans `<first commit>^..`,
@@ -149,7 +149,7 @@ jobs:
           # the type check: a change to any Python, or to what pyright reads
           py=true
           if [ "$changed" != ALL ] && ! grep -qE \
-              '(\.pyi?$|^pyproject\.toml$|^requirements|^scripts/pyright_baseline\.json$|^\.github/workflows/checks\.yml$)' <<< "$changed"; then
+              '(\.pyi?$|^pyproject\.toml$|^requirements|^scripts/checks/pyright_baseline\.json$|^\.github/workflows/checks\.yml$)' <<< "$changed"; then
             py=false
           fi
           echo "py=$py" >> "$GITHUB_OUTPUT"
@@ -162,9 +162,9 @@ jobs:
           ruff check .
       # every text the app shows is in every catalog, none left over (CLAUDE.md)
       - name: Translations complete
-        run: python scripts/i18n_extract.py --check
+        run: python scripts/checks/i18n_extract.py --check
       - name: CODE.md lists every module
-        run: python scripts/check_code_doc.py
+        run: python scripts/checks/check_code_doc.py
       # the Store tab's server (server/store): Node's own test runner, SQLite as its D1
       - uses: actions/setup-node@v7
         with:
@@ -172,7 +172,7 @@ jobs:
       - name: Store server tests
         run: node --test "server/store/test/*.test.mjs"
 
-  # pyright over the whole repo: errors not in scripts/pyright_baseline.json fail
+  # pyright over the whole repo: errors not in scripts/checks/pyright_baseline.json fail
   # (it's empty now, so any type error does). On Windows: Linux's PySide6 has no
   # Windows-only APIs (QImage.fromHICON), so pyright there flags code that's fine.
   # Same venv cache as the Windows test jobs. Only when Python changed (pick job).
@@ -196,7 +196,7 @@ jobs:
         run: |
           python -m venv .venv
           .venv\Scripts\python -m pip install -r requirements.txt -r requirements-dev.txt
-      - run: .venv\Scripts\python scripts/check_types.py --all
+      - run: .venv\Scripts\python scripts/checks/check_types.py --all
 
   # The Windows tests, as the pick job split them: a long run (main, or a PR that needs
   # most of the suite) in up to six jobs side by side (pick_tests.py, SHARDS).
@@ -425,7 +425,7 @@ jobs:
             echo "ruff or the test pick failed: see the pick job"; exit 1
           fi
           if [ "$TYPES" != success ] && [ "$TYPES" != skipped ]; then
-            echo "new type errors: see the types job (scripts/check_types.py)"; exit 1
+            echo "new type errors: see the types job (scripts/checks/check_types.py)"; exit 1
           fi
           if [ "$MIC" != success ] && [ "$MIC" != skipped ]; then
             echo "the mic effect's checks failed: see the mic-effect job"; exit 1

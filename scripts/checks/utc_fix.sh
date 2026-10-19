@@ -3,7 +3,7 @@
 # moments, same trees, merges kept as they are; only the +HHMM offsets become +0000.
 # The branch's commits get new IDs, so push it with --force-with-lease afterwards.
 # Never on main (its history is never rewritten).
-#   sh scripts/utc_fix.sh [base]      base defaults to origin/main
+#   sh scripts/checks/utc_fix.sh [base]      base defaults to origin/main
 set -e
 branch=$(git symbolic-ref --short HEAD)
 [ "$branch" != main ] || { echo "Not on main: its history is never rewritten." >&2; exit 1; }

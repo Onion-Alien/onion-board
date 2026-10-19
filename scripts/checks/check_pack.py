@@ -1,6 +1,6 @@
 """Check a shared sound pack and print its packs/catalog.json entry.
 
-    python scripts/check_pack.py horror.zip --id horror-night --name "Horror night"
+    python scripts/checks/check_pack.py horror.zip --id horror-night --name "Horror night"
         --tag pack-horror-night [--about "..."] [--author "..."] [--emoji 👻]
         [--preview "Door creak" --preview Scream ...]
 
@@ -26,7 +26,7 @@ import sys
 import zipfile
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from soundboard.core import backup, updates  # noqa: E402
 from soundboard.sounds import library, packs  # noqa: E402
