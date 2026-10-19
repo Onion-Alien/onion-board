@@ -984,7 +984,8 @@ class SetupWizard(QDialog):
         v.addWidget(_section(_("Headphones or speakers")))
         v.addSpacing(6)
         outs = [d["name"] for d in eng.list_devices("output") if not eng.is_virtual(d["name"])]
-        cur = self.win.cfg.mon_device if self.win.cfg.mon_device in outs else             (outs[0] if outs else None)
+        cur = self.win.cfg.mon_device if self.win.cfg.mon_device in outs else \
+            (outs[0] if outs else None)
         if cur and cur != self.win.cfg.mon_device:   # the saved one is missing
             self._pick_headphones(cur)
         lst, __ = self._choice_list(outs, cur,

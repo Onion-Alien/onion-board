@@ -1033,8 +1033,9 @@ def test_tiles_are_as_tall_as_their_names_need(mic_wizard, qapp):
 
 
 def test_test_sound_card_and_a_lone_option_span_the_page(mic_wizard, monkeypatch, qapp):
-    """The test sound's button lines up with the tiles above it, and with the device list open the cable's tile fills the optional card's
-    row instead of sitting at half width beside a hole."""
+    """The test sound's button lines up with the tiles above it, and with the device
+    list open the cable's tile fills the optional card's row instead of sitting at half
+    width beside a hole."""
     from soundboard.mic import directmic
     _, wiz = mic_wizard
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
