@@ -4215,5 +4215,6 @@
   "Couldn't apply the effects to the playing sound": "Die Effekte konnten nicht auf den laufenden Sound angewendet werden",
   "Reset effects": "Effekte zurücksetzen",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Schaltet alle Effekte aus (der Zuschnitt bleibt). Ein laufender Sound klingt sofort wieder normal.",
-  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Der laufende Sound hat deine Änderungen. Abbrechen macht sie rückgängig."
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Der laufende Sound hat deine Änderungen. Abbrechen macht sie rückgängig.",
+  "Most liked": "Am beliebtesten"
 }

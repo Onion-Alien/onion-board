@@ -4531,5 +4531,6 @@
   "Couldn't apply the effects to the playing sound": "تعذّر تطبيق التأثيرات على الصوت المُشغَّل",
   "Reset effects": "إعادة ضبط التأثيرات",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "أوقف كل التأثيرات (يبقى القصّ). يعود الصوت المُشغَّل عاديًا فورًا.",
-  "✓ The playing sound has your changes. Cancel puts it back.": "✓ الصوت المُشغَّل فيه تغييراتك الآن. «إلغاء» يعيده كما كان."
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ الصوت المُشغَّل فيه تغييراتك الآن. «إلغاء» يعيده كما كان.",
+  "Most liked": "الأكثر إعجابًا"
 }

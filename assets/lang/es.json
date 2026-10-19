@@ -4215,5 +4215,6 @@
   "Couldn't apply the effects to the playing sound": "No se han podido aplicar los efectos al sonido que suena",
   "Reset effects": "Restablecer efectos",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Quita todos los efectos (el recorte se queda). El sonido que suena vuelve a normal al instante.",
-  "✓ The playing sound has your changes. Cancel puts it back.": "✓ El sonido que suena ya tiene tus cambios. Cancelar lo deja como estaba."
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ El sonido que suena ya tiene tus cambios. Cancelar lo deja como estaba.",
+  "Most liked": "Los más gustados"
 }

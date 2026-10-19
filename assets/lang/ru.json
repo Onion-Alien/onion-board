@@ -4294,5 +4294,6 @@
   "Couldn't apply the effects to the playing sound": "Не удалось применить эффекты к играющему звуку",
   "Reset effects": "Сбросить эффекты",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Выключает все эффекты (обрезка останется). Играющий звук сразу становится обычным.",
-  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Играющий звук теперь с вашими изменениями. «Отмена» вернёт как было."
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Играющий звук теперь с вашими изменениями. «Отмена» вернёт как было.",
+  "Most liked": "Самые любимые"
 }

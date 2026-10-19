@@ -4294,5 +4294,6 @@
   "Couldn't apply the effects to the playing sound": "Efekty se nepodařilo použít na hrající zvuk",
   "Reset effects": "Resetovat efekty",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Vypne všechny efekty (ořez zůstane). Hrající zvuk je hned zase čistý.",
-  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Hrající zvuk má tvoje změny. Zrušit ho vrátí zpět."
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Hrající zvuk má tvoje změny. Zrušit ho vrátí zpět.",
+  "Most liked": "Nejoblíbenější"
 }

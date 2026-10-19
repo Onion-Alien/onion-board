@@ -4136,5 +4136,6 @@
   "Couldn't apply the effects to the playing sound": "ใช้เอฟเฟกต์กับเสียงที่กำลังเล่นไม่ได้",
   "Reset effects": "รีเซ็ตเอฟเฟกต์",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "ปิดเอฟเฟกต์ทั้งหมด (ส่วนที่ตัดยังอยู่) เสียงที่กำลังเล่นจะกลับเป็นเสียงปกติทันที",
-  "✓ The playing sound has your changes. Cancel puts it back.": "✓ เสียงที่กำลังเล่นใช้การเปลี่ยนแปลงของคุณแล้ว กดยกเลิกเพื่อย้อนกลับ"
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ เสียงที่กำลังเล่นใช้การเปลี่ยนแปลงของคุณแล้ว กดยกเลิกเพื่อย้อนกลับ",
+  "Most liked": "ถูกใจมากที่สุด"
 }
