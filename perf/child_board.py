@@ -301,6 +301,67 @@ class Counts:
         self.by_class.clear()
 
 
+class UiSampler:
+    """The UI thread's Python stack, sampled every 2 ms from a thread of its own:
+    which calls the UI thread spends its time under (Qt's own painting and layout
+    show up under the Python call that started them, or as the event loop)."""
+
+    EVERY_S = 0.002
+
+    def __init__(self):
+        from collections import Counter
+        self.leaf: Counter[str] = Counter()     # the innermost app function
+        self.under: Counter[str] = Counter()    # every app function on the stack
+        self.n = 0
+        self._ui = threading.main_thread().ident
+        self._pkg = str(Path(__file__).resolve().parent.parent / "soundboard")
+        self._stop = threading.Event()
+        self._t = threading.Thread(target=self._run, name="perf-sampler", daemon=True)
+        self._t.start()
+
+    @staticmethod
+    def _where(f) -> str:
+        c = f.f_code
+        return f"{Path(c.co_filename).name}:{c.co_firstlineno}({c.co_name})"
+
+    def _run(self):
+        tick = getattr(getattr(__import__("ctypes"), "windll", None), "winmm", None)
+        if tick is not None:   # Windows' timer: 15.6 ms steps without it
+            tick.timeBeginPeriod(1)
+        try:
+            self._sample()
+        finally:
+            if tick is not None:
+                tick.timeEndPeriod(1)
+
+    def _sample(self):
+        while not self._stop.wait(self.EVERY_S):
+            f = sys._current_frames().get(self._ui)
+            if f is None:
+                continue
+            self.n += 1
+            seen, leaf = set(), None
+            while f is not None:
+                if f.f_code.co_filename.startswith(self._pkg):
+                    w = self._where(f)
+                    leaf = leaf or w
+                    seen.add(w)
+                f = f.f_back
+            self.leaf[leaf or "(event loop / Qt / perf)"] += 1
+            for w in seen:
+                self.under[w] += 1
+
+    def stop(self) -> str:
+        self._stop.set()
+        self._t.join(1.0)
+        n = max(1, self.n)
+        out = [f"{self.n} samples, every {self.EVERY_S * 1000:.0f} ms", "", "innermost app call:"]
+        out += [f"  {c * 100 / n:5.1f}%  {k}" for k, c in self.leaf.most_common(30)]
+        out += ["", "anywhere on the stack:"]
+        out += [f"  {c * 100 / n:5.1f}%  {k}" for k, c in self.under.most_common(40)]
+        return "\n".join(out) + "\n"
+
+
 class Child:
     def __init__(self, conf: dict, state: dict):
         self.conf = conf
@@ -399,6 +460,11 @@ class Child:
             import cProfile
             prof = cProfile.Profile()
             prof.enable()
+        # --env PERF_SAMPLE=idle_front: the UI thread's stack every 2 ms (cProfile
+        # can't keep to one thread), what it was doing to logs/samples-<name>.txt
+        sampler = None
+        if name in os.environ.get("PERF_SAMPLE", "").split(","):
+            sampler = UiSampler()
         try:
             extra = fn()
         except Exception as e:  # noqa: BLE001 - one broken scenario mustn't end the run
@@ -409,6 +475,10 @@ class Child:
         if prof is not None:
             prof.disable()
             self._write_profile(name, prof)
+        if sampler is not None:
+            logs = Path(self.conf["profile"]).parent.parent / "logs"
+            logs.mkdir(parents=True, exist_ok=True)
+            (logs / f"samples-{name}.txt").write_text(sampler.stop(), encoding="utf-8")
         link.mark("end", name=name)
         self.stats(name, wall, extra)
 
@@ -507,6 +577,20 @@ class Child:
         self.foreground(False)
         self.run_for(self.secs)
         self.foreground(True)
+
+    def sc_settle(self):
+        """The start-up's work in the background through (the kept Settings' pages
+        built one at a time), then a second more."""
+        ctl = self.w.setctl
+        self.foreground(True)
+        self.run_until(lambda: ctl._settings_kept is not None
+                       and not getattr(ctl, "_preload_pages", [None]), 30.0, 0.25)
+        self.run_for(1.0)
+
+    def sc_idle_settled(self):
+        self.w.tabs.setCurrentIndex(0)
+        self.foreground(True)
+        self.run_for(self.secs)
 
     def sc_minimised(self):
         self.w.showMinimized()
