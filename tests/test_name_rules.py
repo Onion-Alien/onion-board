@@ -1,7 +1,6 @@
 """Typed names (categories, subcategories, sounds) follow one set of rules and say so
 when a name can't be used as typed; a restored backup brings back a removed pad that
-shared its audio with one still here; the other-soundboard question says where the
-sounds go."""
+shared its audio with one still here."""
 import pytest
 
 from soundboard.core import backup
