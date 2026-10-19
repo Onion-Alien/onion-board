@@ -1,1 +1,1 @@
-- Bun makes you work for his Pong game now: once he is cross, it takes five more pokes (at your own pace) before he fetches his bat.
+- Bun makes you work for his Pong game now: spam-clicking no longer piles up. Once he has gone red, it takes five more pokes before he fetches his bat.

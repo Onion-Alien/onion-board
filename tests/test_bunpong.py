@@ -68,8 +68,12 @@ def test_once_cross_five_more_pokes_fetch_the_bat(qapp, monkeypatch):
     monkeypatch.setattr(bw.time, "monotonic", lambda: clock[0])
     for _ in range(bw.GRUMPY_AT):
         bun.poke()
-        clock[0] += 0.2
+        clock[0] += 0.05
     assert bun.say and not bun.building   # cross now
+    for _ in range(20):   # spam before he's gone red counts for nothing
+        clock[0] += 0.01
+        assert bun.poke() and not bun.building
+    clock[0] += bw.RED_IN
     for _ in range(4):
         clock[0] += 2.0   # slower pokes still count while he's cross
         assert bun.poke() and not bun.building
@@ -87,7 +91,10 @@ def test_a_plain_bun_never_plays(qapp):
 def test_enough_pokes_fetch_the_bat_and_open_the_game(qapp):
     stack, page, other, bun = _page_with_bun()
     stack.show()
-    for _ in range(bw.ANNOY_CLICKS):
+    for _ in range(bw.GRUMPY_AT):
+        QTest.mouseClick(bun, Qt.LeftButton)
+    QTest.qWait(round(bw.RED_IN * 1000) + 50)   # until he's red
+    for _ in range(bw.BAT_POKES):
         QTest.mouseClick(bun, Qt.LeftButton)
     assert bun.act_phase() == "dash"
     seen = set()
