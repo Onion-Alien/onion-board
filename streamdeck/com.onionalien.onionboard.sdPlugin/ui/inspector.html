@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Onion Board</title>
+  <link rel="stylesheet" href="inspector.css">
+</head>
+<body>
+  <div class="status" id="status"><span class="dot"></span><span id="status-text">Looking for Onion Board…</span></div>
+  <p class="help" id="problem" hidden></p>
+  <p class="help" id="get" hidden><a href="#" id="get-link">Get Onion Board (free)</a></p>
+
+  <div class="for" data-for="play">
+    <label class="row"><span>Sound</span><input type="search" id="search" placeholder="Search your sounds"></label>
+    <div class="row"><span></span><select id="sound" size="8"></select></div>
+    <p class="help" id="none" hidden>No sounds yet: add some in Onion Board first.</p>
+  </div>
+
+  <div class="for" data-for="random">
+    <label class="row"><span>From</span><select id="category"></select></label>
+  </div>
+
+  <div class="for" data-for="toggle">
+    <label class="row"><span>Switch</span><select id="what"></select></label>
+  </div>
+
+  <div class="for" data-for="stop">
+    <p class="help">Stops every sound that's playing.</p>
+  </div>
+
+  <details id="manual">
+    <summary>Connect by hand</summary>
+    <p class="help">Not needed most of the time: the plugin reads the port and key from Onion
+      Board by itself. Copy them from Onion Board's Settings → Remote if it can't.</p>
+    <label class="row"><span>Port</span><input type="number" id="port" min="1" max="65535" placeholder="7474"></label>
+    <label class="row"><span>Key</span><input type="password" id="token" placeholder="(found by itself)" autocomplete="off"></label>
+  </details>
+
+  <script src="inspector.js"></script>
+</body>
+</html>

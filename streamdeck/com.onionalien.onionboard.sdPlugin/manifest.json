@@ -1,0 +1,98 @@
+{
+  "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
+  "Name": "Onion Board",
+  "Version": "1.0.0.0",
+  "Author": "OnionAlien",
+  "Description": "Play your Onion Board sounds from Stream Deck keys. Pick a sound from a list and its key lights up while it plays. Also: stop every sound, a random sound, and switches for Live / Muted, the voice changer, your mic and hotkeys. Needs Onion Board with Settings → Remote → Remote control on.",
+  "UUID": "com.onionalien.onionboard",
+  "URL": "https://onion-alien.github.io/onion-board/",
+  "SupportURL": "https://github.com/Onion-Alien/onion-board/issues",
+  "Icon": "imgs/plugin",
+  "Category": "Onion Board",
+  "CategoryIcon": "imgs/category",
+  "CodePath": "bin/plugin.js",
+  "PropertyInspectorPath": "ui/inspector.html",
+  "SDKVersion": 2,
+  "Software": {
+    "MinimumVersion": "7.1"
+  },
+  "OS": [
+    {
+      "Platform": "windows",
+      "MinimumVersion": "10"
+    }
+  ],
+  "Nodejs": {
+    "Version": "24"
+  },
+  "Actions": [
+    {
+      "UUID": "com.onionalien.onionboard.play",
+      "Name": "Play sound",
+      "Tooltip": "Plays one of your sounds. The key shows its colour and lights up while it plays.",
+      "Icon": "imgs/play",
+      "Controllers": [
+        "Keypad"
+      ],
+      "States": [
+        {
+          "Image": "imgs/play-key",
+          "TitleAlignment": "bottom",
+          "FontSize": 12
+        }
+      ]
+    },
+    {
+      "UUID": "com.onionalien.onionboard.stop",
+      "Name": "Stop all sounds",
+      "Tooltip": "Stops every sound that's playing.",
+      "Icon": "imgs/stop",
+      "Controllers": [
+        "Keypad"
+      ],
+      "States": [
+        {
+          "Image": "imgs/stop-key"
+        }
+      ]
+    },
+    {
+      "UUID": "com.onionalien.onionboard.random",
+      "Name": "Random sound",
+      "Tooltip": "Plays a random sound: from any category, the one showing, or one you pick.",
+      "Icon": "imgs/random",
+      "Controllers": [
+        "Keypad"
+      ],
+      "States": [
+        {
+          "Image": "imgs/random-key"
+        }
+      ]
+    },
+    {
+      "UUID": "com.onionalien.onionboard.toggle",
+      "Name": "Switch",
+      "Tooltip": "Turns Live / Muted, the voice changer, your mic or hotkeys on and off, and shows which it is.",
+      "Icon": "imgs/toggle",
+      "Controllers": [
+        "Keypad"
+      ],
+      "DisableAutomaticStates": true,
+      "States": [
+        {
+          "Name": "On",
+          "Image": "imgs/toggle-on",
+          "TitleAlignment": "bottom",
+          "FontSize": 12
+        },
+        {
+          "Name": "Off",
+          "Image": "imgs/toggle-off",
+          "TitleAlignment": "bottom",
+          "FontSize": 12
+        }
+      ]
+    }
+  ]
+}

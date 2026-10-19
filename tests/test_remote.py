@@ -139,6 +139,16 @@ def test_window_endpoints(qapp, window):
     assert d("status")[1]["version"]
 
 
+def test_status_says_whether_hotkeys_are_on(qapp, window):
+    # a Stream Deck key showing the hotkeys switch reads it from here
+    w = window
+    d = lambda action, **p: remote.dispatch(w, action, p)   # noqa: E731
+    w.hkctl.set_hotkeys_on(True)
+    assert d("status")[1]["hotkeys"] is True
+    assert d("hotkeys", on="0") == (200, {"hotkeys": False})
+    assert d("status")[1]["hotkeys"] is False
+
+
 def test_pause_on_sets_instead_of_flipping(qapp, window):
     w = window
     state = {"paused": False}

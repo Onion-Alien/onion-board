@@ -14,7 +14,8 @@ Every endpoint takes GET or POST and answers JSON (ENDPOINTS below is the list;
 /api/help returns it, so a script or an AI assistant can look it up):
 
     /api/status                  version, what's playing / queued, category, live /
-                                 voice / mic / hear, speed and effects, mode, radio
+                                 voice / mic / hear / hotkeys, speed and effects, mode,
+                                 radio
     /api/sounds[?q=…&category=…] [{id, name, hotkey, categories, color, playing,
                                  volume, loop, press, plays, duration, effects}]
     /api/categories              ["Memes", ...]
@@ -153,8 +154,8 @@ def public_network() -> str:
 # setup prompt and Settings all read this)
 ENDPOINTS = {
     "status": "version, what's playing and what's queued, the category showing, live / "
-              "voice (and which voice) / mic / hear / volume, the live speed and effects, "
-              "the sound mode, the radio",
+              "voice (and which voice) / mic / hear / hotkeys / volume, the live speed and "
+              "effects, the sound mode, the radio",
     "sounds": "every sound: [{id, name, hotkey, categories, color, playing, volume (%), "
               "loop, press (what pressing does), plays, duration (s), effects}]; "
               "?q=horn keeps the names holding that, ?category=Chill one category's",
@@ -779,6 +780,7 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
                      "voice_name": getattr(mw.voice.fx, "preset", ""),
                      "mic": bool(cfg.mic_enabled),
                      "hear": bool(mw.engine.mic_check),
+                     "hotkeys": bool(mw.hkctl.hotkeys_on),
                      **queue_state(mw),
                      "volume": mw.vol_sound.spin.value(),
                      **live_state(mw), **mode_state(mw, full=False),
