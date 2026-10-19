@@ -60,6 +60,20 @@ class StreamStats:
 STATS: dict[str, StreamStats] = {}
 _open: list = []
 _lock = threading.Lock()
+# time to first sound: listen() arms it, the first output block with anything in it
+# after that notes when its callback ended (a real device adds its own latency)
+_ear: dict[str, float | None] = {"since": None, "heard": None}
+
+
+def listen():
+    _ear["heard"] = None
+    _ear["since"] = time.perf_counter()
+
+
+def heard_ms() -> float | None:
+    """ms from listen() to the first output block with sound in it, None if none yet."""
+    since, heard = _ear["since"], _ear["heard"]
+    return None if since is None or heard is None else round((heard - since) * 1000, 1)
 
 
 def reset_all():
@@ -155,6 +169,9 @@ class _FakeStream:
                 return
             end = time.perf_counter()
             st.note(start - due, end - start, end > due + period)
+            if (self.kind == "out" and _ear["since"] is not None and _ear["heard"] is None
+                    and buf.any()):
+                _ear["heard"] = end
             due += period
 
     def start(self):
@@ -187,6 +204,10 @@ class _FakeStream:
 
 class FakeOutputStream(_FakeStream):
     kind = "out"
+
+    def _call(self, buf):
+        buf.fill(0)   # what the app leaves in it is what was heard (time to first sound)
+        super()._call(buf)
 
 
 class FakeInputStream(_FakeStream):

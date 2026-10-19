@@ -142,6 +142,7 @@ COLUMNS = (   # (heading, metric key, digits)
     ("audio late p99 ms", "late_p99_ms", 1),
     ("callback p99 ms", "cb_p99_ms", 2),
     ("late blocks", "late_blocks", 0),
+    ("UI stall max ms", "stall_max_ms", 0),
 )
 
 
@@ -215,6 +216,12 @@ def markdown(report: dict, before: dict | None = None) -> str:
             if m.get("slopes"):
                 extra.append("growth per " + m.get("slope_unit", "step") + ": " + ", ".join(
                     f"{k} {v}" for k, v in m["slopes"].items() if v is not None))
+            if m.get("stalls_top_ms"):
+                extra.append("longest UI stalls ms " + ", ".join(map(str, m["stalls_top_ms"]))
+                             + f" (over 100 ms: {m.get('stalls_over_100', 0)})")
+            for k in ("first_sound_p50_ms", "first_sound_max_ms"):
+                if m.get(k) is not None:
+                    extra.append(f"{k.replace('_', ' ')} {m[k]}")
             if m.get("notes"):
                 extra.append(m["notes"])
             if extra:

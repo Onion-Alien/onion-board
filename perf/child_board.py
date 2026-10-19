@@ -283,6 +283,7 @@ class Counts:
         self.paints = self.timers = 0
         self.by_class: Counter[str] = Counter()   # paints per widget class (the top ones
         counts = self                             # say what keeps repainting)
+        self.skip = None                          # the stall meter's timer
 
         class F(QObject):
             def eventFilter(self, obj, ev):
@@ -290,7 +291,7 @@ class Counts:
                 if t == paint:
                     counts.paints += 1
                     counts.by_class[type(obj).__name__] += 1
-                elif t == timer:
+                elif t == timer and obj is not counts.skip:
                     counts.timers += 1
                 return False
         self.f = F()
@@ -301,6 +302,45 @@ class Counts:
         self.by_class.clear()
 
 
+class StallMeter:
+    """How long the UI thread went without running its event loop: a 4 ms precise timer
+    notes the gap between its ticks, and a gap past the tick is a stall (a click, a
+    key or a repaint that came in then waited that long). Its own timer events aren't
+    in Counts' timers_per_s."""
+
+    EVERY_MS = 4
+    BIG_MS = (50, 100, 250)
+
+    def __init__(self, app):
+        from PySide6.QtCore import QTimer, Qt
+        self.timer = QTimer(app)
+        self.timer.setTimerType(Qt.TimerType.PreciseTimer)
+        self.timer.timeout.connect(self._tick)
+        self.last = time.perf_counter()
+        self.reset()
+        self.timer.start(self.EVERY_MS)
+
+    def reset(self):
+        self.last = time.perf_counter()
+        self.stalls: list[float] = []   # ms past the tick, each over 16 ms (a frame)
+
+    def _tick(self):
+        now = time.perf_counter()
+        late = (now - self.last) * 1000 - self.EVERY_MS
+        self.last = now
+        if late > 16:
+            self.stalls.append(late)
+
+    def summary(self) -> dict:
+        s = sorted(self.stalls, reverse=True)
+        out = {"stall_max_ms": round(s[0]) if s else 0,
+               "stalls_top_ms": [round(x) for x in s[:5]],
+               "stall_total_ms": round(sum(s))}
+        for b in self.BIG_MS:
+            out[f"stalls_over_{b}"] = sum(1 for x in s if x > b)
+        return out
+
+
 class UiSampler:
     """The UI thread's Python stack, sampled every 2 ms from a thread of its own:
     which calls the UI thread spends its time under (Qt's own painting and layout
@@ -308,11 +348,25 @@ class UiSampler:
 
     EVERY_S = 0.002
 
-    def __init__(self):
+    STALL_S = 0.030   # a sample this long after the stall meter's last tick: in a stall
+
+    def __init__(self, meter: StallMeter | None = None):
         from collections import Counter
         self.leaf: Counter[str] = Counter()     # the innermost app function
         self.under: Counter[str] = Counter()    # every app function on the stack
-        self.n = 0
+        self.stalled: Counter[str] = Counter()  # innermost app call, only inside stalls
+        self.stalled_under: Counter[str] = Counter()
+        self.meter = meter
+        self.n = self.n_stalled = 0
+        # the UI thread's frames this thread took hold of, let go of on the UI thread:
+        # one that returned meanwhile owns its locals, and its last reference dropped
+        # here freed the UI's Qt objects on this thread (a native crash, see uigc)
+        self._held: list = []
+        self._held_lock = threading.Lock()
+        from PySide6.QtCore import QTimer
+        self._drop = QTimer()
+        self._drop.timeout.connect(self._let_go)
+        self._drop.start(50)
         self._ui = threading.main_thread().ident
         self._pkg = str(Path(__file__).resolve().parent.parent / "soundboard")
         self._stop = threading.Event()
@@ -334,31 +388,60 @@ class UiSampler:
             if tick is not None:
                 tick.timeEndPeriod(1)
 
+    def _let_go(self):
+        with self._held_lock:
+            held, self._held = self._held, []
+        del held   # (here, on the UI thread)
+
     def _sample(self):
         while not self._stop.wait(self.EVERY_S):
-            f = sys._current_frames().get(self._ui)
+            frames = sys._current_frames()
+            f = frames.get(self._ui)
             if f is None:
+                with self._held_lock:
+                    self._held.append(frames)
+                del frames
                 continue
             self.n += 1
-            seen, leaf = set(), None
+            seen, leaf, walked = set(), None, [frames]
             while f is not None:
+                walked.append(f)
                 if f.f_code.co_filename.startswith(self._pkg):
                     w = self._where(f)
                     leaf = leaf or w
                     seen.add(w)
                 f = f.f_back
+            with self._held_lock:
+                self._held.append(walked)
+            del frames, walked
             self.leaf[leaf or "(event loop / Qt / perf)"] += 1
             for w in seen:
                 self.under[w] += 1
+            m = self.meter
+            if m is not None and time.perf_counter() - m.last > self.STALL_S:
+                self.n_stalled += 1
+                self.stalled[leaf or "(Qt / perf)"] += 1
+                for w in seen:
+                    self.stalled_under[w] += 1
 
     def stop(self) -> str:
         self._stop.set()
         self._t.join(1.0)
+        self._drop.stop()
+        self._let_go()
         n = max(1, self.n)
         out = [f"{self.n} samples, every {self.EVERY_S * 1000:.0f} ms", "", "innermost app call:"]
         out += [f"  {c * 100 / n:5.1f}%  {k}" for k, c in self.leaf.most_common(30)]
         out += ["", "anywhere on the stack:"]
         out += [f"  {c * 100 / n:5.1f}%  {k}" for k, c in self.under.most_common(40)]
+        if self.meter is not None:
+            ns = max(1, self.n_stalled)
+            out += ["", f"inside UI stalls ({self.n_stalled} samples, "
+                        f"~{self.n_stalled * self.EVERY_S * 1000:.0f} ms), innermost app call:"]
+            out += [f"  {c * 100 / ns:5.1f}%  {k}" for k, c in self.stalled.most_common(30)]
+            out += ["", "inside UI stalls, anywhere on the stack:"]
+            out += [f"  {c * 100 / ns:5.1f}%  {k}"
+                    for k, c in self.stalled_under.most_common(50)]
         return "\n".join(out) + "\n"
 
 
@@ -367,7 +450,7 @@ class Child:
         self.conf = conf
         self.state = state
         self.secs = float(conf.get("secs", 4.0))
-        self.app = self.w = self.counts = None
+        self.app = self.w = self.counts = self.meter = None
         self.errors: list[str] = []
         self._t0 = 0.0
 
@@ -451,6 +534,8 @@ class Child:
             self.counts.reset()
         fakeaudio.reset_all()
         link.mark("start", name=name, thread_names=self.thread_names())
+        if self.meter is not None:
+            self.meter.reset()
         t0 = time.perf_counter()
         extra = None
         # --env PERF_CPROFILE=idle_front,dialogs: those scenarios' UI-thread Python
@@ -464,7 +549,7 @@ class Child:
         # can't keep to one thread), what it was doing to logs/samples-<name>.txt
         sampler = None
         if name in os.environ.get("PERF_SAMPLE", "").split(","):
-            sampler = UiSampler()
+            sampler = UiSampler(self.meter)
         try:
             extra = fn()
         except Exception as e:  # noqa: BLE001 - one broken scenario mustn't end the run
@@ -472,6 +557,8 @@ class Child:
             self.errors.append(f"{name}: {type(e).__name__}: {e}")
             link.send("error", text=f"{name}: {traceback.format_exc()[-1500:]}")
         wall = time.perf_counter() - t0
+        if self.meter is not None:
+            extra = {**self.meter.summary(), **(extra or {})}
         if prof is not None:
             prof.disable()
             self._write_profile(name, prof)
@@ -526,6 +613,10 @@ class Child:
             self._park_windows_off_screen()
         if self.conf.get("event_counts", True):
             self.counts = Counts(app)
+        if self.conf.get("stalls"):   # (the use tier: its 4 ms timer costs a little)
+            self.meter = StallMeter(app)
+            if self.counts is not None:
+                self.counts.skip = self.meter.timer
         from soundboard.ui.window.mainwindow import MainWindow
         self.w = w = MainWindow()
         app.aboutToQuit.connect(w.shutdown)
@@ -736,6 +827,222 @@ class Child:
         self.run_until(lambda: w.setctl._spare_editor is not None, 5.0)
         self.run_for(0.2)
         return {"dialog_s": took}
+
+    # -- using the app (the use tier): what each thing a user does blocks the UI
+    # thread for (StallMeter), on a board of --sounds sounds
+    def _pads(self):
+        """The pads showing, in board order."""
+        return [p for p in self.w.grid.pads if p.isVisibleTo(self.w)]
+
+    def _home(self):
+        w = self.w
+        if w.setctl.settings_open():
+            w.setctl.close_settings()
+        self._tab("sounds")
+        self.foreground(True)
+        self.run_for(0.3)
+
+    @staticmethod
+    def _click(widget, button=None):
+        from PySide6.QtCore import Qt
+        from PySide6.QtTest import QTest
+        QTest.mouseClick(widget, button or Qt.MouseButton.LeftButton)
+
+    def sc_pad_click(self):
+        """Pads clicked one at a time: time from the click to the first block with
+        sound in it (first_sound_ms), and the UI stall around each."""
+        from perf import fakeaudio
+        self._home()
+        pads = self._pads()
+        heard = []
+        for k in range(10):
+            fakeaudio.listen()
+            self._click(pads[(k * 7) % len(pads)])
+            self.run_until(lambda: fakeaudio.heard_ms() is not None, 1.5, 0.002)
+            heard.append(fakeaudio.heard_ms())
+            self.run_for(0.4)
+            self.w.playctl.stop_all()
+            self.run_for(0.2)
+        got = sorted(h for h in heard if h is not None)
+        return {"first_sound_ms": heard,
+                "first_sound_p50_ms": got[len(got) // 2] if got else None,
+                "first_sound_max_ms": got[-1] if got else None}
+
+    def sc_pad_spam(self):
+        """Pads spam-clicked: 40 clicks 40 ms apart over different pads."""
+        self._home()
+        pads = self._pads()
+        for k in range(40):
+            self._click(pads[(k * 5) % len(pads)])
+            self.run_for(0.04)
+        self.run_for(1.0)
+        self.w.playctl.stop_all()
+        self.run_for(0.5)
+
+    def sc_tabs_again(self):
+        """Every tab once more (tabs_tour opened them the first time)."""
+        return {"tab_again_ms": self.sc_tabs_tour()["tab_open_ms"]}
+
+    def sc_settings_pages(self):
+        """Settings opened, each page shown in turn, closed; twice."""
+        from PySide6.QtWidgets import QApplication
+        w = self.w
+        self._home()
+        took: dict[str, list[int]] = {}
+
+        def timed(key, fn):
+            t0 = time.perf_counter()
+            out = fn()
+            QApplication.processEvents()
+            took.setdefault(key, []).append(round((time.perf_counter() - t0) * 1000))
+            return out
+        for _round in range(2):
+            dlg = timed("open", lambda: w.setctl.open_settings("audio"))
+            self.run_for(0.2)
+            for key in list(dlg._page_keys):
+                timed(key, lambda k=key, d=dlg: d.show_page(k))
+                self.run_for(0.15)
+            timed("close", w.setctl.close_settings)
+            self.run_for(0.3)
+        return {"page_ms": took}
+
+    def sc_menus(self):
+        """A pad's right-click menu, the live controls pop-up, and the drop-downs on
+        Settings' Audio page. *_ms: from the click to its own event loop running (the
+        menu up) or to the pop-up drawn."""
+        from PySide6.QtCore import QPoint, QTimer
+        from PySide6.QtWidgets import QApplication, QComboBox, QMenu
+        w = self.w
+        self._home()
+        took: dict[str, list[int]] = {}
+        t0 = [0.0]
+
+        def up():   # the menu's exec() runs: it's built and shown
+            took.setdefault("pad_menu", []).append(round((time.perf_counter() - t0[0]) * 1000))
+            QTimer.singleShot(150, close_menus)
+
+        def close_menus():
+            for tl in QApplication.topLevelWidgets():
+                if isinstance(tl, QMenu) and tl.isVisible():
+                    tl.close()
+        pads = self._pads()
+        for k in range(4):
+            QTimer.singleShot(0, up)
+            t0[0] = time.perf_counter()
+            w.padctl.pad_menu(pads[(k * 3) % len(pads)].meta.id, QPoint(200, 200))
+            self.run_for(0.2)
+
+        def timed(key, fn):
+            t = time.perf_counter()
+            fn()
+            QApplication.processEvents()
+            took.setdefault(key, []).append(round((time.perf_counter() - t) * 1000))
+        btn = getattr(w, "speed_btn", None)
+        for _k in range(4 if btn is not None else 0):
+            timed("live_controls", btn.click)
+            self.run_for(0.3)
+            btn.pop.hide()
+            self.run_for(0.2)
+        dlg = w.setctl.open_settings("audio")
+        self.run_for(0.3)
+        combos = [c for c in dlg.findChildren(QComboBox) if c.isVisibleTo(dlg) and c.count() > 1]
+        for c in combos[:4]:
+            timed("dropdown", c.showPopup)
+            self.run_for(0.25)
+            c.hidePopup()
+            self.run_for(0.2)
+        w.setctl.close_settings()
+        self.run_for(0.3)
+        return {"menu_ms": took, "dropdowns": len(combos[:4])}
+
+    def sc_search_typing(self):
+        """Typing in the Sounds tab's search box at ~8 keys a second, then deleting it."""
+        from PySide6.QtCore import Qt
+        from PySide6.QtTest import QTest
+        w = self.w
+        self._home()
+        box = w.search
+        box.setFocus()
+        shown = []
+        for text in ("sound 1", "zz", "s"):
+            for ch in text:
+                QTest.keyClick(box, ch)
+                self.run_for(0.12)
+            self.run_for(0.4)
+            shown.append((box.text(), sum(1 for p in w.pads.values()
+                                          if not p.property("filtered"))))
+            for _ch in text:
+                QTest.keyClick(box, Qt.Key.Key_Backspace)
+                self.run_for(0.12)
+            self.run_for(0.4)
+        box.clear()
+        self.run_for(0.5)
+        return {"pads_shown": shown}
+
+    def sc_resize_sweep(self):
+        """The window dragged narrower and wider: 1700 -> 440 -> 1700 px wide, a step
+        every frame (16 ms)."""
+        w = self.w
+        self._home()
+        was = w.size()
+        h = max(720, was.height())
+        widths = list(range(1700, 439, -40)) + list(range(440, 1701, 40))
+        for x in widths:
+            w.resize(x, h)
+            self.run_for(0.016)
+        w.resize(was)
+        self.run_for(0.5)
+        return {"steps": len(widths)}
+
+    def sc_scroll_board(self):
+        """The board scrolled from top to bottom and back, a wheel notch (120 px) a
+        frame."""
+        self._home()
+        bar = self.w._pads_scroll.verticalScrollBar()
+        steps = 0
+        for target in (bar.maximum(), 0):
+            while bar.value() != target and steps < 400:
+                bar.setValue(bar.value() + (120 if target else -120))
+                steps += 1
+                self.run_for(0.016)
+        self.run_for(0.3)
+        return {"steps": steps, "scroll_px": bar.maximum()}
+
+    def sc_sliders(self):
+        """Sliders dragged while a sound plays: the sounds' volume, then the live
+        controls' first two (speed, pitch), end to end and back, a step a frame."""
+        from PySide6.QtWidgets import QSlider
+        w = self.w
+        self._home()
+        w.playctl.play(self._sids()[0], now=True)
+        dragged = []
+
+        def drag(sl):
+            lo, hi, was = sl.minimum(), sl.maximum(), sl.value()
+            step = max(1, (hi - lo) // 60)
+            sl.setSliderDown(True)
+            for v in [*range(was, hi, step), *range(hi, lo, -step), *range(lo, was, step)]:
+                sl.setSliderPosition(v)
+                self.run_for(0.016)
+            sl.setSliderPosition(was)
+            sl.setSliderDown(False)
+            self.run_for(0.2)
+        vol = getattr(w, "vol_sound", None)
+        for sl in (vol.findChildren(QSlider) if vol is not None else [])[:1]:
+            drag(sl)
+            dragged.append("sound volume")
+        btn = getattr(w, "speed_btn", None)
+        if btn is not None:
+            btn.click()
+            self.run_for(0.3)
+            for sl in [s for s in btn.pop.findChildren(QSlider) if s.isVisibleTo(btn.pop)][:2]:
+                drag(sl)
+                dragged.append(sl.accessibleName() or sl.objectName() or "live slider")
+            btn.reset()
+            btn.pop.hide()
+        w.playctl.stop_all()
+        self.run_for(0.5)
+        return {"dragged": dragged}
 
     def sc_voice_preset(self, preset: str = "Robot"):
         w = self.w

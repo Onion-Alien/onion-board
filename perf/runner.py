@@ -44,6 +44,11 @@ BOARD_TABS = (["idle_front"] + [f"{p}_{k}" for k in TAB_KEYS for p in ("open", "
                  "open_triggers", "wait_triggers", "tab_triggers_rested",
                  "open_bunmode", "tab_bunmode",
                  "open_sounds", "tab_sounds_behind", "idle_end"])
+# using the app (the use tier, on a big board): each thing a user does, with the
+# longest UI-thread stall (child_board.StallMeter) and the pads' time to first sound
+BOARD_USE = ["settle", "idle_settled", "pad_click", "pad_spam", "tabs_tour", "tabs_again",
+             "settings_pages", "dialogs", "menus", "voice_preset", "search_typing",
+             "resize_sweep", "scroll_board", "sliders"]
 TRIGGERS_TABS = ["open_triggers", "tab_triggers", "open_sounds", "tab_sounds"]
 
 TIERS = {
@@ -51,6 +56,8 @@ TIERS = {
               "board": BOARD_QUICK, "timeout_s": 240},
     "full": {"secs": 8.0, "sounds": 100, "leak_iterations": 20, "trigger_counts": [0, 10, 50],
              "board": BOARD_FULL, "timeout_s": 600},
+    "use": {"secs": 4.0, "sounds": 200, "leak_iterations": 0, "trigger_counts": [],
+            "board": BOARD_USE, "stalls": True, "timeout_s": 420},
     "tabs": {"secs": 9.0, "sounds": 20, "leak_iterations": 0, "trigger_counts": [50],
              "board": BOARD_TABS, "triggers": TRIGGERS_TABS, "timeout_s": 360},
 }
@@ -317,6 +324,7 @@ def board_run(name: str, out: Path, args, tier: dict, hz: float, scenarios: list
         "real_window": args.real_window,
         "event_counts": not args.no_event_counts,
         "soak_minutes": args.minutes,
+        "stalls": bool(tier.get("stalls")),
     }
     if watch_zip is not None:
         conf["watch_zip"] = str(watch_zip)
@@ -408,7 +416,8 @@ def frozen(exe: Path, out: Path, timeout_s: float = 150) -> dict:
 
 def parse_args(argv=None):
     ap = argparse.ArgumentParser(prog="python -m perf", description=__doc__)
-    ap.add_argument("--tier", choices=("quick", "full", "tabs", "soak", "frozen"), default="quick")
+    ap.add_argument("--tier", choices=("quick", "full", "tabs", "use", "soak", "frozen"),
+                    default="quick")
     ap.add_argument("--out", type=Path, help="folder for the report, profiles and logs "
                     "(default: a new folder under %%TEMP%%\\onionboard-perf)")
     ap.add_argument("--watch-src", type=Path, help="an Onion Watch checkout: adds the Triggers "
@@ -496,7 +505,7 @@ def main(argv=None) -> int:
                                     for k, v in run.scenarios.items()})
         report["errors"] += info["errors"]
 
-    if args.tier in ("quick", "full", "tabs"):
+    if args.tier in ("quick", "full", "tabs", "use"):
         tier = dict(TIERS[args.tier])
         if args.sounds:
             tier["sounds"] = args.sounds
