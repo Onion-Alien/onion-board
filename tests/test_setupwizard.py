@@ -46,6 +46,8 @@ def resume(monkeypatch):
     """Never touch the real RunOnce key: record what the guide asks for instead."""
     calls = []
     monkeypatch.setattr(setupwizard, "resume_after_restart", calls.append)
+    # whether Discord happens to be open on this PC never decides a test
+    monkeypatch.setattr(setupwizard, "_discord_open", lambda: False)
     return calls
 
 
@@ -524,9 +526,27 @@ def mic_wizard(qapp, app_dir, devices, monkeypatch):
     qapp.sendPostedEvents(None, QEvent.DeferredDelete)
 
 
-def test_new_users_are_offered_their_mic_first(mic_wizard, monkeypatch):
+@pytest.fixture
+def mic_wizard_again(qapp, app_dir, devices, monkeypatch):
+    """The guide opened again later (Setup tab): straight into the mic, and the
+    Discord step is the full page of tips, last as ever."""
+    monkeypatch.setattr(Config, "first_start", FIRST_START)
+    w = main.MainWindow()
+    w.cfg.use_mode = "normal"
+    wiz = setupwizard.SetupWizard(w)
+    yield w, wiz
+    wiz.done(0)
+    w.soundctl._load_thread.join(15)
+    w.close()
+    from PySide6.QtCore import QEvent
+    wiz.deleteLater()
+    w.deleteLater()
+    qapp.sendPostedEvents(None, QEvent.DeferredDelete)
+
+
+def test_new_users_are_offered_their_mic_first(mic_wizard_again, monkeypatch):
     from soundboard.mic import directmic
-    w, wiz = mic_wizard
+    w, wiz = mic_wizard_again
     assert w.cfg.route == "mic"
     wiz.go(wiz.base + 2)
     # the step's one thing to do is Next itself; leaving without it is the quiet Skip
@@ -540,10 +560,10 @@ def test_new_users_are_offered_their_mic_first(mic_wizard, monkeypatch):
     assert not wiz.alt_fold_row.isHidden() and wiz.alt_card.isHidden()
     wiz.alt_fold.click()
     assert not wiz.alt_card.isHidden() and not wiz.btn_alt_cable.isHidden()
-    wiz.go(wiz.base + 3)   # not on the mic yet: the last page says so
+    wiz.go(wiz.discord_index)   # not on the mic yet: the last page says so
     assert "isn't on your mic yet" in wiz.discord_text.text()
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
-    wiz.go(wiz.base + 3)
+    wiz.go(wiz.discord_index)
     assert "check Discord" in wiz.discord_title.text()
     assert "nothing to pick" in wiz.discord_text.text()
     assert "noise filter" in wiz.discord_text.text()
@@ -777,17 +797,17 @@ def test_back_and_next_never_stretch_the_guide(mic_wizard, qapp):
     assert heights and max(heights) <= max(tall.values()), (heights, tall)
 
 
-def test_a_fold_shut_again_puts_the_guide_back(mic_wizard, qapp, monkeypatch):
+def test_a_fold_shut_again_puts_the_guide_back(mic_wizard_again, qapp, monkeypatch):
     """Near the screen's bottom, opening the Discord tip moves the guide up to fit;
     shutting it puts it back where it was (it walked up the screen click by click)."""
     from soundboard.mic import directmic
     from soundboard.ui.kit import fit
     monkeypatch.setattr(directmic, "works", lambda *a: True)
-    w, wiz = mic_wizard
+    w, wiz = mic_wizard_again
     w.cfg.route = "mic"
     w.cfg.mic_device = w.cfg.mic_device or "Mic"
     wiz.show()
-    wiz.go(wiz.base + 3)
+    wiz.go(wiz.discord_index)
     _settle(qapp)
     assert wiz.discord_fold.isVisible()
     wiz.discord_fold.click()   # (it starts open: shut first)
@@ -886,14 +906,14 @@ def test_status_card_says_each_state_plainly(mic_wizard, monkeypatch):
         assert card.pill.isHidden() == (s != "ready")
 
 
-def test_discord_tip_folds_away(mic_wizard, monkeypatch):
+def test_discord_tip_folds_away(mic_wizard_again, monkeypatch):
     """On the mic, Discord needs nothing picked, but its noise filter (on by default)
     wipes sounds out: its tip starts open under its heading, which shuts it. On the
     cable Discord's steps are needed, so nothing folds."""
     from soundboard.mic import directmic
-    w, wiz = mic_wizard
+    w, wiz = mic_wizard_again
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
-    wiz.go(wiz.base + 3)
+    wiz.go(wiz.discord_index)
     assert not wiz.discord_fold.isHidden() and not wiz.discord_body.isHidden()
     assert not wiz.btn_discord.isHidden()
     assert not wiz.discord_tip.text().startswith("<b>")   # its lead-in is the heading
@@ -904,18 +924,18 @@ def test_discord_tip_folds_away(mic_wizard, monkeypatch):
     assert not wiz.discord_body.isHidden()
     assert wiz.discord_fold.toolTip()   # says Show / Hide
     w.routectl.set_route("cable")
-    wiz.go(wiz.base + 3)
+    wiz.go(wiz.discord_index)
     assert wiz.discord_fold.isHidden()
     assert wiz.btn_discord.isHidden() or not wiz.discord_body.isHidden()
 
 
-def test_discord_pill_is_only_as_wide_as_its_words(mic_wizard, monkeypatch):
+def test_discord_pill_is_only_as_wide_as_its_words(mic_wizard_again, monkeypatch):
     from PySide6.QtWidgets import QSizePolicy
     from soundboard.mic import directmic
-    _, wiz = mic_wizard
+    _, wiz = mic_wizard_again
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     wiz.show()
-    wiz.go(wiz.base + 3)
+    wiz.go(wiz.discord_index)
     # its words' width, never stretched across the page (the row's stretch takes the rest)
     assert wiz.discord_fold.width() == wiz.discord_fold.sizeHint().width()
     assert wiz.discord_fold.sizePolicy().horizontalPolicy() == QSizePolicy.Fixed
@@ -1059,9 +1079,10 @@ def test_picking_what_its_for_never_resizes_the_guide(mic_wizard, qapp):
 
 def test_the_first_launch_asks_what_its_for_first(mic_wizard):
     w, wiz = mic_wizard
-    assert wiz._ask_use and wiz.PAGES == 6 and wiz.stack.currentIndex() == 0
+    # (no Discord open: "Make it yours" is the last of five)
+    assert wiz._ask_use and wiz.PAGES == 5 and wiz.stack.currentIndex() == 0
     assert wiz.use_buttons["normal"].isChecked()
-    assert "Step 1 of 6" in wiz.progress.text()
+    assert "Step 1 of 5" in wiz.progress.text()
     wiz.use_buttons["games"].click()
     assert "Triggers" in wiz.use_hint.text()
     assert not w.tabctl.tab_on("triggers")   # nothing changes until Next
@@ -1268,18 +1289,77 @@ def test_discord_reads_keep_one_thread(mic_wizard, monkeypatch, qapp):
     assert threading.main_thread() not in threads
 
 
-def test_the_first_launch_ends_on_make_it_yours(mic_wizard):
+def test_the_first_launch_ends_on_make_it_yours(mic_wizard, monkeypatch):
+    """No Discord open: "Make it yours" is the last step, Finish and all."""
+    from soundboard.mic import directmic
+    monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     w, wiz = mic_wizard
-    last = wiz.PAGES - 1
-    assert wiz.stack.widget(last).isAncestorOf(wiz.lang_button)
+    wiz.go(wiz.look_index)
+    assert wiz.PAGES - 1 == wiz.look_index == wiz.stack.currentIndex()
+    assert wiz.stack.widget(wiz.look_index).isAncestorOf(wiz.lang_button)
     assert [c.name for c in wiz.look_cards] == setupwizard.look_themes()
     assert len(wiz.look_cards) == 9
-    # the Discord step isn't the last one any more: it says Next, and so does its text
-    wiz.go(wiz.base + 3)
-    assert "Last step" not in wiz.discord_title.text()
-    assert "Next" in wiz.closing.text() and "Finish" not in wiz.btn_next.text()
-    wiz.go(last)
     assert "Finish" in wiz.btn_next.text()
+    assert "Last thing" not in wiz.stack.widget(wiz.look_index).findChild(
+        setupwizard.QLabel).text()
+    wiz.go(wiz.discord_index)   # not a step now: stays on the last one
+    assert wiz.stack.currentIndex() == wiz.look_index
+
+
+def test_the_first_launch_asks_about_discord_last_when_its_open(mic_wizard, monkeypatch):
+    """Discord open and the sounds in the mic: after "Make it yours", one question.
+    Yes finishes and opens the Discord guide; No just finishes."""
+    from soundboard.mic import directmic
+    from soundboard.ui.setup import chatguide
+    monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
+    monkeypatch.setattr(setupwizard, "_discord_open", lambda: True)
+    opened = []
+    monkeypatch.setattr(chatguide, "show_guide", lambda which, *a: opened.append(which))
+    w, wiz = mic_wizard
+    wiz.go(wiz.look_index)
+    assert wiz.PAGES == 6 and "Next" in wiz.btn_next.text()
+    wiz.next_clicked()
+    assert wiz.stack.currentIndex() == wiz.discord_index == wiz.PAGES - 1
+    assert "set up Discord?" in wiz.discord_title.text()
+    assert "Yes, set up Discord" in wiz.btn_next.text()
+    assert not wiz.btn_skip.isHidden() and "No thanks" in wiz.btn_skip.text()
+    assert wiz.discord_body.isHidden() and wiz.help_card.isHidden()
+    wiz.next_clicked()
+    QApplication.processEvents()
+    assert w.cfg.setup_done and opened == ["discord"]
+
+
+def test_no_thanks_to_discord_just_finishes(mic_wizard, monkeypatch):
+    from soundboard.mic import directmic
+    from soundboard.ui.setup import chatguide
+    monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
+    monkeypatch.setattr(setupwizard, "_discord_open", lambda: True)
+    opened = []
+    monkeypatch.setattr(chatguide, "show_guide", lambda which, *a: opened.append(which))
+    w, wiz = mic_wizard
+    wiz.go(wiz.discord_index)
+    wiz.skip_clicked()
+    QApplication.processEvents()
+    assert w.cfg.setup_done and opened == []
+
+
+def test_on_the_cable_the_first_launch_still_ends_on_discord(mic_wizard):
+    """The cable has to be picked in Discord: its full step stays, after the look."""
+    w, wiz = mic_wizard
+    w.routectl.set_route("cable")
+    wiz.go(wiz.discord_index)
+    assert wiz.PAGES == 6 and wiz.stack.currentIndex() == wiz.discord_index
+    assert not wiz._asking and "Finish" in wiz.btn_next.text()
+
+
+def test_lite_mode_on_make_it_yours(mic_wizard):
+    w, wiz = mic_wizard
+    wiz.go(wiz.look_index)
+    assert not wiz.chk_lite.isChecked()
+    wiz.chk_lite.setChecked(True)   # at once, as in Settings
+    assert w.cfg.lite_mode
+    wiz.chk_lite.setChecked(False)
+    assert not w.cfg.lite_mode
 
 
 def test_a_later_guide_has_no_make_it_yours_page(wizard):

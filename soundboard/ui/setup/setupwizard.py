@@ -225,6 +225,13 @@ class StepBar(QWidget):
         self._anim.valueChanged.connect(self._slide)
         self.setFixedSize(steps * self.SEG_W + (steps - 1) * self.GAP, self.SEG_H)
 
+    def set_steps(self, steps: int):
+        """The first launch's Discord step comes and goes (only with Discord open)."""
+        if steps != self.steps:
+            self.steps = steps
+            self.setFixedSize(steps * self.SEG_W + (steps - 1) * self.GAP, self.SEG_H)
+            self.update()
+
     def set_step(self, i: int):
         self.current = i
         self._anim.stop()
@@ -472,6 +479,16 @@ class _PageStack(QWidget):
         self.currentChanged.emit(i)
 
 
+def _discord_open() -> bool:
+    """A Discord app is running (any client)."""
+    from soundboard.mic import discordtalk
+    try:
+        return bool(discordtalk.running_clients())
+    except Exception:  # noqa: BLE001 - can't tell: as if it isn't
+        log.warning("checking for Discord failed", exc_info=True)
+        return False
+
+
 def _working_title() -> str:   # (a call: translated in the language picked by then)
     return _("Working: your sounds go into your mic")
 
@@ -636,8 +653,12 @@ class SetupWizard(QDialog):
         self._ask_use = win.cfg.use_mode == ""
         self._use = "normal"
         self.base = 1 if self._ask_use else 0
-        # ...and once the devices are done, a last "Make it yours" page (language, theme)
-        self.PAGES = SetupWizard.PAGES + self.base + (1 if self._ask_use else 0)
+        # ...and once the devices are done, a "Make it yours" page (language, theme), then
+        # Discord last, and only when there's something to do there (_discord_due)
+        self.look_index = self.base + 3 if self._ask_use else -1
+        self.discord_index = self.base + (4 if self._ask_use else 3)
+        self._asking = False   # the Discord step is one yes / no question (_fill_discord)
+        self.PAGES = self.discord_index + 1
         self._lang_pending = False   # a language picked there: Finish restarts into it
         # Discord's own settings, read live on the last step (discordcfg)
         self._discord_sig: tuple | None = None
@@ -664,9 +685,9 @@ class SetupWizard(QDialog):
         self.stack.addWidget(self._page_mic())
         self.stack.addWidget(self._page_headphones())
         self.stack.addWidget(self._page_cable())
-        self.stack.addWidget(self._page_discord())
         if self._ask_use:
             self.stack.addWidget(self._page_look())
+        self.stack.addWidget(self._page_discord())
         for i in range(self.stack.count()):   # the pages' edges are the dialog's: their
             page = self.stack.widget(i)          # cards line up with Back / Next
             if page is not None and (lay := page.layout()) is not None:
@@ -808,9 +829,25 @@ class SetupWizard(QDialog):
         return p
 
     def _discord_heading(self) -> str:
-        # the first launch has one more page after it ("Make it yours")
-        return (_("Tell Discord or your game") if self._ask_use
-                else _("Last step: tell Discord or your game"))
+        return _("Last step: tell Discord or your game")
+
+    def _discord_due(self) -> bool:
+        """The first launch's Discord step, after "Make it yours": only when a Discord
+        is open (straight into the mic: one question), or on the cable or a virtual
+        mic, which Discord has to be told to pick. Otherwise "Make it yours" is last."""
+        if not self._ask_use:
+            return True
+        cfg = self.win.cfg
+        if cfg.route == "cable" or (cfg.route == "device" and eng.virtual_mic_for(
+                self.win.routectl._main_name())):
+            return True
+        return (cfg.route == "mic" and directmic.works(directmic.status(cfg.mic_device))
+                and _discord_open())
+
+    def _count_steps(self):
+        if self._ask_use:
+            self.PAGES = self.discord_index + (1 if self._discord_due() else 0)
+            self.step_bar.set_steps(self.PAGES)
 
     def _page_look(self) -> QWidget:
         """First launch only: the language, a theme, and starting with Windows."""
@@ -819,7 +856,7 @@ class SetupWizard(QDialog):
         from soundboard.ui.settings.appearance import ThemeCard, ThemeGrid
         p = QWidget()
         v = QVBoxLayout(p)
-        v.addLayout(_header(_("All set! Last thing: make it yours"),
+        v.addLayout(_header(_("All set! Now make it yours"),
                             _label(_("Pick a language and a look. Change them any time in "
                                      "<b>Settings</b> → <b>Appearance</b>.")),
                             BunnyWidget("star", height=BUN_H, pad=BUN_PAD)))
@@ -865,6 +902,14 @@ class SetupWizard(QDialog):
         self.chk_autostart.setChecked(autostart.is_enabled())
         self.chk_autostart.setEnabled(autostart.available())
         v.addWidget(self.chk_autostart)
+        # Lite mode, as in Settings > Appearance: applied at once, so they see it
+        from soundboard.ui.settings import lite
+        self.chk_lite = QCheckBox(
+            _("Lite mode: no animations, for slower PCs (suggested for this PC)")
+            if lite.slow_pc() else _("Lite mode: no animations, for slower PCs"))
+        self.chk_lite.setChecked(self.win.cfg.lite_mode)
+        self.chk_lite.toggled.connect(self.win.themectl.set_lite_mode)
+        v.addWidget(self.chk_lite)
         v.addStretch(1)
         return p
 
@@ -1284,6 +1329,7 @@ class SetupWizard(QDialog):
 
     # ------------------------------------------------------------------ navigation
     def go(self, i: int):
+        self._count_steps()
         i = max(0, min(self.PAGES - 1, i))
         if self._ask_use and self.stack.currentIndex() == 0 and i > 0:
             self._save_use()   # leaving "What's it for?"
@@ -1299,9 +1345,10 @@ class SetupWizard(QDialog):
             self.cable_status.setText(_("Checking…"))
             self.cable_status.repaint()   # the check can take a moment (it may reopen devices)
             self.recheck_cable(rescan=False)
-        elif page == 3:
+        elif i == self.discord_index:
             self._fill_discord()
-        if page == 3:   # Discord's own settings: read now, then while the step is up
+        # Discord's own settings: read now, then while the step is up
+        if i == self.discord_index and not self._asking:
             self._read_discord()
             self.discord_timer.start(DISCORD_READ_MS)
         else:
@@ -1382,9 +1429,14 @@ class SetupWizard(QDialog):
         busy.set_busy(self.btn_next, installing)
         busy.set_busy(self.btn_back, installing)
         mic_action = self._mic_action()
-        self.btn_skip.setVisible(mic_action)
+        asking = i == self.discord_index and self._asking
+        self.btn_skip.setText(_("No thanks, finish") if asking
+                              else _("Skip: only I'll hear my sounds"))
+        self.btn_skip.setVisible(mic_action or asking)
         SetupWizard._sync_or(self)   # (by the class: tests drive this with a stand-in)
-        if i == self.PAGES - 1:
+        if asking:
+            text, icon = _("Yes, set up Discord"), "speech"
+        elif i == self.PAGES - 1:
             text, icon = _("Finish  ✓"), "check"
         elif i == self.base + 2 and self._was_locked:
             text, icon = _("Setting up…"), "mic"
@@ -1446,6 +1498,8 @@ class SetupWizard(QDialog):
         i = self.stack.currentIndex()
         if self._mic_action():
             self.attach_mic()   # Next is "Put my sounds in my mic" here (_update_next)
+        elif i == self.discord_index and self._asking:
+            self.finish(discord=True)   # Next is "Yes, set up Discord"
         elif i == self.PAGES - 1:
             self.finish()
         else:
@@ -1455,10 +1509,14 @@ class SetupWizard(QDialog):
         """Past the send step without setting it up: only they hear their sounds."""
         if self._busy():
             return
+        if self.stack.currentIndex() == self.discord_index and self._asking:
+            self.finish()   # "No thanks, finish"
+            return
         usage.used("setup-skipped-send")
         self.go(self.stack.currentIndex() + 1)
 
-    def finish(self):
+    def finish(self, discord: bool = False):
+        """`discord`: then the Discord guide, over the window (the setup guide is gone)."""
         cfg = self.win.cfg
         # Finish means done, sending set up or not: like closing it, the guide doesn't
         # open by itself again (the Setup tab's Step-by-step guide still opens it, and
@@ -1474,6 +1532,10 @@ class SetupWizard(QDialog):
         self.accept()
         if self._lang_pending:   # text already on screen can't change language
             QTimer.singleShot(0, self.win.restart_app)
+        elif discord:
+            from soundboard.ui.setup.chatguide import show_guide
+            win, vm = self.win, self._vm
+            QTimer.singleShot(0, win, lambda: show_guide("discord", win, win, vm))
 
     def reject(self):
         """Esc / the window's X. Mid-install, check first: the install carries on
@@ -1991,6 +2053,10 @@ class SetupWizard(QDialog):
     def _show_discord_body(self):
         # one rule: a Discord tip folds under its heading; without one (on the cable,
         # where Discord's steps are on the page) the Discord button shows as it is
+        if self._asking:   # (the question: Next is its Discord button)
+            self.discord_fold.hide()
+            self.discord_body.hide()
+            return
         tip = bool(self.discord_tip.text())
         self.discord_fold.setVisible(tip)
         # nothing in it (not on the mic yet, sounds only for me, no cable): no empty box
@@ -2003,10 +2069,7 @@ class SetupWizard(QDialog):
         self._live_kept: bool | None = None   # (_fill_discord_text: Discord's settings count)
         self._fill_discord_text()
         self._show_live()
-        # (the first launch's "Make it yours" page comes next: Press Finish is said there)
         self.closing.setText(
-            _("Press <b>Next</b> for the last bit: your language and a look.")
-            if self._ask_use else
             _("That's it. Add sounds by dragging files onto the window, then click one "
               "to play it. You can open this guide again any time from the <b>Setup</b> "
               "tab (<b>Step-by-step guide</b>)."))
@@ -2016,6 +2079,19 @@ class SetupWizard(QDialog):
         self.btn_streamer.setVisible(streamer)
         self.help_card.setVisible(games or streamer)
         self.helper_row.setVisible(not (self.btn_copy.isHidden() and self.btn_nomic.isHidden()))
+        # the first launch, straight into a working mic: nothing to pick in Discord, so
+        # the step is one question (Yes opens the Discord guide), not a page of tips
+        self._asking = self._ask_use and self._live_kept is True and _discord_open()
+        self.closing.setVisible(not self._asking)
+        if self._asking:
+            self.discord_title.setText(_("Last step: set up Discord?"))
+            self.discord_text.setText(_(
+                "Discord is open. Your sounds are already in your mic, but Discord's noise "
+                "filter (on by default) can chop them up. Bun shows you the one setting to "
+                "change, and checks it for you."))
+            for w in (self.helper_row, self.help_card):
+                w.hide()
+            self._show_discord_body()
 
     def _fill_discord_text(self):
         cfg = self.win.cfg
