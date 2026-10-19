@@ -609,6 +609,15 @@ def test_a_live_voice_that_cant_load_turns_the_button_back_off(panel):
     s.livevoice._on_event({"type": "stopped", "text": "no model"})
     assert not s.livevoice.b_live.isChecked() and "no model" in s.livevoice.lbl_state.text()
     assert s.installs.b_update.isEnabled()
+    # a "stopped" with no words keeps the helper's own reason (live and translating)
+    s.livevoice._set_live_ui(True, "starting…")
+    s.livevoice._on_event({"type": "error", "text": "out of memory"})
+    s.livevoice._on_event({"type": "stopped", "text": ""})
+    assert "out of memory" in s.livevoice.lbl_state.text()
+    s.livevoice.bg_for = "ai"
+    s.livevoice._on_event({"type": "error", "text": "no translation"})
+    s.livevoice._on_event({"type": "stopped", "text": ""})
+    assert "no translation" in s.livevoice.lbl_bg.text()
 
 
 @pytest.mark.parametrize("fx, speech", [

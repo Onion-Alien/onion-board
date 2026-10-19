@@ -51,6 +51,7 @@ class LiveVoice(QObject):
         self.bg_for = ""             # translating for the "ai" voice or the "fx" changer
         self._bg_key: tuple = ()     # (who, language) the running helper was started for
         self._bg_failed: tuple = ()  # the key it last stopped with an error for
+        self._said = ""              # the helper's own last error: "stopped" keeps it
         self._bg_warning = False     # lbl_bg shows a ⚠ problem (not a hint)
         panel.ctl.on_event = self._event.emit
         self._event.connect(self._on_event)
@@ -234,6 +235,12 @@ class LiveVoice(QObject):
         text = str(ev.get("text", ""))
         if t != "download":
             (self.bg_bar if self.bg_for else self.dl_bar).hide()
+        if t == "error":
+            self._said = text
+        elif t == "ready":
+            self._said = ""
+        elif t == "stopped":
+            text, self._said = text or self._said, ""   # its reason, if it gave one
         if self.bg_for and t != "tts_error":
             self._on_bg_event(t, text, ev)
             return

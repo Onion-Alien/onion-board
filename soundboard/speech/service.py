@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import logging
 import queue
+import re
 import secrets
 import socket
 import struct
@@ -43,6 +44,10 @@ QUIT_WAIT_S = 0.5           # stop(): how long "quit" waits for a busy sender
 QUEUE_BLOCKS = 400          # ~4 s of 10 ms mic blocks
 HELLO_TIMEOUT_S = 5.0       # a connection has this long to say hello
 HELLO_MAX = 4096            # bytes: the first frame, before we know who's calling
+LOG_TAIL_BYTES = 8192       # a crash: how much of the end of its log is read for the reason
+LOG_TAIL_CHARS = 200        # ... and the most of its last line that's shown
+# "2026-01-02 03:04:05,678 ERROR " (the logging prefix the add-ons use): not worth showing
+_LOG_PREFIX = re.compile(r"^\d{4}-\d\d-\d\d \d\d:\d\d:\d\d[,.]\d+ [A-Z]+ ")
 
 
 class ServiceHost:
@@ -67,6 +72,7 @@ class ServiceHost:
         self._send_lock = threading.Lock()
         self.connected = False
         self.dropped = 0
+        self._log_from = 0
 
     # ------------------------------------------------------------ lifecycle
     def start(self):
@@ -83,6 +89,7 @@ class ServiceHost:
             if self.log_path:
                 self.log_path.parent.mkdir(parents=True, exist_ok=True)
                 out = open(self.log_path, "ab")  # noqa: SIM115
+                self._log_from = out.tell()   # this run's lines start here
             self._proc = subprocess.Popen(
                 self.argv + ["--port", str(port), "--token", token], cwd=self.cwd, env=self.env,
                 stdin=subprocess.DEVNULL, stdout=out, stderr=out,
@@ -196,6 +203,8 @@ class ServiceHost:
                         reason = f"{self.name} failed the handshake (exited, code {code})"
                     else:
                         reason = f"{self.name} exited before connecting (code {code})"
+                    if reason:      # what it printed as it died (a traceback's last line)
+                        reason += self._log_tail()
                     self._emit_stopped(reason)
                     return
                 if time.monotonic() > deadline:
@@ -226,14 +235,16 @@ class ServiceHost:
         self.on_event(hello)
         threading.Thread(target=self._send_audio, args=(conn,), name=f"{self.name}-sender",
                          daemon=True).start()
-        reason = ""
+        reason, said_why = "", False
         try:
             while not self._stop.is_set():
                 msg = protocol.recv(conn)
                 if msg is None:
                     break
                 if msg[0] == protocol.JSON:
-                    self.on_event(protocol.decode_json(msg[1]))
+                    ev = protocol.decode_json(msg[1])
+                    said_why = said_why or ev.get("type") == "error"
+                    self.on_event(ev)
                 elif msg[0] == protocol.VOICE and self.on_audio is not None:
                     self.on_audio(msg[1])
         except Exception as e:  # noqa: BLE001
@@ -243,8 +254,29 @@ class ServiceHost:
                 reason = errors.plain(e)
         self.connected = False
         if not self._stop.is_set():
-            self.stop()         # it hung up on us: make sure the process goes too
+            # it hung up on us: a crash (it didn't say why) gets its log's last line
+            code = _exit_code(self._proc, 0.5)
+            if not reason and not said_why and code:
+                reason = f"{self.name} stopped (code {code})" + self._log_tail()
+            self.stop()         # make sure the process goes too
         self._emit_stopped(reason)
+
+    def _log_tail(self) -> str:
+        """": <the last line this run wrote to its log>", or "" (no log, nothing new)."""
+        if not self.log_path:
+            return ""
+        try:
+            with open(self.log_path, "rb") as f:
+                f.seek(max(self._log_from, f.seek(0, 2) - LOG_TAIL_BYTES))
+                lines = f.read().decode("utf-8", "replace").splitlines()
+        except OSError:
+            return ""
+        for line in reversed(lines):
+            line = _LOG_PREFIX.sub("", line).strip()
+            if line:
+                return ": " + (line if len(line) <= LOG_TAIL_CHARS
+                               else line[:LOG_TAIL_CHARS - 1] + "…")
+        return ""
 
     def _emit_stopped(self, reason: str):
         if reason:
@@ -309,6 +341,16 @@ def _handshake(conn: socket.socket, token: str, timeout: float) -> dict | None:
             str(hello.get("token", "")).encode(), token.encode()):
         return None
     return hello
+
+
+def _exit_code(p: subprocess.Popen | None, wait: float) -> int | None:
+    """Its exit code once it has quit (waiting up to `wait` s), else None."""
+    if p is None:
+        return None
+    try:
+        return p.wait(timeout=wait)
+    except subprocess.TimeoutExpired:
+        return None
 
 
 def _late_call(srv: socket.socket, token: str) -> tuple[socket.socket, dict] | None:
