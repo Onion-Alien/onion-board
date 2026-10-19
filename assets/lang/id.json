@@ -4082,5 +4082,6 @@
   "Twitch won't send some events to this channel: {events}.": "Twitch tidak mengirim beberapa peristiwa ke channel ini: {events}.",
   "Twitch: channel points, chat and alerts": "Twitch: poin channel, chat, dan peringatan",
   "{name} (not found)": "{name} (tidak ditemukan)",
-  "✓ Asked Twitch": "✓ Sudah tanya Twitch"
+  "✓ Asked Twitch": "✓ Sudah tanya Twitch",
+  "Only once you click Connect Twitch (Settings > Remote): channel points, alerts and chat commands from your channel. Off: never contacts Twitch.": "Hanya setelah kamu mengeklik Hubungkan Twitch (Pengaturan > Terpencil): poin channel, peringatan, dan perintah chat dari channel-mu. Mati: tidak pernah menghubungi Twitch."
 }

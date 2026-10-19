@@ -4161,5 +4161,6 @@
   "Twitch won't send some events to this channel: {events}.": "Twitch ei lähetä tälle kanavalle joitakin tapahtumia: {events}.",
   "Twitch: channel points, chat and alerts": "Twitch: kanavapisteet, chat ja hälytykset",
   "{name} (not found)": "{name} (ei löytynyt)",
-  "✓ Asked Twitch": "✓ Kysytty Twitchiltä"
+  "✓ Asked Twitch": "✓ Kysytty Twitchiltä",
+  "Only once you click Connect Twitch (Settings > Remote): channel points, alerts and chat commands from your channel. Off: never contacts Twitch.": "Vasta kun painat Yhdistä Twitch (Asetukset > Etäohjaus): kanavapisteet, hälytykset ja chat-komennot kanavaltasi. Pois: ei koskaan ota yhteyttä Twitchiin."
 }

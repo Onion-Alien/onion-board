@@ -707,6 +707,8 @@ class SettingsDialog(QDialog, Built):
                              "winget). Off: install it yourself from ffmpeg.org."),
         "usage_stats": _("Anonymous usage stats once a day, to see what to improve. "
                          "Never your name, IP address or device info."),
+        "twitch": _("Only once you click Connect Twitch (Settings > Remote): channel points, "
+                    "alerts and chat commands from your channel. Off: never contacts Twitch."),
     }
 
     # ---- Offline mode: what only works online is hidden, not left greyed out

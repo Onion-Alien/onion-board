@@ -4161,5 +4161,6 @@
   "Twitch won't send some events to this channel: {events}.": "Twitch non invia alcuni eventi a questo canale: {events}.",
   "Twitch: channel points, chat and alerts": "Twitch: punti canale, chat e avvisi",
   "{name} (not found)": "{name} (non trovato)",
-  "✓ Asked Twitch": "✓ Chiesto a Twitch"
+  "✓ Asked Twitch": "✓ Chiesto a Twitch",
+  "Only once you click Connect Twitch (Settings > Remote): channel points, alerts and chat commands from your channel. Off: never contacts Twitch.": "Solo quando clicchi Collega Twitch (Impostazioni > Remoto): punti canale, avvisi e comandi in chat del tuo canale. Disattivato: non contatta mai Twitch."
 }

@@ -4161,5 +4161,6 @@
   "Twitch won't send some events to this channel: {events}.": "Το Twitch δεν στέλνει κάποια γεγονότα σε αυτό το κανάλι: {events}.",
   "Twitch: channel points, chat and alerts": "Twitch: πόντοι καναλιού, chat και ειδοποιήσεις",
   "{name} (not found)": "{name} (δεν βρέθηκε)",
-  "✓ Asked Twitch": "✓ Ρωτήθηκε το Twitch"
+  "✓ Asked Twitch": "✓ Ρωτήθηκε το Twitch",
+  "Only once you click Connect Twitch (Settings > Remote): channel points, alerts and chat commands from your channel. Off: never contacts Twitch.": "Μόνο αφού πατήσεις Σύνδεση Twitch (Ρυθμίσεις > Απομακρυσμένο): πόντοι καναλιού, ειδοποιήσεις και εντολές chat από το κανάλι σου. Ανενεργό: δεν επικοινωνεί ποτέ με το Twitch."
 }

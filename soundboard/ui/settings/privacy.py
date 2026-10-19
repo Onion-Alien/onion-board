@@ -701,6 +701,7 @@ class PrivacyPage(Page):
             (_("Updates and add-ons"), "reload", ("app_update", "ytdlp_update", "addons")),
             (_("Setup downloads"), "download",
              ("setup_downloads", "tor_download", "ffmpeg_download")),
+            (_("Twitch"), "twitch", ("twitch",)),
             (_("Usage count"), "eye", ("usage_stats",)),
         )
         labels = {"sounds_web": _("Online sounds"), "sound_packs": _("Free sound packs"),

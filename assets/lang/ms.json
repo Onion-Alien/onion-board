@@ -4082,5 +4082,6 @@
   "Twitch won't send some events to this channel: {events}.": "Twitch tidak hantar beberapa peristiwa ke saluran ini: {events}.",
   "Twitch: channel points, chat and alerts": "Twitch: mata saluran, sembang dan amaran",
   "{name} (not found)": "{name} (tidak dijumpai)",
-  "✓ Asked Twitch": "✓ Sudah tanya Twitch"
+  "✓ Asked Twitch": "✓ Sudah tanya Twitch",
+  "Only once you click Connect Twitch (Settings > Remote): channel points, alerts and chat commands from your channel. Off: never contacts Twitch.": "Hanya selepas anda klik Sambung Twitch (Tetapan > Kawalan jauh): mata saluran, amaran dan arahan sembang daripada saluran anda. Mati: tidak sekali-kali menghubungi Twitch."
 }

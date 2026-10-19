@@ -4082,5 +4082,6 @@
   "Twitch won't send some events to this channel: {events}.": "Twitch 不会向此频道发送部分事件：{events}。",
   "Twitch: channel points, chat and alerts": "Twitch：频道积分、聊天和提醒",
   "{name} (not found)": "{name}（未找到）",
-  "✓ Asked Twitch": "✓ 已向 Twitch 请求"
+  "✓ Asked Twitch": "✓ 已向 Twitch 请求",
+  "Only once you click Connect Twitch (Settings > Remote): channel points, alerts and chat commands from your channel. Off: never contacts Twitch.": "仅在你点击“连接 Twitch”后（设置 > 远程）：来自你频道的频道积分、提醒和聊天命令。关闭：从不联系 Twitch。"
 }

@@ -4082,5 +4082,6 @@
   "Twitch won't send some events to this channel: {events}.": "Twitch ไม่ส่งบางเหตุการณ์มาที่ช่องนี้: {events}",
   "Twitch: channel points, chat and alerts": "Twitch: แต้มช่อง แชท และการแจ้งเตือน",
   "{name} (not found)": "{name} (ไม่พบ)",
-  "✓ Asked Twitch": "✓ ถาม Twitch แล้ว"
+  "✓ Asked Twitch": "✓ ถาม Twitch แล้ว",
+  "Only once you click Connect Twitch (Settings > Remote): channel points, alerts and chat commands from your channel. Off: never contacts Twitch.": "เฉพาะเมื่อคุณกดเชื่อมต่อ Twitch (การตั้งค่า > ระยะไกล): แต้มช่อง การแจ้งเตือน และคำสั่งแชทจากช่องของคุณ ปิด: ไม่ติดต่อ Twitch เลย"
 }
