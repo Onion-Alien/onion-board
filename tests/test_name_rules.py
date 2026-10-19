@@ -130,11 +130,12 @@ def test_a_removed_pad_sharing_audio_comes_back_from_its_backup(window, tmp_path
     assert backup.install(backup.read(out), set(known)).skipped == ["Boom", "Airhorn"]
 
 
-def test_the_import_question_says_which_category_they_go_in(window, monkeypatch):
+def test_importing_another_board_asks_no_question_first(window, monkeypatch):
+    # picking the import is enough (where they go: test_soundpad)
     asked = []
     no = QMessageBox.StandardButton.No
     monkeypatch.setattr(QMessageBox, "question",
                         lambda _w, _t, text, *a: asked.append(text) or no)
     entry = Entry(name="x", path="C:/x.wav", exists=True)
     window.impctl._board_read(soundpad.SOURCE, "C:/b.spl", True, ([entry], [], [entry]))
-    assert "They go in a category called “Soundpad”." in asked[0]
+    assert asked == []
