@@ -238,8 +238,9 @@ class TriggersTab(QWidget):
         row.addLayout(text, 1)
         # Enough room for Hoot's speech bubble without squeezing the card's text.
         side = 16
+        # (no dancing to what's playing: just his idle moves)
         self.hoot = OwlWidget(HOOT_PX, HOOT_BEGS, HOOT_JOY, left=side, right=side,
-                              dances=True, rest_after_s=lite.rest_s(HOOT_REST_S))
+                              rest_after_s=lite.rest_s(HOOT_REST_S))
         self.hoot.clicked.connect(lambda: (usage.used("hoot-talk"),
                                            self.btn_get.setFocus(Qt.FocusReason.OtherFocusReason)))
         row.addWidget(self.hoot, 0, Qt.AlignmentFlag.AlignCenter)
