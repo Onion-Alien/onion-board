@@ -119,7 +119,7 @@ class UiCollector(QObject):
 
     def check(self) -> int:
         let_go()
-        overridepin.pin()   # classes imported since the last tick (a tab, an add-on)
+        overridepin.pin_new()   # classes imported since (a tab, an add-on)
         since = time.monotonic() - self._deep_at
         if self._freeze and (since > DEEP_MAX_S or (since > DEEP_S and self._quiet())):
             return self.deep()

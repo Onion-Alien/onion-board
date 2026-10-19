@@ -34,6 +34,8 @@ if TYPE_CHECKING:
 TICK_MS = 1000 // 24  # the UI timer while the window is on screen (meters, visualisers)
 TICK_QUIET_MS = 100  # on screen with nothing moving: no sound, radio, recording or level
 TICK_IDLE_MS = 250   # ...and while it's in the tray or minimised (push-to-talk, watchdog)
+TICK_LITE_MS = 1000 // 15   # lite mode (ui/settings/lite.py): on screen and busy...
+TICK_LITE_QUIET_MS = 200    # ...and quiet (the mic meters still follow, 5 times a second)
 LEVEL_FALL = 0.88     # what the levels keep a tick (at 24 a second: as fast a fall as 0.9 at 30)
 LEVEL_QUIET = 0.003  # a level below this (-50 dB) shows as nothing on the meters
 RADIO_LAG = 0.1      # seconds between the radio's audio arriving and it being heard
@@ -59,9 +61,9 @@ class TickControl(Controller):
         if not mw._ui_live and not mw.overlay.is_open and not mw.bunctl.bun_up():
             return TICK_IDLE_MS
         if not self._tick_busy:   # nothing moves: 10 ticks a second instead of 24
-            return TICK_QUIET_MS
+            return TICK_LITE_QUIET_MS if lite.on() else TICK_QUIET_MS
         # Visible and busy: meters stay smooth even when a game has focus.
-        return TICK_MS
+        return TICK_LITE_MS if lite.on() else TICK_MS
 
     def _wake(self):
         """A sound started or resumed: full pace now, not after a quiet tick (auto
