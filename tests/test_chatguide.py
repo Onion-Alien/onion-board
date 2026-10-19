@@ -260,3 +260,48 @@ def test_with_rate_rewrites_rate_and_byte_rate():
     out = cableformat._with_rate(raw, 48000)
     assert cableformat._parse(out) == (48000, 16, 2)
     assert WAVEFORMATEX.from_buffer_copy(bytes(out)).nAvgBytesPerSec == 48000 * 4
+
+
+def _discord(**kw):
+    from soundboard.mic import discordcfg
+    base = dict(client="Discord", profile="CUSTOM", krisp=True, suppression=False,
+                echo=True, agc=False, bypass=False, vad=False, input_device="default",
+                stamp=0.0, auto=True)
+    return discordcfg.Settings(**{**base, **kw})
+
+
+def test_setting_changes_name_each_switch_from_and_to():
+    rows = chatguide.setting_changes(
+        _discord(), _discord(krisp=False, echo=False, auto=False, ptt=True))
+    assert ("Noise Suppression", "Krisp", "None") in rows
+    assert ("Echo Cancellation", "On", "Off") in rows
+    assert ("Input Mode", "Voice Activity", "Push to Talk") in rows
+    # on Push to Talk the sensitivity switch isn't there: no "auto: On -> Off" row
+    assert not any(r[0].startswith("Automatically") for r in rows)
+    assert chatguide.setting_changes(_discord(), _discord()) == []
+    rows = chatguide.setting_changes(_discord(profile="VOICE_ISOLATION"), _discord())
+    assert ("Input Profile", "Voice Isolation", "Custom") in rows
+
+
+def test_guide_cheers_with_what_changed_once_discord_is_fixed(wizard, monkeypatch):
+    """Fix Discord: once the guide sees the settings come right, a window with Bun
+    says exactly what changed; closing it closes the guide too."""
+    w, wiz = wizard
+    monkeypatch.setattr(chatguide.DiscordGuide, "_read_settings", lambda self: None)
+    g = chatguide.DiscordGuide(wiz, w, "CABLE Output")
+    g._settings_in(1, [_discord()])
+    assert g.fixed is None
+    g._settings_in(2, [_discord(krisp=False, echo=False, auto=False)])
+    app = chatguide.QApplication.instance()
+    assert process_events(app, lambda: g.fixed is not None, timeout=2)
+    t = g.fixed.table.text()
+    assert "Noise Suppression" in t and "Krisp" in t and "None" in t
+    assert "Echo Cancellation" in t and "Automatic Gain Control" not in t
+    assert g.fixed.bun.celebrate
+    g._settings_in(3, [_discord(krisp=False, echo=False, auto=False, agc=True)])
+    g._settings_in(4, [_discord(krisp=False, echo=False, auto=False)])
+    process_events(app, lambda: False, timeout=0.2)
+    shown = g.fixed
+    shown.accept()
+    assert g.result() == chatguide.QDialog.DialogCode.Accepted
+    g.done(0)
