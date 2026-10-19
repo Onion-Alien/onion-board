@@ -206,7 +206,7 @@ def test_flat_map_moves_dots_apart_instead_of_covering(qapp):
     each its own dot to click; the busiest keeps the spot and a dot alone doesn't move."""
     pts = [{"id": f"s{i}", "la": 50.0, "lo": 10.0, "k": i} for i in range(20)]
     pts.append({"id": "alone", "la": 40.0, "lo": 0.0, "k": 5})
-    from soundboard.ui.radio.flatmap import ROOM_PX, FlatMap
+    from soundboard.ui.radio.flatmap import FlatMap
     m = FlatMap()
     m.resize(400, 300)
     m.set_points(pts)
@@ -220,13 +220,38 @@ def test_flat_map_moves_dots_apart_instead_of_covering(qapp):
         r = m._r * m._grow()
         assert (dx[alone], dy[alone]) == (0, 0)
         assert (dx[busiest], dy[busiest]) == (0, 0)   # the busiest keeps the middle
-        assert np.hypot(dx, dy).max() <= ROOM_PX * m._grow() ** 2 + 1e-6
+        assert np.hypot(dx, dy).max() <= m._room_size()[1] + 1e-6
         apart = [all(np.hypot(xs[i] - xs[j], ys[i] - ys[j]) >= r[i] + r[j]
                      for j in range(21) if j != i) for i in range(21)]
         # zoomed out there's room near the spot for most; zoomed in, for all
         assert sum(apart) >= (15 if zoom == 1 else 21)
     m.grab()
 
+
+
+def test_flat_map_city_clump_keeps_coming_apart_zoomed_in(qapp):
+    """A big city's stations all listed at its centre, popular ones among them: the
+    further in, the further apart they spread (not one clump the same size at every
+    zoom), and all the way in none covers another."""
+    pts = [{"id": f"s{i}", "la": 40.7, "lo": -74.0, "k": (i * 37) % 400}
+           for i in range(150)]
+    from soundboard.ui.radio.flatmap import ZOOM_MAX, FlatMap
+    m = FlatMap()
+    m.resize(800, 500)
+    m.set_points(pts)
+    width = {}
+    for zoom in (8.0, 40.0, ZOOM_MAX):
+        m.zoom, m.cx, m.cy = zoom, -74.0, 40.7
+        m._clamp()
+        m._spread(m._scale(), wait=True)
+        xs, ys = m._screen()
+        width[zoom] = xs.max() - xs.min()
+        if zoom == ZOOM_MAX:
+            r = m._r * m._grow()
+            d = np.hypot(xs[:, None] - xs[None], ys[:, None] - ys[None])
+            np.fill_diagonal(d, np.inf)
+            assert (d >= (r[:, None] + r[None]) - 1e-6).all()
+    assert width[8.0] < width[40.0] < width[ZOOM_MAX]
 
 def test_flat_map_popular_stations_glow_bigger(qapp):
     """The most played stations are big glowing dots, the more plays the bigger; the

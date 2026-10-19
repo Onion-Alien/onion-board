@@ -70,11 +70,15 @@ HOT_R = (2.0, 5.0)                  # ...a popular one's, least to most played
 GLOW = 2.8                          # the glow round a popular dot, times its size
 # Dots that would cover each other move apart (where they are needn't be exact): each
 # takes the nearest free place round its spot, up to ROOM_PX away (more zoomed in, as
-# the dots grow), ROOM_GAP_PX apart. Worked out once per half zoom step (ROOM_STEPS a
-# doubling) and kept, a slice at a time (ROOM_BATCH dots a step, ROOM_SLICE_S a slice)
-# between frames, the dots where they were till it's done.
+# the dots grow), ROOM_GAP_PX apart. Past ROOM_ZOOM both grow with the zoom (the gaps
+# as its square root, the reach in step with it): a city's stations all listed at its
+# centre keep coming apart as you zoom in, instead of staying one fixed clump. Worked
+# out once per half zoom step (ROOM_STEPS a doubling) and kept, a slice at a time
+# (ROOM_BATCH dots a step, ROOM_SLICE_S a slice) between frames, the dots where they
+# were till it's done.
 ROOM_PX = 14.0
 ROOM_GAP_PX = 0.8
+ROOM_ZOOM = 4.0
 ROOM_STEPS = 2
 ROOM_BATCH = 32
 ROOM_SLICE_S = 0.004
@@ -179,6 +183,7 @@ def _make_room(x: np.ndarray, y: np.ndarray, r: np.ndarray, step: float,
     d = step * np.sqrt(j)
     a = j * math.pi * (3 - math.sqrt(5))
     tx, ty = (d * np.cos(a))[:, None], (d * np.sin(a))[:, None]   # (0, 0) first
+    chunk = 256   # places tried at a time: zoomed in there can be thousands
     reach = 2 * (room + float(r.max())) + gap   # two moved dots touching, at most
     # the dots placed so far, by square (reach a side, by where each started): a dot
     # looks only at the nine round its own, not at every dot placed
@@ -193,10 +198,17 @@ def _make_room(x: np.ndarray, y: np.ndarray, r: np.ndarray, step: float,
         if near:
             q = np.array(near)
             lim = (r[i] + r[q] + gap) ** 2
-            free = (((x[i] + tx - px[q]) ** 2 + (y[i] + ty - py[q]) ** 2)
-                    >= lim).all(axis=1)
-            t = int(np.argmax(free))
-            if t and free[t]:   # not free anywhere near enough: it stays on its spot
+            for c in range(0, len(tx), chunk):
+                cx, cy = tx[c:c + chunk], ty[c:c + chunk]
+                free = (((x[i] + cx - px[q]) ** 2 + (y[i] + cy - py[q]) ** 2)
+                        >= lim).all(axis=1)
+                t = int(np.argmax(free))
+                if free[t]:
+                    t += c
+                    break
+            else:   # not free anywhere near enough: it stays on its spot
+                t = 0
+            if t:
                 out[i] = (tx[t, 0], ty[t, 0])
                 px[i], py[i] = x[i] + tx[t, 0], y[i] + ty[t, 0]
         cells.setdefault((a, b), []).append(i)
@@ -551,7 +563,7 @@ class FlatMap(QWidget):
                 grow = self._grow(zoom)
                 self._room_job = ((b, base), _make_room(
                     self._lon * base * zoom, -self._lat * base * zoom, self._r * grow,
-                    (2 * QUIET_R * grow + ROOM_GAP_PX) * 1.05, ROOM_PX * grow * grow))
+                    *self._room_size(zoom)))
                 self._room_timer.start()
             if wait:
                 self._room_step(math.inf)
@@ -564,6 +576,15 @@ class FlatMap(QWidget):
                 return 0.0, 0.0
             room = self._room_shown = self._room[(done[0], base)]
         return room[:, 0], room[:, 1]
+
+    def _room_size(self, zoom: float | None = None) -> tuple[float, float]:
+        """How far apart moved dots sit and how far from their spot they may go, in
+        pixels, at `zoom` (_make_room)."""
+        zoom = self.zoom if zoom is None else zoom
+        grow = self._grow(zoom)
+        more = max(1.0, zoom / ROOM_ZOOM)
+        return ((2 * QUIET_R * grow + ROOM_GAP_PX) * 1.05 * math.sqrt(more),
+                ROOM_PX * grow * grow * more)
 
     def _room_step(self, budget: float = ROOM_SLICE_S):
         """Works on the dots' places (_spread) for `budget` seconds; once they're done,
