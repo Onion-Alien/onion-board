@@ -4297,5 +4297,7 @@
   "Not yet": "Още не",
   "Nothing here yet. Try another filter.": "Още няма нищо. Опитай друг филтър.",
   "Rarity": "Рядкост",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Възпроизвежда вашия микрофон в слушалките ви върху звуците, точно това, което другите чуват."
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Възпроизвежда вашия микрофон в слушалките ви върху звуците, точно това, което другите чуват.",
+  "Achievement unlocked": "Отключено постижение",
+  "{points}G - {name}": "{points}G - {name}"
 }

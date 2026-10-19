@@ -4223,5 +4223,7 @@
   "Not yet": "아직",
   "Nothing here yet. Try another filter.": "아직 여기에 아무것도 없어요. 다른 필터를 써 보세요.",
   "Rarity": "희귀도",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "사운드 위에 내 마이크를 헤드폰으로 들려줘요, 다른 사람이 듣는 그대로예요."
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "사운드 위에 내 마이크를 헤드폰으로 들려줘요, 다른 사람이 듣는 그대로예요.",
+  "Achievement unlocked": "업적 달성",
+  "{points}G - {name}": "{points}G - {name}"
 }

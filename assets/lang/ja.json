@@ -4223,5 +4223,7 @@
   "Not yet": "未獲得",
   "Nothing here yet. Try another filter.": "まだ何もありません。別のフィルターを試してください。",
   "Rarity": "レア度",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "サウンドに重ねてマイクの音をヘッドホンで再生します、相手に聞こえるそのままの音です。"
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "サウンドに重ねてマイクの音をヘッドホンで再生します、相手に聞こえるそのままの音です。",
+  "Achievement unlocked": "実績解除",
+  "{points}G - {name}": "{points}G - {name}"
 }

@@ -4297,5 +4297,7 @@
   "Not yet": "Henüz değil",
   "Nothing here yet. Try another filter.": "Burada henüz bir şey yok. Başka bir filtre dene.",
   "Rarity": "Nadirlik",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Mikrofonunu seslerin üstüne kulaklığında çalar, tam olarak diğerlerinin duyduğu."
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Mikrofonunu seslerin üstüne kulaklığında çalar, tam olarak diğerlerinin duyduğu.",
+  "Achievement unlocked": "Başarım kazanıldı",
+  "{points}G - {name}": "{points}G - {name}"
 }

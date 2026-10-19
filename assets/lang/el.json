@@ -4297,5 +4297,7 @@
   "Not yet": "Όχι ακόμα",
   "Nothing here yet. Try another filter.": "Τίποτα εδώ ακόμα. Δοκίμασε άλλο φίλτρο.",
   "Rarity": "Σπανιότητα",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Παίζει το μικρόφωνό σου στα ακουστικά σου πάνω από τους ήχους, ακριβώς ό,τι ακούν οι άλλοι."
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Παίζει το μικρόφωνό σου στα ακουστικά σου πάνω από τους ήχους, ακριβώς ό,τι ακούν οι άλλοι.",
+  "Achievement unlocked": "Ξεκλείδωσες επίτευγμα",
+  "{points}G - {name}": "{points}G - {name}"
 }

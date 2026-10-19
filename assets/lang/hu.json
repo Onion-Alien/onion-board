@@ -4297,5 +4297,7 @@
   "Not yet": "Még nem",
   "Nothing here yet. Try another filter.": "Itt még nincs semmi. Próbálj másik szűrőt.",
   "Rarity": "Ritkaság",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "A mikrofonodat a hangok tetejére játssza a fejhallgatódba, pontosan azt, amit mások hallanak."
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "A mikrofonodat a hangok tetejére játssza a fejhallgatódba, pontosan azt, amit mások hallanak.",
+  "Achievement unlocked": "Teljesítmény feloldva",
+  "{points}G - {name}": "{points}G - {name}"
 }

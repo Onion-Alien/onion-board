@@ -4371,5 +4371,7 @@
   "Not yet": "Ще ні",
   "Nothing here yet. Try another filter.": "Тут поки нічого немає. Спробуй інший фільтр.",
   "Rarity": "Рідкісність",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Грає твій мікрофон у навушники поверх звуків: саме те, що чують інші."
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Грає твій мікрофон у навушники поверх звуків: саме те, що чують інші.",
+  "Achievement unlocked": "Досягнення отримано",
+  "{points}G - {name}": "{points}G - {name}"
 }

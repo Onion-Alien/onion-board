@@ -4223,5 +4223,7 @@
   "Not yet": "未获得",
   "Nothing here yet. Try another filter.": "这里还没有内容。换个筛选试试。",
   "Rarity": "稀有度",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "把你的麦克风和音效一起放进你的耳机，正是别人听到的内容。"
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "把你的麦克风和音效一起放进你的耳机，正是别人听到的内容。",
+  "Achievement unlocked": "成就已解锁",
+  "{points}G - {name}": "{points}G - {name}"
 }

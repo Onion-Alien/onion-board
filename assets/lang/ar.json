@@ -4593,5 +4593,7 @@
   "Not yet": "ليس بعد",
   "Nothing here yet. Try another filter.": "لا شيء هنا بعد. جرّب عامل تصفية آخر.",
   "Rarity": "الندرة",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "يشغّل الميكروفون في سماعاتك فوق الأصوات, تمامًا ما يسمعه الآخرون."
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "يشغّل الميكروفون في سماعاتك فوق الأصوات, تمامًا ما يسمعه الآخرون.",
+  "Achievement unlocked": "تم فتح إنجاز",
+  "{points}G - {name}": "{points}G - {name}"
 }

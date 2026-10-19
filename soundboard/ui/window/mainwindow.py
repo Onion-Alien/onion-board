@@ -37,6 +37,7 @@ from soundboard.audio.replay import InstantReplay
 from soundboard.sounds.library import Config, SoundMeta
 from soundboard.ui.kit.crashdialog import free_dialog
 from soundboard.ui.kit import restyled, worker
+from soundboard.ui.window.achievepop import AchievementPops
 from soundboard.ui.window.ffmpegcontrol import FfmpegControl
 from soundboard.ui.window.netcontrol import NetControl
 from soundboard.ui.window.soundscontrol import SoundsControl
@@ -451,6 +452,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(self.title)
         self.setAcceptDrops(True)   # files dropped outside the pad grid: see dropEvent
         self.cfg = Config.load()
+        self.achievepops = AchievementPops(self)   # first: attach() can earn some
         achievements.attach(self.cfg)   # Settings > Achievements counts from here
         achievements.set_goal("rainbow_road", len(theme.THEMES))
         # sounds left on the Undo bar by a crash: into Recently deleted (before the
@@ -1629,6 +1631,7 @@ class MainWindow(QMainWindow):
                      self.alertctl.discord_quit,
                      self._remember_usage, self._count_at_quit, self.cfg.save,
                      self.overlay.shutdown,
+                     self.achievepops.shutdown,
                      self.hotkeys.stop, self.replay.stop, self.remote.stop, self.twitch.quit,
                      self.remctl._stop_remote_addons,
                      self._finish_count_at_quit,   # sent meanwhile; before Tor stops

@@ -4223,5 +4223,7 @@
   "Not yet": "ยังไม่ได้",
   "Nothing here yet. Try another filter.": "ยังไม่มีอะไรที่นี่ ลองตัวกรองอื่นดู",
   "Rarity": "ความหายาก",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "เล่นไมค์ของคุณเข้าหูฟังพร้อมกับเสียง, ตรงกับที่คนอื่นได้ยิน"
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "เล่นไมค์ของคุณเข้าหูฟังพร้อมกับเสียง, ตรงกับที่คนอื่นได้ยิน",
+  "Achievement unlocked": "ปลดล็อกความสำเร็จแล้ว",
+  "{points}G - {name}": "{points}G - {name}"
 }

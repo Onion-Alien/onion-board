@@ -4297,5 +4297,7 @@
   "Not yet": "Ei vielä",
   "Nothing here yet. Try another filter.": "Täällä ei ole vielä mitään. Kokeile toista suodatinta.",
   "Rarity": "Harvinaisuus",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Soittaa mikkisi kuulokkeisiisi äänien päälle, juuri sen, mitä muut kuulevat."
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Soittaa mikkisi kuulokkeisiisi äänien päälle, juuri sen, mitä muut kuulevat.",
+  "Achievement unlocked": "Saavutus avattu",
+  "{points}G - {name}": "{points}G - {name}"
 }

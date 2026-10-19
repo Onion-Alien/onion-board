@@ -4297,5 +4297,7 @@
   "Not yet": "Pas encore",
   "Nothing here yet. Try another filter.": "Rien ici pour l'instant. Essaie un autre filtre.",
   "Rarity": "Rareté",
-  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Joue ton micro dans ton casque par-dessus les sons, exactement ce que les autres entendent."
+  "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Joue ton micro dans ton casque par-dessus les sons, exactement ce que les autres entendent.",
+  "Achievement unlocked": "Succès débloqué",
+  "{points}G - {name}": "{points}G - {name}"
 }
