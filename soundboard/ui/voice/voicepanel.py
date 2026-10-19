@@ -13,7 +13,7 @@ from collections.abc import Callable
 
 from PySide6.QtCore import QRectF, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QLinearGradient, QPainter
-from PySide6.QtWidgets import (QButtonGroup, QFrame, QHBoxLayout, QLabel, QPushButton,
+from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QFrame, QHBoxLayout, QLabel, QPushButton,
                                QScrollArea, QVBoxLayout, QWidget)
 
 from soundboard.addons import modules as mods
@@ -173,7 +173,14 @@ class VoicePanel(QWidget):
     active_changed = Signal(bool)   # the voice changer or the computer voice is on / off
     clip_ready = Signal(object, str)   # a typed line saved as a sound (SpeechPanel)
     share_asked = Signal(str)   # Share to the store: the voice, as the Share window lists it
+    light_changed = Signal(bool)   # Use less CPU switched by hand
     _scanned = Signal(object, object)   # the Refresh button's worker: (modules, AI voices)
+
+    def set_light(self, on: bool):
+        """Show Use less CPU as on or off (the main window decides; no signal)."""
+        self.chk_light.blockSignals(True)
+        self.chk_light.setChecked(bool(on))
+        self.chk_light.blockSignals(False)
 
     def __init__(self, engine, fx_spec: dict | None = None, speech: dict | None = None):
         super().__init__()
@@ -258,7 +265,22 @@ class VoicePanel(QWidget):
         th = QVBoxLayout(tab_head)
         th.setContentsMargins(0, 0, 0, 0)
         th.setSpacing(8)
-        th.addWidget(tab_row)
+        # Use less CPU, beside the tabs: it's for every voice, not one card. On by
+        # itself in lite mode (the main window says which)
+        self.chk_light = QCheckBox(_("Use less CPU"))
+        self.chk_light.setToolTip(_(
+            "For slower PCs: the voices use less CPU. The voice changer skips hiss "
+            "removal and its robot voices and echoes are a little simpler. Speech "
+            "recognition uses the smaller model if it's downloaded (other languages are "
+            "heard a little less well) and translations are simpler. AI voices stay as they "
+            "are: they can't get lighter without sounding worse. On by itself in lite mode."))
+        self.chk_light.toggled.connect(self.light_changed)
+        tabs_line = QHBoxLayout()
+        tabs_line.setContentsMargins(0, 0, 0, 0)
+        tabs_line.setSpacing(12)
+        tabs_line.addWidget(tab_row, 1)
+        tabs_line.addWidget(self.chk_light, 0, Qt.AlignmentFlag.AlignTop)
+        th.addLayout(tabs_line)
         rule = QFrame()
         rule.setObjectName("voicetabrule")
         rule.setFixedHeight(1)
@@ -313,6 +335,8 @@ class VoicePanel(QWidget):
         self.addons.show_modules(self.modules)
         self._section("addons", self.addons, self.addons.title)
         self.show_tab(self._tab if self._tabs[self._tab].isVisibleTo(self) else "fx")
+        # as tall as a tab: Use less CPU sits level with the first row of them
+        self.chk_light.setFixedHeight(self._tabs["fx"].sizeHint().height())
 
         from soundboard.ui.voice.voicesetupsbar import SetupsBar
         self.setups_bar = SetupsBar(self.setups, self.current_setup, self.use_setup,

@@ -254,7 +254,8 @@ def test_use_less_cpu_is_auto_by_default_and_stays_on_this_pc():
 def test_use_less_cpu_follows_lite_mode_until_switched_by_hand(window):  # noqa: F811
     from soundboard import voicefx
     try:
-        box = window.voice.fx.chk_light
+        box = window.voice.chk_light   # on the Voice tab itself, for every voice
+        assert not window.voice.fx.isAncestorOf(box)
         assert not voicefx.light() and not box.isChecked()
         window.themectl.set_lite_mode(True)
         assert voicefx.light() and box.isChecked()

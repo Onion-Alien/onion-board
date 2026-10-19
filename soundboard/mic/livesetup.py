@@ -90,9 +90,9 @@ def lang_args(model: str, target) -> list[str]:
     """The live-voice helper's arguments for hearing a stream or a sound (whatever
     language it's in: a multilingual model, into English) and translating it into
     `target` (a translation add-on, downloaded)."""
-    from soundboard.speech import spoken, translation
-    model = model if model in MODELS else "base.en"
-    return ["--model", spoken.model_for(model, "auto"), "--language", "auto",
+    from soundboard.speech import live, spoken, translation
+    model = spoken.model_for(model if model in MODELS else "base.en", "auto")
+    return ["--model", model, "--language", "auto", *live.lighter_args(model),
             "--task", "translate", "--translate", str(translation.model_dir(target))]
 
 
@@ -279,12 +279,13 @@ def hear_lines(lang: Lang, mono: np.ndarray, rate: int,
     starts, in seconds; the line), by the live-voice helper. Raises RuntimeError when
     it can't, library.Cancelled once `cancel()`. Slow: off the UI thread."""
     from soundboard.online import net
+    from soundboard.speech.live import helper_env
     from soundboard.speech.service import QUEUE_BLOCKS, ServiceHost
     events: queue.Queue[dict] = queue.Queue()
     mod = lang.module
     host = ServiceHost(mod.resolved_command(list(lang.args)), events.put, cwd=mod.path,
                        log_path=library.APP_DIR / f"module-{mod.id}.log", name=mod.id,
-                       env=net.child_env("voices"))
+                       env=helper_env(net.child_env("voices")))
     host.start()
 
     def next_event(seconds: float) -> dict:

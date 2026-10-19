@@ -4039,7 +4039,7 @@
   "Lite mode": "輕量模式",
   "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Onion Board 在這台電腦上可以更輕快：輕量模式會關閉動畫。也可以在 設定 > 外觀 裡找到。",
   "Use less CPU": "降低 CPU 使用量",
-  "For slower PCs: the voice changer and live voice use less CPU. Hiss removal is off, the robot voices and echoes are a little simpler, and live voice uses the smaller speech model if it's downloaded. On by itself in lite mode.": "適合較慢的電腦：變聲器和即時語音使用較少的 CPU。消除嘶嘶聲會關閉，機器人聲音和回聲會稍微簡單一些；如果已下載較小的語音模型，即時語音會改用它。輕量模式下會自動開啟。",
+  "For slower PCs: the voices use less CPU. The voice changer skips hiss removal and its robot voices and echoes are a little simpler. Speech recognition uses the smaller model if it's downloaded (other languages are heard a little less well) and translations are simpler. AI voices stay as they are: they can't get lighter without sounding worse. On by itself in lite mode.": "適合較慢的電腦：語音佔用更少 CPU。變聲器略過去嘶聲，機器人聲和回音稍微簡化。語音辨識在已下載時使用較小的模型（其他語言聽得稍差一些），翻譯也更簡單。AI 語音維持不變：變輕就會變難聽。輕量模式下自動開啟。",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor 尚未在此電腦上：按 Get Tor（設定 > 連接）下載它。從原始碼來看，scripts/buildtools/fetch_tor.py 也可以工作。",
   "Another language is downloading. Wait for it to finish.": "另一種語言正在下載。請等它完成。",
   "Download {language}?": "下載{language}？",

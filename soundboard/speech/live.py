@@ -68,11 +68,26 @@ def helper_env(env: dict[str, str]) -> dict[str, str]:
     """The speech helper's maths threads (CTranslate2's OpenMP) sleep as soon as a
     sentence is done instead of spinning for ~200 ms: speech comes in bursts, and the
     spinning was a third of its CPU (on a slower PC 123 -> 86 % of a core, the
-    sentences ~0.05 s slower). With Use less CPU, two threads instead of one per core."""
+    sentences ~0.05 s slower). With Use less CPU, two threads instead of one per core,
+    and ONIONBOARD_LESS_CPU=1 (it translates with one guess instead of two; an older
+    helper doesn't know it and carries on as before)."""
     env = {**env, "OMP_WAIT_POLICY": "PASSIVE", "KMP_BLOCKTIME": "0"}
     if voicefx.light():
         env["OMP_NUM_THREADS"] = "2"
+        env["ONIONBOARD_LESS_CPU"] = "1"
     return env
+
+
+# Use less CPU: the next smaller recognition model, used only when it's downloaded
+# already (the helper looks; --lighter). The Languages card's "small" (any language)
+# takes ~1.3 s a line on a CPU, "base" ~0.4 s but hears other languages a little worse.
+LIGHTER = {"base.en": "tiny.en", "small": "base"}
+
+
+def lighter_args(model: str) -> list[str]:
+    """["--lighter", <smaller model>] for the helper with Use less CPU on, else []."""
+    small = LIGHTER.get(model)
+    return ["--lighter", small] if small and voicefx.light() else []
 
 
 class SpeechController:
