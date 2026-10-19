@@ -222,6 +222,26 @@ def test_the_values_can_be_typed(qapp):
     assert b.speed.value() == 1.5
 
 
+def test_a_typed_value_survives_enter(qapp):
+    """Enter in a value box also reached the popup's Reset (its default button), which
+    put the typed value straight back."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
+    b = SpeedPitchButton()
+    b.click()
+    for s, text, want in ((b.speed, "1.25", 1.25), (b.pitch, "7", 7.0),
+                          (b.fx["bass"], "5", 5.0)):
+        box = s.val
+        box.setFocus()
+        box.selectAll()
+        QTest.keyClicks(box, text)
+        QTest.keyClick(box, Qt.Key.Key_Return)
+        assert s.value() == want and box.value() == want
+    assert b.speed.value() == 1.25 and b.pitch.value() == 7.0   # none of them reset
+    b.pop.hide()
+
+
 def test_a_lit_preset_clicked_again_puts_the_knobs_back(qapp):
     """Clicked again, a lit preset turned every knob off, a tweak made before it too."""
     from soundboard.audio import livefx
