@@ -10,6 +10,12 @@ the first sounds aren't clipped), and plays what comes back after a 20 ms jitter
 buffer. While you're quiet nothing is sent, the helper sleeps and the output is
 silence.
 
+With Use less CPU (voicefx.light()) the helper is started with ONIONBOARD_LESS_CPU=1:
+an add-on that has the lighter model converts 40 ms a call instead of 20 (about a
+third less CPU), and its "ready" says so (chunk_s): the jitter buffer and the
+drop-ahead limits follow the chunk, so you're ~40 ms further behind. Switching it
+takes effect the next time the AI voice starts; an older add-on ignores it.
+
 If the helper falls behind, the last 5 ms fade out; if nothing comes back for
 300 ms while you talk (it crashed or hung), the backup takes over with a 10 ms
 crossfade: a built-in voice preset by default, so your real voice still isn't
@@ -38,6 +44,7 @@ log = logging.getLogger(__name__)
 
 MODULE_ID = "ai-voices"
 VOICE_RATE = 24000          # what the helper sends back
+CHUNK_S = 0.02              # what the helper converts at a time (its "ready" can say more)
 JITTER_S = 0.02             # buffered before playing (one helper chunk)
 MAX_BUFFER_S = 0.06         # more than this queued: drop the oldest down to TRIM_TO_S
 TRIM_TO_S = 0.03            # (the pre-roll comes back in one go when you start talking:
@@ -51,6 +58,19 @@ HANG_S = 0.3
 BACKUP_PRESET = "Masked caller"     # hides your voice if the AI voice stops
 BACKUPS = ("voice", "mic", "mute")
 LATENCY_S = 0.075           # typical: 20 ms chunks + ~32 ms model look-ahead + buffer
+
+
+def buffer_limits(chunk_s: float) -> tuple[float, float, float]:
+    """(jitter, max, trim to) in seconds for helper chunks of `chunk_s`: one chunk
+    buffered before playing; more than two chunks and 20 ms queued is dropped down to a
+    chunk and 10 ms (for 20 ms chunks: JITTER_S, MAX_BUFFER_S, TRIM_TO_S)."""
+    return chunk_s, 2 * chunk_s + 0.02, chunk_s + 0.01
+
+
+def latency_s(chunk_s: float) -> float:
+    """About how far behind you the voice is with helper chunks of `chunk_s`: a longer
+    chunk waits longer to fill and is buffered longer."""
+    return LATENCY_S + 2 * (chunk_s - CHUNK_S)
 
 
 def clean_settings(raw) -> dict:
@@ -113,6 +133,7 @@ class VoiceSource:
         self.send_quiet = send_quiet
         self.backup = backup if backup in BACKUPS else "voice"
         self.gate = TalkGate()
+        self.chunk_s = CHUNK_S                # the helper's chunk (set from its "ready")
         self.rate = 0                         # the mic's, written by the audio thread
         self.ready = False                    # the helper said "ready"
         self.dead = False                     # the helper is gone: backup only
@@ -201,9 +222,10 @@ class VoiceSource:
             return self._backup(m, rate)
         # keep the delay short: a burst that piled up is dropped, oldest first
         have = self._ring_n + len(self._head)
-        if have > MAX_BUFFER_S * rate:
-            self._drop(have - int(TRIM_TO_S * rate))
-        if not self._playing and self._ring_n + len(self._head) >= JITTER_S * rate:
+        jitter, most, trim = buffer_limits(self.chunk_s)
+        if have > most * rate:
+            self._drop(have - int(trim * rate))
+        if not self._playing and self._ring_n + len(self._head) >= jitter * rate:
             self._playing = True
         y = self._take(n) if self._playing else None
         if y is not None:
@@ -312,7 +334,7 @@ class VoiceSource:
         return y
 
     def latency(self) -> float:
-        return LATENCY_S
+        return latency_s(self.chunk_s)
 
 
 def backup_effects(rate: int) -> list:
@@ -327,6 +349,13 @@ def backup_effects(rate: int) -> list:
             except Exception:  # noqa: BLE001
                 log.warning("backup voice effect %r couldn't start", etype, exc_info=True)
     return out
+
+
+def helper_env(env: dict[str, str]) -> dict[str, str]:
+    """The helper's environment: ONIONBOARD_LESS_CPU=1 with Use less CPU (the lighter
+    model, when the add-on has it)."""
+    from soundboard import voicefx
+    return {**env, "ONIONBOARD_LESS_CPU": "1"} if voicefx.light() else env
 
 
 class AiVoiceController:
@@ -356,7 +385,7 @@ class AiVoiceController:
                            lambda ev: self._event(ev, holder[0] if holder else None),
                            cwd=module.path,
                            log_path=library.APP_DIR / f"module-{module.id}.log",
-                           name=module.id, env=net.child_env("voices"),
+                           name=module.id, env=helper_env(net.child_env("voices")),
                            on_audio=lambda pcm: self._audio(pcm, holder[0] if holder else None),
                            make_resampler=resample.make)
         holder.append(host)
@@ -427,7 +456,14 @@ class AiVoiceController:
         t = ev.get("type")
         src = self.source
         if t == "ready" and src is not None:
+            try:   # an older add-on doesn't say: 20 ms
+                chunk = float(ev.get("chunk_s", CHUNK_S))
+            except (TypeError, ValueError):
+                chunk = CHUNK_S
+            src.chunk_s = min(max(chunk, 0.01), 0.1) if math.isfinite(chunk) else CHUNK_S
             src.ready = True
+        elif t == "stats" and src is not None:
+            ev = {**ev, "latency_s": src.latency()}
         elif t in ("stopped", "error") and src is not None and (t == "stopped" or not src.ready):
             # it died or couldn't load: the backup voice keeps covering your mic until
             # you press Stop (falling back to your real voice would give it away)

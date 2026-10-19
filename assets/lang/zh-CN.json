@@ -3528,7 +3528,6 @@
   "You have the most saved voices there can be: delete one first.": "你保存的声音已经达到上限：先删掉一个。",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "你听到的是没有人工智能声音的版本：安装人工智能声音（语音标签 → 人工智能声音）才能听全。",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "其他玩家分享并投票的音效和声音：添加它们，或分享你自己的。",
-  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "玩家分享、大家投票的音效和声音：添加它们或分享你自己的",
   "Community": "社区",
   "Share this link in the Community tab": "在社区标签里分享这个链接",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "社区标签：项目自己的商店，用于它的列表、你播放或添加的音效和声音、你的投票以及你分享的内容。",
@@ -4225,5 +4224,11 @@
   "Rarity": "稀有度",
   "Achievement unlocked": "成就已解锁",
   "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "没有与“{text}”匹配的结果。",
+  "Search AI voices": "搜索 AI 语音",
+  "Search voices": "搜索语音",
+  "Which languages show": "显示哪些语言",
+  "Which voices show": "显示哪些语音",
+  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "玩家分享、大家投票的音效和声音：添加它们或分享你自己的",
   "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "把你的麦克风和音效一起放进你的耳机，正是别人听到的内容。"
 }

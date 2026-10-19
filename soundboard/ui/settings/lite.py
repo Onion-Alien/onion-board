@@ -20,6 +20,12 @@ It turns off what only decorates and still costs CPU while the app is open:
   when it's switched (`DeviceControl.set_lite_block`), a short gap like an Audio
   buffering change. Straight into my mic keeps its own 10 ms.
 
+It also turns on the Voice tab's Use less CPU while that's left on "auto"
+(`voicefx.light()`): cheaper voice effects and language voices, and the AI voice on
+its lighter model (40 ms a call instead of 20: about a third less CPU, ~40 ms more
+delay; from its next start, with AI voices 0.2.0 or later). A Use less CPU switched
+by hand wins either way.
+
 Everything still works the same; it only looks calmer (and your voice is that little
 bit later). `on()` is read wherever one
 of those starts, so turning it on or off applies at once (`set_on`), except Hoot's

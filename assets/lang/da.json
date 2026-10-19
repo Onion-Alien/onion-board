@@ -3598,7 +3598,6 @@
   "You have the most saved voices there can be: delete one first.": "Du har allerede så mange gemte stemmer, som der kan være: slet en først.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Du hører den uden dens AI-stemme: hent AI-stemmer (fanen Stemme → AI-stemmer) for at høre det hele.",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "Lyde og stemmer, som andre spillere har delt og stemt på: tilføj dem, eller del dine egne.",
-  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Lyde og stemmer, som spillere deler, og alle stemmer på: tilføj dem, eller del dine egne",
   "Community": "Fællesskab",
   "Share this link in the Community tab": "Del dette link i fanen Fællesskab",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "Fanen Fællesskab: projektets egen butik, til dens liste, de lyde og stemmer du afspiller eller tilføjer, dine stemmer og det, du deler.",
@@ -4299,5 +4298,11 @@
   "Rarity": "Sjældenhed",
   "Achievement unlocked": "Præstation låst op",
   "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Intet matcher “{text}”.",
+  "Search AI voices": "Søg efter AI-stemmer",
+  "Search voices": "Søg efter stemmer",
+  "Which languages show": "Hvilke sprog der vises",
+  "Which voices show": "Hvilke stemmer der vises",
+  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Lyde og stemmer, som spillere deler, og alle stemmer på: tilføj dem, eller del dine egne",
   "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Afspiller din mikrofon i dine hovedtelefoner oven i lydene, præcis det, andre hører."
 }

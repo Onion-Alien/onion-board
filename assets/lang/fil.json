@@ -3598,7 +3598,6 @@
   "You have the most saved voices there can be: delete one first.": "Nasa pinakamaraming naka-save na voice ka na: magbura muna ng isa.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Naririnig mo ito nang wala ang boses ng AI nito: kunin ang mga boses ng AI (Voice tab → Mga boses ng AI) para marinig lahat.",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "Mga tunog at boses na ibinahagi at binotohan ng ibang manlalaro: idagdag ang mga ito, o i-share ang sa iyo.",
-  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Mga tunog at boses na ibinabahagi ng mga manlalaro, binotohan ng lahat: idagdag ang mga ito o i-share ang sa iyo",
   "Community": "Community",
   "Share this link in the Community tab": "I-share ang link na ito sa tab na Community",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "Ang tab na Community: ang sariling store ng project, para sa listahan nito, ang mga tunog at boses na pinapatugtog o idinadagdag mo, ang mga boto mo at ang ibinabahagi mo.",
@@ -4299,5 +4298,11 @@
   "Rarity": "Rarity",
   "Achievement unlocked": "Na-unlock ang achievement",
   "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Walang tumugma sa “{text}”.",
+  "Search AI voices": "Maghanap ng mga AI voice",
+  "Search voices": "Maghanap ng mga voice",
+  "Which languages show": "Aling mga wika ang ipapakita",
+  "Which voices show": "Aling mga voice ang ipapakita",
+  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Mga tunog at boses na ibinabahagi ng mga manlalaro, binotohan ng lahat: idagdag ang mga ito o i-share ang sa iyo",
   "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Pine-play ang mic mo sa headphones mo kasabay ng mga sound, eksaktong naririnig ng iba."
 }

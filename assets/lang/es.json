@@ -3598,7 +3598,6 @@
   "You have the most saved voices there can be: delete one first.": "Ya tienes el máximo de voces guardadas: borra una primero.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "La estás oyendo sin su voz de IA: consigue las voces de IA (pestaña Voz → Voces de IA) para oírla entera.",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "Sonidos y voces que otros jugadores han compartido y votado: añádelos o comparte los tuyos.",
-  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Sonidos y voces que comparten los jugadores, votados por todos: añádelos o comparte los tuyos",
   "Community": "Comunidad",
   "Share this link in the Community tab": "Compartir este enlace en la pestaña Comunidad",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "La pestaña Comunidad: la tienda propia del proyecto, para su lista, los sonidos y voces que reproduces o añades, tus votos y lo que compartes.",
@@ -4299,5 +4298,11 @@
   "Rarity": "Rareza",
   "Achievement unlocked": "Logro desbloqueado",
   "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Nada coincide con «{text}».",
+  "Search AI voices": "Buscar voces de IA",
+  "Search voices": "Buscar voces",
+  "Which languages show": "Qué idiomas se muestran",
+  "Which voices show": "Qué voces se muestran",
+  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Sonidos y voces que comparten los jugadores, votados por todos: añádelos o comparte los tuyos",
   "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Reproduce tu micro en tus auriculares por encima de los sonidos: justo lo que oyen los demás."
 }

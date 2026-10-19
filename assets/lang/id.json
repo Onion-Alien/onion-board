@@ -3528,7 +3528,6 @@
   "You have the most saved voices there can be: delete one first.": "Kamu sudah punya suara tersimpan sebanyak mungkin: hapus satu dulu.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Kamu mendengarnya tanpa suara AI-nya: ambil suara AI (tab Suara → suara AI) untuk mendengar semuanya.",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "Suara dan voice yang dibagikan dan di-vote pemain lain: tambahkan, atau bagikan milikmu.",
-  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Suara dan voice yang dibagikan pemain, di-vote semua orang: tambahkan atau bagikan milikmu",
   "Community": "Komunitas",
   "Share this link in the Community tab": "Bagikan link ini di tab Komunitas",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "Tab Komunitas: toko milik proyek ini, untuk daftarnya, suara dan voice yang kamu putar atau tambahkan, vote-mu, dan apa yang kamu bagikan.",
@@ -4225,5 +4224,11 @@
   "Rarity": "Kelangkaan",
   "Achievement unlocked": "Pencapaian terbuka",
   "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Tidak ada yang cocok dengan “{text}”.",
+  "Search AI voices": "Cari suara AI",
+  "Search voices": "Cari suara",
+  "Which languages show": "Bahasa yang ditampilkan",
+  "Which voices show": "Suara yang ditampilkan",
+  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Suara dan voice yang dibagikan pemain, di-vote semua orang: tambahkan atau bagikan milikmu",
   "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Memutar mic-mu ke headphone bersama suara-suaranya, persis yang didengar orang lain."
 }

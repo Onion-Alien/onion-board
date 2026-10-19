@@ -3598,7 +3598,6 @@
   "You have the most saved voices there can be: delete one first.": "Вече имаш възможно най-много запазени гласове: първо изтрий един.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Чуваш го без неговия AI глас: вземи AI гласовете (раздел Глас → AI гласове), за да го чуеш целия.",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "Звуци и гласове, споделени от други играчи, с гласувания: добави ги или сподели свои.",
-  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Звуци и гласове, които играчите споделят, гласувани от всички: добави ги или сподели свои",
   "Community": "Общност",
   "Share this link in the Community tab": "Сподели този линк в раздела Общност",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "Разделът Общност: собственият магазин на проекта, за списъка му, звуците и гласовете, които пускаш или добавяш, гласовете ти и това, което споделяш.",
@@ -4299,5 +4298,11 @@
   "Rarity": "Рядкост",
   "Achievement unlocked": "Отключено постижение",
   "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Няма съвпадения за „{text}“.",
+  "Search AI voices": "Търсене на AI гласове",
+  "Search voices": "Търсене на гласове",
+  "Which languages show": "Кои езици да се показват",
+  "Which voices show": "Кои гласове да се показват",
+  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Звуци и гласове, които играчите споделят, гласувани от всички: добави ги или сподели свои",
   "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Възпроизвежда вашия микрофон в слушалките ви върху звуците, точно това, което другите чуват."
 }

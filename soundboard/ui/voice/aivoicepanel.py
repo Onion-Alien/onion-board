@@ -38,6 +38,7 @@ from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.voice.effectspopup import place_over
 from soundboard.ui.kit.panel import (Flow, UndoBar, ViewToggle, fold_button, hint_label,
                                      section_label)
+from soundboard.ui.voice.groupbar import GroupBar, no_match
 from soundboard.ui.voice.voicefxpanel import (LIST_MIN_W, MAX_COLS, PICKED_ART, TILE_ART,
                                               TILE_GAP, TILE_MIN_W, BigSwitch, VoiceTile)
 from soundboard.ui.kit.widgets import LoadingBar
@@ -56,6 +57,7 @@ ALL, FAVS, MINE = "", "favs", "mine"
 MAKE = "+make"   # the Make your own voice card's place among the voice ids
 KINDS = (("men", _("Men")), ("women", _("Women")), ("other", _("In between & fun")),
          (MINE, _("Mine")))
+KIND_ICONS = {"men": "voice", "women": "voice", "other": "laugh", MINE: "mic"}
 
 
 def voice_kind(voice: dict) -> str:
@@ -236,32 +238,17 @@ class AiVoicePanel(QWidget):
         favs = self.s.pop("favorites", None)   # kept here, added back by _emit
         self._favs: list[str] = list(favs) if isinstance(favs, list) else []
         self._group = ALL
-        self.cats = QWidget()
-        cflow = Flow(self.cats, gap=6)
-        self._cat_group = QButtonGroup(self)
-        self._cat_btns: dict[str, QPushButton] = {}
-        for key, text in ((ALL, _("All")), (FAVS, _("Favorites")), *KINDS):
-            b = QPushButton(text.replace("&", "&&"))
-            b.setObjectName("voicecat")
-            b.setAccessibleName(text)
-            b.setCheckable(True)
-            b.setCursor(Qt.CursorShape.PointingHandCursor)
-            if key == FAVS:
-                icons.set_icon(b, "star_filled", "accent")
-            b.clicked.connect(lambda __=False, k=key: (usage.used("ai-voice-group"),
-                                                     self.show_group(k)))
-            self._cat_group.addButton(b)
-            self._cat_btns[key] = b
-            cflow.addWidget(b)
-        self._cat_btns[ALL].setChecked(True)
         self._listed = False
         self.view_toggle = ViewToggle("grid", _("Voices"))
         self.view_toggle.changed.connect(self.set_view)
-        chips = QHBoxLayout()
-        chips.setSpacing(12)
-        chips.addWidget(self.cats, 1)
-        chips.addWidget(self.view_toggle, 0, Qt.AlignmentFlag.AlignTop)
-        rv.addLayout(chips)
+        self.bar = GroupBar(
+            [(ALL, _("All"), "sounds"), (FAVS, _("Favorites"), "star_filled"),
+             *((k, t, KIND_ICONS[k]) for k, t in KINDS)],
+            self.view_toggle, self._group_count,
+            (_("Search AI voices"), _("Search")), _("Which voices show"))
+        self.bar.picked.connect(lambda k: (usage.used("ai-voice-group"), self.show_group(k)))
+        self.bar.searched.connect(lambda _t: self._place_tiles())
+        rv.addWidget(self.bar)
         self._heads: dict[str, QLabel] = {}
         for key, text in KINDS:
             lbl = QLabel(text)
@@ -271,6 +258,8 @@ class AiVoicePanel(QWidget):
         self.no_favs = hint_label(_("No favorites yet. Click the star in a voice's corner "
                                     "to keep it here."))
         self.no_favs.hide()
+        self.no_match = hint_label("")
+        self.no_match.hide()
 
         # ---- pick a voice: a card each, as many a row as the width holds; under Mine,
         # after your own, a card that makes one (as the voice changer's My own mix)
@@ -289,6 +278,7 @@ class AiVoicePanel(QWidget):
         mt.clicked.connect(lambda: self.edit(None))
         rv.addLayout(self._tile_grid)
         rv.addWidget(self.no_favs)
+        rv.addWidget(self.no_match)
         self.undo_bar = UndoBar(_("Bring the voice back"))
         rv.addWidget(self.undo_bar)
         self.lbl_sample = QLabel("")
@@ -644,8 +634,12 @@ class AiVoicePanel(QWidget):
             rows = [("", [i for i in self._favs if i in by_id])]
         else:
             rows = [("", [vo["id"] for vo in low_first if voice_kind(vo) == self._group])]
+        found = self.bar.text()
+        if found:
+            rows = [(k, [i for i in ids if self.bar.matches(self._tile[i].title, i)])
+                    for k, ids in rows]
         # Make your own voice: the last card under Mine (and in Mine), even with none yet
-        make = self._group in (ALL, MINE)
+        make = not found and self._group in (ALL, MINE)
         if make:
             rows = [(k, ids + [MAKE] if k == MINE or self._group == MINE else ids)
                     for k, ids in rows]
@@ -667,15 +661,25 @@ class AiVoicePanel(QWidget):
         for vid, b in self._tile.items():
             b.setVisible(vid in shown)
         self.make_tile.setVisible(make)
-        self.no_favs.setVisible(self._group == FAVS and not shown)
+        self.no_favs.setVisible(self._group == FAVS and not shown and not found)
+        no_match(self.no_match, found, shown)
         for c in range(MAX_COLS):
             g.setColumnStretch(c, 1 if c < cols else 0)
 
     def show_group(self, key: str):
         """Show one chip's voices (ALL, FAVS, MINE or an avl.WHO key)."""
         self._group = key
-        self._cat_btns[key].setChecked(True)
+        self.bar.set_group(key)
         self._place_tiles()
+
+    def _group_count(self, key: str) -> int:
+        """How many voices a group holds (the dropdown's numbers)."""
+        listed = [vo for vo in self.voices if vo["id"] in self._tile]
+        if key == ALL:
+            return len(listed)
+        if key == FAVS:
+            return sum(i in self._tile for i in self._favs)
+        return sum(voice_kind(vo) == key for vo in listed)
 
     @property
     def favorites(self) -> list[str]:
@@ -982,7 +986,8 @@ class AiVoicePanel(QWidget):
                                "changer preset (left) is much lighter.")
             self._state(msg)
         elif t == "stats":
-            cpu, ms = f"{float(ev.get('cpu', 0)):.0f}", f"{aivoice.LATENCY_S * 1000:.0f}"
+            cpu = f"{float(ev.get('cpu', 0)):.0f}"
+            ms = f"{float(ev.get('latency_s', aivoice.LATENCY_S)) * 1000:.0f}"
             self._state(
                 _("● you sound like {voice} · CPU {cpu}% · about {ms} ms behind you",
                   voice=self._voice_name, cpu=cpu, ms=ms) if self._voice_name else

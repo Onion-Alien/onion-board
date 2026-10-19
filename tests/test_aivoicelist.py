@@ -244,18 +244,18 @@ def test_card_shows_every_voice_as_a_card_under_its_kind(qapp, app_dir, monkeypa
         assert p.picked.isHidden()                               # off: no voice bar
         assert p._tile["bear"].toolTip().startswith("Man · Very deep. ")
         assert p.b_edit.isHidden() and p.b_delete.isHidden()     # not one of yours
-        p._cat_btns["women"].click()
+        p.bar.choose("women")
         g = p._tile_grid
         order = sorted(shown(), key=lambda vid: (g.getItemPosition(g.indexOf(p._tile[vid]))))
         assert order == ["onyx", "ivy", "sage", "nana", "nova", "zoe", "pixie"]   # lowest first
-        p._cat_btns["mine"].click()
+        p.bar.choose("mine")
         # none of yours yet: just the card that makes one
         assert shown() == [] and not p.make_tile.isHidden()
         saved, starts = [], []
         p.changed.connect(saved.append)
         monkeypatch.setattr(p.ctl, "start", lambda m, voice, *a: starts.append(voice))
         monkeypatch.setattr(p.ctl, "stop", lambda: None)
-        p._cat_btns[""].click()
+        p.bar.choose("")
         p._tile["bear"].click()                                   # picks it and starts it
         assert saved[-1]["voice"] == "bear" and p.current_voice() == "bear"
         assert starts == ["bear"] and p.is_on()
@@ -277,7 +277,7 @@ def test_card_favorites_are_kept_in_the_order_starred(qapp, app_dir, monkeypatch
     saved = []
     p.changed.connect(saved.append)
     try:
-        p._cat_btns["favs"].click()
+        p.bar.choose("favs")
         assert shown() == set() and not p.no_favs.isHidden()
         p._tile["nova"].star.click()
         p._tile["bear"].star.click()
@@ -307,7 +307,7 @@ def test_card_makes_changes_and_deletes_your_own_voices(qapp, app_dir, monkeypat
         p.b_make.click()                                # made, and picked
         assert made["id"] in p._tile and p.current_voice() == made["id"]
         assert not p.b_edit.isHidden() and not p.b_delete.isHidden()
-        p._cat_btns["mine"].click()
+        p.bar.choose("mine")
         assert [vid for vid, b in p._tile.items() if not b.isHidden()] == [made["id"]]
         p.b_delete.click()                              # gone: back to the first voice
         assert made["id"] not in p._tile and avl.Store().voices == []

@@ -3528,7 +3528,6 @@
   "You have the most saved voices there can be: delete one first.": "保存した声はもう上限です：先にひとつ削除してください。",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "AIの声なしで聞いています：全部聞くにはAIの声を入れてください（ボイスタブ → AIの声）。",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "ほかのプレイヤーが共有して投票したサウンドと声。追加するか、自分のものを共有しよう。",
-  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "プレイヤーが共有し、みんなが投票したサウンドと声。追加するか、自分のものを共有しよう",
   "Community": "コミュニティ",
   "Share this link in the Community tab": "このリンクをコミュニティタブで共有",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "コミュニティタブ：このプロジェクト独自のストア。一覧、再生・追加したサウンドと声、あなたの投票、共有したもののために使います。",
@@ -4225,5 +4224,11 @@
   "Rarity": "レア度",
   "Achievement unlocked": "実績解除",
   "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "「{text}」に一致するものはありません。",
+  "Search AI voices": "AI ボイスを検索",
+  "Search voices": "ボイスを検索",
+  "Which languages show": "表示する言語",
+  "Which voices show": "表示するボイス",
+  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "プレイヤーが共有し、みんなが投票したサウンドと声。追加するか、自分のものを共有しよう",
   "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "サウンドに重ねてマイクの音をヘッドホンで再生します、相手に聞こえるそのままの音です。"
 }

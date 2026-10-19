@@ -3598,7 +3598,6 @@
   "You have the most saved voices there can be: delete one first.": "Már annyi mentett hangod van, amennyi lehet: előbb törölj egyet.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Az AI hangja nélkül hallod: szerezd be az AI hangokat (Hang fül → AI hangok), hogy mindent hallj.",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "Más játékosok által megosztott és értékelt hangok és hangeffektek: add hozzá őket, vagy oszd meg a sajátjaidat.",
-  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Játékosok által megosztott hangok és hangeffektek, mindenki értékeli: add hozzá őket, vagy oszd meg a sajátjaidat",
   "Community": "Közösség",
   "Share this link in the Community tab": "Link megosztása a Közösség lapon",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "A Közösség lap: a projekt saját áruháza, a listájához, a lejátszott vagy hozzáadott hangokhoz, a szavazataidhoz és ahhoz, amit megosztasz.",
@@ -4299,5 +4298,11 @@
   "Rarity": "Ritkaság",
   "Achievement unlocked": "Teljesítmény feloldva",
   "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Semmi sem felel meg ennek: „{text}”.",
+  "Search AI voices": "AI-hangok keresése",
+  "Search voices": "Hangok keresése",
+  "Which languages show": "Mely nyelvek látszanak",
+  "Which voices show": "Mely hangok látszanak",
+  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Játékosok által megosztott hangok és hangeffektek, mindenki értékeli: add hozzá őket, vagy oszd meg a sajátjaidat",
   "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "A mikrofonodat a hangok tetejére játssza a fejhallgatódba, pontosan azt, amit mások hallanak."
 }
