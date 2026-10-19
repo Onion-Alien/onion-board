@@ -4136,5 +4136,6 @@
   "Couldn't apply the effects to the playing sound": "无法将效果应用到播放中的声音",
   "Reset effects": "重置效果",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "关闭所有效果（保留裁剪）。播放中的声音会立刻恢复原声。",
-  "✓ The playing sound has your changes. Cancel puts it back.": "✓ 播放中的声音已带上你的修改。点取消可恢复。"
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ 播放中的声音已带上你的修改。点取消可恢复。",
+  "Most liked": "最受欢迎"
 }

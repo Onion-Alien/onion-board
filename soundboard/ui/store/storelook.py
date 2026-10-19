@@ -33,7 +33,7 @@ KIND_EMOJI = {"fx": "🎭", "ai": "🤖", "setup": "🎛️"}
 # the Category dropdown's line icons (icons.SHAPES): a category's, a voice kind's, and
 # "All categories"
 CAT_ICON = {"memes": "laugh", "reactions": "wow", "games": "gamepad", "movies": "clapper",
-            "tv": "tv", "music": "music", "sports": "ball", "viral": "flame",
+            "tv": "tv", "music": "music", "sports": "ball", "viral": "star",
             "pranks": "wink", "politics": "columns", "streamer": "live", "esports": "trophy",
             "podcast": "mic", "spooky": "ghost", "onionboard": "onion"}
 KIND_ICON = {"fx": "voice", "ai": "robot", "setup": "setup"}

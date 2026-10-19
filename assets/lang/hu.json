@@ -4215,5 +4215,6 @@
   "Couldn't apply the effects to the playing sound": "Nem sikerült az effekteket a szóló hangra alkalmazni",
   "Reset effects": "Effektek alaphelyzetbe",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Minden effektet kikapcsol (a vágás megmarad). A szóló hang azonnal sima lesz.",
-  "✓ The playing sound has your changes. Cancel puts it back.": "✓ A szóló hangon már a változtatásaid vannak. A Mégse visszaállítja."
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ A szóló hangon már a változtatásaid vannak. A Mégse visszaállítja.",
+  "Most liked": "Legkedveltebbek"
 }

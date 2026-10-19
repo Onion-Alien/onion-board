@@ -4215,5 +4215,6 @@
   "Couldn't apply the effects to the playing sound": "Efektler çalan sese uygulanamadı",
   "Reset effects": "Efektleri sıfırla",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Tüm efektleri kapatır (kırpma kalır). Çalan ses hemen düz haline döner.",
-  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Çalan seste artık değişikliklerin var. İptal eski haline getirir."
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Çalan seste artık değişikliklerin var. İptal eski haline getirir.",
+  "Most liked": "En çok beğenilenler"
 }

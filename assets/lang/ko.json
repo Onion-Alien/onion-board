@@ -4136,5 +4136,6 @@
   "Couldn't apply the effects to the playing sound": "재생 중인 사운드에 효과를 적용하지 못했어요",
   "Reset effects": "효과 초기화",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "모든 효과를 꺼요(자르기는 유지). 재생 중인 사운드가 바로 원래 소리로 돌아가요.",
-  "✓ The playing sound has your changes. Cancel puts it back.": "✓ 재생 중인 사운드에 변경 사항이 적용됐어요. 취소하면 되돌아가요."
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ 재생 중인 사운드에 변경 사항이 적용됐어요. 취소하면 되돌아가요.",
+  "Most liked": "좋아요 많은 순"
 }

@@ -4215,5 +4215,6 @@
   "Couldn't apply the effects to the playing sound": "Не успях да приложа ефектите към звука, който свири",
   "Reset effects": "Нулирай ефектите",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Изключва всички ефекти (изрязването остава). Звукът, който свири, веднага става обикновен.",
-  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Звукът, който свири, вече е с промените ти. „Отказ“ го връща."
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Звукът, който свири, вече е с промените ти. „Отказ“ го връща.",
+  "Most liked": "Най-харесвани"
 }

@@ -4215,5 +4215,6 @@
   "Couldn't apply the effects to the playing sound": "Kunne ikke lægge effekterne på lyden, der spiller",
   "Reset effects": "Nulstil effekter",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Slår alle effekter fra (beskæringen bliver). Lyden, der spiller, bliver ren med det samme.",
-  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Lyden, der spiller, har dine ændringer. Annuller sætter den tilbage."
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Lyden, der spiller, har dine ændringer. Annuller sætter den tilbage.",
+  "Most liked": "Mest likede"
 }
