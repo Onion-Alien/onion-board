@@ -26,7 +26,7 @@ from PySide6.QtCore import QRect
 from PySide6.QtWidgets import QApplication, QWidget
 
 from soundboard.online import net
-from soundboard.core import tips, usage
+from soundboard.core import usage
 from soundboard.i18n import _
 from soundboard.ui.setup import coach
 from soundboard.ui.sounds.ytsearch import SearchResults
@@ -73,7 +73,6 @@ def start(win) -> Tour | None:
     tabtours.stop(win)   # (one tour at a time)
     cfg = win.cfg
     cfg.tips_seen = [*cfg.tips_seen, KEY, "search"]   # (the search tip says the same)
-    cfg.tip_day = tips.today()   # this is today's tip: no "Did you know?" bar on top
     win._save_later()
     usage.used("tour-shown")
     _current = Tour(win)

@@ -43,7 +43,7 @@ class LanguageControl(Controller):
               name=name, where=" → ".join((_("Settings"), _("Appearance"), _("Language")))),
             _("Switch to {name}", name=name), _("No thanks")))
         # a right-to-left line that starts with "Onion Board" still reads right to left
-        mw.lang_lbl.setText("‏" + text if i18n.is_rtl(code) else text)
+        mw.lang_bar.set_message("‏" + text if i18n.is_rtl(code) else text)
         mw.lang_btn.setText(button)
         mw.lang_hide.setAccessibleName(hide)
         mw.lang_hide.setToolTip(hide)

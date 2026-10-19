@@ -70,7 +70,7 @@ from soundboard.ui.window.categorycontrol import CategoryControl
 from soundboard.ui.window.importcontrol import ImportControl
 from soundboard.ui.window.updatecontrol import UpdateControl
 from soundboard.ui.kit import toast as toastmod
-from soundboard.ui.kit import a11y, appstate, busy, icons
+from soundboard.ui.kit import a11y, busy, icons
 from soundboard.ui.settings import lite
 from soundboard.ui.window import livesize, responsive, taboff
 from soundboard.ui.bun import splash
@@ -99,7 +99,6 @@ DEFAULT_POLL_MS = 1500   # how often Windows' default output is checked
 DISCORD_POLL_MS = 10000  # how often Discord's voice settings are looked at (discordcfg)
 RAW_POLL_MS = 2000       # how often the apps recording the mic are counted (rawmic)
 TLS_WARM_MS = 2500     # Qt's TLS is set up this long after the start (_warm_tls)
-TIP_DELAY_MS = 8000    # the first tip waits this long after the start
 FF_CHECK_MS = 1500     # the FFmpeg check's answer is taken this long after the start
 VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.mic.voicesdk)
 
@@ -110,10 +109,9 @@ _TONE_SPAN = re.compile(r"<span style='color:[^']*'>(.*)</span>", re.S)
 
 
 if TYPE_CHECKING:
-    from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGraphicsOpacityEffect,
-                                   QGridLayout, QHBoxLayout, QLabel, QLineEdit, QProgressBar,
-                                   QStackedWidget, QVBoxLayout, QWidget)
-    from soundboard.core import tips
+    from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout,
+                                   QLabel, QLineEdit, QProgressBar, QStackedWidget,
+                                   QVBoxLayout, QWidget)
     from soundboard.ui.window import moretabs
     from soundboard.ui.apps.appspanel import ElidedLabel
     from soundboard.ui.setup.destpanel import DestPanel, ModeButton
@@ -124,12 +122,12 @@ if TYPE_CHECKING:
     from soundboard.ui.sounds.padbatch import PadSelection
     from soundboard.ui.kit.panel import EqPanel, Flow, TileRow, ViewToggle, VolumeControl
     from soundboard.ui.kit.playbutton import PlayButton
+    from soundboard.ui.kit.topbar import TopBar
     from soundboard.ui.setup.setupshow import SetupShow
     from soundboard.ui.window.sidebar import SideTabs
     from soundboard.ui.sounds.speedpitch import SpeedPitchButton
     from soundboard.ui.kit.widgets import (DropdownMenu, EdgeMatch, NameAndSeek, PadGrid,
                                            SeekSlider, WindowRoot)
-    from soundboard.ui.window.windowbuild import BannerButton, Pulse
     from soundboard.ui.sounds.ytsearch import SearchResults
 
 class Bridge(QObject):
@@ -169,7 +167,6 @@ class MainWindow(QMainWindow):
     _attach_release: Any
     _attaching: bool
     attach_glow: Any   # ui/kit/glow.py Glow on btn_attach
-    _banner_fx: QGraphicsOpacityEffect
     _body_lay: Any
     btn_about: QPushButton
     btn_add: QPushButton
@@ -235,7 +232,7 @@ class MainWindow(QMainWindow):
     drop_veil: DropVeil
     eq: EqPanel
     eq_card: Any
-    ff_bar: Any
+    ff_bar: TopBar
     _fit_tab: Any
     flow_mic: QLabel
     flow_out: QLabel
@@ -248,7 +245,7 @@ class MainWindow(QMainWindow):
     how_title: Any
     hp_lbl: Any
     _install_icon: tuple | None
-    lang_bar: QFrame
+    lang_bar: TopBar
     lang_btn: QPushButton
     lang_hide: Any
     lang_lbl: QLabel
@@ -258,7 +255,6 @@ class MainWindow(QMainWindow):
     logo: LogoWidget
     mic_alt: QWidget
     mic_alt_tiles: TileRow
-    mic_banner: BannerButton
     mic_flow: QFrame
     _mic_icon: tuple[str, str] | None
     _mic_tone: str | None
@@ -312,7 +308,6 @@ class MainWindow(QMainWindow):
     pill: QPushButton
     playing_row: QWidget
     _pp_icon: str | None
-    _pulse: Pulse
     radio: RadioTab | RadioOff
     radio_page: QStackedWidget
     _radio_steps: list
@@ -327,7 +322,7 @@ class MainWindow(QMainWindow):
     selection: PadSelection
     _settle_until: Any
     _settle_more: bool
-    setup_bar: QFrame
+    setup_bar: TopBar
     _setup_cols: QGridLayout
     setup_connection: QLabel
     setup_hint: Any
@@ -358,16 +353,12 @@ class MainWindow(QMainWindow):
     _tabs_box: QWidget
     _tabs_lay: Any
     tagline: sidebar.ClickLabel
-    tip: tips.Tip | None
-    tip_bar: QFrame
-    enjoy_bar: QFrame
-    tip_btn: QPushButton
-    tip_lbl: QLabel
+    enjoy_bar: TopBar
     _toolbar_hold: QWidget
     transport: Any
     _transport_vol: Any
     triggers: Any
-    urgent_bar: QFrame
+    urgent_bar: TopBar
     urgent_btn: QPushButton
     urgent_lbl: QLabel
     urgent_prog: QProgressBar
@@ -416,8 +407,9 @@ class MainWindow(QMainWindow):
     app_setup_changed = Signal()   # an app remembered / forgotten (appsetup)
     bin_filled = Signal(object)    # removed sounds are in the bin: its sound count|None
 
-    # the slim bars across the top of the window (urgent fix, tip, app offer, FFmpeg, language)
-    TOP_BARS = ("urgent_bar", "tip_bar", "setup_bar", "ff_bar", "lang_bar", "enjoy_bar")
+    # the slim bars across the top of the window (urgent fix, app offer, FFmpeg, language,
+    # the survey): one look, ui/kit/topbar.py
+    TOP_BARS = ("urgent_bar", "setup_bar", "ff_bar", "lang_bar", "enjoy_bar")
 
     def __init__(self):
         super().__init__()
@@ -619,9 +611,6 @@ class MainWindow(QMainWindow):
         self._voice_timer.timeout.connect(self.appsetctl._voice_tick)
         if self.voice_watch is not None:
             self._voice_timer.start(VOICE_POLL_MS)
-        # a tip once things have settled; tried again now and then while the window is
-        # hidden or a game is up, until one has been shown this start
-        QTimer.singleShot(TIP_DELAY_MS, self, self.tipctl._start_tips)
         self.enjoyctl.start()   # *Enjoying Onion Board?* once it's due (enjoy.py)
         tabtours.hook(self)   # each tab's quick how-to on its first visit
         self.langctl._offer_language()
@@ -1471,11 +1460,6 @@ class MainWindow(QMainWindow):
         self.btn_check.setProperty("short_text", short)   # ...and what it shows meanwhile
         self.btn_check.setAccessibleName(text)
         self.btn_check.setText(short if self.btn_check.property("compact") else text)
-        self.mic_banner.setVisible(on)
-        # impossible to miss; turned on from the tray or behind a game it pulses once
-        # the window is shown in front (_set_tick_rate)
-        self._pulse.set_live(self._ui_live and appstate.active())
-        self._pulse.set_on(on)
         self.mic_lbl.setStyleSheet(f"color:{theme.status('error')};" if on else "")
         self.mic_meter.hot = on
         if on and not self.cfg.mic_enabled:

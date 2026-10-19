@@ -155,9 +155,9 @@ def test_box_wraps_grows_and_enter_sends(window, monkeypatch):  # noqa: F811
 def test_bar_waits_for_a_calm_moment(window, monkeypatch):  # noqa: F811
     w, sent = window, []
     _ready(w, monkeypatch, sent)
-    w.tip_bar.show()   # another bar up: wait
+    w.lang_bar.show()   # another bar up: wait
     assert not w.enjoyctl.maybe_show() and w.enjoy_bar.isHidden()
-    w.tip_bar.hide()
+    w.lang_bar.hide()
     w.overlay.is_open = True   # a game up: wait
     try:
         assert not w.enjoyctl.maybe_show()

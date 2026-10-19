@@ -4,6 +4,7 @@ import pytest
 from PySide6.QtCore import QAbstractAnimation
 
 from conftest import said, unsay
+from soundboard.ui.kit import appstate
 from soundboard.sounds import library
 from soundboard.ui.kit import theme
 from soundboard.ui.settings.settings import SettingsDialog
@@ -177,21 +178,6 @@ def test_pad_hover_has_no_fade(qapp):
     assert pad._hover_k == 0.0
 
 
-def test_mic_banner_does_not_pulse(qapp):
-    from PySide6.QtWidgets import QGraphicsOpacityEffect, QWidget
-    from soundboard.ui.window.windowbuild import Pulse
-    host = QWidget()
-    fx = QGraphicsOpacityEffect(host)
-    p = Pulse(fx, host)
-    lite.set_on(True)
-    p.set_on(True)
-    assert not p.running()
-    lite.set_on(False)
-    p.set_live(True)
-    assert p.running()
-    p.set_on(False)
-
-
 def test_the_theme_cover_does_not_fade(qapp):
     from PySide6.QtGui import QColor
     from PySide6.QtWidgets import QWidget
@@ -275,12 +261,11 @@ def test_the_mic_alone_keeps_the_tick_quiet_in_lite_mode(window, monkeypatch):  
     """Most mics hear the room above the meters' floor: that kept the window's tick at
     full pace for as long as it was open. In lite mode the mic meters follow at the
     quiet pace; a sound playing still gets the full pace."""
-    from soundboard.ui.window import mainwindow as main
     from soundboard.ui.window import tickcontrol
     e = window.engine
     playing = {}
     monkeypatch.setattr(e, "playing", lambda: dict(playing))
-    monkeypatch.setattr(main.appstate, "active", lambda: True)
+    monkeypatch.setattr(appstate, "active", lambda: True)
     monkeypatch.setattr(window, "isVisible", lambda: True)
     monkeypatch.setattr(e, "mic_stream", object())
     window._ui_live = True

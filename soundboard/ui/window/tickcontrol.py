@@ -19,7 +19,6 @@ from soundboard.control import winkeys
 from soundboard.audio.groove import Groove
 from soundboard.audio.sendfx import CEILING_DB
 from soundboard.i18n import _
-from soundboard.ui.kit import appstate
 from soundboard.ui.settings import lite
 from soundboard.style.owl import OwlWidget
 from soundboard.ui.bun.bunnywidget import BunnyWidget
@@ -101,8 +100,6 @@ class TickControl(Controller):
             self._tray_since, self._given_back = None, False
         elif self._tray_since is None and not self._given_back:
             self._tray_since = time.monotonic()
-        # the mic-check banner pulses only while it can be seen, in front
-        mw._pulse.set_live(live and appstate.active())
         pace = self._tick_pace()
         if (live == was and mw.timer.interval() == pace) or getattr(mw, "_shut_down", False):
             return
