@@ -3,6 +3,8 @@
 #   dist\OnionBoardSetup.exe          (the one file to give people: installs the app
 #                                      and the shortcuts; the virtual cable only if
 #                                      its box is ticked)
+#   dist\com.onionalien.onionboard.streamDeckPlugin  (the Stream Deck plugin, packed
+#                                      with Node.js after the installer)
 #
 # The installer step needs Inno Setup 6 once:  winget install JRSoftware.InnoSetup
 #
@@ -192,4 +194,7 @@ $version = & $py -c "import soundboard; print(soundboard.__version__)"
 & $iscc /Q "/DAppVersion=$version" installer\OnionBoard.iss
 if ($LASTEXITCODE -ne 0) { throw "Inno Setup failed" }
 Write-Host "Built dist\OnionBoardSetup.exe - that's the one file to give people." -ForegroundColor Green
+# The Stream Deck plugin goes on the release next to the installer (Node.js, or it skips)
+& $py scripts\buildtools\pack_streamdeck.py
+if ($LASTEXITCODE -ne 0) { throw "pack_streamdeck.py failed" }
 Publish-Build

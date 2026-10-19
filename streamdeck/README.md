@@ -51,4 +51,6 @@ npx @elgato/cli@1.10.2 pack streamdeck/com.onionalien.onionboard.sdPlugin -o dis
 ```
 
 makes `dist/com.onionalien.onionboard.streamDeckPlugin`: double-clicking it installs the
-plugin. Raise `Version` in the manifest (four numbers) for each new one.
+plugin. `build.ps1` does this after the installer (`scripts/buildtools/pack_streamdeck.py`)
+and every release carries the file. The manifest's `Version` is the app's plus `.0`:
+`scripts/release.py` moves both, and Stream Deck only updates a plugin whose version went up.

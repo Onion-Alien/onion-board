@@ -331,6 +331,11 @@ def test_streamer_guide_turns_it_on_and_copies_working_links(qapp, window):
     w.cfg.api_port = 0
     g = streamguide.StreamerGuide(w, w)
     try:
+        # the Stream Deck step links to the file build.ps1 packs for every release
+        from PySide6.QtWidgets import QLabel
+        url = streamguide.STREAM_DECK_PLUGIN
+        assert url.endswith("/releases/latest/download/com.onionalien.onionboard.streamDeckPlugin")
+        assert any(f"href='{url}'" in lbl.text() for lbl in g.findChildren(QLabel))
         assert not g.btn_play.isEnabled() and g.btn_on.isVisibleTo(g)
         g.turn_on()
         assert w.remote.running and w.cfg.api_enabled and not g.btn_on.isVisibleTo(g)

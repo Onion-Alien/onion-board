@@ -4,8 +4,9 @@ name: release
 # (git tag vX.Y.Z <main's sha> && git push origin vX.Y.Z) after scripts/release.py's
 # bump is merged, and this builds the installer from that tag (build.ps1 -Clean),
 # scans it and the mic helper on VirusTotal when the VT_API_KEY secret is set, and
-# makes a DRAFT release with both assets (OnionBoardSetup.exe and the same file as
-# OnionBoardSetup-update.exe, docs/DEVELOPING.md "Release"), the SHA-256 and the scan
+# makes a DRAFT release with its assets (OnionBoardSetup.exe, the same file as
+# OnionBoardSetup-update.exe and the Stream Deck plugin, docs/DEVELOPING.md "Release"),
+# the SHA-256 and the scan
 # line. Nobody gets it until the draft is published by hand, after the headline is
 # written and the draft's installer is installed over a real copy.
 # A tag whose release already exists (made by hand) is left alone. On a PR that
@@ -63,6 +64,11 @@ jobs:
           if [ "v$v" != "$TAG" ]; then
             echo "::error::soundboard/__init__.py says $v but the tag is $TAG"; exit 1
           fi
+      # Node for Elgato's CLI: build.ps1 packs the Stream Deck plugin with it
+      - if: steps.gate.outputs.skip != '1'
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
       - name: Tools (venv, Inno Setup, MinGW-w64 g++ for the mic effect and bootloader)
         if: steps.gate.outputs.skip != '1'
         shell: pwsh
@@ -83,6 +89,9 @@ jobs:
         run: |
           ./build.ps1 -Clean
           if (-not (Test-Path dist\OnionBoardSetup.exe)) { throw "no dist\OnionBoardSetup.exe" }
+          if (-not (Test-Path dist\com.onionalien.onionboard.streamDeckPlugin)) {
+            throw "no dist\com.onionalien.onionboard.streamDeckPlugin (Node missing?)"
+          }
           Copy-Item dist\OnionBoardSetup.exe dist\OnionBoardSetup-update.exe
           $sha = (Get-FileHash dist\OnionBoardSetup.exe -Algorithm SHA256).Hash.ToLower()
           "SHA=$sha" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
@@ -150,11 +159,14 @@ jobs:
 
           $section
 
+          Stream Deck: [the Onion Board plugin](https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG/com.onionalien.onionboard.streamDeckPlugin). Double-click it to install, then turn on Settings → Remote → *Remote control*.
+
           The whole list is in the [changelog](https://github.com/$GITHUB_REPOSITORY/blob/main/CHANGELOG.md).
 
           SHA-256 (OnionBoardSetup.exe): \`$SHA\`
           $vt
           EOF
           gh release create "$TAG" dist/OnionBoardSetup.exe dist/OnionBoardSetup-update.exe \
+            dist/com.onionalien.onionboard.streamDeckPlugin \
             --draft --verify-tag --title "Onion Board $v" --notes-file notes.md
           echo "Draft release made: write the headline, install it over a real copy, then publish." >> "$GITHUB_STEP_SUMMARY"

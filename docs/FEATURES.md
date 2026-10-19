@@ -284,8 +284,10 @@ The full list. The [README](../README.md) has the short version and how to get s
   free. A cheap USB macro keypad works too: set its keys to F13–F24 (keys nothing
   else uses) and use those as hotkeys.
 - **Stream Deck and scripts (optional, off by default):** Settings → Remote →
-  *Remote control* lets programs on this PC play your sounds: a Stream Deck
-  (Bitfocus Companion, Touch Portal, its website buttons), AutoHotkey or a script.
+  *Remote control* lets programs on this PC play your sounds: a Stream Deck (with
+  the [Onion Board plugin](https://github.com/Onion-Alien/onion-board/releases/latest/download/com.onionalien.onionboard.streamDeckPlugin), a *Play sound* key per sound
+  picked from a list, lit while it plays; or Bitfocus Companion, Touch Portal, website
+  buttons), AutoHotkey or a script.
   It only listens on this PC and needs the key shown there (*Copy an example link* gives a
   ready-made "play a random sound" link). Besides playing and stopping sounds it can
   mute you (a panic button), switch the voice changer on or straight to a voice,

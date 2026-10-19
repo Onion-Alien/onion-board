@@ -8,7 +8,8 @@ never edit the same lines of CHANGELOG.md and conflict). It:
 1. checks the new version is newer than soundboard/__init__.py's;
 2. checks changelog.d/ has entries, writes them into CHANGELOG.md under
    "## <version> <long dash> <today, UTC>" (newest first) and deletes the files;
-3. sets __version__ in soundboard/__init__.py;
+3. sets __version__ in soundboard/__init__.py, and the Stream Deck plugin's manifest
+   Version to the same (X.Y.Z.0: build.ps1 packs it for the release);
 4. runs `scripts/checks/i18n_extract.py --check` (missing translations fail it) and
    `scripts/docs.py --no-shots` (the README and website release line).
 
@@ -38,6 +39,7 @@ ROOT = Path(__file__).resolve().parent.parent
 INIT = ROOT / "soundboard" / "__init__.py"
 CHANGELOG = ROOT / "CHANGELOG.md"
 FRAGMENTS = ROOT / "changelog.d"
+MANIFEST = ROOT / "streamdeck" / "com.onionalien.onionboard.sdPlugin" / "manifest.json"
 FRAGMENT_README = "README.md"   # keeps the folder in git; not an entry
 DASH = "\u2014"   # the changelog's headings are "## 1.9.27 <long dash> 2026-10-09"
 VERSION_RE = re.compile(r'__version__ = "([^"]+)"')
@@ -55,6 +57,17 @@ def current_version(text: str) -> str:
 
 def bump_init(text: str, new: str) -> str:
     return VERSION_RE.sub(f'__version__ = "{new}"', text, count=1)
+
+
+MANIFEST_VERSION_RE = re.compile(r'^(  "Version": ")[^"]+(")', flags=re.M)
+
+
+def bump_manifest(text: str, new: str) -> str:
+    """The plugin's top-level Version (Stream Deck wants four numbers)."""
+    out, n = MANIFEST_VERSION_RE.subn(rf"\g<1>{new}.0\g<2>", text, count=1)
+    if not n:
+        raise SystemExit(f"no top-level \"Version\" in {MANIFEST.name}")
+    return out
 
 
 def fragment_files(folder: Path | None = None) -> list[Path]:
@@ -173,10 +186,12 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     CHANGELOG.write_text(new_log, encoding="utf-8")
     INIT.write_text(bump_init(init, args.version), encoding="utf-8")
+    manifest = MANIFEST.read_text(encoding="utf-8")
+    MANIFEST.write_text(bump_manifest(manifest, args.version), encoding="utf-8")
     for p in frags:
         p.unlink()
     print(f"{old} -> {args.version}: CHANGELOG.md ({len(frags)} entries from "
-          "changelog.d/), soundboard/__init__.py")
+          "changelog.d/), soundboard/__init__.py, the Stream Deck manifest")
     for cmd in (["scripts/checks/i18n_extract.py", "--check"], ["scripts/docs.py", "--no-shots"]):
         if subprocess.run([sys.executable, *cmd], cwd=ROOT).returncode:
             raise SystemExit(f"{' '.join(cmd)} failed: fix it, then run it again")
