@@ -515,7 +515,9 @@ class DiscordGuide(QDialog):
     """The Discord settings that matter for sounds, with the check built in."""
     _settings_read = Signal(object, object)   # (signature, [Settings] or None = unchanged)
 
-    def __init__(self, parent, mw, vm: str, kept: bool = False):
+    def __init__(self, parent, mw, vm: str, kept: bool = False, open_app: bool = False):
+        """`open_app`: open Discord on its voice settings as the guide shows (the setup
+        guide's "Set up Discord when I finish")."""
         super().__init__(parent)
         fit.watch(self)
         self.mw, self.vm, self.kept = mw, vm, kept
@@ -589,6 +591,8 @@ class DiscordGuide(QDialog):
             failed=_("Couldn't open Discord: is it installed? Open it yourself: ⚙ User "
                      "Settings → Voice & Video. The link was")))
         row.addWidget(opn)
+        if open_app:   # once it's up, so a failure's note has a window to sit on
+            QTimer.singleShot(0, self, opn.click)
         ptt = QPushButton(_("Auto push-to-talk"))
         ptt.clicked.connect(lambda: mw.setctl.open_settings("hotkeys"))
         row.addWidget(ptt)
@@ -796,9 +800,10 @@ class MeetingGuide(QDialog):
         v.addLayout(row)
 
 
-def show_guide(which: str, parent, mw, vm: str):
+def show_guide(which: str, parent, mw, vm: str, open_app: bool = False):
     """Open one guide modally: 'discord', 'game', 'meeting' or 'steam'. Straight into
-    the mic, the guides name the user's own mic (there's nothing to switch to)."""
+    the mic, the guides name the user's own mic (there's nothing to switch to).
+    `open_app`: the Discord guide opens Discord on its voice settings too."""
     kept = on_mic(mw)
     if kept:
         vm = mw.cfg.mic_device or _("your mic")
@@ -810,6 +815,6 @@ def show_guide(which: str, parent, mw, vm: str):
     elif which == "meeting":
         g = MeetingGuide(parent, mw, vm, kept)
     else:
-        g = DiscordGuide(parent, mw, vm, kept)
+        g = DiscordGuide(parent, mw, vm, kept, open_app)
     g.exec()
     free_dialog(g)

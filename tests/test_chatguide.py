@@ -48,7 +48,7 @@ def test_check_keeps_the_focus_on_its_button(wizard, monkeypatch):
 
 def test_game_guide_and_freeing(wizard, monkeypatch):
     w, wiz = wizard
-    wiz.go(3)
+    wiz.go(wiz.discord_index)
     g = chatguide.GameGuide(wiz, w, "CABLE Output")
     assert "noise" in _text(g).lower()
     g.setParent(None)

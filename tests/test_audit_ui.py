@@ -144,13 +144,14 @@ def test_installing_greys_the_guide_buttons_without_disabling_them(qapp):
     stack = QStackedWidget()
     for _ in range(4):
         stack.addWidget(QLabel())
-    stack.setCurrentIndex(2)
+    stack.setCurrentIndex(1)   # the send step
     went = []
     fake = SimpleNamespace(stack=stack, btn_next=QPushButton(), btn_back=QPushButton(),
-                           _proc=object(), PAGES=4, base=0, route_ok=lambda: False,
+                           _proc=object(), PAGES=3, send_index=1, look_index=-1,
+                           route_ok=lambda: False,
                            go=went.append, finish=lambda: went.append("finish"),
                            _locked=lambda: False, _mic_action=lambda: False,
-                           btn_skip=QPushButton(), discord_index=3, _asking=False)
+                           btn_skip=QPushButton(), discord_index=2)
     fake._busy = lambda: setupwizard.SetupWizard._busy(fake)
     setupwizard.SetupWizard._update_next(fake)
     assert fake.btn_next.isEnabled() and busy.is_busy(fake.btn_next)
@@ -162,7 +163,7 @@ def test_installing_greys_the_guide_buttons_without_disabling_them(qapp):
     setupwizard.SetupWizard._update_next(fake)
     assert not busy.is_busy(fake.btn_next) and not busy.is_busy(fake.btn_back)
     setupwizard.SetupWizard.next_clicked(fake)
-    assert went == [3]
+    assert went == [2]
 
 
 def test_steam_guide_escapes_the_mic_name(qapp):

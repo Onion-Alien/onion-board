@@ -1,15 +1,15 @@
-"""Quick setup: the four steps a first-time user goes through, one per page,
-in plain words. Shown on the very first launch (and from the Setup tab's
-Step-by-step guide button any time after).
+"""Quick setup: three steps, one per page, in plain words. Shown on the very first
+launch (and from the Setup tab's Step-by-step guide button any time after).
 
-  1. Which microphone do you talk into?   (live level bar: "talk, it should move")
-  2. Where do you listen?                 (test sound)
-  3. Where your sounds go                 (the virtual cable: checks it's there, installs
-                                           it if not; or another device / nowhere instead)
-  4. Tell Discord / your game / OBS       (the one setting outside the app)
+  1. Your mic and headphones              (live level bar: "talk, it should move", and a
+                                           test sound)
+  2. Where your sounds go                 (straight into the mic, the virtual cable,
+                                           another device or nowhere)
+  3. Tell Discord / your game / OBS       (the one setting outside the app)
 
-On the very first launch only (Config.use_mode is "" just then), a page before them
-asks what the app is for (USES) and switches on the tabs that fit.
+On the very first launch only (Config.use_mode is "" just then), step 3 is "Make it
+yours" instead: the tabs to start with (OPTIONAL_TABS), a language and a look, and a
+"Set up Discord" switch that opens the Discord guide (and Discord) once they finish.
 
 Every choice is applied to the engine as it's made, so the level bar and the test
 sound use the real devices. The window's own device boxes are refreshed at the end.
@@ -68,13 +68,12 @@ DISCORD_READ_MS = 2000  # the last step re-reads Discord's own settings this oft
 # Thread.start (2.2.2's freeze at _read_discord, pollthread.py)
 _DISCORD_POLL = PollThread("setup-discord-read")
 # the device steps by name, for the count of where the guide was closed (usage.py)
-PAGE_NAMES = ("mic", "headphones", "send", "last")
-# the first launch's "Make it yours" page: nine looks to start from (the rest: Settings).
-# Row one the plain pair and a seasonal one, then the best three dark and three light.
+PAGE_NAMES = ("mic", "send", "last")   # (the mic and headphones share step 1: "mic")
+# the first launch's "Make it yours" page: three looks to start from, the plain pair and
+# a seasonal one (the rest: Settings; one row, so the step with the tabs and Discord on
+# it still fits a 720 px window)
 SEASONAL, SEASONAL_OFF = "Halloween", "Midnight"   # (Midnight once Halloween's gone)
-LOOK_ROWS = (("Light", "Dark", SEASONAL),
-             ("Ocean", "Toxic", "Synthwave"),
-             ("Mint", "Paper", "Cherry Blossom"))
+LOOK_ROWS = (("Light", "Dark", SEASONAL),)
 
 
 def look_themes() -> list[str]:
@@ -192,6 +191,7 @@ def test_tune() -> np.ndarray:
 TILE_W = 138                  # a device tile; TILE_COLS of them fill the page's width
 TILE_MIN_H = 72               # a tile's least height (as tall as its names need: tile_h)
 TILE_COLS, TILE_GAP = 4, 12
+TAB_TILE_H = 48               # the last step's tab tiles (icon beside the name)
 CONTENT_W = TILE_COLS * TILE_W + (TILE_COLS - 1) * TILE_GAP   # a page's width: one row
 MARGIN = 24                   # the dialog's sides: the step bar, pages and Back / Next
 HEADER_GAP = 20               # every step: between the title + words and what's below
@@ -262,30 +262,24 @@ class StepBar(QWidget):
                 p.drawRoundedRect(QRectF(seg.x(), 0, seg.width() * fill, self.SEG_H), 2, 2)
 
 
-def uses() -> tuple[tuple[str, str, str, str], ...]:
-    """The first page's answers to "What's it for?": (key, icon, title, what it adds).
-    A function, not a constant: the words follow the language picked at start-up."""
-    return (("normal", "volume", _("Just sounds"),
-             _("Play sounds in Discord and games. Nothing else to learn.")),
-            ("streamer", "live", _("Streaming"),
-             _("Adds the <b>Apps</b> tab (send music or a game to your stream). The last step "
-               "links the <b>Streamer guide</b> (Stream Deck keys, chat commands).")),
-            ("games", "gamepad", _("Competitive games"),
-             _("Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something "
-               "shows up on your screen (a kill, \u201cYOU DIED\u201d).")),
-            ("all", "star", _("Show me everything"),
-             _("Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.")))
+# the first launch's last step: the tabs to start with, besides Sounds and Setup (on
+# for good). A new user starts with Voice on and these three off (BASIC_TABS_OFF).
+OPTIONAL_TABS = ("voice", "radio", "apps", "triggers")
 
 
-# the tabs each answer switches on (the rest stay as they are: a plain soundboard)
-USE_TABS = {"streamer": ("apps",), "games": ("triggers",),
-            "all": ("radio", "apps", "triggers")}
+def tab_names() -> dict[str, str]:
+    """The tiles' names (a function: the words follow the language picked at start-up)."""
+    return {"voice": _("Voice"), "radio": _("Radio"), "apps": _("Apps"),
+            "triggers": _("Triggers")}
 
 
-def apply_use(win, use: str):
-    """Switch on the tabs that fit what the app is for (Settings > Tabs can undo it)."""
-    for key in USE_TABS.get(use, ()):
-        win.tabctl.set_tab_on(key, True)
+def use_for(tabs: set[str]) -> str:
+    """The extra tabs picked, as the use count's answer (usage.py: use-*): the old
+    "What's it for?" answers, so the counts carry on from before the question went."""
+    extra = tabs & {"radio", "apps", "triggers"}
+    return {frozenset(): "normal", frozenset({"apps"}): "streamer",
+            frozenset({"triggers"}): "games",
+            frozenset({"radio", "apps", "triggers"}): "all"}.get(frozenset(extra), "custom")
 
 
 def _ok() -> str:    # status colours readable on the current theme (theme.status)
@@ -368,6 +362,14 @@ def _label(text: str, css: str = BODY_CSS) -> QLabel:
     lbl.setWordWrap(True)
     lbl.setTextFormat(Qt.TextFormat.RichText)
     lbl.setStyleSheet(css)
+    return lbl
+
+
+def _section(text: str) -> QLabel:
+    """A part of a step's title ("Microphone"): one line, never wrapped."""
+    lbl = QLabel(f"<b>{text}</b>")
+    lbl.setTextFormat(Qt.TextFormat.RichText)
+    lbl.setStyleSheet(BODY_CSS)
     return lbl
 
 
@@ -477,16 +479,6 @@ class _PageStack(QWidget):
                                   and p.setGraphicsEffect(None))  # pyright: ignore[reportArgumentType]
             anim.start()
         self.currentChanged.emit(i)
-
-
-def _discord_open() -> bool:
-    """A Discord app is running (any client)."""
-    from soundboard.mic import discordtalk
-    try:
-        return bool(discordtalk.running_clients())
-    except Exception:  # noqa: BLE001 - can't tell: as if it isn't
-        log.warning("checking for Discord failed", exc_info=True)
-        return False
 
 
 def _working_title() -> str:   # (a call: translated in the language picked by then)
@@ -621,7 +613,7 @@ class CableConfirm(QDialog):
 
 
 class SetupWizard(QDialog):
-    PAGES = 4
+    PAGES = 3
     _discord_read = Signal(object, object)   # worker -> UI: (files' signature, settings)
 
     def __init__(self, win, resumed: bool = False):
@@ -657,17 +649,15 @@ class SetupWizard(QDialog):
                                "mon_device": win.cfg.mon_device}
         self._user_picked: set[str] = set()   # the ones they actually clicked
         self._chose_cable = False   # "Virtual cable instead" clicked here
-        # the first launch only: a "What's it for?" page goes before the mic, and the
-        # device pages move up one (self.base)
+        # the steps: the mic and headphones, then where the sounds go, then the last one:
+        # on the first launch "Make it yours" (tabs, language, look and a "Set up
+        # Discord" switch), any other time the Discord step (its page stays built on
+        # the first launch too, for its words, but isn't a step then)
         self._ask_use = win.cfg.use_mode == ""
-        self._use = "normal"
-        self.base = 1 if self._ask_use else 0
-        # ...and once the devices are done, a "Make it yours" page (language, theme), then
-        # Discord last, and only when there's something to do there (_discord_due)
-        self.look_index = self.base + 3 if self._ask_use else -1
-        self.discord_index = self.base + (4 if self._ask_use else 3)
-        self._asking = False   # the Discord step is one yes / no question (_fill_discord)
-        self.PAGES = self.discord_index + 1
+        self.dev_index, self.send_index = 0, 1
+        self.look_index = 2 if self._ask_use else -1
+        self.discord_index = 3 if self._ask_use else 2
+        self.PAGES = 3
         self._lang_pending = False   # a language picked there: Finish restarts into it
         # Discord's own settings, read live on the last step (discordcfg)
         self._discord_sig: tuple | None = None
@@ -697,10 +687,7 @@ class SetupWizard(QDialog):
         v.addLayout(top)
         self.stack = _PageStack()
         v.addWidget(self.stack, 1)
-        if self._ask_use:
-            self.stack.addWidget(self._page_use())
-        self.stack.addWidget(self._page_mic())
-        self.stack.addWidget(self._page_headphones())
+        self.stack.addWidget(self._page_devices())
         self.stack.addWidget(self._page_cable())
         if self._ask_use:
             self.stack.addWidget(self._page_look())
@@ -749,7 +736,7 @@ class SetupWizard(QDialog):
             self.bun_cable.build()
         if win._attaching:
             self.setup_show.start()
-        self.go(self.base + 2 if resumed or self._proc is not None or win._attaching else 0)
+        self.go(self.send_index if resumed or self._proc is not None or win._attaching else 0)
 
     # ------------------------------------------------------------------ pages
     def _choice_list(self, names: list[str], current: str | None,
@@ -791,108 +778,60 @@ class SetupWizard(QDialog):
         scroll.setFixedHeight(rows * h + (rows - 1) * TILE_GAP if names else h)
         return scroll, group
 
-    def _page_use(self) -> QWidget:
-        """First launch only: what the app is for. Each answer switches on the tabs
-        that fit (USE_TABS) when they press Next; the words under the tiles say what."""
+    def _discord_heading(self) -> str:
+        return _("Last step: tell Discord or your game")
+
+    def _page_look(self) -> QWidget:
+        """First launch only, the last step: the tabs to start with, the language, a
+        look, starting with Windows, Lite mode, and the "Set up Discord" switch."""
+        from soundboard import i18n
+        from soundboard.ui.settings.langpick import LangButton
+        from soundboard.ui.settings.appearance import ThemeCard, ThemeGrid
+        from soundboard.ui.window.moretabs import PITCH
         p = QWidget()
         v = QVBoxLayout(p)
-        v.addLayout(_header(_("What will you use Onion Board for?"),
-                            _label(_("Pick the closest one. It only decides which tabs you "
-                                     "start with: change it any time in <b>Settings</b> "
-                                     "→ <b>Tabs</b>.")),
-                            BunnyWidget("star", height=BUN_H, pad=BUN_PAD)))
+        v.addLayout(_header(_("All set! Now make it yours"),
+                            _label(_("Pick your tabs and a look. Change them any time in "
+                                     "<b>Settings</b>.")),
+                            BunnyWidget("star", celebrate=True, height=BUN_H, pad=BUN_PAD)))
+        v.addSpacing(HEADER_GAP)
+        # the tabs: tick the ones to start with (Sounds and Setup are always there)
+        v.addWidget(_section(_("Your tabs")))
+        v.addSpacing(6)
         box = QWidget()
         grid = QGridLayout(box)   # one row, like the device tiles
         grid.setContentsMargins(0, 0, 0, 0)
         grid.setSpacing(TILE_GAP)
-        self.use_group = QButtonGroup(box)
-        self.use_buttons: dict[str, ChoiceTile] = {}
-        self._use_words: dict[str, str] = {}
-        for i, (key, icon, title, words) in enumerate(uses()):
-            rb = ChoiceTile(title, icon, TILE_W, TILE_MIN_H)
-            rb.setProperty("use", key)
-            rb.setChecked(key == self._use)
-            self.use_group.addButton(rb)
-            grid.addWidget(rb, 0, i)
-            self.use_buttons[key] = rb
-            self._use_words[key] = words
-        tile_h(list(self.use_buttons.values()))
-        grid.setColumnStretch(len(uses()), 1)
-        v.addSpacing(HEADER_GAP)
+        self.tab_buttons: dict[str, ChoiceTile] = {}
+        names = tab_names()
+        for i, key in enumerate(OPTIONAL_TABS):
+            # the icon beside the name: shorter than a device's tile, so the step fits
+            tile = ChoiceTile(names[key], key, TILE_W, TAB_TILE_H, stacked=False)
+            tile.setAutoExclusive(False)   # any number of them
+            tile.setChecked(self.win.tabctl.tab_on(key))
+            tile.setToolTip(PITCH.get(key, ""))
+            tile.setProperty("tab", key)
+            grid.addWidget(tile, 0, i)
+            self.tab_buttons[key] = tile
+        grid.setColumnStretch(len(OPTIONAL_TABS), 1)
         v.addWidget(box)
-        v.addSpacing(12)
-        card, cl = _card(14, 8, roomy=False)
-        # every answer's words sit hidden in the same spot, keeping their room: the
-        # card is always as tall as the longest, so clicking between the tiles
-        # doesn't grow and shrink the window (it jumped around when spammed)
-        words = QGridLayout()
-        words.setContentsMargins(0, 0, 0, 0)
-        for text in self._use_words.values():
-            ghost = _label(text)
-            keep = ghost.sizePolicy()
-            keep.setRetainSizeWhenHidden(True)
-            ghost.setSizePolicy(keep)
-            ghost.hide()
-            words.addWidget(ghost, 0, 0)
-        self.use_hint = _label("")   # fills that room, its words at the top: a pick
-        self.use_hint.setAlignment(Qt.AlignmentFlag.AlignLeading   # never re-lays it out
-                                   | Qt.AlignmentFlag.AlignTop)
-        words.addWidget(self.use_hint, 0, 0)
-        cl.addLayout(words)
-        v.addWidget(card)
-        v.addStretch(1)
-        self.use_group.buttonClicked.connect(lambda b: self._pick_use(b.property("use")))
-        self._pick_use(self._use)
-        return p
-
-    def _discord_heading(self) -> str:
-        return _("Last step: tell Discord or your game")
-
-    def _discord_due(self) -> bool:
-        """The first launch's Discord step, after "Make it yours": only when a Discord
-        is open (straight into the mic: one question), or on the cable or a virtual
-        mic, which Discord has to be told to pick. Otherwise "Make it yours" is last."""
-        if not self._ask_use:
-            return True
-        cfg = self.win.cfg
-        if cfg.route == "cable" or (cfg.route == "device" and eng.virtual_mic_for(
-                self.win.routectl._main_name())):
-            return True
-        return (cfg.route == "mic" and directmic.works(directmic.status(cfg.mic_device))
-                and _discord_open())
-
-    def _count_steps(self):
-        if self._ask_use:
-            self.PAGES = self.discord_index + (1 if self._discord_due() else 0)
-            self.step_bar.set_steps(self.PAGES)
-
-    def _page_look(self) -> QWidget:
-        """First launch only: the language, a theme, and starting with Windows."""
-        from soundboard import i18n
-        from soundboard.ui.settings.langpick import LangButton
-        from soundboard.ui.settings.appearance import ThemeCard, ThemeGrid
-        p = QWidget()
-        v = QVBoxLayout(p)
-        v.addLayout(_header(_("All set! Now make it yours"),
-                            _label(_("Pick a language and a look. Change them any time in "
-                                     "<b>Settings</b> → <b>Appearance</b>.")),
-                            BunnyWidget("star", height=BUN_H, pad=BUN_PAD)))
-        v.addSpacing(HEADER_GAP)
-        card, cl = _card(14, 10, roomy=False)
+        v.addSpacing(SECTION_GAP)
+        # the look: a few themes, the language beside its title
         row = QHBoxLayout()
         row.setSpacing(10)
-        row.addWidget(_label(_("<b>Language</b>")))
+        row.addWidget(_section(_("Look")))
+        row.addStretch(1)
+        row.addWidget(QLabel(_("Language")))
         self.lang_button = LangButton()
         langs = dict(i18n.available())
         code = self.win.cfg.language if self.win.cfg.language in langs else i18n.current()
         self.lang_button.show_language(code, langs.get(code, code))
         row.addWidget(self.lang_button)
-        row.addStretch(1)
-        cl.addLayout(row)
+        v.addLayout(row)
         self.lang_note = _label("", "")
         self.lang_note.setObjectName("hint")
         self.lang_note.hide()
-        cl.addWidget(self.lang_note)
+        v.addWidget(self.lang_note)
 
         def open_picker():
             from soundboard.ui.settings.langpick import LanguageDialog
@@ -901,18 +840,32 @@ class SetupWizard(QDialog):
             dlg.chosen.connect(self._pick_language)
             dlg.open_under(self.lang_button)
         self.lang_button.clicked.connect(open_picker)
-        v.addWidget(card)
-        v.addSpacing(12)
+        v.addSpacing(6)
         self.look_cards: list = []
         for name in look_themes():
             c = ThemeCard(name)
             c.setChecked(name == theme.current_name)
             c.clicked.connect(lambda __=False, n=name: self._pick_look(n))
             self.look_cards.append(c)
-        v.addWidget(ThemeGrid(self.look_cards, max_columns=len(LOOK_ROWS[0])))
+        grid = ThemeGrid(self.look_cards, max_columns=len(LOOK_ROWS[0]))
+        grid.setMaximumWidth(CONTENT_W)   # (its cards' widths would widen the guide)
+        v.addWidget(grid)
         more = QLabel(_("{n} more themes in Settings.", n=len(theme.THEMES) - len(look_themes())))
         more.setObjectName("hint")
         v.addWidget(more)
+        v.addSpacing(SECTION_GAP)
+        # Discord: an opt-in, done after Finish (the Discord guide over the board, and
+        # Discord opened on its voice settings), so the guide itself stays short
+        card, cl = _card(14, 6, roomy=False)
+        self.chk_discord = QCheckBox(_("Set up Discord when I finish"))
+        self.chk_discord.setStyleSheet("font-weight:700;")
+        cl.addWidget(self.chk_discord)
+        self.discord_why = _label("", "font-size:10pt;")
+        self.discord_why.setObjectName("muted")
+        cl.addWidget(self.discord_why)
+        v.addWidget(card)
+        self._discord_touched = False   # ticked or unticked by them: keep it so
+        self.chk_discord.clicked.connect(lambda: setattr(self, "_discord_touched", True))
         v.addSpacing(6)
         self.chk_autostart = QCheckBox(_("Start Onion Board when I sign in to Windows "
                                          "(quietly, in the tray)"))
@@ -929,6 +882,32 @@ class SetupWizard(QDialog):
         v.addWidget(self.chk_lite)
         v.addStretch(1)
         return p
+
+    def _discord_needed(self) -> bool:
+        """Discord has to be told something: on the cable or a virtual mic it must pick
+        that mic (straight into the mic, it keeps the one it has)."""
+        cfg = self.win.cfg
+        return cfg.route == "cable" or (cfg.route == "device" and bool(
+            eng.virtual_mic_for(self.win.routectl._main_name())))
+
+    def _fill_discord_choice(self):
+        """The "Set up Discord" switch's words (and, until they touch it, whether it's
+        ticked) follow the send step: on by itself only when Discord must pick a mic."""
+        cfg = self.win.cfg
+        need = self._discord_needed()
+        if not self._discord_touched:
+            self.chk_discord.setChecked(need)
+        if need:
+            why = _("Discord has to be told to use your new mic. Bun opens Discord on the "
+                    "right page and shows you what to pick.")
+        elif cfg.route == "mic" and self.route_ok():
+            why = _("Your sounds are already in your mic. Bun opens Discord and checks its "
+                    "noise filter, which can chop sounds up. Skip it if you don't use "
+                    "Discord.")
+        else:
+            why = _("Bun opens Discord on its voice settings and shows you what to change. "
+                    "Skip it if you don't use Discord.")
+        self.discord_why.setText(why)
 
     def _pick_language(self, code: str):
         from soundboard import i18n
@@ -950,31 +929,35 @@ class SetupWizard(QDialog):
         for c in self.look_cards:
             c.setChecked(c.name == name)
 
-    def _pick_use(self, key: str):
-        self._use = key
-        self.use_hint.setText(self._use_words[key])
-
-    def _save_use(self):
-        """Leaving the "What's it for?" page: remember the answer (so it's never asked
-        again, even if the guide is closed later) and add the tabs that fit."""
+    def _save_tabs(self):
+        """The first launch's last step, left by Finish or closed there: the tabs as
+        ticked, and the answer remembered (so the step is never the first launch's
+        again). Its count is the old "What's it for?" answer (use_for)."""
         cfg = self.win.cfg
-        if cfg.use_mode == self._use:
+        if cfg.use_mode:
             return
-        usage.used(f"use-{self._use}")   # the answer's name only (usage.py)
-        cfg.use_mode = self._use
-        apply_use(self.win, self._use)
+        picked = {k for k, b in self.tab_buttons.items() if b.isChecked()}
+        for key in OPTIONAL_TABS:
+            self.win.tabctl.set_tab_on(key, key in picked)
+        cfg.use_mode = use_for(picked)
+        usage.used(f"use-{cfg.use_mode}")   # the answer's name only (usage.py)
         cfg.save()
-        self._fill_discord()   # the streamer guide's button on the last page
 
-    def _page_mic(self) -> QWidget:
+    def _page_devices(self) -> QWidget:
+        """Step 1: the mic (its tile shows your voice's level) and, under it, the
+        headphones (with a test sound), on one page."""
         p = QWidget()
         v = QVBoxLayout(p)
-        self.bun_mic = BunnyWidget("mic", height=BUN_H, pad=BUN_PAD)
-        v.addLayout(_header(_("Which microphone do you talk into?"),
-                            _label(_("Pick the mic you use for gaming (your headset or desk "
-                                     "mic). <b>Say something</b>, the bar below should move "
-                                     "(and Bun talks along) when you talk.")),
+        self.bun_mic = BunnyWidget("headphones", height=BUN_H, pad=BUN_PAD)
+        self.bun_phones = self.bun_mic   # (one Bun: talks along, and bursts on the test)
+        v.addLayout(_header(_("Your mic and headphones"),
+                            _label(_("Pick the ones you use for gaming. <b>Say something</b>: "
+                                     "the bar on your mic should move.")),
                             self.bun_mic))
+        v.addSpacing(HEADER_GAP)
+        # the mic
+        v.addWidget(_section(_("Microphone")))
+        v.addSpacing(6)
         mics = [d["name"] for d in eng.list_devices("input") if not eng.is_virtual(d["name"])]
         self._no_mics = not mics
         cur = self.win.cfg.mic_device if self.win.cfg.mic_device in mics else \
@@ -983,28 +966,36 @@ class SetupWizard(QDialog):
             self._pick_mic(cur)
         lst, self.mic_group = self._choice_list(
             mics, cur, lambda n: self._pick_mic(n, by_user=True), "input")
-        v.addSpacing(HEADER_GAP)
         v.addWidget(lst)   # the picked mic's tile shows your voice's level along its foot
-        v.addSpacing(12)
-        self.mic_heard = _label("")
-        v.addWidget(self.mic_heard)
+        v.addSpacing(8)
+        row = QHBoxLayout()
+        row.setSpacing(12)
+        self.mic_heard = _label("", "font-size:10pt;")
+        row.addWidget(self.mic_heard, 1)
         self.chk_send = QCheckBox(_("Send my voice too"))
         self.chk_send.setToolTip(_("Send my voice too (untick if you only want your sounds to "
                                    "go out, not your mic)"))
         self.chk_send.setChecked(self.win.cfg.mic_enabled)
-        v.addWidget(self.chk_send, 0, Qt.AlignmentFlag.AlignLeft)
-        v.addStretch(1)
-        self._mic_peak_seen = False
-        return p
-
-    def _page_headphones(self) -> QWidget:
-        p = QWidget()
-        v = QVBoxLayout(p)
-        self.bun_phones = BunnyWidget("headphones", height=BUN_H, pad=BUN_PAD)
-        v.addLayout(_header(_("Where do you listen?"),
-                            _label(_("Pick your headphones or speakers, then press the "
-                                     "<b>speaker button</b>. Only you hear this.")),
-                            self.bun_phones))
+        row.addWidget(self.chk_send, 0, Qt.AlignmentFlag.AlignTop)
+        v.addLayout(row)
+        v.addSpacing(SECTION_GAP + 4)
+        # the headphones, the test sound's button beside their title
+        head = QHBoxLayout()
+        head.setSpacing(10)
+        head.addWidget(_section(_("Headphones or speakers")))
+        head.addStretch(1)
+        self.test_hint = _label("", "font-size:10pt;")
+        self.test_hint.setObjectName("muted")
+        head.addWidget(self.test_hint)
+        play = self.btn_test = QPushButton(_test_title())
+        icons.set_icon(play, "volume")
+        play.setToolTip(_("Only you hear it. Didn't hear it? Pick another one and try again."))
+        play.setAccessibleName(_test_title())
+        play.setAutoDefault(False)   # (Enter is Next's)
+        play.clicked.connect(self.test_sound)
+        head.addWidget(play)
+        v.addLayout(head)
+        v.addSpacing(6)
         outs = [d["name"] for d in eng.list_devices("output") if not eng.is_virtual(d["name"])]
         cur = self.win.cfg.mon_device if self.win.cfg.mon_device in outs else \
             (outs[0] if outs else None)
@@ -1012,35 +1003,9 @@ class SetupWizard(QDialog):
             self._pick_headphones(cur)
         lst, __ = self._choice_list(outs, cur,
                                    lambda n: self._pick_headphones(n, by_user=True))
-        v.addSpacing(HEADER_GAP)
         v.addWidget(lst)
-        v.addSpacing(SECTION_GAP)
-        # a round speaker button in a card, with what to do next to it: the page's
-        # width, so its edges are the tiles' and Next's (a card as wide as its words
-        # ended at a spot nothing else lines up with)
-        card, cl = _card(16, roomy=False)
-        row = QHBoxLayout()
-        row.setSpacing(16)
-        play = self.btn_test = _RoundButton(56)
-        icons.set_icon(play, "volume", "on_accent", size=26)
-        play.setToolTip(_test_title())
-        play.setAccessibleName(_test_title())
-        play.clicked.connect(self.test_sound)
-        row.addWidget(play)
-        words = QVBoxLayout()
-        words.setSpacing(2)
-        words.addStretch(1)
-        self.test_hint = _label(f"<b>{_test_title()}</b>")
-        words.addWidget(self.test_hint)
-        hint = _label(_("Only you hear it. Didn't hear it? Pick another one and try again."),
-                      "font-size:10pt;")
-        hint.setObjectName("muted")
-        words.addWidget(hint)
-        words.addStretch(1)
-        row.addLayout(words, 1)
-        cl.addLayout(row)
-        v.addWidget(card)
         v.addStretch(1)
+        self._mic_peak_seen = False
         return p
 
     def _page_cable(self) -> QWidget:
@@ -1346,26 +1311,24 @@ class SetupWizard(QDialog):
 
     # ------------------------------------------------------------------ navigation
     def go(self, i: int):
-        self._count_steps()
         i = max(0, min(self.PAGES - 1, i))
-        if self._ask_use and self.stack.currentIndex() == 0 and i > 0:
-            self._save_use()   # leaving "What's it for?"
-        page = i - self.base   # 0 mic, 1 headphones, 2 cable, 3 Discord; -1 what it's for
-        if page != 2 and self.setup_show.on:
+        if i != self.send_index and self.setup_show.on:
             self.setup_show._stop()
         self.stack.setCurrentIndex(i)
         self.progress.setText(_("Step {step} of {pages}", step=i + 1, pages=self.PAGES))
         self.step_bar.set_step(i)
         self.btn_back.setVisible(i > 0)
-        self.timer.setInterval(TICK_MS if page == 0 else SLOW_TICK_MS)
-        if page == 2:
+        self.timer.setInterval(TICK_MS if i == self.dev_index else SLOW_TICK_MS)
+        if i == self.send_index:
             self.cable_status.setText(_("Checking…"))
             self.cable_status.repaint()   # the check can take a moment (it may reopen devices)
             self.recheck_cable(rescan=False)
         elif i == self.discord_index:
             self._fill_discord()
+        elif i == self.look_index:
+            self._fill_discord_choice()
         # Discord's own settings: read now, then while the step is up
-        if i == self.discord_index and not self._asking:
+        if i == self.discord_index:
             self._read_discord()
             self.discord_timer.start(DISCORD_READ_MS)
         else:
@@ -1502,28 +1465,23 @@ class SetupWizard(QDialog):
         busy.set_busy(self.btn_next, installing)
         busy.set_busy(self.btn_back, installing)
         mic_action = self._mic_action()
-        asking = i == self.discord_index and self._asking
-        self.btn_skip.setText(_("No thanks, finish") if asking
-                              else _("Skip: only I'll hear my sounds"))
-        self.btn_skip.setVisible(mic_action or asking)
+        self.btn_skip.setVisible(mic_action)
         SetupWizard._sync_or(self)   # (by the class: tests drive this with a stand-in)
-        if asking:
-            text, icon = _("Yes, set up Discord"), "speech"
-        elif i == self.PAGES - 1:
+        if i == self.PAGES - 1:
             text, icon = _("Finish  ✓"), "check"
-        elif i == self.base + 2 and self._was_locked:
+        elif i == self.send_index and self._was_locked:
             text, icon = _("Setting up…"), "mic"
         elif mic_action:   # the step's one thing to do: Next does it (next_clicked)
             text = (_("Repair my mic  →") if directmic.needs_repair(
                 directmic.status(self.win.cfg.mic_device)) else _("Put my sounds in my mic  →"))
             icon = "nav_next"
-        elif i == self.base + 2 and not self.route_ok():
+        elif i == self.send_index and not self.route_ok():
             text, icon = _("Skip for now  →"), "nav_next"
         else:
             text, icon = _("Next  →"), "nav_next"
         # skipping is the way out, not the step's main thing: a plain button, so the
         # one filled button on the page is the one that sets it up
-        skip = (i == self.base + 2 and not mic_action and not self.route_ok()
+        skip = (i == self.send_index and not mic_action and not self.route_ok()
                 and not self._was_locked)
         if self.btn_next.objectName() != ("" if skip else "primary"):
             self.btn_next.setObjectName("" if skip else "primary")
@@ -1557,7 +1515,7 @@ class SetupWizard(QDialog):
         """The send step, straight into the mic and not set up (or needing a repair):
         Next puts the sounds into the mic, the step's one thing to do, and Skip is
         the quiet way past it."""
-        return (self.stack.currentIndex() == self.base + 2 and self.win.cfg.route == "mic"
+        return (self.stack.currentIndex() == self.send_index and self.win.cfg.route == "mic"
                 and self._proc is None and not self.win._attaching
                 and not self.setup_show.on and not self.route_ok())
 
@@ -1571,10 +1529,9 @@ class SetupWizard(QDialog):
         i = self.stack.currentIndex()
         if self._mic_action():
             self.attach_mic()   # Next is "Put my sounds in my mic" here (_update_next)
-        elif i == self.discord_index and self._asking:
-            self.finish(discord=True)   # Next is "Yes, set up Discord"
         elif i == self.PAGES - 1:
-            self.finish()
+            # the first launch: Discord after, if they ticked it
+            self.finish(discord=i == self.look_index and self.chk_discord.isChecked())
         else:
             self.go(i + 1)
 
@@ -1582,14 +1539,12 @@ class SetupWizard(QDialog):
         """Past the send step without setting it up: only they hear their sounds."""
         if self._busy():
             return
-        if self.stack.currentIndex() == self.discord_index and self._asking:
-            self.finish()   # "No thanks, finish"
-            return
         usage.used("setup-skipped-send")
         self.go(self.stack.currentIndex() + 1)
 
     def finish(self, discord: bool = False):
-        """`discord`: then the Discord guide, over the window (the setup guide is gone)."""
+        """`discord`: then the Discord guide, over the window (the setup guide is gone),
+        with Discord opened on its voice settings."""
         cfg = self.win.cfg
         # Finish means done, sending set up or not: like closing it, the guide doesn't
         # open by itself again (the Setup tab's Step-by-step guide still opens it, and
@@ -1608,7 +1563,9 @@ class SetupWizard(QDialog):
         elif discord:
             from soundboard.ui.setup.chatguide import show_guide
             win, vm = self.win, self._vm
-            QTimer.singleShot(0, win, lambda: show_guide("discord", win, win, vm))
+            usage.used("setup-discord")
+            QTimer.singleShot(0, win, lambda: show_guide("discord", win, win, vm,
+                                                         open_app=True))
 
     def reject(self):
         """Esc / the window's X. Mid-install, check first: the install carries on
@@ -1638,11 +1595,13 @@ class SetupWizard(QDialog):
         self.discord_timer.stop()
         if self.setup_show.on:
             self.setup_show._stop()
-        page = self.stack.currentIndex() - self.base
+        page = self.stack.currentIndex()
         if r != QDialog.DialogCode.Accepted and 0 <= page < len(PAGE_NAMES):
             usage.used(f"setup-closed-{PAGE_NAMES[page]}")   # where people give up
         tour = self._ask_use   # the very first launch: Bun's tour of the empty board next
-        if not self.win.cfg.use_mode:   # closed on "What's it for?": asked once is enough
+        if self._ask_use and page == self.look_index:
+            self._save_tabs()   # finished, or closed on the last step: the tabs as ticked
+        if not self.win.cfg.use_mode:   # closed before the last step: asked once is enough
             usage.used("use-skipped")
             self.win.cfg.use_mode = "normal"
             self.win.cfg.save()
@@ -1691,7 +1650,7 @@ class SetupWizard(QDialog):
         serial = self._hint_serial
         # self as the receiver: the guide may be closed before it fires
         QTimer.singleShot(ms, self, lambda: serial == self._hint_serial
-                          and self.test_hint.setText(f"<b>{_test_title()}</b>"))
+                          and self.test_hint.setText(""))
 
     def test_sound(self):
         if self.win.engine.mon_stream is None:
@@ -2126,10 +2085,6 @@ class SetupWizard(QDialog):
     def _show_discord_body(self):
         # one rule: a Discord tip folds under its heading; without one (on the cable,
         # where Discord's steps are on the page) the Discord button shows as it is
-        if self._asking:   # (the question: Next is its Discord button)
-            self.discord_fold.hide()
-            self.discord_body.hide()
-            return
         tip = bool(self.discord_tip.text())
         self.discord_fold.setVisible(tip)
         # nothing in it (not on the mic yet, sounds only for me, no cable): no empty box
@@ -2152,19 +2107,6 @@ class SetupWizard(QDialog):
         self.btn_streamer.setVisible(streamer)
         self.help_card.setVisible(games or streamer)
         self.helper_row.setVisible(not (self.btn_copy.isHidden() and self.btn_nomic.isHidden()))
-        # the first launch, straight into a working mic: nothing to pick in Discord, so
-        # the step is one question (Yes opens the Discord guide), not a page of tips
-        self._asking = self._ask_use and self._live_kept is True and _discord_open()
-        self.closing.setVisible(not self._asking)
-        if self._asking:
-            self.discord_title.setText(_("Last step: set up Discord?"))
-            self.discord_text.setText(_(
-                "Discord is open. Your sounds are already in your mic, but Discord's noise "
-                "filter (on by default) can chop them up. Bun shows you the one setting to "
-                "change, and checks it for you."))
-            for w in (self.helper_row, self.help_card):
-                w.hide()
-            self._show_discord_body()
 
     def _fill_discord_text(self):
         cfg = self.win.cfg
@@ -2323,7 +2265,7 @@ class SetupWizard(QDialog):
         if (locked := self._locked()) != self._was_locked:   # the mic set-up began / ended
             self._was_locked = locked
             self._update_next()
-        if self.stack.currentIndex() == self.base:   # the mic page: its meter and Bun
+        if self.stack.currentIndex() == self.dev_index:   # the mic's meter and Bun
             e = self.win.engine
             lvl = e.level_mic if e.mic_stream is not None else 0.0
             for tile in self.mic_group.buttons():   # the level on the picked mic's tile
@@ -2349,7 +2291,7 @@ class SetupWizard(QDialog):
             else:
                 self.mic_heard.setText(_("Waiting to hear you… if the bar doesn't move, pick "
                                          "another mic."))
-        if (self.stack.currentIndex() == self.base + 2 and self._proc is None
+        if (self.stack.currentIndex() == self.send_index and self._proc is None
                 and not self._was_locked):
             # the step's card follows the mic effect when it changes from outside the
             # guide (a Windows update takes it off, a repair or Remove elsewhere): it

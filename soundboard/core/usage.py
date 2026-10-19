@@ -169,9 +169,11 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "store-heard", "store-added", "store-voted", "store-shared",
             # its Voices: a community voice taken into yours, or one of yours shared
             "store-voice-added", "store-voice-shared",
-            # the first start's "What's it for?" answer (setupwizard.uses keys), or
-            # the guide closed on that page
-            *(f"use-{k}" for k in ("normal", "streamer", "games", "all", "skipped")),
+            # the tabs the first start's last step started with, as the old "What's it
+            # for?" answers (setupwizard.use_for: "custom" for any other mix), or the
+            # guide closed before that step; its "Set up Discord" ticked at Finish
+            *(f"use-{k}" for k in ("normal", "streamer", "games", "all", "custom", "skipped")),
+            "setup-discord",
             # the setup guide closed on one of its device steps (where people give up),
             # its send step skipped, finished sending or not; Bun's first-run tour of the
             # empty board shown, searched from, or skipped (ui/setup/firsttour.py)

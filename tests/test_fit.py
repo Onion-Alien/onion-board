@@ -71,7 +71,7 @@ def test_setup_wizard_last_page_fits_straight_into_the_mic(qapp, wizard, monkeyp
 def _last_page_fits(qapp, wiz):
     wiz.resize(wiz.minimumSize())
     wiz.show()
-    wiz.go(3)
+    wiz.go(wiz.discord_index)
     assert process_events(qapp, lambda: not clipped(wiz.discord_text), 3)
     assert wiz.height() >= fit.needed_height(wiz, wiz.width())
 
