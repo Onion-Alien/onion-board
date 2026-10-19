@@ -4325,5 +4325,7 @@
   "Every rarity": "हर दुर्लभता",
   "Not yet": "अभी नहीं",
   "Nothing here yet. Try another filter.": "अभी यहाँ कुछ नहीं है। कोई और फ़िल्टर आज़माएँ।",
-  "Rarity": "दुर्लभता"
+  "Rarity": "दुर्लभता",
+  "Achievement unlocked": "उपलब्धि अनलॉक हुई",
+  "{points}G - {name}": "{points}G - {name}"
 }

@@ -4325,5 +4325,7 @@
   "Every rarity": "Todas las rarezas",
   "Not yet": "Aún no",
   "Nothing here yet. Try another filter.": "Aún no hay nada aquí. Prueba otro filtro.",
-  "Rarity": "Rareza"
+  "Rarity": "Rareza",
+  "Achievement unlocked": "Logro desbloqueado",
+  "{points}G - {name}": "{points}G - {name}"
 }

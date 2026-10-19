@@ -4251,5 +4251,7 @@
   "Every rarity": "全部稀有度",
   "Not yet": "未獲得",
   "Nothing here yet. Try another filter.": "這裡還沒有內容。換個篩選試試。",
-  "Rarity": "稀有度"
+  "Rarity": "稀有度",
+  "Achievement unlocked": "成就已解鎖",
+  "{points}G - {name}": "{points}G - {name}"
 }

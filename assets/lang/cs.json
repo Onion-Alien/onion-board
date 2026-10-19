@@ -4399,5 +4399,7 @@
   "Every rarity": "Každá vzácnost",
   "Not yet": "Zatím ne",
   "Nothing here yet. Try another filter.": "Zatím tu nic není. Zkus jiný filtr.",
-  "Rarity": "Vzácnost"
+  "Rarity": "Vzácnost",
+  "Achievement unlocked": "Úspěch odemčen",
+  "{points}G - {name}": "{points}G - {name}"
 }

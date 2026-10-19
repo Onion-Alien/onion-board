@@ -4325,5 +4325,7 @@
   "Every rarity": "Alla sällsyntheter",
   "Not yet": "Inte än",
   "Nothing here yet. Try another filter.": "Inget här än. Testa ett annat filter.",
-  "Rarity": "Sällsynthet"
+  "Rarity": "Sällsynthet",
+  "Achievement unlocked": "Prestation upplåst",
+  "{points}G - {name}": "{points}G - {name}"
 }

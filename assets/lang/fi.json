@@ -4325,5 +4325,7 @@
   "Every rarity": "Kaikki harvinaisuudet",
   "Not yet": "Ei vielä",
   "Nothing here yet. Try another filter.": "Täällä ei ole vielä mitään. Kokeile toista suodatinta.",
-  "Rarity": "Harvinaisuus"
+  "Rarity": "Harvinaisuus",
+  "Achievement unlocked": "Saavutus avattu",
+  "{points}G - {name}": "{points}G - {name}"
 }

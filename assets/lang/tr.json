@@ -4325,5 +4325,7 @@
   "Every rarity": "Her nadirlik",
   "Not yet": "Henüz değil",
   "Nothing here yet. Try another filter.": "Burada henüz bir şey yok. Başka bir filtre dene.",
-  "Rarity": "Nadirlik"
+  "Rarity": "Nadirlik",
+  "Achievement unlocked": "Başarım kazanıldı",
+  "{points}G - {name}": "{points}G - {name}"
 }

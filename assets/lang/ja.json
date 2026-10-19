@@ -4251,5 +4251,7 @@
   "Every rarity": "すべてのレア度",
   "Not yet": "未獲得",
   "Nothing here yet. Try another filter.": "まだ何もありません。別のフィルターを試してください。",
-  "Rarity": "レア度"
+  "Rarity": "レア度",
+  "Achievement unlocked": "実績解除",
+  "{points}G - {name}": "{points}G - {name}"
 }

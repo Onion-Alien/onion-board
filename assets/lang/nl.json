@@ -4325,5 +4325,7 @@
   "Every rarity": "Elke zeldzaamheid",
   "Not yet": "Nog niet",
   "Nothing here yet. Try another filter.": "Hier is nog niets. Probeer een ander filter.",
-  "Rarity": "Zeldzaamheid"
+  "Rarity": "Zeldzaamheid",
+  "Achievement unlocked": "Prestatie ontgrendeld",
+  "{points}G - {name}": "{points}G - {name}"
 }

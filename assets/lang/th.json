@@ -4251,5 +4251,7 @@
   "Every rarity": "ทุกความหายาก",
   "Not yet": "ยังไม่ได้",
   "Nothing here yet. Try another filter.": "ยังไม่มีอะไรที่นี่ ลองตัวกรองอื่นดู",
-  "Rarity": "ความหายาก"
+  "Rarity": "ความหายาก",
+  "Achievement unlocked": "ปลดล็อกความสำเร็จแล้ว",
+  "{points}G - {name}": "{points}G - {name}"
 }
