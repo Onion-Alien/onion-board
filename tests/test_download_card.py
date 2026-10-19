@@ -27,7 +27,7 @@ def _added(bar, url: str, title: str = "Added one"):
     QTest.qWait(db.Outcome.SHOW_MS + 100)   # the flash holds what comes next
 
 
-def test_card_sits_in_the_corner_and_folds_to_a_pill(window, qapp):
+def test_card_sits_in_the_corner_and_folds_to_a_pill(window, qapp, monkeypatch):
     """Over the page's bottom-right corner above the player, never pushing the page
     down; minimised, a round pill as wide as its summary line, still in the corner;
     opened again, the card."""
@@ -69,6 +69,8 @@ def test_card_sits_in_the_corner_and_folds_to_a_pill(window, qapp):
 
     # a sound playing shows Now playing over the player: the card moves up onto it
     window.playctl._update_chips({window.cfg.sounds[0].id})
+    # (nothing really plays: the app's tick would take the row down again)
+    monkeypatch.setattr(window.playctl, "_update_chips", lambda *a, **k: None)
     QTest.qWait(50)
     row = window.playing_row
     assert row.isVisible()
