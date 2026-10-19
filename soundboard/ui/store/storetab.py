@@ -34,9 +34,8 @@ log = logging.getLogger(__name__)
 
 PREVIEW = "__store_preview"   # the store's "hear it first" voice (headphones only)
 SEARCH_WAIT_MS = 400          # typing pauses this long before the store is searched
-ROW_MAX_W = 1060              # the cards stay a column, centred, on a wide window
 COUNT_W = "9.9k"              # the widest vote count kept room for
-CARD_MIN_W = 400              # a card's narrowest: two side by side when two fit
+CARD_MIN_W = 300              # a card's narrowest: as many across as fit at this width
 CARD_GAP = 8                  # between the cards
 LIST_GAP = 8                  # between the cards and the scroll bar (DESIGN.md, *Breathing room*)
 ONE_ROW = 720                 # a narrower tab puts the toolbar on two rows
@@ -279,19 +278,10 @@ class StoreTab(QWidget):
         self._cat = ""            # the category picked ("" all)
         self._have_cats = False   # the categories came (the dropdown has more than its tops)
 
-        # one column, centred in the tab (a wide window: room both sides, not all on
-        # the right)
-        outer = QHBoxLayout(self)
-        outer.setContentsMargins(0, 0, 0, 0)
-        outer.setSpacing(0)
-        column = QWidget()
-        column.setMaximumWidth(ROW_MAX_W)
-        col = QVBoxLayout(column)
+        # the whole tab's width, as the Sounds tab: a wide window gets more cards a row
+        col = QVBoxLayout(self)
         col.setContentsMargins(0, 0, 0, 0)
         col.setSpacing(12)
-        outer.addStretch(1)
-        outer.addWidget(column, 100)
-        outer.addStretch(1)
         # still new: a green Beta tag right after the title
         beta = QLabel(_("Beta"))
         beta.setObjectName("pill")
@@ -322,7 +312,7 @@ class StoreTab(QWidget):
         words.addLayout(title_row)
         # (one line for Sounds and Voices: the same words as the tab's tooltip)
         self.tagline = hint_label(_("Sounds and voices players share, voted on by everyone: "
-                                    "add them or share your own"))
+                                    "add them to your board or share your own"))
         words.addWidget(self.tagline)
         words.addStretch(1)
         top.addLayout(words, 1)
@@ -423,7 +413,7 @@ class StoreTab(QWidget):
         self._list = QVBoxLayout(body)
         self._list.setContentsMargins(0, 0, LIST_GAP, 0)   # cards end before the scroll bar
         self._list.setSpacing(CARD_GAP)
-        self._grid = QGridLayout()   # the cards: two a row when two fit (_fit_columns)
+        self._grid = QGridLayout()   # the cards: as many a row as fit (_fit_columns)
         self._grid.setSpacing(CARD_GAP)
         self._cols = 0
         self._list.addLayout(self._grid)
@@ -534,7 +524,7 @@ class StoreTab(QWidget):
 
     def _fit_toolbar(self):
         """One row when the card has room for all of it (and the tab is wide), else two."""
-        room = min(self.width(), ROW_MAX_W) - 28   # (the banner's side margins)
+        room = self.width() - 28   # (the banner's side margins)
         parts = self._toolbar_parts()
         full = self._share_w(self._share_label())
         need = sum(full if w is self.btn_share else w.minimumSizeHint().width()
@@ -611,23 +601,26 @@ class StoreTab(QWidget):
                 b.setIcon(QIcon())
 
     def _fit_columns(self, force: bool = False):
-        """Two cards side by side when two fit the list, else one. A card narrower than
-        its buttons with their words (measured on the first, so longer words or other
-        fonts move the step, never cut a card off): every card shows their pictures only."""
+        """As many cards a row as fit the list at CARD_MIN_W each (or the first card's
+        smallest, if other fonts make it wider). A card narrower than its buttons with
+        their words (measured on the first, so longer words or other fonts move the step,
+        never cut a card off): every card shows their pictures only."""
         if not self._rows:
             return
         w = self.list_area.viewport().width() - LIST_GAP
-        cols = 2 if w >= 2 * CARD_MIN_W + CARD_GAP else 1
+        first = self._rows[0]
+        first.compact(True)
+        least = max(CARD_MIN_W, self._needs(first))
+        cols = max(1, (w + CARD_GAP) // (least + CARD_GAP))
         if force or cols != self._cols:
             self._cols = cols
             for r in self._rows:
                 self._grid.removeWidget(r)
             for i, r in enumerate(self._rows):
                 self._grid.addWidget(r, i // cols, i % cols)
-            for c in range(2):
+            for c in range(max(cols, self._grid.columnCount())):
                 self._grid.setColumnStretch(c, 1 if c < cols else 0)
         room = (w - CARD_GAP * (cols - 1)) // cols
-        first = self._rows[0]
         first.compact(False)
         compact = self._needs(first) > room
         for r in self._rows:

@@ -63,7 +63,7 @@ def test_unchanged_files_and_no_discord(window, monkeypatch):
 def test_hiding_it_lasts_until_the_settings_change(window, monkeypatch):
     monkeypatch.setattr(chatguide, "on_mic", lambda mw: True)
     window.alertctl._on_discord((found(echoCancellation=True), ("a",)))
-    window.urgent_bar.findChild(type(window.urgent_btn), "urgenthide").click()
+    window.urgent_bar.close_btn.click()
     assert window.urgent_bar.isHidden()
     window.alertctl._on_discord((found(echoCancellation=True, automaticGainControl=True), ("b",)))
     assert not window.urgent_bar.isHidden()          # something new is wrong

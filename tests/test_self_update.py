@@ -429,7 +429,7 @@ def test_an_urgent_fix_gets_a_banner_and_no_skip(window, boxes, qapp, monkeypatc
 
 def test_hiding_the_banner_lasts_until_the_next_start(window, boxes):
     window.updctl._on_update(_urgent(), "", False)
-    window.urgent_bar.findChild(type(window.urgent_btn), "urgenthide").click()
+    window.urgent_bar.close_btn.click()
     assert window.urgent_bar.isHidden()
     window.updctl._on_update(_urgent(), "", False)          # found again 6 hours later
     assert window.urgent_bar.isHidden()

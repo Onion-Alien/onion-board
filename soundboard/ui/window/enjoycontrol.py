@@ -1,5 +1,5 @@
 """*Enjoying Onion Board?*: a slim bar over the tabs (never a window, so it's safe while a
-game is up) with Bun holding up a survey clipboard and a thumb up and down, shown once
+game is up) with a thumb up and down, shown once
 ever (enjoy.asked), after a few days of heavy use (soundboard.core.enjoy says when). A thumb
 is sent at once (usage.survey); the bar then asks "What do you like most?" or "What
 should we fix?" over a box that wraps and grows, and Send. The ✕ just closes it.
@@ -9,19 +9,18 @@ game in front, no tutorial, no other bar. MainWindow makes one ``EnjoyControl``
 (``MainWindow.enjoyctl``); everything here runs on the UI thread."""
 from __future__ import annotations
 
-import time
 import uuid
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QEvent, Qt, QTimer
 from PySide6.QtGui import QTextCursor
-from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPlainTextEdit, QPushButton,
-                               QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QHBoxLayout, QPlainTextEdit, QPushButton,
+                               QWidget)
 
 from soundboard.core import enjoy, tips, usage
 from soundboard.i18n import _
 from soundboard.ui.kit import busy, icons
-from soundboard.ui.bun.bunnywidget import BunnyWidget
+from soundboard.ui.kit.topbar import TopBar
 from soundboard.ui.window.controller import Controller
 
 if TYPE_CHECKING:
@@ -29,11 +28,9 @@ if TYPE_CHECKING:
 
 START_DELAY_MS = 30_000   # never in the first moments after a start
 RETRY_MS = 60_000         # ...then looked at this often until it's been shown this start
-BUN_H = 70                # Bun's height in the bar
 SAID_MAX = 100            # characters of what they type (usage.other_tag keeps as much)
 SAID_LINES = 6            # the box grows to this many lines: SAID_MAX always fits
 SAID_W = 420              # ...at most this wide
-WORDS_W = 200             # the question wraps only past this width (a narrow window)
 
 
 class EnjoyControl(Controller):
@@ -47,46 +44,16 @@ class EnjoyControl(Controller):
         self._timer = QTimer(mw, interval=RETRY_MS)
         self._timer.timeout.connect(self.maybe_show)
 
-    def build_bar(self) -> QFrame:
-        """[Bun] the question and its thumbs, or (after a thumb) the next question with a
-        box under it that wraps and grows with the text, so every word typed stays
-        in view (SAID_MAX characters fit even in the narrowest window), and Send. ✕ on the right."""
-        self.bar = QFrame()
-        self.bar.setObjectName("tipbar")
-        h = QHBoxLayout(self.bar)
-        h.setContentsMargins(4, 4, 6, 4)
-        h.setSpacing(8)
-        self.bun = BunnyWidget("survey", height=BUN_H, pad=2)
-        h.addWidget(self.bun, 0, Qt.AlignmentFlag.AlignVCenter)
-        col = QVBoxLayout()
-        col.setSpacing(6)
-        col.addStretch(1)
-        top = self._top = QHBoxLayout()
-        top.setSpacing(8)
-        words = QVBoxLayout()
-        words.setSpacing(2)
-        self.lbl = QLabel()
-        self.lbl.setObjectName("enjoytitle")
-        self.lbl.setTextFormat(Qt.TextFormat.PlainText)
-        self.lbl.setWordWrap(True)   # (only in a narrow window: it gets its width first)
-        f = self.lbl.font()
-        f.setBold(True)
-        self.lbl.setFont(f)
-        words.addWidget(self.lbl)
-        self.sub = QLabel()
-        self.sub.setObjectName("hint")
-        self.sub.setTextFormat(Qt.TextFormat.PlainText)
-        self.sub.setWordWrap(True)
-        words.addWidget(self.sub)
-        top.addLayout(words)
-        self.up = self._thumb_button("like", _("Yes, I like it"))
-        self.up.clicked.connect(lambda: self.vote("positive"))
-        top.addWidget(self.up, 0, Qt.AlignmentFlag.AlignVCenter)
-        self.down = self._thumb_button("dislike", _("Not really"))
+    def build_bar(self) -> TopBar:
+        """The question and its thumbs, or (after a thumb) the next question with a box
+        under it that wraps and grows with the text, so every word typed stays in view
+        (SAID_MAX characters fit even in the narrowest window), and Send. ✕ on the
+        right. The look every top bar has (ui/kit/topbar.py)."""
+        self.bar = TopBar("like")
+        self.down = self._thumb_button(self.bar, "dislike", _("Not really"))
         self.down.clicked.connect(lambda: self.vote("negative"))
-        top.addWidget(self.down, 0, Qt.AlignmentFlag.AlignVCenter)
-        top.addStretch(1)
-        col.addLayout(top)
+        self.up = self._thumb_button(self.bar, "like", _("Yes, I like it"), primary=True)
+        self.up.clicked.connect(lambda: self.vote("positive"))
         self.answer = QWidget()
         row = QHBoxLayout(self.answer)
         row.setContentsMargins(0, 0, 0, 0)
@@ -108,16 +75,9 @@ class EnjoyControl(Controller):
         self.send_btn.clicked.connect(self.send_said)
         row.addWidget(self.send_btn, 0, Qt.AlignmentFlag.AlignTop)
         row.addStretch(0)
-        col.addWidget(self.answer)
-        col.addStretch(1)
-        h.addLayout(col, 1)
-        self.x = QPushButton()
-        self.x.setObjectName("urgenthide")
-        self.x.setAccessibleName(_("Close"))
-        self.x.setToolTip(_("Close"))
-        icons.close_button(self.x, 28)
+        self.bar.add_row(self.answer)
+        self.x = self.bar.close_btn
         self.x.clicked.connect(self.close)
-        h.addWidget(self.x, 0, Qt.AlignmentFlag.AlignTop)
         self._said_changed()
         self.bar.hide()
         return self.bar
@@ -144,11 +104,8 @@ class EnjoyControl(Controller):
         return False
 
     def _set_words(self, title: str, sub: str):
-        """The question and the line under it. Each keeps its own width up to WORDS_W
-        before it wraps: a wrapped label is otherwise squeezed to a narrow block."""
-        for label, text in ((self.lbl, title), (self.sub, sub)):
-            label.setText(text)
-            label.setMinimumWidth(min(WORDS_W, label.fontMetrics().horizontalAdvance(text) + 2))
+        """The question and the line after it."""
+        self.bar.set_text(title, sub)
 
     def _fit_said(self):
         """As tall as its lines, up to SAID_LINES."""
@@ -162,13 +119,12 @@ class EnjoyControl(Controller):
         self.send_btn.setFixedHeight(line + pad)   # level with the box's first line
 
     @staticmethod
-    def _thumb_button(icon: str, tip: str) -> QPushButton:
-        b = QPushButton()
-        icons.set_icon(b, icon, "muted", size=20, gap=False)
-        b.setFixedSize(44, 34)
+    def _thumb_button(bar: TopBar, icon: str, tip: str, primary: bool = False) -> QPushButton:
+        b = bar.add_button(primary=primary)
+        icons.set_icon(b, icon, "on_accent" if primary else "text", size=18, gap=False)
+        b.setFixedWidth(44)
         b.setToolTip(tip)
         b.setAccessibleName(tip)
-        b.setCursor(Qt.CursorShape.PointingHandCursor)
         return b
 
     def start(self):
@@ -209,12 +165,9 @@ class EnjoyControl(Controller):
         self.shown, self.thumb = True, ""
         self.sid = uuid.uuid4().hex   # never this PC's stats_id
         self._set_words(_("Enjoying Onion Board?"), _("One click. It's anonymous."))
-        self.bun.sad, self.bun._joy_at = 0.0, -1.0
         self.up.show()
         self.down.show()
         self.answer.hide()
-        self._top.setStretch(0, 0)   # the thumbs right after the words
-        self._top.setStretch(3, 1)
         self.bar.show()
         enjoy.asked(self.mw.cfg)   # once, ever: even if they ignore it or quit
         self.mw._save_later()
@@ -224,11 +177,6 @@ class EnjoyControl(Controller):
         """A thumb: sent now, then what they'd say about it."""
         self.thumb = thumb
         usage.survey(self.sid, thumb)
-        if thumb == "positive":   # a happy hop and some notes
-            self.bun._joy_at = time.monotonic()
-            self.bun.burst(6)
-        else:
-            self.bun.sad = 0.6
         self._set_words(_("Nice! What do you like most?") if thumb == "positive"
                         else _("Sorry about that. What should we fix?"),
                         _("Optional. Never linked to you."))
@@ -237,8 +185,6 @@ class EnjoyControl(Controller):
         self.up.hide()
         self.down.hide()
         self.answer.show()
-        self._top.setStretch(0, 1)   # no thumbs: the words take the room
-        self._top.setStretch(3, 0)
         self.said.setFocus()
 
     def send_said(self):
