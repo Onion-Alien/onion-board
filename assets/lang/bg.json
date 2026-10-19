@@ -380,18 +380,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "Забрави списъка дотук (и запазената история, ако се пази)",
   "Forgets Apps tab volumes and hidden programs.": "Забравя силата на звука и скритите програми в раздела Приложения.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Забравя микрофона, слушалките, къде се пращат звуците ти и изхода за стрийма; бързата настройка се пуска отново.",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "Намерен е <b>{n}</b> звук в {name} с {categories} и {hotkeys}.",
-    "Намерени са <b>{n}</b> звука в {name} с {categories} и {hotkeys}."
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "Намерен е <b>{n}</b> звук в {name} с {what}.",
-    "Намерени са <b>{n}</b> звука в {name} с {what}."
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "Намерен е <b>{n}</b> звук в {name}.",
-    "Намерени са <b>{n}</b> звука в {name}."
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Безплатни добавки от GitHub. Махането или преинсталирането на някоя пази тригерите ти и сдвоените телефони.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Безплатно, без реклами и без акаунт. Направено от OnionAlien. Лиценз MIT с Commons Clause: ползвай го за каквото искаш, споделяй го безплатно, никога не го продавай.",
   "Frequencies": "Честоти",
@@ -1042,7 +1030,6 @@
   "There are no sounds yet. Export just your settings?": "Още няма звуци. Да експортирам ли само настройките ти?",
   "There's already a “{new}”.": "Вече има „{new}“.",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Те смятат музиката за фонов шум и накъсват звуците ти. Onion Board вече изчиства гласа ти.",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Копират се в Onion Board; {name} си запазва своите. Тези, които вече са тук, се пропускат, а бърз клавиш, който нещо тук вече ползва, се оставя празен.",
   "This desktop has no system tray, so closing the window quits.": "Този работен плот няма системен трей, затова затварянето на прозореца излиза от приложението.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Това е Onion Board {version}. С отметнато поле пита GitHub на всеки няколко часа дали има по-нова версия и ти казва (с лента, ако е важна поправка). Това копие върви от изходния код, затова само ти казва: обнови го с git pull.",
   "This sound's video isn't there any more": "Видеото на този звук вече го няма",
@@ -1329,10 +1316,6 @@
     "{n} блокирана",
     "{n} блокирани"
   ],
-  "{n} category": [
-    "{n} категория",
-    "{n} категории"
-  ],
   "{n} connection to {places}": [
     "{n} връзка към {places}",
     "{n} връзки към {places}"
@@ -1360,10 +1343,6 @@
   "{n} failed": [
     "{n} неуспешна",
     "{n} неуспешни"
-  ],
-  "{n} hotkey": [
-    "{n} бърз клавиш",
-    "{n} бързи клавиша"
   ],
   "{n} hour ago": [
     "преди {n} час",
@@ -3310,7 +3289,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows пази {key} за себе си и никога не го дава на приложение, така че този бърз клавиш никога няма да свири: избери друг клавиш.",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} е клавишът ти за „Спри всичко“, затова остава за него. Избери друг клавиш или първо дай нов на „Спри всичко“ в Настройки → Бързи клавиши.",
   "Names can be up to {n} characters, so it's “{name}”.": "Имената може да са до {n} знака, затова е „{name}“.",
-  "They go in a category called “{name}”.": "Отиват в категория с име „{name}“.",
   "Type a name first.": "Първо въведете име.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Преименувано на „{new}“. Има и друг звук с това име.",
   "Disguise": "Маскировка",
@@ -4333,5 +4311,12 @@
   "Set up Discord when I finish": "Настройте Discord, когато свърша",
   "Your mic and headphones": "Вашият микрофон и слушалки",
   "Your sounds are already in your mic. Bun opens Discord and checks its noise filter, which can chop sounds up. Skip it if you don't use Discord.": "Вашите звуци вече са във вашия микрофон. Bun отваря Discord и проверява неговия филтър за шум, който може да нарязва звуците. Пропуснете го, ако не използвате Discord.",
-  "Your tabs": "Вашите раздели"
+  "Your tabs": "Вашите раздели",
+  "Earned": "Спечелени",
+  "Every rarity": "Всяка рядкост",
+  "Not yet": "Още не",
+  "Nothing here yet. Try another filter.": "Още няма нищо. Опитай друг филтър.",
+  "Rarity": "Рядкост",
+  "Achievement unlocked": "Отключено постижение",
+  "{points}G - {name}": "{points}G - {name}"
 }

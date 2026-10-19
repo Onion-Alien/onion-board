@@ -412,18 +412,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "Glem listen så langt (og den lagrede historikken, hvis den beholdes)",
   "Forgets Apps tab volumes and hidden programs.": "Glemmer volum i Apper-fanen og skjulte programmer.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Glemmer mikrofonen, hodetelefonene, hvor lydene dine sendes og stream-utgangen; hurtigoppsettet kjører igjen.",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "Fant <b>{n}</b> lyd i {name} med {categories} og {hotkeys}.",
-    "Fant <b>{n}</b> lyder i {name} med {categories} og {hotkeys}."
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "Fant <b>{n}</b> lyd i {name} med {what}.",
-    "Fant <b>{n}</b> lyder i {name} med {what}."
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "Fant <b>{n}</b> lyd i {name}.",
-    "Fant <b>{n}</b> lyder i {name}."
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Gratis tillegg fra GitHub. Hvis du fjerner eller installerer et på nytt, beholdes triggerne og de sammenkoblede telefonene dine.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Gratis, uten reklame og uten konto. Laget av OnionAlien. MIT-lisens med Commons Clause: bruk den til hva som helst, del den gratis, aldri selg den.",
   "Frequencies": "Frekvenser",
@@ -1111,7 +1099,6 @@
   "There are no sounds yet. Export just your settings?": "Det er ingen lyder ennå. Eksportere bare innstillingene dine?",
   "There's already a “{new}”.": "Det finnes allerede en «{new}».",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "De tror musikk er bakgrunnsstøy og hakker opp lydene dine. Onion Board renser allerede stemmen din.",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "De kopieres inn i Onion Board; {name} beholder sine egne. De som allerede er her, hoppes over, og en hurtigtast som noe her allerede bruker, utelates.",
   "This desktop has no system tray, so closing the window quits.": "Dette skrivebordet har ikke noe systemstatusfelt, så å lukke vinduet avslutter.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Dette er Onion Board {version}. Med haken på spør den GitHub med noen timers mellomrom om en nyere versjon er ute, og sier fra (med et banner hvis det er en viktig fiks). Denne kopien kjører fra kildekoden, så den sier bare fra: oppdater den med git pull.",
   "This sound's video isn't there any more": "Videoen til denne lyden finnes ikke lenger",
@@ -1402,10 +1389,6 @@
     "{n} blokkert",
     "{n} blokkert"
   ],
-  "{n} category": [
-    "{n} kategori",
-    "{n} kategorier"
-  ],
   "{n} connection to {places}": [
     "{n} tilkobling til {places}",
     "{n} tilkoblinger til {places}"
@@ -1433,10 +1416,6 @@
   "{n} failed": [
     "{n} mislyktes",
     "{n} mislyktes"
-  ],
-  "{n} hotkey": [
-    "{n} hurtigtast",
-    "{n} hurtigtaster"
   ],
   "{n} hour ago": [
     "for {n} time siden",
@@ -3310,7 +3289,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows holder {key} for seg selv og gir den aldri videre til en app, så den hurtigtasten ville aldri spille: velg en annen tast.",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} er tasten din for Stopp alt, så den blir der. Velg en annen tast, eller gi først Stopp alt en ny i Innstillinger → Hurtigtaster.",
   "Names can be up to {n} characters, so it's “{name}”.": "Navn kan ha opptil {n} tegn, så det blir «{name}».",
-  "They go in a category called “{name}”.": "De havner i en kategori som heter «{name}».",
   "Type a name first.": "Skriv inn et navn først.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Nytt navn: «{new}». En annen lyd heter også det.",
   "Disguise": "Forkledning",
@@ -4333,5 +4311,12 @@
   "Set up Discord when I finish": "Sett opp Discord når jeg er ferdig",
   "Your mic and headphones": "Mikrofonen og hodetelefonene dine",
   "Your sounds are already in your mic. Bun opens Discord and checks its noise filter, which can chop sounds up. Skip it if you don't use Discord.": "Lydene dine er allerede i mikrofonen din. Bun åpner Discord og sjekker støyfilteret, som kan kutte opp lyder. Hopp over det hvis du ikke bruker Discord.",
-  "Your tabs": "Dine faner"
+  "Your tabs": "Dine faner",
+  "Earned": "Opptjent",
+  "Every rarity": "Alle sjeldenheter",
+  "Not yet": "Ikke ennå",
+  "Nothing here yet. Try another filter.": "Ingenting her ennå. Prøv et annet filter.",
+  "Rarity": "Sjeldenhet",
+  "Achievement unlocked": "Prestasjon låst opp",
+  "{points}G - {name}": "{points}G - {name}"
 }

@@ -2,7 +2,7 @@
 in its rarity's colour (the rare loading screens' colours), hidden ones as ??? until
 earned. The counting is soundboard.core.achievements; this page only shows it.
 
-A badge is drawn (a medal in the rarity's colour with an icon on it) until a picture
+A badge is Bun drawn in a scene for it (badges.py) unless a picture
 for it is in assets/art/achievement-<id>.png (art.ART_DIR, which the installed build
 carries): then that's shown, greyed while locked."""
 from __future__ import annotations
@@ -19,22 +19,12 @@ from soundboard.i18n import _
 from soundboard.ui.kit import icons, theme
 from soundboard.ui.kit.panel import hint_label
 from soundboard.ui.settings import Page
+from soundboard.ui.settings import badges
+from soundboard.ui.settings.badges import TIER_SPLASH, tier_colour
 from soundboard.ui.voice import art
 
-# a rarity's loading screen (ui/bun/splashacts.py RARES), for its colour and name
-TIER_SPLASH = {"uncommon": "gold", "rare": "ice", "legendary": "galaxy", "super": "rainbow"}
 TILE_W = 250   # the narrowest a tile gets; they share each row's width
-COMMON = "#a3a9b6"   # Common's silver
-BADGE = 48
-
-
-def tier_colour(tier: str) -> QColor:
-    """A rarity's colour: its rare loading screen's glow; Common, silver (a theme's
-    accent can be any of them: purple read as Legendary)."""
-    if tier in TIER_SPLASH:
-        from soundboard.ui.bun import splashacts
-        return QColor(splashacts.RARES[TIER_SPLASH[tier]][2])
-    return QColor(COMMON)
+BADGE = 56
 
 
 def tier_name(tier: str) -> str:
@@ -126,9 +116,9 @@ def _picture(ach_id: str, size: int, grey: bool) -> QPixmap | None:
 
 
 class Badge(QWidget):
-    """A medal: earned, filled with its rarity's colour; locked, the card's grey with a
-    ring of that colour (so a hidden one still says how rare it is) and the icon faint;
-    hidden and locked, a question mark."""
+    """The achievement's badge: Bun in its scene (badges.py), in colour when earned,
+    grey and faded while locked; a secret one still locked is a question mark in a ring
+    of its rarity's colour. A picture in assets/art (achievement-<id>.png) wins."""
 
     def __init__(self, a: ach.Ach):
         super().__init__()
@@ -137,32 +127,28 @@ class Badge(QWidget):
         self.setFixedSize(BADGE, BADGE)
 
     def paintEvent(self, _e):
-        tk = theme.tokens()
         p = QPainter(self)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(2, 2, BADGE - 4, BADGE - 4)
         colour = tier_colour(self.a.tier)
-        circle = QPainterPath()
-        circle.addEllipse(r)
-        pic = _picture(self.a.id, BADGE - 4, not self.earned)
-        if pic is not None and (self.earned or not self.a.hidden):
-            p.setClipPath(circle)
-            p.drawPixmap(2, 2, pic)
-            p.setClipping(False)
-        else:
-            p.fillPath(circle, colour if self.earned else QColor(tk["card_hi"]))
-            name = "question" if self.a.hidden and not self.earned else self.a.icon
-            ink = (QColor("#1b1b1f") if self.earned and colour.lightnessF() > 0.6
-                   else QColor("#ffffff") if self.earned else QColor(tk["faint"]))
+        if self.a.hidden and not self.earned:   # a secret: ? in its rarity's ring
+            circle = QPainterPath()
+            circle.addEllipse(r)
+            p.fillPath(circle, QColor(theme.tokens()["card_hi"]))
             g = 22
             p.drawPixmap(int((BADGE - g) / 2), int((BADGE - g) / 2),
-                         icons.pixmap(name, g, ink.name()))
-        ring = QColor(colour)
-        if self.earned:
-            ring = ring.lighter(130)
-        p.setPen(QPen(ring, 2.5))   # the same ring earned or not: the same size
-        p.setBrush(Qt.BrushStyle.NoBrush)
-        p.drawEllipse(r)
+                         icons.pixmap("question", g, theme.tokens()["faint"]))
+            p.setPen(QPen(colour, 2.5))
+            p.setBrush(Qt.BrushStyle.NoBrush)
+            p.drawEllipse(r)
+        elif (pic := _picture(self.a.id, BADGE - 4, not self.earned)) is not None:
+            circle = QPainterPath()
+            circle.addEllipse(r)
+            p.setClipPath(circle)
+            p.drawPixmap(2, 2, pic)
+        else:
+            p.drawPixmap(0, 0, badges.badge(self.a.id, self.a.tier, BADGE, not self.earned,
+                                            self.devicePixelRatioF()))
         p.end()
 
 
@@ -273,6 +259,7 @@ class TileGrid(QWidget):
     def __init__(self, tiles: list[Tile]):
         super().__init__()
         self.tiles = tiles
+        self.shown = set(tiles)
         self.grid = QGridLayout(self)
         self.grid.setContentsMargins(0, 0, 0, 0)
         self.grid.setSpacing(self.GAP)
@@ -284,17 +271,26 @@ class TileGrid(QWidget):
         self._place(1)   # (resizeEvent picks how many; a wider start would set the
                          # page's minimum width and keep it from ever getting narrow)
 
-    def _place(self, cols: int):
-        if cols == self.cols:
+    def _place(self, cols: int, force: bool = False):
+        if cols == self.cols and not force:
             return
         for t in self.tiles:
             self.grid.removeWidget(t)
         for c in range(max(cols, self.cols)):
             self.grid.setColumnStretch(c, 1 if c < cols else 0)
         self.cols = cols
-        for i, t in enumerate(self.tiles):
+        shown = [t for t in self.tiles if t in self.shown]
+        for i, t in enumerate(shown):
             self.grid.addWidget(t, i // cols, i % cols)
+        for t in self.tiles:
+            t.setVisible(t in self.shown)
         self.updateGeometry()
+
+    def show_only(self, tiles) -> int:
+        """Show just `tiles` (the filters' picks), closed up; how many there are."""
+        self.shown = set(tiles) & set(self.tiles)
+        self._place(self.cols, force=True)
+        return len(self.shown)
 
     def minimumSizeHint(self):
         return QSize(TILE_W, self.grid.minimumSize().height())
@@ -329,6 +325,8 @@ class AchievementsPage(Page):
         ach.sounds_now(len(self.mw.cfg.sounds))   # (sounds added since the last tick)
         words = texts()
         self.dlg.ach_tiles = []
+        self.dlg.ach_cards = []
+        v.addWidget(self._filters())
         for hidden, title, hint, icon in (
                 (False, _("Achievements"), "", "trophy"),
                 (True, _("Secret achievements"),
@@ -339,11 +337,64 @@ class AchievementsPage(Page):
                 cv.addWidget(self.dlg.ach_count)
             tiles = [Tile(a, *words[a.id]) for a in ach.ALL if a.hidden == hidden]
             self.dlg.ach_tiles += tiles
-            cv.addWidget(TileGrid(tiles))
+            grid = TileGrid(tiles)
+            cv.addWidget(grid)
             v.addWidget(card)
+            self.dlg.ach_cards.append((card, grid))
+        self.dlg.ach_none = hint_label(_("Nothing here yet. Try another filter."))
+        self.dlg.ach_none.hide()
+        v.addWidget(self.dlg.ach_none)
         v.addStretch(1)
         self._count()
         return w
+
+    # the filters: which ones (all, earned, not yet) and which rarity
+    SHOW = ("all", "earned", "todo")
+
+    def _filters(self) -> QWidget:
+        from PySide6.QtWidgets import QButtonGroup, QComboBox, QPushButton
+        from soundboard.ui.kit.panel import Flow
+        from soundboard.ui.kit.wheelguard import no_wheel
+        row = QWidget()
+        flow = Flow(row, gap=8)
+        group = QButtonGroup(row)
+        group.setExclusive(True)
+        self.dlg.ach_show = {}
+        for key, words in zip(self.SHOW, (_("All"), _("Earned"), _("Not yet"))):
+            b = QPushButton(words)
+            b.setObjectName("voicetab")   # (the page-tab chips: checkable, one at a time)
+            b.setCheckable(True)
+            b.setChecked(key == "all")
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            b.clicked.connect(self.apply_filters)
+            group.addButton(b)
+            flow.addWidget(b)
+            self.dlg.ach_show[key] = b
+        rarity = QComboBox()
+        rarity.setAccessibleName(_("Rarity"))
+        rarity.addItem(_("Every rarity"), "")
+        for tier in ach.TIERS:
+            rarity.addItem(tier_name(tier), tier)
+        no_wheel(rarity)
+        rarity.currentIndexChanged.connect(self.apply_filters)
+        flow.addWidget(rarity)
+        self.dlg.ach_rarity = rarity
+        return row
+
+    def apply_filters(self, *_):
+        """Show only what the filters pick; a section with none of it goes, and a
+        line says so when nothing at all is left."""
+        show = next((k for k, b in self.dlg.ach_show.items() if b.isChecked()), "all")
+        tier = self.dlg.ach_rarity.currentData() or ""
+        left = 0
+        for card, grid in self.dlg.ach_cards:
+            picked = [t for t in grid.tiles
+                      if (not tier or t.a.tier == tier)
+                      and (show == "all" or (show == "earned") == bool(ach.got(t.a.id)))]
+            n = grid.show_only(picked)
+            card.setVisible(bool(n))
+            left += n
+        self.dlg.ach_none.setVisible(not left)
 
     def _count(self):
         n, total = ach.earned(), len(ach.ALL)
@@ -358,3 +409,4 @@ class AchievementsPage(Page):
                 t.refresh()
         if isValid(self.dlg.ach_count):
             self._count()
+            self.apply_filters()   # (one may have been earned meanwhile)

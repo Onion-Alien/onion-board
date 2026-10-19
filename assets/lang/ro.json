@@ -418,21 +418,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "Uită lista de până acum (și istoricul salvat, dacă e păstrat)",
   "Forgets Apps tab volumes and hidden programs.": "Uită volumele din fila Aplicații și programele ascunse.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Uită microfonul, căștile, unde sunt trimise sunetele tale și ieșirea pentru stream; configurarea rapidă rulează din nou.",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "Am găsit <b>{n}</b> sunet în {name} cu {categories} și {hotkeys}.",
-    "Am găsit <b>{n}</b> sunete în {name} cu {categories} și {hotkeys}.",
-    "Am găsit <b>{n}</b> de sunete în {name} cu {categories} și {hotkeys}."
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "Am găsit <b>{n}</b> sunet în {name} cu {what}.",
-    "Am găsit <b>{n}</b> sunete în {name} cu {what}.",
-    "Am găsit <b>{n}</b> de sunete în {name} cu {what}."
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "Am găsit <b>{n}</b> sunet în {name}.",
-    "Am găsit <b>{n}</b> sunete în {name}.",
-    "Am găsit <b>{n}</b> de sunete în {name}."
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Suplimente gratuite de pe GitHub. Dacă dezinstalezi sau reinstalezi unul, declanșatoarele și telefoanele asociate rămân.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Gratuit, fără reclame și fără cont. Făcut de OnionAlien. Licență MIT cu Commons Clause: folosește-l pentru orice, partajează-l gratuit, nu-l vinde niciodată.",
   "Frequencies": "Frecvențe",
@@ -1127,7 +1112,6 @@
   "There are no sounds yet. Export just your settings?": "Încă nu sunt sunete. Exporți doar setările?",
   "There's already a “{new}”.": "Există deja un „{new}”.",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Tratează muzica drept zgomot de fundal și îți taie sunetele. Onion Board îți curăță deja vocea.",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Sunt copiate în Onion Board; {name} le păstrează pe ale lui. Cele care sunt deja aici sunt sărite, iar o tastă rapidă pe care o folosește deja ceva de aici e lăsată deoparte.",
   "This desktop has no system tray, so closing the window quits.": "Desktopul ăsta n-are tray de sistem, deci închiderea ferestrei închide aplicația.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Asta e Onion Board {version}. Cu căsuța bifată întreabă GitHub la câteva ore dacă a apărut o versiune mai nouă și îți spune (cu un banner dacă e o reparație importantă). Copia asta rulează din sursă, deci doar îți spune: actualizeaz-o cu git pull.",
   "This sound's video isn't there any more": "Videoclipul sunetului ăstuia nu mai există",
@@ -1428,11 +1412,6 @@
     "{n} blocate",
     "{n} de blocate"
   ],
-  "{n} category": [
-    "{n} categorie",
-    "{n} categorii",
-    "{n} de categorii"
-  ],
   "{n} connection to {places}": [
     "{n} conexiune la {places}",
     "{n} conexiuni la {places}",
@@ -1467,11 +1446,6 @@
     "{n} eșuată",
     "{n} eșuate",
     "{n} de eșuate"
-  ],
-  "{n} hotkey": [
-    "{n} tastă rapidă",
-    "{n} taste rapide",
-    "{n} de taste rapide"
   ],
   "{n} hour ago": [
     "acum {n} oră",
@@ -3383,7 +3357,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows păstrează {key} pentru el și nu o dă niciodată unei aplicații, așa că tasta rapidă n-ar suna niciodată: alege altă tastă.",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} e tasta ta pentru Oprește tot, așa că rămâne acolo. Alege altă tastă sau dă-i întâi lui Oprește tot una nouă în Setări → Taste rapide.",
   "Names can be up to {n} characters, so it's “{name}”.": "Numele pot avea cel mult {n} caractere, așa că e „{name}”.",
-  "They go in a category called “{name}”.": "Ajung într-o categorie numită „{name}”.",
   "Type a name first.": "Scrie mai întâi un nume.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Redenumit în „{new}”. Și alt sunet are numele ăsta.",
   "Disguise": "Deghizare",
@@ -4412,5 +4385,12 @@
   "Set up Discord when I finish": "Configurați Discord când termin",
   "Your mic and headphones": "Microfonul și căștile dvs",
   "Your sounds are already in your mic. Bun opens Discord and checks its noise filter, which can chop sounds up. Skip it if you don't use Discord.": "Sunetele tale sunt deja în microfon. Bun deschide Discord și își verifică filtrul de zgomot, care poate tăia sunetele. Omite-l dacă nu folosești Discord.",
-  "Your tabs": "Filele tale"
+  "Your tabs": "Filele tale",
+  "Earned": "Obținute",
+  "Every rarity": "Orice raritate",
+  "Not yet": "Încă nu",
+  "Nothing here yet. Try another filter.": "Încă nu e nimic aici. Încearcă alt filtru.",
+  "Rarity": "Raritate",
+  "Achievement unlocked": "Realizare deblocată",
+  "{points}G - {name}": "{points}G - {name}"
 }

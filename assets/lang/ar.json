@@ -894,30 +894,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "انسَ القائمة حتى الآن (والسجل المحفوظ، إذا تم الاحتفاظ به)",
   "Forgets Apps tab volumes and hidden programs.": "ينسى مجلدات علامة تبويب التطبيقات والبرامج المخفية.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "ينسى الميكروفون وسماعات الرأس ومكان إرسال الأصوات وإخراج البث؛ يتم تشغيل الإعداد السريع مرة أخرى.",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "تم العثور على صوت <b>{n}</b> في {name} مع {categories} و {hotkeys} .",
-    "تم العثور على أصوات <b>{n}</b> في {name} مع {categories} و {hotkeys} .",
-    "تم العثور على أصوات <b>{n}</b> في {name} مع {categories} و {hotkeys} .",
-    "تم العثور على أصوات <b>{n}</b> في {name} مع {categories} و {hotkeys} .",
-    "تم العثور على أصوات <b>{n}</b> في {name} مع {categories} و {hotkeys} .",
-    "تم العثور على أصوات <b>{n}</b> في {name} مع {categories} و {hotkeys} ."
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "تم العثور على صوت <b>{n}</b> في {name} مع {what} .",
-    "تم العثور على أصوات <b>{n}</b> في {name} مع {what} .",
-    "تم العثور على أصوات <b>{n}</b> في {name} مع {what} .",
-    "تم العثور على أصوات <b>{n}</b> في {name} مع {what} .",
-    "تم العثور على أصوات <b>{n}</b> في {name} مع {what} .",
-    "تم العثور على أصوات <b>{n}</b> في {name} مع {what} ."
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "تم العثور على صوت <b>{n}</b> في {name} .",
-    "تم العثور على أصوات <b>{n}</b> في {name} .",
-    "تم العثور على أصوات <b>{n}</b> في {name} .",
-    "تم العثور على أصوات <b>{n}</b> في {name} .",
-    "تم العثور على أصوات <b>{n}</b> في {name} .",
-    "تم العثور على أصوات <b>{n}</b> في {name} ."
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "إضافات مجانية من جيثب. تؤدي إزالة أحدها أو إعادة تثبيته إلى الحفاظ على المشغلات والهواتف المقترنة.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "مجاني، بدون إعلانات ولا حساب. مصنوع بواسطة OnionAlien. ترخيص معهد ماساتشوستس للتكنولوجيا مع بند العموم: استخدمه في أي شيء، وشاركه مجانًا، ولا تبيعه أبدًا.",
   "Frequencies": "الترددات",
@@ -1327,7 +1303,6 @@
   "Theme, audio, voice, overlay and privacy options.": "خيارات السمة والصوت والصوت والتراكب والخصوصية.",
   "Then Ctrl+click picks a pad without playing it": "ثم يقوم Ctrl+click باختيار اللوحة دون تشغيلها",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "يعتقدون أن الموسيقى عبارة عن ضجيج في الخلفية وتقطع الأصوات. يقوم Onion Board بالفعل بتنظيف صوتك.",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "لقد تم نسخها إلى Onion Board؛ {name} يحتفظ بنفسه. يتم تخطي المفاتيح الموجودة هنا بالفعل، ويتم إيقاف مفتاح التشغيل السريع الذي يستخدمه هنا بالفعل.",
   "This desktop has no system tray, so closing the window quits.": "لا يحتوي سطح المكتب هذا على علبة نظام، لذا يتم إنهاء إغلاق النافذة.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "هذا هو Onion Board {version} . مع تحديد المربع، يسأل GitHub كل بضع ساعات ما إذا كان قد تم إصدار إصدار أحدث ويخبرك (مع لافتة إذا كان هذا إصلاحًا مهمًا). تعمل هذه النسخة من المصدر، لذا فهي تخبرك فقط: قم بتحديثها باستخدام git pull.",
   "Through a proxy": "من خلال وكيل",
@@ -1571,14 +1546,6 @@
     "{n} محظور",
     "{n} محظور"
   ],
-  "{n} category": [
-    "فئة {n}",
-    "{n} الفئات",
-    "{n} الفئات",
-    "{n} الفئات",
-    "{n} الفئات",
-    "{n} الفئات"
-  ],
   "{n} connection to {places}": [
     "{n} اتصال بـ {places}",
     "{n} اتصالات إلى {places}",
@@ -1626,14 +1593,6 @@
     "{n} فشل",
     "{n} فشل",
     "{n} فشل"
-  ],
-  "{n} hotkey": [
-    "مفتاح التشغيل السريع {n}",
-    "{n} مفاتيح الاختصار",
-    "{n} مفاتيح الاختصار",
-    "{n} مفاتيح الاختصار",
-    "{n} مفاتيح الاختصار",
-    "{n} مفاتيح الاختصار"
   ],
   "{n} more can't be brought over (the file was moved or deleted, or isn't a sound): {names}": [
     "{n} لا يمكن إحضار المزيد (تم نقل الملف أو حذفه، أو أنه ليس صوتًا): {names}",
@@ -3602,7 +3561,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "يحتفظ Windows بـ {key} لنفسه ولا يمرره لأي تطبيق، فلن يعمل هذا الاختصار أبدًا: اختر مفتاحًا آخر.",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} هو مفتاح «أوقف كل شيء»، فيبقى له. اختر مفتاحًا آخر، أو أعطِ «أوقف كل شيء» مفتاحًا جديدًا في الإعدادات → الاختصارات أولًا.",
   "Names can be up to {n} characters, so it's “{name}”.": "يمكن أن يصل الاسم إلى {n} حرفًا، لذا أصبح “{name}”.",
-  "They go in a category called “{name}”.": "ستوضع في فئة باسم “{name}”.",
   "Type a name first.": "اكتب اسمًا أولًا.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ أُعيدت التسمية إلى “{new}”. يوجد صوت آخر بهذا الاسم أيضًا.",
   "Disguise": "تنكّر",
@@ -4649,5 +4607,12 @@
   "Set up Discord when I finish": "قم بإعداد Discord عندما أنتهي",
   "Your mic and headphones": "الميكروفون وسماعات الرأس الخاصة بك",
   "Your sounds are already in your mic. Bun opens Discord and checks its noise filter, which can chop sounds up. Skip it if you don't use Discord.": "الأصوات الخاصة بك موجودة بالفعل في الميكروفون الخاص بك. يفتح Bun Discord ويفحص مرشح الضوضاء الخاص به، والذي يمكنه تقطيع الأصوات. تخطيها إذا كنت لا تستخدم Discord.",
-  "Your tabs": "علامات التبويب الخاصة بك"
+  "Your tabs": "علامات التبويب الخاصة بك",
+  "Earned": "تم الحصول عليه",
+  "Every rarity": "كل الندرات",
+  "Not yet": "ليس بعد",
+  "Nothing here yet. Try another filter.": "لا شيء هنا بعد. جرّب عامل تصفية آخر.",
+  "Rarity": "الندرة",
+  "Achievement unlocked": "تم فتح إنجاز",
+  "{points}G - {name}": "{points}G - {name}"
 }

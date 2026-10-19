@@ -826,18 +826,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "Dimentica l'elenco finora (e la cronologia salvata, se mantenuta)",
   "Forgets Apps tab volumes and hidden programs.": "Dimentica i volumi della scheda App e i programmi nascosti.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Dimentica il microfono, le cuffie, il luogo in cui vengono inviati i suoni e l'uscita del flusso; la configurazione rapida viene eseguita di nuovo.",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "Trovato <b>{n}</b> suono in {name} con {categories} e {hotkeys} .",
-    "Trovato <b>{n}</b> suoni in {name} con {categories} e {hotkeys} ."
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "Trovato <b>{n}</b> suono in {name} con {what} .",
-    "Trovato <b>{n}</b> suoni in {name} con {what} ."
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "Trovato <b>{n}</b> suono in {name} .",
-    "Trovato <b>{n}</b> suoni in {name} ."
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Componenti aggiuntivi gratuiti da GitHub. La rimozione o la reinstallazione di uno mantiene i trigger e i telefoni associati.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Gratuito, senza pubblicità e senza account. Realizzato da OnionAlien. Licenza MIT con Commons Clause: usalo per qualsiasi cosa, condividilo gratuitamente, non venderlo mai.",
   "Frequencies": "Frequenze",
@@ -1235,7 +1223,6 @@
   "Theme, audio, voice, overlay and privacy options.": "Opzioni di tema, audio, voce, sovrapposizione e privacy.",
   "Then Ctrl+click picks a pad without playing it": "Quindi Ctrl+clic seleziona un pad senza riprodurlo",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Pensano che la musica sia un rumore di sottofondo e tagliano i suoni. Onion Board ripulisce già la tua voce.",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Vengono copiati in Onion Board; {name} mantiene il suo. Quelli già presenti vengono saltati e un tasto di scelta rapida utilizzato già da qualcosa qui viene lasciato fuori.",
   "This desktop has no system tray, so closing the window quits.": "Questo desktop non ha la barra delle applicazioni, quindi chiudendo la finestra si chiude.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Questa è Onion Board {version} . Con la casella selezionata, chiede a GitHub ogni poche ore se è disponibile una versione più recente e te lo dice (con un banner se si tratta di una correzione importante). Questa copia viene eseguita dal sorgente, quindi ti dice solo: aggiornala con git pull.",
   "Through a proxy": "Attraverso una delega",
@@ -1447,10 +1434,6 @@
     "{n} bloccato",
     "{n} bloccato"
   ],
-  "{n} category": [
-    "{n} categoria",
-    "{n} categorie"
-  ],
   "{n} connection to {places}": [
     "{n} collegamento a {places}",
     "{n} collegamenti a {places}"
@@ -1474,10 +1457,6 @@
   "{n} failed": [
     "{n} non sono riusciti",
     "{n} non sono riusciti"
-  ],
-  "{n} hotkey": [
-    "{n} tasto di scelta rapida",
-    "{n} tasti di scelta rapida"
   ],
   "{n} more can't be brought over (the file was moved or deleted, or isn't a sound): {names}": [
     "Impossibile trasferirne altri {n} (il file è stato spostato o eliminato oppure non viene emesso alcun suono): {names}",
@@ -3310,7 +3289,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows tiene {key} per sé e non la passa mai a un'app, quindi quella scorciatoia non potrebbe mai suonare: scegli un altro tasto.",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} è il tuo tasto per Ferma tutto, quindi resta lì. Scegli un altro tasto, oppure prima dai un tasto nuovo a Ferma tutto in Impostazioni → Scorciatoie.",
   "Names can be up to {n} characters, so it's “{name}”.": "I nomi possono avere fino a {n} caratteri, quindi è “{name}”.",
-  "They go in a category called “{name}”.": "Finiscono in una categoria chiamata “{name}”.",
   "Type a name first.": "Prima scrivi un nome.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Rinominato in “{new}”. Anche un altro suono ha questo nome.",
   "Disguise": "Travestimento",
@@ -4333,5 +4311,12 @@
   "Set up Discord when I finish": "Configura Discord quando avrò finito",
   "Your mic and headphones": "Il tuo microfono e le tue cuffie",
   "Your sounds are already in your mic. Bun opens Discord and checks its noise filter, which can chop sounds up. Skip it if you don't use Discord.": "I tuoi suoni sono già nel microfono. Bun apre Discord e controlla il suo filtro antirumore, che può tagliare i suoni. Saltalo se non usi Discord.",
-  "Your tabs": "Le tue schede"
+  "Your tabs": "Le tue schede",
+  "Earned": "Ottenuti",
+  "Every rarity": "Ogni rarità",
+  "Not yet": "Non ancora",
+  "Nothing here yet. Try another filter.": "Qui non c'è ancora niente. Prova un altro filtro.",
+  "Rarity": "Rarità",
+  "Achievement unlocked": "Obiettivo sbloccato",
+  "{points}G - {name}": "{points}G - {name}"
 }

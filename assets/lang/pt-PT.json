@@ -412,18 +412,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "Esquecer a lista até agora (e o histórico guardado, se for mantido)",
   "Forgets Apps tab volumes and hidden programs.": "Esquece os volumes do separador Apps e os programas ocultos.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Esquece o teu microfone, os auscultadores, para onde os teus sons são enviados e a saída de stream; a configuração rápida volta a correr.",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "Encontrado <b>{n}</b> som em {name} com {categories} e {hotkeys}.",
-    "Encontrados <b>{n}</b> sons em {name} com {categories} e {hotkeys}."
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "Encontrado <b>{n}</b> som em {name} com {what}.",
-    "Encontrados <b>{n}</b> sons em {name} com {what}."
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "Encontrado <b>{n}</b> som em {name}.",
-    "Encontrados <b>{n}</b> sons em {name}."
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Suplementos gratuitos do GitHub. Remover ou reinstalar um mantém os teus gatilhos e telemóveis emparelhados.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Gratuito, sem anúncios e sem conta. Feito por OnionAlien. Licença MIT com a Commons Clause: usa-o para o que quiseres, partilha-o de graça, nunca o vendas.",
   "Frequencies": "Frequências",
@@ -1111,7 +1099,6 @@
   "There are no sounds yet. Export just your settings?": "Ainda não há sons. Exportar só as tuas definições?",
   "There's already a “{new}”.": "Já existe um “{new}”.",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Pensam que a música é ruído de fundo e cortam os teus sons aos bocados. O Onion Board já limpa a tua voz.",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "São copiados para o Onion Board; o {name} mantém os seus. Os que já estão cá são ignorados, e um atalho que algo aqui já usa fica de fora.",
   "This desktop has no system tray, so closing the window quits.": "Este ambiente de trabalho não tem área de notificação, por isso fechar a janela sai da app.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Esta é o Onion Board {version}. Com a caixa marcada, pergunta ao GitHub de poucas em poucas horas se saiu uma versão mais recente e avisa-te (com uma faixa se for uma correção importante). Esta cópia corre a partir do código-fonte, por isso só te avisa: atualiza-a com git pull.",
   "This sound's video isn't there any more": "O vídeo deste som já não está lá",
@@ -1402,10 +1389,6 @@
     "{n} bloqueada",
     "{n} bloqueadas"
   ],
-  "{n} category": [
-    "{n} categoria",
-    "{n} categorias"
-  ],
   "{n} connection to {places}": [
     "{n} ligação a {places}",
     "{n} ligações a {places}"
@@ -1433,10 +1416,6 @@
   "{n} failed": [
     "{n} falhou",
     "{n} falharam"
-  ],
-  "{n} hotkey": [
-    "{n} atalho",
-    "{n} atalhos"
   ],
   "{n} hour ago": [
     "há {n} hora",
@@ -3310,7 +3289,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "O Windows guarda {key} para si e nunca a passa a uma app, por isso esse atalho nunca tocaria: escolhe outra tecla.",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} é a tua tecla de Parar tudo, por isso fica lá. Escolhe outra tecla ou dá primeiro uma nova a Parar tudo em Definições → Atalhos.",
   "Names can be up to {n} characters, so it's “{name}”.": "Os nomes podem ter até {n} caracteres, por isso ficou “{name}”.",
-  "They go in a category called “{name}”.": "Vão para uma categoria chamada “{name}”.",
   "Type a name first.": "Escreve primeiro um nome.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Nome mudado para “{new}”. Outro som também tem esse nome.",
   "Disguise": "Disfarce",
@@ -4333,5 +4311,12 @@
   "Set up Discord when I finish": "Configurar o Discord quando eu terminar",
   "Your mic and headphones": "O seu microfone e fones de ouvido",
   "Your sounds are already in your mic. Bun opens Discord and checks its noise filter, which can chop sounds up. Skip it if you don't use Discord.": "Os seus sons já estão no seu microfone. Bun abre o Discord e verifica o seu filtro de ruído, que pode cortar sons. Salte se não usa o Discord.",
-  "Your tabs": "As suas guias"
+  "Your tabs": "As suas guias",
+  "Earned": "Conquistadas",
+  "Every rarity": "Todas as raridades",
+  "Not yet": "Ainda não",
+  "Nothing here yet. Try another filter.": "Ainda não há nada aqui. Experimenta outro filtro.",
+  "Rarity": "Raridade",
+  "Achievement unlocked": "Conquista desbloqueada",
+  "{points}G - {name}": "{points}G - {name}"
 }

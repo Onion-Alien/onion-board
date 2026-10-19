@@ -412,18 +412,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "Kalimutan ang listahan hanggang ngayon (at ang naka-save na history, kung nakatago)",
   "Forgets Apps tab volumes and hidden programs.": "Kinakalimutan ang mga volume at nakatagong program sa Apps tab.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Kinakalimutan ang mic, headphones mo, kung saan ipinapadala ang mga sound mo at ang stream output; tatakbo ulit ang quick setup.",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "May nakitang <b>{n}</b> sound sa {name} na may {categories} at {hotkeys}.",
-    "May nakitang <b>{n}</b> sound sa {name} na may {categories} at {hotkeys}."
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "May nakitang <b>{n}</b> sound sa {name} na may {what}.",
-    "May nakitang <b>{n}</b> sound sa {name} na may {what}."
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "May nakitang <b>{n}</b> sound sa {name}.",
-    "May nakitang <b>{n}</b> sound sa {name}."
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Libreng add-ons mula sa GitHub. Kapag inalis o ni-reinstall ang isa, nananatili ang mga trigger mo at mga naka-pair na phone.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Libre, walang ads at walang account. Gawa ni OnionAlien. MIT license na may Commons Clause: gamitin sa kahit ano, i-share nang libre, 'wag kailanman ibenta.",
   "Frequencies": "Mga frequency",
@@ -1111,7 +1099,6 @@
   "There are no sounds yet. Export just your settings?": "Wala pang sound. Settings mo lang ang i-export?",
   "There's already a “{new}”.": "May “{new}” na.",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Akala nila background noise ang music at pinuputol-putol nila ang mga sound mo. Nililinis na ng Onion Board ang boses mo.",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Kinokopya sila sa Onion Board; itinatago ng {name} ang sarili nito. Nilalaktawan ang mga nandito na, at hindi isinasama ang hotkey na gamit na ng iba dito.",
   "This desktop has no system tray, so closing the window quits.": "Walang system tray ang desktop na ito, kaya mag-quit ito kapag isinara ang window.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Ito ang Onion Board {version}. Kapag naka-tick ang box, tinatanong nito ang GitHub kada ilang oras kung may bagong version at sinasabihan ka (may banner kung importanteng fix). Tumatakbo ang kopyang ito mula sa source, kaya sinasabihan ka lang nito: i-update gamit ang git pull.",
   "This sound's video isn't there any more": "Wala na ang video ng sound na ito",
@@ -1402,10 +1389,6 @@
     "{n} na-block",
     "{n} na-block"
   ],
-  "{n} category": [
-    "{n} kategorya",
-    "{n} kategorya"
-  ],
   "{n} connection to {places}": [
     "{n} connection sa {places}",
     "{n} connection sa {places}"
@@ -1433,10 +1416,6 @@
   "{n} failed": [
     "{n} pumalya",
     "{n} pumalya"
-  ],
-  "{n} hotkey": [
-    "{n} hotkey",
-    "{n} hotkey"
   ],
   "{n} hour ago": [
     "{n} oras na ang nakalipas",
@@ -3310,7 +3289,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Itinatabi ng Windows ang {key} para sa sarili nito at hindi ito ibinibigay sa anumang app, kaya hindi kailanman tutugtog ang hotkey na iyan: pumili ng ibang key.",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "Ang {key} ang key mo para sa Itigil lahat, kaya doon ito mananatili. Pumili ng ibang key, o bigyan muna ng bago ang Itigil lahat sa Settings → Mga hotkey.",
   "Names can be up to {n} characters, so it's “{name}”.": "Hanggang {n} character lang ang pangalan, kaya “{name}” ito.",
-  "They go in a category called “{name}”.": "Mapupunta sila sa category na “{name}”.",
   "Type a name first.": "Mag-type muna ng pangalan.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Na-rename sa “{new}”. May isa pang sound na ganito rin ang pangalan.",
   "Disguise": "Pagbabalatkayo",
@@ -4333,5 +4311,12 @@
   "Set up Discord when I finish": "I-set up ang Discord kapag natapos ko na",
   "Your mic and headphones": "Iyong mikropono at headphone",
   "Your sounds are already in your mic. Bun opens Discord and checks its noise filter, which can chop sounds up. Skip it if you don't use Discord.": "Ang iyong mga tunog ay nasa iyong mikropono na. Binuksan ni Bun ang Discord at sinusuri ang noise filter nito, na maaaring tumaga ng mga tunog. Laktawan ito kung hindi mo ginagamit ang Discord.",
-  "Your tabs": "Iyong mga tab"
+  "Your tabs": "Iyong mga tab",
+  "Earned": "Nakuha na",
+  "Every rarity": "Lahat ng rarity",
+  "Not yet": "Hindi pa",
+  "Nothing here yet. Try another filter.": "Wala pa rito. Subukan ang ibang filter.",
+  "Rarity": "Rarity",
+  "Achievement unlocked": "Na-unlock ang achievement",
+  "{points}G - {name}": "{points}G - {name}"
 }

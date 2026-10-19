@@ -809,15 +809,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "忘掉目前的清單（如果有保留歷史記錄，也一起忘掉）",
   "Forgets Apps tab volumes and hidden programs.": "忘掉「應用程式」分頁的音量和隱藏的程式。",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "忘掉你的麥克風、耳機、音效傳送到哪裡以及直播輸出；快速設置會重新執行。",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "在{name}中使用{categories}和{hotkeys}找到了<b>{n}</b>個音。"
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "在{name}中使用{what}找到了<b>{n}</b>個聲音。"
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "在{name}中找出<b>{n}</b>個聲音。"
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "來自 GitHub 的免費附加元件。移除或重新安裝附加元件時，你的觸發器和配對的手機都會保留。",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "免費、沒有廣告、不用帳號。由 OnionAlien 製作。MIT 授權加上 Commons Clause：可以用在任何地方、免費分享，但絕對不能販售。",
   "Frequencies": "頻率",
@@ -1211,7 +1202,6 @@
   "Theme, audio, voice, overlay and privacy options.": "主題、音訊、語音、覆蓋畫面和隱私選項。",
   "Then Ctrl+click picks a pad without playing it": "然後 Ctrl+點擊可以選取按鈕而不播放",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "它們會把音樂當成背景噪音，把你的音效切碎。Onion Board 已經會清理你的聲音了。",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "它們會被複製到 Onion Board；{name} 會保留它自己的那份。已經有的會略過，這裡已經被使用的快速鍵也不會設定。",
   "This desktop has no system tray, so closing the window quits.": "這個桌面沒有系統匣，所以關閉視窗就會結束程式。",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "這是 Onion Board {version}。勾選這個方塊後，它每隔幾小時會向 GitHub 查詢是否有新版本並通知你（如果是重要修正，會顯示橫幅）。這份是從原始碼執行的，所以只會通知你：請用 git pull 更新。",
   "Through a proxy": "透過代理伺服器",
@@ -1415,9 +1405,6 @@
   "{n} blocked": [
     "{n}被阻止"
   ],
-  "{n} category": [
-    "{n}個類別"
-  ],
   "{n} connection to {places}": [
     "與{places}的{n}連接"
   ],
@@ -1435,9 +1422,6 @@
   ],
   "{n} failed": [
     "{n}失敗"
-  ],
-  "{n} hotkey": [
-    "{n}熱鍵"
   ],
   "{n} more can't be brought over (the file was moved or deleted, or isn't a sound): {names}": [
     "還有{n}個無法帶過來（檔案已移動或刪除，或不是聲音）： {names}"
@@ -3237,7 +3221,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "{key} 被 Windows 自己保留，永遠不會交給任何應用程式，所以這個快速鍵永遠不會播放：請換一個鍵。",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} 是你的「停止所有東西」鍵，所以它會保持不變。請換一個鍵，或先在 設定 → 快速鍵 裡給「停止所有東西」設一個新鍵。",
   "Names can be up to {n} characters, so it's “{name}”.": "名稱最多 {n} 個字元，所以是「{name}」。",
-  "They go in a category called “{name}”.": "它們會放進名為「{name}」的分類。",
   "Type a name first.": "請先輸入名稱。",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ 已重新命名為「{new}」。另一個音效也叫這個名字。",
   "Disguise": "偽裝",
@@ -4254,5 +4237,12 @@
   "Set up Discord when I finish": "完成後設定 Discord",
   "Your mic and headphones": "您的麥克風和耳機",
   "Your sounds are already in your mic. Bun opens Discord and checks its noise filter, which can chop sounds up. Skip it if you don't use Discord.": "你的聲音已經在你的麥克風裡了。 Bun 打開 Discord 並檢查其噪音過濾器，該過濾器可以減弱聲音。如果您不使用 Discord，請跳過它。",
-  "Your tabs": "你的標籤"
+  "Your tabs": "你的標籤",
+  "Earned": "已獲得",
+  "Every rarity": "全部稀有度",
+  "Not yet": "未獲得",
+  "Nothing here yet. Try another filter.": "這裡還沒有內容。換個篩選試試。",
+  "Rarity": "稀有度",
+  "Achievement unlocked": "成就已解鎖",
+  "{points}G - {name}": "{points}G - {name}"
 }

@@ -809,15 +809,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "Quên danh sách cho đến nay (và lịch sử đã lưu, nếu nó được giữ)",
   "Forgets Apps tab volumes and hidden programs.": "Quên khối lượng tab Ứng dụng và các chương trình ẩn.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Quên mic, tai nghe, nơi gửi âm thanh và đầu ra luồng; thiết lập nhanh sẽ chạy lại.",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "Đã tìm thấy âm thanh <b>{n}</b> trong {name} với {categories} và {hotkeys} ."
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "Đã tìm thấy âm thanh <b>{n}</b> trong {name} với {what} ."
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "Đã tìm thấy âm thanh <b>{n}</b> trong {name} ."
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Tiện ích bổ sung miễn phí từ GitHub. Việc gỡ bỏ hoặc cài đặt lại một cái sẽ giữ lại trình kích hoạt và điện thoại được ghép nối của bạn.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Miễn phí, không có quảng cáo và không có tài khoản. Được thực hiện bởi OnionAlien. Giấy phép MIT với Điều khoản Commons: sử dụng nó cho mọi mục đích, chia sẻ miễn phí, không bao giờ bán nó.",
   "Frequencies": "Tần số",
@@ -1212,7 +1203,6 @@
   "Theme, audio, voice, overlay and privacy options.": "Tùy chọn chủ đề, âm thanh, giọng nói, lớp phủ và quyền riêng tư.",
   "Then Ctrl+click picks a pad without playing it": "Sau đó nhấn Ctrl+click để chọn một pad mà không phát nó",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Họ cho rằng âm nhạc là tiếng ồn xung quanh và cắt giảm âm thanh của bạn. Onion Board đã làm sạch giọng nói của bạn.",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Chúng được sao chép vào Onion Board; {name} giữ quyền riêng của mình. Những cái đã có ở đây sẽ bị bỏ qua và một phím nóng nào đó đã sử dụng ở đây sẽ bị bỏ đi.",
   "This desktop has no system tray, so closing the window quits.": "Máy tính để bàn này không có khay hệ thống nên việc đóng cửa sổ sẽ dừng lại.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Đây là Onion Board {version} . Với hộp được đánh dấu, cứ sau vài giờ, nó sẽ hỏi GitHub xem có phiên bản mới hơn không và cho bạn biết (kèm biểu ngữ nếu đó là một bản sửa lỗi quan trọng). Bản sao này chạy từ nguồn nên nó chỉ cho bạn biết: cập nhật nó bằng git pull.",
   "Through a proxy": "Thông qua một proxy",
@@ -1416,9 +1406,6 @@
   "{n} blocked": [
     "{n} bị chặn"
   ],
-  "{n} category": [
-    "{n} danh mục"
-  ],
   "{n} connection to {places}": [
     "{n} kết nối tới {places}"
   ],
@@ -1436,9 +1423,6 @@
   ],
   "{n} failed": [
     "{n} thất bại"
-  ],
-  "{n} hotkey": [
-    "{n} phím nóng"
   ],
   "{n} more can't be brought over (the file was moved or deleted, or isn't a sound): {names}": [
     "Không thể mang thêm {n} nội dung khác (tệp đã bị di chuyển hoặc bị xóa hoặc không có âm thanh): {names}"
@@ -3237,7 +3221,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows giữ {key} cho riêng mình và không bao giờ chuyển cho ứng dụng nào, nên phím tắt đó sẽ không bao giờ phát: hãy chọn phím khác.",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} là phím Dừng mọi thứ của bạn, nên nó vẫn giữ ở đó. Hãy chọn phím khác, hoặc đặt phím mới cho Dừng mọi thứ trước trong Cài đặt → Phím tắt.",
   "Names can be up to {n} characters, so it's “{name}”.": "Tên dài tối đa {n} ký tự, nên tên là “{name}”.",
-  "They go in a category called “{name}”.": "Chúng vào một danh mục tên “{name}”.",
   "Type a name first.": "Hãy nhập tên trước.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Đã đổi tên thành “{new}”. Một âm thanh khác cũng có tên này.",
   "Disguise": "Cải trang",
@@ -4254,5 +4237,12 @@
   "Set up Discord when I finish": "Thiết lập Discord khi tôi hoàn thành",
   "Your mic and headphones": "Mic và tai nghe của bạn",
   "Your sounds are already in your mic. Bun opens Discord and checks its noise filter, which can chop sounds up. Skip it if you don't use Discord.": "Âm thanh của bạn đã có trong micrô của bạn. Bun mở Discord và kiểm tra bộ lọc tiếng ồn, bộ lọc này có thể cắt âm thanh. Bỏ qua nếu bạn không sử dụng Discord.",
-  "Your tabs": "Tab của bạn"
+  "Your tabs": "Tab của bạn",
+  "Earned": "Đã đạt",
+  "Every rarity": "Mọi độ hiếm",
+  "Not yet": "Chưa đạt",
+  "Nothing here yet. Try another filter.": "Chưa có gì ở đây. Thử bộ lọc khác nhé.",
+  "Rarity": "Độ hiếm",
+  "Achievement unlocked": "Đã mở khóa thành tựu",
+  "{points}G - {name}": "{points}G - {name}"
 }

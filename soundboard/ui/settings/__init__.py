@@ -26,7 +26,11 @@ class Built:
     inherits it; it has nothing at run time."""
 
     about_version: Any
+    ach_cards: Any
     ach_count: Any
+    ach_none: Any
+    ach_rarity: Any
+    ach_show: Any
     ach_tiles: Any
     addon_label: Any
     addon_remove: Any

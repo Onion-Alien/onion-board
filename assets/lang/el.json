@@ -412,18 +412,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "Ξέχνα τη λίστα μέχρι τώρα (και το αποθηκευμένο ιστορικό, αν κρατιέται)",
   "Forgets Apps tab volumes and hidden programs.": "Ξεχνάει τις εντάσεις της καρτέλας Εφαρμογές και τα κρυμμένα προγράμματα.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Ξεχνάει το μικρόφωνο, τα ακουστικά, πού στέλνονται οι ήχοι σου και την έξοδο stream· η γρήγορη ρύθμιση τρέχει ξανά.",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "Βρέθηκε <b>{n}</b> ήχος στο {name} με {categories} και {hotkeys}.",
-    "Βρέθηκαν <b>{n}</b> ήχοι στο {name} με {categories} και {hotkeys}."
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "Βρέθηκε <b>{n}</b> ήχος στο {name} με {what}.",
-    "Βρέθηκαν <b>{n}</b> ήχοι στο {name} με {what}."
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "Βρέθηκε <b>{n}</b> ήχος στο {name}.",
-    "Βρέθηκαν <b>{n}</b> ήχοι στο {name}."
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Δωρεάν πρόσθετα από το GitHub. Η αφαίρεση ή επανεγκατάσταση ενός κρατάει τα εναύσματα και τα συζευγμένα κινητά σου.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Δωρεάν, χωρίς διαφημίσεις και χωρίς λογαριασμό. Από τον OnionAlien. Άδεια MIT με Commons Clause: χρησιμοποίησέ το για οτιδήποτε, μοιράσου το δωρεάν, μην το πουλήσεις ποτέ.",
   "Frequencies": "Συχνότητες",
@@ -1111,7 +1099,6 @@
   "There are no sounds yet. Export just your settings?": "Δεν υπάρχουν ακόμα ήχοι. Εξαγωγή μόνο των ρυθμίσεών σου;",
   "There's already a “{new}”.": "Υπάρχει ήδη ένα «{new}».",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Θεωρούν τη μουσική θόρυβο φόντου και κομματιάζουν τους ήχους σου. Το Onion Board ήδη καθαρίζει τη φωνή σου.",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Αντιγράφονται στο Onion Board· το {name} κρατάει τους δικούς του. Όσοι υπάρχουν ήδη εδώ παραλείπονται, και μια συντόμευση που ήδη χρησιμοποιείται εδώ μένει απ' έξω.",
   "This desktop has no system tray, so closing the window quits.": "Αυτή η επιφάνεια εργασίας δεν έχει system tray, οπότε το κλείσιμο του παραθύρου τερματίζει την εφαρμογή.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Αυτό είναι το Onion Board {version}. Με τσεκαρισμένο το κουτάκι ρωτάει το GitHub κάθε λίγες ώρες αν βγήκε νεότερη έκδοση και σου το λέει (με μπάνερ αν είναι σημαντική διόρθωση). Αυτό το αντίγραφο τρέχει από τον πηγαίο κώδικα, οπότε μόνο σου το λέει: ενημέρωσέ το με git pull.",
   "This sound's video isn't there any more": "Το βίντεο αυτού του ήχου δεν υπάρχει πια",
@@ -1402,10 +1389,6 @@
     "{n} αποκλείστηκε",
     "{n} αποκλείστηκε"
   ],
-  "{n} category": [
-    "{n} κατηγορία",
-    "{n} κατηγορίες"
-  ],
   "{n} connection to {places}": [
     "{n} σύνδεση με {places}",
     "{n} συνδέσεις με {places}"
@@ -1433,10 +1416,6 @@
   "{n} failed": [
     "{n} απέτυχε",
     "{n} απέτυχε"
-  ],
-  "{n} hotkey": [
-    "{n} πλήκτρο πρόσβασης",
-    "{n} πλήκτρα πρόσβασης"
   ],
   "{n} hour ago": [
     "πριν από {n} ώρα",
@@ -3310,7 +3289,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Τα Windows κρατούν το {key} για τον εαυτό τους και δεν το δίνουν ποτέ σε εφαρμογή, οπότε αυτή η συντόμευση δεν θα έπαιζε ποτέ: διάλεξε άλλο πλήκτρο.",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "Το {key} είναι το πλήκτρο σου για το Σταμάτα τα πάντα, οπότε μένει εκεί. Διάλεξε άλλο πλήκτρο ή δώσε πρώτα νέο στο Σταμάτα τα πάντα στις Ρυθμίσεις → Συντομεύσεις.",
   "Names can be up to {n} characters, so it's “{name}”.": "Τα ονόματα έχουν έως {n} χαρακτήρες, οπότε είναι «{name}».",
-  "They go in a category called “{name}”.": "Μπαίνουν σε κατηγορία με όνομα «{name}».",
   "Type a name first.": "Γράψτε πρώτα ένα όνομα.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Μετονομάστηκε σε \"{new}\". Και άλλος ήχος έχει αυτό το όνομα.",
   "Disguise": "Μεταμφίεση",
@@ -4333,5 +4311,12 @@
   "Set up Discord when I finish": "Ρυθμίστε το Discord όταν τελειώσω",
   "Your mic and headphones": "Το μικρόφωνο και τα ακουστικά σας",
   "Your sounds are already in your mic. Bun opens Discord and checks its noise filter, which can chop sounds up. Skip it if you don't use Discord.": "Οι ήχοι σας βρίσκονται ήδη στο μικρόφωνό σας. Το Bun ανοίγει το Discord και ελέγχει το φίλτρο θορύβου του, το οποίο μπορεί να κόψει τους ήχους. Παραλείψτε το εάν δεν χρησιμοποιείτε το Discord.",
-  "Your tabs": "Οι καρτέλες σας"
+  "Your tabs": "Οι καρτέλες σας",
+  "Earned": "Κερδισμένα",
+  "Every rarity": "Κάθε σπανιότητα",
+  "Not yet": "Όχι ακόμα",
+  "Nothing here yet. Try another filter.": "Τίποτα εδώ ακόμα. Δοκίμασε άλλο φίλτρο.",
+  "Rarity": "Σπανιότητα",
+  "Achievement unlocked": "Ξεκλείδωσες επίτευγμα",
+  "{points}G - {name}": "{points}G - {name}"
 }

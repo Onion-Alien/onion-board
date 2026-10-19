@@ -843,21 +843,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "Zapomnij o dotychczasowej liście (i zapisanej historii, jeśli jest przechowywana)",
   "Forgets Apps tab volumes and hidden programs.": "Zapomina o woluminach kart Aplikacje i ukrytych programach.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Zapomina o mikrofonie, słuchawkach, do których wysyłane są dźwięki i o wyjściu strumieniowym; szybka konfiguracja zostanie uruchomiona ponownie.",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "Znaleziono dźwięk <b>{n}</b> w {name} z {categories} i {hotkeys} .",
-    "Znaleziono <b>{n}</b> dźwięków w {name} z {categories} i {hotkeys} .",
-    "Znaleziono <b>{n}</b> dźwięków w {name} z {categories} i {hotkeys} ."
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "Znaleziono dźwięk <b>{n}</b> w {name} z {what} .",
-    "Znaleziono <b>{n}</b> dźwięków w {name} z {what} .",
-    "Znaleziono <b>{n}</b> dźwięków w {name} z {what} ."
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "Znaleziono dźwięk <b>{n}</b> w: {name} .",
-    "Znaleziono <b>{n}</b> dźwięków w: {name} .",
-    "Znaleziono <b>{n}</b> dźwięków w: {name} ."
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Darmowe dodatki z GitHuba. Usunięcie lub ponowna instalacja jednego z nich powoduje zachowanie wyzwalaczy i sparowanych telefonów.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Za darmo, bez reklam i bez konta. Wykonane przez OnionAlien. Licencja MIT z klauzulą ​​Commons: używaj jej do czegokolwiek, udostępniaj ją za darmo, nigdy nie sprzedawaj.",
   "Frequencies": "Częstotliwości",
@@ -1258,7 +1243,6 @@
   "Theme, audio, voice, overlay and privacy options.": "Opcje motywu, dźwięku, głosu, nakładki i prywatności.",
   "Then Ctrl+click picks a pad without playing it": "Następnie Ctrl + kliknięcie wybiera pad bez grania na nim",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Myślą, że muzyka to szum tła i obcinają dźwięki. Onion Board już oczyszcza Twój głos.",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "Są kopiowane do Onion Board; {name} ma swoje. Te, które już tu są, są pomijane, a klawisz skrótu, którego już tu używa, zostaje pominięty.",
   "This desktop has no system tray, so closing the window quits.": "Ten pulpit nie ma zasobnika systemowego, więc zamknięcie okna kończy się.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "To jest Deska Cebulowa {version} . Po zaznaczeniu tego pola co kilka godzin pyta GitHub, czy jest dostępna nowsza wersja, i informuje Cię (z banerem, jeśli jest to ważna poprawka). Ta kopia działa ze źródła, więc mówi tylko: zaktualizuj ją za pomocą git pull.",
   "Through a proxy": "Przez proxy",
@@ -1478,11 +1462,6 @@
     "{n} zablokowane",
     "{n} zablokowane"
   ],
-  "{n} category": [
-    "Kategoria {n}",
-    "Kategorie: {n}",
-    "Kategorie: {n}"
-  ],
   "{n} connection to {places}": [
     "{n} połączenie z {places}",
     "{n} połączeń do {places}",
@@ -1512,11 +1491,6 @@
     "{n} nie powiodło się",
     "{n} nie powiodło się",
     "{n} nie powiodło się"
-  ],
-  "{n} hotkey": [
-    "Klawisz skrótu {n}",
-    "{n} klawiszy skrótu",
-    "{n} klawiszy skrótu"
   ],
   "{n} more can't be brought over (the file was moved or deleted, or isn't a sound): {names}": [
     "Nie można przenieść jeszcze {n} (plik został przeniesiony, usunięty albo nie jest dźwiękiem): {names}",
@@ -3383,7 +3357,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows zatrzymuje {key} dla siebie i nigdy nie przekazuje go aplikacji, więc ten skrót nigdy by nie zagrał: wybierz inny klawisz.",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} to twój klawisz Zatrzymaj wszystko, więc zostaje przy nim. Wybierz inny klawisz albo najpierw daj Zatrzymaj wszystko nowy w Ustawienia → Skróty.",
   "Names can be up to {n} characters, so it's “{name}”.": "Nazwa może mieć do {n} znaków, więc jest „{name}”.",
-  "They go in a category called “{name}”.": "Trafią do kategorii o nazwie „{name}”.",
   "Type a name first.": "Najpierw wpisz nazwę.",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ Zmieniono nazwę na „{new}”. Inny dźwięk też ma tę nazwę.",
   "Disguise": "Przebranie",
@@ -4412,5 +4385,12 @@
   "Set up Discord when I finish": "Gdy skończę, skonfiguruj Discorda",
   "Your mic and headphones": "Twój mikrofon i słuchawki",
   "Your sounds are already in your mic. Bun opens Discord and checks its noise filter, which can chop sounds up. Skip it if you don't use Discord.": "Twoje dźwięki są już w Twoim mikrofonie. Bun otwiera Discorda i sprawdza filtr szumów, który może przycinać dźwięki. Pomiń tę opcję, jeśli nie korzystasz z Discorda.",
-  "Your tabs": "Twoje zakładki"
+  "Your tabs": "Twoje zakładki",
+  "Earned": "Zdobyte",
+  "Every rarity": "Każda rzadkość",
+  "Not yet": "Jeszcze nie",
+  "Nothing here yet. Try another filter.": "Na razie nic tu nie ma. Spróbuj innego filtra.",
+  "Rarity": "Rzadkość",
+  "Achievement unlocked": "Osiągnięcie odblokowane",
+  "{points}G - {name}": "{points}G - {name}"
 }

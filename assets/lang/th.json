@@ -809,15 +809,6 @@
   "Forget the list so far (and the saved history, if it's kept)": "ลืมรายการไปได้เลย (และประวัติที่บันทึกไว้ หากเก็บไว้)",
   "Forgets Apps tab volumes and hidden programs.": "ลืมปริมาณแท็บแอปและโปรแกรมที่ซ่อนอยู่",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "ลืมไมโครโฟน หูฟัง ตำแหน่งที่เสียงของคุณถูกส่งและสตรีมเอาท์พุตไปได้เลย การตั้งค่าด่วนจะทำงานอีกครั้ง",
-  "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "พบ <b>{n}</b> เสียงใน {name} ด้วย {categories} และ {hotkeys}"
-  ],
-  "Found <b>{n}</b> sound in {name} with {what}.": [
-    "พบ <b>{n}</b> เสียงใน {name} ด้วย {what}"
-  ],
-  "Found <b>{n}</b> sound in {name}.": [
-    "พบ <b>{n}</b> เสียงใน {name}"
-  ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "ส่วนเสริมฟรีจาก GitHub การถอดหรือติดตั้งใหม่จะทำให้ทริกเกอร์และโทรศัพท์ที่จับคู่ของคุณยังคงอยู่",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "ฟรี ไม่มีโฆษณาและไม่มีบัญชี สร้างโดย OnionAlien ใบอนุญาต MIT ที่มี Commons Clause: ใช้เพื่ออะไรก็ได้ แบ่งปันได้ฟรี ไม่ต้องขายเลย",
   "Frequencies": "ความถี่",
@@ -1212,7 +1203,6 @@
   "Theme, audio, voice, overlay and privacy options.": "ตัวเลือกธีม เสียง เสียงพูด การซ้อนทับ และความเป็นส่วนตัว",
   "Then Ctrl+click picks a pad without playing it": "จากนั้นกด Ctrl+คลิก เลือกแผ่นโดยไม่ต้องเล่น",
   "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "พวกเขาคิดว่าดนตรีคือเสียงรบกวนรอบข้างและตัดเสียงของคุณออกไป Onion Board ช่วยทำความสะอาดเสียงของคุณแล้ว",
-  "They're copied into Onion Board; {name} keeps its own. Ones already here are skipped, and a hotkey something here already uses is left off.": "พวกมันถูกคัดลอกไปยัง Onion Board; {name} ยังคงเป็นของตัวเอง อันที่อยู่ที่นี่จะถูกข้ามไป และปุ่มลัดบางอย่างที่นี่ใช้อยู่แล้วจะถูกละไว้",
   "This desktop has no system tray, so closing the window quits.": "เดสก์ท็อปเครื่องนี้ไม่มีถาดระบบ ดังนั้นการปิดหน้าต่างจึงปิดไป",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "นี่คือกระดานหัวหอม {version} เมื่อทำเครื่องหมายที่ช่อง ระบบจะถาม GitHub ทุก ๆ สองสามชั่วโมงว่ามีเวอร์ชันใหม่ออกหรือไม่ และจะแจ้งให้คุณทราบ (พร้อมแบนเนอร์หากเป็นการแก้ไขที่สำคัญ) สำเนานี้ทำงานจากแหล่งที่มา ดังนั้นจึงเพียงแจ้งคุณว่า: อัปเดตด้วย git pull",
   "Through a proxy": "ผ่านทางตัวแทน",
@@ -1416,9 +1406,6 @@
   "{n} blocked": [
     "{n} ถูกบล็อค"
   ],
-  "{n} category": [
-    "{n} หมวดหมู่"
-  ],
   "{n} connection to {places}": [
     "{n} การเชื่อมต่อกับ {places}"
   ],
@@ -1436,9 +1423,6 @@
   ],
   "{n} failed": [
     "{n} ล้มเหลว"
-  ],
-  "{n} hotkey": [
-    "{n} ปุ่มลัด"
   ],
   "{n} more can't be brought over (the file was moved or deleted, or isn't a sound): {names}": [
     "ไม่สามารถนำเข้าได้อีก {n} รายการ (ไฟล์ถูกย้ายหรือลบ หรือไม่ใช่เสียง): {names}"
@@ -3237,7 +3221,6 @@
   "Windows keeps {key} for itself and never passes it to an app, so that hotkey could never play: pick another key.": "Windows เก็บ {key} ไว้ใช้เองและไม่ส่งต่อให้แอปใดเลย ปุ่มลัดนี้จึงไม่มีวันเล่นเสียง: เลือกปุ่มอื่น",
   "{key} is your Stop everything key, so it stays on that. Pick another key, or give Stop everything a new one in Settings → Hotkeys first.": "{key} เป็นปุ่ม หยุดทุกอย่าง ของคุณ จึงยังคงอยู่ที่เดิม เลือกปุ่มอื่น หรือตั้งปุ่มใหม่ให้ หยุดทุกอย่าง ก่อนใน การตั้งค่า → ปุ่มลัด",
   "Names can be up to {n} characters, so it's “{name}”.": "ชื่อยาวได้ไม่เกิน {n} ตัวอักษร จึงเป็น “{name}”",
-  "They go in a category called “{name}”.": "จะอยู่ในหมวดหมู่ชื่อ “{name}”",
   "Type a name first.": "พิมพ์ชื่อก่อน",
   "✓ Renamed to “{new}”. Another sound has that name too.": "✓ เปลี่ยนชื่อเป็น “{new}” แล้ว มีเสียงอื่นที่ชื่อนี้ด้วย",
   "Disguise": "ปลอมตัว",
@@ -4254,5 +4237,12 @@
   "Set up Discord when I finish": "ตั้งค่า Discord เมื่อเสร็จแล้ว",
   "Your mic and headphones": "ไมค์และหูฟังของคุณ",
   "Your sounds are already in your mic. Bun opens Discord and checks its noise filter, which can chop sounds up. Skip it if you don't use Discord.": "เสียงของคุณอยู่ในไมโครโฟนแล้ว Bun เปิด Discord และตรวจสอบตัวกรองเสียงรบกวนซึ่งสามารถตัดเสียงได้ ข้ามไปหากคุณไม่ได้ใช้ Discord",
-  "Your tabs": "แท็บของคุณ"
+  "Your tabs": "แท็บของคุณ",
+  "Earned": "ได้แล้ว",
+  "Every rarity": "ทุกความหายาก",
+  "Not yet": "ยังไม่ได้",
+  "Nothing here yet. Try another filter.": "ยังไม่มีอะไรที่นี่ ลองตัวกรองอื่นดู",
+  "Rarity": "ความหายาก",
+  "Achievement unlocked": "ปลดล็อกความสำเร็จแล้ว",
+  "{points}G - {name}": "{points}G - {name}"
 }
