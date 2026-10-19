@@ -5,7 +5,8 @@
 
 AiVoices-module.zip holds one ai-voices/ folder: the add-on's code from
 modules/ai-voices (no .venv, caches or dev tools' output) plus the voice model in
-ai-voices/model/. Upload it to the "ai-voices" release; GitHub lists its SHA-256,
+ai-voices/model/ (stream4.onnx, the lighter model, too: export_model.py --frames 4).
+Upload it to the "ai-voices" release; GitHub lists its SHA-256,
 which the app checks before installing it.
 """
 from __future__ import annotations
@@ -17,7 +18,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "modules" / "ai-voices"
-MODEL_FILES = ("stream.onnx", "speaker.onnx", "voices.npz")
+MODEL_FILES = ("stream.onnx", "speaker.onnx", "voices.npz", "stream4.onnx")
 SKIP_DIRS = {".venv", "__pycache__", "model"}
 
 
@@ -28,7 +29,8 @@ def main() -> int:
     a = ap.parse_args()
     missing = [f for f in MODEL_FILES if not (a.model / f).is_file()]
     if missing:
-        raise SystemExit(f"{a.model} is missing {', '.join(missing)} (run tools/export_model.py)")
+        raise SystemExit(f"{a.model} is missing {', '.join(missing)} "
+                         "(run tools/export_model.py, and again with --frames 4)")
     a.out.mkdir(parents=True, exist_ok=True)
     z = a.out / "AiVoices-module.zip"
     with zipfile.ZipFile(z, "w", zipfile.ZIP_DEFLATED) as zf:

@@ -15,6 +15,12 @@ It turns off what only decorates and still costs CPU while the app is open:
   instead of 24 (`tickcontrol.TICK_LITE_MS`). Each meter update also repaints the
   window behind it, so this is most of what the window costs while it's quiet.
 
+It also turns on the Voice tab's Use less CPU while that's left on "auto"
+(`voicefx.light()`): cheaper voice effects and language voices, and the AI voice on
+its lighter model (40 ms a call instead of 20: about a third less CPU, ~40 ms more
+delay; from its next start, with AI voices 0.2.0 or later). A Use less CPU switched
+by hand wins either way.
+
 Everything still works the same; it only looks calmer. `on()` is read wherever one
 of those starts, so turning it on or off applies at once (`set_on`), except Hoot's
 rest, which takes the next start of the Triggers tab.

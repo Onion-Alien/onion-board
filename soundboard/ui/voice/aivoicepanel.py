@@ -986,7 +986,8 @@ class AiVoicePanel(QWidget):
                                "changer preset (left) is much lighter.")
             self._state(msg)
         elif t == "stats":
-            cpu, ms = f"{float(ev.get('cpu', 0)):.0f}", f"{aivoice.LATENCY_S * 1000:.0f}"
+            cpu = f"{float(ev.get('cpu', 0)):.0f}"
+            ms = f"{float(ev.get('latency_s', aivoice.LATENCY_S)) * 1000:.0f}"
             self._state(
                 _("● you sound like {voice} · CPU {cpu}% · about {ms} ms behind you",
                   voice=self._voice_name, cpu=cpu, ms=ms) if self._voice_name else
