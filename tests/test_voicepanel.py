@@ -291,6 +291,116 @@ def test_speak_in_offers_the_languages_and_downloads_only_on_request(panel, monk
         assert started == [] and "Download German first" in s.livevoice.lbl_state.text()
 
 
+def _ready(monkeypatch, codes):
+    from soundboard.addons import modules as mods
+    monkeypatch.setattr(mods.ModuleInfo, "installed", property(
+        lambda self: self.language in codes if self.kind == "translation" else True))
+
+
+def test_languages_are_cards_grey_until_downloaded(panel, monkeypatch):
+    """The Languages card works as AI voices: a card per language, the downloaded ones
+    first, the rest grey; the switch next to the card's name."""
+    p, _ = panel
+    _ready(monkeypatch, {"de", "fr"})
+    s = p.speech
+    s.set_modules(p.modules)
+    assert set(s._tile) == {m.language for m in s.langs}
+    assert not s._tile["de"].property("missing") and s._tile["it"].property("missing")
+    assert "Click to download" in s._tile["it"].toolTip()
+    assert s.cb_lang.isHidden()                       # no Speak in list any more
+    assert s.head.isAncestorOf(s.b_on)
+    s.show_group("ready")
+    assert {c for c, b in s._tile.items() if not b.isHidden()} == {"de", "fr"}
+    s.set_favorite("fr", True)
+    s.show_group("favs")
+    assert {c for c, b in s._tile.items() if not b.isHidden()} == {"fr"}
+    assert s.s["lang_favorites"] == ["fr"]
+
+
+def test_a_language_card_turns_it_on_and_off_like_a_voice(panel, monkeypatch):
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    p, _ = panel
+    _ready(monkeypatch, {"de", "fr"})
+    s = p.speech
+    s.set_modules(p.modules)
+    monkeypatch.setattr(s.ctl, "start_live", lambda *a, **k: None)
+    monkeypatch.setattr(s, "_warm_for_a_line", lambda: None)
+    p.ai.is_on = lambda: True                       # the AI voice says it: no computer voice
+    s.said_by("ai", "Duke")
+    QTest.mouseClick(s._tile["de"], Qt.LeftButton)
+    assert s.cb_lang.currentData() == "de" and s.b_on.isChecked()
+    assert s._tile["de"].isChecked() and not s._tile["fr"].isChecked()
+    assert not s.livevoice.b_live.isChecked()
+    QTest.mouseClick(s._tile["fr"], Qt.LeftButton)  # another one: that one instead
+    assert s.cb_lang.currentData() == "fr" and not s._tile["de"].isChecked()
+    QTest.mouseClick(s._tile["fr"], Qt.LeftButton)  # the lit one: off
+    assert not s.cb_lang.currentData() and not s.b_on.isChecked()
+    assert not any(b.isChecked() for b in s._tile.values())
+    QTest.mouseClick(s.b_on, Qt.LeftButton)         # the switch: the last one back
+    assert s.cb_lang.currentData() == "fr" and s.b_on.isChecked()
+    QTest.mouseClick(s.b_on, Qt.LeftButton)
+    assert not s.cb_lang.currentData()
+
+
+def test_a_language_with_nobody_to_say_it_starts_the_computer_voice(panel, monkeypatch):
+    p, _ = panel
+    _ready(monkeypatch, {"de"})
+    s = p.speech
+    s.set_modules(p.modules)
+    monkeypatch.setattr(s.ctl, "start_live", lambda *a, **k: None)
+    monkeypatch.setattr(s, "_warm_for_a_line", lambda: None)
+    s.said_by("")
+    s.set_language("de")
+    assert s.livevoice.b_live.isChecked()
+    s.set_language("")
+    assert not s.livevoice.b_live.isChecked()
+
+
+def test_a_grey_language_card_asks_then_downloads_and_turns_it_on(panel, monkeypatch):
+    from PySide6.QtWidgets import QMessageBox
+    p, _ = panel
+    ready = {"de"}
+    _ready(monkeypatch, ready)
+    s = p.speech
+    s.set_modules(p.modules)
+    monkeypatch.setattr("soundboard.online.net.offline", lambda: False)
+    monkeypatch.setattr("soundboard.online.net.allowed", lambda what: True)
+    answers = [QMessageBox.StandardButton.No, QMessageBox.StandardButton.Yes]
+    asked = []
+    monkeypatch.setattr(QMessageBox, "question",
+                        lambda *a, **k: (asked.append(a[2]), answers.pop(0))[1])
+    got = []
+    monkeypatch.setattr(s.installs, "_download", lambda m=None: got.append(m.language))
+    voice = []
+    monkeypatch.setattr(s.installs, "_install_voice", lambda: voice.append(True))
+    s._tile_clicked("it")                           # No: nothing happens
+    assert "Italian isn't downloaded yet" in asked[0] and got == []
+    assert not s.cb_lang.currentData()
+    s._tile_clicked("it")                           # Yes: it downloads
+    assert got == ["it"] and not s.cb_lang.currentData()
+    ready.add("it")                                 # ...it's in
+    monkeypatch.setattr(s.ctl.tts, "voices", ["A voice"], raising=False)
+    monkeypatch.setattr(s, "_voice_for", lambda m: "")   # Windows has no Italian voice
+    s.downloaded.emit()
+    assert s.cb_lang.currentData() == "it" and s._tile["it"].isChecked()
+    assert voice == [True]                          # ...so it adds one (Windows asks)
+
+
+def test_a_grey_language_card_offline_says_why(panel, monkeypatch):
+    from PySide6.QtWidgets import QMessageBox
+    p, _ = panel
+    _ready(monkeypatch, set())
+    s = p.speech
+    s.set_modules(p.modules)
+    monkeypatch.setattr("soundboard.online.net.offline", lambda: True)
+    monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: 1 / 0)
+    toasts = []
+    monkeypatch.setattr("soundboard.ui.kit.busy.toast", lambda w, t, *a, **k: toasts.append(t))
+    s._tile_clicked("it")
+    assert toasts and "Offline mode" in toasts[0]
+
+
 def test_downloaded_language_needs_a_windows_voice_and_uses_it(panel, monkeypatch):
     from soundboard.speech import translation
     p, _ = panel

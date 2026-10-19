@@ -239,9 +239,10 @@ class SpeechInstalls(QObject):
             self._voice_note = ""
 
     # ---- translation downloads
-    def _download(self):
+    def _download(self, m: mods.ModuleInfo | None = None):
+        """Download `m`'s translation (a grey language card), else the language picked."""
         p = self.p
-        m = p._lang()
+        m = m or p._lang()
         if m is None or self._dl_busy is not None:
             return
         self._dl_busy, self._dl_cancel = m, False
@@ -401,7 +402,7 @@ class SpeechInstalls(QObject):
         if ok:
             self.lbl_install.hide()
             self._refresh_module()
-            p.livevoice.lbl_state.setText(_("Installed. Press Start and talk."))
+            p.livevoice.lbl_state.setText(_("Installed. Pick a language and talk."))
         else:
             last = self.lbl_install.text()
             self.lbl_install.hide()

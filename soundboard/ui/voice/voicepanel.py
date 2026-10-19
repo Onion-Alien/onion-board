@@ -302,7 +302,7 @@ class VoicePanel(QWidget):
         self._ai_follow_offline()
         self.speech.live_changed.connect(self._speech_live)
         self.speech.lang_changed.connect(self._emit_active)
-        self._section("speak", self.speech, self.speech.title)
+        self._section("speak", self.speech, self.speech.title, self.speech.head)
         # speech recognition has to hear the app's language for any of it to work
         self._tabs["speak"].setVisible(spoken.heard())
         self.speech.custom_wanted.connect(lambda: self.show_tab("addons"))
@@ -345,7 +345,9 @@ class VoicePanel(QWidget):
         outer.addWidget(self.bar)
         # cards or a list: one setting for both (the window keeps the voice changer's)
         self.fx.view_toggle.changed.connect(self.ai.set_view)
+        self.fx.view_toggle.changed.connect(self.speech.set_view)
         self.ai.view_toggle.changed.connect(self.fx.view_toggle.changed)
+        self.speech.view_toggle.changed.connect(self.fx.view_toggle.changed)
         self.fx.sound_list = lambda: [(m.id, m.name, list(m.tags)) for m in self.board_sounds()]
         self.chain.configure(self.fx.spec())
         self._update_backdrop(self.fx.spec())
@@ -505,6 +507,7 @@ class VoicePanel(QWidget):
         """The voices as picture cards or a list, in both cards."""
         self.fx.set_view(view)
         self.ai.set_view(view)
+        self.speech.set_view(view)
 
     def _pin_picked_off(self, compact: bool):
         """Pinned under the scrolling card, or (`compact`) at the end of its card (the
@@ -923,7 +926,8 @@ class VoicePanel(QWidget):
         # another language spoken for the AI voice or the voice changer is on here too:
         # its tab lights up beside theirs (it only did while the computer voice spoke)
         speaking = tts or (m is not None and spoken.heard())
-        self._set_state("speak", speaking, lang if speaking else "")
+        # its switch and its lit card already say which: no words beside the switch
+        self._set_state("speak", speaking, "", say_on=False)
 
     def _set_state(self, key: str, on: bool, note: str, say_on: bool = True):
         text = " · ".join(t for t in (_("On") if on and say_on else "", note) if t)

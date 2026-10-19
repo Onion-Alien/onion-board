@@ -1,6 +1,13 @@
 """The Voice tab's Languages card: `SpeechPanel` (text-to-speech and live
 voice-to-speech, with translation).
 
+It looks and works as the voice changer's and AI voices' cards: the big ON/OFF switch
+next to its name (`head`), chips (All, Favorites, Downloaded), cards or a list, and a
+card per language. A language that isn't downloaded yet is grey; clicking it asks to
+download it (and to add its Windows voice). Clicking a downloaded one turns it on (the
+AI voice or the voice changer says it, else the computer voice starts); clicking the
+lit one turns it off. The hidden `cb_lang` list keeps which language is on.
+
 It follows panel.py's pattern: it owns its widgets and emits plain dicts
 (`changed`) that the main window stores in the config. Two helpers it owns do the
 rest: `livevoice` (Start, translating for another voice: livevoice.py) and
@@ -14,9 +21,9 @@ import logging
 import threading
 import time
 
-from PySide6.QtCore import QEvent, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QGuiApplication
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QDialogButtonBox,
+from PySide6.QtCore import QEvent, QRectF, QSize, Qt, QTimer, Signal
+from PySide6.QtGui import QColor, QFont, QGuiApplication, QIcon, QPainter, QPixmap
+from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QDialogButtonBox,
                                QFormLayout, QFrame, QGridLayout, QHBoxLayout, QLabel,
                                QLineEdit, QMessageBox, QPlainTextEdit, QPushButton,
                                QScrollArea, QSlider, QVBoxLayout, QWidget)
@@ -29,10 +36,13 @@ from soundboard.online import net
 from soundboard.speech import customvoices, spoken, translation, tts, winvoices
 from soundboard.speech.live import SpeechController, clean_settings
 from soundboard.ui.kit import busy, fit, icons
-from soundboard.ui.kit.panel import bar, fold_button, hint_label, icon_label, section_label
+from soundboard.ui.kit.panel import (Flow, ViewToggle, bar, fold_button, hint_label,
+                                     icon_label, section_label)
 from soundboard.ui.kit.restyled import measured, on_restyle
 from soundboard.ui.voice.livevoice import MODELS, LiveVoice
 from soundboard.ui.voice.speechinstall import SpeechInstalls
+from soundboard.ui.voice.voicefxpanel import (LIST_MIN_W, MAX_COLS, TILE_ART, TILE_GAP,
+                                              TILE_MIN_W, BigSwitch, VoiceTile)
 from soundboard.ui.kit.widgets import fit_placeholder
 from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.core import errors
@@ -45,6 +55,33 @@ def default_speech_settings() -> dict:
     return {"voice": "", "rate": 0, "gain": 1.0, "model": "base.en", "language": "en",
             "mute_real_voice": True, "voice_fx": True, "translate": "",
             "translate_on": False}
+
+
+# the chips over the language cards
+ALL, FAVS, READY = "", "favs", "ready"
+
+
+def lang_icon(code: str, ready: bool, size: int = TILE_ART) -> QIcon:
+    """A language card's picture: its code on a rounded square, a colour of its own
+    once it's downloaded, grey until then (no flags: a language isn't a country)."""
+    pm = QPixmap(size * 2, size * 2)
+    pm.setDevicePixelRatio(2)
+    pm.fill(Qt.GlobalColor.transparent)
+    p = QPainter(pm)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
+    hue = sum(ord(c) * (i + 7) for i, c in enumerate(code)) * 37 % 360
+    p.setPen(Qt.PenStyle.NoPen)
+    p.setBrush(QColor.fromHsv(hue, 140, 205) if ready else QColor(theme.T["groove"]))
+    r = QRectF(1, 1, size - 2, size - 2)
+    p.drawRoundedRect(r, size * 0.26, size * 0.26)
+    f = QFont()
+    f.setBold(True)
+    f.setPixelSize(int(size * 0.38))
+    p.setFont(f)
+    p.setPen(QColor("white") if ready else QColor(theme.T["muted"]))
+    p.drawText(r, Qt.AlignmentFlag.AlignCenter, code.split("-")[0].upper()[:3])
+    p.end()
+    return QIcon(pm)
 
 
 def translations(module_list: list[mods.ModuleInfo]) -> list[mods.ModuleInfo]:
@@ -98,9 +135,75 @@ class SpeechPanel(QWidget):
         # in the order you use it: the language, who says it, then Start
         self.title = section_label(_("Speak another language"))
         v.addWidget(self.title)
+        # ---- the big ON/OFF, as the voice changer's and AI voices': the Voice tab puts
+        # `head` right after the card's name. Clicking a language turns it on too
+        self.b_on = BigSwitch(_("Languages"))
+        self.b_on.setText(_("Off"))
+        self.b_on.clicked.connect(self._switch_clicked)
+        self.head = QWidget()
+        hh = QHBoxLayout(self.head)
+        hh.setContentsMargins(0, 0, 0, 0)
+        hh.addWidget(self.b_on)
         self.lbl_intro = hint_label(_("Talk in your language and others hear another one. "
-                                      "Pick it under Speak in."))
+                                      "Pick a language to turn it on."))
         v.addWidget(self.lbl_intro)
+        v.addWidget(live.start_box)   # how the computer voice is doing (listening, a problem)
+
+        # ---- the language cards: chips over them, cards or a list at the right
+        favs = self.s.get("lang_favorites")
+        self._favs: list[str] = ([c for c in favs if isinstance(c, str)]
+                                 if isinstance(favs, list) else [])
+        self._group = ALL
+        self._wanted = ""        # a grey card's language, downloading: on once it's in
+        self.cards = QWidget()
+        cv = QVBoxLayout(self.cards)
+        cv.setContentsMargins(0, 0, 0, 0)
+        cv.setSpacing(12)
+        cats = QWidget()
+        cflow = Flow(cats, gap=6)
+        self._cat_group = QButtonGroup(self)
+        self._cat_btns: dict[str, QPushButton] = {}
+        for key, text in ((ALL, _("All")), (FAVS, _("Favorites")), (READY, _("Downloaded"))):
+            b = QPushButton(text)
+            b.setObjectName("voicecat")
+            b.setAccessibleName(text)
+            b.setCheckable(True)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            if key == FAVS:
+                icons.set_icon(b, "star_filled", "accent")
+            b.clicked.connect(lambda __=False, k=key: self.show_group(k))
+            self._cat_group.addButton(b)
+            self._cat_btns[key] = b
+            cflow.addWidget(b)
+        self._cat_btns[ALL].setChecked(True)
+        self._listed = False
+        self.view_toggle = ViewToggle("grid", _("Languages"))
+        self.view_toggle.changed.connect(self.set_view)
+        chips = QHBoxLayout()
+        chips.setSpacing(12)
+        chips.addWidget(cats, 1)
+        chips.addWidget(self.view_toggle, 0, Qt.AlignmentFlag.AlignTop)
+        cv.addLayout(chips)
+        self._heads = {}
+        for key, text in ((READY, _("Downloaded")), ("get", _("Not downloaded yet"))):
+            lbl = QLabel(text)
+            lbl.setObjectName("fxgroup")
+            lbl.hide()
+            self._heads[key] = lbl
+        self._tile_grid = QGridLayout()
+        self._tile_grid.setSpacing(TILE_GAP)
+        self._tile_cols = 3
+        self._tile: dict[str, VoiceTile] = {}
+        cv.addLayout(self._tile_grid)
+        self.no_favs = hint_label(_("No favorites yet. Click the star on a language to keep "
+                                    "it here."))
+        self.no_favs.hide()
+        cv.addWidget(self.no_favs)
+        self.no_ready = hint_label(_("None downloaded yet. Click a grey language to get it."))
+        self.no_ready.hide()
+        cv.addWidget(self.no_ready)
+        v.addWidget(self.cards)
+        self._lang_ready = False   # speech recognition is in and there are languages
         # Speak in belongs to every voice on the tab (VoicePanel._sync_translate).
         # your language in, the chosen one out (through English: spoken.py).
         self.lang_box = QWidget()
@@ -111,6 +214,7 @@ class SpeechPanel(QWidget):
         # a language here is on; Don't translate (the list's first) is off. Turning on
         # a voice elsewhere never changes it
         self.lbl_lang = QLabel(_("Speak in"))
+        self.lbl_lang.hide()   # the cards pick the language now; the list keeps it
         trow.addWidget(self.lbl_lang)
         self.cb_lang = QComboBox()
         self.cb_lang.setAccessibleName(_("Speak in"))
@@ -119,6 +223,7 @@ class SpeechPanel(QWidget):
         on_restyle(self.cb_lang.view(), self._fit_lang_list)   # (see restyled)
         self.cb_lang.setMinimumWidth(120)   # a list, not a bar across the card: it
         self.cb_lang.setMaximumWidth(380)   # opens as wide as its names need
+        self.cb_lang.hide()
         trow.setSpacing(12)
         trow.addWidget(self.cb_lang, 1)
         trow.addStretch(1)
@@ -169,7 +274,6 @@ class SpeechPanel(QWidget):
         sbl.setSpacing(14)
         sbl.addWidget(self.lang_box)
         v.addWidget(self.settings_box)
-        v.addWidget(live.start_box)   # Start and its state: shown once it's installed
 
         # ---- the voice (shared by live and typed speech): set before you press Start
         grid = QGridLayout()
@@ -246,6 +350,9 @@ class SpeechPanel(QWidget):
         ov = QVBoxLayout(self.opts)
         ov.setContentsMargins(0, 0, 0, 0)
         ov.setSpacing(10)
+        # the computer voice's own Start (a language card starts it by itself): to talk
+        # as the computer voice in your own language
+        ov.addWidget(live.b_live, 0, Qt.AlignmentFlag.AlignLeft)
         grid = voice_grid
         grid.addWidget(QLabel(_("Recognition")), 2, 0)
         self.cb_model = QComboBox()
@@ -350,6 +457,7 @@ class SpeechPanel(QWidget):
         self.ed_lang.editingFinished.connect(self._settings_edited)
         self._fill_langs()
         self.cb_lang.currentIndexChanged.connect(self._lang_picked)
+        self.downloaded.connect(self._after_download)
         inst._refresh_module()
 
         app = QGuiApplication.instance()
@@ -639,14 +747,239 @@ class SpeechPanel(QWidget):
         self.cb_lang.setCurrentIndex(max(0, self.cb_lang.findData(self.s["translate"]))
                                      if self.s["translate_on"] else 0)
         self.cb_lang.blockSignals(False)
+        self._fill_tiles()
         self.show_lang_box(self.module is not None and self.module.installed
                            and bool(self.langs))
         self._refresh_translation()
+        self._sync_switch()
 
     def show_lang_box(self, on: bool):
-        """Speak in and its frame together: the frame alone was an empty box."""
+        """The language cards, once there's speech recognition and languages."""
+        self._lang_ready = on
+        self.cards.setVisible(on)
+        self._show_settings()
+
+    def _show_settings(self):
+        """Who says it and what the language still needs, in their inner area: only
+        while a language is on or downloading (an empty box otherwise)."""
+        on = self._lang_ready and (self._lang() is not None
+                                   or self.installs._dl_busy is not None)
         self.lang_box.setVisible(on)
         self.settings_box.setVisible(on)
+
+    # ---- the language cards
+    def _fill_tiles(self):
+        """(Re)make a card for each language: grey until it's downloaded."""
+        for b in self._tile.values():
+            self._tile_grid.removeWidget(b)
+            b.hide()   # until it's gone it would paint over the regrown grid
+            b.deleteLater()
+        self._tile = {}
+        for m in self.langs:
+            code, name = m.language, langnames.of(m)
+            b = VoiceTile(name)
+            if self._listed:
+                b.set_listed(True)
+            b.setIcon(lang_icon(code, m.installed))
+            b.setIconSize(QSize(TILE_ART, TILE_ART))
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            b.setProperty("missing", not m.installed)
+            b.setToolTip(_("Others hear you in {language}.", language=name) if m.installed
+                         else _("Not downloaded yet ({size} MB). Click to download it.",
+                                size=translation.size_mb(m)))
+            b.clicked.connect(lambda __=False, c=code: self._tile_clicked(c))
+            b.star.setChecked(code in self._favs)
+            b.star.toggled.connect(lambda on, c=code: self.set_favorite(c, on))
+            self._tile[code] = b
+        self._place_tiles()
+        self._mark_tiles()
+
+    def _place_tiles(self):
+        """The cards the picked chip shows: All under Downloaded / Not downloaded yet,
+        else your favorites (in the order you starred them) or the downloaded ones."""
+        g, cols = self._tile_grid, self._tile_cols
+        for w in (*self._tile.values(), *self._heads.values()):
+            g.removeWidget(w)
+        ready = [m.language for m in self.langs if m.installed]
+        rows: list[tuple[str, list[str]]]
+        if self._group == ALL:
+            rows = [(READY, ready), ("get", [m.language for m in self.langs
+                                             if not m.installed])]
+        elif self._group == FAVS:
+            rows = [("", [c for c in self._favs if c in self._tile])]
+        else:
+            rows = [("", ready)]
+        shown: set[str] = set()
+        r = 0
+        for head, group in rows:
+            if not group:
+                continue
+            if head:
+                g.addWidget(self._heads[head], r, 0, 1, cols)
+                r += 1
+            for i, code in enumerate(group):
+                g.addWidget(self._tile[code], r + i // cols, i % cols)
+            r += (len(group) + cols - 1) // cols
+            shown.update(group)
+        for k, lbl in self._heads.items():
+            lbl.setVisible(self._group == ALL and any(
+                (READY if c in ready else "get") == k for c in shown))
+        for code, b in self._tile.items():
+            b.setVisible(code in shown)
+        self.no_favs.setVisible(self._group == FAVS and not shown)
+        self.no_ready.setVisible(self._group == READY and not shown)
+        for c in range(MAX_COLS):
+            g.setColumnStretch(c, 1 if c < cols else 0)
+
+    def _mark_tiles(self):
+        """Light up the language that's on (a card's own click toggles it: undone here)."""
+        on = self.cb_lang.currentData() or ""
+        for code, b in self._tile.items():
+            if b.isChecked() != (code == on):
+                b.setChecked(code == on)
+
+    def show_group(self, key: str):
+        """Show one chip's languages (ALL, FAVS or READY)."""
+        self._group = key
+        self._cat_btns[key].setChecked(True)
+        self._place_tiles()
+
+    @property
+    def favorites(self) -> list[str]:
+        return list(self._favs)
+
+    def set_favorite(self, code: str, on: bool):
+        """Star or unstar a language: Favorites lists them in the order you starred them."""
+        if on == (code in self._favs):
+            return
+        if on:
+            self._favs.append(code)
+        else:
+            self._favs.remove(code)
+        b = self._tile.get(code)
+        if b is not None and b.star.isChecked() != on:
+            b.star.setChecked(on)
+        if self._group == FAVS:
+            self._place_tiles()
+        self.s["lang_favorites"] = list(self._favs)
+        self.changed.emit(dict(self.s))
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        if e.size().width() != e.oldSize().width():
+            self._fit_width(self.width())
+
+    def _fit_width(self, width: int):
+        """As many language cards a row as the width holds, at least one."""
+        least = LIST_MIN_W if self._listed else TILE_MIN_W
+        cols = max(1, min(MAX_COLS, (width + TILE_GAP) // (least + TILE_GAP)))
+        if cols != self._tile_cols:
+            self._tile_cols = cols
+            self._place_tiles()
+
+    def set_view(self, view: str):
+        """Picture cards, or a list (the Voice tab keeps all three cards the same)."""
+        self._listed = view == "list"
+        self.view_toggle.set_view(view)
+        for b in self._tile.values():
+            b.set_listed(self._listed)
+        self._tile_cols = 0
+        self._fit_width(self.width())
+
+    def _module(self, code: str) -> mods.ModuleInfo | None:
+        return next((m for m in self.langs if m.language == code), None)
+
+    def _tile_clicked(self, code: str):
+        """A language card: a grey one asks to download it; a downloaded one goes on;
+        the one that's on goes off (as the voice cards)."""
+        self._mark_tiles()   # its own click checked it: the language decides
+        m = self._module(code)
+        if m is None:
+            return
+        if code == (self.cb_lang.currentData() or ""):
+            self.set_language("")
+        elif not m.installed:
+            self._offer_download(m)
+        else:
+            self.set_language(code)
+
+    def set_language(self, code: str):
+        """Turn `code` on (the AI voice or the voice changer says it, else the computer
+        voice starts), or "" every language off (and the computer voice speaking it)."""
+        lv = self.livevoice.b_live
+        if code:
+            if lv.isChecked():
+                lv.setChecked(False)   # it restarts with the new language below
+            self.cb_lang.setCurrentIndex(max(0, self.cb_lang.findData(code)))
+            if not self._who and self.translating() is not None:
+                lv.setChecked(True)    # nobody else to say it: the computer voice
+        else:
+            if lv.isChecked():
+                lv.setChecked(False)
+            self.cb_lang.setCurrentIndex(0)
+        self._mark_tiles()
+
+    def _switch_clicked(self, on: bool):
+        """The card's ON / OFF: the last language back on, or every language off."""
+        if not on:
+            self.set_language("")
+            return
+        m = self._module(self.s.get("translate") or "")
+        if m is None or not m.installed:
+            m = next((x for x in self.langs if x.installed), None)
+        if m is None:
+            self._sync_switch()
+            busy.toast(self, html.escape(_("Pick a language first: click one below.")))
+            return
+        self.set_language(m.language)
+
+    def _sync_switch(self):
+        on = bool(self.cb_lang.currentData())
+        if self.b_on.isChecked() != on:
+            self.b_on.blockSignals(True)
+            self.b_on.setChecked(on)
+            self.b_on.blockSignals(False)
+        self.b_on.setText(_("On") if on else _("Off"))
+        self.b_on.update()
+
+    def _offer_download(self, m: mods.ModuleInfo):
+        """A grey card: download it (and add its Windows voice) after a Yes."""
+        name = langnames.of(m)
+        if net.offline():
+            busy.toast(self, html.escape(_("Offline mode is on, so {language} can't be "
+                                           "downloaded now.", language=name)), "warn")
+            return
+        if not net.allowed("voices"):
+            busy.toast(self, html.escape(net.off_message("voices")), "warn")
+            return
+        if self.installs._dl_busy is not None:
+            busy.toast(self, html.escape(_("Another language is downloading. Wait for it "
+                                           "to finish.")))
+            return
+        if QMessageBox.question(
+                self, _("Download {language}?", language=name),
+                _("{language} isn't downloaded yet. Download and install it now? It's a "
+                  "one-time {size} MB download, and Windows may ask to add its voice too.",
+                  language=name, size=translation.size_mb(m))
+        ) != QMessageBox.StandardButton.Yes:
+            return
+        if self.livevoice.b_live.isChecked():
+            self.livevoice.b_live.setChecked(False)   # no download while it's talking
+        self._wanted = m.language
+        self.installs._download(m)
+        self._show_settings()
+
+    def _after_download(self):
+        """A grey card's language came in: on now, and its Windows voice added when
+        Windows has none (Windows asks first)."""
+        code, self._wanted = self._wanted, ""
+        m = self._module(code) if code else None
+        if m is None or not m.installed:
+            return
+        self.set_language(code)
+        if (self.ctl.tts.voices and not self._voice_for(m) and not net.offline()
+                and net.allowed("voices")):
+            self.installs._install_voice()
 
     def _fit_lang_list(self):
         """The open list shows every name whole, even past the box's own width."""
@@ -659,6 +992,9 @@ class SpeechPanel(QWidget):
             usage.used("translate-on")
         self._settings_edited()
         self._refresh_translation()
+        self._sync_switch()
+        self._mark_tiles()
+        self._show_settings()
         self.lang_changed.emit()
 
     def stop_translating(self):
@@ -715,6 +1051,8 @@ class SpeechPanel(QWidget):
         focused = self.focusWidget()
         self._refresh_translation_state()
         self._show_who()
+        if hasattr(self, "cards"):   # (still being made)
+            self._show_settings()
         if (focused is not None and focused in self.installs.tr_buttons()
                 and focused.isVisible()):
             focused.setFocus(Qt.FocusReason.OtherFocusReason)

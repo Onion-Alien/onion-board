@@ -535,6 +535,7 @@ QPushButton#voicetab[live="true"]:!checked { color:$live_text; border-color:$liv
 QFrame#card QToolButton#voicetile { background:$card; color:$text; border:1px solid transparent; border-radius:12px; padding:8px 4px 6px 4px; font-size:8.5pt; }
 QFrame#card QToolButton#voicetile:hover:!checked { background:$btn_hover; border-color:$border_hi; }
 QFrame#card QToolButton#voicetile:checked { background:$accent; color:$on_accent; border:1px solid $accent_hi; font-weight:700; }
+QFrame#card QToolButton#voicetile[missing="true"]:!checked { color:$muted; }
 QFrame#card QToolButton#voicetile:focus { border-color:$accent; }
 QFrame#card QToolButton#voicetile:checked:focus { border-color:$text_hi; }
 QFrame#card QFrame#picked { background:$inset; border-radius:10px; }
