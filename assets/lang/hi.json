@@ -4209,5 +4209,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord वापस वैसा है जैसे आप बात करते हैं: शोर दमन, इको कैंसलेशन और अपने आप वॉल्यूम फिर से चालू हैं।",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "अपडेट के बाद माइक में आवाज़ भेजने की समस्याएँ ठीक करें, या Discord को बात करने के लिए वापस करें।",
   "Put Discord back": "Discord वापस करें",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Discord का शोर दमन, इको कैंसलेशन और अपने आप वॉल्यूम वैसे ही फिर से चालू करता है जैसे आवाज़ों के लिए सेट करने से पहले थे। Onion Board के बिना बात करने के लिए: कॉल में आपकी आवाज़ें फिर से कट सकती हैं।"
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Discord का शोर दमन, इको कैंसलेशन और अपने आप वॉल्यूम वैसे ही फिर से चालू करता है जैसे आवाज़ों के लिए सेट करने से पहले थे। Onion Board के बिना बात करने के लिए: कॉल में आपकी आवाज़ें फिर से कट सकती हैं।",
+  "Applying to the playing sound": "चल रहे साउंड पर लगाया जा रहा है",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "चल रहे साउंड पर लगाया जा रहा है: {pct}%. तब तक यह पहले जैसा चलता रहेगा।",
+  "Couldn't apply the effects to the playing sound": "चल रहे साउंड पर इफ़ेक्ट नहीं लग सके",
+  "Reset effects": "इफ़ेक्ट रीसेट करें",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "सारे इफ़ेक्ट बंद करें (ट्रिम बना रहेगा)। चल रहा साउंड तुरंत सादा हो जाता है।",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ चल रहे साउंड में आपके बदलाव लग गए। रद्द करें इसे वापस कर देता है।"
 }

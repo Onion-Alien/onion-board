@@ -4288,5 +4288,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord снова как для разговора: шумоподавление, эхоподавление и автоматическая громкость опять включены.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Исправь проблемы с передачей звуков в микрофон после обновления или верни Discord для разговора.",
   "Put Discord back": "Вернуть Discord",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Снова включает шумоподавление, эхоподавление и автоматическую громкость в Discord, как было до настройки для звуков. Для разговора без Onion Board: звуки в звонках снова могут обрываться."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Снова включает шумоподавление, эхоподавление и автоматическую громкость в Discord, как было до настройки для звуков. Для разговора без Onion Board: звуки в звонках снова могут обрываться.",
+  "Applying to the playing sound": "Применяю к играющему звуку",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Применяю к играющему звуку: {pct}%. До этого он играет как раньше.",
+  "Couldn't apply the effects to the playing sound": "Не удалось применить эффекты к играющему звуку",
+  "Reset effects": "Сбросить эффекты",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Выключает все эффекты (обрезка останется). Играющий звук сразу становится обычным.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Играющий звук теперь с вашими изменениями. «Отмена» вернёт как было."
 }

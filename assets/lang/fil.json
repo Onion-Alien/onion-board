@@ -4209,5 +4209,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Balik na ang Discord sa paraan ng pagsasalita mo: naka-on ulit ang noise suppression, echo cancellation at awtomatikong volume.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Ayusin ang mga problema sa pagpapadala ng tunog sa mic mo pagkatapos ng update, o ibalik ang Discord para sa pag-uusap.",
   "Put Discord back": "Ibalik ang Discord",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Ibinabalik ang noise suppression, echo cancellation at awtomatikong volume ng Discord gaya ng dati bago mo ito i-set up para sa mga sound. Para sa pag-uusap nang walang Onion Board: puwedeng maputol ulit ang mga sound mo sa tawag."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Ibinabalik ang noise suppression, echo cancellation at awtomatikong volume ng Discord gaya ng dati bago mo ito i-set up para sa mga sound. Para sa pag-uusap nang walang Onion Board: puwedeng maputol ulit ang mga sound mo sa tawag.",
+  "Applying to the playing sound": "Ina-apply sa tumutugtog na sound",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Ina-apply sa tumutugtog na sound: {pct}%. Tutugtog ito gaya ng dati hanggang doon.",
+  "Couldn't apply the effects to the playing sound": "Hindi ma-apply ang effects sa tumutugtog na sound",
+  "Reset effects": "I-reset ang effects",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Pinapatay ang lahat ng effects (nananatili ang trim). Babalik agad sa plain ang tumutugtog na sound.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Nasa tumutugtog na sound na ang mga binago mo. Ibabalik ito ng Kanselahin."
 }

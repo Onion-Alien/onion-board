@@ -4288,5 +4288,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord je zpátky, jak mluvíš: potlačení šumu, potlačení ozvěny a automatická hlasitost jsou zase zapnuté.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Oprav problémy s posíláním zvuků do mikrofonu po aktualizaci, nebo vrať Discord na mluvení.",
   "Put Discord back": "Vrátit Discord",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Zase zapne v Discordu potlačení šumu, potlačení ozvěny a automatickou hlasitost, jak jsi je měl, než jsi ho nastavil pro zvuky. Pro mluvení bez Onion Board: zvuky se ti v hovorech můžou zase sekat."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Zase zapne v Discordu potlačení šumu, potlačení ozvěny a automatickou hlasitost, jak jsi je měl, než jsi ho nastavil pro zvuky. Pro mluvení bez Onion Board: zvuky se ti v hovorech můžou zase sekat.",
+  "Applying to the playing sound": "Používám na hrající zvuk",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Používám na hrající zvuk: {pct} %. Do té doby hraje jako dřív.",
+  "Couldn't apply the effects to the playing sound": "Efekty se nepodařilo použít na hrající zvuk",
+  "Reset effects": "Resetovat efekty",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Vypne všechny efekty (ořez zůstane). Hrající zvuk je hned zase čistý.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Hrající zvuk má tvoje změny. Zrušit ho vrátí zpět."
 }

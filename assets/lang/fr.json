@@ -4209,5 +4209,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord est revenu comme tu parles : la suppression du bruit, l'annulation de l'écho et le volume automatique sont rallumés.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Corrige les problèmes d’envoi des sons dans ton micro après une mise à jour, ou remets Discord pour parler.",
   "Put Discord back": "Remettre Discord",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Rallume la suppression du bruit, l'annulation de l'écho et le volume automatique de Discord comme avant que tu le règles pour les sons. Pour parler sans Onion Board : tes sons risquent d'être coupés en appel à nouveau."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Rallume la suppression du bruit, l'annulation de l'écho et le volume automatique de Discord comme avant que tu le règles pour les sons. Pour parler sans Onion Board : tes sons risquent d'être coupés en appel à nouveau.",
+  "Applying to the playing sound": "Application au son en cours",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Application au son en cours : {pct} %. D'ici là, il continue comme avant.",
+  "Couldn't apply the effects to the playing sound": "Impossible d'appliquer les effets au son en cours",
+  "Reset effects": "Réinitialiser les effets",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Coupe tous les effets (la coupe reste). Le son en cours redevient normal tout de suite.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Le son en cours a tes changements. Annuler le remet comme avant."
 }

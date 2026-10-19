@@ -4288,5 +4288,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord e iar cum vorbești: suprimarea zgomotului, anularea ecoului și volumul automat sunt pornite din nou.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Rezolvă problemele de trimitere a sunetelor în microfon după o actualizare sau readu Discord pe vorbit.",
   "Put Discord back": "Readu Discord",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Repornește suprimarea zgomotului, anularea ecoului și volumul automat din Discord cum le aveai înainte să-l setezi pentru sunete. Pentru vorbit fără Onion Board: sunetele tale se pot tăia iar în apeluri."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Repornește suprimarea zgomotului, anularea ecoului și volumul automat din Discord cum le aveai înainte să-l setezi pentru sunete. Pentru vorbit fără Onion Board: sunetele tale se pot tăia iar în apeluri.",
+  "Applying to the playing sound": "Se aplică pe sunetul care cântă",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Se aplică pe sunetul care cântă: {pct}%. Până atunci cântă ca înainte.",
+  "Couldn't apply the effects to the playing sound": "Efectele nu s-au putut aplica pe sunetul care cântă",
+  "Reset effects": "Resetează efectele",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Oprește toate efectele (tăietura rămâne). Sunetul care cântă revine imediat la normal.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Sunetul care cântă are acum modificările tale. Anulează îl readuce cum era."
 }

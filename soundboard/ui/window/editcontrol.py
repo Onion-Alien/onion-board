@@ -12,14 +12,15 @@ import logging
 import subprocess
 import sys
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from PySide6.QtCore import QTimer, QUrl
+from PySide6.QtCore import QTimer, QUrl, Signal
 from PySide6.QtGui import QDesktopServices
 from shiboken6 import isValid as qt_valid
 
+from soundboard.audio.engine import SR
 from soundboard.core import errors
 from soundboard.audio import renderworker, soundfx
 from soundboard import voicefx
@@ -40,6 +41,7 @@ PROGRESS_MS = 200      # an in-app render tells the UI how far it is at most thi
 ETA_AFTER_S = 3.0      # time left is guessed once it has run this long...
 ETA_AFTER_FRAC = 0.03  # ...and done this much of it
 DONE_TOAST_S = 2.0     # a render that took longer says so when it's ready
+LIVE_WAIT_MS = 450     # a playing sound is made again once its effects stop changing this long
 
 
 @dataclass
@@ -48,6 +50,7 @@ class Render:
     gen: int
     old_fx: dict | None        # what Stop puts back (None: nothing to go back to)
     old_data: Any = None       # the audio that goes with old_fx, when it was loaded
+    keep: bool = False         # the sound plays on meanwhile; the new audio takes over
     frac: float = 0.0          # how far, 0..1
     t0: float = field(default_factory=time.monotonic)
 
@@ -59,11 +62,50 @@ class Render:
         return spent * (1 - self.frac) / self.frac
 
 
+def render_fx(m: SoundMeta, cancel, progress) -> Any:
+    """The sound's audio with its effects (call off the UI thread): a slow render in
+    its own process (renderworker), else here. Raises library.Cancelled when cancel()."""
+    data = None
+    key = soundfx.key(m.fx)
+    if (renderworker.enabled and renderworker.worth_it(m.fx, m.duration)
+            and library.load_cached(m.id, key) is None):
+        try:   # out of the app's process: no stutter, no lag
+            renderworker.render(m, cancel, progress)
+            data = library.load_cached(m.id, key)
+        except renderworker.Unavailable as e:
+            log.info("rendering %s in the app: %s", m.id, e)
+    if data is None:
+        data = load_sound(m, cancel=cancel, progress=progress)
+    return data
+
+
+@dataclass
+class Live:
+    """A sound that plays while its Edit sound window changes the effects: what plays
+    follows the window's draft (EditControl._live) until Save keeps it or Cancel puts
+    the saved one back."""
+    saved: Any             # its audio with the saved effects
+    saved_key: str         # (soundfx.key of those)
+    key: str               # the effects of what plays now
+    gen: int = 0           # the newest change: an older render's answer is dropped
+    want: str = ""         # the effects being rendered
+
+
 class EditControl(Controller):
     """The Edit sound windows of one MainWindow (``mw``)."""
+    live_ready = Signal(str, int, object)       # id, which change (gen), its audio|None
+    live_progress = Signal(str, int, float)     # id, which change (gen), how far 0..1
 
     def __init__(self, mw: MainWindow):
         super().__init__(mw)
+        self._live: dict[str, Live] = {}   # sid -> its playing draft (_live_apply)
+        self._live_due: set[str] = set()    # sids whose effects changed: made again soon
+        self._live_timer = QTimer(self)
+        self._live_timer.setSingleShot(True)
+        self._live_timer.setInterval(LIVE_WAIT_MS)
+        self._live_timer.timeout.connect(self._live_now)
+        self.live_ready.connect(self._live_ready)
+        self.live_progress.connect(self._live_progress)
         self._editors: dict[str, EditDialog] = {}
         self._render_gen: dict[str, int] = {}   # sid -> newest effects render (_rerender)
         self._renders: dict[str, Render] = {}  # sid -> the render in flight, how far it is
@@ -109,12 +151,14 @@ class EditControl(Controller):
         # the sound as it is now: gone (removed while the window was open: nothing to
         # save it onto), or the same sound in a new object (Undo put it back)
         m = mw.meta(sid)
+        self._live_due.discard(sid)
         try:
             if ok and m is not None and d.as_copy:
                 self._save_copy(m, d)
             elif ok and m is not None:
                 self._save_edits(m, d)
         finally:
+            self._live_back(sid)   # not saved: what plays goes back to the saved effects
             if mw.setctl._spare_editor is None and d not in self._editors.values():
                 rehome_crash_reports(d)
                 mw.setctl._spare_editor = d
@@ -126,6 +170,7 @@ class EditControl(Controller):
         """Save puts the window's draft on the sound (its effects rendered again when
         they changed)."""
         mw = self.mw
+        live = self._live.pop(m.id, None)   # what plays now: kept when it's what's saved
         old_key, old_hotkey = soundfx.key(m.fx), m.hotkey
         old_fx = m.fx
         d.apply(m)
@@ -136,8 +181,14 @@ class EditControl(Controller):
                 mw.hkctl.everyday_note(m.hotkey)
         mw.hkctl._clear_dupe_hotkey(m)
         mw.engine.set_gain(m.id, mw.gain_for(m))
-        if soundfx.key(m.fx) != old_key:
-            self._rerender(m, old_fx)
+        new_key = soundfx.key(m.fx)
+        now = mw.audio.get(m.id)
+        if live is not None and live.key == new_key and now is not None:
+            m.duration = len(now) / SR   # made already: it plays on as it is
+        elif new_key != old_key:
+            self._rerender(m, old_fx, live.saved if live else None, keep=True)
+        elif live is not None and live.key != live.saved_key:
+            self._live_put(m.id, live, live.saved, live.saved_key)
         mw._save_now()
         p = mw.pads.get(m.id)
         if p is not None:
@@ -169,6 +220,8 @@ class EditControl(Controller):
         d.hotkeys_changed.connect(mw.hkctl.register_hotkeys)
         d.source_forgotten.connect(mw._save_now)
         d.finished.connect(lambda ok, d=d: self._edit_done(d.meta.id, d, ok))
+        d.effects.changed.connect(lambda d=d: self._fx_edited(d))
+        d.effects_reset.connect(lambda d=d: self._live_apply(d.meta.id))   # at once
         return d
 
     def voice_catalog(self):
@@ -295,29 +348,32 @@ class EditControl(Controller):
         mw._rebuild_pads()
         self._rerender(new, m.fx, mw.audio.get(m.id))
 
-    def _rerender(self, m: SoundMeta, old_fx: dict | None = None, old_data=None):
+    def _rerender(self, m: SoundMeta, old_fx: dict | None = None, old_data=None,
+                  keep: bool = False):
         """Load a sound again after its effects changed. They're rendered in the
         background (a slow one in its own process: renderworker); the pad shows how far
         it is until it's ready. old_fx: the effects before, which Stop goes back to (with
-        old_data, their audio; the pad's own audio when not given)."""
+        old_data, their audio; the pad's own audio when not given). keep: it plays on
+        meanwhile, and the new audio takes over where it is (Save in Edit sound)."""
         mw = self.mw
         prev = self._renders.get(m.id)
         if old_data is None and old_fx is not None:
             old_data = mw.audio.get(m.id)
-        mw.engine.stop(m.id)
+        keep = keep and mw.engine.state(m.id) is not None
+        if not keep:
+            mw.engine.stop(m.id)
         mw.audio.pop(m.id, None)
         mw.engine.forget(m.id)
         gen = self._render_gen[m.id] = self._render_gen.get(m.id, 0) + 1
         if prev is not None:   # edited again while rendering: Stop still goes back to
             old_fx, old_data = prev.old_fx, prev.old_data   # how it was before both
-        self._renders[m.id] = Render(gen, old_fx, old_data)
+        self._renders[m.id] = Render(gen, old_fx, old_data, keep=keep)
         p = mw.pads.get(m.id)
         if p:
             p.state = "rendering"
             p.render_frac, p.can_stop = 0.0, old_fx is not None
             p.update()
         self._show_render(m.id)
-        key = soundfx.key(m.fx)
         told = [0.0]
 
         def cancel():
@@ -331,16 +387,7 @@ class EditControl(Controller):
 
         def run():
             try:
-                data = None
-                if (renderworker.enabled and renderworker.worth_it(m.fx, m.duration)
-                        and library.load_cached(m.id, key) is None):
-                    try:   # out of the app's process: no stutter, no lag
-                        renderworker.render(m, cancel, progress)
-                        data = library.load_cached(m.id, key)
-                    except renderworker.Unavailable as e:
-                        log.info("rendering %s in the app: %s", m.id, e)
-                if data is None:
-                    data = load_sound(m, cancel=cancel, progress=progress)
+                data = render_fx(m, cancel, progress)
             except library.Cancelled:
                 return worker.SKIP   # (it stopped partway: Stop, or a newer one)
             if self._render_gen.get(m.id) != gen:
@@ -356,6 +403,113 @@ class EditControl(Controller):
             prune()
             return m.id, None, errors.plain(e)
         worker.run(run, mw.bridge.loaded, "fx-render", error=failed, owner=mw)
+
+    # ------------------------------------------------- the playing sound follows the draft
+    def _fx_edited(self, d: EditDialog):
+        """An effect changed in an Edit sound window: once the changes stop for a
+        moment, a playing sound is made again with them (_live_apply)."""
+        if self._editors.get(d.meta.id) is d:
+            self._live_due.add(d.meta.id)
+            self._live_timer.start()
+
+    def _live_now(self):
+        due, self._live_due = self._live_due, set()
+        for sid in due:
+            self._live_apply(sid)
+
+    def _live_apply(self, sid: str):
+        """The sound plays with its Edit sound window's effects: made again in the
+        background (it plays on as it was meanwhile), then swapped in at the same spot.
+        Only while it plays, or once it did with the window open."""
+        mw = self.mw
+        self._live_due.discard(sid)
+        d = self._editors.get(sid)
+        m = mw.meta(sid)
+        if d is None or not qt_valid(d) or m is None or self.rendering(sid) is not None:
+            return
+        fx = d.effects.fx()
+        key = soundfx.key(fx)
+        live = self._live.get(sid)
+        if live is None:
+            saved = mw.audio.get(sid)
+            if saved is None or mw.engine.state(sid) is None or key == soundfx.key(m.fx):
+                return   # not playing: Save applies them, as it always did
+            live = self._live[sid] = Live(saved, soundfx.key(m.fx), soundfx.key(m.fx))
+        live.gen += 1   # a render still going for an older change gives up
+        gen = live.gen
+        if key == live.key:
+            live.want = ""
+            d.show_live(None)
+            return
+        if key == live.saved_key:   # back to the saved effects: their audio is here
+            self._live_put(sid, live, live.saved, key)
+            return
+        live.want = key
+        d.show_live(0.0)
+        draft = replace(m, fx=fx)
+        told = [0.0]
+
+        def cancel():
+            return self._live.get(sid) is not live or live.gen != gen
+
+        def progress(frac: float):   # (the rendering thread)
+            now = time.monotonic()
+            if now - told[0] >= PROGRESS_MS / 1000 or frac >= 1.0:
+                told[0] = now
+                self.live_progress.emit(sid, gen, float(frac))
+
+        def run():
+            try:
+                data = render_fx(draft, cancel, progress)
+            except library.Cancelled:
+                return worker.SKIP
+            if cancel():
+                return worker.SKIP
+            mw.engine.prepare(sid, data)
+            return sid, gen, data
+
+        def failed(e):
+            log.warning("can't apply effects to the playing %s: %s", sid, e)
+            return sid, gen, None
+        worker.run(run, self.live_ready, "fx-live", error=failed, owner=self)
+
+    def _live_progress(self, sid: str, gen: int, frac: float):
+        live, d = self._live.get(sid), self._editors.get(sid)
+        if live is not None and live.gen == gen and live.want and d is not None and qt_valid(d):
+            d.show_live(frac)
+
+    def _live_ready(self, sid: str, gen: int, data):
+        live = self._live.get(sid)
+        if live is None or live.gen != gen or not live.want:
+            return   # saved, cancelled or changed again meanwhile
+        key, live.want = live.want, ""
+        if data is None:
+            d = self._editors.get(sid)
+            if d is not None and qt_valid(d):
+                d.show_live(None, _("Couldn't apply the effects to the playing sound"))
+            return
+        self._live_put(sid, live, data, key)
+
+    def _live_put(self, sid: str, live: Live, data, key: str):
+        """What plays (and plays next) becomes `data`, the sound with effects `key`."""
+        mw = self.mw
+        live.key, live.want = key, ""
+        mw.audio[sid] = data
+        mw.engine.swap(sid, data)
+        d = self._editors.get(sid)
+        if d is not None and qt_valid(d):
+            d.show_live(None, _("✓ The playing sound has your changes. Cancel puts it back.")
+                        if key != live.saved_key else "")
+
+    def _live_back(self, sid: str):
+        """The window closed without saving: the sound goes back to its saved audio."""
+        live = self._live.pop(sid, None)
+        if live is None:
+            return
+        live.gen += 1
+        if live.key != live.saved_key:
+            self.mw.audio[sid] = live.saved
+            self.mw.engine.swap(sid, live.saved)
 
     # ------------------------------------------------------------ renders in flight
     def rendering(self, sid: str) -> Render | None:
@@ -404,6 +558,8 @@ class EditControl(Controller):
         if r is None:
             return
         mw = self.mw
+        if r.keep and data is not None:
+            mw.engine.swap(sid, data)   # it played on meanwhile: the new one takes over
         p = mw.pads.get(sid)
         if p is not None:
             p.render_frac = None

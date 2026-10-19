@@ -4130,5 +4130,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord kembali seperti caramu bicara: peredam bising, pembatalan gema, dan volume otomatis menyala lagi.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Atasi masalah pengiriman suara ke mikrofon setelah pembaruan, atau kembalikan Discord untuk bicara.",
   "Put Discord back": "Kembalikan Discord",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Menyalakan lagi peredam bising, pembatalan gema, dan volume otomatis Discord seperti sebelum kamu menyiapkannya untuk suara. Untuk bicara tanpa Onion Board: suaramu bisa terputus lagi saat panggilan."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Menyalakan lagi peredam bising, pembatalan gema, dan volume otomatis Discord seperti sebelum kamu menyiapkannya untuk suara. Untuk bicara tanpa Onion Board: suaramu bisa terputus lagi saat panggilan.",
+  "Applying to the playing sound": "Menerapkan ke suara yang diputar",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Menerapkan ke suara yang diputar: {pct}%. Sampai saat itu tetap diputar seperti tadi.",
+  "Couldn't apply the effects to the playing sound": "Tidak bisa menerapkan efek ke suara yang diputar",
+  "Reset effects": "Reset efek",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Matikan semua efek (potongannya tetap). Suara yang diputar langsung kembali polos.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Suara yang diputar sudah memakai perubahanmu. Batal mengembalikannya."
 }

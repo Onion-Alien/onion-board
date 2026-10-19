@@ -4130,5 +4130,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord가 평소 말하던 대로 돌아왔어요. 노이즈 억제, 에코 제거, 자동 볼륨이 다시 켜졌어요.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "업데이트 후 마이크로 소리가 전송되지 않는 문제를 해결하거나 Discord를 대화용으로 되돌리세요.",
   "Put Discord back": "Discord 되돌리기",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Discord의 노이즈 억제, 에코 제거, 자동 볼륨을 사운드용으로 설정하기 전처럼 다시 켜요. Onion Board 없이 대화할 때용이에요. 통화에서 사운드가 다시 끊길 수 있어요."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Discord의 노이즈 억제, 에코 제거, 자동 볼륨을 사운드용으로 설정하기 전처럼 다시 켜요. Onion Board 없이 대화할 때용이에요. 통화에서 사운드가 다시 끊길 수 있어요.",
+  "Applying to the playing sound": "재생 중인 사운드에 적용 중",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "재생 중인 사운드에 적용 중: {pct}%. 그때까지는 원래대로 재생돼요.",
+  "Couldn't apply the effects to the playing sound": "재생 중인 사운드에 효과를 적용하지 못했어요",
+  "Reset effects": "효과 초기화",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "모든 효과를 꺼요(자르기는 유지). 재생 중인 사운드가 바로 원래 소리로 돌아가요.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ 재생 중인 사운드에 변경 사항이 적용됐어요. 취소하면 되돌아가요."
 }

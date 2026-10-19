@@ -4525,5 +4525,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "عاد ديسكورد كما تتكلم: قمع الضوضاء وإلغاء الصدى والصوت التلقائي تعمل من جديد.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "أصلح مشاكل إرسال الأصوات إلى الميكروفون بعد التحديث، أو أعد ديسكورد للكلام.",
   "Put Discord back": "أعد ديسكورد",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "يعيد تشغيل قمع الضوضاء وإلغاء الصدى والصوت التلقائي في ديسكورد كما كانت قبل ضبطه للأصوات. للكلام بدون Onion Board: قد تنقطع أصواتك في المكالمات مجددًا."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "يعيد تشغيل قمع الضوضاء وإلغاء الصدى والصوت التلقائي في ديسكورد كما كانت قبل ضبطه للأصوات. للكلام بدون Onion Board: قد تنقطع أصواتك في المكالمات مجددًا.",
+  "Applying to the playing sound": "جارٍ التطبيق على الصوت المُشغَّل",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "جارٍ التطبيق على الصوت المُشغَّل: {pct}%. يستمر كما كان حتى ذلك الحين.",
+  "Couldn't apply the effects to the playing sound": "تعذّر تطبيق التأثيرات على الصوت المُشغَّل",
+  "Reset effects": "إعادة ضبط التأثيرات",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "أوقف كل التأثيرات (يبقى القصّ). يعود الصوت المُشغَّل عاديًا فورًا.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ الصوت المُشغَّل فيه تغييراتك الآن. «إلغاء» يعيده كما كان."
 }

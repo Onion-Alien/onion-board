@@ -4130,5 +4130,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord kembali seperti cara anda bercakap: penindasan hingar, pembatalan gema dan kelantangan automatik hidup semula.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Baiki masalah menghantar bunyi ke mikrofon selepas kemas kini, atau kembalikan Discord untuk bercakap.",
   "Put Discord back": "Kembalikan Discord",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Menghidupkan semula penindasan hingar, pembatalan gema dan kelantangan automatik Discord seperti sebelum anda menyediakannya untuk bunyi. Untuk bercakap tanpa Onion Board: bunyi anda mungkin terputus lagi dalam panggilan."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Menghidupkan semula penindasan hingar, pembatalan gema dan kelantangan automatik Discord seperti sebelum anda menyediakannya untuk bunyi. Untuk bercakap tanpa Onion Board: bunyi anda mungkin terputus lagi dalam panggilan.",
+  "Applying to the playing sound": "Menerapkan pada bunyi yang dimainkan",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Menerapkan pada bunyi yang dimainkan: {pct}%. Ia terus dimainkan seperti tadi sehingga itu.",
+  "Couldn't apply the effects to the playing sound": "Tidak dapat menerapkan kesan pada bunyi yang dimainkan",
+  "Reset effects": "Tetapkan semula kesan",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Matikan semua kesan (potongan kekal). Bunyi yang dimainkan terus kembali biasa.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Bunyi yang dimainkan kini ada perubahan anda. Batal mengembalikannya."
 }

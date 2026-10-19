@@ -4209,5 +4209,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord vuelve a estar como hablas: la supresión de ruido, la cancelación de eco y el volumen automático están activos otra vez.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Soluciona problemas al enviar sonidos a tu micro después de una actualización, o devuelve Discord a modo charla.",
   "Put Discord back": "Devolver Discord",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Vuelve a activar la supresión de ruido, la cancelación de eco y el volumen automático de Discord como los tenías antes de prepararlo para sonidos. Para hablar sin Onion Board: tus sonidos pueden volver a cortarse en llamadas."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Vuelve a activar la supresión de ruido, la cancelación de eco y el volumen automático de Discord como los tenías antes de prepararlo para sonidos. Para hablar sin Onion Board: tus sonidos pueden volver a cortarse en llamadas.",
+  "Applying to the playing sound": "Aplicando al sonido que suena",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Aplicando al sonido que suena: {pct} %. Hasta entonces sigue como estaba.",
+  "Couldn't apply the effects to the playing sound": "No se han podido aplicar los efectos al sonido que suena",
+  "Reset effects": "Restablecer efectos",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Quita todos los efectos (el recorte se queda). El sonido que suena vuelve a normal al instante.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ El sonido que suena ya tiene tus cambios. Cancelar lo deja como estaba."
 }

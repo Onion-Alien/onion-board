@@ -4130,5 +4130,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discordを通話用に戻しました。ノイズ抑制、エコー除去、自動音量が再びオンです。",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "アップデート後にサウンドがマイクに送れない問題を修復したり、Discordを通話用に戻したりします。",
   "Put Discord back": "Discordを元に戻す",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Discordのノイズ抑制・エコー除去・自動音量を、サウンド用に設定する前の状態でオンに戻します。Onion Boardなしで話す場合に。通話でサウンドがまた途切れることがあります。"
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Discordのノイズ抑制・エコー除去・自動音量を、サウンド用に設定する前の状態でオンに戻します。Onion Boardなしで話す場合に。通話でサウンドがまた途切れることがあります。",
+  "Applying to the playing sound": "再生中のサウンドに適用中",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "再生中のサウンドに適用中：{pct}%。それまでは今のまま再生されます。",
+  "Couldn't apply the effects to the playing sound": "再生中のサウンドにエフェクトを適用できませんでした",
+  "Reset effects": "エフェクトをリセット",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "すべてのエフェクトをオフにします（トリミングは残ります）。再生中のサウンドはすぐ元の音に戻ります。",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ 再生中のサウンドに変更が反映されました。キャンセルで元に戻ります。"
 }

@@ -4209,5 +4209,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord è tornato come parli: soppressione del rumore, cancellazione dell'eco e volume automatico sono di nuovo attivi.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Risolvi i problemi di invio dei suoni al microfono dopo un aggiornamento, o rimetti Discord per parlare.",
   "Put Discord back": "Rimetti Discord",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Riaccende la soppressione del rumore, la cancellazione dell'eco e il volume automatico di Discord come li avevi prima di prepararlo per i suoni. Per parlare senza Onion Board: i tuoi suoni potrebbero di nuovo essere tagliati nelle chiamate."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Riaccende la soppressione del rumore, la cancellazione dell'eco e il volume automatico di Discord come li avevi prima di prepararlo per i suoni. Per parlare senza Onion Board: i tuoi suoni potrebbero di nuovo essere tagliati nelle chiamate.",
+  "Applying to the playing sound": "Applico al suono in riproduzione",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Applico al suono in riproduzione: {pct}%. Fino ad allora suona come prima.",
+  "Couldn't apply the effects to the playing sound": "Impossibile applicare gli effetti al suono in riproduzione",
+  "Reset effects": "Azzera effetti",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Spegne tutti gli effetti (il taglio resta). Il suono in riproduzione torna normale subito.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Il suono in riproduzione ha le tue modifiche. Annulla lo riporta com'era."
 }

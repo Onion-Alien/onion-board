@@ -4209,5 +4209,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "A Discord újra úgy szól, ahogy beszélsz: a zajszűrés, a visszhangszűrés és az automatikus hangerő újra be van kapcsolva.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Javítsd ki a hangok mikrofonba küldésének frissítés utáni hibáit, vagy állítsd vissza a Discordot beszédre.",
   "Put Discord back": "Discord visszaállítása",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Újra bekapcsolja a Discord zajszűrését, visszhangszűrését és automatikus hangerejét úgy, ahogy a hangokhoz állítás előtt voltak. Onion Board nélküli beszédhez: hívásban a hangjaid újra szaggathatnak."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Újra bekapcsolja a Discord zajszűrését, visszhangszűrését és automatikus hangerejét úgy, ahogy a hangokhoz állítás előtt voltak. Onion Board nélküli beszédhez: hívásban a hangjaid újra szaggathatnak.",
+  "Applying to the playing sound": "Alkalmazás a szóló hangra",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Alkalmazás a szóló hangra: {pct}%. Addig úgy szól, ahogy eddig.",
+  "Couldn't apply the effects to the playing sound": "Nem sikerült az effekteket a szóló hangra alkalmazni",
+  "Reset effects": "Effektek alaphelyzetbe",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Minden effektet kikapcsol (a vágás megmarad). A szóló hang azonnal sima lesz.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ A szóló hangon már a változtatásaid vannak. A Mégse visszaállítja."
 }

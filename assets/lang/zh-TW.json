@@ -4130,5 +4130,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord 已恢復成聊天設定：噪音抑制、回音消除和自動音量都重新打開了。",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "修復更新後無法將聲音傳送到麥克風的問題，或把 Discord 恢復成聊天設定。",
   "Put Discord back": "恢復 Discord",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "把 Discord 的噪音抑制、回音消除和自動音量重新打開，恢復成你為聲音設定之前的樣子。適合不用 Onion Board 聊天：通話中你的聲音可能又會被切斷。"
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "把 Discord 的噪音抑制、回音消除和自動音量重新打開，恢復成你為聲音設定之前的樣子。適合不用 Onion Board 聊天：通話中你的聲音可能又會被切斷。",
+  "Applying to the playing sound": "正在套用到播放中的音效",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "正在套用到播放中的音效：{pct}%。在那之前照舊播放。",
+  "Couldn't apply the effects to the playing sound": "無法將效果套用到播放中的音效",
+  "Reset effects": "重設效果",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "關閉所有效果（修剪會保留）。播放中的音效會立刻回到原音。",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ 播放中的音效已套用你的修改。按取消可還原。"
 }

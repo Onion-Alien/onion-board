@@ -4209,5 +4209,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord е както говориш: потискането на шума, премахването на ехото и автоматичната сила на звука пак са включени.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Отстрани проблеми с изпращането на звуци към микрофона след актуализация или върни Discord за говорене.",
   "Put Discord back": "Върни Discord",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Пак включва потискането на шума, премахването на ехото и автоматичната сила на звука в Discord, както бяха, преди да го настроиш за звуци. За говорене без Onion Board: звуците ти пак може да се накъсват в разговори."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Пак включва потискането на шума, премахването на ехото и автоматичната сила на звука в Discord, както бяха, преди да го настроиш за звуци. За говорене без Onion Board: звуците ти пак може да се накъсват в разговори.",
+  "Applying to the playing sound": "Прилагам към звука, който свири",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Прилагам към звука, който свири: {pct}%. Дотогава свири както преди.",
+  "Couldn't apply the effects to the playing sound": "Не успях да приложа ефектите към звука, който свири",
+  "Reset effects": "Нулирай ефектите",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Изключва всички ефекти (изрязването остава). Звукът, който свири, веднага става обикновен.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Звукът, който свири, вече е с промените ти. „Отказ“ го връща."
 }

@@ -4209,5 +4209,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "O Discord voltou do jeito que você fala: supressão de ruído, cancelamento de eco e volume automático ligados de novo.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Resolva problemas ao enviar sons para seu microfone após uma atualização, ou volte o Discord para conversa.",
   "Put Discord back": "Voltar o Discord",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Liga de novo a supressão de ruído, o cancelamento de eco e o volume automático do Discord como estavam antes de você prepará-lo para sons. Para conversar sem o Onion Board: seus sons podem voltar a cortar nas chamadas."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Liga de novo a supressão de ruído, o cancelamento de eco e o volume automático do Discord como estavam antes de você prepará-lo para sons. Para conversar sem o Onion Board: seus sons podem voltar a cortar nas chamadas.",
+  "Applying to the playing sound": "Aplicando ao som que está tocando",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Aplicando ao som que está tocando: {pct}%. Até lá, ele continua como estava.",
+  "Couldn't apply the effects to the playing sound": "Não foi possível aplicar os efeitos ao som que está tocando",
+  "Reset effects": "Redefinir efeitos",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Desliga todos os efeitos (o corte fica). O som que está tocando volta ao normal na hora.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ O som que está tocando já tem suas mudanças. Cancelar volta como estava."
 }

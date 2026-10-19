@@ -4209,5 +4209,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Το Discord είναι ξανά όπως μιλάς: καταστολή θορύβου, ακύρωση ηχούς και αυτόματη ένταση είναι πάλι ανοιχτά.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Διόρθωσε προβλήματα αποστολής ήχων στο μικρόφωνο μετά από ενημέρωση ή επανέφερε το Discord για ομιλία.",
   "Put Discord back": "Επαναφορά του Discord",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Ξανανοίγει την καταστολή θορύβου, την ακύρωση ηχούς και την αυτόματη ένταση του Discord όπως ήταν πριν το ρυθμίσεις για ήχους. Για ομιλία χωρίς το Onion Board: οι ήχοι σου μπορεί να κόβονται ξανά στις κλήσεις."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Ξανανοίγει την καταστολή θορύβου, την ακύρωση ηχούς και την αυτόματη ένταση του Discord όπως ήταν πριν το ρυθμίσεις για ήχους. Για ομιλία χωρίς το Onion Board: οι ήχοι σου μπορεί να κόβονται ξανά στις κλήσεις.",
+  "Applying to the playing sound": "Εφαρμογή στον ήχο που παίζει",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Εφαρμογή στον ήχο που παίζει: {pct}%. Μέχρι τότε παίζει όπως πριν.",
+  "Couldn't apply the effects to the playing sound": "Δεν ήταν δυνατή η εφαρμογή των εφέ στον ήχο που παίζει",
+  "Reset effects": "Επαναφορά εφέ",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Κλείνει όλα τα εφέ (το κόψιμο μένει). Ο ήχος που παίζει γίνεται αμέσως καθαρός.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Ο ήχος που παίζει έχει τις αλλαγές σου. Η Ακύρωση τον επαναφέρει."
 }

@@ -515,6 +515,7 @@ QTabBar::tear { width:0; border:none; }
 QPushButton#live { font-weight:700; }
 QPushButton[nudge="true"] { background:$accent_tint; border-color:$accent; color:$accent_text; }
 QPushButton[nudge="true"]:hover { background:$accent_tint_hi; }
+QPushButton#resetfx[nudge="true"] { color:$text; }   /* Edit sound: readable on every tint */
 QPushButton#voicetile { text-align:left; padding:9px 10px; border-radius:10px; }
 QPushButton#voicetile:checked { background:$accent; color:$on_accent; border:1px solid $accent_hi; font-weight:700; }
 QPushButton#voicetile[art="true"] { padding:5px 10px 5px 6px; }

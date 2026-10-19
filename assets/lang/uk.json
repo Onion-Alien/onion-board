@@ -4288,5 +4288,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord знову як для розмови: шумозаглушення, придушення відлуння й автоматична гучність знову ввімкнені.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Виправ проблеми з передаванням звуків у мікрофон після оновлення або поверни Discord для розмови.",
   "Put Discord back": "Повернути Discord",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Знову вмикає шумозаглушення, придушення відлуння й автоматичну гучність у Discord, як було до налаштування для звуків. Для розмови без Onion Board: звуки в дзвінках знову можуть обриватися."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Знову вмикає шумозаглушення, придушення відлуння й автоматичну гучність у Discord, як було до налаштування для звуків. Для розмови без Onion Board: звуки в дзвінках знову можуть обриватися.",
+  "Applying to the playing sound": "Застосовую до звуку, що грає",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Застосовую до звуку, що грає: {pct}%. Доти він грає як раніше.",
+  "Couldn't apply the effects to the playing sound": "Не вдалося застосувати ефекти до звуку, що грає",
+  "Reset effects": "Скинути ефекти",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Вимикає всі ефекти (обрізка лишається). Звук, що грає, одразу стає звичайним.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Звук, що грає, тепер з вашими змінами. «Скасувати» поверне як було."
 }

@@ -4209,5 +4209,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord er tilbake slik du prater: støydemping, ekkoreduksjon og automatisk volum er på igjen.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Løs problemer med å sende lyder til mikrofonen din etter en oppdatering, eller sett Discord tilbake til prat.",
   "Put Discord back": "Sett Discord tilbake",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Slår på igjen Discords støydemping, ekkoreduksjon og automatiske volum slik du hadde dem før du satte den opp for lyder. For prat uten Onion Board: lydene dine kan bli hakkete i samtaler igjen."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Slår på igjen Discords støydemping, ekkoreduksjon og automatiske volum slik du hadde dem før du satte den opp for lyder. For prat uten Onion Board: lydene dine kan bli hakkete i samtaler igjen.",
+  "Applying to the playing sound": "Legger på lyden som spilles",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Legger på lyden som spilles: {pct} %. Den spiller som før til da.",
+  "Couldn't apply the effects to the playing sound": "Kunne ikke legge effektene på lyden som spilles",
+  "Reset effects": "Tilbakestill effekter",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Slår av alle effekter (trimmingen blir). Lyden som spilles, blir ren med en gang.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Lyden som spilles, har endringene dine. Avbryt setter den tilbake."
 }

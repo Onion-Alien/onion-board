@@ -4209,5 +4209,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord is terug zoals je praat: ruisonderdrukking, echo-onderdrukking en automatisch volume staan weer aan.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Los problemen op met het sturen van geluiden naar je microfoon na een update, of zet Discord terug voor praten.",
   "Put Discord back": "Discord terugzetten",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Zet de ruisonderdrukking, echo-onderdrukking en het automatische volume van Discord weer aan zoals je ze had voordat je het voor geluiden instelde. Om te praten zonder Onion Board: je geluiden kunnen in gesprekken weer afgekapt worden."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Zet de ruisonderdrukking, echo-onderdrukking en het automatische volume van Discord weer aan zoals je ze had voordat je het voor geluiden instelde. Om te praten zonder Onion Board: je geluiden kunnen in gesprekken weer afgekapt worden.",
+  "Applying to the playing sound": "Toepassen op het geluid dat speelt",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Toepassen op het geluid dat speelt: {pct}%. Tot dan speelt het zoals het was.",
+  "Couldn't apply the effects to the playing sound": "Kon de effecten niet toepassen op het geluid dat speelt",
+  "Reset effects": "Effecten resetten",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Zet alle effecten uit (het inkorten blijft). Het geluid dat speelt klinkt meteen weer gewoon.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Het geluid dat speelt heeft je wijzigingen. Annuleren zet het terug."
 }

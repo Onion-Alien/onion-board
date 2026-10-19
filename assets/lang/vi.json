@@ -4130,5 +4130,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord đã trở lại như khi bạn nói chuyện: giảm tiếng ồn, khử tiếng vọng và âm lượng tự động đã bật lại.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Khắc phục lỗi gửi âm thanh vào mic sau khi cập nhật, hoặc đưa Discord về chế độ nói chuyện.",
   "Put Discord back": "Đưa Discord về",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Bật lại giảm tiếng ồn, khử tiếng vọng và âm lượng tự động của Discord như trước khi bạn thiết lập cho âm thanh. Để nói chuyện không cần Onion Board: âm thanh của bạn có thể lại bị ngắt trong cuộc gọi."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Bật lại giảm tiếng ồn, khử tiếng vọng và âm lượng tự động của Discord như trước khi bạn thiết lập cho âm thanh. Để nói chuyện không cần Onion Board: âm thanh của bạn có thể lại bị ngắt trong cuộc gọi.",
+  "Applying to the playing sound": "Đang áp lên âm thanh đang phát",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Đang áp lên âm thanh đang phát: {pct}%. Trong lúc đó nó vẫn phát như cũ.",
+  "Couldn't apply the effects to the playing sound": "Không áp được hiệu ứng lên âm thanh đang phát",
+  "Reset effects": "Đặt lại hiệu ứng",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Tắt mọi hiệu ứng (đoạn cắt vẫn giữ). Âm thanh đang phát trở lại bình thường ngay.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Âm thanh đang phát đã có thay đổi của bạn. Hủy sẽ đưa nó về như cũ."
 }

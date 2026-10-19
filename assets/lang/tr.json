@@ -4209,5 +4209,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord konuştuğun haline döndü: gürültü bastırma, yankı engelleme ve otomatik ses seviyesi yeniden açık.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Güncellemeden sonra sesleri mikrofonuna gönderirken yaşanan sorunları düzelt ya da Discord'u konuşmaya geri al.",
   "Put Discord back": "Discord'u geri al",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Discord'un gürültü bastırma, yankı engelleme ve otomatik ses seviyesini, sesler için ayarlamadan önceki gibi yeniden açar. Onion Board olmadan konuşmak için: seslerin aramalarda yine kesilebilir."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Discord'un gürültü bastırma, yankı engelleme ve otomatik ses seviyesini, sesler için ayarlamadan önceki gibi yeniden açar. Onion Board olmadan konuşmak için: seslerin aramalarda yine kesilebilir.",
+  "Applying to the playing sound": "Çalan sese uygulanıyor",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Çalan sese uygulanıyor: %{pct}. O zamana kadar eskisi gibi çalar.",
+  "Couldn't apply the effects to the playing sound": "Efektler çalan sese uygulanamadı",
+  "Reset effects": "Efektleri sıfırla",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Tüm efektleri kapatır (kırpma kalır). Çalan ses hemen düz haline döner.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Çalan seste artık değişikliklerin var. İptal eski haline getirir."
 }

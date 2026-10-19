@@ -4209,5 +4209,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord ist wieder so, wie du redest: Rauschunterdrückung, Echounterdrückung und automatische Lautstärke sind wieder an.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Behebe Probleme beim Senden von Sounds an dein Mikrofon nach einem Update oder stell Discord aufs Reden zurück.",
   "Put Discord back": "Discord zurückstellen",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Schaltet Rauschunterdrückung, Echounterdrückung und automatische Lautstärke in Discord wieder ein, so wie du sie hattest, bevor du es für Sounds eingerichtet hast. Fürs Reden ohne Onion Board: Deine Sounds werden in Calls dann vielleicht wieder abgehackt."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Schaltet Rauschunterdrückung, Echounterdrückung und automatische Lautstärke in Discord wieder ein, so wie du sie hattest, bevor du es für Sounds eingerichtet hast. Fürs Reden ohne Onion Board: Deine Sounds werden in Calls dann vielleicht wieder abgehackt.",
+  "Applying to the playing sound": "Wird auf den laufenden Sound angewendet",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Wird auf den laufenden Sound angewendet: {pct} %. Bis dahin läuft er wie vorher.",
+  "Couldn't apply the effects to the playing sound": "Die Effekte konnten nicht auf den laufenden Sound angewendet werden",
+  "Reset effects": "Effekte zurücksetzen",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Schaltet alle Effekte aus (der Zuschnitt bleibt). Ein laufender Sound klingt sofort wieder normal.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Der laufende Sound hat deine Änderungen. Abbrechen macht sie rückgängig."
 }

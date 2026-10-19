@@ -4209,5 +4209,11 @@
   "Discord is back the way you talk: its noise suppression, echo cancellation and automatic volume are on again.": "Discord on taas niin kuin puhut: kohinanvaimennus, kaiunpoisto ja automaattinen äänenvoimakkuus ovat taas päällä.",
   "Fix problems sending sounds into your mic after an update, or put Discord back for talking.": "Korjaa päivityksen jälkeiset ongelmat äänten lähettämisessä mikrofoniin tai palauta Discord puhetta varten.",
   "Put Discord back": "Palauta Discord",
-  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Laittaa Discordin kohinanvaimennuksen, kaiunpoiston ja automaattisen äänenvoimakkuuden takaisin päälle niin kuin ne olivat ennen kuin säädit sen äänille. Puheeseen ilman Onion Boardia: äänesi voivat taas katkeilla puheluissa."
+  "Turns Discord's noise suppression, echo cancellation and automatic volume back on, the way you had them before you set it up for sounds. For talking without Onion Board: your sounds may get cut off in calls again.": "Laittaa Discordin kohinanvaimennuksen, kaiunpoiston ja automaattisen äänenvoimakkuuden takaisin päälle niin kuin ne olivat ennen kuin säädit sen äänille. Puheeseen ilman Onion Boardia: äänesi voivat taas katkeilla puheluissa.",
+  "Applying to the playing sound": "Lisätään soivaan ääneen",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Lisätään soivaan ääneen: {pct} %. Siihen asti se soi kuten ennen.",
+  "Couldn't apply the effects to the playing sound": "Efektejä ei voitu lisätä soivaan ääneen",
+  "Reset effects": "Nollaa efektit",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Poistaa kaikki efektit (rajaus säilyy). Soiva ääni palaa heti tavalliseksi.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Soivassa äänessä on nyt muutoksesi. Peruuta palauttaa sen."
 }
