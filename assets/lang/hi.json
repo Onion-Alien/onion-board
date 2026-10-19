@@ -4196,5 +4196,11 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Onion Board बंद होने पर Discord का शोर दमन, इको कैंसलेशन और अपने आप वॉल्यूम बात करने के लिए फिर से चालू कर देता है। यह नहीं चाहिए? सेटअप टैब पर <b>बंद करने पर Discord को बात करने के लिए वापस करें</b> से टिक हटाएँ।",
   "Your sounds reach your friends clean now, not muffled or cut off.": "अब आपकी आवाज़ें दोस्तों तक साफ़ पहुँचती हैं, दबी या कटी हुई नहीं।",
   "{name} is set up for your sounds": "{name} आपकी आवाज़ों के लिए तैयार है",
-  "What's popular right now": "अभी क्या लोकप्रिय है"
+  "What's popular right now": "अभी क्या लोकप्रिय है",
+  "Applying to the playing sound": "चल रहे साउंड पर लगाया जा रहा है",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "चल रहे साउंड पर लगाया जा रहा है: {pct}%. तब तक यह पहले जैसा चलता रहेगा।",
+  "Couldn't apply the effects to the playing sound": "चल रहे साउंड पर इफ़ेक्ट नहीं लग सके",
+  "Reset effects": "इफ़ेक्ट रीसेट करें",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "सारे इफ़ेक्ट बंद करें (ट्रिम बना रहेगा)। चल रहा साउंड तुरंत सादा हो जाता है।",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ चल रहे साउंड में आपके बदलाव लग गए। रद्द करें इसे वापस कर देता है।"
 }

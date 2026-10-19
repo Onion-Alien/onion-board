@@ -4196,5 +4196,11 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Όταν κλείνει το Onion Board, ξανανοίγει την καταστολή θορύβου, την ακύρωση ηχούς και την αυτόματη ένταση του Discord για ομιλία. Δεν το θέλεις; Βγάλε το τικ από το <b>Επαναφορά του Discord για ομιλία στο κλείσιμο</b> στην καρτέλα Διαμόρφωση.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Οι ήχοι σου φτάνουν τώρα καθαροί στους φίλους σου, όχι πνιχτοί ή κομμένοι.",
   "{name} is set up for your sounds": "Το {name} είναι ρυθμισμένο για τους ήχους σου",
-  "What's popular right now": "Τι είναι δημοφιλές τώρα"
+  "What's popular right now": "Τι είναι δημοφιλές τώρα",
+  "Applying to the playing sound": "Εφαρμογή στον ήχο που παίζει",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Εφαρμογή στον ήχο που παίζει: {pct}%. Μέχρι τότε παίζει όπως πριν.",
+  "Couldn't apply the effects to the playing sound": "Δεν ήταν δυνατή η εφαρμογή των εφέ στον ήχο που παίζει",
+  "Reset effects": "Επαναφορά εφέ",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Κλείνει όλα τα εφέ (το κόψιμο μένει). Ο ήχος που παίζει γίνεται αμέσως καθαρός.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Ο ήχος που παίζει έχει τις αλλαγές σου. Η Ακύρωση τον επαναφέρει."
 }

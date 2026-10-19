@@ -4275,5 +4275,11 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Když se Onion Board zavře, zapne v Discordu zpátky potlačení šumu, potlačení ozvěny a automatickou hlasitost pro mluvení. Nechceš to? Zruš <b>Při zavření vrátit Discord na mluvení</b> na kartě Zapojení.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Tvoje zvuky teď dorazí ke kamarádům čisté, ne tlumené ani useknuté.",
   "{name} is set up for your sounds": "{name} je nastavený pro tvoje zvuky",
-  "What's popular right now": "Co je teď populární"
+  "What's popular right now": "Co je teď populární",
+  "Applying to the playing sound": "Používám na hrající zvuk",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Používám na hrající zvuk: {pct} %. Do té doby hraje jako dřív.",
+  "Couldn't apply the effects to the playing sound": "Efekty se nepodařilo použít na hrající zvuk",
+  "Reset effects": "Resetovat efekty",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Vypne všechny efekty (ořez zůstane). Hrající zvuk je hned zase čistý.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Hrající zvuk má tvoje změny. Zrušit ho vrátí zpět."
 }

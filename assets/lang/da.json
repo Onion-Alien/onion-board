@@ -4196,5 +4196,11 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Når Onion Board lukker, slår det Discords støjreduktion, ekkoannullering og automatiske lydstyrke til igen til snak. Vil du ikke det? Fjern fluebenet ved <b>Sæt Discord tilbage til snak ved lukning</b> på fanen Opsætning.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Dine lyde når nu rent frem til dine venner, ikke dæmpet eller hakket.",
   "{name} is set up for your sounds": "{name} er sat op til dine lyde",
-  "What's popular right now": "Det, der er populært lige nu"
+  "What's popular right now": "Det, der er populært lige nu",
+  "Applying to the playing sound": "Lægger på lyden, der spiller",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Lægger på lyden, der spiller: {pct} %. Den spiller som før indtil da.",
+  "Couldn't apply the effects to the playing sound": "Kunne ikke lægge effekterne på lyden, der spiller",
+  "Reset effects": "Nulstil effekter",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Slår alle effekter fra (beskæringen bliver). Lyden, der spiller, bliver ren med det samme.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Lyden, der spiller, har dine ændringer. Annuller sætter den tilbage."
 }

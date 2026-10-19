@@ -4196,5 +4196,11 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Onion Board kapanınca Discord'un gürültü bastırma, yankı engelleme ve otomatik ses seviyesini konuşma için yeniden açar. İstemiyor musun? Kurulum sekmesinde <b>Kapanınca Discord'u konuşmaya geri al</b> işaretini kaldır.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Seslerin artık arkadaşlarına boğuk ya da kesik değil, temiz ulaşıyor.",
   "{name} is set up for your sounds": "{name} seslerin için ayarlandı",
-  "What's popular right now": "Şu an popüler olanlar"
+  "What's popular right now": "Şu an popüler olanlar",
+  "Applying to the playing sound": "Çalan sese uygulanıyor",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Çalan sese uygulanıyor: %{pct}. O zamana kadar eskisi gibi çalar.",
+  "Couldn't apply the effects to the playing sound": "Efektler çalan sese uygulanamadı",
+  "Reset effects": "Efektleri sıfırla",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Tüm efektleri kapatır (kırpma kalır). Çalan ses hemen düz haline döner.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Çalan seste artık değişikliklerin var. İptal eski haline getirir."
 }

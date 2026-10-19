@@ -4196,5 +4196,11 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Amikor az Onion Board bezárul, a Discord zajszűrését, visszhangszűrését és automatikus hangerejét visszakapcsolja beszédhez. Nem kéred? Vedd ki a pipát a <b>Bezáráskor a Discord vissza beszédre</b> elől a Beüzemelés lapon.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "A hangjaid most tisztán érnek el a barátaidhoz, nem tompán vagy szaggatva.",
   "{name} is set up for your sounds": "{name} be van állítva a hangjaidhoz",
-  "What's popular right now": "Ami most népszerű"
+  "What's popular right now": "Ami most népszerű",
+  "Applying to the playing sound": "Alkalmazás a szóló hangra",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Alkalmazás a szóló hangra: {pct}%. Addig úgy szól, ahogy eddig.",
+  "Couldn't apply the effects to the playing sound": "Nem sikerült az effekteket a szóló hangra alkalmazni",
+  "Reset effects": "Effektek alaphelyzetbe",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Minden effektet kikapcsol (a vágás megmarad). A szóló hang azonnal sima lesz.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ A szóló hangon már a változtatásaid vannak. A Mégse visszaállítja."
 }

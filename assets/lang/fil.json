@@ -4196,5 +4196,11 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Pagsara ng Onion Board, ibinabalik nito ang noise suppression, echo cancellation at awtomatikong volume ng Discord para sa pag-uusap. Ayaw mo nun? Alisin ang tsek sa <b>Ibalik ang Discord para sa pag-uusap pagsara</b> sa tab na Setup.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Malinis nang naririnig ng mga kaibigan mo ang mga sound mo, hindi mahina o putol-putol.",
   "{name} is set up for your sounds": "Naka-set up na ang {name} para sa mga sound mo",
-  "What's popular right now": "Ang sikat ngayon"
+  "What's popular right now": "Ang sikat ngayon",
+  "Applying to the playing sound": "Ina-apply sa tumutugtog na sound",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Ina-apply sa tumutugtog na sound: {pct}%. Tutugtog ito gaya ng dati hanggang doon.",
+  "Couldn't apply the effects to the playing sound": "Hindi ma-apply ang effects sa tumutugtog na sound",
+  "Reset effects": "I-reset ang effects",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Pinapatay ang lahat ng effects (nananatili ang trim). Babalik agad sa plain ang tumutugtog na sound.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Nasa tumutugtog na sound na ang mga binago mo. Ibabalik ito ng Kanselahin."
 }

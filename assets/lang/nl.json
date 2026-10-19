@@ -4196,5 +4196,11 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Als Onion Board sluit, zet het de ruisonderdrukking, echo-onderdrukking en automatische volume van Discord weer aan voor praten. Wil je dat niet? Vink <b>Discord bij sluiten terugzetten voor praten</b> uit op het tabblad Setup.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Je geluiden komen nu schoon bij je vrienden aan, niet dof of afgekapt.",
   "{name} is set up for your sounds": "{name} is ingesteld voor je geluiden",
-  "What's popular right now": "Wat nu populair is"
+  "What's popular right now": "Wat nu populair is",
+  "Applying to the playing sound": "Toepassen op het geluid dat speelt",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Toepassen op het geluid dat speelt: {pct}%. Tot dan speelt het zoals het was.",
+  "Couldn't apply the effects to the playing sound": "Kon de effecten niet toepassen op het geluid dat speelt",
+  "Reset effects": "Effecten resetten",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Zet alle effecten uit (het inkorten blijft). Het geluid dat speelt klinkt meteen weer gewoon.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Het geluid dat speelt heeft je wijzigingen. Annuleren zet het terug."
 }

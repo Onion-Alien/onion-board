@@ -4196,5 +4196,11 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Quando Onion Board si chiude, riaccende la soppressione del rumore, la cancellazione dell'eco e il volume automatico di Discord per parlare. Non lo vuoi? Togli la spunta a <b>Rimetti Discord per parlare alla chiusura</b> nella scheda Configura.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Ora i tuoi suoni arrivano puliti ai tuoi amici, non attutiti o tagliati.",
   "{name} is set up for your sounds": "{name} è pronto per i tuoi suoni",
-  "What's popular right now": "Cosa va di moda adesso"
+  "What's popular right now": "Cosa va di moda adesso",
+  "Applying to the playing sound": "Applico al suono in riproduzione",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Applico al suono in riproduzione: {pct}%. Fino ad allora suona come prima.",
+  "Couldn't apply the effects to the playing sound": "Impossibile applicare gli effetti al suono in riproduzione",
+  "Reset effects": "Azzera effetti",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Spegne tutti gli effetti (il taglio resta). Il suono in riproduzione torna normale subito.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Il suono in riproduzione ha le tue modifiche. Annulla lo riporta com'era."
 }

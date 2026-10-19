@@ -90,6 +90,7 @@ from soundboard.audio.engineparts import (  # noqa: F401
 log = logging.getLogger(__name__)
 
 FADE_S = 0.010  # fade when a sound is stopped early (no clicks)
+SWAP_FADE_S = 0.04   # swap(): the crossfade from a playing sound to it with new effects
 # where Sounds over 100 % round their peaks to: the limiter that follows them
 LOUD_SEND = 10 ** (CEILING_DB / 20)
 LOUD_SAFE = 10 ** (SAFETY_DB / 20)
@@ -754,6 +755,27 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
             for v in self.voices:
                 if v.sid == sid:
                     v.stopping = True
+
+    def swap(self, sid: str, data: np.ndarray) -> bool:
+        """The sound playing as `sid` goes on with `data` (it with other effects) from
+        the same share of the way through, on the same outputs, paused or not: a quick
+        crossfade, not a restart. False: it isn't playing."""
+        with self.lock:
+            v = self._current(sid)
+            if v is None or v.preview:
+                return False
+            frac, paused, outs = v.progress(), v.paused, tuple(v.data)
+            gain, loop, fade_out = v.gain, v.loop, v.fade_out
+            for old in self.voices:
+                if old.sid == sid and not old.stopping:
+                    old.fade_out = SWAP_FADE_S   # not the sound's own (long) fade-out
+        new = self.play(sid, data, gain, loop=loop, only=outs, start=min(frac, 0.999),
+                        fade_in=SWAP_FADE_S, fade_out=fade_out)
+        if new is None:
+            return False
+        with self.lock:
+            new.paused = paused
+        return True
 
     def stop_all(self):
         """Stop everything now: the panic button skips the sounds' own fade-outs, and

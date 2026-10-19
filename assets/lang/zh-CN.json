@@ -4117,5 +4117,11 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "关闭 Onion Board 时，它会把 Discord 的噪音抑制、回声消除和自动音量重新打开，方便聊天。不想这样？在向导标签页取消勾选<b>关闭时把 Discord 恢复成聊天设置</b>。",
   "Your sounds reach your friends clean now, not muffled or cut off.": "你的声音现在能清楚地传给朋友，不再发闷或断断续续。",
   "{name} is set up for your sounds": "{name} 已为你的声音设置好",
-  "What's popular right now": "现在流行的"
+  "What's popular right now": "现在流行的",
+  "Applying to the playing sound": "正在应用到播放中的声音",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "正在应用到播放中的声音：{pct}%。在此之前照旧播放。",
+  "Couldn't apply the effects to the playing sound": "无法将效果应用到播放中的声音",
+  "Reset effects": "重置效果",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "关闭所有效果（保留裁剪）。播放中的声音会立刻恢复原声。",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ 播放中的声音已带上你的修改。点取消可恢复。"
 }

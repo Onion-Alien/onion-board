@@ -4117,5 +4117,11 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Onion Boardを閉じると、Discordのノイズ抑制・エコー除去・自動音量を通話用にオンに戻します。戻したくない場合は、セットアップタブで<b>閉じたらDiscordを通話用に戻す</b>のチェックを外してください。",
   "Your sounds reach your friends clean now, not muffled or cut off.": "サウンドがこもったり途切れたりせず、きれいに友だちに届くようになりました。",
   "{name} is set up for your sounds": "{name}がサウンド用に設定されました",
-  "What's popular right now": "今人気のもの"
+  "What's popular right now": "今人気のもの",
+  "Applying to the playing sound": "再生中のサウンドに適用中",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "再生中のサウンドに適用中：{pct}%。それまでは今のまま再生されます。",
+  "Couldn't apply the effects to the playing sound": "再生中のサウンドにエフェクトを適用できませんでした",
+  "Reset effects": "エフェクトをリセット",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "すべてのエフェクトをオフにします（トリミングは残ります）。再生中のサウンドはすぐ元の音に戻ります。",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ 再生中のサウンドに変更が反映されました。キャンセルで元に戻ります。"
 }

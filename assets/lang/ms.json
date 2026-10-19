@@ -4117,5 +4117,11 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Apabila Onion Board ditutup, ia menghidupkan semula penindasan hingar, pembatalan gema dan kelantangan automatik Discord untuk bercakap. Tak mahu? Nyahtanda <b>Kembalikan Discord untuk bercakap bila ditutup</b> di tab Persediaan.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Bunyi anda kini sampai kepada kawan-kawan dengan jelas, tidak tenggelam atau terputus.",
   "{name} is set up for your sounds": "{name} sudah disediakan untuk bunyi anda",
-  "What's popular right now": "Apa yang popular sekarang"
+  "What's popular right now": "Apa yang popular sekarang",
+  "Applying to the playing sound": "Menerapkan pada bunyi yang dimainkan",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Menerapkan pada bunyi yang dimainkan: {pct}%. Ia terus dimainkan seperti tadi sehingga itu.",
+  "Couldn't apply the effects to the playing sound": "Tidak dapat menerapkan kesan pada bunyi yang dimainkan",
+  "Reset effects": "Tetapkan semula kesan",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Matikan semua kesan (potongan kekal). Bunyi yang dimainkan terus kembali biasa.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Bunyi yang dimainkan kini ada perubahan anda. Batal mengembalikannya."
 }

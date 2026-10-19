@@ -4275,5 +4275,11 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Коли Onion Board закривається, він знову вмикає шумозаглушення, придушення відлуння й автоматичну гучність у Discord для розмови. Не треба? Зніми позначку <b>Повернути Discord для розмови при закритті</b> на вкладці Підключення.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Тепер твої звуки доходять до друзів чистими, а не глухими чи обірваними.",
   "{name} is set up for your sounds": "{name} налаштовано для твоїх звуків",
-  "What's popular right now": "Що зараз популярне"
+  "What's popular right now": "Що зараз популярне",
+  "Applying to the playing sound": "Застосовую до звуку, що грає",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Застосовую до звуку, що грає: {pct}%. Доти він грає як раніше.",
+  "Couldn't apply the effects to the playing sound": "Не вдалося застосувати ефекти до звуку, що грає",
+  "Reset effects": "Скинути ефекти",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Вимикає всі ефекти (обрізка лишається). Звук, що грає, одразу стає звичайним.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Звук, що грає, тепер з вашими змінами. «Скасувати» поверне як було."
 }

@@ -4196,5 +4196,11 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Когато Onion Board се затвори, той пак включва потискането на шума, премахването на ехото и автоматичната сила на звука в Discord за говорене. Не искаш това? Махни отметката от <b>Върни Discord за говорене при затваряне</b> в раздел Свързване.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Звуците ти вече стигат до приятелите ти чисти, не заглушени или накъсани.",
   "{name} is set up for your sounds": "{name} е настроен за звуците ти",
-  "What's popular right now": "Какво е популярно в момента"
+  "What's popular right now": "Какво е популярно в момента",
+  "Applying to the playing sound": "Прилагам към звука, който свири",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Прилагам към звука, който свири: {pct}%. Дотогава свири както преди.",
+  "Couldn't apply the effects to the playing sound": "Не успях да приложа ефектите към звука, който свири",
+  "Reset effects": "Нулирай ефектите",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Изключва всички ефекти (изрязването остава). Звукът, който свири, веднага става обикновен.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Звукът, който свири, вече е с промените ти. „Отказ“ го връща."
 }
