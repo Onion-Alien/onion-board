@@ -548,6 +548,15 @@ QFrame#card QFrame#picked { background:$inset; border-radius:10px; }
 QFrame#card QPushButton#voicecat { border-radius:12px; padding:4px 12px; min-height:16px; font-size:8.5pt; background:$btn; border:1px solid transparent; color:$text; }
 QFrame#card QPushButton#voicecat:hover:!checked { background:$btn_hover; }
 QFrame#card QPushButton#voicecat:checked { background:$accent; border-color:$accent_hi; color:$on_accent; font-weight:600; }
+QFrame#card QPushButton#voicepick { background:$field; border:1px solid $border; border-radius:10px;
+    padding:0 28px 0 12px; text-align:left; font-weight:600; color:$text_hi; }
+QFrame#card QPushButton#voicepick:hover, QFrame#card QLineEdit#voicesearch:hover { border-color:$border_hi; }
+QFrame#card QPushButton#voicepick:focus, QFrame#card QPushButton#voicepick:open,
+QFrame#card QLineEdit#voicesearch:focus { border-color:$accent; }
+QFrame#card QPushButton#voicepick::menu-indicator { right:10px; }
+QFrame#card QLineEdit#voicesearch { background:$field; border:1px solid $border; border-radius:10px;
+    padding:0 8px 0 2px; }
+QMenu#voicepickmenu::item { padding:8px 16px 8px 12px; min-width:170px; }
 QFrame#card QToolButton#voicestar { background:transparent; border:none; border-radius:11px; padding:0; }
 QFrame#card QToolButton#voicestar:hover { background:$card; border:1px solid $border_hi; }
 QFrame#card QToolButton#voicestar[picked="true"]:hover { background:$btn_hover; border:none; }

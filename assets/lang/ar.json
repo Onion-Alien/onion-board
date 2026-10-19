@@ -3878,7 +3878,6 @@
   "You have the most saved voices there can be: delete one first.": "لديك أكبر عدد ممكن من الأصوات المحفوظة: احذف واحدًا أولًا.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "أنت تسمعه بدون صوت الذكاء الاصطناعي الخاص به: احصل على أصوات الذكاء الاصطناعي (تبويب الصوت ← أصوات الذكاء الاصطناعي) لتسمعه كاملًا.",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "أصوات ومؤثرات صوتية شاركها لاعبون آخرون وصوّتوا عليها: أضفها أو شارك ما لديك.",
-  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "أصوات ومؤثرات صوتية يشاركها اللاعبون ويصوّت عليها الجميع: أضفها أو شارك ما لديك",
   "Community": "المجتمع",
   "Share this link in the Community tab": "شارك هذا الرابط في تبويب المجتمع",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "تبويب المجتمع: متجر المشروع الخاص، لقائمته والأصوات التي تشغّلها أو تضيفها، وتصويتك وما تشاركه.",
@@ -4595,5 +4594,11 @@
   "Rarity": "الندرة",
   "Achievement unlocked": "تم فتح إنجاز",
   "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "لا شيء يطابق «{text}».",
+  "Search AI voices": "بحث في أصوات الذكاء الاصطناعي",
+  "Search voices": "بحث في الأصوات",
+  "Which languages show": "اللغات المعروضة",
+  "Which voices show": "الأصوات المعروضة",
+  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "أصوات ومؤثرات صوتية يشاركها اللاعبون ويصوّت عليها الجميع: أضفها أو شارك ما لديك",
   "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "يشغّل الميكروفون في سماعاتك فوق الأصوات, تمامًا ما يسمعه الآخرون."
 }

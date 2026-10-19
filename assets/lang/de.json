@@ -3598,7 +3598,6 @@
   "You have the most saved voices there can be: delete one first.": "Du hast schon die meisten gespeicherten Stimmen, die es geben kann: Lösch zuerst eine.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Du hörst sie ohne ihre KI-Stimme: Hol dir KI-Stimmen (Stimme-Tab → KI-Stimmen), um alles zu hören.",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "Sounds und Stimmen, die andere Spieler geteilt und bewertet haben: füge sie hinzu oder teile deine eigenen.",
-  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Sounds und Stimmen, die Spieler teilen und alle bewerten: füge sie hinzu oder teile deine eigenen",
   "Community": "Community",
   "Share this link in the Community tab": "Diesen Link im Tab Community teilen",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "Der Tab Community: der eigene Store des Projekts, für seine Liste, die Sounds und Stimmen, die du abspielst oder hinzufügst, deine Bewertungen und was du teilst.",
@@ -4299,5 +4298,11 @@
   "Rarity": "Seltenheit",
   "Achievement unlocked": "Erfolg freigeschaltet",
   "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Nichts passt zu „{text}“.",
+  "Search AI voices": "KI-Stimmen suchen",
+  "Search voices": "Stimmen suchen",
+  "Which languages show": "Welche Sprachen angezeigt werden",
+  "Which voices show": "Welche Stimmen angezeigt werden",
+  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Sounds und Stimmen, die Spieler teilen und alle bewerten: füge sie hinzu oder teile deine eigenen",
   "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Spielt dein Mikro zusammen mit den Sounds in deine Kopfhörer, genau das, was andere hören."
 }

@@ -3598,7 +3598,6 @@
   "You have the most saved voices there can be: delete one first.": "Hai già il massimo di voci salvate: prima eliminane una.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "La stai sentendo senza la sua voce dell'IA: scarica le voci dell'IA (scheda Voce → Voci dell'IA) per sentirla tutta.",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "Suoni e voci condivisi e votati da altri giocatori: aggiungili o condividi i tuoi.",
-  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Suoni e voci che i giocatori condividono, votati da tutti: aggiungili o condividi i tuoi",
   "Community": "Community",
   "Share this link in the Community tab": "Condividi questo link nella scheda Community",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "La scheda Community: lo store del progetto, per il suo elenco, i suoni e le voci che riproduci o aggiungi, i tuoi voti e ciò che condividi.",
@@ -4299,5 +4298,11 @@
   "Rarity": "Rarità",
   "Achievement unlocked": "Obiettivo sbloccato",
   "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "Nessun risultato per “{text}”.",
+  "Search AI voices": "Cerca voci IA",
+  "Search voices": "Cerca voci",
+  "Which languages show": "Quali lingue mostrare",
+  "Which voices show": "Quali voci mostrare",
+  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Suoni e voci che i giocatori condividono, votati da tutti: aggiungili o condividi i tuoi",
   "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Suona il tuo microfono nelle cuffie sopra i suoni: esattamente quello che sentono gli altri."
 }

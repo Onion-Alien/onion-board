@@ -3528,7 +3528,6 @@
   "You have the most saved voices there can be: delete one first.": "คุณมีเสียงที่บันทึกไว้ครบจำนวนแล้ว: ลบออกหนึ่งอันก่อน",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "คุณกำลังฟังโดยไม่มีเสียงเอไอ: ติดตั้งเสียงเอไอ (แท็บเสียง → เสียงเอไอ) เพื่อฟังทั้งหมด",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "เสียงและเสียงพูดที่ผู้เล่นคนอื่นแชร์และโหวต: เพิ่มเลย หรือแชร์ของคุณเอง",
-  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "เสียงและเสียงพูดที่ผู้เล่นแชร์ ทุกคนโหวต: เพิ่มเลย หรือแชร์ของคุณเอง",
   "Community": "ชุมชน",
   "Share this link in the Community tab": "แชร์ลิงก์นี้ในแท็บชุมชน",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "แท็บชุมชน: ร้านค้าของโปรเจกต์เอง ใช้สำหรับรายการ เสียงและเสียงพูดที่คุณเล่นหรือเพิ่ม โหวตของคุณ และสิ่งที่คุณแชร์",
@@ -4225,5 +4224,11 @@
   "Rarity": "ความหายาก",
   "Achievement unlocked": "ปลดล็อกความสำเร็จแล้ว",
   "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "ไม่พบสิ่งที่ตรงกับ “{text}”",
+  "Search AI voices": "ค้นหาเสียง AI",
+  "Search voices": "ค้นหาเสียง",
+  "Which languages show": "ภาษาที่แสดง",
+  "Which voices show": "เสียงที่แสดง",
+  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "เสียงและเสียงพูดที่ผู้เล่นแชร์ ทุกคนโหวต: เพิ่มเลย หรือแชร์ของคุณเอง",
   "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "เล่นไมค์ของคุณเข้าหูฟังพร้อมกับเสียง, ตรงกับที่คนอื่นได้ยิน"
 }

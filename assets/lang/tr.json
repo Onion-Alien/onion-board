@@ -3598,7 +3598,6 @@
   "You have the most saved voices there can be: delete one first.": "Olabilecek en fazla kayıtlı sese sahipsin: önce birini sil.",
   "You're hearing it without its AI voice: get AI voices (Voice tab → AI voices) to hear all of it.": "Onu yapay zeka sesi olmadan duyuyorsun: hepsini duymak için yapay zeka seslerini al (Ses sekmesi → Yapay zeka sesleri).",
   "Sounds and voices other players shared, voted on: add them, or share your own.": "Diğer oyuncuların paylaşıp oyladığı sesler ve ses efektleri: ekle ya da kendininkini paylaş.",
-  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Oyuncuların paylaştığı, herkesin oyladığı sesler ve ses efektleri: ekle ya da kendininkini paylaş",
   "Community": "Topluluk",
   "Share this link in the Community tab": "Bu bağlantıyı Topluluk sekmesinde paylaş",
   "The Community tab: the project's own store, for its list, the sounds and voices you play or add, your votes and what you share.": "Topluluk sekmesi: projenin kendi mağazası; listesi, çaldığın veya eklediğin sesler, oyların ve paylaştıkların için.",
@@ -4299,5 +4298,11 @@
   "Rarity": "Nadirlik",
   "Achievement unlocked": "Başarım kazanıldı",
   "{points}G - {name}": "{points}G - {name}",
+  "Nothing matches “{text}”.": "“{text}” ile eşleşen bir şey yok.",
+  "Search AI voices": "Yapay zekâ seslerini ara",
+  "Search voices": "Sesleri ara",
+  "Which languages show": "Hangi diller gösterilsin",
+  "Which voices show": "Hangi sesler gösterilsin",
+  "Sounds and voices players share, voted on by everyone: add them to your board or share your own": "Oyuncuların paylaştığı, herkesin oyladığı sesler ve ses efektleri: ekle ya da kendininkini paylaş",
   "Plays your mic into your headphones on top of the sounds, exactly what others hear.": "Mikrofonunu seslerin üstüne kulaklığında çalar, tam olarak diğerlerinin duyduğu."
 }
