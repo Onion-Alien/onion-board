@@ -7,7 +7,7 @@ invariants: a mic always ends up exactly as it started, one mic that won't go ba
 never strands the others, and the audio-stop retry behaves. Nothing touches the PC's
 real registry, audio devices or mic.
 
-    .venv\\Scripts\\python scripts\\sim_directmic.py
+    .venv\\Scripts\\python scripts\\directmic\\sim_directmic.py
 
 Exit 0 = every scenario passed, 1 = something failed (printed). Run it after changing
 the mic effect's admin install/uninstall or the ring layout (soundboard/mic/directmic.py),
@@ -21,7 +21,7 @@ import tempfile
 from contextlib import contextmanager
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "tests"))
 

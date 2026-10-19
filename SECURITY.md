@@ -616,7 +616,7 @@ goes online.
   late, the effect crossfades back to the plain mic. Since others can write the file,
   the effect trusts nothing in it: a damaged, cut-short or tampered file (even one
   that makes reading it fault) gets the plain mic passed through, never a crash of
-  Windows' audio engine. `scripts/fuzz_directmic.py` tests this.
+  Windows' audio engine. `scripts/directmic/fuzz_directmic.py` tests this.
 - **Taking it off**: uninstalling Onion Board runs `--direct-mic remove`, which (through
   the mic helper, or else after Windows' prompt, and only if the effect or the helper
   is there at all) does what `--direct-mic uninstall` (as admin) does: put every mic's

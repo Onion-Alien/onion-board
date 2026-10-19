@@ -1,7 +1,7 @@
 """Straight into my mic (soundboard.mic.directmic + native/directmic/obmic.cpp).
 
 The end-to-end tests run the real mic effect DLL in testhost.exe (built by
-scripts/build_directmic.py --testhost), which loads it the way Windows' audio engine
+scripts/directmic/build_directmic.py --testhost), which loads it the way Windows' audio engine
 does; they're skipped when it isn't built. Nothing touches the PC's audio devices.
 """
 from __future__ import annotations
@@ -1075,7 +1075,7 @@ def test_late_pump_sends_all_the_voice(ring_file):
 # ---------------------------------------------------------------------- the real effect
 
 _have_host = pytest.mark.skipif(not (HOST.is_file() and DLL.is_file()),
-                                reason="run scripts/build_directmic.py --testhost")
+                                reason="run scripts/directmic/build_directmic.py --testhost")
 
 
 def needs_host(test):
@@ -1752,7 +1752,7 @@ def test_a_header_gone_bad_puts_the_mic_back_until_it_is_right(ring_file):
 FUZZ_HOST = BUILD / "fuzzhost.exe"
 FUZZ_DLL = BUILD / "obmic_fuzz.dll"
 _have_fuzz = pytest.mark.skipif(not (FUZZ_HOST.is_file() and FUZZ_DLL.is_file()),
-                                reason="run scripts/build_directmic.py --fuzz")
+                                reason="run scripts/directmic/build_directmic.py --fuzz")
 
 
 def needs_fuzz(test):
@@ -1784,7 +1784,7 @@ def test_lead_grows_just_enough_and_comes_back(tmp_path):
 def test_effect_survives_a_short_fuzz(tmp_path):
     """A few seconds of fuzzhost (hostile, truncated and half-written ring files; the
     effect with sanitizer traps): no crash, hang, caught fault or sound out of range.
-    scripts/fuzz_directmic.py runs it for longer."""
+    scripts/directmic/fuzz_directmic.py runs it for longer."""
     r = subprocess.run([str(FUZZ_HOST), str(FUZZ_DLL), str(tmp_path), "4", "12345"],
                        capture_output=True, text=True, timeout=60)
     assert r.returncode == 0 and "0 findings" in r.stdout, r.stdout[-3000:] + r.stderr

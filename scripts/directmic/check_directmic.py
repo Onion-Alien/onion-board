@@ -1,7 +1,7 @@
 """Check the mic effect's C++ (native/directmic/) without running it: g++ with extra
 warnings as errors, GCC's static analyzer, and cppcheck. Exit 0 = nothing found.
 
-    .venv\\Scripts\\python scripts\\check_directmic.py [--need-cppcheck]
+    .venv\\Scripts\\python scripts\\directmic\\check_directmic.py [--need-cppcheck]
 
 Nothing is built or changed (g++ only parses and analyses), so the shipped obmic.dll's
 bytes can't move. cppcheck is skipped with a note when it isn't installed (WinLibs

@@ -28,7 +28,8 @@
 // no file or registry access there. Everything that touches the shared file runs
 // through guarded() (a fault there, say a disk error paging the file in, puts the mic
 // back as it was and rests the effect for a moment instead of taking audiodg down).
-// native/directmic/fuzzhost.cpp hammers it with hostile files (scripts/fuzz_directmic.py).
+// native/directmic/fuzzhost.cpp hammers it with hostile files
+// (scripts/directmic/fuzz_directmic.py).
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -422,7 +423,7 @@ __attribute__((noinline)) static bool guarded(void (*fn)(void *), void *ctx) {
 #endif
 
 #ifdef OBMIC_FUZZ
-// fuzz build only (scripts/fuzz_directmic.py): how many faults the guard caught
+// fuzz build only (scripts/directmic/fuzz_directmic.py): how many faults the guard caught
 extern "C" __declspec(dllexport) LONG ObmicFuzzFaults(DWORD *code, void **addr) {
     if (code) *code = g_faultCode;
     if (addr) *addr = g_faultAddr;
