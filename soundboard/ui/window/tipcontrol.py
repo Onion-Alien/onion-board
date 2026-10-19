@@ -141,17 +141,15 @@ class TipControl(Controller):
         box = TabHelpPopup(
             _("When to use the cable"),
             _("Most people don't need it: your sounds go into the mic you already use. "
-              "The cable is the better pick if:<br><br>"
-              "• <b>You have no mic</b>, or it's often unplugged. The cable works without "
-              "one, so you can still play sounds to others.<br>"
+              "The cable is for two cases:<br><br>"
+              "• <b>You don't have a mic.</b> Without one there's nothing to put your sounds "
+              "into, but the cable works on its own: others hear your sounds through it.<br>"
               "• <b>You'd rather Onion Board didn't touch your mic.</b> Putting sounds into "
               "your mic adds Onion Board's audio driver to it, and Windows asks you to "
-              "allow that. The cable is VB-Audio's own free driver instead (its installer "
-              "asks Windows too), and Onion Board leaves your mic as it is.<br>"
-              "• <b>A game or app skips Onion Board's driver</b>, so others hear your "
-              "voice but not your sounds.<br><br>"
+              "allow that. With the cable, Onion Board leaves your mic as it is: the cable "
+              "is VB-Audio's own free driver (its installer asks Windows too).<br><br>"
               "With the cable, pick <b>CABLE Output</b> as the mic in Discord and in each "
-              "game. If you have a mic, your voice goes along with your sounds."),
+              "game."),
             parent=mw)
         box.body.setTextFormat(Qt.TextFormat.RichText)   # (the bold and the list)
         self._show_help(box, mw.btn_cableinfo)

@@ -2851,7 +2851,6 @@
   "Click Yes when Windows asks.": "Windows 询问时点击“是”。",
   "Discord: one setting worth changing": "Discord：一个值得改的设置",
   "For streamers and mixers: send your sounds to Voicemeeter, OBS, a mixer or a capture card, or to nobody.": "给主播和调音台用：把你的音效发送到 Voicemeeter、OBS、调音台或采集卡，或者不发送。",
-  "If you'd rather not add Onion Board's audio driver to your mic, or a game skips it: a free virtual cable you pick as the mic in Discord and games.": "如果你不想把 Onion Board 的音频驱动加到麦克风上，或者某个游戏会跳过它：用一条免费的虚拟音频线，在 Discord 和游戏里把它选作麦克风。",
   "Installed": "已安装",
   "Keep my mic": "保留我的麦克风",
   "Not set up": "未设置",
@@ -4118,6 +4117,7 @@
   "Your sounds reach your friends clean now, not muffled or cut off.": "你的声音现在能清楚地传给朋友，不再发闷或断断续续。",
   "{name} is set up for your sounds": "{name} 已为你的声音设置好",
   "What's popular right now": "现在流行的",
-  "Most people don't need it: your sounds go into the mic you already use. The cable is the better pick if:<br><br>• <b>You have no mic</b>, or it's often unplugged. The cable works without one, so you can still play sounds to others.<br>• <b>You'd rather Onion Board didn't touch your mic.</b> Putting sounds into your mic adds Onion Board's audio driver to it, and Windows asks you to allow that. The cable is VB-Audio's own free driver instead (its installer asks Windows too), and Onion Board leaves your mic as it is.<br>• <b>A game or app skips Onion Board's driver</b>, so others hear your voice but not your sounds.<br><br>With the cable, pick <b>CABLE Output</b> as the mic in Discord and in each game. If you have a mic, your voice goes along with your sounds.": "大多数人用不到：你的音效会进入你正在用的麦克风。以下情况用音频线更好：<br><br>• <b>你没有麦克风</b>，或者经常拔掉。音频线没有麦克风也能用，你照样可以给别人放音效。<br>• <b>你不想让 Onion Board 动你的麦克风。</b>把音效送进麦克风会给它加上 Onion Board 的音频驱动，Windows 会请你允许。音频线则是 VB-Audio 自己的免费驱动（它的安装程序也会请求 Windows 允许），Onion Board 不会动你的麦克风。<br>• <b>某个游戏或应用跳过了 Onion Board 的驱动</b>，别人能听到你的声音，却听不到音效。<br><br>用音频线时，在 Discord 和每个游戏里把 <b>CABLE Output</b> 选为麦克风。如果你有麦克风，你的声音会和音效一起传过去。",
-  "When to use the cable": "什么时候用音频线"
+  "When to use the cable": "什么时候用音频线",
+  "Most people don't need it: your sounds go into the mic you already use. The cable is for two cases:<br><br>• <b>You don't have a mic.</b> Without one there's nothing to put your sounds into, but the cable works on its own: others hear your sounds through it.<br>• <b>You'd rather Onion Board didn't touch your mic.</b> Putting sounds into your mic adds Onion Board's audio driver to it, and Windows asks you to allow that. With the cable, Onion Board leaves your mic as it is: the cable is VB-Audio's own free driver (its installer asks Windows too).<br><br>With the cable, pick <b>CABLE Output</b> as the mic in Discord and in each game.": "大多数人用不到：你的音效会进入你正在用的麦克风。音频线适用于两种情况：<br><br>• <b>你没有麦克风。</b>没有麦克风，音效就无处可送，但音频线可以单独工作：别人通过它听到你的音效。<br>• <b>你不想让 Onion Board 动你的麦克风。</b>把音效送进麦克风会给它加上 Onion Board 的音频驱动，Windows 会请你允许。用音频线时，Onion Board 不会动你的麦克风：音频线是 VB-Audio 自己的免费驱动（它的安装程序也会请求 Windows 允许）。<br><br>用音频线时，在 Discord 和每个游戏里把 <b>CABLE Output</b> 选为麦克风。",
+  "No mic, or you'd rather Onion Board didn't touch yours? Use a free virtual cable instead: you pick it as the mic in Discord and games.": "没有麦克风，或者不想让 Onion Board 动你的麦克风？那就用免费的虚拟音频线：在 Discord 和游戏里把它选为麦克风。"
 }

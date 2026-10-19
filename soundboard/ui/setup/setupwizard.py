@@ -1117,8 +1117,8 @@ class SetupWizard(QDialog):
         self.btn_alt_cable.clicked.connect(self._alt_cable)
         self.alt_cable_row = tile(
             "cable", _("Virtual cable"),
-            _("If you'd rather not add Onion Board's audio driver to your mic, or a game "
-              "skips it: a free virtual cable you pick as the mic in Discord and games."),
+            _("No mic, or you'd rather Onion Board didn't touch yours? Use a free virtual "
+              "cable instead: you pick it as the mic in Discord and games."),
             self.btn_alt_cable)
         self.btn_alt_other = QPushButton(_("Pick a device"))
         icons.set_icon(self.btn_alt_other, "sliders")

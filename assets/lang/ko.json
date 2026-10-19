@@ -2851,7 +2851,6 @@
   "Click Yes when Windows asks.": "Windows가 물으면 예를 클릭하세요.",
   "Discord: one setting worth changing": "Discord: 바꿔 둘 만한 설정 하나",
   "For streamers and mixers: send your sounds to Voicemeeter, OBS, a mixer or a capture card, or to nobody.": "스트리머와 믹서용: 사운드를 Voicemeeter, OBS, 믹서나 캡처 카드로 보내거나 아무 데도 보내지 않습니다.",
-  "If you'd rather not add Onion Board's audio driver to your mic, or a game skips it: a free virtual cable you pick as the mic in Discord and games.": "Onion Board의 오디오 드라이버를 마이크에 넣고 싶지 않거나 게임이 그것을 건너뛴다면: Discord와 게임에서 마이크로 고르는 무료 가상 케이블.",
   "Installed": "설치됨",
   "Keep my mic": "마이크 유지",
   "Not set up": "설정 안 됨",
@@ -4118,6 +4117,7 @@
   "Your sounds reach your friends clean now, not muffled or cut off.": "이제 사운드가 먹먹하거나 끊기지 않고 친구들에게 깨끗하게 전달돼요.",
   "{name} is set up for your sounds": "{name}이(가) 사운드용으로 설정됐어요",
   "What's popular right now": "지금 인기 있는 것",
-  "Most people don't need it: your sounds go into the mic you already use. The cable is the better pick if:<br><br>• <b>You have no mic</b>, or it's often unplugged. The cable works without one, so you can still play sounds to others.<br>• <b>You'd rather Onion Board didn't touch your mic.</b> Putting sounds into your mic adds Onion Board's audio driver to it, and Windows asks you to allow that. The cable is VB-Audio's own free driver instead (its installer asks Windows too), and Onion Board leaves your mic as it is.<br>• <b>A game or app skips Onion Board's driver</b>, so others hear your voice but not your sounds.<br><br>With the cable, pick <b>CABLE Output</b> as the mic in Discord and in each game. If you have a mic, your voice goes along with your sounds.": "대부분은 필요 없어요: 사운드는 이미 쓰는 마이크로 들어가요. 이럴 땐 케이블이 더 좋아요:<br><br>• <b>마이크가 없을 때</b>, 또는 자주 뽑아 둘 때. 케이블은 마이크 없이도 되니까 다른 사람에게 사운드를 들려줄 수 있어요.<br>• <b>Onion Board가 마이크를 건드리지 않았으면 할 때.</b> 마이크로 사운드를 보내면 마이크에 Onion Board의 오디오 드라이버가 추가되고, Windows가 허용할지 물어요. 케이블은 대신 VB-Audio의 무료 드라이버이고(설치 프로그램도 Windows에 물어요), Onion Board는 마이크를 그대로 둬요.<br>• <b>게임이나 앱이 Onion Board의 드라이버를 건너뛸 때</b>. 그러면 다른 사람에게 목소리는 들리지만 사운드는 안 들려요.<br><br>케이블을 쓸 땐 Discord와 각 게임에서 <b>CABLE Output</b>을 마이크로 고르세요. 마이크가 있으면 목소리도 사운드와 함께 가요.",
-  "When to use the cable": "케이블은 언제 쓰나요"
+  "When to use the cable": "케이블은 언제 쓰나요",
+  "Most people don't need it: your sounds go into the mic you already use. The cable is for two cases:<br><br>• <b>You don't have a mic.</b> Without one there's nothing to put your sounds into, but the cable works on its own: others hear your sounds through it.<br>• <b>You'd rather Onion Board didn't touch your mic.</b> Putting sounds into your mic adds Onion Board's audio driver to it, and Windows asks you to allow that. With the cable, Onion Board leaves your mic as it is: the cable is VB-Audio's own free driver (its installer asks Windows too).<br><br>With the cable, pick <b>CABLE Output</b> as the mic in Discord and in each game.": "대부분은 필요 없어요: 사운드는 이미 쓰는 마이크로 들어가요. 케이블은 두 경우를 위한 거예요:<br><br>• <b>마이크가 없어요.</b> 마이크가 없으면 사운드를 넣을 곳이 없지만, 케이블은 혼자서도 돼요: 다른 사람은 케이블을 통해 사운드를 들어요.<br>• <b>Onion Board가 마이크를 건드리지 않았으면 해요.</b> 마이크로 사운드를 보내면 마이크에 Onion Board의 오디오 드라이버가 추가되고, Windows가 허용할지 물어요. 케이블을 쓰면 Onion Board는 마이크를 그대로 둬요: 케이블은 VB-Audio의 무료 드라이버예요(설치 프로그램도 Windows에 물어요).<br><br>케이블을 쓸 땐 Discord와 각 게임에서 <b>CABLE Output</b>을 마이크로 고르세요.",
+  "No mic, or you'd rather Onion Board didn't touch yours? Use a free virtual cable instead: you pick it as the mic in Discord and games.": "마이크가 없거나, Onion Board가 마이크를 건드리지 않았으면 하나요? 대신 무료 가상 케이블을 쓰세요: Discord와 게임에서 마이크로 고르면 돼요."
 }
