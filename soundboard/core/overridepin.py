@@ -12,17 +12,24 @@ crashes outright. Tests: tests/test_overridepin.py reproduces it.
 
 `pin()` gives each override of a Qt method a reference count no stolen reference can
 empty. They belong to classes, which live as long as the app anyway. It's cheap
-(~0.2 ms for every class), and only classes it hasn't seen are looked at again, so
-the UI-thread collector (uigc) calls it on every tick for classes imported later.
+(~0.2 ms for every class), and only classes it hasn't seen are looked at again. Finding
+them still walks every Qt class (~1 ms with ~700 of them), so the UI-thread collector
+(uigc) calls `pin_new()` on every tick: a walk only once a module was imported since the
+last one, or WALK_S after it (a class made inside a function). Walking on every tick
+was about 1% of a core with nothing else going on, more on a slower PC.
 """
 from __future__ import annotations
 
 import ctypes
 import sys
+import time
 import types
 import weakref
 
 PIN = 1 << 24   # references added to each override: far more than any burst of steals
+WALK_S = 1.0    # pin_new: the classes walked again at least this often
+
+_walked = (-1, 0.0)   # (modules imported, monotonic time) at pin_new's last walk
 
 _done: weakref.WeakSet[type] = weakref.WeakSet()   # classes already pinned
 
@@ -70,3 +77,15 @@ def pin() -> int:
                     _pin(value)
                     pinned += 1
     return pinned
+
+
+def pin_new(now: float | None = None) -> int:
+    """pin(), when a module was imported since the last walk or WALK_S has passed;
+    how many functions were pinned (0 when it skipped)."""
+    global _walked
+    now = time.monotonic() if now is None else now
+    mods, at = _walked
+    if len(sys.modules) == mods and 0 <= now - at < WALK_S:
+        return 0
+    _walked = (len(sys.modules), now)
+    return pin()
