@@ -22,10 +22,11 @@ TILE = 44        # a row's picture, px square
 BUN_ROOM = 470   # the tab hides Bun below this width (the title and buttons need it)
 BUN_TALL = 480   # ... or this height (the list needs it)
 
-# a category's own emoji (and its tile's colour, by its place in store.CATS)
+# a category's own emoji (and its tile's colour, by its place in store.SITE_CATS)
 CAT_EMOJI = {"memes": "😂", "reactions": "😮", "games": "🎮", "movies": "🎬", "tv": "📺",
              "music": "🎵", "sports": "⚽", "viral": "🔥", "pranks": "🤡", "politics": "🏛️",
-             "streamer": "📡", "esports": "🏆", "podcast": "🎙️", "spooky": "👻"}
+             "streamer": "📡", "esports": "🏆", "podcast": "🎙️", "spooky": "👻",
+             "onionboard": "🧅"}
 FALLBACK = "🔊"
 # a community voice's kind (the Store's Voices) -> its tile's emoji when it has none
 KIND_EMOJI = {"fx": "🎭", "ai": "🤖", "setup": "🎛️"}
@@ -34,7 +35,7 @@ KIND_EMOJI = {"fx": "🎭", "ai": "🤖", "setup": "🎛️"}
 CAT_ICON = {"memes": "laugh", "reactions": "wow", "games": "gamepad", "movies": "clapper",
             "tv": "tv", "music": "music", "sports": "ball", "viral": "flame",
             "pranks": "wink", "politics": "columns", "streamer": "live", "esports": "trophy",
-            "podcast": "mic", "spooky": "ghost"}
+            "podcast": "mic", "spooky": "ghost", "onionboard": "onion"}
 KIND_ICON = {"fx": "voice", "ai": "robot", "setup": "setup"}
 ALL_ICON = "sounds"
 
@@ -95,8 +96,8 @@ def sound_emoji(s) -> str:
 def tile_hue(s) -> int:
     """The tile's colour, 0..359: the category's own, else one from the sound's id (the
     same sound always gets the same colour)."""
-    if getattr(s, "cat", "") in store.CATS:
-        return round(store.CATS.index(s.cat) * 360 / len(store.CATS) + 12) % 360
+    if getattr(s, "cat", "") in store.SITE_CATS:
+        return round(store.SITE_CATS.index(s.cat) * 360 / len(store.SITE_CATS) + 12) % 360
     return zlib.crc32(s.id.encode()) % 360
 
 

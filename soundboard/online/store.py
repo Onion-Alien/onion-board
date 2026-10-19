@@ -36,9 +36,12 @@ MAX_BYTES = 4 << 20         # the biggest sound the store takes
 EXTS = (".mp3", ".ogg", ".wav", ".flac")   # what it takes (checked from the bytes there)
 LIST_LIMIT = 1 << 20        # a page of the list is a few KB
 REASONS = ("copyright", "offensive", "broken", "other")
-# the store's categories (the server's CATS), in the order the chips show them
-CATS = ("memes", "reactions", "games", "movies", "tv", "music", "sports", "viral", "pranks",
-        "politics", "streamer", "esports", "podcast", "spooky")
+# the store's categories (the server's CATS), then OURS; the dropdown shows them in the
+# server's order (OURS first, then the biggest)
+OURS = "onionboard"   # "Onion Board": the store's own sounds, shared by players or ours
+SITE_CATS = ("memes", "reactions", "games", "movies", "tv", "music", "sports", "viral",
+             "pranks", "politics", "streamer", "esports", "podcast", "spooky")   # a sound's
+CATS = (*SITE_CATS, OURS)
 
 
 def cat_name(key: str) -> str:
@@ -48,7 +51,7 @@ def cat_name(key: str) -> str:
             "movies": _("Movies"), "tv": _("TV"), "music": _("Music"), "sports": _("Sports"),
             "viral": _("Viral"), "pranks": _("Pranks"), "politics": _("Politics"),
             "streamer": _("Streaming"), "esports": _("Esports"), "podcast": _("Podcast"),
-            "spooky": _("Spooky")}.get(key, "")
+            "spooky": _("Spooky"), OURS: "Onion Board"}.get(key, "")
 ID_LEN = 12
 
 
@@ -110,7 +113,7 @@ class Sound:
     mine: int = 0      # this install's vote: 1, -1 or 0
     tags: list[str] = field(default_factory=list)
     link: str = ""     # a shared link (ext "link"): no file, the site's own download
-    cat: str = ""      # one of CATS, or none
+    cat: str = ""      # one of SITE_CATS, or none
     source: str = ""   # "myinstants": brought in from that site by the server; "" shared here
 
     @property
@@ -149,7 +152,7 @@ def parse(raw) -> tuple[list[Sound], bool]:
                       created=int(d.get("created") or 0), mine=int(d.get("mine") or 0),
                       tags=[str(t)[:24] for t in d.get("tags") or [] if isinstance(t, str)][:8],
                       link=str(d.get("link") or "")[:500],
-                      cat=str(d.get("cat") or "") if d.get("cat") in CATS else "",
+                      cat=str(d.get("cat") or "") if d.get("cat") in SITE_CATS else "",
                       source=str(d.get("source") or "")[:20])
         except (KeyError, TypeError, ValueError):
             continue
