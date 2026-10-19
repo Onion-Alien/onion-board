@@ -1619,3 +1619,41 @@ def test_resize_transactions_finish_before_painting(window, qapp, monkeypatch, p
     assert calls
     assert not window.fitctl.is_mini()
     assert window.tabs.currentWidget() is getattr(window, page)
+
+
+@pytest.mark.parametrize("size", [(800, 600), (1180, 720)])
+def test_setup_tab_in_and_out_again_measures_once(window, size, qapp, monkeypatch):
+    """Into and out of Setup, the window worked out what gives way from scratch: every
+    step undone and done again, the whole window measured 40-60 times (120 ms a switch
+    on a slower PC). Now each side's is kept for the window's size: the second time in
+    and out it's put back as it was, measured once to check."""
+    from soundboard.ui.window import responsive
+    from conftest import process_events
+    window.show()
+    window.tabs.setCurrentWidget(window.sounds_page)
+    window.resize(*size)
+    window.fitctl._refit()
+    qapp.processEvents()
+    fit = window.fitctl._fit
+    on_sounds = set(fit.applied())
+    measured = []
+    real = responsive.Fitter.need
+
+    def need(self):
+        if self._known is None:
+            measured.append(1)
+        return real(self)
+    monkeypatch.setattr(responsive.Fitter, "need", need)
+    seen = []
+    for page in (window.setup_page, window.sounds_page) * 2:
+        measured.clear()
+        window.tabs.setCurrentWidget(page)
+        process_events(qapp, lambda: False, timeout=0.3)   # (a refit comes after it too)
+        assert not window.fitctl.is_mini()
+        got = window._full.minimumSizeHint()
+        assert got.width() <= window._pages.width() and got.height() <= window._pages.height()
+        seen.append((set(fit.applied()), len(measured)))
+    (in1, _), (out1, _), (in2, m_in2), (out2, m_out2) = seen
+    assert out1 == out2 == on_sounds   # back as it was before Setup
+    assert in2 == in1                  # Setup as it was worked out the first time
+    assert m_in2 <= 4 and m_out2 <= 4, f"measured {m_in2} / {m_out2} times"

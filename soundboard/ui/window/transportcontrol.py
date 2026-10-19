@@ -52,7 +52,8 @@ class TransportControl(Controller):
             # From the play tick: just after it, not inside it
             if want and hasattr(mw.fitctl, "_fit"):
                 if not from_tick:
-                    mw.fitctl._refit()
+                    if not mw.fitctl.setup_switching():   # (it fits again next)
+                        mw.fitctl._refit()
                 elif not self._refit_due:
                     self._refit_due = True
 

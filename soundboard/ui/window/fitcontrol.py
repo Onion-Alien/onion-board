@@ -36,6 +36,8 @@ class FitControl(Controller):
 
     def __init__(self, mw: MainWindow):
         super().__init__(mw)
+        # what gave way with Setup showing and without, at one window size (_fit_setup_tab)
+        self._tab_fits: dict = {}
 
     def _init_fit(self):
         """What gives way when the window gets small (see ui/window/responsive.py). Lower
@@ -142,6 +144,25 @@ class FitControl(Controller):
                 self._refit_layout()
         finally:
             self._refitting = False
+        self._note_side()
+
+    def _key(self) -> tuple:
+        """What a kept side (_tab_fits) is good for: this window size (the pages' changes
+        with the tab: the transport bar), these steps."""
+        mw = self.mw
+        return (mw.width(), mw.height(), self._fit.changes)
+
+    def _note_side(self):
+        """What gives way now, kept for the side showing (Setup or not), unless a tab
+        switch is half-way (the tab showing isn't the one fitted for yet)."""
+        mw = self.mw
+        if (not hasattr(self, "_fit")
+                or getattr(mw, "_fit_tab", None) is not mw.tabs.currentWidget()):
+            return
+        key = self._key()
+        if self._tab_fits.get("key") != key:
+            self._tab_fits = {"key": key}
+        self._tab_fits[mw._fit_tab is mw.setup_page] = self._fit.applied()
 
     def _refit_layout(self):
         mw = self.mw
@@ -300,14 +321,32 @@ class FitControl(Controller):
         if getattr(mw, "_mixer_tight", False):   # its room changed: measure it again
             self._fit_mixer(True)
 
+    def setup_switching(self) -> bool:
+        """Half-way into or out of Setup: the tab shows, _fit_setup_tab hasn't fitted
+        the window for it yet (it does next, so a fit before it is wasted)."""
+        mw = self.mw
+        now, fitted = mw.tabs.currentWidget(), getattr(mw, "_fit_tab", None)
+        return (hasattr(self, "_fit") and now is not fitted
+                and mw.setup_page in (now, fitted))
+
     def _fit_setup_tab(self, _i: int):
         """Into or out of Setup: its width counts only while it shows (WidthScroll),
-        so what gives way is worked out again."""
+        so what gives way is worked out again, from scratch: every step undone and
+        done again, the whole window measured 40-60 times (120 ms a switch on a slower
+        PC). So what gave way on each side is kept, for this window size, and going
+        back and forth puts it back as it was (measured once, to check)."""
         mw = self.mw
         was, mw._fit_tab = mw._fit_tab, mw.tabs.currentWidget()
-        if hasattr(self, "_fit") and mw.setup_page in (was, mw._fit_tab):
-            self._fit.reset()
-            self._refit()
+        if not hasattr(self, "_fit") or mw.setup_page not in (was, mw._fit_tab):
+            return
+        fit = self._fit
+        known = (self._tab_fits.get(mw._fit_tab is mw.setup_page)
+                 if self._tab_fits.get("key") == self._key() else None)
+        if known is None:
+            fit.reset()
+        else:
+            fit.restore(known)
+        self._refit()   # (and kept for this side: _note_side)
 
     def _rail_opened(self, on: bool):
         """The rail opened out or shut: save it, and fit the window to its new width
