@@ -48,6 +48,34 @@ def test_chat_commands_play_list_and_wait_their_turn(qapp, window):
     assert d(w, "chat", user="Bea")[0] == 400
 
 
+def test_the_list_and_stop_wait_their_turn_too(qapp, window):
+    """One viewer can't flood chat with !sounds, and asking for the list doesn't hold up
+    the !sound after it. A viewer's !stop waits like a play; a mod's doesn't."""
+    w = window
+    d(w, "chat_rules", user_cooldown="30", cooldown="0", stop="everyone")
+    assert d(w, "chat", user="Ann", message="!sounds")[1]["handled"]
+    body = d(w, "chat", user="Ann", message="!sounds")[1]
+    assert not body["handled"] and body["reason"] == "cooldown" and body["wait"] > 0
+    assert d(w, "chat", user="Bea", message="!sounds")[1]["handled"]   # someone else
+    assert d(w, "chat", user="Ann", message="!sound boom")[1]["handled"]
+    stopped = []
+    w.playctl.stop_all = lambda: stopped.append(1)
+    body = d(w, "chat", user="Ann", message="!stop")[1]
+    assert body["reason"] == "cooldown" and not stopped
+    assert d(w, "chat", user="Mo", message="!stop", mod="1")[1]["handled"]
+    assert d(w, "chat", user="Mo", message="!stop", mod="1")[1]["handled"] and stopped == [1, 1]
+
+
+def test_bidi_overrides_are_taken_out_of_names_and_text(qapp, window):
+    """Right-to-left overrides in a name or a line can flip what the feed and the
+    overlay show: they're dropped like other control characters."""
+    w = window
+    d(w, "chat_rules", tts="everyone", cooldown="0", user_cooldown="0")
+    body = d(w, "chat", user="‮Ann‬", message="⁧hi⁩ ‪all‬")[1]
+    assert body["handled"] and body["user"] == "Ann" and w.said == ["Ann says hi all"]
+    assert streamapi.clean_text("a‭b⁦c", {}) == "a b c"
+
+
 def test_random_names_a_category_outside_chats_one(qapp, window):
     """Under a category limit, !random <another real category> says that's not chat's
     one (it used to answer "no such category", and posted nothing)."""
