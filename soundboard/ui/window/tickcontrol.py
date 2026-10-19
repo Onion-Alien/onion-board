@@ -138,6 +138,9 @@ class TickControl(Controller):
         if (LINK_ID not in playing and mw.linkbar.up_next()
                 and not mw.playctl._board_song_playing(playing) and mw.linkbar.play_next()):
             playing = e.playing()   # the web search song ended: the next one waiting
+        if LINK_ID not in playing:   # a Play's sound stopped: its "Playing" card goes
+            for bar in (mw.download_bar, mw.mini_download_bar):
+                bar.play_ended(mw.linkbar.playing_url)
         live = any((sid in mw._meta or sid == LINK_ID) and not paused   # a web search's
                    for sid, (_p, paused) in playing.items())                # Play too
         if live != self._sounds_live:   # the Sounds tab glows while a sound plays
