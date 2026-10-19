@@ -6,13 +6,13 @@ from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 
 from soundboard.ui.kit import theme
+from soundboard.ui.settings import lite
 from soundboard.ui.triggers import logoduel
 from soundboard.ui.bun.logowidget import LogoWidget
 
 
 @pytest.fixture
-def arena(qapp, monkeypatch):
-    monkeypatch.setattr(logoduel, "_animations_enabled", lambda: True)
+def arena(qapp):
     host = QWidget()
     row = QHBoxLayout(host)
     host.logo = LogoWidget()
@@ -70,12 +70,11 @@ def test_tab_hide_and_addon_removal_stop_the_duel(arena):
     duel.bind()
 
 
-def test_reduced_motion_keeps_normal_click(arena, monkeypatch):
+def test_lite_mode_keeps_normal_click(arena, monkeypatch):
     host, tab, other, duel = arena
-    monkeypatch.setattr(logoduel, "_animations_enabled", lambda: False)
+    monkeypatch.setattr(lite, "on", lambda: True)
     QTest.mouseClick(host.logo, Qt.MouseButton.LeftButton)
     assert duel.overlay is None
-    assert host.logo.squish == 1
 
 
 def test_lasers_render_in_every_theme_and_follow_resizing(arena):

@@ -147,8 +147,10 @@ class ThemeCard(QPushButton):
 
     def enterEvent(self, e):
         super().enterEvent(e)
-        from soundboard.ui.kit.toast import animations_on
-        if self._hello is None and animations_on():   # (once per visit: no restart)
+        # Lite mode only, like Bun's other moves when stirred: Windows' Animation effects
+        # (toast.animations_on) is off on many PCs, and there he never waved
+        from soundboard.ui.settings import lite
+        if self._hello is None and not lite.on():   # (once per visit: no restart)
             self._hello = time.monotonic()
             self._tick.start()
 

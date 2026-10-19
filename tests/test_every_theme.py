@@ -251,11 +251,11 @@ def test_hovering_a_theme_card_makes_bun_wave(qapp, monkeypatch):
     from PySide6.QtGui import QEnterEvent
 
     from soundboard.ui.kit import toast
-    from soundboard.ui.settings import appearance
+    from soundboard.ui.settings import appearance, lite
 
     clock = [10.0]
     monkeypatch.setattr(appearance.time, "monotonic", lambda: clock[0])
-    monkeypatch.setattr(toast, "ANIMATE", True)
+    monkeypatch.setattr(toast, "ANIMATE", False)   # Windows' Animation effects off: he still waves
     card = ThemeCard("Royal")
     card.resize(card.sizeHint())
     still = card.grab().toImage()
@@ -266,6 +266,6 @@ def test_hovering_a_theme_card_makes_bun_wave(qapp, monkeypatch):
     clock[0] += appearance.WAVE_S
     card._step()
     assert not card._tick.isActive() and card.grab().toImage() == still
-    monkeypatch.setattr(toast, "ANIMATE", False)   # animations off: he stays still
+    monkeypatch.setattr(lite, "on", lambda: True)   # lite mode: he stays still
     card.enterEvent(QEnterEvent(QPointF(5, 5), QPointF(5, 5), QPointF(5, 5)))
     assert not card._tick.isActive()
