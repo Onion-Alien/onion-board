@@ -229,13 +229,15 @@ class Translator:
         self.sp = sentencepiece.SentencePieceProcessor(model_file=f"{folder}/sentencepiece.model")
         self.model = ctranslate2.Translator(f"{folder}/model", device=device,
                                             compute_type="int8" if device == "cpu" else "auto")
+        # the app's Use less CPU: one guess per word instead of two
+        self.beams = 1 if os.environ.get("ONIONBOARD_LESS_CPU") == "1" else 2
 
     def __call__(self, text: str) -> str:
         parts = [p for p in self.SENTENCE.split(text.strip()) if p]
         if not parts:
             return ""
         res = self.model.translate_batch([self.sp.encode(p, out_type=str) for p in parts],
-                                         beam_size=2, max_decoding_length=256)
+                                         beam_size=self.beams, max_decoding_length=256)
         # joined by hand: some models' target pieces aren't in the source tokenizer
         out = ["".join(r.hypotheses[0]).replace("▁", " ").strip() for r in res]
         text = ""

@@ -1,24 +1,25 @@
 """The veil over the window while files are dragged onto it: "Drop to add 4 files".
 
 Files can be dropped anywhere on the window, not only on the outlined box, so while a
-drag is over it the whole window says so. It watches drags for the window (an
-application event filter, since the pads' grid and other children take drags before
-the window sees them) and never takes a drop itself: it lets mouse and drag events
-through to whatever is under it. Pictures aren't announced: dropped on a pad they
+drag is over it the whole window says so. It watches drags on the window's own
+native window (winwatch.py: they reach it before the pads' grid and the other
+children that take them) and never takes a drop itself: it lets mouse and drag
+events through to whatever is under it. Pictures aren't announced: dropped on a pad they
 become its picture, not a new sound.
 """
 from __future__ import annotations
 
 from pathlib import PurePath
 
-from PySide6.QtCore import QEvent, QObject, QRectF, Qt, QTimer
+from PySide6.QtCore import QEvent, QRectF, Qt, QTimer
 from PySide6.QtGui import QColor, QCursor, QDragEnterEvent, QFont, QFontMetrics, QPainter, QPen
-from PySide6.QtWidgets import QApplication, QWidget
+from PySide6.QtWidgets import QWidget
 
 from soundboard.ui.kit import theme
 from soundboard.i18n import _, ngettext
 from soundboard.ui.kit import icons
 from soundboard.ui.kit.pixels import snap_to_pixels
+from soundboard.ui.window import winwatch
 
 PICTURE_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".jfif"}
 
@@ -33,9 +34,6 @@ def label_for(paths: list[str]) -> str | None:
 
 
 class DropVeil(QWidget):
-    EVENTS = (QEvent.Type.DragEnter, QEvent.Type.DragMove, QEvent.Type.DragLeave,
-              QEvent.Type.Drop)   # all its eventFilter reads (theme.app_filter)
-
     def __init__(self, window: QWidget):
         super().__init__(window)
         self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
@@ -47,24 +45,20 @@ class DropVeil(QWidget):
         # (PySide takes properties and signals as keywords; the stubs don't know)
         self._leave = QTimer(self, singleShot=True, interval=60, timeout=self._check_left)   # pyright: ignore[reportCallIssue]
         self.hide()
-        app = QApplication.instance()
-        assert app is not None
-        theme.app_filter(app, self)   # (sits out theme switches: 49,000 events each)
+        winwatch.watch(window).add(
+            (QEvent.Type.DragEnter, QEvent.Type.DragLeave, QEvent.Type.Drop), self._drag)
 
-    def eventFilter(self, obj: QObject, ev: QEvent) -> bool:
+    def _drag(self, ev: QEvent) -> bool:
         t = ev.type()
-        if t in (QEvent.Type.DragEnter, QEvent.Type.DragMove, QEvent.Type.DragLeave,
-                 QEvent.Type.Drop) \
-                and isinstance(obj, QWidget) and obj.window() is self._window:
-            if t == QEvent.Type.DragEnter and isinstance(ev, QDragEnterEvent):
-                self._leave.stop()
-                paths = [u.toLocalFile() for u in ev.mimeData().urls() if u.isLocalFile()] \
-                    if ev.mimeData().hasUrls() else []
-                self.show_for(label_for(paths))
-            elif t == QEvent.Type.DragLeave:
-                self._leave.start()
-            elif t == QEvent.Type.Drop:
-                self.hide()
+        if t == QEvent.Type.DragEnter and isinstance(ev, QDragEnterEvent):
+            self._leave.stop()
+            paths = [u.toLocalFile() for u in ev.mimeData().urls() if u.isLocalFile()] \
+                if ev.mimeData().hasUrls() else []
+            self.show_for(label_for(paths))
+        elif t == QEvent.Type.DragLeave:
+            self._leave.start()
+        elif t == QEvent.Type.Drop:
+            self.hide()
         return False
 
     def _check_left(self):

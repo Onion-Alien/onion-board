@@ -1,6 +1,6 @@
 // What people may write in the names, tags and descriptions everyone sees: no links,
-// none of the owner's blocked words (the CHAT_BLOCK secret, named for the chat room it
-// was first made for), and nothing too long. Sounds' and voices' routes both use it.
+// none of the owner's blocked words (the BLOCKED_WORDS secret), and nothing too long.
+// Sounds' and voices' routes both use it.
 
 const MAX_LEN = 280;
 

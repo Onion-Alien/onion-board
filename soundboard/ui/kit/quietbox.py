@@ -111,26 +111,44 @@ def tidy_input(dlg: QInputDialog) -> None:
         ok.style().polish(ok)
 
 
+def _polished(w) -> None:
+    """Every widget as the app style polishes it (wheelguard.on_polish): a box is
+    silenced before it's sized, and watched for its Show."""
+    if isinstance(w, QMessageBox):
+        silence(w)
+        w.installEventFilter(_show_filter())   # once: Qt doesn't add it twice
+    elif isinstance(w, QInputDialog):
+        w.installEventFilter(_show_filter())
+
+
 class _Filter(QObject):
-    EVENTS = (QEvent.Type.Polish, QEvent.Type.Show)   # all it reads (theme.app_filter)
+    """On each message box and ask-for-a-name box only, never the whole app (an
+    application filter is called for every event of every object). Show comes before
+    the box's showEvent, which plays the sound and sizes the box: it catches an icon
+    or text set after the box was polished."""
 
     def eventFilter(self, obj, event):   # noqa: N802 - Qt API
-        # Polish comes before the box is sized; Show (before its showEvent, which
-        # plays the sound and sizes the box) catches an icon or text set after that
-        if event.type() in (QEvent.Type.Polish, QEvent.Type.Show):
+        if event.type() == QEvent.Type.Show:
             if isinstance(obj, QMessageBox):
                 silence(obj)
-                if event.type() == QEvent.Type.Show:
-                    tidy(obj)
-            elif isinstance(obj, QInputDialog) and event.type() == QEvent.Type.Show:
+                tidy(obj)
+            elif isinstance(obj, QInputDialog):
                 tidy_input(obj)
         return False
+
+
+_filter: _Filter | None = None
+
+
+def _show_filter() -> _Filter:
+    global _filter
+    if _filter is None:
+        _filter = _Filter()
+    return _filter
 
 
 def install(app: QApplication) -> None:
     """Silence and restyle every Information/Warning/Question QMessageBox (and tidy
     every QInputDialog) the app shows from now on."""
-    from soundboard.ui.kit import theme
-    f = _Filter(app)
-    app._quietbox_filter = f   # pyright: ignore[reportAttributeAccessIssue]  # kept alive with the app
-    theme.app_filter(app, f)   # (sits out theme switches: no boxes made)
+    from soundboard.ui.kit import wheelguard
+    wheelguard.on_polish(_polished)

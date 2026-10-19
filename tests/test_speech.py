@@ -970,8 +970,12 @@ def test_the_speech_helper_sleeps_between_sentences_and_uses_two_threads_when_li
     env = live.helper_env({"PATH": "x"})
     assert env["OMP_WAIT_POLICY"] == "PASSIVE" and env["KMP_BLOCKTIME"] == "0"
     assert "OMP_NUM_THREADS" not in env and env["PATH"] == "x"
+    assert "ONIONBOARD_LESS_CPU" not in env and live.lighter_args("small") == []
     voicefx.set_light(True)
     try:
-        assert live.helper_env({})["OMP_NUM_THREADS"] == "2"
+        light = live.helper_env({})
+        assert light["OMP_NUM_THREADS"] == "2" and light["ONIONBOARD_LESS_CPU"] == "1"
+        assert live.lighter_args("small") == ["--lighter", "base"]
+        assert live.lighter_args("tiny.en") == []   # already the smallest
     finally:
         voicefx.set_light(False)

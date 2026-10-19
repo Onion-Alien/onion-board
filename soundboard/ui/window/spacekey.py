@@ -10,12 +10,11 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from PySide6.QtCore import QEvent, QObject, Qt
+from PySide6.QtCore import QEvent, QObject, Qt, QTimer
 from PySide6.QtWidgets import (QAbstractButton, QAbstractSpinBox, QApplication, QComboBox,
                                QLineEdit, QPlainTextEdit, QTextEdit, QWidget)
 
-KEYBOARD_FOCUS = (Qt.FocusReason.TabFocusReason, Qt.FocusReason.BacktabFocusReason)
-
+from soundboard.ui.window import winwatch
 
 def types_text(w: QWidget | None) -> bool:
     """Space types a space here."""
@@ -37,30 +36,39 @@ def handles_space(w: QWidget | None) -> bool:
 
 
 class SpaceKey(QObject):
-    """Installed on the application. `action()` gives what Space does right now (a
-    callable, or None to leave Space alone: another tab, a dialog in front);
-    `window` is the main window, so other windows keep their Space."""
-    EVENTS = (QEvent.Type.FocusIn, QEvent.Type.KeyPress)   # all it reads (theme.app_filter)
+    """On the main window's own native window (winwatch.py), so other windows keep
+    their Space. `action()` gives what Space does right now (a callable, or None to
+    leave Space alone: another tab, a dialog in front)."""
 
     def __init__(self, window: QWidget, action: Callable[[], Callable[[], None] | None]):
         super().__init__(window)
         self.window = window
         self.action = action
         self._kbd: QWidget | None = None   # the widget the keyboard last moved focus to
+        self._tabbing = False              # a Tab press is moving the focus right now
+        app = QApplication.instance()
+        assert isinstance(app, QApplication)
+        app.focusChanged.connect(self._focus_moved)
+        winwatch.watch(window).add((QEvent.Type.KeyPress,), self._key)
 
-    def eventFilter(self, obj, ev) -> bool:
-        t = ev.type()
-        if t == QEvent.Type.FocusIn:
-            self._kbd = obj if ev.reason() in KEYBOARD_FOCUS else None
+    def _focus_moved(self, _old, new) -> None:
+        # Qt's own Tab handling moves the focus inside the key press (a FocusIn with
+        # TabFocusReason); anything else (a click, the window coming back) doesn't count
+        self._kbd = new if self._tabbing else None
+
+    def _done_tabbing(self) -> None:
+        self._tabbing = False
+
+    def _key(self, ev) -> bool:
+        key = ev.key()
+        if key in (Qt.Key.Key_Tab, Qt.Key.Key_Backtab):
+            self._tabbing = True   # until this press has been handled
+            QTimer.singleShot(0, self, self._done_tabbing)
             return False
-        if t != QEvent.Type.KeyPress or ev.key() != Qt.Key.Key_Space or ev.modifiers() not in (
+        if key != Qt.Key.Key_Space or ev.modifiers() not in (
                 Qt.KeyboardModifier.NoModifier, Qt.KeyboardModifier.KeypadModifier):
             return False
-        fw = QApplication.focusWidget()
-        # the key goes to the focus widget first, then up to its parents: act once
-        target = fw if fw is not None else obj
-        if obj is not target or not isinstance(obj, QWidget) or obj.window() is not self.window:
-            return False
+        fw = self.window.focusWidget()   # where the window hands the key
         if types_text(fw) or handles_space(fw):
             return False
         if isinstance(fw, QAbstractButton) and fw is self._kbd:

@@ -190,6 +190,20 @@ def test_a_setup_has_its_language_and_the_helper_hears_any():
     assert livesetup.lang_args("not-ours", target)[1] == "small"
 
 
+def test_use_less_cpu_offers_the_languages_helper_the_smaller_model():
+    from soundboard import voicefx
+    target = SimpleNamespace(id="translate-de", language="de", path=Path("x"))
+    voicefx.set_light(True)
+    try:
+        args = livesetup.lang_args("base.en", target)
+        # small hears any language; base is the lighter one (used only if it's there)
+        assert args[1] == "small" and args[args.index("--lighter") + 1] == "base"
+        assert args[args.index("--translate") - 2:args.index("--translate")] == [
+            "--task", "translate"]
+    finally:
+        voicefx.set_light(False)
+
+
 def test_the_helper_hears_a_whole_sound_and_says_when_each_line_starts():
     x = talk([(0.5, False), (1.0, True), (1.0, False), (0.8, True), (0.3, False)])
     seen = []
