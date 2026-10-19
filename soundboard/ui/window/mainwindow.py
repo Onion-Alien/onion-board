@@ -79,6 +79,7 @@ from soundboard.ui.sounds.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.bun.logowidget import glow_icon
 from soundboard.ui.window import sidebar
 from soundboard.ui.window.spacekey import SpaceKey
+from soundboard.ui.window import winwatch
 from soundboard.ui.sounds.overlay import Overlay
 from soundboard.ui.apps.appspanel import AppsTab
 from soundboard.ui.triggers.triggershost import BoardHost
@@ -602,7 +603,6 @@ class MainWindow(QMainWindow):
         app.applicationStateChanged.connect(self.micctl._app_state)
         # Space plays / pauses on the Sounds and Radio tabs, wherever the focus is
         self._space = SpaceKey(self, self.playctl._space_action)
-        theme.app_filter(QApplication.instance(), self._space)
         # which voice chat the game you're playing uses: a hint by Who's listening
         self.voice_suggestion: str | None = None
         self.voice_why = ""   # why it's suggested, for the hint ("Discord is listening…")
@@ -1489,6 +1489,7 @@ class MainWindow(QMainWindow):
     def showEvent(self, ev):
         shellicon.on_show(self)   # the Jump List icon, before the taskbar button exists
         shellicon.paint_background(self, theme.T["bg"])
+        winwatch.watch(self).attach()   # Space and the drop veil: a new QWindow after Always on top
         super().showEvent(ev)
         if not getattr(self, "_start_focus_set", False):
             # (again here: start-up can still switch the tab after __init__, to Setup)

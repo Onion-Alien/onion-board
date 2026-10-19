@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 from PySide6.QtCore import QEvent, Qt
-from PySide6.QtGui import QFocusEvent, QKeyEvent
+from PySide6.QtGui import QKeyEvent
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QPushButton
 
@@ -36,6 +36,8 @@ class FakePlayer:
 def window(main_window):  # noqa: F811
     main_window.tabs.setCurrentWidget(main_window.sounds_page)
     main_window.show()
+    main_window.activateWindow()   # keys and focus changes go to the active window
+    QApplication.processEvents()
     return main_window
 
 
@@ -45,15 +47,25 @@ def player(window, monkeypatch):
     return FakePlayer(window, monkeypatch)
 
 
+def key(w, k, text=""):
+    """A key pressed in `w`'s window, the way Qt delivers it: to the window's own
+    QWindow first (where Space is watched), which hands it to the focused widget."""
+    QApplication.sendEvent(w.window().windowHandle(), QKeyEvent(QEvent.KeyPress, k, Qt.NoModifier, text))
+
+
 def focus(w, reason):
-    """Give `w` the focus as a click (MouseFocusReason) or Tab would."""
-    w.setFocus(reason)
-    QApplication.sendEvent(w, QFocusEvent(QEvent.FocusIn, reason))
+    """Give `w` the focus as a click (MouseFocusReason) or the Tab key would."""
+    if reason == Qt.TabFocusReason:   # a real Tab press from the widget before it
+        w.previousInFocusChain().setFocus(Qt.OtherFocusReason)
+        key(w, Qt.Key_Tab)
+        assert w.window().focusWidget() is w
+    else:
+        w.setFocus(reason)
 
 
 def space(w):
-    """Space pressed with `w` focused, the way Qt delivers it: the app's filters first."""
-    QApplication.sendEvent(w, QKeyEvent(QEvent.KeyPress, Qt.Key_Space, Qt.NoModifier, " "))
+    """Space pressed with `w` focused."""
+    key(w, Qt.Key_Space, " ")
 
 
 def toolbar_button(window):
@@ -63,17 +75,12 @@ def toolbar_button(window):
     return btn
 
 
-def focused(monkeypatch, w):
-    monkeypatch.setattr(QApplication, "focusWidget", staticmethod(lambda: w))
-
-
 def test_space_pauses_the_player_after_a_button_was_clicked(window, player, monkeypatch):
     window.playctl.play("s0")
     assert player.paused("s0") is False
     btn = toolbar_button(window)
     clicks = []
     btn.clicked.connect(lambda: clicks.append(1))
-    focused(monkeypatch, btn)
     focus(btn, Qt.MouseFocusReason)
     space(btn)
     assert player.paused("s0") is True and not clicks   # paused, the button not pressed
@@ -85,12 +92,10 @@ def test_space_still_presses_a_button_reached_with_tab_and_types_in_text(
         window, player, monkeypatch):
     window.playctl.play("s0")
     btn = toolbar_button(window)
-    focused(monkeypatch, btn)
     focus(btn, Qt.TabFocusReason)
     space(btn)
     assert player.paused("s0") is False         # the keyboard's way to press a button
     box = window.search
-    focused(monkeypatch, box)
     focus(box, Qt.MouseFocusReason)
     space(box)
     assert player.paused("s0") is False and box.text() == " "
@@ -116,7 +121,6 @@ def test_space_on_a_web_result_playing_pauses_it_not_downloads_it_again(
     row = _link(window)
     fetched = []
     monkeypatch.setattr(window.linkbar, "play_once", lambda: fetched.append(1) or True)
-    focused(monkeypatch, row)
     focus(row, Qt.MouseFocusReason)
     space(row)                                    # the row's own Space: it's the one playing
     assert player.paused(LINK_ID) is True and not fetched
@@ -148,7 +152,6 @@ def test_space_on_the_radio_tab_plays_and_stops_the_radio(window, monkeypatch):
     calls = []
     monkeypatch.setattr(window.radio, "toggle_play", lambda: calls.append(1), raising=False)
     target = window.tabs.tabBar()
-    focused(monkeypatch, target)
     focus(target, Qt.MouseFocusReason)
     space(target)
     assert calls == [1]
@@ -244,15 +247,47 @@ def test_space_ticks_a_clicked_box_in_settings_over_the_sounds_tab(window, playe
     window.playctl.play("s0")
     window.setctl.open_settings("privacy")
     box = window.setctl._settings_dlg.offline_box
-    focused(monkeypatch, box)
     focus(box, Qt.MouseFocusReason)
-    QTest.keyClick(box, Qt.Key_Space)
+    QTest.keyClick(window.windowHandle(), Qt.Key_Space)
     assert box.isChecked() and player.paused("s0") is False
-    QTest.keyClick(box, Qt.Key_Space)   # and back, so nothing stays offline
+    QTest.keyClick(window.windowHandle(), Qt.Key_Space)   # and back, so nothing stays offline
     assert not box.isChecked()
     window.setctl.close_settings()
     btn = toolbar_button(window)
-    focused(monkeypatch, btn)
     focus(btn, Qt.MouseFocusReason)
     space(btn)
     assert player.paused("s0") is True   # back on Sounds: Space pauses again
+
+
+def test_space_still_plays_after_always_on_top_makes_a_new_window(window, player, monkeypatch):
+    """Always on top makes the window's QWindow again: Space is watched on the new one."""
+    window.playctl.play("s0")
+    monkeypatch.setattr(window, "set_option", lambda *a: None)
+    window.on_top_toggle(True)
+    try:
+        btn = toolbar_button(window)
+        focus(btn, Qt.MouseFocusReason)
+        space(btn)
+        assert player.paused("s0") is True
+    finally:
+        window.on_top_toggle(False)
+
+
+def test_dragging_files_over_the_window_shows_the_veil(window):
+    """The veil watches drags on the window's own QWindow: they reach it first."""
+    from PySide6.QtCore import QMimeData, QPoint, QUrl
+    from PySide6.QtGui import QDragEnterEvent, QDragLeaveEvent, QDropEvent
+    veil, handle = window.drop_veil, window.windowHandle()
+    data = QMimeData()
+    data.setUrls([QUrl.fromLocalFile("C:/a.mp3"), QUrl.fromLocalFile("C:/b.wav")])
+    enter = QDragEnterEvent(QPoint(10, 10), Qt.DropAction.CopyAction, data,
+                            Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier)
+    QApplication.sendEvent(handle, enter)
+    assert veil.isVisible() and veil.text == "Drop to add 2 files"
+    QApplication.sendEvent(handle, QDragLeaveEvent())
+    assert veil._leave.isActive()   # hides once the mouse has really left
+    QApplication.sendEvent(handle, enter)
+    drop = QDropEvent(QPoint(10, 10).toPointF(), Qt.DropAction.CopyAction, data,
+                      Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier)
+    veil._drag(drop)   # (not through the window: that would add the files)
+    assert not veil.isVisible()

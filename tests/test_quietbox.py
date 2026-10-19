@@ -7,10 +7,10 @@ from soundboard.ui.kit import quietbox
 
 @pytest.fixture
 def quiet(qapp):
-    f = quietbox._Filter(qapp)
-    qapp.installEventFilter(f)
+    from soundboard.ui.kit import wheelguard
+    quietbox.install(qapp)
     yield
-    qapp.removeEventFilter(f)
+    wheelguard.AppStyle.hooks.remove(quietbox._polished)
 
 
 @pytest.mark.parametrize("icon", [QMessageBox.Icon.Information, QMessageBox.Icon.Warning])
