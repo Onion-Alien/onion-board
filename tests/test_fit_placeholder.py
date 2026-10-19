@@ -25,13 +25,18 @@ def test_the_longest_hint_that_fits(qapp):
 def test_narrow_boxes_say_whole_words(window, qapp):  # noqa: F811
     w = window
     w.show()
+    checked = 0
     for width in (440, 900, 1280):
         w.resize(width, 700)
         for page, box in ((w.sounds_page, w.search), (w.voice, w.voice.speech.ed)):
             w.tabs.setCurrentWidget(page)
             process_events(qapp, lambda: False, 0.2)
+            if not box.isVisible():
+                continue   # 440 px is the mini player: the box is fitted when it shows
             hint = box.placeholderText()
             assert box.fontMetrics().horizontalAdvance(hint) < box.width() - 30, (width, hint)
+            checked += 1
+    assert checked >= 4
     w.resize(440, 700)
     w.tabs.setCurrentWidget(w.voice)
     process_events(qapp, lambda: False, 0.2)

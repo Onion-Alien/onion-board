@@ -1427,6 +1427,29 @@ def test_a_long_name_stays_on_one_line(window, qapp):
     assert pad._fit_name(QRectF(0, 0, 120, 60))[2] == "Boom" and not pad.name_cut
 
 
+def test_the_search_box_never_grows_as_the_window_narrows(window, qapp):
+    """Narrowing the window drops the card size and the toolbar buttons' words one by
+    one; the room they gave up went to the search box, so at some widths a narrower
+    window had a wider box (and it shrank again a few pixels later). Swept both ways
+    in 5 px steps, the box only ever gets wider with the window."""
+    from soundboard.ui.window.fitcontrol import SEARCH_MIN_W
+    window.show()
+    window.tabs.setCurrentIndex(0)
+    seen = []
+    for wd in [*range(1500, 659, -5), *range(660, 1501, 5)]:
+        window.resize(wd, 860)
+        qapp.processEvents()
+        window.fitctl._refit()
+        seen.append((window.width(), window.search.width()))
+    for (w1, s1), (w2, s2) in zip(seen, seen[1:]):
+        if w2 < w1:
+            assert s2 <= s1, f"{w1} -> {w2} px: the search box grew {s1} -> {s2}"
+        elif w2 > w1:
+            assert s2 >= s1, f"{w1} -> {w2} px: the search box shrank {s1} -> {s2}"
+    # both ends were reached: room to spare, and the box below its usual least
+    assert max(s for _w, s in seen) > SEARCH_MIN_W > min(s for _w, s in seen)
+
+
 def test_full_screen_caps_only_the_search_box(window, qapp):
     """At 1920x1080 the search box stops at SEARCH_MAX_W (the library tools stay at
     the right); the seek bar and the drop box still follow the window."""

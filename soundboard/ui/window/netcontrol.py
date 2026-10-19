@@ -66,6 +66,8 @@ class NetControl(Controller):
         else:
             fit_placeholder(mw.search, _("Search your sounds"), _("Search"))
         mw.search.setToolTip(mw._search_tip if online else _("Type to filter your sounds"))
+        if hasattr(mw, "fitctl"):
+            mw.fitctl.search_button_changed()
 
     def _cable_follow_switch(self):
         """The cable's install button downloads it (from vb-audio.com): gone in Offline

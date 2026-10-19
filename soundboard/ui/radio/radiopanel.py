@@ -29,8 +29,8 @@ from soundboard.audio.engine import SR
 from soundboard.sounds.library import MAX_SECONDS, trim_silence
 from soundboard.online.radio import RadioDirectory, RadioPlayer, Station
 from soundboard.ui.kit import appstate, busy, icons
-from soundboard.ui.kit.panel import (EmptyList, RoundedFrame, VolumeControl, bar, icon_label,
-                                     vsep)
+from soundboard.ui.kit.panel import (CONTROL_H, EmptyList, RoundedFrame, VolumeControl, bar,
+                                     icon_label, vsep)
 # the station list and its filters live in radiolist.py; their names stay importable here
 from soundboard.ui.radio.radiolist import (GENRE_LABELS, GENRES, LIST_MAX,  # noqa: F401
                                            MAP_CACHE, QUALITIES, ROW_H, SORTS, StationList,
@@ -257,6 +257,10 @@ class RadioTab(QWidget):
         icons.set_icon(self.btn_refresh, "reload")
         self.btn_refresh.clicked.connect(self._reload)
         top.addWidget(self.btn_refresh)
+        # one height for both, as on the Sounds tab: the box alone was shorter, so the
+        # row lost 4 px when a narrow window hid the button and the page under it jumped
+        for w in (self.search, self.btn_refresh):
+            w.setFixedHeight(CONTROL_H)
         v.addLayout(top)
 
         # ---- globe | station list
