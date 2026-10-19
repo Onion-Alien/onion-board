@@ -2228,3 +2228,38 @@ def test_use_less_cpu_asks_for_the_small_speech_model_if_it_is_there(panel):
         assert args[args.index("--lighter") + 1] == "tiny.en"
     finally:
         voicefx.set_light(False)
+
+
+def test_clicks_on_the_voice_tab_dont_check_the_disk_each_time(panel, monkeypatch, tmp_path):
+    """Every click on the tab asks which voices are on (translating()). It reads the
+    add-on's install from the disk once, not per click: during an install the disk is
+    busy and one check held the window, and the sounds, for seconds."""
+    p, _ = panel
+    asked = []
+
+    class Mod:
+        broken, language, language_name = False, "zh", "Chinese"
+
+        def __init__(self, name):
+            self.path = tmp_path / name
+
+        @property
+        def installed(self):
+            asked.append(self.path.name)
+            return True
+
+    live, lang = Mod("live"), Mod("zh")
+    monkeypatch.setattr(p.speech, "module", live)
+    monkeypatch.setattr(p.speech, "_lang_on", lambda: lang)
+    monkeypatch.setattr("soundboard.core.langnames.of", lambda m: "Chinese")
+    p.speech._ready.clear()
+    for _i in range(5):
+        assert p.speech.translating() is lang
+    assert sorted(asked) == ["live", "zh"]
+    p.speech.installs._refresh_module()        # installed / repaired / rescanned
+    asked.clear()
+    assert p.speech.translating() is lang and sorted(asked) == ["live", "zh"]
+    p.speech._ready[id(lang)] = False          # a language removed: _fill_langs asks again
+    p.speech._fill_langs()
+    asked.clear()
+    assert p.speech.translating() is lang and "zh" in asked
