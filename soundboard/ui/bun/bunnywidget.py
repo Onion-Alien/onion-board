@@ -180,9 +180,11 @@ SWAY = {"blink": 14.0, "mouth": 12.0, "ears": 1.2, "sad": 70.0, "angry": 40.0,
 EAR_DRAG = 9.0     # how far his ears trail behind, degrees per Bun-height a second
 BUBBLE = QColor("#fffaf0")
 BEG = 2.8          # how long a begging line stays up, seconds
-# the Pong Easter egg: this many clicks inside ANNOY_WINDOW seconds and he fetches
-# his bat; from GRUMPY_AT on he's already getting cross
-ANNOY_CLICKS, ANNOY_WINDOW, GRUMPY_AT = 7, 3.0, 4
+# the Pong Easter egg: GRUMPY_AT clicks inside ANNOY_WINDOW seconds make him cross;
+# RED_IN seconds later his face is red, and BAT_POKES more from then fetch his bat
+# (each poke keeps him cross for ANNOY_WINDOW; spam before he's red doesn't count)
+ANNOY_WINDOW, GRUMPY_AT, RED_IN, BAT_POKES = 3.0, 4, 0.4, 5
+ANNOY_CLICKS = GRUMPY_AT + BAT_POKES   # the fewest pokes it can take
 TAUNT = 1.5        # how long he taps the bat before the game opens, seconds
 NAP_HOURS = (2, 3, 4)   # local hours (2:00 to 4:59) he's asleep, with naps=True
 WOKEN_S = 30.0     # how long a click keeps him awake
@@ -404,6 +406,8 @@ class BunnyWidget(QWidget):
         self._pokes: list[float] = []   # recent click times (the Pong Easter egg)
         self._angry = 0.0               # how cross he looks right now (smoothed)
         self._cross_until = 0.0         # ... and stays cross until then
+        self._red_at = -1.0             # poked cross: red in the face from then (or -1)
+        self._red_pokes = 0             # ... and the pokes since, towards BAT_POKES
         self._act_kind = "build"        # which act is running: "build" or "bat"
         self._dared = False             # the bat act has sent `challenge`
         self.lines, self.hope_lines, self.joy_lines = (tuple(lines), tuple(hope_lines),
@@ -626,22 +630,26 @@ class BunnyWidget(QWidget):
 
     def poke(self) -> bool:
         """A click, for the Pong Easter egg: True if it made him cross (rather than
-        happy). The ANNOY_CLICKS-th quick one sends him off for his bat."""
+        happy). The BAT_POKES-th one after he's gone red sends him off for his bat."""
         if not self.pong:
             return False
         if self.building:
             return True   # mid-act: more clicks do nothing
         now = time.monotonic()
-        self._pokes = [t for t in self._pokes if now - t < ANNOY_WINDOW] + [now]
-        n = len(self._pokes)
-        if n < GRUMPY_AT:
-            return False
+        if self._red_at < 0 or now >= self._cross_until:   # not cross (any more)
+            self._red_at, self._red_pokes = -1.0, 0
+            self._pokes = [t for t in self._pokes if now - t < ANNOY_WINDOW] + [now]
+            if len(self._pokes) < GRUMPY_AT:
+                return False
+            self._red_at = now + RED_IN   # he turns red; pokes count from then on
+        elif now >= self._red_at:
+            self._red_pokes += 1
         self._cross_until = now + ANNOY_WINDOW
-        if n >= ANNOY_CLICKS:
+        if self._red_pokes >= BAT_POKES:
             self.fetch_bat()
         else:
             grumpy = (_("hey!"), _("quit it!"), _("stop poking!"), _("okay, that's it…"))
-            self.say = grumpy[min(n - GRUMPY_AT, len(grumpy) - 1)]
+            self.say = grumpy[min(self._red_pokes, len(grumpy) - 1)]
             self._say_until = now + 1.2
             self._joy_at = -1.0
         return True
@@ -649,6 +657,7 @@ class BunnyWidget(QWidget):
     def fetch_bat(self):
         """He storms off and comes back with a baseball bat, then sends `challenge`."""
         self._pokes.clear()
+        self._red_at, self._red_pokes = -1.0, 0
         self._act_kind, self._dared = "bat", False
         self._act_t, self._blows = 0.0, 0
         self.celebrate = False
@@ -657,6 +666,7 @@ class BunnyWidget(QWidget):
     def calm_down(self):
         """Back to how he was before the game (it closed)."""
         self._pokes.clear()
+        self._red_at, self._red_pokes = -1.0, 0
         self._act_t, self._act_kind, self._dared = -1.0, "build", False
         self._cross_until = 0.0
         self.prop, self.celebrate = self._home_prop, self._home_celebrate
