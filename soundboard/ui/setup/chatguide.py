@@ -23,7 +23,7 @@ from soundboard.sim import chatcheck
 from soundboard.mic import directmic, discordcfg
 from soundboard.ui.kit import theme
 from soundboard.core.pollthread import PollThread
-from soundboard.ui.kit import busy, fit, icons
+from soundboard.ui.kit import busy, fit, icons, panel
 from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.kit.crashdialog import free_dialog
 from soundboard.core import errors
@@ -157,6 +157,114 @@ def settings_html(found: list, kept: bool) -> str:
             + f"<ul style='margin-left:-20px'>{items}</ul><span style='font-size:9pt'>"
             + _("Discord saves a change after a few seconds, up to a minute: this updates "
                 "by itself.") + "</span>")
+
+
+def _profile_name(p: str) -> str:
+    return {"CUSTOM": _("Custom"), "STUDIO": _("Studio"),
+            "VOICE_ISOLATION": _("Voice Isolation")}.get(p.upper(),
+                                                         p.replace("_", " ").title())
+
+
+def _noise_name(s: discordcfg.Settings) -> str:
+    return "Krisp" if s.krisp else _("Standard") if s.suppression else _("None")
+
+
+def setting_changes(before: discordcfg.Settings,
+                    after: discordcfg.Settings) -> list[tuple[str, str, str]]:
+    """Each Discord voice setting that differs between two reads, in the order Voice &
+    Video lists them: (setting, was, now)."""
+    def on(v: bool) -> str:
+        return _("On") if v else _("Off")
+
+    def mode(s) -> str:
+        return _("Push to Talk") if s.ptt else _("Voice Activity")
+    rows = []
+    if before.profile and after.profile:   # older Discord: no Input Profile
+        rows.append((_("Input Profile"), _profile_name(before.profile),
+                     _profile_name(after.profile)))
+    rows += [(_("Noise Suppression"), _noise_name(before), _noise_name(after)),
+             (_("Echo Cancellation"), on(before.echo), on(after.echo)),
+             (_("Input Mode"), mode(before), mode(after))]
+    if not before.ptt and not after.ptt:   # these two only exist on Voice Activity
+        rows += [(_("Automatically determine input sensitivity"), on(before.auto),
+                  on(after.auto)),
+                 (_("Advanced Voice Activity"), on(before.vad), on(after.vad))]
+    rows += [(_("Automatic Gain Control"), on(before.agc), on(after.agc)),
+             (_("Bypass System Audio Input Processing"), on(before.bypass),
+              on(after.bypass))]
+    return [r for r in rows if r[1] != r[2]]
+
+
+def changes_html(changes: list[tuple[str, str, str]]) -> str:
+    """The changed settings as a table: setting, what it was (struck out), what it is."""
+    ok = _ok()
+    rows = "".join(
+        f"<tr><td style='padding:3px 18px 3px 0'><b>{html.escape(name)}</b></td>"
+        f"<td style='padding:3px 8px 3px 0' nowrap><s>{html.escape(was)}</s></td>"
+        f"<td style='padding:3px 8px 3px 0'>→</td>"
+        f"<td style='padding:3px 0' nowrap><b style='color:{ok}'>{html.escape(now)}</b></td></tr>"
+        for name, was, now in changes)
+    return f"<table cellspacing='0'>{rows}</table>"
+
+
+class DiscordFixed(QDialog):
+    """Discord's settings came right while its guide was open: Bun celebrates, and the
+    table says exactly which settings changed, from what to what."""
+
+    def __init__(self, parent, client: str, changes: list[tuple[str, str, str]],
+                 restore: bool):
+        super().__init__(parent)
+        title = _("{name} is set up for your sounds", name=client)
+        self.setWindowTitle(title)
+        self.setMinimumWidth(480)   # the table on one line a row, not a narrow column
+        self.setMaximumWidth(620)
+        v = QVBoxLayout(self)
+        v.setContentsMargins(18, 18, 18, 18)
+        v.setSpacing(12)
+        head = QHBoxLayout()
+        head.setSpacing(16)
+        col = QVBoxLayout()
+        col.setSpacing(6)
+        top = QLabel(title)
+        top.setObjectName("helptitle")
+        top.setWordWrap(True)
+        col.addWidget(top)
+        col.addWidget(panel.hint_label(_(
+            "Your sounds reach your friends clean now, not muffled or cut off.")))
+        col.addStretch(1)
+        head.addLayout(col, 1)
+        self.bun = BunnyWidget("star", celebrate=True, height=74, pad=5)
+        head.addWidget(self.bun, 0, Qt.AlignmentFlag.AlignTop)
+        v.addLayout(head)
+        sec = QLabel(_("What changed in {name}", name=client))
+        sec.setObjectName("section")
+        v.addWidget(sec)
+        self.table = _label(changes_html(changes), "")
+        self.table.setObjectName("resultbox")
+        v.addWidget(self.table)
+        if restore:
+            lbl = panel.hint_label(_(
+                "When Onion Board closes, it turns Discord's noise suppression, echo "
+                "cancellation and automatic volume back on for talking. Don't want that? "
+                "Untick <b>Put Discord back for talking on close</b> on the Setup tab."))
+            lbl.setTextFormat(Qt.TextFormat.RichText)
+            v.addWidget(lbl)
+        row = QHBoxLayout()
+        row.setSpacing(8)
+        row.addStretch(1)
+        ok = QPushButton(_("Nice!"))
+        ok.setObjectName("primary")
+        ok.setDefault(True)
+        ok.clicked.connect(self.accept)
+        row.addWidget(ok)
+        v.addLayout(row)
+        fit.watch(self)
+
+    def showEvent(self, ev):
+        # its first size is the labels' narrow guess (tall): as tall as the words at
+        # this width, not a gap under the title
+        super().showEvent(ev)
+        self.resize(self.width(), fit.needed_height(self, self.width()))
 
 
 def result_html(res: dict, vm: str, kept: bool = False) -> str:
@@ -425,6 +533,9 @@ class DiscordGuide(QDialog):
         self.settings.hide()
         v.addWidget(self.settings)
         self._sig = None
+        self._broken = None     # Discord's settings when first seen hurting your sounds
+        self._cheered = False   # the "fixed" window has shown
+        self.fixed: DiscordFixed | None = None
         self._reading = False   # a worker is reading them (files in Discord's folder)
         self._settings_read.connect(self._settings_in)
         self._watch = QTimer(self)
@@ -489,6 +600,7 @@ class DiscordGuide(QDialog):
         if found is None:
             return
         self._sig = sig
+        self._watch_fixed(found)
         text = settings_html(found, self.kept)
         if text == self.settings.text():
             return
@@ -496,6 +608,28 @@ class DiscordGuide(QDialog):
         self.settings.setVisible(bool(text))
         if self.isVisible():   # a shorter list: shrink, not a gap under the header
             QTimer.singleShot(0, self, self.adjustSize)
+
+    def _watch_fixed(self, found: list):
+        """Settings that hurt your sounds, then came right while this is open: the
+        "fixed" window, once, with exactly what changed."""
+        if not found or self._cheered:
+            return
+        s = found[0]
+        if s.problems(self.kept and not directmic.endpoint_wide()):
+            if self._broken is None or self._broken.client != s.client:
+                self._broken = s
+        elif self._broken is not None and self._broken.client == s.client:
+            self._cheered = True
+            changes = setting_changes(self._broken, s)
+            if changes:   # (not just Straight into my mic switched off meanwhile)
+                QTimer.singleShot(0, self, lambda: self._show_fixed(s.client, changes))
+
+    def _show_fixed(self, client: str, changes: list):
+        cfg = getattr(self.mw, "cfg", None)
+        self.fixed = DiscordFixed(self, client, changes,
+                                  bool(getattr(cfg, "discord_restore", False)))
+        self.fixed.finished.connect(self.accept)   # nothing left to do in the guide
+        self.fixed.open()
 
     def check(self):
         if busy.is_busy(self.btn_check):

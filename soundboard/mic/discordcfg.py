@@ -62,6 +62,7 @@ class Settings:
     input_device: str          # Windows endpoint id, or "default"
     stamp: float               # when the file it came from was written
     auto: bool = False         # Voice Activity with its sensitivity set automatically
+    ptt: bool = False          # Input Mode: Push to Talk
 
     def problems(self, on_mic: bool) -> list[str]:
         """What in these settings changes or removes sounds, ORDER first-worst.
@@ -255,7 +256,8 @@ def parse(store: dict, client: str = "Discord", stamp: float = 0.0) -> Settings:
                     input_device=str(d.get("inputDeviceId") or "default"),
                     stamp=stamp,
                     auto=str(d.get("mode", "VOICE_ACTIVITY")) == "VOICE_ACTIVITY"
-                    and (d.get("modeOptions") or {}).get("autoThreshold", True) is not False)
+                    and (d.get("modeOptions") or {}).get("autoThreshold", True) is not False,
+                    ptt=str(d.get("mode", "VOICE_ACTIVITY")) == "PUSH_TO_TALK")
 
 
 def read_client(client_dir: str, name: str, appdata: Path | None = None) -> Settings | None:
