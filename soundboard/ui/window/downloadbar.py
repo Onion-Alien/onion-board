@@ -296,7 +296,6 @@ CARD_GAP = 8                  # from the page's bottom: the player bar under it
 PILL_BAR_W = 64               # the summary's bar in the pill
 FOLD_MS = 4000                # everything added: the card folds to its pill after this
 FOLDED_MS = 6000              # and the pill goes after this (hovering waits)
-ENDED_MS = 1500               # a Play's sound stopped: the card goes after this
 
 
 AUDIO_EXTS = (".mp3", ".wav", ".ogg", ".flac", ".m4a", ".aac", ".opus", ".webm", ".mp4")
@@ -1449,24 +1448,18 @@ class DownloadBar(QFrame):
         """A Play started (linkbar.played): the one that waited in Up next plays now."""
         if url != self.url or self.kind != "play" or self.stage != "done":
             return
+        if self._alone():
+            self._clear_and_hide()
+            return
         self._say_play()
         self._sync_head()
         if not self._up_next and not self._others_failed():
             self._wind_down(7000)
 
-    def play_ended(self, url: str):
-        """The link player has stopped (the sound ended, or Stop): a card that says
-        `url` is Playing goes now, not seconds after, folded down to a pill that stayed."""
-        if (url != self.url or self.kind != "play" or self.stage != "done" or not self.isVisible()
-                or self._queue or self._up_next or self._failed or self._waits()):
-            return
-        if self._auto_hide.isActive() and self._auto_hide.remainingTime() <= ENDED_MS:
-            return
-        self._auto_fold.stop()
-        if self._corner and self._mouse_on():
-            self._paused_ms = ENDED_MS
-            return
-        self._auto_hide.start(ENDED_MS)
+    def _alone(self) -> bool:
+        """Nothing else on the list: no pick waiting, none in Up next, none failed. A
+        Play that started playing then has nothing to say the player bar doesn't."""
+        return not (self._queue or self._up_next or self._failed)
 
     def _retry(self, url: str):
         """Retry: the failed pick is picked again (it starts, or waits its turn)."""
@@ -1529,6 +1522,9 @@ class DownloadBar(QFrame):
             self.bar.set_progress(1.0)
             theme.set_tone(self.lbl_status, "ok")
             if kind == "play":
+                if not self._waits() and self._alone():   # it plays, and that was all
+                    self._clear_and_hide()
+                    return
                 self._say_play()
             else:
                 self.lbl_status.setText(_("✓ Added to your sounds"))

@@ -4134,5 +4134,12 @@
   "Lite mode: no animations, for slower PCs": "Chế độ nhẹ: không có hiệu ứng động, cho PC chậm hơn",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Chế độ nhẹ: không có hiệu ứng động, cho PC chậm hơn (gợi ý cho PC này)",
   "No thanks, finish": "Không, cảm ơn, hoàn tất",
-  "Yes, set up Discord": "Có, thiết lập Discord"
+  "Yes, set up Discord": "Có, thiết lập Discord",
+  "Applying to the playing sound": "Đang áp lên âm thanh đang phát",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Đang áp lên âm thanh đang phát: {pct}%. Trong lúc đó nó vẫn phát như cũ.",
+  "Couldn't apply the effects to the playing sound": "Không áp được hiệu ứng lên âm thanh đang phát",
+  "Reset effects": "Đặt lại hiệu ứng",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Tắt mọi hiệu ứng (đoạn cắt vẫn giữ). Âm thanh đang phát trở lại bình thường ngay.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Âm thanh đang phát đã có thay đổi của bạn. Hủy sẽ đưa nó về như cũ.",
+  "Most liked": "Được thích nhiều nhất"
 }

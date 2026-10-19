@@ -4213,5 +4213,12 @@
   "Lite mode: no animations, for slower PCs": "Lite mode: walang animation, para sa mas mabagal na PC",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Lite mode: walang animation, para sa mas mabagal na PC (inirerekomenda para sa PC na ito)",
   "No thanks, finish": "Hindi na, tapusin",
-  "Yes, set up Discord": "Oo, i-set up ang Discord"
+  "Yes, set up Discord": "Oo, i-set up ang Discord",
+  "Applying to the playing sound": "Ina-apply sa tumutugtog na sound",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Ina-apply sa tumutugtog na sound: {pct}%. Tutugtog ito gaya ng dati hanggang doon.",
+  "Couldn't apply the effects to the playing sound": "Hindi ma-apply ang effects sa tumutugtog na sound",
+  "Reset effects": "I-reset ang effects",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Pinapatay ang lahat ng effects (nananatili ang trim). Babalik agad sa plain ang tumutugtog na sound.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Nasa tumutugtog na sound na ang mga binago mo. Ibabalik ito ng Kanselahin.",
+  "Most liked": "Pinakagusto"
 }

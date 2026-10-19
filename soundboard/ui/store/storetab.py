@@ -41,6 +41,8 @@ CARD_GAP = 8                  # between the cards
 LIST_GAP = 8                  # between the cards and the scroll bar (DESIGN.md, *Breathing room*)
 ONE_ROW = 720                 # a narrower tab puts the toolbar on two rows
 LINK_TICK_MS = 250            # how often the cards look at what the player is doing
+# the Sounds dropdown's first two (every sound, in an order): the order -> its key there
+TOPS = {"trending": "@trending", "top": "@top"}
 
 
 def meta_line(s: store.Sound) -> str:
@@ -275,6 +277,7 @@ class StoreTab(QWidget):
         self._link_tick.timeout.connect(self._follow_links)
         net.on_change(self._net_changed)   # Settings > Privacy's switch, Offline mode
         self._cat = ""            # the category picked ("" all)
+        self._have_cats = False   # the categories came (the dropdown has more than its tops)
 
         # one column, centred in the tab (a wide window: room both sides, not all on
         # the right)
@@ -357,6 +360,7 @@ class StoreTab(QWidget):
         self.cat_pick = QComboBox()
         self.cat_pick.setAccessibleName(_("Category"))
         self.cat_pick.setToolTip(_("Category"))
+        self.cat_pick.setPlaceholderText(_("All categories"))   # every sound, by Added
         self.cat_pick.activated.connect(self._cat_picked)
         self.btn_share = QPushButton(_("Share a sound"))
         self.btn_share.setObjectName("primary")
@@ -678,7 +682,13 @@ class StoreTab(QWidget):
         or Added (the newest first, "new")."""
         self._sort = key if key in ("top", "new") else "trending"
         self._sort_look()
+        self._show_picked(self._cat)
         self.reload()
+
+    def _pick_top(self, key: str):
+        """The dropdown's first two: every sound, Trending or Most liked ("top")."""
+        self._cat = ""
+        self.set_sort(key)
 
     def set_cat(self, key: str):
         """Only one category's sounds ("" all of them)."""
@@ -687,14 +697,21 @@ class StoreTab(QWidget):
         self.reload()
 
     def _show_picked(self, key: str):
+        if not key and self._mode == "sounds":   # every sound: the top that matches the order
+            key = TOPS.get(self._sort, "")       # (Added: none, the box says All categories)
         i = self.cat_pick.findData(key)
-        if i >= 0:
+        if i >= 0 or not key:
             self.cat_pick.setCurrentIndex(i)
 
     def _cat_picked(self, i: int):
         key = self.cat_pick.itemData(i) or ""
         if self._mode == "voices":
             self.set_kind(key)
+        elif key in TOPS.values():
+            sort = next(k for k, v in TOPS.items() if v == key)
+            if sort != "trending":
+                usage.used(f"store-sort-{sort}")
+            self._pick_top(sort)
         else:
             if key:
                 usage.used("store-category")
@@ -730,12 +747,18 @@ class StoreTab(QWidget):
         self._show_picked(self._kind)
 
     def _fill_cats(self, items: list[tuple[str, str, str]]):
-        """"All categories", then (key, text, icon name) for each."""
+        """The sounds: Trending and Most liked (every sound), then (key, text, icon name)
+        for each category. The voices: "All categories", then each kind."""
         self.cat_pick.clear()
-        self.cat_pick.addItem(_("All categories"), "")
+        if self._mode == "sounds":
+            items = [(TOPS["trending"], _("Trending"), "flame"),
+                     (TOPS["top"], _("Most liked"), "like"), *items]
+        else:
+            items = [("", _("All categories"), storelook.ALL_ICON), *items]
         for key, text, _icon in items:
             self.cat_pick.addItem(text, key)
-        icons.set_item_icons(self.cat_pick, [storelook.ALL_ICON] + [i for _k, _t, i in items])
+        icons.set_item_icons(self.cat_pick, [i for _k, _t, i in items])
+        self._show_picked(self._kind if self._mode == "voices" else self._cat)
         wheelguard.snug_combo(self.cat_pick)
         # the list as wide as its longest name (+ padding and scroll bar), never cut off
         view = self.cat_pick.view()
@@ -761,9 +784,11 @@ class StoreTab(QWidget):
         if got is None or self._mode != "sounds":
             return
         cats, _total = got
-        # the name, then how many (a number needs no words)
+        self._have_cats = True
+        # the biggest first; the name, then how many (a number needs no words)
         self._fill_cats([(key, f"{store.cat_name(key)}  {count_text(n)}",
-                          storelook.CAT_ICON.get(key, storelook.ALL_ICON)) for key, n in cats])
+                          storelook.CAT_ICON.get(key, storelook.ALL_ICON))
+                         for key, n in sorted(cats, key=lambda c: -c[1])])
         self._show_picked(self._cat)
 
     def _say(self, icon: str, title: str, text: str, button: str = "",
@@ -826,7 +851,7 @@ class StoreTab(QWidget):
         install, voices, kind = self.install(), self._mode == "voices", self._kind
         if replace:
             self._say("store", _("Loading the store…"), "")
-            if self.cat_pick.count() < 2 and not voices:
+            if not self._have_cats and not voices:
                 self._fetch_cats()
         else:
             busy.set_busy(self.btn_more, True)

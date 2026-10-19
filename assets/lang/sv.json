@@ -4213,5 +4213,12 @@
   "Lite mode: no animations, for slower PCs": "Lätt läge: inga animationer, för långsammare datorer",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Lätt läge: inga animationer, för långsammare datorer (föreslås för den här datorn)",
   "No thanks, finish": "Nej tack, slutför",
-  "Yes, set up Discord": "Ja, ställ in Discord"
+  "Yes, set up Discord": "Ja, ställ in Discord",
+  "Applying to the playing sound": "Lägger på ljudet som spelas",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Lägger på ljudet som spelas: {pct} %. Det spelas som förut tills dess.",
+  "Couldn't apply the effects to the playing sound": "Kunde inte lägga effekterna på ljudet som spelas",
+  "Reset effects": "Återställ effekter",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Stänger av alla effekter (trimningen blir kvar). Ljudet som spelas blir rent direkt.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Ljudet som spelas har dina ändringar. Avbryt sätter tillbaka det.",
+  "Most liked": "Mest gillade"
 }

@@ -4213,5 +4213,12 @@
   "Lite mode: no animations, for slower PCs": "Hafif mod: animasyon yok, daha yavaş PC'ler için",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Hafif mod: animasyon yok, daha yavaş PC'ler için (bu PC için önerilir)",
   "No thanks, finish": "Hayır, teşekkürler, bitir",
-  "Yes, set up Discord": "Evet, Discord'u ayarla"
+  "Yes, set up Discord": "Evet, Discord'u ayarla",
+  "Applying to the playing sound": "Çalan sese uygulanıyor",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Çalan sese uygulanıyor: %{pct}. O zamana kadar eskisi gibi çalar.",
+  "Couldn't apply the effects to the playing sound": "Efektler çalan sese uygulanamadı",
+  "Reset effects": "Efektleri sıfırla",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Tüm efektleri kapatır (kırpma kalır). Çalan ses hemen düz haline döner.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Çalan seste artık değişikliklerin var. İptal eski haline getirir.",
+  "Most liked": "En çok beğenilenler"
 }

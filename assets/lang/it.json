@@ -4213,5 +4213,12 @@
   "Lite mode: no animations, for slower PCs": "Modalità leggera: niente animazioni, per PC più lenti",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Modalità leggera: niente animazioni, per PC più lenti (consigliata per questo PC)",
   "No thanks, finish": "No grazie, fine",
-  "Yes, set up Discord": "Sì, configura Discord"
+  "Yes, set up Discord": "Sì, configura Discord",
+  "Applying to the playing sound": "Applico al suono in riproduzione",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Applico al suono in riproduzione: {pct}%. Fino ad allora suona come prima.",
+  "Couldn't apply the effects to the playing sound": "Impossibile applicare gli effetti al suono in riproduzione",
+  "Reset effects": "Azzera effetti",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Spegne tutti gli effetti (il taglio resta). Il suono in riproduzione torna normale subito.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Il suono in riproduzione ha le tue modifiche. Annulla lo riporta com'era.",
+  "Most liked": "I più apprezzati"
 }

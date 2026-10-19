@@ -4134,5 +4134,12 @@
   "Lite mode: no animations, for slower PCs": "軽量モード：アニメーションなし、遅めのPC向け",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "軽量モード：アニメーションなし、遅めのPC向け（このPCにおすすめ）",
   "No thanks, finish": "いいえ、完了する",
-  "Yes, set up Discord": "はい、Discord を設定する"
+  "Yes, set up Discord": "はい、Discord を設定する",
+  "Applying to the playing sound": "再生中のサウンドに適用中",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "再生中のサウンドに適用中：{pct}%。それまでは今のまま再生されます。",
+  "Couldn't apply the effects to the playing sound": "再生中のサウンドにエフェクトを適用できませんでした",
+  "Reset effects": "エフェクトをリセット",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "すべてのエフェクトをオフにします（トリミングは残ります）。再生中のサウンドはすぐ元の音に戻ります。",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ 再生中のサウンドに変更が反映されました。キャンセルで元に戻ります。",
+  "Most liked": "いいねが多い順"
 }

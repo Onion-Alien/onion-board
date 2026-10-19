@@ -4213,5 +4213,12 @@
   "Lite mode: no animations, for slower PCs": "Ελαφριά λειτουργία: χωρίς κινήσεις, για πιο αργά PC",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Ελαφριά λειτουργία: χωρίς κινήσεις, για πιο αργά PC (προτείνεται για αυτό το PC)",
   "No thanks, finish": "Όχι, ευχαριστώ, τέλος",
-  "Yes, set up Discord": "Ναι, ρύθμισε το Discord"
+  "Yes, set up Discord": "Ναι, ρύθμισε το Discord",
+  "Applying to the playing sound": "Εφαρμογή στον ήχο που παίζει",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Εφαρμογή στον ήχο που παίζει: {pct}%. Μέχρι τότε παίζει όπως πριν.",
+  "Couldn't apply the effects to the playing sound": "Δεν ήταν δυνατή η εφαρμογή των εφέ στον ήχο που παίζει",
+  "Reset effects": "Επαναφορά εφέ",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Κλείνει όλα τα εφέ (το κόψιμο μένει). Ο ήχος που παίζει γίνεται αμέσως καθαρός.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Ο ήχος που παίζει έχει τις αλλαγές σου. Η Ακύρωση τον επαναφέρει.",
+  "Most liked": "Τα πιο αγαπημένα"
 }

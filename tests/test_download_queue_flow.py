@@ -128,7 +128,7 @@ def test_play_then_queue_and_remove_another_still_plays(net):
     net.land(A)
     assert net.played() == [480]
     assert net.w.searchctl._link_url == A and net.w.searchctl._link_meta.name == "Shrek"
-    assert net.bar().stage == "done" and net.bar().shown and "Playing" in net.bar().head
+    assert not net.bar().shown   # it plays and nothing else is listed: the card goes
     assert (A, "play", True) in net.done
 
 
@@ -328,8 +328,7 @@ def test_a_play_that_waits_its_turn_says_up_next_until_it_plays(net):
     assert net.w.linkbar.up_next() == ["Third"]
     net.end()                                         # A ends: C, the bar's own, plays
     assert net.played() == [480, 1440]
-    assert net.bar().head == "Playing" and net.bar().status == "▶ Playing"
-    assert bar._auto_fold.isActive()   # it winds down: folds to its pill, then goes
+    assert not net.bar().shown   # it plays and nothing else waits: the card goes
 
 
 def test_now_playing_and_up_next_show_on_every_tab(net):

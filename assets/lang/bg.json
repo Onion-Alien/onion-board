@@ -4213,5 +4213,12 @@
   "Lite mode: no animations, for slower PCs": "Лек режим: без анимации, за по-бавни компютри",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Лек режим: без анимации, за по-бавни компютри (препоръчан за този компютър)",
   "No thanks, finish": "Не, благодаря, край",
-  "Yes, set up Discord": "Да, настрой Discord"
+  "Yes, set up Discord": "Да, настрой Discord",
+  "Applying to the playing sound": "Прилагам към звука, който свири",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Прилагам към звука, който свири: {pct}%. Дотогава свири както преди.",
+  "Couldn't apply the effects to the playing sound": "Не успях да приложа ефектите към звука, който свири",
+  "Reset effects": "Нулирай ефектите",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Изключва всички ефекти (изрязването остава). Звукът, който свири, веднага става обикновен.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Звукът, който свири, вече е с промените ти. „Отказ“ го връща.",
+  "Most liked": "Най-харесвани"
 }

@@ -513,8 +513,10 @@ def test_categories_filter_the_list(qapp, fake):
     t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
     t.show()
     pick = t.cat_pick
-    assert _wait(qapp, lambda: len(t._rows) == 2 and pick.count() == 3)
-    assert [pick.itemText(i) for i in range(3)] == ["All categories", "Games  3", "Memes  1"]
+    assert _wait(qapp, lambda: len(t._rows) == 2 and pick.count() == 4)
+    # Trending (picked) and Most liked: every sound; then the categories
+    assert [pick.itemText(i) for i in range(4)] == ["Trending", "Most liked", "Games  3",
+                                                    "Memes  1"]
     assert pick.currentIndex() == 0
     # it opens on Trending: what's popular right now, its header with the arrow
     assert "sort=trending" in next(c[1] for c in fake.calls if c[1].startswith("/v1/sounds"))
@@ -535,6 +537,15 @@ def test_categories_filter_the_list(qapp, fake):
     assert _wait(qapp, lambda: t.msg_btn.isVisibleTo(t) and t.msg_btn.text() == "All")
     t.msg_btn.click()
     assert _wait(qapp, lambda: "cat=" not in fake.calls[-1][1])
+    # every sound by Added: no top says it, the box says All categories
+    assert pick.currentIndex() == -1 and pick.currentText() == ""
+    # Most liked: every sound by votes; the header's arrow follows, and back
+    pick.activated.emit(pick.findData("@top"))
+    assert _wait(qapp, lambda: "sort=top" in fake.calls[-1][1] and "cat=" not in fake.calls[-1][1])
+    assert not t.sort_btns["top"].icon().isNull()
+    t.sort_btns["trending"].click()
+    assert _wait(qapp, lambda: "sort=trending" in fake.calls[-1][1])
+    assert pick.currentData() == "@trending"
     t.shutdown()
 
 
@@ -558,15 +569,14 @@ def test_switched_back_on_the_store_says_so(qapp, fake):
 
 
 def test_onion_board_category_lists_the_stores_own_sounds(qapp, fake):
-    # the server puts it first; picking it asks for the store's own sounds only
+    # the biggest first, after the two tops; picking it asks for the store's own sounds only
     fake.cats = [("onionboard", 2), ("games", 3)]
     fake.sounds["000000000002"]["cat"] = "onionboard"   # never a sound's own category
     t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
     t.show()
     pick = t.cat_pick
-    assert _wait(qapp, lambda: len(t._rows) == 2 and pick.count() == 3)
-    assert [pick.itemText(i) for i in range(3)] == ["All categories", "Onion Board  2",
-                                                    "Games  3"]
+    assert _wait(qapp, lambda: len(t._rows) == 2 and pick.count() == 4)
+    assert [pick.itemText(i) for i in range(2, 4)] == ["Games  3", "Onion Board  2"]
     pick.activated.emit(pick.findData("onionboard"))
     assert _wait(qapp, lambda: "cat=onionboard" in fake.calls[-1][1])
     assert _wait(qapp, lambda: len(t._rows) == 2)
@@ -580,7 +590,7 @@ def test_no_categories_only_all(qapp, fake):
     t.show()
     assert _wait(qapp, lambda: len(t._rows) == 2)
     qapp.processEvents()
-    assert t.cat_pick.count() == 1 and t.cat_pick.currentData() == ""
+    assert t.cat_pick.count() == 2 and t.cat_pick.currentData() == "@trending"
     t.shutdown()
 
 

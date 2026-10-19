@@ -4213,5 +4213,12 @@
   "Lite mode: no animations, for slower PCs": "Kevyt tila: ei animaatioita, hitaammille koneille",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Kevyt tila: ei animaatioita, hitaammille koneille (suositellaan tälle koneelle)",
   "No thanks, finish": "Ei kiitos, valmis",
-  "Yes, set up Discord": "Kyllä, säädä Discord"
+  "Yes, set up Discord": "Kyllä, säädä Discord",
+  "Applying to the playing sound": "Lisätään soivaan ääneen",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Lisätään soivaan ääneen: {pct} %. Siihen asti se soi kuten ennen.",
+  "Couldn't apply the effects to the playing sound": "Efektejä ei voitu lisätä soivaan ääneen",
+  "Reset effects": "Nollaa efektit",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Poistaa kaikki efektit (rajaus säilyy). Soiva ääni palaa heti tavalliseksi.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Soivassa äänessä on nyt muutoksesi. Peruuta palauttaa sen.",
+  "Most liked": "Tykätyimmät"
 }

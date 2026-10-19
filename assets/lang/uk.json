@@ -4292,5 +4292,12 @@
   "Lite mode: no animations, for slower PCs": "Полегшений режим: без анімацій, для слабших ПК",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Полегшений режим: без анімацій, для слабших ПК (радимо для цього ПК)",
   "No thanks, finish": "Ні, дякую, готово",
-  "Yes, set up Discord": "Так, налаштувати Discord"
+  "Yes, set up Discord": "Так, налаштувати Discord",
+  "Applying to the playing sound": "Застосовую до звуку, що грає",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Застосовую до звуку, що грає: {pct}%. Доти він грає як раніше.",
+  "Couldn't apply the effects to the playing sound": "Не вдалося застосувати ефекти до звуку, що грає",
+  "Reset effects": "Скинути ефекти",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Вимикає всі ефекти (обрізка лишається). Звук, що грає, одразу стає звичайним.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Звук, що грає, тепер з вашими змінами. «Скасувати» поверне як було.",
+  "Most liked": "Найулюбленіші"
 }

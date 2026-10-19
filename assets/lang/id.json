@@ -4134,5 +4134,12 @@
   "Lite mode: no animations, for slower PCs": "Mode ringan: tanpa animasi, untuk PC yang lebih lambat",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Mode ringan: tanpa animasi, untuk PC yang lebih lambat (disarankan untuk PC ini)",
   "No thanks, finish": "Tidak, selesai",
-  "Yes, set up Discord": "Ya, atur Discord"
+  "Yes, set up Discord": "Ya, atur Discord",
+  "Applying to the playing sound": "Menerapkan ke suara yang diputar",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Menerapkan ke suara yang diputar: {pct}%. Sampai saat itu tetap diputar seperti tadi.",
+  "Couldn't apply the effects to the playing sound": "Tidak bisa menerapkan efek ke suara yang diputar",
+  "Reset effects": "Reset efek",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Matikan semua efek (potongannya tetap). Suara yang diputar langsung kembali polos.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Suara yang diputar sudah memakai perubahanmu. Batal mengembalikannya.",
+  "Most liked": "Paling disukai"
 }

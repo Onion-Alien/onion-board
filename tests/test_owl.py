@@ -380,3 +380,47 @@ def test_his_kept_shapes_are_the_ones_built_fresh(qapp):
         assert owl._wing(sx) == owl._wing.__wrapped__(sx)
         for style in {k.get("tufts", "point") for k in owl.LOOKS.values()} | {"point"}:
             assert owl._tuft(sx, style) == owl._tuft.__wrapped__(sx, style)
+
+
+def _click(w):
+    from PySide6.QtGui import QMouseEvent
+    c = QPointF(w.width() / 2, w.height() / 2)
+    w.mousePressEvent(QMouseEvent(QMouseEvent.MouseButtonPress, c, c, Qt.LeftButton,
+                                  Qt.LeftButton, Qt.NoModifier))
+
+
+def test_a_sleeping_hoot_wakes_on_a_click_and_goes_back_to_bed_when_hidden(qapp):
+    """The Triggers tab's Hoot (sleeps=True): asleep in his bed with z's, only a click
+    wakes him (the mouse near doesn't), then he idles; hidden, he's back in bed."""
+    w = owl.OwlWidget(96, lines=("please?",), joy=("yay",), sleeps=True)
+    w.resize(w.sizeHint())
+    for _ in range(80):                        # 8 s: long past his first act
+        w.step(0.1, mouse=(0.3, 0.0))          # the mouse right by him
+        assert w.asleep and w.act is None and not w.say
+        pose = w.pose()
+        assert pose["blink"] == 1.0 and "sleep" in pose
+    asleep = paint(w)
+    w.clicked.connect(lambda: hits.append(1))
+    hits = []
+    _click(w)
+    assert not w.asleep and hits == [1] and w._joy_t < 0   # woken, not cheered
+    w.step(0.3, mouse=None)
+    assert "startle" in w.pose() and "sleep" not in w.pose()
+    for _ in range(80):
+        w.step(0.1, mouse=None)
+    assert w._bed == 0.0 and w.pose()["blink"] < 1.0
+    assert paint(w) != asleep
+    w.show()
+    w.hide()                                   # the tab left
+    assert w.asleep and w._bed == 1.0
+    w.close()
+
+
+def test_a_hoot_that_doesnt_sleep_never_does(qapp):
+    w = owl.OwlWidget(80)
+    w.show()
+    w.hide()
+    assert not w.asleep and w._bed == 0.0
+    _click(w)
+    assert w._joy_t >= 0                       # a click still cheers
+    w.close()

@@ -4134,5 +4134,12 @@
   "Lite mode: no animations, for slower PCs": "輕量模式：無動畫，適合較慢的電腦",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "輕量模式：無動畫，適合較慢的電腦（建議這台電腦使用）",
   "No thanks, finish": "不用了，完成",
-  "Yes, set up Discord": "好，設定 Discord"
+  "Yes, set up Discord": "好，設定 Discord",
+  "Applying to the playing sound": "正在套用到播放中的音效",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "正在套用到播放中的音效：{pct}%。在那之前照舊播放。",
+  "Couldn't apply the effects to the playing sound": "無法將效果套用到播放中的音效",
+  "Reset effects": "重設效果",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "關閉所有效果（修剪會保留）。播放中的音效會立刻回到原音。",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ 播放中的音效已套用你的修改。按取消可還原。",
+  "Most liked": "最受歡迎"
 }

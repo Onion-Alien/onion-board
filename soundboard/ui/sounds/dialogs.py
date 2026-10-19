@@ -309,6 +309,13 @@ class EffectsPanel(QWidget):
         self.preset.setCurrentIndex(max(0, self.preset.findData(name)))
         self.preset.blockSignals(False)
 
+    def reset_all(self):
+        """Every effect off, the voice too (the trim stays)."""
+        start, end = self.trim.values()
+        self.load({"start": start, "end": end})
+        self._matching_preset()
+        self.changed.emit()
+
     def _on_preset(self, name: str):
         if name in soundfx.PRESETS:
             start, end = self.trim.values()
@@ -328,6 +335,7 @@ class EditDialog(QDialog):
     hotkeys_changed = Signal()
     picture_fetched = Signal(int, object, str)   # (which try, QImage or None, why not)
     source_forgotten = Signal()   # Details → Delete info: saved at once, Save or Cancel
+    effects_reset = Signal()      # Reset effects: a playing sound goes plain at once
 
     def __init__(self, meta: SoundMeta, hotkeys: Hotkeys, preview_cb, parent=None,
                  tab: str = "sound", others=None, pick_voice=None, save_hook=None,
@@ -570,6 +578,15 @@ class EditDialog(QDialog):
         self.fx_note.setObjectName("muted")
         self.fx_note.setWordWrap(True)
         lay.addWidget(self.fx_note)
+        # while the playing sound is made again with the changed effects (show_live)
+        self.live_bar = QProgressBar()
+        self.live_bar.setObjectName("downloadprogress")   # the theme's thin bar
+        self.live_bar.setRange(0, 1000)
+        self.live_bar.setTextVisible(False)
+        self.live_bar.setFixedHeight(4)
+        self.live_bar.setAccessibleName(_("Applying to the playing sound"))
+        self.live_bar.hide()
+        lay.addWidget(self.live_bar)
         self.effects.changed.connect(self._fx_note)
         self._fx_note()
 
@@ -611,9 +628,26 @@ class EditDialog(QDialog):
         copy.clicked.connect(lambda: setattr(self, "as_copy", True))
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
+        # beside Save: every effect off, so a playing sound goes plain again at once
+        # (and a slow voice still being applied to it stops)
+        self.btn_reset = QPushButton(_("Reset effects"))
+        self.btn_reset.setObjectName("resetfx")
+        icons.set_icon(self.btn_reset, "reload", size=14)
+        self.btn_reset.setToolTip(_("Turn every effect off (the trim stays). "
+                                    "A playing sound goes back to plain at once."))
+
+        def reset_all():
+            self.effects.reset_all()
+            self.effects_reset.emit()
+        self.btn_reset.clicked.connect(reset_all)
+        from soundboard.ui.kit.glow import Halo
+        self._reset_glow = Halo(self.btn_reset)   # lit while there's anything to reset
+        self.effects.changed.connect(self._light_reset)
+        self._light_reset()
         brow = QHBoxLayout()
         brow.addWidget(prev)
         brow.addStretch(1)
+        brow.addWidget(self._reset_glow)
         brow.addWidget(bb)
         self._bb = bb
         lay.addLayout(brow)
@@ -719,6 +753,8 @@ class EditDialog(QDialog):
         self._set_color(meta.color)
         self.effects.set_sound(meta)
         self.show_render(None)   # (EditControl.edit shows this sound's, if it has one)
+        self.live_bar.hide()
+        self._light_reset()   # (set_sound loads without the changed signal)
         self._fx_scroll.verticalScrollBar().setValue(0)
         busy.set_busy(self.btn_preview, False)
         self._saying = False
@@ -785,6 +821,7 @@ class EditDialog(QDialog):
             return
         self._bb.setVisible(not on)
         self.btn_preview.setVisible(not on)
+        self._reset_glow.setVisible(not on)
         self.tabs.setEnabled(not on)   # the draft is saved: it waits while it renders
         self.render_box.setVisible(on)
         if on:
@@ -795,6 +832,36 @@ class EditDialog(QDialog):
             save.setFocus(Qt.FocusReason.OtherFocusReason)
             if words:
                 self._say(words, 6000)
+
+    def _light_reset(self):
+        """Reset effects stands out (the accent border and glow) while any effect is
+        on, so it's easy to find; the trim alone doesn't count (Reset keeps it)."""
+        f = self.effects.fx()
+        on = bool(f) and not soundfx.is_neutral({**f, "start": 0.0, "end": 0.0})
+        self._reset_glow.set_on(on)
+        if bool(self.btn_reset.property("nudge")) != on:
+            self.btn_reset.setProperty("nudge", on)
+            self.btn_reset.style().unpolish(self.btn_reset)
+            self.btn_reset.style().polish(self.btn_reset)
+
+    def show_live(self, frac: float | None, words: str = ""):
+        """The playing sound being made again with these effects: how far (`frac`,
+        0..1), or None when it's done or dropped (then `words`, if any, say how it
+        went, where the effects summary goes)."""
+        if frac is not None:
+            pct = int(frac * 100)
+            self.live_bar.setValue(int(round(frac * 1000)))
+            self.live_bar.show()
+            self._say(_("Applying to the playing sound: {pct}%. It plays on as it was "
+                        "until then.", pct=pct), 0)
+            return
+        self.live_bar.hide()
+        if words:
+            self._say(words, 6000)
+        elif getattr(self, "_saying", False):
+            self._said = getattr(self, "_said", 0) + 1
+            self._saying = False
+            self._fx_note()
 
     def _fx_note(self):
         if getattr(self, "_saying", False):

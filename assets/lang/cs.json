@@ -4292,5 +4292,12 @@
   "Lite mode: no animations, for slower PCs": "Lehký režim: bez animací, pro pomalejší PC",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Lehký režim: bez animací, pro pomalejší PC (doporučeno pro tohle PC)",
   "No thanks, finish": "Ne, díky, dokončit",
-  "Yes, set up Discord": "Ano, nastavit Discord"
+  "Yes, set up Discord": "Ano, nastavit Discord",
+  "Applying to the playing sound": "Používám na hrající zvuk",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Používám na hrající zvuk: {pct} %. Do té doby hraje jako dřív.",
+  "Couldn't apply the effects to the playing sound": "Efekty se nepodařilo použít na hrající zvuk",
+  "Reset effects": "Resetovat efekty",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Vypne všechny efekty (ořez zůstane). Hrající zvuk je hned zase čistý.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Hrající zvuk má tvoje změny. Zrušit ho vrátí zpět.",
+  "Most liked": "Nejoblíbenější"
 }

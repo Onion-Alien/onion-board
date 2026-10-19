@@ -4292,5 +4292,12 @@
   "Lite mode: no animations, for slower PCs": "Tryb lekki: bez animacji, dla wolniejszych komputerów",
   "Lite mode: no animations, for slower PCs (suggested for this PC)": "Tryb lekki: bez animacji, dla wolniejszych komputerów (zalecany dla tego komputera)",
   "No thanks, finish": "Nie, dzięki, zakończ",
-  "Yes, set up Discord": "Tak, skonfiguruj Discorda"
+  "Yes, set up Discord": "Tak, skonfiguruj Discorda",
+  "Applying to the playing sound": "Nakładanie na grający dźwięk",
+  "Applying to the playing sound: {pct}%. It plays on as it was until then.": "Nakładanie na grający dźwięk: {pct}%. Do tego czasu gra jak wcześniej.",
+  "Couldn't apply the effects to the playing sound": "Nie udało się nałożyć efektów na grający dźwięk",
+  "Reset effects": "Resetuj efekty",
+  "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Wyłącza wszystkie efekty (przycięcie zostaje). Grający dźwięk od razu wraca do zwykłego.",
+  "✓ The playing sound has your changes. Cancel puts it back.": "✓ Grający dźwięk ma już twoje zmiany. Anuluj przywraca go.",
+  "Most liked": "Najbardziej lubiane"
 }
