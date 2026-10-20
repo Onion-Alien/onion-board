@@ -4414,5 +4414,10 @@
   "Your headset's mic is off": "Mikrofon sluchátek je vypnutý",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofon na <b>{headset}</b> se odpojil. Připoj ho znovu a tvoje zvuky zase půjdou ven.",
   "Put the sound first on a busy PC": "Zvuk má přednost, když je PC vytížené",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Spustí board s vyšší než normální prioritou, aby jiné programy nemohly způsobit výpadky zvuku. Bere velmi málo CPU, takže hry nic nepoznají."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Spustí board s vyšší než normální prioritou, aby jiné programy nemohly způsobit výpadky zvuku. Bere velmi málo CPU, takže hry nic nepoznají.",
+  "{n} sound is back.": [
+    "{n} zvuk je zpátky.",
+    "{n} zvuky jsou zpátky.",
+    "{n} zvuků je zpátky."
+  ]
 }

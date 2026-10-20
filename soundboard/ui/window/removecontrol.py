@@ -101,8 +101,7 @@ class RemoveControl(Controller):
         mw.hkctl.register_hotkeys()
         # "Removed X · Undo" for a while; after that they're in Recently deleted
         if len(gone) == 1:
-            name = mw.fontMetrics().elidedText(gone[0].name, Qt.TextElideMode.ElideRight, 260)
-            text = _("Removed “{name}”", name=name)
+            text = _("Removed “{name}”", name=self._short_name(gone[0]))
         else:
             text = _("Removed {n} sounds", n=len(gone))
         t = mw.toast(html.escape(text), "", UNDO_S * 1000, key=UNDO_KEY,
@@ -122,6 +121,14 @@ class RemoveControl(Controller):
         # Ctrl+Z, not its button: its card goes too (after the sounds are back, so its
         # on_close finds their pack still in use)
         toastmod.close(mw, UNDO_KEY)
+        # the pad coming back can be off screen (another category, scrolled away): say it
+        text = (_("“{name}” is back.", name=self._short_name(done[0][0])) if len(done) == 1
+                else ngettext("{n} sound is back.", "{n} sounds are back.", len(done),
+                              n=len(done)))
+        mw.toast(html.escape(text), "ok")
+
+    def _short_name(self, m: SoundMeta) -> str:
+        return self.mw.fontMetrics().elidedText(m.name, Qt.TextElideMode.ElideRight, 260)
 
     def _put_back(self, entries: list[tuple[SoundMeta, int, np.ndarray | None]]):
         """Put removed sounds back on the board: (meta, the index it had, its audio or
