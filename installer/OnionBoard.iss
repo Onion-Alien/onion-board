@@ -103,7 +103,8 @@ CloseApplications=yes
 
 [Messages]
 WelcomeLabel1=Let's set up Onion Board
-WelcomeLabel2=Onion Board plays your sounds straight into your mic, so Discord and your games hear them. Nothing to set up in those apps.%n%nClick Next to start.
+WelcomeLabel2=Onion Board plays your sounds straight into your mic, so Discord and your games hear them. Nothing to set up in those apps.
+ClickNext=
 WizardSelectTasks=Pick what you want
 SelectTasksDesc=Tick what you'd like. If you're not sure, leave the boxes as they are.
 FinishedHeadingLabel=All done!
