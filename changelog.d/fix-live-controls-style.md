@@ -1,0 +1,1 @@
+- Live controls no longer opens with plain, unthemed sliders, ticks and buttons after the theme was switched or a page was built while it was closed.
