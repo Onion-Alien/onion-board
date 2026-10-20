@@ -1141,7 +1141,6 @@
   "Since start: {dropouts}, {reconnects}.": "З початку: {dropouts} , {reconnects} .",
   "Site": "Сайт",
   "Size": "Розмір",
-  "Skip for now  →": "Поки що пропустити →",
   "Slow or patchy connection": "Повільне або неоднорідне з’єднання",
   "Snowflake": "Сніжинка",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "Дещо з нещодавно видаленого не вдалося відновити: воно зберігається в цій точці відновлення.",
@@ -1531,7 +1530,6 @@
   "❚❚ paused": "❚❚ призупинено",
   "⟲  Restart my PC now": "⟲ Перезавантажте мій ПК зараз",
   "⟳  Check again": "⟳ Перевірте ще раз",
-  "⬇  Install it now (free)": "⬇ Установіть зараз (безкоштовно)",
   "⬇  Try installing again": "⬇ Спробуйте встановити ще раз",
   "Join the Discord": "Зайти в Discord",
   "Chat about it on Discord": "Обговорити в Discord",
@@ -4415,5 +4413,9 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Мікрофон на <b>{headset}</b> від'єднався. Під'єднай його знову, і твої звуки знову підуть.",
   "Put the sound first on a busy PC": "Звук у пріоритеті, коли ПК завантажений",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Запускає панель із пріоритетом вище звичайного, щоб інші програми не змушували звук перериватися. Вона майже не навантажує процесор, тож ігри цього не помітять.",
-  "its file is gone (it was at {path})": "його файл зник (він був у {path})"
+  "its file is gone (it was at {path})": "його файл зник (він був у {path})",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Безкоштовний віртуальний кабель від VB-Audio. Це займе близько хвилини, і Windows один раз спитає дозволу. Потім вибери його як мікрофон у Discord та іграх.",
+  "Install the cable": "Встановити кабель",
+  "Not set up yet: only you will hear your sounds.": "Ще не налаштовано: свої звуки чуєш лише ти.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Зараз у тебе <b>{theme}</b>. Ще теми в налаштуваннях: {n}"
 }

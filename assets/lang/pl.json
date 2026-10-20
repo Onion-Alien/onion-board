@@ -1141,7 +1141,6 @@
   "Since start: {dropouts}, {reconnects}.": "Od początku: {dropouts} , {reconnects} .",
   "Site": "Strona",
   "Size": "Rozmiar",
-  "Skip for now  →": "Na razie pomiń →",
   "Slow or patchy connection": "Powolne lub niejednolite połączenie",
   "Snowflake": "Płatek śniegu",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "Niektórych ostatnio usuniętych plików nie można przywrócić: są one przechowywane w tym punkcie przywracania.",
@@ -1531,7 +1530,6 @@
   "❚❚ paused": "❚❚ pauza",
   "⟲  Restart my PC now": "⟲ Uruchom ponownie mój komputer teraz",
   "⟳  Check again": "⟳ Sprawdź ponownie",
-  "⬇  Install it now (free)": "⬇ Zainstaluj teraz (za darmo)",
   "⬇  Try installing again": "⬇ Spróbuj zainstalować ponownie",
   "Join the Discord": "Dołącz do Discorda",
   "Chat about it on Discord": "Pogadaj o tym na Discordzie",
@@ -4415,5 +4413,9 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofon w <b>{headset}</b> się rozłączył. Połącz go ponownie, a twoje dźwięki znowu będą wychodzić.",
   "Put the sound first on a busy PC": "Dźwięk na pierwszym miejscu, gdy PC jest zajęty",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Uruchamia board z priorytetem wyższym niż normalny, żeby inne programy nie powodowały przerw w dźwięku. Zużywa bardzo mało CPU, więc gry tego nie odczują.",
-  "its file is gone (it was at {path})": "jego plik zniknął (był w {path})"
+  "its file is gone (it was at {path})": "jego plik zniknął (był w {path})",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Darmowy wirtualny kabel od VB-Audio. Zajmuje to około minuty, a Windows raz zapyta, czy się zgadzasz. Potem wybierasz go jako mikrofon w Discordzie i grach.",
+  "Install the cable": "Zainstaluj kabel",
+  "Not set up yet: only you will hear your sounds.": "Jeszcze nieustawione: tylko ty usłyszysz swoje dźwięki.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Teraz używasz <b>{theme}</b>. Więcej motywów w Ustawieniach: {n}"
 }

@@ -1101,7 +1101,6 @@
   "Since start: {dropouts}, {reconnects}.": "開始以降: {dropouts} 、 {reconnects} 。",
   "Site": "サイト",
   "Size": "サイズ",
-  "Skip for now  →": "とりあえずスキップ→",
   "Slow or patchy connection": "接続が遅い、または斑点がある",
   "Snowflake": "スノーフレーク",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "最近削除されたものの一部は元に戻せませんでした。この復元ポイントに保持されています。",
@@ -1455,7 +1454,6 @@
   "❚❚ paused": "❚❚一時停止中",
   "⟲  Restart my PC now": "⟲ 今すぐ PC を再起動してください",
   "⟳  Check again": "⟳ もう一度確認してください",
-  "⬇  Install it now (free)": "⬇ 今すぐインストールしてください（無料）",
   "⬇  Try installing again": "⬇ もう一度インストールしてみてください",
   "Join the Discord": "Discord に参加",
   "Chat about it on Discord": "Discord で話そう",
@@ -4267,5 +4265,9 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> のマイクが切断されました。もう一度接続すると、サウンドがまた届きます。",
   "Put the sound first on a busy PC": "PCが忙しいときもサウンドを優先",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "ボードを通常より高い優先度で動かし、ほかのプログラムのせいで音が途切れないようにします。CPUはほとんど使わないので、ゲームへの影響はありません。",
-  "its file is gone (it was at {path})": "ファイルが見つかりません（{path} にありました）"
+  "its file is gone (it was at {path})": "ファイルが見つかりません（{path} にありました）",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "VB-Audio の無料の仮想ケーブルです。1 分ほどで終わり、Windows が一度だけ確認します。そのあと Discord やゲームでマイクとして選びます。",
+  "Install the cable": "ケーブルを入れる",
+  "Not set up yet: only you will hear your sounds.": "まだ設定されていません：サウンドは自分にしか聞こえません。",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "いまは <b>{theme}</b> を使っています。設定にはほかに {n} 個のテーマがあります。"
 }

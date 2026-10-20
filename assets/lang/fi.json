@@ -959,7 +959,6 @@
   "Since start: {dropouts}, {reconnects}.": "Käynnistyksen jälkeen: {dropouts}, {reconnects}.",
   "Site": "Sivusto",
   "Size": "Koko",
-  "Skip for now  →": "Ohita toistaiseksi  →",
   "Skip this version": "Ohita tämä versio",
   "Slow or patchy connection": "Hidas tai pätkivä yhteys",
   "Snowflake": "Snowflake",
@@ -1492,7 +1491,6 @@
   "❚❚ paused": "❚❚ keskeytetty",
   "⟲  Restart my PC now": "⟲ Käynnistä tietokoneeni uudelleen nyt",
   "⟳  Check again": "⟳ Tarkista uudelleen",
-  "⬇  Install it now (free)": "⬇ Asenna se nyt (ilmainen)",
   "⬇  Try installing again": "⬇ Yritä asentaa uudelleen",
   "(didn't say)": "(ei sanonut)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
@@ -4341,5 +4339,9 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Kuulokkeiden <b>{headset}</b> mikrofonin yhteys katkesi. Yhdistä se uudelleen, niin äänesi kuuluvat taas.",
   "Put the sound first on a busy PC": "Ääni ensin, kun PC on kuormitettu",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Ajaa boardia normaalia korkeammalla prioriteetilla, jotta muut ohjelmat eivät saa ääntä katkeilemaan. Se käyttää hyvin vähän suoritinta, joten pelit eivät huomaa sitä.",
-  "its file is gone (it was at {path})": "sen tiedosto on poissa (se oli kohteessa {path})"
+  "its file is gone (it was at {path})": "sen tiedosto on poissa (se oli kohteessa {path})",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Ilmainen virtuaalikaapeli VB-Audiolta. Se vie noin minuutin, ja Windows kysyy kerran, sopiiko se. Sen jälkeen valitset sen mikrofoniksi Discordissa ja peleissä.",
+  "Install the cable": "Asenna kaapeli",
+  "Not set up yet: only you will hear your sounds.": "Ei vielä käytössä: vain sinä kuulet äänesi.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Käytössä nyt: <b>{theme}</b>. Lisää teemoja asetuksissa: {n}"
 }

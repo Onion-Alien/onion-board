@@ -959,7 +959,6 @@
   "Since start: {dropouts}, {reconnects}.": "Siden start: {dropouts}, {reconnects}.",
   "Site": "Side",
   "Size": "Størrelse",
-  "Skip for now  →": "Spring over for nu  →",
   "Skip this version": "Spring denne version over",
   "Slow or patchy connection": "Langsom eller ustabil forbindelse",
   "Snowflake": "Snowflake",
@@ -1492,7 +1491,6 @@
   "❚❚ paused": "❚❚ på pause",
   "⟲  Restart my PC now": "⟲  Genstart min pc nu",
   "⟳  Check again": "⟳  Tjek igen",
-  "⬇  Install it now (free)": "⬇  Installér det nu (gratis)",
   "⬇  Try installing again": "⬇  Prøv at installere igen",
   "(didn't say)": "(sagde ikke)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
@@ -4341,5 +4339,9 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofonen på <b>{headset}</b> blev afbrudt. Tilslut den igen, så går dine lyde ud igen.",
   "Put the sound first on a busy PC": "Lyden først på en travl pc",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Kører boardet med højere end normal prioritet, så andre programmer ikke kan få lyden til at hakke. Den bruger meget lidt CPU, så spil mærker det ikke.",
-  "its file is gone (it was at {path})": "filen er væk (den lå i {path})"
+  "its file is gone (it was at {path})": "filen er væk (den lå i {path})",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Et gratis virtuelt kabel fra VB-Audio. Det tager omkring et minut, og Windows spørger én gang, om det er okay. Bagefter vælger du det som mikrofon i Discord og spil.",
+  "Install the cable": "Installer kablet",
+  "Not set up yet: only you will hear your sounds.": "Ikke sat op endnu: kun du hører dine lyde.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Du bruger <b>{theme}</b> nu. {n} flere temaer under Indstillinger."
 }

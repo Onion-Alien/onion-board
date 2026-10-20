@@ -1100,7 +1100,6 @@
   "Since start: {dropouts}, {reconnects}.": "Sejak mulai: {dropouts}, {reconnects}.",
   "Site": "Lokasi",
   "Size": "Ukuran",
-  "Skip for now  →": "Lewati sekarang →",
   "Slow or patchy connection": "Koneksi lambat atau tidak merata",
   "Snowflake": "Kepingan salju",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "Sebagian Baru dihapus tidak bisa dikembalikan: masih disimpan di titik pemulihan ini.",
@@ -1454,7 +1453,6 @@
   "❚❚ paused": "❚❚ dijeda",
   "⟲  Restart my PC now": "⟲ Nyalakan ulang PC saya sekarang",
   "⟳  Check again": "⟳ Periksa lagi",
-  "⬇  Install it now (free)": "⬇ Instal sekarang (gratis)",
   "⬇  Try installing again": "⬇ Coba instal lagi",
   "The Discord is where to chat, ask for help and hear about new versions. The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "Di Discord kamu bisa ngobrol, minta bantuan, dan dapat kabar versi baru. Formulir masukan tidak perlu akun. Menemukan masalah keamanan? Laporkan secara pribadi di GitHub, jangan di issue publik.",
   "Join the Discord": "Gabung ke Discord",
@@ -4267,5 +4265,9 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofon di <b>{headset}</b> terputus. Sambungkan lagi dan suaramu akan keluar lagi.",
   "Put the sound first on a busy PC": "Utamakan suara saat PC sibuk",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Menjalankan board dengan prioritas di atas normal, supaya program lain tidak bikin suara tersendat. Pemakaian CPU-nya sangat kecil, jadi game tidak akan terasa.",
-  "its file is gone (it was at {path})": "filenya sudah tidak ada (tadinya di {path})"
+  "its file is gone (it was at {path})": "filenya sudah tidak ada (tadinya di {path})",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Kabel virtual gratis dari VB-Audio. Butuh sekitar semenit, dan Windows akan bertanya sekali apakah boleh. Lalu kamu pilih sebagai mik di Discord dan game.",
+  "Install the cable": "Pasang kabel",
+  "Not set up yet: only you will hear your sounds.": "Belum diatur: cuma kamu yang dengar suaramu.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Kamu sedang pakai <b>{theme}</b>. {n} tema lagi di Pengaturan."
 }

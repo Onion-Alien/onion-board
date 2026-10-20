@@ -971,7 +971,6 @@
   "Since start: {dropouts}, {reconnects}.": "Od spuštění: {dropouts}, {reconnects}.",
   "Site": "Web",
   "Size": "Velikost",
-  "Skip for now  →": "Teď přeskočit  →",
   "Skip this version": "Přeskočit tuto verzi",
   "Slow or patchy connection": "Pomalé nebo nestabilní připojení",
   "Snowflake": "Snowflake",
@@ -1530,7 +1529,6 @@
   "❚❚ paused": "❚❚ pozastaveno",
   "⟲  Restart my PC now": "⟲  Restartovat PC teď",
   "⟳  Check again": "⟳  Zkontrolovat znovu",
-  "⬇  Install it now (free)": "⬇  Nainstalovat teď (zdarma)",
   "⬇  Try installing again": "⬇  Zkusit instalaci znovu",
   "(didn't say)": "(neřekl)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
@@ -4415,5 +4413,9 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofon na <b>{headset}</b> se odpojil. Připoj ho znovu a tvoje zvuky zase půjdou ven.",
   "Put the sound first on a busy PC": "Zvuk má přednost, když je PC vytížené",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Spustí board s vyšší než normální prioritou, aby jiné programy nemohly způsobit výpadky zvuku. Bere velmi málo CPU, takže hry nic nepoznají.",
-  "its file is gone (it was at {path})": "jeho soubor zmizel (byl v {path})"
+  "its file is gone (it was at {path})": "jeho soubor zmizel (byl v {path})",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Bezplatný virtuální kabel od VB-Audio. Trvá to asi minutu a Windows se jednou zeptá, jestli to je v pořádku. Pak ho vybereš jako mikrofon v Discordu a ve hrách.",
+  "Install the cable": "Nainstalovat kabel",
+  "Not set up yet: only you will hear your sounds.": "Zatím nenastaveno: své zvuky uslyšíš jen ty.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Teď používáš <b>{theme}</b>. Další motivy v Nastavení: {n}"
 }
