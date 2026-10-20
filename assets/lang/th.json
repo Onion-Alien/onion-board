@@ -4266,5 +4266,7 @@
   "Your headset's mic is off": "ไมค์ของหูฟังปิดอยู่",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "ไมค์ของ <b>{headset}</b> หลุดการเชื่อมต่อ เชื่อมต่อใหม่แล้วเสียงของคุณจะออกไปอีกครั้ง",
   "Put the sound first on a busy PC": "ให้เสียงมาก่อนเมื่อพีซีทำงานหนัก",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "รันบอร์ดด้วยลำดับความสำคัญสูงกว่าปกติ เพื่อไม่ให้โปรแกรมอื่นทำให้เสียงสะดุด ใช้ CPU น้อยมาก เกมจึงไม่รู้สึกถึงความต่าง"
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "รันบอร์ดด้วยลำดับความสำคัญสูงกว่าปกติ เพื่อไม่ให้โปรแกรมอื่นทำให้เสียงสะดุด ใช้ CPU น้อยมาก เกมจึงไม่รู้สึกถึงความต่าง",
+  "Exact volume of {name}": "ระดับเสียงที่แน่นอนของ {name}",
+  "Volume of {name}": "ระดับเสียงของ {name}"
 }

@@ -4266,5 +4266,7 @@
   "Your headset's mic is off": "ヘッドセットのマイクがオフです",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> のマイクが切断されました。もう一度接続すると、サウンドがまた届きます。",
   "Put the sound first on a busy PC": "PCが忙しいときもサウンドを優先",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "ボードを通常より高い優先度で動かし、ほかのプログラムのせいで音が途切れないようにします。CPUはほとんど使わないので、ゲームへの影響はありません。"
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "ボードを通常より高い優先度で動かし、ほかのプログラムのせいで音が途切れないようにします。CPUはほとんど使わないので、ゲームへの影響はありません。",
+  "Exact volume of {name}": "{name} の音量（数値）",
+  "Volume of {name}": "{name} の音量"
 }

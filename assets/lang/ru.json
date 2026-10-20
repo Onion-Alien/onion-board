@@ -4414,5 +4414,7 @@
   "Your headset's mic is off": "Микрофон гарнитуры выключен",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Микрофон на <b>{headset}</b> отключился. Подключите его снова, и ваши звуки снова пойдут.",
   "Put the sound first on a busy PC": "Звук в приоритете, когда ПК загружен",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Запускает панель с приоритетом выше обычного, чтобы другие программы не заставляли звук прерываться. Она почти не нагружает процессор, так что игры этого не заметят."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Запускает панель с приоритетом выше обычного, чтобы другие программы не заставляли звук прерываться. Она почти не нагружает процессор, так что игры этого не заметят.",
+  "Exact volume of {name}": "Точная громкость {name}",
+  "Volume of {name}": "Громкость {name}"
 }

@@ -4340,5 +4340,7 @@
   "Your headset's mic is off": "A headseted mikrofonja ki van kapcsolva",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "A(z) <b>{headset}</b> mikrofonja lecsatlakozott. Csatlakoztasd újra, és a hangjaid újra kimennek.",
   "Put the sound first on a busy PC": "A hang előnyt kap, ha a gép le van terhelve",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "A boardot a normálnál magasabb prioritással futtatja, így más programok nem tudják akadozóvá tenni a hangot. Nagyon kevés CPU-t használ, a játékok nem veszik észre."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "A boardot a normálnál magasabb prioritással futtatja, így más programok nem tudják akadozóvá tenni a hangot. Nagyon kevés CPU-t használ, a játékok nem veszik észre.",
+  "Exact volume of {name}": "{name} pontos hangereje",
+  "Volume of {name}": "{name} hangereje"
 }

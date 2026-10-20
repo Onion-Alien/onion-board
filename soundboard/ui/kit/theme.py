@@ -330,6 +330,10 @@ QFrame#toast QPushButton#toastclose:hover { background:$btn_hover; }
 QFrame#chip { background:$panel; border:1px solid transparent; border-radius:14px; }
 QFrame#chip[sel="true"] { border-color:$accent; }
 QFrame#chip QPushButton { background:transparent; border:none; padding:2px 6px; }
+QPushButton#upnextchip { background:$panel; border:1px solid transparent; border-radius:14px;
+    padding:0; }
+QPushButton#upnextchip:hover { background:$btn_hover; }
+QPushButton#upnextchip:focus { border-color:$accent; }
 QFrame#chip QPushButton#chipname { font-weight:600; }
 QFrame#chip QPushButton#chipstop { border-radius:12px; padding:0; }
 QFrame#chip QPushButton#chipstop:hover { background:$danger_bg; }

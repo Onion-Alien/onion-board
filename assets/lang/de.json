@@ -4340,5 +4340,7 @@
   "Your headset's mic is off": "Das Mikrofon deines Headsets ist aus",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Das Mikrofon von <b>{headset}</b> hat die Verbindung verloren. Verbinde es wieder, dann gehen deine Sounds wieder raus.",
   "Put the sound first on a busy PC": "Sound zuerst, wenn der PC ausgelastet ist",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Lässt das Board mit höherer Priorität als normal laufen, damit andere Programme den Sound nicht stocken lassen. Es braucht sehr wenig CPU, Spiele merken also nichts."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Lässt das Board mit höherer Priorität als normal laufen, damit andere Programme den Sound nicht stocken lassen. Es braucht sehr wenig CPU, Spiele merken also nichts.",
+  "Exact volume of {name}": "Genaue Lautstärke von {name}",
+  "Volume of {name}": "Lautstärke von {name}"
 }

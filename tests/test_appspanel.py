@@ -1040,6 +1040,20 @@ def test_card_buttons_say_which_program_they_are_for(qapp):
     assert row.btn_clip.accessibleName() == f"Clip editor for {name}"
 
 
+def test_each_cards_volume_says_whose_it_is(qapp):
+    """Several cards: a screen reader heard the same "volume" slider on each one."""
+    from soundboard.ui.apps.appspanel import AppRow
+    rows = [AppRow("music.exe", Meter), AppRow("chat.exe", Meter)]
+    rows[0].set_app(music())
+    rows[1].set_app(App(200, "chat.exe", r"C:\Programs\chat.exe", "Chat", True, 0.3,
+                        ["Speakers"]))
+    names = [r.name.text() for r in rows]
+    assert names[0] != names[1]
+    for row, name in zip(rows, names):
+        assert row.vol.slider.accessibleName() == f"Volume of {name}"
+        assert row.vol.spin.accessibleName() == f"Exact volume of {name}"
+
+
 def test_effects_and_card_size_wait_for_a_program(tab, qapp):
     """Over the empty page the effects button and the card-size slider are hidden:
     nothing to apply them to."""

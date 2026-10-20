@@ -11,7 +11,7 @@ from __future__ import annotations
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
-from PySide6.QtCore import QPoint, Qt, Signal
+from PySide6.QtCore import QPoint, Qt
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QScrollArea,
                                QVBoxLayout, QWidget)
@@ -69,22 +69,22 @@ class _Grip(QLabel):
         e.accept()
 
 
-class UpNextChip(QFrame):
+class UpNextChip(QPushButton):
     """The row's one Up next chip: a list icon, "Up next", the count and ^, one even
-    6 px apart and in one font (a button's own padding and a smaller number made the
-    gaps uneven). The whole chip is the button: a click, Enter or Space opens the list."""
-    clicked = Signal()
+    6 px apart and in one font (a button's own text and a smaller number made the gaps
+    uneven, so they're labels inside it). A button, so a screen reader says "button":
+    a click, Enter or Space opens the list."""
 
     def __init__(self, count: int):
         super().__init__()
-        self.setObjectName("chip")
+        self.setObjectName("upnextchip")
+        self.setAutoDefault(False)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setToolTip(_("See everything waiting to play"))
         self.setAccessibleDescription(_("See everything waiting to play"))
         self.setFixedHeight(CHIP_H)
         h = QHBoxLayout(self)
-        h.setContentsMargins(10, 0, 10, 0)
+        h.setContentsMargins(11, 0, 11, 0)   # 10 inside its 1 px edge, as the frame had
         h.setSpacing(6)
         pic = QLabel()
         icons.set_label_icon(pic, "list", "muted", size=14)   # a theme colour, kept on switch
@@ -101,6 +101,14 @@ class UpNextChip(QFrame):
             h.addWidget(w, 0, Qt.AlignmentFlag.AlignVCenter)
         self._name()
 
+    def sizeHint(self):
+        # a button's own hint is for its (empty) text: the labels' row is its size
+        lay = self.layout()
+        return lay.sizeHint() if lay is not None else super().sizeHint()
+
+    def minimumSizeHint(self):
+        return self.sizeHint()
+
     def _name(self):
         """Its name for a screen reader: the words it shows, "Up next 3"."""
         self.setAccessibleName(f"{_('Up next')} {self.count.text()}")
@@ -109,17 +117,9 @@ class UpNextChip(QFrame):
         self.count.setText(str(n))
         self._name()
 
-    def click(self):
-        self.clicked.emit()
-
-    def mouseReleaseEvent(self, e):
-        if e.button() == Qt.MouseButton.LeftButton and self.rect().contains(e.position().toPoint()):
-            self.clicked.emit()
-        super().mouseReleaseEvent(e)
-
     def keyPressEvent(self, e):
-        if e.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter, Qt.Key.Key_Space):
-            self.clicked.emit()
+        if e.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):   # Space is a button's own
+            self.click()
             return
         super().keyPressEvent(e)
 
