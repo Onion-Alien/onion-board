@@ -207,28 +207,16 @@ def changes_html(changes: list[tuple[str, str, str]]) -> str:
     return f"<table cellspacing='0'>{rows}</table>"
 
 
-def _row_picture(parent, width: int = 420):
-    """Audio recovery's Put Discord back row, drawn as a picture (never shown itself)."""
-    from soundboard.ui.setup.audiorecovery import DiscordRow
-    row = DiscordRow(parent)
-    row.hide()
-    row.ensurePolished()
-    for w in row.findChildren(QLabel) + row.findChildren(QPushButton):
-        w.ensurePolished()
-    row.resize(width, fit.needed_height(row, width))
-    row.layout().activate()   # pyright: ignore[reportOptionalMemberAccess] - it has one
-    pm = row.grab()
-    row.deleteLater()
-    return pm
-
-
 class DiscordFixed(QDialog):
     """Discord's settings came right while its guide was open: Bun celebrates, and the
-    table says exactly which settings changed, from what to what."""
+    table says exactly which settings changed, from what to what. Audio recovery's Put
+    Discord back is under it, and works here too."""
+    discord_back = Signal(list, list)   # (Discord folders to put back, still open)
 
     def __init__(self, parent, client: str, changes: list[tuple[str, str, str]],
-                 restore: bool, show_me=None):
+                 restore: bool, show_me=None, mw=None):
         super().__init__(parent)
+        self.mw = mw if hasattr(mw, "alertctl") else None   # the main window: its toasts
         title = _("{name} is set up for your sounds", name=client)
         self.setWindowTitle(title)
         self.setMinimumWidth(480)   # the table on one line a row, not a narrow column
@@ -264,15 +252,18 @@ class DiscordFixed(QDialog):
                 "Untick <b>Put Discord back for talking on close</b> on the Setup tab."))
             lbl.setTextFormat(Qt.TextFormat.RichText)
             v.addWidget(lbl)
-        # where to undo it, with a picture of the very button (this theme, this language)
+        # where to undo it, and the very button, working (not a picture of it)
         back = panel.hint_label(_(
             "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. "
             "It's in <b>Settings → Audio → Audio recovery</b>:"))
         back.setTextFormat(Qt.TextFormat.RichText)
         v.addWidget(back)
-        self.picture = QLabel(self)
-        self.picture.setPixmap(_row_picture(self))
-        v.addWidget(self.picture, 0, Qt.AlignmentFlag.AlignLeft)
+        from soundboard.ui.setup.audiorecovery import DiscordRow
+        self.back = DiscordRow(self)
+        self.back.button.clicked.connect(self.put_back)
+        self.back.button.setVisible(self.mw is not None)
+        self.discord_back.connect(self._put_back_done)
+        v.addWidget(self.back)
         row = QHBoxLayout()
         row.setSpacing(8)
         row.addStretch(1)
@@ -287,6 +278,18 @@ class DiscordFixed(QDialog):
             row.addWidget(where)
         v.addLayout(row)
         fit.watch(self)
+
+    def put_back(self):
+        from soundboard.ui.setup.audiorecovery import put_discord_back
+        put_discord_back(self.mw, self.back.button, self.discord_back)
+
+    def _put_back_done(self, todo, left):
+        """Put back (or waiting for Discord to close): this window's news is old now."""
+        from soundboard.ui.setup.audiorecovery import said_discord_back
+        busy.set_busy(self.back.button, False)
+        said_discord_back(self.mw, todo, left)
+        if left != ["?"]:
+            self.accept()
 
     def showEvent(self, ev):
         # its first size is the labels' narrow guess (tall): as tall as the words at
@@ -593,7 +596,8 @@ class DiscordSetUp(QObject):
         cfg, setctl = mw.cfg, getattr(mw, "setctl", None)
         box = DiscordFixed(self.parent_w, name, setting_changes(before, after),
                            bool(cfg.discord_restore),
-                           (lambda: setctl.open_settings("audio")) if setctl else None)
+                           (lambda: setctl.open_settings("audio")) if setctl else None,
+                           mw=mw)
         box.exec()
         free_dialog(box)
         self._end()
@@ -793,7 +797,8 @@ class DiscordGuide(QDialog):
         setctl = getattr(self.mw, "setctl", None)
         self.fixed = DiscordFixed(
             self, client, changes, bool(getattr(cfg, "discord_restore", False)),
-            (lambda: setctl.open_settings("audio")) if setctl is not None else None)
+            (lambda: setctl.open_settings("audio")) if setctl is not None else None,
+            mw=self.mw)
         self.fixed.finished.connect(self.accept)   # nothing left to do in the guide
         self.fixed.open()
 
