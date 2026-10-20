@@ -20,7 +20,8 @@ export class Plugin {
     this.timers = timers;
     this.keys = new Map();        // context → { action, settings }
     this.shown = new Map();       // context → what was last drawn (so nothing is sent twice)
-    this.sounds = new Map();      // id → { id, name, color, categories }
+    this.sounds = new Map();      // id → { id, name, color, categories, look }
+    this.cards = new Map();       // "id|look|playing" → the pad as Onion Board draws it
     this.categories = [];
     this.soundsAt = 0;
     this.status = null;
@@ -160,6 +161,10 @@ export class Plugin {
         if (list.ok && Array.isArray(list.body)) {
           this.sounds = new Map(list.body.map((s) => [s.id, s]));
           this.soundsAt = Date.now();
+          const current = new Set(list.body.map((s) => `${s.id}|${s.look}|`));
+          for (const k of [...this.cards.keys()]) {   // a pad changed: its old pictures go
+            if (!current.has(k.slice(0, k.lastIndexOf("|") + 1))) this.cards.delete(k);
+          }
         }
         if (cats.ok && Array.isArray(cats.body)) this.categories = cats.body;
       }
@@ -177,8 +182,14 @@ export class Plugin {
     if (action === PLAY) {
       const sound = this.sounds.get(settings.sound);
       const playing = Boolean(this.status?.playing?.includes(settings.sound));
-      look.image = soundImage({ color: sound?.color, playing, problem: this.problem });
-      look.title = keyTitle(sound?.name || settings.name || "");
+      const card = sound?.look && this.problem === null ? await this.card(sound, playing) : null;
+      if (card) {   // the pad as it is on the board, its name and all
+        look.image = card;
+        look.title = "";
+      } else {      // Onion Board can't be reached, or it's too old to draw pads
+        look.image = soundImage({ color: sound?.color, playing, problem: this.problem });
+        look.title = keyTitle(sound?.name || settings.name || "");
+      }
     } else if (action === TOGGLE) {
       const what = TOGGLES[settings.what] ? settings.what : "live";
       const on = Boolean(this.status?.[what]);
@@ -197,6 +208,18 @@ export class Plugin {
       this.send({ event: "setTitle", context, payload: { title: look.title, target: 0 } });
     }
     this.shown.set(context, look);
+  }
+
+  // The pad drawn by Onion Board itself (its theme, picture, name): fetched once for each
+  // look of it (the sound list's `look` changes when the picture would) and kept.
+  async card(sound, playing) {
+    const k = `${sound.id}|${sound.look}|${playing ? 1 : 0}`;
+    if (!this.cards.has(k)) {
+      const res = await this.board.call("key_image", { id: sound.id, playing: playing ? 1 : 0 });
+      if (!res.ok || typeof res.body?.image !== "string") return null;
+      this.cards.set(k, res.body.image);
+    }
+    return this.cards.get(k);
   }
 
   // What the key's settings panel shows: the sounds and categories to pick from, and

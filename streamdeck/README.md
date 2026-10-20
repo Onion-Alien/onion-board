@@ -4,7 +4,7 @@ A plugin for Elgato's Stream Deck app that plays your Onion Board sounds.
 
 | Key | What it does |
 |---|---|
-| **Play sound** | Plays the sound you pick from a list. The key takes the pad's colour, shows its name and lights up while it plays. |
+| **Play sound** | Plays the sound you pick from a list. The key looks like the pad on your board (its picture, name and theme) and lights up while it plays. |
 | **Stop all sounds** | Stops everything that's playing. |
 | **Random sound** | A random sound: from any category, the one showing in Onion Board, or one you pick. |
 | **Switch** | Live / Muted, the voice changer, "others hear my mic" or hotkeys, on and off. The key shows which it is, even when you change it in the app. |

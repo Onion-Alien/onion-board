@@ -326,6 +326,16 @@ def pixmap(path: str, waiter=None) -> QPixmap | None:
     return _put(path, QPixmap.fromImage(QImage(path)))
 
 
+def load_now(path: str) -> QPixmap | None:
+    """pixmap(), but read here and now if it isn't in yet (a Stream Deck key's picture is
+    drawn once, with nothing to repaint later). UI thread only."""
+    if not path:
+        return None
+    if path in _pixmaps:
+        return pixmap(path)
+    return _put(path, QPixmap.fromImage(QImage(path)))
+
+
 def fitted(path: str, w: int, h: int, dpr: float,
            shade: tuple[tuple[float, int], ...] = (), radius: float = 0,
            waiter=None) -> QPixmap | None:

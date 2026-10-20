@@ -19,6 +19,7 @@ Every endpoint takes GET or POST and answers JSON (ENDPOINTS below is the list;
     /api/sounds[?q=…&category=…] [{id, name, hotkey, categories, color, playing,
                                  volume, loop, press, plays, duration, effects}]
     /api/categories              ["Memes", ...]
+    /api/key_image?id=…[&playing=1]   a pad drawn as a Stream Deck key (PNG data URL)
     /api/play?id=… or ?name=…    play a pad (name: exact, any case)
     /api/stop?id=… or ?name=…    stop one sound;  /api/stop alone stops everything
     /api/pause[?on=1|0|toggle]   pause everything / resume (no on=: toggle)
@@ -157,9 +158,13 @@ ENDPOINTS = {
               "voice (and which voice) / mic / hear / hotkeys / mic_gate / volume, the live "
               "speed and effects, the sound mode, the radio",
     "sounds": "every sound: [{id, name, hotkey, categories, color, playing, volume (%), "
-              "loop, press (what pressing does), plays, duration (s), effects}]; "
+              "loop, press (what pressing does), plays, duration (s), effects, look (changes "
+              "when its key_image would)}]; "
               "?q=horn keeps the names holding that, ?category=Chill one category's",
     "categories": "the category names",
+    "key_image": "a sound's pad as a picture for a Stream Deck key, drawn as on the board: "
+                 "?id=… or ?name=…, &playing=1 lit up (default: as it is now), &size=72-288 "
+                 "px (144); answers {id, look, image: a data:image/png URL}",
     "play": "play one sound: ?name=Airhorn (exact name, any case) or ?id=…",
     "stop": "stop one sound (?name= or ?id=); with neither, stop everything",
     "pause": "pause everything (?on=1), resume it (?on=0), or flip (?on=toggle or nothing)",
@@ -787,6 +792,7 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
                      **live_state(mw), **mode_state(mw, full=False),
                      "radio": radio_state(mw)}
     if action == "sounds":
+        from soundboard.control import keyimage
         q = (params.get("q") or "").strip().casefold()
         cat = None
         if params.get("category"):
@@ -798,11 +804,14 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
                       "categories": list(m.tags), "color": m.color,
                       "playing": m.id in sounding, "volume": round(m.volume * 100),
                       "loop": m.loop, "press": m.mode, "plays": m.plays,
-                      "duration": round(m.duration, 2), "effects": bool(m.fx)}
+                      "duration": round(m.duration, 2), "effects": bool(m.fx),
+                      "look": keyimage.look(m, cfg.theme)}
                      for m in cfg.sounds
                      if (not q or q in m.name.casefold()) and (cat is None or cat in m.tags)]
     if action == "categories":
         return 200, list(cfg.categories)
+    if action == "key_image":
+        return key_image(mw, params, sounding)
     if action == "pause":
         paused = bool(playing) and all(p for _, p in playing.values())
         on = on_value(params, paused)
@@ -1424,6 +1433,24 @@ def find_category(cfg, name: str) -> str | None:
     """A category by name, any case; None if there's no such one."""
     name = name.strip().lower()
     return next((c for c in cfg.categories if c.lower() == name), None)
+
+
+def key_image(mw: MainWindow, params: dict, sounding: list[str]) -> tuple[int, object]:
+    from soundboard.control import keyimage
+
+    m = find_sound(mw, params)
+    if m is None:
+        return no_sound(mw.cfg, params)
+    flag = (params.get("playing") or "").strip().lower()
+    playing = m.id in sounding if flag == "" else flag in ("1", "true", "on", "yes")
+    try:
+        size = int(params.get("size") or keyimage.SIZE)
+    except ValueError:
+        return 400, {"error": "size= takes a number of pixels"}
+    size = max(keyimage.MIN_SIZE, min(keyimage.MAX_SIZE, size))
+    data = base64.b64encode(keyimage.png(m, playing, size)).decode("ascii")
+    return 200, {"id": m.id, "look": keyimage.look(m, mw.cfg.theme),
+                 "image": f"data:image/png;base64,{data}"}
 
 
 def find_sound(mw: MainWindow, params: dict):
