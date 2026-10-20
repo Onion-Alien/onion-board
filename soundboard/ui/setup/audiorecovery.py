@@ -14,7 +14,7 @@ from __future__ import annotations
 import logging
 import threading
 
-from PySide6.QtCore import QObject, Qt, QTimer, Signal
+from PySide6.QtCore import QObject, QSize, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QHBoxLayout, QLabel, QPushButton,
                                QVBoxLayout)
 from shiboken6 import isValid as qt_valid
@@ -246,6 +246,15 @@ def ask(parent, action, lines, go_on):
     return d
 
 
+class MicName(QLabel):
+    """The mic's name: asks for its whole name on one line, and wraps only when the
+    row is too narrow for it (a plain wrapping label asks for about half that)."""
+
+    def sizeHint(self):
+        h = super().sizeHint()
+        return QSize(self.fontMetrics().horizontalAdvance(self.text()) + 2, h.height())
+
+
 class MicRow(QFrame):
     """One mic on the card: its name, where the mic effect stands on it, and every
     action that mic can take, as buttons (nothing hidden in a menu)."""
@@ -263,10 +272,11 @@ class MicRow(QFrame):
         top = QHBoxLayout()
         top.setSpacing(8)
         v.addLayout(top)
-        self.name = QLabel(label, self)
+        self.name = MicName(label, self)
         self.name.setToolTip(mic["name"])
         self.name.setWordWrap(True)
-        top.addWidget(self.name, 1)
+        top.addWidget(self.name)
+        # the pills sit right after the name, not out at the far edge of the row
         pill, tone, _fix = look(mic["state"])
         self.pill = QLabel(pill, self)
         self.pill.setObjectName("pill")
@@ -278,6 +288,7 @@ class MicRow(QFrame):
         theme.set_tone(self.in_use, "muted")
         self.in_use.setVisible(in_use)
         top.addWidget(self.in_use, 0, Qt.AlignmentFlag.AlignVCenter)
+        top.addStretch(1)
         self.buttons = {}
         row = Flow(gap=8)
         v.addLayout(row)

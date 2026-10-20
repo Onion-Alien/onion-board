@@ -301,6 +301,9 @@ def test_every_mic_is_a_row_with_its_name_and_state(window, qapp, monkeypatch): 
     assert (a.name.text(), b.name.text()) == ('#1 Headset Mic (USB)', '#2 Headset Mic (USB)')
     assert a.in_use.isVisibleTo(a) and not b.in_use.isVisibleTo(b)
     assert a.pill.text() == 'Ready' and texts(a) == ['Clean reinstall', 'Remove mic effect']
+    # the pills sit right after the name, on its line, not at the far edge of the row
+    assert 0 <= a.pill.x() - a.name.geometry().right() <= 12
+    assert a.name.height() < 2 * a.name.fontMetrics().height()
     assert not card.findChildren(QComboBox)
     d.close()
 
