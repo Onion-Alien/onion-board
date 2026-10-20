@@ -1730,15 +1730,12 @@
   "Game": "Гра",
   "Gap between voices": "Розрив між голосами",
   "Get AI voices": "Отримайте голос ШІ",
-  "Get Onion Watch": "Отримайте Onion Watch",
-  "Get Onion Watch again": "Знову отримайте Onion Watch",
   "Get and update add-ons": "Отримайте та оновіть доповнення",
   "Getting AI voices…": "Отримання голосів ШІ…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Отримання та оновлення доповнень вимкнено в Налаштуваннях > Конфіденційність і безпека.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "Отримання звуків із {site} вимкнено в налаштуваннях > Конфіденційність і безпека.",
   "Ghost": "Привид",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "Перевірка завантажень GitHub тимчасово недоступна (помилка шлюзу). Спробуйте ще раз отримати голоси штучного інтелекту.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Перевірка завантажень GitHub тимчасово недоступна (помилка шлюзу). Спробуйте отримати Onion Watch ще раз.",
   "Got it": "зрозумів",
   "Growl": "Гарчання",
   "Hear it": "Почуйте це",
@@ -4394,5 +4391,8 @@
   "Using Discord for voice chat?": "Користуєшся Discord для голосового чату?",
   "Voice is on. Tick more to add them to the side.": "Голос увімкнено. Познач ще, щоб додати їх збоку.",
   "What does Offline mode change?": "Що змінює офлайн-режим?",
-  "What does Use less data change?": "Що змінює «Менше даних»?"
+  "What does Use less data change?": "Що змінює «Менше даних»?",
+  "Add Onion Watch again": "Додати Onion Watch знову",
+  "Add Onion Watch to this tab": "Додати Onion Watch на цю вкладку",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Перевірка завантажень GitHub тимчасово недоступна (помилка шлюзу). Спробуйте додати Onion Watch знову трохи згодом."
 }

@@ -1652,15 +1652,12 @@
   "Game": "游戏",
   "Gap between voices": "声音之间的间隙",
   "Get AI voices": "获取人工智能声音",
-  "Get Onion Watch": "获取洋葱手表",
-  "Get Onion Watch again": "再次获取洋葱手表",
   "Get and update add-ons": "获取和更新附加组件",
   "Getting AI voices…": "获取人工智能声音...",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "在“设置”>“隐私和安全”中获取和更新附加组件已关闭。",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "在“设置”>“隐私和安全”中关闭从{site}获取声音。",
   "Ghost": "鬼",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "GitHub 的下载检查暂时不可用（网关错误）。稍后再次尝试获取 AI 声音。",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "GitHub 的下载检查暂时不可用（网关错误）。稍后再次尝试获取 Onion Watch。",
   "Got it": "知道了",
   "Growl": "咆哮",
   "Hear it": "听到它",
@@ -4246,5 +4243,8 @@
   "Using Discord for voice chat?": "用 Discord 语音聊天吗？",
   "Voice is on. Tick more to add them to the side.": "变声已开启。勾选更多以添加到侧边。",
   "What does Offline mode change?": "离线模式会改变什么？",
-  "What does Use less data change?": "节省流量会改变什么？"
+  "What does Use less data change?": "节省流量会改变什么？",
+  "Add Onion Watch again": "再次添加 Onion Watch",
+  "Add Onion Watch to this tab": "将 Onion Watch 添加到此选项卡",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHub 的下载检查暂时不可用（网关错误）。请稍后再次尝试添加 Onion Watch。"
 }

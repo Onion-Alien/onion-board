@@ -1691,15 +1691,12 @@
   "Game": "Jogo",
   "Gap between voices": "Lacuna entre vozes",
   "Get AI voices": "Obtenha vozes de IA",
-  "Get Onion Watch": "Obtenha o relógio de cebola",
-  "Get Onion Watch again": "Obtenha o Onion Watch novamente",
   "Get and update add-ons": "Obtenha e atualize complementos",
   "Getting AI voices…": "Obtendo vozes de IA…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "A obtenção e atualização de complementos está desativada em Configurações > Privacidade e segurança.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "A obtenção de sons de {site} está desativada em Configurações > Privacidade e segurança.",
   "Ghost": "Fantasma",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "A verificação de download do GitHub está temporariamente indisponível (erro de gateway). Tente obter vozes de IA novamente em alguns instantes.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "A verificação de download do GitHub está temporariamente indisponível (erro de gateway). Tente Get Onion Watch novamente em um momento.",
   "Got it": "Entendi",
   "Growl": "Rosnar",
   "Hear it": "Ouça",
@@ -4320,5 +4317,8 @@
   "Using Discord for voice chat?": "Usa o Discord para chat de voz?",
   "Voice is on. Tick more to add them to the side.": "Voz está ligada. Marque mais para adicioná-las na lateral.",
   "What does Offline mode change?": "O que o modo offline muda?",
-  "What does Use less data change?": "O que Usar menos dados muda?"
+  "What does Use less data change?": "O que Usar menos dados muda?",
+  "Add Onion Watch again": "Adicionar Onion Watch de novo",
+  "Add Onion Watch to this tab": "Adicionar Onion Watch a esta aba",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "A verificação de download do GitHub está indisponível no momento (erro de gateway). Tente adicionar o Onion Watch de novo daqui a pouco."
 }

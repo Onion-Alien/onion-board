@@ -1691,15 +1691,12 @@
   "Game": "Oyun",
   "Gap between voices": "Sesler arasındaki boşluk",
   "Get AI voices": "Yapay zeka seslerini alın",
-  "Get Onion Watch": "Soğan İzlemesini Alın",
-  "Get Onion Watch again": "Onion Watch'ı tekrar edinin",
   "Get and update add-ons": "Eklentileri edinin ve güncelleyin",
   "Getting AI voices…": "Yapay zeka sesleri alınıyor…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Eklentileri alma ve güncelleme, Ayarlar > Gizlilik ve güvenlik bölümünde kapatılmıştır.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "{site} sitesinden ses alma Ayarlar > Gizlilik ve güvenlik bölümünde kapatıldı.",
   "Ghost": "Hayalet",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "GitHub'ın indirme kontrolü geçici olarak kullanılamıyor (ağ geçidi hatası). Biraz sonra AI seslerini tekrar almayı deneyin.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "GitHub'ın indirme kontrolü geçici olarak kullanılamıyor (ağ geçidi hatası). Bir süre sonra Onion Watch'ı tekrar almayı deneyin.",
   "Got it": "Anladım",
   "Growl": "hırlama",
   "Hear it": "Duy onu",
@@ -4320,5 +4317,8 @@
   "Using Discord for voice chat?": "Sesli sohbet için Discord mu kullanıyorsun?",
   "Voice is on. Tick more to add them to the side.": "Ses açık. Yana eklemek için başkalarını da işaretle.",
   "What does Offline mode change?": "Çevrimdışı mod neyi değiştirir?",
-  "What does Use less data change?": "Daha az veri kullan neyi değiştirir?"
+  "What does Use less data change?": "Daha az veri kullan neyi değiştirir?",
+  "Add Onion Watch again": "Onion Watch'ı yeniden ekle",
+  "Add Onion Watch to this tab": "Onion Watch'ı bu sekmeye ekle",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHub'ın indirme kontrolü geçici olarak kullanılamıyor (ağ geçidi hatası). Biraz sonra Onion Watch'ı yeniden eklemeyi dene."
 }

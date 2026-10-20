@@ -1691,15 +1691,12 @@
   "Game": "Jeu",
   "Gap between voices": "Écart entre les voix",
   "Get AI voices": "Obtenez des voix IA",
-  "Get Onion Watch": "Obtenez une montre à l'oignon",
-  "Get Onion Watch again": "Obtenez à nouveau Onion Watch",
   "Get and update add-ons": "Obtenez et mettez à jour les modules complémentaires",
   "Getting AI voices…": "Obtenir des voix IA…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "L'obtention et la mise à jour des modules complémentaires sont désactivées dans Paramètres > Confidentialité et sécurité.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "La réception des sons de {site} est désactivée dans Paramètres > Confidentialité et sécurité.",
   "Ghost": "Fantôme",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "La vérification de téléchargement de GitHub est temporairement indisponible (erreur de passerelle). Essayez à nouveau d'obtenir des voix AI dans un instant.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "La vérification de téléchargement de GitHub est temporairement indisponible (erreur de passerelle). Essayez à nouveau Get Onion Watch dans un instant.",
   "Got it": "J'ai compris",
   "Growl": "Grognement",
   "Hear it": "Écoutez-le",
@@ -4320,5 +4317,8 @@
   "Using Discord for voice chat?": "Tu utilises Discord pour le chat vocal ?",
   "Voice is on. Tick more to add them to the side.": "Voix est activé. Coche-en d'autres pour les ajouter sur le côté.",
   "What does Offline mode change?": "Que change le mode hors ligne ?",
-  "What does Use less data change?": "Que change Utiliser moins de données ?"
+  "What does Use less data change?": "Que change Utiliser moins de données ?",
+  "Add Onion Watch again": "Ajouter Onion Watch à nouveau",
+  "Add Onion Watch to this tab": "Ajouter Onion Watch à cet onglet",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "La vérification de téléchargement de GitHub est indisponible pour le moment (erreur de passerelle). Réessaie d'ajouter Onion Watch dans un instant."
 }

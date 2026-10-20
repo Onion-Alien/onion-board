@@ -1609,15 +1609,12 @@
   "Game": "Игра",
   "Gap between voices": "Пропаст между гласовете",
   "Get AI voices": "Вземете AI гласове",
-  "Get Onion Watch": "Вземете Onion Watch",
-  "Get Onion Watch again": "Вземете отново Onion Watch",
   "Get and update add-ons": "Вземете и актуализирайте добавки",
   "Getting AI voices…": "Извличане на AI гласове...",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Получаването и актуализирането на добавки е изключено в Настройки > Поверителност и сигурност.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "Получаването на звуци от {site} е изключено в Настройки > Поверителност и сигурност.",
   "Ghost": "Призрак",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "Проверката за изтегляне на GitHub временно не е достъпна (грешка в шлюза). Опитайте отново да получите AI voices след малко.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Проверката за изтегляне на GitHub временно не е достъпна (грешка в шлюза). Опитайте отново да получите Onion Watch след малко.",
   "Got it": "разбрах",
   "Growl": "ръмжене",
   "Hear it": "чуй го",
@@ -4320,5 +4317,8 @@
   "Using Discord for voice chat?": "Ползваш Discord за гласов чат?",
   "Voice is on. Tick more to add them to the side.": "Глас е включен. Отметни още, за да ги добавиш отстрани.",
   "What does Offline mode change?": "Какво променя офлайн режимът?",
-  "What does Use less data change?": "Какво променя „По-малко данни“?"
+  "What does Use less data change?": "Какво променя „По-малко данни“?",
+  "Add Onion Watch again": "Добави Onion Watch отново",
+  "Add Onion Watch to this tab": "Добави Onion Watch в този раздел",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Проверката за изтегляне на GitHub временно не е достъпна (грешка в шлюза). Опитай да добавиш Onion Watch отново след малко."
 }

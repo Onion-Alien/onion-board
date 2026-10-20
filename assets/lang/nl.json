@@ -1691,15 +1691,12 @@
   "Game": "Spel",
   "Gap between voices": "Kloof tussen stemmen",
   "Get AI voices": "Verkrijg AI-stemmen",
-  "Get Onion Watch": "Koop Onion Watch",
-  "Get Onion Watch again": "Koop Onion Watch opnieuw",
   "Get and update add-ons": "Add-ons downloaden en bijwerken",
   "Getting AI voices…": "AI-stemmen krijgen…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Het verkrijgen en bijwerken van add-ons is uitgeschakeld in Instellingen > Privacy en beveiliging.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "Geluiden ontvangen van {site} is uitgeschakeld in Instellingen > Privacy en beveiliging.",
   "Ghost": "Spook",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "De downloadcontrole van GitHub is tijdelijk niet beschikbaar (gatewayfout). Probeer AI-stemmen zo meteen opnieuw te krijgen.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "De downloadcontrole van GitHub is tijdelijk niet beschikbaar (gatewayfout). Probeer Get Onion Watch over een ogenblik opnieuw.",
   "Got it": "Ik heb het",
   "Growl": "Grommen",
   "Hear it": "Hoor het",
@@ -4320,5 +4317,8 @@
   "Using Discord for voice chat?": "Gebruik je Discord voor voicechat?",
   "Voice is on. Tick more to add them to the side.": "Stem staat aan. Vink er meer aan om ze aan de zijkant toe te voegen.",
   "What does Offline mode change?": "Wat verandert de offlinemodus?",
-  "What does Use less data change?": "Wat verandert Minder data gebruiken?"
+  "What does Use less data change?": "Wat verandert Minder data gebruiken?",
+  "Add Onion Watch again": "Onion Watch opnieuw toevoegen",
+  "Add Onion Watch to this tab": "Onion Watch aan dit tabblad toevoegen",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "De downloadcontrole van GitHub is tijdelijk niet beschikbaar (gatewayfout). Probeer Onion Watch zo meteen opnieuw toe te voegen."
 }

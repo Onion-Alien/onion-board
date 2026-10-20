@@ -1688,15 +1688,12 @@
   "Game": "Juego",
   "Gap between voices": "Brecha entre voces",
   "Get AI voices": "Obtén voces de IA",
-  "Get Onion Watch": "Obtener reloj de cebolla",
-  "Get Onion Watch again": "Obtén Onion Watch nuevamente",
   "Get and update add-ons": "Obtener y actualizar complementos",
   "Getting AI voices…": "Obteniendo voces de IA...",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "La obtención y actualización de complementos está desactivada en Configuración > Privacidad y seguridad.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "Obtener sonidos de {site} está desactivado en Configuración > Privacidad y seguridad.",
   "Ghost": "Fantasma",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "La verificación de descarga de GitHub no está disponible temporalmente (error de puerta de enlace). Intente Obtener voces de IA nuevamente en un momento.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "La verificación de descarga de GitHub no está disponible temporalmente (error de puerta de enlace). Prueba Get Onion Watch nuevamente en un momento.",
   "Got it": "Entiendo",
   "Growl": "Gruñido",
   "Hear it": "Escúchalo",
@@ -4320,5 +4317,8 @@
   "Using Discord for voice chat?": "¿Usas Discord para el chat de voz?",
   "Voice is on. Tick more to add them to the side.": "Voz está activada. Marca más para agregarlas al costado.",
   "What does Offline mode change?": "¿Qué cambia el modo sin conexión?",
-  "What does Use less data change?": "¿Qué cambia Usar menos datos?"
+  "What does Use less data change?": "¿Qué cambia Usar menos datos?",
+  "Add Onion Watch again": "Agregar Onion Watch otra vez",
+  "Add Onion Watch to this tab": "Agregar Onion Watch a esta pestaña",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "La verificación de descargas de GitHub no está disponible ahora (error de puerta de enlace). Intenta agregar Onion Watch otra vez en un momento."
 }

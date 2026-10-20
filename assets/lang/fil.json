@@ -1688,15 +1688,12 @@
   "Game": "Laro",
   "Gap between voices": "Gap sa pagitan ng mga boses",
   "Get AI voices": "Kumuha ng mga boses ng AI",
-  "Get Onion Watch": "Kumuha ng Onion Watch",
-  "Get Onion Watch again": "Kumuha muli ng Onion Watch",
   "Get and update add-ons": "Kumuha at mag-update ng mga add-on",
   "Getting AI voices…": "Pagkuha ng AI voices...",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Naka-off ang pagkuha at pag-update ng mga add-on sa Mga Setting > Privacy at seguridad.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "Naka-off ang pagkuha ng mga tunog mula sa {site} sa Mga Setting > Privacy at seguridad.",
   "Ghost": "Multo",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "Pansamantalang hindi available ang pagsusuri sa pag-download ng GitHub (error sa gateway). Subukang Kumuha muli ng mga boses ng AI sa isang sandali.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Pansamantalang hindi available ang pagsusuri sa pag-download ng GitHub (error sa gateway). Subukang Kumuha muli ng Onion Watch sa ilang sandali.",
   "Got it": "Nakuha ko",
   "Growl": "Ungol",
   "Hear it": "Pakinggan mo",
@@ -4320,5 +4317,8 @@
   "Using Discord for voice chat?": "Gamit mo ba ang Discord sa voice chat?",
   "Voice is on. Tick more to add them to the side.": "Naka-on ang Voice. Mag-tsek pa para idagdag sila sa gilid.",
   "What does Offline mode change?": "Ano ang binabago ng Offline mode?",
-  "What does Use less data change?": "Ano ang binabago ng Gumamit ng mas kaunting data?"
+  "What does Use less data change?": "Ano ang binabago ng Gumamit ng mas kaunting data?",
+  "Add Onion Watch again": "Idagdag muli ang Onion Watch",
+  "Add Onion Watch to this tab": "Idagdag ang Onion Watch sa tab na ito",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Pansamantalang hindi available ang pagsusuri ng download ng GitHub (error sa gateway). Subukang idagdag muli ang Onion Watch maya-maya."
 }

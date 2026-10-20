@@ -1649,15 +1649,12 @@
   "Game": "Permainan",
   "Gap between voices": "Jurang antara suara",
   "Get AI voices": "Dapatkan suara AI",
-  "Get Onion Watch": "Dapatkan Jam Tangan Bawang",
-  "Get Onion Watch again": "Dapatkan Onion Watch sekali lagi",
   "Get and update add-ons": "Dapatkan dan kemas kini alat tambah",
   "Getting AI voices…": "Mendapatkan suara AI…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Mendapatkan dan mengemas kini alat tambah dimatikan dalam Tetapan > Privasi & keselamatan.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "Mendapatkan bunyi daripada {site} dimatikan dalam Tetapan > Privasi & keselamatan.",
   "Ghost": "hantu",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "Semakan muat turun GitHub tidak tersedia buat sementara waktu (ralat pintu masuk). Cuba Dapatkan suara AI sekali lagi.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Semakan muat turun GitHub tidak tersedia buat sementara waktu (ralat pintu masuk). Cuba Dapatkan Onion Watch sekali lagi.",
   "Got it": "faham",
   "Growl": "Geram",
   "Hear it": "Dengarlah",
@@ -4246,5 +4243,8 @@
   "Using Discord for voice chat?": "Guna Discord untuk sembang suara?",
   "Voice is on. Tick more to add them to the side.": "Suara sudah dihidupkan. Tanda lagi untuk menambahnya di sisi.",
   "What does Offline mode change?": "Apakah yang diubah oleh mod luar talian?",
-  "What does Use less data change?": "Apakah yang diubah oleh Guna kurang data?"
+  "What does Use less data change?": "Apakah yang diubah oleh Guna kurang data?",
+  "Add Onion Watch again": "Tambah Onion Watch sekali lagi",
+  "Add Onion Watch to this tab": "Tambah Onion Watch ke tab ini",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Semakan muat turun GitHub tidak tersedia buat sementara (ralat gateway). Cuba tambah Onion Watch sekali lagi sebentar nanti."
 }

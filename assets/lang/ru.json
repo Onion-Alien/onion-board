@@ -1651,15 +1651,12 @@
   "Game": "Игра",
   "Gap between voices": "Разрыв между голосами",
   "Get AI voices": "Получите голоса ИИ",
-  "Get Onion Watch": "Получить луковые часы",
-  "Get Onion Watch again": "Получите Onion Watch снова",
   "Get and update add-ons": "Получайте и обновляйте дополнения",
   "Getting AI voices…": "Получение голосов ИИ…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Получение и обновление надстроек отключено в разделе «Настройки» > «Конфиденциальность и безопасность».",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "Получение звуков с {site} отключено в меню «Настройки» > «Конфиденциальность и безопасность».",
   "Ghost": "Призрак",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "Проверка загрузки GitHub временно недоступна (ошибка шлюза). Попробуйте получить голоса AI еще раз через мгновение.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Проверка загрузки GitHub временно недоступна (ошибка шлюза). Попробуйте Get Onion Watch еще раз через минуту.",
   "Got it": "Понятно",
   "Growl": "Рычать",
   "Hear it": "Слушай это",
@@ -4394,5 +4391,8 @@
   "Using Discord for voice chat?": "Пользуешься Discord для голосового чата?",
   "Voice is on. Tick more to add them to the side.": "Голос включён. Отметь ещё, чтобы добавить их сбоку.",
   "What does Offline mode change?": "Что меняет автономный режим?",
-  "What does Use less data change?": "Что меняет «Меньше трафика»?"
+  "What does Use less data change?": "Что меняет «Меньше трафика»?",
+  "Add Onion Watch again": "Добавить Onion Watch снова",
+  "Add Onion Watch to this tab": "Добавить Onion Watch на эту вкладку",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Проверка загрузки GitHub временно недоступна (ошибка шлюза). Попробуйте добавить Onion Watch снова чуть позже."
 }

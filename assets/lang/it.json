@@ -1691,15 +1691,12 @@
   "Game": "Gioco",
   "Gap between voices": "Divario tra le voci",
   "Get AI voices": "Ottieni voci AI",
-  "Get Onion Watch": "Ottieni l'orologio a cipolla",
-  "Get Onion Watch again": "Ottieni di nuovo Onion Watch",
   "Get and update add-ons": "Ottieni e aggiorna i componenti aggiuntivi",
   "Getting AI voices…": "Ottenere voci AI...",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "L'acquisizione e l'aggiornamento dei componenti aggiuntivi è disattivata in Impostazioni > Privacy e sicurezza.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "La ricezione di suoni da {site} è disattivata in Impostazioni > Privacy e sicurezza.",
   "Ghost": "Fantasma",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "Il controllo dei download di GitHub è temporaneamente non disponibile (errore del gateway). Prova di nuovo a ottenere le voci AI tra un attimo.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Il controllo dei download di GitHub è temporaneamente non disponibile (errore del gateway). Prova nuovamente a ottenere Onion Watch tra un attimo.",
   "Got it": "Fatto",
   "Growl": "Ringhiare",
   "Hear it": "Ascoltalo",
@@ -4320,5 +4317,8 @@
   "Using Discord for voice chat?": "Usi Discord per la chat vocale?",
   "Voice is on. Tick more to add them to the side.": "Voce è attiva. Spunta le altre per aggiungerle a lato.",
   "What does Offline mode change?": "Cosa cambia la modalità offline?",
-  "What does Use less data change?": "Cosa cambia Usa meno dati?"
+  "What does Use less data change?": "Cosa cambia Usa meno dati?",
+  "Add Onion Watch again": "Aggiungi di nuovo Onion Watch",
+  "Add Onion Watch to this tab": "Aggiungi Onion Watch a questa scheda",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Il controllo dei download di GitHub non è disponibile al momento (errore del gateway). Riprova ad aggiungere Onion Watch tra un attimo."
 }

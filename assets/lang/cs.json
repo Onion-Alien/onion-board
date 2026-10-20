@@ -1727,15 +1727,12 @@
   "Game": "Hra",
   "Gap between voices": "Mezera mezi hlasy",
   "Get AI voices": "Získejte hlasy AI",
-  "Get Onion Watch": "Získejte cibulové hodinky",
-  "Get Onion Watch again": "Získejte znovu Onion Watch",
   "Get and update add-ons": "Získejte a aktualizujte doplňky",
   "Getting AI voices…": "Získávání hlasů AI…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Získávání a aktualizace doplňků je vypnutá v Nastavení > Soukromí a zabezpečení.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "Získávání zvuků z {site} je vypnuto v Nastavení > Soukromí a zabezpečení.",
   "Ghost": "Duch",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "Kontrola stahování GitHubu je dočasně nedostupná (chyba brány). Zkuste za chvíli znovu získat hlasy AI.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Kontrola stahování GitHubu je dočasně nedostupná (chyba brány). Vyzkoušejte Get Onion Watch znovu za chvíli.",
   "Got it": "Rozumím",
   "Growl": "Zavrčení",
   "Hear it": "Slyšte to",
@@ -4394,5 +4391,8 @@
   "Using Discord for voice chat?": "Používáš Discord na hlasový chat?",
   "Voice is on. Tick more to add them to the side.": "Hlas je zapnutý. Zaškrtni další a přidají se do strany.",
   "What does Offline mode change?": "Co mění režim offline?",
-  "What does Use less data change?": "Co mění Méně dat?"
+  "What does Use less data change?": "Co mění Méně dat?",
+  "Add Onion Watch again": "Přidat Onion Watch znovu",
+  "Add Onion Watch to this tab": "Přidat Onion Watch do této karty",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Kontrola stahování na GitHubu je dočasně nedostupná (chyba brány). Zkus Onion Watch přidat znovu za chvíli."
 }

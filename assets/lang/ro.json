@@ -1727,15 +1727,12 @@
   "Game": "Joc",
   "Gap between voices": "Decalaj dintre voci",
   "Get AI voices": "Obțineți voci AI",
-  "Get Onion Watch": "Ia ceapa ceapa",
-  "Get Onion Watch again": "Ia din nou Onion Watch",
   "Get and update add-ons": "Obțineți și actualizați suplimente",
   "Getting AI voices…": "Primesc voci AI...",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Obținerea și actualizarea suplimentelor este dezactivată în Setări > Confidențialitate și securitate.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "Obținerea de sunete de pe {site} este dezactivată în Setări > Confidențialitate și securitate.",
   "Ghost": "Fantomă",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "Verificarea de descărcare a GitHub este temporar indisponibilă (eroare de gateway). Încercați să obțineți din nou voci AI peste un moment.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Verificarea de descărcare a GitHub este temporar indisponibilă (eroare de gateway). Încercați din nou Obțineți ceapa ceapă peste un moment.",
   "Got it": "Am înţeles",
   "Growl": "Mârâi",
   "Hear it": "Auzi",
@@ -4394,5 +4391,8 @@
   "Using Discord for voice chat?": "Folosești Discord pentru chat vocal?",
   "Voice is on. Tick more to add them to the side.": "Voce e pornit. Bifează mai multe ca să le adaugi în lateral.",
   "What does Offline mode change?": "Ce schimbă modul offline?",
-  "What does Use less data change?": "Ce schimbă Folosește mai puține date?"
+  "What does Use less data change?": "Ce schimbă Folosește mai puține date?",
+  "Add Onion Watch again": "Adaugă Onion Watch din nou",
+  "Add Onion Watch to this tab": "Adaugă Onion Watch în această filă",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Verificarea descărcărilor GitHub este temporar indisponibilă (eroare de gateway). Încearcă să adaugi Onion Watch din nou peste puțin timp."
 }

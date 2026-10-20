@@ -1688,15 +1688,12 @@
   "Game": "Peli",
   "Gap between voices": "Ero äänien välillä",
   "Get AI voices": "Hanki AI-ääniä",
-  "Get Onion Watch": "Hanki sipulikello",
-  "Get Onion Watch again": "Hanki Onion Watch uudelleen",
   "Get and update add-ons": "Hanki ja päivitä lisäosat",
   "Getting AI voices…": "Haetaan tekoälyääniä…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Lisäosien hakeminen ja päivittäminen on kytketty pois päältä kohdassa Asetukset > Tietosuoja ja suojaus.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "Äänien vastaanottaminen sivustolta {site} on poistettu käytöstä kohdassa Asetukset > Tietosuoja ja suojaus.",
   "Ghost": "Aave",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "GitHubin lataustarkistus ei ole tilapäisesti käytettävissä (yhdyskäytävävirhe). Yritä saada AI-ääniä hetken kuluttua uudelleen.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "GitHubin lataustarkistus ei ole tilapäisesti käytettävissä (yhdyskäytävävirhe). Kokeile Get Onion Watchia hetken kuluttua uudelleen.",
   "Got it": "Selvä",
   "Growl": "Murista",
   "Hear it": "Kuule se",
@@ -4320,5 +4317,8 @@
   "Using Discord for voice chat?": "Käytätkö Discordia äänichattiin?",
   "Voice is on. Tick more to add them to the side.": "Puhe on päällä. Valitse lisää, niin ne tulevat sivulle.",
   "What does Offline mode change?": "Mitä offline-tila muuttaa?",
-  "What does Use less data change?": "Mitä Käytä vähemmän dataa muuttaa?"
+  "What does Use less data change?": "Mitä Käytä vähemmän dataa muuttaa?",
+  "Add Onion Watch again": "Lisää Onion Watch uudelleen",
+  "Add Onion Watch to this tab": "Lisää Onion Watch tähän välilehteen",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHubin lataustarkistus ei ole hetkeen käytettävissä (yhdyskäytävävirhe). Yritä lisätä Onion Watch uudelleen hetken päästä."
 }

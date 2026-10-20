@@ -1652,15 +1652,12 @@
   "Game": "Trò chơi",
   "Gap between voices": "Khoảng cách giữa các giọng nói",
   "Get AI voices": "Nhận giọng nói AI",
-  "Get Onion Watch": "Nhận đồng hồ hành tây",
-  "Get Onion Watch again": "Nhận lại Onion Watch",
   "Get and update add-ons": "Nhận và cập nhật các tiện ích bổ sung",
   "Getting AI voices…": "Nhận giọng nói AI…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Việc tải và cập nhật các tiện ích bổ sung bị tắt trong Cài đặt > Quyền riêng tư & bảo mật.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "Tính năng nhận âm thanh từ {site} bị tắt trong Cài đặt > Quyền riêng tư và bảo mật.",
   "Ghost": "Bóng ma",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "Kiểm tra tải xuống của GitHub tạm thời không khả dụng (lỗi cổng). Hãy thử Nhận lại giọng nói AI sau giây lát.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Kiểm tra tải xuống của GitHub tạm thời không khả dụng (lỗi cổng). Hãy thử tải lại Onion Watch sau giây lát.",
   "Got it": "Hiểu rồi",
   "Growl": "gầm gừ",
   "Hear it": "Hãy nghe nó",
@@ -4246,5 +4243,8 @@
   "Using Discord for voice chat?": "Bạn dùng Discord để trò chuyện thoại?",
   "Voice is on. Tick more to add them to the side.": "Giọng nói đang bật. Đánh dấu thêm để thêm chúng vào thanh bên.",
   "What does Offline mode change?": "Chế độ ngoại tuyến thay đổi gì?",
-  "What does Use less data change?": "Dùng ít dữ liệu hơn thay đổi gì?"
+  "What does Use less data change?": "Dùng ít dữ liệu hơn thay đổi gì?",
+  "Add Onion Watch again": "Thêm lại Onion Watch",
+  "Add Onion Watch to this tab": "Thêm Onion Watch vào tab này",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Tạm thời không kiểm tra tải xuống của GitHub được (lỗi cổng). Hãy thử thêm lại Onion Watch sau giây lát."
 }

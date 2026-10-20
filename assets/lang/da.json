@@ -1688,15 +1688,12 @@
   "Game": "Spil",
   "Gap between voices": "Gab mellem stemmer",
   "Get AI voices": "Få AI-stemmer",
-  "Get Onion Watch": "Få Onion Watch",
-  "Get Onion Watch again": "Få Onion Watch igen",
   "Get and update add-ons": "Hent og opdater tilføjelser",
   "Getting AI voices…": "Får AI-stemmer...",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Hentning og opdatering af tilføjelser er slået fra i Indstillinger > Privatliv og sikkerhed.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "Hentning af lyde fra {site} er slået fra i Indstillinger > Privatliv og sikkerhed.",
   "Ghost": "Spøgelse",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "GitHubs downloadcheck er midlertidigt utilgængelig (gateway-fejl). Prøv Få AI-stemmer igen om et øjeblik.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "GitHubs downloadcheck er midlertidigt utilgængelig (gateway-fejl). Prøv Get Onion Watch igen om et øjeblik.",
   "Got it": "Forstår det",
   "Growl": "Knurre",
   "Hear it": "Hør det",
@@ -4320,5 +4317,8 @@
   "Using Discord for voice chat?": "Bruger du Discord til stemmechat?",
   "Voice is on. Tick more to add them to the side.": "Stemme er slået til. Sæt flere flueben for at tilføje dem i siden.",
   "What does Offline mode change?": "Hvad ændrer offlinetilstand?",
-  "What does Use less data change?": "Hvad ændrer Brug mindre data?"
+  "What does Use less data change?": "Hvad ændrer Brug mindre data?",
+  "Add Onion Watch again": "Tilføj Onion Watch igen",
+  "Add Onion Watch to this tab": "Tilføj Onion Watch til denne fane",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHubs downloadtjek er midlertidigt utilgængeligt (gateway-fejl). Prøv at tilføje Onion Watch igen om et øjeblik."
 }
