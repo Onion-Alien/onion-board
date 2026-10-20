@@ -109,10 +109,13 @@ class PlaybackControl(Controller):
             else:
                 mw.toast(_("“{name}” is still loading…", name=html.escape(m.name)), "warn")
             return
-        if (sid != LINK_ID and LINK_ID in mw.engine.playing()
-                and mw.searchctl._pad_for_link(mw.searchctl._link_url) == sid):
-            # the web song played from a search, now saved as this pad: one song, so
-            # it starts again from the top instead of a second copy playing over it
+        if sid != LINK_ID and LINK_ID in mw.engine.playing() and (
+                (PRESS_MODE.get(m.mode, m.mode) == "solo" and not m.loop)
+                or mw.searchctl._pad_for_link(mw.searchctl._link_url) == sid):
+            # a sound that stops the others stops the web search's song too (the
+            # engine leaves that voice alone): it played over it, two songs at once.
+            # Its own pad (the song saved) starts it again from the top instead.
+            # Play over it is the pad's Overlap mode; a loop is a background.
             self._stop_sound(LINK_ID)
         live = getattr(mw, "livesetups", None)
         if live is not None:   # a Live controls setup's AI voice: its version of the sound
@@ -662,8 +665,8 @@ class PlaybackControl(Controller):
         links = tuple(mw.linkbar.up_next())
         queue = tuple(self._queue)
         waiting: list[Waiting] = [
-            Waiting(title,
-                    lambda __=False, i=i, q=links: mw.linkbar.play_next(i, q),
+            Waiting(title,   # its name plays it now, as its ▶ does: never over a sound
+                    lambda __=False, i=i, q=links: self._play_link_now(i, q),
                     lambda __=False, i=i, q=links: mw.linkbar.drop_up_next(i, q),
                     lambda __=False, i=i, q=links: self._play_link_now(i, q),
                     lambda to, i=i, q=links: self._move_link(i, to, q), "links")

@@ -735,7 +735,7 @@ def fake_link_download(monkeypatch, tmp_path):
     """download_audio writes a 1 s tone into a fresh folder; returns the call log."""
     calls = []
 
-    def download(url, dest=None, progress=None, auto_update=True):
+    def download(url, dest=None, progress=None, auto_update=True, **kw):
         calls.append(url)
         folder = tmp_path / f"sb-ytdl-{len(calls)}"   # the link bar only deletes these
         folder.mkdir()

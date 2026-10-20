@@ -188,9 +188,15 @@ def test_a_web_song_saved_as_a_pad_plays_once_not_twice(window, player, monkeypa
     assert LINK_ID not in player.voices and "s0" in player.voices
 
 
-def test_another_pad_leaves_the_web_song_playing(window, player, monkeypatch):
+def test_another_pad_stops_the_web_song_unless_it_overlaps(window, player, monkeypatch):
+    """A pad that stops the others stops the web song too: two songs played at once.
+    An Overlap pad (or a loop, a background) plays over it."""
     _link(window)
     monkeypatch.setattr(window.meta("s0"), "source", {"link": "https://youtu.be/other"})
+    window.playctl.play("s0")
+    assert LINK_ID not in player.voices and "s0" in player.voices
+    _link(window)
+    window.meta("s0").mode = "overlap"
     window.playctl.play("s0")
     assert LINK_ID in player.voices and "s0" in player.voices
 
