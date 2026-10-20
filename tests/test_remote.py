@@ -556,7 +556,8 @@ def test_key_names_wrap_onto_two_lines(qapp):
 
     from soundboard.control.keyimage import two_lines
     fm = QFontMetrics(QFont())
-    assert two_lines("Sad Trombone", fm, fm.horizontalAdvance("Sad Trombone") - 1) == "Sad\nTrombone"
+    narrow = fm.horizontalAdvance("Sad Trombone") - 1
+    assert two_lines("Sad Trombone", fm, narrow) == "Sad\nTrombone"
     assert two_lines("Bruh", fm, 500) == "Bruh"
     long = two_lines("one two three four five six seven", fm, fm.horizontalAdvance("one two"))
     assert long.startswith("one two\n") and long.endswith("…") and long.count("\n") == 1
