@@ -140,9 +140,9 @@ QDialog#setupcard { border:1px solid $border; border-radius:16px; }
 QFrame#card { background:$panel; border-radius:12px; }
 QFrame#card QWidget { background:transparent; }
 QFrame#card[interactive="true"] { border:1px solid transparent; }
-QFrame#card[interactive="true"][hovered="true"] { background:$card_hi; border-color:$border_hi; }
-QFrame#card[interactive="true"]:focus { background:$card_hi; border-color:$accent; }
-QFrame#card[interactive="true"][playing="true"] { background:$card_hi; border:2px solid $accent; }
+QFrame#card[interactive="true"][hovered="true"] { background-color:$card_hi; border-color:$border_hi; }
+QFrame#card[interactive="true"]:focus { background-color:$card_hi; border-color:$accent; }
+QFrame#card[interactive="true"][playing="true"] { background-color:$card_hi; border:2px solid $accent; }
 QLabel#section { color:$heading; font-size:10pt; font-weight:600; padding-top:8px;
                  qproperty-indent:0; }  /* padding alone makes Qt indent the text 3 px */
 QLabel#section[head="true"] { padding-top:0; }
@@ -497,6 +497,9 @@ QMenu::icon { padding-left:10px; }
 QMenu::separator { height:1px; background:$border; margin:5px 8px; }
 QFrame#tabcard { background:$card_hi; border:1px solid transparent; border-radius:10px; margin:3px 4px; }
 QFrame#tabcard:hover { border-color:$border_hi; background:$btn_hover; }
+/* inside a textured card the box is see-through: a hovered one lifts with a see-through
+   wash, so the card's texture and the buttons on the box still show */
+QFrame#setcard QFrame#tabcard:hover { background:$box_hover; }
 QLabel#tabcardpic { background:$inset; border-radius:12px; }
 QLabel#tabcardtitle { font-size:11pt; font-weight:700; color:$text_hi; background:transparent; }
 QLabel#tabcardblurb { color:$muted; background:transparent; }
@@ -592,8 +595,8 @@ QPlainTextEdit#speechlog { background:$bg; border:1px solid transparent; border-
 QFrame#fxcard { background:$card; border:1px solid transparent; border-radius:12px; }
 QFrame#fxcard:hover { border-color:$border_hi; }
 QFrame#fxcard[on="true"] { border-color:$accent; }
-QFrame#fxcard[hero="true"] { background:$card; }
-QFrame#fxcard[fresh="true"] { background:$card_hi; border:2px solid $accent_hi; }
+QFrame#fxcard[hero="true"] { background-color:$card; }
+QFrame#fxcard[fresh="true"] { background-color:$card_hi; border:2px solid $accent_hi; }
 QFrame#fxcard QLabel, QFrame#fxcard QCheckBox { background:transparent; }
 QLabel#fxname { font-weight:700; font-size:10pt; color:$text_hi; }
 QLabel#fxdesc { color:$muted; font-size:8.5pt; }
@@ -755,7 +758,7 @@ QToolTip { background:$card; }
 QFrame#card, QFrame#setcard, QFrame#fxcard {
     background:$panel; border:1px solid $surface_border; }
 QFrame#card[interactive="true"] { border-left:1px solid transparent; border-right:1px solid transparent; }
-QFrame#card[interactive="true"][hovered="true"] { background:$card_hi; border-color:$border_hi; }
+QFrame#card[interactive="true"][hovered="true"] { background-color:$card_hi; border-color:$border_hi; }
 QFrame#transport, QFrame#deck { background:$glass; border-top:1px solid $edge; }
 QPushButton#primary, QFrame#card QPushButton#primary, QFrame#setcard QPushButton#primary {
     background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top, stop:0.3 $accent,
@@ -1064,6 +1067,7 @@ def stylesheet(name: str | None = None) -> str:
     # window's finish shades both a little: 1.5 measured 1.42:1 as drawn in Paper.
     tk["nav_sel"] = max((stand_out(tk["bg"], (tk["accent"], tk["text"]), 1.6, tk),
                          tk["card_hi"]), key=lambda c: _contrast(c, tk["bg"]))
+    tk["box_hover"] = _rgba(tk["text_hi"], 0.07)   # a hovered box in a card
     tk["accent_tint"] = _rgba(tk["accent"], 0.30)
     tk["accent_tint_hi"] = _rgba(tk["accent"], 0.42)
     tk["check"] = _check_url(tk["on_accent"])

@@ -1,6 +1,7 @@
 """Every theme in theme.THEMES, not just Dark and Light: the bugs a full
 render of each one found, kept from coming back."""
 import math
+import re
 
 import pytest
 from PySide6.QtCore import QPoint, QSize
@@ -269,3 +270,21 @@ def test_hovering_a_theme_card_makes_bun_wave(qapp, monkeypatch):
     monkeypatch.setattr(lite, "on", lambda: True)   # lite mode: he stays still
     card.enterEvent(QEnterEvent(QPointF(5, 5), QPointF(5, 5), QPointF(5, 5)))
     assert not card._tick.isActive()
+
+
+_TEXTURED = re.compile(r"QFrame#(card|setcard|fxcard)(\[[^\]]*\])*(:[\w!]+)*$")
+
+
+@pytest.mark.parametrize("name", [n for n in theme.THEMES if theme.tokens(n).get("texture")])
+def test_a_hovered_or_picked_card_keeps_its_texture(name):
+    """Carbon's weave went flat on a hovered card: `background:` in a state rule wipes the
+    texture tile too. A card's states set only `background-color`, and a hovered box in
+    a Settings card is a see-through wash, so the card's texture and its buttons show."""
+    css = theme.stylesheet(name)
+    for m in re.finditer(r"([^{}]*)\{([^{}]*)\}", css):
+        sels = [s.strip() for s in re.sub(r"/\*.*?\*/", "", m.group(1), flags=re.S).split(",")]
+        for sel in sels:
+            if _TEXTURED.match(sel) and ("[" in sel or ":" in sel):
+                assert not re.search(r"(^|[;\s])background\s*:", m.group(2)), sel
+    hover = re.search(r"QFrame#setcard QFrame#tabcard:hover \{ background:([^;]*);", css)
+    assert hover and hover.group(1).startswith("rgba("), "hovered box isn't see-through"
