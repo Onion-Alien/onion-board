@@ -1201,7 +1201,6 @@
   "Since start: {dropouts}, {reconnects}.": "منذ البداية: {dropouts} ، {reconnects} .",
   "Site": "موقع",
   "Size": "مقاس",
-  "Skip for now  →": "تخطي الآن →",
   "Slow or patchy connection": "اتصال بطيء أو غير مكتمل",
   "Snowflake": "ندفة الثلج",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "لا يمكن استعادة بعض العناصر المحذوفة مؤخرًا: يتم الاحتفاظ بها في نقطة الاستعادة هذه.",
@@ -1645,7 +1644,6 @@
   "❚❚ paused": "❚❚ متوقفة",
   "⟲  Restart my PC now": "⟲ أعد تشغيل جهاز الكمبيوتر الخاص بي الآن",
   "⟳  Check again": "⟳ تحقق مرة أخرى",
-  "⬇  Install it now (free)": "⬇ قم بتثبيته الآن (مجانًا)",
   "⬇  Try installing again": "⬇ حاول التثبيت مرة أخرى",
   "Join the Discord": "انضم إلى Discord",
   "Chat about it on Discord": "تحدّث عنه على Discord",
@@ -4636,5 +4634,9 @@
   "Your headset's mic is off": "مايك السماعة مطفأ",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "انقطع مايك <b>{headset}</b>. أعد توصيله وستخرج أصواتك من جديد.",
   "Put the sound first on a busy PC": "أعطِ الصوت الأولوية عندما يكون الكمبيوتر مشغولًا",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "يشغّل اللوحة بأولوية أعلى من العادية، فلا تستطيع البرامج الأخرى أن تجعل الصوت يتقطّع. تستهلك القليل جدًا من المعالج، فلن تلاحظ الألعاب شيئًا."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "يشغّل اللوحة بأولوية أعلى من العادية، فلا تستطيع البرامج الأخرى أن تجعل الصوت يتقطّع. تستهلك القليل جدًا من المعالج، فلن تلاحظ الألعاب شيئًا.",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "كابل افتراضي مجاني من VB-Audio. يستغرق دقيقة تقريبًا، ويسألك Windows مرة واحدة إن كان ذلك مناسبًا. بعدها تختاره كميكروفون في Discord والألعاب.",
+  "Install the cable": "ثبّت الكابل",
+  "Not set up yet: only you will hear your sounds.": "لم يُضبط بعد: أنت وحدك ستسمع أصواتك.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "تستخدم الآن <b>{theme}</b>. مظاهر أخرى في الإعدادات: {n}"
 }

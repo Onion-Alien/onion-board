@@ -1120,7 +1120,6 @@
   "Since start: {dropouts}, {reconnects}.": "Seit dem Start: {dropouts}, {reconnects}.",
   "Site": "Seite",
   "Size": "Größe",
-  "Skip for now  →": "Erst mal überspringen  →",
   "Slow or patchy connection": "Langsame oder wacklige Verbindung",
   "Snowflake": "Snowflake",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "Ein Teil von Zuletzt gelöscht ließ sich nicht zurückholen: Er bleibt in diesem Wiederherstellungspunkt.",
@@ -1492,7 +1491,6 @@
   "❚❚ paused": "❚❚ pausiert",
   "⟲  Restart my PC now": "⟲  Meinen PC jetzt neu starten",
   "⟳  Check again": "⟳  Nochmal prüfen",
-  "⬇  Install it now (free)": "⬇  Jetzt installieren (kostenlos)",
   "⬇  Try installing again": "⬇  Nochmal installieren",
   "The Discord is where to chat, ask for help and hear about new versions. The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "Im Discord kannst du quatschen, Hilfe bekommen und von neuen Versionen hören. Fürs Feedback-Formular brauchst du kein Konto. Eine Sicherheitslücke gefunden? Melde sie privat auf GitHub, nicht in einem öffentlichen Issue.",
   "Join the Discord": "Dem Discord beitreten",
@@ -4340,5 +4338,9 @@
   "Your headset's mic is off": "Das Mikrofon deines Headsets ist aus",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Das Mikrofon von <b>{headset}</b> hat die Verbindung verloren. Verbinde es wieder, dann gehen deine Sounds wieder raus.",
   "Put the sound first on a busy PC": "Sound zuerst, wenn der PC ausgelastet ist",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Lässt das Board mit höherer Priorität als normal laufen, damit andere Programme den Sound nicht stocken lassen. Es braucht sehr wenig CPU, Spiele merken also nichts."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Lässt das Board mit höherer Priorität als normal laufen, damit andere Programme den Sound nicht stocken lassen. Es braucht sehr wenig CPU, Spiele merken also nichts.",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Ein kostenloses virtuelles Kabel von VB-Audio. Das dauert etwa eine Minute, und Windows fragt einmal, ob das okay ist. Danach wählst du es in Discord und Spielen als Mikrofon.",
+  "Install the cable": "Kabel installieren",
+  "Not set up yet: only you will hear your sounds.": "Noch nicht eingerichtet: nur du hörst deine Sounds.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Du nutzt gerade <b>{theme}</b>. {n} weitere Themes in den Einstellungen."
 }

@@ -959,7 +959,6 @@
   "Since start: {dropouts}, {reconnects}.": "Sedan start: {dropouts}, {reconnects}.",
   "Site": "Webbplats",
   "Size": "Storlek",
-  "Skip for now  →": "Hoppa över tills vidare  →",
   "Skip this version": "Hoppa över den här versionen",
   "Slow or patchy connection": "Långsam eller ojämn anslutning",
   "Snowflake": "Snowflake",
@@ -1492,7 +1491,6 @@
   "❚❚ paused": "❚❚ pausad",
   "⟲  Restart my PC now": "⟲  Starta om min dator nu",
   "⟳  Check again": "⟳  Kolla igen",
-  "⬇  Install it now (free)": "⬇  Installera den nu (gratis)",
   "⬇  Try installing again": "⬇  Försök installera igen",
   "(didn't say)": "(sa inte)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
@@ -4340,5 +4338,9 @@
   "Your headset's mic is off": "Ditt headsets mikrofon är av",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofonen på <b>{headset}</b> kopplades från. Anslut den igen så går dina ljud ut igen.",
   "Put the sound first on a busy PC": "Ljudet först när datorn har mycket att göra",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Kör boarden med högre prioritet än normalt, så att andra program inte får ljudet att hacka. Den använder väldigt lite CPU, så spel märker inget."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Kör boarden med högre prioritet än normalt, så att andra program inte får ljudet att hacka. Den använder väldigt lite CPU, så spel märker inget.",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "En gratis virtuell kabel från VB-Audio. Det tar ungefär en minut, och Windows frågar en gång om det är okej. Sedan väljer du den som mikrofon i Discord och spel.",
+  "Install the cable": "Installera kabeln",
+  "Not set up yet: only you will hear your sounds.": "Inte konfigurerat än: bara du hör dina ljud.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Du använder <b>{theme}</b> nu. {n} teman till i Inställningar."
 }
