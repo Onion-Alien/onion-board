@@ -3,7 +3,7 @@ itself is the Onion Watch add-on (soundboard.addons.watchaddon); this is Onion B
 side of it:
 
   * Until the add-on is installed, the tab is Hoot's card: what Onion Watch does
-    and a *Get Onion Watch* button (no window popping up on entering). One click
+    and a *Add Onion Watch to this tab* button (no window popping up on entering). One click
     downloads it (nothing is fetched before that), installs it into
     %APPDATA%\\OnionBoard\\modules and loads it into this tab, no restart needed.
     Triggers made before the add-on existed are kept in Config.screen meanwhile,
@@ -15,7 +15,7 @@ side of it:
 An add-on that fails to load shows Hoot again with why, and a button to get it
 afresh: a broken add-on never stops the app.
 
-*Remove Onion Watch* (last in the add-on's More menu, or beside *Get Onion Watch
+*Remove Onion Watch* (last in the add-on's More menu, or beside *Add Onion Watch
 again* when it's broken) uninstalls it after asking, and Hoot is back; the triggers are kept.
 """
 from __future__ import annotations
@@ -307,8 +307,8 @@ class TriggersTab(QWidget):
         broken = self.info is not None and self.panel is None and not self._busy
         self.title.setText(_("Onion Watch couldn't start") if broken and error else
                            "Onion Watch")
-        self.btn_get.setText(_("Get Onion Watch again") if broken and error
-                             else _("Get Onion Watch"))
+        self.btn_get.setText(_("Add Onion Watch again") if broken and error
+                             else _("Add Onion Watch to this tab"))
         icons.text_gap(self.btn_get)   # (its icon was set before it had words)
         local = watchaddon.local_zip()
         self.btn_get.setToolTip(_("Install {file}", file=local) if local is not None else

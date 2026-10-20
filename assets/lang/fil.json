@@ -1688,15 +1688,12 @@
   "Game": "Laro",
   "Gap between voices": "Gap sa pagitan ng mga boses",
   "Get AI voices": "Kumuha ng mga boses ng AI",
-  "Get Onion Watch": "Kumuha ng Onion Watch",
-  "Get Onion Watch again": "Kumuha muli ng Onion Watch",
   "Get and update add-ons": "Kumuha at mag-update ng mga add-on",
   "Getting AI voices…": "Pagkuha ng AI voices...",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Naka-off ang pagkuha at pag-update ng mga add-on sa Mga Setting > Privacy at seguridad.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "Naka-off ang pagkuha ng mga tunog mula sa {site} sa Mga Setting > Privacy at seguridad.",
   "Ghost": "Multo",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "Pansamantalang hindi available ang pagsusuri sa pag-download ng GitHub (error sa gateway). Subukang Kumuha muli ng mga boses ng AI sa isang sandali.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Pansamantalang hindi available ang pagsusuri sa pag-download ng GitHub (error sa gateway). Subukang Kumuha muli ng Onion Watch sa ilang sandali.",
   "Got it": "Nakuha ko",
   "Growl": "Ungol",
   "Hear it": "Pakinggan mo",
@@ -4308,5 +4305,8 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Ino-off ng Bun ang noise filter ng Discord para hindi maputol ang iyong mga tunog.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Ino-off ng Bun ang noise filter ng Discord, pagkatapos ay ipapakita sa iyo kung aling mikropono ang pipiliin.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "Pagkatapos ay piliin ang {mic} bilang iyong mikropono sa Discord: Ipinapakita sa iyo ng Bun kung saan.",
-  "What does Bun change in Discord?": "Ano ang binabago ng Bun sa Discord?"
+  "What does Bun change in Discord?": "Ano ang binabago ng Bun sa Discord?",
+  "Add Onion Watch again": "Idagdag muli ang Onion Watch",
+  "Add Onion Watch to this tab": "Idagdag ang Onion Watch sa tab na ito",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Pansamantalang hindi available ang pagsusuri ng download ng GitHub (error sa gateway). Subukang idagdag muli ang Onion Watch maya-maya."
 }

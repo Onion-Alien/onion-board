@@ -1652,15 +1652,12 @@
   "Game": "ゲーム",
   "Gap between voices": "声と声のギャップ",
   "Get AI voices": "AI音声を取得する",
-  "Get Onion Watch": "オニオンウォッチを入手",
-  "Get Onion Watch again": "オニオンウォッチをもう一度入手",
   "Get and update add-ons": "アドオンの取得と更新",
   "Getting AI voices…": "AI音声を取得中…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "アドオンの取得と更新は、[設定] > [プライバシーとセキュリティ] でオフになります。",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "{site}からの音の取得は、[設定] > [プライバシーとセキュリティ] でオフになっています。",
   "Ghost": "おばけ",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "GitHub のダウンロード チェックが一時的に利用できなくなりました (ゲートウェイ エラー)。しばらくしてから AI 音声をもう一度取得してみてください。",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "GitHub のダウンロード チェックが一時的に利用できなくなりました (ゲートウェイ エラー)。しばらくしてからもう一度「Get Onion Watch」を試してください。",
   "Got it": "わかった",
   "Growl": "唸る",
   "Hear it": "聞いてください",
@@ -4234,5 +4231,8 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun は Discord のノイズ フィルターをオフにして、音が途切れないようにします。",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun は Discord のノイズ フィルターをオフにして、どのマイクを選択すればよいかを示します。",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "次に、Discord でマイクとして{mic}を選択します。Bun が場所を示します。",
-  "What does Bun change in Discord?": "Bun は Discord で何を変更しますか?"
+  "What does Bun change in Discord?": "Bun は Discord で何を変更しますか?",
+  "Add Onion Watch again": "Onion Watch をもう一度追加",
+  "Add Onion Watch to this tab": "このタブに Onion Watch を追加",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHub のダウンロード確認が一時的に使えません (ゲートウェイ エラー)。少ししてから、もう一度 Onion Watch を追加してください。"
 }

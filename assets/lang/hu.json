@@ -1688,15 +1688,12 @@
   "Game": "Játék",
   "Gap between voices": "Szakadék a hangok között",
   "Get AI voices": "Szerezzen AI hangokat",
-  "Get Onion Watch": "Szerezze be az Onion Watchot",
-  "Get Onion Watch again": "Szerezd meg újra az Onion Watch-ot",
   "Get and update add-ons": "Bővítmények beszerzése és frissítése",
   "Getting AI voices…": "AI hangok lekérése…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "A bővítmények letöltése és frissítése ki van kapcsolva a Beállítások > Adatvédelem és biztonság menüpontban.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "A hangok lekérése innen: {site} ki van kapcsolva a Beállítások > Adatvédelem és biztonság menüpontban.",
   "Ghost": "Szellem",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "A GitHub letöltési ellenőrzése átmenetileg nem érhető el (átjáróhiba). Próbálja újra az AI hangokat egy pillanat múlva.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "A GitHub letöltési ellenőrzése átmenetileg nem érhető el (átjáróhiba). Próbálja újra a Hagyma óráját egy pillanat múlva.",
   "Got it": "Értem",
   "Growl": "Morgás",
   "Hear it": "Halld",
@@ -4308,5 +4305,8 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "A Bun kikapcsolja a Discord zajszűrőjét, hogy a hangok ne szakadjanak el.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "A Bun kikapcsolja a Discord zajszűrőjét, majd megmutatja, melyik mikrofont válassza.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "Ezután válassza ki {mic} -ot mikrofonnak a Discordban: A Bun megmutatja, hol.",
-  "What does Bun change in Discord?": "Mit változtat Bun a Discordban?"
+  "What does Bun change in Discord?": "Mit változtat Bun a Discordban?",
+  "Add Onion Watch again": "Onion Watch újbóli hozzáadása",
+  "Add Onion Watch to this tab": "Onion Watch hozzáadása ehhez a laphoz",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "A GitHub letöltés-ellenőrzése átmenetileg nem érhető el (átjáróhiba). Próbáld meg kicsit később újra hozzáadni az Onion Watch-ot."
 }

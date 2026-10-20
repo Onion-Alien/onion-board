@@ -176,7 +176,7 @@ The full list. The [README](../README.md) has the short version and how to get s
 - **Triggers tab:** plays a sound when a picture shows up in your game: a
   game's "YOU DIED", a rare spawn, a queue popping. It's the
   [Onion Watch](https://github.com/Onion-Alien/onion-watch) add-on: the tab's
-  *Get Onion Watch* button downloads it from its GitHub release (checked against
+  *Add Onion Watch to this tab* button downloads it from its GitHub release (checked against
   the SHA-256 GitHub lists) and it appears right there, no restart. Pick the
   game's window (it's watched even while other windows cover it, and two copies of
   a game are told apart) or a screen, cut the thing to watch for straight out of

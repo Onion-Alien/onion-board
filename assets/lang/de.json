@@ -1691,15 +1691,12 @@
   "Game": "Spiel",
   "Gap between voices": "Lücke zwischen den Stimmen",
   "Get AI voices": "Holen Sie sich KI-Stimmen",
-  "Get Onion Watch": "Holen Sie sich Onion Watch",
-  "Get Onion Watch again": "Holen Sie sich erneut Onion Watch",
   "Get and update add-ons": "Holen Sie sich Add-ons und aktualisieren Sie sie",
   "Getting AI voices…": "KI-Stimmen bekommen…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Das Abrufen und Aktualisieren von Add-ons ist unter „Einstellungen“ > „Datenschutz und Sicherheit“ deaktiviert.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "Der Empfang von Sounds von {site} ist unter „Einstellungen“ > „Datenschutz und Sicherheit“ deaktiviert.",
   "Ghost": "Geist",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "Die Download-Prüfung von GitHub ist vorübergehend nicht verfügbar (Gateway-Fehler). Versuchen Sie es gleich noch einmal mit „KI-Stimmen abrufen“.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Die Download-Prüfung von GitHub ist vorübergehend nicht verfügbar (Gateway-Fehler). Versuchen Sie es gleich noch einmal mit „Get Onion Watch“.",
   "Got it": "Habe es",
   "Growl": "Knurren",
   "Hear it": "Hören Sie es",
@@ -4308,5 +4305,8 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun schaltet den Geräuschfilter von Discord aus, damit Ihre Sounds nicht abgeschnitten werden.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun schaltet den Rauschfilter von Discord aus und zeigt Ihnen dann, welches Mikrofon Sie auswählen müssen.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "Dann wähle {mic} als dein Mikrofon in Discord: Bun zeigt dir wo.",
-  "What does Bun change in Discord?": "Was ändert Bun in Discord?"
+  "What does Bun change in Discord?": "Was ändert Bun in Discord?",
+  "Add Onion Watch again": "Onion Watch erneut hinzufügen",
+  "Add Onion Watch to this tab": "Onion Watch zu diesem Tab hinzufügen",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Die Download-Prüfung von GitHub ist gerade nicht erreichbar (Gateway-Fehler). Versuch gleich noch einmal, Onion Watch hinzuzufügen."
 }

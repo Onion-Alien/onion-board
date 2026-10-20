@@ -1847,15 +1847,12 @@
   "Game": "لعبة",
   "Gap between voices": "الفجوة بين الأصوات",
   "Get AI voices": "احصل على أصوات الذكاء الاصطناعي",
-  "Get Onion Watch": "احصل على ساعة البصل",
-  "Get Onion Watch again": "احصل على Onion Watch مرة أخرى",
   "Get and update add-ons": "الحصول على الوظائف الإضافية وتحديثها",
   "Getting AI voices…": "الحصول على أصوات الذكاء الاصطناعي...",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "يتم إيقاف الحصول على الوظائف الإضافية وتحديثها في الإعدادات > الخصوصية والأمان.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "تم إيقاف تشغيل الحصول على الأصوات من {site} في الإعدادات > الخصوصية والأمان.",
   "Ghost": "شبح",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "فحص تنزيل GitHub غير متاح مؤقتًا (خطأ في البوابة). حاول الحصول على أصوات الذكاء الاصطناعي مرة أخرى بعد قليل.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "فحص تنزيل GitHub غير متاح مؤقتًا (خطأ في البوابة). حاول الحصول على Onion Watch مرة أخرى بعد قليل.",
   "Got it": "فهمتها",
   "Growl": "تذمر",
   "Hear it": "اسمعها",
@@ -4604,5 +4601,8 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "يقوم Bun بإيقاف تشغيل مرشح الضوضاء في Discord حتى لا تنقطع الأصوات.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "يقوم Bun بإيقاف تشغيل مرشح الضوضاء في Discord، ثم يظهر لك أي ميكروفون تختاره.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "ثم اختر {mic} باعتباره الميكروفون الخاص بك في Discord: يوضح لك Bun مكانه.",
-  "What does Bun change in Discord?": "ماذا تغير بون في Discord؟"
+  "What does Bun change in Discord?": "ماذا تغير بون في Discord؟",
+  "Add Onion Watch again": "أضف Onion Watch مرة أخرى",
+  "Add Onion Watch to this tab": "أضف Onion Watch إلى هذا التبويب",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "فحص التنزيل في GitHub غير متاح مؤقتًا (خطأ في البوابة). حاول إضافة Onion Watch مرة أخرى بعد قليل."
 }

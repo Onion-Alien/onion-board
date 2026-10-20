@@ -1730,15 +1730,12 @@
   "Game": "Gra",
   "Gap between voices": "Przerwa między głosami",
   "Get AI voices": "Zdobądź głosy AI",
-  "Get Onion Watch": "Zdobądź zegarek cebulowy",
-  "Get Onion Watch again": "Zdobądź ponownie Cebulowy Zegarek",
   "Get and update add-ons": "Pobieraj i aktualizuj dodatki",
   "Getting AI voices…": "Uzyskiwanie głosów AI…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Pobieranie i aktualizowanie dodatków jest wyłączone w Ustawieniach > Prywatność i bezpieczeństwo.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "Pobieranie dźwięków z {site} jest wyłączone w Ustawieniach > Prywatność i bezpieczeństwo.",
   "Ghost": "Duch",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "Kontrola pobierania w GitHub jest tymczasowo niedostępna (błąd bramy). Spróbuj ponownie uzyskać głosy AI za chwilę.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Kontrola pobierania w GitHub jest tymczasowo niedostępna (błąd bramy). Spróbuj ponownie uzyskać dostęp do Onion Watch za chwilę.",
   "Got it": "Rozumiem",
   "Growl": "Warczeć",
   "Hear it": "Usłysz to",
@@ -4382,5 +4379,8 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun wyłącza filtr szumów Discorda, aby Twoje dźwięki nie zostały obcięte.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun wyłącza filtr szumów Discorda, a następnie pokazuje, który mikrofon wybrać.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "Następnie wybierz {mic} jako swój mikrofon w Discord: Bun pokaże Ci, gdzie.",
-  "What does Bun change in Discord?": "Co Bun zmienia w Discordzie?"
+  "What does Bun change in Discord?": "Co Bun zmienia w Discordzie?",
+  "Add Onion Watch again": "Dodaj Onion Watch ponownie",
+  "Add Onion Watch to this tab": "Dodaj Onion Watch do tej karty",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Sprawdzanie pobierania w GitHubie jest chwilowo niedostępne (błąd bramy). Spróbuj za chwilę ponownie dodać Onion Watch."
 }

@@ -118,7 +118,7 @@ def test_without_the_add_on_it_shows_hoot_and_keeps_the_triggers(qapp, tmp_path)
     host = FakeHost(two_triggers())
     tab = TriggersTab(host, [tmp_path / "modules"])
     assert tab.stack.currentWidget() is tab.get_page and tab.panel is None
-    assert tab.btn_get.text() == "Get Onion Watch"
+    assert tab.btn_get.text() == "Add Onion Watch to this tab"
     assert tab.kept.text().startswith("Your 2 triggers and their pictures are kept")
     assert not tab.is_active()
     # watching was on: the board points at the tab once
@@ -130,7 +130,7 @@ def test_without_the_add_on_it_shows_hoot_and_keeps_the_triggers(qapp, tmp_path)
 
 
 def test_the_tab_itself_offers_it_no_window_pops_up(qapp, tmp_path, monkeypatch):
-    """Not installed: the tab is Hoot's card (what it does, Get Onion Watch), not a
+    """Not installed: the tab is Hoot's card (what it does, Add Onion Watch), not a
     window popping up on entering it and a lone button once that was closed."""
     from PySide6.QtWidgets import QDialog
 
@@ -187,7 +187,7 @@ def test_a_deferred_tab_loads_the_add_on_only_when_asked(qapp, tmp_path, pkg, mo
     monkeypatch.setattr(watchaddon, "installed", lambda d: loads.append(1) or real(d))
     tab = TriggersTab(host, [tmp_path / "modules"], defer=True)
     assert not loads and tab.pending and tab.panel is None
-    assert tab.stack.currentWidget() is tab.wait_page   # blank, not "Get Onion Watch"
+    assert tab.stack.currentWidget() is tab.wait_page   # blank, not "Add Onion Watch"
     assert not tab.needs_nudge()                         # not known yet
     tab.load()
     assert loads == [1] and not tab.pending
@@ -520,7 +520,7 @@ def test_one_that_breaks_shows_hoot_with_why(qapp, tmp_path, addon_zip):
     tab = TriggersTab(FakeHost({"explode": True}), [tmp_path / "modules"])
     assert tab.panel is None and tab.stack.currentWidget() is tab.get_page
     assert tab.title.text() == "Onion Watch couldn't start"
-    assert "fell over" in tab.error.text() and tab.btn_get.text() == "Get Onion Watch again"
+    assert "fell over" in tab.error.text() and tab.btn_get.text() == "Add Onion Watch again"
 
 
 def test_one_that_cannot_be_downloaded_says_why(qapp, tmp_path, monkeypatch):
@@ -574,7 +574,7 @@ def test_remove_asks_first_then_uninstalls_it_and_keeps_the_triggers(qapp, tmp_p
     assert panel.calls == ["shutdown"] and live == [False]
     assert not (tmp_path / "modules" / "onion-watch").exists()
     assert watchaddon.installed([tmp_path / "modules"]) is None
-    assert tab.btn_get.text() == "Get Onion Watch" and tab.btn_remove_broken.isHidden()
+    assert tab.btn_get.text() == "Add Onion Watch to this tab" and tab.btn_remove_broken.isHidden()
     assert host.screen["triggers"] and tab.kept.text().startswith("Your 2 triggers")
     # ...and getting it again in the same run loads it afresh
     tab.btn_get.click()

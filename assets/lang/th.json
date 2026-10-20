@@ -1652,15 +1652,12 @@
   "Game": "เกม",
   "Gap between voices": "ช่องว่างระหว่างเสียง",
   "Get AI voices": "รับเสียง AI",
-  "Get Onion Watch": "รับนาฬิกาหัวหอม",
-  "Get Onion Watch again": "รับ Onion Watch อีกครั้ง",
   "Get and update add-ons": "รับและอัปเดตส่วนเสริม",
   "Getting AI voices…": "กำลังรับเสียง AI...",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "การรับและอัปเดตส่วนเสริมปิดอยู่ในการตั้งค่า > ความเป็นส่วนตัวและความปลอดภัย",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "การรับเสียงจาก {site} ถูกปิดในการตั้งค่า > ความเป็นส่วนตัวและความปลอดภัย",
   "Ghost": "ผี",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "การตรวจสอบการดาวน์โหลดของ GitHub ไม่สามารถใช้งานได้ชั่วคราว (ข้อผิดพลาดเกตเวย์) ลองรับเสียง AI อีกครั้งในอีกสักครู่",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "การตรวจสอบการดาวน์โหลดของ GitHub ไม่สามารถใช้งานได้ชั่วคราว (ข้อผิดพลาดเกตเวย์) ลองรับ Onion Watch อีกครั้งในอีกสักครู่",
   "Got it": "เข้าใจแล้ว",
   "Growl": "คำราม",
   "Hear it": "ได้ยินมัน",
@@ -4234,5 +4231,8 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun จะปิดตัวกรองเสียงรบกวนของ Discord เพื่อให้เสียงของคุณไม่ถูกตัดออก",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun จะปิดตัวกรองเสียงรบกวนของ Discord แล้วแสดงให้คุณเห็นว่าควรเลือกไมโครโฟนตัวไหน",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "จากนั้นเลือก {mic} เป็นไมโครโฟนของคุณใน Discord: Bun จะแสดงให้คุณเห็นว่าอยู่ที่ไหน",
-  "What does Bun change in Discord?": "Bun เปลี่ยนแปลงอะไรใน Discord?"
+  "What does Bun change in Discord?": "Bun เปลี่ยนแปลงอะไรใน Discord?",
+  "Add Onion Watch again": "เพิ่ม Onion Watch อีกครั้ง",
+  "Add Onion Watch to this tab": "เพิ่ม Onion Watch ในแท็บนี้",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "การตรวจสอบการดาวน์โหลดของ GitHub ใช้งานไม่ได้ชั่วคราว (ข้อผิดพลาดเกตเวย์) ลองเพิ่ม Onion Watch อีกครั้งในอีกสักครู่"
 }

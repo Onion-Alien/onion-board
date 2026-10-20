@@ -1691,15 +1691,12 @@
   "Game": "Spel",
   "Gap between voices": "Kloof tussen stemmen",
   "Get AI voices": "Verkrijg AI-stemmen",
-  "Get Onion Watch": "Koop Onion Watch",
-  "Get Onion Watch again": "Koop Onion Watch opnieuw",
   "Get and update add-ons": "Add-ons downloaden en bijwerken",
   "Getting AI voices…": "AI-stemmen krijgen…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Het verkrijgen en bijwerken van add-ons is uitgeschakeld in Instellingen > Privacy en beveiliging.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "Geluiden ontvangen van {site} is uitgeschakeld in Instellingen > Privacy en beveiliging.",
   "Ghost": "Spook",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "De downloadcontrole van GitHub is tijdelijk niet beschikbaar (gatewayfout). Probeer AI-stemmen zo meteen opnieuw te krijgen.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "De downloadcontrole van GitHub is tijdelijk niet beschikbaar (gatewayfout). Probeer Get Onion Watch over een ogenblik opnieuw.",
   "Got it": "Ik heb het",
   "Growl": "Grommen",
   "Hear it": "Hoor het",
@@ -4308,5 +4305,8 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun schakelt het ruisfilter van Discord uit, zodat je geluiden niet worden onderbroken.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun schakelt het ruisfilter van Discord uit en laat je vervolgens zien welke microfoon je moet kiezen.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "Kies vervolgens {mic} als je microfoon in Discord: Bun laat je zien waar.",
-  "What does Bun change in Discord?": "Wat verandert Bun in Discord?"
+  "What does Bun change in Discord?": "Wat verandert Bun in Discord?",
+  "Add Onion Watch again": "Onion Watch opnieuw toevoegen",
+  "Add Onion Watch to this tab": "Onion Watch aan dit tabblad toevoegen",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "De downloadcontrole van GitHub is tijdelijk niet beschikbaar (gatewayfout). Probeer Onion Watch zo meteen opnieuw toe te voegen."
 }

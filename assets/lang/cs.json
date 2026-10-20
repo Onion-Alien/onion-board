@@ -1727,15 +1727,12 @@
   "Game": "Hra",
   "Gap between voices": "Mezera mezi hlasy",
   "Get AI voices": "Získejte hlasy AI",
-  "Get Onion Watch": "Získejte cibulové hodinky",
-  "Get Onion Watch again": "Získejte znovu Onion Watch",
   "Get and update add-ons": "Získejte a aktualizujte doplňky",
   "Getting AI voices…": "Získávání hlasů AI…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Získávání a aktualizace doplňků je vypnutá v Nastavení > Soukromí a zabezpečení.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "Získávání zvuků z {site} je vypnuto v Nastavení > Soukromí a zabezpečení.",
   "Ghost": "Duch",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "Kontrola stahování GitHubu je dočasně nedostupná (chyba brány). Zkuste za chvíli znovu získat hlasy AI.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Kontrola stahování GitHubu je dočasně nedostupná (chyba brány). Vyzkoušejte Get Onion Watch znovu za chvíli.",
   "Got it": "Rozumím",
   "Growl": "Zavrčení",
   "Hear it": "Slyšte to",
@@ -4382,5 +4379,8 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun vypne šumový filtr Discordu, takže vaše zvuky nebudou oříznuty.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun vypne šumový filtr Discordu a poté vám ukáže, který mikrofon vybrat.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "Poté vyberte {mic} , protože váš mikrofon v Discord: Bun vám ukáže, kde.",
-  "What does Bun change in Discord?": "Co změní Bun v Discordu?"
+  "What does Bun change in Discord?": "Co změní Bun v Discordu?",
+  "Add Onion Watch again": "Přidat Onion Watch znovu",
+  "Add Onion Watch to this tab": "Přidat Onion Watch do této karty",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Kontrola stahování na GitHubu je dočasně nedostupná (chyba brány). Zkus Onion Watch přidat znovu za chvíli."
 }

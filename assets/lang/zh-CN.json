@@ -1652,15 +1652,12 @@
   "Game": "游戏",
   "Gap between voices": "声音之间的间隙",
   "Get AI voices": "获取人工智能声音",
-  "Get Onion Watch": "获取洋葱手表",
-  "Get Onion Watch again": "再次获取洋葱手表",
   "Get and update add-ons": "获取和更新附加组件",
   "Getting AI voices…": "获取人工智能声音...",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "在“设置”>“隐私和安全”中获取和更新附加组件已关闭。",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "在“设置”>“隐私和安全”中关闭从{site}获取声音。",
   "Ghost": "鬼",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "GitHub 的下载检查暂时不可用（网关错误）。稍后再次尝试获取 AI 声音。",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "GitHub 的下载检查暂时不可用（网关错误）。稍后再次尝试获取 Onion Watch。",
   "Got it": "知道了",
   "Growl": "咆哮",
   "Hear it": "听到它",
@@ -4234,5 +4231,8 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun 会关闭 Discord 的噪音过滤器，这样您的声音就不会被切断。",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun 会关闭 Discord 的噪音过滤器，然后向您展示要选择的麦克风。",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "然后在 Discord 中选择{mic}作为您的麦克风：Bun 会告诉您位置。",
-  "What does Bun change in Discord?": "Bun 在 Discord 中发生了什么变化？"
+  "What does Bun change in Discord?": "Bun 在 Discord 中发生了什么变化？",
+  "Add Onion Watch again": "再次添加 Onion Watch",
+  "Add Onion Watch to this tab": "将 Onion Watch 添加到此选项卡",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHub 的下载检查暂时不可用（网关错误）。请稍后再次尝试添加 Onion Watch。"
 }

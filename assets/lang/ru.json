@@ -1651,15 +1651,12 @@
   "Game": "Игра",
   "Gap between voices": "Разрыв между голосами",
   "Get AI voices": "Получите голоса ИИ",
-  "Get Onion Watch": "Получить луковые часы",
-  "Get Onion Watch again": "Получите Onion Watch снова",
   "Get and update add-ons": "Получайте и обновляйте дополнения",
   "Getting AI voices…": "Получение голосов ИИ…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Получение и обновление надстроек отключено в разделе «Настройки» > «Конфиденциальность и безопасность».",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "Получение звуков с {site} отключено в меню «Настройки» > «Конфиденциальность и безопасность».",
   "Ghost": "Призрак",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "Проверка загрузки GitHub временно недоступна (ошибка шлюза). Попробуйте получить голоса AI еще раз через мгновение.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Проверка загрузки GitHub временно недоступна (ошибка шлюза). Попробуйте Get Onion Watch еще раз через минуту.",
   "Got it": "Понятно",
   "Growl": "Рычать",
   "Hear it": "Слушай это",
@@ -4382,5 +4379,8 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Бан отключает шумовой фильтр Discord, чтобы ваши звуки не прерывались.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Бан отключает шумовой фильтр Discord, а затем показывает, какой микрофон выбрать.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "Затем выберите {mic} в качестве микрофона в Discord: Бан покажет вам, где именно.",
-  "What does Bun change in Discord?": "Что меняет Бун в Discord?"
+  "What does Bun change in Discord?": "Что меняет Бун в Discord?",
+  "Add Onion Watch again": "Добавить Onion Watch снова",
+  "Add Onion Watch to this tab": "Добавить Onion Watch на эту вкладку",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Проверка загрузки GitHub временно недоступна (ошибка шлюза). Попробуйте добавить Onion Watch снова чуть позже."
 }

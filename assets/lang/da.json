@@ -1688,15 +1688,12 @@
   "Game": "Spil",
   "Gap between voices": "Gab mellem stemmer",
   "Get AI voices": "Få AI-stemmer",
-  "Get Onion Watch": "Få Onion Watch",
-  "Get Onion Watch again": "Få Onion Watch igen",
   "Get and update add-ons": "Hent og opdater tilføjelser",
   "Getting AI voices…": "Får AI-stemmer...",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Hentning og opdatering af tilføjelser er slået fra i Indstillinger > Privatliv og sikkerhed.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "Hentning af lyde fra {site} er slået fra i Indstillinger > Privatliv og sikkerhed.",
   "Ghost": "Spøgelse",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "GitHubs downloadcheck er midlertidigt utilgængelig (gateway-fejl). Prøv Få AI-stemmer igen om et øjeblik.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "GitHubs downloadcheck er midlertidigt utilgængelig (gateway-fejl). Prøv Get Onion Watch igen om et øjeblik.",
   "Got it": "Forstår det",
   "Growl": "Knurre",
   "Hear it": "Hør det",
@@ -4308,5 +4305,8 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun slår Discords støjfilter fra, så dine lyde ikke bliver afskåret.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun slår Discords støjfilter fra og viser dig derefter, hvilken mikrofon du skal vælge.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "Vælg derefter {mic} som din mikrofon i Discord: Bun viser dig hvor.",
-  "What does Bun change in Discord?": "Hvad ændrer Bun i Discord?"
+  "What does Bun change in Discord?": "Hvad ændrer Bun i Discord?",
+  "Add Onion Watch again": "Tilføj Onion Watch igen",
+  "Add Onion Watch to this tab": "Tilføj Onion Watch til denne fane",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHubs downloadtjek er midlertidigt utilgængeligt (gateway-fejl). Prøv at tilføje Onion Watch igen om et øjeblik."
 }

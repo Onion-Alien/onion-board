@@ -1649,15 +1649,12 @@
   "Game": "Permainan",
   "Gap between voices": "Jurang antara suara",
   "Get AI voices": "Dapatkan suara AI",
-  "Get Onion Watch": "Dapatkan Jam Tangan Bawang",
-  "Get Onion Watch again": "Dapatkan Onion Watch sekali lagi",
   "Get and update add-ons": "Dapatkan dan kemas kini alat tambah",
   "Getting AI voices…": "Mendapatkan suara AI…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Mendapatkan dan mengemas kini alat tambah dimatikan dalam Tetapan > Privasi & keselamatan.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "Mendapatkan bunyi daripada {site} dimatikan dalam Tetapan > Privasi & keselamatan.",
   "Ghost": "hantu",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "Semakan muat turun GitHub tidak tersedia buat sementara waktu (ralat pintu masuk). Cuba Dapatkan suara AI sekali lagi.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Semakan muat turun GitHub tidak tersedia buat sementara waktu (ralat pintu masuk). Cuba Dapatkan Onion Watch sekali lagi.",
   "Got it": "faham",
   "Growl": "Geram",
   "Hear it": "Dengarlah",
@@ -4234,5 +4231,8 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun mematikan penapis hingar Discord supaya bunyi anda tidak terputus.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun mematikan penapis hingar Discord, kemudian menunjukkan kepada anda mikrofon yang hendak dipilih.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "Kemudian pilih {mic} sebagai mikrofon anda dalam Discord: Bun menunjukkan kepada anda tempat.",
-  "What does Bun change in Discord?": "Apakah perubahan Bun dalam Discord?"
+  "What does Bun change in Discord?": "Apakah perubahan Bun dalam Discord?",
+  "Add Onion Watch again": "Tambah Onion Watch sekali lagi",
+  "Add Onion Watch to this tab": "Tambah Onion Watch ke tab ini",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Semakan muat turun GitHub tidak tersedia buat sementara (ralat gateway). Cuba tambah Onion Watch sekali lagi sebentar nanti."
 }

@@ -1688,15 +1688,12 @@
   "Game": "Παιχνίδι",
   "Gap between voices": "Κενό ανάμεσα στις φωνές",
   "Get AI voices": "Λάβετε φωνές AI",
-  "Get Onion Watch": "Αποκτήστε το Onion Watch",
-  "Get Onion Watch again": "Αποκτήστε ξανά το Onion Watch",
   "Get and update add-ons": "Λήψη και ενημέρωση πρόσθετων",
   "Getting AI voices…": "Λήψη φωνών AI…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "Η λήψη και η ενημέρωση πρόσθετων απενεργοποιούνται στις Ρυθμίσεις > Απόρρητο και ασφάλεια.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "Η λήψη ήχων από {site} είναι απενεργοποιημένη στις Ρυθμίσεις > Απόρρητο και ασφάλεια.",
   "Ghost": "Φάντασμα",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "Ο έλεγχος λήψης του GitHub δεν είναι προσωρινά διαθέσιμος (σφάλμα πύλης). Δοκιμάστε ξανά τη λήψη φωνών AI σε λίγο.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "Ο έλεγχος λήψης του GitHub δεν είναι προσωρινά διαθέσιμος (σφάλμα πύλης). Δοκιμάστε το Get Onion Watch ξανά σε λίγο.",
   "Got it": "Κατάλαβα",
   "Growl": "Γκρινιάζω",
   "Hear it": "Ακούστε το",
@@ -4308,5 +4305,8 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Το Bun απενεργοποιεί το φίλτρο θορύβου του Discord για να μην κόβονται οι ήχοι σας.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Το Bun απενεργοποιεί το φίλτρο θορύβου του Discord και, στη συνέχεια, σας δείχνει ποιο μικρόφωνο να επιλέξετε.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "Στη συνέχεια, επιλέξτε {mic} ως μικρόφωνό σας στο Discord: Το Bun σας δείχνει πού.",
-  "What does Bun change in Discord?": "Τι αλλάζει το Bun στο Discord;"
+  "What does Bun change in Discord?": "Τι αλλάζει το Bun στο Discord;",
+  "Add Onion Watch again": "Πρόσθεσε ξανά το Onion Watch",
+  "Add Onion Watch to this tab": "Πρόσθεσε το Onion Watch σε αυτή την καρτέλα",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Ο έλεγχος λήψης του GitHub δεν είναι προσωρινά διαθέσιμος (σφάλμα πύλης). Δοκίμασε να προσθέσεις ξανά το Onion Watch σε λίγο."
 }

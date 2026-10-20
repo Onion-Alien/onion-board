@@ -50,7 +50,7 @@ and the download), `ui/triggers/triggershost.py` (the host interface the add-on 
 (its releases).
 
 - **Try an unreleased build:** build its zip (`scripts\build_module.py` in that repo)
-  and start Onion Board with `ONIONBOARD_ONION_WATCH_ZIP` set to it. *Get Onion Watch*
+  and start Onion Board with `ONIONBOARD_ONION_WATCH_ZIP` set to it. *Add Onion Watch to this tab*
   and the update check then use that file instead of GitHub.
 - **It can only import what the built app ships** (it has no pip): the standard
   library, numpy, soxr, PySide6's QtCore / QtGui / QtWidgets, and of scipy only

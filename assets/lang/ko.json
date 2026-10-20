@@ -1652,15 +1652,12 @@
   "Game": "게임",
   "Gap between voices": "목소리 사이의 간격",
   "Get AI voices": "AI 음성 받기",
-  "Get Onion Watch": "양파시계 구입",
-  "Get Onion Watch again": "양파시계를 다시 구매하세요",
   "Get and update add-ons": "추가 기능 다운로드 및 업데이트",
   "Getting AI voices…": "AI 음성을 얻는 중…",
   "Getting and updating add-ons is switched off in Settings > Privacy & security.": "추가 기능 다운로드 및 업데이트는 설정 > 개인 정보 보호 및 보안에서 꺼져 있습니다.",
   "Getting sounds from {site} is switched off in Settings > Privacy & security.": "{site} 에서 소리 듣기는 설정 > 개인 정보 보호 및 보안에서 꺼져 있습니다.",
   "Ghost": "귀신",
   "GitHub's download check is temporarily unavailable (gateway error). Try Get AI voices again in a moment.": "GitHub의 다운로드 확인을 일시적으로 사용할 수 없습니다(게이트웨이 오류). 잠시 후에 AI 음성 받기를 다시 시도해 보세요.",
-  "GitHub's download check is temporarily unavailable (gateway error). Try Get Onion Watch again in a moment.": "GitHub의 다운로드 확인을 일시적으로 사용할 수 없습니다(게이트웨이 오류). 잠시 후 Get Onion Watch를 다시 시도해 보세요.",
   "Got it": "알았어요",
   "Growl": "으르렁",
   "Hear it": "들어보세요",
@@ -4234,5 +4231,8 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun은 Discord의 소음 필터를 꺼서 소리가 잘리지 않도록 합니다.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun은 Discord의 노이즈 필터를 끈 다음 어떤 마이크를 선택할지 보여줍니다.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "그런 다음 Discord에서 {mic} 마이크로 선택하세요. Bun이 위치를 알려줍니다.",
-  "What does Bun change in Discord?": "Bun은 Discord에서 무엇을 바꾸나요?"
+  "What does Bun change in Discord?": "Bun은 Discord에서 무엇을 바꾸나요?",
+  "Add Onion Watch again": "Onion Watch 다시 추가",
+  "Add Onion Watch to this tab": "이 탭에 Onion Watch 추가",
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHub 다운로드 확인을 일시적으로 사용할 수 없습니다(게이트웨이 오류). 잠시 후 Onion Watch를 다시 추가해 보세요."
 }

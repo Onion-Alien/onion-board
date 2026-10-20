@@ -1,7 +1,7 @@
 """Onion Watch, the add-on behind the Triggers tab: its newest release, downloading
 it and installing it into %APPDATA%\\OnionBoard\\modules\\onion-watch.
 
-Nothing here runs until the user asks for it: the tab's *Get Onion Watch* button,
+Nothing here runs until the user asks for it: the tab's *Add Onion Watch to this tab* button,
 or its *Update* button once it's installed and the app's own update check
 (only while "Tell me when a new version is out" is ticked) found a newer one. The
 file is taken only from the project's own github.com/…/releases/download/ link,
@@ -172,7 +172,7 @@ def friendly(e: Exception) -> str:
         return text
     if getattr(e, "code", None) in (502, 503, 504):
         return _("GitHub's download check is temporarily unavailable (gateway error). "
-                 "Try Get Onion Watch again in a moment.")
+                 "Try adding Onion Watch again in a moment.")
     if "404" in text:
         return _("Onion Watch isn't available to download yet (GitHub says it can't find "
                  "it). Try again later.")
