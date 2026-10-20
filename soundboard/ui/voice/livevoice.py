@@ -41,6 +41,18 @@ def download_bar() -> QProgressBar:
     return bar
 
 
+class _StateLabel(QLabel):
+    """The Start row's state: tells `fit` when its words change (empty takes no room)."""
+
+    def __init__(self, fit):
+        super().__init__(IDLE_HINT)
+        self._fit = fit
+
+    def setText(self, text: str):
+        super().setText(text)
+        self._fit()
+
+
 class LiveVoice(QObject):
     """Speech recognition (+ translation) running live for one SpeechPanel (``p``)."""
     _event = Signal(dict)          # the helper's / TTS events, hopped onto the UI thread
@@ -57,6 +69,7 @@ class LiveVoice(QObject):
         self._event.connect(self._on_event)
 
         # ---- Start and its state (shown once speech recognition is installed)
+        self._installed = False        # speech recognition is in (set_installed)
         self.start_box = QWidget()
         sv = QVBoxLayout(self.start_box)
         sv.setContentsMargins(0, 0, 0, 0)
@@ -73,7 +86,7 @@ class LiveVoice(QObject):
         self.b_live.setMinimumHeight(40)
         self.b_live.setObjectName("primary")
         self.b_live.toggled.connect(self._toggle_live)
-        self.lbl_state = QLabel(IDLE_HINT)
+        self.lbl_state = _StateLabel(self._fit_start_box)
         self.lbl_state.setTextFormat(Qt.TextFormat.PlainText)   # shows the module's error text
         self.lbl_state.setObjectName("muted")
         self.lbl_state.setWordWrap(True)
@@ -88,6 +101,17 @@ class LiveVoice(QObject):
         self.lbl_bg.setTextFormat(Qt.TextFormat.PlainText)     # shows the helper's error text
         self.lbl_bg.hide()
         self.bg_bar = download_bar()   # the same, while translating for another voice
+
+    def set_installed(self, ok: bool):
+        """Speech recognition is in (or not): its state row can show."""
+        self._installed = ok
+        self._fit_start_box()
+
+    def _fit_start_box(self):
+        """The state row takes room only while it says something: an empty one left a
+        gap between the card's intro and its language cards. (Never shown parentless.)"""
+        if self.start_box.parent() is not None:
+            self.start_box.setVisible(self._installed and bool(self.lbl_state.text()))
 
     def _live_args(self) -> list[str]:
         """The live-voice helper's arguments; sets the voice translated lines use."""

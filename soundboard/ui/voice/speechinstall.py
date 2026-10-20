@@ -341,7 +341,7 @@ class SpeechInstalls(QObject):
         m = p.module
         ok = m is not None and m.installed
         p.show_lang_box(ok and bool(p.langs))
-        p.livevoice.start_box.setVisible(ok)
+        p.livevoice.set_installed(ok)
         self.missing.setVisible(not ok)
         self.b_install.setVisible(m is not None and not ok and not net.offline())
         self.b_update.setVisible(m is not None and not net.offline())   # pip: online

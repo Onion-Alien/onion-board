@@ -138,6 +138,35 @@ def test_no_empty_language_frame_before_speech_recognition_is_in(qapp, monkeypat
         panel.deleteLater()
 
 
+def test_languages_card_has_no_gap_while_the_state_says_nothing(qapp, monkeypatch):
+    """Installed and idle: the cards sit one spacing under the intro, like AI voices'
+    (an empty state row left a tall gap); a state line opens the row again."""
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+    panel = VoicePanel(FakeEngine(), {}, {"tab": "speak"})
+    speech = panel.speech
+    live = speech.livevoice
+    try:
+        live.set_installed(True)
+        speech.show_lang_box(True)
+        live.lbl_state.setText("")
+        panel.resize(1000, 800)
+        panel.show()
+        qapp.processEvents()
+        assert not live.start_box.isVisibleTo(speech)
+        gap = at(speech.cards, speech).top() - at(speech.lbl_intro, speech).bottom() - 1
+        assert gap == speech.layout().spacing()
+        live.lbl_state.setText("● listening")
+        qapp.processEvents()
+        assert live.start_box.isVisibleTo(speech)
+        assert at(speech.lbl_intro, speech).bottom() < at(live.start_box, speech).top()
+        live.set_installed(False)
+        assert not live.start_box.isVisibleTo(speech)
+    finally:
+        panel.shutdown()
+        panel.close()
+        panel.deleteLater()
+
+
 @pytest.mark.parametrize("name", ["Dark", "Light"])
 @pytest.mark.parametrize("width", [340, 580])
 def test_languages_card_reads_cards_then_who_says_it(qapp, monkeypatch, tmp_path,
@@ -150,7 +179,7 @@ def test_languages_card_reads_cards_then_who_says_it(qapp, monkeypatch, tmp_path
     try:
         speech.setParent(None)
         speech.title.show()
-        speech.livevoice.start_box.show()
+        speech.livevoice.set_installed(True)
         speech.show_lang_box(True)
         speech.cb_lang.setCurrentIndex(speech.cb_lang.findData("de"))
         speech.setFixedWidth(width)

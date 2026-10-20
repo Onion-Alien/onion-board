@@ -150,6 +150,7 @@ class SpeechPanel(QWidget):
                                       "Pick a language to turn it on."))
         v.addWidget(self.lbl_intro)
         v.addWidget(live.start_box)   # how the computer voice is doing (listening, a problem)
+        live._fit_start_box()   # placed now: hidden while it has nothing to say
 
         # ---- the language cards: chips over them, cards or a list at the right
         favs = self.s.get("lang_favorites")
