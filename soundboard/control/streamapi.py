@@ -388,11 +388,12 @@ def clean_text(text: str, rules: dict) -> str | None:
 
 
 def fill(template: str, values: dict) -> str:
-    """{user}, {amount}… in `template` from `values` (unknown ones are left as they are)."""
+    """{user}, {amount}… in `template` from `values`. A field with no value (a donation
+    with no amount) becomes ""; names `values` doesn't have are left as they are."""
     def one(m):
         v = values.get(m.group(1))
         if v is None:
-            return m.group(0)
+            return "" if m.group(1) in values else m.group(0)
         if isinstance(v, float):
             return f"{v:g}"
         return str(v)
@@ -758,6 +759,9 @@ def normalize(params: dict) -> dict:
     for k in ("months", "count"):
         n = _amount(out[k])
         out[k] = int(n) if n is not None else 0
+    if out["type"] == "raid" and not out["count"] and out["amount"]:
+        out["count"] = int(out["amount"])   # Streamlabs and flat calls send a raid's size
+                                            # as its amount: {count} says it too
     return out
 
 
