@@ -137,6 +137,10 @@ RECOVERY = ("install", "repair", "update", "reinstall", "cleanup", "remove")
 MIC_FAILS = ("unanswered", "no-start", "stuck", "silent", "no-helper", "no-mic",
              "no-mic-off", "no-mic-unsure", "no-mic-gone", "no-effect", "code-1", "code-2",
              "code-3", "code-4", "code-5", "code-6", "code-other")
+# exit code 1 (the admin step raised): where in it and what Windows said (directmic
+# RAISED_WHERE / RAISED_WHAT, read back from its log)
+MIC_RAISED = ("at-register", "at-mic-settings", "at-ring", "at-files", "at-audio",
+              "at-rights", "at-other", "denied", "in-use", "missing", "other")
 # why a download from a link or search failed (errors.download_reason): the kind only
 DL_FAILS = ("private", "age", "bot", "members", "region", "gone", "no-formats", "429",
             "403", "5xx", "stalled", "timeout", "cut-off", "offline", "proxy", "sign-in",
@@ -247,6 +251,7 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "mic-effect-fix-failed", *(f"mic-effect-fix-failed-{k}" for k in MIC_FAILS),
             "mic-effect-no-load", *(f"mic-effect-no-load-{k}" for k in MIC_NO_LOAD),
             "mic-effect-taken-off", "mic-helper",
+            *(f"mic-effect-code-1-{k}" for k in MIC_RAISED),
             # Onion Board's own update: the download cancelled or failed, the installer
             # wouldn't start, Copy error, Later at "Restart now", one that didn't finish,
             # one installing itself as the app started

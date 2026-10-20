@@ -831,6 +831,37 @@ def endpoint_names(kind: str) -> set[str] | None:
             _ole32.CoUninitialize()
 
 
+def capture_mics() -> list[tuple[str, str]] | None:
+    """Windows' active recording devices as [(endpoint GUID, name)], asked now: the
+    names PortAudio's list shows, straight from Windows rather than from the registry
+    (directmic.mic_lookup's last try). None if Windows can't be asked."""
+    if not _win:
+        return None
+    own = _co_init()
+    try:
+        with _enumerator() as en:
+            devs = _render_devices(en, E_CAPTURE)
+        out = []
+        try:
+            for d in devs:
+                p = c_void_p()
+                d.call(5, (POINTER(c_void_p),), byref(p), what="GetId")
+                guid = _cotaskmem_str(p).rpartition(".")[2].lower()
+                name = _device_name(d)
+                if guid.startswith("{") and name:
+                    out.append((guid, name))
+        finally:
+            for d in devs:
+                d.release()
+        return out
+    except ComError:
+        log.debug("listing recording devices failed", exc_info=True)
+        return None
+    finally:
+        if own:
+            _ole32.CoUninitialize()
+
+
 def list_apps(strict: bool = False, alive: dict[int, str] | None = None,
               meters: dict | None = None) -> list[App]:
     """Every program with a live audio session on any playback device, this

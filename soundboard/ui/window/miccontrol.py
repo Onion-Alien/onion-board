@@ -45,6 +45,7 @@ class MicControl(Controller):
     _mic_fail_kind = ""     # the last set-up's directmic.FAIL_KINDS word, for the count
     _autofix_tried = False  # it ran since the mic last worked (once per time it's off)
     _declined = False       # the last set-up's Windows prompt got a No
+    _raised = None          # exit code 1: directmic.raised_why() of that set-up
     _helper_checking = False
     _helper_failed = False  # the last check raised: the next waits HELPER_RETRY_S
     _helper_check_at = 0.0  # when the last check started (time.monotonic())
@@ -347,7 +348,7 @@ class MicControl(Controller):
         mic = mw.cfg.mic_device
         if not mic:
             if not auto:
-                mw.toast(_("Pick your mic first (Setup tab → Devices)."), "warn")
+                mw.toast(_("Pick your mic first (Setup tab → Devices)."), "warn", aside=True)
             return
         mw._attaching = True
         self._autofixing = auto
@@ -386,6 +387,8 @@ class MicControl(Controller):
                 mic, err = other, directmic.install(other, clean=clean) or ""
         # its reason word, kept here: the signal hands _mic_attached a plain str
         self._mic_fail_kind = directmic.fail_kind(err) if err else ""
+        # the admin step raised: where and what, from its log (read here, off the UI thread)
+        self._raised = directmic.raised_why() if self._mic_fail_kind == "code-1" else None
         return mic, err
 
     def _mic_attached(self, mic: str, err: str):
@@ -415,21 +418,30 @@ class MicControl(Controller):
             kind, self._mic_fail_kind = self._mic_fail_kind or "code-other", ""
             if auto or err != directmic.declined():   # why, as a fixed word (never err)
                 usage.used(f"mic-effect-{'fix-' if auto else ''}failed-{kind}")
+            raised, self._raised = self._raised, None
+            if kind == "code-1" and raised:
+                where, what = raised
+                usage.used(f"mic-effect-code-1-at-{where}")
+                usage.used(f"mic-effect-code-1-{what}")
             if auto:
                 # the card turns into its one button with the reason (_mic_view)
                 self._autofix_err = err
-                mw.toast(_("Couldn't fix your mic by itself: see the Setup tab."), "warn")
+                mw.toast(_("Couldn't fix your mic by itself: see the Setup tab."), "warn",
+                         aside=True)
             elif err == directmic.declined() and not updating:
                 self._declined = True   # the card says so, with its button to try again
             elif updating and err == directmic.declined():
                 # No to the optional update: the old part keeps working, no box needed
                 mw.toast(_("Update cancelled. Your mic part is still the old one: "
-                             "update it from the Setup tab."), "warn")
+                             "update it from the Setup tab."), "warn", aside=True)
             else:
                 # the route stays on the mic: until it's set up, the cable carries the
                 # sounds meanwhile (_main_name), and the one-click stays on offer
+                # with the way that works on every PC one click away: new users who only
+                # got "Try again" tried again (the same failure) and uninstalled
                 err = _("{error}\n\nTry again any time from the Setup tab.", error=err)
-                mw.tell(_("Couldn't put Onion Board on your mic"), err, "error")
+                mw.tell(_("Couldn't put Onion Board on your mic"), err, "error",
+                        action=(_("Use the cable"), mw.btn_usecable.click), aside=True)
         else:
             log.info("on the mic now: %s", mic)
             usage.used("mic-effect-updated" if updating else
@@ -441,11 +453,12 @@ class MicControl(Controller):
                 mw.devctl._reopen_devices()
                 mw.toast(_("Windows doesn't know your picked mic any more, so Onion Board "
                            "went on {mic} (Windows' default mic) instead.",
-                           mic=html.escape(mic)), "warn")
+                           mic=html.escape(mic)), "warn", aside=True)
             if silent:
                 usage.used("mic-silent-after-setup")
                 mw.toast(_("Your sounds are in your mic, but your mic sends no sound itself "
-                           "right now. Is your headset switched off or muted?"), "warn")
+                           "right now. Is your headset switched off or muted?"), "warn",
+                         aside=True)
             # Windows takes a few seconds to load it: "starting…" meanwhile, then a
             # redraw when the wait is over (it works by then, or Repair comes back)
             mw._settle_until = time.monotonic() + mw.SETTLE_S
