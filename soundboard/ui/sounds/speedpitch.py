@@ -217,17 +217,28 @@ class ValueBox(QDoubleSpinBox):
         v, ok = self.locale().toDouble(t.strip().lstrip("+"))
         return v if ok else None
 
+    def _bare_minus(self, text: str) -> bool:
+        """Just "-" so far: Speed's range has no minus, but -999 still means as slow as it
+        goes (dropping the key made it 999, the fastest)."""
+        t = text.strip()
+        if self.suffix() and t.endswith(self.suffix().strip()):
+            t = t[:-len(self.suffix().strip())]
+        return t.strip() == "-"
+
     def validate(self, text: str, pos: int):
         if text.startswith("+"):
             state, t, p = self.validate(text[1:], max(pos - 1, 0))
             return state, "+" + t, p + 1
         state, t, p = super().validate(text, pos)
-        if state == QValidator.State.Invalid and self._number(text) is not None:
-            state = QValidator.State.Intermediate   # 20 past +18 dB, 1.5 with no decimals:
-        return state, t, p                          # kept, fixup() caps it on Enter
+        if state == QValidator.State.Invalid and (self._number(text) is not None
+                                                  or self._bare_minus(text)):
+            state = QValidator.State.Intermediate   # 20 past +18 dB, 1.5 with no decimals,
+        return state, t, p                          # a minus on Speed: kept, fixup() caps it
 
     def fixup(self, text: str) -> str:
         v = self._number(text)
+        if v is None and self._bare_minus(text):
+            v = self.value()   # a minus and nothing else: no change
         if v is None:
             return super().fixup(text)
         v = round(min(max(v, self.minimum()), self.maximum()), self.decimals())

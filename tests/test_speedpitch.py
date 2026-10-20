@@ -261,6 +261,15 @@ def test_a_typed_value_past_the_range_is_capped(qapp):
         assert box.lineEdit().text().startswith(text)   # every key went in
         QTest.keyClick(box, Qt.Key.Key_Return)
         assert bass.value() == want and box.lineEdit().text() == shown, text
+    speed = b.speed                         # a minus on a range with none: as slow as it goes
+    for text, want, shown in (("-999", 0.25, "0.25x"), ("1.5", 1.5, "1.50x"), ("-", 1.5, "1.50x")):
+        box = speed.val
+        box.setFocus()
+        box.selectAll()
+        QTest.keyClicks(box, text)
+        assert box.lineEdit().text().startswith(text)   # the minus went in (it made 999 = 2x)
+        QTest.keyClick(box, Qt.Key.Key_Return)
+        assert speed.value() == want and box.lineEdit().text() == shown, text
     box = b.speed.val                                    # clicked away, not Enter
     box.setFocus()
     box.selectAll()
