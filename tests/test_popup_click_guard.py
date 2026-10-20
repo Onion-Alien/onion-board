@@ -13,6 +13,7 @@ def test_mouse_burst_stays_closed_then_reopens(qapp, monkeypatch, kind):
     clock = [100.0]
     monkeypatch.setattr(wheelguard, "time", type("Clock", (), {
         "monotonic": staticmethod(lambda: clock[0])}))
+    monkeypatch.setattr(wheelguard, "_mouse_on", lambda w: True)   # closed on the button
     button = QComboBox() if kind == "combo" else QPushButton("Open")
     button.resize(160, 40)
     if kind == "combo":
@@ -87,7 +88,8 @@ def test_submenu_dismissal_does_not_throttle_root_opener(qapp):
         button.deleteLater()
 
 
-def test_menu_owned_by_panel_still_throttles_its_button(qapp):
+def test_menu_owned_by_panel_still_throttles_its_button(qapp, monkeypatch):
+    monkeypatch.setattr(wheelguard, "_mouse_on", lambda w: True)
     panel = QWidget()
     button = QPushButton("Edit", panel)
     menu = QMenu(panel)
@@ -104,3 +106,25 @@ def test_menu_owned_by_panel_still_throttles_its_button(qapp):
     finally:
         panel.close()
         panel.deleteLater()
+
+
+def test_picking_a_choice_reopens_on_the_next_click(qapp, monkeypatch):
+    """Closed with the mouse off the button (a choice picked, a click elsewhere):
+    no pause, the next click opens it again at once."""
+    monkeypatch.setattr(wheelguard, "_mouse_on", lambda w: False)
+    button = QPushButton("Open")
+    menu = QMenu(button)
+    menu.addAction("First")
+    button.clicked.connect(lambda: menu.popup(button.mapToGlobal(QPoint(0, 45))))
+    button.show()
+    try:
+        for _ in range(3):
+            QTest.mouseClick(button, Qt.LeftButton)
+            assert menu.isVisible()
+            menu.actions()[0].trigger()
+            menu.hide()
+            assert button.property("popupClosedAt") is None
+    finally:
+        menu.close()
+        button.close()
+        button.deleteLater()

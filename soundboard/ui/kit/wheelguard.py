@@ -203,7 +203,9 @@ class _SubmenuEdge(QObject):
                     drop_gap(obj, opener)
             elif ev.type() == QEvent.Type.Hide:
                 opener = getattr(obj, "_click_opener", None)
-                if opener is not None:
+                # Only a close with the mouse on the opener can be replayed onto it.
+                # Picking a choice or clicking elsewhere leaves it ready at once.
+                if opener is not None and _mouse_on(opener):
                     opener.setProperty("popupClosedAt", time.monotonic())
         if ev.type() == QEvent.Type.Show and obj.windowType() == Qt.WindowType.Popup:
             # A popup grabs the mouse before the opener receives Leave. Moving away
@@ -231,6 +233,11 @@ class _SubmenuEdge(QObject):
                          else pg.left() - self.GAP - g.width())
                     obj.move(x, g.top())
         return False
+
+
+def _mouse_on(w: QWidget) -> bool:
+    """The mouse is over `w` (popups grab the mouse, so underMouse() can't say)."""
+    return w.isVisible() and w.rect().contains(w.mapFromGlobal(QCursor.pos()))
 
 
 DROP_GAP = 8   # px between a dropdown's list or menu and the button it opened from
@@ -272,8 +279,10 @@ class _PopupClickGuard(QObject):
     Require a short pause before reopening a dismissed dropdown with the mouse.
 
     Qt can replay the outside click that dismissed a popup onto its opener. That
-    must not immediately reopen it. Repeated presses extend the pause, so a burst
-    of clicks settles closed rather than flashing a new popup every few clicks.
+    must not immediately reopen it. Only a close with the mouse on the opener starts
+    the pause: after picking a choice the dropdown opens again on the next click.
+    Repeated presses extend the pause, so a burst of clicks settles closed rather
+    than flashing a new popup every few clicks.
     Keyboard input, menu choices and the first click remain immediate.
     """
     PAUSE = 0.25
