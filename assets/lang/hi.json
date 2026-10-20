@@ -4340,5 +4340,6 @@
   "Your headset's mic is off": "आपके हेडसेट का माइक बंद है",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> का माइक डिस्कनेक्ट हो गया। इसे फिर से जोड़ें, आपकी आवाज़ें फिर से जाने लगेंगी।",
   "Put the sound first on a busy PC": "PC व्यस्त हो तो आवाज़ को पहले रखें",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "बोर्ड को सामान्य से ऊँची प्राथमिकता पर चलाता है, ताकि दूसरे प्रोग्राम आवाज़ को अटकने न दें। यह बहुत कम CPU लेता है, इसलिए गेम्स को फ़र्क़ नहीं पड़ेगा।"
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "बोर्ड को सामान्य से ऊँची प्राथमिकता पर चलाता है, ताकि दूसरे प्रोग्राम आवाज़ को अटकने न दें। यह बहुत कम CPU लेता है, इसलिए गेम्स को फ़र्क़ नहीं पड़ेगा।",
+  "its file is gone (it was at {path})": "इसकी फ़ाइल नहीं मिली (यह {path} पर थी)"
 }

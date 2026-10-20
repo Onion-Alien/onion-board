@@ -4266,5 +4266,6 @@
   "Your headset's mic is off": "耳機的麥克風已關閉",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> 的麥克風斷開了。重新連接後，你的音效就會再次送出。",
   "Put the sound first on a busy PC": "電腦忙碌時優先保證聲音",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "以高於正常的優先順序執行音板，讓其他程式無法使聲音卡頓。它占用的 CPU 極少，遊戲不會受影響。"
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "以高於正常的優先順序執行音板，讓其他程式無法使聲音卡頓。它占用的 CPU 極少，遊戲不會受影響。",
+  "its file is gone (it was at {path})": "它的檔案不見了（原本在 {path}）"
 }
