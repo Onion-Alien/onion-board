@@ -4398,5 +4398,7 @@
   "Play a chime in your headphones when you earn one.": "Zahrát zvonění ve sluchátkách, když nějaký získáš.",
   "Pop-up sound": "Zvuk oznámení",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "„Úspěch odemčen“ dole na obrazovce, když nějaký získáš.",
-  "Show pop-ups": "Zobrazovat oznámení"
+  "Show pop-ups": "Zobrazovat oznámení",
+  "Already in your library as “{name}”": "Už je v knihovně jako „{name}“",
+  "Names and tags can't have links in them.": "Názvy a štítky nesmí obsahovat odkazy."
 }

@@ -4324,5 +4324,7 @@
   "Play a chime in your headphones when you earn one.": "Reproduce un tono en tus audífonos cuando consigas uno.",
   "Pop-up sound": "Sonido de la ventana emergente",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "\"Logro desbloqueado\" en la parte de abajo de la pantalla cuando consigas uno.",
-  "Show pop-ups": "Mostrar ventanas emergentes"
+  "Show pop-ups": "Mostrar ventanas emergentes",
+  "Already in your library as “{name}”": "Ya está en tu biblioteca como “{name}”",
+  "Names and tags can't have links in them.": "Los nombres y las etiquetas no pueden tener enlaces."
 }

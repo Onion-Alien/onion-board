@@ -4250,5 +4250,7 @@
   "Play a chime in your headphones when you earn one.": "実績を獲得したときにヘッドホンでチャイムを鳴らします。",
   "Pop-up sound": "ポップアップの音",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "実績を獲得したときに画面下に「実績解除」を表示します。",
-  "Show pop-ups": "ポップアップを表示"
+  "Show pop-ups": "ポップアップを表示",
+  "Already in your library as “{name}”": "すでにライブラリに「{name}」として存在しています",
+  "Names and tags can't have links in them.": "名前とタグにはリンクを入れられません。"
 }

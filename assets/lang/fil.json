@@ -4324,5 +4324,7 @@
   "Play a chime in your headphones when you earn one.": "Magpatugtog ng chime sa headphones mo kapag nakakuha ka ng isa.",
   "Pop-up sound": "Tunog ng pop-up",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "\"Na-unlock ang achievement\" sa ibaba ng screen kapag nakakuha ka ng isa.",
-  "Show pop-ups": "Ipakita ang mga pop-up"
+  "Show pop-ups": "Ipakita ang mga pop-up",
+  "Already in your library as “{name}”": "Nasa library mo na bilang “{name}”",
+  "Names and tags can't have links in them.": "Hindi puwedeng may link ang mga pangalan at tag."
 }

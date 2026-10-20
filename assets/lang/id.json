@@ -4250,5 +4250,7 @@
   "Play a chime in your headphones when you earn one.": "Putar bunyi lonceng di headphone saat kamu mendapatkannya.",
   "Pop-up sound": "Suara pop-up",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "\"Pencapaian terbuka\" di bagian bawah layar saat kamu mendapatkannya.",
-  "Show pop-ups": "Tampilkan pop-up"
+  "Show pop-ups": "Tampilkan pop-up",
+  "Already in your library as “{name}”": "Sudah ada di perpustakaan Anda sebagai “{name}”",
+  "Names and tags can't have links in them.": "Nama dan tag tidak boleh berisi tautan."
 }

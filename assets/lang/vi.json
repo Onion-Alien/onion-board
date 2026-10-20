@@ -4250,5 +4250,7 @@
   "Play a chime in your headphones when you earn one.": "Phát tiếng chuông trong tai nghe khi bạn đạt được một thành tựu.",
   "Pop-up sound": "Âm thanh cửa sổ bật lên",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "\"Đã mở khóa thành tựu\" ở cuối màn hình khi bạn đạt được một thành tựu.",
-  "Show pop-ups": "Hiện cửa sổ bật lên"
+  "Show pop-ups": "Hiện cửa sổ bật lên",
+  "Already in your library as “{name}”": "Đã có trong thư viện của bạn với tên “{name}”",
+  "Names and tags can't have links in them.": "Tên và thẻ không được chứa liên kết."
 }

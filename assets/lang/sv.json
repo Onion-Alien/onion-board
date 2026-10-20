@@ -4324,5 +4324,7 @@
   "Play a chime in your headphones when you earn one.": "Spela ett klingljud i hörlurarna när du låser upp en.",
   "Pop-up sound": "Popup-ljud",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "”Prestation upplåst” längst ner på skärmen när du låser upp en.",
-  "Show pop-ups": "Visa popup-fönster"
+  "Show pop-ups": "Visa popup-fönster",
+  "Already in your library as “{name}”": "Finns redan i ditt bibliotek som ”{name}”",
+  "Names and tags can't have links in them.": "Namn och taggar får inte innehålla länkar."
 }

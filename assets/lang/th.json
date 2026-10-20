@@ -4250,5 +4250,7 @@
   "Play a chime in your headphones when you earn one.": "เล่นเสียงกริ่งในหูฟังเมื่อคุณได้รับความสำเร็จ",
   "Pop-up sound": "เสียงป๊อปอัป",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "\"ปลดล็อกความสำเร็จแล้ว\" ที่ด้านล่างของหน้าจอเมื่อคุณได้รับความสำเร็จ",
-  "Show pop-ups": "แสดงป๊อปอัป"
+  "Show pop-ups": "แสดงป๊อปอัป",
+  "Already in your library as “{name}”": "มีอยู่ในห้องสมุดของคุณแล้วในชื่อ “{name}”",
+  "Names and tags can't have links in them.": "ชื่อและแท็กใส่ลิงก์ไม่ได้"
 }

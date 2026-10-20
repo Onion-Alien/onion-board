@@ -4324,5 +4324,7 @@
   "Play a chime in your headphones when you earn one.": "Csilingelés a fejhallgatódban, amikor megszerzel egyet.",
   "Pop-up sound": "Felugró ablak hangja",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "„Teljesítmény feloldva” a képernyő alján, amikor megszerzel egyet.",
-  "Show pop-ups": "Felugró ablakok mutatása"
+  "Show pop-ups": "Felugró ablakok mutatása",
+  "Already in your library as “{name}”": "Már a könyvtáradban van „{name}” néven",
+  "Names and tags can't have links in them.": "A nevekben és címkékben nem lehet link."
 }

@@ -4324,5 +4324,7 @@
   "Play a chime in your headphones when you earn one.": "Παίζει ένα κουδούνισμα στα ακουστικά σου όταν κερδίζεις ένα.",
   "Pop-up sound": "Ήχος αναδυόμενου",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "«Ξεκλείδωσες επίτευγμα» στο κάτω μέρος της οθόνης όταν κερδίζεις ένα.",
-  "Show pop-ups": "Εμφάνιση αναδυόμενων"
+  "Show pop-ups": "Εμφάνιση αναδυόμενων",
+  "Already in your library as “{name}”": "Ήδη στη βιβλιοθήκη σας ως \"{name}\"",
+  "Names and tags can't have links in them.": "Τα ονόματα και οι ετικέτες δεν μπορούν να περιέχουν συνδέσμους."
 }

@@ -4324,5 +4324,7 @@
   "Play a chime in your headphones when you earn one.": "Riproduce un suono nelle cuffie quando ne sblocchi uno.",
   "Pop-up sound": "Suono del pop-up",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "\"Obiettivo sbloccato\" in fondo allo schermo quando ne sblocchi uno.",
-  "Show pop-ups": "Mostra i pop-up"
+  "Show pop-ups": "Mostra i pop-up",
+  "Already in your library as “{name}”": "Già nella tua raccolta come \"{name}\"",
+  "Names and tags can't have links in them.": "Nomi e tag non possono contenere link."
 }

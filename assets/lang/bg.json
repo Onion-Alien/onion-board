@@ -4324,5 +4324,7 @@
   "Play a chime in your headphones when you earn one.": "Пусни звън в слушалките, когато спечелиш постижение.",
   "Pop-up sound": "Звук при изскачане",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "„Отключено постижение“ в долната част на екрана, когато спечелиш постижение.",
-  "Show pop-ups": "Показвай изскачащи известия"
+  "Show pop-ups": "Показвай изскачащи известия",
+  "Already in your library as “{name}”": "Вече е в библиотеката ти като „{name}“",
+  "Names and tags can't have links in them.": "Имената и таговете не може да съдържат връзки."
 }

@@ -515,8 +515,8 @@ def test_categories_filter_the_list(qapp, fake):
     pick = t.cat_pick
     assert _wait(qapp, lambda: len(t._rows) == 2 and pick.count() == 4)
     # Trending (picked) and Most liked: every sound; then the categories
-    assert [pick.itemText(i) for i in range(4)] == ["Trending", "Most liked", "Games  3",
-                                                    "Memes  1"]
+    assert [pick.itemText(i) for i in range(4)] == ["Trending", "Most liked", "Games (3)",
+                                                    "Memes (1)"]
     assert pick.currentIndex() == 0
     # it opens on Trending: what's popular right now, its header with the arrow
     assert "sort=trending" in next(c[1] for c in fake.calls if c[1].startswith("/v1/sounds"))
@@ -576,7 +576,7 @@ def test_onion_board_category_lists_the_stores_own_sounds(qapp, fake):
     t.show()
     pick = t.cat_pick
     assert _wait(qapp, lambda: len(t._rows) == 2 and pick.count() == 4)
-    assert [pick.itemText(i) for i in range(2, 4)] == ["Games  3", "Onion Board  2"]
+    assert [pick.itemText(i) for i in range(2, 4)] == ["Games (3)", "Onion Board (2)"]
     pick.activated.emit(pick.findData("onionboard"))
     assert _wait(qapp, lambda: "cat=onionboard" in fake.calls[-1][1])
     assert _wait(qapp, lambda: len(t._rows) == 2)
@@ -856,3 +856,13 @@ def test_playing_a_link_keeps_the_rows_where_they_are(window, qapp, monkeypatch)
     assert _wait(qapp, lambda: w.download_bar.isVisible())
     process_events(qapp, lambda: False, 0.5)
     assert abs(row.mapTo(w, row.rect().topLeft()).y() - y) <= 2
+
+
+def test_names_and_tags_with_links_are_caught_before_sending():
+    assert store.check_words("Air horn", "meme, horn") == ""
+    assert store.check_words("Mr. Bean", "e.g. funny") == ""
+    for name, tags in [("get it at example.com", ""), ("horn", "www.spam"),
+                       ("join discord.gg/abc", ""), ("horn", "https://x.y")]:
+        assert store.check_words(name, tags), (name, tags)
+    with pytest.raises(store.StoreError):
+        store.share_link("i", "https://www.youtube.com/watch?v=abc", "see example.com")

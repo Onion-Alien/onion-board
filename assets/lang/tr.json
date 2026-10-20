@@ -4324,5 +4324,7 @@
   "Play a chime in your headphones when you earn one.": "Bir başarım kazandığında kulaklığında bir zil sesi çal.",
   "Pop-up sound": "Açılır pencere sesi",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "Bir başarım kazandığında ekranın altında \"Başarım kazanıldı\".",
-  "Show pop-ups": "Açılır pencereleri göster"
+  "Show pop-ups": "Açılır pencereleri göster",
+  "Already in your library as “{name}”": "Zaten kitaplığınızda “{name}” olarak mevcut",
+  "Names and tags can't have links in them.": "Adlar ve etiketler bağlantı içeremez."
 }

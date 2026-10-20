@@ -4324,5 +4324,7 @@
   "Play a chime in your headphones when you earn one.": "Toca um sino nos teus auscultadores quando conquistas um.",
   "Pop-up sound": "Som do pop-up",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "\"Conquista desbloqueada\" na parte de baixo do ecrã quando conquistas um.",
-  "Show pop-ups": "Mostrar pop-ups"
+  "Show pop-ups": "Mostrar pop-ups",
+  "Already in your library as “{name}”": "Já está na tua biblioteca como “{name}”",
+  "Names and tags can't have links in them.": "Os nomes e as etiquetas não podem ter links."
 }

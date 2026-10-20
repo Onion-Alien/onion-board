@@ -4250,5 +4250,7 @@
   "Play a chime in your headphones when you earn one.": "获得成就时在耳机中播放提示音。",
   "Pop-up sound": "弹窗音效",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "获得成就时在屏幕底部显示“成就已解锁”。",
-  "Show pop-ups": "显示弹窗"
+  "Show pop-ups": "显示弹窗",
+  "Already in your library as “{name}”": "已在你的音效库里，名为“{name}”",
+  "Names and tags can't have links in them.": "名称和标签里不能有链接。"
 }

@@ -4324,5 +4324,7 @@
   "Play a chime in your headphones when you earn one.": "कोई उपलब्धि मिलने पर आपके हेडफ़ोन में एक धुन बजाएँ।",
   "Pop-up sound": "पॉप-अप ध्वनि",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "कोई उपलब्धि मिलने पर स्क्रीन के नीचे \"उपलब्धि अनलॉक हुई\"।",
-  "Show pop-ups": "पॉप-अप दिखाएँ"
+  "Show pop-ups": "पॉप-अप दिखाएँ",
+  "Already in your library as “{name}”": "आपकी लाइब्रेरी में पहले से ही \"{name}\" के रूप में",
+  "Names and tags can't have links in them.": "नाम और टैग में लिंक नहीं हो सकते।"
 }

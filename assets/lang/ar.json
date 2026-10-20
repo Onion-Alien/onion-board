@@ -4620,5 +4620,7 @@
   "Play a chime in your headphones when you earn one.": "شغّل نغمة في سماعاتك عندما تحصل على إنجاز.",
   "Pop-up sound": "صوت النافذة المنبثقة",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "«تم فتح إنجاز» أسفل الشاشة عندما تحصل على إنجاز.",
-  "Show pop-ups": "إظهار النوافذ المنبثقة"
+  "Show pop-ups": "إظهار النوافذ المنبثقة",
+  "Already in your library as “{name}”": "موجود بالفعل في مكتبتك باسم \"{name}\"",
+  "Names and tags can't have links in them.": "لا يمكن أن تحتوي الأسماء والوسوم على روابط."
 }

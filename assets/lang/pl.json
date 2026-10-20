@@ -4398,5 +4398,7 @@
   "Play a chime in your headphones when you earn one.": "Odtwarzaj dzwonek w słuchawkach, gdy zdobędziesz osiągnięcie.",
   "Pop-up sound": "Dźwięk powiadomienia",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "„Osiągnięcie odblokowane” na dole ekranu, gdy zdobędziesz osiągnięcie.",
-  "Show pop-ups": "Pokazuj powiadomienia"
+  "Show pop-ups": "Pokazuj powiadomienia",
+  "Already in your library as “{name}”": "Już w Twojej bibliotece jako „{name}”",
+  "Names and tags can't have links in them.": "Nazwy i tagi nie mogą zawierać linków."
 }

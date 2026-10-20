@@ -4250,5 +4250,7 @@
   "Play a chime in your headphones when you earn one.": "업적을 달성하면 헤드폰에서 알림음을 재생합니다.",
   "Pop-up sound": "팝업 소리",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "업적을 달성하면 화면 아래에 \"업적 달성\"이(가) 표시됩니다.",
-  "Show pop-ups": "팝업 표시"
+  "Show pop-ups": "팝업 표시",
+  "Already in your library as “{name}”": "이미 ' {name} '으로 라이브러리에 있습니다.",
+  "Names and tags can't have links in them.": "이름과 태그에는 링크를 넣을 수 없습니다."
 }

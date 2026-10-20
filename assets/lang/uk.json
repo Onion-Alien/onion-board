@@ -4398,5 +4398,7 @@
   "Play a chime in your headphones when you earn one.": "Відтворювати дзвін у навушниках, коли ти отримуєш досягнення.",
   "Pop-up sound": "Звук сповіщення",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "«Досягнення отримано» внизу екрана, коли ти отримуєш досягнення.",
-  "Show pop-ups": "Показувати сповіщення"
+  "Show pop-ups": "Показувати сповіщення",
+  "Already in your library as “{name}”": "Вже у вашій бібліотеці як “{name}”",
+  "Names and tags can't have links in them.": "Назви й теги не можуть містити посилань."
 }

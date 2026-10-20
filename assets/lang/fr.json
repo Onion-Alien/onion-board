@@ -4324,5 +4324,7 @@
   "Play a chime in your headphones when you earn one.": "Jouer un carillon dans ton casque quand tu en débloques un.",
   "Pop-up sound": "Son de la notification",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "« Succès débloqué » en bas de l'écran quand tu en débloques un.",
-  "Show pop-ups": "Afficher les notifications"
+  "Show pop-ups": "Afficher les notifications",
+  "Already in your library as “{name}”": "Déjà dans ta bibliothèque sous « {name} »",
+  "Names and tags can't have links in them.": "Les noms et les tags ne peuvent pas contenir de liens."
 }

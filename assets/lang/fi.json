@@ -4324,5 +4324,7 @@
   "Play a chime in your headphones when you earn one.": "Soita kilahdus kuulokkeisiisi, kun ansaitset saavutuksen.",
   "Pop-up sound": "Ponnahdusikkunan ääni",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "”Saavutus avattu” näytön alareunassa, kun ansaitset saavutuksen.",
-  "Show pop-ups": "Näytä ponnahdusikkunat"
+  "Show pop-ups": "Näytä ponnahdusikkunat",
+  "Already in your library as “{name}”": "Jo kirjastossasi nimellä “{name}”",
+  "Names and tags can't have links in them.": "Nimissä ja tunnisteissa ei saa olla linkkejä."
 }

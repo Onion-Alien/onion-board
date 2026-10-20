@@ -4398,5 +4398,7 @@
   "Play a chime in your headphones when you earn one.": "Redă un clinchet în căști când obții una.",
   "Pop-up sound": "Sunet pop-up",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "„Realizare deblocată” în partea de jos a ecranului când obții una.",
-  "Show pop-ups": "Arată ferestrele pop-up"
+  "Show pop-ups": "Arată ferestrele pop-up",
+  "Already in your library as “{name}”": "E deja în biblioteca ta ca „{name}”",
+  "Names and tags can't have links in them.": "Numele și etichetele nu pot conține linkuri."
 }
