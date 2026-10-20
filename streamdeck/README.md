@@ -9,6 +9,10 @@ A plugin for Elgato's Stream Deck app that plays your Onion Board sounds.
 | **Random sound** | A random sound: from any category, the one showing in Onion Board, or one you pick. |
 | **Switch** | Live / Muted, the voice changer, "others hear my mic" or hotkeys, on and off. The key shows which it is, even when you change it in the app. |
 
+Onion Board draws every key itself (`/api/key_image`) with its own pad card, in your theme
+and language, so the keys look like the board. When it can't be reached, or it's an older
+version, the keys fall back to the plugin's own pictures.
+
 It talks to Onion Board's control API (Settings → Remote → *Remote control*, off by
 default). There's nothing to copy: the plugin reads the port and key from Onion Board's
 `%APPDATA%\OnionBoard\config.json` (it never writes to it) and only connects to

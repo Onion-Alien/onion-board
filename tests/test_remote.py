@@ -562,3 +562,22 @@ def test_key_names_wrap_onto_two_lines(qapp):
     long = two_lines("one two three four five six seven", fm, fm.horizontalAdvance("one two"))
     assert long.startswith("one two\n") and long.endswith("…") and long.count("\n") == 1
     assert "\n" not in two_lines("Supercalifragilistic", fm, 20)
+
+
+def test_key_image_draws_stop_random_and_the_switches_as_cards_too(qapp, window):
+    from soundboard.control import keyimage
+    w = window
+    d = lambda action, **p: remote.dispatch(w, action, p)   # noqa: E731
+    tag = d("status")[1]["keys"]
+    for kind in keyimage.CONTROLS:
+        status, body = d("key_image", control=kind, on="1")
+        assert status == 200 and body["image"].startswith("data:image/png;base64,")
+        assert body["on"] is True and body["look"] == tag
+    off = d("key_image", control="mic", on="0")[1]
+    assert off["on"] is False and off["image"] != d("key_image", control="mic", on="1")[1]["image"]
+    d("hotkeys", on="0")                               # no on=: as it is now
+    assert d("key_image", control="hotkeys")[1]["on"] is False
+    assert d("key_image", control="nope")[0] == 404
+    assert d("key_image", control="mic", on="maybe") == (400, remote.BAD_ON)
+    w.cfg.theme = "Light" if w.cfg.theme != "Light" else "Dark"
+    assert d("status")[1]["keys"] != tag               # a plugin draws them again
