@@ -256,22 +256,20 @@ class BunMode(QWidget):
 
     # ------------------------------------------------------------------ show
     def present(self, near: QRect | None = None):
-        """Up on screen: where he was last, else the bottom corner of `near` (the
-        window he came from), else the main screen's bottom-right corner."""
+        """Up on screen: Bun himself centred on `near` (the window he came from, so he
+        turns up right where it was), else where he was last, else the main screen's
+        bottom-right corner."""
         self._lay_out()
         pos = self._saved().get("pos")
-        if isinstance(pos, (list, tuple)) and len(pos) == 2 and self._on_a_screen(
+        if near is not None:
+            self.move(near.center() - self._bun_rect().center())
+        elif isinstance(pos, (list, tuple)) and len(pos) == 2 and self._on_a_screen(
                 QPoint(int(pos[0]), int(pos[1]))):
             self.move(int(pos[0]), int(pos[1]))
         else:
-            screen = QGuiApplication.screenAt(near.center()) if near is not None else None
-            room = (screen or QGuiApplication.primaryScreen()).availableGeometry()
-            if near is not None:
-                corner = near.bottomRight()
-            else:
-                corner = room.bottomRight()
-            self.move(corner - QPoint(self.width() + MARGIN, self.height() + MARGIN))
-            self._keep_on_screen()
+            room = QGuiApplication.primaryScreen().availableGeometry()
+            self.move(room.bottomRight() - QPoint(self.width() + MARGIN, self.height() + MARGIN))
+        self._keep_on_screen()
         self.show()
         self.raise_()
         # his buttons for a moment as he lands, so the way back is seen once even by

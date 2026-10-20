@@ -1,5 +1,5 @@
-"""The main window's About menu (the onion's menu: Join the Discord, Send feedback,
-Report a problem) and opening those pages.
+"""The main window's About menu (Bun's menu at the rail's foot: Join the Discord, Send
+feedback, Report a problem, then Turn into Bun) and opening those pages.
 
 MainWindow makes one ``AboutControl`` (``MainWindow.aboutctl``); everything here runs on
 the UI thread."""
@@ -27,15 +27,15 @@ class AboutControl(Controller):
         # (a foot button is checkable for Settings' "showing" fill: this one never is)
         mw = self.mw
         mw.btn_about.setChecked(False)
-        # up from the rail's foot, its edge over the onion's (down, it ran off the window)
+        # up from the rail's foot, its edge over Bun's (down, it ran off the window)
         m = mw.about_menu
         self._fill_about_menu()
         edge = 0 if not mw.isRightToLeft() else mw.btn_about.width() - m.sizeHint().width()
         m.popup(mw.btn_about.mapToGlobal(QPoint(edge, -m.sizeHint().height())))
 
     def _fill_about_menu(self):
-        """The onion at the rail's foot: where to talk to us. Only those three: What's new
-        is the version under the app's name."""
+        """Bun at the rail's foot: where to talk to us, and Turn into Bun under a line.
+        What's new is the version under the app's name."""
         mw = self.mw
         from soundboard import __version__
         from soundboard.core import feedback
@@ -46,6 +46,8 @@ class AboutControl(Controller):
         icons.set_icon(m.addAction(_("Send feedback"), self.ask_feedback), "edit")
         icons.set_icon(m.addAction(_("Report a problem"), lambda: self._open_page(
             feedback.problem_url(__version__))), "warn")
+        m.addSeparator()
+        icons.set_icon(m.addAction(_("Turn into Bun"), mw.bunctl.enter_bun_mode), "bun")
 
     def ask_feedback(self):
         """*Send feedback*: "What would you improve?" (ui/kit/feedbackdialog.py)."""

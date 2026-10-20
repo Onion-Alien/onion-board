@@ -251,19 +251,24 @@ def test_the_foot_never_overlaps_at_any_width(qapp):
     rail.close()
 
 
-def test_the_help_onion_opens_its_menu_and_is_never_left_selected(window):  # noqa: F811
+def test_the_help_bun_opens_its_menu_and_is_never_left_selected(window):  # noqa: F811
     window.show()
     QApplication.processEvents()
     window.btn_about.click()
     QApplication.processEvents()
-    texts = [a.text() for a in window.about_menu.actions() if a.text()]
-    assert texts == ["Join the Discord", "Send feedback", "Report a problem"]
+    acts = window.about_menu.actions()
+    texts = [a.text() for a in acts if a.text()]
+    assert texts == ["Join the Discord", "Send feedback", "Report a problem", "Turn into Bun"]
+    assert acts[3].isSeparator()   # a line over Turn into Bun
     assert not window.btn_about.isChecked()
-    # up from the rail's foot, its edge over the onion's (down, it ran off the window)
-    menu, onion = window.about_menu.geometry(), window.btn_about
-    top_left = onion.mapToGlobal(onion.rect().topLeft())
+    # up from the rail's foot, its edge over Bun's (down, it ran off the window)
+    menu, bun = window.about_menu.geometry(), window.btn_about
+    top_left = bun.mapToGlobal(bun.rect().topLeft())
     assert menu.bottom() < top_left.y() and menu.left() == top_left.x()
     window.about_menu.hide()
+    acts[4].trigger()
+    assert window.bunctl.bun_up() and not window.isVisible()
+    window.bunctl.leave_bun_mode()
 
 
 def test_a_small_chevron_has_a_solid_tip(qapp):
