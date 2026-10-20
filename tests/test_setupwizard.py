@@ -151,7 +151,9 @@ def test_missing_cable_offers_install_and_finish_is_done(wizard, devices):
     w, wiz = wizard
     wiz.go(1)
     assert not wiz.btn_cable.isHidden()
-    assert wiz.btn_next.text().startswith("Skip")
+    # Next stays Next (a plain one: the filled button sets it up), and says why beside it
+    assert wiz.btn_next.text().startswith("Next") and wiz.btn_next.objectName() == ""
+    assert not wiz.next_why.isHidden() and "only you" in wiz.next_why.text()
     wiz.go(2)
     wiz.next_clicked()
     assert library.Config.load().setup_done   # Finish: not shown again by itself
@@ -1467,6 +1469,21 @@ def test_picking_a_look_switches_the_theme(mic_wizard):
     assert theme.current_name == "Ocean" and w.cfg.theme == "Ocean"
     assert [c.name for c in wiz.look_cards if c.isChecked()] == ["Ocean"]
     wiz._pick_look("Dark")
+
+
+def test_a_theme_outside_the_nine_looks_is_named(mic_wizard):
+    """The board on a theme that isn't one of the nine: no look is ticked, so the line
+    under them names it, and goes back to the plain count once one is picked."""
+    from soundboard.ui.kit import theme
+    w, wiz = mic_wizard
+    other = next(n for n in theme.THEMES if n not in setupwizard.look_themes())
+    w.themectl.apply_theme(other)
+    wiz.go(wiz.look_index)
+    wiz._pick_look(other)   # (what the page shows for the board's current theme)
+    assert not any(c.isChecked() for c in wiz.look_cards)
+    assert other in wiz.look_more.text() and "more themes" in wiz.look_more.text()
+    wiz._pick_look("Dark")
+    assert other not in wiz.look_more.text() and "more themes" in wiz.look_more.text()
 
 
 def test_a_new_language_restarts_into_it_on_finish(mic_wizard, monkeypatch):

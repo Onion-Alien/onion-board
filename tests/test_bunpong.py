@@ -125,6 +125,40 @@ def test_esc_ends_the_game(qapp):
     stack.close()
 
 
+def test_esc_ends_the_game_wherever_the_focus_is(qapp):
+    """Esc goes to whatever has the focus (a real key press, through the window): the
+    court, Close, Play again, Another game, or the next game after it."""
+    from PySide6.QtWidgets import QPushButton
+
+    def focus_close(g):
+        next(b for b in g.findChildren(QPushButton) if b.text() == "Close").setFocus()
+
+    def ended(g):
+        g.court.on_over()
+
+    def another(g):
+        g.court.on_over()
+        QTest.mouseClick(g.other, Qt.MouseButton.LeftButton)
+
+    def other_button(g):
+        g.court.on_over()
+        g.other.setFocus()
+
+    for put in (lambda g: None, focus_close, ended, other_button, another):
+        stack, page, _other, bun = _page_with_bun()
+        stack.show()
+        bun.fetch_bat()
+        game = bunpong.open_for(bun)
+        game.activateWindow()
+        qapp.processEvents()
+        put(game)
+        qapp.processEvents()
+        assert qapp.focusWidget() is not None
+        QTest.keyClick(game.windowHandle(), Qt.Key.Key_Escape)
+        assert game._done
+        stack.close()
+
+
 def test_a_click_serves_and_bun_returns_an_easy_ball(qapp):
     stack, game = _game()
     c = game.court

@@ -1121,7 +1121,6 @@
   "Since start: {dropouts}, {reconnects}.": "Dall'inizio: {dropouts} , {reconnects} .",
   "Site": "Sito",
   "Size": "Misurare",
-  "Skip for now  →": "Salta per ora →",
   "Slow or patchy connection": "Connessione lenta o irregolare",
   "Snowflake": "Fiocco di neve",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "Non è stato possibile ripristinare alcuni elementi eliminati di recente: vengono conservati in questo punto di ripristino.",
@@ -1493,7 +1492,6 @@
   "❚❚ paused": "❚❚ fece una pausa",
   "⟲  Restart my PC now": "⟲ Riavvia il mio PC adesso",
   "⟳  Check again": "⟳ Controlla di nuovo",
-  "⬇  Install it now (free)": "⬇ Installalo ora (gratuito)",
   "⬇  Try installing again": "⬇ Prova a eseguire nuovamente l'installazione",
   "Join the Discord": "Entra nel Discord",
   "Chat about it on Discord": "Parlane su Discord",
@@ -4344,5 +4342,12 @@
   "All sounds: trending": "Tutti i suoni: tendenza",
   "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "La finestra è troppo piccola per la board, quindi questo è il mini lettore. Allargala per riavere la board.",
   "Watches your game's window while it's open, even behind others": "Osserva la finestra del tuo gioco finché è aperta, anche dietro le altre",
-  "Your file stays whole: only the part between the handles plays.": "Il tuo file resta intero: suona solo la parte tra le maniglie."
+  "Your file stays whole: only the part between the handles plays.": "Il tuo file resta intero: suona solo la parte tra le maniglie.",
+  "its file is gone (it was at {path})": "il suo file non c'è più (era in {path})",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Un cavo virtuale gratuito di VB-Audio. Ci vuole circa un minuto e Windows chiede una volta se va bene. Poi lo scegli come microfono in Discord e nei giochi.",
+  "Install the cable": "Installa il cavo",
+  "Not set up yet: only you will hear your sounds.": "Non ancora configurato: i tuoi suoni li sentirai solo tu.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Ora stai usando <b>{theme}</b>. Altri {n} temi nelle Impostazioni.",
+  "Exact volume of {name}": "Volume esatto di {name}",
+  "Volume of {name}": "Volume di {name}"
 }

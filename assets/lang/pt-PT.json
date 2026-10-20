@@ -959,7 +959,6 @@
   "Since start: {dropouts}, {reconnects}.": "Desde o início: {dropouts}, {reconnects}.",
   "Site": "Site",
   "Size": "Tamanho",
-  "Skip for now  →": "Saltar por agora  →",
   "Skip this version": "Saltar esta versão",
   "Slow or patchy connection": "Ligação lenta ou instável",
   "Snowflake": "Snowflake",
@@ -1492,7 +1491,6 @@
   "❚❚ paused": "❚❚ em pausa",
   "⟲  Restart my PC now": "⟲  Reiniciar o meu PC agora",
   "⟳  Check again": "⟳  Verificar outra vez",
-  "⬇  Install it now (free)": "⬇  Instalar agora (gratuito)",
   "⬇  Try installing again": "⬇  Tentar instalar outra vez",
   "(didn't say)": "(não disse)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
@@ -4344,5 +4342,12 @@
   "All sounds: trending": "Todos os sons: tendências",
   "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "A janela é pequena demais para o painel, por isso este é o minileitor. Aumenta-a para voltar ao painel.",
   "Watches your game's window while it's open, even behind others": "Vigia a janela do teu jogo enquanto está aberta, mesmo atrás de outras",
-  "Your file stays whole: only the part between the handles plays.": "O teu ficheiro fica inteiro: só toca a parte entre as pegas."
+  "Your file stays whole: only the part between the handles plays.": "O teu ficheiro fica inteiro: só toca a parte entre as pegas.",
+  "its file is gone (it was at {path})": "o ficheiro dele desapareceu (estava em {path})",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Um cabo virtual gratuito da VB-Audio. Demora cerca de um minuto e o Windows pergunta uma vez se está tudo bem. Depois escolhes o cabo como microfone no Discord e nos jogos.",
+  "Install the cable": "Instalar o cabo",
+  "Not set up yet: only you will hear your sounds.": "Ainda não está configurado: só tu vais ouvir os teus sons.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Estás a usar <b>{theme}</b>. Mais {n} temas nas Definições.",
+  "Exact volume of {name}": "Volume exato de {name}",
+  "Volume of {name}": "Volume de {name}"
 }

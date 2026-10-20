@@ -1100,7 +1100,6 @@
   "Since start: {dropouts}, {reconnects}.": "Sejak mulai: {dropouts}, {reconnects}.",
   "Site": "Lokasi",
   "Size": "Ukuran",
-  "Skip for now  →": "Lewati sekarang →",
   "Slow or patchy connection": "Koneksi lambat atau tidak merata",
   "Snowflake": "Kepingan salju",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "Sebagian Baru dihapus tidak bisa dikembalikan: masih disimpan di titik pemulihan ini.",
@@ -1454,7 +1453,6 @@
   "❚❚ paused": "❚❚ dijeda",
   "⟲  Restart my PC now": "⟲ Nyalakan ulang PC saya sekarang",
   "⟳  Check again": "⟳ Periksa lagi",
-  "⬇  Install it now (free)": "⬇ Instal sekarang (gratis)",
   "⬇  Try installing again": "⬇ Coba instal lagi",
   "The Discord is where to chat, ask for help and hear about new versions. The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "Di Discord kamu bisa ngobrol, minta bantuan, dan dapat kabar versi baru. Formulir masukan tidak perlu akun. Menemukan masalah keamanan? Laporkan secara pribadi di GitHub, jangan di issue publik.",
   "Join the Discord": "Gabung ke Discord",
@@ -4270,5 +4268,12 @@
   "All sounds: trending": "Semua suara: sedang tren",
   "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Jendelanya terlalu kecil untuk board, jadi ini pemutar mini. Perbesar untuk mengembalikan board.",
   "Watches your game's window while it's open, even behind others": "Mengawasi jendela game-mu selama terbuka, bahkan di balik jendela lain",
-  "Your file stays whole: only the part between the handles plays.": "File-mu tetap utuh: hanya bagian di antara pegangan yang diputar."
+  "Your file stays whole: only the part between the handles plays.": "File-mu tetap utuh: hanya bagian di antara pegangan yang diputar.",
+  "its file is gone (it was at {path})": "filenya sudah tidak ada (tadinya di {path})",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Kabel virtual gratis dari VB-Audio. Butuh sekitar semenit, dan Windows akan bertanya sekali apakah boleh. Lalu kamu pilih sebagai mik di Discord dan game.",
+  "Install the cable": "Pasang kabel",
+  "Not set up yet: only you will hear your sounds.": "Belum diatur: cuma kamu yang dengar suaramu.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Kamu sedang pakai <b>{theme}</b>. {n} tema lagi di Pengaturan.",
+  "Exact volume of {name}": "Volume pasti {name}",
+  "Volume of {name}": "Volume {name}"
 }

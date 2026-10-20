@@ -1101,7 +1101,6 @@
   "Since start: {dropouts}, {reconnects}.": "開始以降: {dropouts} 、 {reconnects} 。",
   "Site": "サイト",
   "Size": "サイズ",
-  "Skip for now  →": "とりあえずスキップ→",
   "Slow or patchy connection": "接続が遅い、または斑点がある",
   "Snowflake": "スノーフレーク",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "最近削除されたものの一部は元に戻せませんでした。この復元ポイントに保持されています。",
@@ -1455,7 +1454,6 @@
   "❚❚ paused": "❚❚一時停止中",
   "⟲  Restart my PC now": "⟲ 今すぐ PC を再起動してください",
   "⟳  Check again": "⟳ もう一度確認してください",
-  "⬇  Install it now (free)": "⬇ 今すぐインストールしてください（無料）",
   "⬇  Try installing again": "⬇ もう一度インストールしてみてください",
   "Join the Discord": "Discord に参加",
   "Chat about it on Discord": "Discord で話そう",
@@ -4270,5 +4268,12 @@
   "All sounds: trending": "すべてのサウンド: トレンド",
   "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "ウィンドウがボードには小さすぎるため、ミニプレーヤーになっています。広げるとボードに戻ります。",
   "Watches your game's window while it's open, even behind others": "ゲームのウィンドウが開いている間見張ります（他のウィンドウの裏でも）",
-  "Your file stays whole: only the part between the handles plays.": "ファイルはそのまま残ります。ハンドルの間の部分だけが再生されます。"
+  "Your file stays whole: only the part between the handles plays.": "ファイルはそのまま残ります。ハンドルの間の部分だけが再生されます。",
+  "its file is gone (it was at {path})": "ファイルが見つかりません（{path} にありました）",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "VB-Audio の無料の仮想ケーブルです。1 分ほどで終わり、Windows が一度だけ確認します。そのあと Discord やゲームでマイクとして選びます。",
+  "Install the cable": "ケーブルを入れる",
+  "Not set up yet: only you will hear your sounds.": "まだ設定されていません：サウンドは自分にしか聞こえません。",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "いまは <b>{theme}</b> を使っています。設定にはほかに {n} 個のテーマがあります。",
+  "Exact volume of {name}": "{name} の音量（数値）",
+  "Volume of {name}": "{name} の音量"
 }

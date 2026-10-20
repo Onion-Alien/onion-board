@@ -1101,7 +1101,6 @@
   "Since start: {dropouts}, {reconnects}.": "시작 이후: {dropouts} , {reconnects} .",
   "Site": "대지",
   "Size": "크기",
-  "Skip for now  →": "지금은 건너뛰기 →",
   "Slow or patchy connection": "느리거나 불안정한 연결",
   "Snowflake": "눈송이",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "최근 삭제된 항목 중 일부는 다시 가져올 수 없습니다. 해당 항목은 이 복원 지점에 보관되어 있습니다.",
@@ -1455,7 +1454,6 @@
   "❚❚ paused": "❚❚ 일시중지됨",
   "⟲  Restart my PC now": "⟲ 지금 PC를 다시 시작하세요",
   "⟳  Check again": "⟳ 다시 확인해보세요",
-  "⬇  Install it now (free)": "⬇ 지금 설치하세요(무료)",
   "⬇  Try installing again": "⬇ 다시 설치해 보세요",
   "Join the Discord": "Discord 참여하기",
   "Chat about it on Discord": "Discord에서 이야기해요",
@@ -4270,5 +4268,12 @@
   "All sounds: trending": "모든 사운드: 인기 급상승",
   "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "창이 보드에 비해 너무 작아서 미니 플레이어가 됐어요. 창을 크게 늘리면 보드가 돌아와요.",
   "Watches your game's window while it's open, even behind others": "게임 창이 열려 있는 동안 지켜봐요. 다른 창 뒤에 있어도요",
-  "Your file stays whole: only the part between the handles plays.": "파일은 그대로 남아요. 핸들 사이 부분만 재생돼요."
+  "Your file stays whole: only the part between the handles plays.": "파일은 그대로 남아요. 핸들 사이 부분만 재생돼요.",
+  "its file is gone (it was at {path})": "파일이 없어졌어요({path}에 있었어요)",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "VB-Audio의 무료 가상 케이블이에요. 1분 정도 걸리고, Windows가 괜찮은지 한 번 물어봐요. 그다음 Discord와 게임에서 마이크로 고르면 돼요.",
+  "Install the cable": "케이블 설치",
+  "Not set up yet: only you will hear your sounds.": "아직 설정 안 됨: 내 사운드는 나만 들어요.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "지금 <b>{theme}</b> 테마를 쓰고 있어요. 설정에 테마가 {n}개 더 있어요.",
+  "Exact volume of {name}": "{name} 정확한 볼륨",
+  "Volume of {name}": "{name} 볼륨"
 }

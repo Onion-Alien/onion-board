@@ -722,6 +722,14 @@ class SetupWizard(QDialog):
         self.btn_skip.clicked.connect(self.skip_clicked)
         self.btn_skip.hide()
         nav.addWidget(self.btn_skip)
+        # the send step, not set up some other way (the cable, a device): Next still
+        # says Next, and this line beside it says what going on without it means
+        # ("Skip for now" in its place gave no reason, and people stopped there)
+        self.next_why = QLabel(_("Not set up yet: only you will hear your sounds."))
+        self.next_why.setObjectName("hint")
+        self.next_why.setWordWrap(True)
+        self.next_why.hide()
+        nav.addWidget(self.next_why, 1)
         self.btn_next = QPushButton(_nav_words(_("Next  →")))
         self.btn_next.setObjectName("primary")
         # the arrow after the words, on the reading side's end
@@ -820,9 +828,13 @@ class SetupWizard(QDialog):
         g.setColumnStretch(3, 1)
         v.addLayout(g)
         v.addSpacing(6)
-        more = QLabel(_("{n} more themes in Settings.", n=len(theme.THEMES) - len(look_themes())))
-        more.setObjectName("hint")
-        v.addWidget(more)
+        # the board on a theme that isn't one of the nine: none would be ticked, so
+        # this line says which one it is (_look_note)
+        self.look_more = QLabel()
+        self.look_more.setObjectName("hint")
+        self.look_more.setWordWrap(True)
+        v.addWidget(self.look_more)
+        self._look_note()
         v.addSpacing(SECTION_GAP)
         # the language
         row = QHBoxLayout()
@@ -1081,6 +1093,18 @@ class SetupWizard(QDialog):
                 backdrop.update()
         for c in self.look_cards:
             c.setChecked(c.name == name)
+        self._look_note()
+
+    def _look_note(self):
+        """Under the looks: how many more there are in Settings, and the theme the board
+        uses now when it isn't one of the nine (so no look is ticked)."""
+        more = len(theme.THEMES) - len(look_themes())
+        if any(c.name == theme.current_name for c in self.look_cards):
+            self.look_more.setText(_("{n} more themes in Settings.", n=more))
+        else:
+            self.look_more.setText(_("You're using <b>{theme}</b> now. {n} more themes in "
+                                     "Settings.", theme=html.escape(theme.current_name),
+                                     n=more))
 
     def _save_tabs(self):
         """The first launch's last step, left by Finish or closed there: the tabs as
@@ -1206,7 +1230,7 @@ class SetupWizard(QDialog):
         self.cable_steps.hide()
         v.addWidget(self.cable_steps)
         # the cable is only the backup: a plain button, never the big main one
-        self.btn_cable = QPushButton(_cable_text(_("⬇  Install it now (free)")))
+        self.btn_cable = QPushButton(_("Install the cable"))
         icons.set_icon(self.btn_cable, "cable")
         self.btn_cable.clicked.connect(self._cable_clicked)
         buttons = QHBoxLayout()   # each button only as wide as its words
@@ -1637,14 +1661,14 @@ class SetupWizard(QDialog):
             text = (_("Repair my mic  →") if directmic.needs_repair(
                 directmic.status(self.win.cfg.mic_device)) else _("Put my sounds in my mic  →"))
             icon = "nav_next"
-        elif i == self.send_index and not self.route_ok():
-            text, icon = _("Skip for now  →"), "nav_next"
         else:
             text, icon = _("Next  →"), "nav_next"
-        # skipping is the way out, not the step's main thing: a plain button, so the
-        # one filled button on the page is the one that sets it up
+        # going on without it is the way out, not the step's main thing: a plain Next
+        # with its reason beside it, so the one filled button on the page is the one
+        # that sets it up
         skip = (i == self.send_index and not mic_action and not self.route_ok()
                 and not self._was_locked)
+        self.next_why.setVisible(skip)
         if self.btn_next.objectName() != ("" if skip else "primary"):
             self.btn_next.setObjectName("" if skip else "primary")
             self.btn_next.style().unpolish(self.btn_next)
@@ -1892,8 +1916,6 @@ class SetupWizard(QDialog):
             route = self.win.cfg.route
         # (straight into the mic has its own "...instead" button, below)
         self.btn_use_cable.setVisible(not busy and route not in ("cable", "mic"))
-        self.btn_cable.setToolTip(_("Use a free virtual cable instead: you pick it as the mic "
-                                    "in Discord and games") if route == "mic" else "")
         self.btn_other.setVisible(not busy and self.other_box.isHidden())
         self.mic_done.hide()   # (shown below: on the mic, with the sounds not in it)
         self.alt_card.hide()   # the mic's other ways: shown below once it's the mic's page
@@ -2054,14 +2076,18 @@ class SetupWizard(QDialog):
                                         "so far.</b> Put them into your mic (nothing to "
                                         "install), or install the free virtual cable.",
                                         colour=_bad()))
-            self.btn_cable.setText(_cable_text(_("⬇  Install it now (free)")))
+            self.btn_cable.setText(_("Install the cable"))
             self.btn_cable.show()
             self.btn_recheck.hide()
         # switched off in Settings > Privacy & security: the installer's download
         # (PowerShell, from vb-audio.com) can't go through the app's connection
         allowed = net.allowed("setup_downloads")
         self.btn_cable.setEnabled(allowed)
-        self.btn_cable.setToolTip("" if allowed else net.off_message("setup_downloads"))
+        # what installing means, said calmly: free, about a minute, one Windows prompt
+        self.btn_cable.setToolTip(_("A free virtual cable from VB-Audio. It takes about a "
+                                    "minute, and Windows asks once if that's OK. Then you "
+                                    "pick it as the mic in Discord and games.") if allowed
+                                  else net.off_message("setup_downloads"))
         if not allowed and not self.btn_cable.isHidden():
             self.btn_recheck.show()   # for after installing it by hand
             if net.offline():   # Offline mode: no dead button, and the way that works

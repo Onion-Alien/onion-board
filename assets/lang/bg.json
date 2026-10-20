@@ -898,7 +898,6 @@
   "Since start: {dropouts}, {reconnects}.": "От старта: {dropouts}, {reconnects}.",
   "Site": "Сайт",
   "Size": "Размер",
-  "Skip for now  →": "Пропусни засега  →",
   "Skip this version": "Пропусни тази версия",
   "Slow or patchy connection": "Бавна или накъсана връзка",
   "Snowflake": "Snowflake",
@@ -1414,7 +1413,6 @@
   "❚❚ paused": "❚❚ пауза",
   "⟲  Restart my PC now": "⟲  Рестартирай компютъра сега",
   "⟳  Check again": "⟳  Провери пак",
-  "⬇  Install it now (free)": "⬇  Инсталирай го сега (безплатно)",
   "⬇  Try installing again": "⬇  Опитай да инсталираш пак",
   "(didn't say)": "(не каза)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
@@ -4344,5 +4342,12 @@
   "All sounds: trending": "Всички звуци: тенденция",
   "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Прозорецът е твърде малък за таблото, затова това е мини плейърът. Направи го по-голям, за да върнеш таблото.",
   "Watches your game's window while it's open, even behind others": "Следи прозореца на играта ти, докато е отворен, дори зад други",
-  "Your file stays whole: only the part between the handles plays.": "Файлът ти остава цял: звучи само частта между дръжките."
+  "Your file stays whole: only the part between the handles plays.": "Файлът ти остава цял: звучи само частта между дръжките.",
+  "its file is gone (it was at {path})": "файлът му го няма (беше в {path})",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Безплатен виртуален кабел от VB-Audio. Отнема около минута и Windows пита веднъж дали е наред. После го избираш като микрофон в Discord и игрите.",
+  "Install the cable": "Инсталирай кабела",
+  "Not set up yet: only you will hear your sounds.": "Още не е настроено: само ти ще чуваш звуците си.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Сега ползваш <b>{theme}</b>. Още теми в Настройки: {n}",
+  "Exact volume of {name}": "Точна сила на звука на {name}",
+  "Volume of {name}": "Сила на звука на {name}"
 }
