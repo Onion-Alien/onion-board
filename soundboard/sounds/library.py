@@ -635,9 +635,9 @@ class Config:
     # Settings > Achievements' counts, sets and what's earned (soundboard.core.achievements):
     # this PC's own, never sent or exported
     achievements: dict = field(default_factory=dict)
-    # Settings > Achievements: the "Achievement unlocked" pop-up, and its chime (off
-    # unless turned on)
-    achievement_popups: bool = True
+    # Settings > Achievements: the "Achievement unlocked" pop-up, and its chime (both
+    # off unless turned on)
+    achievement_popups: bool = False
     achievement_sound: bool = False
     sounds: list[SoundMeta] = field(default_factory=list)
 

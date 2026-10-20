@@ -235,6 +235,7 @@ def test_the_filters_pick_earned_not_yet_and_a_rarity(window):  # noqa: F811
 
 def test_the_page_turns_the_pop_up_sound_on_and_off(window):  # noqa: F811
     from soundboard.ui.settings.settings import SettingsDialog
+    window.cfg.achievement_popups = True
     window.cfg.achievement_sound = False
     d = SettingsDialog(window, "achievements")
     d.show()
