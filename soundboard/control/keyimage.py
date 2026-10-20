@@ -6,8 +6,8 @@ from __future__ import annotations
 import hashlib
 import time
 
-from PySide6.QtCore import QBuffer, QByteArray, QIODevice, Qt
-from PySide6.QtGui import QPixmap
+from PySide6.QtCore import QBuffer, QByteArray, QIODevice, QRectF, Qt
+from PySide6.QtGui import QFontMetrics, QPixmap
 
 from soundboard.sounds.library import SoundMeta
 
@@ -24,6 +24,20 @@ def look(meta: SoundMeta, theme: str) -> str:
     return hashlib.sha1("\0".join(map(str, bits)).encode()).hexdigest()[:10]
 
 
+def two_lines(name: str, fm: QFontMetrics, width: int) -> str:
+    """The name over at most two lines `width` wide, the second cut short with "…": a
+    key is narrower than a card, and one line left "Sad Trom…"."""
+    words = name.split()
+    first, i = "", 0
+    while i < len(words) and fm.horizontalAdvance(f"{first} {words[i]}".strip()) <= width:
+        first = f"{first} {words[i]}".strip()
+        i += 1
+    if not first:   # one word wider than the key
+        return fm.elidedText(name, Qt.TextElideMode.ElideRight, width)
+    rest = " ".join(words[i:])
+    return first + ("\n" + fm.elidedText(rest, Qt.TextElideMode.ElideRight, width) if rest else "")
+
+
 def png(meta: SoundMeta, playing: bool = False, size: int = SIZE) -> bytes:
     """The pad as a `size` x `size` PNG; `playing` draws it lit up, as on the board."""
     from soundboard.sounds import thumbs
@@ -34,6 +48,10 @@ def png(meta: SoundMeta, playing: bool = False, size: int = SIZE) -> bytes:
     class KeyPad(Pad):
         def devicePixelRatioF(self):   # its picture is fitted at the key's pixels, not
             return size / CARD         # the screen's: scaled up after, it was blocky
+
+        def _fit_name(self, room: QRectF):
+            f, flags, _ = super()._fit_name(room)
+            return f, flags, two_lines(self.meta.name, QFontMetrics(f), room.toRect().width())
 
     pad = KeyPad(meta, CARD)
     try:

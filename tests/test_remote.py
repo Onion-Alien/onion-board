@@ -548,3 +548,16 @@ def test_key_image_draws_the_pad_as_a_stream_deck_key(qapp, window):
     assert looks["s0"] == body["look"]
     w.meta("s0").color = "#123456"
     assert d("sounds")[1][0]["look"] != body["look"]
+
+
+def test_key_names_wrap_onto_two_lines(qapp):
+    # a key is narrower than a card: one line left "Sad Trom…"
+    from PySide6.QtGui import QFont, QFontMetrics
+
+    from soundboard.control.keyimage import two_lines
+    fm = QFontMetrics(QFont())
+    assert two_lines("Sad Trombone", fm, fm.horizontalAdvance("Sad Trombone") - 1) == "Sad\nTrombone"
+    assert two_lines("Bruh", fm, 500) == "Bruh"
+    long = two_lines("one two three four five six seven", fm, fm.horizontalAdvance("one two"))
+    assert long.startswith("one two\n") and long.endswith("…") and long.count("\n") == 1
+    assert "\n" not in two_lines("Supercalifragilistic", fm, 20)
