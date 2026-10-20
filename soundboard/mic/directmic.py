@@ -745,7 +745,11 @@ class DirectMicStream:
             except Exception:  # noqa: BLE001 - logged once; the next block is tried as usual
                 self._log_once("pump")
                 wait = POLL_S
-            time.sleep(wait)
+            try:
+                time.sleep(wait)
+            except OSError:   # Windows' high-resolution timer can fail: a coarser wait
+                self._log_once("sleep")
+                self._stop.wait(wait)
 
 
 def _pid_alive(pid: int) -> bool:
