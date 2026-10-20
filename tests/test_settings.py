@@ -401,7 +401,9 @@ def test_remote_page_copies_an_ai_prompt_with_the_key_only_when_ticked(window): 
     window.cfg.api_enabled, window.cfg.api_token = True, "key-for-the-ai-test"
     d = SettingsDialog(window, "remote")
     try:
-        ai = next(b for b in d.findChildren(QPushButton) if b.text() == "Copy AI prompt")
+        # the links card's (the Twitch card has one of its own)
+        ai = next(b for b in d.findChildren(QPushButton) if b.text() == "Copy AI prompt"
+                  and "Twitch" not in b.toolTip())
         ai.click()
         text = QApplication.clipboard().text()
         assert "/api/play" in text and "key-for-the-ai-test" not in text
