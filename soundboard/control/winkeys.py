@@ -80,6 +80,16 @@ def reserved(combo: str) -> bool:
 
 
 POLL_MS = 20   # how often a watched (reserved) key is checked while one is set
+PROBE_ID = 0xBFFF   # hotkey id for _probe, far above the ids register hands out
+
+
+def _probe(mods: int, vk: int) -> bool:
+    """False if another program owns this combo (RegisterHotKey says no). A shared key
+    is only read, never registered, so nothing else would tell us; it's let go at once."""
+    if not user32.RegisterHotKey(None, PROBE_ID, mods | MOD_NOREPEAT, vk):
+        return False
+    user32.UnregisterHotKey(None, PROBE_ID)
+    return True
 
 
 def parse(combo: str) -> tuple[int, int] | None:
@@ -525,6 +535,9 @@ class Hotkeys(QObject):
                 mods, vk = parsed
                 if share and combo in shared:
                     self._shared.setdefault(parsed, act)
+                    # still read, but say so if another program owns it: it fires there too
+                    if not reserved(combo) and not _probe(mods, vk):
+                        failed.append(combo)
                 elif reserved(combo):
                     self._watched[vk] = act
                 elif user32.RegisterHotKey(None, i, mods | MOD_NOREPEAT, vk):

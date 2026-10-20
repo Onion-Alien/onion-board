@@ -283,6 +283,10 @@ def test_shared_keys_are_read_not_registered_and_grabbed_ones_still_taken(qapp):
         assert process_events(qapp, lambda: got["b"] is not None, 3)
         assert got["b"] == [grabbed]              # a still holds the grabbed one, not the other
         got["a"] = None
+        a.register({shared: "x"})   # b owns it now: still read, but said so
+        assert process_events(qapp, lambda: got["a"] is not None, 3)
+        assert got["a"] == [shared] and set(a._shared.values()) == {"x"}
+        got["a"] = None
         a.share = False
         a.register({})
         assert process_events(qapp, lambda: got["a"] is not None, 3)
