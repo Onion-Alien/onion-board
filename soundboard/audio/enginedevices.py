@@ -360,6 +360,10 @@ class EngineDevices:
             else:
                 self._open_warned.discard(f"obs:{name}")
 
+    def mic_live(self) -> bool:
+        """The mic is open and its sound is coming in right now (its callback just ran)."""
+        return self.mic_stream is not None and time.monotonic() - self._last_cb["mic"] < STALL_S
+
     @_holding_devices
     def set_mic_device(self, name: str | None):
         self._close("mic_stream")

@@ -14,7 +14,6 @@
   "<span style='color:{status}'>Nothing to save: {why}.</span>": "<span style='color:{status}'>Нечего сохранять: {why}.</span>",
   "<span style='color:{status}'>Remote control is off: {err}.</span>": "<span style='color:{status}'>Пульт выключен: {err}.</span>",
   "<span style='color:{status}'>Sounds only: your mic isn't sent, so nobody (including you) hears it.</span>": "<span style='color:{status}'>Только звуки: твой микрофон не отправляется, поэтому его никто (и ты тоже) не слышит.</span>",
-  "<span style='color:{status}'>That's a Bluetooth headset's phone-call mic: while it's open, Windows switches the headset to call quality, so everything you hear sounds muffled. A wired mic, or the headset's own USB dongle, sounds much better.</span>": "<span style='color:{status}'>Это микрофон Bluetooth-гарнитуры для звонков: пока он открыт, Windows переключает гарнитуру в режим звонка, и всё, что ты слышишь, звучит глухо. Проводной микрофон или собственный USB-адаптер гарнитуры звучат намного лучше.</span>",
   "<span style='color:{status}'>That's a normal speaker/headphone device, so only you will hear the sounds. Set <b>Send my sounds to</b> back to <b>My mic</b>, unless that's on purpose.</span>": "<span style='color:{status}'>Это обычные колонки/наушники, поэтому звуки услышишь только ты. Верни <b>Отправлять мои звуки в</b> на <b>Мой микрофон</b>, если это не нарочно.</span>",
   "<span style='color:{status}'>That's your headphones too, so nothing is sent (you'd hear everything twice). Pick another device, or pick <b>Nobody</b>: your sounds already play in your headphones, where OBS's Desktop Audio picks them up.</span>": "<span style='color:{status}'>Это тоже твои наушники, поэтому ничего не отправляется (ты бы слышал всё дважды). Выбери другое устройство или <b>Никуда</b>: твои звуки и так играют в наушниках, откуда их берёт «Звук рабочего стола» в OBS.</span>",
   "<span style='color:{status}'>Your screen triggers now come from the free Onion Watch add-on: open the Triggers tab to get it.</span>": "<span style='color:{status}'>Триггеры по экрану теперь в бесплатном дополнении Onion Watch: открой вкладку «Триггеры», чтобы его получить.</span>",
@@ -348,7 +347,6 @@
   "Tap to open, tap again to close": "Нажми — открыть, ещё раз — закрыть",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Режим кассеты: скорость меняет и тон (nightcore / slowed)",
   "Test": "Тест",
-  "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "Это микрофон Bluetooth-гарнитуры для звонков: некоторые из них обходят звуковые эффекты Windows. Если твои звуки никто не слышит, используй USB-адаптер гарнитуры или виртуальный кабель.",
   "The Voice tab is switched off (Settings > Tabs).": "Вкладка «Голос» выключена (Настройки > Вкладки).",
   "The device changed mid-way, so the recording stopped there.": "Устройство сменилось посреди записи, поэтому запись там остановилась.",
   "The game you have open uses {engine} for voice chat": "Открытая у тебя игра использует {engine} для голосового чата",
@@ -4411,5 +4409,8 @@
   "Copied. Paste it into ChatGPT, Claude or any AI chat and say what you want your stream to do.": "Скопировано. Вставьте его в ChatGPT, Claude или любой AI-чат и скажите, что вы хотите от своего потока.",
   "How channel points, alerts and chat commands work, step by step": "Как работают точки канала, оповещения и команды чата, шаг за шагом",
   "Twitch guide": "Руководство по Twitch",
-  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "Ваши зрители могут воспроизводить ваши звуки: с помощью <b>очков канала</b> , с <b>оповещениями</b> о подписке, подписке, поддержке или набеге, а также с помощью <b>команд !</b> в чате. Onion Board общается с самим Twitch, поэтому не нужно настраивать бота."
+  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "Ваши зрители могут воспроизводить ваши звуки: с помощью <b>очков канала</b> , с <b>оповещениями</b> о подписке, подписке, поддержке или набеге, а также с помощью <b>команд !</b> в чате. Onion Board общается с самим Twitch, поэтому не нужно настраивать бота.",
+  "Mic off": "Микрофон выкл.",
+  "Your headset's mic is off": "Микрофон гарнитуры выключен",
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Микрофон на <b>{headset}</b> отключился. Подключите его снова, и ваши звуки снова пойдут."
 }

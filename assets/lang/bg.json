@@ -72,7 +72,6 @@
   "<span style='color:{status}'>Nothing to save: {why}.</span>": "<span style='color:{status}'>Нищо за запазване: {why}.</span>",
   "<span style='color:{status}'>Remote control is off: {err}.</span>": "<span style='color:{status}'>Дистанционното управление е изключено: {err}.</span>",
   "<span style='color:{status}'>Sounds only: your mic isn't sent, so nobody (including you) hears it.</span>": "<span style='color:{status}'>Само звуци: микрофонът ти не се праща, така че никой (и ти) не го чува.</span>",
-  "<span style='color:{status}'>That's a Bluetooth headset's phone-call mic: while it's open, Windows switches the headset to call quality, so everything you hear sounds muffled. A wired mic, or the headset's own USB dongle, sounds much better.</span>": "<span style='color:{status}'>Това е микрофонът за разговори на Bluetooth слушалки: докато е отворен, Windows превключва слушалките на качество за разговор и всичко, което чуваш, звучи приглушено. Микрофон с кабел или собственият USB донгъл на слушалките звучи много по-добре.</span>",
   "<span style='color:{status}'>That's a normal speaker/headphone device, so only you will hear the sounds. Set <b>Send my sounds to</b> back to <b>My mic</b>, unless that's on purpose.</span>": "<span style='color:{status}'>Това е обикновено устройство за колони/слушалки, така че само ти ще чуваш звуците. Върни <b>Пращай звуците ми към</b> на <b>Моят микрофон</b>, освен ако не е нарочно.</span>",
   "<span style='color:{status}'>That's your headphones too, so nothing is sent (you'd hear everything twice). Pick another device, or pick <b>Nobody</b>: your sounds already play in your headphones, where OBS's Desktop Audio picks them up.</span>": "<span style='color:{status}'>Това са и слушалките ти, затова нищо не се праща (щеше да чуваш всичко два пъти). Избери друго устройство или <b>Никой</b>: звуците ти и без това звучат в слушалките, където Desktop Audio в OBS ги хваща.</span>",
   "<span style='color:{status}'>Your screen triggers now come from the free Onion Watch add-on: open the Triggers tab to get it.</span>": "<span style='color:{status}'>Тригерите от екрана вече идват от безплатната добавка Onion Watch: отвори раздела Тригери, за да я вземеш.</span>",
@@ -973,7 +972,6 @@
   "Test": "Тествай",
   "Testing…": "Тествам…",
   "That restore point is gone.": "Тази точка за възстановяване вече я няма.",
-  "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "Това е микрофонът за разговори на Bluetooth слушалки: някои от тях прескачат звуковите ефекти на Windows. Ако никой не чува звуците ти, ползвай USB донгъла на слушалките или виртуалния кабел.",
   "That's it. Add sounds by dragging files onto the window, then click one to play it. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "Това е. Добавяй звуци, като провлачваш файлове в прозореца, после кликни един, за да го пуснеш. Можеш да отвориш това ръководство пак по всяко време от раздела <b>Свързване</b> (<b>Ръководство стъпка по стъпка</b>).",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does": "Настройките на Discord, които спират накъсването на звуците ти, и проверка, която слуша какво прави Discord",
   "The Triggers tab is switched off (Settings > Tabs).": "Разделът Тригери е изключен (Настройки > Раздели).",
@@ -4337,5 +4335,8 @@
   "Copied. Paste it into ChatGPT, Claude or any AI chat and say what you want your stream to do.": "Копирано. Поставете го в ChatGPT, Claude или който и да е AI чат и кажете какво искате да прави вашият поток.",
   "How channel points, alerts and chat commands work, step by step": "Как работят каналните точки, предупрежденията и командите за чат, стъпка по стъпка",
   "Twitch guide": "Twitch ръководство",
-  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "Вашите зрители могат да възпроизвеждат вашите звуци: с <b>канални точки</b> , с <b>предупреждения,</b> когато следват, суб, аплодират или нападат и с <b>!команди</b> в чата. Onion Board разговаря със самия Twitch, така че няма бот за настройка."
+  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "Вашите зрители могат да възпроизвеждат вашите звуци: с <b>канални точки</b> , с <b>предупреждения,</b> когато следват, суб, аплодират или нападат и с <b>!команди</b> в чата. Onion Board разговаря със самия Twitch, така че няма бот за настройка.",
+  "Mic off": "Микрофонът е изключен",
+  "Your headset's mic is off": "Микрофонът на слушалките е изключен",
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Микрофонът на <b>{headset}</b> прекъсна. Свържи го отново и звуците ти пак ще излизат."
 }

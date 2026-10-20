@@ -23,7 +23,6 @@
   "<span style='color:{status}'>Remote control is off: {err}.</span>": "<span style='color:{status}'>遠端控制已關閉：{err}。</span>",
   "<span style='color:{status}'>Sounds only: your mic isn't sent, so nobody (including you) hears it.</span>": "<span style='color:{status}'>只傳音效：你的麥克風沒有送出，所以沒有人（包括你）聽得到。</span>",
   "<span style='color:{status}'>Still no virtual cable. If you just installed it, restart your PC, Windows often only shows it after a restart.</span>": "<span style='color:{status}'>還是沒有虛擬音源線。如果你剛裝好，請重新啟動電腦，Windows 通常要重開機後才會顯示。</span>",
-  "<span style='color:{status}'>That's a Bluetooth headset's phone-call mic: while it's open, Windows switches the headset to call quality, so everything you hear sounds muffled. A wired mic, or the headset's own USB dongle, sounds much better.</span>": "<span style='color:{status}'>這是藍牙耳機的通話用麥克風：開啟時 Windows 會把耳機切到通話品質，你聽到的所有聲音都會變悶。有線麥克風，或耳機本身的 USB 接收器，音質會好很多。</span>",
   "<span style='color:{status}'>That's a normal speaker/headphone device, so only you will hear the sounds. Set <b>Send my sounds to</b> back to <b>My mic</b>, unless that's on purpose.</span>": "<span style='color:{status}'>這是一般的喇叭／耳機裝置，所以只有你聽得到音效。請把<b>音效傳送到</b>改回<b>我的麥克風</b>，除非你是故意的。</span>",
   "<span style='color:{status}'>That's your headphones too, so nothing is sent (you'd hear everything twice). Pick another device, or pick <b>Nobody</b>: your sounds already play in your headphones, where OBS's Desktop Audio picks them up.</span>": "<span style='color:{status}'>這也是你的耳機，所以什麼都不會送出（不然你會聽到兩次）。請選其他裝置，或選<b>不傳送</b>：你的音效本來就會在耳機裡播放，OBS 的桌面音訊會收到。</span>",
   "<span style='color:{status}'>Your screen triggers now come from the free Onion Watch add-on: open the Triggers tab to get it.</span>": "<span style='color:{status}'>你的螢幕觸發器現在改由免費的 Onion Watch 附加元件提供：打開「觸發器」分頁就能取得。</span>",
@@ -370,7 +369,6 @@
   "Tap to open, tap again to close": "點一下開啟，再點一下關閉",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "錄音帶模式：速度也會改變音高（nightcore／降速）",
   "Test": "測試",
-  "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "這是藍牙耳機的通話用麥克風：有些會略過 Windows 的音效處理。如果沒有人聽到你的音效，請改用耳機的 USB 接收器或虛擬音源線。",
   "The Voice tab is switched off (Settings > Tabs).": "「語音」分頁已關閉（設定 > 分頁）。",
   "The device changed mid-way, so the recording stopped there.": "裝置在中途變更了，所以錄音停在那裡。",
   "The game you have open uses {engine} for voice chat": "你開啟的遊戲用 {engine} 進行語音聊天",
@@ -4263,5 +4261,8 @@
   "Copied. Paste it into ChatGPT, Claude or any AI chat and say what you want your stream to do.": "已複製。將其貼到 ChatGPT、Claude 或任何 AI 聊天中，並說出您希望直播執行的操作。",
   "How channel points, alerts and chat commands work, step by step": "通道點、警報和聊天命令如何運作（逐步）",
   "Twitch guide": "抽搐指南",
-  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "您的觀眾可以播放您的聲音：使用<b>頻道點</b>，跟隨、訂閱、歡呼或突襲時發出<b>警報</b>，以及聊天中的<b>! 命令</b>。 Onion Board 與 Twitch 本身進行對話，因此無需設置機器人。"
+  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "您的觀眾可以播放您的聲音：使用<b>頻道點</b>，跟隨、訂閱、歡呼或突襲時發出<b>警報</b>，以及聊天中的<b>! 命令</b>。 Onion Board 與 Twitch 本身進行對話，因此無需設置機器人。",
+  "Mic off": "麥克風已關",
+  "Your headset's mic is off": "耳機的麥克風已關閉",
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> 的麥克風斷開了。重新連接後，你的音效就會再次送出。"
 }

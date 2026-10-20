@@ -23,7 +23,6 @@
   "<span style='color:{status}'>Remote control is off: {err}.</span>": "<span style='color:{status}'>Điều khiển từ xa đang tắt: {err}.</span>",
   "<span style='color:{status}'>Sounds only: your mic isn't sent, so nobody (including you) hears it.</span>": "<span style='color:{status}'>Chỉ âm thanh: mic của bạn không được gửi, nên không ai (kể cả bạn) nghe thấy.</span>",
   "<span style='color:{status}'>Still no virtual cable. If you just installed it, restart your PC, Windows often only shows it after a restart.</span>": "<span style='color:{status}'>Vẫn chưa có cáp ảo. Nếu bạn vừa cài, hãy khởi động lại PC, Windows thường chỉ hiện nó sau khi khởi động lại.</span>",
-  "<span style='color:{status}'>That's a Bluetooth headset's phone-call mic: while it's open, Windows switches the headset to call quality, so everything you hear sounds muffled. A wired mic, or the headset's own USB dongle, sounds much better.</span>": "<span style='color:{status}'>Đó là mic gọi điện của tai nghe Bluetooth: khi nó mở, Windows chuyển tai nghe sang chất lượng cuộc gọi, nên mọi thứ bạn nghe đều bị rè. Mic có dây, hoặc USB dongle riêng của tai nghe, nghe tốt hơn nhiều.</span>",
   "<span style='color:{status}'>That's a normal speaker/headphone device, so only you will hear the sounds. Set <b>Send my sounds to</b> back to <b>My mic</b>, unless that's on purpose.</span>": "<span style='color:{status}'>Đó là thiết bị loa/tai nghe bình thường, nên chỉ bạn nghe thấy âm thanh. Đặt <b>Gửi âm thanh của tôi tới</b> lại thành <b>Mic của tôi</b>, trừ khi bạn cố ý.</span>",
   "<span style='color:{status}'>That's your headphones too, so nothing is sent (you'd hear everything twice). Pick another device, or pick <b>Nobody</b>: your sounds already play in your headphones, where OBS's Desktop Audio picks them up.</span>": "<span style='color:{status}'>Đó cũng là tai nghe của bạn, nên không gửi gì cả (bạn sẽ nghe mọi thứ hai lần). Chọn thiết bị khác, hoặc chọn <b>Không ai</b>: âm thanh của bạn đã phát trong tai nghe, nơi Desktop Audio của OBS thu lại.</span>",
   "<span style='color:{status}'>Your screen triggers now come from the free Onion Watch add-on: open the Triggers tab to get it.</span>": "<span style='color:{status}'>Kích hoạt màn hình giờ đến từ tiện ích Onion Watch miễn phí: mở thẻ Kích hoạt để tải.</span>",
@@ -370,7 +369,6 @@
   "Tap to open, tap again to close": "Chạm để mở, chạm lần nữa để đóng",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Chế độ băng: tốc độ cũng đổi cao độ (nightcore / slowed)",
   "Test": "Thử",
-  "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "Đó là mic gọi điện của tai nghe Bluetooth: một số loại bỏ qua hiệu ứng âm thanh của Windows. Nếu không ai nghe âm thanh của bạn, hãy dùng USB dongle của tai nghe hoặc cáp ảo.",
   "The Voice tab is switched off (Settings > Tabs).": "Thẻ Giọng nói đang tắt (Cài đặt > Thẻ).",
   "The device changed mid-way, so the recording stopped there.": "Thiết bị đã đổi giữa chừng, nên bản ghi dừng ở đó.",
   "The game you have open uses {engine} for voice chat": "Game bạn đang mở dùng {engine} cho voice chat",
@@ -4263,5 +4261,8 @@
   "Copied. Paste it into ChatGPT, Claude or any AI chat and say what you want your stream to do.": "Đã sao chép. Dán nó vào ChatGPT, Claude hoặc bất kỳ cuộc trò chuyện AI nào và nói những gì bạn muốn luồng của mình thực hiện.",
   "How channel points, alerts and chat commands work, step by step": "Cách các điểm kênh, cảnh báo và lệnh trò chuyện hoạt động theo từng bước",
   "Twitch guide": "Hướng dẫn co giật",
-  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "Người xem có thể phát âm thanh của bạn: bằng <b>điểm kênh</b> , với <b>cảnh báo</b> khi họ theo dõi, phụ, cổ vũ hoặc đột kích và bằng <b>!lệnh</b> trong trò chuyện. Onion Board giao tiếp với chính Twitch nên không cần thiết lập bot."
+  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "Người xem có thể phát âm thanh của bạn: bằng <b>điểm kênh</b> , với <b>cảnh báo</b> khi họ theo dõi, phụ, cổ vũ hoặc đột kích và bằng <b>!lệnh</b> trong trò chuyện. Onion Board giao tiếp với chính Twitch nên không cần thiết lập bot.",
+  "Mic off": "Micrô tắt",
+  "Your headset's mic is off": "Micrô của tai nghe đang tắt",
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Micrô của <b>{headset}</b> đã ngắt kết nối. Kết nối lại và âm thanh của bạn sẽ được gửi đi lại."
 }

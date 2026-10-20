@@ -483,7 +483,11 @@ class StatusControl(Controller):
         for short in (True, False):
             if state == "off":
                 pill = _("Only you") if short else _("Not sending to others (only you hear sounds)")
-            elif route == "mic" and not mic_busy and directmic.unplugged(mw.cfg.mic_device):
+            elif route == "mic" and not mic_busy and mw.micctl.mic_unplugged() \
+                    and directmic.sound_only(mw.cfg.mic_device):
+                # a Bluetooth headset that plays, with its mic half off: not "plugged in?"
+                pill = _("Mic off") if short else _("Your headset's mic is off")
+            elif route == "mic" and not mic_busy and mw.micctl.mic_unplugged():
                 # pulled out or switched off: nothing's broken, it works once it's back
                 pill = _("Unplugged") if short else _("Is your headset plugged in?")
             elif state == "ok" and route == "mic":

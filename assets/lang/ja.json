@@ -23,7 +23,6 @@
   "<span style='color:{status}'>Remote control is off: {err}.</span>": "<span style='color:{status}'>リモート操作はオフです: {err}。</span>",
   "<span style='color:{status}'>Sounds only: your mic isn't sent, so nobody (including you) hears it.</span>": "<span style='color:{status}'>サウンドのみ: マイクは送信されないので、誰にも（あなたにも）聞こえません。</span>",
   "<span style='color:{status}'>Still no virtual cable. If you just installed it, restart your PC, Windows often only shows it after a restart.</span>": "<span style='color:{status}'>まだ仮想ケーブルがありません。インストールしたばかりなら PC を再起動してください、Windows は再起動後にしか表示しないことがよくあります。</span>",
-  "<span style='color:{status}'>That's a Bluetooth headset's phone-call mic: while it's open, Windows switches the headset to call quality, so everything you hear sounds muffled. A wired mic, or the headset's own USB dongle, sounds much better.</span>": "<span style='color:{status}'>それは Bluetooth ヘッドセットの通話用マイクです。開いている間、Windows はヘッドセットを通話品質に切り替えるため、聞こえる音がすべてこもってしまいます。有線マイクか、ヘッドセット専用の USB ドングルのほうがずっと良い音になります。</span>",
   "<span style='color:{status}'>That's a normal speaker/headphone device, so only you will hear the sounds. Set <b>Send my sounds to</b> back to <b>My mic</b>, unless that's on purpose.</span>": "<span style='color:{status}'>それは普通のスピーカー/ヘッドホンなので、サウンドはあなたにしか聞こえません。わざとでなければ、<b>サウンドの送信先</b>を<b>自分のマイク</b>に戻してください。</span>",
   "<span style='color:{status}'>That's your headphones too, so nothing is sent (you'd hear everything twice). Pick another device, or pick <b>Nobody</b>: your sounds already play in your headphones, where OBS's Desktop Audio picks them up.</span>": "<span style='color:{status}'>それはあなたのヘッドホンでもあるので、何も送信されません（すべて二重に聞こえてしまうため）。別のデバイスを選ぶか、<b>なし</b>を選んでください: サウンドはすでにヘッドホンで再生され、OBS のデスクトップ音声がそれを拾います。</span>",
   "<span style='color:{status}'>Your screen triggers now come from the free Onion Watch add-on: open the Triggers tab to get it.</span>": "<span style='color:{status}'>画面トリガーは無料の Onion Watch アドオンに移りました: トリガータブを開いて入手してください。</span>",
@@ -370,7 +369,6 @@
   "Tap to open, tap again to close": "タップで開く、もう一度タップで閉じる",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "テープモード: 速度を変えるとピッチも変わる（ナイトコア / スロー）",
   "Test": "テスト",
-  "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "それは Bluetooth ヘッドセットの通話用マイクです: Windows のサウンド効果を通らないものがあります。誰にもサウンドが聞こえない場合は、ヘッドセットの USB ドングルか仮想ケーブルを使ってください。",
   "The Voice tab is switched off (Settings > Tabs).": "ボイスタブはオフになっています（設定 > タブ）。",
   "The device changed mid-way, so the recording stopped there.": "途中でデバイスが変わったため、録音はそこで止まりました。",
   "The game you have open uses {engine} for voice chat": "開いているゲームはボイスチャットに {engine} を使っています",
@@ -4263,5 +4261,8 @@
   "Copied. Paste it into ChatGPT, Claude or any AI chat and say what you want your stream to do.": "コピーされました。これを ChatGPT、Claude、または任意の AI チャットに貼り付けて、ストリームに何をさせたいかを伝えます。",
   "How channel points, alerts and chat commands work, step by step": "チャネルポイント、アラート、チャットコマンドの仕組み（ステップバイステップ）",
   "Twitch guide": "トゥイッチガイド",
-  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "視聴者は、<b>チャンネル ポイント</b>、フォロー、サブ、チア、レイド時の<b>アラート</b>、およびチャットの<b>! コマンド</b>を使用してサウンドを再生できます。 Onion Board は Twitch 自体と通信するため、ボットをセットアップする必要はありません。"
+  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "視聴者は、<b>チャンネル ポイント</b>、フォロー、サブ、チア、レイド時の<b>アラート</b>、およびチャットの<b>! コマンド</b>を使用してサウンドを再生できます。 Onion Board は Twitch 自体と通信するため、ボットをセットアップする必要はありません。",
+  "Mic off": "マイクオフ",
+  "Your headset's mic is off": "ヘッドセットのマイクがオフです",
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> のマイクが切断されました。もう一度接続すると、サウンドがまた届きます。"
 }

@@ -23,7 +23,6 @@
   "<span style='color:{status}'>Remote control is off: {err}.</span>": "<span style='color:{status}'>รีโมตปิดอยู่: {err}</span>",
   "<span style='color:{status}'>Sounds only: your mic isn't sent, so nobody (including you) hears it.</span>": "<span style='color:{status}'>เสียงเท่านั้น: ไมค์ของคุณไม่ถูกส่ง จึงไม่มีใคร (รวมถึงคุณ) ได้ยิน</span>",
   "<span style='color:{status}'>Still no virtual cable. If you just installed it, restart your PC, Windows often only shows it after a restart.</span>": "<span style='color:{status}'>ยังไม่มีสายเสมือน ถ้าเพิ่งติดตั้ง ให้รีสตาร์ท PC, Windows มักแสดงหลังรีสตาร์ทเท่านั้น</span>",
-  "<span style='color:{status}'>That's a Bluetooth headset's phone-call mic: while it's open, Windows switches the headset to call quality, so everything you hear sounds muffled. A wired mic, or the headset's own USB dongle, sounds much better.</span>": "<span style='color:{status}'>นั่นคือไมค์โทรศัพท์ของหูฟัง Bluetooth: ระหว่างที่เปิดอยู่ Windows จะสลับหูฟังเป็นคุณภาพโทร ทุกอย่างที่ได้ยินจะอู้อี้ ไมค์แบบมีสาย หรือดองเกิล USB ของหูฟังเอง จะเสียงดีกว่ามาก</span>",
   "<span style='color:{status}'>That's a normal speaker/headphone device, so only you will hear the sounds. Set <b>Send my sounds to</b> back to <b>My mic</b>, unless that's on purpose.</span>": "<span style='color:{status}'>นั่นคือลำโพง/หูฟังปกติ จึงมีแค่คุณที่ได้ยินเสียง ตั้ง <b>ส่งเสียงของฉันไปที่</b> กลับเป็น <b>ไมค์ของฉัน</b> เว้นแต่ตั้งใจ</span>",
   "<span style='color:{status}'>That's your headphones too, so nothing is sent (you'd hear everything twice). Pick another device, or pick <b>Nobody</b>: your sounds already play in your headphones, where OBS's Desktop Audio picks them up.</span>": "<span style='color:{status}'>นั่นคือหูฟังของคุณเหมือนกัน จึงไม่ส่งอะไรเลย (ไม่งั้นจะได้ยินซ้ำสองรอบ) เลือกอุปกรณ์อื่น หรือเลือก <b>ไม่มีใคร</b>: เสียงของคุณเล่นในหูฟังอยู่แล้ว และ Desktop Audio ของ OBS จะรับไปเอง</span>",
   "<span style='color:{status}'>Your screen triggers now come from the free Onion Watch add-on: open the Triggers tab to get it.</span>": "<span style='color:{status}'>ทริกเกอร์หน้าจอตอนนี้มาจากส่วนเสริม Onion Watch ฟรี: เปิดแท็บ ทริกเกอร์ เพื่อรับมัน</span>",
@@ -370,7 +369,6 @@
   "Tap to open, tap again to close": "แตะเพื่อเปิด แตะอีกครั้งเพื่อปิด",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "โหมดเทป: ความเร็วเปลี่ยนพิตช์ด้วย (nightcore / slowed)",
   "Test": "ทดสอบ",
-  "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "นั่นคือไมค์โทรของหูฟัง Bluetooth: บางรุ่นข้ามเอฟเฟกต์เสียงของ Windows ถ้าไม่มีใครได้ยินเสียงของคุณ ให้ใช้ดองเกิล USB ของหูฟังหรือสายเสมือน",
   "The Voice tab is switched off (Settings > Tabs).": "แท็บ เสียงพูด ปิดอยู่ (การตั้งค่า > แท็บ)",
   "The device changed mid-way, so the recording stopped there.": "อุปกรณ์เปลี่ยนกลางทาง การอัดจึงหยุดตรงนั้น",
   "The game you have open uses {engine} for voice chat": "เกมที่คุณเปิดอยู่ใช้ {engine} สำหรับแชทเสียง",
@@ -4263,5 +4261,8 @@
   "Copied. Paste it into ChatGPT, Claude or any AI chat and say what you want your stream to do.": "คัดลอกแล้ว วางลงใน ChatGPT, Claude หรือแชท AI แล้วพูดสิ่งที่คุณต้องการให้สตรีมทำ",
   "How channel points, alerts and chat commands work, step by step": "วิธีการทำงานของช่องชี้ การแจ้งเตือน และคำสั่งแชททีละขั้นตอน",
   "Twitch guide": "คู่มือกระตุก",
-  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "ผู้ดูของคุณสามารถเล่นเสียงของคุณได้: ด้วย <b>คะแนนช่อง</b> พร้อม <b>การแจ้งเตือน</b> เมื่อพวกเขาติดตาม ย่อย เชียร์ หรือบุก และด้วย <b>คำสั่ง !</b> Onion Board คุยกับ Twitch เอง ดังนั้นจึงไม่ต้องตั้งค่าบอท"
+  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "ผู้ดูของคุณสามารถเล่นเสียงของคุณได้: ด้วย <b>คะแนนช่อง</b> พร้อม <b>การแจ้งเตือน</b> เมื่อพวกเขาติดตาม ย่อย เชียร์ หรือบุก และด้วย <b>คำสั่ง !</b> Onion Board คุยกับ Twitch เอง ดังนั้นจึงไม่ต้องตั้งค่าบอท",
+  "Mic off": "ไมค์ปิดอยู่",
+  "Your headset's mic is off": "ไมค์ของหูฟังปิดอยู่",
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "ไมค์ของ <b>{headset}</b> หลุดการเชื่อมต่อ เชื่อมต่อใหม่แล้วเสียงของคุณจะออกไปอีกครั้ง"
 }

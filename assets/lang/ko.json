@@ -23,7 +23,6 @@
   "<span style='color:{status}'>Remote control is off: {err}.</span>": "<span style='color:{status}'>리모컨이 꺼져 있어요: {err}.</span>",
   "<span style='color:{status}'>Sounds only: your mic isn't sent, so nobody (including you) hears it.</span>": "<span style='color:{status}'>사운드만: 마이크를 보내지 않으니 아무도(나 포함) 못 들어요.</span>",
   "<span style='color:{status}'>Still no virtual cable. If you just installed it, restart your PC, Windows often only shows it after a restart.</span>": "<span style='color:{status}'>아직 가상 케이블이 없어요. 방금 설치했다면 PC를 다시 시작하세요, Windows는 보통 재시작 후에야 표시해요.</span>",
-  "<span style='color:{status}'>That's a Bluetooth headset's phone-call mic: while it's open, Windows switches the headset to call quality, so everything you hear sounds muffled. A wired mic, or the headset's own USB dongle, sounds much better.</span>": "<span style='color:{status}'>블루투스 헤드셋의 통화용 마이크예요: 이 마이크가 열려 있는 동안 Windows가 헤드셋을 통화 음질로 바꿔서 모든 소리가 먹먹하게 들려요. 유선 마이크나 헤드셋 전용 USB 동글이 훨씬 좋아요.</span>",
   "<span style='color:{status}'>That's a normal speaker/headphone device, so only you will hear the sounds. Set <b>Send my sounds to</b> back to <b>My mic</b>, unless that's on purpose.</span>": "<span style='color:{status}'>일반 스피커/헤드폰 장치라서 사운드는 나만 들어요. 일부러 그런 게 아니라면 <b>사운드 보낼 곳</b>을 <b>내 마이크</b>로 되돌리세요.</span>",
   "<span style='color:{status}'>That's your headphones too, so nothing is sent (you'd hear everything twice). Pick another device, or pick <b>Nobody</b>: your sounds already play in your headphones, where OBS's Desktop Audio picks them up.</span>": "<span style='color:{status}'>이것도 헤드폰이라서 아무것도 보내지 않아요(모든 소리가 두 번 들리게 돼요). 다른 장치를 고르거나 <b>아무도 없음</b>을 고르세요: 사운드는 이미 헤드폰에서 재생되고, OBS의 데스크톱 오디오가 그걸 잡아요.</span>",
   "<span style='color:{status}'>Your screen triggers now come from the free Onion Watch add-on: open the Triggers tab to get it.</span>": "<span style='color:{status}'>화면 트리거는 이제 무료 애드온 Onion Watch에서 제공돼요: 트리거 탭을 열어 받으세요.</span>",
@@ -370,7 +369,6 @@
   "Tap to open, tap again to close": "누르면 열고, 다시 누르면 닫기",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "테이프 모드: 속도가 피치도 바꿔요(나이트코어 / 슬로우)",
   "Test": "테스트",
-  "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "블루투스 헤드셋의 통화용 마이크예요: 일부는 Windows의 사운드 효과를 건너뛰어요. 아무도 사운드를 못 들으면 헤드셋의 USB 동글이나 가상 케이블을 쓰세요.",
   "The Voice tab is switched off (Settings > Tabs).": "음성 탭이 꺼져 있어요(설정 > 탭).",
   "The device changed mid-way, so the recording stopped there.": "도중에 장치가 바뀌어서 녹음이 거기서 멈췄어요.",
   "The game you have open uses {engine} for voice chat": "열려 있는 게임은 보이스 채팅에 {engine}을(를) 써요",
@@ -4263,5 +4261,8 @@
   "Copied. Paste it into ChatGPT, Claude or any AI chat and say what you want your stream to do.": "복사되었습니다. ChatGPT, Claude 또는 AI 채팅에 붙여넣고 스트림에서 원하는 작업을 말하세요.",
   "How channel points, alerts and chat commands work, step by step": "채널 포인트, 알림, 채팅 명령의 단계별 작동 방식",
   "Twitch guide": "트위치 가이드",
-  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "시청자는 <b>채널 포인트</b> , 팔로우, 구독, 응원 또는 공격 시 <b>알림</b> , 채팅에서 <b>!명령을</b> 사용하여 사운드를 재생할 수 있습니다. Onion Board는 Twitch 자체와 통신하므로 설정할 봇이 없습니다."
+  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "시청자는 <b>채널 포인트</b> , 팔로우, 구독, 응원 또는 공격 시 <b>알림</b> , 채팅에서 <b>!명령을</b> 사용하여 사운드를 재생할 수 있습니다. Onion Board는 Twitch 자체와 통신하므로 설정할 봇이 없습니다.",
+  "Mic off": "마이크 꺼짐",
+  "Your headset's mic is off": "헤드셋 마이크가 꺼져 있어요",
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b>의 마이크 연결이 끊겼어요. 다시 연결하면 사운드가 다시 나가요."
 }

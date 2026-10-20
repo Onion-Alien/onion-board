@@ -23,7 +23,6 @@
   "<span style='color:{status}'>Remote control is off: {err}.</span>": "<span style='color:{status}'>Remote control mati: {err}.</span>",
   "<span style='color:{status}'>Sounds only: your mic isn't sent, so nobody (including you) hears it.</span>": "<span style='color:{status}'>Hanya suara: mic-mu tidak dikirim, jadi tidak ada yang mendengarnya (termasuk kamu).</span>",
   "<span style='color:{status}'>Still no virtual cable. If you just installed it, restart your PC, Windows often only shows it after a restart.</span>": "<span style='color:{status}'>Masih belum ada kabel virtual. Kalau baru saja dipasang, restart PC-mu, Windows sering baru menampilkannya setelah restart.</span>",
-  "<span style='color:{status}'>That's a Bluetooth headset's phone-call mic: while it's open, Windows switches the headset to call quality, so everything you hear sounds muffled. A wired mic, or the headset's own USB dongle, sounds much better.</span>": "<span style='color:{status}'>Itu mic panggilan telepon dari headset Bluetooth: selama terbuka, Windows mengubah headset ke kualitas panggilan, jadi semua yang kamu dengar jadi teredam. Mic kabel, atau dongle USB bawaan headset, jauh lebih bagus.</span>",
   "<span style='color:{status}'>That's a normal speaker/headphone device, so only you will hear the sounds. Set <b>Send my sounds to</b> back to <b>My mic</b>, unless that's on purpose.</span>": "<span style='color:{status}'>Itu perangkat speaker/headphone biasa, jadi hanya kamu yang akan mendengar suaranya. Kembalikan <b>Kirim suaraku ke</b> ke <b>Mic-ku</b>, kecuali memang disengaja.</span>",
   "<span style='color:{status}'>That's your headphones too, so nothing is sent (you'd hear everything twice). Pick another device, or pick <b>Nobody</b>: your sounds already play in your headphones, where OBS's Desktop Audio picks them up.</span>": "<span style='color:{status}'>Itu juga headphone-mu, jadi tidak ada yang dikirim (kamu akan mendengar semuanya dua kali). Pilih perangkat lain, atau pilih <b>Tidak ada</b>: suaramu sudah diputar di headphone-mu, tempat Desktop Audio OBS menangkapnya.</span>",
   "<span style='color:{status}'>Your screen triggers now come from the free Onion Watch add-on: open the Triggers tab to get it.</span>": "<span style='color:{status}'>Pemicu layarmu sekarang berasal dari add-on gratis Onion Watch: buka tab Pemicu untuk mendapatkannya.</span>",
@@ -370,7 +369,6 @@
   "Tap to open, tap again to close": "Tekan untuk buka, tekan lagi untuk tutup",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Mode kaset: kecepatan juga mengubah nada (nightcore / slowed)",
   "Test": "Tes",
-  "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "Itu mic panggilan dari headset Bluetooth: sebagian melewati efek suara Windows. Kalau tidak ada yang mendengar suaramu, pakai dongle USB headset atau kabel virtual.",
   "The Voice tab is switched off (Settings > Tabs).": "Tab Vokal dimatikan (Pengaturan > Tab).",
   "The device changed mid-way, so the recording stopped there.": "Perangkat berganti di tengah jalan, jadi rekamannya berhenti di situ.",
   "The game you have open uses {engine} for voice chat": "Game yang kamu buka memakai {engine} untuk voice chat",
@@ -4263,5 +4261,8 @@
   "Copied. Paste it into ChatGPT, Claude or any AI chat and say what you want your stream to do.": "Disalin. Tempelkan ke ChatGPT, Claude, atau obrolan AI apa pun dan ucapkan apa yang Anda ingin streaming Anda lakukan.",
   "How channel points, alerts and chat commands work, step by step": "Cara kerja titik saluran, peringatan, dan perintah obrolan, langkah demi langkah",
   "Twitch guide": "Panduan kedutan",
-  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "Pemirsa dapat memutar suara Anda: dengan <b>titik saluran</b> , dengan <b>peringatan</b> ketika mereka mengikuti, melakukan sub-sub, bersorak atau menyerang, dan dengan <b>perintah !</b> dalam obrolan. Onion Board berbicara dengan Twitch sendiri, jadi tidak ada bot yang perlu disiapkan."
+  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "Pemirsa dapat memutar suara Anda: dengan <b>titik saluran</b> , dengan <b>peringatan</b> ketika mereka mengikuti, melakukan sub-sub, bersorak atau menyerang, dan dengan <b>perintah !</b> dalam obrolan. Onion Board berbicara dengan Twitch sendiri, jadi tidak ada bot yang perlu disiapkan.",
+  "Mic off": "Mikrofon mati",
+  "Your headset's mic is off": "Mikrofon headset-mu mati",
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofon di <b>{headset}</b> terputus. Sambungkan lagi dan suaramu akan keluar lagi."
 }

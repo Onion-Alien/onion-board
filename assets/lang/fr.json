@@ -23,7 +23,6 @@
   "<span style='color:{status}'>Remote control is off: {err}.</span>": "<span style='color:{status}'>La télécommande est coupée : {err}.</span>",
   "<span style='color:{status}'>Sounds only: your mic isn't sent, so nobody (including you) hears it.</span>": "<span style='color:{status}'>Sons seulement : ton micro n'est pas envoyé, donc personne (toi compris) ne l'entend.</span>",
   "<span style='color:{status}'>Still no virtual cable. If you just installed it, restart your PC, Windows often only shows it after a restart.</span>": "<span style='color:{status}'>Toujours pas de câble virtuel. Si tu viens de l'installer, redémarre ton PC, Windows ne l'affiche souvent qu'après un redémarrage.</span>",
-  "<span style='color:{status}'>That's a Bluetooth headset's phone-call mic: while it's open, Windows switches the headset to call quality, so everything you hear sounds muffled. A wired mic, or the headset's own USB dongle, sounds much better.</span>": "<span style='color:{status}'>C'est le micro d'appel d'un casque Bluetooth : tant qu'il est ouvert, Windows passe le casque en qualité appel, donc tout ce que tu entends sonne étouffé. Un micro filaire, ou le dongle USB du casque, sonne bien mieux.</span>",
   "<span style='color:{status}'>That's a normal speaker/headphone device, so only you will hear the sounds. Set <b>Send my sounds to</b> back to <b>My mic</b>, unless that's on purpose.</span>": "<span style='color:{status}'>C'est un périphérique haut-parleurs/casque normal, donc toi seul entendras les sons. Remets <b>Envoyer mes sons vers</b> sur <b>Mon micro</b>, sauf si c'est voulu.</span>",
   "<span style='color:{status}'>That's your headphones too, so nothing is sent (you'd hear everything twice). Pick another device, or pick <b>Nobody</b>: your sounds already play in your headphones, where OBS's Desktop Audio picks them up.</span>": "<span style='color:{status}'>C'est aussi ton casque, donc rien n'est envoyé (tu entendrais tout en double). Choisis un autre périphérique, ou choisis <b>Personne</b> : tes sons passent déjà dans ton casque, où l'Audio du bureau d'OBS les capte.</span>",
   "<span style='color:{status}'>Your screen triggers now come from the free Onion Watch add-on: open the Triggers tab to get it.</span>": "<span style='color:{status}'>Tes déclencheurs d'écran viennent maintenant de l'extension gratuite Onion Watch : ouvre l'onglet Déclencheurs pour l'obtenir.</span>",
@@ -376,7 +375,6 @@
   "Tap to open, tap again to close": "Appuie pour ouvrir, appuie à nouveau pour fermer",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Mode cassette : la vitesse change aussi la hauteur (nightcore / slowed)",
   "Test": "Tester",
-  "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "C'est le micro d'appel d'un casque Bluetooth : certains ignorent les effets sonores de Windows. Si personne n'entend tes sons, utilise le dongle USB du casque ou le câble virtuel.",
   "The Voice tab is switched off (Settings > Tabs).": "L'onglet Voix est coupé (Paramètres > Onglets).",
   "The device changed mid-way, so the recording stopped there.": "Le périphérique a changé en cours de route, donc l'enregistrement s'est arrêté là.",
   "The game you have open uses {engine} for voice chat": "Le jeu que tu as ouvert utilise {engine} pour le chat vocal",
@@ -4337,5 +4335,8 @@
   "Copied. Paste it into ChatGPT, Claude or any AI chat and say what you want your stream to do.": "Copié. Collez-le dans ChatGPT, Claude ou n'importe quel chat AI et dites ce que vous voulez que votre flux fasse.",
   "How channel points, alerts and chat commands work, step by step": "Comment fonctionnent les points de canal, les alertes et les commandes de chat, étape par étape",
   "Twitch guide": "Guide Twitch",
-  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "Vos spectateurs peuvent jouer vos sons : avec <b>des points de chaîne</b> , avec <b>des alertes</b> lorsqu'ils suivent, s'absentent, encouragent ou font un raid, et avec <b>les commandes !</b> dans le chat. Onion Board parle à Twitch lui-même, il n'y a donc pas de robot à configurer."
+  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "Vos spectateurs peuvent jouer vos sons : avec <b>des points de chaîne</b> , avec <b>des alertes</b> lorsqu'ils suivent, s'absentent, encouragent ou font un raid, et avec <b>les commandes !</b> dans le chat. Onion Board parle à Twitch lui-même, il n'y a donc pas de robot à configurer.",
+  "Mic off": "Micro coupé",
+  "Your headset's mic is off": "Le micro de ton casque est coupé",
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Le micro de <b>{headset}</b> s'est déconnecté. Reconnecte-le et tes sons repartent."
 }

@@ -23,7 +23,6 @@
   "<span style='color:{status}'>Remote control is off: {err}.</span>": "<span style='color:{status}'>التحكم عن بُعد متوقف: {err}.</span>",
   "<span style='color:{status}'>Sounds only: your mic isn't sent, so nobody (including you) hears it.</span>": "<span style='color:{status}'>الأصوات فقط: الميكروفون لا يُرسَل، لذا لا أحد يسمعه (ولا أنت).</span>",
   "<span style='color:{status}'>Still no virtual cable. If you just installed it, restart your PC, Windows often only shows it after a restart.</span>": "<span style='color:{status}'>لا يوجد كابل افتراضي بعد. إذا ثبّته للتو فأعد تشغيل جهازك, غالبًا لا يُظهره Windows إلا بعد إعادة التشغيل.</span>",
-  "<span style='color:{status}'>That's a Bluetooth headset's phone-call mic: while it's open, Windows switches the headset to call quality, so everything you hear sounds muffled. A wired mic, or the headset's own USB dongle, sounds much better.</span>": "<span style='color:{status}'>هذا ميكروفون المكالمات في سماعة Bluetooth: ما دام مفتوحًا يحوّل Windows السماعة إلى جودة المكالمات، فيبدو كل ما تسمعه مكتومًا. الميكروفون السلكي، أو قطعة USB الخاصة بالسماعة، أفضل بكثير.</span>",
   "<span style='color:{status}'>That's a normal speaker/headphone device, so only you will hear the sounds. Set <b>Send my sounds to</b> back to <b>My mic</b>, unless that's on purpose.</span>": "<span style='color:{status}'>هذا جهاز سماعات/مكبرات عادي، لذا ستسمع الأصوات أنت فقط. أعد <b>أرسل أصواتي إلى</b> إلى <b>ميكروفوني</b>، إلا إن كان ذلك مقصودًا.</span>",
   "<span style='color:{status}'>That's your headphones too, so nothing is sent (you'd hear everything twice). Pick another device, or pick <b>Nobody</b>: your sounds already play in your headphones, where OBS's Desktop Audio picks them up.</span>": "<span style='color:{status}'>هذه هي سماعاتك أيضًا، لذا لا يُرسَل شيء (ستسمع كل شيء مرتين). اختر جهازًا آخر، أو اختر <b>لا أحد</b>: أصواتك تُشغَّل أصلًا في سماعاتك، حيث يلتقطها Desktop Audio في OBS.</span>",
   "<span style='color:{status}'>Your screen triggers now come from the free Onion Watch add-on: open the Triggers tab to get it.</span>": "<span style='color:{status}'>محفّزات الشاشة صارت تأتي من إضافة Onion Watch المجانية: افتح تبويب المحفّزات للحصول عليها.</span>",
@@ -400,7 +399,6 @@
   "Tap to open, tap again to close": "انقر للفتح، وانقر مجددًا للإغلاق",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "وضع الشريط: السرعة تغيّر الحدّة أيضًا (nightcore / slowed)",
   "Test": "اختبار",
-  "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "هذا ميكروفون المكالمات في سماعة Bluetooth: بعضها يتخطى مؤثرات الصوت في Windows. إذا لم يسمع أحد أصواتك، فاستخدم قطعة USB الخاصة بالسماعة أو الكابل الافتراضي.",
   "The Voice tab is switched off (Settings > Tabs).": "تبويب صوتك متوقف (الإعدادات > التبويبات).",
   "The device changed mid-way, so the recording stopped there.": "تغيّر الجهاز في المنتصف، فتوقف التسجيل عند تلك النقطة.",
   "The game you have open uses {engine} for voice chat": "اللعبة المفتوحة لديك تستخدم {engine} للدردشة الصوتية",
@@ -4633,5 +4631,8 @@
   "Copied. Paste it into ChatGPT, Claude or any AI chat and say what you want your stream to do.": "منقول. الصقها في ChatGPT أو Claude أو أي دردشة تعمل بالذكاء الاصطناعي وقل ما تريد أن يفعله البث الخاص بك.",
   "How channel points, alerts and chat commands work, step by step": "كيفية عمل نقاط القناة والتنبيهات وأوامر الدردشة خطوة بخطوة",
   "Twitch guide": "دليل نشل",
-  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "يمكن للمشاهدين تشغيل الأصوات الخاصة بك: باستخدام <b>نقاط القناة</b> ، ومع <b>التنبيهات</b> عند المتابعة أو الاشتراك أو الهتاف أو الغارة، ومع <b>أوامر !</b> في الدردشة. تتحدث Onion Board مع Twitch نفسها، لذا لا يوجد روبوت لإعداده."
+  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "يمكن للمشاهدين تشغيل الأصوات الخاصة بك: باستخدام <b>نقاط القناة</b> ، ومع <b>التنبيهات</b> عند المتابعة أو الاشتراك أو الهتاف أو الغارة، ومع <b>أوامر !</b> في الدردشة. تتحدث Onion Board مع Twitch نفسها، لذا لا يوجد روبوت لإعداده.",
+  "Mic off": "المايك مطفأ",
+  "Your headset's mic is off": "مايك السماعة مطفأ",
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "انقطع مايك <b>{headset}</b>. أعد توصيله وستخرج أصواتك من جديد."
 }

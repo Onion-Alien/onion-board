@@ -23,7 +23,6 @@
   "<span style='color:{status}'>Remote control is off: {err}.</span>": "<span style='color:{status}'>Bediening op afstand staat uit: {err}.</span>",
   "<span style='color:{status}'>Sounds only: your mic isn't sent, so nobody (including you) hears it.</span>": "<span style='color:{status}'>Alleen geluiden: je mic wordt niet verstuurd, dus niemand (ook jij niet) hoort hem.</span>",
   "<span style='color:{status}'>Still no virtual cable. If you just installed it, restart your PC, Windows often only shows it after a restart.</span>": "<span style='color:{status}'>Nog steeds geen virtuele kabel. Net geïnstalleerd? Herstart je pc, Windows toont hem vaak pas na een herstart.</span>",
-  "<span style='color:{status}'>That's a Bluetooth headset's phone-call mic: while it's open, Windows switches the headset to call quality, so everything you hear sounds muffled. A wired mic, or the headset's own USB dongle, sounds much better.</span>": "<span style='color:{status}'>Dat is de belmic van een Bluetooth-headset: zolang die open is, zet Windows de headset op belkwaliteit, dus alles wat je hoort klinkt dof. Een mic met kabel, of de eigen USB-dongle van de headset, klinkt veel beter.</span>",
   "<span style='color:{status}'>That's a normal speaker/headphone device, so only you will hear the sounds. Set <b>Send my sounds to</b> back to <b>My mic</b>, unless that's on purpose.</span>": "<span style='color:{status}'>Dat is een gewone speaker/koptelefoon, dus alleen jij hoort de geluiden. Zet <b>Stuur mijn geluiden naar</b> terug op <b>Mijn mic</b>, tenzij dit expres is.</span>",
   "<span style='color:{status}'>That's your headphones too, so nothing is sent (you'd hear everything twice). Pick another device, or pick <b>Nobody</b>: your sounds already play in your headphones, where OBS's Desktop Audio picks them up.</span>": "<span style='color:{status}'>Dat is ook je koptelefoon, dus er wordt niets verstuurd (je zou alles dubbel horen). Kies een ander apparaat, of kies <b>Niemand</b>: je geluiden spelen al in je koptelefoon, waar Desktopaudio van OBS ze oppikt.</span>",
   "<span style='color:{status}'>Your screen triggers now come from the free Onion Watch add-on: open the Triggers tab to get it.</span>": "<span style='color:{status}'>Je schermtriggers komen nu uit de gratis add-on Onion Watch: open het tabblad Triggers om hem te krijgen.</span>",
@@ -376,7 +375,6 @@
   "Tap to open, tap again to close": "Tik om te openen, tik nog eens om te sluiten",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Cassettemodus: snelheid verandert ook de toonhoogte (nightcore / slowed)",
   "Test": "Test",
-  "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "Dat is de belmic van een Bluetooth-headset: sommige slaan de geluidseffecten van Windows over. Hoort niemand je geluiden? Gebruik de USB-dongle van de headset of de virtuele kabel.",
   "The Voice tab is switched off (Settings > Tabs).": "Het tabblad Stem staat uit (Instellingen > Tabbladen).",
   "The device changed mid-way, so the recording stopped there.": "Het apparaat veranderde halverwege, dus de opname stopte daar.",
   "The game you have open uses {engine} for voice chat": "De game die je open hebt, gebruikt {engine} voor voicechat",
@@ -4337,5 +4335,8 @@
   "Copied. Paste it into ChatGPT, Claude or any AI chat and say what you want your stream to do.": "Gekopieerd. Plak het in ChatGPT, Claude of een andere AI-chat en zeg wat je wilt dat je stream doet.",
   "How channel points, alerts and chat commands work, step by step": "Hoe kanaalpunten, waarschuwingen en chatopdrachten werken, stap voor stap",
   "Twitch guide": "Twitch-gids",
-  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "Je kijkers kunnen je geluiden afspelen: met <b>kanaalpunten</b> , met <b>waarschuwingen</b> wanneer ze volgen, sub, juichen of overvallen, en met <b>!commando's</b> in de chat. Onion Board praat met Twitch zelf, dus er is geen bot om in te stellen."
+  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "Je kijkers kunnen je geluiden afspelen: met <b>kanaalpunten</b> , met <b>waarschuwingen</b> wanneer ze volgen, sub, juichen of overvallen, en met <b>!commando's</b> in de chat. Onion Board praat met Twitch zelf, dus er is geen bot om in te stellen.",
+  "Mic off": "Microfoon uit",
+  "Your headset's mic is off": "De microfoon van je headset staat uit",
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "De microfoon van <b>{headset}</b> is losgekoppeld. Verbind hem opnieuw en je geluiden gaan weer naar buiten."
 }
