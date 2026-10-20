@@ -38,6 +38,12 @@ function fakeApp(state = {}) {
     }
     if (action === "sounds") return reply(200, s.sounds);
     if (action === "categories") return reply(200, s.categories);
+    if (action === "key_image") {
+      const m = s.sounds.find((x) => x.id === p.id);
+      if (!m) return reply(404, { error: "no such sound" });
+      return reply(200, { id: m.id, look: m.look,
+                          image: `data:image/png;base64,${m.id}-${m.look}-${p.playing}` });
+    }
     if (action === "play") {
       const m = s.sounds.find((x) => x.id === p.id || x.name.toLowerCase() === p.name?.toLowerCase());
       if (!m) return reply(404, { error: "no such sound" });
@@ -279,4 +285,38 @@ test("the manifest's pictures and files exist", () => {
   for (const p of pics) assert.ok(exists(p, [".svg", ".png"]), p);
   assert.ok(exists(m.CodePath, [""]) && exists(m.PropertyInspectorPath, [""]));
   assert.deepEqual(m.Actions.map((a) => a.UUID), [PLAY, STOP, RANDOM, TOGGLE]);
+});
+
+test("a play key shows the pad as Onion Board draws it, and fetches it again only when it changes", async () => {
+  const app = fakeApp();
+  app.sounds = app.sounds.map((x) => ({ ...x, look: "a1" }));
+  const { plugin, sent, conf } = setup(undefined, app);
+  try {
+    await plugin.handle(appear(PLAY, "k", { sound: "s0", name: "Airhorn" }));
+    await plugin.tick();
+    assert.equal(of(sent, "setImage", "k").at(-1).payload.image, "data:image/png;base64,s0-a1-0");
+    assert.equal(of(sent, "setTitle", "k").at(-1)?.payload.title ?? "", "");   // the name is in the picture
+    const asked = () => app.calls.filter(([a]) => a === "key_image").length;
+    const n = asked();
+    await plugin.tick();
+    assert.equal(asked(), n);                                   // kept, not fetched every second
+    app.playing = ["s0"];
+    await plugin.tick();
+    assert.equal(of(sent, "setImage", "k").at(-1).payload.image, "data:image/png;base64,s0-a1-1");
+    app.playing = [];
+    await plugin.tick();
+    assert.equal(of(sent, "setImage", "k").at(-1).payload.image, "data:image/png;base64,s0-a1-0");
+    assert.equal(asked(), n + 1);                               // the idle one was kept too
+    app.sounds[0] = { ...app.sounds[0], look: "b2" };            // renamed / new picture / theme
+    plugin.soundsAt = 0;
+    await plugin.tick();
+    assert.equal(of(sent, "setImage", "k").at(-1).payload.image, "data:image/png;base64,s0-b2-0");
+    assert.ok(![...plugin.cards.keys()].some((k) => k.includes("|a1|")));
+    app.down = true;                                            // can't be reached: the grey key
+    await plugin.tick();
+    assert.equal(of(sent, "setImage", "k").at(-1).payload.image,
+                 soundImage({ color: "#ff5c8a", problem: plugin.problem }));
+  } finally {
+    conf.done();
+  }
 });

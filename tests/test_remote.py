@@ -519,3 +519,32 @@ def test_a_volume_that_isnt_a_finite_number_is_refused(qapp):
         assert status == 400
     assert spin.value() == 40
     assert remote.set_volume(spin, {"set": "70"}) is None and spin.value() == 70
+
+
+def test_key_image_draws_the_pad_as_a_stream_deck_key(qapp, window):
+    import base64
+
+    from PySide6.QtGui import QImage
+    w = window
+    d = lambda action, **p: remote.dispatch(w, action, p)   # noqa: E731
+
+    def picture(body):
+        assert body["image"].startswith("data:image/png;base64,")
+        img = QImage()
+        assert img.loadFromData(base64.b64decode(body["image"].split(",", 1)[1]), "PNG")
+        return img
+    status, body = d("key_image", id="s0")
+    assert status == 200 and body["id"] == "s0"
+    img = picture(body)
+    assert (img.width(), img.height()) == (144, 144)
+    assert img.pixelColor(72, 72).alpha() == 255          # the card fills the key
+    lit = d("key_image", id="s0", playing="1")[1]
+    assert lit["image"] != body["image"]                  # lit up while it plays
+    assert picture(d("key_image", name="airhorn", size="9999")[1]).width() == 288
+    assert d("key_image", id="nope")[0] == 404
+    assert d("key_image", id="s0", size="big")[0] == 400
+    # the sound list tells a plugin when to fetch it again
+    looks = {s["id"]: s["look"] for s in d("sounds")[1]}
+    assert looks["s0"] == body["look"]
+    w.meta("s0").color = "#123456"
+    assert d("sounds")[1][0]["look"] != body["look"]
