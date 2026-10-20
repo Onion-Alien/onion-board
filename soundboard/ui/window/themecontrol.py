@@ -112,6 +112,7 @@ class ThemeControl(Controller):
         mw.devctl.set_lite_block(on)
         BunnyWidget.lite_changed()
         mw.logo.lite_changed()
+        mw.netctl._net_follow()   # (the On Air card's Lite mode line)
         setctl = mw.setctl
         for dlg in (setctl._settings_dlg, setctl._settings_kept):   # (switched from a toast)
             box = getattr(dlg, "lite_check", None)

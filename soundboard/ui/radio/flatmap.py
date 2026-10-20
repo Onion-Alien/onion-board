@@ -34,6 +34,7 @@ from soundboard.ui.kit import theme
 from soundboard.i18n import _, ngettext
 from soundboard.ui.kit import oops
 from soundboard.ui.kit.pixels import snap_to_pixels
+from soundboard.ui.settings import lite
 
 LAT_TOP, LAT_BOTTOM = 84.0, -58.0   # the inhabited world: no polar wastes
 ZOOM_MAX = 250.0                    # about street level: a city's stations come apart
@@ -145,7 +146,8 @@ class _Loading(QFrame):
     def showEvent(self, e):
         super().showEvent(e)
         self.bun.burst(3)
-        self._notes.start()
+        if not lite.on():   # (lite mode: a still Bun, no notes)
+            self._notes.start()
 
     def hideEvent(self, e):
         self._notes.stop()

@@ -20,6 +20,7 @@ from PySide6.QtGui import (QColor, QIcon, QImage, QLinearGradient, QPainter,
 
 from soundboard.i18n import _
 from soundboard.style import hooks, palettes, textures
+from soundboard.ui.settings import lite
 # the colours and textures are in the style kit, shared with Onion Watch
 from soundboard.style.palettes import (DEFAULT, FONT, GROUPS, LIMITED,  # noqa: F401
                                        LIVE_NAMES, LIVE_STYLE, TEXT_ON,
@@ -73,8 +74,9 @@ T: dict[str, str] = dict(THEMES[DEFAULT])   # current theme (read at paint time)
 current_name = DEFAULT
 live_override = ""   # the user's own highlight colour ("" = each theme's own)
 textures_on = True  # Settings > Appearance: Textured (each theme's pattern, the default) or Plain
-# what the style kit (Bun's outfit, Hoot, the textures) paints in
-hooks.connect(palette=lambda: T, theme_name=lambda: current_name, tr=_)
+# what the style kit (Bun's outfit, Hoot, the textures) paints in; Hoot holds still in
+# lite mode
+hooks.connect(palette=lambda: T, theme_name=lambda: current_name, tr=_, still=lite.on)
 
 
 def tokens(name: str | None = None) -> dict[str, str]:

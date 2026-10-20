@@ -37,6 +37,7 @@ from soundboard.ui.bun.scribebun import ScribeBunny
 from soundboard.ui.kit.widgets import fmt_time
 from soundboard.ui.kit.pixels import snap_to_pixels
 from soundboard.ui.kit.restyled import measured, on_restyle
+from soundboard.ui.settings import lite
 
 
 BAR_W = 480   # the progress bar's length in the banner
@@ -239,6 +240,10 @@ class Outcome(QWidget):
         return self._k
 
     def _step(self, k):
+        if lite.on():   # (lite mode: there whole and still, then gone at once)
+            k = 0.5 if k < 0.95 else 1.0
+            if k == self._k:
+                return
         self._k = float(k)
         self.update()
         bar = self.parentWidget()

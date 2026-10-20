@@ -5,8 +5,10 @@ It turns off what only decorates and still costs CPU while the app is open:
 - every animation that asks `toast.animations_on()` (toasts, the guide's fades, the
   backdrop's glide, the theme cover's fade, the pads' hover glow, flashes);
 - the header logo's breathing glow, sheen and embers (a still glow instead);
-- Bun's idle moves: every Bun holds still `REST_S` after he's shown or stirred (a
-  sound, the mic, a click still move him, then he settles again), and so does Hoot;
+- Bun's moves: every Bun is a still picture (`REST_S` is 0). Sounds, the radio and
+  the mic don't move him; a click still gets its hop, then he holds still again. Hoot
+  too;
+- the guide's breathing ring round what to click (a still ring instead);
 - the themes' textures (Plain, whatever Theme style says; that choice is kept).
 - the window's full-pace tick for the mic alone: with nothing playing, the mic
   meters follow 5 times a second instead of 24 (most mics hear the room, which
@@ -39,7 +41,7 @@ from __future__ import annotations
 import os
 import sys
 
-REST_S = 1.0          # lite mode: Bun and Hoot settle this long after a stir
+REST_S = 0.0          # lite mode: Bun and Hoot hold still right after a stir
 SLOW_CORES = 4        # this many logical CPUs or fewer counts as a slower PC
 SLOW_RAM_GB = 6.0     # ... and so does less RAM than this
 

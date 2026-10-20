@@ -4250,5 +4250,6 @@
   "Play a chime in your headphones when you earn one.": "獲得成就時在耳機中播放提示音。",
   "Pop-up sound": "彈出視窗音效",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "獲得成就時在螢幕底部顯示「成就已解鎖」。",
-  "Show pop-ups": "顯示彈出視窗"
+  "Show pop-ups": "顯示彈出視窗",
+  "Lite mode is on: no animations, plain themes and less CPU. Click to change it.": "輕量模式已開啟：沒有動畫，主題樸素，佔用更少 CPU。點一下即可更改。"
 }

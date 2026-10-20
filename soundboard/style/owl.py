@@ -716,7 +716,7 @@ class OwlWidget(QWidget):
         self._wake_t = -1.0        # seconds since he was woken, or -1
         self.rest_after_s = rest_after_s
         self.resting = False       # holding still: the timer's off until a stir
-        self._rest_t = rest_after_s or 0.0   # (his own time, `t`) settles down from then
+        self._rest_t = self._rest_s() or 0.0   # (his own time, `t`) settles down from then
         if dances:
             OwlWidget.dancers.add(self)
         self.groove = None         # what's playing (set_groove): he dances to it
@@ -780,10 +780,11 @@ class OwlWidget(QWidget):
         return QSize(round(self.owl_h * W / H) + 8, self.owl_h + self.top + 8)
 
     def showEvent(self, ev):
-        if self.rest_after_s is not None:   # shown again: another rest_after_s to move
+        rest = self._rest_s()
+        if rest is not None:   # shown again: another rest_after_s to move
             self.resting = False
             self._peek.stop()
-            self._rest_t = self.t + self.rest_after_s
+            self._rest_t = self.t + rest
         if appstate.active():   # behind a game it waits until the app is back in front
             self._resume()
         super().showEvent(ev)
@@ -809,16 +810,24 @@ class OwlWidget(QWidget):
     def stir(self):
         """Something happened (the mouse came near, a click, a sound): with
         `rest_after_s` he moves again and keeps moving for another rest_after_s."""
-        if self.rest_after_s is None:
+        rest = self._rest_s()
+        if rest is None:
             return
-        self._rest_t = self.t + self.rest_after_s
+        self._rest_t = self.t + rest
         if self.resting:
             self.resting = False
             self._peek.stop()
             if self.isVisible() and appstate.active():
                 self._resume()
 
+    def _rest_s(self) -> float | None:
+        """How long he moves after a stir (None: always): rest_after_s, or none at all
+        while the app wants still mascots (hooks.still: lite mode)."""
+        return 0.0 if hooks.still() else self.rest_after_s
+
     def _peek_mouse(self):
+        if hooks.still():   # (a still picture: the mouse doesn't stir him)
+            return
         m = self._mouse()
         if m and math.hypot(*m) < NEAR:
             self.stir()
@@ -868,7 +877,9 @@ class OwlWidget(QWidget):
 
     def set_groove(self, groove):
         """What's playing, as a soundboard.audio.groove.Groove (its beat, style and hits), or
-        None. He bobs his head to it."""
+        None. He bobs his head to it (not while he's a still picture: hooks.still)."""
+        if hooks.still():
+            groove = None
         self.groove = groove
         if groove is not None:
             self.stir()
@@ -913,7 +924,8 @@ class OwlWidget(QWidget):
         self._last = now
         if not self._still():   # (30 fps: a slower idle pace made the sway judder)
             self.update()
-        if self.rest_after_s is not None and self.t >= self._rest_t and self._calm():
+        if (self._rest_s() is not None and (self.t >= self._rest_t or hooks.still())
+                and self._calm()):
             self._timer.stop()   # (this frame is the one he keeps)
             self.resting = True
             self._peek.start()
@@ -950,7 +962,7 @@ class OwlWidget(QWidget):
                 self._was = None
         m = self._mouse() if mouse is ... else mouse
         dist = math.hypot(*m) if m else 99.0
-        near = 1.0 if dist < NEAR else 0.0
+        near = 1.0 if dist < NEAR and not hooks.still() else 0.0
         if near:   # (asleep: only a click wakes him, but the z's keep floating)
             self.stir()
         if self.asleep:
@@ -962,7 +974,7 @@ class OwlWidget(QWidget):
         self._bed += (float(self.asleep) - self._bed) * min(1.0, dt * 5)
         if self._bed < 0.01 and not self.asleep:
             self._bed = 0.0
-        settling = self.rest_after_s is not None and self.t >= self._rest_t
+        settling = self._rest_s() is not None and (self.t >= self._rest_t or hooks.still())
         self._near += (near - self._near) * min(1.0, dt * (5 if near else 1.5))
         if self._joy_t >= 0:
             self._joy_t += dt

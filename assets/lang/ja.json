@@ -4250,5 +4250,6 @@
   "Play a chime in your headphones when you earn one.": "実績を獲得したときにヘッドホンでチャイムを鳴らします。",
   "Pop-up sound": "ポップアップの音",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "実績を獲得したときに画面下に「実績解除」を表示します。",
-  "Show pop-ups": "ポップアップを表示"
+  "Show pop-ups": "ポップアップを表示",
+  "Lite mode is on: no animations, plain themes and less CPU. Click to change it.": "軽量モードがオンです：アニメーションなし、シンプルなテーマ、CPU 使用量も少なめ。クリックで変更します。"
 }

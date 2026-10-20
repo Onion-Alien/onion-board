@@ -4250,5 +4250,6 @@
   "Play a chime in your headphones when you earn one.": "업적을 달성하면 헤드폰에서 알림음을 재생합니다.",
   "Pop-up sound": "팝업 소리",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "업적을 달성하면 화면 아래에 \"업적 달성\"이(가) 표시됩니다.",
-  "Show pop-ups": "팝업 표시"
+  "Show pop-ups": "팝업 표시",
+  "Lite mode is on: no animations, plain themes and less CPU. Click to change it.": "라이트 모드가 켜져 있어요: 애니메이션 없음, 단순한 테마, CPU 사용 감소. 클릭해서 바꾸세요."
 }

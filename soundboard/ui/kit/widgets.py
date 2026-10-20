@@ -604,6 +604,7 @@ def paint_now_playing(p: QPainter, rect: QRectF, color: QColor, paused: bool = F
     playing has to stand out at a glance: a web result's picture, the playing radio
     station."""
     t = time.monotonic() if t is None else t
+    paused = paused or lite.on()   # (lite mode: low and still)
     gap = rect.width() / (n * 3 - 1)   # a bar is two gaps wide
     bw = gap * 2
     p.save()
@@ -1208,7 +1209,7 @@ class Pad(QAbstractButton):
             progress = self.progress or 0.0   # (playing: set)
             p.fillRect(QRectF(r.left(), r.top(), r.width() * progress, r.height()), done)
             flash = 1 - (now - (self._play_t if self._play_t is not None else now)) / 0.35
-            if flash > 0:   # a quick wash of its colour as it starts
+            if flash > 0 and not lite.on():   # a quick wash of its colour as it starts
                 wash = QColor(accent)
                 wash.setAlpha(int(90 * flash))
                 p.fillPath(path, wash)
@@ -1220,7 +1221,8 @@ class Pad(QAbstractButton):
         p.setBrush(Qt.BrushStyle.NoBrush)
         if playing:
             glow = QColor(accent)   # breathes while it plays
-            glow.setAlpha(60 if self.paused else int(105 + 35 * math.sin(now * 5)))
+            glow.setAlpha(60 if self.paused else 105 if lite.on()   # (lite: steady)
+                          else int(105 + 35 * math.sin(now * 5)))
             p.setPen(QPen(glow, 6))
             p.drawPath(path)
             ink = QColor(accent)
