@@ -622,7 +622,6 @@
   "A restore point is saved first, so you can undo this.": "Antes se guarda un punto de restauración, para que puedas deshacerlo.",
   "A small dot on its icon": "Un puntito en su icono",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Una soundboard es más útil si la dejas en marcha: tus atajos y la superposición funcionan con la ventana cerrada. El icono de la bandeja (junto al reloj) la vuelve a abrir; clic derecho en él para salir.",
-  "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Una pestaña cuya función está activa ahora mismo (un sonido sonando, el cambiador de voz, la radio…) se marca, para que nada se quede activado sin que te des cuenta.",
   "About": "Acerca de",
   "Add a device": "Añadir un dispositivo",
   "Add as sound keeps a copy of the video too (the pad is still just its sound). Videos use a lot more data: about 5 to 25 MB a minute.": "Añadir como sonido también guarda una copia del vídeo (el pad sigue siendo solo su sonido). Los vídeos usan muchos más datos: unos 5 a 25 MB por minuto.",
@@ -1265,7 +1264,6 @@
   "What do these do?": "¿Qué hacen estos?",
   "What do you want to reset?": "¿Qué quieres restablecer?",
   "What goes online": "Lo que se conecta a internet",
-  "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "Lo que está activado (el cambiador de voz, En directo, una pestaña activa) se muestra en el color del tema. Desliza para elegir el tuyo; se mantiene al cambiar de tema.",
   "Whatever played last, from a pad, a hotkey or the random key.": "Lo último que sonó, desde un pad, un atajo o la tecla de sonido al azar.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "Cuando Discord, TeamSpeak, Mumble o un juego con un chat de voz conocido está escuchando tu micro (o el cable), usar su modo sin preguntar. Si no escucha nada, el modo se queda como está.",
   "When the program closes, the board goes back to what it showed before.": "Cuando el programa se cierra, el tablero vuelve a lo que mostraba antes.",
@@ -4325,5 +4323,8 @@
   "Pop-up sound": "Sonido de la ventana emergente",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "«Logro desbloqueado» en la parte inferior de la pantalla cuando consigas uno.",
   "Show pop-ups": "Mostrar ventanas emergentes",
-  "Lite mode is on: no animations, plain themes and less CPU. Click to change it.": "El modo ligero está activado: sin animaciones, temas simples y menos CPU. Haz clic para cambiarlo."
+  "Lite mode is on: no animations, plain themes and less CPU. Click to change it.": "El modo ligero está activado: sin animaciones, temas simples y menos CPU. Haz clic para cambiarlo.",
+  "Marks a tab whose feature is on, so nothing is left on without you noticing.": "Marca una pestaña cuya función está activada, para que nada se quede encendido sin que te des cuenta.",
+  "Size and speed": "Tamaño y velocidad",
+  "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Lo que está activado se muestra en este color. Desliza para elegir el tuyo; se mantiene al cambiar de tema."
 }

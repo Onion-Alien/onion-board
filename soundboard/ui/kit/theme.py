@@ -660,6 +660,9 @@ QDialog#recorddialog QPushButton#rec:focus { border-color:$text_hi; }
 QDialog#recorddialog QPushButton#rec:disabled { background:$inset; border-color:$border; color:$muted; }
 QFrame#setcard { background:$panel; border-radius:12px; }
 QFrame#setcard QWidget { background:transparent; }
+/* Settings > Look: a group's soft box and the thin line between its settings */
+QFrame#setcard QFrame#lookgroup { background:$inset; border-radius:10px; }
+QFrame#setcard QFrame#lookrule { background:$border; }
 QFrame#setcard QPushButton { background:$btn; }
 QFrame#setcard QPushButton:hover { background:$btn_hover; }
 QFrame#setcard QPushButton[quiet="true"] { background:transparent; }

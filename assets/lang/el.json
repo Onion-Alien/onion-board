@@ -111,7 +111,6 @@
   "A restore point is saved first, so you can undo this.": "Πρώτα αποθηκεύεται σημείο επαναφοράς, για να μπορείς να το αναιρέσεις.",
   "A small dot on its icon": "Μια μικρή τελεία στο εικονίδιό της",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Ένα soundboard είναι πιο χρήσιμο όταν μένει ανοιχτό: οι συντομεύσεις και η επικάλυψη δουλεύουν όσο το παράθυρο είναι κλειστό. Το εικονίδιο στο tray (δίπλα στο ρολόι) το ξανανοίγει· δεξί κλικ πάνω του για έξοδο.",
-  "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Μια καρτέλα της οποίας η λειτουργία είναι ενεργή αυτή τη στιγμή (ένας ήχος που παίζει, η αλλαγή φωνής, το ραδιόφωνο…) σημαδεύεται, ώστε να μη μένει τίποτα ανοιχτό χωρίς να το καταλάβεις.",
   "A virtual cable (not installed yet)": "Ένα εικονικό καλώδιο (δεν έχει εγκατασταθεί ακόμα)",
   "A virtual cable is a pipe: audio goes in at <b>{main}</b> and comes out at <b>{virtual_mic}</b>, which Discord / the game uses as your mic.": "Ένα εικονικό καλώδιο είναι ένας σωλήνας: ο ήχος μπαίνει στο <b>{main}</b> και βγαίνει στο <b>{virtual_mic}</b>, που το Discord / το παιχνίδι το χρησιμοποιεί ως μικρόφωνό σου.",
   "A window opened that downloads VB-Cable (free) from the official VB-Audio site.\n\nWindows will ask for permission, click Yes, then click “Install Driver”.\n\nWhen it's done, click “I've installed it, check again”. If it doesn't show up, restart your PC.": "Άνοιξε ένα παράθυρο που κατεβάζει το VB-Cable (δωρεάν) από την επίσημη σελίδα της VB-Audio.\n\nΤα Windows θα ζητήσουν άδεια, κάνε κλικ στο Ναι, μετά στο «Install Driver».\n\nΌταν τελειώσει, κάνε κλικ στο «Το εγκατέστησα, έλεγξε ξανά». Αν δεν εμφανιστεί, κάνε επανεκκίνηση του PC.",
@@ -1185,7 +1184,6 @@
   "What goes online": "Τι βγαίνει online",
   "What's new": "Τι νέο υπάρχει",
   "What's playing": "Τι παίζει",
-  "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "Ό,τι είναι ανοιχτό (η αλλαγή φωνής, το Ζωντανά, μια ενεργή καρτέλα) φαίνεται στο χρώμα του θέματος. Σύρε για να διαλέξεις δικό σου· μένει όταν αλλάζεις θέμα.",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "Ό,τι ακούει το <b>{main}</b> παίρνει τους ήχους σου (και τη φωνή σου, αν τη στέλνεις): OBS, Voicemeeter, μίκτης ή κάρτα καταγραφής.",
   "Whatever played last, from a pad, a hotkey or the random key.": "Ό,τι έπαιξε τελευταίο, από κουμπί, συντόμευση ή το πλήκτρο τυχαίου ήχου.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "Όταν το Discord, το TeamSpeak, το Mumble ή ένα παιχνίδι με γνωστό φωνητικό chat ακούει το μικρόφωνό σου (ή το καλώδιο), χρησιμοποίησε τη λειτουργία του χωρίς να ρωτάς. Όταν δεν ακούει τίποτα, η λειτουργία μένει όπως είναι.",
@@ -4325,5 +4323,8 @@
   "Pop-up sound": "Ήχος αναδυόμενου",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "«Ξεκλείδωσες επίτευγμα» στο κάτω μέρος της οθόνης όταν κερδίζεις ένα.",
   "Show pop-ups": "Εμφάνιση αναδυόμενων",
-  "Lite mode is on: no animations, plain themes and less CPU. Click to change it.": "Η ελαφριά λειτουργία είναι ενεργή: χωρίς κινούμενα εφέ, απλά θέματα και λιγότερη CPU. Κάνε κλικ για αλλαγή."
+  "Lite mode is on: no animations, plain themes and less CPU. Click to change it.": "Η ελαφριά λειτουργία είναι ενεργή: χωρίς κινούμενα εφέ, απλά θέματα και λιγότερη CPU. Κάνε κλικ για αλλαγή.",
+  "Marks a tab whose feature is on, so nothing is left on without you noticing.": "Σημαδεύει μια καρτέλα της οποίας η λειτουργία είναι ενεργή, ώστε να μη μένει τίποτα ανοιχτό χωρίς να το προσέξεις.",
+  "Size and speed": "Μέγεθος και ταχύτητα",
+  "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Ό,τι είναι ενεργό φαίνεται σε αυτό το χρώμα. Σύρε για να διαλέξεις το δικό σου· μένει όταν αλλάζεις θέμα."
 }

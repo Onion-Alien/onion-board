@@ -9,7 +9,7 @@ from PySide6.QtGui import (QBrush, QColor, QFont, QFontMetricsF, QLinearGradient
                            QPainterPath, QPen, QPixmap)
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QColorDialog, QComboBox, QFrame,
                                QGridLayout, QHBoxLayout, QLabel, QLayout, QPushButton, QRadioButton,
-                               QSlider, QVBoxLayout, QWidget)
+                               QSizePolicy, QSlider, QVBoxLayout, QWidget)
 
 from soundboard import i18n
 from soundboard.ui.kit import theme
@@ -309,10 +309,14 @@ class AppearancePage(Page):
             tv.addWidget(ThemeGrid(cards))
             tv.addSpacing(8)
         look, lv = self._card(_("Look"), icon="image")
-        lv.setSpacing(18)
-        for part in (self._lite_card(), self._highlight_card(), self._ui_scale_card(),
-                     self._live_tabs_card(), self._playing_background_card()):
-            lv.addWidget(self._section(part))
+        lv.setSpacing(6)
+        groups = ((_("Colour"), (self._highlight_card(), self._live_tabs_card())),
+                  (_("Size and speed"), (self._ui_scale_card(), self._lite_card())),
+                  (_("Background"), (self._playing_background_card(),)))
+        for i, (name, parts) in enumerate(groups):
+            if i:
+                lv.addSpacing(10)
+            lv.addWidget(self._group(name, parts))
         v.addWidget(self._look_box([(_("Themes"), themes), (_("Look"), look)]))
         v.addStretch(1)
         return w
@@ -324,6 +328,32 @@ class AppearancePage(Page):
         if (lay := card.layout()) is not None:
             lay.setContentsMargins(0, 0, 0, 0)
         return card
+
+    def _group(self, name: str, parts) -> QWidget:
+        """A muted group label over a soft box holding `parts` (look tab sections), a thin
+        line between them: the Look tab's five settings read as three small groups,
+        not one long list of headings."""
+        w = QWidget()
+        v = QVBoxLayout(w)
+        v.setContentsMargins(0, 0, 0, 0)
+        v.setSpacing(6)
+        label = QLabel(name)
+        label.setObjectName("hint")
+        v.addWidget(label)
+        box = QFrame()
+        box.setObjectName("lookgroup")
+        bv = QVBoxLayout(box)
+        bv.setContentsMargins(14, 12, 14, 14)
+        bv.setSpacing(12)
+        for i, part in enumerate(parts):
+            if i:
+                rule = QFrame()
+                rule.setObjectName("lookrule")
+                rule.setFixedHeight(1)
+                bv.addWidget(rule)
+            bv.addWidget(self._section(part))
+        v.addWidget(box)
+        return w
 
     def _look_box(self, pages) -> QFrame:
         """One card holding `pages` [(tab name, card)], a tab row on top showing one at a
@@ -375,9 +405,8 @@ class AppearancePage(Page):
 
     def _live_tabs_card(self) -> QFrame:
         card, cv = self._card(_("Live tabs"),
-                              _("A tab whose feature is on right now (a sound playing, the voice "
-                                "changer, the radio…) is marked, so nothing is left on without "
-                                "you noticing."), icon="live")
+                              _("Marks a tab whose feature is on, so nothing is left on "
+                                "without you noticing."), icon="live")
         # side by side like Connection's and Network activity's choices (DESIGN section 0:
         # comparable short choices look alike); they wrap when Settings is narrow
         row = _button_row()
@@ -417,14 +446,14 @@ class AppearancePage(Page):
 
     def _lite_card(self) -> QFrame:
         """Lite mode (ui/settings/lite.py): calmer and lighter for slower PCs, applied at once."""
-        card, cv = self._card(_("Lite mode"),
-                              _("For slower PCs: no animations, Bun holds still and the "
-                                "themes are plain. Everything still works."), icon="leaf")
         on = QCheckBox(_("On"))
         on.setAccessibleName(_("Lite mode"))
         on.setChecked(self.mw.cfg.lite_mode)
         on.toggled.connect(self.mw.themectl.set_lite_mode)
-        cv.addWidget(on)
+        card, cv = self._card(_("Lite mode"),
+                              _("For slower PCs: no animations, Bun holds still and the "
+                                "themes are plain. Everything still works."), icon="leaf",
+                              end=(on,))   # (at the end of its heading, like a switch)
         self.dlg.lite_check = on
         return card
 
@@ -434,28 +463,27 @@ class AppearancePage(Page):
         size offers a restart, like the language."""
         import os
         from soundboard.sounds.library import UI_SCALES
-        card, cv = self._card(_("Interface size"),
-                              _("Makes everything in Onion Board bigger or smaller: text, "
-                                "buttons and pads."), icon="expand")
         now = round(float(os.environ.get("QT_SCALE_FACTOR") or 1) * 100)
         combo = QComboBox()
         combo.setAccessibleName(_("Interface size"))
+        combo.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)   # (not the row)
         for pct in UI_SCALES:
             combo.addItem(_("{percent}%", percent=pct), pct)
         combo.setCurrentIndex(max(0, combo.findData(self.mw.cfg.ui_scale)))
         no_wheel(combo)
+        card, cv = self._card(_("Interface size"),
+                              _("Makes everything in Onion Board bigger or smaller: text, "
+                                "buttons and pads."), icon="expand", end=(combo,))
         restart = QPushButton(_("Restart now"))
         restart.clicked.connect(self.mw.restart_app)
-        row = QHBoxLayout()
-        row.setSpacing(10)
-        row.addWidget(combo)
-        row.addWidget(restart)
-        row.addStretch(1)   # as wide as their text, not the card
-        cv.addLayout(row)
         note = QLabel(_("Onion Board changes size after a restart."))
         note.setObjectName("hint")
         note.setWordWrap(True)
-        cv.addWidget(note)
+        row = QHBoxLayout()
+        row.setSpacing(10)
+        row.addWidget(note, 1)
+        row.addWidget(restart)
+        cv.addLayout(row)
 
         def show():
             later = self.mw.cfg.ui_scale != now
@@ -473,14 +501,15 @@ class AppearancePage(Page):
         return card
 
     def _playing_background_card(self) -> QFrame:
-        card, cv = self._card(_("Playing sound background"),
-                              _("Show the playing sound's thumbnail behind the cards"), icon="wave")
         enabled = QCheckBox(_("On"))
         enabled.setAccessibleName(_("Playing sound background"))
         enabled.setChecked(self.mw.cfg.playing_background)
         enabled.toggled.connect(lambda on: self.mw.set_option("playing_background", on))
-        cv.addWidget(enabled)
+        card, cv = self._card(_("Playing sound background"),
+                              _("Show the playing sound's thumbnail behind the cards"), icon="wave",
+                              end=(enabled,))
         row = QHBoxLayout()
+        row.setSpacing(10)
         row.addWidget(QLabel(_("Opacity")))
         opacity = QSlider(Qt.Orientation.Horizontal)
         opacity.setRange(0, 100)
@@ -569,9 +598,8 @@ class AppearancePage(Page):
         """Your own colour for what's on right now (the voice changer, Live, a live tab),
         kept whatever the theme: for when you like a theme but not its colour."""
         card, cv = self._card(_("Highlight colour"),
-                              _("What's switched on (the voice changer, Live, a live tab) is "
-                                "shown in the theme's colour. Slide to pick your own; it stays "
-                                "when you change theme."), icon="edit")
+                              _("What's switched on is shown in this colour. Slide to pick "
+                                "your own; it stays when you change theme."), icon="edit")
         row = QHBoxLayout()
         row.setSpacing(10)
         swatch = QPushButton(_("On"))   # a switched-on button, as it will look

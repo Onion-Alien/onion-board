@@ -111,7 +111,6 @@
   "A restore point is saved first, so you can undo this.": "En återställningspunkt sparas först, så du kan ångra det här.",
   "A small dot on its icon": "En liten prick på ikonen",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "En soundboard är mest användbar när den får vara igång: dina snabbtangenter och overlayen funkar medan fönstret är stängt. Ikonen i systemfältet (vid klockan) öppnar den igen; högerklicka på den för att avsluta.",
-  "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "En flik vars funktion är på just nu (ett ljud som spelas, röstförvrängaren, radion…) markeras, så att inget står på utan att du märker det.",
   "A virtual cable (not installed yet)": "En virtuell kabel (inte installerad än)",
   "A virtual cable is a pipe: audio goes in at <b>{main}</b> and comes out at <b>{virtual_mic}</b>, which Discord / the game uses as your mic.": "En virtuell kabel är ett rör: ljud går in vid <b>{main}</b> och kommer ut vid <b>{virtual_mic}</b>, som Discord / spelet använder som din mikrofon.",
   "A window opened that downloads VB-Cable (free) from the official VB-Audio site.\n\nWindows will ask for permission, click Yes, then click “Install Driver”.\n\nWhen it's done, click “I've installed it, check again”. If it doesn't show up, restart your PC.": "Ett fönster öppnades som laddar ner VB-Cable (gratis) från VB-Audios officiella webbplats.\n\nWindows ber om lov, klicka Ja och sedan ”Install Driver”.\n\nNär det är klart, klicka ”Jag har installerat den, kolla igen”. Om den inte syns, starta om datorn.",
@@ -1185,7 +1184,6 @@
   "What goes online": "Vad som går ut på nätet",
   "What's new": "Nyheter",
   "What's playing": "Vad som spelas",
-  "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "Det som är påslaget (röstförvrängaren, Live, en liveflik) visas i temats färg. Dra för att välja din egen; den blir kvar när du byter tema.",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "Det som lyssnar på <b>{main}</b> får dina ljud (och din röst, om du skickar den): OBS, Voicemeeter, en mixer eller ett capture-kort.",
   "Whatever played last, from a pad, a hotkey or the random key.": "Det som spelades senast, från en ruta, en snabbtangent eller slumptangenten.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "När Discord, TeamSpeak, Mumble eller ett spel med känd röstchatt lyssnar på din mikrofon (eller kabeln), använd dess läge utan att fråga. När inget lyssnar förblir läget som det är.",
@@ -4325,5 +4323,8 @@
   "Pop-up sound": "Popup-ljud",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "”Prestation upplåst” längst ner på skärmen när du låser upp en.",
   "Show pop-ups": "Visa popup-fönster",
-  "Lite mode is on: no animations, plain themes and less CPU. Click to change it.": "Lätt läge är på: inga animationer, enkla teman och mindre CPU. Klicka för att ändra."
+  "Lite mode is on: no animations, plain themes and less CPU. Click to change it.": "Lätt läge är på: inga animationer, enkla teman och mindre CPU. Klicka för att ändra.",
+  "Marks a tab whose feature is on, so nothing is left on without you noticing.": "Markerar en flik vars funktion är på, så att inget står på utan att du märker det.",
+  "Size and speed": "Storlek och hastighet",
+  "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Det som är på visas i den här färgen. Dra för att välja din egen; den stannar kvar när du byter tema."
 }

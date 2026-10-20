@@ -622,7 +622,6 @@
   "A restore point is saved first, so you can undo this.": "पहले एक रिस्टोर पॉइंट सेव होता है, ताकि आप इसे पलट सकें।",
   "A small dot on its icon": "इसके आइकन पर एक छोटा डॉट",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "साउंडबोर्ड चालू छोड़ने पर सबसे काम का है: विंडो बंद होने पर भी आपकी हॉटकी और ओवरले काम करते हैं। ट्रे आइकन (घड़ी के पास) इसे फिर खोलता है; बंद करने के लिए उस पर राइट-क्लिक करें।",
-  "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "जिस टैब का फ़ीचर अभी चालू है (कोई साउंड चल रहा है, वॉइस चेंजर, रेडियो…) उस पर निशान लगता है, ताकि आपकी जानकारी के बिना कुछ चालू न रह जाए।",
   "About": "बारे में",
   "Add a device": "डिवाइस जोड़ें",
   "Add as sound keeps a copy of the video too (the pad is still just its sound). Videos use a lot more data: about 5 to 25 MB a minute.": "साउंड के रूप में जोड़ें वीडियो की भी एक कॉपी रखता है (पैड फिर भी सिर्फ़ उसका साउंड है)। वीडियो बहुत ज़्यादा डेटा लेते हैं: लगभग 5 से 25 MB प्रति मिनट।",
@@ -1266,7 +1265,6 @@
   "What do these do?": "ये क्या करते हैं?",
   "What do you want to reset?": "आप क्या रीसेट करना चाहते हैं?",
   "What goes online": "ऑनलाइन क्या होता है",
-  "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "क्या चालू है (वॉइस चेंजर, लाइव, एक लाइव टैब) थीम के रंग में दिखाया गया है। अपना स्वयं का चयन करने के लिए स्लाइड करें; जब आप थीम बदलते हैं तो यह बना रहता है।",
   "Whatever played last, from a pad, a hotkey or the random key.": "पैड, हॉटकी या रैंडम कुंजी से, आखिरी बार जो भी खेला गया।",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "जब डिस्कॉर्ड, टीमस्पीक, मम्बल या किसी ज्ञात वॉइस चैट वाला गेम आपके माइक (या केबल) को सुन रहा हो, तो बिना पूछे इसके मोड का उपयोग करें। कुछ भी न सुने जाने से, मोड वैसे ही बना रहता है।",
   "When the program closes, the board goes back to what it showed before.": "जब प्रोग्राम बंद हो जाता है, तो बोर्ड वापस उसी स्थिति में चला जाता है जैसा उसने पहले दिखाया था।",
@@ -4325,5 +4323,8 @@
   "Pop-up sound": "पॉप-अप ध्वनि",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "कोई उपलब्धि मिलने पर स्क्रीन के नीचे \"उपलब्धि अनलॉक हुई\"।",
   "Show pop-ups": "पॉप-अप दिखाएँ",
-  "Lite mode is on: no animations, plain themes and less CPU. Click to change it.": "लाइट मोड चालू है: कोई एनिमेशन नहीं, सादी थीम और कम CPU। बदलने के लिए क्लिक करें।"
+  "Lite mode is on: no animations, plain themes and less CPU. Click to change it.": "लाइट मोड चालू है: कोई एनिमेशन नहीं, सादी थीम और कम CPU। बदलने के लिए क्लिक करें।",
+  "Marks a tab whose feature is on, so nothing is left on without you noticing.": "जिस टैब की सुविधा चालू है उसे चिह्नित करता है, ताकि कुछ भी तुम्हारे ध्यान दिए बिना चालू न रह जाए।",
+  "Size and speed": "आकार और रफ़्तार",
+  "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "जो चालू है वह इस रंग में दिखता है। अपना रंग चुनने के लिए स्लाइड करो; थीम बदलने पर भी यह बना रहता है।"
 }

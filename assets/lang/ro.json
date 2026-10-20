@@ -112,7 +112,6 @@
   "A restore point is saved first, so you can undo this.": "Mai întâi se salvează un punct de restaurare, ca să poți anula asta.",
   "A small dot on its icon": "Un punct mic pe pictograma ei",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Un soundboard e cel mai util lăsat pornit: tastele rapide și overlay-ul merg cât fereastra e închisă. Pictograma din tray (lângă ceas) o redeschide; clic dreapta pe ea ca să ieși.",
-  "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "O filă a cărei funcție e pornită acum (un sunet care se redă, schimbătorul de voce, radioul…) e marcată, ca nimic să nu rămână pornit fără să observi.",
   "A virtual cable (not installed yet)": "Un cablu virtual (încă neinstalat)",
   "A virtual cable is a pipe: audio goes in at <b>{main}</b> and comes out at <b>{virtual_mic}</b>, which Discord / the game uses as your mic.": "Un cablu virtual e o țeavă: sunetul intră pe la <b>{main}</b> și iese pe la <b>{virtual_mic}</b>, pe care Discord / jocul îl folosește ca microfon.",
   "A window opened that downloads VB-Cable (free) from the official VB-Audio site.\n\nWindows will ask for permission, click Yes, then click “Install Driver”.\n\nWhen it's done, click “I've installed it, check again”. If it doesn't show up, restart your PC.": "S-a deschis o fereastră care descarcă VB-Cable (gratuit) de pe site-ul oficial VB-Audio.\n\nWindows va cere permisiunea, dă clic pe Da, apoi pe „Install Driver”.\n\nCând e gata, dă clic pe „L-am instalat, verifică din nou”. Dacă nu apare, repornește PC-ul.",
@@ -1199,7 +1198,6 @@
   "What goes online": "Ce iese online",
   "What's new": "Ce e nou",
   "What's playing": "Ce se redă",
-  "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "Ce e pornit (schimbătorul de voce, Live, o filă live) e afișat în culoarea temei. Glisează ca să-ți alegi culoarea; rămâne când schimbi tema.",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "Ce ascultă <b>{main}</b> primește sunetele tale (și vocea, dacă o trimiți): OBS, Voicemeeter, un mixer sau o placă de captură.",
   "Whatever played last, from a pad, a hotkey or the random key.": "Ce s-a redat ultima dată, de la un pad, o tastă rapidă sau tasta aleatorie.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "Când Discord, TeamSpeak, Mumble sau un joc cu chat vocal cunoscut îți ascultă microfonul (sau cablul), folosește-i modul fără să întrebi. Când nu ascultă nimic, modul rămâne cum e.",
@@ -4399,5 +4397,8 @@
   "Pop-up sound": "Sunet pop-up",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "„Realizare deblocată” în partea de jos a ecranului când obții una.",
   "Show pop-ups": "Arată ferestrele pop-up",
-  "Lite mode is on: no animations, plain themes and less CPU. Click to change it.": "Modul ușor e pornit: fără animații, teme simple și mai puțin CPU. Dă clic ca să-l schimbi."
+  "Lite mode is on: no animations, plain themes and less CPU. Click to change it.": "Modul ușor e pornit: fără animații, teme simple și mai puțin CPU. Dă clic ca să-l schimbi.",
+  "Marks a tab whose feature is on, so nothing is left on without you noticing.": "Marchează o filă a cărei funcție e pornită, ca nimic să nu rămână pornit fără să observi.",
+  "Size and speed": "Mărime și viteză",
+  "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Ce e pornit apare în această culoare. Glisează ca să alegi una a ta; rămâne când schimbi tema."
 }
