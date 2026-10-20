@@ -130,7 +130,10 @@ def _card(meta: SoundMeta, lit: bool, size: int,
 def _icon(p: QPainter, icon: str, on: bool, C: dict[str, QColor], two: bool = False):
     """The control's icon between the name and the footer (logical CARD x CARD); lower
     and a little smaller under a name on two lines."""
-    ink = QColor(C["accent"] if on or icon != "switch" else C["muted"])
+    if icon == "stop":   # red: the theme's own (its Stop all's pink read as purple-ish)
+        ink = QColor(C["error_text"])
+    else:
+        ink = QColor(C["accent"] if on or icon != "switch" else C["muted"])
     cx, cy = CARD / 2, (61 if two else 55)
     p.translate(cx, cy)
     p.scale(0.8 if two else 0.92, 0.8 if two else 0.92)
