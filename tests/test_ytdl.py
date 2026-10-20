@@ -374,21 +374,87 @@ def test_auto_update_only_when_enabled_and_due(listed):
 
 def test_a_failed_download_updates_and_retries_once(listed, monkeypatch, tmp_path):
     calls = []
+    monkeypatch.setattr(ytdl, "RETRY_PAUSE_S", 0)
 
-    def dl(url, dest, progress, *_feature):
+    def dl(url, dest, progress, *_feature, again=False):
         calls.append(ytdl.override_version())
-        if len(calls) == 1:
+        if len(calls) <= 2:   # the first try and its second try by itself
             raise ytdl.FetchError("Sign in to confirm you're not a bot")
         return tmp_path / "a.m4a", "Title"
 
     monkeypatch.setattr(ytdl, "_download", dl)
     assert ytdl.download_audio("https://youtu.be/x")[1] == "Title"
-    assert calls == ["", "2099.1.1"]           # retried with the new copy
+    assert calls == ["", "", "2099.1.1"]       # then retried with the new copy
 
     calls.clear()                               # checked just now: no second update
     with pytest.raises(ytdl.FetchError):
         ytdl.download_audio("https://youtu.be/x")
-    assert calls == ["2099.1.1"]
+    assert calls == ["2099.1.1", "2099.1.1"]
+
+
+@pytest.mark.parametrize("raw, again", [
+    ("ERROR: [youtube] abc: Sign in to confirm you're not a bot", True),
+    ("ERROR: unable to download video data: HTTP Error 403: Forbidden", True),
+    ("ERROR: [youtube] abc: Requested format is not available", True),
+    ("The read operation timed out", True),
+    ("HTTP Error 503: Service Unavailable", True),
+    ("ERROR: [youtube] abc: Video unavailable. This video is private", False),
+    ("ERROR: [youtube] abc: Sign in to confirm your age", False),
+    ("ERROR: [youtube] abc: The uploader has not made this video available in your "
+     "country", False),
+])
+def test_a_youtube_refusal_is_tried_once_more_with_other_players(monkeypatch, tmp_path,
+                                                                  raw, again):
+    """Users gave up (and uninstalled) after a YouTube download failed: a refusal or a
+    dropped connection is tried again by itself, asking YouTube as other players
+    (RETRY_CLIENTS), before any error shows. A private or locked video isn't."""
+    monkeypatch.setattr(ytdl, "RETRY_PAUSE_S", 0)
+    counted = []
+    monkeypatch.setattr(ytdl, "_count_used", counted.append)
+    seen = []
+
+    class YDL:
+        def __init__(self, opts):
+            self.opts = opts
+            seen.append(opts.get("extractor_args"))
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def extract_info(self, url, download=False):
+            if len(seen) == 1:
+                raise Exception(raw)
+            return {"title": "Boom", "duration": 3, "id": "abc", "ext": "m4a"}
+
+        def process_ie_result(self, info, download=True):
+            (tmp_path / "abc.m4a").write_bytes(b"audio")
+            return info
+
+        def prepare_filename(self, info):
+            return str(tmp_path / "abc.m4a")
+
+    monkeypatch.setitem(sys.modules, "yt_dlp", types.SimpleNamespace(YoutubeDL=YDL))
+    if again:
+        assert ytdl.download_audio("https://youtu.be/abc", tmp_path, auto_update=False)[1] \
+            == "Boom"
+        assert seen == [None, {"youtube": {"player_client": list(ytdl.RETRY_CLIENTS)}}]
+        assert counted == ["dl-retried-ok"]
+    else:
+        with pytest.raises(ytdl.FetchError):
+            ytdl.download_audio("https://youtu.be/abc", tmp_path, auto_update=False)
+        assert seen == [None] and counted == []
+
+
+def test_no_second_try_over_tor(monkeypatch, tmp_path):
+    """Tor has its own tries with new identities (_over_tor): none on top."""
+    monkeypatch.setattr(ytdl, "RETRY_PAUSE_S", 0)
+    monkeypatch.setattr(ytdl.net, "mode", lambda: ytdl.net.TOR)
+    assert not ytdl._worth_another_try(ytdl.FetchError("HTTP Error 403: Forbidden"))
+    monkeypatch.setattr(ytdl.net, "mode", lambda: ytdl.net.DIRECT)
+    assert ytdl._worth_another_try(ytdl.FetchError("HTTP Error 403: Forbidden"))
 
 
 @pytest.mark.parametrize("spec, ok", [

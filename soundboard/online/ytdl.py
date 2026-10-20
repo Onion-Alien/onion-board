@@ -79,6 +79,18 @@ PYPI_MAX = 5 * 1024 * 1024
 WHEEL_HOST = "https://files.pythonhosted.org/"
 CHECK_EVERY = 24 * 3600          # automatic update check
 RETRY_CHECK_AFTER = 3600         # a failed download checks again if the last check is older
+RETRY_PAUSE_S = 2.0              # before a failed download's one automatic second try
+# YouTube's players for that second try: a refusal (403, "not a bot", no formats) is
+# often for the ones yt-dlp asks first (visionos, web) only. These need no PO token
+# (yt-dlp's INNERTUBE_CLIENTS); web_safari last, as its HLS has the sound too
+RETRY_CLIENTS = ("tv", "tv_downgraded", "web_embedded", "web_safari")
+# failures a second try can get past: refused, cut off, stuck or slow. Not a private,
+# removed, age- or country-locked video, which no second try changes
+_TRY_AGAIN = re.compile(
+    r"http error (?:403|5\d\d)|forbidden|not a bot|confirm you.?re not|"
+    r"requested format is not available|no (?:video )?formats|timed? ?out|stopped moving|"
+    r"no new data|incomplete ?read|bytes, expected|cut off|connection (?:reset|aborted)|"
+    r"having trouble", re.I)
 WHEEL_MAX = 30 * 1024 * 1024
 
 class _SharedLock:
@@ -688,26 +700,57 @@ def download_audio(url: str, dest: Path | None = None,
     if not thumbnail:
         extra["thumbnail"] = False
 
-    def fetch():
+    def fetch(again: bool = False):
+        more = dict(extra, again=True) if again else extra
         if direct:
-            return _download(url, dest, progress, feature, direct=True, **extra)
-        return _over_tor(lambda: _download(url, dest, progress, feature, **extra), url)
+            return _download(url, dest, progress, feature, direct=True, **more)
+        return _over_tor(lambda: _download(url, dest, progress, feature, **more), url)
     try:
         return fetch()
-    except FetchError as e:
-        if (isinstance(e, TorBlocked) or not auto_update or not due(RETRY_CHECK_AFTER)
-                or not net.allowed(UPDATE_FEATURE)):
-            raise
-        before = override_version()
+    except FetchError as first:
+        e = first
+    if _worth_another_try(e):
+        # most of these pass by themselves: try once more, YouTube with other players,
+        # before the user sees an error (and gives up on the app)
+        log.info("%s failed (%s); trying once more", _site_name(url), e)
+        time.sleep(RETRY_PAUSE_S)
         try:
-            msg = update()
-        except Exception as ue:  # noqa: BLE001
-            log.info("yt-dlp update after a failed download didn't work: %s", ue)
-            raise e from None
-        if override_version() != before:   # a newer copy came in (not "up to date")
-            log.info("%s Retrying %s", msg, url)
-            return fetch()
-        raise
+            done = fetch(again=True)
+        except FetchError as second:
+            e = second
+        else:
+            _count_used("dl-retried-ok")
+            return done
+    if (isinstance(e, TorBlocked) or not auto_update or not due(RETRY_CHECK_AFTER)
+            or not net.allowed(UPDATE_FEATURE)):
+        raise e
+    before = override_version()
+    try:
+        msg = update()
+    except Exception as ue:  # noqa: BLE001
+        log.info("yt-dlp update after a failed download didn't work: %s", ue)
+        raise e from None
+    if override_version() != before:   # a newer copy came in (not "up to date")
+        log.info("%s Retrying %s", msg, url)
+        return fetch()
+    raise e
+
+
+def _worth_another_try(e: FetchError) -> bool:
+    """A failure a second try often gets past (_TRY_AGAIN): not one over Tor (_over_tor
+    has its own tries, with new identities) or the proxy's fault."""
+    if isinstance(e, TorBlocked) or getattr(e, "proxy", False) or net.mode() == net.TOR:
+        return False
+    return bool(_TRY_AGAIN.search(f"{getattr(e, 'raw', '')} {e}"))
+
+
+def _count_used(name: str) -> None:
+    """usage.used(), imported here only (usage imports from this package)."""
+    try:
+        from soundboard.core import usage
+        usage.used(name)
+    except Exception:  # noqa: BLE001 - counting never breaks a download
+        log.debug("couldn't count %s", name, exc_info=True)
 
 
 def probe(url: str, direct: bool = False) -> tuple[str, float]:
@@ -945,15 +988,16 @@ def _ydl():
 
 def _download(url, dest, progress, feature: str = FEATURE,
               direct: bool = False, video: bool = False,
-              thumbnail: bool = True) -> tuple[Path, str]:
+              thumbnail: bool = True, again: bool = False) -> tuple[Path, str]:
     with _ydl() as yt_dlp:
         if dest:
-            return _run(yt_dlp, url, Path(dest), progress, feature, direct, video, thumbnail)
+            return _run(yt_dlp, url, Path(dest), progress, feature, direct, video, thumbnail,
+                        again)
         # Our own temp folder: the caller only learns it on success, so a failed
         # download (up to the size cap) must not be left behind in %TEMP%.
         tmp = Path(tempfile.mkdtemp(prefix="sb-ytdl-"))
         try:
-            return _run(yt_dlp, url, tmp, progress, feature, direct, video, thumbnail)
+            return _run(yt_dlp, url, tmp, progress, feature, direct, video, thumbnail, again)
         except BaseException:
             shutil.rmtree(tmp, ignore_errors=True)
             raise
@@ -1108,7 +1152,8 @@ def _readable(e: Exception) -> FetchError:
 
 
 def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False,
-          feature: str = FEATURE, direct: bool = False, video: bool = False) -> dict:
+          feature: str = FEATURE, direct: bool = False, video: bool = False,
+          again: bool = False) -> dict:
     last = [-1.0]
     stalled = ytworker.stall_guard()
 
@@ -1144,6 +1189,8 @@ def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False,
     # the relay, as this site: Settings > Connection and Privacy & security;
     # `direct` is the user's "Try this one without Tor" (the switches still hold)
     opts["proxy"] = net.ytdlp_proxy(feature, direct=direct)
+    if again:   # download_audio's second try: YouTube's other players
+        opts["extractor_args"] = {"youtube": {"player_client": list(RETRY_CLIENTS)}}
     if video:
         ff = library._ffmpeg()
         fmt = quality.current.video_format()
@@ -1179,10 +1226,11 @@ def save_video(path: Path, title: str) -> Path | None:
 
 
 def _run(yt_dlp, url: str, dest: Path, progress, feature: str = FEATURE,
-         direct: bool = False, video: bool = False, thumbnail: bool = True) -> tuple[Path, str]:
+         direct: bool = False, video: bool = False, thumbnail: bool = True,
+         again: bool = False) -> tuple[Path, str]:
     try:
         opts = _opts(dest, progress, thumbnail=thumbnail, feature=feature, direct=direct,
-                     video=video)
+                     video=video, again=again)
         # a playlist's entries left unresolved: one private or deleted video in it
         # must not hide that it's a playlist (_check says so). A video isn't affected.
         opts["extract_flat"] = "in_playlist"

@@ -105,6 +105,7 @@ class LinkBar(QFrame):
         self.picture_for: Callable[[str], QPixmap | None] = lambda url: None
         self._via: dict[str, str] = {}   # url -> "link" (pasted) or "search", for usage
         self._dups: set[str] = set()     # urls refused as already in the library
+        self._why: dict[str, str] = {}   # url -> why its download failed (usage.DL_FAILS)
         self.added_ids: dict[str, str] = {}   # url -> the sound it was added as (this run)
         self._msg.connect(self._on_msg)
         self._shown = False           # the line says something wrong (_say)
@@ -591,11 +592,13 @@ class LinkBar(QFrame):
             emit("added", url, (meta, data, title, saved))
         except ytdl.TorBlocked as e:   # the bar offers to try it without Tor
             log.warning("link %s turned away over Tor for %s", kind, url)
+            emit("why", url, "proxy")
             emit("blocked", url, (kind, html.escape(
                 _("Couldn't add it: {error}", error=e) if kind == "add" else
                 _("Couldn't play it: {error}", error=e))))
         except Exception as e:  # noqa: BLE001 - shown in the bar, logged
             log.warning("link %s failed for %s: %s", kind, url, e)
+            emit("why", url, errors.download_reason(e))   # for the usage count only
             # a bot check or rate limit is about the user's address, not yt-dlp; with
             # auto-update on, download_audio() already tried a newer one
             fixable = (isinstance(e, ytdl.FetchError) and not auto_update
@@ -617,7 +620,7 @@ class LinkBar(QFrame):
 
     def _on_msg(self, kind: str, url: str, payload, job=None):
         if job in self._dropped:   # a cancelled download, still sending: not the running one
-            if kind in ("progress", "title", "dup"):
+            if kind in ("progress", "title", "dup", "why"):
                 return
             self._dropped.discard(job)
             if kind == "play":
@@ -645,6 +648,9 @@ class LinkBar(QFrame):
             return
         if kind == "dup":
             self._dups.add(url)
+            return
+        if kind == "why":
+            self._why[url] = payload
             return
         # the download finished one way or another
         was, self._busy = self._busy, ""
@@ -721,7 +727,8 @@ class LinkBar(QFrame):
             self._dups.discard(url)
             usage.used("dl-already-have")
             return
-        usage.downloaded(self.cfg, url, self._via.get(url, "link"), kind, ok)
+        usage.downloaded(self.cfg, url, self._via.get(url, "link"), kind, ok,
+                         self._why.pop(url, ""))
 
     def _next(self):
         """The download finished or was cancelled: start what's waiting. The same
