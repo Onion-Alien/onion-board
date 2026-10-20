@@ -63,6 +63,11 @@ class AudioPage(Page):
                                             e.stalls)))
         stat.setObjectName("hint")
         cv.addWidget(stat)
+        self.dlg.box_priority = self._option(
+            cv, _("Put the sound first on a busy PC"),
+            _("Runs the board above normal priority, so other programs can't make the "
+              "sound skip. It uses very little CPU, so games won't notice."),
+            self.mw.cfg.audio_priority, self._set_priority)
         v.addWidget(adv(card))
         more = QPushButton(_("More audio settings"))
         more.setToolTip(_("Speech voices, buffering and your mic switch (Show advanced)"))
@@ -71,6 +76,12 @@ class AudioPage(Page):
         v.addWidget(adv(more, show_when_basic=True), 0, Qt.AlignmentFlag.AlignLeft)
         v.addStretch(1)
         return w
+
+    def _set_priority(self, on: bool):
+        from soundboard.core.app import raise_process_priority
+        self.mw.cfg.audio_priority = on
+        raise_process_priority(on)
+        self.mw._save_now()
 
     def _voices_card(self):
         """Custom text-to-speech voices live on the Voice tab (behind Add voices); this

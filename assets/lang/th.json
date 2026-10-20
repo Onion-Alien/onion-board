@@ -4264,5 +4264,7 @@
   "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "ผู้ดูของคุณสามารถเล่นเสียงของคุณได้: ด้วย <b>คะแนนช่อง</b> พร้อม <b>การแจ้งเตือน</b> เมื่อพวกเขาติดตาม ย่อย เชียร์ หรือบุก และด้วย <b>คำสั่ง !</b> Onion Board คุยกับ Twitch เอง ดังนั้นจึงไม่ต้องตั้งค่าบอท",
   "Mic off": "ไมค์ปิดอยู่",
   "Your headset's mic is off": "ไมค์ของหูฟังปิดอยู่",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "ไมค์ของ <b>{headset}</b> หลุดการเชื่อมต่อ เชื่อมต่อใหม่แล้วเสียงของคุณจะออกไปอีกครั้ง"
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "ไมค์ของ <b>{headset}</b> หลุดการเชื่อมต่อ เชื่อมต่อใหม่แล้วเสียงของคุณจะออกไปอีกครั้ง",
+  "Put the sound first on a busy PC": "ให้เสียงมาก่อนเมื่อพีซีทำงานหนัก",
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "รันบอร์ดด้วยลำดับความสำคัญสูงกว่าปกติ เพื่อไม่ให้โปรแกรมอื่นทำให้เสียงสะดุด ใช้ CPU น้อยมาก เกมจึงไม่รู้สึกถึงความต่าง"
 }

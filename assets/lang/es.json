@@ -4338,5 +4338,7 @@
   "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "Tus espectadores pueden reproducir tus sonidos: con <b>puntos de canal</b> , con <b>alertas</b> cuando siguen, suben, animan o atacan, y con <b>comandos !</b> en el chat. Onion Board habla con Twitch, por lo que no es necesario configurar ningún bot.",
   "Mic off": "Micro apagado",
   "Your headset's mic is off": "El micro de tus cascos está apagado",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "El micro de <b>{headset}</b> se ha desconectado. Vuelve a conectarlo y tus sonidos saldrán de nuevo."
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "El micro de <b>{headset}</b> se ha desconectado. Vuelve a conectarlo y tus sonidos saldrán de nuevo.",
+  "Put the sound first on a busy PC": "Dar prioridad al sonido con el PC ocupado",
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Ejecuta el board con prioridad superior a la normal, para que otros programas no hagan que el sonido se corte. Usa muy poca CPU, así que los juegos no lo notan."
 }

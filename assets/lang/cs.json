@@ -4412,5 +4412,7 @@
   "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "Vaši diváci mohou přehrávat vaše zvuky: s <b>body kanálu</b> , s <b>upozorněním</b> , když vás sledují, přispívat, povzbuzovat nebo raidovat, a pomocí <b>příkazů !</b> v chatu. Onion Board mluví se samotným Twitchem, takže není potřeba nastavovat žádného robota.",
   "Mic off": "Mikrofon vypnutý",
   "Your headset's mic is off": "Mikrofon sluchátek je vypnutý",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofon na <b>{headset}</b> se odpojil. Připoj ho znovu a tvoje zvuky zase půjdou ven."
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofon na <b>{headset}</b> se odpojil. Připoj ho znovu a tvoje zvuky zase půjdou ven.",
+  "Put the sound first on a busy PC": "Zvuk má přednost, když je PC vytížené",
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Spustí board s vyšší než normální prioritou, aby jiné programy nemohly způsobit výpadky zvuku. Bere velmi málo CPU, takže hry nic nepoznají."
 }

@@ -4634,5 +4634,7 @@
   "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "يمكن للمشاهدين تشغيل الأصوات الخاصة بك: باستخدام <b>نقاط القناة</b> ، ومع <b>التنبيهات</b> عند المتابعة أو الاشتراك أو الهتاف أو الغارة، ومع <b>أوامر !</b> في الدردشة. تتحدث Onion Board مع Twitch نفسها، لذا لا يوجد روبوت لإعداده.",
   "Mic off": "المايك مطفأ",
   "Your headset's mic is off": "مايك السماعة مطفأ",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "انقطع مايك <b>{headset}</b>. أعد توصيله وستخرج أصواتك من جديد."
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "انقطع مايك <b>{headset}</b>. أعد توصيله وستخرج أصواتك من جديد.",
+  "Put the sound first on a busy PC": "أعطِ الصوت الأولوية عندما يكون الكمبيوتر مشغولًا",
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "يشغّل اللوحة بأولوية أعلى من العادية، فلا تستطيع البرامج الأخرى أن تجعل الصوت يتقطّع. تستهلك القليل جدًا من المعالج، فلن تلاحظ الألعاب شيئًا."
 }

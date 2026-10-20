@@ -4264,5 +4264,7 @@
   "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "您的觀眾可以播放您的聲音：使用<b>頻道點</b>，跟隨、訂閱、歡呼或突襲時發出<b>警報</b>，以及聊天中的<b>! 命令</b>。 Onion Board 與 Twitch 本身進行對話，因此無需設置機器人。",
   "Mic off": "麥克風已關",
   "Your headset's mic is off": "耳機的麥克風已關閉",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> 的麥克風斷開了。重新連接後，你的音效就會再次送出。"
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> 的麥克風斷開了。重新連接後，你的音效就會再次送出。",
+  "Put the sound first on a busy PC": "電腦忙碌時優先保證聲音",
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "以高於正常的優先順序執行音板，讓其他程式無法使聲音卡頓。它占用的 CPU 極少，遊戲不會受影響。"
 }

@@ -41,6 +41,7 @@ class Built:
     app_log_box: Any
     app_setup_list: Any
     box_app_setup: Any
+    box_priority: Any
     box_programs: Any
     box_tips: Any
     box_tutorials: Any

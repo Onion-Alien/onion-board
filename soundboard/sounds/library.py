@@ -482,6 +482,7 @@ class Config:
     # runs (named *_optin so configs saved while it defaulted to on start off again)
     ytdlp_auto_optin: bool = False
     latency: str = "low"              # audio buffering: 'low' | 'high' (safer on flaky devices)
+    audio_priority: bool = True       # run above normal priority (app.raise_process_priority)
     setup_done: bool = False          # the quick-setup guide has been completed
     # what the quick-setup guide's first page was told the app is for (USES in
     # ui/setup/setupwizard.py). "" = not asked yet: only a brand-new install starts so
