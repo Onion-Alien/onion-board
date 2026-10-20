@@ -155,6 +155,21 @@ def test_the_installer_marks_the_files_and_clears_it_before_opening_the_app():
     assert len(opens) == 2 and all("BeforeInstall: EndInstallingMark" in ln for ln in opens)
 
 
+def test_the_uninstaller_removes_the_app_folder_the_mark_made():
+    # StartInstallingMark makes {app} itself (ForceDirectories), so Setup finds it there
+    # and only removes it on uninstall when told to: an empty folder stayed behind
+    from pathlib import Path
+    iss = (Path(__file__).resolve().parent.parent / "installer" / "OnionBoard.iss"
+           ).read_text(encoding="utf-8")
+    mark = iss[iss.index("procedure StartInstallingMark"):]
+    assert "ForceDirectories(ExpandConstant('{app}'))" in mark[:mark.index("\nend;\n")]
+    dirs = iss[iss.index("\n[Dirs]\n") + 1:]
+    dirs = dirs[:dirs.index("\n[")]
+    entries = [ln for ln in dirs.splitlines()[1:] if ln and not ln.startswith(";")]
+    assert any(ln.startswith('Name: "{app}";') and "uninsalwaysuninstall" in ln
+               for ln in entries), entries
+
+
 def test_the_check_comes_before_anything_a_half_copied_install_can_fail(monkeypatch, tmp_path):
     """Started while the installer copies files, even bootmark (and what it imports) may
     be half there: the mark is checked first, with only os, sys and time."""
