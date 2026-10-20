@@ -4340,5 +4340,6 @@
   "Your headset's mic is off": "Kulaklığının mikrofonu kapalı",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> mikrofonunun bağlantısı koptu. Yeniden bağla, seslerin tekrar gitsin.",
   "Put the sound first on a busy PC": "Bilgisayar meşgulken sese öncelik ver",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Board'u normalin üstünde öncelikle çalıştırır, böylece diğer programlar sesin takılmasına yol açamaz. Çok az CPU kullanır, oyunlar fark etmez."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Board'u normalin üstünde öncelikle çalıştırır, böylece diğer programlar sesin takılmasına yol açamaz. Çok az CPU kullanır, oyunlar fark etmez.",
+  "its file is gone (it was at {path})": "dosyası artık yok ({path} konumundaydı)"
 }

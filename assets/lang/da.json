@@ -4340,5 +4340,6 @@
   "Your headset's mic is off": "Dit headsets mikrofon er slukket",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofonen på <b>{headset}</b> blev afbrudt. Tilslut den igen, så går dine lyde ud igen.",
   "Put the sound first on a busy PC": "Lyden først på en travl pc",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Kører boardet med højere end normal prioritet, så andre programmer ikke kan få lyden til at hakke. Den bruger meget lidt CPU, så spil mærker det ikke."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Kører boardet med højere end normal prioritet, så andre programmer ikke kan få lyden til at hakke. Den bruger meget lidt CPU, så spil mærker det ikke.",
+  "its file is gone (it was at {path})": "filen er væk (den lå i {path})"
 }

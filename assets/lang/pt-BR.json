@@ -4340,5 +4340,6 @@
   "Your headset's mic is off": "O microfone do seu headset está desligado",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "O microfone do <b>{headset}</b> desconectou. Conecte de novo e seus sons voltam a sair.",
   "Put the sound first on a busy PC": "Prioridade ao som com o PC ocupado",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Roda o board com prioridade acima do normal, para que outros programas não façam o som falhar. Ele usa pouquíssima CPU, então os jogos nem percebem."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Roda o board com prioridade acima do normal, para que outros programas não façam o som falhar. Ele usa pouquíssima CPU, então os jogos nem percebem.",
+  "its file is gone (it was at {path})": "o arquivo dele sumiu (estava em {path})"
 }
