@@ -4296,7 +4296,6 @@
   "Lite mode (suggested for this PC)": "Lite-Modus (empfohlen für diesen PC)",
   "Set up Discord for me": "Richte Discord für mich ein",
   "Start with Windows": "Beginnen Sie mit Windows",
-  "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "Markieren Sie die gewünschten Registerkarten und wählen Sie einen Look aus.<br> Sie sind sich nicht sicher, was ein Tab bewirkt? Klicken Sie auf das Symbol ⓘ. Ändern Sie alles später in <b>den Einstellungen</b> .",
   "Nothing matches “{text}”.": "Nichts passt zu „{text}“.",
   "Search AI voices": "KI-Stimmen suchen",
   "Search voices": "Stimmen suchen",
@@ -4308,5 +4307,18 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun schaltet den Geräuschfilter von Discord aus, damit Ihre Sounds nicht abgeschnitten werden.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun schaltet den Rauschfilter von Discord aus und zeigt Ihnen dann, welches Mikrofon Sie auswählen müssen.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "Dann wähle {mic} als dein Mikrofon in Discord: Bun zeigt dir wo.",
-  "What does Bun change in Discord?": "Was ändert Bun in Discord?"
+  "What does Bun change in Discord?": "Was ändert Bun in Discord?",
+  "A few handy switches": "Ein paar praktische Schalter",
+  "All optional: the way it is works fine.<br>Change any of it later in <b>Settings</b>.": "Alles optional: So wie es ist, funktioniert es gut.<br>Ändere alles später in den <b>Einstellungen</b>.",
+  "For a phone hotspot, capped plan or slow internet: smaller downloads, lower-bitrate radio, more patience with stations that cut out, and no pictures in web search results.": "Für einen Handy-Hotspot, einen begrenzten Tarif oder langsames Internet: kleinere Downloads, Radio mit niedrigerer Bitrate, mehr Geduld mit Sendern, die aussetzen, und keine Bilder in Websuchergebnissen.",
+  "How Onion Board starts and runs.": "Wie Onion Board startet und läuft.",
+  "Internet": "Internet",
+  "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…).": "Es geht überhaupt nichts online und alles, was das Internet benötigt, ist ausgeblendet (der Radio-Tab, die Websuche, Downloads, Updates…).",
+  "On a hotspot, a capped plan or no internet?": "Mit Hotspot, begrenztem Tarif oder ohne Internet?",
+  "Pick a look and your language.<br>Change either later in <b>Settings</b>.": "Wähl ein Aussehen und deine Sprache.<br>Beides später in den <b>Einstellungen</b> änderbar.",
+  "This PC": "Dieser PC",
+  "Using Discord for voice chat?": "Nutzt du Discord für den Sprachchat?",
+  "Voice is on. Tick more to add them to the side.": "Stimme ist an. Hak mehr an, um sie seitlich hinzuzufügen.",
+  "What does Offline mode change?": "Was ändert der Offlinemodus?",
+  "What does Use less data change?": "Was ändert Weniger Daten?"
 }

@@ -4296,7 +4296,6 @@
   "Lite mode (suggested for this PC)": "Yksinkertaistettu tila (suositeltu tälle tietokoneelle)",
   "Set up Discord for me": "Asenna Discord minulle",
   "Start with Windows": "Aloita Windowsilla",
-  "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "Valitse haluamasi välilehdet ja katso.<br> Etkö ole varma mitä välilehti tekee? Napsauta sen ⓘ. Muuta mitä tahansa niistä myöhemmin <b>asetuksissa</b> .",
   "Nothing matches “{text}”.": "Mikään ei vastaa hakua ”{text}”.",
   "Search AI voices": "Hae tekoälyääniä",
   "Search voices": "Hae ääniä",
@@ -4308,5 +4307,18 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun sammuttaa Discordin kohinasuodattimen, jotta äänesi eivät katkea.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun sammuttaa Discordin kohinasuodattimen ja näyttää sitten, minkä mikrofonin valitset.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "Valitse sitten {mic} mikrofoniksi Discordissa: Bun näyttää missä.",
-  "What does Bun change in Discord?": "Mitä Bun muuttaa Discordissa?"
+  "What does Bun change in Discord?": "Mitä Bun muuttaa Discordissa?",
+  "A few handy switches": "Muutama kätevä valinta",
+  "All optional: the way it is works fine.<br>Change any of it later in <b>Settings</b>.": "Kaikki on vapaaehtoista: näin se toimii hyvin.<br>Muuta mitä tahansa myöhemmin <b>Asetuksissa</b>.",
+  "For a phone hotspot, capped plan or slow internet: smaller downloads, lower-bitrate radio, more patience with stations that cut out, and no pictures in web search results.": "Puhelimen hotspotille, rajatulle liittymälle tai hitaalle netille: pienemmät lataukset, matalampi radion bittinopeus, enemmän kärsivällisyyttä katkeileville asemille, eikä kuvia verkkohaun tuloksissa.",
+  "How Onion Board starts and runs.": "Miten Onion Board käynnistyy ja toimii.",
+  "Internet": "Internet",
+  "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…).": "Mikään ei mene verkkoon, ja kaikki, mikä tarvitsee Internetiä, on piilotettu (Radio-välilehti, verkkohaku, lataukset, päivitykset…).",
+  "On a hotspot, a capped plan or no internet?": "Hotspotilla, rajatulla liittymällä vai ilman nettiä?",
+  "Pick a look and your language.<br>Change either later in <b>Settings</b>.": "Valitse ulkoasu ja kieli.<br>Muuta niitä myöhemmin <b>Asetuksissa</b>.",
+  "This PC": "Tämä tietokone",
+  "Using Discord for voice chat?": "Käytätkö Discordia äänichattiin?",
+  "Voice is on. Tick more to add them to the side.": "Puhe on päällä. Valitse lisää, niin ne tulevat sivulle.",
+  "What does Offline mode change?": "Mitä offline-tila muuttaa?",
+  "What does Use less data change?": "Mitä Käytä vähemmän dataa muuttaa?"
 }

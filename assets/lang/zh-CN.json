@@ -4222,7 +4222,6 @@
   "Lite mode (suggested for this PC)": "Lite 模式（建议用于此 PC）",
   "Set up Discord for me": "为我设置 Discord",
   "Start with Windows": "从 Windows 开始",
-  "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "勾选您想要的选项卡并选择查看。<br>不确定选项卡的作用是什么？单击其 ⓘ。稍后在<b>“设置”</b>中更改其中任何一项。",
   "Nothing matches “{text}”.": "没有与“{text}”匹配的结果。",
   "Search AI voices": "搜索 AI 语音",
   "Search voices": "搜索语音",
@@ -4234,5 +4233,18 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun 会关闭 Discord 的噪音过滤器，这样您的声音就不会被切断。",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun 会关闭 Discord 的噪音过滤器，然后向您展示要选择的麦克风。",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "然后在 Discord 中选择{mic}作为您的麦克风：Bun 会告诉您位置。",
-  "What does Bun change in Discord?": "Bun 在 Discord 中发生了什么变化？"
+  "What does Bun change in Discord?": "Bun 在 Discord 中发生了什么变化？",
+  "A few handy switches": "几个实用开关",
+  "All optional: the way it is works fine.<br>Change any of it later in <b>Settings</b>.": "全是可选的：保持现状也能正常使用。<br>以后随时在<b>设置</b>中更改。",
+  "For a phone hotspot, capped plan or slow internet: smaller downloads, lower-bitrate radio, more patience with stations that cut out, and no pictures in web search results.": "适合手机热点、限流套餐或慢网速：下载更小、电台码率更低、对断断续续的电台更有耐心，网页搜索结果不显示图片。",
+  "How Onion Board starts and runs.": "Onion Board 如何启动和运行。",
+  "Internet": "网络",
+  "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…).": "根本没有任何东西可以上网，所有需要互联网的东西都被隐藏了（广播选项卡、网络搜索、下载、更新……）。",
+  "On a hotspot, a capped plan or no internet?": "用热点、限流套餐或没有网络？",
+  "Pick a look and your language.<br>Change either later in <b>Settings</b>.": "选一个外观和你的语言。<br>以后可在<b>设置</b>中更改。",
+  "This PC": "这台电脑",
+  "Using Discord for voice chat?": "用 Discord 语音聊天吗？",
+  "Voice is on. Tick more to add them to the side.": "变声已开启。勾选更多以添加到侧边。",
+  "What does Offline mode change?": "离线模式会改变什么？",
+  "What does Use less data change?": "节省流量会改变什么？"
 }

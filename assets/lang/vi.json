@@ -4222,7 +4222,6 @@
   "Lite mode (suggested for this PC)": "Chế độ thu gọn (được đề xuất cho PC này)",
   "Set up Discord for me": "Thiết lập Discord cho tôi",
   "Start with Windows": "Bắt đầu với Windows",
-  "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "Đánh dấu vào các tab bạn muốn và chọn một cái nhìn.<br> Bạn không chắc tab có tác dụng gì? Nhấp vào ⓘ của nó. Thay đổi bất kỳ mục nào sau này trong <b>Cài đặt</b> .",
   "Nothing matches “{text}”.": "Không có kết quả cho “{text}”.",
   "Search AI voices": "Tìm giọng AI",
   "Search voices": "Tìm giọng",
@@ -4234,5 +4233,18 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun tắt bộ lọc tiếng ồn của Discord để âm thanh của bạn không bị cắt đứt.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun tắt bộ lọc tiếng ồn của Discord, sau đó chỉ cho bạn nên chọn micrô nào.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "Sau đó chọn {mic} làm micrô của bạn trong Discord: Bun chỉ cho bạn vị trí.",
-  "What does Bun change in Discord?": "Bun thay đổi gì trong Discord?"
+  "What does Bun change in Discord?": "Bun thay đổi gì trong Discord?",
+  "A few handy switches": "Vài công tắc tiện lợi",
+  "All optional: the way it is works fine.<br>Change any of it later in <b>Settings</b>.": "Tất cả đều tùy chọn: để nguyên vẫn chạy tốt.<br>Đổi bất cứ lúc nào trong <b>Cài đặt</b>.",
+  "For a phone hotspot, capped plan or slow internet: smaller downloads, lower-bitrate radio, more patience with stations that cut out, and no pictures in web search results.": "Đối với điểm phát sóng điện thoại, gói bị giới hạn hoặc Internet chậm: tải xuống nhỏ hơn, radio có tốc độ bit thấp hơn, kiên nhẫn hơn với các đài bị cắt và không có hình ảnh trong kết quả tìm kiếm trên web.",
+  "How Onion Board starts and runs.": "Cách Onion Board khởi động và chạy.",
+  "Internet": "Internet",
+  "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…).": "Không có gì trực tuyến cả và mọi thứ cần internet đều bị ẩn (tab Radio, tìm kiếm trên web, tải xuống, cập nhật…).",
+  "On a hotspot, a capped plan or no internet?": "Dùng điểm phát sóng, gói cước giới hạn hay không có mạng?",
+  "Pick a look and your language.<br>Change either later in <b>Settings</b>.": "Chọn giao diện và ngôn ngữ.<br>Đổi cả hai sau trong <b>Cài đặt</b>.",
+  "This PC": "Máy tính này",
+  "Using Discord for voice chat?": "Bạn dùng Discord để trò chuyện thoại?",
+  "Voice is on. Tick more to add them to the side.": "Giọng nói đang bật. Đánh dấu thêm để thêm chúng vào thanh bên.",
+  "What does Offline mode change?": "Chế độ ngoại tuyến thay đổi gì?",
+  "What does Use less data change?": "Dùng ít dữ liệu hơn thay đổi gì?"
 }

@@ -4296,7 +4296,6 @@
   "Lite mode (suggested for this PC)": "Lite-modus (aanbevolen voor deze pc)",
   "Set up Discord for me": "Stel Discord voor mij in",
   "Start with Windows": "Begin met Windows",
-  "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "Vink de gewenste tabbladen aan en kies een look.<br> Weet u niet zeker wat een tabblad doet? Klik op de ⓘ. Wijzig dit later in <b>Instellingen</b> .",
   "Nothing matches “{text}”.": "Niets gevonden voor “{text}”.",
   "Search AI voices": "AI-stemmen zoeken",
   "Search voices": "Stemmen zoeken",
@@ -4308,5 +4307,18 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun schakelt het ruisfilter van Discord uit, zodat je geluiden niet worden onderbroken.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun schakelt het ruisfilter van Discord uit en laat je vervolgens zien welke microfoon je moet kiezen.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "Kies vervolgens {mic} als je microfoon in Discord: Bun laat je zien waar.",
-  "What does Bun change in Discord?": "Wat verandert Bun in Discord?"
+  "What does Bun change in Discord?": "Wat verandert Bun in Discord?",
+  "A few handy switches": "Een paar handige schakelaars",
+  "All optional: the way it is works fine.<br>Change any of it later in <b>Settings</b>.": "Alles is optioneel: zo werkt het prima.<br>Wijzig alles later in <b>Instellingen</b>.",
+  "For a phone hotspot, capped plan or slow internet: smaller downloads, lower-bitrate radio, more patience with stations that cut out, and no pictures in web search results.": "Voor een telefoonhotspot, een beperkt abonnement of langzaam internet: kleinere downloads, radio met een lagere bitsnelheid, meer geduld met zenders die uitvallen en geen afbeeldingen in de zoekresultaten op internet.",
+  "How Onion Board starts and runs.": "Hoe Onion Board start en draait.",
+  "Internet": "Internet",
+  "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…).": "Er gaat helemaal niets online en alles wat internet nodig heeft, is verborgen (het tabblad Radio, zoeken op internet, downloads, updates…).",
+  "On a hotspot, a capped plan or no internet?": "Op een hotspot, een beperkt abonnement of zonder internet?",
+  "Pick a look and your language.<br>Change either later in <b>Settings</b>.": "Kies een uiterlijk en je taal.<br>Wijzig ze later in <b>Instellingen</b>.",
+  "This PC": "Deze pc",
+  "Using Discord for voice chat?": "Gebruik je Discord voor voicechat?",
+  "Voice is on. Tick more to add them to the side.": "Stem staat aan. Vink er meer aan om ze aan de zijkant toe te voegen.",
+  "What does Offline mode change?": "Wat verandert de offlinemodus?",
+  "What does Use less data change?": "Wat verandert Minder data gebruiken?"
 }

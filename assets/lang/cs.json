@@ -4370,7 +4370,6 @@
   "Lite mode (suggested for this PC)": "Zjednodušený režim (doporučeno pro tento počítač)",
   "Set up Discord for me": "Nastavte mi Discord",
   "Start with Windows": "Začněte s Windows",
-  "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "Zaškrtněte požadované karty a vyberte vzhled.<br> Nejste si jisti, co karta dělá? Klikněte na jeho ⓘ. Změňte cokoli později v <b>Nastavení</b> .",
   "Nothing matches “{text}”.": "Nic neodpovídá „{text}“.",
   "Search AI voices": "Hledat AI hlasy",
   "Search voices": "Hledat hlasy",
@@ -4382,5 +4381,18 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun vypne šumový filtr Discordu, takže vaše zvuky nebudou oříznuty.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun vypne šumový filtr Discordu a poté vám ukáže, který mikrofon vybrat.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "Poté vyberte {mic} , protože váš mikrofon v Discord: Bun vám ukáže, kde.",
-  "What does Bun change in Discord?": "Co změní Bun v Discordu?"
+  "What does Bun change in Discord?": "Co změní Bun v Discordu?",
+  "A few handy switches": "Pár šikovných přepínačů",
+  "All optional: the way it is works fine.<br>Change any of it later in <b>Settings</b>.": "Vše je volitelné: i takhle to funguje dobře.<br>Cokoli změň později v <b>Nastavení</b>.",
+  "For a phone hotspot, capped plan or slow internet: smaller downloads, lower-bitrate radio, more patience with stations that cut out, and no pictures in web search results.": "Pro hotspot z telefonu, omezený tarif nebo pomalý internet: menší stahování, rádio s nižším datovým tokem, víc trpělivosti se stanicemi, které vypadávají, a žádné obrázky ve výsledcích hledání na webu.",
+  "How Onion Board starts and runs.": "Jak se Onion Board spouští a běží.",
+  "Internet": "Internet",
+  "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…).": "Vůbec nic nejde online a vše, co potřebuje internet, je skryto (karta Rádio, vyhledávání na webu, stahování, aktualizace…).",
+  "On a hotspot, a capped plan or no internet?": "Na hotspotu, omezeném tarifu nebo bez internetu?",
+  "Pick a look and your language.<br>Change either later in <b>Settings</b>.": "Vyber vzhled a jazyk.<br>Obojí změň později v <b>Nastavení</b>.",
+  "This PC": "Tento počítač",
+  "Using Discord for voice chat?": "Používáš Discord na hlasový chat?",
+  "Voice is on. Tick more to add them to the side.": "Hlas je zapnutý. Zaškrtni další a přidají se do strany.",
+  "What does Offline mode change?": "Co mění režim offline?",
+  "What does Use less data change?": "Co mění Méně dat?"
 }

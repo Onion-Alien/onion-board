@@ -4296,7 +4296,6 @@
   "Lite mode (suggested for this PC)": "Egyszerűsített mód (ehhez a számítógéphez javasolt)",
   "Set up Discord for me": "Állítsd be nekem a Discordot",
   "Start with Windows": "Kezdje a Windows rendszerrel",
-  "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "Jelölje be a kívánt lapokat, és nézze meg.<br> Nem tudja, mit csinál egy lap? Kattintson a ⓘ ikonra. Bármelyik módosítást később <b>a Beállításokban</b> módosíthatja.",
   "Nothing matches “{text}”.": "Semmi sem felel meg ennek: „{text}”.",
   "Search AI voices": "AI-hangok keresése",
   "Search voices": "Hangok keresése",
@@ -4308,5 +4307,18 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "A Bun kikapcsolja a Discord zajszűrőjét, hogy a hangok ne szakadjanak el.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "A Bun kikapcsolja a Discord zajszűrőjét, majd megmutatja, melyik mikrofont válassza.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "Ezután válassza ki {mic} -ot mikrofonnak a Discordban: A Bun megmutatja, hol.",
-  "What does Bun change in Discord?": "Mit változtat Bun a Discordban?"
+  "What does Bun change in Discord?": "Mit változtat Bun a Discordban?",
+  "A few handy switches": "Néhány hasznos kapcsoló",
+  "All optional: the way it is works fine.<br>Change any of it later in <b>Settings</b>.": "Mind opcionális: így is jól működik.<br>Később bármit módosíthatsz a <b>Beállításokban</b>.",
+  "For a phone hotspot, capped plan or slow internet: smaller downloads, lower-bitrate radio, more patience with stations that cut out, and no pictures in web search results.": "Telefonos hotspothoz, korlátos csomaghoz vagy lassú nethez: kisebb letöltések, kisebb bitrátájú rádió, több türelem a kieső állomásokkal, és nincsenek képek a webes keresési találatokban.",
+  "How Onion Board starts and runs.": "Hogyan indul és fut az Onion Board.",
+  "Internet": "Internet",
+  "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…).": "Egyáltalán semmi sem megy online, és minden el van rejtve, aminek szüksége van az internetre (a Rádió lap, webes keresés, letöltések, frissítések…).",
+  "On a hotspot, a capped plan or no internet?": "Hotspoton, korlátos csomaggal vagy internet nélkül?",
+  "Pick a look and your language.<br>Change either later in <b>Settings</b>.": "Válassz kinézetet és nyelvet.<br>Később a <b>Beállításokban</b> módosíthatod.",
+  "This PC": "Ez a gép",
+  "Using Discord for voice chat?": "Discordot használsz hangcsevegéshez?",
+  "Voice is on. Tick more to add them to the side.": "A Beszéd be van kapcsolva. Pipálj be többet, hogy oldalt megjelenjenek.",
+  "What does Offline mode change?": "Mit változtat az offline mód?",
+  "What does Use less data change?": "Mit változtat a Kevesebb adat?"
 }

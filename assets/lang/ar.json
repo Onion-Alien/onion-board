@@ -4592,7 +4592,6 @@
   "Lite mode (suggested for this PC)": "الوضع البسيط (مقترح لهذا الكمبيوتر)",
   "Set up Discord for me": "قم بإعداد Discord من أجلي",
   "Start with Windows": "ابدأ مع ويندوز",
-  "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "حدد علامات التبويب التي تريدها واختر مظهرًا.<br> لست متأكدا ما تفعله علامة التبويب؟ انقر فوق ⓘ. قم بتغيير أي منها لاحقًا في <b>الإعدادات</b> .",
   "Nothing matches “{text}”.": "لا شيء يطابق «{text}».",
   "Search AI voices": "بحث في أصوات الذكاء الاصطناعي",
   "Search voices": "بحث في الأصوات",
@@ -4604,5 +4603,18 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "يقوم Bun بإيقاف تشغيل مرشح الضوضاء في Discord حتى لا تنقطع الأصوات.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "يقوم Bun بإيقاف تشغيل مرشح الضوضاء في Discord، ثم يظهر لك أي ميكروفون تختاره.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "ثم اختر {mic} باعتباره الميكروفون الخاص بك في Discord: يوضح لك Bun مكانه.",
-  "What does Bun change in Discord?": "ماذا تغير بون في Discord؟"
+  "What does Bun change in Discord?": "ماذا تغير بون في Discord؟",
+  "A few handy switches": "بعض الإعدادات المفيدة",
+  "All optional: the way it is works fine.<br>Change any of it later in <b>Settings</b>.": "كلها اختيارية: الوضع الحالي يعمل جيدًا.<br>غيّر أيًا منها لاحقًا في <b>الإعدادات</b>.",
+  "For a phone hotspot, capped plan or slow internet: smaller downloads, lower-bitrate radio, more patience with stations that cut out, and no pictures in web search results.": "بالنسبة لنقطة اتصال الهاتف، أو الخطة المحددة أو الإنترنت البطيء: تنزيلات أصغر، وراديو بمعدل بت أقل، ومزيد من الصبر مع المحطات المقطوعة، ولا توجد صور في نتائج بحث الويب.",
+  "How Onion Board starts and runs.": "كيف يبدأ Onion Board ويعمل.",
+  "Internet": "الإنترنت",
+  "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…).": "لا شيء يتم نشره عبر الإنترنت على الإطلاق، ويتم إخفاء كل ما يحتاج إلى الإنترنت (علامة تبويب الراديو، بحث الويب، التنزيلات، التحديثات ...).",
+  "On a hotspot, a capped plan or no internet?": "على نقطة اتصال أو باقة محدودة أو بلا إنترنت؟",
+  "Pick a look and your language.<br>Change either later in <b>Settings</b>.": "اختر مظهرًا ولغتك.<br>غيّر أيًا منهما لاحقًا في <b>الإعدادات</b>.",
+  "This PC": "هذا الكمبيوتر",
+  "Using Discord for voice chat?": "هل تستخدم Discord للدردشة الصوتية؟",
+  "Voice is on. Tick more to add them to the side.": "صوتك مفعّل. حدّد المزيد لإضافتها إلى الجانب.",
+  "What does Offline mode change?": "ماذا يغيّر وضع عدم الاتصال؟",
+  "What does Use less data change?": "ماذا يغيّر خيار استخدام بيانات أقل؟"
 }

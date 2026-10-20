@@ -4370,7 +4370,6 @@
   "Lite mode (suggested for this PC)": "Спрощений режим (рекомендується для цього ПК)",
   "Set up Discord for me": "Налаштуйте Discord для мене",
   "Start with Windows": "Почати з Windows",
-  "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "Відзначте потрібні вкладки та виберіть вигляд.<br> Не знаєте, що робить вкладка? Натисніть його ⓘ. Змініть це пізніше в <b>налаштуваннях</b> .",
   "Nothing matches “{text}”.": "Нічого не знайдено за запитом «{text}».",
   "Search AI voices": "Пошук ШІ-голосів",
   "Search voices": "Пошук голосів",
@@ -4382,5 +4381,18 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun вимикає шумовий фільтр Discord, щоб ваші звуки не були обрізані.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun вимикає шумовий фільтр Discord, а потім показує, який мікрофон вибрати.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "Потім виберіть {mic} своїм мікрофоном у Discord: Bun покаже вам, де.",
-  "What does Bun change in Discord?": "Що Bun змінює в Discord?"
+  "What does Bun change in Discord?": "Що Bun змінює в Discord?",
+  "A few handy switches": "Кілька зручних перемикачів",
+  "All optional: the way it is works fine.<br>Change any of it later in <b>Settings</b>.": "Усе за бажанням: і так усе працює.<br>Змінити можна пізніше в <b>Налаштуваннях</b>.",
+  "For a phone hotspot, capped plan or slow internet: smaller downloads, lower-bitrate radio, more patience with stations that cut out, and no pictures in web search results.": "Для телефонної точки доступу, обмеженого тарифного плану або повільного Інтернету: менші завантаження, радіо з нижчим бітрейтом, більше терпіння до станцій, які виключаються, і відсутність зображень у результатах веб-пошуку.",
+  "How Onion Board starts and runs.": "Як Onion Board запускається і працює.",
+  "Internet": "Інтернет",
+  "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…).": "Взагалі нічого не виходить в Інтернет, і все, що потребує Інтернету, приховано (вкладка «Радіо», веб-пошук, завантаження, оновлення…).",
+  "On a hotspot, a capped plan or no internet?": "Роздаєш з телефона, лімітний тариф чи без інтернету?",
+  "Pick a look and your language.<br>Change either later in <b>Settings</b>.": "Вибери вигляд і мову.<br>Змінити можна пізніше в <b>Налаштуваннях</b>.",
+  "This PC": "Цей ПК",
+  "Using Discord for voice chat?": "Користуєшся Discord для голосового чату?",
+  "Voice is on. Tick more to add them to the side.": "Голос увімкнено. Познач ще, щоб додати їх збоку.",
+  "What does Offline mode change?": "Що змінює офлайн-режим?",
+  "What does Use less data change?": "Що змінює «Менше даних»?"
 }

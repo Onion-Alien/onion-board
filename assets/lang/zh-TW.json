@@ -4222,7 +4222,6 @@
   "Lite mode (suggested for this PC)": "Lite 模式（建議用於此 PC）",
   "Set up Discord for me": "為我設定 Discord",
   "Start with Windows": "從 Windows 開始",
-  "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "勾選您想要的選項卡並選擇查看。<br>不確定選項卡的作用是什麼？點選其 ⓘ。稍後在<b>“設定”</b>中更改其中任何一項。",
   "Nothing matches “{text}”.": "沒有符合「{text}」的結果。",
   "Search AI voices": "搜尋 AI 語音",
   "Search voices": "搜尋語音",
@@ -4234,5 +4233,18 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun 會關閉 Discord 的噪音過濾器，這樣您的聲音就不會被切斷。",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun 會關閉 Discord 的噪音過濾器，然後向您顯示要選擇的麥克風。",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "然後在 Discord 中選擇{mic}作為您的麥克風：Bun 會告訴您位置。",
-  "What does Bun change in Discord?": "Bun 在 Discord 中發生了什麼變化？"
+  "What does Bun change in Discord?": "Bun 在 Discord 中發生了什麼變化？",
+  "A few handy switches": "幾個實用開關",
+  "All optional: the way it is works fine.<br>Change any of it later in <b>Settings</b>.": "全是選用的：維持現狀也能正常使用。<br>之後隨時在<b>設定</b>中更改。",
+  "For a phone hotspot, capped plan or slow internet: smaller downloads, lower-bitrate radio, more patience with stations that cut out, and no pictures in web search results.": "適合手機熱點、有流量上限的方案或慢速網路：更小的下載、更低位元率的電台、對會斷線的電台更有耐心，網頁搜尋結果也不顯示圖片。",
+  "How Onion Board starts and runs.": "Onion Board 如何啟動和執行。",
+  "Internet": "網路",
+  "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…).": "根本沒有任何東西可以上網，所有需要網路的東西都被隱藏了（廣播標籤、網路搜尋、下載、更新…）。",
+  "On a hotspot, a capped plan or no internet?": "用熱點、有上限的方案或沒有網路？",
+  "Pick a look and your language.<br>Change either later in <b>Settings</b>.": "選一個外觀和你的語言。<br>之後可在<b>設定</b>中更改。",
+  "This PC": "這台電腦",
+  "Using Discord for voice chat?": "用 Discord 語音聊天嗎？",
+  "Voice is on. Tick more to add them to the side.": "語音已開啟。勾選更多以加到側邊。",
+  "What does Offline mode change?": "離線模式會改變什麼？",
+  "What does Use less data change?": "節省流量會改變什麼？"
 }

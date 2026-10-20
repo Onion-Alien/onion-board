@@ -4222,7 +4222,6 @@
   "Lite mode (suggested for this PC)": "Mode ringan (disarankan untuk PC ini)",
   "Set up Discord for me": "Siapkan Discord untuk saya",
   "Start with Windows": "Mulailah dengan Windows",
-  "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "Centang tab yang Anda inginkan dan pilih tampilan.<br> Tidak yakin apa fungsi tab? Klik ⓘ-nya. Ubah semua itu nanti di <b>Pengaturan</b> .",
   "Nothing matches “{text}”.": "Tidak ada yang cocok dengan “{text}”.",
   "Search AI voices": "Cari suara AI",
   "Search voices": "Cari suara",
@@ -4234,5 +4233,18 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun matikan filter suara Discord agar suaramu tidak terpotong.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun mematikan filter kebisingan Discord, lalu menunjukkan mikrofon mana yang harus dipilih.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "Lalu pilih {mic} sebagai mikrofon Anda di Discord: Bun menunjukkan tempatnya.",
-  "What does Bun change in Discord?": "Apa yang Bun ubah di Discord?"
+  "What does Bun change in Discord?": "Apa yang Bun ubah di Discord?",
+  "A few handy switches": "Beberapa sakelar praktis",
+  "All optional: the way it is works fine.<br>Change any of it later in <b>Settings</b>.": "Semua opsional: begini pun sudah berjalan baik.<br>Ubah kapan saja nanti di <b>Pengaturan</b>.",
+  "For a phone hotspot, capped plan or slow internet: smaller downloads, lower-bitrate radio, more patience with stations that cut out, and no pictures in web search results.": "Untuk hotspot telepon, paket terbatas, atau internet lambat: unduhan lebih kecil, bitrate radio lebih rendah, lebih sabar dengan stasiun yang terputus, dan tidak ada gambar di hasil penelusuran web.",
+  "How Onion Board starts and runs.": "Cara Onion Board dimulai dan berjalan.",
+  "Internet": "Internet",
+  "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…).": "Tidak ada yang online sama sekali, dan semua yang memerlukan internet disembunyikan (tab Radio, pencarian web, download, pembaruan…).",
+  "On a hotspot, a capped plan or no internet?": "Pakai hotspot, paket terbatas, atau tanpa internet?",
+  "Pick a look and your language.<br>Change either later in <b>Settings</b>.": "Pilih tampilan dan bahasamu.<br>Ubah keduanya nanti di <b>Pengaturan</b>.",
+  "This PC": "PC ini",
+  "Using Discord for voice chat?": "Pakai Discord untuk obrolan suara?",
+  "Voice is on. Tick more to add them to the side.": "Vokal sudah aktif. Centang lagi untuk menambahkannya di samping.",
+  "What does Offline mode change?": "Apa yang diubah mode offline?",
+  "What does Use less data change?": "Apa yang diubah Pakai lebih sedikit data?"
 }

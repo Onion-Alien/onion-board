@@ -4296,7 +4296,6 @@
   "Lite mode (suggested for this PC)": "Modalità Lite (consigliata per questo PC)",
   "Set up Discord for me": "Configura Discord per me",
   "Start with Windows": "Inizia con Windows",
-  "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "Seleziona le schede che desideri e dai un'occhiata.<br> Non sei sicuro di cosa fa una scheda? Fare clic su ⓘ. Modificalo in un secondo momento in <b>Impostazioni</b> .",
   "Nothing matches “{text}”.": "Nessun risultato per “{text}”.",
   "Search AI voices": "Cerca voci IA",
   "Search voices": "Cerca voci",
@@ -4308,5 +4307,18 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun disattiva il filtro antirumore di Discord in modo che i tuoi suoni non vengano interrotti.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun disattiva il filtro antirumore di Discord, quindi ti mostra quale microfono scegliere.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "Quindi scegli {mic} come microfono in Discord: Bun ti mostra dove.",
-  "What does Bun change in Discord?": "Cosa cambia Bun in Discord?"
+  "What does Bun change in Discord?": "Cosa cambia Bun in Discord?",
+  "A few handy switches": "Qualche interruttore utile",
+  "All optional: the way it is works fine.<br>Change any of it later in <b>Settings</b>.": "Tutto facoltativo: così com'è funziona bene.<br>Cambia tutto più tardi in <b>Impostazioni</b>.",
+  "For a phone hotspot, capped plan or slow internet: smaller downloads, lower-bitrate radio, more patience with stations that cut out, and no pictures in web search results.": "Per un hotspot telefonico, un piano limitato o una connessione Internet lenta: download più piccoli, radio con bitrate inferiore, più pazienza con le stazioni che si interrompono e nessuna immagine nei risultati di ricerca web.",
+  "How Onion Board starts and runs.": "Come Onion Board si avvia e funziona.",
+  "Internet": "Internet",
+  "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…).": "Niente va online e tutto ciò che necessita di Internet viene nascosto (la scheda Radio, la ricerca web, i download, gli aggiornamenti...).",
+  "On a hotspot, a capped plan or no internet?": "Su hotspot, piano limitato o senza internet?",
+  "Pick a look and your language.<br>Change either later in <b>Settings</b>.": "Scegli un aspetto e la tua lingua.<br>Cambiali più tardi in <b>Impostazioni</b>.",
+  "This PC": "Questo PC",
+  "Using Discord for voice chat?": "Usi Discord per la chat vocale?",
+  "Voice is on. Tick more to add them to the side.": "Voce è attiva. Spunta le altre per aggiungerle a lato.",
+  "What does Offline mode change?": "Cosa cambia la modalità offline?",
+  "What does Use less data change?": "Cosa cambia Usa meno dati?"
 }

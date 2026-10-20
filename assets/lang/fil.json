@@ -4296,7 +4296,6 @@
   "Lite mode (suggested for this PC)": "Lite mode (iminumungkahi para sa PC na ito)",
   "Set up Discord for me": "I-set up ang Discord para sa akin",
   "Start with Windows": "Magsimula sa Windows",
-  "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "Lagyan ng tsek ang mga tab na gusto mo at pumili ng hitsura.<br> Hindi sigurado kung ano ang ginagawa ng tab? I-click ang ⓘ. Baguhin ang alinman sa mga ito sa ibang pagkakataon sa <b>Mga Setting</b> .",
   "Nothing matches “{text}”.": "Walang tumugma sa “{text}”.",
   "Search AI voices": "Maghanap ng mga AI voice",
   "Search voices": "Maghanap ng mga voice",
@@ -4308,5 +4307,18 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Ino-off ng Bun ang noise filter ng Discord para hindi maputol ang iyong mga tunog.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Ino-off ng Bun ang noise filter ng Discord, pagkatapos ay ipapakita sa iyo kung aling mikropono ang pipiliin.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "Pagkatapos ay piliin ang {mic} bilang iyong mikropono sa Discord: Ipinapakita sa iyo ng Bun kung saan.",
-  "What does Bun change in Discord?": "Ano ang binabago ng Bun sa Discord?"
+  "What does Bun change in Discord?": "Ano ang binabago ng Bun sa Discord?",
+  "A few handy switches": "Ilang madaling switch",
+  "All optional: the way it is works fine.<br>Change any of it later in <b>Settings</b>.": "Opsyonal lahat: maayos na ito kahit ganito lang.<br>Palitan ang alinman mamaya sa <b>Settings</b>.",
+  "For a phone hotspot, capped plan or slow internet: smaller downloads, lower-bitrate radio, more patience with stations that cut out, and no pictures in web search results.": "Para sa phone hotspot, limitadong plan o mabagal na internet: mas maliliit na download, mas mababang bitrate ng radio, mas mahabang pasensya sa mga station na napuputol, at walang larawan sa web search results.",
+  "How Onion Board starts and runs.": "Paano nagsisimula at tumatakbo ang Onion Board.",
+  "Internet": "Internet",
+  "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…).": "Walang nag-o-online, at lahat ng nangangailangan ng internet ay nakatago (ang tab ng Radyo, paghahanap sa web, pag-download, pag-update…).",
+  "On a hotspot, a capped plan or no internet?": "Naka-hotspot, may limit na plan o walang internet?",
+  "Pick a look and your language.<br>Change either later in <b>Settings</b>.": "Pumili ng itsura at ng iyong wika.<br>Palitan ang alinman mamaya sa <b>Settings</b>.",
+  "This PC": "Itong PC",
+  "Using Discord for voice chat?": "Gamit mo ba ang Discord sa voice chat?",
+  "Voice is on. Tick more to add them to the side.": "Naka-on ang Voice. Mag-tsek pa para idagdag sila sa gilid.",
+  "What does Offline mode change?": "Ano ang binabago ng Offline mode?",
+  "What does Use less data change?": "Ano ang binabago ng Gumamit ng mas kaunting data?"
 }
