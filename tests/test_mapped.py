@@ -172,6 +172,43 @@ def test_a_long_sound_playing_keeps_its_next_minutes_asked_for(app_dir, map_all,
     assert not e._ahead_on
 
 
+def test_the_read_ahead_goes_on_when_its_sleep_fails(app_dir, map_all, monkeypatch):
+    """time.sleep raising OSError (Windows' timer) used to end the thread for good, and
+    with _ahead_on left set it was never started again: a long song's later minutes
+    were read by the audio thread itself."""
+    import types
+
+    from soundboard.audio import engine as E
+
+    def sleep(_s):
+        raise OSError("timer")
+
+    clock = types.SimpleNamespace(**{k: getattr(time, k) for k in dir(time)
+                                     if not k.startswith("_")})
+    clock.sleep = sleep
+    store_cached("long", song(3.0))
+    d = load_cached("long")
+    asked = []
+    monkeypatch.setattr(mapped, "prefetch", lambda a, frame=0, *_a, **_k: asked.append(frame))
+    monkeypatch.setattr(mapped, "AHEAD_S", 1.0)
+    monkeypatch.setattr(E, "READ_AHEAD_EVERY_S", 0.01)
+    monkeypatch.setattr(E, "time", clock)
+    e = engine_with("main")
+    v = e.play("long", d, 1.0)
+    deadline = time.monotonic() + 5
+    while 0 not in asked and time.monotonic() < deadline:
+        time.sleep(0.01)
+    v.pos["main"] = 2 * SR                     # the next round, after a failed sleep
+    while 2 * SR not in asked and time.monotonic() < deadline:
+        time.sleep(0.01)
+    assert 2 * SR in asked
+    e.stop_all()
+    v.done.add("main")
+    while e._ahead_on and time.monotonic() < deadline:
+        time.sleep(0.01)
+    assert not e._ahead_on
+
+
 def test_a_very_long_sound_is_never_copied_at_another_rate(app_dir, map_all, monkeypatch):
     """It plays read at the device's rate: a 2-hour song's copy took 17 s and 1.2 GB."""
     from soundboard.audio import engine as E

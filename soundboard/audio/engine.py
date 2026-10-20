@@ -749,7 +749,10 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
                         asked[key] = (p, p + span)
             asked = {k: asked[k] for k in keys}
             eng = live = v = d = None   # (let go of them while it sleeps)
-            time.sleep(READ_AHEAD_EVERY_S)
+            try:
+                time.sleep(READ_AHEAD_EVERY_S)
+            except OSError:   # Windows' high-resolution timer can fail: a coarser wait
+                threading.Event().wait(READ_AHEAD_EVERY_S)
 
     def stop(self, sid: str):
         with self.lock:
