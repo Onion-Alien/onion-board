@@ -92,7 +92,9 @@ def control_png(kind: str, on: bool, size: int = SIZE) -> bytes:
 def _card(meta: SoundMeta, lit: bool, size: int,
           foot: str | None = None) -> tuple[QPixmap, str]:
     """The card as a pixmap, and its name as drawn (on two lines: a newline in it)."""
+    from soundboard.control import midi
     from soundboard.ui.kit import widgets
+    from soundboard.ui.kit.hotkeypick import pretty_key
 
     class KeyPad(widgets.Pad):
         def devicePixelRatioF(self):   # its picture is fitted at the key's pixels, not
@@ -105,7 +107,21 @@ def _card(meta: SoundMeta, lit: bool, size: int,
 
         def _footer(self, room: QRectF, name_font):
             f, right, badge = super()._footer(room, name_font)
-            return (f, right, badge) if foot is None else (f, foot, None)
+            if foot is not None:
+                return f, foot, None
+            if badge is None and self.meta.hotkey:
+                # the board drops a badge wider than 68 % of the footer, and a key is
+                # always 96 wide: "Ctrl+Alt+7" never showed. The key's hotkey goes over
+                # its length instead, when the two don't fit side by side
+                m = self.meta.hotkey
+                hk = midi.short(m) if midi.is_midi(m) else pretty_key(m)
+                fm = QFontMetrics(f)
+                w = fm.horizontalAdvance(hk) + 12
+                if w <= room.width():
+                    badge = (hk, w)
+                    if w + 6 + fm.horizontalAdvance(right) > room.width():
+                        right = ""
+            return f, right, badge
 
     pad = KeyPad(meta, CARD)
     pad.shown = meta.name
