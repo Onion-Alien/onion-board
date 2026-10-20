@@ -17,7 +17,9 @@ or another window (a menu, a file picker, a dialog the ring's button opened).
 Something going wrong stops it at once, so nobody is held on a thing that doesn't
 work (a station that won't play, a search that can't get through): an "error" or
 "warn" card (toast.PROBLEM_HOOKS), an error logged anywhere in the app, or a step's own
-`failed()`. The card then turns red, Bun goes sad, and it says what didn't work (the
+`failed()`. Not the mic effect's: its set-up and repair run beside the tour and say what
+went wrong in their own card and on the Setup tab (a mic problem read as "the tour
+broke"). The card then turns red, Bun goes sad, and it says what didn't work (the
 step's `oops`) and what to do (oops.py): Try again (the step once more; its `retry()`
 redoes what failed), close and reopen the app, or Report a problem. The window isn't
 held meanwhile (no dimming, clicks go through); Close ends the tour ("failed").
@@ -67,6 +69,9 @@ ARROW = 9            # the arrow's half width at the card's edge
 RETRY_MS = 1500      # after Try again, a step's own failed() isn't asked this long
 
 _running: list[Tour] = []
+# errors logged by these aren't the tour's: the mic effect and the mic helper, which say
+# so themselves (miccontrol's cards, the Setup tab)
+ASIDE_LOGS = ("soundboard.mic.", "soundboard.ui.window.miccontrol")
 
 
 def abort(_kind: str = ""):
@@ -87,7 +92,8 @@ class _Errors(logging.Handler):
         self.seen = False
 
     def emit(self, record):
-        if not record.name.startswith(__name__):   # (its own log lines aren't news)
+        # its own log lines aren't news, and the mic effect's speak for themselves
+        if not record.name.startswith((__name__, *ASIDE_LOGS)):
             self.seen = True
 
 

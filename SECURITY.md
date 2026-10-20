@@ -244,8 +244,11 @@ account or anything else about you.
     `no-start`, `stuck`, `silent`, `no-helper`, `no-mic`, `no-mic-off` (unplugged or
     switched off), `no-mic-unsure` (two mics with names alike), `no-mic-gone` (not known
     to Windows), `no-effect`, the admin step's
-    exit code as `code-1` to `code-6`, or `code-other`): never the message or the mic's
-    name; Settings' *Audio recovery* (`used/recovery-repair`, `recovery-remove`… and
+    exit code as `code-1` to `code-6`, or `code-other`), and for exit code 1 which part
+    of the admin step stopped and what Windows said, as words read from its log
+    (`mic-effect-code-1-at-<part>`: `register`, `mic-settings`, `ring`, `files`, `audio`,
+    `rights`, `other`; `mic-effect-code-1-<what>`: `denied`, `in-use`, `missing`,
+    `other`): never the message or the mic's name; Settings' *Audio recovery* (`used/recovery-repair`, `recovery-remove`… and
     `recovery-failed`);
   - Onion Board's own update cancelled, failing to download or to start, its *Copy
     error*, *Later*, one that didn't finish, one installing itself as the app started

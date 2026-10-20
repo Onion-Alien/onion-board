@@ -28,6 +28,13 @@ HOST = BUILD / "testhost.exe"
 DLL = BUILD / "obmic.dll"
 
 
+@pytest.fixture(autouse=True)
+def _no_windows_mics(monkeypatch):
+    """mic_lookup's last try asks Windows for its mics: none here (the tests' made-up
+    mics would otherwise meet this PC's real ones)."""
+    monkeypatch.setattr(dm, "_windows_mics", lambda: [])
+
+
 @pytest.fixture
 def ring_file(tmp_path):
     d = tmp_path / "OnionBoard" / "MicPlugin"
@@ -2707,6 +2714,30 @@ def test_why_a_set_up_failed_is_counted_as_its_word(window, monkeypatch, auto, c
     assert not w.micctl._mic_fail_kind   # used once
 
 
+def test_a_set_up_that_raised_counts_where_and_offers_the_cable(window, monkeypatch,  # noqa: F811
+                                                                  tmp_path):
+    """Exit code 1 (only Windows 10 PCs so far, the same failure on every try): where in
+    the admin step and what Windows said are counted from its log, and the error card
+    has the cable one click away (new users who only got "Try again" uninstalled)."""
+    from soundboard.core import usage
+    w = window
+    _routes(w, monkeypatch, "missing")
+    monkeypatch.setattr(usage, "enabled", lambda: True)
+    monkeypatch.setattr(usage, "_used", set())
+    told = []
+    monkeypatch.setattr(w, "tell", lambda *a, **k: told.append(k))
+    monkeypatch.setattr(dm, "endpoint_for", lambda name: GUID)
+    monkeypatch.setattr(dm, "bundled_dll", lambda: Path(dm.__file__))   # (any file)
+    monkeypatch.setattr(dm, "_elevated", lambda *a, **k: 1)
+    monkeypatch.setattr(dm, "raised_why", lambda: ("mic-settings", "denied"))
+    w.micctl._mic_attached(*w.micctl._attach_mic_work("My mic"))
+    assert {"mic-effect-failed-code-1", "mic-effect-code-1-at-mic-settings",
+            "mic-effect-code-1-denied"} <= usage._used
+    (kw,) = told
+    assert kw["aside"] and kw["action"][0] == "Use the cable"
+    assert w.micctl._raised is None   # used once
+
+
 def _fake_shell(monkeypatch, started: bool, error: int = 0, wait: int = 0, code: int = 0):
     """run_elevated's Windows calls: ShellExecuteExW `started` (else failing with
     `error`), WaitForSingleObject giving `wait`, the exit code `code`."""
@@ -3182,7 +3213,7 @@ def test_a_removed_cable_is_never_sent_to(window, monkeypatch):  # noqa: F811
 
 def _toasts(w, monkeypatch):
     said = []
-    monkeypatch.setattr(w, "toast", lambda text, kind="": said.append(text))
+    monkeypatch.setattr(w, "toast", lambda text, kind="", *a, **k: said.append(text))
     return said
 
 
@@ -4092,3 +4123,46 @@ def test_the_mic_box_flashes_when_it_starts_working(window, monkeypatch):  # noq
     assert not reveal.shown(w.mic_voice)   # folding away
     w.statusctl._update_flow()   # the once-a-second redraw: no second flash
     assert len(w.mic_status.findChildren(reveal._Flash)) == 1
+
+
+def test_a_mic_the_registry_names_differently_is_found_by_asking_windows(monkeypatch):
+    # new users' first set-up said Windows didn't know the mic they had just picked
+    # (no-mic-gone): the registry's copy of its name didn't match the app's list
+    mics = [{"guid": "{a}", "name": "Microphone (Realtek Audio)", "active": True}]
+    monkeypatch.setattr(dm, "capture_endpoints", lambda: mics)
+    monkeypatch.setattr(dm, "_engine_name", lambda name: None)
+    monkeypatch.setattr(dm, "_windows_mics", lambda: [
+        ("{a}", "Microphone (Realtek Audio)"), ("{b}", "Headset Mic (Arctis Nova)")])
+    assert dm.mic_lookup("Headset Mic (Arctis Nova)") == ("{b}", "")
+    assert dm.mic_lookup("Nothing (Like It)") == (None, "gone")
+    # two by that name: either could be it, so neither
+    monkeypatch.setattr(dm, "_windows_mics", lambda: [
+        ("{b}", "Headset Mic (Arctis Nova)"), ("{c}", "Headset Mic (Arctis Nova)")])
+    assert dm.mic_lookup("Headset Mic (Arctis Nova)") == (None, "gone")
+
+
+def test_why_the_admin_step_raised_is_read_from_its_log(tmp_path):
+    log_file = tmp_path / "directmic-admin.log"
+    assert dm.raised_why(log_file) == ("other", "other")   # no log
+    log_file.write_text(
+        "2026-10-20 mic effect install failed\n"
+        "Traceback (most recent call last):\n"
+        '  File "x/directmic.py", line 2010, in _try_put_on\n'
+        "    return _put_on(guid, slot, dll)\n"
+        '  File "x/directmic.py", line 1990, in _put_on\n'
+        "    _register_com(target)\n"
+        '  File "x/directmic.py", line 1500, in _register_com\n'
+        "    with winreg.CreateKeyEx(...) as k:\n"
+        "PermissionError: [WinError 5] Access is denied\n", encoding="utf-8")
+    assert dm.raised_why(log_file) == ("register", "denied")
+    with open(log_file, "a", encoding="utf-8") as f:   # the last one counts
+        f.write("Traceback (most recent call last):\n"
+                '  File "x/directmic.py", line 1990, in _put_on\n'
+                "    os.replace(tmp, target)\n"
+                "OSError: [WinError 32] The process cannot access the file\n")
+    assert dm.raised_why(log_file) == ("files", "in-use")
+
+
+def test_every_admin_step_failure_word_can_be_counted():
+    from soundboard.core import usage
+    assert {f"at-{w}" for w in dm.RAISED_WHERE} | set(dm.RAISED_WHAT) == set(usage.MIC_RAISED)

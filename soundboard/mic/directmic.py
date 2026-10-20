@@ -863,6 +863,15 @@ def mic_lookup(name: str | None) -> tuple[str | None, str]:
     same = [e for e in active if _unnumbered(e["name"]) == _unnumbered(name)]
     if len(same) == 1:
         return same[0]["guid"], ""
+    # Windows itself, asked now: the registry's copy of a mic's name or state can
+    # disagree with what Windows (and so the app's mic list) says. New users' first
+    # set-up said it didn't know the mic they had just picked (no-mic-gone)
+    live = [{"guid": g, "name": n} for g, n in _windows_mics()]
+    for want in dict.fromkeys(n for n in (name, opened) if n):
+        exact = [e for e in live if _squash(e["name"]) == _squash(want)]
+        if len(exact) == 1:
+            log.info("mic found by asking Windows (not in the registry's list)")
+            return exact[0]["guid"], ""
     if len(_near(name, active)) > 1:
         return None, "unsure"
     others = [e for e in endpoints if not e["active"]]
@@ -886,6 +895,17 @@ def fallback_mic(name: str | None) -> str | None:
     if not other or other == name or engine.is_virtual(other):
         return None
     return other if endpoint_for(other) is not None else None
+
+
+def _windows_mics() -> list[tuple[str, str]]:
+    """appaudio.capture_mics(): [(endpoint GUID, name)] of the mics Windows has on now
+    ([] if it can't be asked)."""
+    try:
+        from soundboard.audio import appaudio
+        return appaudio.capture_mics() or []
+    except Exception:  # noqa: BLE001 - only a last try: the registry's answer stands
+        log.debug("asking Windows for its mics failed", exc_info=True)
+        return []
 
 
 def _engine_name(name: str) -> str | None:
@@ -2572,6 +2592,45 @@ class Failure(str):
         self = super().__new__(cls, text)
         self.kind = kind
         return self
+
+
+# exit code 1 (the admin step raised): which part of it, by the deepest of these in the
+# admin log's last traceback, and what Windows said (RAISED_WHAT). Counted as these
+# fixed words (usage MIC_RAISED), never the log's text. Only Windows 10 PCs failed so
+RAISED_AT = {"_register_com": "register", "_install_endpoint": "mic-settings",
+             "_uninstall_endpoint": "mic-settings", "_strip_endpoint": "mic-settings",
+             "_make_ring": "ring", "secure_data_dirs": "ring", "_put_on": "files",
+             "_audio_service": "audio", "_audio_off": "audio",
+             "_enable_privileges": "rights"}
+RAISED_WHERE = (*dict.fromkeys(RAISED_AT.values()), "other")
+RAISED_WHAT = ("denied", "in-use", "missing", "other")
+
+
+def raised_why(log_path: Path | None = None) -> tuple[str, str]:
+    """(where, what) the admin step's last exception was, from the tail of its log
+    (users may read it): RAISED_WHERE and RAISED_WHAT words, ("other", "other") when
+    the log can't tell."""
+    path = log_path or data_dir().parent / "directmic-admin.log"
+    try:
+        with open(path, "rb") as f:
+            f.seek(0, os.SEEK_END)
+            f.seek(max(0, f.tell() - 64 * 1024))
+            tail = f.read().decode("utf-8", "replace")
+    except OSError:
+        return "other", "other"
+    start = tail.rfind("Traceback (most recent call last):")
+    if start < 0:
+        return "other", "other"
+    lines = tail[start:].splitlines()[1:]
+    funcs = [m.group(1) for m in map(re.compile(r'\s*File ".*", line \d+, in (\S+)').match,
+                                     lines) if m]
+    where = next((RAISED_AT[f] for f in reversed(funcs) if f in RAISED_AT), "other")
+    last = next((s for s in lines if s and not s[0].isspace()), "")
+    what = ("denied" if re.match(r"PermissionError|.*\[(WinError 5|Errno 13)\]", last) else
+            "in-use" if re.match(r".*\[WinError (32|33)\]", last) else
+            "missing" if re.match(r"FileNotFoundError|.*\[WinError [23]\]", last) else
+            "other")
+    return where, what
 
 
 def fail_kind(err: str) -> str:

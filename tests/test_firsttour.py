@@ -246,3 +246,21 @@ def test_an_error_card_ends_it(window, counted):
     assert tour.failing and firsttour._current is tour
     tour.end("failed")   # Close
     assert firsttour._current is None and "tour-failed" in counted
+
+
+def test_a_mic_effect_problem_doesnt_end_it(window, counted, qapp):
+    # both people whose first tour "failed" had the mic effect fail at the same moment
+    # (and uninstalled): the mic's own card says what's wrong, the tour carries on
+    import logging
+    from soundboard.ui.kit import busy
+    firsttour.start(window)
+    tour = firsttour._current
+    busy.toast(window, "Couldn't put Onion Board on your mic", "error", aside=True)
+    logging.getLogger("soundboard.mic.directmic").error("the admin step failed")
+    logging.getLogger("soundboard.ui.window.miccontrol").error("not put on the mic")
+    spin(qapp, coach.TICK_MS * 3 / 1000)
+    assert not tour.failing and firsttour._current is tour
+    logging.getLogger("soundboard.sounds.library").error("something on the board broke")
+    spin(qapp, coach.TICK_MS * 3 / 1000)
+    assert tour.failing   # anything else still stops it
+    tour.end("failed")
