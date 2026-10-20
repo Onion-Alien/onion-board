@@ -330,6 +330,10 @@ QFrame#toast QPushButton#toastclose:hover { background:$btn_hover; }
 QFrame#chip { background:$panel; border:1px solid transparent; border-radius:14px; }
 QFrame#chip[sel="true"] { border-color:$accent; }
 QFrame#chip QPushButton { background:transparent; border:none; padding:2px 6px; }
+QPushButton#upnextchip { background:$panel; border:1px solid transparent; border-radius:14px;
+    padding:0; }
+QPushButton#upnextchip:hover { background:$btn_hover; }
+QPushButton#upnextchip:focus { border-color:$accent; }
 QFrame#chip QPushButton#chipname { font-weight:600; }
 QFrame#chip QPushButton#chipstop { border-radius:12px; padding:0; }
 QFrame#chip QPushButton#chipstop:hover { background:$danger_bg; }
@@ -1166,28 +1170,61 @@ def _recolour_inline(widgets, old: dict[str, str]) -> None:
             pass
 
 
-def _style_when_shown(app) -> None:
+def _style_when_shown(app) -> list:
     """Leave the app's closed windows (Edit voice, Live controls, a menu: a few hundred
     widgets never shown yet) out of the next restyle: Qt restyles only the widgets it
     has polished, and a widget not polished is polished in the sheet of the day when
     it's shown. A third of a theme switch, which froze the app on slower PCs. Only
-    windows with an owner: the main window hidden in the tray restyles as before."""
+    windows with an owner: the main window hidden in the tray restyles as before.
+    Returns the widgets in them with a sheet of their own (_own_sheets_again)."""
     from PySide6.QtWidgets import QWidget
     polished = Qt.WidgetAttribute.WA_WState_Polished
+    own = []
     for top in app.topLevelWidgets():
         if top.isVisible() or top.parentWidget() is None:
             continue
+        # one under an owner with its own sheet (Live controls' button, lit) takes
+        # its style from there, so it counts as having one
+        inherits = any(p.styleSheet() for p in _owners(top))
         for w in (top, *top.findChildren(QWidget)):
             w.setAttribute(polished, False)
+            if w.styleSheet() or (inherits and w is top):
+                own.append(w)
+    return own
+
+
+def _owners(w):
+    p = w.parentWidget()
+    while p is not None:
+        yield p
+        p = p.parentWidget()
+
+
+def _own_sheets_again(own: list) -> None:
+    """A widget with its own sheet (and all under it) keeps a style of its own, made
+    from the app sheet of the day it was set: skipped by the restyle, it stayed on the
+    plain one the restyle clears to first, so a closed Live controls opened with bare
+    Windows sliders and boxes until a change re-set its button's sheet. Setting each
+    sheet again makes those styles anew from the new app sheet (cheap while they're
+    not polished: nothing is polished until it's shown)."""
+    for w in own:
+        try:
+            sheet = w.styleSheet()
+            w.setStyleSheet("" if sheet else " ")
+            w.setStyleSheet(sheet)
+        except RuntimeError:   # being deleted
+            pass
 
 
 def _restyle(app, css: str) -> None:
-    _style_when_shown(app)
+    own = _style_when_shown(app)
     # cleared first: Qt swapping one app-wide sheet straight for another re-styles
     # every widget the slow way (3 s against 0.6 s with ~2000 widgets); empty and
     # then the new sheet gives the same look. No paint happens in between.
     app.setStyleSheet("")
     app.setStyleSheet(css)
+    if css:
+        _own_sheets_again(own)
 
 
 @contextmanager

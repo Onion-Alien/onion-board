@@ -959,7 +959,6 @@
   "Since start: {dropouts}, {reconnects}.": "Käynnistyksen jälkeen: {dropouts}, {reconnects}.",
   "Site": "Sivusto",
   "Size": "Koko",
-  "Skip for now  →": "Ohita toistaiseksi  →",
   "Skip this version": "Ohita tämä versio",
   "Slow or patchy connection": "Hidas tai pätkivä yhteys",
   "Snowflake": "Snowflake",
@@ -1492,7 +1491,6 @@
   "❚❚ paused": "❚❚ keskeytetty",
   "⟲  Restart my PC now": "⟲ Käynnistä tietokoneeni uudelleen nyt",
   "⟳  Check again": "⟳ Tarkista uudelleen",
-  "⬇  Install it now (free)": "⬇ Asenna se nyt (ilmainen)",
   "⬇  Try installing again": "⬇ Yritä asentaa uudelleen",
   "(didn't say)": "(ei sanonut)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
@@ -4345,5 +4343,15 @@
     "{n} odottaa",
     "{n} odottaa"
   ],
-  "its file is gone (it was at {path})": "sen tiedosto on poissa (se oli kohteessa {path})"
+  "its file is gone (it was at {path})": "sen tiedosto on poissa (se oli kohteessa {path})",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Ilmainen virtuaalikaapeli VB-Audiolta. Se vie noin minuutin, ja Windows kysyy kerran, sopiiko se. Sen jälkeen valitset sen mikrofoniksi Discordissa ja peleissä.",
+  "Install the cable": "Asenna kaapeli",
+  "Not set up yet: only you will hear your sounds.": "Ei vielä käytössä: vain sinä kuulet äänesi.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Käytössä nyt: <b>{theme}</b>. Lisää teemoja asetuksissa: {n}",
+  "Exact volume of {name}": "Ohjelman {name} tarkka äänenvoimakkuus",
+  "Volume of {name}": "Ohjelman {name} äänenvoimakkuus",
+  "{n} sound is back.": [
+    "{n} ääni palasi.",
+    "{n} ääntä palasi."
+  ]
 }

@@ -1100,7 +1100,6 @@
   "Since start: {dropouts}, {reconnects}.": "启动以来：{dropouts}，{reconnects}。",
   "Site": "网站",
   "Size": "大小",
-  "Skip for now  →": "暂时跳过  →",
   "Slow or patchy connection": "网速慢或不稳定",
   "Snowflake": "Snowflake",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "“最近删除”里的部分内容无法恢复：它们保留在这个还原点里。",
@@ -1454,7 +1453,6 @@
   "❚❚ paused": "❚❚ 已暂停",
   "⟲  Restart my PC now": "⟲  立即重启我的电脑",
   "⟳  Check again": "⟳  再检查一次",
-  "⬇  Install it now (free)": "⬇  立即安装（免费）",
   "⬇  Try installing again": "⬇  再试一次安装",
   "The Discord is where to chat, ask for help and hear about new versions. The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "在 Discord 里可以聊天、求助，还能第一时间知道新版本。反馈表单不需要账号。发现了安全问题？请在 GitHub 上私下报告，不要发在公开的 issue 里。",
   "Join the Discord": "加入 Discord",
@@ -4270,5 +4268,14 @@
   "{n} waiting": [
     "{n} 个等待中"
   ],
-  "its file is gone (it was at {path})": "它的文件不见了（原来在 {path}）"
+  "its file is gone (it was at {path})": "它的文件不见了（原来在 {path}）",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "VB-Audio 的免费虚拟音频线。大约一分钟，Windows 会问一次是否允许。之后在 Discord 和游戏里把它选为麦克风。",
+  "Install the cable": "安装音频线",
+  "Not set up yet: only you will hear your sounds.": "还没设置好：只有你自己听得到你的音效。",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "你正在使用 <b>{theme}</b>。设置中还有 {n} 个主题。",
+  "Exact volume of {name}": "{name} 的精确音量",
+  "Volume of {name}": "{name} 的音量",
+  "{n} sound is back.": [
+    "{n} 个音效回来了。"
+  ]
 }

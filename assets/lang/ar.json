@@ -1201,7 +1201,6 @@
   "Since start: {dropouts}, {reconnects}.": "منذ البداية: {dropouts} ، {reconnects} .",
   "Site": "موقع",
   "Size": "مقاس",
-  "Skip for now  →": "تخطي الآن →",
   "Slow or patchy connection": "اتصال بطيء أو غير مكتمل",
   "Snowflake": "ندفة الثلج",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "لا يمكن استعادة بعض العناصر المحذوفة مؤخرًا: يتم الاحتفاظ بها في نقطة الاستعادة هذه.",
@@ -1645,7 +1644,6 @@
   "❚❚ paused": "❚❚ متوقفة",
   "⟲  Restart my PC now": "⟲ أعد تشغيل جهاز الكمبيوتر الخاص بي الآن",
   "⟳  Check again": "⟳ تحقق مرة أخرى",
-  "⬇  Install it now (free)": "⬇ قم بتثبيته الآن (مجانًا)",
   "⬇  Try installing again": "⬇ حاول التثبيت مرة أخرى",
   "Join the Discord": "انضم إلى Discord",
   "Chat about it on Discord": "تحدّث عنه على Discord",
@@ -4645,5 +4643,19 @@
     "{n} ينتظر",
     "{n} ينتظر"
   ],
-  "its file is gone (it was at {path})": "ملفه لم يعد موجودًا (كان في {path})"
+  "its file is gone (it was at {path})": "ملفه لم يعد موجودًا (كان في {path})",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "كابل افتراضي مجاني من VB-Audio. يستغرق دقيقة تقريبًا، ويسألك Windows مرة واحدة إن كان ذلك مناسبًا. بعدها تختاره كميكروفون في Discord والألعاب.",
+  "Install the cable": "ثبّت الكابل",
+  "Not set up yet: only you will hear your sounds.": "لم يُضبط بعد: أنت وحدك ستسمع أصواتك.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "تستخدم الآن <b>{theme}</b>. مظاهر أخرى في الإعدادات: {n}",
+  "Exact volume of {name}": "مستوى صوت {name} بالضبط",
+  "Volume of {name}": "مستوى صوت {name}",
+  "{n} sound is back.": [
+    "عادت {n} أصوات.",
+    "عاد {n} صوت.",
+    "عاد {n} صوتان.",
+    "عادت {n} أصوات.",
+    "عاد {n} صوتًا.",
+    "عاد {n} صوت."
+  ]
 }

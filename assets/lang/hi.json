@@ -1121,7 +1121,6 @@
   "Since start: {dropouts}, {reconnects}.": "प्रारंभ से: {dropouts} , {reconnects} ।",
   "Site": "साइट",
   "Size": "आकार",
-  "Skip for now  →": "अभी के लिए छोड़ें →",
   "Slow or patchy connection": "धीमा या ख़राब कनेक्शन",
   "Snowflake": "हिमपात का एक खंड",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "हाल ही में हटाए गए कुछ को वापस नहीं लाया जा सका: इसे इस पुनर्स्थापना बिंदु में रखा गया है।",
@@ -1493,7 +1492,6 @@
   "❚❚ paused": "❚❚ रुका हुआ",
   "⟲  Restart my PC now": "⟲ अब मेरे पीसी को पुनरारंभ करें",
   "⟳  Check again": "⟳ दोबारा जांचें",
-  "⬇  Install it now (free)": "⬇ इसे अभी इंस्टॉल करें (निःशुल्क)",
   "⬇  Try installing again": "⬇ पुनः स्थापित करने का प्रयास करें",
   "Join the Discord": "Discord से जुड़ें",
   "Chat about it on Discord": "Discord पर इसके बारे में बात करें",
@@ -4345,5 +4343,15 @@
     "{n} इंतज़ार में",
     "{n} इंतज़ार में"
   ],
-  "its file is gone (it was at {path})": "इसकी फ़ाइल नहीं मिली (यह {path} पर थी)"
+  "its file is gone (it was at {path})": "इसकी फ़ाइल नहीं मिली (यह {path} पर थी)",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "VB-Audio का मुफ़्त वर्चुअल केबल। इसमें लगभग एक मिनट लगता है, और Windows एक बार पूछता है कि ठीक है या नहीं। फिर आप इसे Discord और गेम्स में माइक के रूप में चुनते हैं।",
+  "Install the cable": "केबल इंस्टॉल करें",
+  "Not set up yet: only you will hear your sounds.": "अभी सेट नहीं है: आपके साउंड सिर्फ़ आप सुनेंगे।",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "अभी आप <b>{theme}</b> इस्तेमाल कर रहे हैं। सेटिंग्स में {n} और थीम।",
+  "Exact volume of {name}": "{name} का सटीक वॉल्यूम",
+  "Volume of {name}": "{name} का वॉल्यूम",
+  "{n} sound is back.": [
+    "{n} साउंड वापस आ गया।",
+    "{n} साउंड वापस आ गए।"
+  ]
 }

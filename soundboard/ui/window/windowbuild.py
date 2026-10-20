@@ -901,6 +901,8 @@ class WindowBuilder(Controller):
         # has the rest
         fit_placeholder(mw.search, _("Search sounds or paste a link"), _("Search sounds"),
                         _("Search"))
+        # its whole job, whatever hint fits (a narrow window shows only "Search")
+        mw.search.setAccessibleName(_("Search sounds or paste a link"))
         mw._search_tip = _("Type to filter your sounds; Enter searches the web (YouTube, "
                              "TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, "
                              "TikTok, most media sites) to see it, then play or add it")

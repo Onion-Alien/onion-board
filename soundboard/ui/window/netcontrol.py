@@ -66,6 +66,8 @@ class NetControl(Controller):
                             _("Search sounds"), _("Search"))
         else:
             fit_placeholder(mw.search, _("Search your sounds"), _("Search"))
+        mw.search.setAccessibleName(_("Search sounds or paste a link") if online
+                                    else _("Search your sounds"))
         mw.search.setToolTip(mw._search_tip if online else _("Type to filter your sounds"))
         if hasattr(mw, "fitctl"):
             mw.fitctl.search_button_changed()

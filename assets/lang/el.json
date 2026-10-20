@@ -959,7 +959,6 @@
   "Since start: {dropouts}, {reconnects}.": "Από την εκκίνηση: {dropouts}, {reconnects}.",
   "Site": "Σελίδα",
   "Size": "Μέγεθος",
-  "Skip for now  →": "Παράλειψη προς το παρόν  →",
   "Skip this version": "Παράλειψη αυτής της έκδοσης",
   "Slow or patchy connection": "Αργή ή ασταθής σύνδεση",
   "Snowflake": "Snowflake",
@@ -1492,7 +1491,6 @@
   "❚❚ paused": "❚❚ σε παύση",
   "⟲  Restart my PC now": "⟲ Κάντε επανεκκίνηση του υπολογιστή μου τώρα",
   "⟳  Check again": "⟳ Ελέγξτε ξανά",
-  "⬇  Install it now (free)": "⬇ Εγκαταστήστε το τώρα (δωρεάν)",
   "⬇  Try installing again": "⬇ Δοκιμάστε να εγκαταστήσετε ξανά",
   "(didn't say)": "(δεν ειπα)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
@@ -4345,5 +4343,15 @@
     "{n} σε αναμονή",
     "{n} σε αναμονή"
   ],
-  "its file is gone (it was at {path})": "το αρχείο του χάθηκε (ήταν στο {path})"
+  "its file is gone (it was at {path})": "το αρχείο του χάθηκε (ήταν στο {path})",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Ένα δωρεάν εικονικό καλώδιο από τη VB-Audio. Παίρνει περίπου ένα λεπτό και τα Windows ρωτούν μία φορά αν είναι εντάξει. Μετά το επιλέγεις ως μικρόφωνο στο Discord και στα παιχνίδια.",
+  "Install the cable": "Εγκατάσταση καλωδίου",
+  "Not set up yet: only you will hear your sounds.": "Δεν έχει ρυθμιστεί ακόμα: μόνο εσύ θα ακούς τους ήχους σου.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Τώρα χρησιμοποιείς το <b>{theme}</b>. Ακόμα {n} θέματα στις Ρυθμίσεις.",
+  "Exact volume of {name}": "Ακριβής ένταση του {name}",
+  "Volume of {name}": "Ένταση του {name}",
+  "{n} sound is back.": [
+    "{n} ήχος επέστρεψε.",
+    "{n} ήχοι επέστρεψαν."
+  ]
 }

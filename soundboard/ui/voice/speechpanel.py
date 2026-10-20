@@ -421,7 +421,7 @@ class SpeechPanel(QWidget):
         self.ed.returnPressed.connect(self._say)
         self.ed.textEdited.connect(self._warm_for_a_line)
         row.addWidget(self.ed, 1)
-        b_say = QPushButton(_("Say"))
+        b_say = self.b_say = QPushButton(_("Say"))
         b_say.clicked.connect(self._say)
         b_stop = QPushButton(_("Stop"))
         b_stop.clicked.connect(lambda: (controller.stop_speaking(),
@@ -497,9 +497,12 @@ class SpeechPanel(QWidget):
 
     def _say(self):
         text = self.ed.text().strip()
-        if text:
-            self.say_line(text)
-            self.ed.clear()
+        if not text:   # as Save as sound says it: the box is where the line goes
+            busy.flash(self.b_say, _("Type a line first"), 1600)
+            self.ed.setFocus()
+            return
+        self.say_line(text)
+        self.ed.clear()
 
     def say_line(self, text: str):
         """Speak `text` (the Say button, or the control API's /api/say)."""

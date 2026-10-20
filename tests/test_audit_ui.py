@@ -151,7 +151,7 @@ def test_installing_greys_the_guide_buttons_without_disabling_them(qapp):
                            route_ok=lambda: False,
                            go=went.append, finish=lambda: went.append("finish"),
                            _locked=lambda: False, _mic_action=lambda: False,
-                           btn_skip=QPushButton(), discord_index=2)
+                           btn_skip=QPushButton(), next_why=QLabel(), discord_index=2)
     fake._busy = lambda: setupwizard.SetupWizard._busy(fake)
     setupwizard.SetupWizard._update_next(fake)
     assert fake.btn_next.isEnabled() and busy.is_busy(fake.btn_next)

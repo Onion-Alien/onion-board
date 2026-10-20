@@ -959,7 +959,6 @@
   "Since start: {dropouts}, {reconnects}.": "Indítás óta: {dropouts}, {reconnects}.",
   "Site": "Oldal",
   "Size": "Méret",
-  "Skip for now  →": "Most kihagyom  →",
   "Skip this version": "Ezt a verziót kihagyom",
   "Slow or patchy connection": "Lassú vagy akadozó kapcsolat",
   "Snowflake": "Snowflake",
@@ -1492,7 +1491,6 @@
   "❚❚ paused": "❚❚ szünetel",
   "⟲  Restart my PC now": "⟲ Indítsa újra a számítógépemet most",
   "⟳  Check again": "⟳ Ellenőrizze újra",
-  "⬇  Install it now (free)": "⬇ Telepítse most (ingyenes)",
   "⬇  Try installing again": "⬇ Próbálja újra a telepítést",
   "(didn't say)": "(nem mondta)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
@@ -4345,5 +4343,15 @@
     "{n} vár",
     "{n} vár"
   ],
-  "its file is gone (it was at {path})": "a fájlja eltűnt (itt volt: {path})"
+  "its file is gone (it was at {path})": "a fájlja eltűnt (itt volt: {path})",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Ingyenes virtuális kábel a VB-Audiótól. Körülbelül egy perc, és a Windows egyszer megkérdezi, rendben van-e. Utána kiválasztod mikrofonként a Discordban és a játékokban.",
+  "Install the cable": "Kábel telepítése",
+  "Not set up yet: only you will hear your sounds.": "Még nincs beállítva: csak te hallod a hangjaidat.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Most ezt használod: <b>{theme}</b>. További témák a Beállításokban: {n}",
+  "Exact volume of {name}": "{name} pontos hangereje",
+  "Volume of {name}": "{name} hangereje",
+  "{n} sound is back.": [
+    "{n} hang visszatért.",
+    "{n} hang visszatért."
+  ]
 }

@@ -787,3 +787,25 @@ def test_trim_shows_all_of_what_is_left(tab, qapp):
     ed.btn_trim.click()
     assert len(ed.take) == SR
     assert ed.view == (0.0, float(SR))   # not a sliver at the left of a 6 s view
+
+
+def test_after_pause_the_waveform_takes_the_keys(tab, qapp):
+    """Pause left the focus on its own button, so Home, Ctrl+Right and Shift+End went
+    to a button that takes none of them."""
+    row = opened(tab, qapp)
+    ed = row.editor
+    row.capture.sink(tone(4.0))
+    qapp.processEvents()
+    tab.activateWindow()
+    qapp.processEvents()
+    QTest.mouseClick(ed.btn_live, Qt.LeftButton)
+    qapp.processEvents()
+    assert ed.take is not None and ed.wave.hasFocus()
+    win = tab.windowHandle()
+    QTest.keyClick(win, Qt.Key_Home)
+    assert (ed.take.a, ed.take.b) == (0, 0)
+    QTest.keyClick(win, Qt.Key_Right, Qt.ControlModifier)
+    a = ed.take.a
+    assert a > 0 and ed.take.b == a
+    QTest.keyClick(win, Qt.Key_End, Qt.ShiftModifier)
+    assert (ed.take.a, ed.take.b) == (a, len(ed.take))

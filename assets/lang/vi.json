@@ -1101,7 +1101,6 @@
   "Since start: {dropouts}, {reconnects}.": "Kể từ khi bắt đầu: {dropouts} , {reconnects} .",
   "Site": "Địa điểm",
   "Size": "Kích cỡ",
-  "Skip for now  →": "Bỏ qua bây giờ →",
   "Slow or patchy connection": "Kết nối chậm hoặc chắp vá",
   "Snowflake": "Bông tuyết",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "Một số nội dung đã xóa gần đây không thể khôi phục lại được: nó được giữ ở điểm khôi phục này.",
@@ -1455,7 +1454,6 @@
   "❚❚ paused": "❚❚ đã tạm dừng",
   "⟲  Restart my PC now": "⟲ Khởi động lại PC của tôi ngay bây giờ",
   "⟳  Check again": "⟳ Kiểm tra lại",
-  "⬇  Install it now (free)": "⬇ Cài đặt ngay (miễn phí)",
   "⬇  Try installing again": "⬇ Thử cài đặt lại",
   "Join the Discord": "Tham gia Discord",
   "Chat about it on Discord": "Trò chuyện về nó trên Discord",
@@ -4270,5 +4268,14 @@
   "{n} waiting": [
     "{n} đang chờ"
   ],
-  "its file is gone (it was at {path})": "tệp của nó đã mất (trước ở {path})"
+  "its file is gone (it was at {path})": "tệp của nó đã mất (trước ở {path})",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Một cáp ảo miễn phí của VB-Audio. Mất khoảng một phút, và Windows sẽ hỏi một lần xem có được không. Sau đó bạn chọn nó làm mic trong Discord và game.",
+  "Install the cable": "Cài cáp",
+  "Not set up yet: only you will hear your sounds.": "Chưa thiết lập: chỉ mình bạn nghe được âm thanh của bạn.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Bạn đang dùng <b>{theme}</b>. Còn {n} chủ đề khác trong Cài đặt.",
+  "Exact volume of {name}": "Âm lượng chính xác của {name}",
+  "Volume of {name}": "Âm lượng của {name}",
+  "{n} sound is back.": [
+    "{n} âm thanh đã trở lại."
+  ]
 }

@@ -1121,7 +1121,6 @@
   "Since start: {dropouts}, {reconnects}.": "Sinds start: {dropouts} , {reconnects} .",
   "Site": "Locatie",
   "Size": "Maat",
-  "Skip for now  →": "Voor nu overslaan →",
   "Slow or patchy connection": "Trage of fragmentarische verbinding",
   "Snowflake": "Sneeuwvlok",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "Een deel van de onlangs verwijderde bestanden kan niet worden teruggezet: deze worden in dit herstelpunt bewaard.",
@@ -1493,7 +1492,6 @@
   "❚❚ paused": "❚❚ pauzeerde",
   "⟲  Restart my PC now": "⟲ Start mijn pc nu opnieuw op",
   "⟳  Check again": "⟳ Controleer opnieuw",
-  "⬇  Install it now (free)": "⬇ Installeer het nu (gratis)",
   "⬇  Try installing again": "⬇ Probeer opnieuw te installeren",
   "Join the Discord": "Kom op de Discord",
   "Chat about it on Discord": "Praat erover op Discord",
@@ -4345,5 +4343,15 @@
     "{n} wacht",
     "{n} wachten"
   ],
-  "its file is gone (it was at {path})": "het bestand is weg (het stond in {path})"
+  "its file is gone (it was at {path})": "het bestand is weg (het stond in {path})",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Een gratis virtuele kabel van VB-Audio. Het duurt ongeveer een minuut en Windows vraagt één keer of dat goed is. Daarna kies je hem als microfoon in Discord en games.",
+  "Install the cable": "Kabel installeren",
+  "Not set up yet: only you will hear your sounds.": "Nog niet ingesteld: alleen jij hoort je geluiden.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Je gebruikt nu <b>{theme}</b>. Nog {n} thema's in Instellingen.",
+  "Exact volume of {name}": "Exact volume van {name}",
+  "Volume of {name}": "Volume van {name}",
+  "{n} sound is back.": [
+    "{n} geluid is terug.",
+    "{n} geluiden zijn terug."
+  ]
 }

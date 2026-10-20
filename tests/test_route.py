@@ -166,7 +166,8 @@ def test_the_guide_can_send_to_another_device(wizard, devices):  # noqa: F811
     devices["cable"] = False
     w.devctl.refresh_devices()
     wiz.go(wiz.send_index)
-    assert wiz.btn_next.text().startswith("Skip")
+    # not set up: Next with the reason beside it, gone once a device works
+    assert wiz.btn_next.text().startswith("Next") and not wiz.next_why.isHidden()
     wiz.btn_other.click()
     assert not wiz.other_box.isHidden()
     choices = [b.text() for b in wiz.other_box.findChildren(setupwizard.ChoiceTile)]
@@ -174,7 +175,7 @@ def test_the_guide_can_send_to_another_device(wizard, devices):  # noqa: F811
     wiz._pick_route("Speakers")
     assert w.cfg.route == "device" and devices["picked"]["set_main_device"] == "Speakers"
     assert "Sending to Speakers" in wiz.cable_status.text()
-    assert wiz.btn_next.text().startswith("Next")
+    assert wiz.btn_next.text().startswith("Next") and wiz.next_why.isHidden()
     wiz.go(wiz.discord_index)
     assert "Audio Output Capture" in wiz.discord_text.text()
     assert wiz.btn_discord.isHidden() and wiz.btn_steam.isHidden()

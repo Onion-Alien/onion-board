@@ -934,6 +934,8 @@ class AppRow(HoverCard):
         self.btn_forget.setAccessibleName(_("Forget {name}", name=name))
         self.btn_clip.setAccessibleName(_("Clip editor for {name}", name=name))
         self.btn_view.setAccessibleName(_("Window of {name}", name=name))
+        self.vol.slider.setAccessibleName(_("Volume of {name}", name=name))
+        self.vol.spin.setAccessibleName(_("Exact volume of {name}", name=name))
 
     def set_status(self, text: str, error: bool = False):
         self.status_text = text

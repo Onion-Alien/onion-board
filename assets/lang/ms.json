@@ -947,7 +947,6 @@
   "Since start: {dropouts}, {reconnects}.": "Sejak mula: {dropouts}, {reconnects}.",
   "Site": "Laman",
   "Size": "Saiz",
-  "Skip for now  →": "Langkau buat masa ini  →",
   "Skip this version": "Langkau versi ini",
   "Slow or patchy connection": "Sambungan perlahan atau tidak stabil",
   "Snowflake": "Snowflake",
@@ -1454,7 +1453,6 @@
   "❚❚ paused": "❚❚ dijeda",
   "⟲  Restart my PC now": "⟲  Mulakan semula PC saya sekarang",
   "⟳  Check again": "⟳  Semak lagi",
-  "⬇  Install it now (free)": "⬇  Pasang sekarang (percuma)",
   "⬇  Try installing again": "⬇  Cuba pasang lagi",
   "(didn't say)": "(tidak berkata)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
@@ -4270,5 +4268,14 @@
   "{n} waiting": [
     "{n} menunggu"
   ],
-  "its file is gone (it was at {path})": "failnya sudah tiada (dahulu di {path})"
+  "its file is gone (it was at {path})": "failnya sudah tiada (dahulu di {path})",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Kabel maya percuma daripada VB-Audio. Ia ambil kira-kira seminit, dan Windows bertanya sekali sama ada boleh. Kemudian anda pilih ia sebagai mik dalam Discord dan permainan.",
+  "Install the cable": "Pasang kabel",
+  "Not set up yet: only you will hear your sounds.": "Belum disediakan: hanya anda dengar bunyi anda.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Anda sedang guna <b>{theme}</b>. {n} lagi tema dalam Tetapan.",
+  "Exact volume of {name}": "Kelantangan tepat {name}",
+  "Volume of {name}": "Kelantangan {name}",
+  "{n} sound is back.": [
+    "{n} bunyi kembali."
+  ]
 }

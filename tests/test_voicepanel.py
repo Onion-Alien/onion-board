@@ -1005,6 +1005,26 @@ def test_delete_a_saved_voice_then_undo_or_bring_it_back(panel, monkeypatch):
     assert p.fx.btn_bin.isHidden()
 
 
+def test_saving_a_voice_says_its_name_on_a_card(panel, monkeypatch):
+    """The button's "✓ Saved" is gone in a second: a card says it stuck, and as what."""
+    from tests.conftest import said
+    p, _ = panel
+    _ask(monkeypatch, "Squeaky")
+    p.fx.save_voice()
+    assert said(p) == "Saved “Squeaky”."
+    assert p.fx.btn_save.text() == "✓ Saved"
+
+
+def test_say_with_an_empty_box_says_to_type_a_line(panel):
+    p, _ = panel
+    p.show()
+    sp = p.speech
+    sp.ed.setText("   ")
+    sp.b_say.click()
+    assert sp.b_say.text() == "Type a line first" and not sp._last_said
+    assert sp.ed.hasFocus() or p.window().focusWidget() is sp.ed
+
+
 def test_rename_a_saved_voice(panel, monkeypatch):
     p, _ = panel
     _ask(monkeypatch, "One", "Better name")

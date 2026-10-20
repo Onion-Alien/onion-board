@@ -431,6 +431,8 @@ class RadioTab(QWidget):
             # after the tab has painted
             QTimer.singleShot(0, self, self._make_flat)
         self.dir.load_globe()
+        if not self._globe_list:   # the list itself says it's on its way, not a blank box
+            self.listctl._show_list()
         self._refresh_info()
 
     # ------------------------------------------------------------------ the map
@@ -855,8 +857,9 @@ class RadioTab(QWidget):
         st, state = self.player.station, self.player.status
         if st is None:
             n = len(self._globe_list)
-            if not n:
-                text = self._no_stations_text()
+            if not n:   # on its way: an empty list says it already, not twice
+                text = ("" if not self._globe_error and not self.list.count()
+                        else self._no_stations_text())
             elif self.globe_box.isHidden():   # narrow: no map to click
                 text = ngettext("{n} popular station: search, or click a station to "
                                 "play it.",

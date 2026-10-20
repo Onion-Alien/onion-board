@@ -539,7 +539,10 @@ class ClipEditor(QWidget):
 
     def _live_clicked(self):
         if self.take is None:
-            self.freeze()
+            # the keys pick from the waveform: Home, Ctrl+Right, Shift+End would
+            # otherwise go to this button, which takes none of them
+            if self.freeze() is not None:
+                self.wave.setFocus(Qt.FocusReason.OtherFocusReason)
         else:
             self.go_live()
 
