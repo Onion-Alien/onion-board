@@ -147,6 +147,14 @@ COMPOSITE_SFX = 13                                  # PKEY_CompositeFX_StreamEff
 COMPOSITE_EFX = 15                                  # PKEY_CompositeFX_EndpointEffectClsid
 ENDPOINT_SLOTS = (EFX, COMPOSITE_EFX)               # raw streams get these too
 OUR_SLOTS = (SFX, LFX, COMPOSITE_SFX, EFX, COMPOSITE_EFX)
+# Equalizer APO works like this effect: it takes a slot and runs the effect it replaced,
+# noted per mic under EAPO_KEY\<endpoint> as "<FX % pid>" (or "!VALUE": none) plus
+# PreMixChild / PostMixChild. Put on the mic after this effect, it runs this one: that
+# counts as on the mic, and this effect never wraps it back (obmic.cpp EAPO_*).
+EAPO_KEY = r"SOFTWARE\EqualizerAPO\Child APOs"
+EAPO_CLSIDS = ("{EACD2258-FCAC-4FF4-B36D-419E924A6D79}",   # its pre-mix effect
+               "{EC1CC9CE-FAED-4822-828A-82A81A6F018F}")   # its post-mix effect
+EAPO_NONE = "!VALUE"
 DISABLE_SYSFX = "{1da5d803-d492-4edd-8c23-e0c0ffee7f0e},5"   # "Audio enhancements: off"
 MODES_KEY = "{d3993a3f-99c2-4402-b5ec-a92a0367664b},%d"     # PKEY_*_ProcessingModes_...
 MODE_DEFAULT = "{C18E2F7E-933D-4965-B7D1-1EEF228D2AF3}"     # AUDIO_SIGNALPROCESSINGMODE_DEFAULT
@@ -1085,9 +1093,52 @@ def effect_in_place(guid: str) -> bool:
     try:
         with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
                             rf"{CAPTURE_KEY}\{guid}\FxProperties") as k:
-            return any(_is_ours(_value(k, FX % pid)) for pid in OUR_SLOTS)
+            slots = [_value(k, FX % pid) for pid in OUR_SLOTS]
     except OSError:
         return False
+    return any(_is_ours(v) for v in slots) \
+        or any(_is_eapo(v) for v in slots) and bool(eapo_runs_us(guid))
+
+
+def _is_eapo(value) -> bool:
+    """An effect slot's value is Equalizer APO's effect."""
+    return isinstance(value, str) and value.upper() in EAPO_CLSIDS
+
+
+def eapo_runs_us(guid: str) -> list[str]:
+    """The names of Equalizer APO's notes for this mic that hold this effect (it was put
+    on the mic after this one, and runs it): [] if none, or no Equalizer APO."""
+    out = []
+    try:
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, rf"{EAPO_KEY}\{guid}") as k:
+            i = 0
+            while True:
+                try:
+                    name, value, _kind = winreg.EnumValue(k, i)
+                except OSError:
+                    break
+                i += 1
+                if _is_ours(value):
+                    out.append(name)
+    except OSError:
+        pass
+    return out
+
+
+def _eapo_hand_back(guid: str, original: str) -> bool:
+    """Equalizer APO runs this effect on this mic: point its notes at the effect this one
+    ran (`original`, "" for none) instead, so it runs that. False if it doesn't run us."""
+    names = eapo_runs_us(guid)
+    if not names:
+        return False
+    with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, rf"{EAPO_KEY}\{guid}", 0,
+                        winreg.KEY_SET_VALUE) as k:
+        for name in names:
+            # its slot notes say "none" with a word, its *Child notes with ""
+            gone = EAPO_NONE if name.startswith("{") else ""
+            winreg.SetValueEx(k, name, 0, winreg.REG_SZ, original or gone)
+    log.info("%s: Equalizer APO runs the mic's own effect again", guid)
+    return True
 
 
 def without_ours(value):
@@ -1455,6 +1506,16 @@ def _install_endpoint(guid: str, slot: str | None):
         values = {p: (fx.get(FX % p) or (None,))[0]
                   for p in (*MODERN, *LEGACY, COMPOSITE_SFX, COMPOSITE_EFX)}
         kind, pid = pick_slot(values) if not slot else ("wrap", SLOTS_FX[slot])
+        if _is_eapo(values.get(pid)) and eapo_runs_us(guid):
+            # Equalizer APO went on after this effect and runs it: wrapping it back
+            # would make each run the other. Notes kept (or, lost, made: nothing to
+            # put back in the slot, Equalizer APO is handed the effect it ran)
+            if not state.get("Slot"):
+                state.set("Slot", winreg.REG_DWORD, pid)
+                state.set("Before", winreg.REG_MULTI_SZ, [])
+                state.set("Original", winreg.REG_SZ, "")
+            log.info("mic effect on %s: run by Equalizer APO (slot %s)", guid, pid)
+            return
         modes = SFX if pid in (SFX, COMPOSITE_SFX) else EFX if pid in ENDPOINT_SLOTS else None
         state.set("FxCreated", winreg.REG_DWORD, 1 if fx.created else 0)
         state.set("Slot", winreg.REG_DWORD, pid)
@@ -1551,8 +1612,8 @@ def _uninstall_endpoint(guid: str):
         before = (state.get("Before") or ([],))[0] or []
         created = (state.get("FxCreated") or (0,))[0]
         slot = (state.get("Slot") or (None,))[0]
+        original = (state.get("Original") or ("",))[0]
         if not before and slot is not None:   # an early test build's notes
-            original = (state.get("Original") or ("",))[0]
             before = [f"{FX % slot}=sz:{original}" if original else f"{FX % slot}="]
             modes_created = (state.get("ModesCreated") or (0,))[0]
             if modes_created:
@@ -1572,6 +1633,11 @@ def _uninstall_endpoint(guid: str):
                 # uninstall cut off half-way): finish it. A slot holding some other value
                 # means Windows reset the mic: leave it all.
                 restore = _is_ours(cur) or cur == want
+                if not restore and _is_eapo(cur):
+                    # Equalizer APO took the slot after this effect and runs it: it
+                    # runs the mic's own effect again instead. The rest stays as it set
+                    # it (the old "Audio enhancements: off" would switch it off too)
+                    _eapo_hand_back(guid, original)
             if restore:
                 for item in before:
                     _put_back(fx, item)
