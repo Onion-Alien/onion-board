@@ -1057,6 +1057,29 @@ def test_the_feeds_thread_goes_on_after_an_exception(ring_file, monkeypatch):
         s.close()
 
 
+def test_the_feeds_thread_goes_on_when_its_sleep_fails(ring_file, monkeypatch):
+    """time.sleep raising OSError (Windows' timer) used to end the thread for good."""
+    s = dm.DirectMicStream(lambda out, *a: out.fill(0), ring_file)
+    calls = []
+
+    def pump():
+        calls.append(1)
+        if len(calls) == 3:
+            s._stop.set()
+        return True
+
+    def sleep(t):
+        raise OSError("timer")
+
+    monkeypatch.setattr(s, "pump", pump)
+    monkeypatch.setattr(dm.time, "sleep", sleep)
+    try:
+        s._run()
+        assert len(calls) == 3
+    finally:
+        s.close()
+
+
 def test_the_engines_clean_mic_failing_is_counted_not_fatal():
     """Engine._mic_direct is guarded like the device mic's callback: the failure shows
     in cb_errors and errors (so the window can say so), and the next block goes in."""
