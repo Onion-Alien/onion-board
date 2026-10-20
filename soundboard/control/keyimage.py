@@ -1,27 +1,49 @@
-"""A pad drawn as a Stream Deck key: the board's own card (the theme's colours, the pad's
-picture, its name, hotkey and length), so the key looks like the pad it plays.
-/api/key_image sends it (soundboard.control.remote). UI thread only."""
+"""Stream Deck keys drawn with the board's own pad card (the theme's colours and font, a
+pad's picture, its name, hotkey and length, the glow while it plays), so a key looks like
+the board. A pad's key is the pad; Stop all, Random sound and the switches are the same
+card with an icon. /api/key_image sends them (soundboard.control.remote). UI thread only.
+
+A key is filled edge to edge: the Stream Deck rounds its keys itself, and a card's own
+rounded corners showed as black notches on the key."""
 from __future__ import annotations
 
 import hashlib
 import time
 
-from PySide6.QtCore import QBuffer, QByteArray, QIODevice, QRectF, Qt
-from PySide6.QtGui import QFontMetrics, QPixmap
+from PySide6.QtCore import QBuffer, QByteArray, QIODevice, QPoint, QRectF, Qt
+from PySide6.QtGui import QColor, QFontMetrics, QPainter, QPen, QPixmap
 
+from soundboard.i18n import _
 from soundboard.sounds.library import SoundMeta
 
 SIZE = 144      # pixels: the biggest Stream Deck keys; it scales the picture down for the rest
 CARD = 96       # the card is laid out this big (as on the board) and drawn at SIZE
 MIN_SIZE, MAX_SIZE = 72, 288
 FLASH = 0.4     # playing: how much of the board's "it just started" wash stays on (0..1)
+EDGE = 2        # a pad card leaves this much round itself (for its glow): cut off on a key
+
+# the keys that aren't a pad: what they say (on, off) and their icon
+CONTROLS = {
+    "stop": ("stop", lambda on: _("Stop all")),
+    "random": ("dice", lambda on: _("Random sound")),
+    "live": ("switch", lambda on: _("Live") if on else _("Muted")),
+    "voice": ("switch", lambda on: _("Voice changer")),
+    "mic": ("switch", lambda on: _("My mic")),
+    "hotkeys": ("switch", lambda on: _("Hotkeys")),
+}
 
 
 def look(meta: SoundMeta, theme: str) -> str:
-    """A short tag that changes whenever the key's picture would: a plugin keeps the
-    picture it has until then."""
+    """A short tag that changes whenever the pad's key would: a plugin keeps the picture
+    it has until then."""
     bits = (meta.name, meta.color, meta.image, meta.hotkey, f"{meta.duration:.1f}", theme)
     return hashlib.sha1("\0".join(map(str, bits)).encode()).hexdigest()[:10]
+
+
+def controls_look(theme: str, language: str) -> str:
+    """The same for the Stop / Random / switch keys: they change with the theme and the
+    language only."""
+    return hashlib.sha1(f"{theme}\0{language}".encode()).hexdigest()[:10]
 
 
 def two_lines(name: str, fm: QFontMetrics, width: int) -> str:
@@ -39,33 +61,107 @@ def two_lines(name: str, fm: QFontMetrics, width: int) -> str:
 
 
 def png(meta: SoundMeta, playing: bool = False, size: int = SIZE) -> bytes:
-    """The pad as a `size` x `size` PNG; `playing` draws it lit up, as on the board."""
+    """A pad's key as a `size` x `size` PNG; `playing` draws it lit up, as on the board."""
     from soundboard.sounds import thumbs
-    from soundboard.ui.kit.widgets import Pad
 
     if meta.image:   # the board reads pictures in the background: this one is needed now
         thumbs.load_now(meta.image)
-    class KeyPad(Pad):
+    return _encode(_card(meta, playing, size)[0])
+
+
+def control_png(kind: str, on: bool, size: int = SIZE) -> bytes:
+    """Stop all / Random sound / a switch (`kind`, a CONTROLS key) as a key: the pad card
+    with the theme's accent, its name, an icon, and for a switch On / Off and the glow."""
+    from soundboard.ui.kit.widgets import pad_colours
+
+    icon, label = CONTROLS[kind]
+    C = pad_colours()
+    switch = icon == "switch"
+    meta = SoundMeta(id=f"key:{kind}", name=label(on), file="", color=C["accent"].name())
+    foot = (_("On") if on else _("Off")) if switch and kind != "live" else ""
+    pm, name = _card(meta, switch and on, size, foot)
+    p = QPainter(pm)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing)
+    _icon(p, icon, on, C, two=("\n" in name))
+    p.end()
+    return _encode(pm)
+
+
+def _card(meta: SoundMeta, lit: bool, size: int,
+          foot: str | None = None) -> tuple[QPixmap, str]:
+    """The card as a pixmap, and its name as drawn (on two lines: a newline in it)."""
+    from soundboard.ui.kit import widgets
+
+    class KeyPad(widgets.Pad):
         def devicePixelRatioF(self):   # its picture is fitted at the key's pixels, not
             return size / CARD         # the screen's: scaled up after, it was blocky
 
         def _fit_name(self, room: QRectF):
-            f, flags, _ = super()._fit_name(room)
-            return f, flags, two_lines(self.meta.name, QFontMetrics(f), room.toRect().width())
+            f, flags, _n = super()._fit_name(room)
+            self.shown = two_lines(self.meta.name, QFontMetrics(f), room.toRect().width())
+            return f, flags, self.shown
+
+        def _footer(self, room: QRectF, name_font):
+            f, right, badge = super()._footer(room, name_font)
+            return (f, right, badge) if foot is None else (f, foot, None)
 
     pad = KeyPad(meta, CARD)
+    pad.shown = meta.name
+    radius = widgets.PAD_RADIUS
+    widgets.PAD_RADIUS = 0   # square: the Stream Deck rounds the key
     try:
-        pad.setFixedSize(CARD, CARD)
+        pad.setFixedSize(CARD + 2 * EDGE, CARD + 2 * EDGE)
         pad.state = "ready"
-        if playing:
+        if lit:
             pad.progress = 0.0
             pad._play_t = time.monotonic() - 0.35 * (1 - FLASH)   # (Pad's flash lasts 0.35 s)
         pm = QPixmap(size, size)
         pm.setDevicePixelRatio(size / CARD)
-        pm.fill(Qt.GlobalColor.transparent)
-        pad.render(pm)
+        pm.fill(widgets.pad_colours()["card"])
+        pad.render(pm, QPoint(-EDGE, -EDGE))
     finally:
+        widgets.PAD_RADIUS = radius
         pad.deleteLater()
+    return pm, pad.shown
+
+
+def _icon(p: QPainter, icon: str, on: bool, C: dict[str, QColor], two: bool = False):
+    """The control's icon between the name and the footer (logical CARD x CARD); lower
+    and a little smaller under a name on two lines."""
+    ink = QColor(C["accent"] if on or icon != "switch" else C["muted"])
+    cx, cy = CARD / 2, (61 if two else 55)
+    p.translate(cx, cy)
+    p.scale(0.8 if two else 0.92, 0.8 if two else 0.92)
+    cx = cy = 0
+    p.setPen(Qt.PenStyle.NoPen)
+    if icon == "stop":
+        p.setBrush(ink)
+        p.drawRoundedRect(QRectF(cx - 13, cy - 13, 26, 26), 6, 6)
+    elif icon == "dice":
+        p.setPen(QPen(ink, 3))
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        p.drawRoundedRect(QRectF(cx - 15, cy - 15, 30, 30), 7, 7)
+        p.setPen(Qt.PenStyle.NoPen)
+        p.setBrush(ink)
+        for dx, dy in ((-7, -7), (0, 0), (7, 7)):
+            p.drawEllipse(QRectF(cx + dx - 3, cy + dy - 3, 6, 6))
+    else:   # a switch, as the board's own: filled with the knob right when on
+        track = QRectF(cx - 20, cy - 11, 40, 22)
+        if on:
+            p.setBrush(ink)
+            p.drawRoundedRect(track, 11, 11)
+            p.setBrush(C["on_accent"])
+            p.drawEllipse(QRectF(track.right() - 19, track.top() + 3, 16, 16))
+        else:
+            p.setPen(QPen(ink, 2.5))
+            p.setBrush(Qt.BrushStyle.NoBrush)
+            p.drawRoundedRect(track.adjusted(1, 1, -1, -1), 10, 10)
+            p.setPen(Qt.PenStyle.NoPen)
+            p.setBrush(ink)
+            p.drawEllipse(QRectF(track.left() + 4, track.top() + 4, 14, 14))
+
+
+def _encode(pm: QPixmap) -> bytes:
     data = QByteArray()
     buf = QBuffer(data)
     buf.open(QIODevice.OpenModeFlag.WriteOnly)

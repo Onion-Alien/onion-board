@@ -34,10 +34,13 @@ function fakeApp(state = {}) {
     if (opts.headers["X-Token"] !== TOKEN) return reply(401, { error: "wrong key" });
     if (action === "status") {
       return reply(200, { version: "9.9.9", playing: s.playing, live: s.live, voice: s.voice,
-                          mic: s.mic, hotkeys: s.hotkeys });
+                          mic: s.mic, hotkeys: s.hotkeys, ...(s.keys ? { keys: s.keys } : {}) });
     }
     if (action === "sounds") return reply(200, s.sounds);
     if (action === "categories") return reply(200, s.categories);
+    if (action === "key_image" && p.control) {
+      return reply(200, { control: p.control, image: `data:image/png;base64,${p.control}-${s.keys}-${p.on}` });
+    }
     if (action === "key_image") {
       const m = s.sounds.find((x) => x.id === p.id);
       if (!m) return reply(404, { error: "no such sound" });
@@ -316,6 +319,38 @@ test("a play key shows the pad as Onion Board draws it, and fetches it again onl
     await plugin.tick();
     assert.equal(of(sent, "setImage", "k").at(-1).payload.image,
                  soundImage({ color: "#ff5c8a", problem: plugin.problem }));
+  } finally {
+    conf.done();
+  }
+});
+
+test("Stop, Random and switch keys are cards Onion Board draws, kept until the theme changes", async () => {
+  const app = fakeApp({ keys: "t1", voice: true });
+  const { plugin, sent, conf } = setup(undefined, app);
+  try {
+    await plugin.handle(appear(STOP, "s"));
+    await plugin.handle(appear(RANDOM, "r"));
+    await plugin.handle(appear(TOGGLE, "v", { what: "voice" }));
+    await plugin.tick();
+    assert.equal(of(sent, "setImage", "s").at(-1).payload.image, "data:image/png;base64,stop-t1-0");
+    assert.equal(of(sent, "setImage", "r").at(-1).payload.image, "data:image/png;base64,random-t1-0");
+    assert.equal(of(sent, "setImage", "v").at(-1).payload.image, "data:image/png;base64,voice-t1-1");
+    assert.equal(of(sent, "setTitle", "v").at(-1).payload.title, "");   // the card says it
+    const asked = () => app.calls.filter(([a]) => a === "key_image").length;
+    const n = asked();
+    plugin.soundsAt = 0;                  // the sound list coming in again keeps them
+    await plugin.tick();
+    assert.equal(asked(), n);
+    await plugin.handle({ event: "keyDown", action: TOGGLE, context: "v", payload: { settings: { what: "voice" } } });
+    assert.equal(of(sent, "setImage", "v").at(-1).payload.image, "data:image/png;base64,voice-t1-0");
+    app.keys = "t2";                      // another theme or language: drawn again
+    await plugin.tick();
+    assert.equal(of(sent, "setImage", "s").at(-1).payload.image, "data:image/png;base64,stop-t2-0");
+    app.down = true;                      // can't be reached: back to the plugin's own pictures
+    await plugin.tick();
+    assert.deepEqual(of(sent, "setImage", "s").at(-1).payload, { target: 0 });
+    assert.deepEqual(of(sent, "setImage", "v").at(-1).payload, { target: 0 });
+    assert.equal(of(sent, "setTitle", "v").at(-1).payload.title, "Voice\noff");
   } finally {
     conf.done();
   }

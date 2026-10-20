@@ -22,6 +22,8 @@ export class Plugin {
     this.shown = new Map();       // context → what was last drawn (so nothing is sent twice)
     this.sounds = new Map();      // id → { id, name, color, categories, look }
     this.cards = new Map();       // "id|look|playing" → the pad as Onion Board draws it
+                                  // ("control|kind|on": Stop / Random / a switch)
+    this.keysLook = undefined;    // status's `keys` the control cards were drawn for
     this.categories = [];
     this.soundsAt = 0;
     this.status = null;
@@ -163,6 +165,7 @@ export class Plugin {
           this.soundsAt = Date.now();
           const current = new Set(list.body.map((s) => `${s.id}|${s.look}|`));
           for (const k of [...this.cards.keys()]) {   // a pad changed: its old pictures go
+            if (k.startsWith("control|")) continue;
             if (!current.has(k.slice(0, k.lastIndexOf("|") + 1))) this.cards.delete(k);
           }
         }
@@ -194,11 +197,16 @@ export class Plugin {
       const what = TOGGLES[settings.what] ? settings.what : "live";
       const on = Boolean(this.status?.[what]);
       look.state = on ? 0 : 1;
-      look.title = TOGGLES[what][on ? "on" : "off"];
+      const card = await this.controlCard(what, on);
+      look.image = card;   // null: the plugin's own picture for the state
+      look.title = card ? "" : TOGGLES[what][on ? "on" : "off"];
+    } else if (action === STOP || action === RANDOM) {
+      look.image = await this.controlCard(action === STOP ? "stop" : "random", false);
     }
     const before = this.shown.get(context) || {};
     if (look.image !== undefined && look.image !== before.image) {
-      this.send({ event: "setImage", context, payload: { image: look.image, target: 0 } });
+      const payload = look.image === null ? { target: 0 } : { image: look.image, target: 0 };
+      this.send({ event: "setImage", context, payload });
     }
     if (look.state !== undefined && look.state !== before.state) {
       this.send({ event: "setState", context, payload: { state: look.state } });
@@ -216,6 +224,25 @@ export class Plugin {
     const k = `${sound.id}|${sound.look}|${playing ? 1 : 0}`;
     if (!this.cards.has(k)) {
       const res = await this.board.call("key_image", { id: sound.id, playing: playing ? 1 : 0 });
+      if (!res.ok || typeof res.body?.image !== "string") return null;
+      this.cards.set(k, res.body.image);
+    }
+    return this.cards.get(k);
+  }
+
+  // Stop all, Random sound or a switch drawn by Onion Board as a card like its pads; null
+  // when it can't be reached or is too old to (its status has no `keys`). Kept until the
+  // theme or language changes `keys`.
+  async controlCard(kind, on) {
+    const tag = this.problem === null ? this.status?.keys : undefined;
+    if (!tag) return null;
+    if (tag !== this.keysLook) {
+      this.keysLook = tag;
+      for (const k of [...this.cards.keys()]) if (k.startsWith("control|")) this.cards.delete(k);
+    }
+    const k = `control|${kind}|${on ? 1 : 0}`;
+    if (!this.cards.has(k)) {
+      const res = await this.board.call("key_image", { control: kind, on: on ? 1 : 0 });
       if (!res.ok || typeof res.body?.image !== "string") return null;
       this.cards.set(k, res.body.image);
     }

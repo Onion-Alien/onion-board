@@ -164,7 +164,9 @@ ENDPOINTS = {
     "categories": "the category names",
     "key_image": "a sound's pad as a picture for a Stream Deck key, drawn as on the board: "
                  "?id=… or ?name=…, &playing=1 lit up (default: as it is now), &size=72-288 "
-                 "px (144); answers {id, look, image: a data:image/png URL}",
+                 "px (144); answers {id, look, image: a data:image/png URL}. ?control=stop / "
+                 "random / live / voice / mic / hotkeys [&on=1|0] draws that key instead "
+                 "(status's keys changes when those would)",
     "play": "play one sound: ?name=Airhorn (exact name, any case) or ?id=…",
     "stop": "stop one sound (?name= or ?id=); with neither, stop everything",
     "pause": "pause everything (?on=1), resume it (?on=0), or flip (?on=toggle or nothing)",
@@ -777,6 +779,7 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
                             "Bearer …"}
     if action == "status":
         from soundboard import __version__
+        from soundboard.control import keyimage
         return 200, {"version": __version__, "category": cfg.category,
                      "playing": [s for s in sounding if s in mw.pads],
                      "paused": bool(playing) and all(p for _, p in playing.values()),
@@ -786,6 +789,7 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
                      "mic": bool(cfg.mic_enabled),
                      "hear": bool(mw.engine.mic_check),
                      "hotkeys": bool(mw.hkctl.hotkeys_on),
+                     "keys": keyimage.controls_look(cfg.theme, cfg.language),
                      "mic_gate": bool(cfg.mic_gate),
                      **queue_state(mw),
                      "volume": mw.vol_sound.spin.value(),
@@ -1438,16 +1442,29 @@ def find_category(cfg, name: str) -> str | None:
 def key_image(mw: MainWindow, params: dict, sounding: list[str]) -> tuple[int, object]:
     from soundboard.control import keyimage
 
-    m = find_sound(mw, params)
-    if m is None:
-        return no_sound(mw.cfg, params)
-    flag = (params.get("playing") or "").strip().lower()
-    playing = m.id in sounding if flag == "" else flag in ("1", "true", "on", "yes")
     try:
         size = int(params.get("size") or keyimage.SIZE)
     except ValueError:
         return 400, {"error": "size= takes a number of pixels"}
     size = max(keyimage.MIN_SIZE, min(keyimage.MAX_SIZE, size))
+    kind = (params.get("control") or "").strip().lower()
+    if kind:
+        if kind not in keyimage.CONTROLS:
+            return 404, {"error": "no such control", "controls": list(keyimage.CONTROLS)}
+        now = {"live": bool(mw.engine.sending), "voice": mw.voice.fx.btn_power.isChecked(),
+               "mic": bool(mw.cfg.mic_enabled), "hotkeys": bool(mw.hkctl.hotkeys_on)}
+        on = on_value(params, now.get(kind, False)) if params.get("on") else now.get(kind, False)
+        if on is None:
+            return 400, BAD_ON
+        data = base64.b64encode(keyimage.control_png(kind, on, size)).decode("ascii")
+        return 200, {"control": kind, "on": on,
+                     "look": keyimage.controls_look(mw.cfg.theme, mw.cfg.language),
+                     "image": f"data:image/png;base64,{data}"}
+    m = find_sound(mw, params)
+    if m is None:
+        return no_sound(mw.cfg, params)
+    flag = (params.get("playing") or "").strip().lower()
+    playing = m.id in sounding if flag == "" else flag in ("1", "true", "on", "yes")
     data = base64.b64encode(keyimage.png(m, playing, size)).decode("ascii")
     return 200, {"id": m.id, "look": keyimage.look(m, mw.cfg.theme),
                  "image": f"data:image/png;base64,{data}"}
