@@ -1609,6 +1609,8 @@ def _read(path: str, sid: str | None = None,
 
     Only the first MAX_SECONDS are ever read: libsndfile is asked for that many
     frames and ffmpeg is given -t."""
+    if not os.path.exists(path):   # moved or deleted: ffmpeg's own words were shown
+        raise RuntimeError(_("its file is gone (it was at {path})", path=path))
     try:
         return _read_from(path, sid, store, None)
     except _SourceError as e:

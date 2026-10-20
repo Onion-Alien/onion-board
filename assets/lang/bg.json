@@ -4342,5 +4342,6 @@
   "Put the sound first on a busy PC": "Звукът с предимство при натоварен компютър",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Пуска таблото с приоритет над нормалния, за да не могат други програми да накъсват звука. Ползва съвсем малко процесор, така че игрите няма да усетят.",
   "Exact volume of {name}": "Точна сила на звука на {name}",
-  "Volume of {name}": "Сила на звука на {name}"
+  "Volume of {name}": "Сила на звука на {name}",
+  "its file is gone (it was at {path})": "файлът му го няма (беше в {path})"
 }

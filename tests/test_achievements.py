@@ -2,6 +2,7 @@
 from types import SimpleNamespace
 
 import pytest
+from conftest import process_events
 
 from soundboard.core import achievements as ach, usage
 from soundboard.ui.settings.achievements import TIER_SPLASH, texts
@@ -258,3 +259,15 @@ def test_pop_ups_off_greys_the_sound_box(window):  # noqa: F811
     d.box_ach_popups.click()
     assert window.cfg.achievement_popups is True and d.box_ach_sound.isEnabled()
     d.close()
+
+
+def test_silent_but_deadly_counts_with_sending_off_too(qapp, window, monkeypatch):  # noqa: F811
+    """A sound played at 0% Sounds volume earns it whatever the route: with the route
+    "off" it never counted, though the badge just says "with the sound volume at 0%"."""
+    assert process_events(qapp, lambda: "s0" in window.audio)   # loaded
+    ach.attach(window.cfg, today="2026-10-19")
+    monkeypatch.setattr(window.engine, "play", lambda *a, **k: object())
+    window.cfg.route = "off"
+    window.cfg.sound_vol = 0.0
+    window.playctl.play("s0")
+    assert ach.got("silent_but_deadly")

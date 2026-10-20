@@ -4342,5 +4342,6 @@
   "Put the sound first on a busy PC": "Bilgisayar meşgulken sese öncelik ver",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Board'u normalin üstünde öncelikle çalıştırır, böylece diğer programlar sesin takılmasına yol açamaz. Çok az CPU kullanır, oyunlar fark etmez.",
   "Exact volume of {name}": "{name} tam ses düzeyi",
-  "Volume of {name}": "{name} ses düzeyi"
+  "Volume of {name}": "{name} ses düzeyi",
+  "its file is gone (it was at {path})": "dosyası artık yok ({path} konumundaydı)"
 }

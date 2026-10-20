@@ -4268,5 +4268,6 @@
   "Put the sound first on a busy PC": "ให้เสียงมาก่อนเมื่อพีซีทำงานหนัก",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "รันบอร์ดด้วยลำดับความสำคัญสูงกว่าปกติ เพื่อไม่ให้โปรแกรมอื่นทำให้เสียงสะดุด ใช้ CPU น้อยมาก เกมจึงไม่รู้สึกถึงความต่าง",
   "Exact volume of {name}": "ระดับเสียงที่แน่นอนของ {name}",
-  "Volume of {name}": "ระดับเสียงของ {name}"
+  "Volume of {name}": "ระดับเสียงของ {name}",
+  "its file is gone (it was at {path})": "ไฟล์ของเสียงนี้หายไปแล้ว (เคยอยู่ที่ {path})"
 }

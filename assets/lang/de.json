@@ -4342,5 +4342,6 @@
   "Put the sound first on a busy PC": "Sound zuerst, wenn der PC ausgelastet ist",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Lässt das Board mit höherer Priorität als normal laufen, damit andere Programme den Sound nicht stocken lassen. Es braucht sehr wenig CPU, Spiele merken also nichts.",
   "Exact volume of {name}": "Genaue Lautstärke von {name}",
-  "Volume of {name}": "Lautstärke von {name}"
+  "Volume of {name}": "Lautstärke von {name}",
+  "its file is gone (it was at {path})": "die Datei ist weg (sie lag unter {path})"
 }
