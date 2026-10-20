@@ -1582,8 +1582,10 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         g0 = self._gate.get(out, 1.0)
         if not self.mic_gate and g0 >= 1.0:
             return m
+        # done on `out` is enough: a sound still held on another output (headphones
+        # that stalled, a stream being reopened) kept the mic shut after it ended here
         playing = self.mic_gate and any(
-            out in v.data and not v.preview and not v.paused and not v.silent
+            out in v.data and out not in v.done and not v.preview and not v.paused
             for v in self.voices)
         target = 0.0 if playing else 1.0
         step = len(m) / (self.GATE_S * max(self.rates.get(out, SR), 1))
