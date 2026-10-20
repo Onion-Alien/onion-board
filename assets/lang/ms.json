@@ -4263,10 +4263,6 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofon pada <b>{headset}</b> terputus. Sambungkan semula dan bunyi anda akan keluar semula.",
   "Put the sound first on a busy PC": "Utamakan bunyi bila PC sibuk",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Menjalankan board pada keutamaan atas biasa, supaya program lain tidak membuat bunyi tersekat-sekat. Ia guna CPU yang sangat sedikit, jadi permainan tidak akan perasan.",
-  "All sounds: most liked": "Semua bunyi: paling disukai",
-  "All sounds: newest": "Semua bunyi: terbaru",
-  "All sounds: trending": "Semua bunyi: trending",
-  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Tetingkap terlalu kecil untuk papan, jadi ini pemain mini. Besarkan untuk dapatkan papan semula.",
   "Watches your game's window while it's open, even behind others": "Memerhati tetingkap permainan anda selagi ia terbuka, walaupun di belakang yang lain",
   "Your file stays whole: only the part between the handles plays.": "Fail anda kekal penuh: hanya bahagian di antara pemegang dimainkan.",
   "its file is gone (it was at {path})": "failnya sudah tiada (dahulu di {path})",
@@ -4275,5 +4271,6 @@
   "Not set up yet: only you will hear your sounds.": "Belum disediakan: hanya anda dengar bunyi anda.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Anda sedang guna <b>{theme}</b>. {n} lagi tema dalam Tetapan.",
   "Exact volume of {name}": "Kelantangan tepat {name}",
-  "Volume of {name}": "Kelantangan {name}"
+  "Volume of {name}": "Kelantangan {name}",
+  "Most liked": "Paling disukai"
 }

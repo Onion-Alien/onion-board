@@ -4263,10 +4263,6 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofon di <b>{headset}</b> terputus. Sambungkan lagi dan suaramu akan keluar lagi.",
   "Put the sound first on a busy PC": "Utamakan suara saat PC sibuk",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Menjalankan board dengan prioritas di atas normal, supaya program lain tidak bikin suara tersendat. Pemakaian CPU-nya sangat kecil, jadi game tidak akan terasa.",
-  "All sounds: most liked": "Semua suara: paling disukai",
-  "All sounds: newest": "Semua suara: terbaru",
-  "All sounds: trending": "Semua suara: sedang tren",
-  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Jendelanya terlalu kecil untuk board, jadi ini pemutar mini. Perbesar untuk mengembalikan board.",
   "Watches your game's window while it's open, even behind others": "Mengawasi jendela game-mu selama terbuka, bahkan di balik jendela lain",
   "Your file stays whole: only the part between the handles plays.": "File-mu tetap utuh: hanya bagian di antara pegangan yang diputar.",
   "its file is gone (it was at {path})": "filenya sudah tidak ada (tadinya di {path})",
@@ -4275,5 +4271,6 @@
   "Not set up yet: only you will hear your sounds.": "Belum diatur: cuma kamu yang dengar suaramu.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Kamu sedang pakai <b>{theme}</b>. {n} tema lagi di Pengaturan.",
   "Exact volume of {name}": "Volume pasti {name}",
-  "Volume of {name}": "Volume {name}"
+  "Volume of {name}": "Volume {name}",
+  "Most liked": "Paling disukai"
 }

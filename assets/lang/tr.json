@@ -4337,10 +4337,6 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> mikrofonunun bağlantısı koptu. Yeniden bağla, seslerin tekrar gitsin.",
   "Put the sound first on a busy PC": "Bilgisayar meşgulken sese öncelik ver",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Board'u normalin üstünde öncelikle çalıştırır, böylece diğer programlar sesin takılmasına yol açamaz. Çok az CPU kullanır, oyunlar fark etmez.",
-  "All sounds: most liked": "Tüm sesler: en çok beğenilenler",
-  "All sounds: newest": "Tüm sesler: en yeni",
-  "All sounds: trending": "Tüm sesler: trend olan",
-  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Pencere pano için fazla küçük, bu yüzden bu mini oynatıcı. Panoyu geri almak için pencereyi büyüt.",
   "Watches your game's window while it's open, even behind others": "Oyununun penceresini açık olduğu sürece izler, diğerlerinin arkasında olsa bile",
   "Your file stays whole: only the part between the handles plays.": "Dosyan bütün kalır: sadece tutamaçların arasındaki kısım çalar.",
   "its file is gone (it was at {path})": "dosyası artık yok ({path} konumundaydı)",
@@ -4349,5 +4345,6 @@
   "Not set up yet: only you will hear your sounds.": "Henüz ayarlanmadı: seslerini sadece sen duyacaksın.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Şu an <b>{theme}</b> kullanıyorsun. Ayarlar'da {n} tema daha var.",
   "Exact volume of {name}": "{name} tam ses düzeyi",
-  "Volume of {name}": "{name} ses düzeyi"
+  "Volume of {name}": "{name} ses düzeyi",
+  "Most liked": "En çok beğenilenler"
 }

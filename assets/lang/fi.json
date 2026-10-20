@@ -4337,10 +4337,6 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Kuulokkeiden <b>{headset}</b> mikrofonin yhteys katkesi. Yhdistä se uudelleen, niin äänesi kuuluvat taas.",
   "Put the sound first on a busy PC": "Ääni ensin, kun PC on kuormitettu",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Ajaa boardia normaalia korkeammalla prioriteetilla, jotta muut ohjelmat eivät saa ääntä katkeilemaan. Se käyttää hyvin vähän suoritinta, joten pelit eivät huomaa sitä.",
-  "All sounds: most liked": "Kaikki äänet: tykätyimmät",
-  "All sounds: newest": "Kaikki äänet: uusimmat",
-  "All sounds: trending": "Kaikki äänet: trendaavat",
-  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Ikkuna on liian pieni boardille, joten tämä on minisoitin. Suurenna sitä saadaksesi boardin takaisin.",
   "Watches your game's window while it's open, even behind others": "Tarkkailee pelisi ikkunaa, kun se on auki, myös muiden takana",
   "Your file stays whole: only the part between the handles plays.": "Tiedostosi pysyy kokonaisena: vain kahvojen välinen osa soi.",
   "its file is gone (it was at {path})": "sen tiedosto on poissa (se oli kohteessa {path})",
@@ -4349,5 +4345,6 @@
   "Not set up yet: only you will hear your sounds.": "Ei vielä käytössä: vain sinä kuulet äänesi.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Käytössä nyt: <b>{theme}</b>. Lisää teemoja asetuksissa: {n}",
   "Exact volume of {name}": "Ohjelman {name} tarkka äänenvoimakkuus",
-  "Volume of {name}": "Ohjelman {name} äänenvoimakkuus"
+  "Volume of {name}": "Ohjelman {name} äänenvoimakkuus",
+  "Most liked": "Tykätyimmät"
 }

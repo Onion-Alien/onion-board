@@ -4337,10 +4337,6 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "A(z) <b>{headset}</b> mikrofonja lecsatlakozott. Csatlakoztasd újra, és a hangjaid újra kimennek.",
   "Put the sound first on a busy PC": "A hang előnyt kap, ha a gép le van terhelve",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "A boardot a normálnál magasabb prioritással futtatja, így más programok nem tudják akadozóvá tenni a hangot. Nagyon kevés CPU-t használ, a játékok nem veszik észre.",
-  "All sounds: most liked": "Minden hang: legkedveltebbek",
-  "All sounds: newest": "Minden hang: legújabb",
-  "All sounds: trending": "Minden hang: felkapott",
-  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Az ablak túl kicsi a táblához, ezért ez a minilejátszó. Nagyítsd fel, hogy visszakapd a táblát.",
   "Watches your game's window while it's open, even behind others": "Figyeli a játékod ablakát, amíg nyitva van, mások mögött is",
   "Your file stays whole: only the part between the handles plays.": "A fájlod egészben marad: csak a fogantyúk közötti rész szól.",
   "its file is gone (it was at {path})": "a fájlja eltűnt (itt volt: {path})",
@@ -4349,5 +4345,6 @@
   "Not set up yet: only you will hear your sounds.": "Még nincs beállítva: csak te hallod a hangjaidat.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Most ezt használod: <b>{theme}</b>. További témák a Beállításokban: {n}",
   "Exact volume of {name}": "{name} pontos hangereje",
-  "Volume of {name}": "{name} hangereje"
+  "Volume of {name}": "{name} hangereje",
+  "Most liked": "Legkedveltebbek"
 }

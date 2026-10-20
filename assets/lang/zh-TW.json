@@ -4263,10 +4263,6 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> 的麥克風斷開了。重新連接後，你的音效就會再次送出。",
   "Put the sound first on a busy PC": "電腦忙碌時優先保證聲音",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "以高於正常的優先順序執行音板，讓其他程式無法使聲音卡頓。它占用的 CPU 極少，遊戲不會受影響。",
-  "All sounds: most liked": "所有音效：最受歡迎",
-  "All sounds: newest": "所有音效：最新",
-  "All sounds: trending": "所有音效：流行趨勢",
-  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "視窗太小放不下面板，所以這是迷你播放器。把視窗拖大即可回到面板。",
   "Watches your game's window while it's open, even behind others": "在你的遊戲視窗開著時盯著它，即使被其他視窗擋住",
   "Your file stays whole: only the part between the handles plays.": "你的檔案保持完整：只會播放兩個把手之間的部分。",
   "its file is gone (it was at {path})": "它的檔案不見了（原本在 {path}）",
@@ -4275,5 +4271,6 @@
   "Not set up yet: only you will hear your sounds.": "還沒設定好：只有你自己聽得到你的音效。",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "你正在使用 <b>{theme}</b>。設定中還有 {n} 個主題。",
   "Exact volume of {name}": "{name} 的精確音量",
-  "Volume of {name}": "{name} 的音量"
+  "Volume of {name}": "{name} 的音量",
+  "Most liked": "最受歡迎"
 }

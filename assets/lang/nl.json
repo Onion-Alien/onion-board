@@ -4337,10 +4337,6 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "De microfoon van <b>{headset}</b> is losgekoppeld. Verbind hem opnieuw en je geluiden gaan weer naar buiten.",
   "Put the sound first on a busy PC": "Geluid eerst als de pc druk bezig is",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Laat het board draaien met een hogere prioriteit dan normaal, zodat andere programma's het geluid niet laten haperen. Het gebruikt heel weinig CPU, dus games merken er niets van.",
-  "All sounds: most liked": "Alle geluiden: meest geliket",
-  "All sounds: newest": "Alle geluiden: nieuwste",
-  "All sounds: trending": "Alle geluiden: populair",
-  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Het venster is te klein voor het board, dus dit is de minispeler. Maak het groter om het board terug te krijgen.",
   "Watches your game's window while it's open, even behind others": "Houdt het venster van je game in de gaten zolang het open is, ook achter andere",
   "Your file stays whole: only the part between the handles plays.": "Je bestand blijft heel: alleen het deel tussen de grepen speelt af.",
   "its file is gone (it was at {path})": "het bestand is weg (het stond in {path})",
@@ -4349,5 +4345,6 @@
   "Not set up yet: only you will hear your sounds.": "Nog niet ingesteld: alleen jij hoort je geluiden.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Je gebruikt nu <b>{theme}</b>. Nog {n} thema's in Instellingen.",
   "Exact volume of {name}": "Exact volume van {name}",
-  "Volume of {name}": "Volume van {name}"
+  "Volume of {name}": "Volume van {name}",
+  "Most liked": "Meest geliket"
 }

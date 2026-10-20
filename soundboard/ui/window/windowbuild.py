@@ -632,12 +632,6 @@ class WindowBuilder(Controller):
         cv = QVBoxLayout(card)
         cv.setContentsMargins(8, 6, 8, 6)
         cv.setSpacing(4)
-        # why the board went: said the first time each launch, for a few seconds
-        # (FitControl._set_mini)
-        mw.mini_why = hint_label(_("The window is too small for the board, so this is the "
-                                   "mini player. Make it bigger to get the board back."))
-        mw.mini_why.hide()
-        cv.addWidget(mw.mini_why)
         top = QHBoxLayout()
         top.setSpacing(6)
         mw.mini_pp = PlayButton()

@@ -4411,10 +4411,6 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofon na <b>{headset}</b> se odpojil. Připoj ho znovu a tvoje zvuky zase půjdou ven.",
   "Put the sound first on a busy PC": "Zvuk má přednost, když je PC vytížené",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Spustí board s vyšší než normální prioritou, aby jiné programy nemohly způsobit výpadky zvuku. Bere velmi málo CPU, takže hry nic nepoznají.",
-  "All sounds: most liked": "Všechny zvuky: nejoblíbenější",
-  "All sounds: newest": "Všechny zvuky: nejnovější",
-  "All sounds: trending": "Všechny zvuky: trendy",
-  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Okno je na board moc malé, takže je tu mini přehrávač. Zvětši ho a board je zpátky.",
   "Watches your game's window while it's open, even behind others": "Sleduje okno tvé hry, dokud je otevřené, i když je za jinými",
   "Your file stays whole: only the part between the handles plays.": "Tvůj soubor zůstane celý: hraje jen část mezi úchyty.",
   "its file is gone (it was at {path})": "jeho soubor zmizel (byl v {path})",
@@ -4423,5 +4419,6 @@
   "Not set up yet: only you will hear your sounds.": "Zatím nenastaveno: své zvuky uslyšíš jen ty.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Teď používáš <b>{theme}</b>. Další motivy v Nastavení: {n}",
   "Exact volume of {name}": "Přesná hlasitost {name}",
-  "Volume of {name}": "Hlasitost {name}"
+  "Volume of {name}": "Hlasitost {name}",
+  "Most liked": "Nejoblíbenější"
 }

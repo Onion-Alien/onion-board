@@ -1429,9 +1429,11 @@ _items: list[tuple[weakref.ref, list[str]]] = []
 
 
 def set_item_icons(combo, names: list[str]):
-    """Icons for a combo box's items, in order, that follow theme changes."""
+    """Icons for a combo box's items, in order, that follow theme changes ("" for a
+    divider: no icon)."""
     for i, name in enumerate(names):
-        combo.setItemIcon(i, icon(name))
+        if name:
+            combo.setItemIcon(i, icon(name))
     _items[:] = [e for e in _items if e[0]() is not None and e[0]() is not combo]
     _items.append((weakref.ref(combo), names))
 

@@ -4263,10 +4263,6 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "ไมค์ของ <b>{headset}</b> หลุดการเชื่อมต่อ เชื่อมต่อใหม่แล้วเสียงของคุณจะออกไปอีกครั้ง",
   "Put the sound first on a busy PC": "ให้เสียงมาก่อนเมื่อพีซีทำงานหนัก",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "รันบอร์ดด้วยลำดับความสำคัญสูงกว่าปกติ เพื่อไม่ให้โปรแกรมอื่นทำให้เสียงสะดุด ใช้ CPU น้อยมาก เกมจึงไม่รู้สึกถึงความต่าง",
-  "All sounds: most liked": "ทุกเสียง: ถูกใจมากที่สุด",
-  "All sounds: newest": "ทุกเสียง: ใหม่ล่าสุด",
-  "All sounds: trending": "ทุกเสียง: กำลังมาแรง",
-  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "หน้าต่างเล็กเกินไปสำหรับบอร์ด จึงเป็นมินิเพลเยอร์ ขยายให้ใหญ่ขึ้นเพื่อกลับไปที่บอร์ด",
   "Watches your game's window while it's open, even behind others": "เฝ้าดูหน้าต่างเกมของคุณขณะที่เปิดอยู่ แม้อยู่หลังหน้าต่างอื่น",
   "Your file stays whole: only the part between the handles plays.": "ไฟล์ของคุณยังอยู่ครบ: เล่นแค่ส่วนที่อยู่ระหว่างที่จับ",
   "its file is gone (it was at {path})": "ไฟล์ของเสียงนี้หายไปแล้ว (เคยอยู่ที่ {path})",
@@ -4275,5 +4271,6 @@
   "Not set up yet: only you will hear your sounds.": "ยังไม่ได้ตั้งค่า: มีแค่คุณที่ได้ยินเสียงของคุณ",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "ตอนนี้ใช้ <b>{theme}</b> อยู่มีธีมอีก {n} แบบในการตั้งค่า",
   "Exact volume of {name}": "ระดับเสียงที่แน่นอนของ {name}",
-  "Volume of {name}": "ระดับเสียงของ {name}"
+  "Volume of {name}": "ระดับเสียงของ {name}",
+  "Most liked": "ถูกใจมากที่สุด"
 }

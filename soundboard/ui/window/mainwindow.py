@@ -283,7 +283,6 @@ class MainWindow(QMainWindow):
     mini_connection: QPushButton
     mini_download_bar: DownloadBar
     mini_mic: QPushButton
-    mini_why: Any
     mini_name: ElidedLabel
     mini_pp: PlayButton
     mini_seek: SeekSlider

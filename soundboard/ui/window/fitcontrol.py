@@ -9,7 +9,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QSize, QTimer
+from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QBoxLayout, QWidgetItem
 
 from soundboard.ui.window import responsive
@@ -26,7 +26,6 @@ BODY_SIDE = 14         # the gap around the window's content (beside the tab rai
 BODY_SIDE_TIGHT = 8    # ...and beside the rail in a narrow window
 MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
 MINI_PAD_ROWS = 1             # ...which has the pads above it when this many rows fit
-MINI_WHY_MS = 8000            # ...and says why for this long, the first time each launch
 SEARCH_MIN_W = 220    # the Sounds tab's search box, until the window gets narrow
 SEARCH_TIGHT_W = 130  # ...then this, until it gets very narrow
 # ...and its most: a few words go in it, so past this it's only a longer empty bar
@@ -336,19 +335,7 @@ class FitControl(Controller):
                 scroll.setVisible(mw.ytresults.isHidden())   # results take the pads' place
             mw._pages.setCurrentIndex(1 if on else 0)
             mw.searchctl.apply_filter(mw.search.text())
-            if not on:
-                mw.mini_why.hide()
-            elif not getattr(self, "_told_mini", False):
-                self._told_mini = True
-                mw.mini_why.show()
-                QTimer.singleShot(MINI_WHY_MS, mw.mini_why, self._hide_mini_why)
         toastmod.relayout(mw)   # cards in the window, icons in the mini player
-
-    def _hide_mini_why(self):
-        """The mini player's "why" line goes: its room goes back to the pads."""
-        if self.mw.mini_why.isVisible():
-            self.mw.mini_why.hide()
-            self._refit()
 
     def _squeeze_rail(self, tight: bool):
         """A narrow window: the rail shut (opened out, it shuts again) and the gap

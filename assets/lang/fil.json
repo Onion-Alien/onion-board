@@ -4337,10 +4337,6 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Na-disconnect ang mic ng <b>{headset}</b>. Ikonekta ulit ito at lalabas ulit ang mga tunog mo.",
   "Put the sound first on a busy PC": "Unahin ang tunog kapag busy ang PC",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Pinapatakbo ang board nang mas mataas sa normal na priority, para hindi mapaputol ng ibang program ang tunog. Kaunting CPU lang ang gamit nito, kaya hindi ito mapapansin ng mga laro.",
-  "All sounds: most liked": "Lahat ng sound: pinakagusto",
-  "All sounds: newest": "Lahat ng sound: pinakabago",
-  "All sounds: trending": "Lahat ng sound: trending",
-  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Masyadong maliit ang window para sa board, kaya ito ang mini player. Palakihin ito para maibalik ang board.",
   "Watches your game's window while it's open, even behind others": "Binabantayan ang window ng laro mo habang bukas ito, kahit nasa likod ng iba",
   "Your file stays whole: only the part between the handles plays.": "Buo pa rin ang file mo: ang bahagi lang sa pagitan ng mga handle ang magpe-play.",
   "its file is gone (it was at {path})": "wala na ang file nito (nasa {path} ito dati)",
@@ -4349,5 +4345,6 @@
   "Not set up yet: only you will hear your sounds.": "Hindi pa naka-set up: ikaw lang ang makakarinig ng mga sound mo.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "<b>{theme}</b> ang gamit mo ngayon. {n} pang theme sa Settings.",
   "Exact volume of {name}": "Eksaktong volume ng {name}",
-  "Volume of {name}": "Volume ng {name}"
+  "Volume of {name}": "Volume ng {name}",
+  "Most liked": "Pinakagusto"
 }

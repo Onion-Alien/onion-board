@@ -528,24 +528,6 @@ def test_the_mini_players_full_board_button_brings_the_board_back(window):
     assert not w.fitctl.is_mini() and w.width() > 440
 
 
-def test_the_mini_player_says_why_the_board_went_once(window):
-    """Narrowed to ~480 px the window turned into the mini player with no word why: it
-    says so the first time each launch, for a few seconds, then gives the room back."""
-    w = window
-    w.show()
-    w.resize(440, 600)
-    QApplication.processEvents()
-    assert w.fitctl.is_mini() and w.mini_why.isVisibleTo(w)
-    assert "mini player" in w.mini_why.text()
-    w.fitctl._hide_mini_why()   # (its timer's job)
-    assert w.mini_why.isHidden()
-    w.resize(1180, 720)
-    QApplication.processEvents()
-    w.resize(440, 600)
-    QApplication.processEvents()
-    assert w.fitctl.is_mini() and w.mini_why.isHidden()   # once a launch
-
-
 def test_the_strip_says_when_the_mic_is_muted(window):
     """Unticked, the bottom strip's mic group still said "My mic": it says "Mic muted"
     then, as the mini player does, and its narrow-strip icon button too."""

@@ -4263,10 +4263,6 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> のマイクが切断されました。もう一度接続すると、サウンドがまた届きます。",
   "Put the sound first on a busy PC": "PCが忙しいときもサウンドを優先",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "ボードを通常より高い優先度で動かし、ほかのプログラムのせいで音が途切れないようにします。CPUはほとんど使わないので、ゲームへの影響はありません。",
-  "All sounds: most liked": "すべてのサウンド: いいねが多い順",
-  "All sounds: newest": "すべてのサウンド: 最新",
-  "All sounds: trending": "すべてのサウンド: トレンド",
-  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "ウィンドウがボードには小さすぎるため、ミニプレーヤーになっています。広げるとボードに戻ります。",
   "Watches your game's window while it's open, even behind others": "ゲームのウィンドウが開いている間見張ります（他のウィンドウの裏でも）",
   "Your file stays whole: only the part between the handles plays.": "ファイルはそのまま残ります。ハンドルの間の部分だけが再生されます。",
   "its file is gone (it was at {path})": "ファイルが見つかりません（{path} にありました）",
@@ -4275,5 +4271,6 @@
   "Not set up yet: only you will hear your sounds.": "まだ設定されていません：サウンドは自分にしか聞こえません。",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "いまは <b>{theme}</b> を使っています。設定にはほかに {n} 個のテーマがあります。",
   "Exact volume of {name}": "{name} の音量（数値）",
-  "Volume of {name}": "{name} の音量"
+  "Volume of {name}": "{name} の音量",
+  "Most liked": "いいねが多い順"
 }

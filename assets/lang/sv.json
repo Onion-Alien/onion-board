@@ -4337,10 +4337,6 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofonen på <b>{headset}</b> kopplades från. Anslut den igen så går dina ljud ut igen.",
   "Put the sound first on a busy PC": "Ljudet först när datorn har mycket att göra",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Kör boarden med högre prioritet än normalt, så att andra program inte får ljudet att hacka. Den använder väldigt lite CPU, så spel märker inget.",
-  "All sounds: most liked": "Alla ljud: mest gillade",
-  "All sounds: newest": "Alla ljud: nyaste",
-  "All sounds: trending": "Alla ljud: trendigt",
-  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Fönstret är för litet för boarden, så det här är minispelaren. Gör det större för att få tillbaka boarden.",
   "Watches your game's window while it's open, even behind others": "Håller koll på ditt spels fönster medan det är öppet, även bakom andra",
   "Your file stays whole: only the part between the handles plays.": "Din fil förblir hel: bara delen mellan handtagen spelas.",
   "its file is gone (it was at {path})": "filen är borta (den låg i {path})",
@@ -4349,5 +4345,6 @@
   "Not set up yet: only you will hear your sounds.": "Inte konfigurerat än: bara du hör dina ljud.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Du använder <b>{theme}</b> nu. {n} teman till i Inställningar.",
   "Exact volume of {name}": "Exakt volym för {name}",
-  "Volume of {name}": "Volym för {name}"
+  "Volume of {name}": "Volym för {name}",
+  "Most liked": "Mest gillade"
 }

@@ -4263,10 +4263,6 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b>의 마이크 연결이 끊겼어요. 다시 연결하면 사운드가 다시 나가요.",
   "Put the sound first on a busy PC": "PC가 바쁠 때 소리를 우선",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "보드를 보통보다 높은 우선순위로 실행해서 다른 프로그램 때문에 소리가 끊기지 않게 합니다. CPU를 아주 조금만 쓰므로 게임에는 티가 나지 않습니다.",
-  "All sounds: most liked": "모든 사운드: 좋아요 많은 순",
-  "All sounds: newest": "모든 사운드: 최신",
-  "All sounds: trending": "모든 사운드: 인기 급상승",
-  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "창이 보드에 비해 너무 작아서 미니 플레이어가 됐어요. 창을 크게 늘리면 보드가 돌아와요.",
   "Watches your game's window while it's open, even behind others": "게임 창이 열려 있는 동안 지켜봐요. 다른 창 뒤에 있어도요",
   "Your file stays whole: only the part between the handles plays.": "파일은 그대로 남아요. 핸들 사이 부분만 재생돼요.",
   "its file is gone (it was at {path})": "파일이 없어졌어요({path}에 있었어요)",
@@ -4275,5 +4271,6 @@
   "Not set up yet: only you will hear your sounds.": "아직 설정 안 됨: 내 사운드는 나만 들어요.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "지금 <b>{theme}</b> 테마를 쓰고 있어요. 설정에 테마가 {n}개 더 있어요.",
   "Exact volume of {name}": "{name} 정확한 볼륨",
-  "Volume of {name}": "{name} 볼륨"
+  "Volume of {name}": "{name} 볼륨",
+  "Most liked": "좋아요 많은 순"
 }

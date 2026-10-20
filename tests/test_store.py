@@ -513,12 +513,11 @@ def test_categories_filter_the_list(qapp, fake):
     t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
     t.show()
     pick = t.cat_pick
-    assert _wait(qapp, lambda: len(t._rows) == 2 and pick.count() == 5)
-    # Trending (picked), Most liked and Newest: every sound, and they say so (an order
+    assert _wait(qapp, lambda: len(t._rows) == 2 and pick.count() == 6)
+    # Trending (picked), Most liked and Newest: every sound; a line under them (an order
     # read as one more category beside "Games (3)"); then the categories
-    assert [pick.itemText(i) for i in range(5)] == [
-        "All sounds: trending", "All sounds: most liked", "All sounds: newest",
-        "Games (3)", "Memes (1)"]
+    assert [pick.itemText(i) for i in range(6)] == ["Trending", "Most liked", "Newest", "",
+                                                    "Games (3)", "Memes (1)"]
     assert pick.currentIndex() == 0
     # it opens on Trending: what's popular right now
     assert "sort=trending" in next(c[1] for c in fake.calls if c[1].startswith("/v1/sounds"))
@@ -587,8 +586,8 @@ def test_onion_board_category_lists_the_stores_own_sounds(qapp, fake):
     t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
     t.show()
     pick = t.cat_pick
-    assert _wait(qapp, lambda: len(t._rows) == 2 and pick.count() == 5)
-    assert [pick.itemText(i) for i in range(3, 5)] == ["Games (3)", "Onion Board (2)"]
+    assert _wait(qapp, lambda: len(t._rows) == 2 and pick.count() == 6)
+    assert [pick.itemText(i) for i in range(4, 6)] == ["Games (3)", "Onion Board (2)"]
     pick.activated.emit(pick.findData("onionboard"))
     assert _wait(qapp, lambda: "cat=onionboard" in fake.calls[-1][1])
     assert _wait(qapp, lambda: len(t._rows) == 2)

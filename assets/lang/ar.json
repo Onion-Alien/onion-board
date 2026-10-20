@@ -4633,10 +4633,6 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "انقطع مايك <b>{headset}</b>. أعد توصيله وستخرج أصواتك من جديد.",
   "Put the sound first on a busy PC": "أعطِ الصوت الأولوية عندما يكون الكمبيوتر مشغولًا",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "يشغّل اللوحة بأولوية أعلى من العادية، فلا تستطيع البرامج الأخرى أن تجعل الصوت يتقطّع. تستهلك القليل جدًا من المعالج، فلن تلاحظ الألعاب شيئًا.",
-  "All sounds: most liked": "كل الأصوات: الأكثر إعجابًا",
-  "All sounds: newest": "كل الأصوات: الأحدث",
-  "All sounds: trending": "كل الأصوات: الأكثر رواجًا",
-  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "النافذة أصغر من اللوحة، لذا هذا هو المشغل المصغّر. كبّرها لاستعادة اللوحة.",
   "Watches your game's window while it's open, even behind others": "يراقب نافذة لعبتك ما دامت مفتوحة، حتى خلف النوافذ الأخرى",
   "Your file stays whole: only the part between the handles plays.": "يبقى ملفك كاملًا: لا يُشغَّل إلا الجزء الذي بين المقبضين.",
   "its file is gone (it was at {path})": "ملفه لم يعد موجودًا (كان في {path})",
@@ -4645,5 +4641,6 @@
   "Not set up yet: only you will hear your sounds.": "لم يُضبط بعد: أنت وحدك ستسمع أصواتك.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "تستخدم الآن <b>{theme}</b>. مظاهر أخرى في الإعدادات: {n}",
   "Exact volume of {name}": "مستوى صوت {name} بالضبط",
-  "Volume of {name}": "مستوى صوت {name}"
+  "Volume of {name}": "مستوى صوت {name}",
+  "Most liked": "الأكثر إعجابًا"
 }

@@ -4337,10 +4337,6 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Il microfono di <b>{headset}</b> si è disconnesso. Ricollegalo e i tuoi suoni ripartono.",
   "Put the sound first on a busy PC": "Il suono prima di tutto col PC sotto sforzo",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Esegue la board con priorità superiore al normale, così gli altri programmi non fanno saltare il suono. Usa pochissima CPU, quindi i giochi non se ne accorgono.",
-  "All sounds: most liked": "Tutti i suoni: i più apprezzati",
-  "All sounds: newest": "Tutti i suoni: più recenti",
-  "All sounds: trending": "Tutti i suoni: tendenza",
-  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "La finestra è troppo piccola per la board, quindi questo è il mini lettore. Allargala per riavere la board.",
   "Watches your game's window while it's open, even behind others": "Osserva la finestra del tuo gioco finché è aperta, anche dietro le altre",
   "Your file stays whole: only the part between the handles plays.": "Il tuo file resta intero: suona solo la parte tra le maniglie.",
   "its file is gone (it was at {path})": "il suo file non c'è più (era in {path})",
@@ -4349,5 +4345,6 @@
   "Not set up yet: only you will hear your sounds.": "Non ancora configurato: i tuoi suoni li sentirai solo tu.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Ora stai usando <b>{theme}</b>. Altri {n} temi nelle Impostazioni.",
   "Exact volume of {name}": "Volume esatto di {name}",
-  "Volume of {name}": "Volume di {name}"
+  "Volume of {name}": "Volume di {name}",
+  "Most liked": "I più apprezzati"
 }

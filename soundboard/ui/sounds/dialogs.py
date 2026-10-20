@@ -161,9 +161,9 @@ class EffectsPanel(QWidget):
         # it only picks the part that plays: someone hunted for the cut file
         self.trim_kept = hint_label(_("Your file stays whole: only the part between the "
                                       "handles plays."))
-        self.trim = self._new_trim(meta)
         v.addWidget(self.trim_hint)
         v.addWidget(self.trim_kept)
+        self.trim = self._new_trim(meta, v.indexOf(self.trim_hint))   # above them
 
         v.addWidget(section_label(_("Speed & pitch")))
         self.speed = ParamSlider(SPEED, 1.0, centred=True)

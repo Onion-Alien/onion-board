@@ -4337,10 +4337,6 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Микрофонът на <b>{headset}</b> прекъсна. Свържи го отново и звуците ти пак ще излизат.",
   "Put the sound first on a busy PC": "Звукът с предимство при натоварен компютър",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Пуска таблото с приоритет над нормалния, за да не могат други програми да накъсват звука. Ползва съвсем малко процесор, така че игрите няма да усетят.",
-  "All sounds: most liked": "Всички звуци: най-харесвани",
-  "All sounds: newest": "Всички звуци: най-новите",
-  "All sounds: trending": "Всички звуци: тенденция",
-  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Прозорецът е твърде малък за таблото, затова това е мини плейърът. Направи го по-голям, за да върнеш таблото.",
   "Watches your game's window while it's open, even behind others": "Следи прозореца на играта ти, докато е отворен, дори зад други",
   "Your file stays whole: only the part between the handles plays.": "Файлът ти остава цял: звучи само частта между дръжките.",
   "its file is gone (it was at {path})": "файлът му го няма (беше в {path})",
@@ -4349,5 +4345,6 @@
   "Not set up yet: only you will hear your sounds.": "Още не е настроено: само ти ще чуваш звуците си.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Сега ползваш <b>{theme}</b>. Още теми в Настройки: {n}",
   "Exact volume of {name}": "Точна сила на звука на {name}",
-  "Volume of {name}": "Сила на звука на {name}"
+  "Volume of {name}": "Сила на звука на {name}",
+  "Most liked": "Най-харесвани"
 }

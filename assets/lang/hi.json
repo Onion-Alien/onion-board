@@ -4337,10 +4337,6 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> का माइक डिस्कनेक्ट हो गया। इसे फिर से जोड़ें, आपकी आवाज़ें फिर से जाने लगेंगी।",
   "Put the sound first on a busy PC": "PC व्यस्त हो तो आवाज़ को पहले रखें",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "बोर्ड को सामान्य से ऊँची प्राथमिकता पर चलाता है, ताकि दूसरे प्रोग्राम आवाज़ को अटकने न दें। यह बहुत कम CPU लेता है, इसलिए गेम्स को फ़र्क़ नहीं पड़ेगा।",
-  "All sounds: most liked": "सभी साउंड: सबसे पसंदीदा",
-  "All sounds: newest": "सभी साउंड: नवीनतम",
-  "All sounds: trending": "सभी साउंड: रुझान",
-  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "विंडो बोर्ड के लिए बहुत छोटी है, इसलिए यह मिनी प्लेयर है। बोर्ड वापस पाने के लिए इसे बड़ा करें।",
   "Watches your game's window while it's open, even behind others": "आपके गेम की विंडो खुली रहने तक उस पर नज़र रखता है, दूसरी विंडो के पीछे भी",
   "Your file stays whole: only the part between the handles plays.": "आपकी फ़ाइल पूरी रहती है: सिर्फ़ हैंडल के बीच का हिस्सा चलता है।",
   "its file is gone (it was at {path})": "इसकी फ़ाइल नहीं मिली (यह {path} पर थी)",
@@ -4349,5 +4345,6 @@
   "Not set up yet: only you will hear your sounds.": "अभी सेट नहीं है: आपके साउंड सिर्फ़ आप सुनेंगे।",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "अभी आप <b>{theme}</b> इस्तेमाल कर रहे हैं। सेटिंग्स में {n} और थीम।",
   "Exact volume of {name}": "{name} का सटीक वॉल्यूम",
-  "Volume of {name}": "{name} का वॉल्यूम"
+  "Volume of {name}": "{name} का वॉल्यूम",
+  "Most liked": "सबसे पसंदीदा"
 }

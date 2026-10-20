@@ -4337,10 +4337,6 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Το μικρόφωνο στα <b>{headset}</b> αποσυνδέθηκε. Σύνδεσέ το ξανά και οι ήχοι σου θα βγαίνουν πάλι.",
   "Put the sound first on a busy PC": "Πρώτα ο ήχος όταν το PC είναι φορτωμένο",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Τρέχει το board με προτεραιότητα πάνω από την κανονική, ώστε άλλα προγράμματα να μην κάνουν τον ήχο να κόβεται. Χρησιμοποιεί ελάχιστη CPU, οπότε τα παιχνίδια δεν θα το καταλάβουν.",
-  "All sounds: most liked": "Όλοι οι ήχοι: τα πιο αγαπημένα",
-  "All sounds: newest": "Όλοι οι ήχοι: νεότεροι",
-  "All sounds: trending": "Όλοι οι ήχοι: τάσεις",
-  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Το παράθυρο είναι πολύ μικρό για το board, γι' αυτό αυτό είναι το μίνι πρόγραμμα αναπαραγωγής. Μεγάλωσέ το για να επιστρέψει το board.",
   "Watches your game's window while it's open, even behind others": "Παρακολουθεί το παράθυρο του παιχνιδιού σου όσο είναι ανοιχτό, ακόμα και πίσω από άλλα",
   "Your file stays whole: only the part between the handles plays.": "Το αρχείο σου μένει ολόκληρο: παίζει μόνο το κομμάτι ανάμεσα στις λαβές.",
   "its file is gone (it was at {path})": "το αρχείο του χάθηκε (ήταν στο {path})",
@@ -4349,5 +4345,6 @@
   "Not set up yet: only you will hear your sounds.": "Δεν έχει ρυθμιστεί ακόμα: μόνο εσύ θα ακούς τους ήχους σου.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Τώρα χρησιμοποιείς το <b>{theme}</b>. Ακόμα {n} θέματα στις Ρυθμίσεις.",
   "Exact volume of {name}": "Ακριβής ένταση του {name}",
-  "Volume of {name}": "Ένταση του {name}"
+  "Volume of {name}": "Ένταση του {name}",
+  "Most liked": "Τα πιο αγαπημένα"
 }

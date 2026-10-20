@@ -4411,10 +4411,6 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Microfonul de pe <b>{headset}</b> s-a deconectat. Conectează-l din nou și sunetele tale ies iar.",
   "Put the sound first on a busy PC": "Sunetul pe primul loc când PC-ul e ocupat",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Rulează board-ul cu prioritate peste normal, ca alte programe să nu facă sunetul să sară. Folosește foarte puțin procesor, așa că jocurile nu vor observa.",
-  "All sounds: most liked": "Toate sunetele: cele mai apreciate",
-  "All sounds: newest": "Toate sunetele: cele mai noi",
-  "All sounds: trending": "Toate sunetele: trending",
-  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Fereastra e prea mică pentru board, așa că acesta e mini playerul. Mărește-o ca să revină board-ul.",
   "Watches your game's window while it's open, even behind others": "Urmărește fereastra jocului tău cât e deschisă, chiar și în spatele altora",
   "Your file stays whole: only the part between the handles plays.": "Fișierul tău rămâne întreg: se redă doar partea dintre mânere.",
   "its file is gone (it was at {path})": "fișierul lui a dispărut (era în {path})",
@@ -4423,5 +4419,6 @@
   "Not set up yet: only you will hear your sounds.": "Încă nu e configurat: doar tu îți auzi sunetele.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Acum folosești <b>{theme}</b>. Încă {n} teme în Setări.",
   "Exact volume of {name}": "Volumul exact al {name}",
-  "Volume of {name}": "Volumul {name}"
+  "Volume of {name}": "Volumul {name}",
+  "Most liked": "Cele mai apreciate"
 }

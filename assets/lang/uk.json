@@ -4411,10 +4411,6 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Мікрофон на <b>{headset}</b> від'єднався. Під'єднай його знову, і твої звуки знову підуть.",
   "Put the sound first on a busy PC": "Звук у пріоритеті, коли ПК завантажений",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Запускає панель із пріоритетом вище звичайного, щоб інші програми не змушували звук перериватися. Вона майже не навантажує процесор, тож ігри цього не помітять.",
-  "All sounds: most liked": "Усі звуки: найулюбленіші",
-  "All sounds: newest": "Усі звуки: найновіші",
-  "All sounds: trending": "Усі звуки: в тренді",
-  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Вікно замале для панелі, тож це мініплеєр. Збільш його, щоб повернути панель.",
   "Watches your game's window while it's open, even behind others": "Стежить за вікном твоєї гри, поки воно відкрите, навіть за іншими вікнами",
   "Your file stays whole: only the part between the handles plays.": "Твій файл лишається цілим: грає лише частина між повзунками.",
   "its file is gone (it was at {path})": "його файл зник (він був у {path})",
@@ -4423,5 +4419,6 @@
   "Not set up yet: only you will hear your sounds.": "Ще не налаштовано: свої звуки чуєш лише ти.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Зараз у тебе <b>{theme}</b>. Ще теми в налаштуваннях: {n}",
   "Exact volume of {name}": "Точна гучність {name}",
-  "Volume of {name}": "Гучність {name}"
+  "Volume of {name}": "Гучність {name}",
+  "Most liked": "Найулюбленіші"
 }

@@ -4263,10 +4263,6 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Micrô của <b>{headset}</b> đã ngắt kết nối. Kết nối lại và âm thanh của bạn sẽ được gửi đi lại.",
   "Put the sound first on a busy PC": "Ưu tiên âm thanh khi PC đang bận",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Chạy board ở mức ưu tiên trên bình thường, để các chương trình khác không làm âm thanh bị giật. Nó dùng rất ít CPU nên game sẽ không thấy khác biệt.",
-  "All sounds: most liked": "Mọi âm thanh: được thích nhiều nhất",
-  "All sounds: newest": "Mọi âm thanh: mới nhất",
-  "All sounds: trending": "Mọi âm thanh: xu hướng",
-  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Cửa sổ quá nhỏ cho bảng nên đây là trình phát mini. Kéo to ra để quay lại bảng.",
   "Watches your game's window while it's open, even behind others": "Theo dõi cửa sổ game của bạn khi nó đang mở, kể cả khi bị che",
   "Your file stays whole: only the part between the handles plays.": "Tệp của bạn vẫn nguyên vẹn: chỉ phần giữa hai tay nắm được phát.",
   "its file is gone (it was at {path})": "tệp của nó đã mất (trước ở {path})",
@@ -4275,5 +4271,6 @@
   "Not set up yet: only you will hear your sounds.": "Chưa thiết lập: chỉ mình bạn nghe được âm thanh của bạn.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Bạn đang dùng <b>{theme}</b>. Còn {n} chủ đề khác trong Cài đặt.",
   "Exact volume of {name}": "Âm lượng chính xác của {name}",
-  "Volume of {name}": "Âm lượng của {name}"
+  "Volume of {name}": "Âm lượng của {name}",
+  "Most liked": "Được thích nhiều nhất"
 }

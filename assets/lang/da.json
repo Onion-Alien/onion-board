@@ -4337,10 +4337,6 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofonen på <b>{headset}</b> blev afbrudt. Tilslut den igen, så går dine lyde ud igen.",
   "Put the sound first on a busy PC": "Lyden først på en travl pc",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Kører boardet med højere end normal prioritet, så andre programmer ikke kan få lyden til at hakke. Den bruger meget lidt CPU, så spil mærker det ikke.",
-  "All sounds: most liked": "Alle lyde: mest likede",
-  "All sounds: newest": "Alle lyde: nyeste",
-  "All sounds: trending": "Alle lyde: trending",
-  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Vinduet er for lille til boardet, så dette er miniafspilleren. Gør det større for at få boardet tilbage.",
   "Watches your game's window while it's open, even behind others": "Holder øje med dit spils vindue, mens det er åbent, også bag andre",
   "Your file stays whole: only the part between the handles plays.": "Din fil forbliver hel: kun delen mellem håndtagene bliver afspillet.",
   "its file is gone (it was at {path})": "filen er væk (den lå i {path})",
@@ -4349,5 +4345,6 @@
   "Not set up yet: only you will hear your sounds.": "Ikke sat op endnu: kun du hører dine lyde.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Du bruger <b>{theme}</b> nu. {n} flere temaer under Indstillinger.",
   "Exact volume of {name}": "Præcis lydstyrke for {name}",
-  "Volume of {name}": "Lydstyrke for {name}"
+  "Volume of {name}": "Lydstyrke for {name}",
+  "Most liked": "Mest likede"
 }
