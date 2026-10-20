@@ -625,6 +625,61 @@ def test_cards_fill_the_tab_as_many_a_row_as_fit(qapp, fake):
     t.shutdown()
 
 
+def test_cards_fit_by_the_widest_card_not_the_first(qapp, fake):
+    # the first card a plain file (no Play next) with a short second line; the rest links
+    # with a longer one, one playing (Pause and Stop): none past the list's edge, and
+    # LIST_GAP left between the cards and the scroll bar
+    url = "https://www.myinstants.com/en/instant/bruh/"
+    fake.sounds = {f"{1:012x}": _sound(1, cat="games", created=int(time.time()) - 86400)}
+    for i in range(2, 30):
+        fake.sounds[f"{i:012x}"] = _sound(i, ext="link", link=url if i == 2 else f"{url}{i}/",
+                                          cat="reactions",
+                                          created=int(time.time()) - 33 * 86400)
+    t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None,
+                          link=lambda u, name, kind: None,
+                          link_state=lambda u: "playing" if u == url else "")
+    t.resize(1900, 700)
+    t.show()
+    assert _wait(qapp, lambda: len(t._rows) == 29 and t.table_head.isVisible())
+    assert _wait(qapp, lambda: t._rows[1].btn_stop.isVisibleTo(t._rows[1]))
+    for width in range(1900, 419, -15):
+        t.resize(width, 700)
+        process_events(qapp, lambda: False, timeout=0.05)
+        room = t.list_area.viewport().width() - storetab.LIST_GAP
+        for r in t._rows:
+            assert r.geometry().right() < room, width
+            assert r.btn_report.mapTo(r, r.btn_report.rect().topRight()).x() < r.width(), width
+    t.shutdown()
+
+
+def test_playing_a_link_never_moves_the_cards(qapp, fake):
+    # Pause and Stop coming out on one card: no column grows, no card moves
+    url = "https://www.myinstants.com/en/instant/bruh/"
+    fake.sounds = {f"{i:012x}": _sound(i, ext="link", link=f"{url}{i}/", cat="reactions",
+                                       name="Michael Jackson Hee Hee" if i == 11 else f"S{i}",
+                                       created=int(time.time()) - 33 * 86400)
+                   for i in range(1, 25)}
+    state = {"now": ""}
+    t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None,
+                          link=lambda u, name, kind: None,
+                          link_state=lambda u: state["now"] if u == f"{url}11/" else "")
+    t.resize(1900, 700)
+    t.show()
+    assert _wait(qapp, lambda: len(t._rows) == 24 and t.table_head.isVisible())
+    r = t._rows[10]
+    for width in (1900, 1600, 1250, 900, 640, 440):
+        t.resize(width, 700)
+        state["now"] = ""
+        assert _wait(qapp, lambda: not r.btn_stop.isVisibleTo(r))
+        process_events(qapp, lambda: False, timeout=0.1)
+        before = [c.geometry() for c in t._rows]
+        state["now"] = "playing"
+        assert _wait(qapp, lambda: r.btn_stop.isVisibleTo(r))
+        process_events(qapp, lambda: False, timeout=0.1)
+        assert [c.geometry() for c in t._rows] == before, width
+    t.shutdown()
+
+
 def test_a_link_card_plays_now_pauses_stops_and_queues(qapp, fake):
     """Play plays a link now (over one that's playing), then turns Pause, Resume while
     it's paused, with Stop beside it; Play next waits for what's playing. The card follows
@@ -635,6 +690,7 @@ def test_a_link_card_plays_now_pauses_stops_and_queues(qapp, fake):
     t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None,
                           link=lambda u, name, kind: links.append(kind),
                           link_state=lambda u: state["now"] if u == url else "")
+    t.resize(560, 700)   # (one card a row, room for its buttons' words)
     t.show()
     assert _wait(qapp, lambda: len(t._rows) == 1)
     r = t._rows[0]

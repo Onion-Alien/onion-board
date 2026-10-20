@@ -15,8 +15,8 @@ from pathlib import Path
 from PySide6.QtCore import QEvent, QPoint, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QFileDialog, QGridLayout,
-                               QHBoxLayout, QLabel, QLineEdit, QMenu, QPushButton, QScrollArea,
-                               QSizePolicy, QStackedWidget, QVBoxLayout, QWidget)
+                               QHBoxLayout, QLabel, QLayout, QLineEdit, QMenu, QPushButton,
+                               QScrollArea, QSizePolicy, QStackedWidget, QVBoxLayout, QWidget)
 
 from soundboard.core import achievements, errors, usage
 from soundboard.ui.kit import wheelguard
@@ -265,6 +265,7 @@ class StoreTab(QWidget):
         self._off = False   # showing "The store is off"
         self._offset = 0
         self._rows: list[SoundRow] = []
+        self._need: tuple[int, int] | None = None   # (_card_needs)
         self._playing: SoundRow | None = None
         self._busy: set[tuple[str, str]] = set()   # (sound id, "play" / "add" / "vote")
         self._listed.connect(self._on_listed)
@@ -481,7 +482,8 @@ class StoreTab(QWidget):
         return False
 
     def retheme(self):
-        pass
+        self._need = None   # (another style's padding: the cards measured again)
+        QTimer.singleShot(0, self, lambda: self._fit_columns(force=True))
 
     def shutdown(self):
         self._closed = True
@@ -601,16 +603,19 @@ class StoreTab(QWidget):
                 b.setIcon(QIcon())
 
     def _fit_columns(self, force: bool = False):
-        """As many cards a row as fit the list at CARD_MIN_W each (or the first card's
-        smallest, if other fonts make it wider). A card narrower than its buttons with
-        their words (measured on the first, so longer words or other fonts move the step,
-        never cut a card off): every card shows their pictures only."""
+        """As many cards a row as fit the list with their buttons' words (CARD_MIN_W
+        each, or the widest card's smallest if other fonts make it wider). Not even one
+        fits: every card shows their pictures only, as many a row as fit that way.
+        Measured on every card at its widest, so longer words, other fonts or a link's
+        Stop never cut a card off."""
         if not self._rows:
             return
+        if force:
+            self._need = None
         w = self.list_area.viewport().width() - LIST_GAP
-        first = self._rows[0]
-        first.compact(True)
-        least = max(CARD_MIN_W, self._needs(first))
+        full, small = self._card_needs()
+        compact = w < full
+        least = max(CARD_MIN_W, small if compact else full)
         cols = max(1, (w + CARD_GAP) // (least + CARD_GAP))
         if force or cols != self._cols:
             self._cols = cols
@@ -620,20 +625,41 @@ class StoreTab(QWidget):
                 self._grid.addWidget(r, i // cols, i % cols)
             for c in range(max(cols, self._grid.columnCount())):
                 self._grid.setColumnStretch(c, 1 if c < cols else 0)
-        room = (w - CARD_GAP * (cols - 1)) // cols
-        first.compact(False)
-        compact = self._needs(first) > room
         for r in self._rows:
             r.compact(compact)
 
+    def _card_needs(self) -> tuple[int, int]:
+        """(with words, pictures only): the widest card's smallest width, each card as wide
+        as it gets (Play's longest word, a link's Stop out). Kept until the list changes."""
+        if self._need is None:
+            words = [_("Play"), _("Pause"), _("Resume"), _("Stop")]
+            full = small = 0
+            for r in self._rows:
+                r.ensurePolished()   # (its style's padding: a new card has none yet)
+                was, text, hid = r._compact, r.btn_play.text(), r.btn_stop.isHidden()
+                r.btn_stop.setHidden(r.btn_queue.isHidden())   # (only a link plays on)
+                r.compact(True)
+                small = max(small, self._needs(r))
+                r.compact(False)
+                for word in words:
+                    r.btn_play.setText(word)
+                    full = max(full, self._needs(r))
+                r.btn_play.setText(text)
+                r.btn_stop.setHidden(hid)
+                r.compact(was)
+            self._need = (full, small)
+        return self._need
+
     @staticmethod
     def _needs(r) -> int:
-        """The card's smallest width, as its buttons are now (its own frame included)."""
+        """The card's smallest width, as its buttons are now (its own frame included).
+        Every layout in it is redone first: a card not shown yet keeps its old sizes."""
         lay = r.layout()
-        if lay is not None:
-            lay.invalidate()
-        return max(lay.minimumSize().width() if lay is not None else 0,
-                   r.minimumSizeHint().width())
+        if lay is None:
+            return r.minimumSizeHint().width()
+        for sub in [*r.findChildren(QLayout), lay]:
+            sub.invalidate()
+        return max(lay.minimumSize().width(), r.minimumSizeHint().width())
 
     def showEvent(self, e):
         super().showEvent(e)
