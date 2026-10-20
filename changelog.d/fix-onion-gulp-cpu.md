@@ -1,0 +1,1 @@
+- The Onion Alien easter egg on About no longer keeps the CPU busy while he sits on the empty window: only he is redrawn, and less often.
