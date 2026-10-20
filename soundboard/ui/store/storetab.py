@@ -13,7 +13,6 @@ from collections.abc import Callable
 from pathlib import Path
 
 from PySide6.QtCore import QEvent, QPoint, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QFileDialog, QGridLayout,
                                QHBoxLayout, QLabel, QLayout, QLineEdit, QMenu, QPushButton,
                                QScrollArea, QSizePolicy, QStackedWidget, QVBoxLayout, QWidget)
@@ -376,32 +375,7 @@ class StoreTab(QWidget):
         self._one_row: bool | None = None
         self._lay_toolbar(False)
         col.addWidget(head)
-        # the order, over the cards' right edge: Votes (the best voted first) or Added
-        # (the newest first)
-        self.table_head = QWidget()
-        hh = QHBoxLayout(self.table_head)
-        hh.setContentsMargins(0, 0, LIST_GAP, 0)
-        hh.setSpacing(4)
-        hh.addStretch(1)
-        self._sort = "trending"   # the default: what people are adding now
-        self.sort_btns: dict[str, QPushButton] = {}
-        for key, text, tip in (("trending", _("Trending"),
-                                _("What's popular right now")),
-                               ("top", _("Votes"), _("The best voted first")),
-                               ("new", _("Added"), _("The newest first"))):
-            b = QPushButton(text)
-            hh.addWidget(b)
-            b.setObjectName("small")   # header-sized; the arrow after the words says
-            b.setProperty("quiet", True)   # which one sorts (not checkable: no filled pill)
-            b.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
-            b.setToolTip(tip)
-            b.setCursor(Qt.CursorShape.PointingHandCursor)
-            b.clicked.connect(lambda _c=False, k=key: (
-                k != "trending" and usage.used(f"store-sort-{k}"), self.set_sort(k)))
-            self.sort_btns[key] = b
-        self._sort_look()
-        self.table_head.hide()
-        col.addWidget(self.table_head)
+        self._sort = "trending"   # the default (the dropdown picks Most liked)
 
         # the list, or a message in its place (loading, nothing found, off, failed)
         self.stack = QStackedWidget()
@@ -594,14 +568,6 @@ class StoreTab(QWidget):
         second.addWidget(self.btn_reload)
 
     # ------------------------------------------------------------------ the table
-    def _sort_look(self):
-        """The order the list is in: its column's header with an arrow."""
-        for key, b in self.sort_btns.items():
-            if key == self._sort:
-                icons.set_icon(b, "fold_open", "accent", "accent", size=14)
-            else:
-                b.setIcon(QIcon())
-
     def _fit_columns(self, force: bool = False):
         """As many cards a row as fit the list with their buttons' words (CARD_MIN_W
         each, or the widest card's smallest if other fonts make it wider). Not even one
@@ -700,7 +666,6 @@ class StoreTab(QWidget):
         """Trending (popular right now, the default), Votes (the best voted first, "top")
         or Added (the newest first, "new")."""
         self._sort = key if key in ("top", "new") else "trending"
-        self._sort_look()
         self._show_picked(self._cat)
         self.reload()
 
@@ -826,7 +791,6 @@ class StoreTab(QWidget):
         self.msg_btn.setText(button)
         self.msg_btn.setVisible(bool(button))
         self._msg_do = do
-        self.table_head.hide()
         self.stack.setCurrentWidget(self.message)
 
     def _problem(self, title: str, line: str, fixable: bool = True):
@@ -837,7 +801,6 @@ class StoreTab(QWidget):
         self._fit_buns()
         self.oops.show_problem(title, html.escape(line, quote=False), self.reload,
                                fixable=fixable)
-        self.table_head.hide()
         self.stack.setCurrentWidget(self.oops_page)
 
     def _message_action(self):
@@ -948,11 +911,10 @@ class StoreTab(QWidget):
         self.failed = False
         self._fit_buns()
         self.stack.setCurrentWidget(self.list_area)
-        self.table_head.show()
         self._fit_columns(force=True)
         self._follow_links()
-        if replace:   # a new list starts at its top (the order bar coming in above it
-            QTimer.singleShot(0, self, self._to_top)   # moved it: _hold_rows followed)
+        if replace:   # a new list starts at its top (_hold_rows may have moved it)
+            QTimer.singleShot(0, self, self._to_top)
 
     def _to_top(self):
         """(Where the list is now is where _hold_rows keeps it from here on.)"""
