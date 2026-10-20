@@ -170,8 +170,12 @@ class PlaybackControl(Controller):
         headphones, so it seems to work while nobody else hears it. Said once, until
         the volume goes up again (sound_volume_changed)."""
         mw = self.mw
-        if (not played or mw.cfg.sound_vol > 0 or self._zero_vol_said
-                or mw.cfg.route == "off"):
+        if not played or mw.cfg.sound_vol > 0:
+            return
+        if mw.cfg.route == "off":   # nobody else hears it anyway: no warning, but the
+            achievements.event("sound-vol-0")   # badge (Silent But Deadly) still counts
+            return
+        if self._zero_vol_said:
             return
         self._zero_vol_said = True
         usage.used("sound-vol-0")
