@@ -49,6 +49,31 @@ def tune_runtime_for_audio():
     """
     sys.setswitchinterval(SWITCH_S)
     gc.set_threshold(50_000, 20, 20)
+    raise_process_priority()
+
+
+ABOVE_NORMAL_PRIORITY_CLASS = 0x8000
+
+
+def raise_process_priority():
+    """Run the app one step above normal priority, so a busy PC can't starve the sound.
+
+    At normal priority the audio callbacks and the UI thread share the CPU evenly with
+    everything else that's busy (a build, a browser, an AI tool), and when Windows parks
+    the thread holding the GIL for a time slice (~16-30 ms), the next audio block is
+    late: a ~0.1 s skip in the headphones and in what others hear. Above normal wins
+    those slices back. The app uses a few percent of one core, so nothing else (a game)
+    loses anything it would notice. Not "high": that one outranks parts of Windows
+    itself. Windows doesn't pass above-normal on to the programs the app starts
+    (ffmpeg, the helpers), they start at normal as before."""
+    if sys.platform != "win32":
+        return
+    try:
+        k32 = ctypes.windll.kernel32
+        if not k32.SetPriorityClass(k32.GetCurrentProcess(), ABOVE_NORMAL_PRIORITY_CLASS):
+            log.debug("SetPriorityClass failed: %s", ctypes.GetLastError())
+    except Exception:  # noqa: BLE001
+        log.debug("raising the process priority failed", exc_info=True)
 
 
 RESTART_FLAGS = 8   # RESTART_NO_REBOOT: after a crash, a hang or an update, not a reboot
