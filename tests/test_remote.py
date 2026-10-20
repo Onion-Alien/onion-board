@@ -581,3 +581,38 @@ def test_key_image_draws_stop_random_and_the_switches_as_cards_too(qapp, window)
     assert d("key_image", control="mic", on="maybe") == (400, remote.BAD_ON)
     w.cfg.theme = "Light" if w.cfg.theme != "Light" else "Dark"
     assert d("status")[1]["keys"] != tag               # a plugin draws them again
+
+
+def test_a_keys_hotkey_shows_even_when_it_is_a_combo(qapp, monkeypatch):
+    # a key is always laid out 96 wide, and the board's own rule (a badge only when it
+    # takes under 68 % of the footer) left "Ctrl+Alt+7" off every key
+    from PySide6.QtGui import QFontMetrics
+
+    from soundboard.control import keyimage
+    from soundboard.sounds.library import SoundMeta
+    from soundboard.ui.kit import widgets
+    from soundboard.ui.kit.hotkeypick import pretty_key
+
+    seen = []
+    board = widgets.Pad._footer
+
+    def spy(self, foot, name_font):
+        out = board(self, foot, name_font)
+        seen.append((foot.width(), out[0]))
+        return out
+    monkeypatch.setattr(widgets.Pad, "_footer", spy)
+
+    def badge_pixels(hotkey):
+        meta = SoundMeta(id="k", name="Airhorn", file="", hotkey=hotkey, duration=2.0)
+        img = keyimage._card(meta, False, 144)[0].toImage()
+        ink = widgets.pad_colours()["badge"]
+        return sum(img.pixelColor(x, y) == ink for x in range(0, 72) for y in range(110, 144))
+
+    assert badge_pixels("") == 0
+    width, font = seen[-1]
+    fm = QFontMetrics(font)
+    # one the board's rule drops but that fits the key's footer (which one depends on
+    # the font: CI has no real fonts)
+    combo = next(c for c in ("ctrl+alt+7", "alt+a", "ctrl+7", "f12+a")
+                 if 0.68 * width < fm.horizontalAdvance(pretty_key(c)) + 12 <= width)
+    assert badge_pixels(combo) > 0
