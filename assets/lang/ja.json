@@ -2707,7 +2707,6 @@
   "Only looks: never clicks or types in your game": "見るだけ：ゲームでクリックや入力は一切しません",
   "Plays one of your sounds when something happens in your game.": "ゲームで何か起きたとき、あなたのサウンドを鳴らします。",
   "Rare spawns, queue pops, “YOU DIED”": "レア湧き、マッチング完了、“YOU DIED”",
-  "Watches the game's window, even behind others": "ゲームのウィンドウを見張ります（他のウィンドウの裏でも）",
   "Browsers": "ブラウザー",
   "Calls & chat": "通話とチャット",
   "Games": "ゲーム",
@@ -4277,5 +4276,7 @@
   "Volume of {name}": "{name} の音量",
   "{n} sound is back.": [
     "{n} 個のサウンドを元に戻しました。"
-  ]
+  ],
+  "Watches your game's window while it's open, even behind others": "ゲームのウィンドウが開いている間見張ります（他のウィンドウの裏でも）",
+  "Your file stays whole: only the part between the handles plays.": "ファイルはそのまま残ります。ハンドルの間の部分だけが再生されます。"
 }

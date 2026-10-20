@@ -182,7 +182,7 @@ class TriggersTab(QWidget):
         points.setSpacing(6)
         for pic, words in (
                 ("gamepad", _("Rare spawns, queue pops, “YOU DIED”")),
-                ("eye", _("Watches the game's window, even behind others")),
+                ("eye", _("Watches your game's window while it's open, even behind others")),
                 ("volume", _("Can ring until you stop it")),
                 ("shield", _("Only looks: never clicks or types in your game"))):
             line = QHBoxLayout()

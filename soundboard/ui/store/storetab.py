@@ -744,7 +744,12 @@ class StoreTab(QWidget):
             items = [("", _("All categories"), storelook.ALL_ICON), *items]
         for key, text, _icon in items:
             self.cat_pick.addItem(text, key)
-        icons.set_item_icons(self.cat_pick, [i for _k, _t, i in items])
+        names = [i for _k, _t, i in items]
+        if self._mode == "sounds" and len(items) > len(TOPS):
+            # a line under the orders: "Most liked" read like one more category
+            self.cat_pick.insertSeparator(len(TOPS))
+            names.insert(len(TOPS), "")
+        icons.set_item_icons(self.cat_pick, names)
         self._show_picked(self._kind if self._mode == "voices" else self._cat)
         wheelguard.snug_combo(self.cat_pick)
         # the list as wide as its longest name (+ padding and scroll bar), never cut off

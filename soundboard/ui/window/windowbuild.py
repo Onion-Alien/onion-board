@@ -797,6 +797,9 @@ class WindowBuilder(Controller):
 
         mw.mic_lbl, row = group("mic", _("My mic"),
                                   _("Your real microphone, and how loud your voice is for others"))
+        first = row.itemAt(0)   # its CapIcon: struck through while muted (_sync_mini_mic)
+        assert first is not None
+        mw.mic_icon = first.widget()
         mw.chk_mic = QCheckBox(_("Others hear it"))
         mw.chk_mic.setToolTip(_("Send your voice to others along with the sounds.\nUntick for "
                                   "sounds only: they hear your sounds but not your mic."))

@@ -529,6 +529,19 @@ def test_the_mini_players_full_board_button_brings_the_board_back(window):
     assert not w.fitctl.is_mini() and w.width() > 440
 
 
+def test_the_strip_says_when_the_mic_is_muted(window):
+    """Unticked, the bottom strip's mic group still said "My mic": it says "Mic muted"
+    then, as the mini player does, and its narrow-strip icon button too."""
+    w = window
+    w.chk_mic.setChecked(True)
+    assert w.mic_lbl.text() == "My mic"
+    w.chk_mic.setChecked(False)
+    assert w.mic_lbl.text() == "Mic muted" and w.mini_mic.text() == "Mic muted"
+    assert w._deck_tabs[0].accessibleName() == "Mic muted"
+    w.mini_mic.setChecked(True)
+    assert w.mic_lbl.text() == "My mic" and w._deck_tabs[0].toolTip() == "My mic"
+
+
 def test_muted_with_the_mic_on_the_rail_button_keeps_a_word(window):
     """Muted while your mic still goes out, "Only your mic" didn't fit the rail's
     button and it lost its word: "Mic only" then."""

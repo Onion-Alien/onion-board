@@ -2764,7 +2764,6 @@
   "Only looks: never clicks or types in your game": "Vain katsoo: ei koskaan napsauta tai kirjoita peliisi",
   "Plays one of your sounds when something happens in your game.": "Soittaa yhden äänistäsi, kun pelissä tapahtuu jotain.",
   "Rare spawns, queue pops, “YOU DIED”": "Harvinaiset spawnit, jono valmis, “YOU DIED”",
-  "Watches the game's window, even behind others": "Tarkkailee pelin ikkunaa, myös muiden takana",
   "Browsers": "Selaimet",
   "Calls & chat": "Puhelut ja chat",
   "Games": "Pelit",
@@ -4353,5 +4352,7 @@
   "{n} sound is back.": [
     "{n} ääni palasi.",
     "{n} ääntä palasi."
-  ]
+  ],
+  "Watches your game's window while it's open, even behind others": "Tarkkailee pelisi ikkunaa, kun se on auki, myös muiden takana",
+  "Your file stays whole: only the part between the handles plays.": "Tiedostosi pysyy kokonaisena: vain kahvojen välinen osa soi."
 }

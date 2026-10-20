@@ -2764,7 +2764,6 @@
   "Only looks: never clicks or types in your game": "Само гледа: никога не щраква и не пише в играта",
   "Plays one of your sounds when something happens in your game.": "Пуска един от звуците ви, когато нещо се случи в играта.",
   "Rare spawns, queue pops, “YOU DIED”": "Редки появи, намерен мач, “YOU DIED”",
-  "Watches the game's window, even behind others": "Следи прозореца на играта, дори зад други",
   "Browsers": "Браузъри",
   "Calls & chat": "Разговори и чат",
   "Games": "Игри",
@@ -4353,5 +4352,7 @@
   "{n} sound is back.": [
     "{n} звук се върна.",
     "{n} звука се върнаха."
-  ]
+  ],
+  "Watches your game's window while it's open, even behind others": "Следи прозореца на играта ти, докато е отворен, дори зад други",
+  "Your file stays whole: only the part between the handles plays.": "Файлът ти остава цял: звучи само частта между дръжките."
 }

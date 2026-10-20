@@ -2764,7 +2764,6 @@
   "Only looks: never clicks or types in your game": "Csak néz: soha nem kattint és nem gépel a játékodban",
   "Plays one of your sounds when something happens in your game.": "Lejátssza egy hangodat, amikor valami történik a játékban.",
   "Rare spawns, queue pops, “YOU DIED”": "Ritka spawnok, várólista pukkan, „YOU DIED”",
-  "Watches the game's window, even behind others": "Figyeli a játék ablakát, mások mögött is",
   "Browsers": "Böngészők",
   "Calls & chat": "Hívások és csevegés",
   "Games": "Játékok",
@@ -4353,5 +4352,7 @@
   "{n} sound is back.": [
     "{n} hang visszatért.",
     "{n} hang visszatért."
-  ]
+  ],
+  "Watches your game's window while it's open, even behind others": "Figyeli a játékod ablakát, amíg nyitva van, mások mögött is",
+  "Your file stays whole: only the part between the handles plays.": "A fájlod egészben marad: csak a fogantyúk közötti rész szól."
 }

@@ -308,6 +308,9 @@ def test_effects_tab_has_the_trim(window):
     d = EditDialog(window.meta("s0"), window.hotkeys, lambda *a: None, window, tab="effects")
     tp = d.effects.trim
     assert not tp.isHidden() and abs(tp.length - 0.1) < 1e-3
+    # it only picks the part that plays, and says so: someone hunted for the cut file
+    assert not d.effects.trim_kept.isHidden() and "whole" in d.effects.trim_kept.text()
+    assert d.effects.trim_hint.isHidden()
     tp.set_values(0.02, 0.08, emit=True)
     fx = d.effects.fx()
     assert fx["start"] == 0.02 and fx["end"] == 0.08
