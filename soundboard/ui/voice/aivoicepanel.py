@@ -18,10 +18,10 @@ import re
 import threading
 
 from PySide6.QtCore import QEvent, QPoint, QSize, Qt, Signal
-from PySide6.QtGui import QFont, QIcon, QPainter, QPixmap
+from PySide6.QtGui import QColor, QFont, QIcon, QPainter, QPixmap
 from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QCheckBox, QComboBox, QDialog, QFrame,
-                               QGridLayout, QHBoxLayout, QLabel, QMenu, QPushButton,
-                               QSlider, QVBoxLayout, QWidget)
+                               QGraphicsDropShadowEffect, QGridLayout, QHBoxLayout, QLabel, QMenu,
+                               QPushButton, QSlider, QVBoxLayout, QWidget)
 
 from soundboard.addons import aiaddon
 from soundboard.core import applog, errors, updates, usage
@@ -58,6 +58,28 @@ MAKE = "+make"   # the Make your own voice card's place among the voice ids
 KINDS = (("men", _("Men")), ("women", _("Women")), ("other", _("In between & fun")),
          (MINE, _("Mine")))
 KIND_ICONS = {"men": "voice", "women": "voice", "other": "laugh", MINE: "mic"}
+
+
+class GlowButton(QPushButton):
+    """A primary button with a soft accent glow round it: the one thing to press before
+    the AI voices switch works (greyed till then, which alone didn't say why)."""
+
+    def __init__(self, text: str):
+        super().__init__(text)
+        self.setObjectName("primary")
+        self._glow = QGraphicsDropShadowEffect(self)
+        self._glow.setOffset(0, 0)
+        self._glow.setBlurRadius(40)
+        self.setGraphicsEffect(self._glow)
+        self._recolour()
+
+    def _recolour(self):
+        self._glow.setColor(QColor(theme.T.get("accent", "#7c5cff")))
+
+    def changeEvent(self, e):
+        if e.type() == QEvent.Type.StyleChange:   # a theme change: the new accent
+            self._recolour()
+        super().changeEvent(e)
 
 
 def voice_kind(voice: dict) -> str:
@@ -393,12 +415,12 @@ class AiVoicePanel(QWidget):
 
         mrow = QHBoxLayout()
         mrow.setSpacing(8)
-        self.b_install = QPushButton(_("Install AI voices"))
+        self.b_install = GlowButton(_("Install AI voices"))
         icons.set_icon(self.b_install, "plus")
         self.b_install.setToolTip(_("One-time download, about 90 MB."))
         self.b_install.clicked.connect(self._install)
         mrow.addWidget(self.b_install)
-        self.b_get = QPushButton(_("Get AI voices"))
+        self.b_get = GlowButton(_("Get AI voices"))
         icons.set_icon(self.b_get, "plus")
         self.b_get.setToolTip(_("An optional add-on: about 55 MB, from this project's GitHub "
                                 "page."))
