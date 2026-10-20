@@ -22,6 +22,7 @@ from typing import Any
 from pathlib import Path
 
 from PySide6.QtCore import Qt, QTimer, Signal
+from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
 
 from soundboard.sounds import library, sourceinfo, thumbs, videos
@@ -99,6 +100,9 @@ class LinkBar(QFrame):
         # is one of the board's own songs playing? (MainWindow sets it): a Play waits
         # for it too, it never plays over it
         self.board_busy: Callable[[], bool] = lambda: False
+        # url -> its search card's picture (MainWindow sets it): an Add that reuses a
+        # Play's download has no picture of its own (Play skips it)
+        self.picture_for: Callable[[str], QPixmap | None] = lambda url: None
         self._via: dict[str, str] = {}   # url -> "link" (pasted) or "search", for usage
         self._dups: set[str] = set()     # urls refused as already in the library
         self.added_ids: dict[str, str] = {}   # url -> the sound it was added as (this run)
@@ -535,6 +539,8 @@ class LinkBar(QFrame):
                     more["direct"] = True
                 if video:
                     more["video"] = True
+                if kind == "play":   # no pad to put the picture on: it only slows it down
+                    more["thumbnail"] = False
                 path, title = ytdl.download_audio(
                     url, progress=lambda f: emit("progress", url, f),
                     auto_update=auto_update, **more)
@@ -665,6 +671,8 @@ class LinkBar(QFrame):
             self._count(url, was or "add", False)
         if kind == "added":
             meta, data, title, saved = payload
+            if not meta.image and (pm := self.picture_for(url)) is not None:
+                meta.image = thumbs.store(pm.toImage(), meta.id)
             if current:   # one for a link no longer showing would never be played
                 self._kept = (url, data, meta.level_gain)
             meta.name = (title or (current and self.title) or meta.name)[:40].strip()

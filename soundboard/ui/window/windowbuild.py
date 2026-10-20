@@ -1080,6 +1080,7 @@ class WindowBuilder(Controller):
         mw.linkbar.sound_ready.connect(mw.soundctl.on_downloaded)
         mw.linkbar.played.connect(mw.searchctl.on_link_played)
         mw.linkbar.board_busy = mw.playctl._board_song_playing
+        mw.linkbar.picture_for = lambda url: mw.ytresults.thumb_for(url)   # (made below)
         mw.linkbar.up_next_changed.connect(
             lambda *__: mw.playctl._update_chips(mw.engine.playing()))
         # a link in the search box shows as a result card (nothing downloads until Play / Add)

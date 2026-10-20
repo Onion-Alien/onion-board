@@ -31,6 +31,7 @@ class Net:
         self.plays: list[tuple[str, int]] = []      # (sid, frames) the engine was asked
         self.added: list[str] = []                  # names added to the library
         self.done: list[tuple[str, str, bool]] = []
+        self.asked: list[tuple[str, dict]] = []    # (url, download_audio's options)
         net = self
 
         class Worker:
@@ -47,6 +48,7 @@ class Net:
         monkeypatch.setattr(linkbar_mod, "threading", fake)
 
         def download(url, **kw):
+            net.asked.append((url, kw))
             if url in net.fail:
                 raise RuntimeError("the site said no")
             return f"C:/nowhere/{url[-3:]}.m4a", NAMES[url]
@@ -71,6 +73,7 @@ class Net:
                             net.plays.append((sid, len(data))) or
                             net.now.__setitem__(sid, (0.0, False)) or object())
         monkeypatch.setattr(w.engine, "playing", lambda: dict(net.now))
+        monkeypatch.setattr(w.engine, "stop", lambda sid, *a, **kw: net.now.pop(sid, None))
         monkeypatch.setattr(w, "_save_now", lambda: None)
         w.linkbar.done.connect(lambda *a: self.done.append(a))
 
@@ -344,3 +347,79 @@ def test_now_playing_and_up_next_show_on_every_tab(net):
     w.playctl._update_chips(w.engine.playing())
     assert w.playing_row.isVisible() and w._up_next_chip is not None
     assert not w.sounds_page.isAncestorOf(w.playing_row)
+
+
+def test_play_skips_the_picture_add_keeps_it(net):
+    """Play once has no pad to show a picture on, and fetching it was most of the
+    wait (yt-dlp tries sizes YouTube doesn't have, seconds each). Add still gets it."""
+    net.click(A, play=True)
+    net.land(A)
+    net.click(B, play=False)
+    net.land(B)
+    assert net.asked == [(A, {"progress": net.asked[0][1]["progress"], "auto_update": False,
+                              "thumbnail": False}),
+                         (B, {"progress": net.asked[1][1]["progress"], "auto_update": False})]
+
+
+def test_add_after_play_takes_the_cards_picture(net, monkeypatch):
+    """Add after Play reuses Play's download, which has no picture: the search card's
+    picture goes on the pad instead."""
+    from PySide6.QtGui import QPixmap
+    pm = QPixmap(16, 9)
+    stored = []
+    monkeypatch.setattr(linkbar_mod.thumbs, "store",
+                        lambda img, sid: stored.append((img.size().toTuple(), sid)) or "p.jpg")
+    monkeypatch.setattr(net.w.linkbar, "picture_for", lambda url: pm if url == A else None)
+    net.click(A, play=True)
+    net.land(A)
+    net.click(A, play=False)
+    net.land(A)
+    assert [u for u, _kw in net.asked] == [A]   # Play's file, not a second download
+    meta = next(m for m in net.w.cfg.sounds if m.name == "Shrek")
+    assert meta.image == "p.jpg" and stored == [((16, 9), meta.id)]
+
+
+def _pad(net, url, monkeypatch, **how):
+    """`url` added as a pad (its audio loaded), with `how` (mode, loop) set."""
+    net.click(url, play=False)
+    net.land(url)
+    m = next(m for m in net.w.cfg.sounds if m.name == NAMES[url])
+    for k, v in how.items():
+        setattr(m, k, v)
+    net.w.audio[m.id] = np.zeros((480, 2), np.int16)
+    monkeypatch.setattr(net.w.searchctl, "_pad_for_link", lambda link: None)
+    return m.id
+
+
+def test_a_pad_stops_the_search_song_instead_of_playing_over_it(net, monkeypatch):
+    """The reported double play: a pad (or the download bar's ▶ on an added one) set
+    to stop the others left the search's song playing under it."""
+    sid = _pad(net, C, monkeypatch)
+    net.click(A, play=True)
+    net.land(A)
+    assert PLAY_ID in net.now
+    net.w.playctl.play(sid)
+    assert sid in net.now and PLAY_ID not in net.now
+
+
+def test_overlap_and_loop_pads_still_play_over_the_search_song(net, monkeypatch):
+    over = _pad(net, C, monkeypatch, mode="overlap")
+    rain = _pad(net, D, monkeypatch, loop=True)
+    net.click(A, play=True)
+    net.land(A)
+    net.w.playctl.play(over)
+    net.w.playctl.play(rain)
+    assert {over, rain, PLAY_ID} <= set(net.now)
+
+
+def test_up_next_name_click_makes_way_for_it(net, monkeypatch):
+    """A song's name in Up next plays it now like its ▶: the board's song playing
+    stops, they never play together."""
+    sid = _pad(net, C, monkeypatch)
+    net.w.playctl.play(sid)
+    net.click(A, play=True)
+    net.land(A)
+    assert net.w.linkbar.up_next() == ["Shrek"]   # waits for the pad's song
+    item = net.w.playctl._up_next_items()[0]
+    item.on_click()
+    assert PLAY_ID in net.now and sid not in net.now

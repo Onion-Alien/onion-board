@@ -664,7 +664,7 @@ def clean_title(title: str) -> str:
 def download_audio(url: str, dest: Path | None = None,
                    progress: Callable[[float], None] | None = None,
                    auto_update: bool = True, direct: bool = False,
-                   video: bool = False) -> tuple[Path, str]:
+                   video: bool = False, thumbnail: bool = True) -> tuple[Path, str]:
     """Download the audio of `url` into `dest` (a new temp folder by default), at
     Settings > Data & quality's download quality; with `video`, the video with its
     sound in one file (save_video() keeps a copy, the pad is still decoded from it).
@@ -674,14 +674,19 @@ def download_audio(url: str, dest: Path | None = None,
     Raises DownloadError with a message fit to show the user (SwitchedOff when its
     site is switched off in Settings > Privacy & security, TorBlocked when the site
     turned Tor away). `direct` skips the Connection setting (not the switches) for
-    this one download: only for the user's own "Try this one without Tor" click."""
+    this one download: only for the user's own "Try this one without Tor" click.
+    `thumbnail` False skips the video's picture (Play once has no pad to show it on):
+    yt-dlp tries the biggest sizes first and YouTube takes seconds to say each of
+    those doesn't exist, ~12 s before the audio even starts."""
     feature = _gate(url)
     if url.startswith(MYINSTANTS + "/media/sounds/"):
         if direct:
             return _download_direct(url, dest, progress, direct=True)
         return _over_tor(lambda: _download_direct(url, dest, progress), url)
 
-    extra = {"video": True} if video else {}
+    extra: dict[str, bool] = {"video": True} if video else {}
+    if not thumbnail:
+        extra["thumbnail"] = False
 
     def fetch():
         if direct:
@@ -939,15 +944,16 @@ def _ydl():
 
 
 def _download(url, dest, progress, feature: str = FEATURE,
-              direct: bool = False, video: bool = False) -> tuple[Path, str]:
+              direct: bool = False, video: bool = False,
+              thumbnail: bool = True) -> tuple[Path, str]:
     with _ydl() as yt_dlp:
         if dest:
-            return _run(yt_dlp, url, Path(dest), progress, feature, direct, video)
+            return _run(yt_dlp, url, Path(dest), progress, feature, direct, video, thumbnail)
         # Our own temp folder: the caller only learns it on success, so a failed
         # download (up to the size cap) must not be left behind in %TEMP%.
         tmp = Path(tempfile.mkdtemp(prefix="sb-ytdl-"))
         try:
-            return _run(yt_dlp, url, tmp, progress, feature, direct, video)
+            return _run(yt_dlp, url, tmp, progress, feature, direct, video, thumbnail)
         except BaseException:
             shutil.rmtree(tmp, ignore_errors=True)
             raise
@@ -1173,9 +1179,9 @@ def save_video(path: Path, title: str) -> Path | None:
 
 
 def _run(yt_dlp, url: str, dest: Path, progress, feature: str = FEATURE,
-         direct: bool = False, video: bool = False) -> tuple[Path, str]:
+         direct: bool = False, video: bool = False, thumbnail: bool = True) -> tuple[Path, str]:
     try:
-        opts = _opts(dest, progress, thumbnail=True, feature=feature, direct=direct,
+        opts = _opts(dest, progress, thumbnail=thumbnail, feature=feature, direct=direct,
                      video=video)
         # a playlist's entries left unresolved: one private or deleted video in it
         # must not hide that it's a playlist (_check says so). A video isn't affected.

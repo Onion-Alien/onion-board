@@ -259,7 +259,8 @@ def test_skip_stops_the_web_search_song_your_sound_waits_for(window, monkeypatch
     playing(monkeypatch, w, ["__link__"])
     w.playctl.queue_sound("s1")
     w.btn_skip.click()
-    assert stopped == ["__link__"] and [c[0] for c in calls] == ["s1"]
+    # (the fake engine never lets it go, so the sound starting stops it again too)
+    assert stopped and set(stopped) == {"__link__"} and [c[0] for c in calls] == ["s1"]
 
 
 def test_skip_with_nothing_waiting_just_stops_the_players_sound(window, monkeypatch, calls):
