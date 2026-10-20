@@ -4265,6 +4265,9 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b>의 마이크 연결이 끊겼어요. 다시 연결하면 사운드가 다시 나가요.",
   "Put the sound first on a busy PC": "PC가 바쁠 때 소리를 우선",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "보드를 보통보다 높은 우선순위로 실행해서 다른 프로그램 때문에 소리가 끊기지 않게 합니다. CPU를 아주 조금만 쓰므로 게임에는 티가 나지 않습니다.",
+  "{n} waiting": [
+    "{n}개 대기 중"
+  ],
   "its file is gone (it was at {path})": "파일이 없어졌어요({path}에 있었어요)",
   "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "VB-Audio의 무료 가상 케이블이에요. 1분 정도 걸리고, Windows가 괜찮은지 한 번 물어봐요. 그다음 Discord와 게임에서 마이크로 고르면 돼요.",
   "Install the cable": "케이블 설치",

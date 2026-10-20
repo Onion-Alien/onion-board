@@ -4339,6 +4339,10 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "De microfoon van <b>{headset}</b> is losgekoppeld. Verbind hem opnieuw en je geluiden gaan weer naar buiten.",
   "Put the sound first on a busy PC": "Geluid eerst als de pc druk bezig is",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Laat het board draaien met een hogere prioriteit dan normaal, zodat andere programma's het geluid niet laten haperen. Het gebruikt heel weinig CPU, dus games merken er niets van.",
+  "{n} waiting": [
+    "{n} wacht",
+    "{n} wachten"
+  ],
   "its file is gone (it was at {path})": "het bestand is weg (het stond in {path})",
   "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Een gratis virtuele kabel van VB-Audio. Het duurt ongeveer een minuut en Windows vraagt één keer of dat goed is. Daarna kies je hem als microfoon in Discord en games.",
   "Install the cable": "Kabel installeren",

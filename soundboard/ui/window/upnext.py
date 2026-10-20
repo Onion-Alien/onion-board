@@ -11,13 +11,14 @@ from __future__ import annotations
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
-from PySide6.QtCore import QPoint, Qt
+from PySide6.QtCore import QPoint, QSize, Qt
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QScrollArea,
+                               QSizePolicy, QStyle, QStyleOptionButton,
                                QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
 
-from soundboard.i18n import _
+from soundboard.i18n import _, ngettext
 from soundboard.ui.kit import icons, panel
 from soundboard.ui.kit.panel import icon_button
 
@@ -37,6 +38,40 @@ class Waiting:
     on_play: Callable[[], object]
     on_move: Callable[[int], object]
     group: str = ""
+
+
+class _Name(QPushButton):
+    """A row's name: the whole name, cut with "…" once, at the width the row really
+    gives it (it was cut to a width worked out ahead, ~50 px short of the room there
+    was). Its whole name is its tooltip."""
+
+    def __init__(self, text: str):
+        super().__init__()
+        self.full = text
+        self.setObjectName("chipname")
+        self.setToolTip(text)
+        self.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
+        self._fit()
+
+    def sizeHint(self) -> QSize:
+        return QSize(0, super().sizeHint().height())
+
+    def minimumSizeHint(self) -> QSize:
+        return QSize(0, super().minimumSizeHint().height())
+
+    def _fit(self):
+        opt = QStyleOptionButton()
+        self.initStyleOption(opt)
+        # inside the style sheet's padding
+        room = self.style().subElementRect(QStyle.SubElement.SE_PushButtonContents,
+                                           opt, self).width()
+        text = self.fontMetrics().elidedText(self.full, Qt.TextElideMode.ElideRight,
+                                             max(room, 0))
+        self.setText(text.replace("&", "&&"))   # "R&B", not "RB"
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        self._fit()
 
 
 class _Grip(QLabel):
@@ -70,9 +105,11 @@ class _Grip(QLabel):
 
 
 class UpNextChip(QPushButton):
-    """The row's one Up next chip: a list icon, "Up next", the count and ^, one even
-    6 px apart and in one font (a button's own text and a smaller number made the gaps
-    uneven, so they're labels inside it). A button, so a screen reader says "button":
+    """The row's one Up next chip: a list icon, "Up next", how many wait ("3 waiting")
+    and ^, one even 6 px apart and in one font (a button's own text and a smaller
+    number made the gaps uneven, so they're labels inside it). A bare "3" read as
+    everything, the sound playing too: it's only what waits (what plays has its own
+    chip before it, the list the same 3). A button, so a screen reader says "button":
     a click, Enter or Space opens the list."""
 
     def __init__(self, count: int):
@@ -89,7 +126,7 @@ class UpNextChip(QPushButton):
         pic = QLabel()
         icons.set_label_icon(pic, "list", "muted", size=14)   # a theme colour, kept on switch
         name = QLabel(_("Up next"))
-        self.count = QLabel(str(count))
+        self.count = QLabel()
         self.count.setObjectName("muted")
         bold = name.font()
         bold.setWeight(QFont.Weight.DemiBold)   # the chips' names are 600 too
@@ -99,7 +136,7 @@ class UpNextChip(QPushButton):
         icons.set_label_icon(fold, "fold_up", "muted", size=12)
         for w in (pic, name, self.count, fold):
             h.addWidget(w, 0, Qt.AlignmentFlag.AlignVCenter)
-        self._name()
+        self.set_count(count)
 
     def sizeHint(self):
         # a button's own hint is for its (empty) text: the labels' row is its size
@@ -109,13 +146,10 @@ class UpNextChip(QPushButton):
     def minimumSizeHint(self):
         return self.sizeHint()
 
-    def _name(self):
-        """Its name for a screen reader: the words it shows, "Up next 3"."""
-        self.setAccessibleName(f"{_('Up next')} {self.count.text()}")
-
     def set_count(self, n: int):
-        self.count.setText(str(n))
-        self._name()
+        self.count.setText(ngettext("{n} waiting", "{n} waiting", n))
+        # its name for a screen reader: the words it shows, "Up next 3 waiting"
+        self.setAccessibleName(f"{_('Up next')} {self.count.text()}")
 
     def keyPressEvent(self, e):
         if e.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):   # Space is a button's own
@@ -178,8 +212,6 @@ class UpNextPopup(QWidget):
         a = self._anchor
         win = a.window().width() if a is not None and qt_valid(a) else POPUP_W + 16
         self.setFixedWidth(max(240, min(POPUP_W, win - 16)))   # inside a narrow window
-        # the card's margins, the grip, the number, the ▶, the ✕, a scroll bar
-        name_w = self.width() - 202
         for i, it in enumerate(items):
             row = QFrame()
             row.setObjectName("chip")
@@ -189,10 +221,7 @@ class UpNextPopup(QWidget):
             num = QLabel(str(i + 1))
             num.setObjectName("muted")
             num.setFixedWidth(22)
-            name = QPushButton(row.fontMetrics().elidedText(
-                it.text, Qt.TextElideMode.ElideRight, name_w).replace("&", "&&"))
-            name.setObjectName("chipname")
-            name.setToolTip(it.text)
+            name = _Name(it.text)
             name.clicked.connect(it.on_click)
             play = QPushButton()
             play.setObjectName("chipstop")

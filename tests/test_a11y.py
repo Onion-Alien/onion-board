@@ -179,7 +179,7 @@ def test_up_next_chip_is_a_button_to_a_screen_reader(window, monkeypatch, qapp):
     assert isinstance(chip, QPushButton)
     face = QAccessible.queryAccessibleInterface(chip)
     assert face.role() == QAccessible.Role.Button
-    assert face.text(QAccessible.Text.Name) == "Up next 3"
+    assert face.text(QAccessible.Text.Name) == "Up next 3 waiting"
     assert chip.sizeHint().width() > 60 and chip.height() == 30   # the labels fit in it
     for key in (Qt.Key.Key_Space, Qt.Key.Key_Return):
         QTest.keyClick(chip, key)

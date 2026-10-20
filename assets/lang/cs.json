@@ -4413,6 +4413,11 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofon na <b>{headset}</b> se odpojil. Připoj ho znovu a tvoje zvuky zase půjdou ven.",
   "Put the sound first on a busy PC": "Zvuk má přednost, když je PC vytížené",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Spustí board s vyšší než normální prioritou, aby jiné programy nemohly způsobit výpadky zvuku. Bere velmi málo CPU, takže hry nic nepoznají.",
+  "{n} waiting": [
+    "{n} čeká",
+    "{n} čekají",
+    "{n} čeká"
+  ],
   "its file is gone (it was at {path})": "jeho soubor zmizel (byl v {path})",
   "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Bezplatný virtuální kabel od VB-Audio. Trvá to asi minutu a Windows se jednou zeptá, jestli to je v pořádku. Pak ho vybereš jako mikrofon v Discordu a ve hrách.",
   "Install the cable": "Nainstalovat kabel",

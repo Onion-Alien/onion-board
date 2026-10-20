@@ -4339,6 +4339,10 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Το μικρόφωνο στα <b>{headset}</b> αποσυνδέθηκε. Σύνδεσέ το ξανά και οι ήχοι σου θα βγαίνουν πάλι.",
   "Put the sound first on a busy PC": "Πρώτα ο ήχος όταν το PC είναι φορτωμένο",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Τρέχει το board με προτεραιότητα πάνω από την κανονική, ώστε άλλα προγράμματα να μην κάνουν τον ήχο να κόβεται. Χρησιμοποιεί ελάχιστη CPU, οπότε τα παιχνίδια δεν θα το καταλάβουν.",
+  "{n} waiting": [
+    "{n} σε αναμονή",
+    "{n} σε αναμονή"
+  ],
   "its file is gone (it was at {path})": "το αρχείο του χάθηκε (ήταν στο {path})",
   "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Ένα δωρεάν εικονικό καλώδιο από τη VB-Audio. Παίρνει περίπου ένα λεπτό και τα Windows ρωτούν μία φορά αν είναι εντάξει. Μετά το επιλέγεις ως μικρόφωνο στο Discord και στα παιχνίδια.",
   "Install the cable": "Εγκατάσταση καλωδίου",

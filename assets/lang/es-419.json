@@ -4339,6 +4339,10 @@
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "El micrófono de <b>{headset}</b> se desconectó. Vuelve a conectarlo y tus sonidos saldrán de nuevo.",
   "Put the sound first on a busy PC": "Darle prioridad al sonido con la PC ocupada",
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Ejecuta el board con prioridad superior a la normal, para que otros programas no hagan que el sonido se corte. Usa muy poca CPU, así que los juegos no lo notan.",
+  "{n} waiting": [
+    "{n} en espera",
+    "{n} en espera"
+  ],
   "its file is gone (it was at {path})": "su archivo ya no está (estaba en {path})",
   "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Un cable virtual gratis de VB-Audio. Tarda como un minuto y Windows te pregunta una vez si está bien. Después lo eliges como micrófono en Discord y en los juegos.",
   "Install the cable": "Instalar el cable",
