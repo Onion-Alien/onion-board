@@ -4338,5 +4338,7 @@
   "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "Οι θεατές σας μπορούν να αναπαράγουν τους ήχους σας: με <b>πόντους καναλιού</b> , με <b>ειδοποιήσεις</b> όταν ακολουθούν, υποβρύχιες, επευφημίες ή επιδρομές και με <b>εντολές !</b> στη συνομιλία. Το Onion Board μιλά με το ίδιο το Twitch, επομένως δεν υπάρχει bot για εγκατάσταση.",
   "Mic off": "Μικρόφωνο κλειστό",
   "Your headset's mic is off": "Το μικρόφωνο των ακουστικών σου είναι κλειστό",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Το μικρόφωνο στα <b>{headset}</b> αποσυνδέθηκε. Σύνδεσέ το ξανά και οι ήχοι σου θα βγαίνουν πάλι."
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Το μικρόφωνο στα <b>{headset}</b> αποσυνδέθηκε. Σύνδεσέ το ξανά και οι ήχοι σου θα βγαίνουν πάλι.",
+  "Put the sound first on a busy PC": "Πρώτα ο ήχος όταν το PC είναι φορτωμένο",
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Τρέχει το board με προτεραιότητα πάνω από την κανονική, ώστε άλλα προγράμματα να μην κάνουν τον ήχο να κόβεται. Χρησιμοποιεί ελάχιστη CPU, οπότε τα παιχνίδια δεν θα το καταλάβουν."
 }

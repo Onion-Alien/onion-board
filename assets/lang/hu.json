@@ -4338,5 +4338,7 @@
   "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "Nézői lejátszhatják az Ön hangjait: <b>csatornapontokkal</b> , <b>figyelmeztetésekkel</b> , amikor követik, sub, cheer vagy raid, valamint <b>!parancsokkal</b> a chatben. Az Onion Board magával a Twitch-vel beszél, így nincs beállítandó bot.",
   "Mic off": "Mikrofon kikapcsolva",
   "Your headset's mic is off": "A headseted mikrofonja ki van kapcsolva",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "A(z) <b>{headset}</b> mikrofonja lecsatlakozott. Csatlakoztasd újra, és a hangjaid újra kimennek."
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "A(z) <b>{headset}</b> mikrofonja lecsatlakozott. Csatlakoztasd újra, és a hangjaid újra kimennek.",
+  "Put the sound first on a busy PC": "A hang előnyt kap, ha a gép le van terhelve",
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "A boardot a normálnál magasabb prioritással futtatja, így más programok nem tudják akadozóvá tenni a hangot. Nagyon kevés CPU-t használ, a játékok nem veszik észre."
 }

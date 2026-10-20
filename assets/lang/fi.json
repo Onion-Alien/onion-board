@@ -4338,5 +4338,7 @@
   "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "Katsojasi voivat toistaa ääniäsi: <b>kanavapisteillä</b> , <b>hälytyksellä</b> , kun he seuraavat, sub-, hurraa- tai raid-toiminnolla ja chatin <b>!-komennoilla</b> . Onion Board keskustelee itse Twitchin kanssa, joten bottia ei tarvitse määrittää.",
   "Mic off": "Mikrofoni pois",
   "Your headset's mic is off": "Kuulokkeidesi mikrofoni on pois päältä",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Kuulokkeiden <b>{headset}</b> mikrofonin yhteys katkesi. Yhdistä se uudelleen, niin äänesi kuuluvat taas."
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Kuulokkeiden <b>{headset}</b> mikrofonin yhteys katkesi. Yhdistä se uudelleen, niin äänesi kuuluvat taas.",
+  "Put the sound first on a busy PC": "Ääni ensin, kun PC on kuormitettu",
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Ajaa boardia normaalia korkeammalla prioriteetilla, jotta muut ohjelmat eivät saa ääntä katkeilemaan. Se käyttää hyvin vähän suoritinta, joten pelit eivät huomaa sitä."
 }

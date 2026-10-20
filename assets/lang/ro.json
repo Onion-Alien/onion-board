@@ -4412,5 +4412,7 @@
   "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "Telespectatorii îți pot reda sunetele: cu <b>puncte de canal</b> , cu <b>alerte</b> când urmăresc, sub, aplaudă sau raid și cu <b>!comenzi</b> în chat. Onion Board vorbește cu Twitch în sine, așa că nu trebuie configurat niciun bot.",
   "Mic off": "Microfon oprit",
   "Your headset's mic is off": "Microfonul căștilor e oprit",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Microfonul de pe <b>{headset}</b> s-a deconectat. Conectează-l din nou și sunetele tale ies iar."
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Microfonul de pe <b>{headset}</b> s-a deconectat. Conectează-l din nou și sunetele tale ies iar.",
+  "Put the sound first on a busy PC": "Sunetul pe primul loc când PC-ul e ocupat",
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Rulează board-ul cu prioritate peste normal, ca alte programe să nu facă sunetul să sară. Folosește foarte puțin procesor, așa că jocurile nu vor observa."
 }

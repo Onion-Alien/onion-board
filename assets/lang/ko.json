@@ -4264,5 +4264,7 @@
   "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "시청자는 <b>채널 포인트</b> , 팔로우, 구독, 응원 또는 공격 시 <b>알림</b> , 채팅에서 <b>!명령을</b> 사용하여 사운드를 재생할 수 있습니다. Onion Board는 Twitch 자체와 통신하므로 설정할 봇이 없습니다.",
   "Mic off": "마이크 꺼짐",
   "Your headset's mic is off": "헤드셋 마이크가 꺼져 있어요",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b>의 마이크 연결이 끊겼어요. 다시 연결하면 사운드가 다시 나가요."
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b>의 마이크 연결이 끊겼어요. 다시 연결하면 사운드가 다시 나가요.",
+  "Put the sound first on a busy PC": "PC가 바쁠 때 소리를 우선",
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "보드를 보통보다 높은 우선순위로 실행해서 다른 프로그램 때문에 소리가 끊기지 않게 합니다. CPU를 아주 조금만 쓰므로 게임에는 티가 나지 않습니다."
 }

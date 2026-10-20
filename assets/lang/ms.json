@@ -4264,5 +4264,7 @@
   "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "Penonton anda boleh memainkan bunyi anda: dengan <b>titik saluran</b> , dengan <b>makluman</b> apabila mereka mengikuti, sub, sorak atau serbuan dan dengan <b>!perintah</b> dalam sembang. Onion Board bercakap dengan Twitch sendiri, jadi tiada bot untuk disediakan.",
   "Mic off": "Mikrofon dimatikan",
   "Your headset's mic is off": "Mikrofon set kepala anda dimatikan",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofon pada <b>{headset}</b> terputus. Sambungkan semula dan bunyi anda akan keluar semula."
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofon pada <b>{headset}</b> terputus. Sambungkan semula dan bunyi anda akan keluar semula.",
+  "Put the sound first on a busy PC": "Utamakan bunyi bila PC sibuk",
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Menjalankan board pada keutamaan atas biasa, supaya program lain tidak membuat bunyi tersekat-sekat. Ia guna CPU yang sangat sedikit, jadi permainan tidak akan perasan."
 }

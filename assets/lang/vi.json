@@ -4264,5 +4264,7 @@
   "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "Người xem có thể phát âm thanh của bạn: bằng <b>điểm kênh</b> , với <b>cảnh báo</b> khi họ theo dõi, phụ, cổ vũ hoặc đột kích và bằng <b>!lệnh</b> trong trò chuyện. Onion Board giao tiếp với chính Twitch nên không cần thiết lập bot.",
   "Mic off": "Micrô tắt",
   "Your headset's mic is off": "Micrô của tai nghe đang tắt",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Micrô của <b>{headset}</b> đã ngắt kết nối. Kết nối lại và âm thanh của bạn sẽ được gửi đi lại."
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Micrô của <b>{headset}</b> đã ngắt kết nối. Kết nối lại và âm thanh của bạn sẽ được gửi đi lại.",
+  "Put the sound first on a busy PC": "Ưu tiên âm thanh khi PC đang bận",
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Chạy board ở mức ưu tiên trên bình thường, để các chương trình khác không làm âm thanh bị giật. Nó dùng rất ít CPU nên game sẽ không thấy khác biệt."
 }
