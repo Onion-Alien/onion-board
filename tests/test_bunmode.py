@@ -110,6 +110,20 @@ def test_bun_keeps_his_size_and_stays_on_screen(window, qapp):
     assert bun.bun_h == 180 and bun._on_a_screen(bun.pos())
 
 
+def test_bun_lands_centred_on_the_window_he_came_from(window, qapp):
+    """Even after he was dragged somewhere else last time: right where the window was."""
+    _mini(window)
+    room = window.screen().availableGeometry()
+    window.move(room.center() - window.rect().center() + QPoint(30, -20))   # off the middle
+    qapp.processEvents()
+    window.cfg.bun["pos"] = [0, 0]
+    was = window.frameGeometry().center()
+    window.bunctl.enter_bun_mode()
+    bun = window.bunctl.bun_mode
+    body = bun._bun_rect().translated(bun.pos()).center()
+    assert abs(body.x() - was.x()) <= 1 and abs(body.y() - was.y()) <= 1
+
+
 def test_hover_shows_the_buttons_and_paints_the_grip(window, qapp):
     _mini(window)
     window.bunctl.enter_bun_mode()

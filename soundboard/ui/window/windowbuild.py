@@ -313,7 +313,7 @@ class WindowBuilder(Controller):
         mw.btn_about.setProperty("quiet", True)
         mw.btn_about.setToolTip(_("Help and community"))
         mw.btn_about.setProperty("railtext", _("Help and community"))
-        icons.set_icon(mw.btn_about, "onion", size=sidebar.ICON, gap=False)
+        icons.set_icon(mw.btn_about, "bun", size=sidebar.ICON, gap=False)
         mw.about_menu = DropdownMenu(mw.btn_about)
         mw.about_menu.aboutToShow.connect(mw.aboutctl._fill_about_menu)
         mw.btn_about.clicked.connect(mw.aboutctl._show_about_menu)
