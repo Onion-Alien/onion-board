@@ -53,7 +53,7 @@ def pops(qapp, monkeypatch):
     monkeypatch.setattr(ap, "GAP_MS", 0)
     host = QWidget()
     host.engine = _Engine()
-    host.cfg = Config(achievement_sound=True)
+    host.cfg = Config(achievement_popups=True, achievement_sound=True)
     p = ap.AchievementPops(host)
     process_events(qapp, lambda: p.ready)
     yield p
@@ -70,9 +70,16 @@ def test_an_earned_one_pops_up_with_its_chime_in_the_headphones_only(qapp, pops)
                                       {"mode": "restart", "preview": True})]
 
 
-def test_the_chime_is_off_by_default_and_the_pop_up_still_shows(qapp, pops):
+def test_pop_ups_and_their_chime_are_off_by_default(qapp, pops):
     pops.mw.cfg = Config()
-    assert not pops.mw.cfg.achievement_sound
+    assert not pops.mw.cfg.achievement_popups and not pops.mw.cfg.achievement_sound
+    pops.earned.emit("first_blood")
+    process_events(qapp, lambda: pops.showing, timeout=0.3)
+    assert not pops.showing and not pops.queue and pops.mw.engine.played == []
+
+
+def test_the_chime_is_off_by_default_and_the_pop_up_still_shows(qapp, pops):
+    pops.mw.cfg = Config(achievement_popups=True)
     pops.earned.emit("first_blood")
     process_events(qapp, lambda: pops.showing)
     assert pops.pop.isVisible() and pops.mw.engine.played == []
