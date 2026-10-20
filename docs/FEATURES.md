@@ -349,6 +349,10 @@ Soundpad do). It hands Onion Board your clean voice, and puts back what you send
 your processed voice plus your sounds, about 20 ms later. Close Onion Board and your
 mic is just your mic again.
 
+It works with Equalizer APO on the same mic, whichever went on first: your EQ still
+runs, Onion Board's sounds still get through, and taking either off leaves the other
+working.
+
 With the virtual cable:
 
 ```
