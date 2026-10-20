@@ -345,14 +345,28 @@ def startup(app_dir: Path) -> str:
     import os
     want = os.environ.get("ONIONBOARD_LANG")
     if want is None:
-        raw = _read(app_dir / "config.json") if (app_dir / "config.json").is_file() else {}
-        want = raw.get("language", WINDOWS)
+        want = _setting(app_dir / "config.json")
         want = want if isinstance(want, str) else WINDOWS
     if want == WINDOWS and not FOLLOW_WINDOWS:
         want = ENGLISH
     code = set_language(resolve(want))
     log.info("language: %s (setting %r)", code, want)
     return code
+
+
+def _setting(config: Path) -> object:
+    """config.json's `language` (WINDOWS when there's none). A damaged config.json is the
+    settings load's to report, set aside and recover (library.Config.load): one quiet
+    line here, not a second traceback in the log for a case the app handles."""
+    if not config.is_file():
+        return WINDOWS
+    try:
+        raw = json.loads(config.read_text(encoding="utf-8-sig"))
+    except (OSError, ValueError) as e:
+        log.info("language: config.json is unreadable (%s); the settings load recovers it",
+                 type(e).__name__)
+        return WINDOWS
+    return raw.get("language", WINDOWS) if isinstance(raw, dict) else WINDOWS
 
 
 def _qt_button(source: str) -> str | None:

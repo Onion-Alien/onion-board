@@ -201,6 +201,21 @@ def test_startup_reads_the_setting_or_the_env(langs, tmp_path, monkeypatch):
     assert i18n.startup(tmp_path) == "xx"
 
 
+def test_startup_logs_a_damaged_config_without_a_traceback(langs, tmp_path, monkeypatch,
+                                                            caplog):
+    # the settings load reports, sets aside and recovers a damaged config.json: the
+    # language read before it mustn't add a traceback to the log for the same file
+    monkeypatch.delenv("ONIONBOARD_LANG", raising=False)
+    monkeypatch.setattr(i18n, "windows_language", lambda: "en-NZ")
+    (tmp_path / "config.json").write_text('{"language": "de", "sounds": [', encoding="utf-8")
+    with caplog.at_level("DEBUG", logger=i18n.log.name):
+        assert i18n.startup(tmp_path) == "en"
+    assert not [r for r in caplog.records if r.exc_info or r.levelno >= 30]
+    # a byte-order mark (another editor's save) is still read
+    (tmp_path / "config.json").write_text(json.dumps({"language": "de"}), encoding="utf-8-sig")
+    assert i18n.startup(tmp_path) == "de"
+
+
 def test_startup_stays_english_on_another_windows_until_the_picker(langs, tmp_path,
                                                                    monkeypatch):
     monkeypatch.delenv("ONIONBOARD_LANG", raising=False)
