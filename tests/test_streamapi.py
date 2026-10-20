@@ -325,3 +325,20 @@ def test_a_post_body_is_read_as_the_values(qapp):
         assert st == 413 and len(calls) == 3
     finally:
         ctl.stop()
+
+
+def test_a_raid_sent_with_an_amount_fills_in_its_count(qapp, window):
+    w = window
+    assert d(w, "alerts", type="raid", say="{user} raided with {count} people")[0] == 200
+    st, body = d(w, "event", type="raid", user="Raider", amount="42")
+    assert body["handled"] and body["saying"] == "Raider raided with 42 people", body
+    assert streamapi.normalize({"type": "raid", "count": "7", "amount": "42"})["count"] == 7
+
+
+def test_a_field_with_no_value_is_left_out_not_read_out(qapp, window):
+    w = window
+    assert d(w, "alerts", type="donation", say="{user} tipped {amount} {currency}")[0] == 200
+    st, body = d(w, "event", type="donation", user="Ana", currency="NZD")
+    assert body["handled"] and body["saying"] == "Ana tipped NZD", body
+    # a name it doesn't know stays as it was written
+    assert streamapi.fill("{user} {nope} {amount}", {"user": "Bo", "amount": None}) == "Bo {nope} "
