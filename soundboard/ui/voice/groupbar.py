@@ -20,6 +20,8 @@ BAR_H = 32        # px: the dropdown, the search box and the view switch (26 + 2
 PICK_MIN_W = 190  # px: the dropdown's width, so the search box starts in one place
 PICK_NARROW = 120  # px: its least, in a narrow window (the name ends in "…")
 PICK_PAD = 8      # px: its icon from the left edge, level with the search box's magnifier
+SEARCH_MAX = 80   # letters: no voice name comes close; a huge paste stops here instead of
+                  # sorting every card again for each of thousands of letters
 
 
 class PickButton(QPushButton):
@@ -92,6 +94,7 @@ class GroupBar(QWidget):
         s = self.search = QLineEdit()
         s.setObjectName("voicesearch")
         s.setFixedHeight(BAR_H)
+        s.setMaxLength(SEARCH_MAX)
         fit_placeholder(s, *hints)
         s.setAccessibleName(hints[-1])
         s.addAction(icons.icon("search", "muted"), QLineEdit.ActionPosition.LeadingPosition)
@@ -170,4 +173,6 @@ def no_match(label, found: str, shown) -> None:
     """The "nothing matches" line under the bar: shown while a search finds no card."""
     label.setVisible(bool(found) and not shown)
     if found and not shown:
+        if len(found) > 40:
+            found = found[:39] + "…"
         label.setText(_("Nothing matches “{text}”.", text=found))
