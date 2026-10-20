@@ -622,7 +622,6 @@
   "A restore point is saved first, so you can undo this.": "Un point de restauration est d'abord enregistré, pour que tu puisses annuler.",
   "A small dot on its icon": "Un petit point sur son icône",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Une soundboard est plus utile laissée ouverte : tes raccourcis et l'overlay marchent même fenêtre fermée. L'icône de la zone de notification (près de l'horloge) la rouvre ; clic droit dessus pour quitter.",
-  "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Un onglet dont la fonction est active en ce moment (un son qui joue, le changeur de voix, la radio…) est marqué, pour que rien ne reste actif sans que tu le remarques.",
   "About": "À propos",
   "Add a device": "Ajouter un périphérique",
   "Add as sound keeps a copy of the video too (the pad is still just its sound). Videos use a lot more data: about 5 to 25 MB a minute.": "Ajouter comme son garde aussi une copie de la vidéo (le pad reste juste son son). Les vidéos utilisent bien plus de données : environ 5 à 25 Mo par minute.",
@@ -1265,7 +1264,6 @@
   "What do these do?": "À quoi servent-ils ?",
   "What do you want to reset?": "Que veux-tu réinitialiser ?",
   "What goes online": "Ce qui va en ligne",
-  "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "Ce qui est actif (le changeur de voix, En direct, un onglet actif) s'affiche dans la couleur du thème. Fais glisser pour choisir la tienne ; elle reste quand tu changes de thème.",
   "Whatever played last, from a pad, a hotkey or the random key.": "Ce qui a joué en dernier, depuis un pad, un raccourci ou la touche au hasard.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "Quand Discord, TeamSpeak, Mumble ou un jeu avec un chat vocal connu écoute ton micro (ou le câble), utiliser son mode sans demander. Si rien n'écoute, le mode reste tel quel.",
   "When the program closes, the board goes back to what it showed before.": "Quand le programme se ferme, le tableau revient à ce qu'il affichait avant.",
@@ -4324,5 +4322,8 @@
   "Play a chime in your headphones when you earn one.": "Jouer un carillon dans ton casque quand tu en débloques un.",
   "Pop-up sound": "Son de la notification",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "« Succès débloqué » en bas de l'écran quand tu en débloques un.",
-  "Show pop-ups": "Afficher les notifications"
+  "Show pop-ups": "Afficher les notifications",
+  "Marks a tab whose feature is on, so nothing is left on without you noticing.": "Marque un onglet dont la fonction est activée, pour que rien ne reste allumé sans que tu le remarques.",
+  "Size and speed": "Taille et vitesse",
+  "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Ce qui est activé s'affiche dans cette couleur. Fais glisser pour choisir la tienne ; elle reste quand tu changes de thème."
 }

@@ -111,7 +111,6 @@
   "A restore point is saved first, so you can undo this.": "Et gjenopprettingspunkt lagres først, så du kan angre dette.",
   "A small dot on its icon": "En liten prikk på ikonet",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Et soundboard er mest nyttig når det får kjøre: hurtigtastene og overlayet virker mens vinduet er lukket. Ikonet i systemstatusfeltet (ved klokken) åpner det igjen; høyreklikk det for å avslutte.",
-  "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "En fane der funksjonen er på akkurat nå (en lyd som spilles, stemmeforvrengeren, radioen…) blir merket, så ingenting står på uten at du merker det.",
   "A virtual cable (not installed yet)": "En virtuell kabel (ikke installert ennå)",
   "A virtual cable is a pipe: audio goes in at <b>{main}</b> and comes out at <b>{virtual_mic}</b>, which Discord / the game uses as your mic.": "En virtuell kabel er et rør: lyden går inn på <b>{main}</b> og kommer ut på <b>{virtual_mic}</b>, som Discord / spillet bruker som mikrofonen din.",
   "A window opened that downloads VB-Cable (free) from the official VB-Audio site.\n\nWindows will ask for permission, click Yes, then click “Install Driver”.\n\nWhen it's done, click “I've installed it, check again”. If it doesn't show up, restart your PC.": "Et vindu åpnet seg som laster ned VB-Cable (gratis) fra det offisielle nettstedet til VB-Audio.\n\nWindows vil be om tillatelse, klikk Ja, og klikk så «Install Driver».\n\nNår det er ferdig, klikk «Jeg har installert den, sjekk igjen». Hvis den ikke dukker opp, start PC-en på nytt.",
@@ -1185,7 +1184,6 @@
   "What goes online": "Hva som går på nett",
   "What's new": "Hva er nytt",
   "What's playing": "Det som spilles",
-  "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "Det som er slått på (stemmeforvrengeren, Live, en live-fane), vises i temaets farge. Dra for å velge din egen; den blir når du bytter tema.",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "Det som lytter til <b>{main}</b>, får lydene dine (og stemmen din, hvis du sender den): OBS, Voicemeeter, en mikser eller et opptakskort.",
   "Whatever played last, from a pad, a hotkey or the random key.": "Det som ble spilt sist, fra en pad, en hurtigtast eller tasten for tilfeldig lyd.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "Når Discord, TeamSpeak, Mumble eller et spill med kjent talechat lytter til mikrofonen din (eller kabelen), bruk modusen dens uten å spørre. Når ingenting lytter, blir modusen som den er.",
@@ -4324,5 +4322,8 @@
   "Play a chime in your headphones when you earn one.": "Spill en klokkelyd i hodetelefonene når du låser opp en.",
   "Pop-up sound": "Lyd for oppsprettvindu",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "«Prestasjon låst opp» nederst på skjermen når du låser opp en.",
-  "Show pop-ups": "Vis oppsprettvinduer"
+  "Show pop-ups": "Vis oppsprettvinduer",
+  "Marks a tab whose feature is on, so nothing is left on without you noticing.": "Merker en fane der funksjonen er på, så ingenting står på uten at du merker det.",
+  "Size and speed": "Størrelse og fart",
+  "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Det som er slått på, vises i denne fargen. Dra for å velge din egen; den blir værende når du bytter tema."
 }
