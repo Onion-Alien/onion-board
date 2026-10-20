@@ -4343,5 +4343,7 @@
   "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Een gratis virtuele kabel van VB-Audio. Het duurt ongeveer een minuut en Windows vraagt één keer of dat goed is. Daarna kies je hem als microfoon in Discord en games.",
   "Install the cable": "Kabel installeren",
   "Not set up yet: only you will hear your sounds.": "Nog niet ingesteld: alleen jij hoort je geluiden.",
-  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Je gebruikt nu <b>{theme}</b>. Nog {n} thema's in Instellingen."
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Je gebruikt nu <b>{theme}</b>. Nog {n} thema's in Instellingen.",
+  "Exact volume of {name}": "Exact volume van {name}",
+  "Volume of {name}": "Volume van {name}"
 }

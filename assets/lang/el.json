@@ -4343,5 +4343,7 @@
   "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Ένα δωρεάν εικονικό καλώδιο από τη VB-Audio. Παίρνει περίπου ένα λεπτό και τα Windows ρωτούν μία φορά αν είναι εντάξει. Μετά το επιλέγεις ως μικρόφωνο στο Discord και στα παιχνίδια.",
   "Install the cable": "Εγκατάσταση καλωδίου",
   "Not set up yet: only you will hear your sounds.": "Δεν έχει ρυθμιστεί ακόμα: μόνο εσύ θα ακούς τους ήχους σου.",
-  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Τώρα χρησιμοποιείς το <b>{theme}</b>. Ακόμα {n} θέματα στις Ρυθμίσεις."
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Τώρα χρησιμοποιείς το <b>{theme}</b>. Ακόμα {n} θέματα στις Ρυθμίσεις.",
+  "Exact volume of {name}": "Ακριβής ένταση του {name}",
+  "Volume of {name}": "Ένταση του {name}"
 }

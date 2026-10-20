@@ -4269,5 +4269,7 @@
   "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "VB-Audio의 무료 가상 케이블이에요. 1분 정도 걸리고, Windows가 괜찮은지 한 번 물어봐요. 그다음 Discord와 게임에서 마이크로 고르면 돼요.",
   "Install the cable": "케이블 설치",
   "Not set up yet: only you will hear your sounds.": "아직 설정 안 됨: 내 사운드는 나만 들어요.",
-  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "지금 <b>{theme}</b> 테마를 쓰고 있어요. 설정에 테마가 {n}개 더 있어요."
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "지금 <b>{theme}</b> 테마를 쓰고 있어요. 설정에 테마가 {n}개 더 있어요.",
+  "Exact volume of {name}": "{name} 정확한 볼륨",
+  "Volume of {name}": "{name} 볼륨"
 }

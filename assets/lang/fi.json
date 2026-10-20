@@ -4343,5 +4343,7 @@
   "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Ilmainen virtuaalikaapeli VB-Audiolta. Se vie noin minuutin, ja Windows kysyy kerran, sopiiko se. Sen jälkeen valitset sen mikrofoniksi Discordissa ja peleissä.",
   "Install the cable": "Asenna kaapeli",
   "Not set up yet: only you will hear your sounds.": "Ei vielä käytössä: vain sinä kuulet äänesi.",
-  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Käytössä nyt: <b>{theme}</b>. Lisää teemoja asetuksissa: {n}"
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Käytössä nyt: <b>{theme}</b>. Lisää teemoja asetuksissa: {n}",
+  "Exact volume of {name}": "Ohjelman {name} tarkka äänenvoimakkuus",
+  "Volume of {name}": "Ohjelman {name} äänenvoimakkuus"
 }

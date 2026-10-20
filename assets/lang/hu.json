@@ -4343,5 +4343,7 @@
   "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Ingyenes virtuális kábel a VB-Audiótól. Körülbelül egy perc, és a Windows egyszer megkérdezi, rendben van-e. Utána kiválasztod mikrofonként a Discordban és a játékokban.",
   "Install the cable": "Kábel telepítése",
   "Not set up yet: only you will hear your sounds.": "Még nincs beállítva: csak te hallod a hangjaidat.",
-  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Most ezt használod: <b>{theme}</b>. További témák a Beállításokban: {n}"
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Most ezt használod: <b>{theme}</b>. További témák a Beállításokban: {n}",
+  "Exact volume of {name}": "{name} pontos hangereje",
+  "Volume of {name}": "{name} hangereje"
 }

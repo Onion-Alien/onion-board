@@ -148,3 +148,43 @@ def test_every_tab_stop_in_settings_has_a_name(window):
             w = w.nextInFocusChain()
     window.setctl.close_settings()
     assert missing == {}
+
+
+def test_the_search_box_says_it_takes_links_too(window, monkeypatch):
+    """A narrow window's hint is only "Search", but the box also takes a pasted link:
+    its name says both. With finding sounds online off, it only searches yours."""
+    from soundboard.ui.kit.widgets import fit_placeholder
+    box = window.search
+    fit_placeholder(box, "Search")   # what a narrow window shows
+    a11y.label_tree(window, force=True)
+    assert box.accessibleName() == "Search sounds or paste a link"
+    monkeypatch.setattr(window.ytresults, "available", lambda: False)
+    window.netctl._search_follow_switch()
+    assert box.accessibleName() == "Search your sounds"
+
+
+def test_up_next_chip_is_a_button_to_a_screen_reader(window, monkeypatch, qapp):
+    """It looked and clicked like a button but read as a plain frame."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QAccessible
+    from PySide6.QtTest import QTest
+    from test_board_controls import playing
+    w = window
+    w.resize(1200, 760)
+    w.show()
+    playing(monkeypatch, w, ["s0"])
+    w.playctl._queue = ["s1", "s0", "s1"]
+    w.playctl._update_chips(w.engine.playing())
+    chip = w._up_next_chip
+    assert isinstance(chip, QPushButton)
+    face = QAccessible.queryAccessibleInterface(chip)
+    assert face.role() == QAccessible.Role.Button
+    assert face.text(QAccessible.Text.Name) == "Up next 3"
+    assert chip.sizeHint().width() > 60 and chip.height() == 30   # the labels fit in it
+    for key in (Qt.Key.Key_Space, Qt.Key.Key_Return):
+        QTest.keyClick(chip, key)
+        qapp.processEvents()
+        assert w._up_next_popup.isVisible()
+        w._up_next_popup.close()
+        qapp.processEvents()
+        chip = w._up_next_chip

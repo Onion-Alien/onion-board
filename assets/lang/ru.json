@@ -4417,5 +4417,7 @@
   "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Бесплатный виртуальный кабель от VB-Audio. Это займёт около минуты, и Windows один раз спросит разрешения. Потом выбери его как микрофон в Discord и играх.",
   "Install the cable": "Установить кабель",
   "Not set up yet: only you will hear your sounds.": "Пока не настроено: свои звуки слышишь только ты.",
-  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Сейчас у тебя <b>{theme}</b>. Ещё темы в настройках: {n}"
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Сейчас у тебя <b>{theme}</b>. Ещё темы в настройках: {n}",
+  "Exact volume of {name}": "Точная громкость {name}",
+  "Volume of {name}": "Громкость {name}"
 }

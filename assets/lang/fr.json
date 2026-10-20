@@ -4343,5 +4343,7 @@
   "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Un câble virtuel gratuit de VB-Audio. Ça prend environ une minute, et Windows demande une fois si c'est d'accord. Ensuite, tu le choisis comme micro dans Discord et les jeux.",
   "Install the cable": "Installer le câble",
   "Not set up yet: only you will hear your sounds.": "Pas encore configuré : toi seul entendras tes sons.",
-  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Tu utilises <b>{theme}</b> en ce moment. {n} autres thèmes dans les Paramètres."
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Tu utilises <b>{theme}</b> en ce moment. {n} autres thèmes dans les Paramètres.",
+  "Exact volume of {name}": "Volume exact de {name}",
+  "Volume of {name}": "Volume de {name}"
 }

@@ -4269,5 +4269,7 @@
   "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "สายเสมือนฟรีจาก VB-Audio ใช้เวลาประมาณหนึ่งนาที และ Windows จะถามครั้งเดียวว่าโอเคไหม จากนั้นเลือกเป็นไมค์ใน Discord และเกม",
   "Install the cable": "ติดตั้งสาย",
   "Not set up yet: only you will hear your sounds.": "ยังไม่ได้ตั้งค่า: มีแค่คุณที่ได้ยินเสียงของคุณ",
-  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "ตอนนี้ใช้ <b>{theme}</b> อยู่มีธีมอีก {n} แบบในการตั้งค่า"
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "ตอนนี้ใช้ <b>{theme}</b> อยู่มีธีมอีก {n} แบบในการตั้งค่า",
+  "Exact volume of {name}": "ระดับเสียงที่แน่นอนของ {name}",
+  "Volume of {name}": "ระดับเสียงของ {name}"
 }

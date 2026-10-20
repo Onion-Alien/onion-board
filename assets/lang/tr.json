@@ -4343,5 +4343,7 @@
   "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "VB-Audio'dan ücretsiz bir sanal kablo. Yaklaşık bir dakika sürer ve Windows bir kez uygun olup olmadığını sorar. Sonra Discord'da ve oyunlarda mikrofon olarak seçersin.",
   "Install the cable": "Kabloyu kur",
   "Not set up yet: only you will hear your sounds.": "Henüz ayarlanmadı: seslerini sadece sen duyacaksın.",
-  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Şu an <b>{theme}</b> kullanıyorsun. Ayarlar'da {n} tema daha var."
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Şu an <b>{theme}</b> kullanıyorsun. Ayarlar'da {n} tema daha var.",
+  "Exact volume of {name}": "{name} tam ses düzeyi",
+  "Volume of {name}": "{name} ses düzeyi"
 }

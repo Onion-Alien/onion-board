@@ -4343,5 +4343,7 @@
   "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Libreng virtual cable mula sa VB-Audio. Mga isang minuto lang ito, at minsang magtatanong ang Windows kung okay lang. Pagkatapos, piliin mo ito bilang mic sa Discord at sa mga laro.",
   "Install the cable": "I-install ang cable",
   "Not set up yet: only you will hear your sounds.": "Hindi pa naka-set up: ikaw lang ang makakarinig ng mga sound mo.",
-  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "<b>{theme}</b> ang gamit mo ngayon. {n} pang theme sa Settings."
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "<b>{theme}</b> ang gamit mo ngayon. {n} pang theme sa Settings.",
+  "Exact volume of {name}": "Eksaktong volume ng {name}",
+  "Volume of {name}": "Volume ng {name}"
 }

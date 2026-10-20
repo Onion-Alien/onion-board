@@ -4269,5 +4269,7 @@
   "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Một cáp ảo miễn phí của VB-Audio. Mất khoảng một phút, và Windows sẽ hỏi một lần xem có được không. Sau đó bạn chọn nó làm mic trong Discord và game.",
   "Install the cable": "Cài cáp",
   "Not set up yet: only you will hear your sounds.": "Chưa thiết lập: chỉ mình bạn nghe được âm thanh của bạn.",
-  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Bạn đang dùng <b>{theme}</b>. Còn {n} chủ đề khác trong Cài đặt."
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Bạn đang dùng <b>{theme}</b>. Còn {n} chủ đề khác trong Cài đặt.",
+  "Exact volume of {name}": "Âm lượng chính xác của {name}",
+  "Volume of {name}": "Âm lượng của {name}"
 }

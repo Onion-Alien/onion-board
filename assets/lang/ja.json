@@ -4269,5 +4269,7 @@
   "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "VB-Audio の無料の仮想ケーブルです。1 分ほどで終わり、Windows が一度だけ確認します。そのあと Discord やゲームでマイクとして選びます。",
   "Install the cable": "ケーブルを入れる",
   "Not set up yet: only you will hear your sounds.": "まだ設定されていません：サウンドは自分にしか聞こえません。",
-  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "いまは <b>{theme}</b> を使っています。設定にはほかに {n} 個のテーマがあります。"
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "いまは <b>{theme}</b> を使っています。設定にはほかに {n} 個のテーマがあります。",
+  "Exact volume of {name}": "{name} の音量（数値）",
+  "Volume of {name}": "{name} の音量"
 }
