@@ -8,7 +8,8 @@ import pytest
 import numpy as np
 from PySide6.QtCore import QPoint, QPointF, Qt
 from PySide6.QtGui import QMouseEvent
-from PySide6.QtWidgets import QApplication, QLabel, QPushButton
+from PySide6.QtWidgets import (QApplication, QLabel, QPushButton, QStyle,
+                               QStyleOptionButton)
 
 from soundboard import voicefx
 
@@ -421,7 +422,7 @@ def test_a_removed_sound_leaves_up_next(window, monkeypatch, calls):
     w.playctl.queue_sound("s0")
     w.rmctl.remove_sounds(["s1"])
     assert w.playctl._queue == ["s0"]
-    assert w._up_next_chip.count.text() == "1"
+    assert w._up_next_chip.count.text() == "1 waiting"
     assert [i.text for i in w.playctl._up_next_items()] == [w.meta("s0").name]
 
 
@@ -585,8 +586,8 @@ def test_up_next_is_one_chip_whose_list_reaches_every_queued_sound(window, monke
     w.playctl._queue = ["s1", "s0"] * 6 + ["s1"]
     w.playctl._update_chips(w.engine.playing())
     chip = w._up_next_chip
-    assert isinstance(chip, UpNextChip) and chip.count.text() == "13"
-    assert chip.accessibleName() == "Up next 13"   # what it shows, not its tooltip
+    assert isinstance(chip, UpNextChip) and chip.count.text() == "13 waiting"
+    assert chip.accessibleName() == "Up next 13 waiting"   # what it shows, not its tooltip
     assert w._chips_hl.indexOf(chip) == w._chips_hl.count() - 1   # after Now playing
     chip.click()
     pop = w._up_next_popup
@@ -601,11 +602,41 @@ def test_up_next_is_one_chip_whose_list_reaches_every_queued_sound(window, monke
     tenth.findChildren(QPushButton)[-1].click()                    # the 10th's ✕
     assert len(w.playctl._queue) == 12 and w.playctl._queue[9] == "s1"
     assert pop.isVisible() and pop.count.text() == "12"           # refilled in place
-    assert w._up_next_chip.count.text() == "12"
-    assert w._up_next_chip.accessibleName() == "Up next 12"
+    assert w._up_next_chip.count.text() == "12 waiting"
+    assert w._up_next_chip.accessibleName() == "Up next 12 waiting"
     pop.clear.click()                                              # Clear: all of them
     assert w.playctl._queue == [] and not pop.isVisible()
     assert w._up_next_chip is None and set(w.engine.playing()) == {"s0"}
+
+
+def test_up_next_names_fill_the_room_their_row_gives_them(window, monkeypatch):
+    """A long name is cut with "…" once, at the width its row really has: it was cut
+    to a width worked out ahead, ~50 px short, a gap before its ▶."""
+    from soundboard.ui.window.upnext import _Name
+    w = window
+    w.resize(1200, 760)
+    w.show()
+    playing(monkeypatch, w, ["s0"])
+    w._meta["s1"].name = "Windows XP shutdown (extra crunchy ver.)"
+    w.linkbar._up_next = [("Never Gonna Give You Up - Rick Astley (Official Music Video)",
+                           None, 1.0, "https://example.com/v")]
+    w.playctl._queue = ["s1"]
+    w.playctl._update_chips(w.engine.playing())
+    w._up_next_chip.click()
+    QApplication.processEvents()
+    for row in up_next_rows(w):
+        name = row.findChild(_Name)
+        shown = name.text().replace("&&", "&")
+        assert shown.endswith("…") and shown != name.full
+        opt = QStyleOptionButton()
+        name.initStyleOption(opt)
+        room = name.style().subElementRect(QStyle.SubElement.SE_PushButtonContents,
+                                           opt, name).width()
+        fm = name.fontMetrics()
+        assert fm.horizontalAdvance(shown) <= room
+        one_more = name.full[:len(shown)] + "…"   # one letter more: wouldn't fit (no gap)
+        assert fm.horizontalAdvance(one_more) > room
+        assert name.toolTip() == name.full
 
 
 def test_up_next_list_shrinks_when_sounds_are_taken_out_while_open(window, monkeypatch):

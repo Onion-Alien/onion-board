@@ -616,3 +616,24 @@ def test_a_keys_hotkey_shows_even_when_it_is_a_combo(qapp, monkeypatch):
     combo = next(c for c in ("ctrl+alt+7", "alt+a", "ctrl+7", "f12+a")
                  if 0.68 * width < fm.horizontalAdvance(pretty_key(c)) + 12 <= width)
     assert badge_pixels(combo) > 0
+
+
+def test_a_small_keys_length_is_drawn_bigger(qapp):
+    """A 72 px key is the 96 px card drawn smaller: its length was a few pixels high.
+    It grows on a small key: its ink is taller than half of a 144 px key's."""
+    from soundboard.control import keyimage
+    from soundboard.sounds.library import SoundMeta
+    from soundboard.ui.kit import widgets
+
+    def ink_rows(size):
+        """How many pixel rows the footer's right half (the length) has ink in."""
+        meta = SoundMeta(id="k", name="Airhorn", file="", duration=12.4)
+        img = keyimage._card(meta, False, size)[0].toImage()
+        bg = widgets.pad_colours()["card"].lightness()
+        top, left = size * 2 // 3, size // 2
+        return sum(any(img.pixelColor(x, y).lightness() > bg + 60
+                       for x in range(left, size - 2)) for y in range(top, size - 2))
+
+    big, small = ink_rows(144), ink_rows(72)
+    assert big > 0
+    assert small >= big / 2 * 1.25

@@ -436,6 +436,36 @@ def test_card_lists_the_voices_once_installed(qapp, tmp_path, monkeypatch):
         p.deleteLater()
 
 
+def test_your_own_voices_come_before_the_ready_made_ones(qapp, tmp_path):
+    """Under All, the voices you recorded (Mine) are the first cards: under the long
+    grid of ready-made ones they were out of sight."""
+    from soundboard.speech import aivoicelist as avl
+    from soundboard.ui.voice.aivoicepanel import MAKE, MINE, AiVoicePanel
+    folder = tmp_path / "ai-voices"
+    folder.mkdir()
+    for f in ("module.json", "voices.json"):
+        (folder / f).write_bytes((ADDON / f).read_bytes())
+    (info,) = modules.discover([tmp_path])
+    p = AiVoicePanel(AiVoiceController(VoiceChain(), lambda e: None), {}, [info])
+    try:
+        p.voices = [*p.voices, {"id": avl.MY_PREFIX + "gravel", "name": "Gravel",
+                                "pitch_hz": 300}]
+        p._fill_tiles()
+        p.show_group("")   # All
+        g = p._tile_grid
+
+        def row(w):
+            return g.getItemPosition(g.indexOf(w))[0]
+        mine = row(p._tile[avl.MY_PREFIX + "gravel"])
+        assert row(p._heads[MINE]) == 0 and mine == 1
+        assert row(p.make_tile) == mine   # Make your own voice right after yours
+        assert all(row(b) > mine for vid, b in p._tile.items()
+                   if not avl.is_mine({"id": vid}) and vid != MAKE)
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
 def test_card_tries_once_more_when_the_helper_never_calls_back(qapp, tmp_path, monkeypatch):
     """A helper that sat silent (no hello) gets one silent retry; a second silence,
     or one that connected and then failed, is shown."""

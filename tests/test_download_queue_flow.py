@@ -180,7 +180,7 @@ def test_up_next_chips_play_now_or_come_out_and_stop_all_clears_them(net):
     row, flow = net.w.playing_row, net.w._chips_hl
     assert flow.itemAt(0).widget().text() == "Now playing"     # first, then Up next
     chip = net.w._up_next_chip                       # one chip: how many wait
-    assert chip.count.text() == "3"
+    assert chip.count.text() == "3 waiting"
     row.resize(330, row.height())                     # narrow: it stays, the row wraps
     assert not chip.isHidden()
     net.w.linkbar.drop_up_next(0, shown)              # Random's ✕

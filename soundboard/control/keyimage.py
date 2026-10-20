@@ -12,7 +12,7 @@ import hashlib
 import time
 
 from PySide6.QtCore import QBuffer, QByteArray, QIODevice, QPoint, QRectF, Qt
-from PySide6.QtGui import QColor, QFontMetrics, QPainter, QPen, QPixmap
+from PySide6.QtGui import QColor, QFont, QFontMetrics, QPainter, QPen, QPixmap
 
 from soundboard.i18n import _
 from soundboard.sounds.library import SoundMeta
@@ -23,6 +23,7 @@ MIN_SIZE, MAX_SIZE = 72, 288
 FLASH = 0.4     # playing: how much of the board's "it just started" wash stays on (0..1)
 EDGE = 2        # a pad card leaves this much round itself (for its glow): cut off on a key
 KEY_RADIUS = 14  # a Stream Deck key's own rounded corners, on the CARD scale (~14 %)
+FOOT_GROW = 1.4  # the most a small key's footer text grows (it fills the footer then)
 
 # the keys that aren't a pad: what they say (on, off) and their icon
 CONTROLS = {
@@ -107,20 +108,30 @@ def _card(meta: SoundMeta, lit: bool, size: int,
 
         def _footer(self, room: QRectF, name_font):
             f, right, badge = super()._footer(room, name_font)
+            if size < SIZE:
+                # the board's 8.5 pt, drawn at 72 px, was a few pixels high: bigger
+                # on a small key (up to FOOT_GROW), the hotkey's badge measured again
+                f = QFont(f)
+                f.setPointSizeF(f.pointSizeF() * min(FOOT_GROW, max(1.0, SIZE * 0.7 / size)))
+                badge = None
             if foot is not None:
                 return f, foot, None
             if badge is None and self.meta.hotkey:
                 # the board drops a badge wider than 68 % of the footer, and a key is
                 # always 96 wide: "Ctrl+Alt+7" never showed. The key's hotkey goes over
-                # its length instead, when the two don't fit side by side
+                # its length instead, when the two don't fit side by side (the length
+                # without its ⟳ / FX marks first: a small key's bigger font)
                 m = self.meta.hotkey
                 hk = midi.short(m) if midi.is_midi(m) else pretty_key(m)
                 fm = QFontMetrics(f)
                 w = fm.horizontalAdvance(hk) + 12
                 if w <= room.width():
                     badge = (hk, w)
-                    if w + 6 + fm.horizontalAdvance(right) > room.width():
-                        right = ""
+                    length = f"{self.meta.duration:.1f}s"
+                    for text in (right, length if right.endswith(length) else "", ""):
+                        if w + 6 + fm.horizontalAdvance(text) <= room.width():
+                            break
+                    right = text
             return f, right, badge
 
     pad = KeyPad(meta, CARD)

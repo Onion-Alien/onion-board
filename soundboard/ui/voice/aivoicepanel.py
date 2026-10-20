@@ -52,11 +52,12 @@ BACKUP_LABELS = [(_("A built-in voice (still hides yours)"), "voice"),
 BACKUP_HEARD = {"voice": _("a built-in voice (still hides yours)"),
                 "mic": _("your real voice"), "mute": _("silence")}
 
-# the chips over the voice cards: All shows a heading per kind (avl.who), your own last
+# the chips over the voice cards: All shows a heading per kind (avl.who), your own
+# first (under the long ready-made grid, the ones you recorded were out of sight)
 ALL, FAVS, MINE = "", "favs", "mine"
 MAKE = "+make"   # the Make your own voice card's place among the voice ids
-KINDS = (("men", _("Men")), ("women", _("Women")), ("other", _("In between & fun")),
-         (MINE, _("Mine")))
+KINDS = ((MINE, _("Mine")), ("men", _("Men")), ("women", _("Women")),
+         ("other", _("In between & fun")))
 KIND_ICONS = {"men": "voice", "women": "voice", "other": "laugh", MINE: "mic"}
 
 
