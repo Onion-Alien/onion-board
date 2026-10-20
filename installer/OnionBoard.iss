@@ -128,6 +128,12 @@ Type: filesandordirs; Name: "{app}\_internal"
 ; the exe a past update moved aside (MoveOldExeAside), if it was still running then
 Type: files; Name: "{app}\{#AppExeName}.exe.old*"
 
+[Dirs]
+; StartInstallingMark makes {app} before Setup gets to it, so Setup never counts it as
+; its own and the uninstaller left the empty folder behind. Removed when empty, never
+; with anything of someone else's still in it.
+Name: "{app}"; Flags: uninsalwaysuninstall
+
 [Files]
 ; Includes the add-ons in {app}\modules (build.ps1 copies them in; see soundboard/addons/modules.py).
 ; live-voice's own .venv is made later, by the "livevoice" task or the Voice tab's button.
