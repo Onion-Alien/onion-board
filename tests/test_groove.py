@@ -124,3 +124,18 @@ def test_a_stream_like_the_radio_is_heard_chunk_by_chunk():
     assert len(times) >= 6 and all(np.abs(kicks - t).min() < 0.02 for t in times)
     g.feed(_club(bpm, 2, np.random.default_rng(7)), 0.5)   # a sound now: starts again
     assert g.bpm == 0
+
+
+def test_a_busy_chorus_near_the_rock_line_keeps_his_dance(monkeypatch):
+    # a loud pop chorus: busy, bright, its beat's sureness wobbling around the line the
+    # "busy and unsure: rock" rule draws (it flipped him into headbanging and back)
+    g = Groove()
+    chorus = {"bpm": 110.0, "conf": 0.47, "four": 0.1, "gaps": 0.0, "bass": -5.0,
+              "voice": -4.0, "high": -12.0, "flat": 0.25, "cent": -0.2, "dyn": 1.0,
+              "onsets": 0.9, "loud": -7.0}
+    monkeypatch.setattr(g, "features", lambda: dict(chorus))
+    assert g.guess() == "rock"   # (heard fresh, it's on the rock side of the line)
+    g.style = "pop"
+    assert g.guess() == "pop"    # but dancing to pop, a wobble this near the line keeps it
+    chorus["conf"] = 0.38
+    assert g.guess() == "rock"   # well over the line: it's really changed

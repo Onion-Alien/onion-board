@@ -34,6 +34,8 @@ TEMPO_EVERY = 0.5        # seconds of audio between tempo checks
 STYLE_EVERY = 1.0        # ... and style checks
 STYLE_MIN = 250          # frames heard before the first guess (2.5 s)
 SWITCH_VOTES = 3         # another tempo or style must win this many checks in a row
+CONF_SLOW = 0.1          # the style goes by the beat's sureness averaged over ~5 s...
+CONF_STICK = 0.06        # ...and keeps its dance while that's this near a rule's line
 BPM_LO, BPM_HI = 60.0, 185.0
 STYLES = ("pop", "electronic", "rock", "hiphop", "chill", "speech")
 
@@ -69,6 +71,7 @@ class Groove:
         self.style = ""        # "" until it's heard enough to guess
         self.bpm = 0.0
         self.confidence = 0.0  # how sure of the beat (0..1)
+        self._conf_slow = 0.0  # ...averaged over a few seconds (what the style goes by)
         self.energy = 0.0      # how loud right now, 0..1
         self.kick = 0.0        # the latest onset's strength, 0..1 (decays)
         self.voice = 0.0       # how loud the vocal range is right now, 0..1 (lip sync)
@@ -325,6 +328,7 @@ class Groove:
                 else:
                     self._doubt = 0
         self.confidence = self.confidence * 0.5 + conf * 0.5 if self.bpm else conf
+        self._conf_slow += (self.confidence - self._conf_slow) * (CONF_SLOW if self.bpm else 1.0)
         # where the beats fall: the offset whose comb lines up with the most kicks (the
         # kick band alone: with the hi-hats in, it locked onto the off-beat)
         kick_env = np.maximum(0.0, kick - np.convolve(kick, np.ones(20) / 20, "same"))
@@ -371,7 +375,7 @@ class Groove:
         med = float(np.median(db[live])) if live.any() else float(db.max())
         rel = lambda row: float(np.mean((row - db)[live])) if live.any() else -99.0  # noqa: E731
         sm = np.convolve(db, np.ones(25) / 25, "valid")   # 1/4 s steps: phrasing, not hits
-        return {"bpm": self.bpm, "conf": self.confidence, "four": self._four,
+        return {"bpm": self.bpm, "conf": self._conf_slow, "four": self._four,
                 "gaps": float(np.mean(db < med - 15)),
                 "bass": rel(r[4]), "voice": rel(r[3]), "high": rel(r[5]),
                 "flat": float(np.mean(r[6][live])) if live.any() else 0.0,
@@ -385,9 +389,21 @@ class Groove:
         measured on real songs, speech and narration (a wrong guess only changes how he
         dances): speech stops and starts (gaps, big swings in loudness, few hits); metal
         is a bright wall of noise; hip-hop is dark and bassy; electronic music is a steady
-        beat at club tempo; calm music has little bass or top end."""
+        beat at club tempo; calm music has little bass or top end.
+
+        The beat's sureness wobbles in a busy chorus, so while it's within CONF_STICK of
+        a rule's line, the style he's dancing to stays (a pop chorus wobbling over the
+        line flipped him into headbanging and back every few seconds)."""
         f = self.features()
-        bpm, conf = f["bpm"], f["conf"]
+        style = self._rules(f, f["conf"])
+        if self.style and style != self.style and self.style in (
+                self._rules(f, f["conf"] - CONF_STICK), self._rules(f, f["conf"] + CONF_STICK)):
+            return self.style
+        return style
+
+    @staticmethod
+    def _rules(f: dict, conf: float) -> str:
+        bpm = f["bpm"]
         if f["gaps"] > 0.25 and f["dyn"] > 9 and f["onsets"] < 0.45 and conf < 0.5:
             return "speech"
         if f["loud"] < -22:
