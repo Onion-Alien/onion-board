@@ -622,7 +622,6 @@
   "A restore point is saved first, so you can undo this.": "Um ponto de restauração é salvo antes, para você poder desfazer isto.",
   "A small dot on its icon": "Um pontinho no ícone",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Uma soundboard é mais útil deixada rodando: seus atalhos e a sobreposição funcionam com a janela fechada. O ícone na bandeja (perto do relógio) abre de novo; clique com o botão direito nele para sair.",
-  "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Uma aba cujo recurso está ligado agora (um som tocando, o modificador de voz, a rádio…) fica marcada, para nada ficar ligado sem você perceber.",
   "About": "Sobre",
   "Add a device": "Adicionar um dispositivo",
   "Add as sound keeps a copy of the video too (the pad is still just its sound). Videos use a lot more data: about 5 to 25 MB a minute.": "Adicionar como som guarda uma cópia do vídeo também (o botão continua sendo só o som). Vídeos usam muito mais dados: uns 5 a 25 MB por minuto.",
@@ -1265,7 +1264,6 @@
   "What do these do?": "O que estes fazem?",
   "What do you want to reset?": "O que você quer redefinir?",
   "What goes online": "O que vai para a internet",
-  "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "O que está ligado (o modificador de voz, Ao vivo, uma aba ao vivo) aparece na cor do tema. Deslize para escolher a sua; ela fica quando você troca de tema.",
   "Whatever played last, from a pad, a hotkey or the random key.": "O que tocou por último, de um botão, um atalho ou da tecla aleatória.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "Quando o Discord, TeamSpeak, Mumble ou um jogo com chat de voz conhecido está ouvindo seu microfone (ou o cabo), usar o modo dele sem perguntar. Sem nada ouvindo, o modo fica como está.",
   "When the program closes, the board goes back to what it showed before.": "Quando o programa fecha, a soundboard volta para o que mostrava antes.",
@@ -4324,5 +4322,8 @@
   "Play a chime in your headphones when you earn one.": "Toca um sino nos seus fones quando você conquistar um.",
   "Pop-up sound": "Som do pop-up",
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "\"Conquista desbloqueada\" na parte de baixo da tela quando você conquistar um.",
-  "Show pop-ups": "Mostrar pop-ups"
+  "Show pop-ups": "Mostrar pop-ups",
+  "Marks a tab whose feature is on, so nothing is left on without you noticing.": "Marca uma aba cujo recurso está ligado, para que nada fique ligado sem você perceber.",
+  "Size and speed": "Tamanho e velocidade",
+  "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "O que está ligado aparece nesta cor. Deslize para escolher a sua; ela fica mesmo quando você troca de tema."
 }
