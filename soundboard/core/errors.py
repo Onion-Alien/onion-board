@@ -138,24 +138,27 @@ def _downloader() -> list[tuple[str, str]]:
 _DL_REASONS = (
     (r"private video|video is private", "private"),
     (r"confirm your age|age.restricted|inappropriate for some users", "age"),
-    (r"not a bot|confirm you.?re not", "bot"),
+    (r"not a (?:ro)?bot|confirm you.?re not", "bot"),
     (r"members.only|join this channel", "members"),
     (r"not available in your country|geo.?restrict|in your (?:country|region|location)",
      "region"),
+    (r"requested format is not available|no video formats|no formats found|"
+     r"no sound to download", "no-formats"),
     (r"copyright|video (?:is )?unavailable|not available|has been removed|"
-     r"no longer available|account .* terminated|does not exist|http error 404", "gone"),
-    (r"requested format is not available|no video formats|no formats found", "no-formats"),
+     r"no longer available|available any more|account .* terminated|does not exist|"
+     r"http error 404", "gone"),
     (r"http error 429|too many requests", "429"),
-    (r"http error 403|forbidden", "403"),
-    (r"http error 5\d\d", "5xx"),
+    (r"http error 403|forbidden|\(403\)", "403"),
+    (r"http error 5\d\d|having trouble", "5xx"),
     (r"stopped moving|no new data|stalled", "stalled"),
     (r"timed? ?out", "timeout"),
     (r"downloaded \d+ bytes, expected \d+ bytes|incomplete ?read|cut off", "cut-off"),
     (r"getaddrinfo|name resolution|unable to download webpage|connection (?:refused|reset|"
-     r"aborted)|network is unreachable|no route to host|urlopen error|check your internet",
+     r"aborted)|network is unreachable|no route to host|urlopen error|check your internet|"
+     r"couldn.t reach",
      "offline"),
     (r"\bproxy\b|\btor\b", "proxy"),
-    (r"sign in|login required|logged.in|cookies", "sign-in"),
+    (r"sign(?:ing)? in|login required|logged.in|cookies", "sign-in"),
     (r"over \d+ mb|filesize", "too-big"),
     (r"yt-dlp\) isn't installed", "no-downloader"),
 )

@@ -349,8 +349,10 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # the red "didn't work" card (ui/kit/oops.py): Try again, Report a problem
             "oops-retry", "oops-report",
             # the Community tab's "store's down" page, and its down-for-maintenance one; a
-            # web search's site down or turning requests away
+            # web search's site down or turning requests away; a web search that failed
+            # and why (DL_FAILS, as a download's)
             "store-down", "store-maintenance", "search-site-down",
+            "search-failed", *(f"search-failed-why-{k}" for k in DL_FAILS),
             # the setup guide's "almost done" note (closed while the mic is set up); the
             # cable's "only if you need it" box, and its Use my mic instead
             "setup-wait-note", "cable-confirm", "cable-confirm-mic",

@@ -828,6 +828,7 @@ class SearchResults(RoundedFrame):
         self.source = "youtube"
         self._gen = 0
         self.failed = False   # the last search came back with an error (firsttour.py)
+        self._why = ""        # why it failed, for the usage count (usage.DL_FAILS)
         self._running: tuple[str, str] | None = None   # (query, site) still being searched
         self._asked = PAGE      # hits asked for so far (Show more asks for the next PAGE)
         self._rows: list[ResultRow] = []
@@ -1120,6 +1121,9 @@ class SearchResults(RoundedFrame):
         down = any(html.escape(w) in err or w in err for w in errors.site_side())
         if down:
             usage.used("search-site-down")
+        usage.used("search-failed")
+        usage.used(f"search-failed-why-{self._why or 'other'}")   # the kind only
+        self._why = ""
         self.oops.show_problem(title, err, self.try_again, fixable=not down)
         self.oops.show()
         self.scroll_area.hide()
@@ -1229,6 +1233,7 @@ class SearchResults(RoundedFrame):
             busy.emit(self._done, gen, "blocked", html.escape(str(e)))
         except Exception as e:  # noqa: BLE001 - shown in the panel
             log.info("%s search failed for %r: %s", source, query, e)
+            self._why = errors.download_reason(e)   # from yt-dlp's own words
             # rich text: the plain words, and a "Report it" link when it's one for us
             busy.emit(self._done, gen, [], errors.html(e, where=f"Searching {source}"))
 
@@ -1241,6 +1246,7 @@ class SearchResults(RoundedFrame):
             busy.emit(self._done, gen, "blocked", html.escape(str(e)))
         except Exception as e:  # noqa: BLE001 - shown in the panel
             log.info("link look-up failed for %s: %s", url, e)
+            self._why = errors.download_reason(e)
             busy.emit(self._done, gen, [], errors.html(e, where="Looking up a link"))
 
     def _on_done(self, gen: int, results, err: str):

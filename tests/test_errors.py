@@ -131,3 +131,13 @@ def test_a_failed_download_has_one_short_reason_for_the_count(raw, why):
     e.raw = raw
     assert errors.download_reason(e) == why
     assert why in usage.DL_FAILS
+
+
+@pytest.mark.parametrize("raw, why", [
+    ("ERROR: [youtube] abc: Requested format is not available", "no-formats"),
+    ("The site wants to check you're not a robot.", "bot"),   # the app's own words
+    ("The site refused the download (403).", "403"),
+    ("Couldn't reach the site. Check your internet connection.", "offline"),
+])
+def test_download_reasons_read_both_ytdlps_and_our_words(raw, why):
+    assert errors.download_reason(raw) == why
