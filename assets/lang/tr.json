@@ -1121,7 +1121,6 @@
   "Since start: {dropouts}, {reconnects}.": "Başlangıçtan beri: {dropouts} , {reconnects} .",
   "Site": "Alan",
   "Size": "Boyut",
-  "Skip for now  →": "Şimdilik atla →",
   "Slow or patchy connection": "Yavaş veya düzensiz bağlantı",
   "Snowflake": "Kar tanesi",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "Yakın zamanda silinenlerden bazıları geri getirilemedi: bu geri yükleme noktasında tutuluyor.",
@@ -1493,7 +1492,6 @@
   "❚❚ paused": "❚❚ duraklatıldı",
   "⟲  Restart my PC now": "⟲ Bilgisayarımı şimdi yeniden başlat",
   "⟳  Check again": "⟳ Tekrar kontrol edin",
-  "⬇  Install it now (free)": "⬇ Şimdi yükleyin (ücretsiz)",
   "⬇  Try installing again": "⬇ Tekrar yüklemeyi deneyin",
   "Join the Discord": "Discord'a katıl",
   "Chat about it on Discord": "Discord'da konuş",
@@ -4344,5 +4342,10 @@
   "{n} sound is back.": [
     "{n} ses geri geldi.",
     "{n} ses geri geldi."
-  ]
+  ],
+  "its file is gone (it was at {path})": "dosyası artık yok ({path} konumundaydı)",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "VB-Audio'dan ücretsiz bir sanal kablo. Yaklaşık bir dakika sürer ve Windows bir kez uygun olup olmadığını sorar. Sonra Discord'da ve oyunlarda mikrofon olarak seçersin.",
+  "Install the cable": "Kabloyu kur",
+  "Not set up yet: only you will hear your sounds.": "Henüz ayarlanmadı: seslerini sadece sen duyacaksın.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Şu an <b>{theme}</b> kullanıyorsun. Ayarlar'da {n} tema daha var."
 }

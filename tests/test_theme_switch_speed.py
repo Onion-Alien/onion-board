@@ -200,6 +200,57 @@ def test_a_closed_window_sits_out_the_restyle_and_opens_in_the_new_theme(main_wi
         theme.apply(app, start)
 
 
+def _closed_window_with_own_sheet(owner):
+    """Like Live controls: its sliders and boxes sit in a column with a sheet of its
+    own (a transparent background)."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QCheckBox, QDialog, QPushButton, QSlider, QVBoxLayout, QWidget
+    d = QDialog(owner)
+    col = QWidget()
+    col.setObjectName("spcol")
+    col.setStyleSheet("QWidget#spcol { background:transparent; }")
+    lay = QVBoxLayout(col)
+    slider = QSlider(Qt.Orientation.Horizontal)
+    slider.setValue(50)
+    check = QCheckBox("Keep pitch")
+    check.setChecked(True)
+    b = QPushButton("1.5x")
+    b.setObjectName("small")
+    for w in (slider, check, b):
+        lay.addWidget(w)
+    QVBoxLayout(d).addWidget(col)
+    for w in d.findChildren(QWidget):
+        w.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+    d.resize(240, 140)
+    return d
+
+
+def test_a_closed_window_with_its_own_sheets_opens_in_the_theme_not_bare(main_window):  # noqa: F811
+    """Live controls opened with bare Windows sliders, ticks and buttons after any
+    restyle while it was closed (a theme switch, a page built): the parts under a sheet
+    of their own kept the plain style the restyle clears to, until a change re-set
+    its button's sheet. They're made anew from the new theme now."""
+    app = QApplication.instance()
+    start = theme.current_name
+    other = "Light" if start != "Light" else "Dark"
+    kept = _closed_window_with_own_sheet(main_window)
+    kept.show()   # opened once in the first theme, then closed
+    QApplication.processEvents()
+    kept.hide()
+    theme.apply(app, other)
+    fresh = _closed_window_with_own_sheet(main_window)
+    try:
+        for d in (kept, fresh):
+            d.show()
+            QApplication.processEvents()
+        assert kept.grab().toImage() == fresh.grab().toImage()
+    finally:
+        for d in (kept, fresh):
+            d.close()
+            d.deleteLater()
+        theme.apply(app, start)
+
+
 def test_the_main_window_still_restyles_while_hidden(main_window):  # noqa: F811
     """In the tray (no owner): restyled with the rest, as before."""
     from PySide6.QtCore import Qt

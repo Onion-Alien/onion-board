@@ -1120,7 +1120,6 @@
   "Since start: {dropouts}, {reconnects}.": "Seit dem Start: {dropouts}, {reconnects}.",
   "Site": "Seite",
   "Size": "Größe",
-  "Skip for now  →": "Erst mal überspringen  →",
   "Slow or patchy connection": "Langsame oder wacklige Verbindung",
   "Snowflake": "Snowflake",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "Ein Teil von Zuletzt gelöscht ließ sich nicht zurückholen: Er bleibt in diesem Wiederherstellungspunkt.",
@@ -1492,7 +1491,6 @@
   "❚❚ paused": "❚❚ pausiert",
   "⟲  Restart my PC now": "⟲  Meinen PC jetzt neu starten",
   "⟳  Check again": "⟳  Nochmal prüfen",
-  "⬇  Install it now (free)": "⬇  Jetzt installieren (kostenlos)",
   "⬇  Try installing again": "⬇  Nochmal installieren",
   "The Discord is where to chat, ask for help and hear about new versions. The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "Im Discord kannst du quatschen, Hilfe bekommen und von neuen Versionen hören. Fürs Feedback-Formular brauchst du kein Konto. Eine Sicherheitslücke gefunden? Melde sie privat auf GitHub, nicht in einem öffentlichen Issue.",
   "Join the Discord": "Dem Discord beitreten",
@@ -4344,5 +4342,10 @@
   "{n} sound is back.": [
     "{n} Sound ist wieder da.",
     "{n} Sounds sind wieder da."
-  ]
+  ],
+  "its file is gone (it was at {path})": "die Datei ist weg (sie lag unter {path})",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Ein kostenloses virtuelles Kabel von VB-Audio. Das dauert etwa eine Minute, und Windows fragt einmal, ob das okay ist. Danach wählst du es in Discord und Spielen als Mikrofon.",
+  "Install the cable": "Kabel installieren",
+  "Not set up yet: only you will hear your sounds.": "Noch nicht eingerichtet: nur du hörst deine Sounds.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Du nutzt gerade <b>{theme}</b>. {n} weitere Themes in den Einstellungen."
 }

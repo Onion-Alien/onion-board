@@ -959,7 +959,6 @@
   "Since start: {dropouts}, {reconnects}.": "Sedan start: {dropouts}, {reconnects}.",
   "Site": "Webbplats",
   "Size": "Storlek",
-  "Skip for now  →": "Hoppa över tills vidare  →",
   "Skip this version": "Hoppa över den här versionen",
   "Slow or patchy connection": "Långsam eller ojämn anslutning",
   "Snowflake": "Snowflake",
@@ -1492,7 +1491,6 @@
   "❚❚ paused": "❚❚ pausad",
   "⟲  Restart my PC now": "⟲  Starta om min dator nu",
   "⟳  Check again": "⟳  Kolla igen",
-  "⬇  Install it now (free)": "⬇  Installera den nu (gratis)",
   "⬇  Try installing again": "⬇  Försök installera igen",
   "(didn't say)": "(sa inte)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
@@ -4344,5 +4342,10 @@
   "{n} sound is back.": [
     "{n} ljud är tillbaka.",
     "{n} ljud är tillbaka."
-  ]
+  ],
+  "its file is gone (it was at {path})": "filen är borta (den låg i {path})",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "En gratis virtuell kabel från VB-Audio. Det tar ungefär en minut, och Windows frågar en gång om det är okej. Sedan väljer du den som mikrofon i Discord och spel.",
+  "Install the cable": "Installera kabeln",
+  "Not set up yet: only you will hear your sounds.": "Inte konfigurerat än: bara du hör dina ljud.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Du använder <b>{theme}</b> nu. {n} teman till i Inställningar."
 }

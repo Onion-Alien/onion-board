@@ -971,7 +971,6 @@
   "Since start: {dropouts}, {reconnects}.": "De la pornire: {dropouts}, {reconnects}.",
   "Site": "Site",
   "Size": "Mărime",
-  "Skip for now  →": "Sari peste deocamdată  →",
   "Skip this version": "Sari peste versiunea asta",
   "Slow or patchy connection": "Conexiune lentă sau instabilă",
   "Snowflake": "Snowflake",
@@ -1530,7 +1529,6 @@
   "❚❚ paused": "❚❚ pe pauză",
   "⟲  Restart my PC now": "⟲  Repornește-mi PC-ul acum",
   "⟳  Check again": "⟳  Verifică din nou",
-  "⬇  Install it now (free)": "⬇  Instalează-l acum (gratuit)",
   "⬇  Try installing again": "⬇  Încearcă să instalezi din nou",
   "(didn't say)": "(nu a spus)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
@@ -4419,5 +4417,10 @@
     "{n} sunet s-a întors.",
     "{n} sunete s-au întors.",
     "{n} de sunete s-au întors."
-  ]
+  ],
+  "its file is gone (it was at {path})": "fișierul lui a dispărut (era în {path})",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Un cablu virtual gratuit de la VB-Audio. Durează cam un minut, iar Windows te întreabă o dată dacă e în regulă. Apoi îl alegi ca microfon în Discord și în jocuri.",
+  "Install the cable": "Instalează cablul",
+  "Not set up yet: only you will hear your sounds.": "Încă nu e configurat: doar tu îți auzi sunetele.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Acum folosești <b>{theme}</b>. Încă {n} teme în Setări."
 }

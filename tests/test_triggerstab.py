@@ -831,3 +831,38 @@ def test_has_addon_reads_the_add_ons_once_until_a_folder_changes(qapp, tmp_path,
     assert tab.has_addon() and looks == [1, 1]      # put in: seen at once
     assert tab.has_addon() and looks == [1, 1]
     tab.shutdown()
+
+
+def test_cancel_after_the_download_installs_nothing(qapp, tmp_path, addon_zip, monkeypatch):
+    """Cancel clicked as the download ends (or with nothing to download, a local zip):
+    it used to install Onion Watch anyway."""
+    zip_path = addon_zip()
+    tab = TriggersTab(FakeHost(), [tmp_path / "modules"])
+    tab.offer = watchaddon.Offer("0.2.0", local=zip_path)
+
+    def fetch(offer, progress=None, cancelled=None):
+        tab.cancel()                      # the click, between the download and installing
+        return zip_path
+    monkeypatch.setattr(watchaddon, "fetch", fetch)
+    tab.show()
+    assert process_events(qapp, tab.btn_get.isVisible)
+    tab.btn_get.click()
+    assert process_events(qapp, lambda: not tab._busy)
+    assert watchaddon.installed([tmp_path / "modules"]) is None
+    assert tab.panel is None and tab.stack.currentWidget() is tab.get_page
+    assert tab.error.text() == "Cancelled."
+    tab.shutdown()
+
+
+def test_cancel_is_hidden_once_it_installs(qapp, tmp_path):
+    """Installing can't be stopped half-way: no Cancel that would be ignored."""
+    tab = TriggersTab(FakeHost(), [tmp_path / "modules"])
+    tab.show()
+    tab._busy = True
+    tab.btn_cancel.show()
+    tab._on_step("Downloading…")
+    assert tab.btn_cancel.isVisible()
+    tab._on_step("Installing…")
+    assert not tab.btn_cancel.isVisible()
+    tab._busy = False
+    tab.shutdown()

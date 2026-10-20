@@ -1101,7 +1101,6 @@
   "Since start: {dropouts}, {reconnects}.": "ตั้งแต่เริ่มต้น: {dropouts} , {reconnects}",
   "Site": "เว็บไซต์",
   "Size": "ขนาด",
-  "Skip for now  →": "ข้ามไปก่อน →",
   "Slow or patchy connection": "การเชื่อมต่อช้าหรือเป็นหย่อม",
   "Snowflake": "เกล็ดหิมะ",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "บางส่วนของการลบล่าสุดไม่สามารถนำกลับมาได้: มันถูกเก็บไว้ในจุดคืนค่านี้",
@@ -1455,7 +1454,6 @@
   "❚❚ paused": "❚❚ หยุดชั่วคราว",
   "⟲  Restart my PC now": "⟲ รีสตาร์ทพีซีของฉันทันที",
   "⟳  Check again": "⟳ ตรวจสอบอีกครั้ง",
-  "⬇  Install it now (free)": "⬇ ติดตั้งทันที (ฟรี)",
   "⬇  Try installing again": "⬇ ลองติดตั้งอีกครั้ง",
   "Join the Discord": "เข้าร่วม Discord",
   "Chat about it on Discord": "คุยเรื่องนี้กันใน Discord",
@@ -4269,5 +4267,10 @@
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "รันบอร์ดด้วยลำดับความสำคัญสูงกว่าปกติ เพื่อไม่ให้โปรแกรมอื่นทำให้เสียงสะดุด ใช้ CPU น้อยมาก เกมจึงไม่รู้สึกถึงความต่าง",
   "{n} sound is back.": [
     "{n} เสียงกลับมาแล้ว"
-  ]
+  ],
+  "its file is gone (it was at {path})": "ไฟล์ของเสียงนี้หายไปแล้ว (เคยอยู่ที่ {path})",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "สายเสมือนฟรีจาก VB-Audio ใช้เวลาประมาณหนึ่งนาที และ Windows จะถามครั้งเดียวว่าโอเคไหม จากนั้นเลือกเป็นไมค์ใน Discord และเกม",
+  "Install the cable": "ติดตั้งสาย",
+  "Not set up yet: only you will hear your sounds.": "ยังไม่ได้ตั้งค่า: มีแค่คุณที่ได้ยินเสียงของคุณ",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "ตอนนี้ใช้ <b>{theme}</b> อยู่มีธีมอีก {n} แบบในการตั้งค่า"
 }

@@ -1070,7 +1070,6 @@
   "Since start: {dropouts}, {reconnects}.": "С запуска: {dropouts}, {reconnects}.",
   "Site": "Сайт",
   "Size": "Размер",
-  "Skip for now  →": "Пока пропустить  →",
   "Slow or patchy connection": "Медленное или нестабильное соединение",
   "Snowflake": "Snowflake",
   "Some of Recently deleted couldn't be brought back: it's kept in this restore point.": "Часть «Недавно удалённых» не удалось вернуть: она хранится в этой точке восстановления.",
@@ -1452,7 +1451,6 @@
   "❚❚ paused": "❚❚ на паузе",
   "⟲  Restart my PC now": "⟲  Перезагрузить ПК сейчас",
   "⟳  Check again": "⟳  Проверить снова",
-  "⬇  Install it now (free)": "⬇  Установить сейчас (бесплатно)",
   "⬇  Try installing again": "⬇  Попробовать установить снова",
   "The Discord is where to chat, ask for help and hear about new versions. The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "В Discord можно пообщаться, попросить помощи и узнать о новых версиях. Для формы отзыва аккаунт не нужен. Нашёл проблему с безопасностью? Сообщи о ней приватно на GitHub, а не в открытом issue.",
   "Join the Discord": "Зайти в Discord",
@@ -4419,5 +4417,10 @@
     "{n} звук вернулся.",
     "{n} звука вернулись.",
     "{n} звуков вернулись."
-  ]
+  ],
+  "its file is gone (it was at {path})": "его файл пропал (он был в {path})",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Бесплатный виртуальный кабель от VB-Audio. Это займёт около минуты, и Windows один раз спросит разрешения. Потом выбери его как микрофон в Discord и играх.",
+  "Install the cable": "Установить кабель",
+  "Not set up yet: only you will hear your sounds.": "Пока не настроено: свои звуки слышишь только ты.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Сейчас у тебя <b>{theme}</b>. Ещё темы в настройках: {n}"
 }

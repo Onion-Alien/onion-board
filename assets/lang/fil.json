@@ -959,7 +959,6 @@
   "Since start: {dropouts}, {reconnects}.": "Mula sa simula: {dropouts}, {reconnects}.",
   "Site": "Site",
   "Size": "Laki",
-  "Skip for now  →": "Laktawan muna  →",
   "Skip this version": "Laktawan ang version na ito",
   "Slow or patchy connection": "Mabagal o putol-putol na connection",
   "Snowflake": "Snowflake",
@@ -1492,7 +1491,6 @@
   "❚❚ paused": "❚❚ naka-pause",
   "⟲  Restart my PC now": "⟲  I-restart ang PC ko ngayon",
   "⟳  Check again": "⟳  I-check ulit",
-  "⬇  Install it now (free)": "⬇  I-install ngayon (libre)",
   "⬇  Try installing again": "⬇  Subukang i-install ulit",
   "(didn't say)": "(hindi sinabi)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
@@ -4344,5 +4342,10 @@
   "{n} sound is back.": [
     "Bumalik ang {n} sound.",
     "Bumalik ang {n} sound."
-  ]
+  ],
+  "its file is gone (it was at {path})": "wala na ang file nito (nasa {path} ito dati)",
+  "A free virtual cable from VB-Audio. It takes about a minute, and Windows asks once if that's OK. Then you pick it as the mic in Discord and games.": "Libreng virtual cable mula sa VB-Audio. Mga isang minuto lang ito, at minsang magtatanong ang Windows kung okay lang. Pagkatapos, piliin mo ito bilang mic sa Discord at sa mga laro.",
+  "Install the cable": "I-install ang cable",
+  "Not set up yet: only you will hear your sounds.": "Hindi pa naka-set up: ikaw lang ang makakarinig ng mga sound mo.",
+  "You're using <b>{theme}</b> now. {n} more themes in Settings.": "<b>{theme}</b> ang gamit mo ngayon. {n} pang theme sa Settings."
 }
