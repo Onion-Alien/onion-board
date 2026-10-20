@@ -12,7 +12,7 @@
   "CategoryIcon": "imgs/category",
   "CodePath": "bin/plugin.js",
   "PropertyInspectorPath": "ui/inspector.html",
-  "SDKVersion": 2,
+  "SDKVersion": 3,
   "Software": {
     "MinimumVersion": "7.1"
   },
