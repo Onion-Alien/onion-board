@@ -52,5 +52,7 @@ npx @elgato/cli@1.10.2 pack streamdeck/com.onionalien.onionboard.sdPlugin -o dis
 
 makes `dist/com.onionalien.onionboard.streamDeckPlugin`: double-clicking it installs the
 plugin. `build.ps1` does this after the installer (`scripts/buildtools/pack_streamdeck.py`)
-and every release carries the file. The manifest's `Version` is the app's plus `.0`:
+and every release carries the file. The Marketplace copy-protects (DRM) every plugin it
+takes, which needs `SDKVersion` 3 and Stream Deck 6.9+ in the manifest; the plugin must
+also never read `manifest.json` or change its own files while it runs. The manifest's `Version` is the app's plus `.0`:
 `scripts/release.py` moves both, and Stream Deck only updates a plugin whose version went up.
