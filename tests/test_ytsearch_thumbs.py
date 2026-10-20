@@ -124,3 +124,21 @@ def test_a_picture_for_a_search_thats_gone_is_dropped(qapp, server, monkeypatch)
     assert process_events(qapp, lambda: finished, timeout=15)
     process_events(qapp, lambda: False, timeout=0.3)
     assert shown == [] and decoded == []
+
+
+def test_a_failed_search_is_counted_with_why(qapp, monkeypatch):
+    """A web search that failed is counted, with the kind of failure (usage.DL_FAILS)
+    read from yt-dlp's own words, never the search or the message."""
+    from soundboard.core import usage
+
+    def search(*a, **kw):
+        raise Exception("ERROR: [youtube] Sign in to confirm you're not a bot")
+    monkeypatch.setattr(ytdl, "search", search)
+    used = []
+    monkeypatch.setattr(usage, "used", used.append)
+    panel = ytsearch.SearchResults()
+    assert panel.search("a secret search")
+    assert process_events(qapp, lambda: panel.failed)
+    assert "search-failed" in used and "search-failed-why-bot" in used
+    assert all(k in usage.FEATURES for k in used)
+    panel.deleteLater()

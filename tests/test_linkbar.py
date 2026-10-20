@@ -298,8 +298,10 @@ def test_downloads_are_counted_by_site_and_how_they_were_picked(qapp, monkeypatc
     bar._on_msg("play", URL, ("x.wav", np.zeros(4, np.int16), 1.0))
     bar.open(OTHER, "Other", 3.0)              # a web search pick
     bar._busy, bar._busy_url = "add", OTHER
+    bar._on_msg("why", OTHER, "bot")           # why it failed, before the error
+    assert bar._busy == "add"                  # not the end of the download
     bar._on_msg("error", OTHER, "Couldn't download it")
-    assert calls == [(URL, "link", "play", True), (OTHER, "search", "add", False)]
+    assert calls == [(URL, "link", "play", True, ""), (OTHER, "search", "add", False, "bot")]
     bar._busy, bar._busy_url = "add", OTHER    # already in the library: not a failure
     bar._on_msg("dup", OTHER, None)
     bar._on_msg("error", OTHER, "It's already in your Sounds")

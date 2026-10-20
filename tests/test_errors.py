@@ -113,3 +113,31 @@ def test_the_original_error_is_kept_for_reports_and_the_log(caplog):
     assert "Private video. Use --cookies for it." in p.detail   # what a report carries
     assert "Private video. Use --cookies for it." in caplog.text   # and the log
     assert "Use --cookies" in unquote(errors.report_url(p))
+
+
+@pytest.mark.parametrize("raw, why", [
+    ("ERROR: [youtube] abc: Sign in to confirm you’re not a bot. Use --cookies", "bot"),
+    ("ERROR: [youtube] abc: Sign in to confirm your age", "age"),
+    ("ERROR: unable to download video data: HTTP Error 403: Forbidden", "403"),
+    ("ERROR: [youtube] abc: Video unavailable. This video is private", "private"),
+    ("ERROR: [youtube] abc: Video unavailable", "gone"),
+    ("The read operation timed out", "timeout"),
+    ("no new data for 60 s", "stalled"),
+    ("Something nobody has seen", "other"),
+])
+def test_a_failed_download_has_one_short_reason_for_the_count(raw, why):
+    from soundboard.core import usage
+    e = RuntimeError("shown words")
+    e.raw = raw
+    assert errors.download_reason(e) == why
+    assert why in usage.DL_FAILS
+
+
+@pytest.mark.parametrize("raw, why", [
+    ("ERROR: [youtube] abc: Requested format is not available", "no-formats"),
+    ("The site wants to check you're not a robot.", "bot"),   # the app's own words
+    ("The site refused the download (403).", "403"),
+    ("Couldn't reach the site. Check your internet connection.", "offline"),
+])
+def test_download_reasons_read_both_ytdlps_and_our_words(raw, why):
+    assert errors.download_reason(raw) == why

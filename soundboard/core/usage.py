@@ -137,6 +137,10 @@ RECOVERY = ("install", "repair", "update", "reinstall", "cleanup", "remove")
 MIC_FAILS = ("unanswered", "no-start", "stuck", "silent", "no-helper", "no-mic",
              "no-mic-off", "no-mic-unsure", "no-mic-gone", "no-effect", "code-1", "code-2",
              "code-3", "code-4", "code-5", "code-6", "code-other")
+# why a download from a link or search failed (errors.download_reason): the kind only
+DL_FAILS = ("private", "age", "bot", "members", "region", "gone", "no-formats", "429",
+            "403", "5xx", "stalled", "timeout", "cut-off", "offline", "proxy", "sign-in",
+            "too-big", "no-downloader", "other")
 # why the mic effect still wasn't working when the wait after its set-up ran out
 # (statuscontrol._no_load_why): sent elsewhere since, Windows took it off, not on the
 # mic, the board's sending into it not open, or open but the effect never ran
@@ -226,7 +230,9 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # failed. Never the link, title or search words
             *(f"dl-{k}" for k in DL_SITES),
             "dl-link", "dl-search", "dl-add", "dl-play", "dl-queue", "dl-already-have",
-            *(f"dl-failed-{k}" for k in DL_SITES),
+            *(f"dl-failed-{k}" for k in DL_SITES), *(f"dl-failed-why-{k}" for k in DL_FAILS),
+            # a failed download that worked when tried again by itself (ytdl.download_audio)
+            "dl-retried-ok",
             # FFmpeg got by the app itself while it loads (not a click), and that failing
             "get-ffmpeg-auto", "get-ffmpeg-auto-failed",
             "ffmpeg-broken", "ffmpeg-recovered",
@@ -343,8 +349,10 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # the red "didn't work" card (ui/kit/oops.py): Try again, Report a problem
             "oops-retry", "oops-report",
             # the Community tab's "store's down" page, and its down-for-maintenance one; a
-            # web search's site down or turning requests away
+            # web search's site down or turning requests away; a web search that failed
+            # and why (DL_FAILS, as a download's)
             "store-down", "store-maintenance", "search-site-down",
+            "search-failed", *(f"search-failed-why-{k}" for k in DL_FAILS),
             # the setup guide's "almost done" note (closed while the mic is set up); the
             # cable's "only if you need it" box, and its Use my mic instead
             "setup-wait-note", "cable-confirm", "cable-confirm-mic",
@@ -521,13 +529,15 @@ def download_bucket(n: int) -> str:
             else "21-plus")
 
 
-def downloaded(cfg, url: str, via: str, kind: str, ok: bool) -> None:
+def downloaded(cfg, url: str, via: str, kind: str, ok: bool, why: str = "") -> None:
     """A link or web-search pick finished (ui/sounds/linkbar.py): `via` "link" or "search",
-    `kind` "add" or "play". Counted as used() names, and one more for the next daily
-    `downloads/` when it worked (only while the count is on, like open_tick)."""
+    `kind` "add" or "play", `why` it failed (DL_FAILS). Counted as used() names, and one
+    more for the next daily `downloads/` when it worked (only while the count is on,
+    like open_tick)."""
     site = download_site(url)
     if not ok:
         used(f"dl-failed-{site}")
+        used(f"dl-failed-why-{why if why in DL_FAILS else 'other'}")
         return
     for k in (site, via, kind):
         used(f"dl-{k}")

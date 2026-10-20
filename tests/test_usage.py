@@ -682,12 +682,14 @@ def test_downloads_say_the_site_and_how_many_never_the_link(sent):
     net.configure_features()
     usage.downloaded(cfg, "https://youtu.be/abc?si=secret", "search", "add", True)
     usage.downloaded(cfg, "https://music.youtube.com/watch?v=x", "search", "play", True)
-    usage.downloaded(cfg, "https://example.org/my-file.mp3", "link", "add", False)
+    usage.downloaded(cfg, "https://example.org/my-file.mp3", "link", "add", False, "403")
+    usage.downloaded(cfg, "https://youtu.be/b", "link", "add", False, "a made-up why")
     usage.maybe_send(cfg)
     paths = _paths(sent[0][0])
     assert "downloads/2-5" in paths
     for k in ("dl-youtube", "dl-tiktok", "dl-search", "dl-link", "dl-add", "dl-play",
-              "dl-failed-other"):
+              "dl-failed-other", "dl-failed-youtube", "dl-failed-why-403",
+              "dl-failed-why-other"):
         assert f"used/{k}" in paths
     assert "used/dl-other" not in paths   # it failed: only dl-failed-other
     body = sent[0][0].data.decode("utf-8")
