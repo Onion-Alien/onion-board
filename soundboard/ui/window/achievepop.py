@@ -23,6 +23,7 @@ from shiboken6 import isValid as qt_valid
 from soundboard.core import achievements
 from soundboard.i18n import _
 from soundboard.ui.kit import icons
+from soundboard.ui.settings import lite
 
 if TYPE_CHECKING:
     from soundboard.ui.window.mainwindow import MainWindow
@@ -129,7 +130,15 @@ class AchievementPop(QWidget):
         self.update()
 
     def _step(self):
-        self.t = self._start + self._clock.elapsed()
+        t = self._start + self._clock.elapsed()
+        if lite.on():   # (lite mode: there whole and still, then gone at once)
+            if t < TEXT_OUT[0]:
+                if self.t != TEXT_IN[1]:
+                    self.t = TEXT_IN[1]
+                    self.update()
+                return
+            t = TOTAL
+        self.t = t
         if self.t >= TOTAL:
             self._timer.stop()
             self.hide()

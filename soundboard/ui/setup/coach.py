@@ -638,7 +638,7 @@ class Tour(QWidget):
         side, x, y = self._spot(rings, cw, ch)
         self._side = side
         since = time.monotonic() - self._shake_at
-        if since < SHAKE_MS / 1000:   # a little side-to-side, dying away
+        if since < SHAKE_MS / 1000 and toast.animations_on():   # a little side-to-side, dying away
             k = 1 - since / (SHAKE_MS / 1000)
             x += round(math.sin(since * 60) * 9 * k)
         card.move(x, y)
@@ -702,8 +702,9 @@ class Tour(QWidget):
                 path = path.subtracted(hole)
             p.fillPath(path, QColor(0, 0, 0, DIM))
             flash = time.monotonic() - self._shake_at < FLASH_MS / 1000
-            # a slow breath on the ring, so the eye finds it
-            breath = 0.5 + 0.5 * math.sin(time.monotonic() * 3.2)
+            # a slow breath on the ring, so the eye finds it (still with animations off)
+            breath = (0.5 + 0.5 * math.sin(time.monotonic() * 3.2) if toast.animations_on()
+                      else 1.0)
             for r in rings[:1] if self.step is not None and self.step.ring else ():
                 self._ring(p, r, breath, flash)
             for r in rings[1:]:

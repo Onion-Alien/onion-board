@@ -49,8 +49,9 @@ his bubble still move every frame.
 (or after the last sound, click or burst), then finishes what he's doing and holds
 still: the timer stops and the last pose stays, so an empty page costs nothing. A
 sound (`set_groove`), the mic (`set_level`) or a click wakes him; showing him again
-gives him another N seconds. In lite mode (ui/settings/lite.py) every Bun rests like that after
-lite.REST_S (`_rest_s`), so he's a still picture until something happens.
+gives him another N seconds. In lite mode (ui/settings/lite.py) every Bun rests at once
+(lite.REST_S, `_rest_s`) and sounds and the mic don't stir him: a still picture, which only
+a click moves.
 
 Over the pose sits a springy layer (`_spring`, `springy`): his ears trail behind his
 hops and wobble as they settle, a fast move stretches him and a landing squashes him,
@@ -514,6 +515,8 @@ class BunnyWidget(QWidget):
     # ------------------------------------------------------------------ inputs
     def set_level(self, level: float):
         """The live mic level, 0..1. Call it as often as you like (the wizard: 25/s)."""
+        if lite.on():   # (a still picture: the mic doesn't move him)
+            return
         self._level = max(float(level), self._level * 0.8)
         if self._level > TALK:
             self.stir()
@@ -524,7 +527,10 @@ class BunnyWidget(QWidget):
 
     def set_groove(self, groove):
         """The song playing, as a groove.Groove (its beat and style), or None. He dances
-        to it: on the beat, in the song's style (see `_moves`), notes flying on the beats."""
+        to it: on the beat, in the song's style (see `_moves`), notes flying on the beats.
+        Not in lite mode: he holds still."""
+        if lite.on():
+            groove = None
         self.groove = groove
         if groove is not None:
             self.stir()
@@ -556,6 +562,8 @@ class BunnyWidget(QWidget):
         for b in list(cls.alive):
             if not shiboken6.isValid(b):   # (Qt freed it; the wrapper's still about)
                 continue
+            if lite.on():
+                b.groove, b._level = None, 0.0   # (a still picture: no dancing, no talking)
             rest = b._rest_s()
             if rest is not None:
                 b._rest_at = min(b._rest_at, now + rest) if lite.on() else now + rest
@@ -565,7 +573,9 @@ class BunnyWidget(QWidget):
                     b._resume()
 
     def burst(self, n: int = 6):
-        """Throw a handful of notes out at once."""
+        """Throw a handful of notes out at once (none in lite mode: a still picture)."""
+        if lite.on():
+            return
         self.stir()
         for _i in range(n):
             self._spawn(1.3)
@@ -582,6 +592,7 @@ class BunnyWidget(QWidget):
     def cheer(self):
         """A happy hop, notes and a joyful line (what a click does)."""
         self._joy_at = time.monotonic()
+        self.stir()   # (lite mode: the hop alone, no notes)
         self.burst(6)
         # his own lines for where he is, and his theme's character (mascotlines.py)
         self.say = mascotlines.pick(self._rng, self.joy_lines + mascotlines.bun(), self.say)

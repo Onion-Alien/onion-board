@@ -13,6 +13,7 @@ from soundboard.online import net, tor
 from soundboard.control import remote
 from soundboard.i18n import _
 from soundboard.ui.kit import busy
+from soundboard.ui.settings import lite
 from soundboard.ui.window import sidebar
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.radio.radiopanel import RadioTab
@@ -107,8 +108,18 @@ class NetControl(Controller):
 
     def card_lines(self) -> list[sidebar.Line]:
         """What the On Air card says under its status (OutputBlock.set_lines): how the
-        app goes online, and a remote control listening."""
-        return [line for line in (self._network_line(), self._remote_line()) if line]
+        app goes online, a remote control listening, and lite mode."""
+        return [line for line in (self._network_line(), self._remote_line(),
+                                  self._lite_line()) if line]
+
+    @staticmethod
+    def _lite_line() -> sidebar.Line | None:
+        """Lite mode on (Settings > Appearance), else None."""
+        if not lite.on():
+            return None
+        return sidebar.Line("leaf", _("Lite mode"), "",
+                            _("Lite mode is on: no animations, plain themes and less CPU. "
+                              "Click to change it."), "appearance")
 
     def _network_line(self) -> sidebar.Line | None:
         """Offline mode, a proxy or Tor (and how far Tor got), or None when direct."""

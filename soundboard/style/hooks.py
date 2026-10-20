@@ -1,4 +1,5 @@
-"""What the app using the style kit plugs in: the current theme and translation.
+"""What the app using the style kit plugs in: the current theme, translation and whether
+the mascots hold still (a lite mode).
 
 The app's theme module calls connect() once, at import. Until then (a script or test
 that only imports the kit) the kit draws in Dark and in English.
@@ -22,16 +23,23 @@ def _tr(text: str, /, **kw) -> str:
     return text.format(**kw) if kw else text
 
 
+def _still() -> bool:
+    return False
+
+
 palette: Callable[[], dict[str, str]] = _palette   # the current theme's colours (`T`)
 theme_name: Callable[[], str] = _theme_name        # its name (picks Bun's outfit)
 tr: Callable[..., str] = _tr                       # the app's translation, as i18n._
+still: Callable[[], bool] = _still                 # True: the mascots are still pictures
 
 
-def connect(*, palette=None, theme_name=None, tr=None) -> None:
+def connect(*, palette=None, theme_name=None, tr=None, still=None) -> None:
     """Plug in the app's own: `palette()` -> the current theme's colours, `theme_name()`
-    -> its name, `tr(text, **kw)` -> `text` in the user's language."""
+    -> its name, `tr(text, **kw)` -> `text` in the user's language, `still()` -> True
+    while the mascots should hold still (a lite mode)."""
     g = globals()
-    for key, fn in (("palette", palette), ("theme_name", theme_name), ("tr", tr)):
+    for key, fn in (("palette", palette), ("theme_name", theme_name), ("tr", tr),
+                    ("still", still)):
         if fn is not None:
             g[key] = fn
 

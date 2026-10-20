@@ -10,7 +10,8 @@ rollers wind in to meet side by side, he ties them with a ribbon and hops, then 
 with it (or, if it failed, he droops over the scroll). He never leaves: the next
 download unrolls the same scroll open again (and a droop eases back to a smile), so
 one pick hands over to the next without a jump. The timer only runs while a state is
-animating and the widget is on screen.
+animating and the widget is on screen. In lite mode (ui/settings/lite.py) there's no timer
+at all: a still picture of each state, the scroll as full as the download is done.
 
 Everything is drawn in this widget's own pixels (SLOT_W x SLOT_H), Bun himself scaled
 down with soundboard/ui/bun/bunny.py's draw_bunny.
@@ -30,6 +31,7 @@ from PySide6.QtWidgets import QSizePolicy, QWidget
 from soundboard.ui.kit import theme
 from soundboard.ui.bun.bunny import H, INK, W, WOOD, draw_bunny, look_colour, sparkle
 from soundboard.ui.kit.pixels import snap_to_pixels
+from soundboard.ui.settings import lite
 
 SLOT_W, SLOT_H = 56, 59          # about the old thumbnail's size: Bun's head over the scroll
 BUN_SCALE = 0.41                 # Bun's canvas (100 x 120) to pixels
@@ -278,6 +280,9 @@ class ScribeBunny(QWidget):
     def set_progress(self, frac: float):
         self.prog = max(0.0, min(1.0, float(frac)))
         self.set_state("downloading")
+        if lite.on():   # (no timer: the scroll follows each step)
+            self._shown_prog = self.prog
+            self.update()
 
     def finish(self, ok: bool):
         self.prog = 1.0 if ok else self.prog
@@ -307,6 +312,11 @@ class ScribeBunny(QWidget):
         return time.monotonic() - self._t0
 
     def _run(self):
+        if lite.on():   # a still picture of the state: no timer, no endings playing out
+            self._timer.stop()
+            self._shown_prog, self._from = self.prog, ""
+            self.update()
+            return
         if self.isVisible() and not self.settled():
             if not self._timer.isActive():
                 self._timer.start()
@@ -359,8 +369,9 @@ class ScribeBunny(QWidget):
 
     # --------------------------------------------------------------- painting
     def paintEvent(self, _e):
-        t = time.monotonic()
-        age = self._age()
+        still = lite.on()   # (lite mode: one moment, past any hop)
+        t = 1.0 if still else time.monotonic()
+        age = HOP_S + OPEN_S if still else self._age()
         p = QPainter(self)
         snap_to_pixels(p)
         # the kept pictures are made at the screen's real pixel size (or a zoomed render's)

@@ -14,6 +14,7 @@ from PySide6.QtCore import (QElapsedTimer, QEvent, QPointF, QRect, QRectF, QSize
 from PySide6.QtGui import (QColor, QFont, QFontMetricsF, QImage, QPainter, QPainterPath, QPen,
                            QPixmap, QRadialGradient, QTextLayout, QTextOption)
 from PySide6.QtWidgets import QSizePolicy, QWidget
+from soundboard.ui.settings import lite
 
 # drawn on a 100 x 120 canvas, like Bun and Hoot, scaled to the requested height
 W, H = 100.0, 120.0
@@ -276,6 +277,9 @@ class AlienNote(QWidget):
         return self.shown < len(self.text)
 
     def restart(self):
+        if lite.on():   # (lite mode: the whole note at once, no typing)
+            self.finish()
+            return
         self.shown, self._wait = 0, 0
         self._timer.start()
         self.update()

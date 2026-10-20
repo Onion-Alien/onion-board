@@ -14,6 +14,7 @@ from PySide6.QtWidgets import QFrame, QSizePolicy, QWidget
 
 from soundboard.online import store
 from soundboard.ui.kit import theme
+from soundboard.ui.settings import lite
 
 if TYPE_CHECKING:
     from soundboard.ui.bun.bunnywidget import BunnyWidget
@@ -132,7 +133,7 @@ class SoundTile(QWidget):
 
     def set_playing(self, on: bool):
         self._playing = on
-        if on:
+        if on and not lite.on():   # (lite mode: still bars)
             self._t0 = time.monotonic()
             self._tick.start()
         else:
@@ -179,7 +180,7 @@ class SoundTile(QWidget):
         er = r.adjusted(0, -r.height() * 0.16, 0, 0) if self._playing else r
         p.drawText(er, Qt.AlignmentFlag.AlignCenter, self.emoji)
         if self._playing:   # three bouncing bars along the bottom
-            t = time.monotonic() - self._t0
+            t = 0.3 if lite.on() else time.monotonic() - self._t0
             bw, gap = r.width() * 0.12, r.width() * 0.07
             x = r.center().x() - (3 * bw + 2 * gap) / 2
             for i in range(3):

@@ -47,7 +47,7 @@ def test_rest_s():
     assert lite.rest_s(None) is None and lite.rest_s(30.0) == 30.0
     lite.set_on(True)
     assert lite.rest_s(None) == lite.REST_S and lite.rest_s(30.0) == lite.REST_S
-    assert lite.rest_s(0.5) == 0.5
+    assert lite.rest_s(0.5) == lite.REST_S == 0.0   # (a still picture)
 
 
 def test_slow_pc():
@@ -156,8 +156,10 @@ def test_bun_who_never_rests_holds_still_in_lite_mode(qapp, monkeypatch):
     b.lite_changed()
     _run(b, 10)
     assert b.resting and not b._timer.isActive()
-    b.stir()   # a sound or a click still moves him...
-    assert not b.resting and b._timer.isActive()
+    b.set_level(1.0)   # the mic and a sound don't move him...
+    b.set_groove(object())
+    assert b.resting and not b._timer.isActive() and b.groove is None
+    b.stir()   # ...a click still does...
     _run(b, 10)
     assert b.resting   # ...then he settles again
     lite.set_on(False)
@@ -309,3 +311,41 @@ def test_the_audio_runs_in_bigger_blocks_in_lite_mode(window, monkeypatch):  # n
     w.themectl.set_lite_mode(False)
     devices_done(w)
     assert reopened == [LITE_BLOCK_S, 0.0] and w.engine.ring_main.est_scale == 1.0
+
+
+def test_on_air_card_says_lite_mode(window):  # noqa: F811
+    assert not any(line.words == "Lite mode" for line in window.netctl.card_lines())
+    window.themectl.set_lite_mode(True)
+    line = next(line for line in window.netctl.card_lines() if line.words == "Lite mode")
+    assert line.icon == "leaf" and line.page == "appearance"
+    window.themectl.set_lite_mode(False)
+    assert not any(line.words == "Lite mode" for line in window.netctl.card_lines())
+
+
+def test_hoot_holds_still_and_ignores_the_mouse_and_music(qapp, monkeypatch):
+    from soundboard.style import owl
+    monkeypatch.setattr(owl.appstate, "active", lambda: True)
+    lite.set_on(True)
+    h = owl.OwlWidget(80)   # (no rest_after_s: moves forever normally)
+    h.show()
+    qapp.processEvents()
+    for _ in range(200):
+        if h.resting:
+            break
+        h._tick()
+    assert h.resting and not h._timer.isActive()
+    h.set_groove(object())
+    h._peek_mouse()
+    assert h.groove is None and h.resting
+    h.close()
+
+
+def test_the_download_scroll_is_a_still_picture(qapp):
+    from soundboard.ui.bun.scribebun import ScribeBunny
+    lite.set_on(True)
+    s = ScribeBunny()
+    s.show()
+    s.set_progress(0.5)
+    assert not s._timer.isActive() and s._shown_prog == 0.5
+    assert not s.grab().isNull()
+    s.close()

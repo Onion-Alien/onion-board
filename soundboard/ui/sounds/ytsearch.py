@@ -43,6 +43,7 @@ from soundboard.ui.kit.widgets import LoadingBar, fmt_time, paint_now_playing
 from soundboard.core import errors
 from soundboard.i18n import _, ngettext
 from soundboard.ui.kit.pixels import snap_to_pixels
+from soundboard.ui.settings import lite
 
 log = logging.getLogger(__name__)
 
@@ -107,6 +108,9 @@ class _BusyOwl(OwlWidget):
     def base_pose(self) -> dict:
         d = super().base_pose()   # (the springy layer goes on top: tufts trail his turns)
         d["sad"] = 0.0
+        if lite.on():   # (lite mode: a still picture, eyes on the results)
+            d["look_y"] = 0.25
+            return d
         scan = math.sin(self.t * 1.6)
         d["tufts"] = -8 + 3 * math.sin(self.t * 1.1)
         d["look"] = 0.8 * scan                       # scanning the results,
