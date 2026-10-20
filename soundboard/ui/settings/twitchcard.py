@@ -87,6 +87,7 @@ class TwitchCard(QObject):
         self.btn_connect.setObjectName("primary")
         icons.set_icon(self.btn_connect, "twitch")
         row.addWidget(self.btn_connect)
+        self._help_buttons(row)
         sv.addLayout(row)
         cv.addWidget(self.start)
 
@@ -161,6 +162,7 @@ class TwitchCard(QObject):
         self.btn_disconnect.setObjectName("danger")
         self.btn_disconnect.setProperty("quiet", True)
         row.addWidget(self.btn_reload)
+        self._help_buttons(row)
         row.addWidget(self.btn_disconnect)
         ov.addLayout(row)
         cv.addWidget(self.on)
@@ -179,6 +181,40 @@ class TwitchCard(QObject):
         self.link.login_done.connect(self._done)
         self.signing_in = False
         self.refresh()
+
+    # ------------------------------------------------------------------ help
+
+    def _help_buttons(self, row) -> None:
+        """The guide and the AI prompt, in both the connect row and the connected one."""
+        guide = QPushButton(_("Twitch guide"))
+        icons.set_icon(guide, "question")
+        guide.setProperty("quiet", True)
+        guide.setToolTip(_("How channel points, alerts and chat commands work, step by step"))
+        guide.clicked.connect(self._guide)
+        ai = QPushButton(_("Copy AI prompt"))
+        icons.set_icon(ai, "copy")
+        ai.setProperty("quiet", True)
+        ai.setToolTip(_("A message for ChatGPT / Claude that explains the Twitch card "
+                        "and lists your rewards and sounds, so it can help you set "
+                        "it up"))
+        ai.clicked.connect(lambda: self._copy_prompt(ai))
+        row.addWidget(guide)
+        row.addWidget(ai)
+
+    def _guide(self):
+        from soundboard.ui.kit.crashdialog import free_dialog
+        from soundboard.ui.settings.twitchguide import TwitchGuide
+        g = TwitchGuide(self.page.dlg, self.mw)
+        g.exec()
+        free_dialog(g)
+
+    def _copy_prompt(self, btn):
+        from soundboard.ui.settings.twitchguide import copy_twitch_prompt
+        copy_twitch_prompt(self.mw)
+        busy.flash(btn, _("✓ Copied"))
+        busy.toast(self.page.dlg, html.escape(_(
+            "Copied. Paste it into ChatGPT, Claude or any AI chat and say what you want "
+            "your stream to do.")), "ok")
 
     # ------------------------------------------------------------------ pickers
 

@@ -337,3 +337,36 @@ def test_no_card_without_a_client_id(qapp, window, monkeypatch):
     window.setctl.open_settings("remote")
     process_events(qapp, lambda: window.setctl._settings_dlg is not None)
     assert not window.setctl._settings_dlg.findChildren(twitchcard.TwitchCard)
+
+
+def test_the_cards_guide_and_ai_prompt(qapp, window, monkeypatch):
+    from PySide6.QtWidgets import QApplication, QPushButton
+    from soundboard.ui.kit import busy
+    from soundboard.ui.settings import twitchcard, twitchguide
+    w = window
+    monkeypatch.setattr(busy, "toast", lambda *a, **k: None)
+    monkeypatch.setattr(w.twitch, "apply", lambda: None)
+    w.cfg.twitch_token, w.cfg.twitch_login, w.cfg.twitch_user_id = "tok", "streamer", "42"
+    w.twitch.rewards = ["Honk", "Hydrate"]
+    w.twitch.state = twitchlink.ON
+    w.cfg.api_token = "secret-key-123"
+    twitchcard.set_rule(w, "redeem", "Airhorn", "Honk")
+    twitchcard.set_rule(w, "raid", twitchcard.RANDOM)
+    # what's set now goes in, the secrets never do
+    p = twitchguide.twitch_prompt(w)
+    assert "signed in as streamer" in p
+    assert '"Honk": the sound "Airhorn"' in p and '"Hydrate": nothing' in p
+    assert "- raid: a random sound" in p and "- Airhorn" in p
+    assert "YOUR-KEY" in p and "secret-key-123" not in p and "tok" not in p.split()
+    # both buttons on the card: the AI prompt is copied, the guide opens
+    w.setctl.open_settings("remote")
+    process_events(qapp, lambda: w.setctl._settings_dlg is not None)
+    card = w.setctl._settings_dlg.findChildren(twitchcard.TwitchCard)[0]
+    shown = [b for b in card.on.findChildren(QPushButton) if b.isVisibleTo(card.card)]
+    ai = next(b for b in shown if b.text() == "Copy AI prompt")
+    ai.click()
+    assert QApplication.clipboard().text() == p
+    opened = []
+    monkeypatch.setattr(twitchguide.TwitchGuide, "exec", lambda self: opened.append(self) or 0)
+    next(b for b in shown if b.text() == "Twitch guide").click()
+    assert len(opened) == 1
