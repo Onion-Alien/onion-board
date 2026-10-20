@@ -410,6 +410,20 @@ def test_the_queue_shows_above_the_pads_and_can_be_trimmed(window, monkeypatch, 
     assert w.playctl._queue == [] and w.playing_row.isHidden()
 
 
+def test_a_removed_sound_leaves_up_next(window, monkeypatch, calls):
+    """A queued sound taken off the board leaves the queue: Up next's count and list
+    never show it (as its raw id) after it's gone."""
+    w = window
+    w._ui_live = True
+    playing(monkeypatch, w, ["s0"])
+    w.playctl.queue_sound("s1")
+    w.playctl.queue_sound("s0")
+    w.rmctl.remove_sounds(["s1"])
+    assert w.playctl._queue == ["s0"]
+    assert w._up_next_chip.count.text() == "1"
+    assert [i.text for i in w.playctl._up_next_items()] == [w.meta("s0").name]
+
+
 def test_a_double_click_on_a_queue_chips_x_takes_out_only_that_one(window, monkeypatch, calls):
     w = window
     w._ui_live = True
