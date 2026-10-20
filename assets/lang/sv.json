@@ -4320,5 +4320,9 @@
   "What does Use less data change?": "Vad ändrar Använd mindre data?",
   "Add Onion Watch again": "Lägg till Onion Watch igen",
   "Add Onion Watch to this tab": "Lägg till Onion Watch i den här fliken",
-  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHubs nedladdningskontroll är tillfälligt otillgänglig (gateway-fel). Försök lägga till Onion Watch igen om en stund."
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHubs nedladdningskontroll är tillfälligt otillgänglig (gateway-fel). Försök lägga till Onion Watch igen om en stund.",
+  "Play a chime in your headphones when you earn one.": "Spela ett klingljud i hörlurarna när du låser upp en.",
+  "Pop-up sound": "Popup-ljud",
+  "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "”Prestation upplåst” längst ner på skärmen när du låser upp en.",
+  "Show pop-ups": "Visa popup-fönster"
 }

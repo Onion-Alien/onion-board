@@ -29,6 +29,8 @@ class Built:
     ach_cards: Any
     ach_count: Any
     ach_none: Any
+    box_ach_popups: Any
+    box_ach_sound: Any
     ach_rarity: Any
     ach_show: Any
     ach_tiles: Any

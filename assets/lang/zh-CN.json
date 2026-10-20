@@ -4246,5 +4246,9 @@
   "What does Use less data change?": "节省流量会改变什么？",
   "Add Onion Watch again": "再次添加 Onion Watch",
   "Add Onion Watch to this tab": "将 Onion Watch 添加到此选项卡",
-  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHub 的下载检查暂时不可用（网关错误）。请稍后再次尝试添加 Onion Watch。"
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHub 的下载检查暂时不可用（网关错误）。请稍后再次尝试添加 Onion Watch。",
+  "Play a chime in your headphones when you earn one.": "获得成就时在耳机中播放提示音。",
+  "Pop-up sound": "弹窗音效",
+  "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "获得成就时在屏幕底部显示“成就已解锁”。",
+  "Show pop-ups": "显示弹窗"
 }

@@ -231,3 +231,29 @@ def test_the_filters_pick_earned_not_yet_and_a_rarity(window):  # noqa: F811
     assert not shown() and d.ach_none.isVisibleTo(d)   # nothing: the line says so
     d.close()
     ach.detach()
+
+
+def test_the_page_turns_the_pop_up_sound_on_and_off(window):  # noqa: F811
+    from soundboard.ui.settings.settings import SettingsDialog
+    window.cfg.achievement_sound = False
+    d = SettingsDialog(window, "achievements")
+    d.show()
+    assert not d.box_ach_sound.isChecked()
+    d.box_ach_sound.click()
+    assert window.cfg.achievement_sound is True
+    d.box_ach_sound.click()
+    assert window.cfg.achievement_sound is False
+    d.close()
+
+
+def test_pop_ups_off_greys_the_sound_box(window):  # noqa: F811
+    from soundboard.ui.settings.settings import SettingsDialog
+    window.cfg.achievement_popups = True
+    d = SettingsDialog(window, "achievements")
+    d.show()
+    assert d.box_ach_popups.isChecked() and d.box_ach_sound.isEnabled()
+    d.box_ach_popups.click()
+    assert window.cfg.achievement_popups is False and not d.box_ach_sound.isEnabled()
+    d.box_ach_popups.click()
+    assert window.cfg.achievement_popups is True and d.box_ach_sound.isEnabled()
+    d.close()

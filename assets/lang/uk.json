@@ -4394,5 +4394,9 @@
   "What does Use less data change?": "Що змінює «Менше даних»?",
   "Add Onion Watch again": "Додати Onion Watch знову",
   "Add Onion Watch to this tab": "Додати Onion Watch на цю вкладку",
-  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Перевірка завантажень GitHub тимчасово недоступна (помилка шлюзу). Спробуйте додати Onion Watch знову трохи згодом."
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Перевірка завантажень GitHub тимчасово недоступна (помилка шлюзу). Спробуйте додати Onion Watch знову трохи згодом.",
+  "Play a chime in your headphones when you earn one.": "Відтворювати дзвін у навушниках, коли ти отримуєш досягнення.",
+  "Pop-up sound": "Звук сповіщення",
+  "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "«Досягнення отримано» внизу екрана, коли ти отримуєш досягнення.",
+  "Show pop-ups": "Показувати сповіщення"
 }

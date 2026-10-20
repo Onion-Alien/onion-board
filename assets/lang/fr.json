@@ -4320,5 +4320,9 @@
   "What does Use less data change?": "Que change Utiliser moins de données ?",
   "Add Onion Watch again": "Ajouter Onion Watch à nouveau",
   "Add Onion Watch to this tab": "Ajouter Onion Watch à cet onglet",
-  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "La vérification de téléchargement de GitHub est indisponible pour le moment (erreur de passerelle). Réessaie d'ajouter Onion Watch dans un instant."
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "La vérification de téléchargement de GitHub est indisponible pour le moment (erreur de passerelle). Réessaie d'ajouter Onion Watch dans un instant.",
+  "Play a chime in your headphones when you earn one.": "Jouer un carillon dans ton casque quand tu en débloques un.",
+  "Pop-up sound": "Son de la notification",
+  "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "« Succès débloqué » en bas de l'écran quand tu en débloques un.",
+  "Show pop-ups": "Afficher les notifications"
 }

@@ -4320,5 +4320,9 @@
   "What does Use less data change?": "Какво променя „По-малко данни“?",
   "Add Onion Watch again": "Добави Onion Watch отново",
   "Add Onion Watch to this tab": "Добави Onion Watch в този раздел",
-  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Проверката за изтегляне на GitHub временно не е достъпна (грешка в шлюза). Опитай да добавиш Onion Watch отново след малко."
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Проверката за изтегляне на GitHub временно не е достъпна (грешка в шлюза). Опитай да добавиш Onion Watch отново след малко.",
+  "Play a chime in your headphones when you earn one.": "Пусни звън в слушалките, когато спечелиш постижение.",
+  "Pop-up sound": "Звук при изскачане",
+  "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "„Отключено постижение“ в долната част на екрана, когато спечелиш постижение.",
+  "Show pop-ups": "Показвай изскачащи известия"
 }

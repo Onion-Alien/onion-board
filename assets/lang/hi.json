@@ -4320,5 +4320,9 @@
   "What does Use less data change?": "कम डेटा इस्तेमाल करें क्या बदलता है?",
   "Add Onion Watch again": "Onion Watch फिर से जोड़ें",
   "Add Onion Watch to this tab": "इस टैब में Onion Watch जोड़ें",
-  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHub की डाउनलोड जाँच अभी उपलब्ध नहीं है (गेटवे त्रुटि)। थोड़ी देर में Onion Watch फिर से जोड़ने की कोशिश करें।"
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHub की डाउनलोड जाँच अभी उपलब्ध नहीं है (गेटवे त्रुटि)। थोड़ी देर में Onion Watch फिर से जोड़ने की कोशिश करें।",
+  "Play a chime in your headphones when you earn one.": "कोई उपलब्धि मिलने पर आपके हेडफ़ोन में एक धुन बजाएँ।",
+  "Pop-up sound": "पॉप-अप ध्वनि",
+  "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "कोई उपलब्धि मिलने पर स्क्रीन के नीचे \"उपलब्धि अनलॉक हुई\"।",
+  "Show pop-ups": "पॉप-अप दिखाएँ"
 }

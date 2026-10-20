@@ -4246,5 +4246,9 @@
   "What does Use less data change?": "데이터 절약은 무엇을 바꾸나요?",
   "Add Onion Watch again": "Onion Watch 다시 추가",
   "Add Onion Watch to this tab": "이 탭에 Onion Watch 추가",
-  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHub 다운로드 확인을 일시적으로 사용할 수 없습니다(게이트웨이 오류). 잠시 후 Onion Watch를 다시 추가해 보세요."
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHub 다운로드 확인을 일시적으로 사용할 수 없습니다(게이트웨이 오류). 잠시 후 Onion Watch를 다시 추가해 보세요.",
+  "Play a chime in your headphones when you earn one.": "업적을 달성하면 헤드폰에서 알림음을 재생합니다.",
+  "Pop-up sound": "팝업 소리",
+  "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "업적을 달성하면 화면 아래에 \"업적 달성\"이(가) 표시됩니다.",
+  "Show pop-ups": "팝업 표시"
 }

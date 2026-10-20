@@ -4320,5 +4320,9 @@
   "What does Use less data change?": "Daha az veri kullan neyi değiştirir?",
   "Add Onion Watch again": "Onion Watch'ı yeniden ekle",
   "Add Onion Watch to this tab": "Onion Watch'ı bu sekmeye ekle",
-  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHub'ın indirme kontrolü geçici olarak kullanılamıyor (ağ geçidi hatası). Biraz sonra Onion Watch'ı yeniden eklemeyi dene."
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHub'ın indirme kontrolü geçici olarak kullanılamıyor (ağ geçidi hatası). Biraz sonra Onion Watch'ı yeniden eklemeyi dene.",
+  "Play a chime in your headphones when you earn one.": "Bir başarım kazandığında kulaklığında bir zil sesi çal.",
+  "Pop-up sound": "Açılır pencere sesi",
+  "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "Bir başarım kazandığında ekranın altında \"Başarım kazanıldı\".",
+  "Show pop-ups": "Açılır pencereleri göster"
 }
