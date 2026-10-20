@@ -4620,5 +4620,6 @@
   "Size and speed": "الحجم والسرعة",
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "ما هو شغّال يظهر بهذا اللون. اسحب لتختار لونك؛ يبقى عند تغيير الثيم.",
   "Already in your library as “{name}”": "موجود بالفعل في مكتبتك باسم \"{name}\"",
-  "Names and tags can't have links in them.": "لا يمكن أن تحتوي الأسماء والوسوم على روابط."
+  "Names and tags can't have links in them.": "لا يمكن أن تحتوي الأسماء والوسوم على روابط.",
+  "“{name}” is on. Click it again to turn the voice changer off.": "«{name}» مُشغّل. انقر عليه مرة أخرى لإيقاف مغير الصوت."
 }

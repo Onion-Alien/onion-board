@@ -4324,5 +4324,6 @@
   "Size and speed": "Laki at bilis",
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Ang naka-on ay ipinapakita sa kulay na ito. I-slide para pumili ng sarili mo; nananatili ito kapag nagpalit ka ng tema.",
   "Already in your library as “{name}”": "Nasa library mo na bilang “{name}”",
-  "Names and tags can't have links in them.": "Hindi puwedeng may link ang mga pangalan at tag."
+  "Names and tags can't have links in them.": "Hindi puwedeng may link ang mga pangalan at tag.",
+  "“{name}” is on. Click it again to turn the voice changer off.": "Naka-on ang “{name}”. I-click ulit para i-off ang voice changer."
 }

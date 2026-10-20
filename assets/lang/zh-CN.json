@@ -4250,5 +4250,6 @@
   "Size and speed": "大小和速度",
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "开着的东西会显示成这个颜色。拖动来选你自己的颜色；换主题后也会保留。",
   "Already in your library as “{name}”": "已在你的音效库里，名为“{name}”",
-  "Names and tags can't have links in them.": "名称和标签里不能有链接。"
+  "Names and tags can't have links in them.": "名称和标签里不能有链接。",
+  "“{name}” is on. Click it again to turn the voice changer off.": "“{name}”已开启。再次单击可关闭变声器。"
 }
