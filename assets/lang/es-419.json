@@ -90,7 +90,6 @@
   "<span style='color:{status}'>Remote control is off: {err}.</span>": "<span style='color:{status}'>El control remoto está desactivado: {err}.</span>",
   "<span style='color:{status}'>Sounds only: your mic isn't sent, so nobody (including you) hears it.</span>": "<span style='color:{status}'>Solo sonidos: tu micrófono no se envía, así que nadie (ni tú) lo oye.</span>",
   "<span style='color:{status}'>Still no virtual cable. If you just installed it, restart your PC, Windows often only shows it after a restart.</span>": "<span style='color:{status}'>Todavía no hay cable virtual. Si acabas de instalarlo, reinicia tu PC: Windows muchas veces solo lo muestra después de reiniciar.</span>",
-  "<span style='color:{status}'>That's a Bluetooth headset's phone-call mic: while it's open, Windows switches the headset to call quality, so everything you hear sounds muffled. A wired mic, or the headset's own USB dongle, sounds much better.</span>": "<span style='color:{status}'>Ese es el micrófono de llamadas de unos audífonos Bluetooth: mientras está abierto, Windows pone los audífonos en calidad de llamada, así que todo lo que oyes suena apagado. Un micrófono con cable, o el adaptador USB de los propios audífonos, suena mucho mejor.</span>",
   "<span style='color:{status}'>That's a normal speaker/headphone device, so only you will hear the sounds. Set <b>Send my sounds to</b> back to <b>My mic</b>, unless that's on purpose.</span>": "<span style='color:{status}'>Ese es un dispositivo normal de bocinas/audífonos, así que solo tú oirás los sonidos. Vuelve a poner <b>Enviar mis sonidos a</b> en <b>Mi micrófono</b>, a menos que sea a propósito.</span>",
   "<span style='color:{status}'>That's your headphones too, so nothing is sent (you'd hear everything twice). Pick another device, or pick <b>Nobody</b>: your sounds already play in your headphones, where OBS's Desktop Audio picks them up.</span>": "<span style='color:{status}'>Esos también son tus audífonos, así que no se envía nada (lo oirías todo dos veces). Elige otro dispositivo, o elige <b>Nadie</b>: tus sonidos ya suenan en tus audífonos, donde los toma el Audio del escritorio de OBS.</span>",
   "<span style='color:{status}'>Your screen triggers now come from the free Onion Watch add-on: open the Triggers tab to get it.</span>": "<span style='color:{status}'>Tus disparadores de pantalla ahora vienen del complemento gratuito Onion Watch: abre la pestaña Disparadores para conseguirlo.</span>",
@@ -1041,7 +1040,6 @@
   "Test": "Probar",
   "Testing…": "Probando…",
   "That restore point is gone.": "Ese punto de restauración ya no existe.",
-  "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "Ese es el micrófono de llamadas de unos audífonos Bluetooth: algunos se saltan los efectos de sonido de Windows. Si nadie oye tus sonidos, usa el adaptador USB de los audífonos o el cable virtual.",
   "That's it. Add sounds by dragging files onto the window, then click one to play it. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "Listo. Agrega sonidos arrastrando archivos a la ventana y luego haz clic en uno para reproducirlo. Puedes volver a abrir esta guía cuando quieras desde la pestaña <b>Configurar</b> (<b>Guía paso a paso</b>).",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does": "La configuración de Discord que evita que corte tus sonidos, y una prueba que escucha lo que hace Discord",
   "The Triggers tab is switched off (Settings > Tabs).": "La pestaña Disparadores está desactivada (Configuración > Pestañas).",
@@ -4329,7 +4327,7 @@
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Lo que está activado se muestra en este color. Desliza para elegir el tuyo; se queda aunque cambies de tema.",
   "Already in your library as “{name}”": "Ya está en tu biblioteca como “{name}”",
   "Names and tags can't have links in them.": "Los nombres y las etiquetas no pueden tener enlaces.",
-  "<b>{headset}</b> is connected, but only for sound: Windows has its mic switched off. Put it away (or switch it off) for a few seconds and connect it again. If your phone is near, it may have taken the mic.": "<b>{headset}</b> están conectados, pero solo para el sonido: Windows tiene su micrófono apagado. Guárdalos (o apágalos) unos segundos y vuelve a conectarlos. Si tu celular está cerca, puede que haya tomado el micrófono.",
   "Mic off": "Micrófono apagado",
-  "Your headset's mic is off": "El micrófono de tus audífonos está apagado"
+  "Your headset's mic is off": "El micrófono de tus audífonos está apagado",
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "El micrófono de <b>{headset}</b> se desconectó. Vuelve a conectarlo y tus sonidos saldrán de nuevo."
 }

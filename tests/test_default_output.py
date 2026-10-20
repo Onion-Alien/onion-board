@@ -105,18 +105,17 @@ def test_a_listed_device_that_wont_open_gets_a_rescan_with_backoff(window, monke
     assert window.devctl._recover_n == 0
 
 
-def test_picking_a_bluetooth_hands_free_mic_warns_about_call_quality(window, monkeypatch):
-    from soundboard.ui.window import routecontrol
+def test_picking_a_bluetooth_hands_free_mic_just_uses_it(window, monkeypatch):
+    """Earbuds picked as the mic are used like any mic: no warning about call quality
+    (people with earbuds know) or about Windows' effects."""
     monkeypatch.setattr(eng.Engine, "set_mic_device", lambda self, n: None)
-    assert routecontrol.is_hands_free("Headset (WH-1000XM4 Hands-Free AG Audio)")
-    assert not routecontrol.is_hands_free("Microphone (USB Mic)")
     cb = window.cb_mic
     cb.addItem("Headset (WH-1000XM4 Hands-Free AG Audio)",
                "Headset (WH-1000XM4 Hands-Free AG Audio)")
     cb.setCurrentIndex(cb.count() - 1)
     window.routectl.on_device(cb, "mic_device")
     devices_done(window)
-    assert "phone-call mic" in said(window)
+    assert "phone-call" not in said(window) and "Bluetooth" not in said(window)
 
 
 def test_a_pick_waits_its_turn_while_a_driver_is_stuck(window, monkeypatch, qapp):

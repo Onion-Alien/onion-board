@@ -1,4 +1,4 @@
-- Bluetooth headsets (AirPods and the like) that are connected for sound but have their mic
-  switched off by Windows now get a card that says so and how to fix it, instead of "Is
-  your headset plugged in?". The mic is also never called unplugged while its sound is
-  coming in.
+- Bluetooth earbuds (AirPods and the like) work as your mic like any other: no more
+  warnings about call quality when you pick them. If their mic drops out while they
+  keep playing, the mic card says so in one line instead of "Is your headset plugged
+  in?", and a mic whose sound is coming in is never called unplugged.

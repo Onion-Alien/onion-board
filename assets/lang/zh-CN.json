@@ -23,7 +23,6 @@
   "<span style='color:{status}'>Remote control is off: {err}.</span>": "<span style='color:{status}'>远程控制已关闭：{err}。</span>",
   "<span style='color:{status}'>Sounds only: your mic isn't sent, so nobody (including you) hears it.</span>": "<span style='color:{status}'>只发音效：你的麦克风没有发送，所以谁都听不到（包括你）。</span>",
   "<span style='color:{status}'>Still no virtual cable. If you just installed it, restart your PC, Windows often only shows it after a restart.</span>": "<span style='color:{status}'>还是没有虚拟音频线。如果刚装好，请重启电脑，Windows 往往要重启后才显示它。</span>",
-  "<span style='color:{status}'>That's a Bluetooth headset's phone-call mic: while it's open, Windows switches the headset to call quality, so everything you hear sounds muffled. A wired mic, or the headset's own USB dongle, sounds much better.</span>": "<span style='color:{status}'>这是蓝牙耳机的通话麦克风：打开它时，Windows 会把耳机切到通话音质，你听到的一切都会发闷。用有线麦克风或耳机自带的 USB 接收器，效果会好很多。</span>",
   "<span style='color:{status}'>That's a normal speaker/headphone device, so only you will hear the sounds. Set <b>Send my sounds to</b> back to <b>My mic</b>, unless that's on purpose.</span>": "<span style='color:{status}'>这是普通的扬声器/耳机设备，所以只有你能听到音效。请把 <b>把我的音效发送到</b> 改回 <b>我的麦克风</b>，除非你是故意的。</span>",
   "<span style='color:{status}'>That's your headphones too, so nothing is sent (you'd hear everything twice). Pick another device, or pick <b>Nobody</b>: your sounds already play in your headphones, where OBS's Desktop Audio picks them up.</span>": "<span style='color:{status}'>这也是你的耳机，所以不会发送任何内容（不然你会听到两遍）。换一个设备，或选 <b>不发送</b>：你的音效本来就在耳机里播放，OBS 的“桌面音频”会采集到。</span>",
   "<span style='color:{status}'>Your screen triggers now come from the free Onion Watch add-on: open the Triggers tab to get it.</span>": "<span style='color:{status}'>屏幕触发器现在由免费的 Onion Watch 插件提供：打开“触发器”标签页即可获取。</span>",
@@ -370,7 +369,6 @@
   "Tap to open, tap again to close": "点击打开，再点击关闭",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "磁带模式：变速也会变调（Nightcore / 慢速）",
   "Test": "测试",
-  "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "这是蓝牙耳机的通话麦克风：有些会跳过 Windows 的音效处理。如果没人听到你的音效，请使用耳机的 USB 接收器或虚拟音频线。",
   "The Voice tab is switched off (Settings > Tabs).": "“变声”标签页已关闭（设置 > 标签页）。",
   "The device changed mid-way, so the recording stopped there.": "设备中途变了，所以录音在那里停止了。",
   "The game you have open uses {engine} for voice chat": "你打开的游戏使用 {engine} 做语音聊天",
@@ -4255,7 +4253,7 @@
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "开着的东西会显示成这个颜色。拖动来选你自己的颜色；换主题后也会保留。",
   "Already in your library as “{name}”": "已在你的音效库里，名为“{name}”",
   "Names and tags can't have links in them.": "名称和标签里不能有链接。",
-  "<b>{headset}</b> is connected, but only for sound: Windows has its mic switched off. Put it away (or switch it off) for a few seconds and connect it again. If your phone is near, it may have taken the mic.": "<b>{headset}</b> 已连接，但只用于声音：Windows 关掉了它的麦克风。把它收起来（或关掉）几秒钟，再重新连接。如果手机在旁边，可能是手机占用了麦克风。",
   "Mic off": "麦克风已关",
-  "Your headset's mic is off": "耳机的麦克风已关闭"
+  "Your headset's mic is off": "耳机的麦克风已关闭",
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> 的麦克风断开了。重新连接后，你的音效就会再次发出。"
 }

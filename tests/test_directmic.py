@@ -3663,7 +3663,7 @@ def test_a_bluetooth_headset_on_for_sound_only_says_its_mic_is_off(window, monke
     w.statusctl._update_flow()
     assert w.mic_line.text() == "Your headset's mic is off"
     assert w.mic_pill.text() == "Mic off"
-    assert "<b>AirPods &lt;3</b> is connected" in w.mic_reason.text()
+    assert "<b>AirPods &lt;3</b> disconnected" in w.mic_reason.text()
     assert "plugged in" not in w.mic_reason.text() and w.btn_install.isHidden()
     assert w._pill_long == "Your headset's mic is off"
     # Windows' list says it's gone, but the mic's sound is coming in: it's there

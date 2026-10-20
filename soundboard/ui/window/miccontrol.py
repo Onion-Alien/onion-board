@@ -25,7 +25,6 @@ from soundboard.i18n import _
 from soundboard.sounds.library import RESOURCE_DIR
 from soundboard.ui.kit import busy, icons, reveal, worker
 from soundboard.ui.window.controller import Controller
-from soundboard.ui.window.routecontrol import is_hands_free
 
 if TYPE_CHECKING:
     from soundboard.ui.window.mainwindow import MainWindow
@@ -181,14 +180,12 @@ class MicControl(Controller):
         elif state == "missing" and settling:
             look = ("warn", "reload", _("Starting…"), _("Setting up…"), step, None)
         elif self.mic_unplugged() and (headset := directmic.sound_only(mw.cfg.mic_device)):
-            # a Bluetooth headset playing fine with its mic half off (AirPods): "is it
-            # plugged in?" read as the app being wrong, it was connected
+            # a Bluetooth headset still playing with its mic half dropped (AirPods): "is
+            # it plugged in?" read as the app being wrong, it was connected
             usage.used("mic-unplugged")
             look = ("warn", "mic", _("Your headset's mic is off"), _("Mic off"), _(
-                "<b>{headset}</b> is connected, but only for sound: Windows has its mic "
-                "switched off. Put it away (or switch it off) for a few seconds and connect "
-                "it again. If your phone is near, it may have taken the mic.",
-                headset=html.escape(headset)), None)
+                "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go "
+                "out again.", headset=html.escape(headset)), None)
         elif self.mic_unplugged():
             # Windows still knows it, it's just not there: nothing to repair or set up
             usage.used("mic-unplugged")   # the card said so (never which mic)
@@ -463,10 +460,6 @@ class MicControl(Controller):
             # was still hammering, and Windows can still fail to load it
             mw._done_toast = ("updated" if updating else "fixed" if auto else
                                 None if isinstance(modal, SetupWizard) else "done")
-            if is_hands_free(mic):
-                mw.toast(_("That's a Bluetooth headset's call mic: some of them skip Windows' "
-                             "sound effects. If nobody hears your sounds, use the headset's USB "
-                             "dongle or the virtual cable."), "warn")
         mw.routectl._show_route()
         mw.statusctl._update_status()
 

@@ -23,7 +23,6 @@
   "<span style='color:{status}'>Remote control is off: {err}.</span>": "<span style='color:{status}'>El control remoto está desactivado: {err}.</span>",
   "<span style='color:{status}'>Sounds only: your mic isn't sent, so nobody (including you) hears it.</span>": "<span style='color:{status}'>Solo sonidos: tu micro no se envía, así que nadie (ni tú) lo oye.</span>",
   "<span style='color:{status}'>Still no virtual cable. If you just installed it, restart your PC, Windows often only shows it after a restart.</span>": "<span style='color:{status}'>Sigue sin haber cable virtual. Si acabas de instalarlo, reinicia el PC: Windows a menudo solo lo muestra después de reiniciar.</span>",
-  "<span style='color:{status}'>That's a Bluetooth headset's phone-call mic: while it's open, Windows switches the headset to call quality, so everything you hear sounds muffled. A wired mic, or the headset's own USB dongle, sounds much better.</span>": "<span style='color:{status}'>Ese es el micro de llamadas de unos auriculares Bluetooth: mientras está abierto, Windows pone los auriculares en calidad de llamada, así que todo lo que oyes suena apagado. Un micro con cable, o el adaptador USB propio de los auriculares, suena mucho mejor.</span>",
   "<span style='color:{status}'>That's a normal speaker/headphone device, so only you will hear the sounds. Set <b>Send my sounds to</b> back to <b>My mic</b>, unless that's on purpose.</span>": "<span style='color:{status}'>Ese es un dispositivo normal de altavoces/auriculares, así que solo tú oirás los sonidos. Vuelve a poner <b>Enviar mis sonidos a</b> en <b>Mi micro</b>, salvo que sea a propósito.</span>",
   "<span style='color:{status}'>That's your headphones too, so nothing is sent (you'd hear everything twice). Pick another device, or pick <b>Nobody</b>: your sounds already play in your headphones, where OBS's Desktop Audio picks them up.</span>": "<span style='color:{status}'>Esos también son tus auriculares, así que no se envía nada (lo oirías todo dos veces). Elige otro dispositivo, o elige <b>Nadie</b>: tus sonidos ya suenan en tus auriculares, donde los recoge el Audio del escritorio de OBS.</span>",
   "<span style='color:{status}'>Your screen triggers now come from the free Onion Watch add-on: open the Triggers tab to get it.</span>": "<span style='color:{status}'>Tus disparadores de pantalla ahora vienen del complemento gratuito Onion Watch: abre la pestaña Disparadores para conseguirlo.</span>",
@@ -376,7 +375,6 @@
   "Tap to open, tap again to close": "Toca para abrir, toca otra vez para cerrar",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Modo cinta: la velocidad también cambia el tono (nightcore / slowed)",
   "Test": "Probar",
-  "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "Ese es el micro de llamadas de unos auriculares Bluetooth: algunos se saltan los efectos de sonido de Windows. Si nadie oye tus sonidos, usa el adaptador USB de los auriculares o el cable virtual.",
   "The Voice tab is switched off (Settings > Tabs).": "La pestaña Voz está desactivada (Ajustes > Pestañas).",
   "The device changed mid-way, so the recording stopped there.": "El dispositivo cambió a mitad, así que la grabación se paró ahí.",
   "The game you have open uses {engine} for voice chat": "El juego que tienes abierto usa {engine} para el chat de voz",
@@ -4329,7 +4327,7 @@
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Lo que está activado se muestra en este color. Desliza para elegir el tuyo; se mantiene al cambiar de tema.",
   "Already in your library as “{name}”": "Ya está en tu biblioteca como “{name}”",
   "Names and tags can't have links in them.": "Los nombres y las etiquetas no pueden tener enlaces.",
-  "<b>{headset}</b> is connected, but only for sound: Windows has its mic switched off. Put it away (or switch it off) for a few seconds and connect it again. If your phone is near, it may have taken the mic.": "<b>{headset}</b> están conectados, pero solo para el sonido: Windows tiene su micro apagado. Guárdalos (o apágalos) unos segundos y vuelve a conectarlos. Si tu móvil está cerca, puede que se haya quedado con el micro.",
   "Mic off": "Micro apagado",
-  "Your headset's mic is off": "El micro de tus cascos está apagado"
+  "Your headset's mic is off": "El micro de tus cascos está apagado",
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "El micro de <b>{headset}</b> se ha desconectado. Vuelve a conectarlo y tus sonidos saldrán de nuevo."
 }

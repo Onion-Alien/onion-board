@@ -89,7 +89,6 @@
   "<span style='color:{status}'>Remote control is off: {err}.</span>": "<span style='color:{status}'>Alat kawalan jauh mati: {err}.</span>",
   "<span style='color:{status}'>Sounds only: your mic isn't sent, so nobody (including you) hears it.</span>": "<span style='color:{status}'>Bunyi sahaja: mikrofon anda tidak dihantar, jadi tiada sesiapa (termasuk anda) mendengarnya.</span>",
   "<span style='color:{status}'>Still no virtual cable. If you just installed it, restart your PC, Windows often only shows it after a restart.</span>": "<span style='color:{status}'>Masih tiada kabel maya. Jika anda baru memasangnya, mulakan semula PC anda, Windows selalunya hanya menunjukkannya selepas dimulakan semula.</span>",
-  "<span style='color:{status}'>That's a Bluetooth headset's phone-call mic: while it's open, Windows switches the headset to call quality, so everything you hear sounds muffled. A wired mic, or the headset's own USB dongle, sounds much better.</span>": "<span style='color:{status}'>Itu mikrofon panggilan telefon set kepala Bluetooth: semasa ia dibuka, Windows menukar set kepala ke kualiti panggilan, jadi semua yang anda dengar kedengaran tersekat. Mikrofon berwayar, atau dongle USB set kepala itu sendiri, jauh lebih baik.</span>",
   "<span style='color:{status}'>That's a normal speaker/headphone device, so only you will hear the sounds. Set <b>Send my sounds to</b> back to <b>My mic</b>, unless that's on purpose.</span>": "<span style='color:{status}'>Itu peranti pembesar suara/fon kepala biasa, jadi hanya anda yang akan dengar bunyi. Tetapkan <b>Hantar bunyi saya ke</b> kembali kepada <b>Mikrofon saya</b>, melainkan itu memang disengajakan.</span>",
   "<span style='color:{status}'>That's your headphones too, so nothing is sent (you'd hear everything twice). Pick another device, or pick <b>Nobody</b>: your sounds already play in your headphones, where OBS's Desktop Audio picks them up.</span>": "<span style='color:{status}'>Itu juga fon kepala anda, jadi tiada apa dihantar (anda akan dengar semuanya dua kali). Pilih peranti lain, atau pilih <b>Tiada sesiapa</b>: bunyi anda sudah dimainkan dalam fon kepala anda, tempat Desktop Audio OBS merakamnya.</span>",
   "<span style='color:{status}'>Your screen triggers now come from the free Onion Watch add-on: open the Triggers tab to get it.</span>": "<span style='color:{status}'>Pencetus skrin anda kini datang dari add-on Onion Watch percuma: buka tab Pencetus untuk mendapatkannya.</span>",
@@ -1028,7 +1027,6 @@
   "Test": "Uji",
   "Testing…": "Menguji…",
   "That restore point is gone.": "Titik pemulihan itu sudah tiada.",
-  "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "Itu mikrofon panggilan set kepala Bluetooth: sesetengahnya melangkau kesan bunyi Windows. Jika tiada sesiapa mendengar bunyi anda, guna dongle USB set kepala atau kabel maya.",
   "That's it. Add sounds by dragging files onto the window, then click one to play it. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "Itu sahaja. Tambah bunyi dengan menyeret fail ke tetingkap, kemudian klik satu untuk memainkannya. Anda boleh membuka panduan ini lagi bila-bila masa dari tab <b>Persediaan</b> (<b>Panduan langkah demi langkah</b>).",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does": "Tetapan Discord yang menghalangnya memotong bunyi anda, dan semakan yang mendengar apa yang Discord lakukan",
   "The Triggers tab is switched off (Settings > Tabs).": "Tab Pencetus dimatikan (Tetapan > Tab).",
@@ -4255,7 +4253,7 @@
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Apa yang dihidupkan ditunjukkan dalam warna ini. Luncurkan untuk memilih warna sendiri; ia kekal apabila kamu tukar tema.",
   "Already in your library as “{name}”": "Sudah ada dalam pustaka anda sebagai “{name}”",
   "Names and tags can't have links in them.": "Nama dan tag tidak boleh mengandungi pautan.",
-  "<b>{headset}</b> is connected, but only for sound: Windows has its mic switched off. Put it away (or switch it off) for a few seconds and connect it again. If your phone is near, it may have taken the mic.": "<b>{headset}</b> disambung, tetapi untuk bunyi sahaja: Windows mematikan mikrofonnya. Simpan (atau matikan) selama beberapa saat dan sambungkan semula. Jika telefon anda berdekatan, mungkin telefon itu yang mengambil mikrofon.",
   "Mic off": "Mikrofon dimatikan",
-  "Your headset's mic is off": "Mikrofon set kepala anda dimatikan"
+  "Your headset's mic is off": "Mikrofon set kepala anda dimatikan",
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofon pada <b>{headset}</b> terputus. Sambungkan semula dan bunyi anda akan keluar semula."
 }

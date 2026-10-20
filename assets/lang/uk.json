@@ -23,7 +23,6 @@
   "<span style='color:{status}'>Remote control is off: {err}.</span>": "<span style='color:{status}'>Дистанційне керування вимкнено: {err}.</span>",
   "<span style='color:{status}'>Sounds only: your mic isn't sent, so nobody (including you) hears it.</span>": "<span style='color:{status}'>Лише звуки: твій мікрофон не надсилається, тож його ніхто (і ти теж) не чує.</span>",
   "<span style='color:{status}'>Still no virtual cable. If you just installed it, restart your PC, Windows often only shows it after a restart.</span>": "<span style='color:{status}'>Віртуального кабелю досі немає. Якщо ти щойно його встановив, перезапусти ПК: Windows часто показує його лише після перезапуску.</span>",
-  "<span style='color:{status}'>That's a Bluetooth headset's phone-call mic: while it's open, Windows switches the headset to call quality, so everything you hear sounds muffled. A wired mic, or the headset's own USB dongle, sounds much better.</span>": "<span style='color:{status}'>Це мікрофон для дзвінків у Bluetooth-гарнітурі: поки він відкритий, Windows перемикає гарнітуру в якість дзвінка, і все, що ти чуєш, звучить глухо. Дротовий мікрофон або власний USB-адаптер гарнітури звучить набагато краще.</span>",
   "<span style='color:{status}'>That's a normal speaker/headphone device, so only you will hear the sounds. Set <b>Send my sounds to</b> back to <b>My mic</b>, unless that's on purpose.</span>": "<span style='color:{status}'>Це звичайний пристрій для динаміків/навушників, тож звуки чутимеш лише ти. Поверни <b>Надсилати мої звуки в</b> на <b>Мій мікрофон</b>, якщо це не навмисно.</span>",
   "<span style='color:{status}'>That's your headphones too, so nothing is sent (you'd hear everything twice). Pick another device, or pick <b>Nobody</b>: your sounds already play in your headphones, where OBS's Desktop Audio picks them up.</span>": "<span style='color:{status}'>Це теж твої навушники, тож нічого не надсилається (ти чув би все двічі). Вибери інший пристрій або <b>Нікому</b>: твої звуки й так грають у навушниках, де їх підхоплює «Звук робочого столу» в OBS.</span>",
   "<span style='color:{status}'>Your screen triggers now come from the free Onion Watch add-on: open the Triggers tab to get it.</span>": "<span style='color:{status}'>Тригери на екрані тепер працюють через безкоштовне доповнення Onion Watch: відкрий вкладку «Тригери», щоб його отримати.</span>",
@@ -382,7 +381,6 @@
   "Tap to open, tap again to close": "Торкнись: відкрити, ще раз: закрити",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Режим касети: швидкість змінює й висоту (nightcore / slowed)",
   "Test": "Тест",
-  "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "Це мікрофон для дзвінків у Bluetooth-гарнітурі: деякі з них оминають звукові ефекти Windows. Якщо ніхто не чує твоїх звуків, скористайся USB-адаптером гарнітури або віртуальним кабелем.",
   "The Voice tab is switched off (Settings > Tabs).": "Вкладку «Голос» вимкнено (Налаштування > Вкладки).",
   "The device changed mid-way, so the recording stopped there.": "Пристрій змінився посередині, тож запис на цьому зупинився.",
   "The game you have open uses {engine} for voice chat": "Відкрита гра використовує {engine} для голосового чату",
@@ -4403,7 +4401,7 @@
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Увімкнене показується цим кольором. Посунь повзунок, щоб вибрати свій; він лишиться після зміни теми.",
   "Already in your library as “{name}”": "Вже у вашій бібліотеці як “{name}”",
   "Names and tags can't have links in them.": "Назви й теги не можуть містити посилань.",
-  "<b>{headset}</b> is connected, but only for sound: Windows has its mic switched off. Put it away (or switch it off) for a few seconds and connect it again. If your phone is near, it may have taken the mic.": "<b>{headset}</b> під'єднано, але лише для звуку: Windows вимкнув їхній мікрофон. Сховай їх (або вимкни) на кілька секунд і під'єднай знову. Якщо поруч твій телефон, можливо, він забрав мікрофон.",
   "Mic off": "Мікрофон вимк.",
-  "Your headset's mic is off": "Мікрофон гарнітури вимкнено"
+  "Your headset's mic is off": "Мікрофон гарнітури вимкнено",
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Мікрофон на <b>{headset}</b> від'єднався. Під'єднай його знову, і твої звуки знову підуть."
 }

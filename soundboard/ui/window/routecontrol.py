@@ -13,7 +13,6 @@ from PySide6.QtWidgets import QCheckBox, QMessageBox
 
 from soundboard.audio import appaudio
 from soundboard.ui.bun import bunny
-from soundboard.ui.kit import theme
 from soundboard.mic import directmic
 from soundboard.core import usage
 from soundboard.sounds import library
@@ -32,12 +31,6 @@ log = logging.getLogger(__name__)
 ROUTE_CHOICES = ((_("My mic (normal)"), "mic"),
                  (_("Nobody: only I hear them"), "off"))
 ROUTE_DEVICE = "device:"
-
-
-def is_hands_free(name: str | None) -> bool:
-    """A Bluetooth headset's phone-call mic ("Headset (… Hands-Free AG Audio)")."""
-    n = (name or "").lower()
-    return "hands-free" in n or "hands free" in n
 
 
 class RouteControl(Controller):
@@ -97,13 +90,6 @@ class RouteControl(Controller):
                     and directmic.status(name) == "other":
                 mw.micctl.attach_mic()   # it follows you to the new mic
             mw.statusctl._update_status()
-            if attr == "mic_device" and is_hands_free(name):   # after: it'd be overwritten
-                mw.say(
-                    _("<span style='color:{status}'>That's a Bluetooth headset's phone-call "
-                      "mic: while it's open, Windows switches the headset to call quality, so "
-                      "everything you hear sounds muffled. A wired mic, or the headset's own "
-                      "USB dongle, sounds much better.</span>", status=theme.status('warn')),
-                    "warn", 10000)
             self._prepare_all()
         mw.devctl._device_job(plan, opened)
 

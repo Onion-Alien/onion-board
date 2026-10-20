@@ -23,7 +23,6 @@
   "<span style='color:{status}'>Remote control is off: {err}.</span>": "<span style='color:{status}'>Uzaktan kumanda kapalı: {err}.</span>",
   "<span style='color:{status}'>Sounds only: your mic isn't sent, so nobody (including you) hears it.</span>": "<span style='color:{status}'>Sadece sesler: mikrofonun gönderilmiyor, yani onu kimse (sen de) duymuyor.</span>",
   "<span style='color:{status}'>Still no virtual cable. If you just installed it, restart your PC, Windows often only shows it after a restart.</span>": "<span style='color:{status}'>Hâlâ sanal kablo yok. Yeni kurduysan bilgisayarını yeniden başlat, Windows onu çoğu zaman ancak yeniden başlatınca gösterir.</span>",
-  "<span style='color:{status}'>That's a Bluetooth headset's phone-call mic: while it's open, Windows switches the headset to call quality, so everything you hear sounds muffled. A wired mic, or the headset's own USB dongle, sounds much better.</span>": "<span style='color:{status}'>Bu bir Bluetooth kulaklığın telefon görüşmesi mikrofonu: açıkken Windows kulaklığı arama kalitesine geçirir, bu yüzden duyduğun her şey boğuk gelir. Kablolu bir mikrofon ya da kulaklığın kendi USB alıcısı çok daha iyi ses verir.</span>",
   "<span style='color:{status}'>That's a normal speaker/headphone device, so only you will hear the sounds. Set <b>Send my sounds to</b> back to <b>My mic</b>, unless that's on purpose.</span>": "<span style='color:{status}'>Bu normal bir hoparlör/kulaklık cihazı, yani sesleri sadece sen duyacaksın. Bilerek yapmadıysan <b>Seslerimi şuraya gönder</b> ayarını tekrar <b>Mikrofonum</b> yap.</span>",
   "<span style='color:{status}'>That's your headphones too, so nothing is sent (you'd hear everything twice). Pick another device, or pick <b>Nobody</b>: your sounds already play in your headphones, where OBS's Desktop Audio picks them up.</span>": "<span style='color:{status}'>Bu aynı zamanda senin kulaklığın, bu yüzden hiçbir şey gönderilmiyor (her şeyi iki kez duyardın). Başka bir cihaz seç ya da <b>Hiç kimse</b> seç: seslerin zaten kulaklığında çalıyor, OBS'nin Masaüstü Sesi de onları oradan alır.</span>",
   "<span style='color:{status}'>Your screen triggers now come from the free Onion Watch add-on: open the Triggers tab to get it.</span>": "<span style='color:{status}'>Ekran tetikleyicilerin artık ücretsiz Onion Watch eklentisinden geliyor: almak için Tetikleyiciler sekmesini aç.</span>",
@@ -376,7 +375,6 @@
   "Tap to open, tap again to close": "Açmak için dokun, kapatmak için tekrar dokun",
   "Tape mode: speed changes the pitch too (nightcore / slowed)": "Kaset modu: hız perdeyi de değiştirir (nightcore / yavaşlatılmış)",
   "Test": "Test",
-  "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "Bu bir Bluetooth kulaklığın arama mikrofonu: bazıları Windows'un ses efektlerini atlar. Seslerini kimse duymuyorsa kulaklığın USB alıcısını ya da sanal kabloyu kullan.",
   "The Voice tab is switched off (Settings > Tabs).": "Ses sekmesi kapalı (Ayarlar > Sekmeler).",
   "The device changed mid-way, so the recording stopped there.": "Cihaz yarı yolda değişti, bu yüzden kayıt orada durdu.",
   "The game you have open uses {engine} for voice chat": "Açık olan oyunun sesli sohbet için {engine} kullanıyor",
@@ -4329,7 +4327,7 @@
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Açık olanlar bu renkte gösterilir. Kendi rengini seçmek için kaydır; tema değiştirdiğinde de kalır.",
   "Already in your library as “{name}”": "Zaten kitaplığınızda “{name}” olarak mevcut",
   "Names and tags can't have links in them.": "Adlar ve etiketler bağlantı içeremez.",
-  "<b>{headset}</b> is connected, but only for sound: Windows has its mic switched off. Put it away (or switch it off) for a few seconds and connect it again. If your phone is near, it may have taken the mic.": "<b>{headset}</b> bağlı, ama sadece ses için: Windows mikrofonunu kapatmış. Birkaç saniye kaldır (ya da kapat) ve yeniden bağla. Telefonun yakındaysa mikrofonu o almış olabilir.",
   "Mic off": "Mikrofon kapalı",
-  "Your headset's mic is off": "Kulaklığının mikrofonu kapalı"
+  "Your headset's mic is off": "Kulaklığının mikrofonu kapalı",
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> mikrofonunun bağlantısı koptu. Yeniden bağla, seslerin tekrar gitsin."
 }

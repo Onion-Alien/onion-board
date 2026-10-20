@@ -90,7 +90,6 @@
   "<span style='color:{status}'>Remote control is off: {err}.</span>": "<span style='color:{status}'>Fjernbetjening er slået fra: {err}.</span>",
   "<span style='color:{status}'>Sounds only: your mic isn't sent, so nobody (including you) hears it.</span>": "<span style='color:{status}'>Kun lyde: din mikrofon bliver ikke sendt, så ingen (heller ikke dig) hører den.</span>",
   "<span style='color:{status}'>Still no virtual cable. If you just installed it, restart your PC, Windows often only shows it after a restart.</span>": "<span style='color:{status}'>Stadig intet virtuelt kabel. Hvis du lige har installeret det, så genstart din pc, Windows viser det tit først efter en genstart.</span>",
-  "<span style='color:{status}'>That's a Bluetooth headset's phone-call mic: while it's open, Windows switches the headset to call quality, so everything you hear sounds muffled. A wired mic, or the headset's own USB dongle, sounds much better.</span>": "<span style='color:{status}'>Det er et Bluetooth-headsets opkaldsmikrofon: mens den er åben, skifter Windows headsettet til opkaldskvalitet, så alt, hvad du hører, lyder dæmpet. En mikrofon med ledning, eller headsettets egen USB-dongle, lyder meget bedre.</span>",
   "<span style='color:{status}'>That's a normal speaker/headphone device, so only you will hear the sounds. Set <b>Send my sounds to</b> back to <b>My mic</b>, unless that's on purpose.</span>": "<span style='color:{status}'>Det er en almindelig højttaler-/hovedtelefonenhed, så kun du vil høre lydene. Sæt <b>Send mine lyde til</b> tilbage til <b>Min mikrofon</b>, medmindre det er med vilje.</span>",
   "<span style='color:{status}'>That's your headphones too, so nothing is sent (you'd hear everything twice). Pick another device, or pick <b>Nobody</b>: your sounds already play in your headphones, where OBS's Desktop Audio picks them up.</span>": "<span style='color:{status}'>Det er også dine hovedtelefoner, så der bliver ikke sendt noget (du ville høre alt to gange). Vælg en anden enhed, eller vælg <b>Ingen</b>: dine lyde spiller allerede i dine hovedtelefoner, hvor OBS' Skrivebordslyd fanger dem.</span>",
   "<span style='color:{status}'>Your screen triggers now come from the free Onion Watch add-on: open the Triggers tab to get it.</span>": "<span style='color:{status}'>Dine skærm-triggere kommer nu fra den gratis Onion Watch-add-on: åbn fanen Triggere for at hente den.</span>",
@@ -1041,7 +1040,6 @@
   "Test": "Test",
   "Testing…": "Tester…",
   "That restore point is gone.": "Det gendannelsespunkt findes ikke længere.",
-  "That's a Bluetooth headset's call mic: some of them skip Windows' sound effects. If nobody hears your sounds, use the headset's USB dongle or the virtual cable.": "Det er et Bluetooth-headsets opkaldsmikrofon: nogle af dem springer Windows' lydeffekter over. Hvis ingen hører dine lyde, så brug headsettets USB-dongle eller det virtuelle kabel.",
   "That's it. Add sounds by dragging files onto the window, then click one to play it. You can open this guide again any time from the <b>Setup</b> tab (<b>Step-by-step guide</b>).": "Det var det. Tilføj lyde ved at trække filer over på vinduet, og klik så på en for at afspille den. Du kan åbne denne guide igen når som helst fra fanen <b>Opsætning</b> (<b>Trin-for-trin-guide</b>).",
   "The Discord settings that stop it chopping up your sounds, and a check that listens to what Discord does": "Discord-indstillingerne, der forhindrer den i at hakke dine lyde i stykker, og et tjek, der lytter til, hvad Discord gør",
   "The Triggers tab is switched off (Settings > Tabs).": "Fanen Triggere er slået fra (Indstillinger > Faner).",
@@ -4329,7 +4327,7 @@
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Det, der er tændt, vises i denne farve. Træk for at vælge din egen; den bliver, når du skifter tema.",
   "Already in your library as “{name}”": "Allerede i dit bibliotek som “{name}”",
   "Names and tags can't have links in them.": "Navne og tags må ikke indeholde links.",
-  "<b>{headset}</b> is connected, but only for sound: Windows has its mic switched off. Put it away (or switch it off) for a few seconds and connect it again. If your phone is near, it may have taken the mic.": "<b>{headset}</b> er tilsluttet, men kun til lyd: Windows har slukket for mikrofonen. Læg det væk (eller sluk det) i et par sekunder, og tilslut det igen. Hvis din telefon er i nærheden, har den måske taget mikrofonen.",
   "Mic off": "Mikrofon slukket",
-  "Your headset's mic is off": "Dit headsets mikrofon er slukket"
+  "Your headset's mic is off": "Dit headsets mikrofon er slukket",
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofonen på <b>{headset}</b> blev afbrudt. Tilslut den igen, så går dine lyde ud igen."
 }
