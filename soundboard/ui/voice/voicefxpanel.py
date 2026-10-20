@@ -712,6 +712,7 @@ class VoiceTile(QToolButton):
         self.star.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self.star.toggled.connect(self._show_star)
         self.toggled.connect(self._show_star)   # on the picked (accent) card: white
+        self.toggled.connect(self._show_tip)    # the lit card says a click turns it off
         self._show_star()
         self._fit_name(TILE_MIN_W)
 
@@ -732,7 +733,17 @@ class VoiceTile(QToolButton):
 
     def setToolTip(self, tip: str):
         self._tip = tip
-        super().setToolTip(tip or (self.title if self._cut else ""))
+        self._show_tip()
+
+    def _show_tip(self, *_a):
+        """Its own tip; the lit card's says a second click turns the voice changer off
+        (the same on every card: clicking the voice that's on is the off switch)."""
+        if self.isCheckable() and self.isChecked():
+            tip = _("“{name}” is on. Click it again to turn the voice changer off.",
+                    name=self.title)
+        else:
+            tip = self._tip or (self.title if self._cut else "")
+        super().setToolTip(tip)
 
     def set_listed(self, on: bool):
         self.listed = on

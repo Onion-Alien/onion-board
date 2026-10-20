@@ -4254,5 +4254,6 @@
   "Size and speed": "Kích thước và tốc độ",
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Những gì đang bật được hiện bằng màu này. Kéo để chọn màu của bạn; màu vẫn giữ khi bạn đổi giao diện.",
   "Already in your library as “{name}”": "Đã có trong thư viện của bạn với tên “{name}”",
-  "Names and tags can't have links in them.": "Tên và thẻ không được chứa liên kết."
+  "Names and tags can't have links in them.": "Tên và thẻ không được chứa liên kết.",
+  "“{name}” is on. Click it again to turn the voice changer off.": "“{name}” đang bật. Nhấp lần nữa để tắt tính năng thay đổi giọng nói."
 }

@@ -4328,5 +4328,6 @@
   "Size and speed": "Boyut ve hız",
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Açık olanlar bu renkte gösterilir. Kendi rengini seçmek için kaydır; tema değiştirdiğinde de kalır.",
   "Already in your library as “{name}”": "Zaten kitaplığınızda “{name}” olarak mevcut",
-  "Names and tags can't have links in them.": "Adlar ve etiketler bağlantı içeremez."
+  "Names and tags can't have links in them.": "Adlar ve etiketler bağlantı içeremez.",
+  "“{name}” is on. Click it again to turn the voice changer off.": "“{name}” açık. Ses değiştiriciyi kapatmak için yeniden tıklayın."
 }
