@@ -4346,5 +4346,9 @@
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "अभी आप <b>{theme}</b> इस्तेमाल कर रहे हैं। सेटिंग्स में {n} और थीम।",
   "Exact volume of {name}": "{name} का सटीक वॉल्यूम",
   "Volume of {name}": "{name} का वॉल्यूम",
-  "Most liked": "सबसे पसंदीदा"
+  "Most liked": "सबसे पसंदीदा",
+  "{n} sound is back.": [
+    "{n} साउंड वापस आ गया।",
+    "{n} साउंड वापस आ गए।"
+  ]
 }

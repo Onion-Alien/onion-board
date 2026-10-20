@@ -4272,5 +4272,8 @@
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "ตอนนี้ใช้ <b>{theme}</b> อยู่มีธีมอีก {n} แบบในการตั้งค่า",
   "Exact volume of {name}": "ระดับเสียงที่แน่นอนของ {name}",
   "Volume of {name}": "ระดับเสียงของ {name}",
-  "Most liked": "ถูกใจมากที่สุด"
+  "Most liked": "ถูกใจมากที่สุด",
+  "{n} sound is back.": [
+    "{n} เสียงกลับมาแล้ว"
+  ]
 }

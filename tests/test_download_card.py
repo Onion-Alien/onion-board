@@ -58,7 +58,7 @@ def test_card_sits_in_the_corner_and_folds_to_a_pill(window, qapp, monkeypatch):
     open_h = g.height()
 
     bar.btn_min.click()
-    QTest.qWait(50)
+    QTest.qWait(db.GLIDE_MS + 100)   # (it slides there)
     g = bar.geometry()
     assert bar.property("pill") and not bar.panel.isVisibleTo(bar)
     assert g.height() < open_h   # as wide as its line needs (the fonts decide)
@@ -67,7 +67,7 @@ def test_card_sits_in_the_corner_and_folds_to_a_pill(window, qapp, monkeypatch):
     assert bar.s_bar.isVisibleTo(bar)                      # how far it's got, still
 
     bar.btn_min.click()
-    QTest.qWait(50)
+    QTest.qWait(db.GLIDE_MS + 100)   # (it slides there)
     assert not bar.property("pill") and bar.geometry().height() == open_h
 
     # a sound playing shows Now playing over the player, its chips on the left: the
@@ -90,6 +90,47 @@ def test_card_sits_in_the_corner_and_folds_to_a_pill(window, qapp, monkeypatch):
     row_top = bar._in_host(row).top()
     assert bar._in_host(row).left() + row.childrenRect().right() >= bar.x()
     assert bar.geometry().bottom() < row_top
+    bar._clear_and_hide()
+
+
+def test_minimise_and_expand_slide_without_squashing(window, qapp):
+    """Minimise and expand slide the card between its sizes: never the next view in the
+    old size for a frame (an empty card, a squashed one), never the rows squashed
+    together while it moves; the open list keeps its full size and the card's edge
+    cuts it off."""
+    window.resize(1200, 800)
+    window.show()
+    bar = window.download_bar
+    QTest.qWait(50)
+    for u in LINKS[:2]:
+        _added(bar, u)
+    bar._stop_wind_down()
+    bar.set_up_next([("Up next one", LINKS[2])])
+    QTest.qWait(300)
+    open_g = bar.geometry()
+    row_h = bar.cur_row.height()
+    for _ in range(2):
+        bar.btn_min.click()
+        # straight after the click it's still the open card, list and all
+        assert bar.geometry() == open_g and bar.panel.isVisibleTo(bar)
+        seen = []
+        for _ in range(40):
+            QTest.qWait(10)
+            g = bar.geometry()
+            seen.append(g.height())
+            if bar.panel.isVisibleTo(bar):
+                assert bar.cur_row.height() == row_h   # cut off, not squashed
+            else:
+                assert g.height() < open_g.height() / 2   # the summary line alone
+        assert bar.property("pill") and len(set(seen)) > 3   # it slid there
+        pill_g = bar.geometry()
+        bar.btn_min.click()
+        assert bar.geometry() == pill_g and bar.property("pill")
+        for _ in range(40):
+            QTest.qWait(10)
+            if bar.panel.isVisibleTo(bar):
+                assert bar.cur_row.height() == row_h
+        assert bar.geometry() == open_g and not bar.property("pill")
     bar._clear_and_hide()
 
 
@@ -165,7 +206,7 @@ def test_a_failure_keeps_the_pill_red_and_up(window, qapp, monkeypatch):
     QTest.qWait(db.Outcome.SHOW_MS + 300)
     assert bar.isVisible() and not bar._collapsed and bar.btn_retry.isVisibleTo(bar)
     bar.btn_min.click()
-    QTest.qWait(50)
+    QTest.qWait(db.GLIDE_MS + 100)   # (it slides there)
     assert bar.property("pill") and bar.h_failed.isVisibleTo(bar)
     assert bar.h_failed.text() == "1 failed"
     QTest.qWait(300)

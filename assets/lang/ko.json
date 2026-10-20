@@ -4272,5 +4272,8 @@
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "지금 <b>{theme}</b> 테마를 쓰고 있어요. 설정에 테마가 {n}개 더 있어요.",
   "Exact volume of {name}": "{name} 정확한 볼륨",
   "Volume of {name}": "{name} 볼륨",
-  "Most liked": "좋아요 많은 순"
+  "Most liked": "좋아요 많은 순",
+  "{n} sound is back.": [
+    "사운드 {n}개가 돌아왔어요."
+  ]
 }

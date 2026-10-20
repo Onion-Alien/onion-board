@@ -4346,5 +4346,9 @@
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Tu utilises <b>{theme}</b> en ce moment. {n} autres thèmes dans les Paramètres.",
   "Exact volume of {name}": "Volume exact de {name}",
   "Volume of {name}": "Volume de {name}",
-  "Most liked": "Les plus aimés"
+  "Most liked": "Les plus aimés",
+  "{n} sound is back.": [
+    "{n} son est revenu.",
+    "{n} sons sont revenus."
+  ]
 }

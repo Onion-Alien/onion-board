@@ -5,6 +5,7 @@ from pathlib import Path
 from conftest import process_events, said, unsay
 from soundboard.core import backup
 from soundboard.ui.sounds.dialogs import EditDialog
+from soundboard.ui.kit import toast
 import pytest
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
@@ -200,6 +201,19 @@ def test_remove_can_be_undone_then_goes_for_good(window, qapp):
     assert len(window.rmctl._removed) == 1 and window.cfg.sounds == []
     window.rmctl._finish_removals()
     assert window.rmctl._removed == [] and not _undo_card(window)
+
+
+def test_undo_says_the_sounds_are_back(window, qapp):
+    """The pad coming back may be off screen: a card says it, for one or several."""
+    _loaded(window, qapp)
+    window.rmctl.remove_sound("s0")
+    next(t for t in toast.shown(window) if t.key == "undo-sounds").card.action.click()
+    back = [t for t in toast.shown(window) if t.text() == "“Boom” is back."]
+    assert back and back[0].kind == "ok" and not _undo_card(window)
+    unsay(window)
+    window.rmctl.remove_sounds(["s0", "s1"])
+    window.rmctl.undo_remove()   # Ctrl+Z
+    assert said(window) == "2 sounds are back."
 
 
 def test_remove_is_finished_on_close(window):

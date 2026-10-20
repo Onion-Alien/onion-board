@@ -4346,5 +4346,9 @@
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Käytössä nyt: <b>{theme}</b>. Lisää teemoja asetuksissa: {n}",
   "Exact volume of {name}": "Ohjelman {name} tarkka äänenvoimakkuus",
   "Volume of {name}": "Ohjelman {name} äänenvoimakkuus",
-  "Most liked": "Tykätyimmät"
+  "Most liked": "Tykätyimmät",
+  "{n} sound is back.": [
+    "{n} ääni palasi.",
+    "{n} ääntä palasi."
+  ]
 }

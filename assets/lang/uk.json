@@ -4420,5 +4420,10 @@
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Зараз у тебе <b>{theme}</b>. Ще теми в налаштуваннях: {n}",
   "Exact volume of {name}": "Точна гучність {name}",
   "Volume of {name}": "Гучність {name}",
-  "Most liked": "Найулюбленіші"
+  "Most liked": "Найулюбленіші",
+  "{n} sound is back.": [
+    "{n} звук повернувся.",
+    "{n} звуки повернулися.",
+    "{n} звуків повернулися."
+  ]
 }

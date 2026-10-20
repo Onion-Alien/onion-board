@@ -4420,5 +4420,10 @@
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Teraz używasz <b>{theme}</b>. Więcej motywów w Ustawieniach: {n}",
   "Exact volume of {name}": "Dokładna głośność {name}",
   "Volume of {name}": "Głośność {name}",
-  "Most liked": "Najbardziej lubiane"
+  "Most liked": "Najbardziej lubiane",
+  "{n} sound is back.": [
+    "{n} dźwięk wrócił.",
+    "{n} dźwięki wróciły.",
+    "{n} dźwięków wróciło."
+  ]
 }

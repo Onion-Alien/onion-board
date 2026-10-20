@@ -4272,5 +4272,8 @@
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Anda sedang guna <b>{theme}</b>. {n} lagi tema dalam Tetapan.",
   "Exact volume of {name}": "Kelantangan tepat {name}",
   "Volume of {name}": "Kelantangan {name}",
-  "Most liked": "Paling disukai"
+  "Most liked": "Paling disukai",
+  "{n} sound is back.": [
+    "{n} bunyi kembali."
+  ]
 }

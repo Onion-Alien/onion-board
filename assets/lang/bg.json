@@ -4346,5 +4346,9 @@
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Сега ползваш <b>{theme}</b>. Още теми в Настройки: {n}",
   "Exact volume of {name}": "Точна сила на звука на {name}",
   "Volume of {name}": "Сила на звука на {name}",
-  "Most liked": "Най-харесвани"
+  "Most liked": "Най-харесвани",
+  "{n} sound is back.": [
+    "{n} звук се върна.",
+    "{n} звука се върнаха."
+  ]
 }

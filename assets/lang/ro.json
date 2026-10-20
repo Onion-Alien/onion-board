@@ -4420,5 +4420,10 @@
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Acum folosești <b>{theme}</b>. Încă {n} teme în Setări.",
   "Exact volume of {name}": "Volumul exact al {name}",
   "Volume of {name}": "Volumul {name}",
-  "Most liked": "Cele mai apreciate"
+  "Most liked": "Cele mai apreciate",
+  "{n} sound is back.": [
+    "{n} sunet s-a întors.",
+    "{n} sunete s-au întors.",
+    "{n} de sunete s-au întors."
+  ]
 }

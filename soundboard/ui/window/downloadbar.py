@@ -21,8 +21,8 @@ import time
 import urllib.parse
 from collections.abc import Callable
 
-from PySide6.QtCore import (QEvent, QPoint, QRect, QRectF, QSize, Qt, QTimer, QVariantAnimation,
-                            Signal)
+from PySide6.QtCore import (QEasingCurve, QEvent, QPoint, QRect, QRectF, QSize, Qt, QTimer,
+                            QVariantAnimation, Signal)
 from PySide6.QtGui import (QColor, QCursor, QFontMetricsF, QLinearGradient, QPainter,
                            QPainterPath, QPalette, QPen, QPixmap)
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QScrollArea,
@@ -301,6 +301,7 @@ CARD_GAP = 8                  # from the page's bottom: the player bar under it
 PILL_BAR_W = 64               # the summary's bar in the pill
 FOLD_MS = 4000                # everything added: the card folds to its pill after this
 FOLDED_MS = 6000              # and the pill goes after this (hovering waits)
+GLIDE_MS = 280                # the corner card sliding down to its pill and back up
 
 
 AUDIO_EXTS = (".mp3", ".wav", ".ogg", ".flac", ".m4a", ".aac", ".opus", ".webm", ".mp4")
@@ -475,6 +476,11 @@ class DownloadBar(QFrame):
         self._area: QWidget | None = None
         self._under: tuple[QWidget, ...] = ()   # what it stands on (float_in)
         self._collapsed = False
+        # minimising / expanding, which view shows as the card slides (None: not sliding):
+        # the open list at its full size, cut off by the card's bottom edge (True), or
+        # just the summary line (False). Never the list squashed into a smaller card.
+        self._tall: bool | None = None
+        self._glide_from = self._glide_to = QRect()
         self._room = "open"   # place: what the page has room for
         self._shown_rows = 0   # rows under the running one the list is tall for
         self._queue: list[dict] = []
@@ -508,6 +514,15 @@ class DownloadBar(QFrame):
         self._place_due = QTimer(self)
         self._place_due.setSingleShot(True)
         self._place_due.timeout.connect(self.place)
+        # the corner card going from one size to the next (minimise, expand) in two
+        # moves: down with the list showing, then sideways as just the summary line
+        # (expanding: sideways first, then up)
+        self._glide = QVariantAnimation(self)
+        self._glide.setDuration(GLIDE_MS)
+        self._glide.setStartValue(0.0)
+        self._glide.setEndValue(1.0)
+        self._glide.valueChanged.connect(self._glide_step)
+        self._glide.finished.connect(self._glide_done)
 
         self._build_ui()
         self.outcome = Outcome(self)
@@ -896,8 +911,13 @@ class DownloadBar(QFrame):
         """Minimised: just the summary line (and a thin bar), in the corner a pill, so the
         page under it shows again; its chevron, or a click anywhere on it, opens it
         again."""
-        self._collapsed = on and not self._mini
+        on = on and not self._mini
+        glide = self._corner and self.isVisible() and on != self._collapsed
+        start = self.geometry()
+        self._collapsed = on
         self._apply_fold()
+        if glide:
+            self.place(start)   # at once: no frame of the new view in the old size
         self.room_changed.emit()
 
     def _folded(self) -> bool:
@@ -905,7 +925,7 @@ class DownloadBar(QFrame):
         return self._collapsed or self._room == "line"
 
     def _apply_fold(self):
-        folded = self._folded()
+        folded = self._folded() if self._tall is None else not self._tall
         pill = self._corner and folded
         if bool(self.property("pill")) != pill:
             self.setProperty("pill", pill)
@@ -1011,13 +1031,17 @@ class DownloadBar(QFrame):
         return (page.left() + CARD_MARGIN if self.isRightToLeft()
                 else page.right() + 1 - w - CARD_MARGIN)
 
-    def place(self):
+    def place(self, glide_from: QRect | None = None):
         """Its size and spot in the corner: the whole list if the page has the height,
         else the running row, else the summary line; minimised, a pill as wide as the
-        summary line needs."""
+        summary line needs. `glide_from`: it slides there from that rectangle."""
         host, area = self._host, self._area
         if host is None or area is None or not self._corner:
             return
+        if self._tall is not None:   # measured as it'll end up
+            self._tall = None
+            self._outer.setEnabled(True)
+            self._apply_fold()
         w = self.card_width()
         x = self._card_x(w)
         floor = self._floor(x, x + w)
@@ -1034,9 +1058,66 @@ class DownloadBar(QFrame):
             w = min(w, self.summary.sizeHint().width() + 20)
         h = max(0, min(h, room_h))
         x = self._card_x(w)
-        self.setGeometry(x, floor - h - CARD_GAP, w, h)
+        to = QRect(x, floor - h - CARD_GAP, w, h)
+        glide = self._glide
+        if glide_from is not None and glide_from.isValid() and glide_from != to:
+            glide.stop()
+            self._glide_from, self._glide_to = QRect(glide_from), to
+            # the pictures as for the wider end: they don't drop out as it slides
+            self._fit_tight(max(glide_from.width(), to.width()))
+            glide.start()
+            self._glide_step(0.0)
+            return
+        if glide.state() == QVariantAnimation.State.Running:
+            self._glide_to = to   # the window moved under it: it goes to the new spot
+            self._glide_step(glide.currentValue())
+            return
+        self.setGeometry(to)
         self.raise_()
         self.placed.emit()
+
+    def _glide_step(self, k: float):
+        a, b = self._glide_from, self._glide_to
+        shrinks = b.height() < a.height()
+        ease = QEasingCurve(QEasingCurve.Type.InOutCubic)
+        first = ease.valueForProgress(min(1.0, k * 2))
+        second = ease.valueForProgress(max(0.0, k * 2 - 1))
+        kh, kw = (first, second) if shrinks else (second, first)
+
+        def mix(x0: int, x1: int, t: float) -> int:
+            return round(x0 + (x1 - x0) * t)
+
+        r = QRect(QPoint(mix(a.left(), b.left(), kw), mix(a.top(), b.top(), kh)),
+                  QPoint(mix(a.right(), b.right(), kw), mix(a.bottom(), b.bottom(), kh)))
+        if a.height() == b.height():
+            tall = not self._folded()
+        else:
+            tall = k < 0.5 if shrinks else k >= 0.5
+        if tall != self._tall:
+            self._tall = tall
+            self._outer.setEnabled(True)
+            self._apply_fold()
+            if tall:
+                # the list laid out at its full size, then held there: the card's edge
+                # cuts it off instead of the rows squashing together
+                full = QRect(0, 0, max(a.width(), b.width()), max(a.height(), b.height()))
+                self._outer.setGeometry(full.marginsRemoved(self.contentsMargins()))
+                self._outer.setEnabled(False)
+        self.setGeometry(r)
+        self.raise_()
+        self.placed.emit()   # the toasts standing on it go with it
+
+    def _end_glide(self):
+        self._glide.stop()
+        if self._tall is not None:
+            self._tall = None
+            self._outer.setEnabled(True)
+            self._apply_fold()
+
+    def _glide_done(self):
+        self._end_glide()
+        self._fit_tight()
+        self.place()
 
     def enterEvent(self, ev):
         """The mouse on the card holds it as it is: no folding or going while it's read."""
@@ -1156,6 +1237,7 @@ class DownloadBar(QFrame):
 
     def hideEvent(self, ev):
         super().hideEvent(ev)
+        self._end_glide()
         self.shown_changed.emit(False)
         if self._corner:
             self.placed.emit()
@@ -1166,11 +1248,14 @@ class DownloadBar(QFrame):
         self._fit_tight()
         self._show_meta()
 
-    def _fit_tight(self):
+    def _fit_tight(self, width: int | None = None):
         """In a narrow window (and the mini player) the rows drop their pictures, and the
         running row its picture (or Bun) and "Adding to sounds" (the summary line says
-        what the list is doing)."""
-        tight = self._mini or self.width() < (CARD_TIGHT if self._corner else TIGHT_BELOW)
+        what the list is doing). `width`: the card's, about to be (place's glide)."""
+        if width is None and self._glide.state() == QVariantAnimation.State.Running:
+            return   # (sliding through the narrow widths: it was set for the widest)
+        width = self.width() if width is None else width
+        tight = self._mini or width < (CARD_TIGHT if self._corner else TIGHT_BELOW)
         if tight == self._tight:
             return
         self._tight = tight

@@ -1687,6 +1687,8 @@ class VoiceFxPanel(QWidget):
         self._fill_saved()
         self._emit()
         busy.flash(self.btn_save, _("✓ Saved"))
+        # the flash is gone in a second: the card says it stuck, and under what name
+        busy.toast(self._parent(), html.escape(_("Saved “{name}”.", name=name)), "ok")
 
     def voice_names(self) -> set[str]:
         """The voices a hotkey can pick: the ready ones and your saved ones."""

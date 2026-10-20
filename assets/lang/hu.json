@@ -4346,5 +4346,9 @@
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Most ezt használod: <b>{theme}</b>. További témák a Beállításokban: {n}",
   "Exact volume of {name}": "{name} pontos hangereje",
   "Volume of {name}": "{name} hangereje",
-  "Most liked": "Legkedveltebbek"
+  "Most liked": "Legkedveltebbek",
+  "{n} sound is back.": [
+    "{n} hang visszatért.",
+    "{n} hang visszatért."
+  ]
 }

@@ -4346,5 +4346,9 @@
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "<b>{theme}</b> ang gamit mo ngayon. {n} pang theme sa Settings.",
   "Exact volume of {name}": "Eksaktong volume ng {name}",
   "Volume of {name}": "Volume ng {name}",
-  "Most liked": "Pinakagusto"
+  "Most liked": "Pinakagusto",
+  "{n} sound is back.": [
+    "Bumalik ang {n} sound.",
+    "Bumalik ang {n} sound."
+  ]
 }

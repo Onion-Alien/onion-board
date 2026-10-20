@@ -4420,5 +4420,10 @@
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Teď používáš <b>{theme}</b>. Další motivy v Nastavení: {n}",
   "Exact volume of {name}": "Přesná hlasitost {name}",
   "Volume of {name}": "Hlasitost {name}",
-  "Most liked": "Nejoblíbenější"
+  "Most liked": "Nejoblíbenější",
+  "{n} sound is back.": [
+    "{n} zvuk je zpátky.",
+    "{n} zvuky jsou zpátky.",
+    "{n} zvuků je zpátky."
+  ]
 }

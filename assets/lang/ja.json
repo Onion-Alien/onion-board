@@ -4272,5 +4272,8 @@
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "いまは <b>{theme}</b> を使っています。設定にはほかに {n} 個のテーマがあります。",
   "Exact volume of {name}": "{name} の音量（数値）",
   "Volume of {name}": "{name} の音量",
-  "Most liked": "いいねが多い順"
+  "Most liked": "いいねが多い順",
+  "{n} sound is back.": [
+    "{n} 個のサウンドを元に戻しました。"
+  ]
 }

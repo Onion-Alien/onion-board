@@ -4272,5 +4272,8 @@
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "你正在使用 <b>{theme}</b>。設定中還有 {n} 個主題。",
   "Exact volume of {name}": "{name} 的精確音量",
   "Volume of {name}": "{name} 的音量",
-  "Most liked": "最受歡迎"
+  "Most liked": "最受歡迎",
+  "{n} sound is back.": [
+    "{n} 個音效回來了。"
+  ]
 }

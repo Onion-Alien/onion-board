@@ -4346,5 +4346,9 @@
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Şu an <b>{theme}</b> kullanıyorsun. Ayarlar'da {n} tema daha var.",
   "Exact volume of {name}": "{name} tam ses düzeyi",
   "Volume of {name}": "{name} ses düzeyi",
-  "Most liked": "En çok beğenilenler"
+  "Most liked": "En çok beğenilenler",
+  "{n} sound is back.": [
+    "{n} ses geri geldi.",
+    "{n} ses geri geldi."
+  ]
 }

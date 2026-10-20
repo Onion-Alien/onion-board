@@ -4272,5 +4272,8 @@
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Bạn đang dùng <b>{theme}</b>. Còn {n} chủ đề khác trong Cài đặt.",
   "Exact volume of {name}": "Âm lượng chính xác của {name}",
   "Volume of {name}": "Âm lượng của {name}",
-  "Most liked": "Được thích nhiều nhất"
+  "Most liked": "Được thích nhiều nhất",
+  "{n} sound is back.": [
+    "{n} âm thanh đã trở lại."
+  ]
 }

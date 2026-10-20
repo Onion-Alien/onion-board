@@ -622,6 +622,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
                              n, n=f"{n:,}", shown=LIST_MAX)
         else:
             count = ngettext("{n} station", "{n} stations", n, n=f"{n:,}")
+        if not total and self._popular_showing() and not self.tab._globe_error:
+            count = ""   # still on its way: the list says so, "0 stations" would be wrong
         self.tab.count_label.setText(count)
         self.tab.btn_clear.setVisible(self.filters_on())
         cur = self.tab.list.currentItem()

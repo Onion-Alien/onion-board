@@ -4346,5 +4346,9 @@
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Du bruker <b>{theme}</b> nå. {n} flere temaer i Innstillinger.",
   "Exact volume of {name}": "Nøyaktig volum for {name}",
   "Volume of {name}": "Volumet til {name}",
-  "Most liked": "Mest likt"
+  "Most liked": "Mest likt",
+  "{n} sound is back.": [
+    "{n} lyd er tilbake.",
+    "{n} lyder er tilbake."
+  ]
 }

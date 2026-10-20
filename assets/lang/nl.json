@@ -4346,5 +4346,9 @@
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Je gebruikt nu <b>{theme}</b>. Nog {n} thema's in Instellingen.",
   "Exact volume of {name}": "Exact volume van {name}",
   "Volume of {name}": "Volume van {name}",
-  "Most liked": "Meest geliket"
+  "Most liked": "Meest geliket",
+  "{n} sound is back.": [
+    "{n} geluid is terug.",
+    "{n} geluiden zijn terug."
+  ]
 }
