@@ -131,7 +131,7 @@ class UpNextPopup(QWidget):
     def __init__(self, parent: QWidget, on_clear: Callable[[], object]):
         super().__init__(parent, Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
-        outer = QVBoxLayout(self)
+        self._outer = outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 0, 0, 0)
         self.count = QLabel()
         self.count.setObjectName("muted")
@@ -219,7 +219,11 @@ class UpNextPopup(QWidget):
         self.list_area.setFixedHeight(sum(r.sizeHint().height() for r in shown)
                                       + self.rows_v.spacing() * max(len(shown) - 1, 0))
         # its whole height (adjustSize caps a window at 2/3 of the screen, which
-        # squeezed the heading of a long list on a small screen)
+        # squeezed the heading of a long list on a small screen); the card's new size
+        # first, or the longer list's (cached by this layout) keeps it tall, a gap over
+        # the rows, when sounds are taken out with it open
+        self.card.updateGeometry()
+        self._outer.activate()
         self.resize(self.width(), self.sizeHint().height())
         self._place()
 

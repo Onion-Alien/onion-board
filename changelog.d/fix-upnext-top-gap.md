@@ -1,0 +1,1 @@
+- Up next: taking sounds out with the list open now shrinks it at once, instead of leaving an empty gap over the rows until it was reopened.

@@ -6,7 +6,7 @@ from conftest import said, unsay
 import pytest
 
 import numpy as np
-from PySide6.QtCore import QPointF, Qt
+from PySide6.QtCore import QPoint, QPointF, Qt
 from PySide6.QtGui import QMouseEvent
 from PySide6.QtWidgets import QApplication, QLabel, QPushButton
 
@@ -607,6 +607,29 @@ def test_up_next_is_one_chip_whose_list_reaches_every_queued_sound(window, monke
     assert w._up_next_chip is None and set(w.engine.playing()) == {"s0"}
 
 
+def test_up_next_list_shrinks_when_sounds_are_taken_out_while_open(window, monkeypatch):
+    """Four waiting, three taken out with the list open: it ends as short as a list
+    opened with one (the old height stayed as an empty gap over the last row)."""
+    w = window
+    w.resize(1200, 760)
+    w.show()
+    playing(monkeypatch, w, ["s0"])
+    w.playctl._queue = ["s0", "s1", "s0", "s1"]
+    w.playctl._update_chips(w.engine.playing())
+    w._up_next_chip.click()
+    QApplication.processEvents()
+    pop = w._up_next_popup
+    for _i in range(3):
+        up_next_rows(w)[0].findChildren(QPushButton)[-1].click()
+        QApplication.processEvents()
+    assert pop.isVisible() and pop.count.text() == "1"
+    shrunk = (pop.height(), up_next_rows(w)[0].mapTo(pop, QPoint(0, 0)).y())
+    pop.close()
+    w._up_next_chip.click()
+    QApplication.processEvents()
+    assert shrunk == (pop.height(), up_next_rows(w)[0].mapTo(pop, QPoint(0, 0)).y())
+
+
 def up_next_rows(w):
     pop = w._up_next_popup
     return [r for r in (pop.rows_v.itemAt(i).widget() for i in range(pop.rows_v.count()))
@@ -632,7 +655,6 @@ def test_an_up_next_rows_play_plays_it_now_and_the_rest_keep_waiting(window, mon
 
 
 def test_an_up_next_row_dragged_by_its_grip_moves_in_the_queue(window, monkeypatch):
-    from PySide6.QtCore import QPoint
     from PySide6.QtTest import QTest
     w = window
     w.resize(1200, 760)
