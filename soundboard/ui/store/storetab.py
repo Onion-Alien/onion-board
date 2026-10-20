@@ -40,7 +40,7 @@ LIST_GAP = 8                  # between the cards and the scroll bar (DESIGN.md,
 ONE_ROW = 720                 # a narrower tab puts the toolbar on two rows
 LINK_TICK_MS = 250            # how often the cards look at what the player is doing
 # the Sounds dropdown's first two (every sound, in an order): the order -> its key there
-TOPS = {"trending": "@trending", "top": "@top"}
+TOPS = {"trending": "@trending", "top": "@top", "new": "@new"}
 
 
 def meta_line(s: store.Sound) -> str:
@@ -383,6 +383,7 @@ class StoreTab(QWidget):
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QScrollArea.Shape.NoFrame)
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll.setFocusPolicy(Qt.FocusPolicy.NoFocus)   # Tab goes straight to the cards' buttons
         scroll.viewport().installEventFilter(self)   # resized: the columns line up again
         body = QWidget()
         self._list = QVBoxLayout(body)
@@ -670,7 +671,8 @@ class StoreTab(QWidget):
         self.reload()
 
     def _pick_top(self, key: str):
-        """The dropdown's first two: every sound, Trending or Most liked ("top")."""
+        """The dropdown's first three: every sound, Trending, Most liked ("top") or
+        Newest ("new")."""
         self._cat = ""
         self.set_sort(key)
 
@@ -682,7 +684,7 @@ class StoreTab(QWidget):
 
     def _show_picked(self, key: str):
         if not key and self._mode == "sounds":   # every sound: the top that matches the order
-            key = TOPS.get(self._sort, "")       # (Added: none, the box says All categories)
+            key = TOPS.get(self._sort, "")
         i = self.cat_pick.findData(key)
         if i >= 0 or not key:
             self.cat_pick.setCurrentIndex(i)
@@ -731,12 +733,13 @@ class StoreTab(QWidget):
         self._show_picked(self._kind)
 
     def _fill_cats(self, items: list[tuple[str, str, str]]):
-        """The sounds: Trending and Most liked (every sound), then (key, text, icon name)
+        """The sounds: Trending, Most liked and Newest (every sound), then (key, text, icon name)
         for each category. The voices: "All categories", then each kind."""
         self.cat_pick.clear()
         if self._mode == "sounds":
             items = [(TOPS["trending"], _("Trending"), "flame"),
-                     (TOPS["top"], _("Most liked"), "like"), *items]
+                     (TOPS["top"], _("Most liked"), "like"),
+                     (TOPS["new"], _("Newest"), "history"), *items]
         else:
             items = [("", _("All categories"), storelook.ALL_ICON), *items]
         for key, text, _icon in items:

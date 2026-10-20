@@ -1,0 +1,2 @@
+- Community: sort by Newest again, from the dropdown next to the search box.
+- Community: Tab goes straight to the cards, not first to the list itself.
