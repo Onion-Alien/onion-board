@@ -605,7 +605,6 @@
   "A restore point is saved first, so you can undo this.": "先に復元ポイントを保存するので、元に戻せます。",
   "A small dot on its icon": "アイコンに小さな点",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "サウンドボードは起動したままが一番便利です: ウィンドウを閉じてもホットキーとオーバーレイは動きます。トレイアイコン（時計の横）でまた開けます。終了するには右クリックしてください。",
-  "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "機能が今オンになっているタブ（サウンド再生中、ボイスチェンジャー、ラジオ…）には印が付くので、知らないうちにオンのままになることはありません。",
   "About": "情報",
   "Add a device": "デバイスを追加",
   "Add as sound keeps a copy of the video too (the pad is still just its sound). Videos use a lot more data: about 5 to 25 MB a minute.": "「サウンドとして追加」は動画のコピーも保存します（パッドは音だけのままです）。動画はデータ量がずっと多く、1分あたり約 5〜25 MB です。",
@@ -1246,7 +1245,6 @@
   "What do these do?": "これらは何をするのでしょうか？",
   "What do you want to reset?": "何をリセットしたいのですか？",
   "What goes online": "オンラインになるもの",
-  "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "オンになっているもの (ボイスチェンジャー、ライブ、ライブタブ) がテーマの色で表示されます。スライドして自分のものを選択してください。テーマを変更してもそれは残ります。",
   "Whatever played last, from a pad, a hotkey or the random key.": "パッド、ホットキー、またはランダム キーから最後に再生されたもの。",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "Discord、TeamSpeak、Mumble、または既知のボイスチャットを備えたゲームがマイク (またはケーブル) を聞いている場合は、尋ねることなくそのモードを使用してください。何も聞いていない状態では、モードはそのままです。",
   "When the program closes, the board goes back to what it showed before.": "プログラムが終了すると、ボードは以前に表示されていた状態に戻ります。",
@@ -4252,5 +4250,8 @@
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "実績を獲得したときに画面下に「実績解除」を表示します。",
   "Show pop-ups": "ポップアップを表示",
   "Already in your library as “{name}”": "すでにライブラリに「{name}」として存在しています",
-  "Names and tags can't have links in them.": "名前とタグにはリンクを入れられません。"
+  "Names and tags can't have links in them.": "名前とタグにはリンクを入れられません。",
+  "Marks a tab whose feature is on, so nothing is left on without you noticing.": "機能がオンになっているタブに印を付けるので、気づかないままオンのままになることがありません。",
+  "Size and speed": "サイズと速さ",
+  "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "オンになっているものはこの色で表示されます。スライドして自分の色を選べます。テーマを変えてもそのままです。"
 }

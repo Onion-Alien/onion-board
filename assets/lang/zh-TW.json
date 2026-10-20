@@ -605,7 +605,6 @@
   "A restore point is saved first, so you can undo this.": "會先建立還原點，所以你可以復原這個動作。",
   "A small dot on its icon": "圖示上的小圓點",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "音效板最好一直開著：關掉視窗後，你的快速鍵和覆蓋畫面仍然有效。系統匣圖示（在時鐘旁邊）可以再次開啟它；在圖示上按右鍵即可結束。",
-  "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "功能目前開啟中的分頁（音效正在播放、變聲器、電台…）會有標記，這樣就不會有東西在你沒注意時一直開著。",
   "About": "關於",
   "Add a device": "新增裝置",
   "Add as sound keeps a copy of the video too (the pad is still just its sound). Videos use a lot more data: about 5 to 25 MB a minute.": "「加入為音效」也會保存一份影片（按鈕本身仍然只有聲音）。影片會用掉多很多流量：大約每分鐘 5 到 25 MB。",
@@ -1245,7 +1244,6 @@
   "What do these do?": "這些是做什麼的？",
   "What do you want to reset?": "你想重設什麼？",
   "What goes online": "哪些東西會上網",
-  "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "開啟中的東西（變聲器、傳送中、使用中的分頁）會用主題的顏色顯示。滑動來選擇你自己的顏色；換主題時會保留。",
   "Whatever played last, from a pad, a hotkey or the random key.": "最後播放的東西，不管是來自按鈕、快速鍵或隨機按鍵。",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "當 Discord、TeamSpeak、Mumble 或有已知語音聊天的遊戲正在收聽你的麥克風（或音源線）時，不用問就使用它的模式。沒有東西在收聽時，模式會保持不變。",
   "When the program closes, the board goes back to what it showed before.": "程式關閉後，音效板會回到原本顯示的內容。",
@@ -4252,5 +4250,8 @@
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "獲得成就時在螢幕底部顯示「成就已解鎖」。",
   "Show pop-ups": "顯示彈出視窗",
   "Already in your library as “{name}”": "已經在你的音效庫裡，名稱是「{name}」",
-  "Names and tags can't have links in them.": "名稱和標籤裡不能有連結。"
+  "Names and tags can't have links in them.": "名稱和標籤裡不能有連結。",
+  "Marks a tab whose feature is on, so nothing is left on without you noticing.": "為功能正開著的分頁做個標記，免得有東西開著你卻沒注意到。",
+  "Size and speed": "大小和速度",
+  "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "開著的東西會顯示成這個顏色。拖動來選你自己的顏色；換主題後也會保留。"
 }

@@ -605,7 +605,6 @@
   "A restore point is saved first, so you can undo this.": "복원 지점이 먼저 저장되므로 이 작업을 취소할 수 있습니다.",
   "A small dot on its icon": "아이콘의 작은 점",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "사운드보드는 실행 중인 상태에서 가장 유용합니다. 단축키와 오버레이는 창이 닫혀 있는 동안에도 작동합니다. 트레이 아이콘(시계 옆)을 누르면 다시 열립니다. 종료하려면 마우스 오른쪽 버튼을 클릭하세요.",
-  "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "지금 기능이 켜져 있는 탭(소리 재생, 보이스 체인저, 라디오…)이 표시되어 있어 눈치채지 못한 채 아무것도 남지 않습니다.",
   "About": "에 대한",
   "Add a device": "장치 추가",
   "Add as sound keeps a copy of the video too (the pad is still just its sound). Videos use a lot more data: about 5 to 25 MB a minute.": "사운드로 추가하면 비디오 복사본도 유지됩니다(패드는 여전히 사운드일 뿐입니다). 동영상은 훨씬 더 많은 데이터를 사용합니다(분당 약 5~25MB).",
@@ -1246,7 +1245,6 @@
   "What do these do?": "이것들은 무엇을 하는가?",
   "What do you want to reset?": "무엇을 재설정하시겠습니까?",
   "What goes online": "온라인으로 가는 것",
-  "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "켜져 있는 것(보이스 체인저, 라이브, 라이브 탭)이 테마 색상으로 표시됩니다. 슬라이드하여 원하는 것을 선택하세요. 테마를 변경해도 그대로 유지됩니다.",
   "Whatever played last, from a pad, a hotkey or the random key.": "패드, 핫키 또는 임의의 키 중 마지막으로 재생된 것이 무엇이든 가능합니다.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "Discord, TeamSpeak, Mumble 또는 알려진 음성 채팅이 포함된 게임이 마이크(또는 케이블)를 듣고 있을 때 묻지 않고 해당 모드를 사용하세요. 아무것도 듣지 않으면 모드는 그대로 유지됩니다.",
   "When the program closes, the board goes back to what it showed before.": "프로그램이 종료되면 보드는 이전에 표시되었던 화면으로 돌아갑니다.",
@@ -4252,5 +4250,8 @@
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "업적을 달성하면 화면 아래에 \"업적 달성\"이(가) 표시됩니다.",
   "Show pop-ups": "팝업 표시",
   "Already in your library as “{name}”": "이미 ' {name} '으로 라이브러리에 있습니다.",
-  "Names and tags can't have links in them.": "이름과 태그에는 링크를 넣을 수 없습니다."
+  "Names and tags can't have links in them.": "이름과 태그에는 링크를 넣을 수 없습니다.",
+  "Marks a tab whose feature is on, so nothing is left on without you noticing.": "기능이 켜져 있는 탭에 표시를 해서, 모르는 사이에 켜진 채로 남는 것이 없어요.",
+  "Size and speed": "크기와 속도",
+  "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "켜져 있는 것은 이 색으로 보여요. 밀어서 원하는 색을 고르세요. 테마를 바꿔도 그대로예요."
 }

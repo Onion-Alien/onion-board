@@ -589,7 +589,6 @@
   "A restore point is saved first, so you can undo this.": "Сначала сохраняется точка восстановления, так что это можно отменить.",
   "A small dot on its icon": "Маленькая точка на значке",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Саундборд полезнее всего, когда работает в фоне: горячие клавиши и оверлей работают и при закрытом окне. Значок в трее (у часов) снова его открывает; ПКМ по нему: выйти.",
-  "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Вкладка, функция которой сейчас включена (играет звук, изменитель голоса, радио…), помечается, чтобы ничего не осталось включённым незаметно.",
   "About": "О программе",
   "Add a device": "Добавить устройство",
   "Add as sound keeps a copy of the video too (the pad is still just its sound). Videos use a lot more data: about 5 to 25 MB a minute.": "«Добавить как звук» сохраняет и копию видео (кнопка всё равно только со звуком). Видео занимают гораздо больше места: примерно 5–25 МБ в минуту.",
@@ -1212,7 +1211,6 @@
   "What do these do?": "Что они делают?",
   "What do you want to reset?": "Что ты хочешь сбросить?",
   "What goes online": "Что выходит в сеть",
-  "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "То, что включено (изменитель голоса, эфир, активная вкладка), показывается цветом темы. Сдвинь ползунок, чтобы выбрать свой; он останется при смене темы.",
   "Whatever played last, from a pad, a hotkey or the random key.": "То, что играло последним — с кнопки, горячей клавиши или клавиши случайного звука.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "Когда Discord, TeamSpeak, Mumble или игра с известным голосовым чатом слушает твой микрофон (или кабель), использовать её режим без вопросов. Если никто не слушает, режим не меняется.",
   "When the program closes, the board goes back to what it showed before.": "Когда программа закрывается, доска возвращается к тому, что было до этого.",
@@ -4400,5 +4398,8 @@
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "«Достижение получено» внизу экрана, когда ты получаешь достижение.",
   "Show pop-ups": "Показывать уведомления",
   "Already in your library as “{name}”": "Уже есть в твоей библиотеке как «{name}»",
-  "Names and tags can't have links in them.": "В названиях и тегах не может быть ссылок."
+  "Names and tags can't have links in them.": "В названиях и тегах не может быть ссылок.",
+  "Marks a tab whose feature is on, so nothing is left on without you noticing.": "Отмечает вкладку, чья функция сейчас включена, чтобы ничего не осталось включённым незаметно.",
+  "Size and speed": "Размер и скорость",
+  "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Включённое показывается этим цветом. Сдвинь ползунок, чтобы выбрать свой; он сохранится при смене темы."
 }

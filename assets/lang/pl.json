@@ -639,7 +639,6 @@
   "A restore point is saved first, so you can undo this.": "Najpierw zapisywany jest punkt przywracania, więc możesz to cofnąć.",
   "A small dot on its icon": "Mała kropka na ikonie",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Płyta rezonansowa jest najbardziej przydatna, gdy jest uruchomiona: klawisze skrótu i ​​nakładka działają, gdy okno jest zamknięte. Ikona na pasku zadań (przy zegarze) otwiera ją ponownie; kliknij go prawym przyciskiem myszy, aby wyjść.",
-  "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Zakładka, której funkcja jest aktualnie włączona (odtwarzanie dźwięku, zmieniacz głosu, radio...) jest zaznaczona, więc nic nie pozostanie włączone bez Twojej uwagi.",
   "About": "O",
   "Add a device": "Dodaj urządzenie",
   "Add as sound keeps a copy of the video too (the pad is still just its sound). Videos use a lot more data: about 5 to 25 MB a minute.": "Dodaj jako dźwięk również zachowuje kopię wideo (pad nadal jest tylko dźwiękiem). Filmy zużywają znacznie więcej danych: około 5 do 25 MB na minutę.",
@@ -1286,7 +1285,6 @@
   "What do these do?": "Co oni robią?",
   "What do you want to reset?": "Co chcesz zresetować?",
   "What goes online": "Co trafia do Internetu",
-  "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "To, co jest włączone (zmieniacz głosu, Na żywo, zakładka na żywo) jest wyświetlane w kolorze motywu. Przesuń, aby wybrać własny; pozostaje, gdy zmienisz motyw.",
   "Whatever played last, from a pad, a hotkey or the random key.": "Cokolwiek grało ostatnio, z pada, klawisza skrótu lub losowego klawisza.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "Gdy Discord, TeamSpeak, Mumble lub gra ze znanym czatem głosowym słucha Twojego mikrofonu (lub kabla), użyj jego trybu bez pytania. Gdy nikt nie słucha, tryb pozostaje taki, jaki jest.",
   "When the program closes, the board goes back to what it showed before.": "Po zamknięciu programu tablica wraca do tego, co pokazywała wcześniej.",
@@ -4400,5 +4398,8 @@
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "„Osiągnięcie odblokowane” na dole ekranu, gdy zdobędziesz osiągnięcie.",
   "Show pop-ups": "Pokazuj powiadomienia",
   "Already in your library as “{name}”": "Już w Twojej bibliotece jako „{name}”",
-  "Names and tags can't have links in them.": "Nazwy i tagi nie mogą zawierać linków."
+  "Names and tags can't have links in them.": "Nazwy i tagi nie mogą zawierać linków.",
+  "Marks a tab whose feature is on, so nothing is left on without you noticing.": "Oznacza kartę, której funkcja jest włączona, żeby nic nie zostało włączone bez twojej wiedzy.",
+  "Size and speed": "Rozmiar i szybkość",
+  "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "To, co jest włączone, pokazuje się w tym kolorze. Przesuń, by wybrać własny; zostaje po zmianie motywu."
 }

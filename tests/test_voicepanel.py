@@ -2027,6 +2027,27 @@ def test_voice_groups_and_favorites(qapp, monkeypatch):
     assert voicefx.clean_spec({"favorites": ["A", 3, "A", ""]})["favorites"] == ["A"]
 
 
+
+def test_a_huge_search_stops_at_the_cap_and_says_so_briefly(qapp, monkeypatch):
+    """Thousands of letters typed or pasted into the search sort the cards at most
+    SEARCH_MAX times, and the "nothing matches" line stays one short line."""
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+    from soundboard.ui.voice.groupbar import SEARCH_MAX
+    from soundboard.ui.voice.voicefxpanel import VoiceFxPanel
+    fx = VoiceFxPanel({})
+    runs = []
+    fx.bar.searched.connect(runs.append)
+    fx.bar.search.setFocus()
+    from PySide6.QtTest import QTest
+    QTest.keyClicks(fx.bar.search, "Z" * 400)
+    assert len(fx.bar.search.text()) == SEARCH_MAX
+    assert len(runs) == SEARCH_MAX
+    assert not fx.no_match.isHidden()
+    assert len(fx.no_match.text()) < 60 and "…" in fx.no_match.text()
+    fx.bar.search.clear()
+    fx.bar.search.insert("Q" * 4000)   # a paste
+    assert len(fx.bar.search.text()) == SEARCH_MAX
+
 def test_random_voice_turns_on_a_shown_voice_never_the_same_twice(panel):
     import random
     p, _ = panel

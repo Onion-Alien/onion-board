@@ -111,7 +111,6 @@
   "A restore point is saved first, so you can undo this.": "Primero se guarda un punto de restauración, así que puedes deshacer esto.",
   "A small dot on its icon": "Un puntito en su ícono",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Una soundboard es más útil si la dejas abierta: tus atajos y la superposición funcionan con la ventana cerrada. El ícono de la bandeja (junto al reloj) la vuelve a abrir; haz clic derecho en él para salir.",
-  "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Una pestaña cuya función está activa ahora mismo (un sonido sonando, el cambiador de voz, la radio…) se marca, para que nada se quede encendido sin que te des cuenta.",
   "A virtual cable (not installed yet)": "Un cable virtual (aún sin instalar)",
   "A virtual cable is a pipe: audio goes in at <b>{main}</b> and comes out at <b>{virtual_mic}</b>, which Discord / the game uses as your mic.": "Un cable virtual es un tubo: el audio entra por <b>{main}</b> y sale por <b>{virtual_mic}</b>, que Discord / el juego usa como tu micrófono.",
   "A window opened that downloads VB-Cable (free) from the official VB-Audio site.\n\nWindows will ask for permission, click Yes, then click “Install Driver”.\n\nWhen it's done, click “I've installed it, check again”. If it doesn't show up, restart your PC.": "Se abrió una ventana que descarga VB-Cable (gratis) desde el sitio oficial de VB-Audio.\n\nWindows te pedirá permiso: haz clic en Sí y luego en “Install Driver”.\n\nCuando termine, haz clic en “Ya lo instalé: revisar otra vez”. Si no aparece, reinicia tu PC.",
@@ -1185,7 +1184,6 @@
   "What goes online": "Qué se conecta a internet",
   "What's new": "Novedades",
   "What's playing": "Lo que suena",
-  "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "Lo que está activado (el cambiador de voz, En vivo, una pestaña activa) se muestra en el color del tema. Desliza para elegir el tuyo; se queda cuando cambias de tema.",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "Lo que escuche <b>{main}</b> recibe tus sonidos (y tu voz, si la envías): OBS, Voicemeeter, un mezclador o una capturadora.",
   "Whatever played last, from a pad, a hotkey or the random key.": "Lo último que sonó, desde un pad, un atajo o la tecla de sonido al azar.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "Cuando Discord, TeamSpeak, Mumble o un juego con un chat de voz conocido está escuchando tu micrófono (o el cable), usar su modo sin preguntar. Si nada está escuchando, el modo se queda como está.",
@@ -4326,5 +4324,8 @@
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "\"Logro desbloqueado\" en la parte de abajo de la pantalla cuando consigas uno.",
   "Show pop-ups": "Mostrar ventanas emergentes",
   "Already in your library as “{name}”": "Ya está en tu biblioteca como “{name}”",
-  "Names and tags can't have links in them.": "Los nombres y las etiquetas no pueden tener enlaces."
+  "Names and tags can't have links in them.": "Los nombres y las etiquetas no pueden tener enlaces.",
+  "Marks a tab whose feature is on, so nothing is left on without you noticing.": "Marca una pestaña cuya función está activada, para que nada se quede encendido sin que te des cuenta.",
+  "Size and speed": "Tamaño y velocidad",
+  "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Lo que está activado se muestra en este color. Desliza para elegir el tuyo; se queda aunque cambies de tema."
 }

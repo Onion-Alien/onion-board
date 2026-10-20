@@ -469,12 +469,36 @@ def test_live_tabs_is_a_tab_of_the_look_box_tint_or_dot(window, qapp):  # noqa: 
     # one of the look box's tabs, the box right under the language
     names = [b.text() for b in d.look_tabs]
     assert names == ["Themes", "Look"]   # its own part of the Look tab
-    assert card.parentWidget() is d.look_pages[1]
+    assert d.look_pages[1].isAncestorOf(card)
     assert d.look_box.parentWidget().layout().itemAt(1).widget() is d.look_box
     d.live_dot.click()
     assert window.cfg.live_tab_green is False
     d.live_green.click()
     assert window.cfg.live_tab_green is True
+
+
+def test_look_tab_in_three_groups_with_switches_by_their_titles(window, qapp):  # noqa: F811
+    """The Look tab reads as three small groups (Colour, Size and speed, Background), each
+    a soft box, not five headings in one long list; on/off and the size dropdown sit at
+    the end of their setting's heading line."""
+    d = SettingsDialog(window, "appearance")
+    page = d.look_pages[1]
+    boxes = page.findChildren(QFrame, "lookgroup")
+    assert len(boxes) == 3
+
+    def titles(box):
+        return [t.text() for t in box.findChildren(QLabel, "section")]
+    assert titles(boxes[0]) == ["Highlight colour", "Live tabs"]
+    assert titles(boxes[1]) == ["Interface size", "Lite mode"]
+    assert titles(boxes[2]) == ["Playing sound background"]
+    assert [len(b.findChildren(QFrame, "lookrule")) for b in boxes] == [1, 1, 0]
+    labels = [b.parentWidget().findChild(QLabel, "hint").text() for b in boxes]
+    assert labels == ["Colour", "Size and speed", "Background"]
+    for control, title in ((d.lite_check, "Lite mode"), (d.ui_scale_combo, "Interface size"),
+                           (d.playing_background_check, "Playing sound background")):
+        head = control.parentWidget()   # the heading widget: icon, title, then the control
+        assert head.findChild(QLabel, "section").text() == title
+    d.close()
 
 
 def test_theme_style_switches_textured_and_plain(window, qapp):  # noqa: F811

@@ -605,7 +605,6 @@
   "A restore point is saved first, so you can undo this.": "Điểm khôi phục được lưu trước tiên nên bạn có thể hoàn tác việc này.",
   "A small dot on its icon": "Một dấu chấm nhỏ trên biểu tượng của nó",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Bảng âm thanh hữu ích nhất khi chạy: các phím nóng và lớp phủ của bạn hoạt động khi cửa sổ đóng. Biểu tượng khay (theo đồng hồ) sẽ mở lại; nhấp chuột phải vào nó để thoát.",
-  "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Một tab có tính năng hiện đang được bật (phát âm thanh, bộ thay đổi giọng nói, radio…) sẽ được đánh dấu, do đó, không có gì được bật mà bạn không nhận thấy.",
   "About": "Về",
   "Add a device": "Thêm thiết bị",
   "Add as sound keeps a copy of the video too (the pad is still just its sound). Videos use a lot more data: about 5 to 25 MB a minute.": "Thêm dưới dạng âm thanh cũng giữ một bản sao của video (phần đệm vẫn chỉ là âm thanh của video). Video sử dụng nhiều dữ liệu hơn: khoảng 5 đến 25 MB một phút.",
@@ -1246,7 +1245,6 @@
   "What do these do?": "Những thứ này làm gì?",
   "What do you want to reset?": "Bạn muốn thiết lập lại cái gì?",
   "What goes online": "Những gì diễn ra trực tuyến",
-  "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "Những gì được bật (bộ thay đổi giọng nói, Trực tiếp, tab trực tiếp) sẽ được hiển thị bằng màu của chủ đề. Trượt để chọn của riêng bạn; nó vẫn ở đó khi bạn thay đổi chủ đề.",
   "Whatever played last, from a pad, a hotkey or the random key.": "Bất cứ thứ gì được chơi lần cuối, từ bảng phím, phím nóng hoặc phím ngẫu nhiên.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "Khi Discord, TeamSpeak, Mumble hoặc một trò chơi có tính năng trò chuyện thoại đã biết đang nghe micrô (hoặc cáp) của bạn, hãy sử dụng chế độ đó mà không cần hỏi. Không có gì nghe, chế độ vẫn như cũ.",
   "When the program closes, the board goes back to what it showed before.": "Khi chương trình kết thúc, bảng sẽ quay trở lại những gì nó hiển thị trước đó.",
@@ -4252,5 +4250,8 @@
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "\"Đã mở khóa thành tựu\" ở cuối màn hình khi bạn đạt được một thành tựu.",
   "Show pop-ups": "Hiện cửa sổ bật lên",
   "Already in your library as “{name}”": "Đã có trong thư viện của bạn với tên “{name}”",
-  "Names and tags can't have links in them.": "Tên và thẻ không được chứa liên kết."
+  "Names and tags can't have links in them.": "Tên và thẻ không được chứa liên kết.",
+  "Marks a tab whose feature is on, so nothing is left on without you noticing.": "Đánh dấu thẻ có tính năng đang bật, để không có gì bị bật mà bạn không để ý.",
+  "Size and speed": "Kích thước và tốc độ",
+  "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Những gì đang bật được hiện bằng màu này. Kéo để chọn màu của bạn; màu vẫn giữ khi bạn đổi giao diện."
 }

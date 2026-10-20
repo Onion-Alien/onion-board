@@ -622,7 +622,6 @@
   "A restore point is saved first, so you can undo this.": "Er wordt eerst een herstelpunt opgeslagen, dus u kunt dit ongedaan maken.",
   "A small dot on its icon": "Een kleine stip op het pictogram",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Een klankbord is het nuttigst als het actief blijft: uw sneltoetsen en de overlay werken terwijl het venster gesloten is. Het systeemvakpictogram (bij de klok) opent het opnieuw; klik er met de rechtermuisknop op om te stoppen.",
-  "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Een tabblad waarvan de functie momenteel is ingeschakeld (een geluid dat wordt afgespeeld, de stemwisselaar, de radio…) is gemarkeerd, zodat er niets aan blijft staan ​​zonder dat u het merkt.",
   "About": "Over",
   "Add a device": "Voeg een apparaat toe",
   "Add as sound keeps a copy of the video too (the pad is still just its sound). Videos use a lot more data: about 5 to 25 MB a minute.": "Toevoegen als geluid houdt ook een kopie van de video bij (de pad is nog steeds alleen het geluid). Video's gebruiken veel meer data: ongeveer 5 tot 25 MB per minuut.",
@@ -1266,7 +1265,6 @@
   "What do these do?": "Wat doen deze?",
   "What do you want to reset?": "Wat wil je resetten?",
   "What goes online": "Wat gaat online",
-  "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "Wat is ingeschakeld (de stemwisselaar, Live, een live-tabblad) wordt weergegeven in de kleur van het thema. Schuif om je eigen te kiezen; het blijft als je van thema verandert.",
   "Whatever played last, from a pad, a hotkey or the random key.": "Wat er als laatste werd gespeeld, vanaf een pad, een sneltoets of de willekeurige toets.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "Wanneer Discord, TeamSpeak, Mumble of een game met een bekende voicechat naar je microfoon (of de kabel) luistert, gebruik dan de modus ervan zonder te vragen. Als er niets wordt geluisterd, blijft de modus zoals hij is.",
   "When the program closes, the board goes back to what it showed before.": "Wanneer het programma wordt afgesloten, gaat het bord terug naar wat het eerder liet zien.",
@@ -4326,5 +4324,8 @@
   "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "\"Prestatie ontgrendeld\" onderaan het scherm als je er een verdient.",
   "Show pop-ups": "Pop-ups tonen",
   "Already in your library as “{name}”": "Al in uw bibliotheek als “{name}”",
-  "Names and tags can't have links in them.": "Namen en tags mogen geen links bevatten."
+  "Names and tags can't have links in them.": "Namen en tags mogen geen links bevatten.",
+  "Marks a tab whose feature is on, so nothing is left on without you noticing.": "Markeert een tabblad waarvan de functie aan staat, zodat niets aan blijft zonder dat je het merkt.",
+  "Size and speed": "Grootte en snelheid",
+  "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Wat aan staat, wordt in deze kleur getoond. Schuif om je eigen kleur te kiezen; die blijft als je van thema wisselt."
 }
