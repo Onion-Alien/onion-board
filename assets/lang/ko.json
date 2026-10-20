@@ -4254,5 +4254,8 @@
   "Size and speed": "크기와 속도",
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "켜져 있는 것은 이 색으로 보여요. 밀어서 원하는 색을 고르세요. 테마를 바꿔도 그대로예요.",
   "Already in your library as “{name}”": "이미 ' {name} '으로 라이브러리에 있습니다.",
-  "Names and tags can't have links in them.": "이름과 태그에는 링크를 넣을 수 없습니다."
+  "Names and tags can't have links in them.": "이름과 태그에는 링크를 넣을 수 없습니다.",
+  "<b>{headset}</b> is connected, but only for sound: Windows has its mic switched off. Put it away (or switch it off) for a few seconds and connect it again. If your phone is near, it may have taken the mic.": "<b>{headset}</b>이(가) 연결되어 있지만 소리만 나와요: Windows가 마이크를 꺼 두었어요. 몇 초 동안 넣어 두거나 끈 다음 다시 연결하세요. 휴대폰이 근처에 있다면 휴대폰이 마이크를 가져갔을 수 있어요.",
+  "Mic off": "마이크 꺼짐",
+  "Your headset's mic is off": "헤드셋 마이크가 꺼져 있어요"
 }

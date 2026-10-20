@@ -4328,5 +4328,8 @@
   "Size and speed": "Размер и скорост",
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Включеното се показва в този цвят. Плъзни, за да избереш свой; остава, когато смениш темата.",
   "Already in your library as “{name}”": "Вече е в библиотеката ти като „{name}“",
-  "Names and tags can't have links in them.": "Имената и таговете не може да съдържат връзки."
+  "Names and tags can't have links in them.": "Имената и таговете не може да съдържат връзки.",
+  "<b>{headset}</b> is connected, but only for sound: Windows has its mic switched off. Put it away (or switch it off) for a few seconds and connect it again. If your phone is near, it may have taken the mic.": "<b>{headset}</b> са свързани, но само за звук: Windows е изключил микрофона им. Прибери ги (или ги изключи) за няколко секунди и ги свържи отново. Ако телефонът ти е наблизо, може да е взел микрофона.",
+  "Mic off": "Микрофонът е изключен",
+  "Your headset's mic is off": "Микрофонът на слушалките е изключен"
 }

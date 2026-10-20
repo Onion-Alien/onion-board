@@ -180,7 +180,16 @@ class MicControl(Controller):
             look = ("warn", "reload", _("Setting up…"), _("Setting up…"), step, None)
         elif state == "missing" and settling:
             look = ("warn", "reload", _("Starting…"), _("Setting up…"), step, None)
-        elif directmic.unplugged(mw.cfg.mic_device):
+        elif self.mic_unplugged() and (headset := directmic.sound_only(mw.cfg.mic_device)):
+            # a Bluetooth headset playing fine with its mic half off (AirPods): "is it
+            # plugged in?" read as the app being wrong, it was connected
+            usage.used("mic-unplugged")
+            look = ("warn", "mic", _("Your headset's mic is off"), _("Mic off"), _(
+                "<b>{headset}</b> is connected, but only for sound: Windows has its mic "
+                "switched off. Put it away (or switch it off) for a few seconds and connect "
+                "it again. If your phone is near, it may have taken the mic.",
+                headset=html.escape(headset)), None)
+        elif self.mic_unplugged():
             # Windows still knows it, it's just not there: nothing to repair or set up
             usage.used("mic-unplugged")   # the card said so (never which mic)
             look = ("warn", "mic", _("Is your headset plugged in?"), _("Unplugged"), _(
@@ -250,8 +259,7 @@ class MicControl(Controller):
             sub = name
         # the mic itself works (it's open and not unplugged) while the sounds aren't in
         # it yet: said in its own green row, with its level, above what's missing
-        voice = (tone != "ok" and e.mic_stream is not None
-                 and not directmic.unplugged(mw.cfg.mic_device))
+        voice = (tone != "ok" and e.mic_stream is not None and not self.mic_unplugged())
         reveal.set_shown(mw.mic_voice, voice)   # (folds away once the sounds are in)
         if voice:
             mw.mic_voice_sub.setText(name)
@@ -540,8 +548,15 @@ class MicControl(Controller):
         h = (directmic.status(mw.cfg.mic_device), e.main_stream is not None,
              self._direct_not_running(), bool(e.direct_apps()),
              time.monotonic() < mw._settle_until and e.effect_alive(),   # "starting…" ends
-             self._mic_sends_nothing(), directmic.unplugged(mw.cfg.mic_device))
+             self._mic_sends_nothing(), self.mic_unplugged(),
+             directmic.sound_only(mw.cfg.mic_device))
         return h
+
+    def mic_unplugged(self) -> bool:
+        """The picked mic isn't there (directmic.unplugged), and no sound comes in from
+        it either: Windows' list can lag behind (or a name match miss) while the mic
+        works, and "plugged in?" over a moving level read as the app being broken."""
+        return directmic.unplugged(self.mw.cfg.mic_device) and not self.mw.engine.mic_live()
 
     def _mic_sends_nothing(self) -> bool:
         """The mic, with the effect on it, has sent only exact zeros for MIC_SILENT_S."""

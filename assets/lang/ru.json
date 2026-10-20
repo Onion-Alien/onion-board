@@ -4402,5 +4402,8 @@
   "Size and speed": "Размер и скорость",
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Включённое показывается этим цветом. Сдвинь ползунок, чтобы выбрать свой; он сохранится при смене темы.",
   "Already in your library as “{name}”": "Уже есть в твоей библиотеке как «{name}»",
-  "Names and tags can't have links in them.": "В названиях и тегах не может быть ссылок."
+  "Names and tags can't have links in them.": "В названиях и тегах не может быть ссылок.",
+  "<b>{headset}</b> is connected, but only for sound: Windows has its mic switched off. Put it away (or switch it off) for a few seconds and connect it again. If your phone is near, it may have taken the mic.": "<b>{headset}</b> подключены, но только для звука: Windows выключил их микрофон. Уберите их (или выключите) на несколько секунд и подключите снова. Если рядом ваш телефон, возможно, он забрал микрофон.",
+  "Mic off": "Микрофон выкл.",
+  "Your headset's mic is off": "Микрофон гарнитуры выключен"
 }

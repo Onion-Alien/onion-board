@@ -133,6 +133,7 @@ SLOT_REPLACING, SLOT_PUBLISHING = 1, 2
 STATE_KEY = r"SOFTWARE\OnionBoard\MicPlugin"
 ENDPOINTS_KEY = STATE_KEY + r"\Endpoints"
 CAPTURE_KEY = r"SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\Capture"
+RENDER_KEY = r"SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\Render"
 FX = "{d04e05a6-594b-4fb6-a80d-01af5eed7d1d},%d"   # PKEY_FX_* / PKEY_CompositeFX_*
 # On a recording device Windows runs the effects in front of each app's stream: SFX (or
 # LFX on drivers that only know the old kind), after the device's own EFX if it has one.
@@ -152,6 +153,7 @@ MODES_KEY = "{d3993a3f-99c2-4402-b5ec-a92a0367664b},%d"     # PKEY_*_ProcessingM
 MODE_DEFAULT = "{C18E2F7E-933D-4965-B7D1-1EEF228D2AF3}"     # AUDIO_SIGNALPROCESSINGMODE_DEFAULT
 NAME_DESC = "{a45c254e-df1c-4efd-8020-67d146a850e0},2"       # "Microphone"
 NAME_IFACE = "{b3f8fa53-0004-438e-9003-51a46e139bfc},6"      # "Realtek Audio"
+NAME_ENUM = "{a45c254e-df1c-4efd-8020-67d146a850e0},24"      # "USB", "BTHHFENUM" (Bluetooth)
 UNPLUGGED_STATES = (4, 8)   # DEVICE_STATE_NOTPRESENT, _UNPLUGGED (2 is switched off by hand)
 _GUID = re.compile(r"\{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"
                    r"[0-9a-fA-F]{12}\}")
@@ -760,10 +762,20 @@ def _pid_alive(pid: int) -> bool:
 
 def capture_endpoints() -> list[dict]:
     """Every recording device Windows knows: {"guid", "name", "active", "out": unplugged
-    (or its USB or Bluetooth headset switched off)}."""
+    (or its USB or Bluetooth headset switched off), "device": the part of the name in
+    brackets ("AirPods Pro Hands-Free"), "bt": a Bluetooth headset's}."""
+    return _endpoints(CAPTURE_KEY)
+
+
+def render_endpoints() -> list[dict]:
+    """Every playback device Windows knows, as capture_endpoints()."""
+    return _endpoints(RENDER_KEY)
+
+
+def _endpoints(key: str) -> list[dict]:
     found = []
     try:
-        root = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, CAPTURE_KEY)
+        root = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, key)
     except OSError:
         return found
     with root:
@@ -780,12 +792,35 @@ def capture_endpoints() -> list[dict]:
                 with winreg.OpenKey(root, guid + r"\Properties") as p:
                     desc = _value(p, NAME_DESC) or "Microphone"
                     iface = _value(p, NAME_IFACE)
+                    enum = _value(p, NAME_ENUM)
             except OSError:
                 continue
             name = f"{desc} ({iface})" if iface else desc
             found.append({"guid": guid.lower(), "name": name, "active": state == 1,
-                          "out": state in UNPLUGGED_STATES})
+                          "out": state in UNPLUGGED_STATES, "device": iface or "",
+                          "bt": str(enum or "").upper().startswith("BTH")})
     return found
+
+
+_HANDS_FREE = re.compile(r"\s*hands[- ]?free(\s+ag\s+audio)?\s*$", re.I)
+
+
+def _sound_only(mic_name: str) -> str | None:
+    """The name of the Bluetooth headset `mic_name` is the mic of, when Windows has the
+    headset on for sound but its mic off: a Bluetooth headset (AirPods most of all)
+    connects its sound and its phone-call mic separately, and the mic half drops out
+    while the sound keeps playing (a phone took it, or Windows never connected it).
+    None for anything else. Reads the registry: not on the UI thread."""
+    off = [e for e in _near(mic_name, [e for e in capture_endpoints() if not e["active"]])
+           if e.get("bt")]
+    if not off:
+        return None
+    halves = {_squash(_HANDS_FREE.sub("", e.get("device", ""))) for e in off} - {""}
+    for e in render_endpoints():
+        headset = _HANDS_FREE.sub("", e.get("device", ""))
+        if e["active"] and e.get("bt") and _squash(headset) in halves:
+            return headset
+    return None
 
 
 def endpoint_for(name: str | None) -> str | None:
@@ -918,6 +953,7 @@ _status_busy: set = set()  # mic names being re-checked on a thread
 _status_poll = PollThread("mic-effect-status")
 _status_lock = threading.Lock()
 _unplugged: dict = {}   # mic name -> unplugged at the last status() check
+_sound_only_on: dict = {}   # mic name -> its Bluetooth headset, on for sound only (or None)
 STATUS_S = 2.0
 
 
@@ -925,6 +961,7 @@ def forget_status():
     with _status_lock:
         _status_cache.clear()
         _unplugged.clear()
+        _sound_only_on.clear()
         _status_gen[0] += 1
 
 
@@ -993,12 +1030,20 @@ def unplugged(mic_name: str | None) -> bool:
     return bool(mic_name) and _unplugged.get(mic_name, False)
 
 
+def sound_only(mic_name: str | None) -> str | None:
+    """The headset's name when the mic called `mic_name` isn't there because it's a
+    Bluetooth headset's that Windows has on for sound only, its mic off (as the last
+    status() for it found). "Is it plugged in?" is wrong then: it is, and it plays."""
+    return _sound_only_on.get(mic_name) if mic_name else None
+
+
 def _status(mic_name: str | None) -> str:
     on = installed_on()
     if mic_name is None:
         return _state(on[0], on) if on else "missing"
     guid = endpoint_for(mic_name)
-    _unplugged[mic_name] = guid is None and _not_here(mic_name)
+    gone = _unplugged[mic_name] = guid is None and _not_here(mic_name)
+    _sound_only_on[mic_name] = _sound_only(mic_name) if gone else None
     if not on:
         return "missing"
     return _state(guid, on)

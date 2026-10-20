@@ -3605,6 +3605,75 @@ def test_unplugged_follows_the_last_status_check(monkeypatch):
     dm.forget_status()
 
 
+def test_a_bluetooth_mic_on_for_sound_only_names_its_headset(monkeypatch):
+    """AirPods (any Bluetooth headset) connect their sound and their phone-call mic
+    separately, and the mic half drops out while the sound keeps playing. That's still
+    unplugged (nothing to set up), but sound_only() names the headset that plays, so the
+    card doesn't ask whether a connected headset is plugged in."""
+    mics = [{"guid": "{a}", "name": "Headset (AirPods Pro Hands-Free AG Audio)",
+             "active": False, "out": True, "device": "AirPods Pro Hands-Free AG Audio",
+             "bt": True},
+            {"guid": "{b}", "name": "Headset Mic (G733)", "active": False, "out": True,
+             "device": "G733", "bt": False}]
+    outs = [{"guid": "{c}", "name": "Headphones (AirPods Pro)", "active": True, "out": False,
+             "device": "AirPods Pro", "bt": True},
+            {"guid": "{d}", "name": "Headphones (G733)", "active": True, "out": False,
+             "device": "G733", "bt": False}]
+    monkeypatch.setattr(dm, "capture_endpoints", lambda: mics)
+    monkeypatch.setattr(dm, "render_endpoints", lambda: outs)
+    monkeypatch.setattr(dm, "installed_on", lambda: [])
+    monkeypatch.setattr(dm, "_engine_name", lambda name: None)
+    airpods = "Headset (AirPods Pro Hands-Free AG Audio)"
+    dm.forget_status()
+    dm.status(airpods)
+    assert dm.unplugged(airpods) and dm.sound_only(airpods) == "AirPods Pro"
+    # a wired (USB) headset whose sound half plays: just unplugged, no headset named
+    dm.status("Headset Mic (G733)")
+    assert dm.unplugged("Headset Mic (G733)") and dm.sound_only("Headset Mic (G733)") is None
+    # the AirPods switched off altogether (their sound gone too): "plugged in?" again
+    outs[0] = {**outs[0], "active": False}
+    dm.forget_status()
+    dm.status(airpods)
+    assert dm.unplugged(airpods) and dm.sound_only(airpods) is None
+    # the mic half back: neither
+    outs[0] = {**outs[0], "active": True}
+    mics[0] = {**mics[0], "active": True, "out": False}
+    dm.forget_status()
+    dm.status(airpods)
+    assert not dm.unplugged(airpods) and dm.sound_only(airpods) is None
+    assert dm.sound_only(None) is None
+    dm.forget_status()
+
+
+def test_a_bluetooth_headset_on_for_sound_only_says_its_mic_is_off(window, monkeypatch):  # noqa: F811
+    """The picked mic is a Bluetooth headset's that plays but has its mic half off: the
+    card names the headset and says its mic is off, never "Is your headset plugged in?"
+    (a user quit over that: their AirPods were connected). And while sound comes in
+    from the mic, it's never called unplugged at all."""
+    w = window
+    _routes(w, monkeypatch, "missing")
+    w.cfg.mic_device = "Headset (AirPods Hands-Free)"
+    monkeypatch.setattr(w.engine, "main_stream", object())
+    monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: False)
+    monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
+    monkeypatch.setattr(dm, "unplugged", lambda name: bool(name))
+    monkeypatch.setattr(dm, "sound_only", lambda name: "AirPods <3" if name else None)
+    live = [False]
+    monkeypatch.setattr(type(w.engine), "mic_live", lambda self: live[0])
+    w.statusctl._update_flow()
+    assert w.mic_line.text() == "Your headset's mic is off"
+    assert w.mic_pill.text() == "Mic off"
+    assert "<b>AirPods &lt;3</b> is connected" in w.mic_reason.text()
+    assert "plugged in" not in w.mic_reason.text() and w.btn_install.isHidden()
+    assert w._pill_long == "Your headset's mic is off"
+    # Windows' list says it's gone, but the mic's sound is coming in: it's there
+    live[0] = True
+    assert w.micctl._direct_health() != w._direct_shown
+    w.statusctl._update_flow()
+    assert w.mic_line.text() not in ("Your headset's mic is off", "Is your headset plugged in?")
+    assert not w.micctl.mic_unplugged()
+
+
 def test_the_fix_never_asks_windows_by_itself(monkeypatch):
     """The app's own fix goes through the helper only: no helper answer, no prompt."""
     monkeypatch.setattr(dm, "endpoint_for", lambda name: "{G}")

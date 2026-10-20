@@ -4254,5 +4254,8 @@
   "Size and speed": "Kích thước và tốc độ",
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Những gì đang bật được hiện bằng màu này. Kéo để chọn màu của bạn; màu vẫn giữ khi bạn đổi giao diện.",
   "Already in your library as “{name}”": "Đã có trong thư viện của bạn với tên “{name}”",
-  "Names and tags can't have links in them.": "Tên và thẻ không được chứa liên kết."
+  "Names and tags can't have links in them.": "Tên và thẻ không được chứa liên kết.",
+  "<b>{headset}</b> is connected, but only for sound: Windows has its mic switched off. Put it away (or switch it off) for a few seconds and connect it again. If your phone is near, it may have taken the mic.": "<b>{headset}</b> đã kết nối, nhưng chỉ để nghe: Windows đã tắt micrô của nó. Cất đi (hoặc tắt) vài giây rồi kết nối lại. Nếu điện thoại của bạn ở gần, có thể nó đã lấy micrô.",
+  "Mic off": "Micrô tắt",
+  "Your headset's mic is off": "Micrô của tai nghe đang tắt"
 }

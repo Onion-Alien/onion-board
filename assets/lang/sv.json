@@ -4328,5 +4328,8 @@
   "Size and speed": "Storlek och hastighet",
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Det som är på visas i den här färgen. Dra för att välja din egen; den stannar kvar när du byter tema.",
   "Already in your library as “{name}”": "Finns redan i ditt bibliotek som ”{name}”",
-  "Names and tags can't have links in them.": "Namn och taggar får inte innehålla länkar."
+  "Names and tags can't have links in them.": "Namn och taggar får inte innehålla länkar.",
+  "<b>{headset}</b> is connected, but only for sound: Windows has its mic switched off. Put it away (or switch it off) for a few seconds and connect it again. If your phone is near, it may have taken the mic.": "<b>{headset}</b> är anslutet, men bara för ljud: Windows har stängt av mikrofonen. Lägg undan det (eller stäng av det) några sekunder och anslut det igen. Om din telefon är i närheten kan den ha tagit mikrofonen.",
+  "Mic off": "Mikrofon av",
+  "Your headset's mic is off": "Ditt headsets mikrofon är av"
 }

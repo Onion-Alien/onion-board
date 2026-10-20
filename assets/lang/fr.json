@@ -4328,5 +4328,8 @@
   "Size and speed": "Taille et vitesse",
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Ce qui est activé s'affiche dans cette couleur. Fais glisser pour choisir la tienne ; elle reste quand tu changes de thème.",
   "Already in your library as “{name}”": "Déjà dans ta bibliothèque sous « {name} »",
-  "Names and tags can't have links in them.": "Les noms et les tags ne peuvent pas contenir de liens."
+  "Names and tags can't have links in them.": "Les noms et les tags ne peuvent pas contenir de liens.",
+  "<b>{headset}</b> is connected, but only for sound: Windows has its mic switched off. Put it away (or switch it off) for a few seconds and connect it again. If your phone is near, it may have taken the mic.": "<b>{headset}</b> est connecté, mais seulement pour le son : Windows a coupé son micro. Range-le (ou éteins-le) quelques secondes, puis reconnecte-le. Si ton téléphone est à côté, il a peut-être pris le micro.",
+  "Mic off": "Micro coupé",
+  "Your headset's mic is off": "Le micro de ton casque est coupé"
 }

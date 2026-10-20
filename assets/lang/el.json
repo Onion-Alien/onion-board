@@ -4328,5 +4328,8 @@
   "Size and speed": "Μέγεθος και ταχύτητα",
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Ό,τι είναι ενεργό φαίνεται σε αυτό το χρώμα. Σύρε για να διαλέξεις το δικό σου· μένει όταν αλλάζεις θέμα.",
   "Already in your library as “{name}”": "Ήδη στη βιβλιοθήκη σας ως \"{name}\"",
-  "Names and tags can't have links in them.": "Τα ονόματα και οι ετικέτες δεν μπορούν να περιέχουν συνδέσμους."
+  "Names and tags can't have links in them.": "Τα ονόματα και οι ετικέτες δεν μπορούν να περιέχουν συνδέσμους.",
+  "<b>{headset}</b> is connected, but only for sound: Windows has its mic switched off. Put it away (or switch it off) for a few seconds and connect it again. If your phone is near, it may have taken the mic.": "Τα <b>{headset}</b> είναι συνδεδεμένα, αλλά μόνο για ήχο: τα Windows έχουν κλειστό το μικρόφωνό τους. Βγάλ' τα (ή κλείσ' τα) για λίγα δευτερόλεπτα και σύνδεσέ τα ξανά. Αν το κινητό σου είναι κοντά, ίσως πήρε αυτό το μικρόφωνο.",
+  "Mic off": "Μικρόφωνο κλειστό",
+  "Your headset's mic is off": "Το μικρόφωνο των ακουστικών σου είναι κλειστό"
 }
