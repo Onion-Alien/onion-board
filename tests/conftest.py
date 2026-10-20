@@ -252,6 +252,14 @@ def _limited_themes_on_offer(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def _memory_never_full(monkeypatch):
+    """The usage count waits while the PC is short of memory: a test runner that is
+    would quietly send nothing, so no load counts as full here (test_usage sets it)."""
+    from soundboard.core import usage
+    monkeypatch.setattr(usage, "MEMORY_FULL", 101)
+
+
+@pytest.fixture(autouse=True)
 def _splash_act_back_after():
     """splash.show() picks this launch's act at random, now and then a rare one with a
     taller card: a test that showed the splash puts the act before back, or the splash
