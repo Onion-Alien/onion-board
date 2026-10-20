@@ -54,6 +54,16 @@ def default_fx_spec() -> dict:
     return {"enabled": False, "preset": CUSTOM, "effects": {}}
 
 
+def at_start(spec):
+    """The saved voice changer as the app starts with it: left off, it forgets the voice
+    picked last time, so ON doesn't bring back one from an old run. Your own mix stays;
+    left on, it comes back as it was."""
+    if not isinstance(spec, dict) or spec.get("enabled") or spec.get("preset", CUSTOM) == CUSTOM:
+        return spec
+    custom = spec.get("custom")
+    return {**spec, "preset": CUSTOM, "effects": custom if isinstance(custom, dict) else {}}
+
+
 # =========================================================================== voice changer
 
 class Switch(QCheckBox):

@@ -89,6 +89,7 @@ from soundboard.ui.triggers.triggerstab import TriggersTab
 from soundboard.ui.radio.radiopanel import RadioOff, RadioTab
 from soundboard.ui.store.storetab import PREVIEW as STORE_PREVIEW, StoreTab
 from soundboard.ui.voice.voicepanel import VoicePanel
+from soundboard.ui.voice import voicefxpanel
 from soundboard.ui.kit.widgets import Meter, Pad, expand_dropped
 from soundboard.control.winkeys import Hotkeys
 from soundboard.i18n import _
@@ -453,6 +454,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(self.title)
         self.setAcceptDrops(True)   # files dropped outside the pad grid: see dropEvent
         self.cfg = Config.load()
+        # left off last time: ON starts from no picked voice, not one from an old run
+        self.cfg.voice_fx = voicefxpanel.at_start(self.cfg.voice_fx)
         self.achievepops = AchievementPops(self)   # first: attach() can earn some
         achievements.attach(self.cfg)   # Settings > Achievements counts from here
         achievements.set_goal("rainbow_road", len(theme.THEMES))

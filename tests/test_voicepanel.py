@@ -2272,3 +2272,27 @@ def test_clicks_on_the_voice_tab_dont_check_the_disk_each_time(panel, monkeypatc
     p.speech._fill_langs()
     asked.clear()
     assert p.speech.translating() is lang and "zh" in asked
+
+
+def test_off_at_start_forgets_the_picked_voice(qapp, monkeypatch):
+    """Left off last run: ON starts from no picked voice (your own mix), not the old
+    one. Left on: it comes back as it was."""
+    from soundboard.ui.voice.voicefxpanel import CUSTOM, at_start
+    ghost = voicefx.PRESETS["Ghost"]
+    mine = {"cleanup": {"on": True, "gate": 0.6, "hiss": 0.5}}
+    off = {"enabled": False, "preset": "Ghost", "effects": ghost, "custom": mine}
+    assert at_start(off) == {"enabled": False, "preset": CUSTOM, "effects": mine,
+                             "custom": mine}
+    assert at_start({"enabled": False, "preset": "Ghost", "effects": ghost})["effects"] == {}
+    on = {**off, "enabled": True}
+    assert at_start(on) == on
+    assert at_start({}) == {} and at_start(None) is None
+
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
+    from soundboard.ui.voice.voicepanel import VoicePanel
+    p = VoicePanel(FakeEngine(), at_start({"enabled": False, "preset": "Ghost",
+                                           "effects": ghost}),
+                   {"voice": "Microsoft Zira Desktop", "rate": 2})
+    assert p.fx.preset == CUSTOM
+    assert p.bar.texts() == ["Mic unchanged. ON turns on:", "My own mix"]
+    p.deleteLater()
