@@ -3,8 +3,9 @@ pad's picture, its name, hotkey and length, the glow while it plays), so a key l
 the board. A pad's key is the pad; Stop all, Random sound and the switches are the same
 card with an icon. /api/key_image sends them (soundboard.control.remote). UI thread only.
 
-A key is filled edge to edge: the Stream Deck rounds its keys itself, and a card's own
-rounded corners showed as black notches on the key."""
+A key is filled edge to edge (a card's own corners showed as black notches), and its
+outline and picture are rounded like the key itself (KEY_RADIUS): the Stream Deck rounds
+its keys, and a square outline was cut off at the corners."""
 from __future__ import annotations
 
 import hashlib
@@ -21,6 +22,7 @@ CARD = 96       # the card is laid out this big (as on the board) and drawn at S
 MIN_SIZE, MAX_SIZE = 72, 288
 FLASH = 0.4     # playing: how much of the board's "it just started" wash stays on (0..1)
 EDGE = 2        # a pad card leaves this much round itself (for its glow): cut off on a key
+KEY_RADIUS = 14  # a Stream Deck key's own rounded corners, on the CARD scale (~14 %)
 
 # the keys that aren't a pad: what they say (on, off) and their icon
 CONTROLS = {
@@ -108,7 +110,7 @@ def _card(meta: SoundMeta, lit: bool, size: int,
     pad = KeyPad(meta, CARD)
     pad.shown = meta.name
     radius = widgets.PAD_RADIUS
-    widgets.PAD_RADIUS = 0   # square: the Stream Deck rounds the key
+    widgets.PAD_RADIUS = KEY_RADIUS   # the key's own curve (the corners outside: card colour)
     try:
         pad.setFixedSize(CARD + 2 * EDGE, CARD + 2 * EDGE)
         pad.state = "ready"
