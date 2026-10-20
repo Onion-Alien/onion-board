@@ -335,6 +335,7 @@ class AchievementsPage(Page):
             if not hidden:
                 self.dlg.ach_count = hint_label("")
                 cv.addWidget(self.dlg.ach_count)
+                self._popup_options(cv)
             tiles = [Tile(a, *words[a.id]) for a in ach.ALL if a.hidden == hidden]
             self.dlg.ach_tiles += tiles
             grid = TileGrid(tiles)
@@ -347,6 +348,23 @@ class AchievementsPage(Page):
         v.addStretch(1)
         self._count()
         return w
+
+    def _popup_options(self, cv):
+        """Whether an earned one pops up at all, and whether that pop-up plays its chime
+        (no pop-up, no chime: that box waits greyed until the pop-ups are back on)."""
+        mw = self.mw
+        pops = self._option(cv, _("Show pop-ups"),
+                            _("\"Achievement unlocked\" at the bottom of the screen when you "
+                              "earn one."),
+                            mw.cfg.achievement_popups,
+                            lambda b: (mw.set_option("achievement_popups", b),
+                                       sound.setEnabled(b)))
+        sound = self._option(cv, _("Pop-up sound"),
+                             _("Play a chime in your headphones when you earn one."),
+                             mw.cfg.achievement_sound,
+                             lambda b: mw.set_option("achievement_sound", b))
+        sound.setEnabled(mw.cfg.achievement_popups)
+        self.dlg.box_ach_popups, self.dlg.box_ach_sound = pops, sound
 
     # the filters: which ones (all, earned, not yet) and which rarity
     SHOW = ("all", "earned", "todo")

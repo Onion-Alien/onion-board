@@ -4320,5 +4320,9 @@
   "What does Use less data change?": "Τι αλλάζει η λιγότερη χρήση δεδομένων;",
   "Add Onion Watch again": "Πρόσθεσε ξανά το Onion Watch",
   "Add Onion Watch to this tab": "Πρόσθεσε το Onion Watch σε αυτή την καρτέλα",
-  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Ο έλεγχος λήψης του GitHub δεν είναι προσωρινά διαθέσιμος (σφάλμα πύλης). Δοκίμασε να προσθέσεις ξανά το Onion Watch σε λίγο."
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Ο έλεγχος λήψης του GitHub δεν είναι προσωρινά διαθέσιμος (σφάλμα πύλης). Δοκίμασε να προσθέσεις ξανά το Onion Watch σε λίγο.",
+  "Play a chime in your headphones when you earn one.": "Παίζει ένα κουδούνισμα στα ακουστικά σου όταν κερδίζεις ένα.",
+  "Pop-up sound": "Ήχος αναδυόμενου",
+  "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "«Ξεκλείδωσες επίτευγμα» στο κάτω μέρος της οθόνης όταν κερδίζεις ένα.",
+  "Show pop-ups": "Εμφάνιση αναδυόμενων"
 }

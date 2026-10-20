@@ -4246,5 +4246,9 @@
   "What does Use less data change?": "ใช้ข้อมูลน้อยลงเปลี่ยนอะไรบ้าง?",
   "Add Onion Watch again": "เพิ่ม Onion Watch อีกครั้ง",
   "Add Onion Watch to this tab": "เพิ่ม Onion Watch ในแท็บนี้",
-  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "การตรวจสอบการดาวน์โหลดของ GitHub ใช้งานไม่ได้ชั่วคราว (ข้อผิดพลาดเกตเวย์) ลองเพิ่ม Onion Watch อีกครั้งในอีกสักครู่"
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "การตรวจสอบการดาวน์โหลดของ GitHub ใช้งานไม่ได้ชั่วคราว (ข้อผิดพลาดเกตเวย์) ลองเพิ่ม Onion Watch อีกครั้งในอีกสักครู่",
+  "Play a chime in your headphones when you earn one.": "เล่นเสียงกริ่งในหูฟังเมื่อคุณได้รับความสำเร็จ",
+  "Pop-up sound": "เสียงป๊อปอัป",
+  "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "\"ปลดล็อกความสำเร็จแล้ว\" ที่ด้านล่างของหน้าจอเมื่อคุณได้รับความสำเร็จ",
+  "Show pop-ups": "แสดงป๊อปอัป"
 }

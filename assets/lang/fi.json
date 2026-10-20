@@ -4320,5 +4320,9 @@
   "What does Use less data change?": "Mitä Käytä vähemmän dataa muuttaa?",
   "Add Onion Watch again": "Lisää Onion Watch uudelleen",
   "Add Onion Watch to this tab": "Lisää Onion Watch tähän välilehteen",
-  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHubin lataustarkistus ei ole hetkeen käytettävissä (yhdyskäytävävirhe). Yritä lisätä Onion Watch uudelleen hetken päästä."
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHubin lataustarkistus ei ole hetkeen käytettävissä (yhdyskäytävävirhe). Yritä lisätä Onion Watch uudelleen hetken päästä.",
+  "Play a chime in your headphones when you earn one.": "Soita kilahdus kuulokkeisiisi, kun ansaitset saavutuksen.",
+  "Pop-up sound": "Ponnahdusikkunan ääni",
+  "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "”Saavutus avattu” näytön alareunassa, kun ansaitset saavutuksen.",
+  "Show pop-ups": "Näytä ponnahdusikkunat"
 }

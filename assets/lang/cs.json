@@ -4394,5 +4394,9 @@
   "What does Use less data change?": "Co mění Méně dat?",
   "Add Onion Watch again": "Přidat Onion Watch znovu",
   "Add Onion Watch to this tab": "Přidat Onion Watch do této karty",
-  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Kontrola stahování na GitHubu je dočasně nedostupná (chyba brány). Zkus Onion Watch přidat znovu za chvíli."
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "Kontrola stahování na GitHubu je dočasně nedostupná (chyba brány). Zkus Onion Watch přidat znovu za chvíli.",
+  "Play a chime in your headphones when you earn one.": "Zahrát zvonění ve sluchátkách, když nějaký získáš.",
+  "Pop-up sound": "Zvuk oznámení",
+  "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "„Úspěch odemčen“ dole na obrazovce, když nějaký získáš.",
+  "Show pop-ups": "Zobrazovat oznámení"
 }

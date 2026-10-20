@@ -4246,5 +4246,9 @@
   "What does Use less data change?": "データ節約で何が変わりますか？",
   "Add Onion Watch again": "Onion Watch をもう一度追加",
   "Add Onion Watch to this tab": "このタブに Onion Watch を追加",
-  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHub のダウンロード確認が一時的に使えません (ゲートウェイ エラー)。少ししてから、もう一度 Onion Watch を追加してください。"
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHub のダウンロード確認が一時的に使えません (ゲートウェイ エラー)。少ししてから、もう一度 Onion Watch を追加してください。",
+  "Play a chime in your headphones when you earn one.": "実績を獲得したときにヘッドホンでチャイムを鳴らします。",
+  "Pop-up sound": "ポップアップの音",
+  "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "実績を獲得したときに画面下に「実績解除」を表示します。",
+  "Show pop-ups": "ポップアップを表示"
 }

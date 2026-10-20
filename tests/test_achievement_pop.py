@@ -8,6 +8,7 @@ from PySide6.QtWidgets import QWidget
 from conftest import process_events
 from soundboard.audio import achievechime
 from soundboard.core import achievements as ach
+from soundboard.sounds.library import Config
 from soundboard.ui.window import achievepop as ap
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
@@ -52,6 +53,7 @@ def pops(qapp, monkeypatch):
     monkeypatch.setattr(ap, "GAP_MS", 0)
     host = QWidget()
     host.engine = _Engine()
+    host.cfg = Config(achievement_sound=True)
     p = ap.AchievementPops(host)
     process_events(qapp, lambda: p.ready)
     yield p
@@ -66,6 +68,14 @@ def test_an_earned_one_pops_up_with_its_chime_in_the_headphones_only(qapp, pops)
     assert pops.pop.isVisible() and pops.pop.bottom == "10G - First Blood"
     assert pops.mw.engine.played == [("__achievement__",
                                       {"mode": "restart", "preview": True})]
+
+
+def test_the_chime_is_off_by_default_and_the_pop_up_still_shows(qapp, pops):
+    pops.mw.cfg = Config()
+    assert not pops.mw.cfg.achievement_sound
+    pops.earned.emit("first_blood")
+    process_events(qapp, lambda: pops.showing)
+    assert pops.pop.isVisible() and pops.mw.engine.played == []
 
 
 def test_several_queue_and_show_one_after_another(qapp, pops):
@@ -98,3 +108,10 @@ def test_the_window_makes_one_and_stops_it_at_quit(window):  # noqa: F811
     window.achievepops.shutdown()
     assert window.achievepops._heard not in ach.on_unlock
 
+
+
+def test_pop_ups_turned_off_show_nothing_and_play_nothing(qapp, pops):
+    pops.mw.cfg = Config(achievement_popups=False, achievement_sound=True)
+    pops.earned.emit("first_blood")
+    process_events(qapp, lambda: pops.showing, timeout=0.3)
+    assert not pops.showing and not pops.queue and pops.mw.engine.played == []

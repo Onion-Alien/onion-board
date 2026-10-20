@@ -3,7 +3,8 @@ the screen, over games and other apps, as an achievement is earned.
 
 A glossy green orb pops in, a dark rounded bar slides out of it with "Achievement
 unlocked" and "<points>G - <name>", it stays a few seconds, then folds back into the orb
-and the orb shrinks away. Its chime (audio/achievechime.py) plays in your headphones
+and the orb shrinks away. Its chime (audio/achievechime.py), when Settings >
+Achievements has it on (off by default), plays in your headphones
 only. It never takes focus or clicks (a game in front keeps them). Several at once
 queue up and show one after another.
 
@@ -220,7 +221,7 @@ class AchievementPop(QWidget):
 
 class AchievementPops(QObject):
     """Listens for earned achievements (from any thread) and shows them one by one,
-    with the chime in the headphones."""
+    with the chime in the headphones when Settings > Achievements has it on."""
     earned = Signal(str)
 
     def __init__(self, mw: MainWindow):
@@ -245,6 +246,9 @@ class AchievementPops(QObject):
         self._next()
 
     def _add(self, aid: str):
+        cfg = getattr(self.mw, "cfg", None)
+        if not getattr(cfg, "achievement_popups", True):
+            return   # (turned off in Settings > Achievements: still earned, just quiet)
         if aid in achievements.BY_ID:
             self.queue.append(aid)
             self._next()
@@ -264,8 +268,9 @@ class AchievementPops(QObject):
     def _chime(self):
         from soundboard.audio import achievechime
         engine = getattr(self.mw, "engine", None)
-        if engine is None:
-            return
+        cfg = getattr(self.mw, "cfg", None)
+        if engine is None or not getattr(cfg, "achievement_sound", False):
+            return   # (off by default: Settings > Achievements turns it on)
         # preview=True: the headphones only, never the mic or the call
         engine.play("__achievement__", achievechime.chime(), 1.0, mode="restart",
                     preview=True)

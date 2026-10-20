@@ -4246,5 +4246,9 @@
   "What does Use less data change?": "節省流量會改變什麼？",
   "Add Onion Watch again": "再次加入 Onion Watch",
   "Add Onion Watch to this tab": "將 Onion Watch 加入此分頁",
-  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHub 的下載檢查暫時無法使用（閘道錯誤）。請稍後再試著加入 Onion Watch。"
+  "GitHub's download check is temporarily unavailable (gateway error). Try adding Onion Watch again in a moment.": "GitHub 的下載檢查暫時無法使用（閘道錯誤）。請稍後再試著加入 Onion Watch。",
+  "Play a chime in your headphones when you earn one.": "獲得成就時在耳機中播放提示音。",
+  "Pop-up sound": "彈出視窗音效",
+  "\"Achievement unlocked\" at the bottom of the screen when you earn one.": "獲得成就時在螢幕底部顯示「成就已解鎖」。",
+  "Show pop-ups": "顯示彈出視窗"
 }
