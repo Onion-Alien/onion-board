@@ -4344,5 +4344,6 @@
   "{n} waiting": [
     "{n} чака",
     "{n} чакат"
-  ]
+  ],
+  "its file is gone (it was at {path})": "файлът му го няма (беше в {path})"
 }

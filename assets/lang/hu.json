@@ -4344,5 +4344,6 @@
   "{n} waiting": [
     "{n} vár",
     "{n} vár"
-  ]
+  ],
+  "its file is gone (it was at {path})": "a fájlja eltűnt (itt volt: {path})"
 }

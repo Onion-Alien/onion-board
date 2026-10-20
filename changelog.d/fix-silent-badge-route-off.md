@@ -1,0 +1,1 @@
+- The Silent But Deadly badge now counts with sending switched off too.

@@ -4269,5 +4269,6 @@
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Chạy board ở mức ưu tiên trên bình thường, để các chương trình khác không làm âm thanh bị giật. Nó dùng rất ít CPU nên game sẽ không thấy khác biệt.",
   "{n} waiting": [
     "{n} đang chờ"
-  ]
+  ],
+  "its file is gone (it was at {path})": "tệp của nó đã mất (trước ở {path})"
 }

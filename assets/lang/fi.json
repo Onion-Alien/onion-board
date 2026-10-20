@@ -4344,5 +4344,6 @@
   "{n} waiting": [
     "{n} odottaa",
     "{n} odottaa"
-  ]
+  ],
+  "its file is gone (it was at {path})": "sen tiedosto on poissa (se oli kohteessa {path})"
 }

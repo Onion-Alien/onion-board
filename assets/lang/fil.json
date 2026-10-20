@@ -4344,5 +4344,6 @@
   "{n} waiting": [
     "{n} naghihintay",
     "{n} naghihintay"
-  ]
+  ],
+  "its file is gone (it was at {path})": "wala na ang file nito (nasa {path} ito dati)"
 }

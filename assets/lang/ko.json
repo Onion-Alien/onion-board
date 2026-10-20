@@ -4269,5 +4269,6 @@
   "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "보드를 보통보다 높은 우선순위로 실행해서 다른 프로그램 때문에 소리가 끊기지 않게 합니다. CPU를 아주 조금만 쓰므로 게임에는 티가 나지 않습니다.",
   "{n} waiting": [
     "{n}개 대기 중"
-  ]
+  ],
+  "its file is gone (it was at {path})": "파일이 없어졌어요({path}에 있었어요)"
 }

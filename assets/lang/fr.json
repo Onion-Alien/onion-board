@@ -4344,5 +4344,6 @@
   "{n} waiting": [
     "{n} en attente",
     "{n} en attente"
-  ]
+  ],
+  "its file is gone (it was at {path})": "son fichier a disparu (il était dans {path})"
 }

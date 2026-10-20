@@ -4419,5 +4419,6 @@
     "{n} așteaptă",
     "{n} așteaptă",
     "{n} așteaptă"
-  ]
+  ],
+  "its file is gone (it was at {path})": "fișierul lui a dispărut (era în {path})"
 }

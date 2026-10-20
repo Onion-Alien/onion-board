@@ -479,6 +479,8 @@ class TriggersTab(QWidget):
                 busy.emit(self._step, "Downloading…")
                 path = watchaddon.fetch(o, lambda *a: busy.emit(self._progress, *a),
                                         lambda: self._cancel)
+                if self._cancel:   # clicked as it finished (or a local zip: no download)
+                    raise updates.UpdateError(_("cancelled"))
                 busy.emit(self._step, "Installing…")
                 info = watchaddon.install(path, self._base())
                 busy.emit(self._finished, info, "", update)
@@ -506,6 +508,8 @@ class TriggersTab(QWidget):
         self.bar.setValue(0)
         self.working.show()
         self.working.start()
+        if step in ("Installing…", "Starting…"):
+            self.btn_cancel.hide()   # can't be stopped half-way: no Cancel to ignore
         button, line = STEPS.get(step, (step, step))
         self._busy_label(button)
         self.update_text.setText(line)

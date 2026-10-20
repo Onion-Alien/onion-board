@@ -4344,5 +4344,6 @@
   "{n} waiting": [
     "{n} venter",
     "{n} venter"
-  ]
+  ],
+  "its file is gone (it was at {path})": "filen er borte (den lå i {path})"
 }
