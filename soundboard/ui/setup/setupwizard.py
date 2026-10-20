@@ -192,11 +192,13 @@ def test_tune() -> np.ndarray:
 TILE_W = 138                  # a device tile; TILE_COLS of them fill the page's width
 TILE_MIN_H = 72               # a tile's least height (as tall as its names need: tile_h)
 TILE_COLS, TILE_GAP = 4, 12
-# the first launch's last step, in two columns: the choices, then the 3 x 3 looks
-LOOK_CARD_W, LOOK_CARD_H, LOOK_CARD_GAP = 150, 112, 12   # a look (ThemeCard's own size)
-LOOK_LEFT_W, LOOK_GAP = 300, 28
-LOOK_RIGHT_W = 3 * LOOK_CARD_W + 2 * LOOK_CARD_GAP
 CONTENT_W = TILE_COLS * TILE_W + (TILE_COLS - 1) * TILE_GAP   # a page's width: one row
+# the first launch's look step: 3 x 3 looks as wide as the page, then the switches step:
+# 2 x 2 cards as wide as the page
+LOOK_CARD_GAP = 12
+LOOK_CARD_W, LOOK_CARD_H = (CONTENT_W - 2 * LOOK_CARD_GAP) // 3, 124
+SWITCH_CARD_W = (CONTENT_W - LOOK_CARD_GAP) // 2
+SWITCH_ROW_H = 30   # every switch's row on those cards
 MARGIN = 24                   # the dialog's sides: the step bar, pages and Back / Next
 HEADER_GAP = 20               # every step: between the title + words and what's below
 SECTION_GAP = 16              # between a step's parts (a card, a list, the footer line)
@@ -660,8 +662,9 @@ class SetupWizard(QDialog):
         self._ask_use = win.cfg.use_mode == ""
         self.dev_index, self.send_index = 0, 1
         self.look_index = 2 if self._ask_use else -1
-        self.discord_index = 3 if self._ask_use else 2
-        self.PAGES = 3
+        self.switch_index = 3 if self._ask_use else -1
+        self.discord_index = 4 if self._ask_use else 2
+        self.PAGES = 4 if self._ask_use else 3
         self._lang_pending = False   # a language picked there: Finish restarts into it
         # Discord's own settings, read live on the last step (discordcfg)
         self._discord_sig: tuple | None = None
@@ -695,6 +698,7 @@ class SetupWizard(QDialog):
         self.stack.addWidget(self._page_cable())
         if self._ask_use:
             self.stack.addWidget(self._page_look())
+            self.stack.addWidget(self._page_switches())
         self.stack.addWidget(self._page_discord())
         for i in range(self.stack.count()):   # the pages' edges are the dialog's: their
             page = self.stack.widget(i)          # cards line up with Back / Next
@@ -786,8 +790,7 @@ class SetupWizard(QDialog):
         return _("Last step: tell Discord or your game")
 
     def _page_look(self) -> QWidget:
-        """First launch only, the last step: the tabs to start with, the language, a
-        look, starting with Windows, Lite mode, and the "Set up Discord" switch."""
+        """First launch only: a look (nine to start from) and the language."""
         from soundboard import i18n
         from soundboard.ui.settings.langpick import LangButton
         from soundboard.ui.settings.appearance import ThemeCard
@@ -795,97 +798,47 @@ class SetupWizard(QDialog):
         v = QVBoxLayout(p)
         v.addLayout(_header(_("All set! Now make it yours"),
                             # two lines, as every step's: the header ends level with Bun
-                            _label(_("Tick the tabs you want and pick a look.<br>Not sure what "
-                                     "a tab does? Click its ⓘ. Change any of it later in "
-                                     "<b>Settings</b>.")),
+                            _label(_("Pick a look and your language.<br>Change either "
+                                     "later in <b>Settings</b>.")),
                             BunnyWidget("star", celebrate=True, height=BUN_H, pad=BUN_PAD)))
         v.addSpacing(HEADER_GAP)
-        # one grid, so everything lines up: the headings on one line, then each block on
-        # the left level with a row of looks on the right (tabs | row 1, Discord | row 2,
-        # language and the two switches | row 3). Two columns, so the nine looks fit a
-        # 720 px window (one under another it was ~900 px tall)
+        v.addWidget(_section(_("Look")))
+        v.addSpacing(6)
+        # the looks: three rows of three, filling the page's width (their edges on
+        # Back's and Next's)
         g = QGridLayout()
         g.setContentsMargins(0, 0, 0, 0)
-        g.setHorizontalSpacing(LOOK_CARD_GAP)
-        g.setVerticalSpacing(LOOK_CARD_GAP)
-        g.setColumnMinimumWidth(0, LOOK_LEFT_W)
-        # the gap's column (empty: Qt puts one spacing beside it, not two)
-        g.setColumnMinimumWidth(1, LOOK_GAP - LOOK_CARD_GAP)
-        g.setColumnStretch(5, 1)   # spare width after the looks, never between
+        g.setSpacing(LOOK_CARD_GAP)
+        self.look_cards: list = []
+        for i, name in enumerate(look_themes()):
+            c = ThemeCard(name)
+            c.setFixedSize(LOOK_CARD_W, LOOK_CARD_H)
+            c.setChecked(name == theme.current_name)
+            c.clicked.connect(lambda __=False, n=name: self._pick_look(n))
+            self.look_cards.append(c)
+            g.addWidget(c, i // 3, i % 3)
+        g.setColumnStretch(3, 1)
         v.addLayout(g)
-        top = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
-        g.addWidget(_section(_("Your tabs")), 0, 0, top)
-        g.addWidget(_section(_("Look")), 0, 2, 1, 3, top)
-        # the tabs (row 1): one tick box each (an opt-in reads as one), with its tab's icon
-        # and an ⓘ that drops down what the tab is for (+ More tabs' words); four rows
-        # as tall as a look
-        tabs = QWidget()
-        tabs.setFixedSize(LOOK_LEFT_W, LOOK_CARD_H)
-        tl = QVBoxLayout(tabs)
-        tl.setContentsMargins(0, 0, 0, 0)
-        tl.setSpacing(0)
-        self.tab_buttons: dict[str, QCheckBox] = {}
-        self.tab_infos: dict[str, QPushButton] = {}
-        names = tab_names()
-        for key in OPTIONAL_TABS:
-            row = QHBoxLayout()
-            row.setSpacing(4)
-            chk = QCheckBox(names[key])
-            icons.set_icon(chk, key)
-            chk.setChecked(self.win.tabctl.tab_on(key))   # Voice on, the rest opt-in
-            chk.setProperty("tab", key)
-            row.addWidget(chk)
-            info = panel.info_button(_("What's {name}?", name=names[key]))
-            info.clicked.connect(lambda __=False, k=key: self._tab_info(k))
-            row.addWidget(info)
-            row.addStretch(1)
-            tl.addLayout(row, 1)   # (each a quarter of the look's height)
-            self.tab_buttons[key] = chk
-            self.tab_infos[key] = info
-        g.addWidget(tabs, 1, 0, top)
-        # Discord (row 2): an opt-in, done after Finish (Bun sets it:
-        # chatguide.set_up_discord), as tall as a look
-        # (exactly a look's height in every language: one short line, the whole story
-        # behind its ⓘ, as the tabs' are)
-        card, cl = _card(14, 6, roomy=False)
-        card.setFixedSize(LOOK_LEFT_W, LOOK_CARD_H)
-        head = QHBoxLayout()
-        head.setSpacing(4)
-        self.chk_discord = QCheckBox(_("Set up Discord for me"))
-        self.chk_discord.setStyleSheet("font-weight:700;")
-        head.addWidget(self.chk_discord)
-        self.discord_info = panel.info_button(_("What does Bun change in Discord?"))
-        self.discord_info.clicked.connect(self._discord_more)
-        head.addWidget(self.discord_info)
-        head.addStretch(1)
-        cl.addLayout(head)
-        self.discord_why = _label("", "font-size:10pt;")
-        self.discord_why.setObjectName("muted")
-        cl.addWidget(self.discord_why)
-        cl.addStretch(1)
-        g.addWidget(card, 2, 0, top)
-        self._discord_touched = False   # ticked or unticked by them: keep it so
-        self.chk_discord.clicked.connect(lambda: setattr(self, "_discord_touched", True))
-        # the language, starting with Windows and Lite mode (row 3)
-        more_box = QWidget()
-        more_box.setFixedWidth(LOOK_LEFT_W)
-        ml = QVBoxLayout(more_box)
-        ml.setContentsMargins(0, 0, 0, 0)
-        ml.setSpacing(8)
+        v.addSpacing(6)
+        more = QLabel(_("{n} more themes in Settings.", n=len(theme.THEMES) - len(look_themes())))
+        more.setObjectName("hint")
+        v.addWidget(more)
+        v.addSpacing(SECTION_GAP)
+        # the language
         row = QHBoxLayout()
         row.setSpacing(10)
-        row.addWidget(QLabel(_("Language")))
+        row.addWidget(_section(_("Language")))
         self.lang_button = LangButton()
         langs = dict(i18n.available())
         code = self.win.cfg.language if self.win.cfg.language in langs else i18n.current()
         self.lang_button.show_language(code, langs.get(code, code))
         row.addWidget(self.lang_button)
         row.addStretch(1)
-        ml.addLayout(row)
+        v.addLayout(row)
         self.lang_note = _label("", "font-size:10pt;")
         self.lang_note.setObjectName("hint")
         self.lang_note.hide()
-        ml.addWidget(self.lang_note)
+        v.addWidget(self.lang_note)
 
         def open_picker():
             from soundboard.ui.settings.langpick import LanguageDialog
@@ -894,35 +847,163 @@ class SetupWizard(QDialog):
             dlg.chosen.connect(self._pick_language)
             dlg.open_under(self.lang_button)
         self.lang_button.clicked.connect(open_picker)
+        v.addStretch(1)
+        return p
+
+    def _switch_card(self, title: str, icon: str, hint: str) -> tuple[QFrame, QVBoxLayout]:
+        """One of the last step's four cards: its icon and title, one line on what it's
+        for, then its switches."""
+        card, cl = _card(14, 0, roomy=False)   # (the rows' own height spaces them)
+        card.setFixedWidth(SWITCH_CARD_W)
+        row, _t, _marks = panel.heading_row(title, icon)
+        cl.addLayout(row)
+        cl.addSpacing(6)
+        h = _label(hint, "font-size:10pt;")
+        h.setObjectName("muted")
+        cl.addWidget(h)
+        cl.addSpacing(8)
+        return card, cl
+
+    @staticmethod
+    def _switch_row(box: QCheckBox, info: QPushButton | None = None) -> QWidget:
+        """A switch (and its ⓘ) on a row as tall as every other row of the cards, with
+        or without an ⓘ."""
+        w = QWidget()
+        w.setFixedHeight(SWITCH_ROW_H)
+        row = QHBoxLayout(w)
+        row.setContentsMargins(0, 0, 0, 0)
+        row.setSpacing(4)
+        row.addWidget(box)
+        if info is not None:
+            row.addWidget(info)
+        row.addStretch(1)
+        return w
+
+    def _page_switches(self) -> QWidget:
+        """First launch only, the last step: four cards of switches people would only
+        find in Settings: the tabs, Discord, the internet and this PC."""
+        p = QWidget()
+        v = QVBoxLayout(p)
+        v.addLayout(_header(_("A few handy switches"),
+                            _label(_("All optional: the way it is works fine.<br>Change any "
+                                     "of it later in <b>Settings</b>.")),
+                            BunnyWidget("star", celebrate=True, height=BUN_H, pad=BUN_PAD)))
+        v.addSpacing(HEADER_GAP)
+        g = QGridLayout()
+        g.setContentsMargins(0, 0, 0, 0)
+        g.setSpacing(LOOK_CARD_GAP)
+        g.setColumnStretch(2, 1)
+        v.addLayout(g)
+        # the tabs: one tick box each (an opt-in reads as one), with its tab's icon and
+        # an ⓘ that drops down what the tab is for (+ More tabs' words)
+        card, cl = self._switch_card(_("Your tabs"), "list",
+                                     _("Voice is on. Tick more to add them to the side."))
+        self.tab_buttons: dict[str, QCheckBox] = {}
+        self.tab_infos: dict[str, QPushButton] = {}
+        names = tab_names()
+        for key in OPTIONAL_TABS:
+            chk = QCheckBox(names[key])
+            icons.set_icon(chk, key)
+            chk.setChecked(self.win.tabctl.tab_on(key))   # Voice on, the rest opt-in
+            chk.setProperty("tab", key)
+            info = panel.info_button(_("What's {name}?", name=names[key]))
+            info.clicked.connect(lambda __=False, k=key: self._tab_info(k))
+            cl.addWidget(self._switch_row(chk, info))
+            self.tab_buttons[key] = chk
+            self.tab_infos[key] = info
+        cl.addStretch(1)
+        g.addWidget(card, 0, 0)
+        # Discord: an opt-in, done after Finish (Bun sets it: chatguide.set_up_discord)
+        card, cl = self._switch_card(_("Discord"), "chat",
+                                     _("Using Discord for voice chat?"))
+        self.chk_discord = QCheckBox(_("Set up Discord for me"))
+        self.discord_info = panel.info_button(_("What does Bun change in Discord?"))
+        self.discord_info.clicked.connect(self._discord_more)
+        cl.addWidget(self._switch_row(self.chk_discord, self.discord_info))
+        self.discord_why = _label("", "font-size:10pt;")
+        self.discord_why.setObjectName("hint")
+        cl.addWidget(self.discord_why)
+        cl.addStretch(1)
+        g.addWidget(card, 0, 1)
+        self._discord_touched = False   # ticked or unticked by them: keep it so
+        self.chk_discord.clicked.connect(lambda: setattr(self, "_discord_touched", True))
+        # the internet: Low data mode and Offline mode, as on Settings > Privacy and
+        # Data (both applied at once)
+        from soundboard.online import quality
+        card, cl = self._switch_card(_("Internet"), "browser",
+                                     _("On a hotspot, a capped plan or no internet?"))
+        self.chk_low_data = QCheckBox(_("Use less data"))
+        self.chk_low_data.setChecked(quality.current.low_data)
+        self.chk_low_data.toggled.connect(self._set_low_data)
+        self.low_data_info = panel.info_button(_("What does Use less data change?"))
+        self.low_data_info.clicked.connect(lambda: self._drop_down(
+            self.low_data_info, _("Use less data"),
+            _("For a phone hotspot, capped plan or slow internet: smaller downloads, "
+              "lower-bitrate radio, more patience with stations that cut out, and no "
+              "pictures in web search results.")))
+        cl.addWidget(self._switch_row(self.chk_low_data, self.low_data_info))
+        self.chk_offline = QCheckBox(_("Offline mode"))
+        self.chk_offline.setChecked(self.win.cfg.net_offline)
+        self.chk_offline.toggled.connect(self._set_offline)
+        self.offline_info = panel.info_button(_("What does Offline mode change?"))
+        self.offline_info.clicked.connect(lambda: self._drop_down(
+            self.offline_info, _("Offline mode"),
+            _("Nothing goes online at all, and everything that needs the internet is "
+              "hidden (the Radio tab, web search, downloads, updates…).")))
+        cl.addWidget(self._switch_row(self.chk_offline, self.offline_info))
+        cl.addStretch(1)
+        g.addWidget(card, 1, 0)
+        # this PC: starting with Windows, Lite mode (applied at once, as in Settings >
+        # Appearance) and keeping the window on top
+        from soundboard.ui.settings import lite
+        card, cl = self._switch_card(_("This PC"), "settings",
+                                     _("How Onion Board starts and runs."))
         self.chk_autostart = QCheckBox(_("Start with Windows"))
         self.chk_autostart.setToolTip(_("Start Onion Board when I sign in to Windows "
                                         "(quietly, in the tray)"))
         self.chk_autostart.setChecked(autostart.is_enabled())
         self.chk_autostart.setEnabled(autostart.available())
-        ml.addWidget(self.chk_autostart)
-        # Lite mode, as in Settings > Appearance: applied at once, so they see it
-        from soundboard.ui.settings import lite
+        cl.addWidget(self._switch_row(self.chk_autostart))
         self.chk_lite = QCheckBox(_("Lite mode (suggested for this PC)") if lite.slow_pc()
                                   else _("Lite mode"))
         self.chk_lite.setToolTip(_("Lite mode: no animations, for slower PCs"))
         self.chk_lite.setChecked(self.win.cfg.lite_mode)
         self.chk_lite.toggled.connect(self.win.themectl.set_lite_mode)
-        ml.addWidget(self.chk_lite)
-        g.addWidget(more_box, 3, 0, top)
-        # the looks: three rows of three, each card in its own cell (rows 1 to 3)
-        self.look_cards: list = []
-        for i, name in enumerate(look_themes()):
-            c = ThemeCard(name)
-            c.setFixedSize(LOOK_CARD_W, LOOK_CARD_H)
-            c.setChecked(name == theme.current_name)
-            c.clicked.connect(lambda __=False, n=name: self._pick_look(n))
-            self.look_cards.append(c)
-            g.addWidget(c, 1 + i // 3, 2 + i % 3, top)
-        more = QLabel(_("{n} more themes in Settings.", n=len(theme.THEMES) - len(look_themes())))
-        more.setObjectName("hint")
-        g.addWidget(more, 4, 2, 1, 3, top)
+        cl.addWidget(self._switch_row(self.chk_lite))
+        self.chk_on_top = QCheckBox(_("Keep window on top"))
+        self.chk_on_top.setChecked(self.win.cfg.always_on_top)
+        self.chk_on_top.toggled.connect(self.win.on_top_toggle)
+        cl.addWidget(self._switch_row(self.chk_on_top))
+        cl.addStretch(1)
+        g.addWidget(card, 1, 1)
+        self._offline_tabs()
         v.addStretch(1)
         return p
+
+    def _set_low_data(self, on: bool):
+        """Use less data: every Data & quality choice at its lightest, or back."""
+        from soundboard.online import quality
+        self.win.set_option("data", quality.change(**(quality.LOW if on else quality.NORMAL)))
+
+    def _set_offline(self, on: bool):
+        """Offline mode, at once (the window follows: net.on_change)."""
+        from soundboard.online import net
+        cfg = self.win.cfg
+        self.win.set_option("net_offline", on)
+        net.configure_features(cfg.net_off, cfg.net_offline)
+        self._offline_tabs()
+
+    def _offline_tabs(self):
+        """In Offline mode the tabs that only work online can't be ticked (as in
+        Settings), and Use less data has nothing to save."""
+        from soundboard.online import net
+        offline = net.offline()
+        for key, chk in self.tab_buttons.items():
+            needs = self.win.tabctl.needs_online(key)
+            chk.setEnabled(not needs)
+            chk.setToolTip(_("Needs the internet: Offline mode is on (Privacy & security)")
+                           if needs else "")
+        self.chk_low_data.setEnabled(not offline)
 
     def _discord_more(self):
         """Set up Discord's ⓘ: what Bun changes, how it goes back, and on the cable which
@@ -1398,7 +1479,7 @@ class SetupWizard(QDialog):
             self.recheck_cable(rescan=False)
         elif i == self.discord_index:
             self._fill_discord()
-        elif i == self.look_index:
+        elif i == self.switch_index:
             self._fill_discord_choice()
         # Discord's own settings: read now, then while the step is up
         if i == self.discord_index:
@@ -1612,7 +1693,7 @@ class SetupWizard(QDialog):
             self.attach_mic()   # Next is "Put my sounds in my mic" here (_update_next)
         elif i == self.PAGES - 1:
             # the first launch: Discord after, if they ticked it
-            self.finish(discord=i == self.look_index and self.chk_discord.isChecked())
+            self.finish(discord=i == self.switch_index and self.chk_discord.isChecked())
         else:
             self.go(i + 1)
 
@@ -1676,10 +1757,11 @@ class SetupWizard(QDialog):
         if self.setup_show.on:
             self.setup_show._stop()
         page = self.stack.currentIndex()
-        if r != QDialog.DialogCode.Accepted and 0 <= page < len(PAGE_NAMES):
-            usage.used(f"setup-closed-{PAGE_NAMES[page]}")   # where people give up
+        if r != QDialog.DialogCode.Accepted and 0 <= page < self.PAGES:
+            name = "look" if page == self.look_index else PAGE_NAMES[min(page, 2)]
+            usage.used(f"setup-closed-{name}")   # where people give up
         tour = self._ask_use   # the very first launch: Bun's tour of the empty board next
-        if self._ask_use and page == self.look_index:
+        if self._ask_use and page == self.switch_index:
             self._save_tabs()   # finished, or closed on the last step: the tabs as ticked
         if not self.win.cfg.use_mode:   # closed before the last step: asked once is enough
             usage.used("use-skipped")

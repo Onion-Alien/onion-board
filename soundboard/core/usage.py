@@ -177,7 +177,7 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # the setup guide closed on one of its device steps (where people give up),
             # its send step skipped, finished sending or not; Bun's first-run tour of the
             # empty board shown, searched from, or skipped (ui/setup/firsttour.py)
-            *(f"setup-closed-{k}" for k in ("mic", "headphones", "send", "last")),
+            *(f"setup-closed-{k}" for k in ("mic", "headphones", "send", "look", "last")),
             "setup-skipped-send", "setup-finished", "setup-finished-not-sending",
             "tour-shown", "tour-searched", "tour-files", "tour-skipped", "tour-ignored",
             "tour-added", "tour-failed",

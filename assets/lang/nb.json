@@ -4296,7 +4296,6 @@
   "Lite mode (suggested for this PC)": "Lite-modus (foreslått for denne PC-en)",
   "Set up Discord for me": "Sett opp Discord for meg",
   "Start with Windows": "Start med Windows",
-  "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "Kryss av fanene du vil ha, og velg en titt.<br> Ikke sikker på hva en fane gjør? Klikk på ⓘ. Endre noe av det senere i <b>Innstillinger</b> .",
   "Nothing matches “{text}”.": "Ingenting samsvarer med «{text}».",
   "Search AI voices": "Søk etter AI-stemmer",
   "Search voices": "Søk etter stemmer",
@@ -4308,5 +4307,18 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun slår av Discords støyfilter slik at lydene dine ikke blir kuttet av.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun slår av Discords støyfilter, og viser deg deretter hvilken mikrofon du skal velge.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "Velg deretter {mic} som mikrofonen din i Discord: Bun viser deg hvor.",
-  "What does Bun change in Discord?": "Hva endrer Bun i Discord?"
+  "What does Bun change in Discord?": "Hva endrer Bun i Discord?",
+  "A few handy switches": "Noen nyttige brytere",
+  "All optional: the way it is works fine.<br>Change any of it later in <b>Settings</b>.": "Alt er valgfritt: det fungerer fint som det er.<br>Endre hva som helst senere i <b>Innstillinger</b>.",
+  "For a phone hotspot, capped plan or slow internet: smaller downloads, lower-bitrate radio, more patience with stations that cut out, and no pictures in web search results.": "For mobilt nettverk, begrenset abonnement eller tregt internett: mindre nedlastinger, radio med lavere bitrate, mer tålmodighet med stasjoner som faller ut, og ingen bilder i nettsøkresultater.",
+  "How Onion Board starts and runs.": "Hvordan Onion Board starter og kjører.",
+  "Internet": "Internett",
+  "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…).": "Ingenting går på nettet i det hele tatt, og alt som trenger internett er skjult (radiofanen, nettsøk, nedlastinger, oppdateringer...).",
+  "On a hotspot, a capped plan or no internet?": "På et hotspot, et begrenset abonnement eller uten internett?",
+  "Pick a look and your language.<br>Change either later in <b>Settings</b>.": "Velg et utseende og språket ditt.<br>Endre begge senere i <b>Innstillinger</b>.",
+  "This PC": "Denne PC-en",
+  "Using Discord for voice chat?": "Bruker du Discord til talechat?",
+  "Voice is on. Tick more to add them to the side.": "Stemme er på. Huk av flere for å legge dem til i siden.",
+  "What does Offline mode change?": "Hva endrer frakoblet modus?",
+  "What does Use less data change?": "Hva endrer Bruk mindre data?"
 }

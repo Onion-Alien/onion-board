@@ -4222,7 +4222,6 @@
   "Lite mode (suggested for this PC)": "라이트 모드(이 PC에 권장됨)",
   "Set up Discord for me": "나를 위해 Discord를 설정해 주세요",
   "Start with Windows": "윈도우로 시작하기",
-  "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "원하는 탭을 선택하고 모양을 선택하세요.<br> 탭이 무엇을 하는지 모르시나요? ⓘ를 클릭하세요. 나중에 <b>설정</b> 에서 변경하세요.",
   "Nothing matches “{text}”.": "“{text}”와(과) 일치하는 항목이 없습니다.",
   "Search AI voices": "AI 목소리 검색",
   "Search voices": "목소리 검색",
@@ -4234,5 +4233,18 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "Bun은 Discord의 소음 필터를 꺼서 소리가 잘리지 않도록 합니다.",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "Bun은 Discord의 노이즈 필터를 끈 다음 어떤 마이크를 선택할지 보여줍니다.",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "그런 다음 Discord에서 {mic} 마이크로 선택하세요. Bun이 위치를 알려줍니다.",
-  "What does Bun change in Discord?": "Bun은 Discord에서 무엇을 바꾸나요?"
+  "What does Bun change in Discord?": "Bun은 Discord에서 무엇을 바꾸나요?",
+  "A few handy switches": "유용한 스위치 몇 가지",
+  "All optional: the way it is works fine.<br>Change any of it later in <b>Settings</b>.": "모두 선택 사항이에요: 지금 그대로도 잘 작동해요.<br>나중에 <b>설정</b>에서 언제든 바꿀 수 있어요.",
+  "For a phone hotspot, capped plan or slow internet: smaller downloads, lower-bitrate radio, more patience with stations that cut out, and no pictures in web search results.": "전화 핫스팟, 제한 요금제 또는 느린 인터넷의 경우: 다운로드 횟수가 적고, 라디오 비트 전송률이 낮으며, 방송이 잘리는 경우 인내심을 갖고, 웹 검색 결과에 사진이 표시되지 않습니다.",
+  "How Onion Board starts and runs.": "Onion Board의 시작과 실행 방식.",
+  "Internet": "인터넷",
+  "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…).": "온라인에는 아무것도 연결되지 않으며 인터넷이 필요한 모든 항목(라디오 탭, 웹 검색, 다운로드, 업데이트 등)이 숨겨집니다.",
+  "On a hotspot, a capped plan or no internet?": "핫스팟, 데이터 제한 요금제, 또는 인터넷 없음?",
+  "Pick a look and your language.<br>Change either later in <b>Settings</b>.": "모양과 언어를 고르세요.<br>둘 다 나중에 <b>설정</b>에서 바꿀 수 있어요.",
+  "This PC": "이 PC",
+  "Using Discord for voice chat?": "음성 채팅에 Discord를 쓰나요?",
+  "Voice is on. Tick more to add them to the side.": "음성은 켜져 있어요. 더 체크하면 옆에 추가돼요.",
+  "What does Offline mode change?": "오프라인 모드는 무엇을 바꾸나요?",
+  "What does Use less data change?": "데이터 절약은 무엇을 바꾸나요?"
 }

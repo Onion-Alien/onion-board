@@ -4296,7 +4296,6 @@
   "Lite mode (suggested for this PC)": "लाइट मोड (इस पीसी के लिए सुझाया गया)",
   "Set up Discord for me": "मेरे लिए कलह स्थापित करें",
   "Start with Windows": "विंडो के साथ शुरू करें",
-  "Tick the tabs you want and pick a look.<br>Not sure what a tab does? Click its ⓘ. Change any of it later in <b>Settings</b>.": "अपने इच्छित टैब पर निशान लगाएं और एक लुक चुनें।<br> निश्चित नहीं कि टैब क्या करता है? इसके ⓘ पर क्लिक करें. बाद में इसमें से कोई भी <b>सेटिंग्स</b> में बदलें।",
   "Nothing matches “{text}”.": "“{text}” से कुछ नहीं मिला।",
   "Search AI voices": "AI आवाज़ें खोजें",
   "Search voices": "आवाज़ें खोजें",
@@ -4308,5 +4307,18 @@
   "Bun turns off Discord's noise filter so your sounds don't get cut off.": "बन डिस्कॉर्ड के शोर फ़िल्टर को बंद कर देता है ताकि आपकी आवाज़ें बंद न हों।",
   "Bun turns off Discord's noise filter, then shows you which mic to pick.": "बन डिस्कॉर्ड के शोर फ़िल्टर को बंद कर देता है, फिर आपको दिखाता है कि कौन सा माइक चुनना है।",
   "Then pick {mic} as your mic in Discord: Bun shows you where.": "फिर डिस्कॉर्ड में अपने माइक के रूप में {mic} चुनें: बन आपको दिखाता है कि कहां है।",
-  "What does Bun change in Discord?": "बन कलह में क्या बदलता है?"
+  "What does Bun change in Discord?": "बन कलह में क्या बदलता है?",
+  "A few handy switches": "कुछ काम के स्विच",
+  "All optional: the way it is works fine.<br>Change any of it later in <b>Settings</b>.": "सब वैकल्पिक है: जैसा है वैसा भी ठीक चलता है।<br>बाद में <b>सेटिंग्स</b> में कुछ भी बदलें।",
+  "For a phone hotspot, capped plan or slow internet: smaller downloads, lower-bitrate radio, more patience with stations that cut out, and no pictures in web search results.": "फ़ोन हॉटस्पॉट, कैप्ड प्लान या धीमे इंटरनेट के लिए: छोटे डाउनलोड, कम-बिटरेट रेडियो, कट आउट स्टेशनों के साथ अधिक धैर्य, और वेब खोज परिणामों में कोई चित्र नहीं।",
+  "How Onion Board starts and runs.": "Onion Board कैसे शुरू होता और चलता है।",
+  "Internet": "इंटरनेट",
+  "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…).": "कुछ भी ऑनलाइन नहीं होता है, और इंटरनेट की आवश्यकता वाली हर चीज़ छिपी रहती है (रेडियो टैब, वेब खोज, डाउनलोड, अपडेट...)।",
+  "On a hotspot, a capped plan or no internet?": "हॉटस्पॉट, सीमित प्लान या बिना इंटरनेट पर?",
+  "Pick a look and your language.<br>Change either later in <b>Settings</b>.": "एक लुक और अपनी भाषा चुनें।<br>दोनों को बाद में <b>सेटिंग्स</b> में बदलें।",
+  "This PC": "यह पीसी",
+  "Using Discord for voice chat?": "वॉइस चैट के लिए Discord इस्तेमाल करते हैं?",
+  "Voice is on. Tick more to add them to the side.": "वॉइस चालू है। और टैब साइड में जोड़ने के लिए टिक करें।",
+  "What does Offline mode change?": "ऑफ़लाइन मोड क्या बदलता है?",
+  "What does Use less data change?": "कम डेटा इस्तेमाल करें क्या बदलता है?"
 }
