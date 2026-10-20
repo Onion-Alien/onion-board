@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import secrets
 import time
 import urllib.error
@@ -162,6 +163,22 @@ def parse(raw) -> tuple[list[Sound], bool]:
             continue
         out.append(s)
     return out, bool(isinstance(raw, dict) and raw.get("more"))
+
+
+# a link in a name or tags (schemes, www., name.tld): the store refuses those, so the
+# share window says so before sending (blocked words only the store knows)
+_WORD_LINK = re.compile(
+    r"(https?:|ftp:|file:|data:|javascript:|www\.|\b[a-z0-9-]{2,}\.(com|net|org|io|gg|ly|me|"
+    r"co|tv|xyz|app|dev|ru|to|cc|info|biz|site|online|shop|top|link|click|su|pw|cn|uk)\b|"
+    r"discord\.gg|[a-z0-9-]+\.[a-z]{2,}/)", re.I)
+
+
+def check_words(name: str, tags: str = "") -> str:
+    """Why the store won't take this name or these tags, or "" (as far as the app can
+    tell: only the store knows its blocked words)."""
+    if _WORD_LINK.search(name[:60]) or _WORD_LINK.search(tags[:200]):
+        return _("Names and tags can't have links in them.")
+    return ""
 
 
 def link_ok(url: str) -> bool:
@@ -353,7 +370,7 @@ def _form(fields: dict[str, str], file_name: str, data: bytes) -> tuple[bytes, s
 def upload(install: str, path: str, name: str, tags: str = "") -> str:
     """Share a sound: it waits to be checked before it shows. Its id. Raises
     StoreError. Call off the UI thread."""
-    if why := check_file(path):
+    if why := check_file(path) or check_words(name, tags):
         raise StoreError(why)
     netlog.cause(FEATURE, f"You shared {netlog.quoted(name)} with the store")
     try:
@@ -376,6 +393,8 @@ def share_link(install: str, link: str, name: str, tags: str = "") -> str:
     if not link_ok(link):
         raise StoreError(_("The store takes links to YouTube, TikTok, SoundCloud and other "
                            "video and sound sites."))
+    if why := check_words(name, tags):
+        raise StoreError(why)
     netlog.cause(FEATURE, f"You shared a link to {netlog.quoted(name)} with the store")
     body = json.dumps({"link": link[:500], "name": name.strip()[:60], "tags": tags.strip()[:200],
                        "agree": LINK_AGREEMENT}).encode()

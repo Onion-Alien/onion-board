@@ -804,8 +804,9 @@ class StoreTab(QWidget):
             return
         cats, _total = got
         self._have_cats = True
-        # the biggest first; the name, then how many (a number needs no words)
-        self._fill_cats([(key, f"{store.cat_name(key)}  {count_text(n)}",
+        # the biggest first; the name, then how many in brackets (a bare number after
+        # the name read as part of it: "Memes 7")
+        self._fill_cats([(key, f"{store.cat_name(key)} ({count_text(n)})",
                           storelook.CAT_ICON.get(key, storelook.ALL_ICON))
                          for key, n in sorted(cats, key=lambda c: -c[1])])
         self._show_picked(self._cat)
@@ -1356,6 +1357,7 @@ class ShareDialog(QDialog):
         self.tags.setMaxLength(200)
         self.tags.setPlaceholderText(_("Tags, with commas (optional): meme, horn, game"))
         self.tags.setAccessibleName(_("Tags"))
+        self.tags.textChanged.connect(self._ready)
         v.addWidget(self.tags)
         self.agree = QCheckBox(_("This sound is mine to give away"))
         self.agree.toggled.connect(self._ready)
@@ -1457,18 +1459,24 @@ class ShareDialog(QDialog):
             theme.set_tone(self.error, "error")
 
     def _ready(self):
+        if not hasattr(self, "btn_send"):   # (still being built)
+            return
+        # a name or tags the store would refuse say so as they're typed
+        words = store.check_words(self.name.text(), self.tags.text())
         if getattr(self, "mode", "file") == "link":
             url = self.link.text().strip()
-            ok = bool(store.link_ok(url) and self.name.text().strip())
-            why = _("Paste a link and name it first")
+            ok = bool(store.link_ok(url) and self.name.text().strip() and not words)
+            why = words or _("Paste a link and name it first")
             # a pasted link the store won't take says so at once
-            self._show_error("" if not url or store.link_ok(url) else _(
+            self._show_error(words if not url or store.link_ok(url) else _(
                 "The store takes links to YouTube, TikTok, SoundCloud and other video "
                 "and sound sites."))
         else:
+            bad_file = store.check_file(self.path) if self.path else ""
             ok = bool(self.path and self.name.text().strip() and self.agree.isChecked()
-                      and not store.check_file(self.path))
-            why = _("Pick a file, name it and tick the box first")
+                      and not bad_file and not words)
+            why = words or _("Pick a file, name it and tick the box first")
+            self._show_error(bad_file or words)
         busy.set_busy(self.btn_send, not ok)   # greyed until it can go (never disabled)
         self.btn_send.setToolTip("" if ok else why)
 

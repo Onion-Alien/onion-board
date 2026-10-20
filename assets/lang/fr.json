@@ -4326,5 +4326,7 @@
   "Lite mode is on: no animations, plain themes and less CPU. Click to change it.": "Le mode léger est activé : pas d'animations, thèmes unis et moins de CPU. Clique pour le changer.",
   "Marks a tab whose feature is on, so nothing is left on without you noticing.": "Marque un onglet dont la fonction est activée, pour que rien ne reste allumé sans que tu le remarques.",
   "Size and speed": "Taille et vitesse",
-  "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Ce qui est activé s'affiche dans cette couleur. Fais glisser pour choisir la tienne ; elle reste quand tu changes de thème."
+  "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Ce qui est activé s'affiche dans cette couleur. Fais glisser pour choisir la tienne ; elle reste quand tu changes de thème.",
+  "Already in your library as “{name}”": "Déjà dans ta bibliothèque sous « {name} »",
+  "Names and tags can't have links in them.": "Les noms et les tags ne peuvent pas contenir de liens."
 }

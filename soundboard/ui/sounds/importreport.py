@@ -47,6 +47,7 @@ class Skipped:
     file: str      # the name shown (a file, or "pack.zip → inner.wav")
     reason: str    # plain words
     group: str     # a GROUPS key
+    had: str = ""  # a dupe: the name it already has on the board
 
     def line(self) -> str:
         return f"{self.file}: {self.reason}" if self.reason else self.file
@@ -55,7 +56,7 @@ class Skipped:
 def classify(file: str, e: BaseException | str) -> Skipped:
     name = Path(file).name
     if isinstance(e, AlreadyAdded):
-        return Skipped(name, str(e), "dupe")
+        return Skipped(name, str(e), "dupe", e.name)
     if not Path(file).exists():   # moved or deleted since (the decoder says so in its words)
         return Skipped(name, _("The file isn't there any more."), "unreadable")
     if isinstance(e, OSError):    # locked, no permission, no room
@@ -83,6 +84,8 @@ def summary(added: int, skipped: list[Skipped]) -> tuple[str, str]:
                    ngettext("{n} sound is already in your library",
                             "{n} sounds are already in your library", dupes))
         if dupes_only:
+            if dupes == 1 and skipped[0].had:   # one sound: which one it matched
+                return _("Already in your library as “{name}”", name=skipped[0].had), ""
             return already, ""
         return (_("{added} · {skipped}", added=already,
                   skipped=ngettext("{n} skipped", "{n} skipped", k - dupes)), "warn")

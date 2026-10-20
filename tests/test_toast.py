@@ -540,3 +540,13 @@ def test_closing_a_card_for_a_deleted_widget_does_nothing(qapp):
     toast.close(child, "gone")
     toast.close(None, "gone")
     w.close()
+
+
+def test_one_duplicate_names_the_sound_it_matched(tmp_path):
+    there = tmp_path / "horn.wav"
+    there.write_bytes(b"x")
+    dupe = importreport.classify(str(there), importreport.AlreadyAdded("Air horn"))
+    assert dupe.had == "Air horn"
+    assert importreport.summary(0, [dupe]) == ("Already in your library as “Air horn”", "")
+    # several: a count (the See why list names each)
+    assert importreport.summary(0, [dupe, dupe])[0] == "2 sounds are already in your library"

@@ -4326,5 +4326,7 @@
   "Lite mode is on: no animations, plain themes and less CPU. Click to change it.": "Naka-on ang Lite mode: walang animation, simpleng tema at mas kaunting CPU. I-click para baguhin.",
   "Marks a tab whose feature is on, so nothing is left on without you noticing.": "Minamarkahan ang tab na naka-on ang feature, para walang maiwang naka-on nang hindi mo napapansin.",
   "Size and speed": "Laki at bilis",
-  "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Ang naka-on ay ipinapakita sa kulay na ito. I-slide para pumili ng sarili mo; nananatili ito kapag nagpalit ka ng tema."
+  "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Ang naka-on ay ipinapakita sa kulay na ito. I-slide para pumili ng sarili mo; nananatili ito kapag nagpalit ka ng tema.",
+  "Already in your library as “{name}”": "Nasa library mo na bilang “{name}”",
+  "Names and tags can't have links in them.": "Hindi puwedeng may link ang mga pangalan at tag."
 }
