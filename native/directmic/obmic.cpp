@@ -186,6 +186,20 @@ static const CLSID CLSID_OnionMic =
 static const wchar_t *STATE_KEY = L"SOFTWARE\\OnionBoard\\MicPlugin\\Endpoints";
 static const uint32_t EFFECT_VERSION = 5;        // directmic.EFFECT_VERSION
 
+// Equalizer APO works like this effect: it takes a slot and runs the effect it replaced,
+// noted per endpoint under EAPO_KEY\<endpoint>. Put on the mic after this one, it runs
+// this one; this one must not run it back (directmic.py EAPO_*).
+static const wchar_t *EAPO_KEY = L"SOFTWARE\\EqualizerAPO\\Child APOs";
+static const CLSID CLSID_EapoPreMix =    // {EACD2258-FCAC-4FF4-B36D-419E924A6D79}
+    {0xeacd2258, 0xfcac, 0x4ff4, {0xb3, 0x6d, 0x41, 0x9e, 0x92, 0x4a, 0x6d, 0x79}};
+static const CLSID CLSID_EapoPostMix =   // {EC1CC9CE-FAED-4822-828A-82A81A6F018F}
+    {0xec1cc9ce, 0xfaed, 0x4822, {0x82, 0x8a, 0x82, 0xa8, 0x1a, 0x6f, 0x01, 0x8f}};
+
+// Set while this effect starts the mic's own effect. A copy of this effect started inside
+// it (a wrapper that runs this one again) starts no effect of its own: the two would
+// start each other until the audio engine runs out of stack.
+static thread_local int t_loading = 0;
+
 // The shared ring file. soundboard/mic/directmic.py writes the same layout and documents it.
 // Anyone signed in can write this file, so nothing read from it is trusted: sizes are
 // taken once, when it's opened, positions are masked, samples are checked.
@@ -699,8 +713,38 @@ private:
     }
 
     // The mic's own effect, saved by the installer under STATE_KEY\<endpoint>\Original.
+    // Equalizer APO's notes for this endpoint hold this effect: it runs this one already.
+    static bool eapoRunsUs(const wchar_t *endpoint) {
+        wchar_t key[256], ours[64];
+        _snwprintf(key, 256, L"%ls\\%ls", EAPO_KEY, endpoint);
+        key[255] = 0;
+        if (!StringFromGUID2(CLSID_OnionMic, ours, 64)) return false;
+        HKEY h;
+        if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &h) != ERROR_SUCCESS) return false;
+        bool found = false;
+        for (DWORD i = 0; !found; i++) {
+            wchar_t name[256], value[64];
+            DWORD nlen = 256, vlen = sizeof value, type = 0;
+            LONG r = RegEnumValueW(h, i, name, &nlen, NULL, &type, (BYTE *)value, &vlen);
+            if (r == ERROR_NO_MORE_ITEMS) break;
+            if (r != ERROR_SUCCESS || type != REG_SZ) continue;
+            value[63] = 0;
+            found = _wcsicmp(value, ours) == 0;
+        }
+        RegCloseKey(h);
+        return found;
+    }
+
     void loadChild(const wchar_t *endpoint, UINT32 cb, BYTE *data) {
         if (!endpoint[0] || m_child) return;
+        if (t_loading) {
+            logf("started inside the mic's own effect: not starting it again");
+            return;
+        }
+        struct Loading {
+            Loading() { t_loading++; }
+            ~Loading() { t_loading--; }
+        } loading;
         wchar_t key[256], value[64];
         _snwprintf(key, 256, L"%ls\\%ls", STATE_KEY, endpoint);
         key[255] = 0;
@@ -710,6 +754,11 @@ private:
             return;
         CLSID clsid;
         if (FAILED(CLSIDFromString(value, &clsid)) || IsEqualCLSID(clsid, CLSID_OnionMic)) return;
+        if ((IsEqualCLSID(clsid, CLSID_EapoPreMix) || IsEqualCLSID(clsid, CLSID_EapoPostMix))
+                && eapoRunsUs(endpoint)) {
+            logf("Equalizer APO already runs this effect: not starting it again");
+            return;
+        }
         IAudioProcessingObject *child = NULL;
         HRESULT hr = CoCreateInstance(clsid, NULL, CLSCTX_INPROC_SERVER, IID_IAudioProcessingObject_,
                                       (void **)&child);

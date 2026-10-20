@@ -1100,6 +1100,18 @@ def send(payload: list[dict], timeout: float = TIMEOUT_S, no_sessions: bool = Fa
         return False
 
 
+MEMORY_FULL = 90   # % of the PC's memory in use from which the count waits
+
+
+def _memory_full() -> bool:
+    """The PC is short of memory: Windows is swapping to disk, and even starting the
+    count's thread could stall the window for many seconds. A PC that stays this full
+    all day goes uncounted: fine, the count never slows anyone down."""
+    from soundboard.core import hangwatch
+    load = hangwatch.memory_load()
+    return load is not None and load >= MEMORY_FULL
+
+
 def maybe_send(cfg, on_sent=None, event: str = "", app_dir: Path | None = None) -> None:
     """The daily count if it's due (or `event` now), on a thread, when it's allowed.
     Problems since the last send go too, due or not: note()d ones, and with `app_dir`
@@ -1112,6 +1124,8 @@ def maybe_send(cfg, on_sent=None, event: str = "", app_dir: Path | None = None) 
     thread), and apply clears exactly what was sent, keeping anything added meanwhile.
     Without on_sent, apply runs right there (a caller with no UI thread)."""
     if not enabled() or not net.allowed(FEATURE):
+        return
+    if not event and _memory_full():   # a later check sends it; an event goes anyway
         return
     now = time.time()
     settle(cfg, now)

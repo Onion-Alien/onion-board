@@ -3365,8 +3365,6 @@
   "That sound is already in the store.": "Esse som já está na loja.",
   "That sound isn't in the store any more.": "Esse som já não está na loja.",
   "That's a lot for one day. Try again tomorrow.": "É muito para um dia. Tenta outra vez amanhã.",
-  "The best voted first": "Os mais votados primeiro",
-  "The newest first": "Os mais recentes primeiro",
   "The sound store had a problem. Try again in a bit.": "A loja de sons teve um problema. Tenta outra vez daqui a pouco.",
   "The sound store is switched off in Settings > Privacy & security.": "A loja de sons está desligada em Definições > Privacidade e segurança.",
   "The sound store sent more than it should, so it was left.": "A loja de sons enviou mais do que devia, por isso foi descartado.",
@@ -3607,7 +3605,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” está oculta em Todos. Os sons dela continuam no próprio separador.",
   "“{name}” shows in All again": "“{name}” volta a aparecer em Todos",
   "All categories": "Todas as categorias",
-  "Votes": "Votos",
   "Tutorials are off now. Settings → General turns them back on.": "Os guias estão desligados. Definições → Geral volta a ligá-los.",
   "Add a sound from my board": "Adicionar um som do meu board",
   "Bass boosted": "Graves reforçados",
@@ -4103,7 +4100,6 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Quando o Onion Board fecha, volta a ligar a supressão de ruído, o cancelamento de eco e o volume automático do Discord para conversa. Não queres isso? Desmarca <b>Repor o Discord para conversa ao fechar</b> no separador Configurar.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Os teus sons chegam agora limpos aos teus amigos, sem ficarem abafados ou cortados.",
   "{name} is set up for your sounds": "{name} está pronto para os teus sons",
-  "What's popular right now": "O que está popular agora",
   "When to use the cable": "Quando usar o cabo",
   "Most people don't need it: your sounds go into the mic you already use. The cable is for two cases:<br><br>• <b>You don't have a mic.</b> Without one there's nothing to put your sounds into, but the cable works on its own: others hear your sounds through it.<br>• <b>You'd rather Onion Board didn't touch your mic.</b> Putting sounds into your mic adds Onion Board's audio driver to it, and Windows asks you to allow that. With the cable, Onion Board leaves your mic as it is: the cable is VB-Audio's own free driver (its installer asks Windows too).<br><br>With the cable, pick <b>CABLE Output</b> as the mic in Discord and in each game.": "A maioria não precisa: os teus sons vão para o microfone que já usas. O cabo é para dois casos:<br><br>• <b>Não tens microfone.</b> Sem microfone não há onde pôr os teus sons, mas o cabo funciona sozinho: os outros ouvem os teus sons através dele.<br>• <b>Preferes que o Onion Board não mexa no teu microfone.</b> Pôr sons no microfone acrescenta-lhe o controlador de áudio do Onion Board, e o Windows pede-te autorização. Com o cabo, o Onion Board deixa o teu microfone como está: o cabo é o controlador gratuito da VB-Audio (o instalador dele também pede ao Windows).<br><br>Com o cabo, escolhe <b>CABLE Output</b> como microfone no Discord e em cada jogo.",
   "No mic, or you'd rather Onion Board didn't touch yours? Use a free virtual cable instead: you pick it as the mic in Discord and games.": "Sem microfone, ou preferes que o Onion Board não mexa no teu? Usa antes um cabo virtual gratuito: escolhes-o como microfone no Discord e nos jogos.",
@@ -4329,5 +4325,6 @@
   "Names and tags can't have links in them.": "Os nomes e as etiquetas não podem ter links.",
   "Mic off": "Microfone desligado",
   "Your headset's mic is off": "O microfone dos teus auscultadores está desligado",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "O microfone de <b>{headset}</b> desligou-se. Volta a ligá-lo e os teus sons voltam a sair."
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "O microfone de <b>{headset}</b> desligou-se. Volta a ligá-lo e os teus sons voltam a sair.",
+  "“{name}” is on. Click it again to turn the voice changer off.": "“{name}” está ligada. Clique novamente para desligar o trocador de voz."
 }

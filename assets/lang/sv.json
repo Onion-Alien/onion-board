@@ -3365,8 +3365,6 @@
   "That sound is already in the store.": "Det ljudet finns redan i butiken.",
   "That sound isn't in the store any more.": "Det ljudet finns inte i butiken längre.",
   "That's a lot for one day. Try again tomorrow.": "Det är mycket för en dag. Försök igen i morgon.",
-  "The best voted first": "De bäst röstade först",
-  "The newest first": "De nyaste först",
   "The sound store had a problem. Try again in a bit.": "Ljudbutiken fick ett problem. Försök igen om en stund.",
   "The sound store is switched off in Settings > Privacy & security.": "Ljudbutiken är avstängd i Inställningar > Sekretess och säkerhet.",
   "The sound store sent more than it should, so it was left.": "Ljudbutiken skickade mer än den skulle, så det slängdes.",
@@ -3607,7 +3605,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "”{name}” är dold i Alla. Dess ljud stannar på sin egen flik.",
   "“{name}” shows in All again": "”{name}” syns i Alla igen",
   "All categories": "Alla kategorier",
-  "Votes": "Betyg",
   "Tutorials are off now. Settings → General turns them back on.": "Guider är avstängda nu. Inställningar → Allmänt slår på dem igen.",
   "Add a sound from my board": "Lägg till ett ljud från mitt board",
   "Bass boosted": "Basboost",
@@ -4103,7 +4100,6 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "När Onion Board stängs slår det på Discords brusreducering, ekoeliminering och automatiska volym igen för prat. Vill du inte det? Avmarkera <b>Ställ tillbaka Discord för prat vid stängning</b> på fliken Konfiguration.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Dina ljud når nu fram rena till dina vänner, inte dova eller avhuggna.",
   "{name} is set up for your sounds": "{name} är inställt för dina ljud",
-  "What's popular right now": "Det som är populärt just nu",
   "When to use the cable": "När kabeln är bäst",
   "Most people don't need it: your sounds go into the mic you already use. The cable is for two cases:<br><br>• <b>You don't have a mic.</b> Without one there's nothing to put your sounds into, but the cable works on its own: others hear your sounds through it.<br>• <b>You'd rather Onion Board didn't touch your mic.</b> Putting sounds into your mic adds Onion Board's audio driver to it, and Windows asks you to allow that. With the cable, Onion Board leaves your mic as it is: the cable is VB-Audio's own free driver (its installer asks Windows too).<br><br>With the cable, pick <b>CABLE Output</b> as the mic in Discord and in each game.": "De flesta behöver den inte: dina ljud går in i mikrofonen du redan använder. Kabeln är för två fall:<br><br>• <b>Du har ingen mikrofon.</b> Utan mikrofon finns det inget att skicka ljuden in i, men kabeln fungerar på egen hand: andra hör dina ljud genom den.<br>• <b>Du vill hellre att Onion Board inte rör din mikrofon.</b> Att skicka ljud in i mikrofonen lägger till Onion Boards ljuddrivrutin på den, och Windows frågar om du tillåter det. Med kabeln låter Onion Board din mikrofon vara: kabeln är VB-Audios egen gratis drivrutin (dess installationsprogram frågar också Windows).<br><br>Med kabeln väljer du <b>CABLE Output</b> som mikrofon i Discord och i varje spel.",
   "No mic, or you'd rather Onion Board didn't touch yours? Use a free virtual cable instead: you pick it as the mic in Discord and games.": "Ingen mikrofon, eller vill du hellre att Onion Board inte rör din? Använd en gratis virtuell kabel i stället: du väljer den som mikrofon i Discord och spel.",
@@ -4329,5 +4325,6 @@
   "Names and tags can't have links in them.": "Namn och taggar får inte innehålla länkar.",
   "Mic off": "Mikrofon av",
   "Your headset's mic is off": "Ditt headsets mikrofon är av",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofonen på <b>{headset}</b> kopplades från. Anslut den igen så går dina ljud ut igen."
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofonen på <b>{headset}</b> kopplades från. Anslut den igen så går dina ljud ut igen.",
+  "“{name}” is on. Click it again to turn the voice changer off.": "”{name}” är på. Klicka igen för att stänga av röstväxlaren."
 }

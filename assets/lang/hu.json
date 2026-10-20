@@ -3365,8 +3365,6 @@
   "That sound is already in the store.": "Ez a hang már fent van a boltban.",
   "That sound isn't in the store any more.": "Ez a hang már nincs a boltban.",
   "That's a lot for one day. Try again tomorrow.": "Ez egy napra sok. Próbáld újra holnap.",
-  "The best voted first": "A legjobbra szavazottak elöl",
-  "The newest first": "A legújabbak elöl",
   "The sound store had a problem. Try again in a bit.": "A hangboltnál hiba történt. Próbáld újra kicsit később.",
   "The sound store is switched off in Settings > Privacy & security.": "A hangbolt ki van kapcsolva a Beállítások > Adatvédelem és biztonság menüpontban.",
   "The sound store sent more than it should, so it was left.": "A hangbolt többet küldött a kelleténél, ezért el lett dobva.",
@@ -3607,7 +3605,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "„{name}” el van rejtve a Mindből. A hangjai a saját fülén maradnak.",
   "“{name}” shows in All again": "„{name}” újra látszik a Mindben",
   "All categories": "Minden kategória",
-  "Votes": "Szavazatok",
   "Tutorials are off now. Settings → General turns them back on.": "Az útmutatók most ki vannak kapcsolva. A Beállítások → Általános visszakapcsolja őket.",
   "Add a sound from my board": "Hang hozzáadása a boardomról",
   "Bass boosted": "Felturbózott basszus",
@@ -4103,7 +4100,6 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Amikor az Onion Board bezárul, a Discord zajszűrését, visszhangszűrését és automatikus hangerejét visszakapcsolja beszédhez. Nem kéred? Vedd ki a pipát a <b>Bezáráskor a Discord vissza beszédre</b> elől a Beüzemelés lapon.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "A hangjaid most tisztán érnek el a barátaidhoz, nem tompán vagy szaggatva.",
   "{name} is set up for your sounds": "{name} be van állítva a hangjaidhoz",
-  "What's popular right now": "Ami most népszerű",
   "When to use the cable": "Mikor jobb a kábel",
   "Most people don't need it: your sounds go into the mic you already use. The cable is for two cases:<br><br>• <b>You don't have a mic.</b> Without one there's nothing to put your sounds into, but the cable works on its own: others hear your sounds through it.<br>• <b>You'd rather Onion Board didn't touch your mic.</b> Putting sounds into your mic adds Onion Board's audio driver to it, and Windows asks you to allow that. With the cable, Onion Board leaves your mic as it is: the cable is VB-Audio's own free driver (its installer asks Windows too).<br><br>With the cable, pick <b>CABLE Output</b> as the mic in Discord and in each game.": "A legtöbbeknek nem kell: a hangjaid abba a mikrofonba mennek, amit már használsz. A kábel két esetre való:<br><br>• <b>Nincs mikrofonod.</b> Mikrofon nélkül nincs hova küldeni a hangokat, de a kábel magában is működik: mások rajta keresztül hallják a hangjaidat.<br>• <b>Inkább nem szeretnéd, hogy az Onion Board hozzányúljon a mikrofonodhoz.</b> Ha a hangok a mikrofonodba mennek, az Onion Board hangillesztője hozzáadódik, és a Windows engedélyt kér. A kábellel az Onion Board békén hagyja a mikrofonodat: a kábel a VB-Audio saját ingyenes illesztője (a telepítője is engedélyt kér a Windowstól).<br><br>A kábellel a <b>CABLE Output</b> eszközt válaszd mikrofonnak a Discordban és minden játékban.",
   "No mic, or you'd rather Onion Board didn't touch yours? Use a free virtual cable instead: you pick it as the mic in Discord and games.": "Nincs mikrofonod, vagy inkább nem szeretnéd, hogy az Onion Board hozzányúljon? Használj helyette ingyenes virtuális kábelt: ezt választod mikrofonnak a Discordban és a játékokban.",
@@ -4329,5 +4325,6 @@
   "Names and tags can't have links in them.": "A nevekben és címkékben nem lehet link.",
   "Mic off": "Mikrofon kikapcsolva",
   "Your headset's mic is off": "A headseted mikrofonja ki van kapcsolva",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "A(z) <b>{headset}</b> mikrofonja lecsatlakozott. Csatlakoztasd újra, és a hangjaid újra kimennek."
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "A(z) <b>{headset}</b> mikrofonja lecsatlakozott. Csatlakoztasd újra, és a hangjaid újra kimennek.",
+  "“{name}” is on. Click it again to turn the voice changer off.": "A(z) „{name}” be van kapcsolva. Kattints rá újra a hangváltó kikapcsolásához."
 }

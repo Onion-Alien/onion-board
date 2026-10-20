@@ -3365,8 +3365,6 @@
   "That sound is already in the store.": "Den lyd er allerede i butikken.",
   "That sound isn't in the store any more.": "Den lyd er ikke i butikken længere.",
   "That's a lot for one day. Try again tomorrow.": "Det er meget for én dag. Prøv igen i morgen.",
-  "The best voted first": "De bedst stemte først",
-  "The newest first": "De nyeste først",
   "The sound store had a problem. Try again in a bit.": "Lydbutikken havde et problem. Prøv igen om lidt.",
   "The sound store is switched off in Settings > Privacy & security.": "Lydbutikken er slået fra i Indstillinger > Privatliv og sikkerhed.",
   "The sound store sent more than it should, so it was left.": "Lydbutikken sendte mere, end den skulle, så det blev smidt væk.",
@@ -3607,7 +3605,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” er skjult fra Alle. Dens lyde bliver på dens egen fane.",
   "“{name}” shows in All again": "“{name}” vises i Alle igen",
   "All categories": "Alle kategorier",
-  "Votes": "Bedømmelser",
   "Tutorials are off now. Settings → General turns them back on.": "Vejledninger er slået fra nu. Indstillinger → Generelt slår dem til igen.",
   "Add a sound from my board": "Tilføj en lyd fra mit board",
   "Bass boosted": "Bas-boost",
@@ -4103,7 +4100,6 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Når Onion Board lukker, slår det Discords støjreduktion, ekkoannullering og automatiske lydstyrke til igen til snak. Vil du ikke det? Fjern fluebenet ved <b>Sæt Discord tilbage til snak ved lukning</b> på fanen Opsætning.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Dine lyde når nu rent frem til dine venner, ikke dæmpet eller hakket.",
   "{name} is set up for your sounds": "{name} er sat op til dine lyde",
-  "What's popular right now": "Det, der er populært lige nu",
   "When to use the cable": "Hvornår kablet er bedst",
   "Most people don't need it: your sounds go into the mic you already use. The cable is for two cases:<br><br>• <b>You don't have a mic.</b> Without one there's nothing to put your sounds into, but the cable works on its own: others hear your sounds through it.<br>• <b>You'd rather Onion Board didn't touch your mic.</b> Putting sounds into your mic adds Onion Board's audio driver to it, and Windows asks you to allow that. With the cable, Onion Board leaves your mic as it is: the cable is VB-Audio's own free driver (its installer asks Windows too).<br><br>With the cable, pick <b>CABLE Output</b> as the mic in Discord and in each game.": "De fleste har ikke brug for det: dine lyde går ind i den mikrofon, du allerede bruger. Kablet er til to tilfælde:<br><br>• <b>Du har ingen mikrofon.</b> Uden en mikrofon er der intet at sende dine lyde ind i, men kablet virker alene: andre hører dine lyde gennem det.<br>• <b>Du vil helst have, at Onion Board ikke rører din mikrofon.</b> At sende lyde ind i din mikrofon tilføjer Onion Boards lyddriver til den, og Windows spørger, om du vil tillade det. Med kablet lader Onion Board din mikrofon være: kablet er VB-Audios egen gratis driver (dens installationsprogram spørger også Windows).<br><br>Med kablet vælger du <b>CABLE Output</b> som mikrofon i Discord og i hvert spil.",
   "No mic, or you'd rather Onion Board didn't touch yours? Use a free virtual cable instead: you pick it as the mic in Discord and games.": "Ingen mikrofon, eller vil du helst have, at Onion Board ikke rører din? Brug et gratis virtuelt kabel i stedet: du vælger det som mikrofon i Discord og spil.",
@@ -4329,5 +4325,6 @@
   "Names and tags can't have links in them.": "Navne og tags må ikke indeholde links.",
   "Mic off": "Mikrofon slukket",
   "Your headset's mic is off": "Dit headsets mikrofon er slukket",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofonen på <b>{headset}</b> blev afbrudt. Tilslut den igen, så går dine lyde ud igen."
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofonen på <b>{headset}</b> blev afbrudt. Tilslut den igen, så går dine lyde ud igen.",
+  "“{name}” is on. Click it again to turn the voice changer off.": "\"{name}\" er slået til. Klik igen for at slå stemmeskifteren fra."
 }

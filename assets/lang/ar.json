@@ -3641,8 +3641,6 @@
   "That sound is already in the store.": "هذا الصوت موجود في المتجر بالفعل.",
   "That sound isn't in the store any more.": "هذا الصوت لم يعد في المتجر.",
   "That's a lot for one day. Try again tomorrow.": "هذا كثير ليوم واحد. حاول مرة أخرى غدًا.",
-  "The best voted first": "الأعلى تصويتًا أولًا",
-  "The newest first": "الأحدث أولًا",
   "The sound store had a problem. Try again in a bit.": "حدثت مشكلة في متجر الأصوات. حاول مرة أخرى بعد قليل.",
   "The sound store is switched off in Settings > Privacy & security.": "متجر الأصوات متوقف في الإعدادات > الخصوصية والأمان.",
   "The sound store sent more than it should, so it was left.": "أرسل متجر الأصوات أكثر مما ينبغي، فتم تجاهله.",
@@ -3891,7 +3889,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "«{name}» مخفية من الكل. تبقى أصواتها في تبويبها.",
   "“{name}” shows in All again": "«{name}» تظهر في الكل مجددًا",
   "All categories": "كل الفئات",
-  "Votes": "التقييمات",
   "Tutorials are off now. Settings → General turns them back on.": "أُوقفت الشروحات الآن. الإعدادات → عام تعيد تشغيلها.",
   "Add a sound from my board": "أضف صوتًا من لوحتي",
   "Bass boosted": "باص معزّز",
@@ -4399,7 +4396,6 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "عند إغلاق Onion Board، يعيد تشغيل قمع الضوضاء وإلغاء الصدى والصوت التلقائي في ديسكورد للكلام. لا تريد ذلك؟ ألغِ تحديد <b>أعد ديسكورد للكلام عند الإغلاق</b> في تبويب التهيئة.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "تصل أصواتك إلى أصدقائك نقية الآن، بلا كتم أو تقطيع.",
   "{name} is set up for your sounds": "{name} جاهز لأصواتك",
-  "What's popular right now": "الرائج الآن",
   "When to use the cable": "متى تستخدم الكابل",
   "Most people don't need it: your sounds go into the mic you already use. The cable is for two cases:<br><br>• <b>You don't have a mic.</b> Without one there's nothing to put your sounds into, but the cable works on its own: others hear your sounds through it.<br>• <b>You'd rather Onion Board didn't touch your mic.</b> Putting sounds into your mic adds Onion Board's audio driver to it, and Windows asks you to allow that. With the cable, Onion Board leaves your mic as it is: the cable is VB-Audio's own free driver (its installer asks Windows too).<br><br>With the cable, pick <b>CABLE Output</b> as the mic in Discord and in each game.": "معظم الناس لا يحتاجونه: أصواتك تذهب إلى الميكروفون الذي تستخدمه بالفعل. الكابل لحالتين:<br><br>• <b>ليس لديك ميكروفون.</b> بدون ميكروفون لا يوجد مكان لإرسال أصواتك، لكن الكابل يعمل وحده: يسمع الآخرون أصواتك من خلاله.<br>• <b>تفضّل ألا يلمس Onion Board ميكروفونك.</b> إرسال الأصوات إلى ميكروفونك يضيف إليه برنامج تشغيل الصوت الخاص بـ Onion Board، ويطلب منك Windows السماح بذلك. مع الكابل يترك Onion Board ميكروفونك كما هو: الكابل برنامج تشغيل مجاني خاص بـ VB-Audio (ومثبّته يطلب الإذن من Windows أيضًا).<br><br>مع الكابل، اختر <b>CABLE Output</b> كميكروفون في Discord وفي كل لعبة.",
   "No mic, or you'd rather Onion Board didn't touch yours? Use a free virtual cable instead: you pick it as the mic in Discord and games.": "ليس لديك ميكروفون، أو تفضّل ألا يلمس Onion Board ميكروفونك؟ استخدم بدلًا من ذلك كابلًا افتراضيًا مجانيًا: تختاره كميكروفون في Discord والألعاب.",
@@ -4625,5 +4621,6 @@
   "Names and tags can't have links in them.": "لا يمكن أن تحتوي الأسماء والوسوم على روابط.",
   "Mic off": "المايك مطفأ",
   "Your headset's mic is off": "مايك السماعة مطفأ",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "انقطع مايك <b>{headset}</b>. أعد توصيله وستخرج أصواتك من جديد."
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "انقطع مايك <b>{headset}</b>. أعد توصيله وستخرج أصواتك من جديد.",
+  "“{name}” is on. Click it again to turn the voice changer off.": "«{name}» مُشغّل. انقر عليه مرة أخرى لإيقاف مغير الصوت."
 }

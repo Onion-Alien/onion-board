@@ -3365,8 +3365,6 @@
   "That sound is already in the store.": "Bu ses zaten mağazada.",
   "That sound isn't in the store any more.": "Bu ses artık mağazada değil.",
   "That's a lot for one day. Try again tomorrow.": "Bir gün için çok fazla. Yarın tekrar dene.",
-  "The best voted first": "En çok oy alanlar önce",
-  "The newest first": "En yeniler önce",
   "The sound store had a problem. Try again in a bit.": "Ses mağazasında bir sorun oldu. Birazdan tekrar dene.",
   "The sound store is switched off in Settings > Privacy & security.": "Ses mağazası Ayarlar > Gizlilik ve güvenlik bölümünden kapalı.",
   "The sound store sent more than it should, so it was left.": "Ses mağazası olması gerekenden fazlasını gönderdi, bu yüzden atıldı.",
@@ -3607,7 +3605,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” Tümü'nde gizli. Sesleri kendi sekmesinde kalır.",
   "“{name}” shows in All again": "“{name}” yeniden Tümü'nde görünüyor",
   "All categories": "Tüm kategoriler",
-  "Votes": "Oylar",
   "Tutorials are off now. Settings → General turns them back on.": "Nasıl yapılırlar şimdi kapalı. Ayarlar → Genel'den yeniden açılır.",
   "Add a sound from my board": "Board'umdan ses ekle",
   "Bass boosted": "Bas güçlendirilmiş",
@@ -4103,7 +4100,6 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Onion Board kapanınca Discord'un gürültü bastırma, yankı engelleme ve otomatik ses seviyesini konuşma için yeniden açar. İstemiyor musun? Kurulum sekmesinde <b>Kapanınca Discord'u konuşmaya geri al</b> işaretini kaldır.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Seslerin artık arkadaşlarına boğuk ya da kesik değil, temiz ulaşıyor.",
   "{name} is set up for your sounds": "{name} seslerin için ayarlandı",
-  "What's popular right now": "Şu an popüler olanlar",
   "When to use the cable": "Kablo ne zaman daha iyi",
   "Most people don't need it: your sounds go into the mic you already use. The cable is for two cases:<br><br>• <b>You don't have a mic.</b> Without one there's nothing to put your sounds into, but the cable works on its own: others hear your sounds through it.<br>• <b>You'd rather Onion Board didn't touch your mic.</b> Putting sounds into your mic adds Onion Board's audio driver to it, and Windows asks you to allow that. With the cable, Onion Board leaves your mic as it is: the cable is VB-Audio's own free driver (its installer asks Windows too).<br><br>With the cable, pick <b>CABLE Output</b> as the mic in Discord and in each game.": "Çoğu kişinin buna ihtiyacı yok: seslerin zaten kullandığın mikrofona gider. Kablo iki durum için:<br><br>• <b>Mikrofonun yok.</b> Mikrofon olmadan sesleri koyacak bir yer yok, ama kablo tek başına çalışır: diğerleri seslerini onun üzerinden duyar.<br>• <b>Onion Board'un mikrofonuna dokunmamasını tercih ediyorsun.</b> Sesleri mikrofona göndermek ona Onion Board'un ses sürücüsünü ekler ve Windows senden izin ister. Kabloyla Onion Board mikrofonunu olduğu gibi bırakır: kablo VB-Audio'nun kendi ücretsiz sürücüsüdür (yükleyicisi de Windows'a sorar).<br><br>Kabloyla, Discord'da ve her oyunda mikrofon olarak <b>CABLE Output</b>'u seç.",
   "No mic, or you'd rather Onion Board didn't touch yours? Use a free virtual cable instead: you pick it as the mic in Discord and games.": "Mikrofonun yok mu, ya da Onion Board'un seninkine dokunmamasını mı istiyorsun? Bunun yerine ücretsiz bir sanal kablo kullan: onu Discord'da ve oyunlarda mikrofon olarak seçersin.",
@@ -4329,5 +4325,6 @@
   "Names and tags can't have links in them.": "Adlar ve etiketler bağlantı içeremez.",
   "Mic off": "Mikrofon kapalı",
   "Your headset's mic is off": "Kulaklığının mikrofonu kapalı",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> mikrofonunun bağlantısı koptu. Yeniden bağla, seslerin tekrar gitsin."
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> mikrofonunun bağlantısı koptu. Yeniden bağla, seslerin tekrar gitsin.",
+  "“{name}” is on. Click it again to turn the voice changer off.": "“{name}” açık. Ses değiştiriciyi kapatmak için yeniden tıklayın."
 }

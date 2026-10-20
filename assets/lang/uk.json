@@ -3434,8 +3434,6 @@
   "That sound is already in the store.": "Цей звук уже є в магазині.",
   "That sound isn't in the store any more.": "Цього звуку більше немає в магазині.",
   "That's a lot for one day. Try again tomorrow.": "Це багато як на один день. Спробуйте завтра.",
-  "The best voted first": "Спочатку найкращі за голосами",
-  "The newest first": "Спочатку нові",
   "The sound store had a problem. Try again in a bit.": "У магазина звуків виникла проблема. Спробуйте трохи згодом.",
   "The sound store is switched off in Settings > Privacy & security.": "Магазин звуків вимкнено в Налаштуваннях > Конфіденційність і безпека.",
   "The sound store sent more than it should, so it was left.": "Магазин звуків надіслав більше, ніж мав, тож це відкинуто.",
@@ -3678,7 +3676,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "«{name}» прихована в «Усі». Її звуки лишаються на її вкладці.",
   "“{name}” shows in All again": "«{name}» знову видно в «Усі»",
   "All categories": "Усі категорії",
-  "Votes": "Оцінки",
   "Tutorials are off now. Settings → General turns them back on.": "Підказки вимкнено. Налаштування → Загальні вмикає їх знову.",
   "Add a sound from my board": "Додати звук з мого борду",
   "Bass boosted": "Бас-буст",
@@ -4177,7 +4174,6 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Коли Onion Board закривається, він знову вмикає шумозаглушення, придушення відлуння й автоматичну гучність у Discord для розмови. Не треба? Зніми позначку <b>Повернути Discord для розмови при закритті</b> на вкладці Підключення.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Тепер твої звуки доходять до друзів чистими, а не глухими чи обірваними.",
   "{name} is set up for your sounds": "{name} налаштовано для твоїх звуків",
-  "What's popular right now": "Що зараз популярне",
   "When to use the cable": "Коли потрібен кабель",
   "Most people don't need it: your sounds go into the mic you already use. The cable is for two cases:<br><br>• <b>You don't have a mic.</b> Without one there's nothing to put your sounds into, but the cable works on its own: others hear your sounds through it.<br>• <b>You'd rather Onion Board didn't touch your mic.</b> Putting sounds into your mic adds Onion Board's audio driver to it, and Windows asks you to allow that. With the cable, Onion Board leaves your mic as it is: the cable is VB-Audio's own free driver (its installer asks Windows too).<br><br>With the cable, pick <b>CABLE Output</b> as the mic in Discord and in each game.": "Більшості він не потрібен: звуки йдуть у мікрофон, яким ти вже користуєшся. Кабель потрібен у двох випадках:<br><br>• <b>У тебе немає мікрофона.</b> Без мікрофона звукам нікуди йти, але кабель працює сам: інші чують твої звуки через нього.<br>• <b>Ти не хочеш, щоб Onion Board чіпав твій мікрофон.</b> Щоб звуки йшли в мікрофон, до нього додається аудіодрайвер Onion Board, і Windows питає дозволу. З кабелем Onion Board залишає мікрофон як є: кабель — власний безкоштовний драйвер VB-Audio (його інсталятор теж питає Windows).<br><br>З кабелем вибери <b>CABLE Output</b> мікрофоном у Discord і в кожній грі.",
   "No mic, or you'd rather Onion Board didn't touch yours? Use a free virtual cable instead: you pick it as the mic in Discord and games.": "Немає мікрофона або не хочеш, щоб Onion Board чіпав твій? Використай натомість безкоштовний віртуальний кабель: вибери його мікрофоном у Discord та іграх.",
@@ -4403,5 +4399,6 @@
   "Names and tags can't have links in them.": "Назви й теги не можуть містити посилань.",
   "Mic off": "Мікрофон вимк.",
   "Your headset's mic is off": "Мікрофон гарнітури вимкнено",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Мікрофон на <b>{headset}</b> від'єднався. Під'єднай його знову, і твої звуки знову підуть."
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Мікрофон на <b>{headset}</b> від'єднався. Під'єднай його знову, і твої звуки знову підуть.",
+  "“{name}” is on. Click it again to turn the voice changer off.": "«{name}» увімкнено. Клацніть ще раз, щоб вимкнути зміну голосу."
 }

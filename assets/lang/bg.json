@@ -3365,8 +3365,6 @@
   "That sound is already in the store.": "Този звук вече е в магазина.",
   "That sound isn't in the store any more.": "Този звук вече не е в магазина.",
   "That's a lot for one day. Try again tomorrow.": "Това е много за един ден. Опитай пак утре.",
-  "The best voted first": "Най-гласуваните първо",
-  "The newest first": "Най-новите първо",
   "The sound store had a problem. Try again in a bit.": "Магазинът за звуци имаше проблем. Опитай пак след малко.",
   "The sound store is switched off in Settings > Privacy & security.": "Магазинът за звуци е изключен в Настройки > Поверителност и сигурност.",
   "The sound store sent more than it should, so it was left.": "Магазинът за звуци изпрати повече, отколкото трябва, затова беше отхвърлено.",
@@ -3607,7 +3605,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "„{name}“ е скрита от Всички. Звуците ѝ остават в собствения ѝ раздел.",
   "“{name}” shows in All again": "„{name}“ пак се показва във Всички",
   "All categories": "Всички категории",
-  "Votes": "Оценки",
   "Tutorials are off now. Settings → General turns them back on.": "Обясненията са изключени. Настройки → Общи ги включва пак.",
   "Add a sound from my board": "Добави звук от моя борд",
   "Bass boosted": "Усилен бас",
@@ -4103,7 +4100,6 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Когато Onion Board се затвори, той пак включва потискането на шума, премахването на ехото и автоматичната сила на звука в Discord за говорене. Не искаш това? Махни отметката от <b>Върни Discord за говорене при затваряне</b> в раздел Свързване.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Звуците ти вече стигат до приятелите ти чисти, не заглушени или накъсани.",
   "{name} is set up for your sounds": "{name} е настроен за звуците ти",
-  "What's popular right now": "Какво е популярно в момента",
   "When to use the cable": "Кога да ползваш кабела",
   "Most people don't need it: your sounds go into the mic you already use. The cable is for two cases:<br><br>• <b>You don't have a mic.</b> Without one there's nothing to put your sounds into, but the cable works on its own: others hear your sounds through it.<br>• <b>You'd rather Onion Board didn't touch your mic.</b> Putting sounds into your mic adds Onion Board's audio driver to it, and Windows asks you to allow that. With the cable, Onion Board leaves your mic as it is: the cable is VB-Audio's own free driver (its installer asks Windows too).<br><br>With the cable, pick <b>CABLE Output</b> as the mic in Discord and in each game.": "На повечето хора не им трябва: звуците ти отиват в микрофона, който вече ползваш. Кабелът е за два случая:<br><br>• <b>Нямаш микрофон.</b> Без микрофон няма къде да пуснеш звуците, но кабелът работи сам: другите чуват звуците ти през него.<br>• <b>Предпочиташ Onion Board да не пипа микрофона ти.</b> Пускането на звуци в микрофона му добавя аудио драйвера на Onion Board и Windows иска разрешение от теб. С кабела Onion Board оставя микрофона ти както си е: кабелът е собственият безплатен драйвер на VB-Audio (инсталаторът му също пита Windows).<br><br>С кабела избери <b>CABLE Output</b> за микрофон в Discord и във всяка игра.",
   "No mic, or you'd rather Onion Board didn't touch yours? Use a free virtual cable instead: you pick it as the mic in Discord and games.": "Нямаш микрофон или предпочиташ Onion Board да не пипа твоя? Ползвай вместо това безплатен виртуален кабел: избираш го за микрофон в Discord и игрите.",
@@ -4329,5 +4325,6 @@
   "Names and tags can't have links in them.": "Имената и таговете не може да съдържат връзки.",
   "Mic off": "Микрофонът е изключен",
   "Your headset's mic is off": "Микрофонът на слушалките е изключен",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Микрофонът на <b>{headset}</b> прекъсна. Свържи го отново и звуците ти пак ще излизат."
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Микрофонът на <b>{headset}</b> прекъсна. Свържи го отново и звуците ти пак ще излизат.",
+  "“{name}” is on. Click it again to turn the voice changer off.": "„{name}“ е включен. Кликнете отново, за да изключите гласовия чейнджър."
 }

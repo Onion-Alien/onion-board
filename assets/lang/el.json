@@ -3365,8 +3365,6 @@
   "That sound is already in the store.": "Αυτός ο ήχος υπάρχει ήδη στο κατάστημα.",
   "That sound isn't in the store any more.": "Αυτός ο ήχος δεν υπάρχει πια στο κατάστημα.",
   "That's a lot for one day. Try again tomorrow.": "Είναι πολλά για μία μέρα. Δοκίμασε ξανά αύριο.",
-  "The best voted first": "Οι πιο ψηφισμένοι πρώτα",
-  "The newest first": "Οι πιο νέοι πρώτα",
   "The sound store had a problem. Try again in a bit.": "Το κατάστημα ήχων είχε πρόβλημα. Δοκίμασε ξανά σε λίγο.",
   "The sound store is switched off in Settings > Privacy & security.": "Το κατάστημα ήχων είναι απενεργοποιημένο στις Ρυθμίσεις > Απόρρητο και ασφάλεια.",
   "The sound store sent more than it should, so it was left.": "Το κατάστημα ήχων έστειλε περισσότερα απ’ όσα έπρεπε, γι’ αυτό απορρίφθηκαν.",
@@ -3607,7 +3605,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "Η «{name}» είναι κρυφή από τα Όλα. Οι ήχοι της μένουν στη δική της καρτέλα.",
   "“{name}” shows in All again": "Η «{name}» φαίνεται ξανά στα Όλα",
   "All categories": "Όλες οι κατηγορίες",
-  "Votes": "Ψήφοι",
   "Tutorials are off now. Settings → General turns them back on.": "Οι οδηγοί είναι τώρα κλειστοί. Οι Ρυθμίσεις → Γενικά τους ανοίγουν ξανά.",
   "Add a sound from my board": "Πρόσθεσε ήχο από το board μου",
   "Bass boosted": "Ενισχυμένα μπάσα",
@@ -4103,7 +4100,6 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Όταν κλείνει το Onion Board, ξανανοίγει την καταστολή θορύβου, την ακύρωση ηχούς και την αυτόματη ένταση του Discord για ομιλία. Δεν το θέλεις; Βγάλε το τικ από το <b>Επαναφορά του Discord για ομιλία στο κλείσιμο</b> στην καρτέλα Διαμόρφωση.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Οι ήχοι σου φτάνουν τώρα καθαροί στους φίλους σου, όχι πνιχτοί ή κομμένοι.",
   "{name} is set up for your sounds": "Το {name} είναι ρυθμισμένο για τους ήχους σου",
-  "What's popular right now": "Τι είναι δημοφιλές τώρα",
   "When to use the cable": "Πότε να χρησιμοποιήσεις το καλώδιο",
   "Most people don't need it: your sounds go into the mic you already use. The cable is for two cases:<br><br>• <b>You don't have a mic.</b> Without one there's nothing to put your sounds into, but the cable works on its own: others hear your sounds through it.<br>• <b>You'd rather Onion Board didn't touch your mic.</b> Putting sounds into your mic adds Onion Board's audio driver to it, and Windows asks you to allow that. With the cable, Onion Board leaves your mic as it is: the cable is VB-Audio's own free driver (its installer asks Windows too).<br><br>With the cable, pick <b>CABLE Output</b> as the mic in Discord and in each game.": "Οι περισσότεροι δεν το χρειάζονται: οι ήχοι σου πάνε στο μικρόφωνο που ήδη χρησιμοποιείς. Το καλώδιο είναι για δύο περιπτώσεις:<br><br>• <b>Δεν έχεις μικρόφωνο.</b> Χωρίς μικρόφωνο δεν υπάρχει πού να μπουν οι ήχοι σου, αλλά το καλώδιο δουλεύει μόνο του: οι άλλοι ακούν τους ήχους σου μέσα από αυτό.<br>• <b>Προτιμάς το Onion Board να μην πειράξει το μικρόφωνό σου.</b> Για να μπαίνουν ήχοι στο μικρόφωνο, προστίθεται σε αυτό ο οδηγός ήχου του Onion Board και τα Windows σού ζητούν άδεια. Με το καλώδιο, το Onion Board αφήνει το μικρόφωνό σου όπως είναι: το καλώδιο είναι ο δικός του δωρεάν οδηγός της VB-Audio (και το πρόγραμμα εγκατάστασής του ρωτά τα Windows).<br><br>Με το καλώδιο, διάλεξε <b>CABLE Output</b> ως μικρόφωνο στο Discord και σε κάθε παιχνίδι.",
   "No mic, or you'd rather Onion Board didn't touch yours? Use a free virtual cable instead: you pick it as the mic in Discord and games.": "Δεν έχεις μικρόφωνο ή προτιμάς το Onion Board να μην πειράξει το δικό σου; Χρησιμοποίησε ένα δωρεάν εικονικό καλώδιο: το διαλέγεις ως μικρόφωνο στο Discord και στα παιχνίδια.",
@@ -4329,5 +4325,6 @@
   "Names and tags can't have links in them.": "Τα ονόματα και οι ετικέτες δεν μπορούν να περιέχουν συνδέσμους.",
   "Mic off": "Μικρόφωνο κλειστό",
   "Your headset's mic is off": "Το μικρόφωνο των ακουστικών σου είναι κλειστό",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Το μικρόφωνο στα <b>{headset}</b> αποσυνδέθηκε. Σύνδεσέ το ξανά και οι ήχοι σου θα βγαίνουν πάλι."
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Το μικρόφωνο στα <b>{headset}</b> αποσυνδέθηκε. Σύνδεσέ το ξανά και οι ήχοι σου θα βγαίνουν πάλι.",
+  "“{name}” is on. Click it again to turn the voice changer off.": "Η φωνή «{name}» είναι ενεργή. Κάντε κλικ ξανά για να απενεργοποιήσετε τον εναλλάκτη φωνής."
 }

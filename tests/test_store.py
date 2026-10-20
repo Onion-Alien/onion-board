@@ -518,18 +518,15 @@ def test_categories_filter_the_list(qapp, fake):
     assert [pick.itemText(i) for i in range(4)] == ["Trending", "Most liked", "Games (3)",
                                                     "Memes (1)"]
     assert pick.currentIndex() == 0
-    # it opens on Trending: what's popular right now, its header with the arrow
+    # it opens on Trending: what's popular right now
     assert "sort=trending" in next(c[1] for c in fake.calls if c[1].startswith("/v1/sounds"))
-    assert not t.sort_btns["trending"].icon().isNull()
     pick.activated.emit(pick.findData("games"))
     assert _wait(qapp, lambda: "cat=games" in fake.calls[-1][1])
     assert pick.currentData() == "games"
-    # the order (a column's header) and the words keep the category
-    t.sort_btns["new"].click()
+    # the order and the words keep the category
+    t.set_sort("new")
     assert _wait(qapp, lambda: "sort=new" in fake.calls[-1][1]
                  and "cat=games" in fake.calls[-1][1])
-    assert t.sort_btns["top"].icon().isNull()
-    assert not t.sort_btns["new"].icon().isNull()   # the arrow moved to Added
     assert sum(c[1] == "/v1/categories" for c in fake.calls) == 1   # asked once
     # an empty category: a way back to All
     fake.sounds = {}
@@ -539,11 +536,10 @@ def test_categories_filter_the_list(qapp, fake):
     assert _wait(qapp, lambda: "cat=" not in fake.calls[-1][1])
     # every sound by Added: no top says it, the box says All categories
     assert pick.currentIndex() == -1 and pick.currentText() == ""
-    # Most liked: every sound by votes; the header's arrow follows, and back
+    # Most liked: every sound by votes, and back
     pick.activated.emit(pick.findData("@top"))
     assert _wait(qapp, lambda: "sort=top" in fake.calls[-1][1] and "cat=" not in fake.calls[-1][1])
-    assert not t.sort_btns["top"].icon().isNull()
-    t.sort_btns["trending"].click()
+    t.set_sort("trending")
     assert _wait(qapp, lambda: "sort=trending" in fake.calls[-1][1])
     assert pick.currentData() == "@trending"
     t.shutdown()
@@ -600,7 +596,7 @@ def test_cards_fill_the_tab_as_many_a_row_as_fit(qapp, fake):
     t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
     t.resize(1800, 700)   # a wide window: the cards use its whole width, 5 a row
     t.show()
-    assert _wait(qapp, lambda: len(t._rows) == 6 and t.table_head.isVisible())
+    assert _wait(qapp, lambda: len(t._rows) == 6 and t.stack.currentWidget() is t.list_area)
     process_events(qapp, lambda: False, timeout=0.3)
     assert len({r.y() for r in t._rows[:5]}) == 1 and t._rows[5].y() > t._rows[0].y()
     assert t._rows[4].geometry().right() > 1600
@@ -640,7 +636,7 @@ def test_cards_fit_by_the_widest_card_not_the_first(qapp, fake):
                           link_state=lambda u: "playing" if u == url else "")
     t.resize(1900, 700)
     t.show()
-    assert _wait(qapp, lambda: len(t._rows) == 29 and t.table_head.isVisible())
+    assert _wait(qapp, lambda: len(t._rows) == 29 and t.stack.currentWidget() is t.list_area)
     assert _wait(qapp, lambda: t._rows[1].btn_stop.isVisibleTo(t._rows[1]))
     for width in range(1900, 419, -15):
         t.resize(width, 700)
@@ -665,7 +661,7 @@ def test_playing_a_link_never_moves_the_cards(qapp, fake):
                           link_state=lambda u: state["now"] if u == f"{url}11/" else "")
     t.resize(1900, 700)
     t.show()
-    assert _wait(qapp, lambda: len(t._rows) == 24 and t.table_head.isVisible())
+    assert _wait(qapp, lambda: len(t._rows) == 24 and t.stack.currentWidget() is t.list_area)
     r = t._rows[10]
     for width in (1900, 1600, 1250, 900, 640, 440):
         t.resize(width, 700)

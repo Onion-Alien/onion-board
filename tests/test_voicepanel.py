@@ -214,6 +214,19 @@ def test_power_switch(panel):
     assert not hasattr(p.fx, "btn_hear")     # one switch for hearing it: the mixer's
 
 
+def test_the_lit_voice_card_says_a_click_turns_it_off(panel):
+    p, _ = panel
+    deep, robot = p.fx._tile["Deep voice"], p.fx._tile["Robot"]
+    assert "turn the voice changer off" not in deep.toolTip()
+    deep.click()                             # on
+    assert p.fx.btn_power.isChecked()
+    assert "turn the voice changer off" in deep.toolTip()
+    assert "turn the voice changer off" not in robot.toolTip()
+    deep.click()                             # the lit card again: the changer off
+    assert not p.fx.btn_power.isChecked()
+    assert "turn the voice changer off" not in deep.toolTip()
+
+
 def test_saved_spec_loads_back(qapp, monkeypatch):
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
     from soundboard.ui.voice.voicepanel import VoiceFxPanel

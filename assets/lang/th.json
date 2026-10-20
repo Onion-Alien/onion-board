@@ -3296,8 +3296,6 @@
   "That sound is already in the store.": "เสียงนั้นอยู่ในร้านแล้ว",
   "That sound isn't in the store any more.": "เสียงนั้นไม่อยู่ในร้านแล้ว",
   "That's a lot for one day. Try again tomorrow.": "วันเดียวเยอะไปแล้ว ลองอีกครั้งพรุ่งนี้",
-  "The best voted first": "โหวตมากสุดก่อน",
-  "The newest first": "ใหม่สุดก่อน",
   "The sound store had a problem. Try again in a bit.": "ร้านเสียงมีปัญหา ลองอีกครั้งในอีกสักครู่",
   "The sound store is switched off in Settings > Privacy & security.": "ร้านเสียงปิดอยู่ในการตั้งค่า > ความเป็นส่วนตัวและความปลอดภัย",
   "The sound store sent more than it should, so it was left.": "ร้านเสียงส่งมาเกินที่ควร จึงไม่ได้ใช้",
@@ -3536,7 +3534,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” ถูกซ่อนจากทั้งหมดแล้ว เสียงยังอยู่ในแท็บของมันเอง",
   "“{name}” shows in All again": "“{name}” แสดงในทั้งหมดอีกครั้ง",
   "All categories": "ทุกหมวดหมู่",
-  "Votes": "โหวต",
   "Tutorials are off now. Settings → General turns them back on.": "ปิดวิธีใช้แล้ว เปิดอีกครั้งได้ใน การตั้งค่า → ทั่วไป",
   "Add a sound from my board": "เพิ่มเสียงจากบอร์ดของฉัน",
   "Bass boosted": "เบสหนัก",
@@ -4029,7 +4026,6 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "เมื่อ Onion Board ปิด จะเปิดการลดเสียงรบกวน การตัดเสียงสะท้อน และระดับเสียงอัตโนมัติของ Discord กลับสำหรับการพูด ไม่ต้องการแบบนั้น? เอาเครื่องหมายออกจาก <b>คืนค่า Discord สำหรับการพูดเมื่อปิด</b> ในแท็บเซ็ตอัป",
   "Your sounds reach your friends clean now, not muffled or cut off.": "ตอนนี้เสียงของคุณไปถึงเพื่อนอย่างชัดเจน ไม่อู้อี้หรือขาดหาย",
   "{name} is set up for your sounds": "{name} ตั้งค่าสำหรับเสียงของคุณแล้ว",
-  "What's popular right now": "สิ่งที่กำลังฮิตตอนนี้",
   "When to use the cable": "เมื่อไหร่ควรใช้สาย",
   "Most people don't need it: your sounds go into the mic you already use. The cable is for two cases:<br><br>• <b>You don't have a mic.</b> Without one there's nothing to put your sounds into, but the cable works on its own: others hear your sounds through it.<br>• <b>You'd rather Onion Board didn't touch your mic.</b> Putting sounds into your mic adds Onion Board's audio driver to it, and Windows asks you to allow that. With the cable, Onion Board leaves your mic as it is: the cable is VB-Audio's own free driver (its installer asks Windows too).<br><br>With the cable, pick <b>CABLE Output</b> as the mic in Discord and in each game.": "คนส่วนใหญ่ไม่ต้องใช้: เสียงของคุณเข้าไมค์ที่คุณใช้อยู่แล้ว สายมีไว้สำหรับสองกรณี:<br><br>• <b>คุณไม่มีไมค์</b> ถ้าไม่มีไมค์ก็ไม่มีที่ให้ส่งเสียงเข้าไป แต่สายทำงานได้เอง: คนอื่นได้ยินเสียงของคุณผ่านสาย<br>• <b>คุณไม่อยากให้ Onion Board ไปแตะไมค์ของคุณ</b> การส่งเสียงเข้าไมค์จะเพิ่มไดรเวอร์เสียงของ Onion Board ให้ไมค์ และ Windows จะขออนุญาตคุณ ถ้าใช้สาย Onion Board จะปล่อยไมค์ของคุณไว้ตามเดิม: สายเป็นไดรเวอร์ฟรีของ VB-Audio เอง (ตัวติดตั้งก็ขอ Windows เหมือนกัน)<br><br>ถ้าใช้สาย ให้เลือก <b>CABLE Output</b> เป็นไมค์ใน Discord และในแต่ละเกม",
   "No mic, or you'd rather Onion Board didn't touch yours? Use a free virtual cable instead: you pick it as the mic in Discord and games.": "ไม่มีไมค์ หรือไม่อยากให้ Onion Board แตะไมค์ของคุณ? ใช้สายเสมือนฟรีแทน: คุณเลือกมันเป็นไมค์ใน Discord และในเกม",
@@ -4255,5 +4251,6 @@
   "Names and tags can't have links in them.": "ชื่อและแท็กใส่ลิงก์ไม่ได้",
   "Mic off": "ไมค์ปิดอยู่",
   "Your headset's mic is off": "ไมค์ของหูฟังปิดอยู่",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "ไมค์ของ <b>{headset}</b> หลุดการเชื่อมต่อ เชื่อมต่อใหม่แล้วเสียงของคุณจะออกไปอีกครั้ง"
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "ไมค์ของ <b>{headset}</b> หลุดการเชื่อมต่อ เชื่อมต่อใหม่แล้วเสียงของคุณจะออกไปอีกครั้ง",
+  "“{name}” is on. Click it again to turn the voice changer off.": "“{name}” เปิดอยู่ คลิกอีกครั้งเพื่อปิดเครื่องเปลี่ยนเสียง"
 }

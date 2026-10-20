@@ -575,6 +575,71 @@ def test_an_old_silent_note_is_no_retry(fake_reg, monkeypatch, tmp_path):
     assert len([c for c in calls if c[0] is False]) == 1   # silent before: left alone
 
 
+EAPO_POST = dm.EAPO_CLSIDS[1]
+
+
+@pytest.fixture
+def eapo(fake_reg, monkeypatch):
+    """Equalizer APO's notes for the test mic ({name: value}), read and written the way
+    directmic does."""
+    notes = {}
+    monkeypatch.setattr(dm, "eapo_runs_us",
+                        lambda guid: [n for n, v in notes.items() if dm._is_ours(v)])
+
+    def hand_back(guid, original):
+        names = dm.eapo_runs_us(guid)
+        for n in names:
+            notes[n] = original or (dm.EAPO_NONE if n.startswith("{") else "")
+        return bool(names)
+    monkeypatch.setattr(dm, "_eapo_hand_back", hand_back)
+    return notes
+
+
+def _eapo_takes_the_slot(reg, notes, pid=7):
+    """What Equalizer APO's set-up does to a mic: notes the slot's effect, takes it."""
+    fx = reg.keys[FXKEY.lower()]
+    notes[dm.FX % pid] = notes["PostMixChild"] = fx[dm.FX % pid][0]
+    fx[dm.FX % pid] = (EAPO_POST, SZ)
+
+
+def test_equalizer_apo_already_on_the_mic_runs_first(fake_reg, eapo):
+    _mic(fake_reg, {dm.FX % 7: (EAPO_POST, SZ), dm.MODES_KEY % 7: ([dm.MODE_DEFAULT], MULTI)})
+    eapo.update({dm.FX % 7: "{E}", "PostMixChild": "{E}"})
+    before = fake_reg.mics()
+    dm._install_endpoint(GUID, None)
+    state = fake_reg.keys[rf"{dm.ENDPOINTS_KEY}\{GUID}".lower()]
+    assert state["Original"][0] == EAPO_POST and _all_ours(fake_reg)
+    dm._uninstall_endpoint(GUID)
+    assert fake_reg.mics() == before and eapo == {dm.FX % 7: "{E}", "PostMixChild": "{E}"}
+
+
+def test_equalizer_apo_put_on_after_it_is_never_wrapped_back(fake_reg, eapo):
+    """Equalizer APO set up on the mic after this effect runs this effect: a repair must
+    not wrap it back (each would start the other), and taking ours off hands Equalizer
+    APO the mic's own effect again."""
+    _mic(fake_reg, MICS["a gaming headset (EFX + old LFX)"])
+    dm._install_endpoint(GUID, None)
+    _eapo_takes_the_slot(fake_reg, eapo)
+    dm._install_endpoint(GUID, None)   # a repair or an update
+    assert fake_reg.keys[FXKEY.lower()][dm.FX % 7][0] == EAPO_POST
+    state = fake_reg.keys[rf"{dm.ENDPOINTS_KEY}\{GUID}".lower()]
+    assert state["Original"][0] == "{E}"
+    dm._uninstall_endpoint(GUID)
+    assert fake_reg.keys[FXKEY.lower()][dm.FX % 7][0] == EAPO_POST
+    assert eapo == {dm.FX % 7: "{E}", "PostMixChild": "{E}"} and not fake_reg.installed_on()
+
+
+def test_equalizer_apo_running_it_with_our_notes_lost(fake_reg, eapo):
+    _mic(fake_reg, {dm.FX % 7: (EAPO_POST, SZ)})
+    eapo.update({dm.FX % 7: dm.CLSID, "PostMixChild": dm.CLSID})
+    dm._install_endpoint(GUID, None)
+    assert fake_reg.keys[FXKEY.lower()] == {dm.FX % 7: (EAPO_POST, SZ)}
+    assert fake_reg.installed_on() == [GUID.lower()]
+    dm._uninstall_endpoint(GUID)
+    assert eapo == {dm.FX % 7: dm.EAPO_NONE, "PostMixChild": ""}
+    assert fake_reg.keys[FXKEY.lower()] == {dm.FX % 7: (EAPO_POST, SZ)}
+
+
 def test_the_uninstall_listens_to_the_mic_it_took_the_effect_off(fake_reg, monkeypatch,
                                                                  tmp_path):
     calls = _restart_kit(fake_reg, monkeypatch, tmp_path,

@@ -3365,8 +3365,6 @@
   "That sound is already in the store.": "Se ääni on jo kaupassa.",
   "That sound isn't in the store any more.": "Se ääni ei ole enää kaupassa.",
   "That's a lot for one day. Try again tomorrow.": "Se on paljon yhdelle päivälle. Yritä huomenna uudelleen.",
-  "The best voted first": "Parhaiten äänestetyt ensin",
-  "The newest first": "Uusimmat ensin",
   "The sound store had a problem. Try again in a bit.": "Äänikaupassa oli ongelma. Yritä hetken päästä uudelleen.",
   "The sound store is switched off in Settings > Privacy & security.": "Äänikauppa on pois päältä kohdassa Asetukset > Yksityisyys ja suojaus.",
   "The sound store sent more than it should, so it was left.": "Äänikauppa lähetti enemmän kuin piti, joten se hylättiin.",
@@ -3607,7 +3605,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "”{name}” on piilotettu Kaikista. Sen äänet pysyvät sen omalla välilehdellä.",
   "“{name}” shows in All again": "”{name}” näkyy taas Kaikissa",
   "All categories": "Kaikki kategoriat",
-  "Votes": "Arviot",
   "Tutorials are off now. Settings → General turns them back on.": "Ohjeet ovat nyt pois. Asetukset → Yleiset laittaa ne takaisin päälle.",
   "Add a sound from my board": "Lisää ääni omalta boardilta",
   "Bass boosted": "Bassot tappiin",
@@ -4103,7 +4100,6 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Kun Onion Board sulkeutuu, se laittaa Discordin kohinanvaimennuksen, kaiunpoiston ja automaattisen äänenvoimakkuuden takaisin päälle puhetta varten. Etkö halua sitä? Poista valinta <b>Palauta Discord puhetta varten suljettaessa</b> Käyttöönotto-välilehdeltä.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Äänesi menevät nyt kavereillesi puhtaina, eivät vaimeina tai katkonaisina.",
   "{name} is set up for your sounds": "{name} on valmis äänillesi",
-  "What's popular right now": "Mikä on suosittua juuri nyt",
   "When to use the cable": "Milloin kaapeli kannattaa",
   "Most people don't need it: your sounds go into the mic you already use. The cable is for two cases:<br><br>• <b>You don't have a mic.</b> Without one there's nothing to put your sounds into, but the cable works on its own: others hear your sounds through it.<br>• <b>You'd rather Onion Board didn't touch your mic.</b> Putting sounds into your mic adds Onion Board's audio driver to it, and Windows asks you to allow that. With the cable, Onion Board leaves your mic as it is: the cable is VB-Audio's own free driver (its installer asks Windows too).<br><br>With the cable, pick <b>CABLE Output</b> as the mic in Discord and in each game.": "Useimmat eivät tarvitse sitä: äänesi menevät mikrofoniin, jota jo käytät. Kaapeli on kahta tilannetta varten:<br><br>• <b>Sinulla ei ole mikrofonia.</b> Ilman mikrofonia ääniä ei ole minne laittaa, mutta kaapeli toimii yksinään: muut kuulevat äänesi sen kautta.<br>• <b>Et halua, että Onion Board koskee mikrofoniisi.</b> Äänten laittaminen mikrofoniin lisää siihen Onion Boardin ääniajurin, ja Windows kysyy lupaa. Kaapelin kanssa Onion Board jättää mikrofonisi ennalleen: kaapeli on VB-Audion oma ilmainen ajuri (sen asennusohjelmakin kysyy Windowsilta).<br><br>Kaapelin kanssa valitse <b>CABLE Output</b> mikrofoniksi Discordissa ja jokaisessa pelissä.",
   "No mic, or you'd rather Onion Board didn't touch yours? Use a free virtual cable instead: you pick it as the mic in Discord and games.": "Ei mikrofonia, tai et halua Onion Boardin koskevan omaasi? Käytä sen sijaan ilmaista virtuaalikaapelia: valitset sen mikrofoniksi Discordissa ja peleissä.",
@@ -4329,5 +4325,6 @@
   "Names and tags can't have links in them.": "Nimissä ja tunnisteissa ei saa olla linkkejä.",
   "Mic off": "Mikrofoni pois",
   "Your headset's mic is off": "Kuulokkeidesi mikrofoni on pois päältä",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Kuulokkeiden <b>{headset}</b> mikrofonin yhteys katkesi. Yhdistä se uudelleen, niin äänesi kuuluvat taas."
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Kuulokkeiden <b>{headset}</b> mikrofonin yhteys katkesi. Yhdistä se uudelleen, niin äänesi kuuluvat taas.",
+  "“{name}” is on. Click it again to turn the voice changer off.": "”{name}” on päällä. Napsauta uudelleen, niin äänenvaihdin sammuu."
 }

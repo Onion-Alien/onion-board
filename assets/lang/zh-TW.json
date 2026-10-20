@@ -3296,8 +3296,6 @@
   "That sound is already in the store.": "這個音效已經在商店裡了。",
   "That sound isn't in the store any more.": "這個音效已經不在商店裡了。",
   "That's a lot for one day. Try again tomorrow.": "一天這麼多太多了。明天再試。",
-  "The best voted first": "票數最高的在前",
-  "The newest first": "最新的在前",
   "The sound store had a problem. Try again in a bit.": "音效商店出了點問題。稍後再試。",
   "The sound store is switched off in Settings > Privacy & security.": "音效商店已在「設定」>「隱私和安全」中關閉。",
   "The sound store sent more than it should, so it was left.": "音效商店傳來的內容超出預期，已捨棄。",
@@ -3536,7 +3534,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "「{name}」 已從全部中隱藏。它的音效仍在自己的分頁裡。",
   "“{name}” shows in All again": "「{name}」 重新顯示在全部中",
   "All categories": "全部分類",
-  "Votes": "投票",
   "Tutorials are off now. Settings → General turns them back on.": "教學已關閉。設定 → 一般 可以重新開啟。",
   "Add a sound from my board": "從我的音板加入聲音",
   "Bass boosted": "低音增強",
@@ -4029,7 +4026,6 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "關閉 Onion Board 時，它會把 Discord 的噪音抑制、回音消除和自動音量重新打開，方便聊天。不想這樣？在設置分頁取消勾選<b>關閉時把 Discord 恢復成聊天設定</b>。",
   "Your sounds reach your friends clean now, not muffled or cut off.": "你的聲音現在能清楚地傳給朋友，不再悶悶的或斷斷續續。",
   "{name} is set up for your sounds": "{name} 已為你的聲音設定好",
-  "What's popular right now": "現在流行的",
   "When to use the cable": "什麼時候用音源線",
   "Most people don't need it: your sounds go into the mic you already use. The cable is for two cases:<br><br>• <b>You don't have a mic.</b> Without one there's nothing to put your sounds into, but the cable works on its own: others hear your sounds through it.<br>• <b>You'd rather Onion Board didn't touch your mic.</b> Putting sounds into your mic adds Onion Board's audio driver to it, and Windows asks you to allow that. With the cable, Onion Board leaves your mic as it is: the cable is VB-Audio's own free driver (its installer asks Windows too).<br><br>With the cable, pick <b>CABLE Output</b> as the mic in Discord and in each game.": "大多數人用不到：你的音效會進入你正在用的麥克風。音源線適用於兩種情況：<br><br>• <b>你沒有麥克風。</b>沒有麥克風，音效就無處可送，但音源線可以單獨運作：別人透過它聽到你的音效。<br>• <b>你不想讓 Onion Board 動你的麥克風。</b>把音效送進麥克風會替它加上 Onion Board 的音訊驅動程式，Windows 會請你允許。用音源線時，Onion Board 不會動你的麥克風：音源線是 VB-Audio 自己的免費驅動程式（它的安裝程式也會請 Windows 允許）。<br><br>用音源線時，在 Discord 和每個遊戲裡把 <b>CABLE Output</b> 選為麥克風。",
   "No mic, or you'd rather Onion Board didn't touch yours? Use a free virtual cable instead: you pick it as the mic in Discord and games.": "沒有麥克風，或不想讓 Onion Board 動你的麥克風？那就用免費的虛擬音源線：在 Discord 和遊戲裡把它選為麥克風。",
@@ -4255,5 +4251,6 @@
   "Names and tags can't have links in them.": "名稱和標籤裡不能有連結。",
   "Mic off": "麥克風已關",
   "Your headset's mic is off": "耳機的麥克風已關閉",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> 的麥克風斷開了。重新連接後，你的音效就會再次送出。"
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> 的麥克風斷開了。重新連接後，你的音效就會再次送出。",
+  "“{name}” is on. Click it again to turn the voice changer off.": "「{name}」已開啟。再按一下可關閉變聲器。"
 }

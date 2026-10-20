@@ -3365,8 +3365,6 @@
   "That sound is already in the store.": "Dat geluid staat al in de winkel.",
   "That sound isn't in the store any more.": "Dat geluid staat niet meer in de winkel.",
   "That's a lot for one day. Try again tomorrow.": "Dat is veel voor één dag. Probeer het morgen opnieuw.",
-  "The best voted first": "De best beoordeelde eerst",
-  "The newest first": "De nieuwste eerst",
   "The sound store had a problem. Try again in a bit.": "De geluidenwinkel had een probleem. Probeer het zo opnieuw.",
   "The sound store is switched off in Settings > Privacy & security.": "De geluidenwinkel is uitgeschakeld in Instellingen > Privacy en beveiliging.",
   "The sound store sent more than it should, so it was left.": "De geluidenwinkel stuurde meer dan zou moeten, dus is het weggegooid.",
@@ -3607,7 +3605,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” is verborgen in Alle. De geluiden blijven op hun eigen tabblad.",
   "“{name}” shows in All again": "“{name}” staat weer in Alle",
   "All categories": "Alle categorieën",
-  "Votes": "Beoordelingen",
   "Tutorials are off now. Settings → General turns them back on.": "Uitleg staat nu uit. Instellingen → Algemeen zet het weer aan.",
   "Add a sound from my board": "Geluid van mijn board toevoegen",
   "Bass boosted": "Bass boosted",
@@ -4103,7 +4100,6 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Als Onion Board sluit, zet het de ruisonderdrukking, echo-onderdrukking en automatische volume van Discord weer aan voor praten. Wil je dat niet? Vink <b>Discord bij sluiten terugzetten voor praten</b> uit op het tabblad Setup.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Je geluiden komen nu schoon bij je vrienden aan, niet dof of afgekapt.",
   "{name} is set up for your sounds": "{name} is ingesteld voor je geluiden",
-  "What's popular right now": "Wat nu populair is",
   "When to use the cable": "Wanneer de kabel gebruiken",
   "Most people don't need it: your sounds go into the mic you already use. The cable is for two cases:<br><br>• <b>You don't have a mic.</b> Without one there's nothing to put your sounds into, but the cable works on its own: others hear your sounds through it.<br>• <b>You'd rather Onion Board didn't touch your mic.</b> Putting sounds into your mic adds Onion Board's audio driver to it, and Windows asks you to allow that. With the cable, Onion Board leaves your mic as it is: the cable is VB-Audio's own free driver (its installer asks Windows too).<br><br>With the cable, pick <b>CABLE Output</b> as the mic in Discord and in each game.": "De meeste mensen hebben hem niet nodig: je geluiden gaan in de microfoon die je al gebruikt. De kabel is voor twee gevallen:<br><br>• <b>Je hebt geen microfoon.</b> Zonder microfoon is er niets om je geluiden in te stoppen, maar de kabel werkt op zichzelf: anderen horen je geluiden erdoor.<br>• <b>Je hebt liever dat Onion Board niet aan je microfoon zit.</b> Geluiden in je microfoon zetten voegt de audiodriver van Onion Board eraan toe, en Windows vraagt of je dat toestaat. Met de kabel laat Onion Board je microfoon zoals hij is: de kabel is de eigen gratis driver van VB-Audio (de installer vraagt het Windows ook).<br><br>Met de kabel kies je <b>CABLE Output</b> als microfoon in Discord en in elke game.",
   "No mic, or you'd rather Onion Board didn't touch yours? Use a free virtual cable instead: you pick it as the mic in Discord and games.": "Geen microfoon, of heb je liever dat Onion Board niet aan de jouwe zit? Gebruik dan een gratis virtuele kabel: die kies je als microfoon in Discord en games.",
@@ -4329,5 +4325,6 @@
   "Names and tags can't have links in them.": "Namen en tags mogen geen links bevatten.",
   "Mic off": "Microfoon uit",
   "Your headset's mic is off": "De microfoon van je headset staat uit",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "De microfoon van <b>{headset}</b> is losgekoppeld. Verbind hem opnieuw en je geluiden gaan weer naar buiten."
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "De microfoon van <b>{headset}</b> is losgekoppeld. Verbind hem opnieuw en je geluiden gaan weer naar buiten.",
+  "“{name}” is on. Click it again to turn the voice changer off.": "“{name}” staat aan. Klik nog een keer om de stemwisselaar uit te zetten."
 }

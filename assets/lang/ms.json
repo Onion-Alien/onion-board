@@ -3296,8 +3296,6 @@
   "That sound is already in the store.": "Bunyi itu sudah ada di kedai.",
   "That sound isn't in the store any more.": "Bunyi itu tiada lagi di kedai.",
   "That's a lot for one day. Try again tomorrow.": "Itu banyak untuk sehari. Cuba lagi esok.",
-  "The best voted first": "Paling banyak diundi dahulu",
-  "The newest first": "Terbaharu dahulu",
   "The sound store had a problem. Try again in a bit.": "Kedai bunyi menghadapi masalah. Cuba lagi sebentar lagi.",
   "The sound store is switched off in Settings > Privacy & security.": "Kedai bunyi dimatikan dalam Tetapan > Privasi & keselamatan.",
   "The sound store sent more than it should, so it was left.": "Kedai bunyi menghantar lebih daripada sepatutnya, jadi ia dibuang.",
@@ -3536,7 +3534,6 @@
   "“{name}” is hidden from All. Its sounds stay on its own tab.": "“{name}” disembunyikan daripada Semua. Bunyinya kekal di tabnya sendiri.",
   "“{name}” shows in All again": "“{name}” ditunjukkan dalam Semua semula",
   "All categories": "Semua kategori",
-  "Votes": "Undian",
   "Tutorials are off now. Settings → General turns them back on.": "Panduan kini dimatikan. Tetapan → Umum menghidupkannya semula.",
   "Add a sound from my board": "Tambah bunyi dari board saya",
   "Bass boosted": "Bass digandakan",
@@ -4029,7 +4026,6 @@
   "When Onion Board closes, it turns Discord's noise suppression, echo cancellation and automatic volume back on for talking. Don't want that? Untick <b>Put Discord back for talking on close</b> on the Setup tab.": "Apabila Onion Board ditutup, ia menghidupkan semula penindasan hingar, pembatalan gema dan kelantangan automatik Discord untuk bercakap. Tak mahu? Nyahtanda <b>Kembalikan Discord untuk bercakap bila ditutup</b> di tab Persediaan.",
   "Your sounds reach your friends clean now, not muffled or cut off.": "Bunyi anda kini sampai kepada kawan-kawan dengan jelas, tidak tenggelam atau terputus.",
   "{name} is set up for your sounds": "{name} sudah disediakan untuk bunyi anda",
-  "What's popular right now": "Apa yang popular sekarang",
   "When to use the cable": "Bila guna kabel",
   "Most people don't need it: your sounds go into the mic you already use. The cable is for two cases:<br><br>• <b>You don't have a mic.</b> Without one there's nothing to put your sounds into, but the cable works on its own: others hear your sounds through it.<br>• <b>You'd rather Onion Board didn't touch your mic.</b> Putting sounds into your mic adds Onion Board's audio driver to it, and Windows asks you to allow that. With the cable, Onion Board leaves your mic as it is: the cable is VB-Audio's own free driver (its installer asks Windows too).<br><br>With the cable, pick <b>CABLE Output</b> as the mic in Discord and in each game.": "Kebanyakan orang tak perlukannya: bunyi anda masuk ke mikrofon yang anda sudah guna. Kabel ini untuk dua keadaan:<br><br>• <b>Anda tiada mikrofon.</b> Tanpa mikrofon tiada tempat untuk memasukkan bunyi anda, tetapi kabel berfungsi sendiri: orang lain mendengar bunyi anda melaluinya.<br>• <b>Anda lebih suka Onion Board tidak menyentuh mikrofon anda.</b> Memasukkan bunyi ke mikrofon menambah pemacu audio Onion Board padanya, dan Windows meminta kebenaran anda. Dengan kabel, Onion Board membiarkan mikrofon anda seperti biasa: kabel ialah pemacu percuma VB-Audio sendiri (pemasangnya juga meminta kebenaran Windows).<br><br>Dengan kabel, pilih <b>CABLE Output</b> sebagai mikrofon dalam Discord dan dalam setiap permainan.",
   "No mic, or you'd rather Onion Board didn't touch yours? Use a free virtual cable instead: you pick it as the mic in Discord and games.": "Tiada mikrofon, atau anda lebih suka Onion Board tidak menyentuh mikrofon anda? Guna kabel maya percuma: anda memilihnya sebagai mikrofon dalam Discord dan permainan.",
@@ -4255,5 +4251,6 @@
   "Names and tags can't have links in them.": "Nama dan tag tidak boleh mengandungi pautan.",
   "Mic off": "Mikrofon dimatikan",
   "Your headset's mic is off": "Mikrofon set kepala anda dimatikan",
-  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofon pada <b>{headset}</b> terputus. Sambungkan semula dan bunyi anda akan keluar semula."
+  "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofon pada <b>{headset}</b> terputus. Sambungkan semula dan bunyi anda akan keluar semula.",
+  "“{name}” is on. Click it again to turn the voice changer off.": "“{name}” sedang hidup. Klik sekali lagi untuk mematikan penukar suara."
 }

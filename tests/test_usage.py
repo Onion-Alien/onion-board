@@ -115,6 +115,20 @@ def test_first_start_says_where_they_heard(sent, answer, path):
     assert [h["path"] for h in _hits(sent[1][0])] == [f"/app/{__version__}"]
 
 
+def test_the_count_waits_while_the_pc_is_short_of_memory(sent, monkeypatch):
+    from soundboard.core import hangwatch
+    monkeypatch.setattr(usage, "MEMORY_FULL", 90)   # conftest's is never reached
+    monkeypatch.setattr(hangwatch, "memory_load", lambda: 93)
+    cfg = Config()
+    usage.maybe_send(cfg)
+    assert sent == [] and not cfg.stats_sent   # still due: a later check sends it
+    usage.maybe_send(cfg, event="update-now/x")   # an event goes anyway
+    assert len(sent) == 1
+    monkeypatch.setattr(hangwatch, "memory_load", lambda: 89)
+    usage.maybe_send(cfg)
+    assert len(sent) == 2 and cfg.stats_sent
+
+
 def test_update_now_is_one_event(sent):
     cfg = Config(stats_sent=1.0)
     usage.maybe_send(cfg, event=usage.update_event("9.9.9"))
