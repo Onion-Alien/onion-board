@@ -514,9 +514,11 @@ def test_categories_filter_the_list(qapp, fake):
     t.show()
     pick = t.cat_pick
     assert _wait(qapp, lambda: len(t._rows) == 2 and pick.count() == 5)
-    # Trending (picked), Most liked and Newest: every sound; then the categories
-    assert [pick.itemText(i) for i in range(5)] == ["Trending", "Most liked", "Newest",
-                                                    "Games (3)", "Memes (1)"]
+    # Trending (picked), Most liked and Newest: every sound, and they say so (an order
+    # read as one more category beside "Games (3)"); then the categories
+    assert [pick.itemText(i) for i in range(5)] == [
+        "All sounds: trending", "All sounds: most liked", "All sounds: newest",
+        "Games (3)", "Memes (1)"]
     assert pick.currentIndex() == 0
     # it opens on Trending: what's popular right now
     assert "sort=trending" in next(c[1] for c in fake.calls if c[1].startswith("/v1/sounds"))

@@ -2766,7 +2766,6 @@
   "Only looks: never clicks or types in your game": "Kigger kun: klikker eller skriver aldrig i dit spil",
   "Plays one of your sounds when something happens in your game.": "Afspiller en af dine lyde, når der sker noget i dit spil.",
   "Rare spawns, queue pops, “YOU DIED”": "Sjældne spawns, kø der springer, “YOU DIED”",
-  "Watches the game's window, even behind others": "Holder øje med spillets vindue, også bag andre",
   "Browsers": "Browsere",
   "Calls & chat": "Opkald og chat",
   "Games": "Spil",
@@ -4133,7 +4132,6 @@
   "Reset effects": "Nulstil effekter",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Slår alle effekter fra (beskæringen bliver). Lyden, der spiller, bliver ren med det samme.",
   "✓ The playing sound has your changes. Cancel puts it back.": "✓ Lyden, der spiller, har dine ændringer. Annuller sætter den tilbage.",
-  "Most liked": "Mest likede",
   "3 AM Gremlin": "Klokken 3-gremlin",
   "Achievements": "Præstationer",
   "Add 1,000 sounds.": "Tilføj 1.000 lyde.",
@@ -4340,5 +4338,11 @@
   "Your headset's mic is off": "Dit headsets mikrofon er slukket",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofonen på <b>{headset}</b> blev afbrudt. Tilslut den igen, så går dine lyde ud igen.",
   "Put the sound first on a busy PC": "Lyden først på en travl pc",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Kører boardet med højere end normal prioritet, så andre programmer ikke kan få lyden til at hakke. Den bruger meget lidt CPU, så spil mærker det ikke."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Kører boardet med højere end normal prioritet, så andre programmer ikke kan få lyden til at hakke. Den bruger meget lidt CPU, så spil mærker det ikke.",
+  "All sounds: most liked": "Alle lyde: mest likede",
+  "All sounds: newest": "Alle lyde: nyeste",
+  "All sounds: trending": "Alle lyde: trending",
+  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Vinduet er for lille til boardet, så dette er miniafspilleren. Gør det større for at få boardet tilbage.",
+  "Watches your game's window while it's open, even behind others": "Holder øje med dit spils vindue, mens det er åbent, også bag andre",
+  "Your file stays whole: only the part between the handles plays.": "Din fil forbliver hel: kun delen mellem håndtagene bliver afspillet."
 }

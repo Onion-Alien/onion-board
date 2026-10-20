@@ -2823,7 +2823,6 @@
   "Only looks: never clicks or types in your game": "Jen se dívá: nikdy neklikne ani nepíše do hry",
   "Plays one of your sounds when something happens in your game.": "Přehraje jeden z vašich zvuků, když se ve hře něco stane.",
   "Rare spawns, queue pops, “YOU DIED”": "Vzácné spawny, nalezená hra, “YOU DIED”",
-  "Watches the game's window, even behind others": "Sleduje okno hry, i když je za jinými",
   "Browsers": "Prohlížeče",
   "Calls & chat": "Hovory a chat",
   "Games": "Hry",
@@ -4207,7 +4206,6 @@
   "Reset effects": "Resetovat efekty",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Vypne všechny efekty (ořez zůstane). Hrající zvuk je hned zase čistý.",
   "✓ The playing sound has your changes. Cancel puts it back.": "✓ Hrající zvuk má tvoje změny. Zrušit ho vrátí zpět.",
-  "Most liked": "Nejoblíbenější",
   "3 AM Gremlin": "Gremlin ve 3 ráno",
   "Achievements": "Úspěchy",
   "Add 1,000 sounds.": "Přidej 1 000 zvuků.",
@@ -4414,5 +4412,11 @@
   "Your headset's mic is off": "Mikrofon sluchátek je vypnutý",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofon na <b>{headset}</b> se odpojil. Připoj ho znovu a tvoje zvuky zase půjdou ven.",
   "Put the sound first on a busy PC": "Zvuk má přednost, když je PC vytížené",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Spustí board s vyšší než normální prioritou, aby jiné programy nemohly způsobit výpadky zvuku. Bere velmi málo CPU, takže hry nic nepoznají."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Spustí board s vyšší než normální prioritou, aby jiné programy nemohly způsobit výpadky zvuku. Bere velmi málo CPU, takže hry nic nepoznají.",
+  "All sounds: most liked": "Všechny zvuky: nejoblíbenější",
+  "All sounds: newest": "Všechny zvuky: nejnovější",
+  "All sounds: trending": "Všechny zvuky: trendy",
+  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Okno je na board moc malé, takže je tu mini přehrávač. Zvětši ho a board je zpátky.",
+  "Watches your game's window while it's open, even behind others": "Sleduje okno tvé hry, dokud je otevřené, i když je za jinými",
+  "Your file stays whole: only the part between the handles plays.": "Tvůj soubor zůstane celý: hraje jen část mezi úchyty."
 }

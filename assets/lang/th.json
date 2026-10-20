@@ -2709,7 +2709,6 @@
   "Only looks: never clicks or types in your game": "แค่ดู: ไม่คลิกหรือพิมพ์ในเกมของคุณ",
   "Plays one of your sounds when something happens in your game.": "เล่นเสียงของคุณเมื่อมีบางอย่างเกิดขึ้นในเกม",
   "Rare spawns, queue pops, “YOU DIED”": "ของหายากเกิด, คิวเด้ง, “YOU DIED”",
-  "Watches the game's window, even behind others": "เฝ้าดูหน้าต่างเกม แม้อยู่หลังหน้าต่างอื่น",
   "Browsers": "เบราว์เซอร์",
   "Calls & chat": "โทรและแชท",
   "Games": "เกม",
@@ -4059,7 +4058,6 @@
   "Reset effects": "รีเซ็ตเอฟเฟกต์",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "ปิดเอฟเฟกต์ทั้งหมด (ส่วนที่ตัดยังอยู่) เสียงที่กำลังเล่นจะกลับเป็นเสียงปกติทันที",
   "✓ The playing sound has your changes. Cancel puts it back.": "✓ เสียงที่กำลังเล่นใช้การเปลี่ยนแปลงของคุณแล้ว กดยกเลิกเพื่อย้อนกลับ",
-  "Most liked": "ถูกใจมากที่สุด",
   "3 AM Gremlin": "เกรมลินตีสาม",
   "Achievements": "ความสำเร็จ",
   "Add 1,000 sounds.": "เพิ่มเสียง 1,000 เสียง",
@@ -4266,5 +4264,11 @@
   "Your headset's mic is off": "ไมค์ของหูฟังปิดอยู่",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "ไมค์ของ <b>{headset}</b> หลุดการเชื่อมต่อ เชื่อมต่อใหม่แล้วเสียงของคุณจะออกไปอีกครั้ง",
   "Put the sound first on a busy PC": "ให้เสียงมาก่อนเมื่อพีซีทำงานหนัก",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "รันบอร์ดด้วยลำดับความสำคัญสูงกว่าปกติ เพื่อไม่ให้โปรแกรมอื่นทำให้เสียงสะดุด ใช้ CPU น้อยมาก เกมจึงไม่รู้สึกถึงความต่าง"
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "รันบอร์ดด้วยลำดับความสำคัญสูงกว่าปกติ เพื่อไม่ให้โปรแกรมอื่นทำให้เสียงสะดุด ใช้ CPU น้อยมาก เกมจึงไม่รู้สึกถึงความต่าง",
+  "All sounds: most liked": "ทุกเสียง: ถูกใจมากที่สุด",
+  "All sounds: newest": "ทุกเสียง: ใหม่ล่าสุด",
+  "All sounds: trending": "ทุกเสียง: กำลังมาแรง",
+  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "หน้าต่างเล็กเกินไปสำหรับบอร์ด จึงเป็นมินิเพลเยอร์ ขยายให้ใหญ่ขึ้นเพื่อกลับไปที่บอร์ด",
+  "Watches your game's window while it's open, even behind others": "เฝ้าดูหน้าต่างเกมของคุณขณะที่เปิดอยู่ แม้อยู่หลังหน้าต่างอื่น",
+  "Your file stays whole: only the part between the handles plays.": "ไฟล์ของคุณยังอยู่ครบ: เล่นแค่ส่วนที่อยู่ระหว่างที่จับ"
 }

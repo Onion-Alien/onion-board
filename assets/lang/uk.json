@@ -2823,7 +2823,6 @@
   "Only looks: never clicks or types in your game": "Лише дивиться: ніколи не клацає і не друкує у грі",
   "Plays one of your sounds when something happens in your game.": "Грає один із ваших звуків, коли в грі щось стається.",
   "Rare spawns, queue pops, “YOU DIED”": "Рідкісні спавни, знайдено гру, «YOU DIED»",
-  "Watches the game's window, even behind others": "Стежить за вікном гри, навіть за іншими вікнами",
   "Browsers": "Браузери",
   "Calls & chat": "Дзвінки й чат",
   "Games": "Ігри",
@@ -4207,7 +4206,6 @@
   "Reset effects": "Скинути ефекти",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Вимикає всі ефекти (обрізка лишається). Звук, що грає, одразу стає звичайним.",
   "✓ The playing sound has your changes. Cancel puts it back.": "✓ Звук, що грає, тепер з вашими змінами. «Скасувати» поверне як було.",
-  "Most liked": "Найулюбленіші",
   "3 AM Gremlin": "Ґремлін о 3 ночі",
   "Achievements": "Досягнення",
   "Add 1,000 sounds.": "Додай 1000 звуків.",
@@ -4414,5 +4412,11 @@
   "Your headset's mic is off": "Мікрофон гарнітури вимкнено",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Мікрофон на <b>{headset}</b> від'єднався. Під'єднай його знову, і твої звуки знову підуть.",
   "Put the sound first on a busy PC": "Звук у пріоритеті, коли ПК завантажений",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Запускає панель із пріоритетом вище звичайного, щоб інші програми не змушували звук перериватися. Вона майже не навантажує процесор, тож ігри цього не помітять."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Запускає панель із пріоритетом вище звичайного, щоб інші програми не змушували звук перериватися. Вона майже не навантажує процесор, тож ігри цього не помітять.",
+  "All sounds: most liked": "Усі звуки: найулюбленіші",
+  "All sounds: newest": "Усі звуки: найновіші",
+  "All sounds: trending": "Усі звуки: в тренді",
+  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Вікно замале для панелі, тож це мініплеєр. Збільш його, щоб повернути панель.",
+  "Watches your game's window while it's open, even behind others": "Стежить за вікном твоєї гри, поки воно відкрите, навіть за іншими вікнами",
+  "Your file stays whole: only the part between the handles plays.": "Твій файл лишається цілим: грає лише частина між повзунками."
 }

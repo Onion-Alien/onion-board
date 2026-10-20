@@ -2766,7 +2766,6 @@
   "Only looks: never clicks or types in your game": "Sadece bakar: oyununda asla tıklamaz veya yazmaz",
   "Plays one of your sounds when something happens in your game.": "Oyununda bir şey olduğunda seslerinden birini çalar.",
   "Rare spawns, queue pops, “YOU DIED”": "Nadir doğmalar, sıra açılması, “YOU DIED”",
-  "Watches the game's window, even behind others": "Oyunun penceresini izler, diğerlerinin arkasında olsa bile",
   "Browsers": "Tarayıcılar",
   "Calls & chat": "Aramalar ve sohbet",
   "Games": "Oyunlar",
@@ -4133,7 +4132,6 @@
   "Reset effects": "Efektleri sıfırla",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Tüm efektleri kapatır (kırpma kalır). Çalan ses hemen düz haline döner.",
   "✓ The playing sound has your changes. Cancel puts it back.": "✓ Çalan seste artık değişikliklerin var. İptal eski haline getirir.",
-  "Most liked": "En çok beğenilenler",
   "3 AM Gremlin": "Gece 3 Gremlini",
   "Achievements": "Başarımlar",
   "Add 1,000 sounds.": "1.000 ses ekle.",
@@ -4340,5 +4338,11 @@
   "Your headset's mic is off": "Kulaklığının mikrofonu kapalı",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> mikrofonunun bağlantısı koptu. Yeniden bağla, seslerin tekrar gitsin.",
   "Put the sound first on a busy PC": "Bilgisayar meşgulken sese öncelik ver",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Board'u normalin üstünde öncelikle çalıştırır, böylece diğer programlar sesin takılmasına yol açamaz. Çok az CPU kullanır, oyunlar fark etmez."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Board'u normalin üstünde öncelikle çalıştırır, böylece diğer programlar sesin takılmasına yol açamaz. Çok az CPU kullanır, oyunlar fark etmez.",
+  "All sounds: most liked": "Tüm sesler: en çok beğenilenler",
+  "All sounds: newest": "Tüm sesler: en yeni",
+  "All sounds: trending": "Tüm sesler: trend olan",
+  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Pencere pano için fazla küçük, bu yüzden bu mini oynatıcı. Panoyu geri almak için pencereyi büyüt.",
+  "Watches your game's window while it's open, even behind others": "Oyununun penceresini açık olduğu sürece izler, diğerlerinin arkasında olsa bile",
+  "Your file stays whole: only the part between the handles plays.": "Dosyan bütün kalır: sadece tutamaçların arasındaki kısım çalar."
 }

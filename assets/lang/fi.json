@@ -2766,7 +2766,6 @@
   "Only looks: never clicks or types in your game": "Vain katsoo: ei koskaan napsauta tai kirjoita peliisi",
   "Plays one of your sounds when something happens in your game.": "Soittaa yhden äänistäsi, kun pelissä tapahtuu jotain.",
   "Rare spawns, queue pops, “YOU DIED”": "Harvinaiset spawnit, jono valmis, “YOU DIED”",
-  "Watches the game's window, even behind others": "Tarkkailee pelin ikkunaa, myös muiden takana",
   "Browsers": "Selaimet",
   "Calls & chat": "Puhelut ja chat",
   "Games": "Pelit",
@@ -4133,7 +4132,6 @@
   "Reset effects": "Nollaa efektit",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Poistaa kaikki efektit (rajaus säilyy). Soiva ääni palaa heti tavalliseksi.",
   "✓ The playing sound has your changes. Cancel puts it back.": "✓ Soivassa äänessä on nyt muutoksesi. Peruuta palauttaa sen.",
-  "Most liked": "Tykätyimmät",
   "3 AM Gremlin": "Kello 3:n gremlin",
   "Achievements": "Saavutukset",
   "Add 1,000 sounds.": "Lisää 1 000 ääntä.",
@@ -4340,5 +4338,11 @@
   "Your headset's mic is off": "Kuulokkeidesi mikrofoni on pois päältä",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Kuulokkeiden <b>{headset}</b> mikrofonin yhteys katkesi. Yhdistä se uudelleen, niin äänesi kuuluvat taas.",
   "Put the sound first on a busy PC": "Ääni ensin, kun PC on kuormitettu",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Ajaa boardia normaalia korkeammalla prioriteetilla, jotta muut ohjelmat eivät saa ääntä katkeilemaan. Se käyttää hyvin vähän suoritinta, joten pelit eivät huomaa sitä."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Ajaa boardia normaalia korkeammalla prioriteetilla, jotta muut ohjelmat eivät saa ääntä katkeilemaan. Se käyttää hyvin vähän suoritinta, joten pelit eivät huomaa sitä.",
+  "All sounds: most liked": "Kaikki äänet: tykätyimmät",
+  "All sounds: newest": "Kaikki äänet: uusimmat",
+  "All sounds: trending": "Kaikki äänet: trendaavat",
+  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Ikkuna on liian pieni boardille, joten tämä on minisoitin. Suurenna sitä saadaksesi boardin takaisin.",
+  "Watches your game's window while it's open, even behind others": "Tarkkailee pelisi ikkunaa, kun se on auki, myös muiden takana",
+  "Your file stays whole: only the part between the handles plays.": "Tiedostosi pysyy kokonaisena: vain kahvojen välinen osa soi."
 }

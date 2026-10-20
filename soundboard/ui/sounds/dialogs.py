@@ -158,8 +158,12 @@ class EffectsPanel(QWidget):
         v.addWidget(section_label(_("Trim")))
         self._v = v
         self.trim_hint = hint_label(_("Trimming works once the sound has loaded."))
+        # it only picks the part that plays: someone hunted for the cut file
+        self.trim_kept = hint_label(_("Your file stays whole: only the part between the "
+                                      "handles plays."))
         self.trim = self._new_trim(meta)
         v.addWidget(self.trim_hint)
+        v.addWidget(self.trim_kept)
 
         v.addWidget(section_label(_("Speed & pitch")))
         self.speed = ParamSlider(SPEED, 1.0, centred=True)
@@ -219,6 +223,7 @@ class EffectsPanel(QWidget):
             self._v.insertWidget(at, trim)
         trim.setVisible(length > 0)     # it flashed up as a window of its own
         self.trim_hint.setVisible(length <= 0)
+        self.trim_kept.setVisible(length > 0)
         trim.changed.connect(self._edited)
         return trim
 

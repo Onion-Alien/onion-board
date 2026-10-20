@@ -2709,7 +2709,6 @@
   "Only looks: never clicks or types in your game": "Hanya melihat: tak pernah mengklik atau mengetik di game-mu",
   "Plays one of your sounds when something happens in your game.": "Memutar salah satu suaramu saat sesuatu terjadi di game-mu.",
   "Rare spawns, queue pops, “YOU DIED”": "Spawn langka, antrean muncul, “YOU DIED”",
-  "Watches the game's window, even behind others": "Mengawasi jendela game, bahkan di balik jendela lain",
   "Browsers": "Browser",
   "Calls & chat": "Panggilan & obrolan",
   "Games": "Game",
@@ -4059,7 +4058,6 @@
   "Reset effects": "Reset efek",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Matikan semua efek (potongannya tetap). Suara yang diputar langsung kembali polos.",
   "✓ The playing sound has your changes. Cancel puts it back.": "✓ Suara yang diputar sudah memakai perubahanmu. Batal mengembalikannya.",
-  "Most liked": "Paling disukai",
   "3 AM Gremlin": "Gremlin Jam 3 Pagi",
   "Achievements": "Pencapaian",
   "Add 1,000 sounds.": "Tambahkan 1.000 suara.",
@@ -4266,5 +4264,11 @@
   "Your headset's mic is off": "Mikrofon headset-mu mati",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofon di <b>{headset}</b> terputus. Sambungkan lagi dan suaramu akan keluar lagi.",
   "Put the sound first on a busy PC": "Utamakan suara saat PC sibuk",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Menjalankan board dengan prioritas di atas normal, supaya program lain tidak bikin suara tersendat. Pemakaian CPU-nya sangat kecil, jadi game tidak akan terasa."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Menjalankan board dengan prioritas di atas normal, supaya program lain tidak bikin suara tersendat. Pemakaian CPU-nya sangat kecil, jadi game tidak akan terasa.",
+  "All sounds: most liked": "Semua suara: paling disukai",
+  "All sounds: newest": "Semua suara: terbaru",
+  "All sounds: trending": "Semua suara: sedang tren",
+  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Jendelanya terlalu kecil untuk board, jadi ini pemutar mini. Perbesar untuk mengembalikan board.",
+  "Watches your game's window while it's open, even behind others": "Mengawasi jendela game-mu selama terbuka, bahkan di balik jendela lain",
+  "Your file stays whole: only the part between the handles plays.": "File-mu tetap utuh: hanya bagian di antara pegangan yang diputar."
 }

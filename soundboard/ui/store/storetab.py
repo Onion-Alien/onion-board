@@ -737,9 +737,10 @@ class StoreTab(QWidget):
         for each category. The voices: "All categories", then each kind."""
         self.cat_pick.clear()
         if self._mode == "sounds":
-            items = [(TOPS["trending"], _("Trending"), "flame"),
-                     (TOPS["top"], _("Most liked"), "like"),
-                     (TOPS["new"], _("Newest"), "history"), *items]
+            # "All sounds:" first, so an order doesn't read as one more category
+            items = [(TOPS["trending"], _("All sounds: trending"), "flame"),
+                     (TOPS["top"], _("All sounds: most liked"), "like"),
+                     (TOPS["new"], _("All sounds: newest"), "history"), *items]
         else:
             items = [("", _("All categories"), storelook.ALL_ICON), *items]
         for key, text, _icon in items:

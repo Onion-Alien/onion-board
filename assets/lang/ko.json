@@ -2709,7 +2709,6 @@
   "Only looks: never clicks or types in your game": "보기만 해요: 게임에서 클릭하거나 입력하지 않아요",
   "Plays one of your sounds when something happens in your game.": "게임에서 무슨 일이 생기면 내 사운드 중 하나를 재생해요.",
   "Rare spawns, queue pops, “YOU DIED”": "희귀 스폰, 매칭 성공, “YOU DIED”",
-  "Watches the game's window, even behind others": "다른 창 뒤에 있어도 게임 창을 지켜봐요",
   "Browsers": "브라우저",
   "Calls & chat": "통화 및 채팅",
   "Games": "게임",
@@ -4059,7 +4058,6 @@
   "Reset effects": "효과 초기화",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "모든 효과를 꺼요(자르기는 유지). 재생 중인 사운드가 바로 원래 소리로 돌아가요.",
   "✓ The playing sound has your changes. Cancel puts it back.": "✓ 재생 중인 사운드에 변경 사항이 적용됐어요. 취소하면 되돌아가요.",
-  "Most liked": "좋아요 많은 순",
   "3 AM Gremlin": "새벽 3시의 그렘린",
   "Achievements": "업적",
   "Add 1,000 sounds.": "사운드를 1,000개 추가하세요.",
@@ -4266,5 +4264,11 @@
   "Your headset's mic is off": "헤드셋 마이크가 꺼져 있어요",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b>의 마이크 연결이 끊겼어요. 다시 연결하면 사운드가 다시 나가요.",
   "Put the sound first on a busy PC": "PC가 바쁠 때 소리를 우선",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "보드를 보통보다 높은 우선순위로 실행해서 다른 프로그램 때문에 소리가 끊기지 않게 합니다. CPU를 아주 조금만 쓰므로 게임에는 티가 나지 않습니다."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "보드를 보통보다 높은 우선순위로 실행해서 다른 프로그램 때문에 소리가 끊기지 않게 합니다. CPU를 아주 조금만 쓰므로 게임에는 티가 나지 않습니다.",
+  "All sounds: most liked": "모든 사운드: 좋아요 많은 순",
+  "All sounds: newest": "모든 사운드: 최신",
+  "All sounds: trending": "모든 사운드: 인기 급상승",
+  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "창이 보드에 비해 너무 작아서 미니 플레이어가 됐어요. 창을 크게 늘리면 보드가 돌아와요.",
+  "Watches your game's window while it's open, even behind others": "게임 창이 열려 있는 동안 지켜봐요. 다른 창 뒤에 있어도요",
+  "Your file stays whole: only the part between the handles plays.": "파일은 그대로 남아요. 핸들 사이 부분만 재생돼요."
 }

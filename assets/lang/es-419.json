@@ -2766,7 +2766,6 @@
   "Only looks: never clicks or types in your game": "Solo mira: nunca hace clic ni escribe en tu juego",
   "Plays one of your sounds when something happens in your game.": "Reproduce uno de tus sonidos cuando pasa algo en tu juego.",
   "Rare spawns, queue pops, “YOU DIED”": "Apariciones raras, partida encontrada, “YOU DIED”",
-  "Watches the game's window, even behind others": "Vigila la ventana del juego, incluso detrás de otras",
   "Browsers": "Navegadores",
   "Calls & chat": "Llamadas y chat",
   "Games": "Juegos",
@@ -4133,7 +4132,6 @@
   "Reset effects": "Restablecer efectos",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Apaga todos los efectos (el recorte se queda). El sonido que suena vuelve a normal al instante.",
   "✓ The playing sound has your changes. Cancel puts it back.": "✓ El sonido que suena ya tiene tus cambios. Cancelar lo deja como estaba.",
-  "Most liked": "Los más gustados",
   "3 AM Gremlin": "Gremlin de las 3 a. m.",
   "Achievements": "Logros",
   "Add 1,000 sounds.": "Agrega 1.000 sonidos.",
@@ -4340,5 +4338,11 @@
   "Your headset's mic is off": "El micrófono de tus audífonos está apagado",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "El micrófono de <b>{headset}</b> se desconectó. Vuelve a conectarlo y tus sonidos saldrán de nuevo.",
   "Put the sound first on a busy PC": "Darle prioridad al sonido con la PC ocupada",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Ejecuta el board con prioridad superior a la normal, para que otros programas no hagan que el sonido se corte. Usa muy poca CPU, así que los juegos no lo notan."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Ejecuta el board con prioridad superior a la normal, para que otros programas no hagan que el sonido se corte. Usa muy poca CPU, así que los juegos no lo notan.",
+  "All sounds: most liked": "Todos los sonidos: los más gustados",
+  "All sounds: newest": "Todos los sonidos: los más nuevos",
+  "All sounds: trending": "Todos los sonidos: tendencia",
+  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "La ventana es muy chica para el tablero, así que este es el minirreproductor. Agrándala para recuperar el tablero.",
+  "Watches your game's window while it's open, even behind others": "Vigila la ventana de tu juego mientras está abierta, incluso detrás de otras",
+  "Your file stays whole: only the part between the handles plays.": "Tu archivo queda entero: solo suena la parte entre los controles."
 }

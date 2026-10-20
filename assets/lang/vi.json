@@ -2709,7 +2709,6 @@
   "Only looks: never clicks or types in your game": "Chỉ nhìn: không bao giờ nhấp hay gõ trong game của bạn",
   "Plays one of your sounds when something happens in your game.": "Phát một âm thanh của bạn khi có gì đó xảy ra trong game.",
   "Rare spawns, queue pops, “YOU DIED”": "Quái hiếm xuất hiện, ghép trận xong, “YOU DIED”",
-  "Watches the game's window, even behind others": "Theo dõi cửa sổ game, kể cả khi bị che",
   "Browsers": "Trình duyệt",
   "Calls & chat": "Gọi & trò chuyện",
   "Games": "Trò chơi",
@@ -4059,7 +4058,6 @@
   "Reset effects": "Đặt lại hiệu ứng",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Tắt mọi hiệu ứng (đoạn cắt vẫn giữ). Âm thanh đang phát trở lại bình thường ngay.",
   "✓ The playing sound has your changes. Cancel puts it back.": "✓ Âm thanh đang phát đã có thay đổi của bạn. Hủy sẽ đưa nó về như cũ.",
-  "Most liked": "Được thích nhiều nhất",
   "3 AM Gremlin": "Gremlin 3 giờ sáng",
   "Achievements": "Thành tựu",
   "Add 1,000 sounds.": "Thêm 1.000 âm thanh.",
@@ -4266,5 +4264,11 @@
   "Your headset's mic is off": "Micrô của tai nghe đang tắt",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Micrô của <b>{headset}</b> đã ngắt kết nối. Kết nối lại và âm thanh của bạn sẽ được gửi đi lại.",
   "Put the sound first on a busy PC": "Ưu tiên âm thanh khi PC đang bận",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Chạy board ở mức ưu tiên trên bình thường, để các chương trình khác không làm âm thanh bị giật. Nó dùng rất ít CPU nên game sẽ không thấy khác biệt."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Chạy board ở mức ưu tiên trên bình thường, để các chương trình khác không làm âm thanh bị giật. Nó dùng rất ít CPU nên game sẽ không thấy khác biệt.",
+  "All sounds: most liked": "Mọi âm thanh: được thích nhiều nhất",
+  "All sounds: newest": "Mọi âm thanh: mới nhất",
+  "All sounds: trending": "Mọi âm thanh: xu hướng",
+  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Cửa sổ quá nhỏ cho bảng nên đây là trình phát mini. Kéo to ra để quay lại bảng.",
+  "Watches your game's window while it's open, even behind others": "Theo dõi cửa sổ game của bạn khi nó đang mở, kể cả khi bị che",
+  "Your file stays whole: only the part between the handles plays.": "Tệp của bạn vẫn nguyên vẹn: chỉ phần giữa hai tay nắm được phát."
 }

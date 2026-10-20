@@ -2766,7 +2766,6 @@
   "Only looks: never clicks or types in your game": "Kijkt alleen: klikt of typt nooit in je game",
   "Plays one of your sounds when something happens in your game.": "Speelt een van je geluiden als er iets gebeurt in je game.",
   "Rare spawns, queue pops, “YOU DIED”": "Zeldzame spawns, wachtrij klaar, “YOU DIED”",
-  "Watches the game's window, even behind others": "Houdt het gamevenster in de gaten, ook achter andere",
   "Browsers": "Browsers",
   "Calls & chat": "Bellen en chatten",
   "Games": "Games",
@@ -4133,7 +4132,6 @@
   "Reset effects": "Effecten resetten",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Zet alle effecten uit (het inkorten blijft). Het geluid dat speelt klinkt meteen weer gewoon.",
   "✓ The playing sound has your changes. Cancel puts it back.": "✓ Het geluid dat speelt heeft je wijzigingen. Annuleren zet het terug.",
-  "Most liked": "Meest geliket",
   "3 AM Gremlin": "Gremlin van 3 uur",
   "Achievements": "Prestaties",
   "Add 1,000 sounds.": "Voeg 1.000 geluiden toe.",
@@ -4340,5 +4338,11 @@
   "Your headset's mic is off": "De microfoon van je headset staat uit",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "De microfoon van <b>{headset}</b> is losgekoppeld. Verbind hem opnieuw en je geluiden gaan weer naar buiten.",
   "Put the sound first on a busy PC": "Geluid eerst als de pc druk bezig is",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Laat het board draaien met een hogere prioriteit dan normaal, zodat andere programma's het geluid niet laten haperen. Het gebruikt heel weinig CPU, dus games merken er niets van."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Laat het board draaien met een hogere prioriteit dan normaal, zodat andere programma's het geluid niet laten haperen. Het gebruikt heel weinig CPU, dus games merken er niets van.",
+  "All sounds: most liked": "Alle geluiden: meest geliket",
+  "All sounds: newest": "Alle geluiden: nieuwste",
+  "All sounds: trending": "Alle geluiden: populair",
+  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Het venster is te klein voor het board, dus dit is de minispeler. Maak het groter om het board terug te krijgen.",
+  "Watches your game's window while it's open, even behind others": "Houdt het venster van je game in de gaten zolang het open is, ook achter andere",
+  "Your file stays whole: only the part between the handles plays.": "Je bestand blijft heel: alleen het deel tussen de grepen speelt af."
 }

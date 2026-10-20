@@ -2766,7 +2766,6 @@
   "Only looks: never clicks or types in your game": "सिर्फ़ देखता है: आपके गेम में कभी क्लिक या टाइप नहीं करता",
   "Plays one of your sounds when something happens in your game.": "आपके गेम में कुछ होने पर आपकी कोई आवाज़ चलाता है।",
   "Rare spawns, queue pops, “YOU DIED”": "दुर्लभ स्पॉन, क्यू पॉप, “YOU DIED”",
-  "Watches the game's window, even behind others": "गेम की विंडो पर नज़र रखता है, दूसरी विंडो के पीछे भी",
   "Browsers": "ब्राउज़र",
   "Calls & chat": "कॉल और चैट",
   "Games": "गेम",
@@ -4133,7 +4132,6 @@
   "Reset effects": "इफ़ेक्ट रीसेट करें",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "सारे इफ़ेक्ट बंद करें (ट्रिम बना रहेगा)। चल रहा साउंड तुरंत सादा हो जाता है।",
   "✓ The playing sound has your changes. Cancel puts it back.": "✓ चल रहे साउंड में आपके बदलाव लग गए। रद्द करें इसे वापस कर देता है।",
-  "Most liked": "सबसे पसंदीदा",
   "3 AM Gremlin": "रात 3 बजे का ग्रेमलिन",
   "Achievements": "उपलब्धियाँ",
   "Add 1,000 sounds.": "1,000 साउंड जोड़ें।",
@@ -4340,5 +4338,11 @@
   "Your headset's mic is off": "आपके हेडसेट का माइक बंद है",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> का माइक डिस्कनेक्ट हो गया। इसे फिर से जोड़ें, आपकी आवाज़ें फिर से जाने लगेंगी।",
   "Put the sound first on a busy PC": "PC व्यस्त हो तो आवाज़ को पहले रखें",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "बोर्ड को सामान्य से ऊँची प्राथमिकता पर चलाता है, ताकि दूसरे प्रोग्राम आवाज़ को अटकने न दें। यह बहुत कम CPU लेता है, इसलिए गेम्स को फ़र्क़ नहीं पड़ेगा।"
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "बोर्ड को सामान्य से ऊँची प्राथमिकता पर चलाता है, ताकि दूसरे प्रोग्राम आवाज़ को अटकने न दें। यह बहुत कम CPU लेता है, इसलिए गेम्स को फ़र्क़ नहीं पड़ेगा।",
+  "All sounds: most liked": "सभी साउंड: सबसे पसंदीदा",
+  "All sounds: newest": "सभी साउंड: नवीनतम",
+  "All sounds: trending": "सभी साउंड: रुझान",
+  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "विंडो बोर्ड के लिए बहुत छोटी है, इसलिए यह मिनी प्लेयर है। बोर्ड वापस पाने के लिए इसे बड़ा करें।",
+  "Watches your game's window while it's open, even behind others": "आपके गेम की विंडो खुली रहने तक उस पर नज़र रखता है, दूसरी विंडो के पीछे भी",
+  "Your file stays whole: only the part between the handles plays.": "आपकी फ़ाइल पूरी रहती है: सिर्फ़ हैंडल के बीच का हिस्सा चलता है।"
 }

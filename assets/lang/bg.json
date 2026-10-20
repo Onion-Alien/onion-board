@@ -2766,7 +2766,6 @@
   "Only looks: never clicks or types in your game": "Само гледа: никога не щраква и не пише в играта",
   "Plays one of your sounds when something happens in your game.": "Пуска един от звуците ви, когато нещо се случи в играта.",
   "Rare spawns, queue pops, “YOU DIED”": "Редки появи, намерен мач, “YOU DIED”",
-  "Watches the game's window, even behind others": "Следи прозореца на играта, дори зад други",
   "Browsers": "Браузъри",
   "Calls & chat": "Разговори и чат",
   "Games": "Игри",
@@ -4133,7 +4132,6 @@
   "Reset effects": "Нулирай ефектите",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Изключва всички ефекти (изрязването остава). Звукът, който свири, веднага става обикновен.",
   "✓ The playing sound has your changes. Cancel puts it back.": "✓ Звукът, който свири, вече е с промените ти. „Отказ“ го връща.",
-  "Most liked": "Най-харесвани",
   "3 AM Gremlin": "Гремлин в 3 през нощта",
   "Achievements": "Постижения",
   "Add 1,000 sounds.": "Добави 1000 звука.",
@@ -4340,5 +4338,11 @@
   "Your headset's mic is off": "Микрофонът на слушалките е изключен",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Микрофонът на <b>{headset}</b> прекъсна. Свържи го отново и звуците ти пак ще излизат.",
   "Put the sound first on a busy PC": "Звукът с предимство при натоварен компютър",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Пуска таблото с приоритет над нормалния, за да не могат други програми да накъсват звука. Ползва съвсем малко процесор, така че игрите няма да усетят."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Пуска таблото с приоритет над нормалния, за да не могат други програми да накъсват звука. Ползва съвсем малко процесор, така че игрите няма да усетят.",
+  "All sounds: most liked": "Всички звуци: най-харесвани",
+  "All sounds: newest": "Всички звуци: най-новите",
+  "All sounds: trending": "Всички звуци: тенденция",
+  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Прозорецът е твърде малък за таблото, затова това е мини плейърът. Направи го по-голям, за да върнеш таблото.",
+  "Watches your game's window while it's open, even behind others": "Следи прозореца на играта ти, докато е отворен, дори зад други",
+  "Your file stays whole: only the part between the handles plays.": "Файлът ти остава цял: звучи само частта между дръжките."
 }

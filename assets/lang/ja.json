@@ -2709,7 +2709,6 @@
   "Only looks: never clicks or types in your game": "見るだけ：ゲームでクリックや入力は一切しません",
   "Plays one of your sounds when something happens in your game.": "ゲームで何か起きたとき、あなたのサウンドを鳴らします。",
   "Rare spawns, queue pops, “YOU DIED”": "レア湧き、マッチング完了、“YOU DIED”",
-  "Watches the game's window, even behind others": "ゲームのウィンドウを見張ります（他のウィンドウの裏でも）",
   "Browsers": "ブラウザー",
   "Calls & chat": "通話とチャット",
   "Games": "ゲーム",
@@ -4059,7 +4058,6 @@
   "Reset effects": "エフェクトをリセット",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "すべてのエフェクトをオフにします（トリミングは残ります）。再生中のサウンドはすぐ元の音に戻ります。",
   "✓ The playing sound has your changes. Cancel puts it back.": "✓ 再生中のサウンドに変更が反映されました。キャンセルで元に戻ります。",
-  "Most liked": "いいねが多い順",
   "3 AM Gremlin": "深夜 3 時のグレムリン",
   "Achievements": "実績",
   "Add 1,000 sounds.": "サウンドを 1,000 個追加する。",
@@ -4266,5 +4264,11 @@
   "Your headset's mic is off": "ヘッドセットのマイクがオフです",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> のマイクが切断されました。もう一度接続すると、サウンドがまた届きます。",
   "Put the sound first on a busy PC": "PCが忙しいときもサウンドを優先",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "ボードを通常より高い優先度で動かし、ほかのプログラムのせいで音が途切れないようにします。CPUはほとんど使わないので、ゲームへの影響はありません。"
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "ボードを通常より高い優先度で動かし、ほかのプログラムのせいで音が途切れないようにします。CPUはほとんど使わないので、ゲームへの影響はありません。",
+  "All sounds: most liked": "すべてのサウンド: いいねが多い順",
+  "All sounds: newest": "すべてのサウンド: 最新",
+  "All sounds: trending": "すべてのサウンド: トレンド",
+  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "ウィンドウがボードには小さすぎるため、ミニプレーヤーになっています。広げるとボードに戻ります。",
+  "Watches your game's window while it's open, even behind others": "ゲームのウィンドウが開いている間見張ります（他のウィンドウの裏でも）",
+  "Your file stays whole: only the part between the handles plays.": "ファイルはそのまま残ります。ハンドルの間の部分だけが再生されます。"
 }

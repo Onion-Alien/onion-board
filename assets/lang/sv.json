@@ -2766,7 +2766,6 @@
   "Only looks: never clicks or types in your game": "Tittar bara: klickar eller skriver aldrig i ditt spel",
   "Plays one of your sounds when something happens in your game.": "Spelar ett av dina ljud när något händer i spelet.",
   "Rare spawns, queue pops, “YOU DIED”": "Sällsynta spawns, kön klar, ”YOU DIED”",
-  "Watches the game's window, even behind others": "Håller koll på spelfönstret, även bakom andra",
   "Browsers": "Webbläsare",
   "Calls & chat": "Samtal och chatt",
   "Games": "Spel",
@@ -4133,7 +4132,6 @@
   "Reset effects": "Återställ effekter",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Stänger av alla effekter (trimningen blir kvar). Ljudet som spelas blir rent direkt.",
   "✓ The playing sound has your changes. Cancel puts it back.": "✓ Ljudet som spelas har dina ändringar. Avbryt sätter tillbaka det.",
-  "Most liked": "Mest gillade",
   "3 AM Gremlin": "Klockan 3-gremlin",
   "Achievements": "Prestationer",
   "Add 1,000 sounds.": "Lägg till 1 000 ljud.",
@@ -4340,5 +4338,11 @@
   "Your headset's mic is off": "Ditt headsets mikrofon är av",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofonen på <b>{headset}</b> kopplades från. Anslut den igen så går dina ljud ut igen.",
   "Put the sound first on a busy PC": "Ljudet först när datorn har mycket att göra",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Kör boarden med högre prioritet än normalt, så att andra program inte får ljudet att hacka. Den använder väldigt lite CPU, så spel märker inget."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Kör boarden med högre prioritet än normalt, så att andra program inte får ljudet att hacka. Den använder väldigt lite CPU, så spel märker inget.",
+  "All sounds: most liked": "Alla ljud: mest gillade",
+  "All sounds: newest": "Alla ljud: nyaste",
+  "All sounds: trending": "Alla ljud: trendigt",
+  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Fönstret är för litet för boarden, så det här är minispelaren. Gör det större för att få tillbaka boarden.",
+  "Watches your game's window while it's open, even behind others": "Håller koll på ditt spels fönster medan det är öppet, även bakom andra",
+  "Your file stays whole: only the part between the handles plays.": "Din fil förblir hel: bara delen mellan handtagen spelas."
 }

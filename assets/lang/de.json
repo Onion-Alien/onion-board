@@ -2766,7 +2766,6 @@
   "Only looks: never clicks or types in your game": "Schaut nur zu: klickt oder tippt nie in deinem Spiel",
   "Plays one of your sounds when something happens in your game.": "Spielt einen deiner Sounds, wenn in deinem Spiel etwas passiert.",
   "Rare spawns, queue pops, “YOU DIED”": "Seltene Spawns, Warteschlange fertig, „YOU DIED“",
-  "Watches the game's window, even behind others": "Beobachtet das Spielfenster, auch hinter anderen",
   "Browsers": "Browser",
   "Calls & chat": "Anrufe & Chat",
   "Games": "Spiele",
@@ -4133,7 +4132,6 @@
   "Reset effects": "Effekte zurücksetzen",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Schaltet alle Effekte aus (der Zuschnitt bleibt). Ein laufender Sound klingt sofort wieder normal.",
   "✓ The playing sound has your changes. Cancel puts it back.": "✓ Der laufende Sound hat deine Änderungen. Abbrechen macht sie rückgängig.",
-  "Most liked": "Am beliebtesten",
   "3 AM Gremlin": "3-Uhr-Gremlin",
   "Achievements": "Erfolge",
   "Add 1,000 sounds.": "Füg 1.000 Sounds hinzu.",
@@ -4340,5 +4338,11 @@
   "Your headset's mic is off": "Das Mikrofon deines Headsets ist aus",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Das Mikrofon von <b>{headset}</b> hat die Verbindung verloren. Verbinde es wieder, dann gehen deine Sounds wieder raus.",
   "Put the sound first on a busy PC": "Sound zuerst, wenn der PC ausgelastet ist",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Lässt das Board mit höherer Priorität als normal laufen, damit andere Programme den Sound nicht stocken lassen. Es braucht sehr wenig CPU, Spiele merken also nichts."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Lässt das Board mit höherer Priorität als normal laufen, damit andere Programme den Sound nicht stocken lassen. Es braucht sehr wenig CPU, Spiele merken also nichts.",
+  "All sounds: most liked": "Alle Sounds: am beliebtesten",
+  "All sounds: newest": "Alle Sounds: neueste",
+  "All sounds: trending": "Alle Sounds: im Trend",
+  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Das Fenster ist zu klein für das Board, darum ist das hier der Mini-Player. Mach es größer, um das Board zurückzuholen.",
+  "Watches your game's window while it's open, even behind others": "Beobachtet das Fenster deines Spiels, solange es offen ist, auch hinter anderen",
+  "Your file stays whole: only the part between the handles plays.": "Deine Datei bleibt ganz: Nur der Teil zwischen den Griffen spielt."
 }

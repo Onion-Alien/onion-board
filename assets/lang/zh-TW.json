@@ -2709,7 +2709,6 @@
   "Only looks: never clicks or types in your game": "只看不動：絕不在遊戲裡點擊或打字",
   "Plays one of your sounds when something happens in your game.": "遊戲裡發生某件事時，播放你的一個音效。",
   "Rare spawns, queue pops, “YOU DIED”": "稀有重生、排隊成功、“YOU DIED”",
-  "Watches the game's window, even behind others": "盯著遊戲視窗，即使被其他視窗擋住",
   "Browsers": "瀏覽器",
   "Calls & chat": "通話與聊天",
   "Games": "遊戲",
@@ -4059,7 +4058,6 @@
   "Reset effects": "重設效果",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "關閉所有效果（修剪會保留）。播放中的音效會立刻回到原音。",
   "✓ The playing sound has your changes. Cancel puts it back.": "✓ 播放中的音效已套用你的修改。按取消可還原。",
-  "Most liked": "最受歡迎",
   "3 AM Gremlin": "凌晨 3 點的小搗蛋",
   "Achievements": "成就",
   "Add 1,000 sounds.": "新增 1,000 個聲音。",
@@ -4266,5 +4264,11 @@
   "Your headset's mic is off": "耳機的麥克風已關閉",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> 的麥克風斷開了。重新連接後，你的音效就會再次送出。",
   "Put the sound first on a busy PC": "電腦忙碌時優先保證聲音",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "以高於正常的優先順序執行音板，讓其他程式無法使聲音卡頓。它占用的 CPU 極少，遊戲不會受影響。"
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "以高於正常的優先順序執行音板，讓其他程式無法使聲音卡頓。它占用的 CPU 極少，遊戲不會受影響。",
+  "All sounds: most liked": "所有音效：最受歡迎",
+  "All sounds: newest": "所有音效：最新",
+  "All sounds: trending": "所有音效：流行趨勢",
+  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "視窗太小放不下面板，所以這是迷你播放器。把視窗拖大即可回到面板。",
+  "Watches your game's window while it's open, even behind others": "在你的遊戲視窗開著時盯著它，即使被其他視窗擋住",
+  "Your file stays whole: only the part between the handles plays.": "你的檔案保持完整：只會播放兩個把手之間的部分。"
 }

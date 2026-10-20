@@ -2823,7 +2823,6 @@
   "Only looks: never clicks or types in your game": "Doar privește: nu dă niciodată clic și nu tastează în joc",
   "Plays one of your sounds when something happens in your game.": "Redă unul dintre sunetele tale când se întâmplă ceva în joc.",
   "Rare spawns, queue pops, “YOU DIED”": "Spawn-uri rare, coadă gata, „YOU DIED”",
-  "Watches the game's window, even behind others": "Urmărește fereastra jocului, chiar și în spatele altora",
   "Browsers": "Browsere",
   "Calls & chat": "Apeluri și chat",
   "Games": "Jocuri",
@@ -4207,7 +4206,6 @@
   "Reset effects": "Resetează efectele",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Oprește toate efectele (tăietura rămâne). Sunetul care cântă revine imediat la normal.",
   "✓ The playing sound has your changes. Cancel puts it back.": "✓ Sunetul care cântă are acum modificările tale. Anulează îl readuce cum era.",
-  "Most liked": "Cele mai apreciate",
   "3 AM Gremlin": "Gremlinul de la 3",
   "Achievements": "Realizări",
   "Add 1,000 sounds.": "Adaugă 1.000 de sunete.",
@@ -4414,5 +4412,11 @@
   "Your headset's mic is off": "Microfonul căștilor e oprit",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Microfonul de pe <b>{headset}</b> s-a deconectat. Conectează-l din nou și sunetele tale ies iar.",
   "Put the sound first on a busy PC": "Sunetul pe primul loc când PC-ul e ocupat",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Rulează board-ul cu prioritate peste normal, ca alte programe să nu facă sunetul să sară. Folosește foarte puțin procesor, așa că jocurile nu vor observa."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Rulează board-ul cu prioritate peste normal, ca alte programe să nu facă sunetul să sară. Folosește foarte puțin procesor, așa că jocurile nu vor observa.",
+  "All sounds: most liked": "Toate sunetele: cele mai apreciate",
+  "All sounds: newest": "Toate sunetele: cele mai noi",
+  "All sounds: trending": "Toate sunetele: trending",
+  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Fereastra e prea mică pentru board, așa că acesta e mini playerul. Mărește-o ca să revină board-ul.",
+  "Watches your game's window while it's open, even behind others": "Urmărește fereastra jocului tău cât e deschisă, chiar și în spatele altora",
+  "Your file stays whole: only the part between the handles plays.": "Fișierul tău rămâne întreg: se redă doar partea dintre mânere."
 }

@@ -2766,7 +2766,6 @@
   "Only looks: never clicks or types in your game": "Μόνο κοιτάζει: ποτέ δεν κάνει κλικ ή πληκτρολογεί στο παιχνίδι",
   "Plays one of your sounds when something happens in your game.": "Παίζει έναν από τους ήχους σου όταν κάτι συμβαίνει στο παιχνίδι.",
   "Rare spawns, queue pops, “YOU DIED”": "Σπάνια spawn, ουρά που ανοίγει, “YOU DIED”",
-  "Watches the game's window, even behind others": "Παρακολουθεί το παράθυρο του παιχνιδιού, ακόμα και πίσω από άλλα",
   "Browsers": "Περιηγητές",
   "Calls & chat": "Κλήσεις και συνομιλίες",
   "Games": "Παιχνίδια",
@@ -4133,7 +4132,6 @@
   "Reset effects": "Επαναφορά εφέ",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Κλείνει όλα τα εφέ (το κόψιμο μένει). Ο ήχος που παίζει γίνεται αμέσως καθαρός.",
   "✓ The playing sound has your changes. Cancel puts it back.": "✓ Ο ήχος που παίζει έχει τις αλλαγές σου. Η Ακύρωση τον επαναφέρει.",
-  "Most liked": "Τα πιο αγαπημένα",
   "3 AM Gremlin": "Γκρέμλιν των 3 π.μ.",
   "Achievements": "Επιτεύγματα",
   "Add 1,000 sounds.": "Πρόσθεσε 1.000 ήχους.",
@@ -4340,5 +4338,11 @@
   "Your headset's mic is off": "Το μικρόφωνο των ακουστικών σου είναι κλειστό",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Το μικρόφωνο στα <b>{headset}</b> αποσυνδέθηκε. Σύνδεσέ το ξανά και οι ήχοι σου θα βγαίνουν πάλι.",
   "Put the sound first on a busy PC": "Πρώτα ο ήχος όταν το PC είναι φορτωμένο",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Τρέχει το board με προτεραιότητα πάνω από την κανονική, ώστε άλλα προγράμματα να μην κάνουν τον ήχο να κόβεται. Χρησιμοποιεί ελάχιστη CPU, οπότε τα παιχνίδια δεν θα το καταλάβουν."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Τρέχει το board με προτεραιότητα πάνω από την κανονική, ώστε άλλα προγράμματα να μην κάνουν τον ήχο να κόβεται. Χρησιμοποιεί ελάχιστη CPU, οπότε τα παιχνίδια δεν θα το καταλάβουν.",
+  "All sounds: most liked": "Όλοι οι ήχοι: τα πιο αγαπημένα",
+  "All sounds: newest": "Όλοι οι ήχοι: νεότεροι",
+  "All sounds: trending": "Όλοι οι ήχοι: τάσεις",
+  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Το παράθυρο είναι πολύ μικρό για το board, γι' αυτό αυτό είναι το μίνι πρόγραμμα αναπαραγωγής. Μεγάλωσέ το για να επιστρέψει το board.",
+  "Watches your game's window while it's open, even behind others": "Παρακολουθεί το παράθυρο του παιχνιδιού σου όσο είναι ανοιχτό, ακόμα και πίσω από άλλα",
+  "Your file stays whole: only the part between the handles plays.": "Το αρχείο σου μένει ολόκληρο: παίζει μόνο το κομμάτι ανάμεσα στις λαβές."
 }

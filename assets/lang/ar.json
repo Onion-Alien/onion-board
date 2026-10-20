@@ -2994,7 +2994,6 @@
   "Only looks: never clicks or types in your game": "يراقب فقط: لا ينقر ولا يكتب في لعبتك أبدًا",
   "Plays one of your sounds when something happens in your game.": "يشغّل أحد أصواتك عندما يحدث شيء في لعبتك.",
   "Rare spawns, queue pops, “YOU DIED”": "ظهور نادر، بدء المباراة، “YOU DIED”",
-  "Watches the game's window, even behind others": "يراقب نافذة اللعبة، حتى خلف النوافذ الأخرى",
   "Browsers": "المتصفحات",
   "Calls & chat": "المكالمات والدردشة",
   "Games": "الألعاب",
@@ -4429,7 +4428,6 @@
   "Reset effects": "إعادة ضبط التأثيرات",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "أوقف كل التأثيرات (يبقى القصّ). يعود الصوت المُشغَّل عاديًا فورًا.",
   "✓ The playing sound has your changes. Cancel puts it back.": "✓ الصوت المُشغَّل فيه تغييراتك الآن. «إلغاء» يعيده كما كان.",
-  "Most liked": "الأكثر إعجابًا",
   "3 AM Gremlin": "غريملن الثالثة فجرًا",
   "Achievements": "الإنجازات",
   "Add 1,000 sounds.": "أضف 1000 صوت.",
@@ -4636,5 +4634,11 @@
   "Your headset's mic is off": "مايك السماعة مطفأ",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "انقطع مايك <b>{headset}</b>. أعد توصيله وستخرج أصواتك من جديد.",
   "Put the sound first on a busy PC": "أعطِ الصوت الأولوية عندما يكون الكمبيوتر مشغولًا",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "يشغّل اللوحة بأولوية أعلى من العادية، فلا تستطيع البرامج الأخرى أن تجعل الصوت يتقطّع. تستهلك القليل جدًا من المعالج، فلن تلاحظ الألعاب شيئًا."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "يشغّل اللوحة بأولوية أعلى من العادية، فلا تستطيع البرامج الأخرى أن تجعل الصوت يتقطّع. تستهلك القليل جدًا من المعالج، فلن تلاحظ الألعاب شيئًا.",
+  "All sounds: most liked": "كل الأصوات: الأكثر إعجابًا",
+  "All sounds: newest": "كل الأصوات: الأحدث",
+  "All sounds: trending": "كل الأصوات: الأكثر رواجًا",
+  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "النافذة أصغر من اللوحة، لذا هذا هو المشغل المصغّر. كبّرها لاستعادة اللوحة.",
+  "Watches your game's window while it's open, even behind others": "يراقب نافذة لعبتك ما دامت مفتوحة، حتى خلف النوافذ الأخرى",
+  "Your file stays whole: only the part between the handles plays.": "يبقى ملفك كاملًا: لا يُشغَّل إلا الجزء الذي بين المقبضين."
 }

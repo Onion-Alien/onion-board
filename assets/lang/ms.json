@@ -2709,7 +2709,6 @@
   "Only looks: never clicks or types in your game": "Hanya melihat: tidak pernah klik atau menaip dalam permainan anda",
   "Plays one of your sounds when something happens in your game.": "Memainkan salah satu bunyi anda apabila sesuatu berlaku dalam permainan.",
   "Rare spawns, queue pops, “YOU DIED”": "Spawn jarang, giliran muncul, “YOU DIED”",
-  "Watches the game's window, even behind others": "Memerhati tetingkap permainan, walaupun di belakang yang lain",
   "Browsers": "Pelayar",
   "Calls & chat": "Panggilan & sembang",
   "Games": "Permainan",
@@ -4059,7 +4058,6 @@
   "Reset effects": "Tetapkan semula kesan",
   "Turn every effect off (the trim stays). A playing sound goes back to plain at once.": "Matikan semua kesan (potongan kekal). Bunyi yang dimainkan terus kembali biasa.",
   "✓ The playing sound has your changes. Cancel puts it back.": "✓ Bunyi yang dimainkan kini ada perubahan anda. Batal mengembalikannya.",
-  "Most liked": "Paling disukai",
   "3 AM Gremlin": "Gremlin Pukul 3 Pagi",
   "Achievements": "Pencapaian",
   "Add 1,000 sounds.": "Tambah 1,000 bunyi.",
@@ -4266,5 +4264,11 @@
   "Your headset's mic is off": "Mikrofon set kepala anda dimatikan",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Mikrofon pada <b>{headset}</b> terputus. Sambungkan semula dan bunyi anda akan keluar semula.",
   "Put the sound first on a busy PC": "Utamakan bunyi bila PC sibuk",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Menjalankan board pada keutamaan atas biasa, supaya program lain tidak membuat bunyi tersekat-sekat. Ia guna CPU yang sangat sedikit, jadi permainan tidak akan perasan."
+  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Menjalankan board pada keutamaan atas biasa, supaya program lain tidak membuat bunyi tersekat-sekat. Ia guna CPU yang sangat sedikit, jadi permainan tidak akan perasan.",
+  "All sounds: most liked": "Semua bunyi: paling disukai",
+  "All sounds: newest": "Semua bunyi: terbaru",
+  "All sounds: trending": "Semua bunyi: trending",
+  "The window is too small for the board, so this is the mini player. Make it bigger to get the board back.": "Tetingkap terlalu kecil untuk papan, jadi ini pemain mini. Besarkan untuk dapatkan papan semula.",
+  "Watches your game's window while it's open, even behind others": "Memerhati tetingkap permainan anda selagi ia terbuka, walaupun di belakang yang lain",
+  "Your file stays whole: only the part between the handles plays.": "Fail anda kekal penuh: hanya bahagian di antara pemegang dimainkan."
 }
