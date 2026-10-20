@@ -4345,5 +4345,9 @@
   "Not set up yet: only you will hear your sounds.": "Ei vielä käytössä: vain sinä kuulet äänesi.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Käytössä nyt: <b>{theme}</b>. Lisää teemoja asetuksissa: {n}",
   "Exact volume of {name}": "Ohjelman {name} tarkka äänenvoimakkuus",
-  "Volume of {name}": "Ohjelman {name} äänenvoimakkuus"
+  "Volume of {name}": "Ohjelman {name} äänenvoimakkuus",
+  "{n} sound is back.": [
+    "{n} ääni palasi.",
+    "{n} ääntä palasi."
+  ]
 }

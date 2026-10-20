@@ -4419,5 +4419,10 @@
   "Not set up yet: only you will hear your sounds.": "Zatím nenastaveno: své zvuky uslyšíš jen ty.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Teď používáš <b>{theme}</b>. Další motivy v Nastavení: {n}",
   "Exact volume of {name}": "Přesná hlasitost {name}",
-  "Volume of {name}": "Hlasitost {name}"
+  "Volume of {name}": "Hlasitost {name}",
+  "{n} sound is back.": [
+    "{n} zvuk je zpátky.",
+    "{n} zvuky jsou zpátky.",
+    "{n} zvuků je zpátky."
+  ]
 }

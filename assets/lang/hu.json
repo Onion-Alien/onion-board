@@ -4345,5 +4345,9 @@
   "Not set up yet: only you will hear your sounds.": "Még nincs beállítva: csak te hallod a hangjaidat.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Most ezt használod: <b>{theme}</b>. További témák a Beállításokban: {n}",
   "Exact volume of {name}": "{name} pontos hangereje",
-  "Volume of {name}": "{name} hangereje"
+  "Volume of {name}": "{name} hangereje",
+  "{n} sound is back.": [
+    "{n} hang visszatért.",
+    "{n} hang visszatért."
+  ]
 }

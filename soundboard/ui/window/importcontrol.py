@@ -101,8 +101,11 @@ class ImportControl(Controller):
         # given to it once it's in if nothing here has that key
         self._import_keys: dict[str, str] = {}
         # the pads come in a few at a time while a big import runs, each playable at once
+        # (the first one at once, as the card says; the ones landing right after it
+        # wait for this, so a big import doesn't rebuild the board for every sound)
         self._import_pads = QTimer(mw, singleShot=True, interval=300,
-                                   timeout=mw._rebuild_pads)   # pyright: ignore[reportCallIssue]
+                                   timeout=self._owed_pads)   # pyright: ignore[reportCallIssue]
+        self._pads_owed = False
 
     def open_sounds_folder(self):
         mw = self.mw
@@ -358,6 +361,13 @@ class ImportControl(Controller):
             t.setProperty("import_card", True)
             t.card.btn_close.clicked.connect(self._shut_import_card)
 
+    def _owed_pads(self):
+        """The import's pad timer: the sounds that landed since the last rebuild."""
+        if self._pads_owed:
+            self._pads_owed = False
+            self.mw._rebuild_pads()
+            self._import_pads.start()   # and the ones still coming wait again
+
     def _shut_import_card(self):
         if self._pending_imports > 0:
             self._import_card_shut = True
@@ -393,11 +403,16 @@ class ImportControl(Controller):
         elif err:
             self._import_errors.append(err)
         if self._pending_imports > 0:
-            if meta is not None and not self._import_pads.isActive():
-                self._import_pads.start()   # on the board soon, with the next few
+            if meta is not None:
+                if self._import_pads.isActive():
+                    self._pads_owed = True   # with the next few, in a moment
+                else:
+                    mw._rebuild_pads()   # on the board now, playable at once
+                    self._import_pads.start()
             self._import_progress()
             return
         self._import_pads.stop()
+        self._pads_owed = False
         self._pending_imports = 0
         self._import_card_shut = False
         self._import_stop.clear()

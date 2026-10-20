@@ -4271,5 +4271,8 @@
   "Not set up yet: only you will hear your sounds.": "まだ設定されていません：サウンドは自分にしか聞こえません。",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "いまは <b>{theme}</b> を使っています。設定にはほかに {n} 個のテーマがあります。",
   "Exact volume of {name}": "{name} の音量（数値）",
-  "Volume of {name}": "{name} の音量"
+  "Volume of {name}": "{name} の音量",
+  "{n} sound is back.": [
+    "{n} 個のサウンドを元に戻しました。"
+  ]
 }

@@ -4345,5 +4345,9 @@
   "Not set up yet: only you will hear your sounds.": "Pas encore configuré : toi seul entendras tes sons.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Tu utilises <b>{theme}</b> en ce moment. {n} autres thèmes dans les Paramètres.",
   "Exact volume of {name}": "Volume exact de {name}",
-  "Volume of {name}": "Volume de {name}"
+  "Volume of {name}": "Volume de {name}",
+  "{n} sound is back.": [
+    "{n} son est revenu.",
+    "{n} sons sont revenus."
+  ]
 }

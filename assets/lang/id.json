@@ -4271,5 +4271,8 @@
   "Not set up yet: only you will hear your sounds.": "Belum diatur: cuma kamu yang dengar suaramu.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Kamu sedang pakai <b>{theme}</b>. {n} tema lagi di Pengaturan.",
   "Exact volume of {name}": "Volume pasti {name}",
-  "Volume of {name}": "Volume {name}"
+  "Volume of {name}": "Volume {name}",
+  "{n} sound is back.": [
+    "{n} suara kembali."
+  ]
 }

@@ -4419,5 +4419,10 @@
   "Not set up yet: only you will hear your sounds.": "Пока не настроено: свои звуки слышишь только ты.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Сейчас у тебя <b>{theme}</b>. Ещё темы в настройках: {n}",
   "Exact volume of {name}": "Точная громкость {name}",
-  "Volume of {name}": "Громкость {name}"
+  "Volume of {name}": "Громкость {name}",
+  "{n} sound is back.": [
+    "{n} звук вернулся.",
+    "{n} звука вернулись.",
+    "{n} звуков вернулись."
+  ]
 }

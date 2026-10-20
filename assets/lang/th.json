@@ -4271,5 +4271,8 @@
   "Not set up yet: only you will hear your sounds.": "ยังไม่ได้ตั้งค่า: มีแค่คุณที่ได้ยินเสียงของคุณ",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "ตอนนี้ใช้ <b>{theme}</b> อยู่มีธีมอีก {n} แบบในการตั้งค่า",
   "Exact volume of {name}": "ระดับเสียงที่แน่นอนของ {name}",
-  "Volume of {name}": "ระดับเสียงของ {name}"
+  "Volume of {name}": "ระดับเสียงของ {name}",
+  "{n} sound is back.": [
+    "{n} เสียงกลับมาแล้ว"
+  ]
 }

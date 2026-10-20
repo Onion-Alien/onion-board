@@ -4419,5 +4419,10 @@
   "Not set up yet: only you will hear your sounds.": "Încă nu e configurat: doar tu îți auzi sunetele.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Acum folosești <b>{theme}</b>. Încă {n} teme în Setări.",
   "Exact volume of {name}": "Volumul exact al {name}",
-  "Volume of {name}": "Volumul {name}"
+  "Volume of {name}": "Volumul {name}",
+  "{n} sound is back.": [
+    "{n} sunet s-a întors.",
+    "{n} sunete s-au întors.",
+    "{n} de sunete s-au întors."
+  ]
 }

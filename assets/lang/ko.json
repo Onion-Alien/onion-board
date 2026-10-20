@@ -4271,5 +4271,8 @@
   "Not set up yet: only you will hear your sounds.": "아직 설정 안 됨: 내 사운드는 나만 들어요.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "지금 <b>{theme}</b> 테마를 쓰고 있어요. 설정에 테마가 {n}개 더 있어요.",
   "Exact volume of {name}": "{name} 정확한 볼륨",
-  "Volume of {name}": "{name} 볼륨"
+  "Volume of {name}": "{name} 볼륨",
+  "{n} sound is back.": [
+    "사운드 {n}개가 돌아왔어요."
+  ]
 }

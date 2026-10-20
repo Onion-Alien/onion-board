@@ -263,6 +263,30 @@ def test_undo_takes_the_new_sounds_off_again(main_window, qapp, tmp_path):  # no
     assert any(x.key == "undo-sounds" for x in toast.shown(w))
 
 
+def test_an_imported_sounds_pad_shows_as_soon_as_its_in(main_window, qapp, tmp_path):  # noqa: F811
+    """The card says "Each sound shows up as soon as it's in": the first one's pad is on
+    the board with the count, not 300 ms later; the next few come together."""
+    w = main_window
+    t = np.arange(SR // 10) / SR
+    files = []
+    for i, hz in enumerate((500, 900, 1300)):
+        p = tmp_path / f"Land {i}.wav"
+        sf.write(p, np.stack([np.sin(2 * np.pi * hz * t)] * 2, 1) * 0.3, SR)
+        files.append(str(p))
+    pads = len(w.pads)
+    seen = []
+    real = w.impctl._import_progress
+
+    def progress():
+        real()
+        seen.append(len(w.pads) - pads)
+    w.impctl._import_progress = progress
+    w.impctl.import_files(files)
+    assert process_events(qapp, lambda: not w.impctl._pending_imports)
+    assert seen[0] == 0 and 1 in seen[1:]   # "Adding 1 of 3…" with its pad there
+    assert len(w.pads) == pads + 3 and not w.impctl._pads_owed
+
+
 def test_the_veil_says_what_a_drop_does():
     assert label_for(["a.mp3", "b.wav"]) == "Drop to add 2 files"
     assert label_for(["one.ogg"]) == "Drop to add 1 file"

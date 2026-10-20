@@ -4271,5 +4271,8 @@
   "Not set up yet: only you will hear your sounds.": "Chưa thiết lập: chỉ mình bạn nghe được âm thanh của bạn.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Bạn đang dùng <b>{theme}</b>. Còn {n} chủ đề khác trong Cài đặt.",
   "Exact volume of {name}": "Âm lượng chính xác của {name}",
-  "Volume of {name}": "Âm lượng của {name}"
+  "Volume of {name}": "Âm lượng của {name}",
+  "{n} sound is back.": [
+    "{n} âm thanh đã trở lại."
+  ]
 }

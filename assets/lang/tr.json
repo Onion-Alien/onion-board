@@ -4345,5 +4345,9 @@
   "Not set up yet: only you will hear your sounds.": "Henüz ayarlanmadı: seslerini sadece sen duyacaksın.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Şu an <b>{theme}</b> kullanıyorsun. Ayarlar'da {n} tema daha var.",
   "Exact volume of {name}": "{name} tam ses düzeyi",
-  "Volume of {name}": "{name} ses düzeyi"
+  "Volume of {name}": "{name} ses düzeyi",
+  "{n} sound is back.": [
+    "{n} ses geri geldi.",
+    "{n} ses geri geldi."
+  ]
 }

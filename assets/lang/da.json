@@ -4345,5 +4345,9 @@
   "Not set up yet: only you will hear your sounds.": "Ikke sat op endnu: kun du hører dine lyde.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Du bruger <b>{theme}</b> nu. {n} flere temaer under Indstillinger.",
   "Exact volume of {name}": "Præcis lydstyrke for {name}",
-  "Volume of {name}": "Lydstyrke for {name}"
+  "Volume of {name}": "Lydstyrke for {name}",
+  "{n} sound is back.": [
+    "{n} lyd er tilbage.",
+    "{n} lyde er tilbage."
+  ]
 }

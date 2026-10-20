@@ -4271,5 +4271,8 @@
   "Not set up yet: only you will hear your sounds.": "還沒設定好：只有你自己聽得到你的音效。",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "你正在使用 <b>{theme}</b>。設定中還有 {n} 個主題。",
   "Exact volume of {name}": "{name} 的精確音量",
-  "Volume of {name}": "{name} 的音量"
+  "Volume of {name}": "{name} 的音量",
+  "{n} sound is back.": [
+    "{n} 個音效回來了。"
+  ]
 }

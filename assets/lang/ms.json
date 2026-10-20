@@ -4271,5 +4271,8 @@
   "Not set up yet: only you will hear your sounds.": "Belum disediakan: hanya anda dengar bunyi anda.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Anda sedang guna <b>{theme}</b>. {n} lagi tema dalam Tetapan.",
   "Exact volume of {name}": "Kelantangan tepat {name}",
-  "Volume of {name}": "Kelantangan {name}"
+  "Volume of {name}": "Kelantangan {name}",
+  "{n} sound is back.": [
+    "{n} bunyi kembali."
+  ]
 }

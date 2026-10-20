@@ -4345,5 +4345,9 @@
   "Not set up yet: only you will hear your sounds.": "Δεν έχει ρυθμιστεί ακόμα: μόνο εσύ θα ακούς τους ήχους σου.",
   "You're using <b>{theme}</b> now. {n} more themes in Settings.": "Τώρα χρησιμοποιείς το <b>{theme}</b>. Ακόμα {n} θέματα στις Ρυθμίσεις.",
   "Exact volume of {name}": "Ακριβής ένταση του {name}",
-  "Volume of {name}": "Ένταση του {name}"
+  "Volume of {name}": "Ένταση του {name}",
+  "{n} sound is back.": [
+    "{n} ήχος επέστρεψε.",
+    "{n} ήχοι επέστρεψαν."
+  ]
 }

@@ -1076,6 +1076,22 @@ def tab(qapp, app_dir, server):
     t.shutdown()
 
 
+def test_the_list_says_its_loading_until_the_stations_come(qapp, app_dir, server, monkeypatch):
+    """A click on a blank list did nothing and nothing said why: it says it's on its way."""
+    from soundboard.ui.radio.radiopanel import RadioTab
+    d = RadioDirectory(app_dir / "radio", bases=(server.base,))
+    monkeypatch.setattr(d, "load_globe", lambda *a, **k: None)   # still on its way
+    t = RadioTab(FakeEngine(), Config(), lambda: None, FakeMeter, directory=d, globe=False)
+    try:
+        t.start()
+        assert t.list.count() == 0 and t.list.empty_text() == "Finding stations…"
+        assert t.count_label.text() == "" and t.info.text() == ""   # not "0 stations", not twice
+        t._on_globe_stations([Station.from_api(api_station(i)) for i in range(3)])
+        assert t.list.count() == 3
+    finally:
+        t.shutdown()
+
+
 def test_tab_lists_popular_stations_and_starts_off_air(tab):
     assert tab.list.count() == 5
     assert tab.engine.radio_live is False and not tab.btn_live.isChecked()
