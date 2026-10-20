@@ -4254,5 +4254,17 @@
   "Size and speed": "크기와 속도",
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "켜져 있는 것은 이 색으로 보여요. 밀어서 원하는 색을 고르세요. 테마를 바꿔도 그대로예요.",
   "Already in your library as “{name}”": "이미 ' {name} '으로 라이브러리에 있습니다.",
-  "Names and tags can't have links in them.": "이름과 태그에는 링크를 넣을 수 없습니다."
+  "Names and tags can't have links in them.": "이름과 태그에는 링크를 넣을 수 없습니다.",
+  "<b>Alerts.</b> Pick a sound for a follow, a sub, a gift sub, a cheer (bits) and a raid. Leave one on <b>Nothing</b> to skip it.": "<b>경고.</b> 팔로우, 구독, 선물 구독, 응원(비트) 및 레이드에 대한 소리를 선택하세요. 건너뛰려면 <b>없음</b> 을 선택하세요.",
+  "<b>Channel points.</b> Make your rewards on Twitch first: Creator Dashboard → Viewer Rewards → Channel Points. Then click <b>Reload rewards</b> on the card and pick a sound for each one, or <b>A random sound</b>. Channel points are only for Twitch affiliates and partners.": "<b>채널 포인트.</b> 먼저 Twitch에서 보상을 받으세요: 스트리머 대시보드 → 시청자 보상 → 채널 포인트. 그런 다음 카드에서 <b>보상 다시 로드를</b> 클릭하고 각 보상에 대한 소리를 선택하거나 <b>임의의 소리를</b> 선택합니다. 채널 포인트는 Twitch 제휴사 및 파트너에게만 제공됩니다.",
+  "<b>Chat commands.</b> Tick <b>Chat commands</b>. Viewers type <b>!sound</b> and a sound's name, <b>!random</b>, or <b>!sounds</b> for the list, and Onion Board answers in your chat. Each viewer waits 30 seconds between commands by default, so chat can't spam you. Mods can type <b>!stop</b>.": "<b>채팅 명령.</b> <b>채팅 명령 을</b> 선택합니다. 시청자가 목록에 <b>!sound</b> 및 사운드 이름, <b>!random</b> 또는 <b>!sounds를</b> 입력하면 Onion Board가 채팅에서 답변합니다. 각 시청자는 기본적으로 명령 사이에 30초를 기다리므로 채팅에서 스팸을 보낼 수 없습니다. 모드는 <b>!stop 을</b> 입력할 수 있습니다.",
+  "<b>Connect.</b> Click <b>Connect Twitch</b>. A Twitch page opens: say yes to Onion Board (if it asks for a code, type the one the card shows). Keep Onion Board open while you stream (the tray is fine).": "<b>연결하다.</b> <b>Twitch 연결 을</b> 클릭하세요. Twitch 페이지가 열립니다. Onion Board에 '예'라고 대답하세요(코드를 묻는 경우 카드에 표시된 코드를 입력하세요). 스트리밍하는 동안 Onion Board를 열어두세요(트레이는 괜찮습니다).",
+  "<b>Let your stream hear the sounds.</b> Setup → Devices → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i>.": "<b>스트림에서 소리를 듣게 하세요.</b> 설정 → 장치 → <b>다음에서도 재생</b> : <b>스트리밍을 위해 Clean</b> 으로 설정된 장치를 추가한 다음 OBS에 해당 장치를 추가합니다: 소스 → + → <i>오디오 출력 캡처</i> .",
+  "<b>Try it.</b> Type <b>!random</b> in your own chat: you hear a sound.": "<b>시도해 보세요.</b> 자신의 채팅에 <b>!random</b> 을 입력하면 소리가 들립니다.",
+  "<b>Want more?</b> Longer or shorter cooldowns, who may use each command, a thank-you line read out for 100 bits, a voice for a reward: click <b>Copy AI prompt</b> and paste it into ChatGPT or Claude. It knows your rewards and sounds and walks you through it.": "<b>더 원하시나요?</b> 각 명령을 사용할 수 있는 더 길거나 더 짧은 쿨다운, 100비트로 읽어주는 감사 대사, 보상 음성: <b>AI 프롬프트 복사를</b> 클릭하고 ChatGPT 또는 Claude에 붙여넣습니다. 그것은 당신의 보상과 소리를 알고 그것을 통해 당신을 안내합니다.",
+  "A message for ChatGPT / Claude that explains the Twitch card and lists your rewards and sounds, so it can help you set it up": "Twitch 카드를 설명하고 보상과 사운드를 나열하여 설정하는 데 도움이 되는 ChatGPT/Claude용 메시지입니다.",
+  "Copied. Paste it into ChatGPT, Claude or any AI chat and say what you want your stream to do.": "복사되었습니다. ChatGPT, Claude 또는 AI 채팅에 붙여넣고 스트림에서 원하는 작업을 말하세요.",
+  "How channel points, alerts and chat commands work, step by step": "채널 포인트, 알림, 채팅 명령의 단계별 작동 방식",
+  "Twitch guide": "트위치 가이드",
+  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "시청자는 <b>채널 포인트</b> , 팔로우, 구독, 응원 또는 공격 시 <b>알림</b> , 채팅에서 <b>!명령을</b> 사용하여 사운드를 재생할 수 있습니다. Onion Board는 Twitch 자체와 통신하므로 설정할 봇이 없습니다."
 }

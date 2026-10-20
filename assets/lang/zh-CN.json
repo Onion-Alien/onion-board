@@ -4254,5 +4254,17 @@
   "Size and speed": "大小和速度",
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "开着的东西会显示成这个颜色。拖动来选你自己的颜色；换主题后也会保留。",
   "Already in your library as “{name}”": "已在你的音效库里，名为“{name}”",
-  "Names and tags can't have links in them.": "名称和标签里不能有链接。"
+  "Names and tags can't have links in them.": "名称和标签里不能有链接。",
+  "<b>Alerts.</b> Pick a sound for a follow, a sub, a gift sub, a cheer (bits) and a raid. Leave one on <b>Nothing</b> to skip it.": "<b>警报。</b>为跟随、低音、礼物低音、欢呼（位）和突袭选择声音。留下一个“ <b>Nothing”</b>以跳过它。",
+  "<b>Channel points.</b> Make your rewards on Twitch first: Creator Dashboard → Viewer Rewards → Channel Points. Then click <b>Reload rewards</b> on the card and pick a sound for each one, or <b>A random sound</b>. Channel points are only for Twitch affiliates and partners.": "<b>通道点。</b>首先在 Twitch 上获得奖励：创作者仪表板 → 观众奖励 → 频道积分。然后单击卡上的<b>“重新加载奖励”</b>并为每个奖励选择一个声音，或<b>“随机声音”</b> 。频道积分仅适用于 Twitch 附属机构和合作伙伴。",
+  "<b>Chat commands.</b> Tick <b>Chat commands</b>. Viewers type <b>!sound</b> and a sound's name, <b>!random</b>, or <b>!sounds</b> for the list, and Onion Board answers in your chat. Each viewer waits 30 seconds between commands by default, so chat can't spam you. Mods can type <b>!stop</b>.": "<b>聊天命令。</b>勾选<b>聊天命令</b>。观众在列表中输入<b>!sound</b>和声音名称、 <b>!random</b>或<b>!sounds</b> ，Onion Board 将在您的聊天中进行回答。默认情况下，每个查看者在命令之间等待 30 秒，因此聊天不会向您发送垃圾邮件。模组可以输入<b>!stop</b> 。",
+  "<b>Connect.</b> Click <b>Connect Twitch</b>. A Twitch page opens: say yes to Onion Board (if it asks for a code, type the one the card shows). Keep Onion Board open while you stream (the tray is fine).": "<b>连接。</b>单击<b>“连接 Twitch”</b> 。 Twitch 页面打开：对 Onion Board 说“是”（如果要求输入代码，请输入卡片上显示的代码）。直播时请保持洋葱板打开（托盘就可以）。",
+  "<b>Let your stream hear the sounds.</b> Setup → Devices → <b>Also play on</b>: add a device set to <b>Clean, for streaming</b>, then add that device in OBS: Sources → + → <i>Audio Output Capture</i>.": "<b>让您的直播听到声音。</b>设置 → 设备 →<b>同时播放</b>：添加设置为<b>Clean 的设备，用于流式传输</b>，然后在 OBS 中添加该设备：源 → + →<i>音频输出捕获</i>。",
+  "<b>Try it.</b> Type <b>!random</b> in your own chat: you hear a sound.": "<b>尝试一下。</b>在您自己的聊天中输入<b>!random</b> ：您会听到声音。",
+  "<b>Want more?</b> Longer or shorter cooldowns, who may use each command, a thank-you line read out for 100 bits, a voice for a reward: click <b>Copy AI prompt</b> and paste it into ChatGPT or Claude. It knows your rewards and sounds and walks you through it.": "<b>想要更多吗？</b>更长或更短的冷却时间，谁可以使用每个命令，读出 100 位的感谢行，奖励的声音：单击<b>“复制 AI 提示”</b>并将其粘贴到 ChatGPT 或 Claude 中。它知道您的奖励和声音，并引导您完成它。",
+  "A message for ChatGPT / Claude that explains the Twitch card and lists your rewards and sounds, so it can help you set it up": "给 ChatGPT / Claude 的消息，解释 Twitch 卡并列出您的奖励和声音，以便它可以帮助您进行设置",
+  "Copied. Paste it into ChatGPT, Claude or any AI chat and say what you want your stream to do.": "已复制。将其粘贴到 ChatGPT、Claude 或任何 AI 聊天中，并说出您希望直播执行的操作。",
+  "How channel points, alerts and chat commands work, step by step": "通道点、警报和聊天命令如何工作（分步）",
+  "Twitch guide": "抽搐指南",
+  "Your viewers can play your sounds: with <b>channel points</b>, with <b>alerts</b> when they follow, sub, cheer or raid, and with <b>!commands</b> in chat. Onion Board talks to Twitch itself, so there's no bot to set up.": "您的观众可以播放您的声音：使用<b>频道点</b>，跟随、订阅、欢呼或突袭时发出<b>警报</b>，以及聊天中的<b>! 命令</b>。 Onion Board 与 Twitch 本身进行对话，因此无需设置机器人。"
 }
