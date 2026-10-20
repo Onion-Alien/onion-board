@@ -330,6 +330,48 @@ class DiscordRow(QFrame):
         row.addWidget(self.button)
 
 
+def put_discord_back(mw, button, done):
+    """Discord back the way you talk, on a worker (its files); `done` (a Signal) gets
+    (what needed putting back, what's still open). A Discord that's open won't take
+    it, so that one's done the moment it closes (AlertControl)."""
+    if busy.is_busy(button):
+        return
+    busy.set_busy(button, True)
+    saved = dict(mw.cfg.discord_talk)
+
+    def work():
+        todo, left = [], []
+        try:
+            from soundboard.mic import discordtalk
+            from soundboard.sounds.library import APP_DIR
+            todo = discordtalk.to_restore(saved)
+            if todo:
+                left = discordtalk.restore(saved, APP_DIR / "discord-backup",
+                                           only=set(todo), always=True)
+        except Exception:  # noqa: BLE001 - say it, don't leave the button stuck
+            log.exception("putting Discord back failed")
+            todo, left = ["?"], ["?"]
+        busy.emit(done, todo, left)
+    threading.Thread(target=work, daemon=True, name="discord-back").start()
+
+
+def said_discord_back(mw, todo, left):
+    """put_discord_back's answer, as a toast on the window."""
+    if left == ["?"]:
+        mw.toast(_("Couldn't put Discord back. Turn on Noise Suppression, Echo "
+                   "Cancellation and Automatic Gain Control in its Voice & Video "
+                   "settings."), "warn")
+    elif not todo:
+        mw.toast(_("Discord is already set up for talking."), "ok")
+    elif left:
+        mw.alertctl.discord_pending |= set(left)
+        mw.toast(_("Close Discord and it's put back right away: Discord doesn't take "
+                   "changes while it's open."), "warn")
+    else:
+        mw.toast(_("Discord is back the way you talk: its noise suppression, echo "
+                   "cancellation and automatic volume are on again."), "ok")
+
+
 def actions_for(mic):
     """The buttons a mic gets: on it, its fix (if it needs one), a clean reinstall and
     remove; not on it, install and a clean-up of anything left behind. Unplugged: only
@@ -446,47 +488,13 @@ class RecoveryCard(QFrame):
         _STATUS_POLL.run(work)
 
     def put_discord_back(self):
-        """Discord back the way you talk, on a worker (its files); a Discord that's open
-        won't take it, so that one's done the moment it closes (AlertControl)."""
-        b = self.discord.button
-        if busy.is_busy(b):
-            return
-        busy.set_busy(b, True)
-        saved = dict(self.mw.cfg.discord_talk)
-
-        def work():
-            todo, left = [], []
-            try:
-                from soundboard.mic import discordtalk
-                from soundboard.sounds.library import APP_DIR
-                todo = discordtalk.to_restore(saved)
-                if todo:
-                    left = discordtalk.restore(saved, APP_DIR / "discord-backup",
-                                               only=set(todo), always=True)
-            except Exception:  # noqa: BLE001 - say it, don't leave the button stuck
-                log.exception("putting Discord back failed")
-                todo, left = ["?"], ["?"]
-            busy.emit(self.discord_back, todo, left)
-        threading.Thread(target=work, daemon=True, name="discord-back").start()
+        put_discord_back(self.mw, self.discord.button, self.discord_back)
 
     def _discord_back(self, todo, left):
         if not qt_valid(self):
             return
         busy.set_busy(self.discord.button, False)
-        mw = self.mw
-        if left == ["?"]:
-            mw.toast(_("Couldn't put Discord back. Turn on Noise Suppression, Echo "
-                       "Cancellation and Automatic Gain Control in its Voice & Video "
-                       "settings."), "warn")
-        elif not todo:
-            mw.toast(_("Discord is already set up for talking."), "ok")
-        elif left:
-            mw.alertctl.discord_pending |= set(left)
-            mw.toast(_("Close Discord and it's put back right away: Discord doesn't take "
-                       "changes while it's open."), "warn")
-        else:
-            mw.toast(_("Discord is back the way you talk: its noise suppression, echo "
-                       "cancellation and automatic volume are on again."), "ok")
+        said_discord_back(self.mw, todo, left)
 
     def shown(self):
         """The mics the card lists: Windows' list, or, when it lists none, the app's

@@ -200,6 +200,30 @@ def test_put_back_waits_for_an_open_discord_to_close(window, monkeypatch, tmp_pa
     card.deleteLater()
 
 
+def test_set_up_window_puts_discord_back_too(window, monkeypatch):  # noqa: F811
+    """The "set up for your sounds" window shows Audio recovery's Put Discord back
+    row, and its button really does it (it used to be a picture of the button)."""
+    import time
+    from PySide6.QtWidgets import QApplication
+    from soundboard.ui.setup.chatguide import DiscordFixed
+    toasts, asked = [], []
+    monkeypatch.setattr(window, "toast", lambda text, kind="", *a, **k: toasts.append(text))
+    monkeypatch.setattr(dt, "to_restore", lambda saved: ["discord"])
+    monkeypatch.setattr(dt, "restore", lambda saved, root, **k: asked.append(k) or [])
+    box = DiscordFixed(window, "Discord", [("Echo Cancellation", "On", "Off")], False,
+                       mw=window)
+    assert not box.back.button.isHidden()
+    box.back.button.click()
+    end = time.monotonic() + 5
+    while not toasts and time.monotonic() < end:
+        QApplication.processEvents()
+        time.sleep(0.01)
+    assert asked and asked[0]["only"] == {"discord"} and asked[0]["always"]
+    assert "back the way you talk" in toasts[-1]
+    assert box.result() == DiscordFixed.DialogCode.Accepted   # its news is old now
+    box.deleteLater()
+
+
 # ---------------------------------------------------------------- setting it up for sounds
 
 TALK = {"activeInputProfile": "CUSTOM", "noiseCancellation": True, "echoCancellation": True,
