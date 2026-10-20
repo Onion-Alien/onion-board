@@ -719,6 +719,30 @@ def test_mic_gate_mutes_the_mic_only_while_a_sound_plays():
     assert mic_level() > 0.4
 
 
+def test_mic_gate_opens_when_the_sound_ends_on_that_output():
+    """Stop all with the gate on: the sound ended on the mic's output, but the
+    headphones' stream hadn't taken its last block yet. The gate waited for every
+    output, so the mic stayed muted for others until that one caught up (never, while
+    it was stalled)."""
+    e = engine_with("main", "mon")
+    mic = np.full((480, 2), 0.5, np.float32)
+    silent = np.zeros((480, 2), np.float32)
+
+    def mic_level():
+        return float(np.abs(e._send_bus("main", silent.copy(), mic)).max())
+    e.mic_gate = True
+    v = e.play("a", tone(), 1.0)
+    for _ in range(5):
+        mic_level()
+    assert mic_level() == 0.0
+    v.stopping = True
+    v.done.add("main")                           # gone from the mic, still on "mon"
+    assert not v.silent
+    for _ in range(5):
+        mic_level()
+    assert mic_level() > 0.4
+
+
 def test_a_broken_block_from_a_program_is_silenced():
     """A captured program handing over NaN / Inf must not reach the send chain's
     filters (one NaN there silences the call until a restart)."""
