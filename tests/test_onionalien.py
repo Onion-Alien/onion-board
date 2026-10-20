@@ -98,6 +98,11 @@ def test_clicks_make_him_cry_then_eat_the_window(qapp):
     gulp.set_t(gulp.blank_at + 10)
     assert all(gulp._piece_at(i) is None for i in range(len(gulp.pieces)))   # all gone
     gulp.set_t(gulp.blank_at + 1000)
+    # sitting on the empty window: a slower clock, and only his spot repainted
+    assert gulp._timer.interval() == gulp.SIT_FRAME_MS
+    box = gulp._sit_box()
+    assert gulp.rect().contains(box) and box.width() < gulp.width()
+    assert box.contains(gulp.big.toAlignedRect())
     QTest.keyClicks(gulp, "onion")
     assert gulp.t == gulp.blank_at + 1000         # not yet
     QTest.keyClicks(gulp, "Alien Please")         # "onionalien please": give it back

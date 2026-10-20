@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import math
 
-from PySide6.QtCore import (QElapsedTimer, QEvent, QPointF, QRectF, QSize, Qt, QTimer,
+from PySide6.QtCore import (QElapsedTimer, QEvent, QPointF, QRect, QRectF, QSize, Qt, QTimer,
                             Signal)
 from PySide6.QtGui import (QColor, QFont, QFontMetricsF, QImage, QPainter, QPainterPath, QPen,
                            QPixmap, QRadialGradient, QTextLayout, QTextOption)
@@ -527,6 +527,8 @@ class OnionGulp(QWidget):
     OPEN_MS = 450       # mouth open again
     HOME_MS = 600       # back into the note
     MAGIC = "onionalienplease"   # typed while he's out (spaces and case don't matter)
+    FRAME_MS = 16       # while the pieces fly
+    SIT_FRAME_MS = 33   # while he sits on the empty window (just a slow bob)
 
     def __init__(self, note: AlienNote, win: QWidget):
         super().__init__(win)
@@ -566,7 +568,8 @@ class OnionGulp(QWidget):
         self.end = self.home_at + self.HOME_MS
         self._clock = QElapsedTimer()
         self._timer = QTimer(self)
-        self._timer.setInterval(16)
+        self._timer.setInterval(self.FRAME_MS)
+        self._sat = False           # the last frame was the empty window
         self.skipped = 0.0          # ms jumped ahead by "onionalien please"
         self.typed = ""
         self._timer.timeout.connect(
@@ -619,20 +622,34 @@ class OnionGulp(QWidget):
         self.t = t
         if t >= self.end:
             self.stop()
+            return
+        sitting = self.blank_at <= t < self.spit_at - self.OPEN_MS
+        self._timer.setInterval(self.SIT_FRAME_MS if sitting else self.FRAME_MS)
+        if sitting and self._sat:
+            # the empty window: only his slow bob moves, so only his spot is redrawn
+            # (the whole window 60 times a second kept a CPU core busy for the minute)
+            self.update(self._sit_box())
         else:
             self.update()
+        self._sat = sitting
+
+    def _sit_box(self) -> QRect:
+        """Everything he can cover while he sits full and bobbing (see paintEvent)."""
+        b = self.big
+        w, h = b.width() * 1.3, b.height() * 1.15
+        return QRectF(b.center().x() - w / 2, b.bottom() - h, w, h).adjusted(
+            -6, -6, 6, 6).toAlignedRect()
 
     # where he is and how he looks at `t`
     def _pose(self) -> tuple[QRectF, float, float]:
         """(his rect, gape 0..1, belly 0..1)."""
         t = self.t
-        eaten = sum(1 for s in self.starts if t >= self.HOP_MS + s + self.FLY_MS / 2)
-        full = eaten / max(1, len(self.starts))
         if t < self.HOP_MS:
             u = _ease(t / self.HOP_MS)
             return self._between(self.home, self.big, u), u, 0.0
         if t < self.ate:
-            return self.big, 1.0, full
+            eaten = sum(1 for s in self.starts if t >= self.HOP_MS + s + self.FLY_MS / 2)
+            return self.big, 1.0, eaten / max(1, len(self.starts))
         if t < self.blank_at:
             u = (t - self.ate) / self.SHUT_MS
             return self.big, 1 - _ease(u * 2), 1.0
@@ -678,7 +695,8 @@ class OnionGulp(QWidget):
         rect, gape, belly = self._pose()
         mouth = self._mouth(rect)
         moving = []
-        for i, (r, pix) in enumerate(self.pieces):
+        eaten = self.blank_at <= self.t < self.spit_at   # every piece is inside him
+        for i, (r, pix) in enumerate(() if eaten else self.pieces):
             k = self._piece_at(i)
             if k is None:
                 continue
