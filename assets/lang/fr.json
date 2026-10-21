@@ -490,7 +490,6 @@
   "✓ {combo} plays “{name}”": "✓ {combo} joue « {name} »",
   "✓ “{name}” shows by itself when {exe} is in front": "✓ « {name} » s'affiche tout seul quand {exe} est au premier plan",
   "All sounds": "Tous les sons",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "Change chaque son pendant qu'il joue. Pour garder une version, clic droit sur un pad → Effets.",
   "Delete {n} item for good? This can't be undone.": [
     "Supprimer {n} élément définitivement ? C'est irréversible.",
     "Supprimer {n} éléments définitivement ? C'est irréversible."
@@ -4362,5 +4361,14 @@
   "Pick a voice to turn one on": "Choisis une voix pour l'allumer",
   "Put the voices back, exactly as they were": "Remettre les voix exactement comme avant",
   "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Éteint toutes les voix et les oublie, pour repartir de zéro. ACTIF ne les ramènera pas",
-  "Voices reset": "Voix réinitialisées"
+  "Voices reset": "Voix réinitialisées",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "Une copie du son en cours avec cette vitesse, cette hauteur et ces effets, en pad à part",
+  "Change the speed, pitch or effects first": "Change d'abord la vitesse, la hauteur ou les effets",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Change chaque son pendant qu'il joue. Enregistrer comme nouveau pad le garde en pad à part.",
+  "Play a sound first, then save it with your changes": "Joue d'abord un son, puis enregistre-le avec tes changements",
+  "Save as new pad": "Enregistrer comme nouveau pad",
+  "Take the Live controls effects off": "Enlever les effets des contrôles en direct",
+  "{name} (modified {n})": "{name} (modifié {n})",
+  "{name} (modified)": "{name} (modifié)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ « {name} » ajouté, sa vitesse et sa hauteur ramenées à ce qu'un pad peut enregistrer"
 }

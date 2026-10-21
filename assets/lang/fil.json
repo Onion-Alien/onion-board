@@ -186,7 +186,6 @@
   "Category: {value}": "Kategorya: {value}",
   "Change my voice while held": "Ibahin ang boses ko habang hawak",
   "Change your voice, speak another language, or use text-to-speech": "Ibahin ang boses mo, magsalita ng ibang wika, o gumamit ng text-to-speech",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "Binabago ang bawat sound habang nagpe-play. Para mag-save ng version, i-right-click ang pad → Effects.",
   "Changes the whole app instantly.": "Binabago agad ang buong app.",
   "Change": "Palitan",
   "Changing…": "Pinapalitan…",
@@ -4362,5 +4361,14 @@
   "Pick a voice to turn one on": "Pumili ng boses para buksan ito",
   "Put the voices back, exactly as they were": "Ibalik ang mga boses, eksakto gaya ng dati",
   "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Patayin at kalimutan ang lahat ng boses, para sa bagong simula. Hindi na ibabalik ng ON",
-  "Voices reset": "Na-reset ang mga boses"
+  "Voices reset": "Na-reset ang mga boses",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "Kopya ng tunog na tumutugtog ngayon na may ganitong bilis, pitch at mga effect, bilang sariling pad",
+  "Change the speed, pitch or effects first": "Baguhin muna ang bilis, pitch o mga effect",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Binabago ang bawat tunog habang tumutugtog. Itinatabi ito ng I-save bilang bagong pad bilang sariling pad.",
+  "Play a sound first, then save it with your changes": "Magpatugtog muna ng tunog, saka i-save ito kasama ang mga binago mo",
+  "Save as new pad": "I-save bilang bagong pad",
+  "Take the Live controls effects off": "Alisin ang mga effect ng Live controls",
+  "{name} (modified {n})": "{name} (binago {n})",
+  "{name} (modified)": "{name} (binago)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Naidagdag ang “{name}”, ang bilis at pitch nito ay hanggang sa kayang i-save ng pad"
 }

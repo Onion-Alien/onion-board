@@ -186,7 +186,6 @@
   "Category: {value}": "Categoría: {value}",
   "Change my voice while held": "Cambiar mi voz mientras la mantengo presionada",
   "Change your voice, speak another language, or use text-to-speech": "Cambia tu voz, habla otro idioma o usa texto a voz",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "Cambia cada sonido mientras suena. Para guardar una versión, clic derecho en un pad → Efectos.",
   "Changes the whole app instantly.": "Cambia toda la app al instante.",
   "Change": "Cambiar",
   "Changing…": "Cambiando…",
@@ -4362,5 +4361,14 @@
   "Pick a voice to turn one on": "Elige una voz para encenderla",
   "Put the voices back, exactly as they were": "Devolver las voces tal como estaban",
   "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Apaga todas las voces y las olvida, para empezar de cero. ACTIVADO no las traerá de vuelta",
-  "Voices reset": "Voces restablecidas"
+  "Voices reset": "Voces restablecidas",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "Una copia del sonido que suena ahora con esta velocidad, este tono y estos efectos, como un pad propio",
+  "Change the speed, pitch or effects first": "Primero cambia la velocidad, el tono o los efectos",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Cambia cada sonido mientras suena. Guardar como nuevo pad lo deja como un pad propio.",
+  "Play a sound first, then save it with your changes": "Primero reproduce un sonido y luego guárdalo con tus cambios",
+  "Save as new pad": "Guardar como nuevo pad",
+  "Take the Live controls effects off": "Quitar los efectos de los controles en vivo",
+  "{name} (modified {n})": "{name} (modificado {n})",
+  "{name} (modified)": "{name} (modificado)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” agregado, con su velocidad y tono dentro de lo que un pad puede guardar"
 }

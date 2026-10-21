@@ -188,7 +188,6 @@
   "Category: {value}": "Categorie: {value}",
   "Change my voice while held": "Schimbă-mi vocea cât e apăsată",
   "Change your voice, speak another language, or use text-to-speech": "Schimbă-ți vocea, vorbește altă limbă sau folosește text-to-speech",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "Schimbă fiecare sunet cât se redă. Ca să salvezi o versiune, clic dreapta pe un pad → Efecte.",
   "Changes the whole app instantly.": "Schimbă instant toată aplicația.",
   "Change": "Schimbă",
   "Changing…": "Se schimbă…",
@@ -4439,5 +4438,14 @@
   "Pick a voice to turn one on": "Alege o voce ca să o pornești",
   "Put the voices back, exactly as they were": "Adu vocile înapoi exact cum erau",
   "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Oprește toate vocile și le uită, pentru un început curat. PORNIT nu le mai aduce înapoi",
-  "Voices reset": "Voci resetate"
+  "Voices reset": "Voci resetate",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "O copie a sunetului care cântă acum, cu această viteză, înălțime și aceste efecte, ca pad separat",
+  "Change the speed, pitch or effects first": "Schimbă întâi viteza, înălțimea sau efectele",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Schimbă fiecare sunet cât cântă. Salvează ca pad nou îl păstrează ca pad separat.",
+  "Play a sound first, then save it with your changes": "Pornește întâi un sunet, apoi salvează-l cu modificările tale",
+  "Save as new pad": "Salvează ca pad nou",
+  "Take the Live controls effects off": "Scoate efectele controalelor live",
+  "{name} (modified {n})": "{name} (modificat {n})",
+  "{name} (modified)": "{name} (modificat)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Am adăugat „{name}”, cu viteza și înălțimea în limita a ce poate salva un pad"
 }

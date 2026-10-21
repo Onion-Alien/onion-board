@@ -480,7 +480,6 @@
   "✓ {combo} plays “{name}”": "✓ {combo} 播放「{name}」",
   "✓ “{name}” shows by itself when {exe} is in front": "✓ {exe} 在最前面時會自動顯示「{name}」",
   "All sounds": "所有音效",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "播放時會改變每個音效。要儲存成一個版本，請在按鈕上按右鍵 → 效果。",
   "Delete {n} item for good? This can't be undone.": [
     "要永久刪除 {n} 個項目嗎？這個動作無法復原。"
   ],
@@ -4285,5 +4284,14 @@
   "Pick a voice to turn one on": "選一個聲音來開啟",
   "Put the voices back, exactly as they were": "把聲音恢復成原來的樣子",
   "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "關掉並忘掉所有聲音，重新開始。開啟 不會再把它們帶回來",
-  "Voices reset": "聲音已重設"
+  "Voices reset": "聲音已重設",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "把正在播放的聲音依目前速度、音調和效果複製成一個獨立的打擊墊",
+  "Change the speed, pitch or effects first": "請先改變速度、音調或效果",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "播放時改變每個聲音。「另存為新打擊墊」可把它存成獨立的打擊墊。",
+  "Play a sound first, then save it with your changes": "先播放一個聲音，再連同你的變更一起儲存",
+  "Save as new pad": "另存為新打擊墊",
+  "Take the Live controls effects off": "拿掉即時控制的效果",
+  "{name} (modified {n})": "{name} （已修改 {n}）",
+  "{name} (modified)": "{name} （已修改）",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ 已加入「{name}」，速度和音調已限制在打擊墊能儲存的範圍內"
 }

@@ -18,6 +18,7 @@ from typing import TYPE_CHECKING, Any
 
 from PySide6.QtCore import QTimer, QUrl, Signal
 from PySide6.QtGui import QDesktopServices
+from PySide6.QtWidgets import QInputDialog
 from shiboken6 import isValid as qt_valid
 
 from soundboard.audio.engine import SR
@@ -304,6 +305,70 @@ class EditControl(Controller):
         mw._rebuild_pads()
         self._rerender(new)
         mw.toast(_("✓ Added “{name}”", name=html.escape(new.name)), "ok")
+        return new
+
+    def live_sound(self) -> str | None:
+        """The sound Live controls' Save as new pad copies: the last one played while
+        it's still playing, else the newest one playing, else the last one played."""
+        mw = self.mw
+        last = mw.playctl._last_sid
+        playing = [sid for sid in mw.engine.playing() if mw.meta(sid) is not None]
+        if last in playing or (not playing and last and mw.meta(last) is not None):
+            return last
+        return playing[-1] if playing else None
+
+    def new_pad_name(self, name: str) -> str:
+        """“Airhorn (modified)”, or “(modified 2)”… when that's taken."""
+        taken = {m.name.lower() for m in self.mw.cfg.sounds}
+        n = 1
+        while True:
+            new = (_("{name} (modified)", name=name) if n == 1
+                   else _("{name} (modified {n})", name=name, n=n))[:40]
+            if new.lower() not in taken:
+                return new
+            n += 1
+
+    def _ask_pad_name(self, default: str) -> str | None:
+        name, ok = QInputDialog.getText(self.mw, _("Save as new pad"), _("Name:"),
+                                        text=default)
+        return name.strip()[:40] if ok and name.strip() else None
+
+    def save_live_copy(self) -> SoundMeta | None:
+        """Live controls' Save as new pad: a copy of the sound playing with Live
+        controls' speed, pitch and effects saved onto it (soundfx.with_live), named by
+        the user, right after the original. Live controls stay as they are."""
+        mw = self.mw
+        sp = mw.speed_btn
+        sid = self.live_sound()
+        m = mw.meta(sid) if sid else None
+        if m is None:
+            mw.toast(_("Play a sound first, then save it with your changes"), "warn")
+            return None
+        if sp.is_default() and not sp.fx_values():
+            mw.toast(_("Change the speed, pitch or effects first"), "warn")
+            return None
+        name = self._ask_pad_name(self.new_pad_name(m.name))
+        if not name:
+            return None
+        fx, capped = soundfx.with_live(m.fx, *sp.values(), sp.fx_values())
+        try:
+            new = duplicate(m, name)
+        except OSError as e:
+            errors.warn(mw, _("Couldn't copy the sound"), e)
+            return None
+        new.fx = {} if soundfx.is_neutral(fx) else fx
+        videos.copy_link(m.id, new.id)
+        mw.catctl._tag_new(new)   # stays in sight in the category showing
+        mw.cfg.sounds.insert(mw.cfg.sounds.index(m) + 1, new)
+        mw._index()
+        mw._save_now()
+        mw._rebuild_pads()
+        self._rerender(new)
+        if capped:   # Redline goes further than a saved sound can
+            mw.toast(_("✓ Added “{name}”, its speed and pitch kept to what a pad can save",
+                       name=html.escape(new.name)), "ok")
+        else:
+            mw.toast(_("✓ Added “{name}”", name=html.escape(new.name)), "ok")
         return new
 
     def show_sound_file(self, sid: str):

@@ -18,7 +18,8 @@ from PySide6.QtCore import QEvent, QPoint, QPointF, QRectF, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPen, QValidator
 from PySide6.QtWidgets import (QAbstractSpinBox, QApplication, QCheckBox, QDialog,
                                QDoubleSpinBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
-                               QProgressBar, QPushButton, QVBoxLayout, QWidget)
+                               QProgressBar, QPushButton, QSizePolicy, QVBoxLayout,
+                               QWidget)
 
 from soundboard.audio import livefx
 from soundboard.core import usage
@@ -281,6 +282,7 @@ class SpeedPitchButton(QPushButton):
     setup_picked = Signal(str)   # a voice setup's name, "" = none (ui.livesetups)
     setup_cancelled = Signal()   # Cancel while its AI voice gets ready
     opening = Signal()           # about to pop up: the setups list is brought up to date
+    save_new = Signal()          # Save as new pad: the playing sound, these on it (sounds)
 
     def __init__(self, what: str = "sounds", hint: str = "",
                  redline: tuple[float, float] = REDLINE_SPEED):
@@ -327,17 +329,29 @@ class SpeedPitchButton(QPushButton):
         sub = QLabel({"radio": _("The radio"), "apps": _("All programs")}.get(
             what, _("All sounds")))
         sub.setObjectName("muted")
+        sub.setMinimumWidth(1)   # the first to give way when a language's buttons are long
         reset = reset_button(_("Back to 1x, no pitch change and no effects") if self.has_speed
                              else _("Back to no pitch change and no effects"))
         reset.setObjectName("liveReset")
-        reset.setMinimumSize(96, 36)
         icons.set_icon(reset, "reload", size=18)
+        # whole buttons, never squeezed: the title's words give way first
+        reset.setMinimumSize(max(96, reset.sizeHint().width()), 36)
         reset.clicked.connect(self.reset)
         self.dj = DjBunny()   # Bun mixing, left of the title
         head.addWidget(self.dj)
         head.addWidget(title)
         head.addWidget(sub)
         head.addStretch(1)
+        if self.has_speed:   # a stream has no pad to copy
+            self.save_btn = QPushButton(_("Save as new pad"))
+            self.save_btn.setMinimumHeight(36)
+            self.save_btn.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+            self.save_btn.setToolTip(_("A copy of the sound playing now with this speed, "
+                                       "pitch and these effects on it, as a pad of its own"))
+            self.save_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+            icons.set_icon(self.save_btn, "copy", size=18)
+            self.save_btn.clicked.connect(self._save_new)
+            head.addWidget(self.save_btn)
         head.addWidget(reset)
         v.addLayout(head)
         v.addWidget(self._rule())
@@ -590,6 +604,10 @@ class SpeedPitchButton(QPushButton):
         self.keep.setChecked(keep)
         self.keep.blockSignals(False)
         self._edited()
+
+    def _save_new(self):
+        self.pop.hide()   # a name box comes up next: the pop-up would sit over it
+        self.save_new.emit()
 
     def reset(self):
         self._count("reset")

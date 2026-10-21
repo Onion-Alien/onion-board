@@ -1232,10 +1232,11 @@ class WindowBuilder(Controller):
         mw._video_win = None   # ui/videowindow.VideoWindow, made on first use
         th.addWidget(mw.btn_video)
         mw.speed_btn = SpeedPitchButton(
-            "sounds", _("Changes every sound while it plays. To save a version, "
-                        "right-click a pad → Effects."))
+            "sounds", _("Changes every sound while it plays. Save as new pad keeps it "
+                        "as a pad of its own."))
         mw.speed_btn.changed.connect(mw.playctl.on_live_speed)
         mw.speed_btn.fx_changed.connect(lambda fx: setattr(mw.engine, "sound_fx", fx))
+        mw.speed_btn.save_new.connect(lambda: mw.editctl.save_live_copy())
         th.addWidget(mw.speed_btn)
         sep = vsep()
         th.addWidget(sep)

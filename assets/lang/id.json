@@ -480,7 +480,6 @@
   "✓ {combo} plays “{name}”": "✓ {combo} memutar “{name}”",
   "✓ “{name}” shows by itself when {exe} is in front": "✓ “{name}” muncul sendiri saat {exe} di depan",
   "All sounds": "Semua suara",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "Mengubah semua suara selagi diputar. Untuk menyimpan versinya, klik kanan pad → Efek.",
   "Delete {n} item for good? This can't be undone.": [
     "Hapus {n} item secara permanen? Ini tidak bisa dibatalkan."
   ],
@@ -4285,5 +4284,14 @@
   "Pick a voice to turn one on": "Pilih suara untuk menyalakannya",
   "Put the voices back, exactly as they were": "Kembalikan suara persis seperti semula",
   "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Matikan semua suara dan lupakan, untuk mulai dari awal. NYALA tidak akan mengembalikannya",
-  "Voices reset": "Suara direset"
+  "Voices reset": "Suara direset",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "Salinan suara yang sedang diputar dengan kecepatan, nada, dan efek ini, sebagai pad tersendiri",
+  "Change the speed, pitch or effects first": "Ubah kecepatan, nada, atau efek dulu",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Mengubah setiap suara saat diputar. Simpan sebagai pad baru menyimpannya sebagai pad tersendiri.",
+  "Play a sound first, then save it with your changes": "Putar suara dulu, lalu simpan dengan perubahanmu",
+  "Save as new pad": "Simpan sebagai pad baru",
+  "Take the Live controls effects off": "Lepas efek kontrol live",
+  "{name} (modified {n})": "{name} (diubah {n})",
+  "{name} (modified)": "{name} (diubah)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” ditambahkan, kecepatan dan nadanya dibatasi sesuai yang bisa disimpan pad"
 }

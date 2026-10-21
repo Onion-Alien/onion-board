@@ -490,7 +490,6 @@
   "✓ {combo} plays “{name}”": "✓ {combo} speelt “{name}”",
   "✓ “{name}” shows by itself when {exe} is in front": "✓ “{name}” verschijnt vanzelf als {exe} vooraan staat",
   "All sounds": "Alle geluiden",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "Verandert elk geluid terwijl het speelt. Wil je een versie bewaren? Rechtsklik een pad → Effecten.",
   "Delete {n} item for good? This can't be undone.": [
     "{n} item definitief verwijderen? Dit kan niet ongedaan worden gemaakt.",
     "{n} items definitief verwijderen? Dit kan niet ongedaan worden gemaakt."
@@ -4362,5 +4361,14 @@
   "Pick a voice to turn one on": "Kies een stem om aan te zetten",
   "Put the voices back, exactly as they were": "Zet de stemmen precies terug zoals ze waren",
   "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Zet alle stemmen uit en vergeet ze, voor een frisse start. AAN haalt ze niet terug",
-  "Voices reset": "Stemmen gereset"
+  "Voices reset": "Stemmen gereset",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "Een kopie van het geluid dat nu speelt met deze snelheid, toonhoogte en effecten, als eigen pad",
+  "Change the speed, pitch or effects first": "Verander eerst de snelheid, toonhoogte of effecten",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Verandert elk geluid terwijl het speelt. Opslaan als nieuwe pad bewaart het als eigen pad.",
+  "Play a sound first, then save it with your changes": "Speel eerst een geluid af en sla het dan op met je wijzigingen",
+  "Save as new pad": "Opslaan als nieuwe pad",
+  "Take the Live controls effects off": "Effecten van de live-bediening eraf halen",
+  "{name} (modified {n})": "{name} (aangepast {n})",
+  "{name} (modified)": "{name} (aangepast)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” toegevoegd, snelheid en toonhoogte binnen wat een pad kan opslaan"
 }

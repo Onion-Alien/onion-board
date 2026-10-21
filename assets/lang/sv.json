@@ -186,7 +186,6 @@
   "Category: {value}": "Kategori: {value}",
   "Change my voice while held": "Ändra min röst medan den hålls ner",
   "Change your voice, speak another language, or use text-to-speech": "Ändra din röst, prata ett annat språk eller använd text-till-tal",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "Ändrar varje ljud medan det spelas. För att spara en version, högerklicka på en ruta → Effekter.",
   "Changes the whole app instantly.": "Ändrar hela appen direkt.",
   "Change": "Ändra",
   "Changing…": "Ändrar…",
@@ -4362,5 +4361,14 @@
   "Pick a voice to turn one on": "Välj en röst för att slå på den",
   "Put the voices back, exactly as they were": "Sätt tillbaka rösterna precis som de var",
   "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Stänger av alla röster och glömmer dem, för en ny start. PÅ tar inte tillbaka dem",
-  "Voices reset": "Röster återställda"
+  "Voices reset": "Röster återställda",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "En kopia av ljudet som spelas nu med den här hastigheten, tonhöjden och de här effekterna, som en egen pad",
+  "Change the speed, pitch or effects first": "Ändra hastighet, tonhöjd eller effekter först",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Ändrar varje ljud medan det spelas. Spara som ny pad behåller det som en egen pad.",
+  "Play a sound first, then save it with your changes": "Spela ett ljud först och spara det sedan med dina ändringar",
+  "Save as new pad": "Spara som ny pad",
+  "Take the Live controls effects off": "Ta bort livekontrollernas effekter",
+  "{name} (modified {n})": "{name} (ändrad {n})",
+  "{name} (modified)": "{name} (ändrad)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ La till ”{name}”, med hastighet och tonhöjd inom vad en pad kan spara"
 }

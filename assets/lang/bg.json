@@ -162,7 +162,6 @@
   "Category: {value}": "Категория: {value}",
   "Change my voice while held": "Променяй гласа ми, докато е задържан",
   "Change your voice, speak another language, or use text-to-speech": "Промени гласа си, говори на друг език или ползвай текст в говор",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "Променя всеки звук, докато звучи. За да запазиш версия, десен клик върху бутон → Ефекти.",
   "Changes the whole app instantly.": "Променя цялото приложение веднага.",
   "Change": "Промени",
   "Changing…": "Променям…",
@@ -4362,5 +4361,14 @@
   "Pick a voice to turn one on": "Избери глас, за да включиш",
   "Put the voices back, exactly as they were": "Върни гласовете точно както бяха",
   "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Изключи всички гласове и ги забрави за чисто начало. ВКЛ. няма да ги върне",
-  "Voices reset": "Гласовете са нулирани"
+  "Voices reset": "Гласовете са нулирани",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "Копие на звука, който свири сега, с тази скорост, тон и тези ефекти, като отделен пад",
+  "Change the speed, pitch or effects first": "Първо промени скоростта, тона или ефектите",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Променя всеки звук, докато звучи. „Запази като нов пад“ го пази като отделен пад.",
+  "Play a sound first, then save it with your changes": "Първо пусни звук, после го запази с промените си",
+  "Save as new pad": "Запази като нов пад",
+  "Take the Live controls effects off": "Махни ефектите от управлението на живо",
+  "{name} (modified {n})": "{name} (променен {n})",
+  "{name} (modified)": "{name} (променен)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ „{name}“ е добавен, скоростта и тонът му са до колкото един пад може да запази"
 }

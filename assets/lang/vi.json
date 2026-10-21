@@ -480,7 +480,6 @@
   "✓ {combo} plays “{name}”": "✓ {combo} phát “{name}”",
   "✓ “{name}” shows by itself when {exe} is in front": "✓ “{name}” tự hiện khi {exe} ở phía trước",
   "All sounds": "Mọi âm thanh",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "Thay đổi mọi âm thanh khi đang phát. Để lưu một phiên bản, chuột phải một nút → Hiệu ứng.",
   "Delete {n} item for good? This can't be undone.": [
     "Xóa vĩnh viễn {n} mục? Không thể hoàn tác."
   ],
@@ -4285,5 +4284,14 @@
   "Pick a voice to turn one on": "Chọn một giọng để bật",
   "Put the voices back, exactly as they were": "Đưa các giọng trở lại y như cũ",
   "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Tắt và quên mọi giọng để bắt đầu lại. BẬT sẽ không mang chúng lại",
-  "Voices reset": "Đã đặt lại giọng"
+  "Voices reset": "Đã đặt lại giọng",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "Bản sao của âm thanh đang phát với tốc độ, cao độ và hiệu ứng này, thành một pad riêng",
+  "Change the speed, pitch or effects first": "Hãy đổi tốc độ, cao độ hoặc hiệu ứng trước",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Thay đổi mọi âm thanh khi đang phát. Lưu thành pad mới giữ nó thành một pad riêng.",
+  "Play a sound first, then save it with your changes": "Hãy phát một âm thanh trước, rồi lưu nó với các thay đổi của bạn",
+  "Save as new pad": "Lưu thành pad mới",
+  "Take the Live controls effects off": "Bỏ hiệu ứng điều khiển trực tiếp",
+  "{name} (modified {n})": "{name} (đã sửa {n})",
+  "{name} (modified)": "{name} (đã sửa)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Đã thêm “{name}”, tốc độ và cao độ giữ trong mức pad có thể lưu"
 }

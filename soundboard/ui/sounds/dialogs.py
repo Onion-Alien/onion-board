@@ -17,7 +17,7 @@ from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QColorDial
                                QWidget)
 
 from soundboard.core import errors, usage
-from soundboard.audio import soundfx
+from soundboard.audio import livefx, soundfx
 from soundboard.ui.kit import theme
 from soundboard import voicefx
 from soundboard.sounds import sourceinfo, thumbs
@@ -131,6 +131,7 @@ class EffectsPanel(QObject):
         super().__init__()
         self._pick_voice = pick_voice
         self._voice: dict = {}
+        self._live: list = []
         self.trim_page, tv = _page()
         self.fx_page, v = _page()
         self.eq_page, ev = _page()
@@ -165,6 +166,22 @@ class EffectsPanel(QObject):
         vrow.addWidget(self.voice_off)
         vrow.addStretch(1)
         v.addLayout(vrow)
+
+        # Live controls' effects on a pad saved from them (soundfx.with_live): shown
+        # here so they can be taken off; their knobs stay in Live controls
+        self.live_row = QWidget()
+        lrow = QHBoxLayout(self.live_row)
+        lrow.setContentsMargins(0, 0, 0, 0)
+        lrow.addWidget(QLabel(_("Live controls")))
+        self.live_text = QLabel()
+        self.live_text.setObjectName("muted")
+        self.live_text.setWordWrap(True)
+        lrow.addWidget(self.live_text, 1)
+        live_off = icon_button("close", _("Take the Live controls effects off"))
+        live_off.clicked.connect(self._live_off)
+        lrow.addWidget(live_off)
+        self.live_row.hide()
+        v.addWidget(self.live_row)
 
         tv.addWidget(section_label(_("Trim")))
         self._v = tv
@@ -278,7 +295,22 @@ class EffectsPanel(QObject):
             w.blockSignals(False)
         self._voice = f["voice"]
         self._show_voice()
+        self._live = f["live"]
+        self._show_live()
         self._boost_hint()
+
+    def _show_live(self):
+        self.live_text.setText("; ".join(", ".join(
+            f"{voicefx.shown(q.label)} " + (f"{st[q.key]:+g}{q.unit}" if q.unit
+                                             else f"{round(st[q.key] * 100)}%")
+            for q in livefx.PARAMS if q.key in st)
+            for st in self._live))
+        self.live_row.setVisible(bool(self._live))
+
+    def _live_off(self):
+        self._live = []
+        self._show_live()
+        self._edited()
 
     def _show_voice(self):
         from soundboard.ui.sounds.voicepicker import describe
@@ -307,7 +339,7 @@ class EffectsPanel(QObject):
              "reverse": self.reverse.isChecked(),
              "eq": gains if on else [0.0] * len(gains),
              "effects": {t: r.state() for t, r in self.rows.items() if r.chk.isChecked()},
-             "voice": self._voice}
+             "voice": self._voice, "live": self._live}
         return {} if soundfx.is_neutral(f) else soundfx.clean(f)
 
     def _boost_hint(self):
@@ -325,6 +357,7 @@ class EffectsPanel(QObject):
         f = soundfx.clean(self.fx())
         f["start"] = f["end"] = 0.0
         f["voice"] = {}   # the voice is a layer of its own: presets don't set it
+        f["live"] = []    # (and Live controls' effects)
         return f
 
     def _matching_preset(self):
@@ -345,7 +378,7 @@ class EffectsPanel(QObject):
         if name in soundfx.PRESETS:
             start, end = self.trim.values()
             self.load({**soundfx.PRESETS[name], "start": start, "end": end,
-                       "voice": self._voice})
+                       "voice": self._voice, "live": self._live})
             self.changed.emit()
 
 

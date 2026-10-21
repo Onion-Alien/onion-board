@@ -490,7 +490,6 @@
   "✓ {combo} plays “{name}”": "✓ {combo} suona “{name}”",
   "✓ “{name}” shows by itself when {exe} is in front": "✓ “{name}” si mostra da sola quando {exe} è in primo piano",
   "All sounds": "Tutti i suoni",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "Cambia ogni suono mentre suona. Per salvarne una versione, clic destro su un pad → Effetti.",
   "Delete {n} item for good? This can't be undone.": [
     "Eliminare per sempre {n} elemento? Non si può annullare.",
     "Eliminare per sempre {n} elementi? Non si può annullare."
@@ -4362,5 +4361,14 @@
   "Pick a voice to turn one on": "Scegli una voce per accenderla",
   "Put the voices back, exactly as they were": "Rimetti le voci esattamente com'erano",
   "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Spegne tutte le voci e le dimentica, per ripartire da zero. ATTIVO non le riporterà",
-  "Voices reset": "Voci azzerate"
+  "Voices reset": "Voci azzerate",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "Una copia del suono in riproduzione con questa velocità, tonalità ed effetti, come pad a sé",
+  "Change the speed, pitch or effects first": "Prima cambia velocità, tonalità o effetti",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Cambia ogni suono mentre suona. Salva come nuovo pad lo tiene come pad a sé.",
+  "Play a sound first, then save it with your changes": "Prima riproduci un suono, poi salvalo con le tue modifiche",
+  "Save as new pad": "Salva come nuovo pad",
+  "Take the Live controls effects off": "Togli gli effetti dei controlli dal vivo",
+  "{name} (modified {n})": "{name} (modificato {n})",
+  "{name} (modified)": "{name} (modificato)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Aggiunto “{name}”, con velocità e tonalità entro ciò che un pad può salvare"
 }

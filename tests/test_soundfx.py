@@ -426,7 +426,7 @@ def test_sounds_without_a_voice_keep_their_cache_keys():
     import json
     fx = {"speed": 1.5, "effects": {"reverb": {"on": True, "mix": 0.3}}}
     f = soundfx.clean(fx)
-    for k in ("start", "end", "voice"):
+    for k in ("start", "end", "voice", "live"):   # (keys added later)
         del f[k]
     old = hashlib.blake2b(json.dumps(f, sort_keys=True).encode(), digest_size=6).hexdigest()
     assert soundfx.key(fx) == old
@@ -455,3 +455,32 @@ def test_a_voice_goes_under_the_sounds_own_effects():
     assert ids == ["voice:robot", "voice:reverb", "reverb"]
     x = sine(330, 0.5)
     assert rms(soundfx.render(x, both)[:len(x)] - soundfx.render(x, own)[:len(x)]) > 0.01
+
+
+def test_with_live_adds_live_controls_on_top():
+    """Live controls' speed, pitch and effects saved onto a sound sound the way they
+    did together: speeds multiply, pitches add (keep-pitch off: the speed's own shift
+    too), the effects become a stage after the rest; Redline values are capped."""
+    f, capped = soundfx.with_live({"speed": 1.5, "pitch": 2}, 2.0, 3, True, {"bass": 8})
+    assert (f["speed"], f["pitch"], f["tape"], capped) == (3.0, 5.0, False, False)
+    assert f["live"] == [{"bass": 8.0}]
+    f, _ = soundfx.with_live({}, 2.0, 0, False, {})   # tape: an octave up
+    assert (f["speed"], f["pitch"], f["live"]) == (2.0, 12.0, [])
+    f, _ = soundfx.with_live({"speed": 1.5, "tape": True}, 2.0, 0, False, {})
+    assert (f["speed"], f["pitch"], f["tape"]) == (3.0, 0.0, True)   # still a resample
+    f, capped = soundfx.with_live({}, 10.0, 36, True, {})
+    assert capped and f["speed"] == soundfx.SPEED_RANGE[1] and f["pitch"] == 24
+    f, _ = soundfx.with_live(f, 1, 0, True, {"echo": 0.5})
+    f, _ = soundfx.with_live(f, 1, 0, True, {"crunch": 0.2})
+    assert f["live"] == [{"echo": 0.5}, {"crunch": 0.2}]   # a copy of a copy: stages
+
+
+def test_live_effects_render_and_keep_old_cache_keys():
+    x = np.zeros((SR, 2), np.float32)
+    x[:2000] = 0.3
+    assert soundfx.key({"speed": 1.2}) == soundfx.key({"speed": 1.2, "live": []})
+    f = {"live": [{"reverb": 0.6}]}
+    assert not soundfx.is_neutral(f) and soundfx.key(f) != ""
+    y = soundfx.render(x, f)
+    assert y.shape[1] == 2 and np.abs(y[SR // 2:SR]).max() > 1e-4   # the tail rings on
+    assert soundfx.clean({"live": [{"bass": 99}, {}, "x"]})["live"] == [{"bass": 18.0}]

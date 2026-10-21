@@ -490,7 +490,6 @@
   "✓ {combo} plays “{name}”": "✓ {combo} spielt „{name}“",
   "✓ “{name}” shows by itself when {exe} is in front": "✓ „{name}“ erscheint von selbst, wenn {exe} vorne ist",
   "All sounds": "Alle Sounds",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "Ändert jeden Sound, während er spielt. Um eine Version zu speichern: Rechtsklick auf ein Pad → Effekte.",
   "Delete {n} item for good? This can't be undone.": [
     "{n} Eintrag endgültig löschen? Das lässt sich nicht rückgängig machen.",
     "{n} Einträge endgültig löschen? Das lässt sich nicht rückgängig machen."
@@ -4362,5 +4361,14 @@
   "Pick a voice to turn one on": "Wähl eine Stimme, um sie einzuschalten",
   "Put the voices back, exactly as they were": "Stimmen genau so zurückholen, wie sie waren",
   "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Schaltet alle Stimmen aus und vergisst sie, für einen frischen Start. AN holt sie nicht zurück",
-  "Voices reset": "Stimmen zurückgesetzt"
+  "Voices reset": "Stimmen zurückgesetzt",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "Eine Kopie des gerade spielenden Sounds mit diesem Tempo, dieser Tonhöhe und diesen Effekten, als eigenes Pad",
+  "Change the speed, pitch or effects first": "Ändere zuerst Tempo, Tonhöhe oder Effekte",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Ändert jeden Sound, während er spielt. „Als neues Pad speichern“ behält ihn als eigenes Pad.",
+  "Play a sound first, then save it with your changes": "Spiel zuerst einen Sound ab und speichere ihn dann mit deinen Änderungen",
+  "Save as new pad": "Als neues Pad speichern",
+  "Take the Live controls effects off": "Effekte der Live-Regler entfernen",
+  "{name} (modified {n})": "{name} (geändert {n})",
+  "{name} (modified)": "{name} (geändert)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ „{name}“ hinzugefügt, Tempo und Tonhöhe auf das begrenzt, was ein Pad speichern kann"
 }

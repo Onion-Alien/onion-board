@@ -530,7 +530,6 @@
   "✓ {combo} plays “{name}”": "✓ {combo} يشغّل “{name}”",
   "✓ “{name}” shows by itself when {exe} is in front": "✓ “{name}” تظهر تلقائيًا عندما يكون {exe} في المقدمة",
   "All sounds": "كل الأصوات",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "يغيّر كل صوت أثناء تشغيله. لحفظ نسخة، انقر بالزر الأيمن على زر → المؤثرات.",
   "Delete {n} item for good? This can't be undone.": [
     "حذف {n} عنصر نهائيًا؟ لا يمكن التراجع عن هذا.",
     "حذف {n} عنصر نهائيًا؟ لا يمكن التراجع عن هذا.",
@@ -4670,5 +4669,14 @@
   "Pick a voice to turn one on": "اختر صوتًا لتشغيله",
   "Put the voices back, exactly as they were": "أعد الأصوات كما كانت تمامًا",
   "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "أطفئ كل الأصوات وانسَها لبداية جديدة. مفعّل لن يعيدها",
-  "Voices reset": "تمت إعادة ضبط الأصوات"
+  "Voices reset": "تمت إعادة ضبط الأصوات",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "نسخة من الصوت الذي يعمل الآن بهذه السرعة وهذه النغمة وهذه المؤثرات، كلوحة خاصة بها",
+  "Change the speed, pitch or effects first": "غيّر السرعة أو النغمة أو المؤثرات أولًا",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "يغيّر كل صوت أثناء تشغيله. «احفظ كلوحة جديدة» يحتفظ به كلوحة خاصة به.",
+  "Play a sound first, then save it with your changes": "شغّل صوتًا أولًا، ثم احفظه بتغييراتك",
+  "Save as new pad": "احفظ كلوحة جديدة",
+  "Take the Live controls effects off": "أزل مؤثرات التحكّم المباشر",
+  "{name} (modified {n})": "{name} (معدّل {n})",
+  "{name} (modified)": "{name} (معدّل)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ أُضيف “{name}”، مع إبقاء سرعته ونغمته ضمن ما تحفظه اللوحة"
 }
