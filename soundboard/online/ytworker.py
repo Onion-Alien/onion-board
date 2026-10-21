@@ -33,6 +33,7 @@ LOOKUP_TIMEOUT_S = 120  # a search or look-up; a download's limit is the caller'
 KEEP = 1                # helpers kept waiting
 RETRY_S = 300           # after a helper failed to start, in-process until then
 STALL_S = 60            # a download whose bytes don't grow for this long is stuck
+DRY_ASKS = 20           # a download's requests in a row that bring no new bytes: stuck
 
 enabled = False
 _lock = threading.Lock()
@@ -64,6 +65,33 @@ def stall_guard(clock=None):
         elif now - grew[0] >= STALL_S:
             raise Stalled(f"no new data for {STALL_S} s")
     return check
+
+
+def guard_requests(ydl) -> None:
+    """From now on (the download, after the look-up), DRY_ASKS requests in a row that
+    bring no new bytes raise Stalled. A server that sends nothing for the last piece
+    leaves yt-dlp asking for it again at once, with no limit (a chunked download's next
+    piece isn't a retry) and no progress call, so stall_guard never hears of it: the
+    site got hundreds of requests a minute until the quiet timer gave up."""
+    urlopen, add = getattr(ydl, "urlopen", None), getattr(ydl, "add_progress_hook", None)
+    if not (callable(urlopen) and callable(add)):
+        return
+    seen: dict = {}
+    dry = [0]
+
+    def hook(d):
+        got = d.get("downloaded_bytes") or 0
+        if got > seen.get(d.get("filename"), -1):   # per file: a video's sound starts at 0
+            seen[d.get("filename")] = got
+            dry[0] = 0
+
+    def counted(req, *a, **kw):
+        dry[0] += 1
+        if dry[0] > DRY_ASKS:
+            raise Stalled(f"{DRY_ASKS} requests in a row brought no new data")
+        return urlopen(req, *a, **kw)
+    add(hook)
+    ydl.urlopen = counted
 
 
 class RemoteError(Exception):
@@ -394,6 +422,7 @@ def _download(conn, yt_dlp, url: str, opts: dict, max_seconds: float):
         info = ydl.extract_info(url, download=False)
         if info.get("_type") == "playlist" or info.get("is_live"):
             return _slim(info), ""   # the app refuses it (ytdl._check)
+        guard_requests(ydl)
         info = ydl.process_ie_result(info, download=True)
         return _slim(info), ydl.prepare_filename(info)
 

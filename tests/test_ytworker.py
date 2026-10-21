@@ -360,3 +360,52 @@ def test_a_soundcloud_result_keeps_its_cover_through_the_helper():
     del entry["thumbnails"]
     entry["thumbnail"] = art
     assert ytdl._soundcloud_hit(ytworker._slim(entry)).art.endswith("-t300x300.jpg")
+
+
+class _EmptyEndYdl(_FakeYdl):
+    """A server that sends nothing for the last piece: yt-dlp asks for it again at once,
+    forever, and with no data there's no progress call either."""
+
+    def __init__(self, opts, clock):
+        super().__init__(opts, clock)
+        self.hooks, self.asks = [], 0
+
+    def add_progress_hook(self, hook):
+        self.hooks.append(hook)
+
+    def urlopen(self, req):
+        self.asks += 1
+        return req
+
+    def process_ie_result(self, info, download):
+        for got in (300, 600, 900):          # the first pieces come in
+            self.urlopen("piece")
+            for h in self.hooks:
+                h({"status": "downloading", "filename": "t.webm", "downloaded_bytes": got})
+        for _ in range(1000):                 # then the last one never does
+            self.urlopen("piece")
+        return info
+
+
+def test_a_download_asking_again_and_again_for_nothing_fails_fast(monkeypatch):
+    """The site got hundreds of requests a minute for one empty piece until the quiet
+    timer gave up: DRY_ASKS of them in a row end it."""
+    clock = [0.0]
+    ydl = _EmptyEndYdl({"progress_hooks": [lambda d: None]}, clock)
+    fake = type("yt_dlp", (), {"YoutubeDL": lambda self, opts: ydl})()
+    with pytest.raises(ytworker.Stalled):
+        ytworker._download(_Conn(), fake, "https://ex.com/v", {}, 600)
+    assert ydl.asks == 3 + ytworker.DRY_ASKS
+
+
+def test_a_new_file_starting_at_zero_counts_as_new_data():
+    """A video's sound is a second file, its bytes counted from 0 again."""
+    hooks, asks = [], []
+    ydl = type("ydl", (), {"add_progress_hook": lambda self, h: hooks.append(h),
+                           "urlopen": lambda self, req: asks.append(req)})()
+    ytworker.guard_requests(ydl)
+    for name in ("v.mp4", "a.webm"):
+        for got in range(0, 10_000, 100):
+            ydl.urlopen("piece")
+            hooks[0]({"status": "downloading", "filename": name, "downloaded_bytes": got + 1})
+    assert len(asks) == 200

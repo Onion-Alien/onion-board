@@ -1243,6 +1243,7 @@ def _run(yt_dlp, url: str, dest: Path, progress, feature: str = FEATURE,
             dur = info.get("duration") or 0
             if dur > MAX_SECONDS:
                 log.info("%s is %ds; only the first %ds will be kept", url, dur, MAX_SECONDS)
+            ytworker.guard_requests(ydl)
             info = ydl.process_ie_result(info, download=True)
             path = Path(ydl.prepare_filename(info))
     except DownloadError:
