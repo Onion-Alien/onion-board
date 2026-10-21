@@ -8,8 +8,8 @@ front, always pointing the way he's going, the propeller spinning and the wind
 streaming past. He flies for REST_S after he's shown (or clicked, or the mouse comes
 onto him), then holds still where he is, so a card left open costs nothing; while the
 install runs (`set_flying(True)`) he keeps going. The timer only runs while he's on
-screen and the app is in front. In lite mode (ui/settings/lite.py) there's no timer at
-all: one still picture.
+screen and the app is in front. In lite mode (ui/settings/lite.py) he still flies, at
+LITE_FPS: a still plane read as a broken picture.
 
 Everything is drawn in this widget's own pixels (SLOT_W x SLOT_H), Bun himself scaled
 down with soundboard/ui/bun/bunny.py's draw_bunny (kept as a picture per pose in
@@ -32,6 +32,7 @@ from soundboard.ui.settings import lite
 SLOT_W, SLOT_H = 132, 104        # about Robo-Bun's size beside the AI voices install
 BUN_SCALE = 0.36                 # Bun's canvas (100 x 120) to the plane's units
 FPS = 30
+LITE_FPS = 15                    # lite mode: half the frames
 REST_S = 20.0                    # how long he flies after a stir, then holds still
 
 GLOBE_C, GLOBE_R = QPointF(66, 54), 31.0
@@ -131,10 +132,11 @@ class PilotBunny(QWidget):
         self._run()
 
     def resting(self) -> bool:
-        return lite.on() or (not self.flying and time.monotonic() >= self._rest_at)
+        return not self.flying and time.monotonic() >= self._rest_at
 
     def _run(self):
         if self.isVisible() and not self.resting():
+            self._timer.setInterval(1000 // (LITE_FPS if lite.on() else FPS))
             if not self._timer.isActive():
                 self._timer.start()
         else:
@@ -165,8 +167,6 @@ class PilotBunny(QWidget):
 
     def _now(self) -> float:
         """His clock: running while he flies, held where he stopped once he rests."""
-        if lite.on():
-            return 0.0
         if not self.resting():
             self._held = time.monotonic() - self._t0
         return self._held

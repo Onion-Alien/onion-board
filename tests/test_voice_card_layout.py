@@ -249,7 +249,7 @@ def test_a_short_window_scrolls_the_picked_voice_bar_with_the_voices(qapp, monke
 def test_speech_install_has_pilot_bun_and_the_glowing_button(qapp, monkeypatch):
     """Speech recognition not in yet: its box has Pilot Bun beside the words and a
     glowing Install button, as the AI voices card has Robo-Bun. He flies while the
-    install runs, rests after a while otherwise, and never moves in lite mode."""
+    install runs, rests after a while otherwise, and flies at half the frames in lite mode."""
     from soundboard.ui.bun import pilotbun
     from soundboard.ui.kit.glowbutton import GlowButton
     from soundboard.ui.settings import lite
@@ -273,7 +273,8 @@ def test_speech_install_has_pilot_bun_and_the_glowing_button(qapp, monkeypatch):
         bun.set_flying(False)
         monkeypatch.setattr(lite, "_on", True)
         bun.stir()
-        assert bun.resting() and not bun._timer.isActive()  # lite: a still picture
+        assert bun._timer.isActive() and not bun.resting()  # lite: flies too,
+        assert bun._timer.interval() == 1000 // pilotbun.LITE_FPS   # at half the frames
         bun.grab()                                          # (and it draws)
         assert pilotbun.LANDS
     finally:
