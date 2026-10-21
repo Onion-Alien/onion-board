@@ -10,7 +10,8 @@ a big sigh now and then. Give him `lines` and every so often he begs for it in a
 speech bubble with a hopeful little hop (the widget gets room beside him for it).
 `hope(True)` (say, while files are dragged over him) cheers him up and he bounces,
 saying one of `hope_lines`; `hope(False)` and he's back to waiting. A click makes
-him hop for joy (`joy_lines`) and emits `clicked`.
+him hop for joy (`joy_lines`) and emits `clicked`. Only Bun himself takes clicks (and
+shows the hand): the room round him for notes and the bubble lets them through.
 
 `build()` is for the cable install: he crouches and dives into a cartoon dust cloud
 (all inside his own box), rummages in it (junk flies out, his ears pop up), pops back
@@ -420,7 +421,7 @@ class BunnyWidget(QWidget):
         self._beg_at = -1.0
         self._joy_at = -1.0
         if joy_lines:
-            self.setCursor(Qt.CursorShape.PointingHandCursor)
+            self.setMouseTracking(True)   # the hand only over him (mouseMoveEvent)
         self.sad = sad             # his mood at rest
         self.sulk = False          # kicking at the ground (see the module's notes)
         self._kicks = -1           # the last sulky kick that threw up dust
@@ -623,7 +624,30 @@ class BunnyWidget(QWidget):
                                      _("it's the middle of the night!"), _("zzz… hm?!")))
         self._say_until = now + 2.2
 
+    def on_bun(self, pos) -> bool:
+        """Is this widget point on Bun himself (ears and hat included), not the room round
+        him?"""
+        r = self._bun_rect()
+        side, top = r.width() * 0.12, self.bun_h * ROOM_TOP / H + BOB_UP   # (droopy ears)
+        return r.adjusted(-side, -top, side, BOB_UP).contains(QPointF(pos))
+
+    def mouseMoveEvent(self, ev):
+        if self.joy_lines:
+            if self.on_bun(ev.position()):
+                self.setCursor(Qt.CursorShape.PointingHandCursor)
+            else:
+                self.unsetCursor()
+        super().mouseMoveEvent(ev)
+
+    def leaveEvent(self, ev):
+        if self.joy_lines:
+            self.unsetCursor()
+        super().leaveEvent(ev)
+
     def mousePressEvent(self, ev):
+        if not self.on_bun(ev.position()):
+            ev.ignore()   # a click beside him: not his
+            return
         if ev.button() == Qt.MouseButton.LeftButton:
             self.stir()
         if ev.button() == Qt.MouseButton.LeftButton and self.asleep:
