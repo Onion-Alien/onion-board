@@ -531,6 +531,52 @@ def test_card_tries_once_more_when_the_helper_never_calls_back(qapp, tmp_path, m
         p.deleteLater()
 
 
+def test_card_gives_up_on_a_helper_that_never_gets_ready(qapp, tmp_path, monkeypatch):
+    """A helper stuck loading gets one silent retry, then the card says it failed (the
+    backup keeps covering you); cards picked meanwhile don't claim to switch."""
+    from soundboard.ui.voice.aivoicepanel import AiVoicePanel
+    folder = tmp_path / "ai-voices"
+    folder.mkdir()
+    for f in ("module.json", "voices.json"):
+        (folder / f).write_bytes((ADDON / f).read_bytes())
+    (folder / ".venv" / "Scripts").mkdir(parents=True)
+    (folder / ".venv" / "Scripts" / "python.exe").write_bytes(b"")
+    (info,) = modules.discover([tmp_path])
+    ctl = AiVoiceController(VoiceChain(), lambda e: None)
+    starts, sent, gave_up = [], [], []
+
+    def fake_start(module, voice, auto_pitch=True, pitch=0.0, args=()):
+        starts.append(voice)
+        ctl.host = object()          # running
+    monkeypatch.setattr(ctl, "start", fake_start)
+    monkeypatch.setattr(ctl, "stop", lambda: setattr(ctl, "host", None))
+    monkeypatch.setattr(ctl, "set_voice", lambda v, pitch=0.0: sent.append(v))
+    monkeypatch.setattr(ctl, "give_up", lambda: gave_up.append(1))
+    p = AiVoicePanel(ctl, {"voice": "duke"}, [info])
+    try:
+        p.b_start.setChecked(True)
+        assert p._load_timer.isActive()
+        p._on_event({"type": "hello"})
+        p.pick("sage")                       # still loading: queued, no "switching to"
+        assert sent == ["sage"] and "switching" not in p.lbl_state.text()
+        assert p.voice_title() == "Sage" and p.status() == "starting"
+        p._on_event({"type": "timeout"})
+        assert starts == ["duke", "sage"] and p.status() == "starting" and not gave_up
+        p._on_event({"type": "timeout"})
+        assert gave_up and p.status() == "failed" and "⚠" in p.lbl_state.text()
+        # one that gets ready in time: the timer stops, and a card says it switches
+        p.b_start.setChecked(False)
+        assert not p._load_timer.isActive()
+        p.b_start.setChecked(True)
+        p._on_event({"type": "ready"})
+        assert not p._load_timer.isActive() and p.status() == "on"
+        p.pick("bear")
+        assert "switching" in p.lbl_state.text()
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
 def test_ai_voice_and_the_computer_voice_take_turns(qapp, monkeypatch, app_dir):
     from soundboard.speech import tts
     from soundboard.ui.voice.voicepanel import VoicePanel

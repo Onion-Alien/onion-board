@@ -319,6 +319,7 @@ class VoicePanel(QWidget):
         saved = speech.get("ai") if isinstance(speech, dict) else None   # may be damaged
         self.ai = AiVoicePanel(self.ai_controller, saved, self.modules, engine)
         self.ai.changed.connect(self._ai_changed)
+        self.ai.changed.connect(lambda _s: self._update_bar())   # the chip names the voice
         self.ai.live_changed.connect(self._ai_live)
         self.ai.modules_changed.connect(self.rescan_modules)
         self.ai._event.connect(lambda _ev: self._update_bar())   # starting -> on / failed
