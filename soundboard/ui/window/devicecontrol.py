@@ -88,11 +88,12 @@ class DeviceControl(Controller):
                 mw.engine.devices.release()
         mw.engine.devices.run(work, done)
 
-    def _refresh_off_ui(self, then=None):
+    def _refresh_off_ui(self, then=None, quiet: bool = False):
         """refresh_devices without the slow part on the UI thread: closing every
         stream, the re-scan, opening them again and the cable's format (asked of
         Windows) run on the device thread. The caller holds its claim; it's released
-        when this is done, then then() runs."""
+        when this is done, then then() runs. quiet: a re-scan nobody asked for (a
+        headset plugged in or pulled out) doesn't say the cable is still missing."""
         mw = self.mw
         e = mw.engine
 
@@ -105,7 +106,7 @@ class DeviceControl(Controller):
 
         def opened(ends, rescanned):
             self._devices_opened(ends or [])
-            msg = self._rescanned(rescanned)
+            msg = self._rescanned(rescanned, quiet)
             e.devices.release()
             if then is not None:
                 then(msg)
@@ -159,7 +160,7 @@ class DeviceControl(Controller):
             self._off_ui(guarded, finish)
         self._when_devices_free(start)
 
-    def _rescanned(self, rescanned: bool) -> str:
+    def _rescanned(self, rescanned: bool, quiet: bool = False) -> str:
         """After a re-scan: the sounds are prepared for the new rates, and the result."""
         mw = self.mw
         mw.routectl._prepare_all()
@@ -170,6 +171,8 @@ class DeviceControl(Controller):
                        status=theme.status('warn')), "warn")
             return _("Couldn't re-scan")
         if mw.cfg.route == "cable" and not any(is_virtual_cable(d["name"]) for d in outs):
+            if quiet:
+                return _("No cable found yet")
             mw.say(_("<span style='color:{status}'>Still no virtual cable. If you "
                        "just installed it, restart your PC, Windows often only shows "
                        "it after a restart.</span>", status=theme.status('warn')), "warn")
@@ -427,9 +430,32 @@ class DeviceControl(Controller):
             if not mw.engine.devices.claim():
                 mw._default_out = was
                 return
-            self._refresh_off_ui(lambda _msg: self._use_default_output(self._default_output()))
+            self._refresh_off_ui(lambda _msg: self._use_default_output(self._default_output()),
+                                 quiet=True)
             return
         self._use_default_output(name)
+        self._drop_if_gone(was)
+
+    def _drop_if_gone(self, was: str | None):
+        """Windows' default moved off `was`. If it was pulled out (a headset unplugged),
+        PortAudio's list, from the last scan, still has it, so the device boxes offered
+        a device that's gone. Windows is asked on the device thread; a re-scan drops it."""
+        if not was or eng.find_device("output", was) is None:
+            return
+
+        def start():
+            def gone():
+                have = appaudio.endpoint_names("output")
+                return have is not None and not _listed(was, have)
+
+            def checked(stale):
+                if stale:
+                    log.info("output %r was pulled out: re-scanning", was)
+                    self._refresh_off_ui(quiet=True)
+                else:
+                    self.mw.engine.devices.release()
+            self._off_ui(gone, checked)
+        self._when_devices_free(start)
 
     def _use_default_output(self, name: str | None):
         """The headphones move to Windows' default output, `name` (as listed)."""
