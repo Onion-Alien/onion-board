@@ -493,13 +493,14 @@ def test_the_window_records_your_voice_and_whats_playing_together(app_dir):
     d.opt_both.setChecked(True)
     assert not d.problem.isVisibleTo(d) and d.btn_rec.isEnabled()
     assert d.start() and d.take.both and e.taking and e.play_taking
-    for _ in range(50):
+    for _ in range(60):
         e._play_take.append(np.full((BLOCK, 2), 0.3, np.float32))
+    feed(e, 0.001, 10)   # the room, then you talk (the ducker learns the room first)
     feed(e, 0.25, 50)
     d._tick()
     d.stop()
     assert not e.taking and not e.play_taking
-    assert d.data is not None and abs(len(d.data) - 50 * BLOCK) <= 2
+    assert d.data is not None and abs(len(d.data) - 60 * BLOCK) <= 2
     mid = float(d.data[len(d.data) // 2, 0])
     assert abs(mid - (0.25 + 0.3 * 10 ** (-12 / 20))) < 0.02   # voice on top of the song
     assert d.save() and saved[0][1] == "Recording 1"

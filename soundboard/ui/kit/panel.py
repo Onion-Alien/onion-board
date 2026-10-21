@@ -899,6 +899,7 @@ class EqPanel(QWidget):
         pv.addWidget(self.body)
 
         self.cb_preset = QComboBox()
+        self.cb_preset.setAccessibleName(_("Preset"))   # (folded away until EQ is on)
         # the item data is the preset's key, "Custom" for none; the keys are saved in
         # config, so they keep their old dash and only the shown name drops it
         for name in EQ_PRESETS:

@@ -123,6 +123,18 @@ def test_ducker_lowers_while_talking_and_comes_back():
     assert g == 1.0
 
 
+def test_ducker_leaves_a_steady_room_alone_from_the_start():
+    """A room's hiss isn't you talking, even in the first seconds: the floor starts at
+    the first mic block, not at -60 dB (which lowered the sounds for ~10 s)."""
+    d = Ducker(SR)
+    room = [_talk(0.02, seed=i) for i in range(300)]   # about -34 dB, for 3 s
+    gains = [d.process(m, BLOCK, -12.0) for m in room]
+    assert all(isinstance(g, float) and g == 1.0 for g in gains)
+    for _ in range(30):                        # talking over it still ducks
+        g = d.process(_talk(0.3), BLOCK, -12.0)
+    assert db(float(g[-1, 0])) == pytest.approx(-12.0, abs=0.5)
+
+
 def test_ducker_off_or_no_mic_does_nothing():
     assert Ducker(SR).process(_talk(0.2), BLOCK, 0.0) == 1.0
     assert Ducker(SR).process(None, BLOCK, -12.0) == 1.0

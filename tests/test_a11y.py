@@ -107,6 +107,15 @@ def test_every_tab_stop_on_the_main_pages_has_a_name(window):
     assert window._pad_scroll.accessibleName() == "Your sounds"
 
 
+def test_the_eq_preset_box_has_a_name_once_unfolded(window):
+    """The EQ's body folds away while it's off, so the page check above never sees it:
+    its preset drop-down was read as a bare "combo box"."""
+    window.eq.chk_on.setChecked(True)
+    assert not window.eq.body.isHidden()
+    assert window.eq.cb_preset.accessibleName() == "Preset"
+    assert window.eq.cb_target.accessibleName() == "Equalizer"
+
+
 def test_the_sounds_page_and_the_hear_switch_have_names(window, qapp):
     """The Sounds page takes the focus when switched to (its Ctrl+V), and a narrow
     window blanks the Hear what they hear switch's words: both still have a name."""
