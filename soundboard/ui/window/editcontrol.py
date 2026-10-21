@@ -16,6 +16,7 @@ from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+import numpy as np
 from PySide6.QtCore import QTimer, QUrl, Signal
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QInputDialog
@@ -32,6 +33,7 @@ from soundboard.ui.kit import worker
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.kit.crashdialog import free_dialog, rehome_crash_reports
 from soundboard.ui.sounds.dialogs import EditDialog
+from soundboard.ui.sounds.linkbar import PLAY_ID as LINK_ID
 
 if TYPE_CHECKING:
     from soundboard.ui.window.mainwindow import MainWindow
@@ -308,9 +310,13 @@ class EditControl(Controller):
         return new
 
     def live_sound(self) -> str | None:
-        """The sound Live controls' Save as new pad copies: the last one played while
-        it's still playing, else the newest one playing, else the last one played."""
+        """The sound Live controls' Save as new pad copies: the one in the player
+        (a Community or web search song too: it isn't a pad, and the last pad played
+        was copied instead), else the last one played while it's still playing, else
+        the newest one playing, else the last one played."""
         mw = self.mw
+        if mw.current and mw.meta(mw.current) is not None:
+            return mw.current
         last = mw.playctl._last_sid
         playing = [sid for sid in mw.engine.playing() if mw.meta(sid) is not None]
         if last in playing or (not playing and last and mw.meta(last) is not None):
@@ -356,15 +362,21 @@ class EditControl(Controller):
         if not name:
             return None
         fx, capped = soundfx.with_live(m.fx, *sp.values(), sp.fx_values())
+        link = m.id == LINK_ID
         try:
-            new = duplicate(m, name)
+            new = self._save_link(m, name) if link else duplicate(m, name)
         except OSError as e:
             errors.warn(mw, _("Couldn't copy the sound"), e)
             return None
+        if new is None:
+            return None
         new.fx = {} if soundfx.is_neutral(fx) else fx
-        videos.copy_link(m.id, new.id)
         mw.catctl._tag_new(new)   # stays in sight in the category showing
-        mw.cfg.sounds.insert(mw.cfg.sounds.index(m) + 1, new)
+        if link:   # not on the board: at its end, as an added link is
+            mw.cfg.sounds.append(new)
+        else:
+            videos.copy_link(m.id, new.id)
+            mw.cfg.sounds.insert(mw.cfg.sounds.index(m) + 1, new)
         mw._index()
         mw._save_now()
         mw._rebuild_pads()
@@ -374,6 +386,23 @@ class EditControl(Controller):
                        name=html.escape(new.name)), "ok")
         else:
             mw.toast(_("✓ Added “{name}”", name=html.escape(new.name)), "ok")
+        return new
+
+    def _save_link(self, m: SoundMeta, name: str) -> SoundMeta | None:
+        """A Community or web search song in the player as a sound of its own: its
+        audio written to the library, in its site's folder (Myinstants/…). None: its
+        audio is gone (it was stopped meanwhile)."""
+        mw = self.mw
+        data = mw.audio.get(LINK_ID)
+        if data is None:
+            mw.toast(_("Play a sound first, then save it with your changes"), "warn")
+            return None
+        if data.dtype == np.int16:
+            data = data.astype(np.float32) / 32768.0
+        url = mw.searchctl._link_url
+        new, _audio = library.save_clip(
+            data, name, library.PAD_COLORS[len(mw.cfg.sounds) % len(library.PAD_COLORS)],
+            folder=library.site_folder(url) if url else library.MY_SOUNDS)
         return new
 
     def show_sound_file(self, sid: str):

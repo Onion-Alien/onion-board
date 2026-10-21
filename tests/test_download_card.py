@@ -72,7 +72,7 @@ def test_card_sits_in_the_corner_and_folds_to_a_pill(window, qapp, monkeypatch):
 
     # a sound playing shows Now playing over the player, its chips on the left: the
     # card stays down on the player beside them...
-    window.playctl._update_chips({window.cfg.sounds[0].id})
+    window.playctl._update_chips({window.cfg.sounds[0].id: (0.0, False)})
     # (nothing really plays: the app's tick would take the row down again)
     monkeypatch.setattr(window.playctl, "_update_chips", lambda *a, **k: None)
     QTest.qWait(50)

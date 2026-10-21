@@ -3,6 +3,8 @@ switch category, louder / quieter, mic and voice changer keys, all hotkeys off, 
 of hotkeys per category, a sound's queue / wait / cooldown / "only others hear it",
 playing a whole category and one-click pads."""
 from conftest import said, unsay
+from pathlib import Path
+
 import pytest
 
 import numpy as np
@@ -1031,6 +1033,45 @@ def test_live_controls_save_as_new_pad(window, monkeypatch):
     monkeypatch.setattr(w.editctl, "_ask_pad_name", lambda d: None)   # Cancel
     n = len(w.cfg.sounds)
     assert w.editctl.save_live_copy() is None and len(w.cfg.sounds) == n
+
+
+def test_live_save_takes_the_community_sound_in_the_player(window, monkeypatch, app_dir):
+    """A Community (or web search) sound in the player is what Save as new pad saves,
+    not the pad played before it: its audio becomes a sound of its own, in its site's
+    folder, at the end of the board, with Live controls' changes on it."""
+    from soundboard.ui.sounds.linkbar import PLAY_ID
+    w = window
+    sp = w.speed_btn
+    asked = []
+    monkeypatch.setattr(w.editctl, "_ask_pad_name", lambda d: asked.append(d) or d)
+    monkeypatch.setattr(w, "toast", lambda *a, **k: None)
+    w.playctl._last_sid = "s0"              # a song of the board played first (paused)
+    w.searchctl.on_link_played("Du bist gut genug", np.full((4800, 2), 1000, np.int16),
+                               1.0, "https://www.myinstants.com/en/instant/x/")
+    assert w.current == PLAY_ID and w.editctl.live_sound() == PLAY_ID
+    sp.set_values(1.0, 6, True)
+    sp.set_fx({"bass": 4})
+    n = len(w.cfg.sounds)
+    new = w.editctl.save_live_copy()
+    assert asked == ["Du bist gut genug (modified)"]
+    assert new is not None and w.cfg.sounds[n] is new and len(w.cfg.sounds) == n + 1
+    assert Path(new.file).is_file() and Path(new.file).parent.name == "Myinstants"
+    assert abs(new.duration - 0.1) < 0.01 and new.fx["pitch"] == 6
+    assert w.meta("s0").fx == {}            # the board's song is left alone
+
+
+def test_a_paused_sound_shows_under_paused_not_now_playing(window):
+    w = window
+    w.playctl._update_chips({"s0": (0.5, True), "s1": (0.2, False)})
+    texts = [w._chips_hl.itemAt(i).widget() for i in range(w._chips_hl.count())]
+    labels = [x.text() for x in texts if isinstance(x, QLabel)]
+    assert labels == ["Now playing", "Paused"]
+    order = [x for x in texts if x in w._chips.values()]
+    assert order == [w._chips["s1"], w._chips["s0"]]
+    w.playctl._update_chips({"s0": (0.5, False), "s1": (0.2, False)})   # resumed
+    labels = [w._chips_hl.itemAt(i).widget().text() for i in range(w._chips_hl.count())
+              if isinstance(w._chips_hl.itemAt(i).widget(), QLabel)]
+    assert labels == ["Now playing"]
 
 
 def test_live_save_button_only_where_there_is_a_pad(qapp):
