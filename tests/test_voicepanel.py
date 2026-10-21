@@ -7,6 +7,7 @@ from PySide6.QtCore import QPoint
 from soundboard import voicefx
 from soundboard.speech import tts
 from tests.conftest import process_events
+from test_mainwindow import window  # noqa: F401
 
 
 class FakeEngine:
@@ -185,6 +186,22 @@ def test_reset_while_voices_are_on_turns_them_off_and_undo_brings_them_back(pane
     assert p.on_keys() == ["fx", "speak"] and p.fx.spec() == before
     assert eng.voice_chain.enabled
 
+
+def test_reset_shows_its_undo_card_on_the_window(window):  # noqa: F811
+    """The bar's Reset puts a "Voices reset" card up on the window, and its Undo
+    button brings the voice back."""
+    from soundboard.ui.kit import toast
+    v = window.voice
+    v.fx.pick("Robot")
+    assert v.on_keys() == ["fx"]
+    v.reset_voices()
+    assert v.on_keys() == []
+    cards = [t for t in toast.shown(window) if "Voices reset" in t.words()]
+    assert len(cards) == 1
+    undo = cards[0].card.action
+    assert undo.isVisibleTo(cards[0]) and undo.text() == "Undo"
+    undo.click()
+    assert v.on_keys() == ["fx"] and v.fx.preset == "Robot"
 
 def test_global_voice_stop_turns_off_replacements_and_translation(panel, monkeypatch):
     p, eng = panel
