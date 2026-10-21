@@ -316,6 +316,7 @@ class _Setup:
         from soundboard.mic import discordtalk
         from soundboard.ui.kit import busy
         self.calls, self.closed, self.opened, self.fixed, self.toasts = [], [], [], [], []
+        self.untoasted: list[str] = []
         answers = [first, then or first]
 
         def set_up(saved, root, on_mic, **k):
@@ -327,6 +328,8 @@ class _Setup:
                             lambda dirs: self.closed.append(list(dirs)) or True)
         monkeypatch.setattr(busy, "open_url", lambda url, *a, **k: self.opened.append(url))
         monkeypatch.setattr(busy, "toast", lambda w, text, *a, **k: self.toasts.append(text))
+        monkeypatch.setattr(chatguide.toastmod, "close",
+                            lambda w, key: self.untoasted.append(key))
         monkeypatch.setattr(chatguide.DiscordFixed, "exec",
                             lambda box: self.fixed.append(box.table.text()) or 0)
 
@@ -365,6 +368,7 @@ def test_set_up_discord_saves_talk_writes_and_shows_what_changed(qapp, wizard, m
     assert w.cfg.discord_talk == {"discord": {"noiseCancellation": True}}   # to put back
     assert fake.opened == [chatguide.DISCORD_VOICE_URL]   # Discord, on its voice page
     assert fake.fixed and "Echo" in fake.fixed[0]          # exactly what changed
+    assert fake.untoasted == ["discord-setup"]   # no "setting up…" left under the box
 
 
 def test_an_open_discord_is_asked_about_then_closed_and_set(qapp, wizard, monkeypatch):
@@ -384,6 +388,7 @@ def test_not_now_leaves_an_open_discord_alone(qapp, wizard, monkeypatch):
                        close=False)
     assert asked == [1] and fake.closed == [] and len(fake.calls) == 1
     assert fake.opened == [] and fake.fixed == []
+    assert fake.untoasted == ["discord-setup"]   # its "setting up…" goes with the box
     assert getattr(w, "_discord_setup", None) is None   # can be asked again
 
 
