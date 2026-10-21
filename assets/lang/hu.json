@@ -4368,5 +4368,9 @@
   "Take the Live controls effects off": "Élő vezérlők effektjeinek levétele",
   "{name} (modified {n})": "{name} (módosított {n})",
   "{name} (modified)": "{name} (módosított)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ „{name}” hozzáadva, a sebesség és a hangmagasság annyi, amennyit egy pad menteni tud"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ „{name}” hozzáadva, a sebesség és a hangmagasság annyi, amennyit egy pad menteni tud",
+  "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Törlöd a beszédfelismerést és minden letöltött nyelvet erről a gépről? Bármikor újra beszerezheted őket.",
+  "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Törli a beszédfelismerést, a beszédmodelljeit és minden letöltött nyelvet erről a gépről. Bármikor újra beszerezheted őket.",
+  "Languages are removed.": "A nyelvek eltávolítva.",
+  "Remove languages": "Nyelvek eltávolítása"
 }

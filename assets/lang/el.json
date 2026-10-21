@@ -4368,5 +4368,9 @@
   "Take the Live controls effects off": "Βγάλε τα εφέ από τα ζωντανά χειριστήρια",
   "{name} (modified {n})": "{name} (τροποποιημένο {n})",
   "{name} (modified)": "{name} (τροποποιημένο)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Προστέθηκε το \"{name}\", με ταχύτητα και τονικότητα όσο μπορεί να αποθηκεύσει ένα pad"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Προστέθηκε το \"{name}\", με ταχύτητα και τονικότητα όσο μπορεί να αποθηκεύσει ένα pad",
+  "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Διαγραφή της αναγνώρισης ομιλίας και κάθε γλώσσας που έχει ληφθεί από αυτόν τον υπολογιστή; Μπορείς να τα πάρεις ξανά οποιαδήποτε στιγμή.",
+  "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Διαγράφει την αναγνώριση ομιλίας, τα μοντέλα ομιλίας της και κάθε γλώσσα που έχει ληφθεί από αυτόν τον υπολογιστή. Μπορείς να τα πάρεις ξανά οποιαδήποτε στιγμή.",
+  "Languages are removed.": "Οι γλώσσες αφαιρέθηκαν.",
+  "Remove languages": "Αφαίρεση γλωσσών"
 }

@@ -4291,5 +4291,9 @@
   "Take the Live controls effects off": "실시간 조절 효과 빼기",
   "{name} (modified {n})": "{name} (수정 {n})",
   "{name} (modified)": "{name} (수정)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” 추가함, 속도와 피치는 패드가 저장할 수 있는 범위로 맞춤"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” 추가함, 속도와 피치는 패드가 저장할 수 있는 범위로 맞춤",
+  "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "이 PC에서 음성 인식과 다운로드한 모든 언어를 삭제할까요? 언제든지 다시 받을 수 있습니다.",
+  "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "이 PC에서 음성 인식, 음성 모델, 다운로드한 모든 언어를 삭제합니다. 언제든지 다시 받을 수 있습니다.",
+  "Languages are removed.": "언어가 제거되었습니다.",
+  "Remove languages": "언어 제거"
 }

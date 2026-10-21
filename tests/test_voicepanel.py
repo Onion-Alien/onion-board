@@ -535,6 +535,44 @@ def test_downloaded_language_needs_a_windows_voice_and_uses_it(panel, monkeypatc
     assert "(download" in s.cb_lang.currentText()
 
 
+def test_remove_languages_takes_speech_recognition_back_off(panel, qapp, monkeypatch,
+                                                            tmp_path):
+    """More options' Remove languages (as AI voices' Remove): speech recognition's
+    environment, its speech models and every downloaded language go; the add-on that
+    came with the app stays, so Install speech recognition gets it all back."""
+    import dataclasses
+    from PySide6.QtWidgets import QMessageBox
+    from soundboard.speech import translation
+    p, _ = panel
+    s = p.speech
+    if s.module is None:
+        pytest.skip("no live-voice add-on in this copy")
+    mod = dataclasses.replace(s.module, path=tmp_path / "live-voice")
+    (mod.path / ".venv" / "Scripts").mkdir(parents=True)
+    (mod.path / ".venv" / "Scripts" / "python.exe").write_bytes(b"x")
+    (mod.path / "helper.py").write_text("")
+    hub = tmp_path / "hub"
+    monkeypatch.setenv("HF_HUB_CACHE", str(hub))
+    whisper = hub / "models--Systran--faster-whisper-base.en"
+    other = hub / "models--someone--else"
+    for d in (whisper, other):
+        d.mkdir(parents=True)
+    d = translation.model_dir(s.langs[0])
+    (d / "model").mkdir(parents=True)
+    (d / "model" / "model.bin").write_bytes(b"x")
+    (d / "sentencepiece.model").write_bytes(b"x")
+    s.module = mod
+    s.installs._refresh_module()
+    assert s.installs.b_install.isHidden() and not s.installs.b_remove.isHidden()
+    monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)
+    s.installs.b_remove.click()                       # asks, then "Removing…"
+    process_events(qapp, lambda: not (mod.path / ".venv").exists() and not d.exists())
+    assert not whisper.exists() and other.exists()    # only our models leave the cache
+    assert (mod.path / "helper.py").exists()          # the add-on itself stays
+    process_events(qapp, lambda: not s.installs.b_install.isHidden())
+    assert s.installs.b_remove.isHidden()
+
+
 def test_voice_installed_in_windows_settings_is_found_on_return(panel, qapp, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtGui import QDesktopServices

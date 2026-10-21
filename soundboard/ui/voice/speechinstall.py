@@ -19,7 +19,7 @@ from soundboard.core import applog
 from soundboard.addons import modules as mods
 from soundboard.core import langnames
 from soundboard.online import net, netlog
-from soundboard.speech import translation, winvoices
+from soundboard.speech import live, translation, winvoices
 from soundboard.ui.bun.pilotbun import PilotBunny
 from soundboard.ui.kit import busy, icons
 from soundboard.ui.kit.glowbutton import GlowButton
@@ -133,6 +133,11 @@ class SpeechInstalls(QObject):
         self.b_update.setToolTip(_("Runs its install again: picks up what a newer Onion Board "
                                    "needs (translation, for one)."))
         self.b_update.clicked.connect(self._install)
+        self.b_remove = QPushButton(_("Remove languages"))
+        self.b_remove.setToolTip(_("Deletes speech recognition, its speech models and every "
+                                   "downloaded language from this PC. Get them again any "
+                                   "time."))
+        self.b_remove.clicked.connect(self._remove)
 
     def tr_buttons(self) -> tuple[QPushButton, ...]:
         """The buttons under "Speak in", in their row's order."""
@@ -340,6 +345,35 @@ class SpeechInstalls(QObject):
                                 "Onion Board and try again."), "warn")
         busy.run_busy(self.b_dl_remove, _("Deleting…"), go, said)
 
+    def _remove(self):
+        p = self.p
+        if p.module is None or p.ctl.live or self._installing or self._dl_busy is not None:
+            return
+        if QMessageBox.question(
+                p, _("Remove languages"),
+                _("Delete speech recognition and every downloaded language from this PC? "
+                  "You can get them again any time.")) != QMessageBox.StandardButton.Yes:
+            return
+        m, langs = p.module, list(p.langs)
+
+        def go():
+            try:
+                return live.remove_recognition(m, langs)
+            except mods.ModuleError:   # a file in its environment is in use
+                return False
+
+        def said(gone: bool):
+            p._ready.clear()
+            p._fill_langs()
+            self._refresh_module()
+            p.downloaded.emit()
+            if gone:
+                busy.toast(p, _("Languages are removed."), "ok")
+            else:
+                busy.toast(p, _("Couldn't delete all of it (a file is in use). Restart "
+                                "Onion Board and try again."), "warn")
+        busy.run_busy(self.b_remove, _("Removing…"), go, said)
+
     # ---- speech recognition (the live-voice add-on)
     def _net_changed(self):
         """Offline mode on or off: the install buttons follow (not mid-install)."""
@@ -356,6 +390,7 @@ class SpeechInstalls(QObject):
         self.missing.setVisible(not ok)
         self.b_install.setVisible(m is not None and not ok and not net.offline())
         self.b_update.setVisible(m is not None and not net.offline())   # pip: online
+        self.b_remove.setVisible(ok)
         if m is not None and not ok and net.offline():
             self.lbl_missing.setText(_("Speaking another language needs speech recognition "
                                        "installed first, which is a download. Offline mode "
@@ -382,7 +417,7 @@ class SpeechInstalls(QObject):
         if m is None or self._installing:
             return          # one pip at a time: two into the same environment break it
         self._installing = True
-        for b in (self.b_install, self.b_update, self.p.livevoice.b_live):
+        for b in (self.b_install, self.b_update, self.b_remove, self.p.livevoice.b_live):
             busy.set_busy(b, True)
         self.b_install.setText(_("Installing… (a few minutes)"))
         self.bun_pilot.set_flying(True)
@@ -405,12 +440,13 @@ class SpeechInstalls(QObject):
         p = self.p
         b_live = p.livevoice.b_live
         self._installing = False
-        for b in (self.b_install, self.b_update, b_live):
+        for b in (self.b_install, self.b_update, self.b_remove, b_live):
             busy.set_busy(b, False)
         self.b_install.setEnabled(True)
         self.b_install.setText(_("Install speech recognition"))
         self.bun_pilot.set_flying(False)
-        _enable(self.b_update, not p.ctl.live, _("Stop the computer voice to change this"))
+        for b in (self.b_update, self.b_remove):
+            _enable(b, not p.ctl.live, _("Stop the computer voice to change this"))
         self.b_update.setText(_("Update speech recognition"))
         _enable(b_live, self._dl_busy is None, _("Waiting for the download to finish"))
         if ok:

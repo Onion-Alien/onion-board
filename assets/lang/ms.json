@@ -4291,5 +4291,9 @@
   "Take the Live controls effects off": "Tanggalkan kesan kawalan langsung",
   "{name} (modified {n})": "{name} (diubah {n})",
   "{name} (modified)": "{name} (diubah)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” ditambah, kelajuan dan picnya dihadkan kepada apa yang boleh disimpan pad"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” ditambah, kelajuan dan picnya dihadkan kepada apa yang boleh disimpan pad",
+  "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Padam pengecaman pertuturan dan setiap bahasa yang dimuat turun daripada PC ini? Anda boleh mendapatkannya semula pada bila-bila masa.",
+  "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Memadam pengecaman pertuturan, model pertuturannya dan setiap bahasa yang dimuat turun daripada PC ini. Dapatkan semula pada bila-bila masa.",
+  "Languages are removed.": "Bahasa telah dialih keluar.",
+  "Remove languages": "Alih keluar bahasa"
 }

@@ -4676,5 +4676,9 @@
   "Take the Live controls effects off": "أزل مؤثرات التحكّم المباشر",
   "{name} (modified {n})": "{name} (معدّل {n})",
   "{name} (modified)": "{name} (معدّل)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ أُضيف “{name}”، مع إبقاء سرعته ونغمته ضمن ما تحفظه اللوحة"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ أُضيف “{name}”، مع إبقاء سرعته ونغمته ضمن ما تحفظه اللوحة",
+  "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "هل تريد حذف التعرف على الكلام وكل لغة تم تنزيلها من هذا الكمبيوتر؟ يمكنك الحصول عليها مرة أخرى في أي وقت.",
+  "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "يحذف التعرف على الكلام ونماذج الكلام الخاصة به وكل لغة تم تنزيلها من هذا الكمبيوتر. احصل عليها مرة أخرى في أي وقت.",
+  "Languages are removed.": "تمت إزالة اللغات.",
+  "Remove languages": "إزالة اللغات"
 }

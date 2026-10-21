@@ -4368,5 +4368,9 @@
   "Take the Live controls effects off": "Poista live-säätimien tehosteet",
   "{name} (modified {n})": "{name} (muokattu {n})",
   "{name} (modified)": "{name} (muokattu)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Lisätty \"{name}\", nopeus ja sävelkorkeus rajattu siihen, minkä padi voi tallentaa"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Lisätty \"{name}\", nopeus ja sävelkorkeus rajattu siihen, minkä padi voi tallentaa",
+  "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Poistetaanko puheentunnistus ja kaikki ladatut kielet tältä tietokoneelta? Voit hakea ne uudelleen milloin tahansa.",
+  "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Poistaa puheentunnistuksen, sen puhemallit ja kaikki ladatut kielet tältä tietokoneelta. Voit hakea ne uudelleen milloin tahansa.",
+  "Languages are removed.": "Kielet on poistettu.",
+  "Remove languages": "Poista kielet"
 }
