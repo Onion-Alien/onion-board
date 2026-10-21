@@ -944,3 +944,18 @@ def test_only_bun_himself_takes_clicks_and_shows_the_hand(qapp):
     QTest.mouseClick(b, Qt.MouseButton.LeftButton, pos=on)
     assert b._joy_at > 0                                 # he hops for joy
     b.close()
+
+
+def test_a_click_hop_and_a_dance_hop_stay_inside_his_box(qapp):
+    from soundboard.ui.bun.bunny import ROOM_TOP, H
+    for kw in ({"joy_lines": ("yay",)}, {"dances": True}):
+        b = BunnyWidget(height=130, pad=16, **kw)
+        b.resize(b.sizeHint())
+        if "joy_lines" in kw:
+            b.cheer()
+            t0 = b._joy_at
+            hop = min(b.pose(t0 + i / 120)["dy"] for i in range(60))
+        else:
+            hop = -0.07 * 130
+        top = b._bun_rect().top() + hop - 2.2 - b.bun_h * ROOM_TOP / H   # (bob, ears, hat)
+        assert top >= 0, kw
