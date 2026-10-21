@@ -79,7 +79,7 @@ class AlertControl(Controller):
         self._discord_reading = False
         self._discord_poll = PollThread("discord-settings")
         self._talk_seen: set[str] = set()   # Discord folders looked at for how you talk
-        # Audio recovery's Put Discord back, asked while Discord was open: done the
+        # the Mic effect card's Put Discord back, asked while Discord was open: done the
         # moment it closes (it won't take changes while it runs)
         self.discord_pending: set[str] = set()
         # straight into my mic: an app recording the mic in raw mode skips Onion Board

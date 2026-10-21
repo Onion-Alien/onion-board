@@ -1173,7 +1173,7 @@ def test_basics_first_and_show_advanced(window, qapp):  # noqa: F811
 
 
 def test_every_card_heading_has_its_icon_on_one_line(window, qapp):  # noqa: F811
-    """Every Settings card's heading has an icon in front (like Audio recovery's), and
+    """Every Settings card's heading has an icon in front (like the Mic effect card's), and
     a heading that fits stays on one line: sharing its row with a stretch, "Custom
     voices (text-to-speech)" wrapped at half the card's width."""
     window.resize(1180, 820)
@@ -1189,7 +1189,7 @@ def test_every_card_heading_has_its_icon_on_one_line(window, qapp):  # noqa: F81
             for card in d.tabs.widget(i).widget().findChildren(QFrame, "setcard"):
                 title = next((lb for lb in card.findChildren(QLabel, "section")), None)
                 assert title is not None
-                # (Audio recovery paints its own: any picture beside the title)
+                # (the Mic effect card paints its own: any picture beside the title)
                 marks = [lb for lb in card.findChildren(QLabel)
                          if not lb.pixmap().isNull() and lb.y() <= title.y() + title.height()]
                 assert marks, (key, title.text())

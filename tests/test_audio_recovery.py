@@ -571,3 +571,23 @@ def test_the_first_look_runs_before_the_card_shows(window, qapp, monkeypatch):  
     assert not card.isVisible()
     wait(qapp, lambda: set(card.rows) == {GUID_A, GUID_B} and not card._checking)
     card.deleteLater()
+
+
+def test_the_mic_in_use_without_the_effect_glows_its_install(window, qapp, monkeypatch):  # noqa: F811
+    # a new mic or headset: the one in use has no mic effect yet, the other one does
+    d, card = card_with(window, qapp, monkeypatch, two_mics('other', 'ready'))
+    a, b = card.rows[GUID_A], card.rows[GUID_B]
+    assert a.glow.button is a.buttons['install'] and a.glow.tone == 'warn'
+    assert not hasattr(b, 'glow')
+    # and the card says a new mic needs it too
+    assert 'New mic or headset?' in card.new_mic.text()
+    d.close()
+
+
+def test_the_mic_in_use_is_listed_first(window, qapp, monkeypatch):  # noqa: F811
+    found = two_mics('ready', 'other')
+    found[0]['pa'], found[1]['pa'] = 'Desk Mic', 'Headset Mic (USB)'   # in use: the 2nd
+    d, card = card_with(window, qapp, monkeypatch, found)
+    first = card.list.itemAt(0).widget()
+    assert first is card.rows[GUID_B] and first.name.text() == '#2 Headset Mic (USB)'
+    d.close()

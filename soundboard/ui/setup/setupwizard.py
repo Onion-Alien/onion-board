@@ -618,6 +618,51 @@ class CableConfirm(QDialog):
         fit.watch(self)
 
 
+def mic_later(win) -> QDialog:
+    """After a guide finished without the sounds in a mic: where to put them in, once
+    the mic's plugged in (Settings → Audio's Install mic effect). Returns the box (open)."""
+    d = QDialog(win)
+    d.setWindowTitle(_("One more step"))
+    d.setMaximumWidth(560)
+    v = QVBoxLayout(d)
+    v.setContentsMargins(18, 18, 18, 18)
+    v.setSpacing(12)
+    head = QHBoxLayout()
+    head.setSpacing(14)
+    head.addWidget(BunnyWidget("plug", height=BUN_H, pad=BUN_PAD), 0, Qt.AlignmentFlag.AlignTop)
+    words = QVBoxLayout()
+    words.setSpacing(8)
+    title = QLabel(_("Your sounds aren't in your mic yet"))
+    title.setObjectName("helptitle")
+    words.addWidget(title)
+    for text in (_("Right now only you hear your sounds."),
+                 _("When your mic is plugged in, go to <b>Settings → Audio</b> and press "
+                   "<b>Install mic effect</b>. Without it, your sounds won't go through to "
+                   "Discord or games."),
+                 _("New mic or headset later? Do it again for that one: each mic needs it "
+                   "once.")):
+        label = QLabel(text)
+        label.setWordWrap(True)
+        words.addWidget(label)
+    head.addLayout(words, 1)
+    v.addLayout(head)
+    row = QHBoxLayout()
+    row.setSpacing(8)
+    row.addStretch(1)
+    go = QPushButton(_("Open Settings → Audio"))
+    icons.set_icon(go, "mic", "on_accent")
+    go.setObjectName("primary")
+    go.setDefault(True)
+    go.clicked.connect(lambda: (d.accept(), win.setctl.open_settings("audio")))
+    later = QPushButton(_("Got it, later"))
+    later.clicked.connect(d.reject)
+    row.addWidget(go)
+    row.addWidget(later)
+    v.addLayout(row)
+    d.open()
+    return d
+
+
 class SetupWizard(QDialog):
     PAGES = 3
     _discord_read = Signal(object, object)   # worker -> UI: (files' signature, settings)
@@ -1023,7 +1068,7 @@ class SetupWizard(QDialog):
         text = _("Bun saves how Discord is set now, then turns off its noise suppression, "
                  "echo cancellation and automatic volume, which chop up your sounds. If "
                  "Discord is open, it closes for a few seconds. Undo it any time: Settings → "
-                 "Audio → Audio recovery → Put Discord back.")
+                 "Audio → Mic effect → Put Discord back.")
         if self._discord_needed():
             mic = eng.virtual_mic_for(self.win.routectl._main_name()) or "CABLE Output"
             text += " " + _("Then pick {mic} as your mic in Discord: Bun shows you where.",
@@ -1220,6 +1265,12 @@ class SetupWizard(QDialog):
         self.mic_done = _label("")
         self.mic_done.hide()
         v.insertWidget(2, self.mic_done)
+        # the mic effect sits on one mic: a new mic or headset needs it put on again
+        self.mic_note = _label(_("🎧 <b>Got a new mic or headset later?</b> Put your sounds "
+                                 "into that one too: <b>Settings → Audio → Install mic "
+                                 "effect</b>. Each mic needs it once."))
+        self.mic_note.setObjectName("hint")
+        v.insertWidget(4, self.mic_note)
         self.cable_bar = QProgressBar()
         self.cable_bar.setRange(0, 0)   # busy: we can't know how long Windows takes
         self.cable_bar.setTextVisible(False)
@@ -1652,6 +1703,7 @@ class SetupWizard(QDialog):
         busy.set_busy(self.btn_back, installing)
         mic_action = self._mic_action()
         self.btn_skip.setVisible(mic_action)
+        self.mic_note.setVisible(self.win.cfg.route == "mic")
         SetupWizard._sync_or(self)   # (by the class: tests drive this with a stand-in)
         if i == self.PAGES - 1:
             text, icon = _("Finish  ✓"), "check"
@@ -1743,9 +1795,14 @@ class SetupWizard(QDialog):
         self.win.devctl._reopen_devices()   # refresh the window's device boxes from the choices
         if self._ask_use and self.chk_autostart.isChecked() != autostart.is_enabled():
             self.win.set_autostart(self.chk_autostart.isChecked())
+        sending = self.route_ok()
         self.accept()
         if self._lang_pending:   # text already on screen can't change language
             QTimer.singleShot(0, self.win.restart_app)
+        elif cfg.route == "mic" and not sending:
+            # skipped the mic: say where it's done, once their mic is plugged in
+            win = self.win
+            QTimer.singleShot(0, win, lambda: mic_later(win))
         elif discord:
             from soundboard.ui.setup.chatguide import set_up_discord
             win = self.win

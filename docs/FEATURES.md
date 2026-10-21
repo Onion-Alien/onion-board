@@ -240,7 +240,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   chops up your sounds (Custom profile, noise suppression, echo cancellation, automatic
   gain and sensitivity off). Discord has to be closed while he writes: if it's open, he
   asks first, closes it, and opens it again on its voice settings. A copy of its settings
-  folder is kept first. *Put Discord back* (Settings → Audio → Audio recovery) undoes it,
+  folder is kept first. *Put Discord back* (Settings → Audio → Mic effect) undoes it,
   and *Put Discord back for talking on close* does it whenever Onion Board closes. On the
   virtual cable you still pick *CABLE Output* as Discord's mic; its guide shows where. With *Straight into my mic*, an app that opens your mic
   in "raw" mode (and so skips your sounds) is named in a warning bar too.
