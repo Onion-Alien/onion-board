@@ -205,9 +205,12 @@ class BunMode(QWidget):
         hint = self.icons.sizeHint()   # its whole height: shorter cut the buttons off
         w = max(bw, min(round(h * 1.5), 300), hint.width() + 8, 200)
         w += -w % (2 * SNAP)   # the button row then centres on the 4 px grid by itself
-        total = self._talk_h() + bh + ICONS_H
+        # the row tucks up into his empty room under the shadow, halving the gap
+        # between his feet and the buttons
+        tuck = (self.bun.pad + (ICONS_H - hint.height()) // 2 - 4) // 2 // SNAP * SNAP
+        total = self._talk_h() + bh + ICONS_H - tuck
         total += -total % SNAP
-        talk = total - bh - ICONS_H   # (the rounding goes to the bubble's room)
+        talk = total - bh - ICONS_H + tuck   # (the rounding goes to the bubble's room)
         self.bun.setGeometry((w - bw) // 2, talk, bw, bh)
         self.icons.setGeometry((w - hint.width()) // 2 // SNAP * SNAP,
                                (total - ICONS_H + (ICONS_H - hint.height()) // 2) // SNAP * SNAP,
