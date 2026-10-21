@@ -1460,7 +1460,6 @@
   "The Onion Board Discord server, in your browser": "Máy chủ Discord của Onion Board, trong trình duyệt của bạn",
   "(didn't say)": "(không nói)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>Tất cả hiệu ứng</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Tự động xác định độ nhạy đầu vào</b> được bật: trong cuộc gọi, nó sẽ giữ âm thanh của bạn ở chế độ im lặng và cắt chúng đi: tắt nó (Độ nhạy đầu vào) và để thanh trượt ở mức thấp hoặc sử dụng Nhấn để nói.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Chế độ đầu vào</b> : <b>Nhấn để nói</b> hoạt động tốt nhất (đặt cùng một phím trong Cài đặt → Phím nóng → Tự động nhấn để nói và Onion Board giữ phím đó cho bạn trong khi âm thanh phát). Trên <b>Hoạt động giọng nói</b> , hãy tắt <b>Tự động xác định độ nhạy đầu vào</b> và kéo thanh trượt gần hết sang trái hoặc Discord tiếp tục cắt âm thanh của bạn, cả những âm thanh lớn.",
   "<b>Languages</b> · {state}": "<b>Ngôn ngữ</b> · {state}",
@@ -4278,5 +4277,10 @@
     "{n} âm thanh đã trở lại."
   ],
   "Watches your game's window while it's open, even behind others": "Theo dõi cửa sổ game của bạn khi nó đang mở, kể cả khi bị che",
-  "Your file stays whole: only the part between the handles plays.": "Tệp của bạn vẫn nguyên vẹn: chỉ phần giữa hai tay nắm được phát."
+  "Your file stays whole: only the part between the handles plays.": "Tệp của bạn vẫn nguyên vẹn: chỉ phần giữa hai tay nắm được phát.",
+  "Main": "Chính",
+  "Trim & speed": "Cắt & tốc độ",
+  "{group}  ·  {n} on": [
+    "{group}  ·  {n} đang bật"
+  ]
 }

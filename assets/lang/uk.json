@@ -1536,7 +1536,6 @@
   "The Onion Board Discord server, in your browser": "Discord-сервер Onion Board, у твоєму браузері",
   "(didn't say)": "(не сказав)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>Всі ефекти</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Автоматично визначати, що вхідна чутливість</b> увімкнена: під час виклику він продовжує сприймати ваші звуки як тишу та вимикає їх: вимкніть (Вхідна чутливість) і залиште повзунок низьким або скористайтеся «Натискай і говори».",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Режим введення</b> : найкраще працює функція <b>«Натисни і говори»</b> (встановіть ту саму клавішу в меню «Налаштування» → «Гарячі клавіші» → «Автоматична функція «Натисни і говори», і Onion Board утримуватиме її під час відтворення звуку). У розділі <b>«Голосова активність»</b> вимкніть <b>«Автоматично визначати чутливість вхідного сигналу»</b> та перетягніть повзунок майже до кінця вліво, інакше Discord продовжуватиме виключати ваші звуки, навіть гучні.",
   "<b>Languages</b> · {state}": "<b>Мови</b> · {state}",
@@ -4430,5 +4429,12 @@
     "{n} звуків повернулися."
   ],
   "Watches your game's window while it's open, even behind others": "Стежить за вікном твоєї гри, поки воно відкрите, навіть за іншими вікнами",
-  "Your file stays whole: only the part between the handles plays.": "Твій файл лишається цілим: грає лише частина між повзунками."
+  "Your file stays whole: only the part between the handles plays.": "Твій файл лишається цілим: грає лише частина між повзунками.",
+  "Main": "Головне",
+  "Trim & speed": "Обрізка і швидкість",
+  "{group}  ·  {n} on": [
+    "{group}  ·  {n} увімк.",
+    "{group}  ·  {n} увімк.",
+    "{group}  ·  {n} увімк."
+  ]
 }

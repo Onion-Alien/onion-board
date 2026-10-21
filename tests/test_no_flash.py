@@ -42,4 +42,4 @@ def test_editing_a_loaded_sound_shows_its_trim_inside_the_dialog(qapp, monkeypat
     made = []
     assert windows_shown(qapp, lambda: made.append(dialogs.EffectsPanel(
         {}, SoundMeta(id="s1", name="Horn", file="")))) == []
-    assert made[0].trim.parent() is made[0]
+    assert made[0].trim.parent() is made[0].trim_page

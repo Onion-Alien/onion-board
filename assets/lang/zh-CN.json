@@ -1460,7 +1460,6 @@
   "The Onion Board Discord server, in your browser": "Onion Board 的 Discord 服务器，在你的浏览器里打开",
   "(didn't say)": "（没说）",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>所有效果</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>自动确定输入灵敏度</b>是否已打开：在通话中，它会持续将您的声音视为静音并切断它们：将其关闭（输入灵敏度）并将滑块保持在低位，或使用按键通话。",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>输入模式</b>：<b>一键通</b>效果最佳（在“设置”→“热键”→“自动一键通”下设置相同的键，洋葱板会在播放声音时为您保留该键）。在<b>“语音活动”</b>上，关闭<b>“自动确定输入灵敏度”</b>并将滑块几乎一直向左拖动，否则 Discord 会不断切断您的声音，甚至大声的声音。",
   "<b>Languages</b> · {state}": "<b>语言</b>· {state}",
@@ -4278,5 +4277,10 @@
     "{n} 个音效回来了。"
   ],
   "Watches your game's window while it's open, even behind others": "在你的游戏窗口打开时盯着它，即使被其他窗口挡住",
-  "Your file stays whole: only the part between the handles plays.": "你的文件保持完整：只播放两个手柄之间的部分。"
+  "Your file stays whole: only the part between the handles plays.": "你的文件保持完整：只播放两个手柄之间的部分。",
+  "Main": "主要",
+  "Trim & speed": "裁剪和速度",
+  "{group}  ·  {n} on": [
+    "{group}  ·  已开 {n} 项"
+  ]
 }

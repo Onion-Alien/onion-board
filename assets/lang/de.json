@@ -1498,7 +1498,6 @@
   "The Onion Board Discord server, in your browser": "Der Onion-Board-Discord-Server, in deinem Browser",
   "(didn't say)": "(habe es nicht gesagt)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>Alle Effekte</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Stellen Sie automatisch fest, dass die Eingangsempfindlichkeit</b> aktiviert ist: Während eines Anrufs werden Ihre Töne weiterhin als Stille interpretiert und unterdrückt: Schalten Sie sie aus (Eingangsempfindlichkeit) und lassen Sie den Schieberegler niedrig oder verwenden Sie Push-to-Talk.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Eingabemodus</b> : <b>Push-to-Talk</b> funktioniert am besten (stellen Sie die gleiche Taste unter Einstellungen → Hotkeys → Auto-Push-to-Talk ein und Onion Board hält sie für Sie bereit, während ein Ton abgespielt wird). Deaktivieren Sie unter <b>„Sprachaktivität“</b> <b>die Option „Eingangsempfindlichkeit automatisch ermitteln“</b> und ziehen Sie den Schieberegler fast ganz nach links. Andernfalls unterdrückt Discord weiterhin Ihre Töne, auch die lauten.",
   "<b>Languages</b> · {state}": "<b>Sprachen</b> · {state}",
@@ -4354,5 +4353,11 @@
     "{n} Sounds sind wieder da."
   ],
   "Watches your game's window while it's open, even behind others": "Beobachtet das Fenster deines Spiels, solange es offen ist, auch hinter anderen",
-  "Your file stays whole: only the part between the handles plays.": "Deine Datei bleibt ganz: Nur der Teil zwischen den Griffen spielt."
+  "Your file stays whole: only the part between the handles plays.": "Deine Datei bleibt ganz: Nur der Teil zwischen den Griffen spielt.",
+  "Main": "Wichtigstes",
+  "Trim & speed": "Schnitt & Tempo",
+  "{group}  ·  {n} on": [
+    "{group}  ·  {n} an",
+    "{group}  ·  {n} an"
+  ]
 }

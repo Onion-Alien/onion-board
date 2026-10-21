@@ -1460,7 +1460,6 @@
   "The Onion Board Discord server, in your browser": "Onion Board の Discord サーバー（ブラウザーで開きます）",
   "(didn't say)": "(言わなかった)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>すべての効果</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>入力感度がオンになっているかどうかを自動的に判断します</b>。通話中はあなたの音を無音として捉え続け、それらをカットします。オフ (入力感度) にしてスライダーを低いままにするか、プッシュ トゥ トークを使用します。",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>入力モード</b>:<b>プッシュ トゥ トーク</b>が最適に機能します ([設定] → [ホットキー] → [自動プッシュ トゥ トーク] で同じキーを設定すると、サウンドが再生されている間、Onion Board がそのキーを保持します)。 <b>[音声アクティビティ]</b>で、 <b>[入力感度を自動的に決定する]</b>をオフにして、スライダーをほぼ左端までドラッグします。そうしないと、Discord は大きな音も含めて音をカットし続けます。",
   "<b>Languages</b> · {state}": "<b>言語</b>· {state}",
@@ -4278,5 +4277,10 @@
     "{n} 個のサウンドを元に戻しました。"
   ],
   "Watches your game's window while it's open, even behind others": "ゲームのウィンドウが開いている間見張ります（他のウィンドウの裏でも）",
-  "Your file stays whole: only the part between the handles plays.": "ファイルはそのまま残ります。ハンドルの間の部分だけが再生されます。"
+  "Your file stays whole: only the part between the handles plays.": "ファイルはそのまま残ります。ハンドルの間の部分だけが再生されます。",
+  "Main": "メイン",
+  "Trim & speed": "トリムとスピード",
+  "{group}  ·  {n} on": [
+    "{group}  ·  {n}個オン"
+  ]
 }

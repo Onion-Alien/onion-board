@@ -1532,7 +1532,6 @@
   "⬇  Try installing again": "⬇  Zkusit instalaci znovu",
   "(didn't say)": "(neřekl)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>Všechny efekty</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Automaticky zjistěte, zda je vstupní citlivost</b> zapnutá: při hovoru ztiší vaše zvuky a přeruší je: vypněte (Input Sensitivity) a nechte posuvník nízko, nebo použijte Push to Talk.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Režim zadávání</b> : Nejlépe funguje <b>Push to Talk</b> (nastavte stejnou klávesu v Nastavení → Klávesové zkratky → Auto push-to-talk a Onion Board ji podrží za vás, když hraje zvuk). Na <b>Hlasové aktivitě</b> vypněte možnost <b>Automaticky určit vstupní citlivost</b> a přetáhněte posuvník téměř úplně doleva, nebo Discord bude stále vyřazovat vaše zvuky, i ty hlasité.",
   "<b>Languages</b> · {state}": "<b>Jazyky</b> · {state}",
@@ -4430,5 +4429,12 @@
     "{n} zvuků je zpátky."
   ],
   "Watches your game's window while it's open, even behind others": "Sleduje okno tvé hry, dokud je otevřené, i když je za jinými",
-  "Your file stays whole: only the part between the handles plays.": "Tvůj soubor zůstane celý: hraje jen část mezi úchyty."
+  "Your file stays whole: only the part between the handles plays.": "Tvůj soubor zůstane celý: hraje jen část mezi úchyty.",
+  "Main": "Hlavní",
+  "Trim & speed": "Ořez a rychlost",
+  "{group}  ·  {n} on": [
+    "{group}  ·  {n} zapnuto",
+    "{group}  ·  {n} zapnuto",
+    "{group}  ·  {n} zapnuto"
+  ]
 }

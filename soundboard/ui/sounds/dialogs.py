@@ -1,12 +1,13 @@
-"""Per-sound Edit dialog: the Sound tab (name, volume, hotkey…) and the Effects tab
-(speed, pitch, EQ, boost, reverse and every voice effect, modules' included)."""
+"""Per-sound Edit dialog: the Sound tab (name, volume, hotkey…), the Trim & speed tab
+(trim, speed, pitch, boost, reverse), the Effects tab (preset, voice and every voice
+effect, modules' included) and the EQ tab."""
 from __future__ import annotations
 
 import logging
 import threading
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QTimer, Signal
+from PySide6.QtCore import QObject, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QFont, QImage, QPixmap
 from shiboken6 import isValid as qt_valid
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QColorDialog, QComboBox,
@@ -30,7 +31,7 @@ from soundboard.ui.sounds import sourcedialog
 from soundboard.ui.kit.panel import (EqPanel, hint_label, icon_button, reset_button,
                                      section_label, steady_number)
 from soundboard.ui.sounds.trim import TrimPanel
-from soundboard.ui.voice.voicefxpanel import EffectRow, ParamSlider
+from soundboard.ui.voice.voicefxpanel import ADDON_GROUP, GROUPS, EffectRow, ParamSlider
 from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.control.winkeys import Hotkeys
 from soundboard.i18n import _
@@ -108,9 +109,19 @@ class TabHelpPopup(QDialog):
             self._opener.setFocus(Qt.FocusReason.PopupFocusReason)
 
 
-class EffectsPanel(QWidget):
-    """Every per-sound effect setting. `changed` fires on any edit; `fx()` is the
-    settings dict for SoundMeta.fx ({} when nothing is changed).
+def _page() -> tuple[QWidget, QVBoxLayout]:
+    w = QWidget()
+    v = QVBoxLayout(w)
+    v.setContentsMargins(0, 14, 8, 0)   # room under the dialog's tab bar
+    v.setSpacing(8)
+    return w, v
+
+
+class EffectsPanel(QObject):
+    """Every per-sound effect setting, on three pages for the dialog's tabs: `trim_page`
+    (trim, speed & pitch, loudness), `fx_page` (preset, voice, effects) and `eq_page`
+    (one long page was too much to scroll). `changed` fires on any edit; `fx()` is the settings
+    dict for SoundMeta.fx ({} when nothing is changed).
 
     `pick_voice(voice)` opens the voice picker (ui.voicepicker) on the sound's voice
     and gives back the new one, or None if it was cancelled. The sound keeps a copy."""
@@ -120,9 +131,9 @@ class EffectsPanel(QWidget):
         super().__init__()
         self._pick_voice = pick_voice
         self._voice: dict = {}
-        v = QVBoxLayout(self)
-        v.setContentsMargins(0, 14, 8, 0)   # room under the dialog's tab bar
-        v.setSpacing(8)
+        self.trim_page, tv = _page()
+        self.fx_page, v = _page()
+        self.eq_page, ev = _page()
 
         prow = QHBoxLayout()
         prow.addWidget(QLabel(_("Preset")))
@@ -155,42 +166,43 @@ class EffectsPanel(QWidget):
         vrow.addStretch(1)
         v.addLayout(vrow)
 
-        v.addWidget(section_label(_("Trim")))
-        self._v = v
+        tv.addWidget(section_label(_("Trim")))
+        self._v = tv
         self.trim_hint = hint_label(_("Trimming works once the sound has loaded."))
         # it only picks the part that plays: someone hunted for the cut file
         self.trim_kept = hint_label(_("Your file stays whole: only the part between the "
                                       "handles plays."))
-        v.addWidget(self.trim_hint)
-        v.addWidget(self.trim_kept)
-        self.trim = self._new_trim(meta, v.indexOf(self.trim_hint))   # above them
+        tv.addWidget(self.trim_hint)
+        tv.addWidget(self.trim_kept)
+        self.trim = self._new_trim(meta, tv.indexOf(self.trim_hint))   # above them
 
-        v.addWidget(section_label(_("Speed & pitch")))
+        tv.addWidget(section_label(_("Speed & pitch")))
         self.speed = ParamSlider(SPEED, 1.0, centred=True)
         self.pitch = ParamSlider(PITCH, 0.0, centred=True)
         self.tape = QCheckBox(_("Tape mode: speed changes the pitch too (nightcore / slowed)"))
         self.tape.setToolTip(_("Off: speed and pitch are independent. On: like a record player, "
                                "faster is also higher; Pitch adds on top."))
         for w in (self.speed, self.pitch, self.tape):
-            v.addWidget(w)
+            tv.addWidget(w)
 
-        v.addWidget(section_label(_("Loudness")))
+        tv.addWidget(section_label(_("Loudness")))
         self.boost = ParamSlider(BOOST, 0.0, centred=True)
-        v.addWidget(self.boost)
+        tv.addWidget(self.boost)
         self.boost_hint = hint_label("")
-        v.addWidget(self.boost_hint)
+        tv.addWidget(self.boost_hint)
         self.reverse = QCheckBox(_("Play backwards"))
-        v.addWidget(self.reverse)
+        tv.addWidget(self.reverse)
+        tv.addStretch(1)
 
         self.eq = EqPanel(False, "sounds", "Flat (off)", [0.0] * 7)
         self.eq.lbl_for.hide()
         self.eq.cb_target.hide()
-        v.addWidget(self.eq)
+        ev.addWidget(self.eq)
+        ev.addStretch(1)
 
-        v.addWidget(section_label(_("Effects")))
         self.rows: dict[str, EffectRow] = {}
         for etype, cls in voicefx.REGISTRY.items():
-            if etype == "pitch":   # the Pitch slider above does this, better
+            if etype == "pitch":   # the Pitch slider on Trim & speed does this, better
                 continue
             if etype == "cleanup":   # a mic's room noise: nothing to clean in a sound
                 continue
@@ -199,7 +211,15 @@ class EffectsPanel(QWidget):
             row = EffectRow(cls, {})
             row.changed.connect(self._edited)
             self.rows[etype] = row
-            v.addWidget(row)
+        # in Edit voice's groups, so the long list reads in parts; add-ons' last
+        grouped = {t for _t, types in GROUPS for t in types}
+        for title, types in (*GROUPS,
+                             (ADDON_GROUP, [t for t in self.rows if t not in grouped])):
+            rows = [self.rows[t] for t in types if t in self.rows]
+            if rows:
+                v.addWidget(section_label(title))
+            for row in rows:
+                v.addWidget(row)
         v.addWidget(hint_label(_("Effects from add-on modules show up here too.")))
         v.addStretch(1)
 
@@ -567,16 +587,20 @@ class EditDialog(QDialog):
 
         self.effects = EffectsPanel(
             meta.fx, meta, (lambda v: pick_voice(v, self)) if pick_voice else None)
-        scroll = QScrollArea()
-        scroll.setWidgetResizable(True)
-        scroll.setWidget(self.effects)
-        self._fx_scroll = scroll
-        scroll.setFrameShape(QScrollArea.Shape.NoFrame)
-        self.tabs.addTab(scroll, _("Effects"))
+        self.effects.setParent(self)
+        self._fx_scrolls = []
+        for pg, title in ((self.effects.trim_page, _("Trim & speed").replace("&", "&&")),
+                          (self.effects.fx_page, _("Effects")),
+                          (self.effects.eq_page, _("Equalizer"))):
+            scroll = QScrollArea()
+            scroll.setWidgetResizable(True)
+            scroll.setWidget(pg)
+            scroll.setFrameShape(QScrollArea.Shape.NoFrame)
+            self._fx_scrolls.append(scroll)
+            self.tabs.addTab(scroll, title)
         self.tabs.currentChanged.connect(
-            lambda i: i == 1 and usage.used("pad-effects"))   # the name only (usage.py)
-        if tab == "effects":
-            self.tabs.setCurrentIndex(1)
+            lambda i: i >= 1 and usage.used("pad-effects"))   # the name only (usage.py)
+        self.tabs.setCurrentIndex(self._tab_index(tab))
 
         # what the effects add up to, on its own line (hidden when there are none)
         self.fx_note = QLabel()
@@ -760,12 +784,19 @@ class EditDialog(QDialog):
         self.show_render(None)   # (EditControl.edit shows this sound's, if it has one)
         self.live_bar.hide()
         self._light_reset()   # (set_sound loads without the changed signal)
-        self._fx_scroll.verticalScrollBar().setValue(0)
+        for scroll in self._fx_scrolls:
+            scroll.verticalScrollBar().setValue(0)
         busy.set_busy(self.btn_preview, False)
         self._saying = False
         self._said = getattr(self, "_said", 0) + 1   # a "Playing" still timing out
         self._fx_note()
-        self.tabs.setCurrentIndex(1 if tab == "effects" else 0)
+        self.tabs.setCurrentIndex(self._tab_index(tab))
+
+    TABS = ("sound", "trim", "effects", "eq")
+
+    @classmethod
+    def _tab_index(cls, tab: str) -> int:
+        return cls.TABS.index(tab) if tab in cls.TABS else 0
 
     @staticmethod
     def _fade_cell(grid: QGridLayout, r: int, col: int, label: str, value: float, tip: str,

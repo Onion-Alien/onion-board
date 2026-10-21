@@ -1416,7 +1416,6 @@
   "⬇  Try installing again": "⬇  Опитай да инсталираш пак",
   "(didn't say)": "(не каза)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>Всички ефекти</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Автоматично определяне на входната чувствителност</b> е включена: по време на разговор продължава да приема вашите звуци за безшумни и ги прекъсва: изключете го (Входна чувствителност) и оставете плъзгача нисък или използвайте Push to Talk.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Режим на въвеждане</b> : <b>Push to Talk</b> работи най-добре (задайте същия клавиш в Настройки → Бързи клавиши → Автоматичен push-to-talk и Onion Board го държи вместо вас, докато се възпроизвежда звук). На <b>Гласова активност</b> изключете <b>Автоматично определяне на входната чувствителност</b> и плъзнете плъзгача почти докрай наляво, или Discord ще продължи да прекъсва звуците ви, силните също.",
   "<b>Languages</b> · {state}": "<b>Езици</b> · {state}",
@@ -4354,5 +4353,11 @@
     "{n} звука се върнаха."
   ],
   "Watches your game's window while it's open, even behind others": "Следи прозореца на играта ти, докато е отворен, дори зад други",
-  "Your file stays whole: only the part between the handles plays.": "Файлът ти остава цял: звучи само частта между дръжките."
+  "Your file stays whole: only the part between the handles plays.": "Файлът ти остава цял: звучи само частта между дръжките.",
+  "Main": "Основни",
+  "Trim & speed": "Изрязване и скорост",
+  "{group}  ·  {n} on": [
+    "{group}  ·  {n} включено",
+    "{group}  ·  {n} включено"
+  ]
 }

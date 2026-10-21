@@ -1494,7 +1494,6 @@
   "⬇  Try installing again": "⬇  Intentar instalarlo otra vez",
   "(didn't say)": "(no lo dije)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>Todos los efectos</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Determina automáticamente que la sensibilidad de entrada</b> está activada: en una llamada, sigue tomando tus sonidos para silenciarlos y los corta: apágalo (Sensibilidad de entrada) y deja el control deslizante bajo, o usa Push to Talk.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Modo de entrada</b> : <b>Pulsar para hablar</b> funciona mejor (configure la misma tecla en Configuración → Teclas de acceso rápido → Pulsar para hablar automáticamente y Onion Board la mantiene mientras se reproduce un sonido). En <b>Actividad de voz</b> , desactive <b>Determinar automáticamente la sensibilidad de entrada</b> y arrastre el control deslizante casi completamente hacia la izquierda, o Discord seguirá cortando sus sonidos, incluso los fuertes.",
   "<b>Languages</b> · {state}": "<b>Idiomas</b> · {state}",
@@ -4354,5 +4353,11 @@
     "{n} sonidos volvieron."
   ],
   "Watches your game's window while it's open, even behind others": "Vigila la ventana de tu juego mientras está abierta, incluso detrás de otras",
-  "Your file stays whole: only the part between the handles plays.": "Tu archivo queda entero: solo suena la parte entre los controles."
+  "Your file stays whole: only the part between the handles plays.": "Tu archivo queda entero: solo suena la parte entre los controles.",
+  "Main": "Principal",
+  "Trim & speed": "Recorte y velocidad",
+  "{group}  ·  {n} on": [
+    "{group}  ·  {n} activado",
+    "{group}  ·  {n} activados"
+  ]
 }

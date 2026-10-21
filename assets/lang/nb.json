@@ -1494,7 +1494,6 @@
   "⬇  Try installing again": "⬇  Prøv å installere igjen",
   "(didn't say)": "(sa ikke)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>Alle effekter</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Bestem automatisk at inngangsfølsomhet</b> er på: i en samtale fortsetter den å ta lydene dine for stillhet og kutte dem ut: slå den av (Input Sensitivity) og la glidebryteren lav, eller bruk Push to Talk.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Inndatamodus</b> : <b>Trykk og snakk</b> fungerer best (sett den samme tasten under Innstillinger → Hurtigtaster → Automatisk trykk-og-snakk og Onion Board holder den for deg mens en lyd spilles av). På <b>Stemmeaktivitet</b> slår du av <b>Bestem automatisk inndatafølsomhet</b> og dra glidebryteren nesten helt til venstre, ellers fortsetter Discord å kutte lydene dine ut, også høye.",
   "<b>Languages</b> · {state}": "<b>Språk</b> · {state}",
@@ -4354,5 +4353,11 @@
     "{n} lyder er tilbake."
   ],
   "Watches your game's window while it's open, even behind others": "Følger med på spillvinduet ditt mens det er åpent, også bak andre",
-  "Your file stays whole: only the part between the handles plays.": "Filen din forblir hel: bare delen mellom håndtakene spilles."
+  "Your file stays whole: only the part between the handles plays.": "Filen din forblir hel: bare delen mellom håndtakene spilles.",
+  "Main": "Viktigst",
+  "Trim & speed": "Trim og hastighet",
+  "{group}  ·  {n} on": [
+    "{group}  ·  {n} på",
+    "{group}  ·  {n} på"
+  ]
 }

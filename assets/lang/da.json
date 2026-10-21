@@ -1494,7 +1494,6 @@
   "⬇  Try installing again": "⬇  Prøv at installere igen",
   "(didn't say)": "(sagde ikke)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>Alle effekter</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Bestem automatisk, at inputfølsomhed</b> er slået til: I et opkald bliver den ved med at tage dine lyde til tavshed og afbryde dem: sluk den (Input Sensitivity), og lad skyderen være lav, eller brug Tryk og tal.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Inputtilstand</b> : <b>Tryk og tal</b> fungerer bedst (indstil den samme tast under Indstillinger → Genvejstaster → Automatisk tryk og tal, og Onion Board holder den for dig, mens en lyd afspilles). På <b>Stemmeaktivitet</b> skal du deaktivere <b>Bestem automatisk inputfølsomhed</b> og træk skyderen næsten helt til venstre, ellers bliver Discord ved med at skære dine lyde ud, også høje.",
   "<b>Languages</b> · {state}": "<b>Sprog</b> · {state}",
@@ -4354,5 +4353,11 @@
     "{n} lyde er tilbage."
   ],
   "Watches your game's window while it's open, even behind others": "Holder øje med dit spils vindue, mens det er åbent, også bag andre",
-  "Your file stays whole: only the part between the handles plays.": "Din fil forbliver hel: kun delen mellem håndtagene bliver afspillet."
+  "Your file stays whole: only the part between the handles plays.": "Din fil forbliver hel: kun delen mellem håndtagene bliver afspillet.",
+  "Main": "Vigtigst",
+  "Trim & speed": "Beskær & hastighed",
+  "{group}  ·  {n} on": [
+    "{group}  ·  {n} slået til",
+    "{group}  ·  {n} slået til"
+  ]
 }

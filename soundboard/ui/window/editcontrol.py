@@ -119,8 +119,8 @@ class EditControl(Controller):
         mw = self.mw
         d = self._editors.get(sid)
         if d is not None and qt_valid(d):
-            if tab == "effects":
-                d.tabs.setCurrentIndex(1)
+            if tab != "sound":
+                d.tabs.setCurrentIndex(d._tab_index(tab))
             d.showNormal() if d.isMinimized() else d.show()
             d.raise_()
             d.activateWindow()

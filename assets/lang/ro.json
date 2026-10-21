@@ -1532,7 +1532,6 @@
   "⬇  Try installing again": "⬇  Încearcă să instalezi din nou",
   "(didn't say)": "(nu a spus)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>Toate efectele</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Determinați automat că sensibilitatea de intrare</b> este activată: într-un apel, vă preia în continuare sunetele pentru tăcere și le întrerupe: dezactivați-o (Sensibilitate de intrare) și lăsați glisorul scăzut sau utilizați Apăsați pentru a vorbi.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Modul de introducere</b> : <b>Push to Talk</b> funcționează cel mai bine (setați aceeași tastă în Setări → Taste rapide → Apăsare și vorbire automată și Onion Board o ține pentru tine în timp ce se aude un sunet). În <b>Activitate vocală</b> , dezactivează <b>Determinarea automată a sensibilității de intrare</b> și trage glisorul aproape până la stânga, sau Discord continuă să-ți taie sunetele, de asemenea, cele puternice.",
   "<b>Languages</b> · {state}": "<b>Limbi</b> · {state}",
@@ -4430,5 +4429,12 @@
     "{n} de sunete s-au întors."
   ],
   "Watches your game's window while it's open, even behind others": "Urmărește fereastra jocului tău cât e deschisă, chiar și în spatele altora",
-  "Your file stays whole: only the part between the handles plays.": "Fișierul tău rămâne întreg: se redă doar partea dintre mânere."
+  "Your file stays whole: only the part between the handles plays.": "Fișierul tău rămâne întreg: se redă doar partea dintre mânere.",
+  "Main": "Principal",
+  "Trim & speed": "Tăiere și viteză",
+  "{group}  ·  {n} on": [
+    "{group}  ·  {n} activat",
+    "{group}  ·  {n} activate",
+    "{group}  ·  {n} activate"
+  ]
 }

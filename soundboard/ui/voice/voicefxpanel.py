@@ -19,7 +19,7 @@ from PySide6.QtGui import QColor, QFont, QGuiApplication, QIcon, QPainter
 from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QCheckBox, QDialog, QFrame, QGridLayout,
                                QHBoxLayout, QInputDialog, QLabel, QLineEdit, QMenu,
                                QMessageBox, QPushButton, QScrollArea, QSizePolicy,
-                               QSlider, QStyle, QStyleOptionSlider, QToolButton,
+                               QSlider, QStyle, QStyleOptionSlider, QTabWidget, QToolButton,
                                QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
 
@@ -395,11 +395,12 @@ FX_ICONS = {"cleanup": "shield", "pitch": "mic", "growl": "wave", "robot": "keyb
             "reverb": "headphones", "polish": "star", "harmony": "music", "ringmod": "wave",
             "backdrop": "sounds",
             "flanger": "reload", "wobble": "ear"}
-# the Voice tab's "Edit voice" window's top and the effect cards' groups;
-# an effect from an add-on goes under Add-ons
+# the Voice tab's "Edit voice" window's tabs: Main (these), then one a group;
+# an effect from an add-on goes under Add-ons (a tab only when there is one)
 HERO = ("pitch", "cleanup")
 HERO_TITLES = {"pitch": _("Pitch & voice")}
-GROUPS = ((_("Change the voice"), ("harmony", "growl", "robot", "ringmod")),
+MAIN_TAB = _("Main")
+GROUPS = ((_("Change the voice"), ("harmony", "growl", "robot", "ringmod", "monk")),
           (_("Character"), ("compressor", "tone", "radio", "distortion", "shout", "helmet",
                             "polish")),
           (_("Room"), ("chorus", "flanger", "wobble", "echo", "reverb", "backdrop")))
@@ -1018,17 +1019,12 @@ class VoiceFxPanel(QWidget):
         dv = QVBoxLayout(self.dlg)
         dv.setContentsMargins(0, 0, 0, 10)
         dv.setSpacing(8)
-        self._scroll = QScrollArea()
-        self._scroll.setWidgetResizable(True)
-        self._scroll.setFrameShape(QFrame.Shape.NoFrame)
-        self._scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        page = QFrame()
-        page.setObjectName("card")   # painted like the tab's cards (sliders see-through)
-        pv = QVBoxLayout(page)
-        pv.setContentsMargins(16, 14, 16, 12)
-        pv.setSpacing(10)
-        self._scroll.setWidget(page)
-        dv.addWidget(self._scroll, 1)
+        body = QFrame()
+        body.setObjectName("card")   # painted like the tab's cards (sliders see-through)
+        bv = QVBoxLayout(body)
+        bv.setContentsMargins(16, 14, 16, 12)
+        bv.setSpacing(6)
+        dv.addWidget(body, 1)
 
         self.tweak = QFrame()
         self.tweak.setObjectName("tweak")
@@ -1079,48 +1075,61 @@ class VoiceFxPanel(QWidget):
         steady_number(self.delay, _("{ms} ms delay", ms="000"))
         self.delay.setAlignment(Qt.AlignmentFlag.AlignCenter)
         srow.addWidget(self.delay)
+        bv.addWidget(self.tweak)
+
+        # ---- the effects, a tab a group (one long page was too much to scroll):
+        # Main has Pitch & voice and Clean up my mic, then Change the voice, Character,
+        # Room and Add-ons, each tab's cards in two columns
+        self.more = QTabWidget()
+        self.more.setDocumentMode(True)
+        bv.addWidget(self.more, 1)
+
+        def tab(title: str) -> tuple[QScrollArea, QVBoxLayout]:
+            scroll = QScrollArea()
+            scroll.setWidgetResizable(True)
+            scroll.setFrameShape(QFrame.Shape.NoFrame)
+            scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+            page = QWidget()
+            pv = QVBoxLayout(page)
+            pv.setContentsMargins(0, 10, 4, 0)   # room under the tab bar, the scroll bar
+            pv.setSpacing(10)
+            scroll.setWidget(page)
+            self.more.addTab(scroll, title)
+            return scroll, pv
+
+        self._main_scroll, mv = tab(MAIN_TAB)
         self.hero_box = QVBoxLayout()
         self.hero_box.setSpacing(10)
-        tv.addLayout(self.hero_box)
-        pv.addWidget(self.tweak)
-
-        # ---- every effect, as cards in groups
-        self.more = QWidget()
-        self.box = QVBoxLayout(self.more)
-        self.box.setContentsMargins(0, 6, 0, 0)
-        self.box.setSpacing(8)
-        self.box.addWidget(QLabel(_("<b>All effects</b>")))
-        self.box.addWidget(hint_label(_("Switch effects on and drag their sliders to build "
-                                        "your own voice. Changing anything switches to “My "
-                                        "own mix”; like it? Save it as a voice and it gets a "
-                                        "button of its own.")))
-        # two columns that stack their cards tightly, each card going under the shorter
-        # one: a grid (or a row per group) left holes beside the shorter cards. The
-        # group titles show in one column only, where they can't leave a hole.
-        self._groups: dict[str, QLabel] = {}
+        mv.addLayout(self.hero_box)
+        mv.addWidget(hint_label(_("Switch effects on and drag their sliders to build "
+                                  "your own voice. Changing anything switches to “My "
+                                  "own mix”; like it? Save it as a voice and it gets a "
+                                  "button of its own.")))
+        mv.addStretch(1)
+        # two columns a tab that stack their cards tightly, each card going under the
+        # shorter one: a grid left holes beside the shorter cards
+        self._pages: dict[str, tuple[QScrollArea, QHBoxLayout, list[QVBoxLayout]]] = {}
         for title, _types in (*GROUPS, (ADDON_GROUP, ())):
-            lbl = QLabel(title)
-            lbl.setObjectName("fxgroup")
-            self._groups[title] = lbl
-        self._fx_row = QHBoxLayout()
-        self._fx_row.setSpacing(10)
-        self._fx_columns: list[QVBoxLayout] = []
-        for __ in range(2):
-            col = QVBoxLayout()
-            col.setSpacing(10)
-            col.addStretch(1)
-            self._fx_row.addLayout(col, 1)
-            self._fx_columns.append(col)
-        self.box.addLayout(self._fx_row)
+            scroll, pv = tab(title)
+            row = QHBoxLayout()
+            row.setSpacing(10)
+            cols = []
+            for __ in range(2):
+                col = QVBoxLayout()
+                col.setSpacing(10)
+                col.addStretch(1)
+                row.addLayout(col, 1)
+                cols.append(col)
+            pv.addLayout(row)
+            pv.addStretch(1)
+            self._pages[title] = (scroll, row, cols)
         self._fx_cols = 2
-        self._placed: list | None = None   # what each column holds now
+        self._placed: dict | None = None   # what each tab's columns hold now
         self._replace = QTimer(self)       # a voice pick changes many cards: once after
         self._replace.setSingleShot(True)
         self._replace.setInterval(0)
         self._replace.timeout.connect(self._place_cards)
         self._folded_fx: set[str] = set()
-        pv.addWidget(self.more)
-        pv.addStretch(1)
         done = QHBoxLayout()
         done.setContentsMargins(16, 0, 16, 0)
         done.addStretch(1)
@@ -1254,11 +1263,17 @@ class VoiceFxPanel(QWidget):
             r.set_fresh(False)
 
     def _scroll_to_fresh(self):
-        """Inside Edit voice, bring the lit-up effects into view."""
+        """Inside Edit voice, bring the lit-up effects into view: the tab of the first
+        one past Main (the pitch is nearly always one of them), scrolled to it."""
         fresh = [r for r in self.rows.values() if r.is_fresh()]
-        if fresh:
-            self._scroll.ensureWidgetVisible(fresh[-1], 0, 24)
-            self._scroll.ensureWidgetVisible(fresh[0], 0, 24)
+        for scroll in (*(pg[0] for pg in self._pages.values()), self._main_scroll):
+            page = scroll.widget()
+            mine = [r for r in fresh if page is not None and page.isAncestorOf(r)]
+            if mine:
+                self.more.setCurrentWidget(scroll)
+                scroll.ensureWidgetVisible(mine[-1], 0, 24)
+                scroll.ensureWidgetVisible(mine[0], 0, 24)
+                return
 
     # ------------------------------------------------------------------ the window
     DLG_SIZE = QSize(660, 720)
@@ -1973,7 +1988,7 @@ class VoiceFxPanel(QWidget):
         for _title, types in GROUPS:
             grouped.update(types)
         out = []
-        for title in self._groups:
+        for title in self._pages:
             types = dict(GROUPS).get(title) or [t for t in self.rows if t not in grouped]
             out.append((title, [self.rows[t] for t in types if t in self.rows]))
         return out
@@ -1983,35 +1998,47 @@ class VoiceFxPanel(QWidget):
         return c.heightForWidth(width) if c.hasHeightForWidth() else c.sizeHint().height()
 
     def _place_cards(self):
-        """The effect cards into the columns: one column with the group titles, or two
-        with each card under whichever column is shorter so far (in reading order),
-        so a short card never leaves a hole beside a tall one."""
-        groups = self._ordered_cards()
-        if self._fx_cols == 1:
-            plan = [[w for title, cards in groups if cards
-                     for w in (self._groups[title], *cards)], []]
-        else:
-            width = max(200, (self.more.width() - self._fx_row.spacing()) // 2)
-            plan, heights = [[], []], [0, 0]
-            for _title, cards in groups:
+        """Each tab's cards into its columns: one column, or two with each card under
+        whichever column is shorter so far (in reading order), so a short card never
+        leaves a hole beside a tall one. A tab with no cards (Add-ons) is hidden."""
+        plans = {}
+        for title, cards in self._ordered_cards():
+            if self._fx_cols == 1:
+                plan = [list(cards), []]
+            else:
+                room = self.more.width() - 4
+                width = max(200, (room - self._pages[title][1].spacing()) // 2)
+                plan, heights = [[], []], [0, 0]
                 for c in cards:
                     i = 0 if heights[0] <= heights[1] else 1
                     plan[i].append(c)
                     heights[i] += self._card_height(c, width) + 10
-        if plan == self._placed:
-            return   # nothing moves (most on/off flips)
-        self._placed = plan
-        for lbl in self._groups.values():
-            lbl.hide()
-        for col in self._fx_columns:
-            while col.count() > 1:           # all but the stretch
-                take_out(col)
-        for col, widgets in zip(self._fx_columns, plan):
-            for w in widgets:
-                col.insertWidget(col.count() - 1, w)   # above the column's stretch
-                if isinstance(w, QLabel):
-                    w.show()                           # a group title
-        self._fx_row.setStretch(1, 1 if self._fx_cols == 2 else 0)
+            plans[title] = plan
+        if plans != self._placed:
+            self._placed = plans
+            for title, plan in plans.items():
+                scroll, row, cols = self._pages[title]
+                for col in cols:
+                    while col.count() > 1:           # all but the stretch
+                        take_out(col)
+                for col, widgets in zip(cols, plan):
+                    for w in widgets:
+                        col.insertWidget(col.count() - 1, w)   # above the column's stretch
+                row.setStretch(1, 1 if self._fx_cols == 2 else 0)
+                self.more.setTabVisible(self.more.indexOf(scroll), any(plan))
+        self._count_tabs()
+
+    def _count_tabs(self):
+        """Each group's tab says how many of its effects are on, so none is missed
+        behind another tab (Main is the first one seen: no count)."""
+        for title, cards in self._ordered_cards():
+            scroll = self._pages[title][0]
+            n = sum(c.chk.isChecked() for c in cards)
+            text = (ngettext("{group}  ·  {n} on", "{group}  ·  {n} on", n, group=title)
+                    if n else title)
+            i = self.more.indexOf(scroll)
+            if self.more.tabText(i) != text:
+                self.more.setTabText(i, text)
 
     def _reshape(self):
         """A card got taller or shorter (on/off, folded): balance the columns again."""
@@ -2089,6 +2116,7 @@ class VoiceFxPanel(QWidget):
                             if n else _("Edit voice"))
         self.btn_tweak.setText(self._tweak_text)   # (_fit_picked may shorten it)
         self.btn_tweak.setAccessibleName(self._tweak_text)
+        self._count_tabs()
         ne = self.effects_count()
         text = ngettext("Effects  ·  {n}", "Effects  ·  {n}", ne) if ne else _("Effects")
         self.btn_effects.setAccessibleName(text)
