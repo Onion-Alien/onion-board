@@ -21,11 +21,13 @@ ALPHA = (170, 255)
 
 class Glow(QObject):
     """`Glow(button)`: on from the start; `set_on(False)` takes it off (the button isn't
-    the main thing any more), `set_on(True)` puts it back."""
+    the main thing any more), `set_on(True)` puts it back. `tone="warn"` glows in the
+    theme's warning colour (a step still to do, like the "1 step left" pill)."""
 
-    def __init__(self, button: QAbstractButton):
+    def __init__(self, button: QAbstractButton, tone: str = ""):
         super().__init__(button)
         self.button = button
+        self.tone = tone
         self._on = True
         self._timer = QTimer(self)
         self._timer.setInterval(TICK_MS)
@@ -71,7 +73,7 @@ class Glow(QObject):
     def _paint(self, k: float):
         if self._effect is None:
             return
-        c = QColor(theme.T.get("accent", "#8b5cf6"))
+        c = QColor(theme.status(self.tone) if self.tone else theme.T.get("accent", "#8b5cf6"))
         c.setAlpha(round(ALPHA[0] + (ALPHA[1] - ALPHA[0]) * k))
         self._effect.setColor(c)
         self._effect.setBlurRadius(BLUR[0] + (BLUR[1] - BLUR[0]) * k)

@@ -25,6 +25,7 @@ from soundboard.core import errors, usage
 from soundboard.core.pollthread import PollThread
 from soundboard.i18n import _
 from soundboard.ui.kit import busy, fit, icons
+from soundboard.ui.kit.glow import Glow
 from soundboard.ui.kit.panel import Flow
 from soundboard.ui.setup.setupshow import SetupShow
 
@@ -302,6 +303,9 @@ class MicRow(QFrame):
             b.clicked.connect(lambda _c=False, a=action: card.confirm(a, self.mic))
             row.addWidget(b)
             self.buttons[action] = b
+        if in_use and "install" in self.buttons:
+            # the mic in use has no mic effect yet: the one button to press here
+            self.glow = Glow(self.buttons["install"], tone="warn")
         self.hint = QLabel(_("Plug this mic in to repair it."), self)
         self.hint.setObjectName("hint")
         self.hint.setWordWrap(True)
@@ -428,7 +432,7 @@ class RecoveryCard(QFrame):
         icon.setPixmap(pixmap)
         icon.setFixedSize(pixmap.size())
         head.addWidget(icon, 0, Qt.AlignmentFlag.AlignVCenter)
-        title = QLabel(_("Audio recovery"))
+        title = QLabel(_("Mic effect"))
         title.setObjectName("section")
         title.setProperty("keepline", True)
         title.setProperty("head", True)   # no top padding: it shares a line with the pill
@@ -440,11 +444,18 @@ class RecoveryCard(QFrame):
         head.addWidget(self.pill, 0, Qt.AlignmentFlag.AlignVCenter)
         head.addStretch(1)
         v.addLayout(head)
-        hint = QLabel(_("Fix problems sending sounds into your mic after an update, or put "
+        hint = QLabel(_("Puts your sounds into your mic. Fix it here after an update, or put "
                        "Discord back for talking."))
         hint.setObjectName("hint")
         hint.setWordWrap(True)
         v.addWidget(hint)
+        # the mic effect sits on one mic: say so where it's installed
+        self.new_mic = QLabel(_("🎧 <b>New mic or headset?</b> The mic effect goes on one mic "
+                                "at a time. Each time you switch to a new one, pick it under "
+                                "Devices, then press <b>Install mic effect</b> here, or others "
+                                "won't hear your sounds."))
+        self.new_mic.setWordWrap(True)
+        v.addWidget(self.new_mic)
         self.list = QVBoxLayout()
         self.list.setSpacing(6)
         v.addLayout(self.list)
@@ -562,8 +573,11 @@ class RecoveryCard(QFrame):
             self.list.removeWidget(r)
             r.deleteLater()
         self.rows = {}
-        for m, text in zip(mics, labels(mics)):
-            r = MicRow(self, m, text, bool(m["pa"]) and m["pa"] == self.mw.cfg.mic_device)
+        def in_use(m):
+            return bool(m["pa"]) and m["pa"] == self.mw.cfg.mic_device
+        # the mic in use first: its row is the one to act on (twins keep their numbers)
+        for m, text in sorted(zip(mics, labels(mics)), key=lambda p: not in_use(p[0])):
+            r = MicRow(self, m, text, in_use(m))
             self.list.addWidget(r)
             self.rows[m["guid"]] = r
         if keep is not None:

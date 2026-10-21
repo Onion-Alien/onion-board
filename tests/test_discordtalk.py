@@ -167,7 +167,7 @@ def test_quitting_hands_an_open_discord_to_the_helper(window, monkeypatch):  # n
 
 
 def test_put_back_by_hand_also_does_a_half_set_discord(tmp_path):
-    """Audio recovery's Put Discord back: quitting leaves a Discord with some clean-up
+    """the Mic effect card's Put Discord back: quitting leaves a Discord with some clean-up
     on alone, the button puts the rest back too."""
     assert not dt.installed()
     half = dict(SOUND, noiseCancellation=True)
@@ -201,7 +201,7 @@ def test_put_back_waits_for_an_open_discord_to_close(window, monkeypatch, tmp_pa
 
 
 def test_set_up_window_puts_discord_back_too(window, monkeypatch):  # noqa: F811
-    """The "set up for your sounds" window shows Audio recovery's Put Discord back
+    """The "set up for your sounds" window shows the Mic effect card's Put Discord back
     row, and its button really does it (it used to be a picture of the button)."""
     import time
     from PySide6.QtWidgets import QApplication
@@ -246,7 +246,7 @@ def test_set_up_saves_how_you_talk_then_clears_what_chops_sounds(tmp_path):
     assert store["default"]["inputDeviceId"] == "default"
     assert store["default"]["modeOptions"]["threshold"] == -50
     assert list((tmp_path / "bk" / "discord").iterdir())
-    # ...and putting it back gives the talking settings again (Audio recovery)
+    # ...and putting it back gives the talking settings again (the Mic effect card)
     dt.restore(res["talk"], tmp_path / "bk", running=set(), always=True)
     assert dt.talking(settings())
 

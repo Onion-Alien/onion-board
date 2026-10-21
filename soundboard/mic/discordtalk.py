@@ -6,7 +6,7 @@ suppression, echo cancellation, automatic gain, automatic input sensitivity). `s
 switches it off (SOUND), after remembering how Discord was set while you only talked
 (`snapshot`, saved in the config). Left that way after Onion Board closes, a plain
 voice comes through noisy and up and down, so on quit those settings go back
-(`restore`; Settings → Audio recovery's Put Discord back does it by hand).
+(`restore`; Settings → Audio → Mic effect's Put Discord back does it by hand).
 
 Discord keeps its settings in memory while it runs and writes over its files, so they
 can only be changed while it's closed. On quit: Discord closed, they're put back at
@@ -442,7 +442,7 @@ def installed(appdata: Path | None = None) -> bool:
 
 def to_restore(saved: dict, appdata: Path | None = None) -> list[str]:
     """The Discord folders where putting how you talk back (`saved`, else Discord's
-    defaults) would change something: Audio recovery's Put Discord back."""
+    defaults) would change something: the Mic effect card's Put Discord back."""
     out = []
     for client_dir, name in discordcfg.CLIENTS:
         try:

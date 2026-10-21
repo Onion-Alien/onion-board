@@ -1591,7 +1591,8 @@ class WindowBuilder(Controller):
         chat = Flow(gap=8)   # at their own size, wrapping, not five full-width bars
         mw.btn_chat = QPushButton(_("Make it sound clean in Discord"))
         mw.btn_chat.setToolTip(_("Bun saves how Discord is set now, then switches off what "
-                                 "chops up your sounds. Settings → Audio recovery puts it back."))
+                                 "chops up your sounds. Settings → Audio → Mic effect puts it "
+                                 "back."))
         icons.set_icon(mw.btn_chat, "headphones")
         mw.btn_chat.clicked.connect(lambda: _set_up_discord(mw))   # Bun does it
         chat.addWidget(mw.btn_chat)

@@ -129,7 +129,7 @@ _DL_HOSTS = (("youtube", ("youtube.com", "youtu.be", "youtube-nocookie.com")),
              ("myinstants", ("myinstants.com",)))
 # the Voice tab's tabs (ui/voice/voicepanel.py VoicePanel._section keys)
 VOICE_TABS = ("fx", "ai", "speak", "addons")
-# Audio recovery's actions (ui/setup/audiorecovery.py; "cleanup-none" counts as cleanup)
+# The Mic effect card's actions (ui/setup/audiorecovery.py; "cleanup-none" counts as cleanup)
 RECOVERY = ("install", "repair", "update", "reinstall", "cleanup", "remove")
 # why a mic effect set-up failed, a click's or the repair-by-itself's (directmic.FAIL_KINDS:
 # the admin prompt unanswered, the step not starting or stopping half-way, a silent mic,
@@ -276,7 +276,7 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             *(f"voice-tab-{k}" for k in VOICE_TABS), "translate-on",
             # Radio: a station played, a station that wouldn't play, the list down
             "radio-played", "radio-failed", "radio-list-down",
-            # Settings' Audio recovery: what was run on a mic, and it failing
+            # Settings' Mic effect card: what was run on a mic, and it failing
             *(f"recovery-{k}" for k in RECOVERY), "recovery-failed",
             # a file import stopped from its card; an import that skipped some files
             "import-stopped", "import-skipped",

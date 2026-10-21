@@ -210,7 +210,7 @@ def changes_html(changes: list[tuple[str, str, str]]) -> str:
 
 class DiscordFixed(QDialog):
     """Discord's settings came right while its guide was open: Bun celebrates, and the
-    table says exactly which settings changed, from what to what. Audio recovery's Put
+    table says exactly which settings changed, from what to what. the Mic effect card's Put
     Discord back is under it, and works here too."""
     discord_back = Signal(list, list)   # (Discord folders to put back, still open)
 
@@ -256,7 +256,7 @@ class DiscordFixed(QDialog):
         # where to undo it, and the very button, working (not a picture of it)
         back = panel.hint_label(_(
             "Changed your mind? <b>Put Discord back</b> turns its talking clean-up back on. "
-            "It's in <b>Settings → Audio → Audio recovery</b>:"))
+            "It's in <b>Settings → Audio → Mic effect</b>:"))
         back.setTextFormat(Qt.TextFormat.RichText)
         v.addWidget(back)
         from soundboard.ui.setup.audiorecovery import DiscordRow
@@ -519,7 +519,7 @@ class DiscordSetUp(QObject):
     """Bun sets Discord up for your sounds (discordtalk.set_up), every Discord button's
     one way to do it: the setup guide's last step, the Setup tab, the Fix Discord bar
     and the Discord guide. How you talk there is saved first: it goes back by itself
-    when Onion Board closes (if that's on), and Settings → Audio → Audio recovery's Put
+    when Onion Board closes (if that's on), and Settings → Audio → Mic effect's Put
     Discord back does it any time. Discord's settings can only be written while it's
     closed: open, it's asked first, closed, and opened again on its voice settings."""
     _done = Signal(object)
@@ -731,7 +731,7 @@ class DiscordGuide(QDialog):
         auto = self.btn_auto = QPushButton(_("Set it up for me"))
         icons.set_icon(auto, "star")
         auto.setToolTip(_("Bun saves how Discord is set now, then switches off what chops "
-                          "up your sounds. Settings → Audio recovery puts it back."))
+                          "up your sounds. Settings → Audio → Mic effect puts it back."))
         # (the guide stays: on the cable its Input Device step is still to do, and its
         # live list ticks the settings off as Bun changes them)
         auto.clicked.connect(lambda: set_up_discord(mw, self, then=lambda: None))

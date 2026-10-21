@@ -1606,3 +1606,43 @@ def test_the_last_steps_line_up(mic_wizard, qapp, monkeypatch):
             wiz.tab_buttons["voice"], wiz.chk_low_data, wiz.chk_lite)} == {
             setupwizard.SWITCH_ROW_H}
         assert wiz.width() == need
+
+
+def test_the_send_step_says_each_new_mic_needs_it(mic_wizard):
+    _, wiz = mic_wizard
+    wiz.go(wiz.send_index)
+    assert not wiz.mic_note.isHidden() and "Install mic effect" in wiz.mic_note.text()
+
+
+def test_finishing_without_the_mic_says_where_to_put_it_later(mic_wizard, monkeypatch):
+    w, wiz = mic_wizard
+    shown = []
+    monkeypatch.setattr(setupwizard, "mic_later", shown.append)
+    wiz.go(wiz.send_index)
+    wiz.skip_clicked()
+    wiz.finish()
+    QApplication.processEvents()
+    assert shown == [w]
+
+
+def test_finishing_with_the_mic_set_up_says_nothing_more(mic_wizard, monkeypatch):
+    _, wiz = mic_wizard
+    shown = []
+    monkeypatch.setattr(setupwizard, "mic_later", shown.append)
+    monkeypatch.setattr(wiz, "route_ok", lambda: True)
+    wiz.go(wiz.look_index)
+    wiz.finish()
+    QApplication.processEvents()
+    assert shown == []
+
+
+def test_the_reminder_opens_settings_on_audio(mic_wizard, monkeypatch):
+    w, _ = mic_wizard
+    pages = []
+    monkeypatch.setattr(w.setctl, "open_settings", pages.append)
+    d = setupwizard.mic_later(w)
+    assert d.isVisible() and "aren't in your mic yet" in " ".join(
+        lbl.text() for lbl in d.findChildren(setupwizard.QLabel))
+    next(b for b in d.findChildren(setupwizard.QPushButton)
+         if "Settings" in b.text()).click()
+    assert pages == ["audio"] and not d.isVisible()
