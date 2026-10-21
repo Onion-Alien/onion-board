@@ -168,6 +168,8 @@ SQUASH_SPRING = (300.0, 15.0)  # his body jiggles back after a squash or stretch
 STRETCH = 0.05     # how tall and thin a fast move makes him, per Bun-height a second
 SQUASH = 0.6       # how hard a change of direction (a landing) squashes him
 BOB_UP = 2.2      # his idle bob, px each way
+JOY_HOPS = (0.17, 0.1, 0.05)   # a click's three hops for joy, in Bun-heights
+DANCE_HOP = 0.07   # his highest dance hop (electronic), in Bun-heights
 # His picture is kept between frames (`_held`, `_picture`) until some part of him has
 # moved HOLD_PX screen pixels: his idle bob and sway move far less than a pixel a frame,
 # so most frames show the same Bun, and redrawing him is most of a frame's cost. What's
@@ -510,8 +512,11 @@ class BunnyWidget(QWidget):
 
     def _head(self) -> int:
         """Extra room above him where `pad` is too small for an upright ear (or a tall
-        hat) at the top of his bob: they reach ROOM_TOP above his canvas."""
-        return max(0, math.ceil(self.bun_h * ROOM_TOP / H + BOB_UP) - self.pad)
+        hat) at the top of his bob, or of his highest hop (a click's, a dance's): they
+        reach ROOM_TOP above his canvas."""
+        hop = max(JOY_HOPS[0] + 0.07 if self.joy_lines else 0.0,   # (+ his stretch: tall hats)
+                  DANCE_HOP if self in BunnyWidget.dancers else 0.0)
+        return max(0, math.ceil(self.bun_h * (ROOM_TOP / H + hop) + BOB_UP) - self.pad)
 
     # ------------------------------------------------------------------ inputs
     def set_level(self, level: float):
@@ -1384,7 +1389,7 @@ class BunnyWidget(QWidget):
         if self._joy_at >= 0 and (j := now - self._joy_at) < 1.35:
             # three hops for joy, each lower, a squash on every landing; eyes shut
             # happy, mouth open in a grin
-            hops = (0.17, 0.1, 0.05)
+            hops = JOY_HOPS
             if j < 1.2:
                 n = int(j / 0.4)
                 u = (j - 0.4 * n) / 0.4
