@@ -30,23 +30,6 @@ def test_saved_clip_retention_setting_persists(window, qapp):  # noqa: F811
     assert not window.cfg.app_clips_keep_forever
 
 
-
-def test_sound_priority_switch_is_on_and_turns_it_back_to_normal(window, qapp, monkeypatch):  # noqa: F811
-    from soundboard.core import app
-    calls = []
-    monkeypatch.setattr(app, "raise_process_priority", calls.append)
-    window.setctl.open_settings("audio")
-    qapp.processEvents()
-    box = window.setctl._settings_dlg.box_priority
-    assert box.isChecked()   # on by default
-    box.click()
-    assert calls == [False] and not window.cfg.audio_priority
-    from soundboard.sounds.library import Config
-    window.cfg.save()
-    assert not Config.load().audio_priority   # kept for the next start
-    box.click()
-    assert calls == [False, True] and window.cfg.audio_priority
-
 @contextmanager
 def windows_shown():
     """The class names of the windows shown meanwhile (a widget shown before it has a

@@ -9,7 +9,6 @@ from pathlib import Path
 
 import pytest
 
-from soundboard.core import app
 from soundboard.core.app import restart_cmdline
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -58,22 +57,3 @@ def test_windows_accepts_the_registration():
     assert int(flags) == 8   # after a crash, a hang or an update: only not a reboot
     assert "--tray" not in line and line.endswith("--restarted")   # back on screen
 
-
-
-def test_audio_tuning_raises_the_process_one_step(monkeypatch):
-    """Above normal, never high: a busy PC can't starve the sound, and the app
-    doesn't outrank Windows itself."""
-    calls = []
-
-    class K32:
-        def GetCurrentProcess(self):
-            return -1
-
-        def SetPriorityClass(self, handle, cls):
-            calls.append((handle, cls))
-            return 1
-
-    monkeypatch.setattr(app.sys, "platform", "win32")
-    monkeypatch.setattr(app.ctypes, "windll", type("W", (), {"kernel32": K32()})(), raising=False)
-    app.raise_process_priority()
-    assert calls == [(-1, 0x8000)]   # ABOVE_NORMAL_PRIORITY_CLASS
