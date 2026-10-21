@@ -4434,5 +4434,10 @@
     "{group}  ·  {n} activate",
     "{group}  ·  {n} activate"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Sunete și voci pe care le distribuie jucătorii. Ascultă-le întâi, adaugă-le pe cele care îți plac și votează ca cele mai bune să urce. „Distribuie un sunet” publică unul de-al tău pentru toți după ce e verificat."
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Sunete și voci pe care le distribuie jucătorii. Ascultă-le întâi, adaugă-le pe cele care îți plac și votează ca cele mai bune să urce. „Distribuie un sunet” publică unul de-al tău pentru toți după ce e verificat.",
+  "Mic unchanged": "Microfon neschimbat",
+  "Pick a voice to turn one on": "Alege o voce ca să o pornești",
+  "Put the voices back, exactly as they were": "Adu vocile înapoi exact cum erau",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Oprește toate vocile și le uită, pentru un început curat. PORNIT nu le mai aduce înapoi",
+  "Voices reset": "Voci resetate"
 }

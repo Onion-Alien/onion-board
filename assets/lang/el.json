@@ -4357,5 +4357,10 @@
     "{group}  ·  {n} ενεργό",
     "{group}  ·  {n} ενεργά"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Ήχοι και φωνές που μοιράζονται οι παίκτες. Άκουσέ τους πρώτα, πρόσθεσε όσους σου αρέσουν και ψήφισε για να ανέβουν οι καλύτεροι στην κορυφή. Το «Μοιράσου έναν ήχο» ανεβάζει έναν δικό σου για όλους, μόλις ελεγχθεί."
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Ήχοι και φωνές που μοιράζονται οι παίκτες. Άκουσέ τους πρώτα, πρόσθεσε όσους σου αρέσουν και ψήφισε για να ανέβουν οι καλύτεροι στην κορυφή. Το «Μοιράσου έναν ήχο» ανεβάζει έναν δικό σου για όλους, μόλις ελεγχθεί.",
+  "Mic unchanged": "Το μικρόφωνο δεν αλλάζει",
+  "Pick a voice to turn one on": "Διάλεξε μια φωνή για να την ανοίξεις",
+  "Put the voices back, exactly as they were": "Φέρε πίσω τις φωνές ακριβώς όπως ήταν",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Κλείνει όλες τις φωνές και τις ξεχνά, για νέα αρχή. Το ΑΝΟΙΧΤΟ δεν θα τις φέρει πίσω",
+  "Voices reset": "Οι φωνές επαναφέρθηκαν"
 }

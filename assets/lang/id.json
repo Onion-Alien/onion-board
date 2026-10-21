@@ -4280,5 +4280,10 @@
   "{group}  ·  {n} on": [
     "{group}  ·  {n} aktif"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Suara dan voice yang dibagikan para pemain. Dengarkan dulu, tambahkan yang kamu suka, dan beri vote supaya yang terbaik naik ke atas. \"Bagikan suara\" memasang salah satu milikmu untuk semua orang setelah diperiksa."
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Suara dan voice yang dibagikan para pemain. Dengarkan dulu, tambahkan yang kamu suka, dan beri vote supaya yang terbaik naik ke atas. \"Bagikan suara\" memasang salah satu milikmu untuk semua orang setelah diperiksa.",
+  "Mic unchanged": "Mik tidak berubah",
+  "Pick a voice to turn one on": "Pilih suara untuk menyalakannya",
+  "Put the voices back, exactly as they were": "Kembalikan suara persis seperti semula",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Matikan semua suara dan lupakan, untuk mulai dari awal. NYALA tidak akan mengembalikannya",
+  "Voices reset": "Suara direset"
 }

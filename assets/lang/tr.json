@@ -4357,5 +4357,10 @@
     "{group}  ·  {n} açık",
     "{group}  ·  {n} açık"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Oyuncuların paylaştığı sesler ve ses efektleri. Önce dinle, beğendiklerini ekle ve en iyileri yukarı çıksın diye oy ver. \"Ses paylaş\" kontrol edildikten sonra senin bir sesini herkese açar."
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Oyuncuların paylaştığı sesler ve ses efektleri. Önce dinle, beğendiklerini ekle ve en iyileri yukarı çıksın diye oy ver. \"Ses paylaş\" kontrol edildikten sonra senin bir sesini herkese açar.",
+  "Mic unchanged": "Mikrofon değişmedi",
+  "Pick a voice to turn one on": "Açmak için bir ses seç",
+  "Put the voices back, exactly as they were": "Sesleri tam olduğu gibi geri getir",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Tüm sesleri kapatır ve unutur, temiz bir başlangıç için. AÇIK onları geri getirmez",
+  "Voices reset": "Sesler sıfırlandı"
 }

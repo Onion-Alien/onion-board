@@ -4357,5 +4357,10 @@
     "{group}  ·  {n} an",
     "{group}  ·  {n} an"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Sounds und Stimmen, die Spieler teilen. Hör sie zuerst an, füge die hinzu, die dir gefallen, und stimm ab, damit die besten nach oben kommen. „Sound teilen“ stellt einen von dir für alle bereit, sobald er geprüft wurde."
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Sounds und Stimmen, die Spieler teilen. Hör sie zuerst an, füge die hinzu, die dir gefallen, und stimm ab, damit die besten nach oben kommen. „Sound teilen“ stellt einen von dir für alle bereit, sobald er geprüft wurde.",
+  "Mic unchanged": "Mikro unverändert",
+  "Pick a voice to turn one on": "Wähl eine Stimme, um sie einzuschalten",
+  "Put the voices back, exactly as they were": "Stimmen genau so zurückholen, wie sie waren",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Schaltet alle Stimmen aus und vergisst sie, für einen frischen Start. AN holt sie nicht zurück",
+  "Voices reset": "Stimmen zurückgesetzt"
 }

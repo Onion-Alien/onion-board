@@ -4357,5 +4357,10 @@
     "{group}  ·  {n} चालू",
     "{group}  ·  {n} चालू"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "खिलाड़ियों के शेयर किए साउंड और आवाज़ें। पहले सुनो, जो पसंद आएँ उन्हें जोड़ो, और वोट करो ताकि सबसे अच्छे ऊपर आएँ। \"साउंड शेयर करें\" तुम्हारा एक साउंड जाँच के बाद सबके लिए डाल देता है।"
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "खिलाड़ियों के शेयर किए साउंड और आवाज़ें। पहले सुनो, जो पसंद आएँ उन्हें जोड़ो, और वोट करो ताकि सबसे अच्छे ऊपर आएँ। \"साउंड शेयर करें\" तुम्हारा एक साउंड जाँच के बाद सबके लिए डाल देता है।",
+  "Mic unchanged": "माइक जैसा था वैसा है",
+  "Pick a voice to turn one on": "चालू करने के लिए एक आवाज़ चुनें",
+  "Put the voices back, exactly as they were": "आवाज़ें बिल्कुल पहले जैसी वापस लाएँ",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "सभी आवाज़ें बंद करके भूल जाएँ, नई शुरुआत के लिए। चालू उन्हें वापस नहीं लाएगा",
+  "Voices reset": "आवाज़ें रीसेट हुईं"
 }

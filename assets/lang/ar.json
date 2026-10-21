@@ -4665,5 +4665,10 @@
     "{group}  ·  {n} مفعّل",
     "{group}  ·  {n} مفعّل"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "أصوات ومؤثرات صوتية يشاركها اللاعبون. استمع إليها أولًا، وأضف ما يعجبك، وصوّت لتصعد الأفضل إلى القمة. «شارك صوتًا» ينشر واحدًا من أصواتك للجميع بعد مراجعته."
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "أصوات ومؤثرات صوتية يشاركها اللاعبون. استمع إليها أولًا، وأضف ما يعجبك، وصوّت لتصعد الأفضل إلى القمة. «شارك صوتًا» ينشر واحدًا من أصواتك للجميع بعد مراجعته.",
+  "Mic unchanged": "الميكروفون كما هو",
+  "Pick a voice to turn one on": "اختر صوتًا لتشغيله",
+  "Put the voices back, exactly as they were": "أعد الأصوات كما كانت تمامًا",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "أطفئ كل الأصوات وانسَها لبداية جديدة. مفعّل لن يعيدها",
+  "Voices reset": "تمت إعادة ضبط الأصوات"
 }

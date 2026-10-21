@@ -4434,5 +4434,10 @@
     "{group}  ·  {n} zapnuto",
     "{group}  ·  {n} zapnuto"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Zvuky a hlasy, které sdílejí hráči. Nejdřív si je poslechni, přidej si ty, které se ti líbí, a hlasuj, ať se nejlepší dostanou nahoru. „Sdílet zvuk“ zveřejní jeden tvůj pro všechny, jakmile projde kontrolou."
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Zvuky a hlasy, které sdílejí hráči. Nejdřív si je poslechni, přidej si ty, které se ti líbí, a hlasuj, ať se nejlepší dostanou nahoru. „Sdílet zvuk“ zveřejní jeden tvůj pro všechny, jakmile projde kontrolou.",
+  "Mic unchanged": "Mikrofon beze změny",
+  "Pick a voice to turn one on": "Vyber hlas, který zapneš",
+  "Put the voices back, exactly as they were": "Vrátit hlasy přesně tak, jak byly",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Vypne všechny hlasy a zapomene je, pro čistý začátek. ZAP. je nevrátí",
+  "Voices reset": "Hlasy resetovány"
 }

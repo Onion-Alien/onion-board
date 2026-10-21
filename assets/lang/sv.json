@@ -4357,5 +4357,10 @@
     "{group}  ·  {n} på",
     "{group}  ·  {n} på"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Ljud och röster som spelare delar. Lyssna först, lägg till dem du gillar och rösta så att de bästa hamnar överst. ”Dela ett ljud” lägger upp ett av dina för alla när det har granskats."
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Ljud och röster som spelare delar. Lyssna först, lägg till dem du gillar och rösta så att de bästa hamnar överst. ”Dela ett ljud” lägger upp ett av dina för alla när det har granskats.",
+  "Mic unchanged": "Mikrofonen oförändrad",
+  "Pick a voice to turn one on": "Välj en röst för att slå på den",
+  "Put the voices back, exactly as they were": "Sätt tillbaka rösterna precis som de var",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Stänger av alla röster och glömmer dem, för en ny start. PÅ tar inte tillbaka dem",
+  "Voices reset": "Röster återställda"
 }

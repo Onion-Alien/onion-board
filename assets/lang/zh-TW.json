@@ -4280,5 +4280,10 @@
   "{group}  ·  {n} on": [
     "{group}  ·  已開 {n} 項"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "玩家分享的音效和聲音。先試聽，加入你喜歡的，再投票讓最好的排到前面。「分享音效」會在審核後把你的音效發布給所有人。"
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "玩家分享的音效和聲音。先試聽，加入你喜歡的，再投票讓最好的排到前面。「分享音效」會在審核後把你的音效發布給所有人。",
+  "Mic unchanged": "麥克風未改變",
+  "Pick a voice to turn one on": "選一個聲音來開啟",
+  "Put the voices back, exactly as they were": "把聲音恢復成原來的樣子",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "關掉並忘掉所有聲音，重新開始。開啟 不會再把它們帶回來",
+  "Voices reset": "聲音已重設"
 }

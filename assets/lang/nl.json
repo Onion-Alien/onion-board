@@ -4357,5 +4357,10 @@
     "{group}  ·  {n} aan",
     "{group}  ·  {n} aan"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Geluiden en stemmen die spelers delen. Luister eerst, voeg toe wat je leuk vindt en stem zodat de beste bovenaan komen. 'Een geluid delen' zet er een van jou neer voor iedereen, zodra die is gecontroleerd."
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Geluiden en stemmen die spelers delen. Luister eerst, voeg toe wat je leuk vindt en stem zodat de beste bovenaan komen. 'Een geluid delen' zet er een van jou neer voor iedereen, zodra die is gecontroleerd.",
+  "Mic unchanged": "Microfoon ongewijzigd",
+  "Pick a voice to turn one on": "Kies een stem om aan te zetten",
+  "Put the voices back, exactly as they were": "Zet de stemmen precies terug zoals ze waren",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Zet alle stemmen uit en vergeet ze, voor een frisse start. AAN haalt ze niet terug",
+  "Voices reset": "Stemmen gereset"
 }

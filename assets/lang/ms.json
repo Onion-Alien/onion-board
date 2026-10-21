@@ -4280,5 +4280,10 @@
   "{group}  ·  {n} on": [
     "{group}  ·  {n} hidup"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Bunyi dan suara yang dikongsi pemain. Dengar dahulu, tambah yang anda suka, dan undi supaya yang terbaik naik ke atas. \"Kongsi bunyi\" menyiarkan satu milik anda untuk semua selepas ia disemak."
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Bunyi dan suara yang dikongsi pemain. Dengar dahulu, tambah yang anda suka, dan undi supaya yang terbaik naik ke atas. \"Kongsi bunyi\" menyiarkan satu milik anda untuk semua selepas ia disemak.",
+  "Mic unchanged": "Mik tidak berubah",
+  "Pick a voice to turn one on": "Pilih suara untuk menghidupkannya",
+  "Put the voices back, exactly as they were": "Kembalikan suara tepat seperti sebelumnya",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Matikan semua suara dan lupakan, untuk mula semula. HIDUP tidak akan membawanya kembali",
+  "Voices reset": "Suara ditetapkan semula"
 }

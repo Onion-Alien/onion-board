@@ -4434,5 +4434,10 @@
     "{group}  ·  {n} вкл.",
     "{group}  ·  {n} вкл."
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Звуки и голоса, которыми делятся игроки. Сначала послушай, добавь те, что нравятся, и голосуй, чтобы лучшие поднимались наверх. «Поделиться звуком» выкладывает твой звук для всех после проверки."
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Звуки и голоса, которыми делятся игроки. Сначала послушай, добавь те, что нравятся, и голосуй, чтобы лучшие поднимались наверх. «Поделиться звуком» выкладывает твой звук для всех после проверки.",
+  "Mic unchanged": "Микрофон без изменений",
+  "Pick a voice to turn one on": "Выберите голос, чтобы включить его",
+  "Put the voices back, exactly as they were": "Вернуть голоса точно как были",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Выключает все голоса и забывает их, чтобы начать с чистого листа. ВКЛ. их не вернёт",
+  "Voices reset": "Голоса сброшены"
 }

@@ -4357,5 +4357,10 @@
     "{group}  ·  {n} päällä",
     "{group}  ·  {n} päällä"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Pelaajien jakamia ääniä ja ääniefektejä. Kuuntele ensin, lisää ne, joista pidät, ja äänestä, jotta parhaat nousevat kärkeen. ”Jaa ääni” julkaisee omasi kaikille, kun se on tarkistettu."
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Pelaajien jakamia ääniä ja ääniefektejä. Kuuntele ensin, lisää ne, joista pidät, ja äänestä, jotta parhaat nousevat kärkeen. ”Jaa ääni” julkaisee omasi kaikille, kun se on tarkistettu.",
+  "Mic unchanged": "Mikki ennallaan",
+  "Pick a voice to turn one on": "Valitse ääni laittaaksesi sen päälle",
+  "Put the voices back, exactly as they were": "Palauta äänet täsmälleen ennalleen",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Sammuttaa kaikki äänet ja unohtaa ne, puhdas aloitus. PÄÄLLÄ ei tuo niitä takaisin",
+  "Voices reset": "Äänet nollattu"
 }

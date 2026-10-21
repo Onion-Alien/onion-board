@@ -4280,5 +4280,10 @@
   "{group}  ·  {n} on": [
     "{group}  ·  {n} đang bật"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Âm thanh và giọng nói người chơi chia sẻ. Nghe thử trước, thêm những cái bạn thích và bình chọn để cái hay nhất lên đầu. \"Chia sẻ âm thanh\" đăng một cái của bạn cho mọi người sau khi được kiểm tra."
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Âm thanh và giọng nói người chơi chia sẻ. Nghe thử trước, thêm những cái bạn thích và bình chọn để cái hay nhất lên đầu. \"Chia sẻ âm thanh\" đăng một cái của bạn cho mọi người sau khi được kiểm tra.",
+  "Mic unchanged": "Mic không đổi",
+  "Pick a voice to turn one on": "Chọn một giọng để bật",
+  "Put the voices back, exactly as they were": "Đưa các giọng trở lại y như cũ",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Tắt và quên mọi giọng để bắt đầu lại. BẬT sẽ không mang chúng lại",
+  "Voices reset": "Đã đặt lại giọng"
 }

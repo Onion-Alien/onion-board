@@ -1211,6 +1211,48 @@ class VoiceFxPanel(QWidget):
         self._refresh()
         self._emit()
 
+    def is_blank(self) -> bool:
+        """No voice at all to turn on: your own mix with nothing in it (`clear_mix`)."""
+        return (self._preset == CUSTOM and not self._extras and not any(
+            r.chk.isChecked() for t, r in self.rows.items() if t != "cleanup"))
+
+    def snapshot(self) -> dict:
+        """Everything `clear_mix` throws away, for `restore` (its Undo)."""
+        return {"rows": {t: r.state() for t, r in self.rows.items()},
+                "extras": {t: dict(c) for t, c in self._extras.items()},
+                "custom": dict(self._custom), "preset": self._preset, "own": self._own,
+                "based_on": self._based_on, "on": self.btn_power.isChecked()}
+
+    def restore(self, snap: dict):
+        for t, r in self.rows.items():
+            r.load(snap["rows"].get(t))
+        self._extras = {t: dict(c) for t, c in snap["extras"].items()}
+        self._custom, self._preset = dict(snap["custom"]), snap["preset"]
+        self._own, self._based_on = snap["own"], snap["based_on"]
+        self.btn_power.blockSignals(True)
+        self.btn_power.setChecked(snap["on"])
+        self.btn_power.blockSignals(False)
+        self._refresh()
+        self._emit()
+
+    def clear_mix(self):
+        """A fresh start: off, with no effects at all (your own mix emptied too, and
+        what's on top of the voice). Clean up my mic is yours, not the voice's: it stays."""
+        for t, r in self.rows.items():
+            if t != "cleanup":
+                r.load(None)
+        self._extras = {}
+        self._custom = {}
+        self._preset = CUSTOM
+        self._own = True
+        self._based_on = ""
+        self._clear_fresh()
+        self.btn_power.blockSignals(True)
+        self.btn_power.setChecked(False)
+        self.btn_power.blockSignals(False)
+        self._refresh()
+        self._emit()
+
     # never ear-splitting: louder settings are capped below their slider's top
     RANDOM_CAPS = {("compressor", "boost"): 9, ("distortion", "drive"): 20,
                    ("echo", "feedback"): 0.6, ("radio", "drive"): 14,

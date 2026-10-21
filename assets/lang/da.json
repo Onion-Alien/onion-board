@@ -4357,5 +4357,10 @@
     "{group}  ·  {n} slået til",
     "{group}  ·  {n} slået til"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Lyde og stemmer, som spillere deler. Hør dem først, tilføj dem, du kan lide, og stem, så de bedste kommer øverst. „Del en lyd“ lægger en af dine ud til alle, når den er blevet tjekket."
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Lyde og stemmer, som spillere deler. Hør dem først, tilføj dem, du kan lide, og stem, så de bedste kommer øverst. „Del en lyd“ lægger en af dine ud til alle, når den er blevet tjekket.",
+  "Mic unchanged": "Mikrofonen er uændret",
+  "Pick a voice to turn one on": "Vælg en stemme for at slå en til",
+  "Put the voices back, exactly as they were": "Sæt stemmerne tilbage, præcis som de var",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Slå alle stemmer fra og glem dem, for en frisk start. TIL bringer dem ikke tilbage",
+  "Voices reset": "Stemmer nulstillet"
 }
