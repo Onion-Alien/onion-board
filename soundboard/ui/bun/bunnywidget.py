@@ -1140,7 +1140,6 @@ class BunnyWidget(QWidget):
         up = math.sin(math.pi * ph)                  # in the air between beats, down on them
         spb = 60 / g.bpm if g is not None and g.bpm else 0.5
         hit = hit_curve((ph if ph < 0.75 else ph - 1) * spb, 5 * spb)   # down on the beat
-        on_beat = hit
         side = math.sin(math.pi * b)                  # one way a beat, then the other
         slow = math.sin(math.pi * b / 2)              # one sway every two beats
         m = dict(dy=0.0, dx=0.0, angle=0.0, ears=0.0, sy=0.0, nod=0.0, dip=0.0,
@@ -1161,11 +1160,14 @@ class BunnyWidget(QWidget):
             swap = 1.0 if t % 4.0 < 0.12 else 0.0   # (a blink covers the change)
             slow = math.sin(t * 1.7)  # (a lazy sway of its own: hip-hop tempos fool it)
             # a nod on each beat too, as far as the beat is sure (an 808 alone, a few
-            # a bar, left him all but still)
+            # a bar, left him all but still). The beat's nod is smooth, down on it and
+            # up between, and the 808s only add a little (less the surer the beat):
+            # snapping down on the beat and again on every bass note looked like
+            # headbanging.
             sure = min(1.0, max(0.0, (getattr(g, "confidence", 0.0) - 0.35) / 0.3))
-            hit = max(hit, 0.7 * sure * on_beat)
-            m.update(dip=12 * hit, nod=6 * hit - 3 - 3 * (face == 3), angle=-3 + 3 * slow,
-                     dx=a * 0.03 * slow, dy=a * 0.035 * hit, ears=6 * slow - 8 * hit,
+            hit = max(0.55 * (1 - 0.6 * sure) * hit, 0.75 * sure * math.cos(math.pi * ph) ** 2)
+            m.update(dip=9 * hit, nod=4 * hit - 3 - 3 * (face == 3), angle=-3 + 3 * slow,
+                     dx=a * 0.03 * slow, dy=a * 0.015 * hit, ears=6 * slow - 5 * hit,
                      smug=float(face in (0, 2)), blink=max(swap, float(face == 1)))
         elif style == "chill":      # a slow sway, eyes shut, lost in it
             awake = 6 <= b % 16 < 8   # (now and then he opens them)

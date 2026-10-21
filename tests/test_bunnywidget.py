@@ -959,3 +959,16 @@ def test_a_click_hop_and_a_dance_hop_stay_inside_his_box(qapp):
             hop = -0.07 * 130
         top = b._bun_rect().top() + hop - 2.2 - b.bun_h * ROOM_TOP / H   # (bob, ears, hat)
         assert top >= 0, kw
+
+
+def test_hiphop_nod_stays_smooth_with_a_bass_note_between_beats(qapp, monkeypatch):
+    # a snap down on every beat and again on every bass note looked like headbanging
+    b, clock = _dance(monkeypatch, "hiphop")
+    song = b.groove
+    song.bpm, song.confidence = 105.0, 0.9
+    song.last_hit = lambda band, now: ((now - song.t0) % (30 / song.bpm), 0.9)   # 2 a beat
+    _beats(b, clock, 2.0)
+    dips = []
+    _beats(b, clock, 4.0, lambda: dips.append(b.pose()["dip"]))
+    assert max(dips) < 8                                       # a nod, not a bang
+    assert max(abs(x - y) for x, y in zip(dips, dips[1:])) < 1.6   # no snaps

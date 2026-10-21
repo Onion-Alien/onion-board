@@ -322,3 +322,13 @@ def test_settings_asked_for_from_bun_bring_the_window_back(window, qapp):
     window.setctl.open_settings("appearance")
     assert window.isVisible() and not window.bunctl.bun_up()
     assert window._content.currentWidget() is window.setctl._settings_dlg
+
+
+def test_buttons_sit_close_under_his_feet(window, qapp):
+    window.bunctl.enter_bun_mode()
+    bun = window.bunctl.bun_mode
+    for h in (130, 220):
+        bun.set_size(h)
+        feet = bun._bun_rect().bottom()
+        gap = bun.icons.y() + bun.b_play.y() - feet
+        assert 0 < gap <= round(h * 0.1) + 6, (h, gap)   # (it was 25 px at 130)
