@@ -244,3 +244,39 @@ def test_a_short_window_scrolls_the_picked_voice_bar_with_the_voices(qapp, monke
     finally:
         panel.shutdown()
         panel.deleteLater()
+
+
+def test_speech_install_has_pilot_bun_and_the_glowing_button(qapp, monkeypatch):
+    """Speech recognition not in yet: its box has Pilot Bun beside the words and a
+    glowing Install button, as the AI voices card has Robo-Bun. He flies while the
+    install runs, rests after a while otherwise, and never moves in lite mode."""
+    from soundboard.ui.bun import pilotbun
+    from soundboard.ui.kit.glowbutton import GlowButton
+    from soundboard.ui.settings import lite
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+    panel = VoicePanel(FakeEngine(), {}, {"tab": "speak"})
+    inst = panel.speech.installs
+    try:
+        panel.show()
+        qapp.processEvents()
+        bun = inst.bun_pilot
+        assert isinstance(inst.b_install, GlowButton)
+        assert bun.isVisibleTo(inst.missing)
+        assert at(bun, inst.missing).right() < at(inst.lbl_missing, inst.missing).left()
+        assert bun._timer.isActive() and not bun.resting()   # just shown: flying
+        bun._rest_at = 0.0
+        bun._tick()
+        assert not bun._timer.isActive()                    # rested: no timer
+        bun.set_flying(True)
+        bun._rest_at = 0.0
+        assert not bun.resting()                            # installing: keeps flying
+        bun.set_flying(False)
+        monkeypatch.setattr(lite, "_on", True)
+        bun.stir()
+        assert bun.resting() and not bun._timer.isActive()  # lite: a still picture
+        bun.grab()                                          # (and it draws)
+        assert pilotbun.LANDS
+    finally:
+        panel.shutdown()
+        panel.close()
+        panel.deleteLater()
