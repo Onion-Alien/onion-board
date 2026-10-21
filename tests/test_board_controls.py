@@ -1021,6 +1021,13 @@ def test_live_controls_save_as_new_pad(window, monkeypatch):
     assert w.meta("s0").fx == {} and sp.values() == (1.3, 5, True)   # both stay as they were
     w.editctl.save_live_copy()
     assert asked[-1] == "Boom (modified 2)"
+    long = "x" * 45                         # a long name still gets a free one, at once
+    w.cfg.sounds[0].name = long
+    first = w.editctl.new_pad_name(long)
+    assert first == "x" * 29 + " (modified)" and len(first) == 40
+    w.cfg.sounds[1].name = first
+    assert w.editctl.new_pad_name(long) == "x" * 27 + " (modified 2)"
+    w.cfg.sounds[0].name = "Boom"
     monkeypatch.setattr(w.editctl, "_ask_pad_name", lambda d: None)   # Cancel
     n = len(w.cfg.sounds)
     assert w.editctl.save_live_copy() is None and len(w.cfg.sounds) == n

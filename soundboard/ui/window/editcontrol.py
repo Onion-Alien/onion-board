@@ -318,12 +318,17 @@ class EditControl(Controller):
         return playing[-1] if playing else None
 
     def new_pad_name(self, name: str) -> str:
-        """“Airhorn (modified)”, or “(modified 2)”… when that's taken."""
+        """“Airhorn (modified)”, or “(modified 2)”… when that's taken. A long name is
+        shortened so the suffix always fits in the 40 characters a name may have: cut
+        off, every try came out as the same taken name and this never returned."""
         taken = {m.name.lower() for m in self.mw.cfg.sounds}
         n = 1
         while True:
-            new = (_("{name} (modified)", name=name) if n == 1
-                   else _("{name} (modified {n})", name=name, n=n))[:40]
+            label = (lambda s: _("{name} (modified)", name=s)) if n == 1 else \
+                (lambda s, n=n: _("{name} (modified {n})", name=s, n=n))
+            new = label(name)
+            if len(new) > 40:
+                new = label(name[:max(1, len(name) - (len(new) - 40))])[:40]
             if new.lower() not in taken:
                 return new
             n += 1
