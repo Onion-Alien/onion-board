@@ -151,6 +151,13 @@ def test_tab_explanations_are_in_each_tabs_right_click_menu(window, monkeypatch)
         assert shown[-1] == title
 
 
+def test_every_tab_has_an_about_this_tab(window):  # noqa: F811
+    """Community's right-click had no About this tab: every other tab did."""
+    for i in range(window.tabs.count()):
+        menu = window.tabctl.tab_menu(i)
+        assert menu.actions()[0].text() == "About this tab", window.tabs.widget(i)
+
+
 def test_auto_ptt_goes_down_with_the_sound_not_on_the_next_tick(window, qapp, monkeypatch):  # noqa: F811
     """Minimised, the tick runs every TICK_IDLE_MS: pressing the game's PTT key there
     let the start of every sound out before the key was held (a game that only sends
