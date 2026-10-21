@@ -34,6 +34,12 @@ TEMPO_EVERY = 0.5        # seconds of audio between tempo checks
 STYLE_EVERY = 1.0        # ... and style checks
 STYLE_MIN = 250          # frames heard before the first guess (2.5 s)
 SWITCH_VOTES = 3         # another tempo or style must win this many checks in a row
+CONF_SLOW = 0.1          # the style goes by the beat's sureness averaged over ~5 s...
+CONF_STICK = 0.06        # ...and keeps its dance while that's this near a rule's line
+ON_BEAT_S = 8.0          # seconds of beats checked for a bass hit on each one...
+ON_BEAT_NEAR = 0.05      # ...this close to it (a kick on every beat: four to the floor)
+ON_BEAT_STICK = 0.1      # (and the dance stays while that share is this near the line)
+BREAK_CONF = 0.6         # electronic stays it through a breakdown this sure of the beat
 BPM_LO, BPM_HI = 60.0, 185.0
 STYLES = ("pop", "electronic", "rock", "hiphop", "chill", "speech")
 
@@ -51,7 +57,7 @@ HIT_RULES = {"bass": (0.12, 0.0), "drums": (0.16, 1.7)}
 BASS_RISE = 5.0
 BASS_FLOOR = 24.0            # ...and no more than this far under its recent peak
 VOICE_KEEP = 40              # frames of the voice's level kept for lip sync (0.4 s)
-HIT_KEEP = 6.0               # seconds of hits remembered
+HIT_KEEP = 9.0               # seconds of hits remembered
 _BINS = np.arange(1, _TOP, dtype=np.float32)
 
 
@@ -69,6 +75,7 @@ class Groove:
         self.style = ""        # "" until it's heard enough to guess
         self.bpm = 0.0
         self.confidence = 0.0  # how sure of the beat (0..1)
+        self._conf_slow = 0.0  # ...averaged over a few seconds (what the style goes by)
         self.energy = 0.0      # how loud right now, 0..1
         self.kick = 0.0        # the latest onset's strength, 0..1 (decays)
         self.voice = 0.0       # how loud the vocal range is right now, 0..1 (lip sync)
@@ -325,6 +332,7 @@ class Groove:
                 else:
                     self._doubt = 0
         self.confidence = self.confidence * 0.5 + conf * 0.5 if self.bpm else conf
+        self._conf_slow += (self.confidence - self._conf_slow) * (CONF_SLOW if self.bpm else 1.0)
         # where the beats fall: the offset whose comb lines up with the most kicks (the
         # kick band alone: with the hi-hats in, it locked onto the off-beat)
         kick_env = np.maximum(0.0, kick - np.convolve(kick, np.ones(20) / 20, "same"))
@@ -361,6 +369,19 @@ class Groove:
             return 0.0
         return self._beat0 + (now - self._t0) * self.bpm / 60
 
+    def _on_beat(self) -> float:
+        """The share of the last ON_BEAT_S seconds' beats with a bass hit right on them:
+        most for a kick on every beat (house, techno), half or less for hip-hop's 808."""
+        if not self.bpm:
+            return 0.0
+        end, spb = self._t_last, 60 / self.bpm
+        b = self.beat(end)
+        beats = end - (b - np.arange(np.ceil(b - ON_BEAT_S / spb), np.floor(b) + 1)) * spb
+        hits = np.array([t for t, _s in self.hits["bass"] if t > end - ON_BEAT_S - 1])
+        if not len(beats) or not len(hits):
+            return 0.0
+        return float(np.mean(np.abs(beats[:, None] - hits[None, :]).min(axis=1) < ON_BEAT_NEAR))
+
     # ------------------------------------------------------------------ style
     def features(self) -> dict:
         """The last few seconds, summed up: what guess() goes by."""
@@ -371,7 +392,8 @@ class Groove:
         med = float(np.median(db[live])) if live.any() else float(db.max())
         rel = lambda row: float(np.mean((row - db)[live])) if live.any() else -99.0  # noqa: E731
         sm = np.convolve(db, np.ones(25) / 25, "valid")   # 1/4 s steps: phrasing, not hits
-        return {"bpm": self.bpm, "conf": self.confidence, "four": self._four,
+        return {"bpm": self.bpm, "conf": self._conf_slow, "four": self._four,
+                "on_beat": self._on_beat(),
                 "gaps": float(np.mean(db < med - 15)),
                 "bass": rel(r[4]), "voice": rel(r[3]), "high": rel(r[5]),
                 "flat": float(np.mean(r[6][live])) if live.any() else 0.0,
@@ -385,8 +407,27 @@ class Groove:
         measured on real songs, speech and narration (a wrong guess only changes how he
         dances): speech stops and starts (gaps, big swings in loudness, few hits); metal
         is a bright wall of noise; hip-hop is dark and bassy; electronic music is a steady
-        beat at club tempo; calm music has little bass or top end."""
+        beat at club tempo; calm music has little bass or top end.
+
+        The beat's sureness and the kicks on the beat wobble from bar to bar, so while
+        they're within CONF_STICK / ON_BEAT_STICK of a rule's line, the style he's dancing
+        to stays (a pop chorus wobbling over the line flipped him into headbanging and
+        back every few seconds, a techno track between hip-hop and electronic), and a
+        techno track's breakdown, the kick gone but the beat as sure, stays electronic."""
         f = self.features()
+        style = self._rules(f)
+        if self.style == "electronic" and style == "hiphop" and f["conf"] >= BREAK_CONF:
+            return self.style   # a breakdown with the kick out, the beat as sure as ever
+        if self.style and style != self.style:
+            for dc in (-CONF_STICK, 0.0, CONF_STICK):
+                for do in (-ON_BEAT_STICK, 0.0, ON_BEAT_STICK):
+                    if self._rules({**f, "conf": f["conf"] + dc,
+                                    "on_beat": f["on_beat"] + do}) == self.style:
+                        return self.style
+        return style
+
+    @staticmethod
+    def _rules(f: dict) -> str:
         bpm, conf = f["bpm"], f["conf"]
         if f["gaps"] > 0.25 and f["dyn"] > 9 and f["onsets"] < 0.45 and conf < 0.5:
             return "speech"
@@ -397,6 +438,10 @@ class Groove:
             return "rock"
         if (f["high"] < -28 and f["bass"] < -9) or (f["bass"] < -14 and conf < 0.5):
             return "chill"
+        if ((f["on_beat"] >= 0.6 or f["four"] >= 0.35) and conf >= 0.55
+                and 116 <= bpm <= 150 and f["bass"] > -10):   # a kick on (nearly) every
+            return "electronic"   # beat: dark techno, not hip-hop (its 808 lands on half
+                                  # the beats or less)
         if f["cent"] < -1.1 and f["high"] < -17 and not 115 <= bpm <= 140:   # (club tempo:
             return "hiphop"                                                # dark house)
         if 116 <= bpm <= 145 and conf >= 0.5 and f["bass"] > -10:

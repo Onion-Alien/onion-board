@@ -124,3 +124,33 @@ def test_a_stream_like_the_radio_is_heard_chunk_by_chunk():
     assert len(times) >= 6 and all(np.abs(kicks - t).min() < 0.02 for t in times)
     g.feed(_club(bpm, 2, np.random.default_rng(7)), 0.5)   # a sound now: starts again
     assert g.bpm == 0
+
+
+def test_a_busy_chorus_near_the_rock_line_keeps_his_dance(monkeypatch):
+    # a loud pop chorus: busy, bright, its beat's sureness wobbling around the line the
+    # "busy and unsure: rock" rule draws (it flipped him into headbanging and back)
+    g = Groove()
+    chorus = {"bpm": 110.0, "conf": 0.47, "four": 0.1, "on_beat": 0.8, "gaps": 0.0, "bass": -5.0,
+              "voice": -4.0, "high": -12.0, "flat": 0.25, "cent": -0.2, "dyn": 1.0,
+              "onsets": 0.9, "loud": -7.0}
+    monkeypatch.setattr(g, "features", lambda: dict(chorus))
+    assert g.guess() == "rock"   # (heard fresh, it's on the rock side of the line)
+    g.style = "pop"
+    assert g.guess() == "pop"    # but dancing to pop, a wobble this near the line keeps it
+    chorus["conf"] = 0.38
+    assert g.guess() == "rock"   # well over the line: it's really changed
+
+
+def test_dark_techno_with_a_kick_on_every_beat_is_electronic_not_hiphop(monkeypatch):
+    # dark and bassy at 143 BPM reads like hip-hop, where he nods to every bass note;
+    # with a kick on nearly every beat it's techno, and he hops on the beat instead
+    g = Groove()
+    track = {"bpm": 143.0, "conf": 0.9, "four": 0.2, "on_beat": 0.8, "gaps": 0.0,
+             "bass": -0.6, "voice": -20.0, "high": -26.0, "flat": 0.4, "cent": -3.1,
+             "dyn": 1.0, "onsets": 0.14, "loud": -4.3}
+    monkeypatch.setattr(g, "features", lambda: dict(track))
+    assert g.guess() == "electronic"
+    track["on_beat"] = 0.3   # an 808 on a few of the beats: hip-hop
+    assert g.guess() == "hiphop"
+    g.style = "electronic"   # but a breakdown, the kick out and the beat as sure, stays
+    assert g.guess() == "electronic"
