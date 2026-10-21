@@ -83,6 +83,39 @@ def test_the_round_button_plays_and_keys_play_send_and_stop(window, monkeypatch)
     assert mic.toolTip() == "Play through mic"
 
 
+def _double_click(widget, pos):
+    """A real mouse's double-click: press, release, double-click, release (QTest's
+    mouseDClick sends the double-click event alone)."""
+    from PySide6.QtCore import QEvent, QPointF
+    from PySide6.QtGui import QMouseEvent
+    from PySide6.QtWidgets import QApplication
+    left, p = Qt.MouseButton.LeftButton, QPointF(pos)
+    for kind, held in ((QEvent.Type.MouseButtonPress, left),
+                       (QEvent.Type.MouseButtonRelease, Qt.MouseButton.NoButton),
+                       (QEvent.Type.MouseButtonDblClick, left),
+                       (QEvent.Type.MouseButtonRelease, Qt.MouseButton.NoButton)):
+        QApplication.sendEvent(widget, QMouseEvent(kind, p, widget.mapToGlobal(p), left, held,
+                                                   Qt.KeyboardModifier.NoModifier))
+
+
+def test_a_double_click_on_the_play_button_plays_once(window, monkeypatch):  # noqa: F811
+    recs, played = _recs(window, monkeypatch)
+    c = recs.add(np.full((SR // 2, 2), 0.2, np.float32), "Take", "My voice")
+    window.resize(1200, 800)
+    window.show()
+    window.tabs.setCurrentWidget(window.voice)
+    recs.title.setChecked(True)
+    QTest.qWait(10)
+    L = recs.row_layout(recs.list.visualItemRect(recs._items[c.id]))
+    _double_click(recs.list.viewport(), L.play.center())
+    assert played == [("voiceclips:preview", True)]          # not play, stop, play again
+    assert recs._playing == ("voiceclips:preview", c.id)
+    QTest.mouseClick(recs.list.viewport(), Qt.MouseButton.LeftButton, pos=L.play.center())
+    assert recs._playing is None                              # the next click stops it
+    _double_click(recs.list.viewport(), L.name.center())      # the row itself: plays too
+    assert len(played) == 2 and recs._playing == ("voiceclips:preview", c.id)
+
+
 def test_row_buttons_follow_the_hovered_row_and_the_waveform_gives_way(window, monkeypatch):  # noqa: F811
     recs, _played = _recs(window, monkeypatch)
     a = recs.add(np.full((SR, 2), 0.2, np.float32), "One", "My voice")
