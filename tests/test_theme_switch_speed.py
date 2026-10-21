@@ -324,3 +324,49 @@ def test_the_fade_out_is_the_dimmed_picture_crossfading_to_the_new_look(qapp):
     c._fade.stop()
     host.close()
     host.deleteLater()
+
+
+def test_the_fade_out_starts_from_the_window_as_it_settles(main_window, monkeypatch):  # noqa: F811
+    """The restyled window's picture is taken after the layouts the restyle queued:
+    taken before, the theme cards in it sat a few pixels to the side, so the fade
+    showed them jump sideways and back on every switch."""
+    from soundboard.style import cover as kit
+    main_window.resize(1400, 900)
+    main_window.show()
+    main_window.setctl.open_settings("appearance")
+    for _ in range(5):
+        QApplication.processEvents()
+    cards = main_window.setctl._settings_dlg.theme_cards
+    fresh = []
+    real = kit.Cover.uncover
+
+    def spy(self):
+        real(self)
+        fresh.append(self.fresh.toImage())
+    monkeypatch.setattr(kit.Cover, "uncover", spy)
+    start = theme.current_name
+    try:
+        picked = next(c for c in cards if c.name == _other(start))
+        picked.click()
+        for _ in range(10):
+            QApplication.processEvents()
+        for c in main_window.findChildren(kit.Cover):
+            c.hide()
+        QApplication.processEvents()
+        now = main_window.grab().toImage()
+        assert len(fresh) == 1
+        dpr = now.devicePixelRatio()
+        checked = 0
+        for card in cards:
+            at = card.mapTo(main_window, card.rect().topLeft())
+            x0, y0 = round(at.x() * dpr), round(at.y() * dpr)
+            w, h = round(card.width() * dpr), round(40 * dpr)
+            if card is picked:   # (its focus ring comes a moment later: colour only)
+                continue
+            if not card.isVisible() or y0 < 0 or y0 + h > now.height() or x0 + w > now.width():
+                continue   # (scrolled out of sight)
+            checked += 1
+            assert fresh[0].copy(x0, y0, w, h) == now.copy(x0, y0, w, h), card.name
+        assert checked >= 5
+    finally:
+        main_window.themectl.apply_theme(start)

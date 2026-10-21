@@ -702,13 +702,14 @@ class AppearancePage(Page):
             for c in self.dlg.theme_cards:   # the app for nothing (a click unticks the card)
                 c.setChecked(c.name == name)
             return
+        for c in self.dlg.theme_cards:   # ticked before the restyle: the fade's picture
+            c.setChecked(c.name == name)   # of the new look has the right card ringed
         self.mw.themectl.apply_theme(name)
         self.dlg._category_icons()
         if getattr(self.dlg, "net_activity", None) is not None:
             self.dlg.net_activity.refresh(force=True)   # its status colours are per theme
         self.dlg._sync_highlight()   # the theme's own colour, unless you picked one
         for c in self.dlg.theme_cards:
-            c.setChecked(c.name == name)
             if c.name in theme.LIMITED:   # picked in time: now it's theirs
                 c.setToolTip(limited_tip(c.name))
                 c.setAccessibleDescription(c.toolTip())
