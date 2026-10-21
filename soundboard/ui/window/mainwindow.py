@@ -966,8 +966,6 @@ class MainWindow(QMainWindow):
             v.fx_changed.connect(self._voice_fx_changed)
             v.speech_changed.connect(lambda s: self.set_option("speech", s))
             v.clip_ready.connect(self.soundctl.on_clip)
-            v.fx.set_tip_enabled(not self.cfg.voice_discord_tip_shown)
-            v.fx.chat_help.connect(lambda: self.statusctl.show_chat_guide("discord"))
             v.fx.hotkey_asked.connect(self.hkctl.set_voice_hotkey)
             v.share_asked.connect(self.share_voice)
             from soundboard.ui.apps.clipshelf import ClipShelf
@@ -986,8 +984,6 @@ class MainWindow(QMainWindow):
             v.board_changed()
             v.set_view(self.cfg.voice_view)   # both cards: Voice changer and AI voices
             v.fx.view_toggle.changed.connect(lambda view: self.set_option("voice_view", view))
-            v.fx.tip_dismissed.connect(
-                lambda: self.set_option("voice_discord_tip_shown", True))
         elif key == "apps":
             v = AppsTab(self.engine, self.cfg, self._save_later, Meter)
             v.clip_ready.connect(self.soundctl.on_clip)

@@ -82,8 +82,6 @@ class TabOff(QWidget):
 class _FxOff(QObject):
     """The voice changer's part of VoiceOff: a power switch that stays off."""
     hear_toggled = Signal(bool)
-    chat_help = Signal()
-    tip_dismissed = Signal()
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -93,9 +91,6 @@ class _FxOff(QObject):
         self.btn_power.hide()
 
     def set_hearing(self, _on: bool):
-        pass
-
-    def set_tip_enabled(self, _on: bool):
         pass
 
     @staticmethod
