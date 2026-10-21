@@ -42,7 +42,7 @@ guide* and *Copy AI prompt* buttons there help you set it up.
 | `/api/apps`, `/api/app?name=&send=&volume=` | the Apps tab: send one program's sound |
 | `/api/hotkeys` | every global hotkey off (to type) or on |
 | `/api/replay` | save the instant replay as a sound |
-| `/api/stations`, `/api/radio…` | the Radio tab |
+| `/api/stations`, `/api/radio…` | the Radio tab (`loading: true` with no `stations`: the list is still on its way, ask again in a second) |
 
 ## Chat commands: `/api/chat`
 

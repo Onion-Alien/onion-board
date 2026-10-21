@@ -253,7 +253,9 @@ class SmartMono:
 class Ducker:
     """Lowers the sounds while the mic hears you talk. Speech is detected against a
     noise floor it tracks itself (fans, hiss), so it works with any mic without a
-    threshold to set. Gain moves per block: down fast, up slowly after a hold."""
+    threshold to set. Gain moves per block: down fast, up slowly after a hold.
+    The floor starts at the first mic block's level: from a fixed -60 dB it took ~10 s
+    to creep up to a room's steady hiss, and the sounds were lowered all that time."""
 
     ATTACK_S, RELEASE_S, HOLD_S = 0.03, 0.4, 0.35
     ABOVE_FLOOR_DB = 12.0     # this much over the noise floor counts as talking
@@ -265,6 +267,7 @@ class Ducker:
         self.gain_db = 0.0
         self.held = 0.0          # seconds of hold left
         self.talking = False
+        self.heard = False       # a mic block came: the floor starts from it
 
     def process(self, mic: np.ndarray | None, n: int, depth_db: float,
                 ramp: bool = True) -> np.ndarray | float:
@@ -275,6 +278,9 @@ class Ducker:
         dt = n / self.rate
         if mic is not None and len(mic):
             lvl = 10 * np.log10(_mean_square(mic) + 1e-12)
+            if not self.heard:
+                self.heard = True
+                self.floor_db = lvl
             # the floor follows quiet stretches down fast and creeps up slowly
             if lvl < self.floor_db:
                 self.floor_db += (lvl - self.floor_db) * min(1.0, dt / 0.2)
