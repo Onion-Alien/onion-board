@@ -14,7 +14,9 @@ import logging
 from collections.abc import Callable
 
 from PySide6.QtCore import QEvent, QObject
+from PySide6.QtGui import QWindow
 from PySide6.QtWidgets import QWidget
+from shiboken6 import invalidate
 
 log = logging.getLogger(__name__)
 
@@ -33,9 +35,17 @@ class WindowWatch(QObject):
             self._by_type.setdefault(k, []).append(fn)
 
     def attach(self) -> None:
-        """On the window's QWindow as it is now (once: Qt doesn't add a filter twice)."""
+        """On the window's QWindow as it is now (once: Qt doesn't add a filter twice).
+
+        A dead Python wrapper left at the new QWindow's address (a layout item's from
+        itemAt(), see widgets.widget_at) comes back in its place: dropped, the second
+        ask makes a real one."""
         handle = self._window.windowHandle()
-        if handle is not None:
+        if handle is not None and not isinstance(handle, QWindow):
+            log.warning("window watch: a stale %s came back as the window", type(handle).__name__)
+            invalidate(handle)
+            handle = self._window.windowHandle()
+        if isinstance(handle, QWindow):
             handle.installEventFilter(self)
 
     def eventFilter(self, obj, ev) -> bool:   # noqa: N802 - Qt API

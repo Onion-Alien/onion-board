@@ -15,6 +15,7 @@ from PySide6.QtWidgets import QVBoxLayout, QWidget
 
 from soundboard.i18n import _
 from soundboard.ui.kit.panel import card, fold_button, hint_label
+from soundboard.ui.kit.widgets import widget_at
 
 if TYPE_CHECKING:
     from soundboard.ui.window.mainwindow import MainWindow
@@ -127,7 +128,6 @@ def flatten(inner: QWidget):
     if lay is None:
         return
     lay.setContentsMargins(0, 0, 0, 0)
-    item = lay.itemAt(0)
-    first = item.widget() if item is not None else None
+    first = widget_at(lay, 0)
     if first is not None and first.objectName() == "section":
         first.hide()
