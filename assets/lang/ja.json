@@ -4293,5 +4293,14 @@
   "Take the Live controls effects off": "ライブ操作のエフェクトを外す",
   "{name} (modified {n})": "{name} (変更 {n})",
   "{name} (modified)": "{name} (変更)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ 「{name}」を追加しました。速度とピッチはパッドに保存できる範囲に収めました"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ 「{name}」を追加しました。速度とピッチはパッドに保存できる範囲に収めました",
+  "56 achievements": "56 個の実績",
+  "A Stream Deck plugin": "Stream Deck プラグイン",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "Play sound キーを追加して、リストからサウンドを選びます。設定 → リモートのストリーマーガイドにリンクがあります。",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "チャンネルポイント、Cheer、レイド、チャットコマンドでサウンドが鳴ります。ボットは不要です。",
+  "Each one has its own Bun badge. They're counted on your PC only.": "それぞれに Bun のバッジがあります。数えるのはこの PC の中だけです。",
+  "Lite mode for slower PCs": "遅めの PC 向け軽量モード",
+  "Open Remote": "リモートを開く",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "設定 → 外観：アニメーションが止まり、AI の声は軽いモデルを使います。",
+  "Twitch, Stream Deck and achievements": "Twitch、Stream Deck、実績"
 }

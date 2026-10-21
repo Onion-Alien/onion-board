@@ -4447,5 +4447,14 @@
   "Take the Live controls effects off": "Sundat efekty živého ovládání",
   "{name} (modified {n})": "{name} (upraveno {n})",
   "{name} (modified)": "{name} (upraveno)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ „{name}“ přidáno, rychlost a výška omezené na to, co pad uloží"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ „{name}“ přidáno, rychlost a výška omezené na to, co pad uloží",
+  "56 achievements": "56 úspěchů",
+  "A Stream Deck plugin": "Plugin pro Stream Deck",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "Přidej tlačítko Play sound a vyber zvuk ze seznamu. Odkaz najdeš v Průvodci pro streamery v Nastavení → Dálkové ovládání.",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "Body kanálu, cheery, raidy a příkazy v chatu přehrají tvé zvuky. Bez bota.",
+  "Each one has its own Bun badge. They're counted on your PC only.": "Každý má svůj odznak s Bunem. Počítají se jen na tvém PC.",
+  "Lite mode for slower PCs": "Lehký režim pro pomalejší PC",
+  "Open Remote": "Otevřít Dálkové ovládání",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "Nastavení → Vzhled: animace se zastaví a hlasy AI použijí lehčí model.",
+  "Twitch, Stream Deck and achievements": "Twitch, Stream Deck a úspěchy"
 }

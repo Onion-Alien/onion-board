@@ -4370,5 +4370,14 @@
   "Take the Live controls effects off": "Ta bort livekontrollernas effekter",
   "{name} (modified {n})": "{name} (ändrad {n})",
   "{name} (modified)": "{name} (ändrad)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ La till ”{name}”, med hastighet och tonhöjd inom vad en pad kan spara"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ La till ”{name}”, med hastighet och tonhöjd inom vad en pad kan spara",
+  "56 achievements": "56 prestationer",
+  "A Stream Deck plugin": "Ett Stream Deck-tillägg",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "Lägg till en Play sound-knapp och välj ljudet i en lista. Streamerguiden under Inställningar → Fjärrstyrning länkar till det.",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "Kanalpoäng, cheers, raids och chattkommandon spelar dina ljud. Ingen bot behövs.",
+  "Each one has its own Bun badge. They're counted on your PC only.": "Var och en har sin egen Bun-bricka. De räknas bara på din dator.",
+  "Lite mode for slower PCs": "Lätt läge för långsammare datorer",
+  "Open Remote": "Öppna Fjärrstyrning",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "Inställningar → Utseende: animationer står still och AI-röster använder en lättare modell.",
+  "Twitch, Stream Deck and achievements": "Twitch, Stream Deck och prestationer"
 }

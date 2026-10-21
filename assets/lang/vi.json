@@ -4293,5 +4293,14 @@
   "Take the Live controls effects off": "Bỏ hiệu ứng điều khiển trực tiếp",
   "{name} (modified {n})": "{name} (đã sửa {n})",
   "{name} (modified)": "{name} (đã sửa)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Đã thêm “{name}”, tốc độ và cao độ giữ trong mức pad có thể lưu"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Đã thêm “{name}”, tốc độ và cao độ giữ trong mức pad có thể lưu",
+  "56 achievements": "56 thành tựu",
+  "A Stream Deck plugin": "Plugin cho Stream Deck",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "Thêm phím Play sound và chọn âm thanh từ danh sách. Hướng dẫn truyền phát trong Cài đặt → Xa có liên kết.",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "Điểm kênh, cheer, raid và lệnh chat phát âm thanh của bạn. Không cần bot.",
+  "Each one has its own Bun badge. They're counted on your PC only.": "Mỗi thành tựu có huy hiệu Bun riêng. Chỉ được đếm trên PC của bạn.",
+  "Lite mode for slower PCs": "Chế độ nhẹ cho PC chậm hơn",
+  "Open Remote": "Mở Xa",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "Cài đặt → Vẻ bề ngoài: hoạt ảnh đứng yên và giọng nói AI dùng mô hình nhẹ hơn.",
+  "Twitch, Stream Deck and achievements": "Twitch, Stream Deck và thành tựu"
 }

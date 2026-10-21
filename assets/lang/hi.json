@@ -4370,5 +4370,14 @@
   "Take the Live controls effects off": "लाइव कंट्रोल के इफ़ेक्ट हटाएँ",
   "{name} (modified {n})": "{name} (बदला गया {n})",
   "{name} (modified)": "{name} (बदला गया)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” जोड़ा, इसकी स्पीड और पिच उतनी रखी जितनी पैड सेव कर सकता है"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” जोड़ा, इसकी स्पीड और पिच उतनी रखी जितनी पैड सेव कर सकता है",
+  "56 achievements": "56 उपलब्धियाँ",
+  "A Stream Deck plugin": "एक Stream Deck प्लगइन",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "एक Play sound बटन जोड़ें और सूची से आवाज़ चुनें। सेटिंग्स → दूर में स्ट्रीमर गाइड इसका लिंक देती है।",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "चैनल पॉइंट, चीयर, रेड और चैट कमांड आपकी आवाज़ें चलाते हैं। किसी बॉट की ज़रूरत नहीं।",
+  "Each one has its own Bun badge. They're counted on your PC only.": "हर एक का अपना Bun बैज है। ये सिर्फ़ आपके पीसी पर गिनी जाती हैं।",
+  "Lite mode for slower PCs": "धीमे पीसी के लिए लाइट मोड",
+  "Open Remote": "दूर खोलें",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "सेटिंग्स → दिखावट: एनिमेशन रुके रहते हैं, और एआई आवाजें हल्का मॉडल इस्तेमाल करती हैं।",
+  "Twitch, Stream Deck and achievements": "Twitch, Stream Deck और उपलब्धियाँ"
 }

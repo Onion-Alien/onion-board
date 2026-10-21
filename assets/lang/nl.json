@@ -4370,5 +4370,14 @@
   "Take the Live controls effects off": "Effecten van de live-bediening eraf halen",
   "{name} (modified {n})": "{name} (aangepast {n})",
   "{name} (modified)": "{name} (aangepast)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” toegevoegd, snelheid en toonhoogte binnen wat een pad kan opslaan"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” toegevoegd, snelheid en toonhoogte binnen wat een pad kan opslaan",
+  "56 achievements": "56 prestaties",
+  "A Stream Deck plugin": "Een Stream Deck-plug-in",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "Voeg een Play sound-toets toe en kies het geluid uit een lijst. De Streamer-gids in Instellingen → Op afstand linkt ernaar.",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "Kanaalpunten, cheers, raids en chatcommando's spelen je geluiden af. Geen bot nodig.",
+  "Each one has its own Bun badge. They're counted on your PC only.": "Elke prestatie heeft een eigen Bun-badge. Ze worden alleen op je pc geteld.",
+  "Lite mode for slower PCs": "Lichte modus voor tragere pc's",
+  "Open Remote": "Op afstand openen",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "Instellingen → Verschijning: animaties staan stil en AI-stemmen gebruiken een lichter model.",
+  "Twitch, Stream Deck and achievements": "Twitch, Stream Deck en prestaties"
 }

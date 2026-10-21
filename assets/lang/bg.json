@@ -4370,5 +4370,14 @@
   "Take the Live controls effects off": "Махни ефектите от управлението на живо",
   "{name} (modified {n})": "{name} (променен {n})",
   "{name} (modified)": "{name} (променен)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ „{name}“ е добавен, скоростта и тонът му са до колкото един пад може да запази"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ „{name}“ е добавен, скоростта и тонът му са до колкото един пад може да запази",
+  "56 achievements": "56 постижения",
+  "A Stream Deck plugin": "Плъгин за Stream Deck",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "Добави бутон Play sound и избери звука от списък. Ръководството за стриймъри в Настройки → Дистанционно води до него.",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "Точки на канала, cheers, рейдове и чат команди пускат твоите звуци. Без бот.",
+  "Each one has its own Bun badge. They're counted on your PC only.": "Всяко има своя значка с Bun. Броят се само на твоя компютър.",
+  "Lite mode for slower PCs": "Лек режим за по-бавни компютри",
+  "Open Remote": "Отвори Дистанционно",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "Настройки → Външен вид: анимациите спират, а AI гласовете ползват по-лек модел.",
+  "Twitch, Stream Deck and achievements": "Twitch, Stream Deck и постижения"
 }

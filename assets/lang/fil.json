@@ -4370,5 +4370,14 @@
   "Take the Live controls effects off": "Alisin ang mga effect ng Live controls",
   "{name} (modified {n})": "{name} (binago {n})",
   "{name} (modified)": "{name} (binago)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Naidagdag ang “{name}”, ang bilis at pitch nito ay hanggang sa kayang i-save ng pad"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Naidagdag ang “{name}”, ang bilis at pitch nito ay hanggang sa kayang i-save ng pad",
+  "56 achievements": "56 na achievement",
+  "A Stream Deck plugin": "Isang Stream Deck plugin",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "Magdagdag ng Play sound key at piliin ang tunog mula sa listahan. Naka-link ito sa Streamer guide sa Settings → Remote.",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "Pinapatugtog ng channel points, cheers, raids at chat commands ang mga tunog mo. Walang bot na kailangan.",
+  "Each one has its own Bun badge. They're counted on your PC only.": "May sariling Bun badge ang bawat isa. Sa PC mo lang sila binibilang.",
+  "Lite mode for slower PCs": "Lite mode para sa mas mabagal na PC",
+  "Open Remote": "Buksan ang Remote",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "Settings → Itsura: tumitigil ang mga animation, at mas magaan na model ang gamit ng mga boses ng AI.",
+  "Twitch, Stream Deck and achievements": "Twitch, Stream Deck at mga achievement"
 }

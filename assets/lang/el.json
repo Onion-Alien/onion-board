@@ -4370,5 +4370,14 @@
   "Take the Live controls effects off": "Βγάλε τα εφέ από τα ζωντανά χειριστήρια",
   "{name} (modified {n})": "{name} (τροποποιημένο {n})",
   "{name} (modified)": "{name} (τροποποιημένο)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Προστέθηκε το \"{name}\", με ταχύτητα και τονικότητα όσο μπορεί να αποθηκεύσει ένα pad"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Προστέθηκε το \"{name}\", με ταχύτητα και τονικότητα όσο μπορεί να αποθηκεύσει ένα pad",
+  "56 achievements": "56 επιτεύγματα",
+  "A Stream Deck plugin": "Ένα πρόσθετο για Stream Deck",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "Πρόσθεσε ένα πλήκτρο Play sound και διάλεξε τον ήχο από λίστα. Ο Οδηγός για streamers στις Ρυθμίσεις → Απομακρυσμένο έχει τον σύνδεσμο.",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "Πόντοι καναλιού, cheers, raids και εντολές chat παίζουν τους ήχους σου. Χωρίς bot.",
+  "Each one has its own Bun badge. They're counted on your PC only.": "Το καθένα έχει το δικό του σήμα με τον Bun. Μετριούνται μόνο στον υπολογιστή σου.",
+  "Lite mode for slower PCs": "Ελαφριά λειτουργία για πιο αργούς υπολογιστές",
+  "Open Remote": "Άνοιγμα Απομακρυσμένο",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "Ρυθμίσεις → Εμφάνιση: τα κινούμενα σχέδια μένουν ακίνητα και οι φωνές AI χρησιμοποιούν ελαφρύτερο μοντέλο.",
+  "Twitch, Stream Deck and achievements": "Twitch, Stream Deck και επιτεύγματα"
 }

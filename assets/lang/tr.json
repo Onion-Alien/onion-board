@@ -4370,5 +4370,14 @@
   "Take the Live controls effects off": "Canlı kontrollerin efektlerini çıkar",
   "{name} (modified {n})": "{name} (değiştirildi {n})",
   "{name} (modified)": "{name} (değiştirildi)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” eklendi, hızı ve perdesi bir pad'in kaydedebileceği kadar"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” eklendi, hızı ve perdesi bir pad'in kaydedebileceği kadar",
+  "56 achievements": "56 başarım",
+  "A Stream Deck plugin": "Bir Stream Deck eklentisi",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "Bir Play sound tuşu ekle ve sesi listeden seç. Ayarlar → Uzak bölümündeki Yayıncı kılavuzu ona bağlantı verir.",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "Kanal puanları, cheer'lar, baskınlar ve sohbet komutları seslerini çalar. Bot gerekmez.",
+  "Each one has its own Bun badge. They're counted on your PC only.": "Her birinin kendi Bun rozeti var. Yalnızca senin bilgisayarında sayılır.",
+  "Lite mode for slower PCs": "Daha yavaş bilgisayarlar için hafif mod",
+  "Open Remote": "Uzak'ı aç",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "Ayarlar → Dış görünüş: animasyonlar durur ve yapay zeka sesleri daha hafif bir model kullanır.",
+  "Twitch, Stream Deck and achievements": "Twitch, Stream Deck ve başarımlar"
 }

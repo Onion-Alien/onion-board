@@ -4447,5 +4447,14 @@
   "Take the Live controls effects off": "Scoate efectele controalelor live",
   "{name} (modified {n})": "{name} (modificat {n})",
   "{name} (modified)": "{name} (modificat)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Am adăugat „{name}”, cu viteza și înălțimea în limita a ce poate salva un pad"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Am adăugat „{name}”, cu viteza și înălțimea în limita a ce poate salva un pad",
+  "56 achievements": "56 de realizări",
+  "A Stream Deck plugin": "Un plugin pentru Stream Deck",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "Adaugă o tastă Play sound și alege sunetul dintr-o listă. Ghidul pentru streameri din Setări → Telecomandă are linkul.",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "Punctele de canal, cheer-urile, raidurile și comenzile din chat îți redau sunetele. Fără bot.",
+  "Each one has its own Bun badge. They're counted on your PC only.": "Fiecare are propria insignă cu Bun. Sunt numărate doar pe PC-ul tău.",
+  "Lite mode for slower PCs": "Mod ușor pentru PC-uri mai lente",
+  "Open Remote": "Deschide Telecomandă",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "Setări → Aspect: animațiile stau pe loc, iar vocile AI folosesc un model mai ușor.",
+  "Twitch, Stream Deck and achievements": "Twitch, Stream Deck și realizări"
 }

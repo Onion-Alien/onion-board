@@ -4293,5 +4293,14 @@
   "Take the Live controls effects off": "เอาเอฟเฟกต์ของการควบคุมสดออก",
   "{name} (modified {n})": "{name} (แก้ไข {n})",
   "{name} (modified)": "{name} (แก้ไข)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ เพิ่ม “{name}” แล้ว ความเร็วและระดับเสียงอยู่ในขอบเขตที่แพดบันทึกได้"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ เพิ่ม “{name}” แล้ว ความเร็วและระดับเสียงอยู่ในขอบเขตที่แพดบันทึกได้",
+  "56 achievements": "56 ความสำเร็จ",
+  "A Stream Deck plugin": "ปลั๊กอิน Stream Deck",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "เพิ่มปุ่ม Play sound แล้วเลือกเสียงจากรายการ คู่มือสตรีมเมอร์ใน การตั้งค่า → ระยะไกล มีลิงก์ให้",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "แต้มช่อง เชียร์ เรด และคำสั่งแชตเล่นเสียงของคุณได้ ไม่ต้องใช้บอต",
+  "Each one has its own Bun badge. They're counted on your PC only.": "แต่ละอันมีเหรียญ Bun ของตัวเอง นับเฉพาะในพีซีของคุณ",
+  "Lite mode for slower PCs": "โหมดเบาสำหรับพีซีที่ช้ากว่า",
+  "Open Remote": "เปิด ระยะไกล",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "การตั้งค่า → รูปร่าง: แอนิเมชันหยุดนิ่ง และเสียงเอไอใช้โมเดลที่เบากว่า",
+  "Twitch, Stream Deck and achievements": "Twitch, Stream Deck และความสำเร็จ"
 }

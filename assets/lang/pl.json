@@ -4447,5 +4447,14 @@
   "Take the Live controls effects off": "Zdejmij efekty sterowania na żywo",
   "{name} (modified {n})": "{name} (zmieniony {n})",
   "{name} (modified)": "{name} (zmieniony)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Dodano „{name}”, prędkość i wysokość w granicach tego, co pad może zapisać"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Dodano „{name}”, prędkość i wysokość w granicach tego, co pad może zapisać",
+  "56 achievements": "56 osiągnięć",
+  "A Stream Deck plugin": "Wtyczka do Stream Decka",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "Dodaj przycisk Play sound i wybierz dźwięk z listy. Przewodnik po streamerze w Ustawienia → Zdalny ma do niej link.",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "Punkty kanału, cheery, rajdy i komendy czatu odtwarzają Twoje dźwięki. Bez bota.",
+  "Each one has its own Bun badge. They're counted on your PC only.": "Każde ma własną odznakę z Bunem. Liczone są tylko na Twoim komputerze.",
+  "Lite mode for slower PCs": "Tryb lekki dla wolniejszych komputerów",
+  "Open Remote": "Otwórz Zdalny",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "Ustawienia → Wygląd: animacje stoją w miejscu, a głosy AI używają lżejszego modelu.",
+  "Twitch, Stream Deck and achievements": "Twitch, Stream Deck i osiągnięcia"
 }

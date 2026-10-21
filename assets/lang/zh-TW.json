@@ -4293,5 +4293,14 @@
   "Take the Live controls effects off": "拿掉即時控制的效果",
   "{name} (modified {n})": "{name} （已修改 {n}）",
   "{name} (modified)": "{name} （已修改）",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ 已加入「{name}」，速度和音調已限制在打擊墊能儲存的範圍內"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ 已加入「{name}」，速度和音調已限制在打擊墊能儲存的範圍內",
+  "56 achievements": "56 個成就",
+  "A Stream Deck plugin": "Stream Deck 外掛",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "新增一個 Play sound 按鍵，從清單中選擇聲音。設定 → 遠端裡的實況主教學有它的連結。",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "頻道點數、Cheer、突襲和聊天指令都能播放你的聲音。不需要機器人。",
+  "Each one has its own Bun badge. They're counted on your PC only.": "每個成就都有自己的 Bun 徽章。只在你的電腦上計算。",
+  "Lite mode for slower PCs": "適合較慢電腦的輕量模式",
+  "Open Remote": "開啟遠端",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "設定 → 外觀：動畫保持靜止，人工智慧聲音使用較輕的模型。",
+  "Twitch, Stream Deck and achievements": "Twitch、Stream Deck 和成就"
 }

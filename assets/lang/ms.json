@@ -4293,5 +4293,14 @@
   "Take the Live controls effects off": "Tanggalkan kesan kawalan langsung",
   "{name} (modified {n})": "{name} (diubah {n})",
   "{name} (modified)": "{name} (diubah)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” ditambah, kelajuan dan picnya dihadkan kepada apa yang boleh disimpan pad"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” ditambah, kelajuan dan picnya dihadkan kepada apa yang boleh disimpan pad",
+  "56 achievements": "56 pencapaian",
+  "A Stream Deck plugin": "Pemalam Stream Deck",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "Tambah kekunci Play sound dan pilih bunyi daripada senarai. Panduan penstrim dalam Tetapan → Kawalan jauh memautkannya.",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "Mata saluran, cheer, raid dan arahan sembang memainkan bunyi anda. Tiada bot diperlukan.",
+  "Each one has its own Bun badge. They're counted on your PC only.": "Setiap satu ada lencana Bun sendiri. Ia dikira pada PC anda sahaja.",
+  "Lite mode for slower PCs": "Mod ringan untuk PC yang lebih perlahan",
+  "Open Remote": "Buka Kawalan jauh",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "Tetapan → Penampilan: animasi kekal pegun, dan suara AI menggunakan model yang lebih ringan.",
+  "Twitch, Stream Deck and achievements": "Twitch, Stream Deck dan pencapaian"
 }
