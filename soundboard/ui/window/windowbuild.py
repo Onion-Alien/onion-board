@@ -1105,6 +1105,7 @@ class WindowBuilder(Controller):
         mw.grid.listed = c.pad_view == "list"
         mw.grid.row_size = c.list_rows
         mw.grid._spacing()
+        mw.grid.tab_after = mw.catctl.btn_cat_add   # Tab: categories, pads, player bar
         mw.grid.reorder.connect(mw.soundctl.on_reorder)
         # queued: the import (and any question it asks) runs after the drop returns,
         # so Explorer isn't frozen until a dialog is answered

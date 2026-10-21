@@ -928,10 +928,22 @@ class Pad(QAbstractButton):
                                          Qt.FocusReason.ShortcutFocusReason,
                                          Qt.FocusReason.OtherFocusReason)
         super().focusInEvent(e)
+        grid = self.parentWidget()
+        if isinstance(grid, PadGrid) and e.reason() in (Qt.FocusReason.TabFocusReason,
+                                                        Qt.FocusReason.BacktabFocusReason):
+            grid.reveal(self)   # (Shift+Tab lands on the last pad, maybe far down)
 
     def focusOutEvent(self, e):
         self._kbd_focus = False
         super().focusOutEvent(e)
+
+    def focusNextPrevChild(self, next):
+        """Tab leaves the pads in one press (the arrows move between them): one Tab per
+        sound stood between the pads and the rest of the window."""
+        grid = self.parentWidget()
+        if isinstance(grid, PadGrid) and grid.tab_out(next):
+            return True
+        return super().focusNextPrevChild(next)
 
     def keyPressEvent(self, e):
         k, mods = e.key(), e.modifiers()
@@ -1603,6 +1615,7 @@ class PadGrid(QWidget):
         self._slack = 0          # pixels right of a full row (slack())
         self._placed = None      # (columns, the pads shown) in the grid now
         self._slots: dict[Pad, tuple[int, int]] = {}   # the pads in the grid: row, column
+        self.tab_after: QWidget | None = None   # the control Tab goes to the pads from
 
     def set_background(self, image: str, opacity: int):
         opacity = min(100, max(0, opacity))
@@ -1795,6 +1808,27 @@ class PadGrid(QWidget):
                     p.show()
             elif not p.isHidden():
                 p.hide()
+        # Tab order: the pads right after `tab_after`, in the order they're shown. A pad
+        # put in the grid goes to the end of the window's focus chain, past the player bar
+        prev: QWidget = self.tab_after or self
+        for p in shown:
+            QWidget.setTabOrder(prev, p)
+            prev = p
+
+    def tab_out(self, forward: bool) -> bool:
+        """Tab (Shift+Tab) on a pad: focus the first control after (before) the pads."""
+        tab = Qt.FocusPolicy.TabFocus.value
+        w = self.window().focusWidget() or self
+        for _i in range(5000):   # (the chain is a ring: never round it twice)
+            w = w.nextInFocusChain() if forward else w.previousInFocusChain()
+            if w is None:
+                return False
+            if (w is not self and not self.isAncestorOf(w) and w.focusProxy() is None
+                    and w.focusPolicy().value & tab == tab and w.isVisible() and w.isEnabled()):
+                w.setFocus(Qt.FocusReason.TabFocusReason if forward
+                           else Qt.FocusReason.BacktabFocusReason)
+                return True
+        return False
 
     def event(self, e):
         done = super().event(e)
@@ -1888,10 +1922,13 @@ class PadGrid(QWidget):
         i = shown.index(pad) + dx + dy * max(1, self._cols)
         if 0 <= i < len(shown):
             shown[i].setFocus(Qt.FocusReason.TabFocusReason)
-            view = self.parentWidget()
-            area = view.parentWidget() if view is not None else None
-            if isinstance(area, QScrollArea):
-                area.ensureWidgetVisible(shown[i])
+
+    def reveal(self, pad: Pad):
+        """Scroll the pad with the keyboard focus into view."""
+        view = self.parentWidget()
+        area = view.parentWidget() if view is not None else None
+        if isinstance(area, QScrollArea):
+            area.ensureWidgetVisible(pad)
 
     def _drop_target(self, pos) -> int:
         """Where a dragged pad dropped at ``pos`` goes: the pad under it, else (a gap
