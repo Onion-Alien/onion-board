@@ -1498,7 +1498,6 @@
   "The Onion Board Discord server, in your browser": "Le serveur Discord d’Onion Board, dans ton navigateur",
   "(didn't say)": "(je n'ai pas dit)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>Tous les effets</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Déterminer automatiquement que la sensibilité d'entrée</b> est activée : lors d'un appel, il continue de prendre vos sons pour le silence et les coupe : désactivez-le (Sensibilité d'entrée) et laissez le curseur bas, ou utilisez Push to Talk.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Mode de saisie</b> :<b> Push to Talk</b> fonctionne mieux (définissez la même touche sous Paramètres → Raccourcis clavier → Push-to-talk automatique et Onion Board la maintient pour vous pendant la lecture d'un son). Sur <b>Activité vocale</b> , désactivez <b>Déterminer automatiquement la sensibilité d'entrée</b> et faites glisser le curseur presque complètement vers la gauche, sinon Discord continue de couper vos sons, même les plus forts.",
   "<b>Languages</b> · {state}": "<b>Langues</b> · {state}",
@@ -4354,5 +4353,11 @@
     "{n} sons sont revenus."
   ],
   "Watches your game's window while it's open, even behind others": "Surveille la fenêtre de ton jeu tant qu'elle est ouverte, même derrière d'autres",
-  "Your file stays whole: only the part between the handles plays.": "Ton fichier reste entier : seule la partie entre les poignées est jouée."
+  "Your file stays whole: only the part between the handles plays.": "Ton fichier reste entier : seule la partie entre les poignées est jouée.",
+  "Main": "Principal",
+  "Trim & speed": "Coupe & vitesse",
+  "{group}  ·  {n} on": [
+    "{group}  ·  {n} activé",
+    "{group}  ·  {n} activés"
+  ]
 }

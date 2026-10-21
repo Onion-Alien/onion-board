@@ -1460,7 +1460,6 @@
   "The Onion Board Discord server, in your browser": "Onion Board Discord 서버 (브라우저에서 열려요)",
   "(didn't say)": "(말 안 했어)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>모든 효과</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>입력 감도가 켜져 있는지 자동으로 결정합니다</b> . 통화 중에는 소리를 계속 묵음 처리하고 차단합니다. 이 기능을 끄고(입력 감도) 슬라이더를 낮게 두거나 눌러서 말하기를 사용합니다.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>입력 모드</b> : <b>눌러서 말하기가</b> 가장 잘 작동합니다(설정 → 단축키 → 자동 눌러서 말하기에서 동일한 키를 설정하면 소리가 재생되는 동안 Onion Board가 이를 유지합니다). <b>음성 활동</b> 에서 <b>입력 감도 자동 결정을</b> 끄고 슬라이더를 거의 왼쪽 끝까지 드래그합니다. 그렇지 않으면 Discord가 계속해서 큰 소리도 차단합니다.",
   "<b>Languages</b> · {state}": "<b>언어</b> · {state}",
@@ -4278,5 +4277,10 @@
     "사운드 {n}개가 돌아왔어요."
   ],
   "Watches your game's window while it's open, even behind others": "게임 창이 열려 있는 동안 지켜봐요. 다른 창 뒤에 있어도요",
-  "Your file stays whole: only the part between the handles plays.": "파일은 그대로 남아요. 핸들 사이 부분만 재생돼요."
+  "Your file stays whole: only the part between the handles plays.": "파일은 그대로 남아요. 핸들 사이 부분만 재생돼요.",
+  "Main": "기본",
+  "Trim & speed": "자르기 및 속도",
+  "{group}  ·  {n} on": [
+    "{group}  ·  {n}개 켜짐"
+  ]
 }

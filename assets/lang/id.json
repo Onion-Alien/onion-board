@@ -1460,7 +1460,6 @@
   "The Onion Board Discord server, in your browser": "Server Discord Onion Board, di browser-mu",
   "(didn't say)": "(tidak mengatakan)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>Semua efek</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Secara otomatis menentukan sensitivitas input</b> aktif: dalam panggilan, suara Anda akan tetap diam dan menghentikannya: matikan (Sensitivitas Input) dan biarkan penggeser tetap rendah, atau gunakan Push to Talk.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Mode Input</b> : <b>Push to Talk</b> berfungsi paling baik (atur tombol yang sama di bawah Pengaturan → Tombol pintas → Push-to-talk otomatis dan Onion Board menahannya saat suara diputar). Pada <b>Aktivitas Suara</b> , matikan <b>Tentukan sensitivitas input secara otomatis</b> dan seret penggeser hampir sepenuhnya ke kiri, atau Discord akan terus memotong suara Anda, yang juga bersuara keras.",
   "<b>Languages</b> · {state}": "<b>Bahasa</b> · {state}",
@@ -4278,5 +4277,10 @@
     "{n} suara kembali."
   ],
   "Watches your game's window while it's open, even behind others": "Mengawasi jendela game-mu selama terbuka, bahkan di balik jendela lain",
-  "Your file stays whole: only the part between the handles plays.": "File-mu tetap utuh: hanya bagian di antara pegangan yang diputar."
+  "Your file stays whole: only the part between the handles plays.": "File-mu tetap utuh: hanya bagian di antara pegangan yang diputar.",
+  "Main": "Utama",
+  "Trim & speed": "Pangkas & kecepatan",
+  "{group}  ·  {n} on": [
+    "{group}  ·  {n} aktif"
+  ]
 }

@@ -1498,7 +1498,6 @@
   "The Onion Board Discord server, in your browser": "Il server Discord di Onion Board, nel tuo browser",
   "(didn't say)": "(non ha detto)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>Tutti gli effetti</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Determina automaticamente se la sensibilità dell'ingresso</b> è attiva: durante una chiamata continua a prendere i tuoi suoni per il silenzio e li interrompe: disattivalo (Sensibilità in ingresso) e lascia il cursore basso, oppure usa Push to Talk.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Modalità di input</b> : <b>Push to Talk</b> funziona meglio (imposta lo stesso tasto in Impostazioni → Tasti di scelta rapida → Push-to-talk automatico e Onion Board lo terrà per te mentre viene riprodotto un suono). Su <b>Attività vocale</b> , disattiva <b>Determina automaticamente la sensibilità dell'input</b> e trascina il cursore quasi completamente a sinistra, altrimenti Discord continuerà a tagliare i suoni, anche quelli forti.",
   "<b>Languages</b> · {state}": "<b>Lingue</b> · {state}",
@@ -4354,5 +4353,11 @@
     "{n} suoni sono tornati."
   ],
   "Watches your game's window while it's open, even behind others": "Osserva la finestra del tuo gioco finché è aperta, anche dietro le altre",
-  "Your file stays whole: only the part between the handles plays.": "Il tuo file resta intero: suona solo la parte tra le maniglie."
+  "Your file stays whole: only the part between the handles plays.": "Il tuo file resta intero: suona solo la parte tra le maniglie.",
+  "Main": "Principale",
+  "Trim & speed": "Taglio e velocità",
+  "{group}  ·  {n} on": [
+    "{group}  ·  {n} attivo",
+    "{group}  ·  {n} attivi"
+  ]
 }

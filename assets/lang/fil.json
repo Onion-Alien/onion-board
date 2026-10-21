@@ -1494,7 +1494,6 @@
   "⬇  Try installing again": "⬇  Subukang i-install ulit",
   "(didn't say)": "(hindi sinabi)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>Lahat ng epekto</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Awtomatikong tukuyin na naka-on ang sensitivity ng input</b> : sa isang tawag, patuloy nitong pinapatahimik ang iyong mga tunog at pinuputol ang mga ito: i-off ito (Input Sensitivity) at hayaang mababa ang slider, o gamitin ang Push to Talk.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Input Mode</b> : Pinakamahusay na gumagana <b>ang Push to Talk</b> (itakda ang parehong key sa ilalim ng Mga Setting → Mga Hotkey → Auto push-to-talk at hawak ito ng Onion Board para sa iyo habang tumutugtog ang tunog). Sa <b>Voice Activity</b> , i-off ang <b>Awtomatikong tukuyin ang sensitivity ng input</b> at i-drag ang slider sa halos lahat ng paraan sa kaliwa, o patuloy na pinuputol ng Discord ang iyong mga tunog, malakas din.",
   "<b>Languages</b> · {state}": "<b>Mga Wika</b> · {state}",
@@ -4354,5 +4353,11 @@
     "Bumalik ang {n} sound."
   ],
   "Watches your game's window while it's open, even behind others": "Binabantayan ang window ng laro mo habang bukas ito, kahit nasa likod ng iba",
-  "Your file stays whole: only the part between the handles plays.": "Buo pa rin ang file mo: ang bahagi lang sa pagitan ng mga handle ang magpe-play."
+  "Your file stays whole: only the part between the handles plays.": "Buo pa rin ang file mo: ang bahagi lang sa pagitan ng mga handle ang magpe-play.",
+  "Main": "Pangunahin",
+  "Trim & speed": "Trim & bilis",
+  "{group}  ·  {n} on": [
+    "{group}  ·  {n} naka-on",
+    "{group}  ·  {n} naka-on"
+  ]
 }

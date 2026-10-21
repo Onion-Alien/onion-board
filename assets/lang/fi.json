@@ -1494,7 +1494,6 @@
   "⬇  Try installing again": "⬇ Yritä asentaa uudelleen",
   "(didn't say)": "(ei sanonut)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>Kaikki tehosteet</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Määritä automaattisesti, että tuloherkkyys</b> on päällä: puhelun aikana se ottaa äänesi hiljaiseksi ja poistaa ne: sammuta se (Input Sensitivity) ja jätä liukusäädin alhaiseksi tai käytä Push to Talk -toimintoa.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Syöttötila</b> : <b>Push to Talk</b> toimii parhaiten (asettamalla sama näppäin kohdassa Asetukset → Pikanäppäimet → Automaattinen push-to-talk ja Onion Board pitää sen puolestasi, kun ääni kuuluu). Laita <b>Äänitoiminto pois päältä</b> <b>Määritä tuloherkkyys automaattisesti</b> ja vedä liukusäädintä lähes kokonaan vasemmalle, tai Discord leikkaa jatkuvasti äänesi, myös kovia.",
   "<b>Languages</b> · {state}": "<b>Kielet</b> · {state}",
@@ -4354,5 +4353,11 @@
     "{n} ääntä palasi."
   ],
   "Watches your game's window while it's open, even behind others": "Tarkkailee pelisi ikkunaa, kun se on auki, myös muiden takana",
-  "Your file stays whole: only the part between the handles plays.": "Tiedostosi pysyy kokonaisena: vain kahvojen välinen osa soi."
+  "Your file stays whole: only the part between the handles plays.": "Tiedostosi pysyy kokonaisena: vain kahvojen välinen osa soi.",
+  "Main": "Tärkeimmät",
+  "Trim & speed": "Rajaus & nopeus",
+  "{group}  ·  {n} on": [
+    "{group}  ·  {n} päällä",
+    "{group}  ·  {n} päällä"
+  ]
 }

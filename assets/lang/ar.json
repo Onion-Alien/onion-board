@@ -1650,7 +1650,6 @@
   "The Onion Board Discord server, in your browser": "خادم Onion Board على Discord، في متصفحك",
   "(didn't say)": "(لم يقل)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>جميع التأثيرات</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>تحديد حساسية الإدخال تلقائيًا</b> قيد التشغيل: في المكالمة، يستمر في تحويل أصواتك إلى صمت ويقطعها: قم بإيقاف تشغيله (حساسية الإدخال) واترك شريط التمرير منخفضًا، أو استخدم ميزة الضغط والتحدث.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>وضع الإدخال</b> : يعمل <b>الضغط والتحدث</b> بشكل أفضل (اضبط نفس المفتاح ضمن الإعدادات ← مفاتيح التشغيل السريع ← الضغط والتحدث التلقائي ويحتفظ به Onion Board لك أثناء تشغيل الصوت). في <b>النشاط الصوتي</b> ، قم بإيقاف تشغيل <b>تحديد حساسية الإدخال تلقائيًا</b> واسحب شريط التمرير إلى أقصى اليسار تقريبًا، أو يستمر Discord في قطع الأصوات، والأصوات العالية أيضًا.",
   "<b>Languages</b> · {state}": "<b>اللغات</b> · {state}",
@@ -4658,5 +4657,15 @@
     "عاد {n} صوت."
   ],
   "Watches your game's window while it's open, even behind others": "يراقب نافذة لعبتك ما دامت مفتوحة، حتى خلف النوافذ الأخرى",
-  "Your file stays whole: only the part between the handles plays.": "يبقى ملفك كاملًا: لا يُشغَّل إلا الجزء الذي بين المقبضين."
+  "Your file stays whole: only the part between the handles plays.": "يبقى ملفك كاملًا: لا يُشغَّل إلا الجزء الذي بين المقبضين.",
+  "Main": "الأساسي",
+  "Trim & speed": "التقليم والسرعة",
+  "{group}  ·  {n} on": [
+    "{group}  ·  {n} مفعّل",
+    "{group}  ·  {n} مفعّل",
+    "{group}  ·  {n} مفعّل",
+    "{group}  ·  {n} مفعّل",
+    "{group}  ·  {n} مفعّل",
+    "{group}  ·  {n} مفعّل"
+  ]
 }

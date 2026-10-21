@@ -1606,7 +1606,7 @@ def test_effect_cards_fold_and_stay_folded(qapp, monkeypatch):
 
 
 def test_effect_columns_stack_without_holes(panel, qapp):
-    """Two columns, each card under the shorter one: no hole beside a short card,
+    """Two columns a tab, each card under the shorter one: no hole beside a short card,
     and the columns end close together, after a voice pick and after folding."""
     fx = panel[0].fx
     fx.open_tweak()
@@ -1616,17 +1616,20 @@ def test_effect_columns_stack_without_holes(panel, qapp):
         for _ in range(3):
             qapp.processEvents()
         assert fx._fx_cols == 2
-        cols = [[col.itemAt(i).widget() for i in range(col.count() - 1)]
-                for col in fx._fx_columns]
-        assert sorted(len(c) for c in cols)[0] >= 3
-        assert not any(lbl.isVisible() for lbl in fx._groups.values())
-        bottoms = []
-        for col in cols:
-            for a, b in zip(col, col[1:]):
-                assert b.y() - (a.y() + a.height()) == 10      # just the spacing
-            bottoms.append(col[-1].y() + col[-1].height())
-        tallest = max(c.height() for col in cols for c in col)
-        assert abs(bottoms[0] - bottoms[1]) <= tallest          # no long empty run
+        for title in ("Character", "Room"):
+            fx.more.setCurrentWidget(fx._pages[title][0])
+            for _ in range(3):
+                qapp.processEvents()
+            cols = [[col.itemAt(i).widget() for i in range(col.count() - 1)]
+                    for col in fx._pages[title][2]]
+            assert sorted(len(c) for c in cols)[0] >= 2
+            bottoms = []
+            for col in cols:
+                for a, b in zip(col, col[1:]):
+                    assert b.y() - (a.y() + a.height()) == 10      # just the spacing
+                bottoms.append(col[-1].y() + col[-1].height())
+            tallest = max(c.height() for col in cols for c in col)
+            assert abs(bottoms[0] - bottoms[1]) <= tallest          # no long empty run
 
     check()
     fx.pick("Robot")
@@ -1636,10 +1639,35 @@ def test_effect_columns_stack_without_holes(panel, qapp):
     for t in ("compressor", "distortion", "shout", "chorus", "echo"):
         fx.rows[t].arrow.click()
     check()
-    fx.dlg.resize(500, 700)                                   # one column: titles back
+    fx.dlg.resize(500, 700)                                   # one column
     for _ in range(3):
         qapp.processEvents()
-    assert fx._fx_cols == 1 and fx._groups["Character"].isVisible()
+    assert fx._fx_cols == 1
+    assert all(cols[1].count() == 1 for _s, _r, cols in fx._pages.values())
+    fx.dlg.close()
+
+
+def test_edit_voice_has_a_tab_a_group_that_counts_whats_on(panel, qapp):
+    """Edit voice was one long page: Main (pitch, mic clean-up), then a tab a group,
+    each saying how many of its effects are on; Add-ons only with an add-on effect."""
+    fx = panel[0].fx
+    fx.open_tweak()
+    names = [fx.more.tabText(i) for i in range(fx.more.count())
+             if fx.more.isTabVisible(i)]
+    assert names[0] == "Main" and fx.rows["pitch"].isVisibleTo(fx.more.widget(0))
+    assert [n.split("  ·  ")[0] for n in names[1:4]] == ["Change the voice", "Character",
+                                                         "Room"]
+    addon = any(t not in ("monk",) and r.cls.__module__.startswith("soundboard_module")
+                for t, r in fx.rows.items())     # (a test may have loaded one)
+    from soundboard.ui.voice.voicefxpanel import GROUPS
+    assert (names[4:] == ["Add-ons"]) == addon and "monk" in dict(GROUPS)["Change the voice"]
+    fx.pick("Robot")
+    fx.rows["radio"].chk.setChecked(True)
+    i = fx.more.indexOf(fx._pages["Character"][0])
+    on = sum(fx.rows[t].chk.isChecked() for t in ("compressor", "tone", "radio",
+                                                  "distortion", "shout", "helmet",
+                                                  "polish"))
+    assert fx.more.tabText(i) == f"Character  ·  {on} on"
     fx.dlg.close()
 
 

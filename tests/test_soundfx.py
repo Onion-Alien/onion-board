@@ -286,7 +286,9 @@ def test_edit_dialog_presets_apply_and_reset(qapp):
     m = SoundMeta(id="a", name="Boom", file="x.wav")
     previews = []
     d = EditDialog(m, Hotkeys(), lambda *a: previews.append(a), tab="effects")
-    assert d.tabs.currentIndex() == 1 and d.effects.fx() == {}
+    assert d.tabs.tabText(d.tabs.currentIndex()) == "Effects" and d.effects.fx() == {}
+    assert [d.tabs.tabText(i) for i in range(d.tabs.count())] == [
+        "Sound", "Trim && speed", "Effects", "Equalizer"]   # one long page was too much
     assert "pitch" not in d.effects.rows            # the Pitch slider covers it
     d.effects.preset.setCurrentText("Nightcore")
     assert d.effects.fx() == soundfx.PRESETS["Nightcore"]

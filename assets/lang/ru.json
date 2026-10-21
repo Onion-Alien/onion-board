@@ -1458,7 +1458,6 @@
   "The Onion Board Discord server, in your browser": "Discord-сервер Onion Board, в твоём браузере",
   "(didn't say)": "(не сказал)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>Все эффекты</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Автоматическое определение чувствительности входа</b> включено: во время разговора система принимает ваши звуки за тишину и отключает их: выключите ее (Чувствительность входа) и оставьте ползунок низким или используйте «Нажми и говори».",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Режим ввода</b> : лучше всего работает режим <b>«Нажми и говори»</b> (установите ту же клавишу в меню «Настройки» → «Горячие клавиши» → «Автонажатие и разговор», и Onion Board будет удерживать ее во время воспроизведения звука). В разделе <b>«Голосовая активность»</b> отключите <b>параметр «Автоматически определять чувствительность ввода»</b> и перетащите ползунок почти до упора влево, иначе Discord продолжит отключать ваши звуки, в том числе и громкие.",
   "<b>Languages</b> · {state}": "<b>Языки</b> · {state}",
@@ -4430,5 +4429,12 @@
     "{n} звуков вернулись."
   ],
   "Watches your game's window while it's open, even behind others": "Следит за окном твоей игры, пока оно открыто, даже за другими окнами",
-  "Your file stays whole: only the part between the handles plays.": "Твой файл остаётся целым: играет только часть между ручками."
+  "Your file stays whole: only the part between the handles plays.": "Твой файл остаётся целым: играет только часть между ручками.",
+  "Main": "Главное",
+  "Trim & speed": "Обрезка и скорость",
+  "{group}  ·  {n} on": [
+    "{group}  ·  {n} вкл.",
+    "{group}  ·  {n} вкл.",
+    "{group}  ·  {n} вкл."
+  ]
 }

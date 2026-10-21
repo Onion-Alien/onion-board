@@ -1456,7 +1456,6 @@
   "⬇  Try installing again": "⬇  Cuba pasang lagi",
   "(didn't say)": "(tidak berkata)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>Semua kesan</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Tentukan secara automatik kepekaan input</b> dihidupkan: dalam panggilan ia terus menyenyapkan bunyi anda dan memotongnya: matikan (Sensitiviti Input) dan biarkan peluncur rendah atau gunakan Tekan untuk Bercakap.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Mod Input</b> : <b>Tekan untuk Cakap</b> berfungsi paling baik (tetapkan kekunci yang sama di bawah Tetapan → Kekunci Panas → Auto tekan untuk cakap dan Onion Board memegangnya untuk anda semasa bunyi dimainkan). Pada <b>Aktiviti Suara</b> , matikan <b>Tentukan sensitiviti input secara automatik</b> dan seret peluncur hampir ke kiri atau Discord terus memotong bunyi anda, bunyi yang kuat juga.",
   "<b>Languages</b> · {state}": "<b>Bahasa</b> · {state}",
@@ -4278,5 +4277,10 @@
     "{n} bunyi kembali."
   ],
   "Watches your game's window while it's open, even behind others": "Memerhati tetingkap permainan anda selagi ia terbuka, walaupun di belakang yang lain",
-  "Your file stays whole: only the part between the handles plays.": "Fail anda kekal penuh: hanya bahagian di antara pemegang dimainkan."
+  "Your file stays whole: only the part between the handles plays.": "Fail anda kekal penuh: hanya bahagian di antara pemegang dimainkan.",
+  "Main": "Utama",
+  "Trim & speed": "Potong & kelajuan",
+  "{group}  ·  {n} on": [
+    "{group}  ·  {n} hidup"
+  ]
 }

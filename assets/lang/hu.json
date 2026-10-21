@@ -1494,7 +1494,6 @@
   "⬇  Try installing again": "⬇ Próbálja újra a telepítést",
   "(didn't say)": "(nem mondta)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>Minden hatás</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Automatikusan határozza meg, hogy a bemeneti érzékenység</b> be van-e kapcsolva: hívás közben folyamatosan elhallgatja a hangokat, és levágja azokat: kapcsolja ki (Bemeneti érzékenység), és hagyja alacsonyan a csúszkát, vagy használja a Push to Talk funkciót.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Beviteli mód</b> : <b>a Push to Talk</b> működik a legjobban (ezt a billentyűt állítsa be a Beállítások → Gyorsbillentyűk → Automatikus push-to-talk menüpontban, és az Onion Board megtartja azt, miközben hang szól). <b>A Hangtevékenység</b> beállításnál kapcsolja ki <b>a Bemeneti érzékenység automatikus meghatározása kikapcsolt állapotot</b> , és húzza el a csúszkát szinte teljesen balra, különben a Discord folyamatosan kivágja a hangokat, akár a hangosakat is.",
   "<b>Languages</b> · {state}": "<b>Nyelvek</b> · {state}",
@@ -4354,5 +4353,11 @@
     "{n} hang visszatért."
   ],
   "Watches your game's window while it's open, even behind others": "Figyeli a játékod ablakát, amíg nyitva van, mások mögött is",
-  "Your file stays whole: only the part between the handles plays.": "A fájlod egészben marad: csak a fogantyúk közötti rész szól."
+  "Your file stays whole: only the part between the handles plays.": "A fájlod egészben marad: csak a fogantyúk közötti rész szól.",
+  "Main": "Fő",
+  "Trim & speed": "Vágás és sebesség",
+  "{group}  ·  {n} on": [
+    "{group}  ·  {n} bekapcsolva",
+    "{group}  ·  {n} bekapcsolva"
+  ]
 }

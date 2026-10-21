@@ -1498,7 +1498,6 @@
   "The Onion Board Discord server, in your browser": "Onion Board Discord sunucusu, tarayıcında",
   "(didn't say)": "(söylemedi)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>Tüm efektler</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Giriş hassasiyetini otomatik olarak belirle</b> açık: bir arama sırasında seslerinizi susturmaya devam eder ve keser: kapatın (Giriş Hassasiyeti) ve kaydırıcıyı düşük bırakın veya Bas-Konuş'u kullanın.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Giriş Modu</b> : <b>Bas-Konuş</b> en iyi şekilde çalışır (Ayarlar → Kısayol Tuşları → Otomatik bas-konuş altında aynı tuşu ayarlayın ve Soğan Kartı ses çalarken onu sizin için tutar). <b>Ses Etkinliği'nde</b> <b>Giriş hassasiyetini otomatik olarak belirle</b> seçeneğini kapatın ve kaydırıcıyı neredeyse tamamen sola sürükleyin; aksi takdirde Discord, yüksek sesli olanlar da dahil olmak üzere seslerinizi kesmeye devam eder.",
   "<b>Languages</b> · {state}": "<b>Diller</b> · {state}",
@@ -4354,5 +4353,11 @@
     "{n} ses geri geldi."
   ],
   "Watches your game's window while it's open, even behind others": "Oyununun penceresini açık olduğu sürece izler, diğerlerinin arkasında olsa bile",
-  "Your file stays whole: only the part between the handles plays.": "Dosyan bütün kalır: sadece tutamaçların arasındaki kısım çalar."
+  "Your file stays whole: only the part between the handles plays.": "Dosyan bütün kalır: sadece tutamaçların arasındaki kısım çalar.",
+  "Main": "Ana",
+  "Trim & speed": "Kırpma ve hız",
+  "{group}  ·  {n} on": [
+    "{group}  ·  {n} açık",
+    "{group}  ·  {n} açık"
+  ]
 }

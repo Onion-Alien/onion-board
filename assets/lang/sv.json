@@ -1494,7 +1494,6 @@
   "⬇  Try installing again": "⬇  Försök installera igen",
   "(didn't say)": "(sa inte)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>Alla effekter</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Bestäm automatiskt att ingångskänsligheten</b> är på: i ett samtal fortsätter den att ta dina ljud för tystnad och stänger av dem: stäng av den (Input Sensitivity) och lämna skjutreglaget lågt, eller använd Push to Talk.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Inmatningsläge</b> : <b>Push to Talk</b> fungerar bäst (ställ in samma tangent under Inställningar → Snabbtangenter → Auto push-to-talk och Onion Board håller den åt dig medan ett ljud spelas). På <b>Röstaktivitet</b> , stäng av. <b>Bestäm automatiskt ingångskänslighet</b> och dra reglaget nästan hela vägen åt vänster, annars fortsätter Discord att klippa ut dina ljud, även höga ljud.",
   "<b>Languages</b> · {state}": "<b>Språk</b> · {state}",
@@ -4354,5 +4353,11 @@
     "{n} ljud är tillbaka."
   ],
   "Watches your game's window while it's open, even behind others": "Håller koll på ditt spels fönster medan det är öppet, även bakom andra",
-  "Your file stays whole: only the part between the handles plays.": "Din fil förblir hel: bara delen mellan handtagen spelas."
+  "Your file stays whole: only the part between the handles plays.": "Din fil förblir hel: bara delen mellan handtagen spelas.",
+  "Main": "Viktigast",
+  "Trim & speed": "Trimma & hastighet",
+  "{group}  ·  {n} on": [
+    "{group}  ·  {n} på",
+    "{group}  ·  {n} på"
+  ]
 }

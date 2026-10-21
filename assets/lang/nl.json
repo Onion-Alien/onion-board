@@ -1498,7 +1498,6 @@
   "The Onion Board Discord server, in your browser": "De Discord-server van Onion Board, in je browser",
   "(didn't say)": "(zei niet)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>Alle effecten</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>Automatisch vaststellen dat de ingangsgevoeligheid</b> aan staat: tijdens een gesprek neemt hij uw geluiden steeds voor stilte en schakelt deze uit: schakel hem uit (Input Sensitivity) en laat de schuifregelaar laag staan, of gebruik Push to Talk.",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>Invoermodus</b> : <b>Push-to-talk</b> werkt het beste (stel dezelfde toets in onder Instellingen → Sneltoetsen → Automatische push-to-talk en Onion Board houdt deze voor u vast terwijl er een geluid wordt afgespeeld). Schakel bij <b>Spraakactiviteit</b> <b>Automatische invoergevoeligheid bepalen</b> uit en sleep de schuifregelaar bijna helemaal naar links, anders blijft Discord je geluiden uitsluiten, ook luide.",
   "<b>Languages</b> · {state}": "<b>Talen</b> · {state}",
@@ -4354,5 +4353,11 @@
     "{n} geluiden zijn terug."
   ],
   "Watches your game's window while it's open, even behind others": "Houdt het venster van je game in de gaten zolang het open is, ook achter andere",
-  "Your file stays whole: only the part between the handles plays.": "Je bestand blijft heel: alleen het deel tussen de grepen speelt af."
+  "Your file stays whole: only the part between the handles plays.": "Je bestand blijft heel: alleen het deel tussen de grepen speelt af.",
+  "Main": "Belangrijkst",
+  "Trim & speed": "Trim & snelheid",
+  "{group}  ·  {n} on": [
+    "{group}  ·  {n} aan",
+    "{group}  ·  {n} aan"
+  ]
 }

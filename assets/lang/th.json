@@ -1460,7 +1460,6 @@
   "The Onion Board Discord server, in your browser": "เซิร์ฟเวอร์ Discord ของ Onion Board ในเบราว์เซอร์ของคุณ",
   "(didn't say)": "(ไม่ได้พูด)",
   "<a href=\"{url}\">Report it</a>": "<a href=\"{url}\">Report it</a>",
-  "<b>All effects</b>": "<b>เอฟเฟกต์ทั้งหมด</b>",
   "<b>Automatically determine input sensitivity</b> is on: in a call it keeps taking your sounds for silence and cuts them out: turn it off (Input Sensitivity) and leave the slider low, or use Push to Talk.": "<b>กำหนดความไวอินพุตโดยอัตโนมัติ</b> เปิดอยู่: ในการโทร เสียงของคุณจะเงียบและตัดเสียงเหล่านั้นออก: ปิด (ความไวอินพุต) และปล่อยแถบเลื่อนให้ต่ำ หรือใช้ Push to Talk",
   "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or Discord keeps cutting your sounds out, loud ones too.": "<b>โหมดอินพุต</b> : <b>Push to Talk</b> ทำงานได้ดีที่สุด (ตั้งค่าคีย์เดียวกันภายใต้การตั้งค่า → ปุ่มลัด → Push-to-talk อัตโนมัติ จากนั้น Onion Board จะถือไว้ให้คุณขณะเล่นเสียง) ใน <b>กิจกรรมเสียง</b> ให้ปิด <b>กำหนดความไวของอินพุตโดยอัตโนมัติ</b> แล้วลากแถบเลื่อนไปทางซ้ายจนสุด มิฉะนั้น Discord จะตัดเสียงของคุณออกอย่างดังเช่นกัน",
   "<b>Languages</b> · {state}": "<b>ภาษา</b> · {state}",
@@ -4278,5 +4277,10 @@
     "{n} เสียงกลับมาแล้ว"
   ],
   "Watches your game's window while it's open, even behind others": "เฝ้าดูหน้าต่างเกมของคุณขณะที่เปิดอยู่ แม้อยู่หลังหน้าต่างอื่น",
-  "Your file stays whole: only the part between the handles plays.": "ไฟล์ของคุณยังอยู่ครบ: เล่นแค่ส่วนที่อยู่ระหว่างที่จับ"
+  "Your file stays whole: only the part between the handles plays.": "ไฟล์ของคุณยังอยู่ครบ: เล่นแค่ส่วนที่อยู่ระหว่างที่จับ",
+  "Main": "หลัก",
+  "Trim & speed": "ทริมและความเร็ว",
+  "{group}  ·  {n} on": [
+    "{group}  ·  เปิด {n}"
+  ]
 }
