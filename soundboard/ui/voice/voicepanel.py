@@ -215,6 +215,7 @@ class VoicePanel(QWidget):
         self.bar.turn_off.connect(lambda k: (usage.used("voice-chip-off"), self.forget_one(k)))
         self.bar.reset_asked.connect(self.reset_voices)
         self.reset_undo = UndoBar(_("Put the voices back, exactly as they were"))
+        outer.addWidget(self.reset_undo)   # in the window, so its card shows there
         scroll = self._scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.Shape.NoFrame)
