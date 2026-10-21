@@ -16,11 +16,14 @@ stays readable and new keys can be added without a migration:
                                                             modules' included
      "voice": {"name": str,                     a voice laid over the sound, before
                "fx": str, "effects": {...},      its own effects (a copy: editing the
-               "ai": {"id", "name", "pitch"}}}   saved voice later doesn't change the
+               "ai": {"id", "name", "pitch"}},  saved voice later doesn't change the
                                                  sound); {} = none. The AI voice part
                                                  needs the AI voices add-on
                                                  (speech.soundvoice); without it the
                                                  sound plays without that part
+     "live": [{"bass": 8.0, ...}]}              Live controls' effects (livefx) after
+                                                 the rest: a stage each time a pad was
+                                                 saved from them (with_live)
 
 The trim is applied first, to the original, so the file itself is never cut and
 the trim can be moved or undone at any time.
@@ -41,7 +44,7 @@ import math
 import numpy as np
 import soxr
 
-from soundboard.audio import dsp, eq
+from soundboard.audio import dsp, eq, livefx
 from soundboard import voicefx
 from soundboard.audio.engine import SR
 
@@ -60,7 +63,10 @@ BLOCK = 2048          # effects run in blocks like they do on the mic
 def neutral() -> dict:
     return {"speed": 1.0, "pitch": 0.0, "tape": False, "eq": [0.0] * len(eq.BANDS),
             "gain_db": 0.0, "reverse": False, "start": 0.0, "end": 0.0, "effects": {},
-            "voice": {}}
+            "voice": {}, "live": []}
+
+
+MAX_LIVE = 4   # Live controls stages on one sound (a copy of a copy of a copy…)
 
 
 MAX_VOICE_NAME = 60
@@ -133,7 +139,33 @@ def clean(fx: dict | None) -> dict:
     if isinstance(effs, dict):
         out["effects"] = {str(k): dict(v) for k, v in effs.items() if isinstance(v, dict)}
     out["voice"] = clean_voice(fx.get("voice"))
+    live = fx.get("live")
+    if isinstance(live, list):
+        out["live"] = [st for st in map(livefx.clean, live[:MAX_LIVE]) if st]
     return out
+
+
+def with_live(fx: dict | None, speed: float, pitch: float, keep: bool,
+              live: dict) -> tuple[dict, bool]:
+    """A sound's settings with Live controls' speed, pitch and effects on top, the way
+    they sound together while it plays: (settings, True if a value had to be pulled
+    into this sound's narrower range, Redline's 10x or ±36 st)."""
+    f = clean(fx)
+    ratio = 2.0 ** (f["pitch"] / 12.0) * (f["speed"] if f["tape"] else 1.0)
+    ratio *= 2.0 ** (pitch / 12.0) * (1.0 if keep else speed)
+    total = f["speed"] * speed
+    if f["tape"] and not keep and abs(f["pitch"]) < 1e-3 and abs(pitch) < 1e-3:
+        semis = 0.0   # tape on tape: still a pure resample
+    else:
+        f["tape"] = False
+        semis = 12.0 * math.log2(max(ratio, 1e-6))
+    f["speed"] = round(min(max(total, SPEED_RANGE[0]), SPEED_RANGE[1]), 3)
+    f["pitch"] = round(min(max(semis, PITCH_RANGE[0]), PITCH_RANGE[1]), 2)
+    capped = abs(f["speed"] - total) > 1e-3 or abs(f["pitch"] - semis) > 0.01
+    stage = livefx.clean(live)
+    if stage:
+        f["live"] = (f["live"] + [stage])[-MAX_LIVE:]
+    return clean(f), capped
 
 
 def _active_effects(fx: dict) -> list[str]:
@@ -181,7 +213,8 @@ def is_neutral(fx: dict | None) -> bool:
     f = clean(fx)
     return (not is_trimmed(f) and abs(f["speed"] - 1) < 1e-3 and abs(f["pitch"]) < 1e-3
             and abs(f["gain_db"]) < 1e-3 and not f["reverse"]
-            and eq.design(f["eq"], SR) is None and not _chain(f) and not f["voice"])
+            and eq.design(f["eq"], SR) is None and not _chain(f) and not f["voice"]
+            and not f["live"])
 
 
 def key(fx: dict | None) -> str:
@@ -189,7 +222,7 @@ def key(fx: dict | None) -> str:
     if is_neutral(fx):
         return ""
     f = clean(fx)
-    for k in ("start", "end", "voice"):   # sounds without these keep the keys (and
+    for k in ("start", "end", "voice", "live"):   # sounds without these keep the keys (and
         if not f[k]:                         # caches) they had
             del f[k]
     text = json.dumps(f, sort_keys=True)
@@ -215,6 +248,8 @@ def summary(fx: dict | None) -> str:
     bits += [voicefx.REGISTRY[t].name for t in _active_effects(f)]
     if f["voice"]:
         bits.append(f"voice: {f['voice']['name'] or 'custom'}")
+    if f["live"]:
+        bits.append("live effects")
     if f["reverse"]:
         bits.append("reversed")
     return ", ".join(bits)
@@ -493,9 +528,10 @@ def _effects(pieces, fx: dict, skip: set):
     trimmed back to where it falls silent. Raises _Broken when one fails (the caller
     starts over with it in `skip`): what was already given out can't be taken back."""
     spec = _chain(fx)
-    if not spec:
+    if not spec and not fx["live"]:
         yield from pieces
         return
+    stages = [(livefx.LiveFx(SR), st) for st in fx["live"]]
     chain = []
     for kind, t, cfg in spec:
         cls = voicefx.REGISTRY[t]
@@ -541,6 +577,9 @@ def _effects(pieces, fx: dict, skip: set):
                     parts.append(yb)
                 chans.append(np.concatenate(parts))
             x = np.stack(chans, 1)
+        for lf, st in stages:   # Live controls' effects, in blocks as on the sounds bus
+            x = np.concatenate([lf.process(np.ascontiguousarray(x[i:i + BLOCK]), st)
+                                for i in range(0, len(x), BLOCK)]) if len(x) else x
         # the sound itself goes on; what's past its end is the tail, held to be trimmed
         end = length[1]
         main = len(x) if end is None else max(0, min(len(x), end - at))

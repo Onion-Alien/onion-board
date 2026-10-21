@@ -186,7 +186,6 @@
   "Category: {value}": "Kategória: {value}",
   "Change my voice while held": "Beszédhang módosítása lenyomva tartva",
   "Change your voice, speak another language, or use text-to-speech": "Módosítsd a beszédhangod, beszélj más nyelven, vagy használj szövegfelolvasást",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "Minden hangot módosít lejátszás közben. Egy változat mentéséhez: jobb klikk egy gombra → Effektek.",
   "Changes the whole app instantly.": "Azonnal megváltoztatja az egész appot.",
   "Change": "Módosítás",
   "Changing…": "Módosítás…",
@@ -4357,5 +4356,14 @@
     "{group}  ·  {n} bekapcsolva",
     "{group}  ·  {n} bekapcsolva"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Hangok és hangszínek, amiket a játékosok osztanak meg. Előbb hallgasd meg, add hozzá, ami tetszik, és szavazz, hogy a legjobbak kerüljenek felülre. A „Hang megosztása” ellenőrzés után mindenkinek elérhetővé teszi a sajátodat."
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Hangok és hangszínek, amiket a játékosok osztanak meg. Előbb hallgasd meg, add hozzá, ami tetszik, és szavazz, hogy a legjobbak kerüljenek felülre. A „Hang megosztása” ellenőrzés után mindenkinek elérhetővé teszi a sajátodat.",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "A most szóló hang másolata ezzel a sebességgel, hangmagassággal és effektekkel, külön padként",
+  "Change the speed, pitch or effects first": "Előbb változtass a sebességen, a hangmagasságon vagy az effekteken",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Minden hangot megváltoztat, amíg szól. A Mentés új padként külön padként megtartja.",
+  "Play a sound first, then save it with your changes": "Előbb játssz le egy hangot, aztán mentsd a változtatásaiddal",
+  "Save as new pad": "Mentés új padként",
+  "Take the Live controls effects off": "Élő vezérlők effektjeinek levétele",
+  "{name} (modified {n})": "{name} (módosított {n})",
+  "{name} (modified)": "{name} (módosított)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ „{name}” hozzáadva, a sebesség és a hangmagasság annyi, amennyit egy pad menteni tud"
 }

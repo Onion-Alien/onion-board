@@ -490,7 +490,6 @@
   "✓ {combo} plays “{name}”": "✓ {combo} “{name}” चलाती है",
   "✓ “{name}” shows by itself when {exe} is in front": "✓ {exe} सामने होने पर “{name}” अपने आप दिखती है",
   "All sounds": "सभी साउंड",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "चलते समय हर साउंड को बदलता है। कोई वर्शन सेव करने के लिए, पैड पर राइट-क्लिक → इफ़ेक्ट।",
   "Delete {n} item for good? This can't be undone.": [
     "{n} चीज़ हमेशा के लिए डिलीट करें? यह वापस नहीं होगा।",
     "{n} चीज़ें हमेशा के लिए डिलीट करें? यह वापस नहीं होगा।"
@@ -4357,5 +4356,14 @@
     "{group}  ·  {n} चालू",
     "{group}  ·  {n} चालू"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "खिलाड़ियों के शेयर किए साउंड और आवाज़ें। पहले सुनो, जो पसंद आएँ उन्हें जोड़ो, और वोट करो ताकि सबसे अच्छे ऊपर आएँ। \"साउंड शेयर करें\" तुम्हारा एक साउंड जाँच के बाद सबके लिए डाल देता है।"
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "खिलाड़ियों के शेयर किए साउंड और आवाज़ें। पहले सुनो, जो पसंद आएँ उन्हें जोड़ो, और वोट करो ताकि सबसे अच्छे ऊपर आएँ। \"साउंड शेयर करें\" तुम्हारा एक साउंड जाँच के बाद सबके लिए डाल देता है।",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "अभी चल रही आवाज़ की कॉपी, इसी स्पीड, पिच और इन इफ़ेक्ट के साथ, अपने अलग पैड के रूप में",
+  "Change the speed, pitch or effects first": "पहले स्पीड, पिच या इफ़ेक्ट बदलें",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "हर आवाज़ को चलते समय बदलता है। नए पैड के रूप में सेव करें इसे अलग पैड बना देता है।",
+  "Play a sound first, then save it with your changes": "पहले कोई आवाज़ चलाएँ, फिर अपने बदलावों के साथ सेव करें",
+  "Save as new pad": "नए पैड के रूप में सेव करें",
+  "Take the Live controls effects off": "लाइव कंट्रोल के इफ़ेक्ट हटाएँ",
+  "{name} (modified {n})": "{name} (बदला गया {n})",
+  "{name} (modified)": "{name} (बदला गया)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” जोड़ा, इसकी स्पीड और पिच उतनी रखी जितनी पैड सेव कर सकता है"
 }

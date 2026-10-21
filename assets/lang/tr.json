@@ -490,7 +490,6 @@
   "✓ {combo} plays “{name}”": "✓ {combo} “{name}” sesini çalar",
   "✓ “{name}” shows by itself when {exe} is in front": "✓ {exe} öndeyken “{name}” kendiliğinden görünür",
   "All sounds": "Tüm sesler",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "Çalarken her sesi değiştirir. Bir sürümünü kaydetmek için bir pad'e sağ tıkla → Efektler.",
   "Delete {n} item for good? This can't be undone.": [
     "{n} öğe kalıcı olarak silinsin mi? Bu geri alınamaz.",
     "{n} öğe kalıcı olarak silinsin mi? Bu geri alınamaz."
@@ -4357,5 +4356,14 @@
     "{group}  ·  {n} açık",
     "{group}  ·  {n} açık"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Oyuncuların paylaştığı sesler ve ses efektleri. Önce dinle, beğendiklerini ekle ve en iyileri yukarı çıksın diye oy ver. \"Ses paylaş\" kontrol edildikten sonra senin bir sesini herkese açar."
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Oyuncuların paylaştığı sesler ve ses efektleri. Önce dinle, beğendiklerini ekle ve en iyileri yukarı çıksın diye oy ver. \"Ses paylaş\" kontrol edildikten sonra senin bir sesini herkese açar.",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "Şu an çalan sesin bu hız, perde ve efektlerle kendi pad'i olarak bir kopyası",
+  "Change the speed, pitch or effects first": "Önce hızı, perdeyi veya efektleri değiştir",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Her sesi çalarken değiştirir. Yeni pad olarak kaydet onu kendi pad'i olarak saklar.",
+  "Play a sound first, then save it with your changes": "Önce bir ses çal, sonra değişikliklerinle kaydet",
+  "Save as new pad": "Yeni pad olarak kaydet",
+  "Take the Live controls effects off": "Canlı kontrollerin efektlerini çıkar",
+  "{name} (modified {n})": "{name} (değiştirildi {n})",
+  "{name} (modified)": "{name} (değiştirildi)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” eklendi, hızı ve perdesi bir pad'in kaydedebileceği kadar"
 }

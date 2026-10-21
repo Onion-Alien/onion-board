@@ -480,7 +480,6 @@
   "✓ {combo} plays “{name}”": "✓ {combo} เล่น “{name}”",
   "✓ “{name}” shows by itself when {exe} is in front": "✓ “{name}” แสดงเองเมื่อ {exe} อยู่ด้านหน้า",
   "All sounds": "ทุกเสียง",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "เปลี่ยนทุกเสียงระหว่างที่เล่น ถ้าจะบันทึกเป็นเวอร์ชันใหม่ คลิกขวาที่แพด → เอฟเฟกต์",
   "Delete {n} item for good? This can't be undone.": [
     "ลบ {n} รายการถาวรไหม? ย้อนกลับไม่ได้"
   ],
@@ -4280,5 +4279,14 @@
   "{group}  ·  {n} on": [
     "{group}  ·  เปิด {n}"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "เสียงและวอยซ์ที่ผู้เล่นแชร์กัน ฟังก่อน เพิ่มอันที่ชอบ แล้วโหวตให้อันที่ดีที่สุดขึ้นไปอยู่บนสุด \"แชร์เสียง\" จะลงเสียงของคุณให้ทุกคนหลังจากตรวจแล้ว"
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "เสียงและวอยซ์ที่ผู้เล่นแชร์กัน ฟังก่อน เพิ่มอันที่ชอบ แล้วโหวตให้อันที่ดีที่สุดขึ้นไปอยู่บนสุด \"แชร์เสียง\" จะลงเสียงของคุณให้ทุกคนหลังจากตรวจแล้ว",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "สำเนาของเสียงที่กำลังเล่นอยู่ พร้อมความเร็ว ระดับเสียง และเอฟเฟกต์นี้ เป็นแพดของตัวเอง",
+  "Change the speed, pitch or effects first": "เปลี่ยนความเร็ว ระดับเสียง หรือเอฟเฟกต์ก่อน",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "เปลี่ยนทุกเสียงขณะเล่น บันทึกเป็นแพดใหม่จะเก็บไว้เป็นแพดของตัวเอง",
+  "Play a sound first, then save it with your changes": "เล่นเสียงก่อน แล้วค่อยบันทึกพร้อมสิ่งที่เปลี่ยน",
+  "Save as new pad": "บันทึกเป็นแพดใหม่",
+  "Take the Live controls effects off": "เอาเอฟเฟกต์ของการควบคุมสดออก",
+  "{name} (modified {n})": "{name} (แก้ไข {n})",
+  "{name} (modified)": "{name} (แก้ไข)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ เพิ่ม “{name}” แล้ว ความเร็วและระดับเสียงอยู่ในขอบเขตที่แพดบันทึกได้"
 }

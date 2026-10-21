@@ -188,7 +188,6 @@
   "Category: {value}": "Kategorie: {value}",
   "Change my voice while held": "Měnit hlas při držení",
   "Change your voice, speak another language, or use text-to-speech": "Změň si hlas, mluv jiným jazykem, nebo použij převod textu na řeč",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "Mění každý zvuk, zatímco hraje. Pro uložení verze: pravý klik na pad → Efekty.",
   "Changes the whole app instantly.": "Změní celou aplikaci hned.",
   "Change": "Změnit",
   "Changing…": "Měním…",
@@ -4434,5 +4433,14 @@
     "{group}  ·  {n} zapnuto",
     "{group}  ·  {n} zapnuto"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Zvuky a hlasy, které sdílejí hráči. Nejdřív si je poslechni, přidej si ty, které se ti líbí, a hlasuj, ať se nejlepší dostanou nahoru. „Sdílet zvuk“ zveřejní jeden tvůj pro všechny, jakmile projde kontrolou."
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Zvuky a hlasy, které sdílejí hráči. Nejdřív si je poslechni, přidej si ty, které se ti líbí, a hlasuj, ať se nejlepší dostanou nahoru. „Sdílet zvuk“ zveřejní jeden tvůj pro všechny, jakmile projde kontrolou.",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "Kopie zvuku, který teď hraje, s touto rychlostí, výškou a efekty, jako samostatný pad",
+  "Change the speed, pitch or effects first": "Nejdřív změň rychlost, výšku nebo efekty",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Mění každý zvuk, zatímco hraje. Uložit jako nový pad ho uchová jako samostatný pad.",
+  "Play a sound first, then save it with your changes": "Nejdřív pusť zvuk, pak ho ulož se svými změnami",
+  "Save as new pad": "Uložit jako nový pad",
+  "Take the Live controls effects off": "Sundat efekty živého ovládání",
+  "{name} (modified {n})": "{name} (upraveno {n})",
+  "{name} (modified)": "{name} (upraveno)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ „{name}“ přidáno, rychlost a výška omezené na to, co pad uloží"
 }

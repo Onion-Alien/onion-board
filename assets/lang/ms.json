@@ -184,7 +184,6 @@
   "Category: {value}": "Kategori: {value}",
   "Change my voice while held": "Ubah suara saya semasa ditahan",
   "Change your voice, speak another language, or use text-to-speech": "Ubah suara anda, bercakap bahasa lain, atau guna teks-ke-pertuturan",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "Mengubah setiap bunyi semasa ia dimainkan. Untuk menyimpan satu versi, klik kanan pad → Kesan.",
   "Changes the whole app instantly.": "Mengubah seluruh aplikasi serta-merta.",
   "Change": "Tukar",
   "Changing…": "Menukar…",
@@ -4280,5 +4279,14 @@
   "{group}  ·  {n} on": [
     "{group}  ·  {n} hidup"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Bunyi dan suara yang dikongsi pemain. Dengar dahulu, tambah yang anda suka, dan undi supaya yang terbaik naik ke atas. \"Kongsi bunyi\" menyiarkan satu milik anda untuk semua selepas ia disemak."
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Bunyi dan suara yang dikongsi pemain. Dengar dahulu, tambah yang anda suka, dan undi supaya yang terbaik naik ke atas. \"Kongsi bunyi\" menyiarkan satu milik anda untuk semua selepas ia disemak.",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "Salinan bunyi yang sedang dimainkan dengan kelajuan, pic dan kesan ini, sebagai pad tersendiri",
+  "Change the speed, pitch or effects first": "Ubah kelajuan, pic atau kesan dahulu",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Mengubah setiap bunyi semasa dimainkan. Simpan sebagai pad baharu menyimpannya sebagai pad tersendiri.",
+  "Play a sound first, then save it with your changes": "Mainkan bunyi dahulu, kemudian simpan dengan perubahan anda",
+  "Save as new pad": "Simpan sebagai pad baharu",
+  "Take the Live controls effects off": "Tanggalkan kesan kawalan langsung",
+  "{name} (modified {n})": "{name} (diubah {n})",
+  "{name} (modified)": "{name} (diubah)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” ditambah, kelajuan dan picnya dihadkan kepada apa yang boleh disimpan pad"
 }

@@ -186,7 +186,6 @@
   "Category: {value}": "Κατηγορία: {value}",
   "Change my voice while held": "Άλλαξε τη φωνή μου όσο το κρατάω",
   "Change your voice, speak another language, or use text-to-speech": "Άλλαξε τη φωνή σου, μίλα άλλη γλώσσα ή χρησιμοποίησε κείμενο σε ομιλία",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "Αλλάζει κάθε ήχο όσο παίζει. Για να σώσεις μια εκδοχή, δεξί κλικ σε ένα κουμπί → Εφέ.",
   "Changes the whole app instantly.": "Αλλάζει όλη την εφαρμογή αμέσως.",
   "Change": "Αλλαγή",
   "Changing…": "Αλλάζει…",
@@ -4357,5 +4356,14 @@
     "{group}  ·  {n} ενεργό",
     "{group}  ·  {n} ενεργά"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Ήχοι και φωνές που μοιράζονται οι παίκτες. Άκουσέ τους πρώτα, πρόσθεσε όσους σου αρέσουν και ψήφισε για να ανέβουν οι καλύτεροι στην κορυφή. Το «Μοιράσου έναν ήχο» ανεβάζει έναν δικό σου για όλους, μόλις ελεγχθεί."
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Ήχοι και φωνές που μοιράζονται οι παίκτες. Άκουσέ τους πρώτα, πρόσθεσε όσους σου αρέσουν και ψήφισε για να ανέβουν οι καλύτεροι στην κορυφή. Το «Μοιράσου έναν ήχο» ανεβάζει έναν δικό σου για όλους, μόλις ελεγχθεί.",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "Ένα αντίγραφο του ήχου που παίζει τώρα με αυτή την ταχύτητα, τονικότητα και αυτά τα εφέ, ως δικό του pad",
+  "Change the speed, pitch or effects first": "Άλλαξε πρώτα την ταχύτητα, την τονικότητα ή τα εφέ",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Αλλάζει κάθε ήχο όσο παίζει. Η «Αποθήκευση ως νέο pad» τον κρατά ως δικό του pad.",
+  "Play a sound first, then save it with your changes": "Παίξε πρώτα έναν ήχο και μετά αποθήκευσέ τον με τις αλλαγές σου",
+  "Save as new pad": "Αποθήκευση ως νέο pad",
+  "Take the Live controls effects off": "Βγάλε τα εφέ από τα ζωντανά χειριστήρια",
+  "{name} (modified {n})": "{name} (τροποποιημένο {n})",
+  "{name} (modified)": "{name} (τροποποιημένο)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Προστέθηκε το \"{name}\", με ταχύτητα και τονικότητα όσο μπορεί να αποθηκεύσει ένα pad"
 }
