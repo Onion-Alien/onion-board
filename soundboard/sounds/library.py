@@ -880,11 +880,13 @@ class Config:
             raw["duck_on"] = True
         sounds = []
         blank = SoundMeta(id="", name="", file="")
+        has_sounds = "sounds" in raw
         raw_sounds = raw.pop("sounds", None)
-        if raw_sounds is None:
+        if raw_sounds is None and not has_sounds:
             raw_sounds = []
-        elif not isinstance(raw_sounds, list):   # damaged / hand-edited: never save over
-            # the pads with an empty list; load() sets the file aside and recovers them
+        elif not isinstance(raw_sounds, list):   # damaged / hand-edited (null too: no version
+            # writes it): never save over the pads with an empty list; load() sets the
+            # file aside and recovers them
             raise ValueError(f"config 'sounds' is a {type(raw_sounds).__name__}, not a list")
         for s in raw_sounds:
             if not isinstance(s, dict) or not all(isinstance(s.get(k), str) and s.get(k)
