@@ -749,10 +749,18 @@ class SpeechPanel(QWidget):
         self._sync_switch()
 
     def show_lang_box(self, on: bool):
-        """The language cards, once there's speech recognition and languages."""
+        """The language cards, once there's speech recognition and languages. Until
+        then the ON / OFF switch and "Pick a language" have nothing to pick: hidden,
+        the install box says what's needed."""
         self._lang_ready = on
         self.cards.setVisible(on)
+        self.b_on.setVisible(on)
+        self.lbl_intro.setVisible(on)
         self._show_settings()
+
+    def recognition_ready(self) -> bool:
+        """Speech recognition is installed: the card works offline from here on."""
+        return self.module is not None and self._is_ready(self.module)
 
     def _show_settings(self):
         """Who says it and what the language still needs, in their inner area: only
