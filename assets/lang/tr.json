@@ -4357,6 +4357,11 @@
     "{group}  ·  {n} açık"
   ],
   "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Oyuncuların paylaştığı sesler ve ses efektleri. Önce dinle, beğendiklerini ekle ve en iyileri yukarı çıksın diye oy ver. \"Ses paylaş\" kontrol edildikten sonra senin bir sesini herkese açar.",
+  "Mic unchanged": "Mikrofon değişmedi",
+  "Pick a voice to turn one on": "Açmak için bir ses seç",
+  "Put the voices back, exactly as they were": "Sesleri tam olduğu gibi geri getir",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Tüm sesleri kapatır ve unutur, temiz bir başlangıç için. AÇIK onları geri getirmez",
+  "Voices reset": "Sesler sıfırlandı",
   "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "Şu an çalan sesin bu hız, perde ve efektlerle kendi pad'i olarak bir kopyası",
   "Change the speed, pitch or effects first": "Önce hızı, perdeyi veya efektleri değiştir",
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Her sesi çalarken değiştirir. Yeni pad olarak kaydet onu kendi pad'i olarak saklar.",

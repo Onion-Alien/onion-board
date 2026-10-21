@@ -4357,6 +4357,11 @@
     "{group}  ·  {n} an"
   ],
   "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Sounds und Stimmen, die Spieler teilen. Hör sie zuerst an, füge die hinzu, die dir gefallen, und stimm ab, damit die besten nach oben kommen. „Sound teilen“ stellt einen von dir für alle bereit, sobald er geprüft wurde.",
+  "Mic unchanged": "Mikro unverändert",
+  "Pick a voice to turn one on": "Wähl eine Stimme, um sie einzuschalten",
+  "Put the voices back, exactly as they were": "Stimmen genau so zurückholen, wie sie waren",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Schaltet alle Stimmen aus und vergisst sie, für einen frischen Start. AN holt sie nicht zurück",
+  "Voices reset": "Stimmen zurückgesetzt",
   "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "Eine Kopie des gerade spielenden Sounds mit diesem Tempo, dieser Tonhöhe und diesen Effekten, als eigenes Pad",
   "Change the speed, pitch or effects first": "Ändere zuerst Tempo, Tonhöhe oder Effekte",
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Ändert jeden Sound, während er spielt. „Als neues Pad speichern“ behält ihn als eigenes Pad.",

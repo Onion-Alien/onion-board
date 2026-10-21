@@ -4280,6 +4280,11 @@
     "{group}  ·  已开 {n} 项"
   ],
   "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "玩家分享的音效和声音。先试听，添加你喜欢的，再投票让最好的排到前面。“分享音效”会在审核后把你的音效发布给所有人。",
+  "Mic unchanged": "麦克风未改变",
+  "Pick a voice to turn one on": "选一个声音来打开",
+  "Put the voices back, exactly as they were": "把声音恢复成原来的样子",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "关掉并忘掉所有声音，重新开始。开 不会再把它们带回来",
+  "Voices reset": "声音已重置",
   "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "把正在播放的声音按当前速度、音调和效果复制成一个单独的打击垫",
   "Change the speed, pitch or effects first": "请先改变速度、音调或效果",
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "播放时改变每个声音。“另存为新打击垫”可把它保存为单独的打击垫。",

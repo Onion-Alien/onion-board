@@ -28,9 +28,12 @@ def test_meter_uses_available_room_after_resizing(qapp, level):
             for _ in range(4):
                 qapp.processEvents()
             if width >= 800:
-                # The Voices switch and Record reserve their own width beside the meter.
+                # The Voices switch, Record, Reset and the mic's icon and words reserve
+                # their own width beside the meter.
                 buttons = (bar.master.width() + bar.master_label.width()
-                           + bar.record_button.width())
+                           + bar.record_button.width() + bar.reset_button.width()
+                           + bar.mic_icon.width()
+                           + (bar.lbl_mic.width() if bar.lbl_mic.isVisible() else 0))
                 assert bar.meter.width() >= (width - buttons) // 2
             assert bar.meter.geometry().right() < bar._mic.width()
             assert bar._right.geometry().right() < bar.width()
@@ -42,9 +45,9 @@ def test_meter_uses_available_room_after_resizing(qapp, level):
 def test_bar_keeps_its_height_when_chips_come_and_go(qapp):
     bar = VoiceStatusBar()
     bar.set_level(0.1)
-    # Enough room for the Voices switch and its name, the meter and both status chips
-    # on one line.
-    bar.resize(1440, 60)
+    # Enough room for the Voices switch and its name, Record, Reset, the meter and both
+    # status chips on one line.
+    bar.resize(1600, 60)
     bar.show()
     try:
         heights = []

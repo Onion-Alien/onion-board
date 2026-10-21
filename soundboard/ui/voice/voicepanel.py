@@ -27,7 +27,8 @@ from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController
 from soundboard.ui.kit import a11y, appstate, busy, icons
 from soundboard.ui.voice import art
-from soundboard.ui.kit.panel import Flow, card, hint_label, icon_button, section_label
+from soundboard.ui.kit.panel import (Flow, UndoBar, card, hint_label, icon_button,
+                                     section_label)
 from soundboard.ui.window.responsive import FitWidth
 from soundboard.ui.voice.speechpanel import LIVE_MODULE, SpeechPanel
 from soundboard.ui.voice.voicefxpanel import CUSTOM, EffectRow, VoiceFxPanel, on_top
@@ -212,6 +213,8 @@ class VoicePanel(QWidget):
         self.bar.master_toggled.connect(self._master_flipped)
         self.bar.toggle.connect(self.toggle_one)
         self.bar.turn_off.connect(lambda k: (usage.used("voice-chip-off"), self.forget_one(k)))
+        self.bar.reset_asked.connect(self.reset_voices)
+        self.reset_undo = UndoBar(_("Put the voices back, exactly as they were"))
         scroll = self._scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.Shape.NoFrame)
@@ -632,8 +635,8 @@ class VoicePanel(QWidget):
 
     def back_keys(self) -> list[str]:
         """What Voices ON would turn on: what it turned off, else the voice changer
-        with the voice picked on it."""
-        return list(self._back) or ["fx"]
+        with the voice picked on it (none after Reset: the voice changer is empty)."""
+        return list(self._back) or ([] if self.fx.is_blank() else ["fx"])
 
     def set_voices(self, on: bool):
         """The Voices switch. Off: every voice goes off, remembered with the grey ones
@@ -710,6 +713,39 @@ class VoicePanel(QWidget):
         self._back = [k for k in self._back if k != key]
         if key in self.on_keys():
             self.stop_one(key)
+        self._update_heads()
+
+    def reset_voices(self):
+        """The bar's Reset: a fresh start. Every voice goes off and is forgotten (Voices
+        ON won't bring any back) and the voice changer's effects are cleared; Undo puts
+        it all back."""
+        was = {"on": self.on_keys(), "back": list(self._back), "back_lang": self._back_lang,
+               "lang": self.speech.cb_lang.currentData() or "", "fx": self.fx.snapshot()}
+        self._switching = True
+        try:
+            self.controller.stop_speaking()
+            for k in was["on"]:
+                self.stop_one(k)
+            self.speech.stop_translating()
+            self._back, self._back_lang = [], ""
+            self.fx.clear_mix()
+        finally:
+            self._switching = False
+        self._update_heads()
+        self.reset_undo.show_for(_("Voices reset"), lambda: self._unreset(was))
+
+    def _unreset(self, was: dict):
+        self._switching = True
+        try:
+            self.fx.restore(was["fx"])
+            for k in was["on"]:
+                if k == "lang":
+                    self._back_lang = was["lang"]
+                if k != "fx":            # restore() turned the voice changer back on
+                    self._turn_on(k)
+            self._back, self._back_lang = was["back"], was["back_lang"]
+        finally:
+            self._switching = False
         self._update_heads()
 
     def stop_one(self, key: str):
@@ -884,7 +920,8 @@ class VoicePanel(QWidget):
         # grey: what Voices ON brings back (a click brings just that one back)
         if not on:
             items.append(("none", _("Mic unchanged. ON brings back:") if self._back else
-                          _("Mic unchanged. ON turns on:"), "off", "mic", None,
+                          _("Mic unchanged. ON turns on:") if self.back_keys() else
+                          _("Mic unchanged"), "off", "mic", None,
                           _("Nothing is changing your mic voice. Switch Voices ON, or "
                             "click a grey voice, to turn it on.")))
         click_on = _("Off. Click to turn it back on. Right-click to open it.")
@@ -912,7 +949,8 @@ class VoicePanel(QWidget):
         names = ", ".join(it[1] for it in items if it[2] == "off" and it[0] != "none")
         self.bar.set_master(bool(on), (
             _("Turns off every voice changing your mic. Switching it on brings them back.")
-            if on else _("Turns on: {voices}", voices=names)))
+            if on else _("Turns on: {voices}", voices=names) if names else
+            _("Pick a voice to turn one on")))
 
     def _fx_shown(self) -> tuple:
         """The voice changer's voice for a chip: its short name and its picture."""

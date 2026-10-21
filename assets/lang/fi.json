@@ -4357,6 +4357,11 @@
     "{group}  ·  {n} päällä"
   ],
   "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Pelaajien jakamia ääniä ja ääniefektejä. Kuuntele ensin, lisää ne, joista pidät, ja äänestä, jotta parhaat nousevat kärkeen. ”Jaa ääni” julkaisee omasi kaikille, kun se on tarkistettu.",
+  "Mic unchanged": "Mikki ennallaan",
+  "Pick a voice to turn one on": "Valitse ääni laittaaksesi sen päälle",
+  "Put the voices back, exactly as they were": "Palauta äänet täsmälleen ennalleen",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Sammuttaa kaikki äänet ja unohtaa ne, puhdas aloitus. PÄÄLLÄ ei tuo niitä takaisin",
+  "Voices reset": "Äänet nollattu",
   "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "Kopio nyt soivasta äänestä tällä nopeudella, sävelkorkeudella ja näillä tehosteilla, omana padinaan",
   "Change the speed, pitch or effects first": "Muuta ensin nopeutta, sävelkorkeutta tai tehosteita",
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Muuttaa jokaista ääntä sen soidessa. Tallenna uudeksi padiksi pitää sen omana padinaan.",

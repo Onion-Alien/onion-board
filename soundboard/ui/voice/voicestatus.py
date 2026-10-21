@@ -94,6 +94,7 @@ class VoiceStatusBar(QFrame):
     turn_off = Signal(str)
     toggle = Signal(str)
     master_toggled = Signal(bool)
+    reset_asked = Signal()
 
     def __init__(self):
         super().__init__()
@@ -133,6 +134,16 @@ class VoiceStatusBar(QFrame):
         self.record_button.setFixedHeight(STOP_H)
         icons.set_icon(self.record_button, "record", "danger_text", size=16)
         mh.addWidget(self.record_button)
+        # a fresh start: every voice off and forgotten, so Voices ON brings none of them back
+        self.reset_button = QPushButton(_("Reset"))
+        self.reset_button.setToolTip(_("Turn every voice off and forget them, for a fresh "
+                                       "start. Voices ON won't bring them back"))
+        self.reset_button.setAccessibleName(_("Reset"))
+        self.reset_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.reset_button.setFixedHeight(STOP_H)
+        icons.set_icon(self.reset_button, "reload", "muted", size=16)
+        self.reset_button.clicked.connect(self.reset_asked)
+        mh.addWidget(self.reset_button)
         self.mic_icon = icon_label("mic", _("Your mic level"))
         mh.addWidget(self.mic_icon)
         self.lbl_mic = QLabel(_("No mic open"))   # only then: the icon says the rest
@@ -233,8 +244,8 @@ class VoiceStatusBar(QFrame):
         self._fit()
 
     def _mic_min(self) -> int:
-        """The mic row's narrowest: the Voices switch, Record, the icon and label whole, the meter
-        at its minimum."""
+        """The mic row's narrowest: the Voices switch, Record, Reset, the icon and label
+        whole, the meter at its minimum."""
         parts = [w for i in range(self._mic_row.count())
                  if (w := widget_at(self._mic_row, i)) is not None and not w.isHidden()]
         return (sum(max(w.sizeHint().width(), w.minimumWidth()) for w in parts
@@ -250,15 +261,17 @@ class VoiceStatusBar(QFrame):
         pad = lbl.contentsMargins()
         lbl.setMinimumWidth(lbl.fontMetrics().horizontalAdvance(lbl.text()) + pad.left()
                             + pad.right() + 2 * lbl.margin() + 1)
-        # Record goes down to its dot when the switch, Record and the mic row can't all fit
-        # (a long "No mic open" in some languages was cut off)
-        rec, word = self.record_button, _("Record")
-        shown = rec.text()
-        rec.setText(word)                  # measured with its word...
+        # Record and Reset go down to their icons when the switch, they and the mic row
+        # can't all fit (a long "No mic open" in some languages was cut off)
+        words = ((self.record_button, _("Record")), (self.reset_button, _("Reset")))
+        shown = [b.text() for b, _w in words]
+        for b, word in words:
+            b.setText(word)                # measured with their words...
         fits = self._mic_min() <= room
-        rec.setText(shown)
-        if (word if fits else "") != shown:   # ...changed only when it must (no loop)
-            rec.setText(word if fits else "")
+        for (b, word), was in zip(words, shown):
+            b.setText(was)
+            if (word if fits else "") != was:   # ...changed only when it must (no loop)
+                b.setText(word if fits else "")
         # still too tight (a wide theme font, a long language): the meter gives way
         # before the "No mic open" words get cut
         self.meter.setMinimumWidth(METER_MIN)
@@ -273,7 +286,7 @@ class VoiceStatusBar(QFrame):
         mic_labels = (self._mic_row.sizeHint().width()
                       - self.meter.sizeHint().width())
         meter = (self.width() - self.master.width() - self.master_label.width()
-                 - self.record_button.width() + 1) // 2
+                 - self.record_button.width() - self.reset_button.width() + 1) // 2
         need = max(160, meter + mic_labels) + GAP + line
         need = max(need, self._mic_min() + GAP + line)   # never squeeze the mic row
         # Stacked, the chips go above the switch row: the bar sits at the bottom of the

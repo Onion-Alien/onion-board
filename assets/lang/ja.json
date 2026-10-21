@@ -4280,6 +4280,11 @@
     "{group}  ·  {n}個オン"
   ],
   "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "プレイヤーが共有したサウンドとボイス。まず聴いて、気に入ったものを追加し、投票していいものを上位に。「サウンドを共有」で自分のサウンドを、確認後にみんなへ公開できます。",
+  "Mic unchanged": "マイクはそのまま",
+  "Pick a voice to turn one on": "声を選んでオンにしよう",
+  "Put the voices back, exactly as they were": "声をそのまま元に戻す",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "すべての声をオフにして忘れ、まっさらにします。オン にしても戻りません",
+  "Voices reset": "声をリセットしました",
   "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "今鳴っているサウンドを、この速度・ピッチ・エフェクトのまま別のパッドとしてコピー",
   "Change the speed, pitch or effects first": "先に速度、ピッチ、エフェクトのどれかを変えてください",
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "再生中のすべてのサウンドを変えます。「新しいパッドとして保存」で別のパッドとして残せます。",

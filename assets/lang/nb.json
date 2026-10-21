@@ -4357,6 +4357,11 @@
     "{group}  ·  {n} på"
   ],
   "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Lyder og stemmer som spillere deler. Hør dem først, legg til de du liker, og stem så de beste havner øverst. «Del en lyd» legger ut en av dine for alle når den er sjekket.",
+  "Mic unchanged": "Mikrofonen er uendret",
+  "Pick a voice to turn one on": "Velg en stemme for å slå den på",
+  "Put the voices back, exactly as they were": "Sett stemmene tilbake, akkurat som de var",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Slår av alle stemmer og glemmer dem, for en ny start. PÅ henter dem ikke tilbake",
+  "Voices reset": "Stemmer tilbakestilt",
   "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "En kopi av lyden som spilles nå med denne hastigheten, tonehøyden og disse effektene, som egen pad",
   "Change the speed, pitch or effects first": "Endre hastighet, tonehøyde eller effekter først",
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Endrer hver lyd mens den spilles. Lagre som ny pad tar vare på den som egen pad.",

@@ -4280,6 +4280,11 @@
     "{group}  ·  {n}개 켜짐"
   ],
   "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "플레이어들이 공유한 사운드와 보이스예요. 먼저 들어 보고, 마음에 드는 걸 추가하고, 투표해서 좋은 걸 위로 올려요. '사운드 공유'로 내 사운드를 확인 후 모두에게 올릴 수 있어요.",
+  "Mic unchanged": "마이크 그대로",
+  "Pick a voice to turn one on": "켤 목소리를 고르세요",
+  "Put the voices back, exactly as they were": "목소리를 그대로 되돌리기",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "모든 목소리를 끄고 잊어서 새로 시작해요. 켬으로 해도 돌아오지 않아요",
+  "Voices reset": "목소리 초기화됨",
   "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "지금 재생 중인 사운드를 이 속도, 피치, 효과 그대로 별도 패드로 복사",
   "Change the speed, pitch or effects first": "먼저 속도, 피치 또는 효과를 바꾸세요",
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "재생 중인 모든 사운드를 바꿉니다. 새 패드로 저장하면 별도 패드로 남습니다.",

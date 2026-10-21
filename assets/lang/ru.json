@@ -4434,6 +4434,11 @@
     "{group}  ·  {n} вкл."
   ],
   "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Звуки и голоса, которыми делятся игроки. Сначала послушай, добавь те, что нравятся, и голосуй, чтобы лучшие поднимались наверх. «Поделиться звуком» выкладывает твой звук для всех после проверки.",
+  "Mic unchanged": "Микрофон без изменений",
+  "Pick a voice to turn one on": "Выберите голос, чтобы включить его",
+  "Put the voices back, exactly as they were": "Вернуть голоса точно как были",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Выключает все голоса и забывает их, чтобы начать с чистого листа. ВКЛ. их не вернёт",
+  "Voices reset": "Голоса сброшены",
   "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "Копия звука, который играет сейчас, с этой скоростью, высотой и эффектами, как отдельный пэд",
   "Change the speed, pitch or effects first": "Сначала измени скорость, высоту или эффекты",
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Меняет каждый звук, пока он играет. «Сохранить как новый пэд» оставит его отдельным пэдом.",

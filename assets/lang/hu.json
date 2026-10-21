@@ -4357,6 +4357,11 @@
     "{group}  ·  {n} bekapcsolva"
   ],
   "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Hangok és hangszínek, amiket a játékosok osztanak meg. Előbb hallgasd meg, add hozzá, ami tetszik, és szavazz, hogy a legjobbak kerüljenek felülre. A „Hang megosztása” ellenőrzés után mindenkinek elérhetővé teszi a sajátodat.",
+  "Mic unchanged": "A mikrofon változatlan",
+  "Pick a voice to turn one on": "Válassz egy hangot a bekapcsoláshoz",
+  "Put the voices back, exactly as they were": "Hangok visszaállítása pontosan úgy, ahogy voltak",
+  "Turn every voice off and forget them, for a fresh start. Voices ON won't bring them back": "Minden hangot kikapcsol és elfelejt, tiszta kezdéshez. A BE nem hozza vissza őket",
+  "Voices reset": "Hangok alaphelyzetben",
   "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "A most szóló hang másolata ezzel a sebességgel, hangmagassággal és effektekkel, külön padként",
   "Change the speed, pitch or effects first": "Előbb változtass a sebességen, a hangmagasságon vagy az effekteken",
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Minden hangot megváltoztat, amíg szól. A Mentés új padként külön padként megtartja.",

@@ -151,6 +151,41 @@ def test_stop_all_remembers_for_the_voices_switch(panel):
     assert p.fx.btn_power.isChecked() and p.fx.preset == "Robot"
 
 
+def test_reset_forgets_every_voice_so_voices_on_brings_none_back(panel):
+    """Voices OFF (or Stop all) remembers what was on; Reset is the fresh start: off,
+    forgotten, the mix emptied, so Voices ON brings nothing back. Undo puts it all back."""
+    p, eng = panel
+    p.fx.use_mix({"pitch": {"on": True, "semitones": 5.0, "mix": 1.0},
+                  "robot": {"on": True}})
+    p.speech.livevoice.b_live.setChecked(True)
+    p.bar.master.click()                  # off: both remembered, grey
+    assert p.bar.texts() == ["Mic unchanged. ON brings back:", "My own mix",
+                             "Computer voice"]
+    assert p.bar.reset_button.isVisibleTo(p.bar)
+    p.bar.reset_button.click()
+    assert not p.is_active() and p.back_keys() == []
+    assert p.fx.is_blank() and not eng.voice_chain.enabled
+    assert p.bar.texts() == ["Mic unchanged"]
+    p.bar.master.click()                  # ON: nothing to bring back, stays off
+    assert not p.is_active() and not p.bar.master.isChecked()
+    assert p.bar.texts() == ["Mic unchanged"]
+    p.fx.pick("Robot")                    # a voice picked works as before
+    assert p.on_keys() == ["fx"]
+
+
+def test_reset_while_voices_are_on_turns_them_off_and_undo_brings_them_back(panel):
+    p, eng = panel
+    p.fx.use_mix({"pitch": {"on": True, "semitones": 5.0, "mix": 1.0}})
+    p.speech.livevoice.b_live.setChecked(True)
+    before = p.fx.spec()
+    p.bar.reset_button.click()
+    assert p.on_keys() == [] and p.fx.is_blank()
+    assert p.reset_undo.active()
+    p.reset_undo.undo()
+    assert p.on_keys() == ["fx", "speak"] and p.fx.spec() == before
+    assert eng.voice_chain.enabled
+
+
 def test_global_voice_stop_turns_off_replacements_and_translation(panel, monkeypatch):
     p, eng = panel
     calls = []
@@ -1819,7 +1854,7 @@ def test_status_bar_chip_x_turns_off_only_that_one(panel):
 
 def test_status_bar_says_what_others_hear(panel):
     p, eng = panel
-    assert p.bar.texts()[0] == "Mic unchanged. ON turns on:"
+    assert p.bar.texts() == ["Mic unchanged"]   # an empty mix: nothing for ON to turn on
     p.fx.pick("Robot")
     assert p.bar.texts() == ["Robot"]          # short; the full words are its tip
     assert "Voice changer" in p.bar.chips["fx"].toolTip()
@@ -2376,5 +2411,5 @@ def test_off_at_start_forgets_the_picked_voice(qapp, monkeypatch):
                                            "effects": ghost}),
                    {"voice": "Microsoft Zira Desktop", "rate": 2})
     assert p.fx.preset == CUSTOM
-    assert p.bar.texts() == ["Mic unchanged. ON turns on:", "My own mix"]
+    assert p.bar.texts() == ["Mic unchanged"]   # your own mix is empty: nothing to turn on
     p.deleteLater()
