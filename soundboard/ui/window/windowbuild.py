@@ -539,7 +539,12 @@ class WindowBuilder(Controller):
             _("Where your sounds go (straight into your mic, the virtual cable, another "
               "device or nobody), your devices, who's listening, the equalizer, and a "
               "test that records what goes out and plays it back.")))
-        tab = mw.cfg.tab if 0 <= mw.cfg.tab < mw.tabs.count() else 0
+        mw.tab_info.setdefault("store", (
+            _("Community"),
+            _("Sounds and voices players share. Hear one first, add the ones you like, and "
+              "vote so the best rise to the top. Share a sound puts one of yours up for "
+              "everyone once it's been checked.")))
+        tab =mw.cfg.tab if 0 <= mw.cfg.tab < mw.tabs.count() else 0
         mw.tabs.setCurrentIndex(tab if mw.tabs.isTabVisible(tab) else 0)
         mw.tabctl._focus_open_tab()
         mw.tabs.currentChanged.connect(lambda i: mw.set_option("tab", i))
