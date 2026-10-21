@@ -441,6 +441,14 @@ class AiVoiceController:
         if self.source is not None:
             self.source.backup = self.backup
 
+    def give_up(self):
+        """A helper that never got ready: it's stopped, and the backup keeps covering
+        your mic until you press Stop (as when it dies)."""
+        if self.source is not None:
+            self.source.dead = True
+        if self.host is not None:
+            self.host.stop()
+
     def stop(self):
         h, self.host = self.host, None
         self.source = None
