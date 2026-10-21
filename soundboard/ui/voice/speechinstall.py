@@ -20,7 +20,9 @@ from soundboard.addons import modules as mods
 from soundboard.core import langnames
 from soundboard.online import net, netlog
 from soundboard.speech import translation, winvoices
+from soundboard.ui.bun.pilotbun import PilotBunny
 from soundboard.ui.kit import busy, icons
+from soundboard.ui.kit.glowbutton import GlowButton
 from soundboard.ui.kit.panel import hint_label, icon_button
 from soundboard.ui.voice.voicefxpanel import _enable
 from soundboard.core import errors
@@ -95,16 +97,23 @@ class SpeechInstalls(QObject):
             tb.addWidget(b)
         tb.addStretch(1)
 
-        # ---- what to install first, in its own inner area above the settings
+        # ---- what to install first, in its own inner area above the settings: Pilot
+        # Bun beside the words and the button, like Robo-Bun on the AI voice card
         self.missing = QFrame()
         self.missing.setObjectName("voicebox")
-        mv = QVBoxLayout(self.missing)
-        mv.setContentsMargins(14, 12, 14, 14)
+        sv = QHBoxLayout(self.missing)
+        sv.setContentsMargins(8, 8, 16, 8)
+        sv.setSpacing(16)
+        self.bun_pilot = PilotBunny()
+        sv.addWidget(self.bun_pilot, 0, Qt.AlignmentFlag.AlignVCenter)
+        mv = QVBoxLayout()
         mv.setSpacing(10)
+        mv.addStretch(1)   # the words and the button stay together, centred beside him
         self.lbl_missing = hint_label("")
         mv.addWidget(self.lbl_missing)
         mrow = QHBoxLayout()
-        self.b_install = QPushButton(_("Install speech recognition"))
+        mrow.setSpacing(8)
+        self.b_install = GlowButton(_("Install speech recognition"))
         icons.set_icon(self.b_install, "plus")
         self.b_install.setToolTip(_("One-time download, about 300 MB."))
         self.b_install.clicked.connect(self._install)
@@ -114,6 +123,8 @@ class SpeechInstalls(QObject):
         mrow.addWidget(b_open)
         mrow.addStretch(1)
         mv.addLayout(mrow)
+        mv.addStretch(1)
+        sv.addLayout(mv, 1)
         # install / update progress: outside `missing`, which is hidden for an update
         self.lbl_install = hint_label("")
         self.lbl_install.hide()
@@ -374,6 +385,7 @@ class SpeechInstalls(QObject):
         for b in (self.b_install, self.b_update, self.p.livevoice.b_live):
             busy.set_busy(b, True)
         self.b_install.setText(_("Installing… (a few minutes)"))
+        self.bun_pilot.set_flying(True)
         self.b_update.setText(_("Updating… (a few minutes)"))
         self.lbl_install.show()
         self.lbl_install.setText(_("starting…"))
@@ -397,6 +409,7 @@ class SpeechInstalls(QObject):
             busy.set_busy(b, False)
         self.b_install.setEnabled(True)
         self.b_install.setText(_("Install speech recognition"))
+        self.bun_pilot.set_flying(False)
         _enable(self.b_update, not p.ctl.live, _("Stop the computer voice to change this"))
         self.b_update.setText(_("Update speech recognition"))
         _enable(b_live, self._dl_busy is None, _("Waiting for the download to finish"))

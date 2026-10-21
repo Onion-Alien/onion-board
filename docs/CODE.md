@@ -159,6 +159,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/kit/pixels.py` | `snap_to_pixels` (from the style kit's `appstate.py`): every hand-painted widget calls it first so its edges land on whole pixels at 125 % / 150 % scaling |
 | `soundboard/ui/kit/restyled.py` | sizes worked out from a widget's text (`measured`, `on_restyle`), worked out again when its style or font changes: the window is built with the app's style sheet off (`theme.styled_after`) and `again()` re-runs them all once it's back on |
 | `soundboard/ui/kit/iconrow.py` | label icons aligned to the first line's capital ink using the current font metrics |
+| `soundboard/ui/kit/glowbutton.py` | `GlowButton`: a primary button with a soft accent glow, for the install a card needs before it works (AI voices, speech recognition) |
 | `soundboard/ui/kit/panel.py` | volume boxes, the equalizer panel (emit values; the window applies them) a wrapping row layout (`Flow`) and a grid of equal-width cards (`CardGrid`) |
 | `soundboard/ui/sounds/dialogs.py` | per-sound Edit dialog: the Sound tab (name, volume, hotkey, fades…) and the Effects tab |
 | `soundboard/ui/window/languagecontrol.py` | the main window's language (`MainWindow.langctl`): offering Windows' language once, turning it down, switching |
@@ -274,6 +275,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/bun/bunnywidget.py` | Bun animated: bobs, blinks, talks along with your mic and throws music notes |
 | `soundboard/ui/bun/onionalien.py` | the Onion Alien, the author's mascot, drawn in code like Bun and Hoot: he says the note on Settings > About in a speech bubble, typed out a letter at a time |
 | `soundboard/ui/bun/bunmode.py` | Bun mode: the mini player as a floating Bun over everything, showing what the app is doing |
+| `soundboard/ui/bun/pilotbun.py` | Pilot Bun: the Languages card's install picture, Bun flying a little plane round a turning Earth (rests after a while; still in lite mode) |
 | `soundboard/ui/bun/scribebun.py` | Bun the scribe: the download banner's picture for a sound with no thumbnail, writing a well-known piece as sheet music on a scroll as the download comes in |
 | `soundboard/ui/bun/bunpong.py` | the Easter egg: poke Bun enough and he challenges you to a game picked at random; Pong, the games' shared base and the dialog (its sounds: `pongsounds.py`) |
 | `soundboard/ui/bun/bungames.py` | Bun's other Easter egg games: quick draw, rock paper scissors, tic-tac-toe |
