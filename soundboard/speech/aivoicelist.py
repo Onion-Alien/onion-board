@@ -259,8 +259,9 @@ def sync(folder: Path, mine: list[dict], write: bool = True) -> list[dict]:
     """Write the built-in voices and `mine` into the add-on's voices.json (its own
     voices that aren't either are kept, after them), leaving out any voice whose
     speakers the installed model doesn't have. Returns the list now there; the
-    file as it was (or []) if it can't be read or written, or `write` is False (a
-    copy that isn't the installed one, such as the source tree's)."""
+    file as it was (or []) if it can't be read or written. With `write` False (a
+    copy shipped with the app, which is never written to) the file's voices and
+    `mine` after them: its helper reads yours from your file (helper_env)."""
     path = folder / "voices.json"
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
@@ -270,17 +271,23 @@ def sync(folder: Path, mine: list[dict], write: bool = True) -> list[dict]:
         return []
     have = [v for v in data["voices"] if isinstance(v, dict) and isinstance(v.get("id"), str)
             and v.get("name")]
-    if not write:
-        return have
     speakers = model_speakers(folder)
     if speakers is None:     # can't look inside the model: only speakers it's known to have
         speakers = {int(s) for v in have for s, _w in v.get("mix", [])
                     if isinstance(s, (int, float))}
+
+    def usable(voices):
+        for raw in voices:
+            v = clean_voice(raw, speakers)
+            if v is not None and len(v["mix"]) == len(raw.get("mix", [])):  # every speaker
+                yield v
+
+    if not write:
+        ids = {v["id"] for v in have}
+        return have + [v for v in usable(mine) if is_mine(v) and v["id"] not in ids]
     want, seen = [], set()
-    for raw in BUILT_IN + list(mine):
-        v = clean_voice(raw, speakers)
-        if v is not None and v["id"] not in seen and \
-                len(v["mix"]) == len(raw.get("mix", [])):   # every speaker it needs
+    for v in usable(BUILT_IN + list(mine)):
+        if v["id"] not in seen:
             seen.add(v["id"])
             want.append(v)
     want += [v for v in have if v["id"] not in seen and not is_mine(v)]

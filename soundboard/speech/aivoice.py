@@ -353,8 +353,11 @@ def backup_effects(rate: int) -> list:
 
 def helper_env(env: dict[str, str]) -> dict[str, str]:
     """The helper's environment: ONIONBOARD_LESS_CPU=1 with Use less CPU (the lighter
-    model, when the add-on has it)."""
+    model, when the add-on has it) and ONIONBOARD_MY_AI_VOICES, your own voices' file
+    (a copy shipped with the app doesn't have them in its voices.json)."""
     from soundboard import voicefx
+    from soundboard.speech import aivoicelist
+    env = {**env, "ONIONBOARD_MY_AI_VOICES": str(aivoicelist.path())}
     return {**env, "ONIONBOARD_LESS_CPU": "1"} if voicefx.light() else env
 
 

@@ -60,6 +60,26 @@ def test_addon_ships_the_apps_protocol_and_valid_voices():
     assert reqs and all("==" in ln for ln in reqs)
 
 
+def test_the_helper_reads_your_own_voices_from_the_apps_file(addon_code, tmp_path,
+                                                             monkeypatch):
+    """A copy shipped with the app (the source tree's) isn't written to: the helper
+    takes your voices from the file the app names (helper_env)."""
+    _c, helper = addon_code
+    built = [v["id"] for v in helper.load_voices()["voices"]]
+    mine = tmp_path / "ai-voices.json"
+    mine.write_text(json.dumps({"voices": [
+        {"id": "my-robo", "name": "Robo", "mix": [[171, 1.0]], "formant": 0, "pitch_hz": 99},
+        {"id": "bear", "name": "Not mine", "mix": [[5, 1.0]]},
+        {"id": "my-empty", "name": "No mix"}]}), encoding="utf-8")
+    monkeypatch.setenv("ONIONBOARD_MY_AI_VOICES", str(mine))
+    voices = helper.load_voices()
+    assert [v["id"] for v in voices["voices"]] == built + ["my-robo"]
+    assert helper.pick(voices, "my-robo")["pitch_hz"] == 99
+    monkeypatch.setenv("ONIONBOARD_MY_AI_VOICES", str(tmp_path / "gone.json"))
+    assert [v["id"] for v in helper.load_voices()["voices"]] == built
+    assert aivoice.helper_env({})["ONIONBOARD_MY_AI_VOICES"].endswith("ai-voices.json")
+
+
 def test_the_addon_is_not_built_into_the_app():
     build = (ROOT / "build.ps1").read_text(encoding="utf-8")
     assert 'Where-Object Name -ne "ai-voices"' in build

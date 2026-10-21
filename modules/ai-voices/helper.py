@@ -50,7 +50,21 @@ MODEL_FILES = ("stream.onnx", "speaker.onnx", "voices.npz")
 
 
 def load_voices() -> dict:
-    return json.loads((HERE / "voices.json").read_text(encoding="utf-8"))
+    """voices.json, plus the user's own voices from the app's file
+    (ONIONBOARD_MY_AI_VOICES): a copy shipped with the app is never written to, so
+    they can't be in its voices.json. An older app never sets it."""
+    voices = json.loads((HERE / "voices.json").read_text(encoding="utf-8"))
+    mine = os.environ.get("ONIONBOARD_MY_AI_VOICES", "")
+    if mine:
+        try:
+            extra = json.loads(Path(mine).read_text(encoding="utf-8")).get("voices", [])
+        except (OSError, ValueError, AttributeError):
+            extra = []
+        have = {v.get("id") for v in voices["voices"]}
+        voices["voices"] += [v for v in extra if isinstance(v, dict) and v.get("mix")
+                             and str(v.get("id", "")).startswith("my-")
+                             and v["id"] not in have]
+    return voices
 
 
 def model_dir() -> Path:
@@ -258,6 +272,8 @@ def main(argv=None) -> int:
             elif t == "config":
                 try:
                     if "voice" in m:
+                        if not any(v["id"] == m["voice"] for v in voices["voices"]):
+                            voices = load_voices()     # one made since this started
                         voice = dict(pick(voices, str(m["voice"])))
                         voice["pitch"] = float(voice.get("pitch", 0.0)) + float(m.get("pitch", 0.0))
                         conv.set_voice(voice)

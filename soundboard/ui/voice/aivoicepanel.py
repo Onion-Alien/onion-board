@@ -797,8 +797,9 @@ class AiVoicePanel(QWidget):
 
     # ------------------------------------------------------------ your own voices
     def can_make(self) -> bool:
-        """Your own voices are written into the add-on: only the one you downloaded."""
-        return self.module is not None and aiaddon.removable(self.module)
+        """Any copy of the add-on: the one you downloaded gets your voices written into
+        its voices.json, one shipped with the app reads them from your file."""
+        return self.module is not None
 
     def _resync(self):
         """Your own voices changed: write them into the add-on and list them again."""
