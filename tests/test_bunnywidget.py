@@ -906,3 +906,24 @@ def test_the_store_and_oops_buns_rest_after_30_s(qapp):
     assert not card.bun.resting                      # a new problem stirs him
     bun.deleteLater()
     card.deleteLater()
+
+
+def test_only_bun_himself_takes_clicks_and_shows_the_hand(qapp):
+    from PySide6.QtCore import QPoint, Qt
+    from PySide6.QtTest import QTest
+    b = BunnyWidget(height=130, pad=18, sad=0.6, lines=("play?",), joy_lines=("yay",))
+    b.resize(b.sizeHint())
+    b.show()
+    body = b._bun_rect()
+    beside = QPoint(round(body.left()) - 30, round(body.center().y()))   # the bubble's room
+    assert b.width() > 2 * body.width() and not b.on_bun(beside)
+    QTest.mouseMove(b, beside)
+    assert b.cursor().shape() != Qt.CursorShape.PointingHandCursor
+    QTest.mouseClick(b, Qt.MouseButton.LeftButton, pos=beside)
+    assert b._joy_at < 0                                 # nothing happened
+    on = body.center().toPoint()
+    QTest.mouseMove(b, on)
+    assert b.cursor().shape() == Qt.CursorShape.PointingHandCursor
+    QTest.mouseClick(b, Qt.MouseButton.LeftButton, pos=on)
+    assert b._joy_at > 0                                 # he hops for joy
+    b.close()
