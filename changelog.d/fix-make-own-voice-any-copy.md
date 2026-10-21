@@ -1,1 +1,0 @@
-- AI voices: Make your own voice works when the app runs from source too. It used to do nothing there, because your voices were only written into a downloaded copy of the add-on; the add-on now also reads them from your own voices file.

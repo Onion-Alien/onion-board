@@ -1,1 +1,0 @@
-- Speak another language: no more empty gap between the card's intro and its language cards.

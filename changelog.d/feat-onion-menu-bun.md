@@ -1,2 +1,0 @@
-- The Help and community button at the sidebar's foot is Bun now, and its menu ends with Turn into Bun.
-- Turn into Bun puts Bun right in the middle of where the window was, instead of a corner or wherever he stood last time.

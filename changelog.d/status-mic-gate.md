@@ -1,1 +1,0 @@
-- The control API's status now says whether "mute my mic while a sound plays" is on, so a phone remote can show that switch.
