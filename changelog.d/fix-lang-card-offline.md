@@ -1,0 +1,1 @@
+- **Voice > Languages**: with Offline mode on and speech recognition not installed yet, the Languages tab hides (nothing there could work or be installed); once installed it stays, as it works offline. Before it is installed, the card no longer shows an ON / OFF switch and "Pick a language" with no languages to pick.
