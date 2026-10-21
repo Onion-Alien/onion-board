@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (QAbstractSpinBox, QApplication, QCheckBox, QDialo
                                QProgressBar, QPushButton, QVBoxLayout, QWidget)
 
 from soundboard.audio import livefx
+from soundboard.core import usage
 from soundboard.ui.kit import theme
 from soundboard import voicefx
 from soundboard.ui.bun import bunskits
@@ -288,6 +289,9 @@ class SpeedPitchButton(QPushButton):
         `redline`: the (slowest, fastest) speed once Redline is unlocked."""
         super().__init__()
         self.has_speed = what == "sounds"
+        self._what = what if what in usage.LIVE_TABS else "sounds"   # (usage.py's word)
+        self._seen = (1.0, 0.0, True)   # speed, pitch, keep: what a change is told by
+        self._seen_fx: dict[str, float] = {}
         self.setObjectName("small")
         self.setProperty("speedpitch", True)
         self.setToolTip({"radio": _("Pitch and effects of the radio"),
@@ -559,6 +563,8 @@ class SpeedPitchButton(QPushButton):
         if self.redline.isChecked() != on:
             self.redline.setChecked(on)   # comes back here through toggled
             return
+        if on:
+            self._count("redline")
         icons.set_icon(self.redline, "wave" if on else "shield", size=14)
         self.redline.setText(_("On") if on else _("Unlock"))
         self.speed.set_param(self._speed_hi if on else SPEED)
@@ -586,6 +592,7 @@ class SpeedPitchButton(QPushButton):
         self._edited()
 
     def reset(self):
+        self._count("reset")
         self.set_values(1.0, 0.0, self.keep.isChecked())
         self.set_fx({})
         if self.setup_name:
@@ -653,6 +660,7 @@ class SpeedPitchButton(QPushButton):
         """A preset sets its knobs; clicked again (lit) the knobs go back to how they
         were before it, not all off: a tweak made before picking it isn't lost."""
         if on:
+            self._count(f"preset-{usage.live_preset_tag(name)}")
             before = self.fx_values()
             self.set_fx(livefx.PRESETS[name])
             self._before_preset = (name, before)
@@ -662,6 +670,9 @@ class SpeedPitchButton(QPushButton):
 
     def _fx_edited(self):
         now = self.fx_values()
+        was, self._seen_fx = self._seen_fx, now
+        self._count(*(f"fx-{k}" for k in sorted(set(was) | set(now))
+                      if was.get(k) != now.get(k)))
         for name, b in self.fx_presets.items():   # lit while the knobs match it
             b.setChecked(now == livefx.clean(livefx.PRESETS[name]))
         self._label()
@@ -681,6 +692,7 @@ class SpeedPitchButton(QPushButton):
 
     def _open(self):
         if not self.pop.isVisible():
+            usage.used(f"live-opened-{self._what}")   # the tab's name only (usage.py)
             self.opening.emit()
         # settle the layouts first: right after Redline hides its box, the column's
         # and the popup's size hint (and the popup's minimum) still hold the old,
@@ -735,7 +747,19 @@ class SpeedPitchButton(QPushButton):
         if sheet != self.styleSheet():
             self.setStyleSheet(sheet)
 
+    def _count(self, *names: str):
+        """Something changed while the pop-up is open, by hand (not the values put back
+        at start): for the usage count, which tab's and which controls, by name only."""
+        if names and self.pop.isVisible():
+            usage.used(f"live-changed-{self._what}")
+            for n in names:
+                usage.used(f"live-{n}")
+
     def _edited(self):
+        now = self.values()
+        was, self._seen = self._seen, now
+        self._count(*(n for n, a, b in zip(("speed", "pitch", "keep-pitch"), was, now)
+                      if a != b))
         self._label()
         self.meter.set_value(self.speed.value() if self.has_speed else self.pitch.value())
         self.changed.emit(*self.values())

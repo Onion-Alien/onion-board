@@ -20,6 +20,7 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import QObject, QTimer, QUrl, Signal
 
 from soundboard.control import streamapi
+from soundboard.core import usage
 from soundboard.core.pollthread import PollThread
 from soundboard.i18n import _
 from soundboard.online import net, twitch
@@ -116,6 +117,7 @@ class TwitchLink(QObject):
         if not net.allowed(twitch.FEATURE):
             self.login_done.emit(False, net.off_message(twitch.FEATURE))
             return
+        usage.used("twitch-login")
         self._run(twitch.start_login, self._got_code)
 
     def cancel_login(self):
@@ -147,6 +149,7 @@ class TwitchLink(QObject):
             return
         if isinstance(out, Exception):
             self._login = None
+            usage.used("twitch-login-failed")
             self.login_done.emit(False, _("Twitch said no: {error}", error=str(out)))
             return
         if out is None:   # not yet
@@ -157,6 +160,7 @@ class TwitchLink(QObject):
 
     def _signed_in(self, out):
         if isinstance(out, Exception):
+            usage.used("twitch-login-failed")
             self.login_done.emit(False, _("Couldn't reach Twitch: {error}", error=str(out)))
             return
         tokens, who = out
@@ -365,7 +369,9 @@ class TwitchLink(QObject):
         mw = self.mw
         sub = _d(payload.get("subscription"))
         event = _d(payload.get("event"))
-        if sub.get("type") == "channel.chat.message":
+        chat = sub.get("type") == "channel.chat.message"
+        usage.used("twitch-chat" if chat else "twitch-event")   # the kind only (usage.py)
+        if chat:
             badges = {b.get("set_id") for b in event.get("badges") or [] if isinstance(b, dict)}
             message = _d(event.get("message"))
             params = {"user": str(event.get("chatter_user_name") or ""),

@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QGridLayout, 
 from shiboken6 import isValid as qt_valid
 
 from soundboard.control import streamapi, twitchlink
+from soundboard.core import usage
 from soundboard.i18n import _
 from soundboard.online import twitch
 from soundboard.ui.kit import busy, icons, theme
@@ -204,6 +205,7 @@ class TwitchCard(QObject):
     def _guide(self):
         from soundboard.ui.kit.crashdialog import free_dialog
         from soundboard.ui.settings.twitchguide import TwitchGuide
+        usage.used("twitch-guide")
         g = TwitchGuide(self.page.dlg, self.mw)
         g.exec()
         free_dialog(g)
@@ -211,6 +213,7 @@ class TwitchCard(QObject):
     def _copy_prompt(self, btn):
         from soundboard.ui.settings.twitchguide import copy_twitch_prompt
         copy_twitch_prompt(self.mw)
+        usage.used("twitch-prompt-copied")
         busy.flash(btn, _("✓ Copied"))
         busy.toast(self.page.dlg, html.escape(_(
             "Copied. Paste it into ChatGPT, Claude or any AI chat and say what you want "

@@ -1,5 +1,7 @@
 """Achievements (Settings > Achievements): milestones for using the app, kept on this
-PC only, in cfg.achievements. Nothing about them is ever sent anywhere.
+PC only, in cfg.achievements. All the usage count (usage.py) sends of them is which
+ones were earned, by id (usage.achieved), and roughly how many: never when, or the
+counts behind them.
 
 Counting is cheap on purpose: a used() feature, a play or a vote is one dict lookup,
 an add to a number or a set, and a check of only the achievements that number feeds.

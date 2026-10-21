@@ -301,3 +301,38 @@ def test_my_setups_label_lines_up_with_its_chips(qapp):
     chip = b._setup_chips[""]
     assert b._setups_lab.property("head") is True
     assert b._setups_lab.height() == chip.sizeHint().height()
+
+
+@pytest.mark.parametrize("what", ["sounds", "radio"])
+def test_live_controls_count_opening_and_what_changed_by_name(qapp, what, monkeypatch):
+    """The usage count hears that it was opened, that something changed in it and which
+    control, never the values; values put back while it's shut (at start) aren't a use."""
+    from soundboard.core import usage
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
+
+    monkeypatch.setattr(usage, "_used", set())
+    b = SpeedPitchButton(what)
+    try:
+        b.set_values(1.5, 3, False)   # the saved values, at start
+        b.set_fx({"bass": 6})
+        assert usage._used == set()
+        b._open()
+        assert usage._used == {f"live-opened-{what}"}
+        b.pitch.set_value(5)
+        b.set_fx({"bass": 6, "reverb": 0.4})
+        b.fx_presets["Canyon"].click()
+        b.set_redline(True)
+        b.reset()
+        assert {f"live-changed-{what}", "live-pitch", "live-fx-reverb", "live-fx-echo",
+                "live-preset-canyon", "live-redline", "live-reset"} <= usage._used
+        assert usage._used <= set(usage.FEATURES)
+    finally:
+        b.pop.close()
+        b.deleteLater()
+
+
+def test_every_live_preset_and_effect_has_a_count_name():
+    from soundboard.audio import livefx
+    from soundboard.core import usage
+    assert {usage.live_preset_tag(n) for n in livefx.PRESETS} == set(usage.LIVE_PRESETS) - {"other"}
+    assert {f"fx-{q.key}" for q in livefx.PARAMS} <= set(usage.LIVE_CONTROLS)

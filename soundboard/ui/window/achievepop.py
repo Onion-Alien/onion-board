@@ -20,7 +20,7 @@ from PySide6.QtGui import (QColor, QFont, QFontMetrics, QGuiApplication,
 from PySide6.QtWidgets import QWidget
 from shiboken6 import isValid as qt_valid
 
-from soundboard.core import achievements
+from soundboard.core import achievements, usage
 from soundboard.i18n import _
 from soundboard.ui.kit import icons
 from soundboard.ui.settings import lite
@@ -255,6 +255,7 @@ class AchievementPops(QObject):
         self._next()
 
     def _add(self, aid: str):
+        usage.achieved(aid)   # its id only, for the next daily count
         cfg = getattr(self.mw, "cfg", None)
         if not getattr(cfg, "achievement_popups", True):
             return   # (turned off in Settings > Achievements: still earned, just quiet)

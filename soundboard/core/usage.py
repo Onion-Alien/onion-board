@@ -36,7 +36,8 @@ one (`sounds/11-50`, `played/1-10`), how long the app was open since then
 (`open/1-3h`), how many sounds were fetched from a link or a web search since then
 (`downloads/2-5`), how many times it was started since then (`launches/2-5`), the system
 (`os/win11`, `os/win10`), the app's language (`lang/de`), its theme (`theme/dark`: a
-built-in theme's name, else `other`), and which features
+built-in theme's name, else `other`), how many achievements were earned
+(`achievements/3-5`), and which features
 were used since then (`used/voice-changer`, `used/more-tabs-added-radio`: the names
 in FEATURES only; for the Triggers tab, the names the Onion Watch add-on passes to
 triggershost.BoardHost.count, as `used/triggers-mode-colour`). A use is only noted
@@ -157,6 +158,15 @@ ADDONS = ("ai-voices", "live-voice", "other")
 PACKS = ("streamer", "esports", "general", "podcast", "halloween", "gm-starter", "other")
 # the Live controls' tabs (ui/voice/livesetups.py)
 LIVE_TABS = ("sounds", "radio", "apps")
+# the Live controls' sliders and switches (ui/sounds/speedpitch.py; the effects by their
+# livefx.PARAMS keys, "crunch" being Distortion)
+LIVE_CONTROLS = ("speed", "pitch", "keep-pitch", "redline", "reset",
+                 *(f"fx-{k}" for k in ("bass", "treble", "muffle", "reverb", "echo", "crunch")))
+# their effect presets (audio/livefx.py PRESETS, as dashed words); any other is "other"
+LIVE_PRESETS = ("bass-boosted", "blown-out", "concert-hall", "canyon", "underwater",
+                "phone-call", "other")
+# what was done to a Voice tab recording or an Apps tab saved clip (ui/apps/clipshelf.py)
+CLIP_ACTIONS = ("play", "mic", "add", "copy", "delete")
 # Bun's games (ui/bun/bunpong.py games()); any other is "other"
 BUN_GAMES = ("pong", "draw", "rps", "ttt", "other")
 # the rare loading screens (ui/bun/splashacts.py RARES' keys)
@@ -370,7 +380,38 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # a deleted category's Undo; a sound played while muted (the note), its Go live
             "category-undo", "muted-note", "muted-go-live",
             # Plain instead of Textured (features_now)
-            "textures-off")
+            "textures-off",
+            # Live controls (ui/sounds/speedpitch.py): opened, and changed while open, on
+            # the Sounds tab, the radio or the programs (LIVE_TABS); which control
+            # (LIVE_CONTROLS) or preset (LIVE_PRESETS): names only, never the values
+            *(f"live-opened-{k}" for k in LIVE_TABS), *(f"live-changed-{k}" for k in LIVE_TABS),
+            *(f"live-{k}" for k in LIVE_CONTROLS), *(f"live-preset-{k}" for k in LIVE_PRESETS),
+            # Settings > Achievements: one earned (achieved(): its id, from the fixed list in
+            # core/achievements.py), the filters used; pop-ups or their chime on
+            # (features_now)
+            *(f"ach-{a.id.replace('_', '-')}" for a in achievements.ALL),   # (ach_tag)
+            "achievements-filter",
+            "achievement-popups", "achievement-chime",
+            # Lite mode on, Use less CPU picked by hand on or off (features_now); a slower
+            # PC's Lite mode hint shown, and its Turn on
+            "lite-mode", "light-voice-on", "light-voice-off", "lite-suggested",
+            "lite-suggested-on",
+            # Connect Twitch: signed in (features_now), Connect clicked, the sign-in
+            # failing; a chat line or another event (an alert, channel points) from
+            # Twitch; its step-by-step guide, its Copy AI prompt
+            "twitch-connected", "twitch-login", "twitch-login-failed", "twitch-chat",
+            "twitch-event", "twitch-guide", "twitch-prompt-copied",
+            # the Voice tab's recordings and the Apps tab's saved clips: what was done to
+            # one (CLIP_ACTIONS: played, sent through the mic, added to Sounds, copied,
+            # deleted)
+            *(f"voice-rec-{k}" for k in CLIP_ACTIONS), *(f"saved-clip-{k}" for k in CLIP_ACTIONS),
+            # a voice searched for (never the words); the Stream Deck plugin answered;
+            # Play next on a Community tab card; Edit sound's Reset effects
+            "voice-search", "remote-stream-deck", "store-play-next", "pad-effects-reset",
+            # Windows started the app again after it crashed or hung
+            "crash-restarted",
+            # the onion on Settings > About: poked, ate the window, given back early
+            "egg-onion-poked", "egg-onion-eaten", "egg-onion-please")
 STEPS = ("added-sound", "played-sound", "sent-to-others",
          # a tab a new user starts without (+ More tabs, Settings > Tabs)
          "added-radio-tab", "added-apps-tab", "added-triggers-tab")
@@ -616,7 +657,7 @@ def addon_tag(module_id: str) -> str:
 
 def used(key: str) -> None:
     """Feature `key` (one of FEATURES) was used, for the next daily count (and for
-    Settings > Achievements, which never sends anything)."""
+    Settings > Achievements' counting)."""
     achievements.event(key)
     if key in FEATURES:
         _used.add(key)
@@ -722,6 +763,16 @@ def features_now(cfg) -> list[str]:
         out.append("sound-voice")
     if any(v.get("ai") for v in voices):
         out.append("sound-ai-voice")
+    if cfg.lite_mode:
+        out.append("lite-mode")
+    if cfg.light_voice in ("on", "off"):   # picked by hand ("auto" follows Lite mode)
+        out.append(f"light-voice-{cfg.light_voice}")
+    if cfg.twitch_token:
+        out.append("twitch-connected")
+    if cfg.achievement_popups:
+        out.append("achievement-popups")
+        if cfg.achievement_sound:
+            out.append("achievement-chime")
     from soundboard.mic import michelper
     if cfg.route == "mic" and michelper.known():   # its last check's answer, no new one
         out.append("mic-helper")
@@ -730,6 +781,31 @@ def features_now(cfg) -> list[str]:
 
 def _positive(v) -> bool:
     return isinstance(v, (int, float)) and not isinstance(v, bool) and v > 0
+
+
+def ach_tag(ach_id: str) -> str:
+    """An achievement's id as a count's word: first_blood -> ach-first-blood."""
+    return "ach-" + ach_id.replace("_", "-")
+
+
+def achieved(ach_id: str) -> None:
+    """An achievement was earned (core/achievements.py): its id, for the next daily count.
+    Ids not in its fixed list (a newer version's) are never sent."""
+    if ach_id in achievements.BY_ID:
+        used(ach_tag(ach_id))
+
+
+def live_preset_tag(name: str) -> str:
+    """A Live controls effect preset's name as a count's word ("Bass boosted" ->
+    bass-boosted); one not in LIVE_PRESETS is "other"."""
+    tag = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+    return tag if tag in LIVE_PRESETS else "other"
+
+
+def ach_bucket(n: int) -> str:
+    """How many achievements were earned, roughly."""
+    return ("0" if n <= 0 else "1-2" if n <= 2 else "3-5" if n <= 5 else
+            "6-10" if n <= 10 else "11-20" if n <= 20 else "21-plus")
 
 
 def game_tag(name: str) -> str:
@@ -767,6 +843,8 @@ def about(cfg, now: float) -> list[str]:
     out.append(f"theme/{theme_tag(cfg.theme)}")
     out.append(f"os/{os_tag()}")
     out.append(f"launches/{launch_bucket(cfg.stats_launches or 0)}")
+    got = cfg.achievements.get("got") if isinstance(cfg.achievements, dict) else None
+    out.append(f"achievements/{ach_bucket(len(got) if isinstance(got, dict) else 0)}")
     have = (set(cfg.stats_used if isinstance(cfg.stats_used, list) else [])
             | set(features_now(cfg)))
     out += [f"used/{k}" for k in FEATURES if k in have]
@@ -1100,8 +1178,19 @@ def update_event(to: str) -> str:
     return f"update-now/{__version__}-to-{to}"
 
 
+MAX_HITS = 100   # GoatCounter's most per request: a longer list goes in parts
+
+
 def send(payload: list[dict], timeout: float = TIMEOUT_S, no_sessions: bool = False) -> bool:
-    """POST them to the counter. True if it took them. Call off the UI thread."""
+    """POST them to the counter, MAX_HITS at a time. True if it took them all (it stops
+    at the first part it didn't take). Call off the UI thread."""
+    for i in range(0, max(len(payload), 1), MAX_HITS):
+        if not _send_part(payload[i:i + MAX_HITS], timeout, no_sessions):
+            return False
+    return True
+
+
+def _send_part(payload: list[dict], timeout: float, no_sessions: bool) -> bool:
     body = json.dumps({"hits": payload, "no_sessions": True} if no_sessions
                       else {"hits": payload}).encode("utf-8")
     req = urllib.request.Request(ENDPOINT, data=body, method="POST", headers={

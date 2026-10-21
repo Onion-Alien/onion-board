@@ -59,7 +59,7 @@ class _Inline:
 
 
 ABOUT = ("age/", "route/", "sounds/", "played/", "open/", "lang/", "used/", "os/",
-         "launches/", "downloads/", "theme/")
+         "launches/", "downloads/", "theme/", "achievements/")
 
 
 def _hits(req, about=False) -> list[dict]:
@@ -1345,3 +1345,38 @@ def test_plain_themes_count_as_textures_off():
     """Textured is the default: only a board set to Plain sends `textures-off`."""
     assert "textures-off" not in usage.features_now(Config())
     assert "textures-off" in usage.features_now(Config(theme_texture=False))
+
+
+def test_an_earned_achievement_is_counted_by_its_id_only(sent):
+    usage.achieved("first_blood")
+    usage.achieved("made_up_by_a_newer_version")
+    assert usage._used == {"ach-first-blood"}
+    from soundboard.core import achievements
+    assert {usage.ach_tag(a.id) for a in achievements.ALL} <= set(usage.FEATURES)
+
+
+def test_the_daily_count_says_roughly_how_many_achievements(sent):
+    cfg = Config()
+    assert "achievements/0" in usage.about(cfg, 1e9)
+    cfg.achievements = {"got": {"first_blood": 1, "critic": 2, "regular": 3}}
+    assert "achievements/3-5" in usage.about(cfg, 1e9)
+    assert [usage.ach_bucket(n) for n in (1, 2, 6, 11, 21, 56)] == [
+        "1-2", "1-2", "6-10", "11-20", "21-plus", "21-plus"]
+
+
+def test_lite_twitch_and_achievement_pop_ups_count_every_day():
+    cfg = Config(lite_mode=True, light_voice="off", twitch_token="t",
+                 achievement_popups=True, achievement_sound=True)
+    now = set(usage.features_now(cfg))
+    assert {"lite-mode", "light-voice-off", "twitch-connected", "achievement-popups",
+            "achievement-chime"} <= now <= set(usage.FEATURES)
+    assert not {"lite-mode", "light-voice-on", "light-voice-off", "twitch-connected",
+                "achievement-popups", "achievement-chime"} & set(usage.features_now(Config()))
+
+
+def test_a_long_send_goes_in_parts_goatcounter_takes(sent):
+    hits = [{"path": f"used/x{i}", "event": True} for i in range(usage.MAX_HITS * 2 + 5)]
+    assert usage.send(hits)
+    parts = [json.loads(req.data)["hits"] for req, _f in sent]
+    assert [len(p) for p in parts] == [usage.MAX_HITS, usage.MAX_HITS, 5]
+    assert [h for p in parts for h in p] == hits

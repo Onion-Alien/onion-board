@@ -122,3 +122,12 @@ def test_pop_ups_turned_off_show_nothing_and_play_nothing(qapp, pops):
     pops.earned.emit("first_blood")
     process_events(qapp, lambda: pops.showing, timeout=0.3)
     assert not pops.showing and not pops.queue and pops.mw.engine.played == []
+
+
+def test_an_earned_one_is_counted_by_its_id_even_with_pop_ups_off(qapp, pops, monkeypatch):
+    from soundboard.core import usage
+    monkeypatch.setattr(usage, "_used", set())
+    pops.mw.cfg = Config()   # pop-ups off: still earned, so still counted
+    pops.earned.emit("golden_bun")
+    process_events(qapp, lambda: "ach-golden-bun" in usage._used, timeout=1)
+    assert usage._used == {"ach-golden-bun"}

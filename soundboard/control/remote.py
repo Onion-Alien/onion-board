@@ -544,6 +544,8 @@ class RemoteControl(QObject):
             job.status, job.body = self.dispatch(job.action, job.params)
             if job.status == 200:   # the name only (usage.py)
                 usage.used("remote-used-phone" if self.lan else "remote-used-api")
+                if job.action == "key_image":   # only the Stream Deck plugin asks for these
+                    usage.used("remote-stream-deck")
         except Exception:  # noqa: BLE001 - a bad request must never take the app down
             log.exception("%s request %s failed", self.name, job.action)
             job.status, job.body = 500, {"error": "internal error (see the log)"}
