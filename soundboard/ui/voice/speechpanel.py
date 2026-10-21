@@ -374,6 +374,7 @@ class SpeechPanel(QWidget):
         urow = QHBoxLayout()
         urow.setSpacing(8)
         urow.addWidget(inst.b_update)
+        urow.addWidget(inst.b_remove)
         inst.tr_row.removeWidget(inst.b_dl_remove)   # rarely wanted: not by Speak in
         urow.addWidget(inst.b_dl_remove)
         urow.addStretch(1)

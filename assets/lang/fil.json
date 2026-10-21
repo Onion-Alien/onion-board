@@ -4368,5 +4368,9 @@
   "Take the Live controls effects off": "Alisin ang mga effect ng Live controls",
   "{name} (modified {n})": "{name} (binago {n})",
   "{name} (modified)": "{name} (binago)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Naidagdag ang “{name}”, ang bilis at pitch nito ay hanggang sa kayang i-save ng pad"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Naidagdag ang “{name}”, ang bilis at pitch nito ay hanggang sa kayang i-save ng pad",
+  "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Burahin ang speech recognition at bawat na-download na wika sa PC na ito? Makukuha mo ulit ang mga ito anumang oras.",
+  "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Binubura ang speech recognition, ang mga speech model nito at bawat na-download na wika sa PC na ito. Makukuha mo ulit ang mga ito anumang oras.",
+  "Languages are removed.": "Naalis na ang mga wika.",
+  "Remove languages": "Alisin ang mga wika"
 }

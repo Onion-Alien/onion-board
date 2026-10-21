@@ -4445,5 +4445,9 @@
   "Take the Live controls effects off": "Scoate efectele controalelor live",
   "{name} (modified {n})": "{name} (modificat {n})",
   "{name} (modified)": "{name} (modificat)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Am adăugat „{name}”, cu viteza și înălțimea în limita a ce poate salva un pad"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Am adăugat „{name}”, cu viteza și înălțimea în limita a ce poate salva un pad",
+  "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Ștergi recunoașterea vocală și fiecare limbă descărcată de pe acest PC? Le poți obține din nou oricând.",
+  "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Șterge recunoașterea vocală, modelele ei vocale și fiecare limbă descărcată de pe acest PC. Le poți obține din nou oricând.",
+  "Languages are removed.": "Limbile au fost eliminate.",
+  "Remove languages": "Elimină limbile"
 }

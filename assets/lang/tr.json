@@ -4368,5 +4368,9 @@
   "Take the Live controls effects off": "Canlı kontrollerin efektlerini çıkar",
   "{name} (modified {n})": "{name} (değiştirildi {n})",
   "{name} (modified)": "{name} (değiştirildi)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” eklendi, hızı ve perdesi bir pad'in kaydedebileceği kadar"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” eklendi, hızı ve perdesi bir pad'in kaydedebileceği kadar",
+  "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Konuşma tanıma ve indirilen her dil bu bilgisayardan silinsin mi? İstediğin zaman yeniden alabilirsin.",
+  "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Konuşma tanımayı, konuşma modellerini ve indirilen her dili bu bilgisayardan siler. İstediğin zaman yeniden alabilirsin.",
+  "Languages are removed.": "Diller kaldırıldı.",
+  "Remove languages": "Dilleri kaldır"
 }

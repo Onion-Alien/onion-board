@@ -4291,5 +4291,9 @@
   "Take the Live controls effects off": "Bỏ hiệu ứng điều khiển trực tiếp",
   "{name} (modified {n})": "{name} (đã sửa {n})",
   "{name} (modified)": "{name} (đã sửa)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Đã thêm “{name}”, tốc độ và cao độ giữ trong mức pad có thể lưu"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Đã thêm “{name}”, tốc độ và cao độ giữ trong mức pad có thể lưu",
+  "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Xóa nhận dạng giọng nói và mọi ngôn ngữ đã tải khỏi PC này? Bạn có thể tải lại bất cứ lúc nào.",
+  "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Xóa nhận dạng giọng nói, các mô hình giọng nói của nó và mọi ngôn ngữ đã tải khỏi PC này. Có thể tải lại bất cứ lúc nào.",
+  "Languages are removed.": "Đã xóa các ngôn ngữ.",
+  "Remove languages": "Xóa ngôn ngữ"
 }

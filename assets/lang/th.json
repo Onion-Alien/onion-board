@@ -4291,5 +4291,9 @@
   "Take the Live controls effects off": "เอาเอฟเฟกต์ของการควบคุมสดออก",
   "{name} (modified {n})": "{name} (แก้ไข {n})",
   "{name} (modified)": "{name} (แก้ไข)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ เพิ่ม “{name}” แล้ว ความเร็วและระดับเสียงอยู่ในขอบเขตที่แพดบันทึกได้"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ เพิ่ม “{name}” แล้ว ความเร็วและระดับเสียงอยู่ในขอบเขตที่แพดบันทึกได้",
+  "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "ลบการรู้จำเสียงพูดและทุกภาษาที่ดาวน์โหลดไว้ออกจากพีซีนี้หรือไม่? ดาวน์โหลดใหม่ได้ทุกเมื่อ",
+  "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "ลบการรู้จำเสียงพูด โมเดลเสียงพูด และทุกภาษาที่ดาวน์โหลดไว้ออกจากพีซีนี้ ดาวน์โหลดใหม่ได้ทุกเมื่อ",
+  "Languages are removed.": "ลบภาษาแล้ว",
+  "Remove languages": "ลบภาษา"
 }

@@ -4291,5 +4291,9 @@
   "Take the Live controls effects off": "Lepas efek kontrol live",
   "{name} (modified {n})": "{name} (diubah {n})",
   "{name} (modified)": "{name} (diubah)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” ditambahkan, kecepatan dan nadanya dibatasi sesuai yang bisa disimpan pad"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” ditambahkan, kecepatan dan nadanya dibatasi sesuai yang bisa disimpan pad",
+  "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Hapus pengenalan suara dan setiap bahasa yang diunduh dari PC ini? Kamu bisa mendapatkannya lagi kapan saja.",
+  "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Menghapus pengenalan suara, model suaranya, dan setiap bahasa yang diunduh dari PC ini. Dapatkan lagi kapan saja.",
+  "Languages are removed.": "Bahasa sudah dihapus.",
+  "Remove languages": "Hapus bahasa"
 }

@@ -4368,5 +4368,9 @@
   "Take the Live controls effects off": "Effekte der Live-Regler entfernen",
   "{name} (modified {n})": "{name} (geändert {n})",
   "{name} (modified)": "{name} (geändert)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ „{name}“ hinzugefügt, Tempo und Tonhöhe auf das begrenzt, was ein Pad speichern kann"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ „{name}“ hinzugefügt, Tempo und Tonhöhe auf das begrenzt, was ein Pad speichern kann",
+  "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Spracherkennung und alle heruntergeladenen Sprachen von diesem PC löschen? Du kannst sie jederzeit wieder holen.",
+  "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Löscht die Spracherkennung, ihre Sprachmodelle und jede heruntergeladene Sprache von diesem PC. Du kannst sie jederzeit wieder holen.",
+  "Languages are removed.": "Sprachen sind entfernt.",
+  "Remove languages": "Sprachen entfernen"
 }

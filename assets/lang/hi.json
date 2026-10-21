@@ -4368,5 +4368,9 @@
   "Take the Live controls effects off": "लाइव कंट्रोल के इफ़ेक्ट हटाएँ",
   "{name} (modified {n})": "{name} (बदला गया {n})",
   "{name} (modified)": "{name} (बदला गया)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” जोड़ा, इसकी स्पीड और पिच उतनी रखी जितनी पैड सेव कर सकता है"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” जोड़ा, इसकी स्पीड और पिच उतनी रखी जितनी पैड सेव कर सकता है",
+  "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "इस PC से वाक् पहचान और हर डाउनलोड की गई भाषा हटाएँ? आप इन्हें कभी भी फिर से पा सकते हैं।",
+  "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "इस PC से वाक् पहचान, उसके वाक् मॉडल और हर डाउनलोड की गई भाषा हटाता है। इन्हें कभी भी फिर से पाएँ।",
+  "Languages are removed.": "भाषाएँ हटा दी गईं।",
+  "Remove languages": "भाषाएँ हटाएँ"
 }

@@ -4368,5 +4368,9 @@
   "Take the Live controls effects off": "Махни ефектите от управлението на живо",
   "{name} (modified {n})": "{name} (променен {n})",
   "{name} (modified)": "{name} (променен)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ „{name}“ е добавен, скоростта и тонът му са до колкото един пад може да запази"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ „{name}“ е добавен, скоростта и тонът му са до колкото един пад може да запази",
+  "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Да се изтрие ли разпознаването на реч и всеки изтеглен език от този компютър? Можете да ги вземете отново по всяко време.",
+  "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Изтрива разпознаването на реч, моделите му за реч и всеки изтеглен език от този компютър. Можете да ги вземете отново по всяко време.",
+  "Languages are removed.": "Езиците са премахнати.",
+  "Remove languages": "Премахни езиците"
 }

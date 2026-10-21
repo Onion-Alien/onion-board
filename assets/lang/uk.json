@@ -4445,5 +4445,9 @@
   "Take the Live controls effects off": "Зняти ефекти живого керування",
   "{name} (modified {n})": "{name} (змінено {n})",
   "{name} (modified)": "{name} (змінено)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Додано «{name}», швидкість і висота в межах того, що може зберегти пед"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Додано «{name}», швидкість і висота в межах того, що може зберегти пед",
+  "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Видалити розпізнавання мовлення та всі завантажені мови з цього ПК? Їх можна завантажити знову будь-коли.",
+  "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Видаляє розпізнавання мовлення, його мовні моделі та всі завантажені мови з цього ПК. Їх можна завантажити знову будь-коли.",
+  "Languages are removed.": "Мови видалено.",
+  "Remove languages": "Видалити мови"
 }

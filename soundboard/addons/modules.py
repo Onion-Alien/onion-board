@@ -516,6 +516,22 @@ def uninstall(module_id: str, base: Path | None = None) -> None:
     log.info("removed module %s from %s", module_id, dest)
 
 
+def remove_env(info: ModuleInfo) -> None:
+    """Delete what a service's install made in its folder (its .venv), keeping the
+    add-on itself: moved aside in one step, so it's either set up or not, then deleted.
+    Nothing there is fine. Raises ModuleError (a file in it still in use)."""
+    venv = info.path / ".venv"
+    if not venv.exists():
+        return
+    gone = info.path / f".venv-old-{uuid.uuid4().hex[:8]}"
+    try:
+        os.rename(venv, gone)
+    except OSError as e:
+        raise ModuleError(_("it couldn't be removed ({error})", error=errors.plain(e))) from e
+    shutil.rmtree(gone, ignore_errors=True)
+    log.info("removed the environment of module %s", info.id)
+
+
 # Add-on copies left in %APPDATA%\OnionBoard (and its modules\): install_zip's and
 # uninstall's own temp folders when deleting them failed (a file still open), and old
 # or half-swapped copies of an add-on beside the real one ("onion-watch-old3",

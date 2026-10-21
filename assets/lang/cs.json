@@ -4445,5 +4445,9 @@
   "Take the Live controls effects off": "Sundat efekty živého ovládání",
   "{name} (modified {n})": "{name} (upraveno {n})",
   "{name} (modified)": "{name} (upraveno)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ „{name}“ přidáno, rychlost a výška omezené na to, co pad uloží"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ „{name}“ přidáno, rychlost a výška omezené na to, co pad uloží",
+  "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Smazat rozpoznávání řeči a všechny stažené jazyky z tohoto PC? Můžete je kdykoli získat znovu.",
+  "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Smaže rozpoznávání řeči, jeho řečové modely a všechny stažené jazyky z tohoto PC. Můžete je kdykoli získat znovu.",
+  "Languages are removed.": "Jazyky jsou odebrány.",
+  "Remove languages": "Odebrat jazyky"
 }

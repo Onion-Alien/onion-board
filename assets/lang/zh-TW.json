@@ -4291,5 +4291,9 @@
   "Take the Live controls effects off": "拿掉即時控制的效果",
   "{name} (modified {n})": "{name} （已修改 {n}）",
   "{name} (modified)": "{name} （已修改）",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ 已加入「{name}」，速度和音調已限制在打擊墊能儲存的範圍內"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ 已加入「{name}」，速度和音調已限制在打擊墊能儲存的範圍內",
+  "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "要從這台電腦刪除語音辨識和所有已下載的語言嗎？隨時可以重新取得。",
+  "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "從這台電腦刪除語音辨識、它的語音模型和所有已下載的語言。隨時可以重新取得。",
+  "Languages are removed.": "語言已刪除。",
+  "Remove languages": "刪除語言"
 }

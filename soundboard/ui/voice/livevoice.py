@@ -215,6 +215,7 @@ class LiveVoice(QObject):
         _enable(p.installs.b_update, not on,
                 _("Stop the computer voice to change this") if on
                 else _("Waiting for the install to finish"))
+        _enable(p.installs.b_remove, not on, _("Stop the computer voice to change this"))
         self.lbl_state.setText(state)
         if not on:
             self.dl_bar.hide()

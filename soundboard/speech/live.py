@@ -18,7 +18,10 @@ from __future__ import annotations
 
 import logging
 import math
+import os
+import shutil
 from collections.abc import Callable, Sequence
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -36,6 +39,36 @@ if TYPE_CHECKING:
     from soundboard.speech.aivoice import AiVoiceController
 
 log = logging.getLogger(__name__)
+
+
+def speech_model_dirs() -> list[Path]:
+    """The speech recognition models the live voice downloaded: faster-whisper's own
+    (core.backup.SPEECH_MODELS), in the Hugging Face cache. Only those folders, never
+    the rest of the cache (other programs share it)."""
+    from soundboard.core.backup import SPEECH_MODELS
+    hub = os.environ.get("HF_HUB_CACHE") or os.path.join(
+        os.environ.get("HF_HOME") or os.path.join(Path.home(), ".cache", "huggingface"),
+        "hub")
+    dirs = (Path(hub) / f"models--Systran--faster-whisper-{m}" for m in SPEECH_MODELS)
+    return [d for d in dirs if d.exists()]
+
+
+def remove_recognition(module: ModuleInfo | None, langs: Sequence[ModuleInfo]) -> bool:
+    """Take speech recognition back off this PC: the live-voice add-on's Python
+    environment, its speech models and every downloaded translation. The add-on stays
+    (it comes with the app), so Install speech recognition gets it all back. Returns
+    whether everything went. Raises ModuleError when the environment can't be moved."""
+    from soundboard.addons import modules as mods
+    from soundboard.speech import translation
+    if module is not None:
+        mods.remove_env(module)
+    for m in langs:
+        translation.remove(m)
+    for d in speech_model_dirs():
+        shutil.rmtree(d, ignore_errors=True)
+    return ((module is None or not (module.path / ".venv").exists())
+            and not speech_model_dirs()
+            and not any(translation.model_dir(m).exists() for m in langs))
 
 TTS_SID = "tts"
 NO_OUTPUT = "No audio device is open, pick one in Setup"

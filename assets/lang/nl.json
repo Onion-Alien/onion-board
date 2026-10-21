@@ -4368,5 +4368,9 @@
   "Take the Live controls effects off": "Effecten van de live-bediening eraf halen",
   "{name} (modified {n})": "{name} (aangepast {n})",
   "{name} (modified)": "{name} (aangepast)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” toegevoegd, snelheid en toonhoogte binnen wat een pad kan opslaan"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” toegevoegd, snelheid en toonhoogte binnen wat een pad kan opslaan",
+  "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "Spraakherkenning en elke gedownloade taal van deze pc verwijderen? Je kunt ze altijd opnieuw ophalen.",
+  "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "Verwijdert spraakherkenning, de spraakmodellen en elke gedownloade taal van deze pc. Je kunt ze altijd opnieuw ophalen.",
+  "Languages are removed.": "Talen zijn verwijderd.",
+  "Remove languages": "Talen verwijderen"
 }

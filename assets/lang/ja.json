@@ -4291,5 +4291,9 @@
   "Take the Live controls effects off": "ライブ操作のエフェクトを外す",
   "{name} (modified {n})": "{name} (変更 {n})",
   "{name} (modified)": "{name} (変更)",
-  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ 「{name}」を追加しました。速度とピッチはパッドに保存できる範囲に収めました"
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ 「{name}」を追加しました。速度とピッチはパッドに保存できる範囲に収めました",
+  "Delete speech recognition and every downloaded language from this PC? You can get them again any time.": "このPCから音声認識とダウンロードしたすべての言語を削除しますか？いつでも再取得できます。",
+  "Deletes speech recognition, its speech models and every downloaded language from this PC. Get them again any time.": "このPCから音声認識、その音声モデル、ダウンロードしたすべての言語を削除します。いつでも再取得できます。",
+  "Languages are removed.": "言語を削除しました。",
+  "Remove languages": "言語を削除"
 }
