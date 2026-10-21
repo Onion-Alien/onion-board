@@ -126,8 +126,11 @@ def test_sync_with_an_unreadable_model_uses_only_known_speakers(tmp_path):
 def test_sync_doesnt_write_into_a_copy_that_isnt_installed(tmp_path):
     folder = addon_copy(tmp_path, all_speakers())
     before = (folder / "voices.json").read_bytes()
-    assert [v["id"] for v in avl.sync(folder, [mine()], write=False)] == \
-        [v["id"] for v in avl.BUILT_IN]
+    me = mine()
+    # your voices are still listed (its helper reads them from your file)
+    assert [v["id"] for v in avl.sync(folder, [me, mine("Bad", mix=[[999, 1.0]])],
+                                      write=False)] == \
+        [v["id"] for v in avl.BUILT_IN] + [me["id"]]
     assert (folder / "voices.json").read_bytes() == before
 
 
@@ -315,6 +318,29 @@ def test_card_makes_changes_and_deletes_your_own_voices(qapp, app_dir, monkeypat
         assert p.b_bin.text() == "Recently deleted (1)" and not p.b_bin.isHidden()
         p.undo_bar.undo()
         assert made["id"] in p._tile and [v["name"] for v in avl.Store().voices] == ["Robo"]
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_card_makes_your_own_voices_with_a_copy_shipped_with_the_app(qapp, app_dir,
+                                                                     monkeypatch):
+    """Running from source the add-on is the source tree's copy, never written to:
+    Make your own voice still works, and the voice is listed from your file."""
+    from soundboard.addons import aiaddon
+    from soundboard.ui.voice import aivoicebrowser
+    p = ready_panel(app_dir, monkeypatch, {"voice": "nova"})
+    monkeypatch.setattr(aiaddon, "removable", lambda m, base=None: False)
+    before = (app_dir / "ai-voices" / "voices.json").read_bytes()
+    made = mine("Robo")
+    monkeypatch.setattr(aivoicebrowser.AiVoiceEditor, "exec", lambda self: 1)
+    monkeypatch.setattr(aivoicebrowser.AiVoiceEditor, "result_voice", lambda self: made)
+    try:
+        p._refresh()
+        assert p.make_tile.isEnabled() and p.b_make.isEnabled()
+        p.make_tile.click()
+        assert made["id"] in p._tile and p.current_voice() == made["id"]
+        assert (app_dir / "ai-voices" / "voices.json").read_bytes() == before
     finally:
         p.shutdown()
         p.deleteLater()
