@@ -23,9 +23,21 @@ def test_wrong_typed_values_fall_back_to_defaults(app_dir):
     assert cfg.load_note == ""   # nothing was lost, so nothing to say
 
 
-def test_sounds_not_a_list_is_ignored(app_dir):
-    _write(library.CONFIG_PATH, {"sounds": None})
-    assert Config.load().sounds == []
+def test_no_sounds_key_is_an_empty_board(app_dir):
+    _write(library.CONFIG_PATH, {"theme": "Ocean"})
+    cfg = Config.load()
+    assert cfg.sounds == [] and cfg.theme == "Ocean" and cfg.load_note == ""
+
+
+def test_null_sounds_load_the_backup_not_an_empty_board(app_dir):
+    """No version writes "sounds": null, so it's damage like any other wrong type."""
+    _write(library.CONFIG_PATH.with_name("config.json.1"),
+           {"stop_hotkey": "f9", "sounds": [_pad("a", "Boom")]})
+    _write(library.CONFIG_PATH, {"sounds": None, "theme": "Ocean"})
+    cfg = Config.load()
+    assert [s.id for s in cfg.sounds] == ["a"] and cfg.stop_hotkey == "f9"
+    assert "damaged" in cfg.load_note and "config.json.1" in cfg.load_note
+    assert list(app_dir.glob("config.json.broken-*"))
 
 
 def test_sounds_of_the_wrong_type_load_the_backup_not_an_empty_board(app_dir):
