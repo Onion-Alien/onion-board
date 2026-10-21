@@ -500,7 +500,6 @@
   "✓ {combo} plays “{name}”": "✓ {combo} грає «{name}»",
   "✓ “{name}” shows by itself when {exe} is in front": "✓ «{name}» з'являється сама, коли {exe} на передньому плані",
   "All sounds": "Усі звуки",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "Змінює кожен звук, поки він грає. Щоб зберегти версію, правий клік на кнопці → Ефекти.",
   "Delete {n} item for good? This can't be undone.": [
     "Видалити {n} елемент назавжди? Це не можна скасувати.",
     "Видалити {n} елементи назавжди? Це не можна скасувати.",
@@ -4434,5 +4433,14 @@
     "{group}  ·  {n} увімк.",
     "{group}  ·  {n} увімк."
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Звуки й голоси, якими діляться гравці. Спершу послухай, додай ті, що подобаються, і голосуй, щоб найкращі піднімалися вгору. «Поділитися звуком» викладає твій звук для всіх після перевірки."
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Звуки й голоси, якими діляться гравці. Спершу послухай, додай ті, що подобаються, і голосуй, щоб найкращі піднімалися вгору. «Поділитися звуком» викладає твій звук для всіх після перевірки.",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "Копія звуку, що грає зараз, з цією швидкістю, висотою та ефектами, як окремий пед",
+  "Change the speed, pitch or effects first": "Спершу зміни швидкість, висоту чи ефекти",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Змінює кожен звук, поки він грає. «Зберегти як новий пед» залишить його окремим педом.",
+  "Play a sound first, then save it with your changes": "Спершу увімкни звук, потім збережи його зі своїми змінами",
+  "Save as new pad": "Зберегти як новий пед",
+  "Take the Live controls effects off": "Зняти ефекти живого керування",
+  "{name} (modified {n})": "{name} (змінено {n})",
+  "{name} (modified)": "{name} (змінено)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Додано «{name}», швидкість і висота в межах того, що може зберегти пед"
 }

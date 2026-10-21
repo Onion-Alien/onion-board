@@ -530,7 +530,6 @@
   "✓ {combo} plays “{name}”": "✓ {combo} يشغّل “{name}”",
   "✓ “{name}” shows by itself when {exe} is in front": "✓ “{name}” تظهر تلقائيًا عندما يكون {exe} في المقدمة",
   "All sounds": "كل الأصوات",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "يغيّر كل صوت أثناء تشغيله. لحفظ نسخة، انقر بالزر الأيمن على زر → المؤثرات.",
   "Delete {n} item for good? This can't be undone.": [
     "حذف {n} عنصر نهائيًا؟ لا يمكن التراجع عن هذا.",
     "حذف {n} عنصر نهائيًا؟ لا يمكن التراجع عن هذا.",
@@ -4665,5 +4664,14 @@
     "{group}  ·  {n} مفعّل",
     "{group}  ·  {n} مفعّل"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "أصوات ومؤثرات صوتية يشاركها اللاعبون. استمع إليها أولًا، وأضف ما يعجبك، وصوّت لتصعد الأفضل إلى القمة. «شارك صوتًا» ينشر واحدًا من أصواتك للجميع بعد مراجعته."
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "أصوات ومؤثرات صوتية يشاركها اللاعبون. استمع إليها أولًا، وأضف ما يعجبك، وصوّت لتصعد الأفضل إلى القمة. «شارك صوتًا» ينشر واحدًا من أصواتك للجميع بعد مراجعته.",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "نسخة من الصوت الذي يعمل الآن بهذه السرعة وهذه النغمة وهذه المؤثرات، كلوحة خاصة بها",
+  "Change the speed, pitch or effects first": "غيّر السرعة أو النغمة أو المؤثرات أولًا",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "يغيّر كل صوت أثناء تشغيله. «احفظ كلوحة جديدة» يحتفظ به كلوحة خاصة به.",
+  "Play a sound first, then save it with your changes": "شغّل صوتًا أولًا، ثم احفظه بتغييراتك",
+  "Save as new pad": "احفظ كلوحة جديدة",
+  "Take the Live controls effects off": "أزل مؤثرات التحكّم المباشر",
+  "{name} (modified {n})": "{name} (معدّل {n})",
+  "{name} (modified)": "{name} (معدّل)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ أُضيف “{name}”، مع إبقاء سرعته ونغمته ضمن ما تحفظه اللوحة"
 }

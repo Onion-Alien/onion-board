@@ -480,7 +480,6 @@
   "✓ {combo} plays “{name}”": "✓ {combo} で「{name}」を再生",
   "✓ “{name}” shows by itself when {exe} is in front": "✓ {exe} が前面のとき「{name}」を自動で表示",
   "All sounds": "すべてのサウンド",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "再生中のすべてのサウンドを変えます。別バージョンとして保存するには、パッドを右クリック → エフェクト。",
   "Delete {n} item for good? This can't be undone.": [
     "{n} 個の項目を完全に削除しますか？ 元に戻せません。"
   ],
@@ -4280,5 +4279,14 @@
   "{group}  ·  {n} on": [
     "{group}  ·  {n}個オン"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "プレイヤーが共有したサウンドとボイス。まず聴いて、気に入ったものを追加し、投票していいものを上位に。「サウンドを共有」で自分のサウンドを、確認後にみんなへ公開できます。"
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "プレイヤーが共有したサウンドとボイス。まず聴いて、気に入ったものを追加し、投票していいものを上位に。「サウンドを共有」で自分のサウンドを、確認後にみんなへ公開できます。",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "今鳴っているサウンドを、この速度・ピッチ・エフェクトのまま別のパッドとしてコピー",
+  "Change the speed, pitch or effects first": "先に速度、ピッチ、エフェクトのどれかを変えてください",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "再生中のすべてのサウンドを変えます。「新しいパッドとして保存」で別のパッドとして残せます。",
+  "Play a sound first, then save it with your changes": "まずサウンドを再生してから、変更ごと保存してください",
+  "Save as new pad": "新しいパッドとして保存",
+  "Take the Live controls effects off": "ライブ操作のエフェクトを外す",
+  "{name} (modified {n})": "{name} (変更 {n})",
+  "{name} (modified)": "{name} (変更)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ 「{name}」を追加しました。速度とピッチはパッドに保存できる範囲に収めました"
 }

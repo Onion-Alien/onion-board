@@ -994,3 +994,41 @@ def test_switching_tab_lets_go_of_a_picked_sound_that_isnt_playing(window, monke
     monkeypatch.setattr(w.engine, "state", lambda sid: (0.5, False) if sid == "s1" else None)
     w.catctl.set_category("")               # playing: stays, so Space still pauses it
     assert w.current == "s1"
+
+
+def test_live_controls_save_as_new_pad(window, monkeypatch):
+    """Live controls' Save as new pad: a copy of the sound played last, right after it,
+    named “Boom (modified)” (then “(modified 2)”), with the live speed, pitch and
+    effects saved onto it; nothing played or nothing changed only says so."""
+    w = window
+    sp = w.speed_btn
+    asked = []
+    monkeypatch.setattr(w.editctl, "_ask_pad_name", lambda d: asked.append(d) or d)
+    toasts = []
+    monkeypatch.setattr(w, "toast", lambda text, kind="", **k: toasts.append(kind))
+    assert w.editctl.save_live_copy() is None and toasts[-1] == "warn"   # nothing played
+    w.playctl._last_sid = "s0"
+    assert w.editctl.save_live_copy() is None and toasts[-1] == "warn"   # nothing changed
+    assert not asked
+    sp.set_values(1.3, 5, True)
+    sp.set_fx({"bass": 8, "reverb": 0.3})
+    sp.save_btn.click()
+    new = w.cfg.sounds[1]
+    assert asked == ["Boom (modified)"] and new.name == "Boom (modified)"
+    assert [m.id for m in w.cfg.sounds][0] == "s0" and new.id in w.pads
+    assert new.fx["speed"] == 1.3 and new.fx["pitch"] == 5 and not new.fx["tape"]
+    assert new.fx["live"] == [{"bass": 8.0, "reverb": 0.3}]
+    assert w.meta("s0").fx == {} and sp.values() == (1.3, 5, True)   # both stay as they were
+    w.editctl.save_live_copy()
+    assert asked[-1] == "Boom (modified 2)"
+    monkeypatch.setattr(w.editctl, "_ask_pad_name", lambda d: None)   # Cancel
+    n = len(w.cfg.sounds)
+    assert w.editctl.save_live_copy() is None and len(w.cfg.sounds) == n
+
+
+def test_live_save_button_only_where_there_is_a_pad(qapp):
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
+    for what, has in (("sounds", True), ("radio", False), ("apps", False)):
+        b = SpeedPitchButton(what)
+        assert hasattr(b, "save_btn") == has
+        b.deleteLater()

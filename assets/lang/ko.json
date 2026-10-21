@@ -480,7 +480,6 @@
   "✓ {combo} plays “{name}”": "✓ {combo}: “{name}” 재생",
   "✓ “{name}” shows by itself when {exe} is in front": "✓ {exe}이(가) 앞에 있으면 “{name}”이(가) 자동으로 표시돼요",
   "All sounds": "모든 사운드",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "재생하는 동안 모든 사운드를 바꿔요. 버전을 저장하려면 패드 우클릭 → 효과.",
   "Delete {n} item for good? This can't be undone.": [
     "항목 {n}개를 완전히 삭제할까요? 되돌릴 수 없어요."
   ],
@@ -4280,5 +4279,14 @@
   "{group}  ·  {n} on": [
     "{group}  ·  {n}개 켜짐"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "플레이어들이 공유한 사운드와 보이스예요. 먼저 들어 보고, 마음에 드는 걸 추가하고, 투표해서 좋은 걸 위로 올려요. '사운드 공유'로 내 사운드를 확인 후 모두에게 올릴 수 있어요."
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "플레이어들이 공유한 사운드와 보이스예요. 먼저 들어 보고, 마음에 드는 걸 추가하고, 투표해서 좋은 걸 위로 올려요. '사운드 공유'로 내 사운드를 확인 후 모두에게 올릴 수 있어요.",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "지금 재생 중인 사운드를 이 속도, 피치, 효과 그대로 별도 패드로 복사",
+  "Change the speed, pitch or effects first": "먼저 속도, 피치 또는 효과를 바꾸세요",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "재생 중인 모든 사운드를 바꿉니다. 새 패드로 저장하면 별도 패드로 남습니다.",
+  "Play a sound first, then save it with your changes": "먼저 사운드를 재생한 뒤 변경 사항과 함께 저장하세요",
+  "Save as new pad": "새 패드로 저장",
+  "Take the Live controls effects off": "실시간 조절 효과 빼기",
+  "{name} (modified {n})": "{name} (수정 {n})",
+  "{name} (modified)": "{name} (수정)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” 추가함, 속도와 피치는 패드가 저장할 수 있는 범위로 맞춤"
 }

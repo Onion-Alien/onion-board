@@ -186,7 +186,6 @@
   "Category: {value}": "Kategoria: {value}",
   "Change my voice while held": "Muuta ääntäni pohjassa pidettäessä",
   "Change your voice, speak another language, or use text-to-speech": "Muuta ääntäsi, puhu toista kieltä tai käytä tekstistä puheeksi -toimintoa",
-  "Changes every sound while it plays. To save a version, right-click a pad → Effects.": "Muuttaa jokaista ääntä sen soidessa. Tallentaaksesi version klikkaa nappia oikealla → Efektit.",
   "Changes the whole app instantly.": "Muuttaa koko sovelluksen heti.",
   "Change": "Muuta",
   "Changing…": "Muutetaan…",
@@ -4357,5 +4356,14 @@
     "{group}  ·  {n} päällä",
     "{group}  ·  {n} päällä"
   ],
-  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Pelaajien jakamia ääniä ja ääniefektejä. Kuuntele ensin, lisää ne, joista pidät, ja äänestä, jotta parhaat nousevat kärkeen. ”Jaa ääni” julkaisee omasi kaikille, kun se on tarkistettu."
+  "Sounds and voices players share. Hear one first, add the ones you like, and vote so the best rise to the top. Share a sound puts one of yours up for everyone once it's been checked.": "Pelaajien jakamia ääniä ja ääniefektejä. Kuuntele ensin, lisää ne, joista pidät, ja äänestä, jotta parhaat nousevat kärkeen. ”Jaa ääni” julkaisee omasi kaikille, kun se on tarkistettu.",
+  "A copy of the sound playing now with this speed, pitch and these effects on it, as a pad of its own": "Kopio nyt soivasta äänestä tällä nopeudella, sävelkorkeudella ja näillä tehosteilla, omana padinaan",
+  "Change the speed, pitch or effects first": "Muuta ensin nopeutta, sävelkorkeutta tai tehosteita",
+  "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Muuttaa jokaista ääntä sen soidessa. Tallenna uudeksi padiksi pitää sen omana padinaan.",
+  "Play a sound first, then save it with your changes": "Soita ensin ääni ja tallenna se sitten muutoksinesi",
+  "Save as new pad": "Tallenna uudeksi padiksi",
+  "Take the Live controls effects off": "Poista live-säätimien tehosteet",
+  "{name} (modified {n})": "{name} (muokattu {n})",
+  "{name} (modified)": "{name} (muokattu)",
+  "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Lisätty \"{name}\", nopeus ja sävelkorkeus rajattu siihen, minkä padi voi tallentaa"
 }
