@@ -192,6 +192,8 @@ account or anything else about you.
 - the system (`os/win11`, `os/win10`, `os/win-older`, `os/linux` or `os/other`: never
   the exact version), the app's language (`lang/de`) and theme (`theme/dark`: a
   built-in theme's name, else `other`);
+- how many of Settings > Achievements you've earned (`achievements/0`, `1-2`, `3-5`,
+  `6-10`, `11-20` or `21-plus`);
 - **which features you used or have set up since then**, as `used/<name>`: only the
   names in `FEATURES` in `soundboard/core/usage.py`, each a yes or no for the day, never how
   many times or what you did with them. Some examples by area:
@@ -334,6 +336,25 @@ account or anything else about you.
     `voice-chip-toggle`); a
     deleted category's *Undo*, and the "you're muted" note on a sound and its *Go live*
     (`category-undo`, `muted-note`, `muted-go-live`: never which category or sound);
+    *Live controls* opened and something changed in it, on the Sounds tab, the radio
+    or the programs (`used/live-opened-sounds`, `live-changed-radio`…), which of its
+    controls or presets (`used/live-speed`, `live-pitch`, `live-keep-pitch`,
+    `live-redline`, `live-reset`, `live-fx-bass`, `live-fx-reverb`…,
+    `live-preset-canyon`…: never the values); an achievement earned, by its name in the
+    fixed list (`used/ach-first-blood`, `ach-golden-bun`…) and the page's filters used
+    (`used/achievements-filter`); Connect Twitch clicked or failing, and a chat line or
+    another event coming in from Twitch (`used/twitch-login`, `twitch-login-failed`,
+    `twitch-chat`, `twitch-event`: never the channel, viewer or message), its guide and
+    *Copy AI prompt* (`twitch-guide`, `twitch-prompt-copied`); the Lite mode hint on a
+    slower PC and its *Turn on* (`lite-suggested`, `lite-suggested-on`); a Voice tab
+    recording or an Apps tab saved clip played, sent through the mic, added to Sounds,
+    copied or deleted (`used/voice-rec-play`, `voice-rec-mic`, `saved-clip-add`…: never
+    the recording); a voice searched for (`used/voice-search`: never the words); the
+    Stream Deck plugin answered (`remote-stream-deck`); *Play next* on a Community card
+    (`store-play-next`); *Reset effects* in Edit sound (`pad-effects-reset`); the app
+    started again by Windows after it crashed or hung (`crash-restarted`); the onion on
+    Settings > About poked, eating the window, or given back early (`egg-onion-poked`,
+    `egg-onion-eaten`, `egg-onion-please`);
   - and every day they're set: *Remember where it came from* off, own Apps categories,
     the side menu kept shut, a proxy, Tor or Offline mode, the playing sound's picture
     behind the board, the mic helper set up, and any sound set to play other than one at
@@ -350,7 +371,10 @@ account or anything else about you.
     alerts set up (`used/voice-background`, `voice-background-sounds`,
     `hidden-from-all`, `api-chat-rules`, `api-alerts`: never which sounds, category,
     commands or alerts); the themes' Plain look instead of Textured
-    (`used/textures-off`).
+    (`used/textures-off`); Lite mode on and *Use less CPU* picked on or off by hand
+    (`used/lite-mode`, `light-voice-on`, `light-voice-off`); Twitch connected
+    (`used/twitch-connected`: never the account); the achievement pop-ups and their
+    chime on (`used/achievement-popups`, `achievement-chime`).
 
 **Problems, as counts only, soon after a start:**
 

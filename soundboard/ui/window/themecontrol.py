@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QApplication
 
-from soundboard.core import achievements
+from soundboard.core import achievements, usage
 from soundboard.win import shellicon
 from soundboard.ui.kit import theme
 from soundboard.i18n import _
@@ -133,10 +133,12 @@ class ThemeControl(Controller):
         if c.lite_mode or c.lite_hint_done or not c.setup_done or not lite.slow_pc():
             return
         c.lite_hint_done = True
+        usage.used("lite-suggested")
         mw._save_later()
         mw.toast(_("Onion Board can run lighter on this PC: Lite mode turns off the "
                    "animations. It's in Settings > Appearance too."), ms=12_000,
-                 action=(_("Turn on"), lambda: self.set_lite_mode(True)))
+                 action=(_("Turn on"), lambda: (usage.used("lite-suggested-on"),
+                                                self.set_lite_mode(True))))
 
     def set_live_tab_tint(self, on: bool):
         mw = self.mw

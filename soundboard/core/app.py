@@ -707,6 +707,8 @@ def main():
         QTimer.singleShot(400, w.run_setup)
     if unclean and RESTARTED_ARG in sys.argv:   # Windows started it again after a crash
         from soundboard.i18n import _
+        from soundboard.core import usage
+        usage.used("crash-restarted")
         QTimer.singleShot(900, lambda: w.toast(
             _("Onion Board closed unexpectedly, so it started again."), "warn"))
     if reset_note:

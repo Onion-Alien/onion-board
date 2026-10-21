@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QComboBox, QHBoxLayout, QLabel
                                QMenu, QPushButton, QStyle, QStyledItemDelegate,
                                QToolTip, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
 
-from soundboard.core import errors
+from soundboard.core import errors, usage
 from soundboard.ui.kit import theme
 from soundboard.sounds.clipshelf import Clip, Shelf, VoiceClip
 from soundboard.i18n import _, ngettext
@@ -828,6 +828,11 @@ class ClipShelf(QWidget):
             errors.warn(self, _("Couldn't open that clip"), e)
             return None
 
+    def _count(self, what: str):
+        """For the usage count: the Voice tab's recordings or the Apps tab's saved clips,
+        and what was done to one (the action's name only)."""
+        usage.used(f"{'voice-rec' if self.voice else 'saved-clip'}-{what}")
+
     def _gain(self, data) -> float:
         return level_gain(data) if getattr(self.cfg, "level_volumes", True) else 1.0
 
@@ -849,6 +854,7 @@ class ClipShelf(QWidget):
                 _("Nowhere to send it: pick where your sounds go on the Setup tab.") if send
                 else _("No headphones to play it in: pick them on the Setup tab.")), "error")
             return
+        self._count("mic" if send else "play")
         self._playing = (sid, cid)
         self._progress = 0.0
         self.shelf.touch(cid)
@@ -913,6 +919,7 @@ class ClipShelf(QWidget):
             added += 1
             self.shelf.touch(c.id)
         if added:
+            self._count("add")
             self.undo_bar.finish()
             busy.toast(self, ngettext("Added {n} clip to your Sounds",
                                       "Added {n} clips to your Sounds", added), "ok")
@@ -923,6 +930,7 @@ class ClipShelf(QWidget):
             return
         data = self._audio(picked[0])
         if data is not None:
+            self._count("copy")
             clipeditor.set_clipboard(data)
             self.shelf.touch(picked[0].id)
             busy.toast(self, _("Copied “{name}”: Ctrl+V pastes it in an editor or on the "
@@ -936,6 +944,7 @@ class ClipShelf(QWidget):
         gone = self.shelf.remove_many({c.id for c in picked})
         if not gone:
             return
+        self._count("delete")
 
         def undo():
             self.shelf.restore_many(gone)

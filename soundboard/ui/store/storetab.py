@@ -1047,6 +1047,7 @@ class StoreTab(QWidget):
 
     def queue(self, row: SoundRow):
         """Play next: a link plays after what's playing (Up next), at once if nothing is."""
+        usage.used("store-play-next")
         if self._is_link(row):
             self._stop_preview()
             usage.used("store-heard")

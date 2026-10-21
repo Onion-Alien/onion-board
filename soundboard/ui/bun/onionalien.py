@@ -14,6 +14,7 @@ from PySide6.QtCore import (QElapsedTimer, QEvent, QPointF, QRect, QRectF, QSize
 from PySide6.QtGui import (QColor, QFont, QFontMetricsF, QImage, QPainter, QPainterPath, QPen,
                            QPixmap, QRadialGradient, QTextLayout, QTextOption)
 from PySide6.QtWidgets import QSizePolicy, QWidget
+from soundboard.core import usage
 from soundboard.ui.settings import lite
 
 # drawn on a 100 x 120 canvas, like Bun and Hoot, scaled to the requested height
@@ -318,6 +319,7 @@ class AlienNote(QWidget):
         """One click on him (none count while he's out eating the window)."""
         if self.gulp is not None:
             return
+        usage.used("egg-onion-poked")
         self.clicks += 1
         if self.clicks == self.TEAR_1:
             self.cry(1)
@@ -360,6 +362,7 @@ class AlienNote(QWidget):
         win = self.window()
         if win is self or not self.isVisible():
             return None
+        usage.used("egg-onion-eaten")
         self.gulp = OnionGulp(self, win)
         self.gulp.done.connect(self._gulp_done)
         self.gulp.start()
@@ -617,6 +620,7 @@ class OnionGulp(QWidget):
 
     def please(self):
         """He gives it all back now: straight on to spitting it out."""
+        usage.used("egg-onion-please")
         spit = self.spit_at - self.OPEN_MS
         if self.t < spit:
             self.skipped += spit - self.t

@@ -14,7 +14,7 @@ from PySide6.QtGui import QColor, QImage, QPainter, QPainterPath, QPen, QPixmap
 from PySide6.QtWidgets import (QGridLayout, QHBoxLayout, QLabel, QLayout, QSizePolicy,
                                QVBoxLayout, QWidget)
 
-from soundboard.core import achievements as ach
+from soundboard.core import achievements as ach, usage
 from soundboard.i18n import _
 from soundboard.ui.kit import icons, theme
 from soundboard.ui.kit.panel import hint_label
@@ -386,6 +386,7 @@ class AchievementsPage(Page):
             b.setChecked(key == "all")
             b.setCursor(Qt.CursorShape.PointingHandCursor)
             b.clicked.connect(self.apply_filters)
+            b.clicked.connect(lambda: usage.used("achievements-filter"))
             group.addButton(b)
             flow.addWidget(b)
             self.dlg.ach_show[key] = b
@@ -396,6 +397,7 @@ class AchievementsPage(Page):
             rarity.addItem(tier_name(tier), tier)
         no_wheel(rarity)
         rarity.currentIndexChanged.connect(self.apply_filters)
+        rarity.activated.connect(lambda _i: usage.used("achievements-filter"))
         flow.addWidget(rarity)
         self.dlg.ach_rarity = rarity
         return row

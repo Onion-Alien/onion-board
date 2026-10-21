@@ -11,6 +11,7 @@ from PySide6.QtGui import QAction, QActionGroup, QIcon
 from PySide6.QtWidgets import (QHBoxLayout, QLineEdit, QPushButton, QStyle,
                                QStyleOptionButton, QStylePainter, QWidget)
 
+from soundboard.core import usage
 from soundboard.i18n import _
 from soundboard.ui.kit import icons
 from soundboard.ui.kit.panel import ViewToggle
@@ -100,6 +101,7 @@ class GroupBar(QWidget):
         s.addAction(icons.icon("search", "muted"), QLineEdit.ActionPosition.LeadingPosition)
         icons.clear_button(s)
         s.textChanged.connect(lambda t: self.searched.emit(t.strip()))
+        s.textEdited.connect(lambda t: t.strip() and usage.used("voice-search"))
         h.addWidget(s, 1)
 
         view_toggle.setFixedHeight(BAR_H)

@@ -666,6 +666,7 @@ class EditDialog(QDialog):
                                     "A playing sound goes back to plain at once."))
 
         def reset_all():
+            usage.used("pad-effects-reset")
             self.effects.reset_all()
             self.effects_reset.emit()
         self.btn_reset.clicked.connect(reset_all)
