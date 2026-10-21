@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import time
 
-from PySide6.QtCore import QEasingCurve, QRectF, Qt, QVariantAnimation
+from PySide6.QtCore import QCoreApplication, QEasingCurve, QEvent, QRectF, Qt, QVariantAnimation
 from PySide6.QtGui import QColor, QPainter, QPixmap
 from PySide6.QtWidgets import QWidget
 
@@ -112,6 +112,10 @@ class Cover(QWidget):
             self._paint(p)
             p.end()
             self.hide()
+            # the layouts the restyle asked for, done first: the picture was taken
+            # before them and faded in a layout a few pixels off (the theme cards
+            # jumped sideways and back on a switch)
+            settle_layouts()
             self.fresh = window.grab()
             self.show()
         fade = self._fade = QVariantAnimation(self)
@@ -126,6 +130,12 @@ class Cover(QWidget):
     def _fading(self, v):
         self.left = float(v)
         self.update()
+
+
+def settle_layouts():
+    """Run the layout passes Qt has queued (each can queue another: a few rounds)."""
+    for _ in range(4):
+        QCoreApplication.sendPostedEvents(None, QEvent.Type.LayoutRequest)
 
 
 def _fade_in(covers: list[Cover]):
