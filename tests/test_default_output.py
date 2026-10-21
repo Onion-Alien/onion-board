@@ -67,6 +67,38 @@ def test_the_cable_as_windows_default_isnt_followed(window, monkeypatch):
     assert window.cfg.mon_device == OUTS[1]
 
 
+def test_a_pulled_out_headset_leaves_the_headphones_box(window, monkeypatch):
+    """Windows' default goes back to the speakers when the headset is pulled out; PortAudio's
+    list (from the last scan) still had it, so the box offered a device that's gone."""
+    devs = eng.list_devices("output")
+    windows_default(monkeypatch, "Headphones (Gaming Headset)")
+    window.devctl._follow_default_output()
+    devices_done(window)
+    scans = []
+
+    def rescan():
+        scans.append(1)
+        devs[:] = [d for d in devs if d["name"] != OUTS[0]]
+        return True
+    monkeypatch.setattr(eng, "rescan", rescan)
+    monkeypatch.setattr(appaudio, "endpoint_names", lambda kind: set(OUTS[1:]))   # unplugged
+    windows_default(monkeypatch, "Speakers (Realtek Audio)")
+    window.devctl._follow_default_output()
+    devices_done(window)
+    assert scans and window.cfg.mon_device == OUTS[1]
+    assert window.cb_mon.findData(OUTS[0]) == -1
+    # Windows' default switched by hand, the headset still plugged in: no re-scan
+    scans.clear()
+    devs[:] = [{"index": i, "name": n} for i, n in enumerate(OUTS)]
+    monkeypatch.setattr(appaudio, "endpoint_names", lambda kind: set(OUTS))
+    windows_default(monkeypatch, "Headphones (Gaming Headset)")
+    window.devctl._follow_default_output()
+    windows_default(monkeypatch, "Speakers (Realtek Audio)")
+    window.devctl._follow_default_output()
+    devices_done(window)
+    assert not scans
+
+
 def test_the_default_when_the_app_starts(window, monkeypatch):
     window.cfg.mon_device = OUTS[0]
     window._default_out = "Speakers (Realtek Audio)"   # changed while the app was closed
