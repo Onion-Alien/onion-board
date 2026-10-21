@@ -24,6 +24,7 @@ from soundboard.mic import directmic, discordcfg
 from soundboard.ui.kit import theme
 from soundboard.core.pollthread import PollThread
 from soundboard.ui.kit import busy, fit, icons, panel
+from soundboard.ui.kit import toast as toastmod
 from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.kit.crashdialog import free_dialog
 from soundboard.core import errors
@@ -563,7 +564,8 @@ class DiscordSetUp(QObject):
     def _finished(self, res: dict):
         mw = self.mw
         if res.get("running") and not self._closed:
-            if not self._ask_to_close():
+            if not self._ask_to_close():   # Not now, ✕ or Esc: nothing is being set up
+                toastmod.close(self.parent_w, "discord-setup")
                 return self._end()
             self._closed = list(res["running"])
             self._go(self._closed)
@@ -593,6 +595,7 @@ class DiscordSetUp(QObject):
                        4000, key="discord-setup")
             return self._end()
         name, before, after = done[0]
+        toastmod.close(self.parent_w, "discord-setup")   # the box says it's done
         cfg, setctl = mw.cfg, getattr(mw, "setctl", None)
         box = DiscordFixed(self.parent_w, name, setting_changes(before, after),
                            bool(cfg.discord_restore),
