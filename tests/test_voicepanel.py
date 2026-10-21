@@ -795,31 +795,6 @@ def test_an_add_on_with_a_bad_slider_is_reported_not_fatal(qapp, app_dir, monkey
         p.deleteLater()
 
 
-def test_discord_notice_always_shows_until_dismissed(panel):
-    p, _ = panel
-    fx = p.fx
-    assert not fx.tip.isHidden()                 # changer off: shown all the same
-    fx.pick(next(iter(voicefx.PRESETS)))
-    assert not fx.tip.isHidden()                 # picking a voice doesn't move the card
-    helped, dismissed = [], []
-    fx.chat_help.connect(lambda: helped.append(1))
-    fx.tip_dismissed.connect(lambda: dismissed.append(1))
-    fx.btn_tip_help.click()
-    assert helped == [1] and not fx.tip.isHidden()   # the guide doesn't dismiss it
-    fx.btn_tip_ok.click()
-    assert dismissed == [1] and fx.tip.isHidden()
-    fx.btn_power.setChecked(False)
-    fx.btn_power.setChecked(True)
-    assert fx.tip.isHidden()                     # stays gone once dismissed
-
-
-def test_discord_notice_stays_hidden_when_already_dismissed(panel):
-    p, _ = panel
-    p.fx.set_tip_enabled(False)
-    p.fx.pick(next(iter(voicefx.PRESETS)))
-    assert p.fx.tip.isHidden()
-
-
 def test_picking_a_preset_keeps_my_own_mix(panel):
     p, _ = panel
     p.fx.pick("Chipmunk")

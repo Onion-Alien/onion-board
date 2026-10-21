@@ -800,12 +800,8 @@ class VoiceFxPanel(QWidget):
     """The voice changer: one big on/off switch, a grid of voices to pick from, a
     way to hear yourself, and (folded away) the individual effects for fine-tuning.
 
-    `changed(spec)` with spec = {"enabled", "preset", "effects": {type: {...}}}.
-    `chat_help()` asks for the Discord guide; `tip_dismissed()` means "Got it" on the
-    Discord notice (the window remembers it)."""
+    `changed(spec)` with spec = {"enabled", "preset", "effects": {type: {...}}}."""
     changed = Signal(dict)
-    chat_help = Signal()
-    tip_dismissed = Signal()
     folds_changed = Signal(list)   # the effect types whose cards are folded away
     hotkey_asked = Signal(str)     # right-click a voice -> Set hotkey: its name ("" key: clear)
     hotkey_cleared = Signal(str)
@@ -859,32 +855,6 @@ class VoiceFxPanel(QWidget):
         v.addWidget(hint_label(_("Change your mic live for whoever you send sounds to (Discord, "
                                  "a game, OBS). Pick a voice to turn it on, then use Hear what "
                                  "they hear at the bottom to try it.")))
-
-        # ---- the Discord catch (always shown until "Got it": popping in when a voice was
-        # picked made the card jump)
-        # Measured in a real call: with Discord's default Input Profile (Voice
-        # Isolation) a deep voice arrived ~20% of the time; on Studio, 93% at -0.8 dB.
-        self.tip = QFrame()
-        tl = QHBoxLayout(self.tip)
-        tl.setContentsMargins(0, 0, 0, 0)
-        tl.setSpacing(8)
-        # Straight into my mic, Studio makes Discord skip Onion Board (your real voice
-        # goes out): Custom with noise suppression off works on the mic and the cable
-        # (plain words: the menu path is on Show me how; it read as a wall of settings
-        # before a voice was even on)
-        tip_text = hint_label(_("⚠ Using Discord or a game's voice chat? Turn its <b>noise "
-                                "suppression</b> off, or it wipes out most of a changed "
-                                "voice. <b>Show me how</b> has the steps."))
-        theme.set_tone(tip_text, "warn")
-        tl.addWidget(tip_text, 1)
-        self.btn_tip_help = QPushButton(_("Show me how"))
-        self.btn_tip_help.clicked.connect(self.chat_help)
-        tl.addWidget(self.btn_tip_help)
-        self.btn_tip_ok = QPushButton(_("Got it"))
-        self.btn_tip_ok.clicked.connect(self._tip_ok)
-        tl.addWidget(self.btn_tip_ok)
-        self._tip_enabled = True
-        v.addWidget(self.tip)
 
         # ---- which voices show: All (under group headings), your favorites, one group
         favs = spec.get("favorites")
@@ -1983,11 +1953,6 @@ class VoiceFxPanel(QWidget):
             self.delay.style().unpolish(self.delay)
             self.delay.style().polish(self.delay)
 
-    def set_tip_enabled(self, on: bool):
-        """Whether the Discord notice may show (False once it's been dismissed)."""
-        self._tip_enabled = on
-        self._refresh()
-
     def add_new_effects(self):
         """Add cards for effect types registered since (modules loaded later)."""
         added = False
@@ -2113,10 +2078,6 @@ class VoiceFxPanel(QWidget):
         self._refresh()
         self._emit()
 
-    def _tip_ok(self):
-        self.set_tip_enabled(False)
-        self.tip_dismissed.emit()
-
     def _count_on(self) -> int:
         # the voice's own effects: what's on top of it is Effects' count
         return sum(r.chk.isChecked() for t, r in self.rows.items()
@@ -2147,7 +2108,6 @@ class VoiceFxPanel(QWidget):
         self.btn_power.setText(_("On") if on else _("Off"))
         self.btn_power.setAccessibleName(POWER_TEXT[on])
         self._show_picked()
-        self.tip.setVisible(self._tip_enabled)
         # only a voice that's actually in use is highlighted
         self.tiles.setExclusive(False)
         for name, b in self._tile.items():
