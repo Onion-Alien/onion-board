@@ -4335,8 +4335,6 @@
   "Mic off": "Microfone desligado",
   "Your headset's mic is off": "O microfone dos teus auscultadores está desligado",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "O microfone de <b>{headset}</b> desligou-se. Volta a ligá-lo e os teus sons voltam a sair.",
-  "Put the sound first on a busy PC": "Prioridade ao som com o PC ocupado",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Corre o board com prioridade acima do normal, para que outros programas não façam o som falhar. Usa muito pouco CPU, por isso os jogos não notam.",
   "{n} waiting": [
     "{n} em espera",
     "{n} em espera"

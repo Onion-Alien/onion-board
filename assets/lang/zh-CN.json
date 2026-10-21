@@ -4261,8 +4261,6 @@
   "Mic off": "麦克风已关",
   "Your headset's mic is off": "耳机的麦克风已关闭",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "<b>{headset}</b> 的麦克风断开了。重新连接后，你的音效就会再次发出。",
-  "Put the sound first on a busy PC": "电脑繁忙时优先保证声音",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "以高于正常的优先级运行音板，让其他程序无法使声音卡顿。它占用的 CPU 极少，游戏不会受影响。",
   "{n} waiting": [
     "{n} 个等待中"
   ],

@@ -4335,8 +4335,6 @@
   "Mic off": "Микрофонът е изключен",
   "Your headset's mic is off": "Микрофонът на слушалките е изключен",
   "The mic on <b>{headset}</b> disconnected. Reconnect it and your sounds go out again.": "Микрофонът на <b>{headset}</b> прекъсна. Свържи го отново и звуците ти пак ще излизат.",
-  "Put the sound first on a busy PC": "Звукът с предимство при натоварен компютър",
-  "Runs the board above normal priority, so other programs can't make the sound skip. It uses very little CPU, so games won't notice.": "Пуска таблото с приоритет над нормалния, за да не могат други програми да накъсват звука. Ползва съвсем малко процесор, така че игрите няма да усетят.",
   "{n} waiting": [
     "{n} чака",
     "{n} чакат"
