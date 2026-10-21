@@ -471,10 +471,19 @@ class RecoveryCard(QFrame):
         self.timer.setInterval(5000)
         self.timer.timeout.connect(self.check)
         self.timer.start()
-        QTimer.singleShot(0, self, self.check)
+        # what the last look found (kept on the window): a new copy of the card shows
+        # those rows at once, then looks again. Built empty, its rows came in after it
+        # was on screen and pushed the rest of the page down.
+        last = getattr(mw, "_recovery_last", None)
+        if last and last["mic"] == (mw.cfg.mic_device or ""):
+            self._state, self.mics = last["state"], last["mics"]
+            self._rebuild()
+        # the first look even before it shows: Settings is built behind the loading
+        # screen, so the rows are there when it's first opened
+        QTimer.singleShot(0, self, lambda: self.check(first=True))
 
-    def check(self):
-        if self._checking or not self.isVisible():
+    def check(self, first: bool = False):
+        if self._checking or not (first or self.isVisible()):
             return
         self._checking = True
         mic = self.mw.cfg.mic_device
@@ -521,6 +530,7 @@ class RecoveryCard(QFrame):
         if mic != (self.mw.cfg.mic_device or ""):
             return
         self.mics = found
+        self._remember()
         self._rebuild()
 
     def _checked(self, state, mic=None):
@@ -528,7 +538,12 @@ class RecoveryCard(QFrame):
         if mic is not None and mic != (self.mw.cfg.mic_device or ""):
             return
         self._state = state
+        self._remember()
         self._rebuild()
+
+    def _remember(self):
+        self.mw._recovery_last = {"mic": self.mw.cfg.mic_device or "", "state": self._state,
+                                  "mics": self.mics}
 
     def _rebuild(self):
         mics = self.shown()

@@ -46,7 +46,7 @@ from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.apps.clipeditor import WAVE_H
 from soundboard.ui.apps.clipshelf import ClipShelf
 from soundboard.ui.kit.panel import UndoBar, ViewToggle, hint_label
-from soundboard.ui.window.responsive import FitWidth
+from soundboard.ui.window.responsive import FitWidth, settle_layouts
 from soundboard.ui.sounds.speedpitch import SpeedPitchButton
 from soundboard.ui.kit.wheelguard import no_wheel
 
@@ -616,11 +616,24 @@ class AppsTab(QWidget):
             # own card is worked out among them
             keep = {app.exe.lower() for app, key in zip(apps, self._keys_for(apps))
                     if key in self.rows or key in now}
+            # the cards land unseen and show together when the last one is in: painted
+            # as each came, the sections jumped down the page one card at a time
+            self._hold_list(True)
             self._on_apps([app for app in apps if app.exe.lower() in keep], alive)
             QTimer.singleShot(CARDS_GAP_MS, self,
                               lambda: self._apply_listing(n, apps, alive))
             return
         self._on_apps(apps, alive)
+        self._hold_list(False)
+
+    def _hold_list(self, on: bool):
+        area = self.scroll_area
+        if on == getattr(self, "_list_held", False):
+            return
+        self._list_held = on
+        if not on:
+            settle_layouts()   # where the cards end up, before the one paint
+        area.setUpdatesEnabled(not on)
 
     def _sound_active(self, app: appaudio.App) -> bool:
         live = self.peaks.peak(app.pid)

@@ -1691,3 +1691,28 @@ def test_setup_tab_in_and_out_again_measures_once(window, size, qapp, monkeypatc
     assert out1 == out2 == on_sounds   # back as it was before Setup
     assert in2 == in1                  # Setup as it was worked out the first time
     assert m_in2 <= 4 and m_out2 <= 4, f"measured {m_in2} / {m_out2} times"
+
+
+def test_keep_on_top_changes_the_window_in_place(window, qapp):
+    """setWindowFlag hid the window and made a new native one: it went white for a
+    frame (and lost its place in the taskbar) each time Keep window on top was switched."""
+    from PySide6.QtCore import QEvent, QObject
+    window.show()
+    qapp.processEvents()
+    hidden = []
+
+    class Watch(QObject):
+        def eventFilter(self, obj, ev):
+            if obj is window and ev.type() == QEvent.Type.Hide:
+                hidden.append(1)
+            return False
+    watch = Watch()
+    window.installEventFilter(watch)
+    for on in (True, False):
+        window.on_top_toggle(on)
+        top = Qt.WindowType.WindowStaysOnTopHint
+        assert bool(window.windowFlags() & top) == on
+        assert bool(window.windowHandle().flags() & top) == on
+        assert window.isVisible()
+    window.removeEventFilter(watch)
+    assert not hidden and not window.cfg.always_on_top

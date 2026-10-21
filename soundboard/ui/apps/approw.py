@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QGraphicsOpac
 from soundboard.audio import appaudio
 from soundboard.ui.kit import theme
 from soundboard.core import usage
+from soundboard.ui.window.responsive import settled
 from soundboard.win import exeicon
 from soundboard.sounds.clipedit import LiveBuffer
 from soundboard.i18n import _
@@ -878,7 +879,10 @@ class AppRow(HoverCard):
             usage.used("apps-window-view")
         self.btn_view.setToolTip(_("Hide this program's window") if on
                                  else _("Show this program's window"))
-        self.view.set_open(on)
+        # the card grows or shrinks in one paint: closing, it kept its old height a
+        # frame with everything moved, then closed up
+        with settled(self.window()):
+            self.view.set_open(on)
 
     def close_view(self):
         if self.btn_view.isChecked():

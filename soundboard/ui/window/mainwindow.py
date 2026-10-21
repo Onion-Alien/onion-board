@@ -1094,8 +1094,18 @@ class MainWindow(QMainWindow):
 
     def on_top_toggle(self, b):
         self.set_option("always_on_top", b)
-        self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint, b)
-        self.show()
+        handle = self.windowHandle()
+        if handle is None or not self.isVisible():
+            self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint, b)
+            self.show()
+            return
+        # on the window as it is: setWindowFlag makes a new native window, and the
+        # window went white for a frame (and lost its place in the taskbar) while it did
+        flags = self.windowFlags()
+        flags = (flags | Qt.WindowType.WindowStaysOnTopHint) if b \
+            else (flags & ~Qt.WindowType.WindowStaysOnTopHint)
+        self.overrideWindowFlags(flags)   # what Qt thinks the widget has...
+        handle.setFlags(flags)            # ...and the window itself, changed in place
 
     def set_pad_width(self, w):
         self._pad_size_wait.stop()

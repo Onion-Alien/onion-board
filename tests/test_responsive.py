@@ -260,3 +260,49 @@ def test_growing_keeps_the_more_important_step_shown(qapp):
     f.fit(QSize(900, 400))
     assert f.compact_count() == 0 and not small[0].isHidden()
     root.deleteLater()
+
+
+def test_a_short_word_goes_back_to_the_whole_label(qapp):
+    """A button with a short word for a narrow window ("Listen") got its whole label
+    ("Hear what they hear") back only when it had no text at all: it kept "Listen"
+    after the window grew again, at a size that showed the whole label before."""
+    b = QPushButton("Hear what they hear")
+    b.setProperty("short_text", "Listen")
+    apply = responsive.icon_only(b)
+    apply(True)
+    assert b.text() == "Listen"
+    apply(False)
+    assert b.text() == "Hear what they hear"
+    b.setText("")   # an icon-only button (no short word) still comes back too
+    b.setProperty("short_text", None)
+    b.setProperty("full_text", "Settings")
+    apply(False)
+    assert b.text() == "Settings"
+    b.deleteLater()
+
+
+def test_settled_lays_out_nested_pages_before_the_paint(qapp):
+    """A change inside a nested page (a row losing a line) set off a layout pass Qt
+    runs a turn later, and painted the page half-moved in between: settled() runs it
+    before painting resumes."""
+    from PySide6.QtWidgets import QLabel
+    root = QWidget()
+    QVBoxLayout(root)
+    inner = QWidget(root)
+    root.layout().addWidget(inner)
+    v = QVBoxLayout(inner)
+    v.setContentsMargins(0, 0, 0, 0)
+    line = QLabel("a line that goes", inner)
+    rest = QLabel("what's under it", inner)
+    v.addWidget(line)
+    v.addWidget(rest)
+    v.addStretch(1)
+    root.resize(300, 200)
+    root.show()
+    qapp.processEvents()
+    assert rest.y() > 0
+    with responsive.settled(root):
+        line.hide()
+        assert not root.updatesEnabled()
+    assert rest.y() == 0 and root.updatesEnabled()   # moved up already, nothing pending
+    root.deleteLater()

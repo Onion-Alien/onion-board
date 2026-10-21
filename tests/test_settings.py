@@ -184,6 +184,27 @@ def test_audio_page_picks_input_and_output_through_the_window(window, monkeypatc
     d.close()
 
 
+def test_the_device_boxes_are_filled_again_only_when_the_devices_change(window):  # noqa: F811
+    """Each pick (and each time Settings opened) emptied and filled every device box:
+    each shrank for a frame and the row beside it slid across and back. The same
+    devices leave a box as it is; a new one fills it again."""
+    window.routectl._fill_combo(window.cb_mic, ["Mic A", "Headset Mic"], "Mic A")
+    d = SettingsDialog(window, "audio")
+    mic = d.dev_combos[0][0]
+    emptied = []
+    mic.model().rowsRemoved.connect(lambda *_: emptied.append(1))
+    d.audio._sync_devices()
+    window.cb_mic.setCurrentIndex(2)
+    d.audio._sync_devices()
+    assert not emptied and mic.currentText() == "Headset Mic"
+    window.routectl._fill_combo(window.cb_mic, ["Mic A", "Headset Mic", "USB Mic"], "USB Mic")
+    d.audio._sync_devices()
+    items = [mic.itemText(i) for i in range(mic.count())]
+    assert emptied and items == ["(none)", "Mic A", "Headset Mic", "USB Mic"]
+    assert mic.currentText() == "USB Mic"
+    d.close()
+
+
 def test_feedback_and_problem_buttons_only_open_the_browser(window, monkeypatch):  # noqa: F811
     from soundboard import __version__
     from soundboard.core import feedback
