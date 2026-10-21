@@ -17,7 +17,7 @@ import logging
 import re
 import threading
 
-from PySide6.QtCore import QEvent, QPoint, QSize, Qt, Signal
+from PySide6.QtCore import QEvent, QPoint, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QFont, QIcon, QPainter, QPixmap
 from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QCheckBox, QComboBox, QDialog, QFrame,
                                QGridLayout, QHBoxLayout, QLabel, QMenu,
@@ -57,6 +57,9 @@ BACKUP_HEARD = {"voice": _("a built-in voice (still hides yours)"),
 # the chips over the voice cards: All shows a heading per kind (avl.who), your own
 # first (under the long ready-made grid, the ones you recorded were out of sight)
 ALL, FAVS, MINE = "", "favs", "mine"
+# the helper loads in about a second; one still loading after this is stuck (it once
+# sat for half a minute, the backup voice on, while the cards seemed to switch)
+LOAD_TIMEOUT_MS = 20_000
 MAKE = "+make"   # the Make your own voice card's place among the voice ids
 KINDS = ((MINE, _("Mine")), ("men", _("Men")), ("women", _("Women")),
          ("other", _("In between & fun")))
@@ -197,6 +200,8 @@ class AiVoicePanel(QWidget):
         self._installing = False
         self._voice_name = ""
         self._connected = self._retried = False   # this start's helper (_start_helper)
+        self._load_timer = QTimer(self, singleShot=True, interval=LOAD_TIMEOUT_MS)
+        self._load_timer.timeout.connect(lambda: self._event.emit({"type": "timeout"}))
         self._status = "off"
         self.module: mods.ModuleInfo | None = None
         self.voices: list[dict] = []
@@ -795,9 +800,12 @@ class AiVoicePanel(QWidget):
         self.s["voice"] = vid
         self._show_about()
         if self.ctl.running:
+            # (still loading: it's used once it's ready; until then "starting…" stays,
+            # as the backup voice is what others hear)
             self.ctl.set_voice(vid, self.s["pitch"])
             self._voice_name = self._voice().get("name", "")
-            self._state(_("● switching to {voice}…", voice=self._voice_name))
+            if self._status == "on":
+                self._state(_("● switching to {voice}…", voice=self._voice_name))
         self._emit()
 
     # ------------------------------------------------------------ your own voices
@@ -918,6 +926,7 @@ class AiVoicePanel(QWidget):
             usage.used("ai-voice")   # switched on (never which voice)
             self._set_ui(True, self._starting_text())
         elif not on:
+            self._load_timer.stop()
             if self.ctl.running:
                 self.ctl.stop()
             self._set_ui(False, "")   # (also when it had already stopped by itself)
@@ -933,6 +942,7 @@ class AiVoicePanel(QWidget):
         except RuntimeError as e:
             self._set_ui(False, f"⚠ {errors.plain(e)}")
             return False
+        self._load_timer.start()
         return True
 
     def status(self) -> str:
@@ -986,6 +996,7 @@ class AiVoicePanel(QWidget):
         elif t == "status":
             self._state(text)
         elif t == "ready":
+            self._load_timer.stop()
             self._status = "on"
             msg = (_("● you sound like {voice}", voice=self._voice_name) if self._voice_name
                    else _("● you sound like the voice"))
@@ -1001,7 +1012,24 @@ class AiVoicePanel(QWidget):
                   voice=self._voice_name, cpu=cpu, ms=ms) if self._voice_name else
                 _("● you sound like the voice · CPU {cpu}% · about {ms} ms behind you",
                   cpu=cpu, ms=ms))
+        elif t == "timeout":
+            if not self.ctl.running or self._status != "starting":
+                return
+            if not self._retried:            # one more go by itself, as for no call back
+                self._retried = True
+                log.warning("AI voice helper still loading after %d s; trying once more",
+                            LOAD_TIMEOUT_MS // 1000)
+                if self._start_helper():
+                    self._state(self._starting_text(retry=True))
+                return
+            log.warning("AI voice helper still loading after %d s; giving up",
+                        LOAD_TIMEOUT_MS // 1000)
+            self._status = "failed"
+            self._failure_error = _("can't load")
+            self._state(self.failure_text(self._failure_error))
+            self.ctl.give_up()
         elif t == "error":
+            self._load_timer.stop()
             self._status = "failed"
             self._failure_error = text
             self._state(self.failure_text(text))
@@ -1015,6 +1043,7 @@ class AiVoicePanel(QWidget):
                 self._status = "starting"
                 self._state(self._starting_text(retry=True))
         elif t == "stopped" and self.ctl.running:
+            self._load_timer.stop()
             if text or self._status != "failed":   # keep the helper's own reason
                 self._failure_error = text
             self._status = "failed"
@@ -1137,4 +1166,5 @@ class AiVoicePanel(QWidget):
                 error=err or self._last_line[-160:] or last).removeprefix("⚠ ")), "error")
 
     def shutdown(self):
+        self._load_timer.stop()
         self.ctl.shutdown()
