@@ -33,7 +33,8 @@ from soundboard.speech import aivoice
 from soundboard.speech import aivoicelist as avl
 from soundboard.ui.voice import art
 from soundboard.ui.kit import busy, fit, icons
-from soundboard.ui.voice.aivoicebrowser import AiVoiceEditor, Previewer, hear_button
+from soundboard.ui.voice.aivoicebrowser import (AiVoiceEditor, Previewer, hear_button,
+                                                mine_icon, mine_pixmap)
 from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.kit.glowbutton import GlowButton
 from soundboard.ui.voice.effectspopup import place_over
@@ -87,7 +88,10 @@ def art_key(voice: dict) -> str:
 
 
 def voice_icon(voice: dict, size: int = TILE_ART) -> QIcon:
-    """A voice's card picture: its drawing (ui/voice/art.py) when there is one, else its emoji."""
+    """A voice's card picture: its drawing (ui/voice/art.py) when there is one, else its
+    emoji; one of yours, the picture you picked or My own mix's."""
+    if avl.is_mine(voice):
+        return mine_icon(voice) or emoji_icon(str(voice.get("emoji") or ""), size)
     key = art_key(voice)
     pic = art.icon(key) if key else None
     return pic or emoji_icon(str(voice.get("emoji") or ""), size)
@@ -562,7 +566,8 @@ class AiVoicePanel(QWidget):
         self.picked_name.setToolTip(about)
         self.picked_pic.setToolTip(about)
         key = art_key(vo) if vo else ""
-        pm = art.pixmap(key, PICKED_ART) if key else None
+        pm = mine_pixmap(vo, PICKED_ART) if avl.is_mine(vo) else \
+            art.pixmap(key, PICKED_ART) if key else None
         self.picked_pic.setPixmap(pm or emoji_icon(str(vo.get("emoji") or ""), PICKED_ART)
                                   .pixmap(PICKED_ART, PICKED_ART))
         mine = avl.is_mine(vo)

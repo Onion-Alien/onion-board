@@ -12,6 +12,8 @@ Your own voices live in %APPDATA%\\OnionBoard\\ai-voices.json, not in config.jso
 not only in the add-on's folder (updating or removing the add-on replaces that):
 
     {"version": 1, "voices": [voice, ...], "deleted": [{"id", "name", "when", "voice"}]}
+
+A picture you gave one is ai-voice-pictures\\<id>.png beside it (picture_path).
 """
 from __future__ import annotations
 
@@ -27,6 +29,7 @@ from soundboard.core import trash
 log = logging.getLogger(__name__)
 
 FILE_NAME = "ai-voices.json"
+PICTURES = "ai-voice-pictures"
 VERSION = 1
 MAX_NAME = 24
 MAX_TEXT = 200
@@ -308,6 +311,11 @@ def path() -> Path:
     return library.APP_DIR / FILE_NAME
 
 
+def picture_path(vid: str) -> Path:
+    """Your voice's own picture for its card (optional): a square PNG by its id."""
+    return library.APP_DIR / PICTURES / f"{vid}.png"
+
+
 class Store:
     """Your own AI voices and the bin. Every change is written straight away. If the
     file couldn't be read (locked by an antivirus or OneDrive) nothing is written over
@@ -437,4 +445,10 @@ class Store:
         return item
 
     def forget(self, item_id: str) -> None:
-        self.take(item_id)
+        item = self.take(item_id)
+        vid = str((item.data.get("voice") or {}).get("id", "")) if item else ""
+        if vid and self.get(vid) is None:     # deleted for good: its picture too
+            try:
+                picture_path(vid).unlink(missing_ok=True)
+            except OSError:
+                log.warning("couldn't delete %s", picture_path(vid), exc_info=True)
