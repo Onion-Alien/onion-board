@@ -226,6 +226,32 @@ def test_keyboard_plays_picks_and_moves_focus(window):
     assert moved == [("s0", 1, 0)]
 
 
+def test_tab_stops_once_on_the_pads_between_categories_and_player_bar(window, qapp):
+    """Every pad was its own Tab stop, and the pads sat at the end of the Tab order (after
+    the player bar): with 40 sounds, 40 Tabs to reach Stop all or Settings. Now Tab goes
+    categories, one pad, the player bar; the arrows move between the pads."""
+    from PySide6.QtTest import QTest
+    w = window
+    add_sounds(w, *(f"Pad {i}" for i in range(12)))
+    w.resize(1180, 720)
+    w.show()
+    w.activateWindow()
+    w.tabs.setCurrentWidget(w.sounds_page)
+    qapp.processEvents()
+    shown = [p for p in w.grid.pads if p.isVisible()]
+    new_cat = w.catctl.btn_cat_add
+    new_cat.setFocus(Qt.TabFocusReason)
+    QTest.keyClick(new_cat, Qt.Key_Tab)
+    assert QApplication.focusWidget() is shown[0]
+    QTest.keyClick(shown[0], Qt.Key_Tab)
+    after = QApplication.focusWidget()
+    assert after.parentWidget() is w.btn_st.parentWidget()   # the player bar
+    QTest.keyClick(after, Qt.Key_Backtab)
+    assert QApplication.focusWidget() is shown[-1]   # back into the pads: the last one
+    QTest.keyClick(shown[-1], Qt.Key_Backtab)
+    assert QApplication.focusWidget() is new_cat
+
+
 def test_click_selects_double_click_plays(window, monkeypatch):
     monkeypatch.setattr(Pad, "single_click", False)   # (Settings: Play pads with one click, off)
     from PySide6.QtCore import QPoint
