@@ -76,6 +76,23 @@ def test_bidi_overrides_are_taken_out_of_names_and_text(qapp, window):
     assert streamapi.clean_text("a‭b⁦c", {}) == "a b c"
 
 
+def test_markup_in_chat_isnt_read_out(qapp, window):
+    """HTML tags and entities a viewer (or a bridge that escapes chat) sends aren't read
+    out letter by letter; "<3", "a < b" and "<your name>" stay as they were typed."""
+    w = window
+    d(w, "chat_rules", say="everyone", cooldown="0", user_cooldown="0")
+    body = d(w, "chat", user="Ann", message="!say <b>bold</b><i>x</i> &amp; &lt;b&gt;")[1]
+    assert body["handled"] and w.said == ["boldx &"], body
+    d(w, "chat_rules", tts="everyone")
+    assert d(w, "chat", user="Bea", message="<i>hi</i> &quot;all&quot;")[1]["handled"]
+    assert w.said[-1] == 'Bea says hi "all"'
+    assert streamapi.clean_text("<script>alert(1)</script><br/>hi", {}) == "alert(1) hi"
+    assert streamapi.clean_text("x&#8238;y &#10;z", {}) == "x y z"   # no way round _CONTROL
+    assert streamapi.clean_text("bad<b></b>word &#98;adword", {"blocked": ["badword"]}) is None
+    for kept in ("i <3 you >:)", "a < b and c > d", "say <your name> here"):
+        assert streamapi.clean_text(kept, {}) == kept
+
+
 def test_random_names_a_category_outside_chats_one(qapp, window):
     """Under a category limit, !random <another real category> says that's not chat's
     one (it used to answer "no such category", and posted nothing)."""

@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import collections
 import difflib
+import html
 import itertools
 import json
 import re
@@ -106,6 +107,12 @@ _LINK = re.compile(r"(?i)\b(?:https?://|www\.)\S+|\b[\w-]+\.(?:com|net|org|tv|gg
                    r"(?:/\S*)?\b")
 # control characters, and the bidi overrides that flip how a name or a line is shown
 _CONTROL = re.compile(r"[\x00-\x1f\x7f‪-‮⁦-⁩]")
+# an HTML tag (a known name, attributes only as name=…), so "<3" and "<your name>" stay
+_TAG = re.compile(r"(?i)</?(a|b|big|blockquote|br|center|code|del|div|em|embed|font|h[1-6]|hr|"
+                  r"i|iframe|img|ins|li|mark|marquee|object|ol|p|pre|q|s|script|small|span|"
+                  r"strike|strong|style|sub|sup|svg|table|td|tr|u|ul|video)"
+                  r"(?:\s*/?|\s+[\w-]+\s*=[^<>]*)>")
+_BREAK_TAGS = {"br", "div", "hr", "li", "p", "td", "tr"} | {f"h{n}" for n in range(1, 7)}
 _FIELD = re.compile(r"\{(\w+)\}")
 _TYPE_NAME = re.compile(r"[a-z0-9_.:-]{1,64}")
 
@@ -375,9 +382,12 @@ def _voice_named(mw: MainWindow, name: str) -> str | None:
 
 
 def clean_text(text: str, rules: dict) -> str | None:
-    """A viewer's text, made safe to speak: no control characters, links read as "link"
-    (unless allowed), cut to max_length. None when it has a blocked word."""
-    text = " ".join(_CONTROL.sub(" ", str(text)[:TEXT_MAX * 2]).split())
+    """A viewer's text, made safe to speak: no control characters or HTML markup (read
+    out letter by letter otherwise), links read as "link" (unless allowed), cut to
+    max_length. None when it has a blocked word."""
+    text = html.unescape(str(text)[:TEXT_MAX * 2])   # first: "&#8238;" is a control too
+    text = _TAG.sub(lambda m: " " if m.group(1).lower() in _BREAK_TAGS else "", text)
+    text = " ".join(_CONTROL.sub(" ", text).split())
     folded = text.casefold()
     for word in rules.get("blocked") or []:
         if word and re.search(r"(?<!\w)" + re.escape(word) + r"(?!\w)", folded):
