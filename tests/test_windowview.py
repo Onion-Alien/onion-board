@@ -83,6 +83,20 @@ def test_open_shows_the_window_and_close_stops_it(qapp, fake_win):
     row.close()
 
 
+def test_the_card_opens_and_closes_in_one_paint(qapp, fake_win, monkeypatch):
+    """Closing, the card kept its old height a frame with everything moved up, then
+    closed up: the view opens and closes with painting held until it's laid out."""
+    row = shown_row(qapp, App(5, "music.exe", title="Music Thing"))
+    held = []
+    real = row.view.set_open
+    monkeypatch.setattr(row.view, "set_open",
+                        lambda on: (held.append(row.window().updatesEnabled()), real(on)))
+    row.btn_view.click()
+    row.btn_view.click()
+    assert held == [False, False] and row.window().updatesEnabled()
+    row.close()
+
+
 @pytest.mark.parametrize("status", [winshot.MINIMISED, winshot.GONE, winshot.BLACK])
 def test_no_picture_says_why(qapp, fake_win, status):
     fake_win["status"] = status

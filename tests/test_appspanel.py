@@ -1081,6 +1081,21 @@ def test_a_listing_makes_its_cards_one_go_at_a_time(tab, qapp):
     assert set(tab.rows) == {"player0.exe"}
 
 
+def test_cards_made_a_go_at_a_time_show_together(tab, qapp):
+    """Painted as each was made, the sections jumped down the page one card at a time:
+    the list isn't painted until the last card of a listing is in."""
+    import time
+    apps = [App(100 + i, f"player{i}.exe") for i in range(4)]
+    tab._on_listed((apps, None))
+    assert not tab.scroll_area.updatesEnabled()   # one card in, the rest on their way
+    end = time.monotonic() + 2
+    while len(tab.rows) < len(apps) and time.monotonic() < end:
+        qapp.processEvents()
+    assert len(tab.rows) == len(apps) and tab.scroll_area.updatesEnabled()
+    tab._on_listed((apps[:1], None))   # nothing new: nothing held
+    assert tab.scroll_area.updatesEnabled()
+
+
 def test_program_icons_are_read_off_the_ui_thread(tab, monkeypatch):
     """The shell's icon lookup held the GIL on the UI thread (10-70 ms a program): the
     listing's thread reads them now, and a card only shows what was read."""

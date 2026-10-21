@@ -8,6 +8,7 @@ from soundboard.i18n import _, ngettext
 from soundboard.ui.kit import busy, icons
 from soundboard.ui.settings import Page, _button_row
 from soundboard.ui.kit.wheelguard import no_wheel
+from soundboard.ui.window.responsive import settled
 
 
 class AudioPage(Page):
@@ -165,13 +166,19 @@ class AudioPage(Page):
 
     def _sync_devices(self):
         for cb, src in self.dlg.dev_combos:
-            cb.clear()
-            for i in range(src.count()):
-                cb.addItem(src.itemText(i), src.itemData(i))
-            cb.setCurrentIndex(src.currentIndex())
-            cb.view().setMinimumWidth(cb.view().sizeHintForColumn(0) + 32)   # whole names
+            items = [(src.itemText(i), src.itemData(i)) for i in range(src.count())]
+            # the same devices: left as they are (emptied and filled again, each box
+            # shrank for a frame and the row beside it slid across and back)
+            if items != [(cb.itemText(i), cb.itemData(i)) for i in range(cb.count())]:
+                cb.clear()
+                for text, data in items:
+                    cb.addItem(text, data)
+                cb.view().setMinimumWidth(cb.view().sizeHintForColumn(0) + 32)   # whole names
+            if cb.currentIndex() != src.currentIndex():
+                cb.setCurrentIndex(src.currentIndex())
 
     def _pick_device(self, src, attr, i):
-        src.setCurrentIndex(i)
-        self.mw.routectl.on_device(src, attr)
-        self._sync_devices()   # "Send my sounds to" never offers the headphones
+        with settled(self.dlg):   # the boxes and the rows a new device changes: at once
+            src.setCurrentIndex(i)
+            self.mw.routectl.on_device(src, attr)
+            self._sync_devices()   # "Send my sounds to" never offers the headphones

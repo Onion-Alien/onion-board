@@ -15,7 +15,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from contextlib import contextmanager
 
-from PySide6.QtCore import QSize
+from PySide6.QtCore import QCoreApplication, QEvent, QSize
 from PySide6.QtWidgets import QBoxLayout, QLayout, QPushButton, QWidget
 
 from soundboard.ui.kit import icons
@@ -41,6 +41,23 @@ def hold_updates(widget: QWidget):
             if layout is not None:
                 layout.activate()
             widget.setUpdatesEnabled(True)
+
+
+def settle_layouts(rounds: int = 4):
+    """Run the layout passes a change set off, now. Qt runs one pass per turn of the
+    event loop and can paint between them: a row that lost a line kept its old height
+    for a frame with its contents moved, then closed up (a visible jitter)."""
+    for _ in range(rounds):
+        QCoreApplication.sendPostedEvents(None, QEvent.Type.LayoutRequest)
+
+
+@contextmanager
+def settled(widget: QWidget):
+    """A change that moves things inside `widget`, painted once: where everything
+    ends up, never a step on the way there."""
+    with hold_updates(widget):
+        yield
+        settle_layouts()
 
 
 def touch(*widgets: QWidget):
@@ -90,7 +107,10 @@ def icon_only(button: QPushButton) -> Callable[[bool], None]:
             if button.text() and button.text() != short:
                 button.setProperty("full_text", button.text())
             button.setText(short)
-        elif not button.text() and button.property("full_text"):
+        elif button.property("full_text") and button.text() in (
+                "", button.property("short_text") or ""):
+            # (a short_text button kept its word while compact: it goes back too, or
+            # "Listen" stayed after the window grew again)
             button.setText(button.property("full_text"))
         icons.text_gap(button)
         touch(button)

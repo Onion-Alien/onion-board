@@ -22,6 +22,7 @@ from soundboard.ui.settings import Page
 from soundboard.ui.settings import badges
 from soundboard.ui.settings.badges import TIER_SPLASH, tier_colour
 from soundboard.ui.voice import art
+from soundboard.ui.window.responsive import settled
 
 TILE_W = 250   # the narrowest a tile gets; they share each row's width
 BADGE = 56
@@ -405,14 +406,17 @@ class AchievementsPage(Page):
         show = next((k for k, b in self.dlg.ach_show.items() if b.isChecked()), "all")
         tier = self.dlg.ach_rarity.currentData() or ""
         left = 0
-        for card, grid in self.dlg.ach_cards:
-            picked = [t for t in grid.tiles
-                      if (not tier or t.a.tier == tier)
-                      and (show == "all" or (show == "earned") == bool(ach.got(t.a.id)))]
-            n = grid.show_only(picked)
-            card.setVisible(bool(n))
-            left += n
-        self.dlg.ach_none.setVisible(not left)
+        # painted once, closed up: a frame of the old, tall card with a few tiles at its
+        # bottom showed between
+        with settled(self.dlg):
+            for card, grid in self.dlg.ach_cards:
+                picked = [t for t in grid.tiles
+                          if (not tier or t.a.tier == tier)
+                          and (show == "all" or (show == "earned") == bool(ach.got(t.a.id)))]
+                n = grid.show_only(picked)
+                card.setVisible(bool(n))
+                left += n
+            self.dlg.ach_none.setVisible(not left)
 
     def _count(self):
         n, total = ach.earned(), len(ach.ALL)

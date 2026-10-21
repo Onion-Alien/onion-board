@@ -547,3 +547,27 @@ def test_cleanup_asks_for_admin_only_when_something_is_there(window, qapp, monke
     assert card.note.text() == ('Leftovers removed from #2 Headset Mic (USB).' if found else
                                 "Nothing of Onion Board's was left on #2 Headset Mic (USB).")
     d.close()
+
+
+def test_a_new_card_shows_the_last_rows_at_once(window, qapp, monkeypatch):  # noqa: F811
+    """Built empty, the card's rows came in after Settings was on screen and pushed the
+    page down: a new card (Settings opened again, made afresh) starts with the rows
+    the last look found, then looks again."""
+    d, card = card_with(window, qapp, monkeypatch, two_mics())
+    d.close()
+    fresh = RecoveryCard(window)
+    assert set(fresh.rows) == {GUID_A, GUID_B}   # before any look of its own
+    fresh.deleteLater()
+
+
+def test_the_first_look_runs_before_the_card_shows(window, qapp, monkeypatch):  # noqa: F811
+    """Settings is built behind the loading screen: its card looks then, so its rows are
+    there the first time Settings opens (it looked only once on screen)."""
+    window.cfg.mic_device = 'Headset Mic (USB)'
+    found = two_mics()
+    monkeypatch.setattr(dm, 'mics', lambda names=(): [dict(m) for m in found])
+    monkeypatch.setattr(dm, 'status', lambda mic=None: 'ready')
+    card = RecoveryCard(window)
+    assert not card.isVisible()
+    wait(qapp, lambda: set(card.rows) == {GUID_A, GUID_B} and not card._checking)
+    card.deleteLater()

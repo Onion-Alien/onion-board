@@ -234,6 +234,24 @@ def test_the_filters_pick_earned_not_yet_and_a_rarity(window):  # noqa: F811
     ach.detach()
 
 
+def test_a_filter_closes_the_page_up_before_it_paints(window, qapp, monkeypatch):  # noqa: F811
+    """Picking Earned painted a frame of the old, tall card with a few tiles at its
+    bottom: the tiles change with painting held until the page is laid out again."""
+    from soundboard.ui.settings import achievements as page
+    from soundboard.ui.settings.settings import SettingsDialog
+    ach.attach(window.cfg, today="2026-10-19")
+    d = SettingsDialog(window, "achievements")
+    d.show()
+    held = []
+    real = page.TileGrid.show_only
+    monkeypatch.setattr(page.TileGrid, "show_only",
+                        lambda grid, tiles: (held.append(d.updatesEnabled()), real(grid, tiles))[1])
+    d.ach_show["earned"].click()
+    assert held and not any(held) and d.updatesEnabled()
+    d.close()
+    ach.detach()
+
+
 def test_the_page_turns_the_pop_up_sound_on_and_off(window):  # noqa: F811
     from soundboard.ui.settings.settings import SettingsDialog
     window.cfg.achievement_popups = True
