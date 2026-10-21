@@ -23,6 +23,7 @@ ROUND = 0.24      # corner radius, as a fraction of the side
 
 _images: dict[str, QImage | None] = {}
 _icons: dict[str, QIcon] = {}
+_files: dict[str, tuple[int, QImage | None]] = {}   # path: (its mtime, the picture)
 
 
 def slug(text: str) -> str:
@@ -48,8 +49,36 @@ def exists(key: str) -> bool:
 def pixmap(key: str, size: int) -> QPixmap | None:
     """The picture as a `size` px rounded square (centre-cropped), or None."""
     img = _image(key)
-    if img is None:
+    return None if img is None else rounded(img, size)
+
+
+def _file_image(path: Path) -> QImage | None:
+    """A picture file of the user's (read again once it changes), or None."""
+    try:
+        when = path.stat().st_mtime_ns
+    except OSError:
         return None
+    hit = _files.get(str(path))
+    if hit is None or hit[0] != when:
+        img = QImage(str(path))
+        hit = _files[str(path)] = (when, None if img.isNull() else img)
+    return hit[1]
+
+
+def file_icon(path: Path) -> QIcon | None:
+    """A picture file as a rounded-square icon, like the art's, or None."""
+    if _file_image(path) is None:
+        return None
+    return icons.sharp_icon(lambda px, _mode, _state: file_pixmap(path, px) or QPixmap())
+
+
+def file_pixmap(path: Path, size: int) -> QPixmap | None:
+    img = _file_image(path)
+    return None if img is None else rounded(img, size)
+
+
+def rounded(img: QImage, size: int) -> QPixmap:
+    """`img` centre-cropped to a square, as a `size` px rounded square."""
     side = min(img.width(), img.height())
     sq = img.copy((img.width() - side) // 2, (img.height() - side) // 2, side, side)
     sq = sq.scaled(size, size, Qt.AspectRatioMode.IgnoreAspectRatio,

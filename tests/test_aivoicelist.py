@@ -217,6 +217,46 @@ def test_make_your_own_voice_from_two_others(qapp, app_dir):
         d.deleteLater()
 
 
+def test_your_voice_can_have_its_own_picture(qapp, app_dir, monkeypatch):
+    from PySide6.QtGui import QColor, QImage
+    from soundboard.ui.voice import aivoicebrowser
+    from soundboard.ui.voice.aivoicebrowser import AiVoiceEditor
+    src = app_dir / "wide.png"
+    img = QImage(300, 100, QImage.Format.Format_RGB32)
+    img.fill(QColor("red"))
+    assert img.save(str(src))
+    d = AiVoiceEditor(avl.BUILT_IN, None, FakePreviewer())
+    try:
+        assert d.b_pic_clear.isHidden()                 # none yet: My own mix's
+        d.save_picture()
+        assert not avl.picture_path(d.vid).exists()     # nothing picked: nothing written
+        monkeypatch.setattr(aivoicebrowser.QFileDialog, "getOpenFileName",
+                            lambda *a, **k: (str(src), ""))
+        d.b_pic.click()
+        assert not d.b_pic_clear.isHidden()
+        d.reject()                                      # Cancel: not kept
+        assert not avl.picture_path(d.vid).exists()
+        d.accept()                                      # Save: a square PNG by its id
+        kept = QImage(str(avl.picture_path(d.vid)))
+        assert (kept.width(), kept.height()) == (aivoicebrowser.PIC_SAVED,) * 2
+        v = avl.Store().put(d.result_voice())
+        assert v is not None and v["emoji"] == ""
+        again = AiVoiceEditor(avl.BUILT_IN, v, FakePreviewer())
+        assert again.picture is not None and not again.b_pic_clear.isHidden()
+        again.b_pic_clear.click()
+        again.accept()
+        assert not avl.picture_path(d.vid).exists()
+        again.deleteLater()
+        d.accept()
+        s = avl.Store()                                 # deleted for good: picture too
+        item = s.remove(v["id"])
+        assert avl.picture_path(v["id"]).exists()       # (kept for Undo)
+        s.forget(item.id)
+        assert not avl.picture_path(v["id"]).exists()
+    finally:
+        d.deleteLater()
+
+
 def ready_panel(app_dir, monkeypatch, settings=None):
     """The AI voices card with the add-on installed (yours: you can make voices)."""
     from soundboard.addons import aiaddon

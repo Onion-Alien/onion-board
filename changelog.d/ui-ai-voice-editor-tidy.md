@@ -1,0 +1,1 @@
+- AI voices: the Make your own voice window is tidied up: no emoji box next to the name, more room under the heading, the sliders and their values lined up, and Hear it beside Save and Cancel. You can pick a picture for your voice's card; without one it gets the My own mix picture.
