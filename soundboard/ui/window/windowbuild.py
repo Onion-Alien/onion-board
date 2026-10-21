@@ -95,6 +95,7 @@ from soundboard.ui.kit.widgets import (
     SteadyTabs,
     WindowRoot,
     fit_placeholder,
+    widget_at,
 )
 from soundboard.ui.sounds.ytsearch import SearchResults
 from soundboard.ui.kit.wheelguard import AppStyle, no_wheel
@@ -797,9 +798,8 @@ class WindowBuilder(Controller):
 
         mw.mic_lbl, row = group("mic", _("My mic"),
                                   _("Your real microphone, and how loud your voice is for others"))
-        first = row.itemAt(0)   # its CapIcon: struck through while muted (_sync_mini_mic)
-        assert first is not None
-        mw.mic_icon = first.widget()
+        mw.mic_icon = widget_at(row, 0)   # its CapIcon: struck through while muted (_sync_mini_mic)
+        assert mw.mic_icon is not None
         mw.chk_mic = QCheckBox(_("Others hear it"))
         mw.chk_mic.setToolTip(_("Send your voice to others along with the sounds.\nUntick for "
                                   "sounds only: they hear your sounds but not your mic."))

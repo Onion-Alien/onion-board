@@ -44,7 +44,7 @@ from soundboard.ui.voice.speechinstall import SpeechInstalls
 from soundboard.ui.voice.groupbar import GroupBar, no_match
 from soundboard.ui.voice.voicefxpanel import (LIST_MIN_W, MAX_COLS, TILE_ART, TILE_GAP,
                                               TILE_MIN_W, BigSwitch, VoiceTile)
-from soundboard.ui.kit.widgets import fit_placeholder
+from soundboard.ui.kit.widgets import fit_placeholder, widget_at
 from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.core import errors
 from soundboard.i18n import _, ngettext
@@ -532,8 +532,7 @@ class SpeechPanel(QWidget):
         if lay is None:
             return
         m = lay.contentsMargins()
-        parts = [lay.itemAt(i) for i in range(lay.count())]
-        others = sum(w.sizeHint().width() for w in (it.widget() for it in parts if it)
+        others = sum(w.sizeHint().width() for w in (widget_at(lay, i) for i in range(lay.count()))
                      if w is not None and w is not ed and not w.isHidden())
         gaps = lay.spacing() * max(lay.count() - 1, 0)
         room = self.say_bar.width() - m.left() - m.right() - others - gaps
