@@ -39,7 +39,7 @@ CONF_STICK = 0.06        # ...and keeps its dance while that's this near a rule'
 ON_BEAT_S = 8.0          # seconds of beats checked for a bass hit on each one...
 ON_BEAT_NEAR = 0.05      # ...this close to it (a kick on every beat: four to the floor)
 ON_BEAT_STICK = 0.1      # (and the dance stays while that share is this near the line)
-BREAK_CONF = 0.75        # electronic stays it through a breakdown this sure of the beat
+BREAK_CONF = 0.6         # electronic stays it through a breakdown this sure of the beat
 BPM_LO, BPM_HI = 60.0, 185.0
 STYLES = ("pop", "electronic", "rock", "hiphop", "chill", "speech")
 

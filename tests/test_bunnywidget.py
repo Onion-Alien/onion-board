@@ -609,6 +609,23 @@ def test_hiphop_nods_on_the_808_hits_themselves(qapp, monkeypatch):
     assert b.pose()["dip"] < 2            # back up before the next one
 
 
+
+def test_hiphop_nods_on_a_sure_beat_too_not_only_on_the_808(qapp, monkeypatch):
+    # a few 808s a bar left him all but still: with the beat sure, he nods on it too
+    b, clock = _dance(monkeypatch, "hiphop")
+    song = b.groove
+    song.bpm = 92.0
+    song.last_hit = lambda band, now: (float("inf"), 0.0)   # no 808 at all
+    _beats(b, clock, 2.0)
+    beat = song.t0 + 60 / song.bpm * 8
+    clock.now = beat - 0.2
+    still = b.pose()["dip"]
+    clock.now = beat
+    assert b.pose()["dip"] < still + 1   # unsure of the beat: no nod of its own
+    song.confidence = 0.9
+    clock.now = beat
+    assert b.pose()["dip"] > still + 5   # sure: down on the beat
+
 def test_a_sad_bun_on_an_empty_page_cheers_up_and_dances_to_what_plays(qapp, monkeypatch):
     from soundboard.ui.bun import bunnywidget
     clock = _Clock()
