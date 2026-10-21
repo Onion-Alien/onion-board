@@ -466,6 +466,39 @@ def test_a_grey_language_card_offline_says_why(panel, monkeypatch):
     assert toasts and "Offline mode" in toasts[0]
 
 
+def test_languages_tab_hides_offline_until_speech_recognition_is_in(panel, monkeypatch):
+    """Offline mode and no speech recognition: nothing on the Languages card can work
+    or be installed, so its tab goes (as AI voices'). Installed, it works offline."""
+    from soundboard.addons import modules as mods
+    p, _ = panel
+    s = p.speech
+    if s.module is None:
+        pytest.skip("no live-voice add-on in this copy")
+    live = s.module.id
+    installed = [False]
+    monkeypatch.setattr(mods.ModuleInfo, "installed", property(
+        lambda self: installed[0] if self.id == live else True))
+    monkeypatch.setattr("soundboard.speech.spoken.heard", lambda: True)
+    off = [False]
+    monkeypatch.setattr("soundboard.online.net.offline", lambda: off[0])
+    s.installs._refresh_module()
+    p._ai_net_changed()
+    p.show_tab("speak")
+    assert p.current_tab() == "speak"
+    # online: Install shows, but no switch or "Pick a language" with nothing to pick
+    assert not s.installs.b_install.isHidden()
+    assert s.b_on.isHidden() and s.lbl_intro.isHidden() and s.cards.isHidden()
+    off[0] = True
+    s.installs._net_changed()
+    p._ai_net_changed()
+    assert p._tabs["speak"].isHidden() and p.current_tab() == "fx"
+    installed[0] = True
+    s.installs._refresh_module()
+    p._ai_net_changed()
+    assert not p._tabs["speak"].isHidden()
+    assert not s.b_on.isHidden() and not s.lbl_intro.isHidden()
+
+
 def test_downloaded_language_needs_a_windows_voice_and_uses_it(panel, monkeypatch):
     from soundboard.speech import translation
     p, _ = panel

@@ -326,12 +326,10 @@ class VoicePanel(QWidget):
         self.ai._event.connect(lambda _ev: self._update_bar())   # starting -> on / failed
         self._ai_card = self._section("ai", self.ai, self.ai.title, self.ai.head)
         net.on_change(self._ai_net_changed)
-        self._ai_follow_offline()
         self.speech.live_changed.connect(self._speech_live)
         self.speech.lang_changed.connect(self._emit_active)
         self._section("speak", self.speech, self.speech.title, self.speech.head)
-        # speech recognition has to hear the app's language for any of it to work
-        self._tabs["speak"].setVisible(spoken.heard())
+        self._follow_offline()
         self.speech.custom_wanted.connect(lambda: self.show_tab("addons"))
         self.addons = ModulesList(self.speech.custom_title, self.speech.custom_box)
         self.addons.refresh.connect(self._rescan_in_background)
@@ -1074,7 +1072,7 @@ class VoicePanel(QWidget):
         self.chain.configure(self.fx.spec())
         self.speech.set_modules(self.modules)
         self.ai.set_modules(self.modules, ai_voices)
-        self._ai_follow_offline()
+        self._follow_offline()
         self.addons.show_modules(self.modules)
 
     def _rescan_in_background(self):
@@ -1097,19 +1095,24 @@ class VoicePanel(QWidget):
             busy.emit(self._scanned, found, voices)
         threading.Thread(target=work, daemon=True, name="addon-scan").start()
 
-    def _ai_follow_offline(self):
-        """Offline mode: the AI voices tab only while they're ready to use (getting
-        or installing them goes online)."""
-        shown = not net.offline() or self.ai.ready()
-        self._tabs["ai"].setVisible(shown)
-        if not shown and self._tab == "ai":
-            self.show_tab("fx")
-        self._ai_card.setVisible(shown and self._tab == "ai")
+    def _follow_offline(self):
+        """Offline mode: the AI voices and Languages tabs only while they're ready to
+        use (getting or installing them goes online). Languages also needs speech
+        recognition to hear the app's language."""
+        off = net.offline()
+        shown = {"ai": not off or self.ai.ready(),
+                 "speak": spoken.heard() and (not off or self.speech.recognition_ready()
+                                              or self.speech.installs._installing)}
+        for key, on in shown.items():
+            self._tabs[key].setVisible(on)
+            if not on and self._tab == key:
+                self.show_tab("fx")
+            self._cards[key].setVisible(on and self._tab == key)
 
     def _ai_net_changed(self):
         if not self.ai._installing:   # (its buttons come back when that's done)
             self.ai._refresh()
-        self._ai_follow_offline()
+        self._follow_offline()
         self.addons.show_modules(self.modules)   # its lines name downloads
 
     def _apply_scan(self, found, voices):
