@@ -1102,7 +1102,7 @@ def test_a_top_bar_and_a_row_of_playing_sounds_dont_force_the_mini_player(window
     window.urgent_bar.show()
     ids = list(window.pads)
     window.playctl._queue[:] = ids * 3
-    window.playctl._update_chips(set(ids))
+    window.playctl._update_chips(dict.fromkeys(ids, (0.0, False)))
     window.fitctl._refit()
     assert window.playing_row.isVisibleTo(window)
     assert not window.fitctl.is_mini()

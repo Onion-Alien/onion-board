@@ -592,14 +592,17 @@ class PlaybackControl(Controller):
         Up next row put back)."""
         mw = self.mw
         if force:
-            mw._chip_ids = ("remake",)   # never equal to a real (ids, queue, links)
+            mw._chip_ids = ("remake",)   # never equal to a real (ids, queue, links, paused)
         ids = tuple(s for s in mw.pads if s in playing)
         if LINK_ID in playing:
             ids += (LINK_ID,)
+        # a paused one is under Paused, not Now playing: a song paused before a
+        # Community sound played said it was still playing
+        paused = tuple(s for s in ids if playing[s][1])
         queue = tuple(self._queue)
         links = tuple(mw.linkbar.up_next())   # web search / link Plays waiting their turn
-        if (ids, queue, links) != mw._chip_ids:
-            mw._chip_ids = (ids, queue, links)
+        if (ids, queue, links, paused) != mw._chip_ids:
+            mw._chip_ids = (ids, queue, links, paused)
             while mw._chips_hl.count():
                 item = mw._chips_hl.takeAt(0)
                 w = item.widget() if item else None
@@ -608,11 +611,15 @@ class PlaybackControl(Controller):
             mw._chips = {}
             # Now playing first, then Up next: one line, read the way the app reads
             # (the Flow mirrors it in Arabic)
-            if ids:
-                lbl = QLabel(_("Now playing"))
+            groups = ((_("Now playing"), [s for s in ids if s not in paused]),
+                      (_("Paused"), list(paused)))
+            for title, group in groups:
+                if not group:
+                    continue
+                lbl = QLabel(title)
                 lbl.setObjectName("muted")
                 mw._chips_hl.addWidget(lbl)
-                for sid in ids:
+                for sid in group:
                     m = mw.meta(sid)
                     chip = QFrame()
                     chip.setObjectName("chip")

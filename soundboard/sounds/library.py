@@ -2335,11 +2335,12 @@ def import_file(src: str, color: str, name: str = "",
         raise
 
 
-def save_clip(data: np.ndarray, name: str, color: str) -> tuple[SoundMeta, np.ndarray]:
+def save_clip(data: np.ndarray, name: str, color: str,
+              folder: str = RECORDINGS) -> tuple[SoundMeta, np.ndarray]:
     """Store recorded audio ((n, 2) float32 at SR) as stored_ext() says; return
     metadata + int16 audio."""
     sid = uuid.uuid4().hex[:10]
-    dest = new_file(name, stored_ext(), RECORDINGS)
+    dest = new_file(name, stored_ext(), folder)
     try:
         write_stored(dest, data)
     except BaseException:
