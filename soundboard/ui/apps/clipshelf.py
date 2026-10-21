@@ -149,6 +149,8 @@ class ClipRowDelegate(QStyledItemDelegate):
     def __init__(self, shelf: ClipShelf):
         super().__init__(shelf.list)
         self.s = shelf
+        self.pressed_play = False   # the last press was on a round play button
+        self._double = False        # ...and became a double-click: its release does nothing
 
     def sizeHint(self, option, index):
         return QSize(0, ROW_H if index.data(ID) else GROUP_H)
@@ -267,7 +269,8 @@ class ClipRowDelegate(QStyledItemDelegate):
     # ------------------------------------------------------------------ input
     def editorEvent(self, event, model, option, index):
         kind = event.type()
-        if kind not in (QEvent.Type.MouseButtonRelease, QEvent.Type.MouseButtonDblClick):
+        if kind not in (QEvent.Type.MouseButtonPress, QEvent.Type.MouseButtonRelease,
+                        QEvent.Type.MouseButtonDblClick):
             return False
         if event.button() != Qt.MouseButton.LeftButton:
             return False
@@ -275,15 +278,30 @@ class ClipRowDelegate(QStyledItemDelegate):
         if it is None:
             return False
         pos = event.position().toPoint()
+        on_play = bool(index.data(ID)) and self.s.row_layout(
+            option.rect, depth(index)).play.contains(pos)
+        if kind == QEvent.Type.MouseButtonPress:
+            self.pressed_play, self._double = on_play, False
+            return False
         if not index.data(ID):   # a group's label: a click folds it
             if kind == QEvent.Type.MouseButtonRelease:
                 it.setExpanded(not it.isExpanded())
             return True
-        if self.s.row_layout(option.rect, depth(index)).play.contains(pos):
-            if kind == QEvent.Type.MouseButtonRelease:
+        if on_play:
+            if kind == QEvent.Type.MouseButtonDblClick:
+                self._double = True
+            elif not self._double:
                 self.s.toggle_play(it)
             return True   # (a double-click on the button isn't a second play)
         return False
+
+    def double_clicked(self) -> bool:
+        """A row was double-clicked: False when it was on its play button (the first
+        click played it; the rest of the double-click does nothing)."""
+        if self.pressed_play:
+            self._double = True
+            return False
+        return True
 
     def helpEvent(self, event, view, option, index):
         L = self.s.row_layout(option.rect, depth(index))
@@ -424,8 +442,9 @@ class ClipShelf(QWidget):
         self.list.customContextMenuRequested.connect(self._menu)
         self.delegate = ClipRowDelegate(self)
         self.list.setItemDelegate(self.delegate)
-        self.list.itemDoubleClicked.connect(
-            lambda it, _col: self.toggle_play(it) if it.data(0, ID) else None)
+        self.list.itemDoubleClicked.connect(   # on the row, not its play button: plays it
+            lambda it, _col: self.toggle_play(it)
+            if it.data(0, ID) and self.delegate.double_clicked() else None)
         self.list.itemChanged.connect(self._renamed)
         self.list.itemSelectionChanged.connect(self._sync)
         self.list.currentItemChanged.connect(lambda *_a: self._place_actions())
