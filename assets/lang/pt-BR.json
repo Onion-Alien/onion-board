@@ -4380,5 +4380,14 @@
   "Right now only you hear your sounds.": "Agora só você ouve seus sons.",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install mic effect</b>. Without it, your sounds won't go through to Discord or games.": "Quando seu microfone estiver conectado, vá em <b>Configurações → Áudio</b> e clique em <b>Instalar efeito</b>. Sem isso, seus sons não chegam ao Discord nem aos jogos.",
   "🎧 <b>Got a new mic or headset later?</b> Put your sounds into that one too: <b>Settings → Audio → Install mic effect</b>. Each mic needs it once.": "🎧 <b>Microfone ou headset novo depois?</b> Coloque seus sons nele também: <b>Configurações → Áudio → Instalar efeito</b>. Cada microfone precisa disso uma vez.",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Microfone ou headset novo?</b> O efeito do microfone fica em um microfone de cada vez. Sempre que trocar por um novo, escolha-o em Dispositivos e depois clique em <b>Instalar efeito</b> aqui, senão os outros não vão ouvir seus sons."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Microfone ou headset novo?</b> O efeito do microfone fica em um microfone de cada vez. Sempre que trocar por um novo, escolha-o em Dispositivos e depois clique em <b>Instalar efeito</b> aqui, senão os outros não vão ouvir seus sons.",
+  "56 achievements": "56 conquistas",
+  "A Stream Deck plugin": "Um plugin para Stream Deck",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "Adicione uma tecla Play sound e escolha o som em uma lista. O Guia para streamers em Configurações → Controle remoto tem o link.",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "Pontos do canal, cheers, raids e comandos do chat tocam seus sons. Sem precisar de bot.",
+  "Each one has its own Bun badge. They're counted on your PC only.": "Cada uma tem seu próprio emblema do Bun. Elas são contadas só no seu PC.",
+  "Lite mode for slower PCs": "Modo leve para PCs mais lentos",
+  "Open Remote": "Abrir Controle remoto",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "Configurações → Aparência: as animações ficam paradas e as vozes de IA usam um modelo mais leve.",
+  "Twitch, Stream Deck and achievements": "Twitch, Stream Deck e conquistas"
 }

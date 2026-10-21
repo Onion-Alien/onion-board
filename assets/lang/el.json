@@ -4380,5 +4380,14 @@
   "Right now only you hear your sounds.": "Αυτή τη στιγμή μόνο εσείς ακούτε τους ήχους σας.",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install mic effect</b>. Without it, your sounds won't go through to Discord or games.": "Όταν το μικρόφωνό σας είναι συνδεδεμένο, πηγαίνετε στο <b>Ρυθμίσεις → Ήχος</b> και πατήστε <b>Εγκατάσταση εφέ</b>. Χωρίς αυτό, οι ήχοι σας δεν θα φτάνουν στο Discord ή στα παιχνίδια.",
   "🎧 <b>Got a new mic or headset later?</b> Put your sounds into that one too: <b>Settings → Audio → Install mic effect</b>. Each mic needs it once.": "🎧 <b>Νέο μικρόφωνο ή headset αργότερα;</b> Βάλτε τους ήχους σας και σε αυτό: <b>Ρυθμίσεις → Ήχος → Εγκατάσταση εφέ</b>. Κάθε μικρόφωνο το χρειάζεται μία φορά.",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Νέο μικρόφωνο ή headset;</b> Το εφέ μικροφώνου μπαίνει σε ένα μικρόφωνο κάθε φορά. Κάθε φορά που αλλάζετε σε νέο, επιλέξτε το στις Συσκευές και μετά πατήστε <b>Εγκατάσταση εφέ</b> εδώ, αλλιώς οι άλλοι δεν θα ακούν τους ήχους σας."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Νέο μικρόφωνο ή headset;</b> Το εφέ μικροφώνου μπαίνει σε ένα μικρόφωνο κάθε φορά. Κάθε φορά που αλλάζετε σε νέο, επιλέξτε το στις Συσκευές και μετά πατήστε <b>Εγκατάσταση εφέ</b> εδώ, αλλιώς οι άλλοι δεν θα ακούν τους ήχους σας.",
+  "56 achievements": "56 επιτεύγματα",
+  "A Stream Deck plugin": "Ένα πρόσθετο για Stream Deck",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "Πρόσθεσε ένα πλήκτρο Play sound και διάλεξε τον ήχο από λίστα. Ο Οδηγός για streamers στις Ρυθμίσεις → Απομακρυσμένο έχει τον σύνδεσμο.",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "Πόντοι καναλιού, cheers, raids και εντολές chat παίζουν τους ήχους σου. Χωρίς bot.",
+  "Each one has its own Bun badge. They're counted on your PC only.": "Το καθένα έχει το δικό του σήμα με τον Bun. Μετριούνται μόνο στον υπολογιστή σου.",
+  "Lite mode for slower PCs": "Ελαφριά λειτουργία για πιο αργούς υπολογιστές",
+  "Open Remote": "Άνοιγμα Απομακρυσμένο",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "Ρυθμίσεις → Εμφάνιση: τα κινούμενα σχέδια μένουν ακίνητα και οι φωνές AI χρησιμοποιούν ελαφρύτερο μοντέλο.",
+  "Twitch, Stream Deck and achievements": "Twitch, Stream Deck και επιτεύγματα"
 }

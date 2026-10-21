@@ -4380,5 +4380,14 @@
   "Right now only you hear your sounds.": "Şu anda seslerinizi yalnızca siz duyuyorsunuz.",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install mic effect</b>. Without it, your sounds won't go through to Discord or games.": "Mikrofonunuz takılıyken <b>Ayarlar → Ses</b> bölümüne gidin ve <b>Efekti kur</b> düğmesine basın. Bu olmadan sesleriniz Discord'a veya oyunlara ulaşmaz.",
   "🎧 <b>Got a new mic or headset later?</b> Put your sounds into that one too: <b>Settings → Audio → Install mic effect</b>. Each mic needs it once.": "🎧 <b>Sonra yeni bir mikrofon veya kulaklık mı?</b> Seslerinizi ona da verin: <b>Ayarlar → Ses → Efekti kur</b>. Her mikrofonun buna bir kez ihtiyacı var.",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Yeni mikrofon veya kulaklık mı?</b> Mikrofon efekti aynı anda tek bir mikrofonda olur. Her yeni mikrofona geçtiğinizde onu Cihazlar bölümünde seçin, sonra burada <b>Efekti kur</b> düğmesine basın; yoksa başkaları seslerinizi duymaz."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Yeni mikrofon veya kulaklık mı?</b> Mikrofon efekti aynı anda tek bir mikrofonda olur. Her yeni mikrofona geçtiğinizde onu Cihazlar bölümünde seçin, sonra burada <b>Efekti kur</b> düğmesine basın; yoksa başkaları seslerinizi duymaz.",
+  "56 achievements": "56 başarım",
+  "A Stream Deck plugin": "Bir Stream Deck eklentisi",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "Bir Play sound tuşu ekle ve sesi listeden seç. Ayarlar → Uzak bölümündeki Yayıncı kılavuzu ona bağlantı verir.",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "Kanal puanları, cheer'lar, baskınlar ve sohbet komutları seslerini çalar. Bot gerekmez.",
+  "Each one has its own Bun badge. They're counted on your PC only.": "Her birinin kendi Bun rozeti var. Yalnızca senin bilgisayarında sayılır.",
+  "Lite mode for slower PCs": "Daha yavaş bilgisayarlar için hafif mod",
+  "Open Remote": "Uzak'ı aç",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "Ayarlar → Dış görünüş: animasyonlar durur ve yapay zeka sesleri daha hafif bir model kullanır.",
+  "Twitch, Stream Deck and achievements": "Twitch, Stream Deck ve başarımlar"
 }

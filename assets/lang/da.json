@@ -4380,5 +4380,14 @@
   "Right now only you hear your sounds.": "Lige nu er det kun dig, der hører dine lyde.",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install mic effect</b>. Without it, your sounds won't go through to Discord or games.": "Når din mikrofon er sat i, så gå til <b>Indstillinger → Lyd</b> og tryk på <b>Installer mikrofoneffekt</b>. Uden den kommer dine lyde ikke igennem til Discord eller spil.",
   "🎧 <b>Got a new mic or headset later?</b> Put your sounds into that one too: <b>Settings → Audio → Install mic effect</b>. Each mic needs it once.": "🎧 <b>Får du en ny mikrofon eller et nyt headset senere?</b> Send også dine lyde ind i den: <b>Indstillinger → Lyd → Installer mikrofoneffekt</b>. Hver mikrofon skal have det én gang.",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Ny mikrofon eller headset?</b> Mikrofoneffekten sidder på én mikrofon ad gangen. Hver gang du skifter til en ny, så vælg den under Enheder og tryk på <b>Installer mikrofoneffekt</b> her, ellers hører andre ikke dine lyde."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Ny mikrofon eller headset?</b> Mikrofoneffekten sidder på én mikrofon ad gangen. Hver gang du skifter til en ny, så vælg den under Enheder og tryk på <b>Installer mikrofoneffekt</b> her, ellers hører andre ikke dine lyde.",
+  "56 achievements": "56 præstationer",
+  "A Stream Deck plugin": "Et Stream Deck-plugin",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "Tilføj en Play sound-tast og vælg lyden fra en liste. Streamerguiden under Indstillinger → Fjernbetjening linker til det.",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "Kanalpoint, cheers, raids og chatkommandoer afspiller dine lyde. Ingen bot nødvendig.",
+  "Each one has its own Bun badge. They're counted on your PC only.": "Hver har sit eget Bun-badge. De tælles kun på din pc.",
+  "Lite mode for slower PCs": "Let tilstand til langsommere pc'er",
+  "Open Remote": "Åbn Fjernbetjening",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "Indstillinger → Udseende: animationer står stille, og AI-stemmer bruger en lettere model.",
+  "Twitch, Stream Deck and achievements": "Twitch, Stream Deck og præstationer"
 }

@@ -4688,5 +4688,14 @@
   "Right now only you hear your sounds.": "الآن أنت وحدك من يسمع أصواتك.",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install mic effect</b>. Without it, your sounds won't go through to Discord or games.": "عندما يكون ميكروفونك موصولًا، اذهب إلى <b>الإعدادات ← صوتي</b> واضغط <b>ثبّت مؤثر الميكروفون</b>. بدونه لن تصل أصواتك إلى ديسكورد أو الألعاب.",
   "🎧 <b>Got a new mic or headset later?</b> Put your sounds into that one too: <b>Settings → Audio → Install mic effect</b>. Each mic needs it once.": "🎧 <b>حصلت على ميكروفون أو سماعة جديدة لاحقًا؟</b> ضع أصواتك فيه أيضًا: <b>الإعدادات ← صوتي ← ثبّت مؤثر الميكروفون</b>. كل ميكروفون يحتاجها مرة واحدة.",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>ميكروفون أو سماعة جديدة؟</b> مؤثر الميكروفون يعمل على ميكروفون واحد في كل مرة. كلما انتقلت إلى ميكروفون جديد، اختره في الأجهزة ثم اضغط <b>ثبّت مؤثر الميكروفون</b> هنا، وإلا فلن يسمع الآخرون أصواتك."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>ميكروفون أو سماعة جديدة؟</b> مؤثر الميكروفون يعمل على ميكروفون واحد في كل مرة. كلما انتقلت إلى ميكروفون جديد، اختره في الأجهزة ثم اضغط <b>ثبّت مؤثر الميكروفون</b> هنا، وإلا فلن يسمع الآخرون أصواتك.",
+  "56 achievements": "56 إنجازًا",
+  "A Stream Deck plugin": "إضافة لـ Stream Deck",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "أضف زر Play sound واختر الصوت من قائمة. دليل البث في الإعدادات ← بعيد يوصلك إليها.",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "نقاط القناة والتشجيعات والغارات وأوامر الدردشة تشغّل أصواتك. بلا حاجة إلى بوت.",
+  "Each one has its own Bun badge. They're counted on your PC only.": "لكل إنجاز شارة Bun خاصة به. تُحسب على جهازك فقط.",
+  "Lite mode for slower PCs": "الوضع الخفيف للأجهزة الأبطأ",
+  "Open Remote": "افتح بعيد",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "الإعدادات ← مظهر: تتوقف الرسوم المتحركة، وتستخدم أصوات الذكاء الاصطناعي نموذجًا أخف.",
+  "Twitch, Stream Deck and achievements": "Twitch وStream Deck والإنجازات"
 }
