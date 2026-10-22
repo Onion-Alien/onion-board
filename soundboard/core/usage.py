@@ -910,6 +910,7 @@ _INNER = re.compile(r'^\s*File "(?:[^"]*[\\/])?([A-Za-z0-9_]+)\.py", line \d+, i
 BUSY = 0.3   # a thread using this share of a core or more was working, not waiting
 IN_DIALOG_MARK = "inside a window's own event loop"   # hangwatch.IN_DIALOG_NOTE
 ALL_HELD_MARK = "every thread was held up"   # hangwatch.ALL_HELD_NOTE
+GC_SWEEP_MARK = "a full garbage sweep over the whole app"   # hangwatch.GC_SWEEP_NOTE
 
 
 def _blocked_in(stack: str) -> str:
@@ -983,6 +984,8 @@ def _freeze_tag(head: str, window: str, others: str) -> str:
     rest = ["in-dialog"] if IN_DIALOG_MARK in window else []
     if ALL_HELD_MARK in window:   # the whole app, not the window alone
         rest.append("all-held")
+    if GC_SWEEP_MARK in window:   # uigc's deep sweep held it (reading the app back in)
+        rest.append("gc-sweep")
     rest += [p for p in (_lasted(head), _busy(window, others)) if p]
     rest += _memory(window)   # a PC short of memory: the likely cause of an idle freeze
     return tag + "".join(f"/{p}" for p in rest)
