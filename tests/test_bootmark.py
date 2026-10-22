@@ -257,3 +257,19 @@ def test_stepping_aside_for_the_installer_takes_the_breadcrumb_away():
     after = src[src.index("except Exception:"):]
     block = after[:after.index("raise")]
     assert "bootmark.clear()" in block
+
+
+def test_a_slow_start_writes_down_where_it_waited(tmp_path):
+    import time
+    bootmark.watch_stall(tmp_path, seconds=0.1)
+    time.sleep(0.4)
+    took, path = bootmark.stop_stall()
+    assert took >= 0.3 and path == tmp_path / bootmark.STALL_NAME
+    assert "test_a_slow_start_writes_down_where_it_waited" in path.read_text(encoding="utf-8")
+
+
+def test_a_quick_start_leaves_no_stall_file(tmp_path):
+    bootmark.watch_stall(tmp_path, seconds=30)
+    took, path = bootmark.stop_stall()
+    assert path is None and not (tmp_path / bootmark.STALL_NAME).exists()
+    assert bootmark.stop_stall() == (0.0, None)   # twice is harmless

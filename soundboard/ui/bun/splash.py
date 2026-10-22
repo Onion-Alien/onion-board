@@ -281,6 +281,7 @@ class NativeSplash:
         self.ok = False   # the window came up and showed its first frame
         self._leave: float | None = None   # when his goodbye started (time.monotonic)
         self._switch = sys.getswitchinterval()
+        self._born = time.monotonic()
         sys.setswitchinterval(min(SWITCH_S, self._switch))   # never coarser than the app's
         self._thread = threading.Thread(target=self._run, name="splash", daemon=True)
         self._thread.start()
@@ -289,6 +290,10 @@ class NativeSplash:
 
     def isVisible(self) -> bool:
         return self.ok and self._thread.is_alive() and not self._stop.is_set()
+
+    def starting(self) -> bool:
+        """Its thread is still drawing the first frame (not shown yet, not given up)."""
+        return not self.ok and not self._up.is_set() and self._thread.is_alive()
 
     def close(self, goodbye: bool = False):
         """Take it down; `goodbye`: after his wave (GOODBYE_S), without waiting for it."""
@@ -427,6 +432,8 @@ class NativeSplash:
                     user.ShowWindow(hwnd, 4)   # SW_SHOWNOACTIVATE
                     self.ok = True
                     self._up.set()
+                    if (took := time.monotonic() - self._born) > 1:
+                        log.info("loading screen: first frame took %.1f s", took)
                 while user.PeekMessageW(ctypes.byref(msg), None, 0, 0, 1):   # PM_REMOVE
                     user.TranslateMessage(ctypes.byref(msg))
                     user.DispatchMessageW(ctypes.byref(msg))
@@ -462,9 +469,15 @@ def show() -> Splash | NativeSplash:
     _show = splashacts.pick()   # after the theme: his outfit is the theme's
     if QGuiApplication.platformName() == "windows":
         _splash = NativeSplash()   # draws itself on its own thread: nothing to pump
-        if _splash.ok:
+        if _splash.ok or _splash.starting():
+            # still on its first frame after a second (a first launch right after
+            # installing can be that slow): keep it, it comes up when that's drawn. The
+            # Qt one instead only drew while the UI thread had time, which a start that
+            # slow doesn't have: nothing at all showed for a minute.
+            if not _splash.ok:
+                log.info("loading screen: first frame not drawn after 1 s; still coming")
             return _splash
-        _splash.close()   # it couldn't: the Qt one instead
+        _splash.close()   # it couldn't (no window): the Qt one instead
     _splash = Splash()
     screen = QGuiApplication.screenAt(QCursor.pos()) or QGuiApplication.primaryScreen()
     if screen is not None:
