@@ -1,4 +1,5 @@
 """Settings > Achievements: the counting (soundboard.core.achievements) and its page."""
+import time
 from types import SimpleNamespace
 
 import pytest
@@ -7,6 +8,13 @@ from conftest import process_events
 from soundboard.core import achievements as ach, usage
 from soundboard.ui.settings.achievements import TIER_SPLASH, texts
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
+
+
+NOON = time.strptime("2026-06-10 12:00:00", "%Y-%m-%d %H:%M:%S")   # no day of note
+
+
+def at(when: str) -> time.struct_time:
+    return time.strptime(when, "%Y-%m-%d %H:%M:%S")
 
 
 @pytest.fixture
@@ -32,15 +40,15 @@ def test_a_count_earns_it_once_at_its_goal(cfg):
     heard = []
     ach.on_unlock.append(heard.append)
     try:
-        ach.played(hour=12)
+        ach.played(hour=12, when=NOON)
         assert ach.got("first_blood") and not ach.got("spammer")
         for _ in range(999):
-            ach.played(hour=12)
+            ach.played(hour=12, when=NOON)
         assert ach.got("spammer")
-        ach.played(hour=12)
+        ach.played(hour=12, when=NOON)
         assert heard == ["first_blood", "spammer"]   # each said once
         assert not ach.got("gremlin")
-        ach.played(hour=3)
+        ach.played(hour=3, when=NOON)
         assert ach.got("gremlin")
     finally:
         ach.on_unlock.remove(heard.append)
@@ -144,7 +152,7 @@ def test_the_rarity_line_never_has_a_number_beside_it(window):  # noqa: F811
     from soundboard.ui.settings.settings import SettingsDialog
     ach.attach(window.cfg, today="2026-10-19")
     for _ in range(140):
-        ach.played(hour=12)
+        ach.played(hour=12, when=NOON)
     d = SettingsDialog(window, "achievements")
     tiles = {t.a.id: t for t in d.ach_tiles}
     assert tiles["spammer"].status.text() == tier_name("uncommon")
@@ -215,7 +223,7 @@ def test_the_filters_pick_earned_not_yet_and_a_rarity(window):  # noqa: F811
     from soundboard.ui.settings.settings import SettingsDialog
     ach.attach(window.cfg, today="2026-10-19")
     usage.used("egg-bun-woken")   # Rise and Shine: an Uncommon secret
-    ach.played(hour=12)           # First Blood: Common
+    ach.played(hour=12, when=NOON)           # First Blood: Common
     d = SettingsDialog(window, "achievements")
     d.show()
     shown = lambda: {t.a.id for t in d.ach_tiles if t.isVisibleTo(d)}  # noqa: E731
@@ -289,3 +297,133 @@ def test_silent_but_deadly_counts_with_sending_off_too(qapp, window, monkeypatch
     window.cfg.sound_vol = 0.0
     window.playctl.play("s0")
     assert ach.got("silent_but_deadly")
+
+
+def test_the_onion_alien_egg_earns_its_four(cfg, monkeypatch):
+    monkeypatch.setattr(usage, "enabled", lambda: False)
+    usage.used("egg-onion-poked")
+    assert ach.got("onion_poke") and not ach.got("onion_tears")
+    ach.bump("onion_tears")
+    usage.used("egg-onion-eaten")
+    usage.used("egg-onion-please")
+    assert all(ach.got(a) for a in ("onion_tears", "swallowed_whole", "pretty_please"))
+
+
+def test_the_onion_alien_crying_counts(qapp, cfg):
+    from soundboard.ui.bun import onionalien
+    note = onionalien.AlienNote("hi")
+    for _ in range(note.TEAR_1):
+        note.poke()
+    assert ach.got("onion_tears")
+    note.deleteLater()
+
+
+def test_an_hour_long_sound_on_the_board_is_the_long_haul(cfg):
+    ach.tick(now=1.0, longest=3599.0)
+    assert not ach.got("long_haul")
+    ach.tick(now=2.0, longest=3600.0)
+    assert ach.got("long_haul")
+
+
+def test_a_long_sound_heard_to_its_end_is_a_full_album(cfg):
+    ach.heard({"a": 0.2, "b": 0.4})
+    ach.heard({"a": 0.6})            # b stopped half-way: no
+    ach.heard({"a": 0.995})
+    assert not ach.got("full_album")
+    ach.heard({})                    # a ended at its end
+    assert ach.got("full_album")
+
+
+def test_ten_sounds_at_once_is_a_wall_of_noise(cfg):
+    ach.at_once(9)
+    assert not ach.got("wall_of_noise")
+    ach.at_once(10)
+    assert ach.got("wall_of_noise")
+
+
+def test_the_pitch_all_the_way_up_or_down(cfg):
+    ach.pitched(11)
+    assert not ach.got("chipmunk") and not ach.got("demon_mode")
+    ach.pitched(12)
+    ach.pitched(-36)
+    assert ach.got("chipmunk") and ach.got("demon_mode")
+
+
+@pytest.mark.parametrize("when, earned", [
+    ("2026-10-31 18:00:00", "spooky_season"), ("2026-12-25 09:30:00", "ho_ho_honk"),
+    ("2027-01-01 00:00:42", "happy_new_noise"), ("2027-01-01 00:01:00", None),
+    ("2026-12-31 23:59:59", None)])
+def test_a_sound_on_the_day(cfg, when, earned):
+    ach.played(when=at(when))
+    days = {"spooky_season", "ho_ho_honk", "happy_new_noise"}
+    assert {a for a in days if ach.got(a)} == ({earned} if earned else set())
+
+
+def test_ten_theme_switches_in_thirty_seconds_is_disco_mode(cfg):
+    for i in range(10):                   # one every 4 s: 36 s for the ten
+        ach.theme_switched(now=i * 4.0)
+    assert not ach.got("disco_mode")
+    for i in range(10):
+        ach.theme_switched(now=100 + i * 3.0)   # 27 s
+    assert ach.got("disco_mode")
+
+
+def test_tor_and_offline_together_is_the_hermit(cfg):
+    ach.tick(now=1.0, tor=True)
+    ach.tick(now=2.0, offline=True)
+    assert not ach.got("hermit")
+    ach.tick(now=3.0, tor=True, offline=True)
+    assert ach.got("hermit")
+
+
+def test_a_mic_unplugged_counts(cfg):
+    usage.used("mic-unplugged")
+    assert ach.got("pulled_plug")
+
+
+def test_the_hunt_counts_what_was_earned(cfg):
+    hidden = [a.id for a in ach.ALL if a.hidden and a.id not in
+              ("achievement_hunter", "completionist", "onion_poke")]
+    for aid in hidden[:9]:
+        cfg.achievements["got"][aid] = 1
+    usage.used("egg-onion-poked")             # the 10th secret one
+    assert ach.got("achievement_hunter") and not ach.got("completionist")
+    for a in ach.ALL:
+        if a.id not in ("completionist", "pulled_plug"):
+            cfg.achievements["got"].setdefault(a.id, 1)
+    usage.used("mic-unplugged")               # the last one
+    assert ach.got("completionist")
+
+
+def test_earned_before_the_hunt_was_added_counts_at_start():
+    secrets = [a.id for a in ach.ALL if a.hidden and a.id != "achievement_hunter"][:10]
+    c = SimpleNamespace(achievements={"got": dict.fromkeys(secrets, 1)}, sounds=[])
+    ach.attach(c, now=0.0, today="2026-10-19", month=10)
+    try:
+        assert ach.got("achievement_hunter")
+    finally:
+        ach.detach()
+
+
+def test_the_konami_code(qapp):
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QWidget
+    from soundboard.ui.window import konami
+    w = QWidget()
+    hits = []
+    code = konami.KonamiCode(w, lambda: hits.append(1))
+    K = Qt.Key
+    for key in (K.Key_Up, K.Key_Down, *konami.CODE[:-1], K.Key_X):   # wrong: no
+        code.press(key)
+    assert not hits
+    for key in (K.Key_Up, *konami.CODE):     # an extra ↑ first still works
+        code.press(key)
+    assert hits == [1]
+    w.deleteLater()
+
+
+def test_the_konami_code_cheers_and_earns_old_school(qapp, window):  # noqa: F811
+    from soundboard.ui.window import konami
+    ach.attach(window.cfg, today="2026-10-19")
+    konami.react(window)
+    assert ach.got("old_school")

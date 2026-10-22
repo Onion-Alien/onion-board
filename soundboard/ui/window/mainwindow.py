@@ -80,6 +80,7 @@ from soundboard.ui.setup import tabtours
 from soundboard.ui.sounds.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.bun.logowidget import glow_icon
 from soundboard.ui.window import sidebar
+from soundboard.ui.window import konami
 from soundboard.ui.window.spacekey import SpaceKey
 from soundboard.ui.window import winwatch
 from soundboard.ui.sounds.overlay import Overlay
@@ -606,6 +607,7 @@ class MainWindow(QMainWindow):
         app.applicationStateChanged.connect(self.micctl._app_state)
         # Space plays / pauses on the Sounds and Radio tabs, wherever the focus is
         self._space = SpaceKey(self, self.playctl._space_action)
+        self._konami = konami.KonamiCode(self, lambda: konami.react(self))
         # which voice chat the game you're playing uses: a hint by Who's listening
         self.voice_suggestion: str | None = None
         self.voice_why = ""   # why it's suggested, for the hint ("Discord is listening…")
@@ -1469,7 +1471,8 @@ class MainWindow(QMainWindow):
         cfg = self.cfg
         if achievements.tick(tor=net.mode() == net.TOR, offline=net.offline(),
                              hotkeys=sum(1 for m in cfg.sounds if m.hotkey),
-                             sounds=len(cfg.sounds)):
+                             sounds=len(cfg.sounds),
+                             longest=max((m.duration for m in cfg.sounds), default=0)):
             self._save_later()
 
     def _mark_stopped(self):
