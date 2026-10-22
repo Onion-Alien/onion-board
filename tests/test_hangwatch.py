@@ -234,6 +234,34 @@ def test_a_freeze_report_says_how_full_the_pcs_memory_was(qapp, tmp_path, monkey
         hw.stop()
 
 
+def test_a_freeze_report_names_a_deep_garbage_sweep(monkeypatch):
+    """A deep sweep that ended while the window was stuck held it (the stack names only
+    app.exec() by the time the watch looks): the report says so, with how long it took;
+    an older one doesn't count."""
+    from soundboard.core import hangwatch, uigc
+    monkeypatch.setattr(uigc, "last_deep", (time.monotonic() - 3, 11.8))
+    assert hangwatch.deep_sweep_within(12) == 11.8
+    assert "11.8 s" in hangwatch.GC_SWEEP_NOTE.format(took=11.8)
+    monkeypatch.setattr(uigc, "last_deep", (time.monotonic() - 60, 11.8))
+    assert hangwatch.deep_sweep_within(12) is None
+    monkeypatch.setattr(uigc, "last_deep", (0.0, 0.0))   # none yet
+    assert hangwatch.deep_sweep_within(12) is None
+
+
+def test_the_saved_report_has_the_deep_sweep_note(qapp, tmp_path, monkeypatch):
+    from soundboard.core import applog, uigc
+    monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
+    settle(qapp)
+    hw = HangWatch(hang_s=HANG_S)
+    try:
+        monkeypatch.setattr(uigc, "last_deep", (time.monotonic(), 9.0))   # held it
+        frozen_in_a_long_wait(hw, HANG_S * 2)
+        assert "garbage sweep over the whole app ran meanwhile: 9.0 s" in \
+            hw.saved.read_text(encoding="utf-8")
+    finally:
+        hw.stop()
+
+
 @pytest.mark.skipif(sys.platform != "win32", reason="Windows' own figures")
 def test_the_memory_figures_read_on_windows():
     from soundboard.core import hangwatch
