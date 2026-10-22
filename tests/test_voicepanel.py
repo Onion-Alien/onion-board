@@ -1422,7 +1422,7 @@ def sp_who(sp, voice: str) -> bool:
 def _chinese_downloaded(sp):
     from types import SimpleNamespace
     from soundboard.speech import translation
-    sp.module = SimpleNamespace(installed=True, id="live")
+    sp.module = SimpleNamespace(installed=True, broken=False, id="live")
     zh = next(m for m in sp.langs if m.language == "zh")
     d = translation.model_dir(zh)
     (d / "model").mkdir(parents=True)
@@ -2044,6 +2044,9 @@ def test_speech_install_and_cancel_keep_focus(panel, qapp, monkeypatch):
     p, _ = panel
     s = p.speech
     assert process_events(qapp, lambda: not s.installs._loading())
+    from types import SimpleNamespace
+    s.module = SimpleNamespace(installed=True, broken=False, id="live")   # Update: it's in
+    s.installs._refresh_module()
     p.show_tab("speak")
     p.show()
     s.opts.show()
@@ -2481,3 +2484,20 @@ def test_off_at_start_forgets_the_picked_voice(qapp, monkeypatch):
     assert p.fx.preset == CUSTOM
     assert p.bar.texts() == ["Mic unchanged"]   # your own mix is empty: nothing to turn on
     p.deleteLater()
+
+
+def test_start_and_recognition_options_wait_for_speech_recognition(panel):
+    """No Start button (or recognition settings) above "Install speech recognition":
+    they show once it's in."""
+    from types import SimpleNamespace
+    p, _ = panel
+    s = p.speech
+    needs = (s.livevoice.b_live, s.cb_model, s.ed_lang, s.chk_mute, s.installs.b_update)
+    s.module = SimpleNamespace(installed=False, broken=False, id="live")
+    s.installs._refresh_module()
+    assert all(w.isHidden() for w in needs)
+    assert not s.installs.missing.isHidden()
+    s.module = SimpleNamespace(installed=True, broken=False, id="live")
+    s.installs._refresh_module()
+    assert not any(w.isHidden() for w in needs)
+    assert s.installs.missing.isHidden()
