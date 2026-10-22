@@ -264,8 +264,8 @@ class PrivacyPage(Page):
                                 "They update with the app, to the exact versions it was "
                                 "tested with. Only yt-dlp can update sooner, if you let it."),
                               icon="download")
-        # FFmpeg: M4A, AAC and video files need it. The installer offers it once; someone
-        # who skipped it had no way to add it later, so the app can get it itself now.
+        # FFmpeg: M4A, AAC and video files need it. The installer adds it when it's missing; if that
+        # failed or it's gone since, the app can get it itself.
         # Always shown: whether it works (MainWindow.check_ffmpeg), and a way to fix it.
         ff_box = QWidget()
         ff_col = QVBoxLayout(ff_box)

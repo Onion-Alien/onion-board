@@ -10,13 +10,14 @@
 ;     start, and unticks the boxes below that download things (they can be ticked
 ;     again: the installer downloads those, the app stays offline; Tor is skipped,
 ;     since the app never starts it while offline)
+;   - FFmpeg, which M4A, AAC and video files need: no box, always added through winget
+;     after the files when it's missing (skipped when winget isn't there, in Offline
+;     mode and on the app's own updates; the app gets it itself at start then)
 ;   - a "Pick what you want" page of checkboxes:
 ;       * the free VB-Cable virtual cable, unticked: sounds go straight into the mic
 ;         by default (soundboard/mic/directmic.py, set up by the app's Quick setup), and
 ;         the cable is only the fallback way (downloaded from vb-audio.com,
 ;         signature-checked by install-vbcable.ps1; Windows asks "Yes" once)
-;       * FFmpeg for m4a / aac / video files (via winget; hidden when ffmpeg is
-;         already there or winget isn't)
 ;       * live voice-to-speech's set-up (its module itself always ships, like the
 ;         other add-on modules in ..\modules but ai-voices): OnionBoard.exe
 ;         --install-addon live-voice, which gets the add-on a Python of its own
@@ -43,7 +44,7 @@
 ;
 ; Silent installs (/VERYSILENT) use each box's default, or the choices from the
 ; last install. /OFFLINE=1 is the Offline mode box: it also skips the boxes that
-; download (VB-Cable, FFmpeg, live voice, Tor) unless /TASKS= or /MERGETASKS= names
+; download (VB-Cable, live voice, Tor) and FFmpeg unless /TASKS= or /MERGETASKS= names
 ; them. Neither the box nor /OFFLINE ever switches Offline mode off: that's in the app.
 ; Compiled with /DPREVIEW it's a look at the import page only, for screenshots: every
 ; other page is skipped, all four apps are offered, and it can't install.
@@ -112,7 +113,6 @@ FinishedLabel=Onion Board is installed. It will open now and ask you a few easy 
 FinishedRestartLabel=Onion Board is installed. To finish setting up the virtual cable, Windows needs to restart your PC.%n%nAfter the restart, open Onion Board from the Start menu and it will pick up where it left off.
 
 [Tasks]
-Name: "ffmpeg"; Description: "Play M4A, AAC and video files (the free FFmpeg, about 100 MB)"; Check: CanOfferFfmpeg
 Name: "livevoice"; Description: "Live voice-to-speech (about 300 MB)"; Flags: unchecked
 Name: "tor"; Description: "Hide my internet address (Tor), about 22 MB"; Flags: unchecked
 Name: "countme"; Description: "Count me in: anonymous usage stats (features used, crash counts)"
@@ -643,8 +643,8 @@ procedure InitializeWizard;
 var
   Body, Link, Note: TNewStaticText;
 begin
-  // The box list stops 11 px short of its page: down to the page's bottom, eleven rows
-  // (with FFmpeg offered and Count me in) fit without a scrollbar.
+  // The box list stops 11 px short of its page: down to the page's bottom, ten rows
+  // (with Count me in) fit without a scrollbar.
   WizardForm.TasksList.Height := WizardForm.TasksList.Parent.ClientHeight -
     WizardForm.TasksList.Top;
   // the box list repainted the row under the mouse on every move (a flash): draw it off-screen first
@@ -747,9 +747,7 @@ begin
     WizardSelectTasks('!vbcable');
   CableUnticked := True;
   if OfflineChosen and not OfflineApplied then
-    WizardSelectTasks('!vbcable,!ffmpeg,!livevoice,!tor')
-  else if OfflineApplied and not OfflineChosen then
-    WizardSelectTasks('ffmpeg');
+    WizardSelectTasks('!vbcable,!livevoice,!tor');
   OfflineApplied := OfflineChosen;
   for I := 0 to WizardForm.TasksList.Items.Count - 1 do
     if (Pos('(Tor)', WizardForm.TasksList.ItemCaption[I]) > 0) then
@@ -848,10 +846,15 @@ begin
   Result := ExpandConstant('{param:RELAUNCH|0}') = '1';
 end;
 
-// Offered only when it's missing and winget (built into Windows 10/11) is there to get it.
-function CanOfferFfmpeg: Boolean;
+// FFmpeg has no box: the app needs it for M4A, AAC and video files, so it's added
+// whenever it's missing and winget (built into Windows 10/11) is there to get it. Not
+// in Offline mode (silent: unless /TASKS= or /MERGETASKS= names ffmpeg), and not on the
+// app's own updates (/RELAUNCH=1), where the app gets it itself at start if it's gone.
+function ShouldGetFfmpeg: Boolean;
 begin
-  Result := (not HasFfmpeg) and FileExists(WingetPath(''));
+  Result := (not HasFfmpeg) and FileExists(WingetPath('')) and not Relaunch;
+  if Result and OfflineChosen then
+    Result := WizardSilent and (ListedIn('TASKS', 'ffmpeg') or ListedIn('MERGETASKS', 'ffmpeg'));
 end;
 
 // install-vbcable.ps1 skips a working cable, installs one otherwise, then checks it:
@@ -1165,7 +1168,7 @@ begin
   Result := True;
 end;
 
-// The FFmpeg box: winget's own package (Gyan.FFmpeg.Essentials).
+// FFmpeg: winget's own package (Gyan.FFmpeg.Essentials).
 procedure GetFfmpeg;
 var
   Code: Integer;
@@ -1372,7 +1375,7 @@ begin
     QueueImports;
   if CurStep = ssPostInstall then
     FinishCable;
-  if (CurStep = ssPostInstall) and MayDownload('ffmpeg') then
+  if (CurStep = ssPostInstall) and ShouldGetFfmpeg then
     GetFfmpeg;
   if (CurStep = ssPostInstall) and MayDownload('livevoice') then
     GetLiveVoice;
