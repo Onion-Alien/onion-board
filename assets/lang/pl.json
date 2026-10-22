@@ -4506,5 +4506,7 @@
   "↑ ↑ ↓ ↓ ← → ← → B A: Bun got 30 extra lives.": "↑ ↑ ↓ ↓ ← → ← → B A: Bun dostał 30 dodatkowych żyć.",
   "Free sounds and voices other players shared and voted on. Add one in a click, or share your own.": "Darmowe dźwięki i głosy udostępnione i ocenione przez innych graczy. Dodaj jednym kliknięciem albo udostępnij swoje.",
   "Let the Onion Board developer see this channel's name": "Pozwól twórcy Onion Board zobaczyć nazwę tego kanału",
-  "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "Wysyłane raz dziennie z liczeniem użycia, tylko gdy jesteś połączony i „Wlicz mnie” jest włączone, żeby twórca widział, kto streamuje z Onion Board. Tylko nazwa. Odznacz, żeby przestać."
+  "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "Wysyłane raz dziennie z liczeniem użycia, tylko gdy jesteś połączony i „Wlicz mnie” jest włączone, żeby twórca widział, kto streamuje z Onion Board. Tylko nazwa. Odznacz, żeby przestać.",
+  "<b>{mic}</b> stopped sending sound after the set-up. Restart the app it belongs to and it works again.": "<b>{mic}</b> przestał wysyłać dźwięk po konfiguracji. Uruchom ponownie aplikację, do której należy, i znowu zadziała.",
+  "Onion Board is on your mic, but a test sound didn't come through it. Click <b>Repair</b> to put it on again.": "Onion Board jest na twoim mikrofonie, ale dźwięk testowy przez niego nie przeszedł. Kliknij <b>Napraw</b>, żeby założyć go ponownie."
 }

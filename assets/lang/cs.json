@@ -4506,5 +4506,7 @@
   "↑ ↑ ↓ ↓ ← → ← → B A: Bun got 30 extra lives.": "↑ ↑ ↓ ↓ ← → ← → B A: Bun dostal 30 životů navíc.",
   "Free sounds and voices other players shared and voted on. Add one in a click, or share your own.": "Zvuky a hlasy zdarma, které sdíleli a ohodnotili jiní hráči. Přidej je jedním kliknutím, nebo sdílej své.",
   "Let the Onion Board developer see this channel's name": "Ukázat vývojáři Onion Board název tohoto kanálu",
-  "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "Posílá se jednou denně s počítáním používání, jen když jsi připojený a „Počítejte se mnou“ je zapnuté, aby vývojář viděl, kdo streamuje s Onion Board. Jen název. Odškrtni pro zastavení."
+  "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "Posílá se jednou denně s počítáním používání, jen když jsi připojený a „Počítejte se mnou“ je zapnuté, aby vývojář viděl, kdo streamuje s Onion Board. Jen název. Odškrtni pro zastavení.",
+  "<b>{mic}</b> stopped sending sound after the set-up. Restart the app it belongs to and it works again.": "<b>{mic}</b> po nastavení přestal posílat zvuk. Restartuj aplikaci, ke které patří, a zase bude fungovat.",
+  "Onion Board is on your mic, but a test sound didn't come through it. Click <b>Repair</b> to put it on again.": "Onion Board je na tvém mikrofonu, ale testovací zvuk jím neprošel. Klikni na <b>Opravit</b> a nasaď ho znovu."
 }

@@ -4737,5 +4737,7 @@
   "↑ ↑ ↓ ↓ ← → ← → B A: Bun got 30 extra lives.": "↑ ↑ ↓ ↓ ← → ← → B A: حصل Bun على 30 حياة إضافية.",
   "Free sounds and voices other players shared and voted on. Add one in a click, or share your own.": "أصوات ومؤثرات صوتية مجانية شاركها لاعبون آخرون وصوّتوا عليها. أضف واحدًا بنقرة، أو شارك أصواتك.",
   "Let the Onion Board developer see this channel's name": "اسمح لمطوّر Onion Board برؤية اسم هذه القناة",
-  "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "يُرسَل مرة في اليوم مع عدّ الاستخدام، فقط وأنت متصل و«عد لي في» مفعّل، ليرى المطوّر من يبث باستخدام Onion Board. الاسم فقط. ألغِ التحديد للإيقاف."
+  "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "يُرسَل مرة في اليوم مع عدّ الاستخدام، فقط وأنت متصل و«عد لي في» مفعّل، ليرى المطوّر من يبث باستخدام Onion Board. الاسم فقط. ألغِ التحديد للإيقاف.",
+  "<b>{mic}</b> stopped sending sound after the set-up. Restart the app it belongs to and it works again.": "توقف <b>{mic}</b> عن إرسال الصوت بعد الإعداد. أعد تشغيل التطبيق الذي يتبع له وسيعمل من جديد.",
+  "Onion Board is on your mic, but a test sound didn't come through it. Click <b>Repair</b> to put it on again.": "Onion Board موجود على الميكروفون، لكن صوت الاختبار لم يمر عبره. انقر <b>إصلاح</b> لإعادة تركيبه."
 }

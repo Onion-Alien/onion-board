@@ -4429,5 +4429,7 @@
   "↑ ↑ ↓ ↓ ← → ← → B A: Bun got 30 extra lives.": "↑ ↑ ↓ ↓ ← → ← → B A: Bun получи 30 допълнителни живота.",
   "Free sounds and voices other players shared and voted on. Add one in a click, or share your own.": "Безплатни звуци и гласове, споделени и гласувани от други играчи. Добави с едно щракване или сподели свои.",
   "Let the Onion Board developer see this channel's name": "Нека разработчикът на Onion Board вижда името на този канал",
-  "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "Изпраща се веднъж на ден с броенето на употребата, само докато си свързан и „Включи ме“ е включено, за да вижда разработчикът кой стриймва с Onion Board. Само името. Махни отметката, за да спре."
+  "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "Изпраща се веднъж на ден с броенето на употребата, само докато си свързан и „Включи ме“ е включено, за да вижда разработчикът кой стриймва с Onion Board. Само името. Махни отметката, за да спре.",
+  "<b>{mic}</b> stopped sending sound after the set-up. Restart the app it belongs to and it works again.": "<b>{mic}</b> спря да праща звук след настройката. Рестартирай приложението, към което принадлежи, и пак ще работи.",
+  "Onion Board is on your mic, but a test sound didn't come through it. Click <b>Repair</b> to put it on again.": "Onion Board е на микрофона ти, но тестов звук не мина през него. Кликни <b>Поправи</b>, за да го сложиш отново."
 }

@@ -56,9 +56,11 @@ LITE_BLOCK_S = 0.02
 # and a longer clock fit (the step is twice the noise in it). (cushion, ceiling) s:
 MIC_RING_S, MIC_RING_BIG_S = (0.015, 0.08), (0.025, 0.1)
 # the app's own playback: the test recording, cue beeps, the setup wizard's tune, the
-# Pong game's sounds (ui/bun/bunpong.py). With
+# Pong game's sounds (ui/bun/bunpong.py), the mic check's probe (mic/micprobe.py: a
+# pitch change would hide it). With
 # previews ("<sid>:preview", "<sid>~fx:preview") they ignore the live speed / pitch
-FIXED_SIDS = frozenset({"__test__", "__cue__", "__setup__", "__check__", "__pong__"})
+FIXED_SIDS = frozenset({"__test__", "__cue__", "__setup__", "__check__", "__pong__",
+                        "__probe__"})
 
 
 def is_fixed(sid: str) -> bool:

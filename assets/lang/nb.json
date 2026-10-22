@@ -4429,5 +4429,7 @@
   "↑ ↑ ↓ ↓ ← → ← → B A: Bun got 30 extra lives.": "↑ ↑ ↓ ↓ ← → ← → B A: Bun fikk 30 ekstra liv.",
   "Free sounds and voices other players shared and voted on. Add one in a click, or share your own.": "Gratis lyder og stemmer som andre spillere har delt og stemt på. Legg til med ett klikk, eller del dine egne.",
   "Let the Onion Board developer see this channel's name": "La Onion Board-utvikleren se navnet på denne kanalen",
-  "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "Sendes én gang om dagen med brukstellingen, bare mens du er tilkoblet og «Jeg er med» er på, så utvikleren kan se hvem som strømmer med Onion Board. Bare navnet. Fjern haken for å stoppe."
+  "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "Sendes én gang om dagen med brukstellingen, bare mens du er tilkoblet og «Jeg er med» er på, så utvikleren kan se hvem som strømmer med Onion Board. Bare navnet. Fjern haken for å stoppe.",
+  "<b>{mic}</b> stopped sending sound after the set-up. Restart the app it belongs to and it works again.": "<b>{mic}</b> sluttet å sende lyd etter oppsettet. Start appen den hører til på nytt, så virker den igjen.",
+  "Onion Board is on your mic, but a test sound didn't come through it. Click <b>Repair</b> to put it on again.": "Onion Board er på mikrofonen din, men en testlyd kom ikke gjennom. Klikk <b>Reparer</b> for å sette den på igjen."
 }

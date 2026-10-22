@@ -411,6 +411,8 @@ class StatusControl(Controller):
                            _("Done: your sounds are back in your mic.") if said == "fixed" else
                            _("Done: Discord and games hear your sounds through your mic now."),
                            "ok")
+        if route == "mic" and state == "ok" and not mic_busy:
+            mw.micctl.probe_mic()   # (once after a set-up: does the mic carry the sounds?)
         # an old part: the banner and its button, until Bun's show is over
         mw.mic_update_note.setVisible(update and not mw.setup_show.on)
         mw.btn_install.setVisible((button is not None if mic_route else state == "missing")
