@@ -30,6 +30,11 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           build-mode: none
+          # Tests check text and run fake local servers on purpose: scanning them
+          # only gives false alarms (URL text checks, made-up redirect headers).
+          config: |
+            paths-ignore:
+              - tests
       - uses: github/codeql-action/analyze@v4
         with:
           category: /language:${{ matrix.language }}
