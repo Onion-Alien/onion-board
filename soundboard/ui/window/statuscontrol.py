@@ -97,6 +97,7 @@ class StatusControl(Controller):
                     status=theme.status('warn'), devices=devices))
         # the headphones or mic picked here won't open (unplugged): the toast about it
         # fades, so say it where the device is picked until it's back
+        unplugged = {}   # ...and the toast says it in the same words, not PortAudio's
         if not (mw._attaching or time.monotonic() < mw._settle_until):
             errs_now = e.errors_snapshot()
 
@@ -106,17 +107,17 @@ class StatusControl(Controller):
                     return f"<b>{html.escape(name)}</b>"
                 return None
             if dev := gone("mon"):
-                mw.setup_hint.setText(
-                    mw.setup_hint.text()
-                    + _("<br><span style='color:{status}'>Can't open {devices} (My headphones). "
-                        "Plugged in? It's tried again by itself.</span>",
-                        status=theme.status('warn'), devices=dev))
+                unplugged["mon"] = _(
+                    "<br><span style='color:{status}'>Can't open {devices} (My headphones). "
+                    "Plugged in? It's tried again by itself.</span>",
+                    status=theme.status('warn'), devices=dev)
+                mw.setup_hint.setText(mw.setup_hint.text() + unplugged["mon"])
             if dev := gone("mic"):
-                mw.setup_hint.setText(
-                    mw.setup_hint.text()
-                    + _("<br><span style='color:{status}'>Can't open {devices} (My mic). "
-                        "Plugged in? It's tried again by itself.</span>",
-                        status=theme.status('warn'), devices=dev))
+                unplugged["mic"] = _(
+                    "<br><span style='color:{status}'>Can't open {devices} (My mic). "
+                    "Plugged in? It's tried again by itself.</span>",
+                    status=theme.status('warn'), devices=dev)
+                mw.setup_hint.setText(mw.setup_hint.text() + unplugged["mic"])
         if mw.setup_hint.text().startswith("<br>"):   # only the lines above: no blank first line
             mw.setup_hint.setText(mw.setup_hint.text()[4:])
         mw.setup_hint.setVisible(bool(mw.setup_hint.text()))   # (no empty gap)
@@ -124,7 +125,9 @@ class StatusControl(Controller):
         self._update_flow()
         where = {"main": _("sending"), "mon": _("headphones"), "mic": _("mic"),
                  "obs": _("stream output")}
-        errs = [f"{where.get(k, k)}: {v}" for k, v in e.errors_snapshot().items()]
+        errs = [re.sub(r"<span[^>]*>(.*?)</span>", r"\1", unplugged[k][4:], flags=re.S)
+                if k in unplugged else html.escape(f"{where.get(k, k)}: {v}")
+                for k, v in e.errors_snapshot().items()]
         if errs and (mw._attaching or time.monotonic() < mw._settle_until):
             # setting up straight into my mic restarts Windows' audio on purpose: every
             # device drops for a few seconds and comes back by itself, so that's no error
@@ -133,7 +136,7 @@ class StatusControl(Controller):
         if errs:
             self._say_audio(_("<span style='color:{status}'>Audio device problem: "
                               "{problems}</span>", status=theme.status('error'),
-                              problems=html.escape(" · ".join(errs))), "error")
+                              problems=" · ".join(errs)), "error")
             return
         text = ""
         xr = sum(e.xruns.values())
