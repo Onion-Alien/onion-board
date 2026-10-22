@@ -1,5 +1,5 @@
 """Playback's round button, with one antialiased circular edge."""
-from PySide6.QtCore import QRectF
+from PySide6.QtCore import QRectF, Qt
 from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPen
 from PySide6.QtWidgets import QPushButton, QStyle, QStyleOptionButton
 
@@ -27,21 +27,30 @@ class PlayButton(QPushButton):
         if not enabled:
             fill = QColor(tokens['btn'])
             edge = QColor(tokens['border'])
-        elif theme.polished():
+        else:
             shades = theme._accent_shades(tokens)
             if down:
                 fill = QColor(shades['accent_press'])
             else:
-                fill = QLinearGradient(rect.topLeft(), rect.bottomRight())
+                # across the circle itself (corner to corner, the round edge hid the ends)
+                inner = rect.adjusted(side * 0.15, side * 0.15, -side * 0.15, -side * 0.15)
+                fill = QLinearGradient(inner.topLeft(), inner.bottomRight())
                 fill.setColorAt(0, QColor(shades['accent_top_hi' if hover else 'accent_top']))
                 fill.setColorAt(0.3, QColor(tokens['accent_hover' if hover else 'accent']))
                 fill.setColorAt(1, QColor(shades['accent_end_hi' if hover else 'accent_end']))
-            edge = QColor(theme.mix(tokens['accent'], tokens['text_hi'], 0.16))
-        else:
-            fill = QColor(tokens['accent_hover' if hover else 'accent'])
-            edge = QColor(tokens['accent'])
+            edge = QColor(theme.mix(tokens['accent'], tokens['text_hi'], 0.16)
+                          if theme.polished() else tokens['accent'])
         painter.setBrush(fill)
         painter.setPen(QPen(QColor(tokens['text_hi']) if focused else edge, 1.0))
         painter.drawEllipse(rect)
+        if enabled and not down:
+            # the gloss: a soft white shine over the top half
+            shine = rect.adjusted(side * 0.14, side * 0.06, -side * 0.14, -side * 0.5)
+            glow = QLinearGradient(shine.topLeft(), shine.bottomLeft())
+            glow.setColorAt(0, QColor(255, 255, 255, 90))
+            glow.setColorAt(1, QColor(255, 255, 255, 0))
+            painter.setPen(Qt.PenStyle.NoPen)
+            painter.setBrush(glow)
+            painter.drawEllipse(shine)
         self.style().drawControl(QStyle.ControlElement.CE_PushButtonLabel, option, painter, self)
         painter.end()

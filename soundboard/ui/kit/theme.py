@@ -757,7 +757,7 @@ def live_sheet() -> str:
 # Flat window and cards with quiet hairline borders. Textured adds each theme's tile on
 # the cards and a soft glow of its two accent colours behind them (paint_window_bg: the
 # root widget and opaque widgets paint it, a style sheet can't hold two gradients).
-# The colours follow each theme; High Contrast keeps its solid fills and outlines.
+# The colours follow each theme; High Contrast keeps its outlines (GLOSS_STYLE: fills).
 POLISH_STYLE = Template("""
 QWidget#root { background:$bg; }
 QWidget#root QTabWidget, QWidget#root QTabBar, QWidget#root QStackedWidget,
@@ -770,26 +770,38 @@ QFrame#card[interactive="true"] { border-left:1px solid transparent; border-righ
 QFrame#card[interactive="true"][hovered="true"] { background-color:$card_hi; border-color:$border_hi; }
 QFrame#transport, QFrame#deck { background:$glass; border-top:1px solid $edge; }
 QPushButton#primary, QFrame#card QPushButton#primary, QFrame#setcard QPushButton#primary {
-    background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top, stop:0.3 $accent,
-        stop:1 $accent_end);
     border:1px solid $accent_rim_side; border-top-color:$accent_rim; }
-QPushButton#primary:hover, QFrame#card QPushButton#primary:hover,
-QFrame#setcard QPushButton#primary:hover {
-    background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top_hi,
-        stop:0.3 $accent_hover, stop:1 $accent_end_hi); }
 QPushButton#primary:pressed, QFrame#card QPushButton#primary:pressed,
-QFrame#setcard QPushButton#primary:pressed {
-    background:$accent_press; border-top-color:$accent_rim_side; }
+QFrame#setcard QPushButton#primary:pressed { border-top-color:$accent_rim_side; }
 QPushButton#primary:focus, QFrame#card QPushButton#primary:focus,
 QFrame#setcard QPushButton#primary:focus { border:1px solid $text_hi; }
 QPushButton#transport_play {
-    background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top, stop:0.3 $accent,
-        stop:1 $accent_end);
     border:1px solid $accent_rim_side; border-top-color:$accent_rim; }
-QPushButton#transport_play:hover:!disabled {
+""")
+
+
+# The accent's gloss on every accent-filled button (the main button, tabs, mode tiles,
+# chips): in every theme, High Contrast too, where it keeps its outline over the fill.
+GLOSS_STYLE = Template("""
+QPushButton#primary, QFrame#card QPushButton#primary, QFrame#setcard QPushButton#primary,
+QPushButton#transport_play {
+    background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top, stop:0.3 $accent,
+        stop:1 $accent_end); }
+QPushButton#primary:hover, QFrame#card QPushButton#primary:hover,
+QFrame#setcard QPushButton#primary:hover, QPushButton#transport_play:hover:!disabled {
     background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top_hi,
         stop:0.3 $accent_hover, stop:1 $accent_end_hi); }
+QPushButton#primary:pressed, QFrame#card QPushButton#primary:pressed,
+QFrame#setcard QPushButton#primary:pressed,
 QPushButton#transport_play:pressed:!disabled { background:$accent_press; }
+/* stop and next: the same sheen in the button colour */
+QPushButton#transport_stop {
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 $btn_top, stop:0.5 $btn,
+        stop:1 $btn_end); }
+QPushButton#transport_stop:hover:!disabled {
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 $btn_top_hi,
+        stop:0.5 $btn_hover, stop:1 $btn_end); }
+QPushButton#transport_stop:pressed:!disabled { background:$btn_press; }
 /* every accent-filled on-state (tabs, mode tiles, chips) gets the main button's gloss */
 QPushButton:checked, QFrame#card QPushButton:checked, QFrame#setcard QPushButton:checked,
 QFrame#viewtoggle QPushButton#viewbtn:checked,
@@ -863,11 +875,16 @@ def _accent_shades(tk: dict[str, str]) -> dict[str, str]:
     )
 
 
+def _button_shades(tk: dict[str, str]) -> dict[str, str]:
+    """A plain button's sheen (stop, next): lit at the top, a little deeper at the foot."""
+    return dict(btn_top=_mix(tk["btn"], "#ffffff", 0.12),
+                btn_top_hi=_mix(tk["btn_hover"], "#ffffff", 0.12),
+                btn_end=_mix(tk["btn"], "#000000", 0.25))
+
+
 def accent_fill(hover: bool = False) -> str:
     """A filled accent button's background as a stylesheet value, for widgets that style
-    themselves: the same gradient as `#primary`, or the flat accent in outlined themes."""
-    if not polished():
-        return T["accent_hover" if hover else "accent"]
+    themselves: the same gradient as `#primary`."""
     s = _accent_shades(T)
     top, mid, end = ((s["accent_top_hi"], T["accent_hover"], s["accent_end_hi"]) if hover
                      else (s["accent_top"], T["accent"], s["accent_end"]))
@@ -1099,6 +1116,7 @@ def stylesheet(name: str | None = None) -> str:
         css += OUTLINE_STYLE.substitute(tk)
     else:
         css += POLISH_STYLE.substitute(polish_tokens(tk, is_light(name)))
+    css += GLOSS_STYLE.substitute(tk, **_accent_shades(tk), **_button_shades(tk))
     css += texture_style("QFrame#card, QFrame#setcard, QFrame#fxcard, QFrame#transport, "
                          "QDialog#transport, QFrame#deck", tk)
     return css + held_rings(css)
