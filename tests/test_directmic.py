@@ -866,6 +866,7 @@ def _one_mic_kit(fake_reg, monkeypatch, tmp_path, heard, restarts=True):
         ("mics", sorted(set(guids)))) or (answers.pop(0) if len(answers) > 1 else answers[0]))
     snaps = [{OTHER: {"a": 1}}, {OTHER: {"a": 2}}]
     monkeypatch.setattr(dm, "_fx_now", lambda: snaps.pop(0) if snaps else {})
+    monkeypatch.setattr(dm, "_effect_runs", lambda guids, mark: True)
     return calls
 
 
@@ -1046,6 +1047,57 @@ def test_the_effect_in_use_is_taken_off_the_restart_list(fake_reg, monkeypatch, 
     unmark = [c for c in calls if c[0] == "unmark"]
     assert len(unmark) == 1 and dm.ring_path() in unmark[0][1]
     assert unmark[0][1][0].parent == tmp_path / "pf"
+
+
+def test_an_effect_that_doesnt_start_after_its_mic_restarted_gets_the_audio_restarted(
+        fake_reg, monkeypatch, tmp_path):
+    """A USB headset's mic restarted on its own came back without the effect running at
+    all (nothing in its log, the board's sounds never in the mic): all of Windows' audio
+    restarts then, which does start it."""
+    calls = _one_mic_kit(fake_reg, monkeypatch, tmp_path, [False, False])
+    monkeypatch.setattr(dm, "_effect_runs",
+                        lambda guids, mark: calls.append(("effect?", sorted(guids))) or False)
+    assert dm.admin_install(GUID) == 0
+    i = calls.index(("effect?", [GUID.lower()]))
+    assert calls[i - 1][0] == "mics" and calls[i + 1:i + 3] == [(False, ()), (True, ["midisrv"])]
+
+
+def test_the_effect_starting_is_read_from_its_log(monkeypatch, tmp_path):
+    """Windows starting the effect on a mic shows as "initialize: endpoint <GUID>" in its
+    log; a mic that isn't open yet is opened once to make it."""
+    log_ = tmp_path / dm.APO_LOG
+    log_.write_text("old: initialize: endpoint {GUID-OLD}\n", encoding="utf-8")
+    monkeypatch.setattr(dm, "data_dir", lambda: tmp_path)
+    monkeypatch.setattr(dm, "capture_endpoints", lambda: [
+        {"guid": "{aaaa}", "name": "Mic", "active": True},
+        {"guid": "{bbbb}", "name": "Unplugged", "active": False}])
+    monkeypatch.setattr(dm.time, "sleep", lambda s: None)
+    mark = dm._apo_log_size()
+    opened = []
+
+    def listen(guid):
+        opened.append(guid)
+        with open(log_, "a", encoding="utf-8") as f:
+            f.write("pid 1: initialize: endpoint {AAAA}, 56 bytes, discovery 0, child no\n")
+    monkeypatch.setattr(dm, "_mic_is_silent", listen)
+    assert dm._effect_runs(["{AAAA}", "{bbbb}"], mark)   # the unplugged one isn't waited for
+    assert opened == ["{aaaa}"]
+    opened.clear()
+    assert dm._effect_runs(["{aaaa}"], mark) and opened == []   # in the log already
+
+
+def test_an_effect_that_never_logs_doesnt_run(monkeypatch, tmp_path):
+    monkeypatch.setattr(dm, "data_dir", lambda: tmp_path)
+    monkeypatch.setattr(dm, "capture_endpoints",
+                        lambda: [{"guid": "{aaaa}", "name": "Mic", "active": True}])
+    now = [0.0]
+
+    def listen(guid):
+        now[0] += 3
+    monkeypatch.setattr(dm.time, "monotonic", lambda: now[0])
+    monkeypatch.setattr(dm, "_mic_is_silent", listen)
+    assert not dm._effect_runs(["{aaaa}"], 0)
+    assert dm._effect_runs([], 0)   # nothing to check
 
 
 def test_cleanup_restarts_only_that_mic(monkeypatch):

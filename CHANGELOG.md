@@ -12,6 +12,9 @@ Changes not released yet are in [changelog.d/](changelog.d/), one file per chang
 - Fixed a crash while the app was starting: on a slow start, the check that notes where start-up is waiting could itself crash the app.
 - Direct mic: SteelSeries Sonar is only restarted after a restart of all of Windows'
   audio, and never when its mic was already silent before (it could stay off).
+- Direct mic: when restarting only your mic leaves the effect not running (seen with a
+  USB headset: set-up said done, but your sounds never reached the mic), all of
+  Windows' audio restarts as well, which does start it.
 - Direct mic: with the effect on SteelSeries Sonar's own mic, removing it (or
   uninstalling) no longer leaves that mic refusing every app until the PC restarts:
   Sonar's mic gets all of Windows' audio restarted, and Sonar after it, as before.

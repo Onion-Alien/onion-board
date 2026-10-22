@@ -2026,12 +2026,15 @@ def _mic_by_mic(work, also: Sequence[str], quiet: Collection[str],
     either, the change waits for the PC's next restart: 6). Files it removes go after
     the restart (_remove_held): Windows' audio still holds the effect until then.
     The mic apps (_mic_apps_back) are only seen to when all of Windows' audio did
-    restart: a mic restarted on its own doesn't cut them off."""
+    restart: a mic restarted on its own doesn't cut them off. A mic restarted on its own
+    can also come back without the effect running at all (a USB headset's did): if it
+    doesn't start (_effect_runs), all of Windows' audio restarts as well."""
     global _held
     restarts = _audio_restarts
     mics = installed_on()   # the one it comes off is listened to as well
     before = _fx_now()
-    code = None
+    mark = _apo_log_size()
+    code: int | None = None
     _held = []
     try:
         code = work()
@@ -2043,13 +2046,69 @@ def _mic_by_mic(work, also: Sequence[str], quiet: Collection[str],
         if not restarted:
             log.warning("a mic wouldn't restart on its own: restarting Windows' audio")
             restarted = _restart_audio()
+        elif code == 0 and not _effect_runs(installed_on(), mark):
+            log.warning("the effect didn't start on its mic after the mic restarted: "
+                        "restarting Windows' audio")
+            restarted = _restart_audio()
         _remove_held(held)
         live = _mics_come_back_live(mics, quiet, one_by_one=True)
         if _audio_restarts != restarts:
             _mic_apps_back(apps_quiet)
     if code == 0 and not restarted:
         return 6
+    if code is None:   # (work raised: its exception goes on from the finally above)
+        return 1
     return MIC_SILENT if code == 0 and not live else code
+
+
+APO_LOG = "apo.log"     # in data_dir(): the effect's own log (obmic.cpp logv)
+EFFECT_START_S = 5      # how long a mic gets to start the effect once it's opened
+
+
+def _apo_log_size() -> int:
+    """The effect's log's size now (0 without one): what's written after it is new."""
+    try:
+        return (data_dir() / APO_LOG).stat().st_size
+    except OSError:
+        return 0
+
+
+def _effect_started(mark: int) -> str:
+    """What the effect logged since `mark` (all of it if the log was started again
+    meanwhile: it does at 256 kB), lowercased. A check: never fails."""
+    try:
+        with open(data_dir() / APO_LOG, "rb") as f:
+            if f.seek(0, 2) >= mark:
+                f.seek(mark)
+            else:
+                f.seek(0)
+            return f.read().decode("utf-8", "replace").lower()
+    except OSError:
+        return ""
+
+
+def _effect_runs(guids: Sequence[str], mark: int) -> bool:
+    """The effect started on each of the active mics `guids` after the step (it logs
+    "initialize: endpoint <guid>" whenever Windows starts it on a mic): each is opened
+    once to make it, if no app has it open already. False if one doesn't within
+    EFFECT_START_S; True when there's nothing to check or the check itself fails."""
+    try:
+        active = {e["guid"].lower() for e in capture_endpoints() if e["active"]}
+        waiting = [g.lower() for g in guids if g.lower() in active]
+        end = time.monotonic() + EFFECT_START_S
+        while waiting:
+            text = _effect_started(mark)
+            waiting = [g for g in waiting if f"initialize: endpoint {g}" not in text]
+            if not waiting or time.monotonic() > end:
+                break
+            for g in waiting:
+                _mic_is_silent(g)   # opening it starts the effect on it
+        if waiting:
+            log.warning("the effect didn't start on %s", ", ".join(waiting))
+        return not waiting
+    except Exception:  # noqa: BLE001
+        log.info("couldn't check that the effect started", exc_info=True)
+        return True
 
 
 def _fx_now() -> dict[str, dict]:
