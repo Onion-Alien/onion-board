@@ -1394,6 +1394,24 @@ def test_lite_twitch_and_achievement_pop_ups_count_every_day():
                 "achievement-popups", "achievement-chime"} & set(usage.features_now(Config()))
 
 
+def test_the_twitch_channel_only_when_ticked_and_connected(sent):
+    cfg = Config(twitch_token="t", twitch_login="some_streamer")
+    usage.maybe_send(cfg)   # connected, box not ticked: never the name
+    assert not any("twitch-channel" in h["path"] for h in _hits(sent[-1][0], about=True))
+    cfg.twitch_share = True
+    cfg.stats_sent -= usage.EVERY_S
+    usage.maybe_send(cfg)
+    assert "twitch-channel/some_streamer" in [h["path"] for h in _hits(sent[-1][0])]
+    cfg.twitch_token = ""   # disconnected: nothing, ticked or not
+    cfg.stats_sent -= usage.EVERY_S
+    usage.maybe_send(cfg)
+    assert not any("twitch-channel" in h["path"] for h in _hits(sent[-1][0], about=True))
+    cfg.twitch_token, cfg.twitch_login = "t", "../me@example.com"   # never a stray login
+    cfg.stats_sent -= usage.EVERY_S
+    usage.maybe_send(cfg)
+    assert not any("twitch-channel" in h["path"] for h in _hits(sent[-1][0], about=True))
+
+
 def test_a_long_send_goes_in_parts_goatcounter_takes(sent):
     hits = [{"path": f"used/x{i}", "event": True} for i in range(usage.MAX_HITS * 2 + 5)]
     assert usage.send(hits)

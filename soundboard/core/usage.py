@@ -60,6 +60,9 @@ use: enjoy.py), their thumb (`feedback/positive`, `feedback/negative`) and what 
 typed under it as dashed words (`feedback/positive/more-meme-sounds`, other_tag), plus
 `feedback/shown` and `feedback/dismissed` to see how many answer, with a one-off random
 session like the improve picks.
+And with the daily one, only for a streamer who ticked the Twitch card's "Let the Onion
+Board developer see this channel's name" (off until then) and only while connected, that
+channel's Twitch login (`twitch-channel/<login>`).
 Nothing else: no name, sounds, settings, devices, games or IP address in the message
 (GoatCounter sees the connection's address like any site does, and isn't sent it to
 keep or look up).
@@ -441,6 +444,7 @@ IMPROVE_MORE = {
 }
 BUGS_MAX = 200   # characters of "What bugs did you hit?" (Fewer bugs opens only that)
 LANG_RE = r"[a-z]{2,3}(?:-[A-Za-z0-9]{2,4})?"
+TWITCH_LOGIN_RE = r"[a-z0-9_]{1,25}"   # what Twitch allows in a login
 DAY_S = 24 * 3600
 
 
@@ -525,6 +529,10 @@ def hits(cfg, now: float, event: str = "", extra=()) -> list[dict]:
         out.append(_event(f"first-start/heard-{heard}" if heard else "first-start", sid))
     out += [_event(f"tab/{t}", sid) for t in cfg.stats_tabs if t in TABS]
     out += [_event(e, sid) for e in about(cfg, now)]
+    login = cfg.twitch_login
+    if cfg.twitch_share and cfg.twitch_token and re.fullmatch(TWITCH_LOGIN_RE, login or ""):
+        # only when the streamer ticked the Twitch card's box, and only while connected
+        out.append(_event(f"twitch-channel/{login}", sid))
     return out
 
 

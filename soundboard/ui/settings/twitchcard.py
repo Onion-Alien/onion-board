@@ -155,6 +155,12 @@ class TwitchCard(QObject):
         self.chat.setToolTip(_("Cooldowns, who may use each command and blocked words: the "
                                "streamer guide below shows how to change them"))
         ov.addWidget(self.chat)
+        self.share = QCheckBox(_("Let the Onion Board developer see this channel's name"))
+        self.share.setToolTip(_("Sent once a day with the usage count, only while you're "
+                                "connected and Count me in is on, so the developer can see "
+                                "who streams with Onion Board. Just the name. Untick to "
+                                "stop."))
+        ov.addWidget(self.share)
         row = _button_row()
         self.btn_reload = QPushButton(_("Reload rewards"))
         icons.set_icon(self.btn_reload, "reload")
@@ -177,6 +183,7 @@ class TwitchCard(QObject):
         self.btn_reload.clicked.connect(self._reload)
         self.btn_disconnect.clicked.connect(self._disconnect)
         self.chat.toggled.connect(self._chat)
+        self.share.toggled.connect(self._share)
         self.link.changed.connect(self.refresh)
         self.link.code_ready.connect(self._code)
         self.link.login_done.connect(self._done)
@@ -325,6 +332,9 @@ class TwitchCard(QObject):
             self.chat.blockSignals(True)
             self.chat.setChecked(bool(streamapi.chat_rules(self.mw)["on"]))
             self.chat.blockSignals(False)
+            self.share.blockSignals(True)
+            self.share.setChecked(bool(cfg.twitch_share))
+            self.share.blockSignals(False)
         elif not self.signing_in:
             self.status.setText("")
         self.status.setVisible(bool(self.status.text()))
@@ -381,6 +391,10 @@ class TwitchCard(QObject):
 
     def _chat(self, on: bool):
         streamapi.set_chat_rules(self.mw, {"on": "1" if on else "0"})
+
+    def _share(self, on: bool):
+        self.mw.cfg.twitch_share = on
+        self.mw._save_now()
 
 
 def twitch_card(page):

@@ -178,6 +178,7 @@ class TwitchLink(QObject):
         token = cfg.twitch_token
         self.stop()
         cfg.twitch_token = cfg.twitch_refresh = cfg.twitch_login = cfg.twitch_user_id = ""
+        cfg.twitch_share = False
         self.rewards, self.refused = [], []
         self._save()
         if token and net.allowed(twitch.FEATURE):

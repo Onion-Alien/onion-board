@@ -4350,5 +4350,7 @@
   "Wall of Noise": "音の壁",
   "Who Pulled the Plug?": "誰がプラグを抜いたの？",
   "↑ ↑ ↓ ↓ ← → ← → B A: Bun got 30 extra lives.": "↑ ↑ ↓ ↓ ← → ← → B A：Bun の残機が 30 増えた。",
-  "Free sounds and voices other players shared and voted on. Add one in a click, or share your own.": "他のプレイヤーが共有し、投票した無料のサウンドとボイス。クリックひとつで追加、または自分のものを共有。"
+  "Free sounds and voices other players shared and voted on. Add one in a click, or share your own.": "他のプレイヤーが共有し、投票した無料のサウンドとボイス。クリックひとつで追加、または自分のものを共有。",
+  "Let the Onion Board developer see this channel's name": "このチャンネル名を Onion Board の開発者に見せる",
+  "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "接続中で「参加する」がオンのときだけ、1日1回の利用カウントと一緒に送られます。誰が Onion Board で配信しているか開発者が見られるようにするためです。名前だけです。チェックを外すと止まります。"
 }

@@ -4350,5 +4350,7 @@
   "Wall of Noise": "กำแพงเสียง",
   "Who Pulled the Plug?": "ใครถอดปลั๊ก?",
   "↑ ↑ ↓ ↓ ← → ← → B A: Bun got 30 extra lives.": "↑ ↑ ↓ ↓ ← → ← → B A: Bun ได้ชีวิตเพิ่ม 30 ชีวิต",
-  "Free sounds and voices other players shared and voted on. Add one in a click, or share your own.": "เสียงและเสียงพากย์ฟรีที่ผู้เล่นคนอื่นแชร์และโหวต เพิ่มได้ในคลิกเดียว หรือแชร์ของคุณเอง"
+  "Free sounds and voices other players shared and voted on. Add one in a click, or share your own.": "เสียงและเสียงพากย์ฟรีที่ผู้เล่นคนอื่นแชร์และโหวต เพิ่มได้ในคลิกเดียว หรือแชร์ของคุณเอง",
+  "Let the Onion Board developer see this channel's name": "ให้ผู้พัฒนา Onion Board เห็นชื่อช่องนี้",
+  "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "ส่งวันละครั้งพร้อมการนับการใช้งาน เฉพาะตอนที่เชื่อมต่ออยู่และเปิด \"นับฉันเข้าด้วย\" ไว้ เพื่อให้ผู้พัฒนาเห็นว่าใครสตรีมด้วย Onion Board ส่งแค่ชื่อ เอาเครื่องหมายออกเพื่อหยุด"
 }

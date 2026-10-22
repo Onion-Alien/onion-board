@@ -251,7 +251,7 @@ def test_an_old_token_is_refreshed_and_kept(qapp, window, monkeypatch):
 def test_switched_off_or_disconnected_it_stays_away(qapp, window, monkeypatch):
     w = window
     t = Link(w, monkeypatch)
-    w.cfg.twitch_token, w.cfg.twitch_user_id = "tok", "42"
+    w.cfg.twitch_token, w.cfg.twitch_user_id, w.cfg.twitch_share = "tok", "42", True
     net.configure_features(off=["twitch"])
     t.link.apply()
     assert t.link.state == twitchlink.PROBLEM and "Privacy" in t.link.message
@@ -261,6 +261,7 @@ def test_switched_off_or_disconnected_it_stays_away(qapp, window, monkeypatch):
     assert process_events(qapp, lambda: t.opened)
     t.link.disconnect()
     assert w.cfg.twitch_token == "" and w.cfg.twitch_login == ""
+    assert w.cfg.twitch_share is False   # a new account is asked again
     assert t.link.state == twitchlink.OFF
     assert process_events(qapp, lambda: ("revoke", "tok") in t.calls)
 
@@ -325,6 +326,11 @@ def test_the_settings_card(qapp, window, monkeypatch):
     assert twitchcard.rule_for(w, "follow")["say"] == "Thanks {user}"
     card.chat.setChecked(False)
     assert streamapi.chat_rules(w)["on"] is False
+    # the name for the developer: on the connected card only, off until ticked
+    assert card.share.isVisibleTo(card.card) and not card.share.isChecked()
+    assert not w.cfg.twitch_share
+    card.share.setChecked(True)
+    assert w.cfg.twitch_share is True
     disconnected = []
     monkeypatch.setattr(w.twitch, "disconnect", lambda: disconnected.append(1))
     card.btn_disconnect.click()
