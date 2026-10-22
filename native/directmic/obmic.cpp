@@ -184,6 +184,9 @@ static const PROPERTYKEY PKEY_AudioEndpoint_GUID_ =
 static const CLSID CLSID_OnionMic =
     {0xc55e76fe, 0x6667, 0x4828, {0x81, 0xfd, 0x05, 0xb3, 0x93, 0xfd, 0x64, 0x9e}};
 static const wchar_t *STATE_KEY = L"SOFTWARE\\OnionBoard\\MicPlugin\\Endpoints";
+#ifndef OBMIC_STATE_ROOT   // a test build reads the notes from HKEY_CURRENT_USER
+#define OBMIC_STATE_ROOT HKEY_LOCAL_MACHINE
+#endif
 static const uint32_t EFFECT_VERSION = 5;        // directmic.EFFECT_VERSION
 
 // Equalizer APO works like this effect: it takes a slot and runs the effect it replaced,
@@ -594,8 +597,15 @@ public:
         if (m_childConfig) {
             HRESULT hr = m_childConfig->LockForProcess(nIn, in, nOut, out);
             if (FAILED(hr)) {
-                problemf("the mic's own effect failed to lock: 0x%08lx", (unsigned long)hr);
-                return hr;
+                if (!sameShape(in[0], out[0])) {   // it changes the format: can't go without it
+                    problemf("the mic's own effect failed to lock: 0x%08lx", (unsigned long)hr);
+                    return hr;
+                }
+                // a headset maker's effect that won't run inside another one: the mic
+                // without it rather than no mic at all
+                problemf("the mic's own effect failed to lock (0x%08lx): the mic without it",
+                         (unsigned long)hr);
+                dropChild();
             }
         }
         const WAVEFORMATEX *f = out[0]->pFormat ? out[0]->pFormat->GetAudioFormat() : NULL;
@@ -712,6 +722,23 @@ private:
         return S_OK;
     }
 
+    // In and out the same float format: the mic can go on without its own effect.
+    static bool sameShape(const APO_CONNECTION_DESCRIPTOR *in, const APO_CONNECTION_DESCRIPTOR *out) {
+        const WAVEFORMATEX *a = in->pFormat ? in->pFormat->GetAudioFormat() : NULL;
+        const WAVEFORMATEX *b = out->pFormat ? out->pFormat->GetAudioFormat() : NULL;
+        return isFloat32(a) && isFloat32(b) && a->nChannels == b->nChannels
+               && a->nSamplesPerSec == b->nSamplesPerSec;
+    }
+
+    void dropChild() {
+        if (m_childConfig) m_childConfig->Release();
+        if (m_childRT) m_childRT->Release();
+        if (m_child) m_child->Release();
+        m_childConfig = NULL;
+        m_childRT = NULL;
+        m_child = NULL;
+    }
+
     // The mic's own effect, saved by the installer under STATE_KEY\<endpoint>\Original.
     // Equalizer APO's notes for this endpoint hold this effect: it runs this one already.
     static bool eapoRunsUs(const wchar_t *endpoint) {
@@ -749,7 +776,7 @@ private:
         _snwprintf(key, 256, L"%ls\\%ls", STATE_KEY, endpoint);
         key[255] = 0;
         DWORD size = sizeof value;
-        if (RegGetValueW(HKEY_LOCAL_MACHINE, key, L"Original", RRF_RT_REG_SZ, NULL, value, &size)
+        if (RegGetValueW(OBMIC_STATE_ROOT, key, L"Original", RRF_RT_REG_SZ, NULL, value, &size)
                 != ERROR_SUCCESS || !value[0])
             return;
         CLSID clsid;
