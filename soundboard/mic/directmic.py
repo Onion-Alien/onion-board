@@ -1531,6 +1531,46 @@ def _stopped_soon(wait_s: float | None = None) -> bool:
         time.sleep(1.0)
 
 
+ENDPOINT_DEVICE = "SWD\\MMDEVAPI\\{0.0.1.00000000}."   # a mic's own device: this + its GUID
+
+
+def _mic_restart_works() -> bool:
+    """This Windows can restart one device on its own (pnputil /restart-device: Windows
+    10 2004 and later)."""
+    try:
+        r = subprocess.run(["pnputil", "/?"], capture_output=True, text=True,
+                           errors="replace", timeout=15, creationflags=_CREATE_NO_WINDOW)
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return "/restart-device" in r.stdout
+
+
+def _restart_mics(guids: Sequence[str]) -> bool:
+    """Restart only the mics `guids` (the active ones): Windows reads their effect
+    settings again, as when one is unplugged and plugged back in, and every app that
+    records one picks it up again by itself. A restart of all of Windows' audio also
+    cut off the apps that sit between the mic and a voice chat (a virtual mic of their
+    own) until they were restarted. False if one wouldn't restart."""
+    active = {e["guid"].lower() for e in capture_endpoints() if e["active"]}
+    ok = True
+    for g in dict.fromkeys(g.lower() for g in guids):
+        if g in active and _run(["pnputil", "/restart-device", ENDPOINT_DEVICE + g],
+                                timeout=60.0):
+            ok = False
+    return ok
+
+
+def _restart_audio() -> bool:
+    """Restart all of Windows' audio (the services that ran on it too). False if it
+    wouldn't stop (it's started again either way)."""
+    dependents = _running_dependents()
+    _audio_comes_back(dependents)
+    try:
+        return _audio_service(False)
+    finally:
+        _audio_service(True, dependents)
+
+
 def _register_com(dll: Path):
     clsid_key = rf"SOFTWARE\Classes\CLSID\{CLSID}"
     with winreg.CreateKeyEx(winreg.HKEY_LOCAL_MACHINE, clsid_key, 0, winreg.KEY_ALL_ACCESS) as k:
@@ -1941,13 +1981,18 @@ def _audio_off(work, also: Sequence[str] = ()) -> int:
     but a mic still sends only silence after every restart (_mics_come_back_live):
     MIC_SILENT. A mic (the effect's, or `also`: the one it goes on) that was already
     silent before isn't the step's doing: a headset that's switched off, or its mic
-    muted, sends only zeros too, and restarting the audio for it only cut the sound."""
+    muted, sends only zeros too, and restarting the audio for it only cut the sound.
+    Where Windows can restart one mic on its own (_mic_restart_works), `work` runs with
+    the audio on and only the mics it changed restart after it (_restart_mics): the
+    rest of the PC's sound, and the apps in between a mic and a voice chat, carry on."""
     _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
-    dependents = _running_dependents()
-    _audio_comes_back(dependents)
     # a mic the last step left silent (MIC_SILENT, just now) is silent before this retry
     # too, but that's the stuck mic the retry is for: it still gets the extra restarts
     quiet = _silent_before([*installed_on(), *also]) - _left_silent()
+    if _mic_restart_works():
+        return _mic_by_mic(work, also, quiet)
+    dependents = _running_dependents()
+    _audio_comes_back(dependents)
     mics: list[str] | None = None
     code = None
     try:
@@ -1957,8 +2002,41 @@ def _audio_off(work, also: Sequence[str] = ()) -> int:
         code = work()
     finally:
         _audio_service(True, dependents)
-        live = mics is None or _mics_come_back_live(mics, dependents, quiet)
+        live = mics is None or _mics_come_back_live(mics, quiet)
     return MIC_SILENT if code == 0 and not live else code
+
+
+def _mic_by_mic(work, also: Sequence[str], quiet: Collection[str]) -> int:
+    """_audio_off with the audio on: `work`, then a restart of each mic whose effect
+    settings it changed (`also` and the ones the effect was on too). A mic that won't
+    restart on its own: all of Windows' audio restarts instead (if that won't stop
+    either, the change waits for the PC's next restart: 6). Files it removes go after
+    the restart (_remove_held): Windows' audio still holds the effect until then."""
+    global _held
+    mics = installed_on()   # the one it comes off is listened to as well
+    before = _fx_now()
+    code = None
+    _held = []
+    try:
+        code = work()
+    finally:
+        held, _held = _held, None
+        after = _fx_now()
+        changed = [g for g in {*before, *after} if before.get(g) != after.get(g)]
+        restarted = _restart_mics([*mics, *also, *installed_on(), *changed])
+        if not restarted:
+            log.warning("a mic wouldn't restart on its own: restarting Windows' audio")
+            restarted = _restart_audio()
+        _remove_held(held)
+        live = _mics_come_back_live(mics, quiet, one_by_one=True)
+    if code == 0 and not restarted:
+        return 6
+    return MIC_SILENT if code == 0 and not live else code
+
+
+def _fx_now() -> dict[str, dict]:
+    """Every mic's effect settings now."""
+    return {e["guid"]: _fx_values(e["guid"]) for e in capture_endpoints()}
 
 
 def _silent_before(guids: Sequence[str]) -> set[str]:
@@ -2029,27 +2107,28 @@ def _silent(guid: str) -> bool:
     return bool(heard)
 
 
-def _mics_come_back_live(before: Sequence[str], dependents: Sequence[str],
-                          quiet: Collection[str] = ()) -> bool:
+def _mics_come_back_live(before: Sequence[str], quiet: Collection[str] = (),
+                          one_by_one: bool = False) -> bool:
     """After the audio restart a mic can come back sending only exact zeros (an app
     such as a voice chat grabbed it the moment it was back), to every app and to Windows'
     own mic test, until the audio restarts again. So the mics the effect was on (`before`)
     and is on now are listened to: digital silence gets another restart, up to
     EXTRA_RESTARTS of them. False if a mic still sends only silence after those (the app
     then says so); True otherwise, "can't tell" and a failed check included. Mics in
-    `quiet` were silent before the step already (_silent_before): left alone."""
+    `quiet` were silent before the step already (_silent_before): left alone.
+    `one_by_one`: the first extra restart is of the silent mics only (_restart_mics),
+    the rest of all of Windows' audio."""
     try:
         silent = [g for g in dict.fromkeys([*before, *installed_on()])
                   if g.lower() not in quiet and _silent(g)]
         for n in range(1, EXTRA_RESTARTS + 1):
             if not silent:
                 break
-            log.warning("%s sends only silence after the audio restart: restarting the "
-                        "audio again (%d of %d)", ", ".join(silent), n, EXTRA_RESTARTS)
-            try:
-                _audio_service(False)
-            finally:
-                _audio_service(True, dependents)
+            log.warning("%s sends only silence after the audio restart: restarting %s "
+                        "again (%d of %d)", ", ".join(silent),
+                        "it" if one_by_one and n == 1 else "the audio", n, EXTRA_RESTARTS)
+            if not (one_by_one and n == 1 and _restart_mics(silent)):
+                _restart_audio()
             silent = [g for g in silent if _silent(g)]
             if not silent:
                 log.info("the mic is back after %d more restart(s)", n)
@@ -2084,7 +2163,7 @@ def admin_install(guid: str, slot: str | None = None, source: Path | None = None
 
 
 def _put_on(guid: str, slot: str | None, dll: Path) -> int:
-    """admin_install()'s work, with the audio stopped."""
+    """admin_install()'s work (with the audio stopped, or before its mics restart)."""
     # a name of its own per version: a copy Windows still holds can't block it
     digest = hashlib.sha256(dll.read_bytes()).hexdigest()[:12]
     target = install_dir() / f"obmic-{digest}.dll"
@@ -2101,6 +2180,7 @@ def _put_on(guid: str, slot: str | None, dll: Path) -> int:
         if old != target:
             _remove(old)
     _make_ring()
+    _unmark([target, ring_path()])
     for other in installed_on():   # one mic at a time; this one is done afresh
         _uninstall_endpoint(other)
     for e in capture_endpoints():
@@ -2244,7 +2324,11 @@ def admin_cleanup(guid: str) -> int:
     if guid in installed_on():
         return admin_uninstall(guid)
     _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
-    if any(without_ours(v)[0] for v in _fx_values(guid).values()):
+    if any(without_ours(v)[0] for v in _fx_values(guid).values()) and _mic_restart_works():
+        _strip_endpoint(guid)
+        if not _restart_mics([guid]) and not _restart_audio():
+            return 6
+    elif any(without_ours(v)[0] for v in _fx_values(guid).values()):
         dependents = _running_dependents()
         _audio_comes_back(dependents)
         try:
@@ -2258,9 +2342,16 @@ def admin_cleanup(guid: str) -> int:
     return 0
 
 
+_held: list[Path] | None = None   # what _remove holds back while the audio is on
+
+
 def _remove(path: Path):
     """Delete a file or folder of ours. What Windows still holds open (an old copy of
-    the effect) goes at the next restart instead of staying behind for good."""
+    the effect) goes at the next restart instead of staying behind for good. While a
+    step runs with the audio on (_mic_by_mic) it's only noted, for _remove_held."""
+    if _held is not None:
+        _held.append(path)
+        return
     if path.is_dir():
         shutil.rmtree(path, ignore_errors=True)
         if path.exists():   # files first, deepest folders next, the folder itself last
@@ -2276,8 +2367,77 @@ def _remove(path: Path):
             _gone_at_restart(path)
 
 
+def _remove_held(paths: Sequence[Path]):
+    """Delete what _remove held back, now that the mics have restarted and Windows'
+    audio has let go of an old copy of the effect. What the effect still uses stays:
+    an update to the same version had its folder taken away and put back, and marking
+    the copy in use for removal at the next restart broke the mic after it."""
+    using = []
+    if installed_on():
+        using = [_same_path(p) for p in (registered_dll(), ring_path()) if p is not None]
+    for path in dict.fromkeys(paths):
+        p = _same_path(path)
+        if not any(u == p or u.startswith(p + os.sep) for u in using):
+            _remove(path)
+
+
+SESSION_KEY = r"SYSTEM\CurrentControlSet\Control\Session Manager"
+PENDING = "PendingFileRenameOperations"   # Windows' list of what goes at the next restart
+
+
+def _pending_path(entry: str) -> str:
+    """A path as _same_path compares it, from an entry of Windows' list: the path after
+    a "*1" and a "\\??\\"."""
+    return _same_path(re.sub(r"^\*\d+", "", entry).removeprefix("\\??\\"))
+
+
+def _same_path(path) -> str:
+    return os.path.normcase(os.path.abspath(path)).rstrip(os.sep)
+
+
+def _unmark(paths: Sequence[Path]):
+    """Take `paths` and the folders they're in off Windows' list of what goes at the next
+    restart. An earlier step marked them while something still held them (the board its
+    ring, Windows' audio an effect copy), and this step uses them again: left marked, the
+    effect lost its files at the next restart. (A check: never fails the step.)"""
+    want = [_same_path(p) for p in paths]
+    try:
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, SESSION_KEY, 0,
+                            winreg.KEY_QUERY_VALUE | winreg.KEY_SET_VALUE) as k:
+            ops, kind = winreg.QueryValueEx(k, PENDING)
+            if kind != winreg.REG_MULTI_SZ or len(ops) % 2:
+                return
+            keep = []
+            for src, dst in zip(ops[::2], ops[1::2]):
+                p = _pending_path(src)
+                if not dst and any(w == p or w.startswith(p + os.sep) for w in want):
+                    log.info("%s no longer goes at the next restart: it's in use", p)
+                    continue
+                keep += [src, dst]
+            if len(keep) != len(ops):
+                winreg.SetValueEx(k, PENDING, 0, winreg.REG_MULTI_SZ, keep)
+    except FileNotFoundError:
+        pass   # nothing goes at the next restart
+    except OSError:
+        log.warning("couldn't read what goes at the next restart", exc_info=True)
+
+
+def _marked(path: Path) -> bool:
+    """`path` is on Windows' list of what goes at the next restart already."""
+    try:
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, SESSION_KEY) as k:
+            ops = winreg.QueryValueEx(k, PENDING)[0]
+    except OSError:
+        return False
+    p = _same_path(path)
+    return isinstance(ops, list) and any(
+        not dst and _pending_path(src) == p for src, dst in zip(ops[::2], ops[1::2]))
+
+
 def _gone_at_restart(path: Path):
     log.info("can't remove %s yet: it goes at the next restart", path)
+    if _marked(path):
+        return   # (an old copy Windows' audio still holds: once is enough)
     try:
         # MOVEFILE_DELAY_UNTIL_REBOOT (admin only: the admin step is)
         if not ctypes.windll.kernel32.MoveFileExW(str(path), None, 4):

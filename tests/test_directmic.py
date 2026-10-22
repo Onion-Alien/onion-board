@@ -22,6 +22,8 @@ from soundboard.mic import directmic as dm
 from test_mainwindow import window  # noqa: F401  (fixture)
 
 _REAL_ELEVATED = dm._elevated   # (before the conftest guard replaces it)
+_REAL_RESTART_WORKS = dm._mic_restart_works   # (before _no_windows_mics replaces it)
+_REAL_UNMARK = dm._unmark
 
 BUILD = Path(__file__).resolve().parent.parent / "build" / "directmic"
 HOST = BUILD / "testhost.exe"
@@ -33,6 +35,9 @@ def _no_windows_mics(monkeypatch):
     """mic_lookup's last try asks Windows for its mics: none here (the tests' made-up
     mics would otherwise meet this PC's real ones)."""
     monkeypatch.setattr(dm, "_windows_mics", lambda: [])
+    # the admin steps restart all of Windows' audio unless a test says otherwise
+    monkeypatch.setattr(dm, "_mic_restart_works", lambda: False)
+    monkeypatch.setattr(dm, "_unmark", lambda paths: None)   # never this PC's own list
 
 
 @pytest.fixture
@@ -664,6 +669,218 @@ def test_no_listen_when_the_audio_never_stopped(fake_reg, monkeypatch, tmp_path)
     monkeypatch.setattr(dm, "_audio_service", lambda start, deps=(): start)   # stop fails
     assert dm.admin_install(GUID) == 6
     assert calls == [("listen", GUID)]   # only the one before the step
+
+
+OTHER = "{22222222-3333-4444-5555-666666666666}"
+
+
+def _one_mic_kit(fake_reg, monkeypatch, tmp_path, heard, restarts=True):
+    """_restart_kit where Windows can restart one mic on its own: `restarts` is what
+    each restart of mics answers (True: done), in turn (the last one repeats). The
+    effect settings of a second mic, OTHER, change during the step."""
+    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, heard)
+    answers = [restarts] if isinstance(restarts, bool) else list(restarts)
+    monkeypatch.setattr(dm, "_mic_restart_works", lambda: True)
+    monkeypatch.setattr(dm, "_restart_mics", lambda guids: calls.append(
+        ("mics", sorted(set(guids)))) or (answers.pop(0) if len(answers) > 1 else answers[0]))
+    snaps = [{OTHER: {"a": 1}}, {OTHER: {"a": 2}}]
+    monkeypatch.setattr(dm, "_fx_now", lambda: snaps.pop(0) if snaps else {})
+    return calls
+
+
+def test_only_the_mics_the_step_changed_restart(fake_reg, monkeypatch, tmp_path):
+    """Where Windows can restart one mic on its own, the step runs with the audio on and
+    only the mics it changed restart: all of Windows' audio restarting cut off the apps
+    in between a mic and a voice chat (their virtual mic went silent until they were
+    restarted), and everyone's sound with it."""
+    calls = _one_mic_kit(fake_reg, monkeypatch, tmp_path, [False, False])
+    assert dm.admin_install(GUID) == 0
+    assert fake_reg.installed_on() == [GUID.lower()]
+    assert calls == [("listen", GUID), ("mics", sorted([GUID, OTHER])), ("listen", GUID)]
+
+
+def test_a_mic_that_wont_restart_alone_restarts_the_audio(fake_reg, monkeypatch, tmp_path):
+    calls = _one_mic_kit(fake_reg, monkeypatch, tmp_path, [False, False], restarts=False)
+    assert dm.admin_install(GUID) == 0
+    assert calls[1:] == [("mics", sorted([GUID, OTHER])), (False, ()), (True, ["midisrv"]),
+                         ("listen", GUID)]
+
+
+def test_no_restart_at_all_says_so(fake_reg, monkeypatch, tmp_path):
+    """The mic wouldn't restart, and Windows' audio wouldn't stop: the change waits for
+    the PC's next restart (6), as when the audio wouldn't stop before a step."""
+    calls = _one_mic_kit(fake_reg, monkeypatch, tmp_path, [False, False], restarts=False)
+    monkeypatch.setattr(dm, "_audio_service",
+                        lambda start, deps=(): calls.append((start, deps)) or start)
+    assert dm.admin_install(GUID) == 6
+
+
+def test_a_mic_silent_after_its_restart_gets_its_own_restart_first(fake_reg, monkeypatch,
+                                                                   tmp_path):
+    """Silent after the step: first only that mic restarts again; still silent, then
+    all of Windows' audio, as before."""
+    calls = _one_mic_kit(fake_reg, monkeypatch, tmp_path, [False, True, True, True, True, False])
+    assert dm.admin_install(GUID) == 0
+    assert calls[1:] == [("mics", sorted([GUID, OTHER])), ("listen", GUID), ("listen", GUID),
+                         ("mics", [GUID]), ("listen", GUID), ("listen", GUID),
+                         (False, ()), (True, ["midisrv"]), ("listen", GUID)]
+
+
+def test_a_failed_step_still_restarts_the_mics_it_touched(fake_reg, monkeypatch, tmp_path):
+    calls = _one_mic_kit(fake_reg, monkeypatch, tmp_path, [False, False])
+    monkeypatch.setattr(dm, "_put_on", lambda *a: 1)
+    assert dm.admin_install(GUID) == 1
+    assert ("mics", sorted([GUID, OTHER])) in calls
+
+
+def test_restart_mics_restarts_only_the_plugged_in_ones(monkeypatch):
+    """Each mic's own device (pnputil /restart-device): one that's unplugged has nothing
+    to restart (its settings are read when it's back); one that fails says so."""
+    ran = []
+    monkeypatch.setattr(dm, "capture_endpoints", lambda: [
+        {"guid": GUID, "active": True}, {"guid": OTHER, "active": False}])
+    monkeypatch.setattr(dm, "_run", lambda cmd, timeout=60.0: ran.append(cmd) or 0)
+    assert dm._restart_mics([GUID.upper(), GUID, OTHER]) is True
+    assert ran == [["pnputil", "/restart-device", dm.ENDPOINT_DEVICE + GUID]]
+    monkeypatch.setattr(dm, "_run", lambda cmd, timeout=60.0: 1)
+    assert dm._restart_mics([GUID]) is False
+
+
+@pytest.mark.parametrize("out, works", [
+    ("PNPUTIL [/add-driver ...]\n  /restart-device <instance ID>", True),
+    ("PNPUTIL [-a] [-d] [-e] [-f] [-i]", False)])   # an older Windows
+def test_mic_restart_works_where_pnputil_can(monkeypatch, out, works):
+    monkeypatch.setattr(dm.subprocess, "run",
+                        lambda *a, **k: subprocess.CompletedProcess(a, 0, out, ""))
+    assert _REAL_RESTART_WORKS() is works
+
+
+def test_mic_restart_works_is_false_without_pnputil(monkeypatch):
+    def missing(*a, **k):
+        raise FileNotFoundError("pnputil")
+    monkeypatch.setattr(dm.subprocess, "run", missing)
+    assert _REAL_RESTART_WORKS() is False
+
+
+def test_files_removed_with_the_audio_on_wait_for_the_mic_restart(fake_reg, monkeypatch,
+                                                                  tmp_path):
+    """With the audio on, Windows still holds the effect while the step runs: what the
+    step removes goes after the mics restart, not marked for the PC's next restart."""
+    calls = _one_mic_kit(fake_reg, monkeypatch, tmp_path, [False, False, False, False])
+    removed = []
+    real = dm._remove
+    monkeypatch.setattr(dm, "_remove_held", lambda paths: calls.append(("files", paths)))
+    assert dm.admin_install(GUID) == 0
+    calls.clear()
+    assert dm.admin_uninstall() == 0
+    held = [c for c in calls if c[0] == "files"][0][1]
+    assert held and calls.index(("files", held)) > calls.index(("mics", [GUID]))
+    assert dm._held is None   # removing works normally again
+    monkeypatch.setattr(dm, "_gone_at_restart", removed.append)
+    f = tmp_path / "x.txt"
+    f.write_text("x")
+    real(f)
+    assert not f.exists() and not removed
+
+
+def test_held_files_the_effect_still_uses_stay(monkeypatch, tmp_path):
+    """An update to the same version takes the effect's folder away and puts it back:
+    the copy in use and the ring stay, an older copy goes."""
+    pf, data = tmp_path / "pf", tmp_path / "data"
+    pf.mkdir()
+    data.mkdir()
+    dll, old, ring = pf / "obmic-new.dll", pf / "obmic-old.dll", data / "ring2.bin"
+    for f in (dll, old, ring):
+        f.write_bytes(b"x")
+    monkeypatch.setattr(dm, "registered_dll", lambda: dll)
+    monkeypatch.setattr(dm, "ring_path", lambda: ring)
+    monkeypatch.setattr(dm, "installed_on", lambda: [GUID])
+    dm._remove_held([pf, data, old])
+    assert dll.exists() and ring.exists() and not old.exists()
+    monkeypatch.setattr(dm, "installed_on", lambda: [])   # off every mic: all of it goes
+    dm._remove_held([pf, data])
+    assert not pf.exists() and not data.exists()
+
+
+class _PendingKey:
+    """Windows' list of what goes at the next restart, as winreg sees it."""
+
+    def __init__(self, ops):
+        self.ops, self.written = ops, None
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        pass
+
+
+def test_files_in_use_come_off_the_restart_list(monkeypatch, tmp_path):
+    """The ring and the effect copy in use, marked to go at the next restart by an
+    earlier step (the board held the ring), come off Windows' list: everything else on
+    it, renames and other programs' files, stays exactly as it was."""
+    pf = tmp_path / "Onion Board Mic"
+    dll, old, ring = pf / "obmic-new.dll", pf / "obmic-old.dll", tmp_path / "data" / "ring2.bin"
+    nt, star = "\\??\\", "*1\\??\\"
+    key = _PendingKey([
+        nt + r"C:\Other\a.dll", "", star + str(ring), "", star + str(ring.parent), "",
+        nt + str(old), "", star + str(dll), "", nt + str(pf), "",
+        nt + r"C:\x\new.sys", nt + r"C:\x\old.sys"])
+    monkeypatch.setattr(dm.winreg, "OpenKey", lambda *a: key)
+    monkeypatch.setattr(dm.winreg, "QueryValueEx", lambda k, n: (k.ops, dm.winreg.REG_MULTI_SZ))
+    monkeypatch.setattr(dm.winreg, "SetValueEx",
+                        lambda k, n, r, kind, v: setattr(k, "written", v))
+    _REAL_UNMARK([dll, ring])
+    assert key.written == [nt + r"C:\Other\a.dll", "", nt + str(old), "",
+                           nt + r"C:\x\new.sys", nt + r"C:\x\old.sys"]
+
+
+def test_nothing_on_the_restart_list_writes_nothing(monkeypatch, tmp_path):
+    key = _PendingKey(["\\??\\" + r"C:\Other\a.dll", ""])
+    monkeypatch.setattr(dm.winreg, "OpenKey", lambda *a: key)
+    monkeypatch.setattr(dm.winreg, "QueryValueEx", lambda k, n: (k.ops, dm.winreg.REG_MULTI_SZ))
+    monkeypatch.setattr(dm.winreg, "SetValueEx", lambda *a: pytest.fail("written"))
+    _REAL_UNMARK([tmp_path / "x.dll"])
+
+    def missing(*a):
+        raise FileNotFoundError("no list")
+    monkeypatch.setattr(dm.winreg, "OpenKey", missing)
+    _REAL_UNMARK([tmp_path / "x.dll"])   # no list at all: nothing to do
+
+
+def test_a_file_on_the_restart_list_is_put_on_it_once(monkeypatch, tmp_path):
+    """An old effect copy Windows' audio still holds is marked once, not again on
+    every step."""
+    f = tmp_path / "obmic-old.dll"
+    key = _PendingKey(["*1\\??\\" + str(f), ""])
+    monkeypatch.setattr(dm.winreg, "OpenKey", lambda *a: key)
+    monkeypatch.setattr(dm.winreg, "QueryValueEx", lambda k, n: (k.ops, dm.winreg.REG_MULTI_SZ))
+    assert dm._marked(f) and not dm._marked(tmp_path / "other.dll")
+
+
+def test_the_effect_in_use_is_taken_off_the_restart_list(fake_reg, monkeypatch, tmp_path):
+    calls = _one_mic_kit(fake_reg, monkeypatch, tmp_path, [False, False])
+    monkeypatch.setattr(dm, "_unmark", lambda paths: calls.append(("unmark", paths)))
+    assert dm.admin_install(GUID) == 0
+    unmark = [c for c in calls if c[0] == "unmark"]
+    assert len(unmark) == 1 and dm.ring_path() in unmark[0][1]
+    assert unmark[0][1][0].parent == tmp_path / "pf"
+
+
+def test_cleanup_restarts_only_that_mic(monkeypatch):
+    """A leftover of ours on a mic it isn't (by our notes) on: taken out, and only that
+    mic restarts."""
+    calls = []
+    monkeypatch.setattr(dm, "_enable_privileges", lambda *a: None)
+    monkeypatch.setattr(dm, "installed_on", lambda: [])
+    monkeypatch.setattr(dm, "anything_installed", lambda: False)
+    monkeypatch.setattr(dm, "_fx_values", lambda guid: {dm.FX % 5: dm.CLSID})
+    monkeypatch.setattr(dm, "_mic_restart_works", lambda: True)
+    monkeypatch.setattr(dm, "_strip_endpoint", lambda guid: calls.append(("strip", guid)))
+    monkeypatch.setattr(dm, "_restart_mics", lambda guids: calls.append(("mics", guids)) or True)
+    monkeypatch.setattr(dm, "_audio_service", lambda *a: calls.append("audio"))
+    assert dm.admin_cleanup(GUID) == 0
+    assert calls == [("strip", GUID), ("mics", [GUID])]
 
 
 def test_a_failing_listen_never_fails_the_install(fake_reg, monkeypatch, tmp_path):
