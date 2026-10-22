@@ -1543,19 +1543,26 @@ class SetupWizard(QDialog):
         i = max(0, min(self.PAGES - 1, i))
         if i != self.send_index and self.setup_show.on:
             self.setup_show._stop()
-        self.stack.setCurrentIndex(i)
-        self.progress.setText(_("Step {step} of {pages}", step=i + 1, pages=self.PAGES))
-        self.step_bar.set_step(i)
-        self.btn_back.setVisible(i > 0)
-        self.timer.setInterval(TICK_MS if i == self.dev_index else SLOW_TICK_MS)
+        # the new step's words and buttons first, while it's still hidden, then show it:
+        # shown first, the send step's first showing painted its unfilled state (a
+        # "Checking…" card, buttons it doesn't have, the old step's size) and then grew
+        # twice as its words came in (only the first time: after that it was filled)
         if i == self.send_index:
-            self.cable_status.setText(_("Checking…"))
-            self.cable_status.repaint()   # the check can take a moment (it may reopen devices)
             self.recheck_cable(rescan=False)
         elif i == self.discord_index:
             self._fill_discord()
         elif i == self.switch_index:
             self._fill_discord_choice()
+        self.stack.setCurrentIndex(i)
+        # and its cards measured for those words now: a card's own layout only catches
+        # up on its posted LayoutRequest, so the step was sized (and drawn) once with
+        # a card's old height, its new words cut to one line, and grew a frame later
+        for __ in range(4):   # (each card that changes asks its parent in turn)
+            QApplication.sendPostedEvents(None, QEvent.Type.LayoutRequest)
+        self.progress.setText(_("Step {step} of {pages}", step=i + 1, pages=self.PAGES))
+        self.step_bar.set_step(i)
+        self.btn_back.setVisible(i > 0)
+        self.timer.setInterval(TICK_MS if i == self.dev_index else SLOW_TICK_MS)
         # Discord's own settings: read now, then while the step is up
         if i == self.discord_index:
             self._read_discord()
