@@ -1560,9 +1560,14 @@ def _restart_mics(guids: Sequence[str]) -> bool:
     return ok
 
 
+_audio_restarts = 0   # restarts of all of Windows' audio (_restart_audio) so far
+
+
 def _restart_audio() -> bool:
     """Restart all of Windows' audio (the services that ran on it too). False if it
     wouldn't stop (it's started again either way)."""
+    global _audio_restarts
+    _audio_restarts += 1
     dependents = _running_dependents()
     _audio_comes_back(dependents)
     try:
@@ -1989,8 +1994,9 @@ def _audio_off(work, also: Sequence[str] = ()) -> int:
     # a mic the last step left silent (MIC_SILENT, just now) is silent before this retry
     # too, but that's the stuck mic the retry is for: it still gets the extra restarts
     quiet = _silent_before([*installed_on(), *also]) - _left_silent()
+    apps_quiet = _mic_apps_quiet()
     if _mic_restart_works():
-        return _mic_by_mic(work, also, quiet)
+        return _mic_by_mic(work, also, quiet, apps_quiet)
     dependents = _running_dependents()
     _audio_comes_back(dependents)
     mics: list[str] | None = None
@@ -2003,17 +2009,21 @@ def _audio_off(work, also: Sequence[str] = ()) -> int:
     finally:
         _audio_service(True, dependents)
         live = mics is None or _mics_come_back_live(mics, quiet)
-        _mic_apps_back()
+        _mic_apps_back(apps_quiet)
     return MIC_SILENT if code == 0 and not live else code
 
 
-def _mic_by_mic(work, also: Sequence[str], quiet: Collection[str]) -> int:
+def _mic_by_mic(work, also: Sequence[str], quiet: Collection[str],
+                apps_quiet: Collection[str] = ()) -> int:
     """_audio_off with the audio on: `work`, then a restart of each mic whose effect
     settings it changed (`also` and the ones the effect was on too). A mic that won't
     restart on its own: all of Windows' audio restarts instead (if that won't stop
     either, the change waits for the PC's next restart: 6). Files it removes go after
-    the restart (_remove_held): Windows' audio still holds the effect until then."""
+    the restart (_remove_held): Windows' audio still holds the effect until then.
+    The mic apps (_mic_apps_back) are only seen to when all of Windows' audio did
+    restart: a mic restarted on its own doesn't cut them off."""
     global _held
+    restarts = _audio_restarts
     mics = installed_on()   # the one it comes off is listened to as well
     before = _fx_now()
     code = None
@@ -2030,7 +2040,8 @@ def _mic_by_mic(work, also: Sequence[str], quiet: Collection[str]) -> int:
             restarted = _restart_audio()
         _remove_held(held)
         live = _mics_come_back_live(mics, quiet, one_by_one=True)
-        _mic_apps_back()   # (for a restart of all of Windows' audio above)
+        if _audio_restarts != restarts:
+            _mic_apps_back(apps_quiet)
     if code == 0 and not restarted:
         return 6
     return MIC_SILENT if code == 0 and not live else code
@@ -2052,18 +2063,39 @@ MIC_APPS = (
 MIC_APP_BACK_S = 30   # how long a restarted mic app gets to be running again
 
 
-def _mic_apps_back() -> None:
+def _mic_app_mics(mic: str) -> list[str]:
+    """The active mics whose name starts with `mic` (a mic app's own)."""
+    return [e["guid"].lower() for e in capture_endpoints()
+            if e["active"] and e["name"].startswith(mic)]
+
+
+def _mic_apps_quiet() -> set[str]:
+    """The running mic apps' (MIC_APPS) mics sending only silence before a step: not
+    the step's doing (the app switched off, or set up to send nothing), so they're left
+    alone after it. A check: never fails the step."""
+    quiet = set()
+    try:
+        for exe, _parent, mic in MIC_APPS:
+            if _processes(exe):
+                quiet |= {g for g in _mic_app_mics(mic) if _mic_is_silent(g)}
+    except Exception:  # noqa: BLE001
+        log.info("couldn't listen to the mic apps before the step", exc_info=True)
+    return quiet
+
+
+def _mic_apps_back(quiet: Collection[str] = ()) -> None:
     """After a restart of Windows' audio: each mic app (MIC_APPS) whose mic now sends
     only silence is restarted (ended, for its own app to start it again), once, and its
-    mic listened to again. Only one its own app will start again is ended. A check:
-    never fails the step."""
+    mic listened to again. Only one its own app will start again is ended, and never
+    one whose mic was silent before the step already (`quiet`, _mic_apps_quiet): that
+    silence isn't the restart's, and ending it lost the app for good when its own app
+    didn't start it again. A check: never fails the step."""
     try:
         for exe, parent, mic in MIC_APPS:
             running = _processes(exe)
             if not running:
                 continue
-            guids = [e["guid"] for e in capture_endpoints()
-                     if e["active"] and e["name"].startswith(mic)]
+            guids = [g for g in _mic_app_mics(mic) if g not in quiet]
             if not guids or not any(_silent(g) for g in guids):
                 continue
             if not all(p == parent.lower() for _, p in running):
@@ -2395,14 +2427,16 @@ def admin_cleanup(guid: str) -> int:
     if guid in installed_on():
         return admin_uninstall(guid)
     _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
-    if any(without_ours(v)[0] for v in _fx_values(guid).values()) and _mic_restart_works():
+    leftover = any(without_ours(v)[0] for v in _fx_values(guid).values())
+    apps_quiet = _mic_apps_quiet() if leftover else set()
+    if leftover and _mic_restart_works():
         _strip_endpoint(guid)
         if not _restart_mics([guid]):
             restarted = _restart_audio()
-            _mic_apps_back()
+            _mic_apps_back(apps_quiet)
             if not restarted:
                 return 6
-    elif any(without_ours(v)[0] for v in _fx_values(guid).values()):
+    elif leftover:
         dependents = _running_dependents()
         _audio_comes_back(dependents)
         try:
@@ -2411,7 +2445,7 @@ def admin_cleanup(guid: str) -> int:
             _strip_endpoint(guid)
         finally:
             _audio_service(True, dependents)
-            _mic_apps_back()
+            _mic_apps_back(apps_quiet)
     if not installed_on() and anything_installed():
         return admin_uninstall()   # on no mic: the rest of it goes too
     return 0
