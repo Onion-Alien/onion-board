@@ -709,8 +709,9 @@ class _FakeSonar:
     (the last one repeats): {channel: (device, running)}. A PUT sets the channel (unless
     `refuse` says no, as while its device isn't back yet)."""
 
-    def __init__(self, states, refuse=0):
+    def __init__(self, states, refuse=0, same_starts=True):
         self.states, self.refuse, self.puts = [dict(s) for s in states], refuse, []
+        self.same_starts = same_starts   # False: as in streamer mode, only a new device starts it
 
     def http(self, method, address, path, tls=False):
         if tls:
@@ -724,7 +725,9 @@ class _FakeSonar:
                 self.refuse -= 1
                 raise OSError("HTTP 400")
             _, kind, rid, _, dev = path.split("/")
-            self.states[-1][rid] = (dev, True)
+            old, ran = self.states[-1].get(rid, ("", False))
+            self.states[-1][rid] = (dev, ran if old == dev and not self.same_starts
+                                    else not dev.endswith(dm._NO_DEVICE))
             return b""
         if path == "/classicRedirections":
             now = self.states[0] if len(self.states) == 1 else self.states.pop(0)
@@ -775,6 +778,24 @@ def test_a_stopped_sonar_channel_on_its_device_is_set_again(monkeypatch, tmp_pat
     dm._sonar_keep()
     dm._sonar_back()
     assert f"/classicRedirections/mic/deviceId/{SONAR_DEV}" in sonar.puts
+    assert dm._sonar_fixed is True
+
+
+def test_a_stopped_channel_the_same_device_doesnt_start_is_moved_and_back(monkeypatch,
+                                                                          tmp_path):
+    """In streamer mode Sonar keeps its mic's device after a restart but stops it, and
+    setting the same device again doesn't start it (Sonar was ended for it, using up
+    SteelSeries GG's restarts): set to no device and back, it runs."""
+    sonar = _FakeSonar([BEFORE, {**BEFORE, "mic": (SONAR_DEV, False)}], same_starts=False)
+    _sonar_kit(monkeypatch, tmp_path, sonar)
+    dm._sonar_keep()
+    dm._sonar_back()
+    nowhere = "{0.0.1.00000000}." + dm._NO_DEVICE
+    mic = [p for p in sonar.puts if p.startswith("/classicRedirections/mic/")]
+    assert mic == [f"/classicRedirections/mic/deviceId/{SONAR_DEV}",
+                   f"/classicRedirections/mic/deviceId/{nowhere}",
+                   f"/classicRedirections/mic/deviceId/{SONAR_DEV}"]
+    assert dm._DEVICE_ID.fullmatch(nowhere)
     assert dm._sonar_fixed is True
 
 

@@ -21,10 +21,14 @@ Changes not released yet are in [changelog.d/](changelog.d/), one file per chang
 - Direct mic: with SteelSeries Sonar on, a set-up, repair or removal no longer leaves
   Sonar's mic silent in Discord and other voice chats, or its sound on the wrong
   device: the devices Sonar used are set back through Sonar itself after Windows' audio
-  restarts. Sonar is no longer restarted for it (SteelSeries GG restarts Sonar only 3
+  restarts, in its streamer mode too. Sonar is no longer restarted for it (SteelSeries GG restarts Sonar only 3
   times, then leaves it off). It's restarted once only when it won't take its devices
-  back, or when its mic had already lost its device (after a set-up with 2.7.0): that
-  makes it pick the mic it's set up with again.
+  back, or when its mic had already lost its device (after a set-up with 2.7.0), so
+  that its mic has a device again.
+- SteelSeries Sonar users who set up direct mic with an earlier version: Windows' audio
+  restart made Sonar switch its mic to the first device it lists, which isn't always
+  yours (a webcam, a virtual cable). If Discord hears you badly or not at all through
+  Sonar, pick your mic again in SteelSeries GG > Sonar. This version keeps it.
 - Direct mic: the mic helper updates once (Windows asks one more time), so set-ups
   through it get these fixes too.
 - Once you've connected Twitch, the Twitch card has a box (off until you tick it) that

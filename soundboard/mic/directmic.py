@@ -2191,6 +2191,9 @@ GG_PROPS = Path(os.environ.get("PROGRAMDATA", r"C:\ProgramData")) / "SteelSeries
 SONAR_ROUTES = (("classicRedirections", "id"), ("streamRedirections", "streamRedirectionId"))
 SONAR_BACK_S = 20    # how long Sonar's devices get to be set again after an audio restart
 SONAR_SETTLE_S = 8   # ...watched at least this long: Sonar picks devices of its own meanwhile
+SONAR_START_S = 3    # how long a channel set again gets to say it runs before it's moved
+SONAR_AWAY_S = 2     # ...how long on no device before it's set back (at once: 1 in 4 start)
+_NO_DEVICE = "{00000000-0000-0000-0000-000000000000}"
 _DEVICE_ID = re.compile(r"\{0\.0\.[01]\.00000000\}\.\{[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-"
                         r"[0-9a-fA-F]{12}\}")
 _ROUTE_ID = re.compile(r"[A-Za-z]{1,40}")
@@ -2314,7 +2317,8 @@ def _sonar_back() -> None:
         return
     start = time.monotonic()
     answered = False
-    put: set[tuple[str, str]] = set()
+    put: dict[tuple[str, str], float] = {}   # when each channel was last set
+    away: dict[tuple[str, str], float] = {}  # ...or moved to no device (to start it)
     address, now = "", {}
     while True:
         wrong = None   # (Sonar not answering this time)
@@ -2328,8 +2332,21 @@ def _sonar_back() -> None:
             for kind, rid in wrong:
                 dev = _sonar_saved[(kind, rid)][0]
                 try:
+                    if (kind, rid) in away:   # moved to no device: back after a moment
+                        if time.monotonic() - away[(kind, rid)] < SONAR_AWAY_S:
+                            continue
+                        del away[(kind, rid)]
+                    elif (kind, rid) in put and now.get((kind, rid), ("",))[0] == dev:
+                        # set again and still stopped: in streamer mode Sonar starts a
+                        # channel only when its device changes, so it's moved to no
+                        # device (an id no device has) for a moment, then back
+                        if time.monotonic() - put[(kind, rid)] >= SONAR_START_S:
+                            _local_http("PUT", address, f"/{kind}/{rid}/deviceId/"
+                                        + dev.rpartition(".")[0] + "." + _NO_DEVICE)
+                            away[(kind, rid)] = time.monotonic()
+                        continue
                     _local_http("PUT", address, f"/{kind}/{rid}/deviceId/{dev}")
-                    put.add((kind, rid))
+                    put[(kind, rid)] = time.monotonic()
                 except OSError as e:   # its device not back yet: tried again
                     log.info("Sonar's %s: %s", rid, e)
         except Exception:  # noqa: BLE001 - Sonar's server not back yet
