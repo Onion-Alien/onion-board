@@ -487,6 +487,57 @@ class _PageStack(QWidget):
         self.currentChanged.emit(i)
 
 
+class _StepScroll(QScrollArea):
+    """The steps, scrolling when the window can't be tall enough for one (1920x1080 at
+    150% scaling: 1280x672): Qt squeezed the page instead, and its fixed-size tiles
+    drew over each other and over the words. As tall as the step needs otherwise, so
+    the guide sizes to it as before (fit.py). Its scroll bar sits in the guide's right
+    margin (ROOM), so the pages keep their edges on Back's and Next's either way."""
+    ROOM = 18   # the bar (10 px, theme.py) and the gap before the page (DESIGN.md: 8)
+
+    def __init__(self, stack: QWidget):
+        super().__init__()
+        self.setFrameShape(QFrame.Shape.NoFrame)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setWidgetResizable(True)
+        self._page = stack   # (before setWidget: that already filters its events)
+        self.setWidget(stack)
+        stack.installEventFilter(self)
+        self.verticalScrollBar().rangeChanged.connect(self._room)
+        self._room()
+
+    def _room(self, *_a):
+        """The page's right margin: ROOM, less the bar's width while it shows."""
+        bar = self.verticalScrollBar()
+        shown = bar.maximum() > 0
+        lay = self._page.layout()
+        if lay is not None:
+            lay.setContentsMargins(0, 0, self.ROOM - (bar.sizeHint().width() if shown else 0), 0)
+
+    def eventFilter(self, obj, ev):
+        if obj is self._page and ev.type() == QEvent.Type.LayoutRequest:
+            self.updateGeometry()   # the step changed: the guide asks again (fit.py)
+        return super().eventFilter(obj, ev)   # (its own: the bar follows the page)
+
+    def hasHeightForWidth(self) -> bool:
+        return True
+
+    def heightForWidth(self, w: int) -> int:
+        lay = self._page.layout()
+        if lay is not None and lay.hasHeightForWidth():
+            return max(lay.totalHeightForWidth(w), lay.totalMinimumSize().height())
+        return self._page.sizeHint().height()
+
+    def sizeHint(self) -> QSize:
+        page = self._page.sizeHint()
+        return QSize(page.width(), self.heightForWidth(max(self.width(), page.width())))
+
+    def minimumSizeHint(self) -> QSize:
+        # as wide as the page needs (the tiles set the guide's width), never squeezed
+        # below the page: only short, it scrolls
+        return QSize(self._page.minimumSizeHint().width(), 80)
+
+
 def _working_title() -> str:   # (a call: translated in the language picked by then)
     return _("Working: your sounds go into your mic")
 
@@ -683,6 +734,7 @@ class SetupWizard(QDialog):
         self.setObjectName("setupcard")
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground)
         self.setProperty(fit.MARGIN, 2 * self.EDGE)
+        self.setProperty(fit.SCROLLS, True)   # too tall for the window: the step scrolls
         win.installEventFilter(self)
         # as wide as a row of tiles plus the margins: the tiles' right edge lines up
         # with Next's (DESIGN.md: everything on the same edges)
@@ -718,9 +770,11 @@ class SetupWizard(QDialog):
         self._discord_read.connect(self._discord_in)
 
         v = QVBoxLayout(self)
-        v.setContentsMargins(MARGIN, 18, MARGIN, 18)
+        # (the steps reach into the right margin, for their scroll bar: _StepScroll)
+        v.setContentsMargins(MARGIN, 18, MARGIN - _StepScroll.ROOM, 18)
         v.setSpacing(12)
         top = QHBoxLayout()   # the step bar, then "Step 2 of 5"
+        top.setContentsMargins(0, 0, _StepScroll.ROOM, 0)
         top.setSpacing(12)
         self.step_bar = StepBar(self.PAGES)
         top.addWidget(self.step_bar, 0, Qt.AlignmentFlag.AlignVCenter)
@@ -738,7 +792,8 @@ class SetupWizard(QDialog):
         top.addWidget(self.btn_close, 0, Qt.AlignmentFlag.AlignVCenter)
         v.addLayout(top)
         self.stack = _PageStack()
-        v.addWidget(self.stack, 1)
+        self.steps_scroll = _StepScroll(self.stack)
+        v.addWidget(self.steps_scroll, 1)
         self.stack.addWidget(self._page_devices())
         self.stack.addWidget(self._page_cable())
         if self._ask_use:
@@ -753,6 +808,7 @@ class SetupWizard(QDialog):
         self._fill_discord()
 
         nav = QHBoxLayout()
+        nav.setContentsMargins(0, 0, _StepScroll.ROOM, 0)
         self.btn_back = QPushButton(NAV_GAP + _nav_words(_("←  Back")))
         rtl = QApplication.isRightToLeft()
         icons.set_icon(self.btn_back, "nav_next" if rtl else "nav_back")   # painted: bolder

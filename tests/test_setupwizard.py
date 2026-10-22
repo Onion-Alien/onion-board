@@ -2,7 +2,8 @@
 the config and engine, the cable page reacts to the cable being there or not, and
 finishing marks setup done (only when the cable exists)."""
 import pytest
-from PySide6.QtCore import QEvent, QObject
+from PySide6.QtCore import QEvent, QObject, QRect
+from PySide6.QtGui import QScreen
 from PySide6.QtWidgets import QApplication, QDialog
 
 from soundboard.audio import engine
@@ -16,6 +17,7 @@ from soundboard.ui.setup import setupwizard
 INS = ["Headset Mic (USB)", "Desk Mic", "CABLE Output (VB-Audio Virtual Cable)"]
 OUTS = ["Headphones (USB)", "Speakers", "CABLE Input (VB-Audio Virtual Cable)"]
 _REAL_RESUME = setupwizard.resume_after_restart   # before the autouse fixture swaps it
+_REAL_FIRST_START = Config.first_start   # (the devices fixture swaps it)
 
 
 @pytest.fixture
@@ -1677,3 +1679,29 @@ def test_the_reminder_opens_settings_on_audio(mic_wizard, monkeypatch):
     next(b for b in d.findChildren(setupwizard.QPushButton)
          if "Settings" in b.text()).click()
     assert pages == ["audio"] and not d.isVisible()
+
+
+def test_a_short_screen_scrolls_the_step_instead_of_piling_it_up(qapp, app_dir, devices,
+                                                                 monkeypatch):
+    """1920x1080 at 150% leaves 1280x672: the first launch's looks step is taller than
+    that. It scrolls, at its own width; squeezed, its tiles drew over each other."""
+    monkeypatch.setattr(QScreen, "availableGeometry", lambda self: QRect(0, 0, 1280, 672))
+    monkeypatch.setattr(Config, "first_start", _REAL_FIRST_START)
+    w = main.MainWindow()
+    w.resize(1000, 600)
+    w.show()
+    wiz = setupwizard.SetupWizard(w)
+    try:
+        wiz.show()
+        wiz.go(wiz.look_index)
+        QApplication.processEvents()
+        assert wiz.height() <= 672 - 2 * wiz.EDGE
+        assert wiz.width() == wiz.minimumWidth()   # not stretched wide to make room
+        assert wiz.steps_scroll.verticalScrollBar().maximum() > 0
+        cards = [c.geometry() for c in wiz.look_cards]
+        assert not any(a.intersects(b) for i, a in enumerate(cards) for b in cards[i + 1:])
+        assert all(c.size() == wiz.look_cards[0].size() for c in wiz.look_cards)
+    finally:
+        wiz.done(0)
+        w.soundctl._load_thread.join(15)
+        w.close()
