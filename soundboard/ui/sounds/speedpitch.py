@@ -22,7 +22,7 @@ from PySide6.QtWidgets import (QAbstractSpinBox, QApplication, QCheckBox, QDialo
                                QWidget)
 
 from soundboard.audio import livefx
-from soundboard.core import usage
+from soundboard.core import achievements, usage
 from soundboard.ui.kit import theme
 from soundboard import voicefx
 from soundboard.ui.bun import bunskits
@@ -783,6 +783,8 @@ class SpeedPitchButton(QPushButton):
         """Something changed while the pop-up is open, by hand (not the values put back
         at start): for the usage count, which tab's and which controls, by name only."""
         if names and self.pop.isVisible():
+            if "pitch" in names:   # Chipmunk / Demon Mode
+                achievements.pitched(self.pitch.value())
             usage.used(f"live-changed-{self._what}")
             for n in names:
                 usage.used(f"live-{n}")

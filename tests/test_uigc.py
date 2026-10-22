@@ -1,6 +1,7 @@
 """Garbage collection runs on the UI thread only (soundboard.core.uigc)."""
 import gc
 import threading
+import time
 import weakref
 
 from PySide6.QtCore import QObject, QTimer
@@ -113,7 +114,7 @@ def test_full_collections_skip_whats_set_aside_till_its_quiet(qapp, monkeypatch)
     new, and all of it is gone through only while nothing plays (or after DEEP_MAX_S)."""
     old = dropped_cycle()                      # made before: set aside
     quiet = [False]
-    c = uigc.UiCollector(interval_ms=10**6, quiet=lambda: quiet[0])
+    c = uigc.UiCollector(interval_ms=10**6, quiet=lambda: quiet[0], warm=lambda: True)
     try:
         assert gc.get_freeze_count() > 0
         new = dropped_cycle()
@@ -136,6 +137,47 @@ def test_full_collections_skip_whats_set_aside_till_its_quiet(qapp, monkeypatch)
         c._timer.stop()                        # (not stop(): gc stays off for the suite)
         c.deleteLater()
         gc.unfreeze()
+
+
+def test_a_deep_sweep_waits_till_the_app_is_in_ram(qapp, monkeypatch):
+    """A deep sweep touches every object: with the app in the background on a PC short
+    of memory, Windows had moved them out to disk and the sweep read them all back with
+    Python's lock held (every thread stuck for 10 s or more). It waits for `warm`, even
+    past DEEP_MAX_S, and the freeze report can tell how long the last one took."""
+    warm = [False]
+    c = uigc.UiCollector(interval_ms=10**6, warm=lambda: warm[0])
+    try:
+        monkeypatch.setattr(uigc, "DEEP_S", 0)
+        monkeypatch.setattr(uigc, "DEEP_MAX_S", 0)
+        old = dropped_cycle()
+        gc.freeze()
+        assert c.check() != 3 and old() is not None   # cold: no deep sweep
+        warm[0] = True
+        assert c.check() == 3 and old() is None
+        end, took = uigc.last_deep
+        assert 0 <= took < 5 and time.monotonic() - end < 5
+    finally:
+        c._timer.stop()
+        c.deleteLater()
+        gc.unfreeze()
+
+
+def test_warm_means_in_front_with_memory_to_spare(qapp, monkeypatch):
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QGuiApplication
+
+    from soundboard.core import hangwatch
+    state = [Qt.ApplicationState.ApplicationActive]
+    monkeypatch.setattr(QGuiApplication, "applicationState", lambda: state[0])
+    monkeypatch.setattr(hangwatch, "memory_load", lambda: 50)
+    assert uigc.warm()
+    monkeypatch.setattr(hangwatch, "memory_load", lambda: None)   # unknown: fine
+    assert uigc.warm()
+    monkeypatch.setattr(hangwatch, "memory_load", lambda: uigc.COLD_MEMORY)
+    assert not uigc.warm()
+    monkeypatch.setattr(hangwatch, "memory_load", lambda: 50)
+    state[0] = Qt.ApplicationState.ApplicationInactive   # a game in front
+    assert not uigc.warm()
 
 
 def test_the_young_generation_is_collected_small():

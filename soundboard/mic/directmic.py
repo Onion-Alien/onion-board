@@ -2003,6 +2003,7 @@ def _audio_off(work, also: Sequence[str] = ()) -> int:
     finally:
         _audio_service(True, dependents)
         live = mics is None or _mics_come_back_live(mics, quiet)
+        _mic_apps_back()
     return MIC_SILENT if code == 0 and not live else code
 
 
@@ -2029,6 +2030,7 @@ def _mic_by_mic(work, also: Sequence[str], quiet: Collection[str]) -> int:
             restarted = _restart_audio()
         _remove_held(held)
         live = _mics_come_back_live(mics, quiet, one_by_one=True)
+        _mic_apps_back()   # (for a restart of all of Windows' audio above)
     if code == 0 and not restarted:
         return 6
     return MIC_SILENT if code == 0 and not live else code
@@ -2037,6 +2039,75 @@ def _mic_by_mic(work, also: Sequence[str], quiet: Collection[str]) -> int:
 def _fx_now() -> dict[str, dict]:
     """Every mic's effect settings now."""
     return {e["guid"]: _fx_values(e["guid"]) for e in capture_endpoints()}
+
+
+# Apps that put a mic of their own between the real mic and voice chat (the chat app
+# records theirs): (their process, the process that starts it again when it ends, the
+# name their mic starts with). A restart of Windows' audio leaves their mic sending only
+# silence until they start again, so the voice chat hears nothing; ended, they're
+# started again by their own app within seconds, and that's how they're restarted here.
+MIC_APPS = (
+    ("SteelSeriesSonar.exe", "SteelSeriesGGEZ.exe", "SteelSeries Sonar - Microphone"),
+)
+MIC_APP_BACK_S = 30   # how long a restarted mic app gets to be running again
+
+
+def _mic_apps_back() -> None:
+    """After a restart of Windows' audio: each mic app (MIC_APPS) whose mic now sends
+    only silence is restarted (ended, for its own app to start it again), once, and its
+    mic listened to again. Only one its own app will start again is ended. A check:
+    never fails the step."""
+    try:
+        for exe, parent, mic in MIC_APPS:
+            running = _processes(exe)
+            if not running:
+                continue
+            guids = [e["guid"] for e in capture_endpoints()
+                     if e["active"] and e["name"].startswith(mic)]
+            if not guids or not any(_silent(g) for g in guids):
+                continue
+            if not all(p == parent.lower() for _, p in running):
+                log.warning("%s's mic sends only silence after the audio restart, but "
+                            "nothing would start it again: left as it is", exe)
+                continue
+            log.info("%s's mic sends only silence after the audio restart: restarting it",
+                     exe)
+            old = {pid for pid, _ in running}
+            for pid in old:
+                subprocess.run(["taskkill", "/F", "/PID", str(pid)], capture_output=True,
+                               timeout=15, creationflags=_CREATE_NO_WINDOW)
+            end = time.monotonic() + MIC_APP_BACK_S
+            while not {p for p, _ in _processes(exe)} - old:
+                if time.monotonic() > end:
+                    log.warning("%s didn't start again within %d s", exe, MIC_APP_BACK_S)
+                    break
+                time.sleep(1)
+            else:
+                silent = [g for g in guids if _silent(g)]
+                log.info("%s is back; its mic: %s", exe,
+                         "still only silence" if silent else "sound")
+    except Exception:  # noqa: BLE001 - a check: never fails the step
+        log.warning("couldn't check the mic apps after the audio restart", exc_info=True)
+
+
+def _processes(exe: str) -> list[tuple[int, str]]:
+    """The running copies of `exe`: (pid, its parent's process name, lowercase)."""
+    script = (f"$all = Get-CimInstance Win32_Process; $all | Where-Object Name -eq '{exe}' | "
+              "ForEach-Object { $p = $_.ParentProcessId; "
+              "$n = ($all | Where-Object ProcessId -eq $p | Select-Object -First 1).Name; "
+              "\"$($_.ProcessId) $n\" }")
+    try:
+        r = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", script],
+                           capture_output=True, text=True, errors="replace", timeout=30,
+                           creationflags=_CREATE_NO_WINDOW)
+    except (OSError, subprocess.TimeoutExpired):
+        return []
+    found = []
+    for line in r.stdout.splitlines():
+        pid, _, parent = line.strip().partition(" ")
+        if pid.isdigit():
+            found.append((int(pid), parent.strip().lower()))
+    return found
 
 
 def _silent_before(guids: Sequence[str]) -> set[str]:
@@ -2326,8 +2397,11 @@ def admin_cleanup(guid: str) -> int:
     _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
     if any(without_ours(v)[0] for v in _fx_values(guid).values()) and _mic_restart_works():
         _strip_endpoint(guid)
-        if not _restart_mics([guid]) and not _restart_audio():
-            return 6
+        if not _restart_mics([guid]):
+            restarted = _restart_audio()
+            _mic_apps_back()
+            if not restarted:
+                return 6
     elif any(without_ours(v)[0] for v in _fx_values(guid).values()):
         dependents = _running_dependents()
         _audio_comes_back(dependents)
@@ -2337,6 +2411,7 @@ def admin_cleanup(guid: str) -> int:
             _strip_endpoint(guid)
         finally:
             _audio_service(True, dependents)
+            _mic_apps_back()
     if not installed_on() and anything_installed():
         return admin_uninstall()   # on no mic: the rest of it goes too
     return 0

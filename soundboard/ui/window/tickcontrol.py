@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 from shiboken6 import isValid
 
-from soundboard.core import memtrim
+from soundboard.core import achievements, memtrim
 from soundboard.sounds import thumbs
 from soundboard.control import winkeys
 from soundboard.audio.groove import Groove
@@ -161,6 +161,9 @@ class TickControl(Controller):
         if mw._ui_live:
             self._tick_visuals(playing, now)
         mw.overlay.tick(playing)
+        achievements.heard({sid: prog for sid, (prog, _p) in playing.items()
+                            if prog is not None and (m := mw._meta.get(sid)) is not None
+                            and not m.loop and m.duration >= achievements.HOUR})
         self._dance(playing, now)
         if mw.bunctl.bun_mode is not None and mw.bunctl.bun_mode.isVisible():
             bar = mw.download_bar

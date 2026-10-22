@@ -39,6 +39,8 @@ class ThemeControl(Controller):
         # of a half-styled window, and it fades to the new theme (ui/window/themecover.py)
         mw = self.mw
         achievements.add("themes", name)
+        if name != mw.cfg.theme:
+            achievements.theme_switched()
         with themecover.covered(mw, name):
             self._apply_theme(name)
 

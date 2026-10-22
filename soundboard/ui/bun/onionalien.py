@@ -14,7 +14,7 @@ from PySide6.QtCore import (QElapsedTimer, QEvent, QPointF, QRect, QRectF, QSize
 from PySide6.QtGui import (QColor, QFont, QFontMetricsF, QImage, QPainter, QPainterPath, QPen,
                            QPixmap, QRadialGradient, QTextLayout, QTextOption)
 from PySide6.QtWidgets import QSizePolicy, QWidget
-from soundboard.core import usage
+from soundboard.core import achievements, usage
 from soundboard.ui.settings import lite
 
 # drawn on a 100 x 120 canvas, like Bun and Hoot, scaled to the requested height
@@ -330,6 +330,7 @@ class AlienNote(QWidget):
             self.eat_window()
 
     def cry(self, count: int):
+        achievements.bump("onion_tears")
         self.tear_count = count
         self.tear_ms = 0.0
         self._tear_clock.start()

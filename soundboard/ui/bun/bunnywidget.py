@@ -595,13 +595,14 @@ class BunnyWidget(QWidget):
             self.say = ""
         self._hopeful = on
 
-    def cheer(self):
-        """A happy hop, notes and a joyful line (what a click does)."""
+    def cheer(self, line: str = ""):
+        """A happy hop, notes and a joyful line (what a click does), or `line`."""
         self._joy_at = time.monotonic()
         self.stir()   # (lite mode: the hop alone, no notes)
         self.burst(6)
         # his own lines for where he is, and his theme's character (mascotlines.py)
-        self.say = mascotlines.pick(self._rng, self.joy_lines + mascotlines.bun(), self.say)
+        self.say = line or mascotlines.pick(self._rng, self.joy_lines + mascotlines.bun(),
+                                            self.say)
         usage.used("bun-talk")
         self._say_until = time.monotonic() + mascotlines.read_secs(self.say)
 

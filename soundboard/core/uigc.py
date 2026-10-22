@@ -28,6 +28,13 @@ objects, checked every INTERVAL_MS), and what's alive once the window is up is s
 aside (gc.freeze), so a gen-2 collection only goes through what's been made since.
 What's set aside is gone through too (a deep sweep: gc.unfreeze, collect, freeze), but
 only when nothing's playing (`quiet`), every DEEP_S; or, never quiet, after DEEP_MAX_S.
+
+A deep sweep touches every object the app has, and on a PC short of memory Windows has
+moved most of them out to the page file while the app sat in the background: the sweep
+read them all back from disk with Python's lock held, and every thread, the sound too,
+stopped for 10 s to over 2 minutes (freeze reports: `all-held`, `paging`, `mem-80`).
+So a deep sweep also waits until the app is the one in front and the PC has memory to
+spare (`warm`), and how long the last one took is kept (last_deep) for those reports.
 """
 from __future__ import annotations
 
@@ -44,6 +51,9 @@ INTERVAL_MS = 100
 YOUNG = 5_000         # new objects before a gen-0 collection (~1 ms each)
 DEEP_S = 600          # the set-aside objects gone through again, when it's quiet...
 DEEP_MAX_S = 3600     # ...or after this long anyway (the radio on all day)
+COLD_MEMORY = 80      # % of the PC's memory in use from which deep sweeps wait
+
+last_deep = (0.0, 0.0)   # the last deep sweep: (time.monotonic() it ended, seconds taken)
 
 _handed: list[tuple] = []   # (target, args, kwargs) of finished threads, until let_go
 _handed_lock = threading.Lock()
@@ -96,16 +106,33 @@ def collect_due(thresholds=None) -> int:
     return gen
 
 
+def warm() -> bool:
+    """A deep sweep won't read the app back from disk: the app is the one in front
+    (Windows keeps its memory in RAM; one in the background is the first it moves out,
+    and memtrim empties it in the tray) and the PC isn't short of memory."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QGuiApplication
+
+    from soundboard.core import hangwatch
+    if QGuiApplication.applicationState() != Qt.ApplicationState.ApplicationActive:
+        return False
+    load = hangwatch.memory_load()
+    return load is None or load < COLD_MEMORY
+
+
 class UiCollector(QObject):
     """`quiet`: True while nothing is playing (Engine.quiet), when a deep sweep's
-    pause can't be heard. `freeze` False: nothing is set aside (the tests' collector:
+    pause can't be heard. `warm`: True when a deep sweep won't page the app back in
+    (warm() by default). `freeze` False: nothing is set aside (the tests' collector:
     a test that checks something is freed by gc.collect() can't have it set aside)."""
 
     def __init__(self, parent=None, interval_ms: int = INTERVAL_MS,
-                 quiet: Callable[[], bool] | None = None, freeze: bool = True):
+                 quiet: Callable[[], bool] | None = None, freeze: bool = True,
+                 warm: Callable[[], bool] = warm):
         super().__init__(parent)
         self.thresholds = (YOUNG, *gc.get_threshold()[1:])
         self._quiet = quiet or (lambda: True)
+        self._warm = warm
         self._freeze = freeze
         gc.disable()
         if freeze:
@@ -121,7 +148,8 @@ class UiCollector(QObject):
         let_go()
         overridepin.pin_new()   # classes imported since (a tab, an add-on)
         since = time.monotonic() - self._deep_at
-        if self._freeze and (since > DEEP_MAX_S or (since > DEEP_S and self._quiet())):
+        if (self._freeze and since > DEEP_S and (since > DEEP_MAX_S or self._quiet())
+                and self._warm()):
             return self.deep()
         gen = collect_due(self.thresholds)
         if gen == 2 and self._freeze:
@@ -130,10 +158,13 @@ class UiCollector(QObject):
 
     def deep(self) -> int:
         """Everything, the set-aside objects too, collected; then set aside again."""
-        self._deep_at = time.monotonic()
+        global last_deep
+        self._deep_at = start = time.monotonic()
         gc.unfreeze()
         gc.collect()
         gc.freeze()
+        end = time.monotonic()
+        last_deep = (end, end - start)
         return 3
 
     def stop(self):

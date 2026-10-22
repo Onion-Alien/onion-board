@@ -5,7 +5,8 @@ a badge is drawn once per size and kept (badge()).
 
 SCENES says each badge's scene: draw_bunny's keywords ("prop", poses, "outfit", "kit"
 or a rare look's name in "rare"), an icons.SHAPES name as "glyph" (on a chip at the
-bottom right) and "bg" for a backdrop of its own (night, stars, rainbow, seasons)."""
+bottom right) and "bg" for a backdrop of its own (night, stars, rainbow, seasons).
+"alien": the Onion Alien beside him (ui/bun/onionalien.py draw_alien's keywords)."""
 from __future__ import annotations
 
 import math
@@ -80,6 +81,29 @@ SCENES: dict[str, dict] = {
     "streamer": {"prop": "mic", "outfit": ("snapback",), "glyph": "twitch"},
     "watcher": {"outfit": ("readers",), "look": 1.0, "glyph": "eye"},
     "no_life": {"outfit": ("dizzy",), "blink": 0.3, "glyph": "trophy"},
+    "onion_poke": {"alien": {"mouth_open": 0.7}, "wave": 0.9, "mouth": 0.5, "look": 1.0},
+    "onion_tears": {"alien": {"tears": ((0, 0.45), (1, 0.7))}, "sad": 0.7, "look": 1.0},
+    "swallowed_whole": {"alien": {"gape": 1.0}, "sad": 1.0, "ears": 28, "look": 1.0},
+    "pretty_please": {"alien": {"mouth_open": 0.3}, "wave": 0.5, "mouth": 0.6, "look": 1.0},
+    "long_haul": {"prop": "headphones", "outfit": ("readers",), "blink": 0.6,
+                  "glyph": "history"},
+    "full_album": {"prop": "headphones", "blink": 0.75, "mouth": 0.3, "bg": "starslight",
+                   "glyph": "music"},
+    "wall_of_noise": {"mouth": 1.0, "ears": 28, "sad": 0.4, "glyph": "volume"},
+    "chipmunk": {"outfit": ("propeller",), "mouth": 0.9, "ears": 30, "glyph": "sliders"},
+    "demon_mode": {"outfit": ("horns",), "angry": 1.0, "mouth": 0.6, "bg": "night",
+                   "glyph": "sliders"},
+    "spooky_season": {"outfit": ("witch_hat",), "smug": True, "bg": "night", "glyph": "ghost"},
+    "ho_ho_honk": {"outfit": ("santa", "scarf"), "wave": 0.7, "mouth": 0.7, "glyph": "star"},
+    "happy_new_noise": {"outfit": ("party",), "mouth": 1.0, "wave": 0.9, "bg": "stars"},
+    "disco_mode": {"outfit": ("glasses_3d",), "kick": 1.0, "wave": 0.8, "bg": "rainbow"},
+    "hermit": {"outfit": ("hood",), "blink": 0.5, "look": -0.8, "bg": "night",
+               "glyph": "offline"},
+    "pulled_plug": {"prop": "plug", "sad": 0.9, "ears": 20},
+    "old_school": {"outfit": ("pixel_shades",), "wave": 0.8, "mouth": 0.6, "glyph": "gamepad"},
+    "achievement_hunter": {"prop": "star", "outfit": ("readers",), "smug": True,
+                           "glyph": "search"},
+    "completionist": {"prop": "star", "outfit": ("crown",), "mouth": 0.8, "bg": "rainbow"},
 }
 
 
@@ -104,7 +128,7 @@ def _bun(p: QPainter, rect: QRectF, scene: dict, rare: str | None = None) -> Non
     from soundboard.style import bunnyfit
     from soundboard.ui.bun import bunny
     pose = {k: v for k, v in scene.items()
-            if k not in ("glyph", "bg", "rare", "trio", "hoot", "prop")}
+            if k not in ("glyph", "bg", "rare", "trio", "hoot", "alien", "prop")}
     pose.setdefault("outfit", ())
     pose["kit"] = _rare_kit(rare) if rare else dict(bunnyfit.VANILLA)
     bunny.draw_bunny(p, rect, scene.get("prop"), **pose)
@@ -193,6 +217,12 @@ def paint(p: QPainter, r: QRectF, ach_id: str, tier: str) -> None:
         _bun(p, QRectF(inner.left() + w * 0.02, inner.top() + w * 0.2, bw, bw * 1.2), scene)
         owl.draw_owl(p, QRectF(inner.left() + w * 0.48, inner.top() + w * 0.34, w * 0.56,
                                w * 0.67), look=-1.0, beak=0.8, wave=0.5)
+    elif scene.get("alien") is not None:   # Bun and the Onion Alien side by side
+        from soundboard.ui.bun import onionalien
+        bw = w * 0.7
+        _bun(p, QRectF(inner.left() + w * 0.0, inner.top() + w * 0.22, bw, bw * 1.2), scene)
+        onionalien.draw_alien(p, QRectF(inner.left() + w * 0.44, inner.top() + w * 0.25,
+                                        w * 0.56, w * 0.7), **scene["alien"])
     else:   # Bun big, his ears near the top and his paws (and what he holds) in sight
         bw = w * 0.78
         box = QRectF(inner.center().x() - bw / 2, inner.top() + w * 0.09, bw, bw * 1.2)
