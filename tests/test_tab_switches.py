@@ -549,6 +549,12 @@ def test_more_tabs_counts_opened_added_and_closed(window, qapp, monkeypatch):
     assert all(k in usage.FEATURES for k in seen)
 
 
+def test_more_tabs_cards_all_say_what_the_tab_is_for():
+    """Every tab that can be hidden has its + More tabs card text (Community had none)."""
+    from soundboard.ui.window import moretabs, taboff
+    assert set(moretabs.PITCH) == set(taboff.KEYS)
+
+
 def test_more_tabs_menu_opens_clear_of_its_button(window, qapp):
     """+ More tabs' menu opens beside the button on the rail, a few px clear of it, not
     down over the tabs (and with no menu arrow's room, the + is centred like the rest)."""

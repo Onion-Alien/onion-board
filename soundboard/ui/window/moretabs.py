@@ -25,6 +25,8 @@ PITCH = {
                   "DIED, a kill, a queue popping."),
     "voice": _("Change your voice live: robots, monsters, other languages, or let it "
                "speak what you type."),
+    "store": _("Free sounds and voices other players shared and voted on. Add one in a "
+               "click, or share your own."),
 }
 
 
