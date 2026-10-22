@@ -309,7 +309,7 @@ class AiVoicePanel(QWidget):
         self.picked_box.setSpacing(10)
         ph = QHBoxLayout()
         ph.setSpacing(10)
-        self.picked_box.addLayout(ph, 1)
+        self.picked_box.addLayout(ph)
         self.picked_pic = QLabel()
         self.picked_pic.setFixedSize(PICKED_ART, PICKED_ART)
         ph.addWidget(self.picked_pic)
@@ -318,10 +318,10 @@ class AiVoicePanel(QWidget):
         self.picked_name.setTextFormat(Qt.TextFormat.PlainText)
         self.picked_name.setWordWrap(True)
         self.picked_name.setMinimumWidth(40)   # a long name gives way in a narrow window
-        ph.addWidget(self.picked_name, 1)
+        ph.addWidget(self.picked_name)
         self._picked_btns = QWidget()
         bflow = Flow(self._picked_btns, gap=10)
-        self.picked_box.addWidget(self._picked_btns, 1)   # the buttons start mid-bar
+        self.picked_box.addWidget(self._picked_btns, 1)   # right after the name
         self.btn_tweak = QPushButton(_("Edit voice"))
         icons.set_icon(self.btn_tweak, "sliders")
         self.btn_tweak.clicked.connect(lambda: self.open_tweak())

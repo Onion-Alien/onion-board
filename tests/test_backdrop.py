@@ -500,6 +500,22 @@ def test_the_voice_bar_puts_its_buttons_under_the_name_when_narrow(qapp):
         fx.deleteLater()
 
 
+def test_the_voice_bar_buttons_sit_beside_the_name_on_a_wide_bar(qapp):
+    """A wide window leaves the buttons right after the voice's name, not mid-bar."""
+    fx, bar = _picked_bar(qapp)
+    try:
+        bar.resize(2000, 200)
+        process_events(qapp, lambda: False, timeout=0.1)
+        first = min((b for b in (fx.btn_effects, fx.btn_tweak) if not b.isHidden()),
+                    key=lambda b: b.mapTo(bar, b.rect().topLeft()).x())
+        name_end = fx.picked_name.mapTo(bar, fx.picked_name.rect().topRight()).x()
+        assert first.mapTo(bar, first.rect().topLeft()).x() - name_end <= 40
+    finally:
+        bar.close()
+        bar.deleteLater()
+        fx.deleteLater()
+
+
 def test_effects_keeps_its_words_while_they_fit_and_its_name_always(qapp):
     fx, bar = _picked_bar(qapp)
     try:
