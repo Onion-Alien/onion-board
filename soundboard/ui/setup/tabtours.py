@@ -1,7 +1,7 @@
 """Each tab's quick how-to, the first time it's opened: the window dims, the thing to use
 sits in the yellow ring, and one card (coach.py) says what to do. It stays until they've
 done it (played a station on the globe, sent a program, picked a voice…) or pressed
-its "OK", which shows after a moment, or something went wrong (a station that
+its "OK", or something went wrong (a station that
 won't play: it ends at once, coach.py); either way it never comes back
 (Config.tips_seen). One
 step each, a few seconds long.
@@ -215,7 +215,9 @@ def _voice(win, panel) -> list[coach.Step]:
 
 
 def _store(win, tab) -> list[coach.Step]:
-    count = len(win.cfg.sounds)
+    # Play or Add pressed here, not the board growing: a sound arriving from anywhere
+    # else (a download, an import finishing) ended it the moment it showed
+    count = getattr(tab, "used", 0)
 
     def first() -> list[QRect]:
         rows = [r for r in getattr(tab, "_rows", []) if r.isVisible()]
@@ -223,7 +225,7 @@ def _store(win, tab) -> list[coach.Step]:
     return [coach.Step(
         _("Hear one, then add it"),
         _("Press play to hear a sound. Add puts it on your board."),
-        target=first, done=lambda: len(win.cfg.sounds) > count, skip=_("OK"),
+        target=first, done=lambda: getattr(tab, "used", 0) > count, skip=_("OK"),
         allow=_inside(tab.list_area, getattr(tab, "oops_page", None)),
         failed=lambda: bool(getattr(tab, "failed", False)),
         oops_title=_("The store couldn't load"),

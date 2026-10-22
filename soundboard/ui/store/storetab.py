@@ -255,6 +255,7 @@ class StoreTab(QWidget):
         self._link = link
         self._link_state = link_state   # a link's state in the player (SoundRow.link_look)
         self._add_file = add_file
+        self.used = 0   # Play or Add pressed here (its first-visit tour waits on it)
         self._play = play
         self._open_privacy = open_privacy
         self._closed = False
@@ -980,6 +981,7 @@ class StoreTab(QWidget):
             self._decode(row, path)
 
     def add(self, row: SoundRow):
+        self.used += 1
         if self._is_voice(row):
             assert self.voices is not None   # (only listed with them)
             said = self.voices.take(row.sound)
@@ -1023,6 +1025,7 @@ class StoreTab(QWidget):
     def play_clicked(self, row: SoundRow):
         """The card's Play. A link (from its site, as a search hit): played now, over a
         link that's playing; while it plays, Pause (and Resume). Else its sample, to you."""
+        self.used += 1
         if not self._is_link(row):
             self.hear(row, row is not self._playing)
             return

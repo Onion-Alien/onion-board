@@ -12,7 +12,7 @@ yet, the window dims and one card (coach.py) walks them through it:
   "nice"     A sound arrived: one last card, any click closes it.
 
 It can't be clicked away: a click outside the ring and the card does nothing until the
-search (or Add) step, whose quiet "OK" shows after a moment (coach.SKIP_MS). Once
+search (or Add) step, which has a quiet "OK" to put it off. Once
 only (Config.tips_seen); never with tutorials switched off (Config.tutorials_on).
 
 Anything going wrong (a search that can't get through, an error card, an error logged)
