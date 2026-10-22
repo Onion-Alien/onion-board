@@ -4457,5 +4457,14 @@
   "Right now only you hear your sounds.": "Acum doar tu îți auzi sunetele.",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install mic effect</b>. Without it, your sounds won't go through to Discord or games.": "Când microfonul e conectat, mergi la <b>Setări → Audio</b> și apasă <b>Instalează efectul</b>. Fără el, sunetele tale nu ajung în Discord sau în jocuri.",
   "🎧 <b>Got a new mic or headset later?</b> Put your sounds into that one too: <b>Settings → Audio → Install mic effect</b>. Each mic needs it once.": "🎧 <b>Microfon sau căști noi mai târziu?</b> Pune-ți sunetele și în acela: <b>Setări → Audio → Instalează efectul</b>. Fiecare microfon are nevoie o dată.",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Microfon sau căști noi?</b> Efectul de microfon stă pe un singur microfon odată. De fiecare dată când treci la unul nou, alege-l la Dispozitive, apoi apasă <b>Instalează efectul</b> aici, altfel ceilalți nu îți vor auzi sunetele."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Microfon sau căști noi?</b> Efectul de microfon stă pe un singur microfon odată. De fiecare dată când treci la unul nou, alege-l la Dispozitive, apoi apasă <b>Instalează efectul</b> aici, altfel ceilalți nu îți vor auzi sunetele.",
+  "56 achievements": "56 de realizări",
+  "A Stream Deck plugin": "Un plugin pentru Stream Deck",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "Adaugă o tastă Play sound și alege sunetul dintr-o listă. Ghidul pentru streameri din Setări → Telecomandă are linkul.",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "Punctele de canal, cheer-urile, raidurile și comenzile din chat îți redau sunetele. Fără bot.",
+  "Each one has its own Bun badge. They're counted on your PC only.": "Fiecare are propria insignă cu Bun. Sunt numărate doar pe PC-ul tău.",
+  "Lite mode for slower PCs": "Mod ușor pentru PC-uri mai lente",
+  "Open Remote": "Deschide Telecomandă",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "Setări → Aspect: animațiile stau pe loc, iar vocile AI folosesc un model mai ușor.",
+  "Twitch, Stream Deck and achievements": "Twitch, Stream Deck și realizări"
 }

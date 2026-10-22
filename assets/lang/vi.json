@@ -4303,5 +4303,14 @@
   "Right now only you hear your sounds.": "Hiện chỉ mình bạn nghe được âm thanh của bạn.",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install mic effect</b>. Without it, your sounds won't go through to Discord or games.": "Khi đã cắm mic, vào <b>Cài đặt → Âm thanh</b> và nhấn <b>Cài hiệu ứng</b>. Không có nó, âm thanh của bạn sẽ không tới được Discord hay game.",
   "🎧 <b>Got a new mic or headset later?</b> Put your sounds into that one too: <b>Settings → Audio → Install mic effect</b>. Each mic needs it once.": "🎧 <b>Sau này có mic hoặc tai nghe mới?</b> Đưa âm thanh vào cái đó nữa: <b>Cài đặt → Âm thanh → Cài hiệu ứng</b>. Mỗi mic cần làm một lần.",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Mic hoặc tai nghe mới?</b> Hiệu ứng mic chỉ nằm trên một mic mỗi lúc. Mỗi lần đổi sang mic mới, hãy chọn nó trong Thiết bị, rồi nhấn <b>Cài hiệu ứng</b> ở đây, nếu không người khác sẽ không nghe được âm thanh của bạn."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Mic hoặc tai nghe mới?</b> Hiệu ứng mic chỉ nằm trên một mic mỗi lúc. Mỗi lần đổi sang mic mới, hãy chọn nó trong Thiết bị, rồi nhấn <b>Cài hiệu ứng</b> ở đây, nếu không người khác sẽ không nghe được âm thanh của bạn.",
+  "56 achievements": "56 thành tựu",
+  "A Stream Deck plugin": "Plugin cho Stream Deck",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "Thêm phím Play sound và chọn âm thanh từ danh sách. Hướng dẫn truyền phát trong Cài đặt → Xa có liên kết.",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "Điểm kênh, cheer, raid và lệnh chat phát âm thanh của bạn. Không cần bot.",
+  "Each one has its own Bun badge. They're counted on your PC only.": "Mỗi thành tựu có huy hiệu Bun riêng. Chỉ được đếm trên PC của bạn.",
+  "Lite mode for slower PCs": "Chế độ nhẹ cho PC chậm hơn",
+  "Open Remote": "Mở Xa",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "Cài đặt → Vẻ bề ngoài: hoạt ảnh đứng yên và giọng nói AI dùng mô hình nhẹ hơn.",
+  "Twitch, Stream Deck and achievements": "Twitch, Stream Deck và thành tựu"
 }

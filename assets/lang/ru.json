@@ -4457,5 +4457,14 @@
   "Right now only you hear your sounds.": "Сейчас ваши звуки слышите только вы.",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install mic effect</b>. Without it, your sounds won't go through to Discord or games.": "Когда микрофон подключён, откройте <b>Настройки → Аудио</b> и нажмите <b>Установить эффект</b>. Без этого ваши звуки не дойдут до Discord и игр.",
   "🎧 <b>Got a new mic or headset later?</b> Put your sounds into that one too: <b>Settings → Audio → Install mic effect</b>. Each mic needs it once.": "🎧 <b>Позже новый микрофон или гарнитура?</b> Пустите звуки и в него: <b>Настройки → Аудио → Установить эффект</b>. Каждому микрофону это нужно один раз.",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Новый микрофон или гарнитура?</b> Эффект микрофона стоит только на одном микрофоне за раз. Каждый раз, переходя на новый, выберите его в разделе Устройства, затем нажмите здесь <b>Установить эффект</b>, иначе другие не услышат ваши звуки."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Новый микрофон или гарнитура?</b> Эффект микрофона стоит только на одном микрофоне за раз. Каждый раз, переходя на новый, выберите его в разделе Устройства, затем нажмите здесь <b>Установить эффект</b>, иначе другие не услышат ваши звуки.",
+  "56 achievements": "56 достижений",
+  "A Stream Deck plugin": "Плагин для Stream Deck",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "Добавь кнопку Play sound и выбери звук из списка. Ссылка есть в гайде для стримеров в Настройки → Пульт.",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "Баллы канала, cheers, рейды и команды чата запускают твои звуки. Бот не нужен.",
+  "Each one has its own Bun badge. They're counted on your PC only.": "У каждого свой значок с Bun. Они считаются только на твоём ПК.",
+  "Lite mode for slower PCs": "Облегчённый режим для медленных ПК",
+  "Open Remote": "Открыть Пульт",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "Настройки → Внешний вид: анимации замирают, а голоса ИИ используют более лёгкую модель.",
+  "Twitch, Stream Deck and achievements": "Twitch, Stream Deck и достижения"
 }

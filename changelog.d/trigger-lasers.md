@@ -1,1 +1,0 @@
-- Click either header logo on the Triggers tab for a short laser duel with Onion Watch. Other tabs keep the usual logo wobble.

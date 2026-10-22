@@ -2,6 +2,386 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.7.0 — 2026-10-22
+
+- The tick next to "Your sounds go into your mic" now sits level with the text.
+- The tutorial cards' quiet button says OK instead of Not now.
+- Lite mode: Pilot Bun on the Languages card flies round the globe again, at half the
+  frames, instead of sitting still like a broken picture.
+- **Voice > Languages**: with Offline mode on and speech recognition not installed yet, the Languages tab hides (nothing there could work or be installed); once installed it stays, as it works offline. Before it is installed, the card no longer shows an ON / OFF switch and "Pick a language" with no languages to pick.
+- The Voice tab's bar has a Reset button: it turns every voice off and forgets them, and
+  empties the voice changer's mix, so Voices ON no longer brings an old voice back. Undo
+  puts it all back.
+- AI voices: an AI voice that gets stuck loading now tries once more by itself, then
+  says it couldn't load, instead of staying on "starting…" forever. Picking another voice
+  while it loads no longer says "switching to…" (you still hear the backup voice until
+  it's ready), and the voice bar's chip names the voice you picked.
+- Live controls has a **Save as new pad** button beside Reset: it copies the sound playing
+  now, with the speed, pitch and effects you dialled in, as a pad of its own (named
+  "… (modified)", which you can change). Its Edit sound window shows those effects and can
+  take them off.
+- The anonymous usage count now also says whether Live controls is opened and changed
+  (which control, never the values), which achievements were earned and roughly how
+  many, and whether Lite mode, Connect Twitch, Voice tab recordings, the voice search
+  and the Stream Deck plugin are used. A long daily count goes in parts (the counter
+  takes 100 at a time). Everything it can send is listed in SECURITY.md.
+- AI voices: the Make your own voice window is tidied up: no emoji box next to the name, more room under the heading, the sliders and their values lined up, and Hear it beside Save and Cancel. You can pick a picture for your voice's card; without one it gets the My own mix picture.
+- AI voices: Make your own voice works when the app runs from source too. It used to do nothing there, because your voices were only written into a downloaded copy of the add-on; the add-on now also reads them from your own voices file.
+- A settings file whose sound list was blanked out (`"sounds": null`) no longer opens as an
+  empty board: like other damage, it is set aside, your last good copy is loaded and you
+  are told.
+- A download whose last piece never arrives now stops within seconds, instead of asking the
+  site for it again hundreds of times over a minute first.
+- Tab no longer stops on every sound: it goes from the categories to your sounds once
+  (the arrow keys move between them), then on to the player bar, so Stop all and
+  Settings are a few presses away however many sounds you have.
+- A headset pulled out while the app is open no longer stays in the headphones list,
+  where picking it did nothing.
+- Chat text read out by the voice (!say and chat-to-speech) no longer reads HTML tags
+  and codes like "&amp;" letter by letter: they're taken out, or turned back into "&".
+- Switching Keep window on top no longer turns the whole window white for a moment.
+- Settings opens without the Audio page jumping down as its mic row comes in.
+- Picking a device in Settings no longer makes the drop-downs twitch.
+- The Apps tab's cards show together instead of jumping in one by one, and opening or
+  closing a program's window view, or filtering Achievements, no longer jitters.
+- "Hear what they hear" comes back in full after the window is made narrow and wide again.
+- Edit sound and Edit voice are split into tabs instead of one long page: Edit sound has
+  Sound, Trim & speed, Effects (in groups) and Equalizer; Edit voice has Main, Change the
+  voice, Character and Room, each tab saying how many of its effects are on.
+- The Languages card's speech recognition install now looks like the AI voices one: a
+  glowing Install button beside Bun flying a little plane round the world.
+- Clicks that used to give no answer now do: saving a voice says its name on a card,
+  Say with an empty box says to type a line first, Undo after removing a sound says
+  it's back, and the Radio list says it's finding stations while it loads.
+- Importing several sounds: each pad shows up on the board as soon as its sound is in,
+  not a moment after the count says so.
+- Live controls no longer opens with plain, unthemed sliders, ticks and buttons after the theme was switched or a page was built while it was closed.
+- Screen readers: the Sounds search box says it takes a pasted link too, each Apps card's
+  volume says which program it's for, and the Up next chip reads as a button.
+- After Pause in the clip editor, the keys (Home, Ctrl+Right, Shift+End…) go straight to
+  the waveform instead of the Pause button.
+- Up next: long names now fill the list's whole width before they're cut short, and its
+  chip says how many are waiting ("3 waiting"), so the number isn't read as counting the
+  sound playing too.
+- AI voices: the voices you made come first under All, before the ready-made ones.
+- Stream Deck: the length and On / Off on small (72 px) keys are bigger and easy to read.
+- Clearer in four places: the bottom strip says "Mic muted" when your mic isn't sent,
+  Community's dropdown has a line between the orders (Trending, Most liked, Newest) and
+  the categories, Trim says your file stays whole, and the Triggers tab says your game's
+  window has to be open.
+- The Silent But Deadly badge now counts with sending switched off too.
+- A sound whose file was moved or deleted now says "its file is gone" and where it was,
+  instead of FFmpeg's own error text.
+- The setup guide's "Where do your sounds go?" step keeps a plain Next when sending isn't
+  set up, with a line saying only you will hear your sounds, and the cable button now just
+  says "Install the cable" (its tooltip says what that means). The look step names the
+  board's theme when it isn't one of the nine.
+- Cancel while Onion Watch is being added now really stops it: it used to install it
+  anyway when the click came after the download. Once it's installing, Cancel goes away.
+- The Help and community button at the sidebar's foot is Bun now, and its menu ends with Turn into Bun.
+- Turn into Bun puts Bun right in the middle of where the window was, instead of a corner or wherever he stood last time.
+- Uninstalling now removes the empty Onion Board program folder too (your sounds and
+  settings in %APPDATA%\OnionBoard are still kept).
+- A damaged settings file no longer leaves a second, scary error in the log when it is
+  recovered at start-up; a settings file saved with a byte-order mark keeps its language.
+- Stream Deck keys now show a pad's hotkey when it's a combo like Ctrl+Alt+7; before, only
+  short keys like F7 fit on a key.
+- Community: sort by Newest again, from the dropdown next to the search box.
+- Community: Tab goes straight to the cards, not first to the list itself.
+- Fix: on a PC short on resources, a long song could start cutting out partway through,
+  because the part that reads ahead of it stopped for good. It now carries on.
+- Mute mic during sounds: your mic comes back as soon as the sound ends (or you press
+  Stop all). It could stay muted for others when your headphones were a moment behind.
+- Mic effect: a mic Windows' registry names differently from the mic list is now found
+  by asking Windows directly, instead of "Windows doesn't know this mic". When the
+  set-up fails, its message has a "Use the cable" button. A mic effect problem no
+  longer ends the first-run tour as if the tour had broken: the mic's own message says
+  what went wrong.
+- Adding a sound from YouTube (or another site) that fails because the site refused it, the
+  connection dropped or the download got stuck now tries once more by itself before showing
+  an error, asking YouTube in a different way the second time.
+- Up next: taking sounds out with the list open now shrinks it at once, instead of leaving an empty gap over the rows until it was reopened.
+- Play on a YouTube search result starts about 10 seconds sooner: it no longer waits for
+  YouTube's video picture, which Play never shows.
+- A pad no longer plays on top of a song you played from a search: like other sounds,
+  the song stops (set the pad to Overlap to play over it). Clicking a song's name in
+  Up next also stops what's playing before it starts.
+- Fewer themes give Bun a floppy ear: Onion, Slate, Paper, Carbon, Retro 98, Amber Terminal,
+  Vaporwave and Vampire now have both ears up.
+- The Twitch card in Settings → Remote has a *Twitch guide* that walks through channel
+  points, alerts and chat commands step by step, and *Copy AI prompt*: a message for
+  ChatGPT or Claude that knows your rewards and sounds, so it can help with the rest.
+- A voice card that's on says so when you point at it: clicking it again turns the voice
+  changer off.
+- Bluetooth earbuds (AirPods and the like) work as your mic like any other: no more
+  warnings about call quality when you pick them. If their mic drops out while they
+  keep playing, the mic card says so in one line instead of "Is your headset plugged
+  in?", and a mic whose sound is coming in is never called unplugged.
+- *Straight into my mic* works with Equalizer APO on the same mic. Setting Equalizer APO
+  up on the mic after Onion Board no longer makes the two start each other over and over
+  (which could stop Windows' sound), the repair no longer wraps it back, and taking
+  Onion Board off hands Equalizer APO the mic's own effect again.
+- Lite mode really stops the animations now: Bun and Hoot are still pictures (sounds,
+  music and the mic don't move them), and the guide's ring, the download banner, the
+  achievement pop-up and the playing pads hold still too.
+- The On Air card says "Lite mode" while it's on; a click opens Appearance.
+- Settings > Appearance > Look is easier to read: its settings sit in three small groups
+  (Colour, Size and speed, Background), on/off and size are beside each setting's name,
+  and the long explanations are shorter.
+- Settings > Achievements has two new switches: *Show pop-ups* turns the "Achievement
+  unlocked" pop-up off, and *Pop-up sound* turns its chime on. The chime is now off by
+  default.
+- The first-launch guide's last part is now two steps: pick a look and your language,
+  then "A few handy switches" in four cards: your tabs, Discord, Internet and This PC.
+  New on it: Use less data and Offline mode (for a phone hotspot, a capped plan or no
+  internet) and Keep window on top, so you don't have to find them in Settings.
+- Speak another language: no more empty gap between the card's intro and its language cards.
+- The voice changer no longer remembers last run's voice when it was left off: after a restart,
+  turning it ON starts from your own mix instead of an old pick. Left on, it still comes back.
+- The Onion Alien easter egg on About no longer keeps the CPU busy while he sits on the empty window: only he is redrawn, and less often.
+- Textured themes (Carbon and others) keep their pattern on a hovered card or box,
+  and the buttons on a hovered box in Settings no longer blend into it.
+- Live controls: typing a minus into Speed (like `-999`) now gives the slowest speed
+  instead of dropping the minus and jumping to the fastest.
+- Stream alerts: a raid sent with only an amount now says that many people in `{count}`,
+  and a field with no value (a tip with no amount) is left out instead of read out as
+  `{amount}`.
+- The first-run tour's card moves with the window straight away when it's made narrow
+  (it used to sit off the right edge for a moment).
+- Bringing sounds over from another soundboard ends with "✓ Added 3 sounds to Soundpad",
+  so you know which category they went in.
+- Live controls: a speed, pitch or effect value typed into its box and confirmed with Enter
+  now stays; Enter used to also press Reset and put it straight back.
+- Lite mode now runs the audio in 20 ms blocks instead of 10, so the app uses noticeably
+  less CPU with nothing playing. Your voice goes out about 20 ms later in lite mode.
+- AI voices use about a third less CPU in lite mode (or with *Use less CPU* on): they
+  run a lighter copy of the same voice model, which converts 40 ms at a time, so you
+  are about 40 ms further behind. Needs AI voices 0.2.0 (update it under More options).
+- The Voice changer, AI voices and Languages cards share one tidy bar over their voices:
+  a dropdown picks the group (with how many each holds), a search box finds a voice or
+  language by name, and the cards / list switch sits at the end, in the same place on
+  all three.
+- Making the window narrower no longer makes the Sounds tab's search box wider: it used to
+  jump bigger each time a toolbar button lost its words, then shrink again a few pixels later.
+- The Radio tab no longer jumps up and down by a few pixels at the width where its refresh
+  button comes and goes.
+- Downloads, searches, the radio list and the store use less CPU: the app no longer reads
+  Windows' certificate list again for every connection.
+- The bars across the top of the window (an urgent fix, "Set up for it?", FFmpeg missing,
+  the language offer, *Enjoying Onion Board?*) now all look the same: slim, with a coloured
+  edge, a bold heading and their buttons lined up.
+- The red "You're hearing your mic output" banner is gone: the lit *Hear what they hear*
+  button already shows it's on.
+- The "Did you know?" tips bar is gone, and with it *Show tips* in Settings → General.
+- Picking a voice or flipping Voices ON / OFF while an add-on was installing could
+  freeze the window, and the sounds playing, for a second or more. The Voice tab no
+  longer checks the disk on every click.
+- Lite mode now also slows the meters and the playing screen (15 updates a second while
+  something plays, 5 with only the mic), so the app uses less CPU while it sits open.
+- The app uses a little less CPU while it sits open in every mode: a safety check that
+  went over every window class 10 times a second now runs when something new loads.
+- First start is now three steps instead of up to six. Your mic and headphones share one
+  page, then where your sounds go, then "Make it yours".
+- "What will you use Onion Board for?" is gone. On the last step, Voice starts ticked and
+  Radio, Apps and Triggers are tick boxes to opt in to, each with an ⓘ saying what it's for.
+- Bun now sets Discord up for your sounds himself. He saves how Discord is set for talking,
+  then switches off what chops up your sounds (noise suppression, echo cancellation,
+  automatic gain and sensitivity). If Discord is open, he asks before closing it for a few
+  seconds, then opens it again on its voice settings. Settings → Audio → Audio recovery's
+  *Put Discord back* undoes it. The setup guide's last step ("Set up Discord for me when I
+  finish"), the Setup tab's Discord button, the Fix Discord bar and the Discord guide all
+  do this now.
+- Earning an achievement now pops up "Achievement unlocked" at the bottom of the screen,
+  the classic console way, with its chime in your headphones only (never in the call).
+- Importing from another soundboard (Soundpad, Resanance and others) no longer asks "are you sure?" first: picking it is enough. Sounds that can't be brought over are listed in a short note instead.
+- Every achievement now has its own badge: Bun dressed up for it (a crown, a beret, the
+  bat, Robo-Bun, the rare Golden, Ice, Galaxy and Rainbow looks and more) in a rim of
+  its rarity's colour.
+- Settings > Achievements has filters: All, Earned or Not yet, and a rarity.
+- Bun now waves when the mouse comes onto a theme card in Settings, and clicking the
+  board or Onion Watch logo on the Triggers tab fires their laser duel, also on PCs
+  with Windows' Animation effects turned off. Lite mode still keeps them still.
+- The logo, the level meters, the loading and download bars, the download scribe, the radio
+  map's pop-in, the theme cards' wave and the logos' laser duel now draw 24 frames a
+  second instead of 30 to 60, so the window uses a little less CPU while it's open.
+- Mic effect set-up: fewer failures. A mic that sends no sound itself after the set-up
+  (a headset switched off) no longer counts as a failed set-up: your sounds go in, and
+  a warning says the mic is silent. A picked mic Windows no longer knows is swapped for
+  Windows' default mic instead of stopping. A step that failed once is tried again,
+  the same mic part already there is kept instead of written over, and a slow PC gets
+  longer for Windows' audio to stop and for the effect to load.
+- New: Settings > Achievements (under Show advanced). 56 achievements for using the app,
+  from your first sound played to 100 hours of voice changing; most stay secret (???)
+  until you find them. Each badge wears its rarity's colour, like the rare loading
+  screens. They're counted on your PC only and never sent anywhere.
+- Bun makes you work for his Pong game now: spam-clicking no longer piles up. Once he has gone red, it takes five more pokes before he fetches his bat.
+- The Community tab's dropdown starts with Trending (picked when it opens) and Most liked,
+  then the categories, the biggest first.
+- Triggers tab: before Onion Watch is installed, Hoot now sleeps in a little bed with
+  z's floating up instead of dancing to your sounds. Click him to wake him up; he goes
+  back to bed when you leave the tab.
+- The onion on Settings > About has a secret. Try clicking him. A lot.
+- Edit sound's effects now change a sound while it plays: pick a preset, a speed or a voice
+  and the playing sound switches to it at the same spot (a slow voice shows how far it is,
+  and the sound plays on as it was meanwhile). Cancel puts it back; Save no longer stops it.
+- A big "Reset effects" button sits beside Save, glowing while any effect is on: every effect off at once, and a playing
+  sound goes back to plain straight away.
+- The Community tab has an Onion Board category, first in the list: only the sounds players
+  shared here and the app's own sounds, without the ones from other sites.
+- The control API's status now says whether "mute my mic while a sound plays" is on, so a phone remote can show that switch.
+- The Community tab shows a small "New" label until you first open it.
+- Voice "setups" are now called voice combos, so they're not mixed up with the Setup tab.
+- The Voice tab's My voice combos row has a Share button: send a combo to the store or
+  copy it as a code for a friend.
+- The Community tab opens on Trending: the sounds that are popular right now. Votes and
+  Added still sort the list.
+- Voice add-ons (AI voices, live voice, translation): when one crashes without saying why, the message now ends with the last line it printed (the actual error) instead of only "code 1", and a reason it did give is no longer replaced by a plain "stopped".
+- AI voices: when the AI voice can't start, it now says why (for example "not enough free memory") instead of "exited before connecting (code 1)".
+- Downloads now show in a small card in the bottom-right corner, on every tab, instead of
+  a big banner across the top that pushed the page down. Minimise it to a pill (it still
+  shows how far it's got and how many failed), and once everything is added it folds to
+  the pill by itself, then goes; hovering keeps it up.
+- Each added sound in the card has a play button and Show, which takes you to its pad.
+- **Use less CPU** moved up beside the Voice tab's tabs, since it's for every voice now:
+  translating your speech or a stream also uses the smaller speech model (if it's
+  downloaded) and simpler translations. AI voices already use as little as they can.
+- Radio map: a city's stations all listed at its centre now keep spreading apart as you zoom in, instead of staying one overlapping clump the same size at every zoom.
+- The Stream Deck plugin comes with every release now: double-click
+  `com.onionalien.onionboard.streamDeckPlugin` and Stream Deck installs it. The Streamer
+  guide (Settings → Remote) links to it and says how to set up a *Play sound* key.
+- Developers: a source copy run from the temp folder (a throwaway worktree) keeps its own profile, `%APPDATA%\OnionBoard-dev`, so a branch under test can't empty the real sound cache or change the real settings.
+- The Voice tab's Languages card now works like Voice changer and AI voices: a big ON / OFF
+  next to its name, All / Favorites / Downloaded chips, cards or a list, and a card per
+  language. Languages you haven't downloaded are grey: click one and it asks to download
+  and install it. Click a language to turn it on, click it again to turn it off. The
+  computer voice's own Start moved under More options.
+- **Connect Twitch.** Settings → Remote has a Twitch card: click *Connect Twitch*, say yes on
+  twitch.tv, and Onion Board plays your sounds when viewers redeem channel points, cheer,
+  follow, sub, gift subs or raid. Pick a sound (or a random one) for each channel point reward
+  and each alert, right there. Chat can use !sound, !random and !sounds, and the answer is
+  posted back in chat. No Streamer.bot or other bot needed. Twitch has its own switch in
+  Settings > Privacy & security.
+- The control API's `/api/alerts` takes `&reward=` for channel points, so each reward can play
+  its own sound.
+- Voice tab: every tab with something on gets its blue border at once. With the AI voice
+  on and another language spoken for it, Languages lights up beside AI voices (it only did
+  while the computer voice spoke).
+- Settings opens straight away after you've looked at About, Add-ons, Connection, Data,
+  Updates or Remote: it was built again from scratch every time (about half a second on a
+  slower PC), and only those pages are now refreshed when you open them again.
+- Switching to and from the Setup tab no longer works out the whole window's layout from
+  scratch each time (about a tenth of a second each way on a slower PC).
+- **Stream Deck plugin.** Onion Board now has its own plugin for the Stream Deck app: add a
+  *Play sound* key and pick the sound from a list (no copying links or keys). The key takes
+  the pad's colour and lights up while it plays. There are also *Stop all sounds*, *Random
+  sound* and a *Switch* key for Live / Muted, the voice changer, your mic or hotkeys that
+  shows whether it's on. It finds Onion Board by itself once Settings → Remote → *Remote
+  control* is on.
+- The control API's `/api/status` now also says whether hotkeys are on (`hotkeys`).
+- New on the voice changer card: Use less CPU, for slower PCs. Hiss removal goes off, the
+  robot voices and echoes get a little simpler and live voice uses the smaller speech
+  model when it's downloaded: the voice changer uses about a quarter less CPU. It's on
+  by itself in lite mode.
+- Live voice and translations use about a third less CPU: their speech recognition no
+  longer keeps the processor busy between sentences.
+- The voice changer uses less CPU: the robot voices (Robot, Talkbox, Autotune, Mecha) about
+  a third less for that effect, and Clean up my mic, which runs under every voice, about a
+  quarter less. The voices sound the same.
+- Switching themes no longer redraws the whole board on every frame of its fade.
+- Onion Board gives its memory back to Windows after 30 seconds in the tray or minimised
+  (with nothing playing): Task Manager shows about 35 MB there instead of ~350 MB.
+- AI voice and voice changer samples you listen to no longer pile up in memory: only the
+  last 16 are kept.
+- Bun and Hoot use about half the CPU while they move: a frame where they have moved less
+  than a quarter of a pixel shows the picture already drawn, and a frame where nothing
+  moved is not drawn again. They look and move the same.
+- New: Lite mode in Settings > Appearance > Look, for slower PCs. One switch turns off
+  the animations, Bun's and the logo's idle moves and the theme textures, at once;
+  everything else works the same. A slower PC gets one suggestion to try it.
+- The board uses less CPU while it sits idle: the audio engine does less work on blocks
+  where nothing plays, and Bun and Hoot reuse the shapes that don't change between frames.
+  Nothing you hear or see changes.
+- The onion menu at the foot of the tab rail is down to Join the Discord, Send feedback and Report a problem (What's new is the version under the app's name).
+- Skipping the first-run tour no longer fills a new board with 25 starter sounds in a
+  Starter tab: the board stays as you left it. Boards that already got them keep them.
+- The first launch looks cleaner: the loading screen hands over to a plain window with
+  the logo, the setup guide fades in over it, and the app fades in once you finish or
+  close the guide (no half-set-up app behind it any more).
+- The first setup guide now ends with "Make it yours": pick your language, one of nine
+  themes, and whether Onion Board starts with Windows.
+- If Onion Board crashes or Windows closes it as Not Responding, Windows now starts it
+  again by itself (after it had been open for a minute or more), without taking the
+  focus from your game, and it says it restarted.
+- Bun's arm now comes from his shoulder when he holds something (the mic, the bat, the hammer, his idle skits' props), instead of poking out from behind his body or floating as a third paw.
+- Switching themes takes about half as long, so it no longer freezes the app on slower PCs
+  or ones short on memory.
+- The Community tab's Bun and the sad Bun on a "something went wrong" card no longer
+  animate nonstop: after 30 seconds with nothing going on they hold still (using no CPU)
+  until a sound, a click or a new problem wakes them. The Community tab used half of a
+  slower PC's core just sitting open.
+- Hoot on the Triggers tab (before Onion Watch is installed) holds still after 30 seconds
+  with nothing going on too; the mouse coming near him, a click or a sound wakes him.
+- The Voice tab's red Stop is now one big Voices ON / OFF switch. OFF turns off every voice
+  changing your mic (voice changer, AI voice, computer voice, translating) and ON brings
+  back exactly what was on. With nothing to bring back it says what ON turns on.
+- New hotkey, All voices on / off (Settings > Hotkeys > Mic and voice): the same switch,
+  from inside a game.
+- Click a voice in the Voice tab's bottom bar to turn just that one off (it stays there,
+  grey) and click it again to turn it back on. Right-click opens its card; its ✕ turns it
+  off for good.
+- The Apps tab's Bun no longer keeps animating while nothing plays: after 30 seconds he
+  holds still (using no CPU) until a sound, the radio or a click wakes him.
+- The Community tab shows each sound as a card, two side by side on a wide window. Play
+  plays it now, even over a sound from the tab that's still playing, and turns Pause
+  (then Resume) with a Stop button while it plays. Play next waits for what's playing,
+  and Add puts it in your Sounds.
+- AI voices now look and work like the Voice changer: the same on/off switch at the top
+  right, the same cards or list view (one setting for both), and the same bar at the
+  bottom for the voice that's on, with Edit voice (its pitch), Make your own voice and
+  Hear it. Make your own voice is also a card under Mine.
+- The Voice changer and AI voices cards have a big ON/OFF switch right next to their
+  name, and clicking the voice that's on turns it off again.
+- Community tab: playing a shared link no longer slides the list away when the bar at
+  the top opens; the row you clicked stays under the mouse.
+- Voice tab: no more big empty gap under the part buttons on a short part (Languages,
+  Add-ons); My setups is one line again.
+- Fix: the Discord check could get stuck on "checking" for good when it couldn't make its
+  test sound. It now says what went wrong, and you can run it again.
+- Switching tabs is quicker: the sidebar's status is no longer worked out and laid out
+  again on every switch when nothing on it changed.
+- Voice tab: the part buttons (Voice changer, AI voices, ...) and My setups scroll away with the
+  voices, so a short window shows more of them.
+- Edit sound opens at once after a theme change and when Onion Board started with
+  Windows: a ready-made one is built under the theme fade, or a while after sign-in,
+  instead of on the first click (about a second on slower PCs).
+- Settings > Hotkeys in a narrow window: each key sits under its words, which no longer wrap a
+  word a line.
+- Narrow windows: the Sounds search box says "Search" or "Search sounds" instead of a cut "Sea…",
+  and the Voice tab's line box says "Type here" (Save as sound goes down to its +).
+- The red "Couldn't open the store" card no longer squeezes its lines on top of each other in a
+  short, narrow window.
+- Settings > Overlay shows your overlay hotkey again (its button was blank).
+- The installer is about 5 MB smaller again: the voice changer's seven background loops
+  are now Ogg Vorbis instead of FLAC. They sound the same and still loop without a click.
+- The installer is about 11 MB smaller: files the app carries twice (the mic helper's own
+  copy of Python) are stored in it once, and the mic helper and the app no longer carry
+  parts they never run (the rest of the app in the helper, test tools, PortAudio builds
+  for other systems). Everything installs and works as before.
+- **Recordings** (Voice tab) and **Saved clips** (Apps tab) have a new look: each clip is a row with a round play button, its name, where it came from and when ("Today 14:02"), its waveform (which fills in as it plays) and its length. A **Live** label shows while one plays through your mic.
+- The row you point at (or pick) gets its buttons: play through mic, add to Sounds and more. Space plays a clip for you, Enter plays it through your mic, Esc stops it.
+- Voice tab: "No mic open" is no longer cut off in some languages and themes (the mic meter gives way instead).
+- Click either header logo on the Triggers tab for a short laser duel with Onion Watch. Other tabs keep the usual logo wobble.
+- The Back button over online search results is red with a soft glow now, so the way back to your sounds is easy to spot.
+- The store's *Share a sound* button, greyed out while the store can't be reached, has an even edge all round again (its top edge looked cut off).
+- + Subcategory and the Apps tab's + Category also open a name box in place now, instead of a pop-up.
+- The + next to the category tabs now opens a name box right where the new tab goes: type, press Enter to add it, Esc to cancel. No more pop-up.
+- Voice tab: a Record button next to Stop records your voice straight away (as others hear it while the voice changer is on). Saved takes go in a new Recordings list above it, where you can play one to yourself, play it through your mic, or add it to your Sounds.
+- Drag sounds in the Up next list by their grip to change the order, and use a sound's ▶ to play it now (the rest keep waiting).
+- Free sound packs is now only in the Library menu, not in the Add menu as well.
+- Selected tabs, mode tiles, filter chips and on-state buttons now have the same glossy finish as the main buttons.
+- Stop the bottom playback and audio controls from repeatedly shifting sideways when the output meter runs out of room.
+- Make Reset bigger and easier to click in Live controls on the Sounds, Radio and Apps tabs.
+
 ## 2.6.3 — 2026-10-17
 
 - New installs start with Textured themes (each theme's own pattern on the panels). If

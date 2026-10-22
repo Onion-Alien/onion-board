@@ -36,6 +36,19 @@ def recent() -> tuple[Note, ...]:
     release (tests/test_whats_new.py checks this version has one): what a player
     notices, in their words, never the fixes only a log would show."""
     return (
+        Note("2.7.0", _("Twitch, Stream Deck and achievements"), (
+            ("play", _("Connect Twitch"),
+             _("Channel points, cheers, raids and chat commands play your sounds. No bot "
+               "needed.")),
+            ("plus", _("A Stream Deck plugin"),
+             _("Add a Play sound key and pick the sound from a list. The Streamer guide in "
+               "Settings → Remote links to it.")),
+            ("star_filled", _("56 achievements"),
+             _("Each one has its own Bun badge. They're counted on your PC only.")),
+            ("check", _("Lite mode for slower PCs"),
+             _("Settings → Appearance: animations hold still, and AI voices use a lighter "
+               "model.")),
+        ), "remote", _("Open Remote")),
         Note("2.6.0", _("A Halloween theme, and Bun comes alive"), (
             ("ghost", _("Halloween theme, for October only"),
              _("Pumpkin orange, witch purple and cobwebs, with Bun and Hoot in witch's "

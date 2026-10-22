@@ -4457,5 +4457,14 @@
   "Right now only you hear your sounds.": "Teď své zvuky slyšíte jen vy.",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install mic effect</b>. Without it, your sounds won't go through to Discord or games.": "Až budete mít mikrofon připojený, jděte do <b>Nastavení → Zvuk</b> a stiskněte <b>Nainstalovat efekt</b>. Bez toho se vaše zvuky do Discordu ani her nedostanou.",
   "🎧 <b>Got a new mic or headset later?</b> Put your sounds into that one too: <b>Settings → Audio → Install mic effect</b>. Each mic needs it once.": "🎧 <b>Později nový mikrofon nebo headset?</b> Pusťte zvuky i do něj: <b>Nastavení → Zvuk → Nainstalovat efekt</b>. Každý mikrofon to potřebuje jednou.",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Nový mikrofon nebo headset?</b> Efekt mikrofonu je vždy jen na jednom mikrofonu. Pokaždé, když přejdete na nový, vyberte ho v části Zařízení a pak tu stiskněte <b>Nainstalovat efekt</b>, jinak ostatní vaše zvuky neuslyší."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Nový mikrofon nebo headset?</b> Efekt mikrofonu je vždy jen na jednom mikrofonu. Pokaždé, když přejdete na nový, vyberte ho v části Zařízení a pak tu stiskněte <b>Nainstalovat efekt</b>, jinak ostatní vaše zvuky neuslyší.",
+  "56 achievements": "56 úspěchů",
+  "A Stream Deck plugin": "Plugin pro Stream Deck",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "Přidej tlačítko Play sound a vyber zvuk ze seznamu. Odkaz najdeš v Průvodci pro streamery v Nastavení → Dálkové ovládání.",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "Body kanálu, cheery, raidy a příkazy v chatu přehrají tvé zvuky. Bez bota.",
+  "Each one has its own Bun badge. They're counted on your PC only.": "Každý má svůj odznak s Bunem. Počítají se jen na tvém PC.",
+  "Lite mode for slower PCs": "Lehký režim pro pomalejší PC",
+  "Open Remote": "Otevřít Dálkové ovládání",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "Nastavení → Vzhled: animace se zastaví a hlasy AI použijí lehčí model.",
+  "Twitch, Stream Deck and achievements": "Twitch, Stream Deck a úspěchy"
 }

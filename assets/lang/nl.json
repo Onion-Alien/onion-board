@@ -4380,5 +4380,14 @@
   "Right now only you hear your sounds.": "Op dit moment hoor alleen jij je geluiden.",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install mic effect</b>. Without it, your sounds won't go through to Discord or games.": "Als je microfoon is aangesloten, ga je naar <b>Instellingen → Audio</b> en druk je op <b>Effect installeren</b>. Zonder dat komen je geluiden niet door in Discord of games.",
   "🎧 <b>Got a new mic or headset later?</b> Put your sounds into that one too: <b>Settings → Audio → Install mic effect</b>. Each mic needs it once.": "🎧 <b>Later een nieuwe microfoon of headset?</b> Zet je geluiden daar ook in: <b>Instellingen → Audio → Effect installeren</b>. Elke microfoon heeft het één keer nodig.",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Nieuwe microfoon of headset?</b> Het microfooneffect zit op één microfoon tegelijk. Elke keer dat je naar een nieuwe overstapt, kies je die onder Apparaten en druk je hier op <b>Effect installeren</b>, anders horen anderen je geluiden niet."
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>Nieuwe microfoon of headset?</b> Het microfooneffect zit op één microfoon tegelijk. Elke keer dat je naar een nieuwe overstapt, kies je die onder Apparaten en druk je hier op <b>Effect installeren</b>, anders horen anderen je geluiden niet.",
+  "56 achievements": "56 prestaties",
+  "A Stream Deck plugin": "Een Stream Deck-plug-in",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "Voeg een Play sound-toets toe en kies het geluid uit een lijst. De Streamer-gids in Instellingen → Op afstand linkt ernaar.",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "Kanaalpunten, cheers, raids en chatcommando's spelen je geluiden af. Geen bot nodig.",
+  "Each one has its own Bun badge. They're counted on your PC only.": "Elke prestatie heeft een eigen Bun-badge. Ze worden alleen op je pc geteld.",
+  "Lite mode for slower PCs": "Lichte modus voor tragere pc's",
+  "Open Remote": "Op afstand openen",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "Instellingen → Verschijning: animaties staan stil en AI-stemmen gebruiken een lichter model.",
+  "Twitch, Stream Deck and achievements": "Twitch, Stream Deck en prestaties"
 }

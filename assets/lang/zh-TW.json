@@ -4303,5 +4303,14 @@
   "Right now only you hear your sounds.": "現在只有你聽得到你的聲音。",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install mic effect</b>. Without it, your sounds won't go through to Discord or games.": "插好麥克風後，前往 <b>設定 → 音訊</b> 並點擊 <b>安裝麥克風效果</b>。沒有它，你的聲音傳不到 Discord 或遊戲裡。",
   "🎧 <b>Got a new mic or headset later?</b> Put your sounds into that one too: <b>Settings → Audio → Install mic effect</b>. Each mic needs it once.": "🎧 <b>之後換了新麥克風或耳機？</b> 也把聲音放進去：<b>設定 → 音訊 → 安裝麥克風效果</b>。每支麥克風需要做一次。",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>新麥克風或耳機？</b> 麥克風效果一次只裝在一支麥克風上。每次換成新的，先在 裝置 中選取它，再在這裡點擊 <b>安裝麥克風效果</b>，否則別人聽不到你的聲音。"
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>新麥克風或耳機？</b> 麥克風效果一次只裝在一支麥克風上。每次換成新的，先在 裝置 中選取它，再在這裡點擊 <b>安裝麥克風效果</b>，否則別人聽不到你的聲音。",
+  "56 achievements": "56 個成就",
+  "A Stream Deck plugin": "Stream Deck 外掛",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "新增一個 Play sound 按鍵，從清單中選擇聲音。設定 → 遠端裡的實況主教學有它的連結。",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "頻道點數、Cheer、突襲和聊天指令都能播放你的聲音。不需要機器人。",
+  "Each one has its own Bun badge. They're counted on your PC only.": "每個成就都有自己的 Bun 徽章。只在你的電腦上計算。",
+  "Lite mode for slower PCs": "適合較慢電腦的輕量模式",
+  "Open Remote": "開啟遠端",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "設定 → 外觀：動畫保持靜止，人工智慧聲音使用較輕的模型。",
+  "Twitch, Stream Deck and achievements": "Twitch、Stream Deck 和成就"
 }

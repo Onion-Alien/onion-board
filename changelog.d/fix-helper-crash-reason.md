@@ -1,1 +1,0 @@
-- Voice add-ons (AI voices, live voice, translation): when one crashes without saying why, the message now ends with the last line it printed (the actual error) instead of only "code 1", and a reason it did give is no longer replaced by a plain "stopped".

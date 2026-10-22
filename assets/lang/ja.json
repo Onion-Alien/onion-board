@@ -4303,5 +4303,14 @@
   "Right now only you hear your sounds.": "今はあなたにだけサウンドが聞こえています。",
   "When your mic is plugged in, go to <b>Settings → Audio</b> and press <b>Install mic effect</b>. Without it, your sounds won't go through to Discord or games.": "マイクをつないだら、<b>設定 → オーディオ</b> を開いて <b>エフェクトをインストール</b> を押してください。これがないと、サウンドはDiscordやゲームに届きません。",
   "🎧 <b>Got a new mic or headset later?</b> Put your sounds into that one too: <b>Settings → Audio → Install mic effect</b>. Each mic needs it once.": "🎧 <b>あとで新しいマイクやヘッドセットを使う？</b> そちらにもサウンドを入れてください：<b>設定 → オーディオ → エフェクトをインストール</b>。マイクごとに1回必要です。",
-  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>新しいマイクやヘッドセット？</b> マイクエフェクトは一度に1つのマイクにだけ入ります。新しいマイクに替えるたびに、デバイス で選んでから、ここで <b>エフェクトをインストール</b> を押してください。そうしないと、ほかの人にサウンドが聞こえません。"
+  "🎧 <b>New mic or headset?</b> The mic effect goes on one mic at a time. Each time you switch to a new one, pick it under Devices, then press <b>Install mic effect</b> here, or others won't hear your sounds.": "🎧 <b>新しいマイクやヘッドセット？</b> マイクエフェクトは一度に1つのマイクにだけ入ります。新しいマイクに替えるたびに、デバイス で選んでから、ここで <b>エフェクトをインストール</b> を押してください。そうしないと、ほかの人にサウンドが聞こえません。",
+  "56 achievements": "56 個の実績",
+  "A Stream Deck plugin": "Stream Deck プラグイン",
+  "Add a Play sound key and pick the sound from a list. The Streamer guide in Settings → Remote links to it.": "Play sound キーを追加して、リストからサウンドを選びます。設定 → リモートのストリーマーガイドにリンクがあります。",
+  "Channel points, cheers, raids and chat commands play your sounds. No bot needed.": "チャンネルポイント、Cheer、レイド、チャットコマンドでサウンドが鳴ります。ボットは不要です。",
+  "Each one has its own Bun badge. They're counted on your PC only.": "それぞれに Bun のバッジがあります。数えるのはこの PC の中だけです。",
+  "Lite mode for slower PCs": "遅めの PC 向け軽量モード",
+  "Open Remote": "リモートを開く",
+  "Settings → Appearance: animations hold still, and AI voices use a lighter model.": "設定 → 外観：アニメーションが止まり、AI の声は軽いモデルを使います。",
+  "Twitch, Stream Deck and achievements": "Twitch、Stream Deck、実績"
 }

@@ -1,1 +1,0 @@
-- Settings > Overlay shows your overlay hotkey again (its button was blank).
