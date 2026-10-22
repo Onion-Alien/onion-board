@@ -1434,7 +1434,7 @@ def _is_file(p: Path) -> bool:
 
 def _ffmpeg() -> str | None:
     """The app's own FFmpeg (ffmpegget downloads it there when winget can't fix one),
-    else ffmpeg on PATH, or where winget links it (the installer's M4A/video option uses
+    else ffmpeg on PATH, or where winget links it (the installer gets it through
     winget, and a process started before that doesn't see the new PATH yet). Without
     the right to make links (most PCs), winget makes no WinGet\\Links\\ffmpeg.exe: it puts
     the package's bin folder on the user's PATH instead, so that folder is looked in too

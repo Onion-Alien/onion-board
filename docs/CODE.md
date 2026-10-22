@@ -116,7 +116,7 @@ puts it back to straight into the mic. The rest of this page says "what others h
 whichever of these the route picked.
 
 Optional: `winget install Gyan.FFmpeg.Essentials` adds m4a/aac/video support (the
-installer's *Play M4A, AAC and video files* box runs the same command). The app
+installer runs the same command whenever FFmpeg is missing). The app
 finds ffmpeg on `PATH` or in winget's `Links` folder.
 
 ## Where things are stored

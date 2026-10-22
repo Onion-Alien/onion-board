@@ -336,7 +336,7 @@ def test_installer_runs_quietly_without_the_extras_and_reopens_the_app(tmp_path)
     args = updates.installer_args(tmp_path / "OnionBoardSetup-9.0.0.exe")
     assert args[0].endswith("OnionBoardSetup-9.0.0.exe")
     assert "/SILENT" in args and "/NORESTART" in args and "/RELAUNCH=1" in args
-    assert "/MERGETASKS=!vbcable,!ffmpeg,!livevoice" in args
+    assert "/MERGETASKS=!vbcable,!livevoice" in args
     assert any(a.startswith("/LOG=") for a in args)
 
 

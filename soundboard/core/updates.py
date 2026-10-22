@@ -405,10 +405,10 @@ def fetch(url: str, sha256: str, dest: Path, trusted: tuple[str, ...], max_size:
 def installer_args(path: Path) -> list[str]:
     """Run the installer over this copy with no questions, keeping the user's
     shortcut choice but never the one-off extras (the virtual cable would ask Windows
-    for permission, live voice downloads ~300 MB), then open the app again
-    (/RELAUNCH, see installer/OnionBoard.iss)."""
+    for permission, live voice downloads ~300 MB; FFmpeg is skipped on /RELAUNCH), then
+    open the app again (/RELAUNCH, see installer/OnionBoard.iss)."""
     return [str(path), "/SILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/CLOSEAPPLICATIONS",
-            "/MERGETASKS=!vbcable,!ffmpeg,!livevoice", "/RELAUNCH=1",
+            "/MERGETASKS=!vbcable,!livevoice", "/RELAUNCH=1",
             f"/LOG={INSTALL_LOG}"]
 
 

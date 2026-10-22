@@ -51,7 +51,7 @@ from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
-PACKAGE = "Gyan.FFmpeg.Essentials"   # the package the installer ticks (installer/OnionBoard.iss)
+PACKAGE = "Gyan.FFmpeg.Essentials"   # the package the installer adds (installer/OnionBoard.iss)
 FEATURE = "ffmpeg_download"          # net's switch for this download
 TIMEOUT_S = 900.0                    # winget fetches about 100 MB; a stuck one is cut here
 CHECK_TIMEOUT_S = 60.0               # `ffmpeg -version` answers in well under a second,
