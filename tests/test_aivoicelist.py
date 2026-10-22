@@ -378,6 +378,7 @@ def test_card_makes_your_own_voices_with_a_copy_shipped_with_the_app(qapp, app_d
     try:
         p._refresh()
         assert p.make_tile.isEnabled() and p.b_make.isEnabled()
+        assert not p.b_remove.isHidden()           # Remove shows for this copy too
         p.make_tile.click()
         assert made["id"] in p._tile and p.current_voice() == made["id"]
         assert (app_dir / "ai-voices" / "voices.json").read_bytes() == before

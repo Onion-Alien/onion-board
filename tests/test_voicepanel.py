@@ -571,6 +571,11 @@ def test_remove_languages_takes_speech_recognition_back_off(panel, qapp, monkeyp
     assert (mod.path / "helper.py").exists()          # the add-on itself stays
     process_events(qapp, lambda: not s.installs.b_install.isHidden())
     assert s.installs.b_remove.isHidden()
+    (d / "model").mkdir(parents=True)                 # a language without recognition:
+    (d / "model" / "model.bin").write_bytes(b"x")     # still something to remove
+    (d / "sentencepiece.model").write_bytes(b"x")
+    s._fill_langs()
+    assert not s.installs.b_remove.isHidden()
 
 
 def test_voice_installed_in_windows_settings_is_found_on_return(panel, qapp, monkeypatch):

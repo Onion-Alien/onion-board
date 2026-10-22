@@ -513,7 +513,9 @@ class AiVoicePanel(QWidget):
         self.b_install.setVisible(m is not None and not ok)
         self.b_get.setVisible(m is None)
         self.b_update.setVisible(m is not None)
-        self.b_remove.setVisible(m is not None and aiaddon.removable(m))
+        # a copy that came with the app too, once there's something of it to delete
+        self.b_remove.setVisible(m is not None and (aiaddon.removable(m) or m.installed
+                                                    or model_downloaded(m)))
         self.btn_opts.setVisible(m is not None and not self._installing)
         if net.offline():   # Offline mode: nothing here can be fetched (the card goes
             for b in (self.b_get, self.b_install, self.b_update):   # when not ready)

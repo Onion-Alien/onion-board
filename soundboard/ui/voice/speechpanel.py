@@ -748,6 +748,7 @@ class SpeechPanel(QWidget):
                            and bool(self.langs))
         self._refresh_translation()
         self._sync_switch()
+        self.installs.show_remove()   # a language downloaded or deleted
 
     def show_lang_box(self, on: bool):
         """The language cards, once there's speech recognition and languages. Until

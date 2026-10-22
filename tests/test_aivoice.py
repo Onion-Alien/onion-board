@@ -384,6 +384,26 @@ def addon_zip(tmp_path) -> Path:
     return z
 
 
+def test_remove_a_copy_that_came_with_the_app_keeps_its_files(tmp_path):
+    """Running from the app's own modules folder (not downloaded into %APPDATA%):
+    Remove takes what its install added, the environment and the voice model, and
+    leaves the add-on, so Install gets it back."""
+    folder = tmp_path / "app" / aiaddon.MODULE_ID
+    (folder / ".venv" / "Scripts").mkdir(parents=True)
+    (folder / ".venv" / "Scripts" / "python.exe").write_bytes(b"x")
+    (folder / "model").mkdir()
+    (folder / "model" / "stream.onnx").write_bytes(b"x")
+    (folder / "helper.py").write_text("")
+    info = modules.ModuleInfo(id=aiaddon.MODULE_ID, name="AI voices", version="1",
+                              description="", kind="service", path=folder)
+    base = tmp_path / "appdata-modules"
+    assert not aiaddon.removable(info, base)
+    aiaddon.remove(info, base)
+    assert not (folder / ".venv").exists() and not (folder / "model").exists()
+    assert (folder / "helper.py").exists()
+    assert sorted(p.name for p in folder.iterdir()) == ["helper.py"]
+
+
 def test_get_and_remove_the_optional_addon(tmp_path, monkeypatch):
     monkeypatch.setenv(aiaddon.LOCAL_ENV, str(addon_zip(tmp_path)))
     base = tmp_path / "modules"

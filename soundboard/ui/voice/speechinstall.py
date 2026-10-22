@@ -374,6 +374,15 @@ class SpeechInstalls(QObject):
                                 "Onion Board and try again."), "warn")
         busy.run_busy(self.b_remove, _("Removing…"), go, said)
 
+    def show_remove(self):
+        """Remove languages, while there's anything of it on this PC: speech recognition,
+        its speech models or a downloaded language (one can be there without the others)."""
+        p = self.p
+        m = p.module
+        self.b_remove.setVisible(
+            (m is not None and m.installed) or any(lang.installed for lang in p.langs)
+            or bool(live.speech_model_dirs()))
+
     # ---- speech recognition (the live-voice add-on)
     def _net_changed(self):
         """Offline mode on or off: the install buttons follow (not mid-install)."""
@@ -390,7 +399,7 @@ class SpeechInstalls(QObject):
         self.missing.setVisible(not ok)
         self.b_install.setVisible(m is not None and not ok and not net.offline())
         self.b_update.setVisible(m is not None and not net.offline())   # pip: online
-        self.b_remove.setVisible(ok)
+        self.show_remove()
         if m is not None and not ok and net.offline():
             self.lbl_missing.setText(_("Speaking another language needs speech recognition "
                                        "installed first, which is a download. Offline mode "

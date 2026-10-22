@@ -19,6 +19,8 @@ from __future__ import annotations
 import json
 import logging
 import os
+import shutil
+import uuid
 import zipfile
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -136,9 +138,24 @@ def removable(info: ModuleInfo, base: Path | None = None) -> bool:
 
 
 def remove(info: ModuleInfo, base: Path | None = None) -> None:
-    """Uninstall it (modules.uninstall): its code, voice model and Python environment.
-    The user's AI voice settings stay in the config. Raises modules.ModuleError."""
-    modules.uninstall(MODULE_ID, base)
+    """Uninstall it: the downloaded copy goes whole (modules.uninstall: its code, voice
+    model and Python environment); a copy that came with the app keeps its own files
+    and loses what its install added (the Python environment and the voice model), so
+    Install gets it back. The user's AI voice settings stay in the config. Raises
+    modules.ModuleError."""
+    if removable(info, base):
+        modules.uninstall(MODULE_ID, base)
+        return
+    modules.remove_env(info)
+    model = info.path / "model"
+    if model.exists():
+        gone = info.path / f"model-old-{uuid.uuid4().hex[:8]}"
+        try:
+            os.rename(model, gone)
+        except OSError as e:
+            raise modules.ModuleError(
+                _("it couldn't be removed ({error})", error=errors.plain(e))) from e
+        shutil.rmtree(gone, ignore_errors=True)
 
 
 def friendly(e: Exception) -> str:
