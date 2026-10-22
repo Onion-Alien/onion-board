@@ -22,8 +22,8 @@ from soundboard.mic import directmic as dm
 from test_mainwindow import window  # noqa: F401  (fixture)
 
 _REAL_ELEVATED = dm._elevated   # (before the conftest guard replaces it)
-_REAL_RESTART_WORKS = dm._mic_restart_works   # (before _no_windows_mics replaces it)
-_REAL_UNMARK = dm._unmark
+# (before the conftest guard replaces them)
+_REAL_RESTART_WORKS, _REAL_UNMARK, _REAL_MARKED = dm._mic_restart_works, dm._unmark, dm._marked
 
 BUILD = Path(__file__).resolve().parent.parent / "build" / "directmic"
 HOST = BUILD / "testhost.exe"
@@ -35,9 +35,6 @@ def _no_windows_mics(monkeypatch):
     """mic_lookup's last try asks Windows for its mics: none here (the tests' made-up
     mics would otherwise meet this PC's real ones)."""
     monkeypatch.setattr(dm, "_windows_mics", lambda: [])
-    # the admin steps restart all of Windows' audio unless a test says otherwise
-    monkeypatch.setattr(dm, "_mic_restart_works", lambda: False)
-    monkeypatch.setattr(dm, "_unmark", lambda paths: None)   # never this PC's own list
     monkeypatch.setattr(dm, "_processes", lambda exe: [])   # no mic apps (MIC_APPS) running
 
 
@@ -934,7 +931,7 @@ def test_a_file_on_the_restart_list_is_put_on_it_once(monkeypatch, tmp_path):
     key = _PendingKey(["*1\\??\\" + str(f), ""])
     monkeypatch.setattr(dm.winreg, "OpenKey", lambda *a: key)
     monkeypatch.setattr(dm.winreg, "QueryValueEx", lambda k, n: (k.ops, dm.winreg.REG_MULTI_SZ))
-    assert dm._marked(f) and not dm._marked(tmp_path / "other.dll")
+    assert _REAL_MARKED(f) and not _REAL_MARKED(tmp_path / "other.dll")
 
 
 def test_the_effect_in_use_is_taken_off_the_restart_list(fake_reg, monkeypatch, tmp_path):
