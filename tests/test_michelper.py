@@ -48,7 +48,8 @@ ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4
                18: "18c5bd83e7a504aa96ba2995292b386647013d1ae464ac612947c9bc7b141fb9",
                19: "ef4ee762319ea5dad59381fa26471f23cdc4cf60cdd1031227b08d5806bed559",
                20: "e7b210a56344ec4b5420e6b7ddc1fca9d93eec6640657f4b0bf235a87cc0ad1e",
-               21: "fc1d64c720b1acf922be82d6812192cb81f939a15593cd58487237cc5b718c47"}
+               21: "fc1d64c720b1acf922be82d6812192cb81f939a15593cd58487237cc5b718c47",
+               22: "fded1edfd0a79368a14c8b46b8319db148aeebc4a2372a470c26d80ac5b426e6"}
 
 
 def _queue():
@@ -185,6 +186,7 @@ def test_ready_needs_all_of_this_apps_build(monkeypatch, tmp_path):
     mh.write_manifest(mh.helper_dir())
     assert mh.ready() and mh.ready(same_dll=False)
     (mh.helper_dir() / "obmichelper.pkg").unlink()
+    monkeypatch.setattr(mh, "MIN_HELPER_VERSION", 2)   # (while old ones are allowed)
     (mh.helper_dir() / mh.STAMP).write_text(f"{mh.MANIFEST_SINCE - 1} aaaa")
     assert mh.ready()   # an older helper (no manifest yet), same DLL: as before
 
@@ -905,6 +907,7 @@ def test_ready_refreshes_both_answers_at_once(monkeypatch):
     too, with one Task Scheduler look: the set-up text never keeps an old answer."""
     looks = []
     monkeypatch.setattr(mh, "state", mh.HelperState())
+    monkeypatch.setattr(mh, "MIN_HELPER_VERSION", 2)   # (an old one, without a manifest)
     monkeypatch.setattr(mh, "_read_stamp", lambda folder: "8 aaaa")
     monkeypatch.setattr(mh, "_build_files", lambda folder: {})
     monkeypatch.setattr(mh, "installed", lambda: looks.append(1) or True)
@@ -995,7 +998,9 @@ def test_a_tampered_installed_helper_is_replaced_on_the_next_prompt(helper_setup
 
 
 def test_an_older_helper_without_a_manifest_is_still_used(helper_setup, monkeypatch):
-    """Helpers from before the manifest (version 9 and older) have none: still fine."""
+    """Helpers from before the manifest (version 9 and older) have none: still fine
+    (while MIN_HELPER_VERSION allows them)."""
+    monkeypatch.setattr(mh, "MIN_HELPER_VERSION", 2)
     monkeypatch.setattr(mh, "installed", lambda: True)
     dest = mh.helper_dir()
     dest.mkdir(parents=True)
@@ -1003,6 +1008,19 @@ def test_an_older_helper_without_a_manifest_is_still_used(helper_setup, monkeypa
     (dest / mh.STAMP).write_text("9 aaaa")
     (mh.bundled_helper() / mh.STAMP).write_text(f"{mh.HELPER_VERSION} aaaa")
     assert mh.ready()
+
+
+def test_a_helper_older_than_the_minimum_is_not_used(helper_setup, monkeypatch):
+    """Helpers before MIN_HELPER_VERSION restart all of Windows' audio for a set-up
+    (it cut off the apps in between a mic and a voice chat): the app asks Windows once
+    more instead, and that puts this version's helper in place."""
+    monkeypatch.setattr(mh, "installed", lambda: True)
+    dest = mh.helper_dir()
+    dest.mkdir(parents=True)
+    (dest / mh.EXE_NAME).write_bytes(b"MZ")
+    (dest / mh.STAMP).write_text(f"{mh.MIN_HELPER_VERSION - 1} aaaa")
+    (mh.bundled_helper() / mh.STAMP).write_text(f"{mh.HELPER_VERSION} aaaa")
+    assert not mh.ready() and not mh.ready(same_dll=False)
 
 
 # ---------------------------------------------------------------- measured waits

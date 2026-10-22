@@ -4144,6 +4144,7 @@ def test_a_helper_removed_meanwhile_is_noticed_when_the_window_comes_back(window
     w.statusctl._update_flow()
     assert "Windows asks" not in w.mic_reason.text()
     gone = []   # (the same build as this app's, but its task is gone)
+    monkeypatch.setattr(michelper, "MIN_HELPER_VERSION", 2)   # (an old one, no manifest)
     monkeypatch.setattr(michelper, "_read_stamp", lambda folder: "8 aaaa")
     monkeypatch.setattr(michelper, "_build_files", lambda folder: {})
     monkeypatch.setattr(michelper, "installed", lambda: gone.append(1) or False)
