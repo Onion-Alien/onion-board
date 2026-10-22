@@ -184,7 +184,16 @@ static const PROPERTYKEY PKEY_AudioEndpoint_GUID_ =
 static const CLSID CLSID_OnionMic =
     {0xc55e76fe, 0x6667, 0x4828, {0x81, 0xfd, 0x05, 0xb3, 0x93, 0xfd, 0x64, 0x9e}};
 static const wchar_t *STATE_KEY = L"SOFTWARE\\OnionBoard\\MicPlugin\\Endpoints";
+#ifndef OBMIC_STATE_ROOT   // a test build reads the notes from HKEY_CURRENT_USER
+#define OBMIC_STATE_ROOT HKEY_LOCAL_MACHINE
+#endif
 static const uint32_t EFFECT_VERSION = 5;        // directmic.EFFECT_VERSION
+
+// The mic's own effect (a headset maker's, say) sending only silence while the mic has
+// sound this long (louder than CHILD_LOUD) is broken: it's skipped, the mic as it is.
+// A noise gate silences only quiet sound, so it never trips this.
+static const double CHILD_DEAD_S = 3.0;
+static const float CHILD_LOUD = 0.03f;           // about -30 dBFS
 
 // Equalizer APO works like this effect: it takes a slot and runs the effect it replaced,
 // noted per endpoint under EAPO_KEY\<endpoint>. Put on the mic after this one, it runs
@@ -570,19 +579,28 @@ public:
         }
         return S_OK;
     }
+    // A format the mic's own effect turns down is answered as if it weren't there: if the
+    // audio engine picks it, the effect fails to lock and the mic goes on without it,
+    // where turning it down left the mic with no format at all (no sound to any app).
     HRESULT STDMETHODCALLTYPE IsInputFormatSupported(IAudioMediaType *opp, IAudioMediaType *req,
                                                      IAudioMediaType **out) override {
-        if (m_child) return m_child->IsInputFormatSupported(opp, req, out);
+        if (m_child) {
+            HRESULT hr = m_child->IsInputFormatSupported(opp, req, out);
+            if (SUCCEEDED(hr)) return hr;
+        }
         return sameFormat(opp, req, out);
     }
     HRESULT STDMETHODCALLTYPE IsOutputFormatSupported(IAudioMediaType *opp, IAudioMediaType *req,
                                                       IAudioMediaType **out) override {
-        if (m_child) return m_child->IsOutputFormatSupported(opp, req, out);
+        if (m_child) {
+            HRESULT hr = m_child->IsOutputFormatSupported(opp, req, out);
+            if (SUCCEEDED(hr)) return hr;
+        }
         return sameFormat(opp, req, out);
     }
     HRESULT STDMETHODCALLTYPE GetInputChannelCount(UINT32 *n) override {
         if (!n) return E_POINTER;
-        if (m_child) return m_child->GetInputChannelCount(n);
+        if (m_child && SUCCEEDED(m_child->GetInputChannelCount(n))) return S_OK;
         *n = m_channels;
         return S_OK;
     }
@@ -594,10 +612,19 @@ public:
         if (m_childConfig) {
             HRESULT hr = m_childConfig->LockForProcess(nIn, in, nOut, out);
             if (FAILED(hr)) {
-                problemf("the mic's own effect failed to lock: 0x%08lx", (unsigned long)hr);
-                return hr;
+                if (!sameShape(in[0], out[0])) {   // it changes the format: can't go without it
+                    problemf("the mic's own effect failed to lock: 0x%08lx", (unsigned long)hr);
+                    return hr;
+                }
+                // a headset maker's effect that won't run inside another one: the mic
+                // without it rather than no mic at all
+                problemf("the mic's own effect failed to lock (0x%08lx): the mic without it",
+                         (unsigned long)hr);
+                dropChild();
             }
         }
+        m_canSkipChild = m_child && sameShape(in[0], out[0]);
+        m_childDeadFrames = 0;
         const WAVEFORMATEX *f = out[0]->pFormat ? out[0]->pFormat->GetAudioFormat() : NULL;
         m_float = isFloat32(f);
         m_channels = f ? f->nChannels : 0;
@@ -649,6 +676,11 @@ public:
             problemf("%ld faults reading the ring file were caught (last 0x%08lx at %p)",
                      (long)m_faults, (unsigned long)g_faultCode, g_faultAddr);
         m_faults = 0;
+        if (m_childOff && !m_childOffLogged) {
+            problemf("the mic's own effect sent only silence while the mic had sound: "
+                     "the mic without it");
+            m_childOffLogged = true;
+        }
         logf("unlock");
         return m_childConfig ? m_childConfig->UnlockForProcess() : S_OK;
     }
@@ -656,9 +688,13 @@ public:
     // IAudioProcessingObjectRT (real-time: no locks, allocation, files or registry)
     void STDMETHODCALLTYPE APOProcess(UINT32 nIn, APO_CONNECTION_PROPERTY **in, UINT32 nOut,
                                       APO_CONNECTION_PROPERTY **out) override {
-        if (m_childRT) {
+        bool child = m_childRT && !m_childOff;
+        if (child) {
             m_childRT->APOProcess(nIn, in, nOut, out);
-        } else if (nIn >= 1 && nOut >= 1) {
+            if (m_canSkipChild && nIn >= 1 && nOut >= 1 && childSilenced(in[0], out[0]))
+                child = false;   // from this block on: the mic as it came in
+        }
+        if (!child && nIn >= 1 && nOut >= 1) {
             APO_CONNECTION_PROPERTY *i = in[0], *o = out[0];
             if (o->pBuffer != i->pBuffer && i->u32BufferFlags == BUFFER_VALID)
                 memcpy((void *)o->pBuffer, (const void *)i->pBuffer,
@@ -670,10 +706,10 @@ public:
             processGuarded(out[0]);
     }
     UINT32 STDMETHODCALLTYPE CalcInputFrames(UINT32 n) override {
-        return m_childRT ? m_childRT->CalcInputFrames(n) : n;
+        return m_childRT && !m_childOff ? m_childRT->CalcInputFrames(n) : n;
     }
     UINT32 STDMETHODCALLTYPE CalcOutputFrames(UINT32 n) override {
-        return m_childRT ? m_childRT->CalcOutputFrames(n) : n;
+        return m_childRT && !m_childOff ? m_childRT->CalcOutputFrames(n) : n;
     }
 
 private:
@@ -710,6 +746,51 @@ private:
         req->AddRef();
         *out = req;
         return S_OK;
+    }
+
+    // In and out the same float format: the mic can go on without its own effect.
+    static bool sameShape(const APO_CONNECTION_DESCRIPTOR *in, const APO_CONNECTION_DESCRIPTOR *out) {
+        const WAVEFORMATEX *a = in->pFormat ? in->pFormat->GetAudioFormat() : NULL;
+        const WAVEFORMATEX *b = out->pFormat ? out->pFormat->GetAudioFormat() : NULL;
+        return isFloat32(a) && isFloat32(b) && a->nChannels == b->nChannels
+               && a->nSamplesPerSec == b->nSamplesPerSec;
+    }
+
+    void dropChild() {
+        if (m_childConfig) m_childConfig->Release();
+        if (m_childRT) m_childRT->Release();
+        if (m_child) m_child->Release();
+        m_childConfig = NULL;
+        m_childRT = NULL;
+        m_child = NULL;
+    }
+
+    // After the mic's own effect ran: true once it has sent only silence for CHILD_DEAD_S
+    // of loud mic (m_childOff set: it isn't run again). Real-time: no logging here.
+    bool childSilenced(const APO_CONNECTION_PROPERTY *i, const APO_CONNECTION_PROPERTY *o) {
+        if (i->u32BufferFlags != BUFFER_VALID || !i->pBuffer || !m_channels || !m_rate)
+            return false;
+        const float *x = (const float *)i->pBuffer;
+        size_t n = (size_t)i->u32ValidFrameCount * m_channels;
+        float peak = 0.0f;
+        for (size_t k = 0; k < n; k++) {
+            float v = fabsf(x[k]);
+            if (v > peak && v <= 16.0f) peak = v;   // NaN and wild values don't count
+        }
+        if (peak < CHILD_LOUD) return false;   // quiet: a noise gate may silence that
+        if (o->u32BufferFlags == BUFFER_VALID && o->pBuffer) {
+            const float *y = (const float *)o->pBuffer;
+            size_t m = (size_t)o->u32ValidFrameCount * m_channels;
+            for (size_t k = 0; k < m; k++)
+                if (y[k] != 0.0f) {
+                    m_childDeadFrames = 0;
+                    return false;
+                }
+        }
+        m_childDeadFrames += i->u32ValidFrameCount;
+        if (m_childDeadFrames < (uint64_t)(CHILD_DEAD_S * m_rate)) return false;
+        m_childOff = true;
+        return true;
     }
 
     // The mic's own effect, saved by the installer under STATE_KEY\<endpoint>\Original.
@@ -749,7 +830,7 @@ private:
         _snwprintf(key, 256, L"%ls\\%ls", STATE_KEY, endpoint);
         key[255] = 0;
         DWORD size = sizeof value;
-        if (RegGetValueW(HKEY_LOCAL_MACHINE, key, L"Original", RRF_RT_REG_SZ, NULL, value, &size)
+        if (RegGetValueW(OBMIC_STATE_ROOT, key, L"Original", RRF_RT_REG_SZ, NULL, value, &size)
                 != ERROR_SUCCESS || !value[0])
             return;
         CLSID clsid;
@@ -1298,6 +1379,10 @@ private:
     IAudioProcessingObject *m_child = NULL;
     IAudioProcessingObjectRT *m_childRT = NULL;
     IAudioProcessingObjectConfiguration *m_childConfig = NULL;
+    bool m_canSkipChild = false;   // in and out alike: the mic can go on without it
+    bool m_childOff = false;       // it sent only silence (childSilenced): not run again
+    bool m_childOffLogged = false;
+    uint64_t m_childDeadFrames = 0;
     HANDLE m_file = INVALID_HANDLE_VALUE;
     HANDLE m_map = NULL;
     void *m_view = NULL;       // the file's view (m_ring once its layout checked out)
