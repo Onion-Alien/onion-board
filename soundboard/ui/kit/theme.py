@@ -785,12 +785,10 @@ QPushButton#transport_play {
 GLOSS_STYLE = Template("""
 QPushButton#primary, QFrame#card QPushButton#primary, QFrame#setcard QPushButton#primary,
 QPushButton#transport_play {
-    background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top, stop:0.3 $accent,
-        stop:1 $accent_end); }
+    background:$accent_gloss; }
 QPushButton#primary:hover, QFrame#card QPushButton#primary:hover,
 QFrame#setcard QPushButton#primary:hover, QPushButton#transport_play:hover:!disabled {
-    background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top_hi,
-        stop:0.3 $accent_hover, stop:1 $accent_end_hi); }
+    background:$accent_gloss_hi; }
 QPushButton#primary:pressed, QFrame#card QPushButton#primary:pressed,
 QFrame#setcard QPushButton#primary:pressed,
 QPushButton#transport_play:pressed:!disabled { background:$accent_press; }
@@ -810,15 +808,13 @@ QPushButton#chipplay[playing="true"], QPushButton#voicetile:checked,
 QFrame#card QToolButton#voicetile:checked, QWidget#setupsbar QPushButton#voicecat:checked,
 QFrame#card QPushButton#voicecat:checked, QPushButton#voicetab:checked,
 QPushButton#subchip:checked {
-    background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top, stop:0.3 $accent,
-        stop:1 $accent_end); }
+    background:$accent_gloss; }
 QPushButton:checked:hover, QPushButton#voicetile:checked:hover,
 QFrame#card QToolButton#voicetile:checked:hover,
 QWidget#setupsbar QPushButton#voicecat:checked:hover,
 QFrame#card QPushButton#voicecat:checked:hover, QPushButton#voicetab:checked:hover,
 QPushButton#subchip:checked:hover {
-    background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top_hi,
-        stop:0.3 $accent_hover, stop:1 $accent_end_hi); }
+    background:$accent_gloss_hi; }
 QPushButton#onair:checked, QPushButton#power:checked, QFrame#card QPushButton#power:checked,
 QFrame#setcard QPushButton#power:checked, QPushButton#live:checked,
 QFrame#card QPushButton#live:checked {
@@ -864,7 +860,21 @@ def _accent_shades(tk: dict[str, str]) -> dict[str, str]:
         return next((c for c in (_mix(mixed, away, i / 20) for i in range(15))
                      if _contrast(on, c) >= need), _mix(mixed, away, 0.7))
 
+    def deeper(base: str) -> str:   # the lower half's start: a step down from the shine
+        need = min(4.5, _contrast(on, base))
+        return next((c for c in (_mix(base, black, i / 100) for i in range(24, -1, -2))
+                     if _contrast(on, c) >= need), base)
+
+    def gloss(base: str) -> str:
+        """Glossy: a lit top half, a crisp line across the middle, deeper at the foot."""
+        top = lit(base)
+        return (f"qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 {top}, "
+                f"stop:0.48 {_mix(top, base, 0.5)}, stop:0.52 {deeper(base)}, "
+                f"stop:1 {_mix(deeper(base), blend(base), 0.6)})")
+
     return dict(
+        accent_gloss=gloss(tk["accent"]),
+        accent_gloss_hi=gloss(tk["accent_hover"]),
         accent_top=lit(tk["accent"]),
         accent_top_hi=lit(tk["accent_hover"]),
         accent_end=blend(tk["accent"]),
@@ -885,11 +895,7 @@ def _button_shades(tk: dict[str, str]) -> dict[str, str]:
 def accent_fill(hover: bool = False) -> str:
     """A filled accent button's background as a stylesheet value, for widgets that style
     themselves: the same gradient as `#primary`."""
-    s = _accent_shades(T)
-    top, mid, end = ((s["accent_top_hi"], T["accent_hover"], s["accent_end_hi"]) if hover
-                     else (s["accent_top"], T["accent"], s["accent_end"]))
-    return (f"qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 {top}, stop:0.3 {mid}, "
-            f"stop:1 {end})")
+    return _accent_shades(T)["accent_gloss_hi" if hover else "accent_gloss"]
 
 
 def accent_edge() -> str:
