@@ -5,8 +5,7 @@ visit (tabtours.py) are built from it.
 
 A tour is a few `Step`s. A plain step has one button ("Let's go"). An action step waits
 until the person has done the thing (`done()` turns true: searched, played a station);
-it's the one place the tour can be put off, with a quiet "OK" that shows up after
-SKIP_MS, so clicking through without reading doesn't skip it.
+it's the one place the tour can be put off, with a quiet "OK" there from the start.
 
 Until then the tour keeps the window to itself: a click outside the ring and the card
 does nothing (the card gives a little shake and the ring flashes), and so does a key
@@ -53,7 +52,6 @@ log = logging.getLogger(__name__)
 
 TICK_MS = 120        # follows the window (sizes, results, tab) this often
 ARM_MS = 600         # a step's button ignores clicks this long after it shows
-SKIP_MS = 2500       # "OK" shows this long after an action step starts
 SHAKE_MS = 420       # the card's shake when a click lands outside
 FLASH_MS = 700       # ... and the ring's flash
 # the ring round what to use next: a fixed yellow, drawn on the dimmed window (so the
@@ -285,7 +283,7 @@ class Card(QFrame):
         self.btn_go.setText(step.button)
         self.btn_go.setVisible(bool(step.button))
         self.btn_skip.setText(step.skip)
-        self.btn_skip.hide()   # an action step shows it after SKIP_MS
+        self.btn_skip.setVisible(bool(step.skip) and step.done is not None)   # action steps'
         self.bun.setVisible(step.bun is not None)
 
     def fit(self, max_w: int):
@@ -373,8 +371,6 @@ class Tour(QWidget):
         self._step_at = time.monotonic()
         dot = sum(1 for st in self.steps[:i] if st.blocks)
         self.card.fill(s, min(dot, max(0, self.card.dots.total - 1)))
-        if s.done is not None and s.skip:
-            QTimer.singleShot(SKIP_MS, self, lambda st=s: self._show_skip(st))
         if s.enter is not None:
             s.enter()
         self.entered(s)
@@ -386,11 +382,6 @@ class Tour(QWidget):
             if s.extra.get("name") == name:
                 self.go(i)
                 return
-
-    def _show_skip(self, step: Step):
-        if not self._ended and self.step is step:
-            self.card.btn_skip.show()
-            self._place()
 
     def _pressed_go(self):
         if time.monotonic() - self._step_at < ARM_MS / 1000:

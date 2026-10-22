@@ -140,16 +140,12 @@ def test_spam_clicking_its_button_doesnt_race_through(window):
     assert tour.step.extra["name"] == "search"
 
 
-def test_esc_doesnt_skip_until_not_now_shows(window, qapp, counted):
+def test_esc_skips_only_where_ok_shows(window, qapp, counted):
     tour = firsttour.start(window)
     QApplication.sendEvent(window.grid, esc())
-    assert firsttour._current is tour
+    assert firsttour._current is tour   # the welcome card has no "OK"
     press_go(tour)
-    assert not tour.card.btn_skip.isVisible()   # not straight away either
-    QApplication.sendEvent(window.search, esc())
-    assert firsttour._current is tour
-    assert process_events(qapp, lambda: tour.card.btn_skip.isVisible(),
-                          coach.SKIP_MS / 1000 + 2)
+    assert tour.card.btn_skip.isVisible()   # straight away on the search step
     QApplication.sendEvent(window.search, esc())
     assert firsttour._current is None and "tour-skipped" in counted
     assert window.cfg.sounds == []   # nothing gets added for them
@@ -157,7 +153,6 @@ def test_esc_doesnt_skip_until_not_now_shows(window, qapp, counted):
 
 def test_not_now_puts_it_off(window, counted):
     tour = to_search(window)
-    tour._show_skip(tour.step)
     tour.card.btn_skip.click()
     assert firsttour._current is None and "tour-skipped" in counted
     assert window.cfg.sounds == [] and firsttour.start(window) is None

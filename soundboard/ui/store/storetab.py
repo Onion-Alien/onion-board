@@ -255,6 +255,7 @@ class StoreTab(QWidget):
         self._link = link
         self._link_state = link_state   # a link's state in the player (SoundRow.link_look)
         self._add_file = add_file
+        self.added = 0   # sounds / voices added from here (its first-visit tour waits on it)
         self._play = play
         self._open_privacy = open_privacy
         self._closed = False
@@ -974,6 +975,7 @@ class StoreTab(QWidget):
             return
         if what == "add":
             usage.used("store-added")
+            self.added += 1
             self.bun.cheer()
             self._add_file(path)   # (the window says "Added …" itself)
         else:
@@ -984,10 +986,12 @@ class StoreTab(QWidget):
             assert self.voices is not None   # (only listed with them)
             said = self.voices.take(row.sound)
             usage.used("store-voice-added")
+            self.added += 1
             busy.toast(self.window(), html.escape(said), "ok")
             return
         if row.sound.is_link:   # downloaded from its site, as a pasted link is
             usage.used("store-added")
+            self.added += 1
             self.bun.cheer()
             self._link(row.sound.link, row.sound.name, "add")
             return

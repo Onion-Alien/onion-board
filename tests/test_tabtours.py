@@ -60,7 +60,6 @@ def test_each_tab_gets_one_the_first_time(window, qapp, counted, tab):
     tour = tabtours._current
     assert tour.tab == tab and f"tour-{tab}-shown" in counted
     window.grab()   # (draws without an error)
-    tour._show_skip(tour.step)
     tour.card.btn_skip.click()
     assert tabtours._current is None and tabtours.key(tab) in window.cfg.tips_seen
     assert f"tour-{tab}-skipped" in counted
@@ -278,7 +277,6 @@ def test_a_voice_that_cant_switch_on_shows_the_red_card(window, qapp, monkeypatc
 def skip_open_tour(window, qapp, tab):
     assert open_tab(window, qapp, tab)
     tour = tabtours._current
-    tour._show_skip(tour.step)
     tour.card.btn_skip.click()
     window.tabs.setCurrentWidget(window.sounds_page)
 
@@ -317,3 +315,17 @@ def test_the_page_red_card_speaks_and_its_try_again_carries_on(window, qapp, mon
     tab.oops.btn_retry.click()   # the page's own Try again
     assert process_events(qapp, lambda: not tour.failing and tour.card.isVisible(), 3)
     assert not tour.ended and tour.card.title.text() == "Hear one, then add it"
+
+
+def test_store_tour_waits_for_an_add_from_the_store(window, qapp, counted):
+    """A sound landing on the board from elsewhere (a download, an import) doesn't end
+    it: only Add on the Community tab does. Its "OK" is there from the start."""
+    assert open_tab(window, qapp, "store")
+    tour = tabtours._current
+    assert tour.card.btn_skip.isVisible()
+    window.cfg.sounds.append(SoundMeta(id="b", name="B", file="b.wav"))
+    process_events(qapp, lambda: False, 0.5)
+    assert tabtours._current is tour and "tour-store-done" not in counted
+    window.store.added += 1
+    assert process_events(qapp, lambda: tabtours._current is None, 2)
+    assert "tour-store-done" in counted
