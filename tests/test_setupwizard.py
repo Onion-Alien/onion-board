@@ -2,7 +2,7 @@
 the config and engine, the cable page reacts to the cable being there or not, and
 finishing marks setup done (only when the cable exists)."""
 import pytest
-from PySide6.QtCore import QEvent
+from PySide6.QtCore import QEvent, QObject
 from PySide6.QtWidgets import QApplication, QDialog
 
 from soundboard.audio import engine
@@ -948,6 +948,37 @@ def test_discord_pill_is_only_as_wide_as_its_words(mic_wizard_again, monkeypatch
     # its words' width, never stretched across the page (the row's stretch takes the rest)
     assert wiz.discord_fold.width() == wiz.discord_fold.sizeHint().width()
     assert wiz.discord_fold.sizePolicy().horizontalPolicy() == QSizePolicy.Fixed
+
+
+def test_a_steps_first_showing_is_already_its_final_look(mic_wizard, monkeypatch, qapp):
+    """The first Next onto the send step: it's filled in before it shows, at its own
+    size. It used to paint "Checking…" with the old step's size and buttons, then its
+    words cut to one line, then grow: only the first time (after that it was filled)."""
+    from soundboard.mic import directmic
+    monkeypatch.setattr(directmic, "works", lambda *a: True)
+    w, wiz = mic_wizard
+    w.cfg.route = "mic"
+    wiz.show()
+    _settle(qapp)
+    painted = []
+
+    class Spy(QObject):
+        def eventFilter(self, obj, ev):
+            if ev.type() == QEvent.Type.Paint and obj is wiz.cable_status:
+                painted.append((obj.text(), obj.height()))
+            return False
+    spy = Spy(wiz)
+    wiz.cable_status.installEventFilter(spy)
+    wiz.go(wiz.send_index)   # (nothing drawn yet: the state it's drawn in, below)
+    final = wiz.cable_status.text()
+    assert "Checking" not in final
+    for lbl in (wiz.cable_status, wiz.status_card.title):
+        assert lbl.height() >= lbl.heightForWidth(lbl.width()), lbl.text()
+    tall = wiz.height()
+    _settle(qapp)
+    assert painted and all(t == final for t, __ in painted), painted
+    assert len({h for __, h in painted}) == 1, painted
+    assert wiz.height() == tall
 
 
 def test_no_empty_band_after_a_step_grows_the_window(mic_wizard, qapp):
