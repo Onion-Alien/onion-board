@@ -106,6 +106,29 @@ ALL: tuple[Ach, ...] = (
     Ach("streamer", "chat_command", 1, "uncommon", True, "twitch"),
     Ach("watcher", "trigger", 1, "common", True, "eye"),
     Ach("no_life", "open_run_s", 24 * HOUR, "rare", True, "trophy"),
+    # the Onion Alien on Settings > About
+    Ach("onion_poke", "onion_poked", 1, "common", True, "onion"),
+    Ach("onion_tears", "onion_tears", 1, "uncommon", True, "onion"),
+    Ach("swallowed_whole", "onion_eaten", 1, "rare", True, "onion"),
+    Ach("pretty_please", "onion_please", 1, "uncommon", True, "onion"),
+    # long sounds, lots at once, silly pitch
+    Ach("long_haul", "longest_s", HOUR, "rare", True, "history"),
+    Ach("full_album", "album", 1, "legendary", True, "music"),
+    Ach("wall_of_noise", "at_once", 10, "rare", True, "volume"),
+    Ach("chipmunk", "pitch_up", 1, "common", True, "sliders"),
+    Ach("demon_mode", "pitch_down", 1, "common", True, "sliders"),
+    # a sound played on the day (this PC's clock)
+    Ach("spooky_season", "halloween", 1, "uncommon", True, "ghost"),
+    Ach("ho_ho_honk", "christmas", 1, "uncommon", True, "star"),
+    Ach("happy_new_noise", "new_year", 1, "legendary", True, "star"),
+    # odd things to do
+    Ach("disco_mode", "disco", 1, "uncommon", True, "palette"),
+    Ach("hermit", "hermit", 1, "rare", True, "offline"),
+    Ach("pulled_plug", "unplugged", 1, "common", True, "mic_off"),
+    Ach("old_school", "konami", 1, "rare", True, "gamepad"),
+    # the hunt itself
+    Ach("achievement_hunter", "hidden_got", 10, "rare", True, "trophy"),
+    Ach("completionist", "all_got", 1, "super", True, "trophy"),   # every other (_goals)
 )
 BY_ID = {a.id: a for a in ALL}
 _BY_STAT: dict[str, list[Ach]] = {}
@@ -117,7 +140,8 @@ del _a
 SETS = {"stations": 1000, "countries": 300, "upvotes": 100, "voices": 25, "themes": 64,
         "months": 12, "games": 4, "packs": 6, "rares": 3}
 # the stats that keep the most seen, not a running total (at_least)
-BEST = {"hotkeys", "radio_run_s", "open_run_s", "sounds_added"}
+BEST = {"hotkeys", "radio_run_s", "open_run_s", "sounds_added", "longest_s", "at_once",
+        "hidden_got", "all_got"}
 
 # usage.used() names that count (the rest add up for nothing here)
 EVENTS = {
@@ -128,7 +152,9 @@ EVENTS = {
     "voice-saved": "voice_saved", "translate-on": "translate", "ai-voice-made": "ai_made",
     "voice-roll": "voice_roll", "store-shared": "store_shared",
     "remote-used-phone": "phone", "api-chat-command": "chat_command",
-    "triggers-went-off": "trigger",
+    "triggers-went-off": "trigger", "mic-unplugged": "unplugged",
+    "egg-onion-poked": "onion_poked", "egg-onion-eaten": "onion_eaten",
+    "egg-onion-please": "onion_please",
     **{f"splash-{k}": f"splash_{k}" for k in ("gold", "ice", "galaxy", "rainbow")},
 }
 # usage.used() prefixes whose rest goes in a set: egg-game-pong -> games {"pong"}
@@ -137,6 +163,13 @@ PREFIX_SETS = (("egg-game-", "games", ("pong", "draw", "rps", "ttt")),
                                          "halloween", "gm-starter")),
                ("splash-", "rares", ("gold", "ice", "galaxy")))
 LIVE = {"voice": "voice_s", "apps": "apps_s", "radio": "radio_run_s"}
+DISCO = (10, 30.0)     # Disco Mode: this many theme switches inside this many seconds
+ALBUM_END = 0.99       # Full Album: a long sound last seen this far through, then gone
+# (month, day, hour, minute) a sound is played on, None for any: Spooky Season, Ho Ho
+# Honk, and Happy New Noise in the first minute of the year
+DATES = {"halloween": (10, 31, None, None), "christmas": (12, 25, None, None),
+         "new_year": (1, 1, 0, 0)}
+META = ("hidden_got", "all_got")   # the hunt's own: counted from what's been earned
 
 on_unlock: list[Callable[[str], None]] = []
 
@@ -147,7 +180,9 @@ _live: dict[str, float] = {}     # LIVE key -> its time counted up to (time.mono
 _on_since: dict[str, float] = {}  # LIVE key -> when it went on
 _started = 0.0                   # this run's start, for open_run_s
 _dirty = False
-_goals: dict[str, float] = {}    # set_goal()
+_goals: dict[str, float] = {"completionist": len(ALL) - 1}   # set_goal()
+_switches: list[float] = []      # the last theme switches' times (Disco Mode)
+_long: dict[str, float] = {}     # a long sound playing -> how far through, last seen
 
 
 def attach(cfg, now: float | None = None, today: str | None = None,
@@ -177,6 +212,9 @@ def attach(cfg, now: float | None = None, today: str | None = None,
             bump("days")
         add("months", str(lt.tm_mon if month is None else month))
         sounds_now(len(getattr(cfg, "sounds", ()) or ()))
+        _switches.clear()
+        _long.clear()
+        _meta()   # what was earned before the hunt's own were added counts
 
 
 def detach() -> None:
@@ -279,11 +317,54 @@ def event(key: str) -> None:
             add(stat, key[len(prefix):])
 
 
-def played(hour: int | None = None) -> None:
-    """A sound was played (the 3 AM one counts the hour it was played in)."""
+def played(hour: int | None = None, when: time.struct_time | None = None) -> None:
+    """A sound was played (the 3 AM one counts the hour it was played in, the days
+    the date)."""
+    lt = time.localtime() if when is None else when
     bump("plays")
-    if (time.localtime().tm_hour if hour is None else hour) == 3:
+    if (lt.tm_hour if hour is None else hour) == 3:
         bump("play_3am")
+    for stat, (month, day, hr, minute) in DATES.items():
+        if ((lt.tm_mon, lt.tm_mday) == (month, day) and hr in (None, lt.tm_hour)
+                and minute in (None, lt.tm_min)):
+            bump(stat)
+
+
+def at_once(n: int) -> None:
+    """`n` of the board's sounds are playing together now (one just started)."""
+    at_least("at_once", n)
+
+
+def pitched(semitones: float) -> None:
+    """The live pitch was set by hand: all the way up or down (its normal range)."""
+    if semitones >= 12:
+        at_least("pitch_up", 1)
+    elif semitones <= -12:
+        at_least("pitch_down", 1)
+
+
+def theme_switched(now: float | None = None) -> None:
+    """A theme was picked: DISCO's many in a row is Disco Mode."""
+    count, secs = DISCO
+    now = time.monotonic() if now is None else now
+    with _lock:
+        _switches.append(now)
+        del _switches[:-count]
+        if len(_switches) == count and now - _switches[0] <= secs:
+            at_least("disco", 1)
+
+
+def heard(progress: dict[str, float]) -> None:
+    """The long sounds (an hour or more, not looping) playing now, sid -> 0..1 through
+    (the window's tick). One last seen at its end and gone now played all the way
+    through: Full Album."""
+    if not progress and not _long:
+        return
+    with _lock:
+        for sid in [s for s in _long if s not in progress]:
+            if _long.pop(sid) >= ALBUM_END:
+                bump("album")
+        _long.update(progress)
 
 
 def station(uuid: str, country: str) -> None:
@@ -330,9 +411,10 @@ def live(key: str, on: bool, now: float | None = None) -> None:
 
 
 def tick(now: float | None = None, tor: bool = False, offline: bool = False,
-         hotkeys: int = 0, sounds: int | None = None) -> bool:
+         hotkeys: int = 0, sounds: int | None = None, longest: float = 0) -> bool:
     """The window's usage tick: live time so far, this run's length and what's set up
-    now. True when something changed since the last tick (save the settings)."""
+    now (`longest`: the longest sound on the board, in seconds). True when something
+    changed since the last tick (save the settings)."""
     global _dirty
     with _lock:
         if _cfg is None:
@@ -341,9 +423,11 @@ def tick(now: float | None = None, tor: bool = False, offline: bool = False,
         for key in list(_live):
             _settle(key, now)
         at_least("open_run_s", now - _started)
-        for stat, on in (("tor", tor), ("offline", offline)):
+        for stat, on in (("tor", tor), ("offline", offline), ("hermit", tor and offline)):
             if on and not value(stat):
                 bump(stat)
+        if longest:
+            at_least("longest_s", longest)
         if hotkeys:
             at_least("hotkeys", hotkeys)
         if sounds is not None:
@@ -374,3 +458,14 @@ def _check(stat: str) -> None:
                     f(a.id)
                 except Exception:   # a listener's bug never stops the counting
                     log.exception("achievement listener")
+            if stat not in META:
+                _meta()
+
+
+def _meta() -> None:
+    """Achievement Hunter (hidden ones earned) and Completionist (every other one)."""
+    if _cfg is None:
+        return
+    gots = _cfg.achievements["got"]
+    at_least("hidden_got", sum(1 for a in ALL if a.hidden and a.id in gots))
+    at_least("all_got", sum(1 for a in ALL if a.id != "completionist" and a.id in gots))
