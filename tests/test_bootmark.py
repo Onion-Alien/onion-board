@@ -235,3 +235,25 @@ def test_the_installer_copies_python_first_and_the_exe_last_moving_the_old_aside
         part = iss[iss.index(section):]
         part = part[:part.index("\n[", 1)]
         assert "{#AppExeName}.exe.old*" in part, section
+
+
+def test_start_remembers_when_the_last_breadcrumb_was_left(tmp_path):
+    """usage.startup_failed compares it with when Windows last started: a PC shut down
+    or restarted while the app loaded isn't a start that failed."""
+    bootmark.mark("1.9.27", tmp_path)
+    os.utime(tmp_path / bootmark.NAME, (1000.0, 1000.0))
+    bootmark.start("1.9.28", tmp_path)
+    assert bootmark.previous_at() == 1000.0
+    bootmark.clear(tmp_path)
+    bootmark.start("1.9.28", tmp_path)
+    assert bootmark.previous_at() == 0.0   # nothing left: nothing to date
+
+
+def test_stepping_aside_for_the_installer_takes_the_breadcrumb_away():
+    """main.py quits on its own when the installer is replacing the files mid-import:
+    a normal end, so it must not leave the breadcrumb for the next start to count."""
+    from pathlib import Path
+    src = (Path(__file__).resolve().parent.parent / "main.py").read_text(encoding="utf-8")
+    after = src[src.index("except Exception:"):]
+    block = after[:after.index("raise")]
+    assert "bootmark.clear()" in block

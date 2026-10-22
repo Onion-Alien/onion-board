@@ -1092,12 +1092,15 @@ def mark_stopped(app_dir: Path) -> None:
         pass
 
 
-def startup_failed(app_dir: Path, version: str, pid: int = 0, native: str = "") -> str:
+def startup_failed(app_dir: Path, version: str, pid: int = 0, native: str = "",
+                   started: float = 0.0) -> str:
     """`startup-failed/<version>` for a run that died before it started (bootmark.py's
     breadcrumb was left behind): a crash while Qt or a module loaded, which left no
     report and no running.txt. Adds what ended it when it's known -- the native stacks
     faulthandler caught, or Windows' own error for that process -- as names and our own
-    file:line only, never a message. Runs wevtutil (call it off the UI thread)."""
+    file:line only, never a message. "" (nothing to count) when it left no trace and
+    Windows started again since the breadcrumb was left at `started`: the PC was shut
+    down or lost power while the app loaded. Runs wevtutil (call it off the UI thread)."""
     from soundboard.core import exitwatch
     event = f"startup-failed/{version}"
     err, where = exitwatch.native_summary(native)
@@ -1109,6 +1112,8 @@ def startup_failed(app_dir: Path, version: str, pid: int = 0, native: str = "") 
             return event + "/" + "@".join(p for p in (ev["code"], ev["module"]) if p)
     if any(ev["kind"] == "not-responding" for ev in events):
         return event + "/not-responding"
+    if started and exitwatch.boot_time() > started:
+        return ""   # like an unclean exit's pc-restarted: not the app's problem
     return event
 
 

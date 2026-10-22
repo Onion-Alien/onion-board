@@ -651,6 +651,7 @@ def main():
     if splash.rare():   # a rare loading screen came up (Golden Bun and the rest)
         usage.used(f"splash-{splash.rare()}")
     failed_ver, failed_pid = bootmark.previous()   # a start that never got this far
+    failed_at = bootmark.previous_at()
     bootmark.clear(APP_DIR)   # running.txt (just written) is the marker from here on
     if unclean:   # work out why (Windows' log, the native-crash stacks) off this thread
         def why(unclean=unclean):
@@ -664,9 +665,9 @@ def main():
         threading.Thread(target=why, daemon=True, name="last-exit").start()
     elif failed_ver:   # died while loading, before running.txt or the window existed
         native = last_run[1]
-        def why_failed(ver=failed_ver, pid=failed_pid, native=native):
+        def why_failed(ver=failed_ver, pid=failed_pid, native=native, at=failed_at):
             try:
-                usage.note(usage.startup_failed(APP_DIR, ver, pid, native))
+                usage.note(usage.startup_failed(APP_DIR, ver, pid, native, at))
             except Exception:  # noqa: BLE001 - still count it, without the why
                 log.warning("couldn't tell why the last start failed", exc_info=True)
                 usage.note(f"startup-failed/{ver}")
