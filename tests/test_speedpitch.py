@@ -336,3 +336,28 @@ def test_every_live_preset_and_effect_has_a_count_name():
     from soundboard.core import usage
     assert {usage.live_preset_tag(n) for n in livefx.PRESETS} == set(usage.LIVE_PRESETS) - {"other"}
     assert {f"fx-{q.key}" for q in livefx.PARAMS} <= set(usage.LIVE_CONTROLS)
+
+
+def test_live_header_buttons_fit_their_words_on_the_screen_they_open_on(qapp):
+    """Measured where it opens: a pop-up built on one monitor and opened on one with
+    other scaling cut its button's words off ("Save as new pa")."""
+    from PySide6.QtWidgets import QPushButton
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
+
+    button = SpeedPitchButton("sounds")
+    try:
+        save = button.save_btn
+        save.setText("Save as new pad, a much longer label")   # words that grew
+        save.setText("Save as new pad")
+        wide = save.font()
+        wide.setPointSizeF(wide.pointSizeF() * 1.3)
+        save.setFont(wide)
+        button._open()
+        qapp.processEvents()
+        assert button.pop.screen() is button.screen()
+        for b in (save, button.pop.findChild(QPushButton, "liveReset")):
+            need = b.fontMetrics().horizontalAdvance(b.text()) + b.iconSize().width()
+            assert b.width() > need, b.text()
+    finally:
+        button.pop.close()
+        button.deleteLater()
