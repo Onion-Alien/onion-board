@@ -582,6 +582,10 @@ class Config:
     twitch_refresh: str = ""
     twitch_login: str = ""
     twitch_user_id: str = ""
+    # the card's "let the developer see this channel's name" box (off until ticked; reset
+    # on Disconnect, so a new account is asked again): the daily usage count adds
+    # twitch-channel/<login> while connected (soundboard.core.usage.hits)
+    twitch_share: bool = False
     # "remote" add-ons' own settings (soundboard.ui.settings.remotehost), by add-on id: Onion
     # Pocket's on / off, port and key
     remote_addons: dict = field(default_factory=dict)
