@@ -659,6 +659,40 @@ def test_a_working_or_unknown_mic_is_left_alone(fake_reg, monkeypatch, tmp_path,
     assert calls == [("listen", GUID), (False, ()), (True, ["midisrv"]), ("listen", GUID)]
 
 
+def test_a_mic_that_cant_be_listened_to_before_gets_no_extra_restarts(
+        fake_reg, monkeypatch, tmp_path, caplog):
+    """Windows refused to open the mic before the step, and again a moment later (a mic
+    app's own mic, such as SteelSeries Sonar's, right after the board was ended): its
+    silence after the step can't be shown to be the step's. Sonar's mic sends only zeros
+    in a quiet room, and blaming the step restarted all the PC's sound three more times,
+    ended Sonar and called the set-up failed."""
+    caplog.set_level("INFO", logger=dm.log.name)
+    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [None, None] + [True] * 40)
+    assert dm.admin_install(GUID) == 0
+    assert calls[:2] == [("listen", GUID), ("listen", GUID)]   # asked once more
+    assert len([c for c in calls if c[0] is False]) == 1   # the step's own restart only
+    assert "can't tell if mic" in caplog.text
+
+
+def test_a_mic_heard_on_the_second_listen_before_is_still_checked_after(
+        fake_reg, monkeypatch, tmp_path):
+    """Can't tell at first, real sound a moment later: a working mic, so silence after
+    the step is the step's and gets the extra restarts."""
+    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [None, False] + [True] * 40)
+    assert dm.admin_install(GUID) == dm.MIC_SILENT
+    assert len([c for c in calls if c[0] is False]) == 1 + dm.EXTRA_RESTARTS
+
+
+def test_mic_apps_quiet_before_counts_a_mic_that_cant_be_listened_to(monkeypatch):
+    """Not listened to before the step: never ended for its silence after it."""
+    _mic_app_kit(monkeypatch, [[100]], [])
+    monkeypatch.setattr(dm.time, "sleep", lambda s: None)
+    monkeypatch.setattr(dm, "_mic_is_silent", lambda g: None)
+    assert dm._mic_apps_quiet() == {SONAR_MIC}
+    monkeypatch.setattr(dm, "_mic_is_silent", lambda g: False)
+    assert dm._mic_apps_quiet() == set()
+
+
 @pytest.mark.parametrize("op", ["install", "reinstall"])
 def test_a_mic_already_silent_before_gets_no_extra_restarts(fake_reg, monkeypatch,
                                                            tmp_path, caplog, op):

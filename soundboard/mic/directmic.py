@@ -2070,14 +2070,15 @@ def _mic_app_mics(mic: str) -> list[str]:
 
 
 def _mic_apps_quiet() -> set[str]:
-    """The running mic apps' (MIC_APPS) mics sending only silence before a step: not
-    the step's doing (the app switched off, or set up to send nothing), so they're left
-    alone after it. A check: never fails the step."""
+    """The running mic apps' (MIC_APPS) mics sending only silence before a step, or
+    that can't be listened to (_heard_before): not shown to be the step's doing (the app
+    switched off, or set up to send nothing), so they're left alone after it. A check:
+    never fails the step."""
     quiet = set()
     try:
         for exe, _parent, mic in MIC_APPS:
             if _processes(exe):
-                quiet |= {g for g in _mic_app_mics(mic) if _mic_is_silent(g)}
+                quiet |= {g for g in _mic_app_mics(mic) if _heard_before(g) is not False}
     except Exception:  # noqa: BLE001
         log.info("couldn't listen to the mic apps before the step", exc_info=True)
     return quiet
@@ -2142,15 +2143,38 @@ def _processes(exe: str) -> list[tuple[int, str]]:
     return found
 
 
+def _heard_before(guid: str) -> bool | None:
+    """_mic_is_silent before a step, asked once more after a moment when it can't tell:
+    Windows can refuse to open a mic for a moment (a mic app's own, such as SteelSeries
+    Sonar's, right after the board using it was ended)."""
+    heard = _mic_is_silent(guid)
+    if heard is None:
+        time.sleep(BEFORE_RETRY_S)
+        heard = _mic_is_silent(guid)
+    return heard
+
+
+BEFORE_RETRY_S = 2
+
+
 def _silent_before(guids: Sequence[str]) -> set[str]:
-    """The mics among `guids` sending only exact zeros now (a check: never fails)."""
+    """The mics among `guids` sending only exact zeros now (a check: never fails). One
+    that can't be listened to counts as silent too: its silence after the step can't be
+    shown to be the step's, and blaming the step cost a mic app's mic that only sends
+    zeros in a quiet room (Sonar's) three more restarts of all the PC's sound, Sonar
+    itself, and a set-up called failed."""
     quiet = set()
     for g in dict.fromkeys(g.lower() for g in guids):
         try:
-            if _mic_is_silent(g):
-                quiet.add(g)
+            heard = _heard_before(g)
         except Exception:  # noqa: BLE001
             log.info("couldn't listen to mic %s before the step", g, exc_info=True)
+            heard = None
+        if heard is None:
+            log.info("can't tell if mic %s sends sound before the step: its silence "
+                     "after it isn't counted as the step's", g)
+        if heard is not False:
+            quiet.add(g)
     if quiet:
         log.info("%s already sends only silence (switched off or muted?): not the "
                  "step's doing", ", ".join(sorted(quiet)))
