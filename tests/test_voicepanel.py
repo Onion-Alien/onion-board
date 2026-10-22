@@ -2501,3 +2501,31 @@ def test_start_and_recognition_options_wait_for_speech_recognition(panel):
     s.installs._refresh_module()
     assert not any(w.isHidden() for w in needs)
     assert s.installs.missing.isHidden()
+
+
+def test_a_stuck_windows_speech_at_launch_shows_no_toast(qapp, monkeypatch):
+    """The launch lists Windows' voices in the background, before anyone asked for
+    speech (they may be on the Sounds tab): its error is logged, not toasted. The
+    same error when a line is being typed is shown."""
+    from tests.conftest import process_events
+
+    def stuck(self):
+        self.error = "Windows speech stopped answering"
+        return []
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", stuck)
+    toasts = []
+    monkeypatch.setattr("soundboard.ui.kit.busy.toast", lambda w, t, *a, **k: toasts.append(t))
+    from soundboard.ui.voice.voicepanel import VoicePanel
+    filled = []
+    p = VoicePanel(FakeEngine(), {"enabled": False, "effects": {}}, {"rate": 2})
+    try:
+        s = p.speech
+        s._voices_quiet.connect(lambda *a: filled.append(a))
+        assert process_events(qapp, lambda: filled)
+        qapp.processEvents()
+        assert not [t for t in toasts if "Text-to-speech" in t]
+        s._fill_voices([], "Windows speech stopped answering")   # a line being typed
+        assert [t for t in toasts if "Text-to-speech" in t]
+    finally:
+        p.shutdown()
+        p.deleteLater()
