@@ -268,6 +268,71 @@ def test_a_slow_start_writes_down_where_it_waited(tmp_path):
     assert "test_a_slow_start_writes_down_where_it_waited" in path.read_text(encoding="utf-8")
 
 
+def test_the_stall_file_names_each_thread_and_starts_fresh(tmp_path):
+    import threading
+    import time
+    (tmp_path / bootmark.STALL_NAME).write_text("the last start's note", encoding="utf-8")
+    done = threading.Event()
+    t = threading.Thread(target=done.wait, name="splash", daemon=True)
+    t.start()
+    bootmark.watch_stall(tmp_path, seconds=0.05)
+    time.sleep(0.3)
+    _took, path = bootmark.stop_stall()
+    done.set()
+    text = path.read_text(encoding="utf-8")
+    assert "(splash):" in text and "the last start's note" not in text
+    assert "(startup-stall)" not in text   # not its own stack
+
+
+def test_the_stall_watch_survives_threads_busy_making_frames(tmp_path):
+    """faulthandler's dump_traceback_later read the other threads' frames without
+    Python's lock while they ran, and crashed the app on a slow start (the splash and
+    the UI thread both busy). Snapshots every millisecond while threads start, recurse
+    and end: the old watchdog crashed Python on this within seconds."""
+    import threading
+    import time
+    stop = threading.Event()
+
+    def churn(n=0):
+        while not stop.is_set():
+            if n < 30:
+                churn(n + 1)
+                return
+            [i * i for i in range(50)]
+
+    def deep(n):
+        return 0 if n == 0 else deep(n - 1) + 1
+
+    def spawner():
+        while not stop.is_set():
+            ts = [threading.Thread(target=deep, args=(400,)) for _ in range(8)]
+            for t in ts:
+                t.start()
+            for t in ts:
+                t.join()
+    workers = [threading.Thread(target=f, daemon=True) for f in (churn, churn, spawner, spawner)]
+    for w in workers:
+        w.start()
+    bootmark.watch_stall(tmp_path, seconds=0.001)
+    time.sleep(2.0)
+    _took, path = bootmark.stop_stall()
+    stop.set()
+    for w in workers:
+        w.join(timeout=5)
+    assert path is not None and "churn" in path.read_text(encoding="utf-8")
+
+
+def test_no_faulthandler_watchdog_in_the_app():
+    """dump_traceback_later's watchdog reads running threads' frames unlocked (see
+    above): the app's own threads take stacks with sys._current_frames() instead."""
+    from pathlib import Path
+    root = Path(__file__).resolve().parent.parent
+    users = [str(p.relative_to(root)) for p in [root / "main.py",
+                                               *(root / "soundboard").rglob("*.py")]
+             if "dump_traceback_later(" in p.read_text(encoding="utf-8")]
+    assert users == []
+
+
 def test_a_quick_start_leaves_no_stall_file(tmp_path):
     bootmark.watch_stall(tmp_path, seconds=30)
     took, path = bootmark.stop_stall()

@@ -109,43 +109,77 @@ def clear(directory: Path | None = None) -> None:
 
 STALL_NAME = "startup-stall.txt"
 STALL_S = 10.0   # a start slower than this writes down where it is, every STALL_S
-_stall: tuple | None = None   # (open file, its path, when watching started)
+STALL_FRAMES = 40   # innermost frames kept per thread
+_stall: tuple | None = None   # (stop event, its thread, the file's path, when watching started)
 
 
 def watch_stall(directory: Path | None = None, seconds: float = STALL_S) -> None:
     """From the loading screen until the window is up (stop_stall): every `seconds`,
     what each thread is doing goes into startup-stall.txt, so a start that takes a
-    minute says where it waited. faulthandler writes from a thread of its own, so this
-    works however stuck the UI thread is. Only code locations; it stays on this PC."""
+    minute says where it waited. Only code locations; it stays on this PC.
+
+    Not faulthandler.dump_traceback_later: its watchdog walks the other threads' frames
+    without Python's lock while they keep running, and one freed under it (the splash
+    and the UI thread both busy, on a slow start) crashed the app in faulthandler's
+    dump_frame. sys._current_frames() takes the lock, so the frames hold still."""
     global _stall
-    import faulthandler
+    import threading
     import time
     try:
         path = (Path(directory) if directory is not None else app_dir()) / STALL_NAME
-        f = open(path, "w", encoding="utf-8")   # noqa: SIM115 - open until stop_stall
-        faulthandler.dump_traceback_later(seconds, repeat=True, file=f)
-        _stall = (f, path, time.monotonic())
-    except (OSError, RuntimeError, ValueError):
+        path.unlink(missing_ok=True)   # written only once a start is slow
+    except OSError:
         _stall = None
+        return
+    stop = threading.Event()
+    thread = threading.Thread(target=_stall_loop, args=(stop, path, seconds),
+                              name="startup-stall", daemon=True)
+    _stall = (stop, thread, path, time.monotonic())
+    thread.start()
+
+
+def _stall_loop(stop, path: Path, seconds: float) -> None:
+    while not stop.wait(seconds):
+        try:
+            text = _stacks()
+            with open(path, "a", encoding="utf-8") as f:
+                f.write(text)
+        except Exception:   # noqa: BLE001 - a note about a slow start must never hurt it
+            return
+
+
+def _stacks() -> str:
+    """Every other thread's stack, innermost frame last, as faulthandler's dump named them."""
+    import sys
+    import threading
+    import traceback
+    names = {t.ident: t.name for t in threading.enumerate()}
+    me = threading.get_ident()
+    out = []
+    for ident, frame in sys._current_frames().items():
+        if ident == me:
+            continue
+        out.append(f"Thread {ident:#x} ({names.get(ident, '?')}):\n")
+        out.extend(traceback.format_stack(frame, limit=STALL_FRAMES))
+        out.append("\n")
+    return "".join(out)
 
 
 def stop_stall() -> tuple[float, Path | None]:
     """Stop watching: (seconds since watch_stall, startup-stall.txt if the start was
-    slow enough to write in it, else None and the empty file is removed)."""
+    slow enough to write in it, else None)."""
     global _stall
-    import faulthandler
     import time
     if _stall is None:
         return 0.0, None
-    f, path, t0 = _stall
+    stop, thread, path, t0 = _stall
     _stall = None
-    faulthandler.cancel_dump_traceback_later()
+    stop.set()
+    thread.join(timeout=2.0)   # a dump half-written: let it finish
     took = time.monotonic() - t0
     try:
-        f.close()
         if path.stat().st_size:
             return took, path
-        path.unlink(missing_ok=True)
     except OSError:
         pass
     return took, None

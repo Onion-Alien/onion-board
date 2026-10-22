@@ -1,0 +1,1 @@
+- Fixed a crash while the app was starting: on a slow start, the check that notes where start-up is waiting could itself crash the app.
