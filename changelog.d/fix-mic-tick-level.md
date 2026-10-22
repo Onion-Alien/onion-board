@@ -1,1 +1,0 @@
-- The tick next to "Your sounds go into your mic" now sits level with the text.

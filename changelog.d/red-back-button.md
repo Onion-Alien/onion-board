@@ -1,1 +1,0 @@
-- The Back button over online search results is red with a soft glow now, so the way back to your sounds is easy to spot.

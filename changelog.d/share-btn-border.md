@@ -1,1 +1,0 @@
-- The store's *Share a sound* button, greyed out while the store can't be reached, has an even edge all round again (its top edge looked cut off).

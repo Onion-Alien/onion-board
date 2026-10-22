@@ -1,1 +1,0 @@
-- The + next to the category tabs now opens a name box right where the new tab goes: type, press Enter to add it, Esc to cancel. No more pop-up.

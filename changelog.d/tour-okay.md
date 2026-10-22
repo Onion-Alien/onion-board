@@ -1,1 +1,0 @@
-- The tutorial cards' quiet button says OK instead of Not now.
