@@ -420,8 +420,12 @@ def _never_touch_the_real_mic(monkeypatch, tmp_path):
     monkeypatch.setattr(directmic, "installed_on", lambda: [])
     monkeypatch.setattr(directmic, "capture_endpoints", lambda: [])   # nor this PC's mics
     monkeypatch.setattr(directmic, "_mic_is_silent", lambda guid: None)   # nor listens to one
-    # nor restarts one of its mics, or reads or edits what Windows removes at its restart
-    monkeypatch.setattr(directmic, "_mic_restart_works", lambda: False)
+    # nor opens one, or waits for the effect to start on one, or asks SteelSeries Sonar
+    # about its devices, or reads or edits what Windows removes at its restart
+    monkeypatch.setattr(directmic, "_mics_open", lambda guids: set())
+    monkeypatch.setattr(directmic, "_effect_runs", lambda guids, mark: True)
+    monkeypatch.setattr(directmic, "_processes", lambda exe: [])
+    monkeypatch.setattr(directmic, "GG_PROPS", tmp_path / "guard" / "coreProps.json")
     monkeypatch.setattr(directmic, "_unmark", lambda paths: None)
     monkeypatch.setattr(directmic, "_marked", lambda path: False)
     # nor its mic helper (soundboard.mic.michelper): no real Program Files, task or queue

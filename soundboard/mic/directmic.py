@@ -1531,49 +1531,23 @@ def _stopped_soon(wait_s: float | None = None) -> bool:
         time.sleep(1.0)
 
 
-ENDPOINT_DEVICE = "SWD\\MMDEVAPI\\{0.0.1.00000000}."   # a mic's own device: this + its GUID
-
-
-def _mic_restart_works() -> bool:
-    """This Windows can restart one device on its own (pnputil /restart-device: Windows
-    10 2004 and later)."""
-    try:
-        r = subprocess.run(["pnputil", "/?"], capture_output=True, text=True,
-                           errors="replace", timeout=15, creationflags=_CREATE_NO_WINDOW)
-    except (OSError, subprocess.TimeoutExpired):
-        return False
-    return "/restart-device" in r.stdout
-
-
-def _restart_mics(guids: Sequence[str]) -> bool:
-    """Restart only the mics `guids` (the active ones): Windows reads their effect
-    settings again, as when one is unplugged and plugged back in, and every app that
-    records one picks it up again by itself. A restart of all of Windows' audio also
-    cut off the apps that sit between the mic and a voice chat (a virtual mic of their
-    own) until they were restarted. False if one wouldn't restart."""
-    active = {e["guid"].lower() for e in capture_endpoints() if e["active"]}
-    ok = True
-    for g in dict.fromkeys(g.lower() for g in guids):
-        if g in active and _run(["pnputil", "/restart-device", ENDPOINT_DEVICE + g],
-                                timeout=60.0):
-            ok = False
-    return ok
-
-
-_audio_restarts = 0   # restarts of all of Windows' audio (_restart_audio) so far
+# (Restarting only the mic a step changed, pnputil /restart-device on its endpoint, was
+# tried in place of all of the audio and dropped: a USB headset's mic came back without
+# the effect, twice in a row, and a mic it came off refused every app until all of the
+# audio restarted. A full restart worked on every mic.)
 
 
 def _restart_audio() -> bool:
-    """Restart all of Windows' audio (the services that ran on it too). False if it
-    wouldn't stop (it's started again either way)."""
-    global _audio_restarts
-    _audio_restarts += 1
+    """Restart all of Windows' audio (the services that ran on it too), and put SteelSeries
+    Sonar's devices back after it (_sonar_back). False if it wouldn't stop (it's started
+    again either way)."""
     dependents = _running_dependents()
     _audio_comes_back(dependents)
     try:
         return _audio_service(False)
     finally:
         _audio_service(True, dependents)
+        _sonar_back()
 
 
 def _register_com(dll: Path):
@@ -1982,83 +1956,92 @@ def _make_ring():
 def _audio_off(work, also: Sequence[str] = ()) -> int:
     """Run `work` (it returns an exit code) with Windows' audio stopped: the endpoint
     builder reads the mics' effect settings when it starts. The audio always starts
-    again, however `work` ends; if it won't stop, nothing is touched (6). `work` done
-    but a mic still sends only silence after every restart (_mics_come_back_live):
-    MIC_SILENT. A mic (the effect's, or `also`: the one it goes on) that was already
-    silent before isn't the step's doing: a headset that's switched off, or its mic
-    muted, sends only zeros too, and restarting the audio for it only cut the sound.
-    Where Windows can restart one mic on its own (_mic_restart_works), `work` runs with
-    the audio on and only the mics it changed restart after it (_restart_mics): the
-    rest of the PC's sound, and the apps in between a mic and a voice chat, carry on."""
+    again, however `work` ends; if it won't stop, nothing is touched (6). `work` done,
+    the audio back, and then checked (_after_restart): the effect has to start on its mic
+    (else EFFECT_NOT_STARTED) and every mic the step changed that apps could open before
+    has to open again (else MIC_SHUT), each given one more restart first. A mic still
+    sending only silence after every restart (_mics_come_back_live): MIC_SILENT. A mic
+    (the effect's, or `also`: the one it goes on) that was already silent before isn't
+    the step's doing: a headset that's switched off, or its mic muted, sends only zeros
+    too, and restarting the audio for it only cut the sound."""
     _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
+    touched = [*installed_on(), *also]
     # a mic the last step left silent (MIC_SILENT, just now) is silent before this retry
     # too, but that's the stuck mic the retry is for: it still gets the extra restarts
-    quiet = _silent_before([*installed_on(), *also]) - _left_silent()
+    quiet = _silent_before(touched) - _left_silent()
+    opened = _mics_open(touched)
     apps_quiet = _mic_apps_quiet()
-    # a mic app's own mic (SteelSeries Sonar's) the step changes: restarting it on its
-    # own after the effect came off left it refusing every app that opened it, until all
-    # of Windows' audio restarted. So it gets that, and its app a restart after it
-    # (_mic_apps_back): all of the audio restarting cuts it off, silent before or not.
-    own = {g.lower() for g in [*installed_on(), *also]} & _mic_app_guids()
-    if _mic_restart_works() and not own:
-        return _mic_by_mic(work, also, quiet, apps_quiet)
+    _sonar_keep()
     dependents = _running_dependents()
     _audio_comes_back(dependents)
     mics: list[str] | None = None
-    code = None
+    code: int | None = None
+    checked = mark = 0
     try:
         if not _audio_service(False):
             return 6   # don't rewrite a live endpoint if Windows couldn't stop its audio
+        mark = _apo_log_size()   # (no effect runs now: what it logs after this is new)
         mics = installed_on()   # the one it comes off is listened to as well
         code = work()
     finally:
         _audio_service(True, dependents)
+        _sonar_back()
+        if code == 0:
+            checked = _after_restart(opened, mark)
         live = mics is None or _mics_come_back_live(mics, quiet)
-        _mic_apps_back(apps_quiet - own)
-    return MIC_SILENT if code == 0 and not live else code
-
-
-def _mic_by_mic(work, also: Sequence[str], quiet: Collection[str],
-                apps_quiet: Collection[str] = ()) -> int:
-    """_audio_off with the audio on: `work`, then a restart of each mic whose effect
-    settings it changed (`also` and the ones the effect was on too). A mic that won't
-    restart on its own: all of Windows' audio restarts instead (if that won't stop
-    either, the change waits for the PC's next restart: 6). Files it removes go after
-    the restart (_remove_held): Windows' audio still holds the effect until then.
-    The mic apps (_mic_apps_back) are only seen to when all of Windows' audio did
-    restart: a mic restarted on its own doesn't cut them off. A mic restarted on its own
-    can also come back without the effect running at all (a USB headset's did): if it
-    doesn't start (_effect_runs), all of Windows' audio restarts as well."""
-    global _held
-    restarts = _audio_restarts
-    mics = installed_on()   # the one it comes off is listened to as well
-    before = _fx_now()
-    mark = _apo_log_size()
-    code: int | None = None
-    _held = []
-    try:
-        code = work()
-    finally:
-        held, _held = _held, None
-        after = _fx_now()
-        changed = [g for g in {*before, *after} if before.get(g) != after.get(g)]
-        restarted = _restart_mics([*mics, *also, *installed_on(), *changed])
-        if not restarted:
-            log.warning("a mic wouldn't restart on its own: restarting Windows' audio")
-            restarted = _restart_audio()
-        elif code == 0 and not _effect_runs(installed_on(), mark):
-            log.warning("the effect didn't start on its mic after the mic restarted: "
-                        "restarting Windows' audio")
-            restarted = _restart_audio()
-        _remove_held(held)
-        live = _mics_come_back_live(mics, quiet, one_by_one=True)
-        if _audio_restarts != restarts:
-            _mic_apps_back(apps_quiet)
-    if code == 0 and not restarted:
-        return 6
+        _mic_apps_back(apps_quiet)
     if code is None:   # (work raised: its exception goes on from the finally above)
         return 1
+    if code == 0 and checked:
+        return checked
     return MIC_SILENT if code == 0 and not live else code
+
+
+EFFECT_NOT_STARTED = 8   # the step was done, but the effect didn't start on its mic
+MIC_SHUT = 9             # the step was done, but a mic apps could open before won't open
+
+
+def _after_restart(opened: Collection[str], mark: int) -> int:
+    """After a step's audio restart: the effect started on each mic it's on now
+    (_effect_runs; its log from `mark` on), and each mic in `opened` (apps could open it
+    before the step) opens again (_mics_open). Either not: all of Windows' audio restarts
+    once more and they're checked again. 0 when both are fine (a check that can't tell
+    counts as fine), else EFFECT_NOT_STARTED or MIC_SHUT."""
+    for again in (False, True):
+        runs = _effect_runs(installed_on(), mark)
+        now = _mics_open(opened)
+        shut = [g for g in opened if g not in now]
+        if runs and not shut:
+            return 0
+        if not runs:
+            log.warning("the effect didn't start on its mic after the audio restart")
+        if shut:
+            log.warning("%s won't open after the audio restart", ", ".join(shut))
+        if again:
+            return MIC_SHUT if shut else EFFECT_NOT_STARTED
+        log.warning("restarting Windows' audio once more")
+        mark = _apo_log_size()
+        _restart_audio()
+    return 0
+
+
+def _mics_open(guids: Collection[str]) -> set[str]:
+    """The mics among `guids` an app can open now (appaudio.mic_opens), lowercase. One
+    that can't be told about (unplugged, the check failing) isn't in it: it isn't
+    checked again after the step either. A check: never fails."""
+    from soundboard.audio import appaudio
+    opens = set()
+    for g in dict.fromkeys(g.lower() for g in guids):
+        try:
+            ok = appaudio.mic_opens(g)
+        except Exception:  # noqa: BLE001
+            log.info("couldn't open mic %s", g, exc_info=True)
+            ok = None
+        if ok:
+            opens.add(g)
+        elif ok is False:
+            log.info("mic %s doesn't open", g)
+    return opens
 
 
 APO_LOG = "apo.log"     # in data_dir(): the effect's own log (obmic.cpp logv)
@@ -2101,8 +2084,7 @@ def _effect_runs(guids: Sequence[str], mark: int) -> bool:
             waiting = [g for g in waiting if f"initialize: endpoint {g}" not in text]
             if not waiting or time.monotonic() > end:
                 break
-            for g in waiting:
-                _mic_is_silent(g)   # opening it starts the effect on it
+            _mics_open(waiting)   # opening one starts the effect on it (muted too)
         if waiting:
             log.warning("the effect didn't start on %s", ", ".join(waiting))
         return not waiting
@@ -2111,18 +2093,14 @@ def _effect_runs(guids: Sequence[str], mark: int) -> bool:
         return True
 
 
-def _fx_now() -> dict[str, dict]:
-    """Every mic's effect settings now."""
-    return {e["guid"]: _fx_values(e["guid"]) for e in capture_endpoints()}
-
-
 # Apps that put a mic of their own between the real mic and voice chat (the chat app
 # records theirs): (their process, the process that starts it again when it ends, the
 # name their mic starts with). A restart of Windows' audio leaves their mic sending only
 # silence until they start again, so the voice chat hears nothing; ended, they're
 # started again by their own app within seconds, and that's how they're restarted here.
+SONAR_EXE = "SteelSeriesSonar.exe"
 MIC_APPS = (
-    ("SteelSeriesSonar.exe", "SteelSeriesGGEZ.exe", "SteelSeries Sonar - Microphone"),
+    (SONAR_EXE, "SteelSeriesGGEZ.exe", "SteelSeries Sonar - Microphone"),
 )
 MIC_APP_BACK_S = 30   # how long a restarted mic app gets to be running again
 
@@ -2131,15 +2109,6 @@ def _mic_app_mics(mic: str) -> list[str]:
     """The active mics whose name starts with `mic` (a mic app's own)."""
     return [e["guid"].lower() for e in capture_endpoints()
             if e["active"] and e["name"].startswith(mic)]
-
-
-def _mic_app_guids() -> set[str]:
-    """The mic apps' (MIC_APPS) own active mics, running or not (a check: never fails)."""
-    try:
-        return {g for _exe, _parent, mic in MIC_APPS for g in _mic_app_mics(mic)}
-    except Exception:  # noqa: BLE001
-        log.info("couldn't list the mic apps' mics", exc_info=True)
-        return set()
 
 
 def _mic_apps_quiet() -> set[str]:
@@ -2163,15 +2132,23 @@ def _mic_apps_back(quiet: Collection[str] = ()) -> None:
     mic listened to again. Only one its own app will start again is ended, and never
     one whose mic was silent before the step already (`quiet`, _mic_apps_quiet): that
     silence isn't the restart's, and ending it lost the app for good when its own app
-    didn't start it again. A check: never fails the step."""
+    didn't start it again. Sonar whose devices were set back (_sonar_back) is left
+    running; one whose own server answered but whose devices wouldn't go back is
+    restarted, silent before or not: its server says it's off. A check: never fails the
+    step."""
     try:
         for exe, parent, mic in MIC_APPS:
+            if exe == SONAR_EXE and _sonar_fixed:
+                continue
             running = _processes(exe)
             if not running:
                 continue
-            guids = [g for g in _mic_app_mics(mic) if g not in quiet]
-            if not guids or not any(_silent(g) for g in guids):
-                continue
+            if exe == SONAR_EXE and _sonar_fixed is False:
+                guids = _mic_app_mics(mic)
+            else:
+                guids = [g for g in _mic_app_mics(mic) if g not in quiet]
+                if not guids or not any(_silent(g) for g in guids):
+                    continue
             if not all(p == parent.lower() for _, p in running):
                 log.warning("%s's mic sends only silence after the audio restart, but "
                             "nothing would start it again: left as it is", exe)
@@ -2194,6 +2171,143 @@ def _mic_apps_back(quiet: Collection[str] = ()) -> None:
                          "still only silence" if silent else "sound")
     except Exception:  # noqa: BLE001 - a check: never fails the step
         log.warning("couldn't check the mic apps after the audio restart", exc_info=True)
+
+
+# SteelSeries Sonar sends its mic (and plays its Game / Chat / Media / Aux channels) through
+# devices it picked: a restart of Windows' audio drops its mic device (its mic then sends
+# only exact zeros) and moves its channels onto other devices, and it doesn't pick them
+# back. Its own local web server (what SteelSeries GG's window uses) sets a channel's
+# device: so the devices it had before a step are noted (_sonar_keep) and set again after
+# each audio restart (_sonar_back), with Sonar left running. Ending Sonar for SteelSeries
+# GG to start it again did the same, but GG starts it again only 3 times in a session.
+GG_PROPS = Path(os.environ.get("PROGRAMDATA", r"C:\ProgramData")) / "SteelSeries" / "GG" / \
+    "coreProps.json"
+SONAR_ROUTES = (("classicRedirections", "id"), ("streamRedirections", "streamRedirectionId"))
+SONAR_BACK_S = 20    # how long Sonar's devices get to be set again after an audio restart
+SONAR_SETTLE_S = 8   # ...watched at least this long: Sonar picks devices of its own meanwhile
+_DEVICE_ID = re.compile(r"\{0\.0\.[01]\.00000000\}\.\{[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-"
+                        r"[0-9a-fA-F]{12}\}")
+_ROUTE_ID = re.compile(r"[A-Za-z]{1,40}")
+_sonar_saved: dict[tuple[str, str], tuple[str, bool]] | None = None   # (_sonar_keep)
+_sonar_fixed: bool | None = None   # the last _sonar_back: True set, False not, None no Sonar
+
+
+def _local_http(method: str, address: str, path: str, tls: bool = False) -> bytes:
+    """`method` `path` on a server on this PC at `address` ("127.0.0.1:port", from a file
+    any user can write: nothing else is ever connected to). Its answer; OSError if it
+    isn't 2xx or doesn't answer."""
+    import http.client
+    host, _, port = address.removeprefix("http://").rstrip("/").rpartition(":")
+    if host != "127.0.0.1" or not port.isdigit() or not 0 < int(port) < 65536:
+        raise OSError(f"not a local address: {address!r}")
+    if tls:   # SteelSeries GG's own: a certificate it made itself, on this PC only
+        import ssl
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        conn = http.client.HTTPSConnection(host, int(port), timeout=5, context=ctx)
+    else:
+        conn = http.client.HTTPConnection(host, int(port), timeout=5)
+    try:
+        conn.request(method, path)
+        r = conn.getresponse()
+        body = r.read(1 << 20)
+    except (http.client.HTTPException, ValueError) as e:
+        raise OSError(str(e)) from e
+    finally:
+        conn.close()
+    if not 200 <= r.status < 300:
+        raise OSError(f"{method} {path}: HTTP {r.status}")
+    return body
+
+
+def _sonar_address() -> str:
+    """Sonar's web server ("http://127.0.0.1:port"), as SteelSeries GG lists it. OSError
+    when GG or Sonar isn't running."""
+    try:
+        gg = json.loads(GG_PROPS.read_text(encoding="utf-8"))["ggEncryptedAddress"]
+        apps = json.loads(_local_http("GET", str(gg), "/subApps", tls=True))
+        sonar = apps["subApps"]["sonar"]
+        if not sonar.get("isRunning"):
+            raise OSError("Sonar isn't running")
+        return str(sonar["metadata"]["webServerAddress"])
+    except (KeyError, TypeError, ValueError) as e:
+        raise OSError(f"no Sonar address: {e}") from e
+
+
+def _sonar_routes(address: str) -> dict[tuple[str, str], tuple[str, bool]]:
+    """Sonar's channels now: {(list, channel): (its device, running)}, both lists (its
+    classic and its streamer mode), channels without a device left out."""
+    routes = {}
+    for kind, key in SONAR_ROUTES:
+        try:
+            got = json.loads(_local_http("GET", address, "/" + kind))
+        except ValueError as e:
+            raise OSError(f"{kind}: {e}") from e
+        for r in got if isinstance(got, list) else ():
+            rid, dev = r.get(key) if isinstance(r, dict) else None, r.get("deviceId")
+            if isinstance(rid, str) and _ROUTE_ID.fullmatch(rid) and isinstance(dev, str) \
+                    and _DEVICE_ID.fullmatch(dev):
+                routes[(kind, rid)] = (dev.lower(), bool(r.get("isRunning")))
+    return routes
+
+
+def _sonar_keep() -> None:
+    """Note Sonar's devices before a step (none when it isn't running). A check: never
+    fails the step."""
+    global _sonar_saved, _sonar_fixed
+    _sonar_saved, _sonar_fixed = None, None
+    try:
+        if not _processes(SONAR_EXE):
+            return
+        _sonar_saved = _sonar_routes(_sonar_address())
+        log.info("Sonar's devices before the step: %s", ", ".join(
+            f"{rid}={dev}" for (_k, rid), (dev, _r) in sorted(_sonar_saved.items())))
+    except Exception:  # noqa: BLE001
+        log.info("couldn't read Sonar's devices before the step", exc_info=True)
+
+
+def _sonar_back() -> None:
+    """After an audio restart: each of Sonar's channels on another device than before
+    the step, or stopped when it ran, set back to its device (setting it again starts a
+    stopped one), until all are and SONAR_SETTLE_S have gone by; given up after
+    SONAR_BACK_S. Its result (_sonar_fixed) tells _mic_apps_back whether Sonar still
+    needs a restart. A check: never fails the step."""
+    global _sonar_fixed
+    if not _sonar_saved:
+        _sonar_fixed = None
+        return
+    start = time.monotonic()
+    answered = False
+    put: set[tuple[str, str]] = set()
+    while True:
+        wrong = list(_sonar_saved)
+        try:
+            address = _sonar_address()
+            now = _sonar_routes(address)
+            answered = True
+            wrong = [k for k, (dev, ran) in _sonar_saved.items()
+                     if now.get(k, ("", False))[0] != dev or (ran and not now[k][1])
+                     or k not in put]   # each set once at least: a stopped one can say it runs
+            for kind, rid in wrong:
+                dev = _sonar_saved[(kind, rid)][0]
+                try:
+                    _local_http("PUT", address, f"/{kind}/{rid}/deviceId/{dev}")
+                    put.add((kind, rid))
+                except OSError as e:   # its device not back yet: tried again
+                    log.info("Sonar's %s: %s", rid, e)
+        except Exception:  # noqa: BLE001 - Sonar's server not back yet
+            log.debug("Sonar didn't answer", exc_info=True)
+        waited = time.monotonic() - start
+        if not wrong and waited >= SONAR_SETTLE_S:
+            log.info("Sonar's devices are set as before the step")
+            _sonar_fixed = True
+            return
+        if waited > SONAR_BACK_S:
+            log.warning("couldn't set Sonar's devices back after the audio restart")
+            _sonar_fixed = False if answered else None
+            return
+        time.sleep(1)
 
 
 def _processes(exe: str) -> list[tuple[int, str]]:
@@ -2260,6 +2374,8 @@ MIC_SILENT = 7        # the step was done, but a mic still sends only silence
 EXTRA_RESTARTS = 3    # ...after this many more restarts of Windows' audio
 LEFT_SILENT = "left-silent.json"   # in data_dir(): the mics a step's MIC_SILENT named
 RETRY_S = 30 * 60     # a step this soon after one counts as its retry
+# what a step returns when its work was done (whatever the checks after it found)
+DONE_CODES = (0, MIC_SILENT, EFFECT_NOT_STARTED, MIC_SHUT)
 
 
 def _left_silent() -> set[str]:
@@ -2309,28 +2425,23 @@ def _silent(guid: str) -> bool:
     return bool(heard)
 
 
-def _mics_come_back_live(before: Sequence[str], quiet: Collection[str] = (),
-                          one_by_one: bool = False) -> bool:
+def _mics_come_back_live(before: Sequence[str], quiet: Collection[str] = ()) -> bool:
     """After the audio restart a mic can come back sending only exact zeros (an app
     such as a voice chat grabbed it the moment it was back), to every app and to Windows'
     own mic test, until the audio restarts again. So the mics the effect was on (`before`)
     and is on now are listened to: digital silence gets another restart, up to
     EXTRA_RESTARTS of them. False if a mic still sends only silence after those (the app
     then says so); True otherwise, "can't tell" and a failed check included. Mics in
-    `quiet` were silent before the step already (_silent_before): left alone.
-    `one_by_one`: the first extra restart is of the silent mics only (_restart_mics),
-    the rest of all of Windows' audio."""
+    `quiet` were silent before the step already (_silent_before): left alone."""
     try:
         silent = [g for g in dict.fromkeys([*before, *installed_on()])
                   if g.lower() not in quiet and _silent(g)]
         for n in range(1, EXTRA_RESTARTS + 1):
             if not silent:
                 break
-            log.warning("%s sends only silence after the audio restart: restarting %s "
-                        "again (%d of %d)", ", ".join(silent),
-                        "it" if one_by_one and n == 1 else "the audio", n, EXTRA_RESTARTS)
-            if not (one_by_one and n == 1 and _restart_mics(silent)):
-                _restart_audio()
+            log.warning("%s sends only silence after the audio restart: restarting the "
+                        "audio again (%d of %d)", ", ".join(silent), n, EXTRA_RESTARTS)
+            _restart_audio()
             silent = [g for g in silent if _silent(g)]
             if not silent:
                 log.info("the mic is back after %d more restart(s)", n)
@@ -2527,16 +2638,9 @@ def admin_cleanup(guid: str) -> int:
         return admin_uninstall(guid)
     _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
     leftover = any(without_ours(v)[0] for v in _fx_values(guid).values())
-    apps_quiet = _mic_apps_quiet() if leftover else set()
-    own = ({guid.lower()} & _mic_app_guids()) if leftover else set()   # as in _audio_off
-    if leftover and _mic_restart_works() and not own:
-        _strip_endpoint(guid)
-        if not _restart_mics([guid]):
-            restarted = _restart_audio()
-            _mic_apps_back(apps_quiet)
-            if not restarted:
-                return 6
-    elif leftover:
+    if leftover:
+        apps_quiet = _mic_apps_quiet()
+        _sonar_keep()
         dependents = _running_dependents()
         _audio_comes_back(dependents)
         try:
@@ -2545,22 +2649,16 @@ def admin_cleanup(guid: str) -> int:
             _strip_endpoint(guid)
         finally:
             _audio_service(True, dependents)
-            _mic_apps_back(apps_quiet - own)
+            _sonar_back()
+            _mic_apps_back(apps_quiet)
     if not installed_on() and anything_installed():
         return admin_uninstall()   # on no mic: the rest of it goes too
     return 0
 
 
-_held: list[Path] | None = None   # what _remove holds back while the audio is on
-
-
 def _remove(path: Path):
     """Delete a file or folder of ours. What Windows still holds open (an old copy of
-    the effect) goes at the next restart instead of staying behind for good. While a
-    step runs with the audio on (_mic_by_mic) it's only noted, for _remove_held."""
-    if _held is not None:
-        _held.append(path)
-        return
+    the effect) goes at the next restart instead of staying behind for good."""
     if path.is_dir():
         shutil.rmtree(path, ignore_errors=True)
         if path.exists():   # files first, deepest folders next, the folder itself last
@@ -2574,20 +2672,6 @@ def _remove(path: Path):
             pass
         except OSError:
             _gone_at_restart(path)
-
-
-def _remove_held(paths: Sequence[Path]):
-    """Delete what _remove held back, now that the mics have restarted and Windows'
-    audio has let go of an old copy of the effect. What the effect still uses stays:
-    an update to the same version had its folder taken away and put back, and marking
-    the copy in use for removal at the next restart broke the mic after it."""
-    using = []
-    if installed_on():
-        using = [_same_path(p) for p in (registered_dll(), ring_path()) if p is not None]
-    for path in dict.fromkeys(paths):
-        p = _same_path(path)
-        if not any(u == p or u.startswith(p + os.sep) for u in using):
-            _remove(path)
 
 
 SESSION_KEY = r"SYSTEM\CurrentControlSet\Control\Session Manager"
@@ -2722,7 +2806,7 @@ def cli(args: list[str]) -> int:
         except Exception:  # noqa: BLE001
             log.exception("mic effect %s failed", args[:1])
             return 1
-        if code in (0, MIC_SILENT) and args[0] in ("install", "reinstall", "cleanup") \
+        if code in DONE_CODES and args[0] in ("install", "reinstall", "cleanup") \
                 and not michelper.is_helper():
             # the one prompt also sets up (or updates) the helper: no prompt next time
             michelper.install_helper(user)
@@ -2965,8 +3049,9 @@ def no_effect() -> str:
 # own repair, which never asks Windows); no such mic; no effect in this copy; or the
 # admin step's own exit code: 1 it raised, 2 the mic isn't listed to admins, 3 the effect
 # file missing or empty, 4 another copy at it, 5 its data folder couldn't be secured,
-# 6 Windows' audio wouldn't stop. Never the message, the mic or a path.
-FAIL_CODES = (1, 2, 3, 4, 5, 6)
+# 6 Windows' audio wouldn't stop, 8 the effect didn't start on its mic, 9 a mic stopped
+# opening. Never the message, the mic or a path.
+FAIL_CODES = (1, 2, 3, 4, 5, 6, EFFECT_NOT_STARTED, MIC_SHUT)
 # no such mic, and why (mic_lookup): unplugged or off, two that look alike, unknown.
 # Plain "no-mic" is a set-up given no mic at all (and what 2.2 and older counted).
 NO_MIC_KINDS = ("no-mic-off", "no-mic-unsure", "no-mic-gone")

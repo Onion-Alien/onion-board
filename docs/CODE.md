@@ -56,6 +56,13 @@ the route (`Config.route`, `library.ROUTES`):
   again button. `michelper.ready()` keeps its last answer (`known()`, `will_ask()`) so
   the UI thread knows whether Windows will ask and says "click Yes" only then. A clean
   reinstall (`admin_reinstall`) restarts Windows' audio once for the whole job.
+  Every step restarts all of Windows' audio (`_audio_off`; restarting only the changed
+  mic with `pnputil` left a USB headset's mic without the effect), then checks its work
+  (`_after_restart`): the effect's "initialize: endpoint" line in its `apo.log`, and each
+  mic that opened before the step opening again (`appaudio.mic_opens`); one more restart
+  if not, then exit code 8 or 9 instead of "done". SteelSeries Sonar loses its devices
+  in a restart (its mic sends only zeros): `_sonar_keep` / `_sonar_back` read them from
+  its local server (`127.0.0.1` only) before and set them again after, so it isn't ended.
   While the helper works on a request it touches
   `results\<id>.ack` every `BEAT_S`: `ask()` keeps waiting while it's fresh (past
   `wait_s`: a prompt now would only hit the lock, code 4), gives up `STALE_S` after it

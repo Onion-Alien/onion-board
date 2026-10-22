@@ -84,6 +84,11 @@ def admin_extras(tmp: Path) -> dict:
         "_audio_service": lambda *a: True,
         "_register_com": noop,
         "_unregister_com": noop,
+        # never this PC's own mics or programs: nothing opened, listened to or asked
+        "_mic_is_silent": lambda guid: None,
+        "_mics_open": lambda guids: set(),
+        "_effect_runs": lambda guids, mark: True,
+        "_processes": lambda exe: [],
     }
 
 

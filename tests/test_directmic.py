@@ -6,10 +6,10 @@ does; they're skipped when it isn't built. Nothing touches the PC's audio device
 """
 from __future__ import annotations
 
+import json
 import os
 import subprocess
 import threading
-import json
 import time
 from pathlib import Path
 
@@ -23,7 +23,8 @@ from test_mainwindow import window  # noqa: F401  (fixture)
 
 _REAL_ELEVATED = dm._elevated   # (before the conftest guard replaces it)
 # (before the conftest guard replaces them)
-_REAL_RESTART_WORKS, _REAL_UNMARK, _REAL_MARKED = dm._mic_restart_works, dm._unmark, dm._marked
+_REAL_UNMARK, _REAL_MARKED = dm._unmark, dm._marked
+_REAL_EFFECT_RUNS, _REAL_MICS_OPEN = dm._effect_runs, dm._mics_open
 
 BUILD = Path(__file__).resolve().parent.parent / "build" / "directmic"
 HOST = BUILD / "testhost.exe"
@@ -36,6 +37,8 @@ def _no_windows_mics(monkeypatch):
     mics would otherwise meet this PC's real ones)."""
     monkeypatch.setattr(dm, "_windows_mics", lambda: [])
     monkeypatch.setattr(dm, "_processes", lambda exe: [])   # no mic apps (MIC_APPS) running
+    monkeypatch.setattr(dm, "_sonar_saved", None)
+    monkeypatch.setattr(dm, "_sonar_fixed", None)
 
 
 SONAR = dm.MIC_APPS[0]
@@ -585,43 +588,6 @@ def test_mic_apps_are_checked_after_the_audio_is_back(fake_reg, monkeypatch, tmp
     assert calls[-1] == "apps" and calls.count("apps") == 1
 
 
-def test_mic_apps_are_left_alone_when_only_the_mic_restarted(fake_reg, monkeypatch,
-                                                            tmp_path):
-    """A mic restarted on its own doesn't cut the mic apps off: they're only seen to
-    after a restart of all of Windows' audio (a mic that wouldn't restart alone)."""
-    calls = _one_mic_kit(fake_reg, monkeypatch, tmp_path, [False, False])
-    monkeypatch.setattr(dm, "_mic_apps_back", lambda quiet=(): calls.append("apps"))
-    assert dm.admin_install(GUID) == 0
-    assert "apps" not in calls
-    calls = _one_mic_kit(fake_reg, monkeypatch, tmp_path, [False, False], restarts=False)
-    monkeypatch.setattr(dm, "_mic_apps_back", lambda quiet=(): calls.append("apps"))
-    assert dm.admin_install(GUID) == 0
-    assert calls[-1] == "apps"
-
-
-@pytest.mark.parametrize("op", ["install", "uninstall"])
-def test_a_mic_apps_own_mic_gets_all_of_the_audio_restarted(fake_reg, monkeypatch,
-                                                            tmp_path, op):
-    """The step changes a mic app's own mic (SteelSeries Sonar's): restarting that mic on
-    its own left it refusing every app that opened it once the effect came off, until
-    all of Windows' audio restarted. So all of it restarts, and the app after it, even
-    though its mic sent only silence before (Sonar's does in a quiet room): all of the
-    audio restarting cuts it off."""
-    calls = _one_mic_kit(fake_reg, monkeypatch, tmp_path, [True] * 10)
-    monkeypatch.setattr(dm, "_mic_app_guids", lambda: {GUID.lower()})
-    monkeypatch.setattr(dm, "_mic_apps_quiet", lambda: {GUID.lower(), "{another}"})
-    monkeypatch.setattr(dm, "_mic_apps_back", lambda quiet=(): calls.append(("apps", quiet)))
-    if op == "uninstall":
-        assert dm.admin_install(GUID) == 0
-        calls.clear()
-        assert dm.admin_uninstall() == 0
-    else:
-        assert dm.admin_install(GUID) == 0
-    assert not [c for c in calls if c[0] == "mics"]   # never that mic on its own
-    assert [c for c in calls if c[0] is False] == [(False, ())]   # all of the audio, once
-    assert calls[-1] == ("apps", {"{another}"})
-
-
 def test_a_mic_app_silent_before_the_step_is_never_ended(monkeypatch, caplog):
     """Its mic sent only silence before the step too (the app switched off, or set up to
     send nothing): not the restart's doing. Ending it lost it for good when its own app
@@ -730,6 +696,233 @@ def test_mic_apps_quiet_before_counts_a_mic_that_cant_be_listened_to(monkeypatch
     assert dm._mic_apps_quiet() == {SONAR_MIC}
     monkeypatch.setattr(dm, "_mic_is_silent", lambda g: False)
     assert dm._mic_apps_quiet() == set()
+
+
+SONAR_DEV = "{0.0.1.00000000}.{11111111-2222-3333-4444-555555555555}"
+HEADPHONES = "{0.0.0.00000000}.{66666666-7777-8888-9999-000000000000}"
+SPEAKERS = "{0.0.0.00000000}.{aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee}"
+
+
+class _FakeSonar:
+    """Sonar's web server: `states` is what each look at its channels finds, in turn
+    (the last one repeats): {channel: (device, running)}. A PUT sets the channel (unless
+    `refuse` says no, as while its device isn't back yet)."""
+
+    def __init__(self, states, refuse=0):
+        self.states, self.refuse, self.puts = [dict(s) for s in states], refuse, []
+
+    def http(self, method, address, path, tls=False):
+        if tls:
+            assert address == "127.0.0.1:6327" and path == "/subApps"
+            return json.dumps({"subApps": {"sonar": {"isRunning": True, "metadata": {
+                "webServerAddress": "http://127.0.0.1:5000"}}}}).encode()
+        assert address == "http://127.0.0.1:5000"
+        if method == "PUT":
+            self.puts.append(path)
+            if self.refuse:
+                self.refuse -= 1
+                raise OSError("HTTP 400")
+            _, kind, rid, _, dev = path.split("/")
+            self.states[-1][rid] = (dev, True)
+            return b""
+        if path == "/classicRedirections":
+            now = self.states[0] if len(self.states) == 1 else self.states.pop(0)
+            return json.dumps([{"id": k, "deviceId": d, "isRunning": r}
+                               for k, (d, r) in now.items()]).encode()
+        return json.dumps([{"streamRedirectionId": "streaming", "deviceId": "",
+                            "isRunning": False}]).encode()
+
+
+def _sonar_kit(monkeypatch, tmp_path, sonar):
+    props = tmp_path / "coreProps.json"
+    props.write_text(json.dumps({"ggEncryptedAddress": "127.0.0.1:6327"}), encoding="utf-8")
+    monkeypatch.setattr(dm, "GG_PROPS", props)
+    monkeypatch.setattr(dm, "_processes", lambda exe: [(100, "steelseriesggez.exe")])
+    monkeypatch.setattr(dm, "_local_http", sonar.http)
+    now = [0.0]
+
+    def sleep(s):
+        now[0] += s
+    monkeypatch.setattr(dm.time, "monotonic", lambda: now[0])
+    monkeypatch.setattr(dm.time, "sleep", sleep)
+
+
+BEFORE = {"mic": (SONAR_DEV, True), "game": (HEADPHONES, True), "chat": (HEADPHONES, True)}
+
+
+def test_sonars_devices_are_set_back_after_the_audio_restart(monkeypatch, tmp_path):
+    """A restart of Windows' audio drops Sonar's mic device (its mic sends only zeros)
+    and moves its channels onto other devices. Set back through its own server, it
+    works again at once, without ending Sonar (SteelSeries GG starts it again only 3
+    times a session)."""
+    after = {"mic": ("", False), "game": (SPEAKERS, True), "chat": (SPEAKERS, True)}
+    sonar = _FakeSonar([BEFORE, after])
+    _sonar_kit(monkeypatch, tmp_path, sonar)
+    dm._sonar_keep()
+    assert dm._sonar_saved == {("classicRedirections", k): v for k, v in BEFORE.items()}
+    dm._sonar_back()
+    assert sorted(sonar.puts) == sorted(f"/classicRedirections/{k}/deviceId/{d}"
+                                        for k, (d, _r) in BEFORE.items())
+    assert dm._sonar_fixed is True
+
+
+def test_a_stopped_sonar_channel_on_its_device_is_set_again(monkeypatch, tmp_path):
+    """After a restart Sonar can keep its mic's device but say it stopped: setting the
+    same device again starts it."""
+    sonar = _FakeSonar([BEFORE, {**BEFORE, "mic": (SONAR_DEV, False)}])
+    _sonar_kit(monkeypatch, tmp_path, sonar)
+    dm._sonar_keep()
+    dm._sonar_back()
+    assert f"/classicRedirections/mic/deviceId/{SONAR_DEV}" in sonar.puts
+    assert dm._sonar_fixed is True
+
+
+def test_sonar_picking_a_device_of_its_own_later_is_set_back_again(monkeypatch, tmp_path):
+    """Sonar picks devices of its own for a few seconds after a restart: what it moves
+    after being set back is set back again."""
+    moved = {**BEFORE, "mic": (SPEAKERS.replace("0.0.0", "0.0.1"), True)}
+    sonar = _FakeSonar([BEFORE, BEFORE, BEFORE, moved, moved])
+    _sonar_kit(monkeypatch, tmp_path, sonar)
+    dm._sonar_keep()
+    sonar.states = [dict(BEFORE), dict(moved), dict(moved)]
+    dm._sonar_back()
+    assert sonar.puts.count(f"/classicRedirections/mic/deviceId/{SONAR_DEV}") == 2
+    assert dm._sonar_fixed is True
+
+
+def test_a_device_not_back_yet_is_tried_again(monkeypatch, tmp_path):
+    sonar = _FakeSonar([BEFORE, {**BEFORE, "mic": ("", False)}], refuse=2)
+    _sonar_kit(monkeypatch, tmp_path, sonar)
+    dm._sonar_keep()
+    dm._sonar_back()
+    assert sonar.puts.count(f"/classicRedirections/mic/deviceId/{SONAR_DEV}") == 2
+    assert sonar.puts.count(f"/classicRedirections/game/deviceId/{HEADPHONES}") == 2
+    assert dm._sonar_fixed is True
+
+
+def test_sonars_devices_that_wont_go_back_say_so(monkeypatch, tmp_path):
+    sonar = _FakeSonar([BEFORE, {**BEFORE, "mic": ("", False)}], refuse=10 ** 6)
+    _sonar_kit(monkeypatch, tmp_path, sonar)
+    dm._sonar_keep()
+    dm._sonar_back()
+    assert dm._sonar_fixed is False
+
+
+def test_no_sonar_asks_nothing(monkeypatch, tmp_path):
+    monkeypatch.setattr(dm, "_processes", lambda exe: [])
+    monkeypatch.setattr(dm, "_local_http", lambda *a, **k: pytest.fail("asked"))
+    dm._sonar_keep()
+    dm._sonar_back()
+    assert dm._sonar_saved is None and dm._sonar_fixed is None
+
+
+def test_a_sonar_that_doesnt_answer_never_fails_the_step(monkeypatch, tmp_path):
+    """Its server not answering before the step: nothing to set back (the old way,
+    ending it when its mic is silent, is what's left)."""
+    def down(*a, **k):
+        raise OSError("refused")
+    _sonar_kit(monkeypatch, tmp_path, _FakeSonar([BEFORE]))
+    monkeypatch.setattr(dm, "_local_http", down)
+    dm._sonar_keep()
+    dm._sonar_back()
+    assert not dm._sonar_saved and dm._sonar_fixed is None
+
+
+@pytest.mark.parametrize("address", ["203.0.113.5:80", "example.com:80", "127.0.0.1:x",
+                                     "127.0.0.1:0", "http://127.0.0.2:80", "[::1]:80"])
+def test_sonars_server_is_only_ever_reached_on_this_pc(address):
+    """Its address comes from a file any user can write (SteelSeries GG's coreProps.json):
+    nothing but 127.0.0.1 is ever connected to."""
+    with pytest.raises(OSError, match="not a local address"):
+        dm._local_http("GET", address, "/subApps")
+
+
+def test_only_sonars_own_device_ids_are_kept(monkeypatch, tmp_path):
+    """A channel whose device isn't a Windows device id (or whose name isn't a plain
+    word) is never sent back in a URL."""
+    sonar = _FakeSonar([{"mic": (SONAR_DEV, True), "game": ("../../x", True),
+                         "a/b": (HEADPHONES, True)}])
+    _sonar_kit(monkeypatch, tmp_path, sonar)
+    dm._sonar_keep()
+    assert dm._sonar_saved == {("classicRedirections", "mic"): (SONAR_DEV, True)}
+
+
+def test_a_restart_of_the_audio_sets_sonars_devices_back(monkeypatch):
+    calls = []
+    monkeypatch.setattr(dm, "_running_dependents", lambda: [])
+    monkeypatch.setattr(dm, "_audio_comes_back", lambda deps: None)
+    monkeypatch.setattr(dm, "_audio_service", lambda start, deps=(): calls.append(start) or True)
+    monkeypatch.setattr(dm, "_sonar_back", lambda: calls.append("sonar"))
+    assert dm._restart_audio() is True
+    assert calls == [False, True, "sonar"]
+
+
+@pytest.mark.parametrize("fixed, killed", [(True, False), (False, True)])
+def test_sonar_is_only_ended_when_its_devices_wont_go_back(monkeypatch, fixed, killed):
+    """Set back: left running. Its server answered but its devices wouldn't go back:
+    ended for GG to start it again, even with its mic silent before (it sends only zeros
+    in a quiet room)."""
+    calls = _mic_app_kit(monkeypatch, [[100], [200]], [False])
+    monkeypatch.setattr(dm, "_sonar_fixed", fixed)
+    dm._mic_apps_back({SONAR_MIC})
+    assert (["taskkill", "/F", "/PID", "100"] in calls) is killed
+
+
+def test_cleanup_restarts_the_audio_and_sets_sonar_back(monkeypatch):
+    """A leftover of ours on a mic it isn't (by our notes) on: taken out with the audio
+    stopped, then Sonar's devices and the mic apps seen to."""
+    calls = []
+    monkeypatch.setattr(dm, "_enable_privileges", lambda *a: None)
+    monkeypatch.setattr(dm, "installed_on", lambda: [])
+    monkeypatch.setattr(dm, "anything_installed", lambda: False)
+    monkeypatch.setattr(dm, "_fx_values", lambda guid: {dm.FX % 5: dm.CLSID})
+    monkeypatch.setattr(dm, "_mic_apps_quiet", lambda: {GUID.lower()})
+    monkeypatch.setattr(dm, "_sonar_keep", lambda: calls.append("keep"))
+    monkeypatch.setattr(dm, "_sonar_back", lambda: calls.append("sonar"))
+    monkeypatch.setattr(dm, "_running_dependents", lambda: [])
+    monkeypatch.setattr(dm, "_audio_comes_back", lambda deps: None)
+    monkeypatch.setattr(dm, "_strip_endpoint", lambda guid: calls.append(("strip", guid)))
+    monkeypatch.setattr(dm, "_audio_service", lambda start, deps=(): calls.append(start) or True)
+    monkeypatch.setattr(dm, "_mic_apps_back", lambda quiet=(): calls.append(("apps", quiet)))
+    assert dm.admin_cleanup(GUID) == 0
+    assert calls == ["keep", False, ("strip", GUID), True, "sonar", ("apps", {GUID.lower()})]
+
+
+def test_mics_open_lists_only_the_ones_that_open(monkeypatch):
+    from soundboard.audio import appaudio
+    said = {"{a}": True, "{b}": False, "{c}": None}
+
+    def opens(g):
+        if g == "{d}":
+            raise RuntimeError("no COM")
+        return said[g]
+    monkeypatch.setattr(appaudio, "mic_opens", opens)
+    assert _REAL_MICS_OPEN(["{A}", "{b}", "{c}", "{d}"]) == {"{a}"}
+
+
+def test_a_mic_windows_refuses_doesnt_open(monkeypatch):
+    """appaudio.mic_opens: Windows refusing (the 0x887C003A every app got from a mic
+    left broken) is a No, not a "can't tell"."""
+    from soundboard.audio import appaudio
+
+    class Dev:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            pass
+    monkeypatch.setattr(appaudio, "_win", True)
+    monkeypatch.setattr(appaudio, "_co_init", lambda: False)
+    monkeypatch.setattr(appaudio, "_active_capture", lambda guid, wait, muted_too=False: Dev())
+
+    def refuse(dev):
+        raise appaudio.ComError(0x887C003A, "Initialize")
+    monkeypatch.setattr(appaudio, "_open_briefly", refuse)
+    assert appaudio.mic_opens("{a}") is False
+    monkeypatch.setattr(appaudio, "_open_briefly", lambda dev: None)
+    assert appaudio.mic_opens("{a}") is True
+    monkeypatch.setattr(appaudio, "_active_capture", lambda guid, wait, muted_too=False: None)
+    assert appaudio.mic_opens("{a}") is None   # not back: can't tell
 
 
 @pytest.mark.parametrize("op", ["install", "reinstall"])
@@ -852,136 +1045,70 @@ def test_no_listen_when_the_audio_never_stopped(fake_reg, monkeypatch, tmp_path)
     assert calls == [("listen", GUID)]   # only the one before the step
 
 
-OTHER = "{22222222-3333-4444-5555-666666666666}"
-
-
-def _one_mic_kit(fake_reg, monkeypatch, tmp_path, heard, restarts=True):
-    """_restart_kit where Windows can restart one mic on its own: `restarts` is what
-    each restart of mics answers (True: done), in turn (the last one repeats). The
-    effect settings of a second mic, OTHER, change during the step."""
-    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, heard)
-    answers = [restarts] if isinstance(restarts, bool) else list(restarts)
-    monkeypatch.setattr(dm, "_mic_restart_works", lambda: True)
-    monkeypatch.setattr(dm, "_restart_mics", lambda guids: calls.append(
-        ("mics", sorted(set(guids)))) or (answers.pop(0) if len(answers) > 1 else answers[0]))
-    snaps = [{OTHER: {"a": 1}}, {OTHER: {"a": 2}}]
-    monkeypatch.setattr(dm, "_fx_now", lambda: snaps.pop(0) if snaps else {})
-    monkeypatch.setattr(dm, "_effect_runs", lambda guids, mark: True)
+def _after_kit(fake_reg, monkeypatch, tmp_path, runs, opens):
+    """_restart_kit with the checks after the restart faked: `runs` is what each look
+    for the effect in its log says, `opens` the mics that open at each look (the first:
+    before the step), in turn."""
+    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [False] * 10)
+    monkeypatch.setattr(dm, "_effect_runs",
+                        lambda guids, mark: calls.append(("effect?", sorted(guids))) or
+                        runs.pop(0))
+    monkeypatch.setattr(dm, "_mics_open", lambda guids: calls.append("opens?") or
+                        {g.lower() for g in guids} & opens.pop(0))
     return calls
 
 
-def test_only_the_mics_the_step_changed_restart(fake_reg, monkeypatch, tmp_path):
-    """Where Windows can restart one mic on its own, the step runs with the audio on and
-    only the mics it changed restart: all of Windows' audio restarting cut off the apps
-    in between a mic and a voice chat (their virtual mic went silent until they were
-    restarted), and everyone's sound with it."""
-    calls = _one_mic_kit(fake_reg, monkeypatch, tmp_path, [False, False])
+def test_an_effect_that_doesnt_start_after_the_restart_gets_one_more(fake_reg, monkeypatch,
+                                                                    tmp_path):
+    """Windows' audio restarted, but the effect didn't start on its mic (nothing in its
+    log): all of the audio restarts once more, which started it."""
+    calls = _after_kit(fake_reg, monkeypatch, tmp_path, [False, True], [{GUID}] * 3)
     assert dm.admin_install(GUID) == 0
+    i = calls.index(("effect?", [GUID.lower()]))
+    assert calls[i + 2:i + 4] == [(False, ()), (True, ["midisrv"])]
+    assert calls.count((False, ())) == 2
+
+
+def test_an_effect_that_never_starts_is_reported(fake_reg, monkeypatch, tmp_path):
+    """Still not after one more restart: the step says so (EFFECT_NOT_STARTED) rather
+    than done, while the sounds never reach the mic. Its work stays done."""
+    calls = _after_kit(fake_reg, monkeypatch, tmp_path, [False, False], [{GUID}] * 3)
+    assert dm.admin_install(GUID) == dm.EFFECT_NOT_STARTED
     assert fake_reg.installed_on() == [GUID.lower()]
-    assert calls == [("listen", GUID), ("mics", sorted([GUID, OTHER])), ("listen", GUID)]
+    assert calls.count((False, ())) == 2
+    assert dm.EFFECT_NOT_STARTED in dm.DONE_CODES and dm.EFFECT_NOT_STARTED in dm.FAIL_CODES
 
 
-def test_a_mic_that_wont_restart_alone_restarts_the_audio(fake_reg, monkeypatch, tmp_path):
-    calls = _one_mic_kit(fake_reg, monkeypatch, tmp_path, [False, False], restarts=False)
+@pytest.mark.parametrize("op", ["install", "uninstall"])
+def test_a_mic_that_stops_opening_gets_one_more_restart(fake_reg, monkeypatch, tmp_path, op):
+    """A mic the effect came off (or went on) refused every app until all of Windows'
+    audio restarted again: so each mic apps could open before the step is opened after
+    it, and one that won't gets one more restart."""
+    calls = _after_kit(fake_reg, monkeypatch, tmp_path, [True] * 4,
+                       [{GUID}, {GUID}, {GUID}, set(), {GUID}])
+    if op == "uninstall":
+        assert dm.admin_install(GUID) == 0
+        calls.clear()
+        assert dm.admin_uninstall() == 0
+    else:
+        monkeypatch.setattr(dm, "_mics_open", lambda guids, o=[{GUID}, set(), {GUID}]: (
+            calls.append("opens?") or {g.lower() for g in guids} & o.pop(0)))
+        assert dm.admin_install(GUID) == 0
+    assert calls.count((False, ())) == 2
+
+
+def test_a_mic_that_never_opens_again_is_reported(fake_reg, monkeypatch, tmp_path):
+    calls = _after_kit(fake_reg, monkeypatch, tmp_path, [True] * 4, [{GUID}, set(), set()])
+    assert dm.admin_install(GUID) == dm.MIC_SHUT
+    assert calls.count((False, ())) == 2
+    assert dm.MIC_SHUT in dm.DONE_CODES
+
+
+def test_a_mic_that_didnt_open_before_isnt_the_steps_doing(fake_reg, monkeypatch, tmp_path):
+    """Held by an app on its own (exclusive mode), or not working before: not blamed."""
+    calls = _after_kit(fake_reg, monkeypatch, tmp_path, [True], [set(), set()])
     assert dm.admin_install(GUID) == 0
-    assert calls[1:] == [("mics", sorted([GUID, OTHER])), (False, ()), (True, ["midisrv"]),
-                         ("listen", GUID)]
-
-
-def test_no_restart_at_all_says_so(fake_reg, monkeypatch, tmp_path):
-    """The mic wouldn't restart, and Windows' audio wouldn't stop: the change waits for
-    the PC's next restart (6), as when the audio wouldn't stop before a step."""
-    calls = _one_mic_kit(fake_reg, monkeypatch, tmp_path, [False, False], restarts=False)
-    monkeypatch.setattr(dm, "_audio_service",
-                        lambda start, deps=(): calls.append((start, deps)) or start)
-    assert dm.admin_install(GUID) == 6
-
-
-def test_a_mic_silent_after_its_restart_gets_its_own_restart_first(fake_reg, monkeypatch,
-                                                                   tmp_path):
-    """Silent after the step: first only that mic restarts again; still silent, then
-    all of Windows' audio, as before."""
-    calls = _one_mic_kit(fake_reg, monkeypatch, tmp_path, [False, True, True, True, True, False])
-    assert dm.admin_install(GUID) == 0
-    assert calls[1:] == [("mics", sorted([GUID, OTHER])), ("listen", GUID), ("listen", GUID),
-                         ("mics", [GUID]), ("listen", GUID), ("listen", GUID),
-                         (False, ()), (True, ["midisrv"]), ("listen", GUID)]
-
-
-def test_a_failed_step_still_restarts_the_mics_it_touched(fake_reg, monkeypatch, tmp_path):
-    calls = _one_mic_kit(fake_reg, monkeypatch, tmp_path, [False, False])
-    monkeypatch.setattr(dm, "_put_on", lambda *a: 1)
-    assert dm.admin_install(GUID) == 1
-    assert ("mics", sorted([GUID, OTHER])) in calls
-
-
-def test_restart_mics_restarts_only_the_plugged_in_ones(monkeypatch):
-    """Each mic's own device (pnputil /restart-device): one that's unplugged has nothing
-    to restart (its settings are read when it's back); one that fails says so."""
-    ran = []
-    monkeypatch.setattr(dm, "capture_endpoints", lambda: [
-        {"guid": GUID, "active": True}, {"guid": OTHER, "active": False}])
-    monkeypatch.setattr(dm, "_run", lambda cmd, timeout=60.0: ran.append(cmd) or 0)
-    assert dm._restart_mics([GUID.upper(), GUID, OTHER]) is True
-    assert ran == [["pnputil", "/restart-device", dm.ENDPOINT_DEVICE + GUID]]
-    monkeypatch.setattr(dm, "_run", lambda cmd, timeout=60.0: 1)
-    assert dm._restart_mics([GUID]) is False
-
-
-@pytest.mark.parametrize("out, works", [
-    ("PNPUTIL [/add-driver ...]\n  /restart-device <instance ID>", True),
-    ("PNPUTIL [-a] [-d] [-e] [-f] [-i]", False)])   # an older Windows
-def test_mic_restart_works_where_pnputil_can(monkeypatch, out, works):
-    monkeypatch.setattr(dm.subprocess, "run",
-                        lambda *a, **k: subprocess.CompletedProcess(a, 0, out, ""))
-    assert _REAL_RESTART_WORKS() is works
-
-
-def test_mic_restart_works_is_false_without_pnputil(monkeypatch):
-    def missing(*a, **k):
-        raise FileNotFoundError("pnputil")
-    monkeypatch.setattr(dm.subprocess, "run", missing)
-    assert _REAL_RESTART_WORKS() is False
-
-
-def test_files_removed_with_the_audio_on_wait_for_the_mic_restart(fake_reg, monkeypatch,
-                                                                  tmp_path):
-    """With the audio on, Windows still holds the effect while the step runs: what the
-    step removes goes after the mics restart, not marked for the PC's next restart."""
-    calls = _one_mic_kit(fake_reg, monkeypatch, tmp_path, [False, False, False, False])
-    removed = []
-    real = dm._remove
-    monkeypatch.setattr(dm, "_remove_held", lambda paths: calls.append(("files", paths)))
-    assert dm.admin_install(GUID) == 0
-    calls.clear()
-    assert dm.admin_uninstall() == 0
-    held = [c for c in calls if c[0] == "files"][0][1]
-    assert held and calls.index(("files", held)) > calls.index(("mics", [GUID]))
-    assert dm._held is None   # removing works normally again
-    monkeypatch.setattr(dm, "_gone_at_restart", removed.append)
-    f = tmp_path / "x.txt"
-    f.write_text("x")
-    real(f)
-    assert not f.exists() and not removed
-
-
-def test_held_files_the_effect_still_uses_stay(monkeypatch, tmp_path):
-    """An update to the same version takes the effect's folder away and puts it back:
-    the copy in use and the ring stay, an older copy goes."""
-    pf, data = tmp_path / "pf", tmp_path / "data"
-    pf.mkdir()
-    data.mkdir()
-    dll, old, ring = pf / "obmic-new.dll", pf / "obmic-old.dll", data / "ring2.bin"
-    for f in (dll, old, ring):
-        f.write_bytes(b"x")
-    monkeypatch.setattr(dm, "registered_dll", lambda: dll)
-    monkeypatch.setattr(dm, "ring_path", lambda: ring)
-    monkeypatch.setattr(dm, "installed_on", lambda: [GUID])
-    dm._remove_held([pf, data, old])
-    assert dll.exists() and ring.exists() and not old.exists()
-    monkeypatch.setattr(dm, "installed_on", lambda: [])   # off every mic: all of it goes
-    dm._remove_held([pf, data])
-    assert not pf.exists() and not data.exists()
+    assert calls.count((False, ())) == 1
 
 
 class _PendingKey:
@@ -1041,25 +1168,12 @@ def test_a_file_on_the_restart_list_is_put_on_it_once(monkeypatch, tmp_path):
 
 
 def test_the_effect_in_use_is_taken_off_the_restart_list(fake_reg, monkeypatch, tmp_path):
-    calls = _one_mic_kit(fake_reg, monkeypatch, tmp_path, [False, False])
+    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [False, False])
     monkeypatch.setattr(dm, "_unmark", lambda paths: calls.append(("unmark", paths)))
     assert dm.admin_install(GUID) == 0
     unmark = [c for c in calls if c[0] == "unmark"]
     assert len(unmark) == 1 and dm.ring_path() in unmark[0][1]
     assert unmark[0][1][0].parent == tmp_path / "pf"
-
-
-def test_an_effect_that_doesnt_start_after_its_mic_restarted_gets_the_audio_restarted(
-        fake_reg, monkeypatch, tmp_path):
-    """A USB headset's mic restarted on its own came back without the effect running at
-    all (nothing in its log, the board's sounds never in the mic): all of Windows' audio
-    restarts then, which does start it."""
-    calls = _one_mic_kit(fake_reg, monkeypatch, tmp_path, [False, False])
-    monkeypatch.setattr(dm, "_effect_runs",
-                        lambda guids, mark: calls.append(("effect?", sorted(guids))) or False)
-    assert dm.admin_install(GUID) == 0
-    i = calls.index(("effect?", [GUID.lower()]))
-    assert calls[i - 1][0] == "mics" and calls[i + 1:i + 3] == [(False, ()), (True, ["midisrv"])]
 
 
 def test_the_effect_starting_is_read_from_its_log(monkeypatch, tmp_path):
@@ -1075,15 +1189,16 @@ def test_the_effect_starting_is_read_from_its_log(monkeypatch, tmp_path):
     mark = dm._apo_log_size()
     opened = []
 
-    def listen(guid):
-        opened.append(guid)
+    def listen(guids):
+        opened.extend(guids)
         with open(log_, "a", encoding="utf-8") as f:
             f.write("pid 1: initialize: endpoint {AAAA}, 56 bytes, discovery 0, child no\n")
-    monkeypatch.setattr(dm, "_mic_is_silent", listen)
-    assert dm._effect_runs(["{AAAA}", "{bbbb}"], mark)   # the unplugged one isn't waited for
+        return set()
+    monkeypatch.setattr(dm, "_mics_open", listen)
+    assert _REAL_EFFECT_RUNS(["{AAAA}", "{bbbb}"], mark)   # the unplugged one isn't waited for
     assert opened == ["{aaaa}"]
     opened.clear()
-    assert dm._effect_runs(["{aaaa}"], mark) and opened == []   # in the log already
+    assert _REAL_EFFECT_RUNS(["{aaaa}"], mark) and opened == []   # in the log already
 
 
 def test_an_effect_that_never_logs_doesnt_run(monkeypatch, tmp_path):
@@ -1092,48 +1207,13 @@ def test_an_effect_that_never_logs_doesnt_run(monkeypatch, tmp_path):
                         lambda: [{"guid": "{aaaa}", "name": "Mic", "active": True}])
     now = [0.0]
 
-    def listen(guid):
+    def listen(guids):
         now[0] += 3
+        return set()
     monkeypatch.setattr(dm.time, "monotonic", lambda: now[0])
-    monkeypatch.setattr(dm, "_mic_is_silent", listen)
-    assert not dm._effect_runs(["{aaaa}"], 0)
-    assert dm._effect_runs([], 0)   # nothing to check
-
-
-def test_cleanup_restarts_only_that_mic(monkeypatch):
-    """A leftover of ours on a mic it isn't (by our notes) on: taken out, and only that
-    mic restarts."""
-    calls = []
-    monkeypatch.setattr(dm, "_enable_privileges", lambda *a: None)
-    monkeypatch.setattr(dm, "installed_on", lambda: [])
-    monkeypatch.setattr(dm, "anything_installed", lambda: False)
-    monkeypatch.setattr(dm, "_fx_values", lambda guid: {dm.FX % 5: dm.CLSID})
-    monkeypatch.setattr(dm, "_mic_restart_works", lambda: True)
-    monkeypatch.setattr(dm, "_strip_endpoint", lambda guid: calls.append(("strip", guid)))
-    monkeypatch.setattr(dm, "_restart_mics", lambda guids: calls.append(("mics", guids)) or True)
-    monkeypatch.setattr(dm, "_audio_service", lambda *a: calls.append("audio"))
-    assert dm.admin_cleanup(GUID) == 0
-    assert calls == [("strip", GUID), ("mics", [GUID])]
-
-
-def test_cleanup_of_a_mic_apps_own_mic_restarts_all_of_the_audio(monkeypatch):
-    """As a step on a mic app's own mic (_audio_off): never that mic on its own."""
-    calls = []
-    monkeypatch.setattr(dm, "_enable_privileges", lambda *a: None)
-    monkeypatch.setattr(dm, "installed_on", lambda: [])
-    monkeypatch.setattr(dm, "anything_installed", lambda: False)
-    monkeypatch.setattr(dm, "_fx_values", lambda guid: {dm.FX % 5: dm.CLSID})
-    monkeypatch.setattr(dm, "_mic_restart_works", lambda: True)
-    monkeypatch.setattr(dm, "_mic_app_guids", lambda: {GUID.lower()})
-    monkeypatch.setattr(dm, "_mic_apps_quiet", lambda: {GUID.lower()})
-    monkeypatch.setattr(dm, "_running_dependents", lambda: [])
-    monkeypatch.setattr(dm, "_audio_comes_back", lambda deps: None)
-    monkeypatch.setattr(dm, "_strip_endpoint", lambda guid: calls.append(("strip", guid)))
-    monkeypatch.setattr(dm, "_restart_mics", lambda guids: calls.append(("mics", guids)) or True)
-    monkeypatch.setattr(dm, "_audio_service", lambda start, deps=(): calls.append(start) or True)
-    monkeypatch.setattr(dm, "_mic_apps_back", lambda quiet=(): calls.append(("apps", quiet)))
-    assert dm.admin_cleanup(GUID) == 0
-    assert calls == [False, ("strip", GUID), True, ("apps", set())]
+    monkeypatch.setattr(dm, "_mics_open", listen)
+    assert not _REAL_EFFECT_RUNS(["{aaaa}"], 0)
+    assert _REAL_EFFECT_RUNS([], 0)   # nothing to check
 
 
 def test_a_failing_listen_never_fails_the_install(fake_reg, monkeypatch, tmp_path):

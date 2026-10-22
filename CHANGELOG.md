@@ -10,24 +10,22 @@ Changes not released yet are in [changelog.d/](changelog.d/), one file per chang
 - A headset pulled out while the app is open now says so in plain words ("Can't open
   ... Plugged in? It's tried again by itself.") instead of a raw device error.
 - Fixed a crash while the app was starting: on a slow start, the check that notes where start-up is waiting could itself crash the app.
-- Direct mic: SteelSeries Sonar is only restarted after a restart of all of Windows'
-  audio, and never when its mic was already silent before (it could stay off).
-- Direct mic: when restarting only your mic leaves the effect not running (seen with a
-  USB headset: set-up said done, but your sounds never reached the mic), all of
-  Windows' audio restarts as well, which does start it.
-- Direct mic: with the effect on SteelSeries Sonar's own mic, removing it (or
-  uninstalling) no longer leaves that mic refusing every app until the PC restarts:
-  Sonar's mic gets all of Windows' audio restarted, and Sonar after it, as before.
 - Direct mic: setting up on SteelSeries Sonar's mic in a quiet room no longer restarts
   all your sound three more times, restarts Sonar and calls the set-up failed when
   Windows wouldn't let the app listen to the mic just before.
-- Direct mic: the mic helper updates once (Windows asks one more time), so set-ups
-  through it also restart only the mic instead of all of Windows' audio.
-- Direct mic: setting up, repairing or removing the mic effect now restarts only that mic,
-  not all of Windows' audio. Apps that sit between your mic and a voice chat with a
-  virtual mic of their own (such as SteelSeries Sonar) no longer go silent afterwards,
-  and the rest of your sound keeps playing. Older Windows 10 versions restart the audio
+- Direct mic: setting up, repairing or removing the mic effect checks its work: after
+  Windows' audio restarts, the effect has to have started on your mic and every mic it
+  touched has to open in apps again. If not, the audio restarts once more, and if it's
+  still not right the app says so (with an error code) instead of "done" while your
+  sounds never reach the mic.
+- Direct mic: with SteelSeries Sonar on, a set-up, repair or removal no longer leaves
+  Sonar's mic silent in Discord and other voice chats, or its sound on the wrong
+  device: the devices Sonar used are set back through Sonar itself after Windows' audio
+  restarts. Sonar is no longer restarted for it (SteelSeries GG restarts Sonar only 3
+  times, then leaves it off); only if Sonar won't take its devices back is it restarted
   as before.
+- Direct mic: the mic helper updates once (Windows asks one more time), so set-ups
+  through it get these fixes too.
 - Once you've connected Twitch, the Twitch card has a box (off until you tick it) that
   lets the Onion Board developer see your channel's name with the daily usage count,
   so they can see who streams with it. Disconnect unticks it.
@@ -42,9 +40,6 @@ Changes not released yet are in [changelog.d/](changelog.d/), one file per chang
   listen through an hour-long sound, play 10 sounds at once, max out the pitch, play a
   sound on Halloween, Christmas or New Year, and a few more. There's an old cheat code
   hidden in the main window too.
-- Direct mic: with SteelSeries Sonar on, setting up (or repairing or removing) the mic
-  effect no longer leaves Sonar's mic silent in Discord and other voice chats. Sonar is
-  restarted after Windows' audio comes back, and its mic is checked for sound.
 - No "Text-to-speech isn't available" pop-up at launch when Windows speech is slow to start: nobody asked for speech yet. Saying a line still tells you if it can't be spoken.
 - On a first launch right after installing, the loading screen (Bun) no longer gives up
   when its first frame is slow: it used to vanish, and nothing showed until the window
