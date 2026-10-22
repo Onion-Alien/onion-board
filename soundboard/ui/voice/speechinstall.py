@@ -396,9 +396,10 @@ class SpeechInstalls(QObject):
         ok = m is not None and m.installed
         p.show_lang_box(ok and bool(p.langs))
         p.livevoice.set_installed(ok)
+        p.show_recognition(ok)
         self.missing.setVisible(not ok)
         self.b_install.setVisible(m is not None and not ok and not net.offline())
-        self.b_update.setVisible(m is not None and not net.offline())   # pip: online
+        self.b_update.setVisible(ok and not net.offline())   # pip: online; Install till in
         self.show_remove()
         if m is not None and not ok and net.offline():
             self.lbl_missing.setText(_("Speaking another language needs speech recognition "

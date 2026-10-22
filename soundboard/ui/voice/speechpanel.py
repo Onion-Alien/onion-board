@@ -346,13 +346,15 @@ class SpeechPanel(QWidget):
         # as the computer voice in your own language
         ov.addWidget(live.b_live, 0, Qt.AlignmentFlag.AlignLeft)
         grid = voice_grid
-        grid.addWidget(QLabel(_("Recognition")), 2, 0)
+        lbl_model = QLabel(_("Recognition"))
+        grid.addWidget(lbl_model, 2, 0)
         self.cb_model = QComboBox()
         for label, key in MODELS:
             self.cb_model.addItem(label, key)
         self.cb_model.setCurrentIndex(max(0, self.cb_model.findData(self.s["model"])))
         grid.addWidget(self.cb_model, 2, 1)
-        grid.addWidget(QLabel(_("Language")), 3, 0)
+        lbl_spoken = QLabel(_("Language"))
+        grid.addWidget(lbl_spoken, 3, 0)
         self.ed_lang = QLineEdit(spoken.typed(self.s))
         self.ed_lang.setPlaceholderText(_("en, es, de… or auto"))
         self.ed_lang.setToolTip(_("Language you speak (two-letter code). Empty: the app's "
@@ -366,6 +368,10 @@ class SpeechPanel(QWidget):
         self.chk_mute.setToolTip(_("Others hear only the spoken voice, not your real one."))
         self.chk_mute.setChecked(self.s["mute_real_voice"])
         ov.addWidget(self.chk_mute)
+        # what only works with speech recognition in: hidden until it's installed (a
+        # Start button above "Install speech recognition" made no sense)
+        self._needs_recognition = (live.b_live, lbl_model, self.cb_model, lbl_spoken,
+                                   self.ed_lang, self.chk_mute)
         self.chk_fx = QCheckBox(_("Put the voice changer on the computer voice"))
         self.chk_fx.setToolTip(_("With a voice picked under Voice changer, the computer voice "
                                  "gets the same effect (a chipmunk robot voice, say)."))
@@ -749,6 +755,11 @@ class SpeechPanel(QWidget):
         self._refresh_translation()
         self._sync_switch()
         self.installs.show_remove()   # a language downloaded or deleted
+
+    def show_recognition(self, ok: bool):
+        """Speech recognition is in (or not): the options that use it show (or hide)."""
+        for w in getattr(self, "_needs_recognition", ()):
+            w.setVisible(ok)
 
     def show_lang_box(self, on: bool):
         """The language cards, once there's speech recognition and languages. Until
