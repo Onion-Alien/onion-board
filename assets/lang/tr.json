@@ -4429,5 +4429,7 @@
   "↑ ↑ ↓ ↓ ← → ← → B A: Bun got 30 extra lives.": "↑ ↑ ↓ ↓ ← → ← → B A: Bun 30 ekstra can kazandı.",
   "Free sounds and voices other players shared and voted on. Add one in a click, or share your own.": "Diğer oyuncuların paylaştığı ve oyladığı ücretsiz ses efektleri ve sesler. Tek tıkla ekle ya da kendininkini paylaş.",
   "Let the Onion Board developer see this channel's name": "Onion Board geliştiricisi bu kanalın adını görebilsin",
-  "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "Günde bir kez kullanım sayımıyla gönderilir, yalnızca bağlıyken ve \"Beni de dahil et\" açıkken, geliştirici Onion Board ile kimin yayın yaptığını görebilsin diye. Sadece ad. Durdurmak için işareti kaldır."
+  "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "Günde bir kez kullanım sayımıyla gönderilir, yalnızca bağlıyken ve \"Beni de dahil et\" açıkken, geliştirici Onion Board ile kimin yayın yaptığını görebilsin diye. Sadece ad. Durdurmak için işareti kaldır.",
+  "<b>{mic}</b> stopped sending sound after the set-up. Restart the app it belongs to and it works again.": "<b>{mic}</b> kurulumdan sonra ses göndermeyi bıraktı. Ait olduğu uygulamayı yeniden başlat, tekrar çalışır.",
+  "Onion Board is on your mic, but a test sound didn't come through it. Click <b>Repair</b> to put it on again.": "Onion Board mikrofonunda, ama bir test sesi içinden geçmedi. Yeniden takmak için <b>Onar</b>'a tıkla."
 }

@@ -395,6 +395,7 @@ class MainWindow(QMainWindow):
     update_done = Signal(object, str)   # an update check finished: Release|None, error
     update_state = Signal()             # the update card changed (Settings > Updates follows)
     mic_attached = Signal(str, str)     # attach_mic finished: the mic, error ("" = done)
+    mic_probed = Signal(object)         # probe_mic finished: micprobe.Result | None
     helper_checked = Signal()           # michelper.ready() asked again (on a thread)
     cable_removed = Signal(str)         # remove_cable finished: error ("" = done)
     remote_changed = Signal()           # a remote control server started or stopped

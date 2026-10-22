@@ -4429,5 +4429,7 @@
   "↑ ↑ ↓ ↓ ← → ← → B A: Bun got 30 extra lives.": "↑ ↑ ↓ ↓ ← → ← → B A: Bun kapott 30 extra életet.",
   "Free sounds and voices other players shared and voted on. Add one in a click, or share your own.": "Ingyenes hangeffektek és hangok, amiket más játékosok osztottak meg és szavaztak meg. Add hozzá egy kattintással, vagy oszd meg a sajátod.",
   "Let the Onion Board developer see this channel's name": "Az Onion Board fejlesztője láthatja ennek a csatornának a nevét",
-  "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "Naponta egyszer megy a használati számlálással, csak amíg csatlakozva vagy és a „Benne vagyok” be van kapcsolva, hogy a fejlesztő lássa, ki streamel Onion Boarddal. Csak a név. Vedd ki a pipát a leállításhoz."
+  "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "Naponta egyszer megy a használati számlálással, csak amíg csatlakozva vagy és a „Benne vagyok” be van kapcsolva, hogy a fejlesztő lássa, ki streamel Onion Boarddal. Csak a név. Vedd ki a pipát a leállításhoz.",
+  "<b>{mic}</b> stopped sending sound after the set-up. Restart the app it belongs to and it works again.": "A(z) <b>{mic}</b> a beállítás után nem küld hangot. Indítsd újra az alkalmazást, amelyhez tartozik, és újra működni fog.",
+  "Onion Board is on your mic, but a test sound didn't come through it. Click <b>Repair</b> to put it on again.": "Az Onion Board a mikrofonodon van, de egy teszthang nem jött át rajta. Kattints a <b>Javítás</b> gombra, hogy újra feltegyük."
 }

@@ -4506,5 +4506,7 @@
   "↑ ↑ ↓ ↓ ← → ← → B A: Bun got 30 extra lives.": "↑ ↑ ↓ ↓ ← → ← → B A: Bun отримав 30 додаткових життів.",
   "Free sounds and voices other players shared and voted on. Add one in a click, or share your own.": "Безкоштовні звуки й голоси, якими поділилися та за які проголосували інші гравці. Додай в один клік або поділись своїми.",
   "Let the Onion Board developer see this channel's name": "Показати розробнику Onion Board назву цього каналу",
-  "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "Надсилається раз на день разом із підрахунком використання, лише поки ти підключений і «Враховуйте мене» увімкнено, щоб розробник бачив, хто стримить з Onion Board. Лише назва. Зніми позначку, щоб припинити."
+  "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "Надсилається раз на день разом із підрахунком використання, лише поки ти підключений і «Враховуйте мене» увімкнено, щоб розробник бачив, хто стримить з Onion Board. Лише назва. Зніми позначку, щоб припинити.",
+  "<b>{mic}</b> stopped sending sound after the set-up. Restart the app it belongs to and it works again.": "<b>{mic}</b> перестав передавати звук після налаштування. Перезапусти застосунок, до якого він належить, і все запрацює.",
+  "Onion Board is on your mic, but a test sound didn't come through it. Click <b>Repair</b> to put it on again.": "Onion Board стоїть на твоєму мікрофоні, але тестовий звук через нього не пройшов. Натисни <b>Полагодити</b>, щоб поставити його знову."
 }

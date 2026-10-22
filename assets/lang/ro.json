@@ -4506,5 +4506,7 @@
   "↑ ↑ ↓ ↓ ← → ← → B A: Bun got 30 extra lives.": "↑ ↑ ↓ ↓ ← → ← → B A: Bun a primit 30 de vieți în plus.",
   "Free sounds and voices other players shared and voted on. Add one in a click, or share your own.": "Sunete și voci gratuite, distribuite și votate de alți jucători. Adaugă unul cu un clic sau distribuie-le pe ale tale.",
   "Let the Onion Board developer see this channel's name": "Lasă dezvoltatorul Onion Board să vadă numele acestui canal",
-  "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "Se trimite o dată pe zi cu numărătoarea de utilizare, doar cât ești conectat și „Include-mă” e pornit, ca dezvoltatorul să vadă cine face stream cu Onion Board. Doar numele. Debifează ca să oprești."
+  "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "Se trimite o dată pe zi cu numărătoarea de utilizare, doar cât ești conectat și „Include-mă” e pornit, ca dezvoltatorul să vadă cine face stream cu Onion Board. Doar numele. Debifează ca să oprești.",
+  "<b>{mic}</b> stopped sending sound after the set-up. Restart the app it belongs to and it works again.": "<b>{mic}</b> nu mai trimite sunet după configurare. Repornește aplicația căreia îi aparține și va merge din nou.",
+  "Onion Board is on your mic, but a test sound didn't come through it. Click <b>Repair</b> to put it on again.": "Onion Board e pe microfonul tău, dar un sunet de test nu a trecut prin el. Dă clic pe <b>Repară</b> ca să-l pui din nou."
 }

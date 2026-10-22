@@ -721,11 +721,14 @@ def mic_is_silent(guid: str, seconds: float = 1.0, wait: float = 8.0) -> bool | 
             _ole32.CoUninitialize()
 
 
-def _mic_is_silent(guid: str, seconds: float, wait: float) -> bool | None:
+def _active_capture(guid: str, wait: float) -> Com | None:
+    """The recording endpoint `guid` once it's active (right after an audio restart it
+    takes a moment to be back), or None after `wait` seconds or when it's muted or at
+    0% (silent on purpose)."""
     dev = None
     give_up = time.monotonic() + wait
     with _enumerator() as en:
-        while dev is None:   # right after an audio restart it takes a moment to be back
+        while dev is None:
             d, state, got = c_void_p(), c_ulong(), None
             try:
                 en.call(5, (c_wchar_p, POINTER(c_void_p)), CAPTURE_ID + guid.lower(),
@@ -743,7 +746,7 @@ def _mic_is_silent(guid: str, seconds: float, wait: float) -> bool | None:
             if time.monotonic() > give_up:
                 return None
             time.sleep(0.25)
-    with dev:
+    try:
         out = c_void_p()
         dev.call(3, (POINTER(GUID), c_ulong, c_void_p, POINTER(c_void_p)),
                  byref(IID_IAudioEndpointVolume), CLSCTX_ALL, None, byref(out),
@@ -753,7 +756,19 @@ def _mic_is_silent(guid: str, seconds: float, wait: float) -> bool | None:
             vol.call(15, (POINTER(c_int),), byref(muted), what="GetMute")
             vol.call(9, (POINTER(c_float),), byref(level), what="GetMasterVolumeLevelScalar")
             if muted.value or level.value <= 0:
+                dev.release()
                 return None   # silent on purpose
+    except BaseException:
+        dev.release()
+        raise
+    return dev
+
+
+def _mic_is_silent(guid: str, seconds: float, wait: float) -> bool | None:
+    dev = _active_capture(guid, wait)
+    if dev is None:
+        return None
+    with dev:
         out = c_void_p()
         dev.call(3, (POINTER(GUID), c_ulong, c_void_p, POINTER(c_void_p)),
                  byref(IID_IAudioClient), CLSCTX_ALL, None, byref(out),
@@ -806,6 +821,80 @@ def _all_zero(cap: Com, align: int, seconds: float) -> int | None:
             finally:
                 cap.call(4, (c_uint,), frames.value, what="ReleaseBuffer")
     return count
+
+
+def record_mic(guid: str, seconds: float, wait: float = 8.0,
+               started: threading.Event | None = None) -> tuple[np.ndarray, int] | None:
+    """Record the recording endpoint `guid` for `seconds`: (mono float32, its rate), or
+    None when it can't (not back within `wait`, muted or at 0%, Windows refused).
+    `started` is set once it's recording. Its own shared-mode format, so nothing is
+    converted on the way but the samples to float."""
+    if not _win or np is None:
+        return None
+    own = _co_init()
+    try:
+        dev = _active_capture(guid if guid.startswith("{") else "{" + guid + "}", wait)
+        if dev is None:
+            return None
+        with dev:
+            return _record(dev, seconds, started)
+    except ComError:
+        log.info("couldn't record mic %s", guid, exc_info=True)
+        return None
+    finally:
+        if own:
+            _ole32.CoUninitialize()
+
+
+def _record(dev: Com, seconds: float, started) -> tuple[np.ndarray, int]:
+    out = c_void_p()
+    dev.call(3, (POINTER(GUID), c_ulong, c_void_p, POINTER(c_void_p)),
+             byref(IID_IAudioClient), CLSCTX_ALL, None, byref(out),
+             what="Activate(IAudioClient)")
+    with Com(out.value) as client:
+        pfmt = c_void_p()
+        client.call(8, (POINTER(c_void_p),), byref(pfmt), what="GetMixFormat")
+        try:
+            fmt = WAVEFORMATEX.from_buffer_copy(cast(pfmt, POINTER(WAVEFORMATEX))[0])
+            is_float = fmt.wFormatTag == WAVE_FORMAT_IEEE_FLOAT or (
+                fmt.wFormatTag == WAVE_FORMAT_EXTENSIBLE
+                and cast(pfmt, POINTER(WAVEFORMATEXTENSIBLE))[0].SubFormat
+                == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT)
+            client.call(3, (c_ulong, c_ulong, c_int64, c_int64, c_void_p, c_void_p),
+                        AUDCLNT_SHAREMODE_SHARED, 0, 2_000_000, 0, pfmt, None,
+                        what="Initialize")
+        finally:
+            _ole32.CoTaskMemFree(pfmt)
+        out = c_void_p()
+        client.call(14, (POINTER(GUID), POINTER(c_void_p)), byref(IID_IAudioCaptureClient),
+                    byref(out), what="GetService(IAudioCaptureClient)")
+        chunks: list[bytes] = []
+        n, frames, flags, data = c_uint(), c_uint(), c_ulong(), c_void_p()
+        with Com(out.value) as cap:
+            client.call(10, (), what="Start")
+            if started is not None:
+                started.set()
+            try:
+                end = time.monotonic() + seconds
+                while time.monotonic() < end:
+                    time.sleep(0.01)
+                    while True:
+                        cap.call(5, (POINTER(c_uint),), byref(n), what="GetNextPacketSize")
+                        if not n.value:
+                            break
+                        cap.call(3, (POINTER(c_void_p), POINTER(c_uint), POINTER(c_ulong),
+                                     c_void_p, c_void_p), byref(data), byref(frames),
+                                 byref(flags), None, None, what="GetBuffer")
+                        try:
+                            size = frames.value * fmt.nBlockAlign
+                            chunks.append(bytes(size) if flags.value & AUDCLNT_BUFFERFLAGS_SILENT
+                                          or not data.value else ctypes.string_at(data.value, size))
+                        finally:
+                            cap.call(4, (c_uint,), frames.value, what="ReleaseBuffer")
+            finally:
+                client.call(11, (), what="Stop")
+    x = to_stereo_f32(b"".join(chunks), fmt, is_float)
+    return x.mean(axis=1).astype(np.float32), int(fmt.nSamplesPerSec)
 
 
 def endpoint_names(kind: str) -> set[str] | None:

@@ -326,6 +326,9 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # the mic card saying the headset is unplugged, or the mic sends silence
             # (also right after a set-up)
             "mic-unplugged", "mic-silent", "mic-silent-after-setup",
+            # the mic check after a set-up (micprobe): its test sound heard in the mic,
+            # missing, can't tell; another app's mic cut off by the set-up
+            "mic-probe-heard", "mic-probe-missing", "mic-probe-unsure", "mic-probe-app-cut-off",
             # a sound played at 0% Sounds volume (the warning), its Set to 100%; a
             # hotkey no keyboard can press or Windows keeps (Win+L) refused
             "sound-vol-0", "sound-vol-0-fixed", "hotkey-refused",

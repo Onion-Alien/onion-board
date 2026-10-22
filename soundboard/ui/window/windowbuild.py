@@ -1512,6 +1512,7 @@ class WindowBuilder(Controller):
         icons.set_icon(mw.btn_usecable, "cable")
         mw.btn_usecable.hide()
         mw.mic_attached.connect(mw.micctl._mic_attached)
+        mw.mic_probed.connect(mw.micctl._mic_probed)
         mw._attaching = False
         mw._attach_release = None   # busy.hold on btn_install while it's being set up
         mw._settle_until = 0.0      # just set up: Windows is still loading it

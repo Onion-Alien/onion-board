@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import QApplication, QMessageBox
 
-from soundboard.mic import directmic, michelper, voicesdk
+from soundboard.mic import directmic, michelper, micprobe, voicesdk
 from soundboard.ui.kit import theme
 from soundboard.core import errors, usage
 from soundboard.online import net
@@ -33,6 +33,10 @@ log = logging.getLogger(__name__)
 
 HELPER_RETRY_S = 60.0   # a mic helper check that failed is tried again after this long
 MIC_OFFER_MS = 1000   # an older mic part's update is offered this long after the window shows
+# The mic check after a set-up (probe_mic) is only counted for now: how often the probe
+# goes missing on mics nobody here could test (a headset brand's own effect on the mic)
+# decides whether the card's Repair and the cut-off app's toast are switched on.
+PROBE_SHOWS = False
 
 
 class MicControl(Controller):
@@ -52,6 +56,10 @@ class MicControl(Controller):
     _helper_check_at = 0.0  # when the last check started (time.monotonic())
     _mic_offered = False    # shown this start (it comes back next start until updated)
     _following_effect = False
+    _alive_before: frozenset = frozenset()   # other mics with sound before the set-up
+    _probe_due = False      # a set-up worked: probe_mic once it's running
+    _probing = False
+    _probe_missing = False  # the probe didn't come out of the mic: the card says so
 
     def __init__(self, mw: MainWindow):
         super().__init__(mw)
@@ -232,6 +240,14 @@ class MicControl(Controller):
                         _("Others hear your voice, but not your sounds. One click adds Onion "
                           "Board's audio driver to this mic, so Discord and games hear your "
                           "sounds too.")), _("Put my sounds straight into my mic"))
+        elif state == "ok" and self._probe_missing:
+            # set up and running, but the probe didn't come out of the mic (probe_mic):
+            # a voice chat wouldn't hear the sounds either
+            look = ("error", "warn", _("Your sounds aren't in your mic yet"),
+                    _("Not working"), needed(_(
+                        "Onion Board is on your mic, but a test sound didn't come through "
+                        "it. Click <b>Repair</b> to put it on again.")),
+                    _("Repair (one click)"))
         elif state == "ok" and self._mic_sends_nothing():
             # the mic itself sends exact zeros: a wireless headset switched off (its
             # dongle stays plugged in), the mic's own mute or its boom mic pulled out.
@@ -281,6 +297,77 @@ class MicControl(Controller):
             reveal.flash(mw.mic_status, mw.mic_state_icon)
         mw._mic_tone = tone
         return reason or "", button
+
+    def _other_mics_alive(self, mic: str) -> frozenset:
+        """Before a set-up (on its thread): the other mics with sound now. One of them
+        sending only zeros after it was cut off by it (an app between the mic and a
+        voice chat, with a virtual mic of its own). A check: never fails the set-up."""
+        try:
+            target = (directmic.endpoint_for(mic) or "").lower()
+            return frozenset(micprobe.alive(
+                [e["guid"] for e in directmic.capture_endpoints()
+                 if e["active"] and e["guid"] != target]))
+        except Exception:  # noqa: BLE001
+            log.info("couldn't listen to the other mics", exc_info=True)
+            return frozenset()
+
+    def probe_mic(self):
+        """Once a set-up works (statuscontrol, the card turned green): the board plays
+        micprobe's probe into the mic only (never into your own headphones) and listens
+        to the mic and the other mics that had sound before (micprobe.check). Not when
+        the sounds aren't sent at all (muted, voice only): nothing to find then."""
+        mw = self.mw
+        e = mw.engine
+        if not self._probe_due or self._probing or mw._attaching:
+            return
+        self._probe_due = False
+        guid = directmic.endpoint_for(mw.cfg.mic_device)
+        if (not guid or mw.cfg.route != "mic" or e.main_stream is None or not e.sending
+                or e.mic_only() or e.sound_vol <= 0.05):
+            log.info("mic probe skipped (nothing sent to others now)")
+            return
+        self._probing = True
+        data = micprobe.probe()
+        gain = min(1.0 / e.sound_vol, 10.0)   # the sounds' volume to others: undone
+        before = self._alive_before
+
+        def play():
+            e.play("__probe__", data, gain, mode="restart", src_rate=micprobe.SR,
+                   only="main")
+
+        def work():
+            res = micprobe.check(play, guid, before)
+            if res.real is False:   # once more: a word said right then can hide it
+                res = micprobe.check(play, guid, before)
+            return res
+        worker.run(work, mw.mic_probed, "mic-probe", error=lambda err: None, owner=mw)
+
+    def _mic_probed(self, res):
+        mw = self.mw
+        self._probing = False
+        if res is None or mw._shut_down:
+            return
+        usage.used("mic-probe-heard" if res.real else
+                   "mic-probe-missing" if res.real is False else "mic-probe-unsure")
+        if res.real is False:
+            log.warning("the probe didn't come out of the mic: %s", res.scores)
+        for _g in res.dead:
+            usage.used("mic-probe-app-cut-off")
+        if res.dead:
+            log.warning("cut off by the set-up (only zeros now): %s", res.dead)
+        if not PROBE_SHOWS:
+            return
+        if res.real is False:
+            self._probe_missing = True
+            mw.statusctl._update_status()
+        # the name Windows' Sound settings shows first ("SteelSeries Sonar - Microphone"),
+        # without the device part in brackets that made it two lines
+        names = {e["guid"]: e["name"].removesuffix(f" ({e['device']})") if e.get("device")
+                 else e["name"] for e in directmic.capture_endpoints()}
+        for g in res.dead:
+            mw.toast(_("<b>{mic}</b> stopped sending sound after the set-up. Restart the "
+                       "app it belongs to and it works again.",
+                       mic=html.escape(names.get(g, g))), "warn", ms=12000, aside=True)
 
     def _auto_fix(self, direct: str):
         """Windows took the effect off the mic (a driver or Windows update): put it back
@@ -353,6 +440,7 @@ class MicControl(Controller):
             return
         mw._attaching = True
         self._autofixing = auto
+        self._probe_missing = False   # (checked again once this one works)
         self._declined = False   # (whatever happens now is what the card says)
         if auto:
             mw.toast(_("Fixing your mic… (your sound drops for a second)"))
@@ -377,6 +465,7 @@ class MicControl(Controller):
                    owner=mw, args=(mic, clean, auto))
 
     def _attach_mic_work(self, mic: str, clean: bool = False, auto: bool = False):
+        self._alive_before = self._other_mics_alive(mic)
         err = directmic.install(mic, clean=clean, ask_windows=not auto) or ""
         if err and not auto and directmic.fail_kind(err) == "no-mic-gone":
             # Windows doesn't know the picked mic any more (an old headset, renamed):
@@ -480,6 +569,7 @@ class MicControl(Controller):
             # was still hammering, and Windows can still fail to load it
             mw._done_toast = ("updated" if updating else "fixed" if auto else
                                 None if isinstance(modal, SetupWizard) else "done")
+            self._probe_due = True   # once it's running (statuscontrol: probe_mic)
         mw.routectl._show_route()
         mw.statusctl._update_status()
 
