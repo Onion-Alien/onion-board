@@ -1390,6 +1390,7 @@ class WindowBuilder(Controller):
         # line 1: what's happening, the mic, its live level
         top = QHBoxLayout()
         top.setSpacing(10)
+        top.addStrut(mw.mic_state_icon.height())   # as tall as the icon: level with it
         mw.mic_line = QLabel()
         mw.mic_line.setObjectName("micline")
         top.addWidget(mw.mic_line, 0, Qt.AlignmentFlag.AlignVCenter)
