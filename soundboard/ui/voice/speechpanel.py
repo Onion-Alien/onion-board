@@ -95,6 +95,7 @@ class SpeechPanel(QWidget):
     """Text-to-speech box and live voice-to-speech. `changed(settings)` for the config."""
     changed = Signal(dict)
     _voices = Signal(list, str)
+    _voices_quiet = Signal(list, str)   # the launch's own listing: its error isn't shown
     downloaded = Signal()           # a translation was downloaded or removed
     live_changed = Signal(bool)     # "talk as a computer voice" started / stopped
     lang_changed = Signal()         # Speak in: another language picked (VoicePanel)
@@ -121,6 +122,7 @@ class SpeechPanel(QWidget):
         controller.mute_real_voice = self.s["mute_real_voice"]
         controller.voice_fx = self.s["voice_fx"]
         self._voices.connect(self._fill_voices)
+        self._voices_quiet.connect(lambda v, e: self._fill_voices(v, e, quiet=True))
         self._voice_fp: frozenset[str] | None = None   # voice tokens when last loaded
         self._warming = False         # _warm_for_a_line's start is under way
         net.on_change(self._refresh_translation)   # Settings > Privacy's switches
@@ -469,7 +471,9 @@ class SpeechPanel(QWidget):
             known = tts.remembered_voices(self.s.get(tts.VOICE_CACHE), fp)
             voices = (controller.tts.use_listing(*known) if known
                       else controller.tts.warm_up())
-            busy.emit(self._voices, voices, controller.tts.error)
+            # nobody asked for speech yet (they may be on the Sounds tab): a slow or
+            # stuck Windows speech is only logged; a line said later reports its own
+            busy.emit(self._voices_quiet, voices, controller.tts.error)
         threading.Thread(target=warm_up, name="tts-warmup", daemon=True).start()
 
     # ---- text to speech
@@ -579,7 +583,7 @@ class SpeechPanel(QWidget):
         bar_ = self.said_log.verticalScrollBar()
         bar_.setValue(bar_.maximum())
 
-    def _fill_voices(self, voices: list, error: str):
+    def _fill_voices(self, voices: list, error: str, quiet: bool = False):
         self.cb_voice.blockSignals(True)
         self.cb_voice.clear()
         self.cb_voice.addItem(_("Windows default"), "")
@@ -612,7 +616,7 @@ class SpeechPanel(QWidget):
                                 ngettext("{n} custom voice loaded.", "{n} custom voices loaded.",
                                          len(custom)) if custom else "")
         self.lbl_custom.setVisible(bool(self.lbl_custom.text()))
-        if error:
+        if error and not quiet:
             self._tts_error(_("Text-to-speech isn't available: {error}",
                               error=errors.plain(error)))
 
