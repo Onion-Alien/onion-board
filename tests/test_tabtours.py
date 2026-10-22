@@ -319,13 +319,13 @@ def test_the_page_red_card_speaks_and_its_try_again_carries_on(window, qapp, mon
 
 def test_store_tour_waits_for_an_add_from_the_store(window, qapp, counted):
     """A sound landing on the board from elsewhere (a download, an import) doesn't end
-    it: only Add on the Community tab does. Its "OK" is there from the start."""
+    it: only Play or Add on the Community tab does. Its "OK" is there from the start."""
     assert open_tab(window, qapp, "store")
     tour = tabtours._current
     assert tour.card.btn_skip.isVisible()
     window.cfg.sounds.append(SoundMeta(id="b", name="B", file="b.wav"))
     process_events(qapp, lambda: False, 0.5)
     assert tabtours._current is tour and "tour-store-done" not in counted
-    window.store.added += 1
+    window.store.used += 1
     assert process_events(qapp, lambda: tabtours._current is None, 2)
     assert "tour-store-done" in counted

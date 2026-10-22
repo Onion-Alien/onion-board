@@ -215,9 +215,9 @@ def _voice(win, panel) -> list[coach.Step]:
 
 
 def _store(win, tab) -> list[coach.Step]:
-    # an Add pressed here, not the board growing: a sound arriving from anywhere else
-    # (a download, an import finishing) ended it before they'd touched a thing
-    count = getattr(tab, "added", 0)
+    # Play or Add pressed here, not the board growing: a sound arriving from anywhere
+    # else (a download, an import finishing) ended it the moment it showed
+    count = getattr(tab, "used", 0)
 
     def first() -> list[QRect]:
         rows = [r for r in getattr(tab, "_rows", []) if r.isVisible()]
@@ -225,7 +225,7 @@ def _store(win, tab) -> list[coach.Step]:
     return [coach.Step(
         _("Hear one, then add it"),
         _("Press play to hear a sound. Add puts it on your board."),
-        target=first, done=lambda: getattr(tab, "added", 0) > count, skip=_("OK"),
+        target=first, done=lambda: getattr(tab, "used", 0) > count, skip=_("OK"),
         allow=_inside(tab.list_area, getattr(tab, "oops_page", None)),
         failed=lambda: bool(getattr(tab, "failed", False)),
         oops_title=_("The store couldn't load"),
