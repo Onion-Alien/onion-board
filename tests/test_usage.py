@@ -586,6 +586,22 @@ def test_a_start_that_never_finished_is_counted_never_the_message(monkeypatch):
     assert usage.startup_failed("/x", "1.9.28", 42) == "startup-failed/1.9.28"
 
 
+def test_a_start_cut_short_by_the_pc_restarting_isnt_counted(monkeypatch):
+    """The breadcrumb was left before Windows last started: the PC was shut down,
+    restarted or lost power while the app loaded (a start with Windows, say). Not the
+    app's problem, the same as an unclean exit's `pc-restarted`: nothing is counted."""
+    from soundboard.core import exitwatch
+    monkeypatch.setattr(exitwatch, "windows_events", lambda pid: [])
+    monkeypatch.setattr(exitwatch, "boot_time", lambda: 2000.0)
+    assert usage.startup_failed("/x", "1.9.28", 42, started=1000.0) == ""
+    # left after Windows started (or no date known): still counted
+    assert usage.startup_failed("/x", "1.9.28", 42, started=3000.0) == "startup-failed/1.9.28"
+    assert usage.startup_failed("/x", "1.9.28", 42) == "startup-failed/1.9.28"
+    # a crash it left a trace of is still counted, restart or not
+    assert usage.startup_failed("/x", "1.9.28", 42, _NATIVE, started=1000.0).startswith(
+        "startup-failed/1.9.28/access-violation@")
+
+
 def test_a_handled_problem_is_counted_once_with_our_line_never_the_message():
     """errors.warn / html show a problem the app caught; usage.warned counts it, once
     per run, as the error's type and the deepest line of our own code it came from."""

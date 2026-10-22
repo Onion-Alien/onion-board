@@ -47,6 +47,7 @@ try:
 except Exception:
     # the installer started replacing the files while this loaded (installmark)
     if __name__ == "__main__" and installmark.installing():
+        bootmark.clear()   # stepped aside on purpose: not a start that failed
         sys.exit(0)
     raise
 

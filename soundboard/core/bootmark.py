@@ -38,15 +38,17 @@ def app_dir() -> Path:
 
 
 _previous: tuple[str, int] = ("", 0)
+_previous_at = 0.0
 
 
 def start(version: str, directory: Path | None = None) -> None:
     """Read the last run's breadcrumb, then leave this run's: call once, at the top of
     main.py, for a normal launch (not the one-off helper commands). `previous()` then
-    says what the last run left behind."""
-    global _previous
+    says what the last run left behind, and `previous_at()` when."""
+    global _previous, _previous_at
     path = Path(directory) if directory is not None else app_dir()
     _previous = read(path)
+    _previous_at = written(path) if _previous[0] else 0.0
     mark(version, path)
 
 
@@ -54,6 +56,19 @@ def previous() -> tuple[str, int]:
     """(version, pid) the last run left, or ("", 0) after a run that got past start-up
     (or on the very first launch)."""
     return _previous
+
+
+def previous_at() -> float:
+    """When the last run left its breadcrumb (time.time() scale), or 0 with none."""
+    return _previous_at
+
+
+def written(directory: Path) -> float:
+    """When `directory`'s breadcrumb was written, or 0."""
+    try:
+        return (Path(directory) / NAME).stat().st_mtime
+    except OSError:
+        return 0.0
 
 
 def mark(version: str, directory: Path | None = None) -> Path | None:
