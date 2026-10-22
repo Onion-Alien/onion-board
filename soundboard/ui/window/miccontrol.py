@@ -347,8 +347,8 @@ class MicControl(Controller):
         self._probing = False
         if res is None or mw._shut_down:
             return
-        usage.used({True: "mic-probe-heard", False: "mic-probe-missing",
-                    None: "mic-probe-unsure"}[res.real])
+        usage.used("mic-probe-heard" if res.real else
+                   "mic-probe-missing" if res.real is False else "mic-probe-unsure")
         if res.real is False:
             log.warning("the probe didn't come out of the mic: %s", res.scores)
         for _g in res.dead:
