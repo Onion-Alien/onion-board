@@ -27,6 +27,7 @@ from shiboken6 import isValid as qt_valid
 WIDEN_STEP = 80
 LIFTED = "fit_lifted"   # (how far fit() moved a window up, the y it left it at)
 MARGIN = "fit_margin"   # a card inside a window: the room it keeps around itself (px)
+SCROLLS = "fit_scrolls"   # its content scrolls: widened only when that makes it fit
 WATCHED = (QEvent.Type.Show, QEvent.Type.LayoutRequest, QEvent.Type.Resize)
 
 
@@ -64,9 +65,12 @@ def fit(w: QWidget) -> bool:
         lay.activate()
         width = min(max(width, lay.totalMinimumSize().width()), max(max_w, width))
     need = needed_height(w, width)
+    narrow, narrow_need = width, need
     while need > max_h and width + WIDEN_STEP <= max_w:   # too tall for the screen: widen
         width += WIDEN_STEP
         need = needed_height(w, width)
+    if need > max_h and w.property(SCROLLS):   # wider didn't make it fit: it scrolls,
+        width, need = narrow, narrow_need       # at its own width (not stretched empty)
     height = min(max(need, w.height()), max_h)
     if (width, height) == (w.width(), w.height()):
         return False
