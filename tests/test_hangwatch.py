@@ -184,6 +184,19 @@ def test_time_the_pc_slept_is_no_freeze(qapp, tmp_path, monkeypatch):
         hw.stop()
 
 
+def test_stuck_uses_the_watchs_own_clock(qapp):
+    """The exit black box read time.monotonic() - beat: on the awake clock that was the
+    PC's whole sleep time since boot, so every unclean exit after a sleep came in as
+    unclean-exit/…/frozen with no freeze report behind it."""
+    settle(qapp)
+    hw = HangWatch(hang_s=HANG_S, clock=lambda: time.monotonic() - 3600)   # slept 1 h
+    try:
+        beat_for(qapp, 0.3)
+        assert hw.stuck() < HANG_S
+    finally:
+        hw.stop()
+
+
 def test_the_awake_clock_moves_with_time():
     from soundboard.core.hangwatch import awake_clock
     clock = awake_clock()

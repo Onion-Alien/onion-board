@@ -1,0 +1,1 @@
+- Fixed: after the PC had slept, a crash or a closed-from-Task-Manager exit was counted as "frozen" in the anonymous problem count. The exit check now uses the same sleep-proof clock as the freeze check.
