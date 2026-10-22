@@ -4189,3 +4189,22 @@ def test_why_the_admin_step_raised_is_read_from_its_log(tmp_path):
 def test_every_admin_step_failure_word_can_be_counted():
     from soundboard.core import usage
     assert {f"at-{w}" for w in dm.RAISED_WHERE} | set(dm.RAISED_WHAT) == set(usage.MIC_RAISED)
+
+
+def test_the_mic_box_tick_is_level_with_its_headline(window, monkeypatch):  # noqa: F811
+    """The big tick/warning icon in the mic box sits level with the headline next to
+    it, not a few pixels lower (it is taller than one line of text)."""
+    from PySide6.QtCore import QPoint
+    from PySide6.QtWidgets import QApplication
+    w = window
+    _routes(w, monkeypatch, "ready")
+    w.cfg.mic_device = "My mic"
+    monkeypatch.setattr(w.engine, "main_stream", object())
+    monkeypatch.setattr(w.micctl, "_direct_not_running", lambda: False)
+    monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
+    w.show()
+    w.statusctl._update_flow()
+    QApplication.processEvents()
+    box, icon, line = w.mic_status, w.mic_state_icon, w.mic_line
+    mid = lambda wid: wid.mapTo(box, QPoint(0, 0)).y() + wid.height() / 2  # noqa: E731
+    assert abs(mid(icon) - mid(line)) <= 1.5
