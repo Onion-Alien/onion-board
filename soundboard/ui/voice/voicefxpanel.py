@@ -933,10 +933,10 @@ class VoiceFxPanel(QWidget):
         self.picked_box.setSpacing(10)
         ph = QHBoxLayout()
         ph.setSpacing(10)
-        self.picked_box.addLayout(ph, 1)
+        self.picked_box.addLayout(ph)
         pb = QHBoxLayout()
         pb.setSpacing(10)
-        self.picked_box.addLayout(pb, 1)   # an equal share: the buttons start mid-bar
+        self.picked_box.addLayout(pb, 1)   # right after the name; the room left is past them
         self._picked_pb = pb
         self.picked_pic = QLabel()
         self.picked_pic.setFixedSize(PICKED_ART, PICKED_ART)
@@ -945,7 +945,7 @@ class VoiceFxPanel(QWidget):
         self.picked_name.setObjectName("pickedname")
         self.picked_name.setWordWrap(True)
         self.picked_name.setMinimumWidth(40)   # a long name gives way in a narrow window
-        ph.addWidget(self.picked_name, 1)
+        ph.addWidget(self.picked_name)
         # everything for making your own voice opens in a window of its own (on the
         # card it made the tab scroll forever)
         self.btn_tweak = QPushButton(_("Edit voice"))
