@@ -2752,13 +2752,19 @@ def test_a_set_up_that_raised_counts_where_and_offers_the_cable(window, monkeypa
     monkeypatch.setattr(dm, "endpoint_for", lambda name: GUID)
     monkeypatch.setattr(dm, "bundled_dll", lambda: Path(dm.__file__))   # (any file)
     monkeypatch.setattr(dm, "_elevated", lambda *a, **k: 1)
-    monkeypatch.setattr(dm, "raised_why", lambda: ("mic-settings", "denied"))
+    monkeypatch.setattr(dm, "raised_why", lambda: ("mic-settings", "denied", "err-5"))
     w.micctl._mic_attached(*w.micctl._attach_mic_work("My mic"))
     assert {"mic-effect-failed-code-1", "mic-effect-code-1-at-mic-settings",
-            "mic-effect-code-1-denied"} <= usage._used
+            "mic-effect-code-1-denied", "mic-effect-code-1-err-5"} <= usage._used
     (kw,) = told
     assert kw["aside"] and kw["action"][0] == "Use the cable"
     assert w.micctl._raised is None   # used once
+    # exit code 6: which of Windows' audio services wouldn't stop
+    monkeypatch.setattr(dm, "_elevated", lambda *a, **k: 6)
+    monkeypatch.setattr(dm, "stuck_why", lambda: "builder")
+    w.micctl._mic_attached(*w.micctl._attach_mic_work("My mic"))
+    assert {"mic-effect-failed-code-6", "mic-effect-code-6-builder"} <= usage._used
+    assert all(name in usage.FEATURES for name in usage._used)
 
 
 def _fake_shell(monkeypatch, started: bool, error: int = 0, wait: int = 0, code: int = 0):
@@ -4166,7 +4172,7 @@ def test_a_mic_the_registry_names_differently_is_found_by_asking_windows(monkeyp
 
 def test_why_the_admin_step_raised_is_read_from_its_log(tmp_path):
     log_file = tmp_path / "directmic-admin.log"
-    assert dm.raised_why(log_file) == ("other", "other")   # no log
+    assert dm.raised_why(log_file) == ("other", "other", "err-none")   # no log
     log_file.write_text(
         "2026-10-20 mic effect install failed\n"
         "Traceback (most recent call last):\n"
@@ -4177,18 +4183,74 @@ def test_why_the_admin_step_raised_is_read_from_its_log(tmp_path):
         '  File "x/directmic.py", line 1500, in _register_com\n'
         "    with winreg.CreateKeyEx(...) as k:\n"
         "PermissionError: [WinError 5] Access is denied\n", encoding="utf-8")
-    assert dm.raised_why(log_file) == ("register", "denied")
+    assert dm.raised_why(log_file) == ("register", "denied", "err-5")
     with open(log_file, "a", encoding="utf-8") as f:   # the last one counts
         f.write("Traceback (most recent call last):\n"
                 '  File "x/directmic.py", line 1990, in _put_on\n'
                 "    os.replace(tmp, target)\n"
                 "OSError: [WinError 32] The process cannot access the file\n")
-    assert dm.raised_why(log_file) == ("files", "in-use")
+    assert dm.raised_why(log_file) == ("files", "in-use", "err-32")
+    with open(log_file, "a", encoding="utf-8") as f:   # a number not listed, or none
+        f.write("Traceback (most recent call last):\n"
+                '  File "x/directmic.py", line 1700, in _make_ring\n'
+                "OSError: [WinError 1785] odd\n")
+    assert dm.raised_why(log_file) == ("ring", "other", "err-other")
+    with open(log_file, "a", encoding="utf-8") as f:
+        f.write("Traceback (most recent call last):\n"
+                '  File "x/directmic.py", line 1700, in somewhere_new\n'
+                "KeyError: 'x'\n")
+    assert dm.raised_why(log_file) == ("other", "other", "err-none")
+
+
+def test_a_step_the_helper_ran_is_read_from_the_helpers_log(tmp_path, monkeypatch):
+    """The mic helper's steps log to michelper.log, not directmic-admin.log: the
+    newest of the two is read, so a helper's failure isn't counted as "other"."""
+    import os
+    monkeypatch.setattr(dm, "data_dir", lambda: tmp_path / "MicPlugin")
+    admin, helper = tmp_path / "directmic-admin.log", tmp_path / "michelper.log"
+    admin.write_text("Traceback (most recent call last):\n"
+                     '  File "x/directmic.py", line 1, in _register_com\n'
+                     "PermissionError: [WinError 5] Access is denied\n", encoding="utf-8")
+    helper.write_text("Traceback (most recent call last):\n"
+                      '  File "x/directmic.py", line 1, in _install_endpoint\n'
+                      "OSError: [WinError 87] The parameter is incorrect\n", encoding="utf-8")
+    os.utime(admin, (1000, 1000))
+    os.utime(helper, (2000, 2000))
+    assert dm.raised_why() == ("mic-settings", "other", "err-87")
+    os.utime(admin, (3000, 3000))
+    assert dm.raised_why() == ("register", "denied", "err-5")
+
+
+def test_which_audio_service_wouldnt_stop_is_read_from_the_log(tmp_path, monkeypatch):
+    monkeypatch.setattr(dm, "data_dir", lambda: tmp_path / "MicPlugin")
+    log_file = tmp_path / "michelper.log"
+    assert dm.stuck_why() == "other"   # no log
+    log_file.write_text(f"x {dm.AUDIO_STUCK} Audiosrv=StopPending\n", encoding="utf-8")
+    assert dm.stuck_why() == "audio"
+    with open(log_file, "a", encoding="utf-8") as f:   # the last one counts
+        f.write(f"x {dm.AUDIO_STUCK} AudioEndpointBuilder=Running Audiosrv=Running\n")
+    assert dm.stuck_why() == "both"
+    with open(log_file, "a", encoding="utf-8") as f:
+        f.write(f"x {dm.AUDIO_STUCK} AudioEndpointBuilder=StopPending\n")
+    assert dm.stuck_why(log_file) == "builder"
+
+
+def test_audio_that_wont_stop_gets_a_longer_second_wait_and_is_logged(monkeypatch, caplog):
+    waits = []
+    monkeypatch.setattr(dm, "_run", lambda cmd, timeout=60.0: 0)
+    monkeypatch.setattr(dm, "_stopped_soon", lambda wait_s=None: waits.append(wait_s))
+    monkeypatch.setattr(dm, "_services_up", lambda: "Audiosrv=StopPending")
+    with caplog.at_level("WARNING"):
+        assert dm._audio_service(False) is False
+    assert waits == [None, dm.STOP_WAIT_S * 3]
+    assert f"{dm.AUDIO_STUCK} Audiosrv=StopPending" in caplog.text
 
 
 def test_every_admin_step_failure_word_can_be_counted():
     from soundboard.core import usage
-    assert {f"at-{w}" for w in dm.RAISED_WHERE} | set(dm.RAISED_WHAT) == set(usage.MIC_RAISED)
+    assert {f"at-{w}" for w in dm.RAISED_WHERE} | set(dm.RAISED_WHAT) \
+        | set(dm.RAISED_ERR) == set(usage.MIC_RAISED)
+    assert set(dm.STUCK_WHICH) == set(usage.MIC_STUCK)
 
 
 def test_the_mic_box_tick_is_level_with_its_headline(window, monkeypatch):  # noqa: F811

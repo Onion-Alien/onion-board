@@ -250,7 +250,10 @@ account or anything else about you.
     of the admin step stopped and what Windows said, as words read from its log
     (`mic-effect-code-1-at-<part>`: `register`, `mic-settings`, `ring`, `files`, `audio`,
     `rights`, `other`; `mic-effect-code-1-<what>`: `denied`, `in-use`, `missing`,
-    `other`): never the message or the mic's name; Settings' *Audio recovery* (`used/recovery-repair`, `recovery-remove`… and
+    `other`, and Windows' error number as `err-2`, `err-3`, `err-5`, `err-32`, `err-33`,
+    `err-87`, `err-1224`, `err-1314`, `err-other` or `err-none`), and for exit code 6
+    which of Windows' audio services wouldn't stop (`mic-effect-code-6-<which>`:
+    `audio`, `builder`, `both`, `other`): never the message or the mic's name; Settings' *Audio recovery* (`used/recovery-repair`, `recovery-remove`… and
     `recovery-failed`);
   - Onion Board's own update cancelled, failing to download or to start, its *Copy
     error*, *Later*, one that didn't finish, one installing itself as the app started

@@ -46,6 +46,7 @@ class MicControl(Controller):
     _autofix_tried = False  # it ran since the mic last worked (once per time it's off)
     _declined = False       # the last set-up's Windows prompt got a No
     _raised = None          # exit code 1: directmic.raised_why() of that set-up
+    _stuck = ""             # exit code 6: directmic.stuck_why() of that set-up
     _helper_checking = False
     _helper_failed = False  # the last check raised: the next waits HELPER_RETRY_S
     _helper_check_at = 0.0  # when the last check started (time.monotonic())
@@ -387,8 +388,10 @@ class MicControl(Controller):
                 mic, err = other, directmic.install(other, clean=clean) or ""
         # its reason word, kept here: the signal hands _mic_attached a plain str
         self._mic_fail_kind = directmic.fail_kind(err) if err else ""
-        # the admin step raised: where and what, from its log (read here, off the UI thread)
+        # the admin step raised: where, what and Windows' error number; or the audio
+        # wouldn't stop: which service. From its log (read here, off the UI thread)
         self._raised = directmic.raised_why() if self._mic_fail_kind == "code-1" else None
+        self._stuck = directmic.stuck_why() if self._mic_fail_kind == "code-6" else ""
         return mic, err
 
     def _mic_attached(self, mic: str, err: str):
@@ -419,10 +422,14 @@ class MicControl(Controller):
             if auto or err != directmic.declined():   # why, as a fixed word (never err)
                 usage.used(f"mic-effect-{'fix-' if auto else ''}failed-{kind}")
             raised, self._raised = self._raised, None
+            stuck, self._stuck = self._stuck, ""
             if kind == "code-1" and raised:
-                where, what = raised
+                where, what, num = raised
                 usage.used(f"mic-effect-code-1-at-{where}")
                 usage.used(f"mic-effect-code-1-{what}")
+                usage.used(f"mic-effect-code-1-{num}")
+            elif kind == "code-6" and stuck:
+                usage.used(f"mic-effect-code-6-{stuck}")
             if auto:
                 # the card turns into its one button with the reason (_mic_view)
                 self._autofix_err = err

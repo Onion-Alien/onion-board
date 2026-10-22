@@ -1470,6 +1470,21 @@ def _services_stopped() -> bool:
     return r.stdout.strip() == "0"
 
 
+def _services_up() -> str:
+    """Windows' audio services not stopped, with their state ("Audiosrv=StopPending"),
+    or "" when all are stopped or it can't tell (a check: never fails)."""
+    script = ("Get-Service -Name " + ",".join(AUDIO_SERVICES) + " -ErrorAction SilentlyContinue"
+              " | Where-Object Status -ne 'Stopped'"
+              " | ForEach-Object { \"$($_.Name)=$($_.Status)\" }")
+    try:
+        r = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", script],
+                           capture_output=True, text=True, errors="replace", timeout=15,
+                           creationflags=_CREATE_NO_WINDOW)
+    except (OSError, subprocess.TimeoutExpired):
+        return ""
+    return " ".join(r.stdout.split())
+
+
 def _audio_service(start: bool, dependents: Sequence[str] = ()) -> bool:
     """Stop / start Windows' audio. The endpoint builder reads the mics' effect settings
     when it starts, so it goes too (the audio service depends on it). `dependents`: the
@@ -1487,12 +1502,16 @@ def _audio_service(start: bool, dependents: Sequence[str] = ()) -> bool:
     _run(["net", "stop", "AudioEndpointBuilder", "/y"])
     if _stopped_soon():
         return True
-    # a dependency held it, or net gave up while it was still stopping: once more
+    # a dependency held it, or net gave up while it was still stopping: once more, with
+    # longer for a slow sound-card driver (exit code 6 came from PCs that only stopped
+    # a little after the first wait)
     _run(["net", "stop", "audiosrv", "/y"])
     _run(["net", "stop", "AudioEndpointBuilder", "/y"])
-    if _stopped_soon():
+    if _stopped_soon(STOP_WAIT_S * 3):
         return True
+    # what was still up, for the app to count (stuck_why) and for the log's reader
     log.warning("Windows' audio wouldn't stop: the mic effect may need a restart to take")
+    log.warning("%s %s", AUDIO_STUCK, _services_up() or "unknown")
     return False
 
 
@@ -2599,32 +2618,61 @@ class Failure(str):
 
 
 # exit code 1 (the admin step raised): which part of it, by the deepest of these in the
-# admin log's last traceback, and what Windows said (RAISED_WHAT). Counted as these
-# fixed words (usage MIC_RAISED), never the log's text. Only Windows 10 PCs failed so
+# admin log's last traceback, what Windows said (RAISED_WHAT) and its error number
+# (RAISED_ERR). Counted as these fixed words (usage MIC_RAISED), never the log's text.
+# Only Windows 10 PCs failed so far.
 RAISED_AT = {"_register_com": "register", "_install_endpoint": "mic-settings",
              "_uninstall_endpoint": "mic-settings", "_strip_endpoint": "mic-settings",
-             "_make_ring": "ring", "secure_data_dirs": "ring", "_put_on": "files",
-             "_audio_service": "audio", "_audio_off": "audio",
+             "_fx_values": "mic-settings", "capture_endpoints": "mic-settings",
+             "installed_on": "mic-settings", "_BackupKey": "mic-settings",
+             "_make_ring": "ring", "secure_data_dirs": "ring", "_secure_dir": "ring",
+             "_clean_base": "ring", "_put_on": "files", "_remove": "files",
+             "_audio_service": "audio", "_audio_off": "audio", "_running_dependents": "audio",
              "_enable_privileges": "rights"}
 RAISED_WHERE = (*dict.fromkeys(RAISED_AT.values()), "other")
 RAISED_WHAT = ("denied", "in-use", "missing", "other")
+# the Windows error numbers worth telling apart: not found (2, 3), denied (5), in use
+# (32, 33), bad parameter (87), a mapped file (1224), a privilege not held (1314)
+RAISED_CODES = (2, 3, 5, 32, 33, 87, 1224, 1314)
+RAISED_ERR = (*(f"err-{n}" for n in RAISED_CODES), "err-other", "err-none")
 
 
-def raised_why(log_path: Path | None = None) -> tuple[str, str]:
-    """(where, what) the admin step's last exception was, from the tail of its log
-    (users may read it): RAISED_WHERE and RAISED_WHAT words, ("other", "other") when
-    the log can't tell."""
-    path = log_path or data_dir().parent / "directmic-admin.log"
+def admin_logs() -> list[Path]:
+    """The logs an admin step writes to: its own (Windows' prompt) and the mic
+    helper's (a step the helper ran logs there), newest first."""
+    base = data_dir().parent
+    logs = [base / "directmic-admin.log", base / "michelper.log"]
+
+    def mtime(p: Path) -> float:
+        try:
+            return p.stat().st_mtime
+        except OSError:
+            return 0.0
+    return sorted(logs, key=mtime, reverse=True)
+
+
+def _log_tail(path: Path) -> str:
     try:
         with open(path, "rb") as f:
             f.seek(0, os.SEEK_END)
             f.seek(max(0, f.tell() - 64 * 1024))
-            tail = f.read().decode("utf-8", "replace")
+            return f.read().decode("utf-8", "replace")
     except OSError:
-        return "other", "other"
-    start = tail.rfind("Traceback (most recent call last):")
-    if start < 0:
-        return "other", "other"
+        return ""
+
+
+def raised_why(log_path: Path | None = None) -> tuple[str, str, str]:
+    """(where, what, err) the admin step's last exception was, from the tail of its log
+    (users may read it): RAISED_WHERE, RAISED_WHAT and RAISED_ERR words, ("other",
+    "other", "err-none") when no log can tell. Without `log_path`, the newest of
+    admin_logs() that has one."""
+    for path in [log_path] if log_path else admin_logs():
+        tail = _log_tail(path)
+        start = tail.rfind("Traceback (most recent call last):")
+        if start >= 0:
+            break
+    else:
+        return "other", "other", "err-none"
     lines = tail[start:].splitlines()[1:]
     funcs = [m.group(1) for m in map(re.compile(r'\s*File ".*", line \d+, in (\S+)').match,
                                      lines) if m]
@@ -2634,7 +2682,30 @@ def raised_why(log_path: Path | None = None) -> tuple[str, str]:
             "in-use" if re.match(r".*\[WinError (32|33)\]", last) else
             "missing" if re.match(r"FileNotFoundError|.*\[WinError [23]\]", last) else
             "other")
-    return where, what
+    m = re.match(r".*\[WinError (\d+)\]", last)
+    err = ("err-none" if not m else
+           f"err-{m.group(1)}" if int(m.group(1)) in RAISED_CODES else "err-other")
+    return where, what, err
+
+
+# exit code 6 (Windows' audio wouldn't stop): which of its two services was still up,
+# from the AUDIO_STUCK line the admin step logs (stuck_why)
+AUDIO_STUCK = "audio still up:"
+STUCK_WHICH = ("audio", "builder", "both", "other")
+
+
+def stuck_why(log_path: Path | None = None) -> str:
+    """Which of Windows' audio services the last step that got exit code 6 couldn't
+    stop: a STUCK_WHICH word ("other" when no log says)."""
+    for path in [log_path] if log_path else admin_logs():
+        tail = _log_tail(path)
+        at = tail.rfind(AUDIO_STUCK)
+        if at >= 0:
+            up = tail[at + len(AUDIO_STUCK):].partition("\n")[0].lower()
+            audio, builder = "audiosrv" in up, "audioendpointbuilder" in up
+            return ("both" if audio and builder else "audio" if audio else
+                    "builder" if builder else "other")
+    return "other"
 
 
 def fail_kind(err: str) -> str:
