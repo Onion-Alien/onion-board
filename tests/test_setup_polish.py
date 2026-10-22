@@ -2,6 +2,7 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication
 from test_mainwindow import window  # noqa: F401
+from conftest import said
 
 from soundboard.mic import directmic as dm
 from soundboard.audio import engine as eng
@@ -190,6 +191,10 @@ def test_unplugged_headphones_and_mic_stay_said_under_devices(window, monkeypatc
     assert "Can't open <b>Headphones (Example Headset)</b> (My headphones)" in hint
     assert "Can't open <b>Headset Microphone (Example Headset)</b> (My mic)" in hint
     assert not w.setup_hint.isHidden()
+    # the toast says it in the same words, not PortAudio's error
+    toast = said(w)
+    assert "(My headphones). Plugged in?" in toast and "(My mic)" in toast
+    assert "Device unavailable" not in toast and "span" not in toast
     # back: the lines go
     monkeypatch.setattr(e, "mon_stream", _Stream())
     e.errors.pop("mon")
