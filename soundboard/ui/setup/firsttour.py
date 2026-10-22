@@ -12,7 +12,7 @@ yet, the window dims and one card (coach.py) walks them through it:
   "nice"     A sound arrived: one last card, any click closes it.
 
 It can't be clicked away: a click outside the ring and the card does nothing until the
-search (or Add) step, whose quiet "Not now" shows after a moment (coach.SKIP_MS). Once
+search (or Add) step, whose quiet "OK" shows after a moment (coach.SKIP_MS). Once
 only (Config.tips_seen); never with tutorials switched off (Config.tutorials_on).
 
 Anything going wrong (a search that can't get through, an error card, an error logged)
@@ -80,7 +80,7 @@ def start(win) -> Tour | None:
 
 
 def stop(win=None):
-    """End the tour now (tutorials switched off): put off, as with Not now."""
+    """End the tour now (tutorials switched off): put off, as with OK."""
     if _current is not None and (win is None or _current.win is win):
         _current.end("skipped")
 
@@ -107,7 +107,7 @@ class Tour(coach.Tour):
                     _("Try anything: a song, a meme, a game sound."),
                     target=lambda: coach.rect_of(w, w.search),
                     done=lambda: bool(w.cfg.sounds) or self._results_up(),
-                    skip=_("Not now"), enter=self._focus_search,
+                    skip=_("OK"), enter=self._focus_search,
                     failed=lambda: w.ytresults.failed, oops=self._oops,
                     retry=self._retry_search, page_oops=lambda: w.ytresults.oops,
                     allow=self._in_search, extra={"name": "search"}),
@@ -115,7 +115,7 @@ class Tour(coach.Tour):
                     _("Pick one, you'll love it!"),
                     _("Play to hear it, Add to keep it on your board."),
                     target=self._first_result, done=lambda: bool(w.cfg.sounds),
-                    skip=_("Not now"), allow=self._in_results,
+                    skip=_("OK"), allow=self._in_results,
                     failed=lambda: w.ytresults.failed, oops=self._oops,
                     retry=self._retry_search, page_oops=lambda: w.ytresults.oops,
                     enter=self._searched,
@@ -126,7 +126,7 @@ class Tour(coach.Tour):
                 _("Add a song from your PC"),
                 _("Click Add, then Sound files, and pick a song or a sound you have."),
                 target=lambda: coach.rect_of(w, w.btn_add), done=lambda: bool(w.cfg.sounds),
-                skip=_("Not now"), extra={"name": "add"})]
+                skip=_("OK"), extra={"name": "add"})]
         nice = coach.Step(
             _("Nice, that's your first sound!"),
             _("Click it to play it. Each tab shows you a quick how-to like this the first "
