@@ -1995,7 +1995,12 @@ def _audio_off(work, also: Sequence[str] = ()) -> int:
     # too, but that's the stuck mic the retry is for: it still gets the extra restarts
     quiet = _silent_before([*installed_on(), *also]) - _left_silent()
     apps_quiet = _mic_apps_quiet()
-    if _mic_restart_works():
+    # a mic app's own mic (SteelSeries Sonar's) the step changes: restarting it on its
+    # own after the effect came off left it refusing every app that opened it, until all
+    # of Windows' audio restarted. So it gets that, and its app a restart after it
+    # (_mic_apps_back): all of the audio restarting cuts it off, silent before or not.
+    own = {g.lower() for g in [*installed_on(), *also]} & _mic_app_guids()
+    if _mic_restart_works() and not own:
         return _mic_by_mic(work, also, quiet, apps_quiet)
     dependents = _running_dependents()
     _audio_comes_back(dependents)
@@ -2009,7 +2014,7 @@ def _audio_off(work, also: Sequence[str] = ()) -> int:
     finally:
         _audio_service(True, dependents)
         live = mics is None or _mics_come_back_live(mics, quiet)
-        _mic_apps_back(apps_quiet)
+        _mic_apps_back(apps_quiet - own)
     return MIC_SILENT if code == 0 and not live else code
 
 
@@ -2067,6 +2072,15 @@ def _mic_app_mics(mic: str) -> list[str]:
     """The active mics whose name starts with `mic` (a mic app's own)."""
     return [e["guid"].lower() for e in capture_endpoints()
             if e["active"] and e["name"].startswith(mic)]
+
+
+def _mic_app_guids() -> set[str]:
+    """The mic apps' (MIC_APPS) own active mics, running or not (a check: never fails)."""
+    try:
+        return {g for _exe, _parent, mic in MIC_APPS for g in _mic_app_mics(mic)}
+    except Exception:  # noqa: BLE001
+        log.info("couldn't list the mic apps' mics", exc_info=True)
+        return set()
 
 
 def _mic_apps_quiet() -> set[str]:
@@ -2144,11 +2158,13 @@ def _processes(exe: str) -> list[tuple[int, str]]:
 
 
 def _heard_before(guid: str) -> bool | None:
-    """_mic_is_silent before a step, asked once more after a moment when it can't tell:
-    Windows can refuse to open a mic for a moment (a mic app's own, such as SteelSeries
-    Sonar's, right after the board using it was ended)."""
+    """_mic_is_silent before a step, asked once more after a moment when it couldn't
+    tell at once: Windows can refuse to open a mic for a moment (a mic app's own, such
+    as SteelSeries Sonar's, right after the board using it was ended). A mic that took
+    longer to say so (not there, or not back yet) isn't waited for again."""
+    start = time.monotonic()
     heard = _mic_is_silent(guid)
-    if heard is None:
+    if heard is None and time.monotonic() - start < BEFORE_RETRY_S:
         time.sleep(BEFORE_RETRY_S)
         heard = _mic_is_silent(guid)
     return heard
@@ -2453,7 +2469,8 @@ def admin_cleanup(guid: str) -> int:
     _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
     leftover = any(without_ours(v)[0] for v in _fx_values(guid).values())
     apps_quiet = _mic_apps_quiet() if leftover else set()
-    if leftover and _mic_restart_works():
+    own = ({guid.lower()} & _mic_app_guids()) if leftover else set()   # as in _audio_off
+    if leftover and _mic_restart_works() and not own:
         _strip_endpoint(guid)
         if not _restart_mics([guid]):
             restarted = _restart_audio()
@@ -2469,7 +2486,7 @@ def admin_cleanup(guid: str) -> int:
             _strip_endpoint(guid)
         finally:
             _audio_service(True, dependents)
-            _mic_apps_back(apps_quiet)
+            _mic_apps_back(apps_quiet - own)
     if not installed_on() and anything_installed():
         return admin_uninstall()   # on no mic: the rest of it goes too
     return 0

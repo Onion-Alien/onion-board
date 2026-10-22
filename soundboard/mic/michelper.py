@@ -46,11 +46,11 @@ log = logging.getLogger(__name__)
 # side", or this file); tests/test_michelper.py fails until it is. A newer helper is
 # put in place by the next admin step that asks anyway: only another effect DLL makes
 # the app ask (so the helper never adds a prompt the app wouldn't have had).
-HELPER_VERSION = 23
+HELPER_VERSION = 24
 # The oldest helper the app still uses. Raise it (to HELPER_VERSION) only when the
 # helpers out there have a bug that matters: the app then asks Windows once more, and
 # that prompt puts this version's helper in place.
-MIN_HELPER_VERSION = 23   # 23: set-ups restart only the mic, not all of the audio
+MIN_HELPER_VERSION = 24   # 24: set-ups restart only the mic (a mic app's own: all of the audio)
 TASK = r"\Onion Board\Mic helper"
 EXE_NAME = "obmichelper.exe"
 STAMP = "stamp.txt"

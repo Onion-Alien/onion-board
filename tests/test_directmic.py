@@ -599,6 +599,29 @@ def test_mic_apps_are_left_alone_when_only_the_mic_restarted(fake_reg, monkeypat
     assert calls[-1] == "apps"
 
 
+@pytest.mark.parametrize("op", ["install", "uninstall"])
+def test_a_mic_apps_own_mic_gets_all_of_the_audio_restarted(fake_reg, monkeypatch,
+                                                            tmp_path, op):
+    """The step changes a mic app's own mic (SteelSeries Sonar's): restarting that mic on
+    its own left it refusing every app that opened it once the effect came off, until
+    all of Windows' audio restarted. So all of it restarts, and the app after it, even
+    though its mic sent only silence before (Sonar's does in a quiet room): all of the
+    audio restarting cuts it off."""
+    calls = _one_mic_kit(fake_reg, monkeypatch, tmp_path, [True] * 10)
+    monkeypatch.setattr(dm, "_mic_app_guids", lambda: {GUID.lower()})
+    monkeypatch.setattr(dm, "_mic_apps_quiet", lambda: {GUID.lower(), "{another}"})
+    monkeypatch.setattr(dm, "_mic_apps_back", lambda quiet=(): calls.append(("apps", quiet)))
+    if op == "uninstall":
+        assert dm.admin_install(GUID) == 0
+        calls.clear()
+        assert dm.admin_uninstall() == 0
+    else:
+        assert dm.admin_install(GUID) == 0
+    assert not [c for c in calls if c[0] == "mics"]   # never that mic on its own
+    assert [c for c in calls if c[0] is False] == [(False, ())]   # all of the audio, once
+    assert calls[-1] == ("apps", {"{another}"})
+
+
 def test_a_mic_app_silent_before_the_step_is_never_ended(monkeypatch, caplog):
     """Its mic sent only silence before the step too (the app switched off, or set up to
     send nothing): not the restart's doing. Ending it lost it for good when its own app
@@ -681,6 +704,22 @@ def test_a_mic_heard_on_the_second_listen_before_is_still_checked_after(
     calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [None, False] + [True] * 40)
     assert dm.admin_install(GUID) == dm.MIC_SILENT
     assert len([c for c in calls if c[0] is False]) == 1 + dm.EXTRA_RESTARTS
+
+
+def test_a_mic_slow_to_say_it_cant_tell_isnt_waited_for_again(monkeypatch):
+    """Can't tell after a long wait (the mic isn't there, or not back yet): asking again
+    would only wait as long once more."""
+    now = [0.0]
+    calls = []
+
+    def listen(guid):
+        calls.append(guid)
+        now[0] += 9
+        return None
+    monkeypatch.setattr(dm.time, "monotonic", lambda: now[0])
+    monkeypatch.setattr(dm.time, "sleep", lambda s: None)
+    monkeypatch.setattr(dm, "_mic_is_silent", listen)
+    assert dm._heard_before(GUID) is None and calls == [GUID]
 
 
 def test_mic_apps_quiet_before_counts_a_mic_that_cant_be_listened_to(monkeypatch):
@@ -1023,6 +1062,26 @@ def test_cleanup_restarts_only_that_mic(monkeypatch):
     monkeypatch.setattr(dm, "_audio_service", lambda *a: calls.append("audio"))
     assert dm.admin_cleanup(GUID) == 0
     assert calls == [("strip", GUID), ("mics", [GUID])]
+
+
+def test_cleanup_of_a_mic_apps_own_mic_restarts_all_of_the_audio(monkeypatch):
+    """As a step on a mic app's own mic (_audio_off): never that mic on its own."""
+    calls = []
+    monkeypatch.setattr(dm, "_enable_privileges", lambda *a: None)
+    monkeypatch.setattr(dm, "installed_on", lambda: [])
+    monkeypatch.setattr(dm, "anything_installed", lambda: False)
+    monkeypatch.setattr(dm, "_fx_values", lambda guid: {dm.FX % 5: dm.CLSID})
+    monkeypatch.setattr(dm, "_mic_restart_works", lambda: True)
+    monkeypatch.setattr(dm, "_mic_app_guids", lambda: {GUID.lower()})
+    monkeypatch.setattr(dm, "_mic_apps_quiet", lambda: {GUID.lower()})
+    monkeypatch.setattr(dm, "_running_dependents", lambda: [])
+    monkeypatch.setattr(dm, "_audio_comes_back", lambda deps: None)
+    monkeypatch.setattr(dm, "_strip_endpoint", lambda guid: calls.append(("strip", guid)))
+    monkeypatch.setattr(dm, "_restart_mics", lambda guids: calls.append(("mics", guids)) or True)
+    monkeypatch.setattr(dm, "_audio_service", lambda start, deps=(): calls.append(start) or True)
+    monkeypatch.setattr(dm, "_mic_apps_back", lambda quiet=(): calls.append(("apps", quiet)))
+    assert dm.admin_cleanup(GUID) == 0
+    assert calls == [False, ("strip", GUID), True, ("apps", set())]
 
 
 def test_a_failing_listen_never_fails_the_install(fake_reg, monkeypatch, tmp_path):
