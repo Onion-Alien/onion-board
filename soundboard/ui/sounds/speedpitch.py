@@ -22,7 +22,7 @@ from PySide6.QtWidgets import (QAbstractSpinBox, QApplication, QCheckBox, QDialo
                                QWidget)
 
 from soundboard.audio import livefx
-from soundboard.core import usage
+from soundboard.core import achievements, usage
 from soundboard.ui.kit import theme
 from soundboard import voicefx
 from soundboard.ui.bun import bunskits
@@ -353,6 +353,7 @@ class SpeedPitchButton(QPushButton):
             self.save_btn.clicked.connect(self._save_new)
             head.addWidget(self.save_btn)
         head.addWidget(reset)
+        self._head_btns = [b for b in (getattr(self, "save_btn", None), reset) if b]
         v.addLayout(head)
         v.addWidget(self._rule())
 
@@ -712,6 +713,7 @@ class SpeedPitchButton(QPushButton):
         if not self.pop.isVisible():
             usage.used(f"live-opened-{self._what}")   # the tab's name only (usage.py)
             self.opening.emit()
+        self._fit_head()
         # settle the layouts first: right after Redline hides its box, the column's
         # and the popup's size hint (and the popup's minimum) still hold the old,
         # taller height, so adjustSize alone would never shrink it back
@@ -734,6 +736,18 @@ class SpeedPitchButton(QPushButton):
         x = max(area.left(), min(x, area.right() - self.pop.width() + 1))
         self.pop.move(x, y)
         self.pop.show()
+
+    def _fit_head(self):
+        """Measure the header's buttons on the screen the pop-up opens on. A button
+        keeps the size it measured first: built on one monitor and opened on one with
+        other scaling, its words came out wider than it ("Save as new pa")."""
+        self.pop.setScreen(self.screen())
+        for b in self._head_btns:
+            text = b.text()   # new words: the button forgets the size it kept
+            b.setText("")
+            b.setText(text)
+            if b.objectName() == "liveReset":   # whole, never squeezed (see __init__)
+                b.setMinimumWidth(max(96, b.sizeHint().width()))
 
     def _label(self):
         s, p, _k = self.values()
@@ -769,6 +783,8 @@ class SpeedPitchButton(QPushButton):
         """Something changed while the pop-up is open, by hand (not the values put back
         at start): for the usage count, which tab's and which controls, by name only."""
         if names and self.pop.isVisible():
+            if "pitch" in names:   # Chipmunk / Demon Mode
+                achievements.pitched(self.pitch.value())
             usage.used(f"live-changed-{self._what}")
             for n in names:
                 usage.used(f"live-{n}")

@@ -33,6 +33,76 @@ def _no_windows_mics(monkeypatch):
     """mic_lookup's last try asks Windows for its mics: none here (the tests' made-up
     mics would otherwise meet this PC's real ones)."""
     monkeypatch.setattr(dm, "_windows_mics", lambda: [])
+    monkeypatch.setattr(dm, "_processes", lambda exe: [])   # no mic apps (MIC_APPS) running
+
+
+SONAR = dm.MIC_APPS[0]
+SONAR_MIC = "{sonar-mic}"
+
+
+def _mic_app_kit(monkeypatch, runs, heard, parent=SONAR[1]):
+    """_mic_apps_back with Windows faked: `runs` is the pids of the mic app each look at
+    the processes finds, in turn (the last one repeats); `heard` what each listen to its
+    mic says (True: exact zeros). -> the taskkill commands and the listens."""
+    calls = []
+    looks = list(runs)
+    monkeypatch.setattr(dm, "_processes", lambda exe: [
+        (pid, parent.lower()) for pid in (looks.pop(0) if len(looks) > 1 else looks[0])])
+    monkeypatch.setattr(dm, "capture_endpoints", lambda: [
+        {"guid": SONAR_MIC, "name": SONAR[2] + " (SteelSeries Sonar Virtual Audio Device)",
+         "active": True},
+        {"guid": GUID, "name": "Microphone (Realtek(R) Audio)", "active": True}])
+    monkeypatch.setattr(dm, "_silent", lambda g: calls.append(("listen", g)) or heard.pop(0))
+    monkeypatch.setattr(dm.subprocess, "run", lambda cmd, **kw: calls.append(cmd))
+    monkeypatch.setattr(dm.time, "sleep", lambda s: None)
+    return calls
+
+
+def test_a_mic_app_left_silent_by_the_audio_restart_is_restarted(monkeypatch):
+    """SteelSeries Sonar's mic (what the voice chat records) sends only silence after
+    Windows' audio restarts, until Sonar starts again: so it's ended, for SteelSeries' own
+    app to start it again, and its mic is listened to once more."""
+    calls = _mic_app_kit(monkeypatch, [[100], [100], [200]], [True, False])
+    dm._mic_apps_back()
+    assert calls == [("listen", SONAR_MIC), ["taskkill", "/F", "/PID", "100"],
+                     ("listen", SONAR_MIC)]
+
+
+def test_a_mic_app_with_sound_is_left_alone(monkeypatch):
+    calls = _mic_app_kit(monkeypatch, [[100]], [False])
+    dm._mic_apps_back()
+    assert calls == [("listen", SONAR_MIC)]
+
+
+def test_a_mic_app_nothing_would_start_again_is_never_ended(monkeypatch, caplog):
+    """Started by hand (not by its own app): ended, it would stay gone, so it's left."""
+    calls = _mic_app_kit(monkeypatch, [[100]], [True], parent="explorer.exe")
+    dm._mic_apps_back()
+    assert not [c for c in calls if isinstance(c, list)]
+    assert "nothing would start it again" in caplog.text
+
+
+def test_a_mic_app_that_doesnt_come_back_is_reported(monkeypatch, caplog):
+    calls = _mic_app_kit(monkeypatch, [[100]], [True])
+    ticks = iter(range(0, 1000, 5))
+    monkeypatch.setattr(dm.time, "monotonic", lambda: next(ticks))
+    dm._mic_apps_back()
+    assert ["taskkill", "/F", "/PID", "100"] in calls
+    assert "didn't start again" in caplog.text
+
+
+def test_no_mic_app_running_listens_to_nothing(monkeypatch):
+    calls = _mic_app_kit(monkeypatch, [[]], [])
+    dm._mic_apps_back()
+    assert calls == []
+
+
+def test_a_failing_mic_app_check_never_fails_the_step(monkeypatch, caplog):
+    def boom(exe):
+        raise RuntimeError("no WMI")
+    monkeypatch.setattr(dm, "_processes", boom)
+    dm._mic_apps_back()
+    assert "couldn't check the mic apps" in caplog.text
 
 
 @pytest.fixture
@@ -502,6 +572,15 @@ def test_a_mic_left_silent_by_the_restart_gets_one_more(fake_reg, monkeypatch, t
     assert dm.admin_install(GUID) == 0
     assert calls == [("listen", GUID), (False, ()), (True, ["midisrv"]), ("listen", GUID),
                      ("listen", GUID), (False, ()), (True, ["midisrv"]), ("listen", GUID)]
+
+
+def test_mic_apps_are_checked_after_the_audio_is_back(fake_reg, monkeypatch, tmp_path):
+    """The mic apps' check comes last: after the audio is started again and after any
+    extra restart for a silent mic (each restart would cut them off again)."""
+    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [False, True, True, False])
+    monkeypatch.setattr(dm, "_mic_apps_back", lambda: calls.append("apps"))
+    assert dm.admin_install(GUID) == 0
+    assert calls[-1] == "apps" and calls.count("apps") == 1
 
 
 def test_a_mic_still_waking_up_is_listened_to_again(fake_reg, monkeypatch, tmp_path):

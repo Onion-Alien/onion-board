@@ -38,6 +38,10 @@ IN_DIALOG_NOTE = ("(it was inside a window's own event loop; the stall was in Qt
 # The watch's own thread was held up as long: not the window alone but the whole app
 # (one thread kept Python's lock while it waited, or Windows paused the app).
 ALL_HELD_NOTE = "(every thread was held up, this watch too)"
+# A deep garbage sweep (uigc) ended while the window was stuck: by the time the watch
+# could look, the window was often back in the event loop, so its stack named only
+# app.exec(). This says what held it.
+GC_SWEEP_NOTE = "(a full garbage sweep over the whole app ran meanwhile: {took:.1f} s)"
 
 
 class HangWatch(QObject):
@@ -85,6 +89,9 @@ class HangWatch(QObject):
                 stack += f"\n{IN_DIALOG_NOTE}\n"
             if held:
                 stack += f"\n{ALL_HELD_NOTE}\n"
+            took = deep_sweep_within(stuck)
+            if took is not None:
+                stack += "\n" + GC_SWEEP_NOTE.format(took=took) + "\n"
             log.warning("the window hasn't responded for %.0f s; it's doing:\n%s",
                         stuck, stack)
             faults = page_faults()
@@ -144,6 +151,16 @@ class HangWatch(QObject):
             parts.append(f'Thread "{names.get(ident, "?")}" ({ident}){use}:')
             parts.append("".join(traceback.format_stack(frame, limit=MAX_FRAMES)))
         return "\n".join(parts)
+
+
+def deep_sweep_within(seconds: float) -> float | None:
+    """How long uigc's last deep sweep took, when it ended in the last `seconds` (the
+    time the window has been stuck); else None."""
+    from soundboard.core import uigc
+    end, took = uigc.last_deep
+    if end and time.monotonic() - end <= seconds + 1.0:
+        return took
+    return None
 
 
 def awake_clock() -> Callable[[], float]:
