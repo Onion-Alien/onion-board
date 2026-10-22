@@ -276,7 +276,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/bun/bunnywidget.py` | Bun animated: bobs, blinks, talks along with your mic and throws music notes |
 | `soundboard/ui/bun/onionalien.py` | the Onion Alien, the author's mascot, drawn in code like Bun and Hoot: he says the note on Settings > About in a speech bubble, typed out a letter at a time |
 | `soundboard/ui/bun/bunmode.py` | Bun mode: the mini player as a floating Bun over everything, showing what the app is doing |
-| `soundboard/ui/bun/pilotbun.py` | Pilot Bun: the Languages card's install picture, Bun flying a little plane round a turning Earth (rests after a while; still in lite mode) |
+| `soundboard/ui/bun/pilotbun.py` | Pilot Bun: the Languages card's install picture, Bun flying a little 3D plane low over a lit, turning 3D Earth (numpy per pixel; the plane depth-buffered; rests after a while; still in lite mode) |
 | `soundboard/ui/bun/scribebun.py` | Bun the scribe: the download banner's picture for a sound with no thumbnail, writing a well-known piece as sheet music on a scroll as the download comes in |
 | `soundboard/ui/bun/bunpong.py` | the Easter egg: poke Bun enough and he challenges you to a game picked at random; Pong, the games' shared base and the dialog (its sounds: `pongsounds.py`) |
 | `soundboard/ui/bun/bungames.py` | Bun's other Easter egg games: quick draw, rock paper scissors, tic-tac-toe |
