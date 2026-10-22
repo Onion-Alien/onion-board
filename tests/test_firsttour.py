@@ -1,6 +1,6 @@
 """Bun's first-run tour of the empty board (ui/setup/firsttour.py), on the real MainWindow
 offscreen: once only, one card, clicks outside do nothing until the search step's
-Not now, a sound added finishes it, the Add button instead of the search box in
+OK, a sound added finishes it, the Add button instead of the search box in
 Offline mode, and never with tutorials switched off."""
 
 import pytest

@@ -5,7 +5,7 @@ visit (tabtours.py) are built from it.
 
 A tour is a few `Step`s. A plain step has one button ("Let's go"). An action step waits
 until the person has done the thing (`done()` turns true: searched, played a station);
-it's the one place the tour can be put off, with a quiet "Not now" that shows up after
+it's the one place the tour can be put off, with a quiet "OK" that shows up after
 SKIP_MS, so clicking through without reading doesn't skip it.
 
 Until then the tour keeps the window to itself: a click outside the ring and the card
@@ -53,7 +53,7 @@ log = logging.getLogger(__name__)
 
 TICK_MS = 120        # follows the window (sizes, results, tab) this often
 ARM_MS = 600         # a step's button ignores clicks this long after it shows
-SKIP_MS = 2500       # "Not now" shows this long after an action step starts
+SKIP_MS = 2500       # "OK" shows this long after an action step starts
 SHAKE_MS = 420       # the card's shake when a click lands outside
 FLASH_MS = 700       # ... and the ring's flash
 # the ring round what to use next: a fixed yellow, drawn on the dimmed window (so the
@@ -594,7 +594,7 @@ class Tour(QWidget):
         return not self._in_ring_widget(obj)   # (typing in the search box goes in)
 
     def _escape(self) -> bool:
-        """Esc: only where "Not now" is showing (or a last card)."""
+        """Esc: only where "OK" is showing (or a last card)."""
         s = self.step
         if s is not None and not s.blocks:
             self.end("done")

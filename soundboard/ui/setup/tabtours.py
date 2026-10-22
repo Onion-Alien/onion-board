@@ -1,7 +1,7 @@
 """Each tab's quick how-to, the first time it's opened: the window dims, the thing to use
 sits in the yellow ring, and one card (coach.py) says what to do. It stays until they've
 done it (played a station on the globe, sent a program, picked a voice…) or pressed
-its "Not now", which shows after a moment, or something went wrong (a station that
+its "OK", which shows after a moment, or something went wrong (a station that
 won't play: it ends at once, coach.py); either way it never comes back
 (Config.tips_seen). One
 step each, a few seconds long.
@@ -9,7 +9,7 @@ step each, a few seconds long.
 Radio, Apps, Voice and Store have one (Triggers has none: its page says it all);
 Sounds has the first-run tour (firsttour.py) and Setup its own guide. None with
 tutorials switched off (Config.tutorials_on, Settings > General), none during the
-first-run tour or the setup guide (and "Not now" twice inside QUIT_S switches them off:
+first-run tour or the setup guide (and "OK" twice inside QUIT_S switches them off:
 they're clicking around, not learning), and none for tabs an older version already had
 (library.Config.from_raw marks those seen: they've been there).
 """
@@ -33,7 +33,7 @@ log = logging.getLogger(__name__)
 
 TABS = TOUR_TABS
 START_MS = 450   # after the tab opens: it lays itself out first
-QUIT_S = 60      # "Not now" twice this close together: no more tours
+QUIT_S = 60      # "OK" twice this close together: no more tours
 EMPTY_S = 6      # Apps with no program making sound this long: the tour says so
 SETTLE_S = 1.2   # a voice picked: on this long without a problem before it's "done"
 
@@ -137,7 +137,7 @@ def _radio(win, tab) -> list[coach.Step]:
     return [coach.Step(
         _("Pick a station on the globe"),
         _("Click any dot to play that station. Press Send to others and your call hears it too."),
-        target=globe, done=tab.is_active, skip=_("Not now"),
+        target=globe, done=tab.is_active, skip=_("OK"),
         failed=lambda: bool(getattr(tab, "_globe_error", "")),   # no stations to pick
         oops=lambda: getattr(tab, "_globe_error", "") or _("The stations couldn't load."),
         oops_title=_("The radio couldn't connect"), retry=getattr(tab, "_reload", None),
@@ -165,7 +165,7 @@ def _apps(win, tab) -> list[coach.Step]:
         _("Send a program's sound"),
         _("Start some music or a game, then press Send on it. Everyone in your call hears "
           "it."),
-        target=area, done=tab.is_active, skip=_("Not now"), allow=_inside(tab.scroll_area),
+        target=area, done=tab.is_active, skip=_("OK"), allow=_inside(tab.scroll_area),
         failed=nothing, retry=lambda: since.__setitem__("at", time.monotonic()),
         oops_title=_("Nothing to share yet"),
         oops=_("No program is making sound right now. Start some music or a game, then "
@@ -206,7 +206,7 @@ def _voice(win, panel) -> list[coach.Step]:
     return [coach.Step(
         _("Pick a voice"),
         _("Click one, then talk: you hear yourself in your headphones."),
-        target=first_row, done=working, skip=_("Not now"), enter=show_fx,
+        target=first_row, done=working, skip=_("OK"), enter=show_fx,
         allow=_inside(fx, getattr(panel, "oops", None)),
         failed=lambda: bool(problem()), oops=lambda: html.unescape(problem()),
         oops_title=_("Your voice couldn't be switched on"),
@@ -223,7 +223,7 @@ def _store(win, tab) -> list[coach.Step]:
     return [coach.Step(
         _("Hear one, then add it"),
         _("Press play to hear a sound. Add puts it on your board."),
-        target=first, done=lambda: len(win.cfg.sounds) > count, skip=_("Not now"),
+        target=first, done=lambda: len(win.cfg.sounds) > count, skip=_("OK"),
         allow=_inside(tab.list_area, getattr(tab, "oops_page", None)),
         failed=lambda: bool(getattr(tab, "failed", False)),
         oops_title=_("The store couldn't load"),
