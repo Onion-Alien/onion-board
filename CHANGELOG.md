@@ -2,6 +2,51 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.7.1 — 2026-10-22
+
+- Direct mic: after setting up, the app checks with a short, very quiet test sound (never
+  in your own headphones) that your sounds really come out of your mic, and adds what it
+  found to the anonymous usage count. Nothing changes on screen yet.
+- A headset pulled out while the app is open now says so in plain words ("Can't open
+  ... Plugged in? It's tried again by itself.") instead of a raw device error.
+- Fixed a crash while the app was starting: on a slow start, the check that notes where start-up is waiting could itself crash the app.
+- Direct mic: SteelSeries Sonar is only restarted after a restart of all of Windows'
+  audio, and never when its mic was already silent before (it could stay off).
+- Direct mic: the mic helper updates once (Windows asks one more time), so set-ups
+  through it also restart only the mic instead of all of Windows' audio.
+- Direct mic: setting up, repairing or removing the mic effect now restarts only that mic,
+  not all of Windows' audio. Apps that sit between your mic and a voice chat with a
+  virtual mic of their own (such as SteelSeries Sonar) no longer go silent afterwards,
+  and the rest of your sound keeps playing. Older Windows 10 versions restart the audio
+  as before.
+- Once you've connected Twitch, the Twitch card has a box (off until you tick it) that
+  lets the Onion Board developer see your channel's name with the daily usage count,
+  so they can see who streams with it. Disconnect unticks it.
+- Pilot Bun's world on the Languages card is 3D now: a lit, turning Earth with drifting
+  clouds, a night side and glowing air, and Bun's plane is a real 3D model flying low
+  over the curve of the world, with a contrail and his shadow on the ground.
+- Fix: on a PC short on memory, the app could freeze for 10 seconds to minutes at a
+  time, sounds included, while it sat in the background (and Windows could call it Not
+  Responding). Its memory clean-up read the whole app back from disk; it now waits until
+  you're back in the window and the PC has memory to spare.
+- 18 new secret achievements to find: poke the Onion Alien on Settings > About, add or
+  listen through an hour-long sound, play 10 sounds at once, max out the pitch, play a
+  sound on Halloween, Christmas or New Year, and a few more. There's an old cheat code
+  hidden in the main window too.
+- Direct mic: with SteelSeries Sonar on, setting up (or repairing or removing) the mic
+  effect no longer leaves Sonar's mic silent in Discord and other voice chats. Sonar is
+  restarted after Windows' audio comes back, and its mic is checked for sound.
+- No "Text-to-speech isn't available" pop-up at launch when Windows speech is slow to start: nobody asked for speech yet. Saying a line still tells you if it can't be spoken.
+- On a first launch right after installing, the loading screen (Bun) no longer gives up
+  when its first frame is slow: it used to vanish, and nothing showed until the window
+  was up, up to a minute later. A start that slow now also notes where it waited, in
+  `startup-stall.txt` in the settings folder.
+- The installer no longer asks about FFmpeg: the app needs it for M4A, AAC and video
+  files, so it is always added when it is missing (not in Offline mode).
+- Direct mic: a mic whose headset software adds its own effect (some gaming headsets do)
+  no longer goes silent in every app when that effect won't run alongside Onion Board's:
+  the mic now goes on without the headset's effect.
+
 ## 2.7.0 — 2026-10-22
 
 - The tick next to "Your sounds go into your mic" now sits level with the text.
