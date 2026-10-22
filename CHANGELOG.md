@@ -22,8 +22,9 @@ Changes not released yet are in [changelog.d/](changelog.d/), one file per chang
   Sonar's mic silent in Discord and other voice chats, or its sound on the wrong
   device: the devices Sonar used are set back through Sonar itself after Windows' audio
   restarts. Sonar is no longer restarted for it (SteelSeries GG restarts Sonar only 3
-  times, then leaves it off); only if Sonar won't take its devices back is it restarted
-  as before.
+  times, then leaves it off). It's restarted once only when it won't take its devices
+  back, or when its mic had already lost its device (after a set-up with 2.7.0): that
+  makes it pick the mic it's set up with again.
 - Direct mic: the mic helper updates once (Windows asks one more time), so set-ups
   through it get these fixes too.
 - Once you've connected Twitch, the Twitch card has a box (off until you tick it) that

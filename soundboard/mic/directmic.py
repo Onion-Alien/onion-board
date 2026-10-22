@@ -1986,6 +1986,8 @@ def _audio_off(work, also: Sequence[str] = ()) -> int:
     finally:
         _audio_service(True, dependents)
         _sonar_back()
+        if _sonar_fixed is False:   # before its mic is listened to: it's silent until then
+            _mic_apps_back(apps_quiet)
         if code == 0:
             checked = _after_restart(opened, mark)
         live = mics is None or _mics_come_back_live(mics, quiet)
@@ -2136,9 +2138,10 @@ def _mic_apps_back(quiet: Collection[str] = ()) -> None:
     running; one whose own server answered but whose devices wouldn't go back is
     restarted, silent before or not: its server says it's off. A check: never fails the
     step."""
+    global _sonar_ended
     try:
         for exe, parent, mic in MIC_APPS:
-            if exe == SONAR_EXE and _sonar_fixed:
+            if exe == SONAR_EXE and (_sonar_fixed or _sonar_ended):
                 continue
             running = _processes(exe)
             if not running:
@@ -2156,6 +2159,7 @@ def _mic_apps_back(quiet: Collection[str] = ()) -> None:
             log.info("%s's mic sends only silence after the audio restart: restarting it",
                      exe)
             old = {pid for pid, _ in running}
+            _sonar_ended = _sonar_ended or exe == SONAR_EXE
             for pid in old:
                 subprocess.run(["taskkill", "/F", "/PID", str(pid)], capture_output=True,
                                timeout=15, creationflags=_CREATE_NO_WINDOW)
@@ -2166,6 +2170,8 @@ def _mic_apps_back(quiet: Collection[str] = ()) -> None:
                     break
                 time.sleep(1)
             else:
+                if exe == SONAR_EXE:
+                    _sonar_keep_again()
                 silent = [g for g in guids if _silent(g)]
                 log.info("%s is back; its mic: %s", exe,
                          "still only silence" if silent else "sound")
@@ -2190,6 +2196,7 @@ _DEVICE_ID = re.compile(r"\{0\.0\.[01]\.00000000\}\.\{[0-9a-fA-F]{8}(-[0-9a-fA-F
 _ROUTE_ID = re.compile(r"[A-Za-z]{1,40}")
 _sonar_saved: dict[tuple[str, str], tuple[str, bool]] | None = None   # (_sonar_keep)
 _sonar_fixed: bool | None = None   # the last _sonar_back: True set, False not, None no Sonar
+_sonar_ended = False   # Sonar was restarted in this step already (once at most)
 
 
 def _local_http(method: str, address: str, path: str, tls: bool = False) -> bytes:
@@ -2252,11 +2259,22 @@ def _sonar_routes(address: str) -> dict[tuple[str, str], tuple[str, bool]]:
     return routes
 
 
-def _sonar_keep() -> None:
-    """Note Sonar's devices before a step (none when it isn't running). A check: never
-    fails the step."""
-    global _sonar_saved, _sonar_fixed
+def _sonar_mic_runs(address: str, now: Mapping[tuple[str, str], tuple[str, bool]]) -> bool:
+    """Sonar's mic channel (its streamer mode's in that mode) has a device and runs."""
+    try:
+        mode = json.loads(_local_http("GET", address, "/mode"))
+    except (OSError, ValueError):
+        mode = ""
+    return now.get(("streamRedirections" if mode == "stream" else "classicRedirections",
+                    "mic"), ("", False))[1]
+
+
+def _sonar_keep(again: bool = False) -> None:
+    """Note Sonar's devices before a step (None when it isn't running or doesn't
+    answer); `again`: in it, Sonar restarted. A check: never fails the step."""
+    global _sonar_saved, _sonar_fixed, _sonar_ended
     _sonar_saved, _sonar_fixed = None, None
+    _sonar_ended = _sonar_ended and again
     try:
         if not _processes(SONAR_EXE):
             return
@@ -2267,21 +2285,39 @@ def _sonar_keep() -> None:
         log.info("couldn't read Sonar's devices before the step", exc_info=True)
 
 
+def _sonar_keep_again() -> None:
+    """Sonar started again (_mic_apps_back): the devices it picked, once its mic has one
+    (within SONAR_BACK_S), noted for the step's later audio restarts to set back. Seen
+    to either way: it isn't restarted again in this step."""
+    global _sonar_fixed
+    end = time.monotonic() + SONAR_BACK_S
+    while True:
+        _sonar_keep(again=True)
+        has_mic = bool(_sonar_saved) and any(rid == "mic" for _k, rid in _sonar_saved)
+        if has_mic or time.monotonic() > end:
+            break
+        time.sleep(1)
+    _sonar_fixed = True
+
+
 def _sonar_back() -> None:
     """After an audio restart: each of Sonar's channels on another device than before
     the step, or stopped when it ran, set back to its device (setting it again starts a
     stopped one), until all are and SONAR_SETTLE_S have gone by; given up after
-    SONAR_BACK_S. Its result (_sonar_fixed) tells _mic_apps_back whether Sonar still
-    needs a restart. A check: never fails the step."""
+    SONAR_BACK_S. Its mic channel then without a device (dropped before the step, by an
+    older version's restart: nothing to set back) needs Sonar restarted, which picks the
+    device it's set up with again. Its result (_sonar_fixed) tells _mic_apps_back
+    whether Sonar still needs a restart. A check: never fails the step."""
     global _sonar_fixed
-    if not _sonar_saved:
+    if _sonar_saved is None:
         _sonar_fixed = None
         return
     start = time.monotonic()
     answered = False
     put: set[tuple[str, str]] = set()
+    address, now = "", {}
     while True:
-        wrong = list(_sonar_saved)
+        wrong = None   # (Sonar not answering this time)
         try:
             address = _sonar_address()
             now = _sonar_routes(address)
@@ -2299,9 +2335,13 @@ def _sonar_back() -> None:
         except Exception:  # noqa: BLE001 - Sonar's server not back yet
             log.debug("Sonar didn't answer", exc_info=True)
         waited = time.monotonic() - start
-        if not wrong and waited >= SONAR_SETTLE_S:
-            log.info("Sonar's devices are set as before the step")
-            _sonar_fixed = True
+        if wrong == [] and waited >= SONAR_SETTLE_S:
+            _sonar_fixed = _sonar_mic_runs(address, now)
+            if _sonar_fixed:
+                log.info("Sonar's devices are set as before the step")
+            else:
+                log.warning("Sonar's mic has no device (dropped before the step?): it "
+                            "needs a restart")
             return
         if waited > SONAR_BACK_S:
             log.warning("couldn't set Sonar's devices back after the audio restart")

@@ -39,6 +39,7 @@ def _no_windows_mics(monkeypatch):
     monkeypatch.setattr(dm, "_processes", lambda exe: [])   # no mic apps (MIC_APPS) running
     monkeypatch.setattr(dm, "_sonar_saved", None)
     monkeypatch.setattr(dm, "_sonar_fixed", None)
+    monkeypatch.setattr(dm, "_sonar_ended", False)
 
 
 SONAR = dm.MIC_APPS[0]
@@ -846,6 +847,62 @@ def test_only_sonars_own_device_ids_are_kept(monkeypatch, tmp_path):
     dm._sonar_keep()
     assert dm._sonar_saved == {("classicRedirections", "mic"): (SONAR_DEV, True)}
 
+
+def test_a_sonar_mic_dropped_before_the_step_gets_sonar_restarted(monkeypatch, tmp_path):
+    """Coming from a version that restarted Windows' audio and left Sonar alone, Sonar's
+    mic has no device before the step already: nothing to set back. Restarting Sonar
+    picks the device it's set up with, so it's asked for."""
+    dropped = {"game": (HEADPHONES, True), "mic": ("", False)}
+    sonar = _FakeSonar([dropped])
+    _sonar_kit(monkeypatch, tmp_path, sonar)
+    dm._sonar_keep()
+    assert dm._sonar_saved == {("classicRedirections", "game"): (HEADPHONES, True)}
+    dm._sonar_back()
+    assert dm._sonar_fixed is False
+
+
+def test_in_streamer_mode_sonars_streamer_mic_counts(monkeypatch, tmp_path):
+    sonar = _FakeSonar([BEFORE])
+    _sonar_kit(monkeypatch, tmp_path, sonar)
+    real = sonar.http
+
+    def http(method, address, path, tls=False):
+        if path == "/mode":
+            return b'"stream"'
+        return real(method, address, path, tls)
+    monkeypatch.setattr(dm, "_local_http", http)
+    dm._sonar_keep()
+    dm._sonar_back()
+    assert dm._sonar_fixed is False   # its streamer mode's mic has no device
+
+
+def test_sonar_is_restarted_once_a_step_and_its_new_devices_noted(monkeypatch):
+    """Ended for GG to start it again: the devices it picks are noted for the step's
+    later audio restarts, and it isn't ended again in that step (GG starts it again only
+    3 times a session)."""
+    calls = _mic_app_kit(monkeypatch, [[100], [200]], [False, False])
+    monkeypatch.setattr(dm, "_sonar_fixed", False)
+    monkeypatch.setattr(dm, "_sonar_keep_again", lambda: calls.append("noted"))
+    dm._mic_apps_back()
+    assert ["taskkill", "/F", "/PID", "100"] in calls and "noted" in calls
+    calls.clear()
+    monkeypatch.setattr(dm, "_sonar_fixed", False)
+    dm._mic_apps_back()
+    assert calls == []
+    dm._sonar_keep()   # the next step: once again at most
+    assert dm._sonar_ended is False
+
+
+def test_a_sonar_whose_devices_wont_go_back_is_restarted_before_its_mic_is_listened_to(
+        fake_reg, monkeypatch, tmp_path):
+    """Its mic sends only zeros until Sonar restarts: listening to it first cost three
+    more restarts of all the PC's sound for nothing."""
+    calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [False] * 10)
+    monkeypatch.setattr(dm, "_sonar_back", lambda: setattr(dm, "_sonar_fixed", False))
+    monkeypatch.setattr(dm, "_mic_apps_back", lambda quiet=(): calls.append("apps"))
+    assert dm.admin_install(GUID) == 0
+    i = calls.index("apps")
+    assert calls[i - 1] == (True, ["midisrv"]) and ("listen", GUID) in calls[i:]
 
 def test_a_restart_of_the_audio_sets_sonars_devices_back(monkeypatch):
     calls = []
