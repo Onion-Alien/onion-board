@@ -620,6 +620,7 @@ def main():
     from soundboard.core.autostart import TRAY_ARG
     from soundboard.ui.bun import splash
     if TRAY_ARG not in sys.argv:   # a cold start can take seconds: show Bun meanwhile
+        bootmark.watch_stall(APP_DIR)   # a slow one writes down where it waited
         splash.show()
     from soundboard.online import ffmpegget
     ffmpegget.start_check()   # meanwhile: is FFmpeg there and does it start? (never waited on)
@@ -701,6 +702,10 @@ def main():
         if comes_to_front(sys.argv, server.show_requested):
             bring_to_front(w)   # the splash never takes the focus: take it now
     splash.close(goodbye=bool(show))   # Bun waves as the window comes up
+    took, stall = bootmark.stop_stall()
+    if stall is not None:
+        log.warning("slow start: %.0f s before the window was up; where it waited is in %s",
+                    took, stall.name)
     from PySide6.QtCore import QTimer
     if "--resume-setup" in sys.argv:   # back after the restart the cable asked for
         QTimer.singleShot(400, lambda: w.run_setup(resumed=True))

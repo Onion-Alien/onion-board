@@ -105,3 +105,47 @@ def clear(directory: Path | None = None) -> None:
         (path / NAME).unlink(missing_ok=True)
     except OSError:
         pass
+
+
+STALL_NAME = "startup-stall.txt"
+STALL_S = 10.0   # a start slower than this writes down where it is, every STALL_S
+_stall: tuple | None = None   # (open file, its path, when watching started)
+
+
+def watch_stall(directory: Path | None = None, seconds: float = STALL_S) -> None:
+    """From the loading screen until the window is up (stop_stall): every `seconds`,
+    what each thread is doing goes into startup-stall.txt, so a start that takes a
+    minute says where it waited. faulthandler writes from a thread of its own, so this
+    works however stuck the UI thread is. Only code locations; it stays on this PC."""
+    global _stall
+    import faulthandler
+    import time
+    try:
+        path = (Path(directory) if directory is not None else app_dir()) / STALL_NAME
+        f = open(path, "w", encoding="utf-8")   # noqa: SIM115 - open until stop_stall
+        faulthandler.dump_traceback_later(seconds, repeat=True, file=f)
+        _stall = (f, path, time.monotonic())
+    except (OSError, RuntimeError, ValueError):
+        _stall = None
+
+
+def stop_stall() -> tuple[float, Path | None]:
+    """Stop watching: (seconds since watch_stall, startup-stall.txt if the start was
+    slow enough to write in it, else None and the empty file is removed)."""
+    global _stall
+    import faulthandler
+    import time
+    if _stall is None:
+        return 0.0, None
+    f, path, t0 = _stall
+    _stall = None
+    faulthandler.cancel_dump_traceback_later()
+    took = time.monotonic() - t0
+    try:
+        f.close()
+        if path.stat().st_size:
+            return took, path
+        path.unlink(missing_ok=True)
+    except OSError:
+        pass
+    return took, None

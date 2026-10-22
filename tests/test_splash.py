@@ -272,3 +272,41 @@ def test_panel_has_the_themes_soft_glow(qapp, monkeypatch):
     finally:
         theme.set_current("")
         splash._surfaces.clear()
+
+
+class _SlowNative:
+    """A NativeSplash whose thread is still on its first frame after the 1 s wait."""
+    def __init__(self, alive=True):
+        self.ok, self._alive, self.closed = False, alive, False
+
+    def starting(self):
+        return self._alive
+
+    def close(self, goodbye=False):
+        self.closed = True
+
+
+def test_a_slow_first_frame_keeps_the_native_splash(qapp, monkeypatch):
+    # a first launch right after installing drew its first frame late: the native one
+    # stays (it shows when drawn) instead of the Qt one, which only drew while the UI
+    # thread had time -- a start that slow showed nothing at all
+    monkeypatch.setattr(splash.QGuiApplication, "platformName", staticmethod(lambda: "windows"))
+    monkeypatch.setattr(splash, "NativeSplash", _SlowNative)
+    try:
+        s = splash.show()
+        assert isinstance(s, _SlowNative) and not s.closed
+    finally:
+        monkeypatch.setattr(splash, "_splash", None)
+
+
+def test_a_native_splash_that_failed_falls_back_to_qt(qapp, monkeypatch):
+    monkeypatch.setattr(splash.QGuiApplication, "platformName", staticmethod(lambda: "windows"))
+    class _Failed(_SlowNative):
+        def __init__(self):
+            super().__init__(alive=False)
+    monkeypatch.setattr(splash, "NativeSplash", _Failed)
+    try:
+        s = splash.show()
+        assert isinstance(s, splash.Splash)
+    finally:
+        splash.close()
