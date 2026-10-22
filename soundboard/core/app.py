@@ -673,9 +673,8 @@ def main():
                 log.warning("couldn't tell why the last start failed", exc_info=True)
                 usage.note(f"startup-failed/{ver}")
         threading.Thread(target=why_failed, daemon=True, name="last-start").start()
-    import time
-    exitwatch.start(APP_DIR, lambda: time.monotonic() - getattr(  # for the next start
-        getattr(app, "hangwatch", None), "beat", time.monotonic()))
+    exitwatch.start(APP_DIR, lambda: (  # for the next start
+        hw.stuck() if (hw := getattr(app, "hangwatch", None)) is not None else 0.0))
     # a newer version: downloaded and installed behind the loading screen, and the
     # installer opens the new one (not started with Windows into the tray: no splash)
     updating = TRAY_ARG not in sys.argv and w.updctl.update_at_start()

@@ -63,6 +63,12 @@ class HangWatch(QObject):
     def _tick(self):
         self.beat = self._clock()
 
+    def stuck(self) -> float:
+        """Seconds since the window last beat, on this watch's own (awake) clock. Read
+        `beat` only through this: time.monotonic() - beat was the PC's whole sleep time
+        since it booted, and every unclean exit after a sleep looked frozen."""
+        return max(0.0, self._clock() - self.beat)
+
     def stop(self):
         self._stop.set()
         self._timer.stop()
