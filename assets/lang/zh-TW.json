@@ -4358,5 +4358,7 @@
   "Score {score} / {total}": "得分 {score} / {total}",
   "{n} point": [
     "{n} 分"
-  ]
+  ],
+  "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "滑鼠按鍵只能當作自動按鍵發話的鍵：這裡請選一個鍵盤按鍵。",
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…或在這個視窗裡按滑鼠側鍵（Mouse 4 / 5）。Esc = 取消。"
 }

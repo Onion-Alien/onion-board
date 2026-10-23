@@ -4514,5 +4514,7 @@
     "{n} punkt",
     "{n} punkty",
     "{n} punktów"
-  ]
+  ],
+  "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Przycisk myszy może być tylko klawiszem automatycznego naciśnij i mów: wybierz tu klawisz.",
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…albo kliknij bocznym przyciskiem myszy (Mouse 4 / 5) w tym oknie. Esc = anuluj."
 }

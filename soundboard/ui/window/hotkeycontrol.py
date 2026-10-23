@@ -241,12 +241,13 @@ class HotkeyControl(Controller):
                    keys=html.escape(", ".join(pretty_key(c) for c in failed))), "warn",
                key="hotkey")   # (in place of the "✓ … plays" just said for a key set now)
 
-    def _valid_hotkey(self, combo: str) -> str | None:
+    def _valid_hotkey(self, combo: str, mouse: bool = False) -> str | None:
         """`combo` as it's saved, or None (and a toast saying why) if no keyboard could
-        ever send it: such a key used to be saved and shown as working."""
+        ever send it: such a key used to be saved and shown as working. `mouse`: a mouse
+        side button is fine too (auto push-to-talk)."""
         if not combo:
             return combo
-        good, why = winkeys.check(combo)
+        good, why = winkeys.check(combo, mouse)
         if why:
             log.info("refused hotkey %r: %s", combo[:80], why)
             usage.used("hotkey-refused")   # never which key
@@ -280,7 +281,7 @@ class HotkeyControl(Controller):
         lost it: a key quietly going off a pad was a surprise the next time it was
         pressed in a game."""
         mw = self.mw
-        good = self._valid_hotkey(combo)
+        good = self._valid_hotkey(combo, mouse=attr == "ptt_key")
         if good is None:
             self.register_hotkeys()   # the capture paused them
             return
@@ -341,7 +342,7 @@ class HotkeyControl(Controller):
 
     def _quick_set_hotkey(self, attr: str):
         mw = self.mw
-        d = HotkeyDialog(mw.hotkeys, mw, pads=attr != "ptt_key")
+        d = HotkeyDialog(mw.hotkeys, mw, pads=attr != "ptt_key", mouse=attr == "ptt_key")
         if d.exec() and d.result_combo:
             self.set_global_hotkey(attr, d.result_combo)
         else:

@@ -131,8 +131,10 @@ class KeysPage(Page):
                           or (_("Off") if attr == "ptt_key" else _("Click to set")))
 
     def _capture(self, attr):
-        # auto push-to-talk presses the key itself: that can't be a MIDI pad
-        d = HotkeyDialog(self.mw.hotkeys, self.dlg, pads=attr != "ptt_key")
+        # auto push-to-talk presses the key itself: that can't be a MIDI pad, but it can
+        # be a mouse side button (games and Discord take those for push-to-talk)
+        d = HotkeyDialog(self.mw.hotkeys, self.dlg, pads=attr != "ptt_key",
+                         mouse=attr == "ptt_key")
         if d.exec() and d.result_combo:
             self._set_hk(attr, d.result_combo)
         else:

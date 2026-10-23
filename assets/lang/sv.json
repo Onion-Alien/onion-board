@@ -4436,5 +4436,7 @@
   "{n} point": [
     "{n} poäng",
     "{n} poäng"
-  ]
+  ],
+  "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "En musknapp kan bara vara tangenten för automatisk push-to-talk: välj en tangent här.",
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…eller klicka med en sidoknapp på musen (Mouse 4 / 5) i det här fönstret. Esc = avbryt."
 }
