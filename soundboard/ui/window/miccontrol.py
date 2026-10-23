@@ -16,9 +16,10 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import QApplication, QMessageBox
 
-from soundboard.mic import directmic, michelper, micprobe, voicesdk
+from soundboard.mic import directmic, michelper, micprobe, sonarkeep, voicesdk
 from soundboard.ui.kit import theme
 from soundboard.core import errors, usage
+from soundboard.core.pollthread import PollThread
 from soundboard.online import net
 from soundboard.audio import engine as eng
 from soundboard.i18n import _
@@ -65,6 +66,22 @@ class MicControl(Controller):
     def __init__(self, mw: MainWindow):
         super().__init__(mw)
         self.cable_bad = []               # cable ends not at 48 kHz (_check_cable_format)
+        # SteelSeries Sonar's devices, set back after Windows' audio restarts (keep_sonar)
+        self.sonar = sonarkeep.SonarKeep(directmic.sonar_devices, directmic.sonar_set_back)
+        self.sonar_poll = PollThread("sonar-keep")
+
+    def keep_sonar(self):
+        """About once a second: while the mic is SteelSeries Sonar's, its devices are
+        noted, and set back when an audio restart moved them (soundboard.mic.sonarkeep).
+        Not during the mic effect's own steps: they set Sonar back themselves."""
+        mw = self.mw
+        mic = mw.cfg.mic_device or ""
+        on = mic.startswith(directmic.SONAR_MIC) and not mw._attaching
+        do = self.sonar.tick(time.monotonic(), on, mw.engine.mic_live())
+        if do == "note":
+            self.sonar_poll.run(lambda: self.sonar.note(time.monotonic()))
+        elif do == "back":
+            self.sonar_poll.run(lambda: self.sonar.back(time.sleep, time.monotonic))
 
     def _mic_update_due(self) -> bool:
         mw = self.mw

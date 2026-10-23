@@ -2943,6 +2943,34 @@ def _release(h):
 
 # ---------------------------------------------------------------------- the app's side
 
+# SteelSeries Sonar's devices for the app's own watch (soundboard.mic.sonarkeep): the
+# admin part's look-ups and set-back, without admin (Sonar's local server). They use
+# its module-wide note of the devices, which only a step itself (in the mic helper or
+# the app's elevated copy, never this process) otherwise uses.
+SONAR_MIC = MIC_APPS[0][2]   # "SteelSeries Sonar - Microphone": its mic's name starts so
+
+
+def sonar_devices() -> dict[tuple[str, str], tuple[str, bool]] | None:
+    """Sonar's channels now: None when Sonar isn't running or doesn't answer, or its mic
+    channel has no device or is stopped (nothing worth keeping)."""
+    try:
+        address = _sonar_address()
+        routes = _sonar_routes(address)
+    except OSError:
+        return None
+    return routes if _sonar_mic_runs(address, routes) else None
+
+
+def sonar_set_back(saved: dict[tuple[str, str], tuple[str, bool]]) -> bool | None:
+    """Sonar's channels set back to `saved` (sonar_devices) after an audio restart, as a
+    step does it (_sonar_back; Sonar is never ended here). True when they are, False
+    when Sonar wouldn't take them, None when it didn't answer."""
+    global _sonar_saved
+    _sonar_saved = dict(saved)
+    _sonar_back()
+    return _sonar_fixed
+
+
 def relaunch_params(args: list[str]) -> str:
     parts = []
     if not getattr(sys, "frozen", False):
