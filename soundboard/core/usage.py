@@ -271,6 +271,10 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "mic-effect-taken-off", "mic-helper",
             *(f"mic-effect-code-1-{k}" for k in MIC_RAISED),
             *(f"mic-effect-code-6-{k}" for k in MIC_STUCK),
+            # the helper's step raised and Windows' prompt was asked instead, and where
+            # the helper's raised (MIC_RAISED)
+            "mic-effect-helper-fallback",
+            *(f"mic-effect-helper-code-1-{k}" for k in MIC_RAISED),
             # Onion Board's own update: the download cancelled or failed, the installer
             # wouldn't start, Copy error, Later at "Restart now", one that didn't finish,
             # one installing itself as the app started

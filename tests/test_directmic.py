@@ -4437,6 +4437,37 @@ def test_the_fix_never_asks_windows_by_itself(monkeypatch):
     assert dm.install("My mic", ask_windows=False) == dm.no_helper()
 
 
+@pytest.mark.parametrize("prompt, want", [(0, 0), (None, 1), (7, 7)])
+def test_a_helper_step_that_raised_asks_windows_once(monkeypatch, tmp_path, prompt, want):
+    """The helper's run raising (1): a click's step runs once more through Windows'
+    prompt (as the user's admin, not SYSTEM), and helper_fallback says where the
+    helper's raised. Turned down, it stays the helper's 1."""
+    monkeypatch.setattr(dm, "data_dir", lambda: tmp_path / "MicPlugin")
+    (tmp_path / "michelper.log").write_text(
+        "x\nTraceback (most recent call last):\n"
+        '  File "directmic.py", line 1, in _install_endpoint\n'
+        "PermissionError: [WinError 5] Access is denied\n", encoding="utf-8")
+    monkeypatch.setattr(dm, "_via_helper", lambda args, wait_s: 1)
+    asked = []
+    monkeypatch.setattr(dm, "run_elevated", lambda *a, **k: asked.append(a) or prompt)
+    monkeypatch.setattr(dm, "_helper_check", lambda via="check": True)
+    monkeypatch.setattr(dm, "_elevated", _REAL_ELEVATED)
+    assert dm._elevated(["install", "{G}"]) == want
+    assert len(asked) == 1
+    assert dm.helper_fallback() == ("mic-settings", "denied", "err-5")
+    assert dm.helper_fallback() is None   # (once)
+
+
+def test_the_fix_by_itself_never_asks_windows_after_the_helper_raised(monkeypatch):
+    """The app's own fix (no prompt allowed): the helper's 1 stands, nothing asked."""
+    monkeypatch.setattr(dm, "_via_helper", lambda args, wait_s: 1)
+    monkeypatch.setattr(dm, "run_elevated", lambda *a, **k: pytest.fail("asked Windows"))
+    monkeypatch.setattr(dm, "_helper_check", lambda via="check": True)
+    monkeypatch.setattr(dm, "_elevated", _REAL_ELEVATED)
+    assert dm._elevated(["install", "{G}"], ask_windows=False) == 1
+    assert dm.helper_fallback() is None
+
+
 @pytest.mark.parametrize("ready", [False, None])
 def test_without_the_helper_the_card_asks_for_the_click(window, monkeypatch, ready):  # noqa: F811
     """No usable helper (missing, too old, or not checked yet): no fix by itself (it

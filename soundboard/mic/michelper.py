@@ -885,7 +885,17 @@ def install_helper(user: str | None = None) -> bool:
     Files and register its task for `user` (the account that asked, from the app's
     `--for`: checked here) or else the account running this, and every account it was
     set up for before. False (logged) when this copy has no helper build or it
-    couldn't: the mic effect works anyway, with Windows' prompt each time."""
+    couldn't: the mic effect works anyway, with Windows' prompt each time. Never
+    raises: it runs after the effect went on, and an error here made a set-up that
+    worked exit with code 1, which the app reported as failed."""
+    try:
+        return _install_helper(user)
+    except Exception:  # noqa: BLE001 - the effect itself is set up already
+        log.exception("mic helper: setting it up failed")
+        return False
+
+
+def _install_helper(user: str | None) -> bool:
     from soundboard.mic import directmic as dm
     src = bundled_helper()
     if is_helper() or not (src / EXE_NAME).is_file() or _read_stamp(src) is None:

@@ -2932,19 +2932,40 @@ def _elevated(args: list[str], wait_s: float = 300.0, *,
     prompt), else this app's admin copy (Windows asks first; not with `ask_windows`
     False: the app's own repair, which nobody clicked). Its exit code, or None if the
     prompt was turned down, not allowed, or it didn't finish. The audio stop/start and
-    the dependent services can take a while on a slow PC, so allow generously."""
+    the dependent services can take a while on a slow PC, so allow generously.
+    The helper's step raising (1) is tried once more through Windows' prompt, when
+    asking is allowed: on PCs where the helper's run (as SYSTEM) failed every time, the
+    same step run as the user's own admin had set the mic up (helper_fallback says why
+    the helper's failed). Turned down, it stays the helper's 1."""
+    global _helper_raised
     from soundboard.mic import michelper
+    _helper_raised = None
     try:
         code = _via_helper(args, wait_s)
-        if code is not None or not ask_windows:
+        if code == 1 and ask_windows:
+            _helper_raised = raised_why(data_dir().parent / "michelper.log")
+            log.warning("the mic helper's step failed (code 1): asking Windows instead")
+        elif code is not None or not ask_windows:
             return code
-        return run_elevated(sys.executable,
-                            relaunch_params(args + michelper.for_user(args)), wait_s,
-                            progress=data_dir().parent / "directmic-admin.log")
+        asked = run_elevated(sys.executable,
+                             relaunch_params(args + michelper.for_user(args)), wait_s,
+                             progress=data_dir().parent / "directmic-admin.log")
+        return 1 if asked is None and code == 1 else asked
     finally:
         # what the UI shows follows the helper as it is now: the prompt's step may
         # have set it up, and another account may have removed it meanwhile
         _helper_check("after a step")
+
+
+_helper_raised: tuple[str, str, str] | None = None   # set by _elevated
+
+
+def helper_fallback() -> tuple[str, str, str] | None:
+    """raised_why() of the helper's log when the last step's helper run raised and
+    Windows' prompt was asked instead (_elevated), once; None if it didn't."""
+    global _helper_raised
+    why, _helper_raised = _helper_raised, None
+    return why
 
 
 def _helper_check(via: str = "check") -> bool:

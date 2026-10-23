@@ -55,7 +55,7 @@ ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4
                25: "61009c7366fe22f4e795fd16de72c85e19e8bf26c9b554c9d929aecfc4ca61aa",
                26: "819ed89c03f11cb9c066b3a9529062e67e55cf96228875ce8364cbf1cac04181",
                27: "227b9e0bb915510ae86c33c5ab34ac6b4fd30df207998b3c26748c55743a5a09",
-               28: "27ca70a70c0241dcbf8f1cee4438d88c2e92f9643074a5c7ffa5bc13b927164b"}
+               28: "b4dfd79b8e41fc286dc4b56debd3888a55feb95f8d28265b9947608d6465198f"}
 
 
 def _queue():
@@ -464,6 +464,16 @@ def test_install_helper_checks_who_asked(helper_setup, monkeypatch):
     assert not mh.install_helper("S-1-5-18") and not mh.install_helper("S-1-1-0")
     monkeypatch.setattr(mh, "_has_profile", lambda sid: False)
     assert not mh.install_helper(SID2)
+    assert calls == []
+
+
+def test_install_helper_never_raises(helper_setup, monkeypatch):
+    """It runs after the effect went on: a check that raises (a file of the build held
+    open, say) is a False, never the set-up's exit code 1."""
+    calls, _ = helper_setup
+    monkeypatch.setattr(mh, "verify_build", lambda src: (_ for _ in ()).throw(
+        PermissionError(13, "denied")))
+    assert mh.install_helper() is False
     assert calls == []
 
 
