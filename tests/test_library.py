@@ -337,18 +337,19 @@ def test_a_config_locked_for_a_moment_still_saves(app_dir, monkeypatch):
     assert not c.save()
 
 
-def test_lowering_the_sounds_while_you_talk_is_on_once_for_older_settings():
-    """Ducking is on by default: older settings (Off was the default) move to -12 dB
-    once; a depth someone picked stays, and Off chosen after that stays off."""
+def test_lowering_the_sounds_while_you_talk_is_off_by_default():
+    """Ducking is off by default: settings that got the old -12 dB default go back to
+    Off once; another depth someone picked stays, and -12 dB picked after that stays."""
+    assert library.Config().duck_db == 0.0
+    assert library.Config.first_start().duck_db == 0.0
     old = library.Config().to_raw()
+    old.pop("duck_off")
+    got = library.Config.from_raw({**old, "duck_on": True, "duck_db": -12.0})
+    assert got.duck_db == 0.0 and got.duck_on    # older versions don't switch it back on
+    assert library.Config.from_raw({**old, "duck_on": True, "duck_db": -20.0}).duck_db == -20.0
     old.pop("duck_on")
-    old["duck_db"] = 0.0
-    assert library.Config.from_raw(old).duck_db == -12.0
     old.pop("duck_db")   # saved before ducking existed
-    assert library.Config.from_raw(old).duck_db == -12.0
-    old["duck_db"] = -20.0
-    assert library.Config.from_raw(old).duck_db == -20.0
-    off = library.Config.from_raw({**old, "duck_db": 0.0, "duck_on": True})
-    assert off.duck_db == 0.0
-    assert library.Config.from_raw(off.to_raw()).duck_db == 0.0
-    assert library.Config.first_start().duck_db == -12.0
+    assert library.Config.from_raw(old).duck_db == 0.0
+    picked = library.Config.from_raw({**old, "duck_db": -12.0, "duck_on": True, "duck_off": True})
+    assert picked.duck_db == -12.0
+    assert library.Config.from_raw(picked.to_raw()).duck_db == -12.0
