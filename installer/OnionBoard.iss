@@ -853,6 +853,9 @@ end;
 function ShouldGetFfmpeg: Boolean;
 begin
   Result := (not HasFfmpeg) and FileExists(WingetPath('')) and not Relaunch;
+  // a package manager's silent install (Chocolatey) says no with /MERGETASKS=!ffmpeg
+  if Result and WizardSilent and (ListedIn('TASKS', '!ffmpeg') or ListedIn('MERGETASKS', '!ffmpeg')) then
+    Result := False;
   if Result and OfflineChosen then
     Result := WizardSilent and (ListedIn('TASKS', 'ffmpeg') or ListedIn('MERGETASKS', 'ffmpeg'));
 end;
@@ -1158,7 +1161,7 @@ begin
   if ExtrasCancelled and not FileExists(ExitFile) then
   begin
     if LoadStringFromFile(PidFile, Pid) then
-      Exec(ExpandConstant('{sys}	askkill.exe'), '/F /T /PID ' + Trim(String(Pid)), '',
+      Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /T /PID ' + Trim(String(Pid)), '',
            SW_HIDE, ewWaitUntilTerminated, Dummy);
     ExtrasSkipped := ExtrasSkipped + #13#10 + '- ' + Name + ': ' + Later;
     exit;

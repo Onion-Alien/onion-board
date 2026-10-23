@@ -99,7 +99,22 @@ def already_open(name: str, version: str) -> bool:
 def open_pr(name: str, version: str, files: list[Path], title: str, body: str) -> None:
     """Commit the edited files on pin-bump/<name>-<version>, push it, open its PR and
     start the checks on it (a PR opened with GITHUB_TOKEN starts no workflows itself;
-    a workflow_dispatch run does, and its checks land on the PR's commit)."""
+    a workflow_dispatch run does, and its checks land on the PR's commit).
+
+    With PINBUMP_OUT set (the workflow's check job, which runs the downloads and so has
+    no token that can write), the edited files and the PR's text are left in that
+    folder instead, for open_pr.py in a job that runs nothing downloaded."""
+    if out := os.environ.get("PINBUMP_OUT"):
+        bundle = Path(out) / name
+        rel = [str(Path(f).resolve().relative_to(ROOT)).replace("\\", "/") for f in files]
+        for r in rel:
+            (bundle / "files" / r).parent.mkdir(parents=True, exist_ok=True)
+            (bundle / "files" / r).write_bytes((ROOT / r).read_bytes())
+        (bundle / "pr.json").write_text(json.dumps(
+            {"name": name, "version": version, "files": rel, "title": title, "body": body}),
+            encoding="utf-8")
+        print(f"left for the PR job: {bundle}")
+        return
     branch = branch_for(name, version)
     git("switch", "-c", branch)
     git("add", "--", *map(str, files))
@@ -161,6 +176,9 @@ def run(cmd: list, expect: str = "", timeout: float = SMOKE_TIMEOUT_S, **kw) -> 
     when it fails, times out or doesn't print ``expect``."""
     shown = " ".join(map(str, [Path(cmd[0]).name, *cmd[1:]]))
     start = time.monotonic()
+    # what was just downloaded gets no token (nor Actions' own runtime ones)
+    kw.setdefault("env", {k: v for k, v in os.environ.items()
+                          if not k.endswith("_TOKEN") and not k.startswith("ACTIONS_")})
     try:
         p = subprocess.run(list(map(str, cmd)), capture_output=True, text=True,
                            errors="replace", timeout=timeout, **kw)
