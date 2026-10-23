@@ -58,18 +58,21 @@ EXES = dict(zip((c for c, _n in discordcfg.CLIENTS),
 # the voice settings that make up "how you talk", as paths into the store's "default"
 TALK_KEYS = ("activeInputProfile", "noiseCancellation", "noiseSuppression",
              "echoCancellation", "automaticGainControl", "bypassSystemInputProcessing",
-             "modeOptions.autoThreshold", "modeOptions.vadUseKrisp")
+             "modeOptions.autoThreshold", "modeOptions.vadUseKrisp", "modeOptions.threshold")
 # Discord's own defaults: put back when the board never saw you talking without it
 DEFAULT_TALK = {"noiseCancellation": True, "echoCancellation": True,
                 "automaticGainControl": True, "bypassSystemInputProcessing": False,
                 "modeOptions.autoThreshold": True, "modeOptions.vadUseKrisp": True}
 # what sounds need (discordcfg's measurements): the Custom profile with every clean-up
 # off, and Voice Activity's sensitivity set by hand (Push to Talk is left as it is).
-# Clean both straight into the mic and on the cable.
+# Clean both straight into the mic and on the cable. The slider at THRESHOLD_DB: low
+# enough that sounds open it, high enough that keyboard clicks and room noise don't.
+THRESHOLD_DB = -65
 SOUND = {"activeInputProfile": "CUSTOM", "noiseCancellation": False,
          "noiseSuppression": False, "echoCancellation": False,
          "automaticGainControl": False, "bypassSystemInputProcessing": False,
-         "modeOptions.autoThreshold": False, "modeOptions.vadUseKrisp": False}
+         "modeOptions.autoThreshold": False, "modeOptions.vadUseKrisp": False,
+         "modeOptions.threshold": THRESHOLD_DB}
 
 
 # ---------------------------------------------------------------- what "talking" is
@@ -91,7 +94,7 @@ def snapshot(store: dict) -> dict:
         v = d.get(head)
         if tail:
             v = v.get(tail) if isinstance(v, dict) else None
-        if isinstance(v, (bool, str)):
+        if isinstance(v, (bool, str, int, float)):
             out[k] = v
     return out
 
