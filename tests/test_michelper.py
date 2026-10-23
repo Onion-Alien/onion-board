@@ -50,7 +50,8 @@ ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4
                20: "e7b210a56344ec4b5420e6b7ddc1fca9d93eec6640657f4b0bf235a87cc0ad1e",
                21: "fc1d64c720b1acf922be82d6812192cb81f939a15593cd58487237cc5b718c47",
                22: "fded1edfd0a79368a14c8b46b8319db148aeebc4a2372a470c26d80ac5b426e6",
-               23: "bd64dfb3ce017760cfd4859b8d74a840465736c52a5793b58a949f6b11f5c520"}
+               23: "bd64dfb3ce017760cfd4859b8d74a840465736c52a5793b58a949f6b11f5c520",
+               24: "2da4d3ee1622b509ba48a587aec92efd53fb9054547e735388f0bf8ec343fdad"}
 
 
 def _queue():
@@ -198,14 +199,12 @@ def test_a_request_gone_meanwhile_doesnt_stop_the_rest(monkeypatch):
     real = mh.requests_dir()
     _request("a" * 32, f"install {GUID}".encode())
     gone = real / ("b" * 32 + ".req")
+    listed, calls = mh._requests, []
 
-    class Listing:
-        calls = 0
-
-        def glob(self, pattern):
-            Listing.calls += 1
-            return [*real.glob(pattern), gone] if Listing.calls == 1 else real.glob(pattern)
-    monkeypatch.setattr(mh, "requests_dir", Listing)
+    def listing():
+        calls.append(1)
+        return [*listed(), gone] if len(calls) == 1 else listed()
+    monkeypatch.setattr(mh, "_requests", listing)
     ran = []
     assert mh.serve(run=lambda args: ran.append(args) or 0) == 0
     assert ran == [["install", GUID]]
@@ -534,6 +533,35 @@ def test_a_plain_request_is_read_and_gone():
     assert mh._take(req) == ["cleanup", GUID] and not req.exists()
 
 
+@pytest.mark.windows   # Windows' junctions
+def test_a_requests_folder_turned_into_a_link_is_never_looked_into(monkeypatch, tmp_path):
+    """The accounts the helper is set up for may write in requests, so they can make the
+    empty folder a junction to a folder of their own (or to \\RPC Control): SYSTEM then
+    deleted whatever the names in there pointed at. The link goes, nothing behind it is
+    read or deleted, and the folder is made again."""
+    import _winapi
+    _queue()
+    theirs = tmp_path / "theirs"
+    theirs.mkdir()
+    (theirs / f"{'5' * 32}.req").write_bytes(b"uninstall")
+    (theirs / "victim.txt").write_text("keep")
+    mh.requests_dir().rmdir()
+    _winapi.CreateJunction(str(theirs), str(mh.requests_dir()))
+    secured = []
+
+    def secure(path, sddl):
+        secured.append(path)
+        os.rmdir(path)   # (the link itself)
+        path.mkdir()
+    monkeypatch.setattr(dm, "_secure_dir", secure)
+    monkeypatch.setattr(mh, "helper_users", lambda: [SID])
+    ran = []
+    assert mh.serve(run=lambda args: ran.append(args) or 0) == 0
+    assert ran == [] and secured == [mh.requests_dir()]
+    assert sorted(p.name for p in theirs.iterdir()) == [f"{'5' * 32}.req", "victim.txt"]
+    assert not dm._is_link(mh.requests_dir())
+
+
 # ---------------------------------------------------------------- heartbeat
 
 def test_the_helper_beats_while_it_works(monkeypatch):
@@ -761,7 +789,8 @@ def admin_source_digest() -> str:
     rule = "# " + "-" * 70 + " "
     start, end = src.index(rule + "admin part"), src.index(rule + "the app's side")
     helper = (ROOT / "soundboard" / "mic" / "michelper.py").read_text(encoding="utf-8")
-    text = (src[start:end] + helper).replace("\r\n", "\n")
+    safe = (ROOT / "soundboard" / "mic" / "safefs.py").read_text(encoding="utf-8")
+    text = (src[start:end] + helper + safe).replace("\r\n", "\n")
     return hashlib.sha256(text.encode()).hexdigest()
 
 
@@ -1126,3 +1155,15 @@ def test_the_prompt_wait_has_a_hard_cap(tmp_path):
     finally:
         stop.set()
     assert time.monotonic() - start < 2
+
+
+@pytest.mark.windows   # Windows' sharing rules
+def test_a_request_still_being_written_is_waited_for_not_refused():
+    """The helper can list a request while the app is still writing it (open): it was
+    refused then. It's waited for, and read once the app has closed it."""
+    _queue()
+    req = mh.requests_dir() / f"{'6' * 32}.req"
+    f = open(req, "wb")
+    f.write(b"cleanup ")
+    threading.Timer(0.3, lambda: (f.write(GUID.encode()), f.close())).start()
+    assert mh._take(req) == ["cleanup", GUID] and not req.exists()

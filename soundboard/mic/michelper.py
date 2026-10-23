@@ -40,17 +40,20 @@ import threading
 import time
 from pathlib import Path
 
+from soundboard.mic import safefs
+from soundboard.win import systools
+
 log = logging.getLogger(__name__)
 
 # Bump it when the admin part changes (directmic.py from "admin part" to "the app's
 # side", or this file); tests/test_michelper.py fails until it is. A newer helper is
 # put in place by the next admin step that asks anyway: only another effect DLL makes
 # the app ask (so the helper never adds a prompt the app wouldn't have had).
-HELPER_VERSION = 23
+HELPER_VERSION = 24
 # The oldest helper the app still uses. Raise it (to HELPER_VERSION) only when the
 # helpers out there have a bug that matters: the app then asks Windows once more, and
 # that prompt puts this version's helper in place.
-MIN_HELPER_VERSION = 23   # 23: set-ups restart only the mic, not all of the audio
+MIN_HELPER_VERSION = 24   # 24: never steered by a link planted in a folder users write to
 TASK = r"\Onion Board\Mic helper"
 EXE_NAME = "obmichelper.exe"
 STAMP = "stamp.txt"
@@ -67,6 +70,7 @@ _GUID = re.compile(r"\{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{
 _SID = re.compile(r"S-1-5-21(-\d{1,10}){3,4}|S-1-12-1(-\d{1,10}){4}")
 _REQUEST = re.compile(r"[0-9a-f]{32}")
 MAX_REQUEST = 256
+BUSY_TRIES, BUSY_WAIT_S = 40, 0.05   # a request still being written: waited up to 2 s
 RESULT_KEEP_S = 3600.0
 START_S = 20.0   # the task didn't pick a request up in this long, and Task Scheduler
 #                says it isn't running or queued either: it isn't working
@@ -146,7 +150,7 @@ def _schtasks(*args: str, timeout: float = 30.0, out: list[str] | None = None) -
     if _on_ui_thread():
         log.warning("mic helper: schtasks on the UI thread", stack_info=True)
     try:
-        r = subprocess.run(["schtasks", *args], capture_output=True, timeout=timeout,
+        r = subprocess.run([systools.tool("schtasks"), *args], capture_output=True, timeout=timeout,
                            creationflags=_CREATE_NO_WINDOW)
     except (OSError, subprocess.SubprocessError):
         return -1
@@ -453,63 +457,47 @@ def _take(path: Path) -> list[str] | None:
     """Read one request and delete it. The folder is the user's: the entry must be a
     plain file of its own (no link, no second name), checked on the handle it is read
     from, so it can't be swapped in between. What it says is only ever matched against
-    allowed(), never shown or used as a path."""
+    allowed(), never shown or used as a path. The folder itself could be turned into a
+    link too (it's empty most of the time): the request is opened relative to a handle
+    to the folder that was checked to be a real one, and deleted through its own
+    handle once checked, never by name (safefs). One the app is still writing (it's
+    open: ask() writes it in one go) is waited for a moment, never refused."""
+    for _try in range(BUSY_TRIES):
+        try:
+            with safefs.Folder(path.parent) as folder:
+                raw = folder.take(path.name, MAX_REQUEST)
+        except OSError as e:
+            if getattr(e, "winerror", None) == 32 and _try < BUSY_TRIES - 1:   # in use
+                time.sleep(BUSY_WAIT_S)
+                continue
+            raw = None
+        return None if raw is None else parse(raw)
+    return None
+
+
+def _requests() -> list[Path]:
+    """The request files waiting, listed through a checked handle to the folder. One
+    that is a link (someone turned it into one) is removed, never looked into: the
+    accounts it's set up for may write there, so it's made again as install_helper
+    makes it."""
+    folder = requests_dir()
     try:
-        raw = _read_plain(path)
+        with safefs.Folder(folder) as d:
+            return [folder / n for n in d.names() if n.endswith(".req")]
+    except safefs.NotPlain:
+        log.warning("mic helper: the requests folder was a link: removed")
+        from soundboard.mic import directmic as dm
+        dm._secure_dir(folder, _queue_sddl(helper_users()))
+        return []
+
+
+def _drop(path: Path):
+    """Remove a request file that isn't one (a wrong name), through the folder's handle."""
+    try:
+        with safefs.Folder(path.parent) as folder:
+            folder.delete(path.name)
     except OSError:
-        raw = None
-    finally:
-        _forget(path)
-    return None if raw is None else parse(raw)
-
-
-def _read_plain(path: Path) -> bytes | None:
-    """`path`'s bytes if it is a plain file of its own of up to MAX_REQUEST, else None.
-    On Windows it is opened without following a link, nobody else may open it
-    meanwhile, and it goes when closed."""
-    if os.name != "nt":
-        st = os.lstat(path)
-        if not os.path.isfile(path) or os.path.islink(path) or st.st_nlink != 1 \
-                or st.st_size > MAX_REQUEST:
-            return None
-        return path.read_bytes()
-    from ctypes import wintypes
-
-    class Info(ctypes.Structure):   # BY_HANDLE_FILE_INFORMATION
-        _fields_ = [("attributes", wintypes.DWORD), ("times", wintypes.DWORD * 6),
-                    ("volume", wintypes.DWORD), ("size_high", wintypes.DWORD),
-                    ("size_low", wintypes.DWORD), ("links", wintypes.DWORD),
-                    ("index", wintypes.DWORD * 2)]
-    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
-    kernel.CreateFileW.restype = wintypes.HANDLE
-    kernel.CreateFileW.argtypes = [wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD,
-                                   ctypes.c_void_p, wintypes.DWORD, wintypes.DWORD,
-                                   wintypes.HANDLE]
-    kernel.GetFileInformationByHandle.argtypes = [wintypes.HANDLE, ctypes.POINTER(Info)]
-    kernel.ReadFile.argtypes = [wintypes.HANDLE, ctypes.c_void_p, wintypes.DWORD,
-                                ctypes.POINTER(wintypes.DWORD), ctypes.c_void_p]
-    kernel.CloseHandle.argtypes = [wintypes.HANDLE]
-    # GENERIC_READ | DELETE, no sharing, OPEN_EXISTING,
-    # FILE_FLAG_OPEN_REPARSE_POINT | FILE_FLAG_DELETE_ON_CLOSE
-    h = kernel.CreateFileW(str(path), 0x80010000, 0, None, 3, 0x00200000 | 0x04000000,
-                           None)
-    if h is None or h == wintypes.HANDLE(-1).value:
-        raise ctypes.WinError(ctypes.get_last_error())
-    try:
-        info = Info()
-        if not kernel.GetFileInformationByHandle(h, ctypes.byref(info)):
-            raise ctypes.WinError(ctypes.get_last_error())
-        size = (info.size_high << 32) | info.size_low
-        # FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY
-        if info.attributes & 0x410 or info.links != 1 or size > MAX_REQUEST:
-            return None
-        buf = ctypes.create_string_buffer(MAX_REQUEST + 1)
-        got = wintypes.DWORD()
-        if not kernel.ReadFile(h, buf, MAX_REQUEST + 1, ctypes.byref(got), None):
-            raise ctypes.WinError(ctypes.get_last_error())
-        return buf.raw[:got.value]
-    finally:
-        kernel.CloseHandle(h)
+        pass
 
 
 def _answer(rid: str, code: int):
@@ -617,8 +605,7 @@ def serve(run=None) -> int:
     for _round in range(50):   # (requests keep coming: the task's next run takes them)
         try:
             # (_age: one the app gave up on and deleted meanwhile never stops the rest)
-            found = sorted((p for p in requests_dir().glob("*.req")),
-                           key=lambda p: -(_age(p) or 0.0))
+            found = sorted(_requests(), key=lambda p: -(_age(p) or 0.0))
         except OSError:
             return 0
         if not found:
@@ -626,7 +613,7 @@ def serve(run=None) -> int:
         for req in found:
             rid = req.stem
             if not _REQUEST.fullmatch(rid):
-                _forget(req)
+                _drop(req)
                 continue
             beat = _Heartbeat(rid)   # (before the request goes: never neither)
             try:
@@ -962,6 +949,9 @@ def main(argv: list[str]) -> int:
     if argv != [SERVE]:
         return 2
     from soundboard.mic import directmic
+    # SYSTEM never follows a junction a non-admin made (Windows 11; everything this
+    # process opens is admins' anyway: Program Files, the secured ProgramData folders)
+    safefs.guard()
     directmic.secure_data_dirs()   # before anything is written under ProgramData
     directmic.log_to(directmic.data_dir().parent / "michelper.log")
     try:

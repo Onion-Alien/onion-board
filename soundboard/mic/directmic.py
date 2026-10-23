@@ -81,6 +81,8 @@ else:
 
 from soundboard.i18n import _
 from soundboard.core.pollthread import PollThread
+from soundboard.mic import safefs
+from soundboard.win import systools
 
 log = logging.getLogger(__name__)
 
@@ -1401,11 +1403,19 @@ class _StateKey(_BackupKey):
         self.created = False
 
 
+def _powershell(script: str) -> list[str]:
+    """Windows PowerShell running `script` (from System32: systools)."""
+    return [systools.tool("powershell"), "-NoProfile", "-NonInteractive", "-Command", script]
+
+
 def _run(cmd: list[str], timeout: float = 60.0) -> int:
-    """Run a command, hidden. Its exit code; -1 if it hung (it's stopped after `timeout`)."""
+    """Run a command, hidden. Its exit code; -1 if it hung (it's stopped after `timeout`).
+    A bare tool name (net, pnputil) is Windows' own, from System32: never one found in
+    a PATH folder someone else can write to (systools)."""
+    run = [systools.tool(cmd[0]), *cmd[1:]] if os.sep not in cmd[0] else cmd
     try:
-        r = subprocess.run(cmd, capture_output=True, text=True, errors="replace", timeout=timeout,
-                           creationflags=_CREATE_NO_WINDOW)
+        r = subprocess.run(run, capture_output=True, text=True, errors="replace",
+                           timeout=timeout, creationflags=_CREATE_NO_WINDOW)
     except subprocess.TimeoutExpired:
         log.warning("%s: no answer in %.0f s, stopped", " ".join(cmd), timeout)
         return -1
@@ -1426,7 +1436,7 @@ def _running_dependents() -> list[str]:
               "-ErrorAction SilentlyContinue | Where-Object Status -eq Running | "
               "ForEach-Object Name")
     try:
-        r = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", script],
+        r = subprocess.run(_powershell(script),
                            capture_output=True, text=True, errors="replace", timeout=30,
                            creationflags=_CREATE_NO_WINDOW)
     except (OSError, subprocess.TimeoutExpired):
@@ -1444,7 +1454,7 @@ def _audio_comes_back(dependents: Sequence[str] = ()):
     names = [*AUDIO_SERVICES, *(n for n in dependents if _SERVICE_NAME.fullmatch(n))]
     script = (f"Wait-Process -Id {os.getpid()} -ErrorAction SilentlyContinue; "
               + "; ".join(f"Start-Service '{n}' -ErrorAction SilentlyContinue" for n in names))
-    cmd = ["powershell", "-NoProfile", "-NonInteractive", "-Command", script]
+    cmd = _powershell(script)
     for flags in (_CREATE_NO_WINDOW | 0x01000000, _CREATE_NO_WINDOW):   # out of our job
         try:
             subprocess.Popen(cmd, creationflags=flags, stdin=subprocess.DEVNULL,
@@ -1462,7 +1472,7 @@ def _services_stopped() -> bool:
     script = ("(Get-Service -Name " + ",".join(AUDIO_SERVICES) + " -ErrorAction SilentlyContinue"
               " | Where-Object Status -ne 'Stopped' | Measure-Object).Count")
     try:
-        r = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", script],
+        r = subprocess.run(_powershell(script),
                            capture_output=True, text=True, errors="replace", timeout=15,
                            creationflags=_CREATE_NO_WINDOW)
     except (OSError, subprocess.TimeoutExpired):
@@ -1477,7 +1487,7 @@ def _services_up() -> str:
               " | Where-Object Status -ne 'Stopped'"
               " | ForEach-Object { \"$($_.Name)=$($_.Status)\" }")
     try:
-        r = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", script],
+        r = subprocess.run(_powershell(script),
                            capture_output=True, text=True, errors="replace", timeout=15,
                            creationflags=_CREATE_NO_WINDOW)
     except (OSError, subprocess.TimeoutExpired):
@@ -1538,7 +1548,7 @@ def _mic_restart_works() -> bool:
     """This Windows can restart one device on its own (pnputil /restart-device: Windows
     10 2004 and later)."""
     try:
-        r = subprocess.run(["pnputil", "/?"], capture_output=True, text=True,
+        r = subprocess.run([systools.tool("pnputil"), "/?"], capture_output=True, text=True,
                            errors="replace", timeout=15, creationflags=_CREATE_NO_WINDOW)
     except (OSError, subprocess.TimeoutExpired):
         return False
@@ -1816,30 +1826,57 @@ def _is_link(path: Path) -> bool:
 
 
 def _remove_entry(path: Path):
-    """Remove one folder entry itself, never what a link points at."""
-    if _is_link(path):
+    """Remove one folder entry itself, never what a link points at, nor what a link
+    inside it points at: someone else's folder goes through handles to its checked
+    folders (safefs), never by paths they could re-point half-way."""
+    left = safefs.remove_tree(path)
+    if left:
+        raise PermissionError(f"couldn't remove {left[0]} (in use)")
+
+
+def _make_dir(path: Path, sddl: str):
+    """A new folder with `sddl`'s access from the moment it exists: never a moment with
+    what it would inherit from %ProgramData%, where anyone may add to it."""
+    from ctypes import wintypes
+    advapi = ctypes.WinDLL("advapi32", use_last_error=True)
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    advapi.ConvertStringSecurityDescriptorToSecurityDescriptorW.argtypes = [
+        wintypes.LPCWSTR, wintypes.DWORD, ctypes.POINTER(ctypes.c_void_p), ctypes.c_void_p]
+    kernel.CreateDirectoryW.argtypes = [wintypes.LPCWSTR, ctypes.c_void_p]
+    kernel.LocalFree.argtypes = [ctypes.c_void_p]
+
+    class Attributes(ctypes.Structure):   # SECURITY_ATTRIBUTES
+        _fields_ = [("length", wintypes.DWORD), ("sd", ctypes.c_void_p),
+                    ("inherit", wintypes.BOOL)]
+    sd = ctypes.c_void_p()
+    if advapi.ConvertStringSecurityDescriptorToSecurityDescriptorW(sddl, 1, ctypes.byref(sd),
+                                                                   None):
         try:
-            os.rmdir(path)    # a junction / folder link
-        except OSError:
-            os.unlink(path)   # a file link
-    elif path.is_dir():
-        shutil.rmtree(path)   # (doesn't follow links inside)
-    else:
-        path.unlink()
+            if kernel.CreateDirectoryW(str(path), ctypes.byref(
+                    Attributes(ctypes.sizeof(Attributes), sd, False))):
+                return
+        finally:
+            kernel.LocalFree(sd)
+    path.mkdir()   # (an owner this account can't set: _secure_dir then says so)
 
 
 def _secure_dir(path: Path, sddl: str) -> str | None:
     """Make `path` a real folder owned by Administrators with exactly `sddl`'s access, set
     on an open handle to the folder itself: never through a link, and without touching
     anything inside (no inheritance walk a planted link could steer). Its owner SID
-    before (None if it was made just now)."""
+    before (None if it was made just now). One someone else made (only the admin step
+    makes these) is replaced, not re-secured: a handle they opened before keeps the
+    access it was opened with, enough to change it back or swap it later."""
     from ctypes import wintypes
     if _is_link(path) or (path.exists() and not path.is_dir()):
         log.warning("%s wasn't a plain folder: replaced", path)
         _remove_entry(path)
-    made = not path.exists()
-    if made:
-        path.mkdir()
+    owner = _owner(path) if path.exists() else None
+    if owner is not None and owner not in _ADMIN_SIDS:
+        log.warning("%s was made by %s: replaced", path, owner)
+        _remove_entry(path)   # (in use by them: PermissionError, the step stops)
+    if not path.exists():
+        _make_dir(path, sddl)
     advapi = ctypes.WinDLL("advapi32", use_last_error=True)
     kernel = ctypes.WinDLL("kernel32", use_last_error=True)
     kernel.CreateFileW.restype = wintypes.HANDLE
@@ -1852,11 +1889,6 @@ def _secure_dir(path: Path, sddl: str) -> str | None:
     advapi.ConvertStringSecurityDescriptorToSecurityDescriptorW.argtypes = [
         wintypes.LPCWSTR, wintypes.DWORD, ctypes.POINTER(ctypes.c_void_p), ctypes.c_void_p]
     advapi.SetKernelObjectSecurity.argtypes = [wintypes.HANDLE, wintypes.DWORD, ctypes.c_void_p]
-    advapi.GetSecurityInfo.argtypes = [wintypes.HANDLE, ctypes.c_int, wintypes.DWORD,
-                                       ctypes.POINTER(ctypes.c_void_p), ctypes.c_void_p,
-                                       ctypes.c_void_p, ctypes.c_void_p,
-                                       ctypes.POINTER(ctypes.c_void_p)]
-    advapi.ConvertSidToStringSidW.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_wchar_p)]
     # READ_CONTROL | WRITE_DAC | WRITE_OWNER; FILE_FLAG_BACKUP_SEMANTICS | OPEN_REPARSE_POINT
     h = kernel.CreateFileW(str(path), 0x000E0000, 7, None, 3, 0x02200000, None)
     if h in (None, wintypes.HANDLE(-1).value):
@@ -1867,17 +1899,6 @@ def _secure_dir(path: Path, sddl: str) -> str | None:
             raise ctypes.WinError(ctypes.get_last_error())
         if info[0] & _REPARSE or not info[0] & 0x10:   # swapped for a link since the check
             raise PermissionError(f"{path} isn't a plain folder")
-        owner = None
-        if not made:
-            sid, sd = ctypes.c_void_p(), ctypes.c_void_p()
-            # SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION
-            if not advapi.GetSecurityInfo(h, 1, 1, ctypes.byref(sid), None, None, None,
-                                          ctypes.byref(sd)):
-                text = ctypes.c_wchar_p()
-                if advapi.ConvertSidToStringSidW(sid, ctypes.byref(text)):
-                    owner = text.value
-                    kernel.LocalFree(text)
-                kernel.LocalFree(sd)
         sd = ctypes.c_void_p()
         if not advapi.ConvertStringSecurityDescriptorToSecurityDescriptorW(
                 sddl, 1, ctypes.byref(sd), None):
@@ -1923,7 +1944,9 @@ def _owner(path: Path) -> str | None:
 def _clean_base(base: Path):
     """Once the base folder is admins-only (nobody else can add to it), drop what someone
     else could have put there before: links, hard links, anything not admin-owned. The
-    admin step writes its log there, and must never write through a planted link."""
+    admin step writes its log there, and must never write through a planted link. A
+    folder of theirs goes through handles (_remove_entry): they still own what's in it,
+    and could swap a folder deep inside for a link while it's being removed."""
     for entry in list(base.iterdir()):
         if entry.name == "MicPlugin":
             continue
@@ -1943,9 +1966,7 @@ def secure_data_dirs():
     %ProgramData%, so either could be someone else's, or a link to a system folder)."""
     base = data_dir().parent
     base.parent.mkdir(parents=True, exist_ok=True)
-    owner = _secure_dir(base, _BASE_SDDL)
-    if owner is not None and owner not in _ADMIN_SIDS:
-        log.warning("%s belonged to %s: taken over", base, owner)
+    _secure_dir(base, _BASE_SDDL)
     _clean_base(base)
     _secure_dir(data_dir(), _MIC_SDDL)
 
@@ -1957,26 +1978,25 @@ def _make_ring():
     path = ring_path()
     if make_ring_ok(path):
         return
-    if not path.parent.is_dir():
+    try:
+        folder = safefs.Folder(path.parent)
+    except (FileNotFoundError, safefs.NotPlain):
         # a reinstall's uninstall removed the folder (nothing held the ring open, as a
-        # running board does): made again, as safe as the admin step makes it at first
+        # running board does), or someone turned it into a link: made again, as safe
+        # as the admin step makes it at first
         secure_data_dirs()
-    tmp = path.parent / f"ring2.{os.getpid()}-{int(time.monotonic() * 1000)}.tmp"
-    fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0))
-    try:
-        with os.fdopen(fd, "wb") as f:
-            f.write(new_ring_bytes())
-        os.replace(tmp, path)   # replaces the entry itself, never a link's target
-    except BaseException:
+        folder = safefs.Folder(path.parent)
+    # all of it relative to the folder's handle: signed-in users write in it, and could
+    # turn it into a link between one step and the next
+    with folder:
+        tmp = f"ring2.{os.getpid()}-{int(time.monotonic() * 1000)}.tmp"
+        folder.write_new(tmp, new_ring_bytes())
         try:
-            os.unlink(tmp)
-        except OSError:
-            pass
-        raise
-    try:
-        (path.parent / "ring.bin").unlink()   # the first test build's (unlink: the entry itself)
-    except OSError:
-        pass
+            folder.replace(tmp, path.name)   # replaces the entry itself, never a link's target
+        except BaseException:
+            folder.delete(tmp)
+            raise
+        folder.delete("ring.bin")   # the first test build's (the entry itself)
 
 
 def _audio_off(work, also: Sequence[str] = ()) -> int:
@@ -2106,8 +2126,9 @@ def _mic_apps_back(quiet: Collection[str] = ()) -> None:
                      exe)
             old = {pid for pid, _ in running}
             for pid in old:
-                subprocess.run(["taskkill", "/F", "/PID", str(pid)], capture_output=True,
-                               timeout=15, creationflags=_CREATE_NO_WINDOW)
+                subprocess.run([systools.tool("taskkill"), "/F", "/PID", str(pid)],
+                               capture_output=True, timeout=15,
+                               creationflags=_CREATE_NO_WINDOW)
             end = time.monotonic() + MIC_APP_BACK_S
             while not {p for p, _ in _processes(exe)} - old:
                 if time.monotonic() > end:
@@ -2129,7 +2150,7 @@ def _processes(exe: str) -> list[tuple[int, str]]:
               "$n = ($all | Where-Object ProcessId -eq $p | Select-Object -First 1).Name; "
               "\"$($_.ProcessId) $n\" }")
     try:
-        r = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", script],
+        r = subprocess.run(_powershell(script),
                            capture_output=True, text=True, errors="replace", timeout=30,
                            creationflags=_CREATE_NO_WINDOW)
     except (OSError, subprocess.TimeoutExpired):
@@ -2159,7 +2180,7 @@ def _silent_before(guids: Sequence[str]) -> set[str]:
 
 MIC_SILENT = 7        # the step was done, but a mic still sends only silence
 EXTRA_RESTARTS = 3    # ...after this many more restarts of Windows' audio
-LEFT_SILENT = "left-silent.json"   # in data_dir(): the mics a step's MIC_SILENT named
+LEFT_SILENT = "left-silent.json"   # in data_dir().parent: the mics a step's MIC_SILENT named
 RETRY_S = 30 * 60     # a step this soon after one counts as its retry
 
 
@@ -2167,7 +2188,7 @@ def _left_silent() -> set[str]:
     """The mics the last step left sending only silence, if it was under RETRY_S ago
     (a check: never fails)."""
     try:
-        got = json.loads((data_dir() / LEFT_SILENT).read_text(encoding="utf-8"))
+        got = json.loads((data_dir().parent / LEFT_SILENT).read_text(encoding="utf-8"))
         if 0 <= time.time() - float(got["at"]) < RETRY_S:
             mics = {str(g).lower() for g in got["mics"]}
             if mics:
@@ -2180,8 +2201,9 @@ def _left_silent() -> set[str]:
 
 
 def _remember_silent(mics: Sequence[str]) -> None:
-    """Note the mics this step left silent for the next one (none: forget them)."""
-    path = data_dir() / LEFT_SILENT
+    """Note the mics this step left silent for the next one (none: forget them). In the
+    admins-only folder: in MicPlugin, the users' folder, the name could be a link."""
+    path = data_dir().parent / LEFT_SILENT
     try:
         if mics:
             path.write_text(json.dumps({"at": time.time(), "mics": sorted(mics)}),
@@ -2461,19 +2483,24 @@ def _remove(path: Path):
     if _held is not None:
         _held.append(path)
         return
-    if path.is_dir():
-        shutil.rmtree(path, ignore_errors=True)
-        if path.exists():   # files first, deepest folders next, the folder itself last
-            left = sorted(path.rglob("*"), key=lambda p: (p.is_dir(), -len(p.parts)))
-            for entry in [*left, path]:
-                _gone_at_restart(entry)
-    else:
-        try:
-            path.unlink()
-        except FileNotFoundError:
-            pass
-        except OSError:
-            _gone_at_restart(path)
+    # through handles to checked folders: a link anywhere in it goes itself, never what
+    # it points at (a planted %ProgramData%\OnionBoard junction once had everything
+    # behind it marked for removal)
+    left = safefs.remove_tree(path)
+    # files first, deepest folders next, the folder itself last; never in a folder
+    # others may write to, where the name could be a link to anywhere by the restart
+    for entry in sorted(left, key=lambda p: (p.is_dir(), -len(p.parts))):
+        if not _others_write(entry):
+            _gone_at_restart(entry)
+
+
+def _others_write(path: Path) -> bool:
+    """`path` is in a folder signed-in users may write to (MicPlugin, the helper's
+    requests)."""
+    from soundboard.mic import michelper
+    p = _same_path(path)
+    return any(p == d or p.startswith(d + os.sep)
+               for d in map(_same_path, (data_dir(), michelper.requests_dir())))
 
 
 def _remove_held(paths: Sequence[Path]):
