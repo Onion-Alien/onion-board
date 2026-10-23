@@ -140,6 +140,24 @@ def test_spoken_chat_drops_blocked_lines_and_reads_links_as_link(qapp, window):
     assert d(w, "chat", user="Ann", message="!sound boom")[1]["reason"] == "chat commands are off"
 
 
+def test_a_reply_posted_as_the_streamer_never_echoes_blocked_words_or_links(qapp, window):
+    """"No such sound" replies come from the streamer's own Twitch account: what the
+    viewer typed goes through the same filter as spoken chat, and a miss counts for
+    the cooldown, so one viewer can't make the account post anything, over and over."""
+    w = window
+    d(w, "chat_rules", cooldown="0", user_cooldown="30", blocked="badword")
+    body = d(w, "chat", user="Ann", message="!sound badword here")[1]
+    assert body["reason"] == "blocked word" and not body.get("reply")
+    body = d(w, "chat", user="Bo", message="!sound go to https://evil.example/x")[1]
+    assert "evil.example" not in body["reply"] and "link" in body["reply"]
+    assert d(w, "chat", user="Bo", message="!sound again")[1]["reason"] == "cooldown"
+    d(w, "chat_rules", tts="everyone", user_cooldown="0")
+    body = d(w, "chat", user="badword_fan", message="hello")[1]   # (whole words only)
+    assert body["handled"]
+    body = d(w, "chat", user="badword", message="hello")[1]       # the name is read out too
+    assert body["reason"] == "blocked word"
+
+
 def test_alerts_pick_the_rule_for_the_amount_and_play_each_event_once(qapp, window):
     w = window
     assert d(w, "event", type="follow", user="Ann")[1]["handled"] is False   # nothing set

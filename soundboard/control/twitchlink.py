@@ -217,6 +217,8 @@ class TwitchLink(QObject):
     def _token_ok(self, out):
         if isinstance(out, twitch.TwitchError) and out.status in (400, 401):
             self.mw.cfg.twitch_token = self.mw.cfg.twitch_refresh = ""
+            # as Disconnect: signing in again (maybe as another account) asks again
+            self.mw.cfg.twitch_share = False
             self._save()
             self._set(PROBLEM, _("Twitch signed you out. Connect again."))
             return
