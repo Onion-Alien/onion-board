@@ -640,28 +640,57 @@ def _kill_tree(p: subprocess.Popen, job) -> None:
 def install(info: ModuleInfo, on_line: Callable[[str], object],
             on_note: Callable[[str], object] | None = None) -> bool:
     """Run the module's "install" steps (see _install), counting how it went for the
-    daily usage count (usage.py: the add-on's name from a fixed list, nothing else)."""
+    daily usage count (usage.py: the add-on's name from a fixed list and, when it
+    failed, why from usage.ADDON_FAILS; nothing else). A first install that failed
+    before its packages were all in takes its half-made environment away again, so the
+    add-on isn't taken for installed (no Install button, the installer skipping it)."""
     from soundboard.core import usage
     repair = info.broken
-    ok = _install(info, on_line, on_note)
-    usage.used(f"addon-{'installed' if ok else 'failed'}-{usage.addon_tag(info.id)}")
-    if ok and repair:
+    fresh = not info.installed      # (a repair too: its old environment goes first)
+    tag = usage.addon_tag(info.id)
+    try:
+        why = _install(info, on_line, on_note)
+    except Exception:
+        usage.used(f"addon-failed-{tag}")
+        usage.used(f"addon-failed-{tag}-other")
+        raise
+    if why:
+        usage.used(f"addon-failed-{tag}")
+        usage.used(f"addon-failed-{tag}-{why}")
+        # only the model download failing: its packages are in, and it gets the
+        # model itself when it starts
+        if fresh and not why.startswith("download") and (info.path / ".venv").exists():
+            log.info("module %s: removing its half-made environment", info.id)
+            shutil.rmtree(info.path / ".venv", ignore_errors=True)
+        return False
+    usage.used(f"addon-installed-{tag}")
+    if repair:
         usage.used("addon-repaired")
-    return ok
+    return True
+
+
+def _step_word(step: Sequence[str]) -> str:
+    """Which install step this is, as a fixed word for the count: "venv", "pip", the
+    model "download", else "step"."""
+    for i, a in enumerate(step):
+        if a == "-m" and i + 1 < len(step) and step[i + 1] in ("venv", "pip"):
+            return step[i + 1]
+    return "download" if "--download" in step else "step"
 
 
 def _install(info: ModuleInfo, on_line: Callable[[str], object],
-             on_note: Callable[[str], object] | None = None) -> bool:
+             on_note: Callable[[str], object] | None = None) -> str:
     """Run the module's "install" steps (module.json), streaming their output to
     `on_line`; getting a Python for it first when the PC has no good one (pyget), whose
     progress goes to `on_note` (our own words, not a step's output) or else `on_line`.
-    Blocking: call from a worker thread. Returns True on success."""
+    Blocking: call from a worker thread. Returns "" on success, else why it didn't
+    work, as one of usage.ADDON_FAILS."""
     if not info.install_steps:
         on_line(_("This add-on has no install steps."))
-        return False
+        return "step"
     if not net.allowed("addons"):
         on_line(net.off_message("addons"))
-        return False
+        return "off"
     from soundboard.online import netlog
     netlog.cause("addons", f"You installed or updated the {netlog.quoted(info.name)} "
                            "add-on")
@@ -673,7 +702,7 @@ def _install(info: ModuleInfo, on_line: Callable[[str], object],
         py = pyget.for_module(info.path, on_note or on_line)
     except pyget.GetError as e:
         on_line(str(e))
-        return False
+        return "python"
     for step in info.install_steps:
         argv = [info._fill(a, py) for a in step]
         on_line("> " + " ".join(argv[1:]))
@@ -687,7 +716,7 @@ def _install(info: ModuleInfo, on_line: Callable[[str], object],
                                  creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         except OSError as e:
             on_line(_("couldn't run it: {error}", error=errors.plain(e)))
-            return False
+            return "run"
         # a step that hangs (a stuck download, a prompt nobody sees) is killed, with
         # everything it started: a grandchild still holding the output pipe would
         # keep the read below waiting for ever
@@ -721,10 +750,10 @@ def _install(info: ModuleInfo, on_line: Callable[[str], object],
                              "your internet connection and press it again.",
                              INSTALL_STEP_TIMEOUT_S // 60))
             log.warning("install of %s timed out at: %s", info.id, argv)
-            return False
+            return "download-timeout" if _step_word(step) == "download" else "timeout"
         if p.returncode != 0:
             on_line(_("failed (exit code {code})", code=p.returncode))
             log.warning("install of %s failed at: %s", info.id, argv)
-            return False
+            return _step_word(step)
     log.info("installed module %s", info.id)
-    return True
+    return ""

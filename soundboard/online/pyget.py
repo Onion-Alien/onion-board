@@ -8,7 +8,9 @@ them. So, for an add-on's install (modules.install):
 
 1. The add-on's own private copy, if an earlier install already got one.
 2. The PC's own Python, when it's 3.12 or 3.13 (the versions the add-ons' pinned
-   requirements have wheels for) and it starts.
+   requirements have wheels for), 64-bit x86 (live voice's ctranslate2 has no ARM64
+   or 32-bit Windows wheels: pip would fail on it every time), has pip to make a venv
+   with (ensurepip), and it starts.
 3. Otherwise python.org's own build (the "python" package it publishes on nuget.org:
    a plain zip, no installer, pip and venv included), downloaded through net.urlopen
    (so it follows Connection), checked against the SHA-256 PINNED below before anything
@@ -29,6 +31,7 @@ add-ons install with it (``scripts`` has no helper: install them from the Voice 
 from __future__ import annotations
 
 import logging
+import os
 import shutil
 import subprocess
 import sys
@@ -54,6 +57,7 @@ CHUNK = 256 * 1024
 DOWNLOAD_TIMEOUT_S = 60.0            # with no bytes arriving for this long
 CHECK_TIMEOUT_S = 20.0               # a Python's first start, behind a virus scan
 GOOD = ((3, 12), (3, 13))            # a PC's own Python the add-ons can use
+PLATFORM = "win-amd64"               # ...built for this (sysconfig.get_platform())
 FOLDER = ".python"                   # in the add-on's folder
 PREFIX = "tools/"                    # the Python inside the package
 
@@ -67,9 +71,11 @@ def private_python(module_dir: Path) -> Path:
 
 
 def _version(exe: str) -> tuple[int, int] | None:
-    """(major, minor) of the Python at ``exe`` if it starts and has venv, else None."""
+    """(major, minor) of the Python at ``exe`` if it starts, has venv and pip's
+    ensurepip, and (on Windows) is PLATFORM; else None."""
     try:
-        p = subprocess.run([exe, "-c", "import sys, venv; print(*sys.version_info[:2])"],
+        p = subprocess.run([exe, "-c", "import sys, sysconfig, venv, ensurepip; "
+                                       "print(*sys.version_info[:2], sysconfig.get_platform())"],
                            capture_output=True, text=True, timeout=CHECK_TIMEOUT_S,
                            stdin=subprocess.DEVNULL,
                            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
@@ -77,11 +83,15 @@ def _version(exe: str) -> tuple[int, int] | None:
         log.info("python %s didn't start: %s", exe, e)
         return None
     try:
-        major, minor = (int(x) for x in p.stdout.split())
+        major, minor, platform = p.stdout.split()
+        version = int(major), int(minor)
     except ValueError:
-        log.info("python %s: no version (exit %s)", exe, p.returncode)
+        log.info("python %s: no version, or no venv / pip (exit %s)", exe, p.returncode)
         return None
-    return major, minor
+    if os.name == "nt" and platform != PLATFORM:
+        log.info("python %s is %s, not %s: no wheels for it", exe, platform, PLATFORM)
+        return None
+    return version
 
 
 def pc_python() -> str | None:
