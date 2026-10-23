@@ -305,7 +305,10 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/triggers/logoduel.py` | a silent laser exchange between the Board and Watch logos when clicked on the Triggers tab |
 | `soundboard/ui/sounds/overlay.py` | the in-game overlay: a panel of pads that never takes focus, driven by number keys or clicks, on a chosen monitor and spot (or wherever it was dragged) |
 | `soundboard/ui/voice/voicepanel.py` | the Voice tab: lays out its cards and bottom bar, the add-ons list |
-| `soundboard/ui/voice/voicefxpanel.py` | the Voice tab's voice changer card: voice tiles, effect rows and their sliders. |
+| `soundboard/ui/voice/voicefxpanel.py` | the Voice tab's voice changer card (`VoiceFxPanel`): picking, saving and sharing voices, Edit voice's effect cards |
+| `soundboard/ui/voice/voicetiles.py` | the voice changer's voice cards (`VoiceTile`), the groups they're shown in, their sizes, and `BigSwitch` |
+| `soundboard/ui/voice/effectrow.py` | one effect's card in the voice changer (`EffectRow`) and which Edit voice tab it's on; `on_top`: an effect that isn't part of the voice |
+| `soundboard/ui/voice/fxcontrols.py` | the voice changer's small controls: `Switch` and `ParamSlider` (an effect setting's slider with its name and value) |
 | `soundboard/ui/voice/groupbar.py` | the bar over the voice cards on the Voice changer, AI voices and Languages cards: the group dropdown (with counts), the search box and the cards / list switch |
 | `soundboard/ui/voice/backdroprow.py` | the voice changer's Background card (built-in sounds and board sounds behind your voice) and its Speed and pitch pop-up |
 | `soundboard/ui/voice/effectspopup.py` | the voice bar's Effects pop-up: bundled CC0 background sounds, board sounds and the extra Robot, Radio, Echo and Reverb on top of any voice, one slider and a ✕ each |
