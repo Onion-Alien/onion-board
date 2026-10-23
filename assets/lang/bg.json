@@ -4438,5 +4438,10 @@
     "{n} точки"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Бутон на мишката може да е само клавишът за автоматичен push-to-talk: избери клавиш за това.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…или натисни страничен бутон на мишката (Mouse 4 / 5) в този прозорец. Esc = отказ."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…или натисни страничен бутон на мишката (Mouse 4 / 5) в този прозорец. Esc = отказ.",
+  "Copy invite link": "Копирай линка за покана",
+  "Invite a friend": "Покани приятел",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Изпрати на приятел линк за изтегляне на Onion Board. Сложи името или геймърското си име на него и приложението ще го поздрави от твое име, когато го отвори за първи път. Нищо не се следи и не се брои.",
+  "Your name or gamertag (optional)": "Твоето име или геймърско име (по избор)",
+  "{name} invited you to Onion Board. Have fun!": "{name} те покани в Onion Board. Забавлявай се!"
 }

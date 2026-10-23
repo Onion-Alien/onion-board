@@ -4438,5 +4438,10 @@
     "{n} पॉइंट"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "माउस बटन सिर्फ़ ऑटो पुश-टू-टॉक की की बन सकता है: इसके लिए कोई की चुनें।",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…या इस विंडो में माउस का साइड बटन (Mouse 4 / 5) क्लिक करें। Esc = रद्द करें."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…या इस विंडो में माउस का साइड बटन (Mouse 4 / 5) क्लिक करें। Esc = रद्द करें.",
+  "Copy invite link": "न्योते का लिंक कॉपी करें",
+  "Invite a friend": "दोस्त को बुलाएं",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "दोस्त को Onion Board डाउनलोड करने का लिंक भेजें। उस पर अपना नाम या गेमरटैग लगाएं, तो पहली बार ऐप खोलने पर वह आपकी ओर से उन्हें हाय कहेगा। कुछ भी ट्रैक या गिना नहीं जाता।",
+  "Your name or gamertag (optional)": "आपका नाम या गेमरटैग (वैकल्पिक)",
+  "{name} invited you to Onion Board. Have fun!": "{name} ने आपको Onion Board पर बुलाया है। मज़े करें!"
 }

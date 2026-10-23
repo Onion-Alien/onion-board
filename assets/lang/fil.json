@@ -4438,5 +4438,10 @@
     "{n} puntos"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Ang button ng mouse ay pwede lang sa auto push-to-talk: pumili ng key para dito.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…o i-click ang side button ng mouse (Mouse 4 / 5) sa window na ito. Esc = kanselahin."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…o i-click ang side button ng mouse (Mouse 4 / 5) sa window na ito. Esc = kanselahin.",
+  "Copy invite link": "Kopyahin ang invite link",
+  "Invite a friend": "Mag-imbita ng kaibigan",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Padalhan ang kaibigan ng link para i-download ang Onion Board. Ilagay ang pangalan o gamertag mo at babatiin sila ng app para sa iyo sa unang beses nilang buksan ito. Walang sinusubaybayan o binibilang.",
+  "Your name or gamertag (optional)": "Pangalan o gamertag mo (opsyonal)",
+  "{name} invited you to Onion Board. Have fun!": "Inimbita ka ni {name} sa Onion Board. Mag-enjoy!"
 }

@@ -246,6 +246,7 @@ var
   HeardKeys: array of String;  // what each one sends (soundboard/core/usage.py's HEARD)
   HeardOther: TNewEdit;        // Other's own answer
   DiscordLink: TNewStaticText; // the Finished page's "Join the Onion Board Discord"
+  InvitedBy: String;           // InviteName, for a new install only (else '')
 
 // "net_offline": true in %APPDATA%\OnionBoard\config.json: the app is in Offline mode
 // already (a reinstall). A plain text search: json.dumps writes it on one line.
@@ -552,7 +553,44 @@ begin
   HeardOther.OnChange := @HeardOtherTyped;
   HeardRadios[4].Width := HeardOther.Left - ScaleX(4);
   AddHeardRadio('', 'Rather not say', Top);
-  HeardRadios[5].Checked := True;
+  if InvitedBy <> '' then
+    HeardRadios[3].Checked := True   // the invite link: "A friend"
+  else
+    HeardRadios[5].Checked := True;
+end;
+
+// Invite a friend (soundboard/core/invite.py): the site hands the installer out as
+// "OnionBoardSetup-from-<name>.exe" when the link had a name on it. The name, or ''.
+// A second download of the same file ends in " (1)": that's cut off (the site lets no
+// brackets into the name).
+function InviteName: String;
+var
+  N: String;
+  P: Integer;
+begin
+  Result := '';
+  N := ChangeFileExt(ExtractFileName(ExpandConstant('{srcexe}')), '');
+  P := Pos('-from-', Lowercase(N));
+  if P = 0 then
+    exit;
+  N := Copy(N, P + 6, Length(N));
+  P := Pos(' (', N);
+  if P > 0 then
+    N := Copy(N, 1, P - 1);
+  Result := Copy(Trim(N), 1, 24);
+end;
+
+// The name for the app's first start to greet them with ("<name> invited you").
+procedure SaveInvite;
+var
+  Lines: TArrayOfString;
+begin
+  if InvitedBy = '' then
+    exit;
+  SetArrayLength(Lines, 1);
+  Lines[0] := InvitedBy;
+  ForceDirectories(ExpandConstant('{userappdata}\OnionBoard'));
+  SaveStringsToUTF8File(ExpandConstant('{userappdata}\OnionBoard\invited-by'), Lines, False);
 end;
 
 // A first install: no settings from an earlier one. An update already sent its
@@ -694,6 +732,8 @@ begin
   BunnyRight := Bunny.Left + Bunny.Width;
   WizardForm.TasksList.ShowHint := True;
   CreateImportPage;
+  if IsNewInstall then
+    InvitedBy := InviteName;
   CreateHeardPage;
   CreateDiscordLink;
   WizardForm.TasksList.OnClickCheck := @TasksClicked;
@@ -1373,6 +1413,8 @@ begin
     StartCable;
   if CurStep = ssPostInstall then
     QueueImports;
+  if CurStep = ssPostInstall then
+    SaveInvite;
   if CurStep = ssPostInstall then
     FinishCable;
   if (CurStep = ssPostInstall) and ShouldGetFfmpeg then

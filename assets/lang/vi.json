@@ -4360,5 +4360,10 @@
     "{n} điểm"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Nút chuột chỉ dùng được làm phím nhấn để nói tự động: hãy chọn một phím cho mục này.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…hoặc bấm nút bên của chuột (Mouse 4 / 5) trong cửa sổ này. Esc = hủy bỏ."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…hoặc bấm nút bên của chuột (Mouse 4 / 5) trong cửa sổ này. Esc = hủy bỏ.",
+  "Copy invite link": "Sao chép link mời",
+  "Invite a friend": "Mời bạn bè",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Gửi cho bạn bè link tải Onion Board. Ghi tên hoặc gamertag của bạn vào, ứng dụng sẽ chào họ thay bạn khi họ mở lần đầu. Không có gì bị theo dõi hay đếm.",
+  "Your name or gamertag (optional)": "Tên hoặc gamertag của bạn (không bắt buộc)",
+  "{name} invited you to Onion Board. Have fun!": "{name} đã mời bạn dùng Onion Board. Chơi vui nhé!"
 }

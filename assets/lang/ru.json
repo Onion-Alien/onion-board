@@ -4516,5 +4516,10 @@
     "{n} очков"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Кнопка мыши может быть только клавишей авто push-to-talk: выбери здесь клавишу.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…или нажми боковую кнопку мыши (Mouse 4 / 5) в этом окне. Esc = отмена."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…или нажми боковую кнопку мыши (Mouse 4 / 5) в этом окне. Esc = отмена.",
+  "Copy invite link": "Скопировать ссылку-приглашение",
+  "Invite a friend": "Пригласить друга",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Отправь другу ссылку на скачивание Onion Board. Добавь своё имя или ник, и приложение передаст от тебя привет, когда он впервые его откроет. Ничего не отслеживается и не считается.",
+  "Your name or gamertag (optional)": "Твоё имя или ник (необязательно)",
+  "{name} invited you to Onion Board. Have fun!": "{name} приглашает тебя в Onion Board. Развлекайся!"
 }

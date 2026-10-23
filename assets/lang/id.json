@@ -4360,5 +4360,10 @@
     "{n} poin"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Tombol mouse hanya bisa jadi tombol push-to-talk otomatis: pilih tombol keyboard untuk yang ini.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…atau klik tombol samping mouse (Mouse 4 / 5) di jendela ini. Esc = batal."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…atau klik tombol samping mouse (Mouse 4 / 5) di jendela ini. Esc = batal.",
+  "Copy invite link": "Salin link undangan",
+  "Invite a friend": "Undang teman",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Kirim link ke teman untuk mengunduh Onion Board. Taruh nama atau gamertag-mu di situ, dan aplikasinya akan menyapa mereka darimu saat pertama kali dibuka. Tidak ada yang dilacak atau dihitung.",
+  "Your name or gamertag (optional)": "Nama atau gamertag-mu (opsional)",
+  "{name} invited you to Onion Board. Have fun!": "{name} mengundangmu ke Onion Board. Selamat bersenang-senang!"
 }

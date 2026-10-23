@@ -4360,5 +4360,10 @@
     "{n} 分"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "滑鼠按鍵只能當作自動按鍵發話的鍵：這裡請選一個鍵盤按鍵。",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…或在這個視窗裡按滑鼠側鍵（Mouse 4 / 5）。Esc = 取消。"
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…或在這個視窗裡按滑鼠側鍵（Mouse 4 / 5）。Esc = 取消。",
+  "Copy invite link": "複製邀請連結",
+  "Invite a friend": "邀請好友",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "傳給好友一個下載 Onion Board 的連結。附上你的名字或遊戲 ID,好友第一次打開應用程式時會看到你的問候。不追蹤,也不計數。",
+  "Your name or gamertag (optional)": "你的名字或遊戲 ID(選填)",
+  "{name} invited you to Onion Board. Have fun!": "{name} 邀請你來用 Onion Board。玩得開心!"
 }

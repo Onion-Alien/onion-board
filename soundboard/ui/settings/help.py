@@ -3,7 +3,8 @@ disclaimer."""
 from __future__ import annotations
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
+from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QLineEdit, QPushButton,
+                               QVBoxLayout, QWidget)
 
 from soundboard.i18n import _, ngettext
 from soundboard.ui.kit import busy, icons
@@ -97,6 +98,7 @@ class HelpPage(Page):
         w, v = self._page()
         v.addWidget(self._about_card())
         v.addWidget(self._contact_card())
+        v.addWidget(self._invite_card())
         v.addWidget(self._support_card())
         v.addWidget(self._note_card())
         v.addWidget(self._disclaimer_card())
@@ -154,6 +156,42 @@ class HelpPage(Page):
             "shield"))
         cv.addLayout(row)
         cv.addWidget(ProblemsLine(card))
+        return card
+
+    def _invite_card(self):
+        """A link to the download page for a friend, with their name or gamertag on it
+        so the friend's first start says who invited them (soundboard.core.invite).
+        Nothing is counted: the name only travels in the link."""
+        from soundboard.core import invite
+        card, cv = self._card(_("Invite a friend"),
+                              _("Send a friend a link to download Onion Board. Put your name "
+                                "or gamertag on it and it says hi from you when they first "
+                                "open the app. Nothing is tracked or counted."),
+                              icon="link")
+        name = self.dlg.invite_name = QLineEdit(self.mw.cfg.invite_name)
+        name.setPlaceholderText(_("Your name or gamertag (optional)"))
+        name.setMaxLength(invite.MAX_NAME)
+        name.setMaximumWidth(320)
+        cv.addWidget(name)
+        shown = self.dlg.invite_link = QLabel(invite.link(name.text()))
+        shown.setObjectName("hint")
+        shown.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        cv.addWidget(shown)
+
+        def typed(text):
+            self.mw.set_option("invite_name", invite.clean(text))
+            shown.setText(invite.link(text))
+        name.textChanged.connect(typed)
+        copy = self.dlg.invite_copy = QPushButton(_("Copy invite link"))
+        icons.set_icon(copy, "link")
+
+        def copied():
+            QApplication.clipboard().setText(invite.link(name.text()))
+            busy.flash(copy, _("✓ Copied"))
+        copy.clicked.connect(copied)
+        row = _button_row()
+        row.addWidget(copy)
+        cv.addLayout(row)
         return card
 
     def _disclaimer_card(self):

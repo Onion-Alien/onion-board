@@ -4438,5 +4438,10 @@
     "{n} poäng"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "En musknapp kan bara vara tangenten för automatisk push-to-talk: välj en tangent här.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…eller klicka med en sidoknapp på musen (Mouse 4 / 5) i det här fönstret. Esc = avbryt."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…eller klicka med en sidoknapp på musen (Mouse 4 / 5) i det här fönstret. Esc = avbryt.",
+  "Copy invite link": "Kopiera inbjudningslänk",
+  "Invite a friend": "Bjud in en vän",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Skicka en länk till en vän så hen kan ladda ner Onion Board. Sätt ditt namn eller gamertag på den, så hälsar appen från dig första gången hen öppnar den. Inget spåras eller räknas.",
+  "Your name or gamertag (optional)": "Ditt namn eller gamertag (valfritt)",
+  "{name} invited you to Onion Board. Have fun!": "{name} har bjudit in dig till Onion Board. Ha kul!"
 }

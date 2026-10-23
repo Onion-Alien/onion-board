@@ -4516,5 +4516,10 @@
     "{n} bodů"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Tlačítko myši může být jen klávesa pro automatické push-to-talk: tady vyber klávesu.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…nebo klikni bočním tlačítkem myši (Mouse 4 / 5) v tomto okně. Esc = zrušit."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…nebo klikni bočním tlačítkem myši (Mouse 4 / 5) v tomto okně. Esc = zrušit.",
+  "Copy invite link": "Kopírovat odkaz s pozvánkou",
+  "Invite a friend": "Pozvi kamaráda",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Pošli kamarádovi odkaz ke stažení Onion Board. Přidej k němu své jméno nebo herní přezdívku a aplikace ho od tebe pozdraví, až ji poprvé otevře. Nic se nesleduje ani nepočítá.",
+  "Your name or gamertag (optional)": "Tvoje jméno nebo herní přezdívka (nepovinné)",
+  "{name} invited you to Onion Board. Have fun!": "{name} tě pozval(a) do Onion Board. Bav se!"
 }

@@ -4438,5 +4438,10 @@
     "{n} puntos"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Un botón del mouse solo puede ser la tecla de presionar para hablar automático: elige una tecla para esto.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…o haz clic con un botón lateral del mouse (Mouse 4 / 5) en esta ventana. Esc = cancelar."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…o haz clic con un botón lateral del mouse (Mouse 4 / 5) en esta ventana. Esc = cancelar.",
+  "Copy invite link": "Copiar link de invitación",
+  "Invite a friend": "Invitar a un amigo",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Mándale a un amigo un link para descargar Onion Board. Ponle tu nombre o gamertag y la app lo saluda de tu parte la primera vez que la abra. No se rastrea ni se cuenta nada.",
+  "Your name or gamertag (optional)": "Tu nombre o gamertag (opcional)",
+  "{name} invited you to Onion Board. Have fun!": "{name} te invitó a Onion Board. ¡Diviértete!"
 }

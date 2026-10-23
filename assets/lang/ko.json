@@ -4360,5 +4360,10 @@
     "{n}점"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "마우스 버튼은 자동 푸시 투 토크 키로만 쓸 수 있어요. 여기에는 키를 골라 주세요.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…또는 이 창에서 마우스 측면 버튼(Mouse 4 / 5)을 클릭하세요. Esc = 취소"
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…또는 이 창에서 마우스 측면 버튼(Mouse 4 / 5)을 클릭하세요. Esc = 취소",
+  "Copy invite link": "초대 링크 복사",
+  "Invite a friend": "친구 초대",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "친구에게 Onion Board 다운로드 링크를 보내세요. 이름이나 게이머태그를 붙이면 친구가 앱을 처음 열 때 당신 대신 인사해 줍니다. 아무것도 추적하거나 세지 않아요.",
+  "Your name or gamertag (optional)": "이름 또는 게이머태그 (선택)",
+  "{name} invited you to Onion Board. Have fun!": "{name} 님이 Onion Board에 초대했어요. 즐겁게 쓰세요!"
 }

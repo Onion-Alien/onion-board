@@ -4438,5 +4438,10 @@
     "{n} puan"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Fare tuşu yalnızca otomatik bas-konuş tuşu olabilir: bunun için bir klavye tuşu seç.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…ya da bu pencerede farenin yan tuşuna (Mouse 4 / 5) bas. Esc = iptal et."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…ya da bu pencerede farenin yan tuşuna (Mouse 4 / 5) bas. Esc = iptal et.",
+  "Copy invite link": "Davet bağlantısını kopyala",
+  "Invite a friend": "Arkadaşını davet et",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Bir arkadaşına Onion Board'u indirmesi için bir bağlantı gönder. Üstüne adını ya da oyuncu adını koy, uygulamayı ilk açtığında senin adına merhaba desin. Hiçbir şey takip edilmez ya da sayılmaz.",
+  "Your name or gamertag (optional)": "Adın ya da oyuncu adın (isteğe bağlı)",
+  "{name} invited you to Onion Board. Have fun!": "{name} seni Onion Board'a davet etti. İyi eğlenceler!"
 }

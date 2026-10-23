@@ -4360,5 +4360,10 @@
     "{n} คะแนน"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "ปุ่มเมาส์ใช้ได้แค่เป็นปุ่ม Push-to-talk อัตโนมัติ: เลือกปุ่มคีย์บอร์ดสำหรับอันนี้",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…หรือคลิกปุ่มข้างเมาส์ (Mouse 4 / 5) ในหน้าต่างนี้ Esc = ยกเลิก"
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…หรือคลิกปุ่มข้างเมาส์ (Mouse 4 / 5) ในหน้าต่างนี้ Esc = ยกเลิก",
+  "Copy invite link": "คัดลอกลิงก์เชิญ",
+  "Invite a friend": "ชวนเพื่อน",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "ส่งลิงก์ดาวน์โหลด Onion Board ให้เพื่อน ใส่ชื่อหรือเกมเมอร์แท็กของคุณไว้ แล้วแอปจะทักทายเพื่อนแทนคุณตอนเปิดครั้งแรก ไม่มีการติดตามหรือนับอะไรเลย",
+  "Your name or gamertag (optional)": "ชื่อหรือเกมเมอร์แท็กของคุณ (ไม่บังคับ)",
+  "{name} invited you to Onion Board. Have fun!": "{name} ชวนคุณมาใช้ Onion Board ขอให้สนุก!"
 }

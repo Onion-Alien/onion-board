@@ -4438,5 +4438,10 @@
     "{n} πόντοι"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Ένα κουμπί του ποντικιού μπορεί να είναι μόνο το πλήκτρο του αυτόματου push-to-talk: διάλεξε πλήκτρο εδώ.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…ή πάτα ένα πλαϊνό κουμπί του ποντικιού (Mouse 4 / 5) σε αυτό το παράθυρο. Esc = ακύρωση."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…ή πάτα ένα πλαϊνό κουμπί του ποντικιού (Mouse 4 / 5) σε αυτό το παράθυρο. Esc = ακύρωση.",
+  "Copy invite link": "Αντιγραφή συνδέσμου πρόσκλησης",
+  "Invite a friend": "Κάλεσε έναν φίλο",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Στείλε σε έναν φίλο έναν σύνδεσμο για να κατεβάσει το Onion Board. Βάλε πάνω το όνομά σου ή το gamertag σου και η εφαρμογή θα τον χαιρετήσει εκ μέρους σου την πρώτη φορά που θα την ανοίξει. Τίποτα δεν παρακολουθείται ούτε μετριέται.",
+  "Your name or gamertag (optional)": "Το όνομά σου ή το gamertag σου (προαιρετικό)",
+  "{name} invited you to Onion Board. Have fun!": "Ο/Η {name} σε προσκάλεσε στο Onion Board. Καλή διασκέδαση!"
 }

@@ -4438,5 +4438,10 @@
     "{n} pistettä"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Hiiren painike voi olla vain automaattisen push-to-talkin näppäin: valitse tähän näppäin.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…tai klikkaa hiiren sivupainikkeella (Mouse 4 / 5) tässä ikkunassa. Esc = peruuta."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…tai klikkaa hiiren sivupainikkeella (Mouse 4 / 5) tässä ikkunassa. Esc = peruuta.",
+  "Copy invite link": "Kopioi kutsulinkki",
+  "Invite a friend": "Kutsu kaveri",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Lähetä kaverille linkki Onion Boardin lataamiseen. Lisää siihen nimesi tai pelinimesi, niin sovellus tervehtii häntä sinun puolestasi, kun hän avaa sen ensimmäisen kerran. Mitään ei seurata eikä lasketa.",
+  "Your name or gamertag (optional)": "Nimesi tai pelinimesi (valinnainen)",
+  "{name} invited you to Onion Board. Have fun!": "{name} kutsui sinut Onion Boardiin. Pidä hauskaa!"
 }
