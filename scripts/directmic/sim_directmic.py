@@ -1,6 +1,6 @@
 """Simulate the mic effect's admin install / uninstall and hammer it with failures.
 
-Runs the real `soundboard/mic/directmic.py` code (admin_install / admin_uninstall /
+Runs the real `soundboard/mic/micadmin.py` code (admin_install / admin_uninstall /
 _install_endpoint / _uninstall_endpoint) against the fake registry from
 `tests/test_directmic.py`, killing it at every single registry write, and checks the
 invariants: a mic always ends up exactly as it started, one mic that won't go back
@@ -10,8 +10,8 @@ real registry, audio devices or mic.
     .venv\\Scripts\\python scripts\\directmic\\sim_directmic.py
 
 Exit 0 = every scenario passed, 1 = something failed (printed). Run it after changing
-the mic effect's admin install/uninstall or the ring layout (soundboard/mic/directmic.py),
-before opening the PR: the pytest suite covers the normal paths, this covers the ones
+the mic effect's admin install/uninstall or the ring layout (soundboard/mic/micadmin.py,
+micring.py), before opening the PR: the pytest suite covers the normal paths, this covers the ones
 cut off half-way (a crash, a reboot) that are hard to reach by hand.
 """
 from __future__ import annotations

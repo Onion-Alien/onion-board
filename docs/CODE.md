@@ -14,7 +14,7 @@ the route (`Config.route`, `library.ROUTES`):
   "APO" like Equalizer APO's, built with MinGW by `scripts/directmic/build_directmic.py`), so
   Discord and games hear the sounds through the mic they already use. Soundpad works
   the same way. One admin prompt sets it up (`main.py --direct-mic install <endpoint>`,
-  `soundboard/mic/directmic.py`'s admin part): the DLL goes to `Program Files\Onion Board
+  `soundboard/mic/micadmin.py`): the DLL goes to `Program Files\Onion Board
   Mic`, is registered, and takes the mic's stream-effect slot (SFX; Windows runs only
   stream effects in front of each app's recording, after the mic's own endpoint
   effect). An effect the driver had in that slot is saved and run first, inside ours.
@@ -360,7 +360,11 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/apps/windowview.py` | the Apps tab's eye button: a small live picture of a program's window under its card (a worker grabs about 4 a second, only while open, on screen and the app is in front) |
 | `soundboard/win/winshot.py` | finds a program's main window and copies a shrunk picture of it (PrintWindow + halftone StretchBlt); says when it's minimised, gone or black |
 | `soundboard/win/exeicon.py` | a program's icon read from its .exe on the thread that listed the programs, not on the UI thread (the shell call held the GIL and made sounds skip) |
-| `soundboard/mic/directmic.py` | straight into my mic: the shared ring with the mic effect, `DirectMicStream` (the send output on the mic's clock), status / repair checks, and the one-prompt admin install / uninstall |
+| `soundboard/mic/directmic.py` | straight into my mic: what the app asks of the mic effect (install / repair / remove through the mic helper or Windows' prompt, why a step failed, in words); the one module the app, the helper and the tests use: the parts below are reached through it, and a name patched on it is patched in the part that uses it |
+| `soundboard/mic/micbase.py` | the mic effect's names and places, shared by its parts: its COM class, the registry keys and effect slots it uses on a mic, where its files go |
+| `soundboard/mic/micring.py` | the mic effect's ring (the shared file the board writes what others hear into and the effect publishes the clean mic through) and `DirectMicStream`, the send output on the mic's clock |
+| `soundboard/mic/micstate.py` | the mic effect on this PC's mics, read without admin: the recording devices, which carry the effect, its status and the repair checks |
+| `soundboard/mic/micadmin.py` | the mic effect's admin part, all the mic helper runs: putting it on a mic and taking it off, Windows' audio restarted around it (mic apps, SteelSeries Sonar, mics left silent), `cli` |
 | `soundboard/mic/sonarkeep.py` | while the app's mic is SteelSeries Sonar's: Sonar's devices noted while the mic works, and set back when Windows' audio restarted and Sonar moved them (its mic onto a silent cable); the look-ups and the setting are directmic's |
 | `soundboard/core/cleanup.py` | `OnionBoardCleanup.exe`, the separate download (the `cleanup-tool` release) that takes everything of Onion Board off a PC whose uninstall didn't finish: the mic effect off every mic through `directmic`'s own uninstall, the mic helper, the app folder, its Installed apps entry, shortcuts, start-up entry, `ProgramData\OnionBoard`; the user's sounds only if they say so. Built by `scripts/buildtools/build_cleanup.py` |
 | `soundboard/mic/michelper.py` | the mic helper: the first admin prompt also installs `obmichelper.exe` (the admin part alone, with its own effect DLL) in Program Files and an on-demand SYSTEM scheduled task; after that, setting up, repairing, switching mics and removing go through it without a prompt. Only another effect DLL asks again |

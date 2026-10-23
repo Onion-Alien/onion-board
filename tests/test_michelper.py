@@ -56,7 +56,9 @@ ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4
                26: "819ed89c03f11cb9c066b3a9529062e67e55cf96228875ce8364cbf1cac04181",
                27: "227b9e0bb915510ae86c33c5ab34ac6b4fd30df207998b3c26748c55743a5a09",
                28: "b4dfd79b8e41fc286dc4b56debd3888a55feb95f8d28265b9947608d6465198f",
-               29: "d8dcd2d06b62cb4e3745343abf574be058a9bbdae9477886223dddc989a8797f"}
+               # 29 again when directmic.py was split and its admin part became
+               # micadmin.py: the code was only moved, so installed helpers needn't update
+               29: "efce7b0d8d513100903f17e229d74e37eede59d62a9a6ac7867dcd751f7fe90a"}
 
 
 def _queue():
@@ -773,11 +775,9 @@ def test_ring_bytes_match_the_layout():
 
 
 def admin_source_digest() -> str:
-    src = (ROOT / "soundboard" / "mic" / "directmic.py").read_text(encoding="utf-8")
-    rule = "# " + "-" * 70 + " "
-    start, end = src.index(rule + "admin part"), src.index(rule + "the app's side")
+    admin = (ROOT / "soundboard" / "mic" / "micadmin.py").read_text(encoding="utf-8")
     helper = (ROOT / "soundboard" / "mic" / "michelper.py").read_text(encoding="utf-8")
-    text = (src[start:end] + helper).replace("\r\n", "\n")
+    text = (admin + helper).replace("\r\n", "\n")
     return hashlib.sha256(text.encode()).hexdigest()
 
 
