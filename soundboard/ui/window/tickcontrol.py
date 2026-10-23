@@ -122,6 +122,7 @@ class TickControl(Controller):
         if self._tick_n % max(1, 1000 // mw.timer.interval()) == 0:   # about once a second
             if mw.cfg.route == "mic":
                 mw.micctl._follow_mic_effect()
+            mw.micctl.keep_sonar()
             if e.check_streams() or sum(e.xruns.values()) != mw.statusctl._xruns_shown:
                 mw.statusctl._update_status()
             elif mw.cfg.route == "mic" and mw.micctl._direct_health() != mw._direct_shown:

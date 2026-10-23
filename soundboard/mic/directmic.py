@@ -2101,8 +2101,9 @@ def _effect_runs(guids: Sequence[str], mark: int) -> bool:
 # silence until they start again, so the voice chat hears nothing; ended, they're
 # started again by their own app within seconds, and that's how they're restarted here.
 SONAR_EXE = "SteelSeriesSonar.exe"
+SONAR_MIC = "SteelSeries Sonar - Microphone"   # its mic's name starts with this
 MIC_APPS = (
-    (SONAR_EXE, "SteelSeriesGGEZ.exe", "SteelSeries Sonar - Microphone"),
+    (SONAR_EXE, "SteelSeriesGGEZ.exe", SONAR_MIC),
 )
 MIC_APP_BACK_S = 30   # how long a restarted mic app gets to be running again
 
@@ -2303,10 +2304,11 @@ def _sonar_keep_again() -> None:
     _sonar_fixed = True
 
 
-def _sonar_back() -> None:
+def _sonar_back(saved: dict[tuple[str, str], tuple[str, bool]] | None = None) -> None:
     """After an audio restart: each of Sonar's channels on another device than before
-    the step, or stopped when it ran, set back to its device (setting it again starts a
-    stopped one), until all are and SONAR_SETTLE_S have gone by; given up after
+    the step (`saved`, else what _sonar_keep noted), or stopped when it ran, set back to
+    its device (setting it again starts a stopped one), until all are and SONAR_SETTLE_S
+    have gone by; given up after
     SONAR_BACK_S. Its mic channel then without a device (dropped before the step, by an
     older version's restart: nothing to set back) needs Sonar restarted, which picks the
     device it's set up with again. Only its mic decides that: a Game / Chat / Media / Aux
@@ -2316,7 +2318,9 @@ def _sonar_back() -> None:
     sound. Its result (_sonar_fixed) tells _mic_apps_back whether Sonar still needs a
     restart. A check: never fails the step."""
     global _sonar_fixed
-    if _sonar_saved is None:
+    if saved is None:
+        saved = _sonar_saved
+    if saved is None:
         _sonar_fixed = None
         return
     start = time.monotonic()
@@ -2331,12 +2335,12 @@ def _sonar_back() -> None:
             address = _sonar_address()
             now = _sonar_routes(address)
             answered = True
-            wrong = [k for k, (dev, ran) in _sonar_saved.items()
+            wrong = [k for k, (dev, ran) in saved.items()
                      if now.get(k, ("", False))[0] != dev or (ran and not now[k][1])
                      or k not in put]   # each set once at least: a stopped one can say it runs
             last_wrong = wrong
             for kind, rid in wrong:
-                dev = _sonar_saved[(kind, rid)][0]
+                dev = saved[(kind, rid)][0]
                 try:
                     if (kind, rid) in away:   # moved to no device: back after a moment
                         if time.monotonic() - away[(kind, rid)] < SONAR_AWAY_S:
@@ -2384,6 +2388,26 @@ def _sonar_back() -> None:
             _sonar_fixed = False if answered else None
             return
         time.sleep(1)
+
+
+def sonar_devices() -> dict[tuple[str, str], tuple[str, bool]] | None:
+    """Sonar's channels now, for the app's own watch (soundboard.mic.sonarkeep): None
+    when Sonar isn't running or doesn't answer, or its mic channel has no device or is
+    stopped (nothing worth keeping). Local calls only; no admin needed."""
+    try:
+        address = _sonar_address()
+        routes = _sonar_routes(address)
+    except OSError:
+        return None
+    return routes if _sonar_mic_runs(address, routes) else None
+
+
+def sonar_set_back(saved: dict[tuple[str, str], tuple[str, bool]]) -> bool | None:
+    """Sonar's channels set back to `saved` (sonar_devices) after an audio restart, the
+    way a step does it (_sonar_back; Sonar is never ended here). True when they are,
+    False when Sonar wouldn't take them, None when it didn't answer."""
+    _sonar_back(saved)
+    return _sonar_fixed
 
 
 def _processes(exe: str) -> list[tuple[int, str]]:
