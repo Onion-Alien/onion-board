@@ -29,6 +29,7 @@ from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.kit.crashdialog import free_dialog
 from soundboard.core import errors
 from soundboard.i18n import _
+from soundboard.ui.setup.wizardkit import BUN_H, BUN_PAD, _header, _label, _ok
 
 log = logging.getLogger(__name__)
 # Discord's settings, re-read every 2 s while the guide shows: one kept thread for every
@@ -42,20 +43,8 @@ TAIL_S = chatcheck.MAX_LAG_S + 0.8     # keep listening this long after the test
 CONNECT_S = 6.0                         # how long Windows gets to open the capture
 
 
-def _ok() -> str:
-    return theme.status("ok")
-
-
 def _warn() -> str:
     return theme.status("warn")
-
-
-def _label(text: str, css: str = "font-size:11pt;") -> QLabel:
-    lbl = QLabel(text)
-    lbl.setWordWrap(True)
-    lbl.setTextFormat(Qt.TextFormat.RichText)
-    lbl.setStyleSheet(css)
-    return lbl
 
 
 def _steps(*items: str) -> str:
@@ -64,15 +53,9 @@ def _steps(*items: str) -> str:
     return f"<ol style='margin-left:-20px'>{''.join(lis)}<li>{items[-1]}</li></ol>"
 
 
-def _header(title: str, body: QLabel, bun: BunnyWidget) -> QHBoxLayout:
-    from soundboard.ui.setup.setupwizard import _header as header
-    return header(title, body, bun)
-
-
 def _bun(prop: str) -> BunnyWidget:
     """Bun beside a guide's intro, the setup guide's size: no taller than the words,
     so the steps start right under them."""
-    from soundboard.ui.setup.setupwizard import BUN_H, BUN_PAD
     return BunnyWidget(prop, height=BUN_H, pad=BUN_PAD)
 
 
@@ -947,7 +930,7 @@ def show_guide(which: str, parent, mw, vm: str):
     if kept:
         vm = mw.cfg.mic_device or _("your mic")
     if which == "steam":
-        from soundboard.ui.setup.setupwizard import SteamGuide
+        from soundboard.ui.setup.steamguide import SteamGuide
         g = SteamGuide(parent, vm)
     elif which == "game":
         g = GameGuide(parent, mw, vm, kept)

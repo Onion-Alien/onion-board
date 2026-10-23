@@ -35,7 +35,7 @@ from soundboard.ui.kit import appstate, fit, icons
 from soundboard.ui.kit.panel import hint_label, icon_button
 from soundboard.ui.kit.pixels import snap_to_pixels
 
-TITLE_CSS = "font-size:17pt; font-weight:800;"   # as the guides' titles (setupwizard.py)
+TITLE_CSS = "font-size:17pt; font-weight:800;"   # as the guides' titles (wizardkit.py)
 BODY_CSS = "font-size:11pt;"
 
 WIN_AT = 5

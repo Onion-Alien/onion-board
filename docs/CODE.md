@@ -274,7 +274,16 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/window/responsive.py` | small windows: what hides, in which order, as the window shrinks |
 | `soundboard/ui/settings/routewarn.py` | the question on leaving Settings when "Send my sounds to" was just set to speakers or a headset: My mic, the virtual cable (use or install), or keep it |
 | `soundboard/ui/kit/fit.py` | dialogs grow to fit their wrapped text instead of clipping it (`fit.watch(self)` in every dialog's `__init__`) |
-| `soundboard/ui/setup/setupwizard.py` | the first-run guide with Bun (mic, headphones, where your sounds go: straight into your mic, or the cable or another way out, then Discord; on the first launch, then a language and a look) and the Steam help |
+| `soundboard/ui/setup/setupwizard.py` | the first-run guide with Bun (mic, headphones, where your sounds go: straight into your mic, or the cable or another way out, then Discord; on the first launch, then a language and a look): its frame (the steps, Back / Next, the motion); each step's page is a mixin below |
+| `soundboard/ui/setup/devicestep.py` | the guide's mic and headphones step: device tiles, the live level and the test sound |
+| `soundboard/ui/setup/cablestep.py` | the guide's *where your sounds go* step: the mic effect, the virtual cable's installer (and the restart it may need, `resume_after_restart`) or another way out; *Switch to the virtual cable?* |
+| `soundboard/ui/setup/discordstep.py` | the guide's last step: what to pick in Discord (or a game, Steam, OBS), read back from Discord's own settings on a kept thread |
+| `soundboard/ui/setup/lookstep.py` | the guide's first-launch steps (*Make it yours*): the tabs to start with, a language, a look, the privacy switches and *Set up Discord for me* |
+| `soundboard/ui/setup/wizardkit.py` | the guide's shared sizes (tiles, margins, gaps, Bun's size) and small builders (`_header`, `_label`, `_card`) the steps and the chat guides use |
+| `soundboard/ui/setup/wizardparts.py` | the guide's own widgets: the step bar, the page stack that fades between steps, its scroll area and the cable step's status card |
+| `soundboard/ui/setup/testtune.py` | the guide's test sound: a short 8-bit fanfare made in numpy |
+| `soundboard/ui/setup/miclater.py` | *Your sounds aren't in your mic yet*: shown after a guide finished without the mic effect |
+| `soundboard/ui/setup/steamguide.py` | the Steam voice chat help (where Steam picks the mic, its noise cancellation) |
 | `soundboard/ui/setup/setupbackdrop.py` | the first launch's plain backdrop behind the guide: the loading screen hands over to its logo, which glides to the corner, and it fades to the app when the guide closes |
 | `soundboard/ui/setup/coach.py` | Guided tours: the dimmed window, the yellow ring, one card with Bun and the step's button; holds clicks outside until the action step's Not now; something failing turns the card red (Try again, Close, Report a problem) and lets the window go |
 | `soundboard/ui/kit/oops.py` | The red "didn't work" card: sad Bun, what went wrong, what to do, Try again and Report a problem (search results, the store, the radio map, the voice tab) |
