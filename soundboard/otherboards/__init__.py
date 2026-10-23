@@ -8,11 +8,29 @@ window), and nothing of the other app's is changed; the sound files are copied.
 """
 from __future__ import annotations
 
+import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 
 from soundboard.sounds.library import AUDIO_EXTS
+
+_LOCAL_DRIVE = re.compile(r"(\\\\\?\\)?[A-Za-z]:")
+
+
+def on_this_pc(path: Path) -> bool:
+    """`path` is on one of this PC's drives (or relative to one), not a network share
+    (\\\\server\\share, \\\\?\\UNC\\..., \\\\host@SSL\\DavWWWRoot\\...). Looking at a share's
+    file has Windows connect to that server, with this PC's sign-in, around the proxy,
+    Tor and Offline mode: a board file someone sent can name any server. Its sounds on
+    a share are left out (a share the user mapped to a drive letter still works)."""
+    drive = PureWindowsPath(str(path)).drive
+    return not drive or bool(_LOCAL_DRIVE.fullmatch(drive))
+
+
+def usable(path: Path) -> bool:
+    """A sound file a board lists that's on this PC (never asked of a share: on_this_pc)."""
+    return on_this_pc(path) and path.is_file()
 
 # left in our app folder by the installer's "Bring my sounds over from …" boxes, one
 # source key per line, for the app's first start to do (ui.mainwindow import_queued)

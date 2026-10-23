@@ -8,6 +8,7 @@ from PySide6.QtCore import QEvent, QPoint
 from PySide6.QtGui import QHelpEvent
 from PySide6.QtWidgets import QApplication, QToolTip
 
+from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.sounds import library
 from soundboard.sounds.library import SoundMeta
 from soundboard.ui.kit.widgets import Pad
@@ -36,7 +37,7 @@ def test_a_linked_pad_shows_the_mark_and_names_its_file_over_it_only(qapp, app_d
     assert pad.linked_file() == str(outside)
     box = pad._link_rect
     assert box is not None and pad.rect().contains(box.toAlignedRect())
-    assert _tip(pad, box.center().toPoint()) == f"Plays from: {outside}"
+    assert _tip(pad, box.center().toPoint()) == plain_tip(f"Plays from: {outside}")
     assert _tip(pad, QPoint(pad.width() // 2, 20)) == ""   # over the name: nothing
     assert str(outside) in pad.accessibleDescription()     # a screen reader says it too
 
@@ -57,7 +58,7 @@ def test_a_slim_row_shows_the_mark_too(qapp, app_dir):
     p.hover = True
     p.grab()
     assert p._link_rect is not None
-    assert _tip(p, p._link_rect.center().toPoint()) == f"Plays from: {outside}"
+    assert _tip(p, p._link_rect.center().toPoint()) == plain_tip(f"Plays from: {outside}")
 
 
 def test_the_mark_waits_for_the_mouse(qapp, app_dir):

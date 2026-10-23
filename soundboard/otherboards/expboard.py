@@ -19,7 +19,7 @@ import os
 import re
 from pathlib import Path
 
-from soundboard.otherboards import Entry, Source, vk_hotkey
+from soundboard.otherboards import Entry, Source, usable, vk_hotkey
 from soundboard.i18n import _
 
 MAX_BYTES = 20 * 1024 * 1024
@@ -132,7 +132,7 @@ def read(path: str | Path) -> list[Entry]:
             continue
         p = Path(f)
         out.append(Entry(str(p), p.stem.strip()[:40] or "Sound",
-                         hotkey(r.get("activationKeysNumbers")), exists=p.is_file()))
+                         hotkey(r.get("activationKeysNumbers")), exists=usable(p)))
     return out
 
 

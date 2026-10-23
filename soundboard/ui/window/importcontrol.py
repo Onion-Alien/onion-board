@@ -51,6 +51,7 @@ from soundboard.sounds.library import (
 )
 from soundboard.ui.kit.hotkeypick import HOTKEY_ACTIONS, pretty_key
 from soundboard.ui.kit import busy, worker
+from soundboard.ui.kit.plaintext import plain_tip   # (pack names come from the pack)
 from soundboard.ui.sounds import importreport
 from soundboard.ui.window import taboff
 from soundboard.ui.kit import toast as toastmod
@@ -967,9 +968,9 @@ class ImportControl(Controller):
             return
         if QMessageBox.question(
                 mw, _("Put its categories in one tab"),
-                _("Make one “{name}” tab, with {n} of its categories inside it as "
-                  "subcategories instead of tabs of their own?\n\nNo sound is removed or "
-                  "changed.", name=name, n=len(own)),
+                plain_tip(_("Make one “{name}” tab, with {n} of its categories inside it as "
+                            "subcategories instead of tabs of their own?\n\nNo sound is "
+                            "removed or changed.", name=name, n=len(own))),
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel
                 ) != QMessageBox.StandardButton.Yes:
             return
@@ -1016,9 +1017,10 @@ class ImportControl(Controller):
         pkg, name = got
         if ask and QMessageBox.question(
                 mw, _("Reset sound pack"),
-                _("Put the sounds from “{name}” back how they came?\n\nChanges you made to "
-                  "them (names, hotkeys, volume, effects, pictures…) are undone, and ones you "
-                  "removed come back. Your other sounds aren't touched.", name=name),
+                plain_tip(_("Put the sounds from “{name}” back how they came?\n\nChanges you "
+                            "made to them (names, hotkeys, volume, effects, pictures…) are "
+                            "undone, and ones you removed come back. Your other sounds aren't "
+                            "touched.", name=name)),
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel
                 ) != QMessageBox.StandardButton.Yes:
             return
@@ -1100,9 +1102,10 @@ class ImportControl(Controller):
         name = backup.packs().get(pid, pid)
         if ask and QMessageBox.question(
                 mw, _("Remove sound pack"),
-                ngettext("Remove the {n} sound from “{name}”?",
-                         "Remove the {n} sounds from “{name}”?", len(gone), name=name)
-                + "\n\n" + _("You can undo this, or bring them back from Recently deleted."),
+                plain_tip(ngettext("Remove the {n} sound from “{name}”?",
+                                   "Remove the {n} sounds from “{name}”?", len(gone), name=name)
+                          + "\n\n"
+                          + _("You can undo this, or bring them back from Recently deleted.")),
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel
                 ) != QMessageBox.StandardButton.Yes:
             return

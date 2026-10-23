@@ -20,6 +20,7 @@ from shiboken6 import isValid as qt_valid
 
 from soundboard.i18n import _, ngettext
 from soundboard.ui.kit import icons, panel
+from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.ui.kit.panel import icon_button
 
 POPUP_W = 400        # the list's card: narrow, a long name still fits most of itself
@@ -49,7 +50,7 @@ class _Name(QPushButton):
         super().__init__()
         self.full = text
         self.setObjectName("chipname")
-        self.setToolTip(text)
+        self.setToolTip(plain_tip(text))   # a sound's name: web / board text
         self.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
         self._fit()
 

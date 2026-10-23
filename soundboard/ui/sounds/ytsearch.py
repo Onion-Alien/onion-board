@@ -32,7 +32,7 @@ from soundboard.ui.kit import theme
 from soundboard.online import net, netlog, ytdl
 from soundboard.ui.bun.bunny import H as BUN_H
 from soundboard.ui.bun.bunny import W as BUN_W
-from soundboard.ui.kit import busy, icons
+from soundboard.ui.kit import busy, icons, plaintext
 from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.style.owl import H as OWL_H
 from soundboard.style.owl import W as OWL_W
@@ -365,10 +365,7 @@ class Thumb(QWidget):
             self.update()   # bouncing bars: every tick while it plays
 
 
-def plain_tip(text: str) -> str:
-    """`text` as a tooltip that shows exactly what it says: a tooltip reads anything
-    that looks like HTML as HTML, and titles come from the web and the store."""
-    return f"<p>{html.escape(text)}</p>" if text else ""
+plain_tip = plaintext.plain_tip   # (titles come from the web and the store)
 
 
 class ClampLabel(QLabel):

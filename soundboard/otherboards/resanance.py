@@ -24,7 +24,7 @@ import re
 import struct
 from pathlib import Path
 
-from soundboard.otherboards import Entry, Source, vk_hotkey
+from soundboard.otherboards import Entry, Source, usable, vk_hotkey
 from soundboard.i18n import _
 
 PAGE = 8192
@@ -243,7 +243,7 @@ def read(path: str | Path) -> list[Entry]:
         tags = [tab] if tab and len(tabs) > 1 else []
         out.append(Entry(str(p), name.strip()[:40] or p.stem,
                          hotkey(str(d.get("hot") or ""), str(d.get("mod") or "")),
-                         tags, exists=p.is_file()))
+                         tags, exists=usable(p)))
     return out
 
 

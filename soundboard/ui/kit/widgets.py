@@ -35,6 +35,7 @@ from soundboard.ui.settings import lite
 from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.i18n import _
 from soundboard.ui.kit.pixels import snap_to_pixels
+from soundboard.ui.kit.plaintext import plain_tip
 
 PAD_MIME = "application/x-soundboard-pad"
 
@@ -911,11 +912,11 @@ class Pad(QAbstractButton):
                 QToolTip.showText(e.globalPos(), _("Stop, keep the old effects"), self,
                                   stop.toAlignedRect())
             elif hit is not None and hit.contains(QPointF(e.pos())) and self.linked_file():
-                QToolTip.showText(e.globalPos(), _("Plays from: {path}",
-                                                   path=self.linked_file()),
+                QToolTip.showText(e.globalPos(), plain_tip(_("Plays from: {path}",
+                                                             path=self.linked_file())),
                                   self, hit.toAlignedRect())
-            elif self.name_cut:
-                QToolTip.showText(e.globalPos(), self.meta.name, self)
+            elif self.name_cut:   # (names come from the web and other boards)
+                QToolTip.showText(e.globalPos(), plain_tip(self.meta.name), self)
             else:
                 QToolTip.hideText()
                 e.ignore()

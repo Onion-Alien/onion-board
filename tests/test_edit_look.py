@@ -4,6 +4,7 @@ web link shows where it came from."""
 from PySide6.QtGui import QImage
 from PySide6.QtWidgets import QDialog, QFileDialog, QLabel
 
+from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.sounds import library, thumbs
 from soundboard.ui.sounds.dialogs import EditDialog
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
@@ -84,7 +85,7 @@ def test_a_downloaded_sound_says_where_it_came_from(window, monkeypatch):  # noq
     shown = []
     monkeypatch.setattr(sourcedialog.SourceDialog, "show", lambda self: shown.append(self))
     d.btn_source.click()
-    assert len(shown) == 1 and shown[0].btn_open.toolTip() == SRC["link"]
+    assert len(shown) == 1 and shown[0].btn_open.toolTip() == plain_tip(SRC["link"])
     d.deleteLater()
 
 

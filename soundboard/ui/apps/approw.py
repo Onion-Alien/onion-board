@@ -32,6 +32,7 @@ from soundboard.ui.kit.panel import CardGrid, HoverCard, VolumeControl, icon_but
 from soundboard.ui.apps.windowview import WindowView
 from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.ui.kit.pixels import snap_to_pixels
+from soundboard.ui.kit.plaintext import plain_tip
 
 log = logging.getLogger(__name__)
 
@@ -485,7 +486,7 @@ class ElidedLabel(QLabel):
         shown = self.fontMetrics().elidedText(text, Qt.TextElideMode.ElideRight, r.width())
         if shown != text and self.hide_overflow:
             shown = ""
-        tip = text if shown != text else ""
+        tip = plain_tip(text) if shown != text else ""   # (sound names: web / board text)
         if tip != self.toolTip():   # every paint (meters, hover): only when it changes
             self.setToolTip(tip)
         p = QPainter(self)

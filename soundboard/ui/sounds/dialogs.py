@@ -27,6 +27,7 @@ from soundboard.sounds.library import (MAX_COOLDOWN_S, MAX_DELAY_S, MAX_FADE_S, 
                                        SoundMeta, original_peaks)
 from soundboard.ui.kit.hotkeypick import HotkeyDialog, pretty_key
 from soundboard.ui.kit import busy, fit, icons, toast
+from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.ui.sounds import sourcedialog
 from soundboard.ui.kit.panel import (EqPanel, hint_label, icon_button, reset_button,
                                      section_label, steady_number)
@@ -770,10 +771,11 @@ class EditDialog(QDialog):
         from_lbl = QLabel(_("From {site}: {channel}", site=site, channel=who) if who
                           else _("From {site}", site=site))
         from_lbl.setObjectName("muted")
+        from_lbl.setTextFormat(Qt.TextFormat.PlainText)   # a web channel name (plaintext.py)
         srow.addWidget(from_lbl)
         self.btn_source = QPushButton(_("Details"))
         self.btn_source.setProperty("quiet", True)
-        self.btn_source.setToolTip(src["link"])
+        self.btn_source.setToolTip(plain_tip(src["link"]))
         srow.addWidget(self.btn_source)
         srow.addStretch(1)
         row = self.source_row = QWidget()

@@ -33,6 +33,7 @@ from soundboard.ui.kit import busy, icons
 from soundboard.ui.voice.aivoicebrowser import HEAR, MAKING, hear_button
 from soundboard.ui.voice.groupbar import GroupBar, no_match
 from soundboard.ui.kit.widgets import take_out
+from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.ui.kit.panel import (Flow, UndoBar, ViewToggle, hint_label, reset_button,
                                      section_label, steady_number)
 from soundboard.ui.kit.wheelguard import no_wheel
@@ -1689,9 +1690,10 @@ class VoiceFxPanel(QWidget):
             other = self.store.find(name)
             if other is None or other == keep:
                 return name
-            if QMessageBox.question(self._parent(), title,
-                                    _("You already have a voice called “{name}”. Replace it?",
-                                      name=other)) == QMessageBox.StandardButton.Yes:
+            if QMessageBox.question(self._parent(), title,   # (a name from a backup too)
+                                    plain_tip(_("You already have a voice called “{name}”. "
+                                                "Replace it?", name=other))
+                                    ) == QMessageBox.StandardButton.Yes:
                 return other
             text = name
 
