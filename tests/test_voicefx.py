@@ -388,7 +388,7 @@ def _centroid(y):
 
 
 def _f0(y):
-    from soundboard.voicefx.builtin import _PitchTracker
+    from soundboard.voicefx.builtin.parts import _PitchTracker
     tr = _PitchTracker(SR)
     v = [tr.update(y[i:i + 480]) for i in range(SR // 2, len(y) - 480, 480)]
     return float(np.median([a for a in v if a > 0]))
@@ -525,7 +525,7 @@ def test_hothead_preset_changes_normal_speech_without_waiting_for_a_shout(mic_db
 
 
 def test_quiet_pitch_tracker_still_rejects_silence_and_unvoiced_noise():
-    from soundboard.voicefx.builtin import _PitchTracker
+    from soundboard.voicefx.builtin.parts import _PitchTracker
     tracker = _PitchTracker(RATE)
     rng = np.random.default_rng(7)
     for x in (np.zeros(tracker.window, np.float32),
