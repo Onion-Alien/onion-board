@@ -4358,5 +4358,7 @@
   "Score {score} / {total}": "점수 {score} / {total}",
   "{n} point": [
     "{n}점"
-  ]
+  ],
+  "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "마우스 버튼은 자동 푸시 투 토크 키로만 쓸 수 있어요. 여기에는 키를 골라 주세요.",
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…또는 이 창에서 마우스 측면 버튼(Mouse 4 / 5)을 클릭하세요. Esc = 취소"
 }

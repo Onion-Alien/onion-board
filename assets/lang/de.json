@@ -4436,5 +4436,7 @@
   "{n} point": [
     "{n} Punkt",
     "{n} Punkte"
-  ]
+  ],
+  "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Eine Maustaste geht nur als Auto-Push-to-Talk-Taste: nimm hier eine Taste.",
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…oder klick mit einer Maus-Seitentaste (Mouse 4 / 5) in dieses Fenster. Esc = abbrechen."
 }

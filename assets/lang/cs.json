@@ -4514,5 +4514,7 @@
     "{n} bod",
     "{n} body",
     "{n} bodů"
-  ]
+  ],
+  "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Tlačítko myši může být jen klávesa pro automatické push-to-talk: tady vyber klávesu.",
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…nebo klikni bočním tlačítkem myši (Mouse 4 / 5) v tomto okně. Esc = zrušit."
 }

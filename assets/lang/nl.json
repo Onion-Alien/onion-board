@@ -4436,5 +4436,7 @@
   "{n} point": [
     "{n} punt",
     "{n} punten"
-  ]
+  ],
+  "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Een muisknop kan alleen de toets voor automatische push-to-talk zijn: kies hier een toets.",
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…of klik met een zijknop van je muis (Mouse 4 / 5) in dit venster. Esc = annuleren."
 }

@@ -122,6 +122,14 @@ def parse(combo: str) -> tuple[int, int] | None:
 
 MAX_COMBO = 80   # "ctrl+alt+shift+windows+play/pause media" is 39; a MIDI pad's name fits too
 MOUSE_VKS = {0x01, 0x02, 0x04, 0x05, 0x06}
+# the mouse's side (thumb) buttons: only auto push-to-talk takes one (check(mouse=True)),
+# as it presses the key for the game; Windows has no hotkey for a mouse button
+MOUSE_BUTTONS = {"mouse 4": 0x05, "mouse 5": 0x06}
+
+
+def mouse_button(combo: str) -> int | None:
+    """'mouse 4' -> 0x05 (VK_XBUTTON1), 'mouse 5' -> 0x06; None for anything else."""
+    return MOUSE_BUTTONS.get(combo.strip().lower()) if isinstance(combo, str) else None
 
 
 def _split(combo: str) -> list[str]:
@@ -132,12 +140,18 @@ def _split(combo: str) -> list[str]:
     return parts
 
 
-def check(combo: str) -> tuple[str, str]:
+def check(combo: str, mouse: bool = False) -> tuple[str, str]:
     """Can `combo` ever fire? (the combo as saved, "") if so, else ("", why) with the
     reason in plain words (HTML-escaped, for a toast). One key plus any of Ctrl, Alt,
-    Shift and Windows, each once; or a MIDI pad. Everywhere a hotkey is set goes
-    through this, so text no keyboard can send is never saved and shown as working."""
+    Shift and Windows, each once; or a MIDI pad; with `mouse`, a mouse side button too.
+    Everywhere a hotkey is set goes through this, so text no keyboard can send is never
+    saved and shown as working."""
     combo = combo if isinstance(combo, str) else ""
+    if mouse_button(combo) is not None:
+        if mouse:
+            return combo.strip().lower(), ""
+        return "", _("A mouse button can only be the auto push-to-talk key: pick a key "
+                     "for this one.")
     if midi.is_midi(combo):
         if len(combo) <= MAX_COMBO and midi.parse(combo) is not None:
             return combo, ""
@@ -583,14 +597,24 @@ _EXTENDED = {0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x2C, 0x2D, 0x2E,
              0x5B, 0x5C, 0x5D, 0x6F, 0x90, 0xA3, 0xA5}
 
 
+INPUT_MOUSE = 0
+MOUSEEVENTF_XDOWN, MOUSEEVENTF_XUP = 0x80, 0x100
+
+
 class _KEYBDINPUT(ctypes.Structure):
     _fields_ = [("wVk", wt.WORD), ("wScan", wt.WORD), ("dwFlags", wt.DWORD),
                 ("time", wt.DWORD), ("dwExtraInfo", ctypes.POINTER(ctypes.c_ulong))]
 
 
+class _MOUSEINPUT(ctypes.Structure):
+    _fields_ = [("dx", wt.LONG), ("dy", wt.LONG), ("mouseData", wt.DWORD),
+                ("dwFlags", wt.DWORD), ("time", wt.DWORD),
+                ("dwExtraInfo", ctypes.POINTER(ctypes.c_ulong))]
+
+
 class _INPUT(ctypes.Structure):
     class _U(ctypes.Union):
-        _fields_ = [("ki", _KEYBDINPUT), ("pad", ctypes.c_byte * 32)]
+        _fields_ = [("ki", _KEYBDINPUT), ("mi", _MOUSEINPUT), ("pad", ctypes.c_byte * 32)]
     _anonymous_ = ("u",)
     _fields_ = [("type", wt.DWORD), ("u", _U)]
 
@@ -618,9 +642,22 @@ def key_input(vk: int, up: bool) -> _INPUT:
     return inp
 
 
+def mouse_input(vk: int, up: bool) -> _INPUT:
+    """One mouse side-button INPUT record (exposed for tests; nothing is sent)."""
+    inp = _INPUT()
+    inp.type = INPUT_MOUSE
+    inp.mi.mouseData = 1 if vk == 0x05 else 2   # XBUTTON1 / XBUTTON2
+    inp.mi.dwFlags = MOUSEEVENTF_XUP if up else MOUSEEVENTF_XDOWN
+    return inp
+
+
 def key_sequence(combo: str, up: bool) -> list[tuple[int, bool]] | None:
     """The (vk, up) events that press (or release) a combo, in order: modifiers
-    down before the key, and released after it. None if the combo can't be parsed."""
+    down before the key, and released after it. None if the combo can't be parsed.
+    A mouse side button is its one event (pressed as a mouse button by _send_all)."""
+    button = mouse_button(combo)
+    if button is not None:
+        return [(button, up)]
     parsed = parse(combo)
     if not parsed:
         return None
@@ -633,7 +670,8 @@ def key_sequence(combo: str, up: bool) -> list[tuple[int, bool]] | None:
 
 
 def _send_all(events: list[tuple[int, bool]]) -> bool:
-    arr = (_INPUT * len(events))(*[key_input(vk, up) for vk, up in events])
+    arr = (_INPUT * len(events))(*[mouse_input(vk, up) if vk in (0x05, 0x06)
+                                   else key_input(vk, up) for vk, up in events])
     sent = user32.SendInput(len(events), arr, ctypes.sizeof(_INPUT))
     if sent != len(events):
         log.warning("SendInput sent %d of %d events (error %d)", sent, len(events),

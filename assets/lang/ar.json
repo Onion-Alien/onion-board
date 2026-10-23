@@ -4748,5 +4748,7 @@
     "{n} نقاط",
     "{n} نقطة",
     "{n} نقطة"
-  ]
+  ],
+  "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "زر الماوس يصلح فقط كمفتاح الضغط والتحدث التلقائي: اختر مفتاحًا لهذا.",
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…أو انقر زرًا جانبيًا في الماوس (Mouse 4 / 5) داخل هذه النافذة. Esc = إلغاء."
 }

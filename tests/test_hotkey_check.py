@@ -174,3 +174,39 @@ def test_nothing_else_can_take_the_stop_everything_key(window, monkeypatch):  # 
     window.hkctl.set_global_hotkey("stop_hotkey", "f9")            # moved: the old one is free
     window.hkctl.set_sound_hotkey(m.id, "ctrl+alt+s")
     assert m.hotkey == "ctrl+alt+s" and cfg.stop_hotkey == "f9"
+
+
+def test_auto_ptt_takes_a_mouse_side_button_and_nothing_else_does(window, monkeypatch):  # noqa: F811
+    toasts = []
+    monkeypatch.setattr(window, "toast", lambda text, *a, **k: toasts.append(text))
+    window.hkctl.set_global_hotkey("ptt_key", "mouse 4")
+    assert window.cfg.ptt_key == "mouse 4"
+    window.hkctl.set_global_hotkey("stop_hotkey", "mouse 5")
+    assert window.cfg.stop_hotkey != "mouse 5" and "push-to-talk" in toasts[-1]
+
+
+def test_a_saved_mouse_ptt_key_loads(app_dir):
+    library.CONFIG_PATH.write_text(json.dumps({"ptt_key": "mouse 5", "pause_hotkey": "mouse 4"}),
+                                   encoding="utf-8")
+    cfg = Config.load()
+    assert cfg.ptt_key == "mouse 5" and cfg.pause_hotkey == ""
+
+
+def test_the_ptt_picker_takes_a_side_button_click(window):  # noqa: F811
+    from PySide6.QtCore import QPointF, Qt
+    from PySide6.QtGui import QMouseEvent
+    from soundboard.ui.kit.hotkeypick import HotkeyDialog
+
+    def click(d, button):
+        d.mousePressEvent(QMouseEvent(QMouseEvent.Type.MouseButtonPress, QPointF(5, 5),
+                                      QPointF(5, 5), button, button,
+                                      Qt.KeyboardModifier.NoModifier))
+    plain = HotkeyDialog(window.hotkeys, window)
+    click(plain, Qt.MouseButton.XButton1)
+    assert plain.result_combo is None
+    ptt = HotkeyDialog(window.hotkeys, window, pads=False, mouse=True)
+    click(ptt, Qt.MouseButton.LeftButton)
+    assert ptt.result_combo is None
+    click(ptt, Qt.MouseButton.XButton2)
+    assert ptt.result_combo == "mouse 5"
+    window.hkctl.register_hotkeys()   # the pickers paused them

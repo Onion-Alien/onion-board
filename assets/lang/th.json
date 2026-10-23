@@ -4358,5 +4358,7 @@
   "Score {score} / {total}": "คะแนน {score} / {total}",
   "{n} point": [
     "{n} คะแนน"
-  ]
+  ],
+  "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "ปุ่มเมาส์ใช้ได้แค่เป็นปุ่ม Push-to-talk อัตโนมัติ: เลือกปุ่มคีย์บอร์ดสำหรับอันนี้",
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…หรือคลิกปุ่มข้างเมาส์ (Mouse 4 / 5) ในหน้าต่างนี้ Esc = ยกเลิก"
 }

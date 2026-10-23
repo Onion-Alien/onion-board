@@ -4358,5 +4358,7 @@
   "Score {score} / {total}": "Skor {score} / {total}",
   "{n} point": [
     "{n} mata"
-  ]
+  ],
+  "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Butang tetikus hanya boleh jadi kekunci push-to-talk automatik: pilih kekunci untuk yang ini.",
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…atau klik butang sisi tetikus (Mouse 4 / 5) dalam tetingkap ini. Esc = batal."
 }

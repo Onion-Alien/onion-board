@@ -4514,5 +4514,7 @@
     "{n} punct",
     "{n} puncte",
     "{n} de puncte"
-  ]
+  ],
+  "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Un buton de mouse poate fi doar tasta pentru apasă-pentru-a-vorbi automat: alege o tastă aici.",
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…sau apasă un buton lateral al mouse-ului (Mouse 4 / 5) în această fereastră. Esc = anulează."
 }

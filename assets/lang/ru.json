@@ -4514,5 +4514,7 @@
     "{n} очко",
     "{n} очка",
     "{n} очков"
-  ]
+  ],
+  "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Кнопка мыши может быть только клавишей авто push-to-talk: выбери здесь клавишу.",
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…или нажми боковую кнопку мыши (Mouse 4 / 5) в этом окне. Esc = отмена."
 }

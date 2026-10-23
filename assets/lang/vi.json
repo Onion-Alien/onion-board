@@ -4358,5 +4358,7 @@
   "Score {score} / {total}": "Điểm {score} / {total}",
   "{n} point": [
     "{n} điểm"
-  ]
+  ],
+  "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Nút chuột chỉ dùng được làm phím nhấn để nói tự động: hãy chọn một phím cho mục này.",
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…hoặc bấm nút bên của chuột (Mouse 4 / 5) trong cửa sổ này. Esc = hủy bỏ."
 }

@@ -218,7 +218,7 @@ def clean_hotkey(combo: str, what: str) -> str:
     if not combo:
         return ""
     from soundboard.control import winkeys  # Win32; only needed once there's a key
-    if winkeys.check(combo)[1]:
+    if winkeys.check(combo, mouse=what == "ptt_key")[1]:   # a side button: PTT only
         log.warning("dropped the hotkey %r of %s: no key can send it", combo[:80], what)
         return ""
     return combo
