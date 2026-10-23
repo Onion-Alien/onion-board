@@ -337,7 +337,7 @@ def result_html(res: dict, vm: str, kept: bool = False) -> str:
             "<b>Quiet parts of your sounds are cut off</b> (fades, quiet intros). Switch "
             "<b>Input Mode</b> to <b>Push to Talk</b> and turn on <b>Auto push-to-talk</b> "
             "(Settings → Hotkeys), or turn off <b>Automatically determine input "
-            "sensitivity</b> and drag the slider almost all the way left."),
+            "sensitivity</b> and set the slider to about -65 dB."),
         "agc": _(
             "<b>Automatic gain control is pumping your volume.</b> Turn off <b>Automatic "
             "Gain Control</b> and <b>Echo Cancellation</b> (Input Profile <b>Custom</b>, not "
@@ -684,8 +684,8 @@ class DiscordGuide(QDialog):
             _("<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under "
               "Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you "
               "while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically "
-              "determine input sensitivity</b> and drag the slider almost all the way "
-              "left, or Discord keeps cutting your sounds out, loud ones too."),
+              "determine input sensitivity</b> and set the slider to about -65 dB, "
+              "or Discord keeps cutting your sounds out, loud ones too."),
             _("Click <b>Let's Check</b> in Discord, then <b>Check Discord</b> below. Onion "
               "Board plays a short test into your mic and listens to what Discord does "
               "with it."))))
