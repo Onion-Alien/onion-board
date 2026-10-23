@@ -647,6 +647,8 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         when it's stopped and, for a one-shot, over its last fade_out seconds.
         only: 'main' or 'mon' plays on that output alone (the voice chat check); a tuple
         of outputs plays on those ('main', 'obs': others hear it, you don't)."""
+        if data.ndim == 1:   # mono (the mic check's probe): the mix is CH channels wide
+            data = np.repeat(data[:, None], CH, axis=1)
         outs = self.active_outputs()
         if only is not None:
             outs &= {only} if isinstance(only, str) else set(only)
