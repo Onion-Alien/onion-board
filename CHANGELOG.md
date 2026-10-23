@@ -2,8 +2,11 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
-## 2.7.1 — 2026-10-22
+## 2.7.1 — 2026-10-23
 
+- SteelSeries Sonar: with Sonar's Gaming device (a 7.1 device) as your headphones,
+  you now hear your sounds. The app couldn't open it ("That audio device doesn't
+  support that many channels") and stayed silent in your ears.
 - Direct mic: when the background mic helper can't set up your mic (mostly on
   Windows 10), clicking set-up now asks Windows once and does it that way, instead of
   failing with "code 1" every time. A set-up that worked is no longer reported as
