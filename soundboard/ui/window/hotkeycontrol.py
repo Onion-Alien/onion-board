@@ -500,11 +500,15 @@ class HotkeyControl(Controller):
         mw.toast(_("Category: {value}", value=html.escape(name or 'All')), key="category")
 
     def step_sound_volume(self, step: int):
-        """The louder / quieter hotkeys: the sounds' volume box by 10 % a press."""
+        """The louder / quieter hotkeys: the sounds' volume box by 10 % a press, and the
+        "My headphones" slider with it (the sounds' box only shows while one plays, so
+        a key press otherwise showed nothing)."""
         mw = self.mw
-        pct = mw.vol_sound.spin.value()
-        new = min(max((round(pct / 10) + step) * 10, 0), mw.vol_sound.spin.maximum())
-        mw.vol_sound.spin.setValue(new)   # -> set_option("sound_vol")
+        new = 0
+        for vol in (mw.vol_mon, mw.vol_sound):   # -> mon_vol, sound_vol
+            pct = vol.spin.value()
+            new = min(max((round(pct / 10) + step) * 10, 0), vol.spin.maximum())
+            vol.spin.setValue(new)
         mw.playctl.cue((880, 1175) if step > 0 else (880, 659))
         mw.toast(_("Sounds: {new}%", new=new), key="volume")
 
