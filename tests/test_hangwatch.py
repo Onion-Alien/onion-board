@@ -280,3 +280,19 @@ def test_the_memory_figures_read_on_windows():
     from soundboard.core import hangwatch
     load, faults = hangwatch.memory_load(), hangwatch.page_faults()
     assert 0 <= load <= 100 and faults > 0
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows' own figures")
+def test_the_memory_figure_looks_the_dll_up_once(monkeypatch):
+    """The UI thread asks for it; the frozen app's WinDLL checks the disk for the file,
+    and a stalled drive froze the window there for 30 s."""
+    import ctypes
+
+    from soundboard.core import hangwatch
+    hangwatch.memory_load()
+    calls = []
+    real = ctypes.WinDLL
+    monkeypatch.setattr(ctypes, "WinDLL", lambda *a, **k: calls.append(a) or real(*a, **k))
+    for _ in range(3):
+        assert 0 <= hangwatch.memory_load() <= 100
+    assert calls == []

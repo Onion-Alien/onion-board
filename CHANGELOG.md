@@ -77,6 +77,9 @@ Changes not released yet are in [changelog.d/](changelog.d/), one file per chang
   (Logitech G HUB's Blue VO!CE, Windows' own Voice Clarity) keeps that effect with
   Onion Board's effect on. It used to be switched off, without a word, while direct
   mic was on.
+- Fixed the window freezing for as long as the PC's drive stalls (half a minute on some
+  drives): a memory check the window runs every few seconds looked on disk for a
+  Windows file each time. It looks once now.
 
 ## 2.7.0 — 2026-10-22
 
