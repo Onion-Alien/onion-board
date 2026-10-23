@@ -76,9 +76,12 @@ class DeviceWorker:
 
     One recovery at a time: claim() first (False: one is running, try again on the
     next check), then run() its steps; whoever claimed calls release() when the last
-    step is done. A step that hangs keeps the claim, so nothing piles up behind it."""
+    step is done. A step that hangs keeps the claim, so nothing piles up behind it.
 
-    IDLE_S = 30.0   # the thread ends after this long without work (a new one starts)
+    The thread stays for good once started. It used to end after 30 s without work and
+    the next check (on the UI thread, about once a second) started a new one: starting
+    a thread waits for it to run, and on a busy PC short of memory that held the window
+    for seconds (freeze reports in run(), `threading.wait`)."""
 
     def __init__(self, name: str = "devices"):
         self.name = name
@@ -117,14 +120,7 @@ class DeviceWorker:
 
     def _loop(self):
         while True:
-            try:
-                fn, done = self._q.get(timeout=self.IDLE_S)
-            except queue.Empty:
-                with self._lock:
-                    if self._q.empty():
-                        self._thread = None
-                        return
-                continue
+            fn, done = self._q.get()
             t0 = time.monotonic()
             result = None
             try:

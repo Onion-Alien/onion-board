@@ -13,7 +13,7 @@ from conftest import process_events
 from soundboard.audio import appaudio
 from soundboard.audio import engine as eng
 from soundboard.audio.engine import Engine
-from soundboard.audio.engineparts import LITE_BLOCK_S
+from soundboard.audio.engineparts import LITE_BLOCK_S, DeviceWorker
 from test_default_output import OUTS
 from test_default_output import window as default_window  # noqa: F401
 from test_mainwindow import window as main_window  # noqa: F401
@@ -263,3 +263,19 @@ def test_default_output_switch_and_reopening_all_never_wait_on_the_ui_thread(
     assert ("set_mon_device", "Speakers") in calls
     assert [c[0] for c in calls].count("set_mon_device") == 2   # switched, then all reopened
     assert "set_mic_device" in [c[0] for c in calls]
+
+
+def test_the_device_thread_is_started_once_not_on_every_check():
+    """Starting a thread waits for it to run, and the checks start work from the UI
+    thread: on a busy PC short of memory a new thread per check held the window for
+    seconds. One thread does every step, however long it sat idle in between."""
+    w = DeviceWorker(name="devices-test")
+    seen = []
+    for _ in range(3):
+        done = threading.Event()
+        assert w.claim()
+        w.run(threading.get_ident, lambda t, done=done: (seen.append(t), w.release(), done.set()))
+        assert done.wait(5)
+        assert w.wait(5)
+    assert len(set(seen)) == 1
+    assert w._thread is not None and w._thread.is_alive()
