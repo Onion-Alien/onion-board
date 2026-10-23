@@ -65,7 +65,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"soundboard/ui/kit/theme.py" = ["E501"]   # the stylesheet is one rule per line
+"soundboard/ui/kit/themesheet.py" = ["E501"]   # the stylesheet is one rule per line
 "tests/*" = ["BLE"]
 
 # ---------------------------------------------------------------- pyright

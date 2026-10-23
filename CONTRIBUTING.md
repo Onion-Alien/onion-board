@@ -59,8 +59,8 @@ in a later commit.
    `requirements.txt`; VB-Cable is downloaded when someone chooses to install it,
    because its licence forbids redistribution. Don't add `.exe`, `.dll` or driver files. Native code (the
    mic effect in `native/directmic/`) is committed as source and built by `build.ps1`.
-6. **Assets must be ours.** Icons and artwork are drawn in code (`theme.py`,
-   `icons.py`, `bunny.py`), except pictures made for this project in `assets/art/`
+6. **Assets must be ours.** Icons and artwork are drawn in code (`logo.py`,
+   `iconshapes.py`, `bunny.py`), except pictures made for this project in `assets/art/`
    (see its README); the app works without them. Other images, fonts or sounds need
    a licence that allows redistribution, noted in the PR.
 7. **No new network calls without saying so.** Anything that talks to the

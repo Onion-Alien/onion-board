@@ -133,7 +133,7 @@ def test_spectrum_of_silence_is_flat_and_it_shows_what_was_just_played():
 
 def _spectrum_one_band_at_a_time(data, frac, n):
     """The plain version of spectrum(): a loop over the bands (what it used to be)."""
-    from soundboard.ui.kit.widgets import _FREQS, _HANN, FFT_N
+    from soundboard.ui.kit.meters import _FREQS, _HANN, FFT_N
     pos = max(0, int(min(max(frac, 0.0), 1.0) * len(data)) - FFT_N)
     seg = data[pos:pos + FFT_N]
     if len(seg) < FFT_N:
