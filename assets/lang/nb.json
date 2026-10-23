@@ -4438,5 +4438,8 @@
     "{n} poeng"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "En museknapp kan bare være tasten for auto trykk-for-å-snakke: velg en tast for denne.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…eller klikk med en sideknapp på musen (Mouse 4 / 5) i dette vinduet. Esc = avbryt."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…eller klikk med en sideknapp på musen (Mouse 4 / 5) i dette vinduet. Esc = avbryt.",
+  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board er på mikrofonen din, men Windows har ikke startet den ennå. Start PC-en på nytt: den starter med Windows.",
+  "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board er på mikrofonen din, men siden da vil ikke en mikrofon åpne seg. Start PC-en på nytt.",
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Windows-lyden ville ikke pause, så mikrofonen din ble ikke endret. Lukk spill og talechat-apper, eller start PC-en på nytt."
 }

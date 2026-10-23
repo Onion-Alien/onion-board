@@ -4360,5 +4360,8 @@
     "{n} คะแนน"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "ปุ่มเมาส์ใช้ได้แค่เป็นปุ่ม Push-to-talk อัตโนมัติ: เลือกปุ่มคีย์บอร์ดสำหรับอันนี้",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…หรือคลิกปุ่มข้างเมาส์ (Mouse 4 / 5) ในหน้าต่างนี้ Esc = ยกเลิก"
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…หรือคลิกปุ่มข้างเมาส์ (Mouse 4 / 5) ในหน้าต่างนี้ Esc = ยกเลิก",
+  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board อยู่บนไมค์ของคุณแล้ว แต่ Windows ยังไม่ได้เริ่มมัน รีสตาร์ท PC: มันจะเริ่มพร้อมกับ Windows",
+  "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board อยู่บนไมค์ของคุณแล้ว แต่ตั้งแต่นั้นมีไมค์ตัวหนึ่งเปิดไม่ได้ รีสตาร์ท PC",
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "เสียงของ Windows ไม่ยอมหยุดชั่วคราว ไมค์ของคุณจึงไม่ได้ถูกเปลี่ยน ปิดเกมและแอปแชทเสียง หรือรีสตาร์ท PC"
 }

@@ -4438,5 +4438,8 @@
     "{n} pistettä"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Hiiren painike voi olla vain automaattisen push-to-talkin näppäin: valitse tähän näppäin.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…tai klikkaa hiiren sivupainikkeella (Mouse 4 / 5) tässä ikkunassa. Esc = peruuta."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…tai klikkaa hiiren sivupainikkeella (Mouse 4 / 5) tässä ikkunassa. Esc = peruuta.",
+  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board on mikrofonissasi, mutta Windows ei ole vielä käynnistänyt sitä. Käynnistä tietokone uudelleen: se käynnistyy Windowsin mukana.",
+  "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board on mikrofonissasi, mutta sen jälkeen yksi mikrofoni ei aukea. Käynnistä tietokone uudelleen.",
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Windowsin ääni ei pysähtynyt hetkeksi, joten mikrofoniasi ei muutettu. Sulje pelit ja puhechat-sovellukset tai käynnistä tietokone uudelleen."
 }

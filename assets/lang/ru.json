@@ -4516,5 +4516,8 @@
     "{n} очков"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Кнопка мыши может быть только клавишей авто push-to-talk: выбери здесь клавишу.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…или нажми боковую кнопку мыши (Mouse 4 / 5) в этом окне. Esc = отмена."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…или нажми боковую кнопку мыши (Mouse 4 / 5) в этом окне. Esc = отмена.",
+  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board стоит на вашем микрофоне, но Windows ещё не запустила его. Перезагрузите ПК: он запустится вместе с Windows.",
+  "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board стоит на вашем микрофоне, но с тех пор один микрофон не открывается. Перезагрузите ПК.",
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Звук Windows не удалось приостановить, поэтому микрофон не изменён. Закройте игры и приложения голосового чата или перезагрузите ПК."
 }

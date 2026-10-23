@@ -4360,5 +4360,8 @@
     "{n} ポイント"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "マウスボタンは自動プッシュトゥトークのキーにしか使えません。ここではキーを選んでください。",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…またはこのウィンドウ内でマウスのサイドボタン（Mouse 4 / 5）をクリック。Esc = キャンセル。"
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…またはこのウィンドウ内でマウスのサイドボタン（Mouse 4 / 5）をクリック。Esc = キャンセル。",
+  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board はマイクに入っていますが、Windows がまだ起動していません。PC を再起動してください：Windows と一緒に起動します。",
+  "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board はマイクに入っていますが、それ以降マイクが開けません。PC を再起動してください。",
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Windows のサウンドが一時停止しなかったため、マイクは変更されていません。ゲームやボイスチャットのアプリを閉じるか、PC を再起動してください。"
 }

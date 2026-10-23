@@ -4360,5 +4360,8 @@
     "{n} điểm"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Nút chuột chỉ dùng được làm phím nhấn để nói tự động: hãy chọn một phím cho mục này.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…hoặc bấm nút bên của chuột (Mouse 4 / 5) trong cửa sổ này. Esc = hủy bỏ."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…hoặc bấm nút bên của chuột (Mouse 4 / 5) trong cửa sổ này. Esc = hủy bỏ.",
+  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board đã ở trên mic của bạn nhưng Windows chưa khởi động nó. Hãy khởi động lại PC: nó sẽ chạy cùng Windows.",
+  "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board đã ở trên mic của bạn nhưng từ đó một mic không mở được. Hãy khởi động lại PC.",
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Âm thanh của Windows không chịu tạm dừng nên mic của bạn chưa được thay đổi. Hãy đóng trò chơi và ứng dụng trò chuyện thoại, hoặc khởi động lại PC."
 }

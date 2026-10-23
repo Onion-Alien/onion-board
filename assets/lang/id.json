@@ -4360,5 +4360,8 @@
     "{n} poin"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Tombol mouse hanya bisa jadi tombol push-to-talk otomatis: pilih tombol keyboard untuk yang ini.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…atau klik tombol samping mouse (Mouse 4 / 5) di jendela ini. Esc = batal."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…atau klik tombol samping mouse (Mouse 4 / 5) di jendela ini. Esc = batal.",
+  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board sudah ada di mikmu, tapi Windows belum menjalankannya. Mulai ulang PC-mu: ia berjalan bersama Windows.",
+  "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board sudah ada di mikmu, tapi sejak itu ada mik yang tidak mau terbuka. Mulai ulang PC-mu.",
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Suara Windows tidak mau berhenti sejenak, jadi mikmu tidak diubah. Tutup game dan aplikasi obrolan suara, atau mulai ulang PC-mu."
 }

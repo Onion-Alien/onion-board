@@ -4516,5 +4516,8 @@
     "{n} de puncte"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Un buton de mouse poate fi doar tasta pentru apasă-pentru-a-vorbi automat: alege o tastă aici.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…sau apasă un buton lateral al mouse-ului (Mouse 4 / 5) în această fereastră. Esc = anulează."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…sau apasă un buton lateral al mouse-ului (Mouse 4 / 5) în această fereastră. Esc = anulează.",
+  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board este pe microfonul tău, dar Windows nu l-a pornit încă. Repornește PC-ul: pornește odată cu Windows.",
+  "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board este pe microfonul tău, dar de atunci un microfon nu se mai deschide. Repornește PC-ul.",
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Sunetul Windows nu s-a oprit pentru o clipă, așa că microfonul nu a fost schimbat. Închide jocurile și aplicațiile de chat vocal sau repornește PC-ul."
 }

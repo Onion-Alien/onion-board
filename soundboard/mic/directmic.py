@@ -67,6 +67,7 @@ import sys
 import threading
 import time
 import winreg
+from collections import Counter
 from collections.abc import Collection, Mapping, Sequence
 from typing import TYPE_CHECKING
 from pathlib import Path
@@ -1455,10 +1456,57 @@ def _audio_comes_back(dependents: Sequence[str] = ()):
     log.warning("no helper to bring the audio back if this stops half-way")
 
 
+_SERVICE_STATES = {1: "Stopped", 2: "StartPending", 3: "StopPending", 4: "Running",
+                   5: "ContinuePending", 6: "PausePending", 7: "Paused"}
+
+
+def _service_states() -> dict[str, str] | None:
+    """Windows' audio services' states ({"Audiosrv": "Stopped", ...}), asked of Windows'
+    service manager itself; None if it can't tell. PowerShell alone, as before, said
+    "not stopped" on PCs where it was slow or blocked (as the mic helper, too): exit
+    code 6 with neither service named, though the audio had stopped."""
+    from ctypes import wintypes
+
+    class STATUS(ctypes.Structure):
+        _fields_ = [(n, wintypes.DWORD) for n in ("type", "state", "accepted", "exit",
+                                                   "service_exit", "check", "wait")]
+    try:
+        advapi = ctypes.WinDLL("advapi32", use_last_error=True)
+        advapi.OpenSCManagerW.restype = advapi.OpenServiceW.restype = wintypes.HANDLE
+        advapi.OpenSCManagerW.argtypes = [wintypes.LPCWSTR, wintypes.LPCWSTR, wintypes.DWORD]
+        advapi.OpenServiceW.argtypes = [wintypes.HANDLE, wintypes.LPCWSTR, wintypes.DWORD]
+        advapi.QueryServiceStatus.argtypes = [wintypes.HANDLE, ctypes.POINTER(STATUS)]
+        advapi.CloseServiceHandle.argtypes = [wintypes.HANDLE]
+    except (AttributeError, OSError):
+        return None
+    scm = advapi.OpenSCManagerW(None, None, 0x0001)   # SC_MANAGER_CONNECT
+    if not scm:
+        return None
+    states: dict[str, str] = {}
+    try:
+        for name in AUDIO_SERVICES:
+            h = advapi.OpenServiceW(scm, name, 0x0004)   # SERVICE_QUERY_STATUS
+            if not h:
+                return None
+            try:
+                st = STATUS()
+                if not advapi.QueryServiceStatus(h, ctypes.byref(st)):
+                    return None
+                states[name] = _SERVICE_STATES.get(st.state, "Unknown")
+            finally:
+                advapi.CloseServiceHandle(h)
+    finally:
+        advapi.CloseServiceHandle(scm)
+    return states
+
+
 def _services_stopped() -> bool:
     """Windows' audio is really stopped. The endpoint builder re-reads a mic's effect
     settings when it starts, so a stop that silently failed leaves the change unread
     until a restart: worth knowing."""
+    states = _service_states()
+    if states is not None:
+        return all(s == "Stopped" for s in states.values())
     script = ("(Get-Service -Name " + ",".join(AUDIO_SERVICES) + " -ErrorAction SilentlyContinue"
               " | Where-Object Status -ne 'Stopped' | Measure-Object).Count")
     try:
@@ -1473,6 +1521,9 @@ def _services_stopped() -> bool:
 def _services_up() -> str:
     """Windows' audio services not stopped, with their state ("Audiosrv=StopPending"),
     or "" when all are stopped or it can't tell (a check: never fails)."""
+    states = _service_states()
+    if states is not None:
+        return " ".join(f"{n}={s}" for n, s in states.items() if s != "Stopped")
     script = ("Get-Service -Name " + ",".join(AUDIO_SERVICES) + " -ErrorAction SilentlyContinue"
               " | Where-Object Status -ne 'Stopped'"
               " | ForEach-Object { \"$($_.Name)=$($_.Status)\" }")
@@ -1590,9 +1641,20 @@ def pick_slot(values: Mapping[int, object]) -> tuple[str, int]:
     if any(values.get(p) for p in LEGACY) and not any(values.get(p) for p in MODERN) \
             and not values.get(COMPOSITE_SFX):
         return "wrap", LFX
-    if values.get(COMPOSITE_EFX):
+    if values.get(COMPOSITE_EFX) and _clsid_list(values[COMPOSITE_EFX]) is not None:
         return "composite", COMPOSITE_EFX
     return "wrap", EFX
+
+
+def _clsid_list(value) -> list[str] | None:
+    """An endpoint effect list's CLSIDs: a list of texts, or one effect held as plain
+    text; None for any other kind (raw bytes from a driver), which isn't joined: it
+    raised half-way through a set-up (exit code 1), and a text was split into letters."""
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, list) and all(isinstance(c, str) for c in value):
+        return value
+    return None
 
 
 def _original(values: Mapping[int, object], pid: int) -> str:
@@ -1631,7 +1693,7 @@ def _install_endpoint(guid: str, slot: str | None):
         names = (FX % pid, MODES_KEY % SFX, MODES_KEY % EFX, FX % LFX, FX % GFX, DISABLE_SYSFX)
         state.set("Before", winreg.REG_MULTI_SZ, [_note(n, fx.get(n)) for n in names])
         if kind == "composite":
-            cur = list(values[pid] or [])
+            cur = _clsid_list(values[pid]) or []
             fx.set(FX % pid, winreg.REG_MULTI_SZ,
                    [CLSID] + [c for c in cur if c.upper() != CLSID])
             state.set("Original", winreg.REG_SZ, "")
@@ -2072,6 +2134,23 @@ def _effect_started(mark: int) -> str:
         return ""
 
 
+APO_LOG_BURST = 40   # the effect logs at most this many lines a process per 10 s (obmic.cpp
+                     # LOG_BURST): the rest are dropped, and the next line says how many
+_APO_PID = re.compile(r"\bpid (\d+): ")
+
+
+def _apo_log_capped(text: str) -> bool:
+    """The effect's log `text` (since a mark) hit its cap: a process wrote APO_LOG_BURST
+    lines, or a line says some were skipped. Right after an audio restart Windows starts
+    the effect on every mic and asks it about formats many times, so its "initialize"
+    line could be among the dropped ones: it may well have started (exit code 8 on PCs
+    where it had)."""
+    if "lines skipped)" in text:
+        return True
+    per_pid = Counter(m.group(1) for m in map(_APO_PID.search, text.splitlines()) if m)
+    return bool(per_pid) and max(per_pid.values()) >= APO_LOG_BURST
+
+
 def _effect_runs(guids: Sequence[str], mark: int) -> bool:
     """The effect started on each of the active mics `guids` after the step (it logs
     "initialize: endpoint <guid>" whenever Windows starts it on a mic): each is opened
@@ -2087,6 +2166,10 @@ def _effect_runs(guids: Sequence[str], mark: int) -> bool:
             if not waiting or time.monotonic() > end:
                 break
             _mics_open(waiting)   # opening one starts the effect on it (muted too)
+        if waiting and _apo_log_capped(_effect_started(mark)):
+            log.info("the effect's log was full: can't tell it started on %s",
+                     ", ".join(waiting))
+            return True
         if waiting:
             log.warning("the effect didn't start on %s", ", ".join(waiting))
         return not waiting
@@ -2992,6 +3075,7 @@ def _elevated(args: list[str], wait_s: float = 300.0, *,
     global _helper_raised
     from soundboard.mic import michelper
     _helper_raised = None
+    mark_logs()
     try:
         code = _via_helper(args, wait_s)
         if code == 1 and ask_windows:
@@ -3213,8 +3297,16 @@ RAISED_AT = {"_register_com": "register", "_install_endpoint": "mic-settings",
              "_clean_base": "ring", "_put_on": "files", "_remove": "files",
              "_audio_service": "audio", "_audio_off": "audio", "_running_dependents": "audio",
              "_enable_privileges": "rights"}
-RAISED_WHERE = (*dict.fromkeys(RAISED_AT.values()), "other")
-RAISED_WHAT = ("denied", "in-use", "missing", "other")
+# "unlogged": this step left no traceback in either admin log (it ended before logging)
+RAISED_WHERE = (*dict.fromkeys(RAISED_AT.values()), "other", "unlogged")
+# what it was: Windows' denied / in use / not found; else, with no Windows error number,
+# the kind of Python error (RAISED_KIND: 2.7.1's code 1 at mic-settings had no number,
+# and "other" told nothing); else "other"
+RAISED_KIND = {"TypeError": "type", "ValueError": "value", "KeyError": "key",
+               "AttributeError": "attr", "IndexError": "index", "RuntimeError": "runtime",
+               "AssertionError": "assert", "OSError": "os", "TimeoutError": "timeout",
+               "TimeoutExpired": "timeout", "MemoryError": "memory"}
+RAISED_WHAT = ("denied", "in-use", "missing", *dict.fromkeys(RAISED_KIND.values()), "other")
 # the Windows error numbers worth telling apart: not found (2, 3), denied (5), in use
 # (32, 33), bad parameter (87), a mapped file (1224), a privilege not held (1314)
 RAISED_CODES = (2, 3, 5, 32, 33, 87, 1224, 1314)
@@ -3235,11 +3327,31 @@ def admin_logs() -> list[Path]:
     return sorted(logs, key=mtime, reverse=True)
 
 
+_log_marks: dict[Path, int] = {}   # mark_logs(): each admin log's size before a step
+
+
+def mark_logs():
+    """Note how far each admin log goes before a step: what's read back about it
+    (raised_why, stuck_why) is only what that step wrote. A traceback or a stuck line
+    from an older step was counted for a new one that had logged none."""
+    marks = {}
+    for path in admin_logs():
+        try:
+            marks[path] = path.stat().st_size
+        except OSError:
+            marks[path] = 0
+    _log_marks.clear()
+    _log_marks.update(marks)
+
+
 def _log_tail(path: Path) -> str:
+    """The end of the admin log `path`, from its mark_logs() mark on (all of it again
+    when it's shorter now: started afresh at its size cap)."""
     try:
         with open(path, "rb") as f:
-            f.seek(0, os.SEEK_END)
-            f.seek(max(0, f.tell() - 64 * 1024))
+            size = f.seek(0, os.SEEK_END)
+            mark = _log_marks.get(path, 0)
+            f.seek(max(mark if mark <= size else 0, size - 64 * 1024))
             return f.read().decode("utf-8", "replace")
     except OSError:
         return ""
@@ -3247,16 +3359,16 @@ def _log_tail(path: Path) -> str:
 
 def raised_why(log_path: Path | None = None) -> tuple[str, str, str]:
     """(where, what, err) the admin step's last exception was, from the tail of its log
-    (users may read it): RAISED_WHERE, RAISED_WHAT and RAISED_ERR words, ("other",
-    "other", "err-none") when no log can tell. Without `log_path`, the newest of
-    admin_logs() that has one."""
+    (users may read it): RAISED_WHERE, RAISED_WHAT and RAISED_ERR words, ("unlogged",
+    "other", "err-none") when no log has one since mark_logs(). Without `log_path`, the
+    newest of admin_logs() that has one."""
     for path in [log_path] if log_path else admin_logs():
         tail = _log_tail(path)
         start = tail.rfind("Traceback (most recent call last):")
         if start >= 0:
             break
     else:
-        return "other", "other", "err-none"
+        return "unlogged", "other", "err-none"
     lines = tail[start:].splitlines()[1:]
     funcs = [m.group(1) for m in map(re.compile(r'\s*File ".*", line \d+, in (\S+)').match,
                                      lines) if m]
@@ -3269,18 +3381,22 @@ def raised_why(log_path: Path | None = None) -> tuple[str, str, str]:
     m = re.match(r".*\[WinError (\d+)\]", last)
     err = ("err-none" if not m else
            f"err-{m.group(1)}" if int(m.group(1)) in RAISED_CODES else "err-other")
+    if what == "other" and not m:
+        kind = re.match(r"([\w.]+)", last)
+        what = RAISED_KIND.get(kind.group(1).rpartition(".")[2], "other") if kind else "other"
     return where, what, err
 
 
 # exit code 6 (Windows' audio wouldn't stop): which of its two services was still up,
-# from the AUDIO_STUCK line the admin step logs (stuck_why)
+# from the AUDIO_STUCK line the admin step logs (stuck_why); "unknown": the line says
+# it couldn't tell; "unlogged": the step logged none since mark_logs()
 AUDIO_STUCK = "audio still up:"
-STUCK_WHICH = ("audio", "builder", "both", "other")
+STUCK_WHICH = ("audio", "builder", "both", "unknown", "other", "unlogged")
 
 
 def stuck_why(log_path: Path | None = None) -> str:
     """Which of Windows' audio services the last step that got exit code 6 couldn't
-    stop: a STUCK_WHICH word ("other" when no log says)."""
+    stop: a STUCK_WHICH word."""
     for path in [log_path] if log_path else admin_logs():
         tail = _log_tail(path)
         at = tail.rfind(AUDIO_STUCK)
@@ -3288,8 +3404,8 @@ def stuck_why(log_path: Path | None = None) -> str:
             up = tail[at + len(AUDIO_STUCK):].partition("\n")[0].lower()
             audio, builder = "audiosrv" in up, "audioendpointbuilder" in up
             return ("both" if audio and builder else "audio" if audio else
-                    "builder" if builder else "other")
-    return "other"
+                    "builder" if builder else "unknown" if "unknown" in up else "other")
+    return "unlogged"
 
 
 def fail_kind(err: str) -> str:
@@ -3326,11 +3442,34 @@ def install_on(guid: str | None, *, clean: bool = False,
         return Failure(unfinished(), _UNFINISHED_KIND[code])
     if code == MIC_SILENT:
         return Failure(mic_silent(), "silent")
+    if code in _CODE_TEXT:   # what to do, not just a number
+        return Failure(_CODE_TEXT[code]() + f" (code {code})", f"code-{code}")
     if code:
         return Failure(_("Installing failed (code {code}). The log is in {folder}.",
                          code=code, folder=data_dir().parent),
                        f"code-{code}" if code in FAIL_CODES else "code-other")
     return None
+
+
+def audio_stuck() -> str:
+    """What install returns when Windows' audio wouldn't stop for the change (exit code 6)."""
+    return _("Windows' sound wouldn't pause, so your mic wasn't changed. Close games and "
+             "voice chat apps, or restart your PC.")
+
+
+def effect_not_started() -> str:
+    """What install returns when the step was done but Windows didn't start the effect on
+    the mic (EFFECT_NOT_STARTED)."""
+    return _("Onion Board is on your mic, but Windows didn't start it yet. Restart your "
+             "PC: it starts with Windows.")
+
+
+def mic_shut() -> str:
+    """What install returns when the step was done but a mic stopped opening (MIC_SHUT)."""
+    return _("Onion Board is on your mic, but since then a mic won't open. Restart your PC.")
+
+
+_CODE_TEXT = {6: audio_stuck, EFFECT_NOT_STARTED: effect_not_started, MIC_SHUT: mic_shut}
 
 
 def cleanup(guid: str) -> str | None:
