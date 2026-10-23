@@ -4,6 +4,10 @@ Changes not released yet are in [changelog.d/](changelog.d/), one file per chang
 
 ## 2.7.1 — 2026-10-22
 
+- Direct mic: when the background mic helper can't set up your mic (mostly on
+  Windows 10), clicking set-up now asks Windows once and does it that way, instead of
+  failing with "code 1" every time. A set-up that worked is no longer reported as
+  failed when the helper itself couldn't be set up afterwards.
 - Direct mic: after setting up, the app checks with a short, very quiet test sound (never
   in your own headphones) that your sounds really come out of your mic, and adds what it
   found to the anonymous usage count. Nothing changes on screen yet.
