@@ -68,3 +68,19 @@ def test_new_classes_are_walked_for_only_after_an_import_or_a_while(qapp, monkey
     assert len(walks) == 2
     overridepin.pin_new(now=100.6 + overridepin.WALK_S)
     assert len(walks) == 3
+
+
+def test_the_timed_walk_waits_until_it_wont_page_the_app_back_in(qapp, monkeypatch):
+    """In the tray on a PC short of memory, a walk read every Qt class back from the
+    page file with Python's lock held (10-30 s freezes): the timed walk waits for warm.
+    A module just imported is still walked for at once."""
+    walks = []
+    monkeypatch.setattr(overridepin, "pin", lambda: walks.append(1) or 0)
+    monkeypatch.setattr(overridepin, "_walked", (len(sys.modules), 100.0))
+    overridepin.pin_new(now=100.0 + 10 * overridepin.WALK_S, warm=lambda: False)
+    assert walks == []
+    overridepin.pin_new(now=100.0 + 10 * overridepin.WALK_S, warm=lambda: True)
+    assert len(walks) == 1
+    monkeypatch.setitem(sys.modules, "an_add_on_imported_in_the_tray", object())
+    overridepin.pin_new(now=100.0 + 10 * overridepin.WALK_S, warm=lambda: False)
+    assert len(walks) == 2
