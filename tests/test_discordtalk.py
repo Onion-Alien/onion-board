@@ -139,7 +139,8 @@ def test_snapshot_takes_only_the_talking_keys():
     snap = dt.snapshot({"default": dict(SOUND, noiseCancellation=True)})
     assert snap["noiseCancellation"] is True
     assert snap["modeOptions.autoThreshold"] is False
-    assert "inputDeviceId" not in snap and "modeOptions.threshold" not in snap
+    assert snap["modeOptions.threshold"] == -50          # your own slider, put back on quit
+    assert "inputDeviceId" not in snap
 
 
 # ---------------------------------------------------------------- in the board
@@ -244,7 +245,8 @@ def test_set_up_saves_how_you_talk_then_clears_what_chops_sounds(tmp_path):
     assert not s.problems(True) and s.profile == "CUSTOM"
     store = dt.read_store("discord")
     assert store["default"]["inputDeviceId"] == "default"
-    assert store["default"]["modeOptions"]["threshold"] == -50
+    assert store["default"]["modeOptions"]["threshold"] == dt.THRESHOLD_DB == -65
+    assert res["talk"]["discord"]["modeOptions.threshold"] == -50   # put back on quit
     assert list((tmp_path / "bk" / "discord").iterdir())
     # ...and putting it back gives the talking settings again (the Mic effect card)
     dt.restore(res["talk"], tmp_path / "bk", running=set(), always=True)
