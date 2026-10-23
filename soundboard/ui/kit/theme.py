@@ -297,7 +297,7 @@ QFrame#railoutput QPushButton#railoutputsetup:focus { border-color:$accent; }
 QFrame#railoutput QFrame#railoutputstrip { background:$warn_bg; border:none;
     border-radius:8px; }
 QFrame#railoutputstrip QPushButton#railoutputsetup { border-radius:8px; }
-QPushButton#railupdate { background:transparent; border:none; padding:0; }   /* painted: sidebar.UpdateCard */
+QPushButton#railupdate { background:transparent; border:none; padding:0; }   /* painted: updatecard.UpdateCard */
 QPushButton#railupdatecopy { background:transparent; border:1px solid transparent;
     border-radius:6px; padding:2px 6px; color:$accent_link; font-size:8.5pt; font-weight:600; }
 QPushButton#railupdatecopy:hover { background:$panel; }

@@ -296,6 +296,10 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/bun/splashacts.py` | Bun's start-up acts (one picked at random each launch), rare Buns, the season's hat, his goodbye wave |
 | `soundboard/ui/settings/langpick.py` | the language picker (Settings → Appearance → Language): a drop-down of languages, each with its letter coin and its own name, with a search |
 | `soundboard/ui/window/sidebar.py` | the tab rail down the main window's left: one icon per tab, opened out to show their names (the tab widget's own bar is hidden) |
+| `soundboard/ui/window/railsizes.py` | the tab rail's sizes (shut, open, its buttons and icons), shared by the rail's parts |
+| `soundboard/ui/window/railtabs.py` | the tabs on the rail: the tab widget whose own bar is hidden (`SideTabs`), a rail button per tab (`RailTab`), a tab's "New" pill |
+| `soundboard/ui/window/onaircard.py` | the rail's On Air card (`OutputBlock`): the Live switch, who's listening, Stop all and the status lines under them (`Line`: offline, Tor, proxy, remote control) |
+| `soundboard/ui/window/updatecard.py` | Onion Board's own update at the rail's foot (`UpdateCard`): a small card open, a button with a filling ring shut |
 | `soundboard/ui/window/moretabs.py` | *+ More tabs*' dropdown: a card for each switched-off tab (its picture, what it's good for, Add) |
 | `soundboard/ui/settings/lite.py` | lite mode (Settings > Appearance): the switch the animations, Bun, the logo and the textures ask, and whether this PC looks slow enough to suggest it |
 | `soundboard/ui/window/livesize.py` | the window's edge being dragged (Windows' WM_ENTERSIZEMOVE / WM_EXITSIZEMOVE): each step fits with Qt's cached sizes, letting go measures it all fresh |
