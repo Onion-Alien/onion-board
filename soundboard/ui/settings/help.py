@@ -119,7 +119,7 @@ class HelpPage(Page):
         hint.setWordWrap(True)
         cv.addWidget(hint)
         row = _button_row()
-        row.addWidget(self._link_button(_("Website"), "https://onion-alien.github.io/onion-board/",
+        row.addWidget(self._link_button(_("Website"), "https://onionalien.com/onionboard/",
                                         "browser"))
         row.addWidget(self._link_button(_("Source code"), f"https://github.com/{REPO}"))
         row.addWidget(self._link_button(_("Licenses"), f"https://github.com/{REPO}#license"))
