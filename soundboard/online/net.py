@@ -1029,7 +1029,15 @@ class _RedirectHandler(urllib.request.HTTPRedirectHandler):
             if self.feature not in HOME_OK:
                 raise _refuse_home(self.feature, u)
             check(self.feature)
-        return super().redirect_request(req, fp, code, msg, headers, newurl)
+        new = super().redirect_request(req, fp, code, msg, headers, newurl)
+        old = urllib.parse.urlsplit(req.full_url)
+        if new is not None and (old.scheme, old.hostname, old.port) != (u.scheme, host, u.port):
+            # a key (a voice server's Bearer) or cookie is for the site it was given to:
+            # never sent on to another one, nor over plain http after https
+            for name in ("Authorization", "Cookie", "Proxy-Authorization"):
+                new.headers.pop(name.capitalize(), None)
+                new.unredirected_hdrs.pop(name.capitalize(), None)
+        return new
 
 
 def _opener(feature: str, direct: bool = False) -> urllib.request.OpenerDirector:
@@ -1422,7 +1430,8 @@ def _local_target(host: str) -> bool:
         return False
     ip = getattr(ip, "ipv4_mapped", None) or ip
     return (ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_unspecified
-            or ip.is_multicast or ip.is_reserved)
+            or ip.is_multicast or ip.is_reserved
+            or not ip.is_global)   # the shared range too (RFC 6598): carrier NAT, a tailnet
 
 
 _relay: _Relay | None = None

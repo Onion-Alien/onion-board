@@ -1,6 +1,7 @@
 """soundboard.online.net: proxy addresses, SOCKS5 / HTTP CONNECT, failing closed, loopback
 staying direct, the relay and its secret, and applying a change at once."""
 import base64
+import ipaddress
 import http.server
 import os
 import socket
@@ -639,3 +640,35 @@ def test_one_tls_context_is_shared_and_made_again_later(monkeypatch):
                if isinstance(h, net._HTTPSHandler))
     clock[0] += net.TLS_KEEP_S + 1
     assert net._tls_context() is not ctx and len(made) == 2
+
+
+# the shared address space (RFC 6598): its first, a middle and its last address, then
+# the first one past it (built, not written out: addresses like these read as a PC's)
+_SHARED = ipaddress.ip_network(f"{25 * 4}.{2 ** 6}.0.0/10")
+
+
+@pytest.mark.parametrize("host, home", [
+    (str(_SHARED[1]), True), (str(_SHARED[1 << 21]), True), (str(_SHARED[-2]), True),
+    (str(ipaddress.IPv4Address(10 << 24 | 1)), True),
+    (str(_SHARED.broadcast_address + 1), False), ("93.184.216.34", False)])
+def test_a_carriers_nat_or_a_tailnet_counts_as_the_home_network(host, home):
+    """The shared address space (a carrier's NAT, Tailscale's tailnet) isn't public: a
+    station, a redirect or a picture link there reached tailnet devices."""
+    from soundboard.online import radio
+    assert net._local_target(host) is home
+    assert radio._local_ip(ipaddress.ip_address(host)) is home
+
+
+def test_a_key_is_never_sent_on_to_another_site_by_a_redirect():
+    """A voice server's Bearer key (or a cookie) goes only to the site it's for: a
+    redirect to another host, port or to plain http drops it."""
+    h = net._RedirectHandler("voice_servers")
+    req = urllib.request.Request("https://tts.example.com/v1/audio/speech")
+    req.add_header("Authorization", "Bearer secret")
+    req.add_header("Cookie", "a=b")
+    same = h.redirect_request(req, None, 302, "Found", {}, "https://tts.example.com/v2")
+    assert same.get_header("Authorization") == "Bearer secret"
+    for url in ("https://other.example.com/x", "http://tts.example.com/x",
+                "https://tts.example.com:8443/x"):
+        new = h.redirect_request(req, None, 302, "Found", {}, url)
+        assert new.get_header("Authorization") is None and new.get_header("Cookie") is None

@@ -163,7 +163,13 @@ def test_quitting_hands_an_open_discord_to_the_helper(window, monkeypatch):  # n
     assert started == []
     window.cfg.discord_restore = True
     window.alertctl.discord_quit()
-    assert started == [["discord"]]
+    assert started == []   # a Discord this app never wrote to is left as it is
+    from soundboard.sounds.library import APP_DIR
+    (APP_DIR / "discord-backup" / "discord").mkdir(parents=True)   # (set up once)
+    asked = []
+    monkeypatch.setattr(dt, "restore", lambda saved, root, **k: asked.append(k) or ["discord"])
+    window.alertctl.discord_quit()
+    assert started == [["discord"]] and asked == [{"only": ["discord"]}]
 
 
 def test_put_back_by_hand_also_does_a_half_set_discord(tmp_path):

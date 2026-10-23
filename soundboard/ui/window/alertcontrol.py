@@ -276,10 +276,16 @@ class AlertControl(Controller):
         from soundboard.mic import discordtalk
         from soundboard.sounds.library import APP_DIR
         saved = dict(cfg.discord_talk)
+        backups = APP_DIR / "discord-backup"
+        # only a Discord this app wrote to (each write leaves its backup first): one it
+        # never set up is left exactly as the user has it
+        ours = [d for d, _name in discordcfg.CLIENTS if (backups / d).is_dir()]
+        if not ours:
+            return
         out: list = []
 
         def run():
-            out.append(discordtalk.restore(saved, APP_DIR / "discord-backup"))
+            out.append(discordtalk.restore(saved, backups, only=ours))
         t = threading.Thread(target=run, daemon=True, name="discord-restore")
         t.start()
         t.join(DISCORD_QUIT_S)   # files only, normally well under a second

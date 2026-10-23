@@ -169,7 +169,8 @@ def _local_ip(ip) -> bool:
     """Is this address this PC or the home network (or nowhere real)?"""
     ip = getattr(ip, "ipv4_mapped", None) or ip   # ::ffff:127.0.0.1
     return (ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_unspecified
-            or ip.is_multicast or ip.is_reserved)
+            or ip.is_multicast or ip.is_reserved
+            or not ip.is_global)   # the shared range too (RFC 6598): carrier NAT, a tailnet
 
 
 def _name_is_local(host: str) -> bool:
