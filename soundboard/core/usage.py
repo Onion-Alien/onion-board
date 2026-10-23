@@ -37,7 +37,7 @@ one (`sounds/11-50`, `played/1-10`), how long the app was open since then
 (`downloads/2-5`), how many times it was started since then (`launches/2-5`), the system
 (`os/win11`, `os/win10`), the app's language (`lang/de`), its theme (`theme/dark`: a
 built-in theme's name, else `other`), how many achievements were earned
-(`achievements/3-5`), and which features
+(`achievements/3-5`) and their score (`ach-score/51-150`), and which features
 were used since then (`used/voice-changer`, `used/more-tabs-added-radio`: the names
 in FEATURES only; for the Triggers tab, the names the Onion Watch add-on passes to
 triggershost.BoardHost.count, as `used/triggers-mode-colour`). A use is only noted
@@ -825,6 +825,13 @@ def ach_bucket(n: int) -> str:
             "6-10" if n <= 10 else "11-20" if n <= 20 else "21-plus")
 
 
+def score_bucket(n: int) -> str:
+    """The achievement score (achievements.score()), roughly."""
+    return ("0" if n <= 0 else "1-50" if n <= 50 else "51-150" if n <= 150 else
+            "151-400" if n <= 400 else "401-1000" if n <= 1000 else
+            "1001-2000" if n <= 2000 else "2001-plus")
+
+
 def game_tag(name: str) -> str:
     """A Bun game's name as a count's word: one of BUN_GAMES, else "other"."""
     return name if name in BUN_GAMES else "other"
@@ -861,7 +868,10 @@ def about(cfg, now: float) -> list[str]:
     out.append(f"os/{os_tag()}")
     out.append(f"launches/{launch_bucket(cfg.stats_launches or 0)}")
     got = cfg.achievements.get("got") if isinstance(cfg.achievements, dict) else None
-    out.append(f"achievements/{ach_bucket(len(got) if isinstance(got, dict) else 0)}")
+    got = got if isinstance(got, dict) else {}
+    out.append(f"achievements/{ach_bucket(len(got))}")
+    score = sum(achievements.points(a) for a in achievements.ALL if a.id in got)
+    out.append(f"ach-score/{score_bucket(score)}")
     have = (set(cfg.stats_used if isinstance(cfg.stats_used, list) else [])
             | set(features_now(cfg)))
     out += [f"used/{k}" for k in FEATURES if k in have]

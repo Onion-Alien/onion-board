@@ -4508,5 +4508,11 @@
   "Let the Onion Board developer see this channel's name": "Показать разработчику Onion Board название этого канала",
   "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "Отправляется раз в день вместе с подсчётом использования, только пока ты подключён и «Я в деле» включено, чтобы разработчик видел, кто стримит с Onion Board. Только название. Сними галочку, чтобы прекратить.",
   "<b>{mic}</b> stopped sending sound after the set-up. Restart the app it belongs to and it works again.": "<b>{mic}</b> перестал передавать звук после настройки. Перезапусти приложение, к которому он относится, и всё заработает.",
-  "Onion Board is on your mic, but a test sound didn't come through it. Click <b>Repair</b> to put it on again.": "Onion Board стоит на твоём микрофоне, но тестовый звук через него не прошёл. Нажми <b>Починить</b>, чтобы поставить его заново."
+  "Onion Board is on your mic, but a test sound didn't come through it. Click <b>Repair</b> to put it on again.": "Onion Board стоит на твоём микрофоне, но тестовый звук через него не прошёл. Нажми <b>Починить</b>, чтобы поставить его заново.",
+  "Score {score} / {total}": "Очки {score} / {total}",
+  "{n} point": [
+    "{n} очко",
+    "{n} очка",
+    "{n} очков"
+  ]
 }

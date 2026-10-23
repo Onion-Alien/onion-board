@@ -1,6 +1,7 @@
 """Settings → Achievements (under Show advanced): every achievement as a tile, its badge
 in its rarity's colour (the rare loading screens' colours), hidden ones as ??? until
-earned. The counting is soundboard.core.achievements; this page only shows it.
+earned. The counting is soundboard.core.achievements; this page only shows it, with
+each tile's points and the score so far at the top.
 
 A badge is Bun drawn in a scene for it (badges.py) unless a picture
 for it is in assets/art/achievement-<id>.png (art.ART_DIR, which the installed build
@@ -15,7 +16,7 @@ from PySide6.QtWidgets import (QGridLayout, QHBoxLayout, QLabel, QLayout, QSizeP
                                QVBoxLayout, QWidget)
 
 from soundboard.core import achievements as ach, usage
-from soundboard.i18n import _
+from soundboard.i18n import _, ngettext
 from soundboard.ui.kit import icons, theme
 from soundboard.ui.kit.panel import hint_label
 from soundboard.ui.settings import Page
@@ -218,10 +219,12 @@ class Tile(QWidget):
                           else self._desc)
         goal = ach.goal(a)
         have = min(ach.value(a.stat), goal)
-        # the line under is only the rarity (a word, never a number beside it: "Common ·
-        # 140 of 1,000" read as how many people had it); how far along is the bar, and
-        # the numbers or the day it was earned are its tooltip
-        line = tier_name(a.tier)
+        # the line under is the rarity and what it's worth ("Common · 10 points": never
+        # how far along beside it, "Common · 140 of 1,000" read as how many people had
+        # it); how far along is the bar, and the numbers or the day it was earned are its
+        # tooltip
+        pts = ach.points(a)
+        line = f"{tier_name(a.tier)} · " + ngettext("{n} point", "{n} points", pts)
         if earned:
             tip = _("Earned {date}", date=QLocale().toString(
                 QDateTime.fromSecsSinceEpoch(int(when)).date(), QLocale.FormatType.ShortFormat))
@@ -354,7 +357,11 @@ class AchievementsPage(Page):
                 (False, _("Achievements"), "", "trophy"),
                 (True, _("Secret achievements"),
                  _("Hidden until you find them. The ring says how rare each one is."), "question")):
-            card, cv = self._card(title, hint, icon=icon)
+            score = None
+            if not hidden:   # the score so far, at the far end of the first heading
+                score = self.dlg.ach_score = QLabel()
+                score.setObjectName("achscore")
+            card, cv = self._card(title, hint, icon=icon, end=(score,) if score else ())
             if not hidden:
                 self.dlg.ach_count = hint_label("")
                 cv.addWidget(self.dlg.ach_count)
@@ -444,6 +451,10 @@ class AchievementsPage(Page):
 
     def _count(self):
         n, total = ach.earned(), len(ach.ALL)
+        self.dlg.ach_score.setText(_("Score {score} / {total}",
+                                     score=QLocale().toString(ach.score()),
+                                     total=QLocale().toString(ach.max_score())))
+        self.dlg.ach_score.setAccessibleName(self.dlg.ach_score.text())
         self.dlg.ach_count.setText(_("{n} of {total} earned. The badge's colour is its "
                                      "rarity, like the rare loading screens.", n=n, total=total))
 

@@ -4354,5 +4354,9 @@
   "Let the Onion Board developer see this channel's name": "Cho nhà phát triển Onion Board thấy tên kênh này",
   "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "Gửi mỗi ngày một lần cùng lượt đếm sử dụng, chỉ khi bạn đang kết nối và \"Tính tôi vào\" đang bật, để nhà phát triển biết ai đang stream bằng Onion Board. Chỉ có tên. Bỏ chọn để dừng.",
   "<b>{mic}</b> stopped sending sound after the set-up. Restart the app it belongs to and it works again.": "<b>{mic}</b> đã ngừng gửi âm thanh sau khi cài đặt. Khởi động lại ứng dụng sở hữu nó là chạy lại.",
-  "Onion Board is on your mic, but a test sound didn't come through it. Click <b>Repair</b> to put it on again.": "Onion Board đã ở trên mic của bạn, nhưng một âm thanh thử không đi qua được. Bấm <b>Sửa</b> để cài lại."
+  "Onion Board is on your mic, but a test sound didn't come through it. Click <b>Repair</b> to put it on again.": "Onion Board đã ở trên mic của bạn, nhưng một âm thanh thử không đi qua được. Bấm <b>Sửa</b> để cài lại.",
+  "Score {score} / {total}": "Điểm {score} / {total}",
+  "{n} point": [
+    "{n} điểm"
+  ]
 }

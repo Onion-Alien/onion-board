@@ -59,7 +59,8 @@ class _Inline:
 
 
 ABOUT = ("age/", "route/", "sounds/", "played/", "open/", "lang/", "used/", "os/",
-         "launches/", "downloads/", "theme/", "achievements/")
+         "launches/", "downloads/", "theme/", "achievements/",
+         "ach-score/")
 
 
 def _hits(req, about=False) -> list[dict]:
@@ -1382,6 +1383,16 @@ def test_the_daily_count_says_roughly_how_many_achievements(sent):
     assert "achievements/3-5" in usage.about(cfg, 1e9)
     assert [usage.ach_bucket(n) for n in (1, 2, 6, 11, 21, 56)] == [
         "1-2", "1-2", "6-10", "11-20", "21-plus", "21-plus"]
+
+
+def test_the_daily_count_says_roughly_the_achievement_score(sent):
+    cfg = Config()
+    assert "ach-score/0" in usage.about(cfg, 1e9)
+    # common 10 + common 10 + uncommon 25, and an id from a newer version adds nothing
+    cfg.achievements = {"got": {"first_blood": 1, "critic": 2, "regular": 3, "new_one": 4}}
+    assert "ach-score/1-50" in usage.about(cfg, 1e9)
+    assert [usage.score_bucket(n) for n in (51, 150, 151, 401, 1001, 2001, 3010)] == [
+        "51-150", "51-150", "151-400", "401-1000", "1001-2000", "2001-plus", "2001-plus"]
 
 
 def test_lite_twitch_and_achievement_pop_ups_count_every_day():
