@@ -709,9 +709,10 @@ class _FakeSonar:
     (the last one repeats): {channel: (device, running)}. A PUT sets the channel (unless
     `refuse` says no, as while its device isn't back yet)."""
 
-    def __init__(self, states, refuse=0, same_starts=True):
+    def __init__(self, states, refuse=0, same_starts=True, refuse_nowhere=()):
         self.states, self.refuse, self.puts = [dict(s) for s in states], refuse, []
         self.same_starts = same_starts   # False: as in streamer mode, only a new device starts it
+        self.refuse_nowhere = refuse_nowhere   # channels that refuse no device (HTTP 400)
 
     def http(self, method, address, path, tls=False):
         if tls:
@@ -719,8 +720,12 @@ class _FakeSonar:
             return json.dumps({"subApps": {"sonar": {"isRunning": True, "metadata": {
                 "webServerAddress": "http://127.0.0.1:5000"}}}}).encode()
         assert address == "http://127.0.0.1:5000"
+        if path == "/mode":
+            return b'"classic"'
         if method == "PUT":
             self.puts.append(path)
+            if path.split("/")[2] in self.refuse_nowhere and path.endswith(dm._NO_DEVICE):
+                raise OSError("HTTP 400")
             if self.refuse:
                 self.refuse -= 1
                 raise OSError("HTTP 400")
@@ -797,6 +802,33 @@ def test_a_stopped_channel_the_same_device_doesnt_start_is_moved_and_back(monkey
                    f"/classicRedirections/mic/deviceId/{SONAR_DEV}"]
     assert dm._DEVICE_ID.fullmatch(nowhere)
     assert dm._sonar_fixed is True
+
+
+def test_sonar_channels_it_wont_start_dont_get_sonar_ended_when_its_mic_is_back(monkeypatch,
+                                                                              tmp_path):
+    """Found on a real PC: after a restart Sonar's Game / Chat channels sat on their
+    devices but said stopped, and it refused them no device (HTTP 400, tried every
+    second). The put-back gave up and Sonar was ended, 3 times in 12 steps: GG's 3
+    restarts, then Sonar stays off. With its mic set back, Sonar is left running, and a
+    channel that refused no device isn't tried again."""
+    stuck = {**BEFORE, "game": (HEADPHONES, False), "chat": (HEADPHONES, False)}
+    sonar = _FakeSonar([BEFORE, stuck], same_starts=False, refuse_nowhere=("game", "chat"))
+    _sonar_kit(monkeypatch, tmp_path, sonar)
+    dm._sonar_keep()
+    dm._sonar_back()
+    assert dm._sonar_fixed is True
+    nowhere = "{0.0.0.00000000}." + dm._NO_DEVICE
+    assert sonar.puts.count(f"/classicRedirections/game/deviceId/{nowhere}") == 1
+
+
+def test_a_sonar_mic_that_wont_go_back_still_gets_sonar_ended(monkeypatch, tmp_path):
+    """Its mic stopped and refusing no device too: Sonar still needs the restart."""
+    stuck = {**BEFORE, "mic": (SONAR_DEV, False)}
+    sonar = _FakeSonar([BEFORE, stuck], same_starts=False, refuse_nowhere=("mic",))
+    _sonar_kit(monkeypatch, tmp_path, sonar)
+    dm._sonar_keep()
+    dm._sonar_back()
+    assert dm._sonar_fixed is False
 
 
 def test_sonar_picking_a_device_of_its_own_later_is_set_back_again(monkeypatch, tmp_path):

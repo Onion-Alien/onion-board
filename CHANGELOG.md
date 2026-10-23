@@ -32,6 +32,10 @@ Changes not released yet are in [changelog.d/](changelog.d/), one file per chang
 - Direct mic: uninstalling Onion Board after the mic effect was already off no longer
   restarts all of Windows' sound for nothing (it cut every app's sound for a moment, and
   with SteelSeries Sonar on, it could restart Sonar).
+- Direct mic: Sonar is no longer restarted when, after Windows' audio restarts, it won't
+  take back one of its Game / Chat / Media / Aux channels while its mic is fine (Sonar
+  picks those again itself). That could use up SteelSeries GG's 3 restarts of Sonar in
+  a few set-ups, and then Sonar stayed off.
 - SteelSeries Sonar users who set up direct mic with an earlier version: Windows' audio
   restart made Sonar switch its mic to the first device it lists, which isn't always
   yours (a webcam, a virtual cable). If Discord hears you badly or not at all through

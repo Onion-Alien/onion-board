@@ -2309,8 +2309,12 @@ def _sonar_back() -> None:
     stopped one), until all are and SONAR_SETTLE_S have gone by; given up after
     SONAR_BACK_S. Its mic channel then without a device (dropped before the step, by an
     older version's restart: nothing to set back) needs Sonar restarted, which picks the
-    device it's set up with again. Its result (_sonar_fixed) tells _mic_apps_back
-    whether Sonar still needs a restart. A check: never fails the step."""
+    device it's set up with again. Only its mic decides that: a Game / Chat / Media / Aux
+    channel Sonar won't take back (it refuses its device, or says it's stopped and
+    refuses no device too) is left to Sonar, which picks those again by itself; ending
+    Sonar for one used up SteelSeries GG's 3 restarts, then Sonar stayed off, mic and
+    sound. Its result (_sonar_fixed) tells _mic_apps_back whether Sonar still needs a
+    restart. A check: never fails the step."""
     global _sonar_fixed
     if _sonar_saved is None:
         _sonar_fixed = None
@@ -2319,7 +2323,8 @@ def _sonar_back() -> None:
     answered = False
     put: dict[tuple[str, str], float] = {}   # when each channel was last set
     away: dict[tuple[str, str], float] = {}  # ...or moved to no device (to start it)
-    address, now = "", {}
+    refused: set[tuple[str, str]] = set()    # ...which Sonar wouldn't take: not tried again
+    address, now, last_wrong = "", {}, None
     while True:
         wrong = None   # (Sonar not answering this time)
         try:
@@ -2329,6 +2334,7 @@ def _sonar_back() -> None:
             wrong = [k for k, (dev, ran) in _sonar_saved.items()
                      if now.get(k, ("", False))[0] != dev or (ran and not now[k][1])
                      or k not in put]   # each set once at least: a stopped one can say it runs
+            last_wrong = wrong
             for kind, rid in wrong:
                 dev = _sonar_saved[(kind, rid)][0]
                 try:
@@ -2340,9 +2346,15 @@ def _sonar_back() -> None:
                         # set again and still stopped: in streamer mode Sonar starts a
                         # channel only when its device changes, so it's moved to no
                         # device (an id no device has) for a moment, then back
+                        if (kind, rid) in refused:
+                            continue
                         if time.monotonic() - put[(kind, rid)] >= SONAR_START_S:
-                            _local_http("PUT", address, f"/{kind}/{rid}/deviceId/"
-                                        + dev.rpartition(".")[0] + "." + _NO_DEVICE)
+                            try:
+                                _local_http("PUT", address, f"/{kind}/{rid}/deviceId/"
+                                            + dev.rpartition(".")[0] + "." + _NO_DEVICE)
+                            except OSError:   # (its Game / Chat channels: HTTP 400)
+                                refused.add((kind, rid))
+                                raise
                             away[(kind, rid)] = time.monotonic()
                         continue
                     _local_http("PUT", address, f"/{kind}/{rid}/deviceId/{dev}")
@@ -2361,6 +2373,13 @@ def _sonar_back() -> None:
                             "needs a restart")
             return
         if waited > SONAR_BACK_S:
+            if last_wrong and all(rid != "mic" for _k, rid in last_wrong) \
+                    and _sonar_mic_runs(address, now):
+                log.warning("couldn't set Sonar's %s back after the audio restart; its mic "
+                            "is set back: Sonar left running",
+                            ", ".join(sorted({rid for _k, rid in last_wrong})))
+                _sonar_fixed = True
+                return
             log.warning("couldn't set Sonar's devices back after the audio restart")
             _sonar_fixed = False if answered else None
             return
