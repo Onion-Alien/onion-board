@@ -1,7 +1,9 @@
 """Settings are written on a background thread (library.Saver): a slow disk doesn't
 freeze the window, the newest settings always win, and a direct save() (on quit)
 is never overwritten by an older background one."""
+import dataclasses
 import json
+import sys
 import threading
 import time
 
@@ -149,3 +151,43 @@ def test_a_save_as_the_idle_wait_ends_is_still_written(app_dir):
         time.sleep(0.01)
     assert raced and s.flush(5)
     assert _on_disk()["theme"] == "Paper"
+
+
+def _big_config(n: int) -> Config:
+    return Config(theme="Light", eq_gains=[1.0] * 7, sounds=[library.SoundMeta(
+        id=str(i), name=f"Sound {i}", file=str(library.SOUNDS_DIR / f"{i}.mp3"),
+        tags=["Memes"], fx={"speed": 1.5, "eq": [0.0] * 7}, source={"url": "u"})
+        for i in range(n)])
+
+
+def test_the_settings_copy_is_a_full_copy(app_dir):
+    cfg = _big_config(3)
+    raw = cfg.to_raw()
+    assert raw["sounds"][1] == {**dataclasses.asdict(cfg.sounds[1]), "file": "1.mp3"}
+    assert {k: v for k, v in raw.items() if k != "sounds"} == {
+        k: v for k, v in dataclasses.asdict(cfg).items() if k != "sounds"}
+    cfg.sounds[0].fx["eq"][0] = 9.0   # changed after the copy: the copy keeps its own
+    cfg.sounds[0].tags.append("Music")
+    cfg.eq_gains[0] = 0.0
+    assert raw["sounds"][0]["fx"]["eq"][0] == 0.0
+    assert raw["sounds"][0]["tags"] == ["Memes"]
+    assert raw["eq_gains"][0] == 1.0
+
+
+def test_copying_a_big_library_stays_cheap(app_dir):
+    """Every save copies every sound on the window thread. asdict() made ~70 Python
+    calls per sound for it (a 2.7.1 freeze report was caught inside it)."""
+    cfg = _big_config(500)
+    cfg.to_raw()   # the stored file names are remembered after the first save
+    calls = 0
+
+    def count(frame, event, arg):
+        nonlocal calls
+        if event == "call":
+            calls += 1
+    sys.setprofile(count)
+    try:
+        cfg.to_raw()
+    finally:
+        sys.setprofile(None)
+    assert calls < 10 * len(cfg.sounds), calls
