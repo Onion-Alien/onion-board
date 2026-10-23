@@ -172,12 +172,12 @@ def test_a_deep_sweep_waits_after_the_app_comes_back(qapp, monkeypatch):
     c = uigc.UiCollector(interval_ms=10**6, warm=lambda: True)
     try:
         monkeypatch.setattr(uigc, "DEEP_MAX_S", 0)   # long overdue
-        c._deep_at = 0.0
         now = time.monotonic()
+        c._deep_at = now - 10**6                   # (a just-booted PC: monotonic() is small)
         c.state_changed(inactive, now - 5)             # a quick alt-tab: still due
         c.state_changed(active, now)
         assert c.check() == 3
-        c._deep_at = 0.0
+        c._deep_at = now - 10**6
         c.state_changed(inactive, now - uigc.AWAY_S - 600)   # an evening in the tray
         c.state_changed(inactive, now - 60)          # (Hidden after Inactive: the first counts)
         c.state_changed(active, now)
