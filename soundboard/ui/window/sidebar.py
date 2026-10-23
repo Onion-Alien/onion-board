@@ -16,8 +16,8 @@ from collections.abc import Sequence
 
 from PySide6.QtCore import QEvent, QObject, QRectF, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QFont, QFontMetrics, QPainter, QPen
-from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QPushButton,
-                               QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QPushButton, QSizePolicy,
+                               QSpacerItem, QVBoxLayout, QWidget)
 
 from soundboard.ui.kit import theme
 from soundboard.i18n import _
