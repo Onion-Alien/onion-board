@@ -454,6 +454,44 @@ def fake_devices(monkeypatch, rate=44100, start_fails=False):
     return made
 
 
+def test_a_device_that_refuses_stereo_gets_windows_to_map_it(monkeypatch):
+    # SteelSeries Sonar's Gaming device is 7.1: a plain stereo WASAPI open of it fails
+    # with "Invalid number of channels" (the user's headphones stayed silent); open it
+    # again with Windows mapping the stereo onto its channels, at the same rate
+    made = fake_devices(monkeypatch, rate=96000)
+    Fake = eng.sd.OutputStream
+
+    def picky(**kw):
+        if "extra_settings" not in kw:
+            raise eng.sd.PortAudioError(
+                "Error opening OutputStream: Invalid number of channels [PaErrorCode -9998]")
+        return Fake(**kw)
+
+    monkeypatch.setattr(eng.sd, "OutputStream", picky)
+    e = Engine()
+    e.set_mon_device("SteelSeries Sonar - Gaming")
+    assert e.mon_stream is made[0]
+    assert made[0].kw["channels"] == eng.CH and made[0].kw["samplerate"] == 96000
+    auto = eng.sd.WasapiSettings(auto_convert=True)._streaminfo.flags
+    assert made[0].kw["extra_settings"]._streaminfo.flags == auto != 0
+    assert "mon" not in e.errors
+
+
+def test_other_open_errors_arent_retried(monkeypatch):
+    fake_devices(monkeypatch)
+    calls = []
+
+    def busy(**kw):
+        calls.append(kw)
+        raise eng.sd.PortAudioError(
+            "Error opening OutputStream: Device unavailable [PaErrorCode -9985]")
+
+    monkeypatch.setattr(eng.sd, "OutputStream", busy)
+    with pytest.raises(eng.sd.PortAudioError):
+        eng.output_stream(7, 48000, callback=None)
+    assert len(calls) == 1
+
+
 def test_safer_buffering_asks_for_a_real_buffer(monkeypatch):
     # Windows rounds "high" (10 ms) up to the same buffer as "low": Safer must ask for
     # a number of seconds, on the outputs and the mic alike

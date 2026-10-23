@@ -721,10 +721,56 @@ def mic_is_silent(guid: str, seconds: float = 1.0, wait: float = 8.0) -> bool | 
             _ole32.CoUninitialize()
 
 
-def _active_capture(guid: str, wait: float) -> Com | None:
+def mic_opens(guid: str, wait: float = 8.0) -> bool | None:
+    """Whether an app can record the recording endpoint `guid` now: opened in shared mode
+    and started for a moment, as a voice chat opens it (muted or not). False when Windows
+    refuses (a mic left broken refuses every app the same way); None when it can't tell
+    (not Windows, or the mic not active within `wait` seconds: unplugged, switched off)."""
+    if not _win:
+        return None
+    own = _co_init()
+    try:
+        dev = _active_capture(guid if guid.startswith("{") else "{" + guid + "}", wait,
+                              muted_too=True)
+        if dev is None:
+            return None
+        with dev:
+            _open_briefly(dev)
+        return True
+    except ComError:
+        log.info("mic %s doesn't open", guid, exc_info=True)
+        return False
+    finally:
+        if own:
+            _ole32.CoUninitialize()
+
+
+def _open_briefly(dev: Com) -> None:
+    """Open `dev` in shared mode in its own format, start it for 0.1 s, stop it."""
+    out = c_void_p()
+    dev.call(3, (POINTER(GUID), c_ulong, c_void_p, POINTER(c_void_p)),
+             byref(IID_IAudioClient), CLSCTX_ALL, None, byref(out),
+             what="Activate(IAudioClient)")
+    with Com(out.value) as client:
+        pfmt = c_void_p()
+        client.call(8, (POINTER(c_void_p),), byref(pfmt), what="GetMixFormat")
+        try:
+            client.call(3, (c_ulong, c_ulong, c_int64, c_int64, c_void_p, c_void_p),
+                        AUDCLNT_SHAREMODE_SHARED, 0, 2_000_000, 0, pfmt, None,
+                        what="Initialize")
+        finally:
+            _ole32.CoTaskMemFree(pfmt)
+        client.call(10, (), what="Start")
+        try:
+            time.sleep(0.1)
+        finally:
+            client.call(11, (), what="Stop")
+
+
+def _active_capture(guid: str, wait: float, muted_too: bool = False) -> Com | None:
     """The recording endpoint `guid` once it's active (right after an audio restart it
     takes a moment to be back), or None after `wait` seconds or when it's muted or at
-    0% (silent on purpose)."""
+    0% (silent on purpose; `muted_too`: then too)."""
     dev = None
     give_up = time.monotonic() + wait
     with _enumerator() as en:
@@ -746,6 +792,8 @@ def _active_capture(guid: str, wait: float) -> Com | None:
             if time.monotonic() > give_up:
                 return None
             time.sleep(0.25)
+    if muted_too:
+        return dev
     try:
         out = c_void_p()
         dev.call(3, (POINTER(GUID), c_ulong, c_void_p, POINTER(c_void_p)),

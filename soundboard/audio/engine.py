@@ -243,6 +243,23 @@ def virtual_outputs() -> list[str]:
     return sorted(outs, key=lambda n: virtual_mic_for(n) is None)
 
 
+def output_stream(idx: int, rate: int, **kw) -> sd.OutputStream:
+    """A stereo (CH) output stream on device `idx` at its native `rate`. Some devices only
+    take their own channel count in WASAPI's shared mode: SteelSeries Sonar's Gaming
+    device is 7.1 (8 channels), and a stereo open of it fails with "Invalid number of
+    channels", so Sonar users heard nothing in their headphones. Those are opened again
+    with Windows mapping the stereo onto their channels (auto_convert); the rate is the
+    device's own, so Windows' resampler (see the module) isn't used."""
+    try:
+        return sd.OutputStream(device=idx, samplerate=rate, channels=CH, dtype="float32", **kw)
+    except sd.PortAudioError as e:
+        if "Invalid number of channels" not in str(e):
+            raise
+    log.info("device %s won't take %d channels: Windows maps them onto its own", idx, CH)
+    return sd.OutputStream(device=idx, samplerate=rate, channels=CH, dtype="float32",
+                           extra_settings=sd.WasapiSettings(auto_convert=True), **kw)
+
+
 class CableTap:
     """Straight into my mic, and the virtual cable too: a copy of what others hear is
     played into the cable, so a voice app still set to the cable's far end keeps
@@ -258,8 +275,7 @@ class CableTap:
         self.ring = Ring(self.rate, prefill_s=0.03, max_s=0.2, auto_drift=True)
         self._rs = StreamResampler(SR, self.rate)
         self.last_cb = time.monotonic()
-        self.stream = sd.OutputStream(device=idx, samplerate=self.rate, channels=CH,
-                                      dtype="float32", latency=latency, callback=self._cb)
+        self.stream = output_stream(idx, self.rate, latency=latency, callback=self._cb)
         start_or_close(self.stream, f"cable tap {name}")
 
     def write(self, mix: np.ndarray):
@@ -647,6 +663,8 @@ class Engine(EngineTakes, EngineDevices, SoundCache):
         when it's stopped and, for a one-shot, over its last fade_out seconds.
         only: 'main' or 'mon' plays on that output alone (the voice chat check); a tuple
         of outputs plays on those ('main', 'obs': others hear it, you don't)."""
+        if data.ndim == 1:   # mono (the mic check's probe): the mix is CH channels wide
+            data = np.repeat(data[:, None], CH, axis=1)
         outs = self.active_outputs()
         if only is not None:
             outs &= {only} if isinstance(only, str) else set(only)

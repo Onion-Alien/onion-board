@@ -50,6 +50,7 @@ class MicControl(Controller):
     _autofix_tried = False  # it ran since the mic last worked (once per time it's off)
     _declined = False       # the last set-up's Windows prompt got a No
     _raised = None          # exit code 1: directmic.raised_why() of that set-up
+    _fallback = None        # directmic.helper_fallback() of that set-up
     _stuck = ""             # exit code 6: directmic.stuck_why() of that set-up
     _helper_checking = False
     _helper_failed = False  # the last check raised: the next waits HELPER_RETRY_S
@@ -481,6 +482,9 @@ class MicControl(Controller):
         # wouldn't stop: which service. From its log (read here, off the UI thread)
         self._raised = directmic.raised_why() if self._mic_fail_kind == "code-1" else None
         self._stuck = directmic.stuck_why() if self._mic_fail_kind == "code-6" else ""
+        # the helper's run raised and Windows' prompt ran it instead: where the helper's
+        # failed, which the prompt's own result doesn't tell
+        self._fallback = directmic.helper_fallback()
         return mic, err
 
     def _mic_attached(self, mic: str, err: str):
@@ -494,6 +498,13 @@ class MicControl(Controller):
         # nothing: the effect still sends the sounds on that silence (the card says
         # the mic is silent), so it's set up, not failed
         silent = err == directmic.mic_silent()
+        fallback, self._fallback = self._fallback, None
+        if fallback:
+            where, what, num = fallback
+            usage.used("mic-effect-helper-fallback")
+            usage.used(f"mic-effect-helper-code-1-at-{where}")
+            usage.used(f"mic-effect-helper-code-1-{what}")
+            usage.used(f"mic-effect-helper-code-1-{num}")
         if silent:
             err, self._mic_fail_kind = "", ""
         if err:

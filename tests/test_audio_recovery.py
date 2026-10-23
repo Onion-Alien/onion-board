@@ -166,6 +166,8 @@ def test_refusal_to_stop_audio_changes_nothing(monkeypatch, tmp_path, action):  
     monkeypatch.setattr(dm, '_register_com', lambda *a: pytest.fail('registration changed'))
     # (reading which mics have it is fine: the mics are listened to before the step)
     monkeypatch.setattr(dm, 'installed_on', lambda: [])
+    # (something of it is there: with nothing at all an uninstall leaves the audio alone)
+    monkeypatch.setattr(dm, 'anything_installed', lambda: True)
     monkeypatch.setattr(dm, '_put_on', lambda *a: pytest.fail('mic settings touched'))
     monkeypatch.setattr(dm, '_take_off', lambda *a: pytest.fail('mic settings touched'))
     result = dm.admin_install('guid') if action == 'install' else dm.admin_uninstall()

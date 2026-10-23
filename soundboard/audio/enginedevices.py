@@ -123,9 +123,8 @@ class EngineDevices:
         chans = min(CH, sd.query_devices(idx)["max_output_channels"])
         if chans < CH:
             raise RuntimeError(_("mono output devices aren't supported"))
-        s = sd.OutputStream(device=idx, samplerate=rate, channels=CH, dtype="float32",
-                            latency=BUFFER.get(self.latency, "low"),
-                            blocksize=self._blocksize(rate), callback=callback)
+        s = _eng.output_stream(idx, rate, latency=BUFFER.get(self.latency, "low"),
+                               blocksize=self._blocksize(rate), callback=callback)
         self._last_cb[key] = time.monotonic()
         start_or_close(s, key)
         # committed only now, so a failed open leaves the rate and the rings alone.

@@ -1,1 +1,0 @@
-- No "Text-to-speech isn't available" pop-up at launch when Windows speech is slow to start: nobody asked for speech yet. Saying a line still tells you if it can't be spoken.

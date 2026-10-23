@@ -350,13 +350,13 @@ def admin_part() -> int:
         if dm.installed_on() or dm.anything_installed():
             code = dm.admin_uninstall()
             log.info("taking the mic effect off: %s", code)
-            failed = code not in (0, dm.MIC_SILENT)
+            failed = code not in dm.DONE_CODES
         for guid in mics_with_effect():   # in a slot, but no notes: just take it out
             code = dm.admin_cleanup(guid)
             log.info("cleaning %s: %s", guid, code)
-            failed = failed or code not in (0, dm.MIC_SILENT)
+            failed = failed or code not in dm.DONE_CODES
         if not failed and dm.anything_installed():
-            failed = dm.admin_uninstall() not in (0, dm.MIC_SILENT)
+            failed = dm.admin_uninstall() not in dm.DONE_CODES
     finally:
         dm._release(lock)
     if michelper.leftover():

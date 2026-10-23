@@ -46,11 +46,12 @@ log = logging.getLogger(__name__)
 # side", or this file); tests/test_michelper.py fails until it is. A newer helper is
 # put in place by the next admin step that asks anyway: only another effect DLL makes
 # the app ask (so the helper never adds a prompt the app wouldn't have had).
-HELPER_VERSION = 23
+HELPER_VERSION = 29
 # The oldest helper the app still uses. Raise it (to HELPER_VERSION) only when the
 # helpers out there have a bug that matters: the app then asks Windows once more, and
 # that prompt puts this version's helper in place.
-MIN_HELPER_VERSION = 23   # 23: set-ups restart only the mic, not all of the audio
+MIN_HELPER_VERSION = 29   # 29: no audio restart with nothing to remove (28: steps check
+#                            the effect started and the mics open; Sonar set back)
 TASK = r"\Onion Board\Mic helper"
 EXE_NAME = "obmichelper.exe"
 STAMP = "stamp.txt"
@@ -885,7 +886,17 @@ def install_helper(user: str | None = None) -> bool:
     Files and register its task for `user` (the account that asked, from the app's
     `--for`: checked here) or else the account running this, and every account it was
     set up for before. False (logged) when this copy has no helper build or it
-    couldn't: the mic effect works anyway, with Windows' prompt each time."""
+    couldn't: the mic effect works anyway, with Windows' prompt each time. Never
+    raises: it runs after the effect went on, and an error here made a set-up that
+    worked exit with code 1, which the app reported as failed."""
+    try:
+        return _install_helper(user)
+    except Exception:  # noqa: BLE001 - the effect itself is set up already
+        log.exception("mic helper: setting it up failed")
+        return False
+
+
+def _install_helper(user: str | None) -> bool:
     from soundboard.mic import directmic as dm
     src = bundled_helper()
     if is_helper() or not (src / EXE_NAME).is_file() or _read_stamp(src) is None:
