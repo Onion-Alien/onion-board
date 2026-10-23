@@ -166,6 +166,105 @@ def test_quitting_hands_an_open_discord_to_the_helper(window, monkeypatch):  # n
     assert started == [["discord"]]
 
 
+def _helper_job(monkeypatch, tmp_path, pending=("discord",)) -> list:
+    """The job a quit leaves for the helper, in a fake app folder; its wait (the event
+    loop) ends at once. Returns the notifications it shows."""
+    from PySide6 import QtWidgets
+
+    from soundboard.core import bootmark
+    from soundboard.ui.kit import theme
+
+    class App:   # no second QApplication in the test run, no event loop
+        instance = staticmethod(QtWidgets.QApplication.instance)   # conftest asks
+
+        def __init__(self, *a):
+            pass
+
+        def setQuitOnLastWindowClosed(self, on):
+            pass
+
+        def exec(self):
+            return 0
+    shown = []
+
+    class Tray:
+        MessageIcon = QtWidgets.QSystemTrayIcon.MessageIcon
+
+        def __init__(self, *a, **k):
+            self.messageClicked = self
+
+        def connect(self, *a):
+            pass
+
+        def setToolTip(self, *a):
+            pass
+
+        def show(self):
+            pass
+
+        def hide(self):
+            pass
+
+        def showMessage(self, title, *a):
+            shown.append(title)
+    monkeypatch.setattr(QtWidgets, "QApplication", App)
+    monkeypatch.setattr(QtWidgets, "QSystemTrayIcon", Tray)
+    monkeypatch.setattr(theme, "app_icon", lambda: None)
+    monkeypatch.setattr(bootmark, "app_dir", lambda: tmp_path)
+    dt.job_path(tmp_path).write_text(json.dumps({"saved": {}, "pending": list(pending)}),
+                                     "utf-8")
+    return shown
+
+
+def test_the_uninstaller_puts_discord_back_at_once(monkeypatch, tmp_path):
+    """The uninstaller can't leave the helper waiting (it's removing its exe): `--now`
+    puts back a closed Discord and ends, or says one is still open (exit code 2)."""
+    f = make_db(SOUND)
+    before = (f / "000003.log").read_bytes()
+    monkeypatch.setattr(dt, "running_clients", lambda: {"discord"})
+    _helper_job(monkeypatch, tmp_path)
+    assert dt.cli(["--now"]) == 2 == dt.STILL_OPEN
+    assert (f / "000003.log").read_bytes() == before   # never into an open Discord
+    assert not dt.job_path(tmp_path).exists()           # nothing left to wait for it
+
+    monkeypatch.setattr(dt, "running_clients", lambda: set())
+    _helper_job(monkeypatch, tmp_path)
+    assert dt.cli(["--now"]) == 0
+    s = settings()
+    assert s.krisp and s.echo and s.agc
+    assert not dt.job_path(tmp_path).exists()
+
+
+def test_the_helper_started_again_by_the_installer_says_nothing(monkeypatch, tmp_path):
+    """After an update the installer starts the helper it stopped again (`--quiet`): it
+    goes on waiting for Discord, without a second notification."""
+    told = _helper_job(monkeypatch, tmp_path)
+    assert dt.cli(["--quiet"]) == 0
+    assert told == []
+    assert dt.job_path(tmp_path).exists()   # still waiting: the job's kept
+    assert dt.cli([]) == 0
+    assert told == ["Discord is still set up for sounds"]
+
+
+def test_the_installer_stops_the_helper_and_starts_it_again():
+    """The helper runs the exe, so Windows listed it as Onion Board still open on the
+    installer's Preparing to Install page: the installer stops it first (PrepareToInstall
+    runs before that check) and starts it again once the files are in; the uninstaller
+    stops it and puts Discord back at once."""
+    from pathlib import Path
+    iss = (Path(__file__).resolve().parents[1] / "installer" / "OnionBoard.iss").read_text(
+        "utf-8")
+    def body(head):   # a procedure of the script, to its end
+        rest = iss[iss.index(head):]
+        return rest[:rest.index("\nend;")]
+    assert "StopDiscordHelper" in body("function PrepareToInstall(")
+    assert "StartDiscordHelper" in body("procedure CurStepChanged(")
+    assert "'--discord-restore --quiet'" in iss
+    unins = body("procedure CurUninstallStepChanged(")
+    assert "StopDiscordHelper" in unins and "'--discord-restore --now'" in unins
+    assert unins.index("StopDiscordHelper") < unins.index("--uninstall-count")
+
+
 def test_put_back_by_hand_also_does_a_half_set_discord(tmp_path):
     """the Mic effect card's Put Discord back: quitting leaves a Discord with some clean-up
     on alone, the button puts the rest back too."""

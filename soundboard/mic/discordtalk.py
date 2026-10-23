@@ -39,6 +39,9 @@ from soundboard.mic import discordcfg
 log = logging.getLogger(__name__)
 
 ARG = "--discord-restore"
+NOW = "--now"        # the uninstaller: put back what it can and end (cli)
+QUIET = "--quiet"    # the installer, starting it again: no notification
+STILL_OPEN = 2       # NOW's exit code: a Discord is still open, not put back
 KEY = b"_https://discord.com\x00\x01MediaEngineStore"   # Chromium: "_" origin \0 \1 name
 BLOCK = 32768        # LevelDB log block
 HEADER = 7           # crc32c (4), length (2), type (1)
@@ -596,28 +599,12 @@ def start_helper(app_dir: Path, saved: dict, pending: list[str]) -> bool:
 
 # ---------------------------------------------------------------- the helper
 
-def cli(_rest: list[str]) -> int:
-    """`--discord-restore`: says Discord is still set for sounds (a notification), then
-    puts it back as soon as it closes. Ends when that's done, when Onion Board opens
-    again (it takes over), or after HELPER_MAX_S."""
-    from soundboard.core.bootmark import app_dir
-    app = app_dir()
-    logging.basicConfig(filename=str(app / "discord-restore.log"), filemode="w",
-                        level=logging.INFO, format="%(asctime)s %(message)s")
-    try:
-        job = json.loads(job_path(app).read_text("utf-8"))
-        saved, pending = dict(job.get("saved") or {}), list(job.get("pending") or [])
-    except (OSError, ValueError):
-        log.info("no job")
-        return 0
-    from soundboard import i18n
-    i18n.startup(app)
-    from soundboard.i18n import _
+def _notify(qapp):
+    """The tray notification that Discord is still set for sounds; None if it can't."""
     from PySide6.QtCore import QTimer
-    from PySide6.QtWidgets import QApplication, QSystemTrayIcon
-    qapp = QApplication(sys.argv[:1])
-    qapp.setQuitOnLastWindowClosed(False)
-    tray = None
+    from PySide6.QtWidgets import QSystemTrayIcon
+
+    from soundboard.i18n import _
     try:
         from soundboard.ui.kit.theme import app_icon
         tray = QSystemTrayIcon(app_icon(), parent=qapp)   # not a widget: no window
@@ -631,8 +618,47 @@ def cli(_rest: list[str]) -> int:
               "Cancellation and Automatic Gain Control."),
             QSystemTrayIcon.MessageIcon.Information, 15000)
         QTimer.singleShot(20000, tray.hide)
+        return tray
     except Exception:  # noqa: BLE001 - no notification: still put it back
         log.warning("no notification", exc_info=True)
+        return None
+
+
+def cli(rest: list[str]) -> int:
+    """`--discord-restore`: says Discord is still set for sounds (a notification), then
+    puts it back as soon as it closes. Ends when that's done, when Onion Board opens
+    again (it takes over), or after HELPER_MAX_S.
+
+    The installer stops a waiting helper before it replaces the files, then starts it
+    again with QUIET (no second notification). The uninstaller runs it with NOW: put
+    back whatever's closed and end at once, exit code STILL_OPEN when a Discord is
+    still open (the uninstaller then says how to put it back by hand)."""
+    from soundboard.core.bootmark import app_dir
+    app = app_dir()
+    logging.basicConfig(filename=str(app / "discord-restore.log"), filemode="w",
+                        level=logging.INFO, format="%(asctime)s %(message)s")
+    try:
+        job = json.loads(job_path(app).read_text("utf-8"))
+        saved, pending = dict(job.get("saved") or {}), list(job.get("pending") or [])
+    except (OSError, ValueError):
+        log.info("no job")
+        return 0
+    if NOW in rest:
+        left = []
+        try:
+            left = restore(saved, app / "discord-backup", only=set(pending))
+        except Exception:  # noqa: BLE001 - the uninstall goes on regardless
+            log.exception("putting it back failed")
+        log.info("put back at once; still open: %s", ", ".join(left) or "none")
+        job_path(app).unlink(missing_ok=True)   # the app is going: nothing will wait
+        return STILL_OPEN if left else 0
+    from soundboard import i18n
+    i18n.startup(app)
+    from PySide6.QtCore import QTimer
+    from PySide6.QtWidgets import QApplication
+    qapp = QApplication(sys.argv[:1])
+    qapp.setQuitOnLastWindowClosed(False)
+    tray = None if QUIET in rest else _notify(qapp)   # QUIET: told once already
     start = time.monotonic()
 
     def tick():

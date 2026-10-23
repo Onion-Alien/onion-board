@@ -1028,6 +1028,63 @@ begin
   Result := RegKeyExists(Root, 'SOFTWARE\OnionBoard\MicPlugin\Endpoints');
 end;
 
+// Onion Board's Discord helper (`OnionBoard.exe --discord-restore`, no window; see
+// soundboard/mic/discordtalk.py): left running when Onion Board was closed with Discord
+// still open, to turn Discord's voice clean-up back on once Discord closes. It runs the
+// exe, so Windows listed it as "Onion Board" still open on the Preparing to Install page.
+// Stopped quietly instead, its job file left where it is: the installer starts it again
+// once the new files are in (StartDiscordHelper), the uninstaller has it put Discord back
+// at once. True when one was running.
+var
+  DiscordHelperStopped: Boolean;
+
+function StopDiscordHelper: Boolean;
+var
+  Script, CountFile: String;
+  S: AnsiString;
+  Code: Integer;
+begin
+  Result := False;
+  Script := ExpandConstant('{tmp}\discord-helper.ps1');
+  CountFile := Script + '.count';
+  DeleteFile(CountFile);
+  SaveStringToFile(Script,
+    '$app = ' + PsQuote(ExpandConstant('{app}') + '\') + #13#10 +
+    '$p = @(Get-CimInstance Win32_Process -Filter "Name=''{#AppExeName}.exe''" | ' +
+    'Where-Object { $_.ExecutablePath -and $_.CommandLine -and ' +
+    '$_.ExecutablePath.StartsWith($app, [StringComparison]::OrdinalIgnoreCase) -and ' +
+    '$_.CommandLine.Contains(''--discord-restore'') })' + #13#10 +
+    '$p | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }' + #13#10 +
+    '$p | ForEach-Object { Wait-Process -Id $_.ProcessId -Timeout 10 -ErrorAction SilentlyContinue }' + #13#10 +
+    'Set-Content -LiteralPath ' + PsQuote(CountFile) + ' -Value $p.Count' + #13#10, False);
+  if Exec('powershell.exe', '-NoProfile -ExecutionPolicy Bypass -File "' + Script + '"',
+          '', SW_HIDE, ewWaitUntilTerminated, Code) and LoadStringFromFile(CountFile, S) then
+    Result := StrToIntDef(Trim(String(S)), 0) > 0;
+  if Result then
+    Log('Stopped the Discord helper');
+end;
+
+// Before Windows looks for programs using the files (CloseApplications): see above.
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+begin
+  Result := '';
+  if DirExists(ExpandConstant('{app}')) then
+    DiscordHelperStopped := StopDiscordHelper;
+end;
+
+// The helper stopped above, started again from the new exe: it goes on waiting for
+// Discord to close (or for Onion Board to open, which takes over), without a second
+// notification.
+procedure StartDiscordHelper;
+var
+  Code: Integer;
+begin
+  if DiscordHelperStopped and
+     Exec(ExpandConstant('{app}\{#AppExeName}.exe'), '--discord-restore --quiet', '',
+          SW_HIDE, ewNoWait, Code) then
+    Log('Started the Discord helper again');
+end;
+
 // Uninstall: offer to remove the cable too. The default answer is Yes only when this
 // installer put it there (other apps, e.g. Voicemeeter, may use one that was already
 // installed). Silent uninstalls leave it alone.
@@ -1057,6 +1114,15 @@ begin
   end;
   if CurUninstallStep <> usUninstall then
     exit;
+  // the Discord helper (above) holds the exe: stopped, then Discord put back at once; one
+  // still open can't be (Discord writes over its settings), so say how to do it by hand
+  if StopDiscordHelper and
+     Exec(ExpandConstant('{app}\{#AppExeName}.exe'), '--discord-restore --now', '', SW_HIDE,
+          ewWaitUntilTerminated, Code) and (Code = 2) and not UninstallSilent then
+    MsgBox('Discord is still set up for Onion Board''s sounds, so your voice may sound ' +
+      'noisy there.' + #13#10#13#10 + 'To fix it, open Discord''s Voice & Video settings ' +
+      'and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.',
+      mbInformation, MB_OK);
   // the anonymous usage count's "uninstall/<version>" (soundboard/core/usage.py): the app
   // sends it only if the count is switched on, and gives up after 15 s offline
   Exec(ExpandConstant('{app}\{#AppExeName}.exe'), '--uninstall-count', '', SW_HIDE,
@@ -1367,6 +1433,8 @@ begin
     EndInstallingMark;
   if CurStep = ssPostInstall then
     DeleteOldExe;
+  if CurStep = ssPostInstall then
+    StartDiscordHelper;
   // first, right after Install is clicked: Windows' permission box comes up while the
   // user is still looking, not minutes later at the end
   if (CurStep = ssInstall) and MayDownload('vbcable') then
