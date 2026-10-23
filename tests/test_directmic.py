@@ -2914,6 +2914,27 @@ def test_uninstall_keeps_going_when_one_mic_wont_go_back(monkeypatch):
     assert com == []                # the effect wasn't unregistered while it's on a mic
 
 
+def test_an_uninstall_with_nothing_installed_leaves_the_audio_alone(monkeypatch, tmp_path):
+    """The app's uninstall after the effect came off (the helper still there, so the
+    uninstaller runs remove-all): no mic, no registration, no files. Windows' audio
+    isn't stopped for it: a restart cut everyone's sound and moved Sonar's devices
+    (found on a real PC: Sonar's channels stayed stopped and it was ended)."""
+    calls = []
+    d = tmp_path / "MicPlugin"
+    d.mkdir()
+    monkeypatch.setattr(dm, "anything_installed", lambda: False)
+    monkeypatch.setattr(dm, "installed_on", lambda: [])
+    monkeypatch.setattr(dm, "_audio_service", lambda start, deps=(): calls.append(start) or True)
+    monkeypatch.setattr(dm, "_sonar_keep", lambda: calls.append("keep"))
+    monkeypatch.setattr(dm, "_unregister_com", lambda: None)
+    monkeypatch.setattr(dm, "install_dir", lambda: tmp_path / "pf")
+    monkeypatch.setattr(dm, "_old_install_dirs", lambda: [])
+    monkeypatch.setattr(dm, "data_dir", lambda: d)
+    monkeypatch.setattr(dm.winreg, "DeleteKey", lambda *a: None)
+    assert dm.admin_uninstall() == 0
+    assert calls == [] and not d.exists()   # the folder still goes, the audio untouched
+
+
 def test_uninstall_removes_the_ring_folder(monkeypatch, tmp_path):
     """A clean uninstall takes the ring file with it, not just the mic and the keys."""
     d = tmp_path / "MicPlugin"

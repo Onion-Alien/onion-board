@@ -29,6 +29,9 @@ Changes not released yet are in [changelog.d/](changelog.d/), one file per chang
   times, then leaves it off). It's restarted once only when it won't take its devices
   back, or when its mic had already lost its device (after a set-up with 2.7.0), so
   that its mic has a device again.
+- Direct mic: uninstalling Onion Board after the mic effect was already off no longer
+  restarts all of Windows' sound for nothing (it cut every app's sound for a moment, and
+  with SteelSeries Sonar on, it could restart Sonar).
 - SteelSeries Sonar users who set up direct mic with an earlier version: Windows' audio
   restart made Sonar switch its mic to the first device it lists, which isn't always
   yours (a webcam, a virtual cable). If Discord hears you badly or not at all through

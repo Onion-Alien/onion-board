@@ -2628,7 +2628,12 @@ def _try_put_on(guid: str, dll: Path, slot: str | None = None) -> int:
 
 def admin_uninstall(only: str | None = None) -> int:
     """Take the effect off every mic, or only off the mic `only` (a GUID): then the
-    rest stays, and the effect itself is removed once it's on no mic at all."""
+    rest stays, and the effect itself is removed once it's on no mic at all. On no mic,
+    not registered and no files (the app's uninstall after the effect came off): nothing
+    holds Windows' audio, so it isn't restarted for nothing (that cut everyone's sound and
+    moved SteelSeries Sonar's devices)."""
+    if not anything_installed():
+        return _take_off(only)
     return _audio_off(lambda: _take_off(only))
 
 
