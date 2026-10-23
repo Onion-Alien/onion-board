@@ -4354,5 +4354,9 @@
   "Let the Onion Board developer see this channel's name": "讓 Onion Board 開發者看到這個頻道的名稱",
   "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "只在已連線且「算我一份」開啟時，每天隨使用統計送出一次，讓開發者知道誰在用 Onion Board 直播。只有名稱。取消勾選即可停止。",
   "<b>{mic}</b> stopped sending sound after the set-up. Restart the app it belongs to and it works again.": "設定後，<b>{mic}</b> 不再發出聲音。重新啟動它所屬的應用程式就能恢復。",
-  "Onion Board is on your mic, but a test sound didn't come through it. Click <b>Repair</b> to put it on again.": "Onion Board 已在你的麥克風上，但測試聲音沒有從中傳出。按 <b>修復</b> 重新裝上。"
+  "Onion Board is on your mic, but a test sound didn't come through it. Click <b>Repair</b> to put it on again.": "Onion Board 已在你的麥克風上，但測試聲音沒有從中傳出。按 <b>修復</b> 重新裝上。",
+  "Score {score} / {total}": "得分 {score} / {total}",
+  "{n} point": [
+    "{n} 分"
+  ]
 }

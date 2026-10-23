@@ -194,7 +194,8 @@ account or anything else about you.
   the exact version), the app's language (`lang/de`) and theme (`theme/dark`: a
   built-in theme's name, else `other`);
 - how many of Settings > Achievements you've earned (`achievements/0`, `1-2`, `3-5`,
-  `6-10`, `11-20` or `21-plus`);
+  `6-10`, `11-20` or `21-plus`) and their score (`ach-score/0`, `1-50`, `51-150`,
+  `151-400`, `401-1000`, `1001-2000` or `2001-plus`);
 - **which features you used or have set up since then**, as `used/<name>`: only the
   names in `FEATURES` in `soundboard/core/usage.py`, each a yes or no for the day, never how
   many times or what you did with them. Some examples by area:

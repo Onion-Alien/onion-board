@@ -4431,5 +4431,10 @@
   "Let the Onion Board developer see this channel's name": "Fai vedere allo sviluppatore di Onion Board il nome di questo canale",
   "Sent once a day with the usage count, only while you're connected and Count me in is on, so the developer can see who streams with Onion Board. Just the name. Untick to stop.": "Inviato una volta al giorno con il conteggio d'uso, solo mentre sei connesso e «Conta su di me» è attivo, così lo sviluppatore vede chi streamma con Onion Board. Solo il nome. Togli la spunta per smettere.",
   "<b>{mic}</b> stopped sending sound after the set-up. Restart the app it belongs to and it works again.": "<b>{mic}</b> ha smesso di mandare suono dopo la configurazione. Riavvia l'app a cui appartiene e tornerà a funzionare.",
-  "Onion Board is on your mic, but a test sound didn't come through it. Click <b>Repair</b> to put it on again.": "Onion Board è sul tuo microfono, ma un suono di prova non è passato. Fai clic su <b>Ripara</b> per rimetterlo."
+  "Onion Board is on your mic, but a test sound didn't come through it. Click <b>Repair</b> to put it on again.": "Onion Board è sul tuo microfono, ma un suono di prova non è passato. Fai clic su <b>Ripara</b> per rimetterlo.",
+  "Score {score} / {total}": "Punteggio {score} / {total}",
+  "{n} point": [
+    "{n} punto",
+    "{n} punti"
+  ]
 }
