@@ -188,6 +188,10 @@ static const wchar_t *STATE_KEY = L"SOFTWARE\\OnionBoard\\MicPlugin\\Endpoints";
 #define OBMIC_STATE_ROOT HKEY_LOCAL_MACHINE
 #endif
 static const uint32_t EFFECT_VERSION = 5;        // directmic.EFFECT_VERSION
+// Windows' device class of audio effects ("AudioProcessingObject"): a Windows 11 driver's
+// effect is registered in its device's key under this (createDriverApo).
+static const wchar_t *APO_CLASS_KEY =
+    L"SYSTEM\\CurrentControlSet\\Control\\Class\\{5989fce8-9cd0-467d-8a6a-5419e31529d4}";
 
 // Equalizer APO works like this effect: it takes a slot and runs the effect it replaced,
 // noted per endpoint under EAPO_KEY\<endpoint>. Put on the mic after this one, it runs
@@ -762,6 +766,61 @@ private:
         return found;
     }
 
+    // A Windows 11 driver's effect (Logitech's Blue VO!CE, Windows' own Voice Clarity) is
+    // registered in its driver's key only, under APO_CLASS_KEY\NNNN\Classes\CLSID, not in
+    // COM's list: the audio engine finds it there, CoCreateInstance doesn't
+    // (REGDB_E_CLASSNOTREG). So it's made from its DLL here. The key is admin-only, like
+    // COM's. The DLL stays loaded: the audio engine keeps it loaded too.
+    static HRESULT createDriverApo(const wchar_t *clsidText, REFCLSID clsid,
+                                   IAudioProcessingObject **out) {
+        HKEY cls;
+        if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, APO_CLASS_KEY, 0, KEY_READ, &cls) != ERROR_SUCCESS)
+            return REGDB_E_CLASSNOTREG;
+        HRESULT hr = REGDB_E_CLASSNOTREG;
+        for (DWORD i = 0; hr == REGDB_E_CLASSNOTREG; i++) {
+            wchar_t sub[64], key[192], raw[MAX_PATH], path[MAX_PATH];
+            DWORD n = 64;
+            LONG r = RegEnumKeyExW(cls, i, sub, &n, NULL, NULL, NULL, NULL);
+            if (r == ERROR_NO_MORE_ITEMS) break;
+            if (r != ERROR_SUCCESS) continue;
+            _snwprintf(key, 192, L"%ls\\Classes\\CLSID\\%ls\\InprocServer32", sub, clsidText);
+            key[191] = 0;
+            DWORD size = sizeof raw;
+            if (RegGetValueW(cls, key, NULL, RRF_RT_REG_SZ | RRF_RT_REG_EXPAND_SZ | RRF_NOEXPAND,
+                             NULL, raw, &size) != ERROR_SUCCESS)
+                continue;
+            DWORD len = ExpandEnvironmentStringsW(raw, path, MAX_PATH);
+            if (!len || len > MAX_PATH || path[0] == 0 || path[1] != L':') {   // a full path only
+                problemf("the mic's own effect %ls: no usable DLL path", clsidText);
+                break;
+            }
+            HMODULE dll = LoadLibraryExW(path, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+            if (!dll) {
+                hr = HRESULT_FROM_WIN32(GetLastError());
+                break;
+            }
+            typedef HRESULT(STDAPICALLTYPE * GetClassObjectFn)(REFCLSID, REFIID, void **);
+            GetClassObjectFn get = (GetClassObjectFn)(void *)GetProcAddress(dll, "DllGetClassObject");
+            IClassFactory *cf = NULL;
+            hr = get ? get(clsid, IID_IClassFactory, (void **)&cf) : CLASS_E_CLASSNOTAVAILABLE;
+            if (SUCCEEDED(hr) && cf) {
+                hr = cf->CreateInstance(NULL, IID_IAudioProcessingObject_, (void **)out);
+                cf->Release();
+            } else if (SUCCEEDED(hr)) {
+                hr = E_NOINTERFACE;
+            }
+            if (FAILED(hr) || !*out) {
+                *out = NULL;
+                FreeLibrary(dll);
+                if (SUCCEEDED(hr)) hr = E_NOINTERFACE;
+            } else {
+                logf("loaded the mic's own effect %ls from its driver: %ls", clsidText, path);
+            }
+        }
+        RegCloseKey(cls);
+        return hr;
+    }
+
     void loadChild(const wchar_t *endpoint, UINT32 cb, BYTE *data) {
         if (!endpoint[0] || m_child) return;
         if (t_loading) {
@@ -789,6 +848,8 @@ private:
         IAudioProcessingObject *child = NULL;
         HRESULT hr = CoCreateInstance(clsid, NULL, CLSCTX_INPROC_SERVER, IID_IAudioProcessingObject_,
                                       (void **)&child);
+        if (hr == REGDB_E_CLASSNOTREG)
+            hr = createDriverApo(value, clsid, &child);
         if (FAILED(hr) || !child) {
             problemf("can't load the mic's own effect %ls: 0x%08lx", value, (unsigned long)hr);
             return;

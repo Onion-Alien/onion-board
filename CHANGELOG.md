@@ -55,6 +55,14 @@ Changes not released yet are in [changelog.d/](changelog.d/), one file per chang
 - Direct mic: a mic whose headset software adds its own effect (some gaming headsets do)
   no longer goes silent in every app when that effect won't run alongside Onion Board's:
   the mic now goes on without the headset's effect.
+- Fixed: after the PC had slept, a crash or a closed-from-Task-Manager exit was counted as "frozen" in the anonymous problem count. The exit check now uses the same sleep-proof clock as the freeze check.
+- Fixed two causes of the app freezing for seconds on PCs short of memory: the audio
+  device check no longer starts a new background task every half minute, and a safety
+  check over the app's windows no longer runs while the app sits in the tray.
+- Direct mic: a headset whose software adds a Windows 11 style effect to the mic
+  (Logitech G HUB's Blue VO!CE, Windows' own Voice Clarity) keeps that effect with
+  Onion Board's effect on. It used to be switched off, without a word, while direct
+  mic was on.
 
 ## 2.7.0 — 2026-10-22
 
