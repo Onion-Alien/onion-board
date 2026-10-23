@@ -43,7 +43,7 @@ from pathlib import Path
 from urllib.parse import quote
 
 import numpy as np
-from PySide6.QtCore import QObject, Qt, QTimer, QUrl, Signal
+from PySide6.QtCore import QObject, Qt, QThread, QTimer, QUrl, Signal
 from PySide6.QtMultimedia import QAudioBufferOutput, QAudioFormat, QMediaMetaData, QMediaPlayer
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
 
@@ -970,23 +970,63 @@ def _close(handles: tuple[int, int]):
             close(h)
 
 
+class _PlayerHost(QObject):
+    """RadioPlayer's side on the radio's own thread (RadioPlayer._make): runs what it's
+    handed there, and passes Qt's player signals back to the window, each with the
+    stream (`src`) it's about, so one from a stream already replaced is ignored."""
+
+    def __init__(self, owner: RadioPlayer):
+        super().__init__()
+        self.owner = owner
+        self.src = 0
+
+    def run(self, fn):
+        fn()
+
+    def status(self, st):
+        self.owner._status.emit(self.src, st)
+
+    def failed(self, _err, msg: str):
+        self.owner._failed.emit(self.src, msg)
+
+    def meta(self):
+        player = self.owner._player
+        if player is not None:
+            title = player.metaData().stringValue(QMediaMetaData.Key.Title)
+            self.owner._title.emit(self.src, str(title or ""))
+
+
 class RadioPlayer(QObject):
     """Plays one stream at a time into `audio` (48 kHz stereo float32 chunks).
     `audio` is emitted on Qt's decoding thread, so a busy window can't hold the sound
     up: connect it with Qt.DirectConnection to something thread-safe (the engine's
-    feed, the recorder), or Qt queues it to the window like any other signal."""
+    feed, the recorder), or Qt queues it to the window like any other signal.
+
+    Qt's player lives on a thread of its own (`radio-player`), so opening a stream runs
+    Qt's and FFmpeg's code there, not on the window: on a PC reading the app back from
+    disk (back from the tray, short of memory) setSource held the window 10-30 s. The
+    window hands it work in order (_to_player) and never waits for it, shutdown aside."""
     audio = Signal(object)
     state = Signal(str)          # connecting | playing | stopped | error
     error = Signal(str)
     now_playing = Signal(str)    # the stream's own title (song / show), when it sends one
     _looked_up = Signal(int, bool)   # (play generation, the host is local): lookup thread
     _first_audio = Signal(int)       # play generation: decoding thread -> UI thread
+    _to_player = Signal(object)      # a callable, run on the player's thread, in order
+    _status = Signal(int, object)    # (stream, Qt's media status): player thread -> UI
+    _failed = Signal(int, str)       # (stream, Qt's error message)
+    _title = Signal(int, str)        # (stream, its title)
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.station: Station | None = None
+        # made and used on the player's thread only (_make)
         self._player: QMediaPlayer | None = None
         self._out: QAudioBufferOutput | None = None
+        self._hooked = False         # _on_buffer connected to _out
+        self._thread: QThread | None = None
+        self._host: _PlayerHost | None = None
+        self._src = 0                # bumped by each open / halt: the stream signals are for
         self._halting = False
         self._retries = 0
         self._got_audio = False
@@ -1003,6 +1043,9 @@ class RadioPlayer(QObject):
         self._watch.timeout.connect(self._check)
         self._looked_up.connect(self._on_looked_up)
         self._first_audio.connect(self._on_first_audio)
+        self._status.connect(self._status_of)
+        self._failed.connect(self._failed_of)
+        self._title.connect(self._title_of)
         self._conn = 0               # net.generation() when the stream was opened
         # held by _on_buffer (decoding thread) while it runs; shutdown() takes it to know
         # none is running before the player can be freed
@@ -1011,20 +1054,33 @@ class RadioPlayer(QObject):
         net.on_change(self._on_connection)
 
     def _make(self):
-        fmt = QAudioFormat()
-        fmt.setSampleRate(SR)
-        fmt.setChannelCount(2)
-        fmt.setSampleFormat(QAudioFormat.SampleFormat.Float)
-        self._player = QMediaPlayer(self)
-        self._out = QAudioBufferOutput(fmt, self)
-        # no QAudioOutput: Qt decodes (at real-time pace) but never plays it itself
-        self._player.setAudioBufferOutput(self._out)
-        # straight on the decoding thread: queued to the window, the chunks waited out
-        # every busy moment there and the radio ran dry (it skipped)
-        self._out.audioBufferReceived.connect(self._on_buffer, Qt.ConnectionType.DirectConnection)
-        self._player.errorOccurred.connect(self._on_error)
-        self._player.mediaStatusChanged.connect(self._on_status)
-        self._player.metaDataChanged.connect(self._on_meta)
+        """The player's thread started, and the player made on it (see the class)."""
+        self._thread = thread = QThread(self)
+        thread.setObjectName("radio-player")
+        self._host = host = _PlayerHost(self)
+        host.moveToThread(thread)
+        self._to_player.connect(host.run)   # queued: the host lives on that thread
+        # freed without shutdown(): the thread is ended first (a QThread freed running
+        # aborts the app)
+        self.destroyed.connect(lambda *_: (thread.quit(), thread.wait(2000)))
+        thread.start()
+
+        def make():
+            fmt = QAudioFormat()
+            fmt.setSampleRate(SR)
+            fmt.setChannelCount(2)
+            fmt.setSampleFormat(QAudioFormat.SampleFormat.Float)
+            self._player = player = QMediaPlayer(host)
+            self._out = QAudioBufferOutput(fmt, host)
+            # no QAudioOutput: Qt decodes (at real-time pace) but never plays it itself
+            player.setAudioBufferOutput(self._out)
+            # straight on the decoding thread: queued to the window, the chunks waited
+            # out every busy moment there and the radio ran dry (it skipped)
+            self._hook_buffers()
+            player.errorOccurred.connect(host.failed)
+            player.mediaStatusChanged.connect(host.status)
+            player.metaDataChanged.connect(host.meta)
+        self._to_player.emit(make)
 
     @property
     def playing(self) -> bool:
@@ -1042,7 +1098,7 @@ class RadioPlayer(QObject):
             self._set_state("error")
             self.error.emit(why)
             return
-        if self._player is None:
+        if self._host is None:
             self._make()
         self.station = station
         self._retries = 0
@@ -1084,17 +1140,23 @@ class RadioPlayer(QObject):
         self._opened = time.monotonic()
         self._watch.start()
         self._set_state("connecting")
-        player, station = self._player, self.station
-        assert player is not None and station is not None   # play() made and set them
-        self._halt_player()   # also empties the source: the same URL again would be ignored
-        player.setSource(QUrl(station.url))
-        player.play()
+        assert self._host is not None and self.station is not None   # play() made and set them
+        self._src += 1
+        src, url, host = self._src, QUrl(self.station.url), self._host
+
+        def open_():   # on the player's thread
+            self._halt_player()   # also empties the source: the same URL again would be ignored
+            host.src = src
+            if self._player is not None:
+                self._player.setSource(url)
+                self._player.play()
+        self._to_player.emit(open_)
 
     def _on_connection(self):
         """The Connection setting changed: a playing station reconnects the new way at
         once (FFmpeg reads the relay's address each time it opens a stream). Radio
         switched off stops it."""
-        if self.station is None or self._player is None:
+        if self.station is None or self._host is None:
             return
         if not net.allowed(FEATURE):
             log.info("radio: stopped, it was switched off")
@@ -1117,14 +1179,20 @@ class RadioPlayer(QObject):
         self._reconnecting = self._reopen_pending = False
         self._gen += 1
         self._watch.stop()
-        if self._player is not None:
-            self._halt_player()
+        self._halt()
         self._set_state("stopped")
 
+    def _halt(self):
+        """The stream stopped, on the player's thread (_halt_player); what it still
+        sends is ignored."""
+        if self._host is not None:
+            self._src += 1
+            self._to_player.emit(self._halt_player)
+
     def _halt_player(self):
-        """Qt's stop() waits for its decoding thread while this thread holds Python's
-        lock; a buffer that thread is handing to _on_buffer needs that lock too: a
-        deadlock (stopping, and reopening a station that dropped). So _on_buffer is
+        """On the player's thread. Qt's stop() waits for its decoding thread while this
+        thread holds Python's lock; a buffer that thread is handing to _on_buffer needs
+        that lock too: a deadlock (stopping, and reopening a station that dropped). So _on_buffer is
         unhooked first and a buffer already on its way gets a moment (the GIL let go)
         to finish; _halting makes it return."""
         player = self._player
@@ -1142,15 +1210,18 @@ class RadioPlayer(QObject):
                 self._hook_buffers()
 
     def _hook_buffers(self):
-        if self._out is not None:
+        if self._out is not None and not self._hooked:
+            self._hooked = True
             self._out.audioBufferReceived.connect(self._on_buffer,
                                                   Qt.ConnectionType.DirectConnection)
 
     def _unhook_buffers(self):
-        if self._out is not None:
+        """(Twice in a row when shutdown's halt follows one already on its way.)"""
+        if self._out is not None and self._hooked:
+            self._hooked = False
             try:
                 self._out.audioBufferReceived.disconnect(self._on_buffer)
-            except (RuntimeError, TypeError):   # not connected / already gone
+            except (RuntimeError, TypeError):   # already gone
                 pass
 
     def _set_state(self, st: str):
@@ -1239,8 +1310,7 @@ class RadioPlayer(QObject):
         self.station = None
         self._reconnecting = False
         self._watch.stop()
-        if self._player is not None:
-            self._player.stop()
+        self._halt()
         self._set_state("error")
         log.warning("radio: gave up on %s (%s)", url, msg)
         # the proxy's / a switch's reason if that's what failed it, else plain words
@@ -1252,12 +1322,17 @@ class RadioPlayer(QObject):
         self._reopen_pending = False
         self._open()
 
-    def _on_meta(self):
-        if self._player is None:
-            return
-        title = self._player.metaData().stringValue(QMediaMetaData.Key.Title)
-        title = " ".join(str(title or "").split())[:160]
-        if title:
+    def _status_of(self, src: int, st):
+        if src == self._src:
+            self._on_status(st)
+
+    def _failed_of(self, src: int, msg: str):
+        if src == self._src:
+            self._on_error(None, msg)
+
+    def _title_of(self, src: int, title: str):
+        title = " ".join(title.split())[:160]
+        if src == self._src and title:
             self.now_playing.emit(title)
 
     def shutdown(self):
@@ -1269,6 +1344,31 @@ class RadioPlayer(QObject):
         with self._buffer_lock:
             self._closed = True   # stop() leaves the buffers unhooked
         self.stop()
+        self._end_thread()
+
+    def _end_thread(self):
+        """After the halt stop() handed over: the player freed and its thread ended.
+        Waited for with Python's lock let go, as that thread needs it to get there."""
+        thread, host = self._thread, self._host
+        if thread is None or host is None:
+            return
+        self._host = None
+
+        def end():   # on the player's thread
+            player = self._player
+            if player is not None:
+                for sig in (player.errorOccurred, player.mediaStatusChanged,
+                            player.metaDataChanged):
+                    sig.disconnect()
+            self._player = self._out = None
+            host.deleteLater()   # (with the player: freed as the thread ends)
+            thread.quit()
+        self._to_player.emit(end)
+        t0 = time.monotonic()
+        while thread.isRunning() and time.monotonic() - t0 < 5:
+            time.sleep(0.005)
+        if not thread.wait(1000):
+            log.warning("radio: the player's thread didn't end")
 
 
 def _tor_ready() -> bool:
