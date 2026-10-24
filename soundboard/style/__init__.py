@@ -20,6 +20,8 @@ Rules, so the copy keeps working in both apps:
     textures   Textured: TEXTURES, texture_image(), texture_style(), paint_glow()
     bunnyfit   Bun's outfit per theme and the pieces' drawing
     owl        Hoot: draw_owl(), owl_image(), OwlWidget, his look per theme (LOOKS)
+    owllooks   (Hoot's colours and LOOKS, re-exported by owl)
+    owldraw    (Hoot's shapes and draw_owl(), re-exported by owl)
     appstate   active(), pause_in_background(), snap_to_pixels()
     cover      Cover, covered(): a theme switch fades in and out instead of flashing
     hooks      what the app plugs in
