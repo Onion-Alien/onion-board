@@ -10,13 +10,14 @@ import html
 from urllib.parse import quote
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (QApplication, QComboBox, QDialog, QFrame, QHBoxLayout,
-                               QPushButton, QScrollArea, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QComboBox, QDialog, QHBoxLayout, QPushButton,
+                               QVBoxLayout)
 
 from soundboard.control import remote
 from soundboard.ui.kit import theme
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.setup.chatguide import _bun, _header, _label
+from soundboard.ui.setup.wizardkit import scrolled
 from soundboard.core.updates import REPO
 from soundboard.i18n import _
 
@@ -124,18 +125,7 @@ class StreamerGuide(QDialog):
         steps.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse
                                       | Qt.TextInteractionFlag.LinksAccessibleByMouse)
         steps.linkActivated.connect(lambda url: busy.open_url(url, window=self))
-        body = QWidget()
-        bl = QVBoxLayout(body)
-        bl.setContentsMargins(0, 0, 8, 0)
-        bl.addWidget(steps)
-        bl.addStretch(1)
-        scroll = QScrollArea()
-        scroll.setWidget(body)
-        scroll.setWidgetResizable(True)
-        scroll.setFrameShape(QFrame.Shape.NoFrame)
-        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        scroll.setMinimumHeight(300)
-        v.addWidget(scroll, 1)
+        v.addWidget(scrolled(steps), 1)
 
         # the links, ready to copy
         self.state = _label("", "font-size:10pt;")

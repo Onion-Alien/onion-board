@@ -35,6 +35,7 @@ import time
 from pathlib import Path
 
 from soundboard.mic import discordcfg
+_varint = discordcfg._varint
 
 log = logging.getLogger(__name__)
 
@@ -219,17 +220,6 @@ def frame(record: bytes, offset: int) -> bytes:
         first = False
         if last:
             return bytes(out)
-
-
-def _varint(b: bytes, i: int) -> tuple[int, int]:
-    v = shift = 0
-    while True:
-        c = b[i]
-        i += 1
-        v |= (c & 0x7F) << shift
-        if not c & 0x80:
-            return v, i
-        shift += 7
 
 
 def _put_varint(v: int) -> bytes:

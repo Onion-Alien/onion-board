@@ -5,16 +5,8 @@ from __future__ import annotations
 from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import QColor, QPainter, QPainterPath, QPen, QRadialGradient, QTransform
 
-
-
-def _ellipse(p: QPainter, cx, cy, w, h, fill, pen: QPen | None = None, angle=0.0):
-    p.save()
-    p.translate(cx, cy)
-    p.rotate(angle)
-    p.setPen(pen or Qt.PenStyle.NoPen)
-    p.setBrush(fill)
-    p.drawEllipse(QRectF(-w / 2, -h / 2, w, h))
-    p.restore()
+from soundboard.style.owldraw import (  # noqa: F401  (bunny.py, bunprops.py, onionalien.py)
+    _arc, _e as _ellipse, _shade, _stroke)
 
 
 def _oval(x, y, w, h) -> QPainterPath:
@@ -41,37 +33,9 @@ def _glow(p: QPainter, x, y, w, h, col: QColor):
     p.restore()
 
 
-def _shade(p: QPainter, shape: QPainterPath, x, y, r, col: QColor, alpha: int):
-    """A soft round shade inside `shape`, darkest at x, y and gone `r` away."""
-    c = QColor(col)
-    c.setAlpha(alpha)
-    edge = QColor(col)
-    edge.setAlpha(0)
-    g = QRadialGradient(QPointF(x, y), r)
-    g.setColorAt(0.0, c)
-    g.setColorAt(1.0, edge)
-    p.save()
-    p.setClipPath(shape)
-    p.fillRect(QRectF(x - r, y - r, 2 * r, 2 * r), g)
-    p.restore()
-
-
 def _smooth(k: float) -> float:
     k = max(0.0, min(1.0, k))
     return k * k * (3 - 2 * k)
-
-
-def _stroke(p: QPainter, path: QPainterPath, col: QColor, width: float):
-    p.setPen(QPen(col, width, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap,
-                  Qt.PenJoinStyle.RoundJoin))
-    p.setBrush(Qt.BrushStyle.NoBrush)
-    p.drawPath(path)
-
-
-def _arc(x0, y0, cx, cy, x1, y1) -> QPainterPath:
-    path = QPainterPath(QPointF(x0, y0))
-    path.quadTo(QPointF(cx, cy), QPointF(x1, y1))
-    return path
 
 
 def _lerp(a, b, k):

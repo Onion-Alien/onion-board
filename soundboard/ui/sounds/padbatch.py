@@ -248,8 +248,8 @@ class PadSelection(QObject):
             menu.addSeparator()
         menu.addAction(icons.icon("plus"), _("New category"), self.new_category)
 
-    def _changed(self, sids=None):
-        for sid in sids or self.picked:
+    def _changed(self):
+        for sid in self.picked:
             if sid in self.mw.pads:
                 self.mw.pads[sid].update()
         self.mw.cfg.save()

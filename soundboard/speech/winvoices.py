@@ -12,7 +12,6 @@ is reloaded to pick it up, however it was installed.
 from __future__ import annotations
 
 import base64
-import re
 import shutil
 import subprocess
 import tempfile
@@ -113,14 +112,6 @@ def fingerprint() -> frozenset[str]:
         except OSError:
             continue
     return frozenset(names)
-
-
-def has_language(tokens: frozenset[str], lang: str) -> bool:
-    """Whether a token looks like a `lang` voice: MSTTS_V110_zhCN_HuihuiM, TTS_MS_ZH-CN_…
-    ("zh-TW" wants that country's voice; "zh" any)."""
-    code = lang.upper().replace("-", "")
-    pat = re.compile(rf"_{re.escape(code)}{'' if len(code) > 3 else '[A-Z]{2}'}_")
-    return any(pat.search(t.upper().replace("-", "")) for t in tokens)
 
 
 def outcome(code: int, stdout: str, answer: str) -> str:

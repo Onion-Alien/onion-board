@@ -8,7 +8,7 @@ from soundboard.audio.dsp import butter, hermite
 from soundboard.voicefx import Effect, Param, register
 
 from soundboard.voicefx.builtin.parts import (F32, _Filter, _PitchTracker, _Stage, _biquad, _glide,
-                                              _stft_size)
+                                              _shift_in, _stft_size)
 
 if TYPE_CHECKING:
     from soundboard.voicefx.builtin.space import Reverb
@@ -215,12 +215,7 @@ class PitchShift(Effect):
         self.stretched = np.concatenate([self.stretched, new])
 
     def _remember(self, x):
-        h, n = self.hist, len(x)
-        if n >= len(h):
-            h[:] = x[n - len(h):]
-        else:
-            h[:-n] = h[n:]
-            h[-n:] = x
+        _shift_in(self.hist, x)
 
     def _prime(self, ratio: float, rate: int):
         """Start at `ratio` with the recent input already stretched, so the

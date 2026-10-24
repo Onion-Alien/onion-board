@@ -13,6 +13,7 @@ from soundboard.ui.bun.bunpalette import (
     BAT, FUR, FUR_LINE, GADGET, GADGET_SCREEN, GRIP, INK, NOSE_EDGE, ROBOT_BOLT, ROBOT_CYAN,
     ROBOT_INK, STEEL, WOOD, WOOD_DARK)
 from soundboard.ui.bun.bunshapes import _arc, _ellipse, _glow, _stroke
+from soundboard.style.owldraw import sparkle as _sparkle
 
 
 def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0,
@@ -249,17 +250,6 @@ def _star(p: QPainter, x, y, r, ink: QPen | None, col: QColor | None = None):
     p.drawPath(path)
     if col is None:
         _ellipse(p, x - r * 0.22, y - r * 0.22, r * 0.3, r * 0.22, QColor("#fff3c4"), None, -30)
-
-
-def _sparkle(p: QPainter, x, y, r, col: QColor):
-    path = QPainterPath(QPointF(x, y - r))
-    path.quadTo(QPointF(x, y), QPointF(x + r, y))
-    path.quadTo(QPointF(x, y), QPointF(x, y + r))
-    path.quadTo(QPointF(x, y), QPointF(x - r, y))
-    path.quadTo(QPointF(x, y), QPointF(x, y - r))
-    p.setPen(Qt.PenStyle.NoPen)
-    p.setBrush(col)
-    p.drawPath(path)
 
 
 sparkle = _sparkle

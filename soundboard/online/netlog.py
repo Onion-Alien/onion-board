@@ -481,11 +481,14 @@ class Server:
 def servers(items: list[Entry] | None = None) -> list[Server]:
     """The servers contacted (or refused), most recent first."""
     by: dict[str, Server] = {}
+    labels: dict[str, str] = {}   # feature -> its label, once per call
     for e in entries() if items is None else items:
         s = by.get(e.host)
         if s is None:
             s = by[e.host] = Server(e.host, [], [], 0, 0, 0, 0, 0, 0.0)
-        label = feature_label(e.feature)
+        label = labels.get(e.feature)
+        if label is None:
+            label = labels[e.feature] = feature_label(e.feature)
         if label not in s.features:
             s.features.append(label)
         if e.cause:

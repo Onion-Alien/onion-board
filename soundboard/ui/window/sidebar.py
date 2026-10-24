@@ -284,12 +284,9 @@ class SideRail(QFrame):
         tabs.currentChanged.connect(self.sync)
         self._apply()
 
-    def _wrap(self) -> QWidget:
-        """A see-through box for buttons that only the open rail shows."""
-        return self._wrap_lay()[0]
-
     def _wrap_lay(self) -> tuple[QWidget, QVBoxLayout]:
-        """_wrap's box, and its layout to put the buttons in."""
+        """A see-through box for buttons that only the open rail shows, and its layout
+        to put them in."""
         box = QWidget()
         box.setObjectName("railslot")
         lay = QVBoxLayout(box)
@@ -755,7 +752,6 @@ class SideRail(QFrame):
                                     else QBoxLayout.Direction.TopToBottom)
         for box in self._open_only:
             box.setVisible(shown and not mid)   # mid: as shut, the dot on the arrow
-        self._sync_divider()
         self.toggle.setVisible(not self._squeezed)
         # a window with its side bar, the chevron pointing the way the rail will go:
         # mirrored (Arabic), the bar is on the right and it opens leftwards

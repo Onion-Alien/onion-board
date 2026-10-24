@@ -45,10 +45,6 @@ def fingerprint(path: str) -> str:
         return ""
 
 
-def _safe_name(name: str) -> str:
-    return "".join(c if c.isalnum() or c in " -_" else "_" for c in name).strip()[:40] or "clip"
-
-
 # Where a new sound's file goes, inside SOUNDS_DIR. Plain folders and the sound's own
 # name, so the folder reads like a music library in Explorer (and still does if Onion
 # Board is uninstalled and the sounds are kept). Files from before this were all in

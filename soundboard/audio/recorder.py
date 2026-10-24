@@ -81,11 +81,6 @@ class Recorder:
         with self._lock:
             return self._last()
 
-    def clear_replay(self):
-        """Forget the last CLIP_S seconds (a different source starts)."""
-        with self._lock:
-            self.w = self.filled = 0
-
     def release_replay(self):
         """Forget the replay buffer and free its memory (the next push makes it again)."""
         with self._lock:

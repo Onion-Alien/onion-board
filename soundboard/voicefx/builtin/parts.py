@@ -70,15 +70,32 @@ class _Oversampled:
             return x
         z = np.zeros(n * L, F32)
         z[::L] = x * F32(L)
-        up = np.convolve(np.concatenate([self._up, z]), self.h, "valid")
-        self._up = np.concatenate([self._up, z])[-keep:]
+        buf = np.concatenate([self._up, z])
+        up = np.convolve(buf, self.h, "valid")
+        self._up = buf[-keep:]
         y = shape(up.astype(F32, copy=False))
-        down = np.convolve(np.concatenate([self._down, y]), self.h, "valid")
-        self._down = np.concatenate([self._down, y])[-keep:]
+        buf = np.concatenate([self._down, y])
+        down = np.convolve(buf, self.h, "valid")
+        self._down = buf[-keep:]
         return down[::L].astype(F32, copy=False)
 
     def latency(self, rate: int) -> float:
         return (self.TAPS - 1) / self.factor / rate
+
+
+def _shift_in(h: np.ndarray, x: np.ndarray) -> None:
+    """History `h` (newest last) moves on by len(x) samples, `x` landing at its end,
+    in place. Shifted as one flat run: numpy copies an overlapping 2-D slice through
+    a temporary (an allocation every block), a 1-D one in place. `h` is C-contiguous
+    (np.zeros, only ever written in place), so reshape(-1) is a view of it."""
+    n = len(x)
+    if n >= len(h):
+        h[:] = x[n - len(h):]
+        return
+    f = h.reshape(-1)
+    k = f.size // len(h) * n
+    f[:-k] = f[k:]
+    h[-n:] = x
 
 
 class _Line:
@@ -228,13 +245,8 @@ class _PitchTracker:
         return len(self.hist)
 
     def update(self, x: np.ndarray) -> float:
-        h, n = self.hist, len(x)
-        if n >= len(h):
-            h[:] = x[n - len(h):]
-        else:
-            h[:-n] = h[n:]
-            h[-n:] = x
-        return self.measure(h)
+        _shift_in(self.hist, x)
+        return self.measure(self.hist)
 
     def measure(self, h: np.ndarray) -> float:
         """Pitch of exactly `window` samples."""

@@ -113,8 +113,8 @@ def _headphones(p, fill):
     fill(cups)
 
 
-def _volume(p, fill):
-    """A solid speaker with two sound waves."""
+def _speaker(fill):
+    """The solid speaker _volume and _volume_off draw."""
     body = QPainterPath(QPointF(3.6, 9.2))
     for pt in ((7, 9.2), (11.2, 5.4), (12.4, 5.6), (12.4, 18.4), (11.2, 18.6), (7, 14.8),
                (3.6, 14.8)):
@@ -124,21 +124,18 @@ def _volume(p, fill):
     body.quadTo(QPointF(2.6, 9.2), QPointF(3.6, 9.2))
     body.closeSubpath()
     fill(body)
+
+
+def _volume(p, fill):
+    """A solid speaker with two sound waves."""
+    _speaker(fill)
     p.drawArc(QRectF(11, 8, 6, 8), -75 * 16, 150 * 16)
     p.drawArc(QRectF(11, 4.5, 10, 15), -75 * 16, 150 * 16)
 
 
 def _volume_off(p, fill):
     """The speaker with a cross where its sound waves were: muted."""
-    body = QPainterPath(QPointF(3.6, 9.2))
-    for pt in ((7, 9.2), (11.2, 5.4), (12.4, 5.6), (12.4, 18.4), (11.2, 18.6), (7, 14.8),
-               (3.6, 14.8)):
-        body.lineTo(*pt)
-    body.quadTo(QPointF(2.6, 14.8), QPointF(2.6, 13.8))
-    body.lineTo(2.6, 10.2)
-    body.quadTo(QPointF(2.6, 9.2), QPointF(3.6, 9.2))
-    body.closeSubpath()
-    fill(body)
+    _speaker(fill)
     p.drawLine(QPointF(15.5, 9), QPointF(21, 15))
     p.drawLine(QPointF(21, 9), QPointF(15.5, 15))
 

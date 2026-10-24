@@ -18,6 +18,11 @@ from soundboard.ui.kit.panel import hint_label
 log = logging.getLogger("soundboard.ui.store.storetab")
 
 
+def error_text(e: BaseException) -> str:
+    """A failed store call in words: the store's own message, else the error made plain."""
+    return str(e) if isinstance(e, store.StoreError) else errors.plain(e)
+
+
 def _title(text: str) -> QLabel:
     """A small dialog's one big line (as the Send feedback box's)."""
     lab = QLabel(text)
@@ -240,8 +245,7 @@ class ShareDialog(QDialog):
                 busy.emit(self._sent, "")
             except Exception as e:  # noqa: BLE001
                 log.info("couldn't share a sound: %s", e)
-                busy.emit(self._sent, str(e) if isinstance(e, store.StoreError)
-                          else errors.plain(e))
+                busy.emit(self._sent, error_text(e))
         threading.Thread(target=run, daemon=True, name="store-share").start()
 
     def _on_sent(self, err: str):

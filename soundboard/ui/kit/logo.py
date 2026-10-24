@@ -15,6 +15,25 @@ _LANTERN = {(t["accent"].lower(), t["accent2"].lower()) for t in THEMES.values()
             if t.get("logo") == "lantern"}
 
 
+def _bulb(pt, w: float) -> QPainterPath:
+    """The onion's outline on the caller's `pt` grid, w = half-width at its widest."""
+    path = QPainterPath(pt(0, 0.27))
+    path.cubicTo(pt(w * 0.25, 0.36), pt(w, 0.42), pt(w, 0.59))
+    path.cubicTo(pt(w, 0.74), pt(w * 0.55, 0.81), pt(0, 0.81))
+    path.cubicTo(pt(-w * 0.55, 0.81), pt(-w, 0.74), pt(-w, 0.59))
+    path.cubicTo(pt(-w, 0.42), pt(-w * 0.25, 0.36), pt(0, 0.27))
+    return path
+
+
+def _sprout(pt) -> QPainterPath:
+    """Two leaves curling out of the onion's neck."""
+    leaf = QPainterPath(pt(0, 0.29))
+    leaf.cubicTo(pt(0, 0.20), pt(-0.04, 0.15), pt(-0.12, 0.12))
+    leaf.moveTo(pt(0, 0.27))
+    leaf.cubicTo(pt(0.01, 0.19), pt(0.05, 0.14), pt(0.10, 0.10))
+    return leaf
+
+
 def _paint_lantern(p: QPainter, x0: float, y0: float, s: float, inset: float) -> None:
     """The mark as a jack-o'-lantern: the onion's shape on a night-sky tile, pumpkin
     orange with darker ribs where its layers are, a carved face glowing inside."""
@@ -30,14 +49,6 @@ def _paint_lantern(p: QPainter, x0: float, y0: float, s: float, inset: float) ->
     def pt(dx, dy):
         return QPointF(cx + dx * s, y0 + dy * s)
 
-    def bulb(w):
-        path = QPainterPath(pt(0, 0.27))
-        path.cubicTo(pt(w * 0.25, 0.36), pt(w, 0.42), pt(w, 0.59))
-        path.cubicTo(pt(w, 0.74), pt(w * 0.55, 0.81), pt(0, 0.81))
-        path.cubicTo(pt(-w * 0.55, 0.81), pt(-w, 0.74), pt(-w, 0.59))
-        path.cubicTo(pt(-w, 0.42), pt(-w * 0.25, 0.36), pt(0, 0.27))
-        return path
-
     halo = QRadialGradient(pt(0, 0.6), s * 0.45)   # the candle's light on the night
     halo.setColorAt(0.0, QColor(255, 140, 40, 110))
     halo.setColorAt(1.0, QColor(255, 140, 40, 0))
@@ -46,21 +57,17 @@ def _paint_lantern(p: QPainter, x0: float, y0: float, s: float, inset: float) ->
     stem.setCapStyle(Qt.PenCapStyle.RoundCap)
     p.setPen(stem)
     p.setBrush(Qt.BrushStyle.NoBrush)
-    leaf = QPainterPath(pt(0, 0.29))
-    leaf.cubicTo(pt(0, 0.20), pt(-0.04, 0.15), pt(-0.12, 0.12))
-    leaf.moveTo(pt(0, 0.27))
-    leaf.cubicTo(pt(0.01, 0.19), pt(0.05, 0.14), pt(0.10, 0.10))
-    p.drawPath(leaf)
+    p.drawPath(_sprout(pt))
     skin = QRadialGradient(pt(-0.06, 0.52), s * 0.36)
     skin.setColorAt(0.0, QColor("#ffb347"))
     skin.setColorAt(0.6, QColor("#ff7518"))
     skin.setColorAt(1.0, QColor("#c2440a"))
     p.setPen(Qt.PenStyle.NoPen)
-    p.fillPath(bulb(0.31), skin)
+    p.fillPath(_bulb(pt, 0.31), skin)
     if s >= 20:   # ribs: the onion's layers (one at every size, like paint_logo's)
         rib = QPen(QColor(150, 50, 0, 150), max(1.0, s * 0.026))
         p.setPen(rib)
-        p.drawPath(bulb(0.15))
+        p.drawPath(_bulb(pt, 0.15))
     glow = QLinearGradient(pt(0, 0.48), pt(0, 0.76))   # candlelight through the face
     glow.setColorAt(0.0, QColor("#fff6a8"))
     glow.setColorAt(1.0, QColor("#ffb020"))
@@ -114,34 +121,22 @@ def paint_logo(p: QPainter, rect: QRectF, c1: str, c2: str, inset: float = 0.04)
     def pt(dx, dy):   # offsets in units of s, from the top-centre of the icon
         return QPointF(cx + dx * s, y0 + dy * s)
 
-    def bulb(w):   # onion outline, w = half-width at the widest point
-        path = QPainterPath(pt(0, 0.27))
-        path.cubicTo(pt(w * 0.25, 0.36), pt(w, 0.42), pt(w, 0.59))
-        path.cubicTo(pt(w, 0.74), pt(w * 0.55, 0.81), pt(0, 0.81))
-        path.cubicTo(pt(-w * 0.55, 0.81), pt(-w, 0.74), pt(-w, 0.59))
-        path.cubicTo(pt(-w, 0.42), pt(-w * 0.25, 0.36), pt(0, 0.27))
-        return path
-
     # sprout: two leaves curling out of the neck
     pen = QPen(fg, max(1.2, s * 0.05))
     pen.setCapStyle(Qt.PenCapStyle.RoundCap)
     p.setPen(pen)
     p.setBrush(Qt.BrushStyle.NoBrush)
-    leaf = QPainterPath(pt(0, 0.29))
-    leaf.cubicTo(pt(0, 0.20), pt(-0.04, 0.15), pt(-0.12, 0.12))
-    leaf.moveTo(pt(0, 0.27))
-    leaf.cubicTo(pt(0.01, 0.19), pt(0.05, 0.14), pt(0.10, 0.10))
-    p.drawPath(leaf)
+    p.drawPath(_sprout(pt))
     # bulb
     p.setPen(Qt.PenStyle.NoPen)
-    p.fillPath(bulb(0.29), fg)
+    p.fillPath(_bulb(pt, 0.29), fg)
     # layers: an inner outline in the brand gradient, reading like a sound wave. One at
     # every size, so the taskbar's bigger icon is the same mark as the header's
     if s >= 20:
         lp = QPen(g, max(1.0, s * 0.032))
         lp.setCapStyle(Qt.PenCapStyle.RoundCap)
         p.setPen(lp)
-        p.drawPath(bulb(0.13))
+        p.drawPath(_bulb(pt, 0.13))
     # roots
     if s >= 32:
         rp = QPen(fg, max(1.0, s * 0.03))

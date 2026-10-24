@@ -44,18 +44,18 @@ class StatusControl(Controller):
         main = mw.routectl._main_name() or ""
         self.virtual_mic = eng.virtual_mic_for(main)
         if c.route == "off":
-            mw.setup_hint.setText(_("Sending to others is off: your sounds play in your "
-                                      "headphones and on a device set to Clean, for streaming "
-                                      "(Also play on) only."))
+            hint = _("Sending to others is off: your sounds play in your "
+                     "headphones and on a device set to Clean, for streaming "
+                     "(Also play on) only.")
         elif c.route == "device" and c.main_device and c.main_device == c.mon_device:
-            mw.setup_hint.setText(_("<span style='color:{status}'>That's your headphones too, "
-                                      "so nothing is sent (you'd hear everything twice). Pick "
-                                      "another device, or pick <b>Nobody</b>: your sounds "
-                                      "already play in your headphones, where OBS's Desktop "
-                                      "Audio picks them up.</span>", status=theme.status('warn')))
+            hint = _("<span style='color:{status}'>That's your headphones too, "
+                     "so nothing is sent (you'd hear everything twice). Pick "
+                     "another device, or pick <b>Nobody</b>: your sounds "
+                     "already play in your headphones, where OBS's Desktop "
+                     "Audio picks them up.</span>", status=theme.status('warn'))
         elif c.route == "mic":
-            mw.setup_hint.setText(_("Your sounds go straight into <b>My mic</b>, so Discord "
-                                      "and games hear them through the mic they already use."))
+            hint = _("Your sounds go straight into <b>My mic</b>, so Discord "
+                     "and games hear them through the mic they already use.")
         elif self.virtual_mic:
             hint = (_("A virtual cable is a pipe: audio goes in at <b>{main}</b> and comes out "
                       "at <b>{virtual_mic}</b>, which Discord / the game uses as your mic.",
@@ -69,32 +69,29 @@ class StatusControl(Controller):
                           "{rates}, so it converts your sound on the way through. Fix it for "
                           "the cleanest sound.</span>", colour=theme.status('warn'),
                           rates=rates[0])
-            mw.setup_hint.setText(hint)
         elif main and c.route == "device":
-            mw.setup_hint.setText(_("Whatever listens to <b>{main}</b> gets your sounds (and "
-                                      "your voice, if you send it): OBS, Voicemeeter, a mixer or "
-                                      "a capture card.", main=html.escape(main)))
+            hint = _("Whatever listens to <b>{main}</b> gets your sounds (and "
+                     "your voice, if you send it): OBS, Voicemeeter, a mixer or "
+                     "a capture card.", main=html.escape(main))
         elif main:
-            mw.setup_hint.setText(_("<span style='color:{status}'>That's a normal "
-                                      "speaker/headphone device, so only you will hear the "
-                                      "sounds. Set <b>Send my sounds to</b> back to <b>My "
-                                      "mic</b>, unless that's on purpose.</span>",
-                                      status=theme.status('warn')))
+            hint = _("<span style='color:{status}'>That's a normal "
+                     "speaker/headphone device, so only you will hear the "
+                     "sounds. Set <b>Send my sounds to</b> back to <b>My "
+                     "mic</b>, unless that's on purpose.</span>",
+                     status=theme.status('warn'))
         elif c.route == "cable":
             # the cable is picked, just not installed yet: the line above it and Your
             # virtual mic already say so ("Nothing picked" was wrong, and said it twice)
-            mw.setup_hint.setText("")
+            hint = ""
         else:
-            mw.setup_hint.setText(_("<span style='color:{status}'>Nothing picked: only you "
-                                      "will hear sounds.</span>", status=theme.status('warn')))
+            hint = _("<span style='color:{status}'>Nothing picked: only you "
+                     "will hear sounds.</span>", status=theme.status('warn'))
         down = [n for n in mw.engine.copies_down() if n in mw.routectl._copy_names()]
         if down:
             devices = ", ".join(f"<b>{html.escape(n)}</b>" for n in down)
-            mw.setup_hint.setText(
-                mw.setup_hint.text()
-                + _("<br><span style='color:{status}'>Can't open {devices} (under Also play on). "
-                    "Plugged in? It's tried again by itself.</span>",
-                    status=theme.status('warn'), devices=devices))
+            hint += _("<br><span style='color:{status}'>Can't open {devices} (under Also play on). "
+                      "Plugged in? It's tried again by itself.</span>",
+                      status=theme.status('warn'), devices=devices)
         # the headphones or mic picked here won't open (unplugged): the toast about it
         # fades, so say it where the device is picked until it's back
         unplugged = {}   # ...and the toast says it in the same words, not PortAudio's
@@ -111,16 +108,16 @@ class StatusControl(Controller):
                     "<br><span style='color:{status}'>Can't open {devices} (My headphones). "
                     "Plugged in? It's tried again by itself.</span>",
                     status=theme.status('warn'), devices=dev)
-                mw.setup_hint.setText(mw.setup_hint.text() + unplugged["mon"])
+                hint += unplugged["mon"]
             if dev := gone("mic"):
                 unplugged["mic"] = _(
                     "<br><span style='color:{status}'>Can't open {devices} (My mic). "
                     "Plugged in? It's tried again by itself.</span>",
                     status=theme.status('warn'), devices=dev)
-                mw.setup_hint.setText(mw.setup_hint.text() + unplugged["mic"])
-        if mw.setup_hint.text().startswith("<br>"):   # only the lines above: no blank first line
-            mw.setup_hint.setText(mw.setup_hint.text()[4:])
-        mw.setup_hint.setVisible(bool(mw.setup_hint.text()))   # (no empty gap)
+                hint += unplugged["mic"]
+        hint = hint.removeprefix("<br>")   # only the lines above: no blank first line
+        mw.setup_hint.setText(hint)
+        mw.setup_hint.setVisible(bool(hint))   # (no empty gap)
         mw.set_sending(mw.btn_air.isChecked())   # its label follows the route
         self._update_flow()
         where = {"main": _("sending"), "mon": _("headphones"), "mic": _("mic"),

@@ -650,8 +650,8 @@ class BunnyWidget(BunnyBuild, BunnyDance, BunnyPaint, QWidget):
             self._say(self.lines, BEG)
             self._next_beg = now + BEG + self._rng.uniform(3, 6)
         self._step_fidget(now)
-        self._spring(now, dt)
-        if not self._still(now):
+        pose = self._spring(now, dt)
+        if not self._still(now, pose):
             self.update()
         if settling and self._calm(now):
             self._timer.stop()   # (this frame is the one he keeps)
@@ -950,9 +950,10 @@ class BunnyWidget(BunnyBuild, BunnyDance, BunnyPaint, QWidget):
             return kept
         return pose
 
-    def _still(self, now: float) -> bool:
+    def _still(self, now: float, pose: dict | None = None) -> bool:
         """The next frame would look just like the last one: his kept picture still
-        stands for him and nothing round him moves, so no repaint."""
+        stands for him and nothing round him moves, so no repaint. `pose`: his pose at
+        `now` before the springy layer, when the caller already has it (_spring's)."""
         if (not HOLD or self._kept_pose is None
                 or type(self).paintEvent is not BunnyWidget.paintEvent):   # (SetupShow)
             return False
@@ -960,7 +961,7 @@ class BunnyWidget(BunnyBuild, BunnyDance, BunnyPaint, QWidget):
                 or self.celebrate or self.building or self._fail_t >= 0 or self._fin_t >= 0
                 or self._pop_t >= 0 or self.say != self._painted_say):
             return False
-        pose = self.springy(self.pose(now))
+        pose = self.springy(self.pose(now) if pose is None else pose)
         return self._held(pose, self.devicePixelRatioF()) is self._kept_pose
 
     def paintEvent(self, ev):

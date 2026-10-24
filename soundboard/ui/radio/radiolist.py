@@ -307,18 +307,13 @@ class _FilterRow(QWidget):
                                           QSize(text, fm.height()), c)
         return max(c.minimumSizeHint().width(), full.width())
 
-    def fits(self, idx: list[int], width: int) -> bool:
-        """Whether these boxes side by side in `width` each get their words' room
-        (_arrange shares a row out in proportion to what each box needs)."""
-        return sum(self.needs(self.combos[i]) for i in idx) + self.GAP * (len(idx) - 1) <= width
-
     def rows_for(self, width: int) -> int:
-        every = list(range(len(self.combos)))
-        if self.fits(every, width):
+        need = [self.needs(c) for c in self.combos]
+        if sum(need) + self.GAP * (len(need) - 1) <= width:
             return 1
-        if self.fits(every[1:], width):
+        if sum(need[1:]) + self.GAP * (len(need) - 2) <= width:
             return 2
-        return len(every)
+        return len(need)
 
     def _arrange(self, rows: int):
         if rows != self.rows:
@@ -333,10 +328,12 @@ class _FilterRow(QWidget):
                 h.addStretch(1)   # boxes as wide as their words, the rest left empty
             self.updateGeometry()
         for c in self.combos:   # a box's share of its row: what its words need
+            need = self.needs(c)
             for h in self._lines:
-                if h.indexOf(c) >= 0:
-                    h.setStretch(h.indexOf(c), self.needs(c))
-            c.setMaximumWidth(self.needs(c))   # and no wider: the row's rest stays empty
+                i = h.indexOf(c)
+                if i >= 0:
+                    h.setStretch(i, need)
+            c.setMaximumWidth(need)   # and no wider: the row's rest stays empty
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
@@ -575,11 +572,11 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             return list(self.tab.recent)
         return list(self.tab._globe_list)
 
-    def _fill_countries(self, source: list[Station], filtered: bool = False):
-        """The country menu: how many of `source` each country has with the other
-        filters on (`filtered`: they already are)."""
+    def _fill_countries(self, others: list[Station]):
+        """The country menu: how many of `others` (the stations with the other filters
+        already on) each country has."""
         counts: dict[str, int] = {}
-        for s in source if filtered else self._filtered(source, country=False):
+        for s in others:
             c = _country(s)
             if c:
                 counts[c] = counts.get(c, 0) + 1
@@ -597,8 +594,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         cmb.setCurrentIndex(max(0, cmb.findData(self.tab._country)))
         cmb.blockSignals(False)
 
-    def visible_stations(self, source: list[Station] | None = None) -> list[Station]:
-        return self._sorted(self._filtered(self._source() if source is None else source))
+    def visible_stations(self) -> list[Station]:
+        return self._sorted(self._filtered(self._source()))
 
     def _sorted(self, stations: list[Station]) -> list[Station]:
         key = SORTS[max(0, self.tab.cmb_sort.currentIndex())][1]
@@ -609,7 +606,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         source = self._source()    # once: a search goes through every known station
         others = (self._popular_filtered(country=False) if self._popular_showing()
                   else self._filtered(source, country=False))
-        self._fill_countries(others, filtered=True)
+        self._fill_countries(others)
         every = self._sorted([s for s in others if _country(s) == self.tab._country]
                              if self.tab._country else others)
         stations = every[:LIST_MAX]

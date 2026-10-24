@@ -7,8 +7,9 @@ import math
 import time
 from dataclasses import dataclass
 
+import numpy as np
 from PySide6.QtCore import QEvent, QObject, QRectF, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QFont, QFontMetrics, QMouseEvent, QPainter, QPen
+from PySide6.QtGui import QColor, QFont, QFontMetrics, QImage, QMouseEvent, QPainter, QPen
 from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QPushButton, QSizePolicy,
                                QSpacerItem, QVBoxLayout, QWidget)
 
@@ -353,13 +354,14 @@ class OutputBlock(QFrame):
         pm = glyph.pixmap()
         if pm.isNull():
             return 0, 0
-        img = pm.toImage()
-        cols = [x for x in range(img.width())
-                if any(img.pixelColor(x, y).alpha() > 40 for y in range(img.height()))]
-        if not cols:
+        img = pm.toImage().convertToFormat(QImage.Format.Format_ARGB32)
+        w, h = img.width(), img.height()
+        alpha = np.frombuffer(img.constBits(), np.uint32, w * h).reshape(h, w) >> 24
+        cols = np.flatnonzero((alpha > 40).any(axis=0))
+        if not cols.size:
             return 0, 0
         ratio = pm.devicePixelRatio() or 1
-        return round(cols[0] / ratio), round((img.width() - 1 - cols[-1]) / ratio)
+        return round(int(cols[0]) / ratio), round((w - 1 - int(cols[-1])) / ratio)
 
     def _balance(self, row: QHBoxLayout, glyph: QLabel, label: QLabel, tail: QLabel | None,
                  top: int, bottom: int):
@@ -436,9 +438,9 @@ class OutputBlock(QFrame):
         # the status line: in its own button, the card's padding round it and its own
         # inside it
         status_x = 2 * px(self.PAD) + px(self.GLYPH) + px(self.GAP)
-        status = self._metrics(scale).horizontalAdvance(self.status_text.text())
-        network = max((self._metrics(scale).horizontalAdvance(line.words)
-                       for line in self._lines), default=0)
+        fm = self._metrics(scale)
+        status = fm.horizontalAdvance(self.status_text.text())
+        network = max((fm.horizontalAdvance(line.words) for line in self._lines), default=0)
         halves = 2 if self.stop is not None else 1
         return max(2 * px(self.PAD) + halves * px(self.PAIR_H) + (halves - 1) * px(self.PAIR_GAP),
                    status_x + status + 1 + px(self.GAP - 2) + px(self.CHEVRON)

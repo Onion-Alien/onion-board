@@ -11,17 +11,6 @@ def test_locale_for_a_language():
     assert winvoices.locale_for("xx") == "xx-XX"
 
 
-def test_voice_tokens_are_matched_to_their_language():
-    tokens = frozenset({"MSTTS_V110_enUS_ZiraM", "TTS_MS_ZH-CN_HUIHUI_11.0"})
-    assert winvoices.has_language(tokens, "zh")
-    assert winvoices.has_language(frozenset({"MSTTS_V110_zhCN_YaoyaoM"}), "zh")
-    assert winvoices.has_language(tokens, "en")
-    assert not winvoices.has_language(tokens, "de")
-    assert not winvoices.has_language(tokens, "zh-TW")     # a country wants its own voice
-    assert winvoices.has_language(frozenset({"MSTTS_V110_zhTW_HanHanM"}), "zh-TW")
-    assert winvoices.has_language(frozenset({"MSTTS_V110_ptBR_MariaM"}), "pt-BR")
-
-
 def test_installer_answers():
     assert winvoices.outcome(0, "", "OK Language.TextToSpeech~~~zh-CN~0.0.1.0") == "ok"
     assert winvoices.outcome(0, "", "RESTART x  ") == "restart"

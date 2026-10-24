@@ -92,30 +92,36 @@ class MapLabels(_Base):
             got = self._placed[key] = list(self._label_boxes(tr, s, whole, fm))
         return got
 
+    def _label_steps(self, p: QPainter, s: float, corners, rect: QRectF, pause: bool = False):
+        """The steps that draw the country names placed at scale `s` that fall in `rect`
+        (pixels), from each world corner in `corners`, a name a step (`pause`: a step
+        after placing them first)."""
+        t = theme.T
+        font, colour = self._label_style(s)
+        fm = QFontMetricsF(font)
+        halo = QPen(_mix(t["bg"], t["text"], 0.14), 3)
+        halo.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
+        placed = self._place_labels(s)
+        if pause:
+            yield
+        for corner in corners:
+            for box, name in placed:
+                box = box.translated(corner)
+                if not box.adjusted(-3, -3, 3, 3).intersects(rect):
+                    continue
+                path = QPainterPath()
+                path.addText(box.left(), box.top() + fm.ascent(), font, name)
+                p.strokePath(path, halo)
+                p.fillPath(path, colour)
+                yield
+
     def _names_steps(self, pic: QPixmap, s: float):
         """The steps that draw the country names in view onto `pic`, a name a step."""
         q = QPainter(pic)
         try:
             q.setRenderHint(QPainter.RenderHint.Antialiasing)
-            t = theme.T
-            font, colour = self._label_style(s)
-            fm = QFontMetricsF(font)
-            halo = QPen(_mix(t["bg"], t["text"], 0.14), 3)
-            halo.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
-            rect = QRectF(self.rect())
-            placed = self._place_labels(s)
-            yield
-            for k in self._copies():
-                corner = self._origin(k, s)
-                for box, name in placed:
-                    box = box.translated(corner)
-                    if not box.adjusted(-3, -3, 3, 3).intersects(rect):
-                        continue
-                    path = QPainterPath()
-                    path.addText(box.left(), box.top() + fm.ascent(), font, name)
-                    q.strokePath(path, halo)
-                    q.fillPath(path, colour)
-                    yield
+            yield from self._label_steps(q, s, (self._origin(k, s) for k in self._copies()),
+                                         QRectF(self.rect()), pause=True)
         finally:
             q.end()
 
