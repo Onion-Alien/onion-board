@@ -18,7 +18,7 @@ from PySide6.QtCore import QEvent, QPoint, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QComboBox, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QMenu,
                                QPushButton, QScrollArea, QStackedWidget, QVBoxLayout, QWidget)
 
-from soundboard.core import achievements, errors, usage
+from soundboard.core import achievements, usage
 from soundboard.ui.kit import wheelguard
 from soundboard.online import net, store
 from soundboard.i18n import _
@@ -28,7 +28,7 @@ from soundboard.ui.kit.panel import hint_label, icon_button, section_label
 from soundboard.ui.store.storefit import CARD_GAP, LIST_GAP, StoreFit
 from soundboard.ui.store.storeplay import StorePlay
 from soundboard.ui.store.storerow import SoundRow, count_text
-from soundboard.ui.store.storeshare import ShareDialog
+from soundboard.ui.store.storeshare import ShareDialog, error_text
 # (callers import these from here too)
 from soundboard.ui.store.storefit import CARD_MIN_W, ONE_ROW  # noqa: F401
 from soundboard.ui.store.storerow import COUNT_W, _blocked, meta_line  # noqa: F401
@@ -531,7 +531,7 @@ class StoreTab(StoreFit, StorePlay, QWidget):
                 log.info("couldn't read the store: %s", e)
                 busy.emit(self._listed, serial,
                           (replace, None, e if isinstance(e, store.StoreDown) else None), False,
-                          str(e) if isinstance(e, store.StoreError) else errors.plain(e))
+                          error_text(e))
         threading.Thread(target=run, daemon=True, name="store-list").start()
 
     def _on_listed(self, serial: int, got, more: bool, err: str):
@@ -627,8 +627,7 @@ class StoreTab(StoreFit, StorePlay, QWidget):
                 busy.emit(self._fetched, row, (what, str(store.fetch(s))), "")
             except Exception as e:  # noqa: BLE001 - never a crash
                 log.info("couldn't fetch store sound %s: %s", s.id, e)
-                busy.emit(self._fetched, row, (what, ""),
-                          str(e) if isinstance(e, store.StoreError) else errors.plain(e))
+                busy.emit(self._fetched, row, (what, ""), error_text(e))
         threading.Thread(target=run, daemon=True, name="store-fetch").start()
 
     def _on_fetched(self, row: SoundRow, got, err: str):
@@ -695,8 +694,7 @@ class StoreTab(StoreFit, StorePlay, QWidget):
                 else:
                     busy.emit(self._voted, row, store.vote(install, s.id, value), "")
             except Exception as e:  # noqa: BLE001
-                busy.emit(self._voted, row, old,
-                          str(e) if isinstance(e, store.StoreError) else errors.plain(e))
+                busy.emit(self._voted, row, old, error_text(e))
         threading.Thread(target=run, daemon=True, name="store-vote").start()
 
     def _on_voted(self, row: SoundRow, counts, err: str):
@@ -739,8 +737,7 @@ class StoreTab(StoreFit, StorePlay, QWidget):
                     store.report(install, s.id, reason)
                 busy.emit(self._voted, row, (s.up, s.down, s.mine), "")
             except Exception as e:  # noqa: BLE001
-                busy.emit(self._voted, row, (s.up, s.down, s.mine),
-                          str(e) if isinstance(e, store.StoreError) else errors.plain(e))
+                busy.emit(self._voted, row, (s.up, s.down, s.mine), error_text(e))
         busy.toast(self.window(), html.escape(_("Thanks: the voice will be checked.") if voice
                                               else _("Thanks: the sound will be checked.")), "ok")
         threading.Thread(target=run, daemon=True, name="store-report").start()

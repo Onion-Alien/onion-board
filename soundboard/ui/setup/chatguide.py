@@ -59,6 +59,16 @@ def _bun(prop: str) -> BunnyWidget:
     return BunnyWidget(prop, height=BUN_H, pad=BUN_PAD)
 
 
+def _copy_mic(parent: QDialog, vm: str, kept: bool) -> QPushButton:
+    """*Copy the mic name*, for a guide's button row (hidden when it goes straight into the mic)."""
+    copy = QPushButton(_("Copy the mic name"), parent)   # parent: see test_no_flash_windows
+    icons.set_icon(copy, "copy")
+    copy.clicked.connect(lambda: (QApplication.clipboard().setText(vm),
+                                  busy.flash(copy, _("✓  Copied"))))
+    copy.setVisible(not kept)   # straight into the mic: nothing to pick
+    return copy
+
+
 # --------------------------------------------------------------------------- the check
 
 def find_discord():
@@ -693,12 +703,7 @@ class DiscordGuide(QDialog):
         self.result_box.hide()
         v.addWidget(self.result_box)
         row = QHBoxLayout()
-        copy = QPushButton(_("Copy the mic name"), self)   # parent: see test_no_flash_windows
-        icons.set_icon(copy, "copy")
-        copy.clicked.connect(lambda: (QApplication.clipboard().setText(vm),
-                                      busy.flash(copy, _("✓  Copied"))))
-        copy.setVisible(not kept)   # straight into the mic: nothing to pick
-        row.addWidget(copy)
+        row.addWidget(_copy_mic(self, vm, kept))
         opn = QPushButton(_("Open Discord"))
         opn.setToolTip(_("Opens Discord's Voice & Video settings"))
         opn.clicked.connect(lambda: busy.open_url(
@@ -857,12 +862,7 @@ class GameGuide(QDialog):
               "(Fortnite) or <b>Low bandwidth</b> (older and console titles), choose "
               "<b>Advanced</b> and pick it."))))
         row = QHBoxLayout()
-        copy = QPushButton(_("Copy the mic name"), self)   # parent: see test_no_flash_windows
-        icons.set_icon(copy, "copy")
-        copy.clicked.connect(lambda: (QApplication.clipboard().setText(vm),
-                                      busy.flash(copy, _("✓  Copied"))))
-        copy.setVisible(not kept)   # straight into the mic: nothing to pick
-        row.addWidget(copy)
+        row.addWidget(_copy_mic(self, vm, kept))
         ptt = QPushButton(_("Auto push-to-talk"))
         ptt.clicked.connect(lambda: mw.setctl.open_settings("hotkeys"))
         row.addWidget(ptt)
@@ -909,12 +909,7 @@ class MeetingGuide(QDialog):
             _("On the Setup tab, set <b>Who's listening</b> to <b>Voice chat</b>. It picks "
               "the browser shaping by itself once the call is listening."))))
         row = QHBoxLayout()
-        copy = QPushButton(_("Copy the mic name"), self)   # parent: see test_no_flash_windows
-        icons.set_icon(copy, "copy")
-        copy.clicked.connect(lambda: (QApplication.clipboard().setText(vm),
-                                      busy.flash(copy, _("✓  Copied"))))
-        copy.setVisible(not kept)   # straight into the mic: nothing to pick
-        row.addWidget(copy)
+        row.addWidget(_copy_mic(self, vm, kept))
         row.addStretch(1)
         done = QPushButton(_("Done"))
         done.setObjectName("primary")

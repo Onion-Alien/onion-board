@@ -16,7 +16,7 @@ from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import (QComboBox, QDialog, QHBoxLayout, QLabel, QLineEdit,
                                QPushButton, QVBoxLayout, QWidget)
 
-from soundboard.core import errors, usage
+from soundboard.core import usage
 from soundboard.mic import savedvoices, voicesetups
 from soundboard import voicefx
 from soundboard.online import store, storevoices as sv
@@ -24,6 +24,7 @@ from soundboard.i18n import _
 from soundboard.speech import aivoicelist as avl
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import HoverCard
+from soundboard.ui.store.storeshare import error_text
 from soundboard.ui.store.storetab import SoundRow
 
 if TYPE_CHECKING:
@@ -261,8 +262,7 @@ class ShareVoiceDialog(QDialog):
                 sv.share(install, p)
                 busy.emit(self._sent, "")
             except Exception as e:  # noqa: BLE001 - said in the window, never a crash
-                busy.emit(self._sent, str(e) if isinstance(e, store.StoreError)
-                          else errors.plain(e))
+                busy.emit(self._sent, error_text(e))
         threading.Thread(target=run, daemon=True, name="store-share-voice").start()
 
     def _on_sent(self, err: str):

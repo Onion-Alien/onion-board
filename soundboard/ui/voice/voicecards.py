@@ -248,19 +248,18 @@ class VoiceCards(_Panel):
         fx, ai, tts = (self.fx.btn_power.isChecked(), self.ai.is_on(),
                        self.speech.livevoice.b_live.isChecked())
         # the switches already say On: their heads only add the language
-        self._set_state("fx", fx, late if fx and not ai and not tts else "", say_on=False)
-        self._set_state("ai", ai, late if ai and not tts else "", say_on=False)
+        self._set_state("fx", fx, late if fx and not ai and not tts else "")
+        self._set_state("ai", ai, late if ai and not tts else "")
         # another language spoken for the AI voice or the voice changer is on here too:
         # its tab lights up beside theirs (it only did while the computer voice spoke)
         speaking = tts or (m is not None and spoken.heard())
         # its switch and its lit card already say which: no words beside the switch
-        self._set_state("speak", speaking, "", say_on=False)
+        self._set_state("speak", speaking, "")
 
-    def _set_state(self, key: str, on: bool, note: str, say_on: bool = True):
-        text = " · ".join(t for t in (_("On") if on and say_on else "", note) if t)
+    def _set_state(self, key: str, on: bool, note: str):
         st = self._states[key]
-        st.setText(text)
-        st.setVisible(bool(text))
+        st.setText(note)
+        st.setVisible(bool(note))
         tab = self._tabs[key]
         if tab.property("live") != on:   # a tab that's on shows it, picked or not
             tab.setProperty("live", on)

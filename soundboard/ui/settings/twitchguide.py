@@ -8,13 +8,13 @@ from __future__ import annotations
 from urllib.parse import quote
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QHBoxLayout, QPushButton,
-                               QScrollArea, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import QApplication, QDialog, QHBoxLayout, QPushButton, QVBoxLayout
 
 from soundboard.control import remote, streamapi
 from soundboard.i18n import _
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.setup.chatguide import _bun, _header, _label, _steps
+from soundboard.ui.setup.wizardkit import scrolled
 
 PROMPT_SOUNDS = 120     # a big library: list this many names, the AI can ask for the rest
 
@@ -184,18 +184,7 @@ class TwitchGuide(QDialog):
               "prompt</b> and paste it into ChatGPT or Claude. It knows your rewards and "
               "sounds and walks you through it.")))
         steps.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        body = QWidget()
-        bl = QVBoxLayout(body)
-        bl.setContentsMargins(0, 0, 8, 0)
-        bl.addWidget(steps)
-        bl.addStretch(1)
-        scroll = QScrollArea()
-        scroll.setWidget(body)
-        scroll.setWidgetResizable(True)
-        scroll.setFrameShape(QFrame.Shape.NoFrame)
-        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        scroll.setMinimumHeight(300)
-        v.addWidget(scroll, 1)
+        v.addWidget(scrolled(steps), 1)
 
         row = QHBoxLayout()
         row.addStretch(1)

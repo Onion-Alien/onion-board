@@ -358,13 +358,6 @@ class FlatMap(MapTiles, MapLabels, QWidget):
         return [k for k in (-360, 0, 360)
                 if self.cx - half < 180 + k and self.cx + half > -180 + k]
 
-    def _transform(self) -> QTransform:
-        s = self._scale()
-        t = QTransform()
-        t.translate(self.width() / 2 - self.cx * s, self.height() / 2 + self.cy * s)
-        t.scale(s, s)
-        return t
-
     def _screen(self) -> tuple[np.ndarray, np.ndarray]:
         """Each dot's spot on screen: its copy of the world nearest the middle."""
         s = self._scale()
@@ -555,20 +548,7 @@ class FlatMap(MapTiles, MapLabels, QWidget):
                       & (ys > rect.top() - pad) & (ys < rect.bottom() + pad))
                 yield from self._dots_steps(p, xs, ys, np.flatnonzero(on), r)
             # country names last, outlined in the land's colour, so the dots don't hide them
-            font, colour = self._label_style(s)
-            fm = QFontMetricsF(font)
-            halo = QPen(_mix(t["bg"], t["text"], 0.14), 3)
-            halo.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
-            corner = tr.map(QPointF(-180, -LAT_TOP))
-            for box, name in self._place_labels(s):
-                box = box.translated(corner)
-                if not box.adjusted(-3, -3, 3, 3).intersects(rect):
-                    continue
-                path = QPainterPath()
-                path.addText(box.left(), box.top() + fm.ascent(), font, name)
-                p.strokePath(path, halo)
-                p.fillPath(path, colour)
-                yield
+            yield from self._label_steps(p, s, (tr.map(QPointF(-180, -LAT_TOP)),), rect)
         finally:
             p.restore()
 

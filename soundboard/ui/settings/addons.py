@@ -20,6 +20,12 @@ from soundboard.ui.kit.wheelguard import no_wheel
 log = logging.getLogger(__name__)
 
 
+class _PocketRelay(QObject):
+    """An Onion Pocket download (`done`) or update check (`found`), back on the UI thread."""
+    found = Signal(object)
+    done = Signal(object)
+
+
 class _AddonGrid(QWidget):
     """Settings → Add-ons: each add-on's name, status line and buttons, the buttons in
     shared columns so they line up from one add-on to the next. As many columns as
@@ -375,13 +381,10 @@ class AddonsPage(Page):
         from soundboard.online import netlog
         from soundboard.addons import pocketaddon
 
-        class Relay(QObject):
-            done = Signal(object)
-
         release = busy.hold(btn, text)
         netlog.cause(pocketaddon.FEATURE, "You clicked to get Onion Pocket "
                                           "(Settings > Add-ons)")
-        relay = Relay(self.mw)   # the main window's: it's loaded even if Settings closes
+        relay = _PocketRelay(self.mw)   # the main window's: it's loaded even if Settings closes
 
         def finish(new):
             relay.deleteLater()
@@ -665,17 +668,13 @@ class AddonsPage(Page):
         if lay is None:
             return
 
-        class Relay(QObject):
-            found = Signal(object)
-            done = Signal(object)
-
         btn = QPushButton()
         btn.setObjectName("primary")
         btn.hide()
         row = _button_row()
         row.addWidget(btn)
         lay.addLayout(row)
-        found = Relay(card)
+        found = _PocketRelay(card)
         state = {}
 
         def show(offer):
@@ -725,7 +724,7 @@ class AddonsPage(Page):
             state["release"] = busy.hold(btn, _("Updating Onion Pocket…"))
             netlog.cause(pocketaddon.FEATURE, "You clicked to update Onion Pocket "
                                               "(Settings > Remote)")
-            relay = Relay(mw)   # the main window's: it's swapped in even if Settings closes
+            relay = _PocketRelay(mw)   # the main window's: it's swapped in even if Settings closes
             relay.done.connect(lambda new: finish(new, relay))
             threading.Thread(target=lambda: relay.done.emit(pocketaddon.get(offer=offer)),
                              daemon=True, name="onion-pocket-update").start()
@@ -755,9 +754,6 @@ class AddonsPage(Page):
         from soundboard.online import netlog
         from soundboard.addons import pocketaddon
 
-        class Relay(QObject):
-            done = Signal(object)
-
         card, cv = self._card(_("Onion Pocket: your pads on your phone"),
                               _("Scan a code with your phone's camera and tap a pad on the phone "
                                 "to play it here. iPhone or Android, in the browser: nothing to "
@@ -766,7 +762,7 @@ class AddonsPage(Page):
         row = _button_row()
         row.addWidget(get)
         cv.addLayout(row)
-        relay = Relay(card)
+        relay = _PocketRelay(card)
 
         def finish(info):
             if not qt_valid(card):

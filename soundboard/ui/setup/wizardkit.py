@@ -6,7 +6,8 @@ import re
 from typing import TYPE_CHECKING, Any
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QDialog, QFrame, QHBoxLayout, QLabel, QVBoxLayout
+from PySide6.QtWidgets import (QDialog, QFrame, QHBoxLayout, QLabel, QScrollArea, QVBoxLayout,
+                               QWidget)
 
 from soundboard.ui.kit import theme
 from soundboard.ui.bun.bunnywidget import BunnyWidget
@@ -115,6 +116,22 @@ def _card(margins: int = 16, spacing: int = 12,
     lay.setContentsMargins(margins, margins, margins, margins)
     lay.setSpacing(spacing)
     return card, lay
+
+
+def scrolled(inner: QWidget) -> QScrollArea:
+    """`inner` in a frameless scroll area that only scrolls down (a guide's long steps)."""
+    body = QWidget()
+    bl = QVBoxLayout(body)
+    bl.setContentsMargins(0, 0, 8, 0)
+    bl.addWidget(inner)
+    bl.addStretch(1)
+    scroll = QScrollArea()
+    scroll.setWidget(body)
+    scroll.setWidgetResizable(True)
+    scroll.setFrameShape(QFrame.Shape.NoFrame)
+    scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+    scroll.setMinimumHeight(300)
+    return scroll
 
 
 def _label(text: str, css: str = BODY_CSS) -> QLabel:
