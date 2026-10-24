@@ -4441,5 +4441,10 @@
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…o i-click ang side button ng mouse (Mouse 4 / 5) sa window na ito. Esc = kanselahin.",
   "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Nasa mic mo na ang Onion Board, pero hindi pa ito sinisimulan ng Windows. I-restart ang PC mo: magsisimula ito kasabay ng Windows.",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Nasa mic mo na ang Onion Board, pero mula noon ay may mic na ayaw bumukas. I-restart ang PC mo.",
-  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Hindi tumigil sandali ang tunog ng Windows, kaya hindi nabago ang mic mo. Isara ang mga laro at voice chat app, o i-restart ang PC mo."
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Hindi tumigil sandali ang tunog ng Windows, kaya hindi nabago ang mic mo. Isara ang mga laro at voice chat app, o i-restart ang PC mo.",
+  "Copy invite link": "Kopyahin ang invite link",
+  "Invite a friend": "Mag-imbita ng kaibigan",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Padalhan ang kaibigan ng link para i-download ang Onion Board. Ilagay ang pangalan o gamertag mo at babatiin sila ng app para sa iyo sa unang beses nilang buksan ito. Walang sinusubaybayan o binibilang.",
+  "Your name or gamertag (optional)": "Pangalan o gamertag mo (opsyonal)",
+  "{name} invited you to Onion Board. Have fun!": "Inimbita ka ni {name} sa Onion Board. Mag-enjoy!"
 }

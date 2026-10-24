@@ -4363,5 +4363,10 @@
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…hoặc bấm nút bên của chuột (Mouse 4 / 5) trong cửa sổ này. Esc = hủy bỏ.",
   "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board đã ở trên mic của bạn nhưng Windows chưa khởi động nó. Hãy khởi động lại PC: nó sẽ chạy cùng Windows.",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board đã ở trên mic của bạn nhưng từ đó một mic không mở được. Hãy khởi động lại PC.",
-  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Âm thanh của Windows không chịu tạm dừng nên mic của bạn chưa được thay đổi. Hãy đóng trò chơi và ứng dụng trò chuyện thoại, hoặc khởi động lại PC."
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Âm thanh của Windows không chịu tạm dừng nên mic của bạn chưa được thay đổi. Hãy đóng trò chơi và ứng dụng trò chuyện thoại, hoặc khởi động lại PC.",
+  "Copy invite link": "Sao chép link mời",
+  "Invite a friend": "Mời bạn bè",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Gửi cho bạn bè link tải Onion Board. Ghi tên hoặc gamertag của bạn vào, ứng dụng sẽ chào họ thay bạn khi họ mở lần đầu. Không có gì bị theo dõi hay đếm.",
+  "Your name or gamertag (optional)": "Tên hoặc gamertag của bạn (không bắt buộc)",
+  "{name} invited you to Onion Board. Have fun!": "{name} đã mời bạn dùng Onion Board. Chơi vui nhé!"
 }

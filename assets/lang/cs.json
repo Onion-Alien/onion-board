@@ -4519,5 +4519,10 @@
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…nebo klikni bočním tlačítkem myši (Mouse 4 / 5) v tomto okně. Esc = zrušit.",
   "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board je na vašem mikrofonu, ale Windows ho ještě nespustil. Restartujte PC: spustí se s Windows.",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board je na vašem mikrofonu, ale od té doby se jeden mikrofon neotevře. Restartujte PC.",
-  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Zvuk Windows se nepozastavil, takže mikrofon nebyl změněn. Zavřete hry a aplikace pro hlasový chat, nebo restartujte PC."
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Zvuk Windows se nepozastavil, takže mikrofon nebyl změněn. Zavřete hry a aplikace pro hlasový chat, nebo restartujte PC.",
+  "Copy invite link": "Kopírovat odkaz s pozvánkou",
+  "Invite a friend": "Pozvi kamaráda",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Pošli kamarádovi odkaz ke stažení Onion Board. Přidej k němu své jméno nebo herní přezdívku a aplikace ho od tebe pozdraví, až ji poprvé otevře. Nic se nesleduje ani nepočítá.",
+  "Your name or gamertag (optional)": "Tvoje jméno nebo herní přezdívka (nepovinné)",
+  "{name} invited you to Onion Board. Have fun!": "{name} tě pozval(a) do Onion Board. Bav se!"
 }

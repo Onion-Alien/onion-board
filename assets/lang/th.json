@@ -4363,5 +4363,10 @@
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…หรือคลิกปุ่มข้างเมาส์ (Mouse 4 / 5) ในหน้าต่างนี้ Esc = ยกเลิก",
   "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board อยู่บนไมค์ของคุณแล้ว แต่ Windows ยังไม่ได้เริ่มมัน รีสตาร์ท PC: มันจะเริ่มพร้อมกับ Windows",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board อยู่บนไมค์ของคุณแล้ว แต่ตั้งแต่นั้นมีไมค์ตัวหนึ่งเปิดไม่ได้ รีสตาร์ท PC",
-  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "เสียงของ Windows ไม่ยอมหยุดชั่วคราว ไมค์ของคุณจึงไม่ได้ถูกเปลี่ยน ปิดเกมและแอปแชทเสียง หรือรีสตาร์ท PC"
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "เสียงของ Windows ไม่ยอมหยุดชั่วคราว ไมค์ของคุณจึงไม่ได้ถูกเปลี่ยน ปิดเกมและแอปแชทเสียง หรือรีสตาร์ท PC",
+  "Copy invite link": "คัดลอกลิงก์เชิญ",
+  "Invite a friend": "ชวนเพื่อน",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "ส่งลิงก์ดาวน์โหลด Onion Board ให้เพื่อน ใส่ชื่อหรือเกมเมอร์แท็กของคุณไว้ แล้วแอปจะทักทายเพื่อนแทนคุณตอนเปิดครั้งแรก ไม่มีการติดตามหรือนับอะไรเลย",
+  "Your name or gamertag (optional)": "ชื่อหรือเกมเมอร์แท็กของคุณ (ไม่บังคับ)",
+  "{name} invited you to Onion Board. Have fun!": "{name} ชวนคุณมาใช้ Onion Board ขอให้สนุก!"
 }

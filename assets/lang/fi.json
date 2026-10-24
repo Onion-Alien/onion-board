@@ -4441,5 +4441,10 @@
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…tai klikkaa hiiren sivupainikkeella (Mouse 4 / 5) tässä ikkunassa. Esc = peruuta.",
   "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board on mikrofonissasi, mutta Windows ei ole vielä käynnistänyt sitä. Käynnistä tietokone uudelleen: se käynnistyy Windowsin mukana.",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board on mikrofonissasi, mutta sen jälkeen yksi mikrofoni ei aukea. Käynnistä tietokone uudelleen.",
-  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Windowsin ääni ei pysähtynyt hetkeksi, joten mikrofoniasi ei muutettu. Sulje pelit ja puhechat-sovellukset tai käynnistä tietokone uudelleen."
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Windowsin ääni ei pysähtynyt hetkeksi, joten mikrofoniasi ei muutettu. Sulje pelit ja puhechat-sovellukset tai käynnistä tietokone uudelleen.",
+  "Copy invite link": "Kopioi kutsulinkki",
+  "Invite a friend": "Kutsu kaveri",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Lähetä kaverille linkki Onion Boardin lataamiseen. Lisää siihen nimesi tai pelinimesi, niin sovellus tervehtii häntä sinun puolestasi, kun hän avaa sen ensimmäisen kerran. Mitään ei seurata eikä lasketa.",
+  "Your name or gamertag (optional)": "Nimesi tai pelinimesi (valinnainen)",
+  "{name} invited you to Onion Board. Have fun!": "{name} kutsui sinut Onion Boardiin. Pidä hauskaa!"
 }

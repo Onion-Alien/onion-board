@@ -564,6 +564,10 @@ class Config:
     # the newest version whose What's new (ui/setup/whatsnew.py) was shown; a first start has
     # nothing to catch up on, a config without it is from an older version
     whats_new_seen: str = __version__
+    # Invite a friend (soundboard.core.invite): the name put on their invite links, and
+    # who invited them (from the installer, greeted once on the first start)
+    invite_name: str = ""
+    invited_by: str = ""
     # the version that last moved an older mic part on by itself (ui: _auto_mic_update),
     # so a "No" at Windows' prompt isn't asked again until the next version
     mic_update_tried: str = ""

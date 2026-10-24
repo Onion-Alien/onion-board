@@ -4441,5 +4441,10 @@
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…eller klik med en sideknap på musen (Mouse 4 / 5) i dette vindue. Esc = annuller.",
   "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board er på din mikrofon, men Windows har ikke startet den endnu. Genstart din pc: den starter med Windows.",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board er på din mikrofon, men siden da vil en mikrofon ikke åbne. Genstart din pc.",
-  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Windows' lyd ville ikke sætte på pause, så din mikrofon blev ikke ændret. Luk spil og voicechat-apps, eller genstart din pc."
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Windows' lyd ville ikke sætte på pause, så din mikrofon blev ikke ændret. Luk spil og voicechat-apps, eller genstart din pc.",
+  "Copy invite link": "Kopiér invitationslink",
+  "Invite a friend": "Inviter en ven",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Send en ven et link til at hente Onion Board. Sæt dit navn eller gamertag på, så siger appen hej fra dig, første gang de åbner den. Intet bliver sporet eller talt.",
+  "Your name or gamertag (optional)": "Dit navn eller gamertag (valgfrit)",
+  "{name} invited you to Onion Board. Have fun!": "{name} har inviteret dig til Onion Board. God fornøjelse!"
 }

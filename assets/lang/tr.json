@@ -4441,5 +4441,10 @@
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…ya da bu pencerede farenin yan tuşuna (Mouse 4 / 5) bas. Esc = iptal et.",
   "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board mikrofonunda, ancak Windows onu henüz başlatmadı. Bilgisayarı yeniden başlat: Windows ile birlikte başlar.",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board mikrofonunda, ancak o zamandan beri bir mikrofon açılmıyor. Bilgisayarı yeniden başlat.",
-  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Windows sesi duraklamadı, bu yüzden mikrofonun değiştirilmedi. Oyunları ve sesli sohbet uygulamalarını kapat ya da bilgisayarı yeniden başlat."
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Windows sesi duraklamadı, bu yüzden mikrofonun değiştirilmedi. Oyunları ve sesli sohbet uygulamalarını kapat ya da bilgisayarı yeniden başlat.",
+  "Copy invite link": "Davet bağlantısını kopyala",
+  "Invite a friend": "Arkadaşını davet et",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Bir arkadaşına Onion Board'u indirmesi için bir bağlantı gönder. Üstüne adını ya da oyuncu adını koy, uygulamayı ilk açtığında senin adına merhaba desin. Hiçbir şey takip edilmez ya da sayılmaz.",
+  "Your name or gamertag (optional)": "Adın ya da oyuncu adın (isteğe bağlı)",
+  "{name} invited you to Onion Board. Have fun!": "{name} seni Onion Board'a davet etti. İyi eğlenceler!"
 }

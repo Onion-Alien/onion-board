@@ -4363,5 +4363,10 @@
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…atau klik tombol samping mouse (Mouse 4 / 5) di jendela ini. Esc = batal.",
   "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board sudah ada di mikmu, tapi Windows belum menjalankannya. Mulai ulang PC-mu: ia berjalan bersama Windows.",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board sudah ada di mikmu, tapi sejak itu ada mik yang tidak mau terbuka. Mulai ulang PC-mu.",
-  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Suara Windows tidak mau berhenti sejenak, jadi mikmu tidak diubah. Tutup game dan aplikasi obrolan suara, atau mulai ulang PC-mu."
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Suara Windows tidak mau berhenti sejenak, jadi mikmu tidak diubah. Tutup game dan aplikasi obrolan suara, atau mulai ulang PC-mu.",
+  "Copy invite link": "Salin link undangan",
+  "Invite a friend": "Undang teman",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Kirim link ke teman untuk mengunduh Onion Board. Taruh nama atau gamertag-mu di situ, dan aplikasinya akan menyapa mereka darimu saat pertama kali dibuka. Tidak ada yang dilacak atau dihitung.",
+  "Your name or gamertag (optional)": "Nama atau gamertag-mu (opsional)",
+  "{name} invited you to Onion Board. Have fun!": "{name} mengundangmu ke Onion Board. Selamat bersenang-senang!"
 }

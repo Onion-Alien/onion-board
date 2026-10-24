@@ -67,6 +67,9 @@ class Built:
     hue_settle: Any
     hue_slider: Any
     hue_swatch: Any
+    invite_copy: Any
+    invite_link: Any
+    invite_name: Any
     lang_button: Any
     lang_dialog: Any
     lang_note: Any

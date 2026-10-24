@@ -636,6 +636,7 @@ def main():
     from soundboard.core import reset
     reset_note = reset.run_pending()   # a reset / restore asked for: before the settings load
     from soundboard.ui.window.mainwindow import MainWindow  # after the QApplication exists
+    from soundboard.ui.window import invitecontrol
     try:
         w = holder["w"] = MainWindow()
     except Exception:  # noqa: BLE001 - tell the user why nothing appeared, then quit
@@ -728,6 +729,7 @@ def main():
         # the installer's "from Soundpad" box; with the setup guide up, run_setup
         # starts it once the guide is closed
         QTimer.singleShot(500, w.impctl.import_queued)
+        QTimer.singleShot(700, lambda: invitecontrol.welcome(w))   # "{name} invited you"
         QTimer.singleShot(LITE_HINT_MS, w.themectl.suggest_lite)   # a slower PC: once
     QTimer.singleShot(600, w.updctl.after_update)   # "Updated to …" after an update restarted it
     # new versions (updates.py): unless unticked, as it starts (what that finds installs

@@ -40,6 +40,7 @@ from soundboard.ui.kit.crashdialog import free_dialog
 from soundboard.ui.kit import restyled, worker
 from soundboard.ui.window.achievepop import AchievementPops
 from soundboard.ui.window.ffmpegcontrol import FfmpegControl
+from soundboard.ui.window import invitecontrol
 from soundboard.ui.window.netcontrol import NetControl
 from soundboard.ui.window.soundscontrol import SoundsControl
 from soundboard.ui.window.windowbuild import (WindowBuilder, version_text)  # noqa: F401  (settings imports it here)
@@ -831,6 +832,7 @@ class MainWindow(QMainWindow):
         # the installer's "from Soundpad" box waits for this, so its progress card
         # isn't stuck over the guide (a no-op once it's done)
         QTimer.singleShot(300, self.impctl.import_queued)
+        QTimer.singleShot(500, lambda: invitecontrol.welcome(self))   # "{name} invited you"
 
     # ------------------------------------------------------------------ settings
     def set_option(self, attr: str, v):

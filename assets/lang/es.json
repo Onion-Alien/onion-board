@@ -4441,5 +4441,10 @@
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…o haz clic con un botón lateral del ratón (Mouse 4 / 5) en esta ventana. Esc = cancelar.",
   "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board está en tu micrófono, pero Windows aún no lo ha iniciado. Reinicia el PC: se inicia con Windows.",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board está en tu micrófono, pero desde entonces un micrófono no se abre. Reinicia el PC.",
-  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "El sonido de Windows no se pudo pausar, así que tu micrófono no ha cambiado. Cierra los juegos y las apps de chat de voz, o reinicia el PC."
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "El sonido de Windows no se pudo pausar, así que tu micrófono no ha cambiado. Cierra los juegos y las apps de chat de voz, o reinicia el PC.",
+  "Copy invite link": "Copiar enlace de invitación",
+  "Invite a friend": "Invitar a un amigo",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Envía a un amigo un enlace para descargar Onion Board. Ponle tu nombre o gamertag y la app le saludará de tu parte la primera vez que la abra. No se rastrea ni se cuenta nada.",
+  "Your name or gamertag (optional)": "Tu nombre o gamertag (opcional)",
+  "{name} invited you to Onion Board. Have fun!": "{name} te ha invitado a Onion Board. ¡Diviértete!"
 }

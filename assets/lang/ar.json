@@ -4753,5 +4753,10 @@
   "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…أو انقر زرًا جانبيًا في الماوس (Mouse 4 / 5) داخل هذه النافذة. Esc = إلغاء.",
   "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board موجود على الميكروفون، لكن Windows لم يشغّله بعد. أعد تشغيل الكمبيوتر: سيبدأ مع Windows.",
   "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board موجود على الميكروفون، لكن منذ ذلك الحين لا يفتح أحد الميكروفونات. أعد تشغيل الكمبيوتر.",
-  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "لم يتوقف صوت Windows مؤقتًا، لذلك لم يتغيّر الميكروفون. أغلق الألعاب وتطبيقات الدردشة الصوتية، أو أعد تشغيل الكمبيوتر."
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "لم يتوقف صوت Windows مؤقتًا، لذلك لم يتغيّر الميكروفون. أغلق الألعاب وتطبيقات الدردشة الصوتية، أو أعد تشغيل الكمبيوتر.",
+  "Copy invite link": "نسخ رابط الدعوة",
+  "Invite a friend": "ادعُ صديقًا",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "أرسل لصديقك رابطًا لتنزيل Onion Board. ضع اسمك أو اسمك في الألعاب عليه، وسيحييه التطبيق باسمك أول مرة يفتحه. لا شيء يُتتبَّع أو يُحسَب.",
+  "Your name or gamertag (optional)": "اسمك أو اسمك في الألعاب (اختياري)",
+  "{name} invited you to Onion Board. Have fun!": "{name} دعاك إلى Onion Board. استمتع!"
 }
