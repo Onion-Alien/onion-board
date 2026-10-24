@@ -304,14 +304,21 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/bun/logowidget.py` | the header logo animated: a breathing glow and sheen, flaring with embers while sounds play |
 | `soundboard/ui/triggers/logoduel.py` | a silent laser exchange between the Board and Watch logos when clicked on the Triggers tab |
 | `soundboard/ui/sounds/overlay.py` | the in-game overlay: a panel of pads that never takes focus, driven by number keys or clicks, on a chosen monitor and spot (or wherever it was dragged) |
-| `soundboard/ui/voice/voicepanel.py` | the Voice tab: lays out its cards and bottom bar, the add-ons list |
+| `soundboard/ui/voice/voicepanel.py` | the Voice tab: lays out its cards and bottom bar; its parts are mixins in the four files below |
+| `soundboard/ui/voice/voicecombos.py` | the Voice tab's side of My voice combos: what's on as a setup, turning one back on, its share code, picture and words |
+| `soundboard/ui/voice/voiceswitch.py` | the Voice tab's on / off: each voice (voice changer, AI voice, computer voice) or all together with Undo, and the voice that's on saying the translated lines |
+| `soundboard/ui/voice/voicecards.py` | the Voice tab's cards and tabs: each card's head and badge, switching tabs, the status bar's chips and the cards' on / off states |
+| `soundboard/ui/voice/voiceaddons.py` | the Voice tab's add-ons list and finding add-ons again (in the background, going on or offline) |
 | `soundboard/ui/voice/voicefxpanel.py` | the Voice tab's voice changer card: voice tiles, effect rows and their sliders. |
 | `soundboard/ui/voice/groupbar.py` | the bar over the voice cards on the Voice changer, AI voices and Languages cards: the group dropdown (with counts), the search box and the cards / list switch |
 | `soundboard/ui/voice/backdroprow.py` | the voice changer's Background card (built-in sounds and board sounds behind your voice) and its Speed and pitch pop-up |
 | `soundboard/ui/voice/effectspopup.py` | the voice bar's Effects pop-up: bundled CC0 background sounds, board sounds and the extra Robot, Radio, Echo and Reverb on top of any voice, one slider and a ✕ each |
 | `soundboard/ui/sounds/voicepicker.py` | Edit sound → Effects → Voice: picture cards of the voice changer's voices, the AI voices and your setups, to lay a voice over a sound |
 | `soundboard/ui/voice/voicesetupsbar.py` | the Voice tab's My voice combos row: save what's on, turn a setup back on, delete with Undo |
-| `soundboard/ui/voice/speechpanel.py` | the Voice tab's Languages card: text-to-speech, live voice-to-speech, translation |
+| `soundboard/ui/voice/speechpanel.py` | the Voice tab's Languages card: text-to-speech, live voice-to-speech, translation; its parts are mixins in the three files below |
+| `soundboard/ui/voice/speechsay.py` | the Languages card's text-to-speech: saying a typed line, saving it as a sound, the computer voices and their settings |
+| `soundboard/ui/voice/speechtiles.py` | the Languages card's language cards: their pictures, chips, favorites and the cards / list view |
+| `soundboard/ui/voice/speechlangs.py` | the Languages card's translation: picking and downloading a language, the live voice speaking in it, who says the lines |
 | `soundboard/ui/voice/livevoice.py` | the Languages card's live voice: Start, translating for the AI voice or voice changer, the helper's events |
 | `soundboard/ui/voice/livesetups.py` | My voice combos in the three Live controls (`MainWindow.livesetups`): picks a setup, makes a sound again in its AI voice before it plays, Cancel |
 | `soundboard/ui/voice/speechinstall.py` | the Languages card's downloads and installs: Windows voices, translation models, speech recognition |
@@ -324,7 +331,10 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/addons/aiaddon.py` | the optional AI voices add-on: its `ai-voices` GitHub release, downloading and checking it, installing and removing it (`ONIONBOARD_AI_VOICES_ZIP` uses a local zip instead). Not shipped with the app or its installer |
 | `soundboard/speech/aivoice.py` | AI voices in the mic chain: `VoiceSource` (`VoiceChain.source`: talk gate with pre-roll, jitter buffer, the backup voice if the helper stalls) and `AiVoiceController` (starts the helper: a `ServiceHost` with audio coming back) |
 | `soundboard/speech/soundvoice.py` | a sound said in an AI voice: runs the clip once through the AI voices helper (off the UI thread) and lines it back up |
-| `soundboard/ui/voice/aivoicepanel.py` | the Voice tab's AI voices card: *Get AI voices*, install, voice cards (chips, Favorites, your own voices), pitch, start/stop, CPU readout, remove |
+| `soundboard/ui/voice/aivoicepanel.py` | the Voice tab's AI voices card: *Get AI voices*, install, remove, the add-on's voices; its parts are mixins in the three files below |
+| `soundboard/ui/voice/aivoicecards.py` | the AI voices card's voice cards (chips, Favorites, cards / list, their pictures) and the bar under the voice that's on |
+| `soundboard/ui/voice/aivoicemine.py` | the AI voices card's own voices (make, edit, delete with Undo), pitch and the backup voice |
+| `soundboard/ui/voice/aivoicerun.py` | the AI voices card's settings, start / stop, CPU readout and what it says while starting, running or failing |
 | `soundboard/ui/voice/aivoicebrowser.py` | the AI voices card's *Hear it* samples and the *Make your own voice* editor (blend two voices, deeper/brighter, how high) |
 | `soundboard/speech/aivoicelist.py` | the AI voices to pick from: the built-in list (same as the add-on's `voices.json`), writing it and your own voices into the installed add-on (`sync`, so old downloads get new voices), and your own voices' file and bin (`%APPDATA%\OnionBoard\ai-voices.json`) |
 | `soundboard/speech/aipreview.py` | *Hear it*: a Windows voice says a line, the add-on's converter turns it into the voice offline (its own Python, `-c`), kept for the run |
