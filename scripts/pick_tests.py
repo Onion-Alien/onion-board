@@ -59,6 +59,8 @@ HUBS = {
     # library.py's code, which the tests reach through library
     *(f"soundboard/sounds/{m}.py" for m in ("paths", "levels", "saving", "tags", "config",
                                             "cachefiles", "decoding", "files")),
+    # engine.py's code, which the tests reach through engine
+    *(f"soundboard/audio/{m}.py" for m in ("devicelist", "enginerender", "enginebus")),
 }
 # too common to say which test is about it
 VAGUE_NAMES = {"__init__.py", "README.md", "LICENSE", ".gitignore", "requirements.txt"}

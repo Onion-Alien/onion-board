@@ -4,7 +4,7 @@ shifter, the device thread, and the small sample helpers the mix uses.
 
 Moved out of soundboard.audio.engine as they were; that module still imports every name, so
 `from soundboard.audio.engine import Ring` keeps working. Nothing here opens a device or
-reads the device list (those stay in engine.py, where tests swap them).
+reads the device list (that's devicelist.py; tests swap its names in engine).
 """
 from __future__ import annotations
 

@@ -22,11 +22,13 @@ import os
 import sys
 import threading
 import time
+import types
 import typing
 from collections.abc import Callable
-from ctypes import (POINTER, Structure, Union, addressof, byref, c_float, c_int, c_int64,
-                    c_long, c_ubyte, c_uint, c_ulong, c_ushort, c_void_p, c_wchar_p, cast, sizeof)
+from ctypes import (POINTER, addressof, byref, c_float, c_int, c_int64,
+                    c_long, c_uint, c_ulong, c_void_p, c_wchar_p, cast, sizeof)
 from dataclasses import dataclass, field
+from typing import Any
 
 if typing.TYPE_CHECKING:
     import numpy as np
@@ -39,6 +41,32 @@ else:
 from soundboard.core import errors
 from soundboard.i18n import _
 
+# its parts, each building on the ones before; all they have is reached through
+# this module too (appaudio.Com, appaudio.running, ...): see _Parts
+from soundboard.audio import appcom, appmics, appprocs
+from soundboard.audio.appcom import *  # noqa: F403
+from soundboard.audio.appprocs import *  # noqa: F403
+from soundboard.audio.appmics import *  # noqa: F403
+from soundboard.audio.appcom import (
+    ACTIVATION_PARAMS, AUDCLNT_BUFFERFLAGS_SILENT, AUDCLNT_E_DEVICE_INVALIDATED,
+    AUDCLNT_E_UNSUPPORTED_FORMAT, AUDCLNT_SHAREMODE_SHARED,
+    AUDCLNT_STREAMFLAGS_EVENTCALLBACK, AUDCLNT_STREAMFLAGS_LOOPBACK,
+    AUDIOCLIENT_ACTIVATION_TYPE_PROCESS_LOOPBACK, CLSCTX_ALL, _co_init, Com, ComError,
+    _device_name, E_CAPTURE, E_CONSOLE, E_NOINTERFACE, E_RENDER, _enumerator, GUID,
+    IID_IAgileObject, IID_IAudioCaptureClient, IID_IAudioClient,
+    IID_IAudioMeterInformation, IID_IAudioSessionControl2, IID_IAudioSessionManager2,
+    IID_ICompletionHandler, IID_IUnknown, PROCESS_LOOPBACK_MODE_EXCLUDE_TREE,
+    PROCESS_LOOPBACK_MODE_INCLUDE_TREE, PROPVARIANT, _render_devices, S_OK, to_stereo_f32,
+    VIRTUAL_AUDIO_DEVICE_PROCESS_LOOPBACK, VT_BLOB, WAVE_FORMAT_IEEE_FLOAT,
+    WAVE_FORMAT_PCM, WAVEFORMATEX, _win,
+)
+from soundboard.audio.appprocs import (
+    file_description, forget_dead_pids, HELPER_EXES, is_running, PidTable, process_path,
+    process_started, _process_table, root_pid, SYSTEM_EXES, window_titles,
+)
+if _win:
+    from soundboard.audio.appcom import WINFUNCTYPE, _k32, _ole32, windll
+
 log = logging.getLogger(__name__)
 
 SR = 48000            # what the sink gets (the engine's storage rate)
@@ -46,75 +74,6 @@ MIN_BUILD = 19041     # Windows 10 2004: process loopback works there (OBS relie
                       # though Microsoft only documents it from 20348, a Server build
 GAP_S = 0.03          # no packets from the program this long: it's quiet, send silence
 MAX_GAP_S = 0.2       # most silence handed over at once (about the engine's cushion)
-
-S_OK = 0
-E_NOINTERFACE = -2147467262
-CLSCTX_ALL = 23
-COINIT_MULTITHREADED = 0
-RPC_E_CHANGED_MODE = -2147417850
-VT_BLOB = 0x41
-VT_LPWSTR = 31
-VT_UI4 = 19
-STGM_READ = 0
-E_RENDER, E_CAPTURE, DEVICE_STATE_ACTIVE = 0, 1, 1
-E_CONSOLE = 0   # ERole: the default device (not the communications one)
-AUDCLNT_SHAREMODE_SHARED = 0
-AUDCLNT_STREAMFLAGS_LOOPBACK = 0x00020000
-AUDCLNT_STREAMFLAGS_EVENTCALLBACK = 0x00040000
-AUDCLNT_BUFFERFLAGS_SILENT = 0x2
-AUDCLNT_E_UNSUPPORTED_FORMAT = -2004287480       # 0x88890008
-AUDCLNT_E_DEVICE_INVALIDATED = -2004287484       # 0x88890004
-PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
-STILL_ACTIVE = 259
-WAVE_FORMAT_PCM, WAVE_FORMAT_IEEE_FLOAT, WAVE_FORMAT_EXTENSIBLE = 1, 3, 0xFFFE
-PROCESS_LOOPBACK_MODE_INCLUDE_TREE, PROCESS_LOOPBACK_MODE_EXCLUDE_TREE = 0, 1
-AUDIOCLIENT_ACTIVATION_TYPE_PROCESS_LOOPBACK = 1
-VIRTUAL_AUDIO_DEVICE_PROCESS_LOOPBACK = "VAD\\Process_Loopback"
-# Windows' own sounds and helpers: never something you'd want to send to a call
-SYSTEM_EXES = {"svchost.exe", "audiodg.exe", "explorer.exe", "shellexperiencehost.exe"}
-# shared helpers that play audio for whichever program started them (the new Teams,
-# Steam's store and overlay, launchers built on CEF / Qt WebEngine): their sound is
-# that program's, so they're folded into it instead of showing up on their own
-HELPER_EXES = {"msedgewebview2.exe", "steamwebhelper.exe", "cefsharp.browsersubprocess.exe",
-               "qtwebengineprocess.exe", "epicwebhelper.exe", "upc_webhelper.exe"}
-
-_win = sys.platform == "win32"
-if _win:
-    from ctypes import WINFUNCTYPE, windll
-    _ole32, _k32, _user32 = windll.ole32, windll.kernel32, windll.user32
-    _mmdev = None   # mmdevapi.dll, loaded on first capture (it's not on Windows 7)
-    # handles and pointers are 64-bit: without these, ctypes would pass them as C ints
-    for _f, _res, _args in (
-        (_k32.OpenProcess, c_void_p, (c_ulong, c_int, c_ulong)),
-        (_k32.CloseHandle, c_int, (c_void_p,)),
-        (_k32.GetExitCodeProcess, c_int, (c_void_p, c_void_p)),
-        (_k32.GetProcessTimes, c_int, (c_void_p, c_void_p, c_void_p, c_void_p, c_void_p)),
-        (_k32.QueryFullProcessImageNameW, c_int, (c_void_p, c_ulong, c_void_p, c_void_p)),
-        (_k32.CreateToolhelp32Snapshot, c_void_p, (c_ulong, c_ulong)),
-        (_k32.Process32FirstW, c_int, (c_void_p, c_void_p)),
-        (_k32.Process32NextW, c_int, (c_void_p, c_void_p)),
-        (_k32.CreateEventW, c_void_p, (c_void_p, c_int, c_int, c_void_p)),
-        (_k32.WaitForSingleObject, c_ulong, (c_void_p, c_ulong)),
-        (_user32.IsWindowVisible, c_int, (c_void_p,)),
-        (_user32.GetWindow, c_void_p, (c_void_p, c_uint)),
-        (_user32.GetWindowThreadProcessId, c_ulong, (c_void_p, c_void_p)),
-        (_user32.GetWindowTextLengthW, c_int, (c_void_p,)),
-        (_user32.GetWindowTextW, c_int, (c_void_p, c_void_p, c_int)),
-        (_user32.EnumWindows, c_int, (c_void_p, c_void_p)),
-        (_ole32.CoInitializeEx, c_long, (c_void_p, c_ulong)),
-        (_ole32.CoUninitialize, None, ()),
-        (_ole32.CoCreateInstance, c_long, (c_void_p, c_void_p, c_ulong, c_void_p, c_void_p)),
-        (_ole32.CoTaskMemFree, None, (c_void_p,)),
-        (_ole32.PropVariantClear, c_long, (c_void_p,)),
-    ):
-        _f.restype, _f.argtypes = _res, _args
-    # its own copy, so OpenProcess's error code is kept for ctypes.get_last_error()
-    _k32le = ctypes.WinDLL("kernel32", use_last_error=True)
-    _k32le.OpenProcess.restype = c_void_p
-    _k32le.OpenProcess.argtypes = (c_ulong, c_int, c_ulong)
-    _ntdll = windll.ntdll
-    _ntdll.NtQueryInformationProcess.restype = c_long
-    _ntdll.NtQueryInformationProcess.argtypes = (c_void_p, c_int, c_void_p, c_ulong, c_void_p)
 
 
 def supported() -> tuple[bool, str]:
@@ -127,527 +86,6 @@ def supported() -> tuple[bool, str]:
                         "updated to version 2004 or newer (this is build {build}).",
                         build=build)
     return True, ""
-
-
-# --------------------------------------------------------------------------- COM plumbing
-
-class GUID(Structure):
-    _fields_ = [("d1", c_ulong), ("d2", c_ushort), ("d3", c_ushort), ("d4", c_ubyte * 8)]
-
-    @classmethod
-    def of(cls, text: str) -> GUID:
-        p = text.strip("{}").split("-")
-        g = cls()
-        g.d1, g.d2, g.d3 = int(p[0], 16), int(p[1], 16), int(p[2], 16)
-        g.d4 = (c_ubyte * 8)(*bytes.fromhex(p[3] + p[4]))   # not c_char: it stops at a 0 byte
-        return g
-
-    def __eq__(self, other):
-        return isinstance(other, GUID) and bytes(self) == bytes(other)
-
-    __hash__ = None   # pyright: ignore[reportAssignmentType]  # unhashable: __eq__ compares bytes
-
-
-IID_IUnknown = GUID.of("00000000-0000-0000-C000-000000000046")
-IID_IAgileObject = GUID.of("94EA2B94-E9CC-49E0-C0FF-EE64CA8F5B90")
-IID_IAudioClient = GUID.of("1CB9AD4C-DBFA-4C32-B178-C2F568A703B2")
-IID_IAudioCaptureClient = GUID.of("C8ADBD64-E71E-48A0-A4DE-185C395CD317")
-IID_ICompletionHandler = GUID.of("41D949AB-9862-444A-80F6-C261334DA5EB")
-IID_IMMDeviceEnumerator = GUID.of("A95664D2-9614-4F35-A746-DE8DB63617E6")
-CLSID_MMDeviceEnumerator = GUID.of("BCDE0395-E52F-467C-8E3D-C4579291692E")
-IID_IAudioSessionManager2 = GUID.of("77AA99A0-1BD6-484F-8BC7-2C654C9A9B6F")
-IID_IAudioSessionControl2 = GUID.of("BFB7FF88-7239-4FC9-8FA2-07C950BE9C6D")
-IID_IAudioMeterInformation = GUID.of("C02216F6-8C67-4B5B-9D00-D008E73E0064")
-KSDATAFORMAT_SUBTYPE_IEEE_FLOAT = GUID.of("00000003-0000-0010-8000-00AA00389B71")
-KSDATAFORMAT_SUBTYPE_PCM = GUID.of("00000001-0000-0010-8000-00AA00389B71")
-
-
-class PROPERTYKEY(Structure):
-    _fields_ = [("fmtid", GUID), ("pid", c_ulong)]
-
-
-PKEY_Device_FriendlyName = PROPERTYKEY(GUID.of("A45C254E-DF1C-4EFD-8020-67D146A850E0"), 14)
-# what Windows thinks the device is (EndpointFormFactor): soundboard.audio.howl reads it
-PKEY_AudioEndpoint_FormFactor = PROPERTYKEY(GUID.of("1DA5D803-D492-4EDD-8C23-E0C0FFEE7F0E"), 0)
-
-
-class BLOB(Structure):
-    _fields_ = [("cbSize", c_ulong), ("pBlobData", c_void_p)]
-
-
-class _PVU(Union):
-    _fields_ = [("blob", BLOB), ("pwszVal", c_void_p), ("ulVal", c_ulong)]
-
-
-class PROPVARIANT(Structure):
-    _fields_ = [("vt", c_ushort), ("r1", c_ushort), ("r2", c_ushort), ("r3", c_ushort),
-                ("u", _PVU)]
-
-
-class ACTIVATION_PARAMS(Structure):
-    """AUDIOCLIENT_ACTIVATION_PARAMS with its one union member, the process-loopback params."""
-    _fields_ = [("ActivationType", c_ulong), ("TargetProcessId", c_ulong),
-                ("ProcessLoopbackMode", c_ulong)]
-
-
-class WAVEFORMATEX(Structure):
-    _pack_ = 1
-    _fields_ = [("wFormatTag", c_ushort), ("nChannels", c_ushort), ("nSamplesPerSec", c_ulong),
-                ("nAvgBytesPerSec", c_ulong), ("nBlockAlign", c_ushort),
-                ("wBitsPerSample", c_ushort), ("cbSize", c_ushort)]
-
-
-class WAVEFORMATEXTENSIBLE(Structure):
-    _pack_ = 1
-    _fields_ = [("Format", WAVEFORMATEX), ("wValidBitsPerSample", c_ushort),
-                ("dwChannelMask", c_ulong), ("SubFormat", GUID)]
-
-
-class ComError(OSError):
-    def __init__(self, hr: int, what: str = ""):
-        self.hr = hr & 0xFFFFFFFF
-        super().__init__(f"{what or 'COM call'} failed: 0x{self.hr:08X}")
-
-
-_protos: dict = {}
-
-
-class Com:
-    """A raw COM interface pointer: calls by vtable slot, released once."""
-
-    def __init__(self, ptr: int | None):
-        if not ptr:
-            raise ComError(-2147467261, "null interface")   # E_POINTER
-        self.ptr = ptr
-
-    def _fn(self, slot: int, argtypes: tuple, restype=c_long):
-        key = (slot, argtypes, restype)
-        proto = _protos.get(key)
-        if proto is None:
-            proto = _protos[key] = WINFUNCTYPE(restype, c_void_p, *argtypes)
-        ptr = self.ptr
-        assert ptr, "the interface was released"
-        vtbl = cast(ptr, POINTER(c_void_p))[0]
-        return proto(cast(vtbl, POINTER(c_void_p))[slot])
-
-    def call(self, slot: int, argtypes: tuple, *args, what: str = "") -> int:
-        hr = self._fn(slot, argtypes)(self.ptr, *args)
-        if hr < 0:
-            raise ComError(hr, what or f"slot {slot}")
-        return hr
-
-    def qi(self, iid: GUID) -> Com:
-        out = c_void_p()
-        self.call(0, (POINTER(GUID), POINTER(c_void_p)), byref(iid), byref(out),
-                  what="QueryInterface")
-        return Com(out.value)
-
-    def release(self):
-        if self.ptr:
-            p, self.ptr = self.ptr, None
-            try:
-                proto = _protos.get((2, (), c_ulong)) or WINFUNCTYPE(c_ulong, c_void_p)
-                _protos[(2, (), c_ulong)] = proto
-                proto(cast(cast(p, POINTER(c_void_p))[0], POINTER(c_void_p))[2])(p)
-            except Exception:  # noqa: BLE001
-                log.debug("Release raised", exc_info=True)
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *_):
-        self.release()
-
-
-def _co_init() -> bool:
-    """CoInitializeEx for this thread. Returns whether we own the uninit."""
-    hr = _ole32.CoInitializeEx(None, COINIT_MULTITHREADED)
-    if hr == RPC_E_CHANGED_MODE:
-        return False   # the thread is already STA (Qt's main thread): calls still work
-    if hr < 0:
-        raise ComError(hr, "CoInitializeEx")
-    return True   # S_OK or S_FALSE (already initialised here): both need a CoUninitialize
-
-
-def _enumerator() -> Com:
-    out = c_void_p()
-    hr = _ole32.CoCreateInstance(byref(CLSID_MMDeviceEnumerator), None, CLSCTX_ALL,
-                                 byref(IID_IMMDeviceEnumerator), byref(out))
-    if hr < 0:
-        raise ComError(hr, "CoCreateInstance(MMDeviceEnumerator)")
-    return Com(out.value)
-
-
-def _render_devices(en: Com, flow: int = E_RENDER) -> list[Com]:
-    coll = c_void_p()
-    en.call(3, (c_int, c_ulong, POINTER(c_void_p)), flow, DEVICE_STATE_ACTIVE, byref(coll),
-            what="EnumAudioEndpoints")
-    devs = []
-    with Com(coll.value) as c:
-        try:
-            n = c_uint()
-            c.call(3, (POINTER(c_uint),), byref(n), what="GetCount")
-            for i in range(n.value):
-                d = c_void_p()
-                c.call(4, (c_uint, POINTER(c_void_p)), i, byref(d), what="Item")
-                devs.append(Com(d.value))
-        except Exception:   # the ones already got would never be released
-            for d in devs:
-                d.release()
-            raise
-    return devs
-
-
-def _device_name(dev: Com) -> str:
-    store = c_void_p()
-    try:
-        dev.call(4, (c_ulong, POINTER(c_void_p)), STGM_READ, byref(store), what="OpenPropertyStore")
-        with Com(store.value) as s:
-            pv = PROPVARIANT()
-            s.call(5, (POINTER(PROPERTYKEY), POINTER(PROPVARIANT)), byref(PKEY_Device_FriendlyName),
-                   byref(pv), what="GetValue")
-            try:
-                if pv.vt == VT_LPWSTR and pv.u.pwszVal:
-                    return cast(pv.u.pwszVal, c_wchar_p).value or ""
-            finally:
-                _ole32.PropVariantClear(byref(pv))
-    except ComError:
-        log.debug("device name unavailable", exc_info=True)
-    return ""
-
-
-def _form_factor(dev: Com) -> int | None:
-    store = c_void_p()
-    try:
-        dev.call(4, (c_ulong, POINTER(c_void_p)), STGM_READ, byref(store), what="OpenPropertyStore")
-        with Com(store.value) as s:
-            pv = PROPVARIANT()
-            s.call(5, (POINTER(PROPERTYKEY), POINTER(PROPVARIANT)),
-                   byref(PKEY_AudioEndpoint_FormFactor), byref(pv), what="GetValue")
-            try:
-                return int(pv.u.ulVal) if pv.vt == VT_UI4 else None
-            finally:
-                _ole32.PropVariantClear(byref(pv))
-    except ComError:
-        log.debug("form factor unavailable", exc_info=True)
-    return None
-
-
-def output_form_factors() -> dict[str, int]:
-    """Each playback device's name -> what Windows thinks it is (EndpointFormFactor:
-    1 speakers, 3 headphones, 5 a headset, 9 a screen over HDMI, ...). Asks Windows:
-    never on the UI thread. Empty when it can't be asked."""
-    if not _win:
-        return {}
-    out: dict[str, int] = {}
-    own = _co_init()
-    try:
-        with _enumerator() as en:
-            for dev in _render_devices(en):
-                with dev:
-                    name, ff = _device_name(dev), _form_factor(dev)
-                    if name and ff is not None:
-                        out[name] = ff
-    except ComError:
-        log.debug("no playback devices", exc_info=True)
-    finally:
-        if own:
-            _ole32.CoUninitialize()
-    return out
-
-
-def _cotaskmem_str(p: c_void_p) -> str:
-    if not p.value:
-        return ""
-    try:
-        return cast(p.value, c_wchar_p).value or ""
-    finally:
-        _ole32.CoTaskMemFree(p.value)
-
-
-# --------------------------------------------------------------------------- processes
-
-_names: dict[int, str] = {}   # pid -> full image path; see forget_dead_pids
-_names_lock = threading.Lock()
-
-
-def process_path(pid: int, exe: str = "") -> str:
-    """Full path of the process's .exe ('' if it can't be opened). `exe`, the name a
-    fresh process list gives this pid, catches a pid Windows has handed to another
-    program since it was cached."""
-    with _names_lock:
-        path = _names.get(pid)
-    if path is not None and (not exe or not path
-                             or os.path.basename(path).lower() == exe.lower()):
-        return path
-    path = ""
-    h = _k32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
-    if h:
-        try:
-            buf = ctypes.create_unicode_buffer(1024)
-            size = c_ulong(len(buf))
-            if _k32.QueryFullProcessImageNameW(h, 0, buf, byref(size)):
-                path = buf.value
-        finally:
-            _k32.CloseHandle(h)
-    with _names_lock:
-        _names[pid] = path
-    return path
-
-
-_descriptions: dict[str, str] = {}   # .exe path -> its file description; see file_description
-_version = None   # version.dll, its own copy (argtypes set here don't leak elsewhere)
-
-
-def file_description(path: str) -> str:
-    """The program's own name for itself: its .exe's FileDescription version info, what
-    Windows' volume mixer shows ('VLC media player' for vlc.exe, 'OBS Studio' for
-    obs64.exe); '' if it has none. Reads the file, so never on the UI thread; cached
-    per path (a program's name doesn't change while it runs)."""
-    global _version
-    if not _win or not path:
-        return ""
-    with _names_lock:
-        if path in _descriptions:
-            return _descriptions[path]
-    desc = ""
-    try:
-        if _version is None:
-            v = ctypes.WinDLL("version")
-            v.GetFileVersionInfoSizeW.restype = c_ulong
-            v.GetFileVersionInfoSizeW.argtypes = (c_wchar_p, c_void_p)
-            v.GetFileVersionInfoW.restype = c_int
-            v.GetFileVersionInfoW.argtypes = (c_wchar_p, c_ulong, c_ulong, c_void_p)
-            v.VerQueryValueW.restype = c_int
-            v.VerQueryValueW.argtypes = (c_void_p, c_wchar_p, c_void_p, c_void_p)
-            _version = v
-        size = _version.GetFileVersionInfoSizeW(path, None)
-        buf = ctypes.create_string_buffer(size) if size else None
-        if buf is not None and _version.GetFileVersionInfoW(path, 0, size, buf):
-            ptr, n = c_void_p(), c_uint()
-            langs = []   # the file's own language + code page pairs first, then the usual
-            if (_version.VerQueryValueW(buf, "\\VarFileInfo\\Translation", byref(ptr),
-                                        byref(n)) and ptr.value and n.value >= 4):
-                w = (c_ushort * (n.value // 2)).from_address(ptr.value)
-                langs = [f"{w[i]:04x}{w[i + 1]:04x}" for i in range(0, len(w) - 1, 2)]
-            for lang in (*langs, "040904b0", "040904e4", "04090000"):
-                if (_version.VerQueryValueW(buf, f"\\StringFileInfo\\{lang}\\FileDescription",
-                                            byref(ptr), byref(n)) and ptr.value and n.value):
-                    desc = ctypes.wstring_at(ptr.value, n.value).split("\0", 1)[0].strip()
-                    if desc:
-                        break
-    except (OSError, ValueError):
-        log.debug("version info of %s unavailable", path, exc_info=True)
-    if desc.lower().endswith(".exe"):   # Notepad and Snipping Tool say 'Notepad.exe'
-        desc = desc[:-4].rstrip()
-    desc = desc[:60]
-    with _names_lock:
-        _descriptions[path] = desc
-    return desc
-
-
-def forget_dead_pids(table: dict[int, tuple[int, str]]):
-    """Drops cached paths of pids missing from a fresh process list: Windows reuses
-    pids, and a stale entry would put a remembered program's name (and its auto-send)
-    on whatever new process gets the number."""
-    with _names_lock:
-        for pid in [p for p in _names if p not in table]:
-            del _names[pid]
-
-
-def process_started(pid: int) -> int | None:
-    """When the process started (FILETIME ticks), None if it can't be opened. With
-    the pid it names one process for good: a reused pid starts at another time."""
-    h = _k32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
-    if not h:
-        return None
-    try:
-        t = [ctypes.c_ulonglong() for _ in range(4)]
-        if not _k32.GetProcessTimes(h, *(byref(x) for x in t)):
-            return None
-        return t[0].value
-    finally:
-        _k32.CloseHandle(h)
-
-
-def is_running(pid: int, started: int | None = None) -> bool:
-    """False once the process has exited, or (with `started`, from process_started)
-    once its pid belongs to a newer process. A process we may not open (a service, a
-    game guarded by anti-cheat) counts as running: we can't tell."""
-    h = _k32le.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
-    if not h:
-        return ctypes.get_last_error() == 5   # ERROR_ACCESS_DENIED
-    try:
-        code = c_ulong()
-        if not (_k32.GetExitCodeProcess(h, byref(code)) and code.value == STILL_ACTIVE):
-            return False
-        if started is not None:
-            t = [ctypes.c_ulonglong() for _ in range(4)]
-            if _k32.GetProcessTimes(h, *(byref(x) for x in t)) and t[0].value != started:
-                return False
-        return True
-    finally:
-        _k32.CloseHandle(h)
-
-class _PROCESSENTRY32W(Structure):
-    _fields_ = [("dwSize", c_ulong), ("cntUsage", c_ulong), ("th32ProcessID", c_ulong),
-                ("th32DefaultHeapID", c_void_p), ("th32ModuleID", c_ulong), ("cntThreads", c_ulong),
-                ("th32ParentProcessID", c_ulong), ("pcPriClassBase", c_long), ("dwFlags", c_ulong),
-                ("szExeFile", ctypes.c_wchar * 260)]
-
-
-def _process_table() -> dict[int, tuple[int, str]]:
-    """pid -> (parent pid, exe name) for every process (Toolhelp snapshot)."""
-    table: dict[int, tuple[int, str]] = {}
-    snap = _k32.CreateToolhelp32Snapshot(0x2, 0)   # TH32CS_SNAPPROCESS
-    if snap == -1 or not snap:
-        return table
-    try:
-        e = _PROCESSENTRY32W()
-        e.dwSize = sizeof(e)
-        ok = _k32.Process32FirstW(snap, byref(e))
-        while ok:
-            table[e.th32ProcessID] = (e.th32ParentProcessID, e.szExeFile.lower())
-            ok = _k32.Process32NextW(snap, byref(e))
-    finally:
-        _k32.CloseHandle(snap)
-    return table
-
-
-class _PBI(Structure):   # PROCESS_BASIC_INFORMATION
-    _fields_ = [("ExitStatus", c_long), ("PebBaseAddress", c_void_p),
-                ("AffinityMask", ctypes.c_size_t), ("BasePriority", c_long),
-                ("UniqueProcessId", ctypes.c_size_t), ("ParentPid", ctypes.c_size_t)]
-
-
-class PidTable:
-    """The _process_table rows a session list needs, (parent pid, exe name), looked up
-    one process at a time as they're asked for. A recording-session list touches a
-    handful of pids (each session's and a few parents), and a full snapshot of every
-    process (~500 on a gaming PC) cost ~20 ms of the ~28 ms the Who's listening poll
-    took every 3 s. A pid that's gone isn't in it, as in a snapshot; one Windows won't
-    let us open (a protected process) makes it take the full snapshot after all, so
-    nothing is ever named differently from before."""
-
-    def __init__(self):
-        self._rows: dict[int, tuple[int, str] | None] = {}
-        self._full: dict[int, tuple[int, str]] | None = None
-        self.snapshots = 0   # full snapshots it had to take (for the tests and benches)
-
-    def _row(self, pid: int) -> tuple[int, str] | None:
-        if self._full is not None:
-            return self._full.get(pid)
-        if pid in self._rows:
-            return self._rows[pid]
-        found = _open_row(pid)
-        if found is _DENIED:
-            self._full = _process_table()
-            self.snapshots += 1
-            return self._full.get(pid)
-        row = typing.cast("tuple[int, str] | None", found)
-        self._rows[pid] = row
-        return row
-
-    def get(self, pid: int, default=None):
-        row = self._row(pid)
-        return default if row is None else row
-
-    def __contains__(self, pid) -> bool:
-        return self._row(pid) is not None
-
-    def __getitem__(self, pid: int) -> tuple[int, str]:
-        row = self._row(pid)
-        if row is None:
-            raise KeyError(pid)
-        return row
-
-
-_DENIED = object()
-
-
-def _open_row(pid: int):
-    """(parent pid, exe name) of one running process, None if there's no such process,
-    _DENIED if Windows won't say."""
-    if pid == 0:
-        return None
-    h = _k32le.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
-    if not h:
-        return None if ctypes.get_last_error() == 87 else _DENIED   # INVALID_PARAMETER: gone
-    try:
-        code = c_ulong()
-        if _k32.GetExitCodeProcess(h, byref(code)) and code.value != STILL_ACTIVE:
-            return None   # exited, only a handle keeps it (a snapshot wouldn't list it)
-        buf = ctypes.create_unicode_buffer(1024)
-        size = c_ulong(len(buf))
-        pbi, got = _PBI(), c_ulong()
-        if (not _k32.QueryFullProcessImageNameW(h, 0, buf, byref(size))
-                or _ntdll.NtQueryInformationProcess(h, 0, byref(pbi), sizeof(pbi),
-                                                    byref(got)) != 0):
-            return _DENIED
-        return int(pbi.ParentPid), os.path.basename(buf.value).lower()
-    finally:
-        _k32.CloseHandle(h)
-
-
-def running() -> dict[int, str]:
-    """pid -> exe name (lower case) of every running process; {} off Windows."""
-    return {pid: exe for pid, (_, exe) in _process_table().items()} if _win else {}
-
-
-def root_pid(pid: int, table: dict[int, tuple[int, str]] | None = None) -> int:
-    """The topmost ancestor with the same .exe name. Browsers and chat apps play
-    their audio from a helper child process that comes and goes; capturing the main
-    process *and its tree* keeps following them. A shared helper (HELPER_EXES) goes
-    to the program that started it, unless that's Windows itself."""
-    table = table if table is not None else _process_table()
-    if pid not in table:
-        return pid
-    exe = table[pid][1]
-    if exe in HELPER_EXES:
-        seen, host = {pid}, pid
-        while table[host][1] in HELPER_EXES:
-            parent = table[host][0]
-            if parent in seen or parent not in table or table[parent][1] in SYSTEM_EXES:
-                break
-            seen.add(parent)
-            host = parent
-        if table[host][1] not in HELPER_EXES:
-            pid, exe = host, table[host][1]
-    seen = {pid}
-    while True:
-        parent = table[pid][0]
-        if parent in seen or parent not in table or table[parent][1] != exe:
-            return pid
-        seen.add(parent)
-        pid = parent
-
-
-def window_titles() -> dict[int, str]:
-    """pid -> title of its main visible window (the first one found), for nicer names."""
-    titles: dict[int, str] = {}
-    proto = WINFUNCTYPE(c_int, c_void_p, c_void_p)
-
-    def visit(hwnd, _):
-        try:
-            if not _user32.IsWindowVisible(hwnd) or _user32.GetWindow(hwnd, 4):   # 4 = GW_OWNER
-                return True
-            pid = c_ulong()
-            _user32.GetWindowThreadProcessId(hwnd, byref(pid))
-            if pid.value in titles:
-                return True
-            n = _user32.GetWindowTextLengthW(hwnd)
-            if n > 0:
-                buf = ctypes.create_unicode_buffer(n + 1)
-                _user32.GetWindowTextW(hwnd, buf, n + 1)
-                if buf.value.strip():
-                    titles[pid.value] = buf.value.strip()
-        except Exception:  # noqa: BLE001
-            pass
-        return True
-
-    cb = proto(visit)
-    _user32.EnumWindows(cb, 0)
-    return titles
 
 
 # --------------------------------------------------------------------------- sessions
@@ -691,308 +129,6 @@ def default_output_name() -> str | None:
                 return _device_name(dev) or None
     except ComError:
         log.debug("no default playback device", exc_info=True)
-        return None
-    finally:
-        if own:
-            _ole32.CoUninitialize()
-
-
-IID_IAudioEndpointVolume = GUID.of("5CDF2C82-841E-4546-9722-0CF74078229A")
-CAPTURE_ID = "{0.0.1.00000000}."   # a recording endpoint's id: this + its GUID
-
-
-def mic_is_silent(guid: str, seconds: float = 1.0, wait: float = 8.0) -> bool | None:
-    """Open the recording endpoint `guid` (as in MMDevices\\Audio\\Capture) for up to
-    `seconds` and say whether it delivers nothing but exact zeros: True for digital
-    silence (a quiet room still has noise, so a working mic never does), False at the
-    first real sample. None when it can't tell: the mic isn't back within `wait`
-    seconds, it's muted or at 0%, Windows refused, or too little audio came."""
-    if not _win:
-        return None
-    own = _co_init()
-    try:
-        return _mic_is_silent(guid if guid.startswith("{") else "{" + guid + "}",
-                              seconds, wait)
-    except ComError:
-        log.info("couldn't listen to mic %s", guid, exc_info=True)
-        return None
-    finally:
-        if own:
-            _ole32.CoUninitialize()
-
-
-def mic_opens(guid: str, wait: float = 8.0) -> bool | None:
-    """Whether an app can record the recording endpoint `guid` now: opened in shared mode
-    and started for a moment, as a voice chat opens it (muted or not). False when Windows
-    refuses (a mic left broken refuses every app the same way); None when it can't tell
-    (not Windows, or the mic not active within `wait` seconds: unplugged, switched off)."""
-    if not _win:
-        return None
-    own = _co_init()
-    try:
-        dev = _active_capture(guid if guid.startswith("{") else "{" + guid + "}", wait,
-                              muted_too=True)
-        if dev is None:
-            return None
-        with dev:
-            _open_briefly(dev)
-        return True
-    except ComError:
-        log.info("mic %s doesn't open", guid, exc_info=True)
-        return False
-    finally:
-        if own:
-            _ole32.CoUninitialize()
-
-
-def _open_briefly(dev: Com) -> None:
-    """Open `dev` in shared mode in its own format, start it for 0.1 s, stop it."""
-    out = c_void_p()
-    dev.call(3, (POINTER(GUID), c_ulong, c_void_p, POINTER(c_void_p)),
-             byref(IID_IAudioClient), CLSCTX_ALL, None, byref(out),
-             what="Activate(IAudioClient)")
-    with Com(out.value) as client:
-        pfmt = c_void_p()
-        client.call(8, (POINTER(c_void_p),), byref(pfmt), what="GetMixFormat")
-        try:
-            client.call(3, (c_ulong, c_ulong, c_int64, c_int64, c_void_p, c_void_p),
-                        AUDCLNT_SHAREMODE_SHARED, 0, 2_000_000, 0, pfmt, None,
-                        what="Initialize")
-        finally:
-            _ole32.CoTaskMemFree(pfmt)
-        client.call(10, (), what="Start")
-        try:
-            time.sleep(0.1)
-        finally:
-            client.call(11, (), what="Stop")
-
-
-def _active_capture(guid: str, wait: float, muted_too: bool = False) -> Com | None:
-    """The recording endpoint `guid` once it's active (right after an audio restart it
-    takes a moment to be back), or None after `wait` seconds or when it's muted or at
-    0% (silent on purpose; `muted_too`: then too)."""
-    dev = None
-    give_up = time.monotonic() + wait
-    with _enumerator() as en:
-        while dev is None:
-            d, state, got = c_void_p(), c_ulong(), None
-            try:
-                en.call(5, (c_wchar_p, POINTER(c_void_p)), CAPTURE_ID + guid.lower(),
-                        byref(d), what="GetDevice")
-                got = Com(d.value)
-                got.call(6, (POINTER(c_ulong),), byref(state), what="GetState")
-                if state.value == DEVICE_STATE_ACTIVE:
-                    dev, got = got, None
-                    break
-            except ComError:
-                pass
-            finally:
-                if got is not None:
-                    got.release()
-            if time.monotonic() > give_up:
-                return None
-            time.sleep(0.25)
-    if muted_too:
-        return dev
-    try:
-        out = c_void_p()
-        dev.call(3, (POINTER(GUID), c_ulong, c_void_p, POINTER(c_void_p)),
-                 byref(IID_IAudioEndpointVolume), CLSCTX_ALL, None, byref(out),
-                 what="Activate(IAudioEndpointVolume)")
-        with Com(out.value) as vol:
-            muted, level = c_int(), c_float()
-            vol.call(15, (POINTER(c_int),), byref(muted), what="GetMute")
-            vol.call(9, (POINTER(c_float),), byref(level), what="GetMasterVolumeLevelScalar")
-            if muted.value or level.value <= 0:
-                dev.release()
-                return None   # silent on purpose
-    except BaseException:
-        dev.release()
-        raise
-    return dev
-
-
-def _mic_is_silent(guid: str, seconds: float, wait: float) -> bool | None:
-    dev = _active_capture(guid, wait)
-    if dev is None:
-        return None
-    with dev:
-        out = c_void_p()
-        dev.call(3, (POINTER(GUID), c_ulong, c_void_p, POINTER(c_void_p)),
-                 byref(IID_IAudioClient), CLSCTX_ALL, None, byref(out),
-                 what="Activate(IAudioClient)")
-        with Com(out.value) as client:
-            pfmt = c_void_p()
-            client.call(8, (POINTER(c_void_p),), byref(pfmt), what="GetMixFormat")
-            try:
-                # its own format: exact zeros are zero bytes in every sample format
-                align = cast(pfmt, POINTER(WAVEFORMATEX))[0].nBlockAlign
-                rate = cast(pfmt, POINTER(WAVEFORMATEX))[0].nSamplesPerSec
-                client.call(3, (c_ulong, c_ulong, c_int64, c_int64, c_void_p, c_void_p),
-                            AUDCLNT_SHAREMODE_SHARED, 0, 2_000_000, 0, pfmt, None,
-                            what="Initialize")
-            finally:
-                _ole32.CoTaskMemFree(pfmt)
-            out = c_void_p()
-            client.call(14, (POINTER(GUID), POINTER(c_void_p)), byref(IID_IAudioCaptureClient),
-                        byref(out), what="GetService(IAudioCaptureClient)")
-            with Com(out.value) as cap:
-                client.call(10, (), what="Start")
-                try:
-                    zeros = _all_zero(cap, align, seconds)
-                finally:
-                    client.call(11, (), what="Stop")
-    if zeros is None:
-        return False
-    return True if zeros >= rate * seconds / 2 else None
-
-
-def _all_zero(cap: Com, align: int, seconds: float) -> int | None:
-    """How many frames came, all exact zeros; None at the first one that isn't."""
-    n, frames, flags, data = c_uint(), c_uint(), c_ulong(), c_void_p()
-    count = 0
-    end = time.monotonic() + seconds
-    while time.monotonic() < end:
-        time.sleep(0.01)
-        while True:
-            cap.call(5, (POINTER(c_uint),), byref(n), what="GetNextPacketSize")
-            if not n.value:
-                break
-            cap.call(3, (POINTER(c_void_p), POINTER(c_uint), POINTER(c_ulong), c_void_p,
-                         c_void_p), byref(data), byref(frames), byref(flags), None, None,
-                     what="GetBuffer")
-            try:
-                if not flags.value & AUDCLNT_BUFFERFLAGS_SILENT and data.value \
-                        and any(ctypes.string_at(data.value, frames.value * align)):
-                    return None
-                count += frames.value
-            finally:
-                cap.call(4, (c_uint,), frames.value, what="ReleaseBuffer")
-    return count
-
-
-def record_mic(guid: str, seconds: float, wait: float = 8.0,
-               started: threading.Event | None = None) -> tuple[np.ndarray, int] | None:
-    """Record the recording endpoint `guid` for `seconds`: (mono float32, its rate), or
-    None when it can't (not back within `wait`, muted or at 0%, Windows refused).
-    `started` is set once it's recording. Its own shared-mode format, so nothing is
-    converted on the way but the samples to float."""
-    if not _win or np is None:
-        return None
-    own = _co_init()
-    try:
-        dev = _active_capture(guid if guid.startswith("{") else "{" + guid + "}", wait)
-        if dev is None:
-            return None
-        with dev:
-            return _record(dev, seconds, started)
-    except ComError:
-        log.info("couldn't record mic %s", guid, exc_info=True)
-        return None
-    finally:
-        if own:
-            _ole32.CoUninitialize()
-
-
-def _record(dev: Com, seconds: float, started) -> tuple[np.ndarray, int]:
-    out = c_void_p()
-    dev.call(3, (POINTER(GUID), c_ulong, c_void_p, POINTER(c_void_p)),
-             byref(IID_IAudioClient), CLSCTX_ALL, None, byref(out),
-             what="Activate(IAudioClient)")
-    with Com(out.value) as client:
-        pfmt = c_void_p()
-        client.call(8, (POINTER(c_void_p),), byref(pfmt), what="GetMixFormat")
-        try:
-            fmt = WAVEFORMATEX.from_buffer_copy(cast(pfmt, POINTER(WAVEFORMATEX))[0])
-            is_float = fmt.wFormatTag == WAVE_FORMAT_IEEE_FLOAT or (
-                fmt.wFormatTag == WAVE_FORMAT_EXTENSIBLE
-                and cast(pfmt, POINTER(WAVEFORMATEXTENSIBLE))[0].SubFormat
-                == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT)
-            client.call(3, (c_ulong, c_ulong, c_int64, c_int64, c_void_p, c_void_p),
-                        AUDCLNT_SHAREMODE_SHARED, 0, 2_000_000, 0, pfmt, None,
-                        what="Initialize")
-        finally:
-            _ole32.CoTaskMemFree(pfmt)
-        out = c_void_p()
-        client.call(14, (POINTER(GUID), POINTER(c_void_p)), byref(IID_IAudioCaptureClient),
-                    byref(out), what="GetService(IAudioCaptureClient)")
-        chunks: list[bytes] = []
-        n, frames, flags, data = c_uint(), c_uint(), c_ulong(), c_void_p()
-        with Com(out.value) as cap:
-            client.call(10, (), what="Start")
-            if started is not None:
-                started.set()
-            try:
-                end = time.monotonic() + seconds
-                while time.monotonic() < end:
-                    time.sleep(0.01)
-                    while True:
-                        cap.call(5, (POINTER(c_uint),), byref(n), what="GetNextPacketSize")
-                        if not n.value:
-                            break
-                        cap.call(3, (POINTER(c_void_p), POINTER(c_uint), POINTER(c_ulong),
-                                     c_void_p, c_void_p), byref(data), byref(frames),
-                                 byref(flags), None, None, what="GetBuffer")
-                        try:
-                            size = frames.value * fmt.nBlockAlign
-                            chunks.append(bytes(size) if flags.value & AUDCLNT_BUFFERFLAGS_SILENT
-                                          or not data.value else ctypes.string_at(data.value, size))
-                        finally:
-                            cap.call(4, (c_uint,), frames.value, what="ReleaseBuffer")
-            finally:
-                client.call(11, (), what="Stop")
-    x = to_stereo_f32(b"".join(chunks), fmt, is_float)
-    return x.mean(axis=1).astype(np.float32), int(fmt.nSamplesPerSec)
-
-
-def endpoint_names(kind: str) -> set[str] | None:
-    """Names of Windows' active playback ('output') or recording ('input') devices,
-    asked now (PortAudio's list is from when it started or was last re-scanned).
-    None if Windows can't be asked."""
-    if not _win:
-        return None
-    own = _co_init()
-    try:
-        with _enumerator() as en:
-            devs = _render_devices(en, E_CAPTURE if kind == "input" else E_RENDER)
-        try:
-            return {n for n in map(_device_name, devs) if n}
-        finally:
-            for d in devs:
-                d.release()
-    except ComError:
-        log.debug("listing %s devices failed", kind, exc_info=True)
-        return None
-    finally:
-        if own:
-            _ole32.CoUninitialize()
-
-
-def capture_mics() -> list[tuple[str, str]] | None:
-    """Windows' active recording devices as [(endpoint GUID, name)], asked now: the
-    names PortAudio's list shows, straight from Windows rather than from the registry
-    (directmic.mic_lookup's last try). None if Windows can't be asked."""
-    if not _win:
-        return None
-    own = _co_init()
-    try:
-        with _enumerator() as en:
-            devs = _render_devices(en, E_CAPTURE)
-        out = []
-        try:
-            for d in devs:
-                p = c_void_p()
-                d.call(5, (POINTER(c_void_p),), byref(p), what="GetId")
-                guid = _cotaskmem_str(p).rpartition(".")[2].lower()
-                name = _device_name(d)
-                if guid.startswith("{") and name:
-                    out.append((guid, name))
-        finally:
-            for d in devs:
-                d.release()
-        return out
-    except ComError:
-        log.debug("listing recording devices failed", exc_info=True)
         return None
     finally:
         if own:
@@ -1269,6 +405,7 @@ _QI_T: typing.Any = None
 _REF_T: typing.Any = None
 _DONE_T: typing.Any = None
 if _win:
+    _mmdev = None   # mmdevapi.dll, loaded on first capture (it's not on Windows 7)
     _QI_T = WINFUNCTYPE(c_long, c_void_p, POINTER(GUID), POINTER(c_void_p))
     _REF_T = WINFUNCTYPE(c_ulong, c_void_p)
     _DONE_T = WINFUNCTYPE(c_long, c_void_p, c_void_p)
@@ -1363,28 +500,6 @@ def _format(kind: str) -> WAVEFORMATEX:
     if kind == "f32":
         return WAVEFORMATEX(WAVE_FORMAT_IEEE_FLOAT, 2, SR, SR * 8, 8, 32, 0)
     return WAVEFORMATEX(WAVE_FORMAT_PCM, 2, SR, SR * 4, 4, 16, 0)
-
-
-def to_stereo_f32(raw: bytes, fmt: WAVEFORMATEX, is_float: bool) -> np.ndarray:
-    """Interleaved capture bytes -> (n, 2) float32 (any channel count / sample width)."""
-    ch, bits = fmt.nChannels, fmt.wBitsPerSample
-    if is_float and bits == 32:
-        x = np.frombuffer(raw, np.float32)
-    elif bits == 16:
-        x = np.frombuffer(raw, np.int16).astype(np.float32) * np.float32(1 / 32768)
-    elif bits == 32:
-        x = np.frombuffer(raw, np.int32).astype(np.float32) * np.float32(1 / 2147483648)
-    elif bits == 24:
-        b = np.frombuffer(raw, np.uint8).reshape(-1, 3).astype(np.int32)
-        x = ((b[:, 0] << 8) | (b[:, 1] << 16) | (b[:, 2] << 24)).astype(np.float32) / 2147483648
-    else:
-        x = np.frombuffer(raw, np.uint8).astype(np.float32) * np.float32(1 / 128) - 1
-    x = x.reshape(-1, max(ch, 1))
-    if ch == 1:
-        x = np.repeat(x, 2, axis=1)
-    elif ch > 2:
-        x = x[:, :2]
-    return np.ascontiguousarray(x, dtype=np.float32)
 
 
 class AppCapture:
@@ -1619,3 +734,34 @@ def _explain(e: ComError) -> str:
         return why
     return _("Windows couldn't start the capture ({error}). Switch Send on to try again.",
              error=errors.plain(e))
+
+
+# ---------------------------------------------------------------------- one module
+
+# appaudio was one module, and the app, the tests and the scripts still use it as one:
+# what a part has is read here (appaudio.<name>, the private names too), and a name set
+# here (a test's monkeypatch) is set in every part that has the same thing, so it
+# reaches the code that uses it wherever that code now lives.
+_PARTS = (appcom, appprocs, appmics)
+_UNSET = object()
+
+
+def __getattr__(name: str) -> Any:
+    for part in _PARTS:
+        if name in vars(part):
+            return vars(part)[name]
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
+class _Parts(types.ModuleType):
+    def __setattr__(self, name: str, value):
+        old = getattr(self, name, _UNSET)
+        if old is not _UNSET:
+            for part in _PARTS:
+                if vars(part).get(name, _UNSET) is old:
+                    setattr(part, name, value)
+        if name in vars(self) or not any(name in vars(part) for part in _PARTS):
+            super().__setattr__(name, value)
+
+
+sys.modules[__name__].__class__ = _Parts

@@ -30,7 +30,8 @@ MARKER = "compiled-here.txt"
 # What the helper runs: never left out (the build stops if one can't load without EXCLUDE)
 NEEDS = ("soundboard.mic.michelper", "soundboard.mic.directmic", "soundboard.mic.micbase",
          "soundboard.mic.micring", "soundboard.mic.micstate", "soundboard.mic.micadmin",
-         "soundboard.audio.appaudio")
+         "soundboard.audio.appaudio", "soundboard.audio.appcom", "soundboard.audio.appprocs",
+         "soundboard.audio.appmics")
 # Imports every module of the soundboard package with EXCLUDE refused, as in the helper,
 # and prints those that fail. PyInstaller follows imports inside functions too, so
 # directmic's lazy `engine` and `appaudio` (applog -> the crash dialog -> all of the UI)

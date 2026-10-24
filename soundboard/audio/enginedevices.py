@@ -3,7 +3,7 @@ straight-into-my-mic stream and its cable copies, and the watchdog that reopens 
 stream that stalled or failed to open (on the device thread, DeviceWorker).
 
 A mixin Engine inherits, so every `self.` lookup is the same as before. Nothing here
-runs per audio block: the stream callbacks and what they call stay in engine.py.
+runs per audio block: the stream callbacks and what they call are in enginebus.py.
 `find_device` and `CableTap` are looked up in soundboard.audio.engine when called (tests
 swap them there).
 """
