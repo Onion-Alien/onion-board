@@ -167,7 +167,10 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/kit/restyled.py` | sizes worked out from a widget's text (`measured`, `on_restyle`), worked out again when its style or font changes: the window is built with the app's style sheet off (`theme.styled_after`) and `again()` re-runs them all once it's back on |
 | `soundboard/ui/kit/iconrow.py` | label icons aligned to the first line's capital ink using the current font metrics |
 | `soundboard/ui/kit/glowbutton.py` | `GlowButton`: a primary button with a soft accent glow, for the install a card needs before it works (AI voices, speech recognition) |
-| `soundboard/ui/kit/panel.py` | volume boxes, the equalizer panel (emit values; the window applies them) a wrapping row layout (`Flow`) and a grid of equal-width cards (`CardGrid`) |
+| `soundboard/ui/kit/panel.py` | the bar, card and heading helpers every tab is built from, icon, info, fold and reset buttons, tiles, the view toggle and the empty list's picture; the volume boxes, the equalizer, `Flow` and `CardGrid` live in the `panel*` modules below (still importable from here) |
+| `soundboard/ui/kit/panellabels.py` | a section's title, a number label as wide as its widest value, a hint's muted words (`panel` re-exports them) |
+| `soundboard/ui/kit/panellayouts.py` | `ShownStack`, keeping focus off a page switched away, `Flow` (wrapping) and `CardGrid` (`panel` re-exports them) |
+| `soundboard/ui/kit/panelcontrols.py` | `VolumeControl` (slider + typed %), `EqPanel` (the equaliser) and `UndoBar` (`panel` re-exports them) |
 | `soundboard/ui/sounds/dialogs.py` | per-sound Edit dialog: the Sound tab (name, volume, hotkey, fades…) and the Effects tab |
 | `soundboard/ui/window/languagecontrol.py` | the main window's language (`MainWindow.langctl`): offering Windows' language once, turning it down, switching |
 | `soundboard/ui/window/miccontrol.py` | straight into the mic and the virtual cable in the main window (`MainWindow.micctl`): the mic effect's status, putting it on the mic (and back by itself), the mic helper, its update offer, falling back to the cable; installing, removing and fixing the cable; Windows' mic settings |
