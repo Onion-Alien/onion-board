@@ -15,6 +15,7 @@ from soundboard.ui.kit import theme
 from soundboard.core import usage
 from soundboard.i18n import _
 from soundboard.ui.kit import busy, fit, icons
+from soundboard.ui.kit.plaintext import plain_tip
 
 PIC_W, PIC_H = 160, 90   # a video's 16:9 thumbnail
 
@@ -70,6 +71,7 @@ class SourceDialog(QDialog):
         names = QVBoxLayout()
         names.setSpacing(2)
         title = QLabel(self.src.get("title") or meta.name)
+        title.setTextFormat(Qt.TextFormat.PlainText)   # a web title (plaintext.py)
         f = title.font()
         f.setPointSizeF(f.pointSizeF() * 1.15)
         f.setBold(True)
@@ -84,9 +86,10 @@ class SourceDialog(QDialog):
                 chl.setText(f'<a href="{html.escape(link)}" style="color: {theme.T["accent_link"]};'
                             f' text-decoration: none;">{html.escape(ch)}</a>')
                 chl.setOpenExternalLinks(True)
-                chl.setToolTip(link)
+                chl.setToolTip(plain_tip(link))
             else:
-                chl.setText(html.escape(ch))
+                chl.setTextFormat(Qt.TextFormat.PlainText)
+                chl.setText(ch)
             names.addWidget(chl)
         names.addStretch(1)
         top.addLayout(names, 1)
@@ -102,6 +105,7 @@ class SourceDialog(QDialog):
             lab.setObjectName("hint")
             grid.addWidget(lab, r, 0)
             vl = QLabel(val)
+            vl.setTextFormat(Qt.TextFormat.PlainText)
             vl.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
             grid.addWidget(vl, r, 1)
         grid.setColumnStretch(2, 1)
@@ -115,7 +119,7 @@ class SourceDialog(QDialog):
         self.btn_open = QPushButton(_("Open on {site}", site=site))
         self.btn_open.setObjectName("primary")
         icons.set_icon(self.btn_open, sourceinfo.icon(self.src), "on_accent")
-        self.btn_open.setToolTip(self.src.get("link", ""))
+        self.btn_open.setToolTip(plain_tip(self.src.get("link", "")))
         self.btn_open.clicked.connect(lambda: open_link(self.src, self))
         self.btn_copy = QPushButton(_("Copy link"))
         icons.set_icon(self.btn_copy, "copy")
@@ -146,6 +150,7 @@ class SourceDialog(QDialog):
                             name=self.meta.name),
                           QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel,
                           self.parentWidget() or self)   # (asking closes this pop-up)
+        box.setTextFormat(Qt.TextFormat.PlainText)   # the name is a web title
         box.button(QMessageBox.StandardButton.Yes).setText(_("Delete"))
         box.setDefaultButton(QMessageBox.StandardButton.Cancel)
         if box.exec() != QMessageBox.StandardButton.Yes:

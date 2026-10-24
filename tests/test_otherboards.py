@@ -157,6 +157,30 @@ def test_exp_reads_files_and_hotkeys(tmp_path, encoding):
     assert [e.exists for e in rows] == [True, True, True, False, True]
 
 
+@pytest.mark.parametrize("share", [r"\\attacker.example\s\airhorn.mp3",
+                                   "//attacker.example/s/airhorn.mp3",
+                                   r"\\?\UNC\attacker.example\s\airhorn.mp3",
+                                   r"\\attacker.example@SSL\DavWWWRoot\airhorn.mp3"])
+def test_a_board_file_naming_a_network_share_never_reaches_it(tmp_path, monkeypatch, share):
+    """A board someone sent can list sounds on any server: looking at one has Windows
+    connect there with this PC's sign-in, around the proxy, Tor and Offline mode. Those
+    are left out, never looked at."""
+    looked = []
+    real = Path.is_file
+    monkeypatch.setattr(Path, "is_file", lambda self: looked.append(str(self)) or real(self))
+    p = tmp_path / "board.json"
+    p.write_text(json.dumps({"soundboardEntries": [
+        {"file": share, "activationKeysNumbers": []},
+        {"file": str(_wav(tmp_path / "s" / "mine.wav")), "activationKeysNumbers": []}]}))
+    rows = expboard.read(p)
+    assert [e.exists for e in rows] == [False, True]
+    assert not any("attacker" in x for x in looked)
+    ok, bad = otherboards.importable(rows)
+    assert [Path(e.path).name for e in ok] == ["mine.wav"] and len(bad) == 1
+    assert otherboards.on_this_pc(Path(r"C:\sounds\a.mp3"))
+    assert otherboards.on_this_pc(Path(r"\\?\C:\sounds\a.mp3"))
+
+
 def test_exp_finds_a_board_in_documents_when_the_registry_has_none(tmp_path, monkeypatch):
     monkeypatch.setattr(expboard, "_last_board", lambda: None)
     monkeypatch.setenv("USERPROFILE", str(tmp_path))

@@ -148,6 +148,20 @@ def test_crafted_archive_is_contained(app_dir, tmp_path):
     assert not (tmp_path.parent / "escape.wav").exists()
 
 
+@pytest.mark.parametrize("key, kept", [("space", False), ("w", False), ("shift+enter", False),
+                                       ("ctrl+c", False), ("alt+f4", False), ("f1", True),
+                                       ("ctrl+alt+1", True), ("num 1", True)])
+def test_a_pack_never_takes_a_key_every_app_uses(app_dir, tmp_path, key, kept):
+    """A sound pack goes in without asking: its hotkeys can't take Space, a letter or
+    Ctrl+C from every other program (set by hand, a warning says so)."""
+    zp = tmp_path / "pack.zip"
+    with zipfile.ZipFile(zp, "w") as z:
+        z.write(_tone(tmp_path / "x.wav"), "a/x.wav")
+        z.writestr("a/sound.json", json.dumps({"name": "a", "audio": "x.wav", "hotkey": key}))
+    (m,) = backup.install(backup.read(zp), set()).sounds
+    assert (m.hotkey == key) is kept
+
+
 def test_oversized_entries_are_refused(app_dir, tmp_path, monkeypatch):
     zp = tmp_path / "big.zip"
     with zipfile.ZipFile(zp, "w", zipfile.ZIP_DEFLATED) as z:
@@ -240,6 +254,21 @@ def test_apply_settings_checks_types_and_skips_local_ones():
     assert cfg.sound_vol == 2.0 and cfg.pad_width == 180 and cfg.cue_sounds is False
     assert cfg.mic_device is None and cfg.update_check is True
     assert sorted(changed) == ["cue_sounds", "pad_width", "sound_vol"]
+
+
+def test_a_backup_never_brings_keys_sent_elsewhere_ids_or_twitch_chat_rules():
+    """A backup may be someone else's: it mustn't set the key sent to the game with
+    every sound (Alt+F4), who in Twitch chat may make the app speak or post as you,
+    this install's store id or privacy switches, or another PC's Discord state."""
+    cfg = Config()
+    theirs = {"ptt_key": "alt+f4", "hotkeys_share": False, "store_id": "a" * 32,
+              "api_stream": {"tts": "everyone", "reply_missing": "follow me"},
+              "netlog_keep": True, "app_log": False, "stats_ffmpeg_failed": True,
+              "discord_talk": {"x": {"echoCancellation": False}}, "discord_restore": False}
+    assert backup.apply_settings(cfg, dict(theirs, mon_vol=0.5)) == ["mon_vol"]
+    for k in theirs:
+        assert getattr(cfg, k) == getattr(Config(), k), k
+    assert not set(theirs) & set(backup.settings_of(cfg))   # nor exported
 
 
 def test_apply_settings_never_takes_the_windows_own_state():

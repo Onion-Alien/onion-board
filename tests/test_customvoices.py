@@ -136,6 +136,33 @@ def test_a_program_voice_writes_its_wav(tmp_path):
         CustomVoice("P", command=[sys.executable, "-c", "raise SystemExit(3)"]).synth("x")
 
 
+def test_a_program_voice_gets_the_line_as_a_file_or_one_plain_argument(tmp_path):
+    out = tmp_path / "src.wav"
+    out.write_bytes(wav_bytes(1000, 16000))
+    line = 'x" & calc & "'
+    script = ("import shutil, sys; from pathlib import Path; "
+              "t = Path(sys.argv[2]).read_text(encoding='utf-8'); "
+              f"assert t == sys.argv[3] == {line!r}, (t, sys.argv[3]); "
+              f"shutil.copy({str(out)!r}, sys.argv[1])")
+    v = CustomVoice("P", command=[sys.executable, "-c", script, "{out}", "{text_file}",
+                                  "{text}"])
+    mono, sr = v.synth(line)   # a program (not a script) gets it as one argument, as is
+    assert sr == 16000 and len(mono) == 1000
+    opt = ("import shutil, sys; assert sys.argv[2] == 'help', sys.argv[2]; "
+           f"shutil.copy({str(out)!r}, sys.argv[1])")
+    CustomVoice("P", command=[sys.executable, "-c", opt, "{out}", "{text}"]).synth("--help")
+
+
+@pytest.mark.parametrize("program", ["C:/tools/say.bat", "say.cmd", "cmd", "powershell.exe",
+                                     "C:/Windows/System32/WindowsPowerShell/v1.0/powershell"])
+def test_chat_text_never_goes_into_a_scripts_command_line(program):
+    """Lines come from Twitch chat: on a .bat's command line `x" & calc & "` runs calc
+    (cmd.exe has its own quoting), so {text} is refused there before anything runs."""
+    v = CustomVoice("P", command=[program, "/c", "say", "{text}"])
+    with pytest.raises(RuntimeError, match="text_file"):
+        v.synth('x" & calc & "')
+
+
 @pytest.mark.windows   # Windows sorts file names whatever their case
 def test_voice_set_lists_and_routes_custom_voices(vdir, server, monkeypatch):
     url, seen = server

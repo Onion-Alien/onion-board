@@ -33,6 +33,7 @@ from soundboard.ui.kit import icons
 from soundboard.ui.window import responsive
 from soundboard.ui.bun.scribebun import ScribeBunny
 from soundboard.ui.kit.widgets import fmt_time
+from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.ui.kit.pixels import snap_to_pixels
 from soundboard.ui.kit.restyled import measured, on_restyle
 from soundboard.ui.window.downloadparts import (SOFT, ElideLabel, KindTag, Outcome,
@@ -969,7 +970,7 @@ class DownloadBar(QFrame):
         self.src_icon.setToolTip(self._source[1])
 
         self.lbl_title.setText(self.title)
-        self.lbl_title.setToolTip(self.title)
+        self.lbl_title.setToolTip(plain_tip(self.title))   # a web title (plaintext.py)
         meta = " · ".join(x for x in (channel, fmt_time(seconds) if seconds else "") if x)
         self._meta = meta
         self.lbl_meta.setText(meta)
@@ -1112,7 +1113,7 @@ class DownloadBar(QFrame):
         title = ElideLabel()
         name = pretty_title(q.get("title", "")) or _("Sound")
         title.setText(name)
-        title.setToolTip(name)
+        title.setToolTip(plain_tip(name))
         title.setObjectName("queuetitle")
         title.setProperty("waiting", how == "wait")
         col.addWidget(title)

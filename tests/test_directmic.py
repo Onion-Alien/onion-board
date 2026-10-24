@@ -19,8 +19,10 @@ import pytest
 from conftest import own_module, real_pc_timing, said
 from soundboard.ui.kit import toast
 from soundboard.mic import directmic as dm
+from soundboard.win import systools
 from test_mainwindow import window  # noqa: F401  (fixture)
 
+TASKKILL = systools.tool("taskkill")   # Windows' own, by its full path
 _REAL_ELEVATED = dm._elevated   # (before the conftest guard replaces it)
 # (before the conftest guard replaces them)
 _REAL_UNMARK, _REAL_MARKED = dm._unmark, dm._marked
@@ -70,7 +72,7 @@ def test_a_mic_app_left_silent_by_the_audio_restart_is_restarted(monkeypatch):
     app to start it again, and its mic is listened to once more."""
     calls = _mic_app_kit(monkeypatch, [[100], [100], [200]], [True, False])
     dm._mic_apps_back()
-    assert calls == [("listen", SONAR_MIC), ["taskkill", "/F", "/PID", "100"],
+    assert calls == [("listen", SONAR_MIC), [TASKKILL, "/F", "/PID", "100"],
                      ("listen", SONAR_MIC)]
 
 
@@ -93,7 +95,7 @@ def test_a_mic_app_that_doesnt_come_back_is_reported(monkeypatch, caplog):
     ticks = iter(range(0, 1000, 5))
     monkeypatch.setattr(dm.time, "monotonic", lambda: next(ticks))
     dm._mic_apps_back()
-    assert ["taskkill", "/F", "/PID", "100"] in calls
+    assert [TASKKILL, "/F", "/PID", "100"] in calls
     assert "didn't start again" in caplog.text
 
 
@@ -1084,7 +1086,7 @@ def test_a_retry_after_a_silent_mic_still_restarts_for_it(fake_reg, monkeypatch,
 def test_an_old_silent_note_is_no_retry(fake_reg, monkeypatch, tmp_path):
     calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [True] * 40)
     (dm.data_dir()).mkdir(parents=True, exist_ok=True)
-    (dm.data_dir() / dm.LEFT_SILENT).write_text(json.dumps(
+    (dm.data_dir().parent / dm.LEFT_SILENT).write_text(json.dumps(
         {"at": time.time() - dm.RETRY_S - 5, "mics": [GUID]}), encoding="utf-8")
     assert dm.admin_install(GUID) == 0
     assert len([c for c in calls if c[0] is False]) == 1   # silent before: left alone
@@ -3199,9 +3201,10 @@ def test_a_planted_link_is_replaced_not_followed(tmp_path):
 
 
 @pytest.mark.windows   # Windows' access lists
-def test_the_folder_gets_exactly_its_access_and_nothing_inside_changes(tmp_path):
+def test_the_folder_gets_exactly_its_access_and_nothing_inside_changes(tmp_path, monkeypatch):
     d = tmp_path / "MicPlugin"
     (d / "inside").mkdir(parents=True)
+    monkeypatch.setattr(dm, "_owner", lambda p: "S-1-5-32-544")   # the admin step's own
     inside = _dacl(d / "inside")
     dm._secure_dir(d, _TEST_SDDL)
     assert _dacl(d) == _TEST_SDDL
@@ -3249,6 +3252,74 @@ def test_the_admin_ring_never_writes_through_a_link(tmp_path, monkeypatch):
     assert dm.make_ring_ok(d / "ring2.bin")
     assert outside.read_bytes() == b"keep"
     assert not list(d.glob("*.tmp"))
+
+
+@pytest.mark.windows   # Windows' junctions
+def test_the_admin_ring_never_goes_through_a_folder_turned_into_a_link(tmp_path, monkeypatch):
+    """Signed-in users may write in MicPlugin, so they can empty it and make it a junction
+    (to a folder of theirs, or \\RPC Control and its symlinks): the admin step then made
+    and deleted files wherever it pointed. Now it's made safe again first."""
+    d, theirs = tmp_path / "MicPlugin", tmp_path / "theirs"
+    theirs.mkdir()
+    (theirs / "ring.bin").write_text("keep")
+    _junction(d, theirs)
+    monkeypatch.setattr(dm, "data_dir", lambda: d)
+    monkeypatch.setattr(dm, "ring_path", lambda: d / "ring2.bin")
+    secured = []
+
+    def secure():
+        secured.append(True)
+        os.rmdir(d)   # (the link itself)
+        d.mkdir()
+    monkeypatch.setattr(dm, "secure_data_dirs", secure)
+    dm._make_ring()
+    assert secured and dm.make_ring_ok(d / "ring2.bin")
+    assert sorted(p.name for p in theirs.iterdir()) == ["ring.bin"]   # nothing made or gone
+
+
+@pytest.mark.windows   # Windows' junctions
+def test_removing_a_folder_never_follows_a_link_in_it(tmp_path, monkeypatch):
+    """A planted %ProgramData%\\OnionBoard junction (the cleanup tool) or one deep inside
+    a folder: only the link goes, nothing behind it is removed or marked for removal."""
+    victim = tmp_path / "victim"
+    (victim / "deep").mkdir(parents=True)
+    (victim / "deep" / "system.ini").write_text("keep")
+    marked = []
+    monkeypatch.setattr(dm, "_gone_at_restart", marked.append)
+    top = tmp_path / "OnionBoard"
+    _junction(top, victim)
+    dm._remove(top)
+    assert not os.path.lexists(top) and (victim / "deep" / "system.ini").exists()
+    tree = tmp_path / "ours"
+    (tree / "a").mkdir(parents=True)
+    _junction(tree / "a" / "j", victim)
+    (tree / "a" / "f.txt").write_text("x")
+    dm._remove(tree)
+    assert not tree.exists() and (victim / "deep" / "system.ini").exists() and not marked
+
+
+@pytest.mark.windows   # Windows' access lists
+def test_a_folder_someone_else_made_is_replaced_not_re_secured(tmp_path, monkeypatch):
+    """%ProgramData%\\OnionBoard made by another account before the first set-up: a handle
+    they opened then keeps its rights after the folder is re-secured in place. Their
+    folder goes (with what's in it) and a new one is made."""
+    d = tmp_path / "OnionBoard"
+    (d / "x" / "y").mkdir(parents=True)
+    monkeypatch.setattr(dm, "_owner", lambda p: "S-1-5-21-1-2-3-1001")
+    assert dm._secure_dir(d, _TEST_SDDL) == "S-1-5-21-1-2-3-1001"
+    assert d.is_dir() and not list(d.iterdir()) and _dacl(d) == _TEST_SDDL
+
+
+def test_the_silent_mics_note_is_kept_where_only_admins_write(tmp_path):
+    """MicPlugin is the users' folder: the note's name there could be a link that SYSTEM
+    then wrote or deleted through."""
+    dm.data_dir().mkdir(parents=True, exist_ok=True)
+    dm._remember_silent([GUID])
+    assert (dm.data_dir().parent / dm.LEFT_SILENT).exists()
+    assert not (dm.data_dir() / dm.LEFT_SILENT).exists()
+    assert dm._left_silent() == {GUID.lower()}
+    dm._remember_silent([])
+    assert not (dm.data_dir().parent / dm.LEFT_SILENT).exists()
 
 
 def test_who_is_listening_looks_at_the_mic_itself(window, monkeypatch):  # noqa: F811
@@ -4334,11 +4405,8 @@ def test_a_held_old_copy_goes_at_the_next_restart(monkeypatch, tmp_path):
     monkeypatch.setattr(dm, "_gone_at_restart", lambda p: marked.append(p))
     old = tmp_path / "obmic-old.dll"
     old.write_bytes(b"old")
-
-    def unlink(self, missing_ok=False):
-        raise PermissionError("in use") if self.exists() else FileNotFoundError(self)
-    monkeypatch.setattr(Path, "unlink", unlink)
-    dm._remove(old)
+    with open(old, "rb"):   # held (no FILE_SHARE_DELETE), as Windows' audio holds it
+        dm._remove(old)
     assert marked == [old]
     dm._remove(tmp_path / "gone.dll")   # already gone: nothing to mark
     assert marked == [old]

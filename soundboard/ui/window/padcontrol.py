@@ -33,6 +33,7 @@ from soundboard.ui.apps import clipeditor
 from soundboard.ui.window import responsive
 from soundboard.ui.sounds import sourcedialog
 from soundboard.ui.kit import icons
+from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.kit.panel import icon_label, steady_number
 
@@ -180,8 +181,9 @@ class PadControl(Controller):
             return
         m.volume = round(min(2.0, max(0.0, m.volume + 0.05 * steps)), 2)
         mw.engine.set_gain(sid, mw.gain_for(m))
-        QToolTip.showText(QCursor.pos(), _("{name}: {pct}%", name=m.name,
-                                           pct=round(m.volume * 100)), mw.pads.get(sid))
+        QToolTip.showText(QCursor.pos(), plain_tip(_("{name}: {pct}%", name=m.name,
+                                                     pct=round(m.volume * 100))),
+                          mw.pads.get(sid))
         if not mw.playctl._count_save.isActive():
             mw.playctl._count_save.start()
 

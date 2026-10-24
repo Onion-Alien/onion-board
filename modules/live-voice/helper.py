@@ -399,8 +399,9 @@ def main(argv=None) -> int:
                 log.exception("transcription failed")
                 link.send(type="error", text=f"transcription failed: {e}")
                 return None
-            log.info("%.1fs of speech -> %r in %.2fs", len(audio) / RATE, text,
-                     time.monotonic() - t0)
+            # never the words: this log is a file on disk, kept with the app log off too
+            log.info("%.1fs of speech -> %d characters in %.2fs", len(audio) / RATE,
+                     len(text or ""), time.monotonic() - t0)
             if not text or tr is None:
                 return (text, "") if text else None
             t0 = time.monotonic()
@@ -410,7 +411,8 @@ def main(argv=None) -> int:
                 log.exception("translation failed")
                 link.send(type="error", text=f"translation failed: {e}")
                 return None
-            log.info("  translated -> %r in %.2fs", said, time.monotonic() - t0)
+            log.info("  translated -> %d characters in %.2fs", len(said or ""),
+                     time.monotonic() - t0)
             return (said, text) if said else None
 
         while (audio := work.get()) is not None:

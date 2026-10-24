@@ -248,6 +248,18 @@ def test_an_old_token_is_refreshed_and_kept(qapp, window, monkeypatch):
     assert (w.cfg.twitch_token, w.cfg.twitch_refresh) == ("tok2", "ref2")
 
 
+def test_signed_out_by_twitch_the_channel_name_opt_in_is_asked_again(qapp, window,
+                                                                     monkeypatch):
+    """Twitch ended the sign-in: whoever connects next (maybe another account) is asked
+    again before its channel's name is sent, as after Disconnect."""
+    w = window
+    t = Link(w, monkeypatch)
+    w.cfg.twitch_token, w.cfg.twitch_refresh, w.cfg.twitch_share = "tok", "ref", True
+    t.link._token_ok(twitch.TwitchError("invalid refresh token", 400))
+    assert w.cfg.twitch_token == "" and w.cfg.twitch_share is False
+    assert t.link.state == twitchlink.PROBLEM
+
+
 def test_switched_off_or_disconnected_it_stays_away(qapp, window, monkeypatch):
     w = window
     t = Link(w, monkeypatch)

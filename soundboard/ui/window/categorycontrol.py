@@ -29,6 +29,7 @@ from soundboard.i18n import _, ngettext
 from soundboard.sounds.library import SoundMeta
 from soundboard.ui.kit.hotkeypick import pretty_key
 from soundboard.ui.kit import icons
+from soundboard.ui.kit.plaintext import plain_tip   # (names from backups and packs)
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.sounds.padbatch import fill_colour_menu
 from soundboard.ui.kit.panel import Flow
@@ -250,9 +251,11 @@ class CategoryControl(Controller):
         n = sum(tag in m.tags for m in mw.cfg.sounds)
         if n and QMessageBox.question(
                 mw, _("Delete subcategory"),
-                ngettext("Delete the “{name}” subcategory? Its {n} sound stay in {cat}.",
-                         "Delete the “{name}” subcategory? Its {n} sounds stay in {cat}.",
-                         n, name=sub, cat=cat)) != QMessageBox.StandardButton.Yes:
+                plain_tip(ngettext("Delete the “{name}” subcategory? Its {n} sound stay in "
+                                   "{cat}.",
+                                   "Delete the “{name}” subcategory? Its {n} sounds stay in "
+                                   "{cat}.", n, name=sub, cat=cat))
+                ) != QMessageBox.StandardButton.Yes:
             return
         subs.remove(sub)
         if not subs:
@@ -533,11 +536,11 @@ class CategoryControl(Controller):
         n = sum(name in m.tags for m in mw.cfg.sounds)
         if n and QMessageBox.question(
                 mw, _("Delete category"),
-                ngettext("Delete the “{name}” category? Its {n} sound stay in All (and any other "
-                         "categories they're in).",
-                         "Delete the “{name}” category? Its {n} sounds stay in All (and any "
-                         "other categories they're in).",
-                         n, name=name)) != QMessageBox.StandardButton.Yes:
+                plain_tip(ngettext("Delete the “{name}” category? Its {n} sound stay in All "
+                                   "(and any other categories they're in).",
+                                   "Delete the “{name}” category? Its {n} sounds stay in All "
+                                   "(and any other categories they're in).", n, name=name))
+                ) != QMessageBox.StandardButton.Yes:
             return
         cfg = mw.cfg
         was = {   # for Undo: everything below takes from it

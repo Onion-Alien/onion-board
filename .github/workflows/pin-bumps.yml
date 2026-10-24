@@ -29,19 +29,23 @@ permissions:
   contents: read
 
 jobs:
-  bump:
+  # `check` downloads and runs new upstream programs (the smoke tests), so its token can
+  # only read and none is left in .git/config; it leaves each bump's edited pin and PR
+  # text as an artifact. `open` has the write token and runs nothing downloaded: it
+  # puts those pin files back (only files a checker may edit) and opens the PRs.
+  check:
     runs-on: windows-latest
     timeout-minutes: 25
     permissions:
-      contents: write        # push pin-bump/* branches
-      pull-requests: write   # open their PRs
-      actions: write         # start checks.yml on them
+      contents: read
     strategy:
       fail-fast: false
       matrix:
         checker: [tor, ffmpeg, qjs, python, ytdlp]
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
@@ -50,8 +54,40 @@ jobs:
       # On a PR touching the bumpers: check, verify and smoke-test only, change nothing.
       # Git Bash puts Git for Windows' gpg on PATH (tor.py checks a signature with it).
       - env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ github.token }}   # (read-only here: GitHub's API rate limit)
           PYTHONIOENCODING: utf-8
+          PINBUMP_OUT: ${{ runner.temp }}/pinbump
           DRY_RUN: ${{ github.event_name == 'pull_request' && '--dry-run' || '' }}
         shell: bash
         run: python scripts/pinbump/${{ matrix.checker }}.py $DRY_RUN
+      - if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v7
+        with:
+          name: pinbump-${{ matrix.checker }}
+          path: ${{ runner.temp }}/pinbump/
+          if-no-files-found: ignore
+          retention-days: 2
+
+  open:
+    needs: check
+    if: ${{ !cancelled() && github.event_name != 'pull_request' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write        # push pin-bump/* branches
+      pull-requests: write   # open their PRs
+      actions: write         # start checks.yml on them
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: pinbump-*
+          merge-multiple: true
+          path: ${{ runner.temp }}/pinbump
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          PYTHONIOENCODING: utf-8
+        run: python scripts/pinbump/open_pr.py "${{ runner.temp }}/pinbump"

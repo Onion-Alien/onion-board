@@ -33,6 +33,7 @@ from soundboard.ui.kit.widgets import take_out
 from soundboard.ui.kit.panel import (Flow, UndoBar, ViewToggle, hint_label, section_label,
                                      steady_number)
 from soundboard.i18n import _, ngettext
+from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.ui.voice.fxcontrols import _enable
 # (callers import these from here too)
 from soundboard.ui.voice.fxcontrols import ParamSlider, Switch, param_text  # noqa: F401
@@ -954,9 +955,10 @@ class VoiceFxPanel(QWidget):
             other = self.store.find(name)
             if other is None or other == keep:
                 return name
-            if QMessageBox.question(self._parent(), title,
-                                    _("You already have a voice called “{name}”. Replace it?",
-                                      name=other)) == QMessageBox.StandardButton.Yes:
+            if QMessageBox.question(self._parent(), title,   # (a name from a backup too)
+                                    plain_tip(_("You already have a voice called “{name}”. "
+                                                "Replace it?", name=other))
+                                    ) == QMessageBox.StandardButton.Yes:
                 return other
             text = name
 

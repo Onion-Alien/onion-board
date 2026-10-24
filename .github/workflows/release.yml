@@ -30,15 +30,18 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
-    runs-on: windows-latest
-    timeout-minutes: 60
-    permissions:
-      contents: write   # the draft release
+  # Three jobs, so no token that can write sits next to code from outside: `build`
+  # installs PyPI / npm / Chocolatey packages and runs them with a read-only token (and
+  # none left in .git/config); only `release`, which runs nothing but curl, gh and the
+  # files built, can write, and it takes the installer's SHA-256 from `build`.
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      skip: ${{ steps.gate.outputs.skip }}
     env:
       GH_TOKEN: ${{ github.token }}
       TAG: ${{ github.event.inputs.tag || (github.event_name == 'push' && github.ref_name) || '' }}
-      HAS_VT: ${{ secrets.VT_API_KEY != '' }}
     steps:
       - name: Already released?
         id: gate
@@ -48,16 +51,28 @@ jobs:
             echo "A release for $TAG already exists: nothing to do."
             echo "skip=1" >> "$GITHUB_OUTPUT"
           fi
-      - if: steps.gate.outputs.skip != '1'
-        uses: actions/checkout@v6
+
+  build:
+    needs: gate
+    if: needs.gate.outputs.skip != '1'
+    runs-on: windows-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    outputs:
+      sha: ${{ steps.build.outputs.sha }}
+    env:
+      TAG: ${{ github.event.inputs.tag || (github.event_name == 'push' && github.ref_name) || '' }}
+    steps:
+      - uses: actions/checkout@v6
         with:
           ref: ${{ env.TAG || github.sha }}
-      - if: steps.gate.outputs.skip != '1'
-        uses: actions/setup-python@v7
+          persist-credentials: false
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
       - name: Version matches the tag
-        if: steps.gate.outputs.skip != '1' && env.TAG != ''
+        if: env.TAG != ''
         shell: bash
         run: |
           v=$(sed -nE 's/^__version__ = "([^"]+)".*/\1/p' soundboard/__init__.py)
@@ -65,12 +80,10 @@ jobs:
             echo "::error::soundboard/__init__.py says $v but the tag is $TAG"; exit 1
           fi
       # Node for Elgato's CLI: build.ps1 packs the Stream Deck plugin with it
-      - if: steps.gate.outputs.skip != '1'
-        uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: "24"
       - name: Tools (venv, Inno Setup, MinGW-w64 g++ for the mic effect and bootloader)
-        if: steps.gate.outputs.skip != '1'
         shell: pwsh
         run: |
           python -m venv .venv
@@ -84,7 +97,7 @@ jobs:
             "C:\ProgramData\mingw64\mingw64\bin" | Out-File -Append -Encoding utf8 $env:GITHUB_PATH
           }
       - name: Build (build.ps1 -Clean)
-        if: steps.gate.outputs.skip != '1'
+        id: build
         shell: pwsh
         run: |
           ./build.ps1 -Clean
@@ -94,27 +107,64 @@ jobs:
           }
           Copy-Item dist\OnionBoardSetup.exe dist\OnionBoardSetup-update.exe
           $sha = (Get-FileHash dist\OnionBoardSetup.exe -Algorithm SHA256).Hash.ToLower()
-          "SHA=$sha" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          "sha=$sha" | Out-File -Append -Encoding utf8 $env:GITHUB_OUTPUT
           $mb = [math]::Round((Get-Item dist\OnionBoardSetup.exe).Length / 1MB)
           "Built OnionBoardSetup.exe: $mb MB, SHA-256 $sha" | Out-File -Append -Encoding utf8 $env:GITHUB_STEP_SUMMARY
+          New-Item -ItemType Directory -Force out | Out-Null
+          Copy-Item dist\OnionBoardSetup.exe, dist\OnionBoardSetup-update.exe, dist\com.onionalien.onionboard.streamDeckPlugin out\
+          if (Test-Path build\michelper\obmichelper\obmichelper.exe) {
+            Copy-Item build\michelper\obmichelper\obmichelper.exe out\
+          }
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-files
+          path: out/
+          retention-days: 3
+
+  release:
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write   # the draft release
+    env:
+      TAG: ${{ github.event.inputs.tag || (github.event_name == 'push' && github.ref_name) || '' }}
+      HAS_VT: ${{ secrets.VT_API_KEY != '' }}
+      SHA: ${{ needs.build.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v6   # (for CHANGELOG.md only: nothing from it runs)
+        with:
+          ref: ${{ env.TAG || github.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v7
+        with:
+          name: release-files
+          path: out
+      - name: The files are the ones built
+        shell: bash
+        run: |
+          got=$(sha256sum out/OnionBoardSetup.exe | cut -d' ' -f1)
+          [ "$got" = "$SHA" ] || { echo "::error::OnionBoardSetup.exe isn't the file built"; exit 1; }
+          cmp out/OnionBoardSetup.exe out/OnionBoardSetup-update.exe
       # Upload, then wait for the full report: a fresh upload often has engines that
       # haven't answered yet, so poll until the analysis says completed (max 20 min).
       - name: VirusTotal scan
         id: vt
-        if: steps.gate.outputs.skip != '1' && env.TAG != '' && env.HAS_VT == 'true'
+        if: env.TAG != '' && env.HAS_VT == 'true'
         env:
           VT_API_KEY: ${{ secrets.VT_API_KEY }}
         shell: bash
         run: |
           scan() {
             up=$(curl -sf -H "x-apikey: $VT_API_KEY" https://www.virustotal.com/api/v3/files/upload_url \
-                 | python -c "import json,sys; print(json.load(sys.stdin)['data'])") || return 1
+                 | python3 -c "import json,sys; print(json.load(sys.stdin)['data'])") || return 1
             id=$(curl -sf -H "x-apikey: $VT_API_KEY" -F "file=@$1" "$up" \
-                 | python -c "import json,sys; print(json.load(sys.stdin)['data']['id'])") || return 1
+                 | python3 -c "import json,sys; print(json.load(sys.stdin)['data']['id'])") || return 1
             for i in $(seq 1 40); do
               sleep 30
               r=$(curl -sf -H "x-apikey: $VT_API_KEY" "https://www.virustotal.com/api/v3/analyses/$id") || continue
-              line=$(python -c "
+              line=$(python3 -c "
           import json,sys
           a=json.loads(sys.argv[1])['data']['attributes']
           if a['status']!='completed': sys.exit(1)
@@ -123,7 +173,7 @@ jobs:
             done
             return 1
           }
-          if res=$(scan dist/OnionBoardSetup.exe); then
+          if res=$(scan out/OnionBoardSetup.exe); then
             set -- $res
             echo "clean=$1" >> "$GITHUB_OUTPUT"; echo "total=$2" >> "$GITHUB_OUTPUT"
             echo "VirusTotal (installer): $1 of $2 clean" >> "$GITHUB_STEP_SUMMARY"
@@ -131,16 +181,17 @@ jobs:
           else
             echo "::warning::VirusTotal scan of the installer didn't finish; scan it by hand"
           fi
-          helper=build/michelper/obmichelper/obmichelper.exe
+          helper=out/obmichelper.exe
           if [ -f "$helper" ] && res=$(scan "$helper"); then
             set -- $res
             echo "VirusTotal (mic helper): $1 of $2 clean" >> "$GITHUB_STEP_SUMMARY"
             [ "$1" = "$2" ] || echo "::warning::VirusTotal flags the mic helper: only $1 of $2 clean"
           fi
       - name: Draft release
-        if: steps.gate.outputs.skip != '1' && env.TAG != ''
+        if: env.TAG != ''
         shell: bash
         env:
+          GH_TOKEN: ${{ github.token }}   # (only here: the one step that writes)
           CLEAN: ${{ steps.vt.outputs.clean }}
           TOTAL: ${{ steps.vt.outputs.total }}
         run: |
@@ -166,7 +217,7 @@ jobs:
           SHA-256 (OnionBoardSetup.exe): \`$SHA\`
           $vt
           EOF
-          gh release create "$TAG" dist/OnionBoardSetup.exe dist/OnionBoardSetup-update.exe \
-            dist/com.onionalien.onionboard.streamDeckPlugin \
-            --draft --verify-tag --title "Onion Board $v" --notes-file notes.md
+          gh release create "$TAG" out/OnionBoardSetup.exe out/OnionBoardSetup-update.exe \
+            out/com.onionalien.onionboard.streamDeckPlugin \
+            --draft --verify-tag --title "Onion Board $v" --notes-file notes.md -R "$GITHUB_REPOSITORY"
           echo "Draft release made: write the headline, install it over a real copy, then publish." >> "$GITHUB_STEP_SUMMARY"

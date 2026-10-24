@@ -73,6 +73,7 @@ from soundboard.ui.window.windowtabs import WindowTabs
 from soundboard.ui.window.windowtoasts import (TOAST_EXPAND, _TONE_SPAN,  # noqa: F401  (moved)
                                               WindowToasts)
 from soundboard.ui.kit import a11y, busy, icons
+from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.ui.settings import lite
 from soundboard.ui.window import livesize, responsive
 from soundboard.ui.window import sidebar  # noqa: F401  (tests read it here)
@@ -483,7 +484,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
     def _set_np_name(self, text: str):
         self.np_name.setText(self.np_name.fontMetrics().elidedText(
             text, Qt.TextElideMode.ElideRight, 186))
-        self.np_name.setToolTip(text)
+        self.np_name.setToolTip(plain_tip(text))   # a sound's name: web / board text
         self._name_seek.relayout()
         self.mini_name.setText(text)   # hides itself when it has no room
         if text == _("Pick a sound"):   # nothing picked: no time either

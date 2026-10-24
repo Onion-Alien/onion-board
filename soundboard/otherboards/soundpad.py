@@ -20,7 +20,7 @@ import os
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-from soundboard.otherboards import Entry, Source, vk_hotkey
+from soundboard.otherboards import Entry, Source, usable, vk_hotkey
 from soundboard.i18n import _
 
 LIST_NAME = "soundlist.spl"
@@ -77,7 +77,7 @@ def read(path: str | Path) -> list[Entry]:
         if artist and artist.lower() not in name.lower():
             name = f"{artist} - {name}"
         entries.append(Entry(str(p), name[:40], hotkey(s.get("key"), s.get("keyModifiers")),
-                             exists=p.is_file()))
+                             exists=usable(p)))
     cats = root.find("Categories")
     if cats is not None:
         _tag(cats, entries)

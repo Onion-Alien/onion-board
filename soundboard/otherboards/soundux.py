@@ -18,7 +18,7 @@ import json
 import os
 from pathlib import Path
 
-from soundboard.otherboards import Entry, Source, vk_hotkey
+from soundboard.otherboards import Entry, Source, usable, vk_hotkey
 from soundboard.i18n import _
 
 MAX_BYTES = 50 * 1024 * 1024
@@ -87,7 +87,7 @@ def read(path: str | Path) -> list[Entry]:
                 name = name[:-len(p.suffix)]
             out.append(Entry(str(p), name.strip()[:40] or p.stem,
                              hotkey(s.get("hotkeys")),
-                             [tab] if tab and len(tabs) > 1 else [], exists=p.is_file()))
+                             [tab] if tab and len(tabs) > 1 else [], exists=usable(p)))
     return out
 
 

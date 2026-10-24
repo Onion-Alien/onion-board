@@ -162,3 +162,14 @@ def test_a_failed_download_has_one_short_reason_for_the_count(raw, why):
 ])
 def test_download_reasons_read_both_ytdlps_and_our_words(raw, why):
     assert errors.download_reason(raw) == why
+
+
+def test_a_report_link_never_carries_the_home_folder_in_what_it_said(monkeypatch, tmp_path):
+    """The message itself can name a path (a downloader error): it goes in the address
+    the browser opens, so it's scrubbed like the details are."""
+    from soundboard.core import applog
+    monkeypatch.setattr(applog.Path, "home", lambda: tmp_path / "Ann")
+    p = errors.Problem(f"Couldn't write {tmp_path / 'Ann' / 'Music' / 'x.mp3'}",
+                       reportable=True)
+    url = unquote(errors.report_url(p))
+    assert str(tmp_path / "Ann") not in url and "%USERPROFILE%" in url

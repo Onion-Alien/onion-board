@@ -382,11 +382,12 @@ def report_url(p: Problem, where: str = "") -> str:
     The user sees it in the browser and decides what to send."""
     from soundboard import __version__
     from soundboard.core.feedback import ISSUE_URL
-    title = f"Problem: {where}" if where else "Problem: " + _short(p.text, 70)
+    said = _scrub(p.text)   # (it can hold a path or a link: it goes in the address)
+    title = f"Problem: {where}" if where else "Problem: " + _short(said, 70)
     body = (f"**Onion Board version:** {__version__}\n"
             + _extra_versions(p.detail)
             + (f"**Where:** {where}\n" if where else "")
-            + f"**What it said:** {p.text}\n\n"
+            + f"**What it said:** {said}\n\n"
             "**What were you doing?**\n\n\n"
             "<details><summary>Details</summary>\n\n```\n"
             + _short(p.detail, 1500) + "\n```\n</details>\n")

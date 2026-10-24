@@ -264,6 +264,7 @@ class TriggersTab(QWidget):
         h = QHBoxLayout(self.update_bar)
         h.setContentsMargins(0, 8, 0, 0)
         self.update_text = hint_label("")
+        self.update_text.setTextFormat(Qt.TextFormat.PlainText)   # release notes: GitHub's text
         h.addWidget(self.update_text, 1)
         self.btn_update = QPushButton(_("Update"))
         self.btn_update.setObjectName("primary")

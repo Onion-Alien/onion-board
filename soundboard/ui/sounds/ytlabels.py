@@ -2,15 +2,13 @@
 label cut to a few lines with an ellipsis (the Store's cards use it too)."""
 from __future__ import annotations
 
-import html
-
 from PySide6.QtCore import QEvent, QPointF, Qt
 from PySide6.QtGui import QColor, QPainter, QTextLayout
 from PySide6.QtWidgets import QLabel, QSizePolicy
 
 from soundboard.ui.kit import theme
 from soundboard.online import ytdl
-from soundboard.ui.kit import icons
+from soundboard.ui.kit import icons, plaintext
 from soundboard.i18n import ngettext
 from soundboard.ui.kit.pixels import snap_to_pixels
 
@@ -45,10 +43,7 @@ def stats_text(r: ytdl.Result) -> tuple[str, str]:
     return " · ".join(parts), ", ".join(tip)
 
 
-def plain_tip(text: str) -> str:
-    """`text` as a tooltip that shows exactly what it says: a tooltip reads anything
-    that looks like HTML as HTML, and titles come from the web and the store."""
-    return f"<p>{html.escape(text)}</p>" if text else ""
+plain_tip = plaintext.plain_tip   # (titles come from the web and the store)
 
 
 class ClampLabel(QLabel):

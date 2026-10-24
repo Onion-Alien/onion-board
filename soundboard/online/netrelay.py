@@ -323,7 +323,8 @@ def _local_target(host: str) -> bool:
         return False
     ip = getattr(ip, "ipv4_mapped", None) or ip
     return (ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_unspecified
-            or ip.is_multicast or ip.is_reserved)
+            or ip.is_multicast or ip.is_reserved
+            or not ip.is_global)   # the shared range too (RFC 6598): carrier NAT, a tailnet
 
 
 _relay: _Relay | None = None
