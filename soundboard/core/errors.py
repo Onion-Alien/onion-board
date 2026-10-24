@@ -36,6 +36,10 @@ class Problem:
     text: str           # what to show the user
     detail: str = ""    # the original message, scrubbed, for a report
     reportable: bool = False   # not something the user can fix: ask them to tell us
+    # a site refusing a download in words we have no plain version of: still ours to
+    # hear about (Report it), but not counted as the app going wrong (_count): the
+    # download's own failure count already has it, and the count can't say why
+    site: bool = False
 
 
 # -- cleaning other projects' wording ----------------------------------------------
@@ -325,7 +329,8 @@ def _describe(e: BaseException | str | None, downloader: bool) -> Problem:
         if words:
             return Problem(words, detail)
         return Problem(_("The downloader ran into a problem: {error}", error=_short(cleaned))
-                       if cleaned else _("The downloader ran into a problem."), detail, True)
+                       if cleaned else _("The downloader ran into a problem."), detail, True,
+                       site=True)
     # a device first: PortAudio's "Error opening OutputStream: ..." starts like
     # libsndfile's "Error opening 'x.mp3': ...", and isn't about a sound file
     if mod.startswith("sounddevice") or "PaErrorCode" in raw:
@@ -417,8 +422,9 @@ def html(e: BaseException | str | None, before: str = "", where: str = "") -> st
 def _count(p: Problem, e) -> None:
     """A reportable problem the app handled itself (warn / html): tell the usage count
     it happened (usage.warned), so a bug the user can carry on past still shows up.
-    Type and place only, never the message. Counting never breaks a warning."""
-    if not p.reportable:
+    Type and place only, never the message. Counting never breaks a warning. A site
+    refusing a download isn't the app going wrong (Problem.site): not counted."""
+    if not p.reportable or p.site:
         return
     try:
         from soundboard.core import usage

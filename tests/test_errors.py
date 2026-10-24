@@ -39,6 +39,27 @@ def test_yt_dlp_report_upstream_text_becomes_a_report_to_us():
     assert "Adding a link" in url and "Unable to extract" in url
 
 
+def test_a_site_refusing_a_download_isnt_counted_as_the_app_going_wrong(monkeypatch):
+    """yt-dlp's words we have no plain version of still get a Report it link, but
+    aren't sent as a warned/ count: the site said no, the count can't say why, and
+    the download's own failure count already has it."""
+    from soundboard.core import usage
+    from soundboard.online import ytdl
+    counted = []
+    monkeypatch.setattr(usage, "warned", counted.append)
+    try:
+        raise ytdl._readable(DownloadError("ERROR: [youtube] x: Some new refusal"))
+    except ytdl.FetchError as e:
+        shown = errors.html(e)
+    assert "Report it" in shown
+    assert counted == []
+    try:
+        raise KeyError("ours")
+    except KeyError as e:
+        errors.html(e)
+    assert len(counted) == 1     # the app's own bugs still count
+
+
 @pytest.mark.parametrize("text", [
     "x; please report this issue on  https://github.com/foo/bar/issues , thanks",
     "Use --cookies-from-browser or --cookies for the authentication.",
