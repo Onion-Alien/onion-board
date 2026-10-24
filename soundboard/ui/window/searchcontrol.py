@@ -69,6 +69,11 @@ class SearchControl(Controller):
                 mw.search.setFocus()
                 busy.flash(mw.btn_yt, _("Type something first"))
             return
+        self._results_shown()
+
+    def _results_shown(self):
+        """Web results take the pads' place."""
+        mw = self.mw
         mw._pads_scroll.hide()
         mw.catctl._cat_row.hide()
         mw.fitctl._results_open = True
@@ -80,10 +85,7 @@ class SearchControl(Controller):
         mw = self.mw
         if mw.fitctl.is_mini() or not mw.ytresults.show_trending():
             return
-        mw._pads_scroll.hide()
-        mw.catctl._cat_row.hide()
-        mw.fitctl._results_open = True
-        mw.fitctl._sync_cat_bar()
+        self._results_shown()
 
     def on_search_enter(self):
         mw = self.mw
@@ -119,10 +121,7 @@ class SearchControl(Controller):
             return
         if not mw.ytresults.show_link(url):
             return
-        mw._pads_scroll.hide()
-        mw.catctl._cat_row.hide()
-        mw.fitctl._results_open = True
-        mw.fitctl._sync_cat_bar()
+        self._results_shown()
 
     def _retry_download(self, item: dict):
         """The download bar's Retry on a pick that failed: picked again, as if its
@@ -172,10 +171,7 @@ class SearchControl(Controller):
         self._link_meta, self._link_url = None, ""
         mw.audio.pop(LINK_ID, None)
         if mw.current == LINK_ID:
-            mw.current = None
-            mw.start_frac = 0.0
-            mw._set_np_name(_("Pick a sound"))
-            mw.np_name.setToolTip(_("Select a sound pad to use these playback controls."))
+            mw.playctl.deselect()
 
     def _results_closed(self):
         """"My sounds": all of them. The search box also filters the pads, so the web

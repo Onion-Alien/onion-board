@@ -300,11 +300,7 @@ class EditControl(Controller):
             errors.warn(mw, _("Couldn't copy the sound"), e)
             return None
         videos.copy_link(m.id, new.id)
-        mw.catctl._tag_new(new)   # stays in sight in the category showing
-        mw.cfg.sounds.insert(mw.cfg.sounds.index(m) + 1, new)
-        mw._index()
-        mw._save_now()
-        mw._rebuild_pads()
+        mw.soundctl.add_to_board(new, after=m)
         self._rerender(new)
         mw.toast(_("✓ Added “{name}”", name=html.escape(new.name)), "ok")
         return new
@@ -371,15 +367,10 @@ class EditControl(Controller):
         if new is None:
             return None
         new.fx = {} if soundfx.is_neutral(fx) else fx
-        mw.catctl._tag_new(new)   # stays in sight in the category showing
-        if link:   # not on the board: at its end, as an added link is
-            mw.cfg.sounds.append(new)
-        else:
+        if not link:
             videos.copy_link(m.id, new.id)
-            mw.cfg.sounds.insert(mw.cfg.sounds.index(m) + 1, new)
-        mw._index()
-        mw._save_now()
-        mw._rebuild_pads()
+        # a link isn't on the board: at its end, as an added link is
+        mw.soundctl.add_to_board(new, after=None if link else m)
         self._rerender(new)
         if capped:   # Redline goes further than a saved sound can
             mw.toast(_("✓ Added “{name}”, its speed and pitch kept to what a pad can save",
@@ -440,11 +431,7 @@ class EditControl(Controller):
         if mw.hkctl.keeps_stop_key(new.hotkey):
             new.hotkey = ""
         mw.hkctl._clear_dupe_hotkey(new)
-        mw.catctl._tag_new(new)   # stays in sight in the category showing
-        mw.cfg.sounds.insert(mw.cfg.sounds.index(m) + 1, new)
-        mw._index()
-        mw._save_now()
-        mw._rebuild_pads()
+        mw.soundctl.add_to_board(new, after=m)
         self._rerender(new, m.fx, mw.audio.get(m.id))
 
     def _rerender(self, m: SoundMeta, old_fx: dict | None = None, old_data=None,
