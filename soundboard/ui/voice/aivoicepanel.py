@@ -8,6 +8,9 @@ Favorites, Men, Women, In between & fun, Mine. Picking one turns it on, and the 
 that's on gets the same bar under the cards: Edit voice (its pitch), Make your own
 voice (ui/voice/aivoicebrowser.py), Hear it. Settings
 are a plain dict (`changed`) the Voice tab keeps in the speech settings under "ai".
+Its methods live in three mixins beside it: `aivoicecards` (the voice cards and the
+voice bar), `aivoicemine` (your own voices, pitch, the backup voice) and `aivoicerun`
+(settings, start / stop, the helper's events).
 """
 from __future__ import annotations
 
@@ -17,87 +20,39 @@ import logging
 import re
 import threading
 
-from PySide6.QtCore import QEvent, QPoint, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QFont, QIcon, QPainter, QPixmap
-from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QCheckBox, QComboBox, QDialog, QFrame,
-                               QGridLayout, QHBoxLayout, QLabel, QMenu,
-                               QPushButton, QSlider, QVBoxLayout, QWidget)
+from PySide6.QtCore import QEvent, QSize, Qt, QTimer, Signal
+from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QCheckBox, QComboBox, QFrame, QGridLayout,
+                               QHBoxLayout, QLabel, QPushButton, QSlider, QVBoxLayout, QWidget)
 
 from soundboard.addons import aiaddon
 from soundboard.core import applog, errors, updates, usage
-from soundboard.ui.kit import theme
 from soundboard.online import net
 from soundboard.addons import modules as mods
-from soundboard.i18n import _, ngettext
+from soundboard.i18n import _
 from soundboard.speech import aivoice
 from soundboard.speech import aivoicelist as avl
-from soundboard.ui.voice import art
-from soundboard.ui.kit import busy, fit, icons
-from soundboard.ui.voice.aivoicebrowser import (AiVoiceEditor, Previewer, hear_button,
-                                                mine_icon, mine_pixmap)
+from soundboard.ui.kit import busy, icons
+from soundboard.ui.voice.aivoicebrowser import Previewer, hear_button
 from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.kit.glowbutton import GlowButton
-from soundboard.ui.voice.effectspopup import place_over
 from soundboard.ui.kit.panel import (Flow, UndoBar, ViewToggle, fold_button, hint_label,
                                      section_label)
-from soundboard.ui.voice.groupbar import GroupBar, no_match
-from soundboard.ui.voice.voicefxpanel import (LIST_MIN_W, MAX_COLS, PICKED_ART, TILE_ART,
-                                              TILE_GAP, TILE_MIN_W, BigSwitch, VoiceTile)
+from soundboard.ui.voice.groupbar import GroupBar
+from soundboard.ui.voice.voicefxpanel import PICKED_ART, TILE_ART, TILE_GAP, BigSwitch, VoiceTile
 from soundboard.ui.kit.widgets import LoadingBar
 from soundboard.ui.kit.wheelguard import no_wheel
+# the card's parts (callers import their names from here too)
+from soundboard.ui.voice.aivoicecards import (ALL, FAVS, KINDS, KIND_ICONS, MAKE,  # noqa: F401
+                                              MINE, AiVoiceCards, EditPopup,
+                                              art_key, emoji_icon, voice_icon,
+                                              voice_kind)
+from soundboard.ui.voice.aivoicemine import AiVoiceMine
+from soundboard.ui.voice.aivoicerun import BACKUP_HEARD, LOAD_TIMEOUT_MS, AiVoiceRun  # noqa: F401
 
 log = logging.getLogger(__name__)
 
 BACKUP_LABELS = [(_("A built-in voice (still hides yours)"), "voice"),
                  (_("My real voice"), "mic"), (_("Silence"), "mute")]
-# what others hear once the AI voice has stopped, by backup key ("Others now hear …")
-BACKUP_HEARD = {"voice": _("a built-in voice (still hides yours)"),
-                "mic": _("your real voice"), "mute": _("silence")}
-
-# the chips over the voice cards: All shows a heading per kind (avl.who), your own
-# first (under the long ready-made grid, the ones you recorded were out of sight)
-ALL, FAVS, MINE = "", "favs", "mine"
-# the helper loads in about a second; one still loading after this is stuck (it once
-# sat for half a minute, the backup voice on, while the cards seemed to switch)
-LOAD_TIMEOUT_MS = 20_000
-MAKE = "+make"   # the Make your own voice card's place among the voice ids
-KINDS = ((MINE, _("Mine")), ("men", _("Men")), ("women", _("Women")),
-         ("other", _("In between & fun")))
-KIND_ICONS = {"men": "voice", "women": "voice", "other": "laugh", MINE: "mic"}
-
-
-def voice_kind(voice: dict) -> str:
-    """The heading a voice card goes under: yours under Mine, else who it sounds like."""
-    return MINE if avl.is_mine(voice) else avl.who(voice)
-
-
-def emoji_icon(emoji: str, size: int = TILE_ART) -> QIcon:
-    """A voice's emoji as a card picture (the AI voices have emoji, not drawings)."""
-    pm = QPixmap(size * 2, size * 2)   # drawn at 2x: sharp on a high-DPI screen too
-    pm.setDevicePixelRatio(2.0)
-    pm.fill(Qt.GlobalColor.transparent)
-    p = QPainter(pm)
-    f = QFont("Segoe UI Emoji")
-    f.setPixelSize(int(size * 0.8))
-    p.setFont(f)
-    p.drawText(0, 0, size, size, Qt.AlignmentFlag.AlignCenter, emoji or "🎙️")
-    p.end()
-    return QIcon(pm)
-
-
-def art_key(voice: dict) -> str:
-    """A built-in AI voice's picture in assets/art: "ai-voice-bear" (yours have none)."""
-    return "" if avl.is_mine(voice) else "ai-voice-" + art.slug(str(voice.get("id", "")))
-
-
-def voice_icon(voice: dict, size: int = TILE_ART) -> QIcon:
-    """A voice's card picture: its drawing (ui/voice/art.py) when there is one, else its
-    emoji; one of yours, the picture you picked or My own mix's."""
-    if avl.is_mine(voice):
-        return mine_icon(voice) or emoji_icon(str(voice.get("emoji") or ""), size)
-    key = art_key(voice)
-    pic = art.icon(key) if key else None
-    return pic or emoji_icon(str(voice.get("emoji") or ""), size)
 
 
 def read_voices(module: mods.ModuleInfo | None,
@@ -144,36 +99,7 @@ def install_step(line: str) -> str | None:
     return None
 
 
-class EditPopup(QDialog):
-    """An AI voice's Edit voice: its pitch, over the voice bar's button (like the
-    voice changer's Effects pop-up)."""
-
-    def __init__(self, panel: AiVoicePanel):
-        # owned by the app's window: inside a card the theme makes every widget
-        # see-through (QFrame#card QWidget), a pop-up's background too
-        super().__init__(panel.window(), Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
-        fit.watch(self)
-        self.setProperty("popover", True)
-        self.setObjectName("transport")
-        self.setAccessibleName(_("Edit voice"))
-        v = QVBoxLayout(self)
-        v.setContentsMargins(16, 12, 16, 14)
-        v.setSpacing(10)
-        title = QLabel(_("Edit voice"))
-        title.setObjectName("section")
-        title.setProperty("head", True)
-        v.addWidget(title)
-        v.addWidget(panel.pitch_box)
-        panel.pitch_box.show()
-        self.setFixedWidth(400)
-
-    def open_for(self, under: QWidget):
-        self.adjustSize()
-        place_over(self, under)
-        self.show()
-
-
-class AiVoicePanel(QWidget):
+class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
     changed = Signal(dict)
     live_changed = Signal(bool)
     modules_changed = Signal()      # got or removed the add-on: the Voice tab rescans
@@ -549,172 +475,6 @@ class AiVoicePanel(QWidget):
         self.b_start.setEnabled(usable)
         self.b_start.setToolTip("" if usable else self.lbl_missing.text())
 
-    # ------------------------------------------------------------ settings
-    def _emit(self):
-        self.changed.emit({**self.s, **({"favorites": list(self._favs)} if self._favs
-                                        else {})})
-
-    def current_voice(self) -> str:
-        """The picked voice's id: the saved one if the add-on has it, else its first."""
-        ids = [vo["id"] for vo in self.voices]
-        return self.s["voice"] if self.s["voice"] in ids else (ids[0] if ids else "")
-
-    def _voice(self) -> dict:
-        vid = self.current_voice()
-        return next((vo for vo in self.voices if vo["id"] == vid), {})
-
-    def _show_about(self):
-        """The bar under the cards: the picked voice, who it sounds like and about it."""
-        vo = self._voice()
-        tags = avl.tag_line(vo) if vo else ""
-        text = str(vo.get("about") or vo.get("description") or "")
-        self.picked_name.setText(str(vo.get("name", "")))
-        about = f"{tags}. {text}" if tags and text else tags or text
-        self.picked_name.setToolTip(about)
-        self.picked_pic.setToolTip(about)
-        key = art_key(vo) if vo else ""
-        pm = mine_pixmap(vo, PICKED_ART) if avl.is_mine(vo) else \
-            art.pixmap(key, PICKED_ART) if key else None
-        self.picked_pic.setPixmap(pm or emoji_icon(str(vo.get("emoji") or ""), PICKED_ART)
-                                  .pixmap(PICKED_ART, PICKED_ART))
-        mine = avl.is_mine(vo)
-        self.b_edit.setVisible(mine and self.can_make())
-        self.b_delete.setVisible(mine)
-        self.b_hear.setVisible(self.previewer.available())
-        n = len(self.store.deleted)
-        self.b_bin.setText(_("Recently deleted ({n})", n=n))
-        self.b_bin.setVisible(n > 0)
-        self._mark_tile()
-        self._fit_picked()
-
-    def _mark_tile(self):
-        """Light up the picked voice's card only while the AI voice is on (like the
-        voice changer's cards): off, no card looks switched on."""
-        vid = self.current_voice() if self.is_on() else None
-        self.tiles.setExclusive(False)
-        for i, b in self._tile.items():
-            b.setChecked(i == vid)
-        self.tiles.setExclusive(True)
-
-    def _say(self, text: str):
-        self.lbl_sample.setText(text)
-        self.lbl_sample.setVisible(bool(text))
-
-    # ------------------------------------------------------------ the voice cards
-    def _fill_tiles(self):
-        """(Re)make a card for each voice the add-on has."""
-        for b in self._tile.values():
-            self.tiles.removeButton(b)
-            self._tile_grid.removeWidget(b)
-            b.hide()   # until it's gone it would paint over the regrown grid
-            b.deleteLater()
-        self._tile = {}
-        for vo in self.voices:
-            vid = vo["id"]
-            b = VoiceTile(vo["name"])
-            if self._listed:
-                b.set_listed(True)
-            b.setIcon(voice_icon(vo))
-            b.setIconSize(QSize(TILE_ART, TILE_ART))
-            b.setCursor(Qt.CursorShape.PointingHandCursor)
-            tags = avl.tag_line(vo)
-            about = str(vo.get("about") or vo.get("description") or "")
-            b.setToolTip(f"{tags}. {about}" if tags and about else tags or about)
-            b.clicked.connect(lambda __=False, i=vid: self._tile_clicked(i))
-            b.star.setChecked(vid in self._favs)
-            b.star.toggled.connect(lambda on, i=vid: self.set_favorite(i, on))
-            if avl.is_mine(vo):
-                b.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-                b.customContextMenuRequested.connect(
-                    lambda pos, i=vid, w=b: self._mine_menu(i, w.mapToGlobal(pos)))
-            self.tiles.addButton(b)
-            self._tile[vid] = b
-        self._place_tiles()
-        self._show_about()
-
-    def _place_tiles(self):
-        """The cards the picked chip shows: All under a heading per kind (lowest voice
-        first), else one kind (or your favorites, in the order you starred them)."""
-        g, cols = self._tile_grid, self._tile_cols
-        for w in (*self._tile.values(), *self._heads.values(), self.make_tile):
-            g.removeWidget(w)
-        by_id = {vo["id"]: vo for vo in self.voices if vo["id"] in self._tile}
-        low_first = sorted(by_id.values(), key=lambda vo: vo.get("pitch_hz", 0))
-        rows: list[tuple[str, list[str]]]
-        if self._group == ALL:
-            rows = [(k, [vo["id"] for vo in low_first if voice_kind(vo) == k])
-                    for k, _t in KINDS]
-        elif self._group == FAVS:
-            rows = [("", [i for i in self._favs if i in by_id])]
-        else:
-            rows = [("", [vo["id"] for vo in low_first if voice_kind(vo) == self._group])]
-        found = self.bar.text()
-        if found:
-            rows = [(k, [i for i in ids if self.bar.matches(self._tile[i].title, i)])
-                    for k, ids in rows]
-        # Make your own voice: the last card under Mine (and in Mine), even with none yet
-        make = not found and self._group in (ALL, MINE)
-        if make:
-            rows = [(k, ids + [MAKE] if k == MINE or self._group == MINE else ids)
-                    for k, ids in rows]
-        shown: set[str] = set()
-        r = 0
-        for head, group in rows:
-            if not group:
-                continue
-            if head:
-                g.addWidget(self._heads[head], r, 0, 1, cols)
-                r += 1
-            for i, vid in enumerate(group):
-                g.addWidget(self._tile.get(vid) or self.make_tile, r + i // cols, i % cols)
-            r += (len(group) + cols - 1) // cols
-            shown.update(group)
-        for k, lbl in self._heads.items():
-            lbl.setVisible(self._group == ALL and any(
-                (MINE if i == MAKE else voice_kind(by_id[i])) == k for i in shown))
-        for vid, b in self._tile.items():
-            b.setVisible(vid in shown)
-        self.make_tile.setVisible(make)
-        self.no_favs.setVisible(self._group == FAVS and not shown and not found)
-        no_match(self.no_match, found, shown)
-        for c in range(MAX_COLS):
-            g.setColumnStretch(c, 1 if c < cols else 0)
-
-    def show_group(self, key: str):
-        """Show one chip's voices (ALL, FAVS, MINE or an avl.WHO key)."""
-        self._group = key
-        self.bar.set_group(key)
-        self._place_tiles()
-
-    def _group_count(self, key: str) -> int:
-        """How many voices a group holds (the dropdown's numbers)."""
-        listed = [vo for vo in self.voices if vo["id"] in self._tile]
-        if key == ALL:
-            return len(listed)
-        if key == FAVS:
-            return sum(i in self._tile for i in self._favs)
-        return sum(voice_kind(vo) == key for vo in listed)
-
-    @property
-    def favorites(self) -> list[str]:
-        return list(self._favs)
-
-    def set_favorite(self, vid: str, on: bool):
-        """Star or unstar a voice: Favorites lists them in the order you starred them."""
-        if on == (vid in self._favs):
-            return
-        if on:
-            usage.used("ai-voice-favorite")   # the name only (usage.py)
-            self._favs.append(vid)
-        else:
-            self._favs.remove(vid)
-        b = self._tile.get(vid)
-        if b is not None and b.star.isChecked() != on:
-            b.star.setChecked(on)   # (toggled comes back here and finds nothing to do)
-        if self._group == FAVS:
-            self._place_tiles()
-        self._emit()
-
     def resizeEvent(self, e):
         super().resizeEvent(e)
         # only a new width: fewer cards a row makes it taller, and refitting on that
@@ -722,99 +482,10 @@ class AiVoicePanel(QWidget):
         if e.size().width() != e.oldSize().width():
             self._fit_width(self.width())
 
-    def _fit_width(self, width: int):
-        """As many voice cards a row as the width holds, at least one."""
-        least = LIST_MIN_W if self._listed else TILE_MIN_W
-        cols = max(1, min(MAX_COLS, (width + TILE_GAP) // (least + TILE_GAP)))
-        if cols != self._tile_cols:
-            self._tile_cols = cols
-            self._place_tiles()
-
-    def set_view(self, view: str):
-        """Picture cards, or a list (the voice changer's switch: the Voice tab keeps
-        the two the same)."""
-        self._listed = view == "list"
-        self.view_toggle.set_view(view)
-        for b in (*self._tile.values(), self.make_tile):
-            b.set_listed(self._listed)
-        self._tile_cols = 0   # refit for the new width a voice needs
-        self._fit_width(self.width())
-
-    # ------------------------------------------------------------ the voice bar
-    def show_picked_row(self, room: bool | None = None):
-        """The bar under the cards shows only while the AI voice is on, as the voice
-        changer's does. `room`: whether the Voice tab has a place for it now (its own
-        tab showing)."""
-        if room is not None:
-            self._picked_room = room
-        self.picked.setVisible(getattr(self, "_picked_room", True) and self.is_on())
-
-    def _fit_picked(self):
-        """The buttons beside the voice's name while they fit there, else on a line of
-        their own under it (where they wrap, narrow)."""
-        if not hasattr(self, "_picked_btns"):
-            return
-        box = self.picked_box
-        btns = [b for b in self._picked_btns.findChildren(QPushButton) if not b.isHidden()]
-        need = (sum(b.sizeHint().width() for b in btns) + 10 * max(0, len(btns) - 1))
-        m = box.contentsMargins()
-        line = self.picked.width() - m.left() - m.right()
-        beside = (line - PICKED_ART - min(self.picked_name.sizeHint().width(), 140)
-                  - 2 * box.spacing())
-        want = (QBoxLayout.Direction.LeftToRight if need <= beside
-                else QBoxLayout.Direction.TopToBottom)
-        if box.direction() != want:
-            box.setDirection(want)
-        # beside the name they keep one line (half the bar was too little for all of
-        # them, so they wrapped); under it they wrap when they must
-        self._picked_btns.setMinimumWidth(
-            need if want == QBoxLayout.Direction.LeftToRight else 0)
-
     def eventFilter(self, obj, e):
         if obj is self.picked and e.type() == QEvent.Type.Resize:
             self._fit_picked()
         return super().eventFilter(obj, e)
-
-    def open_tweak(self):
-        """Edit voice: the pitch, in a pop-up over the bar's button."""
-        if self.tweak_pop is None:
-            self.tweak_pop = EditPopup(self)
-        self.tweak_pop.open_for(self.btn_tweak)
-
-    def _tile_clicked(self, vid: str):
-        """A voice card: that voice, on; the one that's on already: off (as the voice
-        changer's cards)."""
-        if self.is_on() and vid == self.current_voice():
-            self.stop()
-            return
-        self.use(vid)
-
-    def use(self, vid: str):
-        """A card was clicked: that voice, on now (like the voice changer's cards)."""
-        self.pick(vid)
-        if vid in self._tile and not self.is_on():
-            self.b_start.setChecked(True)      # _toggle starts it with this voice
-
-    def pick(self, vid: str):
-        """Make this the voice: the next Start, or now if it's on."""
-        if vid not in self._tile:
-            return
-        self.s["voice"] = vid
-        self._show_about()
-        if self.ctl.running:
-            # (still loading: it's used once it's ready; until then "starting…" stays,
-            # as the backup voice is what others hear)
-            self.ctl.set_voice(vid, self.s["pitch"])
-            self._voice_name = self._voice().get("name", "")
-            if self._status == "on":
-                self._state(_("● switching to {voice}…", voice=self._voice_name))
-        self._emit()
-
-    # ------------------------------------------------------------ your own voices
-    def can_make(self) -> bool:
-        """Any copy of the add-on: the one you downloaded gets your voices written into
-        its voices.json, one shipped with the app reads them from your file."""
-        return self.module is not None
 
     def _resync(self):
         """Your own voices changed: write them into the add-on and list them again."""
@@ -825,231 +496,6 @@ class AiVoicePanel(QWidget):
         if self.current_voice() != old:     # it was deleted: the first one instead
             self.pick(self.current_voice())
         self._emit()
-
-    def _play_sample(self, data):
-        assert self.engine is not None   # only offered with one
-        self.engine.play("__ai_voice_sample", data, 1.0, preview=True)
-
-    def _mine_menu(self, vid: str, pos: QPoint):
-        m = QMenu(self)
-        if self.can_make():
-            m.addAction(_("Change this voice"), lambda: self.edit(vid))
-        m.addAction(_("Delete"), lambda: self.delete(vid))
-        m.exec(pos)
-
-    def edit(self, vid: str | None):
-        """Make one of your own voices (None) or change one."""
-        if not self.can_make():
-            return
-        if vid is None and self.store.full():
-            busy.toast(self, html.escape(ngettext(
-                "⚠ You have {n} voice of your own already: delete it to make another.",
-                "⚠ You have {n} voices of your own already: delete one to make another.",
-                avl.MAX_VOICES).removeprefix("⚠ ")), "warn")
-            return
-        built = [vo for vo in self.voices if not avl.is_mine(vo)]
-        d = AiVoiceEditor(built, self.store.get(vid) if vid else None, self.previewer, self)
-        if d.exec() == QDialog.DialogCode.Accepted and self.store.put(d.result_voice()) is not None:
-            self._resync()
-            if vid is None:
-                usage.used("ai-voice-made")
-                self.pick(d.result_voice()["id"])
-
-    def delete(self, vid: str):
-        item = self.store.remove(vid)
-        if item is None:
-            return
-        self._resync()
-        self.undo_bar.show_for(_("Deleted “{name}”", name=item.name),
-                               lambda: self._undo(item.id))
-
-    def _undo(self, item_id: str):
-        it = self.store.take(item_id)
-        if it is not None and self.store.restore(it) is not None:
-            self._resync()
-
-    def show_deleted(self):
-        from soundboard.ui.sounds.deleted import DeletedDialog
-        self.undo_bar.finish()
-
-        def back(item) -> bool:
-            return self.store.restore(item) is not None
-        DeletedDialog(avl.KIND, "voices", back, self, source=self.store).exec()
-        self._resync()
-
-    def _auto_toggled(self, on: bool):
-        self.s["auto_pitch"] = on
-        self.ctl.set_auto_pitch(on)
-        self._emit()
-
-    def _show_pitch(self):
-        st = self.sl_pitch.value() / 2
-        self.lbl_pitch.setText("0" if st == 0 else f"{st:+g}")
-
-    def _pitch_moved(self, _v):
-        self._show_pitch()
-        if not self.sl_pitch.isSliderDown():
-            self._pitch_released()
-
-    def _pitch_released(self):
-        st = self.sl_pitch.value() / 2
-        if st != self.s["pitch"]:
-            self.s["pitch"] = st
-            if self.ctl.running:
-                self.ctl.set_voice(self.s["voice"], st)
-            self._emit()
-
-    def _backup_picked(self, *_):
-        self.s["backup"] = self.cb_backup.currentData() or "voice"
-        self.ctl.set_backup(self.s["backup"])
-        if self.status() == "failed":
-            self._state(self.failure_text(getattr(self, "_failure_error", "")))
-        elif self.status() == "starting":
-            self._state(self._starting_text())
-        self._emit()
-
-    # ------------------------------------------------------------ start / stop
-    def is_on(self) -> bool:
-        return self.b_start.isChecked()
-
-    def stop(self):
-        if self.b_start.isChecked():
-            self.b_start.setChecked(False)
-
-    def _toggle(self, on: bool):
-        if on and not self.ctl.running:
-            if self.module is None:
-                self._set_ui(False, "")
-                return
-            self._retried = False
-            if not self._start_helper():
-                return
-            self._voice_name = self._voice().get("name", "")
-            usage.used("ai-voice")   # switched on (never which voice)
-            self._set_ui(True, self._starting_text())
-        elif not on:
-            self._load_timer.stop()
-            if self.ctl.running:
-                self.ctl.stop()
-            self._set_ui(False, "")   # (also when it had already stopped by itself)
-        self._mark_tile()
-
-    def _start_helper(self) -> bool:
-        self._connected = False      # the helper said hello (it can still fail to load)
-        module = self.module
-        assert module is not None   # both callers checked
-        try:
-            self.ctl.start(module, self.current_voice(),
-                           self.s["auto_pitch"], self.s["pitch"])
-        except RuntimeError as e:
-            self._set_ui(False, f"⚠ {errors.plain(e)}")
-            return False
-        self._load_timer.start()
-        return True
-
-    def status(self) -> str:
-        """"off", "starting", "on" (others hear the AI voice) or "failed" (the backup
-        covers you): for the Voice tab's status bar."""
-        return self._status if self.is_on() else "off"
-
-    def voice_title(self) -> str:
-        """The running voice's name (the status bar's chip)."""
-        return self._voice_name or self._voice().get("name", "")
-
-    def backup_heard(self) -> str:
-        return BACKUP_HEARD.get(self.cb_backup.currentData() or "voice", BACKUP_HEARD["voice"])
-
-    def _starting_text(self, retry: bool = False) -> str:
-        return (_("starting again…") if retry else _("starting…")) + " " + _(
-            "Others now hear {backup}.", backup=self.backup_heard())
-
-    def failure_text(self, error: str = "") -> str:
-        error = error.strip().rstrip(".。")   # the sentence adds its own full stop
-        return (_("⚠ The AI voice stopped: {error}. Others now hear {backup}. Switch it "
-                  "off and on again to try again.", error=error, backup=self.backup_heard())
-                if error else
-                _("⚠ The AI voice stopped. Others now hear {backup}. Switch it off and on "
-                  "again to try again.", backup=self.backup_heard()))
-
-    def _state(self, text: str):
-        """The line under the card's words: how it's doing while it's on."""
-        self.lbl_state.setText(text)
-        self.lbl_state.setVisible(bool(text))
-        theme.set_tone(self.lbl_state, "warn" if text.startswith("⚠") else "")
-
-    def _set_ui(self, on: bool, state: str):
-        self._status = "starting" if on else "off"
-        self.b_start.blockSignals(True)
-        self.b_start.setChecked(on)
-        self.b_start.blockSignals(False)
-        self.b_start.setText(_("On") if on else _("Off"))
-        self._mark_tile()
-        self.b_update.setEnabled(not on)
-        self._state(state)
-        self.show_picked_row()
-        self._refresh()   # (the switch: usable again once off)
-        self.live_changed.emit(on)
-
-    def _on_event(self, ev: dict):
-        t = ev.get("type")
-        text = str(ev.get("text", ""))
-        if t == "hello":
-            self._connected = True
-        elif t == "status":
-            self._state(text)
-        elif t == "ready":
-            self._load_timer.stop()
-            self._status = "on"
-            msg = (_("● you sound like {voice}", voice=self._voice_name) if self._voice_name
-                   else _("● you sound like the voice"))
-            if ev.get("slow"):
-                msg += " " + _("⚠ This PC is slow for AI voices: games may stutter. A voice "
-                               "changer preset (left) is much lighter.")
-            self._state(msg)
-        elif t == "stats":
-            cpu = f"{float(ev.get('cpu', 0)):.0f}"
-            ms = f"{float(ev.get('latency_s', aivoice.LATENCY_S)) * 1000:.0f}"
-            self._state(
-                _("● you sound like {voice} · CPU {cpu}% · about {ms} ms behind you",
-                  voice=self._voice_name, cpu=cpu, ms=ms) if self._voice_name else
-                _("● you sound like the voice · CPU {cpu}% · about {ms} ms behind you",
-                  cpu=cpu, ms=ms))
-        elif t == "timeout":
-            if not self.ctl.running or self._status != "starting":
-                return
-            if not self._retried:            # one more go by itself, as for no call back
-                self._retried = True
-                log.warning("AI voice helper still loading after %d s; trying once more",
-                            LOAD_TIMEOUT_MS // 1000)
-                if self._start_helper():
-                    self._state(self._starting_text(retry=True))
-                return
-            log.warning("AI voice helper still loading after %d s; giving up",
-                        LOAD_TIMEOUT_MS // 1000)
-            self._status = "failed"
-            self._failure_error = _("can't load")
-            self._state(self.failure_text(self._failure_error))
-            self.ctl.give_up()
-        elif t == "error":
-            self._load_timer.stop()
-            self._status = "failed"
-            self._failure_error = text
-            self._state(self.failure_text(text))
-        elif (t == "stopped" and self.ctl.running and not self._connected
-              and not self._retried and self.module is not None):
-            # the helper never called back (once it sat silent for 30 s, then started
-            # fine the next time): one more go by itself before asking you to
-            self._retried = True
-            log.warning("AI voice helper didn't connect (%s); trying once more", text)
-            if self._start_helper():
-                self._status = "starting"
-                self._state(self._starting_text(retry=True))
-        elif t == "stopped" and self.ctl.running:
-            self._load_timer.stop()
-            if text or self._status != "failed":   # keep the helper's own reason
-                self._failure_error = text
-            self._status = "failed"
-            self._state(self.failure_text(self._failure_error))
 
     # ------------------------------------------------------------ get / remove
     def _get(self):
