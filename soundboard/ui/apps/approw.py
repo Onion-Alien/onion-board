@@ -6,23 +6,15 @@ helpers for remembering programs by .exe and folder (path_key)."""
 from __future__ import annotations
 
 import logging
-import math
-import re
-import threading
 import time
 
-from PySide6.QtCore import QEvent, QMimeData, QObject, QRect, QSize, Qt, Signal
-from PySide6.QtGui import (QActionGroup, QColor, QDrag, QFont, QKeySequence, QPainter, QPixmap,
-                           QShortcut)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QGraphicsOpacityEffect,
-                               QHBoxLayout, QLabel,
-                               QLayout, QMenu, QPushButton, QSizePolicy, QVBoxLayout, QWidget)
+from PySide6.QtCore import QEvent, QMimeData, QRect, Qt, Signal
+from PySide6.QtGui import (QActionGroup, QColor, QDrag, QFont, QKeySequence, QPainter, QShortcut)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QHBoxLayout, QLabel,
+                               QMenu, QPushButton, QSizePolicy, QVBoxLayout, QWidget)
 
 from soundboard.audio import appaudio
 from soundboard.ui.kit import theme
-from soundboard.core import usage
-from soundboard.ui.window.responsive import settled
-from soundboard.win import exeicon
 from soundboard.sounds.clipedit import LiveBuffer
 from soundboard.i18n import _
 from soundboard.audio.recorder import ArmedRecorder
@@ -32,14 +24,19 @@ from soundboard.ui.kit.panel import CardGrid, HoverCard, VolumeControl, icon_but
 from soundboard.ui.apps.windowview import WindowView
 from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.ui.kit.pixels import snap_to_pixels
+from soundboard.ui.apps.applister import (  # noqa: F401
+    _Lister,
+    _VERSION_DIR,
+    HIDDEN_FULL_S,
+    is_path_key,
+    MAX_VOL,
+    path_key,
+    saved_volume,
+)
+from soundboard.ui.apps.approwparts import AppRowParts
 
 log = logging.getLogger(__name__)
 
-# while hidden, a 5 s check only walks the process list (~4 ms, not the ~20 ms of a whole
-# listing) and lists the programs when one of the tab's started or closed, one not yet
-# picked up runs, or this long has gone by
-HIDDEN_FULL_S = 30.0
-MAX_VOL = 10.0          # 1000 %, the most the volume box takes
 # where a sent program goes (cfg.apps[exe]["to"], cfg.apps_paths[path]["to"]): the
 # choice shows once a stream output is set (Also play on → Clean, for streaming), or
 # while it's set to anything but both
@@ -353,123 +350,6 @@ class AppGrid(CardGrid):
             QWidget.setTabOrder(a, b)
 
 
-# a version folder in a program's path (Discord's app-1.0.9156, 24.1.3): it changes on
-# every update, so it doesn't count when telling two programs of the same name apart
-_VERSION_DIR = re.compile(r"(app-)?v?\d+(\.\d+)+([-_+][\w.]*)?", re.I)
-
-
-def path_key(path: str) -> str:
-    """How a program's .exe path is remembered: lower case, version folders as *."""
-    parts = re.split(r"[\\/]+", path.lower())
-    return "\\".join("*" if _VERSION_DIR.fullmatch(p) else p for p in parts)
-
-
-def is_path_key(key: str) -> bool:
-    """A row / remembered key that is a path (cfg.apps_paths), not an .exe name."""
-    return "\\" in key
-
-
-def saved_volume(v) -> float:
-    """A remembered program's volume from the config, whatever was written there."""
-    try:
-        v = float(v)
-    except (TypeError, ValueError):
-        return 1.0
-    return min(max(v, 0.0), MAX_VOL) if math.isfinite(v) else 1.0
-
-
-class _Lister(QObject):
-    """Reads the audio sessions off the UI thread (COM, ~50 ms) and hands the result
-    to it: `peaks`' next rescan makes the list while that watcher runs (it was finding
-    the same sessions on its own), else one worker thread of the lister's own does
-    (it started a new thread for every listing, 720 an hour in the tray)."""
-    ready = Signal(object)
-
-    def __init__(self, parent=None, peaks: appaudio.PeakWatcher | None = None):
-        super().__init__(parent)
-        self.peaks = peaks
-        self._busy = False
-        self._stopped = False
-        # held while a result is handed over (worker thread); stop() takes it, so none
-        # is mid-way once the tab is going and could be freed under it (a crash)
-        self._hand_over = threading.Lock()
-        self._job: tuple[frozenset, frozenset] | None = None
-        self._wake = threading.Event()
-        self._thread: threading.Thread | None = None
-        # the worker's own: what refresh(watch=...) saw last time, and when it last listed
-        self._seen: frozenset | None = None
-        self._listed_at = -math.inf
-
-    def refresh(self, watch: frozenset[str] | None = None,
-                waiting: frozenset[str] = frozenset()):
-        """List the programs. With `watch` (.exe names, lower case: the tab is hidden),
-        only walk the processes first, and list them only if one of those started or
-        closed since the last walk, one in `waiting` (not picked up yet) runs, or
-        HIDDEN_FULL_S has gone by since the last listing."""
-        if self._busy or self._stopped:
-            return
-        self._busy = True
-        if watch is None and self.peaks is not None and self.peaks.list_for(self._listed):
-            return
-        self._job = None if watch is None else (watch, waiting)
-        if self._thread is None or not self._thread.is_alive():
-            self._thread = threading.Thread(target=self._run, name="applist", daemon=True)
-            self._thread.start()
-        self._wake.set()
-
-    def _run(self):
-        while True:
-            self._wake.wait()
-            self._wake.clear()
-            if self._stopped:
-                return
-            job = self._job
-            try:
-                due = job is None or self._due(*job)
-            except Exception:  # noqa: BLE001
-                log.debug("walking the processes failed", exc_info=True)
-                due = True
-            if due:
-                self._work()
-            else:
-                self._busy = False
-
-    def _due(self, watch: frozenset[str], waiting: frozenset[str]) -> bool:
-        alive = appaudio.running()
-        seen = frozenset((pid, exe) for pid, exe in alive.items() if exe in watch)
-        changed, self._seen = seen != self._seen, seen
-        return (changed or any(exe in waiting for _pid, exe in seen)
-                or time.monotonic() - self._listed_at >= HIDDEN_FULL_S)
-
-    def _work(self):
-        alive: dict[int, str] = {}   # every process, from the listing's own process list
-        apps = None
-        try:
-            apps = appaudio.list_apps(strict=True, alive=alive)
-        except appaudio.ComError:
-            log.debug("listing programs failed", exc_info=True)
-        except Exception:  # noqa: BLE001
-            log.exception("listing programs failed")
-        self._listed(apps, alive)
-
-    def _listed(self, apps: list | None, alive: dict[int, str] | None):
-        """On the worker's or the level watcher's thread. apps None: the listing failed,
-        and this round is skipped (an empty list would stop every capture and drop
-        the rows)."""
-        if apps:
-            exeicon.load(app.path for app in apps)   # here, not on the UI thread
-        self._listed_at = time.monotonic()
-        self._busy = False
-        with self._hand_over:
-            if apps is not None and not self._stopped:
-                self.ready.emit((apps, alive))
-
-    def stop(self):
-        with self._hand_over:
-            self._stopped = True
-        self._wake.set()   # the worker sees it and ends
-
-
 class ElidedLabel(QLabel):
     """A one-line label that ends in "…" when it doesn't fit (the full text in its
     tooltip), instead of being cut off mid-word. With `hide_overflow` it shows nothing
@@ -500,7 +380,7 @@ def _route(src, to: str):
     src.stream = to in ("both", "stream")
 
 
-class AppRow(HoverCard):
+class AppRow(AppRowParts, HoverCard):
     """One program, as a card: icon and name, its level, Send and Record, volume and
     Hear it myself."""
     send_toggled = Signal(object, bool)     # row, on
@@ -660,49 +540,6 @@ class AppRow(HoverCard):
         self._label_send()
         self.set_app(None)
 
-    def set_listed(self, on: bool):
-        """The list view: everything on one line (name, level, buttons, volume, ✕),
-        the window picture still folding out below. A row narrower than LINE_MIN_W
-        stacks as the card does, still one a line: squeezed onto one line, the
-        buttons were crushed to slivers."""
-        if on == self.listed:
-            return
-        self.listed = on
-        self._tight = -1
-        self._fit_width(self.width())
-
-    def _arrange(self, as_line: bool):
-        self._as_line = as_line
-        v, line = self._v, self._line_lay
-        if as_line:
-            line.addWidget(self.header, 3)
-            line.addWidget(self.meter, 1)
-            line.addWidget(self.buttons_w)
-            line.addWidget(self.mix_w, 1)
-            self.header.setMinimumWidth(150)   # the name never squeezed away
-            self.meter.setMinimumWidth(50)
-            self.meter.setMaximumWidth(120)
-            self.buttons_w.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
-            self.mix_w.setMinimumWidth(110)
-            self.mix_w.setMaximumWidth(190)
-            self._top.removeWidget(self.btn_forget)
-            line.addWidget(self.btn_forget)
-            v.insertWidget(0, self._line)
-            self._line.show()
-            v.setContentsMargins(12, 6, 8, 6)
-        else:
-            self._top.addWidget(self.btn_forget, 0, Qt.AlignmentFlag.AlignTop)
-            for i, w in enumerate((self.header, self.meter, self.buttons_w, self.mix_w)):
-                v.insertWidget(i, w)
-            self.meter.setMinimumWidth(60)
-            self.meter.setMaximumWidth(16777215)
-            self.header.setMinimumWidth(0)
-            self.buttons_w.setSizePolicy(QSizePolicy.Policy.Preferred,
-                                         QSizePolicy.Policy.Preferred)
-            self.mix_w.setMinimumWidth(0)
-            self.mix_w.setMaximumWidth(16777215)
-            self._line.hide()
-            v.setContentsMargins(12, 10, 12, 10)
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
@@ -807,185 +644,3 @@ class AppRow(HoverCard):
                               lambda: self.forget.emit(self))
         gone.setToolTip(_("Take this program off the list"))
         menu.exec(self.mapToGlobal(pos))
-
-    NAME_ROOM = 0    # the name has its own line in the card: nothing to keep room for
-    # narrow card, in this order: the typed volume goes, the buttons keep only their
-    # icons (their tooltips say what they are)
-    _TIGHTEN = ("spin", "send", "rec")
-    LINE_MIN_W = 720   # px: the list view's one line with its words dropped, and room
-
-    def resizeEvent(self, e):
-        super().resizeEvent(e)
-        # only a new width: tightening changes the card's height (the typed volume is
-        # taller than the slider), and refitting on that made the cards flip between
-        # tight and full forever, jumping up and down
-        if e.size().width() != e.oldSize().width():
-            self._fit_width(self.width())
-
-    def _needs(self) -> int:
-        """The card's narrowest width as it is now, measured fresh: the rows cache
-        their sizes, and a stale one picked a different tightness on each pass."""
-        for lay in self.findChildren(QLayout):
-            lay.invalidate()
-        return self.minimumSizeHint().width() + self.NAME_ROOM
-
-    def _fit_width(self, width: int):
-        as_line = self.listed and width >= self.LINE_MIN_W
-        if as_line != self._as_line:
-            self._arrange(as_line)
-            self._tight = -1
-        want = 0
-        while want < len(self._TIGHTEN):
-            self._set_tight(want)
-            if self._needs() <= width:
-                break
-            want += 1
-        self._set_tight(want)
-
-    def _set_tight(self, n: int):
-        if n == self._tight:
-            return
-        self._tight = n
-        on = set(self._TIGHTEN[:n])
-        self.vol.spin.setVisible("spin" not in on)
-        self._label_send()
-        if not self.btn_rec.isChecked():   # while recording it shows how long it's been
-            self.btn_rec.setText("" if "rec" in on else _("Record"))
-        lay = self.layout()
-        assert lay is not None   # made in __init__
-        lay.activate()
-
-    @property
-    def sending(self) -> bool:
-        return self.btn_send.isChecked()
-
-    @property
-    def to(self) -> str:
-        """Where it goes when sent: one of TO_KEYS."""
-        return self.cb_to.currentData() or "both"
-
-    def show_to(self, stream_output: bool):
-        """The call / stream choice: only worth showing with a stream output set
-        (or when it's already set to something else)."""
-        self.cb_to.setVisible(stream_output or self.to != "both")
-
-    def _label_send(self):
-        self.btn_send.setText("" if "send" in self._TIGHTEN[:self._tight]
-                              else _("Sending") if self.sending else _("Send"))
-        icons.text_gap(self.btn_send)   # (its icon was set before it had words)
-
-    def _on_view(self, on: bool):
-        if on:
-            usage.used("apps-window-view")
-        self.btn_view.setToolTip(_("Hide this program's window") if on
-                                 else _("Show this program's window"))
-        # the card grows or shrinks in one paint: closing, it kept its old height a
-        # frame with everything moved, then closed up
-        with settled(self.window()):
-            self.view.set_open(on)
-
-    def close_view(self):
-        if self.btn_view.isChecked():
-            self.btn_view.setChecked(False)
-        self.view.set_open(False)
-
-    def set_app(self, app: appaudio.App | None):
-        """The program is running (app) or not (None)."""
-        self.app = app
-        running = app is not None
-        has_window = app is not None and bool(app.title)
-        if app is not None and has_window:
-            self.view.set_pids((app.pid, *sorted(app.session_pids)))
-        else:
-            self.close_view()
-        self.btn_view.setVisible(has_window)
-        if running:
-            self.known_name = app.name   # kept for when it closes
-            self.name.setText(app.name + self.folder)
-            self._set_icon(app.path)
-            where = ", ".join(app.devices[:2])
-            sub = app.title or app.exe
-            # a quiet program keeps its audio session (and its devices): it says so
-            if where and app.active:
-                sub = _("{title}  ·  playing on {devices}", title=sub, devices=where)
-            elif where:
-                sub = _("{title}  ·  quiet on {devices}", title=sub, devices=where)
-            if not self.status_text:   # an error stays up until the next attempt
-                self.sub.setText(sub)
-        else:
-            self.name.setText((self.known_name
-                               or (self.exe.rsplit(".", 1)[0].capitalize() if self.exe else "?"))
-                              + self.folder)
-            self.set_status("")
-            self.sub.setText(_("Not running: it'll be picked up when it starts"))
-        # not running: its icon faded, so a remembered card doesn't pass for a live one
-        if running != (self.icon.graphicsEffect() is None):
-            if running:
-                self.icon.setGraphicsEffect(None)  # pyright: ignore[reportArgumentType] - None takes it off (Qt allows it)
-            else:
-                fade = QGraphicsOpacityEffect(self.icon)
-                fade.setOpacity(0.4)
-                self.icon.setGraphicsEffect(fade)
-        self.btn_send.setEnabled(running)
-        self.btn_rec.setEnabled(running)
-        self.btn_clip.setEnabled(running or self.btn_clip.isChecked())
-        self.btn_forget.setVisible((not running or not self.sending) and self.listen is None)
-        self.setEnabled(True)
-        self.name.setEnabled(running)
-        name = self.name.text()   # a screen reader hears whose card each button is on
-        self.btn_send.setAccessibleName(_("Send {name}", name=name))
-        self.btn_rec.setAccessibleName(_("Record {name}", name=name))
-        self.btn_forget.setAccessibleName(_("Forget {name}", name=name))
-        self.btn_clip.setAccessibleName(_("Clip editor for {name}", name=name))
-        self.btn_view.setAccessibleName(_("Window of {name}", name=name))
-        self.vol.slider.setAccessibleName(_("Volume of {name}", name=name))
-        self.vol.spin.setAccessibleName(_("Exact volume of {name}", name=name))
-
-    def set_status(self, text: str, error: bool = False):
-        self.status_text = text
-        self.status_error = error
-        if text:
-            self.sub.setText(text)
-            theme.set_tone(self.sub, "error" if error else "")
-        else:
-            theme.set_tone(self.sub, "")   # an error line was red: back to normal
-            if self.app is not None:
-                self.set_app(self.app)   # back to the program's own line
-
-    def set_sending(self, on: bool):
-        self.btn_send.blockSignals(True)
-        self.btn_send.setChecked(on)
-        self.btn_send.blockSignals(False)
-        self._label_send()
-        self.btn_forget.setVisible((not on or self.app is None) and self.listen is None)
-
-    def set_clip_open(self, on: bool):
-        self.btn_clip.blockSignals(True)
-        self.btn_clip.setChecked(on)
-        self.btn_clip.blockSignals(False)
-        self.btn_forget.setVisible((not self.sending or self.app is None) and not on)
-
-    def set_recording(self, on: bool):
-        self.btn_rec.blockSignals(True)
-        self.btn_rec.setChecked(on)
-        self.btn_rec.blockSignals(False)
-        if not on:
-            self.btn_rec.setText("" if "rec" in self._TIGHTEN[:self._tight] else _("Record"))
-
-    def _set_icon(self, path: str, force: bool = False):
-        # set_app runs on every refresh (each 1.5 s, 5 s while hidden): only when the
-        # program changed. The icon itself was read by the listing's thread (exeicon):
-        # asking the shell here held up the audio
-        if not force and path == getattr(self, "_icon_path", None):
-            return
-        self._icon_path = path
-        img = exeicon.get(path) if path else None
-        if img is None:
-            pm = icons.icon("apps", "accent").pixmap(QSize(22, 22))
-        else:
-            dpr = self.icon.devicePixelRatioF()
-            side = round(24 * dpr)
-            pm = QPixmap.fromImage(img.scaled(side, side, Qt.AspectRatioMode.KeepAspectRatio,
-                                              Qt.TransformationMode.SmoothTransformation))
-            pm.setDevicePixelRatio(dpr)
-        self.icon.setPixmap(pm)
