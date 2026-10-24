@@ -38,7 +38,7 @@ UNINSTALL = r"Software\Microsoft\Windows\CurrentVersion\Uninstall"
 RUN_KEYS = (r"Software\Microsoft\Windows\CurrentVersion\Run",
             r"Software\Microsoft\Windows\CurrentVersion\RunOnce",
             r"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run")
-RUN_NAMES = ("OnionBoard", "OnionBoardResumeSetup")   # autostart.py, ui/setup/setupwizard.py
+RUN_NAMES = ("OnionBoard", "OnionBoardResumeSetup")   # autostart.py, ui/setup/cablestep.py
 APP_EXES = ("onionboard.exe", "soundboard.exe", "obmichelper.exe")
 FIREWALL_RULES = ("onion-pocket-firewall",)           # onion_pocket/addon.py
 STATE_ROOT = r"SOFTWARE\OnionBoard"

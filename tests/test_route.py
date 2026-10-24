@@ -9,7 +9,7 @@ from soundboard.audio import engine
 from soundboard.sounds.library import Config
 from soundboard.ui.settings.settings import SettingsDialog
 from soundboard.ui.window import mainwindow as main
-from soundboard.ui.setup import setupwizard
+from soundboard.ui.setup import setupwizard, wizardkit
 from soundboard.ui.window.routecontrol import ROUTE_DEVICE
 from conftest import devices_done
 from test_setupwizard import devices, resume, wizard  # noqa: F401  (fake devices)
@@ -171,7 +171,7 @@ def test_the_guide_can_send_to_another_device(wizard, devices):  # noqa: F811
     wiz.btn_other.click()
     assert not wiz.other_box.isHidden()
     choices = [b.text() for b in wiz.other_box.findChildren(setupwizard.ChoiceTile)]
-    assert PHONES not in choices and "Speakers" in choices and setupwizard.NOWHERE in choices
+    assert PHONES not in choices and "Speakers" in choices and wizardkit.NOWHERE in choices
     wiz._pick_route("Speakers")
     assert w.cfg.route == "device" and devices["picked"]["set_main_device"] == "Speakers"
     assert "Sending to Speakers" in wiz.cable_status.text()
@@ -187,7 +187,7 @@ def test_the_guide_can_send_nowhere_and_go_back_to_the_cable(wizard, devices):  
     w, wiz = wizard
     wiz.go(wiz.send_index)
     wiz.btn_other.click()
-    wiz._pick_route(setupwizard.NOWHERE)
+    wiz._pick_route(wizardkit.NOWHERE)
     assert w.cfg.route == "off" and wiz.route_ok()
     assert not wiz.btn_use_cable.isHidden()
     wiz.go(wiz.discord_index)

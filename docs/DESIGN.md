@@ -14,7 +14,7 @@ font:                 # THE type scale: these 7 sizes only (see "Standard kit")
   section: 10pt 600     # QLabel#section: card and group headings
   large: 11pt 600-700   # tile / pack / tab-card names; body text of full-page guides
   title: 13pt 700       # a dialog's one question, #helptitle, the wordmark
-  display: 17pt 800     # a full-page guide's step title (setupwizard TITLE_CSS)
+  display: 17pt 800     # a full-page guide's step title (wizardkit TITLE_CSS)
   number: 28pt 600      # one big live number (the recording timer)
   digits: same-width (tabular); live numbers via panel.steady_number()
 button:               # THE button kinds and sizes (see "Standard kit")
