@@ -354,7 +354,7 @@ def test_download_bar_glow_follows_the_theme(qapp):
     """Full accent glow only where the theme's cards are its accent's colour; half
     elsewhere, and always half for the green and red endings."""
     from soundboard.ui.kit import theme
-    from soundboard.ui.window import downloadbar as db
+    from soundboard.ui.window import downloadparts as db
     was = theme.current_name
     try:
         for name, full in (("Lava", True), ("Ocean", True), ("Dark", False),

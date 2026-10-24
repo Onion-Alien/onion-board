@@ -18,7 +18,7 @@ from soundboard.sounds import library
 from soundboard.control import winkeys
 from soundboard.sounds.library import SR, Config, SoundMeta
 from soundboard.ui.window import mainwindow as main
-from soundboard.ui.window import windowbuild
+from soundboard.ui.window import fitcontrol
 from soundboard.ui.window.livedot import is_tab_live
 from soundboard.ui.window.tabcontrol import TABS
 from soundboard.ui.kit.wheelguard import no_wheel
@@ -1458,7 +1458,7 @@ def test_full_screen_caps_only_the_search_box(window, qapp):
     window.tabs.setCurrentIndex(0)
     window.resize(1920, 1080)
     QTest.qWait(150)   # the window's re-fit runs on a timer
-    assert window.search.width() == windowbuild.SEARCH_MAX_W
+    assert window.search.width() == fitcontrol.SEARCH_MAX_W
     last = window._pad_size[1]   # Pad size: the toolbar's last control
     right = last.mapTo(window.sounds_toolbar, last.rect().topRight()).x()
     assert window.sounds_toolbar.width() - right < 40

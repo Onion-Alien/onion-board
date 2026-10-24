@@ -206,7 +206,10 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/window/tickcontrol.py` | the main window's tick (`MainWindow.tickctl`): the timer that moves the meters, the now-playing time and the pads' progress, how fast it runs (fast while something moves and the window is seen, slower when quiet or hidden), waking it |
 | `soundboard/ui/window/transportcontrol.py` | the main window's transport and what plays behind it (`MainWindow.transctl`): the play / pause / stop / seek row, the playing sound's picture as the board's background, a sound's video |
 | `soundboard/ui/window/updatecontrol.py` | Onion Board's own updates in the main window (`MainWindow.updctl`): the check (and Onion Watch's), the update card's states, the download with Cancel, installing it, What's new |
-| `soundboard/ui/window/windowbuild.py` | building the main window's parts (`MainWindow.builder`): the frame (tab rail, tabs, mixer strip, the bars on top), the mini player, the mixer, the Sounds and Setup pages; runs once while the window is made |
+| `soundboard/ui/window/windowbuild.py` | building the main window's parts (`MainWindow.builder`): the frame (tab rail, tabs, mixer strip, the bars on top); the pages come from the mixins it inherits (below); runs once while the window is made |
+| `soundboard/ui/window/playerbuild.py` | building the mini player and the mixer strip (`PlayerBuild`, a mixin `WindowBuilder` inherits) |
+| `soundboard/ui/window/soundsbuild.py` | building the Sounds page: its toolbar, the search box, the pads and the bars around them (`SoundsPageBuild`, a mixin `WindowBuilder` inherits) |
+| `soundboard/ui/window/setupbuild.py` | building the Setup page: its cards and the step-by-step guide (`SetupPageBuild`, a mixin `WindowBuilder` inherits) |
 | `soundboard/ui/window/dropveil.py` | the veil over the window while files are dragged in: "Drop to add 4 files" |
 | `soundboard/ui/window/themecover.py` | a still of the window with Bun over it while a theme switch restyles every widget, faded in and out (the kit's `style/cover.py`): never a half-styled frame or a flash |
 | `soundboard/ui/kit/a11y.py` | screen-reader names for icon-only controls, taken from their tooltips as the focus moves |
@@ -230,6 +233,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/setup/pocketcard.py` | Onion Pocket's card on the Setup tab (`MainWindow.pocket_card`), only while it's installed: on the left in Connect your chat's place (that moves right); shut it says if phones can reach the board, its fold opens the add-on's own controls |
 | `soundboard/ui/sounds/linkbar.py` | the Sounds tab's link bar: a link pasted into *Search sounds* is looked up with yt-dlp, then added as a sound or played once |
 | `soundboard/ui/window/downloadbar.py` | persistent top download bar across tabs and in mini player mode: parsing, download progress with live percentage, processing stages, queue badge, and cancel button |
+| `soundboard/ui/window/downloadparts.py` | the download card's parts: the smooth progress bar, the title label and kind tag, the tick / cross flash when a pick ends, a pick's title and source in words, the pictures' rounded corners, the accent glow's strength |
 | `soundboard/ui/sounds/ytsearch.py` | the Sounds tab's web search: Enter in *Search sounds* shows YouTube or SoundCloud hits as a grid of cards (thumbnail, title, length) in place of the pads; *Play* / *Add* hand one to the link bar; the one in the player shows a bouncing equalizer and *Play* becomes *Pause* |
 | `soundboard/sounds/sourceinfo.py` | where a sound added from a web link came from: link, channel, upload date, length and views picked from the download's own yt-dlp reply, kept as `SoundMeta.source` and as a text file next to its audio |
 | `soundboard/ui/sounds/sourcedialog.py` | the pad menu's *Details* for a downloaded sound: its picture, title, channel and dates, with *Open on YouTube*, *Copy link* and *Delete info* |
@@ -297,6 +301,10 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/bun/splashacts.py` | Bun's start-up acts (one picked at random each launch), rare Buns, the season's hat, his goodbye wave |
 | `soundboard/ui/settings/langpick.py` | the language picker (Settings → Appearance → Language): a drop-down of languages, each with its letter coin and its own name, with a search |
 | `soundboard/ui/window/sidebar.py` | the tab rail down the main window's left: one icon per tab, opened out to show their names (the tab widget's own bar is hidden) |
+| `soundboard/ui/window/railsizes.py` | the tab rail's sizes (shut, open, its buttons and icons), shared by the rail's parts |
+| `soundboard/ui/window/railtabs.py` | the tabs on the rail: the tab widget whose own bar is hidden (`SideTabs`), a rail button per tab (`RailTab`), a tab's "New" pill |
+| `soundboard/ui/window/onaircard.py` | the rail's On Air card (`OutputBlock`): the Live switch, who's listening, Stop all and the status lines under them (`Line`: offline, Tor, proxy, remote control) |
+| `soundboard/ui/window/updatecard.py` | Onion Board's own update at the rail's foot (`UpdateCard`): a small card open, a button with a filling ring shut |
 | `soundboard/ui/window/moretabs.py` | *+ More tabs*' dropdown: a card for each switched-off tab (its picture, what it's good for, Add) |
 | `soundboard/ui/settings/lite.py` | lite mode (Settings > Appearance): the switch the animations, Bun, the logo and the textures ask, and whether this PC looks slow enough to suggest it |
 | `soundboard/ui/window/livesize.py` | the window's edge being dragged (Windows' WM_ENTERSIZEMOVE / WM_EXITSIZEMOVE): each step fits with Qt's cached sizes, letting go measures it all fresh |
