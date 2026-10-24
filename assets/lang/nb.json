@@ -2639,7 +2639,7 @@
   "Same hotkeys": "Samme hurtigtaster",
   "A sound in “{name}” uses a hotkey one of your sounds already has:\n\n{lines}\n\nGive it to the new sound?": [
     "En lyd i «{name}» bruker en hurtigtast som en av lydene dine allerede har:\n\n{lines}\n\nGi den til den nye lyden?",
-    "{n} lyder i «{name}» bruker hurtigtaster som lydene dine allerede har:\n\n{lines}\n\nGi dem til de nye lydene?"
+    "Lyder i «{name}» bruker hurtigtaster som noen av lydene dine allerede har:\n\n{lines}\n\nGi dem til de nye lydene?"
   ],
   "Use the new ones": "Bruk de nye",
   "Keep mine": "Behold mine",

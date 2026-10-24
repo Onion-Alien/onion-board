@@ -2639,7 +2639,7 @@
   "Same hotkeys": "Samma snabbtangenter",
   "A sound in “{name}” uses a hotkey one of your sounds already has:\n\n{lines}\n\nGive it to the new sound?": [
     "Ett ljud i ”{name}” använder en snabbtangent som ett av dina ljud redan har:\n\n{lines}\n\nGe den till det nya ljudet?",
-    "{n} ljud i ”{name}” använder snabbtangenter som dina ljud redan har:\n\n{lines}\n\nGe dem till de nya ljuden?"
+    "Ljud i ”{name}” använder snabbtangenter som några av dina ljud redan har:\n\n{lines}\n\nGe dem till de nya ljuden?"
   ],
   "Use the new ones": "Använd de nya",
   "Keep mine": "Behåll mina",
