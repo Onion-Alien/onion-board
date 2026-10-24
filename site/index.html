@@ -42,7 +42,7 @@
 <script>
   document.documentElement.classList.add("js");
   // Open on the app the link asks for (#watch), before anything paints.
-  if (/^#watch/.test(location.hash) || /^/onionwatch//.test(location.pathname)) document.documentElement.dataset.product = "watch";
+  if (/^#watch/.test(location.hash) || /^\/onionwatch\//.test(location.pathname)) document.documentElement.dataset.product = "watch";
   // The look they picked last time (home.js keeps it): its colours before anything paints.
   try {
     var look = JSON.parse(localStorage.getItem("onion-site-look") || "null");
