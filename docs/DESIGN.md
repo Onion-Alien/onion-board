@@ -95,7 +95,7 @@ Older code still has off-scale sizes (7pt, 9pt, 9.5pt, 10.5pt, 12pt, 15pt, 19pt 
 - Hierarchy comes from **weight and colour first, size second**: a heading is body
   size in weight 600, a secondary line is `muted`. Most screens need only hint, body
   and section.
-- Set sizes in `theme.py`'s style sheet by object name. **No `font-size` in widget
+- Set sizes in the app style sheet (`themesheet.py`) by object name. **No `font-size` in widget
   code** and no `setPointSizeF(…)` with a literal. If a role has no generic object
   name yet, add one to the style sheet (e.g. `QLabel#title`) and use it.
 - Sizes are in pt so the *Interface size* setting (80-150%) and Windows scaling
@@ -692,8 +692,8 @@ The rules above are Onion Board's take on what the big design systems agree on n
 
 | Piece | Code |
 | --- | --- |
-| Colour tokens, themes, the app style sheet, object names (`#card`, `#primary`, `#hint`, `#section`, `#danger`, `#chip`, `#pill`, `[quiet]`, `[busy]`, `[tone]`) | `soundboard/ui/kit/theme.py` |
-| Painted icons | `soundboard/ui/kit/icons.py` |
+| Colour tokens, themes, the app style sheet, object names (`#card`, `#primary`, `#hint`, `#section`, `#danger`, `#chip`, `#pill`, `[quiet]`, `[busy]`, `[tone]`) | `soundboard/ui/kit/theme.py`, its sheet's text in `themesheet.py` |
+| Painted icons | `soundboard/ui/kit/icons.py`, their drawings in `iconshapes.py` |
 | Busy states, opening links, toasts | `soundboard/ui/kit/busy.py` |
 | Dialogs that grow to fit their text | `soundboard/ui/kit/fit.py` |
 | The bars across the top of the window (`TopBar`) | `soundboard/ui/kit/topbar.py` |

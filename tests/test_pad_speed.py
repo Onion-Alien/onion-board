@@ -265,11 +265,11 @@ def test_window_background_never_touches_the_disk(qapp, monkeypatch):
 
     from PySide6.QtCore import QRect
     from PySide6.QtGui import QPainter
-    from soundboard.ui.kit import theme
+    from soundboard.ui.kit import indicators, theme
 
     def no_disk(*_a, **_k):
         raise AssertionError("painting asked the disk")
-    monkeypatch.setattr(theme, "tempfile", SimpleNamespace(gettempdir=no_disk))
+    monkeypatch.setattr(indicators, "tempfile", SimpleNamespace(gettempdir=no_disk))
     old = theme.current_name
     try:
         for name in ("Light", "Dark"):

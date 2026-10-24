@@ -25,7 +25,7 @@ lines in the files below.
 
 `BunnyWidget` in the setup guide (`ui/setup/setupwizard.py`, a prop per page), the chat guides
 (`ui/setup/chatguide.py`, `ui/setup/streamguide.py`), Bun mode (`ui/bun/bunmode.py`, the window as a
-floating Bun: `in_background=True` keeps him moving behind a game), the empty board (`ui/kit/widgets.py`), the Apps tab
+floating Bun: `in_background=True` keeps him moving behind a game), the empty board (`ui/kit/padgrid.py`), the Apps tab
 (`ui/apps/appspanel.py`, sad and begging; `rest_after_s=30`: still after 30 s with nothing playing, until a sound or a click), the Radio map (`ui/radio/flatmap.py`), the YouTube search
 (`ui/sounds/ytsearch.py`), left of the Live controls title (`ui/sounds/speedpitch.py` `DjBunny`: his
 `bunskits.mixing` act on a loop, tapping sound pads and scratching a record), the mic part update (`ui/setup/micupdate.py`), the *Enjoying Onion Board?* bar (`ui/window/enjoycontrol.py`, holding up the `survey` clipboard) Robo-Bun on the AI voice
