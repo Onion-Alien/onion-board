@@ -56,6 +56,8 @@ RUN_ALL = {
 HUBS = {
     "soundboard/ui/window/mainwindow.py", "soundboard/audio/engine.py",
     "soundboard/sounds/library.py", "soundboard/ui/settings/settings.py",
+    # engine.py's code, which the tests reach through engine
+    *(f"soundboard/audio/{m}.py" for m in ("devicelist", "enginerender", "enginebus")),
 }
 # too common to say which test is about it
 VAGUE_NAMES = {"__init__.py", "README.md", "LICENSE", ".gitignore", "requirements.txt"}
