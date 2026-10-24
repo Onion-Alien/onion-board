@@ -16,7 +16,7 @@ import threading
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QFileSystemWatcher, Qt, QTimer, QUrl, QVariantAnimation
+from PySide6.QtCore import QFileSystemWatcher, Qt, QTimer, QUrl, QVariantAnimation, Signal
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QApplication, QFileDialog
 
@@ -64,9 +64,11 @@ LOOSE_EMPTY_LOOKS = 20   # an empty file that long (~30 s) waits for the folder 
 
 class ImportControl(BackupImport, PackImport, Controller):
     """Importing, exporting and sound packs for one MainWindow (``mw``)."""
+    _loose_checked = Signal(object)   # _take_loose's look on a thread: [(Path, sig)] | None
 
     def __init__(self, mw: MainWindow):
         super().__init__(mw)
+        self._loose_checked.connect(self._loose_found)
         self._packs_removed: set[str] = set()   # sound packs to stop keeping after Undo
         self._imported_short = False      # a sound added in this batch is under SHORT_SOUND_S
         self._pending_imports = 0
@@ -114,6 +116,7 @@ class ImportControl(BackupImport, PackImport, Controller):
         self._loose_sizes: dict[Path, tuple[int, int]] = {}
         self._loose_taken: set[Path] = set()   # imported or failed: not tried again
         self._loose_empty: dict[Path, tuple[tuple[int, int], int]] = {}   # sig, looks
+        self._loose_looking = False   # the folder is being listed on a thread
         self._loose_timer = QTimer(mw)
         self._loose_timer.setSingleShot(True)
         self._loose_timer.setInterval(LOOSE_WAIT_MS)
@@ -128,27 +131,45 @@ class ImportControl(BackupImport, PackImport, Controller):
 
     def _take_loose(self):
         """Import the sounds folder's loose files once they're done copying in (the
-        same size on two looks in a row)."""
+        same size on two looks in a row). The folder is listed on a thread (it can be
+        big, or on OneDrive): _loose_found does the rest."""
         mw = self.mw
+        if self._loose_looking:   # one look at a time: this one looks again after it
+            self._loose_timer.start()
+            return
+        self._loose_looking = True
+        cfg = library.Config(sounds=list(mw.cfg.sounds))   # (the board changes meanwhile)
+
+        def look():
+            found = []
+            for p in loose_sounds(cfg):
+                try:
+                    st = p.stat()
+                except OSError:
+                    continue
+                found.append((p, (st.st_size, st.st_mtime_ns)))
+            return (found,)
+        worker.run(look, self._loose_checked, "loose-sounds", error=(None,), owner=mw)
+
+    def _loose_found(self, found):
+        mw = self.mw
+        self._loose_looking = False
+        if found is None or mw._shut_down:   # (the failure is logged)
+            return
         seen, ready, empty = {}, [], {}
         # a sound on the Undo bar is off the board but its file is still here: not a
         # new one (it came back as a copy, without its hotkey, and its bin entry broke)
         undoable = {os.path.normcase(m.file) for m, *_rest in mw.rmctl._removed}
-        for p in loose_sounds(mw.cfg):
+        for p, sig in found:
             if p in self._loose_taken or os.path.normcase(str(p)) in undoable:
                 continue
-            try:
-                st = p.stat()
-            except OSError:
-                continue
-            sig = (st.st_size, st.st_mtime_ns)
-            if not st.st_size:   # never "ready": don't look again every 1.5 s forever
+            if not sig[0]:   # empty: never "ready", so not looked at every 1.5 s forever
                 was = self._loose_empty.get(p)
                 looks = was[1] + 1 if was and was[0] == sig else 0
                 empty[p] = (sig, looks)
                 if looks >= LOOSE_EMPTY_LOOKS:
                     continue   # the folder changing (it's written to) looks again
-            if st.st_size and self._loose_sizes.get(p) == sig:
+            if sig[0] and self._loose_sizes.get(p) == sig:
                 ready.append(p)
             else:
                 seen[p] = sig

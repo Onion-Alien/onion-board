@@ -10,7 +10,7 @@ import logging
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import Qt, QTimer, Signal
 
 from soundboard.sounds import videos
 from soundboard.audio.engine import SR
@@ -28,10 +28,13 @@ log = logging.getLogger(__name__)
 
 class TransportControl(Controller):
     """The transport, playing background and video of one MainWindow (``mw``)."""
+    _video_checked = Signal(int, str, object)   # show_video's look: which click, sid, Path|None
 
     def __init__(self, mw: MainWindow):
         super().__init__(mw)
         self._refit_due = False   # a refit for the player bar is on its way
+        self._video_ask = 0       # the Video button's latest click: only its answer opens
+        self._video_checked.connect(self._open_video)
 
     def _show_transport(self, playing=None):
         """The player bar: always on the Sounds tab; on the others only while a sound
@@ -193,13 +196,27 @@ class TransportControl(Controller):
 
     def show_video(self):
         """The player's Video button: open the current sound's video (and play the
-        sound if it isn't playing)."""
+        sound if it isn't playing). It's looked up again first, on a thread (it reads
+        videos.json and checks the video is still there, maybe on a sleeping drive)."""
         mw = self.mw
-        sid = mw.current
+        sid = mw.current or ""
+        self._video_ask += 1
+        ask = self._video_ask
+        if not sid or mw.meta(sid) is None:
+            self._open_video(ask, sid, None)
+            return
+        worker.run(lambda: (ask, sid, videos.get(sid)), self._video_checked, "video-open",
+                   error=(ask, sid, None), owner=mw)
+
+    def _open_video(self, ask: int, sid: str, path):
+        mw = self.mw
+        if ask != self._video_ask or mw._shut_down:   # clicked again, or the window closed
+            return
+        if sid != (mw.current or ""):   # another sound was picked meanwhile
+            return
         m = mw.meta(sid) if sid else None
-        path = videos.get(sid) if m and sid else None
-        mw._video_for = (sid, path)
-        if path is None or sid is None or m is None:   # (a path: there's a sound)
+        mw._video_for = (mw.current, path)
+        if path is None or m is None:
             mw.btn_video.hide()
             mw.toast(_("This sound's video isn't there any more"), "warn")
             return

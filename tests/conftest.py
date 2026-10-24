@@ -336,6 +336,18 @@ def devices_done(win, timeout=8.0):
                           and not win.engine.devices.busy, timeout)
 
 
+def loose_look(win, timeout=8.0):
+    """One look at the sounds folder's loose files (ImportControl._take_loose), back
+    from the thread that lists the folder. Its timer is stopped first, so it's this
+    look and not one the timer starts."""
+    from PySide6.QtWidgets import QApplication
+    ctl, app = win.impctl, QApplication.instance()
+    ctl._loose_timer.stop()
+    assert process_events(app, lambda: not ctl._loose_looking, timeout)   # one going
+    ctl._take_loose()
+    assert process_events(app, lambda: not ctl._loose_looking, timeout)
+
+
 @pytest.fixture
 def app_dir(tmp_path, monkeypatch):
     """Point library's config/sounds paths at a temp folder."""

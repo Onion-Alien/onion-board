@@ -171,7 +171,7 @@ def _transport(w):
     w.transctl._update_transport({})
 
 
-def test_the_video_button_shows_only_for_a_video_pad(window, monkeypatch):
+def test_the_video_button_shows_only_for_a_video_pad(window, monkeypatch, qapp):
     w = window
     w.playctl.select("plain")
     _transport(w)
@@ -183,19 +183,22 @@ def test_the_video_button_shows_only_for_a_video_pad(window, monkeypatch):
     monkeypatch.setattr(VideoWindow, "show_for", lambda self, sid, name, path: shown.append(sid))
     monkeypatch.setattr(w.playctl, "toggle_play_pause", lambda: played.append(w.current))
     w.btn_video.click()
+    assert process_events(qapp, lambda: shown, 3)   # (looked up again on a thread)
     assert shown == ["vid"] and played == ["vid"]   # opens it and starts the sound
 
 
-def test_a_moved_video_takes_the_button_away(window, app_dir):
+def test_a_moved_video_takes_the_button_away(window, app_dir, qapp):
     w = window
     w.playctl.select("vid")
     _transport(w)
     (app_dir / "clips" / "vid.mp4").unlink()
     w.btn_video.click()
-    assert w.btn_video.isHidden() and w._video_win is None
+    assert process_events(qapp, lambda: w.btn_video.isHidden(), 3)
+    assert w._video_win is None
 
 
-def test_a_build_without_qt_video_still_starts_and_just_hides_the_button(window, monkeypatch):
+def test_a_build_without_qt_video_still_starts_and_just_hides_the_button(window, monkeypatch,
+                                                                         qapp):
     import builtins
     real = builtins.__import__
 
@@ -209,7 +212,8 @@ def test_a_build_without_qt_video_still_starts_and_just_hides_the_button(window,
     w.playctl.select("vid")
     _transport(w)
     w.btn_video.click()
-    assert w.btn_video.isHidden() and w._video_win is None
+    assert process_events(qapp, lambda: w.btn_video.isHidden(), 3)
+    assert w._video_win is None
 
 
 def test_picking_a_pad_never_reads_videos_json_on_the_ui_thread(window, monkeypatch, qapp):
@@ -238,3 +242,47 @@ def test_picking_a_pad_never_reads_videos_json_on_the_ui_thread(window, monkeypa
     gate.set()
     assert process_events(qapp, lambda: not w.btn_video.isHidden(), 3)
     assert w._video_asking is None and asked[-1] == "vid"
+
+
+def test_the_video_button_never_reads_videos_json_on_the_ui_thread(window, monkeypatch, qapp):
+    """The Video button looked the video up again on the UI thread (videos.json, and
+    the file, maybe on a sleeping drive): the click froze the window. It's looked up
+    on a thread and opens once it's known, unless another pad was picked meanwhile;
+    of quick clicks, only the last one's answer opens it."""
+    import threading
+    import time
+    w = window
+    w.playctl.select("vid")
+    _transport(w)
+    gate, real, threads = threading.Event(), videos.get, []
+
+    def slow(sid):
+        threads.append(threading.current_thread())
+        gate.wait(3)
+        return real(sid)
+    monkeypatch.setattr(videos, "get", slow)
+    shown, played = [], []
+    monkeypatch.setattr(VideoWindow, "show_for", lambda self, sid, name, path: shown.append(sid))
+    monkeypatch.setattr(w.playctl, "toggle_play_pause", lambda: played.append(w.current))
+    t0 = time.monotonic()
+    w.btn_video.click()
+    assert time.monotonic() - t0 < 0.5 and not shown
+    assert process_events(qapp, lambda: threads, 3)
+    assert threading.main_thread() not in threads
+    gate.set()
+    assert process_events(qapp, lambda: shown, 3)
+    assert shown == ["vid"] and played == ["vid"]
+
+    shown.clear()
+    gate.clear()
+    w.btn_video.click()
+    w.playctl.select("plain")        # another pad before the answer came
+    gate.set()
+    assert not process_events(qapp, lambda: shown, 1)
+
+    w.playctl.select("vid")
+    w.btn_video.click()
+    w.btn_video.click()              # clicked twice: opened once
+    assert process_events(qapp, lambda: shown, 3)
+    assert not process_events(qapp, lambda: len(shown) > 1, 1)
+    assert shown == ["vid"]

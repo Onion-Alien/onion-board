@@ -3,7 +3,7 @@ sound files dragged into that folder in Explorer join the board by themselves.""
 import numpy as np
 import pytest
 import soundfile as sf
-from conftest import process_events
+from conftest import loose_look, process_events
 from PySide6.QtGui import QDesktopServices
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
@@ -45,21 +45,47 @@ def test_a_sound_dragged_into_the_folder_joins_the_board(window, qapp):
     assert m.id in window.pads and m.duration > 0
     assert library.Path(m.file).is_file() and not dropped.exists()   # kept once, as ours
     assert process_events(qapp, lambda: not window.impctl._pending_imports)
-    window.impctl._take_loose()
+    loose_look(window)
     assert [s.name for s in window.cfg.sounds].count("Vine boom") == 1
 
 
 def test_a_file_still_copying_in_waits(window, qapp):
+    loose_look(window)                    # (none still going from the start)
     dropped = library.SOUNDS_DIR / "Big.wav"
     _wav(dropped)
-    window.impctl._loose_timer.stop()
-    window.impctl._take_loose()                  # first look: noted, not taken yet
+    loose_look(window)                    # first look: noted, not taken yet
     assert dropped in window.impctl._loose_sizes and not window.impctl._pending_imports
     _wav(dropped, 600)                    # it grew meanwhile
-    window.impctl._take_loose()
+    loose_look(window)
     assert dropped in window.impctl._loose_sizes and not window.impctl._pending_imports
-    window.impctl._take_loose()                  # the same twice: done copying
+    loose_look(window)                    # the same twice: done copying
     assert process_events(qapp, lambda: any(m.name == "Big" for m in window.cfg.sounds))
+
+
+def test_the_folder_is_listed_off_the_ui_thread(window, qapp, monkeypatch):
+    """Each look listed and checked the sounds folder on the UI thread, set off by
+    anything changing in it: a big folder, or one on OneDrive or a sleeping drive,
+    froze the window. It's listed on a thread, one look at a time, and the window
+    only takes the answer."""
+    import threading
+    import time
+    loose_look(window)
+    gate, threads, real = threading.Event(), [], importcontrol.loose_sounds
+
+    def slow(cfg):
+        threads.append(threading.current_thread())
+        gate.wait(3)
+        return real(cfg)
+    monkeypatch.setattr(importcontrol, "loose_sounds", slow)
+    _wav(library.SOUNDS_DIR / "Slow.wav")
+    t0 = time.monotonic()
+    window.impctl._take_loose()
+    assert time.monotonic() - t0 < 0.5
+    assert process_events(qapp, lambda: threads, 3)
+    window.impctl._take_loose()                  # while it's still listing: no second one
+    assert len(threads) == 1 and threads[0] is not threading.main_thread()
+    gate.set()
+    assert process_events(qapp, lambda: any(m.name == "Slow" for m in window.cfg.sounds))
 
 
 def test_the_button_opens_the_sounds_folder(window, monkeypatch):
