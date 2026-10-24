@@ -385,6 +385,10 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/online/quality.py` | Settings > Data & quality: download size, keeping the video, the radio's bitrate cap and patience, and web search extras (low data mode) |
 | `soundboard/online/radio.py` | Radio tab back end: the Radio Browser directory client (stations, search, a day's cache), the stream player (Qt Multimedia decodes, a `QAudioBufferOutput` hands 48 kHz PCM to the engine; the decoder's DLLs preload on a thread when the tab first opens) and the map's land outlines (SHA-384-checked) |
 | `soundboard/ui/radio/radiopanel.py` | the Radio tab: search bar, the map (click a dot to play), station list, favourites, Send / record / last 15 s, the now-playing strip |
+| `soundboard/ui/radio/radiomap.py` | part of `RadioTab`: the flat map, its dots and town labels, picking a station on it, the popular and remembered stations, and the directory being down |
+| `soundboard/ui/radio/radiosearch.py` | part of `RadioTab`: searching as you type, the matches already known, and the phone remote's station lists |
+| `soundboard/ui/radio/radioinfo.py` | part of `RadioTab`: the info line, the now-playing title and buttons, favourites, the Live switch, fitting a narrow window, volume, hearing and recording |
+| `soundboard/ui/radio/radiobits.py` | the Radio tab's timings and list sizes and its steady-width button text (`radiopanel` re-exports them) |
 | `soundboard/ui/radio/radiolist.py` | the Radio tab's station list (`RadioTab.listctl`): Popular / Favorites / Recent, the genre chips, country / quality / sort filters and the painted station rows |
 | `soundboard/ui/radio/flatmap.py` | the Radio tab's world map, painted by Qt (no web engine) |
 | `soundboard/ui/kit/appstate.py` | stops decorative animations (logo, mascots, live dot) while another program is in front |
