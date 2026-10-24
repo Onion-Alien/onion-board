@@ -55,6 +55,10 @@ RUN_ALL = {
 # to one runs the whole suite rather than trust the imports to find every test
 HUBS = {
     "soundboard/ui/window/mainwindow.py", "soundboard/audio/engine.py",
+    # MainWindow's mixins: the window itself
+    "soundboard/ui/window/windowparts.py", "soundboard/ui/window/windowtoasts.py",
+    "soundboard/ui/window/windowtabs.py", "soundboard/ui/window/windowlife.py",
+    "soundboard/ui/window/windowoptions.py", "soundboard/ui/window/hearcheck.py",
     "soundboard/sounds/library.py", "soundboard/ui/settings/settings.py",
 }
 # too common to say which test is about it

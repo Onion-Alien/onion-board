@@ -1,0 +1,273 @@
+"""Sound packs in the main window: the Free packs window, a pack's category, tidying,
+resetting and removing a pack. A mixin of ImportControl (importcontrol.py)."""
+from __future__ import annotations
+
+import copy
+import html
+import logging
+import re
+from pathlib import Path
+from typing import TYPE_CHECKING
+
+from PySide6.QtWidgets import QMenu, QMessageBox
+
+from soundboard.core import (
+    backup,
+    errors,
+    usage,
+)
+from soundboard.audio import soundfx
+from soundboard.sounds import (
+    catswitch,
+    library,
+)
+from soundboard.i18n import _, ngettext
+from soundboard.sounds.library import (
+    PAD_COLORS,
+    SoundMeta,
+)
+from soundboard.ui.window.controller import Controller
+from soundboard.ui.kit.crashdialog import free_dialog
+
+log = logging.getLogger("soundboard.ui.window.importcontrol")
+
+PACK_SAMPLE = "__pack_sample"   # Free packs' "hear it first" voice (headphones only)
+
+
+def pack_tab_name(name: str) -> str:
+    """A pack's tab: its name without a trailing "pack" ("Streamer pack" → "Streamer",
+    "GM starter pack" → "GM starter"), first letter capital."""
+    tab = re.sub(r"(?i)[\s_-]*\bpack\s*$", "", name.strip()).strip() or name.strip()
+    return tab[:1].upper() + tab[1:]
+
+
+# a plain, empty class at run time (ImportControl itself is the Controller)
+_Ctl = Controller if TYPE_CHECKING else object
+
+
+class PackImport(_Ctl):
+    """ImportControl's sound packs (a mixin)."""
+
+    if TYPE_CHECKING:   # ImportControl's own, for the type checker
+        from soundboard import otherboards
+        def import_files(self, files,
+                         extras: dict[str, otherboards.Entry] | None = ...) -> None: ...
+        def _on_worker(self, work, then, name: str) -> None: ...
+        _packs_removed: set[str]
+        # (BackupImport's)
+        def _on_unpacked(self, res, pkg, err: str) -> None: ...
+
+    def show_packs(self):
+        """The Free packs window (soundboard.sounds.packs): a pack it downloads is imported the
+        way dropping its zip on the window is."""
+        mw = self.mw
+        from soundboard.ui.sounds.packsdialog import PacksDialog
+        usage.used("packs-opened")
+        dlg = PacksDialog(self._pack_got, mw, play=self._pack_sample)
+        dlg.exec()
+        free_dialog(dlg)
+
+    def _pack_got(self, path):
+        """A free pack downloaded (packs/<its id>.zip): imported like a dropped zip."""
+        usage.used(f"pack-added-{usage.pack_tag(Path(path).stem)}")
+        self.import_files([str(path)])
+
+    def _pack_sample(self, data, gain: float) -> bool:
+        """Free packs' samples: to your headphones only (None stops it). False: no
+        headphones to play them on."""
+        mw = self.mw
+        if data is None:
+            mw.engine.stop(PACK_SAMPLE)
+            return True
+        usage.used("pack-heard")
+        return mw.engine.play(PACK_SAMPLE, data, gain, mode="restart",
+                                preview=True) is not None
+
+    def _pack_name(self, pkg) -> str:
+        return backup.packs().get(pkg.pack_id) or Path(pkg.path).name
+
+    def _pack_tab(self, pkg) -> str:
+        """The one tab a pack goes into: its name without "pack" ("Streamer pack" →
+        "Streamer")."""
+        return pack_tab_name(self._pack_name(pkg))
+
+    def _pack_spot(self, m: SoundMeta, order: list[str]) -> int:
+        """Where a sound coming back into its pack goes: after the pack's sound before it
+        (or before the one after it) on the board; anything else goes on the end."""
+        mw = self.mw
+        if not m.pack or m.pack_item not in order:
+            return len(mw.cfg.sounds)
+        at = {o.pack_item: i for i, o in enumerate(mw.cfg.sounds) if o.pack == m.pack}
+        k = order.index(m.pack_item)
+        for f in reversed(order[:k]):
+            if f in at:
+                return at[f] + 1
+        for f in order[k + 1:]:
+            if f in at:
+                return at[f]
+        return len(mw.cfg.sounds)
+
+    def _fill_packs_menu(self, menu: QMenu):
+        """Backup → My sound packs: each pack imported, to reset or remove in one go."""
+        mw = self.mw
+        menu.clear()
+        for pid, name in backup.packs().items():
+            n = sum(m.pack == pid for m in mw.cfg.sounds)
+            sub = menu.addMenu(ngettext("{name} ({n} sound)", "{name} ({n} sounds)", n,
+                                        name=name.replace("&", "&&")))   # not a shortcut
+            sub.addAction(_("Reset to how it came"), lambda pid=pid: self.reset_pack(pid))
+            if self._ungrouped_pack_sounds(pid):
+                sub.addAction(_("Put its categories in one tab"),
+                              lambda pid=pid: self.tidy_pack(pid))
+            act = sub.addAction(_("Remove from the board"), lambda pid=pid: self.remove_pack(pid))
+            act.setEnabled(bool(n))
+
+    @staticmethod
+    def _pack_own_categories(pid: str) -> set[str]:
+        """The categories a free pack comes with (lower case); {} for any other pack."""
+        from soundboard.sounds import packs
+        return {c.lower() for p in packs.built_in() if p.id == pid for c in p.categories}
+
+    def _ungrouped_pack_sounds(self, pid: str) -> list[SoundMeta]:
+        """Sounds of pack `pid` still in its categories as tabs of their own."""
+        mw = self.mw
+        own = self._pack_own_categories(pid)
+        return [m for m in mw.cfg.sounds if m.pack == pid and any(
+            library.split_tag(t)[0].lower() in own and not library.split_tag(t)[1]
+            for t in m.tags)] if own else []
+
+    def tidy_pack(self, pid: str):
+        """Backup → My sound packs → Put its categories in one tab: the pack's categories
+        (Tavern, Combat…) stop being tabs and become subcategories of one named after
+        the pack. Sounds you added to your own categories stay in them."""
+        mw = self.mw
+        moved = self._ungrouped_pack_sounds(pid)
+        name = backup.packs().get(pid, pid)
+        own = self._pack_own_categories(pid)
+        if not moved:
+            return
+        if QMessageBox.question(
+                mw, _("Put its categories in one tab"),
+                _("Make one “{name}” tab, with {n} of its categories inside it as "
+                  "subcategories instead of tabs of their own?\n\nNo sound is removed or "
+                  "changed.", name=name, n=len(own)),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel
+                ) != QMessageBox.StandardButton.Yes:
+            return
+        mine = [m for m in mw.soundctl._live_metas() if m.pack == pid]
+        library.group_pack_tags(mine, pack_tab_name(name), own)
+        merge = library.merge_tags
+        for m in mine:
+            m.tags = merge(m.tags, mw.cfg.categories, mw.cfg.subcategories)
+        live = mw.soundctl._live_metas()
+        for c in list(mw.cfg.categories):   # the old tabs, once nothing is in them
+            if c.lower() in own and not any(c in m.tags for m in live) and not (
+                    mw.cfg.category_hotkeys.get(c)
+                    or catswitch.programs_for(mw.cfg.category_programs, c)):
+                mw.cfg.categories.remove(c)
+                mw.cfg.category_colors.pop(c, None)
+                mw.cfg.subcategories.pop(c, None)
+                if c in mw.cfg.hidden_from_all:
+                    mw.cfg.hidden_from_all.remove(c)
+        if mw.cfg.category not in mw.cfg.categories:
+            mw.cfg.category = mw.cfg.subcategory = ""
+        mw._save_now()
+        mw.catctl._fill_categories()
+        mw.searchctl.apply_filter(mw.search.text())
+        mw.hkctl.register_hotkeys()
+        mw.toast(_("✓ “{name}” is one tab now", name=html.escape(name)), "ok")
+
+    def reset_pack(self, pid: str, ask: bool = True):
+        """Put a sound pack back how it came: its sounds' names, hotkeys, volume,
+        effects, categories and pictures, and its removed sounds come back.
+        The pack is read, and its pictures put back, on a worker; this returns at once."""
+        def read():
+            pkg = backup.read_pack(pid)
+            return pkg, self._pack_name(pkg)
+        self._on_worker(read, lambda got, err: self._pack_read(pid, got, err, ask),
+                        "reset-read")
+
+    def _pack_read(self, pid: str, got, err, ask: bool):
+        mw = self.mw
+        if err is not None:
+            if not isinstance(err, backup.BackupError):
+                log.warning("couldn't read the sound pack %s: %r", pid, err)
+            errors.warn(mw, _("Can't reset the sound pack"), err)
+            return
+        pkg, name = got
+        if ask and QMessageBox.question(
+                mw, _("Reset sound pack"),
+                _("Put the sounds from “{name}” back how they came?\n\nChanges you made to "
+                  "them (names, hotkeys, volume, effects, pictures…) are undone, and ones you "
+                  "removed come back. Your other sounds aren't touched.", name=name),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel
+                ) != QMessageBox.StandardButton.Yes:
+            return
+        on_board = {}
+        for m in mw.cfg.sounds:
+            if m.pack == pid:
+                on_board.setdefault(m.pack_item, m)
+        # put back on copies (the pictures are re-encoded: disk), copied over here
+        copies = {k: copy.copy(m) for k, m in on_board.items()}
+        missing = [ps for ps in pkg.sounds if ps.folder not in on_board]
+        start = len(mw.cfg.sounds)
+
+        def run():
+            restored = backup.reset_sounds(pkg, copies)
+            if not missing:
+                return restored, backup.Imported(), ""
+            full = list(pkg.sounds)
+            pkg.sounds = missing
+            try:
+                res = backup.install(
+                    pkg, set(), lambda i: PAD_COLORS[(start + i) % len(PAD_COLORS)])
+            except Exception as e:  # noqa: BLE001
+                log.exception("reset of the sound pack %s failed", pid)
+                res, err = None, errors.plain(e)
+            else:
+                err = ""
+            finally:
+                pkg.sounds = full   # for _pack_spot's order
+            return restored, res, err
+
+        def then(got, err):
+            if err is not None:
+                if not isinstance(err, (OSError, backup.BackupError)):
+                    log.warning("reset of the sound pack %s failed: %r", pid, err)
+                errors.warn(mw, _("Can't reset the sound pack"), err)
+                return
+            restored, res, failed = got
+            pkg.restored = []
+            for c in restored:
+                m = on_board[c.pack_item]
+                if m not in mw.cfg.sounds:   # removed while it ran
+                    continue
+                fx_before = soundfx.key(m.fx)
+                for k in (*backup.SOUND_FIELDS, "image"):
+                    setattr(m, k, getattr(c, k))
+                pkg.restored.append(m)
+                if soundfx.key(m.fx) != fx_before:
+                    mw.editctl._rerender(m)
+                if p := mw.pads.get(m.id):
+                    p.update()
+            self._on_unpacked(res, pkg, failed)
+        self._on_worker(run, then, "reset-pack")
+
+    def remove_pack(self, pid: str, ask: bool = True):
+        """Take every sound of a sound pack off the board (one Undo brings them back);
+        once the Undo bar is gone, the pack is no longer kept."""
+        mw = self.mw
+        gone = [m.id for m in mw.cfg.sounds if m.pack == pid]
+        if not gone:
+            return
+        name = backup.packs().get(pid, pid)
+        if ask and QMessageBox.question(
+                mw, _("Remove sound pack"),
+                ngettext("Remove the {n} sound from “{name}”?",
+                         "Remove the {n} sounds from “{name}”?", len(gone), name=name)
+                + "\n\n" + _("You can undo this, or bring them back from Recently deleted."),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel
+                ) != QMessageBox.StandardButton.Yes:
+            return
+        mw.rmctl.remove_sounds(gone)
+        self._packs_removed.add(pid)

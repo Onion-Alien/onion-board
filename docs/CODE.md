@@ -161,6 +161,12 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/core/app.py` | entry point: log file, crash hooks, runtime tuning, single instance, the window |
 | `soundboard/core/singleinstance.py` | named mutex + local socket so a second launch just raises the first |
 | `soundboard/ui/window/mainwindow.py` | the main window: pads, transport, tabs, the audio panel, test mode, auto push-to-talk |
+| `soundboard/ui/window/windowparts.py` | `WindowParts`, the base of MainWindow's mixins below: the window's parts `WindowBuilder` makes, and (for the type checker only) what MainWindow provides; empty at run time |
+| `soundboard/ui/window/windowtoasts.py` | MainWindow's toasts (a mixin): `toast`, `say`, `tell`, `unsay`, where the cards stand and how they show, growing the window when a shrunk card is clicked |
+| `soundboard/ui/window/windowtabs.py` | MainWindow making its tabs (a mixin): Radio, Voice, Apps, Triggers and Store or their stand-ins when switched off, the Store's links and samples, sharing a voice, loading the Onion Watch add-on |
+| `soundboard/ui/window/windowlife.py` | MainWindow's life (a mixin): the tray icon and its menu, quitting and restarting, Windows ending the session, starting with Windows, the usage count |
+| `soundboard/ui/window/windowoptions.py` | MainWindow's settings changes (a mixin): `set_option` and saving, Use less CPU for voice, the EQ, always on top, pad width, single click, the master switch (`set_sending`) |
+| `soundboard/ui/window/hearcheck.py` | *Hear what they hear* in the main window (a mixin): the switch, the speakers warning, stopping when the mic squeals |
 | `soundboard/ui/kit/widgets.py` | hand-painted widgets: meter, EQ curve, seek slider, pads (picture, spectrum visualizer while playing) and their grid |
 | `soundboard/ui/kit/playbutton.py` | playback button with a smooth circular edge in full and mini views |
 | `soundboard/ui/kit/pixels.py` | `snap_to_pixels` (from the style kit's `appstate.py`): every hand-painted widget calls it first so its edges land on whole pixels at 125 % / 150 % scaling |
@@ -193,7 +199,9 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/window/ffmpegcontrol.py` | FFmpeg in the main window (`MainWindow.ffctl`): the check at start-up, getting it by itself when it's missing or won't start, Fix it / Get FFmpeg / Reinstall, and the top bar with how far it is and Stop |
 | `soundboard/ui/window/fitcontrol.py` | the main window fitting its size (`MainWindow.fitctl`): what gives way as it gets smaller (the rail, the mixer, the category bar, the Setup page's columns, the toolbar), the mini player, laying it all out again |
 | `soundboard/ui/window/hotkeycontrol.py` | hotkeys in the main window (`MainWindow.hkctl`): registering them (per category when they follow it), what each key does pressed or let go, push-to-talk, MIDI and instant replay, setting a sound's, a category's or an app-wide key (a combo does one thing), the keyboard menu, all hotkeys off |
-| `soundboard/ui/window/importcontrol.py` | getting sounds in and out, in the main window (`MainWindow.impctl`): Add sounds / folder / link, dropped files, the sounds folder's loose files, backups and sound packs (import, export, tidy, reset, remove), other soundboards, Free packs |
+| `soundboard/ui/window/importcontrol.py` | getting sounds in, in the main window (`MainWindow.impctl`): Add sounds / folder / link, dropped files, the sounds folder's loose files, other soundboards; its backups and sound packs are the mixins below |
+| `soundboard/ui/window/importbackup.py` | backups in the main window (a mixin of `ImportControl`): exporting the board, a category or some sounds, importing a backup with its settings and hotkeys |
+| `soundboard/ui/window/importpacks.py` | sound packs in the main window (a mixin of `ImportControl`): the Free packs window, a pack's category, tidying, resetting and removing a pack |
 | `soundboard/ui/window/searchcontrol.py` | the Sounds tab's search box (`MainWindow.searchctl`): filtering the pads as you type, a link pasted in it, searching YouTube and other sites from it |
 | `soundboard/ui/window/settingscontrol.py` | the Settings page of the main window (`MainWindow.setctl`): opening it on a page in the window's place, growing the mini player for it, closing and keeping it, building it (and a spare Edit sound) ahead of time |
 | `soundboard/ui/window/soundscontrol.py` | the board's sounds coming in (`MainWindow.soundctl`): loading them all on a worker, each one's audio arriving, a clip, recording or download made into a sound, moving and renaming a pad |
