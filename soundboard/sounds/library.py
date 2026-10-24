@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import collections
 import contextlib
+import copy
 import hashlib
 import itertools
 import json
@@ -146,6 +147,31 @@ def _stored_path(path: str, folder: Path, absolute: bool) -> str:
     if absolute and p.is_absolute() and p.is_relative_to(folder):   # a sound in one of
         return p.relative_to(folder).as_posix()   # its folders: "YouTube/Song.flac"
     return path
+
+
+_ATOMS = frozenset((str, int, float, bool, type(None)))
+
+
+def _plain(v):
+    """A copy of a setting's value, as asdict() makes it: lists and dicts copied
+    all the way down, so another thread can write it while this one changes the
+    config. Settings hold only JSON types, so this is all asdict() did for them."""
+    t = type(v)
+    if t in _ATOMS:
+        return v
+    if t is dict:
+        return {k: x if type(x) in _ATOMS else _plain(x) for k, x in v.items()}
+    if t is list or t is tuple:
+        out = [x if type(x) in _ATOMS else _plain(x) for x in v]
+        return out if t is list else tuple(out)
+    return asdict(v) if hasattr(type(v), "__dataclass_fields__") else copy.deepcopy(v)
+
+
+def _fields_raw(obj, names) -> dict:
+    """asdict(obj) for a Config / SoundMeta, without asdict's call per value: every
+    save copies every sound, and asdict() made ~70 Python calls per sound for it."""
+    return {n: v if type(v) in _ATOMS else _plain(v)
+            for n in names for v in (getattr(obj, n),)}
 
 
 # A newer version's settings, kept so this one's save writes them back (an older
@@ -988,10 +1014,9 @@ class Config:
         return cfg
 
     def to_raw(self) -> dict:
-        d = _with_raw(asdict(self), self)
+        d = _with_raw(_fields_raw(self, _CONFIG_FIELDS), self)
         d["version"] = CONFIG_VERSION
-        for s, m in zip(d["sounds"], self.sounds):
-            _with_raw(s, m)
+        d["sounds"] = [_with_raw(_fields_raw(m, _SOUND_FIELDS), m) for m in self.sounds]
         # files inside the library are stored by name only, so the whole
         # %APPDATA%\OnionBoard folder can move or be restored
         for s in d["sounds"]:
@@ -1022,6 +1047,10 @@ class Config:
         return (seq, self.to_raw(),
                 json.dumps({k: getattr(self, k) for k in SIDE_KEYS}, indent=2))
 
+
+# what Config.to_raw copies, in asdict()'s order
+_SOUND_FIELDS = tuple(f.name for f in fields(SoundMeta))
+_CONFIG_FIELDS = tuple(f.name for f in fields(Config) if f.name != "sounds")
 
 _write_lock = threading.Lock()   # one writer at a time: Saver's thread or a direct save()
 _seq_lock = threading.Lock()     # numbering snapshots (never held across disk I/O)
