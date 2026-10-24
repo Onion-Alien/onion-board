@@ -1185,13 +1185,14 @@ def test_addon_installs_are_counted_by_a_fixed_name(monkeypatch):
     assert with_steps and with_steps <= set(usage.ADDONS)
     seen = []
     monkeypatch.setattr(usage, "used", seen.append)
-    for ok, mid, broken in ((True, "ai-voices", False), (False, "secret-addon", False),
-                            (True, "live-voice", True)):
-        monkeypatch.setattr(modules, "_install", lambda *a, ok=ok, **k: ok)
-        info = SimpleNamespace(id=mid, broken=broken)
-        assert modules.install(info, print) is ok
+    for why, mid, broken in (("", "ai-voices", False), ("pip", "secret-addon", False),
+                             ("", "live-voice", True)):
+        monkeypatch.setattr(modules, "_install", lambda *a, why=why, **k: why)
+        info = SimpleNamespace(id=mid, broken=broken, installed=not broken,
+                               path=Path("nowhere"))
+        assert modules.install(info, print) is (not why)
     assert seen == ["addon-installed-ai-voices", "addon-failed-other",
-                    "addon-installed-live-voice", "addon-repaired"]
+                    "addon-failed-other-pip", "addon-installed-live-voice", "addon-repaired"]
     assert set(seen) <= set(usage.FEATURES)
 
 

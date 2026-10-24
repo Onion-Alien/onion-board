@@ -265,7 +265,9 @@ account or anything else about you.
     `update-copy-error`, `update-later`, `update-didnt-finish`, `update-auto`), the version clicked for What's new
     (`used/whats-new`), a restore point saved before an update and one put back
     (`used/restore-point-update`, `restore-point-used`);
-  - add-ons: one set up, failing to, repaired, a Python got for it or that failing
+  - add-ons: one set up, failing to (and at which step, from a fixed list:
+    `addon-failed-live-voice-pip`, `-download`, `-timeout`…; never the error itself),
+    repaired, a Python got for it or that failing
     (`used/addon-installed-ai-voices`, `addon-installed-live-voice`, `addon-failed-…`,
     `addon-repaired`, `addon-got-python`, `addon-python-failed`; another add-on is
     `other`); the Triggers tab's *Add Onion Watch* window shown, Add clicked or closed

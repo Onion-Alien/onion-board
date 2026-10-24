@@ -162,6 +162,12 @@ MIC_NO_LOAD = ("off-route", "wiped", "not-on", "no-stream", "not-running")
 PRESS_MODES = ("overlap", "toggle", "solo", "queue")
 # the add-ons with install steps (their module.json id); any other is "other"
 ADDONS = ("ai-voices", "live-voice", "other")
+# why an add-on's install failed (modules._install): add-ons switched off, no Python
+# for it (pyget), a step that wouldn't start, its venv / pip / model download step
+# failing, another step, a step stopped for taking too long (the model download's
+# apart), or an error in the app itself
+ADDON_FAILS = ("off", "python", "run", "venv", "pip", "download", "step", "timeout",
+               "download-timeout", "other")
 # the free sound packs (soundboard.sounds.packs BUILT_IN ids); any other is "other"
 PACKS = ("streamer", "esports", "general", "podcast", "halloween", "gm-starter", "other")
 # the Live controls' tabs (ui/voice/livesetups.py)
@@ -298,9 +304,11 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # (features_now, SoundMeta.mode)
             "pause", "stop-all", "taskbar-buttons",
             *(f"press-{k}" for k in PRESS_MODES),
-            # an add-on with install steps (ADDONS) set up or failing to, Repair, and a
-            # Python got for it (soundboard.online.pyget) or that failing
+            # an add-on with install steps (ADDONS) set up or failing to (and why:
+            # ADDON_FAILS), Repair, and a Python got for it (soundboard.online.pyget)
+            # or that failing
             *(f"addon-installed-{k}" for k in ADDONS), *(f"addon-failed-{k}" for k in ADDONS),
+            *(f"addon-failed-{k}-{r}" for k in ADDONS for r in ADDON_FAILS),
             "addon-repaired", "addon-got-python", "addon-python-failed",
             # a restore point saved before an update; a restore point put back
             "restore-point-update", "restore-point-used",
