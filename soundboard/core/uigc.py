@@ -35,6 +35,11 @@ read them all back from disk with Python's lock held, and every thread, the soun
 stopped for 10 s to over 2 minutes (freeze reports: `all-held`, `paging`, `mem-80`).
 So a deep sweep also waits until the app is the one in front and the PC has memory to
 spare (`warm`), and how long the last one took is kept (last_deep) for those reports.
+Being in front isn't enough the moment the app comes back, though: after a while in the
+tray (memtrim empties it there) or behind a game, most of it is still on disk, and the
+sweep, long overdue by then, ran on the first tick (2.7.1's freeze reports: `gc-sweep`,
+`paging`, no `mem-80`). So back in front after AWAY_S or more, the clock starts again:
+the next deep sweep is a full DEEP_S later, once the app is used and back in RAM.
 """
 from __future__ import annotations
 
@@ -43,7 +48,8 @@ import threading
 import time
 from collections.abc import Callable
 
-from PySide6.QtCore import QObject, QTimer
+from PySide6.QtCore import QObject, Qt, QTimer
+from PySide6.QtGui import QGuiApplication
 
 from soundboard.core import overridepin
 
@@ -52,6 +58,7 @@ YOUNG = 5_000         # new objects before a gen-0 collection (~1 ms each)
 DEEP_S = 600          # the set-aside objects gone through again, when it's quiet...
 DEEP_MAX_S = 3600     # ...or after this long anyway (the radio on all day)
 COLD_MEMORY = 80      # % of the PC's memory in use from which deep sweeps wait
+AWAY_S = 30           # out of the front this long: the deep sweep's clock starts again
 
 last_deep = (0.0, 0.0)   # the last deep sweep: (time.monotonic() it ended, seconds taken)
 
@@ -110,9 +117,6 @@ def warm() -> bool:
     """A deep sweep won't read the app back from disk: the app is the one in front
     (Windows keeps its memory in RAM; one in the background is the first it moves out,
     and memtrim empties it in the tray) and the PC isn't short of memory."""
-    from PySide6.QtCore import Qt
-    from PySide6.QtGui import QGuiApplication
-
     from soundboard.core import hangwatch
     if QGuiApplication.applicationState() != Qt.ApplicationState.ApplicationActive:
         return False
@@ -138,11 +142,27 @@ class UiCollector(QObject):
         if freeze:
             gc.freeze()   # what start-up made: gone through by the deep sweeps only
         self._deep_at = time.monotonic()
+        self._away_at: float | None = None   # when the app left the front, while away
+        app = QGuiApplication.instance()
+        if isinstance(app, QGuiApplication):
+            app.applicationStateChanged.connect(self.state_changed)
         hand_threads_to_ui()
         overridepin.pin()
         self._timer = QTimer(self)
         self._timer.timeout.connect(self.check)
         self._timer.start(interval_ms)
+
+    def state_changed(self, state, now: float | None = None):
+        """Back in front after AWAY_S or more: the next deep sweep a full DEEP_S later
+        (see the module)."""
+        now = time.monotonic() if now is None else now
+        if state != Qt.ApplicationState.ApplicationActive:
+            if self._away_at is None:
+                self._away_at = now
+            return
+        if self._away_at is not None and now - self._away_at >= AWAY_S:
+            self._deep_at = now
+        self._away_at = None
 
     def check(self) -> int:
         let_go()

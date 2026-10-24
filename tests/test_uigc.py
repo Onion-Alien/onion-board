@@ -162,6 +162,38 @@ def test_a_deep_sweep_waits_till_the_app_is_in_ram(qapp, monkeypatch):
         gc.unfreeze()
 
 
+def test_a_deep_sweep_waits_after_the_app_comes_back(qapp, monkeypatch):
+    """Back in front from the tray or from behind a game, most of the app is still on
+    disk: an overdue deep sweep on the first tick read it all back (2.7.1: `gc-sweep`,
+    `paging`). Away AWAY_S or more, the next one is a full DEEP_S after coming back."""
+    from PySide6.QtCore import Qt
+    active = Qt.ApplicationState.ApplicationActive
+    inactive = Qt.ApplicationState.ApplicationInactive
+    c = uigc.UiCollector(interval_ms=10**6, warm=lambda: True)
+    try:
+        monkeypatch.setattr(uigc, "DEEP_MAX_S", 0)   # long overdue
+        now = time.monotonic()
+        c._deep_at = now - 10**6                   # (a just-booted PC: monotonic() is small)
+        c.state_changed(inactive, now - 5)             # a quick alt-tab: still due
+        c.state_changed(active, now)
+        assert c.check() == 3
+        c._deep_at = now - 10**6
+        c.state_changed(inactive, now - uigc.AWAY_S - 600)   # an evening in the tray
+        c.state_changed(inactive, now - 60)          # (Hidden after Inactive: the first counts)
+        c.state_changed(active, now)
+        assert c._deep_at == now
+        monkeypatch.setattr(uigc, "DEEP_MAX_S", 3600)
+        assert c.check() != 3                          # back: not yet
+        c._deep_at = now - uigc.DEEP_S - 1
+        assert c.check() == 3                          # DEEP_S later: swept
+        qapp.applicationStateChanged.emit(inactive)   # hooked to Qt's own signal
+        assert c._away_at is not None
+    finally:
+        c._timer.stop()
+        c.deleteLater()
+        gc.unfreeze()
+
+
 def test_warm_means_in_front_with_memory_to_spare(qapp, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtGui import QGuiApplication

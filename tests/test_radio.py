@@ -880,6 +880,44 @@ def test_first_audio_is_sent_once_however_long_the_window_takes(qapp, server):
         p.stop()
 
 
+def test_opening_a_stream_never_holds_up_the_window(qapp, monkeypatch):
+    """Qt's setSource ran on the window: on a PC reading the app back from disk it held
+    the window 10-30 s (2.7.1's freeze reports). The player has a thread of its own."""
+    opened = []
+
+    class SlowPlayer(radio.QMediaPlayer):
+        def setSource(self, url):
+            if url.toString():   # (not the halt's empty one)
+                time.sleep(1.0)
+                opened.append((threading.get_ident(), url.toString()))
+            super().setSource(url)
+    monkeypatch.setattr(radio, "QMediaPlayer", SlowPlayer)
+    monkeypatch.setattr(radio.net, "active", lambda: True)   # (no lookup first)
+    p = RadioPlayer()
+    t0 = time.monotonic()
+    p.play(Station(uuid="u", name="S", url="http://127.0.0.1:9/live"))
+    assert time.monotonic() - t0 < 0.5 and p.status == "connecting"
+    assert process_events(qapp, lambda: opened, timeout=10)
+    tid, url = opened[0]
+    assert url == "http://127.0.0.1:9/live" and tid != threading.get_ident()
+    p.shutdown()
+    assert p._thread is not None and not p._thread.isRunning()
+
+
+def test_a_replaced_streams_late_trouble_is_ignored(qapp, monkeypatch):
+    """What Qt sends about a stream already replaced (its end, an error) reaches the
+    window after the new one was asked for: it doesn't count against the new one."""
+    p = RadioPlayer()
+    retried = []
+    monkeypatch.setattr(p, "_retry", retried.append)
+    p.station, p._src = Station(uuid="u", name="S", url="http://x"), 2
+    p._status_of(1, radio.QMediaPlayer.MediaStatus.EndOfMedia)
+    p._failed_of(1, "network")
+    assert retried == []
+    p._failed_of(2, "network")
+    assert retried == ["network"]
+
+
 def test_shutdown_waits_out_a_buffer_being_handed_over(qapp):
     """Qt's decoding thread mid-way through a buffer when the player shuts down (its tab
     going): shutdown waits for it, and a buffer after that isn't taken. Freed while
