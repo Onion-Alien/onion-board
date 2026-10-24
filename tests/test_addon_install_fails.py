@@ -56,10 +56,10 @@ def test_add_ons_switched_off_python_not_got_and_a_hang_say_so(tmp_path, seen, m
 
     def no_python(d, on_line):
         raise pyget.GetError("no")
+    real_for_module = pyget.for_module
     monkeypatch.setattr(pyget, "for_module", no_python)
     assert not modules.install(m, print)
-    monkeypatch.undo()
-    monkeypatch.setattr(usage, "used", seen.append)
+    monkeypatch.setattr(pyget, "for_module", real_for_module)
     monkeypatch.setattr(modules, "INSTALL_STEP_TIMEOUT_S", 0.5)
     assert not modules.install(m, print)
     assert seen[1::2] == ["addon-failed-live-voice-off", "addon-failed-live-voice-python",
