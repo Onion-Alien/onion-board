@@ -1153,7 +1153,7 @@ def test_turning_down_the_language_offer_is_remembered(window, monkeypatch):
     from soundboard import i18n
     monkeypatch.setattr(i18n, "windows_language", lambda: "ja-JP")
     window.langctl._offer_language()
-    assert window.lang_bar.isVisibleTo(window) and window.lang_btn.text() == "日本語に切り替えます"
+    assert window.lang_bar.isVisibleTo(window) and window.lang_btn.text() == "日本語に切り替える"
     window.lang_hide.click()
     assert not window.lang_bar.isVisibleTo(window) and window.cfg.language == ""
     window.langctl._offer_language()

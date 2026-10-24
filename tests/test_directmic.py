@@ -958,7 +958,7 @@ def test_sonar_is_restarted_once_a_step_and_its_new_devices_noted(monkeypatch):
     monkeypatch.setattr(dm, "_sonar_fixed", False)
     monkeypatch.setattr(dm, "_sonar_keep_again", lambda: calls.append("noted"))
     dm._mic_apps_back()
-    assert ["taskkill", "/F", "/PID", "100"] in calls and "noted" in calls
+    assert [TASKKILL, "/F", "/PID", "100"] in calls and "noted" in calls
     calls.clear()
     monkeypatch.setattr(dm, "_sonar_fixed", False)
     dm._mic_apps_back()
@@ -996,7 +996,7 @@ def test_sonar_is_only_ended_when_its_devices_wont_go_back(monkeypatch, fixed, k
     calls = _mic_app_kit(monkeypatch, [[100], [200]], [False])
     monkeypatch.setattr(dm, "_sonar_fixed", fixed)
     dm._mic_apps_back({SONAR_MIC})
-    assert (["taskkill", "/F", "/PID", "100"] in calls) is killed
+    assert ([TASKKILL, "/F", "/PID", "100"] in calls) is killed
 
 
 def test_cleanup_restarts_the_audio_and_sets_sonar_back(monkeypatch):
