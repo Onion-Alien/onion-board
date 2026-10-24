@@ -76,7 +76,7 @@
   }
   function select(name, scrollUp) {
     if (name === current()) { if (scrollUp) window.scrollTo({ top: 0, behavior: still ? "auto" : "smooth" }); return; }
-    history.replaceState(null, "", name === "watch" ? "#watch" : location.pathname + location.search);
+    history.replaceState(null, "", name === "watch" ? "/onionwatch/" : "/onionboard/");
     did("tab-" + name);
     apply(name);
     if (scrollUp) window.scrollTo(0, 0);

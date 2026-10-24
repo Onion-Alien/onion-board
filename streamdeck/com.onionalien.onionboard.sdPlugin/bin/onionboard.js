@@ -6,7 +6,7 @@ import { join } from "node:path";
 
 export const DEFAULT_PORT = 7474;
 export const TIMEOUT_MS = 2500;
-export const SITE = "https://onion-alien.github.io/onion-board/";
+export const SITE = "https://onionalien.com/onionboard/";
 
 // what can go wrong, in the order a user would fix it
 export const PROBLEMS = {
