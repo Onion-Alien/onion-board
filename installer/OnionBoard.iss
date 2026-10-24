@@ -60,6 +60,8 @@
 AppId={{6B0B6E2F-6D63-4C1B-9E0B-5B8E3C2A71D4}
 AppName={#AppName}
 AppVersion={#AppVersion}
+; files keep their UTC time stamps: local ones would give away the build PC's time zone
+TimeStampsInUTC=yes
 AppPublisher=Onion Alien
 AppPublisherURL=https://github.com/Onion-Alien/onion-board
 AppSupportURL=https://github.com/Onion-Alien/onion-board/issues
