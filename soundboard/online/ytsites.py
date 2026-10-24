@@ -9,7 +9,6 @@ import logging
 import re
 import threading
 import urllib.parse
-import urllib.request
 from collections.abc import Callable
 from dataclasses import dataclass
 

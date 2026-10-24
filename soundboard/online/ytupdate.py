@@ -16,7 +16,6 @@ import shutil
 import sys
 import tempfile
 import time
-import urllib.parse
 import urllib.request
 import zipfile
 from dataclasses import dataclass

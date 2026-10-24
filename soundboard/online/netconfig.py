@@ -7,9 +7,7 @@ import ipaddress
 import logging
 import threading
 import time
-import urllib.error
 import urllib.parse
-import urllib.request
 import weakref
 from collections.abc import Callable
 from dataclasses import dataclass

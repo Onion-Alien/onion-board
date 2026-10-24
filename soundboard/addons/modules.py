@@ -270,6 +270,28 @@ def discover(dirs: list[Path] | None = None) -> list[ModuleInfo]:
     return list(found.values())
 
 
+def find(module_id: str, dirs: list[Path] | None = None) -> ModuleInfo | None:
+    """The module with this id as discover() finds it, or None."""
+    return next((m for m in discover(dirs) if m.id == module_id), None)
+
+
+def env_zip(var: str) -> Path | None:
+    """The zip the environment variable `var` names (a build to try before it's
+    released), or None."""
+    v = os.environ.get(var, "").strip().strip('"')
+    return Path(v) if v else None
+
+
+def zip_version(path: Path, module_id: str) -> str:
+    """The version in a module zip's <module_id>/module.json, or "?"."""
+    try:
+        with zipfile.ZipFile(path) as z:
+            d = json.loads(z.read(f"{module_id}/module.json").decode("utf-8-sig"))
+        return str(d.get("version", "?"))
+    except (OSError, KeyError, ValueError, zipfile.BadZipFile, AttributeError):
+        return "?"
+
+
 class ModuleAPI:
     """What an effects module's `register(api)` is handed."""
 
@@ -514,6 +536,27 @@ def uninstall(module_id: str, base: Path | None = None) -> None:
         raise ModuleError(_("it couldn't be removed ({error})", error=errors.plain(e))) from e
     shutil.rmtree(gone, ignore_errors=True)
     log.info("removed module %s from %s", module_id, dest)
+
+
+def install_fetched(path: Path, module_id: str, kind: str, base: Path | None,
+                    downloads: Path) -> ModuleInfo:
+    """install_zip, then delete the zip if it was downloaded into `downloads` (a
+    local one stays). Raises ModuleError."""
+    try:
+        return install_zip(path, module_id, kind, base)
+    finally:
+        if path.parent == downloads:
+            path.unlink(missing_ok=True)
+
+
+def is_base_copy(info: ModuleInfo, module_id: str, base: Path | None = None) -> bool:
+    """Whether `info` is the copy installed into `base` (default search_dirs()[0]),
+    not one shipped with the app."""
+    base = base if base is not None else search_dirs()[0]
+    try:
+        return info.path.resolve() == (base / module_id).resolve()
+    except OSError:
+        return False
 
 
 def remove_env(info: ModuleInfo) -> None:

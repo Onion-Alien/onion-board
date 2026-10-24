@@ -11,9 +11,7 @@ import secrets
 import select
 import socket
 import threading
-import urllib.error
 import urllib.parse
-import urllib.request
 from collections.abc import Callable
 
 from soundboard import without_app_blas

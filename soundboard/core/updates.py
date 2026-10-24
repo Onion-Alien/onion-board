@@ -165,6 +165,12 @@ def find_asset(data: dict, name: str, trusted: tuple[str, ...]) -> tuple[str, st
     return "", "", 0
 
 
+def own_page(data: dict, page: str, fallback: str) -> str:
+    """A release's html_url, only if it's under `page` (the project's own); else `fallback`."""
+    p = str(data.get("html_url") or fallback)
+    return p if p.startswith(page + "/") else fallback
+
+
 # "Urgent: …" at the start of a line, also as **Urgent:**, "> Urgent -", "- Urgent:"
 URGENT_RE = re.compile(r"^[\s>*_#-]*urgent[*_]*\s*[:\-–—]\s*(.+)$",
                        re.IGNORECASE | re.MULTILINE)
@@ -400,6 +406,21 @@ def fetch(url: str, sha256: str, dest: Path, trusted: tuple[str, ...], max_size:
         raise UpdateError(_("the download failed ({error})", error=errors.plain(e))) from e
     log.info("downloaded %s (%d bytes, SHA-256 checked)", dest.name, dest.stat().st_size)
     return dest
+
+
+def fetch_addon(offer, asset: str, downloads: str, max_size: int, local_env: str,
+                progress: Callable[[int, int], object] | None = None,
+                cancelled: Callable[[], bool] | None = None, feature: str = "addons") -> Path:
+    """An add-on offer's zip on this PC: its local zip (local_env), or downloaded into
+    UPDATES_DIR and checked against its SHA-256. Raises UpdateError. Call off the UI
+    thread."""
+    if offer.local is not None:
+        if not offer.local.is_file():
+            raise UpdateError(f"{offer.local} isn't there ({local_env})")
+        return offer.local
+    dest = UPDATES_DIR / f"{asset.removesuffix('.zip')}-{offer.version}.zip"
+    return fetch(offer.url, offer.sha256, dest, (downloads,), max_size, "add-on",
+                 offer.size, progress, cancelled, feature)
 
 
 def installer_args(path: Path) -> list[str]:

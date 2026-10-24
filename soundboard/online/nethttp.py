@@ -94,8 +94,15 @@ class _Logged(_LoggedBase):
     gen = -1           # the Connection setting's generation() it connected under
     feature = ""
 
-    def _connecting(self):
+    def __init__(self, *a, feature: str = "", direct: bool = False, **kw):
+        super().__init__(*a, **kw)
+        self.feature, self.direct = feature, direct
+
+    def _dial(self):
+        """connect()'s socket and activity entry, the way the Connection setting says."""
         self.gen = netconfig._generation
+        return _open(self.host, self.port, _timeout(self.timeout), feature=self.feature,
+                     direct=self.direct, away=self.feature not in HOME_OK)
 
     def _stale(self) -> str:
         """Why this connection mustn't carry on, or "": its switch went off, or the
@@ -147,28 +154,14 @@ class _Logged(_LoggedBase):
 
 
 class _HTTPConnection(_Logged, http.client.HTTPConnection):
-    def __init__(self, *a, feature: str = "", direct: bool = False, **kw):
-        super().__init__(*a, **kw)
-        self.feature, self.direct = feature, direct
-
     def connect(self):
-        self._connecting()
-        self.sock, entry = _open(self.host, self.port, _timeout(self.timeout),
-                                 feature=self.feature, direct=self.direct,
-                                 away=self.feature not in HOME_OK)
+        self.sock, entry = self._dial()
         self._opened(entry)
 
 
 class _HTTPSConnection(_Logged, http.client.HTTPSConnection):
-    def __init__(self, *a, feature: str = "", direct: bool = False, **kw):
-        super().__init__(*a, **kw)
-        self.feature, self.direct = feature, direct
-
     def connect(self):
-        self._connecting()
-        sock, entry = _open(self.host, self.port, _timeout(self.timeout),
-                            feature=self.feature, direct=self.direct,
-                            away=self.feature not in HOME_OK)
+        sock, entry = self._dial()
         self.sock = sock
         self._opened(entry)
         try:
@@ -250,15 +243,20 @@ def _tls_context() -> ssl.SSLContext:
         return ctx
 
 
+def _port(u: urllib.parse.SplitResult) -> int:
+    """A URL's port (443 / 80 by default), or 0 when it isn't a number."""
+    try:
+        return u.port or (443 if u.scheme.lower() == "https" else 80)
+    except ValueError:
+        return 0
+
+
 def _refuse_home(feature: str, u: urllib.parse.SplitResult) -> ProxyError:
     """The error (logged, and kept for explain()) for a request to this PC or the
     home network that `feature` may not make."""
     host = (u.hostname or "").strip("[]")
     why = _("Not connecting to {host}: it's on this PC or your home network", host=host)
-    try:
-        port = u.port or (443 if u.scheme.lower() == "https" else 80)
-    except ValueError:
-        port = 0
+    port = _port(u)
     netlog.blocked(feature, host, port, why)
     return _failed(why)
 
@@ -323,10 +321,7 @@ def urlopen(req, timeout: float = 30, feature: str | None = None, direct: bool =
         try:
             check(feature)
         except FeatureOff as e:
-            try:
-                port = u.port or (443 if u.scheme.lower() == "https" else 80)
-            except ValueError:
-                port = 0
+            port = _port(u)
             netlog.blocked(feature, u.hostname or "", port, str(e))
             raise
     assert feature is not None   # check() raised for None

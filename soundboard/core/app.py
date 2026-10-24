@@ -277,7 +277,7 @@ def install_addon(module_id: str) -> int:
     from soundboard.sounds import library
     from soundboard.online import net, tor
     from soundboard.addons import modules
-    info = next((m for m in modules.discover() if m.id == module_id), None)
+    info = modules.find(module_id)
     if info is None or info.error:
         print(f"FAIL: no usable add-on {module_id!r}", file=sys.stderr)
         return 1
