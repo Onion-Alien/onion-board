@@ -42,8 +42,8 @@ from pathlib import Path
 
 log = logging.getLogger(__name__)
 
-# Bump it when the admin part changes (directmic.py from "admin part" to "the app's
-# side", or this file); tests/test_michelper.py fails until it is. A newer helper is
+# Bump it when the admin part changes (micadmin.py, or this file); tests/test_michelper.py
+# fails until it is. A newer helper is
 # put in place by the next admin step that asks anyway: only another effect DLL makes
 # the app ask (so the helper never adds a prompt the app wouldn't have had).
 HELPER_VERSION = 30
