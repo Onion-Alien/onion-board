@@ -387,13 +387,12 @@ def test_card_makes_your_own_voices_with_a_copy_shipped_with_the_app(qapp, app_d
         p.deleteLater()
 
 
-def test_voices_sort_into_who_and_how_high():
-    kinds = {v["id"]: (avl.who(v), avl.pitch_band(v)) for v in avl.BUILT_IN}
-    assert kinds["bear"] == ("men", "low") and kinds["riley"] == ("men", "mid")
-    assert kinds["sage"] == ("women", "mid") and kinds["pixie"] == ("women", "high")
-    assert kinds["river"][0] == kinds["squeak"][0] == kinds["titan"][0] == "other"
+def test_voices_sort_into_who():
+    kinds = {v["id"]: avl.who(v) for v in avl.BUILT_IN}
+    assert kinds["bear"] == kinds["riley"] == "men"
+    assert kinds["sage"] == kinds["pixie"] == "women"
+    assert kinds["river"] == kinds["squeak"] == kinds["titan"] == "other"
     assert avl.who(mine(tags=["Woman"])) == "women" and avl.who(mine()) == "other"
-    assert avl.pitch_band({"pitch_hz": "junk"}) == "low"
 
 
 

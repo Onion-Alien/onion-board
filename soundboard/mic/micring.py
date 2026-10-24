@@ -210,13 +210,6 @@ class RingWriter:
         now = _tick() if now is None else now
         return now - int(self._mtick[0]) < MIC_LIVE_MS and 8000 <= self.mic_rate <= 384000
 
-    def effect_format(self) -> tuple[int, int]:
-        s = self.live_slots()
-        if not len(s):
-            return 0, 0
-        top = s[s["tick"].argmax()]
-        return int(top["rate"]), int(top["channels"])
-
     def apps(self) -> int:
         """How many apps' streams the effect runs on right now (the board's own too)."""
         return len(self.live_slots())

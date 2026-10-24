@@ -136,35 +136,24 @@ class EngineBus:
             log.error("exception in %s audio callback", key, exc_info=exc)
             self.errors[key] = f"audio callback failed: {errors.plain(exc)}"
 
-    def _cb_main(self, outdata, frames, t, status):
-        self._last_cb["main"] = time.monotonic()
+    def _cb_out(self, key, work, outdata, frames, status):
+        self._last_cb[key] = time.monotonic()
         if is_xrun(status):
-            self.xruns["main"] += 1
+            self.xruns[key] += 1
         try:
-            self._main(outdata, frames)
+            work(outdata, frames)
         except Exception as e:  # noqa: BLE001
             outdata.fill(0)
-            self._guard("main", e)
+            self._guard(key, e)
+
+    def _cb_main(self, outdata, frames, t, status):
+        self._cb_out("main", self._main, outdata, frames, status)
 
     def _cb_mon(self, outdata, frames, t, status):
-        self._last_cb["mon"] = time.monotonic()
-        if is_xrun(status):
-            self.xruns["mon"] += 1
-        try:
-            self._mon(outdata, frames)
-        except Exception as e:  # noqa: BLE001
-            outdata.fill(0)
-            self._guard("mon", e)
+        self._cb_out("mon", self._mon, outdata, frames, status)
 
     def _cb_obs(self, outdata, frames, t, status):
-        self._last_cb["obs"] = time.monotonic()
-        if is_xrun(status):
-            self.xruns["obs"] += 1
-        try:
-            self._obs(outdata, frames)
-        except Exception as e:  # noqa: BLE001
-            outdata.fill(0)
-            self._guard("obs", e)
+        self._cb_out("obs", self._obs, outdata, frames, status)
 
     DIRECT_LOCK_S = 0.02   # longest the mic callback waits on the mic effect's feed
 

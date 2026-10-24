@@ -402,10 +402,6 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
         for a in self.aux:
             self._aux_setup(a.key)
 
-    def apps_waiting(self) -> bool:
-        """A captured program is held back while its AI voice or language gets ready."""
-        return bool(self.apps_starting())
-
     def apps_starting(self) -> str:
         """What a captured program waits for: "ai", "lang" (StreamVoice.starting) or ""."""
         return next((w for sv in list(self._aux_voice.values()) if (w := sv.starting)), "")
