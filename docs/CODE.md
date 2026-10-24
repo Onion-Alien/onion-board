@@ -229,7 +229,10 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/setup/pocketcard.py` | Onion Pocket's card on the Setup tab (`MainWindow.pocket_card`), only while it's installed: on the left in Connect your chat's place (that moves right); shut it says if phones can reach the board, its fold opens the add-on's own controls |
 | `soundboard/ui/sounds/linkbar.py` | the Sounds tab's link bar: a link pasted into *Search sounds* is looked up with yt-dlp, then added as a sound or played once |
 | `soundboard/ui/window/downloadbar.py` | persistent top download bar across tabs and in mini player mode: parsing, download progress with live percentage, processing stages, queue badge, and cancel button |
-| `soundboard/ui/sounds/ytsearch.py` | the Sounds tab's web search: Enter in *Search sounds* shows YouTube or SoundCloud hits as a grid of cards (thumbnail, title, length) in place of the pads; *Play* / *Add* hand one to the link bar; the one in the player shows a bouncing equalizer and *Play* becomes *Pause* |
+| `soundboard/ui/sounds/ytsearch.py` | the Sounds tab's web search: Enter in *Search sounds* shows YouTube or SoundCloud hits as a grid of cards (thumbnail, title, length) in place of the pads; *Play* / *Add* hand one to the link bar; the one in the player shows a bouncing equalizer and *Play* becomes *Pause*; it re-exports the cards' names below |
+| `soundboard/ui/sounds/ytcard.py` | one web search hit's card (`ResultRow`): the thumbnail (`Thumb`, with the download's progress and the player's equalizer over it), title, channel, counts, *Play* / *Add* |
+| `soundboard/ui/sounds/ytlabels.py` | words on the web search's cards: view / like counts and `ClampLabel` (a label cut to a few lines with an ellipsis; the Store's cards use it too) |
+| `soundboard/ui/sounds/ytwaiting.py` | the web search's loading view (`SearchingView`: Bun or Hoot over a sliding bar) and its *Back* button (`BackHome`) |
 | `soundboard/sounds/sourceinfo.py` | where a sound added from a web link came from: link, channel, upload date, length and views picked from the download's own yt-dlp reply, kept as `SoundMeta.source` and as a text file next to its audio |
 | `soundboard/ui/sounds/sourcedialog.py` | the pad menu's *Details* for a downloaded sound: its picture, title, channel and dates, with *Open on YouTube*, *Copy link* and *Delete info* |
 | `soundboard/ui/window/spacekey.py` | Space plays / pauses on the Sounds and Radio tabs wherever the focus is (not in text boxes, or on a button reached with Tab) |
@@ -249,7 +252,11 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/core/backup.py` | export / import of the board as a plain zip (JSON + original audio + pictures), sound packs and single sounds; see [BACKUP-FORMAT.md](BACKUP-FORMAT.md) |
 | `soundboard/sounds/packs.py` | free sound packs: the list (`packs/catalog.json` in this repo, with a built-in copy for offline) of ready-made boards in the backup format, added in one click; each pack's preview zip (`samples`) |
 | `soundboard/online/store.py` | the sound store (Store tab): the list, fetching a sound, votes, reports and uploads, talking to the project's own server |
-| `soundboard/ui/store/storetab.py` | the *Store* tab: free CC0 sounds to hear, add, vote on or report, and the *Share a sound* window |
+| `soundboard/ui/store/storetab.py` | the *Store* tab: free CC0 sounds to hear, add, vote on or report; it re-exports the names of the pieces below |
+| `soundboard/ui/store/storerow.py` | one sound's card on the *Store* tab (`SoundRow`): its tile, *Play* / *Add* / vote buttons and who shared it |
+| `soundboard/ui/store/storeshare.py` | the *Store* tab's *Share a sound* window (`ShareDialog`): a file or a link, then a thank-you |
+| `soundboard/ui/store/storefit.py` | `StoreFit`, a mixin of `StoreTab`: the toolbar on one row or two and as many cards a row as fit the tab's width |
+| `soundboard/ui/store/storeplay.py` | `StorePlay`, a mixin of `StoreTab`: *Play* / *Stop* / *Play next*, hearing a sound first in your headphones, a shared link's card following the player |
 | `soundboard/ui/store/storelook.py` | the *Store* tab's pictures: a sound's emoji tile (from its name, tags and category; bars bounce while it plays), the banner with Bun |
 | `soundboard/online/storevoices.py` | the Store's community voices: packing your voice changer voices, AI voices and voice combos to share (settings only), checking every voice from the store again, taking one into your own lists, its *Hear it* sample, and share codes for any of them (`OB2-…`, read back through the same checks; old `OB1-…` voice codes still read) |
 | `soundboard/ui/store/storevoices.py` | the Store tab's *Voices*: a row per community voice and the *Share a voice* window |
@@ -386,7 +393,10 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/online/radio.py` | Radio tab back end: the Radio Browser directory client (stations, search, a day's cache), the stream player (Qt Multimedia decodes, a `QAudioBufferOutput` hands 48 kHz PCM to the engine; the decoder's DLLs preload on a thread when the tab first opens) and the map's land outlines (SHA-384-checked) |
 | `soundboard/ui/radio/radiopanel.py` | the Radio tab: search bar, the map (click a dot to play), station list, favourites, Send / record / last 15 s, the now-playing strip |
 | `soundboard/ui/radio/radiolist.py` | the Radio tab's station list (`RadioTab.listctl`): Popular / Favorites / Recent, the genre chips, country / quality / sort filters and the painted station rows |
-| `soundboard/ui/radio/flatmap.py` | the Radio tab's world map, painted by Qt (no web engine) |
+| `soundboard/ui/radio/flatmap.py` | the Radio tab's world map, painted by Qt (no web engine): dots, town names, zoom and drag; it re-exports the names of the pieces below |
+| `soundboard/ui/radio/mapparts.py` | the Radio map's small parts: Bun's loading card, colour fills, the stations' dot sizes and glow, moving dots that would cover each other apart |
+| `soundboard/ui/radio/maptiles.py` | `MapTiles`, a mixin of `FlatMap`: the world drawn in tiles once per zoom, a slice at a time, with the last whole view stretched in for them meanwhile |
+| `soundboard/ui/radio/maplabels.py` | `MapLabels`, a mixin of `FlatMap`: where the country names go at each zoom, drawn once over the stations popping in |
 | `soundboard/ui/kit/appstate.py` | stops decorative animations (logo, mascots, live dot) while another program is in front |
 | `soundboard/ui/apps/clipeditor.py` | the Apps tab's clip editor, folded away under each card until opened: the live waveform of the program's last minute, drag to select, preview in headphones, Save to clips, the Edit menu and its keys |
 | `soundboard/ui/apps/clipshelf.py` | the Apps tab's *Saved clips* and the Voice tab's *Recordings* (one widget): rows painted by `ClipRowDelegate` (round play button, name, where · when, waveform that fills as it plays, Live pill, length), one set of row buttons (through mic, add to Sounds, more) that follows the hovered or picked row; search, app/day groups, batched rows, background inactivity cleanup and waveform drawing; Space / double-click plays, Enter sends, Esc stops, F2 renames, Del deletes (Undo bar) |
