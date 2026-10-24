@@ -305,6 +305,10 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/setup/firsttour.py` | Bun's first-run tour of the empty board after that guide: the search box (or offline the Add button), the results, then "Nice" once a sound is added |
 | `soundboard/ui/setup/tabtours.py` | Each tab's quick how-to on its first visit (Radio, Apps, Triggers, Voice, Store); Settings > General > Show tutorials |
 | `soundboard/ui/bun/bunnywidget.py` | Bun animated: bobs, blinks, talks along with your mic and throws music notes |
+| `soundboard/ui/bun/bunbits.py` | the animated Bun's timings, colours and small parts: blinks, springs, dancing to hits, the floating notes and the dust, junk and sparks round him (`bunnywidget` re-exports them) |
+| `soundboard/ui/bun/bunbuild.py` | part of `BunnyWidget`: the building act (`build()`, `stop_building()`) and the dust, junk and sparks it throws |
+| `soundboard/ui/bun/bundance.py` | part of `BunnyWidget`: dancing to what's playing and the springy layer over his pose |
+| `soundboard/ui/bun/bunpaint.py` | part of `BunnyWidget`: painting his kept picture, the speaker and gadget he builds, the flying bits, his bubble, dust and scuffle |
 | `soundboard/ui/bun/onionalien.py` | the Onion Alien, the author's mascot, drawn in code like Bun and Hoot: he says the note on Settings > About in a speech bubble, typed out a letter at a time |
 | `soundboard/ui/bun/bunmode.py` | Bun mode: the mini player as a floating Bun over everything, showing what the app is doing |
 | `soundboard/ui/bun/pilotbun.py` | Pilot Bun: the Languages card's install picture, Bun flying a little 3D plane low over a lit, turning 3D Earth (numpy per pixel; the plane depth-buffered; rests after a while; still in lite mode) |
@@ -374,6 +378,9 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/core/trash.py` | Recently deleted: removed sounds (files and pad) and forgotten programs, kept 30 days in `%APPDATA%\OnionBoard\deleted` so they can be brought back |
 | `soundboard/core/reset.py` | Settings → General → Reset: puts the parts picked (settings, hotkeys, sounds, the bin, programs, devices) back to the start at the next launch, after saving a restore point in `%APPDATA%\OnionBoard\restore-points` that undoes it |
 | `soundboard/ui/bun/bunny.py` | Bun the mascot, drawn in code (setup guide and installer art) |
+| `soundboard/ui/bun/bunpalette.py` | Bun's colours and the spots on his 100 x 120 canvas (`bunny` re-exports them) |
+| `soundboard/ui/bun/bunshapes.py` | the small painting helpers Bun is drawn with: ellipses, glows, shading, strokes, arcs, his paw pads |
+| `soundboard/ui/bun/bunprops.py` | what Bun holds and wears on top: his props, the nightcap, the music notes, stars and sparkles |
 | `soundboard/ui/bun/bunskits.py` | Bun's idle skits, one per theme outfit (Blood Moon's cheese moon, Retro 98's "deal with it" shades, ...) and juggling for the rest: functions of time that pose him and queue drawings, played by `BunnyWidget` now and then while he's idle |
 | `soundboard/audio/groove.py` | what the playing song sounds like, from the stretch just played: its tempo, where the beats fall and a guess at its style (rock, electronic, hip-hop, calm, speech); Bun mode's Bun dances to it |
 | `soundboard/style/` | the style kit, shared with Onion Watch (which carries an exact copy; imports nothing else from the app, `tests/test_style_kit.py`): `palettes.py` (the themes' colours, `finish()` works out the derived tokens), `textures.py` (Textured's tiles), `bunnyfit.py` (Bun's outfit for each theme, drawn in layers by `bunny.py`; [MASCOT.md](MASCOT.md)), `owl.py` (Hoot alive, `OwlWidget`, wearing the same outfits; re-exports `owllooks.py`, his colours and look per theme, and `owldraw.py`, his shapes and `draw_owl`), `mascotlines.py` (what Bun and Hoot say when clicked, in each theme's character), `appstate.py` (`active`, `pause_in_background`, `snap_to_pixels`), `cover.py` (a still of a window, fading in and out over a theme switch: `ui/window/themecover.py` puts Bun on it), `hooks.py` (the current theme and translation, connected by `theme.py`) |
