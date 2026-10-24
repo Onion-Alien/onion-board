@@ -186,13 +186,14 @@ class BunnyDance(_Base):
             m = {key: was[key] + (m[key] - was[key]) * k for key in m}
         return {key: v * d for key, v in m.items()}
 
-    def _spring(self, now: float, dt: float):
+    def _spring(self, now: float, dt: float) -> dict:
         """Moves the springy layer on a frame: his ears trail behind his hops and
         wobble as they settle, a fast move stretches him and a change of direction (a
-        landing, a take-off) squashes him, then he jiggles back into shape."""
+        landing, a take-off) squashes him, then he jiggles back into shape. Returns the
+        pose it read (pose(now), without the springs), so _still needn't work it out again."""
         pose = self.pose(now)
         if dt <= 0:
-            return
+            return pose
         acted = self.act_phase() in ("dash", "cloud", "back") or self._pop_t >= 0
         vy = 0.0 if acted else (pose["dy"] - self._dy_last) / dt / self.bun_h
         self._dy_last = pose["dy"]
@@ -205,6 +206,7 @@ class BunnyDance(_Base):
             self._squash_s.step(min(0.08, abs(vy) * STRETCH), dt, *SQUASH_SPRING)
             self._squash_s.x = max(-0.2, min(0.15, self._squash_s.x))
         self._ears_s.step(pose["ears"] - vy * EAR_DRAG, dt, *EAR_SPRING)
+        return pose
 
     def springy(self, pose: dict) -> dict:
         """`pose` with the springy layer on top (what paintEvent draws)."""

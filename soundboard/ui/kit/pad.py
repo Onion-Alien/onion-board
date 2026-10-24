@@ -119,6 +119,18 @@ def pad_colours() -> dict[str, QColor]:
     return _pad_palette[1]
 
 
+def _hover_mix(lo: QColor, hi: QColor, k: float) -> QColor:
+    """`lo` blended `k` of the way to `hi` (a pad's hover fade)."""
+    return QColor.fromRgbF(lo.redF() + (hi.redF() - lo.redF()) * k,
+                           lo.greenF() + (hi.greenF() - lo.greenF()) * k,
+                           lo.blueF() + (hi.blueF() - lo.blueF()) * k)
+
+
+def _badge_text(hotkey: str) -> str:
+    """A hotkey as its badge shows it ("" for none)."""
+    return hotkey and (midi.short(hotkey) if midi.is_midi(hotkey) else pretty_key(hotkey))
+
+
 class Pad(QAbstractButton):
     """One sound's button, painted by hand. It's a QAbstractButton so screen readers
     see a button with the sound's name, and it works from the keyboard: Tab / arrows
@@ -349,8 +361,7 @@ class Pad(QAbstractButton):
                 {"overlap": "⧉ ", "toggle": "⏯ "}.get(m.mode, "") + \
                 (_("hold") + " " if m.hold else "")
             right = _("❚❚ paused") if self.paused else f"{flags}{m.duration:.1f}s"
-            hk = m.hotkey and (midi.short(m.hotkey) if midi.is_midi(m.hotkey)
-                               else pretty_key(m.hotkey))
+            hk = _badge_text(m.hotkey)
             badge = None
             fm = QFontMetrics(f)
             # a cut-off key ("Ctrl+Al…") says nothing: no badge on a pad too narrow
@@ -521,14 +532,7 @@ class Pad(QAbstractButton):
                                              grow, HOVER_LIFT + grow),
                                   PAD_RADIUS + grow, PAD_RADIUS + grow)
             r.translate(0, -HOVER_LIFT * k)
-        if k <= 0.0:
-            base = lo
-        elif k >= 1.0:
-            base = hi
-        else:
-            base = QColor.fromRgbF(lo.redF() + (hi.redF() - lo.redF()) * k,
-                                   lo.greenF() + (hi.greenF() - lo.greenF()) * k,
-                                   lo.blueF() + (hi.blueF() - lo.blueF()) * k)
+        base = lo if k <= 0.0 else hi if k >= 1.0 else _hover_mix(lo, hi, k)
         if self._down:
             base = base.darker(108)
         path = QPainterPath()
@@ -672,12 +676,9 @@ class Pad(QAbstractButton):
         p = QPainter(self)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         r = QRectF(self.rect()).adjusted(1, 1, -1, -1)
-        T = theme.T
-        accent = QColor(self.meta.color)
-        lo, hi, k = QColor(T["card"]), QColor(T["card_hi"]), self._hover_k
-        base = QColor.fromRgbF(lo.redF() + (hi.redF() - lo.redF()) * k,
-                               lo.greenF() + (hi.greenF() - lo.greenF()) * k,
-                               lo.blueF() + (hi.blueF() - lo.blueF()) * k)
+        C = pad_colours()
+        accent = self._accent_colour()
+        base = _hover_mix(C["card"], C["card_hi"], self._hover_k)
         if self._down:
             base = base.darker(108)
         path = QPainterPath()
@@ -699,15 +700,15 @@ class Pad(QAbstractButton):
                 ink.setAlpha(110)
             pen = QPen(ink, 1.8)
         elif self.picked:
-            pen = QPen(QColor(T["accent"]), 2)
+            pen = QPen(C["accent"], 2)
         elif self.selected:
-            pen = QPen(QColor(T["border_hi"]), 1.4)
+            pen = QPen(C["border_hi"], 1.4)
         else:
             pen = Qt.PenStyle.NoPen
         p.setPen(pen)
         p.drawPath(path)
         if self.hasFocus() and self._kbd_focus:
-            p.setPen(QPen(QColor(T["text_hi"]), 1.2))
+            p.setPen(QPen(C["text_hi"], 1.2))
             p.drawRoundedRect(r.adjusted(2, 2, -2, -2), 5, 5)
         p.setPen(Qt.PenStyle.NoPen)
         dot = QRectF(r.left() + 9, r.center().y() - 4, 8, 8)
@@ -717,7 +718,7 @@ class Pad(QAbstractButton):
             p.setBrush(halo)
             grow = 1 + 5 * self.meter
             p.drawEllipse(dot.adjusted(-grow, -grow, grow, grow))
-        p.setBrush(QColor(T["accent"]) if self.picked else accent)
+        p.setBrush(C["accent"] if self.picked else accent)
         p.drawEllipse(dot)
         f = QFont(self.font())
         h = self.height()   # bigger rows (the list's row size), bigger text
@@ -728,25 +729,24 @@ class Pad(QAbstractButton):
         rendering = self.state == "rendering" and self.render_frac is not None
         if rendering:
             right = _("applying… {pct}%", pct=int((self.render_frac or 0.0) * 100))
-            rc = T["muted"]
+            rc = C["muted"]
         elif self.state in ("loading", "rendering"):
             right = _("applying…") if self.state == "rendering" else _("loading…")
-            rc = T["muted"]
+            rc = C["muted"]
         elif self.state == "error":
-            right, rc = _("can't load"), "#ff6b6b"
+            right, rc = _("can't load"), _ERROR_ON_PIC
         else:
             m = self.meta
             flags = ("⟳ " if m.loop else "") + \
                 {"overlap": "⧉ ", "toggle": "⏯ "}.get(m.mode, "")
             right = "❚❚" if self.paused else f"{flags}{m.duration:.1f}s"
-            rc = T["muted"]
+            rc = C["muted"]
         rw = fm.horizontalAdvance(right) + 4
         self._link_rect = None
         if self.state == "ready" and self.hover and self.linked_file() and r.width() >= 160:
             box = QRectF(r.right() - 9 - rw - 2 - LINK_PX, r.center().y() - LINK_PX / 2,
                          LINK_PX, LINK_PX)
-            p.drawPixmap(box.topLeft(), _link_pixmap(QColor(T["muted"]),
-                                                     self.devicePixelRatioF()))
+            p.drawPixmap(box.topLeft(), _link_pixmap(C["muted"], self.devicePixelRatioF()))
             self._link_rect = box
             rw += LINK_PX + 6
         if rendering:   # the ✕ at the end, the bar along the bottom
@@ -757,30 +757,29 @@ class Pad(QAbstractButton):
             self._paint_render(p, QRectF(r.left(), r.top(), r.right() - 9 - r.left(),
                                          r.height()),
                                QRectF(r.left() + 9, r.bottom() - 3, r.width() - 18, 2),
-                               QColor(rc), False, None)
-            p.setPen(QColor(rc))
+                               rc, False, None)
+            p.setPen(rc)
             p.drawText(QRectF(r.left(), r.top(), text_end - r.left(), r.height()),
                        Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter, right)
         else:
-            p.setPen(QColor(rc))
+            p.setPen(rc)
             p.drawText(r.adjusted(0, 0, -9, 0), Qt.AlignmentFlag.AlignRight
                        | Qt.AlignmentFlag.AlignVCenter, right)
-        hk = self.meta.hotkey and (midi.short(self.meta.hotkey) if midi.is_midi(self.meta.hotkey)
-                                   else pretty_key(self.meta.hotkey))
+        hk = _badge_text(self.meta.hotkey)
         if hk and r.width() >= 200:   # the key as a badge left of the length, room allowing
             bw = fm.horizontalAdvance(hk) + 10
             if bw <= r.width() * 0.4:
                 box = QRectF(r.right() - 9 - rw - 4 - bw, r.center().y() - 9, bw, 18)
                 p.setPen(Qt.PenStyle.NoPen)
-                p.setBrush(pad_colours()["badge"])
+                p.setBrush(C["badge"])
                 p.drawRoundedRect(box, 5, 5)
-                p.setPen(pad_colours()["badge_text"])
+                p.setPen(C["badge_text"])
                 p.drawText(box, Qt.AlignmentFlag.AlignCenter, hk)
                 rw += bw + 8
         f.setBold(True)
         p.setFont(f)
         text_r = r.adjusted(24, 0, -14 - rw, 0)
-        p.setPen(QColor(T["text_hi"] if self.state == "ready" else T["muted"]))
+        p.setPen(C["text_hi"] if self.state == "ready" else C["muted"])
         p.drawText(text_r, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
                    p.fontMetrics().elidedText(self.meta.name, Qt.TextElideMode.ElideRight,
                                               int(text_r.width())))

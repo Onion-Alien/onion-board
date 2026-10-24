@@ -120,13 +120,13 @@ class EqCurve(QWidget):
         mid = r.center().y()
         p.setPen(QPen(QColor(theme.T["groove"]), 1))
         p.drawLine(int(r.left() + 6), int(mid), int(r.right() - 6), int(mid))
-        db = eq_response(self.gains, self._freqs)
+        db = np.clip(eq_response(self.gains, self._freqs), -EQ_MAX_DB - 3, EQ_MAX_DB + 3)
         scale = (r.height() / 2 - 6) / EQ_MAX_DB
         path = QPainterPath()
         n = len(db)
-        for i, d in enumerate(db):
+        for i, d in enumerate(db.tolist()):
             x = r.left() + 6 + (r.width() - 12) * i / (n - 1)
-            y = mid - float(np.clip(d, -EQ_MAX_DB - 3, EQ_MAX_DB + 3)) * scale
+            y = mid - d * scale
             path.moveTo(x, y) if i == 0 else path.lineTo(x, y)
         col = QColor(theme.T["accent"] if self.on else theme.T["off"])
         p.setPen(QPen(col, 2.2))

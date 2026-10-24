@@ -10,6 +10,21 @@ from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import (QColor, QImage, QPainter, QPainterPath, QPen, QTransform)
 
 
+def _saved(name: str, px: int, make) -> str:
+    """`make(size)`'s picture saved as <name>.png (px) and <name>@2x.png (2 * px) in the
+    temp folder, each made only when missing; "" when they can't be written."""
+    folder = Path(tempfile.gettempdir()) / "onionboard-ui"
+    base = folder / f"{name}.png"
+    try:
+        folder.mkdir(exist_ok=True)
+        for path, size in ((base, px), (base.with_name(base.stem + "@2x.png"), px * 2)):
+            if not path.exists():
+                make(size).save(str(path))
+    except OSError:
+        return ""
+    return base.as_posix()
+
+
 def _check_image(colour: str, size: int) -> QImage:
     """A rounded tick, drawn in code so it follows the theme's on-accent colour."""
     img = QImage(size, size, QImage.Format.Format_ARGB32)
@@ -31,16 +46,7 @@ def _check_image(colour: str, size: int) -> QImage:
 def _check_url(colour: str) -> str:
     """Stylesheets need a file for `image:`, so write the tick (plus an @2x copy Qt picks
     on high-DPI screens) to the temp folder once per colour."""
-    folder = Path(tempfile.gettempdir()) / "onionboard-ui"
-    base = folder / f"check-{colour.lstrip('#')}.png"
-    try:
-        folder.mkdir(exist_ok=True)
-        for path, size in ((base, 14), (base.with_name(base.stem + "@2x.png"), 28)):
-            if not path.exists():
-                _check_image(colour, size).save(str(path))
-    except OSError:
-        return ""
-    return base.as_posix()
+    return _saved(f"check-{colour.lstrip('#')}", 14, lambda n: _check_image(colour, n))
 
 
 def _radio_image(ring: str, fill: str, dot: str, size: int) -> QImage:
@@ -65,17 +71,8 @@ def _radio_image(ring: str, fill: str, dot: str, size: int) -> QImage:
 
 def _radio_url(ring: str, fill: str, dot: str = "") -> str:
     """The radio circle as a file for `image:`, plus a sharp high-DPI copy."""
-    folder = Path(tempfile.gettempdir()) / "onionboard-ui"
     name = "-".join(c.lstrip("#") for c in (ring, fill, dot) if c)
-    base = folder / f"radio2-{name}.png"
-    try:
-        folder.mkdir(exist_ok=True)
-        for path, size in ((base, 16), (base.with_name(base.stem + "@2x.png"), 32)):
-            if not path.exists():
-                _radio_image(ring, fill, dot, size).save(str(path))
-    except OSError:
-        return ""
-    return base.as_posix()
+    return _saved(f"radio2-{name}", 16, lambda n: _radio_image(ring, fill, dot, n))
 
 
 def _chevron_image(colour: str, size: int, up: bool) -> QImage:
@@ -99,17 +96,11 @@ def _chevron_image(colour: str, size: int, up: bool) -> QImage:
 
 def _chevron_url(colour: str, size: int, up: bool, side: str = "") -> str:
     """`side` "left" / "right" turns the down chevron on its side (tab-bar scroll arrows)."""
-    folder = Path(tempfile.gettempdir()) / "onionboard-ui"
     name = side or ("up" if up else "down")
-    base = folder / f"chevron-{name}{size}-{colour.lstrip('#')}.png"
-    try:
-        folder.mkdir(exist_ok=True)
-        for path, px in ((base, size), (base.with_name(base.stem + "@2x.png"), size * 2)):
-            if not path.exists():
-                img = _chevron_image(colour, px, up)
-                if side:
-                    img = img.transformed(QTransform().rotate(90 if side == "left" else -90))
-                img.save(str(path))
-    except OSError:
-        return ""
-    return base.as_posix()
+
+    def make(px: int) -> QImage:
+        img = _chevron_image(colour, px, up)
+        if side:
+            img = img.transformed(QTransform().rotate(90 if side == "left" else -90))
+        return img
+    return _saved(f"chevron-{name}{size}-{colour.lstrip('#')}", size, make)

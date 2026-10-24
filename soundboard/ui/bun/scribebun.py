@@ -30,6 +30,7 @@ from PySide6.QtWidgets import QSizePolicy, QWidget
 
 from soundboard.ui.kit import theme
 from soundboard.ui.bun.bunny import H, INK, W, WOOD, draw_bunny, look_colour, sparkle
+from soundboard.ui.bun.bunshapes import _ellipse as _oval
 from soundboard.ui.kit.pixels import snap_to_pixels
 from soundboard.ui.settings import lite
 
@@ -229,16 +230,6 @@ def random_tune() -> tuple[list[Note], list[tuple[int, int, float]]]:
     _last_tune[0] = name
     bar, text = TUNES[name]
     return lay_out(parse_tune(text), bar)
-
-
-def _oval(p: QPainter, cx, cy, w, h, fill: QColor, pen: QPen | None = None, angle=0.0):
-    p.save()
-    p.translate(cx, cy)
-    p.rotate(angle)
-    p.setPen(pen or Qt.PenStyle.NoPen)
-    p.setBrush(fill)
-    p.drawEllipse(QRectF(-w / 2, -h / 2, w, h))
-    p.restore()
 
 
 class ScribeBunny(QWidget):
