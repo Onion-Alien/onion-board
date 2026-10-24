@@ -4360,5 +4360,8 @@
     "{n} 分"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "鼠标按键只能用作自动按键说话的键：这里请选一个键盘按键。",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…或在这个窗口里按鼠标侧键（Mouse 4 / 5）。Esc = 取消。"
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…或在这个窗口里按鼠标侧键（Mouse 4 / 5）。Esc = 取消。",
+  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board 已在你的麦克风上，但 Windows 还没有启动它。请重启电脑：它会随 Windows 一起启动。",
+  "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board 已在你的麦克风上，但此后有一个麦克风打不开。请重启电脑。",
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Windows 的声音无法暂停，所以你的麦克风没有被更改。请关闭游戏和语音聊天应用，或重启电脑。"
 }

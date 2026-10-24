@@ -141,15 +141,19 @@ RECOVERY = ("install", "repair", "update", "reinstall", "cleanup", "remove")
 MIC_FAILS = ("unanswered", "no-start", "stuck", "silent", "no-helper", "no-mic",
              "no-mic-off", "no-mic-unsure", "no-mic-gone", "no-effect", "code-1", "code-2",
              "code-3", "code-4", "code-5", "code-6", "code-8", "code-9", "code-other")
-# exit code 1 (the admin step raised): where in it, what Windows said and its error
-# number (directmic RAISED_WHERE / RAISED_WHAT / RAISED_ERR, read back from its log)
+# exit code 1 (the admin step raised): where in it (or that it logged nothing), what
+# Windows said (or, with no error number, the kind of error) and its error number
+# (directmic RAISED_WHERE / RAISED_WHAT / RAISED_ERR, read back from its log)
 MIC_RAISED = ("at-register", "at-mic-settings", "at-ring", "at-files", "at-audio",
-              "at-rights", "at-other", "denied", "in-use", "missing", "other",
+              "at-rights", "at-other", "at-unlogged", "denied", "in-use", "missing",
+              "type", "value", "key", "attr", "index", "runtime", "assert", "os",
+              "timeout", "memory", "other",
               "err-2", "err-3", "err-5", "err-32", "err-33", "err-87", "err-1224",
               "err-1314", "err-other", "err-none")
-# exit code 6 (Windows' audio wouldn't stop): which of its services was still up
-# (directmic STUCK_WHICH, read back from the admin log)
-MIC_STUCK = ("audio", "builder", "both", "other")
+# exit code 6 (Windows' audio wouldn't stop): which of its services was still up, that
+# it couldn't tell, or that the step logged nothing (directmic STUCK_WHICH, read back
+# from the admin log)
+MIC_STUCK = ("audio", "builder", "both", "unknown", "other", "unlogged")
 # why a download from a link or search failed (errors.download_reason): the kind only
 DL_FAILS = ("private", "age", "bot", "members", "region", "gone", "no-formats", "429",
             "403", "5xx", "stalled", "timeout", "cut-off", "offline", "proxy", "sign-in",

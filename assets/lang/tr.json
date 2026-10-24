@@ -4438,5 +4438,8 @@
     "{n} puan"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Fare tuşu yalnızca otomatik bas-konuş tuşu olabilir: bunun için bir klavye tuşu seç.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…ya da bu pencerede farenin yan tuşuna (Mouse 4 / 5) bas. Esc = iptal et."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…ya da bu pencerede farenin yan tuşuna (Mouse 4 / 5) bas. Esc = iptal et.",
+  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board mikrofonunda, ancak Windows onu henüz başlatmadı. Bilgisayarı yeniden başlat: Windows ile birlikte başlar.",
+  "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board mikrofonunda, ancak o zamandan beri bir mikrofon açılmıyor. Bilgisayarı yeniden başlat.",
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Windows sesi duraklamadı, bu yüzden mikrofonun değiştirilmedi. Oyunları ve sesli sohbet uygulamalarını kapat ya da bilgisayarı yeniden başlat."
 }

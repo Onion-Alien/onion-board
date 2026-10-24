@@ -4516,5 +4516,8 @@
     "{n} bodů"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Tlačítko myši může být jen klávesa pro automatické push-to-talk: tady vyber klávesu.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…nebo klikni bočním tlačítkem myši (Mouse 4 / 5) v tomto okně. Esc = zrušit."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…nebo klikni bočním tlačítkem myši (Mouse 4 / 5) v tomto okně. Esc = zrušit.",
+  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board je na vašem mikrofonu, ale Windows ho ještě nespustil. Restartujte PC: spustí se s Windows.",
+  "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board je na vašem mikrofonu, ale od té doby se jeden mikrofon neotevře. Restartujte PC.",
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Zvuk Windows se nepozastavil, takže mikrofon nebyl změněn. Zavřete hry a aplikace pro hlasový chat, nebo restartujte PC."
 }

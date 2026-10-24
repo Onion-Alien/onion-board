@@ -4750,5 +4750,8 @@
     "{n} نقطة"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "زر الماوس يصلح فقط كمفتاح الضغط والتحدث التلقائي: اختر مفتاحًا لهذا.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…أو انقر زرًا جانبيًا في الماوس (Mouse 4 / 5) داخل هذه النافذة. Esc = إلغاء."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…أو انقر زرًا جانبيًا في الماوس (Mouse 4 / 5) داخل هذه النافذة. Esc = إلغاء.",
+  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board موجود على الميكروفون، لكن Windows لم يشغّله بعد. أعد تشغيل الكمبيوتر: سيبدأ مع Windows.",
+  "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board موجود على الميكروفون، لكن منذ ذلك الحين لا يفتح أحد الميكروفونات. أعد تشغيل الكمبيوتر.",
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "لم يتوقف صوت Windows مؤقتًا، لذلك لم يتغيّر الميكروفون. أغلق الألعاب وتطبيقات الدردشة الصوتية، أو أعد تشغيل الكمبيوتر."
 }

@@ -4438,5 +4438,8 @@
     "{n} pont"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Egérgomb csak az automatikus push-to-talk gombja lehet: ide válassz egy billentyűt.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…vagy kattints az egér oldalsó gombjával (Mouse 4 / 5) ebben az ablakban. Esc = mégse."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…vagy kattints az egér oldalsó gombjával (Mouse 4 / 5) ebben az ablakban. Esc = mégse.",
+  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Az Onion Board a mikrofonodon van, de a Windows még nem indította el. Indítsd újra a gépet: a Windowszal együtt indul.",
+  "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Az Onion Board a mikrofonodon van, de azóta egy mikrofon nem nyílik meg. Indítsd újra a gépet.",
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "A Windows hangja nem állt meg, ezért a mikrofonod nem változott. Zárd be a játékokat és a hangcsevegő-appokat, vagy indítsd újra a gépet."
 }

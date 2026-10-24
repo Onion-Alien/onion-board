@@ -4360,5 +4360,8 @@
     "{n}점"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "마우스 버튼은 자동 푸시 투 토크 키로만 쓸 수 있어요. 여기에는 키를 골라 주세요.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…또는 이 창에서 마우스 측면 버튼(Mouse 4 / 5)을 클릭하세요. Esc = 취소"
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…또는 이 창에서 마우스 측면 버튼(Mouse 4 / 5)을 클릭하세요. Esc = 취소",
+  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board가 마이크에 들어갔지만 Windows가 아직 시작하지 않았어요. PC를 다시 시작하세요: Windows와 함께 시작돼요.",
+  "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board가 마이크에 들어갔지만 그 뒤로 마이크 하나가 열리지 않아요. PC를 다시 시작하세요.",
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Windows 소리가 잠시 멈추지 않아 마이크가 바뀌지 않았어요. 게임과 음성 채팅 앱을 닫거나 PC를 다시 시작하세요."
 }

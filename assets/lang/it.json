@@ -4438,5 +4438,8 @@
     "{n} punti"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Un tasto del mouse può essere solo il tasto del push-to-talk automatico: scegli un tasto per questo.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…oppure clicca con un tasto laterale del mouse (Mouse 4 / 5) in questa finestra. Esc = annulla."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…oppure clicca con un tasto laterale del mouse (Mouse 4 / 5) in questa finestra. Esc = annulla.",
+  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board è sul tuo microfono, ma Windows non l'ha ancora avviato. Riavvia il PC: si avvia con Windows.",
+  "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board è sul tuo microfono, ma da allora un microfono non si apre. Riavvia il PC.",
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "L'audio di Windows non si è messo in pausa, quindi il microfono non è stato cambiato. Chiudi giochi e app di chat vocale, o riavvia il PC."
 }

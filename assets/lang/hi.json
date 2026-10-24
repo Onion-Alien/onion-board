@@ -4438,5 +4438,8 @@
     "{n} पॉइंट"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "माउस बटन सिर्फ़ ऑटो पुश-टू-टॉक की की बन सकता है: इसके लिए कोई की चुनें।",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…या इस विंडो में माउस का साइड बटन (Mouse 4 / 5) क्लिक करें। Esc = रद्द करें."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…या इस विंडो में माउस का साइड बटन (Mouse 4 / 5) क्लिक करें। Esc = रद्द करें.",
+  "Onion Board is on your mic, but Windows didn't start it yet. Restart your PC: it starts with Windows.": "Onion Board आपके माइक पर है, लेकिन Windows ने इसे अभी शुरू नहीं किया। अपना PC रीस्टार्ट करें: यह Windows के साथ शुरू होता है।",
+  "Onion Board is on your mic, but since then a mic won't open. Restart your PC.": "Onion Board आपके माइक पर है, लेकिन तब से एक माइक नहीं खुल रहा। अपना PC रीस्टार्ट करें।",
+  "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Windows की आवाज़ रुकी नहीं, इसलिए आपका माइक नहीं बदला गया। गेम और वॉइस चैट ऐप बंद करें, या अपना PC रीस्टार्ट करें।"
 }
