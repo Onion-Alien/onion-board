@@ -12,6 +12,7 @@ is reloaded to pick it up, however it was installed.
 from __future__ import annotations
 
 import base64
+import re
 import shutil
 import subprocess
 import tempfile

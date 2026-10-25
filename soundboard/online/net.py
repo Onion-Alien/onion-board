@@ -79,7 +79,8 @@ from soundboard.online.netconfig import (  # noqa: F401
     FeatureOff, FEATURES, generation, HEAD_LIMIT, HOME_OK, home_url, is_loopback, known,
     last_failure, LeadsHome, _listeners, _lock, LOOPBACK_NAMES, mode, MODES, _nams, NEVER_THIS_PC,
     _notify, off_message, _off_sentence, offline, on_change, parse, PIPE_SEND_S, PROXY, Proxy,
-    proxy, ProxyError, RELAY_HEADER, RELAY_MARK, RELAY_WAITING_MAX, set_tor_gate, site_name, SITES, switched_off, TEST, TEST_HOST,
+    proxy, ProxyError, RELAY_HEADER, RELAY_MARK, RELAY_WAITING_MAX, set_tor_gate, site_name,
+    SITES, switched_off, TEST, TEST_HOST,
     TOR, TOR_HANDSHAKE_S, _tor_proxy, TOR_WAIT_S, web_url, WHERE)
 from soundboard.online.netconnect import (  # noqa: F401
     connect, _connect_away, _drop_live, _http_connect, _live, _live_lock, _open, _recv_exact,
