@@ -17,6 +17,7 @@ import re
 import shutil
 import subprocess
 import sys
+import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -24,6 +25,21 @@ PLUGIN = ROOT / "streamdeck" / "com.onionalien.onionboard.sdPlugin"
 OUT = ROOT / "dist"
 NAME = "com.onionalien.onionboard.streamDeckPlugin"
 CLI = "@elgato/cli@1.10.2"
+
+
+def fixed_times(path: Path) -> None:
+    """Rewrites the zip with every entry dated 1980-01-01 and no extra fields: the
+    packer stores each file's local time next to its UTC time, which gives away the
+    build PC's time zone. The contents and their order stay the same."""
+    tmp = path.with_suffix(".tmp")
+    with zipfile.ZipFile(path) as zin, zipfile.ZipFile(tmp, "w") as zout:
+        for i in zin.infolist():
+            z = zipfile.ZipInfo(i.filename, date_time=(1980, 1, 1, 0, 0, 0))
+            z.compress_type = i.compress_type
+            z.create_system = i.create_system
+            z.external_attr = i.external_attr
+            zout.writestr(z, zin.read(i))
+    tmp.replace(path)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -53,6 +69,7 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit("packing the Stream Deck plugin took over 5 minutes") from None
     if done.returncode or not (OUT / NAME).is_file():
         raise SystemExit("packing the Stream Deck plugin failed (see above)")
+    fixed_times(OUT / NAME)
     kb = (OUT / NAME).stat().st_size // 1024
     print(f"Built dist\\{NAME} ({kb} KB)")
     return 0
