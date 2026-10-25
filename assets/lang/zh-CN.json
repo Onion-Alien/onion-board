@@ -4360,5 +4360,6 @@
     "{n} 分"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "鼠标按键只能用作自动按键说话的键：这里请选一个键盘按键。",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…或在这个窗口里按鼠标侧键（Mouse 4 / 5）。Esc = 取消。"
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…或在这个窗口里按鼠标侧键（Mouse 4 / 5）。Esc = 取消。",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows 无法判断此网络是否为公用网络，因此为安全起见拒绝手机连接。请在 Windows 设置 → 网络和 Internet 中将其设为专用，然后关闭并重新打开此选项"
 }

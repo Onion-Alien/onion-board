@@ -4750,5 +4750,6 @@
     "{n} نقطة"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "زر الماوس يصلح فقط كمفتاح الضغط والتحدث التلقائي: اختر مفتاحًا لهذا.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…أو انقر زرًا جانبيًا في الماوس (Mouse 4 / 5) داخل هذه النافذة. Esc = إلغاء."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…أو انقر زرًا جانبيًا في الماوس (Mouse 4 / 5) داخل هذه النافذة. Esc = إلغاء.",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "تعذّر على Windows معرفة ما إذا كانت هذه الشبكة عامة، لذلك تُرفض الهواتف احتياطًا. اضبطها على خاصة في إعدادات Windows ← الشبكة والإنترنت، ثم أوقف هذا وشغّله من جديد"
 }

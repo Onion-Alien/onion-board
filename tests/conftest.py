@@ -180,6 +180,8 @@ def pytest_configure(config):
                             "DLLs or processes); skipped on Linux and macOS")
     config.addinivalue_line("markers", "fonts: loads Windows' own fonts into Qt, which "
                             "changes every later test's text in that process: run last")
+    config.addinivalue_line("markers", "real_network_kind: asks Windows what kind of "
+                            "network an address is on (others get a Private one)")
     config.addinivalue_line("markers", "host: runs the real mic effect in its test or fuzz "
                             "host (CI's mic-effect job builds them and runs these, one at a "
                             "time: side by side they miss real time)")
@@ -257,6 +259,16 @@ def _memory_never_full(monkeypatch):
     would quietly send nothing, so no load counts as full here (test_usage sets it)."""
     from soundboard.core import usage
     monkeypatch.setattr(usage, "MEMORY_FULL", 101)
+
+
+@pytest.fixture(autouse=True)
+def _a_private_network(request, monkeypatch):
+    """Onion Pocket's server refuses a network Windows can't name, and 127.0.0.1 (where
+    the tests run it) is on none: a Private one, unless a test says otherwise."""
+    if request.node.get_closest_marker("real_network_kind"):
+        return
+    from soundboard.online import netcategory
+    monkeypatch.setattr(netcategory, "category", lambda ip: netcategory.PRIVATE)
 
 
 @pytest.fixture(autouse=True)

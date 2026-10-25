@@ -4438,5 +4438,6 @@
     "{n} puntos"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Ang button ng mouse ay pwede lang sa auto push-to-talk: pumili ng key para dito.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…o i-click ang side button ng mouse (Mouse 4 / 5) sa window na ito. Esc = kanselahin."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…o i-click ang side button ng mouse (Mouse 4 / 5) sa window na ito. Esc = kanselahin.",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Hindi masabi ng Windows kung Public ang network na ito, kaya tinatanggihan muna ang mga phone para ligtas. Gawin itong Private sa Windows Settings → Network & internet, saka i-off at i-on ulit ito"
 }

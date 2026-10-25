@@ -4516,5 +4516,6 @@
     "{n} очок"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Кнопка миші може бути лише клавішею автоматичного натиску і розмови: вибери тут клавішу.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…або натисни бічну кнопку миші (Mouse 4 / 5) у цьому вікні. Esc = скасувати."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…або натисни бічну кнопку миші (Mouse 4 / 5) у цьому вікні. Esc = скасувати.",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows не змогла визначити, чи ця мережа загальнодоступна, тому телефони про всяк випадок не допускаються. Зробіть її приватною в Параметрах Windows → Мережа й Інтернет, а потім вимкніть і знову ввімкніть цю функцію"
 }

@@ -4438,5 +4438,6 @@
     "{n} puan"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Fare tuşu yalnızca otomatik bas-konuş tuşu olabilir: bunun için bir klavye tuşu seç.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…ya da bu pencerede farenin yan tuşuna (Mouse 4 / 5) bas. Esc = iptal et."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…ya da bu pencerede farenin yan tuşuna (Mouse 4 / 5) bas. Esc = iptal et.",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows bu ağın ortak olup olmadığını söyleyemedi, bu yüzden telefonlar güvenlik için geri çevriliyor. Windows Ayarları → Ağ ve internet bölümünden özel olarak ayarlayın, ardından bunu kapatıp yeniden açın"
 }

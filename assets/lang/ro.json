@@ -4516,5 +4516,6 @@
     "{n} de puncte"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Un buton de mouse poate fi doar tasta pentru apasă-pentru-a-vorbi automat: alege o tastă aici.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…sau apasă un buton lateral al mouse-ului (Mouse 4 / 5) în această fereastră. Esc = anulează."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…sau apasă un buton lateral al mouse-ului (Mouse 4 / 5) în această fereastră. Esc = anulează.",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows nu a putut spune dacă această rețea este publică, așa că telefoanele sunt refuzate din precauție. Setați-o ca privată în Setări Windows → Rețea și internet, apoi dezactivați și reactivați această opțiune"
 }

@@ -4438,5 +4438,6 @@
     "{n} Punkte"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Eine Maustaste geht nur als Auto-Push-to-Talk-Taste: nimm hier eine Taste.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…oder klick mit einer Maus-Seitentaste (Mouse 4 / 5) in dieses Fenster. Esc = abbrechen."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…oder klick mit einer Maus-Seitentaste (Mouse 4 / 5) in dieses Fenster. Esc = abbrechen.",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows konnte nicht feststellen, ob dieses Netzwerk öffentlich ist, daher werden Telefone sicherheitshalber abgewiesen. Stellen Sie es in den Windows-Einstellungen → Netzwerk und Internet auf „Privat“ und schalten Sie dies dann aus und wieder ein"
 }

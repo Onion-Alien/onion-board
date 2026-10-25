@@ -4438,5 +4438,6 @@
     "{n} punten"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Een muisknop kan alleen de toets voor automatische push-to-talk zijn: kies hier een toets.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…of klik met een zijknop van je muis (Mouse 4 / 5) in dit venster. Esc = annuleren."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…of klik met een zijknop van je muis (Mouse 4 / 5) in dit venster. Esc = annuleren.",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows kon niet zeggen of dit netwerk openbaar is, dus telefoons worden voor de zekerheid geweigerd. Zet het op Privé in Windows-instellingen → Netwerk en internet en zet dit daarna uit en weer aan"
 }

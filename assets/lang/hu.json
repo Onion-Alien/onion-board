@@ -4438,5 +4438,6 @@
     "{n} pont"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Egérgomb csak az automatikus push-to-talk gombja lehet: ide válassz egy billentyűt.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…vagy kattints az egér oldalsó gombjával (Mouse 4 / 5) ebben az ablakban. Esc = mégse."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…vagy kattints az egér oldalsó gombjával (Mouse 4 / 5) ebben az ablakban. Esc = mégse.",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "A Windows nem tudta megállapítani, hogy ez a hálózat nyilvános-e, ezért a telefonokat biztonsági okból elutasítja. Állítsa magánhálózatra a Windows Gépház → Hálózat és internet részében, majd kapcsolja ki és be újra ezt"
 }

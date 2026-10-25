@@ -4360,5 +4360,6 @@
     "{n} 分"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "滑鼠按鍵只能當作自動按鍵發話的鍵：這裡請選一個鍵盤按鍵。",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…或在這個視窗裡按滑鼠側鍵（Mouse 4 / 5）。Esc = 取消。"
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…或在這個視窗裡按滑鼠側鍵（Mouse 4 / 5）。Esc = 取消。",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows 無法判斷此網路是否為公用網路，因此為了安全起見拒絕手機連線。請在 Windows 設定 → 網路和網際網路中將其設為私人，然後關閉再重新開啟此選項"
 }

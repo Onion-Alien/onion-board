@@ -4360,5 +4360,6 @@
     "{n}점"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "마우스 버튼은 자동 푸시 투 토크 키로만 쓸 수 있어요. 여기에는 키를 골라 주세요.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…또는 이 창에서 마우스 측면 버튼(Mouse 4 / 5)을 클릭하세요. Esc = 취소"
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…또는 이 창에서 마우스 측면 버튼(Mouse 4 / 5)을 클릭하세요. Esc = 취소",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows에서 이 네트워크가 공용인지 확인할 수 없어 안전을 위해 휴대폰 연결을 거부합니다. Windows 설정 → 네트워크 및 인터넷에서 개인으로 설정한 다음 이 기능을 껐다가 다시 켜세요"
 }

@@ -4438,5 +4438,6 @@
     "{n} poäng"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "En musknapp kan bara vara tangenten för automatisk push-to-talk: välj en tangent här.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…eller klicka med en sidoknapp på musen (Mouse 4 / 5) i det här fönstret. Esc = avbryt."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…eller klicka med en sidoknapp på musen (Mouse 4 / 5) i det här fönstret. Esc = avbryt.",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows kunde inte säga om det här nätverket är offentligt, så telefoner avvisas för säkerhets skull. Ställ in det som Privat i Windows-inställningar → Nätverk och internet och stäng sedan av och slå på det här igen"
 }

@@ -4360,5 +4360,6 @@
     "{n} điểm"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Nút chuột chỉ dùng được làm phím nhấn để nói tự động: hãy chọn một phím cho mục này.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…hoặc bấm nút bên của chuột (Mouse 4 / 5) trong cửa sổ này. Esc = hủy bỏ."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…hoặc bấm nút bên của chuột (Mouse 4 / 5) trong cửa sổ này. Esc = hủy bỏ.",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows không xác định được mạng này có phải là Công cộng hay không, nên điện thoại bị từ chối để đảm bảo an toàn. Hãy đặt mạng thành Riêng tư trong Cài đặt Windows → Mạng & Internet, rồi tắt và bật lại tùy chọn này"
 }

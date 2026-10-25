@@ -4516,5 +4516,6 @@
     "{n} bodů"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Tlačítko myši může být jen klávesa pro automatické push-to-talk: tady vyber klávesu.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…nebo klikni bočním tlačítkem myši (Mouse 4 / 5) v tomto okně. Esc = zrušit."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…nebo klikni bočním tlačítkem myši (Mouse 4 / 5) v tomto okně. Esc = zrušit.",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows nedokázal zjistit, zda je tato síť veřejná, proto jsou telefony pro jistotu odmítnuty. Nastavte ji jako soukromou v Nastavení Windows → Síť a internet a pak tuto možnost vypněte a znovu zapněte"
 }

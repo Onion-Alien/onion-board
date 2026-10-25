@@ -4516,5 +4516,6 @@
     "{n} punktów"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Przycisk myszy może być tylko klawiszem automatycznego naciśnij i mów: wybierz tu klawisz.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…albo kliknij bocznym przyciskiem myszy (Mouse 4 / 5) w tym oknie. Esc = anuluj."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…albo kliknij bocznym przyciskiem myszy (Mouse 4 / 5) w tym oknie. Esc = anuluj.",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "System Windows nie potrafił określić, czy ta sieć jest publiczna, więc telefony są na wszelki wypadek odrzucane. Ustaw ją jako prywatną w Ustawieniach systemu Windows → Sieć i Internet, a następnie wyłącz i ponownie włącz tę opcję"
 }

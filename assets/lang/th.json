@@ -4360,5 +4360,6 @@
     "{n} คะแนน"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "ปุ่มเมาส์ใช้ได้แค่เป็นปุ่ม Push-to-talk อัตโนมัติ: เลือกปุ่มคีย์บอร์ดสำหรับอันนี้",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…หรือคลิกปุ่มข้างเมาส์ (Mouse 4 / 5) ในหน้าต่างนี้ Esc = ยกเลิก"
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…หรือคลิกปุ่มข้างเมาส์ (Mouse 4 / 5) ในหน้าต่างนี้ Esc = ยกเลิก",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows บอกไม่ได้ว่าเครือข่ายนี้เป็นสาธารณะหรือไม่ จึงปฏิเสธโทรศัพท์ไว้ก่อนเพื่อความปลอดภัย ตั้งค่าเป็นส่วนตัวในการตั้งค่า Windows → เครือข่ายและอินเทอร์เน็ต แล้วปิดและเปิดตัวเลือกนี้อีกครั้ง"
 }

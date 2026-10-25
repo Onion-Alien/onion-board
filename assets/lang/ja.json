@@ -4360,5 +4360,6 @@
     "{n} ポイント"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "マウスボタンは自動プッシュトゥトークのキーにしか使えません。ここではキーを選んでください。",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…またはこのウィンドウ内でマウスのサイドボタン（Mouse 4 / 5）をクリック。Esc = キャンセル。"
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…またはこのウィンドウ内でマウスのサイドボタン（Mouse 4 / 5）をクリック。Esc = キャンセル。",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "このネットワークがパブリックかどうかを Windows が判断できなかったため、安全のためスマートフォンからの接続を拒否しています。Windows の設定 → ネットワークとインターネットでプライベートに設定してから、これをオフにしてもう一度オンにしてください"
 }

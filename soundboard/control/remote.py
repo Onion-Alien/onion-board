@@ -75,7 +75,8 @@ link's #fragment, which browsers never send). It answers only addresses on the l
 network, takes the key only in a header (never ?token=, which would end up in a
 browser's history), and an address that gets the key wrong FAIL_LIMIT times in a row
 is ignored for LOCK_S seconds. It never listens on a network Windows calls Public
-(a café's Wi-Fi), whatever Windows Firewall says (soundboard.online.netcategory). Either
+(a café's Wi-Fi), whatever Windows Firewall says (soundboard.online.netcategory), nor on
+one Windows can't name (refused the same, never taken as a home network). Either
 server keeps at most MAX_CONNECTIONS open at once (PEER_CONNECTIONS from one address).
 
 On the home network the key needn't travel at all: a request can instead carry
@@ -109,6 +110,7 @@ import re
 import secrets
 import selectors
 import socket
+import sys
 import threading
 import time
 import weakref
@@ -150,6 +152,27 @@ def public_network() -> str:
     return _("Windows calls this network Public (like a café's or a hotel's Wi-Fi), "
              "so phones are turned away. At home, set it to Private in Windows "
              "Settings → Network & internet, then turn this off and on again")
+
+
+def unknown_network() -> str:
+    """Why a lan server won't listen when Windows can't say what the network is."""
+    return _("Windows couldn't say whether this network is Public, so phones are turned "
+             "away to be safe. Set it to Private in Windows Settings → Network & internet, "
+             "then turn this off and on again")
+
+
+def _network_refusal(host: str) -> str:
+    """lan: why phones can't be let in on `host`'s network, or "" when they can. Windows
+    only: a network it can't name (an unreadable answer, an adapter it doesn't list)
+    is refused like a Public one, never taken as a home network."""
+    if sys.platform != "win32":
+        return ""
+    kind = netcategory.category(host)
+    if kind == netcategory.PUBLIC:
+        return public_network()
+    if kind is None:
+        return unknown_network()
+    return ""
 
 
 # every endpoint, in the order they're listed (the 404 answer, /api/help, the
@@ -436,7 +459,7 @@ class RemoteControl(QObject):
     after: `closed` says why when that stops it)."""
     request = Signal(object)
     closed = Signal(str)   # lan: stopped by itself, and why
-    _net_answer = Signal(object, bool)   # (the server asked about, is the network Public)
+    _net_answer = Signal(object, str)   # (the server asked about, why phones go: "" none)
 
     def __init__(self, dispatch, parent=None, *, actions=ACTIONS, page=None,
                  lan: bool = False, name: str = "control API"):
@@ -461,6 +484,7 @@ class RemoteControl(QObject):
         self._network.setInterval(int(NETWORK_CHECK_S * 1000))
         self._network.timeout.connect(self._check_network)
         self._net_asking = False
+        self._net_unknown = 0   # checks in a row Windows couldn't name the network
         self._net_answer.connect(self._network_checked, Qt.ConnectionType.QueuedConnection)
 
     @property
@@ -471,6 +495,7 @@ class RemoteControl(QObject):
         """(Re)start on `host`:`port`. False (and `error` says why) if it can't listen."""
         self.stop()
         self.token, self.port, self.error, self.host = token, int(port), "", host
+        self._net_unknown = 0
         with self._fails_lock:
             self._fails.clear()
             # nonces stay until they're stale: a quick restart still knows them. What it
@@ -479,9 +504,11 @@ class RemoteControl(QObject):
         if not token:
             self.error = "no token"
             return False
-        if self.lan and netcategory.category(host) == netcategory.PUBLIC:
-            self.error = public_network()
-            log.info("%s not started: the network is Public", self.name)
+        why = _network_refusal(host) if self.lan else ""
+        if why:
+            self.error = why
+            log.info("%s not started: the network is %s", self.name,
+                     "Public" if why == public_network() else "unknown")
             return False
         try:
             srv = _Server((self.host, self.port), _handler_for(self))
@@ -517,23 +544,30 @@ class RemoteControl(QObject):
 
         def ask():
             try:
-                public = netcategory.category(host) == netcategory.PUBLIC
+                why = _network_refusal(host)
             finally:
                 self._net_asking = False
             try:
-                self._net_answer.emit(server, public)
+                self._net_answer.emit(server, why)
             except RuntimeError:   # the window (and this) went away meanwhile
                 pass
         self._net_poll.run(ask)
 
-    def _network_checked(self, server, public: bool):
+    def _network_checked(self, server, why: str):
         """lan: the network turned Public (or the PC moved to a Public one keeping its
-        address) while it listens: stop. (An answer about a server since replaced by a
-        restart is dropped: the restart asked again.)"""
-        if public and self.running and server is self._server:
+        address) while it listens: stop. One Windows can't name stops it only the second
+        time in a row (one unreadable answer while it was known mustn't drop the phone).
+        (An answer about a server since replaced by a restart is dropped: the restart
+        asked again.)"""
+        if not (self.running and server is self._server):
+            return
+        unknown = why == unknown_network()
+        self._net_unknown = self._net_unknown + 1 if unknown else 0
+        if why and (not unknown or self._net_unknown >= 2):
             self.stop()
-            self.error = public_network()
-            log.info("%s stopped: the network is Public now", self.name)
+            self.error = why
+            log.info("%s stopped: the network is %s now", self.name,
+                     "unknown" if unknown else "Public")
             self.closed.emit(self.error)
 
     def stop(self):

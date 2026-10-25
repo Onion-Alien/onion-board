@@ -4438,5 +4438,6 @@
     "{n} pistettä"
   ],
   "A mouse button can only be the auto push-to-talk key: pick a key for this one.": "Hiiren painike voi olla vain automaattisen push-to-talkin näppäin: valitse tähän näppäin.",
-  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…tai klikkaa hiiren sivupainikkeella (Mouse 4 / 5) tässä ikkunassa. Esc = peruuta."
+  "…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.": "…tai klikkaa hiiren sivupainikkeella (Mouse 4 / 5) tässä ikkunassa. Esc = peruuta.",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows ei pystynyt kertomaan, onko tämä verkko julkinen, joten puhelimet torjutaan varmuuden vuoksi. Aseta se yksityiseksi kohdassa Windowsin asetukset → Verkko ja internet ja kytke tämä sitten pois ja takaisin päälle"
 }
