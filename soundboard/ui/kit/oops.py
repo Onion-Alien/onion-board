@@ -17,7 +17,8 @@ import re
 from collections.abc import Callable
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
+from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QPushButton,
+                               QVBoxLayout, QWidget)
 
 from soundboard.i18n import _
 
@@ -120,7 +121,7 @@ class OopsPanel(QFrame):
         self.what.setWordWrap(True)
         self.what.setAlignment(align)
         v.addWidget(self.what)
-        row = QHBoxLayout()
+        row = self._row = QHBoxLayout()
         row.setContentsMargins(0, 4, 0, 0)
         row.setSpacing(8)
         if not compact:
@@ -137,6 +138,10 @@ class OopsPanel(QFrame):
         if compact:   # Try again first, where the eye starts
             row.removeWidget(self.btn_report)
             row.insertWidget(1, self.btn_report)
+        # too narrow for both side by side (a squeezed Radio map, a long translation):
+        # one over the other, Try again on top (_fit_buttons)
+        self._stacked = (QBoxLayout.Direction.TopToBottom if compact
+                         else QBoxLayout.Direction.BottomToTop)
         v.addLayout(row)
         self.set_tone(tone)
 
@@ -186,9 +191,24 @@ class OopsPanel(QFrame):
         self.setMinimumHeight(0)
         self.setMinimumHeight(self._words_h() if self.width() > 0 else 0)
 
+    def _fit_buttons(self, w: int):
+        """Try again and Report a problem side by side when they fit in width `w`,
+        else one over the other (cut off at the card's edge, they were)."""
+        shown = [b for b in (self.btn_retry, self.btn_report) if not b.isHidden()]
+        m = self._lay.contentsMargins()
+        need = (sum(b.sizeHint().width() for b in shown)
+                + self._row.spacing() * (len(shown) - 1) + m.left() + m.right())
+        if self.compact:
+            need += self.bun.sizeHint().width() + self._lay.spacing()
+        side = len(shown) < 2 or need <= w
+        want = QBoxLayout.Direction.LeftToRight if side else self._stacked
+        if self._row.direction() != want:
+            self._row.setDirection(want)
+
     def resizeEvent(self, e):   # noqa: N802 - Qt
         super().resizeEvent(e)
-        try:   # a new width wraps the words again: Bun and the height fitted to it
+        try:   # a new width: the buttons side by side or stacked, and the words wrap again
+            self._fit_buttons(e.size().width())
             if self._room is not None and e.size().width() != e.oldSize().width():
                 self.fit_height(self._room)
         except Exception:  # noqa: BLE001 - never raise from a Qt override (AGENT-RULES)
@@ -202,7 +222,8 @@ class OopsPanel(QFrame):
         return h
 
     def height_for(self, w: int) -> int:
-        """How tall it is at width `w` (the words wrap)."""
+        """How tall it is at width `w` (the words wrap, the buttons may stack)."""
+        self._fit_buttons(w)
         lay = self._lay
         lay.activate()
         return (lay.totalHeightForWidth(w) if lay.hasHeightForWidth()
