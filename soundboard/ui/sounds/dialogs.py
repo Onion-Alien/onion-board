@@ -4,31 +4,24 @@ effect, modules' included) and the EQ tab."""
 from __future__ import annotations
 
 import logging
-import threading
-from pathlib import Path
 
-from PySide6.QtCore import QObject, Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QFont, QImage, QPixmap
-from shiboken6 import isValid as qt_valid
-from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QColorDialog, QComboBox,
-                               QDialog, QDialogButtonBox, QFileDialog, QFrame, QGridLayout,
-                               QHBoxLayout, QInputDialog, QLabel, QLineEdit, QProgressBar,
+from PySide6.QtCore import QObject, Qt, Signal
+from PySide6.QtGui import QFont, QImage
+from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox,
+                               QDialog, QDialogButtonBox, QFrame, QGridLayout,
+                               QHBoxLayout, QLabel, QLineEdit, QProgressBar,
                                QPushButton, QScrollArea, QSlider, QTabWidget, QVBoxLayout,
                                QWidget)
 
-from soundboard.core import errors, usage
+from soundboard.core import usage
 from soundboard.audio import livefx, soundfx
 from soundboard.ui.kit import theme
 from soundboard import voicefx
-from soundboard.sounds import sourceinfo, thumbs
-from soundboard.online import net
+from soundboard.sounds import thumbs
 from soundboard.audio.eq import PRESETS as EQ_PRESETS
-from soundboard.sounds.library import (MAX_COOLDOWN_S, MAX_DELAY_S, MAX_FADE_S, PAD_COLORS,
+from soundboard.sounds.library import (MAX_COOLDOWN_S, MAX_DELAY_S, PAD_COLORS,
                                        SoundMeta, original_peaks)
-from soundboard.ui.kit.hotkeypick import HotkeyDialog, pretty_key
-from soundboard.ui.kit import busy, fit, icons, toast
-from soundboard.ui.kit.plaintext import plain_tip
-from soundboard.ui.sounds import sourcedialog
+from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import (EqPanel, hint_label, icon_button, reset_button,
                                      section_label, steady_number)
 from soundboard.ui.sounds.trim import TrimPanel
@@ -36,11 +29,13 @@ from soundboard.ui.voice.voicefxpanel import ADDON_GROUP, GROUPS, EffectRow, Par
 from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.control.winkeys import Hotkeys
 from soundboard.i18n import _
+from soundboard.ui.sounds.tabhelp import TabHelpPopup  # noqa: F401
+from soundboard.ui.sounds.editdialogparts import PIC_H, PIC_W  # noqa: F401
+from soundboard.ui.sounds.editdialogparts import EditDialogParts
 
 log = logging.getLogger(__name__)
 
 CUSTOM = "Custom"   # the preset box's item data when no preset matches
-PIC_W, PIC_H = 64, 36   # the Picture row's 16:9 preview
 # what the pad colour swatches are called (tooltip and screen reader)
 COLOUR_NAMES = {"#7c5cff": _("Purple"), "#ff5c8a": _("Pink"), "#1fb6ff": _("Blue"),
                 "#13ce66": _("Green"), "#ffb020": _("Yellow"), "#ff7849": _("Orange"),
@@ -49,65 +44,6 @@ COLOUR_NAMES = {"#7c5cff": _("Purple"), "#ff5c8a": _("Pink"), "#1fb6ff": _("Blue
 SPEED = voicefx.Param("speed", _("Speed"), *soundfx.SPEED_RANGE, 1.0, "x", 0.05)
 PITCH = voicefx.Param("pitch", _("Pitch"), *soundfx.PITCH_RANGE, 0.0, " st", 1)
 BOOST = voicefx.Param("gain_db", _("Boost"), *soundfx.GAIN_RANGE, 0.0, " dB", 1)
-
-
-class TabHelpPopup(QDialog):
-    """A compact help card with a mascot: Escape, the close button or a click outside
-    closes it, and the focus goes back to what opened it. Its look comes from the
-    shared style sheet (`#helpcard`, `#helptitle`, `#helpbody`), so it follows the theme."""
-
-    def __init__(self, title: str, text: str, *, owl: bool = False, parent=None):
-        super().__init__(parent, Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
-        from soundboard.ui.bun.bunny import bunny_pixmap
-        from soundboard.style.owl import owl_image
-
-        self._opener = QApplication.focusWidget()
-        self.setWindowTitle(title)
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
-        self.setFixedWidth(min(560, self.screen().availableGeometry().width() - 24))
-        outer = QVBoxLayout(self)
-        outer.setContentsMargins(0, 0, 0, 0)
-        frame = QFrame()
-        frame.setObjectName("helpcard")
-        outer.addWidget(frame)
-        layout = QVBoxLayout(frame)
-        layout.setContentsMargins(24, 20, 24, 18)
-        layout.setSpacing(16)
-
-        header = QHBoxLayout()
-        self.heading = QLabel(title)
-        self.heading.setObjectName("helptitle")
-        self.heading.setTextFormat(Qt.TextFormat.PlainText)
-        self.heading.setWordWrap(True)
-        header.addWidget(self.heading, 1)
-        self.close_btn = icon_button("close", _("Close"), size=16)
-        self.close_btn.clicked.connect(self.reject)
-        header.addWidget(self.close_btn, 0, Qt.AlignmentFlag.AlignTop)
-        layout.addLayout(header)
-
-        content = QHBoxLayout()
-        content.setSpacing(22)
-        self.mascot = QLabel()
-        self.mascot.setFixedSize(88, 104)
-        self.mascot.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        dpr = self.devicePixelRatioF()
-        picture = (QPixmap.fromImage(owl_image(round(92 * dpr), look=0.0))
-                   if owl else bunny_pixmap(92, dpr=dpr))
-        picture.setDevicePixelRatio(dpr)
-        self.mascot.setPixmap(picture)
-        content.addWidget(self.mascot, 0, Qt.AlignmentFlag.AlignVCenter)
-        self.body = QLabel(text)
-        self.body.setObjectName("helpbody")
-        self.body.setTextFormat(Qt.TextFormat.PlainText)
-        self.body.setWordWrap(True)
-        content.addWidget(self.body, 1, Qt.AlignmentFlag.AlignVCenter)
-        layout.addLayout(content)
-
-    def done(self, r):
-        super().done(r)
-        # the focus back on what opened it (a rail tab), not lost to the window
-        if self._opener is not None and qt_valid(self._opener) and self._opener.isVisible():
-            self._opener.setFocus(Qt.FocusReason.PopupFocusReason)
 
 
 def _page() -> tuple[QWidget, QVBoxLayout]:
@@ -383,7 +319,7 @@ class EffectsPanel(QObject):
             self.changed.emit()
 
 
-class EditDialog(QDialog):
+class EditDialog(EditDialogParts, QDialog):
     """Edit one sound. Nothing is written to the SoundMeta until `apply()`;
     `hotkeys_changed` fires after a capture so the owner can re-register the (paused)
     global hotkeys. After exec(), `as_copy` says whether "Save a copy" was
@@ -753,42 +689,6 @@ class EditDialog(QDialog):
         self.setMinimumWidth(500)
         self.resize(540, 640)
 
-    def _fill_source(self):
-        """The "From YouTube: channel  [Details]" row, for the sound shown (none: no row)."""
-        if self.source_row is not None:
-            self._look.removeWidget(self.source_row)
-            self.source_row.hide()
-            self.source_row.deleteLater()
-        self.btn_source = self.source_row = None
-        if not (src := sourceinfo.shown(self.meta)):
-            return
-        srow = QHBoxLayout()
-        srow.setSpacing(8)
-        ic = QLabel()
-        icons.set_label_icon(ic, sourceinfo.icon(src), size=16)
-        srow.addWidget(ic)
-        site, who = sourceinfo.site_name(src), src.get("channel")
-        from_lbl = QLabel(_("From {site}: {channel}", site=site, channel=who) if who
-                          else _("From {site}", site=site))
-        from_lbl.setObjectName("muted")
-        from_lbl.setTextFormat(Qt.TextFormat.PlainText)   # a web channel name (plaintext.py)
-        srow.addWidget(from_lbl)
-        self.btn_source = QPushButton(_("Details"))
-        self.btn_source.setProperty("quiet", True)
-        self.btn_source.setToolTip(plain_tip(src["link"]))
-        srow.addWidget(self.btn_source)
-        srow.addStretch(1)
-        row = self.source_row = QWidget()
-        row.setLayout(srow)
-        srow.setContentsMargins(0, 0, 0, 0)
-        self._look.addWidget(row, self._source_at, 0, 1, 2)
-
-        def details():
-            d = sourcedialog.SourceDialog(self.meta, self)
-            d.forgotten.connect(row.hide)
-            d.forgotten.connect(self.source_forgotten)   # the owner saves it
-            d.show()
-        self.btn_source.clicked.connect(details)
 
     def load(self, meta: SoundMeta, tab: str = "sound"):
         """Show another sound, as a new window would: EditControl.edit reuses a closed
@@ -834,37 +734,6 @@ class EditDialog(QDialog):
     def _tab_index(cls, tab: str) -> int:
         return cls.TABS.index(tab) if tab in cls.TABS else 0
 
-    @staticmethod
-    def _fade_cell(grid: QGridLayout, r: int, col: int, label: str, value: float, tip: str,
-                   top: float = MAX_FADE_S) -> QSlider:
-        """A 0..top slider in tenths of a second, its name and value above it."""
-        v = QVBoxLayout()
-        v.setSpacing(4)
-        head = QHBoxLayout()
-        name = QLabel(label)
-        name.setToolTip(tip)
-        lbl = QLabel()
-        lbl.setObjectName("muted")
-        steady_number(lbl, _("{s} s", s=f"{top:.1f}"))
-        head.addWidget(name)
-        head.addStretch(1)
-        head.addWidget(lbl)
-        sl = QSlider(Qt.Orientation.Horizontal)
-        sl.setRange(0, int(top * 10))
-        sl.setValue(int(round(min(max(value, 0.0), top) * 10)))
-        sl.setToolTip(tip)
-        sl.setAccessibleName(label)
-        no_wheel(sl)
-
-        def show(v):
-            lbl.setText(_("{s} s", s=f"{v / 10:.1f}") if v else _("off"))
-            sl.setAccessibleDescription(lbl.text())
-        sl.valueChanged.connect(show)
-        show(sl.value())
-        v.addLayout(head)
-        v.addWidget(sl)
-        grid.addLayout(v, r, col)
-        return sl
 
     def fades(self) -> tuple[float, float]:
         return self.fade_in.value() / 10, self.fade_out.value() / 10
@@ -875,210 +744,6 @@ class EditDialog(QDialog):
             return
         super().accept()
 
-    def render_shown(self) -> bool:
-        return not self.render_box.isHidden()
-
-    def show_render(self, frac: float | None, words: str = "", can_stop: bool = False):
-        """Its sound's effects render: how far (`frac`, 0..1, and `words`), or None when
-        there's none (then `words`, if any, says why it ended: shown where the effects
-        summary goes)."""
-        on = frac is not None
-        was = self.render_shown()
-        if on:
-            self.render_bar.setValue(int(round(frac * 1000)))
-            self.render_words.setText(_("Applying the effects: {how}", how=words))
-            self.render_bar.setAccessibleDescription(words)
-            self.render_stop.setVisible(can_stop)
-        if on == was:
-            return
-        self._bb.setVisible(not on)
-        self.btn_preview.setVisible(not on)
-        self._reset_glow.setVisible(not on)
-        self.tabs.setEnabled(not on)   # the draft is saved: it waits while it renders
-        self.render_box.setVisible(on)
-        if on:
-            self.render_close.setDefault(True)
-            self.render_close.setFocus(Qt.FocusReason.OtherFocusReason)
-        else:
-            save = self._bb.button(QDialogButtonBox.StandardButton.Save)
-            save.setFocus(Qt.FocusReason.OtherFocusReason)
-            if words:
-                self._say(words, 6000)
-
-    def _light_reset(self):
-        """Reset effects stands out (the accent border and glow) while any effect is
-        on, so it's easy to find; the trim alone doesn't count (Reset keeps it)."""
-        f = self.effects.fx()
-        on = bool(f) and not soundfx.is_neutral({**f, "start": 0.0, "end": 0.0})
-        self._reset_glow.set_on(on)
-        if bool(self.btn_reset.property("nudge")) != on:
-            self.btn_reset.setProperty("nudge", on)
-            self.btn_reset.style().unpolish(self.btn_reset)
-            self.btn_reset.style().polish(self.btn_reset)
-
-    def show_live(self, frac: float | None, words: str = ""):
-        """The playing sound being made again with these effects: how far (`frac`,
-        0..1), or None when it's done or dropped (then `words`, if any, say how it
-        went, where the effects summary goes)."""
-        if frac is not None:
-            pct = int(frac * 100)
-            self.live_bar.setValue(int(round(frac * 1000)))
-            self.live_bar.show()
-            self._say(_("Applying to the playing sound: {pct}%. It plays on as it was "
-                        "until then.", pct=pct), 0)
-            return
-        self.live_bar.hide()
-        if words:
-            self._say(words, 6000)
-        elif getattr(self, "_saying", False):
-            self._said = getattr(self, "_said", 0) + 1
-            self._saying = False
-            self._fx_note()
-
-    def _fx_note(self):
-        if getattr(self, "_saying", False):
-            return   # a preview message is up: it puts the summary back when it's done
-        s = soundfx.summary(self.effects.fx())
-        self.fx_note.setText(_("Effects: {s}", s=s) if s else "")
-        self.fx_note.setVisible(bool(s))
-
-    def _say(self, text: str, ms: int):
-        """A preview message where the effects summary goes; back to the summary after
-        ``ms`` (0: stays until the next message)."""
-        self._saying = True
-        self.fx_note.setText(text)
-        self.fx_note.show()
-        self._said = getattr(self, "_said", 0) + 1
-        if ms:
-            n = self._said
-
-            def back():
-                if n == self._said:
-                    self._saying = False
-                    self._fx_note()
-            QTimer.singleShot(ms, self, back)
-
-    # ------------------------------------------------------------------ picture
-    def _show_picture(self):
-        """The picture as it will be after Save, and only the buttons that apply."""
-        if isinstance(self.picture, QImage):
-            pm = QPixmap.fromImage(self.picture)
-        elif self.picture is None and self.meta.image:
-            pm = QPixmap(self.meta.image)
-        else:
-            pm = QPixmap()
-        if not pm.isNull():
-            self.pic_view.setPixmap(pm.scaled(PIC_W, PIC_H, Qt.AspectRatioMode.KeepAspectRatio,
-                                              Qt.TransformationMode.SmoothTransformation))
-        self.pic_view.setVisible(not pm.isNull())   # no picture: just the buttons
-        self.btn_pic_clear.setVisible(not pm.isNull())
-
-    def _set_picture(self, pic):
-        self._pic_gen += 1   # a link still loading no longer counts
-        self.pic_note.setText("")
-        self.picture = pic
-        self._show_picture()
-
-    def _picture_from_file(self):
-        f, __ = QFileDialog.getOpenFileName(
-            self, _("Pick a picture"), str(Path.home()),
-            _("Pictures ({patterns})",
-              patterns=" ".join(f"*{x}" for x in sorted(thumbs.IMAGE_EXTS))))
-        if not f:
-            return
-        img = QImage(f)
-        if img.isNull():
-            busy.toast(self, toast.titled(_("Couldn't use that picture"), _(
-                "{name} isn't a picture this app can read.", name=Path(f).name)), "warn")
-            return
-        self._set_picture(img)
-
-    def _picture_from_link(self):
-        copied = QApplication.clipboard().text().strip()
-        copied = copied if "://" in copied and len(copied) < 2000 and \
-            not any(c.isspace() for c in copied) else ""
-        url, ok = QInputDialog.getText(
-            self, _("Picture from a link"),
-            _("The picture's address (right-click it → Copy image address),\nor a link "
-              "to a YouTube video or a web page:"), text=copied)
-        url = url.strip()
-        if not ok or not url:
-            return
-        self._pic_gen += 1
-        gen = self._pic_gen
-        self.pic_note.setText(_("Getting the picture…"))
-
-        def work():   # the network, off the UI thread
-            try:
-                img, err = thumbs.fetch(url), ""
-            except (thumbs.LinkError, net.FeatureOff) as e:
-                img, err = None, str(e)
-            except Exception as e:  # noqa: BLE001 - never leave it saying "Getting…"
-                log.exception("picture from a link")
-                img, err = None, errors.plain(e)
-            busy.emit(self.picture_fetched, gen, img, err)
-        threading.Thread(target=work, daemon=True, name="edit-picture-link").start()
-
-    def _on_picture_fetched(self, gen: int, img, err: str):
-        if gen != self._pic_gen:   # another picture was picked meanwhile
-            return
-        if img is None or img.isNull():
-            self.pic_note.setText("")
-            busy.toast(self, toast.titled(_("Couldn't use that picture"),
-                                          err or _("There's no picture at that link.")), "warn")
-            return
-        self._set_picture(img)
-
-    def _pick_custom(self):
-        c = QColorDialog.getColor(QColor(self.color or PAD_COLORS[0]), self,
-                                  _("Pick a colour"))
-        if c.isValid():
-            usage.used("custom-colour")
-        self._set_color(c.name() if c.isValid() else self.color)
-
-    def _set_color(self, c):
-        self.color = c
-        t = theme.T
-        custom = bool(c) and c.lower() not in {col.lower() for col in PAD_COLORS}
-        b = self.custom_swatch
-        b.setChecked(custom)
-        ink = (("#000000" if QColor(c).lightnessF() > 0.6 else "#ffffff") if custom
-               else "muted")
-        icons.set_icon(b, "palette", ink, ink, size=12)
-        bg = c if custom else t["inset"]
-        b.setStyleSheet(
-            f"QPushButton {{ background:{bg}; border:1px solid {t['border']};"
-            f" border-radius:11px; }}"
-            f"QPushButton:checked {{ border:3px solid {t['text']}; }}"
-            f"QPushButton:focus {{ border:2px solid {t['accent']}; }}"
-            f"QPushButton:checked:focus {{ border:3px solid {t['accent']}; }}")
-        for b, col in self.swatches:
-            b.setChecked(col == c)
-            # its own sheet outranks the theme's :focus rule, so focus is drawn here:
-            # an accent ring, thick when it's also the chosen colour
-            b.setStyleSheet(
-                f"QPushButton {{ background:{col}; border:1px solid {t['border']};"
-                f" border-radius:11px; }}"
-                f"QPushButton:checked {{ border:3px solid {t['text']}; }}"
-                f"QPushButton:focus {{ border:2px solid {t['accent']}; }}"
-                f"QPushButton:checked:focus {{ border:3px solid {t['accent']}; }}")
-
-    def _check_name(self, *_a):
-        """The warning under Name: another sound already goes by it (any case)."""
-        name = self.name.text().strip().casefold()
-        taken = bool(name) and self.others is not None and any(
-            m.id != self.meta.id and m.name.strip().casefold() == name for m in self.others())
-        self.name_hint.setVisible(taken)
-
-    def _set_hk(self, combo):
-        self.hotkey = combo
-        self.hk_btn.setText(pretty_key(combo) or _("Click to set"))
-
-    def _capture(self):
-        d = HotkeyDialog(self.hotkeys, self)
-        if d.exec() and d.result_combo:
-            self._set_hk(d.result_combo)
-        self.hotkeys_changed.emit()   # the capture paused them; the owner re-registers
 
     def apply(self, target: SoundMeta | None = None):
         m = target or self.meta

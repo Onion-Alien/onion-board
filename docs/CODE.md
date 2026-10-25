@@ -184,6 +184,8 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/kit/panellayouts.py` | `ShownStack`, keeping focus off a page switched away, `Flow` (wrapping) and `CardGrid` (`panel` re-exports them) |
 | `soundboard/ui/kit/panelcontrols.py` | `VolumeControl` (slider + typed %), `EqPanel` (the equaliser) and `UndoBar` (`panel` re-exports them) |
 | `soundboard/ui/sounds/dialogs.py` | per-sound Edit dialog: the Sound tab (name, volume, hotkey, fades…) and the Effects tab |
+| `soundboard/ui/sounds/editdialogparts.py` | part of the Edit dialog: its Source line, the fade cells, the render and live-preview progress, the picture, the pad colour, the name check and the hotkey |
+| `soundboard/ui/sounds/tabhelp.py` | a tab's help pop-up (the ? button), with Bun or Hoot beside it (`dialogs` re-exports it) |
 | `soundboard/ui/window/languagecontrol.py` | the main window's language (`MainWindow.langctl`): offering Windows' language once, turning it down, switching |
 | `soundboard/ui/window/miccontrol.py` | straight into the mic and the virtual cable in the main window (`MainWindow.micctl`): the mic effect's status, putting it on the mic (and back by itself), the mic helper, its update offer, falling back to the cable; installing, removing and fixing the cable; Windows' mic settings |
 | `soundboard/ui/window/netcontrol.py` | the main window following the network and privacy switches (`MainWindow.netctl`): Offline mode, a feature switched off, the proxy / Tor and remote-control lines on the output card, how far Tor is |
@@ -357,6 +359,8 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/bun/logowidget.py` | the header logo animated: a breathing glow and sheen, flaring with embers while sounds play |
 | `soundboard/ui/triggers/logoduel.py` | a silent laser exchange between the Board and Watch logos when clicked on the Triggers tab |
 | `soundboard/ui/sounds/overlay.py` | the in-game overlay: a panel of pads that never takes focus, driven by number keys or clicks, on a chosen monitor and spot (or wherever it was dragged) |
+| `soundboard/ui/sounds/overlaysettings.py` | the overlay's settings and where it goes: its keys, modes and positions, picking the monitor and placing it (`overlay` re-exports them) |
+| `soundboard/ui/sounds/overlaywindow.py` | the overlay's window: the tiles and buttons, dragging, fading, following the game's monitor, painting in cached layers |
 | `soundboard/ui/voice/voicepanel.py` | the Voice tab: lays out its cards and bottom bar; its parts are mixins in the four files below |
 | `soundboard/ui/voice/voicecombos.py` | the Voice tab's side of My voice combos: what's on as a setup, turning one back on, its share code, picture and words |
 | `soundboard/ui/voice/voiceswitch.py` | the Voice tab's on / off: each voice (voice changer, AI voice, computer voice) or all together with Undo, and the voice that's on saying the translated lines |
