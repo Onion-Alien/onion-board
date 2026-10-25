@@ -634,6 +634,7 @@ def test_up_next_is_one_chip_whose_list_reaches_every_queued_sound(window, monke
 def test_up_next_names_fill_the_room_their_row_gives_them(window, monkeypatch):
     """A long name is cut with "…" once, at the width its row really has: it was cut
     to a width worked out ahead, ~50 px short, a gap before its ▶."""
+    from soundboard.ui.kit.plaintext import plain_tip
     from soundboard.ui.window.upnext import _Name
     w = window
     w.resize(1200, 760)
@@ -658,7 +659,7 @@ def test_up_next_names_fill_the_room_their_row_gives_them(window, monkeypatch):
         assert fm.horizontalAdvance(shown) <= room
         one_more = name.full[:len(shown)] + "…"   # one letter more: wouldn't fit (no gap)
         assert fm.horizontalAdvance(one_more) > room
-        assert name.toolTip() == name.full
+        assert name.toolTip() == plain_tip(name.full)   # web text: never read as markup
 
 
 def test_up_next_list_shrinks_when_sounds_are_taken_out_while_open(window, monkeypatch):
