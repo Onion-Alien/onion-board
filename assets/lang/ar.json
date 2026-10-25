@@ -4758,5 +4758,6 @@
   "Invite a friend": "ادعُ صديقًا",
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "أرسل لصديقك رابطًا لتنزيل Onion Board. ضع اسمك أو اسمك في الألعاب عليه، وسيحييه التطبيق باسمك أول مرة يفتحه. لا شيء يُتتبَّع أو يُحسَب.",
   "Your name or gamertag (optional)": "اسمك أو اسمك في الألعاب (اختياري)",
-  "{name} invited you to Onion Board. Have fun!": "{name} دعاك إلى Onion Board. استمتع!"
+  "{name} invited you to Onion Board. Have fun!": "{name} دعاك إلى Onion Board. استمتع!",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "تعذّر على Windows معرفة ما إذا كانت هذه الشبكة عامة، لذلك تُرفض الهواتف احتياطًا. اضبطها على خاصة في إعدادات Windows ← الشبكة والإنترنت، ثم أوقف هذا وشغّله من جديد"
 }

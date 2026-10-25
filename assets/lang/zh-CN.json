@@ -4368,5 +4368,6 @@
   "Invite a friend": "邀请好友",
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "给好友发一个下载 Onion Board 的链接。附上你的名字或游戏 ID,好友第一次打开应用时会看到你的问候。不追踪,也不计数。",
   "Your name or gamertag (optional)": "你的名字或游戏 ID(可选)",
-  "{name} invited you to Onion Board. Have fun!": "{name} 邀请你来用 Onion Board。玩得开心!"
+  "{name} invited you to Onion Board. Have fun!": "{name} 邀请你来用 Onion Board。玩得开心!",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows 无法判断此网络是否为公用网络，因此为安全起见拒绝手机连接。请在 Windows 设置 → 网络和 Internet 中将其设为专用，然后关闭并重新打开此选项"
 }

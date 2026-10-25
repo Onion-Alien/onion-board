@@ -4446,5 +4446,6 @@
   "Invite a friend": "Invita un amico",
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Manda a un amico un link per scaricare Onion Board. Mettici il tuo nome o gamertag e l'app lo saluterà da parte tua la prima volta che la apre. Niente viene tracciato o contato.",
   "Your name or gamertag (optional)": "Il tuo nome o gamertag (facoltativo)",
-  "{name} invited you to Onion Board. Have fun!": "{name} ti ha invitato su Onion Board. Divertiti!"
+  "{name} invited you to Onion Board. Have fun!": "{name} ti ha invitato su Onion Board. Divertiti!",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows non è riuscito a dire se questa rete è pubblica, quindi i telefoni vengono rifiutati per sicurezza. Impostala come privata in Impostazioni di Windows → Rete e Internet, poi disattiva e riattiva questa opzione"
 }

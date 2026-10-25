@@ -4368,5 +4368,6 @@
   "Invite a friend": "ชวนเพื่อน",
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "ส่งลิงก์ดาวน์โหลด Onion Board ให้เพื่อน ใส่ชื่อหรือเกมเมอร์แท็กของคุณไว้ แล้วแอปจะทักทายเพื่อนแทนคุณตอนเปิดครั้งแรก ไม่มีการติดตามหรือนับอะไรเลย",
   "Your name or gamertag (optional)": "ชื่อหรือเกมเมอร์แท็กของคุณ (ไม่บังคับ)",
-  "{name} invited you to Onion Board. Have fun!": "{name} ชวนคุณมาใช้ Onion Board ขอให้สนุก!"
+  "{name} invited you to Onion Board. Have fun!": "{name} ชวนคุณมาใช้ Onion Board ขอให้สนุก!",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows บอกไม่ได้ว่าเครือข่ายนี้เป็นสาธารณะหรือไม่ จึงปฏิเสธโทรศัพท์ไว้ก่อนเพื่อความปลอดภัย ตั้งค่าเป็นส่วนตัวในการตั้งค่า Windows → เครือข่ายและอินเทอร์เน็ต แล้วปิดและเปิดตัวเลือกนี้อีกครั้ง"
 }

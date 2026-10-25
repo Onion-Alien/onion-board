@@ -4368,5 +4368,6 @@
   "Invite a friend": "친구 초대",
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "친구에게 Onion Board 다운로드 링크를 보내세요. 이름이나 게이머태그를 붙이면 친구가 앱을 처음 열 때 당신 대신 인사해 줍니다. 아무것도 추적하거나 세지 않아요.",
   "Your name or gamertag (optional)": "이름 또는 게이머태그 (선택)",
-  "{name} invited you to Onion Board. Have fun!": "{name} 님이 Onion Board에 초대했어요. 즐겁게 쓰세요!"
+  "{name} invited you to Onion Board. Have fun!": "{name} 님이 Onion Board에 초대했어요. 즐겁게 쓰세요!",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows에서 이 네트워크가 공용인지 확인할 수 없어 안전을 위해 휴대폰 연결을 거부합니다. Windows 설정 → 네트워크 및 인터넷에서 개인으로 설정한 다음 이 기능을 껐다가 다시 켜세요"
 }

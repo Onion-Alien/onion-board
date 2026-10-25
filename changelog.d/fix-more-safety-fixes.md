@@ -26,3 +26,5 @@
 - Discord set-up keeps a copy of only the file it changes, for two weeks, not of all of
   Discord's stored data.
 - Installing a Windows voice no longer runs a script file from your temp folder as admin.
+- Onion Pocket no longer starts when Windows can't say whether the network is Public:
+  it's turned away as on a Public network, never taken as a home one.

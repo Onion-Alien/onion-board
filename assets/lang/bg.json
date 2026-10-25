@@ -4446,5 +4446,6 @@
   "Invite a friend": "Покани приятел",
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Изпрати на приятел линк за изтегляне на Onion Board. Сложи името или геймърското си име на него и приложението ще го поздрави от твое име, когато го отвори за първи път. Нищо не се следи и не се брои.",
   "Your name or gamertag (optional)": "Твоето име или геймърско име (по избор)",
-  "{name} invited you to Onion Board. Have fun!": "{name} те покани в Onion Board. Забавлявай се!"
+  "{name} invited you to Onion Board. Have fun!": "{name} те покани в Onion Board. Забавлявай се!",
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows не можа да каже дали тази мрежа е обществена, затова телефоните се отказват за всеки случай. Задайте я като частна в Настройки на Windows → Мрежа и интернет, след което изключете и включете това отново"
 }
