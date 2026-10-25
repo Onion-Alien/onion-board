@@ -76,3 +76,15 @@ def test_folder_an_addon_runs_from_is_never_deleted(tmp_path):
 
 def test_missing_app_dir_is_fine(tmp_path):
     assert modules.prune_leftovers(tmp_path / "nope") == 0
+
+
+def test_remove_takes_the_old_copies_in_modules_too(tmp_path):
+    r"""Remove deleted modules\onion-watch only: an update's old copy next to it was then
+    found instead, and quietly became the live add-on."""
+    mods = tmp_path / "modules"
+    _copy(mods / "onion-watch", "onion-watch", 100)
+    _copy(mods / "onion-watch-old-20261005112119891", "onion-watch", 99)
+    other = _copy(mods / "onion-pocket-old-1", "onion-pocket", 1)
+    modules.uninstall("onion-watch", mods)
+    assert [i.id for i in modules.discover([mods])] == ["onion-pocket"]
+    assert other.exists()

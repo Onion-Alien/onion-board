@@ -260,6 +260,16 @@ def _memory_never_full(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def _no_ptt_key_left_held():
+    """A test that held auto push-to-talk's key (with press / release stood in for)
+    leaves nothing for winkeys' watch to let go of later with the real SendInput."""
+    yield
+    winkeys = sys.modules.get("soundboard.control.winkeys")
+    if winkeys is not None:
+        winkeys._ptt["combo"] = None
+
+
+@pytest.fixture(autouse=True)
 def _splash_act_back_after():
     """splash.show() picks this launch's act at random, now and then a rare one with a
     taller card: a test that showed the splash puts the act before back, or the splash

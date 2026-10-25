@@ -159,7 +159,7 @@ def unpack(package: Path, dest: Path) -> None:
 def get(module_dir: Path, on_line: Callable[[str], object]) -> str:
     """Download and unpack the add-on's private Python; its python.exe. Raises
     GetError. Blocking: never on the UI thread."""
-    log.info("getting Python %s for %s (%s)", VERSION, module_dir.name, net.describe())
+    log.info("getting Python %s for %s (%s)", VERSION, module_dir.name, net.describe(where=False))
     on_line(_("Getting Python for this add-on (about 15 MB)…"))
     last = [-1]
 

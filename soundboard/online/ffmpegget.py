@@ -395,7 +395,7 @@ def unpack(zip_path: Path, dest: Path | None = None) -> Path:
 
 def _own_copy(progress, stop) -> Health:
     """Step 2: download, check and unpack the app's own copy. Raises GetError."""
-    log.info("downloading FFmpeg %s for the app (%s)", VERSION, net.describe())
+    log.info("downloading FFmpeg %s for the app (%s)", VERSION, net.describe(where=False))
     folder = own_dir().parent
     folder.mkdir(parents=True, exist_ok=True)
     part = folder / (ZIP + ".partial")

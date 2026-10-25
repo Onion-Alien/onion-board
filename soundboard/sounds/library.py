@@ -303,7 +303,15 @@ def _is_our_old_folder() -> bool:
         raw = json.loads((OLD_APP_DIR / "config.json").read_text(encoding="utf-8-sig"))
     except (OSError, ValueError):
         return False
-    return isinstance(raw, dict) and ("sounds" in raw or "version" in raw)
+    # both, as ours: a number version and a list of sounds with files ("sounds" or
+    # "version" alone matched other programs' settings, a %APPDATA%\soundboard of
+    # theirs, which was then moved in here)
+    if not isinstance(raw, dict):
+        return False
+    version, sounds = raw.get("version"), raw.get("sounds")
+    return (isinstance(version, int) and not isinstance(version, bool)
+            and 0 < version <= CONFIG_VERSION and isinstance(sounds, list)
+            and all(isinstance(s, dict) and isinstance(s.get("file"), str) for s in sounds))
 
 
 def migrate_from_soundboard() -> None:
@@ -1380,6 +1388,27 @@ def _privacy_path() -> Path:
 
 
 _rotated: dict[Path, float] = {}   # config path -> when its backups last rotated
+
+
+def scrub_old_configs(names) -> None:
+    """Blank the Config fields `names` (a login the user removed) in config.json's
+    older copies too: config.json.1… and the set-aside config.json.broken-<time> kept
+    it in plain text after Disconnect. A copy that can't be read is left alone."""
+    fresh = Config().to_raw()
+    olds = [CONFIG_PATH.with_name(f"config.json.{i}") for i in range(1, CONFIG_BACKUPS + 1)]
+    olds += sorted(CONFIG_PATH.parent.glob("config.json.broken-*"))
+    for p in olds:
+        try:
+            raw = json.loads(p.read_text("utf-8"))
+        except (OSError, ValueError):
+            continue
+        if not isinstance(raw, dict) or not any(raw.get(n) for n in names):
+            continue
+        raw.update({n: fresh.get(n) for n in names if n in raw})
+        try:
+            atomic_write_text(p, json.dumps(raw, indent=2))
+        except OSError:
+            log.warning("couldn't clear an old copy of the settings", exc_info=True)
 
 
 def _rotate_due() -> bool:

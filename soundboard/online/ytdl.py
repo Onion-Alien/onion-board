@@ -663,12 +663,17 @@ def as_link(text: str) -> str:
     return t if re.fullmatch(r"https?://[\w.-]+\.[a-z]{2,}(:\d+)?([/?#]\S*)?", t, re.I) else ""
 
 
+TITLE_MAX = 300   # a title's characters looked at (a pad name keeps far fewer)
+
+
 def clean_title(title: str) -> str:
     """A pad name from a video title: no "(Official Video)" / "[HD]" noise, no HTML
     entities (TikTok's come as "&amp;"), no " - Sound Button" (a Myinstants page's)."""
-    title = html.unescape(title)
-    t = re.sub(r"\s*[(\[][^)\]]*\b(official|video|audio|lyrics?|hd|4k|visuali[sz]er)\b[^)\]]*[)\]]",
-               "", title, flags=re.I)
+    # cut first, and bounded brackets: a site's title is any length, and an open bracket
+    # with no end before a long run of words took minutes, holding the whole app
+    title = html.unescape(title[:TITLE_MAX * 2])[:TITLE_MAX]
+    t = re.sub(r"\s*[(\[][^)\]]{0,80}?\b(official|video|audio|lyrics?|hd|4k|visuali[sz]er)\b"
+               r"[^)\]]{0,80}[)\]]", "", title, flags=re.I)
     t = re.sub(r"\s+[-|]\s+sound button\s*$", "", t, flags=re.I)
     return re.sub(r"\s+", " ", t).strip() or title.strip()
 
@@ -905,8 +910,10 @@ def _myinstants_page(url: str, count: int, direct: bool = False) -> list[Result]
         raise FetchError(_("Myinstants didn't answer ({error})",
                            error=errors.plain(e))) from e
     out = []
-    for m in re.finditer(r"onclick=\"play\('(/media/sounds/[^']+?\.mp3)'.*?"
-                         r'class="instant-link[^"]*">([^<]+)</a>', page, re.S):
+    # bounded gaps: on a page of onclicks with no instant-link, an open .*? read on to
+    # the page's end from each one
+    for m in re.finditer(r"onclick=\"play\('(/media/sounds/[^']{1,300}?\.mp3)'.{0,3000}?"
+                         r'class="instant-link[^"]{0,200}">([^<]{1,300})</a>', page, re.S):
         path, title = m.group(1), html.unescape(m.group(2)).strip()
         out.append(Result(path.rsplit("/", 1)[-1], title or _("Sound"), "Myinstants", 0,
                           "myinstants", MYINSTANTS + path))
@@ -1155,7 +1162,7 @@ def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False,
           feature: str = FEATURE, direct: bool = False, video: bool = False,
           again: bool = False) -> dict:
     last = [-1.0]
-    stalled = ytworker.stall_guard()
+    stalled = ytworker.stall_guard(cap=VIDEO_MAX_BYTES if video else MAX_BYTES)
 
     def hook(d):
         if d.get("status") == "downloading":
@@ -1250,11 +1257,17 @@ def _run(yt_dlp, url: str, dest: Path, progress, feature: str = FEATURE,
         raise
     except ytworker.Stalled as e:
         raise FetchError(_("The download stopped moving. Try again.")) from e
+    except ytworker.TooBig as e:
+        raise _too_big(VIDEO_MAX_BYTES if video else MAX_BYTES) from e
     except Exception as e:  # noqa: BLE001 - yt-dlp raises many kinds; show its message
         if _went_nowhere(url, str(e)):
             raise FetchError(_("That video isn't available any more.")) from e
         raise _readable(e) from e
     return _found(url, dest, path, info)
+
+
+def _too_big(cap: int) -> DownloadError:
+    return DownloadError(_("It's over {mb} MB.", mb=cap // 2**20))
 
 
 DOWNLOAD_QUIET_S = 300   # a helper download that says nothing for this long is stuck
@@ -1268,6 +1281,8 @@ def _run_helper(url: str, opts: dict, progress) -> tuple[dict, Path] | None:
     except ytworker.RemoteError as e:
         if e.kind.endswith(".Stalled"):
             raise FetchError(_("The download stopped moving. Try again.")) from None
+        if e.kind.endswith(".TooBig"):
+            raise _too_big(opts.get("max_filesize") or MAX_BYTES) from None
         if _went_nowhere(url, str(e)):
             raise FetchError(_("That video isn't available any more.")) from None
         raise _readable(_remote(e)) from None

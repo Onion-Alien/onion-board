@@ -730,7 +730,7 @@ class HotkeyControl(Controller):
         or the game's push-to-talk would stay stuck down."""
         mw = self.mw
         if mw._ptt_held:
-            if not winkeys.release(mw._ptt_held):
+            if not winkeys.ptt_up(mw._ptt_held):
                 return False
             mw._ptt_held = None
         return True

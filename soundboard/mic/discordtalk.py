@@ -43,7 +43,8 @@ KEY = b"_https://discord.com\x00\x01MediaEngineStore"   # Chromium: "_" origin \
 BLOCK = 32768        # LevelDB log block
 HEADER = 7           # crc32c (4), length (2), type (1)
 FULL, FIRST, MIDDLE, LAST = 1, 2, 3, 4
-BACKUPS = 3          # copies of each client's folder kept
+BACKUPS = 3          # copies of each client's log kept from before a write
+BACKUP_DAYS = 14     # ...and for this long at most
 HELPER_MAX_S = 12 * 3600
 HELPER_POLL_S = 3.0
 CLOSE_WAIT_S = 10.0   # set_up's Discord closing: how long it may take to go
@@ -350,13 +351,25 @@ def _unlock(f):
     f.close()
 
 
-def _backup(folder: Path, client_dir: str, backup_root: Path) -> Path:
+def _backup(log_path: Path, client_dir: str, backup_root: Path) -> Path:
+    """A copy of the one file a write changes (the log it adds to), for going back by
+    hand. Never the whole folder: that's Discord's Local Storage, its login among it,
+    and copies of it were kept here for good."""
     dest = backup_root / client_dir / time.strftime("%Y%m%d-%H%M%S")
-    shutil.copytree(folder, dest, ignore=shutil.ignore_patterns("LOCK"), dirs_exist_ok=True)
+    dest.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(log_path, dest / log_path.name)
     old = sorted(p for p in (backup_root / client_dir).iterdir() if p.is_dir())
-    for p in old[:-BACKUPS]:
+    stale = time.time() - BACKUP_DAYS * 86400
+    for p in old[:-BACKUPS] + [p for p in old[-BACKUPS:] if p != dest and _older(p, stale)]:
         shutil.rmtree(p, ignore_errors=True)
     return dest
+
+
+def _older(p: Path, when: float) -> bool:
+    try:
+        return p.stat().st_mtime < when
+    except OSError:
+        return False
 
 
 def write_store(client_dir: str, store: dict, backup_root: Path,
@@ -385,7 +398,7 @@ def write_store(client_dir: str, store: dict, backup_root: Path,
             return False
         seq = max(manifest_sequence(edits), log_sequence(records)) + 1
         value = encode_value(json.dumps(store, separators=(",", ":"), ensure_ascii=False))
-        _backup(folder, client_dir, backup_root)
+        _backup(log_path, client_dir, backup_root)
         with open(log_path, "ab") as f:
             f.write(frame(batch_put(seq, KEY, value), len(data)))
             f.flush()

@@ -106,27 +106,76 @@ class Shelf:
         except FileNotFoundError:
             return
         except (OSError, ValueError) as e:
+            # a damaged list: kept aside, and the clips found again from their files
+            # (taken as empty, the next save named only new clips and the next start
+            # deleted every earlier recording)
             log.warning("saved clips list unreadable: %s", e)
+            self._set_aside()
+            self._rebuild()
             return
         known = {f.name for f in Clip.__dataclass_fields__.values()}
+        damaged = not isinstance(rows, list)
         for r in rows if isinstance(rows, list) else []:
-            if isinstance(r, dict) and r.get("id") and r.get("file"):
+            if not (isinstance(r, dict) and r.get("id") and isinstance(r.get("file"), str)
+                    and Path(r["file"]).name == r["file"]):
+                damaged = True
+                continue
+            try:
                 c = self.kind(**{k: v for k, v in r.items() if k in known})
-                if not (isinstance(c.peaks, list)
-                        and all(isinstance(v, (int, float)) for v in c.peaks)):
-                    c.peaks = []   # a damaged picture: drawn again from the audio
-                if c.path.is_file():
-                    # Earlier versions did not track activity. Give their clips a
-                    # full retention period rather than guessing when they were used.
-                    now = time.time()
-                    for attr in ("made", "last_used"):
-                        value = getattr(c, attr)
-                        if (not isinstance(value, (int, float))
-                                or not math.isfinite(value) or value <= 0):
-                            setattr(c, attr, now)
-                            self._dirty = True
-                    self.clips.append(c)
-        self._tidy()
+                c.name = str(c.name)
+                c.seconds = float(c.seconds)
+            except (TypeError, ValueError):
+                damaged = True
+                continue
+            if not (isinstance(c.peaks, list)
+                    and all(isinstance(v, (int, float)) for v in c.peaks)):
+                c.peaks = []   # a damaged picture: drawn again from the audio
+            if c.path.is_file():
+                # Earlier versions did not track activity. Give their clips a
+                # full retention period rather than guessing when they were used.
+                now = time.time()
+                for attr in ("made", "last_used"):
+                    value = getattr(c, attr)
+                    if (not isinstance(value, (int, float))
+                            or not math.isfinite(value) or value <= 0):
+                        setattr(c, attr, now)
+                        self._dirty = True
+                self.clips.append(c)
+        if damaged:   # a row couldn't be read: its file may still be someone's clip
+            self._rebuild(keep=self.clips)
+        else:
+            self._tidy()
+
+    def _set_aside(self):
+        try:
+            self._index().replace(self._index().with_name(
+                f"index.json.broken-{time.strftime('%Y%m%d-%H%M%S')}"))
+        except OSError:
+            pass
+
+    def _rebuild(self, keep: list[Clip] | None = None):
+        """Clips for the FLACs no row names, newest first after `keep`: nothing on disk is
+        dropped because the list was damaged."""
+        self.clips = list(keep or [])
+        named = {c.file for c in self.clips}
+        now = time.time()
+        found = []
+        try:
+            files = [f for f in clips_dir(self.kind.folder).glob("*.flac")
+                     if f.name not in named and f.is_file()]
+        except OSError:
+            files = []
+        for f in files:
+            try:
+                seconds = float(sf.info(str(f)).duration)
+                made = f.stat().st_mtime
+            except Exception:  # noqa: BLE001 - an unreadable file stays on disk, unlisted
+                continue
+            found.append(self.kind(id=uuid.uuid4().hex[:10], name="Clip", file=f.name,
+                                   seconds=seconds, made=made, last_used=now))
+        found.sort(key=lambda c: c.made, reverse=True)
+        self.clips += found
+        self._dirty = True
 
     def _tidy(self):
         """Files no clip points at (deleted ones, from an earlier run) go."""
@@ -142,9 +191,9 @@ class Shelf:
         with self._lock:
             d = clips_dir(self.kind.folder)
             d.mkdir(parents=True, exist_ok=True)
-            tmp = d / "index.json.tmp"
-            tmp.write_text(json.dumps([asdict(c) for c in self.clips], indent=1), "utf-8")
-            tmp.replace(self._index())
+            # durable: a list cut short by a power cut lost clips (see load)
+            library.atomic_write_text(self._index(),
+                                      json.dumps([asdict(c) for c in self.clips], indent=1))
             self._dirty = False
 
     def add(self, data: np.ndarray, name: str, src: str = "") -> Clip:

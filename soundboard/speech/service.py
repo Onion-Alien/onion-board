@@ -334,16 +334,18 @@ class ServiceHost:
 
 def _handshake(conn: socket.socket, token: str, timeout: float) -> dict | None:
     """The hello message if `conn` opened with one carrying `token`, else None. Before
-    that it's an unknown caller: a small first frame only, and not much time."""
-    conn.settimeout(timeout)
+    that it's an unknown caller: a small first frame only, and not much time: all of it
+    within `timeout` (a byte every few seconds kept a per-recv timeout from running out,
+    and the helper waited behind that caller for hours)."""
+    end = time.monotonic() + timeout
     try:
-        head = protocol._exact(conn, protocol._HEAD.size)
+        head = _exact_by(conn, protocol._HEAD.size, end)
         if head is None:
             return None
         kind, n = protocol._HEAD.unpack(head)
         if kind != protocol.JSON or n > HELLO_MAX:
             return None
-        payload = protocol._exact(conn, n) if n else b""
+        payload = _exact_by(conn, n, end) if n else b""
         hello = protocol.decode_json(payload) if payload is not None else {}
     except Exception:  # noqa: BLE001
         # any bad hello (a dropped socket, junk, JSON nested too deep: RecursionError)
@@ -353,6 +355,21 @@ def _handshake(conn: socket.socket, token: str, timeout: float) -> dict | None:
             str(hello.get("token", "")).encode(), token.encode()):
         return None
     return hello
+
+
+def _exact_by(conn: socket.socket, n: int, end: float) -> bytes | None:
+    """protocol._exact, done by time.monotonic() `end` (raises TimeoutError past it)."""
+    buf = bytearray()
+    while len(buf) < n:
+        left = end - time.monotonic()
+        if left <= 0:
+            raise TimeoutError("the hello took too long")
+        conn.settimeout(left)
+        chunk = conn.recv(n - len(buf))
+        if not chunk:
+            return None
+        buf += chunk
+    return bytes(buf)
 
 
 def _exit_code(p: subprocess.Popen | None, wait: float) -> int | None:

@@ -142,6 +142,7 @@ MAX_CONNECTIONS = 32    # connections open at once; more are closed straight awa
 PEER_CONNECTIONS = 8    # ...and from any one address (a phone uses one or two)
 NETWORK_CHECK_S = 30.0  # lan: how often it checks the network is still not Public
 WAKE_S = 30.0           # the server thread's longest sleep (halt() wakes it at once)
+CREDENTIALS = ("X-Sig", "X-Token", "Authorization")   # headers a key comes in
 
 
 def public_network() -> str:
@@ -285,6 +286,9 @@ class _Server(ThreadingHTTPServer):
     a thread fighting the audio thread for Python) and stall the app's sound."""
     daemon_threads = True
     allow_reuse_address = False   # Windows: reuse would let two apps share the port
+    # the cap per address: on this PC's own server every client (Stream Deck, a bot,
+    # a script) is 127.0.0.1, and eight at once dropped the rest without an answer
+    per_peer = True
 
     def __init__(self, *args, **kwargs):
         self._open: dict[str, int] = {}   # peer -> connections open now
@@ -350,10 +354,16 @@ class _Server(ThreadingHTTPServer):
         peer = client_address[0]
         with self._open_lock:
             full = (sum(self._open.values()) >= MAX_CONNECTIONS
-                    or self._open.get(peer, 0) >= PEER_CONNECTIONS)
+                    or (self.per_peer and self._open.get(peer, 0) >= PEER_CONNECTIONS))
             if not full:
                 self._open[peer] = self._open.get(peer, 0) + 1
         if full:
+            try:   # said, not just cut off: the client can tell busy from broken
+                if isinstance(request, socket.socket):
+                    request.sendall(b"HTTP/1.1 503 Service Unavailable\r\n"
+                                    b"Content-Length: 0\r\nConnection: close\r\n\r\n")
+            except OSError:
+                pass
             self.shutdown_request(request)
             return
         try:
@@ -475,6 +485,7 @@ class RemoteControl(QObject):
             return False
         try:
             srv = _Server((self.host, self.port), _handler_for(self))
+            srv.per_peer = self.lan
         except (OverflowError, ValueError) as e:   # a port outside 0-65535
             self.error = f"port {self.port} isn't a valid port — pick one from 1024 to 65535"
             log.warning("%s couldn't listen on %s:%s: %s", self.name, self.host, self.port, e)
@@ -645,6 +656,27 @@ def _handler_for(ctl: RemoteControl):
         def log_message(self, fmt, *args):   # the query string may hold the token
             pass
 
+        def handle_one_request(self):
+            # the request line and headers all within IDLE_S: `timeout` counts per recv,
+            # so a byte every few seconds held a connection (and its slot) for good
+            head = self._head = threading.Timer(IDLE_S, self._too_slow)
+            head.daemon = True
+            head.start()
+            try:
+                super().handle_one_request()
+            finally:
+                head.cancel()
+
+        def parse_request(self):
+            self._head.cancel()   # the head is in
+            return super().parse_request()
+
+        def _too_slow(self):
+            try:
+                self.connection.shutdown(socket.SHUT_RDWR)
+            except OSError:
+                pass
+
         def _answer(self, status: int, body):
             data = json.dumps(body).encode()
             self.send_response(status)
@@ -713,7 +745,10 @@ def _handler_for(ctl: RemoteControl):
             if ctl.locked(peer):
                 return self._answer(429, {"error": "too many wrong keys: wait a minute"})
             if not ctl.authorised(self.headers, query, f"{self.command} {self.path}"):
-                ctl.failed(peer)
+                # counted only with a key: any web page can send a request with none (a
+                # no-cors fetch), and five of those locked the phone out
+                if "token" in query or any(self.headers.get(h) for h in CREDENTIALS):
+                    ctl.failed(peer)
                 body: dict[str, object] = {"error": "missing or wrong token"}
                 if ctl.lan:   # so a phone whose clock is off can sign again
                     body["now"] = int(time.time())
@@ -729,6 +764,10 @@ def _handler_for(ctl: RemoteControl):
                                                    f"{BODY_MAX // 1024} KB"})
             if ctl.lan:   # (read all the same:) X-Sig signs the URL, not the body
                 sent = {}
+            if any(len(v) > 1 for v in query.values()):
+                # a bot pasting a viewer's text in unencoded: "x&mod=1" would add a
+                # second mod= (the first one won), so a name could make itself a mod
+                return self._answer(400, {"error": "a value was sent twice"})
             params = {**sent, **{k: v[0] for k, v in query.items() if k != "token"}}
             job = Job(action, params)
             ctl.request.emit(job)

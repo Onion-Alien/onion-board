@@ -208,7 +208,7 @@ def get(progress: Callable[[int, int], None] | None = None,
     if net.mode() == net.TOR and not tor.available():
         raise GetError(_("Connection is set to Tor, but there's no Tor here yet to carry "
                          "the download. Pick Direct or Through a proxy, then Get Tor."))
-    log.info("downloading Tor %s (%s)", VERSION, net.describe())
+    log.info("downloading Tor %s (%s)", VERSION, net.describe(where=False))
     data = download(progress)
     with tor.hold():   # nothing restarts tor.exe from the folder while it's swapped
         if before_unpack:
