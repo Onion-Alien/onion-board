@@ -821,6 +821,11 @@ def event(mw: MainWindow, params: dict) -> tuple[int, object]:
     inline = {k: params[k] for k in ("sound", "category", "say", "voice", "voice_seconds")
               if isinstance(params.get(k), str)}
     if inline:
+        if "say" in inline:   # a viewer's name can carry it (an unencoded bot template)
+            said = clean_text(inline["say"], chat_rules(mw))
+            if said is None:
+                return 200, {"handled": False, "reason": "blocked word", "event": ev}
+            inline["say"] = said
         rule: dict = {}
         err = _rule_from(mw, inline, rule)
         if err:

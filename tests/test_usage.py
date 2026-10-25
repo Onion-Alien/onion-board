@@ -189,12 +189,10 @@ def test_an_old_config_without_privacy_settings_is_off_too(app_dir):
 
 
 def test_a_settings_reset_never_switches_it_back_on(app_dir):
+    """Nor any other switch: a reset keeps how the app goes online."""
     Config(net_off=["usage_stats", "radio"]).save()
     reset.reset([reset.SETTINGS])
-    assert Config.load().net_off == ["usage_stats"]
-    Config(net_off=["radio"]).save()
-    reset.reset([reset.SETTINGS])
-    assert Config.load().net_off == []
+    assert Config.load().net_off == ["usage_stats", "radio"]
 
 
 @pytest.fixture
@@ -708,7 +706,9 @@ def test_downloads_say_the_site_and_how_many_never_the_link(sent):
     usage.maybe_send(cfg)
     paths = _paths(sent[0][0])
     assert "downloads/2-5" in paths
-    for k in ("dl-youtube", "dl-tiktok", "dl-search", "dl-link", "dl-add", "dl-play",
+    # the TikTok link went while it was off: never sent later
+    assert "used/dl-tiktok" not in paths and "used/dl-link" not in paths
+    for k in ("dl-youtube", "dl-search", "dl-add", "dl-play",
               "dl-failed-other", "dl-failed-youtube", "dl-failed-why-403",
               "dl-failed-why-other"):
         assert f"used/{k}" in paths

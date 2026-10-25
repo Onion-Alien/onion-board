@@ -69,8 +69,17 @@ KEEP = {"version", "sounds", "categories", "category", "category_hotkeys", "voic
         "update_auto_tried",
         "stats_id", "stats_sent", "stats_heard", "stats_started", "stats_steps", "mic_first",
         "duck_on", "duck_off", "stats_version", "stats_pending",
+        # how it goes online: a reset never takes someone off Tor, a proxy or Offline
+        # mode, nor switches a feature they turned off back on
+        "net_mode", "net_proxy", "net_off", "net_offline", "tor_bridges",
         *DEVICE_FIELDS, *PROGRAM_FIELDS}
 RADIO_KEEP = ("favorites", "recent")
+# never kept in a restore point, and never put back by one: keys and logins (one the
+# user changed came back with the point, a leaked key that was replaced among them) and
+# how the app goes online (see KEEP)
+CURRENT = ("api_token", "twitch_token", "twitch_refresh", "twitch_login", "twitch_user_id",
+           "twitch_share", "remote_addons", "net_mode", "net_proxy", "net_off",
+           "net_offline", "tor_bridges")
 
 
 def hotkey_fields() -> list[str]:
@@ -205,14 +214,11 @@ def reset(parts: list[str]) -> str:
     if SETTINGS in parts:
         fresh = Config()
         radio = {k: cfg.radio[k] for k in RADIO_KEEP if k in cfg.radio}
-        no_count = "usage_stats" in cfg.net_off
         for f in fields(Config):
             if f.name not in KEEP and not f.name.endswith("_hotkey"):
                 setattr(cfg, f.name, getattr(fresh, f.name))
                 _forget_newer(cfg, f.name)
         cfg.radio = radio
-        if no_count:   # a reset never switches the usage count (back) on
-            cfg.net_off.append("usage_stats")
     if HOTKEYS in parts:
         fresh = Config()
         for name in hotkey_fields():
@@ -322,6 +328,8 @@ def restore(point_id: str) -> str:
         old.sounds += [m for m in now.sounds if m.id not in ids]
         library.merge_tags(now.categories, old.categories)   # appends the new ones
         old.stats_version = now.stats_version   # the version that's running, not a new update
+        for name in CURRENT:
+            setattr(old, name, getattr(now, name))
         saved = old.save()
     except Exception:
         if not _put_back(moved):
@@ -401,8 +409,8 @@ def _new_point(label: str, parts: list[str], cfg: Config, keep: str = "") -> Poi
                   label, list(parts))
     point.path.mkdir(parents=True)
     # on the disk before an older point is removed below
-    library.atomic_write_text(point.path / "config.json",
-                              json.dumps(cfg.to_raw(), indent=2))
+    raw = {k: v for k, v in cfg.to_raw().items() if k not in CURRENT}
+    library.atomic_write_text(point.path / "config.json", json.dumps(raw, indent=2))
     library.atomic_write_text(
         point.path / "point.json",
         json.dumps({"when": point.when, "label": label, "parts": point.parts}))

@@ -132,7 +132,7 @@ class WindowLife(WindowParts):
         try:
             subprocess.Popen([sys.executable, *self.restart_args()],
                              creationflags=0x00000008 | 0x00000200,   # detached, own group
-                             close_fds=True)
+                             close_fds=True, env=net.own_env())   # not this copy's relay
         except OSError:
             log.exception("couldn't start the app again")
             self.toast(_("Close Onion Board and open it again to finish."), "warn")

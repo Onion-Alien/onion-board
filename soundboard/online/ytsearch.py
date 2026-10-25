@@ -89,8 +89,10 @@ def _myinstants_page(url: str, count: int, direct: bool = False) -> list[Result]
         raise FetchError(_("Myinstants didn't answer ({error})",
                            error=errors.plain(e))) from e
     out = []
-    for m in re.finditer(r"onclick=\"play\('(/media/sounds/[^']+?\.mp3)'.*?"
-                         r'class="instant-link[^"]*">([^<]+)</a>', page, re.S):
+    # bounded gaps: on a page of onclicks with no instant-link, an open .*? read on to
+    # the page's end from each one
+    for m in re.finditer(r"onclick=\"play\('(/media/sounds/[^']{1,300}?\.mp3)'.{0,3000}?"
+                         r'class="instant-link[^"]{0,200}">([^<]{1,300})</a>', page, re.S):
         path, title = m.group(1), html.unescape(m.group(2)).strip()
         out.append(Result(path.rsplit("/", 1)[-1], title or _("Sound"), "Myinstants", 0,
                           "myinstants", MYINSTANTS + path))

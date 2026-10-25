@@ -52,13 +52,22 @@ class Stalled(Exception):
     cuts every piece off makes yt-dlp ask for the same bytes again and again, forever."""
 
 
-def stall_guard(clock=None):
+class TooBig(Exception):
+    """A download past its size cap while it ran: yt-dlp's max_filesize only looks at the
+    size a site gives up front, so one that names none (an endless stream) went on until
+    the disk was full."""
+
+
+def stall_guard(clock=None, cap: int = 0):
     """For a progress hook: `check(downloaded_bytes)` raises Stalled once the count
-    hasn't grown for STALL_S, however often yt-dlp says it's still downloading."""
+    hasn't grown for STALL_S, however often yt-dlp says it's still downloading, and
+    TooBig once it's past `cap` bytes (0: no cap)."""
     clock = clock or (lambda: time.monotonic())
     best, grew = [-1], [clock()]
 
     def check(done: int) -> None:
+        if cap and done > cap:
+            raise TooBig(f"over {cap} bytes")
         now = clock()
         if done > best[0]:
             best[0], grew[0] = done, now
@@ -400,7 +409,7 @@ def _download(conn, yt_dlp, url: str, opts: dict, max_seconds: float):
     (or, when the site gives no size, that it's still going: at least once a second):
     the app takes a download that says nothing for DOWNLOAD_QUIET_S as stuck."""
     last = [0.0]
-    stalled = stall_guard()
+    stalled = stall_guard(cap=opts.get("max_filesize") or 0)
 
     def hook(d):
         if d.get("status") != "downloading":

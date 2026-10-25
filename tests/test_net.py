@@ -344,6 +344,22 @@ def test_every_mode_points_ffmpeg_at_the_relay_as_the_radio(socks, monkeypatch):
     assert "127.0.0.1" in net.child_env("addons")["no_proxy"]
 
 
+@pytest.mark.windows   # Windows' environment ignores case
+def test_a_restarted_copy_never_takes_the_old_relay_as_the_users_proxy(socks, monkeypatch):
+    """A restart (language, reset) started the new copy with this one's relay in
+    http_proxy: it kept that as the user's own and gave the browser and the update
+    installer a dead port with the old secret."""
+    old = f"http://radio:{'s' * 8}@127.0.0.1:1"   # an earlier copy's relay
+    monkeypatch.setattr(net, "_env_saved", None)
+    for k in ("HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY"):
+        monkeypatch.setenv(k, old)
+    monkeypatch.setenv(net.RELAY_MARK, old)
+    net.configure(net.DIRECT, "")
+    own = net.own_env()
+    assert not {k.upper() for k in own} & {"HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY",
+                                           net.RELAY_MARK}
+
+
 def test_a_change_reaches_listeners_and_qt_and_drops_relayed_connections(qapp, site, socks):
     from PySide6.QtNetwork import QNetworkAccessManager, QNetworkProxy
     calls = []

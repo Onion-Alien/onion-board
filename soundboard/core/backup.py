@@ -746,6 +746,12 @@ def keep_pack(pkg: Package) -> str:
             pkg.pack_id = pid
             return pid
         if not dest.is_file():
+            size = (sum(f.stat().st_size for f in src.rglob("*") if f.is_file())
+                    if src.is_dir() else src.stat().st_size)
+            if size > MAX_TOTAL or size + DISK_SPARE > shutil.disk_usage(d).free:
+                log.warning("not keeping a copy of the sound pack %s: %d bytes", src.name,
+                            size)
+                return ""   # the import itself says why (install's _check_room)
             tmp = dest.with_name(dest.name + ".part")
             try:
                 if src.is_dir():

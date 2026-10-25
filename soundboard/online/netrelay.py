@@ -11,6 +11,7 @@ import secrets
 import select
 import socket
 import threading
+import time
 import urllib.parse
 from collections.abc import Callable
 
@@ -19,7 +20,8 @@ from soundboard.online import netlog
 from soundboard.i18n import _
 from soundboard.online import netconfig
 from soundboard.online.netconfig import (CONNECT_TIMEOUT_S, DIRECT, DIRECT_LOGIN, ENV_KEYS,
-    HEAD_LIMIT, LeadsHome, NEVER_THIS_PC, PIPE_SEND_S, RELAY_HEADER, _failed, _lock, _nams,
+    HEAD_LIMIT, LeadsHome, NEVER_THIS_PC, PIPE_SEND_S, RELAY_HEADER, RELAY_MARK,
+    RELAY_WAITING_MAX, _failed, _lock, _nams,
     allowed, is_loopback, off_message)
 from soundboard.online import netconnect
 
@@ -83,6 +85,7 @@ class _Relay:
         self.port = self.srv.getsockname()[1]
         self._open: dict[socket.socket, str] = {}   # socket -> the feature it's for
         self._open_lock = threading.Lock()
+        self._waiting = 0   # connections still sending their head (RELAY_WAITING_MAX)
         # what was asked for lately: (feature, host, "ok" | "off" | "local" | "failed");
         # for the tests and the log, never with the secret
         self.seen: collections.deque = collections.deque(maxlen=500)
@@ -98,8 +101,22 @@ class _Relay:
                 c, _addr = self.srv.accept()
             except OSError:
                 return
-            threading.Thread(target=self._serve, args=(c,), daemon=True,
-                             name="net-relay-conn").start()
+            with self._open_lock:
+                full = self._waiting >= RELAY_WAITING_MAX
+                self._waiting += not full
+            if full:
+                c.close()
+                continue
+            try:
+                threading.Thread(target=self._serve, args=(c,), daemon=True,
+                                 name="net-relay-conn").start()
+            except RuntimeError:   # no more threads: this one goes, the relay stays up
+                self._head_done()
+                c.close()
+
+    def _head_done(self):
+        with self._open_lock:
+            self._waiting -= 1
 
     def drop_all(self):
         self.drop(lambda _feature: True)
@@ -136,8 +153,11 @@ class _Relay:
         up = entry = None
         self._track("", c)
         try:
+            try:
+                head, rest = self._read_head(c)
+            finally:
+                self._head_done()
             c.settimeout(CONNECT_TIMEOUT_S)
-            head, rest = self._read_head(c)
             if head is None:
                 return
             lines = head.split("\r\n")
@@ -242,8 +262,15 @@ class _Relay:
 
     @staticmethod
     def _read_head(c: socket.socket) -> tuple[str | None, bytes]:
+        """The request head, all of it within CONNECT_TIMEOUT_S (a byte now and then
+        kept a per-recv timeout from ever running out)."""
         buf = b""
+        end = time.monotonic() + CONNECT_TIMEOUT_S
         while b"\r\n\r\n" not in buf:
+            left = end - time.monotonic()
+            if left <= 0:
+                return None, b""
+            c.settimeout(left)
             chunk = c.recv(4096)
             if not chunk or len(buf) > HEAD_LIMIT:
                 return None, b""
@@ -364,8 +391,14 @@ def _set_env():
     processes that go online get child_env(), which keeps this PC direct."""
     global _env_saved
     if _env_saved is None:
-        _env_saved = {k: os.environ.get(k) for k in ENV_KEYS}
+        # a copy started by an earlier one (a restart) may have its relay's address in
+        # these: never the user's own (it was kept as theirs and handed to the browser
+        # and the update installer, a dead port with the old secret)
+        old = os.environ.get(RELAY_MARK)
+        _env_saved = {k: (None if old and os.environ.get(k) == old else os.environ.get(k))
+                      for k in ENV_KEYS}
     url = relay_url("radio")
+    os.environ[RELAY_MARK] = url
     os.environ["http_proxy"] = url
     os.environ["https_proxy"] = url
     os.environ["all_proxy"] = url
@@ -373,7 +406,7 @@ def _set_env():
 
 
 def _without_proxy_vars(env: dict[str, str]) -> dict[str, str]:
-    keys = {k.upper() for k in ENV_KEYS}
+    keys = {k.upper() for k in (*ENV_KEYS, RELAY_MARK)}
     return {k: v for k, v in env.items() if k.upper() not in keys}
 
 

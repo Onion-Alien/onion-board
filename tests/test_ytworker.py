@@ -212,6 +212,22 @@ def test_a_stalled_helper_download_says_it_stopped_moving(monkeypatch):
         ytdl._run_helper("https://www.youtube.com/watch?v=x", {}, None)
 
 
+def test_a_download_past_its_cap_stops_while_it_runs(monkeypatch):
+    """max_filesize only looks at the size a site names up front: one that names none
+    (an endless stream) went on until the disk was full."""
+    check = ytworker.stall_guard(cap=1000)
+    check(1000)
+    with pytest.raises(ytworker.TooBig):
+        check(1001)
+    assert ytdl._opts(video=True)["max_filesize"] == ytdl.VIDEO_MAX_BYTES
+
+    def run(*a, **kw):
+        raise ytworker.RemoteError("soundboard.online.ytworker.TooBig", "over 1 bytes")
+    monkeypatch.setattr(ytworker, "run", run)
+    with pytest.raises(ytdl.DownloadError, match="200 MB"):
+        ytdl._run_helper("https://example.com/stream", {"max_filesize": ytdl.MAX_BYTES}, None)
+
+
 class _SearchYdl:
     """yt-dlp's YouTube search: reads YouTube's settings, then asks the API. `fail`
     makes the API turn down settings marked old."""

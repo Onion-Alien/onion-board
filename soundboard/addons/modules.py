@@ -527,15 +527,36 @@ def uninstall(module_id: str, base: Path | None = None) -> None:
     fine. Raises ModuleError."""
     base = base if base is not None else library.APP_DIR / "modules"
     dest = base / module_id
-    if not dest.exists():
-        return
-    gone = base.parent / f"modules-old-{uuid.uuid4().hex[:8]}"
+    if dest.exists():
+        gone = base.parent / f"modules-old-{uuid.uuid4().hex[:8]}"
+        try:
+            os.rename(dest, gone)
+        except OSError as e:
+            raise ModuleError(_("it couldn't be removed ({error})",
+                                error=errors.plain(e))) from e
+        shutil.rmtree(gone, ignore_errors=True)
+        log.info("removed module %s from %s", module_id, dest)
+    _remove_old_copies(module_id, base)
+
+
+def _remove_old_copies(module_id: str, base: Path) -> None:
+    """An update's old copies of `module_id` left in `base`: found by discover() once
+    the add-on itself was gone, one quietly became the live add-on after Remove."""
     try:
-        os.rename(dest, gone)
-    except OSError as e:
-        raise ModuleError(_("it couldn't be removed ({error})", error=errors.plain(e))) from e
-    shutil.rmtree(gone, ignore_errors=True)
-    log.info("removed module %s from %s", module_id, dest)
+        subs = [d for d in base.iterdir() if d.is_dir()]
+    except OSError:
+        return
+    for d in subs:
+        m = _OLD_COPY.fullmatch(d.name)
+        if m is None or m["id"] != module_id or d.is_symlink():
+            continue
+        try:
+            info = _read(d)
+        except OSError:
+            continue
+        if info is not None and info.id == module_id:
+            shutil.rmtree(d, ignore_errors=True)
+            log.info("removed the old copy %s of module %s", d.name, module_id)
 
 
 def install_fetched(path: Path, module_id: str, kind: str, base: Path | None,

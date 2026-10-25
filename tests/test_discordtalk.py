@@ -379,3 +379,19 @@ def test_set_up_never_writes_into_a_running_discord(tmp_path):
     res = dt.set_up({}, tmp_path / "bk", on_mic=True, running={"discord"})
     assert res["running"] == ["discord"] and res["done"] == []
     assert (f / "000003.log").read_bytes() == before
+
+
+def test_a_write_keeps_only_the_log_it_changes(tmp_path):
+    """Each write kept a copy of Discord's whole Local Storage (its login among it),
+    for good: now only the log the write adds to, and not for long."""
+    import os
+    import time
+    f = make_db(SOUND)
+    (f / "000005.ldb").write_bytes(b"someone's login")
+    old = tmp_path / "bk" / "discord" / "20200101-000000"
+    old.mkdir(parents=True)
+    (old / "000005.ldb").write_bytes(b"someone's login")
+    os.utime(old, (time.time() - 30 * 86400,) * 2)
+    dt.restore({}, tmp_path / "bk", running=set())
+    [kept] = list((tmp_path / "bk" / "discord").iterdir())
+    assert [p.name for p in kept.iterdir()] == ["000003.log"]

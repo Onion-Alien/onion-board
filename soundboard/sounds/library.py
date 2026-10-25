@@ -49,7 +49,7 @@ from soundboard.sounds.config import (  # noqa: F401
     clean_wait, Config, CONFIG_VERSION, field_names, fits_type, LIST_ROWS, LOAD_TRIES,
     MAX_COOLDOWN_S, MAX_DELAY_S, MAX_FADE_S, migrate_from_soundboard, MIGRATION_ERRORS, MIGRATIONS,
     MODES, NET_MODES, NEWER_CHOICES, PAD_COLORS, PAD_SORTS, PAD_VIEWS, PAD_WIDTH_RANGE, PRESS_MODE,
-    PRIVACY_KEYS, ROUTES, SETTING_RANGES, SIDE_KEYS, sorted_sounds, SoundMeta, TOR_BRIDGES,
+    PRIVACY_KEYS, ROUTES, scrub_old_configs, SETTING_RANGES, SIDE_KEYS, sorted_sounds, SoundMeta, TOR_BRIDGES,
     TOUR_TABS, UI_SCALES, VOLUME_MAX, _with_raw)
 from soundboard.sounds.cachefiles import (  # noqa: F401
     CACHE_GRACE_S, cache_keep, cache_path, Cancelled, load_cached, _npy_header, prune_cache,

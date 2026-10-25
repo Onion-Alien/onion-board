@@ -26,9 +26,13 @@ TOR_HANDSHAKE_S = 60.0              # Tor opening a circuit to the site
 TEST_HOST = ("api.github.com", 443)   # the Test button's target: the update check's host
 PIPE_SEND_S = 300.0                # a relayed side that takes nothing for this long is cut
 HEAD_LIMIT = 64 * 1024              # a request head bigger than this isn't FFmpeg / Qt
+# connections whose request head hasn't come yet: more are closed at once (a local
+# program opening hundreds and sending a byte now and then held a thread each, forever)
+RELAY_WAITING_MAX = 64
 # the relay's address for FFmpeg (radio) and, with their own feature's login, for child
 # processes (pip, the live-voice helper)
 ENV_KEYS = ("http_proxy", "https_proxy", "all_proxy", "no_proxy")
+RELAY_MARK = "ONIONBOARD_RELAY_ENV"   # what _set_env put in ENV_KEYS (not the user's)
 LOOPBACK_NAMES = ("localhost", "localhost.")
 RELAY_HEADER = "X-Onion-Relay"   # on the relay's own refusals (see _Relay._refuse)
 DIRECT_LOGIN = "direct-"   # relay login "direct-<feature>": not through the proxy / Tor
@@ -253,7 +257,7 @@ def configure(new_mode: str, proxy_url: str = "") -> None:
         return
     _generation += 1
     _last_failure = (0.0, "")
-    log.info("connection: %s", describe())
+    log.info("connection: %s", describe(where=False))
     netrelay._relay_drop_all()
     netconnect._drop_live(lambda _feature: True)
     for nam in list(_nams.keys()):
@@ -411,16 +415,19 @@ def _tor_proxy() -> Proxy:
         raise _failed(errors.plain(e)) from None
 
 
-def describe() -> str:
-    """For the log and Settings: never includes a password."""
+def describe(where: bool = True) -> str:
+    """For Settings: never includes a password. `where` False leaves out the proxy's
+    address too (the log: SECURITY.md says it never names the proxy)."""
     if _mode == DIRECT:
         return _("direct")
     if _mode == TOR:
         return _("through Tor")
     if _proxy is None:
         return _("{mode}, but the address isn't usable ({error})", mode=_mode, error=_bad)
-    return _("{mode} via {kind} {address}", mode=_mode,
-             kind="SOCKS5" if _proxy.kind == "socks5" else "HTTP", address=_proxy.where)
+    kind = "SOCKS5" if _proxy.kind == "socks5" else "HTTP"
+    if not where:
+        return f"{_mode} via {kind}"
+    return _("{mode} via {kind} {address}", mode=_mode, kind=kind, address=_proxy.where)
 
 
 def on_change(fn: Callable[[], None]) -> None:

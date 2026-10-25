@@ -201,10 +201,18 @@ class BackupImport(_Ctl):
         mw.toast(ngettext("Importing {n} sound…", "Importing {n} sounds…", len(pkg.sounds)))
 
         def run():
+            new = ""
             if pkg.is_pack:   # kept, so it can be reset or removed in one go later
-                backup.keep_pack(pkg)
-            res = backup.install(
-                pkg, known, lambda i: PAD_COLORS[(start + i) % len(PAD_COLORS)], have)
+                before = set(backup.packs())
+                new = backup.keep_pack(pkg)
+                new = "" if new in before else new
+            try:
+                res = backup.install(
+                    pkg, known, lambda i: PAD_COLORS[(start + i) % len(PAD_COLORS)], have)
+            except BaseException:
+                if new:   # refused (too big, no room): not kept, nor listed as kept
+                    backup.forget_pack(new)
+                raise
             return res, pkg, ""
         worker.run(run, mw.bridge.unpacked, "import-pack",
                    error=lambda e: (None, pkg, errors.plain(e)), owner=mw)

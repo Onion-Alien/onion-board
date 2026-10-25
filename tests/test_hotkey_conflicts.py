@@ -91,6 +91,21 @@ def test_a_blocked_ptt_key_up_is_tried_again(window, monkeypatch):  # noqa: F811
     assert ups == ["v", "v"]
 
 
+def test_the_ptt_key_is_let_go_when_the_ticks_stop(monkeypatch):
+    """Windows never lets go of a key a program pressed when it freezes or crashes:
+    a frozen UI thread left the game's push-to-talk (the mic) open."""
+    keys = []
+    monkeypatch.setattr(winkeys, "press", lambda k: keys.append(("press", k)) or True)
+    monkeypatch.setattr(winkeys, "release", lambda k: keys.append(("release", k)) or True)
+    monkeypatch.setattr(winkeys, "_ptt_watch", [object()])   # no real watch thread
+    assert winkeys.ptt_down("v")
+    beat = winkeys._ptt["beat"]
+    winkeys._let_go_stale(beat + winkeys.HOLD_STALE_S / 2)   # still ticking
+    assert winkeys.ptt_held() == "v"
+    winkeys._let_go_stale(beat + winkeys.HOLD_STALE_S + 1)   # stuck
+    assert winkeys.ptt_held() is None and keys == [("press", "v"), ("release", "v")]
+
+
 def test_a_sound_brought_back_gives_up_a_key_an_action_took_meanwhile(window, qapp):  # noqa: F811
     """F9 went to Stop all while the pad was on the Undo bar / in Recently deleted:
     the pad comes back without it, rather than showing a key that never plays it."""

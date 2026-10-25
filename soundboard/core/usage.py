@@ -150,6 +150,14 @@ def enabled() -> bool:
             and not os.environ.get("ONIONBOARD_NO_STATS"))
 
 
+def _off(cfg) -> bool:
+    """The count's switch is off (or Offline mode is on). Also true the moment the switch
+    is saved off, before net is told (the opt-out request runs first): a timer or the quit
+    could send with the install ID meanwhile."""
+    off = cfg.net_off if isinstance(cfg.net_off, list) else []
+    return not net.allowed(FEATURE) or FEATURE in off
+
+
 def install_id(cfg) -> str:
     """This PC's random ID (made once, kept in config.json)."""
     if not cfg.stats_id:
@@ -279,7 +287,7 @@ def used(key: str) -> None:
     """Feature `key` (one of FEATURES) was used, for the next daily count (and for
     Settings > Achievements' counting)."""
     achievements.event(key)
-    if key in FEATURES:
+    if key in FEATURES and net.allowed(FEATURE):   # off: nothing piles up for later
         _used.add(key)
 
 
@@ -312,7 +320,14 @@ def ffmpeg_state(cfg, state: str) -> None:
 
 def remember(cfg) -> None:
     """Keep this run's used() features in cfg (so they survive a quit before the
-    next daily count)."""
+    next daily count). With the count off, nothing is kept: what waited is dropped, so
+    switching it back on never sends what happened while it was off."""
+    if _off(cfg):
+        _used.clear()
+        del _pending[:]
+        cfg.stats_used, cfg.stats_pending, cfg.stats_tabs = [], [], []
+        cfg.stats_problems_seen = max(cfg.stats_problems_seen or 0, time.time())
+        return
     have = cfg.stats_used if isinstance(cfg.stats_used, list) else []
     new = [k for k in FEATURES if k in _used and k not in have]
     _used.clear()
@@ -457,7 +472,7 @@ def about(cfg, now: float) -> list[str]:
 def tab_opened(cfg, key: str) -> None:
     """Remember that tab `key` was opened, for the next daily count."""
     tabs = cfg.stats_tabs if isinstance(cfg.stats_tabs, list) else []
-    if key in TABS and key not in tabs:
+    if key in TABS and key not in tabs and not _off(cfg):
         cfg.stats_tabs = [*tabs, key]
 
 
@@ -467,7 +482,7 @@ MAX_PENDING = 20           # one-off events kept in cfg.stats_pending while unse
 
 def note(event: str) -> None:
     """Send `event` with the next count (any thread: remember() moves it into cfg)."""
-    if event:
+    if event and net.allowed(FEATURE):   # off: nothing piles up for later
         _pending.append(event)
 
 
@@ -576,7 +591,7 @@ def maybe_send(cfg, on_sent=None, event: str = "", app_dir: Path | None = None) 
     runs apply() on the thread that owns cfg (the main window queues it to the UI
     thread), and apply clears exactly what was sent, keeping anything added meanwhile.
     Without on_sent, apply runs right there (a caller with no UI thread)."""
-    if not enabled() or not net.allowed(FEATURE):
+    if not enabled() or _off(cfg):
         return
     if not event and _memory_full():   # a later check sends it; an event goes anyway
         return
@@ -662,7 +677,7 @@ def at_quit(cfg, app_dir: Path | None = None):
     QUIT_WAIT_S and returns True when the counter took them, after clearing exactly
     those from cfg (save it after). If it didn't (offline, too slow), they stay for
     the next count."""
-    if not enabled() or not net.allowed(FEATURE):
+    if not enabled() or _off(cfg):
         return None
     now = time.time()
     settle(cfg, now)
