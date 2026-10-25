@@ -143,7 +143,6 @@
   "Hotkey removed from “{name}”": "Hotkey dihapus dari “{name}”",
   "Hotkey: {hotkey}": "Hotkey: {hotkey}",
   "Hotkeys are on again.": "Hotkey nyala lagi.",
-  "How loud your sounds are, type up to 1000% in the box": "Seberapa keras suara Anda, ketik sampai 1000% di kotaknya",
   "How loud your voice is for others. The dot shows activity when you talk": "Seberapa keras suara Anda untuk orang lain. Titiknya menyala saat Anda bicara",
   "I've installed it: check again": "Sudah saya pasang: cek lagi",
   "Import a backup or sound pack": "Impor cadangan atau paket suara",
@@ -4369,5 +4368,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Kirim link ke teman untuk mengunduh Onion Board. Taruh nama atau gamertag-mu di situ, dan aplikasinya akan menyapa mereka darimu saat pertama kali dibuka. Tidak ada yang dilacak atau dihitung.",
   "Your name or gamertag (optional)": "Nama atau gamertag-mu (opsional)",
   "{name} invited you to Onion Board. Have fun!": "{name} mengundangmu ke Onion Board. Selamat bersenang-senang!",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows tidak dapat memastikan apakah jaringan ini Publik, jadi ponsel ditolak demi keamanan. Atur ke Pribadi di Pengaturan Windows → Jaringan & internet, lalu matikan dan nyalakan lagi ini"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows tidak dapat memastikan apakah jaringan ini Publik, jadi ponsel ditolak demi keamanan. Atur ke Pribadi di Pengaturan Windows → Jaringan & internet, lalu matikan dan nyalakan lagi ini",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Seberapa keras orang lain mendengar suara Anda (dan stream Anda). Headphone Anda punya volume sendiri: Headphone saya, di bagian bawah. Ketik sampai 1000% di kotaknya.",
+  "Sounds for others": "Suara untuk orang lain"
 }

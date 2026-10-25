@@ -147,7 +147,6 @@
   "Hotkey removed from “{name}”": "“{name}” sesinin kısayol tuşu kaldırıldı",
   "Hotkey: {hotkey}": "Kısayol tuşu: {hotkey}",
   "Hotkeys are on again.": "Kısayol tuşları tekrar açık.",
-  "How loud your sounds are, type up to 1000% in the box": "Seslerinizin ne kadar yüksek olduğu, kutuya %1000'e kadar yazabilirsiniz",
   "How loud your voice is for others. The dot shows activity when you talk": "Diğerleri için sesinizin ne kadar yüksek olduğu. Konuştuğunuzda nokta etkinliği gösterir",
   "I've installed it: check again": "Kurdum: tekrar kontrol et",
   "Import a backup or sound pack": "Yedek ya da ses paketi içe aktar",
@@ -4447,5 +4446,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Bir arkadaşınıza Onion Board'u indirmesi için bir bağlantı gönderin. Üstüne adınızı ya da oyuncu adınızı ekleyin, uygulamayı ilk açtığında sizin adınıza merhaba desin. Hiçbir şey takip edilmez ya da sayılmaz.",
   "Your name or gamertag (optional)": "Adınız ya da oyuncu adınız (isteğe bağlı)",
   "{name} invited you to Onion Board. Have fun!": "{name} sizi Onion Board'a davet etti. İyi eğlenceler!",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows bu ağın ortak olup olmadığını söyleyemedi, bu yüzden telefonlar güvenlik için geri çevriliyor. Windows Ayarları → Ağ ve internet bölümünden özel olarak ayarlayın, ardından bunu kapatıp yeniden açın"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows bu ağın ortak olup olmadığını söyleyemedi, bu yüzden telefonlar güvenlik için geri çevriliyor. Windows Ayarları → Ağ ve internet bölümünden özel olarak ayarlayın, ardından bunu kapatıp yeniden açın",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Diğerlerinin seslerinizi ne kadar yüksek duyduğu (ve yayınınızın). Kulaklıklarınızın kendi ses düzeyi var: Kulaklıklarım, en altta. Kutuya %1000'e kadar yazabilirsiniz.",
+  "Sounds for others": "Diğerleri için sesler"
 }

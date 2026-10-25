@@ -143,7 +143,6 @@
   "Hotkey removed from “{name}”": "ลบปุ่มลัดออกจาก “{name}” แล้ว",
   "Hotkey: {hotkey}": "ปุ่มลัด: {hotkey}",
   "Hotkeys are on again.": "เปิดปุ่มลัดอีกครั้งแล้ว",
-  "How loud your sounds are, type up to 1000% in the box": "ความดังของเสียงคุณ, พิมพ์ได้ถึง 1000% ในช่อง",
   "How loud your voice is for others. The dot shows activity when you talk": "ความดังของเสียงพูดคุณที่คนอื่นได้ยิน จุดจะแสดงกิจกรรมตอนคุณพูด",
   "I've installed it: check again": "ติดตั้งแล้ว: ตรวจอีกครั้ง",
   "Import a backup or sound pack": "นำเข้าข้อมูลสำรองหรือแพ็กเสียง",
@@ -4369,5 +4368,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "ส่งลิงก์ดาวน์โหลด Onion Board ให้เพื่อน ใส่ชื่อหรือเกมเมอร์แท็กของคุณไว้ แล้วแอปจะทักทายเพื่อนแทนคุณตอนเปิดครั้งแรก ไม่มีการติดตามหรือนับอะไรเลย",
   "Your name or gamertag (optional)": "ชื่อหรือเกมเมอร์แท็กของคุณ (ไม่บังคับ)",
   "{name} invited you to Onion Board. Have fun!": "{name} ชวนคุณมาใช้ Onion Board ขอให้สนุก!",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows บอกไม่ได้ว่าเครือข่ายนี้เป็นสาธารณะหรือไม่ จึงปฏิเสธโทรศัพท์ไว้ก่อนเพื่อความปลอดภัย ตั้งค่าเป็นส่วนตัวในการตั้งค่า Windows → เครือข่ายและอินเทอร์เน็ต แล้วปิดและเปิดตัวเลือกนี้อีกครั้ง"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows บอกไม่ได้ว่าเครือข่ายนี้เป็นสาธารณะหรือไม่ จึงปฏิเสธโทรศัพท์ไว้ก่อนเพื่อความปลอดภัย ตั้งค่าเป็นส่วนตัวในการตั้งค่า Windows → เครือข่ายและอินเทอร์เน็ต แล้วปิดและเปิดตัวเลือกนี้อีกครั้ง",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "คนอื่นได้ยินเสียงของคุณดังแค่ไหน (และในสตรีมของคุณ) หูฟังของคุณมีระดับเสียงของตัวเอง: หูฟังของฉัน ที่ด้านล่าง พิมพ์ได้ถึง 1000% ในช่อง",
+  "Sounds for others": "เสียงสำหรับคนอื่น"
 }

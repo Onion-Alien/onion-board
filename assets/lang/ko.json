@@ -143,7 +143,6 @@
   "Hotkey removed from “{name}”": "“{name}”의 단축키를 지웠습니다",
   "Hotkey: {hotkey}": "단축키: {hotkey}",
   "Hotkeys are on again.": "단축키가 다시 켜졌습니다.",
-  "How loud your sounds are, type up to 1000% in the box": "사운드 볼륨, 상자에 최대 1000%까지 입력할 수 있습니다",
   "How loud your voice is for others. The dot shows activity when you talk": "다른 사람에게 들리는 내 목소리 크기. 말하면 점이 활동을 표시합니다",
   "I've installed it: check again": "설치했습니다: 다시 확인",
   "Import a backup or sound pack": "백업이나 사운드 팩 가져오기",
@@ -4369,5 +4368,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "친구에게 Onion Board 다운로드 링크를 보내세요. 이름이나 게이머태그를 붙이면 친구가 앱을 처음 열 때 당신 대신 인사해 줍니다. 아무것도 추적하거나 세지 않아요.",
   "Your name or gamertag (optional)": "이름 또는 게이머태그 (선택)",
   "{name} invited you to Onion Board. Have fun!": "{name} 님이 Onion Board에 초대했어요. 즐겁게 쓰세요!",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows에서 이 네트워크가 공용인지 확인할 수 없어 안전을 위해 휴대폰 연결을 거부합니다. Windows 설정 → 네트워크 및 인터넷에서 개인으로 설정한 다음 이 기능을 껐다가 다시 켜세요"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows에서 이 네트워크가 공용인지 확인할 수 없어 안전을 위해 휴대폰 연결을 거부합니다. Windows 설정 → 네트워크 및 인터넷에서 개인으로 설정한 다음 이 기능을 껐다가 다시 켜세요",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "다른 사람(과 방송)에게 사운드가 얼마나 크게 들리는지입니다. 내 헤드폰은 따로 볼륨이 있습니다: 맨 아래의 내 헤드폰. 상자에 최대 1000%까지 입력할 수 있습니다.",
+  "Sounds for others": "다른 사람에게 가는 사운드"
 }

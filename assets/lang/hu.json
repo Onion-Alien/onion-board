@@ -452,7 +452,6 @@
   "Hotkeys": "Gyorsbillentyűk",
   "Hotkeys are on again.": "A gyorsbillentyűk újra be vannak kapcsolva.",
   "How loud the stream output is (only OBS hears it)": "Milyen hangos a stream-kimenet (csak az OBS hallja)",
-  "How loud your sounds are, type up to 1000% in the box": "Milyen hangosak a hangjaid, a mezőbe akár 1000%-ot is írhatsz",
   "How loud your voice is for others. The dot shows activity when you talk": "Milyen hangos a beszédhangod másoknak. A pötty aktivitást mutat, amikor beszélsz",
   "How much data went to each site, added up over the whole history": "Mennyi adat ment az egyes oldalakra, a teljes előzményre összeadva",
   "I'm bored…": "Unatkozom…",
@@ -4447,5 +4446,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Küldj egy barátodnak linket az Onion Board letöltéséhez. Írd rá a neved vagy a játékosneved, és az app üdvözli tőled, amikor először megnyitja. Semmit nem követünk és nem számolunk.",
   "Your name or gamertag (optional)": "A neved vagy játékosneved (nem kötelező)",
   "{name} invited you to Onion Board. Have fun!": "{name} meghívott az Onion Boardba. Jó szórakozást!",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "A Windows nem tudta megállapítani, hogy ez a hálózat nyilvános-e, ezért a telefonokat biztonsági okból elutasítja. Állítsa magánhálózatra a Windows Gépház → Hálózat és internet részében, majd kapcsolja ki és be újra ezt"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "A Windows nem tudta megállapítani, hogy ez a hálózat nyilvános-e, ezért a telefonokat biztonsági okból elutasítja. Állítsa magánhálózatra a Windows Gépház → Hálózat és internet részében, majd kapcsolja ki és be újra ezt",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Milyen hangosan hallják mások a hangjaidat (és a streamedet). A fejhallgatódnak saját hangereje van: Fejhallgatóm, lent. A mezőbe akár 1000%-ot is írhatsz.",
+  "Sounds for others": "Hangok másoknak"
 }

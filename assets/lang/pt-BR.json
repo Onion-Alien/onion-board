@@ -147,7 +147,6 @@
   "Hotkey removed from “{name}”": "Atalho removido de “{name}”",
   "Hotkey: {hotkey}": "Atalho: {hotkey}",
   "Hotkeys are on again.": "Os atalhos estão ligados de novo.",
-  "How loud your sounds are, type up to 1000% in the box": "O volume dos seus sons, digite até 1000% na caixa",
   "How loud your voice is for others. The dot shows activity when you talk": "O volume da sua voz para os outros. O ponto mostra atividade quando você fala",
   "I've installed it: check again": "Já instalei: verificar de novo",
   "Import a backup or sound pack": "Importar um backup ou pacote de sons",
@@ -4447,5 +4446,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Mande para um amigo um link para baixar o Onion Board. Coloque seu nome ou gamertag nele e o app dá um oi por você na primeira vez que ele abrir. Nada é rastreado nem contado.",
   "Your name or gamertag (optional)": "Seu nome ou gamertag (opcional)",
   "{name} invited you to Onion Board. Have fun!": "{name} te convidou para o Onion Board. Divirta-se!",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "O Windows não conseguiu dizer se esta rede é pública, então os celulares são recusados por segurança. Defina-a como privada em Configurações do Windows → Rede e Internet e depois desative e ative isto de novo"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "O Windows não conseguiu dizer se esta rede é pública, então os celulares são recusados por segurança. Defina-a como privada em Configurações do Windows → Rede e Internet e depois desative e ative isto de novo",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "O volume com que os outros ouvem seus sons (e sua live). Seus fones têm volume próprio: Meus fones de ouvido, lá embaixo. Digite até 1000% na caixa.",
+  "Sounds for others": "Sons para os outros"
 }

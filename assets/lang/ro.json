@@ -458,7 +458,6 @@
   "Hotkeys": "Taste rapide",
   "Hotkeys are on again.": "Tastele rapide sunt din nou pornite.",
   "How loud the stream output is (only OBS hears it)": "Cât de tare e ieșirea pentru stream (doar OBS o aude)",
-  "How loud your sounds are, type up to 1000% in the box": "Cât de tare sunt sunetele tale, scrie până la 1000% în căsuță",
   "How loud your voice is for others. The dot shows activity when you talk": "Cât de tare e vocea ta pentru ceilalți. Punctul arată activitate când vorbești",
   "How much data went to each site, added up over the whole history": "Câte date au mers la fiecare site, adunate pe tot istoricul",
   "I'm bored…": "Mă plictisesc…",
@@ -4525,5 +4524,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Trimite-i unui prieten un link ca să descarce Onion Board. Pune-ți numele sau gamertagul pe el și aplicația îl salută din partea ta prima dată când o deschide. Nimic nu e urmărit sau numărat.",
   "Your name or gamertag (optional)": "Numele sau gamertagul tău (opțional)",
   "{name} invited you to Onion Board. Have fun!": "{name} te-a invitat în Onion Board. Distracție plăcută!",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows nu a putut spune dacă această rețea este publică, așa că telefoanele sunt refuzate din precauție. Setați-o ca privată în Setări Windows → Rețea și internet, apoi dezactivați și reactivați această opțiune"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows nu a putut spune dacă această rețea este publică, așa că telefoanele sunt refuzate din precauție. Setați-o ca privată în Setări Windows → Rețea și internet, apoi dezactivați și reactivați această opțiune",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Cât de tare aud ceilalți sunetele tale (și streamul tău). Căștile tale au volumul lor: Căștile mele, jos de tot. Scrie până la 1000% în căsuță.",
+  "Sounds for others": "Sunete pentru ceilalți"
 }

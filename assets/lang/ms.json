@@ -446,7 +446,6 @@
   "Hotkeys": "Hotkey",
   "Hotkeys are on again.": "Hotkey hidup semula.",
   "How loud the stream output is (only OBS hears it)": "Sekuat mana output strim (hanya OBS yang dengar)",
-  "How loud your sounds are, type up to 1000% in the box": "Sekuat mana bunyi anda, taip sehingga 1000% dalam kotak",
   "How loud your voice is for others. The dot shows activity when you talk": "Sekuat mana suara anda untuk orang lain. Titik menunjukkan aktiviti apabila anda bercakap",
   "How much data went to each site, added up over the whole history": "Berapa banyak data pergi ke setiap laman, dijumlahkan sepanjang sejarah",
   "I'm bored…": "bosannya…",
@@ -4369,5 +4368,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Hantar pautan kepada kawan untuk muat turun Onion Board. Letak nama atau gamertag anda padanya, dan apl akan menyapa mereka bagi pihak anda kali pertama mereka membukanya. Tiada apa yang dijejak atau dikira.",
   "Your name or gamertag (optional)": "Nama atau gamertag anda (pilihan)",
   "{name} invited you to Onion Board. Have fun!": "{name} menjemput anda ke Onion Board. Selamat berseronok!",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows tidak dapat memastikan sama ada rangkaian ini Awam, jadi telefon ditolak untuk keselamatan. Tetapkannya kepada Peribadi dalam Tetapan Windows → Rangkaian & internet, kemudian matikan dan hidupkan semula ini"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows tidak dapat memastikan sama ada rangkaian ini Awam, jadi telefon ditolak untuk keselamatan. Tetapkannya kepada Peribadi dalam Tetapan Windows → Rangkaian & internet, kemudian matikan dan hidupkan semula ini",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Sekuat mana orang lain mendengar bunyi anda (dan strim anda). Fon kepala anda ada kelantangan sendiri: Fon kepala saya, di bawah. Taip sehingga 1000% dalam kotak.",
+  "Sounds for others": "Bunyi untuk orang lain"
 }

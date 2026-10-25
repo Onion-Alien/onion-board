@@ -143,7 +143,6 @@
   "Hotkey removed from “{name}”": "已移除“{name}”的快捷键",
   "Hotkey: {hotkey}": "快捷键：{hotkey}",
   "Hotkeys are on again.": "快捷键已重新开启。",
-  "How loud your sounds are, type up to 1000% in the box": "音效有多响，在框里最高可输入 1000%",
   "How loud your voice is for others. The dot shows activity when you talk": "别人听到你的声音有多响。说话时圆点会显示活动",
   "I've installed it: check again": "我已安装：再检查一次",
   "Import a backup or sound pack": "导入备份或音效包",
@@ -4369,5 +4368,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "给好友发一个下载 Onion Board 的链接。附上你的名字或游戏 ID,好友第一次打开应用时会看到你的问候。不追踪,也不计数。",
   "Your name or gamertag (optional)": "你的名字或游戏 ID(可选)",
   "{name} invited you to Onion Board. Have fun!": "{name} 邀请你来用 Onion Board。玩得开心!",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows 无法判断此网络是否为公用网络，因此为安全起见拒绝手机连接。请在 Windows 设置 → 网络和 Internet 中将其设为专用，然后关闭并重新打开此选项"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows 无法判断此网络是否为公用网络，因此为安全起见拒绝手机连接。请在 Windows 设置 → 网络和 Internet 中将其设为专用，然后关闭并重新打开此选项",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "别人听到你的音效有多响（还有你的直播）。你自己的耳机有单独的音量：在最下面的“我的耳机”。在框里最高可输入 1000%。",
+  "Sounds for others": "给别人的音效"
 }

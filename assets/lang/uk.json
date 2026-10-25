@@ -151,7 +151,6 @@
   "Hotkey removed from “{name}”": "Гарячу клавішу знято з «{name}»",
   "Hotkey: {hotkey}": "Гаряча клавіша: {hotkey}",
   "Hotkeys are on again.": "Гарячі клавіші знову ввімкнено.",
-  "How loud your sounds are, type up to 1000% in the box": "Гучність ваших звуків: у полі можна ввести до 1000%",
   "How loud your voice is for others. The dot shows activity when you talk": "Наскільки гучно інші чують ваш голос. Крапка показує активність, коли ви говорите",
   "I've installed it: check again": "Я встановив: перевірити ще раз",
   "Import a backup or sound pack": "Імпортувати резервну копію або звуковий пак",
@@ -4525,5 +4524,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Надішліть другові посилання, щоб завантажити Onion Board. Додайте своє ім'я чи нік, і застосунок привітає його від вас, коли він уперше його відкриє. Нічого не відстежується і не рахується.",
   "Your name or gamertag (optional)": "Ваше ім'я чи нік (необов'язково)",
   "{name} invited you to Onion Board. Have fun!": "{name} запрошує вас в Onion Board. Розважайтеся!",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows не змогла визначити, чи ця мережа загальнодоступна, тому телефони про всяк випадок не допускаються. Зробіть її приватною в Параметрах Windows → Мережа й Інтернет, а потім вимкніть і знову ввімкніть цю функцію"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows не змогла визначити, чи ця мережа загальнодоступна, тому телефони про всяк випадок не допускаються. Зробіть її приватною в Параметрах Windows → Мережа й Інтернет, а потім вимкніть і знову ввімкніть цю функцію",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Як гучно інші чують ваші звуки (і ваш стрим). Ваші навушники мають власну гучність: Мої навушники, унизу. У полі можна ввести до 1000%.",
+  "Sounds for others": "Звуки для інших"
 }

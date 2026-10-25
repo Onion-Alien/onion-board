@@ -458,7 +458,6 @@
   "Hotkeys": "Zkratky",
   "Hotkeys are on again.": "Zkratky jsou zase zapnuté.",
   "How loud the stream output is (only OBS hears it)": "Jak hlasitý je výstup pro stream (slyší ho jen OBS)",
-  "How loud your sounds are, type up to 1000% in the box": "Jak hlasité jsou tvoje zvuky, do políčka můžeš napsat až 1000%",
   "How loud your voice is for others. The dot shows activity when you talk": "Jak hlasitý je tvůj hlas pro ostatní. Tečka ukazuje aktivitu, když mluvíš",
   "How much data went to each site, added up over the whole history": "Kolik dat šlo na každý web, sečteno za celou historii",
   "I'm bored…": "Nudím se…",
@@ -4525,5 +4524,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Pošli kamarádovi odkaz ke stažení Onion Board. Přidej k němu své jméno nebo herní přezdívku a aplikace ho od tebe pozdraví, až ji poprvé otevře. Nic se nesleduje ani nepočítá.",
   "Your name or gamertag (optional)": "Tvoje jméno nebo herní přezdívka (nepovinné)",
   "{name} invited you to Onion Board. Have fun!": "{name} tě pozval(a) do Onion Board. Bav se!",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows nedokázal zjistit, zda je tato síť veřejná, proto jsou telefony pro jistotu odmítnuty. Nastavte ji jako soukromou v Nastavení Windows → Síť a internet a pak tuto možnost vypněte a znovu zapněte"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows nedokázal zjistit, zda je tato síť veřejná, proto jsou telefony pro jistotu odmítnuty. Nastavte ji jako soukromou v Nastavení Windows → Síť a internet a pak tuto možnost vypněte a znovu zapněte",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Jak hlasitě ostatní slyší tvoje zvuky (a tvůj stream). Tvoje sluchátka mají vlastní hlasitost: Moje sluchátka, úplně dole. Do políčka můžeš napsat až 1000%.",
+  "Sounds for others": "Zvuky pro ostatní"
 }

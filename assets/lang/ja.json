@@ -143,7 +143,6 @@
   "Hotkey removed from “{name}”": "「{name}」のホットキーを解除しました",
   "Hotkey: {hotkey}": "ホットキー: {hotkey}",
   "Hotkeys are on again.": "ホットキーがオンに戻りました。",
-  "How loud your sounds are, type up to 1000% in the box": "サウンドの音量、欄には最大 1000% まで入力できます",
   "How loud your voice is for others. The dot shows activity when you talk": "相手に聞こえるあなたの声の音量。話すとドットが反応します",
   "I've installed it: check again": "インストールした：もう一度確認",
   "Import a backup or sound pack": "バックアップやサウンドパックをインポート",
@@ -4369,5 +4368,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "友だちに Onion Board のダウンロードリンクを送ろう。名前やゲーマータグを付けておくと、初めてアプリを開いたときにあなたからのあいさつが出ます。追跡もカウントもしません。",
   "Your name or gamertag (optional)": "名前またはゲーマータグ(任意)",
   "{name} invited you to Onion Board. Have fun!": "{name} さんが Onion Board に招待してくれました。楽しんでね!",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "このネットワークがパブリックかどうかを Windows が判断できなかったため、安全のためスマートフォンからの接続を拒否しています。Windows の設定 → ネットワークとインターネットでプライベートに設定してから、これをオフにしてもう一度オンにしてください"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "このネットワークがパブリックかどうかを Windows が判断できなかったため、安全のためスマートフォンからの接続を拒否しています。Windows の設定 → ネットワークとインターネットでプライベートに設定してから、これをオフにしてもう一度オンにしてください",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "相手（と配信）にサウンドがどのくらいの音量で聞こえるか。自分のヘッドホンの音量は別です：一番下の「自分のヘッドホン」。欄には最大 1000% まで入力できます。",
+  "Sounds for others": "相手へのサウンド"
 }

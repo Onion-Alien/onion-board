@@ -475,11 +475,16 @@ class SoundsPageBuild:
         th.addWidget(mw.speed_btn)
         sep = vsep()
         th.addWidget(sep)
-        vol_icon = QLabel(_("Sounds"))
+        # what it changes said where it shows: people took it for their headphones' volume
+        # (that's "My headphones" in the levels strip; the send path uses sound_vol only)
+        vol_tip = _("How loud others hear your sounds (and your stream). Your own "
+                    "headphones have their own volume: My headphones, at the bottom. "
+                    "Type up to 1000% in the box.")
+        vol_icon = QLabel(_("Sounds for others"))
         vol_icon.setObjectName("decktitle")
+        vol_icon.setToolTip(vol_tip)
         th.addWidget(vol_icon)
-        mw.vol_sound = VolumeControl(c.sound_vol, tip=_("How loud your sounds are, type up to "
-                                                          "1000% in the box"))
+        mw.vol_sound = VolumeControl(c.sound_vol, tip=vol_tip)
         mw.vol_sound.changed.connect(lambda v: mw.set_option("sound_vol", v))
         mw.vol_sound.changed.connect(lambda v: mw.playctl.sound_volume_changed(v))
         th.addWidget(mw.vol_sound)

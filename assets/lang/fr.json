@@ -147,7 +147,6 @@
   "Hotkey removed from “{name}”": "Raccourci retiré de « {name} »",
   "Hotkey: {hotkey}": "Raccourci : {hotkey}",
   "Hotkeys are on again.": "Les raccourcis sont réactivés.",
-  "How loud your sounds are, type up to 1000% in the box": "Le volume de tes sons, tape jusqu'à 1000% dans la case",
   "How loud your voice is for others. The dot shows activity when you talk": "Le volume de ta voix pour les autres. Le point montre l'activité quand tu parles",
   "I've installed it: check again": "Je l'ai installé : revérifier",
   "Import a backup or sound pack": "Importer une sauvegarde ou un pack de sons",
@@ -4447,5 +4446,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Envoie à un ami un lien pour télécharger Onion Board. Mets-y ton nom ou ton pseudo et l'appli lui dira bonjour de ta part la première fois qu'il l'ouvre. Rien n'est suivi ni compté.",
   "Your name or gamertag (optional)": "Ton nom ou ton pseudo (facultatif)",
   "{name} invited you to Onion Board. Have fun!": "{name} t'a invité sur Onion Board. Amuse-toi bien !",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows n'a pas pu dire si ce réseau est public, alors les téléphones sont refusés par prudence. Réglez-le sur Privé dans Paramètres Windows → Réseau et Internet, puis désactivez et réactivez cette option"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows n'a pas pu dire si ce réseau est public, alors les téléphones sont refusés par prudence. Réglez-le sur Privé dans Paramètres Windows → Réseau et Internet, puis désactivez et réactivez cette option",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Le volume auquel les autres entendent tes sons (et ton stream). Ton casque a son propre volume : Mon casque, tout en bas. Tape jusqu'à 1000% dans la case.",
+  "Sounds for others": "Sons pour les autres"
 }

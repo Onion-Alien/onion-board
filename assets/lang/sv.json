@@ -452,7 +452,6 @@
   "Hotkeys": "Snabbtangenter",
   "Hotkeys are on again.": "Snabbtangenterna är på igen.",
   "How loud the stream output is (only OBS hears it)": "Hur högt streamutgången låter (bara OBS hör den)",
-  "How loud your sounds are, type up to 1000% in the box": "Hur högt dina ljud låter, skriv upp till 1000% i rutan",
   "How loud your voice is for others. The dot shows activity when you talk": "Hur hög din röst är för andra. Pricken visar aktivitet när du pratar",
   "How much data went to each site, added up over the whole history": "Hur mycket data som gick till varje webbplats, sammanlagt över hela historiken",
   "I'm bored…": "Jag har tråkigt…",
@@ -4447,5 +4446,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Skicka en länk till en vän så hen kan ladda ner Onion Board. Sätt ditt namn eller gamertag på den, så hälsar appen från dig första gången hen öppnar den. Inget spåras eller räknas.",
   "Your name or gamertag (optional)": "Ditt namn eller gamertag (valfritt)",
   "{name} invited you to Onion Board. Have fun!": "{name} har bjudit in dig till Onion Board. Ha kul!",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows kunde inte säga om det här nätverket är offentligt, så telefoner avvisas för säkerhets skull. Ställ in det som Privat i Windows-inställningar → Nätverk och internet och stäng sedan av och slå på det här igen"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows kunde inte säga om det här nätverket är offentligt, så telefoner avvisas för säkerhets skull. Ställ in det som Privat i Windows-inställningar → Nätverk och internet och stäng sedan av och slå på det här igen",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Hur högt andra hör dina ljud (och din stream). Dina egna hörlurar har egen volym: Mina hörlurar, längst ner. Skriv upp till 1000% i rutan.",
+  "Sounds for others": "Ljud till andra"
 }
