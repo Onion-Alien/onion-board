@@ -17,8 +17,8 @@ def test_built_cards_in_board(window, qapp, tmp_path, monkeypatch):  # noqa: F81
     info = modules.install_zip(Path(os.environ["ONIONBOARD_CARD_TEST_ZIP"]),
                                "onion-watch", "triggers", tmp_path / "modules")
     modules.load_package(info)
-    from onionwatch import screenwatch
-    from onionwatch.ui.viewer import PictureViewer
+    from onionwatch.engine import screenwatch
+    from onionwatch.ui.triggers.viewer import PictureViewer
     monkeypatch.setattr(screenwatch, "monitors", lambda: [])
     tab = TriggersTab(BoardHost(window), [tmp_path / "modules"])
     assert tab.panel is not None, tab.error.text()

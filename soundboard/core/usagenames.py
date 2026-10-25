@@ -10,7 +10,7 @@ from soundboard.core.usagetags import DL_SITES
 
 # the tabs whose use is counted (tabcontrol.TAB_KEYS); anything else is never sent
 TABS = ("sounds", "radio", "apps", "triggers", "voice", "setup", "store")
-# the Onion Watch add-on's feature names (onionwatch/usage.py USED + SET_UP)
+# the Onion Watch add-on's feature names (onionwatch/core/usage.py USED + SET_UP)
 TRIGGERS_FEATURES = (
     "watching", "went-off", "test", "cut-from-window", "picture-file", "paste-picture",
     "area-trigger", "duplicate", "pick-windows", "pack-export", "pack-import",
@@ -137,7 +137,7 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "search-show-more", "search-trending", "pad-effects", "pad-picture-file",
             "pad-picture-link",
             # the Triggers tab (the Onion Watch add-on) says which of its features were
-            # used or are set up (triggershost.BoardHost.count): onionwatch/usage.py's
+            # used or are set up (triggershost.BoardHost.count): onionwatch/core/usage.py's
             # FEATURES, keep in step
             *(f"triggers-{k}" for k in TRIGGERS_FEATURES),
             # the Easter eggs, to see if anyone finds them: Pong with Bun opened, left
