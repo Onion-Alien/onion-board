@@ -367,6 +367,9 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/voice/voicecards.py` | the Voice tab's cards and tabs: each card's head and badge, switching tabs, the status bar's chips and the cards' on / off states |
 | `soundboard/ui/voice/voiceaddons.py` | the Voice tab's add-ons list and finding add-ons again (in the background, going on or offline) |
 | `soundboard/ui/voice/voicefxpanel.py` | the Voice tab's voice changer card (`VoiceFxPanel`): picking, saving and sharing voices, Edit voice's effect cards |
+| `soundboard/ui/voice/voicefxtiles.py` | part of `VoiceFxPanel`: the voice tiles: rolling a random voice, hearing one, the tiles and where they go (grid or list, groups, favourites, search) |
+| `soundboard/ui/voice/voicefxsaved.py` | part of `VoiceFxPanel`: your saved voices: naming, saving, renaming, deleting (with undo), a tile's menu, and voice codes |
+| `soundboard/ui/voice/voicefxcards.py` | part of `VoiceFxPanel`: the effect cards: what's on top of the voice, the delay it adds, new effect types, folding and laying out the cards |
 | `soundboard/ui/voice/voicetiles.py` | the voice changer's voice cards (`VoiceTile`), the groups they're shown in, their sizes, and `BigSwitch` |
 | `soundboard/ui/voice/effectrow.py` | one effect's card in the voice changer (`EffectRow`) and which Edit voice tab it's on; `on_top`: an effect that isn't part of the voice |
 | `soundboard/ui/voice/fxcontrols.py` | the voice changer's small controls: `Switch` and `ParamSlider` (an effect setting's slider with its name and value) |
