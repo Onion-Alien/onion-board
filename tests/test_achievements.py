@@ -146,8 +146,9 @@ def test_tiles_take_one_column_in_a_narrow_window(window):  # noqa: F811
     ach.detach()
 
 
-def test_the_rarity_line_never_has_a_number_beside_it(window):  # noqa: F811
-    """"Common · 140 of 1,000" read as how many people had it: the numbers are the tooltip."""
+def test_the_rarity_line_has_its_points_never_how_far_along(window):  # noqa: F811
+    """"Common · 140 of 1,000" read as how many people had it: the numbers are the tooltip;
+    the line has only the rarity and what it's worth."""
     from soundboard.ui.settings.achievements import tier_name
     from soundboard.ui.settings.settings import SettingsDialog
     ach.attach(window.cfg, today="2026-10-19")
@@ -155,9 +156,33 @@ def test_the_rarity_line_never_has_a_number_beside_it(window):  # noqa: F811
         ach.played(hour=12, when=NOON)
     d = SettingsDialog(window, "achievements")
     tiles = {t.a.id: t for t in d.ach_tiles}
-    assert tiles["spammer"].status.text() == tier_name("uncommon")
+    assert tiles["spammer"].status.text() == f"{tier_name('uncommon')} · 25 points"
     assert "140" in tiles["spammer"].toolTip() and "1" in tiles["spammer"].toolTip()
-    assert tiles["first_blood"].status.text() == tier_name("common")
+    assert tiles["first_blood"].status.text() == f"{tier_name('common')} · 10 points"
+    ach.detach()
+
+
+def test_each_is_worth_its_rarity_and_the_score_adds_up(cfg):
+    assert [ach.POINTS[t] for t in ach.TIERS] == sorted(ach.POINTS.values())   # rarer, more
+    assert set(ach.POINTS) == set(ach.TIERS)
+    assert ach.score() == 0
+    assert ach.max_score() == sum(ach.POINTS[a.tier] for a in ach.ALL)
+    ach.played(hour=3, when=NOON)   # First Blood (common) and 3 AM Gremlin (rare)
+    assert ach.score() == ach.POINTS["common"] + ach.POINTS["rare"]
+
+
+def test_the_page_shows_the_score_at_the_top(window):  # noqa: F811
+    from PySide6.QtCore import QLocale
+    from soundboard.ui.settings.settings import SettingsDialog
+    ach.attach(window.cfg, today="2026-10-19")
+    window.cfg.achievements["got"].clear()
+    d = SettingsDialog(window, "achievements")
+    total = QLocale().toString(ach.max_score())
+    assert d.ach_score.text() == f"Score 0 / {total}"
+    ach.played(hour=12, when=NOON)   # First Blood: 10
+    d.achievements.refresh()   # (as each time the page is shown)
+    assert d.ach_score.text() == f"Score 10 / {total}"
+    d.close()
     ach.detach()
 
 

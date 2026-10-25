@@ -28,6 +28,7 @@ class Built:
     about_version: Any
     ach_cards: Any
     ach_count: Any
+    ach_score: Any
     ach_none: Any
     box_ach_popups: Any
     box_ach_sound: Any

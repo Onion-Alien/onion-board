@@ -297,3 +297,21 @@ def test_shared_keys_are_read_not_registered_and_grabbed_ones_still_taken(qapp):
         process_events(qapp, lambda: False, 0.2)
         a.stop()
         b.stop()
+
+
+@pytest.mark.parametrize("combo, vk, data", [("mouse 4", 0x05, 1), ("Mouse 5", 0x06, 2)])
+def test_ptt_mouse_side_button_is_pressed_as_a_mouse_button(combo, vk, data):
+    assert wk.check(combo, mouse=True) == (combo.lower(), "")
+    assert wk.key_sequence(combo, up=False) == [(vk, False)]
+    assert wk.key_sequence(combo, up=True) == [(vk, True)]
+    down, up = wk.mouse_input(vk, False), wk.mouse_input(vk, True)
+    assert down.type == up.type == wk.INPUT_MOUSE
+    assert down.mi.mouseData == up.mi.mouseData == data
+    assert (down.mi.dwFlags, up.mi.dwFlags) == (wk.MOUSEEVENTF_XDOWN, wk.MOUSEEVENTF_XUP)
+
+
+def test_mouse_button_is_never_an_ordinary_hotkey():
+    good, why = wk.check("mouse 4")
+    assert good == "" and "push-to-talk" in why
+    assert wk.parse("mouse 4") is None   # never handed to RegisterHotKey
+    assert wk.check("ctrl+mouse 4", mouse=True)[1]   # side buttons go bare

@@ -37,7 +37,7 @@ one (`sounds/11-50`, `played/1-10`), how long the app was open since then
 (`downloads/2-5`), how many times it was started since then (`launches/2-5`), the system
 (`os/win11`, `os/win10`), the app's language (`lang/de`), its theme (`theme/dark`: a
 built-in theme's name, else `other`), how many achievements were earned
-(`achievements/3-5`), and which features
+(`achievements/3-5`) and their score (`ach-score/51-150`), and which features
 were used since then (`used/voice-changer`, `used/more-tabs-added-radio`: the names
 in FEATURES only; for the Triggers tab, the names the Onion Watch add-on passes to
 triggershost.BoardHost.count, as `used/triggers-mode-colour`). A use is only noted
@@ -137,10 +137,10 @@ RECOVERY = ("install", "repair", "update", "reinstall", "cleanup", "remove")
 # why a mic effect set-up failed, a click's or the repair-by-itself's (directmic.FAIL_KINDS:
 # the admin prompt unanswered, the step not starting or stopping half-way, a silent mic,
 # the helper not answering, no mic (and why: unplugged or off, two alike, unknown to
-# Windows), no effect, the admin step's exit code 1-6 or another)
+# Windows), no effect, the admin step's exit code 1-6, 8 or 9, or another)
 MIC_FAILS = ("unanswered", "no-start", "stuck", "silent", "no-helper", "no-mic",
              "no-mic-off", "no-mic-unsure", "no-mic-gone", "no-effect", "code-1", "code-2",
-             "code-3", "code-4", "code-5", "code-6", "code-other")
+             "code-3", "code-4", "code-5", "code-6", "code-8", "code-9", "code-other")
 # exit code 1 (the admin step raised): where in it, what Windows said and its error
 # number (directmic RAISED_WHERE / RAISED_WHAT / RAISED_ERR, read back from its log)
 MIC_RAISED = ("at-register", "at-mic-settings", "at-ring", "at-files", "at-audio",
@@ -271,6 +271,10 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "mic-effect-taken-off", "mic-helper",
             *(f"mic-effect-code-1-{k}" for k in MIC_RAISED),
             *(f"mic-effect-code-6-{k}" for k in MIC_STUCK),
+            # the helper's step raised and Windows' prompt was asked instead, and where
+            # the helper's raised (MIC_RAISED)
+            "mic-effect-helper-fallback",
+            *(f"mic-effect-helper-code-1-{k}" for k in MIC_RAISED),
             # Onion Board's own update: the download cancelled or failed, the installer
             # wouldn't start, Copy error, Later at "Restart now", one that didn't finish,
             # one installing itself as the app started
@@ -825,6 +829,13 @@ def ach_bucket(n: int) -> str:
             "6-10" if n <= 10 else "11-20" if n <= 20 else "21-plus")
 
 
+def score_bucket(n: int) -> str:
+    """The achievement score (achievements.score()), roughly."""
+    return ("0" if n <= 0 else "1-50" if n <= 50 else "51-150" if n <= 150 else
+            "151-400" if n <= 400 else "401-1000" if n <= 1000 else
+            "1001-2000" if n <= 2000 else "2001-plus")
+
+
 def game_tag(name: str) -> str:
     """A Bun game's name as a count's word: one of BUN_GAMES, else "other"."""
     return name if name in BUN_GAMES else "other"
@@ -861,7 +872,10 @@ def about(cfg, now: float) -> list[str]:
     out.append(f"os/{os_tag()}")
     out.append(f"launches/{launch_bucket(cfg.stats_launches or 0)}")
     got = cfg.achievements.get("got") if isinstance(cfg.achievements, dict) else None
-    out.append(f"achievements/{ach_bucket(len(got) if isinstance(got, dict) else 0)}")
+    got = got if isinstance(got, dict) else {}
+    out.append(f"achievements/{ach_bucket(len(got))}")
+    score = sum(achievements.points(a) for a in achievements.ALL if a.id in got)
+    out.append(f"ach-score/{score_bucket(score)}")
     have = (set(cfg.stats_used if isinstance(cfg.stats_used, list) else [])
             | set(features_now(cfg)))
     out += [f"used/{k}" for k in FEATURES if k in have]

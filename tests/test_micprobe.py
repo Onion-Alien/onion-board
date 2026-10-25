@@ -242,3 +242,17 @@ def test_a_new_set_up_clears_the_old_verdict(window, monkeypatch):  # noqa: F811
     w.micctl.attach_mic()
     assert not w.micctl._probe_missing
     w._attaching = False
+
+
+def test_the_probe_plays_through_the_real_mixer():
+    """The probe is mono; the mix is stereo. Played as it was, the first block raised in
+    the audio callback ("operands could not be broadcast together with shapes (480,2)
+    (480,) (480,2)") and every fresh set-up showed it as an audio device problem."""
+    from soundboard.audio.engine import Engine
+    e = Engine()
+    e.main_stream = object()
+    e.dest, e.limiter_on, e.send_mono = None, False, False
+    e.play("__probe__", mp.probe(), 2.0, mode="restart", src_rate=mp.SR, only="main")
+    out = np.concatenate([e._sounds("main", 480) for _ in range(30)])
+    assert out.shape == (30 * 480, 2) and np.abs(out).max() > 0
+    assert np.array_equal(out[:, 0], out[:, 1])   # the same in both channels

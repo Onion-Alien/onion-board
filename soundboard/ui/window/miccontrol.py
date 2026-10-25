@@ -16,9 +16,10 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import QApplication, QMessageBox
 
-from soundboard.mic import directmic, michelper, micprobe, voicesdk
+from soundboard.mic import directmic, michelper, micprobe, sonarkeep, voicesdk
 from soundboard.ui.kit import theme
 from soundboard.core import errors, usage
+from soundboard.core.pollthread import PollThread
 from soundboard.online import net
 from soundboard.audio import engine as eng
 from soundboard.i18n import _
@@ -50,6 +51,7 @@ class MicControl(Controller):
     _autofix_tried = False  # it ran since the mic last worked (once per time it's off)
     _declined = False       # the last set-up's Windows prompt got a No
     _raised = None          # exit code 1: directmic.raised_why() of that set-up
+    _fallback = None        # directmic.helper_fallback() of that set-up
     _stuck = ""             # exit code 6: directmic.stuck_why() of that set-up
     _helper_checking = False
     _helper_failed = False  # the last check raised: the next waits HELPER_RETRY_S
@@ -64,6 +66,22 @@ class MicControl(Controller):
     def __init__(self, mw: MainWindow):
         super().__init__(mw)
         self.cable_bad = []               # cable ends not at 48 kHz (_check_cable_format)
+        # SteelSeries Sonar's devices, set back after Windows' audio restarts (keep_sonar)
+        self.sonar = sonarkeep.SonarKeep(directmic.sonar_devices, directmic.sonar_set_back)
+        self.sonar_poll = PollThread("sonar-keep")
+
+    def keep_sonar(self):
+        """About once a second: while the mic is SteelSeries Sonar's, its devices are
+        noted, and set back when an audio restart moved them (soundboard.mic.sonarkeep).
+        Not during the mic effect's own steps: they set Sonar back themselves."""
+        mw = self.mw
+        mic = mw.cfg.mic_device or ""
+        on = mic.startswith(directmic.SONAR_MIC) and not mw._attaching
+        do = self.sonar.tick(time.monotonic(), on, mw.engine.mic_live())
+        if do == "note":
+            self.sonar_poll.run(lambda: self.sonar.note(time.monotonic()))
+        elif do == "back":
+            self.sonar_poll.run(lambda: self.sonar.back(time.sleep, time.monotonic))
 
     def _mic_update_due(self) -> bool:
         mw = self.mw
@@ -481,6 +499,9 @@ class MicControl(Controller):
         # wouldn't stop: which service. From its log (read here, off the UI thread)
         self._raised = directmic.raised_why() if self._mic_fail_kind == "code-1" else None
         self._stuck = directmic.stuck_why() if self._mic_fail_kind == "code-6" else ""
+        # the helper's run raised and Windows' prompt ran it instead: where the helper's
+        # failed, which the prompt's own result doesn't tell
+        self._fallback = directmic.helper_fallback()
         return mic, err
 
     def _mic_attached(self, mic: str, err: str):
@@ -494,6 +515,13 @@ class MicControl(Controller):
         # nothing: the effect still sends the sounds on that silence (the card says
         # the mic is silent), so it's set up, not failed
         silent = err == directmic.mic_silent()
+        fallback, self._fallback = self._fallback, None
+        if fallback:
+            where, what, num = fallback
+            usage.used("mic-effect-helper-fallback")
+            usage.used(f"mic-effect-helper-code-1-at-{where}")
+            usage.used(f"mic-effect-helper-code-1-{what}")
+            usage.used(f"mic-effect-helper-code-1-{num}")
         if silent:
             err, self._mic_fail_kind = "", ""
         if err:

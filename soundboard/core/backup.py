@@ -71,7 +71,7 @@ STORED = {".mp3", ".ogg", ".opus", ".m4a", ".aac", ".flac", ".wma", ".webm", ".m
 LOCAL_SETTINGS = {"version", "sounds", "categories", "category", "main_device", "mon_device",
                   "mic_device", "obs_device", "also_send", "route", "mic_first", "cable_tip_done",
                   "lite_mode", "lite_hint_done", "light_voice",
-                  "duck_on", "mute_warning_off", "settings_advanced",
+                  "duck_on", "duck_off", "mute_warning_off", "settings_advanced",
                   "setup_done", "use_mode", "tab", "apps", "apps_paths", "screen",
                   "ytdlp_auto_optin", "update_check", "update_checked", "update_skip",
                   "update_pending", "update_auto", "update_auto_tried", "category_hotkeys",

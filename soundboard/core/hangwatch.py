@@ -195,22 +195,32 @@ def awake_clock() -> Callable[[], float]:
     return time.monotonic
 
 
+_memory_status = None   # (GlobalMemoryStatusEx, its struct), looked up once
+
+
 def memory_load() -> int | None:
-    """Percent of the PC's memory in use (Windows' own figure); None where unknown."""
+    """Percent of the PC's memory in use (Windows' own figure); None where unknown.
+    The UI thread asks (uigc.warm), so the DLL is looked up once: the frozen app's
+    ctypes.WinDLL checks the disk for the file, and with the drive stalled that held
+    the window for 30 s."""
+    global _memory_status
     if sys.platform != "win32":
         return None
     try:
         import ctypes
-        from ctypes import wintypes
+        if _memory_status is None:
+            from ctypes import wintypes
 
-        class Status(ctypes.Structure):
-            _fields_ = [("dwLength", wintypes.DWORD), ("dwMemoryLoad", wintypes.DWORD),
-                        *((n, ctypes.c_ulonglong) for n in (
-                            "total", "avail", "total_pf", "avail_pf", "total_v", "avail_v",
-                            "avail_ext"))]
+            class Status(ctypes.Structure):
+                _fields_ = [("dwLength", wintypes.DWORD), ("dwMemoryLoad", wintypes.DWORD),
+                            *((n, ctypes.c_ulonglong) for n in (
+                                "total", "avail", "total_pf", "avail_pf", "total_v",
+                                "avail_v", "avail_ext"))]
+            _memory_status = (ctypes.WinDLL("kernel32").GlobalMemoryStatusEx, Status)
+        status, Status = _memory_status
         s = Status()
         s.dwLength = ctypes.sizeof(Status)
-        if not ctypes.WinDLL("kernel32").GlobalMemoryStatusEx(ctypes.byref(s)):
+        if not status(ctypes.byref(s)):
             return None
         return int(s.dwMemoryLoad)
     except (OSError, AttributeError, ValueError):

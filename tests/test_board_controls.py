@@ -72,11 +72,17 @@ def test_category_keys_cycle_through_all_and_the_categories(window):
 def test_volume_keys_step_the_sounds_volume_by_ten(window):
     w = window
     w.vol_sound.spin.setValue(95)
+    w.vol_mon.spin.setValue(64)
     w.hkctl.on_hotkey("__volup__")
     assert w.cfg.sound_vol == pytest.approx(1.1)
+    # the headphones slider moves too, so a press shows even with nothing playing
+    assert w.cfg.mon_vol == pytest.approx(0.7)
+    assert w.vol_mon.slider.value() == 70
     w.vol_sound.spin.setValue(0)
+    w.vol_mon.spin.setValue(0)
     w.hkctl.on_hotkey("__voldown__")
     assert w.cfg.sound_vol == 0.0
+    assert w.cfg.mon_vol == 0.0
 
 
 def test_mic_and_voice_changer_keys(window):

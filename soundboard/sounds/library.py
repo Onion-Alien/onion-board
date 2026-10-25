@@ -218,7 +218,7 @@ def clean_hotkey(combo: str, what: str) -> str:
     if not combo:
         return ""
     from soundboard.control import winkeys  # Win32; only needed once there's a key
-    if winkeys.check(combo)[1]:
+    if winkeys.check(combo, mouse=what == "ptt_key")[1]:   # a side button: PTT only
         log.warning("dropped the hotkey %r of %s: no key can send it", combo[:80], what)
         return ""
     return combo
@@ -440,8 +440,9 @@ class Config:
     eq_gains: list[float] = field(default_factory=lambda: [0.0] * 7)
     dest: dict = field(default_factory=dict)   # who's listening (soundboard.mic.destination)
     send_mono: bool = True    # phase-aware mono for the send device (sendfx.SmartMono)
-    duck_db: float = -12.0    # lower the sounds this much while you talk; 0 = off
-    duck_on: bool = False     # ducking was switched on once for older settings (from_raw)
+    duck_db: float = 0.0      # lower the sounds this much while you talk; 0 = off
+    duck_on: bool = False     # older versions switch ducking on once unless this is set
+    duck_off: bool = False    # the old -12 dB default went back to Off once (from_raw)
     mic_gate: bool = False    # mute your mic while a sound plays (only the sound goes out)
     discord_restore: bool = True   # put Discord back for talking on quit (discordtalk)
     discord_talk: dict = field(default_factory=dict)   # Discord folder -> how you talk there
@@ -788,6 +789,7 @@ class Config:
         cfg.route = "mic"
         cfg.mic_first = True
         cfg.duck_on = True
+        cfg.duck_off = True
         # a plain soundboard first; + More tabs adds them ("chat": the removed Chat tab, so
         # 2.3.0 / 2.3.1 opening this config keep it hidden)
         cfg.tabs_off = [*BASIC_TABS_OFF, "chat"]
@@ -874,13 +876,15 @@ class Config:
             if raw.get("route", "cable") == "cable":
                 raw["route"] = "mic"
             raw["mic_first"] = True
-        if not raw.get("duck_on"):
-            # once: lowering the sounds while you talk is on by default now (your voice
-            # was buried under a song). Off was the old default, so it moves to -12 dB;
-            # a depth someone picked stays, and Off picked after this stays off.
-            if not raw.get("duck_db"):
-                raw["duck_db"] = -12.0
+        if not raw.get("duck_off"):
+            # once: lowering the sounds while you talk is off by default again. Settings
+            # that got the old -12 dB default go back to Off; another depth someone
+            # picked stays, and -12 dB picked after this stays. duck_on stays set so an
+            # older version doesn't switch it back on.
+            if raw.get("duck_on") and raw.get("duck_db") == -12.0:
+                raw["duck_db"] = 0.0
             raw["duck_on"] = True
+            raw["duck_off"] = True
         sounds = []
         blank = SoundMeta(id="", name="", file="")
         has_sounds = "sounds" in raw

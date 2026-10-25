@@ -620,6 +620,7 @@ QToolButton#vchipx:hover { background:$btn_hover; }
 QPushButton#vchip:hover { color:$text; }
 QPushButton#vchip[state="on"] { color:$live_text; border-color:$live_border; }
 QPushButton#vchip[state="warn"] { color:$warn_text; border-color:$warn_text; background:$warn_bg; }
+QLabel#achscore { background:$inset; border:1px solid $live_border; border-radius:8px; padding:2px 12px; color:$live_text; font-size:10pt; font-weight:700; }
 QLabel#pill { background:$inset; border:1px solid transparent; border-radius:10px; padding:3px 10px; color:$muted; font-size:8.5pt; font-weight:600; }
 QLabel#pill[slow="true"] { color:$warn_text; border-color:$warn_text; }
 QLabel#pill[on="true"] { color:$live_text; border-color:$live_border; }

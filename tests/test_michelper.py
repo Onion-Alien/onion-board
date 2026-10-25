@@ -51,7 +51,13 @@ ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4
                21: "fc1d64c720b1acf922be82d6812192cb81f939a15593cd58487237cc5b718c47",
                22: "fded1edfd0a79368a14c8b46b8319db148aeebc4a2372a470c26d80ac5b426e6",
                23: "bd64dfb3ce017760cfd4859b8d74a840465736c52a5793b58a949f6b11f5c520",
-               24: "2da4d3ee1622b509ba48a587aec92efd53fb9054547e735388f0bf8ec343fdad"}
+               24: "5924cdd998ab33b703a2abcd8338a11b1503d2945c6f56a5bb7fc5a98ce539e3",
+               25: "61009c7366fe22f4e795fd16de72c85e19e8bf26c9b554c9d929aecfc4ca61aa",
+               26: "819ed89c03f11cb9c066b3a9529062e67e55cf96228875ce8364cbf1cac04181",
+               27: "227b9e0bb915510ae86c33c5ab34ac6b4fd30df207998b3c26748c55743a5a09",
+               28: "b4dfd79b8e41fc286dc4b56debd3888a55feb95f8d28265b9947608d6465198f",
+               29: "d8dcd2d06b62cb4e3745343abf574be058a9bbdae9477886223dddc989a8797f",
+               30: "87483386711e64031b23a9cbbf44ff131605e298e24162f107df0ab069ee6c4b"}
 
 
 def _queue():
@@ -458,6 +464,16 @@ def test_install_helper_checks_who_asked(helper_setup, monkeypatch):
     assert not mh.install_helper("S-1-5-18") and not mh.install_helper("S-1-1-0")
     monkeypatch.setattr(mh, "_has_profile", lambda sid: False)
     assert not mh.install_helper(SID2)
+    assert calls == []
+
+
+def test_install_helper_never_raises(helper_setup, monkeypatch):
+    """It runs after the effect went on: a check that raises (a file of the build held
+    open, say) is a False, never the set-up's exit code 1."""
+    calls, _ = helper_setup
+    monkeypatch.setattr(mh, "verify_build", lambda src: (_ for _ in ()).throw(
+        PermissionError(13, "denied")))
+    assert mh.install_helper() is False
     assert calls == []
 
 

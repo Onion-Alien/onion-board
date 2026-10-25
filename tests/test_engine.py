@@ -454,6 +454,44 @@ def fake_devices(monkeypatch, rate=44100, start_fails=False):
     return made
 
 
+def test_a_device_that_refuses_stereo_gets_windows_to_map_it(monkeypatch):
+    # SteelSeries Sonar's Gaming device is 7.1: a plain stereo WASAPI open of it fails
+    # with "Invalid number of channels" (the user's headphones stayed silent); open it
+    # again with Windows mapping the stereo onto its channels, at the same rate
+    made = fake_devices(monkeypatch, rate=96000)
+    Fake = eng.sd.OutputStream
+
+    def picky(**kw):
+        if "extra_settings" not in kw:
+            raise eng.sd.PortAudioError(
+                "Error opening OutputStream: Invalid number of channels [PaErrorCode -9998]")
+        return Fake(**kw)
+
+    monkeypatch.setattr(eng.sd, "OutputStream", picky)
+    e = Engine()
+    e.set_mon_device("SteelSeries Sonar - Gaming")
+    assert e.mon_stream is made[0]
+    assert made[0].kw["channels"] == eng.CH and made[0].kw["samplerate"] == 96000
+    auto = eng.sd.WasapiSettings(auto_convert=True)._streaminfo.flags
+    assert made[0].kw["extra_settings"]._streaminfo.flags == auto != 0
+    assert "mon" not in e.errors
+
+
+def test_other_open_errors_arent_retried(monkeypatch):
+    fake_devices(monkeypatch)
+    calls = []
+
+    def busy(**kw):
+        calls.append(kw)
+        raise eng.sd.PortAudioError(
+            "Error opening OutputStream: Device unavailable [PaErrorCode -9985]")
+
+    monkeypatch.setattr(eng.sd, "OutputStream", busy)
+    with pytest.raises(eng.sd.PortAudioError):
+        eng.output_stream(7, 48000, callback=None)
+    assert len(calls) == 1
+
+
 def test_safer_buffering_asks_for_a_real_buffer(monkeypatch):
     # Windows rounds "high" (10 ms) up to the same buffer as "low": Safer must ask for
     # a number of seconds, on the outputs and the mic alike
@@ -542,11 +580,10 @@ def test_a_device_rescan_keeps_sounds_playing_where_they_were(monkeypatch):
     e._render("main", 480)
     assert np.abs(e._render("main", 480)).max() > 0.4
     e.shutdown()
-    fake_devices(monkeypatch, rate=44100)        # back at another rate: its data is
-    e.set_main_device("cable")                   # useless, so it stays done
-    assert "main" in v.done
-    e.set_mon_device("headphones")
-    assert v.finished                            # nowhere left to resume it
+    fake_devices(monkeypatch, rate=44100)        # back at another rate: its data is read
+    e.set_main_device("cable")                   # at that one, from where it was
+    assert "main" not in v.done and v.rates["main"] == 44100
+    assert v.step["main"] == pytest.approx(SR / 44100)
 
 
 def test_a_cut_sound_whose_device_never_comes_back_ends(monkeypatch):
@@ -568,17 +605,57 @@ def test_a_sound_stopped_while_cut_ends_at_once():
     assert v.finished and "a" not in e.playing()
 
 
-def test_reopened_output_at_another_rate_leaves_sounds_done(monkeypatch):
+def test_reopened_output_at_another_rate_keeps_the_sound_playing(monkeypatch):
+    """The headphones moved to a device at another rate in the middle of a sound
+    (Windows' default output switched to a 96 kHz one): the sound used to stop there.
+    Its data, made for the old rate, is read at the new one: same pitch, same spot."""
     e = engine_with("main", "mon")
     v = e.play("a", tone(1.0), 1.0, loop=True)
-    e._render("main", 480)
+    for _ in range(10):
+        e._render("main", 480)
+        e._render("mon", 480)
     e._close("mon_stream")
-    fake_devices(monkeypatch, rate=44100)
+    fake_devices(monkeypatch, rate=96000)
     e.set_mon_device("headphones")
-    assert "mon" in v.done                       # its data is for the old rate
-    assert not e._render("mon", 480).any()
-    e.set_mon_device("headphones")               # reopened again at the same new rate:
-    assert "mon" in v.done                       # the data is still for the old one
+    assert "mon" not in v.done and v.rates["mon"] == 96000
+    assert v.step["mon"] == pytest.approx(SR / 96000)
+    assert v.pos["mon"] == v.pos["main"]         # where the other output is
+    e._render("mon", 960)                        # (its fade in)
+    x = np.concatenate([e._render("mon", 960)[:, 0] for _ in range(20)])
+    spec = np.abs(np.fft.rfft(x * np.hanning(len(x))))
+    hz = np.fft.rfftfreq(len(x), 1 / 96000)[np.argmax(spec)]
+    assert abs(hz - 440) < 10                    # the same note, not an octave down
+    fake_devices(monkeypatch, rate=SR)           # and back to the first rate
+    e._close("mon_stream")
+    e.set_mon_device("headphones")
+    assert "mon" not in v.done and v.step["mon"] == pytest.approx(1.0)
+
+
+def test_windows_refusing_a_start_once_is_tried_again(monkeypatch):
+    """Right after Windows' default output moved to a device, Windows refused to start
+    it once ("Unanticipated host error"): the headphones showed an error until the
+    watchdog's next try. Tried again at once; a second refusal is still an error."""
+    from soundboard.audio import enginedevices
+    monkeypatch.setattr(enginedevices, "HOST_RETRY_S", 0.0)
+    made = fake_devices(monkeypatch, rate=SR)
+    Fake = eng.sd.OutputStream
+    refusals = [1]
+
+    class Refused(Fake):
+        def start(self):
+            if refusals[0]:
+                refusals[0] -= 1
+                raise eng.sd.PortAudioError("Error starting stream: Unanticipated host "
+                                            "error [PaErrorCode -9999]: 'Unspecified error'")
+
+    monkeypatch.setattr(eng.sd, "OutputStream", Refused)
+    e = Engine()
+    e.set_mon_device("headphones")
+    assert e.mon_stream is not None and "mon" not in e.errors
+    assert len(made) == 2 and made[0].closed and not made[1].closed
+    refusals[0] = 2
+    e.set_mon_device("headphones")
+    assert e.mon_stream is None and "mon" in e.errors
 
 
 def test_seek_survives_a_render_in_flight():

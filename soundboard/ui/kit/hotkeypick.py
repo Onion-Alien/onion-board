@@ -98,9 +98,10 @@ def pretty_key(combo: str) -> str:
 
 
 class HotkeyDialog(QDialog):
-    """Asks for a key combo, or (with `pads`) a hit on a MIDI pad controller."""
+    """Asks for a key combo, or (with `pads`) a hit on a MIDI pad controller, or (with
+    `mouse`) a click of a mouse side button on it."""
 
-    def __init__(self, hotkeys: Hotkeys, parent=None, pads: bool = True):
+    def __init__(self, hotkeys: Hotkeys, parent=None, pads: bool = True, mouse: bool = False):
         super().__init__(parent)
         fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
         self.setWindowTitle(_("Set hotkey"))
@@ -110,7 +111,10 @@ class HotkeyDialog(QDialog):
         t = QLabel(_("Press the key or combo you want…"))
         t.setStyleSheet("font-size:16px; font-weight:600;")
         lay.addWidget(t)
-        self.hint = QLabel(_("Works globally, even while in-game.  Esc = cancel."))
+        self._mouse = mouse
+        self.hint = QLabel(_("…or click a mouse side button (Mouse 4 / 5) in this window. "
+                             "Esc = cancel.") if mouse
+                           else _("Works globally, even while in-game.  Esc = cancel."))
         self.hint.setWordWrap(True)
         lay.addWidget(self.hint)
         self.pads_note = QLabel()
@@ -171,6 +175,15 @@ class HotkeyDialog(QDialog):
         except (RuntimeError, TypeError):
             pass
         midi.capture(False)
+
+    def mousePressEvent(self, e):
+        button = {Qt.MouseButton.XButton1: "mouse 4",
+                  Qt.MouseButton.XButton2: "mouse 5"}.get(e.button())
+        if self._mouse and button and self.result_combo is None:
+            self.result_combo = button
+            self.accept()
+            return
+        super().mousePressEvent(e)
 
     def keyPressEvent(self, e):
         vk = e.nativeVirtualKey()

@@ -1656,6 +1656,7 @@ class MainWindow(QMainWindow):
         for step in (self.rmctl._finish_removals, self.rmctl._wait_bin, self.timer.stop,
                      self._voice_timer.stop, self.devctl._default_poll.stop,
                      self.alertctl._discord_poll.stop, self.alertctl._raw_poll.stop,
+                     self.micctl.sonar_poll.stop,
                      self.hkctl._release_ptt,
                      self.alertctl.discord_quit,
                      self._remember_usage, self._count_at_quit, self.cfg.save,

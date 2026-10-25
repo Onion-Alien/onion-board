@@ -43,6 +43,8 @@ if TYPE_CHECKING:
 # the engine's logger, as before the move (log lines and filters keep their name)
 log = logging.getLogger("soundboard.audio.engine")
 
+HOST_RETRY_S = 0.3   # an output Windows refused to start once: tried again after this
+
 
 class EngineDevices:
     """Opening, watching and reopening the streams (see the module)."""
@@ -123,11 +125,21 @@ class EngineDevices:
         chans = min(CH, sd.query_devices(idx)["max_output_channels"])
         if chans < CH:
             raise RuntimeError(_("mono output devices aren't supported"))
-        s = sd.OutputStream(device=idx, samplerate=rate, channels=CH, dtype="float32",
-                            latency=BUFFER.get(self.latency, "low"),
-                            blocksize=self._blocksize(rate), callback=callback)
-        self._last_cb[key] = time.monotonic()
-        start_or_close(s, key)
+        # Right after Windows' default output moved to a device, Windows can refuse to
+        # start it once ("Unanticipated host error", seen with SteelSeries Sonar's): the
+        # headphones showed an error until the watchdog's next try. One more try first.
+        for tries_left in (1, 0):
+            s = _eng.output_stream(idx, rate, latency=BUFFER.get(self.latency, "low"),
+                                   blocksize=self._blocksize(rate), callback=callback)
+            self._last_cb[key] = time.monotonic()
+            try:
+                start_or_close(s, key)
+                break
+            except sd.PortAudioError as e:
+                if not tries_left or "Unanticipated host error" not in str(e):
+                    raise
+                log.info("%s output %s refused to start: trying again", key, name)
+                time.sleep(HOST_RETRY_S)
         # committed only now, so a failed open leaves the rate and the rings alone.
         # Nothing plays on or writes to this output until its *_stream attribute is
         # set, so callbacks that run before this line render silence and do no harm.
@@ -283,14 +295,21 @@ class EngineDevices:
         """Output `key` was reopened: sounds still playing on another output pick
         up here again, at the same spot (with a short fade in); sounds this output
         was cut from while every output was closed (a device rescan) pick up where
-        they were cut. Data made for another rate is useless, so those stay done."""
+        they were cut. At another rate (the headphones moved to a 96 kHz device in
+        the middle of a sound), the data made for the old one is read at the new one,
+        as a sound plays while its resampled copy isn't ready (Engine.play's `step`):
+        the sound used to stop there."""
         with self.lock:
             for v in self.voices:
                 if key not in v.done or v.stopping or not len(v.data.get(key, ())):
                     continue
-                if v.rates.get(key) != rate:
-                    v.cut.discard(key)   # can't resume here: let it finish
+                was = v.rates.get(key)
+                if not was:
+                    v.cut.discard(key)   # can't tell its rate: let it finish
                     continue
+                if was != rate:   # (set before done is cleared: the callback reads them)
+                    v.step[key] = v.step.get(key, 1.0) * was / rate
+                    v.rates[key] = rate
                 other = next((o for o in v.data if o != key and o not in v.done
                               and len(v.data[o])), None)
                 if other is None:

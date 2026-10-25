@@ -241,12 +241,13 @@ class HotkeyControl(Controller):
                    keys=html.escape(", ".join(pretty_key(c) for c in failed))), "warn",
                key="hotkey")   # (in place of the "✓ … plays" just said for a key set now)
 
-    def _valid_hotkey(self, combo: str) -> str | None:
+    def _valid_hotkey(self, combo: str, mouse: bool = False) -> str | None:
         """`combo` as it's saved, or None (and a toast saying why) if no keyboard could
-        ever send it: such a key used to be saved and shown as working."""
+        ever send it: such a key used to be saved and shown as working. `mouse`: a mouse
+        side button is fine too (auto push-to-talk)."""
         if not combo:
             return combo
-        good, why = winkeys.check(combo)
+        good, why = winkeys.check(combo, mouse)
         if why:
             log.info("refused hotkey %r: %s", combo[:80], why)
             usage.used("hotkey-refused")   # never which key
@@ -280,7 +281,7 @@ class HotkeyControl(Controller):
         lost it: a key quietly going off a pad was a surprise the next time it was
         pressed in a game."""
         mw = self.mw
-        good = self._valid_hotkey(combo)
+        good = self._valid_hotkey(combo, mouse=attr == "ptt_key")
         if good is None:
             self.register_hotkeys()   # the capture paused them
             return
@@ -341,7 +342,7 @@ class HotkeyControl(Controller):
 
     def _quick_set_hotkey(self, attr: str):
         mw = self.mw
-        d = HotkeyDialog(mw.hotkeys, mw, pads=attr != "ptt_key")
+        d = HotkeyDialog(mw.hotkeys, mw, pads=attr != "ptt_key", mouse=attr == "ptt_key")
         if d.exec() and d.result_combo:
             self.set_global_hotkey(attr, d.result_combo)
         else:
@@ -500,11 +501,15 @@ class HotkeyControl(Controller):
         mw.toast(_("Category: {value}", value=html.escape(name or 'All')), key="category")
 
     def step_sound_volume(self, step: int):
-        """The louder / quieter hotkeys: the sounds' volume box by 10 % a press."""
+        """The louder / quieter hotkeys: the sounds' volume box by 10 % a press, and the
+        "My headphones" slider with it (the sounds' box only shows while one plays, so
+        a key press otherwise showed nothing)."""
         mw = self.mw
-        pct = mw.vol_sound.spin.value()
-        new = min(max((round(pct / 10) + step) * 10, 0), mw.vol_sound.spin.maximum())
-        mw.vol_sound.spin.setValue(new)   # -> set_option("sound_vol")
+        new = 0
+        for vol in (mw.vol_mon, mw.vol_sound):   # -> mon_vol, sound_vol
+            pct = vol.spin.value()
+            new = min(max((round(pct / 10) + step) * 10, 0), vol.spin.maximum())
+            vol.spin.setValue(new)
         mw.playctl.cue((880, 1175) if step > 0 else (880, 659))
         mw.toast(_("Sounds: {new}%", new=new), key="volume")
 

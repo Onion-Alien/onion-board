@@ -2,6 +2,88 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.7.1 — 2026-10-23
+
+- SteelSeries Sonar: with Sonar's Gaming device (a 7.1 device) as your headphones,
+  you now hear your sounds. The app couldn't open it ("That audio device doesn't
+  support that many channels") and stayed silent in your ears.
+- Direct mic: when the background mic helper can't set up your mic (mostly on
+  Windows 10), clicking set-up now asks Windows once and does it that way, instead of
+  failing with "code 1" every time. A set-up that worked is no longer reported as
+  failed when the helper itself couldn't be set up afterwards.
+- Direct mic: after setting up, the app checks with a short, very quiet test sound (never
+  in your own headphones) that your sounds really come out of your mic, and adds what it
+  found to the anonymous usage count. Nothing changes on screen yet.
+- A headset pulled out while the app is open now says so in plain words ("Can't open
+  ... Plugged in? It's tried again by itself.") instead of a raw device error.
+- Fixed a crash while the app was starting: on a slow start, the check that notes where start-up is waiting could itself crash the app.
+- Direct mic: setting up on SteelSeries Sonar's mic in a quiet room no longer restarts
+  all your sound three more times, restarts Sonar and calls the set-up failed when
+  Windows wouldn't let the app listen to the mic just before.
+- Direct mic: setting up, repairing or removing the mic effect checks its work: after
+  Windows' audio restarts, the effect has to have started on your mic and every mic it
+  touched has to open in apps again. If not, the audio restarts once more, and if it's
+  still not right the app says so (with an error code) instead of "done" while your
+  sounds never reach the mic.
+- Direct mic: with SteelSeries Sonar on, a set-up, repair or removal no longer leaves
+  Sonar's mic silent in Discord and other voice chats, or its sound on the wrong
+  device: the devices Sonar used are set back through Sonar itself after Windows' audio
+  restarts, in its streamer mode too. Sonar is no longer restarted for it (SteelSeries GG restarts Sonar only 3
+  times, then leaves it off). It's restarted once only when it won't take its devices
+  back, or when its mic had already lost its device (after a set-up with 2.7.0), so
+  that its mic has a device again.
+- Direct mic: the quiet check sound played after setting up no longer breaks the sound
+  sent to others: it stopped your sounds and your voice reaching Discord and games until
+  the app was closed, with an "audio callback failed" error.
+- Direct mic: uninstalling Onion Board after the mic effect was already off no longer
+  restarts all of Windows' sound for nothing (it cut every app's sound for a moment, and
+  with SteelSeries Sonar on, it could restart Sonar).
+- Direct mic: Sonar is no longer restarted when, after Windows' audio restarts, it won't
+  take back one of its Game / Chat / Media / Aux channels while its mic is fine (Sonar
+  picks those again itself). That could use up SteelSeries GG's 3 restarts of Sonar in
+  a few set-ups, and then Sonar stayed off.
+- SteelSeries Sonar users who set up direct mic with an earlier version: Windows' audio
+  restart made Sonar switch its mic to the first device it lists, which isn't always
+  yours (a webcam, a virtual cable). If Discord hears you badly or not at all through
+  Sonar, pick your mic again in SteelSeries GG > Sonar. This version keeps it.
+- Direct mic: the mic helper updates once (Windows asks one more time), so set-ups
+  through it get these fixes too.
+- Once you've connected Twitch, the Twitch card has a box (off until you tick it) that
+  lets the Onion Board developer see your channel's name with the daily usage count,
+  so they can see who streams with it. Disconnect unticks it.
+- Pilot Bun's world on the Languages card is 3D now: a lit, turning Earth with drifting
+  clouds, a night side and glowing air, and Bun's plane is a real 3D model flying low
+  over the curve of the world, with a contrail and his shadow on the ground.
+- Fix: on a PC short on memory, the app could freeze for 10 seconds to minutes at a
+  time, sounds included, while it sat in the background (and Windows could call it Not
+  Responding). Its memory clean-up read the whole app back from disk; it now waits until
+  you're back in the window and the PC has memory to spare.
+- 18 new secret achievements to find: poke the Onion Alien on Settings > About, add or
+  listen through an hour-long sound, play 10 sounds at once, max out the pitch, play a
+  sound on Halloween, Christmas or New Year, and a few more. There's an old cheat code
+  hidden in the main window too.
+- No "Text-to-speech isn't available" pop-up at launch when Windows speech is slow to start: nobody asked for speech yet. Saying a line still tells you if it can't be spoken.
+- On a first launch right after installing, the loading screen (Bun) no longer gives up
+  when its first frame is slow: it used to vanish, and nothing showed until the window
+  was up, up to a minute later. A start that slow now also notes where it waited, in
+  `startup-stall.txt` in the settings folder.
+- The installer no longer asks about FFmpeg: the app needs it for M4A, AAC and video
+  files, so it is always added when it is missing (not in Offline mode).
+- Direct mic: a mic whose headset software adds its own effect (some gaming headsets do)
+  no longer goes silent in every app when that effect won't run alongside Onion Board's:
+  the mic now goes on without the headset's effect.
+- Fixed: after the PC had slept, a crash or a closed-from-Task-Manager exit was counted as "frozen" in the anonymous problem count. The exit check now uses the same sleep-proof clock as the freeze check.
+- Fixed two causes of the app freezing for seconds on PCs short of memory: the audio
+  device check no longer starts a new background task every half minute, and a safety
+  check over the app's windows no longer runs while the app sits in the tray.
+- Direct mic: a headset whose software adds a Windows 11 style effect to the mic
+  (Logitech G HUB's Blue VO!CE, Windows' own Voice Clarity) keeps that effect with
+  Onion Board's effect on. It used to be switched off, without a word, while direct
+  mic was on.
+- Fixed the window freezing for as long as the PC's drive stalls (half a minute on some
+  drives): a memory check the window runs every few seconds looked on disk for a
+  Windows file each time. It looks once now.
+
 ## 2.7.0 — 2026-10-22
 
 - The tick next to "Your sounds go into your mic" now sits level with the text.
