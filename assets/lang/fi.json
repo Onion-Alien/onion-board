@@ -452,7 +452,6 @@
   "Hotkeys": "Pikanäppäimet",
   "Hotkeys are on again.": "Pikanäppäimet ovat taas päällä.",
   "How loud the stream output is (only OBS hears it)": "Kuinka kovaa stream-ulostulo on (vain OBS kuulee sen)",
-  "How loud your sounds are, type up to 1000% in the box": "Kuinka kovia äänesi ovat, kirjoita ruutuun jopa 1000%",
   "How loud your voice is for others. The dot shows activity when you talk": "Kuinka kovaa äänesi on muille. Piste näyttää toimintaa, kun puhut",
   "How much data went to each site, added up over the whole history": "Kuinka paljon dataa meni kullekin sivustolle, laskettuna yhteen koko historian ajalta",
   "I'm bored…": "Tylsää…",
@@ -4447,5 +4446,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Lähetä kaverille linkki Onion Boardin lataamiseen. Lisää siihen nimesi tai pelinimesi, niin sovellus tervehtii häntä sinun puolestasi, kun hän avaa sen ensimmäisen kerran. Mitään ei seurata eikä lasketa.",
   "Your name or gamertag (optional)": "Nimesi tai pelinimesi (valinnainen)",
   "{name} invited you to Onion Board. Have fun!": "{name} kutsui sinut Onion Boardiin. Pidä hauskaa!",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows ei pystynyt kertomaan, onko tämä verkko julkinen, joten puhelimet torjutaan varmuuden vuoksi. Aseta se yksityiseksi kohdassa Windowsin asetukset → Verkko ja internet ja kytke tämä sitten pois ja takaisin päälle"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows ei pystynyt kertomaan, onko tämä verkko julkinen, joten puhelimet torjutaan varmuuden vuoksi. Aseta se yksityiseksi kohdassa Windowsin asetukset → Verkko ja internet ja kytke tämä sitten pois ja takaisin päälle",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Kuinka kovaa muut kuulevat äänesi (ja streamisi). Omilla kuulokkeillasi on oma äänenvoimakkuutensa: Kuulokkeeni, alhaalla. Kirjoita ruutuun jopa 1000%.",
+  "Sounds for others": "Äänet muille"
 }

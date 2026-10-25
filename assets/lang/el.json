@@ -452,7 +452,6 @@
   "Hotkeys": "Συντομεύσεις",
   "Hotkeys are on again.": "Οι συντομεύσεις είναι ξανά ανοιχτές.",
   "How loud the stream output is (only OBS hears it)": "Πόσο δυνατή είναι η έξοδος stream (μόνο το OBS την ακούει)",
-  "How loud your sounds are, type up to 1000% in the box": "Πόσο δυνατοί είναι οι ήχοι σου, γράψε έως 1000% στο πεδίο",
   "How loud your voice is for others. The dot shows activity when you talk": "Πόσο δυνατή είναι η φωνή σου για τους άλλους. Η τελεία δείχνει δραστηριότητα όταν μιλάς",
   "How much data went to each site, added up over the whole history": "Πόσα δεδομένα πήγαν σε κάθε σελίδα, αθροισμένα σε όλο το ιστορικό",
   "I'm bored…": "Βαριέμαι…",
@@ -4447,5 +4446,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Στείλε σε έναν φίλο έναν σύνδεσμο για να κατεβάσει το Onion Board. Βάλε πάνω το όνομά σου ή το gamertag σου και η εφαρμογή θα τον χαιρετήσει εκ μέρους σου την πρώτη φορά που θα την ανοίξει. Τίποτα δεν παρακολουθείται ούτε μετριέται.",
   "Your name or gamertag (optional)": "Το όνομά σου ή το gamertag σου (προαιρετικό)",
   "{name} invited you to Onion Board. Have fun!": "Ο/Η {name} σε προσκάλεσε στο Onion Board. Καλή διασκέδαση!",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Τα Windows δεν μπόρεσαν να πουν αν αυτό το δίκτυο είναι δημόσιο, οπότε τα τηλέφωνα απορρίπτονται για ασφάλεια. Ορίστε το ως ιδιωτικό στις Ρυθμίσεις των Windows → Δίκτυο και Internet και, στη συνέχεια, απενεργοποιήστε και ενεργοποιήστε ξανά αυτή την επιλογή"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Τα Windows δεν μπόρεσαν να πουν αν αυτό το δίκτυο είναι δημόσιο, οπότε τα τηλέφωνα απορρίπτονται για ασφάλεια. Ορίστε το ως ιδιωτικό στις Ρυθμίσεις των Windows → Δίκτυο και Internet και, στη συνέχεια, απενεργοποιήστε και ενεργοποιήστε ξανά αυτή την επιλογή",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Πόσο δυνατά ακούνε οι άλλοι τους ήχους σου (και το stream σου). Τα ακουστικά σου έχουν δική τους ένταση: Τα ακουστικά μου, στο κάτω μέρος. Γράψε έως 1000% στο πεδίο.",
+  "Sounds for others": "Ήχοι για τους άλλους"
 }

@@ -452,7 +452,6 @@
   "Hotkeys": "Hurtigtaster",
   "Hotkeys are on again.": "Hurtigtastene er på igjen.",
   "How loud the stream output is (only OBS hears it)": "Hvor høy stream-utgangen er (bare OBS hører den)",
-  "How loud your sounds are, type up to 1000% in the box": "Hvor høye lydene dine er, skriv inn opptil 1000% i feltet",
   "How loud your voice is for others. The dot shows activity when you talk": "Hvor høy stemmen din er for andre. Prikken viser aktivitet når du snakker",
   "How much data went to each site, added up over the whole history": "Hvor mye data som gikk til hvert nettsted, lagt sammen over hele historikken",
   "I'm bored…": "Jeg kjeder meg…",
@@ -4447,5 +4446,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Send en venn en lenke for å laste ned Onion Board. Sett navnet eller gamertagen din på, så sier appen hei fra deg første gang de åpner den. Ingenting spores eller telles.",
   "Your name or gamertag (optional)": "Navnet eller gamertagen din (valgfritt)",
   "{name} invited you to Onion Board. Have fun!": "{name} inviterte deg til Onion Board. Kos deg!",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows kunne ikke si om dette nettverket er offentlig, så telefoner avvises for sikkerhets skyld. Sett det til Privat i Windows-innstillinger → Nettverk og Internett, og slå så dette av og på igjen"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows kunne ikke si om dette nettverket er offentlig, så telefoner avvises for sikkerhets skyld. Sett det til Privat i Windows-innstillinger → Nettverk og Internett, og slå så dette av og på igjen",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Hvor høyt andre hører lydene dine (og strømmen din). Hodetelefonene dine har sitt eget volum: Hodetelefonene mine, nederst. Skriv inn opptil 1000% i feltet.",
+  "Sounds for others": "Lyder til andre"
 }

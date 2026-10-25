@@ -452,7 +452,6 @@
   "Hotkeys": "Atajos",
   "Hotkeys are on again.": "Los atajos vuelven a estar activados.",
   "How loud the stream output is (only OBS hears it)": "Qué tan fuerte es la salida para stream (solo OBS la oye)",
-  "How loud your sounds are, type up to 1000% in the box": "Qué tan fuerte suenan tus sonidos: escribe hasta 1000% en la casilla",
   "How loud your voice is for others. The dot shows activity when you talk": "Qué tan fuerte oyen los demás tu voz. El punto muestra actividad cuando hablas",
   "How much data went to each site, added up over the whole history": "Cuántos datos fueron a cada sitio, sumados en todo el historial",
   "I'm bored…": "Me aburro…",
@@ -4447,5 +4446,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Mándale a un amigo un link para descargar Onion Board. Ponle tu nombre o gamertag y la app lo saluda de tu parte la primera vez que la abra. No se rastrea ni se cuenta nada.",
   "Your name or gamertag (optional)": "Tu nombre o gamertag (opcional)",
   "{name} invited you to Onion Board. Have fun!": "{name} te invitó a Onion Board. ¡Diviértete!",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows no pudo decir si esta red es pública, así que los teléfonos se rechazan por seguridad. Configúrala como privada en Configuración de Windows → Red e Internet y luego desactiva esto y vuelve a activarlo"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows no pudo decir si esta red es pública, así que los teléfonos se rechazan por seguridad. Configúrala como privada en Configuración de Windows → Red e Internet y luego desactiva esto y vuelve a activarlo",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Qué tan fuerte oyen los demás tus sonidos (y tu stream). Tus audífonos tienen su propio volumen: Mis audífonos, abajo. Escribe hasta 1000% en la casilla.",
+  "Sounds for others": "Sonidos para los demás"
 }

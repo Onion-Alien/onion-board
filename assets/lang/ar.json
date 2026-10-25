@@ -163,7 +163,6 @@
   "Hotkey removed from “{name}”": "أُزيل الاختصار من “{name}”",
   "Hotkey: {hotkey}": "الاختصار: {hotkey}",
   "Hotkeys are on again.": "الاختصارات تعمل مجددًا.",
-  "How loud your sounds are, type up to 1000% in the box": "مدى علوّ أصواتك، اكتب حتى 1000% في الخانة",
   "How loud your voice is for others. The dot shows activity when you talk": "مدى علوّ صوتك لدى الآخرين. تُظهر النقطة النشاط عندما تتكلم",
   "I've installed it: check again": "ثبّتُّه: تحقّق مجددًا",
   "Import a backup or sound pack": "استيراد نسخة احتياطية أو حزمة أصوات",
@@ -4759,5 +4758,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "أرسل لصديقك رابطًا لتنزيل Onion Board. ضع اسمك أو اسمك في الألعاب عليه، وسيحييه التطبيق باسمك أول مرة يفتحه. لا شيء يُتتبَّع أو يُحسَب.",
   "Your name or gamertag (optional)": "اسمك أو اسمك في الألعاب (اختياري)",
   "{name} invited you to Onion Board. Have fun!": "{name} دعاك إلى Onion Board. استمتع!",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "تعذّر على Windows معرفة ما إذا كانت هذه الشبكة عامة، لذلك تُرفض الهواتف احتياطًا. اضبطها على خاصة في إعدادات Windows ← الشبكة والإنترنت، ثم أوقف هذا وشغّله من جديد"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "تعذّر على Windows معرفة ما إذا كانت هذه الشبكة عامة، لذلك تُرفض الهواتف احتياطًا. اضبطها على خاصة في إعدادات Windows ← الشبكة والإنترنت، ثم أوقف هذا وشغّله من جديد",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "مدى علوّ أصواتك عند الآخرين (وفي البث). لسماعاتك صوتها الخاص: سماعاتي، في الأسفل. اكتب حتى 1000% في الخانة.",
+  "Sounds for others": "الأصوات للآخرين"
 }

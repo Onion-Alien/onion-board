@@ -147,7 +147,6 @@
   "Hotkey removed from “{name}”": "Sneltoets verwijderd van “{name}”",
   "Hotkey: {hotkey}": "Sneltoets: {hotkey}",
   "Hotkeys are on again.": "Sneltoetsen staan weer aan.",
-  "How loud your sounds are, type up to 1000% in the box": "Hoe hard je geluiden zijn, typ tot 1000% in het vak",
   "How loud your voice is for others. The dot shows activity when you talk": "Hoe hard je stem is voor anderen. De stip laat activiteit zien als je praat",
   "I've installed it: check again": "Ik heb hem geïnstalleerd: opnieuw controleren",
   "Import a backup or sound pack": "Een back-up of geluidspakket importeren",
@@ -4447,5 +4446,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Stuur een vriend een link om Onion Board te downloaden. Zet je naam of gamertag erop, dan zegt de app hallo van jou als ze hem voor het eerst openen. Er wordt niets gevolgd of geteld.",
   "Your name or gamertag (optional)": "Je naam of gamertag (optioneel)",
   "{name} invited you to Onion Board. Have fun!": "{name} heeft je uitgenodigd voor Onion Board. Veel plezier!",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows kon niet zeggen of dit netwerk openbaar is, dus telefoons worden voor de zekerheid geweigerd. Zet het op Privé in Windows-instellingen → Netwerk en internet en zet dit daarna uit en weer aan"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows kon niet zeggen of dit netwerk openbaar is, dus telefoons worden voor de zekerheid geweigerd. Zet het op Privé in Windows-instellingen → Netwerk en internet en zet dit daarna uit en weer aan",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Hoe hard anderen je geluiden horen (en je stream). Je koptelefoon heeft een eigen volume: Mijn koptelefoon, onderaan. Typ tot 1000% in het vak.",
+  "Sounds for others": "Geluiden voor anderen"
 }

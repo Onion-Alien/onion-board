@@ -2591,7 +2591,6 @@
   "“{name}” is back how it came": "„{name}“ е върнат какъвто беше първоначално",
   "Onion Board {version} is downloaded, click to install it": "Onion Board {version} е изтеглен, кликни, за да го инсталираш",
   "Only what YOU hear, doesn't change anything for others": "Само каквото чуваш ТИ, за другите не променя нищо",
-  "How loud your sounds are, type up to 1000% in the box": "Колко силни са звуците ти, в полето можеш да напишеш до 1000%",
   "<span style='color:{status}'>Couldn't re-scan devices, restart the app to pick up new ones.</span>": "<span style='color:{status}'>Не успях да сканирам устройствата пак, рестартирай приложението, за да хване новите.</span>",
   "<span style='color:{status}'>Still no virtual cable. If you just installed it, restart your PC, Windows often only shows it after a restart.</span>": "<span style='color:{status}'>Още няма виртуален кабел. Ако току-що си го инсталирал, рестартирай компютъра, Windows често го показва чак след рестарт.</span>",
   "<span style='color:{status}'>Audio device problem: {problems}</span>": "<span style='color:{status}'>Проблем с аудио устройството: {problems}</span>",
@@ -4447,5 +4446,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Изпрати на приятел линк за изтегляне на Onion Board. Сложи името или геймърското си име на него и приложението ще го поздрави от твое име, когато го отвори за първи път. Нищо не се следи и не се брои.",
   "Your name or gamertag (optional)": "Твоето име или геймърско име (по избор)",
   "{name} invited you to Onion Board. Have fun!": "{name} те покани в Onion Board. Забавлявай се!",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows не можа да каже дали тази мрежа е обществена, затова телефоните се отказват за всеки случай. Задайте я като частна в Настройки на Windows → Мрежа и интернет, след което изключете и включете това отново"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows не можа да каже дали тази мрежа е обществена, затова телефоните се отказват за всеки случай. Задайте я като частна в Настройки на Windows → Мрежа и интернет, след което изключете и включете това отново",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Колко силно другите чуват звуците ти (и стриймът ти). Слушалките ти имат своя сила: Моите слушалки, най-долу. В полето можеш да напишеш до 1000%.",
+  "Sounds for others": "Звуци за другите"
 }

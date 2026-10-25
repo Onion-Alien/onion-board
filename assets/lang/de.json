@@ -147,7 +147,6 @@
   "Hotkey removed from “{name}”": "Hotkey von „{name}“ entfernt",
   "Hotkey: {hotkey}": "Hotkey: {hotkey}",
   "Hotkeys are on again.": "Hotkeys sind wieder an.",
-  "How loud your sounds are, type up to 1000% in the box": "Wie laut deine Sounds sind, tipp bis zu 1000% ins Feld",
   "How loud your voice is for others. The dot shows activity when you talk": "Wie laut deine Stimme für andere ist. Der Punkt zeigt Aktivität, wenn du sprichst",
   "I've installed it: check again": "Ich hab's installiert: nochmal prüfen",
   "Import a backup or sound pack": "Backup oder Soundpaket importieren",
@@ -4447,5 +4446,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Schick einem Freund einen Link zum Herunterladen von Onion Board. Setz deinen Namen oder Gamertag drauf, dann grüßt die App ihn von dir, wenn er sie zum ersten Mal öffnet. Nichts wird getrackt oder gezählt.",
   "Your name or gamertag (optional)": "Dein Name oder Gamertag (optional)",
   "{name} invited you to Onion Board. Have fun!": "{name} hat dich zu Onion Board eingeladen. Viel Spaß!",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows konnte nicht feststellen, ob dieses Netzwerk öffentlich ist, daher werden Telefone sicherheitshalber abgewiesen. Stellen Sie es in den Windows-Einstellungen → Netzwerk und Internet auf „Privat“ und schalten Sie dies dann aus und wieder ein"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows konnte nicht feststellen, ob dieses Netzwerk öffentlich ist, daher werden Telefone sicherheitshalber abgewiesen. Stellen Sie es in den Windows-Einstellungen → Netzwerk und Internet auf „Privat“ und schalten Sie dies dann aus und wieder ein",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Wie laut andere deine Sounds hören (und dein Stream). Deine Kopfhörer haben ihre eigene Lautstärke: Meine Kopfhörer, ganz unten. Tipp bis zu 1000% ins Feld.",
+  "Sounds for others": "Sounds für andere"
 }

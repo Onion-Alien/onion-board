@@ -143,7 +143,6 @@
   "Hotkey removed from “{name}”": "Đã gỡ phím tắt khỏi “{name}”",
   "Hotkey: {hotkey}": "Phím tắt: {hotkey}",
   "Hotkeys are on again.": "Phím tắt đã bật lại.",
-  "How loud your sounds are, type up to 1000% in the box": "Âm lượng âm thanh của bạn, gõ đến 1000% vào ô",
   "How loud your voice is for others. The dot shows activity when you talk": "Giọng bạn to bao nhiêu với người khác. Chấm cho thấy hoạt động khi bạn nói",
   "I've installed it: check again": "Tôi đã cài: kiểm tra lại",
   "Import a backup or sound pack": "Nhập bản sao lưu hoặc gói âm thanh",
@@ -4369,5 +4368,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Gửi cho bạn bè link tải Onion Board. Ghi tên hoặc gamertag của bạn vào, ứng dụng sẽ chào họ thay bạn khi họ mở lần đầu. Không có gì bị theo dõi hay đếm.",
   "Your name or gamertag (optional)": "Tên hoặc gamertag của bạn (không bắt buộc)",
   "{name} invited you to Onion Board. Have fun!": "{name} đã mời bạn dùng Onion Board. Chơi vui nhé!",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows không xác định được mạng này có phải là Công cộng hay không, nên điện thoại bị từ chối để đảm bảo an toàn. Hãy đặt mạng thành Riêng tư trong Cài đặt Windows → Mạng & Internet, rồi tắt và bật lại tùy chọn này"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows không xác định được mạng này có phải là Công cộng hay không, nên điện thoại bị từ chối để đảm bảo an toàn. Hãy đặt mạng thành Riêng tư trong Cài đặt Windows → Mạng & Internet, rồi tắt và bật lại tùy chọn này",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Người khác nghe âm thanh của bạn to đến mức nào (và luồng phát của bạn). Tai nghe của bạn có âm lượng riêng: Tai nghe của tôi, ở dưới cùng. Gõ đến 1000% vào ô.",
+  "Sounds for others": "Âm thanh cho người khác"
 }

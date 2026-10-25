@@ -452,7 +452,6 @@
   "Hotkeys": "Mga hotkey",
   "Hotkeys are on again.": "Naka-on ulit ang mga hotkey.",
   "How loud the stream output is (only OBS hears it)": "Gaano kalakas ang stream output (OBS lang ang nakakarinig)",
-  "How loud your sounds are, type up to 1000% in the box": "Gaano kalakas ang mga sound mo, mag-type hanggang 1000% sa box",
   "How loud your voice is for others. The dot shows activity when you talk": "Gaano kalakas ang boses mo para sa iba. Ipinapakita ng tuldok kapag nagsasalita ka",
   "How much data went to each site, added up over the whole history": "Gaano karaming data ang napunta sa bawat site, pinagsama sa buong history",
   "I'm bored…": "Nabo-bored ako…",
@@ -4447,5 +4446,7 @@
   "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Padalhan ang kaibigan ng link para i-download ang Onion Board. Ilagay ang pangalan o gamertag mo at babatiin sila ng app para sa iyo sa unang beses nilang buksan ito. Walang sinusubaybayan o binibilang.",
   "Your name or gamertag (optional)": "Pangalan o gamertag mo (opsyonal)",
   "{name} invited you to Onion Board. Have fun!": "Inimbita ka ni {name} sa Onion Board. Mag-enjoy!",
-  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Hindi masabi ng Windows kung Public ang network na ito, kaya tinatanggihan muna ang mga phone para ligtas. Gawin itong Private sa Windows Settings → Network & internet, saka i-off at i-on ulit ito"
+  "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Hindi masabi ng Windows kung Public ang network na ito, kaya tinatanggihan muna ang mga phone para ligtas. Gawin itong Private sa Windows Settings → Network & internet, saka i-off at i-on ulit ito",
+  "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Gaano kalakas naririnig ng iba ang mga sound mo (at ang stream mo). May sariling volume ang headphones mo: Headphones ko, sa ibaba. Mag-type hanggang 1000% sa box.",
+  "Sounds for others": "Sounds para sa iba"
 }
