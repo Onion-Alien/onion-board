@@ -1,10 +1,10 @@
 name: website
 
-# The website lives at onionalien.com/onionboard now. The old address,
-# onion-alien.github.io/onion-board, keeps every page as a stub that forwards to
-# the same page there (and #watch to /onionwatch/), so old links and search
-# results still land. Runs after each merge that changes site/ (the repo's
-# Pages source is "GitHub Actions").
+# The website's main address is onionalien.com/onionboard (its pages' canonical
+# links say so). The old address, onion-alien.github.io/onion-board, carries the
+# same site so old links still work, downloads included (GitHub's latest
+# release). A page that doesn't exist there forwards to onionalien.com. Runs
+# after each merge that changes site/ (the repo's Pages source is "GitHub Actions").
 on:
   push:
     branches: [main]
@@ -29,29 +29,19 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v6
-      - name: Build the forwarding stubs
+      - name: Copy the site, plus a 404 that forwards to onionalien.com
         run: |
-          mkdir -p out
-          stub() {  # $1 = page path under the site ("" for the home page)
-            new="https://onionalien.com/onionboard/$1"
-            cat <<EOF
+          cp -r site out
+          new=https://onionalien.com/onionboard/
+          cat > out/404.html <<EOF
           <!doctype html>
           <html lang="en"><head><meta charset="utf-8">
-          <title>Onion Board has moved</title>
-          <link rel="canonical" href="$new">
+          <title>Onion Board</title>
           <meta name="robots" content="noindex">
           <meta http-equiv="refresh" content="0; url=$new">
-          <script>location.replace(/^#watch/.test(location.hash) ? "https://onionalien.com/onionwatch/" : "$new" + location.search + location.hash);</script>
-          </head><body><p>Onion Board's website moved to <a href="$new">$new</a>.</p></body></html>
+          <script>location.replace(/^#watch/.test(location.hash) ? "https://onionalien.com/onionwatch/" : "$new");</script>
+          </head><body><p>Onion Board's website: <a href="$new">$new</a>.</p></body></html>
           EOF
-          }
-          (cd site && find . -name index.html) | while read -r f; do
-            dir=$(dirname "${f#./}"); [ "$dir" = "." ] && dir="" || dir="$dir/"
-            mkdir -p "out/$dir"; stub "$dir" > "out/${dir}index.html"
-          done
-          stub "" > out/404.html
-          # Keep the search engines' ownership files, so the old property can still be used to move.
-          cp site/google*.html site/*.txt out/ 2>/dev/null || true
       - uses: actions/upload-pages-artifact@v5
         with:
           path: out
