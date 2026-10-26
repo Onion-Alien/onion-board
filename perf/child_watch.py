@@ -1,5 +1,5 @@
 """The measured process for standalone Onion Watch: its real window, started the way
-onionwatch.app.main starts it, on a throwaway profile (ONIONWATCH_HOME, set by the
+onionwatch.core.app.main starts it, on a throwaway profile (ONIONWATCH_HOME, set by the
 runner), offscreen, with a stand-in screen and silent fake audio. Started by
 perf.runner with an Onion Watch checkout first on PYTHONPATH, never by hand:
 
@@ -28,14 +28,15 @@ def isolate(conf: dict):
     from perf import fakeaudio
     fakeaudio.install(sd, 1)
 
-    from onionwatch import screenwatch, settings
+    from onionwatch.core import settings
+    from onionwatch.engine import screenwatch
     if not Path(settings.APP_DIR).resolve().is_relative_to(Path(conf["profile"]).resolve()):
         link.send("error", text=f"Onion Watch's data folder isn't in the run's profile: "
                                 f"refusing ({settings.APP_DIR})")
         link.hard_exit(3)
     stand_in_screen(screenwatch)
 
-    from onionwatch import updates, usage
+    from onionwatch.core import updates, usage
 
     def offline(*_a, **_k):
         raise OSError("perf run: offline")
@@ -74,11 +75,11 @@ class WatchChild:
         app.setApplicationName("Onion Watch")
         app.setQuitOnLastWindowClosed(False)
         app.setStyle("Fusion")
-        from onionwatch import theme
+        from onionwatch.ui.kit import theme
         app.setWindowIcon(theme.app_icon())
         if self.conf.get("event_counts", True):
             self.counts = Counts(app)
-        from onionwatch.ui.mainwindow import MainWindow
+        from onionwatch.ui.window.mainwindow import MainWindow
         self.w = w = MainWindow()
         app.aboutToQuit.connect(w.shutdown)
         w.show()

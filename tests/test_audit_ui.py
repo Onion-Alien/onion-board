@@ -15,7 +15,7 @@ from PySide6.QtWidgets import (QLabel, QListWidget, QPushButton, QStackedWidget,
 from soundboard.ui.kit import theme
 from soundboard.speech import tts
 from soundboard.ui.apps import appspanel
-from soundboard.ui.setup import setupwizard
+from soundboard.ui.setup import setupwizard, steamguide
 from soundboard.ui.kit import busy
 from tests.conftest import process_events
 from tests.test_appspanel import FakeCapture, music, tab  # noqa: F401  (fixture)
@@ -168,7 +168,7 @@ def test_installing_greys_the_guide_buttons_without_disabling_them(qapp):
 
 
 def test_steam_guide_escapes_the_mic_name(qapp):
-    g = setupwizard.SteamGuide(None, "Mic <b>x</b> & co")
+    g = steamguide.SteamGuide(None, "Mic <b>x</b> & co")
     text = " ".join(lbl.text() for lbl in g.findChildren(QLabel))
     assert "Mic &lt;b&gt;x&lt;/b&gt; &amp; co" in text
     g.deleteLater()

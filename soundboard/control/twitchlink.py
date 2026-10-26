@@ -24,6 +24,11 @@ from soundboard.core import usage
 from soundboard.core.pollthread import PollThread
 from soundboard.i18n import _
 from soundboard.online import net, twitch
+from soundboard.sounds import library
+
+# what Disconnect forgets, in config.json and its older copies
+TWITCH_FIELDS = ("twitch_token", "twitch_refresh", "twitch_login", "twitch_user_id",
+                 "twitch_share")
 
 if TYPE_CHECKING:
     from soundboard.ui.window.mainwindow import MainWindow
@@ -62,6 +67,10 @@ class TwitchLink(QObject):
         self._login = None              # the device code being waited on
         self._login_until = 0.0
         self._gen = 0                   # bumped by stop(): answers for an older run are dropped
+        # tokens a refresh got that aren't saved yet (set on the Twitch thread): Twitch's
+        # refresh tokens work once, so a refresh whose answer was dropped (the link
+        # restarted meanwhile) signed the streamer out on the next try
+        self._rotated: twitch.Tokens | None = None
         self._retry = self._timer(self.apply)
         self._alive = self._timer(self._went_quiet)
         self._poll = self._timer(self._poll_login)
@@ -96,6 +105,8 @@ class TwitchLink(QObject):
     def _on_answer(self, key, out):
         gen, then = key
         if gen != self._gen:   # stopped (disconnected, quit) since it was asked
+            if isinstance(out, twitch.Tokens) and self.connected:   # still kept: see _rotated
+                self._keep_tokens(out)
             return
         then(out)
 
@@ -106,6 +117,11 @@ class TwitchLink(QObject):
 
     def _save(self):
         self.mw._save_now()   # on the saver's thread, never the whole config here
+
+    def _keep_tokens(self, tokens: twitch.Tokens):
+        self.mw.cfg.twitch_token, self.mw.cfg.twitch_refresh = tokens.access, tokens.refresh
+        self._rotated = None
+        self._save()
 
     # ------------------------------------------------------------------ signing in
 
@@ -166,6 +182,7 @@ class TwitchLink(QObject):
         tokens, who = out
         cfg = self.mw.cfg
         cfg.twitch_token, cfg.twitch_refresh = tokens.access, tokens.refresh
+        self._rotated = None
         cfg.twitch_login = str(who.get("login") or "")
         cfg.twitch_user_id = str(who.get("user_id") or "")
         self._save()
@@ -179,8 +196,12 @@ class TwitchLink(QObject):
         self.stop()
         cfg.twitch_token = cfg.twitch_refresh = cfg.twitch_login = cfg.twitch_user_id = ""
         cfg.twitch_share = False
+        self._rotated = None
         self.rewards, self.refused = [], []
-        self._save()
+        # once config.json is written without them (a save rotates the one before into
+        # config.json.1): the older copies too, off the UI thread
+        self.mw._save_now(lambda _ok: self._worker.run(
+            lambda: library.scrub_old_configs(TWITCH_FIELDS)))
         if token and net.allowed(twitch.FEATURE):
             self._worker.run(lambda: twitch.revoke(token))
         self._set(OFF)
@@ -203,20 +224,26 @@ class TwitchLink(QObject):
         token, refresh = self.mw.cfg.twitch_token, self.mw.cfg.twitch_refresh
         self._run(lambda: self._checked_token(token, refresh), self._token_ok)
 
-    @staticmethod
-    def _checked_token(token: str, refresh: str):
+    def _checked_token(self, token: str, refresh: str):
         """The token, or new Tokens if Twitch no longer took it (worker thread)."""
+        rotated = self._rotated
+        if rotated is not None:   # an earlier refresh's, not saved yet
+            token, refresh = rotated.access, rotated.refresh
         try:
             twitch.validate(token)
-            return token
+            return token if rotated is None else rotated
         except twitch.TwitchError as e:
             if e.status != 401 or not refresh:
                 raise
-        return twitch.refresh(refresh)   # a Tokens: saved back on the UI thread
+        self._rotated = out = twitch.refresh(refresh)
+        return out   # a Tokens: saved back on the UI thread
 
     def _token_ok(self, out):
         if isinstance(out, twitch.TwitchError) and out.status in (400, 401):
             self.mw.cfg.twitch_token = self.mw.cfg.twitch_refresh = ""
+            self._rotated = None
+            # as Disconnect: signing in again (maybe as another account) asks again
+            self.mw.cfg.twitch_share = False
             self._save()
             self._set(PROBLEM, _("Twitch signed you out. Connect again."))
             return
@@ -224,8 +251,7 @@ class TwitchLink(QObject):
             self._later(_("Couldn't reach Twitch: {error}", error=str(out)))
             return
         if isinstance(out, twitch.Tokens):
-            self.mw.cfg.twitch_token, self.mw.cfg.twitch_refresh = out.access, out.refresh
-            self._save()
+            self._keep_tokens(out)
         self._fetch_rewards()
         self._open(twitch.EVENTSUB_WS)
 

@@ -184,6 +184,11 @@ def test_another_programs_soundboard_folder_is_left_alone(tmp_path, monkeypatch)
     _write(old / "config.json", {"boards": [{"name": "Other app"}], "volume": 0.4})
     library.migrate_from_soundboard()
     assert (old / "config.json").exists() and not new.exists()
+    for theirs in ({"version": "1.4.2"}, {"sounds": {"a": 1}}, {"version": 2},
+                   {"version": 1, "sounds": [{"path": "x.mp3"}]}):
+        _write(old / "config.json", theirs)
+        library.migrate_from_soundboard()
+        assert (old / "config.json").exists() and not new.exists(), theirs
     # one of ours (a config with sounds / a version, or a sounds folder) still moves
     _write(old / "config.json", {"version": 1, "sounds": []})
     library.migrate_from_soundboard()

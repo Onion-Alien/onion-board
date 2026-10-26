@@ -30,6 +30,8 @@ import time
 import winreg
 from pathlib import Path
 
+from soundboard.win import systools
+
 log = logging.getLogger("cleanup")
 
 ADMIN_PART = "--admin-part"
@@ -38,7 +40,7 @@ UNINSTALL = r"Software\Microsoft\Windows\CurrentVersion\Uninstall"
 RUN_KEYS = (r"Software\Microsoft\Windows\CurrentVersion\Run",
             r"Software\Microsoft\Windows\CurrentVersion\RunOnce",
             r"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run")
-RUN_NAMES = ("OnionBoard", "OnionBoardResumeSetup")   # autostart.py, ui/setup/setupwizard.py
+RUN_NAMES = ("OnionBoard", "OnionBoardResumeSetup")   # autostart.py, ui/setup/cablestep.py
 APP_EXES = ("onionboard.exe", "soundboard.exe", "obmichelper.exe")
 FIREWALL_RULES = ("onion-pocket-firewall",)           # onion_pocket/addon.py
 STATE_ROOT = r"SOFTWARE\OnionBoard"
@@ -253,15 +255,16 @@ def user_items(remove_sounds: bool) -> list[str]:
 
 def _remove(path: Path) -> bool:
     """Delete a file or folder; True if it's gone now (else it goes at the next restart
-    when we're admin)."""
+    when we're admin). A link (%ProgramData%\\OnionBoard made a junction by another
+    account) goes itself: what it points at is never walked or marked (dm._remove)."""
     from soundboard.mic import directmic as dm
-    if not path.exists():
+    if not os.path.lexists(path):
         return True
     try:
         dm._remove(path)
     except OSError:
         log.warning("couldn't remove %s", path, exc_info=True)
-    gone = not path.exists()
+    gone = not os.path.lexists(path)
     log.info("%s %s", "removed" if gone else "couldn't remove yet:", path)
     return gone
 
@@ -328,8 +331,8 @@ def close_apps(dirs: list[Path]):
         p = Path(exe)
         if any(p.is_relative_to(d) for d in dirs) and pid != os.getpid():
             log.info("closing %s (%d)", exe, pid)
-            subprocess.run(["taskkill", "/F", "/T", "/PID", str(pid)], capture_output=True,
-                           creationflags=_CREATE_NO_WINDOW)
+            subprocess.run([systools.tool("taskkill"), "/F", "/T", "/PID", str(pid)],
+                           capture_output=True, creationflags=_CREATE_NO_WINDOW)
     time.sleep(1)
 
 
@@ -362,8 +365,8 @@ def admin_part() -> int:
     if michelper.leftover():
         michelper.remove_helper()
     for name in FIREWALL_RULES:
-        subprocess.run(["netsh", "advfirewall", "firewall", "delete", "rule", f"name={name}"],
-                       capture_output=True, creationflags=_CREATE_NO_WINDOW)
+        subprocess.run([systools.tool("netsh"), "advfirewall", "firewall", "delete", "rule",
+                        f"name={name}"], capture_output=True, creationflags=_CREATE_NO_WINDOW)
     later = False
     for d in machine_dirs:
         later |= not _remove(d)

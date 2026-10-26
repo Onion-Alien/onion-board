@@ -12,13 +12,32 @@ from soundboard.ui.triggers.triggerstab import TriggersTab
 from test_mainwindow import window  # noqa: F401
 
 
+@pytest.fixture(autouse=True)
+def _fresh_watch():
+    """Each test installs the zip in its own folder: drop the copy the last one loaded,
+    or load_package asks for a restart."""
+    yield
+    modules._forget("onionwatch")
+
+
+def _picture() -> QImage:
+    """A small picture with enough detail to make a trigger from (a flat one isn't)."""
+    image = QImage(60, 40, QImage.Format_RGB32)
+    image.fill(Qt.blue)
+    painter = QPainter(image)
+    painter.fillRect(10, 5, 30, 20, Qt.white)
+    painter.fillRect(15, 8, 10, 10, Qt.red)
+    painter.end()
+    return image
+
+
 @pytest.mark.skipif(not os.environ.get("ONIONBOARD_CARD_TEST_ZIP"), reason="local add-on opt-in")
 def test_built_cards_in_board(window, qapp, tmp_path, monkeypatch):  # noqa: F811
     info = modules.install_zip(Path(os.environ["ONIONBOARD_CARD_TEST_ZIP"]),
                                "onion-watch", "triggers", tmp_path / "modules")
     modules.load_package(info)
-    from onionwatch import screenwatch
-    from onionwatch.ui.viewer import PictureViewer
+    from onionwatch.engine import screenwatch
+    from onionwatch.ui.triggers.viewer import PictureViewer
     monkeypatch.setattr(screenwatch, "monitors", lambda: [])
     tab = TriggersTab(BoardHost(window), [tmp_path / "modules"])
     assert tab.panel is not None, tab.error.text()
@@ -26,12 +45,7 @@ def test_built_cards_in_board(window, qapp, tmp_path, monkeypatch):  # noqa: F81
     # The board entry wraps its triggers in an alarm bar.
     if not hasattr(panel, "_new"):
         panel = panel.panel
-    image = QImage(60, 40, QImage.Format_RGB32)
-    image.fill(Qt.blue)
-    painter = QPainter(image)
-    painter.fillRect(10, 5, 30, 20, Qt.white)
-    painter.fillRect(15, 8, 10, 10, Qt.red)
-    painter.end()
+    image = _picture()
     panel._new(image, "Test picture")
     row = next(iter(panel.rows.values()))
     row.t.sounds = ["s0"]
@@ -88,8 +102,8 @@ def test_built_cards_in_board(window, qapp, tmp_path, monkeypatch):  # noqa: F81
 def test_built_bar_keeps_its_words_with_triggers_coming_and_going(
         qapp, app_dir, monkeypatch):
     """The real add-on's bottom bar in a window tight for another tab: its buttons keep
-    their words from no triggers to one blank one, after deleting it and across tab
-    switches, and go icon only only when the bar itself is narrow."""
+    their words from no triggers to one, after deleting it and across tab switches, and
+    Watch goes icon only only when the bar itself is narrow."""
     from PySide6.QtCore import QEvent
 
     from soundboard.audio import engine
@@ -114,7 +128,7 @@ def test_built_bar_keeps_its_words_with_triggers_coming_and_going(
         assert panel is not None, w.triggers.error.text()
         if not hasattr(panel, "_new"):
             panel = panel.panel
-        words = (panel.btn_watch, panel.btn_cut, panel.btn_add)
+        words = (panel.btn_watch, panel.btn_more)
 
         def shown():
             for _ in range(5):
@@ -122,7 +136,7 @@ def test_built_bar_keeps_its_words_with_triggers_coming_and_going(
             return all(b.text() for b in words)
 
         assert w.fitctl._fit.compact_count() and shown()      # no triggers
-        panel.btn_new.click()                          # one, blank
+        panel._new(_picture(), "Test picture")         # one (+ New trigger opens a picker)
         assert len(panel.triggers) == 1 and shown()
         w.tabs.setCurrentIndex(0)
         w.tabs.setCurrentWidget(w.triggers)
@@ -130,7 +144,7 @@ def test_built_bar_keeps_its_words_with_triggers_coming_and_going(
         panel._remove(next(iter(panel.rows.values())))  # the last one deleted
         assert not panel.triggers and shown()
         w.resize(640, 800)                             # the bar itself narrow
-        assert not shown() and panel.btn_cut.text() == ""
+        assert not shown() and panel.btn_watch.text() == ""
         w.resize(1100, 800)
         assert shown()
     finally:

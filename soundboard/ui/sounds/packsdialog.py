@@ -24,6 +24,7 @@ from soundboard.audio.engine import SR
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import hint_label
 from soundboard.ui.kit.widgets import take_out
+from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.i18n import _, ngettext
 
 log = logging.getLogger(__name__)
@@ -100,8 +101,8 @@ class SampleButton(QPushButton):
             pic = QIcon(blank)
         self.setIcon(pic or icons.icon("play", "muted"))
         self.setAccessibleName(_("Hear {name}", name=self._name) if sample else "")
-        self.setToolTip(_("Hear {name} (only you hear it)", name=self._name) if sample
-                        else "")
+        self.setToolTip(plain_tip(_("Hear {name} (only you hear it)", name=self._name))
+                        if sample else "")   # (the name comes from the pack)
         self._fit_name()
 
     def _fit_name(self):

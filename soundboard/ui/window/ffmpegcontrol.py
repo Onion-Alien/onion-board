@@ -20,7 +20,7 @@ from soundboard.online import ffmpegget, net, netlog
 from soundboard.i18n import _
 from soundboard.ui.kit import busy, worker
 from soundboard.ui.kit.topbar import TopBar
-from soundboard.ui.window import sidebar
+from soundboard.ui.window import updatecard
 from soundboard.ui.window.controller import Controller
 
 if TYPE_CHECKING:
@@ -55,7 +55,7 @@ class FfmpegControl(Controller):
         self.prog.setObjectName("updatebar")
         self.prog.setRange(0, 100)
         self.prog.setTextVisible(False)
-        self.prog.setFixedHeight(sidebar.UpdateCard.BAR_H)
+        self.prog.setFixedHeight(updatecard.UpdateCard.BAR_H)
         self.prog.hide()
         self.bar.add_row(self.prog)
         self.never_btn = self.bar.add_button(_("Don't ask again"))

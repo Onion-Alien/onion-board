@@ -12,401 +12,58 @@ Shows:
   - the ones waiting ("Waiting to add"; a click makes one next up), each with its ✕
   - the ones that failed, each with Retry, and the ones added already, each with ▶
     (plays it as its pad would) and Show (the pad, on the Sounds tab)
+
+Its parts (the bar, the labels, the end flash, the pictures, the glow): downloadparts.py.
 """
 from __future__ import annotations
 
-import math
-import re
-import time
-import urllib.parse
 from collections.abc import Callable
 
-from PySide6.QtCore import (QEasingCurve, QEvent, QPoint, QRect, QRectF, QSize, Qt, QTimer,
+from PySide6.QtCore import (QRect, QRectF, Qt, QTimer,
                             QVariantAnimation, Signal)
-from PySide6.QtGui import (QColor, QCursor, QFontMetricsF, QLinearGradient, QPainter,
-                           QPainterPath, QPalette, QPen, QPixmap)
-from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QScrollArea,
-                               QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
+from PySide6.QtGui import QColor, QCursor, QPainter, QPen, QPixmap
+from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QScrollArea, QSizePolicy,
+                               QSpacerItem, QVBoxLayout, QWidget)
 
 from soundboard.core import jobprogress, usage
 from soundboard.ui.kit import theme
 from soundboard.i18n import _, ngettext
 from soundboard.ui.kit import icons
-from soundboard.ui.window import responsive
 from soundboard.ui.bun.scribebun import ScribeBunny
 from soundboard.ui.kit.widgets import fmt_time
+from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.ui.kit.pixels import snap_to_pixels
 from soundboard.ui.kit.restyled import measured, on_restyle
-from soundboard.ui.settings import lite
+from soundboard.ui.window.downloadparts import (ElideLabel, KindTag, Outcome, SmoothProgressBar,
+                                                _placeholder, _rounded, pretty_title, source_of)
+from soundboard.ui.window.downloadbits import (  # noqa: F401
+    _QueueRow,
+    _Summary,
+    BAR_MIN_W,
+    BAR_W,
+    CARD_GAP,
+    CARD_MARGIN,
+    CARD_TIGHT,
+    CARD_W,
+    GLIDE_MS,
+    LINE_GAP,
+    PILL_BAR_W,
+    PILL_R,
+    QUEUE_ROWS,
+    ROW_THUMB,
+    THUMB_H,
+    THUMB_W,
+    TIGHT_BELOW,
+    WIDE_AT,
+)
+from soundboard.ui.window.downloadparts import SOFT, glow  # noqa: F401  (importable here, as before)
+from soundboard.ui.window.downloadlook import DownloadLook
+from soundboard.ui.window.downloadplace import DownloadPlace
+from soundboard.ui.window.downloadrows import DownloadRows
 
 
-BAR_W = 480   # the progress bar's length in the banner
-LINE_GAP = 6  # between line 1 (the title) and line 2 (the bar); the mini player: 4
-
-
-class SmoothProgressBar(QWidget):
-    """A sleek 6px progress bar that only fills forward (soundboard/core/jobprogress.py). While
-    a step has nothing to measure (the link looked up, the audio converted) a faint glint
-    runs along the empty part, so it's plainly busy, never a block that looks full."""
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setFixedHeight(6)
-        self._busy = True
-        self._progress = 0.0          # 0.0 .. 1.0
-        self._t0 = time.monotonic()
-        self._timer = QTimer(self)
-        self._timer.setInterval(1000 // 24)
-        self._timer.timeout.connect(self.update)
-        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-
-    def set_busy(self, on: bool):
-        """The glint over the empty part: on while a step can't say how far it is."""
-        if on and not self._busy:
-            self._t0 = time.monotonic()
-        self._busy = on
-        if on and self.isVisible():
-            if not self._timer.isActive():
-                self._timer.start()
-        else:
-            self._timer.stop()
-        self.update()
-
-    def set_progress(self, frac: float, busy: bool = False):
-        self._progress = max(0.0, min(1.0, float(frac)))
-        self.set_busy(busy)
-
-    def showEvent(self, ev):
-        super().showEvent(ev)
-        if self._busy:
-            self._timer.start()
-
-    def hideEvent(self, ev):
-        self._timer.stop()
-        super().hideEvent(ev)
-
-    def sizeHint(self) -> QSize:
-        return QSize(180, 6)
-
-    def paintEvent(self, _e):
-        p = QPainter(self)
-        snap_to_pixels(p)
-        p.setRenderHint(QPainter.RenderHint.Antialiasing)
-        r = QRectF(self.rect())
-        rad = r.height() / 2
-        p.setPen(Qt.PenStyle.NoPen)
-        groove = QColor(theme.T.get("groove", theme.mix(theme.T["card"], theme.T["text"], 0.12)))
-        p.setBrush(groove)
-        p.drawRoundedRect(r, rad, rad)
-
-        accent = QColor(theme.T.get("accent", "#7c5cff"))
-        w = r.width() * self._progress
-        if w > 0:
-            p.setBrush(accent)
-            p.drawRoundedRect(QRectF(r.left(), r.top(), max(r.height(), w), r.height()),
-                              rad, rad)
-        if self._busy:
-            # a soft glint sweeping the empty part, faded at both ends: busy, not further
-            empty = QRectF(r.left() + w, r.top(), r.width() - w, r.height())
-            if empty.width() > r.height():
-                k = ((time.monotonic() - self._t0) / 1.6) % 1.0
-                gw = max(r.height() * 4, empty.width() * 0.3)
-                gx = empty.left() - gw + (empty.width() + gw) * k
-                g = QLinearGradient(gx, 0, gx + gw, 0)
-                clear, lit = QColor(accent), QColor(accent)
-                clear.setAlpha(0)
-                lit.setAlpha(110)
-                g.setColorAt(0.0, clear)
-                g.setColorAt(0.5, lit)
-                g.setColorAt(1.0, clear)
-                p.save()
-                clip = QPainterPath()
-                clip.addRoundedRect(r, rad, rad)
-                p.setClipPath(clip)
-                p.setClipRect(empty, Qt.ClipOperation.IntersectClip)
-                p.setBrush(g)
-                p.drawRect(QRectF(gx, r.top(), gw, r.height()))
-                p.restore()
-        p.end()
-
-
-class ElideLabel(QLabel):
-    """A one-line label that shrinks with its box and ends in … when the text doesn't fit."""
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setTextFormat(Qt.TextFormat.PlainText)
-        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
-
-    def minimumSizeHint(self) -> QSize:
-        return QSize(0, super().minimumSizeHint().height())
-
-    def sizeHint(self) -> QSize:
-        return QSize(self.fontMetrics().horizontalAdvance(self.text()) + 2,
-                     super().sizeHint().height())
-
-    def paintEvent(self, _e):
-        p = QPainter(self)
-        snap_to_pixels(p)
-        text = self.fontMetrics().elidedText(self.text(), Qt.TextElideMode.ElideRight, self.width())
-        self.style().drawItemText(p, self.rect(),
-                                  int(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter),
-                                  self.palette(), self.isEnabled(), text,
-                                  QPalette.ColorRole.WindowText)
-        p.end()
-
-
-class KindTag(QWidget):
-    """What a pick will do, as a status (an icon and a few words in the accent colour,
-    no box): a filled "Add as sound" pill looked like a button to press."""
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setObjectName("kindtag")
-        lay = QHBoxLayout(self)
-        lay.setContentsMargins(0, 0, 0, 0)
-        lay.setSpacing(4)
-        self.icon = QLabel()
-        self.icon.setFixedSize(12, 12)
-        self.text = QLabel()
-        self.text.setObjectName("kindtag")
-        lay.addWidget(self.icon)
-        lay.addWidget(self.text)
-        self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-        self.kind, self.queued = "", False
-
-    def set_kind(self, kind: str, queued: bool = False):
-        self.kind, self.queued = kind, queued
-        if queued:   # only Add as sound waits in the queue (Play once never does)
-            text = _("Waiting to add")
-            tip = _("Becomes a new sound on your board after the ones before it. "
-                    "Nothing to press.")
-        elif kind == "play":
-            text = _("Playing once")
-            tip = _("Plays once when it's ready. It isn't added to your sounds.")
-        else:
-            text = _("Adding to sounds")
-            tip = _("Becomes a new sound on your board when it's ready. Nothing to press.")
-        self.text.setText(text)
-        self.setToolTip(tip)
-        self.retheme()
-
-    def retheme(self):
-        icons.set_label_icon(self.icon, "play" if self.kind == "play" and not self.queued
-                             else "plus", "live_text", size=12)
-
-
-class Outcome(QWidget):
-    """How a download ended, flashed for a moment: a small green tick in front of the
-    picture (or Bun) when it worked, a red ✗ there when it didn't (the bar's background
-    turns red then too: DownloadBar.paintEvent, under the words). No badge behind the
-    mark; it pops in and fades straight away. Clicks go through it."""
-
-    SHOW_MS = 1000
-    MARK = 20.0          # the tick's or ✗'s size, px
-
-    def __init__(self, bar: QFrame):
-        super().__init__(bar)
-        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
-        self.ok = True
-        self.spot = QRectF()   # the picture's box, in the bar's pixels (empty: no badge)
-        self._k = 0.0
-        self._anim = QVariantAnimation(self)
-        self._anim.setStartValue(0.0)
-        self._anim.setEndValue(1.0)
-        self._anim.setDuration(self.SHOW_MS)
-        self._anim.valueChanged.connect(self._step)
-        self._anim.finished.connect(self.hide)
-        self.hide()
-
-    def play(self, ok: bool, spot: QRectF):
-        self.ok, self.spot = ok, spot
-        bar = self.parentWidget()
-        assert bar is not None   # made on the bar
-        self.setGeometry(bar.rect())
-        self.raise_()
-        self.show()
-        self._anim.stop()
-        self._anim.start()
-
-    def stop(self):
-        self._anim.stop()
-        self.hide()
-
-    def running(self) -> bool:
-        return self._anim.state() == QVariantAnimation.State.Running
-
-    def k(self) -> float:
-        return self._k
-
-    def _step(self, k):
-        if lite.on():   # (lite mode: there whole and still, then gone at once)
-            k = 0.5 if k < 0.95 else 1.0
-            if k == self._k:
-                return
-        self._k = float(k)
-        self.update()
-        bar = self.parentWidget()
-        if not self.ok and bar is not None:
-            bar.update()   # its red background fades with it
-
-    def paintEvent(self, _e):
-        k = self._k
-        p = QPainter(self)
-        snap_to_pixels(p)
-        p.setRenderHint(QPainter.RenderHint.Antialiasing)
-        red = QColor(theme.status("error"))
-        if self.spot.isEmpty():
-            p.end()
-            return
-        pop = min(1.0, k / 0.15)                               # pops in, then fades out
-        fade = min(1.0, (1.0 - k) / 0.4)
-        u = self.MARK / 2 * (0.6 + 0.4 * pop)
-        c = self.spot.center()
-        path = QPainterPath()
-        if self.ok:
-            path.moveTo(c.x() - 0.8 * u, c.y() + 0.05 * u)
-            path.lineTo(c.x() - 0.25 * u, c.y() + 0.6 * u)
-            path.lineTo(c.x() + 0.85 * u, c.y() - 0.6 * u)
-        else:
-            a = 0.62 * u
-            path.moveTo(c.x() - a, c.y() - a)
-            path.lineTo(c.x() + a, c.y() + a)
-            path.moveTo(c.x() - a, c.y() + a)
-            path.lineTo(c.x() + a, c.y() - a)
-        p.setBrush(Qt.BrushStyle.NoBrush)
-        edge = QColor(theme.T["bg"]).darker(140)   # a thin dark edge: shows on any picture
-        edge.setAlphaF(0.7 * fade)
-        p.setPen(QPen(edge, 5.0, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap,
-                      Qt.PenJoinStyle.RoundJoin))
-        p.drawPath(path)
-        mark = QColor(theme.status("ok") if self.ok else red)
-        mark.setAlphaF(fade)
-        p.setPen(QPen(mark, 3.0, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap,
-                      Qt.PenJoinStyle.RoundJoin))
-        p.drawPath(path)
-        p.end()
-
-
-THUMB_W, THUMB_H = 64, 36     # the running pick's picture
-ROW_THUMB = (48, 27)          # and the other rows' ones
-WIDE_AT = 720                 # the banner is this wide or more: the uploader and length show
-TIGHT_BELOW = 640             # narrower: the rows drop their pictures (as in the mini player)
-BAR_MIN_W = 48                # the progress bar never shrinks past this
-QUEUE_ROWS = 5                # queue rows shown before the list scrolls
-CARD_W = 420                  # the corner card's width (narrower windows: less 32)
-CARD_TIGHT = 320              # a corner card narrower than this drops its pictures
-CARD_MARGIN = 16              # from the page's side, as the toasts (ui/kit/toast.py)
-CARD_GAP = 8                  # from the page's bottom: the player bar under it
-PILL_BAR_W = 64               # the summary's bar in the pill
 FOLD_MS = 4000                # everything added: the card folds to its pill after this
 FOLDED_MS = 6000              # and the pill goes after this (hovering waits)
-GLIDE_MS = 280                # the corner card sliding down to its pill and back up
-
-
-AUDIO_EXTS = (".mp3", ".wav", ".ogg", ".flac", ".m4a", ".aac", ".opus", ".webm", ".mp4")
-
-
-def pretty_title(title: str) -> str:
-    """A title as a person would write it: a file name loses its extension, and a name
-    made of underscores or dashes ("my_cool-song") becomes words ("My Cool Song").
-    A real title with spaces keeps its dashes ("Artist - Song")."""
-    t = (title or "").strip()
-    if t.lower().endswith(AUDIO_EXTS):
-        t = t.rsplit(".", 1)[0]
-    if " " not in t:   # a slug or file name
-        t = t.replace("_", " ").replace("-", " ")
-    else:
-        t = t.replace("_", " ")
-    t = re.sub(r"\s+", " ", t).strip()
-    if t and t == t.lower():
-        t = t.title()
-    return t
-
-
-def source_of(url: str) -> tuple[str, str]:
-    """(icon name, site name) for the page a sound comes from."""
-    host = (urllib.parse.urlsplit(url).hostname or "").lower().removeprefix("www.")
-
-    def under(*domains):
-        return any(host == d or host.endswith("." + d) for d in domains)
-    if host == "music.youtube.com":
-        return "ytmusic", "YouTube Music"
-    if under("youtube.com", "youtu.be", "youtube-nocookie.com"):
-        return "youtube", "YouTube"
-    if under("soundcloud.com", "snd.sc"):
-        return "soundcloud", "SoundCloud"
-    if under("tiktok.com"):
-        return "tiktok", "TikTok"
-    if under("myinstants.com"):
-        return "myinstants", "Myinstants"
-    return "browser", host
-
-
-def _rounded(pm: QPixmap, w: int, h: int, radius: int, dpr: float) -> QPixmap:
-    """`pm` filled into a w x h box (cropped, not squashed) with rounded corners."""
-    out = QPixmap(round(w * dpr), round(h * dpr))
-    out.setDevicePixelRatio(dpr)
-    out.fill(Qt.GlobalColor.transparent)
-    p = QPainter(out)
-    p.setRenderHint(QPainter.RenderHint.Antialiasing)
-    p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
-    path = QPainterPath()
-    path.addRoundedRect(QRectF(0, 0, w, h), radius, radius)
-    p.setClipPath(path)
-    src = pm.scaled(round(w * dpr), round(h * dpr), Qt.AspectRatioMode.KeepAspectRatioByExpanding,
-                    Qt.TransformationMode.SmoothTransformation)
-    p.drawPixmap(QRectF(0, 0, w, h), src, QRectF(
-        (src.width() - w * dpr) / 2, (src.height() - h * dpr) / 2, w * dpr, h * dpr))
-    p.end()
-    return out
-
-
-def _placeholder(w: int, h: int, radius: int, dpr: float) -> QPixmap:
-    """The picture for a sound with none of its own (an MP3 link, a search card whose
-    art hasn't come yet): the theme's accent in a soft gradient with a sound wave on it."""
-    T = theme.T
-    out = QPixmap(round(w * dpr), round(h * dpr))
-    out.setDevicePixelRatio(dpr)
-    out.fill(Qt.GlobalColor.transparent)
-    p = QPainter(out)
-    p.setRenderHint(QPainter.RenderHint.Antialiasing)
-    grad = QLinearGradient(0, 0, w, h)
-    grad.setColorAt(0, QColor(theme.mix(T["card"], T["accent"], 0.75)))
-    grad.setColorAt(1, QColor(theme.mix(T["card"], T["accent"], 0.25)))
-    p.setBrush(grad)
-    p.setPen(Qt.PenStyle.NoPen)
-    p.drawRoundedRect(QRectF(0, 0, w, h), radius, radius)
-    side = round(h * 0.6)
-    glyph = icons.pixmap("wave", round(side * dpr), T["live_text"])
-    glyph.setDevicePixelRatio(dpr)
-    p.drawPixmap(round((w - side) / 2), round((h - side) / 2), glyph)
-    p.end()
-    return out
-
-
-PILL_R = 20  # the minimised corner card's corners: half its height
-SOFT = 0.5   # the glow's strength when the theme's cards aren't its accent's colour
-
-
-def theme_matches_accent() -> bool:
-    """The theme's own cards are a shade of its accent: Lava's dark orange cards and
-    orange accent, Ocean's navy and cyan. Then the banner's accent glow is the theme's
-    look and shows in full; on Dark (near-black cards, a purple accent), Light or Royal
-    (gold on violet) the same glow was all anyone saw, so it shows at half."""
-    card, accent = QColor(theme.T["card"]), QColor(theme.T["accent"])
-    hc, ha = card.hsvHueF(), accent.hsvHueF()
-    if hc < 0 or ha < 0:   # a grey: no colour to match
-        return False
-    colour = card.hsvSaturationF() * card.valueF()   # how far from grey the cards are
-    presence = max(0.0, min(1.0, (colour - 0.04) / 0.1))
-    same_hue = max(0.0, math.cos(abs(hc - ha) * 2 * math.pi))   # 1 = the same colour
-    return presence * same_hue >= 0.6
-
-
-def glow() -> float:
-    """The accent glow's strength: 1 on a theme it matches, else SOFT."""
-    return 1.0 if theme_matches_accent() else SOFT
 
 
 def _after_hold(method):
@@ -423,28 +80,7 @@ def _after_hold(method):
     return wrapper
 
 
-class _QueueRow(QFrame):
-    """A row of the queue list; clicking a waiting one makes it next up."""
-    clicked = Signal()
-
-    def mousePressEvent(self, ev):
-        if ev.button() == Qt.MouseButton.LeftButton:
-            self.clicked.emit()
-        super().mousePressEvent(ev)
-
-
-class _Summary(QWidget):
-    """The banner's summary line ("Adding 3 sounds"). Minimised, it's all that shows, and
-    a click on it opens the list again."""
-    clicked = Signal()
-
-    def mousePressEvent(self, ev):
-        if ev.button() == Qt.MouseButton.LeftButton:
-            self.clicked.emit()
-        super().mousePressEvent(ev)
-
-
-class DownloadBar(QFrame):
+class DownloadBar(DownloadLook, DownloadPlace, DownloadRows, QFrame):
     """The persistent top bar: a summary line ("Adding 3 sounds", how many failed) over
     one list with a row per pick: the one downloading now with its bar, then the ones
     waiting, the ones that failed (each with Retry) and the ones added already."""
@@ -750,140 +386,6 @@ class DownloadBar(QFrame):
 
     # ------------------------------------------------------------------ looks
 
-    def retheme(self):
-        T = theme.T
-        k = glow()
-        card_bg = theme.mix(T["card"], T["accent"], 0.12 * k)
-        border = theme.mix(T["card"], T["accent"], 0.38 * k)
-        row_bg = theme.mix(card_bg, T["text"], 0.05)
-        bad = theme.status("error")
-
-        self.setStyleSheet(
-            f"QFrame#downloadbar {{ background:{card_bg}; border:1px solid {border}; "
-            f"border-radius:12px; }}"
-            + self._gradient_css(row_bg) +
-            f"QWidget#downloadhead, QWidget#queuepanel, QWidget#queueholder, "
-            f"QScrollArea#queuescroll {{ background:transparent; border:none; }}"
-            # words sit on the banner (the flat themes give every widget a background)
-            f"QFrame#downloadbar QLabel {{ background:transparent; }}"
-            f"QLabel#downloadhead {{ color:{T['text_hi']}; font-weight:600; }}"
-            f"QLabel#kindtag {{ color:{T['live_text']}; font-size:8.5pt; font-weight:600; }}"
-            f"QLabel#downloadtitle {{ color:{T['text_hi']}; font-weight:600; }}"
-            f"QLabel#queuetitle {{ color:{T['text']}; }}"
-            f"QLabel#queuetitle[waiting=\"true\"] {{ color:{T['muted']}; }}"
-            f"QLabel#downloadmeta {{ color:{T['muted']}; font-size:8.5pt; }}"
-            f"QLabel#downloadstatus {{ color:{T['text']}; font-size:8.5pt; font-weight:600; }}"
-            f"QLabel#downloadstatus[tone=\"ok\"] {{ color:{theme.status('ok')}; }}"
-            f"QLabel#downloadstatus[tone=\"error\"] {{ color:{bad}; }}"
-            f"QPushButton#dlicon {{ background:transparent; border:none; border-radius:8px; "
-            f"padding:0px; }}"
-            f"QPushButton#dlicon:hover {{ background:{T['btn_hover']}; }}"
-            f"QPushButton#dlicon:pressed {{ background:{T['btn_press']}; }}"
-            f"QPushButton#retrybutton {{ background:{T['btn']}; border:none; border-radius:8px; "
-            f"padding:2px 10px; color:{T['text']}; font-size:8pt; font-weight:600; }}"
-            f"QPushButton#retrybutton:hover {{ background:{T['btn_hover']}; }}"
-            f"QPushButton#retrybutton[main=\"true\"] {{ background:{theme.accent_fill()}; "
-            f"{theme.accent_edge()} color:{T['on_accent']}; }}"
-            f"QPushButton#retrybutton[main=\"true\"]:hover "
-            f"{{ background:{theme.accent_fill(hover=True)}; }}"
-            f"QFrame#queuerow {{ background:transparent; border:1px solid transparent; "
-            f"border-radius:8px; }}"
-            f"QFrame#queuerow[running=\"true\"] {{ background:{row_bg}; }}"
-            # lights up under the mouse like the app's other cards (More tabs)
-            f"QFrame#queuerow:hover {{ background:{theme.mix(row_bg, T['text'], 0.06)}; "
-            f"border-color:{T['border_hi']}; }}"
-            + self._row_gradient_css(row_bg)
-            # minimised in the corner: a pill (its height is the summary line's, 40)
-            + f"QFrame#downloadbar[pill=\"true\"] {{ border-radius:{PILL_R}px; }}"
-        )
-        self.bar.update()
-        self._fold_icon()
-        self.pill.retheme()
-        self._line_up()
-        self._sync_head()
-        if self.url:
-            self._update_thumb()   # the plain icon is drawn in the theme's colour
-            self.src_icon.setPixmap(self._icon(self._source[0]))
-        self._fill_rows()
-
-    def _gradient_css(self, row_bg: str) -> str:
-        """The banner as one of the theme's designed surfaces: the accent lit at the top
-        left fading into the theme's second colour, a light rim on top. How it ended
-        tints the lit corner: green when added, red when it failed (state below). The
-        outlined theme (High Contrast) stays flat."""
-        if not theme.polished():
-            return ""
-        T, mix = theme.T, theme.mix
-        base = T["card"]
-        a, a2 = T["accent"], T.get("accent2") or T["accent"]
-        ok, bad = theme.status("ok"), theme.status("error")
-        k = glow()   # soft unless the theme's cards share the accent's colour
-        mid = mix(base, a, 0.12 * k)
-        end = mix(base, a2, 0.14 * k)
-        rim = mix(mix(base, a, 0.45 * k), "#ffffff", 0.18 * k)
-
-        def grad(top, middle, last):
-            return (f"qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 {top}, "
-                    f"stop:0.45 {middle}, stop:1 {last})")
-        # added / failed: a light green / red at half on every theme (they're never the
-        # theme's colours); failed is red the whole way across, so it still reads as red
-        # in red themes (Blood Moon), and the red words, pill and Retry say the rest
-        return (f"QFrame#downloadbar {{ background:{grad(mix(base, a, 0.26 * k), mid, end)}; "
-                f"border-color:{mix(base, a, 0.38 * k)}; border-top-color:{rim}; }}"
-                f"QFrame#downloadbar[ended=\"ok\"] {{ "
-                f"background:{grad(mix(base, ok, 0.22 * SOFT), mid, end)}; "
-                f"border-color:{mix(base, ok, 0.45 * SOFT)}; }}"
-                f"QFrame#downloadbar[ended=\"failed\"] {{ background:"
-                f"{grad(mix(base, bad, 0.26 * SOFT), mix(base, bad, 0.14 * SOFT),
-                        mix(base, bad, 0.08 * SOFT))}; "
-                f"border-color:{mix(base, bad, 0.65 * SOFT)}; }}")
-
-    def _row_gradient_css(self, row_bg: str) -> str:
-        """The running row lit from the left in the accent; the others plain until the
-        mouse is on them."""
-        if not theme.polished():
-            return ""
-        T, mix = theme.T, theme.mix
-        k = glow()
-        hover = mix(row_bg, T["text"], 0.06)
-
-        def lit(left, rest):
-            return (f"qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 {left}, "
-                    f"stop:0.5 {rest}, stop:1 {rest})")
-        return (f"QFrame#queuerow[running=\"true\"] {{ "
-                f"background:{lit(mix(row_bg, T['accent'], 0.16 * k), row_bg)}; "
-                f"border-color:{mix(row_bg, T['text'], 0.07)}; }}"
-                f"QFrame#queuerow:hover {{ background:"
-                f"{lit(mix(hover, T['accent'], 0.24 * k), hover)}; "
-                f"border-color:{T['border_hi']}; }}")
-
-    def _set_ended(self, how: str):
-        """"ok", "failed" or "" (running): the banner's gradient follows it."""
-        if self.property("ended") == how:
-            return
-        self.setProperty("ended", how)
-        self.style().unpolish(self)
-        self.style().polish(self)
-
-    def _line_up(self):
-        """Line 1 on one line: the title and the uploader on the same baseline, the
-        site's logo centred on the middle of the title's capitals. Worked out from the
-        fonts the style sheet gave."""
-        texts = (self.lbl_title, self.lbl_meta)
-        for w in texts:
-            w.ensurePolished()
-        cap_mid = QFontMetricsF(self.lbl_title.font()).capHeight() / 2
-        line_at = {}
-        for w in texts:
-            fm = QFontMetricsF(w.font())
-            w.setFixedHeight(math.ceil(fm.height()))
-            line_at[w] = (w.height() - fm.height()) / 2 + fm.ascent()
-        line_at[self.src_icon] = self.src_icon.height() / 2 + cap_mid
-        base = max(line_at.values())
-        for w, drop in self._drops.items():
-            drop.changeSize(0, round(base - line_at[w]), QSizePolicy.Policy.Minimum,
-                            QSizePolicy.Policy.Fixed)
-        self._row1.invalidate()
 
     def paintEvent(self, ev):
         super().paintEvent(ev)
@@ -907,217 +409,14 @@ class DownloadBar(QFrame):
 
     # ------------------------------------------------------------------ the summary line
 
-    def set_collapsed(self, on: bool):
-        """Minimised: just the summary line (and a thin bar), in the corner a pill, so the
-        page under it shows again; its chevron, or a click anywhere on it, opens it
-        again."""
-        on = on and not self._mini
-        glide = self._corner and self.isVisible() and on != self._collapsed
-        start = self.geometry()
-        self._collapsed = on
-        self._apply_fold()
-        if glide:
-            self.place(start)   # at once: no frame of the new view in the old size
-        self.room_changed.emit()
-
-    def _folded(self) -> bool:
-        """Only the summary line shows: minimised, or the window has no room for more."""
-        return self._collapsed or self._room == "line"
-
-    def _apply_fold(self):
-        folded = self._folded() if self._tall is None else not self._tall
-        pill = self._corner and folded
-        if bool(self.property("pill")) != pill:
-            self.setProperty("pill", pill)
-            self.style().unpolish(self)
-            self.style().polish(self)
-            self.s_bar.setMaximumWidth(PILL_BAR_W if pill else 160)
-        self.panel.setVisible(not folded)
-        self.scroll_area.setVisible(self.rows.count() > 1 and self._room == "open")
-        self._outer.setContentsMargins(8, 6 if folded else 8, 8, 6 if folded else 8)
-        self._fold_icon()
-        self._sync_head()
-        # the window's fitter measures again straight away: without this the box around
-        # the bar kept the open list's height, nothing seemed to fit, and a failed link
-        # sent a roomy window into the mini player (where the bar never re-measures)
-        responsive.touch(self.panel)
 
     # How much shows is one of three states, never a squashed step between them: the
     # whole list ("open"), just the running row ("row") or just the summary line
     # ("line"). In the corner the card picks the most its page has height for (place).
 
-    def _set_room(self, room: str):
-        if room != self._room:
-            self._room = room
-            self._apply_fold()
-
-    def _fold_icon(self):
-        self.btn_min.setAccessibleName(_("Show more") if self._folded() else _("Hide"))
-        # the corner card folds down into its pill and opens upwards; the mini
-        # player's bar the other way round
-        opens, folds = ("fold_up", "fold_open") if self._corner else ("fold_open", "fold_up")
-        icons.set_icon(self.btn_min, opens if self._folded() else folds, "muted")
 
     # ------------------------------------------------------------------ the corner
 
-    def float_in(self, host: QWidget, area: QWidget, under: tuple[QWidget, ...] = ()):
-        """A card over the bottom-right corner of `area` (the page; bottom-left right to
-        left), above it rather than in its layout, so nothing under it moves when it
-        comes and goes. A child of `host`, which holds the page and what's under it:
-        it's hidden with it (the mini player). It stands on the highest of `under` that
-        shows and has something under it (the Now playing row's chips, the player bar),
-        else on the host's bottom; its top never goes past the page's."""
-        self._corner = True
-        self._host = host
-        self._area = area
-        self._under = under
-        self.setParent(host)
-        for w in (host, area, *under):
-            w.installEventFilter(self)
-        self.room_changed.connect(self._place_soon)
-        self._tight = True   # makes _fit_tight apply the card's own rule
-        self._fit_tight()
-        self._fold_icon()
-        self.hide()
-
-    # (LayoutRequest: chips came or went on the Now playing row)
-    _MOVES = (QEvent.Type.Resize, QEvent.Type.Move, QEvent.Type.Show, QEvent.Type.Hide,
-              QEvent.Type.LayoutRequest)
-
-    def eventFilter(self, obj, ev):
-        if (ev.type() in self._MOVES and self._host is not None
-                and (obj is self._host or obj is self._area or obj in self._under)
-                and self.isVisibleTo(self._host)):
-            self._place_soon()
-        return False
-
-    def _in_host(self, w: QWidget) -> QRect:
-        """`w`'s rectangle in the host's coordinates."""
-        host = self._host
-        assert host is not None
-        win = host.window()
-        return QRect(w.mapTo(win, QPoint(0, 0)) - host.mapTo(win, QPoint(0, 0)), w.size())
-
-    def _floor(self, left: int, right: int) -> int:
-        """The host y the card stands on, given its host x span: above the highest of
-        `under` that shows and has something under it. The Now playing row's chips sit
-        on the left: past them the card goes down onto the player."""
-        host = self._host
-        if host is None:
-            return 0
-        floor = host.height()
-        for w in self._under:
-            if not w.isVisibleTo(host) or w.height() <= 0:
-                continue
-            r = self._in_host(w)
-            used = w.childrenRect()   # what's drawn on it (a row's chips), else all of it
-            if not used.isEmpty():
-                x0, x1 = r.x() + used.left(), r.x() + used.right()
-                if x1 < left - CARD_GAP or x0 > right + CARD_GAP:
-                    continue   # nothing under the card
-            floor = min(floor, r.y())
-        return floor
-
-    def _place_soon(self):
-        if self._corner:
-            self._place_due.start(0)
-
-    def card_width(self) -> int:
-        area = self._area
-        return max(200, min(CARD_W, area.width() - 2 * CARD_MARGIN)) if area else CARD_W
-
-    def _card_x(self, w: int) -> int:
-        page = self._in_host(self._area) if self._area is not None else QRect()
-        return (page.left() + CARD_MARGIN if self.isRightToLeft()
-                else page.right() + 1 - w - CARD_MARGIN)
-
-    def place(self, glide_from: QRect | None = None):
-        """Its size and spot in the corner: the whole list if the page has the height,
-        else the running row, else the summary line; minimised, a pill as wide as the
-        summary line needs. `glide_from`: it slides there from that rectangle."""
-        host, area = self._host, self._area
-        if host is None or area is None or not self._corner:
-            return
-        if self._tall is not None:   # measured as it'll end up
-            self._tall = None
-            self._outer.setEnabled(True)
-            self._apply_fold()
-        w = self.card_width()
-        x = self._card_x(w)
-        floor = self._floor(x, x + w)
-        room_h = floor - self._in_host(area).top() - 2 * CARD_GAP
-        lay = self._outer
-        h = 0
-        for room in ("open", "row", "line"):
-            self._set_room(room)
-            lay.activate()
-            h = self.heightForWidth(w) if self.hasHeightForWidth() else self.sizeHint().height()
-            if h <= room_h:
-                break
-        if self._collapsed:   # the pill: as wide as its line, never wider than the card
-            w = min(w, self.summary.sizeHint().width() + 20)
-        h = max(0, min(h, room_h))
-        x = self._card_x(w)
-        to = QRect(x, floor - h - CARD_GAP, w, h)
-        glide = self._glide
-        if glide_from is not None and glide_from.isValid() and glide_from != to:
-            glide.stop()
-            self._glide_from, self._glide_to = QRect(glide_from), to
-            # the pictures as for the wider end: they don't drop out as it slides
-            self._fit_tight(max(glide_from.width(), to.width()))
-            glide.start()
-            self._glide_step(0.0)
-            return
-        if glide.state() == QVariantAnimation.State.Running:
-            self._glide_to = to   # the window moved under it: it goes to the new spot
-            self._glide_step(glide.currentValue())
-            return
-        self.setGeometry(to)
-        self.raise_()
-        self.placed.emit()
-
-    def _glide_step(self, k: float):
-        a, b = self._glide_from, self._glide_to
-        shrinks = b.height() < a.height()
-        ease = QEasingCurve(QEasingCurve.Type.InOutCubic)
-        first = ease.valueForProgress(min(1.0, k * 2))
-        second = ease.valueForProgress(max(0.0, k * 2 - 1))
-        kh, kw = (first, second) if shrinks else (second, first)
-
-        def mix(x0: int, x1: int, t: float) -> int:
-            return round(x0 + (x1 - x0) * t)
-
-        r = QRect(QPoint(mix(a.left(), b.left(), kw), mix(a.top(), b.top(), kh)),
-                  QPoint(mix(a.right(), b.right(), kw), mix(a.bottom(), b.bottom(), kh)))
-        if a.height() == b.height():
-            tall = not self._folded()
-        else:
-            tall = k < 0.5 if shrinks else k >= 0.5
-        if tall != self._tall:
-            self._tall = tall
-            self._outer.setEnabled(True)
-            self._apply_fold()
-            if tall:
-                # the list laid out at its full size, then held there: the card's edge
-                # cuts it off instead of the rows squashing together
-                full = QRect(0, 0, max(a.width(), b.width()), max(a.height(), b.height()))
-                self._outer.setGeometry(full.marginsRemoved(self.contentsMargins()))
-                self._outer.setEnabled(False)
-        self.setGeometry(r)
-        self.raise_()
-        self.placed.emit()   # the toasts standing on it go with it
-
-    def _end_glide(self):
-        self._glide.stop()
-        if self._tall is not None:
-            self._tall = None
-            self._outer.setEnabled(True)
-            self._apply_fold()
-
-    def _glide_done(self):
-        self._end_glide()
-        self._fit_tight()
-        self.place()
 
     def enterEvent(self, ev):
         """The mouse on the card holds it as it is: no folding or going while it's read."""
@@ -1317,7 +616,7 @@ class DownloadBar(QFrame):
         self.src_icon.setToolTip(self._source[1])
 
         self.lbl_title.setText(self.title)
-        self.lbl_title.setToolTip(self.title)
+        self.lbl_title.setToolTip(plain_tip(self.title))   # a web title (plaintext.py)
         meta = " · ".join(x for x in (channel, fmt_time(seconds) if seconds else "") if x)
         self._meta = meta
         self.lbl_meta.setText(meta)
@@ -1397,128 +696,9 @@ class DownloadBar(QFrame):
         self._fill_rows()
         self._sync_head()
 
-    def _others_failed(self) -> list[dict]:
-        """The picks that failed, but not the one on the running row (it says so itself)."""
-        return [f for f in self._failed if f["url"] != self.url]
-
-    def _others_added(self) -> list[dict]:
-        return [a for a in self._added if a["url"] != self.url]
-
-    def _fill_rows(self):
-        """The list under the running row, rebuilt: the picks waiting (a click makes one
-        next up), the ones that failed (each with Retry), then the ones added already,
-        newest first. A handful of rows (the queue is capped)."""
-        while self.rows.count():
-            item = self.rows.takeAt(0)
-            w = item.widget() if item else None
-            if w is not None:   # hidden now: it's only freed later, and mustn't show till then
-                w.hide()
-                w.deleteLater()
-        failed = self._others_failed()
-        added = self._others_added()[::-1]
-        nxt = [{"url": u, "title": t} for t, u in self._up_next if u != self.url]
-        picks = ([(q, "next") for q in nxt] + [(q, "wait") for q in self._queue]
-                 + [(f, "failed") for f in failed] + [(a, "added") for a in added])
-        rows = [self._row(q, how, first=(how == "wait" and i == 0))
-                for i, (q, how) in enumerate(picks)]
-        for row in rows:
-            self.rows.addWidget(row)
-        self.rows.addStretch(1)
-        self.scroll_area.setVisible(bool(picks) and self._room == "open")
-        shown = rows[:QUEUE_ROWS]
-        full = (sum(r.sizeHint().height() for r in shown)
-                + max(0, len(shown) - 1) * self.rows.spacing())
-        # as tall as the first few rows (more scroll)
-        self.scroll_area.setFixedHeight(full)
-        if len(shown) != self._shown_rows:   # taller or shorter: the window fits it again
-            self._shown_rows = len(shown)
-            self.room_changed.emit()
-
-    def _row(self, q: dict, how: str, first: bool) -> QFrame:
-        row = _QueueRow()
-        row.setObjectName("queuerow")
-        row.setProperty("how", how)
-        row.setAttribute(Qt.WidgetAttribute.WA_Hover)
-        if how == "wait" and not first:   # the first one is next up already
-            row.setCursor(Qt.CursorShape.PointingHandCursor)
-            row.setToolTip(_("Download this one next"))
-            row.clicked.connect(lambda u=q["url"]: self.front_requested.emit(u))
-        rl = QHBoxLayout(row)
-        rl.setContentsMargins(8, 6, 6, 6)
-        rl.setSpacing(12)
-        if not self._tight:   # centred under the running row's picture, titles in line
-            if not self._corner:
-                rl.addSpacing(THUMB_W)   # under Bun's column (the card's: under Bun)
-            pic = QLabel()
-            pic.setFixedSize(THUMB_W, ROW_THUMB[1])
-            pic.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            pic.setPixmap(self._picture(self.thumb_lookup(q["url"]), *ROW_THUMB, 6))
-            rl.addWidget(pic, 0, Qt.AlignmentFlag.AlignVCenter)
-        col = QVBoxLayout()
-        col.setContentsMargins(0, 0, 0, 0)
-        col.setSpacing(2)
-        title = ElideLabel()
-        name = pretty_title(q.get("title", "")) or _("Sound")
-        title.setText(name)
-        title.setToolTip(name)
-        title.setObjectName("queuetitle")
-        title.setProperty("waiting", how == "wait")
-        col.addWidget(title)
-        line = QHBoxLayout()
-        line.setContentsMargins(0, 0, 0, 0)
-        line.setSpacing(8)
-        why = QLabel({"next": _("Up next"), "wait": _("Waiting to add"),
-                      "failed": _("Couldn't download"),
-                      "added": _("✓ Added to your sounds")}[how])
-        why.setObjectName("downloadmeta" if how in ("wait", "next") else "downloadstatus")
-        theme.set_tone(why, {"failed": "error", "added": "ok"}.get(how, ""))
-        line.addWidget(why)
-        secs = q.get("seconds") or 0
-        if secs and how != "failed":
-            length = QLabel(fmt_time(secs))
-            length.setObjectName("downloadmeta")
-            line.addWidget(length)
-        line.addStretch(1)
-        col.addLayout(line)
-        rl.addLayout(col, 1)
-        if how == "failed":
-            again = QPushButton(_("Retry"))
-            again.setObjectName("retrybutton")
-            again.setCursor(Qt.CursorShape.PointingHandCursor)
-            again.clicked.connect(lambda _c=False, u=q["url"]: self._retry(u))
-            rl.addWidget(again, 0, Qt.AlignmentFlag.AlignVCenter)
-        if how == "added" and not self._mini and self.sound_for(q["url"]):
-            play, show = self._sound_buttons(lambda u=q["url"]: u)
-            play.show()
-            show.show()
-            rl.addWidget(play, 0, Qt.AlignmentFlag.AlignVCenter)
-            rl.addWidget(show, 0, Qt.AlignmentFlag.AlignVCenter)
-        if how != "added":
-            x = self._icon_button("close", _("Remove"), 24)
-            x.clicked.connect(lambda _c=False, u=q["url"], h=how:
-                              self._forget(u) if h == "failed"
-                              else self.up_next_drop.emit(u) if h == "next"
-                              else (usage.used("dl-cancel"), self.cancel_requested.emit(u)))
-            rl.addWidget(x, 0, Qt.AlignmentFlag.AlignVCenter)
-        return row
 
     # ------------------------------------------------------------------ Up next
 
-    def _waits(self) -> bool:
-        """The running row's Play is downloaded, but waits in Up next for the song
-        playing now: it mustn't say Playing (a click seemed to do nothing)."""
-        return (self.kind == "play" and self.stage == "done"
-                and any(u == self.url for _t, u in self._up_next))
-
-    def _say_play(self):
-        if self._waits():
-            ahead = next(i for i, (_t, u) in enumerate(self._up_next) if u == self.url)
-            self.lbl_status.setText(_("Up next · {n} before it", n=ahead) if ahead
-                                    else _("Up next"))
-            theme.set_tone(self.lbl_status, "")
-        else:
-            self.lbl_status.setText(_("▶ Playing"))
-            theme.set_tone(self.lbl_status, "ok")
 
     def set_up_next(self, items: list[tuple[str, str]]):
         """Up next changed (linkbar.up_next_items): the list shows what waits, in order,
@@ -1534,31 +714,6 @@ class DownloadBar(QFrame):
         self._fill_rows()
         self._sync_head()
 
-    def set_playing(self, url: str):
-        """A Play started (linkbar.played): the one that waited in Up next plays now."""
-        if url != self.url or self.kind != "play" or self.stage != "done":
-            return
-        if self._alone():
-            self._clear_and_hide()
-            return
-        self._say_play()
-        self._sync_head()
-        if not self._up_next and not self._others_failed():
-            self._wind_down(7000)
-
-    def _alone(self) -> bool:
-        """Nothing else on the list: no pick waiting, none in Up next, none failed. A
-        Play that started playing then has nothing to say the player bar doesn't."""
-        return not (self._queue or self._up_next or self._failed)
-
-    def _retry(self, url: str):
-        """Retry: the failed pick is picked again (it starts, or waits its turn)."""
-        item = next((f for f in self._failed if f["url"] == url), None)
-        if item is None:
-            return
-        self._forget(url)
-        usage.used("dl-retry")
-        self.retry_requested.emit(dict(item))
 
     def _forget(self, url: str):
         self._failed = [f for f in self._failed if f["url"] != url]

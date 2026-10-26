@@ -23,7 +23,7 @@ Version **2.7.1** · Windows 10 / 11 · free, no account, no ads, anonymous usag
 [what's new](CHANGELOG.md)
 <!-- /release -->
 
-**[Website](https://onion-alien.github.io/onion-board/)** · **[Discord](https://discord.gg/FhKGaWCWHM)** · **[Report a problem](../../issues/new/choose)**
+**[Website](https://onionalien.com/onionboard/)** · **[Discord](https://discord.gg/FhKGaWCWHM)** · **[Report a problem](../../issues/new/choose)**
 
 <br>
 

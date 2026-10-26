@@ -77,15 +77,10 @@ class AppCapture(QObject):
             self.tab.meter_timer.stop()   # hidden, nothing to cap: showEvent restarts it
             return
         for row in list(self.tab.rows.values()):
-            if row.app is not None:
-                live = self.tab.peaks.peak(row.app.pid)
-                if live is not None and live > 0:
-                    row.last_sound_at = time.monotonic()
+            live = self.tab.peaks.peak(row.app.pid) if row.app is not None else None
+            if live is not None and live > 0:
+                row.last_sound_at = time.monotonic()
             rec = row.rec
-            if row.app is not None:
-                live = self.tab.peaks.peak(row.app.pid)
-                if live is not None and live > 0:
-                    row.last_sound_at = time.monotonic()
             if rec is not None:
                 secs = rec.seconds
                 if secs >= MAX_SECONDS:
@@ -101,7 +96,6 @@ class AppCapture(QObject):
             elif row.app is None:
                 row.meter.set_level(0.0)
             else:
-                live = self.tab.peaks.peak(row.app.pid)
                 row.meter.set_level(row.app.peak if live is None else live)
 
     # ------------------------------------------------------------------ capture

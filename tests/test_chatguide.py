@@ -6,7 +6,7 @@ import pytest
 from soundboard.audio import appaudio
 from soundboard.mic import cableformat
 from soundboard.sim import chatcheck
-from soundboard.ui.setup import chatguide, setupwizard
+from soundboard.ui.setup import chatguide, steamguide
 from tests import test_setupwizard as _sw
 from tests.conftest import process_events
 
@@ -57,7 +57,7 @@ def test_game_guide_and_freeing(wizard, monkeypatch):
     assert all(app in text for app in ("Zoom", "Teams", "browser", "Who's listening"))
     g.setParent(None)
     for cls in (chatguide.DiscordGuide, chatguide.GameGuide, chatguide.MeetingGuide,
-                setupwizard.SteamGuide):
+                steamguide.SteamGuide):
         monkeypatch.setattr(cls, "exec", lambda self: 0)
     for which in ("discord", "game", "meeting", "steam"):
         wiz.show_guide(which)

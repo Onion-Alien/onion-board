@@ -46,6 +46,30 @@ def test_bun_goes_when_theres_no_room(qapp):
     assert not card.bun.isVisibleTo(page) and card.title.isVisibleTo(page)
 
 
+def test_a_narrow_card_stacks_its_buttons_instead_of_cutting_them(qapp):
+    """A squeezed Radio map left the card 200 px wide: Report a problem was cut off."""
+    card = oops.OopsPanel()
+    card.show_problem("The radio couldn't connect", "Stations could not be loaded.",
+                      lambda: None)
+    card.show()
+    card.setFixedWidth(oops.MAX_W)
+    qapp.processEvents()
+    side = card.btn_retry.geometry(), card.btn_report.geometry()
+    assert side[0].top() == side[1].top()   # wide: side by side, as before
+    # room for one button, not both: 200 px with Windows' fonts; CI's fallback font is
+    # wider, so the width comes from the buttons themselves
+    m = card._lay.contentsMargins()
+    one = max(b.sizeHint().width() for b in (card.btn_retry, card.btn_report))
+    w = max(200, one + m.left() + m.right() + 8)   # + the frame
+    card.setFixedWidth(w)
+    card.resize(w, card.height_for(w))
+    qapp.processEvents()
+    retry, report = card.btn_retry.geometry(), card.btn_report.geometry()
+    assert retry.bottom() < report.top()   # one over the other, Try again on top
+    for b in (card.btn_retry, card.btn_report):
+        assert b.width() >= b.sizeHint().width()   # whole words, nothing cut
+
+
 def test_a_failed_search_shows_the_red_card_and_try_again_runs_it(qapp, monkeypatch):
     """The search can't get through: the red card says why, Try again searches the same
     words once more, and the results take its place."""

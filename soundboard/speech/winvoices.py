@@ -20,6 +20,7 @@ from pathlib import Path
 
 from soundboard.online import net
 from soundboard.core import errors
+from soundboard.win import systools
 
 INSTALL_TIMEOUT_S = 30 * 60      # a slow Windows Update download
 ERROR_CANCELLED = 1223           # the UAC prompt was answered No
@@ -38,9 +39,13 @@ LOCALES = {
 _TOKEN_KEYS = (r"SOFTWARE\Microsoft\Speech_OneCore\Voices\Tokens",
                r"SOFTWARE\Microsoft\Speech\Voices\Tokens")
 
-# runs elevated; answers in the -Out file: OK / RESTART / ALREADY <name>, or ERR <why>
+# runs elevated; answers in the $Out file: OK / RESTART / ALREADY <name>, or ERR <why>.
+# Handed over whole on the command line (-EncodedCommand), never as a file: one in the
+# user's %TEMP% could be swapped by anything running as them while the UAC prompt was
+# open, and then run as admin.
 _ELEVATED = r"""
-param([string]$Locale, [string]$Out)
+$Locale = '__LOCALE__'
+$Out = '__OUT__'
 $ErrorActionPreference = 'Stop'
 function Say($t) { [IO.File]::WriteAllText($Out, $t, [Text.Encoding]::UTF8) }
 try {
@@ -63,9 +68,9 @@ try {
 # runs as the user: starts the one above elevated and waits for it
 _OUTER = r"""
 try {
-    $p = Start-Process powershell.exe -Verb RunAs -WindowStyle Hidden -Wait -PassThru `
-        -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', '"__SCRIPT__"',
-                        '-Locale', '__LOCALE__', '-Out', '"__OUT__"')
+    $p = Start-Process '__POWERSHELL__' -Verb RunAs -WindowStyle Hidden -Wait -PassThru `
+        -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass',
+                        '-EncodedCommand', '__ELEVATED__')
     exit $p.ExitCode
 } catch {
     [Console]::Out.WriteLine($_.Exception.Message)
@@ -84,6 +89,13 @@ def _ps_quote(s) -> str:
 
 class Cancelled(Exception):
     """The user said No to the Windows permission prompt."""
+
+
+LOCALE_RE = re.compile(r"[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*")
+
+
+def _encoded(script: str) -> str:
+    return base64.b64encode(script.encode("utf-16-le")).decode("ascii")
 
 
 def locale_for(lang: str) -> str:
@@ -115,14 +127,6 @@ def fingerprint() -> frozenset[str]:
     return frozenset(names)
 
 
-def has_language(tokens: frozenset[str], lang: str) -> bool:
-    """Whether a token looks like a `lang` voice: MSTTS_V110_zhCN_HuihuiM, TTS_MS_ZH-CN_…
-    ("zh-TW" wants that country's voice; "zh" any)."""
-    code = lang.upper().replace("-", "")
-    pat = re.compile(rf"_{re.escape(code)}{'' if len(code) > 3 else '[A-Z]{2}'}_")
-    return any(pat.search(t.upper().replace("-", "")) for t in tokens)
-
-
 def outcome(code: int, stdout: str, answer: str) -> str:
     """"ok" / "restart" / "already" from what the two scripts said; raises otherwise."""
     answer = answer.strip()
@@ -148,18 +152,21 @@ def install(lang: str, timeout: float = INSTALL_TIMEOUT_S) -> str:
     sent through the app's connection, so it isn't started at all)."""
     if not net.allowed("voices"):
         raise RuntimeError(net.off_message("voices"))
+    locale = locale_for(lang)
+    if not LOCALE_RE.fullmatch(locale):
+        raise RuntimeError(f"not a language name: {locale!r}")
     tmp = Path(tempfile.mkdtemp(prefix="sb-voice-"))
     try:
-        script, out = tmp / "install-voice.ps1", tmp / "answer.txt"
-        script.write_text(_ELEVATED, encoding="utf-8")
+        out = tmp / "answer.txt"   # only what it says: swapped, it just says something else
         # the values land in single-quoted strings: a user folder like O'Brien is fine
-        outer = (_OUTER.replace("__LOCALE__", _ps_quote(locale_for(lang)))
-                 .replace("__OUT__", _ps_quote(out)).replace("__SCRIPT__", _ps_quote(script)))
-        enc = base64.b64encode(outer.encode("utf-16-le")).decode("ascii")
+        elevated = (_ELEVATED.replace("__LOCALE__", _ps_quote(locale))
+                    .replace("__OUT__", _ps_quote(out)))
+        outer = (_OUTER.replace("__POWERSHELL__", _ps_quote(systools.tool("powershell")))
+                 .replace("__ELEVATED__", _encoded(elevated)))
         try:
             r = subprocess.run(
-                ["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass",
-                 "-EncodedCommand", enc],
+                [systools.tool("powershell"), "-NoProfile", "-ExecutionPolicy", "Bypass",
+                 "-EncodedCommand", _encoded(outer)],
                 capture_output=True, text=True, errors="replace", timeout=timeout,
                 creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         except subprocess.TimeoutExpired:

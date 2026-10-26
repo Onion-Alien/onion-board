@@ -4,9 +4,9 @@ names Onion Board rather than "Windows Command Processor".
 
 `allow(name, port)` runs this app again as admin (`OnionBoard.exe --firewall-rule NAME
 PORT`, or `pythonw.exe main.py …` from source) and waits for it. That copy does only
-`cli()`: it replaces the rules called NAME with two inbound allow rules, TCP on PORT
-and this program, both Private networks and local subnet only, then exits. It never
-starts the app. The program in the rule is the elevated copy's own sys.executable, never
+`cli()`: it replaces the rules called NAME with one inbound allow rule, TCP on PORT
+for this program only, Private networks and local subnet only, then exits. It never
+starts the app. The program in the rule is the elevated copy's own Python or exe, never
 an argument, and NAME and PORT are checked, so the admin step can't be pointed at
 anything else. netsh runs without a shell, so nothing in them is read as a command.
 """
@@ -17,6 +17,8 @@ import re
 import subprocess
 import sys
 from pathlib import Path
+
+from soundboard.win import systools
 
 log = logging.getLogger(__name__)
 
@@ -34,24 +36,32 @@ def valid(name: str, port) -> bool:
 
 
 def commands(name: str, port: int, program: str) -> list[list[str]]:
-    """The netsh calls, as argument lists: delete the old rules, add the port's, then
-    the program's."""
+    """The netsh calls, as argument lists: delete the old rules (an older version's
+    port-only one too), then add the one for `program` on the port. Only the program:
+    a port-only rule let anything that took the port take phones' connections."""
     if not valid(name, port):
         raise ValueError(f"bad firewall rule {name!r} / {port!r}")
-    base = ["netsh", "advfirewall", "firewall"]
-    add = base + ["add", "rule", f"name={name}", "dir=in", "action=allow", "protocol=TCP"]
-    limits = [f"localport={int(port)}", "profile=private", "remoteip=localsubnet"]
+    base = [systools.tool("netsh"), "advfirewall", "firewall"]
     return [base + ["delete", "rule", f"name={name}"],
-            add + limits,
-            add + [f"program={program}"] + limits]
+            base + ["add", "rule", f"name={name}", "dir=in", "action=allow", "protocol=TCP",
+                    f"program={program}", f"localport={int(port)}", "profile=private",
+                    "remoteip=localsubnet"]]
+
+
+def listener() -> str:
+    """The program that listens: this one, or from source the Python a venv's launcher
+    starts (the launcher itself never opens the port)."""
+    if getattr(sys, "frozen", False):
+        return sys.executable
+    return getattr(sys, "_base_executable", None) or sys.executable
 
 
 def cli(args: list[str]) -> int:
-    """The admin copy: `--firewall-rule NAME PORT`. 0 when both rules were added."""
+    """The admin copy: `--firewall-rule NAME PORT`. 0 when the rule was added."""
     if len(args) != 2 or not valid(*args):
         return 2
     name, port = args[0], int(args[1])
-    calls = commands(name, port, sys.executable)
+    calls = commands(name, port, listener())
     # deleting fails harmlessly when there's no old rule
     subprocess.run(calls[0], capture_output=True, creationflags=_CREATE_NO_WINDOW)
     for call in calls[1:]:
@@ -73,7 +83,7 @@ def relaunch_params(name: str, port: int) -> str:
 
 def allow(name: str, port: int, wait_s: float = 60.0) -> bool:
     """Ask Windows (its admin prompt, naming this app) for the rule NAME on PORT, and
-    wait for it. True if the prompt was accepted and both rules were added."""
+    wait for it. True if the prompt was accepted and the rule was added."""
     if sys.platform != "win32" or not valid(name, port):
         return False
     import ctypes

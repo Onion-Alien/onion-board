@@ -6,6 +6,9 @@ import sys
 import pytest
 
 from soundboard.online import firewall
+from soundboard.win import systools
+
+NETSH = systools.tool("netsh")   # Windows' own, by its full path
 
 
 @pytest.mark.parametrize("name, port", [("OnionPocket", 7475), ("A-b9", "1024"), ("x", 65535)])
@@ -24,23 +27,24 @@ def test_anything_else_is_refused(name, port):
         firewall.commands(name, port, r"C:\x\OnionBoard.exe")
 
 
-def test_commands_replace_the_rules_with_port_and_program_limited_to_the_home_network():
+def test_commands_replace_the_rules_with_one_for_this_program_on_the_home_network():
+    """One rule: this program, on the port, Private networks, local subnet. A second
+    port-only rule let any program that took the port take phones' connections, and
+    stayed after Onion Board was gone."""
     exe = r"C:\Program Files\Onion Board\OnionBoard.exe"
-    delete, port, prog = firewall.commands("OnionPocket", 7475, exe)
-    assert delete == ["netsh", "advfirewall", "firewall", "delete", "rule", "name=OnionPocket"]
-    for call in (port, prog):
-        assert call[:9] == ["netsh", "advfirewall", "firewall", "add", "rule",
-                            "name=OnionPocket", "dir=in", "action=allow", "protocol=TCP"]
-        assert call[-3:] == ["localport=7475", "profile=private", "remoteip=localsubnet"]
-    assert f"program={exe}" in prog and not any(a.startswith("program=") for a in port)
+    delete, rule = firewall.commands("OnionPocket", 7475, exe)
+    assert delete == [NETSH, "advfirewall", "firewall", "delete", "rule", "name=OnionPocket"]
+    assert rule == [NETSH, "advfirewall", "firewall", "add", "rule", "name=OnionPocket",
+                    "dir=in", "action=allow", "protocol=TCP", f"program={exe}",
+                    "localport=7475", "profile=private", "remoteip=localsubnet"]
 
 
-def test_cli_adds_both_rules_for_its_own_program(monkeypatch):
+def test_cli_adds_the_rule_for_the_program_that_listens(monkeypatch):
     ran = []
     monkeypatch.setattr(subprocess, "run", lambda call, **kw: ran.append(call)
                         or subprocess.CompletedProcess(call, 0))
     assert firewall.cli(["OnionPocket", "7475"]) == 0
-    assert ran == firewall.commands("OnionPocket", 7475, sys.executable)
+    assert ran == firewall.commands("OnionPocket", 7475, firewall.listener())
 
 
 def test_cli_refuses_bad_arguments_and_reports_a_failed_rule(monkeypatch):

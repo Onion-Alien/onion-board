@@ -7,317 +7,56 @@ buttons. Space (or a double-click) plays it in your headphones, Enter through yo
 mic, Esc stops, F2 renames, Del deletes (the Undo bar brings it back)."""
 from __future__ import annotations
 
-import html
 import logging
 import threading
-from datetime import date, datetime, timedelta
+from datetime import datetime
 from types import SimpleNamespace
 
 import numpy as np
-from PySide6.QtCore import QDate, QEvent, QPoint, QRect, QSize, Qt, QTime, QTimer, Signal
-from PySide6.QtGui import QAction, QColor, QFont, QFontMetrics, QKeySequence, QPainter, QPen
-from PySide6.QtWidgets import (QAbstractItemView, QComboBox, QHBoxLayout, QLabel, QLineEdit,
-                               QMenu, QPushButton, QStyle, QStyledItemDelegate,
-                               QToolTip, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
+from PySide6.QtCore import QEvent, QPoint, QRect, Qt, QTimer, Signal
+from PySide6.QtGui import QAction, QKeySequence
+from PySide6.QtWidgets import (QAbstractItemView, QComboBox, QHBoxLayout, QLabel, QLineEdit, QMenu,
+                               QPushButton, QStyle, QToolTip, QTreeWidget, QTreeWidgetItem,
+                               QVBoxLayout, QWidget)
 
-from soundboard.core import errors, usage
-from soundboard.ui.kit import theme
 from soundboard.sounds.clipshelf import Clip, Shelf, VoiceClip
-from soundboard.i18n import _, ngettext
+from soundboard.i18n import _
 from soundboard.ui.kit import busy, icons
-from soundboard.ui.apps import clipeditor
 from soundboard.ui.apps.clipeditor import fmt
 from soundboard.ui.kit.panel import CONTROL_H, UndoBar, fold_button
 from soundboard.ui.kit.restyled import on_restyle
 from soundboard.audio.engine import SR
-from soundboard.sounds.library import level_gain
 from soundboard.ui.kit.wheelguard import no_wheel
+from soundboard.ui.apps.cliprows import (  # noqa: F401
+    _locale_time,
+    ACT,
+    ACTS_W,
+    ClipResizeHandle,
+    ClipRowDelegate,
+    depth,
+    GROUP_H,
+    ID,
+    INDENT,
+    LEN_W,
+    length_text,
+    LIVE_W,
+    NAME_W,
+    PLAY_D,
+    ROW_H,
+    WAVE_W,
+    when_text,
+)
+from soundboard.ui.apps.clipshelfactions import ClipShelfActions
 
 log = logging.getLogger(__name__)
 
 VOICE_W = 760            # the Voice tab's Recordings: at most this wide
 ROWS_SHOWN = 5           # the list's height, in rows, before it scrolls
-ROW_H = 44               # a clip's row
-GROUP_H = 30             # a group's label ("Discord (12)")
 PREVIEW = "clipshelf:preview"   # ":preview": headphones only
 SEND = "clipshelf-send"
-ID = Qt.ItemDataRole.UserRole
-
-# a row, left to right (mirrored for right-to-left languages)
-PLAY_D = 32              # the round play button
-NAME_W = 220             # name and the "where · when" line under it
-WAVE_W = 260             # the waveform, when there's room
-LIVE_W = 48              # the Live pill (room kept, so the length never jumps)
-LEN_W = 44               # "0:03"
-ACT = 28                 # one of the row's buttons
-ACTS_W = 3 * ACT + 2 * 2
-INDENT = 16              # a row inside a group
 
 
-def length_text(seconds: float) -> str:
-    s = max(0, round(seconds))
-    return f"{s // 60}:{s % 60:02d}"
-
-
-def when_text(made: float, today: date | None = None) -> str:
-    """"Today 14:02", "Yesterday", then the date."""
-    try:
-        d = datetime.fromtimestamp(made)
-    except (ValueError, OverflowError, OSError):
-        return ""
-    today = today or date.today()
-    if d.date() == today:
-        t = QTime(d.hour, d.minute).toString(_locale_time())
-        return _("Today {time}", time=t)
-    if d.date() == today - timedelta(days=1):
-        return _("Yesterday")
-    q = QDate(d.year, d.month, d.day)
-    return q.toString("d MMM" if d.year == today.year else "d MMM yyyy")
-
-
-def depth(index) -> int:
-    """How many groups a row is inside (the delegate indents it; the tree's own
-    indentation is off, so it draws no branch arrows of its own)."""
-    d, parent = 0, index.parent()
-    while parent.isValid():
-        d, parent = d + 1, parent.parent()
-    return d
-
-
-def _locale_time() -> str:
-    from PySide6.QtCore import QLocale
-    return QLocale().timeFormat(QLocale.FormatType.ShortFormat)
-
-
-class ClipResizeHandle(QWidget):
-    """A mouse and keyboard grip for the saved clips, inside the scrolling page."""
-
-    def __init__(self, shelf):
-        super().__init__(shelf)
-        self.shelf = shelf
-        self.setFixedHeight(20)
-        self.setCursor(Qt.CursorShape.SplitVCursor)
-        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-        tip = _("Drag to resize saved clips. Double-click to fit the clips.")
-        self.setToolTip(tip)
-        self.setAccessibleName(tip)
-        self._drag = None
-
-    def paintEvent(self, event):
-        p = QPainter(self)
-        p.setRenderHint(QPainter.RenderHint.Antialiasing)
-        pen = QPen(QColor(theme.T["accent"] if self.hasFocus() else theme.T["faint"]), 3)
-        pen.setCapStyle(Qt.PenCapStyle.RoundCap)
-        p.setPen(pen)
-        mid = self.width() // 2
-        p.drawLine(mid - 16, 10, mid + 16, 10)   # one rounded grip, like a sheet's
-        p.end()
-
-    def mousePressEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.setFocus(Qt.FocusReason.MouseFocusReason)
-            self._drag = (event.globalPosition().y(), self.shelf.list.height())
-            event.accept()
-
-    def mouseMoveEvent(self, event):
-        if self._drag is not None:
-            y, height = self._drag
-            self.shelf.resize_clips(height + event.globalPosition().y() - y)
-            event.accept()
-
-    def mouseReleaseEvent(self, event):
-        self._drag = None
-
-    def mouseDoubleClickEvent(self, event):
-        self._drag = None
-        self.shelf.resize_clips(0)
-
-    def keyPressEvent(self, event):
-        if event.key() in (Qt.Key.Key_Up, Qt.Key.Key_Down):
-            self.shelf.resize_clips(self.shelf.list.height()
-                                    + (36 if event.key() == Qt.Key.Key_Down else -36))
-        elif event.key() == Qt.Key.Key_Home:
-            self.shelf.resize_clips(0)
-        else:
-            super().keyPressEvent(event)
-
-
-class ClipRowDelegate(QStyledItemDelegate):
-    """Paints a clip's row (see the module's docstring) and a group's label, and
-    handles a click on the round play button."""
-
-    def __init__(self, shelf: ClipShelf):
-        super().__init__(shelf.list)
-        self.s = shelf
-        self.pressed_play = False   # the last press was on a round play button
-        self._double = False        # ...and became a double-click: its release does nothing
-
-    def sizeHint(self, option, index):
-        return QSize(0, ROW_H if index.data(ID) else GROUP_H)
-
-    # ------------------------------------------------------------------ paint
-    def paint(self, p: QPainter, option, index):
-        p.save()
-        p.setRenderHint(QPainter.RenderHint.Antialiasing)
-        T = theme.T
-        r = QRect(option.rect)
-        cid = index.data(ID)
-        if not cid:
-            self._paint_group(p, option, index, r)
-            p.restore()
-            return
-        c = self.s._clips.get(cid)
-        selected = bool(option.state & QStyle.StateFlag.State_Selected)
-        hover = bool(option.state & QStyle.StateFlag.State_MouseOver)
-        L = self.s.row_layout(r, depth(index))
-        if selected or hover:   # neutral, never the accent (DESIGN: lists)
-            p.setPen(Qt.PenStyle.NoPen)
-            p.setBrush(QColor(T["btn_hover" if selected else "card_hi"]))
-            p.drawRoundedRect(L.row.adjusted(0, 1, 0, -1), 6, 6)
-        now = self.s._playing
-        playing = now is not None and now[1] == cid
-        sending = now == (self.s._send_sid, cid)
-        # the round play button: accent while it plays
-        p.setPen(Qt.PenStyle.NoPen)
-        p.setBrush(QColor(T["accent"] if playing else T["btn"]))
-        p.drawEllipse(L.play)
-        glyph = "stop" if playing else "play"
-        icons.icon(glyph, "on_accent" if playing else "text_hi").paint(
-            p, L.play.adjusted(9, 9, -9, -9))
-        # name, then "where · when"
-        name_font = QFont(option.font)
-        name_font.setBold(True)
-        p.setFont(name_font)
-        p.setPen(QColor(T["text_hi"]))
-        fm = QFontMetrics(name_font)
-        name = index.data(Qt.ItemDataRole.DisplayRole) or ""
-        align = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
-        p.drawText(L.name, align, fm.elidedText(name, Qt.TextElideMode.ElideRight,
-                                                L.name.width()))
-        small = QFont(option.font)
-        small.setPointSizeF(max(7.5, option.font.pointSizeF() * 0.85))
-        p.setFont(small)
-        p.setPen(QColor(T["muted"]))
-        sub = " · ".join(x for x in ((c.src if c else ""), (when_text(c.made) if c else "")) if x)
-        p.drawText(L.sub, align, QFontMetrics(small).elidedText(
-            sub, Qt.TextElideMode.ElideRight, L.sub.width()))
-        # the waveform: the played part in the accent
-        if L.wave is not None and c is not None:
-            self._paint_wave(p, L.wave, c.peaks, self.s._progress if playing else 0.0)
-        # Live: going out through the mic (a word with the colour, not colour alone)
-        if sending:
-            pill = L.live.adjusted(0, (L.live.height() - 20) // 2, 0, -(L.live.height() - 20) // 2)
-            p.setPen(Qt.PenStyle.NoPen)
-            p.setBrush(QColor(T["accent"]))
-            p.drawRoundedRect(pill, 10, 10)
-            p.setPen(QColor(T["on_accent"]))
-            bold = QFont(small)
-            bold.setBold(True)
-            p.setFont(bold)
-            p.drawText(pill, Qt.AlignmentFlag.AlignCenter, _("Live"))
-        # the length, in steady digits
-        digits = QFont(small)
-        digits.setPointSizeF(option.font.pointSizeF() * 0.95)
-        digits.setFeature(QFont.Tag("tnum"), 1)   # same-width digits: 0:11 lines up with 0:03
-        p.setFont(digits)
-        p.setPen(QColor(T["muted"]))
-        p.drawText(L.length, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter,
-                   length_text(c.seconds) if c else "")
-        p.restore()
-
-    def _paint_group(self, p, option, index, r):
-        it = self.s.list.itemFromIndex(index)
-        open_ = it is not None and it.isExpanded()
-        r = self.s.row_layout(r, depth(index)).row
-        rtl = self.s.list.layoutDirection() == Qt.LayoutDirection.RightToLeft
-        arrow = QRect(r.x() + 6, r.center().y() - 6, 12, 12)
-        text = QRect(r.x() + 24, r.y(), r.width() - 28, r.height())
-        if rtl:
-            arrow = QStyle.visualRect(Qt.LayoutDirection.RightToLeft, r, arrow)
-            text = QStyle.visualRect(Qt.LayoutDirection.RightToLeft, r, text)
-        icons.icon("fold_open" if open_ else "fold", "muted").paint(p, arrow)
-        f = QFont(option.font)
-        f.setPointSizeF(max(7.5, option.font.pointSizeF() * 0.85))
-        f.setBold(True)
-        p.setFont(f)
-        p.setPen(QColor(theme.T["muted"]))
-        p.drawText(text, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
-                   index.data(Qt.ItemDataRole.DisplayRole) or "")
-
-    def _paint_wave(self, p: QPainter, rect: QRect, peaks: list[float], played: float):
-        T = theme.T
-        p.setPen(Qt.PenStyle.NoPen)
-        if not peaks:   # not drawn yet (an older clip): a flat line until it is
-            p.setBrush(QColor(T["faint"]))
-            p.drawRoundedRect(QRect(rect.x(), rect.center().y() - 1, rect.width(), 2), 1, 1)
-            return
-        n = len(peaks)
-        step = rect.width() / n
-        bar = max(2.0, step * 0.55)
-        rtl = self.s.list.layoutDirection() == Qt.LayoutDirection.RightToLeft
-        h = rect.height()
-        done, rest = QColor(T["accent"]), QColor(T["faint"])
-        for i, v in enumerate(peaks):
-            bh = max(2.0, float(v) * h)
-            x = rect.x() + i * step + (step - bar) / 2
-            if rtl:
-                x = rect.x() + rect.right() - x - bar
-            p.setBrush(done if (i + 0.5) / n <= played else rest)
-            p.drawRoundedRect(int(x), int(rect.center().y() - bh / 2), max(2, int(bar)),
-                              int(bh), 1, 1)
-
-    # ------------------------------------------------------------------ input
-    def editorEvent(self, event, model, option, index):
-        kind = event.type()
-        if kind not in (QEvent.Type.MouseButtonPress, QEvent.Type.MouseButtonRelease,
-                        QEvent.Type.MouseButtonDblClick):
-            return False
-        if event.button() != Qt.MouseButton.LeftButton:
-            return False
-        it = self.s.list.itemFromIndex(index)
-        if it is None:
-            return False
-        pos = event.position().toPoint()
-        on_play = bool(index.data(ID)) and self.s.row_layout(
-            option.rect, depth(index)).play.contains(pos)
-        if kind == QEvent.Type.MouseButtonPress:
-            self.pressed_play, self._double = on_play, False
-            return False
-        if not index.data(ID):   # a group's label: a click folds it
-            if kind == QEvent.Type.MouseButtonRelease:
-                it.setExpanded(not it.isExpanded())
-            return True
-        if on_play:
-            if kind == QEvent.Type.MouseButtonDblClick:
-                self._double = True
-            elif not self._double:
-                self.s.toggle_play(it)
-            return True   # (a double-click on the button isn't a second play)
-        return False
-
-    def double_clicked(self) -> bool:
-        """A row was double-clicked: False when it was on its play button (the first
-        click played it; the rest of the double-click does nothing)."""
-        if self.pressed_play:
-            self._double = True
-            return False
-        return True
-
-    def helpEvent(self, event, view, option, index):
-        L = self.s.row_layout(option.rect, depth(index))
-        if index.data(ID) and L.play.contains(event.pos()):
-            playing = self.s._playing == (self.s._preview_sid, index.data(ID))
-            QToolTip.showText(event.globalPos(), _("Stop") if playing else _("Play for me"),
-                              view)
-            return True
-        return super().helpEvent(event, view, option, index)
-
-    def updateEditorGeometry(self, editor, option, index):
-        L = self.s.row_layout(option.rect, depth(index))
-        editor.setGeometry(L.name.adjusted(-4, -3, 4, 3))
-
-
-class ClipShelf(QWidget):
+class ClipShelf(ClipShelfActions, QWidget):
     """The saved clips list. `add_to_sounds(audio, name)` asks the window to make
     one a sound (AppsTab passes it on as clip_ready)."""
     add_to_sounds = Signal(object, str)
@@ -696,7 +435,7 @@ class ClipShelf(QWidget):
             labels = ((c.src or _("Other"), created) if mode == "app"
                       else (created, c.src or _("Other")) if mode == "day" else ())
             parent = None
-            for depth, label in enumerate(labels):
+            for depth, label in enumerate(labels):  # noqa: F402  (clipshelf re-exports cliprows.depth)
                 key = labels[:depth + 1]
                 group = self._groups.get(key)
                 if group is None:
@@ -819,239 +558,11 @@ class ClipShelf(QWidget):
         self.show()
         return c
 
-    # ------------------------------------------------------------------ actions
-    def _audio(self, c: Clip) -> np.ndarray | None:
-        try:
-            return c.audio()
-        except Exception as e:  # noqa: BLE001 - the file went missing or is damaged
-            log.warning("can't read clip %s: %s", c.file, e)
-            errors.warn(self, _("Couldn't open that clip"), e)
-            return None
-
-    def _count(self, what: str):
-        """For the usage count: the Voice tab's recordings or the Apps tab's saved clips,
-        and what was done to one (the action's name only)."""
-        usage.used(f"{'voice-rec' if self.voice else 'saved-clip'}-{what}")
-
-    def _gain(self, data) -> float:
-        return level_gain(data) if getattr(self.cfg, "level_volumes", True) else 1.0
-
-    def toggle_play(self, it: QTreeWidgetItem | None = None, send: bool = False):
-        it = it or self.list.currentItem()
-        cid = it.data(0, ID) if it is not None else None
-        sid = self._send_sid if send else self._preview_sid
-        again = self._playing == (sid, cid) and self.engine.state(sid) is not None
-        self.stop()
-        c = self.shelf.get(cid) if cid else None
-        if again or c is None or not cid:
-            return
-        data = self._audio(c)
-        if data is None or not len(data):
-            return
-        if self.engine.play(sid, data, self._gain(data), mode="restart",
-                            preview=not send) is None:
-            busy.toast(self, html.escape(
-                _("Nowhere to send it: pick where your sounds go on the Setup tab.") if send
-                else _("No headphones to play it in: pick them on the Setup tab.")), "error")
-            return
-        self._count("mic" if send else "play")
-        self._playing = (sid, cid)
-        self._progress = 0.0
-        self.shelf.touch(cid)
-        self._tick.start()
-        self._repaint(cid)
-
-    def _tick_play(self):
-        playing = self._playing
-        if playing is None or self._closed:
-            self._tick.stop()
-            return
-        state = self.engine.state(playing[0])
-        if state is None:   # it finished
-            self._playing = None
-            self._tick.stop()
-        else:
-            self._progress = float(state[0])
-        self._repaint(playing[1])
-
-    def _repaint(self, cid: str | None):
-        it = self._items.get(cid) if cid else None
-        if it is not None:
-            self.list.viewport().update(self.list.visualItemRect(it))
-        self._place_actions()
-
-    def stop(self):
-        if self._playing is not None:
-            cid = self._playing[1]
-            self.engine.stop(self._playing[0])
-            self._playing = None
-            self._tick.stop()
-            self._repaint(cid)
-
-    def _renamed(self, it: QTreeWidgetItem, col: int):
-        if col != 0:
-            return
-        cid = it.data(0, ID)
-        c = self.shelf.get(cid)
-        if c is None:
-            return
-        if not self.shelf.rename(cid, it.text(0)):
-            self.list.blockSignals(True)
-            it.setText(0, c.name)   # empty: back to what it was
-            self.list.blockSignals(False)
-
-    def rename(self, it: QTreeWidgetItem | None = None):
-        it = it or self.list.currentItem()
-        if it is not None:
-            self.list.editItem(it, 0)
-
-    def add_picked(self):
-        added = 0
-        for c in self._picked():
-            data = self._audio(c)
-            if data is None:
-                continue
-            self.error = ""
-            self.add_to_sounds.emit(data, c.name)
-            if self.error:
-                errors.warn(self, _("Couldn't add it to your Sounds"), self.error)
-                return
-            added += 1
-            self.shelf.touch(c.id)
-        if added:
-            self._count("add")
-            self.undo_bar.finish()
-            busy.toast(self, ngettext("Added {n} clip to your Sounds",
-                                      "Added {n} clips to your Sounds", added), "ok")
-
-    def copy_picked(self):
-        picked = self._picked()
-        if not picked:
-            return
-        data = self._audio(picked[0])
-        if data is not None:
-            self._count("copy")
-            clipeditor.set_clipboard(data)
-            self.shelf.touch(picked[0].id)
-            busy.toast(self, _("Copied “{name}”: Ctrl+V pastes it in an editor or on the "
-                               "Sounds tab", name=html.escape(picked[0].name)), "ok")
-
-    def delete_picked(self):
-        picked = self._picked()
-        for c in picked:
-            if self._playing is not None and self._playing[1] == c.id:
-                self.stop()
-        gone = self.shelf.remove_many({c.id for c in picked})
-        if not gone:
-            return
-        self._count("delete")
-
-        def undo():
-            self.shelf.restore_many(gone)
-            self.reload(pick=gone[0][1].id)
-        what = (_("Deleted “{name}”", name=gone[0][1].name) if len(gone) == 1
-                else ngettext("Deleted {n} clip", "Deleted {n} clips", len(gone)))
-        self.undo_bar.show_for(what, undo)
-        self.reload()
-
-    def _menu(self, pos, it: QTreeWidgetItem | None = None, at: QPoint | None = None):
-        if it is None:
-            it = self.list.itemAt(pos)
-        if it is None or not it.data(0, ID):
-            return
-        if not it.isSelected():
-            self.list.setCurrentItem(it)
-        m = QMenu(self)
-        cid = it.data(0, ID)
-        playing_sid = (self._playing[0] if self._playing is not None and self._playing[1] == cid
-                       else None)
-
-        def act(text, slot, icon=None, keys=None):
-            a = m.addAction(text)
-            if icon:
-                a.setIcon(icons.icon(icon))
-            if keys:
-                a.setShortcut(QKeySequence(keys))   # shown only: the list's own keys do it
-            a.triggered.connect(slot)
-            return a
-        act(_("Stop") if playing_sid == self._preview_sid else _("Play for me"),
-            lambda: self.toggle_play(it), "headphones", Qt.Key.Key_Space)
-        act(_("Stop sending") if playing_sid == self._send_sid else _("Play through mic"),
-            lambda: self.toggle_play(it, send=True), "live", Qt.Key.Key_Return)
-        m.addSeparator()
-        act(_("Add to Sounds"), self.add_picked, "sounds")
-        act(_("Rename"), lambda: self.rename(it), "edit", Qt.Key.Key_F2)
-        act(_("Copy"), self.copy_picked, "copy", QKeySequence.StandardKey.Copy)
-        m.addSeparator()
-        act(_("Delete"), self.delete_picked, "trash", Qt.Key.Key_Delete)
-        m.exec(at if at is not None else self.list.viewport().mapToGlobal(pos))
-
-    def _maintain(self):
-        # the Voice tab's recordings never expire: nothing to tidy, no worker thread
-        if self.voice or self._closed or (self._worker is not None
-                                          and self._worker.is_alive()):
-            return
-        keep = self.voice or self.cfg.app_clips_keep_forever or self.undo_bar.active()
-        playing = self._playing
-        active = (playing[1] if playing is not None
-                  and self.engine.state(playing[0]) is not None else None)
-        def work():
-            try:
-                gone = self.shelf.maintain(keep, active)
-            except OSError:
-                log.exception("saved clips maintenance failed")
-                return
-            busy.emit(self.cleanup_finished, gone)
-        self._worker = threading.Thread(target=work, daemon=True, name="saved-clips-cleanup")
-        self._worker.start()
 
     def showEvent(self, event):
         super().showEvent(event)
         self._maintain()   # coming back to the Apps tab: drop clips deleted meanwhile
 
-    def _cleanup_done(self, gone):
-        if self._closed:
-            return
-        if self.shelf.pruned:
-            self.shelf.pruned = False
-            if not gone:
-                self.reload()
-        if not gone:
-            return
-        def undo():
-            self._restore_background(gone)
-        if self.voice or self.cfg.app_clips_keep_forever or self.undo_bar.active():
-            undo()
-            return
-        self.reload()
-        self.undo_bar.show_for(_("Removed inactive clips: {n}", n=len(gone)), undo,
-                              done=lambda: self._discard(gone))
-
-    def _restore_background(self, gone):
-        def work():
-            error = None
-            try:
-                self.shelf.restore_many(gone)
-            except OSError as e:
-                error = e
-            busy.emit(self.restore_finished, gone[0][1].id, error)
-        self._worker = threading.Thread(target=work, daemon=True, name="saved-clips-restore")
-        self._worker.start()
-
-    def _restored(self, pick, error):
-        if self._closed:
-            return
-        self.reload(pick=pick)
-        if error is not None:
-            busy.toast(self, html.escape(_("Couldn't save it: {error}",
-                                          error=errors.plain(error))), "error")
-
-    def _discard(self, gone):
-        worker = threading.Thread(target=lambda: self.shelf.discard_files(gone),
-                                  daemon=True, name="saved-clips-delete")
-        self._purge_workers = [t for t in self._purge_workers if t.is_alive()]
-        self._purge_workers.append(worker)
-        worker.start()
 
     def shutdown(self):
         self._closed = True

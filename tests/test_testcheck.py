@@ -1,6 +1,6 @@
 import numpy as np
 
-from soundboard.mic.testcheck import analyze, summary_html
+from soundboard.mic.testcheck import analyze
 
 RATE = 48000
 
@@ -37,7 +37,6 @@ def test_voice_missing_from_output_is_reported():
     out = np.stack([_sound()] * 2, 1)
     r = analyze(out, RATE, mic, RATE, sound_vol=1.0)
     assert r["talked"] and not r["voice_in"]
-    assert "NOT reaching" in summary_html(r, None)
 
 
 def test_silent_mic_means_did_not_talk():
@@ -59,12 +58,6 @@ def test_loud_sounds_produce_advice():
     out = np.stack([voice + 4 * _sound()] * 2, 1)
     r = analyze(out, RATE, mic, RATE, sound_vol=1.0)
     assert r["voice_in"] and r["diff"] > 20 and "drown" in r["advice"]
-
-
-def test_sounds_only_summary_doesnt_ask_for_the_voice():
-    r = {"talked": False, "voice_in": False, "sounds_in": True, "advice": ""}
-    html = summary_html(r, None, mic_sent=False)
-    assert "Sounds only" in html and "Didn't hear you talk" not in html
 
 
 def _buzz(seconds=6.0, hz=100.0):
@@ -98,5 +91,3 @@ def test_muted_real_voice_is_explained_not_blamed_on_send():
     mic = np.stack([_mic(), np.zeros(6 * RATE, np.float32)], 1)
     r = analyze(np.stack([_sound()] * 2, 1), RATE, mic, RATE, sound_vol=1.0)
     assert r["talked"] and r["replaced"] and not r["voice_in"] and r["sounds_in"]
-    html = summary_html(r, None)
-    assert "Computer voice" in html and "NOT reaching" not in html

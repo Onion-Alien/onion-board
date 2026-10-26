@@ -126,8 +126,10 @@ _HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit
             "Accept": "image/*,text/html;q=0.9,*/*;q=0.8"}
 _YOUTUBE = re.compile(r"(?:youtube\.com/(?:watch\?(?:.*&)?v=|shorts/|embed/|live/)|youtu\.be/)"
                       r"([\w-]{11})")
-_PAGE_PIC = re.compile(r"<meta\b[^>]*?(?:property|name)\s*=\s*[\"']"
-                       r"(?:og:image(?::secure_url|:url)?|twitter:image(?::src)?)[\"'][^>]*>", re.I)
+# bounded: on a page with many "<meta" and no ">", each one read on to the page's end
+_PAGE_PIC = re.compile(r"<meta\b[^>]{0,2000}?(?:property|name)\s*=\s*[\"']"
+                       r"(?:og:image(?::secure_url|:url)?|twitter:image(?::src)?)[\"']"
+                       r"[^>]{0,2000}>", re.I)
 _CONTENT = re.compile(r"content\s*=\s*[\"']([^\"']+)", re.I)
 
 

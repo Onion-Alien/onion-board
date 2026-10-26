@@ -6,6 +6,7 @@ $pp = Get-PackageParameters
 # (each downloads more software); Tor and the network log stay at their default (off).
 $tasks = @('!vbcable', '!ffmpeg', '!livevoice')
 if ($pp['NoDesktopIcon']) { $tasks += '!desktopicon' }
+if ($pp['NoUsageCount']) { $tasks += '!countme' }   # the anonymous usage count (on by default)
 
 $silentArgs = "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP- /CLOSEAPPLICATIONS " +
               "/MERGETASKS=`"$($tasks -join ',')`" " +

@@ -7,7 +7,7 @@
     <owners>OnionAlien</owners>
     <title>Onion Board</title>
     <authors>Onion Alien</authors>
-    <projectUrl>https://onion-alien.github.io/onion-board/</projectUrl>
+    <projectUrl>https://onionalien.com/onionboard/</projectUrl>
     <iconUrl>https://cdn.jsdelivr.net/gh/Onion-Alien/onion-board@main/packaging/chocolatey/icon.png</iconUrl>
     <copyright>2026 OnionAlien</copyright>
     <licenseUrl>https://github.com/Onion-Alien/onion-board/blob/main/LICENSE</licenseUrl>
@@ -34,6 +34,7 @@ The other optional downloads in the installer (FFmpeg, the live voice-to-speech 
 
 * `/NoDesktopIcon` - don't put a shortcut on the Desktop (the Start menu shortcut is always made).
 * `/Offline` - start the app in Offline mode: it never connects to the internet until you switch Offline mode off in Settings > Connection.
+* `/NoUsageCount` - switch off the anonymous usage count (*Count me in*, on by default: the version, a random ID made on that PC, which features were used and problem counts; Settings > Privacy & security turns it on or off later).
 
 Example: `choco install onion-board --params "'/NoDesktopIcon /Offline'"`
 

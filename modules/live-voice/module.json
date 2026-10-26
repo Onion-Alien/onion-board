@@ -7,7 +7,7 @@
   "command": ["{python}", "{dir}/helper.py"],
   "install": [
     ["{base_python}", "-m", "venv", "{dir}/.venv"],
-    ["{python}", "-m", "pip", "install", "--disable-pip-version-check", "-r", "{dir}/requirements.txt"],
+    ["{python}", "-m", "pip", "install", "--disable-pip-version-check", "--timeout", "60", "-r", "{dir}/requirements.txt"],
     ["{python}", "{dir}/helper.py", "--download", "base.en"]
   ],
   "provides": ["speech-to-text"]

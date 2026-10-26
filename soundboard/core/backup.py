@@ -84,7 +84,14 @@ LOCAL_SETTINGS = {"version", "sounds", "categories", "category", "main_device", 
                   "stats_started", "stats_steps", "stats_used", "stats_plays", "stats_open_s",
                   "stats_downloads", "stats_launches", "stats_version", "stats_pending",
                   "tips_seen", "tip_day",
-                  "enjoy_days", "enjoy_state", "achievements"}
+                  "enjoy_days", "enjoy_state", "achievements",
+                  # this install's own: the store's vote id, the privacy switches, what
+                  # was sent about it, and this PC's Discord as it was
+                  "store_id", "netlog_keep", "app_log", "stats_ffmpeg_failed",
+                  "discord_talk", "discord_restore",
+                  # keys the app sends to other programs, and who in Twitch chat may make
+                  # it speak or post as you (and what): set here, by hand, never by a file
+                  "ptt_key", "hotkeys_share", "api_stream"}
 # per-sound fields that are written to sound.json (the paths are replaced by names)
 SOUND_FIELDS = ("name", "volume", "hotkey", "mode", "loop", "color", "level_gain",
                 "duration", "fingerprint", "fx", "tags", "fade_in", "fade_out", "hold",
@@ -606,6 +613,22 @@ def _fill_meta(src: _Source, ps: PackedSound, sid: str, name: str, color: str | 
 _MEASURED = ("level_gain", "duration", "fingerprint")
 
 
+# keys pressed while typing or playing (letters, digits, space, Enter, arrows…): as a
+# global hotkey with no Ctrl / Alt / Win they'd fire, and be lost to every other app
+_TYPING_VKS = {0x08, 0x09, 0x0D, 0x1B, 0x20, 0x25, 0x26, 0x27, 0x28, *range(0x30, 0x3A),
+               *range(0x41, 0x5B), *range(0xBA, 0xC1), *range(0xDB, 0xE0)}
+
+
+def _typing_key(combo: str) -> bool:
+    """`combo` is one other apps use all the time: Ctrl+C, Alt+Tab, Alt+F4, or a typing
+    key with no Ctrl / Alt / Win (Shift alone doesn't count)."""
+    from soundboard.control import winkeys
+    if winkeys.everyday(combo):
+        return True
+    got = winkeys.parse(combo)
+    return got is not None and not got[0] & ~winkeys.MOD_SHIFT and got[1] in _TYPING_VKS
+
+
 def _apply_entry(meta: SoundMeta, entry: dict, color: str | None):
     """The settings a sound.json gives (checked, like the config's) onto `meta`; ones
     it leaves out or gets wrong are the defaults."""
@@ -624,6 +647,8 @@ def _apply_entry(meta: SoundMeta, entry: dict, color: str | None):
         setattr(meta, k, v.copy() if isinstance(v, (dict, list)) else v)
     meta.tags = clean_tags(meta.tags)
     meta.hotkey = library.clean_hotkey(meta.hotkey, meta.name)
+    if meta.hotkey and _typing_key(meta.hotkey):
+        meta.hotkey = ""   # a pack (no prompt) taking a key every app uses: set by hand only
     meta.volume = min(max(meta.volume, 0.0), 2.0)
     meta.level_gain = min(max(meta.level_gain, 0.1), 6.0)
     meta.fade_in, meta.fade_out = clean_fade(meta.fade_in), clean_fade(meta.fade_out)
@@ -721,6 +746,12 @@ def keep_pack(pkg: Package) -> str:
             pkg.pack_id = pid
             return pid
         if not dest.is_file():
+            size = (sum(f.stat().st_size for f in src.rglob("*") if f.is_file())
+                    if src.is_dir() else src.stat().st_size)
+            if size > MAX_TOTAL or size + DISK_SPARE > shutil.disk_usage(d).free:
+                log.warning("not keeping a copy of the sound pack %s: %d bytes", src.name,
+                            size)
+                return ""   # the import itself says why (install's _check_room)
             tmp = dest.with_name(dest.name + ".part")
             try:
                 if src.is_dir():

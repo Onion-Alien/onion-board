@@ -230,10 +230,15 @@ class TickControl(Controller):
         on_air = e.sending and (e.any_playing() or e.radio_on_air()
                                 or e.aux_on_air())
         want = mw.cfg.ptt_key if (mw.cfg.ptt_key and on_air) else None
+        if mw._ptt_held:
+            if winkeys.ptt_held() != mw._ptt_held:
+                mw._ptt_held = None   # let go while this thread was stuck: pressed again
+            else:
+                winkeys.ptt_alive()
         if want != mw._ptt_held:
             if not mw.hkctl._release_ptt():
                 return   # still held: try the key-up again next tick
-            if want and winkeys.press(want):
+            if want and winkeys.ptt_down(want):
                 mw._ptt_held = want
 
     def _heard_level(self) -> float:

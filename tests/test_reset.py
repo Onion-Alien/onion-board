@@ -49,6 +49,38 @@ def test_settings_reset_keeps_sounds_devices_hotkeys_and_radio_favourites(app_di
     assert not reset._pending_path().exists()   # runs once, not on every start
 
 
+def test_settings_reset_keeps_how_it_goes_online(app_dir):
+    """A reset put Tor, a proxy and Offline mode back to Direct with every feature on."""
+    cfg = _board(app_dir)
+    cfg.net_mode, cfg.net_proxy, cfg.net_offline = "tor", "socks5h://proxy.example.com:1080", True
+    cfg.net_off, cfg.tor_bridges = ["radio", "usage_stats"], "snowflake"
+    assert cfg.save()
+    _note, cfg = _run([reset.SETTINGS])
+    assert (cfg.net_mode, cfg.net_proxy, cfg.net_offline) == (
+        "tor", "socks5h://proxy.example.com:1080", True)
+    assert cfg.net_off == ["radio", "usage_stats"] and cfg.tor_bridges == "snowflake"
+
+
+def test_a_restore_point_never_keeps_or_brings_back_keys(app_dir):
+    """A point kept the API key and Twitch logins: restoring it put back one the user
+    had since replaced."""
+    cfg = _board(app_dir)
+    cfg.api_token, cfg.twitch_token = "old-key", "old-twitch"
+    assert cfg.save()
+    _run([reset.SETTINGS])
+    [point] = reset.points()
+    raw = json.loads((point.path / "config.json").read_text("utf-8"))
+    assert not {"api_token", "twitch_token", "net_proxy"} & raw.keys()
+    cfg = Config.load()
+    cfg.api_token, cfg.twitch_token = "new-key", "new-twitch"
+    assert cfg.save()
+    reset.schedule_restore(point.id)
+    reset.run_pending()
+    cfg = Config.load()
+    assert cfg.theme == "Neon"
+    assert (cfg.api_token, cfg.twitch_token) == ("new-key", "new-twitch")
+
+
 def test_hotkeys_reset_and_sound_hotkeys(app_dir):
     _board(app_dir)
     _, cfg = _run([reset.HOTKEYS])

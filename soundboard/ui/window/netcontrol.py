@@ -14,7 +14,7 @@ from soundboard.control import remote
 from soundboard.i18n import _
 from soundboard.ui.kit import busy
 from soundboard.ui.settings import lite
-from soundboard.ui.window import sidebar
+from soundboard.ui.window import onaircard
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.radio.radiopanel import RadioTab
 from soundboard.ui.window.tabcontrol import TAB_INDEX
@@ -108,25 +108,25 @@ class NetControl(Controller):
         if playing:
             mw.toast(html.escape(_("Radio was switched off, so the station stopped.")))
 
-    def card_lines(self) -> list[sidebar.Line]:
+    def card_lines(self) -> list[onaircard.Line]:
         """What the On Air card says under its status (OutputBlock.set_lines): how the
         app goes online, a remote control listening, and lite mode."""
         return [line for line in (self._network_line(), self._remote_line(),
                                   self._lite_line()) if line]
 
     @staticmethod
-    def _lite_line() -> sidebar.Line | None:
+    def _lite_line() -> onaircard.Line | None:
         """Lite mode on (Settings > Appearance), else None."""
         if not lite.on():
             return None
-        return sidebar.Line("leaf", _("Lite mode"), "",
+        return onaircard.Line("leaf", _("Lite mode"), "",
                             _("Lite mode is on: no animations, plain themes and less CPU. "
                               "Click to change it."), "appearance")
 
-    def _network_line(self) -> sidebar.Line | None:
+    def _network_line(self) -> onaircard.Line | None:
         """Offline mode, a proxy or Tor (and how far Tor got), or None when direct."""
         if net.offline():
-            return sidebar.Line("offline", _("Offline"), "",
+            return onaircard.Line("offline", _("Offline"), "",
                                 _("Offline mode is on: nothing goes online, and what needs "
                                   "the internet is hidden. Click to change it."), "privacy")
         mode = net.mode()
@@ -135,38 +135,38 @@ class NetControl(Controller):
             t = tor.manager()
             tip = "\n".join((t.status_text(), click))
             if t.state == tor.READY:
-                return sidebar.Line("tor", _("Through Tor"), "ok", tip, "privacy")
+                return onaircard.Line("tor", _("Through Tor"), "ok", tip, "privacy")
             if t.state == tor.STARTING:
-                return sidebar.Line("tor", _("Tor {percent}%", percent=t.progress), "", tip,
+                return onaircard.Line("tor", _("Tor {percent}%", percent=t.progress), "", tip,
                                     "privacy")
             if t.state == tor.FAILED:
-                return sidebar.Line("tor", _("Tor failed"), "warn", tip, "privacy")
-            return sidebar.Line("tor", _("Tor"), "", tip, "privacy")
+                return onaircard.Line("tor", _("Tor failed"), "warn", tip, "privacy")
+            return onaircard.Line("tor", _("Tor"), "", tip, "privacy")
         if mode == net.PROXY:
             p = net.proxy()
             if p is None:
-                return sidebar.Line("shield", _("Proxy not working"), "warn",
+                return onaircard.Line("shield", _("Proxy not working"), "warn",
                                     "\n".join((net.describe(), click)), "privacy")
-            return sidebar.Line("shield", _("Through proxy"), "ok",
+            return onaircard.Line("shield", _("Through proxy"), "ok",
                                 "\n".join((_("Everything goes through your proxy "
                                              "({address}).", address=p.where), click)),
                                 "privacy")
         return None
 
-    def _remote_line(self) -> sidebar.Line | None:
+    def _remote_line(self) -> onaircard.Line | None:
         """A phone remote (a remote add-on such as Onion Pocket) listening on the home
         network, or else the control API listening on this PC; None when neither."""
         servers = remote.listening()
         click = _("Click to change it.")
         phone = [s for s in servers if s.lan]
         if phone:
-            return sidebar.Line("phone", _("Phone remote on"), "ok",
+            return onaircard.Line("phone", _("Phone remote on"), "ok",
                                 "\n".join((_("Phones on your home network can control the "
                                              "board ({address}).",
                                              address=f"{phone[0].host}:{phone[0].port}"),
                                             click)), "remote")
         if servers:
-            return sidebar.Line("phone", _("Remote control on"), "",
+            return onaircard.Line("phone", _("Remote control on"), "",
                                 "\n".join((_("Stream Deck buttons and scripts on this PC "
                                              "can control the board (port {port}).",
                                              port=servers[0].port), click)), "remote")

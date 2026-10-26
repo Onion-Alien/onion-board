@@ -1,5 +1,5 @@
 """Regenerate assets/onionboard.ico (the .exe, installer and shortcut icon) from the
-logo in theme.py, so the shortcut icon always matches the in-app one.
+logo in ui/kit/logo.py, so the shortcut icon always matches the in-app one.
 
     .venv\\Scripts\\python scripts\\pictures\\make_icon.py
 """

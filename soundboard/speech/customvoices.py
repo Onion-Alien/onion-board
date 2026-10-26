@@ -68,8 +68,10 @@ They show up in the Voice list marked (custom).
 
    {"name": "My voice", "command": ["C:/tools/tts.exe", "--out", "{out}"]}
 
-   The line to say is sent on its input (or put {text} in the command), and the
-   program writes a WAV file to {out}.
+   The line to say is sent on its input (or put {text_file} in the command: a
+   UTF-8 text file with it), and the program writes a WAV file to {out}.
+   {text} (the line itself in the command) works only for a program, never for
+   a .bat / .cmd / .ps1 script or a shell: lines can come from Twitch chat.
 
 3. A Piper voice pack - copy the .onnx and .onnx.json files here, and piper.exe
    (from github.com/rhasspy/piper releases) into a "piper" folder here.
@@ -143,17 +145,31 @@ class CustomVoice:
                                "Is the server running?") from None
 
     def _run(self, text: str, speed: float) -> bytes:
+        if any("{text}" in a for a in self.command) and _through_a_shell(self.command):
+            # the line can be anyone's in Twitch chat: in a script's or a shell's command
+            # line, `x" & calc & "` runs calc (cmd.exe reads its own quoting, not
+            # Windows'), and %VAR% gives away names and folders
+            raise RuntimeError(f"{self.name}: {{text}} can't go to a script or a shell. "
+                               "Put {text_file} in the command instead (or read the line "
+                               "from the input).")
         fd, out = tempfile.mkstemp(prefix="sb-tts-", suffix=".wav")
         os.close(fd)
+        fd, text_file = tempfile.mkstemp(prefix="sb-tts-", suffix=".txt")
+        with os.fdopen(fd, "wb") as f:
+            f.write(text.encode("utf-8"))
         try:
-            subs = {"{out}": out, "{text}": text, "{voice}": self.voice,
+            subs = {"{out}": out, "{text_file}": text_file, "{voice}": self.voice,
                     "{model}": self.model, "{speed}": f"{speed:.3f}",
-                    "{length_scale}": f"{1 / speed:.3f}"}
+                    "{length_scale}": f"{1 / speed:.3f}",
+                    # last: nothing in the line is read as another placeholder. A line
+                    # that is a whole argument never starts like an option (!say -x)
+                    "{text}": text}
             args = []
             for a in self.command:
+                whole = a == "{text}"
                 for k, v in subs.items():
                     a = a.replace(k, v)
-                args.append(a)
+                args.append(a.lstrip("-/ ") or " " if whole else a)
             try:
                 # a program that goes online by the proxy variables goes through the
                 # relay as a voice server (one that ignores them can't be stopped)
@@ -174,6 +190,25 @@ class CustomVoice:
             return data
         finally:
             Path(out).unlink(missing_ok=True)
+            Path(text_file).unlink(missing_ok=True)
+
+
+# what runs its command line as code: Windows runs .bat / .cmd through cmd.exe, whose
+# quoting isn't the one subprocess writes
+_SHELLS = {"cmd", "powershell", "pwsh", "wscript", "cscript", "bash", "sh", "wsl", "mshta"}
+_SCRIPTS = {".bat", ".cmd", ".ps1", ".vbs", ".vbe", ".wsf", ".sh"}
+
+
+def _through_a_shell(command: list[str]) -> bool:
+    """The program `command` starts reads its arguments as code (a script, a shell),
+    or might (Windows looks up a bare name that could be a .bat: checked too)."""
+    first = command[0] if command else ""
+    found = shutil.which(first) or first
+    for p in {Path(first), Path(found)}:
+        name, ext = p.stem.lower(), p.suffix.lower()
+        if ext in _SCRIPTS or name in _SHELLS:
+            return True
+    return False
 
 
 def decode(data: bytes) -> tuple[np.ndarray, int]:

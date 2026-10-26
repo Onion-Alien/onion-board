@@ -16,6 +16,7 @@ from PySide6.QtGui import (QColor, QFont, QFontMetricsF, QImage, QPainter, QPain
 from PySide6.QtWidgets import QSizePolicy, QWidget
 from soundboard.core import achievements, usage
 from soundboard.ui.settings import lite
+from soundboard.ui.bun.bunshapes import _shade
 
 # drawn on a 100 x 120 canvas, like Bun and Hoot, scaled to the requested height
 W, H = 100.0, 120.0
@@ -41,20 +42,6 @@ def _e(p: QPainter, cx, cy, w, h, fill, pen=None):
     p.setPen(pen or Qt.PenStyle.NoPen)
     p.setBrush(fill)
     p.drawEllipse(QRectF(cx - w / 2, cy - h / 2, w, h))
-
-
-def _shade(p: QPainter, shape: QPainterPath, x, y, r, col: QColor, alpha: int):
-    """A soft round shade inside `shape`, darkest at x, y and gone `r` away."""
-    c, edge = QColor(col), QColor(col)
-    c.setAlpha(alpha)
-    edge.setAlpha(0)
-    g = QRadialGradient(QPointF(x, y), r)
-    g.setColorAt(0.0, c)
-    g.setColorAt(1.0, edge)
-    p.save()
-    p.setClipPath(shape)
-    p.fillRect(QRectF(x - r, y - r, 2 * r, 2 * r), g)
-    p.restore()
 
 
 def body_path() -> QPainterPath:

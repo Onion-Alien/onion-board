@@ -45,11 +45,6 @@ def key(tab: str) -> str:
     return f"tour-{tab}"
 
 
-def seen_all(cfg):
-    """Mark every tab's tour seen (an update from a version without them)."""
-    cfg.tips_seen = [*cfg.tips_seen, *(key(t) for t in TABS if key(t) not in cfg.tips_seen)]
-
-
 def _widget(win, tab: str) -> QWidget | None:
     return getattr(win, tab, None)
 

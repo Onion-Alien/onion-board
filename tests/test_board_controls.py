@@ -13,6 +13,7 @@ from PySide6.QtGui import QMouseEvent
 from PySide6.QtWidgets import (QApplication, QLabel, QPushButton, QStyle,
                                QStyleOptionButton)
 
+from soundboard.ui.kit.plaintext import plain_tip
 from soundboard import voicefx
 
 from soundboard.ui.window import responsive
@@ -618,7 +619,7 @@ def test_up_next_is_one_chip_whose_list_reaches_every_queued_sound(window, monke
     rows = [r for r in rows if r is not None]
     assert len(rows) == 13
     tenth = rows[9]
-    assert tenth.findChildren(QPushButton)[0].toolTip() == "Boom"   # its whole name
+    assert tenth.findChildren(QPushButton)[0].toolTip() == plain_tip("Boom")   # whole name
     w.playctl.select("s1")
     tenth.findChildren(QPushButton)[-1].click()                    # the 10th's ✕
     assert len(w.playctl._queue) == 12 and w.playctl._queue[9] == "s1"
@@ -633,6 +634,7 @@ def test_up_next_is_one_chip_whose_list_reaches_every_queued_sound(window, monke
 def test_up_next_names_fill_the_room_their_row_gives_them(window, monkeypatch):
     """A long name is cut with "…" once, at the width its row really has: it was cut
     to a width worked out ahead, ~50 px short, a gap before its ▶."""
+    from soundboard.ui.kit.plaintext import plain_tip
     from soundboard.ui.window.upnext import _Name
     w = window
     w.resize(1200, 760)
@@ -657,7 +659,7 @@ def test_up_next_names_fill_the_room_their_row_gives_them(window, monkeypatch):
         assert fm.horizontalAdvance(shown) <= room
         one_more = name.full[:len(shown)] + "…"   # one letter more: wouldn't fit (no gap)
         assert fm.horizontalAdvance(one_more) > room
-        assert name.toolTip() == name.full
+        assert name.toolTip() == plain_tip(name.full)   # web text: never read as markup
 
 
 def test_up_next_list_shrinks_when_sounds_are_taken_out_while_open(window, monkeypatch):
@@ -832,7 +834,7 @@ def test_pad_menu_has_the_sites_entries_only_for_downloads(window, monkeypatch):
     menu_pick(monkeypatch, ["YouTube", "Details"])
     w.padctl.pad_menu("s0", None)
     [d] = dialogs
-    assert d.btn_open.text() == "Open on YouTube" and d.btn_open.toolTip() == LINK
+    assert d.btn_open.text() == "Open on YouTube" and d.btn_open.toolTip() == plain_tip(LINK)
     d.close()
 
 

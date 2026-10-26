@@ -50,7 +50,7 @@ class BoardHost:
         self._pressed: dict[str, set[str]] = {}     # tag -> pads its one-shots pressed
 
     def count(self, key: str):
-        """The add-on's feature `key` was used or is set up (onionwatch/usage.py
+        """The add-on's feature `key` was used or is set up (onionwatch/core/usage.py
         FEATURES): `used/triggers-<key>` with the next daily usage count, when Count me
         in is on. Names outside usage.FEATURES are dropped (usage.used)."""
         from soundboard.core import usage

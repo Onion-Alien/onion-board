@@ -16,12 +16,14 @@ game (the overlay's number keys while it's open) are still taken with RegisterHo
 """
 from __future__ import annotations
 
+import atexit
 import ctypes
 import ctypes.wintypes as wt
 import html
 import logging
 import os
 import threading
+import time
 
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtGui import QGuiApplication
@@ -689,6 +691,67 @@ def press(combo: str) -> bool:
 def release(combo: str) -> bool:
     events = key_sequence(combo, up=True)
     return events is not None and _send_all(events)
+
+
+# Auto push-to-talk's key, held by ptt_down until ptt_up. Windows never lets go of a
+# key a program pressed when that program freezes or dies, so a frozen UI thread (or a
+# crash) left the game's mic open: ptt_alive() comes from every UI tick, and a watch
+# thread lets go of the key once the ticks stop for HOLD_STALE_S. Quitting lets go too.
+HOLD_STALE_S = 2.0
+_ptt: dict = {"combo": None, "beat": 0.0}
+_ptt_lock = threading.Lock()
+_ptt_watch: list[threading.Thread] = []
+
+
+def ptt_down(combo: str) -> bool:
+    if not press(combo):
+        return False
+    with _ptt_lock:
+        _ptt.update(combo=combo, beat=time.monotonic())
+        if not _ptt_watch:
+            t = threading.Thread(target=_watch_ptt, name="ptt-watch", daemon=True)
+            _ptt_watch.append(t)
+            t.start()
+    return True
+
+
+def ptt_alive() -> None:
+    _ptt["beat"] = time.monotonic()
+
+
+def ptt_held() -> str | None:
+    """The key ptt_down holds; None once it was let go (by ptt_up or the watch)."""
+    return _ptt["combo"]
+
+
+def ptt_up(combo: str) -> bool:
+    if not release(combo):
+        return False
+    with _ptt_lock:
+        if _ptt["combo"] == combo:
+            _ptt["combo"] = None
+    return True
+
+
+def _let_go_stale(now: float) -> None:
+    with _ptt_lock:
+        combo = _ptt["combo"]
+        if combo and now - _ptt["beat"] > HOLD_STALE_S and release(combo):
+            _ptt["combo"] = None
+            log.warning("the app stopped answering: let go of the push-to-talk key")
+
+
+def _watch_ptt() -> None:
+    while True:
+        time.sleep(0.25)
+        _let_go_stale(time.monotonic())
+
+
+@atexit.register
+def _let_go_at_exit() -> None:
+    combo = _ptt["combo"]
+    if combo:
+        release(combo)
 
 
 # ---------------------------------------------------------------- overlay helpers

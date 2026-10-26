@@ -8,7 +8,7 @@ import pytest
 from PySide6.QtCore import QEvent, QSize
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QWidget
 
-from conftest import own_module, said
+from conftest import loose_look, own_module, said
 from soundboard.audio import appaudio
 from soundboard.core import autostart
 from soundboard.sounds import library
@@ -281,11 +281,10 @@ def test_an_empty_loose_file_stops_the_timer(window):
     library.SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
     (library.SOUNDS_DIR / "empty.wav").write_bytes(b"")
     for _ in range(importcontrol.LOOSE_EMPTY_LOOKS + 2):
-        window.impctl._loose_timer.stop()
-        window.impctl._take_loose()
+        loose_look(window)
     assert not window.impctl._loose_timer.isActive()
     (library.SOUNDS_DIR / "empty.wav").write_bytes(b"RIFF")   # written to: looked at again
-    window.impctl._take_loose()
+    loose_look(window)
     assert window.impctl._loose_timer.isActive()
     window.impctl._loose_timer.stop()
 

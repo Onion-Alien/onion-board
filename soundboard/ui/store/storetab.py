@@ -3,231 +3,47 @@ voted first, in categories, and a way to share your own. Sounds the server bring
 Myinstants are links like any shared one: played and added from that site.
 
 Nothing goes online until the tab is first opened. Every call runs on a worker thread
-and comes back through busy.emit, so a closed tab or window never gets a late answer."""
+and comes back through busy.emit, so a closed tab or window never gets a late answer.
+
+A sound's card is storerow.py, the *Share a sound* window storeshare.py; how the tab fits
+its width (storefit.py) and playing from it (storeplay.py) are StoreTab's mixins."""
 from __future__ import annotations
 
 import html
 import logging
 import threading
 from collections.abc import Callable
-from pathlib import Path
 
-from PySide6.QtCore import QEvent, QPoint, QSize, Qt, QTimer, Signal
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QFileDialog, QGridLayout,
-                               QHBoxLayout, QLabel, QLayout, QLineEdit, QMenu, QPushButton,
-                               QScrollArea, QSizePolicy, QStackedWidget, QVBoxLayout, QWidget)
+from PySide6.QtCore import QEvent, QPoint, Qt, QTimer, Signal
+from PySide6.QtWidgets import (QComboBox, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QMenu,
+                               QPushButton, QScrollArea, QStackedWidget, QVBoxLayout, QWidget)
 
-from soundboard.core import achievements, errors, usage
+from soundboard.core import achievements, usage
 from soundboard.ui.kit import wheelguard
-from soundboard.sounds import library
 from soundboard.online import net, store
-from soundboard.audio.engine import SR
 from soundboard.i18n import _
-from soundboard.ui.kit import busy, fit, icons
+from soundboard.ui.kit import busy, icons
 from soundboard.ui.store import storelook
-from soundboard.core.trash import ago
-from soundboard.ui.kit.panel import HoverCard, hint_label, icon_button, section_label
-from soundboard.ui.sounds.ytsearch import ClampLabel
+from soundboard.ui.kit.panel import hint_label, icon_button, section_label
+from soundboard.ui.store.storefit import CARD_GAP, LIST_GAP, StoreFit
+from soundboard.ui.store.storeplay import StorePlay
+from soundboard.ui.store.storerow import SoundRow, count_text
+from soundboard.ui.store.storeshare import ShareDialog, error_text
+# (callers import these from here too)
+from soundboard.ui.store.storefit import CARD_MIN_W, ONE_ROW  # noqa: F401
+from soundboard.ui.store.storerow import COUNT_W, _blocked, meta_line  # noqa: F401
+from soundboard.ui.store.storeshare import _title  # noqa: F401
 
 log = logging.getLogger(__name__)
 
 PREVIEW = "__store_preview"   # the store's "hear it first" voice (headphones only)
 SEARCH_WAIT_MS = 400          # typing pauses this long before the store is searched
-COUNT_W = "9.9k"              # the widest vote count kept room for
-CARD_MIN_W = 300              # a card's narrowest: as many across as fit at this width
-CARD_GAP = 8                  # between the cards
-LIST_GAP = 8                  # between the cards and the scroll bar (DESIGN.md, *Breathing room*)
-ONE_ROW = 720                 # a narrower tab puts the toolbar on two rows
 LINK_TICK_MS = 250            # how often the cards look at what the player is doing
 # the Sounds dropdown's first two (every sound, in an order): the order -> its key there
 TOPS = {"trending": "@trending", "top": "@top", "new": "@new"}
 
 
-def meta_line(s: store.Sound) -> str:
-    """"by Onion Board · tavern, music", "Shared by a player", for a shared link
-    "YouTube link · Shared by a player", and for one the server brought in
-    "From Myinstants" (its category has a column of its own)."""
-    from soundboard.sounds import sourceinfo
-    site = sourceinfo.site_of(s.link) if s.is_link else None
-    if s.source and site:
-        return _("From {site}", site=site[1])
-    who = _("by {name}", name=s.author) if s.author else _("Shared by a player")
-    where = [_("{site} link", site=site[1])] if site else []
-    return " · ".join([*where, who, *([", ".join(s.tags)] if s.tags else [])])
-
-
-def count_text(n: int) -> str:
-    return f"{n / 1000:.1f}k".replace(".0k", "k") if n >= 1000 else str(n)
-
-
-class SoundRow(HoverCard):
-    """One sound's card: its picture, name and votes, where it's from and when it came,
-    then Play, Stop, Play next, Add and Report. A link's Play plays it now (over a link
-    that's playing) and turns Pause while it plays; Play next waits for what's playing."""
-
-    def __init__(self, s: store.Sound, tab: StoreTab):
-        super().__init__()
-        self._build(s, tab, meta_line(s), self.btn_play_tip(s), _("Add it to your Sounds"),
-                    _("Report this sound"))
-        self.btn_queue.setVisible(s.is_link)   # (a file of the store's plays to you only)
-
-    def _build(self, s, tab, meta: str, play_tip: str, add_tip: str, report_tip: str):
-        """The card's parts (a voice's card too: storevoices.VoiceRow)."""
-        self.sound = s
-        self.state = ""   # its link in the player: "", "loading", "playing", "paused"
-        self._compact = False
-        self._play_tip = play_tip
-        g = QGridLayout(self)
-        g.setContentsMargins(10, 10, 10, 10)
-        g.setHorizontalSpacing(10)
-        g.setVerticalSpacing(4)
-        # its picture: an emoji for what it is, on its category's colour (a click plays)
-        self.tile = storelook.SoundTile(s, lambda: self.btn_play.click())
-        self.tile.setToolTip(play_tip)
-        g.addWidget(self.tile, 0, 0, 2, 1, Qt.AlignmentFlag.AlignTop)
-        # the name and the votes; where it's from, then its category and when it came
-        # (one line each, ending in "…" when the card is narrow: the whole text on hover)
-        self.name = ClampLabel(s.name, lines=1)
-        self.name.set_full(s.name, s.name)
-        self.meta = ClampLabel(meta, lines=1, bold=False)
-        self.meta.setObjectName("hint")
-        self.meta.set_full(meta, meta)
-        for lbl in (self.name, self.meta):   # (they paint their text: never markup)
-            lbl.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
-            lbl.setMinimumWidth(40)
-        self.where = QLabel()
-        self.where.setObjectName("hint")
-        self.where.setTextFormat(Qt.TextFormat.PlainText)
-        self.btn_up = self._vote_button("like", _("I like it"))
-        self.btn_up.clicked.connect(lambda: tab.vote(self, 1))
-        self.btn_down = self._vote_button("dislike", _("Not for me"))
-        self.btn_down.clicked.connect(lambda: tab.vote(self, -1))
-        top = QHBoxLayout()
-        top.setSpacing(4)
-        top.addWidget(self.name, 1)
-        top.addWidget(self.btn_up)
-        top.addWidget(self.btn_down)
-        g.addLayout(top, 0, 1)
-        mid = QHBoxLayout()
-        mid.setSpacing(8)
-        mid.addWidget(self.meta, 1)
-        mid.addWidget(self.where)
-        g.addLayout(mid, 1, 1)
-        # what you can do with it
-        self.btn_play = QPushButton(_("Play"))
-        self.btn_play.setCheckable(True)   # (switched on while it plays)
-        self.btn_play.setToolTip(play_tip)
-        self.btn_play.setAccessibleName(_("Play"))
-        icons.set_icon(self.btn_play, "play", "text", "on_accent")
-        self.btn_play.clicked.connect(lambda: tab.play_clicked(self))
-        self.btn_stop = icon_button("stop", _("Stop"), quiet=False)
-        self.btn_stop.setFixedSize(32, 32)
-        self.btn_stop.clicked.connect(lambda: tab.stop_clicked(self))
-        self.btn_stop.hide()   # (while its link plays)
-        self.btn_queue = QPushButton(_("Play next"))
-        self.btn_queue.setToolTip(_("Queue: waits for the sounds playing to finish"))
-        self.btn_queue.setAccessibleName(_("Play next"))
-        icons.set_icon(self.btn_queue, "next")
-        self.btn_queue.clicked.connect(lambda: tab.queue(self))
-        self.btn_add = QPushButton(_("Add"))
-        self.btn_add.setToolTip(add_tip)
-        self.btn_add.setAccessibleName(add_tip)
-        icons.set_icon(self.btn_add, "plus")
-        self.btn_add.clicked.connect(lambda: tab.add(self))
-        self.btn_report = icon_button("flag", report_tip)
-        self.btn_report.clicked.connect(lambda: tab.report_menu(self))
-        acts = QHBoxLayout()
-        acts.setSpacing(6)
-        for b in (self.btn_play, self.btn_stop, self.btn_queue, self.btn_add):
-            acts.addWidget(b)
-        acts.addStretch(1)
-        acts.addWidget(self.btn_report)
-        g.addLayout(acts, 2, 0, 1, 2)
-        g.setColumnStretch(1, 1)
-        self.show_votes()
-
-    def set_where(self, cat: str, created: int):
-        """Its category and when it came: "Memes · 3 days ago"."""
-        self.where.setText(" · ".join(w for w in (cat, ago(created) if created else "") if w))
-
-    def compact(self, on: bool):
-        """A narrow card: Play, Play next and Add show their pictures only (the words
-        their tooltips), so Report never goes past the card's edge."""
-        if on == self._compact:
-            return
-        self._compact = on
-        for b, text in ((self.btn_play, self._play_word()), (self.btn_queue, _("Play next")),
-                        (self.btn_add, _("Add"))):
-            b.setText("" if on else text)
-        self.btn_queue.setToolTip(_("Play next") if on
-                                  else _("Queue: waits for the sounds playing to finish"))
-
-    @staticmethod
-    def btn_play_tip(s: store.Sound) -> str:
-        return _("Play it now") if s.is_link else _("Hear it (only you)")
-
-    def _play_word(self) -> str:
-        if self.state == "playing":
-            return _("Pause")
-        if self.state == "paused":
-            return _("Resume")
-        return _("Stop") if self.btn_play.isChecked() and not self.state else _("Play")
-
-    def playing_look(self, on: bool):
-        """A sample to your headphones: Play turns Stop (and the picture's bars bounce)
-        while it plays. The switched-on button is drawn in the accent with on_accent ink
-        (a quiet one on the card was black on near-black in Amber Terminal)."""
-        with _blocked(self.btn_play):
-            self.btn_play.setChecked(on)
-        icons.set_icon(self.btn_play, "stop" if on else "play", "text", "on_accent")
-        self.btn_play.setText("" if self._compact else _("Stop") if on else _("Play"))
-        self.btn_play.setToolTip(_("Stop") if on else self._play_tip)
-        self.tile.set_playing(on)
-
-    def link_look(self, state: str):
-        """Its link in the player: Play is switched on while it loads and plays, says
-        Pause while it plays and Resume while it's paused, and Stop shows beside it."""
-        self.state = state
-        live = state in ("playing", "paused")
-        with _blocked(self.btn_play):
-            self.btn_play.setChecked(bool(state))
-        icons.set_icon(self.btn_play, "pause" if state == "playing" else "play", "text",
-                       "on_accent")
-        word = self._play_word()
-        self.btn_play.setText("" if self._compact else word)
-        self.btn_play.setToolTip(word if live else self._play_tip)
-        self.btn_play.setAccessibleName(word)
-        self.btn_stop.setVisible(live)
-        self.tile.set_playing(state == "playing")
-
-    def _vote_button(self, icon: str, tip: str) -> QPushButton:
-        b = QPushButton()
-        b.setObjectName("votebutton")
-        b.setProperty("quiet", True)
-        b.setCheckable(True)
-        icons.set_icon(b, icon, "muted", "on_accent")
-        b.setToolTip(tip)
-        b.setAccessibleName(tip)
-        b.setCursor(Qt.CursorShape.PointingHandCursor)
-        b.setFocusPolicy(Qt.FocusPolicy.TabFocus)
-        return b
-
-    def show_votes(self):
-        s = self.sound
-        for b, n, on in ((self.btn_up, s.up, s.mine == 1), (self.btn_down, s.down, s.mine == -1)):
-            b.setText(count_text(n))
-            b.setChecked(on)
-            if not b.property("steady"):   # room for the widest count, so cards line up
-                b.setProperty("steady", True)
-                was = b.text()
-                b.setText(COUNT_W)
-                b.setMinimumWidth(b.sizeHint().width())
-                b.setText(was)
-        self.btn_up.setAccessibleName(_("I like it ({n})", n=s.up))
-        self.btn_down.setAccessibleName(_("Not for me ({n})", n=s.down))
-
-
-class StoreTab(QWidget):
+class StoreTab(StoreFit, StorePlay, QWidget):
     """The Store tab. `add_file(path)` adds a fetched sound to the board; `play(data,
     gain)` plays one to the headphones only (None stops it) and says whether it could;
     `open_privacy()` opens Settings > Privacy & security."""
@@ -484,151 +300,6 @@ class StoreTab(QWidget):
             self._hold_rows()
         return super().eventFilter(obj, e)
 
-    def _hold_rows(self):
-        """The rows stay where they are on screen when something above the tab comes or
-        goes: the download bar opening for a played link pushed the list down, so the row
-        just clicked slid away (it looked like a jump back up the list)."""
-        vp = self.list_area.viewport()
-        top = vp.mapTo(self.window(), QPoint(0, 0)).y()
-        was, self._list_top = getattr(self, "_list_top", None), top
-        if was is not None and top != was and self.isVisible():
-            sb = self.list_area.verticalScrollBar()
-            sb.setMaximum(max(sb.maximum(), sb.value() + top - was))   # (its range catches up)
-            sb.setValue(sb.value() + top - was)
-
-    def _toolbar_parts(self) -> list[QWidget]:
-        return [w for w in (self.modes_box, self.search, self.cat_pick, self.btn_share,
-                            self.btn_reload) if not w.isHidden()]
-
-    def _fit_toolbar(self):
-        """One row when the card has room for all of it (and the tab is wide), else two."""
-        room = self.width() - 28   # (the banner's side margins)
-        parts = self._toolbar_parts()
-        full = self._share_w(self._share_label())
-        need = sum(full if w is self.btn_share else w.minimumSizeHint().width()
-                   if w is self.search else w.sizeHint().width()
-                   for w in parts) + 8 * (len(parts) - 1)
-        self._lay_toolbar(self.width() >= ONE_ROW and room >= need)
-        # the first of two rows, Sounds / Voices and Share, wanted 487 px with Share's
-        # words: wider than the mini player's cut-off, so the window went mini on it
-        words = bool(self._one_row) or room >= self._modes_w() + 8 + full
-        if words != self._share_words:
-            self._share_words = words
-            self._share_look()
-
-    def _share_label(self) -> str:
-        return _("Share a voice") if self._mode == "voices" else _("Share a sound")
-
-    def _share_look(self):
-        """Share's words on it, or (narrow) its icon only with the words as its tooltip.
-        Greyed out, saying why, while the store's server is down."""
-        label = self._share_label()
-        down = store.is_down()
-        self.btn_share.setEnabled(not down)
-        self.btn_share.setText(label if self._share_words else "")
-        self.btn_share.setToolTip(store.down_share() if down
-                                  else "" if self._share_words else label)
-        self.btn_share.setAccessibleName(label)
-
-    def _share_w(self, text: str) -> int:
-        """The Share button's width with `text` on it."""
-        b = self.btn_share
-        was = b.text()
-        if was == text:
-            return b.sizeHint().width()
-        b.setText(text)
-        w = b.sizeHint().width()
-        b.setText(was)
-        return w
-
-    def _modes_w(self) -> int:
-        return self.modes_box.sizeHint().width() * (not self.modes_box.isHidden())
-
-    def _lay_toolbar(self, one: bool):
-        """The toolbar in one row (a wide tab), or two: Sounds / Voices and Share, then
-        the search, the category and Refresh."""
-        # the box asks for the two rows' width, whichever is shown
-        rows = (self._modes_w() + 8 + self._share_w(""),
-                self.search.minimumSizeHint().width() + self.cat_pick.sizeHint().width()
-                + self.btn_reload.sizeHint().width() + 16)
-        self.toolbar.setMinimumWidth(max(rows))
-        if one == self._one_row:
-            return
-        self._one_row = one
-        for bar in self._bars:
-            while bar.count():
-                bar.takeAt(0)   # (the widgets stay the card's; the stretch goes)
-        first, second = self._bars[0], self._bars[0 if one else 1]
-        first.addWidget(self.modes_box)
-        if not one:
-            first.addStretch(1)
-            first.addWidget(self.btn_share)
-        second.addWidget(self.search, 1)
-        second.addWidget(self.cat_pick)
-        if one:
-            second.addWidget(self.btn_share)
-        second.addWidget(self.btn_reload)
-
-    # ------------------------------------------------------------------ the table
-    def _fit_columns(self, force: bool = False):
-        """As many cards a row as fit the list with their buttons' words (CARD_MIN_W
-        each, or the widest card's smallest if other fonts make it wider). Not even one
-        fits: every card shows their pictures only, as many a row as fit that way.
-        Measured on every card at its widest, so longer words, other fonts or a link's
-        Stop never cut a card off."""
-        if not self._rows:
-            return
-        if force:
-            self._need = None
-        w = self.list_area.viewport().width() - LIST_GAP
-        full, small = self._card_needs()
-        compact = w < full
-        least = max(CARD_MIN_W, small if compact else full)
-        cols = max(1, (w + CARD_GAP) // (least + CARD_GAP))
-        if force or cols != self._cols:
-            self._cols = cols
-            for r in self._rows:
-                self._grid.removeWidget(r)
-            for i, r in enumerate(self._rows):
-                self._grid.addWidget(r, i // cols, i % cols)
-            for c in range(max(cols, self._grid.columnCount())):
-                self._grid.setColumnStretch(c, 1 if c < cols else 0)
-        for r in self._rows:
-            r.compact(compact)
-
-    def _card_needs(self) -> tuple[int, int]:
-        """(with words, pictures only): the widest card's smallest width, each card as wide
-        as it gets (Play's longest word, a link's Stop out). Kept until the list changes."""
-        if self._need is None:
-            words = [_("Play"), _("Pause"), _("Resume"), _("Stop")]
-            full = small = 0
-            for r in self._rows:
-                r.ensurePolished()   # (its style's padding: a new card has none yet)
-                was, text, hid = r._compact, r.btn_play.text(), r.btn_stop.isHidden()
-                r.btn_stop.setHidden(r.btn_queue.isHidden())   # (only a link plays on)
-                r.compact(True)
-                small = max(small, self._needs(r))
-                r.compact(False)
-                for word in words:
-                    r.btn_play.setText(word)
-                    full = max(full, self._needs(r))
-                r.btn_play.setText(text)
-                r.btn_stop.setHidden(hid)
-                r.compact(was)
-            self._need = (full, small)
-        return self._need
-
-    @staticmethod
-    def _needs(r) -> int:
-        """The card's smallest width, as its buttons are now (its own frame included).
-        Every layout in it is redone first: a card not shown yet keeps its old sizes."""
-        lay = r.layout()
-        if lay is None:
-            return r.minimumSizeHint().width()
-        for sub in [*r.findChildren(QLayout), lay]:
-            sub.invalidate()
-        return max(lay.minimumSize().width(), r.minimumSizeHint().width())
-
     def showEvent(self, e):
         super().showEvent(e)
         # nothing goes online until the tab is first opened; switched back on in
@@ -860,7 +531,7 @@ class StoreTab(QWidget):
                 log.info("couldn't read the store: %s", e)
                 busy.emit(self._listed, serial,
                           (replace, None, e if isinstance(e, store.StoreDown) else None), False,
-                          str(e) if isinstance(e, store.StoreError) else errors.plain(e))
+                          error_text(e))
         threading.Thread(target=run, daemon=True, name="store-list").start()
 
     def _on_listed(self, serial: int, got, more: bool, err: str):
@@ -956,8 +627,7 @@ class StoreTab(QWidget):
                 busy.emit(self._fetched, row, (what, str(store.fetch(s))), "")
             except Exception as e:  # noqa: BLE001 - never a crash
                 log.info("couldn't fetch store sound %s: %s", s.id, e)
-                busy.emit(self._fetched, row, (what, ""),
-                          str(e) if isinstance(e, store.StoreError) else errors.plain(e))
+                busy.emit(self._fetched, row, (what, ""), error_text(e))
         threading.Thread(target=run, daemon=True, name="store-fetch").start()
 
     def _on_fetched(self, row: SoundRow, got, err: str):
@@ -998,141 +668,6 @@ class StoreTab(QWidget):
         busy.set_busy(row.btn_add, True)
         self._get(row, "add")
 
-    @staticmethod
-    def _is_voice(row) -> bool:
-        from soundboard.online.storevoices import Voice
-        return isinstance(row.sound, Voice)
-
-    def _hear_voice(self, row: SoundRow):
-        """A community voice's sample: the line said through it, made off the UI thread."""
-        serial, v = self._hear_serial, row.sound
-        assert not isinstance(v, store.Sound)   # (a voice's row: _is_voice)
-        module = self.voices.ai_module() if self.voices is not None else None
-
-        def run():
-            from soundboard.online import storevoices
-            try:
-                data, left_out = storevoices.preview(v, module)
-                busy.emit(self._decoded, row, (data, left_out), 1.0, serial)
-            except Exception as e:  # noqa: BLE001 - no sound, no crash
-                log.info("couldn't make a voice's sample: %s", e)
-                busy.emit(self._decoded, row, None, 1.0, serial)
-        threading.Thread(target=run, daemon=True, name="store-voice-sample").start()
-
-    def _is_link(self, row) -> bool:
-        return not self._is_voice(row) and row.sound.is_link
-
-    def play_clicked(self, row: SoundRow):
-        """The card's Play. A link (from its site, as a search hit): played now, over a
-        link that's playing; while it plays, Pause (and Resume). Else its sample, to you."""
-        self.used += 1
-        if not self._is_link(row):
-            self.hear(row, row is not self._playing)
-            return
-        s = row.sound
-        state = self._link_state(s.link)
-        if state in ("playing", "paused"):
-            self._link(s.link, s.name, "pause")
-        elif state != "loading":
-            self._stop_preview()
-            usage.used("store-heard")
-            self._link(s.link, s.name, "now")
-        self._follow_links()
-        if not row.state:   # (the click switched it on: off until the player has it)
-            row.link_look("")
-
-    def stop_clicked(self, row: SoundRow):
-        if self._is_link(row):
-            self._link(row.sound.link, row.sound.name, "stop")
-            self._follow_links()
-        else:
-            self._stop_preview()
-
-    def queue(self, row: SoundRow):
-        """Play next: a link plays after what's playing (Up next), at once if nothing is."""
-        usage.used("store-play-next")
-        if self._is_link(row):
-            self._stop_preview()
-            usage.used("store-heard")
-            self._link(row.sound.link, row.sound.name, "play")
-            self._follow_links()
-
-    def _follow_links(self):
-        """Every link card shows what the player is doing with it (the bottom strip and
-        Up next stop, pause and start it too)."""
-        if self._closed:
-            return
-        for r in self._rows:
-            if self._is_link(r):
-                state = self._link_state(r.sound.link)
-                if state != r.state:
-                    r.link_look(state)
-
-    def hear(self, row: SoundRow, on: bool):
-        if self._is_voice(row):
-            if self._playing is not None and self._playing is not row:
-                self._stop_preview()
-            self._hear_serial += 1
-            if not on:
-                self._stop_preview()
-                return
-            self._playing = row
-            row.playing_look(True)
-            self._hear_voice(row)
-            return
-        if self._playing is not None and self._playing is not row:
-            self._stop_preview()
-        self._hear_serial += 1
-        if not on:
-            self._stop_preview()
-            return
-        self._playing = row
-        row.playing_look(True)
-        self._get(row, "play")
-
-    def _decode(self, row: SoundRow, path: str):
-        serial = self._hear_serial
-
-        def run():
-            try:
-                data = library.decode(path)
-                busy.emit(self._decoded, row, data, library.level_gain(data), serial)
-            except Exception:  # noqa: BLE001 - a broken file: no sound, no crash
-                log.warning("couldn't decode store sound %s", path, exc_info=True)
-                busy.emit(self._decoded, row, None, 1.0, serial)
-        threading.Thread(target=run, daemon=True, name="store-decode").start()
-
-    def _on_decoded(self, row: SoundRow, data, gain: float, serial: int):
-        if not self._row_alive(row) or serial != self._hear_serial or self._playing is not row:
-            return
-        if isinstance(data, tuple):   # a voice's sample, and whether its AI part was left out
-            data, left_out = data
-            if left_out:
-                busy.toast(self.window(), html.escape(
-                    _("You're hearing it without its AI voice: get AI voices (Voice tab "
-                      "→ AI voices) to hear all of it.")), "warn", 7000)
-        if data is None or not self._play(data, gain):
-            self._stop_preview()
-            if data is not None:
-                busy.toast(self.window(), html.escape(
-                    _("Pick your headphones in Settings → Audio to hear the samples.")), "warn")
-            return
-        usage.used("store-heard")
-        self.bun.burst(3)
-        QTimer.singleShot(int(len(data) / SR * 1000) + 150, self,
-                          lambda s=serial: s == self._hear_serial and self._stop_preview())
-
-    def _stop_preview(self):
-        row, self._playing = self._playing, None
-        if row is not None:
-            try:
-                with _blocked(row.btn_play):
-                    row.btn_play.setChecked(False)
-                row.playing_look(False)
-            except RuntimeError:   # its row went meanwhile
-                pass
-            self._play(None, 1.0)
-
     # ------------------------------------------------------------------ votes and reports
     def vote(self, row: SoundRow, value: int):
         s = row.sound
@@ -1159,8 +694,7 @@ class StoreTab(QWidget):
                 else:
                     busy.emit(self._voted, row, store.vote(install, s.id, value), "")
             except Exception as e:  # noqa: BLE001
-                busy.emit(self._voted, row, old,
-                          str(e) if isinstance(e, store.StoreError) else errors.plain(e))
+                busy.emit(self._voted, row, old, error_text(e))
         threading.Thread(target=run, daemon=True, name="store-vote").start()
 
     def _on_voted(self, row: SoundRow, counts, err: str):
@@ -1203,8 +737,7 @@ class StoreTab(QWidget):
                     store.report(install, s.id, reason)
                 busy.emit(self._voted, row, (s.up, s.down, s.mine), "")
             except Exception as e:  # noqa: BLE001
-                busy.emit(self._voted, row, (s.up, s.down, s.mine),
-                          str(e) if isinstance(e, store.StoreError) else errors.plain(e))
+                busy.emit(self._voted, row, (s.up, s.down, s.mine), error_text(e))
         busy.toast(self.window(), html.escape(_("Thanks: the voice will be checked.") if voice
                                               else _("Thanks: the sound will be checked.")), "ok")
         threading.Thread(target=run, daemon=True, name="store-report").start()
@@ -1235,282 +768,4 @@ class StoreTab(QWidget):
         if dlg is not None:
             dlg.accepted.connect(lambda: self._mode == "voices" and self.reload())
 
-
-def _title(text: str) -> QLabel:
-    """A small dialog's one big line (as the Send feedback box's)."""
-    lab = QLabel(text)
-    f = lab.font()
-    f.setPointSizeF(f.pointSizeF() * 1.3)
-    f.setBold(True)
-    lab.setFont(f)
-    lab.setWordWrap(True)
-    return lab
-
-
-class _blocked:
-    """Signals off on a widget for a `with` block."""
-
-    def __init__(self, w):
-        self.w = w
-
-    def __enter__(self):
-        self.was = self.w.blockSignals(True)
-
-    def __exit__(self, *_exc):
-        self.w.blockSignals(self.was)
-
-
-class ShareDialog(QDialog):
-    """Share a sound with the store: a file (name it, agree it's yours to give away as
-    CC0) or a link to a video or sound site (only the link is kept). Two pages: the
-    form, then "Thanks, it'll show once it's checked". `link` (and `name`) open it on
-    the link, filled in: a sound of yours downloaded from one."""
-    _sent = Signal(str)   # worker -> UI: the error, "" when it went
-
-    def __init__(self, install: str, parent=None, link: str = "", name: str = ""):
-        super().__init__(parent)
-        self.install = install
-        self.path = ""
-        self.sent = False   # shared: the thanks page is up
-        self._closed = False
-        self.setWindowTitle(_("Share a sound"))
-        self.setMaximumWidth(520)
-        self._sent.connect(self._on_sent)
-        lay = QVBoxLayout(self)
-        lay.setContentsMargins(18, 18, 18, 18)
-        self.pages = QStackedWidget()
-        lay.addWidget(self.pages)
-
-        form = QWidget()
-        v = QVBoxLayout(form)
-        v.setContentsMargins(0, 0, 0, 0)
-        v.setSpacing(10)
-        v.addWidget(_title(_("Share a sound with everyone")))
-        # a file or a link: two choice tiles, the picked one in the accent
-        modes = QHBoxLayout()
-        modes.setSpacing(8)
-        self.mode_btns: dict[str, QPushButton] = {}
-        for key, text, icon in (("file", _("A file"), "folder"), ("link", _("A link"), "link")):
-            b = QPushButton(text)
-            b.setCheckable(True)
-            b.setAutoExclusive(True)
-            icons.set_icon(b, icon, "text", "on_accent")
-            b.clicked.connect(lambda _c=False, k=key: self.set_mode(k))
-            modes.addWidget(b)
-            self.mode_btns[key] = b
-        modes.addStretch(1)
-        v.addLayout(modes)
-        self.mode_hint = hint_label("")
-        v.addWidget(self.mode_hint)
-        self.file_box = QWidget()
-        pick = QHBoxLayout(self.file_box)
-        pick.setContentsMargins(0, 0, 0, 0)
-        pick.setSpacing(8)
-        self.btn_file = QPushButton(_("Choose a file"))
-        icons.set_icon(self.btn_file, "folder")
-        self.btn_file.clicked.connect(self.choose)
-        pick.addWidget(self.btn_file)
-        self.file_lbl = QLabel(_("No file picked"))
-        self.file_lbl.setObjectName("hint")
-        self.file_lbl.setTextFormat(Qt.TextFormat.PlainText)
-        self.file_lbl.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
-        pick.addWidget(self.file_lbl, 1)
-        v.addWidget(self.file_box)
-        self.link = QLineEdit(link)
-        self.link.setPlaceholderText(_("Paste a link: https://www.youtube.com/watch?v=…"))
-        self.link.setAccessibleName(_("Link"))
-        self.link.textChanged.connect(self._ready)
-        v.addWidget(self.link)
-        self.name = QLineEdit()
-        self.name.setMaxLength(60)
-        self.name.setPlaceholderText(_("Name (what it is)"))
-        self.name.setAccessibleName(_("Name"))
-        self.name.textChanged.connect(self._ready)
-        v.addWidget(self.name)
-        self.tags = QLineEdit()
-        self.tags.setMaxLength(200)
-        self.tags.setPlaceholderText(_("Tags, with commas (optional): meme, horn, game"))
-        self.tags.setAccessibleName(_("Tags"))
-        self.tags.textChanged.connect(self._ready)
-        v.addWidget(self.tags)
-        self.agree = QCheckBox(_("This sound is mine to give away"))
-        self.agree.toggled.connect(self._ready)
-        v.addWidget(self.agree)
-        self.terms = terms = hint_label(_(
-            "I made or recorded it myself, and I give it away as CC0: anyone may use it for "
-            "anything, for free. No songs, clips from shows or games, or other people's "
-            "sounds: those are removed.") + " " + _(
-            "Is a sound in the store yours? Email {email} and it comes down.",
-            email=store.CONTACT))
-        terms.setContentsMargins(26, 0, 0, 4)   # under the box's text, not its tick
-        terms.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)   # the email
-        v.addWidget(terms)
-        self.error = QLabel()
-        self.error.setWordWrap(True)
-        self.error.setObjectName("hint")
-        self.error.hide()
-        v.addWidget(self.error)
-        buttons = QHBoxLayout()
-        buttons.setSpacing(8)
-        self.btn_send = QPushButton(_("Share"))
-        self.btn_send.setObjectName("primary")
-        self.btn_send.clicked.connect(self.send)
-        buttons.addWidget(self.btn_send)
-        cancel = QPushButton(_("Cancel"))
-        cancel.clicked.connect(self.reject)
-        buttons.addWidget(cancel)
-        buttons.addStretch(1)
-        v.addLayout(buttons)
-        v.addStretch(1)   # room left over (the other choice's parts hidden) goes below
-        self.pages.addWidget(form)
-
-        done = QWidget()
-        dv = QVBoxLayout(done)
-        dv.setContentsMargins(0, 0, 0, 0)
-        dv.setSpacing(10)
-        dv.addWidget(_title(_("Thanks for sharing!")))
-        dv.addWidget(hint_label(_("It shows in the store once it's been checked, usually "
-                                  "within a few days.")))
-        db = QHBoxLayout()
-        ok = QPushButton(_("Done"))
-        ok.setObjectName("primary")
-        ok.clicked.connect(self.accept)
-        db.addWidget(ok)
-        db.addStretch(1)
-        dv.addLayout(db)
-        dv.addStretch(1)
-        self.pages.addWidget(done)
-        if name:
-            self.name.setText(name[:60])
-        self.set_mode("link" if link else "file")
-        fit.watch(self)
-
-    def set_mode(self, mode: str):
-        """Share a file, or a link."""
-        self.mode = "link" if mode == "link" else "file"
-        is_link = self.mode == "link"
-        self.mode_btns[self.mode].setChecked(True)
-        self.file_box.setVisible(not is_link)
-        self.agree.setVisible(not is_link)
-        self.terms.setVisible(not is_link)
-        self.link.setVisible(is_link)
-        self.mode_hint.setText(
-            _("A YouTube, TikTok, SoundCloud or other video link. Only the link is kept: "
-              "whoever adds it gets it from that site. It shows once it's been checked.")
-            if is_link else
-            _("MP3, OGG, WAV or FLAC, up to 4 MB. It shows in the store once it's been "
-              "checked."))
-        self._show_error("")
-        self._ready()
-        if self.isVisible():   # the other choice's parts went: as tall as this one needs
-            QTimer.singleShot(0, self, self._shrink)
-
-    def sizeHint(self) -> QSize:
-        return QSize(500, super().sizeHint().height())
-
-    def choose(self):
-        path, _f = QFileDialog.getOpenFileName(
-            self, _("Choose a sound to share"), str(Path.home()),
-            _("Sounds") + " (*.mp3 *.ogg *.wav *.flac)")
-        if path:
-            self.set_file(path)
-
-    def set_file(self, path: str):
-        self.path = path
-        self.file_lbl.setText(Path(path).name)
-        self.file_lbl.setToolTip(path)
-        if not self.name.text().strip():
-            self.name.setText(Path(path).stem.replace("_", " ")[:60])
-        why = store.check_file(path)
-        self._show_error(why)
-        self._ready()
-
-    def _show_error(self, text: str):
-        self.error.setText(text)
-        self.error.setVisible(bool(text))
-        if text:
-            from soundboard.ui.kit import theme
-            theme.set_tone(self.error, "error")
-
-    def _ready(self):
-        if not hasattr(self, "btn_send"):   # (still being built)
-            return
-        # a name or tags the store would refuse say so as they're typed
-        words = store.check_words(self.name.text(), self.tags.text())
-        if getattr(self, "mode", "file") == "link":
-            url = self.link.text().strip()
-            ok = bool(store.link_ok(url) and self.name.text().strip() and not words)
-            why = words or _("Paste a link and name it first")
-            # a pasted link the store won't take says so at once
-            self._show_error(words if not url or store.link_ok(url) else _(
-                "The store takes links to YouTube, TikTok, SoundCloud and other video "
-                "and sound sites."))
-        else:
-            bad_file = store.check_file(self.path) if self.path else ""
-            ok = bool(self.path and self.name.text().strip() and self.agree.isChecked()
-                      and not bad_file and not words)
-            why = words or _("Pick a file, name it and tick the box first")
-            self._show_error(bad_file or words)
-        busy.set_busy(self.btn_send, not ok)   # greyed until it can go (never disabled)
-        self.btn_send.setToolTip("" if ok else why)
-
-    def send(self):
-        if busy.is_busy(self.btn_send):
-            return
-        release = busy.hold(self.btn_send, _("Sharing…"))
-        self._release = release
-        path, name, tags, install = self.path, self.name.text(), self.tags.text(), self.install
-        link = self.link.text().strip() if self.mode == "link" else ""
-
-        def run():
-            try:
-                if link:
-                    store.share_link(install, link, name, tags)
-                else:
-                    store.upload(install, path, name, tags)
-                busy.emit(self._sent, "")
-            except Exception as e:  # noqa: BLE001
-                log.info("couldn't share a sound: %s", e)
-                busy.emit(self._sent, str(e) if isinstance(e, store.StoreError)
-                          else errors.plain(e))
-        threading.Thread(target=run, daemon=True, name="store-share").start()
-
-    def _on_sent(self, err: str):
-        if self._closed:
-            return
-        self._release()
-        if err:
-            self._show_error(err)
-            return
-        usage.used("store-shared")
-        self.sent = True
-        # the stack is as tall as its tallest page: the form goes, so the short thanks
-        # page shrinks the window (there's no way back to the form from it)
-        form = self.pages.widget(0)
-        assert form is not None
-        self.pages.setCurrentIndex(1)
-        self.pages.removeWidget(form)
-        form.hide()
-        form.deleteLater()
-        lay = self.layout()
-        assert lay is not None
-        # measured once Qt has given the form's room back (after this event)
-        QTimer.singleShot(0, self, self._shrink)
-
-    def _shrink(self):
-        """As short as the thanks page: Qt keeps a shown dialog's height, so the
-        height is pinned to what's needed for a moment, then let go."""
-        lay = self.layout()
-        if lay is None:
-            return
-        lay.activate()
-        h = lay.totalMinimumSize().height()
-        self.setFixedHeight(h)
-        self.setMinimumHeight(0)
-        self.setMaximumHeight(16777215)
-        self.resize(self.width(), h)
-
-    def done(self, r: int):
-        self._closed = True
-        super().done(r)
 

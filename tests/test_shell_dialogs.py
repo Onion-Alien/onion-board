@@ -9,7 +9,7 @@ from soundboard.ui.settings import settings
 from soundboard.ui.kit import theme
 from soundboard.control import winkeys
 from soundboard.ui.window import fitcontrol, settingscontrol
-from soundboard.ui.setup import setupwizard
+from soundboard.ui.setup import cablestep, setupwizard
 from soundboard.ui.window import mainwindow as main
 from soundboard.ui.window.livedot import set_tab_live
 from soundboard.ui.window.tabcontrol import TAB_INDEX
@@ -20,7 +20,7 @@ def win(qapp, app_dir, monkeypatch):
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
         monkeypatch.setattr(engine.Engine, name, lambda self, n, _k=name: None)
     monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
-    monkeypatch.setattr(setupwizard, "resume_after_restart", lambda on: None)
+    monkeypatch.setattr(cablestep, "resume_after_restart", lambda on: None)
     w = main.MainWindow()
     w.soundctl._load_thread.join(15)
     yield w

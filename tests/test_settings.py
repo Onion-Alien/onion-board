@@ -680,7 +680,7 @@ def test_language_comes_first_on_appearance_and_opens_the_picker(window, monkeyp
     assert window.cfg.language == "de" and not restarts   # saved, no surprise restart
     assert btn.text().startswith("Deutsch")
     # what happens next, in the language picked
-    assert d.lang_note.text() == "Onion Board zeigt nach einem Neustart Deutsch an."
+    assert d.lang_note.text() == "Onion Board zeigt nach einem Neustart Deutsch."
     assert d.lang_restart.text() == "Jetzt neu starten" and d.lang_restart.isVisibleTo(d)
     d.lang_restart.click()
     assert restarts == [1]

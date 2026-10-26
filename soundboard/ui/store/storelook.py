@@ -118,7 +118,6 @@ class SoundTile(QWidget):
         self.hue = tile_hue(s)
         self._click = on_click
         self._playing = False
-        self._badge = False   # a play mark in its corner: it's the row's only play button
         self._t0 = time.monotonic()
         self._tick = QTimer(self, interval=40)
         self._tick.timeout.connect(self.update)
@@ -138,10 +137,6 @@ class SoundTile(QWidget):
             self._tick.start()
         else:
             self._tick.stop()
-        self.update()
-
-    def set_badge(self, on: bool):
-        self._badge = on
         self.update()
 
     def hideEvent(self, e):
@@ -190,19 +185,6 @@ class SoundTile(QWidget):
                 p.setPen(Qt.PenStyle.NoPen)
                 p.setBrush(QColor(255, 255, 255, 235))
                 p.drawRoundedRect(bar, bw / 2, bw / 2)
-        elif self._badge:   # a small round play mark, bottom right
-            d = r.width() * 0.4
-            c = QRectF(r.right() - d - 2, r.bottom() - d - 2, d, d)
-            p.setPen(Qt.PenStyle.NoPen)
-            p.setBrush(QColor(0, 0, 0, 150))
-            p.drawEllipse(c)
-            tri = QPainterPath()
-            k = d * 0.22
-            tri.moveTo(c.center().x() - k * 0.8, c.center().y() - k)
-            tri.lineTo(c.center().x() + k * 1.1, c.center().y())
-            tri.lineTo(c.center().x() - k * 0.8, c.center().y() + k)
-            tri.closeSubpath()
-            p.fillPath(tri, QColor(255, 255, 255))
         p.end()
 
 

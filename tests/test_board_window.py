@@ -2,7 +2,7 @@
 categories, undo after Remove, export / import, the trim control, the tray."""
 from pathlib import Path
 
-from conftest import process_events, said, unsay
+from conftest import loose_look, process_events, said, unsay
 from soundboard.core import backup
 from soundboard.ui.sounds.dialogs import EditDialog
 from soundboard.ui.kit import toast
@@ -411,8 +411,7 @@ def test_a_sound_on_the_undo_bar_isnt_taken_back_in_as_a_loose_file(window, qapp
     m.file, m.hotkey = str(plain), "ctrl+alt+2"
     window.rmctl.remove_sound("s1")
     for _ in range(3):   # two looks at the same size = "done copying in"
-        window.impctl._loose_timer.stop()
-        window.impctl._take_loose()
+        loose_look(window)
     # an import runs on a thread: give one the time to land
     assert not process_events(qapp, lambda: len(window.cfg.sounds) > 1, timeout=3)
     assert [s.name for s in window.cfg.sounds] == ["Boom"]

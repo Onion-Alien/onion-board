@@ -42,6 +42,12 @@ log = logging.getLogger("live-voice")
 # plain downloads, written to the cache as they come (fetch_model's progress counts
 # them); Xet's put a model there only once it's whole
 os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
+# Hugging Face gives up on a read after 10 s, which a slow proxy or Tor (the app's
+# Connection setting) can take on a 150 MB model: a minute, and DOWNLOAD_TRIES
+os.environ.setdefault("HF_HUB_DOWNLOAD_TIMEOUT", "60")
+os.environ.setdefault("HF_HUB_ETAG_TIMEOUT", "60")
+DOWNLOAD_TRIES = 3                 # the install's model download; it carries on from
+DOWNLOAD_WAIT_S = (5, 15)          # what it got (huggingface_hub keeps the part)
 
 RATE = protocol.AUDIO_RATE
 FRAME = RATE * 30 // 1000          # 30 ms analysis frames
@@ -266,6 +272,32 @@ class Link:
             pass
 
 
+def download(name: str) -> int:
+    """The install's step: the speech model downloaded (tried again when the connection
+    drops) and loaded once to check it. Returns the exit code."""
+    print(f"Downloading the speech model {name} (about 150 MB)...", flush=True)
+    from faster_whisper import WhisperModel
+    from faster_whisper.utils import download_model
+    for attempt in range(DOWNLOAD_TRIES):
+        try:
+            folder = download_model(name)
+            break
+        except ValueError:            # not a model name: trying again won't help
+            raise
+        except Exception as e:  # noqa: BLE001 - a dropped connection, a server error
+            log.warning("speech model download failed: %s", e)
+            if attempt + 1 == DOWNLOAD_TRIES:
+                print(f"Couldn't download the speech model ({e}). Check your internet "
+                      "connection and press Install again.", flush=True)
+                return 1
+            wait = DOWNLOAD_WAIT_S[min(attempt, len(DOWNLOAD_WAIT_S) - 1)]
+            print(f"The download stopped ({e}); trying again in {wait} s...", flush=True)
+            time.sleep(wait)
+    WhisperModel(folder, device="cpu", compute_type="int8")
+    print("Speech model ready.", flush=True)
+    return 0
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int)
@@ -287,11 +319,7 @@ def main(argv=None) -> int:
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     if args.download:
-        print(f"Downloading the speech model {args.download} (about 150 MB)...", flush=True)
-        from faster_whisper import WhisperModel
-        WhisperModel(args.download, device="cpu", compute_type="int8")
-        print("Speech model ready.", flush=True)
-        return 0
+        return download(args.download)
     if args.port is None or not args.token:
         ap.error("--port and --token are required (Onion Board starts this; don't run it "
                  "by hand)")
@@ -371,8 +399,9 @@ def main(argv=None) -> int:
                 log.exception("transcription failed")
                 link.send(type="error", text=f"transcription failed: {e}")
                 return None
-            log.info("%.1fs of speech -> %r in %.2fs", len(audio) / RATE, text,
-                     time.monotonic() - t0)
+            # never the words: this log is a file on disk, kept with the app log off too
+            log.info("%.1fs of speech -> %d characters in %.2fs", len(audio) / RATE,
+                     len(text or ""), time.monotonic() - t0)
             if not text or tr is None:
                 return (text, "") if text else None
             t0 = time.monotonic()
@@ -382,7 +411,8 @@ def main(argv=None) -> int:
                 log.exception("translation failed")
                 link.send(type="error", text=f"translation failed: {e}")
                 return None
-            log.info("  translated -> %r in %.2fs", said, time.monotonic() - t0)
+            log.info("  translated -> %d characters in %.2fs", len(said or ""),
+                     time.monotonic() - t0)
             return (said, text) if said else None
 
         while (audio := work.get()) is not None:

@@ -525,12 +525,13 @@ def chat(mw: MainWindow, params: dict) -> tuple[int, object]:
         if not _allowed(rules, "tts", rank):
             return 200, {**out, "reason": "not a command"}
         text = clean_text(line, rules)
-        if text is None:
+        who = clean_text(user, rules)   # their name is read out too: the same filter
+        if text is None or who is None:
             return 200, {**out, "reason": "blocked word"}
         wait = _cooldown(mw, rules, user, rank)
         if wait:
             return 200, {**out, "reason": "cooldown", "wait": wait}
-        status, body = _say(mw, fill(str(rules["tts_format"]), {"user": user, "message": text}))
+        status, body = _say(mw, fill(str(rules["tts_format"]), {"user": who, "message": text}))
         if status != 200:
             return 200, {**out, "reason": body.get("error", "")}
         _used(mw, user)
@@ -572,8 +573,14 @@ def chat(mw: MainWindow, params: dict) -> tuple[int, object]:
                          "reply": f"@{user} {prefix}sound <name> · {prefix}sounds lists them"}
         m = _sound_named(mw, rest, pool)
         if m is None:
+            # posted from the streamer's own account: what the viewer typed goes through
+            # the blocked words and the link rule first, and counts for the cooldown
+            _used(mw, user)
+            asked = clean_text(rest, rules)
+            if asked is None:
+                return 200, {**out, "reason": "blocked word"}
             close = difflib.get_close_matches(rest, [s.name for s in pool], 3, 0.5)
-            reply = fill(str(rules["reply_missing"]), {"user": user, "name": rest[:60],
+            reply = fill(str(rules["reply_missing"]), {"user": user, "name": asked[:60],
                                                       "prefix": prefix})
             if close:
                 reply += " (" + ", ".join(close) + "?)"
@@ -584,8 +591,11 @@ def chat(mw: MainWindow, params: dict) -> tuple[int, object]:
         if rest:
             cat = remote.find_category(mw.cfg, rest)
             if cat is None:
+                _used(mw, user)
+                asked = clean_text(rest, rules)
                 return 200, {**out, "reason": "no such category",
-                             "reply": f"@{user} no category called “{rest[:60]}”"}
+                             "reply": f"@{user} no category called “{asked[:60]}”"
+                             if asked else ""}
             if rules["category"] and cat != rules["category"]:   # a real one, not chat's
                 return 200, {**out, "reason": "not chat's category",
                              "reply": f"@{user} chat plays {rules['category']} sounds only: "
@@ -811,6 +821,11 @@ def event(mw: MainWindow, params: dict) -> tuple[int, object]:
     inline = {k: params[k] for k in ("sound", "category", "say", "voice", "voice_seconds")
               if isinstance(params.get(k), str)}
     if inline:
+        if "say" in inline:   # a viewer's name can carry it (an unencoded bot template)
+            said = clean_text(inline["say"], chat_rules(mw))
+            if said is None:
+                return 200, {"handled": False, "reason": "blocked word", "event": ev}
+            inline["say"] = said
         rule: dict = {}
         err = _rule_from(mw, inline, rule)
         if err:

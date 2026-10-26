@@ -226,7 +226,10 @@ def test_never_on_a_network_windows_calls_public(qapp, window, loaded,  # noqa: 
     monkeypatch.setattr(netcategory, "category", lambda ip: netcategory.PUBLIC)
     assert not srv.start(0, "add-on-key", "127.0.0.1") and not srv.running
     assert srv.error == remote.public_network()
-    monkeypatch.setattr(netcategory, "category", lambda ip: None)   # can't tell: on
+    monkeypatch.setattr(netcategory, "category", lambda ip: None)   # can't tell: off too
+    assert not srv.start(0, "add-on-key", "127.0.0.1") and not srv.running
+    assert srv.error == remote.unknown_network()
+    monkeypatch.setattr(netcategory, "category", lambda ip: netcategory.PRIVATE)
     assert srv.start(0, "add-on-key", "127.0.0.1")
     asked = []
     monkeypatch.setattr(netcategory, "category",
@@ -247,6 +250,21 @@ def test_never_on_a_network_windows_calls_public(qapp, window, loaded,  # noqa: 
     loop.stop()
 
 
+def test_an_unreadable_answer_stops_it_only_the_second_time(qapp, loaded, monkeypatch):
+    """One check Windows couldn't answer while the network was known keeps the phone;
+    two in a row stop the server (never taken as a home network)."""
+    srv = loaded.server
+    assert srv.start(0, "add-on-key", "127.0.0.1")
+    srv._network_checked(srv._server, remote.unknown_network())
+    assert srv.running
+    srv._network_checked(srv._server, "")
+    srv._network_checked(srv._server, remote.unknown_network())
+    assert srv.running   # not in a row
+    srv._network_checked(srv._server, remote.unknown_network())
+    assert not srv.running and srv.error == remote.unknown_network()
+
+
+@pytest.mark.real_network_kind
 def test_the_network_category_never_raises():
     from soundboard.online import netcategory
     assert netcategory.category("203.0.113.9") is None   # no adapter has it

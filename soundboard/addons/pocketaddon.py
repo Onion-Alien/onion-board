@@ -22,10 +22,7 @@ in Settings > Privacy & security stops all of it (net.FeatureOff).
 """
 from __future__ import annotations
 
-import json
 import logging
-import os
-import zipfile
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
@@ -63,8 +60,7 @@ class Offer:
 
 
 def local_zip() -> Path | None:
-    v = os.environ.get(LOCAL_ENV, "").strip().strip('"')
-    return Path(v) if v else None
+    return modules.env_zip(LOCAL_ENV)
 
 
 def offered() -> bool:
@@ -74,27 +70,18 @@ def offered() -> bool:
 
 
 def installed(dirs: list[Path] | None = None) -> ModuleInfo | None:
-    return next((m for m in modules.discover(dirs) if m.id == MODULE_ID), None)
+    return modules.find(MODULE_ID, dirs)
 
 
 def removable(info: ModuleInfo, base: Path | None = None) -> bool:
     """Whether this copy is the one installed into `base` (the modules folder in
     %APPDATA%), which RemoteAccess.remove_remote_addon can take out, rather than one
     shipped with the app."""
-    base = base if base is not None else modules.search_dirs()[0]
-    try:
-        return info.path.resolve() == (base / MODULE_ID).resolve()
-    except OSError:
-        return False
+    return modules.is_base_copy(info, MODULE_ID, base)
 
 
 def _zip_version(path: Path) -> str:
-    try:
-        with zipfile.ZipFile(path) as z:
-            d = json.loads(z.read(f"{MODULE_ID}/module.json").decode("utf-8-sig"))
-        return str(d.get("version", "?"))
-    except (OSError, KeyError, ValueError, zipfile.BadZipFile, AttributeError):
-        return "?"
+    return modules.zip_version(path, MODULE_ID)
 
 
 def latest(cancelled: Callable[[], bool] | None = None) -> Offer | None:
@@ -111,9 +98,7 @@ def latest(cancelled: Callable[[], bool] | None = None) -> Offer | None:
     url, sha, size = updates.find_asset(data, ASSET, (DOWNLOADS,))
     if not url:
         return None
-    page = str(data.get("html_url") or RELEASES)
-    if not page.startswith(PAGE + "/"):
-        page = RELEASES     # only ever open the project's own page
+    page = updates.own_page(data, PAGE, RELEASES)   # only ever open the project's own page
     return Offer(".".join(map(str, ver)), url, sha, size, page)
 
 
@@ -121,23 +106,14 @@ def fetch(offer: Offer, progress: Callable[[int, int], None] | None = None,
           cancelled: Callable[[], bool] | None = None) -> Path:
     """The offer's zip on this PC: downloaded into the updates folder and checked
     against its SHA-256. Raises updates.UpdateError. Call off the UI thread."""
-    if offer.local is not None:
-        if not offer.local.is_file():
-            raise updates.UpdateError(f"{offer.local} isn't there ({LOCAL_ENV})")
-        return offer.local
-    dest = updates.UPDATES_DIR / f"OnionPocket-module-{offer.version}.zip"
-    return updates.fetch(offer.url, offer.sha256, dest, (DOWNLOADS,), MAX_SIZE, "add-on",
-                         offer.size, progress, cancelled, FEATURE)
+    return updates.fetch_addon(offer, ASSET, DOWNLOADS, MAX_SIZE, LOCAL_ENV, progress, cancelled,
+                               FEATURE)
 
 
 def install(path: Path, base: Path | None = None) -> ModuleInfo:
     """Install a fetched zip (modules.install_zip); a downloaded one is deleted
     afterwards, a local one is left where it is. Raises modules.ModuleError."""
-    try:
-        return modules.install_zip(path, MODULE_ID, KIND, base)
-    finally:
-        if path.parent == updates.UPDATES_DIR:
-            path.unlink(missing_ok=True)
+    return modules.install_fetched(path, MODULE_ID, KIND, base, updates.UPDATES_DIR)
 
 
 def get(base: Path | None = None, progress: Callable[[int, int], None] | None = None,

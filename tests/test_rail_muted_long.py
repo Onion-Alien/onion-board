@@ -3,18 +3,18 @@ forgotten mute isn't taken for a broken app (the time only on the open rail). Li
 again: both go."""
 from PySide6.QtWidgets import QPushButton, QWidget
 
-from soundboard.ui.window import sidebar
+from soundboard.ui.window import onaircard
 
 
 def test_long_mute_shows_ring_and_time(qapp, monkeypatch):
     now = [1000.0]
-    monkeypatch.setattr(sidebar.time, "monotonic", lambda: now[0])
+    monkeypatch.setattr(onaircard.time, "monotonic", lambda: now[0])
     power, connection = QPushButton(), QPushButton()
     power.setCheckable(True)
     power.setChecked(True)
     host = QWidget()
     host.resize(60, 200)
-    out = sidebar.OutputBlock(power, connection)
+    out = onaircard.OutputBlock(power, connection)
     out.setParent(host)
     host.show()
     out.set_expanded(False)

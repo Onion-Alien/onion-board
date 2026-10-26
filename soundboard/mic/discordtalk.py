@@ -35,15 +35,20 @@ import time
 from pathlib import Path
 
 from soundboard.mic import discordcfg
+_varint = discordcfg._varint
 
 log = logging.getLogger(__name__)
 
 ARG = "--discord-restore"
+NOW = "--now"        # the uninstaller: put back what it can and end (cli)
+QUIET = "--quiet"    # the installer, starting it again: no notification
+STILL_OPEN = 2       # NOW's exit code: a Discord is still open, not put back
 KEY = b"_https://discord.com\x00\x01MediaEngineStore"   # Chromium: "_" origin \0 \1 name
 BLOCK = 32768        # LevelDB log block
 HEADER = 7           # crc32c (4), length (2), type (1)
 FULL, FIRST, MIDDLE, LAST = 1, 2, 3, 4
-BACKUPS = 3          # copies of each client's folder kept
+BACKUPS = 3          # copies of each client's log kept from before a write
+BACKUP_DAYS = 14     # ...and for this long at most
 HELPER_MAX_S = 12 * 3600
 HELPER_POLL_S = 3.0
 CLOSE_WAIT_S = 10.0   # set_up's Discord closing: how long it may take to go
@@ -218,17 +223,6 @@ def frame(record: bytes, offset: int) -> bytes:
             return bytes(out)
 
 
-def _varint(b: bytes, i: int) -> tuple[int, int]:
-    v = shift = 0
-    while True:
-        c = b[i]
-        i += 1
-        v |= (c & 0x7F) << shift
-        if not c & 0x80:
-            return v, i
-        shift += 7
-
-
 def _put_varint(v: int) -> bytes:
     out = bytearray()
     while v >= 0x80:
@@ -350,13 +344,25 @@ def _unlock(f):
     f.close()
 
 
-def _backup(folder: Path, client_dir: str, backup_root: Path) -> Path:
+def _backup(log_path: Path, client_dir: str, backup_root: Path) -> Path:
+    """A copy of the one file a write changes (the log it adds to), for going back by
+    hand. Never the whole folder: that's Discord's Local Storage, its login among it,
+    and copies of it were kept here for good."""
     dest = backup_root / client_dir / time.strftime("%Y%m%d-%H%M%S")
-    shutil.copytree(folder, dest, ignore=shutil.ignore_patterns("LOCK"), dirs_exist_ok=True)
+    dest.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(log_path, dest / log_path.name)
     old = sorted(p for p in (backup_root / client_dir).iterdir() if p.is_dir())
-    for p in old[:-BACKUPS]:
+    stale = time.time() - BACKUP_DAYS * 86400
+    for p in old[:-BACKUPS] + [p for p in old[-BACKUPS:] if p != dest and _older(p, stale)]:
         shutil.rmtree(p, ignore_errors=True)
     return dest
+
+
+def _older(p: Path, when: float) -> bool:
+    try:
+        return p.stat().st_mtime < when
+    except OSError:
+        return False
 
 
 def write_store(client_dir: str, store: dict, backup_root: Path,
@@ -385,7 +391,7 @@ def write_store(client_dir: str, store: dict, backup_root: Path,
             return False
         seq = max(manifest_sequence(edits), log_sequence(records)) + 1
         value = encode_value(json.dumps(store, separators=(",", ":"), ensure_ascii=False))
-        _backup(folder, client_dir, backup_root)
+        _backup(log_path, client_dir, backup_root)
         with open(log_path, "ab") as f:
             f.write(frame(batch_put(seq, KEY, value), len(data)))
             f.flush()
@@ -599,28 +605,12 @@ def start_helper(app_dir: Path, saved: dict, pending: list[str]) -> bool:
 
 # ---------------------------------------------------------------- the helper
 
-def cli(_rest: list[str]) -> int:
-    """`--discord-restore`: says Discord is still set for sounds (a notification), then
-    puts it back as soon as it closes. Ends when that's done, when Onion Board opens
-    again (it takes over), or after HELPER_MAX_S."""
-    from soundboard.core.bootmark import app_dir
-    app = app_dir()
-    logging.basicConfig(filename=str(app / "discord-restore.log"), filemode="w",
-                        level=logging.INFO, format="%(asctime)s %(message)s")
-    try:
-        job = json.loads(job_path(app).read_text("utf-8"))
-        saved, pending = dict(job.get("saved") or {}), list(job.get("pending") or [])
-    except (OSError, ValueError):
-        log.info("no job")
-        return 0
-    from soundboard import i18n
-    i18n.startup(app)
-    from soundboard.i18n import _
+def _notify(qapp):
+    """The tray notification that Discord is still set for sounds; None if it can't."""
     from PySide6.QtCore import QTimer
-    from PySide6.QtWidgets import QApplication, QSystemTrayIcon
-    qapp = QApplication(sys.argv[:1])
-    qapp.setQuitOnLastWindowClosed(False)
-    tray = None
+    from PySide6.QtWidgets import QSystemTrayIcon
+
+    from soundboard.i18n import _
     try:
         from soundboard.ui.kit.theme import app_icon
         tray = QSystemTrayIcon(app_icon(), parent=qapp)   # not a widget: no window
@@ -634,8 +624,47 @@ def cli(_rest: list[str]) -> int:
               "Cancellation and Automatic Gain Control."),
             QSystemTrayIcon.MessageIcon.Information, 15000)
         QTimer.singleShot(20000, tray.hide)
+        return tray
     except Exception:  # noqa: BLE001 - no notification: still put it back
         log.warning("no notification", exc_info=True)
+        return None
+
+
+def cli(rest: list[str]) -> int:
+    """`--discord-restore`: says Discord is still set for sounds (a notification), then
+    puts it back as soon as it closes. Ends when that's done, when Onion Board opens
+    again (it takes over), or after HELPER_MAX_S.
+
+    The installer stops a waiting helper before it replaces the files, then starts it
+    again with QUIET (no second notification). The uninstaller runs it with NOW: put
+    back whatever's closed and end at once, exit code STILL_OPEN when a Discord is
+    still open (the uninstaller then says how to put it back by hand)."""
+    from soundboard.core.bootmark import app_dir
+    app = app_dir()
+    logging.basicConfig(filename=str(app / "discord-restore.log"), filemode="w",
+                        level=logging.INFO, format="%(asctime)s %(message)s")
+    try:
+        job = json.loads(job_path(app).read_text("utf-8"))
+        saved, pending = dict(job.get("saved") or {}), list(job.get("pending") or [])
+    except (OSError, ValueError):
+        log.info("no job")
+        return 0
+    if NOW in rest:
+        left = []
+        try:
+            left = restore(saved, app / "discord-backup", only=set(pending))
+        except Exception:  # noqa: BLE001 - the uninstall goes on regardless
+            log.exception("putting it back failed")
+        log.info("put back at once; still open: %s", ", ".join(left) or "none")
+        job_path(app).unlink(missing_ok=True)   # the app is going: nothing will wait
+        return STILL_OPEN if left else 0
+    from soundboard import i18n
+    i18n.startup(app)
+    from PySide6.QtCore import QTimer
+    from PySide6.QtWidgets import QApplication
+    qapp = QApplication(sys.argv[:1])
+    qapp.setQuitOnLastWindowClosed(False)
+    tray = None if QUIET in rest else _notify(qapp)   # QUIET: told once already
     start = time.monotonic()
 
     def tick():

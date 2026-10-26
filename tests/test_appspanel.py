@@ -560,7 +560,7 @@ def test_card_names_are_bold_without_a_style_sheet_and_tips_change_only_when_nee
     lbl.resize(80, 20)
     lbl.show()
     qapp.processEvents()
-    assert lbl.toolTip().startswith("A window title")
+    assert lbl.toolTip().startswith("<p>A window title")   # (plain text: plaintext.py)
     set_tips = []
     real = appspanel.ElidedLabel.setToolTip
     appspanel.ElidedLabel.setToolTip = lambda self, t: (set_tips.append(t), real(self, t))

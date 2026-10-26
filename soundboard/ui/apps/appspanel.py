@@ -25,8 +25,8 @@ import os
 import time
 
 from PySide6.QtCore import Qt, QTimer, Signal
-from PySide6.QtWidgets import (QFrame, QHBoxLayout, QInputDialog, QLabel, QLayoutItem,
-                               QPushButton, QScrollArea, QSlider, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QFrame, QHBoxLayout, QInputDialog, QLabel, QPushButton,
+                               QScrollArea, QSlider, QVBoxLayout, QWidget)
 
 from soundboard.audio import appaudio
 from soundboard.ui.kit import theme
@@ -268,6 +268,12 @@ class AppsTab(QWidget):
         heading.rename_requested.connect(self._on_rename_category)
         heading.delete_requested.connect(self._on_delete_category)
 
+    def _categories_changed(self):
+        """The grid's categories changed: keep their order and lay the cards out again."""
+        self.cfg.apps_categories = list(self.grid.category_order)
+        self._save()
+        self._layout_apps()
+
     def _add_category(self, typed: str):
         name = (library.clean_tags([typed]) or [""])[0]
         if not name or self._category_taken(name):
@@ -276,16 +282,12 @@ class AppsTab(QWidget):
         label = self.grid.add_category(name)
         if label:
             self._wire_heading(label)
-        self.cfg.apps_categories = list(self.grid.category_order)
-        self._save()
-        self._layout_apps()
+        self._categories_changed()
 
     def _on_category_reordered(self, source_cat: str, target_cat: str, before: bool):
         usage.used("apps-reorder")
         self.grid.reorder_categories(source_cat, target_cat, before)
-        self.cfg.apps_categories = list(self.grid.category_order)
-        self._save()
-        self._layout_apps()
+        self._categories_changed()
 
     def _on_card_dropped_on_category(self, source: AppRow, category: str):
         self._move_row_to_category(source, category)
@@ -306,9 +308,7 @@ class AppsTab(QWidget):
             if row.category == old_cat:
                 row.category = new_name
                 self._save_row_category(row)
-        self.cfg.apps_categories = list(self.grid.category_order)
-        self._save()
-        self._layout_apps()
+        self._categories_changed()
 
     def _on_delete_category(self, category: str):
         usage.used("apps-category-deleted")
@@ -317,9 +317,7 @@ class AppsTab(QWidget):
                 row.category = "Other"
                 self._save_row_category(row)
         self.grid.remove_category(category)
-        self.cfg.apps_categories = list(self.grid.category_order)
-        self._save()
-        self._layout_apps()
+        self._categories_changed()
 
     def _move_row_to_category(self, source: AppRow, target_cat: str):
         if self.big is not None or source.category == target_cat:
@@ -334,11 +332,7 @@ class AppsTab(QWidget):
             order.insert(order.index(first_target), source)
         else:
             order.append(source)
-        items = self._take_grid_items()
-        for row in order:
-            self.grid.addItem(items[row])
-        self.grid.invalidate()
-        self.list_layout.activate()
+        self._set_grid_order(order)
 
     def _grid_rows(self) -> list[AppRow]:
         """The cards in the grid, in its order."""
@@ -349,10 +343,15 @@ class AppsTab(QWidget):
             rows.append(w)
         return rows
 
-    def _take_grid_items(self) -> dict[QWidget | None, QLayoutItem]:
-        """Every item out of the grid, by its card."""
+    def _set_grid_order(self, order: list[AppRow]):
+        """The grid's cards in `order`: their layout items move, so the same cards,
+        captures and clip editors stay alive."""
         taken = [self.grid.takeAt(0) for _ in range(self.grid.count())]
-        return {item.widget(): item for item in taken if item is not None}
+        items = {item.widget(): item for item in taken if item is not None}
+        for row in order:
+            self.grid.addItem(items[row])
+        self.grid.invalidate()
+        self.list_layout.activate()
 
     def _save_row_category(self, row: AppRow):
         spec = self._spec(row.key)
@@ -375,12 +374,7 @@ class AppsTab(QWidget):
         order = self._grid_rows()
         order.remove(source)
         order.insert(order.index(target) + (not before), source)
-        # Move layout items, keeping the same cards, captures and clip editors alive.
-        items = self._take_grid_items()
-        for row in order:
-            self.grid.addItem(items[row])
-        self.grid.invalidate()
-        self.list_layout.activate()
+        self._set_grid_order(order)
 
     def showEvent(self, ev):
         super().showEvent(ev)

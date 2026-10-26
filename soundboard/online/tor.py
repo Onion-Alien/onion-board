@@ -423,6 +423,7 @@ class Tor:
         with self._cond:
             if run_id != self._run_id:
                 return False
+            before = (self.state, self.progress, self.message)
             if state is not None:
                 self.state = state
                 if state == FAILED:
@@ -433,8 +434,10 @@ class Tor:
                 self.progress = progress
             if message is not None:
                 self.message = message
+            changed = (self.state, self.progress, self.message) != before
             self._cond.notify_all()
-        self._changed()
+        if changed:   # a repeat of the same bootstrap phase: listeners have it already
+            self._changed()
         return True
 
     def status_text(self) -> str:

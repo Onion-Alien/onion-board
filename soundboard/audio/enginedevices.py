@@ -3,7 +3,7 @@ straight-into-my-mic stream and its cable copies, and the watchdog that reopens 
 stream that stalled or failed to open (on the device thread, DeviceWorker).
 
 A mixin Engine inherits, so every `self.` lookup is the same as before. Nothing here
-runs per audio block: the stream callbacks and what they call stay in engine.py.
+runs per audio block: the stream callbacks and what they call are in enginebus.py.
 `find_device` and `CableTap` are looked up in soundboard.audio.engine when called (tests
 swap them there).
 """
@@ -58,6 +58,9 @@ class EngineDevices:
         rates: dict[str, int]
         errors: dict[str, str]
         devices: DeviceWorker
+        main_stream: Any
+        mon_stream: Any
+        obs_stream: Any
         cb_errors: dict[str, int]
         _cb_err_base: dict[str, int]
         _cb_err_seen: dict[str, int]
@@ -143,13 +146,7 @@ class EngineDevices:
         # committed only now, so a failed open leaves the rate and the rings alone.
         # Nothing plays on or writes to this output until its *_stream attribute is
         # set, so callbacks that run before this line render silence and do no harm.
-        self._stream_opened(key)
-        if rate != self.rates[key]:
-            self.rates[key] = rate
-            self._reconfigure_out(key)
-        else:   # same rate: only drop what was queued for the old stream
-            self._clear_out(key)
-        self._resume_voices(key, rate)
+        self._out_opened(key, rate)
         log.info("opened %s output: %s @ %d Hz (latency %s)", key, name, rate, self.latency)
         return s
 
@@ -166,14 +163,7 @@ class EngineDevices:
         self._cushioned = False   # a new stream starts at LEAD_S (check_streams re-cushions)
         self._last_cb["main"] = time.monotonic()
         s.start()
-        self._stream_opened("main")
-        rate = directmic.RATE
-        if rate != self.rates["main"]:
-            self.rates["main"] = rate
-            self._reconfigure_out("main")
-        else:
-            self._clear_out("main")
-        self._resume_voices("main", rate)
+        self._out_opened("main", directmic.RATE)
         log.info("opened main output: straight into the mic")
         return s
 
@@ -332,52 +322,43 @@ class EngineDevices:
         # new stream is logged and reported again (cb_errors stays a running total)
         self._cb_err_base[key] = self.cb_errors[key]
 
-    @_holding_devices
-    def set_main_device(self, name: str | None):
-        self._close("main_stream")
-        self.errors.pop("main", None)
-        self.names["main"] = name
-        self.main_direct = name == directmic.DEVICE
-        self._last_try["main"] = time.monotonic()
+    def _out_opened(self, key: str, rate: int):
+        self._stream_opened(key)
+        if rate != self.rates[key]:
+            self.rates[key] = rate
+            self._reconfigure_out(key)
+        else:   # same rate: only drop what was queued for the old stream
+            self._clear_out(key)
+        self._resume_voices(key, rate)
+
+    def _set_out(self, key: str, name: str | None, callback, what: str):
+        self._close(f"{key}_stream")
+        self.errors.pop(key, None)
+        self.names[key] = name
+        if key == "main":
+            self.main_direct = name == directmic.DEVICE
+        self._last_try[key] = time.monotonic()
         if name:
             try:
-                self.main_stream = self._open_out("main", name, self._cb_main)
+                setattr(self, f"{key}_stream", self._open_out(key, name, callback))
             except Exception as e:  # noqa: BLE001
-                self._warn_open(f"main:{name}", "can't open main output %r: %s", name, e)
-                self.errors["main"] = errors.plain(e)
+                self._warn_open(f"{key}:{name}", f"can't open {what} %r: %s", name, e)
+                self.errors[key] = errors.plain(e)
             else:
-                self._open_warned.discard(f"main:{name}")
+                self._open_warned.discard(f"{key}:{name}")
+
+    @_holding_devices
+    def set_main_device(self, name: str | None):
+        self._set_out("main", name, self._cb_main, "main output")
 
     @_holding_devices
     def set_mon_device(self, name: str | None):
-        self._close("mon_stream")
-        self.errors.pop("mon", None)
-        self.names["mon"] = name
-        self._last_try["mon"] = time.monotonic()
-        if name:
-            try:
-                self.mon_stream = self._open_out("mon", name, self._cb_mon)
-            except Exception as e:  # noqa: BLE001
-                self._warn_open(f"mon:{name}", "can't open headphone output %r: %s", name, e)
-                self.errors["mon"] = errors.plain(e)
-            else:
-                self._open_warned.discard(f"mon:{name}")
+        self._set_out("mon", name, self._cb_mon, "headphone output")
 
     @_holding_devices
     def set_obs_device(self, name: str | None):
         """The stream output: a device OBS captures (None = off)."""
-        self._close("obs_stream")
-        self.errors.pop("obs", None)
-        self.names["obs"] = name
-        self._last_try["obs"] = time.monotonic()
-        if name:
-            try:
-                self.obs_stream = self._open_out("obs", name, self._cb_obs)
-            except Exception as e:  # noqa: BLE001
-                self._warn_open(f"obs:{name}", "can't open stream output %r: %s", name, e)
-                self.errors["obs"] = errors.plain(e)
-            else:
-                self._open_warned.discard(f"obs:{name}")
+        self._set_out("obs", name, self._cb_obs, "stream output")
 
     def mic_live(self) -> bool:
         """The mic is open and its sound is coming in right now (its callback just ran)."""
@@ -515,43 +496,19 @@ class EngineDevices:
         """Rebuild what feeds output `key` for its (new) rate. Only that output's
         rings are reset: the other output plays on without a gap."""
         r = self.rates
-        if key == "main":
-            self._rs_main = StreamResampler(r["mic"], r["main"])
-            self._rs_rmain = StreamResampler(SR, r["main"])
-            rings = (self.ring_main, self.ring_rmain)
-        elif key == "obs":
-            self._rs_obs = StreamResampler(r["mic"], r["obs"])
-            self._rs_robs = StreamResampler(SR, r["obs"])
-            rings = (self.ring_obs, self.ring_robs)
-        else:
-            self._rs_mon = StreamResampler(r["mic"], r["mon"])
-            self._rs_rmon = StreamResampler(SR, r["mon"])
-            rings = (self.ring_mon, self.ring_rmon)
-        for ring in rings:
+        setattr(self, f"_rs_{key}", StreamResampler(r["mic"], r[key]))
+        setattr(self, f"_rs_r{key}", StreamResampler(SR, r[key]))
+        for ring in (getattr(self, f"ring_{key}"), getattr(self, f"ring_r{key}")):
             ring.configure(r[key])
         for a in self.aux:
             a.configure(r, (key,))
 
     def _clear_out(self, key: str):
         """Drop everything queued for output `key` (its stream was reopened)."""
-        if key == "main":
-            rings = [self.ring_main, self.ring_rmain]
-            rings += [a.ring_main for a in self.aux]
-        elif key == "obs":
-            rings = [self.ring_obs, self.ring_robs]
-            rings += [a.ring_obs for a in self.aux]
-        else:
-            rings = [self.ring_mon, self.ring_rmon]
-            rings += [a.ring_mon for a in self.aux]
+        rings = [getattr(self, f"ring_{key}"), getattr(self, f"ring_r{key}")]
+        rings += [getattr(a, f"ring_{key}") for a in self.aux]
         for ring in rings:
             ring.clear()
-
-    def _reconfigure_mic_paths(self):
-        """Everything, for the current rates (resets both outputs' rings)."""
-        self._reconfigure_mic_resamplers()
-        self._reconfigure_out("main")
-        self._reconfigure_out("mon")
-        self._reconfigure_out("obs")
 
     def _close(self, attr):
         s = getattr(self, attr)
@@ -599,14 +556,8 @@ class EngineDevices:
                 DEVICES.release()
 
     def active_outputs(self) -> set:
-        outs = set()
-        if self.main_stream is not None:
-            outs.add("main")
-        if self.mon_stream is not None:
-            outs.add("mon")
-        if self.obs_stream is not None:
-            outs.add("obs")
-        return outs
+        return {k for k, s in (("main", self.main_stream), ("mon", self.mon_stream),
+                               ("obs", self.obs_stream)) if s is not None}
 
 
 # last, so either module can be imported first: engine imports this one for the

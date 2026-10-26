@@ -2,7 +2,7 @@
 never again (Config.store_seen)."""
 from test_mainwindow import window  # noqa: F401
 
-from soundboard.ui.window import sidebar
+from soundboard.ui.window import railtabs
 from soundboard.ui.window.tabcontrol import TAB_INDEX
 
 
@@ -24,7 +24,7 @@ def test_new_until_the_store_is_opened(window):  # noqa: F811
 
 def test_seen_stays_seen(window):  # noqa: F811
     w = window
-    sidebar.set_tab_new(w.tabs, TAB_INDEX["store"], False)
+    railtabs.set_tab_new(w.tabs, TAB_INDEX["store"], False)
     w.cfg.store_seen = True
     w.tabctl.mark_store_new()
     assert not _store_button(w).is_new()

@@ -1,6 +1,6 @@
 """The engine's recordings: the setup test's recording and the mic / playback takes
 (recording a sound). Only starts, stops and hands over: the audio callbacks append
-the blocks themselves (engine.py), to the lists these methods set up.
+the blocks themselves (enginebus.py), to the lists these methods set up.
 
 A mixin Engine inherits, so every `self.` lookup is the same as before.
 """

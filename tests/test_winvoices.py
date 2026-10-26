@@ -11,17 +11,6 @@ def test_locale_for_a_language():
     assert winvoices.locale_for("xx") == "xx-XX"
 
 
-def test_voice_tokens_are_matched_to_their_language():
-    tokens = frozenset({"MSTTS_V110_enUS_ZiraM", "TTS_MS_ZH-CN_HUIHUI_11.0"})
-    assert winvoices.has_language(tokens, "zh")
-    assert winvoices.has_language(frozenset({"MSTTS_V110_zhCN_YaoyaoM"}), "zh")
-    assert winvoices.has_language(tokens, "en")
-    assert not winvoices.has_language(tokens, "de")
-    assert not winvoices.has_language(tokens, "zh-TW")     # a country wants its own voice
-    assert winvoices.has_language(frozenset({"MSTTS_V110_zhTW_HanHanM"}), "zh-TW")
-    assert winvoices.has_language(frozenset({"MSTTS_V110_ptBR_MariaM"}), "pt-BR")
-
-
 def test_installer_answers():
     assert winvoices.outcome(0, "", "OK Language.TextToSpeech~~~zh-CN~0.0.1.0") == "ok"
     assert winvoices.outcome(0, "", "RESTART x  ") == "restart"
@@ -44,7 +33,8 @@ def test_a_uac_no_is_known_by_its_code_not_its_words():
 
 def test_paths_with_an_apostrophe_stay_inside_their_quotes():
     assert winvoices._ps_quote(r"D:\Sounds\O'Brien\x.txt") == r"D:\Sounds\O''Brien\x.txt"
-    assert "'\"__OUT__\"'" in winvoices._OUTER and "'\"__SCRIPT__\"'" in winvoices._OUTER
+    assert "$Out = '__OUT__'" in winvoices._ELEVATED   # filled in with _ps_quote
+    assert "__SCRIPT__" not in winvoices._OUTER   # no script file: handed over encoded
 
 
 def test_fingerprint_is_a_set_of_names():

@@ -39,6 +39,27 @@ def test_yt_dlp_report_upstream_text_becomes_a_report_to_us():
     assert "Adding a link" in url and "Unable to extract" in url
 
 
+def test_a_site_refusing_a_download_isnt_counted_as_the_app_going_wrong(monkeypatch):
+    """yt-dlp's words we have no plain version of still get a Report it link, but
+    aren't sent as a warned/ count: the site said no, the count can't say why, and
+    the download's own failure count already has it."""
+    from soundboard.core import usage
+    from soundboard.online import ytdl
+    counted = []
+    monkeypatch.setattr(usage, "warned", counted.append)
+    try:
+        raise ytdl._readable(DownloadError("ERROR: [youtube] x: Some new refusal"))
+    except ytdl.FetchError as e:
+        shown = errors.html(e)
+    assert "Report it" in shown
+    assert counted == []
+    try:
+        raise KeyError("ours")
+    except KeyError as e:
+        errors.html(e)
+    assert len(counted) == 1     # the app's own bugs still count
+
+
 @pytest.mark.parametrize("text", [
     "x; please report this issue on  https://github.com/foo/bar/issues , thanks",
     "Use --cookies-from-browser or --cookies for the authentication.",
@@ -141,3 +162,14 @@ def test_a_failed_download_has_one_short_reason_for_the_count(raw, why):
 ])
 def test_download_reasons_read_both_ytdlps_and_our_words(raw, why):
     assert errors.download_reason(raw) == why
+
+
+def test_a_report_link_never_carries_the_home_folder_in_what_it_said(monkeypatch, tmp_path):
+    """The message itself can name a path (a downloader error): it goes in the address
+    the browser opens, so it's scrubbed like the details are."""
+    from soundboard.core import applog
+    monkeypatch.setattr(applog.Path, "home", lambda: tmp_path / "Ann")
+    p = errors.Problem(f"Couldn't write {tmp_path / 'Ann' / 'Music' / 'x.mp3'}",
+                       reportable=True)
+    url = unquote(errors.report_url(p))
+    assert str(tmp_path / "Ann") not in url and "%USERPROFILE%" in url

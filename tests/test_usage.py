@@ -189,12 +189,10 @@ def test_an_old_config_without_privacy_settings_is_off_too(app_dir):
 
 
 def test_a_settings_reset_never_switches_it_back_on(app_dir):
+    """Nor any other switch: a reset keeps how the app goes online."""
     Config(net_off=["usage_stats", "radio"]).save()
     reset.reset([reset.SETTINGS])
-    assert Config.load().net_off == ["usage_stats"]
-    Config(net_off=["radio"]).save()
-    reset.reset([reset.SETTINGS])
-    assert Config.load().net_off == []
+    assert Config.load().net_off == ["usage_stats", "radio"]
 
 
 @pytest.fixture
@@ -708,7 +706,9 @@ def test_downloads_say_the_site_and_how_many_never_the_link(sent):
     usage.maybe_send(cfg)
     paths = _paths(sent[0][0])
     assert "downloads/2-5" in paths
-    for k in ("dl-youtube", "dl-tiktok", "dl-search", "dl-link", "dl-add", "dl-play",
+    # the TikTok link went while it was off: never sent later
+    assert "used/dl-tiktok" not in paths and "used/dl-link" not in paths
+    for k in ("dl-youtube", "dl-search", "dl-add", "dl-play",
               "dl-failed-other", "dl-failed-youtube", "dl-failed-why-403",
               "dl-failed-why-other"):
         assert f"used/{k}" in paths
@@ -1185,13 +1185,14 @@ def test_addon_installs_are_counted_by_a_fixed_name(monkeypatch):
     assert with_steps and with_steps <= set(usage.ADDONS)
     seen = []
     monkeypatch.setattr(usage, "used", seen.append)
-    for ok, mid, broken in ((True, "ai-voices", False), (False, "secret-addon", False),
-                            (True, "live-voice", True)):
-        monkeypatch.setattr(modules, "_install", lambda *a, ok=ok, **k: ok)
-        info = SimpleNamespace(id=mid, broken=broken)
-        assert modules.install(info, print) is ok
+    for why, mid, broken in (("", "ai-voices", False), ("pip", "secret-addon", False),
+                             ("", "live-voice", True)):
+        monkeypatch.setattr(modules, "_install", lambda *a, why=why, **k: why)
+        info = SimpleNamespace(id=mid, broken=broken, installed=not broken,
+                               path=Path("nowhere"))
+        assert modules.install(info, print) is (not why)
     assert seen == ["addon-installed-ai-voices", "addon-failed-other",
-                    "addon-installed-live-voice", "addon-repaired"]
+                    "addon-failed-other-pip", "addon-installed-live-voice", "addon-repaired"]
     assert set(seen) <= set(usage.FEATURES)
 
 

@@ -22,7 +22,7 @@ from soundboard.ui.apps.appspanel import AppsTab
 from soundboard.ui.window.buncontrol import BUN_TIP
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.window.livedot import set_tab_live
-from soundboard.ui.window.sidebar import set_tab_new
+from soundboard.ui.window.railtabs import set_tab_new
 from soundboard.ui.store.storetab import StoreTab
 from soundboard.ui.voice.voicepanel import VoicePanel
 

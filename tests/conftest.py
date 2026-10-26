@@ -180,6 +180,8 @@ def pytest_configure(config):
                             "DLLs or processes); skipped on Linux and macOS")
     config.addinivalue_line("markers", "fonts: loads Windows' own fonts into Qt, which "
                             "changes every later test's text in that process: run last")
+    config.addinivalue_line("markers", "real_network_kind: asks Windows what kind of "
+                            "network an address is on (others get a Private one)")
     config.addinivalue_line("markers", "host: runs the real mic effect in its test or fuzz "
                             "host (CI's mic-effect job builds them and runs these, one at a "
                             "time: side by side they miss real time)")
@@ -260,6 +262,26 @@ def _memory_never_full(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def _a_private_network(request, monkeypatch):
+    """Onion Pocket's server refuses a network Windows can't name, and 127.0.0.1 (where
+    the tests run it) is on none: a Private one, unless a test says otherwise."""
+    if request.node.get_closest_marker("real_network_kind"):
+        return
+    from soundboard.online import netcategory
+    monkeypatch.setattr(netcategory, "category", lambda ip: netcategory.PRIVATE)
+
+
+@pytest.fixture(autouse=True)
+def _no_ptt_key_left_held():
+    """A test that held auto push-to-talk's key (with press / release stood in for)
+    leaves nothing for winkeys' watch to let go of later with the real SendInput."""
+    yield
+    winkeys = sys.modules.get("soundboard.control.winkeys")
+    if winkeys is not None:
+        winkeys._ptt["combo"] = None
+
+
+@pytest.fixture(autouse=True)
 def _splash_act_back_after():
     """splash.show() picks this launch's act at random, now and then a rare one with a
     taller card: a test that showed the splash puts the act before back, or the splash
@@ -334,6 +356,18 @@ def devices_done(win, timeout=8.0):
     from PySide6.QtWidgets import QApplication
     assert process_events(QApplication.instance(), lambda: not win.devctl._dev_waiting
                           and not win.engine.devices.busy, timeout)
+
+
+def loose_look(win, timeout=8.0):
+    """One look at the sounds folder's loose files (ImportControl._take_loose), back
+    from the thread that lists the folder. Its timer is stopped first, so it's this
+    look and not one the timer starts."""
+    from PySide6.QtWidgets import QApplication
+    ctl, app = win.impctl, QApplication.instance()
+    ctl._loose_timer.stop()
+    assert process_events(app, lambda: not ctl._loose_looking, timeout)   # one going
+    ctl._take_loose()
+    assert process_events(app, lambda: not ctl._loose_looking, timeout)
 
 
 @pytest.fixture

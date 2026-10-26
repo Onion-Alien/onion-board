@@ -170,8 +170,9 @@ def keep(on: bool) -> None:
     root.addHandler(new)
     root.removeHandler(old)
     old.close()
-    if not on:
-        for f in (Path(path), *Path(path).parent.glob(LOG_NAME + ".*")):
+    if not on:   # (the add-ons' logs too: speech.service, module-<id>.log)
+        for f in (Path(path), *Path(path).parent.glob(LOG_NAME + ".*"),
+                  *Path(path).parent.glob("module-*.log")):
             try:
                 f.unlink(missing_ok=True)
             except OSError:

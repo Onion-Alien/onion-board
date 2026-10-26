@@ -12,11 +12,12 @@ from soundboard.control import winkeys
 from soundboard.sounds.library import Config
 from soundboard.ui.window import mainwindow as main
 from soundboard.ui.kit import busy
-from soundboard.ui.setup import setupwizard
+from soundboard.ui.bun.bunnywidget import BunnyWidget
+from soundboard.ui.setup import cablestep, lookstep, setupwizard, steamguide, testtune, wizardkit
 
 INS = ["Headset Mic (USB)", "Desk Mic", "CABLE Output (VB-Audio Virtual Cable)"]
 OUTS = ["Headphones (USB)", "Speakers", "CABLE Input (VB-Audio Virtual Cable)"]
-_REAL_RESUME = setupwizard.resume_after_restart   # before the autouse fixture swaps it
+_REAL_RESUME = cablestep.resume_after_restart   # before the autouse fixture swaps it
 _REAL_FIRST_START = Config.first_start   # (the devices fixture swaps it)
 
 
@@ -60,7 +61,7 @@ def shown_window(monkeypatch):
 def resume(monkeypatch):
     """Never touch the real RunOnce key: record what the guide asks for instead."""
     calls = []
-    monkeypatch.setattr(setupwizard, "resume_after_restart", calls.append)
+    monkeypatch.setattr(cablestep, "resume_after_restart", calls.append)
     return calls
 
 
@@ -177,7 +178,7 @@ def test_steam_guide_names_the_cable_mic(wizard, monkeypatch, tmp_path):
     from soundboard.ui.kit import busy
     monkeypatch.setattr(busy.QDesktopServices, "openUrl",
                         lambda url: opened.append(url.toString()) or True)
-    g = setupwizard.SteamGuide(wiz, wiz._vm)
+    g = steamguide.SteamGuide(wiz, wiz._vm)
     text = " ".join(lbl.text() for lbl in g.findChildren(setupwizard.QLabel))
     assert "CABLE Output (VB-Audio Virtual Cable)" in text and "Voice Input Device" in text
     g.open_steam()
@@ -235,7 +236,7 @@ def test_restart_marker_counts_only_until_the_pc_restarts(wizard, devices, app_d
     w, wiz = wizard
     marker = app_dir / "cable-restart-pending"
     marker.write_text("x")
-    assert setupwizard.cable_restart_pending()       # written this boot
+    assert cablestep.cable_restart_pending()       # written this boot
     wiz.go(1)
     wiz.recheck_cable()
     # restart, or have the installer try waking it once more (never a reinstall)
@@ -243,15 +244,15 @@ def test_restart_marker_counts_only_until_the_pc_restarts(wizard, devices, app_d
 
     past = time.time() - 10 * 365 * 86400             # written before the last boot
     os.utime(marker, (past, past))
-    assert not setupwizard.cable_restart_pending()
+    assert not cablestep.cable_restart_pending()
     wiz.recheck_cable()
     assert wiz.btn_restart.isHidden() and not wiz.btn_cable.isHidden()
 
 
 def test_test_sound_is_quiet_and_clickless():
-    c = setupwizard.test_tune()
+    c = testtune.test_tune()
     assert c.dtype.name == "float32" and c.shape[1] == 2
-    assert abs(float(abs(c).max()) - setupwizard.TUNE_PEAK) < 1e-4   # not a blast
+    assert abs(float(abs(c).max()) - testtune.TUNE_PEAK) < 1e-4   # not a blast
     assert abs(c[:5]).max() < 0.01 and abs(c[-5:]).max() < 0.01      # no clicks
 
 
@@ -391,7 +392,7 @@ def test_mid_install_the_guide_stays_put_and_a_reopened_one_picks_it_up(
         assert len(starts) == 1                    # never a second install
         proc.rc = 0
         again._tick()
-        assert not busy.is_busy(again.btn_next) and setupwizard._installer is None
+        assert not busy.is_busy(again.btn_next) and cablestep._installer is None
     finally:
         again.done(0)
     wiz._proc = None
@@ -478,15 +479,15 @@ def test_cancelling_keeps_a_device_they_did_pick(qapp, app_dir, devices):
 def test_steam_guide_is_freed_after_it_closes(wizard, monkeypatch):
     _, wiz = wizard
     wiz.go(2)
-    monkeypatch.setattr(setupwizard.SteamGuide, "exec", lambda self: 0)
+    monkeypatch.setattr(steamguide.SteamGuide, "exec", lambda self: 0)
     for _ in range(3):
         wiz.show_steam_guide()
-    assert wiz.findChildren(setupwizard.SteamGuide) == []
+    assert wiz.findChildren(steamguide.SteamGuide) == []
 
 
 def test_steam_guide_text_has_its_spaces(wizard):
     _, wiz = wizard
-    g = setupwizard.SteamGuide(wiz, "CABLE Output")
+    g = steamguide.SteamGuide(wiz, "CABLE Output")
     text = " ".join(lbl.text() for lbl in g.findChildren(setupwizard.QLabel))
     assert ").Onion" not in text
     g.done(0)
@@ -991,11 +992,11 @@ def test_no_empty_band_after_a_step_grows_the_window(mic_wizard, qapp):
     _, wiz = mic_wizard
     wiz.show()
     wiz.go(wiz.look_index)
-    QTest.qWait(setupwizard.SETTLE_MS + 100)
+    QTest.qWait(wizardkit.SETTLE_MS + 100)
     need = fit.needed_height(wiz, wiz.width())
     wiz.resize(wiz.width(), need + 200)
     wiz.go(wiz.look_index)
-    QTest.qWait(setupwizard.SETTLE_MS + 100)
+    QTest.qWait(wizardkit.SETTLE_MS + 100)
     assert wiz.height() <= max(need, wiz.minimumHeight()) + 2
 
 
@@ -1022,7 +1023,7 @@ def test_cards_line_up_with_back_and_next(mic_wizard, monkeypatch, qapp):
     tiles = wiz.mic_group.buttons()
     assert edges(tiles[0])[0] == left
     # a full row of tiles ends on Next's edge: no step makes the window wider than that
-    assert wiz.width() == setupwizard.CONTENT_W + 2 * setupwizard.MARGIN
+    assert wiz.width() == wizardkit.CONTENT_W + 2 * wizardkit.MARGIN
 
 
 def test_header_ends_where_its_words_do(mic_wizard, qapp):
@@ -1034,16 +1035,16 @@ def test_header_ends_where_its_words_do(mic_wizard, qapp):
     qapp.processEvents()
     page = wiz.stack.currentWidget()   # the mic and headphones
     title, words, section = page.findChildren(setupwizard.QLabel)[:3]
-    bun = page.findChildren(setupwizard.BunnyWidget)[0]
+    bun = page.findChildren(BunnyWidget)[0]
 
     def y(wd, at_bottom=False):
         return wd.mapTo(wiz, QPoint(0, wd.height() if at_bottom else 0)).y()
     assert y(bun) == y(title)   # top-aligned with the title, not centred below it
     # (+ the room he keeps above him so an upright ear isn't cut at the top of his bob)
-    assert bun.height() <= setupwizard.BUN_H + 2 * setupwizard.BUN_PAD + bun._head()
+    assert bun.height() <= wizardkit.BUN_H + 2 * wizardkit.BUN_PAD + bun._head()
     bottom = max(y(words, True), y(bun, True))
     assert "Microphone" in section.text()
-    assert y(section) - bottom <= setupwizard.HEADER_GAP + 8   # (+ the page's own spacing)
+    assert y(section) - bottom <= wizardkit.HEADER_GAP + 8   # (+ the page's own spacing)
 
 
 def test_tiles_are_as_tall_as_their_names_need(mic_wizard, qapp):
@@ -1056,11 +1057,11 @@ def test_tiles_are_as_tall_as_their_names_need(mic_wizard, qapp):
     qapp.processEvents()
     short = list(wiz.mic_group.buttons())
     assert len({t.height() for t in short}) == 1
-    assert short[0].height() == max(setupwizard.TILE_MIN_H,
+    assert short[0].height() == max(wizardkit.TILE_MIN_H,
                                     max(t.needed_height() for t in short))
-    long_ = ChoiceTile("x", "volume", setupwizard.TILE_W, 50,
+    long_ = ChoiceTile("x", "volume", wizardkit.TILE_W, 50,
                        title="LG ULTRAGEAR (NVIDIA High Definition Audio)")
-    one = ChoiceTile("x", "volume", setupwizard.TILE_W, 50, title="Speakers")
+    one = ChoiceTile("x", "volume", wizardkit.TILE_W, 50, title="Speakers")
     assert long_.needed_height() > one.needed_height()
     before = short[1].needed_height()
     short[1].click()
@@ -1123,9 +1124,9 @@ def test_the_last_step_picks_the_tabs(mic_wizard):
     only change when the guide ends there: Finish, or closed on that step."""
     w, wiz = mic_wizard
     wiz.go(wiz.switch_index)
-    assert set(wiz.tab_buttons) == set(setupwizard.OPTIONAL_TABS)
+    assert set(wiz.tab_buttons) == set(lookstep.OPTIONAL_TABS)
     assert {k for k, b in wiz.tab_buttons.items() if b.isChecked()} == {
-        k for k in setupwizard.OPTIONAL_TABS if w.tabctl.tab_on(k)}
+        k for k in lookstep.OPTIONAL_TABS if w.tabctl.tab_on(k)}
     wiz.tab_buttons["triggers"].click()
     wiz.tab_buttons["apps"].click()   # any number of them: not one or the other
     assert wiz.tab_buttons["triggers"].isChecked() and wiz.tab_buttons["apps"].isChecked()
@@ -1147,12 +1148,12 @@ def test_each_tab_has_an_info_button_saying_what_it_is(mic_wizard, monkeypatch):
     monkeypatch.setattr(dialogs.TabHelpPopup, "exec",
                         lambda box: shown.append((box.heading.text(), box.body.text(),
                                                   box.y())) or 0)
-    for key in setupwizard.OPTIONAL_TABS:
+    for key in lookstep.OPTIONAL_TABS:
         info = wiz.tab_infos[key]
         assert info.toolTip()
         info.click()
         title, body, y = shown[-1]
-        assert title == setupwizard.tab_names()[key] and body == PITCH[key]
+        assert title == lookstep.tab_names()[key] and body == PITCH[key]
         assert 12 <= len(body.split()) <= 25   # a short line, not a page
         assert y >= info.mapToGlobal(info.rect().bottomLeft()).y()   # dropped down
     assert not w.tabctl.tab_on("radio")   # looking never ticks it
@@ -1173,7 +1174,7 @@ def test_unticking_a_tab_switches_it_off(mic_wizard):
     ({"radio"}, "custom")])
 def test_the_tabs_count_as_the_old_answers(tabs, use):
     from soundboard.core import usage
-    assert setupwizard.use_for(tabs) == use
+    assert lookstep.use_for(tabs) == use
     assert f"use-{use}" in usage.FEATURES
 
 
@@ -1339,7 +1340,7 @@ def test_the_send_step_says_the_mic_works_before_what_is_missing(mic_wizard, mon
 
 def test_discord_reads_keep_one_thread(mic_wizard, monkeypatch, qapp):
     # a new thread every 2 s kept the window waiting in Thread.start (2.2.2's freeze at
-    # setupwizard._read_discord): every read runs on the same kept thread
+    # DiscordStep._read_discord): every read runs on the same kept thread
     import threading
 
     from conftest import process_events
@@ -1365,7 +1366,7 @@ def test_the_first_launch_ends_on_the_switches(mic_wizard, monkeypatch):
     wiz.go(wiz.look_index)
     look = wiz.stack.widget(wiz.look_index)
     assert look.isAncestorOf(wiz.lang_button)
-    assert [c.name for c in wiz.look_cards] == setupwizard.look_themes()
+    assert [c.name for c in wiz.look_cards] == lookstep.look_themes()
     assert len(wiz.look_cards) == 9
     assert "Next" in wiz.btn_next.text()
     wiz.next_clicked()
@@ -1489,8 +1490,8 @@ def test_a_later_guide_has_no_make_it_yours_page(wizard):
 def test_the_seasonal_look_gives_way_once_its_over(monkeypatch):
     from soundboard.ui.kit import theme
     monkeypatch.setattr(theme, "offered", lambda name, today=None: name != "Halloween")
-    looks = setupwizard.look_themes()
-    assert "Halloween" not in looks and setupwizard.SEASONAL_OFF in looks
+    looks = lookstep.look_themes()
+    assert "Halloween" not in looks and lookstep.SEASONAL_OFF in looks
     assert len(looks) == len(set(looks)) == 9
 
 
@@ -1509,7 +1510,7 @@ def test_a_theme_outside_the_nine_looks_is_named(mic_wizard):
     under them names it, and goes back to the plain count once one is picked."""
     from soundboard.ui.kit import theme
     w, wiz = mic_wizard
-    other = next(n for n in theme.THEMES if n not in setupwizard.look_themes())
+    other = next(n for n in theme.THEMES if n not in lookstep.look_themes())
     w.themectl.apply_theme(other)
     wiz.go(wiz.look_index)
     wiz._pick_look(other)   # (what the page shows for the board's current theme)
@@ -1589,7 +1590,7 @@ def test_the_first_launch_backdrop(qapp, app_dir, devices):
 
 def test_the_theme_grid_keeps_to_its_columns(qapp):
     from soundboard.ui.settings.appearance import ThemeCard, ThemeGrid
-    cards = [ThemeCard(n) for n in setupwizard.look_themes()]
+    cards = [ThemeCard(n) for n in lookstep.look_themes()]
     grid = ThemeGrid(cards, max_columns=3)
     grid.resize(900, 400)   # room for five across
     grid.show()
@@ -1609,7 +1610,7 @@ def test_the_last_steps_line_up(mic_wizard, qapp, monkeypatch):
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
     wiz.show()
     qapp.processEvents()
-    need = setupwizard.CONTENT_W + 2 * setupwizard.MARGIN
+    need = wizardkit.CONTENT_W + 2 * wizardkit.MARGIN
 
     def at(wd, right=False):
         return wd.mapTo(wiz, QPoint(wd.width() if right else 0, 0))
@@ -1637,7 +1638,7 @@ def test_the_last_steps_line_up(mic_wizard, qapp, monkeypatch):
         # every switch's row as tall, with an ⓘ or without
         assert {b.parentWidget().height() for b in (
             wiz.tab_buttons["voice"], wiz.chk_low_data, wiz.chk_lite)} == {
-            setupwizard.SWITCH_ROW_H}
+            wizardkit.SWITCH_ROW_H}
         assert wiz.width() == need
 
 

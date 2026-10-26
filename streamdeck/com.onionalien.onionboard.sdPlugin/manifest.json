@@ -5,7 +5,7 @@
   "Author": "OnionAlien",
   "Description": "Play your Onion Board sounds from Stream Deck keys. Pick a sound from a list and its key lights up while it plays. Also: stop every sound, a random sound, and switches for Live / Muted, the voice changer, your mic and hotkeys. Needs Onion Board with Settings → Remote → Remote control on.",
   "UUID": "com.onionalien.onionboard",
-  "URL": "https://onion-alien.github.io/onion-board/",
+  "URL": "https://onionalien.com/onionboard/",
   "SupportURL": "https://github.com/Onion-Alien/onion-board/issues",
   "Icon": "imgs/plugin",
   "Category": "Onion Board",

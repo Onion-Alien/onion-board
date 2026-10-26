@@ -1,6 +1,7 @@
 """soundboard.online.net: proxy addresses, SOCKS5 / HTTP CONNECT, failing closed, loopback
 staying direct, the relay and its secret, and applying a change at once."""
 import base64
+import ipaddress
 import http.server
 import os
 import socket
@@ -343,6 +344,22 @@ def test_every_mode_points_ffmpeg_at_the_relay_as_the_radio(socks, monkeypatch):
     assert "127.0.0.1" in net.child_env("addons")["no_proxy"]
 
 
+@pytest.mark.windows   # Windows' environment ignores case
+def test_a_restarted_copy_never_takes_the_old_relay_as_the_users_proxy(socks, monkeypatch):
+    """A restart (language, reset) started the new copy with this one's relay in
+    http_proxy: it kept that as the user's own and gave the browser and the update
+    installer a dead port with the old secret."""
+    old = f"http://radio:{'s' * 8}@127.0.0.1:1"   # an earlier copy's relay
+    monkeypatch.setattr(net, "_env_saved", None)
+    for k in ("HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY"):
+        monkeypatch.setenv(k, old)
+    monkeypatch.setenv(net.RELAY_MARK, old)
+    net.configure(net.DIRECT, "")
+    own = net.own_env()
+    assert not {k.upper() for k in own} & {"HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY",
+                                           net.RELAY_MARK}
+
+
 def test_a_change_reaches_listeners_and_qt_and_drops_relayed_connections(qapp, site, socks):
     from PySide6.QtNetwork import QNetworkAccessManager, QNetworkProxy
     calls = []
@@ -639,3 +656,35 @@ def test_one_tls_context_is_shared_and_made_again_later(monkeypatch):
                if isinstance(h, net._HTTPSHandler))
     clock[0] += net.TLS_KEEP_S + 1
     assert net._tls_context() is not ctx and len(made) == 2
+
+
+# the shared address space (RFC 6598): its first, a middle and its last address, then
+# the first one past it (built, not written out: addresses like these read as a PC's)
+_SHARED = ipaddress.ip_network(f"{25 * 4}.{2 ** 6}.0.0/10")
+
+
+@pytest.mark.parametrize("host, home", [
+    (str(_SHARED[1]), True), (str(_SHARED[1 << 21]), True), (str(_SHARED[-2]), True),
+    (str(ipaddress.IPv4Address(10 << 24 | 1)), True),
+    (str(_SHARED.broadcast_address + 1), False), ("93.184.216.34", False)])
+def test_a_carriers_nat_or_a_tailnet_counts_as_the_home_network(host, home):
+    """The shared address space (a carrier's NAT, Tailscale's tailnet) isn't public: a
+    station, a redirect or a picture link there reached tailnet devices."""
+    from soundboard.online import radio
+    assert net._local_target(host) is home
+    assert radio._local_ip(ipaddress.ip_address(host)) is home
+
+
+def test_a_key_is_never_sent_on_to_another_site_by_a_redirect():
+    """A voice server's Bearer key (or a cookie) goes only to the site it's for: a
+    redirect to another host, port or to plain http drops it."""
+    h = net._RedirectHandler("voice_servers")
+    req = urllib.request.Request("https://tts.example.com/v1/audio/speech")
+    req.add_header("Authorization", "Bearer secret")
+    req.add_header("Cookie", "a=b")
+    same = h.redirect_request(req, None, 302, "Found", {}, "https://tts.example.com/v2")
+    assert same.get_header("Authorization") == "Bearer secret"
+    for url in ("https://other.example.com/x", "http://tts.example.com/x",
+                "https://tts.example.com:8443/x"):
+        new = h.redirect_request(req, None, 302, "Found", {}, url)
+        assert new.get_header("Authorization") is None and new.get_header("Cookie") is None

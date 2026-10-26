@@ -363,9 +363,7 @@ class PlaybackControl(Controller):
             mw.searchctl._drop_link()
             self._next_in_queue()
         elif mw.linkbar.up_next():
-            for sid in mw.engine.playing():   # it waits for your sounds too
-                if sid == LINK_ID or (sid in mw._meta and not mw._meta[sid].loop):
-                    mw.engine.stop(sid)
+            self._make_way()   # it waits for your sounds too
             mw.linkbar.play_next()
         elif mw.current:
             self._stop_sound(mw.current)

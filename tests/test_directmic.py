@@ -19,8 +19,10 @@ import pytest
 from conftest import own_module, real_pc_timing, said
 from soundboard.ui.kit import toast
 from soundboard.mic import directmic as dm
+from soundboard.win import systools
 from test_mainwindow import window  # noqa: F401  (fixture)
 
+TASKKILL = systools.tool("taskkill")   # Windows' own, by its full path
 _REAL_ELEVATED = dm._elevated   # (before the conftest guard replaces it)
 # (before the conftest guard replaces them)
 _REAL_UNMARK, _REAL_MARKED = dm._unmark, dm._marked
@@ -70,7 +72,7 @@ def test_a_mic_app_left_silent_by_the_audio_restart_is_restarted(monkeypatch):
     app to start it again, and its mic is listened to once more."""
     calls = _mic_app_kit(monkeypatch, [[100], [100], [200]], [True, False])
     dm._mic_apps_back()
-    assert calls == [("listen", SONAR_MIC), ["taskkill", "/F", "/PID", "100"],
+    assert calls == [("listen", SONAR_MIC), [TASKKILL, "/F", "/PID", "100"],
                      ("listen", SONAR_MIC)]
 
 
@@ -93,7 +95,7 @@ def test_a_mic_app_that_doesnt_come_back_is_reported(monkeypatch, caplog):
     ticks = iter(range(0, 1000, 5))
     monkeypatch.setattr(dm.time, "monotonic", lambda: next(ticks))
     dm._mic_apps_back()
-    assert ["taskkill", "/F", "/PID", "100"] in calls
+    assert [TASKKILL, "/F", "/PID", "100"] in calls
     assert "didn't start again" in caplog.text
 
 
@@ -420,6 +422,25 @@ def _mic(reg, values):
 
 def _all_ours(reg):
     return [n for v in reg.mics().values() for n, (x, _) in v.items() if dm._is_ours(x)]
+
+
+@pytest.mark.parametrize("value, joined", [
+    (("{X}", SZ), ["{X}"]),            # one effect held as text: joined whole
+    ((b"\x01\x02", BINARY), None)])    # raw bytes: not a list to join
+def test_an_endpoint_effect_list_of_another_kind(fake_reg, value, joined):
+    """A driver's endpoint effect list that isn't a list of texts: one held as text was
+    split into letters, raw bytes raised half-way (exit code 1 at the mic settings, with
+    no Windows error number). It goes back exactly as it was either way."""
+    _mic(fake_reg, {dm.FX % dm.COMPOSITE_EFX: value})
+    before = fake_reg.mics()
+    dm._install_endpoint(GUID, None)
+    fx = fake_reg.keys[FXKEY.lower()]
+    if joined:
+        assert fx[dm.FX % dm.COMPOSITE_EFX][0] == [dm.CLSID, *joined]
+    else:
+        assert fx[dm.FX % dm.COMPOSITE_EFX] == value and dm._is_ours(fx[dm.FX % dm.EFX][0])
+    dm._uninstall_endpoint(GUID)
+    assert fake_reg.mics() == before
 
 
 @pytest.mark.parametrize("mic", MICS)
@@ -937,7 +958,7 @@ def test_sonar_is_restarted_once_a_step_and_its_new_devices_noted(monkeypatch):
     monkeypatch.setattr(dm, "_sonar_fixed", False)
     monkeypatch.setattr(dm, "_sonar_keep_again", lambda: calls.append("noted"))
     dm._mic_apps_back()
-    assert ["taskkill", "/F", "/PID", "100"] in calls and "noted" in calls
+    assert [TASKKILL, "/F", "/PID", "100"] in calls and "noted" in calls
     calls.clear()
     monkeypatch.setattr(dm, "_sonar_fixed", False)
     dm._mic_apps_back()
@@ -975,7 +996,7 @@ def test_sonar_is_only_ended_when_its_devices_wont_go_back(monkeypatch, fixed, k
     calls = _mic_app_kit(monkeypatch, [[100], [200]], [False])
     monkeypatch.setattr(dm, "_sonar_fixed", fixed)
     dm._mic_apps_back({SONAR_MIC})
-    assert (["taskkill", "/F", "/PID", "100"] in calls) is killed
+    assert ([TASKKILL, "/F", "/PID", "100"] in calls) is killed
 
 
 def test_cleanup_restarts_the_audio_and_sets_sonar_back(monkeypatch):
@@ -1065,7 +1086,7 @@ def test_a_retry_after_a_silent_mic_still_restarts_for_it(fake_reg, monkeypatch,
 def test_an_old_silent_note_is_no_retry(fake_reg, monkeypatch, tmp_path):
     calls = _restart_kit(fake_reg, monkeypatch, tmp_path, [True] * 40)
     (dm.data_dir()).mkdir(parents=True, exist_ok=True)
-    (dm.data_dir() / dm.LEFT_SILENT).write_text(json.dumps(
+    (dm.data_dir().parent / dm.LEFT_SILENT).write_text(json.dumps(
         {"at": time.time() - dm.RETRY_S - 5, "mics": [GUID]}), encoding="utf-8")
     assert dm.admin_install(GUID) == 0
     assert len([c for c in calls if c[0] is False]) == 1   # silent before: left alone
@@ -1326,6 +1347,27 @@ def test_an_effect_that_never_logs_doesnt_run(monkeypatch, tmp_path):
     assert _REAL_EFFECT_RUNS([], 0)   # nothing to check
 
 
+@pytest.mark.parametrize("burst", [
+    # (40: obmic.cpp LOG_BURST, dm.APO_LOG_BURST)
+    "".join(f"t pid 7: format asked: tag 3, 48000 Hz {i}\n" for i in range(40)),
+    "t pid 7: (12 lines skipped) unlock\n"])
+def test_an_effect_log_at_its_cap_cant_say_it_didnt_start(monkeypatch, tmp_path, burst):
+    """The effect logs at most APO_LOG_BURST lines a process per 10 s and drops the
+    rest: right after an audio restart its "initialize" line can be one of them. A
+    full log can't tell, so it doesn't fail the step (exit code 8, new in 2.7.1)."""
+    (tmp_path / dm.APO_LOG).write_text(burst, encoding="utf-8")
+    monkeypatch.setattr(dm, "data_dir", lambda: tmp_path)
+    monkeypatch.setattr(dm, "capture_endpoints",
+                        lambda: [{"guid": "{aaaa}", "name": "Mic", "active": True}])
+    now = [0.0]
+    monkeypatch.setattr(dm.time, "monotonic", lambda: now[0])
+    monkeypatch.setattr(dm, "_mics_open", lambda guids: now.__setitem__(0, now[0] + 3))
+    assert _REAL_EFFECT_RUNS(["{aaaa}"], 0)
+    # a few lines, none of them its own: it didn't start
+    (tmp_path / dm.APO_LOG).write_text("t pid 7: unlock\n" * 5, encoding="utf-8")
+    assert not _REAL_EFFECT_RUNS(["{aaaa}"], 0)
+
+
 def test_a_failing_listen_never_fails_the_install(fake_reg, monkeypatch, tmp_path):
     _restart_kit(fake_reg, monkeypatch, tmp_path, [])
 
@@ -1418,6 +1460,38 @@ def test_a_stop_still_pending_is_waited_for(monkeypatch):
     monkeypatch.setattr(dm.time, "sleep", lambda s: now.__setitem__(0, now[0] + s))
     assert dm._audio_service(False) is True
     assert [c[2] for c in ran] == ["audiosrv", "AudioEndpointBuilder"]   # no second stop
+
+
+def test_the_audio_stopping_is_asked_of_windows_not_powershell(monkeypatch):
+    """Exit code 6 with neither service named: PowerShell (slow or blocked) said "not
+    stopped" though the audio had. Windows' service manager is asked first now."""
+    def slow(*a, **k):
+        raise subprocess.TimeoutExpired(a, 15)
+    monkeypatch.setattr(dm.subprocess, "run", slow)
+    states = {"AudioEndpointBuilder": "Stopped", "Audiosrv": "Stopped"}
+    monkeypatch.setattr(dm, "_service_states", lambda: dict(states))
+    assert dm._services_stopped() and dm._services_up() == ""
+    states["Audiosrv"] = "StopPending"
+    assert not dm._services_stopped() and dm._services_up() == "Audiosrv=StopPending"
+    monkeypatch.setattr(dm, "_service_states", lambda: None)   # can't tell: PowerShell's
+    assert not dm._services_stopped() and dm._services_up() == ""
+
+
+def test_windows_says_how_its_audio_services_are():
+    states = dm._service_states()   # (read only: asks, changes nothing)
+    assert states is not None and set(states) == set(dm.AUDIO_SERVICES)
+    assert set(states.values()) <= set(dm._SERVICE_STATES.values())
+
+
+@pytest.mark.parametrize("code, text", [(6, "wouldn't pause"), (8, "didn't start it"),
+                                        (9, "won't open")])
+def test_a_step_that_stopped_says_what_to_do(monkeypatch, code, text):
+    """Exit codes 6, 8 and 9 said only "Installing failed (code N)": they say what to do
+    now, and still count as their code."""
+    monkeypatch.setattr(dm, "bundled_dll", lambda: Path(dm.__file__))   # (any file)
+    monkeypatch.setattr(dm, "_elevated", lambda *a, **k: code)
+    err = dm.install_on(GUID)
+    assert text in err and f"(code {code})" in err and dm.fail_kind(err) == f"code-{code}"
 
 
 def test_audio_restart_brings_back_what_depended_on_it(monkeypatch):
@@ -3127,9 +3201,10 @@ def test_a_planted_link_is_replaced_not_followed(tmp_path):
 
 
 @pytest.mark.windows   # Windows' access lists
-def test_the_folder_gets_exactly_its_access_and_nothing_inside_changes(tmp_path):
+def test_the_folder_gets_exactly_its_access_and_nothing_inside_changes(tmp_path, monkeypatch):
     d = tmp_path / "MicPlugin"
     (d / "inside").mkdir(parents=True)
+    monkeypatch.setattr(dm, "_owner", lambda p: "S-1-5-32-544")   # the admin step's own
     inside = _dacl(d / "inside")
     dm._secure_dir(d, _TEST_SDDL)
     assert _dacl(d) == _TEST_SDDL
@@ -3177,6 +3252,74 @@ def test_the_admin_ring_never_writes_through_a_link(tmp_path, monkeypatch):
     assert dm.make_ring_ok(d / "ring2.bin")
     assert outside.read_bytes() == b"keep"
     assert not list(d.glob("*.tmp"))
+
+
+@pytest.mark.windows   # Windows' junctions
+def test_the_admin_ring_never_goes_through_a_folder_turned_into_a_link(tmp_path, monkeypatch):
+    """Signed-in users may write in MicPlugin, so they can empty it and make it a junction
+    (to a folder of theirs, or \\RPC Control and its symlinks): the admin step then made
+    and deleted files wherever it pointed. Now it's made safe again first."""
+    d, theirs = tmp_path / "MicPlugin", tmp_path / "theirs"
+    theirs.mkdir()
+    (theirs / "ring.bin").write_text("keep")
+    _junction(d, theirs)
+    monkeypatch.setattr(dm, "data_dir", lambda: d)
+    monkeypatch.setattr(dm, "ring_path", lambda: d / "ring2.bin")
+    secured = []
+
+    def secure():
+        secured.append(True)
+        os.rmdir(d)   # (the link itself)
+        d.mkdir()
+    monkeypatch.setattr(dm, "secure_data_dirs", secure)
+    dm._make_ring()
+    assert secured and dm.make_ring_ok(d / "ring2.bin")
+    assert sorted(p.name for p in theirs.iterdir()) == ["ring.bin"]   # nothing made or gone
+
+
+@pytest.mark.windows   # Windows' junctions
+def test_removing_a_folder_never_follows_a_link_in_it(tmp_path, monkeypatch):
+    """A planted %ProgramData%\\OnionBoard junction (the cleanup tool) or one deep inside
+    a folder: only the link goes, nothing behind it is removed or marked for removal."""
+    victim = tmp_path / "victim"
+    (victim / "deep").mkdir(parents=True)
+    (victim / "deep" / "system.ini").write_text("keep")
+    marked = []
+    monkeypatch.setattr(dm, "_gone_at_restart", marked.append)
+    top = tmp_path / "OnionBoard"
+    _junction(top, victim)
+    dm._remove(top)
+    assert not os.path.lexists(top) and (victim / "deep" / "system.ini").exists()
+    tree = tmp_path / "ours"
+    (tree / "a").mkdir(parents=True)
+    _junction(tree / "a" / "j", victim)
+    (tree / "a" / "f.txt").write_text("x")
+    dm._remove(tree)
+    assert not tree.exists() and (victim / "deep" / "system.ini").exists() and not marked
+
+
+@pytest.mark.windows   # Windows' access lists
+def test_a_folder_someone_else_made_is_replaced_not_re_secured(tmp_path, monkeypatch):
+    """%ProgramData%\\OnionBoard made by another account before the first set-up: a handle
+    they opened then keeps its rights after the folder is re-secured in place. Their
+    folder goes (with what's in it) and a new one is made."""
+    d = tmp_path / "OnionBoard"
+    (d / "x" / "y").mkdir(parents=True)
+    monkeypatch.setattr(dm, "_owner", lambda p: "S-1-5-21-1-2-3-1001")
+    assert dm._secure_dir(d, _TEST_SDDL) == "S-1-5-21-1-2-3-1001"
+    assert d.is_dir() and not list(d.iterdir()) and _dacl(d) == _TEST_SDDL
+
+
+def test_the_silent_mics_note_is_kept_where_only_admins_write(tmp_path):
+    """MicPlugin is the users' folder: the note's name there could be a link that SYSTEM
+    then wrote or deleted through."""
+    dm.data_dir().mkdir(parents=True, exist_ok=True)
+    dm._remember_silent([GUID])
+    assert (dm.data_dir().parent / dm.LEFT_SILENT).exists()
+    assert not (dm.data_dir() / dm.LEFT_SILENT).exists()
+    assert dm._left_silent() == {GUID.lower()}
+    dm._remember_silent([])
+    assert not (dm.data_dir().parent / dm.LEFT_SILENT).exists()
 
 
 def test_who_is_listening_looks_at_the_mic_itself(window, monkeypatch):  # noqa: F811
@@ -4262,11 +4405,8 @@ def test_a_held_old_copy_goes_at_the_next_restart(monkeypatch, tmp_path):
     monkeypatch.setattr(dm, "_gone_at_restart", lambda p: marked.append(p))
     old = tmp_path / "obmic-old.dll"
     old.write_bytes(b"old")
-
-    def unlink(self, missing_ok=False):
-        raise PermissionError("in use") if self.exists() else FileNotFoundError(self)
-    monkeypatch.setattr(Path, "unlink", unlink)
-    dm._remove(old)
+    with open(old, "rb"):   # held (no FILE_SHARE_DELETE), as Windows' audio holds it
+        dm._remove(old)
     assert marked == [old]
     dm._remove(tmp_path / "gone.dll")   # already gone: nothing to mark
     assert marked == [old]
@@ -4496,11 +4636,16 @@ def test_a_helper_step_that_raised_asks_windows_once(monkeypatch, tmp_path, prom
     prompt (as the user's admin, not SYSTEM), and helper_fallback says where the
     helper's raised. Turned down, it stays the helper's 1."""
     monkeypatch.setattr(dm, "data_dir", lambda: tmp_path / "MicPlugin")
-    (tmp_path / "michelper.log").write_text(
-        "x\nTraceback (most recent call last):\n"
-        '  File "directmic.py", line 1, in _install_endpoint\n'
-        "PermissionError: [WinError 5] Access is denied\n", encoding="utf-8")
-    monkeypatch.setattr(dm, "_via_helper", lambda args, wait_s: 1)
+    helper_log = tmp_path / "michelper.log"
+    helper_log.write_text("x\n", encoding="utf-8")
+
+    def helper_raised(args, wait_s):   # (what this step logs, after mark_logs)
+        with open(helper_log, "a", encoding="utf-8") as f:
+            f.write("Traceback (most recent call last):\n"
+                    '  File "directmic.py", line 1, in _install_endpoint\n'
+                    "PermissionError: [WinError 5] Access is denied\n")
+        return 1
+    monkeypatch.setattr(dm, "_via_helper", helper_raised)
     asked = []
     monkeypatch.setattr(dm, "run_elevated", lambda *a, **k: asked.append(a) or prompt)
     monkeypatch.setattr(dm, "_helper_check", lambda via="check": True)
@@ -4885,7 +5030,7 @@ def test_a_mic_the_registry_names_differently_is_found_by_asking_windows(monkeyp
 
 def test_why_the_admin_step_raised_is_read_from_its_log(tmp_path):
     log_file = tmp_path / "directmic-admin.log"
-    assert dm.raised_why(log_file) == ("other", "other", "err-none")   # no log
+    assert dm.raised_why(log_file) == ("unlogged", "other", "err-none")   # no log
     log_file.write_text(
         "2026-10-20 mic effect install failed\n"
         "Traceback (most recent call last):\n"
@@ -4912,7 +5057,62 @@ def test_why_the_admin_step_raised_is_read_from_its_log(tmp_path):
         f.write("Traceback (most recent call last):\n"
                 '  File "x/directmic.py", line 1700, in somewhere_new\n'
                 "KeyError: 'x'\n")
-    assert dm.raised_why(log_file) == ("other", "other", "err-none")
+    assert dm.raised_why(log_file) == ("other", "key", "err-none")
+
+
+@pytest.mark.parametrize("last, what", [
+    ("AttributeError: 'int' object has no attribute 'upper'", "attr"),
+    ("TypeError: Objects of type 'int' are not supported", "type"),
+    ("OSError: [Errno 22] Invalid argument", "os"),
+    ("subprocess.TimeoutExpired: Command 'x' timed out", "timeout"),
+    ("SomethingNew: odd", "other"),
+    ("PermissionError: can't enable SeBackupPrivilege", "denied")])
+def test_an_error_with_no_windows_number_says_its_kind(tmp_path, last, what):
+    """Exit code 1 at the mic settings with no Windows error number (2.7.1's counts) said
+    "other" twice over: the kind of error is counted instead (a fixed word)."""
+    log_file = tmp_path / "directmic-admin.log"
+    log_file.write_text("Traceback (most recent call last):\n"
+                        '  File "x/directmic.py", line 1, in _install_endpoint\n'
+                        f"{last}\n", encoding="utf-8")
+    assert dm.raised_why(log_file) == ("mic-settings", what, "err-none")
+
+
+def test_only_what_this_step_logged_is_read_back(tmp_path, monkeypatch):
+    """A step that logged no traceback (or no stuck line) was counted with an older
+    step's, still in the log: only what's after mark_logs() counts now."""
+    monkeypatch.setattr(dm, "data_dir", lambda: tmp_path / "MicPlugin")
+    monkeypatch.setattr(dm, "_log_marks", {})
+    admin, helper = tmp_path / "directmic-admin.log", tmp_path / "michelper.log"
+    admin.write_text("Traceback (most recent call last):\n"
+                     '  File "x/directmic.py", line 1, in _install_endpoint\n'
+                     "KeyError: 'x'\n"
+                     f"x {dm.AUDIO_STUCK} Audiosrv=StopPending\n", encoding="utf-8")
+    helper.write_text("Traceback (most recent call last):\n"
+                      '  File "x/directmic.py", line 1, in _register_com\n'
+                      "PermissionError: [WinError 5] Access is denied\n", encoding="utf-8")
+    dm.mark_logs()
+    assert dm.raised_why() == ("unlogged", "other", "err-none")
+    assert dm.stuck_why() == "unlogged"
+    with open(admin, "a", encoding="utf-8") as f:   # this step's own
+        f.write("Traceback (most recent call last):\n"
+                '  File "x/directmic.py", line 1, in _make_ring\n'
+                "OSError: [WinError 32] in use\n"
+                f"x {dm.AUDIO_STUCK} unknown\n")
+    assert dm.raised_why() == ("ring", "in-use", "err-32")
+    assert dm.stuck_why() == "unknown"
+    admin.write_text("Traceback (most recent call last):\n"   # started afresh at its cap
+                     '  File "x/directmic.py", line 1, in _remove\n'
+                     "FileNotFoundError: [WinError 2] gone\n", encoding="utf-8")
+    assert dm.raised_why(admin) == ("files", "missing", "err-2")
+
+
+def test_each_step_marks_the_logs_first(monkeypatch):
+    marked = []
+    monkeypatch.setattr(dm, "mark_logs", lambda: marked.append(1))
+    monkeypatch.setattr(dm, "_via_helper", lambda args, wait_s: 0)
+    monkeypatch.setattr(dm, "_helper_check", lambda via="check": True)
+    monkeypatch.setattr(dm, "_elevated", _REAL_ELEVATED)
+    assert dm._elevated(["install", GUID]) == 0 and marked == [1]
 
 
 def test_a_step_the_helper_ran_is_read_from_the_helpers_log(tmp_path, monkeypatch):
@@ -4937,7 +5137,7 @@ def test_a_step_the_helper_ran_is_read_from_the_helpers_log(tmp_path, monkeypatc
 def test_which_audio_service_wouldnt_stop_is_read_from_the_log(tmp_path, monkeypatch):
     monkeypatch.setattr(dm, "data_dir", lambda: tmp_path / "MicPlugin")
     log_file = tmp_path / "michelper.log"
-    assert dm.stuck_why() == "other"   # no log
+    assert dm.stuck_why() == "unlogged"   # no log
     log_file.write_text(f"x {dm.AUDIO_STUCK} Audiosrv=StopPending\n", encoding="utf-8")
     assert dm.stuck_why() == "audio"
     with open(log_file, "a", encoding="utf-8") as f:   # the last one counts

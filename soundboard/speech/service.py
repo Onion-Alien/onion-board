@@ -46,6 +46,13 @@ HELLO_TIMEOUT_S = 5.0       # a connection has this long to say hello
 HELLO_MAX = 4096            # bytes: the first frame, before we know who's calling
 LOG_TAIL_BYTES = 8192       # a crash: how much of the end of its log is read for the reason
 LOG_TAIL_CHARS = 200        # ... and the most of its last line that's shown
+MAX_LOG = 1 << 20           # a module's log past this starts again on its next start
+
+
+def _keeping_logs() -> bool:
+    """Settings' "Keep an app log": off, a module's output goes nowhere either."""
+    from soundboard.core import applog
+    return applog.keeping()
 # "2026-01-02 03:04:05,678 ERROR " (the logging prefix the add-ons use): not worth showing
 _LOG_PREFIX = re.compile(r"^\d{4}-\d\d-\d\d \d\d:\d\d:\d\d[,.]\d+ [A-Z]+ ")
 
@@ -72,7 +79,7 @@ class ServiceHost:
         self._send_lock = threading.Lock()
         self.connected = False
         self.dropped = 0
-        self._log_from = 0
+        self._log_from: int | None = 0
 
     # ------------------------------------------------------------ lifecycle
     def start(self):
@@ -85,10 +92,15 @@ class ServiceHost:
         srv.settimeout(0.25)
         port, token = srv.getsockname()[1], secrets.token_hex(16)
         out = subprocess.DEVNULL
+        self._log_from = None   # (no log this run: an older run's lines are never shown)
         try:
-            if self.log_path:
+            if self.log_path and _keeping_logs():
                 self.log_path.parent.mkdir(parents=True, exist_ok=True)
-                out = open(self.log_path, "ab")  # noqa: SIM115
+                try:   # never grows for good: started again past MAX_LOG
+                    fresh = self.log_path.stat().st_size > MAX_LOG
+                except OSError:
+                    fresh = False
+                out = open(self.log_path, "wb" if fresh else "ab")  # noqa: SIM115
                 self._log_from = out.tell()   # this run's lines start here
             self._proc = subprocess.Popen(
                 self.argv + ["--port", str(port), "--token", token], cwd=self.cwd, env=self.env,
@@ -263,7 +275,7 @@ class ServiceHost:
 
     def _log_tail(self) -> str:
         """": <the last line this run wrote to its log>", or "" (no log, nothing new)."""
-        if not self.log_path:
+        if not self.log_path or self._log_from is None:
             return ""
         try:
             with open(self.log_path, "rb") as f:
@@ -322,16 +334,18 @@ class ServiceHost:
 
 def _handshake(conn: socket.socket, token: str, timeout: float) -> dict | None:
     """The hello message if `conn` opened with one carrying `token`, else None. Before
-    that it's an unknown caller: a small first frame only, and not much time."""
-    conn.settimeout(timeout)
+    that it's an unknown caller: a small first frame only, and not much time: all of it
+    within `timeout` (a byte every few seconds kept a per-recv timeout from running out,
+    and the helper waited behind that caller for hours)."""
+    end = time.monotonic() + timeout
     try:
-        head = protocol._exact(conn, protocol._HEAD.size)
+        head = _exact_by(conn, protocol._HEAD.size, end)
         if head is None:
             return None
         kind, n = protocol._HEAD.unpack(head)
         if kind != protocol.JSON or n > HELLO_MAX:
             return None
-        payload = protocol._exact(conn, n) if n else b""
+        payload = _exact_by(conn, n, end) if n else b""
         hello = protocol.decode_json(payload) if payload is not None else {}
     except Exception:  # noqa: BLE001
         # any bad hello (a dropped socket, junk, JSON nested too deep: RecursionError)
@@ -341,6 +355,21 @@ def _handshake(conn: socket.socket, token: str, timeout: float) -> dict | None:
             str(hello.get("token", "")).encode(), token.encode()):
         return None
     return hello
+
+
+def _exact_by(conn: socket.socket, n: int, end: float) -> bytes | None:
+    """protocol._exact, done by time.monotonic() `end` (raises TimeoutError past it)."""
+    buf = bytearray()
+    while len(buf) < n:
+        left = end - time.monotonic()
+        if left <= 0:
+            raise TimeoutError("the hello took too long")
+        conn.settimeout(left)
+        chunk = conn.recv(n - len(buf))
+        if not chunk:
+            return None
+        buf += chunk
+    return bytes(buf)
 
 
 def _exit_code(p: subprocess.Popen | None, wait: float) -> int | None:

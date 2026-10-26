@@ -109,6 +109,18 @@ class SoundsControl(Controller):
         mw = self.mw
         return list(mw.cfg.sounds) + [m for m, _i, _d in list(mw.rmctl._removed)]
 
+    def add_to_board(self, meta: SoundMeta, after: SoundMeta | None = None):
+        """A new sound on the board, in the category showing (_tag_new), right after
+        `after` or at the end: saved, and its pad made."""
+        mw = self.mw
+        mw.catctl._tag_new(meta)
+        if after is None:
+            mw.cfg.sounds.append(meta)
+        else:
+            mw.cfg.sounds.insert(mw.cfg.sounds.index(after) + 1, meta)
+        mw._save_now()
+        mw._rebuild_pads()
+
     def on_clip(self, data, name) -> SoundMeta | None:
         """A clip recorded in the Radio or Apps tab (or with the mic) becomes a normal
         sound pad."""
@@ -123,15 +135,11 @@ class SoundsControl(Controller):
             else:
                 errors.warn(mw, _("Couldn't save clip"), e)
             return None
-        mw.catctl._tag_new(meta)
-        mw.cfg.sounds.append(meta)
-        mw._index()
         mw.audio[meta.id] = data
         usage.used("clip")
         usage.step(mw.cfg, "added-sound")
         worker.run(lambda: mw.engine.prepare(meta.id, data), name="prepare")
-        mw._save_now()
-        mw._rebuild_pads()
+        self.add_to_board(meta)
         mw.toast(_("Added “{name}” ({duration:.1f}s) to Sounds: right-click it there "
                      "to rename or set a hotkey.",
                      name=html.escape(meta.name), duration=meta.duration), "ok")
@@ -239,14 +247,10 @@ class SoundsControl(Controller):
         """"Add as sound" (link bar / web search) finished: already decoded, stored and
         prepared."""
         mw = self.mw
-        mw.catctl._tag_new(meta)
-        mw.cfg.sounds.append(meta)
-        mw._index()
         mw.audio[meta.id] = data
         usage.used("youtube")
         usage.step(mw.cfg, "added-sound")
-        mw._save_now()
-        mw._rebuild_pads()
+        self.add_to_board(meta)
         mw.toast(_("Added “{name}” ({duration:.1f}s) to Sounds: right-click it there "
                      "to rename or set a hotkey.",
                      name=html.escape(meta.name), duration=meta.duration), "ok")

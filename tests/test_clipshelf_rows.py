@@ -83,6 +83,27 @@ def test_the_round_button_plays_and_keys_play_send_and_stop(window, monkeypatch)
     assert mic.toolTip() == "Play through mic"
 
 
+def test_clicking_a_row_then_delete_removes_it_with_an_undo(window, monkeypatch):  # noqa: F811
+    recs, _played = _recs(window, monkeypatch)
+    a = recs.add(np.full((SR // 2, 2), 0.2, np.float32), "First", "My voice")
+    recs.add(np.full((SR // 2, 2), 0.2, np.float32), "Second", "My voice")
+    window.resize(1200, 800)
+    window.show()
+    window.activateWindow()
+    window.tabs.setCurrentWidget(window.voice)
+    recs.title.setChecked(True)
+    QTest.qWait(10)
+    rect = recs.list.visualItemRect(recs._items[a.id])
+    QTest.mouseClick(recs.list.viewport(), Qt.MouseButton.LeftButton,
+                     pos=rect.center())                     # on the name, not a button
+    assert recs.list.hasFocus()
+    QTest.keyClick(recs.list, Qt.Key.Key_Delete)
+    assert [c.name for c in recs.shelf.clips] == ["Second"]
+    assert recs.undo_bar.active()
+    recs.undo_bar.undo()
+    assert sorted(c.name for c in recs.shelf.clips) == ["First", "Second"]
+
+
 def _double_click(widget, pos):
     """A real mouse's double-click: press, release, double-click, release (QTest's
     mouseDClick sends the double-click event alone)."""

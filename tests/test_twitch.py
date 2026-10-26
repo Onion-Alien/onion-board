@@ -248,6 +248,18 @@ def test_an_old_token_is_refreshed_and_kept(qapp, window, monkeypatch):
     assert (w.cfg.twitch_token, w.cfg.twitch_refresh) == ("tok2", "ref2")
 
 
+def test_signed_out_by_twitch_the_channel_name_opt_in_is_asked_again(qapp, window,
+                                                                     monkeypatch):
+    """Twitch ended the sign-in: whoever connects next (maybe another account) is asked
+    again before its channel's name is sent, as after Disconnect."""
+    w = window
+    t = Link(w, monkeypatch)
+    w.cfg.twitch_token, w.cfg.twitch_refresh, w.cfg.twitch_share = "tok", "ref", True
+    t.link._token_ok(twitch.TwitchError("invalid refresh token", 400))
+    assert w.cfg.twitch_token == "" and w.cfg.twitch_share is False
+    assert t.link.state == twitchlink.PROBLEM
+
+
 def test_switched_off_or_disconnected_it_stays_away(qapp, window, monkeypatch):
     w = window
     t = Link(w, monkeypatch)
@@ -376,3 +388,46 @@ def test_the_cards_guide_and_ai_prompt(qapp, window, monkeypatch):
     monkeypatch.setattr(twitchguide.TwitchGuide, "exec", lambda self: opened.append(self) or 0)
     next(b for b in shown if b.text() == "Twitch guide").click()
     assert len(opened) == 1
+
+
+def test_a_refresh_answered_after_a_restart_of_the_link_is_kept(qapp, window, monkeypatch):
+    """Twitch's refresh tokens work once: a refresh whose answer came back after the
+    link restarted (a switch, Offline mode) was dropped, and the next try with the old
+    refresh token signed the streamer out."""
+    w = window
+    t = Link(w, monkeypatch)
+    t.validate_status = 401
+    w.cfg.twitch_token, w.cfg.twitch_refresh, w.cfg.twitch_user_id = "tok", "ref", "42"
+    t.link.apply()
+    t.link.stop()     # restarted before the answer came back
+    assert process_events(qapp, lambda: w.cfg.twitch_token == "tok2")
+    assert w.cfg.twitch_refresh == "ref2"
+    t.link.apply()
+    assert process_events(qapp, lambda: t.opened)
+    assert [c for c in t.calls if c[0] == "refresh"] == [("refresh", "ref")]
+
+
+def test_disconnect_clears_the_older_copies_of_the_settings(qapp, window, monkeypatch):
+    import json
+
+    from soundboard.sounds import library
+    w = window
+    Link(w, monkeypatch)
+    old = library.CONFIG_PATH.with_name("config.json.1")
+    old.write_text(json.dumps({"twitch_token": "tok", "twitch_refresh": "ref",
+                               "theme": "Neon"}), "utf-8")
+    w.cfg.twitch_token = "tok"
+    w.twitch.disconnect()
+
+    def cleared():   # (the save may have rotated it on to config.json.2)
+        for f in library.CONFIG_PATH.parent.glob("config.json*"):
+            try:
+                raw = json.loads(f.read_text("utf-8"))
+            except (OSError, ValueError):   # being written
+                return False
+            if raw.get("twitch_token") or raw.get("twitch_refresh"):
+                return False
+        return True
+    assert process_events(qapp, cleared)
+    assert any("Neon" in f.read_text("utf-8")
+               for f in library.CONFIG_PATH.parent.glob("config.json.*"))   # the rest kept

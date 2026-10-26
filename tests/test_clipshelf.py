@@ -115,3 +115,17 @@ def test_clips_whose_file_was_deleted_by_hand_drop_out_without_an_undo(app_dir):
     assert sh.maintain() == []   # not "removed inactive clips": nothing to undo
     assert [c.id for c in sh.clips] == [a.id] and sh.pruned
     assert [r["id"] for r in json.loads(sh._index().read_text("utf-8"))] == [a.id]
+
+
+@pytest.mark.parametrize("damage", ["\0\0\0\0", '[{"id": "x", "file": 5}]'])
+def test_a_damaged_list_never_deletes_the_saved_clips(app_dir, damage):
+    """A list cut short by a power cut (NULs) or with a bad row was read as empty: the
+    next save named only the new clip and the next start deleted every earlier one."""
+    sh = Shelf()
+    old = [sh.add(audio(), "One"), sh.add(audio(), "Two")]
+    sh._index().write_text(damage, "utf-8")
+    again = Shelf()
+    again.add(audio(), "Three")
+    last = Shelf()
+    assert len(last.clips) == 3
+    assert all(c.path.is_file() for c in old)
