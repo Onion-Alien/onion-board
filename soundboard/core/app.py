@@ -444,10 +444,21 @@ def _selftest_addon_in(path, tmp) -> int:
 
     tab = entry.create(Host())
     pkg = info.package
-    for sub in ("ui.windowpicker", "ui.snip", "windows", "screenwatch"):   # the lazy ones
-        importlib.import_module(f"{pkg}.{sub}")
-    wins = sys.modules[f"{pkg}.windows"].list_windows()
-    sw = sys.modules[f"{pkg}.screenwatch"]
+
+    def lazy(*subs):   # the lazy ones; newer Onion Watch keeps them in engine/ and ui/triggers/
+        for sub in subs[:-1]:
+            name = f"{pkg}.{sub}"
+            try:
+                return importlib.import_module(name)
+            except ModuleNotFoundError as e:   # only "not at this path": a missing library fails
+                if e.name is None or not name.startswith(e.name):
+                    raise
+        return importlib.import_module(f"{pkg}.{subs[-1]}")
+
+    lazy("ui.triggers.windowpicker", "ui.windowpicker")
+    lazy("ui.triggers.snip", "ui.snip")
+    wins = lazy("engine.windows", "windows").list_windows()
+    sw = lazy("engine.screenwatch", "screenwatch")
     mons = sw.monitors()
     # its matcher, on a made-up screen: a piece of it is found where it was cut
     import numpy as np
@@ -458,7 +469,7 @@ def _selftest_addon_in(path, tmp) -> int:
         print(f"FAILED: Onion Watch's matcher found its picture at {at} ({score:.3f})")
         return 1
     # its FFTs are scipy.fft's when this build ships it (newer Onion Watch: imgops)
-    ops = sys.modules.get(f"{pkg}.imgops")
+    ops = sys.modules.get(f"{pkg}.engine.imgops") or sys.modules.get(f"{pkg}.imgops")
     fft = "?" if ops is None else ("scipy.fft" if ops._sfft is not None else "numpy")
     print(f"OK: Onion Watch {info.version} runs in Onion Board {__version__} "
           f"({len(wins)} windows, {len(mons)} screens seen, matching with {fft} FFTs)")
