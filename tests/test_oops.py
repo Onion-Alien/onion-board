@@ -56,8 +56,13 @@ def test_a_narrow_card_stacks_its_buttons_instead_of_cutting_them(qapp):
     qapp.processEvents()
     side = card.btn_retry.geometry(), card.btn_report.geometry()
     assert side[0].top() == side[1].top()   # wide: side by side, as before
-    card.setFixedWidth(200)
-    card.resize(200, card.height_for(200))
+    # room for one button, not both: 200 px with Windows' fonts; CI's fallback font is
+    # wider, so the width comes from the buttons themselves
+    m = card._lay.contentsMargins()
+    one = max(b.sizeHint().width() for b in (card.btn_retry, card.btn_report))
+    w = max(200, one + m.left() + m.right() + 8)   # + the frame
+    card.setFixedWidth(w)
+    card.resize(w, card.height_for(w))
     qapp.processEvents()
     retry, report = card.btn_retry.geometry(), card.btn_report.geometry()
     assert retry.bottom() < report.top()   # one over the other, Try again on top

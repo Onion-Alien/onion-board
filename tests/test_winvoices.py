@@ -33,7 +33,8 @@ def test_a_uac_no_is_known_by_its_code_not_its_words():
 
 def test_paths_with_an_apostrophe_stay_inside_their_quotes():
     assert winvoices._ps_quote(r"D:\Sounds\O'Brien\x.txt") == r"D:\Sounds\O''Brien\x.txt"
-    assert "'\"__OUT__\"'" in winvoices._OUTER and "'\"__SCRIPT__\"'" in winvoices._OUTER
+    assert "$Out = '__OUT__'" in winvoices._ELEVATED   # filled in with _ps_quote
+    assert "__SCRIPT__" not in winvoices._OUTER   # no script file: handed over encoded
 
 
 def test_fingerprint_is_a_set_of_names():
