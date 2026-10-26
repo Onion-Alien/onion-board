@@ -4521,7 +4521,7 @@
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Звук Windows не вдалося призупинити, тож мікрофон не змінено. Закрийте ігри та застосунки голосового чату або перезавантажте ПК.",
   "Copy invite link": "Скопіювати посилання-запрошення",
   "Invite a friend": "Запросити друга",
-  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Надішліть другові посилання, щоб завантажити Onion Board. Додайте своє ім'я чи нік, і застосунок привітає його від вас, коли він уперше його відкриє. Нічого не відстежується і не рахується.",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. The download is counted, but never your name.": "Надішліть другові посилання, щоб завантажити Onion Board. Додайте своє ім'я чи нік, і застосунок привітає його від вас, коли він уперше його відкриє. Завантаження рахується, але ваше ім'я — ніколи.",
   "Your name or gamertag (optional)": "Ваше ім'я чи нік (необов'язково)",
   "{name} invited you to Onion Board. Have fun!": "{name} запрошує вас в Onion Board. Розважайтеся!",
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows не змогла визначити, чи ця мережа загальнодоступна, тому телефони про всяк випадок не допускаються. Зробіть її приватною в Параметрах Windows → Мережа й Інтернет, а потім вимкніть і знову ввімкніть цю функцію",

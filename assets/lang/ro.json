@@ -4521,7 +4521,7 @@
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Sunetul Windows nu s-a oprit pentru o clipă, așa că microfonul nu a fost schimbat. Închide jocurile și aplicațiile de chat vocal sau repornește PC-ul.",
   "Copy invite link": "Copiază linkul de invitație",
   "Invite a friend": "Invită un prieten",
-  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Trimite-i unui prieten un link ca să descarce Onion Board. Pune-ți numele sau gamertagul pe el și aplicația îl salută din partea ta prima dată când o deschide. Nimic nu e urmărit sau numărat.",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. The download is counted, but never your name.": "Trimite-i unui prieten un link ca să descarce Onion Board. Pune-ți numele sau gamertagul pe el și aplicația îl salută din partea ta prima dată când o deschide. Descărcarea e numărată, dar numele tău niciodată.",
   "Your name or gamertag (optional)": "Numele sau gamertagul tău (opțional)",
   "{name} invited you to Onion Board. Have fun!": "{name} te-a invitat în Onion Board. Distracție plăcută!",
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows nu a putut spune dacă această rețea este publică, așa că telefoanele sunt refuzate din precauție. Setați-o ca privată în Setări Windows → Rețea și internet, apoi dezactivați și reactivați această opțiune",

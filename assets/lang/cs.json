@@ -4521,7 +4521,7 @@
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Zvuk Windows se nepozastavil, takže mikrofon nebyl změněn. Zavřete hry a aplikace pro hlasový chat, nebo restartujte PC.",
   "Copy invite link": "Kopírovat odkaz s pozvánkou",
   "Invite a friend": "Pozvi kamaráda",
-  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Pošli kamarádovi odkaz ke stažení Onion Board. Přidej k němu své jméno nebo herní přezdívku a aplikace ho od tebe pozdraví, až ji poprvé otevře. Nic se nesleduje ani nepočítá.",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. The download is counted, but never your name.": "Pošli kamarádovi odkaz ke stažení Onion Board. Přidej k němu své jméno nebo herní přezdívku a aplikace ho od tebe pozdraví, až ji poprvé otevře. Stažení se počítá, tvoje jméno nikdy.",
   "Your name or gamertag (optional)": "Tvoje jméno nebo herní přezdívka (nepovinné)",
   "{name} invited you to Onion Board. Have fun!": "{name} tě pozval(a) do Onion Board. Bav se!",
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows nedokázal zjistit, zda je tato síť veřejná, proto jsou telefony pro jistotu odmítnuty. Nastavte ji jako soukromou v Nastavení Windows → Síť a internet a pak tuto možnost vypněte a znovu zapněte",

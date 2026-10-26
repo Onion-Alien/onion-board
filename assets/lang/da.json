@@ -4443,7 +4443,7 @@
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Windows' lyd ville ikke sætte på pause, så din mikrofon blev ikke ændret. Luk spil og voicechat-apps, eller genstart din pc.",
   "Copy invite link": "Kopiér invitationslink",
   "Invite a friend": "Inviter en ven",
-  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Send en ven et link til at hente Onion Board. Sæt dit navn eller gamertag på, så siger appen hej fra dig, første gang de åbner den. Intet bliver sporet eller talt.",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. The download is counted, but never your name.": "Send en ven et link til at hente Onion Board. Sæt dit navn eller gamertag på, så siger appen hej fra dig, første gang de åbner den. Downloadet bliver talt, men aldrig dit navn.",
   "Your name or gamertag (optional)": "Dit navn eller gamertag (valgfrit)",
   "{name} invited you to Onion Board. Have fun!": "{name} har inviteret dig til Onion Board. God fornøjelse!",
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows kunne ikke sige, om dette netværk er offentligt, så telefoner afvises for en sikkerheds skyld. Sæt det til Privat i Windows-indstillinger → Netværk og internet, og slå så dette fra og til igen",

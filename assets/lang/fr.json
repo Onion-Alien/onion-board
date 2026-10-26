@@ -4443,7 +4443,7 @@
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Le son de Windows n'a pas pu être mis en pause, donc ton micro n'a pas été modifié. Ferme les jeux et les applis de chat vocal, ou redémarre ton PC.",
   "Copy invite link": "Copier le lien d'invitation",
   "Invite a friend": "Inviter un ami",
-  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Envoie à un ami un lien pour télécharger Onion Board. Mets-y ton nom ou ton pseudo et l'appli lui dira bonjour de ta part la première fois qu'il l'ouvre. Rien n'est suivi ni compté.",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. The download is counted, but never your name.": "Envoie à un ami un lien pour télécharger Onion Board. Mets-y ton nom ou ton pseudo et l'appli lui dira bonjour de ta part la première fois qu'il l'ouvre. Le téléchargement est compté, jamais ton nom.",
   "Your name or gamertag (optional)": "Ton nom ou ton pseudo (facultatif)",
   "{name} invited you to Onion Board. Have fun!": "{name} t'a invité sur Onion Board. Amuse-toi bien !",
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows n'a pas pu dire si ce réseau est public, alors les téléphones sont refusés par prudence. Réglez-le sur Privé dans Paramètres Windows → Réseau et Internet, puis désactivez et réactivez cette option",

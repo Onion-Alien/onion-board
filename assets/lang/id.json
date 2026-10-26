@@ -4365,7 +4365,7 @@
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Suara Windows tidak mau berhenti sejenak, jadi mikmu tidak diubah. Tutup game dan aplikasi obrolan suara, atau mulai ulang PC-mu.",
   "Copy invite link": "Salin link undangan",
   "Invite a friend": "Undang teman",
-  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Kirim link ke teman untuk mengunduh Onion Board. Taruh nama atau gamertag-mu di situ, dan aplikasinya akan menyapa mereka darimu saat pertama kali dibuka. Tidak ada yang dilacak atau dihitung.",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. The download is counted, but never your name.": "Kirim link ke teman untuk mengunduh Onion Board. Taruh nama atau gamertag-mu di situ, dan aplikasinya akan menyapa mereka darimu saat pertama kali dibuka. Unduhan dihitung, tetapi nama Anda tidak pernah.",
   "Your name or gamertag (optional)": "Nama atau gamertag-mu (opsional)",
   "{name} invited you to Onion Board. Have fun!": "{name} mengundangmu ke Onion Board. Selamat bersenang-senang!",
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows tidak dapat memastikan apakah jaringan ini Publik, jadi ponsel ditolak demi keamanan. Atur ke Pribadi di Pengaturan Windows → Jaringan & internet, lalu matikan dan nyalakan lagi ini",

@@ -4443,7 +4443,7 @@
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Het geluid van Windows wilde niet pauzeren, dus je microfoon is niet aangepast. Sluit games en voicechat-apps, of start je pc opnieuw op.",
   "Copy invite link": "Uitnodigingslink kopiëren",
   "Invite a friend": "Nodig een vriend uit",
-  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Stuur een vriend een link om Onion Board te downloaden. Zet je naam of gamertag erop, dan zegt de app hallo van jou als ze hem voor het eerst openen. Er wordt niets gevolgd of geteld.",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. The download is counted, but never your name.": "Stuur een vriend een link om Onion Board te downloaden. Zet je naam of gamertag erop, dan zegt de app hallo van jou als ze hem voor het eerst openen. De download wordt geteld, je naam nooit.",
   "Your name or gamertag (optional)": "Je naam of gamertag (optioneel)",
   "{name} invited you to Onion Board. Have fun!": "{name} heeft je uitgenodigd voor Onion Board. Veel plezier!",
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows kon niet zeggen of dit netwerk openbaar is, dus telefoons worden voor de zekerheid geweigerd. Zet het op Privé in Windows-instellingen → Netwerk en internet en zet dit daarna uit en weer aan",

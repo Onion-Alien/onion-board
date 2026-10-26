@@ -4443,7 +4443,7 @@
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "A Windows hangja nem állt meg, ezért a mikrofonod nem változott. Zárd be a játékokat és a hangcsevegő-appokat, vagy indítsd újra a gépet.",
   "Copy invite link": "Meghívó link másolása",
   "Invite a friend": "Hívj meg egy barátot",
-  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Küldj egy barátodnak linket az Onion Board letöltéséhez. Írd rá a neved vagy a játékosneved, és az app üdvözli tőled, amikor először megnyitja. Semmit nem követünk és nem számolunk.",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. The download is counted, but never your name.": "Küldj egy barátodnak linket az Onion Board letöltéséhez. Írd rá a neved vagy a játékosneved, és az app üdvözli tőled, amikor először megnyitja. A letöltést számoljuk, a nevedet soha.",
   "Your name or gamertag (optional)": "A neved vagy játékosneved (nem kötelező)",
   "{name} invited you to Onion Board. Have fun!": "{name} meghívott az Onion Boardba. Jó szórakozást!",
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "A Windows nem tudta megállapítani, hogy ez a hálózat nyilvános-e, ezért a telefonokat biztonsági okból elutasítja. Állítsa magánhálózatra a Windows Gépház → Hálózat és internet részében, majd kapcsolja ki és be újra ezt",

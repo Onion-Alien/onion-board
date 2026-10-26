@@ -161,12 +161,12 @@ class HelpPage(Page):
     def _invite_card(self):
         """A link to the download page for a friend, with their name or gamertag on it
         so the friend's first start says who invited them (soundboard.core.invite).
-        Nothing is counted: the name only travels in the link."""
+        The name only travels in the link; the site counts the download, never the name."""
         from soundboard.core import invite
         card, cv = self._card(_("Invite a friend"),
                               _("Send a friend a link to download Onion Board. Put your name "
                                 "or gamertag on it and it says hi from you when they first "
-                                "open the app. Nothing is tracked or counted."),
+                                "open the app. The download is counted, but never your name."),
                               icon="link")
         name = self.dlg.invite_name = QLineEdit(self.mw.cfg.invite_name)
         name.setPlaceholderText(_("Your name or gamertag (optional)"))

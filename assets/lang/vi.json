@@ -4365,7 +4365,7 @@
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Âm thanh của Windows không chịu tạm dừng nên mic của bạn chưa được thay đổi. Hãy đóng trò chơi và ứng dụng trò chuyện thoại, hoặc khởi động lại PC.",
   "Copy invite link": "Sao chép link mời",
   "Invite a friend": "Mời bạn bè",
-  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Gửi cho bạn bè link tải Onion Board. Ghi tên hoặc gamertag của bạn vào, ứng dụng sẽ chào họ thay bạn khi họ mở lần đầu. Không có gì bị theo dõi hay đếm.",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. The download is counted, but never your name.": "Gửi cho bạn bè link tải Onion Board. Ghi tên hoặc gamertag của bạn vào, ứng dụng sẽ chào họ thay bạn khi họ mở lần đầu. Lượt tải được đếm, nhưng tên bạn thì không bao giờ.",
   "Your name or gamertag (optional)": "Tên hoặc gamertag của bạn (không bắt buộc)",
   "{name} invited you to Onion Board. Have fun!": "{name} đã mời bạn dùng Onion Board. Chơi vui nhé!",
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows không xác định được mạng này có phải là Công cộng hay không, nên điện thoại bị từ chối để đảm bảo an toàn. Hãy đặt mạng thành Riêng tư trong Cài đặt Windows → Mạng & Internet, rồi tắt và bật lại tùy chọn này",

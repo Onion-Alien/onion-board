@@ -4443,7 +4443,7 @@
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Windows sesi duraklatılamadı, bu yüzden mikrofonunuz değiştirilmedi. Oyunları ve sesli sohbet uygulamalarını kapatın ya da bilgisayarı yeniden başlatın.",
   "Copy invite link": "Davet bağlantısını kopyala",
   "Invite a friend": "Bir arkadaşı davet et",
-  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "Bir arkadaşınıza Onion Board'u indirmesi için bir bağlantı gönderin. Üstüne adınızı ya da oyuncu adınızı ekleyin, uygulamayı ilk açtığında sizin adınıza merhaba desin. Hiçbir şey takip edilmez ya da sayılmaz.",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. The download is counted, but never your name.": "Bir arkadaşınıza Onion Board'u indirmesi için bir bağlantı gönderin. Üstüne adınızı ya da oyuncu adınızı ekleyin, uygulamayı ilk açtığında sizin adınıza merhaba desin. İndirme sayılır, ama adınız asla.",
   "Your name or gamertag (optional)": "Adınız ya da oyuncu adınız (isteğe bağlı)",
   "{name} invited you to Onion Board. Have fun!": "{name} sizi Onion Board'a davet etti. İyi eğlenceler!",
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows bu ağın ortak olup olmadığını söyleyemedi, bu yüzden telefonlar güvenlik için geri çevriliyor. Windows Ayarları → Ağ ve internet bölümünden özel olarak ayarlayın, ardından bunu kapatıp yeniden açın",

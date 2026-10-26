@@ -4365,7 +4365,7 @@
   "Windows' sound wouldn't pause, so your mic wasn't changed. Close games and voice chat apps, or restart your PC.": "Windows 的聲音無法暫停，所以你的麥克風沒有被變更。請關閉遊戲和語音聊天應用程式，或重新啟動電腦。",
   "Copy invite link": "複製邀請連結",
   "Invite a friend": "邀請好友",
-  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. Nothing is tracked or counted.": "傳給好友一個下載 Onion Board 的連結。附上你的名字或遊戲 ID,好友第一次打開應用程式時會看到你的問候。不追蹤,也不計數。",
+  "Send a friend a link to download Onion Board. Put your name or gamertag on it and it says hi from you when they first open the app. The download is counted, but never your name.": "傳給好友一個下載 Onion Board 的連結。附上你的名字或遊戲 ID,好友第一次打開應用程式時會看到你的問候。只計下載次數,從不記你的名字。",
   "Your name or gamertag (optional)": "你的名字或遊戲 ID(選填)",
   "{name} invited you to Onion Board. Have fun!": "{name} 邀請你來用 Onion Board。玩得開心!",
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows 無法判斷此網路是否為公用網路，因此為了安全起見拒絕手機連線。請在 Windows 設定 → 網路和網際網路中將其設為私人，然後關閉再重新開啟此選項",
