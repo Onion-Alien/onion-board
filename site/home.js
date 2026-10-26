@@ -30,6 +30,7 @@
   function did(what) { countOnce("site-" + what); }
 
   // ------------------------------------------------------------------ tabs
+  var ownAddress = location.host === "onionalien.com";
   var TITLES = {
     board: "Onion Board: free soundboard for Discord and games (Windows)",
     watch: "Onion Watch: a sound when your game needs you (free, Windows)"
@@ -76,7 +77,9 @@
   }
   function select(name, scrollUp) {
     if (name === current()) { if (scrollUp) window.scrollTo({ top: 0, behavior: still ? "auto" : "smooth" }); return; }
-    history.replaceState(null, "", name === "watch" ? "/onionwatch/" : "/onionboard/");
+    // onionalien.com has an address per app; the github.io copy keeps the old #watch
+    if (ownAddress) history.replaceState(null, "", name === "watch" ? "/onionwatch/" : "/onionboard/");
+    else history.replaceState(null, "", name === "watch" ? "#watch" : location.pathname + location.search);
     did("tab-" + name);
     apply(name);
     if (scrollUp) window.scrollTo(0, 0);
@@ -872,6 +875,6 @@
     io.observe(box);
   });
 
-  apply(location.hash === "#watch" ? "watch" : "board");
+  apply(location.hash === "#watch" || location.pathname.indexOf("/onionwatch/") === 0 ? "watch" : "board");
   did("open-" + current());       // which tab they landed on
 })();
