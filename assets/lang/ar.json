@@ -4760,7 +4760,7 @@
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "مدى علوّ أصواتك عند الآخرين (وفي البث). لسماعاتك صوتها الخاص: سماعاتي، في الأسفل. اكتب حتى 1000% في الخانة.",
   "Sounds for others": "الأصوات للآخرين",
   "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "يمكن أن يعمل Onion Board بخفة أكبر على هذا الحاسوب: الوضع الخفيف يوقف الحركات. تجده أيضًا في الإعدادات > عام.",
-  "Add all ({n})": "أضف الكل ( {n} )",
+  "Add all ({n})": "أضف الكل ({n})",
   "Can't use these links": "لا يمكن استخدام هذه الروابط",
   "Looking up {n} link…": [
     "جارٍ البحث عن الرابط {n} ...",

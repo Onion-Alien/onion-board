@@ -4370,7 +4370,7 @@
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "คนอื่นได้ยินเสียงของคุณดังแค่ไหน (และในสตรีมของคุณ) หูฟังของคุณมีระดับเสียงของตัวเอง: หูฟังของฉัน ที่ด้านล่าง พิมพ์ได้ถึง 1000% ในช่อง",
   "Sounds for others": "เสียงสำหรับคนอื่น",
   "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board ทำงานเบาลงได้บนพีซีเครื่องนี้: โหมดเบาจะปิดแอนิเมชัน อยู่ใน การตั้งค่า > ทั่วไป ด้วย",
-  "Add all ({n})": "เพิ่มทั้งหมด ( {n} )",
+  "Add all ({n})": "เพิ่มทั้งหมด ({n})",
   "Can't use these links": "ไม่สามารถใช้ลิงก์เหล่านี้ได้",
   "Looking up {n} link…": [
     "กำลังค้นหาลิงก์ {n} รายการ..."

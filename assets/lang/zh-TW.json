@@ -4370,7 +4370,7 @@
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "別人聽到你的音效有多大聲（還有你的直播）。你自己的耳機有獨立的音量：在最下面的「我的耳機」。在方框裡可以輸入最高 1000%。",
   "Sounds for others": "給別人的音效",
   "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board 在這台電腦上可以更輕快：輕量模式會關閉動畫。也可以在 設定 > 一般 裡找到。",
-  "Add all ({n})": "添加全部 ( {n} )",
+  "Add all ({n})": "添加全部 ({n})",
   "Can't use these links": "無法使用這些鏈接",
   "Looking up {n} link…": [
     "正在尋找{n}個連結..."

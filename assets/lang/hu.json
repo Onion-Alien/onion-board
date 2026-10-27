@@ -4448,7 +4448,7 @@
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Milyen hangosan hallják mások a hangjaidat (és a streamedet). A fejhallgatódnak saját hangereje van: Fejhallgatóm, lent. A mezőbe akár 1000%-ot is írhatsz.",
   "Sounds for others": "Hangok másoknak",
   "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Az Onion Board könnyebben is futhat ezen a gépen: a Könnyített mód kikapcsolja az animációkat. A Beállítások > Általános alatt is megtalálod.",
-  "Add all ({n})": "Összes hozzáadása ( {n} )",
+  "Add all ({n})": "Összes hozzáadása ({n})",
   "Can't use these links": "Ezeket a linkeket nem lehet használni",
   "Looking up {n} link…": [
     "{n} link keresése…",

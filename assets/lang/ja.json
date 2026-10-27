@@ -4370,7 +4370,7 @@
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "相手（と配信）にサウンドがどのくらいの音量で聞こえるか。自分のヘッドホンの音量は別です：一番下の「自分のヘッドホン」。欄には最大 1000% まで入力できます。",
   "Sounds for others": "相手へのサウンド",
   "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "このPCではOnion Boardをもっと軽く動かせます: 軽量モードでアニメーションをオフにできます。設定 > 一般 にもあります。",
-  "Add all ({n})": "すべて追加 ( {n} )",
+  "Add all ({n})": "すべて追加 ({n})",
   "Can't use these links": "これらのリンクは使用できません",
   "Looking up {n} link…": [
     "{n}個のリンクを検索中…"
