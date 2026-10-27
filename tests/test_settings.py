@@ -501,7 +501,7 @@ def test_live_tabs_is_a_tab_of_the_look_box_tint_or_dot(window, qapp):  # noqa: 
 
 
 def test_look_tab_in_three_groups_with_switches_by_their_titles(window, qapp):  # noqa: F811
-    """The Look tab reads as three small groups (Colour, Size and speed, Background), each
+    """The Look tab reads as three small groups (Colour, Size, Background), each
     a soft box, not five headings in one long list; on/off and the size dropdown sit at
     the end of their setting's heading line."""
     d = SettingsDialog(window, "appearance")
@@ -512,15 +512,34 @@ def test_look_tab_in_three_groups_with_switches_by_their_titles(window, qapp):  
     def titles(box):
         return [t.text() for t in box.findChildren(QLabel, "section")]
     assert titles(boxes[0]) == ["Highlight colour", "Live tabs"]
-    assert titles(boxes[1]) == ["Interface size", "Lite mode"]
+    assert titles(boxes[1]) == ["Interface size"]
     assert titles(boxes[2]) == ["Playing sound background"]
-    assert [len(b.findChildren(QFrame, "lookrule")) for b in boxes] == [1, 1, 0]
+    assert [len(b.findChildren(QFrame, "lookrule")) for b in boxes] == [1, 0, 0]
     labels = [b.parentWidget().findChild(QLabel, "hint").text() for b in boxes]
-    assert labels == ["Colour", "Size and speed", "Background"]
-    for control, title in ((d.lite_check, "Lite mode"), (d.ui_scale_combo, "Interface size"),
+    assert labels == ["Colour", "Size", "Background"]
+    for control, title in ((d.ui_scale_combo, "Interface size"),
                            (d.playing_background_check, "Playing sound background")):
         head = control.parentWidget()   # the heading widget: icon, title, then the control
         assert head.findChild(QLabel, "section").text() == title
+    d.close()
+
+
+def test_lite_mode_is_on_general_under_window(window, qapp):  # noqa: F811
+    """Lite mode is an option of its own Speed card on General, right under Window
+    (it was at the end of Appearance's second tab, where people didn't find it)."""
+    d = SettingsDialog(window, "general")
+    card = d.lite_check.parentWidget()
+    while card.objectName() != "setcard":
+        card = card.parentWidget()
+    page = card.parentWidget().layout()
+    cards = [page.itemAt(i).widget() for i in range(page.count()) if page.itemAt(i).widget()]
+    titles = [c.findChild(QLabel, "section").text() for c in cards[:2]]
+    assert titles == ["Window", "Speed"] and cards[1] is card
+    assert d.lite_check.text() == "Lite mode" and not d.lite_check.isChecked()
+    d.lite_check.click()
+    assert window.cfg.lite_mode is True
+    d.lite_check.click()
+    assert window.cfg.lite_mode is False
     d.close()
 
 

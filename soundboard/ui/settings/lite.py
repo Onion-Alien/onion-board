@@ -1,4 +1,4 @@
-"""Lite mode (Settings > Appearance): one switch for slower PCs.
+"""Lite mode (Settings > General): one switch for slower PCs.
 
 It turns off what only decorates and still costs CPU while the app is open:
 

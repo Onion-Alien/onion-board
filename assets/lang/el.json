@@ -4010,7 +4010,6 @@
   "{n} more themes in Settings.": "Ακόμα {n} θέματα στις Ρυθμίσεις.",
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Για πιο αργούς υπολογιστές: χωρίς κινούμενα εφέ, ο Bun μένει ακίνητος και τα θέματα είναι απλά. Όλα δουλεύουν κανονικά.",
   "Lite mode": "Ελαφριά λειτουργία",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Το Onion Board μπορεί να τρέχει πιο ελαφριά σε αυτόν τον υπολογιστή: η Ελαφριά λειτουργία κλείνει τα κινούμενα εφέ. Υπάρχει και στις Ρυθμίσεις > Εμφάνιση.",
   "Use less CPU": "Λιγότερη χρήση CPU",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Το Tor δεν είναι ακόμα σε αυτό το PC: πάτα Πάρε το Tor (Ρυθμίσεις > Σύνδεση) για να το κατεβάσεις. Όταν τρέχεις από τον πηγαίο κώδικα, δουλεύει και το scripts/buildtools/fetch_tor.py.",
   "Another language is downloading. Wait for it to finish.": "Κατεβαίνει άλλη γλώσσα. Περίμενε να τελειώσει.",
@@ -4305,7 +4304,6 @@
   "Show pop-ups": "Εμφάνιση αναδυόμενων",
   "Lite mode is on: no animations, plain themes and less CPU. Click to change it.": "Η ελαφριά λειτουργία είναι ενεργή: χωρίς κινούμενα εφέ, απλά θέματα και λιγότερη CPU. Κάνε κλικ για αλλαγή.",
   "Marks a tab whose feature is on, so nothing is left on without you noticing.": "Σημαδεύει μια καρτέλα της οποίας η λειτουργία είναι ενεργή, ώστε να μη μένει τίποτα ανοιχτό χωρίς να το προσέξεις.",
-  "Size and speed": "Μέγεθος και ταχύτητα",
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Ό,τι είναι ενεργό φαίνεται σε αυτό το χρώμα. Σύρε για να διαλέξεις το δικό σου· μένει όταν αλλάζεις θέμα.",
   "Already in your library as “{name}”": "Ήδη στη βιβλιοθήκη σου ως «{name}»",
   "Names and tags can't have links in them.": "Τα ονόματα και οι ετικέτες δεν μπορούν να περιέχουν συνδέσμους.",
@@ -4448,5 +4446,6 @@
   "{name} invited you to Onion Board. Have fun!": "Ο/Η {name} σε προσκάλεσε στο Onion Board. Καλή διασκέδαση!",
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Τα Windows δεν μπόρεσαν να πουν αν αυτό το δίκτυο είναι δημόσιο, οπότε τα τηλέφωνα απορρίπτονται για ασφάλεια. Ορίστε το ως ιδιωτικό στις Ρυθμίσεις των Windows → Δίκτυο και Internet και, στη συνέχεια, απενεργοποιήστε και ενεργοποιήστε ξανά αυτή την επιλογή",
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Πόσο δυνατά ακούνε οι άλλοι τους ήχους σου (και το stream σου). Τα ακουστικά σου έχουν δική τους ένταση: Τα ακουστικά μου, στο κάτω μέρος. Γράψε έως 1000% στο πεδίο.",
-  "Sounds for others": "Ήχοι για τους άλλους"
+  "Sounds for others": "Ήχοι για τους άλλους",
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Το Onion Board μπορεί να τρέχει πιο ελαφριά σε αυτόν τον υπολογιστή: η Ελαφριά λειτουργία κλείνει τα κινούμενα εφέ. Υπάρχει και στις Ρυθμίσεις > Γενικά."
 }

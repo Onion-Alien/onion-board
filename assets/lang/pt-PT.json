@@ -4010,7 +4010,6 @@
   "{n} more themes in Settings.": "Mais {n} temas nas Definições.",
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "Para PCs mais lentos: sem animações, o Bun fica quieto e os temas são simples. Tudo continua a funcionar.",
   "Lite mode": "Modo leve",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "O Onion Board pode correr mais leve neste PC: o Modo leve desliga as animações. Também está em Definições > Aspeto.",
   "Use less CPU": "Usar menos CPU",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "O Tor ainda não está neste PC: carrega em Obter o Tor (Definições > Ligação) para o transferir. A partir do código-fonte, o scripts/buildtools/fetch_tor.py também funciona.",
   "Another language is downloading. Wait for it to finish.": "Outro idioma está a ser transferido. Espera que termine.",
@@ -4305,7 +4304,6 @@
   "Show pop-ups": "Mostrar pop-ups",
   "Lite mode is on: no animations, plain themes and less CPU. Click to change it.": "O modo leve está ligado: sem animações, temas simples e menos CPU. Clica para mudar.",
   "Marks a tab whose feature is on, so nothing is left on without you noticing.": "Marca um separador cuja funcionalidade está ligada, para que nada fique ligado sem dares conta.",
-  "Size and speed": "Tamanho e velocidade",
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "O que está ligado aparece nesta cor. Desliza para escolheres a tua; mantém-se quando mudas de tema.",
   "Already in your library as “{name}”": "Já está na tua biblioteca como “{name}”",
   "Names and tags can't have links in them.": "Os nomes e as etiquetas não podem ter ligações.",
@@ -4448,5 +4446,6 @@
   "{name} invited you to Onion Board. Have fun!": "{name} convidou-te para o Onion Board. Diverte-te!",
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "O Windows não conseguiu dizer se esta rede é pública, por isso os telemóveis são recusados por segurança. Defina-a como privada em Definições do Windows → Rede e Internet e depois desative e volte a ativar esta opção",
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "O volume com que os outros ouvem os teus sons (e o teu stream). Os teus auscultadores têm volume próprio: Os meus auscultadores, em baixo. Escreve até 1000% na caixa.",
-  "Sounds for others": "Sons para os outros"
+  "Sounds for others": "Sons para os outros",
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "O Onion Board pode correr mais leve neste PC: o Modo leve desliga as animações. Também está em Definições > Geral."
 }

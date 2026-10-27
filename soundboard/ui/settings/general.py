@@ -34,6 +34,7 @@ class GeneralPage(Page):
                 _("A quick how-to the first time you open each tab."),
                 self.mw.cfg.tutorials_on, self.mw.tipctl.set_tutorials_on)
         v.addWidget(card)
+        v.addWidget(self._speed_card())
         v.addWidget(self._app_setup_card())
         if self.mw.cfg.category_programs:   # rules made before the category menu lost it
             v.addWidget(self._programs_card())
@@ -42,6 +43,17 @@ class GeneralPage(Page):
         v.addWidget(self._reset_card())
         v.addStretch(1)
         return w
+
+    def _speed_card(self):
+        """Lite mode (ui/settings/lite.py): calmer and lighter for slower PCs, applied at
+        once. Here, near the top, rather than at the end of Appearance's second tab, where
+        people looking for it didn't find it."""
+        card, cv = self._card(_("Speed"), icon="leaf")
+        self.dlg.lite_check = self._option(
+            cv, _("Lite mode"), _("For slower PCs: no animations, Bun holds still and the "
+                                  "themes are plain. Everything still works."),
+            self.mw.cfg.lite_mode, self.mw.themectl.set_lite_mode)
+        return card
 
     def _app_setup_card(self):
         """Set up for the app you're using (soundboard.mic.appsetup): ask or not, and the
