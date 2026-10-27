@@ -370,6 +370,29 @@ def test_new_crash_and_freeze_reports_are_counted_once_never_sent(sent, app_dir)
     assert len(sent) == 1
 
 
+def test_the_reports_folder_is_read_on_the_counts_thread(sent, app_dir, monkeypatch):
+    """maybe_send runs on the UI thread a minute after each saved report, so on a PC
+    that's already struggling: listing and reading the reports goes on the send's
+    thread, and the window only gathers what's in memory."""
+    import threading
+    monkeypatch.setattr(usage, "threading", threading)   # a real thread this time
+    _report(app_dir, "crash-a.txt", "Onion Board froze for 12 s\nVersion:  1.9.7\n", 2000)
+    readers, real, done = [], usage.problems, threading.Event()
+
+    def problems(*a, **k):
+        readers.append(threading.current_thread() is threading.main_thread())
+        return real(*a, **k)
+    monkeypatch.setattr(usage, "problems", problems)
+    cfg = Config(stats_sent=1e18, stats_problems_seen=1000.0)   # daily not due
+    queued = []
+    usage.maybe_send(cfg, lambda apply: (queued.append(apply), done.set()), app_dir=app_dir)
+    assert done.wait(5)
+    assert readers == [False]
+    assert [h["path"] for h in _hits(sent[0][0])] == ["freeze/1.9.7"]
+    queued[0]()   # on the UI thread
+    assert cfg.stats_problems_seen == 2000
+
+
 def _real_report(where_from: str) -> str:
     """A report as applog writes it, for an error raised in a soundboard file."""
     try:
