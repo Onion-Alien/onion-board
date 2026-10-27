@@ -123,6 +123,7 @@ from soundboard.core.usagenames import (  # noqa: F401
     PACKS,
     PRESS_MODES,
     RECOVERY,
+    RECOVERY_FAILS,
     ROUTES,
     SETTINGS_PAGES,
     SPLASH_RARES,

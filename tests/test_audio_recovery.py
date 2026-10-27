@@ -79,6 +79,53 @@ def test_failed_repair_never_reports_success(window, qapp, monkeypatch, state, e
     d.close()
 
 
+@pytest.mark.parametrize('result,state,counted', [
+    (lambda: dm.Failure('Installing failed (code 8).', 'code-8'), 'missing',
+     {'recovery-repair', 'recovery-failed', 'recovery-failed-code-8'}),
+    (lambda: dm.Failure(dm.declined(), 'said-no'), 'outdated',
+     {'recovery-repair', 'recovery-said-no'}),
+    (lambda: None, 'outdated',
+     {'recovery-repair', 'recovery-failed', 'recovery-failed-unverified'}),
+    (lambda: 'some other text', 'missing',
+     {'recovery-repair', 'recovery-failed', 'recovery-failed-code-other'}),
+])
+def test_failed_fix_counts_why(window, qapp, monkeypatch, result, state, counted):  # noqa: F811
+    """The card's failure count carries a fixed reason word, and No to Windows' prompt
+    isn't a failure."""
+    from soundboard.core import usage
+    sent = []
+    monkeypatch.setattr(usage, 'used', sent.append)
+    window.cfg.mic_device = 'Test mic'
+    monkeypatch.setattr(window.devctl, '_when_devices_free', lambda fn: None)
+    monkeypatch.setattr(window, 'toast', lambda *a, **k: None)
+    monkeypatch.setattr(dm, 'install', lambda *a, **kw: result())
+    monkeypatch.setattr(dm, 'status', lambda mic=None: state)
+    from soundboard.ui.setup.audiorecovery import recovery_of
+    rec = recovery_of(window)
+    assert rec.start('repair')
+    wait(qapp, lambda: not rec.running)
+    assert set(sent) == counted
+    assert set(sent) <= set(usage.FEATURES)
+
+
+def test_crashed_fix_counts_error(window, qapp, monkeypatch):  # noqa: F811
+    from soundboard.core import usage
+    from soundboard.ui.setup.audiorecovery import recovery_of
+    sent = []
+    monkeypatch.setattr(usage, 'used', sent.append)
+    window.cfg.mic_device = 'Test mic'
+    monkeypatch.setattr(window.devctl, '_when_devices_free', lambda fn: None)
+    monkeypatch.setattr(window, 'toast', lambda *a, **k: None)
+
+    def boom(*a, **kw):
+        raise OSError('device gone')
+    monkeypatch.setattr(dm, 'install', boom)
+    rec = recovery_of(window)
+    assert rec.start('reinstall')
+    wait(qapp, lambda: not rec.running)
+    assert set(sent) == {'recovery-reinstall', 'recovery-failed', 'recovery-failed-error'}
+
+
 def test_remove_verifies_effect_is_gone(window, qapp, monkeypatch):  # noqa: F811
     monkeypatch.setattr(window.devctl, '_when_devices_free', lambda fn: None)
     monkeypatch.setattr(dm, 'uninstall', lambda: None)

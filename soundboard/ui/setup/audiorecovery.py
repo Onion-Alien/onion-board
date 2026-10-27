@@ -135,7 +135,7 @@ class Recovery(QObject):
         return True
 
     def _work(self, action, mic, target=None):
-        err, state = "", ""
+        err, state, why = "", "", ""
         guid = target["guid"] if target else None
         try:
             if action == "cleanup" and target is not None and guid:   # on a picked mic
@@ -144,6 +144,7 @@ class Recovery(QObject):
                 else:
                     err = directmic.cleanup(guid)
                     if not err and directmic.leftovers(guid):
+                        why = "leftovers"
                         err = _("Some leftovers couldn't be removed from {mic}.",
                                 mic=target["name"])
             elif action == "remove":
@@ -152,18 +153,23 @@ class Recovery(QObject):
                 err = directmic.install_on(guid, clean=action in ("reinstall", "update"))
             else:
                 err = directmic.install(mic, clean=action in ("reinstall", "update"))
+            if err and not why:   # its reason word, while err is still install's Failure
+                why = "said-no" if err == directmic.declined() else directmic.fail_kind(err)
             err = err or ""
             directmic.forget_status()
             state = directmic.status_on(guid) if guid else directmic.status(mic)
             if not err and action == "remove" and (
                     has_effect(state) if guid else directmic.anything_installed()):
+                why = "not-removed"
                 err = _("Repair failed")
             elif not err and action in INSTALLS and state != "ready":
+                why = "unverified"
                 err = _("The mic effect could not be verified. Restart your PC, then try "
                         "Repair mic effect again.")
         except Exception as exc:  # noqa: BLE001 - report unexpected device failures
             log.exception("audio recovery failed")
-            err = errors.plain(exc)
+            err, why = errors.plain(exc), "error"
+        self._why = why   # read by _finished (one run at a time; the signal carries str)
         busy.emit(self.finished, action, err, state)
 
     def _finished(self, action, err, state):
@@ -171,8 +177,12 @@ class Recovery(QObject):
         done = "cleanup" if action == "cleanup-none" else action
         if done in usage.RECOVERY:
             usage.used(f"recovery-{done}")
-        if err:
+        why, self._why = getattr(self, "_why", ""), ""
+        if why == "said-no":   # No to Windows' prompt: nothing failed
+            usage.used("recovery-said-no")
+        elif err:   # why, as a fixed word (never err)
             usage.used("recovery-failed")
+            usage.used(f"recovery-failed-{why or 'code-other'}")
         self.mw._attaching = False
         target, self.target = getattr(self, "target", None), None
         pa = target and target.get("pa")

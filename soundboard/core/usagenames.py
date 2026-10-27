@@ -22,6 +22,10 @@ TRIGGERS_FEATURES = (
 VOICE_TABS = ("fx", "ai", "speak", "addons")
 # The Mic effect card's actions (ui/setup/audiorecovery.py; "cleanup-none" counts as cleanup)
 RECOVERY = ("install", "repair", "update", "reinstall", "cleanup", "remove")
+# why one of them failed: an install's reason (MIC_FAILS), or leftovers still there after
+# a clean-up, the effect still on after a remove, an install the status didn't confirm,
+# or an error in the app itself
+RECOVERY_FAILS = ("leftovers", "not-removed", "unverified", "error")
 # why a mic effect set-up failed, a click's or the repair-by-itself's (directmic.FAIL_KINDS:
 # the admin prompt unanswered, the step not starting or stopping half-way, a silent mic,
 # the helper not answering, no mic (and why: unplugged or off, two alike, unknown to
@@ -187,8 +191,10 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             *(f"voice-tab-{k}" for k in VOICE_TABS), "translate-on",
             # Radio: a station played, a station that wouldn't play, the list down
             "radio-played", "radio-failed", "radio-list-down",
-            # Settings' Mic effect card: what was run on a mic, and it failing
-            *(f"recovery-{k}" for k in RECOVERY), "recovery-failed",
+            # Settings' Mic effect card: what was run on a mic, No to Windows' prompt for
+            # it, and it failing (and why: MIC_FAILS, RECOVERY_FAILS)
+            *(f"recovery-{k}" for k in RECOVERY), "recovery-said-no", "recovery-failed",
+            *(f"recovery-failed-{k}" for k in (*MIC_FAILS, *RECOVERY_FAILS)),
             # a file import stopped from its card; an import that skipped some files
             "import-stopped", "import-skipped",
             # Pause and Stop all (the side menu, a hotkey), and the taskbar preview's
