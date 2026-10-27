@@ -52,3 +52,24 @@ def test_registry_drops_deleted_labels_and_tab_widgets(qapp):
     for _ in range(10):
         churn()
     assert len(icons._labels) <= labels and len(icons._tabs) <= tabs
+
+
+def test_registering_an_icon_never_scans_the_others(qapp, monkeypatch):
+    """Each set_label_icon / set_icon went over every entry so far: a big board's
+    thousands made a retheme (which sets them all again) take seconds."""
+    from PySide6.QtWidgets import QPushButton
+
+    box = QWidget()
+    labels = [QLabel(box) for _ in range(50)]
+    buttons = [QPushButton(box) for _ in range(50)]
+    looked = []
+    monkeypatch.setattr(icons, "_gone", lambda ref: looked.append(ref) or False)
+    for lbl, btn in zip(labels, buttons):
+        icons.set_label_icon(lbl, "play")
+        icons.set_icon(btn, "play")
+    icons.retheme()
+    assert not looked
+    assert all(lbl in icons._labels for lbl in labels)
+    assert all(btn in icons._applied for btn in buttons)
+    icons.recolor(buttons[0], "accent")
+    assert icons._applied[buttons[0]][1] == "accent"
