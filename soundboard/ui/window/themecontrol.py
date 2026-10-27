@@ -140,7 +140,7 @@ class ThemeControl(Controller):
         usage.used("lite-suggested")
         mw._save_later()
         mw.toast(_("Onion Board can run lighter on this PC: Lite mode turns off the "
-                   "animations. It's in Settings > Appearance too."), ms=12_000,
+                   "animations. It's in Settings > General too."), ms=12_000,
                  action=(_("Turn on"), lambda: (usage.used("lite-suggested-on"),
                                                 self.set_lite_mode(True))))
 

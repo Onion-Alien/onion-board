@@ -3936,7 +3936,6 @@
   "{n} more themes in Settings.": "設定にはほかに {n} 個のテーマがあります。",
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "遅めのPC向け: アニメーションなし、Bunは静止し、テーマはシンプルになります。機能はすべてそのままです。",
   "Lite mode": "軽量モード",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "このPCではOnion Boardをもっと軽く動かせます: 軽量モードでアニメーションをオフにできます。設定 > 外観 にもあります。",
   "Use less CPU": "CPU使用率を下げる",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "この PC にはまだ Tor がありません: 「Tor を入手」（設定 > 接続）を押してダウンロードしてください。ソースから動かしている場合は scripts/buildtools/fetch_tor.py でも入手できます。",
   "Another language is downloading. Wait for it to finish.": "別の言語をダウンロード中です。終わるまで待ってください。",
@@ -4231,7 +4230,6 @@
   "Show pop-ups": "ポップアップを表示",
   "Lite mode is on: no animations, plain themes and less CPU. Click to change it.": "軽量モードがオンです：アニメーションなし、シンプルなテーマ、CPU 使用量も少なめ。クリックで変更します。",
   "Marks a tab whose feature is on, so nothing is left on without you noticing.": "機能がオンになっているタブに印を付けるので、気づかないままオンのままになることがありません。",
-  "Size and speed": "サイズと速さ",
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "オンになっているものはこの色で表示されます。スライドして自分の色を選べます。テーマを変えてもそのままです。",
   "Already in your library as “{name}”": "すでにライブラリに「{name}」として入っています",
   "Names and tags can't have links in them.": "名前とタグにはリンクを入れられません。",
@@ -4484,5 +4482,6 @@
   "Weekend Warrior": "週末の戦士",
   "Whisper": "ささやき",
   "Zen": "Zen",
-  "Reach a score of 3,000.": "スコアが 3,000 に到達する。"
+  "Reach a score of 3,000.": "スコアが 3,000 に到達する。",
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "このPCではOnion Boardをもっと軽く動かせます: 軽量モードでアニメーションをオフにできます。設定 > 一般 にもあります。"
 }

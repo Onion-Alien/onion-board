@@ -82,7 +82,7 @@ KINDS = {
 
 
 def animations_on() -> bool:
-    if lite.on():   # Settings > Appearance > Lite mode: never
+    if lite.on():   # Settings > General > Lite mode: never
         return False
     if ANIMATE is not None:
         return ANIMATE

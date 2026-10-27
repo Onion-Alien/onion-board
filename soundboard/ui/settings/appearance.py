@@ -312,7 +312,7 @@ class AppearancePage(Page):
         look, lv = self._card(_("Look"), icon="image")
         lv.setSpacing(6)
         groups = ((_("Colour"), (self._highlight_card(), self._live_tabs_card())),
-                  (_("Size and speed"), (self._ui_scale_card(), self._lite_card())),
+                  (_("Size"), (self._ui_scale_card(),)),
                   (_("Background"), (self._playing_background_card(),)))
         for i, (name, parts) in enumerate(groups):
             if i:
@@ -443,19 +443,6 @@ class AppearancePage(Page):
         textured.toggled.connect(self.mw.themectl.set_theme_texture)
         self.dlg.texture_on, self.dlg.texture_off = textured, plain
         cv.addLayout(row)
-        return card
-
-    def _lite_card(self) -> QFrame:
-        """Lite mode (ui/settings/lite.py): calmer and lighter for slower PCs, applied at once."""
-        on = QCheckBox(_("On"))
-        on.setAccessibleName(_("Lite mode"))
-        on.setChecked(self.mw.cfg.lite_mode)
-        on.toggled.connect(self.mw.themectl.set_lite_mode)
-        card, cv = self._card(_("Lite mode"),
-                              _("For slower PCs: no animations, Bun holds still and the "
-                                "themes are plain. Everything still works."), icon="leaf",
-                              end=(on,))   # (at the end of its heading, like a switch)
-        self.dlg.lite_check = on
         return card
 
     def _ui_scale_card(self) -> QFrame:

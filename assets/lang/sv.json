@@ -4010,7 +4010,6 @@
   "{n} more themes in Settings.": "{n} teman till i Inställningar.",
   "For slower PCs: no animations, Bun holds still and the themes are plain. Everything still works.": "För långsammare datorer: inga animationer, Bun står still och teman är enkla. Allt fungerar ändå.",
   "Lite mode": "Lätt läge",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > Appearance too.": "Onion Board kan gå lättare på den här datorn: Lätt läge stänger av animationerna. Det finns också under Inställningar > Utseende.",
   "Use less CPU": "Använd mindre CPU",
   "Tor isn't on this PC yet: press Get Tor (Settings > Connection) to download it. From source, scripts/buildtools/fetch_tor.py also works.": "Tor finns inte på den här datorn än: tryck på Skaffa Tor (Inställningar > Anslutning) för att ladda ner den. Från källkoden fungerar även scripts/buildtools/fetch_tor.py.",
   "Another language is downloading. Wait for it to finish.": "Ett annat språk laddas ner. Vänta tills det är klart.",
@@ -4305,7 +4304,6 @@
   "Show pop-ups": "Visa popup-fönster",
   "Lite mode is on: no animations, plain themes and less CPU. Click to change it.": "Lätt läge är på: inga animationer, enkla teman och mindre CPU. Klicka för att ändra.",
   "Marks a tab whose feature is on, so nothing is left on without you noticing.": "Markerar en flik vars funktion är på, så att inget står på utan att du märker det.",
-  "Size and speed": "Storlek och hastighet",
   "What's switched on is shown in this colour. Slide to pick your own; it stays when you change theme.": "Det som är på visas i den här färgen. Dra för att välja din egen; den stannar kvar när du byter tema.",
   "Already in your library as “{name}”": "Finns redan i ditt bibliotek som ”{name}”",
   "Names and tags can't have links in them.": "Namn och taggar får inte innehålla länkar.",
@@ -4562,5 +4560,6 @@
   "Weekend Warrior": "Weekend Warrior",
   "Whisper": "Viska",
   "Zen": "Zen",
-  "Reach a score of 3,000.": "Nå en poäng på 3 000."
+  "Reach a score of 3,000.": "Nå en poäng på 3 000.",
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board kan gå lättare på den här datorn: Lätt läge stänger av animationerna. Det finns också under Inställningar > Allmänt."
 }
