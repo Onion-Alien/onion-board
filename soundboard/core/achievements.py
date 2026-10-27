@@ -22,8 +22,11 @@ from __future__ import annotations
 import logging
 import threading
 import time
+from collections import deque
 from dataclasses import dataclass
 from collections.abc import Callable
+
+from soundboard.core.continents import CONTINENT
 
 # the rarities, commonest first: the rare loading screens' tiers (ui/bun/splashacts.py
 # RARES, splash.tier_name), whose colours the badges wear: Uncommon = Golden Bun,
@@ -66,6 +69,12 @@ ALL: tuple[Ach, ...] = (
     Ach("tastemaker", "upvotes", 100, "rare", False, "like"),
     Ach("regular", "days", 30, "uncommon", False, "history"),
     Ach("veteran", "days", 365, "legendary", False, "history"),
+    Ach("one_hit_wonder", "top_plays", 500, "rare", False, "play"),
+    Ach("tidy_desk", "tabs", 5, "common", False, "folder"),
+    Ach("download_fiend", "dl_add", 100, "rare", False, "download"),
+    Ach("weekend_warrior", "weekends", 10, "uncommon", False, "history"),
+    Ach("on_a_roll", "streak", 7, "uncommon", False, "flame"),
+    Ach("unbreakable", "streak", 30, "rare", False, "flame"),
     # hidden from here on: "???" until earned
     Ach("golden_bun", "splash_gold", 1, "uncommon", True, "bun"),
     Ach("ice_bun", "splash_ice", 1, "rare", True, "bun"),
@@ -128,7 +137,64 @@ ALL: tuple[Ach, ...] = (
     Ach("hermit", "hermit", 1, "rare", True, "offline"),
     Ach("pulled_plug", "unplugged", 1, "common", True, "mic_off"),
     Ach("old_school", "konami", 1, "rare", True, "gamepad"),
+    # how you play
+    Ach("speed_run", "speed_run", 1, "uncommon", True, "flame"),
+    Ach("broken_record", "same_day", 50, "uncommon", True, "reload"),
+    Ach("deep_cut", "deep_cut", 1, "common", True, "history"),
+    Ach("clicker", "click_plays", 1000, "uncommon", True, "play"),
+    Ach("keyboard_warrior", "hotkey_plays", 1000, "rare", True, "keyboard"),
+    Ach("tray_ninja", "tray_plays", 100, "uncommon", True, "keyboard"),
+    Ach("phone_home", "phone_plays", 100, "uncommon", True, "phone"),
+    Ach("chat_puppet", "chat_command", 100, "rare", True, "twitch"),
+    Ach("triggered", "trigger", 100, "uncommon", True, "eye"),
+    Ach("wait_your_turn", "queued", 1, "common", True, "list"),
+    Ach("whisper", "whisper", 20, "common", True, "volume"),
+    Ach("loop_de_loop", "loop_s", 10 * 60, "uncommon", True, "reload"),
+    Ach("fast_forward", "speed_max", 1, "common", True, "forward"),
+    Ach("slow_mo", "speed_min", 1, "common", True, "back"),
+    Ach("silence", "quiet_s", HOUR, "common", True, "volume_off"),
+    # the board itself
+    Ach("blink", "blink", 1, "common", True, "wink"),
+    Ach("nice", "nice", 1, "uncommon", True, "wink"),
+    Ach("marie_kondo", "deleted", 50, "uncommon", True, "trash"),
+    Ach("ctrl_z", "restored", 10, "common", True, "reload"),
+    Ach("name_tag", "renamed", 25, "common", True, "rename"),
+    Ach("painter", "recoloured", 25, "common", True, "palette"),
+    Ach("backup_plan", "backup", 1, "common", True, "archive"),
+    Ach("fresh_start", "fresh_start", 1, "common", True, "reload"),
+    # links and searches
+    Ach("bulk_buyer", "bulk_links", 10, "uncommon", True, "link"),
+    Ach("site_seer", "sites", 5, "uncommon", True, "link"),
+    Ach("search_engine", "searches", 100, "uncommon", True, "search"),
+    Ach("deja_vu", "dup", 1, "common", True, "copy"),
+    Ach("not_found", "dl_failed", 5, "common", True, "warn"),
+    # radio, voices, Bun
+    Ach("station_loyalist", "station_s", 10 * HOUR, "rare", True, "radio"),
+    Ach("seven_seas", "continents", 6, "legendary", True, "radio"),
+    Ach("quick_change", "run_voices", 10, "uncommon", True, "voice"),
+    Ach("talk_show", "voice_run_s", 3 * HOUR, "uncommon", True, "mic"),
+    Ach("lost_in_translation", "translate_s", HOUR, "rare", True, "speech"),
+    Ach("petting_zoo", "bun_clicks", 100, "uncommon", True, "bun"),
+    Ach("owl_pal", "hoot_talk", 25, "uncommon", True, "triggers"),
+    Ach("grid_master", "ttt_won", 10, "uncommon", True, "gamepad"),
+    Ach("rock_solid", "rps_streak", 5, "rare", True, "gamepad"),
+    Ach("pack_leader", "store_shared", 10, "rare", True, "upload"),
+    # the app
+    Ach("babel", "lang_switch", 5, "common", True, "speech"),
+    Ach("big_picture", "big_ui", 1, "common", True, "expand"),
+    Ach("pocket_size", "mini_s", HOUR, "uncommon", True, "fold"),
+    Ach("zen", "lite_on", 1, "common", True, "leaf"),
+    # when
+    Ach("early_bird", "early", 1, "common", True, "star"),
+    Ach("night_shift", "night_s", HOUR, "uncommon", True, "ghost"),
+    Ach("comeback_kid", "comeback", 1, "uncommon", True, "history"),
+    Ach("leet", "leet", 1, "uncommon", True, "keyboard"),
+    Ach("april_fool", "april_fool", 1, "uncommon", True, "laugh"),
+    Ach("friday_13th", "friday13", 1, "rare", True, "ghost"),
+    Ach("leap_of_faith", "leap_day", 1, "super", True, "star"),
     # the hunt itself
+    Ach("overachiever", "all_got", 50, "legendary", True, "trophy"),
+    Ach("high_score", "score", 3000, "rare", True, "trophy"),
     Ach("achievement_hunter", "hidden_got", 10, "rare", True, "trophy"),
     Ach("completionist", "all_got", 1, "super", True, "trophy"),   # every other (_goals)
 )
@@ -140,10 +206,15 @@ del _a
 
 # the stats kept as sets (their value is how many), and the most each needs to hold
 SETS = {"stations": 1000, "countries": 300, "upvotes": 100, "voices": 25, "themes": 64,
-        "months": 12, "games": 4, "packs": 6, "rares": 3}
+        "months": 12, "games": 4, "packs": 6, "rares": 3, "weekends": 10, "sites": 5,
+        "continents": 6}
 # the stats that keep the most seen, not a running total (at_least)
 BEST = {"hotkeys", "radio_run_s", "open_run_s", "sounds_added", "longest_s", "at_once",
-        "hidden_got", "all_got"}
+        "hidden_got", "all_got", "top_plays", "tabs", "streak", "same_day", "loop_s",
+        "station_s", "run_voices", "voice_run_s", "rps_streak", "night_s", "quiet_s",
+        "bulk_links", "score", "speed_run", "deep_cut", "blink", "nice", "early", "leet",
+        "april_fool", "friday13", "leap_day", "comeback", "big_ui", "lite_on", "speed_max",
+        "speed_min", "fresh_start"}
 
 # usage.used() names that count (the rest add up for nothing here)
 EVENTS = {
@@ -155,6 +226,7 @@ EVENTS = {
     "voice-roll": "voice_roll", "store-shared": "store_shared",
     "remote-used-phone": "phone", "api-chat-command": "chat_command",
     "triggers-went-off": "trigger", "mic-unplugged": "unplugged",
+    "dl-already-have": "dup",
     "egg-onion-poked": "onion_poked", "egg-onion-eaten": "onion_eaten",
     "egg-onion-please": "onion_please",
     **{f"splash-{k}": f"splash_{k}" for k in ("gold", "ice", "galaxy", "rainbow")},
@@ -164,14 +236,26 @@ PREFIX_SETS = (("egg-game-", "games", ("pong", "draw", "rps", "ttt")),
                ("pack-added-", "packs", ("streamer", "esports", "general", "podcast",
                                          "halloween", "gm-starter")),
                ("splash-", "rares", ("gold", "ice", "galaxy")))
-LIVE = {"voice": "voice_s", "apps": "apps_s", "radio": "radio_run_s"}
+LIVE = {"voice": "voice_s", "apps": "apps_s", "radio": "radio_run_s",
+        "translate": "translate_s", "mini": "mini_s"}
 DISCO = (10, 30.0)     # Disco Mode: this many theme switches inside this many seconds
 ALBUM_END = 0.99       # Full Album: a long sound last seen this far through, then gone
 # (month, day, hour, minute) a sound is played on, None for any: Spooky Season, Ho Ho
 # Honk, and Happy New Noise in the first minute of the year
 DATES = {"halloween": (10, 31, None, None), "christmas": (12, 25, None, None),
-         "new_year": (1, 1, 0, 0)}
-META = ("hidden_got", "all_got")   # the hunt's own: counted from what's been earned
+         "new_year": (1, 1, 0, 0), "april_fool": (4, 1, None, None),
+         "leap_day": (2, 29, None, None), "leet": (None, None, 13, 37)}
+EARLY_HOUR = 5         # Early Bird: a sound played between 5 and 6 in the morning
+NIGHT_HOURS = range(1, 5)   # Night Shift: the app open between 1 and 5 in the morning
+SPEED_RUN = (10, 10.0)  # Speed Run: this many sounds inside this many seconds
+DEEP_CUT_DAYS = 30     # Deep Cut: a sound not played for this many days
+STREAK_GAP = 1         # days between two launches that still keep the streak
+COMEBACK_DAYS = 30     # Comeback Kid: away at least this long
+WHISPER = 0.05         # Whisper: played this quietly (the pad's volume x Sounds)
+NICE = 69              # Nice: exactly this many sounds on the board
+SHORT_S = 1.0          # Blink: a sound shorter than this
+STATIONS_KEPT = 200    # radio stations whose listening time is kept (Station Loyalist)
+META = ("hidden_got", "all_got", "score")   # the hunt's own: counted from what's earned
 
 on_unlock: list[Callable[[str], None]] = []
 
@@ -185,6 +269,15 @@ _dirty = False
 _goals: dict[str, float] = {"completionist": len(ALL) - 1}   # set_goal()
 _switches: list[float] = []      # the last theme switches' times (Disco Mode)
 _long: dict[str, float] = {}     # a long sound playing -> how far through, last seen
+_recent: deque = deque(maxlen=SPEED_RUN[0])   # the last plays' times (Speed Run)
+_today: dict[str, int] = {}      # sid -> plays today (Broken Record), for _today_day
+_today_day = ""
+_last_play = 0.0                 # the last sound's time.monotonic() (Silence), 0: none yet
+_last_tick = 0.0                 # the last tick's time.monotonic() (Night Shift)
+_loops: dict[str, float] = {}    # a looping sound playing -> when it was first seen
+_station = ""                    # the radio station playing (Station Loyalist)
+_voices_run: set[str] = set()    # voices picked this run (Quick Change)
+_rps_run = 0                     # rock paper scissors rounds won in a row
 
 
 def attach(cfg, now: float | None = None, today: str | None = None,
@@ -210,13 +303,45 @@ def attach(cfg, now: float | None = None, today: str | None = None,
         lt = time.localtime()
         today = today or time.strftime("%Y-%m-%d", lt)
         if d["seen"].get("day") != today:
+            _new_day(d["seen"], d["seen"].get("day"), today)
             d["seen"]["day"] = today
             bump("days")
         add("months", str(lt.tm_mon if month is None else month))
         sounds_now(len(getattr(cfg, "sounds", ()) or ()))
         _switches.clear()
         _long.clear()
+        _recent.clear()
+        _today.clear()
+        _loops.clear()
+        _voices_run.clear()
+        global _last_play, _last_tick, _rps_run, _station
+        _last_play, _last_tick, _rps_run, _station = 0.0, _started, 0, ""
+        for stat in list(d["n"]):   # set while the window was closed (a reset's Fresh Start)
+            _check(stat)
         _meta()   # what was earned before the hunt's own were added counts
+
+
+def _new_day(seen: dict, last: str | None, today: str) -> None:
+    """The first launch on `today` (`last`: the one before, or None): days in a row,
+    a weekend's week, and back after a long time away."""
+    import datetime
+    try:
+        now = datetime.date.fromisoformat(today)
+    except ValueError:
+        return
+    if now.weekday() >= 5:   # Saturday or Sunday: that week's weekend counts
+        year, week, __ = now.isocalendar()
+        add("weekends", f"{year}-{week:02d}")
+    try:
+        gap = (now - datetime.date.fromisoformat(last)).days if last else None
+    except ValueError:
+        gap = None
+    run = seen.get("run")
+    run = run + 1 if gap is not None and gap <= STREAK_GAP and isinstance(run, int) else 1
+    seen["run"] = run
+    at_least("streak", run)
+    if gap is not None and gap >= COMEBACK_DAYS:
+        at_least("comeback", 1)
 
 
 def detach() -> None:
@@ -338,17 +463,113 @@ def event(key: str) -> None:
             add(stat, key[len(prefix):])
 
 
-def played(hour: int | None = None, when: time.struct_time | None = None) -> None:
+def played(hour: int | None = None, when: time.struct_time | None = None, sid: str = "",
+           plays: int = 0, gain: float = 1.0, now: float | None = None) -> None:
     """A sound was played (the 3 AM one counts the hour it was played in, the days
-    the date)."""
+    the date). `sid` the board's sound, its `plays` so far and how loud (`gain`, its
+    volume times the Sounds volume)."""
+    global _last_play, _today_day
     lt = time.localtime() if when is None else when
+    now = time.monotonic() if now is None else now
     bump("plays")
-    if (lt.tm_hour if hour is None else hour) == 3:
+    h = lt.tm_hour if hour is None else hour
+    if h == 3:
         bump("play_3am")
+    if h == EARLY_HOUR:
+        at_least("early", 1)
     for stat, (month, day, hr, minute) in DATES.items():
-        if ((lt.tm_mon, lt.tm_mday) == (month, day) and hr in (None, lt.tm_hour)
-                and minute in (None, lt.tm_min)):
-            bump(stat)
+        if (month in (None, lt.tm_mon) and day in (None, lt.tm_mday)
+                and hr in (None, h) and minute in (None, lt.tm_min)):
+            if stat in BEST:
+                at_least(stat, 1)
+            else:
+                bump(stat)
+    if lt.tm_mday == 13 and lt.tm_wday == 4:
+        at_least("friday13", 1)
+    with _lock:
+        _last_play = now
+        _recent.append(now)
+        count, secs = SPEED_RUN
+        if len(_recent) == count and now - _recent[0] <= secs:
+            at_least("speed_run", 1)
+        if not sid or _cfg is None:
+            return
+        at_least("top_plays", plays)
+        if 0 < gain <= WHISPER:
+            bump("whisper")
+        day = time.strftime("%Y-%m-%d", lt)
+        if day != _today_day:
+            _today.clear()
+            _today_day = day
+        _today[sid] = _today.get(sid, 0) + 1
+        at_least("same_day", _today[sid])
+        # each sound's last day played: a long gap is a Deep Cut (kept only for sounds
+        # on the board, so it never grows past it)
+        last = _cfg.achievements["seen"].setdefault("last", {})
+        if not isinstance(last, dict):
+            last = _cfg.achievements["seen"]["last"] = {}
+        today = int(time.mktime(lt) // 86400)
+        before = last.get(sid)
+        if isinstance(before, int) and today - before >= DEEP_CUT_DAYS:
+            at_least("deep_cut", 1)
+        last[sid] = today
+
+
+def played_by(how: str, hidden: bool = False) -> None:
+    """How a sound was started: "click" (its pad), "hotkey" (`hidden`: with the window
+    closed or minimised) or "phone" (the phone remote)."""
+    if how == "hotkey":
+        bump("hotkey_plays")
+        if hidden:
+            bump("tray_plays")
+    elif how in ("click", "phone"):
+        bump(f"{how}_plays")
+
+
+def speed(value: float, lowest: float, highest: float) -> None:
+    """The live speed was set by hand: all the way up or down."""
+    if value >= highest:
+        at_least("speed_max", 1)
+    elif value <= lowest:
+        at_least("speed_min", 1)
+
+
+def downloaded(site: str, ok: bool, kind: str) -> None:
+    """A link or search pick finished: `site` (usage.download_site's word) for an Add
+    that worked, or one more that failed."""
+    if not ok:
+        bump("dl_failed")
+    elif kind == "add":
+        add("sites", site)
+
+
+def links_added(n: int) -> None:
+    """Add all on `n` pasted links at once."""
+    at_least("bulk_links", n)
+
+
+def voice_picked(name: str) -> None:
+    """A voice was picked on the Voice tab: the different ones this run."""
+    with _lock:
+        if not name or len(_voices_run) >= 100:
+            return
+        _voices_run.add(name)
+        at_least("run_voices", len(_voices_run))
+
+
+def game_point(game: str, who: str) -> None:
+    """A point in one of Bun's games (`who` "you" or "bun"). Rock paper scissors:
+    rounds won in a row, across games."""
+    global _rps_run
+    if game == "rps":
+        _rps_run = _rps_run + 1 if who == "you" else 0
+        at_least("rps_streak", _rps_run)
+
+
+def game_won(game: str) -> None:
+    """You won one of Bun's games."""
+    if game == "ttt":
+        bump("ttt_won")
 
 
 def at_once(n: int) -> None:
@@ -388,10 +609,16 @@ def heard(progress: dict[str, float]) -> None:
         _long.update(progress)
 
 
-def station(uuid: str, country: str) -> None:
-    """A radio station started playing."""
+def station(uuid: str, country: str, cc: str = "", now: float | None = None) -> None:
+    """A radio station started playing (`cc` its ISO country code)."""
+    global _station
     add("stations", (uuid or "")[:12])
     add("countries", (country or "").upper()[:3])
+    add("continents", CONTINENT.get((cc or "").upper(), ""))
+    with _lock:
+        if "radio" in _live:   # the one before has its time so far
+            _settle("radio", time.monotonic() if now is None else now)
+        _station = (uuid or "")[:12]
 
 
 def voted(sound_id: str, mine: int) -> None:
@@ -413,6 +640,8 @@ def sounds_now(n: int) -> None:
             at_least("sounds_added", n)
         elif n > last:
             bump("sounds_added", n - last)
+        if n == NICE:
+            at_least("nice", 1)
         _dirty = True
 
 
@@ -432,11 +661,13 @@ def live(key: str, on: bool, now: float | None = None) -> None:
 
 
 def tick(now: float | None = None, tor: bool = False, offline: bool = False,
-         hotkeys: int = 0, sounds: int | None = None, longest: float = 0) -> bool:
+         hotkeys: int = 0, sounds: int | None = None, longest: float = 0,
+         shortest: float = 0, tabs: int = 0, looping=(), hour: int | None = None) -> bool:
     """The window's usage tick: live time so far, this run's length and what's set up
-    now (`longest`: the longest sound on the board, in seconds). True when something
-    changed since the last tick (save the settings)."""
-    global _dirty
+    now (`longest` / `shortest`: the longest and shortest sound on the board, in
+    seconds; `tabs` how many; `looping` the looping sounds playing). True when
+    something changed since the last tick (save the settings)."""
+    global _dirty, _last_tick
     with _lock:
         if _cfg is None:
             return False
@@ -444,6 +675,19 @@ def tick(now: float | None = None, tor: bool = False, offline: bool = False,
         for key in list(_live):
             _settle(key, now)
         at_least("open_run_s", now - _started)
+        h = time.localtime().tm_hour if hour is None else hour
+        if h in NIGHT_HOURS and now > _last_tick:
+            bump("night_s", now - _last_tick)
+        _last_tick = now
+        at_least("quiet_s", now - (_last_play or _started))
+        for sid in [s for s in _loops if s not in looping]:
+            del _loops[sid]
+        for sid in looping:
+            at_least("loop_s", now - _loops.setdefault(sid, now))
+        if 0 < shortest < SHORT_S:
+            at_least("blink", 1)
+        if tabs:
+            at_least("tabs", tabs)
         for stat, on in (("tor", tor), ("offline", offline), ("hermit", tor and offline)):
             if on and not value(stat):
                 bump(stat)
@@ -462,8 +706,17 @@ def _settle(key: str, now: float) -> None:
     longest run without a break."""
     if key == "radio":
         at_least("radio_run_s", now - _on_since[key])
+        if _cfg is not None and _station and now > _live[key]:   # this station's, all told
+            kept = _cfg.achievements["seen"].setdefault("stations_s", {})
+            if not isinstance(kept, dict):
+                kept = _cfg.achievements["seen"]["stations_s"] = {}
+            if _station in kept or len(kept) < STATIONS_KEPT:
+                kept[_station] = kept.get(_station, 0) + now - _live[key]
+                at_least("station_s", kept[_station])
     elif now > _live[key]:
         bump(LIVE[key], now - _live[key])
+        if key == "voice":   # the longest stretch without a break (Talk Show)
+            at_least("voice_run_s", now - _on_since[key])
     _live[key] = now
 
 
@@ -481,6 +734,8 @@ def _check(stat: str) -> None:
                     log.exception("achievement listener")
             if stat not in META:
                 _meta()
+            elif stat != "score":   # (a hunt's own one adds to the score too)
+                at_least("score", score())
 
 
 def _meta() -> None:
@@ -490,3 +745,4 @@ def _meta() -> None:
     gots = _cfg.achievements["got"]
     at_least("hidden_got", sum(1 for a in ALL if a.hidden and a.id in gots))
     at_least("all_got", sum(1 for a in ALL if a.id != "completionist" and a.id in gots))
+    at_least("score", sum(points(a) for a in ALL if a.id in gots))

@@ -183,7 +183,12 @@ class WindowLife(WindowParts):
         if achievements.tick(tor=net.mode() == net.TOR, offline=net.offline(),
                              hotkeys=sum(1 for m in cfg.sounds if m.hotkey),
                              sounds=len(cfg.sounds),
-                             longest=max((m.duration for m in cfg.sounds), default=0)):
+                             longest=max((m.duration for m in cfg.sounds), default=0),
+                             shortest=min((m.duration for m in cfg.sounds if m.duration > 0),
+                                          default=0),
+                             tabs=len(cfg.categories),
+                             looping=[s for s in self.engine.playing()
+                                      if s in {m.id for m in cfg.sounds if m.loop}]):
             self._save_later()
 
     def _mark_stopped(self):

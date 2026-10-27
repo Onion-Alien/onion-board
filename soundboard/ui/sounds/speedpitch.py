@@ -785,6 +785,8 @@ class SpeedPitchButton(QPushButton):
         if names and self.pop.isVisible():
             if "pitch" in names:   # Chipmunk / Demon Mode
                 achievements.pitched(self.pitch.value())
+            if "speed" in names:   # Fast Forward / Slow Mo
+                achievements.speed(self.speed.value(), SPEED.lo, SPEED.hi)
             usage.used(f"live-changed-{self._what}")
             for n in names:
                 usage.used(f"live-{n}")

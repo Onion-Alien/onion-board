@@ -104,6 +104,8 @@ class ThemeControl(Controller):
     def set_lite_mode(self, on: bool):
         """Lite mode (ui/settings/lite.py): animations, Bun's and the logo's idle moves and the
         textures off, at once; off again puts them back."""
+        if on:
+            achievements.at_least("lite_on", 1)   # (Zen)
         from soundboard.ui.bun.bunnywidget import BunnyWidget
         mw = self.mw
         if on == lite.on():

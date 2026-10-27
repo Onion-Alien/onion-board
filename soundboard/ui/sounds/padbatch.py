@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (QApplication, QColorDialog, QFrame, QHBoxLayout, 
                                QLabel, QMenu, QPushButton, QWidget)
 
 from soundboard.sounds import library
-from soundboard.core import usage
+from soundboard.core import achievements, usage
 from soundboard.sounds.library import MAX_FADE_S, PAD_COLORS, SoundMeta
 from soundboard.ui.kit import icons
 from soundboard.ui.kit.widgets import DropdownMenu
@@ -260,6 +260,7 @@ class PadSelection(QObject):
         self.mw.toast(_("{what} on {count}", what=what, count=count(n)), "ok")
 
     def set_color(self, color: str):
+        achievements.bump("recoloured", sum(1 for m in self.sounds() if m.color != color))
         for m in self.sounds():
             m.color = color
         self._changed()

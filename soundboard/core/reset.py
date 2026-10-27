@@ -69,6 +69,8 @@ KEEP = {"version", "sounds", "categories", "category", "category_hotkeys", "voic
         "update_auto_tried",
         "stats_id", "stats_sent", "stats_heard", "stats_started", "stats_steps", "mic_first",
         "duck_on", "duck_off", "stats_version", "stats_pending",
+        # Settings > Achievements: what was earned is never reset (Fresh Start is earned)
+        "achievements",
         # how it goes online: a reset never takes someone off Tor, a proxy or Offline
         # mode, nor switches a feature they turned off back on
         "net_mode", "net_proxy", "net_off", "net_offline", "tor_bridges",
@@ -212,6 +214,10 @@ def reset(parts: list[str]) -> str:
         _keep_sounds(cfg, point)
         cfg.sounds, cfg.categories, cfg.category = [], [], ""
     if SETTINGS in parts:
+        if isinstance(cfg.achievements, dict):   # Fresh Start: earned at the next start
+            n = cfg.achievements.setdefault("n", {})
+            if isinstance(n, dict):
+                n["fresh_start"] = 1
         fresh = Config()
         radio = {k: cfg.radio[k] for k in RADIO_KEEP if k in cfg.radio}
         for f in fields(Config):

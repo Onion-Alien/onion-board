@@ -127,7 +127,7 @@ class PlaybackControl(Controller):
         self._last_sid = sid
         if sid != LINK_ID:
             m.plays += 1   # Most played
-            achievements.played()
+            achievements.played(sid=sid, plays=m.plays, gain=m.volume * mw.cfg.sound_vol)
             if not self._count_save.isActive():
                 self._count_save.start()
         v = mw.engine.play(sid, data, mw.gain_for(m), loop=m.loop,
@@ -220,10 +220,16 @@ class PlaybackControl(Controller):
         playing = mw.engine.playing() if playing is None else playing
         return any(sid in mw._meta and not mw._meta[sid].loop for sid in playing)
 
+    def clicked(self, sid: str):
+        """A pad clicked (or Enter on it): played as its settings say."""
+        achievements.played_by("click")
+        self.play(sid)
+
     def queue_sound(self, sid: str) -> bool:
         """Play `sid` once the board's sounds playing now have finished (now, if none are:
         True then)."""
         mw = self.mw
+        achievements.at_least("queued", 1)   # (Wait Your Turn)
         if (not self._pads_playing() and not self._queue
                 and not mw.linkbar.up_next() and LINK_ID not in mw.engine.playing()):
             self.play(sid, now=True)

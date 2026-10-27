@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QBoxLayout, QWidgetItem
 
+from soundboard.core import achievements
 from soundboard.ui.window import responsive
 from soundboard.ui.kit import toast as toastmod
 from soundboard.ui.window.controller import Controller
@@ -321,6 +322,7 @@ class FitControl(Controller):
         mw = self.mw
         if on == self.is_mini():
             return
+        achievements.live("mini", on)   # (Pocket Size)
         scroll = mw._pads_scroll
         with responsive.hold_updates(mw):
             mw.grid.set_two_up(on)

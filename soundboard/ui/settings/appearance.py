@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QColorDialog, QComboBox,
                                QSizePolicy, QSlider, QVBoxLayout, QWidget)
 
 from soundboard import i18n
+from soundboard.core import achievements
 from soundboard.ui.kit import theme
 from soundboard.i18n import _
 from soundboard.ui.kit import busy
@@ -478,6 +479,8 @@ class AppearancePage(Page):
             restart.setVisible(later)
 
         def picked(i):
+            if i == combo.count() - 1:   # the biggest (Big Picture)
+                achievements.at_least("big_ui", 1)
             self.mw.cfg.ui_scale = combo.itemData(i)
             self.mw._save_later()
             show()

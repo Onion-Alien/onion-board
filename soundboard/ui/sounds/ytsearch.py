@@ -25,7 +25,7 @@ from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequ
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QMenu, QPushButton, QScrollArea,
                                QSizePolicy, QVBoxLayout, QWidget)
 
-from soundboard.core import usage
+from soundboard.core import achievements, usage
 from soundboard.online import quality
 from soundboard.online import net, netlog, ytdl
 from soundboard.ui.kit import busy, icons
@@ -264,6 +264,7 @@ class SearchResults(RoundedFrame):
             return False
         if not direct and self._running == (query, self.source) and not self.isHidden():
             return True   # Enter spammed: the same search is still on its way
+        achievements.bump("searches")   # (Search Engine)
         self._running = (query, self.source)
         self.failed = False
         self.query = query

@@ -522,7 +522,8 @@ class RadioTab(RadioMap, RadioSearch, RadioInfo, QWidget):
 
     def _on_state(self, st: str):
         if st == "playing" and self.player.station is not None:   # (Settings > Achievements)
-            achievements.station(self.player.station.uuid, self.player.station.country)
+            achievements.station(self.player.station.uuid, self.player.station.country,
+                                 self.player.station.cc)
         if st == "stopped":        # what the engine still had queued doesn't play out
             self.engine.stop_radio()
         self._flash_until = 0.0    # what's playing matters more than an older notice
