@@ -4525,6 +4525,31 @@
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows не смогла определить, общедоступная ли это сеть, поэтому телефоны на всякий случай не допускаются. Сделайте её частной в Параметрах Windows → Сеть и Интернет, затем выключите и снова включите эту функцию",
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Как громко другие слышат твои звуки (и твой стрим). У твоих наушников своя громкость: Мои наушники, в самом низу. В поле можно ввести до 1000%.",
   "Sounds for others": "Звуки для других",
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board может работать легче на этом ПК: облегчённый режим выключает анимации. Он есть и в Настройки > Общие.",
+  "Add all ({n})": "Добавить все ( {n} )",
+  "Can't use these links": "Не могу использовать эти ссылки",
+  "Looking up {n} link…": [
+    "Поиск ссылки {n} …",
+    "Поиск ссылок {n} …",
+    "Поиск ссылок {n} …"
+  ],
+  "None of these links could be looked up.": "Ни по одной из этих ссылок не удалось найти.",
+  "Tor was turned away.": "Тор был отвергнут.",
+  "{n} couldn't be used": [
+    "{n} невозможно использовать",
+    "{n} невозможно использовать",
+    "{n} невозможно использовать"
+  ],
+  "{n} link": [
+    "{n} ссылка",
+    "{n} ссылок",
+    "{n} ссылок"
+  ],
+  "{n} of them is on your board already.": [
+    "{n} из них уже на вашей доске.",
+    "{n} из них уже на вашей доске.",
+    "{n} из них уже на вашей доске."
+  ],
   "404": "404",
   "Add 10 pasted links at once.": "Добавьте сразу 10 вставленных ссылок.",
   "Add 100 sounds from links or searches.": "Добавьте 100 звуков из ссылок или поиска.",
@@ -4638,6 +4663,5 @@
   "Weekend Warrior": "Воин выходного дня",
   "Whisper": "Шепот",
   "Zen": "Zen",
-  "Reach a score of 3,000.": "Наберите 3000 очков.",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board может работать легче на этом ПК: облегчённый режим выключает анимации. Он есть и в Настройки > Общие."
+  "Reach a score of 3,000.": "Наберите 3000 очков."
 }

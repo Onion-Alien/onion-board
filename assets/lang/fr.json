@@ -4447,6 +4447,27 @@
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows n'a pas pu dire si ce réseau est public, alors les téléphones sont refusés par prudence. Réglez-le sur Privé dans Paramètres Windows → Réseau et Internet, puis désactivez et réactivez cette option",
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Le volume auquel les autres entendent tes sons (et ton stream). Ton casque a son propre volume : Mon casque, tout en bas. Tape jusqu'à 1000% dans la case.",
   "Sounds for others": "Sons pour les autres",
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board peut tourner plus léger sur ce PC : le mode léger coupe les animations. Il est aussi dans Paramètres > Général.",
+  "Add all ({n})": "Ajouter tout ( {n} )",
+  "Can't use these links": "Je ne peux pas utiliser ces liens",
+  "Looking up {n} link…": [
+    "Recherche du lien {n} …",
+    "Recherche de {n} liens…"
+  ],
+  "None of these links could be looked up.": "Aucun de ces liens n'a pu être consulté.",
+  "Tor was turned away.": "Tor a été refoulé.",
+  "{n} couldn't be used": [
+    "{n} n'a pas pu être utilisé",
+    "{n} n'a pas pu être utilisé"
+  ],
+  "{n} link": [
+    "{n} lien",
+    "{n} liens"
+  ],
+  "{n} of them is on your board already.": [
+    "{n} d'entre eux sont déjà sur votre tableau.",
+    "{n} d'entre eux sont déjà sur votre tableau."
+  ],
   "404": "404",
   "Add 10 pasted links at once.": "Ajoutez 10 liens collés à la fois.",
   "Add 100 sounds from links or searches.": "Ajoutez 100 sons à partir de liens ou de recherches.",
@@ -4560,6 +4581,5 @@
   "Weekend Warrior": "Guerrier du week-end",
   "Whisper": "Chuchoter",
   "Zen": "Zen",
-  "Reach a score of 3,000.": "Atteignez un score de 3 000.",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board peut tourner plus léger sur ce PC : le mode léger coupe les animations. Il est aussi dans Paramètres > Général."
+  "Reach a score of 3,000.": "Atteignez un score de 3 000."
 }

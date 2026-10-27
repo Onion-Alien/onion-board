@@ -4447,6 +4447,27 @@
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows kunde inte säga om det här nätverket är offentligt, så telefoner avvisas för säkerhets skull. Ställ in det som Privat i Windows-inställningar → Nätverk och internet och stäng sedan av och slå på det här igen",
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Hur högt andra hör dina ljud (och din stream). Dina egna hörlurar har egen volym: Mina hörlurar, längst ner. Skriv upp till 1000% i rutan.",
   "Sounds for others": "Ljud till andra",
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board kan gå lättare på den här datorn: Lätt läge stänger av animationerna. Det finns också under Inställningar > Allmänt.",
+  "Add all ({n})": "Lägg till alla ( {n} )",
+  "Can't use these links": "Kan inte använda dessa länkar",
+  "Looking up {n} link…": [
+    "Söker upp {n} länk...",
+    "Söker upp {n} länkar..."
+  ],
+  "None of these links could be looked up.": "Ingen av dessa länkar gick att slå upp.",
+  "Tor was turned away.": "Tor avvisades.",
+  "{n} couldn't be used": [
+    "{n} kunde inte användas",
+    "{n} kunde inte användas"
+  ],
+  "{n} link": [
+    "{n} länk",
+    "{n} länkar"
+  ],
+  "{n} of them is on your board already.": [
+    "{n} av dem finns redan på din tavla.",
+    "{n} av dem finns redan på din tavla."
+  ],
   "404": "404",
   "Add 10 pasted links at once.": "Lägg till 10 inklistrade länkar samtidigt.",
   "Add 100 sounds from links or searches.": "Lägg till 100 ljud från länkar eller sökningar.",
@@ -4560,6 +4581,5 @@
   "Weekend Warrior": "Weekend Warrior",
   "Whisper": "Viska",
   "Zen": "Zen",
-  "Reach a score of 3,000.": "Nå en poäng på 3 000.",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board kan gå lättare på den här datorn: Lätt läge stänger av animationerna. Det finns också under Inställningar > Allmänt."
+  "Reach a score of 3,000.": "Nå en poäng på 3 000."
 }

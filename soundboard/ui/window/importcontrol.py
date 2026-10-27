@@ -199,12 +199,15 @@ class ImportControl(BackupImport, PackImport, Controller):
             self.import_files(expand_dropped([folder]))
 
     def add_from_link(self):
-        """A link already copied goes straight into the search box (its card shows);
-        otherwise the box is focused for one to be pasted."""
+        """A link already copied goes straight into the search box (its card shows),
+        and so do several (their cards, with Add all); otherwise the box is focused for
+        one to be pasted."""
         mw = self.mw
         copied = QApplication.clipboard().text().strip()
-        if ytdl.as_link(copied):
-            mw.search.setText(copied)
+        many = ytdl.as_links(copied)
+        if ytdl.as_link(copied) or many:
+            mw.search.setText(" ".join(many) if many else copied)
+            mw.searchctl.flush_search()   # (the link bar has them now)
             mw.searchctl._show_link()
         else:
             mw.toast(_("Paste a link into the search box"))

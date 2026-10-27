@@ -4447,6 +4447,27 @@
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows ei pystynyt kertomaan, onko tämä verkko julkinen, joten puhelimet torjutaan varmuuden vuoksi. Aseta se yksityiseksi kohdassa Windowsin asetukset → Verkko ja internet ja kytke tämä sitten pois ja takaisin päälle",
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Kuinka kovaa muut kuulevat äänesi (ja streamisi). Omilla kuulokkeillasi on oma äänenvoimakkuutensa: Kuulokkeeni, alhaalla. Kirjoita ruutuun jopa 1000%.",
   "Sounds for others": "Äänet muille",
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board voi toimia kevyemmin tällä koneella: Kevyt tila sammuttaa animaatiot. Se löytyy myös kohdasta Asetukset > Yleiset.",
+  "Add all ({n})": "Lisää kaikki ( {n} )",
+  "Can't use these links": "Näitä linkkejä ei voi käyttää",
+  "Looking up {n} link…": [
+    "Haetaan {n} linkkiä…",
+    "Haetaan {n} linkkiä…"
+  ],
+  "None of these links could be looked up.": "Mitään näistä linkeistä ei voitu etsiä.",
+  "Tor was turned away.": "Tor käännettiin pois.",
+  "{n} couldn't be used": [
+    "{n} ei voitu käyttää",
+    "{n} ei voitu käyttää"
+  ],
+  "{n} link": [
+    "{n} linkki",
+    "{n} linkkiä"
+  ],
+  "{n} of them is on your board already.": [
+    "{n} heistä on jo taulullasi.",
+    "{n} heistä on jo taulullasi."
+  ],
   "404": "404",
   "Add 10 pasted links at once.": "Lisää 10 liitettyä linkkiä kerralla.",
   "Add 100 sounds from links or searches.": "Lisää 100 ääntä linkeistä tai hauista.",
@@ -4560,6 +4581,5 @@
   "Weekend Warrior": "Viikonlopun soturi",
   "Whisper": "Kuiskaus",
   "Zen": "Zen",
-  "Reach a score of 3,000.": "Saavuta 3 000 pistemäärä.",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board voi toimia kevyemmin tällä koneella: Kevyt tila sammuttaa animaatiot. Se löytyy myös kohdasta Asetukset > Yleiset."
+  "Reach a score of 3,000.": "Saavuta 3 000 pistemäärä."
 }

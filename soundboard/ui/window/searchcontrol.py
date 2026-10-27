@@ -10,10 +10,11 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtCore import Qt
 
+from soundboard.core import achievements
 from soundboard.sounds import library, sourceinfo
 from soundboard.online import net, ytdl
 from soundboard.audio.engine import SR
-from soundboard.i18n import _
+from soundboard.i18n import _, ngettext
 from soundboard.sounds.library import SoundMeta
 from soundboard.ui.kit import busy, icons
 from soundboard.ui.window.controller import Controller
@@ -59,7 +60,7 @@ class SearchControl(Controller):
         mw = self.mw
         self.flush_search()
         text = mw.search.text()
-        if ytdl.as_link(text):
+        if ytdl.as_link(text) or ytdl.as_links(text):
             self._show_link()
             return
         if not mw.ytresults.available():
@@ -90,7 +91,8 @@ class SearchControl(Controller):
     def on_search_enter(self):
         mw = self.mw
         self.flush_search()   # a link pasted a moment ago: the link bar has it now
-        if ytdl.as_link(mw.search.text()):
+        text = mw.search.text()
+        if ytdl.as_link(text) or ytdl.as_links(text):
             self._show_link()   # its card, at once: nothing downloads until Play / Add
         else:
             self.search_youtube()
@@ -106,11 +108,48 @@ class SearchControl(Controller):
         if mw.ytresults.link and not mw.ytresults.isHidden():
             mw.ytresults.close_results()
 
+    def _on_links_changed(self, urls: list):
+        """Several links pasted: their cards once the box stays like that; none any
+        more: their cards go."""
+        mw = self.mw
+        if urls:
+            mw._link_wait.start()
+            return
+        mw._link_wait.stop()
+        if mw.ytresults.links and not mw.ytresults.isHidden():
+            mw.ytresults.close_results()
+
+    def _show_links(self):
+        """Several links pasted: a card each, looked up, not downloaded (Add all)."""
+        mw = self.mw
+        urls = [u for u in mw.linkbar.many if ytdl.site_allowed(u)]
+        if not urls:
+            mw.toast(net.off_message(ytdl.site_feature(mw.linkbar.many[0])))
+            return
+        if mw.ytresults.show_links(urls):
+            self._results_shown()
+
+    def add_all(self, results: list):
+        """Add all on the pasted links' cards: each one not on the board yet goes to the
+        download queue (one downloads, the rest wait their turn in the download bar)."""
+        mw = self.mw
+        new = [r for r in results if self._pad_for_link(r.url) is None]
+        have = len(results) - len(new)
+        achievements.links_added(len(new))   # (Bulk Buyer)
+        for r in new:
+            self._from_youtube(r, play=False)
+        if have:
+            mw.toast(ngettext("{n} of them is on your board already.",
+                              "{n} of them are on your board already.", have))
+
     def _show_link(self):
         """The search box's link as a result card: looked up, not downloaded."""
         mw = self.mw
         mw._link_wait.stop()
         url = mw.linkbar.url
+        if not url and mw.linkbar.many and not mw.fitctl.is_mini():
+            self._show_links()
+            return
         if not url or mw.fitctl.is_mini():
             return
         if not ytdl.site_allowed(url):
@@ -192,6 +231,11 @@ class SearchControl(Controller):
 
     def _on_search_text(self, text: str):
         mw = self.mw
+        if "\n" in text or "\r" in text:   # links pasted a line each: one line of them
+            flat = " ".join(text.split())
+            mw._search_typed = flat if mw._search_typed == text else None
+            mw.search.setText(flat)   # (this again, with the flat text)
+            return
         typed, mw._search_typed = mw._search_typed == text, None
         if typed:
             mw._search_wait.start()   # each key restarts it: filter once typing pauses
@@ -214,7 +258,8 @@ class SearchControl(Controller):
             mw.overlay.sounds_changed()
         # a link filters nothing, and nor does the box in the mini player, which hides
         # it: a web search's words left there showed a blank mini player
-        t = "" if mw.linkbar.url or mw.fitctl.is_mini() else text.strip().lower()
+        t = ("" if mw.linkbar.url or mw.linkbar.many or mw.fitctl.is_mini()
+             else text.strip().lower())
         cat, sub, hidden = mw.cfg.category, mw.cfg.subcategory, mw.cfg.hidden_from_all
         changed = False
         for m in mw.cfg.sounds:

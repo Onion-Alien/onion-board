@@ -4369,6 +4369,23 @@
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows không xác định được mạng này có phải là Công cộng hay không, nên điện thoại bị từ chối để đảm bảo an toàn. Hãy đặt mạng thành Riêng tư trong Cài đặt Windows → Mạng & Internet, rồi tắt và bật lại tùy chọn này",
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Người khác nghe âm thanh của bạn to đến mức nào (và luồng phát của bạn). Tai nghe của bạn có âm lượng riêng: Tai nghe của tôi, ở dưới cùng. Gõ đến 1000% vào ô.",
   "Sounds for others": "Âm thanh cho người khác",
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board có thể chạy nhẹ hơn trên PC này: Chế độ nhẹ tắt các hiệu ứng động. Nó cũng có trong Cài đặt > Chung.",
+  "Add all ({n})": "Cộng tất cả ( {n} )",
+  "Can't use these links": "Không thể sử dụng các liên kết này",
+  "Looking up {n} link…": [
+    "Đang tra cứu {n} liên kết…"
+  ],
+  "None of these links could be looked up.": "Không có liên kết nào trong số này có thể được tra cứu.",
+  "Tor was turned away.": "Tor đã bị quay lưng.",
+  "{n} couldn't be used": [
+    "{n} không thể sử dụng được"
+  ],
+  "{n} link": [
+    "{n} liên kết"
+  ],
+  "{n} of them is on your board already.": [
+    "{n} trong số họ đã có mặt trên bảng của bạn."
+  ],
   "404": "404",
   "Add 10 pasted links at once.": "Thêm 10 liên kết được dán cùng một lúc.",
   "Add 100 sounds from links or searches.": "Thêm 100 âm thanh từ liên kết hoặc tìm kiếm.",
@@ -4482,6 +4499,5 @@
   "Weekend Warrior": "Chiến binh cuối tuần",
   "Whisper": "Thì thầm",
   "Zen": "Zen",
-  "Reach a score of 3,000.": "Đạt số điểm 3.000.",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board có thể chạy nhẹ hơn trên PC này: Chế độ nhẹ tắt các hiệu ứng động. Nó cũng có trong Cài đặt > Chung."
+  "Reach a score of 3,000.": "Đạt số điểm 3.000."
 }

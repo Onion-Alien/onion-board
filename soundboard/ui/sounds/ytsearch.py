@@ -32,7 +32,7 @@ from soundboard.ui.kit import busy, icons
 from soundboard.ui.kit.panel import CardGrid, Flow, RoundedFrame
 from soundboard.ui.window.responsive import FitWidth
 from soundboard.core import errors
-from soundboard.i18n import _
+from soundboard.i18n import _, ngettext
 from soundboard.ui.sounds.ytcard import ResultRow
 from soundboard.ui.sounds.ytwaiting import BackHome, SearchingView
 # (callers import these from here too)
@@ -45,6 +45,7 @@ log = logging.getLogger(__name__)
 
 CARD_MIN_W = 210             # results are cards, as many across as fit at this width
 LINK_CARD_MAX_W = 820        # a pasted link's card: picture beside the words, this wide at most
+LINK_LOOKUPS = 4   # pasted links looked up at once (show_links)
 PAGE = 20          # hits per search, and per Show more
 THUMB_TIMEOUT_MS = 15_000     # a picture with no bytes arriving for this long is dropped
 THUMB_MAX_BYTES = 5_000_000   # a thumbnail is ~100 kB; a page's og:image can be anything
@@ -80,6 +81,7 @@ class SearchResults(RoundedFrame):
     re-run it there; source_changed(key) says which one it is now."""
     play = Signal(object)
     add = Signal(object)
+    add_all = Signal(list)   # several pasted links' cards: Add all (their results)
     closed = Signal()
     thumb_ready = Signal(str, object)
     source_changed = Signal(str)
@@ -99,6 +101,8 @@ class SearchResults(RoundedFrame):
         self._running: tuple[str, str] | None = None   # (query, site) still being searched
         self._asked = PAGE      # hits asked for so far (Show more asks for the next PAGE)
         self._rows: list[ResultRow] = []
+        self.links: list[str] = []   # several links pasted at once (show_links)
+        self._links_failed = 0       # ...of which this many couldn't be looked up
         self._fetching: dict[str, set[str]] = {}   # url -> {"play", "add"} downloading
         # thumbnails, one network manager per site switch (Settings > Privacy & security)
         self._nams: dict[str, QNetworkAccessManager] = {}
@@ -124,6 +128,14 @@ class SearchResults(RoundedFrame):
         self.heading.setProperty("head", True)   # no space above: in line with Back
         self.heading.hide()
         head.addWidget(self.heading)
+        # several pasted links: all of them to the download queue in one click
+        self.add_all_btn = QPushButton()
+        self.add_all_btn.setObjectName("primary")
+        self.add_all_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        icons.set_icon(self.add_all_btn, "plus", "on_accent", size=16)
+        self.add_all_btn.clicked.connect(self._add_all)
+        self.add_all_btn.hide()
+        head.addWidget(self.add_all_btn)
         self.site_actions: dict[str, QAction] = {}
         group = QActionGroup(self)
         group.setExclusive(True)
@@ -267,6 +279,7 @@ class SearchResults(RoundedFrame):
         achievements.bump("searches")   # (Search Engine)
         self._running = (query, self.source)
         self.failed = False
+        self._set_links([])
         self.query = query
         self.link = ""
         self._set_trending(False)
@@ -297,6 +310,7 @@ class SearchResults(RoundedFrame):
             return True   # already showing (Enter after the paste looked it up)
         self.query = self.link = url
         self._running = None
+        self._set_links([])
         self.failed = False
         self._set_trending(False)
         self._gen += 1
@@ -313,6 +327,69 @@ class SearchResults(RoundedFrame):
                          daemon=True, name="link-lookup").start()
         return True
 
+    def show_links(self, urls: list[str], direct: bool = False) -> bool:
+        """Several pasted links: each looked up (nothing downloaded) and shown as a card
+        like a search hit, with Add all over them."""
+        urls = [u for u in urls if ytdl.site_allowed(u)]
+        if not urls:
+            return False
+        if urls == self.links and not direct and not self.isHidden() and (
+                self._rows or self.loading.running()):
+            return True   # already showing
+        self.query, self.link = " ".join(urls), ""
+        self._running = None
+        self.failed = False
+        self._set_trending(False)
+        self._set_links(urls)
+        self._gen += 1
+        self._clear()
+        netlog.cause(ytdl.FEATURE, f"You pasted {len(urls)} links: looking up their names, "
+                                   "pictures and lengths" + (" (without Tor)" if direct else ""))
+        text = ngettext("Looking up {n} link…", "Looking up {n} links…", len(urls))
+        self.title.setText(text)
+        self._loading(True, text)
+        self.show()
+        self.direct_btn.hide()
+        threading.Thread(target=self._work_links, args=(self._gen, list(urls), direct),
+                         daemon=True, name="links-lookup").start()
+        return True
+
+    def _set_links(self, urls: list[str]):
+        """Several links' mode (urls) or not ([]): its heading and Add all."""
+        self.links = list(urls)
+        self._links_failed = 0
+        if not urls:
+            self.add_all_btn.hide()
+            if not self.trending:
+                self.heading.hide()
+
+    def _to_add(self) -> list:
+        """The pasted links' cards Add all would still add: not added, not on their way."""
+        return [r for r in self._rows if not r._added
+                and "add" not in self._fetching.get(r.result.url, ())]
+
+    def _links_heading(self):
+        """"5 links", and Add all with how many it still adds (none: it goes)."""
+        text = ngettext("{n} link", "{n} links", len(self._rows))
+        if self._links_failed:
+            text += "  ·  " + ngettext("{n} couldn't be used", "{n} couldn't be used",
+                                       self._links_failed)
+        self.heading.setText(text)
+        self.heading.show()
+        n = len(self._to_add())
+        self.add_all_btn.setText(_("Add all ({n})", n=n))
+        if not n and self.add_all_btn.hasFocus():
+            self.btn_back.setFocus()   # (not lost with the button)
+        self.add_all_btn.setVisible(n > 0)
+
+    def _add_all(self):
+        """Add all: every card's sound not added yet to the download queue
+        (searchcontrol.add_all); clicked again, only what's left."""
+        results = [r.result for r in self._to_add()]
+        if results:
+            self.add_all.emit(results)
+        self._links_heading()
+
     def show_trending(self, direct: bool = False) -> bool:
         """Myinstants' trending sounds as cards, to play or add like search hits (the
         search box's words, if any, stay as they are). False when Myinstants is
@@ -325,6 +402,7 @@ class SearchResults(RoundedFrame):
             return True   # picked again while it shows (or is still on its way)
         self.query = self.link = ""
         self._running = None
+        self._set_links([])
         self.failed = False
         self._set_trending(True)
         self._gen += 1
@@ -349,6 +427,8 @@ class SearchResults(RoundedFrame):
     def _without_tor(self):
         if self.trending:
             self.show_trending(direct=True)
+        elif self.links:
+            self.show_links(self.links, direct=True)
         elif self.link:
             self.show_link(self.link, direct=True)
         else:
@@ -360,6 +440,7 @@ class SearchResults(RoundedFrame):
         self._loading(False)
         self._clear()
         self.link = ""
+        self._set_links([])
         self._set_trending(False)
         self.hide()
         self.closed.emit()
@@ -401,6 +482,8 @@ class SearchResults(RoundedFrame):
         """The same search (trending list, link) once more, the same way."""
         if self.trending:
             self.show_trending()
+        elif self.links:
+            self.show_links(self.links)
         elif self.link:
             self.show_link(self.link)
         else:
@@ -420,6 +503,8 @@ class SearchResults(RoundedFrame):
                     r.set_busy(kind)
                 else:
                     r.set_done(kind, ok)
+        if self.links and kind == "add":   # Add all counts what's left
+            self._links_heading()
 
     def show_now(self, url: str, now: str):
         """The player has `url` loaded ("playing" / "paused"), or nothing from here
@@ -471,7 +556,8 @@ class SearchResults(RoundedFrame):
 
     def _more(self):
         """Show more: the next PAGE hits of the same search, added under the cards."""
-        if self._more_release is not None or not (self.query or self.trending) or self.link:
+        if (self._more_release is not None or not (self.query or self.trending) or self.link
+                or self.links):
             return
         start, self._asked = self._asked + 1, min(self._asked + PAGE, MAX_RESULTS)
         self._more_release = busy.hold(self.more_btn, _("Loading…"))
@@ -517,6 +603,28 @@ class SearchResults(RoundedFrame):
             self._why = errors.download_reason(e)
             busy.emit(self._done, gen, [], errors.html(e, where="Looking up a link"))
 
+    def _work_links(self, gen: int, urls: list[str], direct: bool):
+        """Each pasted link looked up, a few at a time; the ones that work, in the
+        order they were pasted (the others counted: _links_failed)."""
+        def one(url):
+            try:
+                return ytdl.lookup(url, **({"direct": True} if direct else {}))
+            except ytdl.TorBlocked:
+                return "blocked"
+            except Exception as e:  # noqa: BLE001 - counted, the rest still show
+                log.info("link look-up failed for %s: %s", url, e)
+                self._why = errors.download_reason(e)
+                return None
+        with ThreadPoolExecutor(max_workers=LINK_LOOKUPS, thread_name_prefix="links") as pool:
+            found = list(pool.map(one, urls))
+        ok = [f for f in found if f is not None and f != "blocked"]
+        if not ok and "blocked" in found:
+            busy.emit(self._done, gen, "blocked", html.escape(_("Tor was turned away.")))
+            return
+        self._links_failed = len(found) - len(ok)
+        busy.emit(self._done, gen, ok, "" if ok else html.escape(
+            _("None of these links could be looked up.")))
+
     def _on_done(self, gen: int, results, err: str):
         if gen != self._gen:
             return
@@ -537,7 +645,9 @@ class SearchResults(RoundedFrame):
         q = html.escape(self.query)
         self.failed = bool(err)
         if err:
-            if self.link:   # err: rich text
+            if self.links:
+                self._fail(_("Can't use these links"), err)
+            elif self.link:   # err: rich text
                 self._fail(_("Can't use this link"), err)
                 busy.toast(self.window(), _("Can't use this link: {error}", error=err),
                            "error", 8000)   # not only in the panel
@@ -553,6 +663,8 @@ class SearchResults(RoundedFrame):
             return
         # the cards say it all; the message is for "no results" / errors
         self._add_rows(results, gen)
+        if self.links:
+            self._links_heading()
         # a full first page: there may be more of them
         self.more_btn.setVisible(not self.link and len(results) >= PAGE // 2)
 

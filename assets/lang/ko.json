@@ -4369,6 +4369,23 @@
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows에서 이 네트워크가 공용인지 확인할 수 없어 안전을 위해 휴대폰 연결을 거부합니다. Windows 설정 → 네트워크 및 인터넷에서 개인으로 설정한 다음 이 기능을 껐다가 다시 켜세요",
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "다른 사람(과 방송)에게 사운드가 얼마나 크게 들리는지입니다. 내 헤드폰은 따로 볼륨이 있습니다: 맨 아래의 내 헤드폰. 상자에 최대 1000%까지 입력할 수 있습니다.",
   "Sounds for others": "다른 사람에게 가는 사운드",
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "이 PC에서는 Onion Board를 더 가볍게 쓸 수 있습니다: 라이트 모드는 애니메이션을 끕니다. 설정 > 일반에도 있습니다.",
+  "Add all ({n})": "모두 추가( {n} )",
+  "Can't use these links": "이 링크를 사용할 수 없습니다",
+  "Looking up {n} link…": [
+    "{n} 개의 링크를 찾는 중…"
+  ],
+  "None of these links could be looked up.": "이러한 링크 중 어느 것도 조회할 수 없습니다.",
+  "Tor was turned away.": "토르는 거절당했습니다.",
+  "{n} couldn't be used": [
+    "{n} 사용할 수 없습니다"
+  ],
+  "{n} link": [
+    "{n} 개의 링크"
+  ],
+  "{n} of them is on your board already.": [
+    "그 중 {n} 개가 이미 귀하의 보드에 있습니다."
+  ],
   "404": "404",
   "Add 10 pasted links at once.": "붙여넣은 링크 10개를 한 번에 추가하세요.",
   "Add 100 sounds from links or searches.": "링크나 검색에서 100개의 소리를 추가하세요.",
@@ -4482,6 +4499,5 @@
   "Weekend Warrior": "주말 전사",
   "Whisper": "속삭임",
   "Zen": "Zen",
-  "Reach a score of 3,000.": "3,000점을 달성하세요.",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "이 PC에서는 Onion Board를 더 가볍게 쓸 수 있습니다: 라이트 모드는 애니메이션을 끕니다. 설정 > 일반에도 있습니다."
+  "Reach a score of 3,000.": "3,000점을 달성하세요."
 }

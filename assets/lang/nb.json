@@ -4447,6 +4447,27 @@
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows kunne ikke si om dette nettverket er offentlig, så telefoner avvises for sikkerhets skyld. Sett det til Privat i Windows-innstillinger → Nettverk og Internett, og slå så dette av og på igjen",
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Hvor høyt andre hører lydene dine (og strømmen din). Hodetelefonene dine har sitt eget volum: Hodetelefonene mine, nederst. Skriv inn opptil 1000% i feltet.",
   "Sounds for others": "Lyder til andre",
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board kan kjøre lettere på denne PC-en: Lett modus slår av animasjonene. Den finnes også under Innstillinger > Generelt.",
+  "Add all ({n})": "Legg til alle ( {n} )",
+  "Can't use these links": "Kan ikke bruke disse linkene",
+  "Looking up {n} link…": [
+    "Slår opp {n} kobling …",
+    "Slår opp {n} linker …"
+  ],
+  "None of these links could be looked up.": "Ingen av disse lenkene kunne slås opp.",
+  "Tor was turned away.": "Tor ble avvist.",
+  "{n} couldn't be used": [
+    "{n} kunne ikke brukes",
+    "{n} kunne ikke brukes"
+  ],
+  "{n} link": [
+    "{n} lenke",
+    "{n} lenker"
+  ],
+  "{n} of them is on your board already.": [
+    "{n} av dem er allerede på tavlen.",
+    "{n} av dem er allerede på styret ditt."
+  ],
   "404": "404",
   "Add 10 pasted links at once.": "Legg til 10 limte lenker samtidig.",
   "Add 100 sounds from links or searches.": "Legg til 100 lyder fra lenker eller søk.",
@@ -4560,6 +4581,5 @@
   "Weekend Warrior": "Helgekriger",
   "Whisper": "Hviske",
   "Zen": "Zen",
-  "Reach a score of 3,000.": "Nå en poengsum på 3000.",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board kan kjøre lettere på denne PC-en: Lett modus slår av animasjonene. Den finnes også under Innstillinger > Generelt."
+  "Reach a score of 3,000.": "Nå en poengsum på 3000."
 }

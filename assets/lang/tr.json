@@ -4447,6 +4447,27 @@
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows bu ağın ortak olup olmadığını söyleyemedi, bu yüzden telefonlar güvenlik için geri çevriliyor. Windows Ayarları → Ağ ve internet bölümünden özel olarak ayarlayın, ardından bunu kapatıp yeniden açın",
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Diğerlerinin seslerinizi ne kadar yüksek duyduğu (ve yayınınızın). Kulaklıklarınızın kendi ses düzeyi var: Kulaklıklarım, en altta. Kutuya %1000'e kadar yazabilirsiniz.",
   "Sounds for others": "Diğerleri için sesler",
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board bu bilgisayarda daha hafif çalışabilir: Hafif mod animasyonları kapatır. Ayarlar > Genel'de de var.",
+  "Add all ({n})": "Tümünü ekle ( {n} )",
+  "Can't use these links": "Bu bağlantılar kullanılamıyor",
+  "Looking up {n} link…": [
+    "{n} bağlantısı aranıyor…",
+    "{n} bağlantı aranıyor…"
+  ],
+  "None of these links could be looked up.": "Bu bağlantıların hiçbiri aranamadı.",
+  "Tor was turned away.": "Tor geri çevrildi.",
+  "{n} couldn't be used": [
+    "{n} kullanılamadı",
+    "{n} kullanılamadı"
+  ],
+  "{n} link": [
+    "{n} bağlantı",
+    "{n} bağlantı"
+  ],
+  "{n} of them is on your board already.": [
+    "Bunlardan {n} tanesi zaten panonuzda.",
+    "Bunlardan {n} tanesi zaten panonuzda."
+  ],
   "404": "404",
   "Add 10 pasted links at once.": "Yapıştırılan 10 bağlantıyı aynı anda ekleyin.",
   "Add 100 sounds from links or searches.": "Bağlantılardan veya aramalardan 100 ses ekleyin.",
@@ -4560,6 +4581,5 @@
   "Weekend Warrior": "Hafta Sonu Savaşçısı",
   "Whisper": "Fısıltı",
   "Zen": "Zen",
-  "Reach a score of 3,000.": "3.000 puana ulaşın.",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board bu bilgisayarda daha hafif çalışabilir: Hafif mod animasyonları kapatır. Ayarlar > Genel'de de var."
+  "Reach a score of 3,000.": "3.000 puana ulaşın."
 }

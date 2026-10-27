@@ -85,9 +85,10 @@ from soundboard.online.ytupdate import (  # noqa: F401
     PYPI, _pypi_file, _pypi_json, PYPI_MAX, _pypi_wheel, reset, root, _save_state, _state, _tidy,
     TIDY_AFTER_S, update, vtuple, _wheel, WHEEL_HOST, WHEEL_MAX)
 from soundboard.online.ytfetch import (  # noqa: F401
-    as_link, _check, clean_title, _count_used, _direct_leaf, _direct_title, _download,
+    as_link, as_links, _check, clean_title, _count_used, _direct_leaf, _direct_title, _download,
     download_audio, _download_direct, DOWNLOAD_QUIET_S, downloadable, _drop_broken, _extract,
-    _found, lookup, _opts, probe, _readable, _remote, _run, _run_helper, save_video, _sendable,
+    _found, lookup, MAX_LINKS, _opts, probe, _readable, _remote, _run, _run_helper, save_video,
+    _sendable,
     _went_nowhere, _worth_another_try, _ydl)
 from soundboard.online.ytsearch import (  # noqa: F401
     _count, _myinstants, _myinstants_page, search, _soundcloud_hit, trending, _youtube_hit)

@@ -4447,6 +4447,27 @@
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows не можа да каже дали тази мрежа е обществена, затова телефоните се отказват за всеки случай. Задайте я като частна в Настройки на Windows → Мрежа и интернет, след което изключете и включете това отново",
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Колко силно другите чуват звуците ти (и стриймът ти). Слушалките ти имат своя сила: Моите слушалки, най-долу. В полето можеш да напишеш до 1000%.",
   "Sounds for others": "Звуци за другите",
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board може да работи по-леко на този компютър: Лекият режим спира анимациите. Има го и в Настройки > Общи.",
+  "Add all ({n})": "Добавяне на всички ( {n} )",
+  "Can't use these links": "Не мога да използвам тези връзки",
+  "Looking up {n} link…": [
+    "Търся {n} връзка…",
+    "Търсят се {n} връзки…"
+  ],
+  "None of these links could be looked up.": "Нито една от тези връзки не може да се търси.",
+  "Tor was turned away.": "Тор беше отхвърлен.",
+  "{n} couldn't be used": [
+    "{n} не може да се използва",
+    "{n} не може да се използва"
+  ],
+  "{n} link": [
+    "{n} връзка",
+    "{n} връзки"
+  ],
+  "{n} of them is on your board already.": [
+    "{n} от тях вече са на вашия борд.",
+    "{n} от тях вече са на вашия борд."
+  ],
   "404": "404",
   "Add 10 pasted links at once.": "Добавете 10 поставени връзки наведнъж.",
   "Add 100 sounds from links or searches.": "Добавете 100 звука от връзки или търсения.",
@@ -4560,6 +4581,5 @@
   "Weekend Warrior": "Уикенд войн",
   "Whisper": "Шепнете",
   "Zen": "Zen",
-  "Reach a score of 3,000.": "Достигнете резултат от 3000.",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board може да работи по-леко на този компютър: Лекият режим спира анимациите. Има го и в Настройки > Общи."
+  "Reach a score of 3,000.": "Достигнете резултат от 3000."
 }

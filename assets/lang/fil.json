@@ -4447,6 +4447,27 @@
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Hindi masabi ng Windows kung Public ang network na ito, kaya tinatanggihan muna ang mga phone para ligtas. Gawin itong Private sa Windows Settings → Network & internet, saka i-off at i-on ulit ito",
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Gaano kalakas naririnig ng iba ang mga sound mo (at ang stream mo). May sariling volume ang headphones mo: Headphones ko, sa ibaba. Mag-type hanggang 1000% sa box.",
   "Sounds for others": "Sounds para sa iba",
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Puwedeng gumaan ang Onion Board sa PC na ito: pinapatay ng Lite mode ang mga animation. Nasa Settings > General rin ito.",
+  "Add all ({n})": "Idagdag lahat ( {n} )",
+  "Can't use these links": "Hindi magagamit ang mga link na ito",
+  "Looking up {n} link…": [
+    "Hinahanap ang {n} link…",
+    "Hinahanap ang {n} mga link..."
+  ],
+  "None of these links could be looked up.": "Wala sa mga link na ito ang maaaring hanapin.",
+  "Tor was turned away.": "Tinalikuran si Tor.",
+  "{n} couldn't be used": [
+    "Hindi magamit {n}",
+    "Hindi magamit {n}"
+  ],
+  "{n} link": [
+    "{n} link",
+    "{n} mga link"
+  ],
+  "{n} of them is on your board already.": [
+    "{n} sa kanila ay nasa iyong board na.",
+    "{n} sa kanila ay nasa iyong board na."
+  ],
   "404": "404",
   "Add 10 pasted links at once.": "Magdagdag ng 10 na-paste na link nang sabay-sabay.",
   "Add 100 sounds from links or searches.": "Magdagdag ng 100 tunog mula sa mga link o paghahanap.",
@@ -4560,6 +4581,5 @@
   "Weekend Warrior": "Mandirigma sa katapusan ng linggo",
   "Whisper": "Bulong",
   "Zen": "Zen",
-  "Reach a score of 3,000.": "Abutin ang score na 3,000.",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Puwedeng gumaan ang Onion Board sa PC na ito: pinapatay ng Lite mode ang mga animation. Nasa Settings > General rin ito."
+  "Reach a score of 3,000.": "Abutin ang score na 3,000."
 }

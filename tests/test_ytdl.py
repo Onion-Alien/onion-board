@@ -1547,3 +1547,15 @@ def test_a_download_cut_off_is_said_in_plain_words():
                                        "97009 bytes"), downloader=True)
     assert p.text == "The download was cut off before the end. Try again."
     assert not p.reportable
+
+
+def test_several_links_pasted_together_are_a_list():
+    from soundboard.online import ytdl
+    two = "https://youtu.be/a\nhttps://soundcloud.com/x/y"
+    assert ytdl.as_links(two) == ["https://youtu.be/a", "https://soundcloud.com/x/y"]
+    assert ytdl.as_links("https://youtu.be/a, www.tiktok.com/@b/video/1  https://youtu.be/a") \
+        == ["https://youtu.be/a", "https://www.tiktok.com/@b/video/1"]
+    assert ytdl.as_links("https://youtu.be/a") == []              # one link: as_link's
+    assert ytdl.as_links("https://youtu.be/a funny sound") == []  # words: a search
+    many = " ".join(f"https://youtu.be/{i}" for i in range(40))
+    assert len(ytdl.as_links(many)) == ytdl.MAX_LINKS

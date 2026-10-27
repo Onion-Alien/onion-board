@@ -4447,6 +4447,27 @@
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows यह नहीं बता सका कि यह नेटवर्क सार्वजनिक है या नहीं, इसलिए सुरक्षा के लिए फ़ोन लौटा दिए जाते हैं। Windows सेटिंग्स → नेटवर्क और इंटरनेट में इसे निजी पर सेट करें, फिर इसे बंद करके दोबारा चालू करें",
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "दूसरे आपके साउंड कितनी तेज़ सुनते हैं (और आपकी स्ट्रीम)। आपके हेडफ़ोन का अपना वॉल्यूम है: मेरे हेडफ़ोन, सबसे नीचे। बॉक्स में 1000% तक टाइप करें।",
   "Sounds for others": "दूसरों के लिए साउंड",
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board इस PC पर हल्का चल सकता है: लाइट मोड एनिमेशन बंद कर देता है। यह सेटिंग्स > जनरल में भी है।",
+  "Add all ({n})": "सभी जोड़ें ( {n} )",
+  "Can't use these links": "इन लिंक्स का उपयोग नहीं कर सकते",
+  "Looking up {n} link…": [
+    "{n} लिंक देख रहे हैं...",
+    "{n} लिंक खोज रहे हैं..."
+  ],
+  "None of these links could be looked up.": "इनमें से किसी भी लिंक को देखा नहीं जा सका.",
+  "Tor was turned away.": "तोर को दूर कर दिया गया.",
+  "{n} couldn't be used": [
+    "{n} उपयोग नहीं किया जा सका",
+    "{n} उपयोग नहीं किया जा सका"
+  ],
+  "{n} link": [
+    "{n} लिंक",
+    "{n} लिंक"
+  ],
+  "{n} of them is on your board already.": [
+    "उनमें से {n} पहले से ही आपके बोर्ड पर हैं।",
+    "उनमें से {n} पहले से ही आपके बोर्ड पर हैं।"
+  ],
   "404": "404",
   "Add 10 pasted links at once.": "एक साथ 10 चिपकाए गए लिंक जोड़ें.",
   "Add 100 sounds from links or searches.": "लिंक या खोजों से 100 ध्वनियाँ जोड़ें।",
@@ -4560,6 +4581,5 @@
   "Weekend Warrior": "सप्ताहांत योद्धा",
   "Whisper": "फुसफुसाना",
   "Zen": "Zen",
-  "Reach a score of 3,000.": "3,000 के स्कोर तक पहुंचें.",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board इस PC पर हल्का चल सकता है: लाइट मोड एनिमेशन बंद कर देता है। यह सेटिंग्स > जनरल में भी है।"
+  "Reach a score of 3,000.": "3,000 के स्कोर तक पहुंचें."
 }
