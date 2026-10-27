@@ -62,7 +62,7 @@ def test_slow_pc():
 def test_settings_switch_applies_at_once_and_keeps_textured(window, qapp):  # noqa: F811
     window.themectl.apply_theme("Amber Terminal")
     assert window.cfg.theme_texture and theme.textures_on
-    d = SettingsDialog(window, "appearance")
+    d = SettingsDialog(window, "general")
     assert not d.lite_check.isChecked()
     d.lite_check.click()
     assert window.cfg.lite_mode is True and lite.on()
@@ -317,7 +317,7 @@ def test_on_air_card_says_lite_mode(window):  # noqa: F811
     assert not any(line.words == "Lite mode" for line in window.netctl.card_lines())
     window.themectl.set_lite_mode(True)
     line = next(line for line in window.netctl.card_lines() if line.words == "Lite mode")
-    assert line.icon == "leaf" and line.page == "appearance"
+    assert line.icon == "leaf" and line.page == "general"
     window.themectl.set_lite_mode(False)
     assert not any(line.words == "Lite mode" for line in window.netctl.card_lines())
 

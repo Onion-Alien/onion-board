@@ -37,6 +37,9 @@ from soundboard.ui.settings.heading import Heading, _BackArrow, _Mark
 
 log = logging.getLogger(__name__)
 
+# a search moves off the page you're on when another says the words this many times as often
+BUSIER = 3
+
 
 # Settings > About. The note is the author's own words, kept casual on purpose.
 NOTE = _("No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun."
@@ -409,8 +412,9 @@ class SettingsDialog(QDialog, Built):
                 self._searching = False
         first = named = None
         # whole words (at a word's start): the page that says them most, unless the one
-        # you're on says them too ("tor" is inside "history" and "monitor" on General:
-        # it goes to Connection, not the first page with the letters)
+        # you're on says them too, nearly as often ("tor" is inside "history" and
+        # "monitor" on General: it goes to Connection, not the first page with the
+        # letters; "theme", once in Lite mode's words on General, goes to Appearance)
         starts = [re.compile(r"\b" + re.escape(w)) for w in words]
         best, best_n, cur_n = None, 0, 0
         for i in range(self.tabs.count()):
@@ -470,7 +474,7 @@ class SettingsDialog(QDialog, Built):
         on_hidden = self.categories.item(self.tabs.currentIndex()).isHidden()
         if named is not None:
             self.tabs.setCurrentIndex(named)
-        elif best is not None and not cur_n:
+        elif best is not None and cur_n * BUSIER <= best_n:
             self.tabs.setCurrentIndex(best)
         elif words and first is not None and on_hidden:
             self.tabs.setCurrentIndex(first)

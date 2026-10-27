@@ -116,12 +116,12 @@ class NetControl(Controller):
 
     @staticmethod
     def _lite_line() -> onaircard.Line | None:
-        """Lite mode on (Settings > Appearance), else None."""
+        """Lite mode on (Settings > General), else None."""
         if not lite.on():
             return None
         return onaircard.Line("leaf", _("Lite mode"), "",
                             _("Lite mode is on: no animations, plain themes and less CPU. "
-                              "Click to change it."), "appearance")
+                              "Click to change it."), "general")
 
     def _network_line(self) -> onaircard.Line | None:
         """Offline mode, a proxy or Tor (and how far Tor got), or None when direct."""
