@@ -1093,6 +1093,8 @@ def test_every_name_in_a_used_call_is_in_features():
         assert f"voice-tab-{k}" in usage.FEATURES
     for k in usage.RECOVERY:
         assert f"recovery-{k}" in usage.FEATURES
+    for k in (*usage.MIC_FAILS, *usage.RECOVERY_FAILS):
+        assert f"recovery-failed-{k}" in usage.FEATURES
     for k in usage.MIC_FAILS:
         assert f"mic-effect-failed-{k}" in usage.FEATURES
         assert f"mic-effect-fix-failed-{k}" in usage.FEATURES

@@ -258,8 +258,9 @@ account or anything else about you.
     `other`, and Windows' error number as `err-2`, `err-3`, `err-5`, `err-32`, `err-33`,
     `err-87`, `err-1224`, `err-1314`, `err-other` or `err-none`), and for exit code 6
     which of Windows' audio services wouldn't stop (`mic-effect-code-6-<which>`:
-    `audio`, `builder`, `both`, `other`): never the message or the mic's name; Settings' *Audio recovery* (`used/recovery-repair`, `recovery-remove`… and
-    `recovery-failed`);
+    `audio`, `builder`, `both`, `other`): never the message or the mic's name; Settings' *Audio recovery* (`used/recovery-repair`, `recovery-remove`…, `recovery-said-no` for No to Windows'
+    prompt, and `recovery-failed` with its reason word: `recovery-failed-code-8`,
+    `-unverified`, `-leftovers`, `-not-removed`, `-error`…; never the message);
   - Onion Board's own update cancelled, failing to download or to start, its *Copy
     error*, *Later*, one that didn't finish, one installing itself as the app started
     (`used/update-cancelled`, `update-download-failed`, `update-install-failed`,
