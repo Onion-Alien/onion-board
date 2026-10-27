@@ -1329,3 +1329,25 @@ def test_expert_audio_cards_wait_for_show_advanced(window, qapp):  # noqa: F811
         assert d._advanced and all(not c.isHidden() for c in cards) and more[0].isHidden()
     finally:
         d.done(0)
+
+
+def test_narrow_rail_icons_sit_in_the_middle_of_their_highlight(window, qapp):  # noqa: F811
+    """Narrow, a category is an icon with no name: the icon is drawn in the middle of
+    its row (the style put it at the left, twice the room on its right)."""
+    from PySide6.QtGui import QIcon, QImage, QPixmap
+
+    d = _open_in_window(window, qapp, "general", width=560)
+    try:
+        cats = d.categories
+        assert cats.width() == 48 and not cats.item(0).text()
+        red = QPixmap(20, 20)
+        red.fill(QColor("red"))
+        cats.item(0).setIcon(QIcon(red))
+        rect = cats.visualItemRect(cats.item(0))
+        img = cats.viewport().grab(rect).toImage().convertToFormat(QImage.Format.Format_RGB32)
+        xs = [x for x in range(img.width()) for y in range(img.height())
+              if img.pixelColor(x, y).red() > 200 and img.pixelColor(x, y).green() < 60]
+        assert xs
+        assert abs(min(xs) - (img.width() - 1 - max(xs))) <= 2
+    finally:
+        d.close()
