@@ -2,6 +2,109 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.7.2 — 2026-10-27
+
+- A big board no longer freezes for seconds when its sounds change with many Onion Watch
+  triggers set up, or when you switch themes: dropdowns are measured once after they're
+  filled, not once per item.
+- Two more freezes on PCs short of memory: checking which game is in front (for *Who's
+  listening*) asked Windows on the window's own thread every few seconds, and one PC
+  sat in it for minutes; it now runs on a helper thread. The anonymous usage count
+  reads its saved problem reports there too, never on the window.
+- The anonymous daily count now says why a fix from the Mic effect card failed (a fixed
+  reason word such as `code-8` or `unverified`, never the message), and counts No to
+  Windows' prompt on its own instead of as a failure.
+- The old website address (onion-alien.github.io/onion-board) shows the whole site again
+  instead of forwarding, so old links work as before, downloads included. onionalien.com
+  stays the main address.
+- Saved clips survive a damaged clip list (a power cut mid-save): they're found again
+  from their files instead of being deleted at the next start.
+- Restarting the app (a language change, a reset) no longer hands the browser and the
+  update installer the old copy's dead connection as your proxy.
+- A sound pack that's too big to import is no longer kept in *My sound packs*.
+- Resetting *Settings* keeps how the app goes online: Tor, a proxy, Offline mode and the
+  features you switched off stay as they are.
+- Restore points no longer keep your API key, Twitch login or proxy, and restoring one
+  never brings back a key you have since changed.
+- The usage count no longer saves up what happened while *Count me in* was off to send
+  once it's back on, and nothing goes out in the moment after you switch it off.
+- A link download that names no size is stopped once it passes the size limit, instead
+  of filling the disk.
+- A very long title or page from a site can no longer freeze the app while it's read.
+- The app log names the proxy's kind only, never its address.
+- Twitch: a sign-in renewed while the link restarted is kept (you were signed out), and
+  Disconnect clears the older copies of your settings too.
+- Auto push-to-talk lets go of the key when the app stops answering, so a frozen app
+  never leaves your game's mic open.
+- The local relay and the control API drop connections that are too slow to send their
+  request, and the control API answers "busy" instead of dropping requests when many
+  local tools call it at once. A web page can no longer lock a phone out of Onion Pocket,
+  and a request that sends the same value twice is refused.
+- Removing an add-on removes its old copies too, so one can't come back by itself.
+- First start no longer moves in another program's `%APPDATA%\Soundboard` folder.
+- Discord set-up keeps a copy of only the file it changes, for two weeks, not of all of
+  Discord's stored data.
+- Installing a Windows voice no longer runs a script file from your temp folder as admin.
+- Onion Pocket no longer starts when Windows can't say whether the network is Public:
+  it's turned away as on a Public network, never taken as a home one.
+- The player's Video button no longer freezes the window for a moment while it checks the
+  video is still there (on a sleeping drive, say), and sound files dragged into the
+  sounds folder no longer make the window stutter while the folder is looked through.
+- A tidy-up under the hood with a few small speed-ups: the live pitch effect no longer
+  copies its history on every audio block, list-view pads and the EQ curve take less
+  work to draw, and the status card no longer redraws twice a second while Tor connects.
+- The installer and the Stream Deck plugin no longer keep the build PC's local time in
+  their files' time stamps.
+- Settings → About has an Invite a friend card: copy a link to the download page with your
+  name or gamertag on it, and the app says who invited them on their first start. The download
+  is counted, but never your name.
+- The website moved to https://onionalien.com/onionboard/ (Onion Watch:
+  https://onionalien.com/onionwatch/). The Website button in Settings > About, the
+  Stream Deck plugin and the README now open it, and the old address forwards there.
+- A sound playing when your headphones switch to a device at another sample rate (Windows'
+  default output moving to SteelSeries Sonar's 96 kHz Gaming device, say) keeps playing
+  there instead of stopping, and a device Windows refuses to start for a moment right
+  after such a switch is tried again at once instead of showing an error.
+- SteelSeries Sonar users: when Windows restarts its audio (a driver or Windows update,
+  another app's installer) while Onion Board is open, Sonar moves your mic to another
+  device, often a silent virtual cable, so Discord stops hearing your voice. Onion Board
+  now notices and sets Sonar's mic and channels back within seconds.
+- Updating while Discord was still open after you'd closed Onion Board no longer lists
+  Onion Board as running, and Discord's voice clean-up still comes back on when Discord
+  closes (the update used to end the small helper that does it). Uninstalling now
+  puts it back at once, or says how to if Discord is still open.
+- Settings > Achievements: every achievement is now worth points by its rarity (Common 10
+  up to Super Rare 200), and your total score shows at the top of the page.
+- The mic helper and the mic effect's admin step can no longer be steered by a folder
+  link another account on the PC puts in Onion Board's shared folders: they work through
+  handles to folders they checked, and a link is removed, never followed. The helper
+  updates once (one Windows prompt).
+- The removal tool no longer follows a link someone put at `%ProgramData%\OnionBoard`.
+- Names and titles from the web, other soundboards, backups and packs always show as the
+  text they are: one that looked like HTML could make Windows contact another server,
+  around the proxy, Tor and Offline mode.
+- A board file from another soundboard that lists sounds on a network share no longer
+  makes Windows connect to that server: those sounds are left out.
+- A custom voice program that's a script (`.bat`, `.cmd`, `.ps1`) or a shell no longer
+  gets the line to say on its command line, where Twitch chat could run commands; use
+  `{text_file}` or the program's input instead.
+- Twitch: a "no such sound" reply posted from your account goes through the blocked words
+  and link rule first and counts for the cooldown, and a viewer's name read out in chat
+  TTS is filtered too. Twitch signing you out also resets *Let the developer see this
+  channel's name*.
+- Backups no longer carry the auto push-to-talk key, Twitch chat rules, the store's vote
+  id, privacy switches or this PC's Discord state, and a sound pack can't take a key every
+  app uses (Space, a letter, Ctrl+C).
+- Onion Pocket's firewall step adds one rule for Onion Board only, not a second one for
+  any program on that port.
+- Quitting only puts back a Discord that Onion Board set up itself.
+- A voice server's key is never sent on to another site by a redirect, and a carrier's
+  NAT or a tailnet (the shared address range) counts as the home network.
+- Live voice no longer writes what you said into its log, and its log goes with the app
+  log when *Keep an app log* is off.
+- Admin steps start Windows' own tools from System32, never by name.
+- The installer's Cancel for the extras stops them again.
+
 ## 2.7.1 — 2026-10-23
 
 - SteelSeries Sonar: with Sonar's Gaming device (a 7.1 device) as your headphones,
