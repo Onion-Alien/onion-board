@@ -75,7 +75,8 @@ from soundboard.mic.micadmin import *  # noqa: F403
 
 from soundboard.mic.micbase import FLAG, bundled_dll, data_dir
 from soundboard.mic.micstate import endpoint_for, mic_lookup
-from soundboard.mic.micadmin import AUDIO_STUCK, EFFECT_NOT_STARTED, MIC_SHUT, MIC_SILENT
+from soundboard.mic.micadmin import AUDIO_STUCK, EFFECT_NOT_STARTED, MIC_SHUT, MIC_SILENT, \
+    UNSTARTED, UNSTARTED_HOW
 
 
 log = logging.getLogger(__name__)
@@ -433,6 +434,24 @@ def stuck_why(log_path: Path | None = None) -> str:
             audio, builder = "audiosrv" in up, "audioendpointbuilder" in up
             return ("both" if audio and builder else "audio" if audio else
                     "builder" if builder else "unknown" if "unknown" in up else "other")
+    return "unlogged"
+
+
+# exit code 8 (the effect didn't start on its mic): what the effect's own log showed
+# instead (micadmin UNSTARTED_HOW, from the UNSTARTED line the admin step logs);
+# "unlogged": the step logged none since mark_logs() (a helper from before it did)
+UNSTARTED_WHY = (*UNSTARTED_HOW, "other", "unlogged")
+
+
+def unstarted_why(log_path: Path | None = None) -> str:
+    """What the effect's log showed when the last step got exit code 8: a
+    UNSTARTED_WHY word."""
+    for path in [log_path] if log_path else admin_logs():
+        tail = _log_tail(path)
+        at = tail.rfind(UNSTARTED)
+        if at >= 0:
+            how = tail[at + len(UNSTARTED):].partition("\n")[0].strip()
+            return how if how in UNSTARTED_HOW else "other"
     return "unlogged"
 
 

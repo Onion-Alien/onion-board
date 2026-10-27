@@ -53,6 +53,7 @@ class MicControl(Controller):
     _raised = None          # exit code 1: directmic.raised_why() of that set-up
     _fallback = None        # directmic.helper_fallback() of that set-up
     _stuck = ""             # exit code 6: directmic.stuck_why() of that set-up
+    _unstarted = ""         # exit code 8: directmic.unstarted_why() of that set-up
     _helper_checking = False
     _helper_failed = False  # the last check raised: the next waits HELPER_RETRY_S
     _helper_check_at = 0.0  # when the last check started (time.monotonic())
@@ -499,6 +500,7 @@ class MicControl(Controller):
         # wouldn't stop: which service. From its log (read here, off the UI thread)
         self._raised = directmic.raised_why() if self._mic_fail_kind == "code-1" else None
         self._stuck = directmic.stuck_why() if self._mic_fail_kind == "code-6" else ""
+        self._unstarted = directmic.unstarted_why() if self._mic_fail_kind == "code-8" else ""
         # the helper's run raised and Windows' prompt ran it instead: where the helper's
         # failed, which the prompt's own result doesn't tell
         self._fallback = directmic.helper_fallback()
@@ -540,6 +542,7 @@ class MicControl(Controller):
                 usage.used(f"mic-effect-{'fix-' if auto else ''}failed-{kind}")
             raised, self._raised = self._raised, None
             stuck, self._stuck = self._stuck, ""
+            unstarted, self._unstarted = self._unstarted, ""
             if kind == "code-1" and raised:
                 where, what, num = raised
                 usage.used(f"mic-effect-code-1-at-{where}")
@@ -547,6 +550,8 @@ class MicControl(Controller):
                 usage.used(f"mic-effect-code-1-{num}")
             elif kind == "code-6" and stuck:
                 usage.used(f"mic-effect-code-6-{stuck}")
+            elif kind == "code-8" and unstarted:
+                usage.used(f"mic-effect-code-8-{unstarted}")
             if auto:
                 # the card turns into its one button with the reason (_mic_view)
                 self._autofix_err = err

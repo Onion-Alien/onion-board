@@ -46,6 +46,9 @@ MIC_RAISED = ("at-register", "at-mic-settings", "at-ring", "at-files", "at-audio
 # it couldn't tell, or that the step logged nothing (directmic STUCK_WHICH, read back
 # from the admin log)
 MIC_STUCK = ("audio", "builder", "both", "unknown", "other", "unlogged")
+# exit code 8 (the effect didn't start on its mic): what the effect's own log showed
+# instead, or that the step logged nothing (directmic UNSTARTED_WHY)
+MIC_UNSTARTED = ("silent", "no-init", "unnamed", "other-mics", "other", "unlogged")
 # why a download from a link or search failed (errors.download_reason): the kind only
 DL_FAILS = ("private", "age", "bot", "members", "region", "gone", "no-formats", "429",
             "403", "5xx", "stalled", "timeout", "cut-off", "offline", "proxy", "sign-in",
@@ -173,6 +176,7 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "mic-effect-taken-off", "mic-helper",
             *(f"mic-effect-code-1-{k}" for k in MIC_RAISED),
             *(f"mic-effect-code-6-{k}" for k in MIC_STUCK),
+            *(f"mic-effect-code-8-{k}" for k in MIC_UNSTARTED),
             # the helper's step raised and Windows' prompt was asked instead, and where
             # the helper's raised (MIC_RAISED)
             "mic-effect-helper-fallback",

@@ -1368,6 +1368,43 @@ def test_an_effect_log_at_its_cap_cant_say_it_didnt_start(monkeypatch, tmp_path,
     assert not _REAL_EFFECT_RUNS(["{aaaa}"], 0)
 
 
+@pytest.mark.parametrize("text, how", [
+    ("", "silent"),
+    ("t pid 7: format asked: tag 3, 48000 hz\n", "no-init"),
+    ("t pid 7: initialize: endpoint , 0 bytes, discovery 0, child no\n", "unnamed"),
+    ("t pid 7: initialize: endpoint {bbbb}, 80 bytes, discovery 0, child no\n",
+     "other-mics")])
+def test_an_effect_that_didnt_start_logs_what_its_log_showed(monkeypatch, tmp_path, caplog,
+                                                              text, how):
+    """Exit code 8 said only that: what the effect's own log showed instead is logged
+    for the app to count (unstarted_why), so the next counts name the cause."""
+    (tmp_path / dm.APO_LOG).write_text(text, encoding="utf-8")
+    monkeypatch.setattr(dm, "data_dir", lambda: tmp_path)
+    monkeypatch.setattr(dm, "capture_endpoints",
+                        lambda: [{"guid": "{aaaa}", "name": "Mic", "active": True}])
+    now = [0.0]
+    monkeypatch.setattr(dm.time, "monotonic", lambda: now[0])
+    monkeypatch.setattr(dm, "_mics_open", lambda guids: now.__setitem__(0, now[0] + 3))
+    with caplog.at_level("WARNING"):
+        assert not _REAL_EFFECT_RUNS(["{aaaa}"], 0)
+    assert f"{dm.UNSTARTED} {how}" in caplog.text
+
+
+def test_what_the_effect_showed_is_read_from_the_log(tmp_path, monkeypatch):
+    monkeypatch.setattr(dm, "data_dir", lambda: tmp_path / "MicPlugin")
+    monkeypatch.setattr(dm, "_log_marks", {})
+    log_file = tmp_path / "michelper.log"
+    assert dm.unstarted_why() == "unlogged"   # no log (a helper from before)
+    log_file.write_text(f"x {dm.UNSTARTED} silent\n", encoding="utf-8")
+    assert dm.unstarted_why() == "silent"
+    with open(log_file, "a", encoding="utf-8") as f:   # the last one counts
+        f.write(f"x {dm.UNSTARTED} other-mics\n")
+    assert dm.unstarted_why() == "other-mics"
+    with open(log_file, "a", encoding="utf-8") as f:
+        f.write(f"x {dm.UNSTARTED} something new\n")
+    assert dm.unstarted_why(log_file) == "other"
+
+
 def test_a_failing_listen_never_fails_the_install(fake_reg, monkeypatch, tmp_path):
     _restart_kit(fake_reg, monkeypatch, tmp_path, [])
 
@@ -3588,6 +3625,11 @@ def test_a_set_up_that_raised_counts_where_and_offers_the_cable(window, monkeypa
     monkeypatch.setattr(dm, "stuck_why", lambda: "builder")
     w.micctl._mic_attached(*w.micctl._attach_mic_work("My mic"))
     assert {"mic-effect-failed-code-6", "mic-effect-code-6-builder"} <= usage._used
+    # exit code 8: what the effect's own log showed instead
+    monkeypatch.setattr(dm, "_elevated", lambda *a, **k: dm.EFFECT_NOT_STARTED)
+    monkeypatch.setattr(dm, "unstarted_why", lambda: "silent")
+    w.micctl._mic_attached(*w.micctl._attach_mic_work("My mic"))
+    assert {"mic-effect-failed-code-8", "mic-effect-code-8-silent"} <= usage._used
     assert all(name in usage.FEATURES for name in usage._used)
 
 
@@ -5164,6 +5206,7 @@ def test_every_admin_step_failure_word_can_be_counted():
     assert {f"at-{w}" for w in dm.RAISED_WHERE} | set(dm.RAISED_WHAT) \
         | set(dm.RAISED_ERR) == set(usage.MIC_RAISED)
     assert set(dm.STUCK_WHICH) == set(usage.MIC_STUCK)
+    assert set(dm.UNSTARTED_WHY) == set(usage.MIC_UNSTARTED)
 
 
 def test_the_mic_box_tick_is_level_with_its_headline(window, monkeypatch):  # noqa: F811

@@ -60,7 +60,8 @@ ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4
                # micadmin.py: the code was only moved, so installed helpers needn't update
                29: "efce7b0d8d513100903f17e229d74e37eede59d62a9a6ac7867dcd751f7fe90a",
                30: "acebab9e7257e67c5c98260264c3c5a28d5b9b7cfaa648cbc18e736c4bae25a4",
-               31: "833eac929852c4838d3869ec238e99f23dc2067746815520de7839ed51e54b85"}
+               31: "833eac929852c4838d3869ec238e99f23dc2067746815520de7839ed51e54b85",
+               32: "5fe573c21a645bad90ed641ff87d1686174da445c20b2e5c1179210457ddd33d"}
 
 
 def _queue():
