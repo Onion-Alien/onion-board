@@ -13,6 +13,8 @@ from __future__ import annotations
 import logging
 import time
 
+import shiboken6
+
 from PySide6.QtCore import QEvent, QObject, QPoint, QPointF, Qt, QTimer
 from PySide6.QtGui import QCursor, QHelpEvent, QHoverEvent, QMouseEvent, QPalette
 from PySide6.QtWidgets import (QAbstractButton, QAbstractScrollArea, QAbstractSlider,
@@ -339,14 +341,41 @@ def snug_combo(cb: QComboBox, cap: int = AppStyle.COMBO_CAP):
             cb.setMinimumWidth(cb.minimumSizeHint().width())   # keep the short floor
         cb.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
         m = cb.model()
-        refit = lambda *_a: _refit(cb, cap)  # noqa: E731
+        refit = lambda *_a: _refit_soon(cb, cap)  # noqa: E731
         for sig in (m.rowsInserted, m.rowsRemoved, m.modelReset, m.dataChanged):
             sig.connect(refit)
+        _refit(cb, cap)
     elif not managed:
         return
-    _refit(cb, cap)
-    # again once the theme's stylesheet has polished it too (its padding counts)
-    QTimer.singleShot(0, cb, lambda: _refit(cb, cap))
+    # (again) once the theme's stylesheet has polished it too (its padding counts)
+    _refit_soon(cb, cap)
+
+
+# dropdowns waiting for _refit, done once on the next turn of the event loop: the
+# model says so for each item added, and measuring a box measures all its items, so
+# a trigger card's list of 400 sounds filled item by item took 0.4 s (20 cards: 7 s)
+_pending: dict[int, tuple[QComboBox, int]] = {}
+
+
+def _refit_soon(cb: QComboBox, cap: int):
+    if not _pending:
+        QTimer.singleShot(0, _refit_pending)
+    _pending[id(cb)] = (cb, cap)
+
+
+def _refit_pending():
+    todo = list(_pending.values())
+    _pending.clear()
+    done: set[int] = set()
+    for cb, cap in todo:
+        if id(cb) in done or not shiboken6.isValid(cb):
+            continue
+        before = cb.maximumWidth()
+        done.update(id(m) for m in _refit(cb, cap))
+        parent = cb.parentWidget()
+        lay = parent.layout() if parent is not None else None
+        if cb.maximumWidth() != before and lay is not None:
+            lay.activate()   # laid out now, as when it was fitted at once
 
 
 def _own_width(cb: QComboBox, cap: int) -> int:
@@ -382,7 +411,8 @@ def _column_mates(cb: QComboBox) -> list[QComboBox]:
     return [cb]
 
 
-def _refit(cb: QComboBox, cap: int):
+def _refit(cb: QComboBox, cap: int) -> list[QComboBox]:
+    """Fit cb and its column mates; returns the mates (fitted too)."""
     try:
         mates = _column_mates(cb)
         width = max(_own_width(m, cap) for m in mates)
@@ -390,8 +420,9 @@ def _refit(cb: QComboBox, cap: int):
             m.setMaximumWidth(width)
         if cb not in mates:
             cb.setMaximumWidth(_own_width(cb, cap))
+        return mates
     except RuntimeError:   # the model outlived its dropdown
-        pass
+        return []
 
 
 class _Guard(QObject):

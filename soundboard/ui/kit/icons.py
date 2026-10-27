@@ -163,7 +163,10 @@ def _gone(ref: weakref.ref) -> bool:
     return w is None or not shiboken6.isValid(w)
 
 
-_applied: list[tuple[weakref.ref, str, str | None, str | None, int]] = []
+# the widgets given a live icon, one entry each, gone with the widget's Python side:
+# looked up by widget, since a list scanned on every call (and every retheme step)
+# froze a big board (thousands of buttons) for seconds
+_applied: weakref.WeakKeyDictionary = weakref.WeakKeyDictionary()   # -> (name, color, checked, pad)
 
 # icon to words on a button, the same everywhere (DESIGN.md: 6-8 px); Qt puts 4 px
 TEXT_GAP = 8
@@ -183,9 +186,7 @@ def set_icon(widget, name: str, color: str | None = None, checked_color: str | N
     widget.setIcon(icon(name, color, checked_color, pad=pad))
     if hasattr(widget, "setIconSize"):   # a QAction takes its menu's size
         widget.setIconSize(QSize(size + pad, size))
-    # one entry per widget: buttons re-iconed on every click must not grow the list
-    _applied[:] = [e for e in _applied if e[0]() is not None and e[0]() is not widget]
-    _applied.append((weakref.ref(widget), name, color, checked_color, pad))
+    _applied[widget] = (name, color, checked_color, pad)
 
 
 def close_button(btn, side: int, color: str = "muted"):
@@ -214,23 +215,19 @@ def clear_button(edit, color: str = "muted"):
 def text_gap(button):
     """Re-fit the icon's gap after a button's words were dropped or put back (a
     narrow window's icon-only step): no words, no empty space after the icon."""
-    for ref, name, color, checked, __ in _applied:
-        if ref() is button:
-            set_icon(button, name, color, checked, button.iconSize().height())
-            return
+    if (e := _applied.get(button)) is not None:
+        name, color, checked, __ = e
+        set_icon(button, name, color, checked, button.iconSize().height())
 
 
 def recolor(button, color: str | None):
     """The same icon in another colour: a button that turned into the filled main one
     (on_accent) or back (None: the text colour). Its old colour would sit on the new fill."""
-    for ref, name, old, checked, __ in _applied:
-        if ref() is button:
-            if old != color:
-                set_icon(button, name, color, checked, button.iconSize().height())
-            return
+    if (e := _applied.get(button)) is not None and e[1] != color:
+        set_icon(button, e[0], color, e[2], button.iconSize().height())
 
 
-_labels: list[tuple[weakref.ref, str, str, int]] = []
+_labels: weakref.WeakKeyDictionary = weakref.WeakKeyDictionary()   # -> (name, color, size)
 
 
 _inline: dict[tuple, str] = {}
@@ -357,11 +354,10 @@ def set_label_icon(label, name: str, color: str = "muted", size: int = 18):
     label.setPixmap(pm)
     # one entry per label, and none for deleted ones: a dialog's labels went on the
     # list each time it was opened
-    _labels[:] = [e for e in _labels if not _gone(e[0]) and e[0]() is not label]
-    _labels.append((weakref.ref(label), name, color, size))
+    _labels[label] = (name, color, size)
 
 
-_items: list[tuple[weakref.ref, list[str]]] = []
+_items: weakref.WeakKeyDictionary = weakref.WeakKeyDictionary()   # combo -> names
 
 
 def set_item_icons(combo, names: list[str]):
@@ -370,8 +366,7 @@ def set_item_icons(combo, names: list[str]):
     for i, name in enumerate(names):
         if name:
             combo.setItemIcon(i, icon(name))
-    _items[:] = [e for e in _items if e[0]() is not None and e[0]() is not combo]
-    _items.append((weakref.ref(combo), names))
+    _items[combo] = names
 
 
 _tab_cache: dict[tuple, QIcon] = {}
@@ -459,9 +454,8 @@ def retheme_live():
     """Re-draw only the icons in the live colour (a live tab's, the mic pill's) or on it
     (a switched-on button's, in on_live) after the user picks a new one: retheme()
     re-draws every icon in the app."""
-    for ref, name, color, checked, pad in _applied:
-        w = ref()
-        if w is not None and {color, checked} & LIVE_TOKENS:
+    for w, (name, color, checked, pad) in list(_applied.items()):
+        if {color, checked} & LIVE_TOKENS:
             try:
                 w.setIcon(icon(name, color, checked, pad=pad))
             except RuntimeError:   # the C++ widget is gone
@@ -478,32 +472,21 @@ def retheme_live():
 def retheme():
     _cache.clear()
     _tab_cache.clear()
-    alive = []
-    for ref, name, color, checked, pad in _applied:
-        w = ref()
+    for w, (name, color, checked, pad) in list(_applied.items()):
         try:
-            if w is not None:
-                w.setIcon(icon(name, color, checked, pad=pad))
-                alive.append((ref, name, color, checked, pad))
+            w.setIcon(icon(name, color, checked, pad=pad))
         except RuntimeError:   # the C++ widget is gone
-            pass
-    _applied[:] = alive
-    for ref, names in list(_items):
-        combo = ref()
+            _applied.pop(w, None)
+    for combo, names in list(_items.items()):
         try:
-            if combo is not None:
-                set_item_icons(combo, names)
+            set_item_icons(combo, names)
         except RuntimeError:   # the C++ widget is gone
-            _items[:] = [e for e in _items if e[0] is not ref]
-    labels = list(_labels)
-    _labels.clear()
-    for ref, name, color, size in labels:
-        lbl = ref()
-        if lbl is not None:
-            try:
-                set_label_icon(lbl, name, color, size)
-            except RuntimeError:
-                pass
+            _items.pop(combo, None)
+    for lbl, (name, color, size) in list(_labels.items()):
+        try:
+            set_label_icon(lbl, name, color, size)
+        except RuntimeError:
+            _labels.pop(lbl, None)
     for ref, index, name, tint, badge in _tabs:
         t = ref()
         if t is not None:

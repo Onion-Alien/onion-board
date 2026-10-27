@@ -170,3 +170,29 @@ def test_a_freed_layout_item_never_reaches_polish(qapp):
     QApplication.sendPostedEvents(None, QEvent.DeferredDelete)
     assert not isinstance(shiboken6.wrapInstance(addr, QObject), QWidgetItem)
     AppStyle().polish(QWidgetItem(QLabel()))           # must not raise
+
+
+def test_filling_a_dropdown_item_by_item_measures_it_once(qapp, monkeypatch):
+    """The model says so for every item added, and measuring a dropdown measures all
+    its items: a trigger card's 400 sounds, added one by one, measured it 400 times
+    (20 cards froze the window for 7 s). It's measured once, after the filling."""
+    from soundboard.ui.kit import wheelguard
+
+    box = QWidget()
+    lay = QVBoxLayout(box)
+    cb = QComboBox()
+    lay.addWidget(cb)
+    box.show()
+    QApplication.processEvents()
+    calls = []
+    real = wheelguard._own_width
+    monkeypatch.setattr(wheelguard, "_own_width", lambda c, cap: calls.append(c) or real(c, cap))
+    try:
+        for i in range(300):
+            cb.addItem(f"Sound number {i}")
+        assert not calls
+        QApplication.processEvents()
+        assert 0 < len(calls) <= 2
+        assert cb.maximumWidth() == wheelguard._own_width(cb, CAP)   # still fitted
+    finally:
+        box.close()
