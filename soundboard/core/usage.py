@@ -118,6 +118,7 @@ from soundboard.core.usagenames import (  # noqa: F401
     LIVE_TABS,
     MIC_FAILS,
     MIC_NO_LOAD,
+    MIC_UNSTARTED,
     MIC_RAISED,
     MIC_STUCK,
     PACKS,

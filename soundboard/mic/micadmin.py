@@ -909,6 +909,24 @@ def _apo_log_capped(text: str) -> bool:
     return bool(per_pid) and max(per_pid.values()) >= APO_LOG_BURST
 
 
+# the line logged when the effect didn't start on a mic (directmic.unstarted_why reads
+# it), with what its log showed instead: nothing at all (Windows loaded it nowhere, or it
+# couldn't write its log), lines but no start, starts on a mic it couldn't name, or
+# starts only on other mics
+UNSTARTED = "effect not started:"
+UNSTARTED_HOW = ("silent", "no-init", "unnamed", "other-mics")
+
+
+def _unstarted_how(text: str) -> str:
+    """An UNSTARTED_HOW word for the effect's log `text` (since a mark, lowercased) when
+    it didn't start on a mic it's on."""
+    if not text.strip():
+        return "silent"
+    starts = re.findall(r"initialize: endpoint ([^,\s]*)", text)
+    return ("no-init" if not starts else "unnamed" if not all(starts) else
+            "other-mics")
+
+
 def _effect_runs(guids: Sequence[str], mark: int) -> bool:
     """The effect started on each of the active mics `guids` after the step (it logs
     "initialize: endpoint <guid>" whenever Windows starts it on a mic): each is opened
@@ -924,12 +942,15 @@ def _effect_runs(guids: Sequence[str], mark: int) -> bool:
             if not waiting or time.monotonic() > end:
                 break
             _mics_open(waiting)   # opening one starts the effect on it (muted too)
-        if waiting and _apo_log_capped(_effect_started(mark)):
+        text = _effect_started(mark) if waiting else ""
+        if waiting and _apo_log_capped(text):
             log.info("the effect's log was full: can't tell it started on %s",
                      ", ".join(waiting))
             return True
         if waiting:
             log.warning("the effect didn't start on %s", ", ".join(waiting))
+            # what its log showed instead, for the app to count (unstarted_why)
+            log.warning("%s %s", UNSTARTED, _unstarted_how(text))
         return not waiting
     except Exception:  # noqa: BLE001
         log.info("couldn't check that the effect started", exc_info=True)
