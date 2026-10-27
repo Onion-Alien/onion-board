@@ -1716,3 +1716,50 @@ def test_keep_on_top_changes_the_window_in_place(window, qapp):
         assert window.isVisible()
     window.removeEventFilter(watch)
     assert not hidden and not window.cfg.always_on_top
+
+
+def test_several_links_pasted_show_a_card_each_and_add_all_queues_them(window, qapp,
+                                                                       monkeypatch):
+    """Links pasted together: each is looked up and shown as a card, and Add all sends
+    every one not on the board yet to the download queue."""
+    from soundboard.online import ytdl
+    from soundboard.online.ytsites import Result
+    urls = ["https://www.youtube.com/watch?v=a", "https://soundcloud.com/x/y",
+            "https://www.youtube.com/watch?v=bad"]
+
+    def lookup(url, direct=False):
+        if url.endswith("bad"):
+            raise RuntimeError("gone")
+        return Result(url[-1], url[-1], "x", 3.0, link=url)
+    monkeypatch.setattr(ytdl, "lookup", lookup)
+    picked = []
+    monkeypatch.setattr(window.searchctl, "_from_youtube", lambda r, play: (
+        picked.append((r.url, play)), window.ytresults.mark(r.url, "add")))
+    window.show()
+    window.resize(1100, 700)
+    window.fitctl._refit()
+    QApplication.clipboard().setText("\n".join(urls))
+    window.search.clear()
+    window.search.paste()
+    assert "\n" not in window.search.text()   # (one line: the line breaks are spaces)
+    window.searchctl.flush_search()
+    assert window.linkbar.many == urls and not window.linkbar.url
+    window.searchctl.on_search_enter()
+    res = window.ytresults
+    for _ in range(200):
+        qapp.processEvents()
+        if res._rows:
+            break
+        time.sleep(0.02)
+    assert [r.result.url for r in res._rows] == urls[:2]
+    assert res.heading.text().startswith("2 links") and "1 couldn't be used" in res.heading.text()
+    assert not res.add_all_btn.isHidden() and res.add_all_btn.text() == "Add all (2)"
+    res.add_all_btn.click()
+    assert picked == [(urls[0], False), (urls[1], False)]
+    from soundboard.core import achievements
+    assert achievements.value("bulk_links") >= 2   # (Bulk Buyer at 10)
+    assert res.add_all_btn.isHidden()   # all on their way: nothing left to add twice
+    res.mark(urls[1], "add", False)     # one didn't work: Add all is back for it
+    assert not res.add_all_btn.isHidden() and res.add_all_btn.text() == "Add all (1)"
+    res.close_results()
+    assert res.add_all_btn.isHidden() and not res.links

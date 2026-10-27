@@ -56,6 +56,23 @@ def as_link(text: str) -> str:
     return t if re.fullmatch(r"https?://[\w.-]+\.[a-z]{2,}(:\d+)?([/?#]\S*)?", t, re.I) else ""
 
 
+MAX_LINKS = 30    # links pasted at once that are looked up (the download queue's size)
+
+
+def as_links(text: str) -> list[str]:
+    """Two or more web links pasted together (on lines of their own, or with spaces or
+    commas between), each once, at most MAX_LINKS; [] when it's one link, or any word
+    in it isn't one (then it's a search)."""
+    words = [w for w in text.replace(",", " ").split() if w]
+    if len(words) < 2 or len(words) > 10 * MAX_LINKS:
+        return []
+    links = [as_link(w) for w in words]
+    if not all(links):
+        return []
+    unique = list(dict.fromkeys(links))
+    return unique[:MAX_LINKS] if len(unique) > 1 else []
+
+
 TITLE_MAX = 300   # a title's characters looked at (a pad name keeps far fewer)
 
 

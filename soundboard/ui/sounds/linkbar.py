@@ -60,6 +60,7 @@ class LinkBar(QFrame):
     failed = Signal(str, str)         # (url, kind): it ended in an error, just before its done
     progress = Signal(str, object)    # (url, 0..1 downloaded, or -1/stage while it's converted)
     link_changed = Signal(str)        # the search box's link ("" when it has none now)
+    links_changed = Signal(list)      # the search box's links, when several were pasted
     download_started = Signal(str, str, str, float)  # (url, title, kind, seconds)
     queue_updated = Signal(list)      # the picks waiting their turn: [{url, title, kind}]
     up_next_changed = Signal(list)    # downloaded Plays waiting for the one playing: [title]
@@ -72,6 +73,7 @@ class LinkBar(QFrame):
         self.engine, self.cfg = engine, cfg
         self._color_for, self._known_for = color_for, known_for
         self.url = ""
+        self.many: list[str] = []     # several links pasted at once (ytdl.as_links)
         self.title = ""
         self._secs = 0.0
         self._text = ""               # the search box's text last seen
@@ -151,6 +153,12 @@ class LinkBar(QFrame):
         if text == self._text:
             return
         self._text = text
+        many = ytdl.as_links(text)
+        if many != self.many:
+            self.many = many
+            for u in many:
+                self._via[u] = "link"
+            self.links_changed.emit(many)
         url = ytdl.as_link(text)
         if url == self.url:
             return

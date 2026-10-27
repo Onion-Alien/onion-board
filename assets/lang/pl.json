@@ -4525,6 +4525,31 @@
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "System Windows nie potrafił określić, czy ta sieć jest publiczna, więc telefony są na wszelki wypadek odrzucane. Ustaw ją jako prywatną w Ustawieniach systemu Windows → Sieć i Internet, a następnie wyłącz i ponownie włącz tę opcję",
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Jak głośno inni słyszą twoje dźwięki (i twój stream). Twoje słuchawki mają własną głośność: Moje słuchawki, na samym dole. W polu wpisz do 1000%.",
   "Sounds for others": "Dźwięki dla innych",
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board może działać lżej na tym komputerze: Tryb lekki wyłącza animacje. Znajdziesz go też w Ustawienia > Ogólne.",
+  "Add all ({n})": "Dodaj wszystko ({n})",
+  "Can't use these links": "Nie można użyć tych linków",
+  "Looking up {n} link…": [
+    "Wyszukuję link {n} …",
+    "Wyszukuję {n} linków…",
+    "Wyszukuję {n} linków…"
+  ],
+  "None of these links could be looked up.": "Nie udało się wyszukać żadnego z tych linków.",
+  "Tor was turned away.": "Tor został odwrócony.",
+  "{n} couldn't be used": [
+    "Nie można użyć {n}",
+    "Nie można użyć {n}",
+    "Nie można użyć {n}"
+  ],
+  "{n} link": [
+    "{n} link",
+    "{n} linki",
+    "{n} linki"
+  ],
+  "{n} of them is on your board already.": [
+    "{n} z nich jest już na Twojej tablicy.",
+    "{n} z nich jest już na Twojej tablicy.",
+    "{n} z nich jest już na Twojej tablicy."
+  ],
   "404": "404",
   "Add 10 pasted links at once.": "Dodaj 10 wklejonych linków na raz.",
   "Add 100 sounds from links or searches.": "Dodaj 100 dźwięków z linków lub wyszukiwań.",
@@ -4638,6 +4663,5 @@
   "Weekend Warrior": "Weekendowy Wojownik",
   "Whisper": "Szept",
   "Zen": "Zen",
-  "Reach a score of 3,000.": "Zdobądź wynik 3000.",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board może działać lżej na tym komputerze: Tryb lekki wyłącza animacje. Znajdziesz go też w Ustawienia > Ogólne."
+  "Reach a score of 3,000.": "Zdobądź wynik 3000."
 }

@@ -4447,6 +4447,27 @@
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows kon niet zeggen of dit netwerk openbaar is, dus telefoons worden voor de zekerheid geweigerd. Zet het op Privé in Windows-instellingen → Netwerk en internet en zet dit daarna uit en weer aan",
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Hoe hard anderen je geluiden horen (en je stream). Je koptelefoon heeft een eigen volume: Mijn koptelefoon, onderaan. Typ tot 1000% in het vak.",
   "Sounds for others": "Geluiden voor anderen",
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board kan lichter draaien op deze pc: de Lite-modus zet de animaties uit. Hij staat ook in Instellingen > Algemeen.",
+  "Add all ({n})": "Alles toevoegen ({n})",
+  "Can't use these links": "Kan deze links niet gebruiken",
+  "Looking up {n} link…": [
+    "{n} link opzoeken…",
+    "{n} links opzoeken…"
+  ],
+  "None of these links could be looked up.": "Geen van deze links kon worden opgezocht.",
+  "Tor was turned away.": "Tor werd afgewezen.",
+  "{n} couldn't be used": [
+    "{n} kan niet worden gebruikt",
+    "{n} kan niet worden gebruikt"
+  ],
+  "{n} link": [
+    "{n} koppeling",
+    "{n} koppelingen"
+  ],
+  "{n} of them is on your board already.": [
+    "{n} daarvan staan ​​al op je bord.",
+    "{n} daarvan staan ​​al op je bord."
+  ],
   "404": "404",
   "Add 10 pasted links at once.": "Voeg 10 geplakte links tegelijk toe.",
   "Add 100 sounds from links or searches.": "Voeg 100 geluiden toe van links of zoekopdrachten.",
@@ -4560,6 +4581,5 @@
   "Weekend Warrior": "Weekendstrijder",
   "Whisper": "Fluisteren",
   "Zen": "Zen",
-  "Reach a score of 3,000.": "Bereik een score van 3.000.",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board kan lichter draaien op deze pc: de Lite-modus zet de animaties uit. Hij staat ook in Instellingen > Algemeen."
+  "Reach a score of 3,000.": "Bereik een score van 3.000."
 }

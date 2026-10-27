@@ -4369,6 +4369,23 @@
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "このネットワークがパブリックかどうかを Windows が判断できなかったため、安全のためスマートフォンからの接続を拒否しています。Windows の設定 → ネットワークとインターネットでプライベートに設定してから、これをオフにしてもう一度オンにしてください",
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "相手（と配信）にサウンドがどのくらいの音量で聞こえるか。自分のヘッドホンの音量は別です：一番下の「自分のヘッドホン」。欄には最大 1000% まで入力できます。",
   "Sounds for others": "相手へのサウンド",
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "このPCではOnion Boardをもっと軽く動かせます: 軽量モードでアニメーションをオフにできます。設定 > 一般 にもあります。",
+  "Add all ({n})": "すべて追加 ({n})",
+  "Can't use these links": "これらのリンクは使用できません",
+  "Looking up {n} link…": [
+    "{n}個のリンクを検索中…"
+  ],
+  "None of these links could be looked up.": "これらのリンクはどれも検索できませんでした。",
+  "Tor was turned away.": "トールは追い返されました。",
+  "{n} couldn't be used": [
+    "{n}は使用できませんでした"
+  ],
+  "{n} link": [
+    "{n}個のリンク"
+  ],
+  "{n} of them is on your board already.": [
+    "そのうち{n}人はすでにボード上にいます。"
+  ],
   "404": "404",
   "Add 10 pasted links at once.": "貼り付けたリンクを一度に 10 個追加します。",
   "Add 100 sounds from links or searches.": "リンクまたは検索から 100 個のサウンドを追加します。",
@@ -4482,6 +4499,5 @@
   "Weekend Warrior": "週末の戦士",
   "Whisper": "ささやき",
   "Zen": "Zen",
-  "Reach a score of 3,000.": "スコアが 3,000 に到達する。",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "このPCではOnion Boardをもっと軽く動かせます: 軽量モードでアニメーションをオフにできます。設定 > 一般 にもあります。"
+  "Reach a score of 3,000.": "スコアが 3,000 に到達する。"
 }

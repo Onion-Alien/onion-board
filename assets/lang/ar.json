@@ -4759,6 +4759,43 @@
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "تعذّر على Windows معرفة ما إذا كانت هذه الشبكة عامة، لذلك تُرفض الهواتف احتياطًا. اضبطها على خاصة في إعدادات Windows ← الشبكة والإنترنت، ثم أوقف هذا وشغّله من جديد",
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "مدى علوّ أصواتك عند الآخرين (وفي البث). لسماعاتك صوتها الخاص: سماعاتي، في الأسفل. اكتب حتى 1000% في الخانة.",
   "Sounds for others": "الأصوات للآخرين",
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "يمكن أن يعمل Onion Board بخفة أكبر على هذا الحاسوب: الوضع الخفيف يوقف الحركات. تجده أيضًا في الإعدادات > عام.",
+  "Add all ({n})": "أضف الكل ({n})",
+  "Can't use these links": "لا يمكن استخدام هذه الروابط",
+  "Looking up {n} link…": [
+    "جارٍ البحث عن الرابط {n} ...",
+    "جارٍ البحث عن الروابط {n} ...",
+    "جارٍ البحث عن الروابط {n} ...",
+    "جارٍ البحث عن الروابط {n} ...",
+    "جارٍ البحث عن الروابط {n} ...",
+    "جارٍ البحث عن الروابط {n} ..."
+  ],
+  "None of these links could be looked up.": "لا يمكن البحث عن أي من هذه الروابط.",
+  "Tor was turned away.": "تم إبعاد تور.",
+  "{n} couldn't be used": [
+    "لا يمكن استخدام {n}",
+    "لا يمكن استخدام {n}",
+    "لا يمكن استخدام {n}",
+    "لا يمكن استخدام {n}",
+    "لا يمكن استخدام {n}",
+    "لا يمكن استخدام {n}"
+  ],
+  "{n} link": [
+    "الرابط {n}",
+    "{n} الروابط",
+    "{n} الروابط",
+    "{n} الروابط",
+    "{n} الروابط",
+    "{n} الروابط"
+  ],
+  "{n} of them is on your board already.": [
+    "{n} منهم موجود على لوحتك بالفعل.",
+    "{n} منهم موجودون على لوحتك بالفعل.",
+    "{n} منهم موجودون على لوحتك بالفعل.",
+    "{n} منهم موجودون على لوحتك بالفعل.",
+    "{n} منهم موجودون على لوحتك بالفعل.",
+    "{n} منهم موجودون على لوحتك بالفعل."
+  ],
   "404": "404",
   "Add 10 pasted links at once.": "اضافة 10 روابط تم لصقها مرة واحدة.",
   "Add 100 sounds from links or searches.": "إضافة 100 صوت من الروابط أو عمليات البحث.",
@@ -4872,6 +4909,5 @@
   "Weekend Warrior": "محارب عطلة نهاية الأسبوع",
   "Whisper": "الهمس",
   "Zen": "Zen",
-  "Reach a score of 3,000.": "الوصول إلى درجة 3000.",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "يمكن أن يعمل Onion Board بخفة أكبر على هذا الحاسوب: الوضع الخفيف يوقف الحركات. تجده أيضًا في الإعدادات > عام."
+  "Reach a score of 3,000.": "الوصول إلى درجة 3000."
 }

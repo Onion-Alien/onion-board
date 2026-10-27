@@ -4369,6 +4369,23 @@
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows 无法判断此网络是否为公用网络，因此为安全起见拒绝手机连接。请在 Windows 设置 → 网络和 Internet 中将其设为专用，然后关闭并重新打开此选项",
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "别人听到你的音效有多响（还有你的直播）。你自己的耳机有单独的音量：在最下面的“我的耳机”。在框里最高可输入 1000%。",
   "Sounds for others": "给别人的音效",
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board 在这台电脑上可以更轻快：轻量模式会关闭动画。也可以在 设置 > 常规 里找到。",
+  "Add all ({n})": "添加全部 ({n})",
+  "Can't use these links": "无法使用这些链接",
+  "Looking up {n} link…": [
+    "正在查找{n}个链接..."
+  ],
+  "None of these links could be looked up.": "这些链接均无法查找。",
+  "Tor was turned away.": "托尔被拒之门外。",
+  "{n} couldn't be used": [
+    "{n}无法使用"
+  ],
+  "{n} link": [
+    "{n}个链接"
+  ],
+  "{n} of them is on your board already.": [
+    "其中{n}个已在您的板上。"
+  ],
   "404": "404",
   "Add 10 pasted links at once.": "一次添加 10 个粘贴链接。",
   "Add 100 sounds from links or searches.": "通过链接或搜索添加 100 个声音。",
@@ -4482,6 +4499,5 @@
   "Weekend Warrior": "周末勇士",
   "Whisper": "耳语",
   "Zen": "Zen",
-  "Reach a score of 3,000.": "达到 3,000 分。",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board 在这台电脑上可以更轻快：轻量模式会关闭动画。也可以在 设置 > 常规 里找到。"
+  "Reach a score of 3,000.": "达到 3,000 分。"
 }

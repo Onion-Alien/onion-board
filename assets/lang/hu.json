@@ -4447,6 +4447,27 @@
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "A Windows nem tudta megállapítani, hogy ez a hálózat nyilvános-e, ezért a telefonokat biztonsági okból elutasítja. Állítsa magánhálózatra a Windows Gépház → Hálózat és internet részében, majd kapcsolja ki és be újra ezt",
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Milyen hangosan hallják mások a hangjaidat (és a streamedet). A fejhallgatódnak saját hangereje van: Fejhallgatóm, lent. A mezőbe akár 1000%-ot is írhatsz.",
   "Sounds for others": "Hangok másoknak",
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Az Onion Board könnyebben is futhat ezen a gépen: a Könnyített mód kikapcsolja az animációkat. A Beállítások > Általános alatt is megtalálod.",
+  "Add all ({n})": "Összes hozzáadása ({n})",
+  "Can't use these links": "Ezeket a linkeket nem lehet használni",
+  "Looking up {n} link…": [
+    "{n} link keresése…",
+    "{n} link keresése…"
+  ],
+  "None of these links could be looked up.": "Ezen linkek egyikét sem lehetett megkeresni.",
+  "Tor was turned away.": "Tort elfordították.",
+  "{n} couldn't be used": [
+    "{n} nem használható",
+    "{n} nem használható"
+  ],
+  "{n} link": [
+    "{n} link",
+    "{n} link"
+  ],
+  "{n} of them is on your board already.": [
+    "Közülük {n} már szerepel a fórumon.",
+    "Közülük {n} már szerepel a fórumon."
+  ],
   "404": "404",
   "Add 10 pasted links at once.": "Adjon hozzá 10 beillesztett linket egyszerre.",
   "Add 100 sounds from links or searches.": "Adjon hozzá 100 hangot a hivatkozásokból vagy keresésekből.",
@@ -4560,6 +4581,5 @@
   "Weekend Warrior": "Hétvégi harcos",
   "Whisper": "Suttogás",
   "Zen": "Zen",
-  "Reach a score of 3,000.": "Érje el a 3000 pontot.",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Az Onion Board könnyebben is futhat ezen a gépen: a Könnyített mód kikapcsolja az animációkat. A Beállítások > Általános alatt is megtalálod."
+  "Reach a score of 3,000.": "Érje el a 3000 pontot."
 }

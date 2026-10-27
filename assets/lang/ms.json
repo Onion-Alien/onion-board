@@ -4369,6 +4369,23 @@
   "Windows couldn't say whether this network is Public, so phones are turned away to be safe. Set it to Private in Windows Settings → Network & internet, then turn this off and on again": "Windows tidak dapat memastikan sama ada rangkaian ini Awam, jadi telefon ditolak untuk keselamatan. Tetapkannya kepada Peribadi dalam Tetapan Windows → Rangkaian & internet, kemudian matikan dan hidupkan semula ini",
   "How loud others hear your sounds (and your stream). Your own headphones have their own volume: My headphones, at the bottom. Type up to 1000% in the box.": "Sekuat mana orang lain mendengar bunyi anda (dan strim anda). Fon kepala anda ada kelantangan sendiri: Fon kepala saya, di bawah. Taip sehingga 1000% dalam kotak.",
   "Sounds for others": "Bunyi untuk orang lain",
+  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board boleh berjalan lebih ringan pada PC ini: Mod ringan mematikan animasi. Ia juga ada dalam Tetapan > Umum.",
+  "Add all ({n})": "Tambahkan semua ({n})",
+  "Can't use these links": "Tidak boleh menggunakan pautan ini",
+  "Looking up {n} link…": [
+    "Mencari {n} pautan…"
+  ],
+  "None of these links could be looked up.": "Tiada satu pun pautan ini boleh dicari.",
+  "Tor was turned away.": "Tor ditolak.",
+  "{n} couldn't be used": [
+    "{n} tidak dapat digunakan"
+  ],
+  "{n} link": [
+    "{n} pautan"
+  ],
+  "{n} of them is on your board already.": [
+    "{n} daripada mereka sudah berada di papan anda."
+  ],
   "404": "404",
   "Add 10 pasted links at once.": "Tambah 10 pautan yang ditampal sekaligus.",
   "Add 100 sounds from links or searches.": "Tambahkan 100 bunyi daripada pautan atau carian.",
@@ -4482,6 +4499,5 @@
   "Weekend Warrior": "Pahlawan Hujung Minggu",
   "Whisper": "Bisik",
   "Zen": "Zen",
-  "Reach a score of 3,000.": "Capai markah 3,000.",
-  "Onion Board can run lighter on this PC: Lite mode turns off the animations. It's in Settings > General too.": "Onion Board boleh berjalan lebih ringan pada PC ini: Mod ringan mematikan animasi. Ia juga ada dalam Tetapan > Umum."
+  "Reach a score of 3,000.": "Capai markah 3,000."
 }
