@@ -8,11 +8,11 @@ import re
 from collections.abc import Callable
 
 from PySide6.QtCore import QElapsedTimer, QEvent, QObject, QSignalBlocker, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QKeySequence, QPainter, QPen, QShortcut
+from PySide6.QtGui import QColor, QIcon, QKeySequence, QPainter, QPen, QShortcut
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QCheckBox, QComboBox, QDialog, QFrame,
                                QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem,
-                               QPushButton, QScrollArea, QStyledItemDelegate, QTabWidget,
-                               QVBoxLayout, QWidget)
+                               QPushButton, QScrollArea, QStyle, QStyledItemDelegate,
+                               QStyleOptionViewItem, QTabWidget, QVBoxLayout, QWidget)
 import shiboken6
 from shiboken6 import isValid as qt_valid
 
@@ -43,7 +43,30 @@ NOTE = _("No ads, no account, no spying, free forever. Found a bug? Tell me. Hav
          "\n\nOnionAlien")
 
 
-class _AdvancedRow(QStyledItemDelegate):
+class _Row(QStyledItemDelegate):
+    """A category row. Narrow, it's an icon with no name: the icon goes in the middle
+    of its highlight (the style put it at the left, with twice the room on its right)."""
+
+    def paint(self, painter: QPainter, option, index):
+        if index.data(Qt.ItemDataRole.DisplayRole):
+            super().paint(painter, option, index)
+            return
+        opt = QStyleOptionViewItem(option)
+        self.initStyleOption(opt, index)
+        icon = QIcon(opt.icon)   # (a copy: opt.icon is the option's own, blanked next)
+        size = QSize(opt.decorationSize)
+        opt.icon = QIcon()
+        opt.features &= ~QStyleOptionViewItem.ViewItemFeature.HasDecoration
+        style = opt.widget.style() if opt.widget is not None else QApplication.style()
+        style.drawControl(QStyle.ControlElement.CE_ItemViewItem, opt, painter, opt.widget)
+        selected = bool(opt.state & QStyle.StateFlag.State_Selected)
+        box = QStyle.alignedRect(opt.direction, Qt.AlignmentFlag.AlignCenter,
+                                 size, opt.rect)
+        icon.paint(painter, box, Qt.AlignmentFlag.AlignCenter,
+                   QIcon.Mode.Selected if selected else QIcon.Mode.Normal)
+
+
+class _AdvancedRow(_Row):
     """The Show advanced row: a clear gap over it with a thin line across, so the
     everyday pages above read as their own group. Only the row under the gap
     highlights."""
@@ -166,6 +189,7 @@ class SettingsDialog(QDialog, Built):
         self._adv_row = self._page_keys.index(self.ADVANCED)
         adv = self.categories.item(self._adv_row)
         adv.setFlags(Qt.ItemFlag.ItemIsEnabled)   # a switch, never the page you're on
+        self.categories.setItemDelegate(_Row(self.categories))
         self._adv_delegate = _AdvancedRow(self.categories)
         self.categories.setItemDelegateForRow(self._adv_row, self._adv_delegate)
         self.categories.currentRowChanged.connect(self._row_picked)
