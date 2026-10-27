@@ -13,7 +13,7 @@ from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox,
                                QPushButton, QScrollArea, QSlider, QTabWidget, QVBoxLayout,
                                QWidget)
 
-from soundboard.core import usage
+from soundboard.core import achievements, usage
 from soundboard.audio import livefx, soundfx
 from soundboard.ui.kit import theme
 from soundboard import voicefx
@@ -747,6 +747,11 @@ class EditDialog(EditDialogParts, QDialog):
 
     def apply(self, target: SoundMeta | None = None):
         m = target or self.meta
+        if not self.as_copy:   # (Name Tag, Painter)
+            if self.name.text().strip() not in ("", m.name):
+                achievements.bump("renamed")
+            if self.color != m.color:
+                achievements.bump("recoloured")
         m.name = self.name.text().strip() or m.name
         m.volume = self.vol.value() / 100
         m.mode = self.mode.currentData()

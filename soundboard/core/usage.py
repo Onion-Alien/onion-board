@@ -230,6 +230,7 @@ def downloaded(cfg, url: str, via: str, kind: str, ok: bool, why: str = "") -> N
     more for the next daily `downloads/` when it worked (only while the count is on,
     like open_tick)."""
     site = download_site(url)
+    achievements.downloaded(site, ok, kind)
     if not ok:
         used(f"dl-failed-{site}")
         used(f"dl-failed-why-{why if why in DL_FAILS else 'other'}")

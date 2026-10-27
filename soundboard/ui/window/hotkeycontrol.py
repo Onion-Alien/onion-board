@@ -19,7 +19,7 @@ from PySide6.QtWidgets import QMenu
 
 from soundboard.control import adminfront, midi, winkeys
 from soundboard.ui.kit import theme
-from soundboard.core import usage
+from soundboard.core import achievements, usage
 from soundboard.audio.engine import SR
 from soundboard.i18n import _, ngettext
 from soundboard.sounds.library import SoundMeta
@@ -383,6 +383,7 @@ class HotkeyControl(Controller):
         elif action == "__voicerandom__":
             self.random_voice()
         else:
+            achievements.played_by("hotkey", hidden=not mw.isVisible() or mw.isMinimized())
             mw.playctl.play(action)
 
     def _voice_fx(self):

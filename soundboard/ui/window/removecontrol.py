@@ -15,7 +15,7 @@ import numpy as np
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QMessageBox
 
-from soundboard.core import backup, trash
+from soundboard.core import achievements, backup, trash
 from soundboard.sounds import library
 from soundboard.i18n import _, ngettext
 from soundboard.sounds.library import SoundMeta
@@ -78,6 +78,7 @@ class RemoveControl(Controller):
         gone = [m for m in (mw.meta(s) for s in sids) if m]
         if not gone:
             return
+        achievements.bump("deleted", len(gone))   # (Marie Kondo)
         mw.editctl._close_editors([m.id for m in gone])
         self._finish_removals()   # only the latest removal can be undone
         for m in gone:

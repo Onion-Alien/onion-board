@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import Qt
 
 from soundboard import i18n
+from soundboard.core import achievements
 from soundboard.i18n import _
 from soundboard.ui.window.controller import Controller
 
@@ -65,6 +66,8 @@ class LanguageControl(Controller):
         mw = self.mw
         if not code:
             return
+        if code != mw.cfg.language:
+            achievements.bump("lang_switch")   # (Babel)
         mw.cfg.language = code
         mw.lang_bar.hide()
         mw._save_later()

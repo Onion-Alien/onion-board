@@ -73,7 +73,7 @@ from PySide6.QtGui import QColor, QFont, QImage, QPainter, QPainterPath, QPen  #
 from PySide6.QtWidgets import QSizePolicy, QWidget
 
 from soundboard.ui.kit import theme
-from soundboard.core import usage
+from soundboard.core import achievements, usage
 from soundboard.ui.bun.bunny import (  # noqa: F401
     FUR,
     GADGET_SCREEN,
@@ -397,6 +397,7 @@ class BunnyWidget(BunnyBuild, BunnyDance, BunnyPaint, QWidget):
             return
         if ev.button() == Qt.MouseButton.LeftButton:
             self.stir()
+            achievements.bump("bun_clicks")   # (Petting Zoo)
         if ev.button() == Qt.MouseButton.LeftButton and self.asleep:
             self.wake()
             self.clicked.emit()

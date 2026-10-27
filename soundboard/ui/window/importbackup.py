@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING
 from PySide6.QtWidgets import QFileDialog, QMessageBox
 
 from soundboard.core import (
+    achievements,
     backup,
     errors,
 )
@@ -128,6 +129,7 @@ class BackupImport(_Ctl):
                       _("Couldn't write {name}:\n{err}",
                         name=Path(path).name, err=errors.plain(err)), "error")
             return
+        achievements.at_least("backup", 1)   # (Backup Plan)
         msg = (ngettext("Exported {n} sound to {name}.",
                         "Exported {n} sounds to {name}.",
                         n, name=html.escape(Path(path).name)))

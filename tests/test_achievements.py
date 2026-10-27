@@ -40,12 +40,12 @@ def test_a_count_earns_it_once_at_its_goal(cfg):
     heard = []
     ach.on_unlock.append(heard.append)
     try:
-        ach.played(hour=12, when=NOON)
+        ach.played(hour=12, when=NOON, now=0.0)
         assert ach.got("first_blood") and not ach.got("spammer")
-        for _ in range(999):
-            ach.played(hour=12, when=NOON)
+        for i in range(999):   # (2 s apart: never a Speed Run)
+            ach.played(hour=12, when=NOON, now=2.0 * (i + 1))
         assert ach.got("spammer")
-        ach.played(hour=12, when=NOON)
+        ach.played(hour=12, when=NOON, now=5000.0)
         assert heard == ["first_blood", "spammer"]   # each said once
         assert not ach.got("gremlin")
         ach.played(hour=3, when=NOON)
@@ -452,3 +452,151 @@ def test_the_konami_code_cheers_and_earns_old_school(qapp, window):  # noqa: F81
     ach.attach(window.cfg, today="2026-10-19")
     konami.react(window)
     assert ach.got("old_school")
+
+
+# ------------------------------------------------------------------ the newer ones
+def test_ten_plays_in_ten_seconds_is_a_speed_run(cfg):
+    for i in range(10):
+        ach.played(when=NOON, now=i * 1.5)   # 13.5 s for the ten
+    assert not ach.got("speed_run")
+    for i in range(10):
+        ach.played(when=NOON, now=100 + i * 1.0)
+    assert ach.got("speed_run")
+
+
+def test_one_sound_all_day_long_and_after_a_month_away(cfg):
+    for i in range(49):
+        ach.played(when=NOON, sid="a", plays=i + 1, now=i * 5.0)
+    assert not ach.got("broken_record")
+    ach.played(when=at("2026-06-11 12:00:00"), sid="a", plays=50, now=500.0)
+    assert not ach.got("broken_record")   # a new day starts again
+    assert not ach.got("deep_cut")
+    ach.played(when=at("2026-07-11 12:00:00"), sid="a", plays=51, now=600.0)
+    assert ach.got("deep_cut")            # 30 days since it last played
+    ach.played(when=NOON, sid="b", plays=500, now=700.0)
+    assert ach.got("one_hit_wonder")
+
+
+def test_quiet_plays_whisper(cfg):
+    for i in range(20):
+        ach.played(when=NOON, sid="a", gain=0.04, now=i * 5.0)
+    ach.played(when=NOON, sid="a", gain=0.0, now=500.0)   # (muted: not a whisper)
+    assert ach.got("whisper")
+
+
+@pytest.mark.parametrize("when, earned", [
+    ("2026-04-01 10:00:00", "april_fool"), ("2028-02-29 10:00:00", "leap_of_faith"),
+    ("2026-06-10 13:37:00", "leet"), ("2026-11-13 10:00:00", "friday_13th"),
+    ("2026-06-10 05:20:00", "early_bird"), ("2026-06-10 13:38:00", None)])
+def test_more_sounds_on_the_day(cfg, when, earned):
+    ach.played(when=at(when))
+    days = {"april_fool", "leap_of_faith", "leet", "friday_13th", "early_bird"}
+    assert {a for a in days if ach.got(a)} == ({earned} if earned else set())
+
+
+def test_how_a_sound_was_played_counts(cfg):
+    for _ in range(100):
+        ach.played_by("hotkey", hidden=True)
+        ach.played_by("phone")
+    assert ach.got("tray_ninja") and ach.got("phone_home")
+    assert not ach.got("keyboard_warrior") and not ach.got("clicker")
+
+
+def test_days_in_a_row_weekends_and_coming_back():
+    c = SimpleNamespace(achievements={}, sounds=[])
+    try:
+        for day in range(1, 8):   # 1 to 7 November 2026: a Sunday, then Monday to Saturday
+            ach.attach(c, now=0.0, today=f"2026-11-{day:02d}", month=11)
+        assert ach.got("on_a_roll") and not ach.got("unbreakable")
+        assert ach.value("weekends") == 2
+        ach.attach(c, now=0.0, today="2026-11-09", month=11)   # a day missed
+        assert c.achievements["seen"]["run"] == 1 and not ach.got("comeback_kid")
+        ach.attach(c, now=0.0, today="2026-12-20", month=12)
+        assert ach.got("comeback_kid")
+    finally:
+        ach.detach()
+
+
+def test_the_tick_counts_the_quiet_the_night_loops_and_the_board(cfg):
+    ach.tick(now=1800.0, hour=2)
+    assert not ach.got("night_shift") and not ach.got("silence")
+    ach.tick(now=3700.0, hour=3, looping=["x"])
+    assert ach.got("night_shift") and ach.got("silence")
+    assert not ach.got("loop_de_loop")
+    ach.tick(now=4400.0, hour=12, looping=["x"], shortest=0.4, tabs=5)
+    assert ach.got("loop_de_loop") and ach.got("blink") and ach.got("tidy_desk")
+
+
+def test_exactly_69_sounds_is_nice(cfg):
+    ach.sounds_now(68)
+    assert not ach.got("nice")
+    ach.sounds_now(69)
+    assert ach.got("nice")
+
+
+def test_radio_from_six_continents_and_a_long_listen_to_one(cfg):
+    for i, cc in enumerate(("DE", "US", "BR", "JP", "ZA")):
+        ach.station(f"s{i}", "x", cc)
+    assert not ach.got("seven_seas")
+    ach.station("s9", "x", "NZ")
+    assert ach.got("seven_seas")
+    ach.live("radio", True, now=0.0)
+    ach.station("s1", "x", "US", now=0.0)
+    ach.tick(now=9 * 3600.0, hour=12)
+    assert not ach.got("station_loyalist")
+    ach.tick(now=10 * 3600.0 + 5, hour=12)
+    assert ach.got("station_loyalist")
+
+
+def test_rock_paper_scissors_in_a_row_and_tic_tac_toe_wins(cfg):
+    for who in ("you", "you", "you", "you", "bun", "you", "you", "you", "you"):
+        ach.game_point("rps", who)
+    assert not ach.got("rock_solid")
+    ach.game_point("rps", "you")
+    assert ach.got("rock_solid")
+    for _ in range(10):
+        ach.game_won("ttt")
+        ach.game_won("pong")
+    assert ach.got("grid_master") and ach.value("ttt_won") == 10
+
+
+def test_a_voice_changer_run_and_the_voices_in_it(cfg):
+    for i in range(10):
+        ach.voice_picked(f"v{i}")
+    assert ach.got("quick_change")
+    ach.live("voice", True, now=0.0)
+    ach.tick(now=3 * 3600.0 + 1, hour=12)
+    assert ach.got("talk_show")
+
+
+def test_downloads_count_sites_and_failures(cfg):
+    for site in ("youtube", "tiktok", "soundcloud", "reddit"):
+        ach.downloaded(site, True, "add")
+    ach.downloaded("other", True, "play")   # (a Play isn't added)
+    assert not ach.got("site_seer")
+    ach.downloaded("other", True, "add")
+    assert ach.got("site_seer")
+    for _ in range(5):
+        ach.downloaded("youtube", False, "add")
+    assert ach.got("not_found")
+
+
+def test_the_score_and_fifty_earned(cfg):
+    for a in ach.ALL[1:50]:   # (not First Blood, ALL[0])
+        cfg.achievements["got"][a.id] = 1
+    ach.played(when=NOON)   # First Blood earned: the hunt looks again
+    assert ach.got("overachiever")
+    assert ach.value("score") == ach.score()
+    assert ach.max_score() >= ach.BY_ID["high_score"].goal
+
+
+def test_a_settings_reset_keeps_what_was_earned_and_earns_fresh_start(tmp_path, monkeypatch):
+    from soundboard.core import reset
+    assert "achievements" in reset.KEEP
+    c = SimpleNamespace(achievements={"n": {"fresh_start": 1}, "got": {"first_blood": 5}},
+                        sounds=[])
+    try:
+        ach.attach(c, now=0.0, today="2026-10-19", month=10)
+        assert ach.got("fresh_start") and ach.got("first_blood") == 5
+    finally:
+        ach.detach()

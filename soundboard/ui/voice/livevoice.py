@@ -17,7 +17,7 @@ from soundboard.speech import live, spoken, translation
 from soundboard.ui.kit import icons
 from soundboard.ui.kit.panel import hint_label
 from soundboard.ui.voice.voicefxpanel import _enable
-from soundboard.core import errors
+from soundboard.core import achievements, errors
 from soundboard.i18n import _
 
 if TYPE_CHECKING:
@@ -210,6 +210,8 @@ class LiveVoice(QObject):
         self.b_live.setChecked(on)
         self.b_live.blockSignals(False)
         p.live_changed.emit(on)
+        # talking in another language: its time counts (Lost in Translation)
+        achievements.live("translate", on and bool(p.cb_lang.currentData()))
         for w in (p.cb_model, p.ed_lang, p.cb_lang):
             _enable(w, not on, _("Stop the computer voice to change this"))
         _enable(p.installs.b_update, not on,

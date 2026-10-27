@@ -118,7 +118,7 @@ from urllib.parse import parse_qs, urlsplit
 
 from PySide6.QtCore import QCoreApplication, QEvent, QObject, Qt, QTimer, Signal
 
-from soundboard.core import errors, usage
+from soundboard.core import achievements, errors, usage
 from soundboard.online import netcategory
 from soundboard.core.pollthread import PollThread
 from soundboard.i18n import _
@@ -585,6 +585,8 @@ class RemoteControl(QObject):
             job.status, job.body = self.dispatch(job.action, job.params)
             if job.status == 200:   # the name only (usage.py)
                 usage.used("remote-used-phone" if self.lan else "remote-used-api")
+                if self.lan and job.action == "play":
+                    achievements.played_by("phone")
                 if job.action == "key_image":   # only the Stream Deck plugin asks for these
                     usage.used("remote-stream-deck")
         except Exception:  # noqa: BLE001 - a bad request must never take the app down

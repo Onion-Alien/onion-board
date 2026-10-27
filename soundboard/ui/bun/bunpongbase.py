@@ -23,7 +23,7 @@ from PySide6.QtGui import (
 )
 from PySide6.QtWidgets import QWidget
 
-from soundboard.core import usage
+from soundboard.core import achievements, usage
 from soundboard.i18n import _
 from soundboard.ui.bun.bunny import H, INK, W, draw_bunny, sparkle
 from soundboard.ui.kit import theme
@@ -131,6 +131,7 @@ class Game(QWidget):
 
     win_at = WIN_AT
     net = False   # the court's middle line and circle (Pong's)
+    ach = ""      # its name for the achievements that count it ("rps", "ttt")
 
     def __init__(self, rng: random.Random | None = None, parent=None):
         super().__init__(parent)
@@ -182,12 +183,14 @@ class Game(QWidget):
     def _point(self, who: str, quip: bool = True) -> bool:
         """`who` ("you" / "bun") scores. True if that ends the game."""
         self.score[who] += 1
+        achievements.game_point(self.ach, who)
         self.pop[who] = 0.0
         self.goal_flash = ["bun" if who == "you" else "you", 0.0]
         self.shake = 0.28
         if self.score[who] >= self.win_at:
             usage.used("egg-pong-won" if who == "you" else "egg-pong-lost")
             if who == "you":
+                achievements.game_won(self.ach)
                 self._confetti()
             self._play("win" if who == "you" else "lose")
             self._go("over")

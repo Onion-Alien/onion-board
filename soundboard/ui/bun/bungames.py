@@ -246,6 +246,7 @@ class RockPaperScissors(Game):
     rock. He has a habit: now and then he plays what beats your last pick."""
 
     win_at = 3
+    ach = "rps"
 
     @staticmethod
     def title() -> str:
@@ -414,6 +415,7 @@ class TicTacToe(Game):
     first swaps every round; a full board with no line is a draw (no point)."""
 
     win_at = 3
+    ach = "ttt"
 
     @staticmethod
     def title() -> str:

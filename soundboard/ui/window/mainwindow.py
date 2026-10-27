@@ -619,7 +619,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
             p = self.pads.get(m.id)
             if p is None:
                 p = Pad(m, self.cfg.pad_width)
-                p.activated.connect(self.playctl.play)
+                p.activated.connect(self.playctl.clicked)
                 p.space.connect(self.playctl.space_pad)
                 p.chosen.connect(self.playctl.select)
                 p.pick.connect(self.selection.on_pick)
