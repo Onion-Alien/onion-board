@@ -60,12 +60,6 @@ def test_scan_skips_data_folders_and_stops_at_its_limit(tmp_path):
     assert voicesdk.scan(tmp_path / "missing" / "x.exe") is None
 
 
-def _join_scans():
-    for t in threading.enumerate():
-        if t.name == "voicesdk-scan":
-            t.join(5)
-
-
 class _Fg:
     def __init__(self):
         self.now = (0, "")
@@ -77,12 +71,7 @@ class _Fg:
 def _watcher(engines, alive):
     fg = _Fg()
     w = voicesdk.Watcher(fg, lambda p: engines.get(p), lambda pid: pid in alive)
-
-    def poll():
-        w.poll()
-        _join_scans()
-        return w.poll()
-    return w, fg, poll
+    return w, fg, w.look   # one look, here (poll() has the worker do it)
 
 
 def test_watcher_suggests_the_game_you_just_left_while_it_runs():
@@ -108,9 +97,33 @@ def test_watcher_scans_each_exe_once():
     w = voicesdk.Watcher(fg, lambda p: calls.append(p) or "unity", lambda pid: True)
     fg.now = (5, "C:/Games/U/u.exe")
     for _ in range(4):
-        w.poll()
-        _join_scans()
+        w.look()
     assert calls == ["C:/Games/U/u.exe"] and w.suggestion == "unity"
+
+
+def test_watcher_poll_never_asks_windows_on_the_callers_thread(monkeypatch):
+    """poll() runs on the UI thread every few seconds: the foreground lookup queries
+    another program, and on a PC short of memory one sat in it for minutes with the
+    window frozen. poll() only wakes the worker and returns the last answer."""
+    monkeypatch.setattr(voicesdk.Watcher, "MIN_GAP_S", 0.01)
+    me, seen, go = threading.get_ident(), [], threading.Event()
+
+    def fg():
+        seen.append(threading.get_ident())
+        go.wait(5)   # Windows slow to answer
+        return 7, "C:/Games/V/v.exe"
+    w = voicesdk.Watcher(fg, lambda p: "game", lambda pid: True)
+    t0 = time.monotonic()
+    assert w.poll() is None and w.poll() is None   # at once, with what it had
+    assert time.monotonic() - t0 < 1
+    go.set()
+    for _ in range(500):
+        if w.suggestion == "game":
+            break
+        time.sleep(0.01)
+    assert w.suggestion == "game" and w.path == "C:/Games/V/v.exe"
+    assert seen and me not in seen
+    assert w.poll() == "game"
 
 
 @pytest.mark.windows   # Windows paths

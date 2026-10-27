@@ -244,14 +244,65 @@ def _is_system(path: str) -> bool:
         return False
 
 
-class Watcher:
+class _Kept:
+    """A worker thread kept while poll()s keep coming (not a new one per poll); it ends
+    after IDLE_EXIT_S without one. Looks are at least MIN_GAP_S apart however often
+    poll() is called. poll() only wakes it and returns what the last look found: the
+    window never waits on Windows, the disk or a thread start each time it asks."""
+
+    IDLE_EXIT_S = 60.0
+    MIN_GAP_S = 1.0
+    THREAD_NAME = "voicesdk"
+
+    def __init__(self):
+        self._lock = threading.Lock()
+        self._wake = threading.Event()
+        self._want = None                          # what the next look is for
+        self._thread: threading.Thread | None = None
+        self.looks = 0
+
+    def _kick(self, want=None):
+        with self._lock:
+            self._want = want
+            if self._thread is None:
+                self._thread = threading.Thread(target=self._run, daemon=True,
+                                                name=self.THREAD_NAME)
+                self._thread.start()
+            self._wake.set()
+
+    def _look_bg(self, want):
+        raise NotImplementedError
+
+    def _run(self):
+        last = 0.0
+        while True:
+            if not self._wake.wait(self.IDLE_EXIT_S):
+                with self._lock:
+                    if not self._wake.is_set():   # (a poll may have come just now)
+                        self._thread = None
+                        return
+            time.sleep(max(0.0, last + self.MIN_GAP_S - time.monotonic()))
+            with self._lock:
+                self._wake.clear()
+                want = self._want
+            last = time.monotonic()
+            self._look_bg(want)
+            self.looks += 1
+
+
+class Watcher(_Kept):
     """The voice engine of the last program you had in front, while it runs.
-    poll() is cheap (one foreground lookup); a new exe's folder is scanned once, on
-    a thread, and cached by path. This app and Windows' own windows don't count, so
-    the game you just switched away from is still the one suggested; any other
-    program in front replaces it (with None if it ships no known voice engine)."""
+    poll() is cheap: the foreground lookup (a query on another program, which held the
+    window for minutes on a PC short of memory) and a new exe's folder scan run on a
+    kept worker (_Kept); a folder is scanned once and cached by path. This app and
+    Windows' own windows don't count, so the game you just switched away from is still
+    the one suggested; any other program in front replaces it (with None if it ships
+    no known voice engine)."""
+
+    THREAD_NAME = "voicesdk-watch"
 
     def __init__(self, foreground=None, scanner=None, alive=None):
+        super().__init__()
         # looked up per call, so a test can stub the module's functions
         self._fg = foreground or (lambda: foreground_process())
         self._scan = scanner or (lambda path: scan(path))
@@ -259,63 +310,61 @@ class Watcher:
             from soundboard.audio.appaudio import is_running
             alive = is_running
         self._alive = alive
-        self._cache: dict[str, str | None] = {}
-        self._pending: set[str] = set()
-        self._lock = threading.Lock()
-        self._pid = 0
-        self.suggestion: str | None = None
-        self.path = ""   # the exe of the program suggested for
+        self._cache: dict[str, str | None] = {}   # the worker's own
+        self._now: tuple[int, str | None, str] = (0, None, "")   # pid, key, exe path
 
-    def _scan_bg(self, path: str):
-        key = self._scan(path)
-        with self._lock:
-            self._cache[path] = key
-            self._pending.discard(path)
+    @property
+    def suggestion(self) -> str | None:
+        return self._now[1]
+
+    @property
+    def path(self) -> str:
+        """The exe of the program suggested for."""
+        return self._now[2]
 
     def poll(self) -> str | None:
-        """Look at the foreground window once; returns the current suggestion."""
-        pid, path = self._fg()
-        if pid and path and not _is_system(path):
-            with self._lock:
-                known = path in self._cache
-                key = self._cache.get(path)
-                start = not known and path not in self._pending
-                if start:
-                    self._pending.add(path)
-            if start:
-                threading.Thread(target=self._scan_bg, args=(path,), daemon=True,
-                                 name="voicesdk-scan").start()
-            elif known:
-                self._pid, self.suggestion = (pid, key) if key else (0, None)
-                self.path = path if key else ""
-        if self.suggestion and self._pid and not self._alive(self._pid):
-            self._pid, self.suggestion, self.path = 0, None, ""
+        """The current suggestion; asks the worker to look at the foreground again."""
+        self._kick()
         return self.suggestion
 
+    def look(self) -> str | None:
+        """One look at the foreground window, on the calling thread (poll runs it on
+        the worker)."""
+        pid, path = self._fg()
+        now = self._now
+        if pid and path and not _is_system(path):
+            if path not in self._cache:
+                self._cache[path] = self._scan(path)
+            key = self._cache[path]
+            now = (pid, key, path) if key else (0, None, "")
+        if now[1] and now[0] and not self._alive(now[0]):
+            now = (0, None, "")
+        self._now = now   # one assignment: the window never sees half a look
+        return now[1]
 
-class Listeners:
+    def _look_bg(self, want):
+        try:
+            self.look()
+        except Exception:  # noqa: BLE001 - only a hint
+            self._now = (0, None, "")
+
+
+class Listeners(_Kept):
     """Who records the mic or the cable's far end, as [(mode key, program name)],
     voice chat programs (VOICE_APPS) first, then games by their files. poll() is cheap: the
-    sessions are listed (and a new game's folder scanned, once) on a worker thread, and
-    it returns what the last look found. The worker is one thread kept while polls keep
-    coming (not a new one per poll); it ends after IDLE_EXIT_S without one. Looks are at
-    least MIN_GAP_S apart however often poll() is called."""
+    sessions are listed (and a new game's folder scanned, once) on a kept worker thread
+    (_Kept), and it returns what the last look found."""
 
-    IDLE_EXIT_S = 60.0
-    MIN_GAP_S = 1.0
+    THREAD_NAME = "voicesdk-listeners"
 
     def __init__(self, lister=None, scanner=None):
+        super().__init__()
         if lister is None:
             from soundboard.audio.appaudio import recording_apps
             lister = recording_apps
         self._list = lister
         self._scan = scanner or (lambda path: scan(path))
         self._cache: dict[str, str | None] = {}   # exe path -> mode key (games)
-        self._lock = threading.Lock()
-        self._wake = threading.Event()
-        self._want = None                          # the device(s) the next look is for
-        self._thread: threading.Thread | None = None
-        self.looks = 0
         self.found: tuple = ()
         self.apps: tuple = ()   # the same programs as (exe in lower case, mode key, name)
 
@@ -325,13 +374,7 @@ class Listeners:
         if not device:
             self.found = self.apps = ()
             return self.found
-        with self._lock:
-            self._want = device
-            if self._thread is None:
-                self._thread = threading.Thread(target=self._run, daemon=True,
-                                                name="voicesdk-listeners")
-                self._thread.start()
-            self._wake.set()
+        self._kick(device)
         return self.found
 
     def look(self, device: str | tuple | None) -> tuple:
@@ -353,24 +396,11 @@ class Listeners:
         self.apps = tuple(dict.fromkeys(apps))
         return tuple(dict.fromkeys(voice + games))
 
-    def _run(self):
-        last = 0.0
-        while True:
-            if not self._wake.wait(self.IDLE_EXIT_S):
-                with self._lock:
-                    if not self._wake.is_set():   # (a poll may have come just now)
-                        self._thread = None
-                        return
-            time.sleep(max(0.0, last + self.MIN_GAP_S - time.monotonic()))
-            with self._lock:
-                self._wake.clear()
-                device = self._want
-            last = time.monotonic()
-            try:
-                self.found = self.look(device)
-            except Exception:  # noqa: BLE001 - only a hint
-                self.found = self.apps = ()
-            self.looks += 1
+    def _look_bg(self, want):
+        try:
+            self.found = self.look(want)
+        except Exception:  # noqa: BLE001 - only a hint
+            self.found = self.apps = ()
 
 
 __all__ = ["NAMES", "ORDER", "SIGNATURES", "VOICE_APPS", "Listeners", "Watcher",

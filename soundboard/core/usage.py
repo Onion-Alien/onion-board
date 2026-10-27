@@ -600,14 +600,16 @@ def maybe_send(cfg, on_sent=None, event: str = "", app_dir: Path | None = None) 
     remember(cfg)
     if not cfg.stats_problems_seen:   # first run with this: older reports aren't news
         cfg.stats_problems_seen = now
-    extra, taken, newest = ([], [], 0.0) if event else _waiting(cfg, now, app_dir)
+    pending = [] if event else list(cfg.stats_pending)   # remember() made it a clean list
+    taken, since = pending[:], cfg.stats_problems_seen
     open_tick(cfg)
-    payload = hits(cfg, now, event, extra)
-    if not payload:
+    base = hits(cfg, now, event)   # the daily count or the event; problems join on the thread
+    if not base and not pending and app_dir is None:
         return
-    daily = not event and not payload[0].get("event")
-    tabs = [h["path"][4:] for h in payload if h["path"].startswith("tab/")]
-    feats = [h["path"][5:] for h in payload if h["path"].startswith("used/")]
+    daily = bool(base) and not event and not base[0].get("event")
+    paths = [*(h["path"] for h in base), *pending]   # (the reports are neither)
+    tabs = [p[4:] for p in paths if p.startswith("tab/")]
+    feats = [p[5:] for p in paths if p.startswith("used/")]
     plays = total_plays(cfg)
     opened = cfg.stats_open_s or 0
     launches = cfg.stats_launches or 0
@@ -626,11 +628,18 @@ def maybe_send(cfg, on_sent=None, event: str = "", app_dir: Path | None = None) 
             cfg.stats_launches = max(0, (cfg.stats_launches or 0) - launches)
             cfg.stats_downloads = max(0, (cfg.stats_downloads or 0) - downloads)
         cfg.stats_pending = _without(cfg.stats_pending, taken)
-        cfg.stats_problems_seen = max(cfg.stats_problems_seen, newest)
+        cfg.stats_problems_seen = max(cfg.stats_problems_seen, newest[0])
 
-    def run():   # the network only: never touches cfg
-        if send(payload) and not event:
+    newest = [0.0]
+
+    def run():   # the saved reports and the network only: never touches cfg
+        # the reports folder is read here, not on the UI thread that called: a send
+        # follows each saved report, so it comes when the PC is already struggling
+        extra, newest[0] = ([], 0.0) if event else _with_reports(pending, app_dir, since)
+        payload = [*base[:1], *(_event(e, sid) for e in extra), *base[1:]]   # as hits()
+        if payload and send(payload) and not event:
             (on_sent or (lambda f: f()))(apply)
+    sid = install_id(cfg)
     threading.Thread(target=run, daemon=True, name="usage-count").start()
 
 
@@ -639,17 +648,25 @@ def _waiting(cfg, now: float, app_dir: Path | None) -> tuple[list[str], list[str
     from cfg.stats_pending, the newest report's time). Call after remember()."""
     if not cfg.stats_problems_seen:   # first run with this: older reports aren't news
         cfg.stats_problems_seen = now
-    extra = list(cfg.stats_pending)   # remember() just made it a clean list
-    taken = extra[:]
-    skipped, newest = [0], 0.0
+    taken = list(cfg.stats_pending)   # remember() just made it a clean list
+    extra, newest = _with_reports(taken, app_dir, cfg.stats_problems_seen)
+    return extra, taken, newest
+
+
+def _with_reports(extra: list[str], app_dir: Path | None,
+                  since: float) -> tuple[list[str], float]:
+    """`extra` and the events for the reports saved in app_dir after `since`, at most
+    MAX_PROBLEMS (one `problems-dropped/` says roughly how many more), and the newest
+    report's time. Reads the disk: maybe_send calls it on its thread."""
+    extra, skipped, newest = list(extra), [0], 0.0
     if app_dir is not None:
-        found, newest = problems(app_dir, cfg.stats_problems_seen, skipped)
+        found, newest = problems(app_dir, since, skipped)
         extra += found
     dropped = skipped[-1] + max(0, len(extra) - MAX_PROBLEMS)
     extra = extra[:MAX_PROBLEMS]
     if dropped:   # a bug in a loop: one count saying roughly how many more
         extra.append(f"problems-dropped/{bucket(dropped)}")
-    return extra, taken, newest
+    return extra, newest
 
 
 def _without(have, sent) -> list[str]:
