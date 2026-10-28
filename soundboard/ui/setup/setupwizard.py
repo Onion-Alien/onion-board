@@ -29,7 +29,7 @@ from PySide6.QtWidgets import (QApplication, QDialog, QGraphicsOpacityEffect, QH
                                QLabel, QMessageBox, QPushButton, QVBoxLayout)
 
 from soundboard.core import autostart
-from soundboard.mic import directmic, micstate
+from soundboard.mic import directmic, micstate, mictest
 from soundboard.core import usage
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.bun.bunnywidget import TALK
@@ -562,6 +562,7 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
         else:
             kind = "silent" if self.win.engine.mic_stream is not None else "no-open"
         usage.used(f"mic-test-{kind}")
+        mictest.save(kind == "heard")   # for the uninstaller's feedback form
 
     def _tick(self):
         if (locked := self._locked()) != self._was_locked:   # the mic set-up began / ended
