@@ -1,26 +1,125 @@
-:root {
-  --bg: #0f1016; --card: #1a1b24; --edge: #2a2b38; --text: #ececf3; --muted: #a3a4b8;
-  --accent: #7c5cff;
+/* The guide pages. Colours, type and buttons come from base.css (shared with the home
+   page); this file lays out a long read on top of them. Light too, when Windows is light. */
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f6f5fb; --card: rgba(255, 255, 255, .78); --card-solid: #fff;
+    --edge: rgba(40, 28, 90, .12); --edge2: rgba(40, 28, 90, .2); --edge-ctl: rgba(40, 28, 90, .5);
+    --text: #17151f; --muted: #555469; --dim: #66657b; --link: #5a3dd8;
+    --glass: linear-gradient(180deg, #fff, #f9f8fe);
+    --glass-hi: inset 0 1px 0 #fff;
+    --lift: 0 18px 40px -22px rgba(40,28,90,.35);
+    --btn-glow: color-mix(in srgb, var(--a1) 35%, transparent);
+    color-scheme: light;
+  }
 }
+
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--text);
-       font: 17px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
-a { color: #a996ff; }
-.wrap { max-width: 760px; margin: 0 auto; padding: 0 16px; }
-nav { padding: 20px 0 0; font-size: 15px; }
-h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.2; margin: 32px 0 12px; }
-h2 { font-size: 24px; margin: 40px 0 10px; }
-.lead { color: var(--muted); font-size: 19px; margin: 0 0 24px; }
-.dl { display: inline-block; background: var(--accent); color: #fff; text-decoration: none;
-      font-weight: 700; padding: 14px 26px; border-radius: 12px; margin: 8px 0 4px; }
-.dl:hover { background: #8d71ff; }
-.small { color: var(--muted); font-size: 14px; }
+html { overflow-x: clip; }
+body { margin: 0; background: var(--bg); color: var(--text); overflow-x: hidden;
+       font: 17px/1.65 var(--body); -webkit-font-smoothing: antialiased; }
+/* the home page's glow and faint grid behind everything */
+body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(60vmax 45vmax at 12% -12%, color-mix(in srgb, var(--a1) 24%, transparent), transparent 70%),
+              radial-gradient(45vmax 35vmax at 100% -5%, color-mix(in srgb, var(--a2) 14%, transparent), transparent 70%),
+              radial-gradient(40vmax 30vmax at 50% 110%, color-mix(in srgb, var(--a1) 9%, transparent), transparent 70%); }
+body::after { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background-image: linear-gradient(color-mix(in srgb, var(--text) 4%, transparent) 1px, transparent 1px),
+                    linear-gradient(90deg, color-mix(in srgb, var(--text) 4%, transparent) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, #000 25%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, #000 25%, transparent 75%); }
+
+a { color: var(--link); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+.wrap { max-width: 780px; margin: 0 auto; padding: 0 16px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; }
+p, li { text-wrap: pretty; }
+::selection { background: color-mix(in srgb, var(--a1) 30%, transparent); }
+
+/* back to the home page: a glass pill */
+nav { padding: 22px 0 0; font-size: 15px; }
+nav a { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 999px;
+        color: var(--text); text-decoration: none; font-weight: 600;
+        background: var(--glass); border: 1px solid var(--edge-ctl); box-shadow: var(--glass-hi), 0 4px 14px rgba(0,0,0,.12);
+        transition: border-color .2s, transform .2s; }
+nav a:hover { border-color: var(--a1); transform: translateX(-2px); }
+
+h1 { font-size: clamp(32px, 5.4vw, 48px); font-weight: 800; line-height: 1.1; letter-spacing: -.03em; margin: 40px 0 16px; }
+h1::before { content: ""; display: block; width: 56px; height: 5px; border-radius: 99px; margin-bottom: 20px;
+             background: linear-gradient(90deg, var(--a1), var(--a2)); box-shadow: 0 0 18px var(--btn-glow); }
+h2 { font-size: clamp(23px, 3.4vw, 28px); font-weight: 750; line-height: 1.2; letter-spacing: -.02em; margin: 52px 0 12px; }
+h3 { font-size: 19px; font-weight: 700; margin: 30px 0 6px; }
+.lead { color: var(--muted); font-size: 19px; margin: 0 0 28px; }
+.dl { margin: 6px 0 4px; white-space: normal; line-height: 1.25; }
+.small { color: var(--dim); font-size: 14px; margin-top: 12px; }
+b { font-weight: 650; }
+
+/* numbered steps get round gradient badges */
+.wrap > ol, section > ol { list-style: none; counter-reset: step; padding-left: 0; }
+.wrap > ol > li, section > ol > li { counter-increment: step; position: relative; padding-left: 44px; margin: 14px 0; }
+.wrap > ol > li::before, section > ol > li::before {
+  content: counter(step); position: absolute; left: 0; top: .1em; width: 30px; height: 30px; border-radius: 50%;
+  display: grid; place-items: center; color: #fff; font: 700 14px/1 var(--display);
+  background: var(--gloss), var(--grad);
+  box-shadow: 0 4px 12px var(--btn-glow), inset 0 1px 0 rgba(255,255,255,.4); }
+ul { padding-left: 22px; }
 ol li, ul li { margin: 8px 0; }
-img { max-width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--edge); display: block; margin: 20px 0; }
-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 16px; }
-th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--edge); vertical-align: top; }
-th { color: var(--muted); font-weight: 600; }
-.note { background: var(--card); border: 1px solid var(--edge); border-radius: 12px;
-        padding: 14px 18px; color: var(--muted); font-size: 15px; margin: 20px 0; }
-code { background: var(--card); border: 1px solid var(--edge); border-radius: 6px; padding: 1px 6px; font-size: 15px; }
-footer { color: var(--muted); font-size: 14px; padding: 48px 0 40px; text-align: center; }
+ul > li::marker { color: color-mix(in srgb, var(--a1) 70%, var(--text)); }
+
+img { max-width: 100%; height: auto; border-radius: 16px; border: 1px solid var(--edge2); display: block; margin: 24px 0;
+      box-shadow: var(--lift); }
+/* one window or card of the app, near its real size (pictures are 1.5x) */
+img.shot { max-width: min(100%, 600px); }
+
+table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 20px 0; font-size: 16px;
+        background: var(--glass); border: 1px solid var(--edge); border-radius: 16px; overflow: hidden;
+        box-shadow: var(--glass-hi), var(--lift); }
+th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--edge); vertical-align: top; }
+tr:last-child > td { border-bottom: 0; }
+th { color: var(--muted); font-weight: 650; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; white-space: nowrap;
+     background: color-mix(in srgb, var(--a1) 9%, transparent); }
+tbody tr:hover > td { background: color-mix(in srgb, var(--text) 3%, transparent); }
+
+.note { position: relative; background: var(--glass); border: 1px solid var(--edge); border-radius: 16px;
+        padding: 16px 20px 16px 24px; color: var(--muted); font-size: 15.5px; margin: 24px 0; overflow: hidden;
+        box-shadow: var(--glass-hi), var(--lift); }
+.note::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+                background: linear-gradient(180deg, var(--a1), var(--a2)); }
+.note b { color: var(--text); }
+
+code { font: 14.5px/1.4 var(--mono); background: color-mix(in srgb, var(--a1) 10%, var(--card));
+       border: 1px solid var(--edge); border-radius: 7px; padding: 1px 6px; overflow-wrap: anywhere; }
+
+footer { color: var(--dim); font-size: 14px; line-height: 2; padding: 32px 0 44px; margin-top: 64px; text-align: center;
+         border-top: 1px solid var(--edge); }
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--text); text-decoration: underline; }
+
+/* TL;DR / Advanced switch: a glass track, the picked one a glossy gradient pill */
+.tabs { display: flex; gap: 4px; padding: 5px; margin: 32px 0 8px; width: fit-content; border-radius: 14px;
+        background: var(--glass); border: 1px solid var(--edge-ctl); box-shadow: var(--glass-hi), 0 6px 18px rgba(0,0,0,.14); }
+.tab { color: var(--muted); text-decoration: none; font: 650 15.5px/1 var(--display); padding: 10px 24px; border-radius: 10px;
+       transition: color .2s, background .2s; }
+.tab:hover { color: var(--text); background: color-mix(in srgb, var(--text) 6%, transparent); }
+.tab.on { color: #fff; background: var(--gloss), var(--grad); text-shadow: 0 1px 1px rgba(20,8,50,.3);
+          box-shadow: 0 6px 18px var(--btn-glow), inset 0 1px 0 rgba(255,255,255,.45), inset 0 -1px 0 rgba(0,0,0,.15); }
+.tab:focus-visible, .jump a:focus-visible, nav a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+[id] { scroll-margin-top: 16px; }
+
+/* jump links: glass chips */
+.jump { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 0 0; }
+.jump a { padding: 6px 14px; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--text); text-decoration: none;
+          background: var(--glass); border: 1px solid var(--edge-ctl); box-shadow: var(--glass-hi);
+          transition: border-color .2s, transform .2s, box-shadow .2s; }
+.jump a:hover { border-color: color-mix(in srgb, var(--a1) 70%, transparent); transform: translateY(-1px);
+                box-shadow: var(--glass-hi), 0 6px 16px var(--btn-glow); }
+
+@media (max-width: 600px) {
+  h1 { margin-top: 30px; }
+  .dl { width: 100%; justify-content: center; padding: 16px 18px; font-size: 17px; }
+  table { display: block; overflow-x: auto; font-size: 15px; }
+  th, td { padding: 9px 10px; } th { white-space: normal; }
+  .tabs { width: 100%; } .tab { flex: 1; text-align: center; }
+}
+@media (prefers-reduced-motion: reduce) { nav a, .jump a, .tab { transition: none; } nav a:hover, .jump a:hover { transform: none; } }
