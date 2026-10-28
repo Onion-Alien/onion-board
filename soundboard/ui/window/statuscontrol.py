@@ -349,6 +349,9 @@ class StatusControl(Controller):
             mw.mic_reason.setText(reason)
             reveal.set_shown(mw.mic_reason, bool(reason))
             step = ""   # (said in the box)
+        # a card asking for a click after a failed set-up: the report button under it
+        mw.mic_report.set_failed(mic_route and button is not None and not mw._attaching
+                                 and bool(mw.micctl.fail_code))
         mw.mic_flow.setVisible(not mic_route)
         if not mic_route:
             reveal.set_shown(mw.mic_voice, False)   # (_show_mic_status says when, on the mic)

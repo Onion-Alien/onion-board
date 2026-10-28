@@ -47,6 +47,7 @@ class MicControl(Controller):
     _mic_updating = False   # attach_mic was started from it (its own result messages)
     _autofixing = False     # attach_mic(auto=True): the app's own repair, nobody clicked
     _autofix_err = ""       # that repair failed: the card asks for a click until it works
+    fail_code = ""          # the last set-up failed: its short code, for the report button
     _mic_fail_kind = ""     # the last set-up's directmic.FAIL_KINDS word, for the count
     _autofix_tried = False  # it ran since the mic last worked (once per time it's off)
     _declined = False       # the last set-up's Windows prompt got a No
@@ -461,6 +462,7 @@ class MicControl(Controller):
         self._autofixing = auto
         self._probe_missing = False   # (checked again once this one works)
         self._declined = False   # (whatever happens now is what the card says)
+        self.fail_code = ""
         if auto:
             mw.toast(_("Fixing your mic… (your sound drops for a second)"))
         else:
@@ -540,6 +542,7 @@ class MicControl(Controller):
             kind, self._mic_fail_kind = self._mic_fail_kind or "code-other", ""
             if auto or err != directmic.declined():   # why, as a fixed word (never err)
                 usage.used(f"mic-effect-{'fix-' if auto else ''}failed-{kind}")
+                self.fail_code = f"attach-{kind}"   # (a No isn't the app failing)
             raised, self._raised = self._raised, None
             stuck, self._stuck = self._stuck, ""
             unstarted, self._unstarted = self._unstarted, ""

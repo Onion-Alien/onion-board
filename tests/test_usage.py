@@ -1455,3 +1455,34 @@ def test_a_long_send_goes_in_parts_goatcounter_takes(sent):
     parts = [json.loads(req.data)["hits"] for req, _f in sent]
     assert [len(p) for p in parts] == [usage.MAX_HITS, usage.MAX_HITS, 5]
     assert [h for p in parts for h in p] == hits
+
+
+@pytest.mark.parametrize("kind", usage.MIC_TESTS)
+def test_the_setup_guides_mic_test_is_one_fixed_name(sent, kind):
+    """How the guide's mic test went: `used/mic-test-<kind>` and nothing about the mic,
+    once a day however often it's tried (the network is blocked: `sent` records it)."""
+    cfg = Config(mic_device="Headset Mic (Secret Brand)")
+    usage.used(f"mic-test-{kind}")
+    usage.used(f"mic-test-{kind}")
+    usage.maybe_send(cfg)
+    paths = _paths(sent[0][0])
+    assert paths.count(f"used/mic-test-{kind}") == 1
+    assert "Secret" not in sent[0][0].data.decode("utf-8")
+    cfg.stats_sent -= usage.EVERY_S
+    usage.maybe_send(cfg)   # the next day: not again unless it happened again
+    assert f"used/mic-test-{kind}" not in _paths(sent[1][0])
+
+
+@pytest.mark.parametrize("why", ["switched off", "source", "dev pc"])
+def test_the_mic_test_count_obeys_the_switch(sent, monkeypatch, why):
+    if why == "switched off":
+        net.configure_features(["usage_stats"])
+    elif why == "source":
+        monkeypatch.delattr(sys, "frozen")
+    else:
+        monkeypatch.setenv("ONIONBOARD_NO_STATS", "1")
+    cfg = Config()
+    usage.used("mic-test-blocked")
+    usage.maybe_send(cfg)
+    assert usage.at_quit(cfg) is None
+    assert sent == [] and cfg.stats_used == []

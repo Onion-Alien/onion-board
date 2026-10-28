@@ -1706,3 +1706,113 @@ def test_a_short_screen_scrolls_the_step_instead_of_piling_it_up(qapp, app_dir, 
         wiz.done(0)
         w.soundctl._load_thread.join(15)
         w.close()
+
+
+def test_a_failed_mic_test_offers_a_report(wizard, monkeypatch):
+    """The mic won't open, or opens and hears nothing: "Didn't work? Send us a report"
+    under it. A click shows what the form gets first; Open the form opens it with the
+    mic, the mode and a short code, never the error's own text."""
+    from urllib.parse import parse_qs, urlsplit
+    from soundboard.ui.kit import failreport
+    from soundboard.ui.setup import devicestep
+    w, wiz = wizard
+    rep = wiz.mic_report
+    wiz._tick()
+    assert rep.isHidden()   # the mic opened: nothing failed
+    w.engine.mic_stream = None
+    w.engine.errors["mic"] = ("Error opening InputStream: Unanticipated host error "
+                              "[PaErrorCode -9999]: 'Access denied.' [Windows WASAPI error "
+                              "-2147024891] X:/audio")
+    wiz._tick()
+    assert "Couldn't open that mic" in wiz.mic_heard.text() and not rep.isHidden()
+    assert not rep.btn_report.isHidden() and rep.btn_open.isHidden()
+    rep.btn_report.click()
+    assert rep.btn_report.isHidden() and not rep.what.isHidden()
+    assert w.cfg.mic_device in rep.what.text() and "mic-open-9999-80070005" in rep.what.text()
+    opened = []
+    monkeypatch.setattr(failreport.busy, "open_url", lambda url, **kw: opened.append(url) or True)
+    rep.btn_open.click()
+    q = {k: v[0] for k, v in parse_qs(urlsplit(opened[0]).query).items()}
+    assert q["from"] == "micfail" and q["mictest"] == "fail" and q["mode"] == "cable"
+    assert q["mic"] == w.cfg.mic_device and q["err"] == "mic-open-9999-80070005"
+    assert "audio" not in opened[0] and "Access" not in opened[0]
+    assert rep.what.isHidden()   # folded back to its button
+    # open again, but silent for the whole wait: still a failed test
+    w.engine.errors.pop("mic")
+    w.engine.mic_stream = object()
+    wiz._mic_peak_seen = False
+    wiz._tick()
+    assert rep.isHidden()
+    wiz._mic_wait_since -= devicestep.MIC_SILENT_S + 1
+    wiz._tick()
+    assert not rep.isHidden() and wiz._mic_fail() == "mic-silent"
+    wiz._mic_peak_seen = True   # heard them: gone
+    wiz._tick()
+    assert rep.isHidden()
+
+
+def test_a_failed_mic_set_up_offers_a_report_in_the_guide(mic_wizard_again, monkeypatch):
+    """Putting it on the mic failed (not a No): the guide's card has the report button,
+    with the failure's short code; a No, or it working, doesn't."""
+    from soundboard.mic import directmic
+    w, wiz = mic_wizard_again
+    monkeypatch.setattr(w, "tell", lambda *a, **k: None)
+    monkeypatch.setattr(directmic, "status", lambda name=None: "missing")
+    wiz.go(wiz.send_index)
+    assert wiz.attach_report.isHidden()
+    w.micctl._mic_fail_kind = "code-6"
+    w.mic_attached.emit(w.cfg.mic_device, "Windows' audio wouldn't stop.")
+    assert not wiz.attach_report.isHidden() and w.micctl.fail_code == "attach-code-6"
+    assert not w.mic_report.isHidden()   # the Setup tab's card too
+    assert "attach-code-6" in wiz.attach_report.url()
+    w.micctl.attach_mic()   # a new try: gone until it fails again
+    assert w.micctl.fail_code == ""
+    w.mic_attached.emit(w.cfg.mic_device, directmic.declined())
+    assert wiz.attach_report.isHidden() and w.mic_report.isHidden()
+
+
+def test_a_step_asks_for_its_height_without_the_scroll_bar(qapp):
+    """With its bar showing, the page's right margin is narrower: asked at that margin,
+    the words wrap less and the step came out a few px short, so the bar never went."""
+    from PySide6.QtWidgets import QLabel, QVBoxLayout, QWidget
+    from soundboard.ui.setup.wizardparts import _StepScroll
+    page = QWidget()
+    lay = QVBoxLayout(page)
+    words = QLabel("Others hear your voice, but not your sounds. " * 12)
+    words.setWordWrap(True)
+    lay.addWidget(words)
+    steps = _StepScroll(page)
+    lay.setContentsMargins(0, 0, steps.ROOM, 0)   # no bar
+    need = steps.heightForWidth(300)
+    lay.setContentsMargins(0, 0, steps.ROOM - 10, 0)   # the bar showing
+    assert steps.heightForWidth(300) == need
+
+
+@pytest.mark.parametrize("heard, blocked, no_mics, opened, kind", [
+    (True, True, False, True, "heard"),
+    (False, True, False, True, "blocked"),
+    (False, False, True, False, "no-mic"),
+    (False, False, False, True, "silent"),
+    (False, False, False, False, "no-open")])
+def test_leaving_the_mic_step_counts_how_its_test_went(wizard, monkeypatch, heard, blocked,
+                                                        no_mics, opened, kind):
+    from soundboard.core import usage
+    w, wiz = wizard
+    counted = []
+    monkeypatch.setattr(usage, "used", counted.append)
+    monkeypatch.setattr(setupwizard.micstate, "windows_blocks_mic", lambda: blocked)
+    wiz.go(wiz.dev_index)
+    wiz.go(wiz.send_index)   # a click straight through says nothing
+    assert counted == []
+    wiz.go(wiz.dev_index)
+    wiz._dev_since -= setupwizard.MIC_TEST_MIN_S
+    wiz._mic_peak_seen, wiz._no_mics = heard, no_mics
+    w.engine.mic_stream = object() if opened else None
+    wiz.go(wiz.send_index)
+    wiz.go(wiz.discord_index)   # once per visit
+    assert counted == [f"mic-test-{kind}"]
+    w.engine.mic_stream = None
+    wiz.go(wiz.dev_index)
+    wiz._dev_since -= setupwizard.MIC_TEST_MIN_S
+    wiz.done(0)   # closing the guide on the mic step counts it too
+    assert len([c for c in counted if c.startswith("mic-test-")]) == 2

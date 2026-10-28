@@ -128,7 +128,8 @@ def main() -> None:
     parts += ["CC0 voice backgrounds\n", (backgrounds / "README.md").read_text("utf-8"),
               (backgrounds / "credits.json").read_text("utf-8")]
     parts += [section(d) for d in closure(ROOTS)]
-    for name in ("QuickJS-ng-MIT.txt", "RNNoise-BSD-3.txt", "LGPL-3.0.txt", "GPL-3.0.txt"):
+    for name in ("QuickJS-ng-MIT.txt", "RNNoise-BSD-3.txt", "DeepFilterNet-MIT.txt",
+                 "LGPL-3.0.txt", "GPL-3.0.txt"):
         parts += [f"{RULE}\n{name}\n{RULE}\n", (ROOT / "licenses" / name).read_text("utf-8")]
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text("\n".join(parts), encoding="utf-8")
