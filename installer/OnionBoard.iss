@@ -564,7 +564,8 @@ end;
 // Invite a friend (soundboard/core/invite.py): the site hands the installer out as
 // "OnionBoardSetup-from-<name>.exe" when the link had a name on it. The name, or ''.
 // A second download of the same file ends in " (1)": that's cut off (the site lets no
-// brackets into the name).
+// brackets into the name). Delete and SetLength only: the script's Copy and Trim turn
+// letters outside the Windows code page into '?' ("Ник" came out as "???").
 function InviteName: String;
 var
   N: String;
@@ -575,11 +576,17 @@ begin
   P := Pos('-from-', Lowercase(N));
   if P = 0 then
     exit;
-  N := Copy(N, P + 6, Length(N));
+  Delete(N, 1, P + 5);
   P := Pos(' (', N);
   if P > 0 then
-    N := Copy(N, 1, P - 1);
-  Result := Copy(Trim(N), 1, 24);
+    SetLength(N, P - 1);
+  while (N <> '') and (N[1] = ' ') do
+    Delete(N, 1, 1);
+  while (N <> '') and (N[Length(N)] = ' ') do
+    SetLength(N, Length(N) - 1);
+  if Length(N) > 24 then
+    SetLength(N, 24);
+  Result := N;
 end;
 
 // The name for the app's first start to greet them with ("<name> invited you").
