@@ -134,8 +134,7 @@ def test_random_voice_is_a_silly_own_mix(panel):
     from soundboard.ui.voice.voicefxpanel import CUSTOM
     for seed in range(20):
         panel.fx.randomize(random.Random(seed))
-        on = {t: r.state() for t, r in panel.fx.rows.items()
-              if r.state().get("on") and t != "cleanup"}   # mic clean-up: yours, kept
+        on = {t: r.state() for t, r in panel.fx.rows.items() if r.state().get("on")}
         assert panel.fx.preset == CUSTOM and panel.fx.btn_power.isChecked()
         assert "pitch" in on and abs(on["pitch"]["semitones"]) >= 4
         assert 2 <= len(on) <= 3

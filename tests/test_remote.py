@@ -391,10 +391,11 @@ def test_live_speed_pitch_and_effects_go_through_the_popup(qapp, window):
     assert w.engine.sound_fx == {"bass": 6.0, "echo": 1.0}
     assert d("effects", bass="loud")[0] == 400
     body = d("effects")[1]                                         # alone: what there is
-    assert "Canyon" in body["presets"] and body["effects"] == {"bass": 6.0, "echo": 1.0}
+    assert "Nightcore" in body["presets"] and body["effects"] == {"bass": 6.0, "echo": 1.0}
     assert {"key": "bass", "label": "Bass", "lo": -12, "hi": 18, "unit": "dB"} in body["knobs"]
-    body = d("effects", preset="canyon")[1]
-    assert body["preset"] == "Canyon" and w.speed_btn.fx_presets["Canyon"].isChecked()
+    body = d("effects", preset="nightcore")[1]                     # its speed too
+    assert body["preset"] == "Nightcore" and w.speed_btn.fx_presets["Nightcore"].isChecked()
+    assert (body["speed"], body["keep_pitch"]) == (1.3, False)
     assert d("effects", preset="Nope")[0] == 404
     assert d("effects", reset="1")[1]["effects"] == {}
 

@@ -6,7 +6,6 @@ from __future__ import annotations
 # Kept short on purpose: every voice here should sound like the thing it's named
 # after, straight away, on a normal headset mic. "natural": 1 keeps the voice's
 # formants where a real person's would be (a different person, not a cartoon).
-# Clean up my mic isn't part of any voice: it stays as you set it.
 PRESETS: dict[str, dict[str, dict]] = {
     "Chipmunk":          {"pitch": {"semitones": 8},
                           "compressor": {"threshold": -24, "ratio": 2.5, "boost": 5}},

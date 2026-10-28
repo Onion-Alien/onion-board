@@ -505,8 +505,11 @@ class SpeedPitchButton(QPushButton):
         grid.setHorizontalSpacing(4)
         grid.setVerticalSpacing(4)
         self.fx_presets = {}
+        shown = {"Nightcore": _("Nightcore"), "Slowed + reverb": _("Slowed + reverb"),
+                 "Bass boosted": _("Bass boosted"), "Chipmunk": _("Chipmunk"),
+                 "Deep voice": _("Deep voice"), "Underwater": _("Underwater")}
         for i, name in enumerate(livefx.PRESETS):
-            b = QPushButton(name)
+            b = QPushButton(shown.get(name, name))
             b.setObjectName("small")
             b.setCheckable(True)
             b.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -675,25 +678,53 @@ class SpeedPitchButton(QPushButton):
             s.set_value(amounts.get(k, 0.0))
         self._fx_edited()
 
+    def apply_preset(self, name: str):
+        """Set a preset's knobs, and its speed and pitch when it has them (Nightcore)."""
+        p = livefx.PRESETS[name]
+        t = livefx.tuning(p, self.has_speed)
+        if t is not None:
+            self.set_values(t[0], t[1], t[2] if self.has_speed else self.keep.isChecked())
+        self.set_fx(p)
+
+    def preset_on(self, name: str) -> bool:
+        """The knobs (and the speed and pitch, if it sets them) are the preset's."""
+        p = livefx.PRESETS[name]
+        if self.fx_values() != livefx.clean(p):
+            return False
+        t = livefx.tuning(p, self.has_speed)
+        if t is None:
+            return True
+        s, pitch, keep = self.values()
+        return (abs(s - t[0]) < 1e-3 and abs(pitch - t[1]) < 1e-3
+                and (keep == t[2] or not self.has_speed))
+
     def _preset_clicked(self, name: str, on: bool):
-        """A preset sets its knobs; clicked again (lit) the knobs go back to how they
-        were before it, not all off: a tweak made before picking it isn't lost."""
+        """A preset sets its knobs; clicked again (lit) they go back to how they were
+        before it, not all off: a tweak made before picking it isn't lost."""
         if on:
             self._count(f"preset-{usage.live_preset_tag(name)}")
-            before = self.fx_values()
-            self.set_fx(livefx.PRESETS[name])
+            before = (self.fx_values(), self.values())
+            self.apply_preset(name)
             self._before_preset = (name, before)
             return
         was = getattr(self, "_before_preset", None)
-        self.set_fx(was[1] if was and was[0] == name else {})
+        fx, (speed, pitch, keep) = (was[1] if was and was[0] == name
+                                    else ({}, (1.0, 0.0, self.keep.isChecked())))
+        if livefx.tuning(livefx.PRESETS[name]) is not None:
+            self.set_values(speed, pitch, bool(keep))
+        self.set_fx(fx)
+
+    def _light_presets(self):
+        if hasattr(self, "keep"):   # (the effects column is built before the sliders)
+            for name, b in self.fx_presets.items():
+                b.setChecked(self.preset_on(name))
 
     def _fx_edited(self):
         now = self.fx_values()
         was, self._seen_fx = self._seen_fx, now
         self._count(*(f"fx-{k}" for k in sorted(set(was) | set(now))
                       if was.get(k) != now.get(k)))
-        for name, b in self.fx_presets.items():   # lit while the knobs match it
-            b.setChecked(now == livefx.clean(livefx.PRESETS[name]))
+        self._light_presets()
         self._label()
         self.fx_changed.emit(now)
 
@@ -796,6 +827,7 @@ class SpeedPitchButton(QPushButton):
         was, self._seen = self._seen, now
         self._count(*(n for n, a, b in zip(("speed", "pitch", "keep-pitch"), was, now)
                       if a != b))
+        self._light_presets()
         self._label()
         self.meter.set_value(self.speed.value() if self.has_speed else self.pitch.value())
         self.changed.emit(*self.values())

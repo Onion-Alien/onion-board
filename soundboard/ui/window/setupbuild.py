@@ -45,6 +45,7 @@ from soundboard.ui.kit.panel import (
 from soundboard.ui.setup.setupshow import SetupShow
 from soundboard.ui.window.sidebar import SHUT_W
 from soundboard.ui.setup import cableconfirm
+from soundboard.ui.kit.failreport import FailReport
 from soundboard.ui.kit.glow import Glow
 from soundboard.ui.kit.widgets import Meter
 from soundboard.ui.kit.wheelguard import AppStyle, no_wheel
@@ -262,6 +263,10 @@ class SetupPageBuild:
         mw.mic_reason.setTextFormat(Qt.TextFormat.RichText)
         mw.mic_reason.hide()
         lines.addWidget(mw.mic_reason)
+        # putting it on the mic failed: tell us, before giving up
+        mw.mic_report = FailReport(lambda: {"mic": mw.cfg.mic_device or "", "mode": "direct",
+                                            "err": mw.micctl.fail_code})
+        lines.addWidget(mw.mic_report)
         mw.mic_ways = Flow(gap=8)
         lines.addLayout(mw.mic_ways)
         for b in (mw.btn_michange, mw.btn_micredo, mw.btn_micoff):   # (wraps when narrow)

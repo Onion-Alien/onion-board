@@ -151,7 +151,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   5 seconds and plays them as they were and cleaned, in your headphones only.
 - **Voice tab:** voice changer (25 ready voices, from Deep, High and Male voice and
   Demon to Autotune, Talkbox, Masked caller, Dark lord, a Dalek and a singing monk; pitch with a natural-sound mode and a
-  voice-size control, autotune, mic clean-up (noise gate + hiss removal), monster growl,
+  voice-size control, autotune, monster growl,
   robot / talkbox, harmony, ring modulator, helmet, shout blowout, radio with walkie-talkie
   clicks, flanger, wobble (vibrato and tremolo), echo, reverb (with pre-delay and early reflections),
   distortion (oversampled, so it crunches without fizz), a studio polish (de-esser,
