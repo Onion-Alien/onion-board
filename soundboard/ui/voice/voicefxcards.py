@@ -198,10 +198,7 @@ class VoiceFxCards(_Base):
         for etype, cls in voicefx.REGISTRY.items():
             if etype in self.rows or cls.extra:   # (the extras live in the Effects pop-up)
                 continue
-            cfg = self._spec_effects.get(etype)
-            if cfg is None:
-                # mic clean-up starts on: it only makes changed voices sound better
-                cfg = {"on": True} if etype == "cleanup" else {}
+            cfg = self._spec_effects.get(etype) or {}
             if etype == "backdrop":
                 from soundboard.ui.voice.backdroprow import BackdropRow
                 r = BackdropRow(cls, cfg, lambda: self.sound_list())

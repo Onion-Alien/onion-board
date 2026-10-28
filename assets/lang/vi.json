@@ -1533,7 +1533,6 @@
   "Chorus": "Điệp khúc",
   "Classic": "Cổ điển",
   "Clean": "Sạch",
-  "Clean up my mic": "Làm sạch mic của tôi",
   "Clean: your sounds go out exactly as mixed.": "Sạch: âm thanh của bạn được gửi đi đúng như đã trộn.",
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "Đã xóa, nhưng không tải được bản mới ({error}). Hãy thử lại khi có mạng.",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "Đã xóa nhưng không thể tải xuống bản sao mới ({error}). Sử dụng yt-dlp {version} tích hợp sẵn.",
@@ -1655,7 +1654,6 @@
   "High cut": "Cắt cao",
   "Higher or lower than that, in semitones": "Cao hơn hoặc thấp hơn thế, tính bằng nửa cung",
   "Higher or lower; a cartoon or a real-sounding person; a bigger or smaller throat; autotune.": "Cao hơn hoặc thấp hơn; kiểu hoạt hình hoặc giống người thật; cổ họng to hơn hoặc nhỏ hơn; autotune.",
-  "Hiss removal": "Lọc tiếng xì",
   "Hoot is waiting for something to watch": "Hoot đang chờ thứ gì đó để theo dõi",
   "Hothead": "Nóng tính",
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Giọng đã đổi chậm hơn giọng thật của bạn bao nhiêu: {effects} ms do hiệu ứng + {devices} ms do thiết bị âm thanh. Dưới khoảng 100 ms thì nói chuyện vẫn thấy bình thường; hiệu ứng cao độ gây trễ nhiều nhất, phần còn lại gần như không đáng kể.",
@@ -1729,7 +1727,6 @@
   "No shaping at all: your sounds go out exactly as mixed, full range. For OBS, recording, Voicemeeter, a mixer, or anything that isn't a voice chat.": "Không xử lý gì cả: âm thanh của bạn được gửi đi đúng như đã trộn, toàn dải. Dành cho OBS, ghi âm, Voicemeeter, bàn mixer hoặc bất cứ thứ gì không phải voice chat.",
   "No shaping. Your sounds go out exactly as mixed.": "Không xử lý. Âm thanh của bạn được gửi đi đúng như đã trộn.",
   "No voice add-ons installed.": "Chưa cài tiện ích giọng nào.",
-  "Noise gate": "Cổng lọc ồn",
   "Not connecting to {host}: it leads to this PC or your home network": "Không kết nối với {host}: nó dẫn đến PC này hoặc mạng gia đình của bạn",
   "Not connecting to {host}: it's on this PC or your home network": "Không kết nối với {host}: trên PC này hoặc mạng gia đình của bạn",
   "Not connecting: Tor is being updated. Nothing was sent without it: try again in a moment.": "Không kết nối: Tor đang được cập nhật. Không gửi gì khi thiếu nó: hãy thử lại sau giây lát.",
@@ -1810,7 +1807,6 @@
   "Remove the Onion Watch add-on from Onion Board? Your {n} trigger and its pictures are kept for when you get it again.\n\nYou can get it again from the Triggers tab any time.": [
     "Gỡ tiện ích Onion Watch khỏi Onion Board? {n} kích hoạt của bạn và ảnh của chúng vẫn được giữ cho lần bạn tải lại.\n\nBạn có thể tải lại nó từ thẻ Kích hoạt bất cứ lúc nào."
   ],
-  "Removes hum, hiss and room noise before the other effects.": "Lọc tiếng ù, tiếng xì và tiếng ồn phòng trước các hiệu ứng khác.",
   "Removing failed (code {code}).": "Xóa không thành công (mã {code}).",
   "Removing…": "Đang xóa…",
   "Rename": "Đổi tên",

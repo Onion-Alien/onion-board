@@ -1533,7 +1533,6 @@
   "Chorus": "คอรัส",
   "Classic": "คลาสสิก",
   "Clean": "สะอาด",
-  "Clean up my mic": "ทำความสะอาดไมค์ของฉัน",
   "Clean: your sounds go out exactly as mixed.": "สะอาด: เสียงของคุณออกไปตามที่มิกซ์ไว้ทุกอย่าง",
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "ล้างแล้ว แต่ไม่สามารถดาวน์โหลดสำเนาใหม่ได้ ({error}) ลองอีกครั้งเมื่อคุณออนไลน์",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "ล้างแล้ว แต่ดาวน์โหลดสำเนาใหม่ไม่ได้ ({error}) ใช้ yt-dlp {version} ในตัวแทน",
@@ -1655,7 +1654,6 @@
   "High cut": "ตัดสูง",
   "Higher or lower than that, in semitones": "สูงหรือต่ำกว่านั้น เป็นเซมิโทน",
   "Higher or lower; a cartoon or a real-sounding person; a bigger or smaller throat; autotune.": "สูงขึ้นหรือต่ำลง เสียงการ์ตูนหรือเสียงคนจริงๆ คอใหญ่ขึ้นหรือเล็กลง ออโต้จูน",
-  "Hiss removal": "ลบเสียงซ่า",
   "Hoot is waiting for something to watch": "Hoot กำลังรอให้มีอะไรให้ดู",
   "Hothead": "หัวร้อน",
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "เสียงที่เปลี่ยนแล้วช้ากว่าเสียงจริงของคุณแค่ไหน: {effects} ms จากเอฟเฟกต์ + {devices} ms จากอุปกรณ์เสียงของคุณ ต่ำกว่าประมาณ 100 ms จะรู้สึกปกติเวลาพูด เอฟเฟกต์พิตช์ใช้เวลามากที่สุด ที่เหลือแทบไม่ใช้เลย",
@@ -1729,7 +1727,6 @@
   "No shaping at all: your sounds go out exactly as mixed, full range. For OBS, recording, Voicemeeter, a mixer, or anything that isn't a voice chat.": "ไม่ปรับแต่งเลย: เสียงของคุณออกไปตามที่มิกซ์ไว้ทุกอย่าง ครบทุกย่านความถี่ สำหรับ OBS, การอัด, Voicemeeter, มิกเซอร์ หรืออะไรก็ตามที่ไม่ใช่แชทเสียง",
   "No shaping. Your sounds go out exactly as mixed.": "ไม่ปรับแต่ง เสียงของคุณออกไปตามที่มิกซ์ไว้ทุกอย่าง",
   "No voice add-ons installed.": "ไม่ได้ติดตั้งส่วนเสริมเสียงพูด",
-  "Noise gate": "นอยส์เกต",
   "Not connecting to {host}: it leads to this PC or your home network": "ไม่ได้เชื่อมต่อกับ {host}: จะนำไปสู่พีซีเครื่องนี้หรือเครือข่ายในบ้านของคุณ",
   "Not connecting to {host}: it's on this PC or your home network": "ไม่ได้เชื่อมต่อกับ {host}: อยู่บนพีซีเครื่องนี้หรือเครือข่ายในบ้านของคุณ",
   "Not connecting: Tor is being updated. Nothing was sent without it: try again in a moment.": "ไม่ได้เชื่อมต่อ: กำลังอัปเดต Tor ไม่มีอะไรถูกส่งออกไปโดยไม่ผ่าน Tor: ลองอีกครั้งในอีกสักครู่",
@@ -1810,7 +1807,6 @@
   "Remove the Onion Watch add-on from Onion Board? Your {n} trigger and its pictures are kept for when you get it again.\n\nYou can get it again from the Triggers tab any time.": [
     "ลบส่วนเสริม Onion Watch ออกจาก Onion Board ไหม? ทริกเกอร์ {n} รายการของคุณและรูปภาพจะถูกเก็บไว้สำหรับตอนที่คุณรับใหม่\n\nคุณรับใหม่ได้จากแท็บ ทริกเกอร์ ทุกเมื่อ"
   ],
-  "Removes hum, hiss and room noise before the other effects.": "ลบเสียงฮัม เสียงซ่า และเสียงรบกวนในห้องออกก่อนเอฟเฟกต์อื่นๆ",
   "Removing failed (code {code}).": "ลบไม่สำเร็จ (รหัส {code})",
   "Removing…": "กำลังลบ…",
   "Rename": "เปลี่ยนชื่อ",

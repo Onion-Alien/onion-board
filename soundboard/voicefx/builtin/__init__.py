@@ -14,7 +14,6 @@ the building blocks they share, and the voices in `presets` are built from them.
 from __future__ import annotations
 
 # importing a module registers its effects: keep these in the order the effects run
-from soundboard.voicefx.builtin.cleanup import Cleanup
 from soundboard.voicefx.builtin.pitch import Growl, Harmony, PitchShift
 from soundboard.voicefx.builtin.synth import Monk, RingMod, Robot
 from soundboard.voicefx.builtin.tone import Compressor, Distortion, Helmet, Radio, Shout, Tone
@@ -27,7 +26,7 @@ from soundboard.voicefx.builtin.polish import Polish
 from soundboard.voicefx.builtin.presets import PRESET_ICONS, PRESETS
 from soundboard.voicefx.builtin.texts import shown_texts
 
-__all__ = ["Cleanup", "PitchShift", "Harmony", "Growl", "Robot", "Monk", "RingMod",
+__all__ = ["PitchShift", "Harmony", "Growl", "Robot", "Monk", "RingMod",
            "Compressor", "Tone", "Radio", "Distortion", "Shout", "Helmet", "Chorus", "Flanger",
            "Wobble", "Echo", "Reverb", "ExtraRobot", "ExtraRadio", "ExtraEcho", "ExtraReverb",
            "Background", "Polish", "PRESETS", "PRESET_ICONS", "shown_texts"]

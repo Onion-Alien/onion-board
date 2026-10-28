@@ -107,9 +107,9 @@ CODE_PREFIX = "OB"
 CODE_VERSION = 1
 MAX_CODE = 4096        # characters of code (a full 13-effect voice is ~300)
 MAX_JSON = 16384       # bytes it may unpack to (a zip bomb stops here)
-# your mic clean-up and what's on top of the voice (the Background, the Effects
-# pop-up's extras) are yours, not the voice's (ui.voicefxpanel.on_top): never shared
-NOT_SHARED = frozenset({"cleanup", "backdrop"})
+# what's on top of the voice (the Background, the Effects pop-up's extras) is yours,
+# not the voice's (ui.voicefxpanel.on_top): never shared
+NOT_SHARED = frozenset({"backdrop"})
 
 
 class CodeError(ValueError):
@@ -140,6 +140,8 @@ def from_shared(raw: dict) -> tuple[dict, list[str]]:
     Raises CodeError when an effect's settings aren't a dict."""
     effects, unknown = {}, []
     for etype, cfg in raw.items():
+        if etype in voicefx.RETIRED:   # (taken out since: not news to the user)
+            continue
         cls = voicefx.REGISTRY.get(etype) if isinstance(etype, str) else None
         if cls is None:
             unknown.append(str(etype)[:40])
