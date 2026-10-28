@@ -29,7 +29,7 @@ from PySide6.QtWidgets import (QApplication, QDialog, QGraphicsOpacityEffect, QH
                                QLabel, QMessageBox, QPushButton, QVBoxLayout)
 
 from soundboard.core import autostart
-from soundboard.mic import directmic
+from soundboard.mic import directmic, mictest
 from soundboard.core import usage
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.bun.bunnywidget import TALK
@@ -515,6 +515,7 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
         if r != QDialog.DialogCode.Accepted and 0 <= page < self.PAGES:
             name = "look" if page == self.look_index else PAGE_NAMES[min(page, 2)]
             usage.used(f"setup-closed-{name}")   # where people give up
+        mictest.save(self._mic_peak_seen)   # for the uninstaller's feedback form
         tour = self._ask_use   # the very first launch: Bun's tour of the empty board next
         if self._ask_use and page == self.switch_index:
             self._save_tabs()   # finished, or closed on the last step: the tabs as ticked
