@@ -4614,5 +4614,14 @@
   "Your recording couldn't be cleaned.": "Não deu para limpar sua gravação.",
   "{label} cleaning": "Limpeza {label}",
   "Nightcore": "Nightcore",
-  "Slowed + reverb": "Lento + reverb"
+  "Slowed + reverb": "Lento + reverb",
+  "Didn't work? Send us a report": "Não funcionou? Mande um relatório pra gente",
+  "Open the form": "Abrir o formulário",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "O formulário abre com: {details}. Nada é enviado a menos que você envie.",
+  "Windows {major} (build {build})": "Windows {major} (build {build})",
+  "error: {code}": "erro: {code}",
+  "mic: {name}": "microfone: {name}",
+  "no mic": "sem microfone",
+  "straight into my mic": "direto no meu microfone",
+  "virtual cable": "cabo virtual"
 }

@@ -4942,5 +4942,14 @@
   "Your recording couldn't be cleaned.": "تعذّر تنظيف تسجيلك.",
   "{label} cleaning": "تنظيف {label}",
   "Nightcore": "نايتكور",
-  "Slowed + reverb": "بطيء + صدى"
+  "Slowed + reverb": "بطيء + صدى",
+  "Didn't work? Send us a report": "لم ينجح؟ أرسل لنا تقريرًا",
+  "Open the form": "افتح النموذج",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "سيُفتح النموذج ومعه: {details}. لا يُرسل شيء إلا إذا أرسلته أنت.",
+  "Windows {major} (build {build})": "Windows {major} (الإصدار {build})",
+  "error: {code}": "الخطأ: {code}",
+  "mic: {name}": "الميكروفون: {name}",
+  "no mic": "لا ميكروفون",
+  "straight into my mic": "مباشرة في ميكروفوني",
+  "virtual cable": "كابل افتراضي"
 }

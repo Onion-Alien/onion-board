@@ -4614,5 +4614,14 @@
   "Your recording couldn't be cleaned.": "Записът ти не можа да бъде изчистен.",
   "{label} cleaning": "Изчистване: {label}",
   "Nightcore": "Найткор",
-  "Slowed + reverb": "Бавно + ехо"
+  "Slowed + reverb": "Бавно + ехо",
+  "Didn't work? Send us a report": "Не стана? Изпрати ни доклад",
+  "Open the form": "Отвори формата",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Формата се отваря с: {details}. Нищо не се изпраща, докато не я изпратиш.",
+  "Windows {major} (build {build})": "Windows {major} (компилация {build})",
+  "error: {code}": "грешка: {code}",
+  "mic: {name}": "микрофон: {name}",
+  "no mic": "без микрофон",
+  "straight into my mic": "направо в микрофона ми",
+  "virtual cable": "виртуален кабел"
 }

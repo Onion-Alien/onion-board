@@ -4614,5 +4614,14 @@
   "Your recording couldn't be cleaned.": "आपकी रिकॉर्डिंग साफ़ नहीं हो सकी।",
   "{label} cleaning": "{label} सफ़ाई",
   "Nightcore": "नाइटकोर",
-  "Slowed + reverb": "स्लो + रिवर्ब"
+  "Slowed + reverb": "स्लो + रिवर्ब",
+  "Didn't work? Send us a report": "काम नहीं किया? हमें रिपोर्ट भेजें",
+  "Open the form": "फ़ॉर्म खोलें",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "फ़ॉर्म इनके साथ खुलेगा: {details}. जब तक आप सबमिट नहीं करते, कुछ नहीं भेजा जाता.",
+  "Windows {major} (build {build})": "Windows {major} (बिल्ड {build})",
+  "error: {code}": "त्रुटि: {code}",
+  "mic: {name}": "माइक: {name}",
+  "no mic": "कोई माइक नहीं",
+  "straight into my mic": "सीधे मेरे माइक में",
+  "virtual cable": "वर्चुअल केबल"
 }

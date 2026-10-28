@@ -4532,5 +4532,14 @@
   "Your recording couldn't be cleaned.": "Không lọc được bản ghi của bạn.",
   "{label} cleaning": "Lọc {label}",
   "Nightcore": "Nightcore",
-  "Slowed + reverb": "Chậm + vang"
+  "Slowed + reverb": "Chậm + vang",
+  "Didn't work? Send us a report": "Không được? Gửi báo cáo cho chúng tôi",
+  "Open the form": "Mở biểu mẫu",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Biểu mẫu mở ra với: {details}. Không có gì được gửi trừ khi bạn tự gửi.",
+  "Windows {major} (build {build})": "Windows {major} (bản dựng {build})",
+  "error: {code}": "lỗi: {code}",
+  "mic: {name}": "mic: {name}",
+  "no mic": "không có mic",
+  "straight into my mic": "thẳng vào mic",
+  "virtual cable": "cáp ảo"
 }

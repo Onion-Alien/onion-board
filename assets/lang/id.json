@@ -4532,5 +4532,14 @@
   "Your recording couldn't be cleaned.": "Rekaman Anda tidak bisa dibersihkan.",
   "{label} cleaning": "Pembersihan {label}",
   "Nightcore": "Nightcore",
-  "Slowed + reverb": "Pelan + reverb"
+  "Slowed + reverb": "Pelan + reverb",
+  "Didn't work? Send us a report": "Tidak berhasil? Kirimi kami laporan",
+  "Open the form": "Buka formulir",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Formulir terbuka dengan: {details}. Tidak ada yang terkirim kecuali kamu mengirimkannya.",
+  "Windows {major} (build {build})": "Windows {major} (build {build})",
+  "error: {code}": "error: {code}",
+  "mic: {name}": "mic: {name}",
+  "no mic": "tidak ada mic",
+  "straight into my mic": "langsung ke mic saya",
+  "virtual cable": "kabel virtual"
 }

@@ -4532,5 +4532,14 @@
   "Your recording couldn't be cleaned.": "녹음의 잡음을 없애지 못했습니다.",
   "{label} cleaning": "{label} 잡음 제거",
   "Nightcore": "나이트코어",
-  "Slowed + reverb": "슬로우 + 리버브"
+  "Slowed + reverb": "슬로우 + 리버브",
+  "Didn't work? Send us a report": "안 됐나요? 보고서 보내기",
+  "Open the form": "양식 열기",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "양식에 다음 내용이 채워집니다: {details}. 직접 제출하기 전에는 아무것도 보내지지 않아요.",
+  "Windows {major} (build {build})": "Windows {major} (빌드 {build})",
+  "error: {code}": "오류: {code}",
+  "mic: {name}": "마이크: {name}",
+  "no mic": "마이크 없음",
+  "straight into my mic": "마이크로 바로",
+  "virtual cable": "가상 케이블"
 }

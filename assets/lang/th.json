@@ -4532,5 +4532,14 @@
   "Your recording couldn't be cleaned.": "ลบเสียงรบกวนจากการบันทึกของคุณไม่ได้",
   "{label} cleaning": "ลบเสียงแบบ{label}",
   "Nightcore": "ไนท์คอร์",
-  "Slowed + reverb": "ช้า + รีเวิร์บ"
+  "Slowed + reverb": "ช้า + รีเวิร์บ",
+  "Didn't work? Send us a report": "ใช้ไม่ได้ใช่ไหม? ส่งรายงานถึงเรา",
+  "Open the form": "เปิดแบบฟอร์ม",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "แบบฟอร์มจะเปิดพร้อมข้อมูล: {details} ไม่มีอะไรถูกส่งจนกว่าคุณจะกดส่งเอง",
+  "Windows {major} (build {build})": "Windows {major} (บิลด์ {build})",
+  "error: {code}": "ข้อผิดพลาด: {code}",
+  "mic: {name}": "ไมค์: {name}",
+  "no mic": "ไม่มีไมค์",
+  "straight into my mic": "เข้าไมค์โดยตรง",
+  "virtual cable": "สายเสมือน"
 }

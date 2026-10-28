@@ -4696,5 +4696,14 @@
   "Your recording couldn't be cleaned.": "Nie udało się oczyścić nagrania.",
   "{label} cleaning": "Oczyszczanie: {label}",
   "Nightcore": "Nightcore",
-  "Slowed + reverb": "Zwolnione + pogłos"
+  "Slowed + reverb": "Zwolnione + pogłos",
+  "Didn't work? Send us a report": "Nie zadziałało? Wyślij nam zgłoszenie",
+  "Open the form": "Otwórz formularz",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Formularz otworzy się z: {details}. Nic nie zostanie wysłane, dopóki go nie wyślesz.",
+  "Windows {major} (build {build})": "Windows {major} (kompilacja {build})",
+  "error: {code}": "błąd: {code}",
+  "mic: {name}": "mikrofon: {name}",
+  "no mic": "brak mikrofonu",
+  "straight into my mic": "prosto do mojego mikrofonu",
+  "virtual cable": "kabel wirtualny"
 }

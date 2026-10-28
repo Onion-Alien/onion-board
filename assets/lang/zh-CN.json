@@ -4532,5 +4532,14 @@
   "Your recording couldn't be cleaned.": "你的录音无法降噪。",
   "{label} cleaning": "{label}降噪",
   "Nightcore": "Nightcore",
-  "Slowed + reverb": "慢速 + 混响"
+  "Slowed + reverb": "慢速 + 混响",
+  "Didn't work? Send us a report": "没成功？给我们发个报告",
+  "Open the form": "打开表单",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "表单会预先填好：{details}。在你提交之前，什么都不会发送。",
+  "Windows {major} (build {build})": "Windows {major}（版本 {build}）",
+  "error: {code}": "错误：{code}",
+  "mic: {name}": "麦克风：{name}",
+  "no mic": "没有麦克风",
+  "straight into my mic": "直接送进我的麦克风",
+  "virtual cable": "虚拟音频线"
 }
