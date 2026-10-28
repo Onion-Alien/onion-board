@@ -4533,5 +4533,22 @@
   "Your recording couldn't be cleaned.": "ลบเสียงรบกวนจากการบันทึกของคุณไม่ได้",
   "{label} cleaning": "ลบเสียงแบบ{label}",
   "Nightcore": "ไนท์คอร์",
-  "Slowed + reverb": "ช้า + รีเวิร์บ"
+  "Slowed + reverb": "ช้า + รีเวิร์บ",
+  "Couldn't download Strong: {error}": "ดาวน์โหลดแรงไม่ได้: {error}",
+  "Couldn't remove Strong's download: {error}": "ลบไฟล์ดาวน์โหลดของแรงไม่ได้: {error}",
+  "Download ({size} MB)": "ดาวน์โหลด ({size} MB)",
+  "Downloading Strong: {percent}% of {size} MB": "กำลังดาวน์โหลดแรง: {percent}% จาก {size} MB",
+  "Downloading Strong…": "กำลังดาวน์โหลดแรง…",
+  "Frees {size} MB. Normal cleans instead.": "คืนพื้นที่ {size} MB แล้วใช้ปกติแทน",
+  "Remove Strong's download": "ลบไฟล์ดาวน์โหลดของแรง",
+  "Strong": "แรง",
+  "Strong couldn't run ({error}), so Normal is cleaning instead.": "แรงทำงานไม่ได้ ({error}) จึงใช้ปกติลดเสียงแทน",
+  "Strong download": "ดาวน์โหลดแรง",
+  "Strong isn't downloaded": "ยังไม่ได้ดาวน์โหลดแรง",
+  "Strong needs a one-time download of {size} MB (DeepFilterNet).": "แรงต้องดาวน์โหลดครั้งเดียว {size} MB (DeepFilterNet)",
+  "Strong: nearly everything but your voice goes, even loud noise. Uses about twice Normal's CPU.": "แรง: แทบทุกเสียงหายไปยกเว้นเสียงคุณ แม้แต่เสียงดัง ใช้ CPU ประมาณสองเท่าของปกติ",
+  "couldn't reach GitHub. Check your internet connection": "เชื่อมต่อ GitHub ไม่ได้ ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต",
+  "it didn't start": "เริ่มไม่ได้",
+  "it stopped answering": "หยุดตอบสนอง",
+  "it's too slow on this PC": "ช้าเกินไปบน PC นี้"
 }

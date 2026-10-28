@@ -4533,5 +4533,22 @@
   "Your recording couldn't be cleaned.": "你的錄音無法降噪。",
   "{label} cleaning": "{label}降噪",
   "Nightcore": "Nightcore",
-  "Slowed + reverb": "慢速 + 殘響"
+  "Slowed + reverb": "慢速 + 殘響",
+  "Couldn't download Strong: {error}": "無法下載強：{error}",
+  "Couldn't remove Strong's download: {error}": "無法刪除強的下載：{error}",
+  "Download ({size} MB)": "下載（{size} MB）",
+  "Downloading Strong: {percent}% of {size} MB": "正在下載強：{size} MB 的 {percent}%",
+  "Downloading Strong…": "正在下載強…",
+  "Frees {size} MB. Normal cleans instead.": "釋放 {size} MB，改由標準降噪。",
+  "Remove Strong's download": "刪除強的下載",
+  "Strong": "強",
+  "Strong couldn't run ({error}), so Normal is cleaning instead.": "強無法執行（{error}），現在改由標準降噪。",
+  "Strong download": "強的下載",
+  "Strong isn't downloaded": "強尚未下載",
+  "Strong needs a one-time download of {size} MB (DeepFilterNet).": "強需要一次性下載 {size} MB（DeepFilterNet）。",
+  "Strong: nearly everything but your voice goes, even loud noise. Uses about twice Normal's CPU.": "強：除了你的聲音幾乎都去掉，連很大的噪音也是。CPU 用量約為標準的兩倍。",
+  "couldn't reach GitHub. Check your internet connection": "無法連線到 GitHub。請檢查網路連線",
+  "it didn't start": "沒有啟動",
+  "it stopped answering": "停止回應了",
+  "it's too slow on this PC": "在這台電腦上太慢"
 }

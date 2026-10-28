@@ -4697,5 +4697,22 @@
   "Your recording couldn't be cleaned.": "Не вдалося очистити запис.",
   "{label} cleaning": "Очищення: {label}",
   "Nightcore": "Найткор",
-  "Slowed + reverb": "Сповільнено + реверб"
+  "Slowed + reverb": "Сповільнено + реверб",
+  "Couldn't download Strong: {error}": "Не вдалося завантажити «Сильно»: {error}",
+  "Couldn't remove Strong's download: {error}": "Не вдалося видалити завантаження «Сильно»: {error}",
+  "Download ({size} MB)": "Завантажити ({size} МБ)",
+  "Downloading Strong: {percent}% of {size} MB": "Завантажується «Сильно»: {percent}% з {size} МБ",
+  "Downloading Strong…": "Завантажується «Сильно»…",
+  "Frees {size} MB. Normal cleans instead.": "Звільнить {size} МБ. Замість нього чистить «Звичайно».",
+  "Remove Strong's download": "Видалити завантаження «Сильно»",
+  "Strong": "Сильно",
+  "Strong couldn't run ({error}), so Normal is cleaning instead.": "«Сильно» не зміг працювати ({error}), тож чистить «Звичайно».",
+  "Strong download": "Завантаження «Сильно»",
+  "Strong isn't downloaded": "«Сильно» не завантажено",
+  "Strong needs a one-time download of {size} MB (DeepFilterNet).": "Для «Сильно» треба один раз завантажити {size} МБ (DeepFilterNet).",
+  "Strong: nearly everything but your voice goes, even loud noise. Uses about twice Normal's CPU.": "Сильно: зникає майже все, крім вашого голосу, навіть гучний шум. Займає приблизно вдвічі більше процесора, ніж «Звичайно».",
+  "couldn't reach GitHub. Check your internet connection": "не вдалося з'єднатися з GitHub. Перевірте підключення до інтернету",
+  "it didn't start": "він не запустився",
+  "it stopped answering": "він перестав відповідати",
+  "it's too slow on this PC": "він надто повільний на цьому комп'ютері"
 }

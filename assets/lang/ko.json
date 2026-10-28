@@ -4533,5 +4533,22 @@
   "Your recording couldn't be cleaned.": "녹음의 잡음을 없애지 못했습니다.",
   "{label} cleaning": "{label} 잡음 제거",
   "Nightcore": "나이트코어",
-  "Slowed + reverb": "슬로우 + 리버브"
+  "Slowed + reverb": "슬로우 + 리버브",
+  "Couldn't download Strong: {error}": "강하게를 내려받지 못했습니다: {error}",
+  "Couldn't remove Strong's download: {error}": "강하게 다운로드를 지우지 못했습니다: {error}",
+  "Download ({size} MB)": "다운로드 ({size} MB)",
+  "Downloading Strong: {percent}% of {size} MB": "강하게 내려받는 중: {size} MB 중 {percent}%",
+  "Downloading Strong…": "강하게 내려받는 중…",
+  "Frees {size} MB. Normal cleans instead.": "{size} MB를 비웁니다. 대신 보통이 잡음을 지웁니다.",
+  "Remove Strong's download": "강하게 다운로드 지우기",
+  "Strong": "강하게",
+  "Strong couldn't run ({error}), so Normal is cleaning instead.": "강하게를 실행할 수 없어서({error}) 보통이 대신 잡음을 지웁니다.",
+  "Strong download": "강하게 다운로드",
+  "Strong isn't downloaded": "강하게가 다운로드되지 않았습니다",
+  "Strong needs a one-time download of {size} MB (DeepFilterNet).": "강하게는 한 번 {size} MB를 내려받아야 합니다 (DeepFilterNet).",
+  "Strong: nearly everything but your voice goes, even loud noise. Uses about twice Normal's CPU.": "강하게: 큰 소음까지 목소리 말고는 거의 다 사라집니다. 보통보다 CPU를 두 배쯤 씁니다.",
+  "couldn't reach GitHub. Check your internet connection": "GitHub에 연결할 수 없습니다. 인터넷 연결을 확인하세요",
+  "it didn't start": "시작되지 않았습니다",
+  "it stopped answering": "응답하지 않습니다",
+  "it's too slow on this PC": "이 PC에서는 너무 느립니다"
 }

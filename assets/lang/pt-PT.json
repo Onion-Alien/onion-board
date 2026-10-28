@@ -4615,5 +4615,22 @@
   "Your recording couldn't be cleaned.": "Não foi possível limpar a tua gravação.",
   "{label} cleaning": "Limpeza {label}",
   "Nightcore": "Nightcore",
-  "Slowed + reverb": "Lento + reverb"
+  "Slowed + reverb": "Lento + reverb",
+  "Couldn't download Strong: {error}": "Não foi possível transferir o Forte: {error}",
+  "Couldn't remove Strong's download: {error}": "Não foi possível remover a transferência do Forte: {error}",
+  "Download ({size} MB)": "Transferir ({size} MB)",
+  "Downloading Strong: {percent}% of {size} MB": "A transferir o Forte: {percent}% de {size} MB",
+  "Downloading Strong…": "A transferir o Forte…",
+  "Frees {size} MB. Normal cleans instead.": "Liberta {size} MB. O Normal limpa em vez dele.",
+  "Remove Strong's download": "Remover a transferência do Forte",
+  "Strong": "Forte",
+  "Strong couldn't run ({error}), so Normal is cleaning instead.": "O Forte não conseguiu funcionar ({error}), por isso o Normal está a limpar em vez dele.",
+  "Strong download": "Transferência do Forte",
+  "Strong isn't downloaded": "O Forte não está transferido",
+  "Strong needs a one-time download of {size} MB (DeepFilterNet).": "O Forte precisa de uma transferência única de {size} MB (DeepFilterNet).",
+  "Strong: nearly everything but your voice goes, even loud noise. Uses about twice Normal's CPU.": "Forte: quase tudo menos a tua voz desaparece, até ruído alto. Usa cerca do dobro do CPU do Normal.",
+  "couldn't reach GitHub. Check your internet connection": "não foi possível chegar ao GitHub. Verifica a tua ligação à internet",
+  "it didn't start": "não arrancou",
+  "it stopped answering": "deixou de responder",
+  "it's too slow on this PC": "é demasiado lento neste PC"
 }

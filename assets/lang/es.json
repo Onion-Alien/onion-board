@@ -4615,5 +4615,22 @@
   "Your recording couldn't be cleaned.": "No se pudo limpiar tu grabación.",
   "{label} cleaning": "Limpieza {label}",
   "Nightcore": "Nightcore",
-  "Slowed + reverb": "Lento + reverb"
+  "Slowed + reverb": "Lento + reverb",
+  "Couldn't download Strong: {error}": "No se ha podido descargar Fuerte: {error}",
+  "Couldn't remove Strong's download: {error}": "No se ha podido quitar la descarga de Fuerte: {error}",
+  "Download ({size} MB)": "Descargar ({size} MB)",
+  "Downloading Strong: {percent}% of {size} MB": "Descargando Fuerte: {percent} % de {size} MB",
+  "Downloading Strong…": "Descargando Fuerte…",
+  "Frees {size} MB. Normal cleans instead.": "Libera {size} MB. Normal limpia en su lugar.",
+  "Remove Strong's download": "Quitar la descarga de Fuerte",
+  "Strong": "Fuerte",
+  "Strong couldn't run ({error}), so Normal is cleaning instead.": "Fuerte no ha podido funcionar ({error}), así que Normal limpia en su lugar.",
+  "Strong download": "Descarga de Fuerte",
+  "Strong isn't downloaded": "Fuerte no está descargado",
+  "Strong needs a one-time download of {size} MB (DeepFilterNet).": "Fuerte necesita una descarga única de {size} MB (DeepFilterNet).",
+  "Strong: nearly everything but your voice goes, even loud noise. Uses about twice Normal's CPU.": "Fuerte: desaparece casi todo menos tu voz, incluso el ruido fuerte. Usa el doble de CPU que Normal, más o menos.",
+  "couldn't reach GitHub. Check your internet connection": "no se ha podido conectar con GitHub. Revisa tu conexión a internet",
+  "it didn't start": "no ha arrancado",
+  "it stopped answering": "ha dejado de responder",
+  "it's too slow on this PC": "es demasiado lento en este PC"
 }

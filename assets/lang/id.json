@@ -4533,5 +4533,22 @@
   "Your recording couldn't be cleaned.": "Rekaman Anda tidak bisa dibersihkan.",
   "{label} cleaning": "Pembersihan {label}",
   "Nightcore": "Nightcore",
-  "Slowed + reverb": "Pelan + reverb"
+  "Slowed + reverb": "Pelan + reverb",
+  "Couldn't download Strong: {error}": "Kuat tidak bisa diunduh: {error}",
+  "Couldn't remove Strong's download: {error}": "Unduhan Kuat tidak bisa dihapus: {error}",
+  "Download ({size} MB)": "Unduh ({size} MB)",
+  "Downloading Strong: {percent}% of {size} MB": "Mengunduh Kuat: {percent}% dari {size} MB",
+  "Downloading Strong…": "Mengunduh Kuat…",
+  "Frees {size} MB. Normal cleans instead.": "Mengosongkan {size} MB. Normal yang membersihkan.",
+  "Remove Strong's download": "Hapus unduhan Kuat",
+  "Strong": "Kuat",
+  "Strong couldn't run ({error}), so Normal is cleaning instead.": "Kuat tidak bisa berjalan ({error}), jadi Normal yang membersihkan.",
+  "Strong download": "Unduhan Kuat",
+  "Strong isn't downloaded": "Kuat belum diunduh",
+  "Strong needs a one-time download of {size} MB (DeepFilterNet).": "Kuat perlu unduhan sekali sebesar {size} MB (DeepFilterNet).",
+  "Strong: nearly everything but your voice goes, even loud noise. Uses about twice Normal's CPU.": "Kuat: hampir semua selain suaramu hilang, bahkan bising keras. Memakai sekitar dua kali CPU Normal.",
+  "couldn't reach GitHub. Check your internet connection": "tidak bisa menjangkau GitHub. Periksa koneksi internetmu",
+  "it didn't start": "tidak mau mulai",
+  "it stopped answering": "berhenti merespons",
+  "it's too slow on this PC": "terlalu lambat di PC ini"
 }

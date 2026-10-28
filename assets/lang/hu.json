@@ -4615,5 +4615,22 @@
   "Your recording couldn't be cleaned.": "A felvételedet nem sikerült megtisztítani.",
   "{label} cleaning": "Tisztítás: {label}",
   "Nightcore": "Nightcore",
-  "Slowed + reverb": "Lassú + reverb"
+  "Slowed + reverb": "Lassú + reverb",
+  "Couldn't download Strong: {error}": "Az Erős nem töltődött le: {error}",
+  "Couldn't remove Strong's download: {error}": "Az Erős letöltését nem sikerült törölni: {error}",
+  "Download ({size} MB)": "Letöltés ({size} MB)",
+  "Downloading Strong: {percent}% of {size} MB": "Erős letöltése: {percent}% / {size} MB",
+  "Downloading Strong…": "Erős letöltése…",
+  "Frees {size} MB. Normal cleans instead.": "{size} MB-ot szabadít fel. Helyette a Normál tisztít.",
+  "Remove Strong's download": "Erős letöltésének törlése",
+  "Strong": "Erős",
+  "Strong couldn't run ({error}), so Normal is cleaning instead.": "Az Erős nem tudott futni ({error}), ezért a Normál tisztít helyette.",
+  "Strong download": "Erős letöltése",
+  "Strong isn't downloaded": "Az Erős nincs letöltve",
+  "Strong needs a one-time download of {size} MB (DeepFilterNet).": "Az Erőshöz egyszeri {size} MB-os letöltés kell (DeepFilterNet).",
+  "Strong: nearly everything but your voice goes, even loud noise. Uses about twice Normal's CPU.": "Erős: a hangodon kívül szinte minden eltűnik, a hangos zaj is. Nagyjából kétszer annyi CPU-t használ, mint a Normál.",
+  "couldn't reach GitHub. Check your internet connection": "a GitHub nem érhető el. Ellenőrizd az internetkapcsolatot",
+  "it didn't start": "nem indult el",
+  "it stopped answering": "nem válaszol",
+  "it's too slow on this PC": "túl lassú ezen a gépen"
 }

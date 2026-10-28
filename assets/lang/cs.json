@@ -4697,5 +4697,22 @@
   "Your recording couldn't be cleaned.": "Tvou nahrávku se nepodařilo vyčistit.",
   "{label} cleaning": "Čištění: {label}",
   "Nightcore": "Nightcore",
-  "Slowed + reverb": "Zpomalené + reverb"
+  "Slowed + reverb": "Zpomalené + reverb",
+  "Couldn't download Strong: {error}": "Silně se nepodařilo stáhnout: {error}",
+  "Couldn't remove Strong's download: {error}": "Stažené Silně se nepodařilo odebrat: {error}",
+  "Download ({size} MB)": "Stáhnout ({size} MB)",
+  "Downloading Strong: {percent}% of {size} MB": "Stahuje se Silně: {percent} % z {size} MB",
+  "Downloading Strong…": "Stahuje se Silně…",
+  "Frees {size} MB. Normal cleans instead.": "Uvolní {size} MB. Místo něj čistí Normálně.",
+  "Remove Strong's download": "Odebrat stažené Silně",
+  "Strong": "Silně",
+  "Strong couldn't run ({error}), so Normal is cleaning instead.": "Silně nemohlo běžet ({error}), takže místo něj čistí Normálně.",
+  "Strong download": "Stažení Silně",
+  "Strong isn't downloaded": "Silně není stažené",
+  "Strong needs a one-time download of {size} MB (DeepFilterNet).": "Silně potřebuje jednorázově stáhnout {size} MB (DeepFilterNet).",
+  "Strong: nearly everything but your voice goes, even loud noise. Uses about twice Normal's CPU.": "Silně: zmizí skoro všechno kromě tvého hlasu, i hlasitý hluk. Bere asi dvakrát víc CPU než Normálně.",
+  "couldn't reach GitHub. Check your internet connection": "nelze se spojit s GitHubem. Zkontroluj připojení k internetu",
+  "it didn't start": "nespustilo se",
+  "it stopped answering": "přestalo odpovídat",
+  "it's too slow on this PC": "na tomhle PC je moc pomalé"
 }

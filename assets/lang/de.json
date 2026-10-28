@@ -4615,5 +4615,22 @@
   "Your recording couldn't be cleaned.": "Deine Aufnahme konnte nicht gesäubert werden.",
   "{label} cleaning": "{label} säubern",
   "Nightcore": "Nightcore",
-  "Slowed + reverb": "Langsam + Hall"
+  "Slowed + reverb": "Langsam + Hall",
+  "Couldn't download Strong: {error}": "Stark konnte nicht geladen werden: {error}",
+  "Couldn't remove Strong's download: {error}": "Der Download von Stark konnte nicht entfernt werden: {error}",
+  "Download ({size} MB)": "Herunterladen ({size} MB)",
+  "Downloading Strong: {percent}% of {size} MB": "Stark wird geladen: {percent} % von {size} MB",
+  "Downloading Strong…": "Stark wird geladen…",
+  "Frees {size} MB. Normal cleans instead.": "Gibt {size} MB frei. Dann säubert Normal.",
+  "Remove Strong's download": "Download von Stark entfernen",
+  "Strong": "Stark",
+  "Strong couldn't run ({error}), so Normal is cleaning instead.": "Stark konnte nicht laufen ({error}), daher säubert jetzt Normal.",
+  "Strong download": "Download von Stark",
+  "Strong isn't downloaded": "Stark ist nicht heruntergeladen",
+  "Strong needs a one-time download of {size} MB (DeepFilterNet).": "Stark braucht einmalig einen Download von {size} MB (DeepFilterNet).",
+  "Strong: nearly everything but your voice goes, even loud noise. Uses about twice Normal's CPU.": "Stark: Fast alles außer deiner Stimme verschwindet, auch lauter Lärm. Braucht etwa doppelt so viel CPU wie Normal.",
+  "couldn't reach GitHub. Check your internet connection": "GitHub ist nicht erreichbar. Prüfe deine Internetverbindung",
+  "it didn't start": "es ist nicht gestartet",
+  "it stopped answering": "es antwortet nicht mehr",
+  "it's too slow on this PC": "es ist auf diesem PC zu langsam"
 }

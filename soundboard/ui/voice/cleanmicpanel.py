@@ -1,6 +1,7 @@
 """The Voice tab's Clean mic card: background noise out of your mic (voicefx.cleanmic).
 
-On or off, Light or Normal, a live look at your mic and the cleaned mic, and Hear the
+On or off, Light, Normal or Strong (DeepFilterNet, downloaded the first time it's
+picked: voicefx.deepfilter), a live look at your mic and the cleaned mic, and Hear the
 difference: 5 seconds of your mic recorded, then played as it was and cleaned, in your
 headphones only. The chain does the cleaning (VoiceChain.set_clean); this card only
 says what's wanted and shows how it's doing.
@@ -13,25 +14,30 @@ import numpy as np
 from PySide6.QtCore import QTimer, Qt, Signal
 from PySide6.QtWidgets import QButtonGroup, QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
 
-from soundboard.core import usage
+from soundboard.core import errors, usage
 from soundboard.i18n import _
 from soundboard.ui.kit import icons, theme
 from soundboard.ui.kit.meters import Meter
 from soundboard.ui.kit.panel import Flow, hint_label, section_label
 from soundboard.ui.voice.voicetiles import BigSwitch
-from soundboard.voicefx import cleanmic
+from soundboard.ui.voice.livevoice import download_bar
+from soundboard.voicefx import cleanmic, deepfilter
 
 TEST_S = 5            # Hear the difference: seconds recorded
 METER_MS = 40         # the two meters' refresh while the card shows
 METER_W = 420         # px: a meter's widest (stretched across a wide window it said nothing more)
 LABEL_W = 130         # px: the meters' names, one column
 PLAY_ID = "__clean_mic_test"
+MB = round(deepfilter.SIZE / 1e6)
 
 
 def strength_words(key: str) -> str:
-    return (_("Light: noise is turned well down, and your voice stays most natural.")
-            if key == "light" else
-            _("Normal: fans, keyboards and a TV go. Uses about 5% of one CPU core."))
+    if key == "light":
+        return _("Light: noise is turned well down, and your voice stays most natural.")
+    if key == "strong":
+        return _("Strong: nearly everything but your voice goes, even loud noise. Uses "
+                 "about twice Normal's CPU.")
+    return _("Normal: fans, keyboards and a TV go. Uses about 5% of one CPU core.")
 
 
 class CleanMicPanel(QWidget):
@@ -41,6 +47,8 @@ class CleanMicPanel(QWidget):
     changed = Signal(dict)
     live_changed = Signal(bool)
     _cleaned = Signal(object, object)   # the test's (raw, cleaned), from its worker
+    _got = Signal(int, int)             # Strong's download: bytes so far, of
+    _got_done = Signal(str)             # ...and how it ended ("" done, "-" cancelled)
 
     def __init__(self, chain, engine, saved=None):
         super().__init__()
@@ -88,7 +96,8 @@ class CleanMicPanel(QWidget):
         self.strength = QButtonGroup(self)
         self.strength.setExclusive(True)
         self.b_strength: dict[str, QPushButton] = {}
-        for key, name in (("light", _("Light")), ("normal", _("Normal"))):
+        for key, name in (("light", _("Light")), ("normal", _("Normal")),
+                          ("strong", _("Strong"))):
             b = QPushButton(name)
             b.setCheckable(True)
             b.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -101,6 +110,48 @@ class CleanMicPanel(QWidget):
         bv.addLayout(row)
         self.lbl_strength = hint_label("")
         bv.addWidget(self.lbl_strength)
+        self.lbl_fallback = hint_label("")   # Strong stopped: Normal cleans instead
+        theme.set_tone(self.lbl_fallback, "warn")
+        self.lbl_fallback.hide()
+        bv.addWidget(self.lbl_fallback)
+
+        # ---- Strong's download: offered when Strong is picked and isn't here yet
+        self.get_box = QWidget()
+        gv = QVBoxLayout(self.get_box)
+        gv.setContentsMargins(0, 0, 0, 0)
+        gv.setSpacing(6)
+        self.lbl_get = hint_label("")
+        gv.addWidget(self.lbl_get)
+        self.get_bar = download_bar()
+        self.get_bar.setAccessibleName(_("Strong download"))
+        gv.addWidget(self.get_bar)
+        gr = QHBoxLayout()
+        gr.setSpacing(8)
+        self.b_get = QPushButton(_("Download ({size} MB)", size=MB))
+        icons.set_icon(self.b_get, "download", size=16)
+        self.b_get.clicked.connect(self._download)
+        self.b_cancel = QPushButton(_("Cancel"))
+        self.b_cancel.clicked.connect(self._cancel_download)
+        self.b_cancel.hide()
+        gr.addWidget(self.b_get)
+        gr.addWidget(self.b_cancel)
+        gr.addStretch(1)
+        gv.addLayout(gr)
+        self.get_box.hide()
+        bv.addWidget(self.get_box)
+        # ...and taken off this PC again, while it's the one picked
+        self.b_drop = QPushButton(_("Remove Strong's download"))
+        self.b_drop.setToolTip(_("Frees {size} MB. Normal cleans instead.", size=MB))
+        icons.set_icon(self.b_drop, "trash", size=16)
+        self.b_drop.clicked.connect(self._remove_download)
+        dr = QHBoxLayout()
+        dr.addWidget(self.b_drop)
+        dr.addStretch(1)
+        bv.addLayout(dr)
+        self._getting = False
+        self._stop_get = False
+        self._got.connect(self._on_got)
+        self._got_done.connect(self._on_got_done)
 
         # ---- right now: your mic, and what's left of it once it's cleaned
         bv.addWidget(section_label(_("Right now")))
@@ -187,8 +238,14 @@ class CleanMicPanel(QWidget):
         self.live_changed.emit(on)
 
     def _pick(self, key: str):
-        if key == self.s["strength"]:
+        if key == "strong" and not deepfilter.downloaded():
+            self._offer()   # it stays as it was until the download is here
             return
+        self.get_box.setVisible(self._getting)
+        if key == self.s["strength"]:
+            self._show()
+            return
+        self.lbl_fallback.hide()
         self.s["strength"] = key
         if self.is_on():
             self.chain.set_clean(True, key)
@@ -202,7 +259,82 @@ class CleanMicPanel(QWidget):
         self.b_on.setText(_("On") if on else _("Off"))
         self.b_strength[self.s["strength"]].setChecked(True)
         self.lbl_strength.setText(strength_words(self.s["strength"]))
+        self.b_drop.setVisible(self.s["strength"] == "strong")
         self._show_error()
+
+    # ------------------------------------------------------------ Strong's download
+    def _offer(self, error: str = ""):
+        """Strong picked, not downloaded: what it needs, and a Download button."""
+        self.b_strength[self.s["strength"]].setChecked(True)
+        self.get_box.show()
+        if self._getting:
+            return
+        if error:
+            self.lbl_get.setText(_("Couldn't download Strong: {error}", error=error))
+        else:
+            self.lbl_get.setText(_("Strong needs a one-time download of {size} MB "
+                                   "(DeepFilterNet).", size=MB))
+        theme.set_tone(self.lbl_get, "error" if error else "")
+        self.b_get.setText(_("Try again") if error else _("Download ({size} MB)", size=MB))
+
+    def _download(self):
+        if self._getting:
+            return
+        self._getting, self._stop_get = True, False
+        self.b_get.hide()
+        self.b_cancel.setEnabled(True)
+        self.b_cancel.show()
+        self.get_bar.setValue(0)
+        self.get_bar.show()
+        theme.set_tone(self.lbl_get, "")
+        self.lbl_get.setText(_("Downloading Strong…"))
+
+        def work():
+            try:
+                deepfilter.download(lambda done, total: self._got.emit(done, total),
+                                    lambda: self._stop_get)
+                why = ""
+            except Exception as ex:  # noqa: BLE001 - said on the card
+                why = "-" if self._stop_get else deepfilter.friendly(ex)
+            self._got_done.emit(why)
+        threading.Thread(target=work, daemon=True, name="clean-mic-strong-get").start()
+
+    def _cancel_download(self):
+        self._stop_get = True
+        self.b_cancel.setEnabled(False)
+
+    def _on_got(self, done: int, total: int):
+        if not self._getting:
+            return
+        total = total or deepfilter.SIZE
+        self.get_bar.setValue(min(1000, done * 1000 // max(1, total)))
+        self.lbl_get.setText(_("Downloading Strong: {percent}% of {size} MB",
+                               percent=min(100, done * 100 // max(1, total)), size=MB))
+
+    def _on_got_done(self, why: str):
+        self._getting = False
+        self.get_bar.hide()
+        self.b_cancel.hide()
+        self.b_get.show()
+        if not why:
+            self.get_box.hide()
+            self._pick("strong")
+        else:
+            self._offer("" if why == "-" else why)
+
+    def _remove_download(self):
+        if self.s["strength"] == "strong":
+            self._pick("normal")
+        try:
+            deepfilter.remove()
+        except OSError as ex:
+            self._fallback(_("Couldn't remove Strong's download: {error}",
+                             error=errors.plain(ex)))
+        self._show()
+
+    def _fallback(self, text: str):
+        self.lbl_fallback.setText(text)
+        self.lbl_fallback.show()
 
     def _cleaning(self) -> bool:
         """On and working: what others hear is the cleaned mic (after an error it's the
@@ -230,6 +362,11 @@ class CleanMicPanel(QWidget):
         self._meters.stop()
 
     def _tick(self):
+        note = getattr(self.chain.cleaner, "note", "")
+        if note and self.s["strength"] == "strong" and self.is_on():
+            self._pick("normal")   # it has stopped: say so, and show what's cleaning
+            self._fallback(_("Strong couldn't run ({error}), so Normal is cleaning "
+                             "instead.", error=note))
         mic = float(getattr(self.engine, "level_mic", 0.0) or 0.0)
         self.m_mic.set_level(mic)
         self.m_clean.set_level(self.chain.clean_level() if self._cleaning() else mic)
@@ -313,6 +450,7 @@ class CleanMicPanel(QWidget):
         theme.set_tone(self.lbl_test, tone)
 
     def shutdown(self):
+        self._stop_get = True
         self._meters.stop()
         if self._take is not None:
             self._take = None
