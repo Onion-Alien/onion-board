@@ -6,6 +6,10 @@ rnnoise.dll comes from scripts/buildtools/fetch_rnnoise.py: build.ps1 bundles it
 frozen app's rnnoise folder; a source run finds it where that script leaves it
 (build/rnnoise). Without it Clean mic just isn't offered (`available()`).
 
+Strong is DeepFilterNet (voicefx.deepfilter), an optional download: the Cleaner hands
+the mic to it once it's there and running, and cleans with RNNoise (Normal) while it
+starts or after it has stopped (`note` says why).
+
 The voice chain runs a `Cleaner` first on every mic block (VoiceChain.set_clean), so
 the voice changer, AI voices and speech recognition all get the cleaned mic.
 """
@@ -25,7 +29,7 @@ RATE = 48000
 FRAME = 480          # RNNoise's frame: 10 ms at 48 kHz
 DELAY = 960          # its output trails its input by two frames (measured: 20 ms)
 SCALE = 32768.0      # it works on 16-bit sample values held in floats
-STRENGTHS = ("light", "normal")
+STRENGTHS = ("light", "normal", "strong")
 DEFAULT = "normal"
 LIGHT_DRY = 10 ** (-12 / 20)   # Light: the mic as it was, 12 dB under the cleaned one
 NAME = "rnnoise.dll"
@@ -82,7 +86,8 @@ def why() -> str:
 
 
 def clean_settings(raw) -> dict:
-    """The saved {"on": bool, "strength": "light" | "normal"}, damaged values replaced."""
+    """The saved {"on": bool, "strength": "light" | "normal" | "strong"}, damaged values
+    replaced."""
     raw = raw if isinstance(raw, dict) else {}
     s = raw.get("strength")
     return {"on": raw.get("on") is True, "strength": s if s in STRENGTHS else DEFAULT}
@@ -104,6 +109,8 @@ class Cleaner:
         self._lib, self._state = lib, state
         self.rate = int(rate)
         self.strength = DEFAULT
+        self._deep = None   # voicefx.deepfilter.Stream while Strong is picked
+        self.note = ""      # why Strong stopped (RNNoise cleans instead), for the card
         self.set_strength(strength)
         self._frame = np.zeros(FRAME, np.float32)
         self._ptr = self._frame.ctypes.data_as(ctypes.POINTER(ctypes.c_float))
@@ -128,15 +135,36 @@ class Cleaner:
     def set_strength(self, strength: str):
         self.strength = strength if strength in STRENGTHS else DEFAULT
         self._mix = LIGHT_DRY if self.strength == "light" else 0.0
+        if self.strength == "strong" and self._deep is None:
+            from soundboard.voicefx import deepfilter
+            self.note = ""
+            self._deep = deepfilter.Stream()
+        elif self.strength != "strong" and self._deep is not None:
+            self._deep.close()
+            self._deep = None
 
     def latency(self) -> float:
-        return DELAY / RATE + (self._prime + self._late) / self.rate
+        deep = self._deep
+        own = deep.latency() if deep is not None and deep.ready else DELAY / RATE
+        return own + (self._prime + self._late) / self.rate
 
     def process(self, mono: np.ndarray) -> np.ndarray:
         n = len(mono)
         x = np.asarray(mono, np.float32)
         if self._up is not None:
             x = self._up.resample_chunk(x)
+        deep = self._deep
+        if deep is not None:
+            if len(self._pending) and deep.ready:
+                x = np.concatenate([self._pending, x])
+                self._pending = np.zeros(0, np.float32)
+            y = deep.feed(x)
+            if deep.error:   # Strong has stopped: Normal from now on
+                self.note = deep.error
+                deep.close()
+                self._deep = None
+            elif y is not None:
+                return self._send(y, n)
         if len(self._pending):
             x = np.concatenate([self._pending, x])
         whole = len(x) // FRAME * FRAME
@@ -155,6 +183,12 @@ class Cleaner:
                 if mix:   # Light: some of the mic as it was, lined up with the output
                     out += self._dry[:FRAME] * np.float32(mix)
                 self._dry = np.concatenate([self._dry[FRAME:], x[i:i + FRAME]])
+            return self._send(y, n)
+        return self._send(np.zeros(0, np.float32), n)
+
+    def _send(self, y: np.ndarray, n: int) -> np.ndarray:
+        """Cleaned 48 kHz samples in, `n` at the mic's rate out."""
+        if len(y):
             if self._down is not None:
                 y = self._down.resample_chunk(y)
             self._out = np.concatenate([self._out, y])
@@ -170,6 +204,9 @@ class Cleaner:
         return res
 
     def close(self):
+        if self._deep is not None:
+            self._deep.close()
+            self._deep = None
         state, self._state = self._state, None
         if state:
             self._lib.rnnoise_destroy(state)
@@ -183,11 +220,22 @@ class Cleaner:
 
 def clean_clip(mono: np.ndarray, rate: int, strength: str = DEFAULT) -> np.ndarray:
     """A whole recording cleaned (Hear the difference's After), lined up with the
-    recording and the same length. Off the UI thread: ~5% of the clip's length."""
+    recording and the same length. Off the UI thread: ~5% of the clip's length (Strong:
+    about a third; it raises RuntimeError when it can't run)."""
     m = np.asarray(mono, np.float32)
     if rate != RATE:
         import soxr
         m = soxr.resample(m, rate, RATE).astype(np.float32)
+    if strength == "strong":
+        from soundboard.voicefx import deepfilter
+        out = deepfilter.clean_clip(m)
+        if rate != RATE:
+            import soxr
+            out = soxr.resample(out, RATE, rate).astype(np.float32)
+        n = len(mono)
+        if len(out) < n:
+            out = np.concatenate([out, np.zeros(n - len(out), np.float32)])
+        return out[:n]
     c = Cleaner(RATE, strength)
     try:
         lag = DELAY + c._prime
