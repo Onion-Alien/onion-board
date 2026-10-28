@@ -121,6 +121,7 @@ from soundboard.core.usagenames import (  # noqa: F401
     MIC_UNSTARTED,
     MIC_RAISED,
     MIC_STUCK,
+    MIC_TESTS,
     PACKS,
     PRESS_MODES,
     RECOVERY,

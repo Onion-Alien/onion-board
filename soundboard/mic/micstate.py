@@ -209,6 +209,27 @@ def _value(key, name):
         return None
 
 
+# Windows' Privacy & security > Microphone switches: for the whole PC (HKLM), "Let apps
+# access your microphone" and "Let desktop apps access your microphone" (HKCU)
+_CONSENT_KEY = (r"Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager"
+                r"\ConsentStore\microphone")
+_CONSENT = ((winreg.HKEY_LOCAL_MACHINE, _CONSENT_KEY), (winreg.HKEY_CURRENT_USER, _CONSENT_KEY),
+            (winreg.HKEY_CURRENT_USER, _CONSENT_KEY + r"\NonPackaged"))
+
+
+def windows_blocks_mic() -> bool:
+    """One of Windows' microphone privacy switches is off, so this app gets silence
+    from every mic (it still opens). False when it can't tell."""
+    for root, path in _CONSENT:
+        try:
+            with winreg.OpenKey(root, path) as k:
+                if str(_value(k, "Value") or "").lower() == "deny":
+                    return True
+        except OSError:
+            continue
+    return False
+
+
 def installed_on() -> list[str]:
     """Endpoint GUIDs the effect is installed on."""
     try:
