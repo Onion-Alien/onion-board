@@ -4613,5 +4613,7 @@
   "Your mic as it was": "Dein Mikro, wie es war",
   "Your mic cleaned": "Dein Mikro gesäubert",
   "Your recording couldn't be cleaned.": "Deine Aufnahme konnte nicht gesäubert werden.",
-  "{label} cleaning": "{label} säubern"
+  "{label} cleaning": "{label} säubern",
+  "Nightcore": "Nightcore",
+  "Slowed + reverb": "Langsam + Hall"
 }

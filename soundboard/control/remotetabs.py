@@ -112,7 +112,7 @@ def live_state(mw: MainWindow) -> dict:
     b = mw.speed_btn
     speed, pitch, keep = b.values()
     fx = b.fx_values()
-    preset = next((n for n, a in livefx.PRESETS.items() if livefx.clean(a) == fx), "")
+    preset = next((n for n in livefx.PRESETS if b.preset_on(n)), "")
     return {"speed": round(speed, 3), "pitch": round(pitch, 2), "keep_pitch": keep,
             "effects": {k: round(v, 3) for k, v in fx.items()}, "preset": preset}
 
@@ -135,7 +135,10 @@ def dispatch_live(mw: MainWindow, action: str, params: dict) -> tuple[int, objec
             if match is None and name not in ("", "none", "off"):
                 return 404, {"error": f"no preset called {params['preset']!r}",
                              "presets": list(livefx.PRESETS)}
-            b.set_fx(livefx.PRESETS[match] if match else {})
+            if match:
+                b.apply_preset(match)
+            else:
+                b.set_fx({})
             return 200, live_state(mw)
         knobs = {q.key: q for q in livefx.PARAMS}
         given = [k for k in params if k in knobs]

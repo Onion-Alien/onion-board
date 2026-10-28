@@ -320,11 +320,11 @@ def test_live_controls_count_opening_and_what_changed_by_name(qapp, what, monkey
         assert usage._used == {f"live-opened-{what}"}
         b.pitch.set_value(5)
         b.set_fx({"bass": 6, "reverb": 0.4})
-        b.fx_presets["Canyon"].click()
+        b.fx_presets["Underwater"].click()
         b.set_redline(True)
         b.reset()
-        assert {f"live-changed-{what}", "live-pitch", "live-fx-reverb", "live-fx-echo",
-                "live-preset-canyon", "live-redline", "live-reset"} <= usage._used
+        assert {f"live-changed-{what}", "live-pitch", "live-fx-reverb", "live-fx-muffle",
+                "live-preset-underwater", "live-redline", "live-reset"} <= usage._used
         assert usage._used <= set(usage.FEATURES)
     finally:
         b.pop.close()

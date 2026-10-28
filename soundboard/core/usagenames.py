@@ -76,8 +76,8 @@ LIVE_TABS = ("sounds", "radio", "apps")
 LIVE_CONTROLS = ("speed", "pitch", "keep-pitch", "redline", "reset",
                  *(f"fx-{k}" for k in ("bass", "treble", "muffle", "reverb", "echo", "crunch")))
 # their effect presets (audio/livefx.py PRESETS, as dashed words); any other is "other"
-LIVE_PRESETS = ("bass-boosted", "blown-out", "concert-hall", "canyon", "underwater",
-                "phone-call", "other")
+LIVE_PRESETS = ("nightcore", "slowed-reverb", "bass-boosted", "chipmunk", "deep-voice",
+                "underwater", "other")
 # what was done to a Voice tab recording or an Apps tab saved clip (ui/apps/clipshelf.py)
 CLIP_ACTIONS = ("play", "mic", "add", "copy", "delete")
 # Bun's games (ui/bun/bunpong.py games()); any other is "other"

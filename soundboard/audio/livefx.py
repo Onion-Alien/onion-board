@@ -11,6 +11,8 @@ turning it back up starts from silence instead of an old tail.
 the UI and read once per block on the audio thread."""
 from __future__ import annotations
 
+import math
+
 import numpy as np
 
 from soundboard.audio.dsp import SmoothSos, butter, matched_biquad
@@ -27,14 +29,34 @@ ECHO = Param("echo", "Echo", 0, 1, 0)
 CRUNCH = Param("crunch", "Distortion", 0, 1, 0)
 PARAMS = (BASS, TREBLE, MUFFLE, REVERB, ECHO, CRUNCH)
 
+# the chips under the knobs. One with a speed, pitch or "keep" (keep pitch, 0 = off:
+# record-style, the pitch rises with the speed) also sets those (tuning()); the rest
+# only the knobs. Nightcore: 1.3x record-style (+4.5 st), like nightcore uploads.
 PRESETS: dict[str, dict[str, float]] = {
+    "Nightcore": {"speed": 1.3, "keep": 0, "bass": 3},
+    "Slowed + reverb": {"speed": 0.8, "keep": 0, "reverb": 0.45, "bass": 3},
     "Bass boosted": {"bass": 12},
-    "Blown out": {"bass": 15, "crunch": 0.7},
-    "Concert hall": {"reverb": 0.55},
-    "Canyon": {"echo": 0.6, "reverb": 0.2},
+    "Chipmunk": {"pitch": 7},
+    "Deep voice": {"pitch": -5, "bass": 4},
     "Underwater": {"muffle": 0.8, "reverb": 0.3, "bass": 4},
-    "Phone call": {"bass": -12, "treble": -4, "muffle": 0.45, "crunch": 0.15},
 }
+TUNING = ("speed", "pitch", "keep")
+
+
+def tuning(preset: dict, has_speed: bool = True) -> tuple[float, float, bool] | None:
+    """The (speed, semitones, keep pitch) a preset sets, None if it only sets knobs.
+    Without a speed (a live stream: radio, apps) a record-style speed-up becomes the
+    pitch it would have given."""
+    if not any(k in preset for k in TUNING):
+        return None
+    speed, pitch = preset.get("speed", 1.0), preset.get("pitch", 0.0)
+    keep = bool(preset.get("keep", 1))
+    if not has_speed:
+        if not keep:
+            pitch += round(12 * math.log2(speed))
+        speed, keep = 1.0, True
+    return speed, pitch, keep
+
 
 MUFFLE_TOP, MUFFLE_LOW = 18000.0, 350.0     # lowpass cutoff at 0 and at full muffle
 FADE = 1024    # samples an effect takes to fade out once its knob hits 0 (as SmoothSos)

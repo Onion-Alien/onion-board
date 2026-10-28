@@ -25,8 +25,17 @@ def _rms(x):
 def test_clean_keeps_only_knobs_off_zero_and_clamps():
     assert livefx.clean({"bass": 0, "reverb": 2, "nope": 1, "echo": "x"}) == {"reverb": 1.0}
     assert livefx.clean(None) == {}
-    for amounts in livefx.PRESETS.values():
-        assert livefx.clean(amounts) == amounts
+    for amounts in livefx.PRESETS.values():   # their speed and pitch aren't knobs
+        assert livefx.clean(amounts) == {k: v for k, v in amounts.items()
+                                         if k not in livefx.TUNING}
+
+
+def test_a_preset_with_a_speed_sets_all_three_and_a_stream_gets_the_pitch():
+    nightcore = livefx.PRESETS["Nightcore"]
+    assert livefx.tuning(nightcore) == (1.3, 0.0, False)
+    assert livefx.tuning(nightcore, has_speed=False) == (1.0, 5, True)   # +4.5 st
+    assert livefx.tuning(livefx.PRESETS["Chipmunk"]) == (1.0, 7, True)
+    assert livefx.tuning(livefx.PRESETS["Bass boosted"]) is None
 
 
 def test_every_knob_and_preset_keeps_shape_and_stays_finite():

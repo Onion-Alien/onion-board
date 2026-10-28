@@ -4531,5 +4531,7 @@
   "Your mic as it was": "Mic của bạn như cũ",
   "Your mic cleaned": "Mic của bạn đã lọc",
   "Your recording couldn't be cleaned.": "Không lọc được bản ghi của bạn.",
-  "{label} cleaning": "Lọc {label}"
+  "{label} cleaning": "Lọc {label}",
+  "Nightcore": "Nightcore",
+  "Slowed + reverb": "Chậm + vang"
 }

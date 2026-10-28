@@ -4613,5 +4613,7 @@
   "Your mic as it was": "A mikrofonod eredetiben",
   "Your mic cleaned": "A mikrofonod megtisztítva",
   "Your recording couldn't be cleaned.": "A felvételedet nem sikerült megtisztítani.",
-  "{label} cleaning": "Tisztítás: {label}"
+  "{label} cleaning": "Tisztítás: {label}",
+  "Nightcore": "Nightcore",
+  "Slowed + reverb": "Lassú + reverb"
 }
