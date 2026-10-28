@@ -73,6 +73,10 @@ if ($LASTEXITCODE -ne 0) { throw "build_michelper.py failed" }
 # bundled as qjs\ with its licence (soundboard\online\jsengine.py).
 & $py scripts\buildtools\fetch_qjs.py build\qjs
 if ($LASTEXITCODE -ne 0) { throw "fetch_qjs.py failed" }
+# Clean mic's noise remover: RNNoise's DLL, from the pinned pyrnnoise wheel on PyPI,
+# SHA-256-checked, bundled as rnnoise\ with its licence (soundboard\voicefx\cleanmic.py).
+& $py scripts\buildtools\fetch_rnnoise.py build\rnnoise
+if ($LASTEXITCODE -ne 0) { throw "fetch_rnnoise.py failed" }
 # PyInstaller looks for the DLLs it bundles on PATH too, so a folder there with another
 # program's copy (an AI tool's ICU, an older C++ runtime) ends up in the app and Qt
 # can't start. Only Windows' own folders while it runs; vc_runtime.py below cleans up
@@ -92,6 +96,7 @@ try {
     --add-binary "build\directmic\obmic.dll;directmic" `
     --add-data "build\michelper\obmichelper;michelper" `
     --add-binary "build\qjs\qjs.exe;qjs" --add-data "build\qjs\LICENSE.txt;qjs" `
+    --add-binary "build\rnnoise\rnnoise.dll;rnnoise" --add-data "build\rnnoise\LICENSE.txt;rnnoise" `
     --copy-metadata yt-dlp --collect-all yt_dlp_ejs `
     --collect-all curl_cffi --hidden-import yt_dlp.networking._curlcffi `
     --hidden-import scipy.fft --hidden-import scipy.ndimage `

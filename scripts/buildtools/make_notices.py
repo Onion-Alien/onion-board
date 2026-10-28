@@ -62,6 +62,13 @@ folder) when no other JavaScript engine is installed. https://github.com/quickjs
 Its licence is reproduced at the end of this file.
 
 {RULE}
+RNNoise  --  BSD-3-Clause
+{RULE}
+Clean mic takes background noise out of your mic with RNNoise's rnnoise.dll (the
+app's rnnoise folder), as built for the pyrnnoise package. https://github.com/xiph/rnnoise
+Its licence is reproduced at the end of this file.
+
+{RULE}
 Country outlines
 {RULE}
 The Radio tab's map draws Natural Earth's country outlines (public domain), shipped
@@ -121,7 +128,7 @@ def main() -> None:
     parts += ["CC0 voice backgrounds\n", (backgrounds / "README.md").read_text("utf-8"),
               (backgrounds / "credits.json").read_text("utf-8")]
     parts += [section(d) for d in closure(ROOTS)]
-    for name in ("QuickJS-ng-MIT.txt", "LGPL-3.0.txt", "GPL-3.0.txt"):
+    for name in ("QuickJS-ng-MIT.txt", "RNNoise-BSD-3.txt", "LGPL-3.0.txt", "GPL-3.0.txt"):
         parts += [f"{RULE}\n{name}\n{RULE}\n", (ROOT / "licenses" / name).read_text("utf-8")]
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text("\n".join(parts), encoding="utf-8")

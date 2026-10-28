@@ -194,7 +194,10 @@ class VoiceChain:
 
     `source` (optional, the AI voice: soundboard.speech.aivoice.VoiceSource) has
     `process(mono, rate) -> mono` and `latency()`: its output replaces your voice,
-    and the effects that are on then run on that."""
+    and the effects that are on then run on that.
+
+    Clean mic (`set_clean`, voicefx.cleanmic) runs before all of it, whether or not a
+    voice is on: noise out of your mic, the voices and the tap get the cleaned one."""
 
     def __init__(self):
         self.enabled = False
@@ -213,6 +216,14 @@ class VoiceChain:
         self.source = None
         self.errors: dict[str, str] = {}      # effect type -> message (effect bypassed)
         self.beds = None    # voicefx.backdrop.Beds: the Background's loops, made ahead
+        # Clean mic: the strength wanted (None: off), posted like the spec; the audio
+        # thread makes the Cleaner. Its failure goes in clean_error, not errors (which
+        # the voice changer lists as its effects')
+        self._clean_want: str | None = None
+        self._clean_gen = 0
+        self._clean_built = 0
+        self.cleaner = None   # voicefx.cleanmic.Cleaner, the audio thread's
+        self.clean_error = ""
 
     # ------------------------------------------------------------ UI thread
     def configure(self, spec: dict):
@@ -221,6 +232,40 @@ class VoiceChain:
         self._spec = spec   # first the spec, then the bump: process() never misses it
         self.enabled = bool(spec.get("enabled"))
         self._gen += 1
+
+    def set_clean(self, on: bool, strength: str = "normal"):
+        """(UI thread.) Clean mic on (at that strength) or off, from the next mic block."""
+        self._clean_want = strength if on else None
+        self.clean_error = ""
+        self._clean_gen += 1
+
+    @property
+    def clean_on(self) -> bool:
+        """Clean mic is switched on (it may still be starting, or have failed)."""
+        return self._clean_want is not None
+
+    def clean_level(self) -> float:
+        """The cleaned mic's last peak (0 while Clean mic is off), for its meter."""
+        c = self.cleaner
+        return c.level if c is not None else 0.0
+
+    def _rebuild_clean(self, rate: int):
+        """(Audio thread, in process.) The Cleaner for the wanted strength and `rate`."""
+        want, old = self._clean_want, self.cleaner
+        if want is not None and old is not None and old.rate == rate:
+            old.set_strength(want)
+            return
+        self.cleaner = None
+        if old is not None:
+            old.close()
+        if want is None or not rate:
+            return
+        from soundboard.voicefx import cleanmic
+        try:
+            self.cleaner = cleanmic.Cleaner(rate, want)
+        except Exception as ex:  # noqa: BLE001 - the mic goes on uncleaned
+            self.clean_error = errors.plain(ex)
+            log.error("Clean mic failed to start", exc_info=ex)
 
     def _rebuild(self, rate: int):
         """(Audio thread, in process.) The effects the spec asks for, made for `rate`."""
@@ -279,7 +324,7 @@ class VoiceChain:
     @property
     def active(self) -> bool:
         return ((self.enabled and bool(self._effects)) or self.tap is not None or self.replace
-                or self.source is not None)
+                or self.source is not None or self._clean_want is not None)
 
     @property
     def changes_voice(self) -> bool:
@@ -289,6 +334,9 @@ class VoiceChain:
     def latency(self) -> float:
         """Seconds the effects that are on (and the AI voice) add to your voice right now."""
         total = 0.0
+        c = self.cleaner
+        if c is not None:
+            total += c.latency()
         src = self.source
         if src is not None:
             try:
@@ -307,6 +355,9 @@ class VoiceChain:
     def clear_errors(self):
         self.errors.clear()
         self._gen += 1   # the next mic block gives the bypassed effects another go
+        if self.clean_error:
+            self.clean_error = ""
+            self._clean_gen += 1
 
     def render(self, mono: np.ndarray, rate: int, block: int = 1024) -> np.ndarray:
         """A whole clip (the computer voice's line) through the voice changer, with its
@@ -374,12 +425,26 @@ class VoiceChain:
         if self._light != _light:
             self._light = _light
             self._tell_light()
-        tap, replace, src = self.tap, self.replace, self.source
+        cgen = self._clean_gen
+        if cgen != self._clean_built or (self.cleaner is not None and self.cleaner.rate != rate):
+            self._clean_built = cgen
+            self._rebuild_clean(rate)
+        tap, replace, src, cleaner = self.tap, self.replace, self.source, self.cleaner
         effects = self._effects if self.enabled else ()
-        if not effects and tap is None and not replace and src is None:
+        if not effects and tap is None and not replace and src is None and cleaner is None:
             return x
         m = x[:, 0] if x.shape[1] == 1 else (x[:, 0] + x[:, 1]) * np.float32(0.5)
         m = np.ascontiguousarray(m, dtype=np.float32)
+        if cleaner is not None:
+            try:
+                y = cleaner.process(m)
+                if y.shape != m.shape or not np.all(np.isfinite(y)):
+                    raise ValueError(f"returned {y.shape} / non-finite audio")
+                m = y
+            except Exception as ex:  # noqa: BLE001 - never kills the mic: it goes on uncleaned
+                self.cleaner = None
+                self.clean_error = errors.plain(ex)
+                log.error("Clean mic failed; off", exc_info=ex)
         if tap is not None:
             try:
                 tap(m, rate)

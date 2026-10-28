@@ -145,6 +145,10 @@ The full list. The [README](../README.md) has the short version and how to get s
   controls change the pitch and effects of every program you send. A closed editor
   doesn't listen or keep anything. A program you removed comes back, settings and
   all, from *Forgotten programs*.
+- **Clean mic** (the Voice tab's first tab): fans, keyboards and other background noise
+  taken out of your mic while you talk (RNNoise, on this PC, about 5% of one CPU core,
+  ~30 ms), Light or Normal, with or without a voice on; *Hear the difference* records
+  5 seconds and plays them as they were and cleaned, in your headphones only.
 - **Voice tab:** voice changer (25 ready voices, from Deep, High and Male voice and
   Demon to Autotune, Talkbox, Masked caller, Dark lord, a Dalek and a singing monk; pitch with a natural-sound mode and a
   voice-size control, autotune, mic clean-up (noise gate + hiss removal), monster growl,

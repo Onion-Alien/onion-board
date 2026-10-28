@@ -30,6 +30,11 @@ source run uses the QuickJS the build ships once `.venv\Scripts\python scripts\b
 has put it in `build\qjs\` (pinned release, SHA-256-checked). Without either, yt-dlp
 goes without (fewer YouTube formats).
 
+Clean mic (the Voice tab's first tab) needs RNNoise: a source run finds it once
+`.venv\Scripts\python scripts\buildtools\fetch_rnnoise.py` has put `rnnoise.dll` in
+`build\rnnoise\` (from the pinned pyrnnoise wheel on PyPI, SHA-256-checked). Without it
+the tab says Clean mic isn't in this copy, and its tests on the real library are skipped.
+
 A `.venv` can't be moved or copied to another folder (its launchers hard-code the
 path). If the repo moves, delete `.venv` and recreate it. The same goes for a
 module's own `.venv` (e.g. `modules\live-voice\.venv`: recreate it with that
@@ -216,7 +221,8 @@ install gcc for a clean release build),
 `scripts\buildtools\version_info.py` (the .exe's version resource),
 `scripts\directmic\build_directmic.py` (the mic effect; the build stops
 if g++ is missing), `scripts\buildtools\fetch_qjs.py` (QuickJS for YouTube, bundled in
-`_internal\qjs\`), `scripts\buildtools\build_michelper.py` (the mic helper `obmichelper.exe`,
+`_internal\qjs\`), `scripts\buildtools\fetch_rnnoise.py` (RNNoise for Clean mic, bundled
+in `_internal\rnnoise\`), `scripts\buildtools\build_michelper.py` (the mic helper `obmichelper.exe`,
 a `--console` build whose Python archive sits beside the .exe rather than appended to
 it — both to avoid antivirus false positives; it warns, but still builds, on the stock
 bootloader), PyInstaller (bundles `installer\install-vbcable.ps1` and

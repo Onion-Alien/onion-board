@@ -19,7 +19,7 @@ TRIGGERS_FEATURES = (
     "several-places", "every-copy", "area", "hold", "quiet-in-front", "own-interval",
     "categories", "profiles", "view-pads", "view-cards")
 # the Voice tab's tabs (ui/voice/voicepanel.py VoicePanel._section keys)
-VOICE_TABS = ("fx", "ai", "speak", "addons")
+VOICE_TABS = ("clean", "fx", "ai", "speak", "addons")
 # The Mic effect card's actions (ui/setup/audiorecovery.py; "cleanup-none" counts as cleanup)
 RECOVERY = ("install", "repair", "update", "reinstall", "cleanup", "remove")
 # why one of them failed: an install's reason (MIC_FAILS), or leftovers still there after
@@ -229,6 +229,8 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # your own made (never which voice)
             "ai-voice", "ai-voice-group", "ai-voice-favorite", "ai-voice-hear",
             "ai-voice-made",
+            # Clean mic switched on (never how strong), and its Hear the difference played
+            "clean-mic", "clean-mic-test",
             # Free packs: the window opened, a sample heard, a pack added (PACKS)
             "packs-opened", "pack-heard", *(f"pack-added-{k}" for k in PACKS),
             # a custom colour from the colour wheel (a pad or a group of them)
