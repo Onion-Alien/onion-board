@@ -260,7 +260,8 @@ class StreamVoice:
         if self.waiting:   # the helper is loading its model: nothing comes out yet
             return np.zeros_like(x)
         c = self.chain
-        if not c.enabled and c.source is None and c.tap is None and not c.replace:
+        if (not c.enabled and c.source is None and c.tap is None and not c.replace
+                and not c.clean_on):
             return x   # (chain.active is only right once process built its effects)
         y = c.process(np.ascontiguousarray(x, dtype=np.float32), rate)
         return self.lines.mix(y) if self.speech is not None else y

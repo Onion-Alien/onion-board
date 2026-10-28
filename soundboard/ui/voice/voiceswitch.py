@@ -56,6 +56,10 @@ class VoiceSwitch(_Panel):
             refresh()
         self._update_backdrop(self.fx.spec())
 
+    def _clean_changed(self, s: dict):
+        self.speech.s["clean"] = s         # kept with the speech settings
+        self.speech_changed.emit(dict(self.speech.s))
+
     def _ai_changed(self, s: dict):
         self.speech.s["ai"] = s            # kept with the speech settings
         self.speech_changed.emit(dict(self.speech.s))
@@ -152,6 +156,10 @@ class VoiceSwitch(_Panel):
         """A status bar chip clicked: that one goes off (remembered, its chip stays
         grey), or a grey one comes back on."""
         usage.used("voice-chip-toggle")
+        if key == "clean":   # not a voice: just off (its chip goes, as with ✕)
+            self.clean.set_on(False)
+            self._update_heads()
+            return
         before = self.on_keys()
         self._switching = True
         try:
@@ -172,6 +180,8 @@ class VoiceSwitch(_Panel):
 
     def forget_one(self, key: str):
         """A chip's ✕: that one goes off, and Voices ON won't bring it back."""
+        if key == "clean":
+            self.clean.set_on(False)
         self._back = [k for k in self._back if k != key]
         if key in self.on_keys():
             self.stop_one(key)

@@ -237,6 +237,11 @@ def selftest() -> int:
         print("FAIL: the bundled QuickJS (qjs.exe) is missing or won't start",
               file=sys.stderr)
         return 1
+    from soundboard.voicefx import cleanmic   # Clean mic's RNNoise (build.ps1 bundles it)
+    if getattr(sys, "frozen", False) and not cleanmic.available():
+        print(f"FAIL: the bundled RNNoise (rnnoise.dll) won't load: {cleanmic.why()}",
+              file=sys.stderr)
+        return 1
     print(f"OK: Onion Board {__version__} self-test passed")
     return 0
 

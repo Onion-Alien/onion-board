@@ -1,11 +1,11 @@
-"""The Voice tab: lays out its cards (voice changer, AI voices, Languages, add-ons)
-and the tab's bottom bar.
+"""The Voice tab: lays out its cards (Clean mic, voice changer, AI voices, Languages,
+add-ons) and the tab's bottom bar.
 
-The cards live in their own files: `VoiceFxPanel` (voicefxpanel.py), `SpeechPanel`
-(speechpanel.py) and `AiVoicePanel` (aivoicepanel.py). `VoicePanel` owns the chain
-wiring between them. Its methods live in four mixins beside it: `voicecombos` (My voice
-combos), `voiceswitch` (voices on and off), `voicecards` (the cards, tabs and status
-chips) and `voiceaddons` (the add-ons list and finding add-ons).
+The cards live in their own files: `CleanMicPanel` (cleanmicpanel.py), `VoiceFxPanel`
+(voicefxpanel.py), `SpeechPanel` (speechpanel.py) and `AiVoicePanel` (aivoicepanel.py).
+`VoicePanel` owns the chain wiring between them. Its methods live in four mixins beside
+it: `voicecombos` (My voice combos), `voiceswitch` (voices on and off), `voicecards` (the
+cards, tabs and status chips) and `voiceaddons` (the add-ons list and finding add-ons).
 """
 from __future__ import annotations
 
@@ -172,6 +172,15 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         # My voice combos: under the tabs, so it's there whichever part is showing
         self.setups = voicesetups.Store()   # (its bar is placed once the panels are made)
         outer.addWidget(scroll, 1)
+
+        # Clean mic, the first tab: noise out of your mic before any voice. Unlike the
+        # voices it stays on from last time: it doesn't change who you sound like
+        from soundboard.ui.voice.cleanmicpanel import CleanMicPanel
+        self.clean = CleanMicPanel(self.chain, engine,
+                                   speech.get("clean") if isinstance(speech, dict) else None)
+        self.clean.changed.connect(self._clean_changed)
+        self.clean.live_changed.connect(lambda _on: self._update_heads())
+        self._section("clean", self.clean, self.clean.title, self.clean.head)
 
         # the voice changer. It always starts off (the voice you picked is kept):
         # left on from last time, it changed your mic the moment the app opened.
@@ -396,6 +405,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         """Closing the app, or the tab switched off in Settings > Tabs. A download or
         install still running finishes quietly (busy.emit) or, a translation, stops."""
         self._meter_timer.stop()
+        self.clean.shutdown()
         if getattr(self, "recordings", None) is not None:
             self.recordings.shutdown()
         self.speech.installs._dl_cancel = True

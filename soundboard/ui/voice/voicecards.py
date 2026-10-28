@@ -57,11 +57,13 @@ class CardBadge(QWidget):
         p.end()
 
 
-CARD_ICONS = {"fx": "voice", "ai": "wave", "speak": "browser", "addons": "puzzle"}
+# Clean mic first: your mic is cleaned before any voice changes it
+CARD_ICONS = {"clean": "mic", "fx": "voice", "ai": "wave", "speak": "browser", "addons": "puzzle"}
 TAB_KEYS = tuple(CARD_ICONS)   # the Voice tab's own tabs, in order
 ORDER = ("fx", "ai", "speak", "lang")   # the status bar's chips, as the sound goes through
-TAB_NAMES = {"fx": lambda: _("Voice changer"), "ai": lambda: _("AI voices"),
-             "speak": lambda: _("Languages"), "addons": lambda: _("Add-ons")}
+TAB_NAMES = {"clean": lambda: _("Clean mic"), "fx": lambda: _("Voice changer"),
+             "ai": lambda: _("AI voices"), "speak": lambda: _("Languages"),
+             "addons": lambda: _("Add-ons")}
 
 
 class VoiceCards(_Panel):
@@ -155,6 +157,13 @@ class VoiceCards(_Panel):
         if not self._switching:
             self._back = [k for k in self._back if k not in on]
         click_off = _("Click to turn it off. Right-click to open it.")
+        # Clean mic first, as the sound goes through it: it isn't a voice, so the Voices
+        # switch leaves it alone and its chip has no grey "comes back" state
+        clean = getattr(self, "clean", None)
+        if clean is not None and clean.is_on():
+            items.append(("clean", _("Clean mic"), "on", "mic", None,
+                          _("Clean mic takes background noise out of your mic.") + " "
+                          + click_off))
         if "fx" in on:
             shown, pic = self._fx_shown()
             items.append(("fx", shown, "on", "voice" if pic is None else "", pic,
@@ -182,7 +191,10 @@ class VoiceCards(_Panel):
                           _("What you say is said in {language}.", language=lang)
                           + " " + click_off))
         # grey: what Voices ON brings back (a click brings just that one back)
-        if not on:
+        # (with Clean mic's chip there and nothing to bring back, "Mic unchanged" beside
+        # it read as if Clean mic did nothing)
+        if not on and not (clean is not None and clean.is_on() and not self._back
+                           and not self.back_keys()):
             items.append(("none", _("Mic unchanged. ON brings back:") if self._back else
                           _("Mic unchanged. ON turns on:") if self.back_keys() else
                           _("Mic unchanged"), "off", "mic", None,
@@ -255,6 +267,7 @@ class VoiceCards(_Panel):
         speaking = tts or (m is not None and spoken.heard())
         # its switch and its lit card already say which: no words beside the switch
         self._set_state("speak", speaking, "")
+        self._set_state("clean", self.clean.is_on(), "")
 
     def _set_state(self, key: str, on: bool, note: str):
         st = self._states[key]
