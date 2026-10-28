@@ -1080,6 +1080,162 @@ begin
   Result := RegKeyExists(Root, 'SOFTWARE\OnionBoard\MicPlugin\Endpoints');
 end;
 
+// The uninstall feedback form's hidden fields (CurUninstallStepChanged), read at
+// usUninstall while the settings, the mic effect and HKCU\Software\OnionBoard are still
+// there: short words, each left out when it can't be read. Only the browser opens the
+// address, on their Yes, and nothing is sent unless they submit the form.
+var
+  FormDetails: String;
+
+// S for an address: everything but letters, digits and -_.~ as %XX of its UTF-8 bytes
+function UrlEncode(S: String): String;
+var
+  I, C: Integer;
+begin
+  Result := '';
+  for I := 1 to Length(S) do
+  begin
+    C := Ord(S[I]);
+    if ((C >= Ord('a')) and (C <= Ord('z'))) or ((C >= Ord('A')) and (C <= Ord('Z'))) or
+       ((C >= Ord('0')) and (C <= Ord('9'))) or (Pos(Copy(S, I, 1), '-_.~') > 0) then
+      Result := Result + Copy(S, I, 1)
+    else if C < $80 then
+      Result := Result + Format('%%%.2x', [C])
+    else if C < $800 then
+      Result := Result + Format('%%%.2x%%%.2x', [$C0 or (C shr 6), $80 or (C and $3F)])
+    else if (C < $D800) or (C > $DFFF) then   // (an emoji's two halves: left out)
+      Result := Result + Format('%%%.2x%%%.2x%%%.2x', [$E0 or (C shr 12),
+        $80 or ((C shr 6) and $3F), $80 or (C and $3F)]);
+  end;
+end;
+
+// A text setting of %APPDATA%\OnionBoard\config.json, '' when it's null or not there.
+// A plain text search, as ConfigIsOffline: json.dumps writes "key": "value" with
+// \uXXXX for anything past ASCII.
+function ConfigString(Key: String): String;
+var
+  Raw: AnsiString;
+  S: String;
+  I: Integer;
+begin
+  Result := '';
+  if not LoadStringFromFile(ExpandConstant('{userappdata}\OnionBoard\config.json'), Raw) then
+    exit;
+  S := String(Raw);
+  I := Pos('"' + Key + '"', S);
+  if I = 0 then
+    exit;
+  I := I + Length(Key) + 2;
+  while (I <= Length(S)) and ((S[I] = ' ') or (S[I] = ':') or (S[I] = #9)) do
+    I := I + 1;
+  if (I > Length(S)) or (S[I] <> '"') then
+    exit;
+  I := I + 1;
+  while (I <= Length(S)) and (S[I] <> '"') do
+  begin
+    if (S[I] = '\') and (I < Length(S)) then
+    begin
+      I := I + 1;
+      if (S[I] = 'u') and (I + 4 <= Length(S)) then
+      begin
+        Result := Result + Chr(StrToIntDef('$' + Copy(S, I + 1, 4), Ord('?')));
+        I := I + 4;
+      end
+      else
+        Result := Result + Copy(S, I, 1);
+    end
+    else
+      Result := Result + Copy(S, I, 1);
+    I := I + 1;
+  end;
+end;
+
+// "11-26100": Windows 11 from build 22000
+function FormWin: String;
+var
+  Build: String;
+  N: Integer;
+begin
+  Result := '';
+  if RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Windows NT\CurrentVersion',
+       'CurrentBuild', Build) then
+  begin
+    N := StrToIntDef(Build, 0);
+    if N >= 22000 then
+      Result := '11-' + IntToStr(N)
+    else if N >= 10240 then
+      Result := '10-' + IntToStr(N);
+  end;
+end;
+
+// The mic: the one picked in Onion Board, or (Windows' default, '' there) the only
+// working recording device, "Microphone (its headset)". Windows keeps no readable mark
+// of which one is its default.
+function FormMic: String;
+var
+  Root, I, Found: Integer;
+  Base, Name, Device: String;
+  Keys: TArrayOfString;
+  State: Cardinal;
+begin
+  Result := ConfigString('mic_device');
+  if Result = '' then
+  begin
+    Found := 0;
+    if IsWin64 then Root := HKLM64 else Root := HKLM;
+    Base := 'SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\Capture';
+    if RegGetSubkeyNames(Root, Base, Keys) then
+      for I := 0 to GetArrayLength(Keys) - 1 do
+        if RegQueryDWordValue(Root, Base + '\' + Keys[I], 'DeviceState', State) and
+           (State = 1) then
+        begin
+          Found := Found + 1;
+          Name := '';
+          Device := '';
+          RegQueryStringValue(Root, Base + '\' + Keys[I] + '\Properties',
+            '{a45c254e-df1c-4efd-8020-67d146a850e0},2', Name);
+          RegQueryStringValue(Root, Base + '\' + Keys[I] + '\Properties',
+            '{b3f8fa53-0004-438e-9003-51a46e139bfc},6', Device);
+          Result := Name;
+          if Device <> '' then
+            Result := Trim(Name + ' (' + Device + ')');
+        end;
+    if Found <> 1 then
+      Result := '';
+  end;
+  Result := Copy(Result, 1, 80);
+end;
+
+// &win=11-26100&mic=...&mode=direct&fx=on&mictest=pass (see FormDetails above). mode is
+// where the sounds went (the "route" setting; "mic" is direct), fx whether Onion Board's
+// mic effect was on a mic, mictest the quick setup's last mic test
+// (soundboard/mic/mictest.py)
+function GetFormDetails: String;
+var
+  S: String;
+begin
+  Result := '';
+  S := FormWin;
+  if S <> '' then
+    Result := Result + '&win=' + S;
+  S := FormMic;
+  if S <> '' then
+    Result := Result + '&mic=' + UrlEncode(S);
+  S := ConfigString('route');
+  if S = 'mic' then
+    S := 'direct';
+  if S <> '' then
+    Result := Result + '&mode=' + UrlEncode(Copy(S, 1, 10));
+  if MicEffectLeft then
+    Result := Result + '&fx=on'
+  else
+    Result := Result + '&fx=off';
+  if not RegQueryStringValue(HKCU, 'Software\OnionBoard', 'MicTest', S) or
+     ((S <> 'pass') and (S <> 'fail')) then
+    S := 'none';
+  Result := Result + '&mictest=' + S;
+end;
+
 // Onion Board's Discord helper (`OnionBoard.exe --discord-restore`, no window; see
 // soundboard/mic/discordtalk.py): left running when Onion Board was closed with Discord
 // still open, to turn Discord's voice clean-up back on once Discord closes. It runs the
@@ -1160,12 +1316,13 @@ begin
     if MsgBox('Onion Board has been removed.' + #13#10#13#10 +
         'Would you tell us why? It opens a short form in your browser (no account, ' +
         'one question). Choose No to skip.', mbConfirmation, MB_YESNO) = IDYES then
-      ShellExec('open', UninstallFeedbackURL + '?version={#AppVersion}&from=uninstall',
-        '', '', SW_SHOWNORMAL, ewNoWait, Code);
+      ShellExec('open', UninstallFeedbackURL + '?version={#AppVersion}&from=uninstall' +
+        FormDetails, '', '', SW_SHOWNORMAL, ewNoWait, Code);
     exit;
   end;
   if CurUninstallStep <> usUninstall then
     exit;
+  FormDetails := GetFormDetails;
   // the Discord helper (above) holds the exe: stopped, then Discord put back at once; one
   // still open can't be (Discord writes over its settings), so say how to do it by hand
   if StopDiscordHelper and
@@ -1201,6 +1358,8 @@ begin
     end;
   end;
   RegDeleteValue(HKCU, 'Software\OnionBoard', 'InstalledCable');
+  RegDeleteValue(HKCU, 'Software\OnionBoard', 'MicTest');
+  RegDeleteValue(HKCU, 'Software\OnionBoard', 'MicTestAt');
   // a restart still pending: don't try to reopen an app that's gone
   RegDeleteValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\RunOnce',
     'OnionBoardResumeSetup');

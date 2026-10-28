@@ -57,6 +57,11 @@ DL_FAILS = ("private", "age", "bot", "members", "region", "gone", "no-formats", 
 # (statuscontrol._no_load_why): sent elsewhere since, Windows took it off, not on the
 # mic, the board's sending into it not open, or open but the effect never ran
 MIC_NO_LOAD = ("off-route", "wiped", "not-on", "no-stream", "not-running")
+# how the setup guide's mic test went when its step was left (ui/setup/setupwizard.py):
+# the level bar heard them, the mic opened but stayed quiet, it wouldn't open, there was
+# no mic, or not heard while Windows' privacy settings keep apps off the mic
+# (micstate.windows_blocks_mic)
+MIC_TESTS = ("heard", "silent", "no-open", "no-mic", "blocked")
 # a pad's "On press" modes other than the default (library.MODES, without "restart")
 PRESS_MODES = ("overlap", "toggle", "solo", "queue")
 # the add-ons with install steps (their module.json id); any other is "other"
@@ -245,6 +250,8 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # the mic check after a set-up (micprobe): its test sound heard in the mic,
             # missing, can't tell; another app's mic cut off by the set-up
             "mic-probe-heard", "mic-probe-missing", "mic-probe-unsure", "mic-probe-app-cut-off",
+            # the setup guide's mic test, as it stood when its step was left (MIC_TESTS)
+            *(f"mic-test-{k}" for k in MIC_TESTS),
             # a sound played at 0% Sounds volume (the warning), its Set to 100%; a
             # hotkey no keyboard can press or Windows keeps (Win+L) refused
             "sound-vol-0", "sound-vol-0-fixed", "hotkey-refused",
