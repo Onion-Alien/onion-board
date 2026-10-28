@@ -1,4 +1,7 @@
 """Invite a friend: the link, the installer's note and the first start's greeting."""
+import re
+from pathlib import Path
+
 from PySide6.QtWidgets import QApplication
 
 from conftest import said
@@ -59,3 +62,12 @@ def test_about_page_copies_an_invite_link_with_their_name(window):  # noqa: F811
     d = SettingsDialog(window, "about")
     assert d.invite_name.text() == "Big Bob"
     d.close()
+
+
+def test_installer_reads_a_name_in_any_script():
+    # Inno's script Copy and Trim turn letters outside the Windows code page into '?':
+    # a friend invited by "Ник" got no greeting at all
+    root = Path(__file__).resolve().parent.parent
+    iss = (root / "installer" / "OnionBoard.iss").read_text("utf-8")
+    body = re.search(r"^function InviteName: String;$(.*?)^end;$", iss, re.S | re.M).group(1)
+    assert not re.search(r"\b(Copy|Trim)\s*\(", body, re.I)
