@@ -17,6 +17,8 @@ h2 { font-size: 24px; margin: 40px 0 10px; }
 .small { color: var(--muted); font-size: 14px; }
 ol li, ul li { margin: 8px 0; }
 img { max-width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--edge); display: block; margin: 20px 0; }
+/* one window or card of the app, near its real size (pictures are 1.5x) */
+img.shot { max-width: min(100%, 600px); }
 table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 16px; }
 th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--edge); vertical-align: top; }
 th { color: var(--muted); font-weight: 600; }
@@ -24,3 +26,15 @@ th { color: var(--muted); font-weight: 600; }
         padding: 14px 18px; color: var(--muted); font-size: 15px; margin: 20px 0; }
 code { background: var(--card); border: 1px solid var(--edge); border-radius: 6px; padding: 1px 6px; font-size: 15px; }
 footer { color: var(--muted); font-size: 14px; padding: 48px 0 40px; text-align: center; }
+/* TL;DR / Advanced switch and the jump links (game guide) */
+.tabs { display: flex; gap: 4px; background: var(--card); border: 1px solid var(--edge);
+        border-radius: 12px; padding: 4px; margin: 28px 0 8px; width: fit-content; }
+.tab { color: var(--muted); text-decoration: none; font-weight: 600; padding: 8px 22px; border-radius: 9px; }
+.tab:hover { color: var(--text); }
+.tab.on { background: var(--accent); color: #fff; }
+h3 { font-size: 19px; margin: 28px 0 6px; }
+[id] { scroll-margin-top: 16px; }
+.jump { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 0 0; }
+.jump a { background: var(--card); border: 1px solid var(--edge); border-radius: 999px; padding: 4px 12px;
+          font-size: 14px; color: var(--text); text-decoration: none; }
+.jump a:hover { border-color: var(--accent); }
