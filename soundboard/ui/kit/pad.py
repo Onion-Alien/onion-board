@@ -119,6 +119,17 @@ def pad_colours() -> dict[str, QColor]:
     return _pad_palette[1]
 
 
+PAUSE_W = 7   # the painted pause sign's width: two 3 px bars, 1 px apart
+
+
+def _paint_pause(p: QPainter, right: float, cy: float, h: float, colour: QColor):
+    """Two bars ending at `right`, `h` tall around `cy`, on whole pixels (sharp).
+    Painted, not the ❚❚ text: some fonts spaced those bars a word apart."""
+    x, top, h = round(right) - PAUSE_W, round(cy - h / 2), round(h)
+    p.fillRect(QRectF(x, top, 3, h), colour)
+    p.fillRect(QRectF(x + 4, top, 3, h), colour)
+
+
 def _hover_mix(lo: QColor, hi: QColor, k: float) -> QColor:
     """`lo` blended `k` of the way to `hi` (a pad's hover fade)."""
     return QColor.fromRgbF(lo.redF() + (hi.redF() - lo.redF()) * k,
@@ -360,7 +371,7 @@ class Pad(QAbstractButton):
             flags = ("FX " if m.fx else "") + ("⟳ " if m.loop else "") + \
                 {"overlap": "⧉ ", "toggle": "⏯ "}.get(m.mode, "") + \
                 (_("hold") + " " if m.hold else "")
-            right = _("❚❚ paused") if self.paused else f"{flags}{m.duration:.1f}s"
+            right = _("paused") if self.paused else f"{flags}{m.duration:.1f}s"
             hk = _badge_text(m.hotkey)
             badge = None
             fm = QFontMetrics(f)
@@ -640,10 +651,15 @@ class Pad(QAbstractButton):
         else:
             p.setPen(muted)
             p.drawText(foot, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter, right)
+            fm = QFontMetrics(f)
+            tw = fm.horizontalAdvance(right)
+            if self.paused:
+                _paint_pause(p, foot.right() - tw - 4, foot.center().y(), fm.capHeight(), muted)
+                tw += PAUSE_W + 4
             # a small chain link just before the length, while the mouse is on the pad
             # only: on every pad it was noise ("is it a web link?")
             if self.hover and self.linked_file():
-                x = foot.right() - QFontMetrics(f).horizontalAdvance(right) - 5 - LINK_PX
+                x = foot.right() - tw - 5 - LINK_PX
                 if x >= foot.left() + (badge[1] + 6 if badge is not None else 0):
                     box = QRectF(x, foot.center().y() - LINK_PX / 2, LINK_PX, LINK_PX)
                     p.drawPixmap(box.topLeft(), _link_pixmap(muted, self.devicePixelRatioF()))
@@ -739,9 +755,9 @@ class Pad(QAbstractButton):
             m = self.meta
             flags = ("⟳ " if m.loop else "") + \
                 {"overlap": "⧉ ", "toggle": "⏯ "}.get(m.mode, "")
-            right = "❚❚" if self.paused else f"{flags}{m.duration:.1f}s"
+            right = "" if self.paused else f"{flags}{m.duration:.1f}s"
             rc = C["muted"]
-        rw = fm.horizontalAdvance(right) + 4
+        rw = (PAUSE_W if right == "" else fm.horizontalAdvance(right)) + 4
         self._link_rect = None
         if self.state == "ready" and self.hover and self.linked_file() and r.width() >= 160:
             box = QRectF(r.right() - 9 - rw - 2 - LINK_PX, r.center().y() - LINK_PX / 2,
@@ -765,6 +781,8 @@ class Pad(QAbstractButton):
             p.setPen(rc)
             p.drawText(r.adjusted(0, 0, -9, 0), Qt.AlignmentFlag.AlignRight
                        | Qt.AlignmentFlag.AlignVCenter, right)
+            if right == "":
+                _paint_pause(p, r.right() - 9, r.center().y(), fm.capHeight(), rc)
         hk = _badge_text(self.meta.hotkey)
         if hk and r.width() >= 200:   # the key as a badge left of the length, room allowing
             bw = fm.horizontalAdvance(hk) + 10
