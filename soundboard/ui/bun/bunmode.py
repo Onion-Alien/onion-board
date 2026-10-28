@@ -37,15 +37,16 @@ from __future__ import annotations
 import time
 
 from PySide6.QtCore import QPoint, QPointF, QRect, QRectF, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QFont, QFontMetrics, QGuiApplication, QPainter, QPainterPath, QPen
+from PySide6.QtGui import QColor, QFont, QFontMetrics, QGuiApplication, QPainter, QPen
 from PySide6.QtWidgets import QApplication, QFrame, QHBoxLayout, QMenu, QPushButton, QWidget
 
 from soundboard.ui.kit import theme
 from soundboard.audio.groove import Groove
-from soundboard.ui.bun.bunny import H, INK, W
+from soundboard.ui.bun.bunny import H, W
 from soundboard.i18n import _
 from soundboard.ui.kit import a11y, icons
-from soundboard.ui.bun.bunnywidget import BUBBLE, BunnyWidget
+from soundboard.ui.bun import bunbubble
+from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.kit.pixels import snap_to_pixels
 
 MIN_H, START_H = 32, 130   # Bun's own height, px; as big as the screen has room for
@@ -106,6 +107,9 @@ class BunMode(QWidget):
         self.groove = Groove()   # the beat and style of what plays (he dances to it)
         self._quiet_since: float | None = None   # nothing playing since then (moods)
         self._build_icons()
+        # his bubble, on a layer of its own over him (the window's own painting is under
+        # him and the buttons)
+        self.talk = _Talk(self)
         self._hide_icons = QTimer(self, singleShot=True, interval=HIDE_ICONS_MS)
         self._hide_icons.timeout.connect(self._icons_off)
         self._icons_back = QTimer(self, singleShot=True, interval=RESIZE_REST_MS)
@@ -212,6 +216,7 @@ class BunMode(QWidget):
         total += -total % SNAP
         talk = total - bh - ICONS_H + tuck   # (the rounding goes to the bubble's room)
         self.bun.setGeometry((w - bw) // 2, talk, bw, bh)
+        self.talk.setGeometry(0, 0, w, total)
         self.icons.setGeometry((w - hint.width()) // 2 // SNAP * SNAP,
                                (total - ICONS_H + (ICONS_H - hint.height()) // 2) // SNAP * SNAP,
                                hint.width(), hint.height())
@@ -348,7 +353,7 @@ class BunMode(QWidget):
         mood = self._mood(now, live, paused or downloading or b.building)
         if self.text and now >= self._text_until:
             self.text = ""
-            self.update()
+            self.talk.update()
         if not b.building and not self._settle.isActive():
             b.sad = SAD_ERROR if self.text and self.kind == "error" else mood
         if self._shown != (live, mic):
@@ -389,7 +394,8 @@ class BunMode(QWidget):
             self.bun.cheer()
         elif self.kind == "error":
             self.bun.sad = SAD_ERROR
-        self.update()
+        self.bun.say = ""   # (the notice is what he says: no second bubble over it)
+        self.talk.update()
 
     # ------------------------------------------------------------------ mouse
     def enterEvent(self, e):
@@ -490,8 +496,6 @@ class BunMode(QWidget):
             # reachable once the mouse is over him
             p.fillRect(self.rect(), QColor(0, 0, 0, 1))
             self._paint_grip(p)
-        if self.text:
-            self._bubble(p)
         p.end()
 
     def _paint_grip(self, p: QPainter):
@@ -521,22 +525,30 @@ class BunMode(QWidget):
             text += "…"
             need = fm.boundingRect(QRect(0, 0, width, 10_000), flags, text)
         bw, bh = need.width() + 2 * pad + 2, need.height() + 2 * pad - 2
-        head = self._bun_rect()
-        bottom = head.top() + 2
-        box = QRectF((self.width() - bw) / 2, max(2.0, bottom - bh - 8), bw, bh)
-        tip = QPointF(head.center().x() + head.width() * 0.12, head.top() + head.height() * 0.2)
-        tail = QPainterPath(QPointF(box.center().x() - 6, box.bottom() - 2))
-        tail.lineTo(tip)
-        tail.lineTo(box.center().x() + 8, box.bottom() - 2)
-        shape = QPainterPath()
-        shape.addRoundedRect(box, min(12.0, bh / 2), min(12.0, bh / 2))
-        shape = shape.united(tail)
-        edge = QColor(EDGE.get(self.kind, INK.name()))
-        p.setPen(QPen(edge, 2.2 if self.kind in EDGE else 1.6))
-        p.setBrush(BUBBLE)
-        p.drawPath(shape)
-        p.setPen(INK)
-        p.drawText(box.adjusted(pad, pad - 1, -pad, -pad + 1), flags, text)
+        head = QRectF(self._bun_rect())
+        box = QRectF((self.width() - bw) / 2, max(2.0, head.top() - bh - 6), bw, bh)
+        # (the same bubble as everywhere he talks, its tail at his mouth: no room beside
+        # him in this window, so above his head)
+        edge = QColor(EDGE[self.kind]) if self.kind in EDGE else None
+        bunbubble.draw(p, box, text, head, flags, edge, min(12.0, bh / 2))
 
     def sizeHint(self) -> QSize:
         return self.size()
+
+
+class _Talk(QWidget):
+    """Bun mode's bubble layer: over Bun, and clicks go through it."""
+
+    def __init__(self, owner: BunMode):
+        super().__init__(owner)
+        self.owner = owner
+        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+
+    def paintEvent(self, e):
+        if not self.owner.text:
+            return
+        p = QPainter(self)
+        snap_to_pixels(p)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        self.owner._bubble(p)
+        p.end()

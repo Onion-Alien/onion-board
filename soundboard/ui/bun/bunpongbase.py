@@ -25,7 +25,8 @@ from PySide6.QtWidgets import QWidget
 
 from soundboard.core import achievements, usage
 from soundboard.i18n import _
-from soundboard.ui.bun.bunny import H, INK, W, draw_bunny, sparkle
+from soundboard.ui.bun import bunbubble
+from soundboard.ui.bun.bunny import H, W, draw_bunny, sparkle
 from soundboard.ui.kit import theme
 from soundboard.ui.kit.pixels import snap_to_pixels
 
@@ -99,26 +100,17 @@ class _Spark:
         self.age, self.life, self.col, self.size, self.spin = 0.0, life, QColor(col), size, spin
 
 
-def _bubble(p: QPainter, text: str, x: float, y: float, px: int):
-    """A small speech bubble whose tail points down at (x, y)."""
+def _bubble(p: QPainter, text: str, body: QRectF, px: int, width: float):
+    """Bun's speech bubble beside his face, as everywhere else (ui/bun/bunbubble.py)."""
     f = QFont(p.font())
     f.setPixelSize(px)
     f.setBold(True)
     p.setFont(f)
     fm = p.fontMetrics()
-    bw, bh = fm.horizontalAdvance(text) + 16, fm.height() + 8
-    box = QRectF(x - 12, y - bh - 10, bw, bh)
-    shape = QPainterPath()
-    shape.addRoundedRect(box, bh / 2, bh / 2)
-    tail = QPainterPath(QPointF(box.left() + 8, box.bottom() - 2))
-    tail.lineTo(x, y)
-    tail.lineTo(box.left() + 20, box.bottom() - 2)
-    shape = shape.united(tail)
-    p.setPen(QPen(INK, 1.6))
-    p.setBrush(BUBBLE)
-    p.drawPath(shape)
-    p.setPen(INK)
-    p.drawText(box, Qt.AlignmentFlag.AlignCenter, text)
+    lines = bunbubble.wrap(fm, text, bunbubble.side_room(body, width))
+    bw = max(fm.horizontalAdvance(t) for t in lines) + 2 * bunbubble.PAD
+    bh = fm.height() * len(lines) + 2 * bunbubble.PAD - 4
+    bunbubble.draw(p, bunbubble.beside(body, bw, bh, width, 108), "\n".join(lines), body)
 
 
 class Game(QWidget):
@@ -315,8 +307,7 @@ class Game(QWidget):
         if not over:
             self.paint_game(p, g)
         if self.say and time.monotonic() < self.say_until:
-            _bubble(p, self.say, br.center().x() + br.width() * 0.15,
-                    br.top() + br.height() * 0.1, max(10, round(g["bh"] * 0.12)))
+            _bubble(p, self.say, br, max(10, round(g["bh"] * 0.12)), w)
         p.end()
 
     def paint_back(self, p: QPainter, g: dict):

@@ -9,6 +9,7 @@ from PySide6.QtCore import QPointF, QRectF
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QWidget
 
+from soundboard.ui.bun import bunsymbols
 from soundboard.ui.bun.bunny import GADGET_SCREEN, H, W
 from soundboard.ui.bun.bunbits import (
     BACK_END, CLOUD_END, DASH_END, DUST, FAIL_END, FAIL_SNAP, _Junk, _Note, PARTS, _Puff,
@@ -134,6 +135,9 @@ class BunnyBuild(_Base):
                   self.note_k())
         n.vx = side * abs(n.vx) + side * 8
         n.calm = calm
+        sym = bunsymbols.pick(self._rng)   # (the theme's hearts, stars...)
+        if sym is not None:
+            n.kind, n.col = sym
         self.notes.append(n)
 
     def _puff(self, x, y, spread: float, r: float, life: float, col: QColor = DUST):

@@ -10,6 +10,7 @@ import random
 from PySide6.QtGui import QColor, QPainter
 
 from soundboard.ui.kit import theme
+from soundboard.ui.bun import bunsymbols
 from soundboard.ui.bun.bunny import INK, music_note, sparkle
 
 NOTE_COLORS = ("#7c5cff", "#a48bff", "#1fb6ff", "#ff8fae", "#13ce66")
@@ -104,6 +105,12 @@ ZZZ_EVERY = 1.1    # seconds between Zs
 NOTE_H = 110       # notes come out their usual size at this Bun height (bigger Bun, bigger)
 DANCE_FADE = 3.0   # how fast he gets into a dance or out of it (1/s)
 STYLE_BLEND = 0.6  # seconds to change from one style of dance to another
+# his happy faces while he bounces to a song, (blink, mouth): eyes shut in a ^^ and
+# grinning, ^^ with his little smile, eyes open and grinning. He keeps one for a random
+# while (FACE_HOLD: low, high, most likely; 15 s on average), then picks again: the
+# same one can come up again, more than once in a row
+DANCE_FACES = ((1.0, 0.55), (1.0, 0.0), (0.0, 0.5))
+FACE_HOLD = (5.0, 30.0, 10.0)
 KICK_HOP = 0.26    # a hop on a hit, before the beat is known (seconds)
 # the styles he moves to the hits themselves (groove.Groove.hits), not a beat grid: the
 # 808 for hip-hop, the kick drums and the snare and riffs for rock (electronic music's
@@ -195,7 +202,8 @@ class _Spring:
 
 
 class _Note:
-    __slots__ = ("x", "y", "vx", "vy", "age", "life", "size", "col", "spin", "calm", "k")
+    __slots__ = ("x", "y", "vx", "vy", "age", "life", "size", "col", "spin", "calm", "k",
+                 "kind", "seed")
 
     def __init__(self, x, y, rng: random.Random, strength: float = 1.0, k: float = 1.0):
         self.x, self.y = x, y
@@ -207,6 +215,8 @@ class _Note:
         self.col = QColor(rng.choice(NOTE_COLORS))
         self.spin = rng.uniform(-25, 25)
         self.calm = False   # the headphones' slow trickle: fine at the idle frame rate
+        self.kind = ""      # or the theme's symbol instead of a note (bunsymbols)
+        self.seed = rng.randrange(2)
 
 
 class _Puff:
@@ -273,8 +283,15 @@ def paint_note(p: QPainter, n) -> None:
     p.setOpacity(min(1.0, n.age * 6) * (1 - k) ** 1.4)
     p.translate(n.x, n.y)
     p.rotate(n.spin * math.sin(n.age * 4))
-    col, rim = note_colors(n.col)
     k = getattr(n, "k", 1.0)
+    kind = getattr(n, "kind", "")
+    if kind:
+        col = note_colors(n.col)[0] if kind in bunsymbols.LIKE_NOTES else n.col
+        bunsymbols.paint(p, kind, 9 * n.size * k, col, bunsymbols.rim(QColor(theme.T["bg"])),
+                         n.seed)
+        p.restore()
+        return
+    col, rim = note_colors(n.col)
     if n.size < 0.6:
         sparkle(p, 0, 0, 5 * k, col)
     else:

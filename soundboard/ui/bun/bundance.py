@@ -9,8 +9,9 @@ from PySide6.QtWidgets import QWidget
 
 from soundboard.ui.bun.bunny import H, PLANK_SPOT, ROOM_TOP
 from soundboard.ui.bun.bunbits import (
-    accent, DANCE_FADE, EAR_DRAG, EAR_SPRING, FAIL_DROP, FAIL_END, FAIL_POOF, FAIL_SNAP,
-    FINALE, HIT_BAND, hit_curve, _Note, POP, SQUASH, SQUASH_SPRING, STRETCH, STYLE_BLEND)
+    accent, DANCE_FACES, DANCE_FADE, EAR_DRAG, EAR_SPRING, FACE_HOLD, FAIL_DROP, FAIL_END,
+    FAIL_POOF, FAIL_SNAP, FINALE, HIT_BAND, hit_curve, _Note, POP, SQUASH, SQUASH_SPRING,
+    STRETCH, STYLE_BLEND)
 
 if TYPE_CHECKING:
     from typing import Any
@@ -29,6 +30,8 @@ class BunnyDance(_Base):
         _dy_last: Any
         _ears_s: Any
         _fail_snap: Any
+        _face: Any
+        _face_until: Any
         _fail_t: Any
         _fin_t: Any
         _g_energy: Any
@@ -68,6 +71,9 @@ class BunnyDance(_Base):
                 self._style = ""
             return False
         on = bool(g.style) and bool(g.bpm)
+        if now >= self._face_until:   # time for a new face (maybe the same one again)
+            self._face = self._rng.randrange(len(DANCE_FACES))
+            self._face_until = now + self._rng.triangular(*FACE_HOLD)
         self._dance += (float(on) - self._dance) * min(1.0, dt * DANCE_FADE)
         self._g_energy += (g.energy - self._g_energy) * min(1.0, dt * 8)
         # the mouth: the voice as it's heard right now, opening at once and shutting a
@@ -135,13 +141,16 @@ class BunnyDance(_Base):
         slow = math.sin(math.pi * b / 2)              # one sway every two beats
         m = dict(dy=0.0, dx=0.0, angle=0.0, ears=0.0, sy=0.0, nod=0.0, dip=0.0,
                  mouth=0.0, blink=0.0, angry=0.0, smug=0.0)
-        # (his mouth stays shut, his little smile, for music: only speech moves it)
+        # (his mouth doesn't move to music, only to speech: bouncing, he wears one of his
+        # happy faces, DANCE_FACES)
+        blink, grin = DANCE_FACES[self._face]
         if style in HIT_BAND and g is not None:   # moving to the hits themselves
             hit, s = accent(g, HIT_BAND[style], now, 12.0 if style == "rock" else 5.0)
             hit *= (0.55 + 0.45 * s) / max(s, 1e-3)
         if style == "electronic":   # a hop a kick: up between them, down on the next one
             m.update(dy=-a * 0.07 * e * up, dx=a * 0.035 * slow, angle=5 * slow,
-                     ears=-10 * up - 4, sy=0.025 * up, nod=-4 * slow, dip=2 * hit)
+                     ears=-10 * up - 4, sy=0.025 * up, nod=-4 * slow, dip=2 * hit,
+                     blink=blink, mouth=grin)
         elif style == "rock":       # headbanging: head down hard on each hit, ears flying
             m.update(dip=13 * hit * e, nod=5 * hit * (1 if int(t / 0.9) % 2 else -1),
                      dy=a * 0.03 * hit, sy=-0.05 * hit, ears=26 * hit - 4, angle=2 * side,
@@ -172,7 +181,7 @@ class BunnyDance(_Base):
                      angle=2 * math.sin(t * 0.9))
         else:                       # anything else: a bounce on the beat
             m.update(dy=-a * 0.06 * e * up, angle=4 * slow, dx=a * 0.025 * slow, dip=4 * hit,
-                     ears=-8 * up)
+                     ears=-8 * up, blink=blink, mouth=grin)
         return m
 
     def dance(self, now: float, t: float) -> dict:
