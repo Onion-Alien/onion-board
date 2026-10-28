@@ -121,6 +121,7 @@ from soundboard.core.usagenames import (  # noqa: F401
     MIC_UNSTARTED,
     MIC_RAISED,
     MIC_STUCK,
+    MIC_TESTS,
     PACKS,
     PRESS_MODES,
     RECOVERY,
@@ -508,8 +509,19 @@ def warned(e: BaseException) -> None:
     problem (no traceback) isn't counted."""
     if not isinstance(e, BaseException):
         return
-    where = _tb_where(e.__traceback__)
-    key = f"{type(e).__name__}@{where}" if where else type(e).__name__
+    warned_at(type(e).__name__, _tb_where(e.__traceback__))
+
+
+def warned_at(kind: str, where: str = "") -> None:
+    """warned() for an error caught in another process (the mic effect's admin step,
+    read back from its log): its type `kind` (`struct.error`) and `where`, the deepest
+    of our own lines (`soundboard/mic/micadmin.py:445`), or "" if none. Anything else
+    isn't counted."""
+    if not re.fullmatch(r"[A-Za-z_][\w.]{0,60}", kind or ""):
+        return
+    if where and not re.fullmatch(_OUR_FILE.pattern + r":\d{1,6}", where):
+        where = ""
+    key = f"{kind}@{where}" if where else kind
     if key in _warned:
         return
     _warned.add(key)

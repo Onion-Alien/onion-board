@@ -1486,7 +1486,6 @@
   "✗ Didn't work": "✗ Ei toiminut",
   "✗ Failed": "✗ Epäonnistui",
   "✗ Not removed": "✗ Ei poistettu",
-  "❚❚ paused": "❚❚ tauolla",
   "⟲  Restart my PC now": "⟲  Käynnistä PC uudelleen nyt",
   "⟳  Check again": "⟳  Tarkista uudelleen",
   "⬇  Try installing again": "⬇  Yritä asentaa uudelleen",
@@ -4632,5 +4631,14 @@
   "couldn't reach GitHub. Check your internet connection": "GitHubiin ei saatu yhteyttä. Tarkista internetyhteys",
   "it didn't start": "se ei käynnistynyt",
   "it stopped answering": "se lakkasi vastaamasta",
-  "it's too slow on this PC": "se on liian hidas tällä koneella"
+  "it's too slow on this PC": "se on liian hidas tällä koneella",
+  "Didn't work? Send us a report": "Eikö toiminut? Lähetä meille raportti",
+  "Open the form": "Avaa lomake",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Lomake avautuu näillä tiedoilla: {details}. Mitään ei lähetetä, ellet itse lähetä lomaketta.",
+  "Windows {major} (build {build})": "Windows {major} (koontiversio {build})",
+  "error: {code}": "virhe: {code}",
+  "mic: {name}": "mikki: {name}",
+  "no mic": "ei mikkiä",
+  "straight into my mic": "suoraan mikkiini",
+  "virtual cable": "virtuaalikaapeli"
 }

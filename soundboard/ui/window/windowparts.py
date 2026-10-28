@@ -28,6 +28,7 @@ if TYPE_CHECKING:
     from soundboard.ui.bun.logowidget import LogoWidget
     from soundboard.ui.sounds.padbatch import PadSelection
     from soundboard.ui.kit.panel import EqPanel, Flow, TileRow, ViewToggle, VolumeControl
+    from soundboard.ui.kit.failreport import FailReport
     from soundboard.ui.kit.playbutton import PlayButton
     from soundboard.ui.kit.topbar import TopBar
     from soundboard.ui.setup.setupshow import SetupShow
@@ -153,6 +154,7 @@ class WindowParts(_Window):
     mic_meter: Any
     mic_pill: QLabel
     mic_reason: QLabel
+    mic_report: FailReport
     mic_state_icon: QLabel
     mic_status: QFrame
     mic_sub: ElidedLabel

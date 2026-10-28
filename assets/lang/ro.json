@@ -1524,7 +1524,6 @@
   "✗ Didn't work": "✗ N-a mers",
   "✗ Failed": "✗ Eșuat",
   "✗ Not removed": "✗ Nedezinstalat",
-  "❚❚ paused": "❚❚ pe pauză",
   "⟲  Restart my PC now": "⟲  Repornește-mi PC-ul acum",
   "⟳  Check again": "⟳  Verifică din nou",
   "⬇  Try installing again": "⬇  Încearcă să instalezi din nou",
@@ -4714,5 +4713,14 @@
   "couldn't reach GitHub. Check your internet connection": "GitHub nu poate fi accesat. Verifică-ți conexiunea la internet",
   "it didn't start": "n-a pornit",
   "it stopped answering": "a încetat să răspundă",
-  "it's too slow on this PC": "e prea lent pe acest PC"
+  "it's too slow on this PC": "e prea lent pe acest PC",
+  "Didn't work? Send us a report": "N-a mers? Trimite-ne un raport",
+  "Open the form": "Deschide formularul",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Formularul se deschide cu: {details}. Nu se trimite nimic dacă nu-l trimiți tu.",
+  "Windows {major} (build {build})": "Windows {major} (build {build})",
+  "error: {code}": "eroare: {code}",
+  "mic: {name}": "microfon: {name}",
+  "no mic": "fără microfon",
+  "straight into my mic": "direct în microfonul meu",
+  "virtual cable": "cablu virtual"
 }

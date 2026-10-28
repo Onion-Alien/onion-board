@@ -1487,7 +1487,6 @@
   "✗ Didn't work": "✗ Werkte niet",
   "✗ Failed": "✗ Mislukt",
   "✗ Not removed": "✗ Niet verwijderd",
-  "❚❚ paused": "❚❚ gepauzeerd",
   "⟲  Restart my PC now": "⟲  Mijn pc nu herstarten",
   "⟳  Check again": "⟳  Opnieuw controleren",
   "⬇  Try installing again": "⬇  Opnieuw proberen te installeren",
@@ -4632,5 +4631,14 @@
   "couldn't reach GitHub. Check your internet connection": "kan GitHub niet bereiken. Controleer je internetverbinding",
   "it didn't start": "het startte niet",
   "it stopped answering": "het reageert niet meer",
-  "it's too slow on this PC": "het is te traag op deze pc"
+  "it's too slow on this PC": "het is te traag op deze pc",
+  "Didn't work? Send us a report": "Werkte het niet? Stuur ons een melding",
+  "Open the form": "Formulier openen",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Het formulier opent met: {details}. Er wordt niets verstuurd tot je het zelf verstuurt.",
+  "Windows {major} (build {build})": "Windows {major} (build {build})",
+  "error: {code}": "fout: {code}",
+  "mic: {name}": "mic: {name}",
+  "no mic": "geen mic",
+  "straight into my mic": "rechtstreeks in mijn mic",
+  "virtual cable": "virtuele kabel"
 }

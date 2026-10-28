@@ -1409,7 +1409,6 @@
   "✗ Didn't work": "✗ Не стана",
   "✗ Failed": "✗ Неуспешно",
   "✗ Not removed": "✗ Не е премахнат",
-  "❚❚ paused": "❚❚ пауза",
   "⟲  Restart my PC now": "⟲  Рестартирай компютъра сега",
   "⟳  Check again": "⟳  Провери пак",
   "⬇  Try installing again": "⬇  Опитай да инсталираш пак",
@@ -4632,5 +4631,14 @@
   "couldn't reach GitHub. Check your internet connection": "няма връзка с GitHub. Провери интернета си",
   "it didn't start": "не тръгна",
   "it stopped answering": "спря да отговаря",
-  "it's too slow on this PC": "твърде бавно е на този компютър"
+  "it's too slow on this PC": "твърде бавно е на този компютър",
+  "Didn't work? Send us a report": "Не стана? Изпрати ни доклад",
+  "Open the form": "Отвори формата",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Формата се отваря с: {details}. Нищо не се изпраща, докато не я изпратиш.",
+  "Windows {major} (build {build})": "Windows {major} (компилация {build})",
+  "error: {code}": "грешка: {code}",
+  "mic: {name}": "микрофон: {name}",
+  "no mic": "без микрофон",
+  "straight into my mic": "направо в микрофона ми",
+  "virtual cable": "виртуален кабел"
 }

@@ -1486,7 +1486,6 @@
   "✗ Didn't work": "✗ Funket ikke",
   "✗ Failed": "✗ Mislyktes",
   "✗ Not removed": "✗ Ikke fjernet",
-  "❚❚ paused": "❚❚ på pause",
   "⟲  Restart my PC now": "⟲  Start PC-en min på nytt nå",
   "⟳  Check again": "⟳  Sjekk igjen",
   "⬇  Try installing again": "⬇  Prøv å installere igjen",
@@ -4632,5 +4631,14 @@
   "couldn't reach GitHub. Check your internet connection": "fikk ikke kontakt med GitHub. Sjekk internettforbindelsen",
   "it didn't start": "den startet ikke",
   "it stopped answering": "den sluttet å svare",
-  "it's too slow on this PC": "den er for treg på denne PC-en"
+  "it's too slow on this PC": "den er for treg på denne PC-en",
+  "Didn't work? Send us a report": "Virket det ikke? Send oss en rapport",
+  "Open the form": "Åpne skjemaet",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Skjemaet åpnes med: {details}. Ingenting sendes før du sender det selv.",
+  "Windows {major} (build {build})": "Windows {major} (build {build})",
+  "error: {code}": "feil: {code}",
+  "mic: {name}": "mikrofon: {name}",
+  "no mic": "ingen mikrofon",
+  "straight into my mic": "rett inn i mikrofonen min",
+  "virtual cable": "virtuell kabel"
 }

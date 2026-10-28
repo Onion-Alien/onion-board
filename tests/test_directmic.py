@@ -5102,6 +5102,28 @@ def test_why_the_admin_step_raised_is_read_from_its_log(tmp_path):
     assert dm.raised_why(log_file) == ("other", "key", "err-none")
 
 
+def test_the_admin_step_raising_counts_its_type_and_our_line(tmp_path, monkeypatch):
+    """"other" told nothing about which error it was: its type and the deepest of our own
+    lines go out like an error the app caught itself, never the message or a path."""
+    from soundboard import __version__
+    from soundboard.core import usage
+    monkeypatch.setattr(usage, "_pending", [])
+    monkeypatch.setattr(usage, "_warned", set())
+    log_file = tmp_path / "directmic-admin.log"
+    log_file.write_text(
+        "Traceback (most recent call last):\n"
+        '  File "C:\\Program Files\\OnionBoard\\soundboard\\mic\\micadmin.py", line 1406, in work\n'
+        "    return _put_on(guid, slot, dll)\n"
+        '  File "C:\\Program Files\\OnionBoard\\soundboard\\mic\\micadmin.py", line 445, in '
+        "_install_endpoint\n"
+        "    fx.set(FX % pid, winreg.REG_SZ, CLSID)\n"
+        '  File "C:\\Python\\Lib\\odd.py", line 3, in f\n'
+        "struct.error: Headset Mic (Someone's)\n", encoding="utf-8")
+    assert dm.raised_why(log_file) == ("mic-settings", "other", "err-none")
+    dm.raised_why(log_file)   # the same again: once
+    assert usage._pending == [f"warned/{__version__}/struct.error@soundboard/mic/micadmin.py:445"]
+
+
 @pytest.mark.parametrize("last, what", [
     ("AttributeError: 'int' object has no attribute 'upper'", "attr"),
     ("TypeError: Objects of type 'int' are not supported", "type"),

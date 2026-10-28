@@ -1448,7 +1448,6 @@
   "✗ Didn't work": "✗ Tidak berjaya",
   "✗ Failed": "✗ Gagal",
   "✗ Not removed": "✗ Tidak dibuang",
-  "❚❚ paused": "❚❚ dijeda",
   "⟲  Restart my PC now": "⟲  Mulakan semula PC saya sekarang",
   "⟳  Check again": "⟳  Semak lagi",
   "⬇  Try installing again": "⬇  Cuba pasang lagi",
@@ -4550,5 +4549,14 @@
   "couldn't reach GitHub. Check your internet connection": "tidak dapat mencapai GitHub. Semak sambungan internet anda",
   "it didn't start": "ia tidak bermula",
   "it stopped answering": "ia berhenti menjawab",
-  "it's too slow on this PC": "ia terlalu perlahan pada PC ini"
+  "it's too slow on this PC": "ia terlalu perlahan pada PC ini",
+  "Didn't work? Send us a report": "Tak berjaya? Hantar laporan kepada kami",
+  "Open the form": "Buka borang",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Borang dibuka dengan: {details}. Tiada apa yang dihantar melainkan anda menghantarnya.",
+  "Windows {major} (build {build})": "Windows {major} (binaan {build})",
+  "error: {code}": "ralat: {code}",
+  "mic: {name}": "mikrofon: {name}",
+  "no mic": "tiada mikrofon",
+  "straight into my mic": "terus ke mikrofon saya",
+  "virtual cable": "kabel maya"
 }

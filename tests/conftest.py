@@ -654,6 +654,13 @@ def _never_touch_real_autostart(monkeypatch):
     monkeypatch.setattr(autostart, "winreg", None)
 
 
+@pytest.fixture(autouse=True)
+def _never_touch_real_mictest(monkeypatch):
+    """The setup guide saves its mic test's result in the real HKCU on closing."""
+    from soundboard.mic import mictest
+    monkeypatch.setattr(mictest, "winreg", None)
+
+
 def own_module(monkeypatch, module, name: str, **fakes):
     """Give `module` its own copy of the module it imported as `name` (time, threading,
     ...) with `fakes` in it. Patching time.sleep or threading.Thread itself changes it

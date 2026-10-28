@@ -1447,7 +1447,6 @@
   "✗ Didn't work": "✗ Не получилось",
   "✗ Failed": "✗ Ошибка",
   "✗ Not removed": "✗ Не удалён",
-  "❚❚ paused": "❚❚ на паузе",
   "⟲  Restart my PC now": "⟲  Перезагрузить ПК сейчас",
   "⟳  Check again": "⟳  Проверить снова",
   "⬇  Try installing again": "⬇  Попробовать установить снова",
@@ -4714,5 +4713,14 @@
   "couldn't reach GitHub. Check your internet connection": "не удалось связаться с GitHub. Проверьте подключение к интернету",
   "it didn't start": "он не запустился",
   "it stopped answering": "он перестал отвечать",
-  "it's too slow on this PC": "он слишком медленный на этом компьютере"
+  "it's too slow on this PC": "он слишком медленный на этом компьютере",
+  "Didn't work? Send us a report": "Не получилось? Отправь нам отчёт",
+  "Open the form": "Открыть форму",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Форма откроется с данными: {details}. Ничего не отправится, пока ты сам её не отправишь.",
+  "Windows {major} (build {build})": "Windows {major} (сборка {build})",
+  "error: {code}": "ошибка: {code}",
+  "mic: {name}": "микрофон: {name}",
+  "no mic": "нет микрофона",
+  "straight into my mic": "прямо в мой микрофон",
+  "virtual cable": "виртуальный кабель"
 }

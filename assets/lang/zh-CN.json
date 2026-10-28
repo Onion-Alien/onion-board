@@ -1448,7 +1448,6 @@
   "✗ Didn't work": "✗ 没成功",
   "✗ Failed": "✗ 失败",
   "✗ Not removed": "✗ 未移除",
-  "❚❚ paused": "❚❚ 已暂停",
   "⟲  Restart my PC now": "⟲  立即重启我的电脑",
   "⟳  Check again": "⟳  再检查一次",
   "⬇  Try installing again": "⬇  再试一次安装",
@@ -4550,5 +4549,14 @@
   "couldn't reach GitHub. Check your internet connection": "无法连接 GitHub。请检查网络连接",
   "it didn't start": "没有启动",
   "it stopped answering": "停止响应了",
-  "it's too slow on this PC": "在这台电脑上太慢"
+  "it's too slow on this PC": "在这台电脑上太慢",
+  "Didn't work? Send us a report": "没成功？给我们发个报告",
+  "Open the form": "打开表单",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "表单会预先填好：{details}。在你提交之前，什么都不会发送。",
+  "Windows {major} (build {build})": "Windows {major}（版本 {build}）",
+  "error: {code}": "错误：{code}",
+  "mic: {name}": "麦克风：{name}",
+  "no mic": "没有麦克风",
+  "straight into my mic": "直接送进我的麦克风",
+  "virtual cable": "虚拟音频线"
 }

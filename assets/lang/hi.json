@@ -1487,7 +1487,6 @@
   "✗ Didn't work": "✗ काम नहीं किया",
   "✗ Failed": "✗ नाकाम",
   "✗ Not removed": "✗ नहीं हटा",
-  "❚❚ paused": "❚❚ पॉज़ है",
   "⟲  Restart my PC now": "⟲  मेरा PC अभी रीस्टार्ट करें",
   "⟳  Check again": "⟳  फिर से जाँचें",
   "⬇  Try installing again": "⬇  फिर से इंस्टॉल करके देखें",
@@ -4632,5 +4631,14 @@
   "couldn't reach GitHub. Check your internet connection": "GitHub तक नहीं पहुँच सके। अपना इंटरनेट कनेक्शन जाँचें",
   "it didn't start": "यह शुरू नहीं हुआ",
   "it stopped answering": "इसने जवाब देना बंद कर दिया",
-  "it's too slow on this PC": "यह इस PC पर बहुत धीमा है"
+  "it's too slow on this PC": "यह इस PC पर बहुत धीमा है",
+  "Didn't work? Send us a report": "काम नहीं किया? हमें रिपोर्ट भेजें",
+  "Open the form": "फ़ॉर्म खोलें",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "फ़ॉर्म इनके साथ खुलेगा: {details}. जब तक आप सबमिट नहीं करते, कुछ नहीं भेजा जाता.",
+  "Windows {major} (build {build})": "Windows {major} (बिल्ड {build})",
+  "error: {code}": "त्रुटि: {code}",
+  "mic: {name}": "माइक: {name}",
+  "no mic": "कोई माइक नहीं",
+  "straight into my mic": "सीधे मेरे माइक में",
+  "virtual cable": "वर्चुअल केबल"
 }

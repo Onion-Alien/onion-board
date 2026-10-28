@@ -162,6 +162,10 @@ class _StepScroll(QScrollArea):
     def heightForWidth(self, w: int) -> int:
         lay = self._page.layout()
         if lay is not None and lay.hasHeightForWidth():
+            # as tall as the page is without the bar (its full ROOM margin): asked with
+            # the bar's narrower margin, the words wrap less, the answer came out a few
+            # px short and the bar never went away
+            w += lay.contentsMargins().right() - self.ROOM
             return max(lay.totalHeightForWidth(w), lay.totalMinimumSize().height())
         return self._page.sizeHint().height()
 

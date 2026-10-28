@@ -1524,7 +1524,6 @@
   "✗ Didn't work": "✗ Nepovedlo se",
   "✗ Failed": "✗ Selhalo",
   "✗ Not removed": "✗ Neodebráno",
-  "❚❚ paused": "❚❚ pozastaveno",
   "⟲  Restart my PC now": "⟲  Restartovat PC teď",
   "⟳  Check again": "⟳  Zkontrolovat znovu",
   "⬇  Try installing again": "⬇  Zkusit instalaci znovu",
@@ -4714,5 +4713,14 @@
   "couldn't reach GitHub. Check your internet connection": "nelze se spojit s GitHubem. Zkontroluj připojení k internetu",
   "it didn't start": "nespustilo se",
   "it stopped answering": "přestalo odpovídat",
-  "it's too slow on this PC": "na tomhle PC je moc pomalé"
+  "it's too slow on this PC": "na tomhle PC je moc pomalé",
+  "Didn't work? Send us a report": "Nefungovalo to? Pošli nám hlášení",
+  "Open the form": "Otevřít formulář",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Formulář se otevře s: {details}. Nic se neodešle, dokud ho neodešleš.",
+  "Windows {major} (build {build})": "Windows {major} (sestavení {build})",
+  "error: {code}": "chyba: {code}",
+  "mic: {name}": "mikrofon: {name}",
+  "no mic": "žádný mikrofon",
+  "straight into my mic": "rovnou do mikrofonu",
+  "virtual cable": "virtuální kabel"
 }

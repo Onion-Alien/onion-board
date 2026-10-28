@@ -1449,7 +1449,6 @@
   "✗ Didn't work": "✗ 작동하지 않음",
   "✗ Failed": "✗ 실패",
   "✗ Not removed": "✗ 삭제되지 않음",
-  "❚❚ paused": "❚❚ 일시중지됨",
   "⟲  Restart my PC now": "⟲  지금 PC 다시 시작",
   "⟳  Check again": "⟳  다시 확인",
   "⬇  Try installing again": "⬇  다시 설치해 보기",
@@ -4550,5 +4549,14 @@
   "couldn't reach GitHub. Check your internet connection": "GitHub에 연결할 수 없습니다. 인터넷 연결을 확인하세요",
   "it didn't start": "시작되지 않았습니다",
   "it stopped answering": "응답하지 않습니다",
-  "it's too slow on this PC": "이 PC에서는 너무 느립니다"
+  "it's too slow on this PC": "이 PC에서는 너무 느립니다",
+  "Didn't work? Send us a report": "안 됐나요? 보고서 보내기",
+  "Open the form": "양식 열기",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "양식에 다음 내용이 채워집니다: {details}. 직접 제출하기 전에는 아무것도 보내지지 않아요.",
+  "Windows {major} (build {build})": "Windows {major} (빌드 {build})",
+  "error: {code}": "오류: {code}",
+  "mic: {name}": "마이크: {name}",
+  "no mic": "마이크 없음",
+  "straight into my mic": "마이크로 바로",
+  "virtual cable": "가상 케이블"
 }

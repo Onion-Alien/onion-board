@@ -309,7 +309,9 @@ account or anything else about you.
     one failing (`used/ytdlp-update`, `ytdlp-reinstall`, `ytdlp-force`, `ytdlp-failed`:
     never the error); the mic card asking whether your headset is plugged in or on
     (`used/mic-unplugged`, `mic-silent`, `mic-silent-after-setup`: never the mic's
-    name); a sound played at 0% Sounds volume and its *Set to 100%*
+    name); how the setup guide's mic test went when its step was left (`used/mic-test-heard`,
+    `mic-test-silent`, `mic-test-no-open`, `mic-test-no-mic`, or `mic-test-blocked` when
+    Windows' microphone privacy switch keeps apps off it: never the mic's name); a sound played at 0% Sounds volume and its *Set to 100%*
     (`used/sound-vol-0`, `sound-vol-0-fixed`); a hotkey that was refused
     (`used/hotkey-refused`: never which key); a Live controls setup picked for sounds,
     the radio or programs, one that speaks in another language, *Not now* on its "this
@@ -409,7 +411,8 @@ account or anything else about you.
   report: never the error message, paths, devices or log lines. The report itself
   never leaves your PC unless you post it.
 - `warned/<version>/<type>@<soundboard/…py:line>`: an error the app caught and showed
-  you as a warning instead of crashing (the type and the line, never the message).
+  you as a warning instead of crashing, or that stopped the mic effect's set-up (the
+  type and the line, never the message).
 - `unclean-exit/<version>/<why>` when the last run ended without the app closing
   itself: `native-crash`, `windows-error`, `not-responding`, `while-closing`, `frozen`,
   `pc-restarted` or `ended`; for a crash also the error's name (such as

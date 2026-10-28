@@ -1449,7 +1449,6 @@
   "✗ Didn't work": "✗ Không hoạt động",
   "✗ Failed": "✗ Thất bại",
   "✗ Not removed": "✗ Chưa gỡ được",
-  "❚❚ paused": "❚❚ đã tạm dừng",
   "⟲  Restart my PC now": "⟲  Khởi động lại PC ngay",
   "⟳  Check again": "⟳  Kiểm tra lại",
   "⬇  Try installing again": "⬇  Thử cài lại",
@@ -4550,5 +4549,14 @@
   "couldn't reach GitHub. Check your internet connection": "không kết nối được GitHub. Hãy kiểm tra kết nối internet",
   "it didn't start": "nó không khởi động",
   "it stopped answering": "nó ngừng phản hồi",
-  "it's too slow on this PC": "nó quá chậm trên PC này"
+  "it's too slow on this PC": "nó quá chậm trên PC này",
+  "Didn't work? Send us a report": "Không được? Gửi báo cáo cho chúng tôi",
+  "Open the form": "Mở biểu mẫu",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Biểu mẫu mở ra với: {details}. Không có gì được gửi trừ khi bạn tự gửi.",
+  "Windows {major} (build {build})": "Windows {major} (bản dựng {build})",
+  "error: {code}": "lỗi: {code}",
+  "mic: {name}": "mic: {name}",
+  "no mic": "không có mic",
+  "straight into my mic": "thẳng vào mic",
+  "virtual cable": "cáp ảo"
 }

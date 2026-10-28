@@ -1486,7 +1486,6 @@
   "✗ Didn't work": "✗ Hindi gumana",
   "✗ Failed": "✗ Pumalya",
   "✗ Not removed": "✗ Hindi naalis",
-  "❚❚ paused": "❚❚ naka-pause",
   "⟲  Restart my PC now": "⟲  I-restart ang PC ko ngayon",
   "⟳  Check again": "⟳  I-check ulit",
   "⬇  Try installing again": "⬇  Subukang i-install ulit",
@@ -4632,5 +4631,14 @@
   "couldn't reach GitHub. Check your internet connection": "hindi maabot ang GitHub. Tingnan ang internet connection mo",
   "it didn't start": "hindi ito nagsimula",
   "it stopped answering": "tumigil itong sumagot",
-  "it's too slow on this PC": "masyado itong mabagal sa PC na ito"
+  "it's too slow on this PC": "masyado itong mabagal sa PC na ito",
+  "Didn't work? Send us a report": "Hindi gumana? Padalhan kami ng report",
+  "Open the form": "Buksan ang form",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Bubukas ang form na may: {details}. Walang maipapadala hangga't hindi mo ito sinu-submit.",
+  "Windows {major} (build {build})": "Windows {major} (build {build})",
+  "error: {code}": "error: {code}",
+  "mic: {name}": "mic: {name}",
+  "no mic": "walang mic",
+  "straight into my mic": "diretso sa mic ko",
+  "virtual cable": "virtual cable"
 }

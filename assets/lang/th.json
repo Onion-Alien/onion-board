@@ -1449,7 +1449,6 @@
   "✗ Didn't work": "✗ ใช้งานไม่ได้",
   "✗ Failed": "✗ ล้มเหลว",
   "✗ Not removed": "✗ ไม่ได้ลบออก",
-  "❚❚ paused": "❚❚ หยุดชั่วคราว",
   "⟲  Restart my PC now": "⟲  รีสตาร์ทพีซีของฉันเลย",
   "⟳  Check again": "⟳  ตรวจสอบอีกครั้ง",
   "⬇  Try installing again": "⬇  ลองติดตั้งอีกครั้ง",
@@ -4550,5 +4549,14 @@
   "couldn't reach GitHub. Check your internet connection": "เชื่อมต่อ GitHub ไม่ได้ ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต",
   "it didn't start": "เริ่มไม่ได้",
   "it stopped answering": "หยุดตอบสนอง",
-  "it's too slow on this PC": "ช้าเกินไปบน PC นี้"
+  "it's too slow on this PC": "ช้าเกินไปบน PC นี้",
+  "Didn't work? Send us a report": "ใช้ไม่ได้ใช่ไหม? ส่งรายงานถึงเรา",
+  "Open the form": "เปิดแบบฟอร์ม",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "แบบฟอร์มจะเปิดพร้อมข้อมูล: {details} ไม่มีอะไรถูกส่งจนกว่าคุณจะกดส่งเอง",
+  "Windows {major} (build {build})": "Windows {major} (บิลด์ {build})",
+  "error: {code}": "ข้อผิดพลาด: {code}",
+  "mic: {name}": "ไมค์: {name}",
+  "no mic": "ไม่มีไมค์",
+  "straight into my mic": "เข้าไมค์โดยตรง",
+  "virtual cable": "สายเสมือน"
 }

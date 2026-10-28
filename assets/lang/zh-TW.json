@@ -1448,7 +1448,6 @@
   "✗ Didn't work": "✗ 沒有成功",
   "✗ Failed": "✗ 失敗",
   "✗ Not removed": "✗ 沒有移除",
-  "❚❚ paused": "❚❚ 已暫停",
   "⟲  Restart my PC now": "⟲  立即重新啟動我的電腦",
   "⟳  Check again": "⟳  再檢查一次",
   "⬇  Try installing again": "⬇  再試一次安裝",
@@ -4550,5 +4549,14 @@
   "couldn't reach GitHub. Check your internet connection": "無法連線到 GitHub。請檢查網路連線",
   "it didn't start": "沒有啟動",
   "it stopped answering": "停止回應了",
-  "it's too slow on this PC": "在這台電腦上太慢"
+  "it's too slow on this PC": "在這台電腦上太慢",
+  "Didn't work? Send us a report": "沒成功？傳份報告給我們",
+  "Open the form": "開啟表單",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "表單會預先填好：{details}。在你送出之前，什麼都不會傳送。",
+  "Windows {major} (build {build})": "Windows {major}（版本 {build}）",
+  "error: {code}": "錯誤：{code}",
+  "mic: {name}": "麥克風：{name}",
+  "no mic": "沒有麥克風",
+  "straight into my mic": "直接送進我的麥克風",
+  "virtual cable": "虛擬音源線"
 }

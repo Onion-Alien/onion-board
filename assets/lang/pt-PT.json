@@ -1486,7 +1486,6 @@
   "✗ Didn't work": "✗ Não funcionou",
   "✗ Failed": "✗ Falhou",
   "✗ Not removed": "✗ Não removido",
-  "❚❚ paused": "❚❚ em pausa",
   "⟲  Restart my PC now": "⟲  Reiniciar o meu PC agora",
   "⟳  Check again": "⟳  Verificar outra vez",
   "⬇  Try installing again": "⬇  Tentar instalar outra vez",
@@ -4632,5 +4631,14 @@
   "couldn't reach GitHub. Check your internet connection": "não foi possível chegar ao GitHub. Verifica a tua ligação à internet",
   "it didn't start": "não arrancou",
   "it stopped answering": "deixou de responder",
-  "it's too slow on this PC": "é demasiado lento neste PC"
+  "it's too slow on this PC": "é demasiado lento neste PC",
+  "Didn't work? Send us a report": "Não funcionou? Envia-nos um relatório",
+  "Open the form": "Abrir o formulário",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "O formulário abre com: {details}. Nada é enviado a não ser que o envies.",
+  "Windows {major} (build {build})": "Windows {major} (compilação {build})",
+  "error: {code}": "erro: {code}",
+  "mic: {name}": "microfone: {name}",
+  "no mic": "sem microfone",
+  "straight into my mic": "diretamente no meu microfone",
+  "virtual cable": "cabo virtual"
 }

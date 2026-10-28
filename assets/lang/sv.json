@@ -1486,7 +1486,6 @@
   "✗ Didn't work": "✗ Funkade inte",
   "✗ Failed": "✗ Misslyckades",
   "✗ Not removed": "✗ Inte borttagen",
-  "❚❚ paused": "❚❚ pausad",
   "⟲  Restart my PC now": "⟲  Starta om min dator nu",
   "⟳  Check again": "⟳  Kolla igen",
   "⬇  Try installing again": "⬇  Försök installera igen",
@@ -4632,5 +4631,14 @@
   "couldn't reach GitHub. Check your internet connection": "det gick inte att nå GitHub. Kontrollera internetanslutningen",
   "it didn't start": "den startade inte",
   "it stopped answering": "den slutade svara",
-  "it's too slow on this PC": "den är för långsam på den här datorn"
+  "it's too slow on this PC": "den är för långsam på den här datorn",
+  "Didn't work? Send us a report": "Funkade det inte? Skicka en rapport till oss",
+  "Open the form": "Öppna formuläret",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Formuläret öppnas med: {details}. Inget skickas förrän du skickar det själv.",
+  "Windows {major} (build {build})": "Windows {major} (build {build})",
+  "error: {code}": "fel: {code}",
+  "mic: {name}": "mikrofon: {name}",
+  "no mic": "ingen mikrofon",
+  "straight into my mic": "direkt i min mikrofon",
+  "virtual cable": "virtuell kabel"
 }

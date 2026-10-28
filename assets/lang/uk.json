@@ -1525,7 +1525,6 @@
   "✗ Didn't work": "✗ Не вийшло",
   "✗ Failed": "✗ Помилка",
   "✗ Not removed": "✗ Не видалено",
-  "❚❚ paused": "❚❚ на паузі",
   "⟲  Restart my PC now": "⟲  Перезапустити ПК зараз",
   "⟳  Check again": "⟳  Перевірити ще раз",
   "⬇  Try installing again": "⬇  Спробувати встановити ще раз",
@@ -4714,5 +4713,14 @@
   "couldn't reach GitHub. Check your internet connection": "не вдалося з'єднатися з GitHub. Перевірте підключення до інтернету",
   "it didn't start": "він не запустився",
   "it stopped answering": "він перестав відповідати",
-  "it's too slow on this PC": "він надто повільний на цьому комп'ютері"
+  "it's too slow on this PC": "він надто повільний на цьому комп'ютері",
+  "Didn't work? Send us a report": "Не вийшло? Надішли нам звіт",
+  "Open the form": "Відкрити форму",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Форма відкриється з даними: {details}. Нічого не надсилається, доки ти сам її не надішлеш.",
+  "Windows {major} (build {build})": "Windows {major} (збірка {build})",
+  "error: {code}": "помилка: {code}",
+  "mic: {name}": "мікрофон: {name}",
+  "no mic": "немає мікрофона",
+  "straight into my mic": "прямо в мій мікрофон",
+  "virtual cable": "віртуальний кабель"
 }

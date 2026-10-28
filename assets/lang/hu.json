@@ -1486,7 +1486,6 @@
   "✗ Didn't work": "✗ Nem működött",
   "✗ Failed": "✗ Sikertelen",
   "✗ Not removed": "✗ Nincs eltávolítva",
-  "❚❚ paused": "❚❚ szünetel",
   "⟲  Restart my PC now": "⟲  Gép újraindítása most",
   "⟳  Check again": "⟳  Ellenőrzés újra",
   "⬇  Try installing again": "⬇  Telepítés újra",
@@ -4632,5 +4631,14 @@
   "couldn't reach GitHub. Check your internet connection": "a GitHub nem érhető el. Ellenőrizd az internetkapcsolatot",
   "it didn't start": "nem indult el",
   "it stopped answering": "nem válaszol",
-  "it's too slow on this PC": "túl lassú ezen a gépen"
+  "it's too slow on this PC": "túl lassú ezen a gépen",
+  "Didn't work? Send us a report": "Nem működött? Küldj nekünk jelentést",
+  "Open the form": "Űrlap megnyitása",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Az űrlap ezekkel nyílik meg: {details}. Semmi sem megy el, amíg el nem küldöd.",
+  "Windows {major} (build {build})": "Windows {major} ({build}. build)",
+  "error: {code}": "hiba: {code}",
+  "mic: {name}": "mikrofon: {name}",
+  "no mic": "nincs mikrofon",
+  "straight into my mic": "egyenesen a mikrofonomba",
+  "virtual cable": "virtuális kábel"
 }

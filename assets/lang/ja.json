@@ -1449,7 +1449,6 @@
   "✗ Didn't work": "✗ 動作しませんでした",
   "✗ Failed": "✗ 失敗しました",
   "✗ Not removed": "✗ 削除できませんでした",
-  "❚❚ paused": "❚❚ 一時停止中",
   "⟲  Restart my PC now": "⟲  今すぐ PC を再起動",
   "⟳  Check again": "⟳  もう一度確認",
   "⬇  Try installing again": "⬇  もう一度インストール",
@@ -4550,5 +4549,14 @@
   "couldn't reach GitHub. Check your internet connection": "GitHub に接続できませんでした。インターネット接続を確認してください",
   "it didn't start": "起動しませんでした",
   "it stopped answering": "応答しなくなりました",
-  "it's too slow on this PC": "この PC では遅すぎます"
+  "it's too slow on this PC": "この PC では遅すぎます",
+  "Didn't work? Send us a report": "うまくいかなかった？レポートを送る",
+  "Open the form": "フォームを開く",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "フォームには次の内容が入ります: {details}。送信するまで何も送られません。",
+  "Windows {major} (build {build})": "Windows {major} (ビルド {build})",
+  "error: {code}": "エラー: {code}",
+  "mic: {name}": "マイク: {name}",
+  "no mic": "マイクなし",
+  "straight into my mic": "マイクに直接",
+  "virtual cable": "仮想ケーブル"
 }

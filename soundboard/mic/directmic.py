@@ -391,7 +391,9 @@ def raised_why(log_path: Path | None = None) -> tuple[str, str, str]:
     """(where, what, err) the admin step's last exception was, from the tail of its log
     (users may read it): RAISED_WHERE, RAISED_WHAT and RAISED_ERR words, ("unlogged",
     "other", "err-none") when no log has one since mark_logs(). Without `log_path`, the
-    newest of admin_logs() that has one."""
+    newest of admin_logs() that has one. Its type and our deepest line are counted too
+    (usage.warned_at), like an error the app caught itself: the words above can't tell
+    which line it was."""
     for path in [log_path] if log_path else admin_logs():
         tail = _log_tail(path)
         start = tail.rfind("Traceback (most recent call last):")
@@ -411,10 +413,20 @@ def raised_why(log_path: Path | None = None) -> tuple[str, str, str]:
     m = re.match(r".*\[WinError (\d+)\]", last)
     err = ("err-none" if not m else
            f"err-{m.group(1)}" if int(m.group(1)) in RAISED_CODES else "err-other")
+    kind = re.match(r"([\w.]+)", last)
+    name = kind.group(1).rpartition(".")[2] if kind else ""
     if what == "other" and not m:
-        kind = re.match(r"([\w.]+)", last)
-        what = RAISED_KIND.get(kind.group(1).rpartition(".")[2], "other") if kind else "other"
+        what = RAISED_KIND.get(name, "other")
+    _count_raised(kind.group(1) if kind else "", lines)
     return where, what, err
+
+
+def _count_raised(name: str, lines: list[str]):
+    """Count the admin step's exception as its type and the deepest of our own lines in
+    its traceback (usage.warned_at: never the message, a path or a mic)."""
+    from soundboard.core import usage
+    ours = usage._ours("\n".join(lines))
+    usage.warned_at(name, ours[-1] if ours else "")
 
 
 # exit code 6 (Windows' audio wouldn't stop): which of its two services was still up,

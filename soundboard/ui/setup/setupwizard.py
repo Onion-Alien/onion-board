@@ -29,7 +29,7 @@ from PySide6.QtWidgets import (QApplication, QDialog, QGraphicsOpacityEffect, QH
                                QLabel, QMessageBox, QPushButton, QVBoxLayout)
 
 from soundboard.core import autostart
-from soundboard.mic import directmic
+from soundboard.mic import directmic, micstate, mictest
 from soundboard.core import usage
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.bun.bunnywidget import TALK
@@ -54,6 +54,7 @@ LOCK_NOTE_MS = 3000     # how long "almost done" shows when they try to close it
 DISCORD_READ_MS = 2000  # the last step re-reads Discord's own settings this often
 # the device steps by name, for the count of where the guide was closed (usage.py)
 PAGE_NAMES = ("mic", "send", "last")   # (the mic and headphones share step 1: "mic")
+MIC_TEST_MIN_S = 3      # on the mic step at least this long before its test is counted
 # the guide's motion (only with Windows' Animation effects on: toast.animations_on)
 ENTER_MS, ENTER_DELAY_MS, RISE = 340, 360, 24   # in: fades up from RISE px lower, once
 # the backdrop's logo has nearly faded out (setupbackdrop.SETTLE_MS)
@@ -99,6 +100,7 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
                                "mon_device": win.cfg.mon_device}
         self._user_picked: set[str] = set()   # the ones they actually clicked
         self._chose_cable = False   # "Virtual cable instead" clicked here
+        self._dev_since: float | None = None   # when the mic step was shown (its test count)
         # the steps: the mic and headphones, then where the sounds go, then the last one:
         # on the first launch "Make it yours" (tabs, language, look and a "Set up
         # Discord" switch), any other time the Discord step (its page stays built on
@@ -205,6 +207,10 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
     # ------------------------------------------------------------------ navigation
     def go(self, i: int):
         i = max(0, min(self.PAGES - 1, i))
+        if i != self.dev_index:
+            self._count_mic_test()   # leaving the mic step (or never on it)
+        elif self.stack.currentIndex() != i or self._dev_since is None:
+            self._dev_since = time.monotonic()
         if i != self.send_index and self.setup_show.on:
             self.setup_show._stop()
         # the new step's words and buttons first, while it's still hidden, then show it:
@@ -509,6 +515,7 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
                           QEasingCurve.Type.InCubic, wait=True)
         self.timer.stop()
         self.discord_timer.stop()
+        self._count_mic_test()
         if self.setup_show.on:
             self.setup_show._stop()
         page = self.stack.currentIndex()
@@ -540,6 +547,23 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
                 self.win.tabs.setCurrentWidget(self.win.sounds_page)
             QTimer.singleShot(firsttour.START_MS, self.win, lambda w=self.win: firsttour.start(w))
 
+    def _count_mic_test(self):
+        """How the mic test went (usage MIC_TESTS: never the mic's name), when the mic
+        step was up long enough for it to mean something. Once per visit."""
+        since, self._dev_since = self._dev_since, None
+        if since is None or time.monotonic() - since < MIC_TEST_MIN_S:
+            return
+        if self._mic_peak_seen:
+            kind = "heard"
+        elif micstate.windows_blocks_mic():
+            kind = "blocked"
+        elif self._no_mics:
+            kind = "no-mic"
+        else:
+            kind = "silent" if self.win.engine.mic_stream is not None else "no-open"
+        usage.used(f"mic-test-{kind}")
+        mictest.save(kind == "heard")   # for the uninstaller's feedback form
+
     def _tick(self):
         if (locked := self._locked()) != self._was_locked:   # the mic set-up began / ended
             self._was_locked = locked
@@ -570,6 +594,7 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
             else:
                 self.mic_heard.setText(_("Waiting to hear you… if the bar doesn't move, pick "
                                          "another mic."))
+            self.mic_report.set_failed(bool(self._mic_fail()))
         if (self.stack.currentIndex() == self.send_index and self._proc is None
                 and not self._was_locked):
             # the step's card follows the mic effect when it changes from outside the

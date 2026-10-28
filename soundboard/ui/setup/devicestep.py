@@ -2,12 +2,16 @@
 and a test sound. Mixed into SetupWizard."""
 from __future__ import annotations
 
+import time
+
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QFrame, QGridLayout, QHBoxLayout,
                                QPushButton, QScrollArea, QVBoxLayout, QWidget)
 
 from soundboard.audio import engine as eng
+from soundboard.core import feedback
 from soundboard.ui.kit import icons
+from soundboard.ui.kit.failreport import FailReport, mode_of
 from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.kit.choicetile import ChoiceTile
 from soundboard.i18n import _
@@ -17,6 +21,9 @@ from soundboard.ui.setup.wizardkit import (BUN_H, BUN_PAD, HEADER_GAP, NOWHERE,
                                            _section, _split_name, _test_title, tile_h,
                                            WizardStep)
 from soundboard.ui.setup.testtune import test_tune
+
+
+MIC_SILENT_S = 10   # the mic open, nothing heard this long: the test failed
 
 
 class DeviceStep(WizardStep):
@@ -90,6 +97,9 @@ class DeviceStep(WizardStep):
         v.addSpacing(8)
         self.mic_heard = _label("", "font-size:10pt;")
         v.addWidget(self.mic_heard)
+        # the mic test failed (won't open, or silent): tell us, before giving up
+        self.mic_report = FailReport(self._mic_fail_details)
+        v.addWidget(self.mic_report)
         v.addSpacing(4)
         self.chk_send = QCheckBox(_("Send my voice too"))
         self.chk_send.setToolTip(_("Send my voice too (untick if you only want your sounds to "
@@ -125,13 +135,33 @@ class DeviceStep(WizardStep):
         v.addLayout(row)
         v.addStretch(1)
         self._mic_peak_seen = False
+        self._mic_wait_since = time.monotonic()
         return p
+
+    def _mic_fail(self) -> str:
+        """Why the mic test failed, as the report's short code ("" = it hasn't): no
+        mic, the mic won't open, or open but nothing heard for MIC_SILENT_S."""
+        e = self.win.engine
+        if e.mic_stream is None and self._no_mics:
+            return "no-mic"
+        if e.mic_stream is None:
+            err = e.errors_snapshot().get("mic")
+            return feedback.mic_error("mic-open", err) if err else ""   # ("" = opening)
+        if (not self._mic_peak_seen
+                and time.monotonic() - self._mic_wait_since > MIC_SILENT_S):
+            return "mic-silent"
+        return ""
+
+    def _mic_fail_details(self) -> dict:
+        return {"mic": self.win.cfg.mic_device or "", "mode": mode_of(self.win.cfg.route),
+                "err": self._mic_fail() or "mic-test"}
 
     def _pick_mic(self, name: str, by_user: bool = False):
         if by_user:
             self._user_picked.add("mic_device")
         self.win.cfg.mic_device = name
         self._mic_peak_seen = False
+        self._mic_wait_since = time.monotonic()
         self._reopen("mic_device", self.win.engine.set_mic_device)
 
     def _pick_headphones(self, name: str, by_user: bool = False):
