@@ -1,0 +1,62 @@
+/* The one look every page of the site shares: colours, type, radii, shadows and the
+   buttons. home.css and guide.css build on it; neither redefines these. */
+
+:root {
+  --bg: #0b0b12; --bg2: #11111b; --card: rgba(255, 255, 255, .035); --card-solid: #15151f;
+  --edge: rgba(255, 255, 255, .08); --edge2: rgba(255, 255, 255, .14);
+  --edge-ctl: rgba(255, 255, 255, .34);   /* a control's outline: 3:1 against the page */
+  --text: #f1f0f7; --muted: #a6a5ba; --dim: #8b8aa1;
+  --a1: #7c5cff; --a2: #ff5c8a; --a3: #ffcf40; --link: #b3a3ff;
+  --ink: #2b2340;
+  --display: "Segoe UI Variable Display", "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --body: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+  --r: 22px; --r-sm: 12px; --r-btn: 16px;
+  /* a glass surface: a faint sheen at the top over the card colour */
+  --glass: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.015));
+  --glass-hi: inset 0 1px 0 rgba(255,255,255,.07);
+  --lift: 0 20px 50px -24px rgba(0,0,0,.85);
+  /* the main button's fill and its gloss */
+  /* vivid but deep enough that white text on it stays above 4.5:1 everywhere along it */
+  --grad: linear-gradient(135deg, #6d4cf5, #9a40cc 55%, #c2397f);
+  --gloss: linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.1) 38%, rgba(255,255,255,0) 47%, rgba(0,0,0,.08));
+  --btn-glow: color-mix(in srgb, var(--a1) 45%, transparent);
+  color-scheme: dark;
+}
+
+/* ---------- buttons ---------- */
+/* .dl: the big gradient one (Download). A gloss layer on top, a light top edge, a darker
+   bottom edge and a coloured glow underneath; it lifts on hover and presses in on click. */
+.dl { position: relative; overflow: hidden; isolation: isolate; display: inline-flex; align-items: center; gap: 10px;
+      padding: 16px 28px; border-radius: var(--r-btn); color: #fff; text-decoration: none; white-space: nowrap;
+      font: 700 18px/1 var(--display); letter-spacing: -.005em; text-shadow: 0 1px 1px rgba(20,8,50,.35);
+      background: var(--gloss), var(--grad);
+      border: 1px solid color-mix(in srgb, var(--a1) 55%, #fff 10%);
+      box-shadow: 0 10px 34px var(--btn-glow), 0 2px 6px rgba(0,0,0,.35),
+                  inset 0 1px 0 rgba(255,255,255,.45), inset 0 -2px 0 rgba(0,0,0,.18);
+      transition: transform .2s, box-shadow .2s, filter .2s; }
+/* a soft streak of light that sweeps across on hover */
+.dl::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+             background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,.28) 50%, transparent 65%);
+             transform: translateX(-110%); transition: transform .7s cubic-bezier(.2,.8,.2,1); }
+.dl:hover { transform: translateY(-2px); filter: brightness(1.07) saturate(1.05);
+            box-shadow: 0 16px 44px color-mix(in srgb, var(--a1) 60%, transparent), 0 3px 8px rgba(0,0,0,.35),
+                        inset 0 1px 0 rgba(255,255,255,.5), inset 0 -2px 0 rgba(0,0,0,.18); }
+.dl:hover::after { transform: translateX(110%); }
+.dl:active { transform: translateY(1px) scale(.985); filter: brightness(.96);
+             box-shadow: 0 6px 18px var(--btn-glow), inset 0 2px 6px rgba(0,0,0,.25), inset 0 -1px 0 rgba(255,255,255,.12); }
+.dl:focus-visible, .ghost:focus-visible { outline: 2px solid var(--link); outline-offset: 3px; }
+.dl svg { width: 20px; height: 20px; }
+
+/* .ghost: the quiet second button, glass with a light top edge */
+.ghost { display: inline-flex; align-items: center; gap: 8px; padding: 15px 22px; border-radius: var(--r-btn);
+         border: 1px solid var(--edge-ctl); color: var(--text); text-decoration: none; font: 600 17px/1 var(--display);
+         background: var(--glass); box-shadow: var(--glass-hi), 0 4px 14px rgba(0,0,0,.18);
+         transition: background .2s, border-color .2s, transform .2s; }
+.ghost:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.5); transform: translateY(-1px); }
+.ghost:active { transform: translateY(1px); background: rgba(255,255,255,.05); }
+
+@media (prefers-reduced-motion: reduce) {
+  .dl, .dl::after, .ghost { transition: none; }
+  .dl:hover, .ghost:hover { transform: none; }
+}

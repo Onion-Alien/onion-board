@@ -6,19 +6,11 @@
 @property --a2 { syntax: "<color>"; inherits: true; initial-value: #ff5c8a; }
 @property --a3 { syntax: "<color>"; inherits: true; initial-value: #ffcf40; }
 
-:root {
-  --bg: #0b0b12; --bg2: #11111b; --card: rgba(255, 255, 255, .035); --card-solid: #15151f;
-  --edge: rgba(255, 255, 255, .08); --edge2: rgba(255, 255, 255, .14);
-  --text: #f1f0f7; --muted: #a6a5ba; --dim: #75748a;
-  --a1: #7c5cff; --a2: #ff5c8a; --a3: #ffcf40; --link: #b3a3ff;
-  --ink: #2b2340;
-  --display: "Segoe UI Variable Display", "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
-  --body: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
-  --r: 22px;
-  color-scheme: dark;
+:root {   /* the colours and type are in base.css */
   transition: --a1 .7s ease, --a2 .7s ease, --a3 .7s ease;
 }
-html[data-product="watch"] { --a1: #1fb6a6; --a2: #2a6fdb; --a3: #ffc53d; --link: #5fd8cb; }
+html[data-product="watch"] { --a1: #1fb6a6; --a2: #2a6fdb; --a3: #ffc53d; --link: #5fd8cb;
+                             --grad: linear-gradient(135deg, #12786d, #1d55b0); }   /* white text stays readable */
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 84px; overflow-x: clip; }
@@ -83,14 +75,15 @@ html.textured .bg::before { display: none; }   /* its own pattern stands in for 
 .switch button:hover svg { transform: translateY(-2px) rotate(-6deg); }
 .switch button[aria-selected="true"] { color: #fff; }
 .switch .pill { position: absolute; z-index: 0; top: 4px; bottom: 4px; left: 4px; width: 0; border-radius: 999px;
-                background: linear-gradient(135deg, var(--a1), color-mix(in srgb, var(--a1) 55%, var(--a2)));
+                background: var(--gloss), var(--grad);
                 box-shadow: 0 6px 24px color-mix(in srgb, var(--a1) 45%, transparent), inset 0 1px 0 rgba(255,255,255,.25);
                 transition: transform .45s cubic-bezier(.5,1.4,.4,1), width .45s cubic-bezier(.5,1.4,.4,1); }
 .switch:not(.ready) .pill { transition: none; }
 html:not(.js) .switch { display: none; }
 .tools { display: flex; align-items: center; gap: 8px; }
-.icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--edge); background: rgba(255,255,255,.04);
-            color: var(--text); cursor: pointer; display: grid; place-items: center; font-size: 17px; transition: background .2s; }
+.icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--edge); background: var(--glass);
+            color: var(--text); cursor: pointer; display: grid; place-items: center; font-size: 17px; transition: background .2s;
+            box-shadow: var(--glass-hi); }
 .icon-btn:hover { background: rgba(255,255,255,.1); }
 .top .mini-dl { opacity: 0; transform: translateY(-6px); pointer-events: none; transition: opacity .25s, transform .25s;
                 padding: 9px 16px; font-size: 14.5px; }
@@ -126,19 +119,7 @@ html:not(.js) .looks { display: none; }
                       box-shadow: 0 0 0 3px var(--s0), 0 0 0 4px rgba(255,255,255,.2); }
 
 /* ---------- buttons ---------- */
-.dl { position: relative; overflow: hidden; display: inline-flex; align-items: center; gap: 10px;
-      padding: 16px 28px; border-radius: 16px; color: #fff; text-decoration: none; white-space: nowrap;
-      font: 700 18px/1 var(--display); letter-spacing: -.005em;
-      background: linear-gradient(135deg, var(--a1), color-mix(in srgb, var(--a1) 50%, var(--a2)));
-      box-shadow: 0 10px 34px color-mix(in srgb, var(--a1) 45%, transparent), inset 0 1px 0 rgba(255,255,255,.3);
-      transition: transform .2s, box-shadow .2s; }
-.dl:hover { transform: translateY(-2px); box-shadow: 0 16px 44px color-mix(in srgb, var(--a1) 60%, transparent), inset 0 1px 0 rgba(255,255,255,.3); }
-.dl:active { transform: translateY(0) scale(.98); }
-.dl svg { width: 20px; height: 20px; }
-.ghost { display: inline-flex; align-items: center; gap: 8px; padding: 15px 22px; border-radius: 16px;
-         border: 1px solid var(--edge2); color: var(--text); text-decoration: none; font: 600 17px/1 var(--display);
-         background: rgba(255,255,255,.03); transition: background .2s, border-color .2s; }
-.ghost:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.25); }
+/* .dl and .ghost are in base.css */
 
 /* ---------- panels (one per app) ---------- */
 html.js[data-product="board"] .panel[data-panel="watch"],
@@ -346,9 +327,13 @@ html:not(.js) .tryit { display: none; }
 .gamewin.fired .status i { color: var(--a3); }
 @keyframes dot { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 60%, transparent); } 70%, 100% { box-shadow: 0 0 0 6px transparent; } }
 .small-btn { flex: none; padding: 9px 14px; border-radius: 11px; border: 0; cursor: pointer; color: #fff;
-             font: 700 13.5px/1 var(--display); background: linear-gradient(135deg, var(--a1), var(--a2)); white-space: nowrap; }
-.small-btn:hover { filter: brightness(1.1); }
-.small-btn.back { background: var(--a3); color: #241a00; }
+             font: 700 13.5px/1 var(--display); background: var(--gloss), var(--grad); white-space: nowrap;
+             text-shadow: 0 1px 1px rgba(20,8,50,.3); transition: transform .15s, filter .15s;
+             box-shadow: 0 4px 14px var(--btn-glow), inset 0 1px 0 rgba(255,255,255,.4), inset 0 -1px 0 rgba(0,0,0,.18); }
+.small-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.small-btn:active { transform: translateY(1px); filter: brightness(.95); }
+.small-btn.back { background: var(--gloss), var(--a3); color: #241a00; text-shadow: none;
+                  box-shadow: 0 4px 14px color-mix(in srgb, var(--a3) 35%, transparent), inset 0 1px 0 rgba(255,255,255,.5); }
 html:not(.js) .gamewin { display: none; }
 
 /* ---------- marquee ---------- */
@@ -460,8 +445,8 @@ h2 { margin: 0 auto 14px; max-width: 820px; text-align: center; font: 800 clamp(
         background: #07070c; border: 1px solid var(--edge); font-size: 15px; color: var(--muted); flex-wrap: wrap; }
 .term code { background: none; border: 0; padding: 0; color: var(--text); }
 .term code::before { content: "> "; color: var(--a1); }
-.term button { margin-left: auto; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--edge2); background: rgba(255,255,255,.05);
-               color: var(--text); font: 600 13.5px/1 var(--display); cursor: pointer; }
+.term button { margin-left: auto; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--edge2); background: var(--glass);
+               color: var(--text); font: 600 13.5px/1 var(--display); cursor: pointer; box-shadow: var(--glass-hi); }
 .term button:hover { background: rgba(255,255,255,.1); }
 
 /* the other app */
