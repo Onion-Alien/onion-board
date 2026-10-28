@@ -24,6 +24,13 @@ def test_a_module_runs_the_tests_that_import_it():
     assert "tests/test_dsp.py" not in picked
 
 
+def test_an_app_module_runs_the_checks_that_read_every_source_file():
+    # they import nothing from the app, so imports alone never pick them
+    picked = pick_tests.pick(["soundboard/ui/voice/cleanmicpanel.py"])
+    assert "tests/test_no_flash_windows.py" in picked
+    assert "tests/test_no_flash_windows.py" not in pick_tests.pick(["docs/DESIGN.md"])
+
+
 def test_a_module_a_package_hands_on_runs_the_tests_of_the_package():
     # test_remote imports soundboard.voicefx, whose __init__ re-exports
     # voicefx.builtin's PRESETS: a new preset changed its "did you mean" answer (#702)
