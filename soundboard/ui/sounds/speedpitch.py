@@ -708,9 +708,10 @@ class SpeedPitchButton(QPushButton):
             self._before_preset = (name, before)
             return
         was = getattr(self, "_before_preset", None)
-        fx, tune = was[1] if was and was[0] == name else ({}, (1.0, 0.0, self.keep.isChecked()))
+        fx, (speed, pitch, keep) = (was[1] if was and was[0] == name
+                                    else ({}, (1.0, 0.0, self.keep.isChecked())))
         if livefx.tuning(livefx.PRESETS[name]) is not None:
-            self.set_values(*tune)
+            self.set_values(speed, pitch, bool(keep))
         self.set_fx(fx)
 
     def _light_presets(self):
