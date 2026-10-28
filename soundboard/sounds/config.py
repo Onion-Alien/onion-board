@@ -460,6 +460,7 @@ class Config:
     duck_db: float = 0.0      # lower the sounds this much while you talk; 0 = off
     duck_on: bool = False     # older versions switch ducking on once unless this is set
     duck_off: bool = False    # the old -12 dB default went back to Off once (from_raw)
+    clean_moved: bool = False   # Clean up my mic moved to Clean mic once (from_raw)
     mic_gate: bool = False    # mute your mic while a sound plays (only the sound goes out)
     discord_restore: bool = True   # put Discord back for talking on quit (discordtalk)
     discord_talk: dict = field(default_factory=dict)   # Discord folder -> how you talk there
@@ -813,6 +814,7 @@ class Config:
         cfg.mic_first = True
         cfg.duck_on = True
         cfg.duck_off = True
+        cfg.clean_moved = True
         # a plain soundboard first; + More tabs adds them ("chat": the removed Chat tab, so
         # 2.3.0 / 2.3.1 opening this config keep it hidden)
         cfg.tabs_off = [*BASIC_TABS_OFF, "chat"]
@@ -909,6 +911,9 @@ class Config:
                 raw["duck_db"] = 0.0
             raw["duck_on"] = True
             raw["duck_off"] = True
+        if not raw.get("clean_moved"):
+            _move_clean_up(raw)
+            raw["clean_moved"] = True
         sounds = []
         blank = SoundMeta(id="", name="", file="")
         has_sounds = "sounds" in raw
@@ -1095,6 +1100,33 @@ def clean_wait(v, kind: str = "delay") -> float:
         return 0.0
     hi = MAX_COOLDOWN_S if kind == "cooldown" else MAX_DELAY_S
     return min(max(v, 0.0), hi) if v == v else 0.0
+
+
+def _move_clean_up(raw: dict) -> None:
+    """Once: the voice changer's Clean up my mic effect is gone, Clean mic (the Voice
+    tab) does the job. It started on and only ran under a voice, so Clean mic goes on
+    (Normal) for whoever used the voice changer with it on; nobody else's mic changes,
+    and a Clean mic already set stays as it is. (An older version opening these
+    settings just has its effect back as it starts: on.)"""
+    fx, speech = raw.get("voice_fx"), raw.get("speech")
+    if not isinstance(fx, dict) or not fx:
+        return
+    if isinstance(speech, dict) and "clean" in speech:
+        return
+    got = fx.get("effects")
+    effects: dict = got if isinstance(got, dict) else {}
+    old = effects.get("cleanup")
+    if isinstance(old, dict) and old.get("on") is False:
+        return
+    preset = fx.get("preset")
+    used = (fx.get("enabled") is True
+            or (isinstance(preset, str) and preset not in ("", "Custom"))
+            or any(isinstance(c, dict) and c.get("on") is True
+                   for t, c in effects.items() if t not in ("cleanup", "backdrop")))
+    if not used:
+        return
+    raw["speech"] = {**(speech if isinstance(speech, dict) else {}),
+                     "clean": {"on": True, "strength": "normal"}}
 
 
 def _migrate_1_to_2(raw: dict) -> dict:

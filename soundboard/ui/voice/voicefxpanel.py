@@ -312,7 +312,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         bv.addWidget(self.tweak)
 
         # ---- the effects, a tab a group (one long page was too much to scroll):
-        # Main has Pitch & voice and Clean up my mic, then Change the voice, Character,
+        # Main has Pitch & voice, then Change the voice, Character,
         # Room and Add-ons, each tab's cards in two columns
         self.more = QTabWidget()
         self.more.setDocumentMode(True)
@@ -406,7 +406,6 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         fx = voicefx.PRESETS.get(name)
         saved = self.store.voices.get(name)
         self._based_on = name if saved is not None else ""
-        # (Clean up my mic is yours, not the voice's: it stays as it is)
         rows = {t: r for t, r in self.rows.items() if t not in KEEP}
         if fx is not None:
             self._own = False
@@ -448,7 +447,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
     def is_blank(self) -> bool:
         """No voice at all to turn on: your own mix with nothing in it (`clear_mix`)."""
         return (self._preset == CUSTOM and not self._extras and not any(
-            r.chk.isChecked() for t, r in self.rows.items() if t != "cleanup"))
+            r.chk.isChecked() for r in self.rows.values()))
 
     def snapshot(self) -> dict:
         """Everything `clear_mix` throws away, for `restore` (its Undo)."""
@@ -471,10 +470,9 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
 
     def clear_mix(self):
         """A fresh start: off, with no effects at all (your own mix emptied too, and
-        what's on top of the voice). Clean up my mic is yours, not the voice's: it stays."""
-        for t, r in self.rows.items():
-            if t != "cleanup":
-                r.load(None)
+        what's on top of the voice)."""
+        for r in self.rows.values():
+            r.load(None)
         self._extras = {}
         self._custom = {}
         self._preset = CUSTOM

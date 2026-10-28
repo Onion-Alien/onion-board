@@ -1532,7 +1532,6 @@
   "Chorus": "合唱",
   "Classic": "經典",
   "Clean": "乾淨",
-  "Clean up my mic": "清理我的麥克風",
   "Clean: your sounds go out exactly as mixed.": "乾淨：你的音效會完全照混音原樣送出。",
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "已清除，但無法下載新的一份（{error}）。連上網路後再試一次。",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "已清除，但無法下載新的一份（{error}）。改用內建的 yt-dlp {version}。",
@@ -1654,7 +1653,6 @@
   "High cut": "高頻切除",
   "Higher or lower than that, in semitones": "比它高或低多少，以半音計",
   "Higher or lower; a cartoon or a real-sounding person; a bigger or smaller throat; autotune.": "更高或更低；卡通或像真人；喉嚨更大或更小；自動修音。",
-  "Hiss removal": "去除嘶聲",
   "Hoot is waiting for something to watch": "Hoot 正在等著看點什麼",
   "Hothead": "暴躁鬼",
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "變聲後的聲音比你的真實聲音慢多少：效果 {effects} ms + 音訊裝置 {devices} ms。大約 100 ms 以下說話感覺正常；音高效果最耗時，其他幾乎不花時間。",
@@ -1728,7 +1726,6 @@
   "No shaping at all: your sounds go out exactly as mixed, full range. For OBS, recording, Voicemeeter, a mixer, or anything that isn't a voice chat.": "完全不調整：你的音效會照混音原樣、全頻段送出。適合 OBS、錄音、Voicemeeter、混音器，或任何不是語音聊天的地方。",
   "No shaping. Your sounds go out exactly as mixed.": "不調整。你的音效會照混音原樣送出。",
   "No voice add-ons installed.": "沒有安裝任何語音附加元件。",
-  "Noise gate": "噪音閘",
   "Not connecting to {host}: it leads to this PC or your home network": "不會連線到 {host}：它指向這台電腦或你的家用網路",
   "Not connecting to {host}: it's on this PC or your home network": "不會連線到 {host}：它在這台電腦或你的家用網路上",
   "Not connecting: Tor is being updated. Nothing was sent without it: try again in a moment.": "沒有連線：Tor 正在更新。沒有 Tor 時什麼都沒有送出：請稍後再試。",
@@ -1809,7 +1806,6 @@
   "Remove the Onion Watch add-on from Onion Board? Your {n} trigger and its pictures are kept for when you get it again.\n\nYou can get it again from the Triggers tab any time.": [
     "要從 Onion Board 移除 Onion Watch 附加元件嗎？你的 {n} 個觸發器和它們的圖片會保留，等你再次取得時使用。\n\n你隨時可以從「觸發器」分頁再次取得它。"
   ],
-  "Removes hum, hiss and room noise before the other effects.": "在其他效果之前先去除嗡聲、嘶聲和房間雜音。",
   "Removing failed (code {code}).": "移除失敗（代碼 {code}）。",
   "Removing…": "移除中…",
   "Rename": "重新命名",

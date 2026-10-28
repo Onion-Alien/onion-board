@@ -11,9 +11,6 @@ def shown_texts() -> dict[str, str]:
     language is set."""
     return {
         # effects
-        "Clean up my mic": _("Clean up my mic"),
-        "Removes hum, hiss and room noise before the other effects.":
-            _("Removes hum, hiss and room noise before the other effects."),
         "Pitch": _("Pitch"),
         "Higher or lower; a cartoon or a real-sounding person; a bigger or smaller throat; "
         "autotune.": _("Higher or lower; a cartoon or a real-sounding person; a bigger or "
@@ -76,8 +73,6 @@ def shown_texts() -> dict[str, str]:
             _("Tames harsh S sounds, adds warmth and keeps every peak under a ceiling. "
               "Runs last."),
         # settings
-        "Noise gate": _("Noise gate"),
-        "Hiss removal": _("Hiss removal"),
         "Natural sound": _("Natural sound"),
         "Voice size": _("Voice size"),
         "Autotune": _("Autotune"),

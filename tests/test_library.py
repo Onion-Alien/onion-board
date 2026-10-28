@@ -353,3 +353,51 @@ def test_lowering_the_sounds_while_you_talk_is_off_by_default():
     picked = library.Config.from_raw({**old, "duck_db": -12.0, "duck_on": True, "duck_off": True})
     assert picked.duck_db == -12.0
     assert library.Config.from_raw(picked.to_raw()).duck_db == -12.0
+
+
+def test_clean_up_my_mic_moves_to_clean_mic_once_for_voice_changer_users():
+    """The voice changer's old Clean up my mic started on and only ran under a voice:
+    whoever used the voice changer gets Clean mic on (Normal) once; nobody else."""
+    old = library.Config().to_raw()
+    old.pop("clean_moved")
+    NORMAL = {"on": True, "strength": "normal"}
+
+    def clean(voice_fx, speech=None):
+        raw = {**old, "voice_fx": voice_fx, "speech": speech if speech is not None else {}}
+        return library.Config.from_raw(raw).speech.get("clean")
+
+    assert clean({"enabled": True, "effects": {}}) == NORMAL        # it was on by itself
+    assert clean({"enabled": False, "preset": "Robot"}) == NORMAL   # a voice picked, off now
+    assert clean({"enabled": False, "preset": "Custom",
+                  "effects": {"echo": {"on": True}, "cleanup": {"on": True, "gate": 0.9}}}) \
+        == NORMAL                                                   # their own mix
+    assert clean({"enabled": True, "effects": {"cleanup": {"on": False}}}) is None   # off
+    assert clean({"enabled": False, "preset": "Custom",
+                  "effects": {"cleanup": {"on": True}}}) is None    # never used a voice
+    assert clean({}) is None and clean("damaged") is None
+    mine = {"on": False, "strength": "light"}                       # Clean mic already set
+    assert clean({"enabled": True}, {"clean": mine}) == mine
+    got = library.Config.from_raw({**old, "voice_fx": {"enabled": True},
+                                   "speech": {"voice": "Zira", "rate": 2}})
+    assert got.speech == {"voice": "Zira", "rate": 2, "clean": NORMAL} and got.clean_moved
+    # once: switched off afterwards, it stays off
+    got.speech["clean"] = {"on": False, "strength": "normal"}
+    assert library.Config.from_raw(got.to_raw()).speech["clean"]["on"] is False
+    assert library.Config.first_start().clean_moved                 # new users: nothing to move
+
+
+def test_settings_with_the_old_clean_up_effect_load_and_older_versions_read_ours():
+    from soundboard import voicefx
+    from soundboard.mic import savedvoices
+    spec = voicefx.clean_spec({"enabled": True, "effects": {
+        "cleanup": {"on": True, "gate": 0.6, "hiss": 0.5}, "pitch": {"on": True}},
+        "custom": {"cleanup": {"on": True}}})
+    assert spec["effects"] == {"pitch": {"on": True}} and spec["custom"] == {}
+    assert savedvoices.clean_effects({"cleanup": {"on": True}, "echo": {"on": True}}) \
+        == {"echo": {"on": True}}
+    assert savedvoices.from_shared({"cleanup": {}, "echo": {}})[1] == []   # no "unknown" note
+    # an older version opening these settings: plain JSON, clean_moved kept as an extra
+    # (so moving back and forth never repeats the move), the voice changer as it knows it
+    raw = library.Config.from_raw({"voice_fx": {"enabled": True}}).to_raw()
+    assert json.loads(json.dumps(raw)) == raw and raw["clean_moved"] is True
+    assert "cleanup" not in raw["voice_fx"].get("effects", {})

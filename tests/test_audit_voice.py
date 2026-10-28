@@ -116,17 +116,6 @@ def test_a_hung_install_steps_grandchild_is_killed_too(tmp_path, monkeypatch):
     assert "internet connection" in lines[-1]
 
 
-# --------------------------------------------------------------------------- hiss
-
-def test_hiss_estimate_creeps_about_3_db_a_second_at_any_rate():
-    for rate in (16000, 48000):
-        e = voicefx.REGISTRY["cleanup"](rate, {"gate": 0, "hiss": 0.5})
-        e.run(np.zeros(1024, np.float32), rate)        # makes the STFT
-        frames_per_s = rate / e.stft.hop
-        db_per_s = 10 * np.log10(e.creep) * frames_per_s
-        assert db_per_s == pytest.approx(3.0, rel=0.01)
-
-
 # --------------------------------------------------------------------------- keys
 
 @pytest.mark.skipif(sys.platform != "win32", reason="SendInput is Windows")

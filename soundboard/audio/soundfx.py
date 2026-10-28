@@ -70,7 +70,6 @@ MAX_LIVE = 4   # Live controls stages on one sound (a copy of a copy of a copyâ€
 
 
 MAX_VOICE_NAME = 60
-NOT_IN_VOICE = frozenset({"cleanup"})   # a mic's room noise clean-up: nothing to clean here
 AI_PITCH = (-12.0, 12.0)
 
 
@@ -85,7 +84,7 @@ def clean_voice(raw) -> dict:
         return {}
     spec = voicefx.clean_spec({"effects": raw.get("effects")})["effects"]
     effects = {t: cfg for t, cfg in spec.items()
-               if cfg.get("on") and t in voicefx.REGISTRY and t not in NOT_IN_VOICE}
+               if cfg.get("on") and t in voicefx.REGISTRY}
     got = raw.get("ai")
     ai: dict = got if isinstance(got, dict) else {}
     ai_id = _line(ai.get("id"), 80)

@@ -158,8 +158,6 @@ class EffectsPanel(QObject):
         for etype, cls in voicefx.REGISTRY.items():
             if etype == "pitch":   # the Pitch slider on Trim & speed does this, better
                 continue
-            if etype == "cleanup":   # a mic's room noise: nothing to clean in a sound
-                continue
             if etype == "backdrop":   # sounds behind your voice: the mic's, not a sound's
                 continue
             row = EffectRow(cls, {})

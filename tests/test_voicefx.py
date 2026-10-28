@@ -556,24 +556,9 @@ def test_hothead_and_autotune_stream_through_mic_rate_changes(name, block):
         assert not chain.errors
 
 
-def test_cleanup_quietens_the_pauses_not_the_voice():
-    rng = np.random.default_rng(0)
-    voice = _vowel(secs=1.0)
-    x = np.concatenate([voice, np.zeros(SR)]).astype(np.float32)
-    x += (rng.standard_normal(len(x)) * 0.004).astype(np.float32)
-    y = _run("cleanup", {}, x)
-    d = int(SR * voicefx.REGISTRY["cleanup"](SR, {}).latency())
-    pause = y[SR + SR // 2:]
-    talk = y[SR // 4 + d:SR - SR // 10]
-    noise_db = 20 * np.log10(np.sqrt(np.mean(pause ** 2)))
-    assert noise_db < -60                              # was about -48 dB
-    loss = np.sqrt(np.mean(talk ** 2)) / np.sqrt(np.mean(voice[SR // 4:SR - SR // 10] ** 2))
-    assert loss > 0.7
-
-
 @pytest.mark.parametrize("etype,cfg", [
     ("growl", {"amount": 1}), ("helmet", {}), ("shout", {"threshold": -30}),
-    ("robot", {"follow": 1}), ("radio", {"squelch": 1}), ("cleanup", {"hiss": 1}),
+    ("robot", {"follow": 1}), ("radio", {"squelch": 1}),
     ("pitch", {"semitones": -7, "natural": 1, "size": 3, "tune": 0.5})])
 def test_new_effects_give_finite_audio_of_the_same_length(etype, cfg):
     for block in (64, 480, 1024):
@@ -675,7 +660,7 @@ BLEND = {"semitones": -5, "mix": 0.5, "gap": 0, "size": 4, "under": 1}
 
 
 @pytest.mark.parametrize("etype, key, base", [
-    ("cleanup", "hiss", {"gate": 0}), ("pitch", "semitones", {}), ("pitch", "size", {}),
+    ("pitch", "semitones", {}), ("pitch", "size", {}),
     ("pitch", "mix", BLEND), ("pitch", "gap", BLEND), ("pitch", "semitones", BLEND),
     ("compressor", "boost", {}), ("compressor", "attack", {}), ("radio", "drive", {"noise": 0}),
     ("distortion", "drive", {}), ("polish", "warmth", {}), ("polish", "ceiling", {}),
@@ -1115,48 +1100,6 @@ def test_robot_buzz_from_its_table_is_the_summed_saw():
         assert np.max(np.abs(got - want)) < 3e-4 * np.max(np.abs(want))
 
 
-def _dehiss_one_frame_at_a_time(c, spec):
-    """Clean up's hiss removal as it was written first, a frame at a time."""
-    strength = c.p["hiss"]
-    power = (spec.real ** 2 + spec.imag ** 2).astype(np.float64)
-    noise = c.noise
-    if noise is None:
-        noise = power.mean(axis=0) * 1e-3 + 1e-12
-    frame_db = 10 * np.log10(power.mean(axis=1) + 1e-20)
-    out = np.empty_like(spec)
-    over, floor = 1.0 + strength, 10 ** (-18 * strength / 20)
-    for f in range(len(spec)):
-        noise_db = 10 * np.log10(noise.mean() + 1e-20)
-        if (c.p["gate"] > 0 and not c.open) or frame_db[f] < noise_db + 3:
-            noise = 0.9 * noise + 0.1 * power[f]
-        else:
-            noise = noise * c.creep
-        c.noise = noise
-        g = np.maximum(1 - over * noise / (power[f] + 1e-20), floor)
-        g = np.convolve(g, (0.25, 0.5, 0.25), "same")
-        if c.prev_gain is not None:
-            g = np.maximum(g, 0.6 * c.prev_gain)
-        c.prev_gain = g
-        out[f] = spec[f] * g
-    return out
-
-
-def test_hiss_removal_all_frames_at_once_matches_one_at_a_time():
-    rng = np.random.default_rng(3)
-    a, b = (voicefx.REGISTRY["cleanup"](SR, {}) for _ in range(2))
-    for c in (a, b):
-        c.creep = 1.001
-    for block in range(12):   # quiet frames (learning) and loud ones (creeping)
-        frames = rng.integers(1, 6)
-        level = 0.01 if block % 3 else 3.0
-        spec = (rng.standard_normal((frames, 257)) + 1j * rng.standard_normal((frames, 257)))
-        spec = (spec * level).astype(np.complex64)
-        a.open = b.open = block % 2 == 0
-        got, want = a._dehiss(spec), _dehiss_one_frame_at_a_time(b, spec)
-        np.testing.assert_allclose(got, want, rtol=1e-5, atol=1e-9)
-        np.testing.assert_allclose(a.noise, b.noise, rtol=1e-9)
-
-
 @pytest.fixture
 def light_off():
     yield
@@ -1165,20 +1108,17 @@ def light_off():
 
 def test_use_less_cpu_reaches_every_effect_on_the_next_block(light_off):
     """Use less CPU (lite mode's): the chain tells its effects on the next mic block,
-    and back again; the robot then has half the bands, the reverb half its lines and
-    Clean up no hiss removal (so no delay from it either)."""
+    and back again; the robot then has half the bands, the reverb half its lines."""
     chain = VoiceChain()
-    chain.configure(spec_for(cleanup={}, robot={"freq": 100}, reverb={"mix": 0.3}))
+    chain.configure(spec_for(robot={"freq": 100}, reverb={"mix": 0.3}))
     x = np.stack([_vowel(secs=0.2)] * 2, 1)[:480]
     chain.process(x, SR)
     eff = {e.type: e for e in chain._effects}
     assert eff["robot"].bands == 16 and eff["reverb"]._in_use() == (8, 4)
-    assert eff["cleanup"].latency() > 0
     voicefx.set_light(True)
     y = chain.process(x, SR)
     assert all(e.light for e in chain._effects)
     assert eff["robot"].bands == 8 and eff["reverb"]._in_use() == (4, 2)
-    assert eff["cleanup"].latency() == 0
     assert np.all(np.isfinite(y)) and not chain.errors
     voicefx.set_light(False)
     chain.process(x, SR)
@@ -1216,7 +1156,6 @@ def test_use_less_cpu_keeps_every_voice_about_as_loud(light_off):
             voicefx.set_light(light)
             chain = VoiceChain()
             chain.configure({"enabled": True, "effects": {
-                "cleanup": {"on": True},
                 **{t: {"on": True, **c} for t, c in voicefx.PRESETS[name].items()}}})
             y = np.concatenate([chain.process(np.stack([x[i:i + 480]] * 2, 1), SR)[:, 0]
                                 for i in range(0, len(x) - 479, 480)])

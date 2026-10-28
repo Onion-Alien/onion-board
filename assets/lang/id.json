@@ -1532,7 +1532,6 @@
   "Chorus": "Chorus",
   "Classic": "Klasik",
   "Clean": "Bersih",
-  "Clean up my mic": "Bersihkan mikrofon saya",
   "Clean: your sounds go out exactly as mixed.": "Bersih: suara Anda keluar persis seperti campurannya.",
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "Dihapus, namun tidak dapat mengunduh salinan baru ({error}). Coba lagi saat Anda online.",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "Dihapus, namun tidak dapat mengunduh salinan baru ({error}). Menggunakan yt-dlp {version} bawaan.",
@@ -1654,7 +1653,6 @@
   "High cut": "Potong tinggi",
   "Higher or lower than that, in semitones": "Lebih tinggi atau lebih rendah dari itu, dalam seminada",
   "Higher or lower; a cartoon or a real-sounding person; a bigger or smaller throat; autotune.": "Lebih tinggi atau lebih rendah; kartun atau orang yang terdengar nyata; tenggorokan lebih besar atau lebih kecil; autotune.",
-  "Hiss removal": "Penghapusan desis",
   "Hoot is waiting for something to watch": "Hoot sedang menunggu sesuatu untuk ditonton",
   "Hothead": "Pemberang",
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Seberapa jauh suara yang diubah tertinggal dari suara asli Anda: {effects} ms dari efek + {devices} ms dari perangkat suara Anda. Di bawah sekitar 100 ms masih terasa normal untuk berbicara; efek nada paling besar, sisanya hampir tidak ada.",
@@ -1728,7 +1726,6 @@
   "No shaping at all: your sounds go out exactly as mixed, full range. For OBS, recording, Voicemeeter, a mixer, or anything that isn't a voice chat.": "Tanpa pembentukan sama sekali: suara Anda keluar persis seperti hasil mix, rentang penuh. Untuk OBS, rekaman, Voicemeeter, mixer, atau apa pun yang bukan voice chat.",
   "No shaping. Your sounds go out exactly as mixed.": "Tanpa pembentukan. Suara Anda keluar persis seperti hasil mix.",
   "No voice add-ons installed.": "Tidak ada add-on suara yang terpasang.",
-  "Noise gate": "Noise gate",
   "Not connecting to {host}: it leads to this PC or your home network": "Tidak tersambung ke {host}: ini mengarah ke PC ini atau jaringan rumah Anda",
   "Not connecting to {host}: it's on this PC or your home network": "Tidak tersambung ke {host}: ada di PC ini atau jaringan rumah Anda",
   "Not connecting: Tor is being updated. Nothing was sent without it: try again in a moment.": "Tidak terhubung: Tor sedang diperbarui. Tidak ada yang terkirim tanpanya: coba lagi sebentar lagi.",
@@ -1809,7 +1806,6 @@
   "Remove the Onion Watch add-on from Onion Board? Your {n} trigger and its pictures are kept for when you get it again.\n\nYou can get it again from the Triggers tab any time.": [
     "Hapus add-on Onion Watch dari Onion Board? {n} pemicu Anda beserta gambarnya tetap disimpan untuk saat Anda memasangnya lagi.\n\nAnda bisa mendapatkannya lagi dari tab Pemicu kapan saja."
   ],
-  "Removes hum, hiss and room noise before the other effects.": "Menghilangkan dengungan, desisan, dan kebisingan ruangan sebelum efek lainnya.",
   "Removing failed (code {code}).": "Gagal menghapus (kode {code}).",
   "Removing…": "Menghapus…",
   "Rename": "Ganti nama",

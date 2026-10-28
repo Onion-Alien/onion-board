@@ -1529,7 +1529,6 @@
   "Chorus": "Korus",
   "Classic": "Klasik",
   "Clean": "Bersih",
-  "Clean up my mic": "Bersihkan mikrofon saya",
   "Clean: your sounds go out exactly as mixed.": "Bersih: bunyi anda keluar tepat seperti dicampur.",
   "Cleared, but couldn't download a fresh copy ({error}). Try again when you're online.": "Dikosongkan, tetapi tidak dapat memuat turun salinan baharu ({error}). Cuba lagi apabila anda dalam talian.",
   "Cleared, but couldn't download a fresh copy ({error}). Using the built-in yt-dlp {version}.": "Dikosongkan, tetapi tidak dapat memuat turun salinan baharu ({error}). Menggunakan yt-dlp {version} terbina dalam.",
@@ -1651,7 +1650,6 @@
   "High cut": "Potongan tinggi",
   "Higher or lower than that, in semitones": "Lebih tinggi atau lebih rendah daripada itu, dalam semiton",
   "Higher or lower; a cartoon or a real-sounding person; a bigger or smaller throat; autotune.": "Lebih tinggi atau lebih rendah; kartun atau orang yang terdengar nyata; tekak yang lebih besar atau lebih kecil; autotune.",
-  "Hiss removal": "Buang desisan",
   "Hoot is waiting for something to watch": "Hoot sedang menunggu sesuatu untuk dipantau",
   "Hothead": "Kepala panas",
   "How far behind your real voice the changed one is: {effects} ms from the effects + {devices} ms from your sound devices. Under about 100 ms feels normal to talk over; pitch effects cost the most, the rest almost nothing.": "Sejauh mana suara yang diubah ketinggalan di belakang suara sebenar anda: {effects} ms daripada kesan + {devices} ms daripada peranti bunyi anda. Di bawah kira-kira 100 ms terasa biasa untuk bercakap; kesan pic paling banyak menambah lengah, yang lain hampir tiada.",
@@ -1726,7 +1724,6 @@
   "No shaping at all: your sounds go out exactly as mixed, full range. For OBS, recording, Voicemeeter, a mixer, or anything that isn't a voice chat.": "Tiada pembentukan langsung: bunyi anda keluar tepat seperti dicampur, julat penuh. Untuk OBS, rakaman, Voicemeeter, pengadun atau apa-apa sahaja yang bukan sembang suara.",
   "No shaping. Your sounds go out exactly as mixed.": "Tiada pembentukan. Bunyi anda keluar tepat seperti dicampur.",
   "No voice add-ons installed.": "Tiada add-on suara dipasang.",
-  "Noise gate": "Gerbang hingar",
   "Not connecting to {host}: it leads to this PC or your home network": "Tidak bersambung ke {host}: ia membawa kepada PC ini atau rangkaian rumah anda",
   "Not connecting to {host}: it's on this PC or your home network": "Tidak bersambung ke {host}: ia ada pada PC ini atau rangkaian rumah anda",
   "Not connecting: Tor is being updated. Nothing was sent without it: try again in a moment.": "Tidak bersambung: Tor sedang dikemas kini. Tiada apa-apa dihantar tanpanya: cuba sebentar lagi.",
@@ -1807,7 +1804,6 @@
   "Remove the Onion Watch add-on from Onion Board? Your {n} trigger and its pictures are kept for when you get it again.\n\nYou can get it again from the Triggers tab any time.": [
     "Buang add-on Onion Watch daripada Onion Board? {n} pencetus anda dan gambarnya disimpan untuk apabila anda mendapatkannya semula.\n\nAnda boleh mendapatkannya semula dari tab Pencetus pada bila-bila masa."
   ],
-  "Removes hum, hiss and room noise before the other effects.": "Mengeluarkan dengungan, desisan dan bunyi bilik sebelum kesan lain.",
   "Removing failed (code {code}).": "Gagal mengalih keluar (kod {code}).",
   "Removing…": "Mengalih keluar…",
   "Rename": "Namakan semula",

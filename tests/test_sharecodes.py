@@ -12,7 +12,7 @@ from soundboard.mic.savedvoices import CodeError, read_code, share_code
 VOICE = {"pitch": {"on": True, "semitones": 7.5, "mix": 1.0},
          "echo": {"on": True, "delay": 250.0, "mix": 0.3},
          "robot": {"on": False, "pitch": 3.0},            # off: not shared
-         "cleanup": {"on": True}}                          # yours, not the voice's
+         "cleanup": {"on": True}}                          # retired: dropped
 
 
 def _code(data, prefix="OB1-") -> str:

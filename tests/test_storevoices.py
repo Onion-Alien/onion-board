@@ -97,7 +97,7 @@ def test_what_you_share_is_only_settings_and_comes_back_the_same():
                "growl": {"on": False, "amount": 0.9}}
     p = sv.pack_fx("  My   voice ", effects, about="so\nfunny")
     assert p == {"kind": "fx", "name": "My voice", "about": "so funny", "emoji": "",
-                 "data": {"e": {"pitch": {"semitones": 5.0}}}}   # mic clean-up stays yours
+                 "data": {"e": {"pitch": {"semitones": 5.0}}}}   # the retired clean-up: dropped
     back = sv.voice_from({"id": ID, **p})
     assert back.effects == {"pitch": {"on": True, "semitones": 5.0}}
     mine = {"id": "my-abc", "name": "Gravel", "emoji": "🪨", "about": "deep",

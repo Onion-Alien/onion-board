@@ -237,8 +237,7 @@ def test_preset_turns_the_changer_on_and_configures_the_chain(panel):
     assert spec["enabled"] and spec["preset"] == "Robot"
     assert spec["effects"]["robot"]["on"] and not spec["effects"]["pitch"]["on"]
     p.chain.process(np.zeros((32, 2), np.float32), 48000)
-    # mic clean-up is your own setting (on to start with), ahead of the voice's effects
-    assert [e.type for e in p.chain._effects] == ["cleanup", "robot", "compressor", "reverb"]
+    assert [e.type for e in p.chain._effects] == ["robot", "compressor", "reverb"]
 
 
 def test_editing_a_slider_switches_to_custom(panel):
@@ -1005,7 +1004,7 @@ def test_random_voice_opens_fine_tune_with_what_it_set_lit_up(panel):
     p.fx.btn_random.click()                  # the dice is in Edit voice
     assert p.fx.dlg.isVisible() and p.fx.preset == "Custom"
     p.fx.randomize(random.Random(3))
-    on = {t for t, r in p.fx.rows.items() if r.chk.isChecked() and t != "cleanup"}
+    on = {t for t, r in p.fx.rows.items() if r.chk.isChecked()}
     lit = {t for t, r in p.fx.rows.items() if r.is_fresh()}
     assert lit == on and "pitch" in lit
     p.fx.pick("Robot")                       # gone as soon as you move on...
@@ -1157,20 +1156,24 @@ def test_tiles_reflow_with_saved_voices(qapp, app_dir, monkeypatch):
     holder.hide()
 
 
-def test_mic_cleanup_stays_as_you_set_it_whatever_voice_you_pick(panel):
-    p, _ = panel
-    clean = p.fx.rows["cleanup"]
-    assert clean.chk.isChecked()                  # on to start with
-    p.fx.pick("Robot")
-    clean.chk.setChecked(False)                   # switched off: Robot stays picked
-    assert p.fx.preset == "Robot"
-    for name in ("Chipmunk", "Custom"):
-        p.fx.pick(name)
-        assert not clean.chk.isChecked()
-    import random
-    p.fx.randomize(random.Random(1))
-    assert not clean.chk.isChecked()
-    assert not p.fx.spec()["effects"]["cleanup"]["on"]
+def test_edit_voice_has_no_mic_clean_up_card_clean_mic_does_that(qapp, monkeypatch):
+    """The old Clean up my mic effect is gone (Clean mic, the Voice tab's first tab,
+    does the job): settings that still have it open without it and never run it."""
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+    from soundboard.ui.voice.voicepanel import VoicePanel
+    old = {"cleanup": {"on": True, "gate": 0.6, "hiss": 0.5}, "robot": {"on": True}}
+    p = VoicePanel(FakeEngine(), {"enabled": True, "preset": "Custom", "effects": old,
+                                  "custom": old}, {})
+    try:
+        assert "cleanup" not in p.fx.rows and "cleanup" not in voicefx.REGISTRY
+        hero = p.fx.hero_box
+        assert [hero.itemAt(i).widget() for i in range(hero.count())] == [p.fx.rows["pitch"]]
+        assert "cleanup" not in p.fx.spec()["effects"]
+        p.chain.process(np.zeros((32, 2), np.float32), 48000)
+        assert [e.type for e in p.chain._effects] == ["robot"]
+    finally:
+        p.shutdown()
+        p.deleteLater()
 
 
 def test_moving_a_pitch_slider_switches_pitch_on(panel):
@@ -1188,11 +1191,11 @@ def test_delay_shows_what_the_effects_and_devices_add(panel):
     p, _ = panel
     fx = p.fx
     assert fx.delay.isHidden()                    # off: no delay to speak of
-    fx.pick("Robot")                              # no pitch: only the clean-up's frame
+    fx.pick("Robot")                              # no pitch: next to nothing
     small = fx.effects_delay()
     fx.pick("Deep voice")                         # pitch + natural formants cost the most
     big = fx.effects_delay()
-    assert 5 < small < 20 and 50 < big < 100
+    assert 0 <= small < 5 and 40 < big < 100
     fx.set_device_delay(30.0)
     assert not fx.delay.isHidden() and f"{big + 30:.0f} ms" in fx.delay.text()
 
@@ -1244,8 +1247,8 @@ def test_effects_that_never_delay_the_voice_arent_built_to_ask(panel, monkeypatc
         real = cls.__init__
         monkeypatch.setattr(cls, "__init__", lambda self, *a, _r=real, _t=etype, **k: (
             built.append(_t), _r(self, *a, **k))[1])
-    p.fx.pick("Robot")                  # no mic yet: only the delay readout builds any
-    assert p.fx.effects_delay() > 0
+    p.fx.pick("Autotune")               # no mic yet: only the delay readout builds any
+    assert p.fx.effects_delay() > 0 and "pitch" in built
     assert "robot" not in built         # its latency() is the base one: always 0
     assert all(voicefx.REGISTRY[t].latency is not voicefx.Effect.latency for t in built)
 
@@ -1626,8 +1629,7 @@ def test_copy_and_import_a_share_code(panel, monkeypatch, qapp):
     # the name was taken: it comes in alongside, on, and sounding the same
     assert "Squeaky (2)" in asked[0] and p.fx.preset == "Squeaky (2)"
     assert list(p.fx.store.voices) == ["Squeaky", "Squeaky (2)"]
-    strip = {t: e for t, e in sound.items() if t != "cleanup"}
-    assert {t: e for t, e in p.fx.spec()["effects"].items() if t != "cleanup"} == strip
+    assert p.fx.spec()["effects"] == sound
 
 
 def test_importing_junk_says_why_and_adds_nothing(panel, monkeypatch):
@@ -1751,7 +1753,7 @@ def test_effect_columns_stack_without_holes(panel, qapp):
 
 
 def test_edit_voice_has_a_tab_a_group_that_counts_whats_on(panel, qapp):
-    """Edit voice was one long page: Main (pitch, mic clean-up), then a tab a group,
+    """Edit voice was one long page: Main (pitch), then a tab a group,
     each saying how many of its effects are on; Add-ons only with an add-on effect."""
     fx = panel[0].fx
     fx.open_tweak()
@@ -2467,7 +2469,7 @@ def test_off_at_start_forgets_the_picked_voice(qapp, monkeypatch):
     one. Left on: it comes back as it was."""
     from soundboard.ui.voice.voicefxpanel import CUSTOM, at_start
     ghost = voicefx.PRESETS["Ghost"]
-    mine = {"cleanup": {"on": True, "gate": 0.6, "hiss": 0.5}}
+    mine = {"echo": {"on": True, "mix": 0.3}}
     off = {"enabled": False, "preset": "Ghost", "effects": ghost, "custom": mine}
     assert at_start(off) == {"enabled": False, "preset": CUSTOM, "effects": mine,
                              "custom": mine}

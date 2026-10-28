@@ -132,6 +132,9 @@ def register[E: Effect](cls: type[E]) -> type[E]:
 # built-in voices that were renamed: old saved name -> new name (an older version
 # reading the new name shows Custom with the same effects, so nothing is lost)
 RENAMED = {"Female voice": "High voice"}
+# effects that were taken out, still found in older settings, saved voices and codes:
+# dropped quietly ("cleanup", Clean up my mic: Clean mic on the Voice tab does it now)
+RETIRED = frozenset({"cleanup"})
 
 
 def _number(v) -> bool:
@@ -154,7 +157,7 @@ def clean_spec(raw) -> dict:
         out = {t: {k: x for k, x in cfg.items()
                    if isinstance(k, str) and (isinstance(x, bool) if k == "on" else _number(x))}
                for t, cfg in (v.items() if isinstance(v, dict) else ())
-               if isinstance(t, str) and isinstance(cfg, dict)}
+               if isinstance(t, str) and isinstance(cfg, dict) and t not in RETIRED}
         for t, cfg in out.items():
             cls = REGISTRY.get(t)
             if cls is not None:

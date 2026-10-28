@@ -15,7 +15,7 @@ from soundboard.ui.voice.fxcontrols import ParamSlider, Switch
 
 
 # the app's own line icons (ui/kit/icons.py), like everywhere else
-FX_ICONS = {"cleanup": "shield", "pitch": "mic", "growl": "wave", "robot": "keyboard",
+FX_ICONS = {"pitch": "mic", "growl": "wave", "robot": "keyboard",
             "compressor": "volume", "tone": "sliders", "radio": "radio", "distortion": "live",
             "shout": "speech", "helmet": "voice", "chorus": "shuffle", "echo": "history",
             "reverb": "headphones", "polish": "star", "harmony": "music", "ringmod": "wave",
@@ -23,7 +23,7 @@ FX_ICONS = {"cleanup": "shield", "pitch": "mic", "growl": "wave", "robot": "keyb
             "flanger": "reload", "wobble": "ear"}
 # the Voice tab's "Edit voice" window's tabs: Main (these), then one a group;
 # an effect from an add-on goes under Add-ons (a tab only when there is one)
-HERO = ("pitch", "cleanup")
+HERO = ("pitch",)
 HERO_TITLES = {"pitch": _("Pitch & voice")}
 MAIN_TAB = _("Main")
 GROUPS = ((_("Change the voice"), ("harmony", "growl", "robot", "ringmod", "monk")),
@@ -31,10 +31,9 @@ GROUPS = ((_("Change the voice"), ("harmony", "growl", "robot", "ringmod", "monk
                             "polish")),
           (_("Room"), ("chorus", "flanger", "wobble", "echo", "reverb", "backdrop")))
 ADDON_GROUP = _("Add-ons")
-# your own setting, not part of a voice: picking or saving a voice leaves it as it is
-# yours, not the voice's: picking a voice leaves them as they are (your mic clean-up,
-# the Background's sounds); with the Effects pop-up's extras, they're "on top"
-KEEP = frozenset({"cleanup", "backdrop"})
+# yours, not the voice's: picking a voice leaves it as it is (the Background's
+# sounds); with the Effects pop-up's extras, they're "on top"
+KEEP = frozenset({"backdrop"})
 
 
 def on_top(etype: str) -> bool:
@@ -45,7 +44,7 @@ def on_top(etype: str) -> bool:
 
 class EffectRow(QFrame):
     """One effect as a card: icon, name, an on/off switch, what it does, and its
-    settings while it's on. `hero` (Pitch, Clean up my mic): the settings always
+    settings while it's on. `hero` (Pitch): the settings always
     show, and moving one switches the effect on. Its arrow folds it down to just
     its title line (`folded_changed`)."""
     changed = Signal()
