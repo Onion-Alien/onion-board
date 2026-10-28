@@ -1706,3 +1706,33 @@ def test_a_short_screen_scrolls_the_step_instead_of_piling_it_up(qapp, app_dir, 
         wiz.done(0)
         w.soundctl._load_thread.join(15)
         w.close()
+
+
+@pytest.mark.parametrize("heard, blocked, no_mics, opened, kind", [
+    (True, True, False, True, "heard"),
+    (False, True, False, True, "blocked"),
+    (False, False, True, False, "no-mic"),
+    (False, False, False, True, "silent"),
+    (False, False, False, False, "no-open")])
+def test_leaving_the_mic_step_counts_how_its_test_went(wizard, monkeypatch, heard, blocked,
+                                                        no_mics, opened, kind):
+    from soundboard.core import usage
+    w, wiz = wizard
+    counted = []
+    monkeypatch.setattr(usage, "used", counted.append)
+    monkeypatch.setattr(setupwizard.micstate, "windows_blocks_mic", lambda: blocked)
+    wiz.go(wiz.dev_index)
+    wiz.go(wiz.send_index)   # a click straight through says nothing
+    assert counted == []
+    wiz.go(wiz.dev_index)
+    wiz._dev_since -= setupwizard.MIC_TEST_MIN_S
+    wiz._mic_peak_seen, wiz._no_mics = heard, no_mics
+    w.engine.mic_stream = object() if opened else None
+    wiz.go(wiz.send_index)
+    wiz.go(wiz.discord_index)   # once per visit
+    assert counted == [f"mic-test-{kind}"]
+    w.engine.mic_stream = None
+    wiz.go(wiz.dev_index)
+    wiz._dev_since -= setupwizard.MIC_TEST_MIN_S
+    wiz.done(0)   # closing the guide on the mic step counts it too
+    assert len([c for c in counted if c.startswith("mic-test-")]) == 2
