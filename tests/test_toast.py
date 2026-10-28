@@ -31,6 +31,15 @@ def test_a_tick_means_ok_and_dots_mean_working(qapp):
     w.close()
 
 
+def test_a_window_already_closed_gets_no_card_and_no_error(qapp):
+    # a job finishing after its window was deleted (a dialog closed meanwhile) used to
+    # raise RuntimeError: its toast asked the dead window for its window()
+    import shiboken6
+    w = _host(qapp)
+    shiboken6.delete(w)
+    assert busy.toast(w, "✓ Exported 4 sounds") is None
+
+
 def test_working_turns_into_its_result_in_place(qapp):
     w = _host(qapp)
     t = busy.toast(w, "Exporting 4 sounds…")

@@ -689,7 +689,7 @@ def show(window: QWidget | None, text: str, kind: str = "", ms: int = TOAST_MS, 
     is modal over the window). Returns the card, or None with no window. ``aside``: a
     problem away from what's being done (PROBLEM_HOOKS aren't told)."""
     host = QApplication.activeModalWidget() or window
-    if host is None:
+    if host is None or not shiboken6.isValid(host):   # (closed while a job ran)
         return None
     host = host.window()
     if text.startswith("✓ "):
