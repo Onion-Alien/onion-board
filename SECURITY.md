@@ -411,7 +411,8 @@ account or anything else about you.
   report: never the error message, paths, devices or log lines. The report itself
   never leaves your PC unless you post it.
 - `warned/<version>/<type>@<soundboard/…py:line>`: an error the app caught and showed
-  you as a warning instead of crashing (the type and the line, never the message).
+  you as a warning instead of crashing, or that stopped the mic effect's set-up (the
+  type and the line, never the message).
 - `unclean-exit/<version>/<why>` when the last run ended without the app closing
   itself: `native-crash`, `windows-error`, `not-responding`, `while-closing`, `frozen`,
   `pc-restarted` or `ended`; for a crash also the error's name (such as
