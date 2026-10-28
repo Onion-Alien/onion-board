@@ -6,6 +6,8 @@ A test file runs when:
   through a test file it imports, or through a package that imports its own modules
   (`from soundboard import voicefx` gets `voicefx.builtin`'s presets). A module no
   test imports picks the tests of the nearest modules that import it.
+- it reads every source file (`rglob("*.py")`: the static checks) and an app module
+  changed
 - it names a changed file that isn't one of those (`build.ps1`, `DESIGN.md`,
   `module.json`, "lang" for assets/lang/…)
 
@@ -180,6 +182,9 @@ def pick(changed: list[str]) -> list[str]:
     texts = {t: p.read_text(encoding="utf-8") for t, p in tests.items()
              if t != "test_pick_tests"}
 
+    # a test that reads every source file (a static check) imports none of them
+    sweeps = {t for t, text in texts.items() if 'rglob("*.py")' in text}
+
     def users(mod: str) -> set[str]:
         return {t for t in tests if t == mod or mod in uses[t]}
 
@@ -196,6 +201,8 @@ def pick(changed: list[str]) -> list[str]:
                 seen |= level
                 found = set().union(*(users(m) for m in level)) if level else set()
             picked |= found
+            if top == "soundboard":
+                picked |= sweeps
         if top not in ("soundboard", "tests"):
             # a file the tests read or check: by its name, its folder's, or its path
             p = Path(rel)

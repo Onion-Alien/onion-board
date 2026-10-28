@@ -66,8 +66,8 @@ class CleanMicPanel(QWidget):
         v.addWidget(self.intro)
         self.lbl_missing = hint_label(_("Clean mic isn't in this copy of Onion Board."))
         theme.set_tone(self.lbl_missing, "warn")
+        v.addWidget(self.lbl_missing)   # in the layout first: shown bare it's a window
         self.lbl_missing.setVisible(not self.ok)
-        v.addWidget(self.lbl_missing)
         self.lbl_error = hint_label("")
         theme.set_tone(self.lbl_error, "error")
         self.lbl_error.hide()
