@@ -6,6 +6,7 @@ import time
 from PySide6.QtCore import QRectF
 from PySide6.QtGui import QColor, QImage, QPainter
 
+from soundboard.ui.bun.bunbits import DANCE_FACES
 from soundboard.ui.bun.bunny import PROPS, draw_bunny
 from soundboard.ui.bun.bunnywidget import BunnyWidget
 
@@ -515,15 +516,34 @@ def test_each_style_dances_its_own_way(qapp, monkeypatch):
     assert calm._dance < 0.01 and calm.pose()["nod"] == 0.0
 
 
-def test_his_mouth_stays_shut_to_music_and_only_talks_to_speech(qapp, monkeypatch):
-    for style in ("electronic", "rock", "hiphop", "chill", "pop"):
-        b, clock = _dance(monkeypatch, style, voice=1.0)   # (a loud singer, too)
-        widest = [0.0]
-        _beats(b, clock, 3.0, lambda w=widest, b=b: w.__setitem__(0, max(w[0], b.pose()["mouth"])))
-        assert widest[0] < 0.05, style
+def test_his_mouth_never_follows_music_and_only_talks_to_speech(qapp, monkeypatch):
+    # to music his mouth holds still: shut in his little smile, or a dance face's grin
+    for face in range(len(DANCE_FACES)):
+        for style in ("electronic", "rock", "hiphop", "chill", "pop"):
+            b, clock = _dance(monkeypatch, style, voice=1.0)   # (a loud singer, too)
+            b._face, b._face_until = face, 1e12
+            seen: list[float] = []
+            _beats(b, clock, 3.0, lambda s=seen, b=b: s.append(b.pose()["mouth"]))
+            grin = DANCE_FACES[face][1] if style in ("electronic", "pop") else 0.0
+            assert max(seen[len(seen) // 2:]) <= grin + 0.05, (face, style)
+            assert max(seen[len(seen) // 2:]) - min(seen[len(seen) // 2:]) < 0.05, (face, style)
     talk, clock = _dance(monkeypatch, "speech", voice=1.0)
     _beats(talk, clock, 2.0)
     assert talk.pose()["mouth"] > 0.5
+
+
+def test_his_dance_face_holds_a_random_while_and_can_come_up_again(qapp, monkeypatch):
+    b, clock = _dance(monkeypatch, "electronic")
+    faces, holds = [], []
+    for _i in range(200):
+        clock.now = max(clock.now, b._face_until) + 0.01   # (just past the last change)
+        b._step()
+        faces.append(b._face)
+        holds.append(b._face_until - clock.now)
+    assert 5 <= min(holds) and max(holds) <= 30
+    assert 12 < sum(holds) / len(holds) < 18                     # about 15 s on average
+    assert set(faces) == set(range(len(DANCE_FACES)))
+    assert any(x == y for x, y in zip(faces, faces[1:]))         # the same one twice
 
 
 def test_every_themes_skit_plays_through_and_ends_clean(qapp, monkeypatch):
@@ -972,3 +992,17 @@ def test_hiphop_nod_stays_smooth_with_a_bass_note_between_beats(qapp, monkeypatc
     _beats(b, clock, 4.0, lambda: dips.append(b.pose()["dip"]))
     assert max(dips) < 8                                       # a nod, not a bang
     assert max(abs(x - y) for x, y in zip(dips, dips[1:])) < 1.6   # no snaps
+
+
+def test_his_bubble_wraps_a_long_line_onto_even_lines_beside_him(qapp):
+    from PySide6.QtGui import QFont, QFontMetrics
+
+    from soundboard.ui.bun.bunbubble import wrap
+    f = QFont()
+    f.setPixelSize(15)
+    fm = QFontMetrics(f)
+    assert wrap(fm, "hehe!", 500) == ["hehe!"]
+    long = "Ich habe gerade keine Ahnung, was das heißt"
+    lines = wrap(fm, long, fm.horizontalAdvance("Ich habe gerade"))
+    assert len(lines) == 3 and " ".join(lines) == long
+    assert wrap(fm, "Wortwortwort", 5) == ["Wortwortwort"]   # (one word: never split)

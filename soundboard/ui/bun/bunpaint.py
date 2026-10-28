@@ -14,9 +14,9 @@ from soundboard.ui.kit import theme
 from soundboard.ui.bun.bunny import (
     draw_bunny, FUR, GADGET_SCREEN, H, INK, look_colour, PINK, PLANK_SPOT, ROBOT_CYAN,
     ROBOT_CYAN_HI, ROBOT_FUR, ROBOT_INK, sparkle, STEEL, WOOD, WOOD_DARK)
-from soundboard.ui.bun import bunskits
+from soundboard.ui.bun import bunbubble, bunskits
 from soundboard.ui.bun.bunbits import (
-    BACK_END, BUBBLE, CABINET, CLOUD_END, CROUCH, DASH_END, DUST, DUST_INK, FAIL_POOF,
+    BACK_END, CABINET, CLOUD_END, CROUCH, DASH_END, DUST, DUST_INK, FAIL_POOF,
     FAIL_RED, FAIL_SNAP, FINALE, PARTS, SCREEN_BARS, SPARKLE_COLORS, _steps, SWAY, _sway)
 
 if TYPE_CHECKING:
@@ -289,39 +289,21 @@ class BunnyPaint(_Base):
             p.drawLine(QPointF(k.x, k.y), QPointF(k.x - k.vx * 0.035, k.y - k.vy * 0.035))
 
     def _bubble(self, p: QPainter, text: str, body: QRectF):
-        """A comic speech bubble up and to the right of his head (Hoot's style)."""
+        """A comic speech bubble beside his face, its tail pointing at his mouth (Hoot's
+        style; the same in the games and Bun mode: ui/bun/bunbubble.py)."""
         f = QFont(self.font())
-        f.setPixelSize(max(9, round(self.bun_h * 0.13)))
+        # (growing slower than he does: a big Bun's words were bigger than his head)
+        f.setPixelSize(max(9, round(14 * (self.bun_h / 110) ** 0.5)))
         f.setBold(True)
         p.setFont(f)
         fm = p.fontMetrics()
         room = self.width() - 20
-        lines = [text]
-        if fm.horizontalAdvance(text) > room and " " in text:
-            # a longer line goes on two, broken at the space nearest the middle
-            spaces = [i for i, c in enumerate(text) if c == " "]
-            cut = min(spaces, key=lambda i: abs(i - len(text) / 2))
-            lines = [text[:cut], text[cut + 1:]]
+        lines = bunbubble.wrap(fm, text, min(room, bunbubble.side_room(body, self.width())))
         tw = max(fm.horizontalAdvance(t) for t in lines)
         if tw > room:
             return   # no room for the whole line: say nothing rather than half of it
-        pad = 7
-        bw, bh = tw + 2 * pad, fm.height() * len(lines) + 2 * pad - 4
-        x = max(2.0, min(body.right() - body.width() * 0.05, self.width() - bw - 2))
-        y = max(2.0, body.top() + body.height() * 0.05 - bh)
-        box = QRectF(x, y, bw, bh)
-        tail = QPainterPath(QPointF(box.left() + 10, box.bottom() - 2))
-        tail.lineTo(body.center().x() + body.width() * 0.3, body.top() + body.height() * 0.38)
-        tail.lineTo(box.left() + 22, box.bottom() - 2)
-        shape = QPainterPath()
-        shape.addRoundedRect(box, bh / 2, bh / 2)
-        shape = shape.united(tail)
-        p.setPen(QPen(INK, 1.6))
-        p.setBrush(BUBBLE)
-        p.drawPath(shape)
-        p.setPen(INK)
-        p.drawText(box.adjusted(pad, 0, -pad, 0), Qt.AlignmentFlag.AlignCenter,
-                   "\n".join(lines))
+        bw, bh = tw + 2 * bunbubble.PAD, fm.height() * len(lines) + 2 * bunbubble.PAD - 4
+        bunbubble.draw(p, bunbubble.beside(body, bw, bh, self.width()), "\n".join(lines), body)
 
     def _paint_puffs(self, p: QPainter):
         p.setPen(Qt.PenStyle.NoPen)

@@ -237,6 +237,7 @@ class BunnyWidget(BunnyBuild, BunnyDance, BunnyPaint, QWidget):
         self.groove = None              # the song playing (set_groove), or None
         self._dance = 0.0               # how much he's dancing (0..1, fades in and out)
         self._style, self._style_was, self._blend = "", "", 1.0
+        self._face, self._face_until = 0, 0.0   # his dance face (DANCE_FACES), till when
         self._last_beat: float | None = None
         self._g_energy = self._g_voice = 0.0
         self._kick_at = -1.0            # a hop on a hit, before the beat is known
@@ -1011,8 +1012,6 @@ class BunnyWidget(BunnyBuild, BunnyDance, BunnyPaint, QWidget):
         if phase == "dash":   # (the cloud he dives into is in front of him)
             self._paint_scuffle(p)
         self._paint_flying(p, r)
-        if self.say and pose["shown"]:
-            self._bubble(p, self.say, body)
         if self.zzz:
             f = QFont(self.font())
             f.setBold(True)
@@ -1026,6 +1025,8 @@ class BunnyWidget(BunnyBuild, BunnyDance, BunnyPaint, QWidget):
                 p.drawText(QPointF(x, y), "z" if k < 0.35 else "Z")
         for n in self.notes:
             paint_note(p, n)
+        if self.say and pose["shown"]:   # (on top: nothing flies over his words)
+            self._bubble(p, self.say, body)
         if kit is not None and kit.flash > 0:   # (Flashbang's skit)
             p.fillRect(self.rect(), QColor(255, 255, 255, round(215 * min(1.0, kit.flash))))
         p.end()
