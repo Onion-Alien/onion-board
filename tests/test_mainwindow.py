@@ -531,15 +531,40 @@ def test_mainwindow_live_speed_button_drives_the_engine(window):
     assert (e.sound_speed, e.sound_pitch) == (1.0, 0.0)
 
 
+def test_nightcore_preset_sets_the_speed_and_undoes_it(window):
+    b, e = window.speed_btn, window.engine
+    b.set_values(1.0, 2, True)
+    b.fx_presets["Nightcore"].click()                        # 1.3x, the pitch rises with it
+    assert (e.sound_speed, e.sound_pitch, e.sound_keep_pitch) == (1.3, 0, False)
+    assert e.sound_fx == {"bass": 3} and b.fx_presets["Nightcore"].isChecked()
+    b.speed.set_value(1.5)
+    b._edited()                                              # moved off it: not lit
+    assert not b.fx_presets["Nightcore"].isChecked()
+    b.speed.set_value(1.3)
+    b._edited()
+    b.fx_presets["Nightcore"].click()                        # off: back to before it
+    assert (e.sound_speed, e.sound_pitch, e.sound_keep_pitch) == (1.0, 2, True)
+    assert e.sound_fx == {}
+
+
+def test_a_live_stream_gets_nightcore_as_pitch(qapp):
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
+    b = SpeedPitchButton("radio")
+    b.fx_presets["Nightcore"].click()                        # no speed: +5 st instead
+    assert b.values()[:2] == (1.0, 5) and b.fx_presets["Nightcore"].isChecked()
+    b.fx_presets["Slowed + reverb"].click()
+    assert b.values()[:2] == (1.0, -4) and not b.fx_presets["Nightcore"].isChecked()
+
+
 def test_live_effects_drive_the_engine(window):
     b, e = window.speed_btn, window.engine
     assert e.sound_fx == {} and "FX" not in b.text()
     b.fx["bass"].set_value(9)
     b.fx["bass"].changed.emit()
     assert e.sound_fx == {"bass": 9} and "FX" in b.text()
-    b.fx_presets["Concert hall"].click()                     # a preset replaces them all
-    assert e.sound_fx == {"reverb": 0.55} and b.fx_presets["Concert hall"].isChecked()
-    b.fx_presets["Concert hall"].click()                     # clicked again: as before it
+    b.fx_presets["Bass boosted"].click()                     # a preset replaces them all
+    assert e.sound_fx == {"bass": 12} and b.fx_presets["Bass boosted"].isChecked()
+    b.fx_presets["Bass boosted"].click()                     # clicked again: as before it
     assert e.sound_fx == {"bass": 9}
     b.set_fx({"echo": 0.5})
     b.set_values(1.5, 2, True)

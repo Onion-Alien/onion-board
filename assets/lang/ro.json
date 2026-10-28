@@ -4695,5 +4695,7 @@
   "Your mic as it was": "Microfonul tău așa cum a fost",
   "Your mic cleaned": "Microfonul tău curățat",
   "Your recording couldn't be cleaned.": "Înregistrarea ta nu a putut fi curățată.",
-  "{label} cleaning": "Curățare {label}"
+  "{label} cleaning": "Curățare {label}",
+  "Nightcore": "Nightcore",
+  "Slowed + reverb": "Încetinit + reverb"
 }

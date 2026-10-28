@@ -4613,5 +4613,7 @@
   "Your mic as it was": "Mikkisi sellaisenaan",
   "Your mic cleaned": "Mikkisi puhdistettuna",
   "Your recording couldn't be cleaned.": "Nauhoitustasi ei voitu puhdistaa.",
-  "{label} cleaning": "{label} puhdistus"
+  "{label} cleaning": "{label} puhdistus",
+  "Nightcore": "Nightcore",
+  "Slowed + reverb": "Hidas + kaiku"
 }

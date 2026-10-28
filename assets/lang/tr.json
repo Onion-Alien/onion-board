@@ -4613,5 +4613,7 @@
   "Your mic as it was": "Mikrofonunuz olduğu gibi",
   "Your mic cleaned": "Mikrofonunuz temizlenmiş",
   "Your recording couldn't be cleaned.": "Kaydınız temizlenemedi.",
-  "{label} cleaning": "{label} temizleme"
+  "{label} cleaning": "{label} temizleme",
+  "Nightcore": "Nightcore",
+  "Slowed + reverb": "Yavaş + reverb"
 }

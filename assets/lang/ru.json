@@ -4695,5 +4695,7 @@
   "Your mic as it was": "Твой микрофон как был",
   "Your mic cleaned": "Твой микрофон очищенный",
   "Your recording couldn't be cleaned.": "Не удалось очистить запись.",
-  "{label} cleaning": "Очистка: {label}"
+  "{label} cleaning": "Очистка: {label}",
+  "Nightcore": "Найткор",
+  "Slowed + reverb": "Замедленно + реверб"
 }

@@ -4531,5 +4531,7 @@
   "Your mic as it was": "원래 마이크 소리",
   "Your mic cleaned": "잡음을 없앤 마이크 소리",
   "Your recording couldn't be cleaned.": "녹음의 잡음을 없애지 못했습니다.",
-  "{label} cleaning": "{label} 잡음 제거"
+  "{label} cleaning": "{label} 잡음 제거",
+  "Nightcore": "나이트코어",
+  "Slowed + reverb": "슬로우 + 리버브"
 }

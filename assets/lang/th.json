@@ -4531,5 +4531,7 @@
   "Your mic as it was": "ไมค์ของคุณแบบเดิม",
   "Your mic cleaned": "ไมค์ของคุณแบบลบเสียงแล้ว",
   "Your recording couldn't be cleaned.": "ลบเสียงรบกวนจากการบันทึกของคุณไม่ได้",
-  "{label} cleaning": "ลบเสียงแบบ{label}"
+  "{label} cleaning": "ลบเสียงแบบ{label}",
+  "Nightcore": "ไนท์คอร์",
+  "Slowed + reverb": "ช้า + รีเวิร์บ"
 }

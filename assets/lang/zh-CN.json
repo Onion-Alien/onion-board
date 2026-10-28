@@ -4531,5 +4531,7 @@
   "Your mic as it was": "原来的麦克风声音",
   "Your mic cleaned": "降噪后的麦克风声音",
   "Your recording couldn't be cleaned.": "你的录音无法降噪。",
-  "{label} cleaning": "{label}降噪"
+  "{label} cleaning": "{label}降噪",
+  "Nightcore": "Nightcore",
+  "Slowed + reverb": "慢速 + 混响"
 }

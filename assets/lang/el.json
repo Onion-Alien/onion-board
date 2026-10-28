@@ -4613,5 +4613,7 @@
   "Your mic as it was": "Το μικρόφωνό σου όπως ήταν",
   "Your mic cleaned": "Το μικρόφωνό σου καθαρό",
   "Your recording couldn't be cleaned.": "Η εγγραφή σου δεν μπόρεσε να καθαριστεί.",
-  "{label} cleaning": "Καθάρισμα: {label}"
+  "{label} cleaning": "Καθάρισμα: {label}",
+  "Nightcore": "Nightcore",
+  "Slowed + reverb": "Αργό + reverb"
 }

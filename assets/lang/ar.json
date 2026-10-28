@@ -4941,5 +4941,7 @@
   "Your mic as it was": "ميكروفونك كما كان",
   "Your mic cleaned": "ميكروفونك بعد التنظيف",
   "Your recording couldn't be cleaned.": "تعذّر تنظيف تسجيلك.",
-  "{label} cleaning": "تنظيف {label}"
+  "{label} cleaning": "تنظيف {label}",
+  "Nightcore": "نايتكور",
+  "Slowed + reverb": "بطيء + صدى"
 }
