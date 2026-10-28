@@ -4614,5 +4614,14 @@
   "Your recording couldn't be cleaned.": "Din inspelning kunde inte rensas.",
   "{label} cleaning": "{label} rensning",
   "Nightcore": "Nightcore",
-  "Slowed + reverb": "Långsam + reverb"
+  "Slowed + reverb": "Långsam + reverb",
+  "Didn't work? Send us a report": "Funkade det inte? Skicka en rapport till oss",
+  "Open the form": "Öppna formuläret",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Formuläret öppnas med: {details}. Inget skickas förrän du skickar det själv.",
+  "Windows {major} (build {build})": "Windows {major} (build {build})",
+  "error: {code}": "fel: {code}",
+  "mic: {name}": "mikrofon: {name}",
+  "no mic": "ingen mikrofon",
+  "straight into my mic": "direkt i min mikrofon",
+  "virtual cable": "virtuell kabel"
 }

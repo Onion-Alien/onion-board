@@ -570,6 +570,7 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
             else:
                 self.mic_heard.setText(_("Waiting to hear you… if the bar doesn't move, pick "
                                          "another mic."))
+            self.mic_report.set_failed(bool(self._mic_fail()))
         if (self.stack.currentIndex() == self.send_index and self._proc is None
                 and not self._was_locked):
             # the step's card follows the mic effect when it changes from outside the

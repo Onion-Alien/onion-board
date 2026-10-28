@@ -4614,5 +4614,14 @@
   "Your recording couldn't be cleaned.": "Kaydınız temizlenemedi.",
   "{label} cleaning": "{label} temizleme",
   "Nightcore": "Nightcore",
-  "Slowed + reverb": "Yavaş + reverb"
+  "Slowed + reverb": "Yavaş + reverb",
+  "Didn't work? Send us a report": "İşe yaramadı mı? Bize rapor gönder",
+  "Open the form": "Formu aç",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Form şu bilgilerle açılır: {details}. Sen göndermedikçe hiçbir şey gönderilmez.",
+  "Windows {major} (build {build})": "Windows {major} (derleme {build})",
+  "error: {code}": "hata: {code}",
+  "mic: {name}": "mikrofon: {name}",
+  "no mic": "mikrofon yok",
+  "straight into my mic": "doğrudan mikrofonuma",
+  "virtual cable": "sanal kablo"
 }

@@ -4696,5 +4696,14 @@
   "Your recording couldn't be cleaned.": "Înregistrarea ta nu a putut fi curățată.",
   "{label} cleaning": "Curățare {label}",
   "Nightcore": "Nightcore",
-  "Slowed + reverb": "Încetinit + reverb"
+  "Slowed + reverb": "Încetinit + reverb",
+  "Didn't work? Send us a report": "N-a mers? Trimite-ne un raport",
+  "Open the form": "Deschide formularul",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Formularul se deschide cu: {details}. Nu se trimite nimic dacă nu-l trimiți tu.",
+  "Windows {major} (build {build})": "Windows {major} (build {build})",
+  "error: {code}": "eroare: {code}",
+  "mic: {name}": "microfon: {name}",
+  "no mic": "fără microfon",
+  "straight into my mic": "direct în microfonul meu",
+  "virtual cable": "cablu virtual"
 }

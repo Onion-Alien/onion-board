@@ -4696,5 +4696,14 @@
   "Your recording couldn't be cleaned.": "Tvou nahrávku se nepodařilo vyčistit.",
   "{label} cleaning": "Čištění: {label}",
   "Nightcore": "Nightcore",
-  "Slowed + reverb": "Zpomalené + reverb"
+  "Slowed + reverb": "Zpomalené + reverb",
+  "Didn't work? Send us a report": "Nefungovalo to? Pošli nám hlášení",
+  "Open the form": "Otevřít formulář",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Formulář se otevře s: {details}. Nic se neodešle, dokud ho neodešleš.",
+  "Windows {major} (build {build})": "Windows {major} (sestavení {build})",
+  "error: {code}": "chyba: {code}",
+  "mic: {name}": "mikrofon: {name}",
+  "no mic": "žádný mikrofon",
+  "straight into my mic": "rovnou do mikrofonu",
+  "virtual cable": "virtuální kabel"
 }

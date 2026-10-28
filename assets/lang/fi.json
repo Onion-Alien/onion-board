@@ -4614,5 +4614,14 @@
   "Your recording couldn't be cleaned.": "Nauhoitustasi ei voitu puhdistaa.",
   "{label} cleaning": "{label} puhdistus",
   "Nightcore": "Nightcore",
-  "Slowed + reverb": "Hidas + kaiku"
+  "Slowed + reverb": "Hidas + kaiku",
+  "Didn't work? Send us a report": "Eikö toiminut? Lähetä meille raportti",
+  "Open the form": "Avaa lomake",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Lomake avautuu näillä tiedoilla: {details}. Mitään ei lähetetä, ellet itse lähetä lomaketta.",
+  "Windows {major} (build {build})": "Windows {major} (koontiversio {build})",
+  "error: {code}": "virhe: {code}",
+  "mic: {name}": "mikki: {name}",
+  "no mic": "ei mikkiä",
+  "straight into my mic": "suoraan mikkiini",
+  "virtual cable": "virtuaalikaapeli"
 }

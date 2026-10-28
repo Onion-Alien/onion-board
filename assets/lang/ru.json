@@ -4696,5 +4696,14 @@
   "Your recording couldn't be cleaned.": "Не удалось очистить запись.",
   "{label} cleaning": "Очистка: {label}",
   "Nightcore": "Найткор",
-  "Slowed + reverb": "Замедленно + реверб"
+  "Slowed + reverb": "Замедленно + реверб",
+  "Didn't work? Send us a report": "Не получилось? Отправь нам отчёт",
+  "Open the form": "Открыть форму",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Форма откроется с данными: {details}. Ничего не отправится, пока ты сам её не отправишь.",
+  "Windows {major} (build {build})": "Windows {major} (сборка {build})",
+  "error: {code}": "ошибка: {code}",
+  "mic: {name}": "микрофон: {name}",
+  "no mic": "нет микрофона",
+  "straight into my mic": "прямо в мой микрофон",
+  "virtual cable": "виртуальный кабель"
 }

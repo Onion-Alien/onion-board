@@ -4614,5 +4614,14 @@
   "Your recording couldn't be cleaned.": "Je opname kon niet worden schoongemaakt.",
   "{label} cleaning": "{label} schoonmaken",
   "Nightcore": "Nightcore",
-  "Slowed + reverb": "Vertraagd + galm"
+  "Slowed + reverb": "Vertraagd + galm",
+  "Didn't work? Send us a report": "Werkte het niet? Stuur ons een melding",
+  "Open the form": "Formulier openen",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Het formulier opent met: {details}. Er wordt niets verstuurd tot je het zelf verstuurt.",
+  "Windows {major} (build {build})": "Windows {major} (build {build})",
+  "error: {code}": "fout: {code}",
+  "mic: {name}": "mic: {name}",
+  "no mic": "geen mic",
+  "straight into my mic": "rechtstreeks in mijn mic",
+  "virtual cable": "virtuele kabel"
 }

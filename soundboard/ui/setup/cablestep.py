@@ -23,6 +23,7 @@ from soundboard.ui.kit import busy, fit, icons, panel
 from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.setup.setupshow import SetupShow
 from soundboard.ui.kit.choicetile import FoldPill
+from soundboard.ui.kit.failreport import FailReport
 from soundboard.core import errors
 from soundboard.i18n import _
 from soundboard.ui.setup.wizardkit import (BUN_H, BUN_PAD, HEADER_GAP, NOWHERE,
@@ -174,6 +175,11 @@ class CableStep(WizardStep):
         # the answer to "is it working?" right under the intro, in a card of its own
         self.status_card = StatusCard(self.cable_status)
         self.status_card.action_box.addWidget(self.btn_attach, 0, Qt.AlignmentFlag.AlignLeft)
+        # putting it on the mic failed: tell us, before giving up
+        self.attach_report = FailReport(lambda: {"mic": self.win.cfg.mic_device or "",
+                                                 "mode": "direct",
+                                                 "err": self.win.micctl.fail_code})
+        self.status_card.action_box.addWidget(self.attach_report)
         v.insertSpacing(1, HEADER_GAP - SECTION_GAP)
         v.insertWidget(2, self.status_card)
         # straight into the mic, not in it yet: step 1's mic works, said above what's
@@ -439,6 +445,9 @@ class CableStep(WizardStep):
                                    and not self.setup_show.on)
         self.btn_attach.setEnabled(not attaching)
         state = directmic.status(self.win.cfg.mic_device)
+        self.attach_report.set_failed(route == "mic" and not attaching and not busy
+                                      and bool(self.win.micctl.fail_code)
+                                      and not self.route_ok())
         # another way already works (the cable, a device): the mic is then an option in
         # the row below, not the big button that looked like it had to be set up again
         other_works = route != "mic" and not attaching and self.route_ok()

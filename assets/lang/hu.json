@@ -4614,5 +4614,14 @@
   "Your recording couldn't be cleaned.": "A felvételedet nem sikerült megtisztítani.",
   "{label} cleaning": "Tisztítás: {label}",
   "Nightcore": "Nightcore",
-  "Slowed + reverb": "Lassú + reverb"
+  "Slowed + reverb": "Lassú + reverb",
+  "Didn't work? Send us a report": "Nem működött? Küldj nekünk jelentést",
+  "Open the form": "Űrlap megnyitása",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Az űrlap ezekkel nyílik meg: {details}. Semmi sem megy el, amíg el nem küldöd.",
+  "Windows {major} (build {build})": "Windows {major} ({build}. build)",
+  "error: {code}": "hiba: {code}",
+  "mic: {name}": "mikrofon: {name}",
+  "no mic": "nincs mikrofon",
+  "straight into my mic": "egyenesen a mikrofonomba",
+  "virtual cable": "virtuális kábel"
 }

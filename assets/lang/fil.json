@@ -4614,5 +4614,14 @@
   "Your recording couldn't be cleaned.": "Hindi malinis ang recording mo.",
   "{label} cleaning": "{label} na paglilinis",
   "Nightcore": "Nightcore",
-  "Slowed + reverb": "Mabagal + reverb"
+  "Slowed + reverb": "Mabagal + reverb",
+  "Didn't work? Send us a report": "Hindi gumana? Padalhan kami ng report",
+  "Open the form": "Buksan ang form",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "Bubukas ang form na may: {details}. Walang maipapadala hangga't hindi mo ito sinu-submit.",
+  "Windows {major} (build {build})": "Windows {major} (build {build})",
+  "error: {code}": "error: {code}",
+  "mic: {name}": "mic: {name}",
+  "no mic": "walang mic",
+  "straight into my mic": "diretso sa mic ko",
+  "virtual cable": "virtual cable"
 }

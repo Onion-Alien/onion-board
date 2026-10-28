@@ -4532,5 +4532,14 @@
   "Your recording couldn't be cleaned.": "録音のノイズを除去できませんでした。",
   "{label} cleaning": "{label}のノイズ除去",
   "Nightcore": "ナイトコア",
-  "Slowed + reverb": "スロー + リバーブ"
+  "Slowed + reverb": "スロー + リバーブ",
+  "Didn't work? Send us a report": "うまくいかなかった？レポートを送る",
+  "Open the form": "フォームを開く",
+  "The form opens with: {details}. Nothing is sent unless you submit it.": "フォームには次の内容が入ります: {details}。送信するまで何も送られません。",
+  "Windows {major} (build {build})": "Windows {major} (ビルド {build})",
+  "error: {code}": "エラー: {code}",
+  "mic: {name}": "マイク: {name}",
+  "no mic": "マイクなし",
+  "straight into my mic": "マイクに直接",
+  "virtual cable": "仮想ケーブル"
 }
