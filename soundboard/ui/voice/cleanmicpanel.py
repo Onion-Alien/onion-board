@@ -1,10 +1,11 @@
 """The Voice tab's Clean mic card: background noise out of your mic (voicefx.cleanmic).
 
-On or off, Light, Normal or Strong (DeepFilterNet, downloaded the first time it's
-picked: voicefx.deepfilter), a live look at your mic and the cleaned mic, and Hear the
-difference: 5 seconds of your mic recorded, then played as it was and cleaned, in your
-headphones only. The chain does the cleaning (VoiceChain.set_clean); this card only
-says what's wanted and shows how it's doing.
+On or off, Mic settings (cleanmicsettings: presets, Input volume, Input sensitivity,
+Noise suppression off, Light, Normal or Strong (DeepFilterNet, downloaded the first time
+it's picked: voicefx.deepfilter) and Automatic gain control), a live look at your mic
+and the cleaned mic, and Hear the difference: 5 seconds of your mic recorded, then played
+as it was and cleaned, in your headphones only. The chain does the cleaning
+(VoiceChain.set_clean); this card only says what's wanted and shows how it's doing.
 """
 from __future__ import annotations
 
@@ -12,13 +13,14 @@ import threading
 
 import numpy as np
 from PySide6.QtCore import QTimer, Qt, Signal
-from PySide6.QtWidgets import QButtonGroup, QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
 
 from soundboard.core import errors, usage
 from soundboard.i18n import _
 from soundboard.ui.kit import icons, theme
 from soundboard.ui.kit.meters import Meter
 from soundboard.ui.kit.panel import Flow, hint_label, section_label
+from soundboard.ui.voice.cleanmicsettings import MicSettings
 from soundboard.ui.voice.voicetiles import BigSwitch
 from soundboard.ui.voice.livevoice import download_bar
 from soundboard.voicefx import cleanmic, deepfilter
@@ -29,19 +31,11 @@ METER_W = 420         # px: a meter's widest (stretched across a wide window it 
 LABEL_W = 130         # px: the meters' names, one column
 PLAY_ID = "__clean_mic_test"
 MB = round(deepfilter.SIZE / 1e6)
-
-
-def strength_words(key: str) -> str:
-    if key == "light":
-        return _("Light: noise is turned well down, and your voice stays most natural.")
-    if key == "strong":
-        return _("Strong: nearly everything but your voice goes, even loud noise. Uses "
-                 "about twice Normal's CPU.")
-    return _("Normal: fans, keyboards and a TV go. Uses about 5% of one CPU core.")
+RETEST_MS = 400       # a setting changed: Hear the difference's After again, once it rests
 
 
 class CleanMicPanel(QWidget):
-    """`changed(settings)`: {"on", "strength"} to keep with the speech settings.
+    """`changed(settings)`: cleanmic.clean_settings' to keep with the speech settings.
     `chain`: the Voice tab's VoiceChain; `engine`: for the mic's level, the test
     recording and playing it in your headphones."""
     changed = Signal(dict)
@@ -90,30 +84,32 @@ class CleanMicPanel(QWidget):
         v.addWidget(self.body)
         self.body.setVisible(self.ok)
 
-        # ---- how strong: Light or Normal
-        bv.addWidget(section_label(_("How strong")))
-        row = Flow(gap=4)
-        self.strength = QButtonGroup(self)
-        self.strength.setExclusive(True)
-        self.b_strength: dict[str, QPushButton] = {}
-        for key, name in (("light", _("Light")), ("normal", _("Normal")),
-                          ("strong", _("Strong"))):
-            b = QPushButton(name)
-            b.setCheckable(True)
-            b.setCursor(Qt.CursorShape.PointingHandCursor)
-            b.setToolTip(strength_words(key))
-            b.setAccessibleName(_("{label} cleaning", label=name))
-            b.clicked.connect(lambda _c=False, k=key: self._pick(k))
-            self.strength.addButton(b)
-            self.b_strength[key] = b
-            row.addWidget(b)
-        bv.addLayout(row)
-        self.lbl_strength = hint_label("")
-        bv.addWidget(self.lbl_strength)
+        # ---- Mic settings (a cog): open right under it, never a pop-up. (Beside the
+        # switch, "Mikro-Einstellungen" ran off the card at 440 px)
+        self.b_cog = QPushButton(_("Mic settings"))
+        self.b_cog.setCheckable(True)
+        self.b_cog.setCursor(Qt.CursorShape.PointingHandCursor)
+        icons.set_icon(self.b_cog, "settings", size=16)
+        self.b_cog.setToolTip(_("Input volume, sensitivity, noise suppression and gain "
+                                "control"))
+        self.b_cog.toggled.connect(self._cog)
+        cr = QHBoxLayout()
+        cr.addWidget(self.b_cog)
+        cr.addStretch(1)
+        bv.addLayout(cr)
+        self.settings = MicSettings(self.s)
+        self.settings.hide()
+        self.settings.edited.connect(self._edited)
+        self.settings.strength_picked.connect(self._pick)
+        self.settings.preset_picked.connect(self._preset)
+        bv.addWidget(self.settings)
+        self.b_strength = self.settings.b_strength
+        self.lbl_strength = self.settings.lbl_strength
+        sv = self.settings.under_strength
         self.lbl_fallback = hint_label("")   # Strong stopped: Normal cleans instead
         theme.set_tone(self.lbl_fallback, "warn")
         self.lbl_fallback.hide()
-        bv.addWidget(self.lbl_fallback)
+        sv.addWidget(self.lbl_fallback)
 
         # ---- Strong's download: offered when Strong is picked and isn't here yet
         self.get_box = QWidget()
@@ -138,7 +134,7 @@ class CleanMicPanel(QWidget):
         gr.addStretch(1)
         gv.addLayout(gr)
         self.get_box.hide()
-        bv.addWidget(self.get_box)
+        sv.addWidget(self.get_box)
         # ...and taken off this PC again, while it's the one picked
         self.b_drop = QPushButton(_("Remove Strong's download"))
         self.b_drop.setToolTip(_("Frees {size} MB. Normal cleans instead.", size=MB))
@@ -147,7 +143,7 @@ class CleanMicPanel(QWidget):
         dr = QHBoxLayout()
         dr.addWidget(self.b_drop)
         dr.addStretch(1)
-        bv.addLayout(dr)
+        sv.addLayout(dr)
         self._getting = False
         self._stop_get = False
         self._got.connect(self._on_got)
@@ -175,8 +171,7 @@ class CleanMicPanel(QWidget):
 
         # ---- hear the difference
         bv.addWidget(section_label(_("Hear the difference")))
-        tr = QHBoxLayout()
-        tr.setSpacing(8)
+        tr = Flow(gap=8)   # (wraps: at 440 px "Record 5 seconds" was cut short)
         self.b_rec = QPushButton(_("Record 5 seconds"))
         icons.set_icon(self.b_rec, "mic", size=16)
         self.b_rec.setToolTip(_("Talk with your usual noise around, then hear it as it was "
@@ -193,7 +188,6 @@ class CleanMicPanel(QWidget):
             tr.addWidget(b)
         self.b_before.clicked.connect(lambda: self._play(False))
         self.b_after.clicked.connect(lambda: self._play(True))
-        tr.addStretch(1)
         bv.addLayout(tr)
         self.lbl_test = hint_label(_("Talk with your usual noise around, then play both."))
         bv.addWidget(self.lbl_test)
@@ -209,6 +203,10 @@ class CleanMicPanel(QWidget):
         self._left = 0
         self._test: tuple[np.ndarray, np.ndarray, int] | None = None   # raw, cleaned, rate
         self._cleaned.connect(self._test_ready)
+        self._retest = QTimer(self)
+        self._retest.setSingleShot(True)
+        self._retest.setInterval(RETEST_MS)
+        self._retest.timeout.connect(self._redo_test)
 
         self.b_on.toggled.connect(self._toggle)
         self.b_on.setEnabled(self.ok)
@@ -217,9 +215,37 @@ class CleanMicPanel(QWidget):
         self.b_on.blockSignals(False)
         self._show()
         if self.s["on"]:
-            self.chain.set_clean(True, self.s["strength"])
+            self._apply()
 
     # ------------------------------------------------------------ on / off, strength
+    def _apply(self):
+        """The chain told what's wanted now."""
+        self.chain.set_clean(self.is_on(), self.s["strength"], cleanmic.options(self.s))
+
+    def _cog(self, open_: bool):
+        self.settings.setVisible(open_)
+
+    def _edited(self, changes: dict):
+        """A Mic settings control moved (not the strength: _pick)."""
+        self.s.update(changes)
+        if self.is_on():
+            self._apply()
+        self._show()
+        self.changed.emit(dict(self.s))
+        self._retest.start()
+
+    def _preset(self, key: str):
+        p = dict(cleanmic.PRESETS[key])
+        strength = p.pop("strength")
+        self.s.update(p)
+        self._edited({})
+        self._pick(strength)   # (Strong not here yet: offered, then picked once it is)
+        self._show()
+
+    def _redo_test(self):
+        if self._test is not None:   # the After of the test, as it's set now
+            self._clean_test(self._test[0], self._test[2])
+
     def is_on(self) -> bool:
         return self.b_on.isChecked()
 
@@ -230,7 +256,7 @@ class CleanMicPanel(QWidget):
 
     def _toggle(self, on: bool):
         self.s["on"] = on
-        self.chain.set_clean(on, self.s["strength"])
+        self._apply()
         if on:
             usage.used("clean-mic")   # switched on (never how strong)
         self._show()
@@ -248,17 +274,16 @@ class CleanMicPanel(QWidget):
         self.lbl_fallback.hide()
         self.s["strength"] = key
         if self.is_on():
-            self.chain.set_clean(True, key)
+            self._apply()
         self._show()
         self.changed.emit(dict(self.s))
-        if self._test is not None:   # the After of the test, at the new strength
-            self._clean_test(self._test[0], self._test[2])
+        self._retest.stop()
+        self._redo_test()   # the After of the test, at the new strength
 
     def _show(self):
         on = self.is_on()
         self.b_on.setText(_("On") if on else _("Off"))
-        self.b_strength[self.s["strength"]].setChecked(True)
-        self.lbl_strength.setText(strength_words(self.s["strength"]))
+        self.settings.show_settings(self.s)
         self.b_drop.setVisible(self.s["strength"] == "strong")
         self._show_error()
 
@@ -266,6 +291,7 @@ class CleanMicPanel(QWidget):
     def _offer(self, error: str = ""):
         """Strong picked, not downloaded: what it needs, and a Download button."""
         self.b_strength[self.s["strength"]].setChecked(True)
+        self.b_cog.setChecked(True)   # the download is offered in Mic settings
         self.get_box.show()
         if self._getting:
             return
@@ -370,6 +396,16 @@ class CleanMicPanel(QWidget):
         mic = float(getattr(self.engine, "level_mic", 0.0) or 0.0)
         self.m_mic.set_level(mic)
         self.m_clean.set_level(self.chain.clean_level() if self._cleaning() else mic)
+        if self.settings.isVisible():   # the sensitivity bar: what the gate hears
+            c = self.chain.cleaner
+            if self._cleaning() and c is not None and hasattr(c, "gate_db"):
+                db, open_db = c.gate_db
+            else:
+                db = 20 * float(np.log10(max(mic * self.s["volume"] / 100, 1e-6)))
+                open_db = None if self.s["auto_sense"] else self.s["sense_db"]
+            if self.s["auto_sense"] and self.s["strength"] == "light":
+                open_db = None   # (Light, automatic: nothing turned down, so no line)
+            self.settings.set_level(db, open_db, METER_MS / 1000)
         self._show_error()
 
     # ------------------------------------------------------------ hear the difference
@@ -416,11 +452,11 @@ class CleanMicPanel(QWidget):
         self._clean_test(raw, rate)
 
     def _clean_test(self, raw: np.ndarray, rate: int):
-        strength = self.s["strength"]
+        strength, opts = self.s["strength"], cleanmic.options(self.s)
 
         def work():
             try:
-                out = cleanmic.clean_clip(raw, rate, strength)
+                out = cleanmic.clean_clip(raw, rate, strength, opts)
             except Exception:  # noqa: BLE001 - said in the card
                 out = None
             self._cleaned.emit((raw, rate), out)
@@ -452,6 +488,7 @@ class CleanMicPanel(QWidget):
     def shutdown(self):
         self._stop_get = True
         self._meters.stop()
+        self._retest.stop()
         if self._take is not None:
             self._take = None
             self.engine.stop_mic_take()

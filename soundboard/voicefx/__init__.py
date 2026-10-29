@@ -223,6 +223,7 @@ class VoiceChain:
         # thread makes the Cleaner. Its failure goes in clean_error, not errors (which
         # the voice changer lists as its effects')
         self._clean_want: str | None = None
+        self._clean_opts: dict = {}   # cleanmic.options(): volume, sensitivity, AGC
         self._clean_gen = 0
         self._clean_built = 0
         self.cleaner = None   # voicefx.cleanmic.Cleaner, the audio thread's
@@ -236,8 +237,10 @@ class VoiceChain:
         self.enabled = bool(spec.get("enabled"))
         self._gen += 1
 
-    def set_clean(self, on: bool, strength: str = "normal"):
-        """(UI thread.) Clean mic on (at that strength) or off, from the next mic block."""
+    def set_clean(self, on: bool, strength: str = "normal", opts: dict | None = None):
+        """(UI thread.) Clean mic on (at that strength, with cleanmic.options() `opts`)
+        or off, from the next mic block."""
+        self._clean_opts = dict(opts or {})   # first the options, then the strength
         self._clean_want = strength if on else None
         self.clean_error = ""
         self._clean_gen += 1
@@ -254,8 +257,9 @@ class VoiceChain:
 
     def _rebuild_clean(self, rate: int):
         """(Audio thread, in process.) The Cleaner for the wanted strength and `rate`."""
-        want, old = self._clean_want, self.cleaner
+        want, opts, old = self._clean_want, self._clean_opts, self.cleaner
         if want is not None and old is not None and old.rate == rate:
+            old.set_options(opts)
             old.set_strength(want)
             return
         self.cleaner = None
@@ -265,7 +269,7 @@ class VoiceChain:
             return
         from soundboard.voicefx import cleanmic
         try:
-            self.cleaner = cleanmic.Cleaner(rate, want)
+            self.cleaner = cleanmic.Cleaner(rate, want, opts)
         except Exception as ex:  # noqa: BLE001 - the mic goes on uncleaned
             self.clean_error = errors.plain(ex)
             log.error("Clean mic failed to start", exc_info=ex)
