@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import ctypes
 import gc
-import json
 import logging
 import os
 import subprocess
@@ -483,20 +482,10 @@ def _selftest_addon_in(path, tmp) -> int:
 
 def ui_scale_startup(app_dir: Path) -> int:
     """Size the whole interface by config.json's `ui_scale` (Settings > Appearance >
-    Interface size). Qt can only scale before the QApplication is made, so a change
-    shows after a restart. QT_SCALE_FACTOR set from outside wins (scripts, tests)."""
-    from soundboard.sounds.library import UI_SCALES
-    if "QT_SCALE_FACTOR" in os.environ:
-        return 100
-    try:
-        raw = json.loads((app_dir / "config.json").read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return 100
-    pct = raw.get("ui_scale", 100) if isinstance(raw, dict) else 100
-    if pct not in UI_SCALES or isinstance(pct, bool):
-        return 100
-    if pct != 100:
-        os.environ["QT_SCALE_FACTOR"] = str(pct / 100)
+    Interface size): earlystart.interface_size, which also runs before the early
+    loading screen's QApplication."""
+    from soundboard.core import earlystart
+    pct = earlystart.interface_size(app_dir)
     log.info("interface size: %d%%", pct)
     return pct
 
@@ -578,13 +567,16 @@ def main():
     for flag, run in ONE_OFF_COMMANDS.items():   # first match wins, in this order
         if flag in sys.argv:
             sys.exit(run(sys.argv[sys.argv.index(flag) + 1:]))
-    from soundboard.core import bootmark, exitwatch, threadnames
+    from soundboard.core import bootmark, earlystart, exitwatch, threadnames
     threadnames.install()   # first: every thread after this has its name in Windows too
     migrate_from_soundboard()
-    last_run = exitwatch.read_last(APP_DIR)   # the last run's black box, before arming wipes it
+    last_run = earlystart.last_run   # main.py's early loading screen read it, then armed
+    if last_run is None:
+        last_run = exitwatch.read_last(APP_DIR)   # the last run's black box, before arming wipes it
     log_path = applog.setup(APP_DIR)
     applog.install_hooks(log_path, __version__)
-    exitwatch.arm_early(APP_DIR)   # faulthandler on before the window is built (native crashes)
+    if earlystart.last_run is None:
+        exitwatch.arm_early(APP_DIR)   # faulthandler on before the window is built (native crashes)
     from soundboard.sounds.library import MIGRATION_ERRORS
     for msg in MIGRATION_ERRORS:
         log.error("%s", msg)
@@ -597,12 +589,13 @@ def main():
     i18n.startup(APP_DIR)   # before any window or module-level text is made
     import threading
     threading.Thread(target=clean_temp_leftovers, daemon=True, name="temp-clean").start()
-    try:
-        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("OnionBoard.App")
-    except Exception:  # noqa: BLE001
-        log.debug("SetCurrentProcessExplicitAppUserModelID failed", exc_info=True)
-    ui_scale_startup(APP_DIR)
-    app = QApplication(sys.argv)
+    if earlystart.up():   # main.py made the QApplication for the early loading screen
+        log.info("interface size: %d%% (loading screen up early)", earlystart.scale)
+    else:
+        earlystart.app_id()
+        ui_scale_startup(APP_DIR)
+    made = QApplication.instance()   # by main.py, for the early loading screen
+    app = made if isinstance(made, QApplication) else QApplication(sys.argv)
     if i18n.is_rtl():   # Arabic: the whole app mirrored, add-on tabs included
         from PySide6.QtCore import Qt as _Qt
         app.setLayoutDirection(_Qt.LayoutDirection.RightToLeft)
@@ -623,7 +616,8 @@ def main():
     applog.ui_ready()
     if "--restart-after" in sys.argv:   # restarted by the app (Settings > Reset)
         wait_for_exit(sys.argv[sys.argv.index("--restart-after") + 1:][:1])
-    if not claim_single_instance():
+    # (taken in main.py for the early loading screen: the lock is this copy's)
+    if not earlystart.locked() and not claim_single_instance():
         log.info("another Onion Board is running; asked it to come to the front")
         bootmark.clear(APP_DIR)   # a normal end, not a start that failed
         sys.exit(0)
@@ -635,7 +629,8 @@ def main():
     app.instance_server = server   # pyright: ignore[reportAttributeAccessIssue]  # kept alive on the app
     from soundboard.core.autostart import TRAY_ARG
     from soundboard.ui.bun import splash
-    if TRAY_ARG not in sys.argv:   # a cold start can take seconds: show Bun meanwhile
+    # a cold start can take seconds: show Bun meanwhile (from main.py, he's up already)
+    if TRAY_ARG not in sys.argv and not earlystart.shown():
         bootmark.watch_stall(APP_DIR)   # a slow one writes down where it waited
         splash.show()
     from soundboard.online import ffmpegget

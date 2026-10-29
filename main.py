@@ -41,6 +41,9 @@ if __name__ == "__main__" and not (set(sys.argv[1:]) & set(bootmark.ONE_OFF)):
     # a breadcrumb before the heavy import below, so a crash while it loads is counted
     from soundboard import __version__  # noqa: E402
     bootmark.start(__version__)
+    # Bun on screen now, not after the heavy import below: the copy that runs only
+    from soundboard.core import earlystart  # noqa: E402
+    earlystart.show(sys.argv, bootmark.app_dir())
 
 try:
     from soundboard.core.app import main  # noqa: E402

@@ -23,14 +23,26 @@ INSTANCE_NAME = os.environ.get("ONIONBOARD_INSTANCE", "OnionBoard.App")
 CONNECT_SECONDS = 5.0   # how long a second launch waits for the first to answer
 
 
+def take_lock() -> bool:
+    """Only the lock, no Qt: True when this process takes it now (it's held until the
+    process exits). core/earlystart.py takes it this way before the loading screen, so
+    a second launch never shows one; claim_single_instance does the rest."""
+    k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    k32.CreateMutexW.restype = ctypes.c_void_p
+    k32.CloseHandle.argtypes = (ctypes.c_void_p,)
+    handle = k32.CreateMutexW(None, False, f"Local\\{INSTANCE_NAME}")
+    if handle and ctypes.get_last_error() != 183:   # 183 = ERROR_ALREADY_EXISTS
+        take_lock.handle = handle
+        return True
+    if handle:
+        k32.CloseHandle(handle)   # the other copy's: not kept alive by this one
+    return False
+
+
 def claim_single_instance() -> bool:
     """True if we're the only Onion Board running. Otherwise asks the running one to
     come to the front and returns False."""
-    k32 = ctypes.WinDLL("kernel32", use_last_error=True)
-    k32.CreateMutexW.restype = ctypes.c_void_p
-    handle = k32.CreateMutexW(None, False, f"Local\\{INSTANCE_NAME}")
-    if handle and ctypes.get_last_error() != 183:   # 183 = ERROR_ALREADY_EXISTS
-        claim_single_instance.handle = handle        # held until the process exits
+    if take_lock():
         return True
     try:
         ctypes.windll.user32.AllowSetForegroundWindow(-1)   # ASFW_ANY: let it take focus

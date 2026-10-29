@@ -283,6 +283,7 @@ class NativeSplash:
         self._switch = sys.getswitchinterval()
         self._born = time.monotonic()
         sys.setswitchinterval(min(SWITCH_S, self._switch))   # never coarser than the app's
+        self._mine = sys.getswitchinterval()
         self._thread = threading.Thread(target=self._run, name="splash", daemon=True)
         self._thread.start()
         atexit.register(self._halt)   # never mid-frame while Python shuts down
@@ -306,7 +307,13 @@ class NativeSplash:
         self._stop.set()
         if self._thread is not threading.current_thread():
             self._thread.join(1.0)
-        sys.setswitchinterval(self._switch)
+        self._switch_back()
+
+    def _switch_back(self):
+        """The switch interval from before, unless it was set again meanwhile: up from
+        main.py (core/earlystart.py), it was there before app.py tuned it for the audio."""
+        if sys.getswitchinterval() == self._mine:
+            sys.setswitchinterval(self._switch)
 
     def leaving(self) -> bool:
         return self._leave is not None and self._thread.is_alive()
@@ -322,7 +329,7 @@ class NativeSplash:
         finally:
             self._up.set()
             if self._leave is not None:   # it said goodbye on its own: tidy up after
-                sys.setswitchinterval(self._switch)
+                self._switch_back()
                 if _splash is None:
                     _surfaces.clear()
 
