@@ -2,8 +2,9 @@
 a pop-up with the sliders (a click outside closes it). It changes what's playing
 right now and isn't saved; to keep a version of a sound, use its Edit → Effects tab instead.
 
-Two columns: speed & pitch on the left, the live effects (soundboard.audio.livefx: bass,
-treble, muffle, reverb, echo, distortion, and presets that set several) on the right.
+Two columns: speed & pitch (and the volume) on the left, the live effects
+(soundboard.audio.livefx: bass, treble, muffle, reverb, echo, distortion, and presets
+that set several) on the right.
 
 The sane range (0.25–2x, ±12 st) is always there. The greyed-out **Redline**
 section under it unlocks the silly range (up to 10x, ±36 st) and shows a rev
@@ -37,6 +38,9 @@ from soundboard.ui.kit.pixels import snap_to_pixels
 SPEED = voicefx.Param("speed", _("Speed"), 0.25, 2.0, 1.0, "x", 0.05)
 PITCH = voicefx.Param("pitch", _("Pitch"), -12, 12, 0, " st", 1)
 QUICK = (0.5, 0.75, 1.0, 1.25, 1.5, 2.0)
+VOLUME = voicefx.Param("volume", _("Volume"), livefx.VOLUME.lo, livefx.VOLUME.hi,
+                       livefx.VOLUME.default, livefx.VOLUME.unit, livefx.VOLUME.step)
+VOLUME_QUICK = (50, 100, 150, 200, 300, 400)
 REDLINE_AT = 8.0                        # the meter's red zone starts here
 REDLINE_SPEED = (0.1, 10.0)             # sounds
 REDLINE_PITCH = voicefx.Param("pitch", _("Pitch"), -36, 36, 0, " st", 1)
@@ -46,6 +50,7 @@ PITCH_QUICK = (-24.0, -12.0, 12.0, 24.0, 36.0)
 RED = "#ff4d4f"
 NAME_W, VAL_W, GAP = 48, 52, 10         # popup slider columns: name | track | value
 FX_NAME_W = 70                          # the effects column: longer names
+QUICK_SLACK = 6                         # how much a long name may push the quick rows in
 COL_W = 340                             # each column
 
 
@@ -269,6 +274,14 @@ class ValueBox(QDoubleSpinBox):
         self.setText("")   # snapped to a step the slider has
 
 
+def name_of(s: ParamSlider) -> QWidget:
+    """A popup slider's name label (the first in its row)."""
+    h = s.layout()
+    w = widget_at(h, 0) if h is not None else None
+    assert w is not None
+    return w
+
+
 def short(name: str, most: int = 14) -> str:
     """A setup's name on the transport bar's button: long ones cut with "…"."""
     return name if len(name) <= most else name[:most - 1].rstrip() + "…"
@@ -330,8 +343,9 @@ class SpeedPitchButton(QPushButton):
             what, _("All sounds")))
         sub.setObjectName("muted")
         sub.setMinimumWidth(1)   # the first to give way when a language's buttons are long
-        reset = reset_button(_("Back to 1x, no pitch change and no effects") if self.has_speed
-                             else _("Back to no pitch change and no effects"))
+        reset = reset_button(_("Back to 1x, no pitch change, no effects and 100 % volume")
+                             if self.has_speed else
+                             _("Back to no pitch change, no effects and 100 % volume"))
         reset.setObjectName("liveReset")
         icons.set_icon(reset, "reload", size=18)
         # whole buttons, never squeezed: the title's words give way first
@@ -419,6 +433,15 @@ class SpeedPitchButton(QPushButton):
         v.addWidget(section_label(_("Speed & pitch") if self.has_speed else _("Pitch")))
         self.speed = self._slider(SPEED, 1.0)
         self.pitch = self._slider(PITCH, 0.0)
+        self.volume = self._slider(VOLUME, VOLUME.default)
+        # the names' column fits the longest (Lautstärke), the quick rows under it too
+        self._name_w = max(NAME_W, *(name_of(s).sizeHint().width()
+                                     for s in (self.speed, self.pitch, self.volume)))
+        for s in (self.speed, self.pitch, self.volume):
+            name_of(s).setFixedWidth(self._name_w)
+        # the quick rows start under the track, but never so far in that six buttons
+        # stop fitting (Äänenvoimakkuus): then a little left of it
+        self._quick_x = min(self._name_w, NAME_W + QUICK_SLACK) + GAP
         v.addWidget(self.speed)
         quick = QWidget()
         quick.setObjectName("spcol")
@@ -433,6 +456,18 @@ class SpeedPitchButton(QPushButton):
         if not self.has_speed:    # a live stream can't be sped up or slowed down
             for w in (self.speed, quick, self.keep):
                 w.hide()
+
+        # --- the volume of everything here, 100 % = as it is (livefx.VOLUME)
+        v.addSpacing(2)
+        v.addWidget(self._rule())
+        self.volume.setToolTip(_("How loud they are, up to 4 times as loud. Over 100 % "
+                                 "the loudest bits are rounded off so it doesn't crackle"))
+        self.volume.changed.connect(self._fx_edited)
+        v.addWidget(self.volume)
+        vquick = QWidget()
+        vquick.setObjectName("spcol")
+        vquick.setLayout(self._volume_row(VOLUME_QUICK))
+        v.addWidget(vquick)
 
         # --- Redline: its own section, locked until you ask for it
         v.addSpacing(2)
@@ -553,7 +588,7 @@ class SpeedPitchButton(QPushButton):
     def _quick_row(self, speeds) -> QHBoxLayout:
         """Preset speeds, under the slider track so they read as part of it."""
         q = QHBoxLayout()
-        q.setContentsMargins(NAME_W + GAP, 0, 0, 0)
+        q.setContentsMargins(self._quick_x, 0, 0, 0)
         q.setSpacing(4)
         for s in speeds:
             b = QPushButton(f"{s:g}x")
@@ -563,10 +598,24 @@ class SpeedPitchButton(QPushButton):
             q.addWidget(b)
         return q
 
+    def _volume_row(self, levels) -> QHBoxLayout:
+        """Preset volumes, under the volume slider like the speeds are."""
+        q = QHBoxLayout()
+        q.setContentsMargins(self._quick_x, 0, 0, 0)
+        q.setSpacing(4)
+        for lv in levels:
+            b = QPushButton(f"{lv:g}%")
+            b.setObjectName("small")
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            b.clicked.connect(lambda __=False, lv=lv: self.volume.set_value(lv)
+                              or self._fx_edited())
+            q.addWidget(b)
+        return q
+
     def _pitch_row(self, steps) -> QHBoxLayout:
         """A stream's Redline pitches, under its meter like the speeds are."""
         q = QHBoxLayout()
-        q.setContentsMargins(NAME_W + GAP, 0, 0, 0)
+        q.setContentsMargins(self._quick_x, 0, 0, 0)
         q.setSpacing(4)
         for st in steps:
             b = QPushButton(f"{st:+g}")
@@ -670,13 +719,22 @@ class SpeedPitchButton(QPushButton):
             self._open()   # grows or shrinks for the row
 
     def fx_values(self) -> dict[str, float]:
-        return livefx.clean({k: s.value() for k, s in self.fx.items()})
+        """The effect knobs off 0 and the volume off 100 % (livefx.clean)."""
+        amounts = {k: s.value() for k, s in self.fx.items()}
+        if hasattr(self, "volume"):   # (the effects column is built before it)
+            amounts[VOLUME.key] = self.volume.value()
+        return livefx.clean(amounts)
 
     def set_fx(self, amounts: dict):
-        """Set every effect knob (missing ones go to 0)."""
+        """Set every effect knob and the volume (missing ones go to 0, and 100 %)."""
         for k, s in self.fx.items():
             s.set_value(amounts.get(k, 0.0))
+        self.volume.set_value(amounts.get(VOLUME.key, VOLUME.default))
         self._fx_edited()
+
+    def _keep_volume(self, amounts: dict) -> dict:
+        """`amounts` with the volume as it is now: a preset never changes it."""
+        return {**amounts, VOLUME.key: self.volume.value()}
 
     def apply_preset(self, name: str):
         """Set a preset's knobs, and its speed and pitch when it has them (Nightcore)."""
@@ -684,12 +742,14 @@ class SpeedPitchButton(QPushButton):
         t = livefx.tuning(p, self.has_speed)
         if t is not None:
             self.set_values(t[0], t[1], t[2] if self.has_speed else self.keep.isChecked())
-        self.set_fx(p)
+        self.set_fx(self._keep_volume(p))
 
     def preset_on(self, name: str) -> bool:
-        """The knobs (and the speed and pitch, if it sets them) are the preset's."""
+        """The knobs (and the speed and pitch, if it sets them) are the preset's, at
+        any volume."""
         p = livefx.PRESETS[name]
-        if self.fx_values() != livefx.clean(p):
+        knobs = {k: v for k, v in self.fx_values().items() if k != VOLUME.key}
+        if knobs != livefx.clean(p):
             return False
         t = livefx.tuning(p, self.has_speed)
         if t is None:
@@ -712,10 +772,10 @@ class SpeedPitchButton(QPushButton):
                                     else ({}, (1.0, 0.0, self.keep.isChecked())))
         if livefx.tuning(livefx.PRESETS[name]) is not None:
             self.set_values(speed, pitch, bool(keep))
-        self.set_fx(fx)
+        self.set_fx(self._keep_volume(fx))
 
     def _light_presets(self):
-        if hasattr(self, "keep"):   # (the effects column is built before the sliders)
+        if hasattr(self, "volume"):   # (the effects column is built before the sliders)
             for name, b in self.fx_presets.items():
                 b.setChecked(self.preset_on(name))
 

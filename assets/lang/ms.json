@@ -2259,7 +2259,6 @@
   "Your sounds, screen triggers, live radio and programs in full quality (no voice chat shaping), at their own volume. In OBS: Sources → + → Audio Output Capture → this device (for a virtual cable: Audio Input Capture → its Output end). One device at a time.": "Bunyi anda, pencetus skrin, radio langsung dan program dalam kualiti penuh (tanpa pembentukan sembang suara), pada kelantangan sendiri. Dalam OBS: Sources → + → Audio Output Capture → peranti ini (untuk kabel maya: Audio Input Capture → hujung Output-nya). Satu peranti pada satu masa.",
   "What {name} gets": "Apa yang {name} dapat",
   "All programs": "Semua program",
-  "Back to no pitch change and no effects": "Kembali kepada tiada perubahan pic dan tiada kesan",
   "No thanks": "Tidak, terima kasih",
   "Onion Board shows {name} after a restart.": "Onion Board menunjukkan {name} selepas dimulakan semula.",
   "Pitch and effects of the programs you send": "Pic dan kesan program yang anda hantar",
@@ -4587,5 +4586,8 @@
   "{label} preset": "Pratetap {label}",
   "Just my voice: Strong cleaning, a strict sensitivity and your voice kept at one loudness. Quiet words can be cut: speak up.": "Suara saya sahaja: pembersihan Kuat, kepekaan ketat dan suara anda sentiasa sama kuat. Kata-kata perlahan mungkin terpotong: bercakap dengan kuat.",
   "Loud room: Strong cleaning and a stricter sensitivity, for loud fans, a TV or people talking nearby.": "Bilik bising: pembersihan Kuat dan kepekaan lebih ketat, untuk kipas yang bising, TV atau orang yang bercakap berdekatan.",
-  "Normal: noise cleaned, and the sensitivity set by itself.": "Biasa: hingar dibersihkan, dan kepekaan ditetapkan sendiri."
+  "Normal: noise cleaned, and the sensitivity set by itself.": "Biasa: hingar dibersihkan, dan kepekaan ditetapkan sendiri.",
+  "Back to 1x, no pitch change, no effects and 100 % volume": "Kembali ke 1x, tiada perubahan pic, tiada kesan dan kelantangan 100 %",
+  "Back to no pitch change, no effects and 100 % volume": "Kembali kepada tiada perubahan pic, tiada kesan dan kelantangan 100 %",
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Sekuat mana bunyinya, sehingga 4 kali ganda. Melebihi 100 %, bahagian paling kuat dibulatkan supaya tidak pecah"
 }

@@ -2259,7 +2259,6 @@
   "Your sounds, screen triggers, live radio and programs in full quality (no voice chat shaping), at their own volume. In OBS: Sources → + → Audio Output Capture → this device (for a virtual cable: Audio Input Capture → its Output end). One device at a time.": "사운드, 화면 트리거, 라이브 라디오와 프로그램을 원래 품질 그대로(음성 채팅용 다듬기 없이), 별도 볼륨으로 보냅니다. OBS에서: 소스 → + → Audio Output Capture → 이 장치 (가상 케이블이면: Audio Input Capture → 그 Output 쪽). 한 번에 한 장치만 됩니다.",
   "What {name} gets": "{name}에 보내는 것",
   "All programs": "모든 프로그램",
-  "Back to no pitch change and no effects": "피치 변경과 효과 없이 되돌리기",
   "No thanks": "괜찮습니다",
   "Onion Board shows {name} after a restart.": "다시 시작하면 Onion Board가 {name}(으)로 표시됩니다.",
   "Pitch and effects of the programs you send": "보내는 프로그램의 피치와 효과",
@@ -4587,5 +4586,8 @@
   "{label} preset": "{label} 프리셋",
   "Just my voice: Strong cleaning, a strict sensitivity and your voice kept at one loudness. Quiet words can be cut: speak up.": "내 목소리만: 강한 잡음 제거, 엄격한 감도, 목소리 크기를 항상 일정하게. 작은 말은 잘릴 수 있으니 크게 말하세요.",
   "Loud room: Strong cleaning and a stricter sensitivity, for loud fans, a TV or people talking nearby.": "시끄러운 방: 강한 잡음 제거와 더 엄격한 감도. 시끄러운 팬, TV, 근처에서 말하는 사람에게 좋아요.",
-  "Normal: noise cleaned, and the sensitivity set by itself.": "보통: 잡음을 없애고 감도는 알아서 맞춰져요."
+  "Normal: noise cleaned, and the sensitivity set by itself.": "보통: 잡음을 없애고 감도는 알아서 맞춰져요.",
+  "Back to 1x, no pitch change, no effects and 100 % volume": "1배속, 피치 변경 없음, 효과 없음, 볼륨 100 %로",
+  "Back to no pitch change, no effects and 100 % volume": "피치 변경과 효과 없이, 볼륨 100 %로 되돌리기",
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "소리 크기, 최대 4배까지. 100 %를 넘으면 소리가 깨지지 않도록 가장 큰 부분을 둥글게 다듬어요"
 }

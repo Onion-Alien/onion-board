@@ -69,3 +69,18 @@ def test_back_to_zero_goes_idle_and_passes_straight_through():
     for i in range(0, len(x), BLOCK):
         y = f.process(x[i:i + BLOCK], {})
     assert f.idle and np.array_equal(y, x[i:i + BLOCK])
+
+
+def test_volume_scales_and_a_boost_never_clips():
+    assert livefx.clean({"volume": 100}) == {}
+    assert livefx.clean({"volume": 900}) == {"volume": 400.0}
+    x = _tone(440)
+    assert abs(_rms(_run({"volume": 50}, x)) - _rms(x) / 2) < 1e-3
+    loud = _run({"volume": 400}, x)
+    assert _rms(loud) > 2 * _rms(x) and np.abs(loud).max() <= 1.0
+    f = livefx.LiveFx(RATE)
+    f.process(x[:BLOCK], {"volume": 200})
+    assert not f.idle
+    back = f.process(x[BLOCK:2 * BLOCK], {})   # glides back to 100 %, then idles
+    assert np.isfinite(back).all() and f.idle
+    assert np.array_equal(f.process(x[:BLOCK], {}), x[:BLOCK])

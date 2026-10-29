@@ -2306,7 +2306,6 @@
   "Your sounds, screen triggers, live radio and programs in full quality (no voice chat shaping), at their own volume. In OBS: Sources → + → Audio Output Capture → this device (for a virtual cable: Audio Input Capture → its Output end). One device at a time.": "A hangjaid, a képernyő-triggerek, az élő rádió és a programok teljes minőségben (hangcsevegés-formázás nélkül), a saját hangerejükön. Az OBS-ben: Sources → + → Audio Output Capture → ez az eszköz (virtuális kábelnél: Audio Input Capture → az Output vége). Egyszerre egy eszköz.",
   "What {name} gets": "Mit kap: {name}",
   "All programs": "Minden program",
-  "Back to no pitch change and no effects": "Vissza hangmagasság-változás és effektek nélkülre",
   "No thanks": "Nem, köszi",
   "Onion Board shows {name} after a restart.": "Az Onion Board újraindítás után ezen a nyelven jelenik meg: {name}.",
   "Pitch and effects of the programs you send": "Az elküldött programok hangmagassága és effektjei",
@@ -4669,5 +4668,8 @@
   "{label} preset": "{label} előbeállítás",
   "Just my voice: Strong cleaning, a strict sensitivity and your voice kept at one loudness. Quiet words can be cut: speak up.": "Csak a hangom: Erős tisztítás, szigorú érzékenység és mindig egyforma hangerő. A halk szavak elveszhetnek: beszélj hangosan.",
   "Loud room: Strong cleaning and a stricter sensitivity, for loud fans, a TV or people talking nearby.": "Hangos szoba: Erős tisztítás és szigorúbb érzékenység, hangos ventilátorokhoz, tévéhez vagy a közelben beszélgetőkhöz.",
-  "Normal: noise cleaned, and the sensitivity set by itself.": "Normál: a zaj eltűnik, az érzékenység magától beáll."
+  "Normal: noise cleaned, and the sensitivity set by itself.": "Normál: a zaj eltűnik, az érzékenység magától beáll.",
+  "Back to 1x, no pitch change, no effects and 100 % volume": "Vissza 1x-re, hangmagasság-változás és effektek nélkül, 100 % hangerővel",
+  "Back to no pitch change, no effects and 100 % volume": "Vissza hangmagasság-változás és effektek nélkül, 100 % hangerővel",
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Milyen hangosan szólnak, akár 4-szer hangosabban. 100 % fölött a leghangosabb részek lekerekítve, hogy ne recsegjen"
 }

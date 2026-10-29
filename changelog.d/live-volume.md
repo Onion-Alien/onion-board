@@ -1,0 +1,1 @@
+- Live controls: a Volume slider (0 to 400 %) with quick buttons, on the Sounds, Radio and Apps tabs. Over 100 % the loudest bits are rounded off instead of crackling. Presets leave it where it is; Reset puts it back to 100 %. *Save as new pad* keeps it.

@@ -2259,7 +2259,6 @@
   "Your sounds, screen triggers, live radio and programs in full quality (no voice chat shaping), at their own volume. In OBS: Sources → + → Audio Output Capture → this device (for a virtual cable: Audio Input Capture → its Output end). One device at a time.": "Âm thanh của bạn, kích hoạt màn hình, radio trực tiếp và chương trình ở chất lượng đầy đủ (không xử lý cho voice chat), với âm lượng riêng. Trong OBS: Sources → + → Audio Output Capture → thiết bị này (với cáp ảo: Audio Input Capture → đầu Output của nó). Mỗi lần một thiết bị.",
   "What {name} gets": "{name} nhận gì",
   "All programs": "Tất cả các chương trình",
-  "Back to no pitch change and no effects": "Về lại không đổi cao độ và không hiệu ứng",
   "No thanks": "Không, cảm ơn",
   "Onion Board shows {name} after a restart.": "Onion Board sẽ hiển thị bằng {name} sau khi khởi động lại.",
   "Pitch and effects of the programs you send": "Cao độ và hiệu ứng của các chương trình bạn gửi",
@@ -4587,5 +4586,8 @@
   "{label} preset": "Mẫu {label}",
   "Just my voice: Strong cleaning, a strict sensitivity and your voice kept at one loudness. Quiet words can be cut: speak up.": "Chỉ giọng tôi: làm sạch Mạnh, độ nhạy chặt và giọng bạn luôn to như nhau. Những lời nói nhỏ có thể bị cắt: hãy nói to.",
   "Loud room: Strong cleaning and a stricter sensitivity, for loud fans, a TV or people talking nearby.": "Phòng ồn: làm sạch Mạnh và độ nhạy chặt hơn, cho quạt ồn, TV hoặc người nói chuyện gần đó.",
-  "Normal: noise cleaned, and the sensitivity set by itself.": "Bình thường: tiếng ồn được làm sạch, độ nhạy tự đặt."
+  "Normal: noise cleaned, and the sensitivity set by itself.": "Bình thường: tiếng ồn được làm sạch, độ nhạy tự đặt.",
+  "Back to 1x, no pitch change, no effects and 100 % volume": "Về lại 1x, không đổi cao độ, không hiệu ứng và âm lượng 100 %",
+  "Back to no pitch change, no effects and 100 % volume": "Về lại không đổi cao độ, không hiệu ứng và âm lượng 100 %",
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Âm thanh to cỡ nào, tối đa gấp 4 lần. Trên 100 %, những chỗ to nhất được làm tròn để không bị rè"
 }

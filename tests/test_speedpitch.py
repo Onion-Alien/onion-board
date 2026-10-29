@@ -361,3 +361,27 @@ def test_live_header_buttons_fit_their_words_on_the_screen_they_open_on(qapp):
     finally:
         button.pop.close()
         button.deleteLater()
+
+
+@pytest.mark.parametrize("what", ["sounds", "radio"])
+def test_live_volume_is_sent_kept_by_presets_and_reset(qapp, what):
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
+
+    button = SpeedPitchButton(what)
+    sent = []
+    button.fx_changed.connect(sent.append)
+    try:
+        assert button.volume.isVisibleTo(button.pop)
+        button.volume.set_value(200)
+        button.volume.changed.emit()
+        assert sent[-1] == {"volume": 200.0}
+        button.fx_presets["Bass boosted"].click()
+        assert sent[-1] == {"volume": 200.0, "bass": 12.0}
+        assert button.preset_on("Bass boosted")
+        button.fx_presets["Bass boosted"].click()   # undone: the volume stays
+        assert sent[-1] == {"volume": 200.0}
+        button.reset()
+        assert sent[-1] == {} and button.volume.value() == 100
+    finally:
+        button.pop.close()
+        button.deleteLater()

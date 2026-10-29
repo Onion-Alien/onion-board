@@ -2259,7 +2259,6 @@
   "Your sounds, screen triggers, live radio and programs in full quality (no voice chat shaping), at their own volume. In OBS: Sources → + → Audio Output Capture → this device (for a virtual cable: Audio Input Capture → its Output end). One device at a time.": "サウンド、画面トリガー、ライブラジオ、プログラムをフル品質で（ボイスチャット向けの調整なし）、専用の音量で送ります。OBS では: ソース → + → Audio Output Capture → このデバイス（仮想ケーブルなら: Audio Input Capture → その Output 側）。一度に 1 台だけです。",
   "What {name} gets": "{name} に送る内容",
   "All programs": "すべてのプログラム",
-  "Back to no pitch change and no effects": "ピッチ変更なし、エフェクトなしに戻す",
   "No thanks": "いいえ、結構です",
   "Onion Board shows {name} after a restart.": "再起動後、Onion Board は{name}で表示されます。",
   "Pitch and effects of the programs you send": "送信するプログラムのピッチとエフェクト",
@@ -4587,5 +4586,8 @@
   "{label} preset": "プリセット「{label}」",
   "Just my voice: Strong cleaning, a strict sensitivity and your voice kept at one loudness. Quiet words can be cut: speak up.": "自分の声だけ：強いノイズ除去、厳しめの感度、声の大きさをいつも一定に。小さな声は切れることがあるので、はっきり話してください。",
   "Loud room: Strong cleaning and a stricter sensitivity, for loud fans, a TV or people talking nearby.": "うるさい部屋：強いノイズ除去と厳しめの感度。うるさいファン、テレビ、近くの話し声に。",
-  "Normal: noise cleaned, and the sensitivity set by itself.": "標準：ノイズを取り、感度は自動で決まります。"
+  "Normal: noise cleaned, and the sensitivity set by itself.": "標準：ノイズを取り、感度は自動で決まります。",
+  "Back to 1x, no pitch change, no effects and 100 % volume": "1倍速、ピッチ変更なし、エフェクトなし、音量 100 % に戻す",
+  "Back to no pitch change, no effects and 100 % volume": "ピッチ変更なし、エフェクトなし、音量 100 % に戻す",
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "音の大きさ。最大 4 倍まで。100 % を超えると、音割れしないように一番大きな部分を丸めます"
 }

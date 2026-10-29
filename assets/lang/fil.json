@@ -2306,7 +2306,6 @@
   "Your sounds, screen triggers, live radio and programs in full quality (no voice chat shaping), at their own volume. In OBS: Sources → + → Audio Output Capture → this device (for a virtual cable: Audio Input Capture → its Output end). One device at a time.": "Ang mga sound mo, screen trigger, live radio at mga program sa buong kalidad (walang paghubog para sa voice chat), sa sarili nilang volume. Sa OBS: Sources → + → Audio Output Capture → ang device na ito (para sa virtual cable: Audio Input Capture → ang Output end nito). Isang device lang sa isang pagkakataon.",
   "What {name} gets": "Ang nakukuha ng {name}",
   "All programs": "Lahat ng program",
-  "Back to no pitch change and no effects": "Balik sa walang pitch change at walang effects",
   "No thanks": "Hindi, salamat",
   "Onion Board shows {name} after a restart.": "Ipapakita ng Onion Board ang {name} pagkatapos mag-restart.",
   "Pitch and effects of the programs you send": "Pitch at effects ng mga program na ipinapadala mo",
@@ -4669,5 +4668,8 @@
   "{label} preset": "Preset na {label}",
   "Just my voice: Strong cleaning, a strict sensitivity and your voice kept at one loudness. Quiet words can be cut: speak up.": "Boses ko lang: Malakas na paglilinis, mahigpit na sensitivity at pare-parehong lakas ng boses mo. Puwedeng maputol ang mahihinang salita: magsalita nang malakas.",
   "Loud room: Strong cleaning and a stricter sensitivity, for loud fans, a TV or people talking nearby.": "Maingay na kuwarto: Malakas na paglilinis at mas mahigpit na sensitivity, para sa maiingay na bentilador, TV o mga taong nag-uusap sa malapit.",
-  "Normal: noise cleaned, and the sensitivity set by itself.": "Normal: nililinis ang ingay, at kusang naitatakda ang sensitivity."
+  "Normal: noise cleaned, and the sensitivity set by itself.": "Normal: nililinis ang ingay, at kusang naitatakda ang sensitivity.",
+  "Back to 1x, no pitch change, no effects and 100 % volume": "Balik sa 1x, walang pitch change, walang effects at 100 % volume",
+  "Back to no pitch change, no effects and 100 % volume": "Balik sa walang pitch change, walang effects at 100 % volume",
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Gaano kalakas sila, hanggang 4 na beses. Lampas 100 %, pinapakinis ang pinakamalalakas na bahagi para hindi mag-crackle"
 }

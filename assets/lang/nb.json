@@ -2306,7 +2306,6 @@
   "Your sounds, screen triggers, live radio and programs in full quality (no voice chat shaping), at their own volume. In OBS: Sources → + → Audio Output Capture → this device (for a virtual cable: Audio Input Capture → its Output end). One device at a time.": "Lydene dine, skjermtriggere, liveradio og programmer i full kvalitet (uten forming for talechat), med eget volum. I OBS: Kilder → + → Audio Output Capture → denne enheten (for en virtuell kabel: Audio Input Capture → Output-enden). Én enhet om gangen.",
   "What {name} gets": "Hva {name} får",
   "All programs": "Alle programmer",
-  "Back to no pitch change and no effects": "Tilbake til ingen tonehøydeendring og ingen effekter",
   "No thanks": "Nei takk",
   "Onion Board shows {name} after a restart.": "Onion Board viser {name} etter en omstart.",
   "Pitch and effects of the programs you send": "Tonehøyde og effekter for programmene du sender",
@@ -4669,5 +4668,8 @@
   "{label} preset": "Forhåndsinnstilling {label}",
   "Just my voice: Strong cleaning, a strict sensitivity and your voice kept at one loudness. Quiet words can be cut: speak up.": "Bare stemmen min: Sterk rensing, en streng følsomhet og stemmen din alltid like høy. Stille ord kan bli kuttet: snakk høyt nok.",
   "Loud room: Strong cleaning and a stricter sensitivity, for loud fans, a TV or people talking nearby.": "Bråkete rom: Sterk rensing og en strengere følsomhet, for høye vifter, en TV eller folk som snakker i nærheten.",
-  "Normal: noise cleaned, and the sensitivity set by itself.": "Normal: støyen renses bort, og følsomheten stiller seg selv."
+  "Normal: noise cleaned, and the sensitivity set by itself.": "Normal: støyen renses bort, og følsomheten stiller seg selv.",
+  "Back to 1x, no pitch change, no effects and 100 % volume": "Tilbake til 1x, ingen tonehøydeendring, ingen effekter og 100 % volum",
+  "Back to no pitch change, no effects and 100 % volume": "Tilbake til ingen tonehøydeendring, ingen effekter og 100 % volum",
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Hvor høyt de spilles, opptil 4 ganger så høyt. Over 100 % rundes de høyeste toppene av så det ikke knaser"
 }

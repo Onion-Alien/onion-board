@@ -2259,7 +2259,6 @@
   "Your sounds, screen triggers, live radio and programs in full quality (no voice chat shaping), at their own volume. In OBS: Sources → + → Audio Output Capture → this device (for a virtual cable: Audio Input Capture → its Output end). One device at a time.": "你的音效、螢幕觸發器、直播電台和程式，保持完整音質（不做語音聊天調整），音量各自獨立。在 OBS 裡：來源 → + → 音訊輸出擷取 → 這個裝置（虛擬音源線：音訊輸入擷取 → 它的 Output 端）。一次只能一個裝置。",
   "What {name} gets": "{name} 收到的內容",
   "All programs": "所有程式",
-  "Back to no pitch change and no effects": "回到不變音高也不加效果",
   "No thanks": "不，謝謝",
   "Onion Board shows {name} after a restart.": "重新啟動後 Onion Board 會顯示{name}。",
   "Pitch and effects of the programs you send": "你傳送的程式的音高和效果",
@@ -4587,5 +4586,8 @@
   "{label} preset": "{label}預設",
   "Just my voice: Strong cleaning, a strict sensitivity and your voice kept at one loudness. Quiet words can be cut: speak up.": "只有我的聲音：強降噪、嚴格的靈敏度，聲音始終一樣大。小聲的話可能被切掉：請大聲說。",
   "Loud room: Strong cleaning and a stricter sensitivity, for loud fans, a TV or people talking nearby.": "吵雜房間：強降噪和更嚴格的靈敏度，適合吵的風扇、電視或旁邊有人說話。",
-  "Normal: noise cleaned, and the sensitivity set by itself.": "標準：清除雜訊，靈敏度自動設定。"
+  "Normal: noise cleaned, and the sensitivity set by itself.": "標準：清除雜訊，靈敏度自動設定。",
+  "Back to 1x, no pitch change, no effects and 100 % volume": "回到 1x、不變音高、不加效果、音量 100 %",
+  "Back to no pitch change, no effects and 100 % volume": "回到不變音高、不加效果、音量 100 %",
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "聲音多大，最高 4 倍。超過 100 % 時會把最響的部分修圓，不會爆音"
 }

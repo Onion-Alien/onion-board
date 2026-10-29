@@ -2259,7 +2259,6 @@
   "Your sounds, screen triggers, live radio and programs in full quality (no voice chat shaping), at their own volume. In OBS: Sources → + → Audio Output Capture → this device (for a virtual cable: Audio Input Capture → its Output end). One device at a time.": "เสียงของคุณ ทริกเกอร์หน้าจอ วิทยุสด และโปรแกรมแบบคุณภาพเต็ม (ไม่ปรับสำหรับแชทเสียง) พร้อมระดับเสียงของมันเอง ใน OBS: Sources → + → Audio Output Capture → อุปกรณ์นี้ (สำหรับสายเสมือน: Audio Input Capture → ปลาย Output ของมัน) ใช้ได้ทีละอุปกรณ์",
   "What {name} gets": "สิ่งที่ {name} ได้รับ",
   "All programs": "โปรแกรมทั้งหมด",
-  "Back to no pitch change and no effects": "กลับเป็นไม่เปลี่ยนพิตช์และไม่มีเอฟเฟกต์",
   "No thanks": "ไม่ล่ะ ขอบคุณ",
   "Onion Board shows {name} after a restart.": "Onion Board แสดง {name} หลังจากรีสตาร์ท",
   "Pitch and effects of the programs you send": "พิตช์และเอฟเฟกต์ของโปรแกรมที่คุณส่ง",
@@ -4587,5 +4586,8 @@
   "{label} preset": "พรีเซ็ต {label}",
   "Just my voice: Strong cleaning, a strict sensitivity and your voice kept at one loudness. Quiet words can be cut: speak up.": "เฉพาะเสียงฉัน: ลดเสียงรบกวนแรง ความไวเข้มงวด และเสียงคุณดังเท่าเดิมตลอด คำที่พูดเบาอาจถูกตัด: พูดให้ดัง",
   "Loud room: Strong cleaning and a stricter sensitivity, for loud fans, a TV or people talking nearby.": "ห้องเสียงดัง: ลดเสียงรบกวนแรงและความไวที่เข้มงวดขึ้น สำหรับพัดลมเสียงดัง ทีวี หรือคนที่คุยอยู่ใกล้ๆ",
-  "Normal: noise cleaned, and the sensitivity set by itself.": "ปกติ: ลดเสียงรบกวน และความไวตั้งเองอัตโนมัติ"
+  "Normal: noise cleaned, and the sensitivity set by itself.": "ปกติ: ลดเสียงรบกวน และความไวตั้งเองอัตโนมัติ",
+  "Back to 1x, no pitch change, no effects and 100 % volume": "กลับเป็น 1x ไม่เปลี่ยนพิตช์ ไม่มีเอฟเฟกต์ และระดับเสียง 100 %",
+  "Back to no pitch change, no effects and 100 % volume": "กลับเป็นไม่เปลี่ยนพิตช์ ไม่มีเอฟเฟกต์ และระดับเสียง 100 %",
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "ดังแค่ไหน ได้สูงสุด 4 เท่า เกิน 100 % ส่วนที่ดังที่สุดจะถูกปัดให้มนเพื่อไม่ให้เสียงแตก"
 }

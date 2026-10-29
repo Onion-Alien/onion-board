@@ -2306,7 +2306,6 @@
   "Your sounds, screen triggers, live radio and programs in full quality (no voice chat shaping), at their own volume. In OBS: Sources → + → Audio Output Capture → this device (for a virtual cable: Audio Input Capture → its Output end). One device at a time.": "Tes sons, déclencheurs d'écran, radio en direct et programmes en pleine qualité (sans adaptation au chat vocal), avec leur propre volume. Dans OBS : Sources → + → Audio Output Capture → ce périphérique (pour un câble virtuel : Audio Input Capture → son côté Output). Un seul périphérique à la fois.",
   "What {name} gets": "Ce que reçoit {name}",
   "All programs": "Tous les programmes",
-  "Back to no pitch change and no effects": "Retour à aucun changement de hauteur ni effet",
   "No thanks": "Non merci",
   "Onion Board shows {name} after a restart.": "Onion Board affiche {name} après un redémarrage.",
   "Pitch and effects of the programs you send": "Hauteur et effets des programmes que tu envoies",
@@ -4669,5 +4668,8 @@
   "{label} preset": "Préréglage {label}",
   "Just my voice: Strong cleaning, a strict sensitivity and your voice kept at one loudness. Quiet words can be cut: speak up.": "Juste ma voix : nettoyage Fort, une sensibilité stricte et ta voix toujours au même volume. Les mots trop bas peuvent être coupés : parle assez fort.",
   "Loud room: Strong cleaning and a stricter sensitivity, for loud fans, a TV or people talking nearby.": "Pièce bruyante : nettoyage Fort et une sensibilité plus stricte, pour des ventilos bruyants, une télé ou des gens qui parlent à côté.",
-  "Normal: noise cleaned, and the sensitivity set by itself.": "Normal : le bruit est nettoyé, et la sensibilité se règle toute seule."
+  "Normal: noise cleaned, and the sensitivity set by itself.": "Normal : le bruit est nettoyé, et la sensibilité se règle toute seule.",
+  "Back to 1x, no pitch change, no effects and 100 % volume": "Retour à 1x, sans changement de hauteur, sans effets et volume à 100 %",
+  "Back to no pitch change, no effects and 100 % volume": "Retour à aucun changement de hauteur, aucun effet et volume à 100 %",
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Le volume, jusqu'à 4 fois plus fort. Au-dessus de 100 %, les pics sont arrondis pour que ça ne grésille pas"
 }

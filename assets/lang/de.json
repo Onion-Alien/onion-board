@@ -2306,7 +2306,6 @@
   "Your sounds, screen triggers, live radio and programs in full quality (no voice chat shaping), at their own volume. In OBS: Sources → + → Audio Output Capture → this device (for a virtual cable: Audio Input Capture → its Output end). One device at a time.": "Deine Sounds, Bildschirm-Trigger, Live-Radio und Programme in voller Qualität (ohne Voice-Chat-Anpassung), mit eigener Lautstärke. In OBS: Quellen → + → Audioausgabeaufnahme → dieses Gerät (bei einem virtuellen Kabel: Audioeingabeaufnahme → sein Output-Ende). Immer nur ein Gerät.",
   "What {name} gets": "Was {name} bekommt",
   "All programs": "Alle Programme",
-  "Back to no pitch change and no effects": "Zurück zu keiner Tonhöhenänderung und keinen Effekten",
   "No thanks": "Nein danke",
   "Onion Board shows {name} after a restart.": "Onion Board zeigt nach einem Neustart {name}.",
   "Pitch and effects of the programs you send": "Tonhöhe und Effekte der Programme, die du sendest",
@@ -4669,5 +4668,8 @@
   "{label} preset": "Vorlage {label}",
   "Just my voice: Strong cleaning, a strict sensitivity and your voice kept at one loudness. Quiet words can be cut: speak up.": "Nur meine Stimme: Starke Säuberung, eine strenge Empfindlichkeit und deine Stimme immer gleich laut. Leise Worte können wegfallen: sprich laut genug.",
   "Loud room: Strong cleaning and a stricter sensitivity, for loud fans, a TV or people talking nearby.": "Lauter Raum: Starke Säuberung und eine strengere Empfindlichkeit, für laute Lüfter, einen Fernseher oder Leute, die in der Nähe reden.",
-  "Normal: noise cleaned, and the sensitivity set by itself.": "Normal: Rauschen wird entfernt, die Empfindlichkeit stellt sich selbst ein."
+  "Normal: noise cleaned, and the sensitivity set by itself.": "Normal: Rauschen wird entfernt, die Empfindlichkeit stellt sich selbst ein.",
+  "Back to 1x, no pitch change, no effects and 100 % volume": "Zurück auf 1x, keine Tonhöhenänderung, keine Effekte, 100 % Lautstärke",
+  "Back to no pitch change, no effects and 100 % volume": "Zurück zu keiner Tonhöhenänderung, keinen Effekten und 100 % Lautstärke",
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Wie laut sie sind, bis zu 4-mal so laut. Über 100 % werden die lautesten Stellen abgerundet, damit es nicht knackt"
 }

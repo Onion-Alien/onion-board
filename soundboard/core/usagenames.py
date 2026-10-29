@@ -79,7 +79,8 @@ LIVE_TABS = ("sounds", "radio", "apps")
 # the Live controls' sliders and switches (ui/sounds/speedpitch.py; the effects by their
 # livefx.PARAMS keys, "crunch" being Distortion)
 LIVE_CONTROLS = ("speed", "pitch", "keep-pitch", "redline", "reset",
-                 *(f"fx-{k}" for k in ("bass", "treble", "muffle", "reverb", "echo", "crunch")))
+                 *(f"fx-{k}" for k in ("bass", "treble", "muffle", "reverb", "echo", "crunch",
+                                          "volume")))
 # their effect presets (audio/livefx.py PRESETS, as dashed words); any other is "other"
 LIVE_PRESETS = ("nightcore", "slowed-reverb", "bass-boosted", "chipmunk", "deep-voice",
                 "underwater", "other")
