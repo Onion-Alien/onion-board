@@ -10,6 +10,11 @@ Strong is DeepFilterNet (voicefx.deepfilter), an optional download: the Cleaner 
 the mic to it once it's there and running, and cleans with RNNoise (Normal) while it
 starts or after it has stopped (`note` says why).
 
+Whichever cleans, `Tidy` then filters out rumble under 80 Hz and (Normal, Strong) turns
+the mic down between your words: the network keeps any voice, a TV's or a quiet one
+across the room too, and a gate that learns your room's level drops those while you're
+quiet. No delay of its own.
+
 The voice chain runs a `Cleaner` first on every mic block (VoiceChain.set_clean), so
 the voice changer, AI voices and speech recognition all get the cleaned mic.
 """
@@ -32,6 +37,7 @@ SCALE = 32768.0      # it works on 16-bit sample values held in floats
 STRENGTHS = ("light", "normal", "strong")
 DEFAULT = "normal"
 LIGHT_DRY = 10 ** (-12 / 20)   # Light: the mic as it was, 12 dB under the cleaned one
+RUMBLE_HZ = 80                 # Tidy's high-pass
 NAME = "rnnoise.dll"
 DIR = (Path(sys._MEIPASS) / "rnnoise" if hasattr(sys, "_MEIPASS")   # pyright: ignore[reportAttributeAccessIssue]
        else Path(__file__).resolve().parents[2] / "build" / "rnnoise")
@@ -85,6 +91,67 @@ def why() -> str:
     return _why
 
 
+class Tidy:
+    """After the network, at 48 kHz: rumble under RUMBLE_HZ filtered out, and with
+    `gate` on, a downward expander that turns the mic down 18 dB between your words.
+    It decides every 2.5 ms, stays open 0.2 s after you stop, and takes the room's
+    level as the quietest moment of the last 1.5 s, so a noisy room is learned at once
+    and followed when it changes. (Voice changer's old Clean up my mic, at its default.)"""
+
+    SUB = 120            # samples a decision: 2.5 ms
+    HOLD_S = 0.2
+    FLOOR_S = 1.5
+    CLOSED = 10 ** (-18 / 20)
+
+    def __init__(self, gate: bool = True):
+        from soundboard.audio.dsp import SmoothSos, butter
+        self.gate = gate
+        self._hp = SmoothSos()
+        self._sos = butter(2, RUMBLE_HZ, btype="high", fs=RATE)
+        self.floor_db = -70.0
+        self.mins: list[tuple[float, float]] = []   # (seconds, quietest dB) a block
+        self.open = False
+        self.held = 0.0
+        self.g = 1.0
+
+    def run(self, y: np.ndarray) -> np.ndarray:
+        if not len(y):
+            return y
+        y = self._hp.run(y, self._sos).astype(np.float32, copy=False)
+        return self._gate(y) if self.gate else y
+
+    def _gate(self, x: np.ndarray) -> np.ndarray:
+        n = len(x)
+        pieces = max(1, n // self.SUB)
+        edges = np.linspace(0, n, pieces + 1).astype(int)
+        lv = np.array([np.sqrt(np.mean(x[a:b] ** 2) + 1e-12)
+                       for a, b in zip(edges[:-1], edges[1:])])
+        db = (20 * np.log10(lv)).tolist()
+        self.mins.append((n / RATE, max(min(db), -90.0)))
+        span = sum(t for t, _ in self.mins)
+        while len(self.mins) > 1 and span - self.mins[0][0] >= self.FLOOR_S:
+            span -= self.mins.pop(0)[0]
+        self.floor_db = min(min(m for _, m in self.mins), -38.0)
+        open_at, close_at = max(self.floor_db + 9, -60), max(self.floor_db + 5, -64)
+        gains = np.empty(pieces + 1)
+        gains[0] = g = self.g
+        for i, d in enumerate(db):   # (plain floats: numpy scalars cost more here)
+            piece = (edges[i + 1] - edges[i]) / RATE
+            if d > open_at:
+                self.open, self.held = True, 0.0
+            elif self.open and d < close_at:
+                self.held += piece
+                if self.held > self.HOLD_S:
+                    self.open = False
+            target = 1.0 if self.open else self.CLOSED
+            tau = 0.002 if target > g else 0.06
+            g = target + (g - target) * float(np.exp(-piece / tau))
+            gains[i + 1] = g
+        knots = np.concatenate([[-1], edges[1:] - 1])
+        self.g = float(g)
+        return (x * np.interp(np.arange(n), knots, gains)).astype(np.float32)
+
+
 def clean_settings(raw) -> dict:
     """The saved {"on": bool, "strength": "light" | "normal" | "strong"}, damaged values
     replaced."""
@@ -111,6 +178,7 @@ class Cleaner:
         self.strength = DEFAULT
         self._deep = None   # voicefx.deepfilter.Stream while Strong is picked
         self.note = ""      # why Strong stopped (RNNoise cleans instead), for the card
+        self._tidy = Tidy()
         self.set_strength(strength)
         self._frame = np.zeros(FRAME, np.float32)
         self._ptr = self._frame.ctypes.data_as(ctypes.POINTER(ctypes.c_float))
@@ -135,6 +203,7 @@ class Cleaner:
     def set_strength(self, strength: str):
         self.strength = strength if strength in STRENGTHS else DEFAULT
         self._mix = LIGHT_DRY if self.strength == "light" else 0.0
+        self._tidy.gate = self.strength != "light"   # (Light keeps some of the room)
         if self.strength == "strong" and self._deep is None:
             from soundboard.voicefx import deepfilter
             self.note = ""
@@ -189,6 +258,7 @@ class Cleaner:
     def _send(self, y: np.ndarray, n: int) -> np.ndarray:
         """Cleaned 48 kHz samples in, `n` at the mic's rate out."""
         if len(y):
+            y = self._tidy.run(y)
             if self._down is not None:
                 y = self._down.resample_chunk(y)
             self._out = np.concatenate([self._out, y])
@@ -228,7 +298,9 @@ def clean_clip(mono: np.ndarray, rate: int, strength: str = DEFAULT) -> np.ndarr
         m = soxr.resample(m, rate, RATE).astype(np.float32)
     if strength == "strong":
         from soundboard.voicefx import deepfilter
-        out = deepfilter.clean_clip(m)
+        tidy, out = Tidy(), deepfilter.clean_clip(m)
+        out = np.concatenate([tidy.run(c) for c in
+                              np.array_split(out, max(1, len(out) // 4800))])
         if rate != RATE:
             import soxr
             out = soxr.resample(out, RATE, rate).astype(np.float32)
