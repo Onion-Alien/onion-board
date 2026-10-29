@@ -279,3 +279,54 @@ def test_the_device_thread_is_started_once_not_on_every_check():
         assert w.wait(5)
     assert len(set(seen)) == 1
     assert w._thread is not None and w._thread.is_alive()
+
+
+def hanging_portaudio(monkeypatch, gate, names):
+    """PortAudio whose device queries hang until `gate` is set, then list `names`."""
+    def query_devices(idx=None):
+        gate.wait(10)
+        devs = [{"name": n, "hostapi": 0, "max_output_channels": 2,
+                 "max_input_channels": 0} for n in names]
+        return devs if idx is None else devs[idx]
+
+    def query_hostapis(idx=None):
+        gate.wait(10)
+        api = {"name": "Windows WASAPI", "default_output_device": 0,
+               "default_input_device": -1}
+        return [api] if idx is None else api
+
+    monkeypatch.setattr(eng.sd, "query_devices", query_devices)
+    monkeypatch.setattr(eng.sd, "query_hostapis", query_hostapis)
+
+
+def answered():
+    """Until the device-list thread has nothing left to answer."""
+    q = eng.devicelist._asker._open
+    assert q is None or q.wait(5)
+
+
+def test_a_hanging_device_query_gives_the_last_list_not_a_frozen_window(monkeypatch, gate):
+    gate.set()
+    hanging_portaudio(monkeypatch, gate, ["Speakers"])
+    assert [d["name"] for d in eng.list_devices("output")] == ["Speakers"]
+    assert eng.default_device_name("output") == "Speakers"
+    gate.clear()                                   # a driver stops answering
+    hanging_portaudio(monkeypatch, gate, ["Speakers", "Headset"])
+    assert [d["name"] for d in quick(eng.list_devices, "output")] == ["Speakers"]
+    for _ in range(20):                            # the next asks don't wait at all
+        assert [d["name"] for d in quick(eng.list_devices, "output")] == ["Speakers"]
+    assert quick(eng.default_device_name, "output") == "Speakers"
+    assert quick(eng.list_name, 0) == "Speakers"
+    assert quick(eng.virtual_outputs) == []
+    gate.set()                                     # it answers after all
+    answered()
+    assert [d["name"] for d in eng.list_devices("output")] == ["Speakers", "Headset"]
+
+
+def test_a_device_query_that_fails_still_raises(monkeypatch):
+    def broken(idx=None):
+        raise eng.sd.PortAudioError("Invalid device")
+    monkeypatch.setattr(eng.sd, "query_devices", broken)
+    with pytest.raises(eng.sd.PortAudioError):
+        eng.list_name(5)
+    answered()

@@ -8,7 +8,10 @@ names there, and a swap reaches the code here).
 from __future__ import annotations
 
 import logging
+import queue
+import threading
 import time
+from typing import Any
 
 import numpy as np
 import sounddevice as sd
@@ -50,51 +53,119 @@ def rescan() -> bool:
             return False
 
 
+ASK_WAIT_S = 0.25  # how long a caller waits for PortAudio before using the last answer
+
+
+class _Asker:
+    """The one thread that asks PortAudio for its devices. Its answers are usually
+    instant, but while a driver is slow or a device is being added or removed one can
+    take minutes, and the device lists are read on the UI thread: the window froze
+    with it (freeze reports in list_devices, `query_devices` / `query_hostapis`).
+    Now a caller waits at most ASK_WAIT_S and then uses the last answer (_seen); the
+    late answer still lands in _seen. While a question is unanswered the next ones
+    use _seen at once, so nothing piles up behind a stuck driver. The thread stays
+    for good once started (starting one waits for it to run, see DeviceWorker)."""
+
+    def __init__(self):
+        self._lock = threading.Lock()
+        self._q: queue.SimpleQueue = queue.SimpleQueue()
+        self._thread: threading.Thread | None = None
+        self._open: threading.Event | None = None   # the question being answered
+
+    def ask(self, fn) -> tuple[bool, Any]:
+        """(True, fn()'s result), or (False, None) when PortAudio hasn't answered in
+        time. fn's exception is raised here."""
+        if self._thread is not None and threading.get_ident() == self._thread.ident:
+            return True, fn()
+        with self._lock:
+            if self._open is not None and not self._open.is_set():
+                return False, None
+            done, box = threading.Event(), []
+            self._open = done
+            self._q.put((fn, done, box))
+            if self._thread is None:
+                self._thread = threading.Thread(target=self._loop, daemon=True,
+                                                name="device-list")
+                self._thread.start()
+        if not done.wait(ASK_WAIT_S):
+            log.warning("the device list took over %.2fs: using the last one", ASK_WAIT_S)
+            return False, None
+        ok, val = box[0]
+        if not ok:
+            raise val
+        return True, val
+
+    def _loop(self):
+        while True:
+            fn, done, box = self._q.get()
+            try:
+                box.append((True, fn()))
+            except BaseException as e:  # noqa: BLE001 - handed to the caller
+                box.append((False, e))
+            done.set()
+
+
+_asker = _Asker()
+
+
+def _ask(fn) -> tuple[bool, Any]:
+    """(True, fn()) on the query thread, holding DEVICES; (False, None) when PortAudio
+    is being re-scanned (its list is being freed) or slow to answer: the caller then
+    uses its last answer."""
+    def held():
+        if not DEVICES.acquire(blocking=False):
+            return False, None
+        try:
+            return True, fn()
+        finally:
+            DEVICES.release()
+    ok, val = _asker.ask(held)
+    return val if ok else (False, None)
+
+
+def _query_list(kind: str) -> list[dict]:
+    api = _wasapi_index()
+    key = "max_input_channels" if kind == "input" else "max_output_channels"
+    out = []
+    for i, d in enumerate(sd.query_devices()):
+        if (api is None or d["hostapi"] == api) and d[key] > 0:
+            out.append({"index": i, "name": d["name"]})
+    _seen[kind] = out
+    return out
+
+
 def list_devices(kind: str) -> list[dict]:
     """WASAPI devices of kind 'input' or 'output' as [{index, name}]."""
-    if not DEVICES.acquire(blocking=False):   # being re-scanned: the last list
-        return list(_seen.get(kind, ()))
-    try:
-        api = _wasapi_index()
-        key = "max_input_channels" if kind == "input" else "max_output_channels"
-        out = []
-        for i, d in enumerate(sd.query_devices()):
-            if (api is None or d["hostapi"] == api) and d[key] > 0:
-                out.append({"index": i, "name": d["name"]})
-        _seen[kind] = out
-        return out
-    finally:
-        DEVICES.release()
+    ok, out = _ask(lambda: _query_list(kind))
+    return out if ok else list(_seen.get(kind, ()))   # or the last list
+
+
+def _query_default(kind: str) -> str | None:
+    api = _wasapi_index()
+    if api is None:
+        return None
+    info = sd.query_hostapis(api)
+    idx = info["default_input_device" if kind == "input" else "default_output_device"]
+    name = None if idx is None or idx < 0 else sd.query_devices(idx)["name"]
+    _seen[("default", kind)] = name
+    return name
 
 
 def default_device_name(kind: str) -> str | None:
-    if not DEVICES.acquire(blocking=False):
-        return _seen.get(("default", kind))
-    try:
-        api = _wasapi_index()
-        if api is None:
-            return None
-        info = sd.query_hostapis(api)
-        idx = info["default_input_device" if kind == "input" else "default_output_device"]
-        name = None if idx is None or idx < 0 else sd.query_devices(idx)["name"]
-        _seen[("default", kind)] = name
-        return name
-    finally:
-        DEVICES.release()
+    ok, name = _ask(lambda: _query_default(kind))
+    return name if ok else _seen.get(("default", kind))
 
 
 def list_name(index: int) -> str:
     """A device's name as the device lists show it."""
-    if not DEVICES.acquire(blocking=False):
-        for kind in ("output", "input"):
-            for d in _seen.get(kind, ()):
-                if d["index"] == index:
-                    return d["name"]
-        raise LookupError(index)
-    try:
-        return sd.query_devices(index)["name"]
-    finally:
-        DEVICES.release()
+    ok, name = _ask(lambda: sd.query_devices(index)["name"])
+    if ok:
+        return name
+    for kind in ("output", "input"):
+        for d in _seen.get(kind, ()):
+            if d["index"] == index:
+                return d["name"]
+    raise LookupError(index)
 
 
 def find_device(kind: str, name: str | None) -> int | None:
