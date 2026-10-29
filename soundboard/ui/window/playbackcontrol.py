@@ -39,6 +39,7 @@ PREVIEW_WHOLE_S = 5 * 60
 PREVIEW_S = 30
 CHIPS_GAP = 6         # between the now-playing row's chips
 CHIPS_ROW_H = 30      # the now-playing row: a chip's 24 px ■ button, its margins and border
+WANTED_S = 10.0       # a sound pressed while it loads still plays once loaded within this
 
 
 def _nothing():
@@ -60,6 +61,7 @@ class PlaybackControl(Controller):
         self._stopped_at = (0.0, "")       # (when, which) a ■ for one sound last stopped
         self._cool: dict[str, float] = {}   # sid -> time.monotonic() its cooldown ends
         self._waiting: dict[str, list[QTimer]] = {}   # sid -> its delayed starts
+        self._wanted: dict[str, float] = {}   # sid -> when it was pressed while still loading
         self._preview_gen = 0            # newest effects preview (older renders are dropped)
         self._preview_done = None         # its done(ok) callback while it renders
         self._seeking = False
@@ -106,7 +108,8 @@ class PlaybackControl(Controller):
                 mw.toast(_("“{name}” can't play until its effects are applied ({how})",
                            name=html.escape(m.name), how=mw.editctl.render_words(sid)),
                          "warn", key="render-wait")
-            else:
+            else:   # it plays once it's loaded (loaded()), as a press a moment later would
+                self._wanted[sid] = time.monotonic()
                 mw.toast(_("“{name}” is still loading…", name=html.escape(m.name)), "warn")
             return
         if sid != LINK_ID and LINK_ID in mw.engine.playing() and (
@@ -573,8 +576,16 @@ class PlaybackControl(Controller):
                 play(station)
         mw.tickctl._wake()
 
+    def loaded(self, sid: str):
+        """A sound finished loading: play it if it was pressed while it loaded, and
+        not too long ago (a press from long before would come as a surprise)."""
+        t = self._wanted.pop(sid, None)
+        if t is not None and time.monotonic() - t < WANTED_S:
+            self.play(sid)
+
     def stop_all(self):
         mw = self.mw
+        self._wanted.clear()
         mw._radio_paused = None
         self._queue.clear()
         self._say_queue()

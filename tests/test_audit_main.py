@@ -125,6 +125,51 @@ def test_a_sound_hotkey_takes_the_push_to_talk_key(window):
     assert window.cfg.ptt_key == "" and lost
 
 
+# --------------------------------------------------------------------------- still loading
+
+def test_a_press_while_loading_plays_once_loaded(window, monkeypatch):
+    """A hotkey pressed the moment the board opened did nothing: its sound was still
+    loading, and the press was dropped."""
+    played = []
+    monkeypatch.setattr(window.engine, "play", lambda sid, *a, **k: played.append(sid))
+    window.audio.pop("s0", None)
+    window.playctl.play("s0")
+    assert played == []
+    window.soundctl.on_loaded("s0", np.zeros((100, 2), np.float32), "")
+    assert played == ["s0"]
+    window.soundctl.on_loaded("s0", np.zeros((100, 2), np.float32), "")   # only once
+    assert played == ["s0"]
+
+
+@pytest.mark.parametrize("late", [False, True])
+def test_a_stale_or_stopped_press_doesnt_play_when_loaded(window, monkeypatch, late):
+    played = []
+    monkeypatch.setattr(window.engine, "play", lambda sid, *a, **k: played.append(sid))
+    window.audio.pop("s0", None)
+    window.playctl.play("s0")
+    if late:
+        window.playctl._wanted["s0"] -= playbackcontrol.WANTED_S + 1
+    else:
+        window.playctl.stop_all()
+    window.soundctl.on_loaded("s0", np.zeros((100, 2), np.float32), "")
+    assert played == []
+
+
+def test_api_play_of_a_loading_sound_plays_it_once_loaded(window, monkeypatch):
+    from soundboard.control import remotedispatch
+    played = []
+    monkeypatch.setattr(window.engine, "play", lambda sid, *a, **k: played.append(sid))
+    window.audio.pop("s0", None)
+    code, body = remotedispatch.dispatch(window, "play", {"id": "s0"})
+    assert code == 200 and body["loading"] is True and played == []
+    window.soundctl.on_loaded("s0", np.zeros((100, 2), np.float32), "")
+    assert played == ["s0"]
+    window.audio.pop("s0", None)
+    window.pads["s0"].state, window.pads["s0"].error = "error", "bad file"
+    code, body = remotedispatch.dispatch(window, "play", {"id": "s0"})
+    assert code == 409 and "bad file" in body["error"]
+
+
 # --------------------------------------------------------------------------- preview
 
 def test_plain_preview_drops_a_render_in_flight(window, monkeypatch):
