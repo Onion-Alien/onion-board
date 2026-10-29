@@ -323,6 +323,7 @@ class SoundsPageBuild:
             mw.engine, c, lambda: PAD_COLORS[len(mw.cfg.sounds) % len(PAD_COLORS)],
             lambda: {m.fingerprint: m.name for m in mw.cfg.sounds if m.fingerprint})
         mw.linkbar.sound_ready.connect(mw.soundctl.on_downloaded)
+        mw.linkbar.already_have.connect(mw._show_existing)
         mw.linkbar.played.connect(mw.searchctl.on_link_played)
         mw.linkbar.board_busy = mw.playctl._board_song_playing
         mw.linkbar.picture_for = lambda url: mw.ytresults.thumb_for(url)   # (made below)

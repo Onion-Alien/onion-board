@@ -73,6 +73,7 @@ from soundboard.ui.window.windowtabs import WindowTabs
 from soundboard.ui.window.windowtoasts import (TOAST_EXPAND, _TONE_SPAN,  # noqa: F401  (moved)
                                               WindowToasts)
 from soundboard.ui.kit import a11y, busy, icons
+from soundboard.ui.kit import reveal as reveal_kit
 from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.ui.settings import lite
 from soundboard.ui.window import livesize, responsive
@@ -439,16 +440,41 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         sid = self.linkbar.added_ids.get(url)
         return sid if sid and self.meta(sid) is not None else None
 
-    def _show_sound(self, sid: str):
-        """The download card's Show: the Sounds tab, the pad picked and scrolled to."""
+    def _show_sound(self, sid: str, ring: bool = False):
+        """The download card's Show: the Sounds tab, the pad picked and scrolled to.
+        `ring`: a yellow ring pulses round it too."""
         self.tabs.setCurrentIndex(TAB_INDEX["sounds"])
         self.playctl.select(sid)
 
         def reveal():   # once the tab has laid its pads out
             pad = self.pads.get(sid)
-            if pad is not None:
-                self._pads_scroll.ensureWidgetVisible(pad)
+            if pad is None:
+                return
+            area = self._pads_scroll
+            if ring and (inner := area.widget()) is not None:   # in the middle, not at an edge
+                mid = pad.mapTo(inner, pad.rect().center()).y()
+                area.verticalScrollBar().setValue(mid - area.viewport().height() // 2)
+                reveal_kit.ring(pad)
+            else:
+                area.ensureWidgetVisible(pad)
         QTimer.singleShot(0, self._pads_scroll, reveal)
+
+    def _show_existing(self, fp: str):
+        """An Add refused as already in the library: that sound's pad, ringed. The
+        category showing switches when it isn't in it (to All, or the sound's own
+        category when it's hidden from All)."""
+        m = next((m for m in self.cfg.sounds if m.fingerprint == fp), None)
+        if m is None:
+            return
+        cfg = self.cfg
+        if not library.in_view(m.tags, cfg.category, cfg.subcategory, cfg.hidden_from_all):
+            if library.in_view(m.tags, cfg.category, "", cfg.hidden_from_all):
+                self.catctl.set_subcategory("")
+            elif library.in_view(m.tags, "", "", cfg.hidden_from_all):
+                self.catctl.set_category("")
+            else:
+                self.catctl.set_category(library.split_tag(m.tags[0])[0])
+        self._show_sound(m.id, ring=True)
 
     def _mini_setup(self):
         self.resize(max(800, self.width()), max(600, self.height()))

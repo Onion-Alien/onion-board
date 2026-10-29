@@ -65,6 +65,7 @@ class LinkBar(QFrame):
     queue_updated = Signal(list)      # the picks waiting their turn: [{url, title, kind}]
     up_next_changed = Signal(list)    # downloaded Plays waiting for the one playing: [title]
     queued = Signal(str, str)         # (url, "add" | "play"): a pick now waits its turn
+    already_have = Signal(str)        # an Add's fingerprint: it's in the library already
 
     def __init__(self, engine, cfg, color_for, known_for):
         """`color_for()` gives the next pad colour, `known_for()` {fingerprint: name}
@@ -566,7 +567,7 @@ class LinkBar(QFrame):
                 return
             fp = fingerprint(str(path))
             if fp and fp in known:
-                emit("dup", url, None)   # counted apart from a failed download
+                emit("dup", url, fp)   # counted apart from a failed download
                 raise ytdl.DownloadError(_("It's already in your Sounds as “{name}”.",
                                            name=known[fp]))
             # named after the video, in a folder for the site: YouTube/<title>.flac
@@ -659,6 +660,8 @@ class LinkBar(QFrame):
             return
         if kind == "dup":
             self._dups.add(url)
+            if payload:
+                self.already_have.emit(payload)   # the board shows where it is
             return
         if kind == "why":
             self._why[url] = payload

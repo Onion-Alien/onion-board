@@ -9,8 +9,13 @@ Instant when Windows' animation effects are off, or nobody can see it (a hidden 
 
 `flash(box, at)`: the box lights up in the theme's "ok" colour, a band of light sweeps
 across it and a ring pops out of `at` (its tick), then it all fades out. Skipped when
-animations are off."""
+animations are off.
+
+`ring(pad)`: a yellow ring pulses round a pad for a few seconds (the sound you tried
+to add again: it's this one)."""
 from __future__ import annotations
+
+import math
 
 from PySide6.QtCore import QEasingCurve, QPointF, QRectF, Qt, QVariantAnimation
 from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPainterPath, QPen
@@ -21,6 +26,8 @@ from soundboard.ui.kit import theme
 FOLD_MS = 340    # folding away or out, fade included
 FOLD_PART = 0.55  # of it, the height changing (the rest: fading)
 FLASH_MS = 1100  # the "it worked" flash
+RING_MS = 3200   # the "it's this one" ring round a pad (ring)
+RING_PULSES = 3
 MAX_H = 16777215  # Qt's QWIDGETSIZE_MAX: no maximum height
 
 
@@ -179,6 +186,64 @@ class _Flash(QWidget):
         p.setBrush(Qt.BrushStyle.NoBrush)
         p.drawEllipse(self._at, radius, radius)
         p.end()
+
+
+class _Ring(QWidget):
+    """A ring in the theme's "warn" colour pulsing round a pad, then fading: "it's
+    this one"."""
+
+    def __init__(self, box: QWidget, still: bool = False):
+        super().__init__(box)
+        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        self.setGeometry(box.rect())
+        self._k = 0.0
+        self._still = still   # animations off: a steady ring, gone after the same time
+        self._anim = QVariantAnimation(self)
+        self._anim.setDuration(RING_MS)
+        self._anim.setStartValue(0.0)
+        self._anim.setEndValue(1.0)
+        self._anim.valueChanged.connect(self._step)
+        self._anim.finished.connect(self.deleteLater)
+        self.show()
+        self.raise_()
+        self._anim.start()
+
+    def _step(self, k):
+        self._k = float(k)
+        box = self.parentWidget()
+        if box is not None:
+            self.setGeometry(box.rect())
+        self.update()
+
+    def paintEvent(self, ev):
+        k = 0.0 if self._still else self._k
+        col = QColor(theme.T.get("warn_text", "#eab308"))
+        # RING_PULSES beats, the last quarter fading out
+        beat = 0.5 + 0.5 * math.cos(k * RING_PULSES * 2 * math.pi)
+        fade = 1.0 if k < 0.75 else (1 - k) / 0.25
+        p = QPainter(self)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        glow = QColor(col)
+        glow.setAlphaF(0.14 * beat * fade)
+        r = QRectF(self.rect()).adjusted(1.5, 1.5, -1.5, -1.5)
+        p.setPen(Qt.PenStyle.NoPen)
+        p.setBrush(glow)
+        p.drawRoundedRect(r, 8, 8)
+        edge = QColor(col)
+        edge.setAlphaF((0.55 + 0.45 * beat) * fade)
+        p.setPen(QPen(edge, 3))
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        p.drawRoundedRect(r, 8, 8)
+        p.end()
+
+
+def ring(box: QWidget):
+    """Pulse a yellow ring round `box` (a pad) for a few seconds. Unlike `flash` it
+    runs with animations off too, held still: it's how the pad is found."""
+    old = box.findChild(_Ring)
+    if old is not None:
+        old.deleteLater()
+    _Ring(box, still=not _animate())
 
 
 def flash(box: QWidget, at: QWidget | None = None):
