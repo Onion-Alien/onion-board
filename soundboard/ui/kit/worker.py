@@ -8,6 +8,7 @@ until the app restarts (a bare ``threading.Thread`` only logs the exception).
 """
 from __future__ import annotations
 
+import _thread
 import logging
 import threading
 from collections.abc import Callable
@@ -44,6 +45,21 @@ def run(fn: Callable[..., Any], signal=None, name: str = "worker", *,
                          daemon=True, name=name)
     t.start()
     return t
+
+
+def start(fn: Callable[..., Any], signal=None, name: str = "worker", *,
+          error: Any = _MISSING, owner=None, args: tuple = ()) -> None:
+    """``run`` without waiting for the thread to get going. ``Thread.start`` waits,
+    with no limit, until the new thread runs; with the whole app held up (the PC
+    swapping, a stalled drive) the window froze in it for 10-30 s. Here the UI goes
+    on at once. No Thread is returned: nothing can join it."""
+    if signal is not None and error is _MISSING:
+        raise TypeError("worker.start: a signal needs an error value")
+
+    def body():
+        threading.current_thread().name = name
+        call(fn, signal, name, error=error, owner=owner, args=args)
+    _thread.start_new_thread(body, ())
 
 
 def call(fn: Callable[..., Any], signal=None, name: str = "worker", *,
