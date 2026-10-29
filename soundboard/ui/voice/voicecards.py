@@ -74,7 +74,8 @@ class _VoiceTab(QPushButton):
 
     def sizeHint(self):
         sh = super().sizeHint()
-        sh.setWidth(sh.width() + self.DOT + 6)   # room for the dot, always: no jump
+        if self.property("live"):   # room for the dot only while it shows: kept on every
+            sh.setWidth(sh.width() + self.DOT + 6)   # tab, the row wrapped a tab sooner
         return sh
 
     def paintEvent(self, e):
@@ -303,6 +304,7 @@ class VoiceCards(_Panel):
         if tab.property("live") != on:   # a tab that's on shows it, picked or not
             tab.setProperty("live", on)
             tab.setToolTip(_("On") if on else "")
+            tab.updateGeometry()   # (its dot's room)
             tab.update()
             self.live_tabs_changed.emit()   # the On Air card's lines (netcontrol)
 
