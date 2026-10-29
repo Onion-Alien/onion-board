@@ -102,9 +102,13 @@ class LogoWidget(QWidget):
 
     def mousePressEvent(self, e):
         if e.button() == Qt.MouseButton.LeftButton:
-            self.squish = 1.0
-            self._resume()
+            self.poke()
         super().mousePressEvent(e)
+
+    def poke(self):
+        """A click's wobble (also a laser hit in the Triggers page's duel)."""
+        self.squish = 1.0
+        self._resume()
 
     # ---- feeding
     def set_level(self, v: float):

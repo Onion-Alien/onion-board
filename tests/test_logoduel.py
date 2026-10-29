@@ -92,3 +92,25 @@ def test_lasers_render_in_every_theme_and_follow_resizing(arena):
         assert duel.overlay.geometry() == host.rect()
     finally:
         theme.T = original
+
+
+def test_hits_wobble_the_target_and_the_clash_hits_both(arena):
+    host, tab, other, duel = arena
+    QTest.mouseClick(host.logo, Qt.MouseButton.LeftButton)
+    overlay = duel.overlay
+    overlay.timer.stop()
+    host.logo.squish = other.squish = 0
+    overlay.advance(logoduel.SHOT_S * logoduel.HIT + 0.01)   # the first shot lands
+    assert other.squish == 1 and host.logo.squish == 0
+    assert overlay.sparks
+    for shot in range(1, logoduel.ROUNDS - 1):   # they take turns
+        host.logo.squish = other.squish = 0
+        overlay.advance(logoduel.SHOT_S)
+        hit = (other, host.logo)[shot % 2]
+        assert hit.squish == 1 and (host.logo, other)[shot % 2].squish == 0
+    host.logo.squish = other.squish = 0
+    overlay.advance(logoduel.SHOT_S)   # the clash in the middle
+    assert host.logo.squish == 1 and other.squish == 1
+    assert not host.grab().isNull()
+    overlay.advance(logoduel.SHOT_S)
+    assert not overlay.isVisible() and not overlay.sparks
