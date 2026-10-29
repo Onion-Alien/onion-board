@@ -338,3 +338,52 @@ def test_a_quick_start_leaves_no_stall_file(tmp_path):
     took, path = bootmark.stop_stall()
     assert path is None and not (tmp_path / bootmark.STALL_NAME).exists()
     assert bootmark.stop_stall() == (0.0, None)   # twice is harmless
+
+
+def _crumb(directory, version: str, pid: int) -> None:
+    import json
+    (directory / bootmark.NAME).write_text(json.dumps({"version": version, "pid": pid}),
+                                           encoding="utf-8")
+
+
+def test_two_copies_started_at_once_is_not_a_start_that_failed(tmp_path):
+    """The Finish page opens the app and the new desktop icon is double-clicked while
+    nothing is on screen yet: the second copy found the first one's breadcrumb, won the
+    single-instance check, and counted the first (which quit as the second launch,
+    exit code 0) as `startup-failed/` -- in the very first count, with no stack and
+    no Windows error."""
+    import subprocess
+    import sys
+    if os.name != "nt":
+        import pytest
+        pytest.skip("the process check is Windows only")
+    other = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"])
+    try:
+        _crumb(tmp_path, "2.7.2", other.pid)     # the other copy, still loading
+        assert bootmark.still_running(other.pid)
+        bootmark.start("2.7.2", tmp_path)
+        assert bootmark.previous() == ("", 0)    # nothing for this copy to report
+        assert bootmark.previous_at() == 0.0
+    finally:
+        other.kill()
+        other.wait()
+    assert not bootmark.still_running(other.pid)
+    # once that copy is gone without clearing its breadcrumb, it's a start that died
+    _crumb(tmp_path, "2.7.2", other.pid)
+    bootmark.start("2.7.2", tmp_path)
+    assert bootmark.previous() == ("2.7.2", other.pid)
+    bootmark.clear(tmp_path)
+
+
+def test_the_copy_that_quits_leaves_the_other_copys_breadcrumb(tmp_path):
+    """The losing copy's clear() must not take away the breadcrumb of the copy that goes
+    on starting (whose own death while loading would go uncounted)."""
+    _crumb(tmp_path, "2.7.2", os.getpid() + 1_000_000)   # left by the other copy since
+    bootmark.clear(tmp_path)
+    assert bootmark.read(tmp_path) == ("2.7.2", os.getpid() + 1_000_000)
+    bootmark.mark("2.7.2", tmp_path)                     # this run's own
+    bootmark.clear(tmp_path)
+    assert not (tmp_path / bootmark.NAME).exists()
+    (tmp_path / bootmark.NAME).write_text("not json", encoding="utf-8")
+    bootmark.clear(tmp_path)                             # unreadable: nobody's, gone
+    assert not (tmp_path / bootmark.NAME).exists()
