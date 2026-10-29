@@ -76,3 +76,37 @@ def _dead():
 def test_a_signal_needs_its_error_answer():
     with pytest.raises(TypeError):
         worker.run(lambda: 1, _Owner().done, "t")
+
+
+def test_start_never_waits_for_the_thread_to_get_going(qapp, monkeypatch):
+    """Thread.start waits, with no limit, for the new thread to run: with the whole app
+    held up the window froze in it. worker.start hands the work over and goes on."""
+    import threading
+    import time
+
+    def stuck(self):
+        time.sleep(3)
+        raise AssertionError("Thread.start was used")
+    monkeypatch.setattr(threading.Thread, "start", stuck)
+    o = _Owner()
+    got = _answers(o)
+    names = []
+    t0 = time.monotonic()
+    worker.start(lambda: names.append(threading.current_thread().name) or (3, ""),
+                 o.done, "t-start", error=(None, "x"), owner=o)
+    assert time.monotonic() - t0 < 0.5
+    assert process_events(qapp, lambda: got)
+    assert got == [(3, "")] and names == ["t-start"]
+
+
+def test_start_answers_a_raise_and_needs_an_error_value(qapp):
+    o = _Owner()
+    got = _answers(o)
+
+    def boom():
+        raise OSError("no room")
+    worker.start(boom, o.done, "t", error=lambda e: (None, str(e)), owner=o)
+    assert process_events(qapp, lambda: got)
+    assert got == [(None, "no room")]
+    with pytest.raises(TypeError):
+        worker.start(lambda: 1, o.done)

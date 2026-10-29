@@ -182,6 +182,38 @@ def test_a_slow_installer_start_never_freezes_the_window(window, boxes, qapp, mo
     assert quit_ == [1] and marks == ["closing"]
 
 
+def test_a_held_up_thread_start_never_freezes_the_window(window, boxes, qapp, monkeypatch,
+                                                         installer):
+    """2.7.1: the window froze 10-30 s in Thread.start (it waits, with no limit, for the
+    new thread to run) as the update check began, with the whole app held up. The check,
+    the download and the installer start hand their work over and go on at once."""
+    import threading
+    import time
+    orig = threading.Thread.start
+    asked = []
+
+    def held(self):
+        if self.name.startswith("update"):
+            asked.append(self.name)
+            time.sleep(3)
+        orig(self)
+    monkeypatch.setattr(threading.Thread, "start", held)
+    gate = threading.Event()
+    monkeypatch.setattr(updates, "check", lambda *a, **k: gate.wait(5) and None)
+    monkeypatch.setattr(updates, "can_install", lambda: True)
+    monkeypatch.setattr(updates, "download", lambda rel, p, c: gate.wait(5) and None)
+    monkeypatch.setattr(updates, "start_install", lambda path: gate.wait(5))
+    monkeypatch.setattr(window, "quit_app", lambda: None)
+    t0 = time.monotonic()
+    window.updctl.release = _rel()
+    window.updctl.check_updates(force=True)
+    window.updctl.download_update()
+    window.updctl._start_install(_rel(), installer.setup)
+    assert time.monotonic() - t0 < 1.0 and asked == []
+    gate.set()
+    assert process_events(qapp, lambda: not window.updctl._installing)
+
+
 def test_an_installer_that_wont_start_says_so_and_stays(window, boxes, qapp, monkeypatch,
                                                        installer):
     marks = _closing_marks(monkeypatch)
@@ -278,6 +310,7 @@ def test_later_keeps_the_download_for_the_pill(window, boxes, qapp, monkeypatch,
     assert started == [] and window.cfg.update_pending == ""
     boxes.answers["Install the update"] = "Restart now"
     window.btn_update.click()              # the pill: straight to the restart question
+    assert process_events(qapp, lambda: started)   # (on its own thread)
     assert started == [setup] and window.cfg.update_pending == "99.0.0"
 
 

@@ -87,7 +87,7 @@ class UpdateControl(Controller):
             offer = watchaddon.check_update()
             return worker.SKIP if offer is None else offer
         # (nothing waits on the add-on's answer)
-        worker.run(run, mw.bridge.watch_update, "update-check", error=worker.SKIP,
+        worker.start(run, mw.bridge.watch_update, "update-check", error=worker.SKIP,
                    owner=mw)
 
     def _on_update(self, rel, err: str, asked: bool):
@@ -218,14 +218,20 @@ class UpdateControl(Controller):
         import threading
 
         from soundboard.ui.bun import splash
-        t = threading.Thread(target=fn, daemon=True, name=name)
-        t.start()
-        while t.is_alive():
+        done = threading.Event()
+
+        def body():
+            try:
+                fn()
+            finally:
+                done.set()
+        worker.start(body, name=name)   # (Thread.start can wait for good: worker.start)
+        while not done.is_set():
             if give_up():
                 return False
             splash.pump()
             remote.answer_waiting()
-            t.join(0.03)
+            done.wait(0.03)
         return True
 
     def _can_auto(self, rel) -> bool:
@@ -459,7 +465,7 @@ class UpdateControl(Controller):
             self._update_detail_next = "".join(traceback.format_exception(e, limit=8))
             return None, errors.plain(e)
         self._update_detail_next = ""
-        worker.run(lambda: (updates.download(rel, progress,
+        worker.start(lambda: (updates.download(rel, progress,
                                              lambda: mw._shut_down or self._update_cancel),
                             ""),
                    mw.bridge.update_ready, "update-download", error=failed, owner=mw)
@@ -568,7 +574,7 @@ class UpdateControl(Controller):
             return rel, e, traceback.format_exc(limit=8)
         # on a thread: Windows checks a freshly downloaded installer before it runs it,
         # and the window stayed frozen meanwhile (for good, when that check hung)
-        worker.run(lambda: (rel, updates.start_install(path), ""), mw.bridge.update_started,
+        worker.start(lambda: (rel, updates.start_install(path), ""), mw.bridge.update_started,
                    "update-start-install", error=failed, owner=mw)
 
     def _on_update_started(self, rel, e, trace: str):
