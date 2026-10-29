@@ -151,9 +151,62 @@ def test_light_leaves_some_noise_and_the_test_clip_lines_up():
     gap = slice(int(0.15 * 48000), int(0.45 * 48000))
     assert _db(normal[gap]) < _db(light[gap]) < _db(x[gap]) - 8
     # lined up with the recording: Light's share of the mic as it was sits at no lag
-    a, b = light[4800:48000], x[4800:48000]
+    # (against the mic through the same rumble filter: it shifts a low tone's phase)
+    a, b = light[4800:48000], cleanmic.Tidy(gate=False).run(x)[4800:48000]
     lags = range(-1500, 1501, 5)
     assert max(lags, key=lambda L: float(np.dot(a, np.roll(b, L)))) == 0
+
+
+# ---------------------------------------------------------------- after the network
+def _tidied(x, gate=True, sizes=(480, 128, 1024, 7)):
+    t, out, i, k = cleanmic.Tidy(gate), [], 0, 0
+    while i < len(x):
+        out.append(t.run(x[i:i + sizes[k % len(sizes)]]))
+        i, k = i + sizes[k % len(sizes)], k + 1
+    return np.concatenate(out)
+
+
+def test_rumble_under_80_hz_goes_and_the_voice_stays():
+    t = np.arange(48000) / 48000
+    rumble = _tidied((0.3 * np.sin(2 * np.pi * 30 * t)).astype(np.float32), gate=False)
+    voice = _tidied((0.3 * np.sin(2 * np.pi * 300 * t)).astype(np.float32), gate=False)
+    assert len(rumble) == 48000 and np.all(np.isfinite(rumble))
+    assert _db(rumble[24000:]) < _db(0.3 * np.sin(2 * np.pi * 30 * t[24000:])) - 15
+    assert abs(_db(voice[24000:]) - _db(0.3 * np.sin(2 * np.pi * 300 * t[24000:]))) < 0.5
+
+
+def _talk_then_room(quiet=0.003):
+    """A second of talking, a second of a quiet room (a voice across it, a TV)."""
+    rng = np.random.default_rng(5)
+    t = np.arange(96000) / 48000
+    room = (rng.standard_normal(96000) * quiet).astype(np.float32)
+    talk = (0.2 * np.sin(2 * np.pi * 220 * t) * (t < 1.0)).astype(np.float32)
+    return talk + room, talk
+
+
+def test_the_gate_turns_the_room_down_between_words_and_not_the_words():
+    x, talk = _talk_then_room()
+    y = _tidied(x)
+    assert _db(y[48000 + 24000:]) < _db(x[48000 + 24000:]) - 15   # the room, once closed
+    assert abs(_db(y[4800:43200]) - _db(x[4800:43200])) < 1        # the words as they were
+    assert _db(y[240:1200]) > _db(x[240:1200]) - 3                 # a word's start isn't cut
+
+
+def test_light_keeps_the_room_and_each_strength_sets_the_gate():
+    x, _talk = _talk_then_room()
+    assert _db(_tidied(x, gate=False)[72000:]) > _db(x[72000:]) - 2
+    assert cleanmic.Tidy().gate
+
+
+@real
+def test_the_cleaner_gates_on_normal_not_light():
+    c = cleanmic.Cleaner(48000, "light")
+    try:
+        assert not c._tidy.gate
+        c.set_strength("normal")
+        assert c._tidy.gate
+    finally:
+        c.close()
 
 
 # ---------------------------------------------------------------- the card
