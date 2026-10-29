@@ -372,6 +372,7 @@ QMenu::item:selected { background:$item_hover; color:$text_hi; }
 QMenu::item:checked { color:$accent_link; }
 QMenu::item:disabled { color:$faint; }
 QMenu::icon { padding-left:10px; }
+QMenu::indicator { left:5px; }   /* the tick under the icons, not 5 px left of them */
 QMenu::separator { height:1px; background:$border; margin:5px 8px; }
 QFrame#tabcard { background:$card_hi; border:1px solid transparent; border-radius:10px; margin:3px 4px; }
 QFrame#tabcard:hover { border-color:$border_hi; background:$btn_hover; }

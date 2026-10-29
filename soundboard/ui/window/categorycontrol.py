@@ -623,9 +623,12 @@ class CategoryControl(Controller):
         fill_colour_menu(cm, mw.cfg.category_colors.get(name, ""),
                          lambda col: self.set_category_color(name, col), none=True)
         adv = menu.addMenu(icons.icon("sliders"), _("Advanced"))
-        a_hide = adv.addAction(_("Hide its sounds from All"))
+        hidden = name in mw.cfg.hidden_from_all
+        # an icon takes the tick's place, so the ticked one shows a tick icon instead
+        a_hide = adv.addAction(icons.icon("check" if hidden else "eye", checked_color="accent"),
+                               _("Hide its sounds from All"))
         a_hide.setCheckable(True)
-        a_hide.setChecked(name in mw.cfg.hidden_from_all)
+        a_hide.setChecked(hidden)
         hk = mw.cfg.category_hotkeys.get(name, "")
         a_hk = adv.addAction(icons.icon("keyboard"),
                              _("Random-sound hotkey: {hk} (change…)", hk=pretty_key(hk)) if hk
