@@ -2222,7 +2222,6 @@
   "Your sounds, screen triggers, live radio and programs in full quality (no voice chat shaping), at their own volume. In OBS: Sources → + → Audio Output Capture → this device (for a virtual cable: Audio Input Capture → its Output end). One device at a time.": "Звуците ти, екранните тригери, радиото на живо и програмите в пълно качество (без оформяне за гласов чат), със собствена сила. В OBS: Sources → + → Audio Output Capture → това устройство (за виртуален кабел: Audio Input Capture → неговият Output край). Едно устройство наведнъж.",
   "What {name} gets": "Какво получава {name}",
   "All programs": "Всички програми",
-  "Back to no pitch change and no effects": "Обратно без промяна на тона и без ефекти",
   "No thanks": "Не, благодаря",
   "Onion Board shows {name} after a restart.": "Onion Board ще е на {name} след рестарт.",
   "Pitch and effects of the programs you send": "Тон и ефекти на програмите, които пращаш",
@@ -4669,5 +4668,8 @@
   "{label} preset": "Настройка „{label}“",
   "Just my voice: Strong cleaning, a strict sensitivity and your voice kept at one loudness. Quiet words can be cut: speak up.": "Само моят глас: Силно почистване, строга чувствителност и гласът ти винаги еднакво силен. Тихите думи може да се изрежат: говори високо.",
   "Loud room: Strong cleaning and a stricter sensitivity, for loud fans, a TV or people talking nearby.": "Шумна стая: Силно почистване и по-строга чувствителност, за шумни вентилатори, телевизор или хора, които говорят наблизо.",
-  "Normal: noise cleaned, and the sensitivity set by itself.": "Нормално: шумът се почиства, а чувствителността се настройва сама."
+  "Normal: noise cleaned, and the sensitivity set by itself.": "Нормално: шумът се почиства, а чувствителността се настройва сама.",
+  "Back to 1x, no pitch change, no effects and 100 % volume": "Обратно на 1x, без промяна на тона, без ефекти и сила на звука 100 %",
+  "Back to no pitch change, no effects and 100 % volume": "Обратно без промяна на тона, без ефекти и сила на звука 100 %",
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Колко силно звучат, до 4 пъти по-силно. Над 100 % най-силните места се заглаждат, за да не пращи"
 }

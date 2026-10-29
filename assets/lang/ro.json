@@ -2353,7 +2353,6 @@
   "Your sounds, screen triggers, live radio and programs in full quality (no voice chat shaping), at their own volume. In OBS: Sources → + → Audio Output Capture → this device (for a virtual cable: Audio Input Capture → its Output end). One device at a time.": "Sunetele tale, declanșatoarele de pe ecran, radioul live și programele la calitate completă (fără adaptare pentru chatul vocal), cu volum propriu. În OBS: Sources → + → Audio Output Capture → acest dispozitiv (pentru un cablu virtual: Audio Input Capture → capătul său Output). Un singur dispozitiv odată.",
   "What {name} gets": "Ce primește {name}",
   "All programs": "Toate programele",
-  "Back to no pitch change and no effects": "Înapoi la fără schimbare de ton și fără efecte",
   "No thanks": "Nu, mulțumesc",
   "Onion Board shows {name} after a restart.": "Onion Board afișează {name} după o repornire.",
   "Pitch and effects of the programs you send": "Tonul și efectele programelor pe care le trimiți",
@@ -4751,5 +4750,8 @@
   "{label} preset": "Presetarea {label}",
   "Just my voice: Strong cleaning, a strict sensitivity and your voice kept at one loudness. Quiet words can be cut: speak up.": "Doar vocea mea: curățare Puternică, o sensibilitate strictă și vocea ta mereu la același volum. Cuvintele încete pot fi tăiate: vorbește tare.",
   "Loud room: Strong cleaning and a stricter sensitivity, for loud fans, a TV or people talking nearby.": "Cameră gălăgioasă: curățare Puternică și o sensibilitate mai strictă, pentru ventilatoare zgomotoase, un televizor sau oameni care vorbesc în apropiere.",
-  "Normal: noise cleaned, and the sensitivity set by itself.": "Normal: zgomotul e curățat, iar sensibilitatea se setează singură."
+  "Normal: noise cleaned, and the sensitivity set by itself.": "Normal: zgomotul e curățat, iar sensibilitatea se setează singură.",
+  "Back to 1x, no pitch change, no effects and 100 % volume": "Înapoi la 1x, fără schimbare de ton, fără efecte și volum 100 %",
+  "Back to no pitch change, no effects and 100 % volume": "Înapoi la fără schimbare de ton, fără efecte și volum 100 %",
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Cât de tare sună, până la de 4 ori mai tare. Peste 100 % vârfurile sunt rotunjite ca să nu pârâie"
 }

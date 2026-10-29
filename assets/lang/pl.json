@@ -2353,7 +2353,6 @@
   "Your sounds, screen triggers, live radio and programs in full quality (no voice chat shaping), at their own volume. In OBS: Sources → + → Audio Output Capture → this device (for a virtual cable: Audio Input Capture → its Output end). One device at a time.": "Twoje dźwięki, wyzwalacze z ekranu, radio na żywo i programy w pełnej jakości (bez dopasowania do czatu głosowego), z własną głośnością. W OBS: Źródła → + → Audio Output Capture → to urządzenie (dla wirtualnego kabla: Audio Input Capture → jego koniec Output). Jedno urządzenie naraz.",
   "What {name} gets": "Co dostaje {name}",
   "All programs": "Wszystkie programy",
-  "Back to no pitch change and no effects": "Z powrotem bez zmiany wysokości i bez efektów",
   "No thanks": "Nie, dziękuję",
   "Onion Board shows {name} after a restart.": "Onion Board pokaże się po {name} po ponownym uruchomieniu.",
   "Pitch and effects of the programs you send": "Wysokość i efekty wysyłanych programów",
@@ -4751,5 +4750,8 @@
   "{label} preset": "Preset {label}",
   "Just my voice: Strong cleaning, a strict sensitivity and your voice kept at one loudness. Quiet words can be cut: speak up.": "Tylko mój głos: Mocne czyszczenie, ostra czułość i twój głos zawsze równo głośny. Ciche słowa mogą zostać ucięte: mów głośno.",
   "Loud room: Strong cleaning and a stricter sensitivity, for loud fans, a TV or people talking nearby.": "Głośny pokój: Mocne czyszczenie i ostrzejsza czułość, na głośne wentylatory, telewizor albo ludzi rozmawiających obok.",
-  "Normal: noise cleaned, and the sensitivity set by itself.": "Normalnie: szum jest czyszczony, a czułość ustawia się sama."
+  "Normal: noise cleaned, and the sensitivity set by itself.": "Normalnie: szum jest czyszczony, a czułość ustawia się sama.",
+  "Back to 1x, no pitch change, no effects and 100 % volume": "Z powrotem 1x, bez zmiany wysokości, bez efektów i głośność 100 %",
+  "Back to no pitch change, no effects and 100 % volume": "Z powrotem bez zmiany wysokości, bez efektów i głośność 100 %",
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Jak głośno grają, do 4 razy głośniej. Powyżej 100 % najgłośniejsze miejsca są zaokrąglane, żeby nie trzeszczało"
 }

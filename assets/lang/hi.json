@@ -2306,7 +2306,6 @@
   "Your sounds, screen triggers, live radio and programs in full quality (no voice chat shaping), at their own volume. In OBS: Sources → + → Audio Output Capture → this device (for a virtual cable: Audio Input Capture → its Output end). One device at a time.": "आपके साउंड, स्क्रीन ट्रिगर, लाइव रेडियो और प्रोग्राम पूरी क्वालिटी में (वॉइस चैट के लिए ढाले बिना), अपनी अलग आवाज़ पर। OBS में: Sources → + → Audio Output Capture → यह डिवाइस (वर्चुअल केबल के लिए: Audio Input Capture → उसका Output सिरा)। एक बार में एक ही डिवाइस।",
   "What {name} gets": "{name} को क्या मिलता है",
   "All programs": "सभी प्रोग्राम",
-  "Back to no pitch change and no effects": "बिना पिच बदलाव और बिना इफ़ेक्ट पर वापस",
   "No thanks": "नहीं, शुक्रिया",
   "Onion Board shows {name} after a restart.": "रीस्टार्ट के बाद Onion Board {name} में दिखेगा।",
   "Pitch and effects of the programs you send": "आपके भेजे प्रोग्राम की पिच और इफ़ेक्ट",
@@ -4669,5 +4668,8 @@
   "{label} preset": "{label} प्रीसेट",
   "Just my voice: Strong cleaning, a strict sensitivity and your voice kept at one loudness. Quiet words can be cut: speak up.": "सिर्फ़ मेरी आवाज़: तेज़ सफ़ाई, सख़्त सेंसिटिविटी और तुम्हारी आवाज़ हमेशा एक जैसी ऊँची। धीमे शब्द कट सकते हैं: ज़ोर से बोलो।",
   "Loud room: Strong cleaning and a stricter sensitivity, for loud fans, a TV or people talking nearby.": "शोर वाला कमरा: तेज़ सफ़ाई और ज़्यादा सख़्त सेंसिटिविटी, तेज़ पंखों, टीवी या पास में बात करते लोगों के लिए।",
-  "Normal: noise cleaned, and the sensitivity set by itself.": "सामान्य: शोर साफ़ होता है, और सेंसिटिविटी अपने आप सेट होती है।"
+  "Normal: noise cleaned, and the sensitivity set by itself.": "सामान्य: शोर साफ़ होता है, और सेंसिटिविटी अपने आप सेट होती है।",
+  "Back to 1x, no pitch change, no effects and 100 % volume": "वापस 1x पर, बिना पिच बदलाव, बिना इफ़ेक्ट और 100 % वॉल्यूम",
+  "Back to no pitch change, no effects and 100 % volume": "बिना पिच बदलाव, बिना इफ़ेक्ट और 100 % वॉल्यूम पर वापस",
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "कितनी तेज़ आवाज़, 4 गुना तक। 100 % से ऊपर सबसे तेज़ हिस्से गोल कर दिए जाते हैं ताकि आवाज़ न फटे"
 }

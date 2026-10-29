@@ -2306,7 +2306,6 @@
   "Your sounds, screen triggers, live radio and programs in full quality (no voice chat shaping), at their own volume. In OBS: Sources → + → Audio Output Capture → this device (for a virtual cable: Audio Input Capture → its Output end). One device at a time.": "Je geluiden, schermtriggers, live radio en programma's in volle kwaliteit (zonder voicechat-afstemming), op hun eigen volume. In OBS: Bronnen → + → Audio-uitvoer opnemen → dit apparaat (bij een virtuele kabel: Audio-invoer opnemen → de Output-kant). Eén apparaat tegelijk.",
   "What {name} gets": "Wat {name} krijgt",
   "All programs": "Alle programma's",
-  "Back to no pitch change and no effects": "Terug naar geen toonhoogteverandering en geen effecten",
   "No thanks": "Nee bedankt",
   "Onion Board shows {name} after a restart.": "Onion Board toont {name} na een herstart.",
   "Pitch and effects of the programs you send": "Toonhoogte en effecten van de programma's die je stuurt",
@@ -4669,5 +4668,8 @@
   "{label} preset": "Voorinstelling {label}",
   "Just my voice: Strong cleaning, a strict sensitivity and your voice kept at one loudness. Quiet words can be cut: speak up.": "Alleen mijn stem: Sterk opschonen, een strenge gevoeligheid en je stem altijd even luid. Zachte woorden kunnen wegvallen: praat luid genoeg.",
   "Loud room: Strong cleaning and a stricter sensitivity, for loud fans, a TV or people talking nearby.": "Luide kamer: Sterk opschonen en een strengere gevoeligheid, voor luide ventilatoren, een tv of mensen die vlakbij praten.",
-  "Normal: noise cleaned, and the sensitivity set by itself.": "Normaal: ruis wordt opgeschoond en de gevoeligheid stelt zichzelf in."
+  "Normal: noise cleaned, and the sensitivity set by itself.": "Normaal: ruis wordt opgeschoond en de gevoeligheid stelt zichzelf in.",
+  "Back to 1x, no pitch change, no effects and 100 % volume": "Terug naar 1x, geen toonhoogte, geen effecten en 100 % volume",
+  "Back to no pitch change, no effects and 100 % volume": "Terug naar geen toonhoogteverandering, geen effecten en 100 % volume",
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Hoe hard ze klinken, tot 4 keer zo hard. Boven 100 % worden de hardste pieken afgerond zodat het niet kraakt"
 }

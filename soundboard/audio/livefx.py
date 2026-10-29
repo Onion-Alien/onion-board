@@ -16,6 +16,7 @@ import math
 import numpy as np
 
 from soundboard.audio.dsp import SmoothSos, butter, matched_biquad
+from soundboard.audio.engineparts import soft_limit
 from soundboard.voicefx import Param
 from soundboard.voicefx.builtin import Distortion, Echo, Reverb
 
@@ -28,6 +29,10 @@ REVERB = Param("reverb", "Reverb", 0, 1, 0)
 ECHO = Param("echo", "Echo", 0, 1, 0)
 CRUNCH = Param("crunch", "Distortion", 0, 1, 0)
 PARAMS = (BASS, TREBLE, MUFFLE, REVERB, ECHO, CRUNCH)
+# the volume of everything here (100 % = as it is): kept apart from the effect knobs,
+# its slider sits under the pitch. Over 100 % the peaks are rounded off (soft_limit) so
+# a boost gets louder instead of crackling
+VOLUME = Param("volume", "Volume", 0, 400, 100, "%", 5)
 
 # the chips under the knobs. One with a speed, pitch or "keep" (keep pitch, 0 = off:
 # record-style, the pitch rises with the speed) also sets those (tuning()); the rest
@@ -63,7 +68,8 @@ FADE = 1024    # samples an effect takes to fade out once its knob hits 0 (as Sm
 
 
 def clean(fx) -> dict[str, float]:
-    """Only the knobs that are off 0, each clamped into its range."""
+    """Only the knobs that are off 0 (the volume: off 100 %), each clamped into its
+    range."""
     if not isinstance(fx, dict):
         return {}
     out = {}
@@ -71,6 +77,9 @@ def clean(fx) -> dict[str, float]:
         v = q.clamp(fx.get(q.key, 0))
         if abs(v) > 1e-6:
             out[q.key] = v
+    v = VOLUME.clamp(fx.get(VOLUME.key, VOLUME.default))
+    if abs(v - VOLUME.default) > 1e-6:
+        out[VOLUME.key] = v
     return out
 
 
@@ -119,10 +128,11 @@ class LiveFx:
         self._gone: dict[str, int] = {}      # key -> samples into its fade-out
         self._flush: int | None = None       # samples into a flush() fade, or None
         self.gen = 0                         # the engine's flush count it last saw
+        self._gain = 1.0                     # the volume the last block ended at
 
     @property
     def idle(self) -> bool:
-        return not self._fx and self.shelf.idle
+        return not self._fx and self.shelf.idle and self._gain == 1.0
 
     def _pair(self, key: str, cls, values: dict):
         pair = self._fx.get(key)
@@ -181,12 +191,32 @@ class LiveFx:
         if self._fx:
             self._flush = 0
 
+    def _volume(self, y: np.ndarray, to: float) -> np.ndarray:
+        """`y` at the volume (1 = 100 %), glided from the last block's over this one
+        so a drag doesn't click; over 100 % its peaks are rounded off."""
+        was, self._gain = self._gain, to
+        if was == to == 1.0 or not len(y):
+            return y
+        if was == to:
+            y = y * F32(to)
+        else:
+            ramp = np.linspace(was, to, len(y) + 1, dtype=F32)[1:]
+            y = y * ramp[:, None]
+        if max(was, to) > 1.0:
+            soft_limit(y)
+        return y.astype(F32, copy=False)
+
     def process(self, x: np.ndarray, fx: dict) -> np.ndarray:
         g = {q.key: float(fx.get(q.key, 0.0)) for q in PARAMS}
         dry = self.shelf.process(x, (g["bass"], g["treble"], g["muffle"]))
         y = self._knob("crunch", g["crunch"], dry, self._crunch)
         y = self._knob("echo", g["echo"], y, self._echo)
         y = self._knob("reverb", g["reverb"], y, self._reverb)
+        y = self._wet(dry, y)
+        return self._volume(y, float(fx.get(VOLUME.key, VOLUME.default)) / 100.0)
+
+    def _wet(self, dry: np.ndarray, y: np.ndarray) -> np.ndarray:
+        """The effects' output, or during a flush() its fade back to `dry`."""
         if self._flush is None:
             return y
         pos, n = self._flush, len(y)

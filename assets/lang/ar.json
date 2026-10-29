@@ -2494,7 +2494,6 @@
   "Your sounds, screen triggers, live radio and programs in full quality (no voice chat shaping), at their own volume. In OBS: Sources → + → Audio Output Capture → this device (for a virtual cable: Audio Input Capture → its Output end). One device at a time.": "أصواتك ومحفّزات الشاشة والراديو المباشر والبرامج بجودة كاملة (بلا تهيئة للدردشة الصوتية)، بمستوى صوتها الخاص. في OBS: Sources → + → Audio Output Capture → هذا الجهاز (للكابل الافتراضي: Audio Input Capture → طرفه Output). جهاز واحد في كل مرة.",
   "What {name} gets": "ما يتلقاه {name}",
   "All programs": "كل البرامج",
-  "Back to no pitch change and no effects": "العودة إلى بلا تغيير في الحدّة وبلا مؤثرات",
   "No thanks": "لا، شكرًا",
   "Onion Board shows {name} after a restart.": "يعرض Onion Board {name} بعد إعادة التشغيل.",
   "Pitch and effects of the programs you send": "حدّة ومؤثرات البرامج التي ترسلها",
@@ -4997,5 +4996,8 @@
   "{label} preset": "الإعداد المسبق {label}",
   "Just my voice: Strong cleaning, a strict sensitivity and your voice kept at one loudness. Quiet words can be cut: speak up.": "صوتي فقط: تنظيف قوي وحساسية صارمة وصوتك دائمًا بنفس العلوّ. قد تُقطع الكلمات الهادئة: تكلّم بصوت عالٍ.",
   "Loud room: Strong cleaning and a stricter sensitivity, for loud fans, a TV or people talking nearby.": "غرفة صاخبة: تنظيف قوي وحساسية أشد، للمراوح الصاخبة أو التلفاز أو أشخاص يتكلمون بالقرب.",
-  "Normal: noise cleaned, and the sensitivity set by itself.": "عادي: تُنظَّف الضوضاء وتُضبط الحساسية تلقائيًا."
+  "Normal: noise cleaned, and the sensitivity set by itself.": "عادي: تُنظَّف الضوضاء وتُضبط الحساسية تلقائيًا.",
+  "Back to 1x, no pitch change, no effects and 100 % volume": "العودة إلى 1x، بلا تغيير في الحدّة وبلا مؤثرات ومستوى صوت 100 %",
+  "Back to no pitch change, no effects and 100 % volume": "العودة إلى بلا تغيير في الحدّة وبلا مؤثرات ومستوى صوت 100 %",
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "مدى ارتفاع الصوت، حتى 4 أضعاف. فوق 100 % تُدوَّر أعلى القمم حتى لا يتشوّه الصوت"
 }

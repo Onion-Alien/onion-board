@@ -2353,7 +2353,6 @@
   "Your sounds, screen triggers, live radio and programs in full quality (no voice chat shaping), at their own volume. In OBS: Sources → + → Audio Output Capture → this device (for a virtual cable: Audio Input Capture → its Output end). One device at a time.": "Tvoje zvuky, spouštěče z obrazovky, živé rádio a programy v plné kvalitě (bez úprav pro hlasový chat), s vlastní hlasitostí. V OBS: Zdroje → + → Audio Output Capture → toto zařízení (u virtuálního kabelu: Audio Input Capture → jeho Output konec). Vždy jen jedno zařízení.",
   "What {name} gets": "Co dostává {name}",
   "All programs": "Všechny programy",
-  "Back to no pitch change and no effects": "Zpět bez změny výšky a bez efektů",
   "No thanks": "Ne, díky",
   "Onion Board shows {name} after a restart.": "Onion Board se po restartu zobrazí v jazyce {name}.",
   "Pitch and effects of the programs you send": "Výška a efekty programů, které posíláš",
@@ -4751,5 +4750,8 @@
   "{label} preset": "Předvolba {label}",
   "Just my voice: Strong cleaning, a strict sensitivity and your voice kept at one loudness. Quiet words can be cut: speak up.": "Jen můj hlas: Silné čištění, přísná citlivost a tvůj hlas pořád stejně hlasitý. Tichá slova se můžou ztratit: mluv nahlas.",
   "Loud room: Strong cleaning and a stricter sensitivity, for loud fans, a TV or people talking nearby.": "Hlučná místnost: Silné čištění a přísnější citlivost, na hlasité větráky, televizi nebo lidi, kteří mluví poblíž.",
-  "Normal: noise cleaned, and the sensitivity set by itself.": "Normálně: šum se vyčistí a citlivost se nastaví sama."
+  "Normal: noise cleaned, and the sensitivity set by itself.": "Normálně: šum se vyčistí a citlivost se nastaví sama.",
+  "Back to 1x, no pitch change, no effects and 100 % volume": "Zpět na 1x, beze změny výšky, bez efektů a hlasitost 100 %",
+  "Back to no pitch change, no effects and 100 % volume": "Zpět bez změny výšky, bez efektů a hlasitost 100 %",
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Jak nahlas hrají, až 4krát hlasitěji. Nad 100 % se nejhlasitější místa zaoblí, aby to nepraskalo"
 }

@@ -2353,7 +2353,6 @@
   "Your sounds, screen triggers, live radio and programs in full quality (no voice chat shaping), at their own volume. In OBS: Sources → + → Audio Output Capture → this device (for a virtual cable: Audio Input Capture → its Output end). One device at a time.": "Ваші звуки, тригери на екрані, живе радіо й програми в повній якості (без підготовки для голосового чату), зі своєю гучністю. В OBS: Джерела → + → Audio Output Capture → цей пристрій (для віртуального кабелю: Audio Input Capture → його кінець Output). Лише один пристрій за раз.",
   "What {name} gets": "Що отримує {name}",
   "All programs": "Усі програми",
-  "Back to no pitch change and no effects": "Повернути без зміни висоти й без ефектів",
   "No thanks": "Ні, дякую",
   "Onion Board shows {name} after a restart.": "Onion Board буде мовою {name} після перезапуску.",
   "Pitch and effects of the programs you send": "Висота й ефекти програм, які ви надсилаєте",
@@ -4751,5 +4750,8 @@
   "{label} preset": "Пресет «{label}»",
   "Just my voice: Strong cleaning, a strict sensitivity and your voice kept at one loudness. Quiet words can be cut: speak up.": "Лише мій голос: Сильне очищення, сувора чутливість і голос завжди однієї гучності. Тихі слова можуть обрізатися: говори голосніше.",
   "Loud room: Strong cleaning and a stricter sensitivity, for loud fans, a TV or people talking nearby.": "Галаслива кімната: Сильне очищення й суворіша чутливість, для гучних вентиляторів, телевізора чи людей, що говорять поруч.",
-  "Normal: noise cleaned, and the sensitivity set by itself.": "Звичайно: шум прибирається, а чутливість налаштовується сама."
+  "Normal: noise cleaned, and the sensitivity set by itself.": "Звичайно: шум прибирається, а чутливість налаштовується сама.",
+  "Back to 1x, no pitch change, no effects and 100 % volume": "Назад до 1x, без зміни висоти, без ефектів і гучність 100 %",
+  "Back to no pitch change, no effects and 100 % volume": "Повернути без зміни висоти, без ефектів і гучність 100 %",
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Наскільки гучно вони звучать, до 4 разів гучніше. Понад 100 % найгучніші місця згладжуються, щоб не тріщало"
 }

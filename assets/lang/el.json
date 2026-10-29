@@ -2306,7 +2306,6 @@
   "Your sounds, screen triggers, live radio and programs in full quality (no voice chat shaping), at their own volume. In OBS: Sources → + → Audio Output Capture → this device (for a virtual cable: Audio Input Capture → its Output end). One device at a time.": "Οι ήχοι σου, τα εναύσματα οθόνης, το ζωντανό ραδιόφωνο και τα προγράμματα σε πλήρη ποιότητα (χωρίς διαμόρφωση για φωνητικό chat), με δική τους ένταση. Στο OBS: Sources → + → Audio Output Capture → αυτή η συσκευή (για εικονικό καλώδιο: Audio Input Capture → η άκρη Output του). Μία συσκευή τη φορά.",
   "What {name} gets": "Τι παίρνει το {name}",
   "All programs": "Όλα τα προγράμματα",
-  "Back to no pitch change and no effects": "Πίσω σε χωρίς αλλαγή τόνου και χωρίς εφέ",
   "No thanks": "Όχι, ευχαριστώ",
   "Onion Board shows {name} after a restart.": "Το Onion Board εμφανίζεται στα {name} μετά από επανεκκίνηση.",
   "Pitch and effects of the programs you send": "Τόνος και εφέ των προγραμμάτων που στέλνεις",
@@ -4669,5 +4668,8 @@
   "{label} preset": "Προρύθμιση {label}",
   "Just my voice: Strong cleaning, a strict sensitivity and your voice kept at one loudness. Quiet words can be cut: speak up.": "Μόνο η φωνή μου: Ισχυρός καθαρισμός, αυστηρή ευαισθησία και η φωνή σου πάντα στην ίδια ένταση. Οι σιγανές λέξεις μπορεί να κοπούν: μίλα δυνατά.",
   "Loud room: Strong cleaning and a stricter sensitivity, for loud fans, a TV or people talking nearby.": "Θορυβώδες δωμάτιο: Ισχυρός καθαρισμός και αυστηρότερη ευαισθησία, για δυνατούς ανεμιστήρες, τηλεόραση ή κόσμο που μιλά κοντά.",
-  "Normal: noise cleaned, and the sensitivity set by itself.": "Κανονικό: ο θόρυβος καθαρίζεται και η ευαισθησία ρυθμίζεται μόνη της."
+  "Normal: noise cleaned, and the sensitivity set by itself.": "Κανονικό: ο θόρυβος καθαρίζεται και η ευαισθησία ρυθμίζεται μόνη της.",
+  "Back to 1x, no pitch change, no effects and 100 % volume": "Πίσω στο 1x, χωρίς αλλαγή τόνου, χωρίς εφέ και ένταση 100 %",
+  "Back to no pitch change, no effects and 100 % volume": "Πίσω σε χωρίς αλλαγή τόνου, χωρίς εφέ και ένταση 100 %",
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Πόσο δυνατά παίζουν, έως 4 φορές πιο δυνατά. Πάνω από 100 % οι πιο δυνατές κορυφές στρογγυλεύονται για να μην τρίζει"
 }

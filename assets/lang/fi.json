@@ -2306,7 +2306,6 @@
   "Your sounds, screen triggers, live radio and programs in full quality (no voice chat shaping), at their own volume. In OBS: Sources → + → Audio Output Capture → this device (for a virtual cable: Audio Input Capture → its Output end). One device at a time.": "Äänesi, näyttölaukaisimet, live-radio ja ohjelmat täydellä laadulla (ilman puhechatin muokkausta), omalla äänenvoimakkuudellaan. OBS:ssä: Lähteet → + → Audio Output Capture → tämä laite (virtuaalikaapelille: Audio Input Capture → sen Output-pää). Yksi laite kerrallaan.",
   "What {name} gets": "Mitä {name} saa",
   "All programs": "Kaikki ohjelmat",
-  "Back to no pitch change and no effects": "Takaisin: ei sävelkorkeuden muutosta eikä efektejä",
   "No thanks": "Ei kiitos",
   "Onion Board shows {name} after a restart.": "Onion Board näkyy kielellä {name} uudelleenkäynnistyksen jälkeen.",
   "Pitch and effects of the programs you send": "Lähettämiesi ohjelmien sävelkorkeus ja efektit",
@@ -4669,5 +4668,8 @@
   "{label} preset": "Esiasetus {label}",
   "Just my voice: Strong cleaning, a strict sensitivity and your voice kept at one loudness. Quiet words can be cut: speak up.": "Vain ääneni: Vahva puhdistus, tiukka herkkyys ja äänesi aina yhtä kovana. Hiljaiset sanat voivat katketa: puhu tarpeeksi kovaa.",
   "Loud room: Strong cleaning and a stricter sensitivity, for loud fans, a TV or people talking nearby.": "Meluisa huone: Vahva puhdistus ja tiukempi herkkyys, kovaäänisille tuulettimille, televisiolle tai lähellä puhuville ihmisille.",
-  "Normal: noise cleaned, and the sensitivity set by itself.": "Normaali: kohina puhdistetaan, ja herkkyys säätyy itsestään."
+  "Normal: noise cleaned, and the sensitivity set by itself.": "Normaali: kohina puhdistetaan, ja herkkyys säätyy itsestään.",
+  "Back to 1x, no pitch change, no effects and 100 % volume": "Takaisin 1x:ään, ei sävelkorkeuden muutosta, ei efektejä ja äänenvoimakkuus 100 %",
+  "Back to no pitch change, no effects and 100 % volume": "Takaisin: ei sävelkorkeuden muutosta, ei efektejä ja äänenvoimakkuus 100 %",
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Kuinka kovaa ne soivat, jopa 4 kertaa kovempaa. Yli 100 %:ssa kovimmat huiput pyöristetään, jottei ääni rätise"
 }

@@ -2306,7 +2306,6 @@
   "Your sounds, screen triggers, live radio and programs in full quality (no voice chat shaping), at their own volume. In OBS: Sources → + → Audio Output Capture → this device (for a virtual cable: Audio Input Capture → its Output end). One device at a time.": "Dina ljud, skärmtriggers, liveradio och program i full kvalitet (utan röstchattanpassning), med egen volym. I OBS: Källor → + → Audio Output Capture → den här enheten (för en virtuell kabel: Audio Input Capture → dess Output-ände). En enhet åt gången.",
   "What {name} gets": "Vad {name} får",
   "All programs": "Alla program",
-  "Back to no pitch change and no effects": "Tillbaka till ingen tonhöjdsändring och inga effekter",
   "No thanks": "Nej tack",
   "Onion Board shows {name} after a restart.": "Onion Board visar {name} efter en omstart.",
   "Pitch and effects of the programs you send": "Tonhöjd och effekter för programmen du skickar",
@@ -4669,5 +4668,8 @@
   "{label} preset": "Förinställning {label}",
   "Just my voice: Strong cleaning, a strict sensitivity and your voice kept at one loudness. Quiet words can be cut: speak up.": "Bara min röst: Stark rensning, en sträng känslighet och din röst alltid lika hög. Tysta ord kan klippas bort: prata högt nog.",
   "Loud room: Strong cleaning and a stricter sensitivity, for loud fans, a TV or people talking nearby.": "Bullrigt rum: Stark rensning och en strängare känslighet, för höga fläktar, en tv eller folk som pratar i närheten.",
-  "Normal: noise cleaned, and the sensitivity set by itself.": "Normal: bruset rensas bort och känsligheten ställer in sig själv."
+  "Normal: noise cleaned, and the sensitivity set by itself.": "Normal: bruset rensas bort och känsligheten ställer in sig själv.",
+  "Back to 1x, no pitch change, no effects and 100 % volume": "Tillbaka till 1x, ingen tonhöjdsändring, inga effekter och 100 % volym",
+  "Back to no pitch change, no effects and 100 % volume": "Tillbaka till ingen tonhöjdsändring, inga effekter och 100 % volym",
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Hur högt de låter, upp till 4 gånger så högt. Över 100 % rundas de högsta topparna av så att det inte sprakar"
 }
