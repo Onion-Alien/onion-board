@@ -4589,5 +4589,7 @@
   "Normal: noise cleaned, and the sensitivity set by itself.": "標準：清除雜訊，靈敏度自動設定。",
   "Back to 1x, no pitch change, no effects and 100 % volume": "回到 1x、不變音高、不加效果、音量 100 %",
   "Back to no pitch change, no effects and 100 % volume": "回到不變音高、不加效果、音量 100 %",
-  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "聲音多大，最高 4 倍。超過 100 % 時會把最響的部分修圓，不會爆音"
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "聲音多大，最高 4 倍。超過 100 % 時會把最響的部分修圓，不會爆音",
+  "{st} st from the speed": "速度帶來 {st} 半音",
+  "{st} st from the speed, {total} st in all": "速度帶來 {st} 半音，共 {total} 半音"
 }

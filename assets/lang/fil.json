@@ -4671,5 +4671,7 @@
   "Normal: noise cleaned, and the sensitivity set by itself.": "Normal: nililinis ang ingay, at kusang naitatakda ang sensitivity.",
   "Back to 1x, no pitch change, no effects and 100 % volume": "Balik sa 1x, walang pitch change, walang effects at 100 % volume",
   "Back to no pitch change, no effects and 100 % volume": "Balik sa walang pitch change, walang effects at 100 % volume",
-  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Gaano kalakas sila, hanggang 4 na beses. Lampas 100 %, pinapakinis ang pinakamalalakas na bahagi para hindi mag-crackle"
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Gaano kalakas sila, hanggang 4 na beses. Lampas 100 %, pinapakinis ang pinakamalalakas na bahagi para hindi mag-crackle",
+  "{st} st from the speed": "{st} st mula sa bilis",
+  "{st} st from the speed, {total} st in all": "{st} st mula sa bilis, {total} st lahat"
 }

@@ -449,6 +449,17 @@ class SpeedPitchButton(QPushButton):
         v.addWidget(quick)
         v.addSpacing(2)
         v.addWidget(self.pitch)
+        # with keep pitch off the speed moves the pitch too (Nightcore's +4.5 st): said
+        # under the slider, which only holds the shift on top. Its line is kept while
+        # hidden, so the pop-up doesn't jump under a speed drag
+        self.pitch_note = QLabel()
+        self.pitch_note.setObjectName("hint")
+        self.pitch_note.setContentsMargins(self._name_w + GAP, 0, 0, 0)
+        keep_line = self.pitch_note.sizePolicy()
+        keep_line.setRetainSizeWhenHidden(self.has_speed)
+        self.pitch_note.setSizePolicy(keep_line)
+        self.pitch_note.hide()
+        v.addWidget(self.pitch_note)
         self.keep = QCheckBox(_("Keep pitch when changing speed"))
         self.keep.setChecked(True)
         self.keep.setToolTip(_("Off: slower is also deeper and faster is higher, like a tape"))
@@ -890,4 +901,21 @@ class SpeedPitchButton(QPushButton):
         self._light_presets()
         self._label()
         self.meter.set_value(self.speed.value() if self.has_speed else self.pitch.value())
+        self._pitch_note()
         self.changed.emit(*self.values())
+
+    def _pitch_note(self):
+        """How far the speed moves the pitch while keep pitch is off, and the total
+        with the slider's shift: shown only then."""
+        speed, shift, keep = self.values()
+        st = round(12 * math.log2(speed), 1) if self.has_speed and not keep else 0.0
+        if abs(st) < 0.05:
+            self.pitch_note.hide()
+            return
+        if abs(shift) < 1e-3:
+            text = _("{st} st from the speed", st=f"{st:+g}")
+        else:
+            text = _("{st} st from the speed, {total} st in all", st=f"{st:+g}",
+                     total=f"{round(st + shift, 1):+g}")
+        self.pitch_note.setText(text)
+        self.pitch_note.show()

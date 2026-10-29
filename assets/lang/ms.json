@@ -4589,5 +4589,7 @@
   "Normal: noise cleaned, and the sensitivity set by itself.": "Biasa: hingar dibersihkan, dan kepekaan ditetapkan sendiri.",
   "Back to 1x, no pitch change, no effects and 100 % volume": "Kembali ke 1x, tiada perubahan pic, tiada kesan dan kelantangan 100 %",
   "Back to no pitch change, no effects and 100 % volume": "Kembali kepada tiada perubahan pic, tiada kesan dan kelantangan 100 %",
-  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Sekuat mana bunyinya, sehingga 4 kali ganda. Melebihi 100 %, bahagian paling kuat dibulatkan supaya tidak pecah"
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Sekuat mana bunyinya, sehingga 4 kali ganda. Melebihi 100 %, bahagian paling kuat dibulatkan supaya tidak pecah",
+  "{st} st from the speed": "{st} st daripada kelajuan",
+  "{st} st from the speed, {total} st in all": "{st} st daripada kelajuan, {total} st semuanya"
 }

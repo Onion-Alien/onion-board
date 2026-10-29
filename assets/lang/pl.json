@@ -4753,5 +4753,7 @@
   "Normal: noise cleaned, and the sensitivity set by itself.": "Normalnie: szum jest czyszczony, a czułość ustawia się sama.",
   "Back to 1x, no pitch change, no effects and 100 % volume": "Z powrotem 1x, bez zmiany wysokości, bez efektów i głośność 100 %",
   "Back to no pitch change, no effects and 100 % volume": "Z powrotem bez zmiany wysokości, bez efektów i głośność 100 %",
-  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Jak głośno grają, do 4 razy głośniej. Powyżej 100 % najgłośniejsze miejsca są zaokrąglane, żeby nie trzeszczało"
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Jak głośno grają, do 4 razy głośniej. Powyżej 100 % najgłośniejsze miejsca są zaokrąglane, żeby nie trzeszczało",
+  "{st} st from the speed": "{st} półt. z prędkości",
+  "{st} st from the speed, {total} st in all": "{st} półt. z prędkości, razem {total} półt."
 }

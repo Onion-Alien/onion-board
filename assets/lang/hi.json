@@ -4671,5 +4671,7 @@
   "Normal: noise cleaned, and the sensitivity set by itself.": "सामान्य: शोर साफ़ होता है, और सेंसिटिविटी अपने आप सेट होती है।",
   "Back to 1x, no pitch change, no effects and 100 % volume": "वापस 1x पर, बिना पिच बदलाव, बिना इफ़ेक्ट और 100 % वॉल्यूम",
   "Back to no pitch change, no effects and 100 % volume": "बिना पिच बदलाव, बिना इफ़ेक्ट और 100 % वॉल्यूम पर वापस",
-  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "कितनी तेज़ आवाज़, 4 गुना तक। 100 % से ऊपर सबसे तेज़ हिस्से गोल कर दिए जाते हैं ताकि आवाज़ न फटे"
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "कितनी तेज़ आवाज़, 4 गुना तक। 100 % से ऊपर सबसे तेज़ हिस्से गोल कर दिए जाते हैं ताकि आवाज़ न फटे",
+  "{st} st from the speed": "स्पीड से {st} st",
+  "{st} st from the speed, {total} st in all": "स्पीड से {st} st, कुल {total} st"
 }

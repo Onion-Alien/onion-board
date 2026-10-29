@@ -4671,5 +4671,7 @@
   "Normal: noise cleaned, and the sensitivity set by itself.": "Normál: a zaj eltűnik, az érzékenység magától beáll.",
   "Back to 1x, no pitch change, no effects and 100 % volume": "Vissza 1x-re, hangmagasság-változás és effektek nélkül, 100 % hangerővel",
   "Back to no pitch change, no effects and 100 % volume": "Vissza hangmagasság-változás és effektek nélkül, 100 % hangerővel",
-  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Milyen hangosan szólnak, akár 4-szer hangosabban. 100 % fölött a leghangosabb részek lekerekítve, hogy ne recsegjen"
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Milyen hangosan szólnak, akár 4-szer hangosabban. 100 % fölött a leghangosabb részek lekerekítve, hogy ne recsegjen",
+  "{st} st from the speed": "{st} félhang a sebességtől",
+  "{st} st from the speed, {total} st in all": "{st} félhang a sebességtől, összesen {total}"
 }

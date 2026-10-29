@@ -4753,5 +4753,7 @@
   "Normal: noise cleaned, and the sensitivity set by itself.": "Normálně: šum se vyčistí a citlivost se nastaví sama.",
   "Back to 1x, no pitch change, no effects and 100 % volume": "Zpět na 1x, beze změny výšky, bez efektů a hlasitost 100 %",
   "Back to no pitch change, no effects and 100 % volume": "Zpět bez změny výšky, bez efektů a hlasitost 100 %",
-  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Jak nahlas hrají, až 4krát hlasitěji. Nad 100 % se nejhlasitější místa zaoblí, aby to nepraskalo"
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Jak nahlas hrají, až 4krát hlasitěji. Nad 100 % se nejhlasitější místa zaoblí, aby to nepraskalo",
+  "{st} st from the speed": "{st} půltónů z rychlosti",
+  "{st} st from the speed, {total} st in all": "{st} půltónů z rychlosti, celkem {total}"
 }

@@ -4671,5 +4671,7 @@
   "Normal: noise cleaned, and the sensitivity set by itself.": "Normal: bruset rensas bort och känsligheten ställer in sig själv.",
   "Back to 1x, no pitch change, no effects and 100 % volume": "Tillbaka till 1x, ingen tonhöjdsändring, inga effekter och 100 % volym",
   "Back to no pitch change, no effects and 100 % volume": "Tillbaka till ingen tonhöjdsändring, inga effekter och 100 % volym",
-  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Hur högt de låter, upp till 4 gånger så högt. Över 100 % rundas de högsta topparna av så att det inte sprakar"
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Hur högt de låter, upp till 4 gånger så högt. Över 100 % rundas de högsta topparna av så att det inte sprakar",
+  "{st} st from the speed": "{st} st från hastigheten",
+  "{st} st from the speed, {total} st in all": "{st} st från hastigheten, {total} st totalt"
 }

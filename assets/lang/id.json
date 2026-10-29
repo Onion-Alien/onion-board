@@ -4589,5 +4589,7 @@
   "Normal: noise cleaned, and the sensitivity set by itself.": "Normal: bising dibersihkan, dan sensitivitas diatur sendiri.",
   "Back to 1x, no pitch change, no effects and 100 % volume": "Kembali ke 1x, tanpa ubah nada, tanpa efek dan volume 100 %",
   "Back to no pitch change, no effects and 100 % volume": "Kembali tanpa perubahan nada, tanpa efek dan volume 100 %",
-  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Seberapa keras suaranya, sampai 4 kali lipat. Di atas 100 % bagian paling keras dibulatkan agar tidak pecah"
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Seberapa keras suaranya, sampai 4 kali lipat. Di atas 100 % bagian paling keras dibulatkan agar tidak pecah",
+  "{st} st from the speed": "{st} st dari kecepatan",
+  "{st} st from the speed, {total} st in all": "{st} st dari kecepatan, total {total} st"
 }

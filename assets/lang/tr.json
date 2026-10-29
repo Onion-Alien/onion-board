@@ -4671,5 +4671,7 @@
   "Normal: noise cleaned, and the sensitivity set by itself.": "Normal: gürültü temizlenir, hassasiyet kendi kendine ayarlanır.",
   "Back to 1x, no pitch change, no effects and 100 % volume": "1x'e dön, perde değişikliği yok, efekt yok, ses düzeyi %100",
   "Back to no pitch change, no effects and 100 % volume": "Perde değişikliği ve efekt olmayan hale, ses düzeyi %100'e dön",
-  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Ne kadar yüksek çaldıkları, 4 katına kadar. %100'ün üstünde en yüksek yerler yuvarlanır, böylece cızırtı olmaz"
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Ne kadar yüksek çaldıkları, 4 katına kadar. %100'ün üstünde en yüksek yerler yuvarlanır, böylece cızırtı olmaz",
+  "{st} st from the speed": "Hızdan {st} yarım ton",
+  "{st} st from the speed, {total} st in all": "Hızdan {st} yarım ton, toplam {total} yarım ton"
 }
