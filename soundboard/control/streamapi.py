@@ -410,9 +410,19 @@ def fill(template: str, values: dict) -> str:
     return _FIELD.sub(one, template)
 
 
+def loading_answer(mw: MainWindow, m) -> tuple[int, dict]:
+    """Play pressed on a sound that isn't loaded: still loading, it plays once it is
+    (as a pad press does); a file that failed to load can't."""
+    p = mw.pads.get(m.id)
+    if p is not None and p.state == "error":
+        return 409, {"error": "that sound couldn't load" + (f": {p.error}" if p.error else "")}
+    mw.playctl.play(m.id)
+    return 200, {"playing": m.id, "name": m.name, "loading": True}
+
+
 def _play(mw: MainWindow, m) -> tuple[int, dict]:
     if m.id not in mw.audio:
-        return 409, {"error": "that sound hasn't loaded (yet)"}
+        return loading_answer(mw, m)
     mw.playctl.play(m.id)
     return 200, {"playing": m.id, "name": m.name}
 

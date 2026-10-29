@@ -102,6 +102,8 @@ class SoundsControl(Controller):
             p.state = "ready" if data is not None else "error"
             p.error = err
             p.update()
+        if data is not None:
+            mw.playctl.loaded(sid)   # pressed while it loaded: it plays now
 
     def _live_metas(self) -> list[SoundMeta]:
         """Every sound whose files must be kept: the library, and removed ones that

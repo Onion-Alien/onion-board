@@ -190,7 +190,7 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
                 mw.engine.stop(v)
         return 200, {"stopped": m.id}
     if m.id not in mw.audio:
-        return 409, {"error": "that sound hasn't loaded (yet)"}
+        return streamapi.loading_answer(mw, m)
     mw.playctl.play(m.id)
     return 200, {"playing": m.id, "name": m.name}
 
