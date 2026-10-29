@@ -66,6 +66,33 @@ TAB_NAMES = {"clean": lambda: _("Clean mic"), "fx": lambda: _("Voice changer"),
              "addons": lambda: _("Add-ons")}
 
 
+class _VoiceTab(QPushButton):
+    """A Voice tab: with property "live" (its voice or Clean mic is on) a small green
+    dot after its name, picked or not. (Blue words for it looked like a glitch.)"""
+
+    DOT = 8
+
+    def sizeHint(self):
+        sh = super().sizeHint()
+        if self.property("live"):   # room for the dot only while it shows: kept on every
+            sh.setWidth(sh.width() + self.DOT + 6)   # tab, the row wrapped a tab sooner
+        return sh
+
+    def paintEvent(self, e):
+        super().paintEvent(e)
+        if not self.property("live"):
+            return
+        p = QPainter(self)
+        snap_to_pixels(p)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        # picked: in its words' colour on the accent, as its icon (green was lost there)
+        p.setPen(Qt.PenStyle.NoPen)
+        p.setBrush(QColor(theme.T["on_accent" if self.isChecked() else "ok_text"]))
+        x = 8 if self.isRightToLeft() else self.width() - 8 - self.DOT
+        p.drawEllipse(QRectF(x, (self.height() - self.DOT) / 2, self.DOT, self.DOT))
+        p.end()
+
+
 class VoiceCards(_Panel):
     """VoicePanel's cards, tabs and status chips."""
 
@@ -102,7 +129,7 @@ class VoiceCards(_Panel):
         # title row sat in an 80 px gap
         v.addWidget(panel, 1)
         panel.show()
-        b = QPushButton(TAB_NAMES[key]())
+        b = _VoiceTab(TAB_NAMES[key]())
         b.setObjectName("voicetab")
         b.setCheckable(True)
         b.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -276,8 +303,15 @@ class VoiceCards(_Panel):
         tab = self._tabs[key]
         if tab.property("live") != on:   # a tab that's on shows it, picked or not
             tab.setProperty("live", on)
-            tab.style().unpolish(tab)
-            tab.style().polish(tab)
+            tab.setToolTip(_("On") if on else "")
+            tab.updateGeometry()   # (its dot's room)
+            tab.update()
+            self.live_tabs_changed.emit()   # the On Air card's lines (netcontrol)
+
+    def live_tabs(self) -> list[tuple[str, str, str]]:
+        """The tabs that are on (their dot), in order: (key, icon, name)."""
+        return [(k, CARD_ICONS[k], TAB_NAMES[k]()) for k, b in self._tabs.items()
+                if b.property("live")]
 
     def tab_icon(self) -> str:
         """A consistent line icon; the live dot indicates whether voice is active."""

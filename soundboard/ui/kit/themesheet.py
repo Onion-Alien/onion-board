@@ -418,7 +418,6 @@ QWidget#setupsbar QPushButton#voicecat:hover:!checked { background:$btn_hover; }
 QWidget#setupsbar QPushButton#voicecat:checked { background:$accent; border-color:$accent_hi; color:$on_accent; font-weight:600; }
 QPushButton#voicetab:hover:!checked { background:$btn_hover; border-color:$border_hi; }
 QPushButton#voicetab:checked { background:$accent; color:$on_accent; border-color:$accent_hi; }
-QPushButton#voicetab[live="true"]:!checked { color:$live_text; border-color:$live_border; }
 QFrame#card QToolButton#voicetile { background:$card; color:$text; border:1px solid transparent; border-radius:12px; padding:8px 4px 6px 4px; font-size:8.5pt; }
 QFrame#card QToolButton#voicetile:hover:!checked { background:$btn_hover; border-color:$border_hi; }
 QFrame#card QToolButton#voicetile:checked { background:$accent; color:$on_accent; border:1px solid $accent_hi; font-weight:700; }

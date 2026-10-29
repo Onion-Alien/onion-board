@@ -371,8 +371,12 @@ class OutputBlock(QFrame):
         if tail is not None and tail.isVisible():
             right = self._air(tail)[1]
         else:
-            ink = label.fontMetrics().tightBoundingRect(label.text())
-            right = max(0, label.sizeHint().width() - (ink.right() + 1))
+            # the widest of the lines it's sized for (_HugLabel's widest): every line the
+            # same shift, so their icons stay in one column
+            fm = label.fontMetrics()
+            ink = max(fm.tightBoundingRect(t).right() + 1
+                      for t in (label.text(), *getattr(label, "_widest", ())))
+            right = max(0, label.sizeHint().width() - ink)
         d, pad = left - right, self._px(self.PAD)
         row.setContentsMargins(pad + max(0, -d), top, pad + max(0, d), bottom)
 
@@ -676,15 +680,22 @@ class OutputBlock(QFrame):
         self.status_icon.setPixmap(self.connection.icon().pixmap(glyph, glyph))
         icons.set_label_icon(self.arrow, "fold_back" if self.isRightToLeft() else "fold",
                              "warn_text", size=self._px(self.CHEVRON))
+        # every line as wide as the widest, so centred they share one icon column and one
+        # text keyline (several lines each centred on its own zigzagged)
+        words = tuple(line.words for line in self._lines)
         for i, n in enumerate(self.net):
             n.setVisible(i < len(self._lines))
             if i < len(self._lines):
+                n.label._widest = words
                 n.show_line(self._lines[i], self._px(self.GLYPH) if not small else self.GLYPH)
+                n.label.updateGeometry()
         # a network line under Mute and Stop all brings its own padding: the same room
         # over its words as under them
         pad = self._px(self.PAD)
         self.pair_lay.setContentsMargins(pad, pad, pad, 0 if self._lines else pad)
-        self.strip_lay.setContentsMargins(pad, pad if self._lines else 0, pad, pad)
+        # (and under them: the strip adds none of its own, or the words sat 7 px nearer
+        # Mute and Stop all than the strip)
+        self.strip_lay.setContentsMargins(pad, 0, pad, pad)
         if self.stop is not None and self.rail_stop is not None:
             self._words()
         self._pin_all()
