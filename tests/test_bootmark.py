@@ -3,7 +3,16 @@ from __future__ import annotations
 
 import os
 
-from soundboard.core import bootmark
+import pytest
+
+from soundboard.core import bootmark, earlystart
+
+
+@pytest.fixture(autouse=True)
+def _no_early_loading_screen(monkeypatch):
+    """Tests here run main.py in this process: never its early loading screen (the real
+    single-instance lock, a QApplication, the stall watch): tests/test_earlystart.py."""
+    monkeypatch.setattr(earlystart, "show", lambda *a, **k: False)
 
 
 def test_a_leftover_breadcrumb_names_the_run(tmp_path):
