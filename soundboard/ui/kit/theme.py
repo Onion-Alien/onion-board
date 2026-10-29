@@ -10,9 +10,11 @@ from __future__ import annotations
 
 import datetime
 import re
+import time
 from contextlib import contextmanager
 
-from PySide6.QtCore import QPointF, Qt
+import shiboken6
+from PySide6.QtCore import QCoreApplication, QEvent, QObject, QPointF, Qt, QTimer
 from PySide6.QtGui import (QColor, QPainter)
 
 from soundboard.i18n import _
@@ -382,19 +384,22 @@ def _recolour_inline(widgets, old: dict[str, str]) -> None:
             pass
 
 
-def _style_when_shown(app) -> list:
+def _style_when_shown(app, closed: list | None = None) -> list:
     """Leave the app's closed windows (Edit voice, Live controls, a menu: a few hundred
     widgets never shown yet) out of the next restyle: Qt restyles only the widgets it
     has polished, and a widget not polished is polished in the sheet of the day when
     it's shown. A third of a theme switch, which froze the app on slower PCs. Only
     windows with an owner: the main window hidden in the tray restyles as before.
-    Returns the widgets in them with a sheet of their own (_own_sheets_again)."""
+    Returns the widgets in them with a sheet of their own (_own_sheets_again);
+    `closed` gets the windows."""
     from PySide6.QtWidgets import QWidget
     polished = Qt.WidgetAttribute.WA_WState_Polished
     own = []
     for top in app.topLevelWidgets():
         if top.isVisible() or top.parentWidget() is None:
             continue
+        if closed is not None:
+            closed.append(top)
         # one under an owner with its own sheet (Live controls' button, lit) takes
         # its style from there, so it counts as having one
         inherits = any(p.styleSheet() for p in _owners(top))
@@ -428,15 +433,180 @@ def _own_sheets_again(own: list) -> None:
             pass
 
 
-def _restyle(app, css: str) -> None:
-    own = _style_when_shown(app)
-    # cleared first: Qt swapping one app-wide sheet straight for another re-styles
-    # every widget the slow way (3 s against 0.6 s with ~2000 widgets); empty and
-    # then the new sheet gives the same look. No paint happens in between.
-    app.setStyleSheet("")
+def _hidden_parts(app) -> list:
+    """The hidden parts of the open windows (the other tabs, Settings' other pages, a
+    closed panel): each the topmost hidden widget under a widget on screen. Most of a
+    window is in them (~1400 of ~1500 styled widgets on a full board)."""
+    from PySide6.QtWidgets import QWidget
+    direct = Qt.FindChildOption.FindDirectChildrenOnly
+    parts, on = [], [w for w in app.topLevelWidgets() if w.isVisible()]
+    while on:
+        for c in on.pop().findChildren(QWidget, options=direct):
+            if not c.isWindow():   # (a window of its own: closed, or on screen)
+                (on if c.isVisible() else parts).append(c)
+    return parts
+
+
+_HELD_BACK = (QEvent.Type.StyleChange, QEvent.Type.FontChange, QEvent.Type.PaletteChange)
+
+
+class _Later(QObject):
+    """What a theme switch leaves for after it, done a few widgets at a time between
+    the event loop's other work. Qt tells every widget in the app the style changed
+    (a StyleChange each), and each works its look out again from the sheet's ~530
+    rules: most of a switch's freeze (~0.5 s on a full board, 1-1.7 s on a busy PC),
+    for the ~2000 widgets nobody can see. Those hear of it afterwards: the hidden
+    parts of the open windows (styled in the new sheet then, as Qt's restyle would
+    have) and the closed windows (styled when shown, as before). One shown before its
+    turn has its share done as it shows, before it paints."""
+
+    SLICE_S = 0.008   # the most each turn takes before the event loop is back
+
+    def __init__(self):
+        super().__init__()
+        self.todo: list = []    # (widget, style it, set its sheet again), parents first
+        self.hold: set = set()  # the widgets in todo: no StyleChange while restyling
+        self.tops: list = []    # the tops of what's in todo, watched for a show
+        self.holding = False
+        self.timer = QTimer(self)
+        self.timer.setInterval(0)
+        self.timer.timeout.connect(self._step)
+
+    def queue(self, parts: list, closed: list, own: list) -> None:
+        """The hidden `parts` of the open windows and the `closed` windows, left for
+        later; `own`: the widgets in those with a sheet of their own (_own_sheets_again).
+        Their old sheet stays on them until then (undone with the new style's
+        unpolish: _keep_sheet_caches)."""
+        from PySide6.QtWidgets import QWidget
+        polished = Qt.WidgetAttribute.WA_WState_Polished
+        own_set = set(own)
+        _keep_sheet_caches()
+        for tops, styled in ((parts, True), (closed, False)):
+            for top in tops:
+                for w in (top, *top.findChildren(QWidget)):   # (each after its parent)
+                    if w in self.hold:
+                        continue   # (left from a switch just before: still to do)
+                    style = styled and w.testAttribute(polished)
+                    self.hold.add(w)
+                    # (Qt's restyle sets a styled widget's own sheet again: so does this)
+                    self.todo.append((w, style, w in own_set or (style and bool(w.styleSheet()))))
+                    if style:
+                        w.setAttribute(polished, False)   # left out of Qt's restyle
+                top.installEventFilter(self)
+                self.tops.append(top)
+        if self.todo:
+            self.timer.start()
+
+    @contextmanager
+    def holding_back(self, app):
+        """While the app restyles: no StyleChange to the widgets left for later."""
+        self.holding = True
+        app.installEventFilter(self)
+        try:
+            yield
+        finally:
+            app.removeEventFilter(self)
+            self.holding = False
+
+    def eventFilter(self, obj, ev):  # noqa: N802 - Qt API
+        try:
+            t = ev.type()
+            if t in _HELD_BACK:
+                return self.holding and obj in self.hold
+            if t == QEvent.Type.Show and obj in self.tops:
+                self._do_now(obj)
+        except RuntimeError:   # (being deleted: nothing to style)
+            pass
+        return False
+
+    def _do_now(self, top) -> None:
+        """`top` is showing: its share done now, before it paints."""
+        rest = []
+        for item in self.todo:
+            w = item[0]
+            if not shiboken6.isValid(w):
+                self.hold.discard(w)
+            elif w is top or top.isAncestorOf(w):
+                self.hold.discard(w)
+                _style_one(*item)
+            else:
+                rest.append(item)
+        self.todo = rest
+
+    def _step(self) -> None:
+        end = time.perf_counter() + self.SLICE_S
+        todo = self.todo
+        i = 0
+        while i < len(todo) and time.perf_counter() < end:
+            item = todo[i]
+            i += 1
+            self.hold.discard(item[0])
+            if shiboken6.isValid(item[0]):
+                _style_one(*item)
+        del todo[:i]
+        if not todo:
+            self.timer.stop()
+            self.hold.clear()
+            for top in self.tops:
+                if shiboken6.isValid(top):
+                    top.removeEventFilter(self)
+            self.tops = []
+
+
+def _style_one(w, style: bool, sheet_again: bool) -> None:
+    """One widget left out of the restyle: told the style changed, its own sheet made
+    anew over the new app sheet (`sheet_again`: _own_sheets_again), and (`style`) given
+    the app's sheet, as Qt's restyle would have."""
+    polished = Qt.WidgetAttribute.WA_WState_Polished
+    try:
+        if sheet_again:
+            _own_sheets_again([w])
+        if style and not w.testAttribute(polished):
+            st = w.style()
+            st.unpolish(w)   # the old sheet undone (its palette and font back)
+            st.polish(w)
+            w.setAttribute(polished, True)
+        QCoreApplication.sendEvent(w, QEvent(QEvent.Type.StyleChange))
+    except RuntimeError:   # being deleted
+        pass
+
+
+_later: _Later | None = None
+_keeper = None
+
+
+def _keep_sheet_caches() -> None:
+    """Qt keeps what a sheet changed on each widget (its palette and font before) only
+    while some sheet style exists, and clearing the app's sheet can end the last one:
+    a widget left out of the restyle kept the old theme's colours for good where the
+    new sheet had no rule (the old one's undone only by Qt's clear, ~0.1 s). A widget
+    never shown with a sheet of its own keeps one alive, so _style_one's unpolish
+    can undo it later."""
+    global _keeper
+    if _keeper is None or not shiboken6.isValid(_keeper):
+        from PySide6.QtWidgets import QWidget
+        _keeper = QWidget()
+        _keeper.setObjectName("sheetkeeper")
+        _keeper.setStyleSheet("QWidget#sheetkeeper { }")
+
+
+def _restyle(app, css: str, later: _Later | None = None) -> None:
+    """The app's sheet to `css`, every widget restyled. `later` (holding back): the
+    widgets not on screen are left to it, done a few at a time after this."""
+    closed: list = []
+    own = _style_when_shown(app, closed)
+    if later is None or not css:
+        # cleared first: Qt swapping one app-wide sheet straight for another re-styles
+        # every widget the slow way (3 s against 0.6 s with ~2000 widgets); empty and
+        # then the new sheet gives the same look. No paint happens in between.
+        app.setStyleSheet("")
+        app.setStyleSheet(css)
+        if css:
+            _own_sheets_again(own)
+        return
+    later.queue(_hidden_parts(app), closed, own)
+    app.setStyleSheet("")   # (as above: cleared first)
     app.setStyleSheet(css)
-    if css:
-        _own_sheets_again(own)
 
 
 @contextmanager
@@ -469,14 +639,18 @@ def apply(app, name: str, live: str | None = None) -> str:
         set_live(live)
     name = set_current(name)
     css = stylesheet(name)
-    if app.styleSheet() != css:   # the same sheet again (a new window): nothing changes
-        _restyle(app, css)
-    widgets = app.allWidgets()
-    _recolour_inline(widgets, old)
-    sheet = live_sheet()
-    for w in widgets:   # restyled by apply_live: keep them in step with the new theme
-        if w.objectName() in LIVE_NAMES and w.styleSheet():
-            w.setStyleSheet(sheet)
+    global _later
+    if _later is None:
+        _later = _Later()
+    with _later.holding_back(app):
+        if app.styleSheet() != css:   # the same sheet again (a new window): no change
+            _restyle(app, css, _later)
+        widgets = app.allWidgets()
+        _recolour_inline(widgets, old)
+        sheet = live_sheet()
+        for w in widgets:   # restyled by apply_live: in step with the new theme
+            if w.objectName() in LIVE_NAMES and w.styleSheet():
+                w.setStyleSheet(sheet)
     for w in widgets:   # hand-painted widgets read T in paintEvent
         w.update()
     return name

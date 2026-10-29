@@ -370,3 +370,121 @@ def test_the_fade_out_starts_from_the_window_as_it_settles(main_window, monkeypa
         assert checked >= 5
     finally:
         main_window.themectl.apply_theme(start)
+
+
+def _page(owner):
+    """A part of the window: shown once, then hidden (another tab, a closed panel)."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QComboBox, QLabel, QPushButton, QVBoxLayout, QWidget
+    page = QWidget(owner)
+    lay = QVBoxLayout(page)
+    for w in (QLabel("Sounds"), QPushButton("Add"), QComboBox()):
+        lay.addWidget(w)
+    b = QPushButton("Save")
+    b.setObjectName("primary")
+    lay.addWidget(b)
+    for w in page.findChildren(QWidget):
+        w.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+    page.setGeometry(0, 0, 240, 160)
+    return page
+
+
+def _hidden_page(main_window):  # noqa: F811
+    main_window.resize(900, 600)
+    main_window.show()
+    page = _page(main_window)
+    page.show()
+    QApplication.processEvents()
+    page.hide()
+    return page
+
+
+def _done_later():
+    end = time.monotonic() + 5
+    while theme._later is not None and theme._later.todo and time.monotonic() < end:
+        QApplication.processEvents()
+    assert not theme._later.todo
+
+
+@pytest.mark.parametrize("show_at_once", [False, True])
+def test_a_hidden_part_sits_out_the_switch_and_shows_in_the_new_theme(main_window, show_at_once):  # noqa: F811
+    """Qt told every widget of the window the style changed, and each worked its look out
+    again from the whole sheet: ~0.5 s of a switch, 1-1.7 s on a busy PC, for the hidden
+    tabs and pages nobody could see. They're styled after it, a few at a time, and one
+    shown before its turn is styled as it shows: it looks the same as one made in the
+    new theme either way."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QWidget
+
+    class Told(QObject):
+        n = 0
+
+        def eventFilter(self, obj, ev):  # noqa: N802 - Qt API
+            if ev.type() == QEvent.Type.StyleChange and obj in parts:
+                self.n += 1
+            return False
+    app = QApplication.instance()
+    start = theme.current_name
+    other = "Light" if start != "Light" else "Dark"
+    kept = _hidden_page(main_window)
+    parts = {kept, *kept.findChildren(QWidget)}
+    polished = Qt.WidgetAttribute.WA_WState_Polished
+    styled = [w for w in parts if w.testAttribute(polished)
+              and w.window() is main_window]   # (its drop-down's list: a closed window)
+    assert len(styled) >= 5
+    told = Told()
+    app.installEventFilter(told)
+    try:
+        theme.apply(app, other)
+    finally:
+        app.removeEventFilter(told)
+    fresh = None
+    try:
+        assert told.n == 0   # nothing worked out for it during the switch
+        assert not any(w.testAttribute(polished) for w in styled)
+        if not show_at_once:
+            _done_later()
+            assert all(w.testAttribute(polished) for w in styled)
+        fresh = _page(main_window)
+        for p in (kept, fresh):
+            p.show()
+            QApplication.processEvents()
+        assert kept.grab().toImage() == fresh.grab().toImage()
+    finally:
+        for p in (kept, fresh):
+            if p is not None:
+                p.deleteLater()
+        theme.apply(app, start)
+        _done_later()
+
+
+def test_a_part_left_for_later_loses_what_the_old_sheet_set(qapp):
+    """Left out of Qt's restyle, a hidden widget kept the old sheet's colour where the
+    new sheet had no rule for it (Qt's record of its own colour went with the old
+    sheet): undone when it's styled now, as Qt's restyle would."""
+    from PySide6.QtGui import QPalette
+    from PySide6.QtWidgets import QLabel, QVBoxLayout, QWidget
+    app = QApplication.instance()
+    before = app.styleSheet()
+    plain = QLabel("x").palette().color(QPalette.ColorRole.WindowText)
+    try:
+        app.setStyleSheet("QLabel { color: #ff0000; }")
+        host = QWidget()
+        page = QWidget(host)
+        QVBoxLayout(page).addWidget(label := QLabel("x"))
+        host.show()
+        QApplication.processEvents()
+        page.hide()
+        later = theme._Later()
+        with later.holding_back(app):
+            theme._restyle(app, "QPushButton { color: #0000ff; }", later)
+        assert later.todo   # (left for later)
+        while later.todo:
+            QApplication.processEvents()
+        page.show()
+        QApplication.processEvents()
+        assert label.palette().color(QPalette.ColorRole.WindowText) == plain
+    finally:
+        app.setStyleSheet(before)
+        host.close()
+        host.deleteLater()
