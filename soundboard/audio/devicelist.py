@@ -109,9 +109,12 @@ _asker = _Asker()
 
 
 def _ask(fn) -> tuple[bool, Any]:
-    """(True, fn()) on the query thread, holding DEVICES; (False, None) when PortAudio
-    is being re-scanned (its list is being freed) or slow to answer: the caller then
-    uses its last answer."""
+    """(True, fn()) holding DEVICES; (False, None) when PortAudio is being re-scanned
+    (its list is being freed) or, on the UI thread, slow to answer: the caller then
+    uses its last answer. Only the UI thread goes through the query thread: the
+    engine opens its streams holding DEVICES (on its device thread), and the query
+    thread could never take it from there, so the engine got the last list, or none
+    at all on start-up ("device not found", retried every few seconds)."""
     def held():
         if not DEVICES.acquire(blocking=False):
             return False, None
@@ -119,6 +122,8 @@ def _ask(fn) -> tuple[bool, Any]:
             return True, fn()
         finally:
             DEVICES.release()
+    if threading.current_thread() is not threading.main_thread():
+        return held()
     ok, val = _asker.ask(held)
     return val if ok else (False, None)
 
