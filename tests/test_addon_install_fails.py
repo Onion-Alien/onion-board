@@ -218,3 +218,19 @@ def test_hugging_face_waits_longer_than_10_s(helper):
     import os
     assert int(os.environ["HF_HUB_DOWNLOAD_TIMEOUT"]) >= 60
     assert int(os.environ["HF_HUB_ETAG_TIMEOUT"]) >= 60
+
+
+def test_an_install_that_crashes_says_its_type_and_place(tmp_path, seen, monkeypatch):
+    from soundboard import __version__
+    monkeypatch.setattr(usage, "_pending", [])
+    monkeypatch.setattr(usage, "_failed", set())
+
+    def boom(d, on_line):
+        raise KeyError("D:/private/x")
+    monkeypatch.setattr(pyget, "for_module", boom)
+    with pytest.raises(KeyError):
+        modules.install(addon(tmp_path / "live-voice", [[PY, "-c", "pass"]]), print)
+    [event] = usage._pending
+    assert event.startswith(f"failed/{__version__}/addon-other/live-voice/KeyError@"
+                            "soundboard/addons/modules.py:")
+    assert "private" not in event

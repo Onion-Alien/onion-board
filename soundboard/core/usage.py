@@ -17,7 +17,10 @@ another thread was busy:
 never its message or anything else from the report), an error the app caught itself and
 showed as a warning instead of crashing (`warned/<version>/<type>@<soundboard/…py:line>`
 from `warned()`, the type and the deepest line of our own code it came from, never the
-message), or the last run ending without the app closing itself
+message), a failure its fixed reason (FEATURES) only calls "other" or "timed out", with what
+was known where it failed (`failed/<version>/dl-other/ExtractorError/http-410`: the
+error's type and our own line, a web status, a Windows error or exit number, or which
+wait ran out; failed()), or the last run ending without the app closing itself
 (`unclean-exit/<version>/<why>`: a hard crash, ended in Task Manager, a power cut;
 exitwatch.py works out which, on this PC), or a run that died before it even started
 (`startup-failed/<version>` when the breadcrumb bootmark.py leaves in main.py is still
@@ -295,14 +298,15 @@ def used(key: str) -> None:
         _used.add(key)
 
 
-def ffmpeg_state(cfg, state: str) -> None:
+def ffmpeg_state(cfg, state: str, fault: str = "") -> None:
     """Remember a broken copy or failed get until a later check verifies it works.
     The marker survives daily sends and restarts; missing on a new install is normal,
     and an unknown check or a cancelled get cannot prove recovery. A check that only
     timed out ("slow") is neither: on a new install's first start the virus scan of the
     new ffmpeg.exe can outlast it, and it works a moment later. If the get it starts
     then fails, get-failed still counts. Only fixed feature
-    names are counted, never a path or error message.
+    names are counted, never a path or error message; a broken one also with `fault`
+    (ffmpegget.Health.fault: `gone`, `err-193`, `exit-N`) by failed().
     On purpose, only this count's own switch (and Offline / Tor) stop it, not FFmpeg's
     download switch: the check that finds a broken copy is local, so with that switch off
     a broken copy still counts, no get runs (so no get-failed), and a copy the user fixes
@@ -317,6 +321,7 @@ def ffmpeg_state(cfg, state: str) -> None:
         cfg.stats_ffmpeg_failed = True
         if state == "broken":
             used("ffmpeg-broken")
+            failed("ffmpeg-broken", fault)
     elif state == "ok" and cfg.stats_ffmpeg_failed:
         used("ffmpeg-recovered")
         cfg.stats_ffmpeg_failed = False
@@ -526,6 +531,86 @@ def warned_at(kind: str, where: str = "") -> None:
         return
     _warned.add(key)
     note(f"warned/{__version__}/{key}")
+
+
+# the counts that only said "another reason" or "timed out", given a detail by failed()
+FAILED = ("dl-other", "search-other", "search-timeout", "ffmpeg-broken", "ffmpeg-get",
+          "mic-code-1", "mic-code", "addon-other")
+# one part of a failed() detail: a word or number we made (`helper`, `http-403`,
+# `err-10013`), or an error's type with the deepest of our own lines
+# (`OSError@soundboard/addons/modules.py:771`); never a message, a path or a link
+_DETAIL = re.compile(r"[A-Za-z_][\w.-]{0,60}(?:@" + _OUR_FILE.pattern + r":\d{1,6})?")
+_failed: set[str] = set()   # failed() details sent this run
+
+
+def failed(what: str, *detail: str) -> None:
+    """Count `what` (one of FAILED), a count that only says it failed, with what was known
+    where it did: `failed/<version>/<what>/<detail>/…`, each part a word or number we
+    made or an error's type and place (error_detail, timeout_kind). Never its message.
+    Once per distinct one per run; a part that isn't one of those is left out."""
+    parts = [d for d in detail if d and _DETAIL.fullmatch(d)][:3]
+    if what not in FAILED or not parts:
+        return
+    key = "/".join((what, *parts))
+    if key in _failed:
+        return
+    _failed.add(key)
+    note(f"failed/{__version__}/{key}")
+
+
+def error_detail(e: BaseException | None) -> list[str]:
+    """What failed() may say about exception `e`: its type (yt-dlp's own class for a
+    download error, `.kind`), where in our code it was raised when that's known, and the
+    number it carried: a web status (`http-404`), a Windows error (`err-5`) or an errno
+    (`errno-13`), read from the exception or its text. Nothing else of the text."""
+    if e is None:
+        return []
+    kind = getattr(e, "kind", "") or type(e).__name__
+    where = _tb_where(e.__traceback__)
+    out = [f"{kind}@{where}" if where else kind]
+    text = f"{getattr(e, 'raw', '')} {e}"
+    code = getattr(e, "code", None)
+    m = re.search(r"HTTP Error (\d{3})", text)
+    if isinstance(code, int) and 100 <= code <= 599:
+        out.append(f"http-{code}")
+    elif m:
+        out.append(f"http-{m.group(1)}")
+    win = getattr(e, "winerror", None)
+    num = getattr(e, "errno", None)
+    m = re.search(r"\[WinError (\d{1,10})\]", text)
+    m2 = re.search(r"\[Errno (\d{1,5})\]", text)
+    if isinstance(win, int):
+        out.append(f"err-{win}")
+    elif m:
+        out.append(f"err-{m.group(1)}")
+    elif isinstance(num, int):
+        out.append(f"errno-{num}")
+    elif m2:
+        out.append(f"errno-{m2.group(1)}")
+    return out
+
+
+def failure_detail(why: str, e: BaseException | None) -> list[str]:
+    """What failed() may add to a download or search that failed with DL_FAILS `why`:
+    for "other" the error (error_detail), for "timeout" which wait ran out
+    (timeout_kind); nothing for the others, their word says it."""
+    if why == "other":
+        return error_detail(e)
+    return [timeout_kind(e)] if why == "timeout" else []
+
+
+def timeout_kind(e: BaseException | str | None) -> str:
+    """Which wait ran out, from a timed-out download's text: our own wait for the download
+    helper (`helper`), the connection being made (`connect`), the secure handshake
+    (`handshake`), an answer that stopped coming (`read`), else `other`."""
+    if getattr(e, "kind", "") == "helper-timeout":
+        return "helper"
+    text = f"{getattr(e, 'raw', '')} {e}".lower()
+    return ("handshake" if "handshake" in text else
+            "connect" if re.search(r"connect(?:ion)?\b[^.]{0,80}timed? ?out|connect timeout",
+                                   text) else
+            "read" if re.search(r"read timed? ?out|read operation timed out", text) else
+            "other")
 
 
 def uninstall_event() -> str:

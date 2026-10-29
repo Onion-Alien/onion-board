@@ -5248,3 +5248,22 @@ def test_the_mic_box_tick_is_level_with_its_headline(window, monkeypatch):  # no
     box, icon, line = w.mic_status, w.mic_state_icon, w.mic_line
     mid = lambda wid: wid.mapTo(box, QPoint(0, 0)).y() + wid.height() / 2  # noqa: E731
     assert abs(mid(icon) - mid(line)) <= 1.5
+
+
+def test_an_unlisted_error_or_exit_code_is_counted_as_its_number(tmp_path, monkeypatch):
+    """err-other and code-other told nothing: the number itself goes out (failed())."""
+    from soundboard import __version__
+    from soundboard.core import usage
+    monkeypatch.setattr(usage, "_pending", [])
+    monkeypatch.setattr(usage, "_warned", set())
+    monkeypatch.setattr(usage, "_failed", set())
+    log_file = tmp_path / "directmic-admin.log"
+    log_file.write_text("Traceback (most recent call last):\n"
+                        '  File "x/directmic.py", line 1700, in _make_ring\n'
+                        "OSError: [WinError 1785] odd\n", encoding="utf-8")
+    assert dm.raised_why(log_file) == ("ring", "other", "err-other")
+    assert f"failed/{__version__}/mic-code-1/err-1785" in usage._pending
+    monkeypatch.setattr(dm, "bundled_dll", lambda: Path(dm.__file__))
+    monkeypatch.setattr(dm, "_elevated", lambda *a, **k: -1073741819)   # a crash
+    assert dm.fail_kind(dm.install_on(GUID)) == "code-other"
+    assert usage._pending[-1] == f"failed/{__version__}/mic-code/exit-3221225477"

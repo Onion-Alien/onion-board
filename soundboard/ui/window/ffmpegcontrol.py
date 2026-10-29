@@ -147,7 +147,8 @@ class FfmpegControl(Controller):
 
         def failed(e):   # shown, never a stuck button
             return None, ffmpegget.GetError(_("Couldn't get FFmpeg ({error}).",
-                                              error=errors.plain(e)))
+                                              error=errors.plain(e)),
+                                            " ".join(usage.error_detail(e)))
         worker.run(work, bridge.ffmpeg, "ffmpeg-get", error=failed, owner=self.mw)
         self.news()
 
@@ -163,7 +164,7 @@ class FfmpegControl(Controller):
         if h is not None:
             self.health = h
             if not err:   # a check or successful fix, never a failed/cancelled fix's stale health
-                usage.ffmpeg_state(mw.cfg, "slow" if h.slow else h.state)
+                usage.ffmpeg_state(mw.cfg, "slow" if h.slow else h.state, h.fault)
                 usage.remember(mw.cfg)
                 mw._save_later()
         if err is None:
@@ -177,6 +178,7 @@ class FfmpegControl(Controller):
             if err and not stopped:
                 usage.used("get-ffmpeg-auto-failed" if self.auto_now
                            else "get-ffmpeg-failed")
+                usage.failed("ffmpeg-get", *getattr(err, "fault", "").split())
                 usage.ffmpeg_state(mw.cfg, "get-failed")
                 usage.remember(mw.cfg)
                 mw._save_later()

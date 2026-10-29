@@ -272,9 +272,11 @@ def test_update_now_fetches_its_own_copy_of_the_installer():
 def _no_pending():
     usage._pending.clear()
     usage._warned.clear()
+    usage._failed.clear()
     yield
     usage._pending.clear()
     usage._warned.clear()
+    usage._failed.clear()
 
 
 def test_the_daily_count_says_which_tabs_were_opened_then_forgets_them(sent):
@@ -1486,3 +1488,71 @@ def test_the_mic_test_count_obeys_the_switch(sent, monkeypatch, why):
     usage.maybe_send(cfg)
     assert usage.at_quit(cfg) is None
     assert sent == [] and cfg.stats_used == []
+
+
+# -- failed(): what a vague failure count can add ----------------------------------------
+
+def test_a_vague_failure_says_its_type_place_and_number_never_its_words():
+    """dl-failed-why-other told nothing: failed() adds the error's type, our own line and
+    the number it carried, never the message (a title, a path, a link)."""
+    try:
+        exec(compile("def f():\n    raise OSError(22, 'D:/private/secret.mp3')\nf()",
+                     "D:\\private\\soundboard\\online\\ytfetch.py", "exec"), {})
+    except OSError as e:
+        usage.failed("dl-other", *usage.error_detail(e))
+        usage.failed("dl-other", *usage.error_detail(e))   # the same again: once
+    assert usage._pending == [f"failed/{__version__}/dl-other/"
+                              "OSError@soundboard/online/ytfetch.py:2/errno-22"]
+    assert "secret" not in usage._pending[0] and "private" not in usage._pending[0]
+
+
+def test_error_detail_reads_the_numbers_an_error_carries():
+    import urllib.error
+    err = urllib.error.HTTPError("https://example.com/x", 410, "Gone", {}, None)
+    assert usage.error_detail(err) == ["HTTPError", "http-410"]
+    win = OSError(0, "x")
+    win.winerror = 10013   # (what Windows sets)
+    assert usage.error_detail(win)[1:] == ["err-10013"]
+    from soundboard.online.ytsites import FetchError
+    fetch = FetchError("The site refused it.")
+    fetch.kind, fetch.raw = "ExtractorError", "ERROR: [youtube] x: HTTP Error 403: Forbidden"
+    assert usage.error_detail(fetch) == ["ExtractorError", "http-403"]
+    assert usage.error_detail(RuntimeError("[WinError 1450] odd")) == ["RuntimeError",
+                                                                      "err-1450"]
+    assert usage.error_detail(None) == []
+
+
+@pytest.mark.parametrize("text, word", [
+    ("Read timed out. (read timeout=20)", "read"),
+    ("<urlopen error _ssl.c:983: The handshake operation timed out>", "handshake"),
+    ("Connection to www.youtube.com timed out. (connect timeout=20)", "connect"),
+    ("The connection timed out. Check your internet and try again.", "connect"),
+    ("timed out", "other")])
+def test_timeout_kind_says_which_wait_ran_out(text, word):
+    assert usage.timeout_kind(Exception(text)) == word
+
+
+def test_a_search_timeout_says_if_it_was_our_own_helper():
+    from soundboard.online.ytsites import FetchError
+    e = FetchError("The site took too long to answer. Try again.")
+    e.kind = "helper-timeout"
+    assert usage.failure_detail("timeout", e) == ["helper"]
+    assert usage.failure_detail("private", e) == []   # its word says it already
+
+
+def test_failed_sends_only_known_counts_and_safe_parts():
+    usage.failed("not-a-count", "x")
+    usage.failed("addon-other", "")   # nothing known: nothing sent
+    usage.failed("addon-other", "live-voice", "has space", "https://example.com",
+                 "D:/private/me", "KeyError@C:/Python/Lib/json.py:3", "http-500")
+    assert usage._pending == [f"failed/{__version__}/addon-other/live-voice/http-500"]
+    assert set(usage.FAILED) >= {"dl-other", "search-other", "search-timeout",
+                                 "ffmpeg-broken", "ffmpeg-get", "mic-code-1", "mic-code",
+                                 "addon-other"}
+
+
+def test_a_broken_ffmpeg_is_counted_with_why(sent):
+    cfg = Config()
+    usage.ffmpeg_state(cfg, "broken", "err-193")
+    assert usage._pending == [f"failed/{__version__}/ffmpeg-broken/err-193"]
+    assert "ffmpeg-broken" in usage._used and cfg.stats_ffmpeg_failed

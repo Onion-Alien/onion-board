@@ -81,7 +81,13 @@ NEEDS_FFMPEG = {".m4a", ".aac", ".wma", ".webm", ".mp4", ".mkv", ".mov"}
 
 
 class GetError(Exception):
-    """FFmpeg couldn't be got or repaired; the message is fit to show the user."""
+    """FFmpeg couldn't be got or repaired; the message is fit to show the user. `fault`:
+    which step failed and how, as short words and numbers for the usage count, one per
+    step tried, spaces between (`winget-exit-2316632107 own-http-403`), never the message."""
+
+    def __init__(self, text: str = "", fault: str = ""):
+        super().__init__(text)
+        self.fault = fault
 
 
 class Stopped(GetError):
@@ -97,12 +103,14 @@ class SwitchedOff(GetError):
 class Health:
     """What check() found: ``state`` is OK, MISSING or BROKEN; ``version`` ("7.1") when
     it runs; ``why`` (for the user) when it's broken; ``slow`` when it only didn't
-    answer in time (it may yet work: not proof it's broken)."""
+    answer in time (it may yet work: not proof it's broken); ``fault`` why it's broken
+    for the usage count (`gone`, `err-193`, `exit-3221225781`), never a path."""
     state: str
     version: str = ""
     path: str = ""
     why: str = ""
     slow: bool = False
+    fault: str = ""
 
 
 _last: Health | None = None   # check()'s latest answer, for the UI thread to show
@@ -195,22 +203,35 @@ def _check() -> Health:
     exe = library._ffmpeg()
     if exe is None:
         if _leftovers():
-            return Health(BROKEN, why=_("some of its files are gone"))
+            return Health(BROKEN, why=_("some of its files are gone"), fault="gone")
         return Health(MISSING)
     try:
         p = _run_version(exe)
     except subprocess.TimeoutExpired:
         return Health(BROKEN, path=exe, why=_("it didn't answer in {seconds} seconds",
-                                              seconds=int(CHECK_TIMEOUT_S)), slow=True)
+                                              seconds=int(CHECK_TIMEOUT_S)), slow=True,
+                      fault="slow")
     except OSError as e:   # not a program, the wrong kind for this PC, a dead link
         log.info("FFmpeg won't start: %s", e)
-        return Health(BROKEN, path=exe, why=_("Windows won't start it"))
+        return Health(BROKEN, path=exe, why=_("Windows won't start it"),
+                      fault=_os_fault("", e))
     out = (p.stdout or b"").decode(errors="ignore")
     if p.returncode != 0:
         log.info("ffmpeg -version gave %s: %s", p.returncode,
                  (p.stderr or b"").decode(errors="ignore").strip())
-        return Health(BROKEN, path=exe, why=_("it stops with an error"))
+        return Health(BROKEN, path=exe, why=_("it stops with an error"),
+                      fault=f"exit-{p.returncode & 0xFFFFFFFF}")
     return Health(OK, _version(out), exe)
+
+
+def _os_fault(step: str, e: BaseException) -> str:
+    """`step` and an OSError's Windows error (or errno) number: `own-err-5`, `err-193`."""
+    num = getattr(e, "winerror", None) or getattr(e, "errno", None)
+    reason = getattr(e, "reason", None)   # a URLError's own OSError
+    if num is None and isinstance(reason, OSError):
+        num = getattr(reason, "winerror", None) or getattr(reason, "errno", None)
+    head = f"{step}-" if step else ""
+    return f"{head}err-{num}" if isinstance(num, int) else f"{head}{type(e).__name__}"
 
 
 def why_not() -> str:
@@ -239,16 +260,17 @@ def _winget(args: list[str]) -> subprocess.CompletedProcess:
     """winget with ``args``, hidden; raises GetError with words for the user."""
     exe = winget()
     if exe is None:
-        raise GetError(_("winget isn't on this PC."))
+        raise GetError(_("winget isn't on this PC."), "winget-missing")
     try:
         return subprocess.run([exe, *args], capture_output=True, timeout=TIMEOUT_S,
                               stdin=subprocess.DEVNULL,
                               creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
     except subprocess.TimeoutExpired:
         raise GetError(_("winget took longer than {seconds} seconds.",
-                         seconds=int(TIMEOUT_S))) from None
+                         seconds=int(TIMEOUT_S)), "winget-timeout") from None
     except OSError as e:
-        raise GetError(_("Couldn't run winget ({error}).", error=e)) from e
+        raise GetError(_("Couldn't run winget ({error}).", error=e),
+                       _os_fault("winget", e)) from e
 
 
 def get(progress: Callable[[], None] | None = None, force: bool = False) -> str:
@@ -272,7 +294,8 @@ def get(progress: Callable[[], None] | None = None, force: bool = False) -> str:
            + (p.stderr or b"").decode(errors="ignore"))
     log.info("winget couldn't install %s (rc=%s): %s", PACKAGE, p.returncode, out.strip())
     raise GetError(_("winget couldn't install FFmpeg (it said: {error}).",
-                     error=_last_line(out) or _("no reason given")))
+                     error=_last_line(out) or _("no reason given")),
+                   f"winget-exit-{p.returncode & 0xFFFFFFFF}")
 
 
 def _with_winget() -> Health:
@@ -307,24 +330,26 @@ def _download_once(url: str, to: Path, progress, stop) -> None:
     except net.TooBig as e:
         if e.listed:
             raise GetError(_("The download is {mb} MB, far bigger than FFmpeg: not "
-                             "taking it.", mb=f"{e.listed / 1e6:.0f}")) from None
+                             "taking it.", mb=f"{e.listed / 1e6:.0f}"),
+                           "own-too-big") from None
         raise GetError(_("The download kept going far past FFmpeg's size: "
-                         "not taking it.")) from None
+                         "not taking it."), "own-too-big") from None
     except net.FeatureOff as e:   # switched off, nothing sent
         raise SwitchedOff(errors.plain(e)) from None
     except net.ProxyError as e:
-        raise GetError(errors.plain(e)) from None
+        raise GetError(errors.plain(e), "own-proxy") from None
     except urllib.error.HTTPError as e:
         raise GetError(_("{host} said {error}.", host=host,
-                         error=f"{e.code} {e.reason}")) from None
+                         error=f"{e.code} {e.reason}"), f"own-http-{e.code}") from None
     except (urllib.error.URLError, OSError) as e:
         why = getattr(e, "reason", None) or e
-        raise GetError(_("Couldn't reach {host} ({error}).", host=host, error=why)) from None
+        raise GetError(_("Couldn't reach {host} ({error}).", host=host, error=why),
+                       _os_fault("own", e)) from None
     if got != SHA256:
         log.warning("ffmpeg download from %s: SHA-256 %s, expected %s", host, got, SHA256)
         raise GetError(_("The download isn't the FFmpeg it should be (its checksum doesn't "
                          "match), so it wasn't used. It was cut short, or something "
-                         "between you and the site changed it."))
+                         "between you and the site changed it."), "own-checksum")
 
 
 def download(to: Path, progress=None, stop: threading.Event | None = None) -> None:
@@ -333,6 +358,7 @@ def download(to: Path, progress=None, stop: threading.Event | None = None) -> No
     builder's site missing the file are two problems, not one); Stopped and SwitchedOff
     at once."""
     why: dict[str, str] = {}
+    fault = ""
     for url in URLS:
         for n in range(TRIES):
             if n:
@@ -349,9 +375,10 @@ def download(to: Path, progress=None, stop: threading.Event | None = None) -> No
             except GetError as e:
                 log.info("ffmpeg download from %s, try %d: %s", url, n + 1, e)
                 why[url] = str(e)
+                fault = e.fault or fault
     reasons = list(dict.fromkeys(why.values()))   # the same words from both: say it once
     raise GetError(" ".join(r if r.endswith((".", "!", "?")) else r + "."
-                            for r in reasons))
+                            for r in reasons), fault)
 
 
 def unpack(zip_path: Path, dest: Path | None = None) -> Path:
@@ -369,7 +396,7 @@ def unpack(zip_path: Path, dest: Path | None = None) -> Path:
                     data = z.read(name)
                 except KeyError:
                     raise GetError(_("{name} is missing from {file}", name=name,
-                                     file=ZIP)) from None
+                                     file=ZIP), "own-unpack-missing") from None
                 (tmp / rel).write_bytes(data)
         old = dest.with_name(dest.name + ".old")
         shutil.rmtree(old, ignore_errors=True)
@@ -389,7 +416,8 @@ def unpack(zip_path: Path, dest: Path | None = None) -> Path:
         shutil.rmtree(tmp, ignore_errors=True)
         raise GetError(_("Couldn't unpack FFmpeg into {folder} ({error}). An antivirus may "
                          "have blocked ffmpeg.exe.", folder=dest,
-                         error=getattr(e, "strerror", "") or e)) from None
+                         error=getattr(e, "strerror", "") or e),
+                       _os_fault("own-unpack", e)) from None
     return dest
 
 
@@ -448,8 +476,9 @@ def fix(force: bool = False, progress: Callable[[int, int], None] | None = None,
         if before.state == OK and not force:
             return before            # fixed meanwhile (the other button, the installer)
         if why_not():
-            raise GetError(why_not())
+            raise GetError(why_not(), "off")
         reasons: list[str] = []
+        faults: list[str] = []   # each step's, for the usage count: "winget-… own-…"
         # winget can't go through a proxy or Tor: then only the app's own download
         if winget() is not None and net.mode() == net.DIRECT:
             try:
@@ -457,14 +486,23 @@ def fix(force: bool = False, progress: Callable[[int, int], None] | None = None,
                 if after.state == OK:
                     return after
                 reasons.append(after.why)
+                faults.append(f"winget-still-{after.fault or 'broken'}")
             except GetError as e:
                 log.info("winget couldn't fix FFmpeg: %s", e)
                 reasons.append(str(e))
+                faults.append(e.fault or "winget-other")
         if stop is not None and stop.is_set():   # (winget itself can't be stopped midway)
             raise Stopped(_("Stopped."))
-        after = _own_copy(progress, stop)
+        try:
+            after = _own_copy(progress, stop)
+        except (Stopped, SwitchedOff):
+            raise
+        except GetError as e:
+            e.fault = " ".join([*faults, e.fault or "own-other"])
+            raise
         if after.state == OK:
             return after
         raise GetError(_("FFmpeg was installed but still won't start ({error}).",
                          error=after.why or (reasons[-1] if reasons else "")
-                         or _("no reason given")))
+                         or _("no reason given")),
+                       " ".join([*faults, f"own-still-{after.fault or 'broken'}"]))

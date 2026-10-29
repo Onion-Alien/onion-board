@@ -413,6 +413,12 @@ account or anything else about you.
 - `warned/<version>/<type>@<soundboard/…py:line>`: an error the app caught and showed
   you as a warning instead of crashing, or that stopped the mic effect's set-up (the
   type and the line, never the message).
+- `failed/<version>/<what>/<detail>`: a download, search, FFmpeg get or check, mic effect
+  set-up or add-on install that failed for a reason the count's fixed words don't
+  cover, with what was known where it failed: the error's type (yt-dlp's own, for a
+  download) and the line of Onion Board's code it came from, a web status
+  (`http-403`), a Windows error or exit number (`err-5`, `exit-2`), or which wait ran
+  out (`helper`, `connect`, `read`). Never the message, a link, a path or a title.
 - `unclean-exit/<version>/<why>` when the last run ended without the app closing
   itself: `native-crash`, `windows-error`, `not-responding`, `while-closing`, `frozen`,
   `pc-restarted` or `ended`; for a crash also the error's name (such as
