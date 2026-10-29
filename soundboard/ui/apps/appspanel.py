@@ -53,7 +53,7 @@ from soundboard.ui.kit.wheelguard import no_wheel
 log = logging.getLogger(__name__)
 
 REFRESH_MS = 1500       # how often the list of programs is re-read while the tab is shown
-REFRESH_HIDDEN_MS = 5000   # ...and while it isn't (a remembered program still gets picked up)
+REFRESH_HIDDEN_MS = 5000   # ...and while it isn't, if a card is remembered or in use
 IDLE_SECONDS = 10 * 60   # quiet, unused cards disappear until their program makes sound again
 MAX_REMEMBERED = 30
 CARD_MIN_W = 300        # programs are cards, as many across as fit at this width
@@ -378,8 +378,11 @@ class AppsTab(QWidget):
 
     def showEvent(self, ev):
         super().showEvent(ev)
+        idle = self._started and not self.timer.isActive()
         self.start()
         self._pace_list()
+        if idle:
+            self.lister.refresh()   # not re-read while hidden: drop expired cards now
         self.meter_timer.start(appstate.interval(METER_MS))
         if appstate.active():
             self.peaks.start()
@@ -413,12 +416,16 @@ class AppsTab(QWidget):
         self.lister.refresh(watch, waiting)
 
     def _watching(self) -> bool:
-        """Keep checking existing cards while hidden, including their idle deadlines."""
-        return bool(self.rows)
+        """Something to keep an eye on while the tab is hidden: a remembered program
+        (picked up when it starts) or one being sent, recorded or listened to (let go
+        when it closes). An unused card's idle deadline waits until the tab is shown."""
+        return any(self._spec(key) is not None or row.sending or row.capture is not None
+                   or row.rec is not None or row.listen is not None
+                   for key, row in self.rows.items())
 
     def _pace_list(self):
         """Re-read the list every 1.5 s while shown, every 5 s while hidden, and not
-        at all while hidden with no cards left."""
+        at all while hidden with nothing to watch."""
         if not self._started:
             return
         ms = (REFRESH_MS if self.isVisible() else

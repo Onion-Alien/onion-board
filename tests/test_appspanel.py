@@ -491,14 +491,14 @@ def test_send_off_does_not_wait_for_the_capture_to_end(tab):
     assert getattr(second, "joined", None) is not None and tab.capctl._stopping == []
 
 
-def test_hidden_tab_stops_rereading_when_there_is_nothing_to_watch(tab, qapp, monkeypatch):
+def test_hidden_tab_stops_rereading_when_there_is_nothing_to_watch(tab, qapp):
     """Shown: the list is re-read every 1.5 s. Hidden: every 5 s while a program is
-    on the list, including an unused card's idle deadline, not at all otherwise."""
+    remembered or in use, not at all for cards nobody is using."""
     tab._on_apps([music()])
     tab.show()
     assert tab.timer.isActive() and tab.timer.interval() == appspanel.REFRESH_MS
     tab.hide()
-    assert tab.timer.isActive() and tab.timer.interval() == appspanel.REFRESH_HIDDEN_MS
+    assert not tab.timer.isActive()                # an unused card: nothing to watch
     tab.show()
     tab.rows["music.exe"].btn_send.setChecked(True)
     tab.hide()
@@ -507,15 +507,40 @@ def test_hidden_tab_stops_rereading_when_there_is_nothing_to_watch(tab, qapp, mo
     tab._on_apps([music()])
     assert tab.timer.isActive()
     tab._on_send(tab.rows["music.exe"], False)     # Send off: forgotten
-    tab._on_apps([music()])                        # unused: still watching for idle timeout
-    assert tab.timer.isActive()
+    tab._on_apps([music()])                        # the next re-read: nothing left to watch
+    assert "music.exe" in tab.rows
+    assert not tab.timer.isActive()
+
+
+@pytest.mark.parametrize("using", ["record", "clip"])
+def test_hidden_tab_keeps_rereading_for_a_recording_or_clip(tab, qapp, using):
+    tab._on_apps([music()])
+    tab.show()
     row = tab.rows["music.exe"]
-    # a second past the deadline: (t + 600) - t comes out 599.99… for some clock values
+    if using == "record":
+        row.btn_rec.setChecked(True)
+    else:
+        tab.capctl._on_clip(row, True)
+    tab.hide()
+    assert tab.timer.isActive() and tab.timer.interval() == appspanel.REFRESH_HIDDEN_MS
+
+
+def test_showing_the_tab_again_drops_cards_that_went_quiet_while_hidden(tab, qapp, monkeypatch):
+    """Hidden, unused cards aren't re-read; their idle deadline is applied as soon as
+    the tab is shown again, not after the next 1.5 s tick."""
+    tab._on_apps([music()])
+    tab.show()
+    tab.hide()
+    assert not tab.timer.isActive()
+    row = tab.rows["music.exe"]
     later = row.last_sound_at + appspanel.IDLE_SECONDS + 1
     monkeypatch.setattr(appspanel.time, "monotonic", lambda: later)
+    asked = []
+    monkeypatch.setattr(tab.lister, "refresh", lambda *a, **k: asked.append(a))
+    tab.show()
+    assert asked == [()] and tab.timer.interval() == appspanel.REFRESH_MS
     tab._on_apps([], {100: "music.exe"})
     assert not tab.rows
-    assert not tab.timer.isActive()
 
 
 def test_level_watcher_pauses_behind_a_game(qapp, monkeypatch):
