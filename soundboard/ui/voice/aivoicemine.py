@@ -53,7 +53,9 @@ class AiVoiceMine(_Panel):
                 avl.MAX_VOICES).removeprefix("⚠ ")), "warn")
             return
         built = [vo for vo in self.voices if not avl.is_mine(vo)]
-        d = AiVoiceEditor(built, self.store.get(vid) if vid else None, self.previewer, self)
+        # on the window, not this card: the card's styles would reach into the dialog
+        d = AiVoiceEditor(built, self.store.get(vid) if vid else None, self.previewer,
+                          self.window())
         if d.exec() == QDialog.DialogCode.Accepted and self.store.put(d.result_voice()) is not None:
             self._resync()
             if vid is None:
