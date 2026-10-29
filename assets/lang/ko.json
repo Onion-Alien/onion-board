@@ -4589,5 +4589,7 @@
   "Normal: noise cleaned, and the sensitivity set by itself.": "보통: 잡음을 없애고 감도는 알아서 맞춰져요.",
   "Back to 1x, no pitch change, no effects and 100 % volume": "1배속, 피치 변경 없음, 효과 없음, 볼륨 100 %로",
   "Back to no pitch change, no effects and 100 % volume": "피치 변경과 효과 없이, 볼륨 100 %로 되돌리기",
-  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "소리 크기, 최대 4배까지. 100 %를 넘으면 소리가 깨지지 않도록 가장 큰 부분을 둥글게 다듬어요"
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "소리 크기, 최대 4배까지. 100 %를 넘으면 소리가 깨지지 않도록 가장 큰 부분을 둥글게 다듬어요",
+  "{st} st from the speed": "속도로 {st} 반음",
+  "{st} st from the speed, {total} st in all": "속도로 {st} 반음, 합계 {total} 반음"
 }

@@ -4671,5 +4671,7 @@
   "Normal: noise cleaned, and the sensitivity set by itself.": "Нормално: шумът се почиства, а чувствителността се настройва сама.",
   "Back to 1x, no pitch change, no effects and 100 % volume": "Обратно на 1x, без промяна на тона, без ефекти и сила на звука 100 %",
   "Back to no pitch change, no effects and 100 % volume": "Обратно без промяна на тона, без ефекти и сила на звука 100 %",
-  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Колко силно звучат, до 4 пъти по-силно. Над 100 % най-силните места се заглаждат, за да не пращи"
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Колко силно звучат, до 4 пъти по-силно. Над 100 % най-силните места се заглаждат, за да не пращи",
+  "{st} st from the speed": "{st} пт от скоростта",
+  "{st} st from the speed, {total} st in all": "{st} пт от скоростта, общо {total} пт"
 }

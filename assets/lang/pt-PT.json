@@ -4671,5 +4671,7 @@
   "Normal: noise cleaned, and the sensitivity set by itself.": "Normal: o ruído é limpo e a sensibilidade ajusta-se sozinha.",
   "Back to 1x, no pitch change, no effects and 100 % volume": "Voltar a 1x, sem mudar o tom, sem efeitos e volume a 100 %",
   "Back to no pitch change, no effects and 100 % volume": "Voltar a sem mudança de tom, sem efeitos e volume a 100 %",
-  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "O quão alto tocam, até 4 vezes mais. Acima de 100 % os picos são arredondados para não estalar"
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "O quão alto tocam, até 4 vezes mais. Acima de 100 % os picos são arredondados para não estalar",
+  "{st} st from the speed": "{st} st vindo da velocidade",
+  "{st} st from the speed, {total} st in all": "{st} st vindo da velocidade, {total} st no total"
 }

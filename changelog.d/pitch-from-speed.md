@@ -1,0 +1,1 @@
+- Live controls: with *Keep pitch* off, a note under Pitch says how much the speed moves the pitch (Nightcore: +4.5 st), and the total with your own pitch on top. The Pitch slider only holds the shift on top, so it read 0 st.

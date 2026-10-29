@@ -4671,5 +4671,7 @@
   "Normal: noise cleaned, and the sensitivity set by itself.": "Normal: støyen renses bort, og følsomheten stiller seg selv.",
   "Back to 1x, no pitch change, no effects and 100 % volume": "Tilbake til 1x, ingen tonehøydeendring, ingen effekter og 100 % volum",
   "Back to no pitch change, no effects and 100 % volume": "Tilbake til ingen tonehøydeendring, ingen effekter og 100 % volum",
-  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Hvor høyt de spilles, opptil 4 ganger så høyt. Over 100 % rundes de høyeste toppene av så det ikke knaser"
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Hvor høyt de spilles, opptil 4 ganger så høyt. Over 100 % rundes de høyeste toppene av så det ikke knaser",
+  "{st} st from the speed": "{st} st fra hastigheten",
+  "{st} st from the speed, {total} st in all": "{st} st fra hastigheten, {total} st i alt"
 }

@@ -4589,5 +4589,7 @@
   "Normal: noise cleaned, and the sensitivity set by itself.": "ปกติ: ลดเสียงรบกวน และความไวตั้งเองอัตโนมัติ",
   "Back to 1x, no pitch change, no effects and 100 % volume": "กลับเป็น 1x ไม่เปลี่ยนพิตช์ ไม่มีเอฟเฟกต์ และระดับเสียง 100 %",
   "Back to no pitch change, no effects and 100 % volume": "กลับเป็นไม่เปลี่ยนพิตช์ ไม่มีเอฟเฟกต์ และระดับเสียง 100 %",
-  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "ดังแค่ไหน ได้สูงสุด 4 เท่า เกิน 100 % ส่วนที่ดังที่สุดจะถูกปัดให้มนเพื่อไม่ให้เสียงแตก"
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "ดังแค่ไหน ได้สูงสุด 4 เท่า เกิน 100 % ส่วนที่ดังที่สุดจะถูกปัดให้มนเพื่อไม่ให้เสียงแตก",
+  "{st} st from the speed": "{st} st จากความเร็ว",
+  "{st} st from the speed, {total} st in all": "{st} st จากความเร็ว รวม {total} st"
 }

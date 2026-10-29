@@ -4753,5 +4753,7 @@
   "Normal: noise cleaned, and the sensitivity set by itself.": "Normal: zgomotul e curățat, iar sensibilitatea se setează singură.",
   "Back to 1x, no pitch change, no effects and 100 % volume": "Înapoi la 1x, fără schimbare de ton, fără efecte și volum 100 %",
   "Back to no pitch change, no effects and 100 % volume": "Înapoi la fără schimbare de ton, fără efecte și volum 100 %",
-  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Cât de tare sună, până la de 4 ori mai tare. Peste 100 % vârfurile sunt rotunjite ca să nu pârâie"
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Cât de tare sună, până la de 4 ori mai tare. Peste 100 % vârfurile sunt rotunjite ca să nu pârâie",
+  "{st} st from the speed": "{st} st din viteză",
+  "{st} st from the speed, {total} st in all": "{st} st din viteză, {total} st în total"
 }

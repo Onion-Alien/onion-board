@@ -4999,5 +4999,7 @@
   "Normal: noise cleaned, and the sensitivity set by itself.": "عادي: تُنظَّف الضوضاء وتُضبط الحساسية تلقائيًا.",
   "Back to 1x, no pitch change, no effects and 100 % volume": "العودة إلى 1x، بلا تغيير في الحدّة وبلا مؤثرات ومستوى صوت 100 %",
   "Back to no pitch change, no effects and 100 % volume": "العودة إلى بلا تغيير في الحدّة وبلا مؤثرات ومستوى صوت 100 %",
-  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "مدى ارتفاع الصوت، حتى 4 أضعاف. فوق 100 % تُدوَّر أعلى القمم حتى لا يتشوّه الصوت"
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "مدى ارتفاع الصوت، حتى 4 أضعاف. فوق 100 % تُدوَّر أعلى القمم حتى لا يتشوّه الصوت",
+  "{st} st from the speed": "{st} st من السرعة",
+  "{st} st from the speed, {total} st in all": "{st} st من السرعة، {total} st في المجموع"
 }

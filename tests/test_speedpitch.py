@@ -385,3 +385,24 @@ def test_live_volume_is_sent_kept_by_presets_and_reset(qapp, what):
     finally:
         button.pop.close()
         button.deleteLater()
+
+
+def test_the_pitch_the_speed_adds_is_said_under_pitch(qapp):
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
+
+    button = SpeedPitchButton("sounds")
+    try:
+        assert button.pitch_note.isHidden()           # keep pitch on, 1x
+        button.fx_presets["Nightcore"].click()        # 1.3x, keep pitch off
+        assert not button.pitch_note.isHidden()
+        assert button.pitch_note.text().startswith("+4.5 st")
+        button.set_values(1.3, 2, False)
+        assert "+6.5 st" in button.pitch_note.text()
+        button.set_values(1.3, 2, True)                # kept: the speed adds nothing
+        assert button.pitch_note.isHidden()
+    finally:
+        button.pop.close()
+        button.deleteLater()
+    stream = SpeedPitchButton("radio")
+    assert stream.pitch_note.isHidden()
+    stream.deleteLater()

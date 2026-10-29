@@ -4589,5 +4589,7 @@
   "Normal: noise cleaned, and the sensitivity set by itself.": "Bình thường: tiếng ồn được làm sạch, độ nhạy tự đặt.",
   "Back to 1x, no pitch change, no effects and 100 % volume": "Về lại 1x, không đổi cao độ, không hiệu ứng và âm lượng 100 %",
   "Back to no pitch change, no effects and 100 % volume": "Về lại không đổi cao độ, không hiệu ứng và âm lượng 100 %",
-  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Âm thanh to cỡ nào, tối đa gấp 4 lần. Trên 100 %, những chỗ to nhất được làm tròn để không bị rè"
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Âm thanh to cỡ nào, tối đa gấp 4 lần. Trên 100 %, những chỗ to nhất được làm tròn để không bị rè",
+  "{st} st from the speed": "{st} st từ tốc độ",
+  "{st} st from the speed, {total} st in all": "{st} st từ tốc độ, tổng {total} st"
 }

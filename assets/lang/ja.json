@@ -4589,5 +4589,7 @@
   "Normal: noise cleaned, and the sensitivity set by itself.": "標準：ノイズを取り、感度は自動で決まります。",
   "Back to 1x, no pitch change, no effects and 100 % volume": "1倍速、ピッチ変更なし、エフェクトなし、音量 100 % に戻す",
   "Back to no pitch change, no effects and 100 % volume": "ピッチ変更なし、エフェクトなし、音量 100 % に戻す",
-  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "音の大きさ。最大 4 倍まで。100 % を超えると、音割れしないように一番大きな部分を丸めます"
+  "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "音の大きさ。最大 4 倍まで。100 % を超えると、音割れしないように一番大きな部分を丸めます",
+  "{st} st from the speed": "速度で {st} 半音",
+  "{st} st from the speed, {total} st in all": "速度で {st} 半音、合計 {total} 半音"
 }
