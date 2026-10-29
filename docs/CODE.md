@@ -159,6 +159,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 |---|---|
 | `soundboard/__main__.py` | `python -m soundboard` |
 | `soundboard/core/app.py` | entry point: log file, crash hooks, runtime tuning, single instance, the window |
+| `soundboard/core/earlystart.py` | the loading screen from main.py, right after the start-up breadcrumb and before app.py's heavy imports: takes the single-instance lock first (a second launch shows nothing), then the language, interface size, QApplication and Bun; app.main() reuses them |
 | `soundboard/core/singleinstance.py` | named mutex + local socket so a second launch just raises the first |
 | `soundboard/ui/window/mainwindow.py` | the main window: pads, transport, tabs, the audio panel, test mode, auto push-to-talk |
 | `soundboard/ui/window/windowparts.py` | `WindowParts`, the base of MainWindow's mixins below: the window's parts `WindowBuilder` makes, and (for the type checker only) what MainWindow provides; empty at run time |

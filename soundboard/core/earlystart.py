@@ -65,7 +65,8 @@ def show(argv: list[str], app_dir) -> bool:
         scale = interface_size(app_dir)
         app_id()
         from PySide6.QtWidgets import QApplication
-        app = QApplication.instance() or QApplication(argv)
+        made = QApplication.instance()
+        app = made if isinstance(made, QApplication) else QApplication(argv)
         _app = True
         if i18n.is_rtl():
             from PySide6.QtCore import Qt
