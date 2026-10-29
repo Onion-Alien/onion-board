@@ -1,8 +1,8 @@
 """The Easter egg: poke Bun enough times (bunnywidget.py, `pong=True`) and he comes back
 with a baseball bat and challenges you to a game, in a dialog like the app's guides.
 
-Which game is picked at random each time: Pong (here) or one of the small games in
-bungames.py (quick draw, rock paper scissors, tic-tac-toe). They all share `Game`: Bun
+Which game is picked at random each time: Pong (here) or one of the games in
+bungames.py (dodgeball, home run, whack-a-Bun). They all share `Game`: Bun
 on the left, the score, his quips, sparks and confetti, first to `win_at`.
 
 Pong: he holds his bat up as his paddle on the left; yours is on the right and follows

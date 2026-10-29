@@ -1195,7 +1195,7 @@ def test_views_hotkeys_leveler_and_sound_voices_count_every_day():
 def test_bun_games_are_counted_by_a_fixed_name():
     from soundboard.ui.bun import bunpong
     assert set(bunpong.games()) <= set(usage.BUN_GAMES)
-    assert usage.game_tag("ttt") == "ttt" and usage.game_tag("chess") == "other"
+    assert usage.game_tag("whack") == "whack" and usage.game_tag("chess") == "other"
     assert all(f"egg-game-{g}" in usage.FEATURES for g in usage.BUN_GAMES)
 
 

@@ -176,8 +176,8 @@ ALL: tuple[Ach, ...] = (
     Ach("lost_in_translation", "translate_s", HOUR, "rare", True, "speech"),
     Ach("petting_zoo", "bun_clicks", 100, "uncommon", True, "bun"),
     Ach("owl_pal", "hoot_talk", 25, "uncommon", True, "triggers"),
-    Ach("grid_master", "ttt_won", 10, "uncommon", True, "gamepad"),
-    Ach("rock_solid", "rps_streak", 5, "rare", True, "gamepad"),
+    Ach("grid_master", "whack_won", 10, "uncommon", True, "gamepad"),
+    Ach("rock_solid", "hr_streak", 3, "rare", True, "gamepad"),
     Ach("pack_leader", "store_shared", 10, "rare", True, "upload"),
     # the app
     Ach("babel", "lang_switch", 5, "common", True, "speech"),
@@ -211,7 +211,7 @@ SETS = {"stations": 1000, "countries": 300, "upvotes": 100, "voices": 25, "theme
 # the stats that keep the most seen, not a running total (at_least)
 BEST = {"hotkeys", "radio_run_s", "open_run_s", "sounds_added", "longest_s", "at_once",
         "hidden_got", "all_got", "top_plays", "tabs", "streak", "same_day", "loop_s",
-        "station_s", "run_voices", "voice_run_s", "rps_streak", "night_s", "quiet_s",
+        "station_s", "run_voices", "voice_run_s", "hr_streak", "night_s", "quiet_s",
         "bulk_links", "score", "speed_run", "deep_cut", "blink", "nice", "early", "leet",
         "april_fool", "friday13", "leap_day", "comeback", "big_ui", "lite_on", "speed_max",
         "speed_min", "fresh_start"}
@@ -232,7 +232,7 @@ EVENTS = {
     **{f"splash-{k}": f"splash_{k}" for k in ("gold", "ice", "galaxy", "rainbow")},
 }
 # usage.used() prefixes whose rest goes in a set: egg-game-pong -> games {"pong"}
-PREFIX_SETS = (("egg-game-", "games", ("pong", "draw", "rps", "ttt")),
+PREFIX_SETS = (("egg-game-", "games", ("pong", "dodge", "homerun", "whack")),
                ("pack-added-", "packs", ("streamer", "esports", "general", "podcast",
                                          "halloween", "gm-starter")),
                ("splash-", "rares", ("gold", "ice", "galaxy")))
@@ -277,7 +277,7 @@ _last_tick = 0.0                 # the last tick's time.monotonic() (Night Shift
 _loops: dict[str, float] = {}    # a looping sound playing -> when it was first seen
 _station = ""                    # the radio station playing (Station Loyalist)
 _voices_run: set[str] = set()    # voices picked this run (Quick Change)
-_rps_run = 0                     # rock paper scissors rounds won in a row
+_hr_run = 0                      # home runs in a row off Bun (Rock Solid)
 
 
 def attach(cfg, now: float | None = None, today: str | None = None,
@@ -314,8 +314,8 @@ def attach(cfg, now: float | None = None, today: str | None = None,
         _today.clear()
         _loops.clear()
         _voices_run.clear()
-        global _last_play, _last_tick, _rps_run, _station
-        _last_play, _last_tick, _rps_run, _station = 0.0, _started, 0, ""
+        global _last_play, _last_tick, _hr_run, _station
+        _last_play, _last_tick, _hr_run, _station = 0.0, _started, 0, ""
         for stat in list(d["n"]):   # set while the window was closed (a reset's Fresh Start)
             _check(stat)
         _meta()   # what was earned before the hunt's own were added counts
@@ -558,18 +558,18 @@ def voice_picked(name: str) -> None:
 
 
 def game_point(game: str, who: str) -> None:
-    """A point in one of Bun's games (`who` "you" or "bun"). Rock paper scissors:
-    rounds won in a row, across games."""
-    global _rps_run
-    if game == "rps":
-        _rps_run = _rps_run + 1 if who == "you" else 0
-        at_least("rps_streak", _rps_run)
+    """A point in one of Bun's games (`who` "you" or "bun"). Home run: home runs in a
+    row (a strike ends the run), across games."""
+    global _hr_run
+    if game == "homerun":
+        _hr_run = _hr_run + 1 if who == "you" else 0
+        at_least("hr_streak", _hr_run)
 
 
 def game_won(game: str) -> None:
     """You won one of Bun's games."""
-    if game == "ttt":
-        bump("ttt_won")
+    if game == "whack":
+        bump("whack_won")
 
 
 def at_once(n: int) -> None:
