@@ -154,3 +154,23 @@ def _on_colours_normal(button) -> set[str]:
     img = button.icon().pixmap(QSize(18, 18)).toImage()
     return {QColor.fromRgba(img.pixel(x, y)).name() for x in range(img.width())
             for y in range(img.height()) if QColor.fromRgba(img.pixel(x, y)).alpha() > 200}
+
+
+def test_a_dialog_opened_from_a_card_is_not_see_through(qapp):
+    """A card makes everything in it see-through, and a dialog parented to something on
+    a card took that too: Make your own voice drew black, its words unreadable."""
+    from PySide6.QtWidgets import QDialog, QFrame, QVBoxLayout, QWidget
+    try:
+        theme.apply(qapp, "Retro 98")
+        card = QFrame()
+        card.setObjectName("card")
+        inner = QWidget(card)
+        QVBoxLayout(card).addWidget(inner)
+        d = QDialog(inner)
+        d.resize(200, 120)
+        d.show()
+        qapp.processEvents()
+        assert QColor(d.grab().toImage().pixel(100, 60)).name() == theme.T["bg"]
+        d.close()
+    finally:
+        theme.apply(qapp, theme.DEFAULT)

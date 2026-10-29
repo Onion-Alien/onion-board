@@ -11,6 +11,7 @@ QDialog { background:$bg; }
 QDialog#setupcard { border:1px solid $border; border-radius:16px; }
 QFrame#card { background:$panel; border-radius:12px; }
 QFrame#card QWidget { background:transparent; }
+QFrame#card QDialog { background:$bg; }   /* a dialog opened from a card: not see-through (black) */
 QFrame#card[interactive="true"] { border:1px solid transparent; }
 QFrame#card[interactive="true"][hovered="true"] { background-color:$card_hi; border-color:$border_hi; }
 QFrame#card[interactive="true"]:focus { background-color:$card_hi; border-color:$accent; }
