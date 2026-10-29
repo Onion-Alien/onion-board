@@ -298,7 +298,12 @@ class _FilterRow(QWidget):
             on_restyle(c, self._again)
 
     def _again(self):
-        self._arrange(self.rows_for(self.width()))
+        if self.isVisible():   # (hidden, its width isn't laid out yet: on show)
+            self._arrange(self.rows_for(self.width()))
+
+    def showEvent(self, e):
+        super().showEvent(e)
+        self._again()
 
     @staticmethod
     def needs(c: QComboBox) -> int:

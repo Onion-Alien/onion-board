@@ -1931,8 +1931,16 @@ def test_filter_boxes_follow_a_new_font(qapp):
         boxes[2].addItem(label)
     row = _FilterRow(boxes)
     row.resize(900, 40)
+    row.show()
     before = [c.maximumWidth() for c in boxes]
     for c in boxes:
         c.setFont(QFont("Consolas", 14))   # what the new theme's sheet sets on it
     assert [c.maximumWidth() for c in boxes] == [row.needs(c) for c in boxes]
     assert all(a > b for a, b in zip((c.maximumWidth() for c in boxes), before))
+    # hidden (another tab showing) when the font comes: measured once it's shown
+    row.hide()
+    for c in boxes:
+        c.setFont(QFont("Consolas", 18))
+    row.show()
+    assert [c.maximumWidth() for c in boxes] == [row.needs(c) for c in boxes]
+    row.close()
