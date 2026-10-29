@@ -418,3 +418,25 @@ def test_a_sound_on_the_undo_bar_isnt_taken_back_in_as_a_loose_file(window, qapp
     window.rmctl.undo_remove()
     assert [(s.name, s.hotkey) for s in window.cfg.sounds] == [("Boom", ""),
                                                                ("Airhorn", "ctrl+alt+2")]
+
+
+def test_adding_a_sound_you_have_shows_it_ringed(window, qapp):
+    """Add refused as already in the library: the board switches to a tab that shows
+    that sound, picks it and a yellow ring pulses round its pad, then goes."""
+    from soundboard.ui.kit import reveal
+    window.cfg.sounds[0].fingerprint = "fp-boom"
+    window.catctl.new_category(name="Memes")
+    window.catctl.toggle_tag("s1", "Memes")
+    assert window.cfg.category == "Memes" and window.pads["s0"].property("filtered")
+    window.linkbar._on_msg("dup", window.linkbar.url, "fp-boom")
+    process_events(qapp, lambda: window.findChild(reveal._Ring) is not None)
+    ring = window.findChild(reveal._Ring)
+    assert window.cfg.category == "" and not window.pads["s0"].property("filtered")
+    assert ring.parentWidget() is window.pads["s0"] and window.current == "s0"
+    process_events(qapp, lambda: window.findChild(reveal._Ring) is None, timeout=8)
+    # a sound only in a category hidden from All: its own tab
+    window.catctl.toggle_tag("s0", "Memes")
+    window.catctl.set_hidden_from_all("Memes", True)
+    window.catctl.new_category(name="Other")
+    window.linkbar._on_msg("dup", window.linkbar.url, "fp-boom")
+    assert window.cfg.category == "Memes"
