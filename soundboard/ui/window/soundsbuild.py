@@ -228,6 +228,7 @@ class SoundsPageBuild:
         mw.btn_keys.setMenu(km)
         mw.btn_keys.setProperty("toolbarMenu", True)
         km.setTitle(_("Quick hotkeys"))
+        icons.set_icon(km.menuAction(), "keyboard")
         mm.addSeparator()
         mm.addMenu(km)
         for utility in (mw.btn_folder, mw.btn_keys, mw.btn_bin):
