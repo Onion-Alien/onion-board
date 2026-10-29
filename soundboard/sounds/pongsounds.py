@@ -202,42 +202,15 @@ def render(name: str, style: str = "soft", *, rally: int = 0, pan: float = 0.0,
             m.add(tone(f, 0.5 if last else 0.2, 0.14, w, f2=f * 0.85 if last else 0.0,
                        lowpass=1800), 0, i * 0.2)
     # ---- Bun's other games (ui/bun/bungames.py)
-    elif name == "heartbeat":   # quick draw's wait: lub-dub, `level` 0.. as it drags on
-        f = 55 + 6 * min(level, 6)
-        m.add(tone(f, 0.12, 0.3, f2=f * 0.7, lowpass=400))
-        m.add(tone(f * 0.9, 0.1, 0.2, f2=f * 0.6, lowpass=400), 0, 0.14)
-        m.add(noise(0.02, 0.02 + 0.006 * level, 150, 500))
-    elif name == "go":   # a bright "now!": a fast rising sweep onto a struck chord
-        sweep = noise(0.09, 0.07, 2000, 9000)
-        m.add(sweep * np.linspace(0.1, 1, len(sweep), dtype=np.float32))
-        for i, k in enumerate((0, 4, 7)):
-            _strike(m, style, note(5) * 2 ** (k / 12), (i - 1) * 0.3, 0.8)
-        m.add(tone(note(10), 0.35, 0.07), 0, 0.03)
-    elif name == "bang":   # a draw: the crack, the boom, a ricochet ring
+    elif name == "bang":   # a hit: the crack, the boom, a ricochet ring
         m.add(noise(0.05, 0.28, 1500), pan)
         m.add(tone(140, 0.22, 0.3, f2=50), pan)
         m.add(noise(0.18, 0.12, 300, 1500), pan, 0.01)
         m.add(tone(2400, 0.25, 0.04, f2=1700), -pan * 0.6, 0.05)
-    elif name == "early":   # too early: a short rude buzzer
+    elif name == "early":   # a wrong one (whacked a carrot): a short rude buzzer
         m.add(tone(110, 0.28, 0.16, "square", lowpass=1400))
         m.add(tone(116, 0.28, 0.12, "saw", lowpass=1400))
-    elif name == "shake":   # rock... paper... scissors...: a drum, `level` 0, 1, 2 rising
-        f = (98, 110, 131)[max(0, min(level, 2))]
-        m.add(tone(f * 2, 0.16, 0.28, f2=f, lowpass=900))
-        m.add(noise(0.03, 0.08, 800, 3000))
-    elif name == "reveal":   # the hands come out: a clack and a whoosh
-        _strike(m, style, note(7), 0, 0.5)
-        m.add(noise(0.015, 0.18, 2500, 7000))
-        w = noise(0.12, 0.06, 800, 4000)
-        m.add(w * np.linspace(1, 0.2, len(w), dtype=np.float32))
-    elif name == "line":   # three in a row: a quick run up the ladder, panned across
-        for i in range(6):
-            _strike(m, style, note(rally + i), pan * (1 - i / 3), 0.6, soft=i < 5, t0=i * 0.045)
-        m.add(noise(0.4, 0.03, 7000), 0, 0.2)
-    elif name == "tie":   # a draw: two flat bonks
-        for i in range(2):
-            m.add(tone(300, 0.12, 0.16, "triangle", f2=270), 0, i * 0.16)
-    elif name == "hover":   # the selection moved: the faintest tick
+    elif name == "hover":   # something popped up (whack-a-Bun): the faintest tick
         m.add(tone(_jit(3200 if chip else 2200, 0.02), 0.02, 0.06,
                    "square" if chip else "sine"), pan)
     else:
@@ -252,5 +225,4 @@ def render(name: str, style: str = "soft", *, rally: int = 0, pan: float = 0.0,
 
 
 NAMES = ("you", "bun", "wall", "serve", "milestone", "score_you", "score_bun", "score_pop",
-         "win", "lose", "heartbeat", "go", "bang", "early", "shake", "reveal", "line", "tie",
-         "hover")
+         "win", "lose", "bang", "early", "hover")

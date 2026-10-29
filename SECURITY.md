@@ -325,8 +325,8 @@ account or anything else about you.
     "muted a long time" ring shown (`used/muted-ring`); the tray's Voice changer menu
     used (`used/tray-voice-toggle`, `tray-voice-pick`: never which voice); *What's new*
     shown after an update and its Settings button (`used/whats-new-shown`,
-    `whats-new-page`); which of Bun's games opened (`used/egg-game-pong`, `-draw`,
-    `-rps`, `-ttt`, `-other`); the Store tab's *New* or *Trending* order and a category
+    `whats-new-page`); which of Bun's games opened (`used/egg-game-pong`, `-dodge`,
+    `-homerun`, `-whack`, `-other`); the Store tab's *New* or *Trending* order and a category
     picked (`used/store-sort-new`, `store-sort-trending`, `store-category`: never which
     category);
     a My setups share code copied (`used/setup-code-shared`: never the setup); the

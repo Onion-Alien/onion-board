@@ -86,7 +86,7 @@ LIVE_PRESETS = ("nightcore", "slowed-reverb", "bass-boosted", "chipmunk", "deep-
 # what was done to a Voice tab recording or an Apps tab saved clip (ui/apps/clipshelf.py)
 CLIP_ACTIONS = ("play", "mic", "add", "copy", "delete")
 # Bun's games (ui/bun/bunpong.py games()); any other is "other"
-BUN_GAMES = ("pong", "draw", "rps", "ttt", "other")
+BUN_GAMES = ("pong", "dodge", "homerun", "whack", "other")
 # the rare loading screens (ui/bun/splashacts.py RARES' keys)
 SPLASH_RARES = ("gold", "ice", "galaxy", "rainbow")
 # Settings' pages (settings.SettingsDialog's page keys, without Show advanced)

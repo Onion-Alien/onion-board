@@ -341,7 +341,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/bun/bunpong.py` | the Easter egg: poke Bun enough and he challenges you to a game picked at random; the dialog the games play in (its sounds: `pongsounds.py`) |
 | `soundboard/ui/bun/bunpongbase.py` | what Bun's games share: the court's colours and timings, sparks and speech bubbles, and `Game`, the base every game builds on (`bunpong` re-exports it) |
 | `soundboard/ui/bun/bunpongcourt.py` | Pong itself (`Court`): serving, Bun's paddle guessing where the ball goes, your paddle, hits and rallies (`bunpong` re-exports it) |
-| `soundboard/ui/bun/bungames.py` | Bun's other Easter egg games: quick draw, rock paper scissors, tic-tac-toe |
+| `soundboard/ui/bun/bungames.py` | Bun's other Easter egg games: dodgeball, home run, whack-a-Bun |
 | `soundboard/ui/kit/choicetile.py` | ChoiceTile (a choice as a fixed-size tile: icon, name, tick, optional level bar; the setup guide's devices) and FoldPill (a small pill that opens something under it) |
 | `soundboard/ui/setup/micupdate.py` | the offer to update the mic part: a card over the window a second after it opens; Windows is asked only after *Install update* |
 | `soundboard/ui/setup/setupshow.py` | Bun building your mic on the Setup tab while Onion Board goes onto it (Windows asking, then loading) |

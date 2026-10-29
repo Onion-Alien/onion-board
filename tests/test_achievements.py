@@ -58,7 +58,7 @@ def test_used_features_count_without_the_usage_count(cfg, monkeypatch):
     monkeypatch.setattr(usage, "enabled", lambda: False)
     usage.used("egg-pong-won")
     usage.used("splash-rainbow")
-    for g in ("pong", "draw", "rps", "ttt", "other"):
+    for g in ("pong", "dodge", "homerun", "whack", "other"):
         usage.used(f"egg-game-{g}")
     assert ach.got("gamer_bun") and ach.got("rainbow_bun") and ach.got("arcade_rat")
     assert not ach.got("catch_em_all")   # Rainbow isn't one of the three
@@ -548,16 +548,17 @@ def test_radio_from_six_continents_and_a_long_listen_to_one(cfg):
     assert ach.got("station_loyalist")
 
 
-def test_rock_paper_scissors_in_a_row_and_tic_tac_toe_wins(cfg):
-    for who in ("you", "you", "you", "you", "bun", "you", "you", "you", "you"):
-        ach.game_point("rps", who)
+def test_home_runs_in_a_row_and_whack_a_bun_wins(cfg):
+    for who in ("you", "you", "bun", "you", "you"):
+        ach.game_point("homerun", who)
+        ach.game_point("dodge", "you")   # other games' points don't count
     assert not ach.got("rock_solid")
-    ach.game_point("rps", "you")
+    ach.game_point("homerun", "you")
     assert ach.got("rock_solid")
     for _ in range(10):
-        ach.game_won("ttt")
+        ach.game_won("whack")
         ach.game_won("pong")
-    assert ach.got("grid_master") and ach.value("ttt_won") == 10
+    assert ach.got("grid_master") and ach.value("whack_won") == 10
 
 
 def test_a_voice_changer_run_and_the_voices_in_it(cfg):

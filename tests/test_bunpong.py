@@ -506,121 +506,243 @@ def test_another_game_switches_and_keeps_the_dialog(qapp):
     stack.close()
 
 
-def test_quick_draw_early_is_his_point_and_fast_is_yours(qapp):
-    stack, game = _play("draw")
+def _until(game, cond, secs=5.0, dt=1 / 120):
+    for _ in range(int(secs / dt)):
+        if cond():
+            return True
+        game.step(dt)
+    return cond()
+
+
+def test_dodgeball_hit_him_while_he_winds_up_and_he_dodges_what_he_sees(qapp):
+    stack, game = _play("dodge")
     c = game.court
-    QTest.mouseClick(c, Qt.MouseButton.LeftButton)
-    assert c.state == "wait"
-    QTest.keyClick(c, Qt.Key.Key_Space)           # before GO
-    assert c.score == {"you": 0, "bun": 1} and c.early
-    for _ in range(400):
-        game.step(1 / 60)
-        if c.state == "go":
-            break
-    assert c.state == "go"
-    c.fire()
-    assert c.score["you"] == 1 and c.shown[0] == "you"
-    for _ in range(400):                          # next round: you never fire
-        game.step(1 / 60)
-        if c.score["bun"] == 2:
-            break
-    assert c.score["bun"] == 2 and c.shown[0] == "bun"
-    game.finish()
-    stack.close()
-
-
-def test_rock_paper_scissors_plays_to_the_end(qapp):
-    stack, game = _play("rps")
-    c = game.court
-    keys = (Qt.Key.Key_1, Qt.Key.Key_2, Qt.Key.Key_3)
-    rounds = 0
-    while c.state != "over" and rounds < 60:
-        QTest.keyClick(c, keys[rounds % 3])
-        assert c.state == "shake"
-        for _ in range(140):
-            game.step(1 / 60)
-            if c.state in ("pick", "over"):
-                break
-        rounds += 1
-    assert c.state == "over" and max(c.score.values()) == c.win_at
-    assert not game.end.isHidden()
-    game.finish()
-    stack.close()
-
-
-def test_rock_paper_scissors_scores_the_right_side(qapp):
-    stack, game = _play("rps")
-    c = game.court
-    c.pick(0)
-    c.his = "scissors"                            # rock beats scissors
-    for _ in range(60):
-        game.step(1 / 60)
-    assert c.score == {"you": 1, "bun": 0} and c.won == "you"
-    for _ in range(100):
-        game.step(1 / 60)
-    c.pick(0)
-    c.his = "paper"
-    for _ in range(60):
-        game.step(1 / 60)
-    assert c.score == {"you": 1, "bun": 1}
-    game.finish()
-    stack.close()
-
-
-def test_tic_tac_toe_you_win_a_row_and_bun_blocks(qapp):
-    stack, game = _play("ttt")
-    c = game.court
-    c.board = ["you", "you", None, "bun", "bun", None, None, None, None]
-    c.place(2)
-    assert c.line == (0, 1, 2) and c.score["you"] == 1
-    for _ in range(100):
-        game.step(1 / 60)
-    assert c.state == "play" and c.first == "bun"   # his go first now
-    c.rng = random.Random(0)
-    c.rng.random = lambda: 0.99                   # no careless move this time
-    c.board = ["you", "you", None, None, "bun", None, None, None, None]
-    assert c._bun_move() == 2                     # blocks your row
-    c.board = ["bun", "bun", None, "you", "you", None, None, None, None]
-    assert c._bun_move() == 2                     # takes his own win first
-    game.finish()
-    stack.close()
-
-
-def test_tic_tac_toe_keys_and_clicks(qapp):
-    stack, game = _play("ttt")
-    c = game.court
-    QTest.keyClick(c, Qt.Key.Key_Left)
-    QTest.keyClick(c, Qt.Key.Key_Up)
+    QTest.mouseClick(c, Qt.MouseButton.LeftButton)   # the first click starts it
+    assert c.state == "play"
+    # he's planted for his wind-up: a throw straight at him lands
+    c.next_throw, c.act, c.act_t, c.windup = 99, "windup", 0.0, 9.0
+    c.you[1] = c.aim[1] = c.bun_y
+    c.rng.random = lambda: 0.99                      # he sees it in time
     QTest.keyClick(c, Qt.Key.Key_Space)
-    assert c.board[0] == "you" and c.turn == "bun"
-    for _ in range(60):
-        game.step(1 / 60)
-    assert c.board.count("bun") == 1 and c.turn == "you"
-    free = c.board.index(None)
-    x, y, _cell = c._cell_centre(c.geo(), free)
-    QTest.mouseClick(c, Qt.MouseButton.LeftButton, pos=QPointF(x, y).toPoint())
-    assert c.board[free] == "you"
+    assert _until(game, lambda: c.score["you"] == 1)
+    assert _until(game, lambda: c.state == "play")
+    # not winding up: he sees it coming and gets out of the way
+    c.next_throw, c.act = 99, "idle"
+    c.you[1] = c.aim[1] = c.bun_y
+    c.spot = c.bun_y
+    was = c.bun_y
+    c.throw()
+    _until(game, lambda: not c.balls, 2.0)
+    assert c.score["you"] == 1 and abs(c.bun_y - was) > 0.1
+    # his throw finds you if you stand still
+    c.act, c.act_t, c.windup = "windup", 0.0, 0.1
+    assert _until(game, lambda: c.score["bun"] == 1, 4.0)
     game.finish()
     stack.close()
 
 
-@pytest.mark.parametrize("name", ["draw", "rps", "ttt"])
+def test_dodgeball_you_only_run_so_fast_and_stay_in_your_half(qapp):
+    stack, game = _play("dodge")
+    c = game.court
+    c.start()
+    c.next_throw = 99
+    c.aim = [0.0, 0.0]                               # off to Bun's side and the top
+    game.step(0.1)
+    g = c.geo()
+    left, _r, top, _b = c._area(g)
+    assert c.you[0] >= left - 1e-6 and c.you[1] >= top - 1e-6
+    ran = (0.8 - c.you[0]) * g["w"], (0.5 - c.you[1]) * g["h"]
+    assert math.hypot(*ran) <= c.YOU_SPEED * g["h"] * 0.1 + 1
+    c.reload = 0
+    c.throw()
+    c.throw()                                        # reloading: one ball, not two
+    assert len([b for b in c.balls if b["who"] == "you"]) == 1
+    game.finish()
+    stack.close()
+
+
+def _pitch(c, ty, kind="fast", bend=0.0, T=0.6):
+    c.start()
+    c.windup = 0.0
+    c.step(1 / 120)
+    c.pitch.update(kind=kind, ty=ty, bend=bend, T=T)
+
+
+def _at_plate(game, c):
+    _until(game, lambda: c.pitch["t"] >= c.pitch["T"] - 1 / 240, 2.0, 1 / 240)
+
+
+def test_home_run_on_time_and_height_is_yours_a_miss_is_his(qapp):
+    stack, game = _play("homerun")
+    c = game.court
+    QTest.keyClick(c, Qt.Key.Key_Space)              # starts it
+    g = c.geo()
+    zy = g["zone_y"] / g["h"]
+    _pitch(c, zy)
+    c.bat_y = zy
+    _at_plate(game, c)
+    c.swing_bat()
+    assert c.result == "hr" and c.score == {"you": 1, "bun": 0}
+    _pitch(c, zy)
+    c.bat_y = zy
+    game.step(0.2)
+    c.swing_bat()                                    # way too early
+    assert c.result == "strike" and c.score["bun"] == 1
+    _pitch(c, zy)
+    c.bat_y = zy + 0.2                               # on time but nowhere near it
+    _at_plate(game, c)
+    c.swing_bat()
+    assert c.result == "strike" and c.score["bun"] == 2
+    _pitch(c, zy)                                    # let a good one go by: a strike too
+    _until(game, lambda: c.result, 2.0)
+    assert c.result == "strike" and c.score["bun"] == 3
+    game.finish()
+    stack.close()
+
+
+def test_home_run_let_the_ones_outside_the_box_go(qapp):
+    stack, game = _play("homerun")
+    c = game.court
+    g = c.geo()
+    out = (g["zone_y"] + g["zone_h"] * 1.6) / g["h"]
+    _pitch(c, out)
+    _until(game, lambda: c.result, 2.0)
+    assert c.result == "ball" and c.score == {"you": 0, "bun": 0}
+    _pitch(c, out)
+    c.bat_y = out
+    _at_plate(game, c)
+    c.swing_bat()                                    # chased it, however well timed
+    assert c.result == "strike" and c.score["bun"] == 1
+    zy = g["zone_y"] / g["h"]                        # a curve still ends where it's aimed
+    _pitch(c, zy, "curve", bend=-0.2)
+    assert c.in_box(g, c._ball_at(g, c.pitch["T"])[1] / g["h"])
+    assert not c.in_box(g, c._ball_at(g, c.pitch["T"] * 0.6)[1] / g["h"])
+    game.finish()
+    stack.close()
+
+
+def test_whack_a_bun_whack_them_never_the_carrots_or_nothing(qapp):
+    stack, game = _play("whack")
+    c = game.court
+    QTest.keyClick(c, Qt.Key.Key_Space)
+    assert c.state == "play"
+    c.next_pop = 99
+    c.holes[4] = {"kind": "bun", "t": 0.0, "up": 1.0, "hit": False}
+    game.step(0.1)
+    QTest.keyClick(c, Qt.Key.Key_5)                  # the middle, as on the number pad
+    assert c.score == {"you": 1, "bun": 0}
+    c.holes[0] = {"kind": "carrot", "t": 0.0, "up": 1.0, "hit": False}
+    game.step(0.1)
+    cx, cy, _w = c.hole(c.geo(), 0)
+    QTest.mouseClick(c, Qt.MouseButton.LeftButton, pos=QPointF(cx, cy - 4).toPoint())
+    assert c.score == {"you": 1, "bun": 1}
+    game.step(0.5)
+    c.holes[8] = {"kind": "bun", "t": 0.0, "up": 1.0, "hit": False}
+    game.step(0.1)
+    QTest.keyClick(c, Qt.Key.Key_1)                  # an empty one: the mallet sticks
+    assert c.stuck > 0
+    QTest.keyClick(c, Qt.Key.Key_3)                  # ... so this one misses its chance
+    assert c.score["you"] == 1
+    _until(game, lambda: c.holes[8] is None, 3.0)    # and it gets away
+    assert c.score == {"you": 1, "bun": 2}
+    game.finish()
+    stack.close()
+
+
+def test_whack_a_bun_is_twenty_for_you_five_for_him(qapp):
+    stack, game = _play("whack")
+    c = game.court
+    for _ in range(4):
+        c._point("bun", quip=False)
+    for _ in range(19):
+        c._point("you", quip=False)
+    assert c.state != "over"
+    c._point("you", quip=False)
+    assert c.winner == "you" and not game.end.isHidden()
+    assert c.score_text("you") == "20/20" and c.score_text("bun") == "4/5"
+    game.finish()
+    stack.close()
+
+
+def _whack_bot(c, react, rng):
+    """Whacks a Bun once it's been up `react` seconds, never a carrot; react 0: swings
+    about at random."""
+    if not react:
+        if rng.random() < 0.08:
+            c.whack(rng.randrange(9))
+        return
+    for i, hl in enumerate(c.holes):
+        if hl and not hl["hit"] and hl["kind"] == "bun" and hl["t"] >= react:
+            c.whack(i)
+            return
+
+
+def _homerun_bot(c, rng, sd):
+    """Takes the ones outside the box and swings on time give or take `sd` seconds
+    (and the ball's height give or take as much); sd 0: swings at everything early."""
+    if c.state == "windup":
+        c.plan = rng.gauss(0, sd)
+    if c.state != "pitch" or c.swung is not None:
+        return
+    g = c.geo()
+    y = c._ball_at(g, c.pitch["T"])[1] / g["h"]
+    if not sd:
+        if c.pitch["t"] > c.pitch["T"] * 0.8:
+            c.swing_bat()
+    elif c.in_box(g, y):
+        c.bat_y = y + c.plan
+        if c.pitch["t"] >= c.pitch["T"] + c.plan:
+            c.swing_bat()
+
+
+@pytest.mark.parametrize("name", ["homerun", "whack"])
+def test_good_play_beats_him_and_mashing_never_does(qapp, name):
+    """Hard, not impossible: a sharp player wins, swinging about loses."""
+    wins = {}
+    for skill in ("sharp", "masher"):
+        wins[skill] = 0
+        for seed in range(3):
+            stack, game = _play(name, seed=seed)
+            c = game.court
+            c.sound = None
+            rng = random.Random(seed)
+            c.plan = 0.0
+            c.start()
+            for _ in range(120 * 240):
+                if name == "whack":
+                    _whack_bot(c, 0.3 if skill == "sharp" else 0.0, rng)
+                else:
+                    _homerun_bot(c, rng, 0.012 if skill == "sharp" else 0.0)
+                game.step(1 / 120)
+                if c.state == "over":
+                    break
+            wins[skill] += c.winner == "you"
+            game.finish()
+            stack.close()
+    assert wins["sharp"] >= 2 and wins["masher"] == 0, wins
+
+
+@pytest.mark.parametrize("name", ["dodge", "homerun", "whack"])
 def test_every_game_paints_through_a_whole_match(qapp, name):
     stack, game = _play(name, seed=5)
     c = game.court
-    for i in range(60 * 90):
-        if name == "draw" and c.state in ("ready", "go") and c.st > 0.2:
-            c.fire()
-        elif name == "rps" and c.state == "pick":
-            c.pick(i % 3)
-        elif name == "ttt" and c.state == "play" and c.turn == "you":
-            c.place(c.board.index(None))
+    QTest.mouseClick(c, Qt.MouseButton.LeftButton, pos=QPointF(2, 2).toPoint())
+    assert c.state != "ready"
+    for i in range(60 * 60):
+        if name == "dodge" and c.state == "play" and i % 20 == 0:
+            c.throw()
+        elif name == "homerun" and c.state == "pitch" and c.pitch["t"] > c.pitch["T"] * 0.98:
+            c.swing_bat()
+        elif name == "whack" and c.state == "play" and i % 9 == 0:
+            c.whack(i % 9)
         game.step(1 / 60)
         if i % 40 == 0:
             game.grab()
         if c.state == "over":
             break
-    assert c.state == "over" and not game.end.isHidden()
+    while c.state != "over":                         # a long match: finish it off
+        c._point("bun", quip=False)
+    assert not game.end.isHidden()
     assert not game.grab().isNull()
     game.finish()
     stack.close()

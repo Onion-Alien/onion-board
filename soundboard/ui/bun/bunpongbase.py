@@ -123,7 +123,7 @@ class Game(QWidget):
 
     win_at = WIN_AT
     net = False   # the court's middle line and circle (Pong's)
-    ach = ""      # its name for the achievements that count it ("rps", "ttt")
+    ach = ""      # its name for the achievements that count it ("homerun", "whack")
 
     def __init__(self, rng: random.Random | None = None, parent=None):
         super().__init__(parent)
@@ -145,6 +145,11 @@ class Game(QWidget):
     def how(self) -> str:
         """The line under the title: how to play."""
         raise NotImplementedError
+
+    def goal(self, who: str) -> int:
+        """The points `who` ("you" / "bun") needs to win: `win_at` for both, unless a game
+        sets each side its own."""
+        return self.win_at
 
     # ------------------------------------------------------------------ state
     def reset(self):
@@ -179,7 +184,7 @@ class Game(QWidget):
         self.pop[who] = 0.0
         self.goal_flash = ["bun" if who == "you" else "you", 0.0]
         self.shake = 0.28
-        if self.score[who] >= self.win_at:
+        if self.score[who] >= self.goal(who):
             usage.used("egg-pong-won" if who == "you" else "egg-pong-lost")
             if who == "you":
                 achievements.game_won(self.ach)
@@ -223,7 +228,7 @@ class Game(QWidget):
     def winner(self) -> str | None:
         if self.state != "over":
             return None
-        return "you" if self.score["you"] >= self.win_at else "bun"
+        return "you" if self.score["you"] >= self.goal("you") else "bun"
 
     # ------------------------------------------------------------------ geometry
     def geo(self) -> dict:
@@ -307,7 +312,9 @@ class Game(QWidget):
         if not over:
             self.paint_game(p, g)
         if self.say and time.monotonic() < self.say_until:
-            _bubble(p, self.say, br, max(10, round(g["bh"] * 0.12)), w)
+            # at the end who won sits on his right: the bubble goes on his left
+            room = br.right() + 4 if over else w
+            _bubble(p, self.say, br, max(10, round(g["bh"] * 0.12)), room)
         p.end()
 
     def paint_back(self, p: QPainter, g: dict):
@@ -345,6 +352,10 @@ class Game(QWidget):
         bun = QRectF(18, h * 0.04, nw, h * 0.18)
         return bun, bun.translated(nw + h * 0.04, 0)
 
+    def score_text(self, side: str) -> str:
+        """`side`'s number as the score shows it."""
+        return str(self.score[side])
+
     def _paint_scores(self, p: QPainter, w: float, h: float):
         """The score: big and faint behind the play, popping when it goes up."""
         f = QFont(self.font())
@@ -359,7 +370,7 @@ class Game(QWidget):
             p.setFont(f)
             p.setPen(col)
             p.drawText(box.adjusted(-30, -30, 30, 30), Qt.AlignmentFlag.AlignCenter,
-                       str(self.score[side]))
+                       self.score_text(side))
         f.setPixelSize(max(10, round(h * 0.045)))
         f.setBold(False)
         p.setFont(f)
