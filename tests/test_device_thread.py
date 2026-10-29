@@ -330,3 +330,24 @@ def test_a_device_query_that_fails_still_raises(monkeypatch):
     with pytest.raises(eng.sd.PortAudioError):
         eng.list_name(5)
     answered()
+
+
+def test_the_engine_finds_its_device_while_it_holds_the_device_lock(monkeypatch):
+    """The engine opens a stream holding DEVICES on its device thread: the lookup must
+    see PortAudio's list then, not the last one (empty on start-up: "not found")."""
+    def query_devices(idx=None):
+        devs = [{"name": "Microphone (Headset)", "hostapi": 0, "max_output_channels": 0,
+                 "max_input_channels": 1}]
+        return devs if idx is None else devs[idx]
+    monkeypatch.setattr(eng.sd, "query_devices", query_devices)
+    monkeypatch.setattr(eng.sd, "query_hostapis", lambda idx=None: [{"name": "Windows WASAPI"}])
+    monkeypatch.setattr(eng.devicelist, "_seen", {})
+    found = []
+
+    def engine_thread():
+        with eng.DEVICES:   # as @_holding_devices does
+            found.append(eng.devicelist.find_device("input", "Microphone (Headset)"))
+    t = threading.Thread(target=engine_thread)
+    t.start()
+    t.join(5)
+    assert found == [0]
