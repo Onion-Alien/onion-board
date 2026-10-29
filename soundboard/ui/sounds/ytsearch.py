@@ -98,6 +98,7 @@ class SearchResults(RoundedFrame):
         self._gen = 0
         self.failed = False   # the last search came back with an error (firsttour.py)
         self._why = ""        # why it failed, for the usage count (usage.DL_FAILS)
+        self._why_more: list[str] = []   # ...and what's known of it (usage.failure_detail)
         self._running: tuple[str, str] | None = None   # (query, site) still being searched
         self._asked = PAGE      # hits asked for so far (Show more asks for the next PAGE)
         self._rows: list[ResultRow] = []
@@ -471,8 +472,11 @@ class SearchResults(RoundedFrame):
         if down:
             usage.used("search-site-down")
         usage.used("search-failed")
-        usage.used(f"search-failed-why-{self._why or 'other'}")   # the kind only
-        self._why = ""
+        why = self._why or "other"
+        usage.used(f"search-failed-why-{why}")   # the kind only
+        if why in ("other", "timeout"):
+            usage.failed(f"search-{why}", *self._why_more)
+        self._why, self._why_more = "", []
         self.oops.show_problem(title, err, self.try_again, fixable=not down)
         self.oops.show()
         self.scroll_area.hide()
@@ -587,9 +591,15 @@ class SearchResults(RoundedFrame):
             busy.emit(self._done, gen, "blocked", html.escape(str(e)))
         except Exception as e:  # noqa: BLE001 - shown in the panel
             log.info("%s search failed for %r: %s", source, query, e)
-            self._why = errors.download_reason(e)   # from yt-dlp's own words
+            self._failed_why(e)
             # rich text: the plain words, and a "Report it" link when it's one for us
             busy.emit(self._done, gen, [], errors.html(e, where=f"Searching {source}"))
+
+    def _failed_why(self, e: BaseException):
+        """Why a search or link look-up failed, from yt-dlp's own words, for the usage
+        count (_fail)."""
+        self._why = errors.download_reason(e)
+        self._why_more = usage.failure_detail(self._why, e)
 
     def _work_link(self, gen: int, url: str, direct: bool):
         try:
@@ -600,7 +610,7 @@ class SearchResults(RoundedFrame):
             busy.emit(self._done, gen, "blocked", html.escape(str(e)))
         except Exception as e:  # noqa: BLE001 - shown in the panel
             log.info("link look-up failed for %s: %s", url, e)
-            self._why = errors.download_reason(e)
+            self._failed_why(e)
             busy.emit(self._done, gen, [], errors.html(e, where="Looking up a link"))
 
     def _work_links(self, gen: int, urls: list[str], direct: bool):
@@ -613,7 +623,7 @@ class SearchResults(RoundedFrame):
                 return "blocked"
             except Exception as e:  # noqa: BLE001 - counted, the rest still show
                 log.info("link look-up failed for %s: %s", url, e)
-                self._why = errors.download_reason(e)
+                self._failed_why(e)
                 return None
         with ThreadPoolExecutor(max_workers=LINK_LOOKUPS, thread_name_prefix="links") as pool:
             found = list(pool.map(one, urls))

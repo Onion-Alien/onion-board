@@ -345,7 +345,9 @@ def _extract(target: str, opts: dict, keep: bool = False) -> dict:
         except ytworker.RemoteError as e:
             raise _readable(_remote(e)) from None
         except TimeoutError as e:
-            raise FetchError(_("The site took too long to answer. Try again.")) from e
+            out = FetchError(_("The site took too long to answer. Try again."))
+            out.kind = "helper-timeout"
+            raise out from e
         except ytworker.Unavailable as e:
             log.info("%s; looking it up here", e)
     with _ydl() as yt_dlp:
@@ -400,6 +402,10 @@ def _readable(e: Exception) -> FetchError:
     # the words shown are the problem's (errors.describe reads .problem back)
     out.problem = p if text == p.text else errors.Problem(text, p.detail)
     out.raw = str(e)
+    # yt-dlp's class (_remote names it the same); its DownloadError keeps the one it wraps
+    inner = getattr(e, "exc_info", None)
+    cause = inner[1] if isinstance(inner, tuple) and len(inner) > 1 else None
+    out.kind = type(cause if isinstance(cause, BaseException) else e).__name__
     out.proxy = text != p.text   # the proxy / Tor's fault: no newer yt-dlp fixes that
     return out
 

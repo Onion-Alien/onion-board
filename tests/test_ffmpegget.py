@@ -461,3 +461,49 @@ def test_the_apps_own_copy_follows_the_app(monkeypatch, tmp_path):
     got.clear()
     net.configure_features(["ffmpeg_download"], offline=False)   # switched off: never
     assert ffmpegget.update_own() is None and not got
+
+
+# --------------------------------------------------------------------------- fault words
+
+def test_check_says_why_it_is_broken_for_the_count(monkeypatch):
+    """The count's ffmpeg-broken couldn't tell an antivirus from a missing DLL: the
+    check keeps Windows' error or the exit code (never a path)."""
+    monkeypatch.setattr(library, "_ffmpeg", lambda: "ffmpeg.exe")
+    e = OSError(22, "%1 is not a valid Win32 application")
+    e.winerror = 193
+    _version_says(monkeypatch, exc=e)
+    assert ffmpegget._check().fault == "err-193"
+    _version_says(monkeypatch, rc=-1073741515, out=b"")   # a DLL missing
+    assert ffmpegget._check().fault == "exit-3221225781"
+
+
+def test_get_failed_keeps_each_steps_fault(monkeypatch):
+    """winget's exit code and why the app's own download failed, both."""
+    _real(monkeypatch, "_winget", "_with_winget")
+    monkeypatch.setattr(ffmpegget, "winget", lambda: "winget.exe")
+    monkeypatch.setattr(library, "_ffmpeg", lambda: None)
+    monkeypatch.setattr(ffmpegget.subprocess, "run",
+                        lambda *a, **kw: subprocess.CompletedProcess(a, 1, b"", b"no"))
+    with pytest.raises(ffmpegget.GetError) as e:
+        ffmpegget.get()
+    assert e.value.fault == "winget-exit-1"
+
+    def own_copy(progress, stop):
+        raise ffmpegget.GetError("github.com said 403 Forbidden.", "own-http-403")
+    monkeypatch.setattr(ffmpegget, "_own_copy", own_copy)
+    _states(monkeypatch, ffmpegget.MISSING)
+    with pytest.raises(ffmpegget.GetError) as e:
+        ffmpegget.fix()
+    assert e.value.fault == "winget-exit-1 own-http-403"
+
+
+def test_download_once_names_the_status(monkeypatch, tmp_path):
+    import urllib.error
+    _real(monkeypatch, "_download_once")
+
+    def refused(*a, **kw):
+        raise urllib.error.HTTPError("https://example.com/f.zip", 403, "Forbidden", {}, None)
+    monkeypatch.setattr(net, "urlopen", refused)
+    with pytest.raises(ffmpegget.GetError) as e:
+        ffmpegget._download_once("https://example.com/f.zip", tmp_path / "f", None, None)
+    assert e.value.fault == "own-http-403"

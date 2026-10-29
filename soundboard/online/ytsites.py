@@ -84,6 +84,9 @@ class FetchError(DownloadError):
 
     problem: errors.Problem | None = None   # set by _readable
     raw: str = ""
+    # for the usage count: yt-dlp's own error class (`ExtractorError`, set by _readable),
+    # or `helper-timeout` when the download helper didn't answer in time
+    kind = ""
     proxy = False   # the proxy / Tor failed, not yt-dlp (set by _readable)
 
 

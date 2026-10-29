@@ -714,9 +714,10 @@ def install(info: ModuleInfo, on_line: Callable[[str], object],
     tag = usage.addon_tag(info.id)
     try:
         why = _install(info, on_line, on_note)
-    except Exception:
+    except Exception as e:
         usage.used(f"addon-failed-{tag}")
         usage.used(f"addon-failed-{tag}-other")
+        usage.failed("addon-other", tag, *usage.error_detail(e))   # its type and place
         raise
     if why:
         usage.used(f"addon-failed-{tag}")

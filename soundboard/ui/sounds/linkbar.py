@@ -606,7 +606,10 @@ class LinkBar(QFrame):
                 _("Couldn't play it: {error}", error=e))))
         except Exception as e:  # noqa: BLE001 - shown in the bar, logged
             log.warning("link %s failed for %s: %s", kind, url, e)
-            emit("why", url, errors.download_reason(e))   # for the usage count only
+            why = errors.download_reason(e)
+            emit("why", url, why)   # for the usage count only
+            if why == "other":   # what's known of it, never its words (usage.failed)
+                usage.failed("dl-other", *usage.error_detail(e))
             # a bot check or rate limit is about the user's address, not yt-dlp; with
             # auto-update on, download_audio() already tried a newer one
             fixable = (isinstance(e, ytdl.FetchError) and not auto_update

@@ -418,6 +418,9 @@ def raised_why(log_path: Path | None = None) -> tuple[str, str, str]:
     if what == "other" and not m:
         what = RAISED_KIND.get(name, "other")
     _count_raised(kind.group(1) if kind else "", lines)
+    if err == "err-other" and m:   # a number RAISED_ERR doesn't list: the number itself
+        from soundboard.core import usage
+        usage.failed("mic-code-1", f"err-{m.group(1)}")
     return where, what, err
 
 
@@ -504,6 +507,9 @@ def install_on(guid: str | None, *, clean: bool = False,
     if code in _CODE_TEXT:   # what to do, not just a number
         return Failure(_CODE_TEXT[code]() + f" (code {code})", f"code-{code}")
     if code:
+        if code not in FAIL_CODES:   # "code-other" alone can't tell a crash from a refusal
+            from soundboard.core import usage
+            usage.failed("mic-code", f"exit-{code & 0xFFFFFFFF}")
         return Failure(_("Installing failed (code {code}). The log is in {folder}.",
                          code=code, folder=data_dir().parent),
                        f"code-{code}" if code in FAIL_CODES else "code-other")
