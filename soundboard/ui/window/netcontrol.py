@@ -24,6 +24,9 @@ if TYPE_CHECKING:
     from soundboard.ui.window.mainwindow import MainWindow
 
 
+VOICE_TAB = "voice:"   # a card line's page that's a Voice tab ("voice:clean"), not Settings
+
+
 class NetControl(Controller):
     """The network and privacy follow-ups of one MainWindow (``mw``)."""
 
@@ -110,9 +113,20 @@ class NetControl(Controller):
 
     def card_lines(self) -> list[onaircard.Line]:
         """What the On Air card says under its status (OutputBlock.set_lines): how the
-        app goes online, a remote control listening, and lite mode."""
-        return [line for line in (self._network_line(), self._remote_line(),
-                                  self._lite_line()) if line]
+        app goes online, a remote control listening, lite mode, and the Voice tabs that
+        are on."""
+        return [*self._voice_lines(), *(line for line in (
+            self._network_line(), self._remote_line(), self._lite_line()) if line)]
+
+    def _voice_lines(self) -> list[onaircard.Line]:
+        """A line for each Voice tab that's on (Clean mic, the voice changer, an AI voice,
+        another language): they change your mic on every tab, so the card says so
+        wherever you are. Shown only while on, as Lite mode: the name in green says it."""
+        live = getattr(getattr(self.mw, "voice", None), "live_tabs", None)
+        if live is None:   # (the Voice tab switched off in Settings)
+            return []
+        return [onaircard.Line(icon, name, "ok", "\n".join((name, _("Click to change it."))),
+                               VOICE_TAB + key) for key, icon, name in live()]
 
     @staticmethod
     def _lite_line() -> onaircard.Line | None:
@@ -175,6 +189,16 @@ class NetControl(Controller):
     def _remote_watch(self):
         mw = self.mw
         mw.remote_changed.emit()   # (maybe from the thread that stopped it)
+
+    def open_line(self, page: str):
+        """A card line clicked: its Settings page, or its tab on the Voice tab."""
+        mw = self.mw
+        if not page.startswith(VOICE_TAB):
+            mw.setctl.open_settings(page)
+            return
+        if mw.tabctl.tab_on("voice"):
+            mw.tabs.setCurrentWidget(mw.voice)
+            mw.voice._open_card(page[len(VOICE_TAB):])
 
     def _net_follow(self):
         mw = self.mw

@@ -54,6 +54,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
     clip_ready = Signal(object, str)   # a typed line saved as a sound (SpeechPanel)
     share_asked = Signal(str)   # Share to the store: the voice, as the Share window lists it
     light_changed = Signal(bool)   # Use less CPU switched by hand
+    live_tabs_changed = Signal()   # a tab's "on" dot came or went (live_tabs)
     _scanned = Signal(object, object)   # the Refresh button's worker: (modules, AI voices)
 
     def set_light(self, on: bool):
