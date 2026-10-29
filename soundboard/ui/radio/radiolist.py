@@ -25,6 +25,7 @@ from soundboard.online.radio import Station
 from soundboard.ui.kit import icons
 from soundboard.ui.kit.panel import Flow as _Flow
 from soundboard.ui.kit.panel import EmptyList, RoundedFrame
+from soundboard.ui.kit.restyled import on_restyle
 from soundboard.ui.kit.widgets import paint_now_playing, take_out
 
 if TYPE_CHECKING:
@@ -291,7 +292,18 @@ class _FilterRow(QWidget):
             self._lines.append(h)
         self._arrange(1)
         for c in combos:   # a longer choice picked may need another row
-            c.currentIndexChanged.connect(lambda _i: self._arrange(self.rows_for(self.width())))
+            c.currentIndexChanged.connect(lambda _i: self._again())
+            # and a theme's font: measured again once it's on the box (a hidden tab's
+            # boxes get it a moment after the switch: theme._Later)
+            on_restyle(c, self._again)
+
+    def _again(self):
+        if self.isVisible():   # (hidden, its width isn't laid out yet: on show)
+            self._arrange(self.rows_for(self.width()))
+
+    def showEvent(self, e):
+        super().showEvent(e)
+        self._again()
 
     @staticmethod
     def needs(c: QComboBox) -> int:

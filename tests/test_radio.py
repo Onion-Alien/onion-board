@@ -1913,3 +1913,34 @@ def test_a_narrow_window_hides_the_map_and_stops_pointing_at_it(tab):
     step(False)
     assert not tab.globe_box.isHidden()
     assert "map" in tab.search.placeholderText() and "map" in tab.info.text()
+
+
+def test_filter_boxes_follow_a_new_font(qapp):
+    """A theme in another font (Amber Terminal's monospace) cut the boxes to "All
+    countri", "Any quali": they were measured when the theme switched, before a hidden
+    Radio tab had the new font. They're measured again when it reaches them."""
+    from PySide6.QtGui import QFont
+    from PySide6.QtWidgets import QComboBox
+
+    from soundboard.ui.radio.radiopanel import QUALITIES, SORTS, _FilterRow
+    boxes = [QComboBox(), QComboBox(), QComboBox()]
+    boxes[0].addItem("All countries")
+    for label, _ in QUALITIES:
+        boxes[1].addItem(label)
+    for label, _ in SORTS:
+        boxes[2].addItem(label)
+    row = _FilterRow(boxes)
+    row.resize(900, 40)
+    row.show()
+    before = [c.maximumWidth() for c in boxes]
+    for c in boxes:
+        c.setFont(QFont("Consolas", 14))   # what the new theme's sheet sets on it
+    assert [c.maximumWidth() for c in boxes] == [row.needs(c) for c in boxes]
+    assert all(a > b for a, b in zip((c.maximumWidth() for c in boxes), before))
+    # hidden (another tab showing) when the font comes: measured once it's shown
+    row.hide()
+    for c in boxes:
+        c.setFont(QFont("Consolas", 18))
+    row.show()
+    assert [c.maximumWidth() for c in boxes] == [row.needs(c) for c in boxes]
+    row.close()
