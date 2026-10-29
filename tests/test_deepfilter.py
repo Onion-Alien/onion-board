@@ -79,8 +79,8 @@ def _feed(stream, x, block):
 
 # ---------------------------------------------------------------- download
 def test_strong_is_a_saved_strength():
-    assert cleanmic.clean_settings({"on": True, "strength": "strong"}) == {
-        "on": True, "strength": "strong"}
+    s = cleanmic.clean_settings({"on": True, "strength": "strong"})
+    assert (s["on"], s["strength"]) == (True, "strong")
 
 
 def test_download_is_the_pinned_file_into_the_app_folder(app_dir, monkeypatch):
@@ -219,12 +219,14 @@ def test_cleaner_uses_strong_once_its_running(fake_plugin):
     c = cleanmic.Cleaner(48000, "strong")
     try:
         _ready(c._deep)
-        x = np.full(48000, 0.2, np.float32)
+        # a tone, not a flat level: the rumble filter after it takes a flat one out
+        x = (0.2 * np.sin(2 * np.pi * 300 * np.arange(48000) / 48000)).astype(np.float32)
         y = []
         for i in range(0, len(x), 480):
             y.append(c.process(x[i:i + 480]))
             time.sleep(0.001)
-        assert np.allclose(np.concatenate(y)[-4800:], 0.1, atol=1e-4) and not c.note
+        tail = np.concatenate(y)[-4800:]
+        assert abs(float(np.max(np.abs(tail))) - 0.1) < 0.005 and not c.note
         assert c.latency() >= (deepfilter.PRIME + F + c._prime) / 48000
         c.set_strength("normal")              # off Strong: its stream goes
         assert c._deep is None

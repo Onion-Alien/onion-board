@@ -15,6 +15,12 @@ the mic down between your words: the network keeps any voice, a TV's or a quiet 
 across the room too, and a gate that learns your room's level drops those while you're
 quiet. No delay of its own.
 
+The card's ⚙ settings, laid out like a voice chat app's: Input volume (the mic turned up
+or down before any of it), Input sensitivity (the gate's own threshold instead of the
+learned one), the strength or "off" (no network: only the rest), and automatic gain
+control (`Agc`, last: your voice held at one loudness). All of it is the mic's alone:
+the board's sounds are mixed in after the voice chain, never through it.
+
 The voice chain runs a `Cleaner` first on every mic block (VoiceChain.set_clean), so
 the voice changer, AI voices and speech recognition all get the cleaned mic.
 """
@@ -35,7 +41,20 @@ FRAME = 480          # RNNoise's frame: 10 ms at 48 kHz
 DELAY = 960          # its output trails its input by two frames (measured: 20 ms)
 SCALE = 32768.0      # it works on 16-bit sample values held in floats
 STRENGTHS = ("light", "normal", "strong")
+LEVELS = ("off",) + STRENGTHS   # Noise suppression's choices: "off" runs no network
 DEFAULT = "normal"
+VOLUME_MAX = 200     # Input volume, % (100: as it is)
+SENSE_LO = -100      # Input sensitivity's dB range when it isn't automatic
+SENSE_DEFAULT = -50
+# the presets: what each sets (Input sensitivity's dB only counts when it isn't automatic)
+PRESETS = {
+    "normal": {"strength": "normal", "volume": 100, "auto_sense": True, "agc": False},
+    "loud": {"strength": "strong", "volume": 100, "auto_sense": False, "sense_db": -50,
+             "agc": False},
+    "voice": {"strength": "strong", "volume": 100, "auto_sense": False, "sense_db": -40,
+              "agc": True},
+    "quiet": {"strength": "light", "volume": 100, "auto_sense": True, "agc": False},
+}
 LIGHT_DRY = 10 ** (-12 / 20)   # Light: the mic as it was, 12 dB under the cleaned one
 RUMBLE_HZ = 80                 # Tidy's high-pass
 NAME = "rnnoise.dll"
@@ -96,16 +115,21 @@ class Tidy:
     `gate` on, a downward expander that turns the mic down 18 dB between your words.
     It decides every 2.5 ms, stays open 0.2 s after you stop, and takes the room's
     level as the quietest moment of the last 1.5 s, so a noisy room is learned at once
-    and followed when it changes. (Voice changer's old Clean up my mic, at its default.)"""
+    and followed when it changes. (Voice changer's old Clean up my mic, at its default.)
+    `sense` (dB, Input sensitivity) sets where it opens instead: closed again 4 dB under.
+    `peak_db` (the loudest 2.5 ms of the last block), `open_db` (where it opens now) and
+    `talking` (that block was over it) are kept with the gate off too: AGC and the
+    card's sensitivity bar read them."""
 
     SUB = 120            # samples a decision: 2.5 ms
     HOLD_S = 0.2
     FLOOR_S = 1.5
     CLOSED = 10 ** (-18 / 20)
 
-    def __init__(self, gate: bool = True):
+    def __init__(self, gate: bool = True, sense: float | None = None):
         from soundboard.audio.dsp import SmoothSos, butter
         self.gate = gate
+        self.sense = sense
         self._hp = SmoothSos()
         self._sos = butter(2, RUMBLE_HZ, btype="high", fs=RATE)
         self.floor_db = -70.0
@@ -113,12 +137,18 @@ class Tidy:
         self.open = False
         self.held = 0.0
         self.g = 1.0
+        self.peak_db = -120.0
+        self.open_db = -60.0
+
+    @property
+    def talking(self) -> bool:
+        return self.peak_db > self.open_db
 
     def run(self, y: np.ndarray) -> np.ndarray:
         if not len(y):
             return y
         y = self._hp.run(y, self._sos).astype(np.float32, copy=False)
-        return self._gate(y) if self.gate else y
+        return self._gate(y)
 
     def _gate(self, x: np.ndarray) -> np.ndarray:
         n = len(x)
@@ -127,12 +157,18 @@ class Tidy:
         lv = np.array([np.sqrt(np.mean(x[a:b] ** 2) + 1e-12)
                        for a, b in zip(edges[:-1], edges[1:])])
         db = (20 * np.log10(lv)).tolist()
+        self.peak_db = max(db)
         self.mins.append((n / RATE, max(min(db), -90.0)))
         span = sum(t for t, _ in self.mins)
         while len(self.mins) > 1 and span - self.mins[0][0] >= self.FLOOR_S:
             span -= self.mins.pop(0)[0]
         self.floor_db = min(min(m for _, m in self.mins), -38.0)
-        open_at, close_at = max(self.floor_db + 9, -60), max(self.floor_db + 5, -64)
+        if self.sense is None:
+            open_at, close_at = max(self.floor_db + 9, -60), max(self.floor_db + 5, -64)
+        else:
+            open_at, close_at = self.sense, self.sense - 4
+        self.open_db = open_at
+        gate = self.gate
         gains = np.empty(pieces + 1)
         gains[0] = g = self.g
         for i, d in enumerate(db):   # (plain floats: numpy scalars cost more here)
@@ -143,7 +179,7 @@ class Tidy:
                 self.held += piece
                 if self.held > self.HOLD_S:
                     self.open = False
-            target = 1.0 if self.open else self.CLOSED
+            target = 1.0 if self.open or not gate else self.CLOSED
             tau = 0.002 if target > g else 0.06
             g = target + (g - target) * float(np.exp(-piece / tau))
             gains[i + 1] = g
@@ -152,21 +188,90 @@ class Tidy:
         return (x * np.interp(np.arange(n), knots, gains)).astype(np.float32)
 
 
+class Agc:
+    """Automatic gain control, last, on the voice alone: while you talk (`Tidy.open`)
+    its level is followed over ~0.4 s and turned towards TARGET_DB, at most MAX_UP dB up
+    or MAX_DOWN down; between words the gain holds, so the room isn't pulled up. Peaks
+    never go over PEAK."""
+
+    TARGET_DB = -20.0     # a 2.5 ms piece's loudness while talking, as Tidy measures it
+    MAX_UP, MAX_DOWN = 18.0, 12.0
+    PEAK = 10 ** (-1 / 20)
+    FOLLOW_S, UP_S, DOWN_S = 0.4, 1.0, 0.3
+
+    def __init__(self):
+        self.level_db: float | None = None   # your voice's loudness, once you've talked
+        self.gain_db = 0.0
+        self._g = 1.0
+
+    def run(self, y: np.ndarray, talking: bool, piece_db: float) -> np.ndarray:
+        n = len(y)
+        if not n:
+            return y
+        dt = n / RATE
+        if talking:
+            lv = piece_db if self.level_db is None else self.level_db
+            self.level_db = lv + (piece_db - lv) * (1 - float(np.exp(-dt / self.FOLLOW_S)))
+            want = min(max(self.TARGET_DB - self.level_db, -self.MAX_DOWN), self.MAX_UP)
+            tau = self.UP_S if want > self.gain_db else self.DOWN_S
+            self.gain_db = want + (self.gain_db - want) * float(np.exp(-dt / tau))
+        g = 10 ** (self.gain_db / 20)
+        peak = float(np.max(np.abs(y)))
+        if peak * g > self.PEAK:   # never over the top: down at once
+            g = self.PEAK / peak
+            self.gain_db = 20 * float(np.log10(g))
+        out = y * np.linspace(self._g, g, n, dtype=np.float32)
+        top = float(np.max(np.abs(out)))
+        if top > self.PEAK:   # (the ramp down from a louder gain: not over it either)
+            out *= np.float32(self.PEAK / top)
+            g = min(g, self._g * self.PEAK / top)
+            self.gain_db = min(self.gain_db, 20 * float(np.log10(max(g, 1e-6))))
+        self._g = g
+        return out.astype(np.float32, copy=False)
+
+
 def clean_settings(raw) -> dict:
-    """The saved {"on": bool, "strength": "light" | "normal" | "strong"}, damaged values
-    replaced."""
+    """The saved settings, damaged values replaced: {"on": bool, "strength": "off" |
+    "light" | "normal" | "strong", "volume": 0-200 (%), "auto_sense": bool, "sense_db":
+    -100-0, "agc": bool}. (Versions before the ⚙ saved only on and strength, and drop
+    the rest; "off" there reads as Normal.)"""
     raw = raw if isinstance(raw, dict) else {}
     s = raw.get("strength")
-    return {"on": raw.get("on") is True, "strength": s if s in STRENGTHS else DEFAULT}
+
+    def num(key, lo, hi, default):
+        v = raw.get(key)
+        if isinstance(v, bool) or not isinstance(v, (int, float)) or not np.isfinite(v):
+            return default
+        return min(max(round(v), lo), hi)
+    return {"on": raw.get("on") is True, "strength": s if s in LEVELS else DEFAULT,
+            "volume": num("volume", 0, VOLUME_MAX, 100),
+            "auto_sense": raw.get("auto_sense") is not False,
+            "sense_db": num("sense_db", SENSE_LO, 0, SENSE_DEFAULT),
+            "agc": raw.get("agc") is True}
+
+
+def preset_of(s: dict) -> str:
+    """The preset these settings are, or "custom"."""
+    for key, p in PRESETS.items():
+        if all(s.get(k) == v for k, v in p.items()
+               if k != "sense_db" or not p["auto_sense"]):
+            return key
+    return "custom"
+
+
+def options(s: dict) -> dict:
+    """What the Cleaner needs of the settings, besides the strength."""
+    return {"volume": s.get("volume", 100), "sense": None if s.get("auto_sense", True)
+            else s.get("sense_db", SENSE_DEFAULT), "agc": bool(s.get("agc"))}
 
 
 class Cleaner:
     """One mic's noise remover. `process(mono)` (the audio thread) returns a block of
     the same length, the cleaned voice `latency()` seconds late. At another rate than
     48 kHz the mic is resampled there and back. Raises RuntimeError when RNNoise isn't
-    available or won't start."""
+    available or won't start. `opts`: `options()` of the card's settings."""
 
-    def __init__(self, rate: int, strength: str = DEFAULT):
+    def __init__(self, rate: int, strength: str = DEFAULT, opts: dict | None = None):
         lib = _load()
         if lib is None:
             raise RuntimeError(f"RNNoise isn't available: {_why}")
@@ -179,6 +284,10 @@ class Cleaner:
         self._deep = None   # voicefx.deepfilter.Stream while Strong is picked
         self.note = ""      # why Strong stopped (RNNoise cleans instead), for the card
         self._tidy = Tidy()
+        self._agc: Agc | None = None
+        self._volume = 1.0
+        self._sense: float | None = None
+        self.set_options(opts or {})
         self.set_strength(strength)
         self._frame = np.zeros(FRAME, np.float32)
         self._ptr = self._frame.ctypes.data_as(ctypes.POINTER(ctypes.c_float))
@@ -200,10 +309,31 @@ class Cleaner:
         self._late = 0     # silence added since, when the resamplers were slow to start
         self.level = 0.0   # the cleaned voice's peak, for the tab's meter (any thread reads)
 
+    def set_options(self, opts: dict):
+        """Input volume (%), Input sensitivity (dB, None: automatic), AGC on or off."""
+        self._volume = min(max(float(opts.get("volume", 100)), 0.0), VOLUME_MAX) / 100
+        self._sense = self._tidy.sense = opts.get("sense")
+        if opts.get("agc") and self._agc is None:
+            self._agc = Agc()
+        elif not opts.get("agc"):
+            self._agc = None
+        self._set_gate()
+
+    def _set_gate(self):
+        # (Light keeps some of the room, unless a sensitivity is set)
+        self._tidy.gate = self.strength != "light" or self._sense is not None
+
+    @property
+    def gate_db(self) -> tuple[float, float]:
+        """(the loudest moment of the last block, where the gate opens), in dB: the
+        sensitivity bar's (any thread reads)."""
+        t = self._tidy
+        return t.peak_db, t.open_db
+
     def set_strength(self, strength: str):
-        self.strength = strength if strength in STRENGTHS else DEFAULT
+        self.strength = strength if strength in LEVELS else DEFAULT
         self._mix = LIGHT_DRY if self.strength == "light" else 0.0
-        self._tidy.gate = self.strength != "light"   # (Light keeps some of the room)
+        self._set_gate()
         if self.strength == "strong" and self._deep is None:
             from soundboard.voicefx import deepfilter
             self.note = ""
@@ -214,14 +344,22 @@ class Cleaner:
 
     def latency(self) -> float:
         deep = self._deep
-        own = deep.latency() if deep is not None and deep.ready else DELAY / RATE
+        own = (deep.latency() if deep is not None and deep.ready
+               else 0.0 if self.strength == "off" else DELAY / RATE)
         return own + (self._prime + self._late) / self.rate
 
     def process(self, mono: np.ndarray) -> np.ndarray:
         n = len(mono)
         x = np.asarray(mono, np.float32)
+        if self._volume != 1.0:
+            x = x * np.float32(self._volume)
         if self._up is not None:
             x = self._up.resample_chunk(x)
+        if self.strength == "off":   # no network: only the gate and the rest
+            if len(self._pending):
+                x = np.concatenate([self._pending, x])
+                self._pending = np.zeros(0, np.float32)
+            return self._send(x, n)
         deep = self._deep
         if deep is not None:
             if len(self._pending) and deep.ready:
@@ -259,6 +397,9 @@ class Cleaner:
         """Cleaned 48 kHz samples in, `n` at the mic's rate out."""
         if len(y):
             y = self._tidy.run(y)
+            agc = self._agc
+            if agc is not None:
+                y = agc.run(y, self._tidy.talking, self._tidy.peak_db)
             if self._down is not None:
                 y = self._down.resample_chunk(y)
             self._out = np.concatenate([self._out, y])
@@ -288,19 +429,26 @@ class Cleaner:
             pass
 
 
-def clean_clip(mono: np.ndarray, rate: int, strength: str = DEFAULT) -> np.ndarray:
+def clean_clip(mono: np.ndarray, rate: int, strength: str = DEFAULT,
+               opts: dict | None = None) -> np.ndarray:
     """A whole recording cleaned (Hear the difference's After), lined up with the
     recording and the same length. Off the UI thread: ~5% of the clip's length (Strong:
     about a third; it raises RuntimeError when it can't run)."""
+    opts = opts or {}
     m = np.asarray(mono, np.float32)
     if rate != RATE:
         import soxr
         m = soxr.resample(m, rate, RATE).astype(np.float32)
     if strength == "strong":
         from soundboard.voicefx import deepfilter
-        tidy, out = Tidy(), deepfilter.clean_clip(m)
-        out = np.concatenate([tidy.run(c) for c in
-                              np.array_split(out, max(1, len(out) // 4800))])
+        m = m * np.float32(min(max(float(opts.get("volume", 100)), 0.0), VOLUME_MAX) / 100)
+        tidy, out = Tidy(sense=opts.get("sense")), deepfilter.clean_clip(m)
+        agc = Agc() if opts.get("agc") else None
+        parts = []
+        for c in np.array_split(out, max(1, len(out) // 4800)):
+            c = tidy.run(c)
+            parts.append(agc.run(c, tidy.talking, tidy.peak_db) if agc is not None else c)
+        out = np.concatenate(parts)
         if rate != RATE:
             import soxr
             out = soxr.resample(out, RATE, rate).astype(np.float32)
@@ -308,9 +456,9 @@ def clean_clip(mono: np.ndarray, rate: int, strength: str = DEFAULT) -> np.ndarr
         if len(out) < n:
             out = np.concatenate([out, np.zeros(n - len(out), np.float32)])
         return out[:n]
-    c = Cleaner(RATE, strength)
+    c = Cleaner(RATE, strength, opts)
     try:
-        lag = DELAY + c._prime
+        lag = (0 if strength == "off" else DELAY) + c._prime
         m = np.concatenate([m, np.zeros(lag, np.float32)])
         out = np.concatenate([c.process(m[i:i + 4800]) for i in range(0, len(m), 4800)])
         out = out[lag:]

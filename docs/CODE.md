@@ -370,7 +370,8 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/voice/voiceswitch.py` | the Voice tab's on / off: each voice (voice changer, AI voice, computer voice) or all together with Undo, and the voice that's on saying the translated lines |
 | `soundboard/ui/voice/voicecards.py` | the Voice tab's cards and tabs: each card's head and badge, switching tabs, the status bar's chips and the cards' on / off states |
 | `soundboard/ui/voice/voiceaddons.py` | the Voice tab's add-ons list and finding add-ons again (in the background, going on or offline) |
-| `soundboard/ui/voice/cleanmicpanel.py` | the Voice tab's Clean mic card (its first tab): on / off, Light, Normal or Strong (offering Strong's download when it's picked), your mic and the cleaned mic's meters, and Hear the difference (5 s recorded, played as it was and cleaned, in your headphones) |
+| `soundboard/ui/voice/cleanmicpanel.py` | the Voice tab's Clean mic card (its first tab): on / off, the Mic settings button (offering Strong's download when it's picked), your mic and the cleaned mic's meters, and Hear the difference (5 s recorded, played as it was and cleaned, in your headphones) |
+| `soundboard/ui/voice/cleanmicsettings.py` | Clean mic's Mic settings, laid out like a voice chat app's: presets, Input volume, Input sensitivity (automatic or a level on a live bar), Noise suppression (Off, Light, Normal, Strong) and Automatic gain control |
 | `soundboard/ui/voice/voicefxpanel.py` | the Voice tab's voice changer card (`VoiceFxPanel`): picking, saving and sharing voices, Edit voice's effect cards |
 | `soundboard/ui/voice/voicefxtiles.py` | part of `VoiceFxPanel`: the voice tiles: rolling a random voice, hearing one, the tiles and where they go (grid or list, groups, favourites, search) |
 | `soundboard/ui/voice/voicefxsaved.py` | part of `VoiceFxPanel`: your saved voices: naming, saving, renaming, deleting (with undo), a tile's menu, and voice codes |

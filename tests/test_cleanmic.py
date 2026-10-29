@@ -15,13 +15,17 @@ class FakeCleaner:
     """Halves the mic: easy to see it ran, and when."""
     made: list = []
 
-    def __init__(self, rate, strength="normal"):
+    def __init__(self, rate, strength="normal", opts=None):
         self.rate, self.strength, self.level = rate, strength, 0.0
+        self.opts = opts or {}
         self.closed = False
         FakeCleaner.made.append(self)
 
     def set_strength(self, s):
         self.strength = s
+
+    def set_options(self, opts):
+        self.opts = opts
 
     def latency(self):
         return 0.03
@@ -47,11 +51,33 @@ def block(n=480, v=0.2):
 
 # ---------------------------------------------------------------- settings
 def test_saved_settings_are_cleaned():
-    assert cleanmic.clean_settings(None) == {"on": False, "strength": "normal"}
-    assert cleanmic.clean_settings({"on": 1, "strength": "max"}) == {"on": False,
-                                                                     "strength": "normal"}
-    assert cleanmic.clean_settings({"on": True, "strength": "light"}) == {"on": True,
-                                                                          "strength": "light"}
+    default = {"on": False, "strength": "normal", "volume": 100, "auto_sense": True,
+               "sense_db": -50, "agc": False}
+    assert cleanmic.clean_settings(None) == default
+    assert cleanmic.clean_settings({"on": 1, "strength": "max"}) == default
+    # (a config from before the cog: on and strength only)
+    assert cleanmic.clean_settings({"on": True, "strength": "light"}) == {
+        **default, "on": True, "strength": "light"}
+    assert cleanmic.clean_settings({"strength": "off", "volume": 999, "auto_sense": False,
+                                    "sense_db": -300.0, "agc": True}) == {
+        **default, "strength": "off", "volume": 200, "auto_sense": False, "sense_db": -100,
+        "agc": True}
+    assert cleanmic.clean_settings({"volume": "loud", "sense_db": float("nan"),
+                                    "auto_sense": 0, "agc": 1}) == default
+
+
+def test_presets_and_custom():
+    s = cleanmic.clean_settings(None)
+    assert cleanmic.preset_of(s) == "normal"
+    assert cleanmic.preset_of({**s, "strength": "light"}) == "quiet"   # old Light configs
+    assert cleanmic.preset_of({**s, "strength": "strong"}) == "custom"
+    for key, p in cleanmic.PRESETS.items():
+        assert cleanmic.preset_of({**s, **p}) == key
+    loud = {**s, **cleanmic.PRESETS["loud"]}
+    assert cleanmic.preset_of({**loud, "sense_db": -49}) == "custom"
+    assert cleanmic.preset_of({**s, "sense_db": -12}) == "normal"   # (automatic: not used)
+    assert cleanmic.options(loud) == {"volume": 100, "sense": -50, "agc": False}
+    assert cleanmic.options(s)["sense"] is None
 
 
 # ---------------------------------------------------------------- the chain
@@ -71,6 +97,17 @@ def test_chain_cleans_the_mic_with_no_voice_on(fake):
     assert len(fake.made) == 2 and fake.made[0].closed and fake.made[1].rate == 44100
     ch.set_clean(False)
     assert ch.process(x, 44100) is x and fake.made[1].closed and ch.clean_level() == 0.0
+
+
+def test_chain_hands_the_cleaner_its_settings(fake):
+    ch = voicefx.VoiceChain()
+    ch.set_clean(True, "off", {"volume": 150, "sense": -40, "agc": True})
+    ch.process(block(), 48000)
+    assert fake.made[-1].strength == "off" and fake.made[-1].opts["sense"] == -40
+    ch.set_clean(True, "off", {"volume": 80, "sense": None, "agc": False})
+    ch.process(block(), 48000)
+    assert len(fake.made) == 1 and fake.made[0].opts == {"volume": 80, "sense": None,
+                                                         "agc": False}
 
 
 def test_chain_cleans_before_the_voice_changer(fake):
@@ -96,7 +133,7 @@ def test_a_failing_cleaner_never_stops_the_mic(monkeypatch):
 
 
 def test_a_cleaner_that_wont_start_says_why(monkeypatch):
-    def no(rate, strength="normal"):
+    def no(rate, strength="normal", opts=None):
         raise RuntimeError("RNNoise isn't available")
     monkeypatch.setattr(cleanmic, "Cleaner", no)
     ch = voicefx.VoiceChain()
@@ -192,6 +229,38 @@ def test_the_gate_turns_the_room_down_between_words_and_not_the_words():
     assert _db(y[240:1200]) > _db(x[240:1200]) - 3                 # a word's start isn't cut
 
 
+def test_a_set_sensitivity_opens_the_gate_there():
+    x, talk = _talk_then_room(quiet=0.02)          # a loud room: -34 dB
+    t = cleanmic.Tidy(sense=-20.0)                 # stricter than the room, under the voice
+    y = np.concatenate([t.run(x[i:i + 480]) for i in range(0, len(x), 480)])
+    assert _db(y[72000:]) < _db(x[72000:]) - 15 and t.open_db == -20.0
+    assert abs(_db(y[4800:43200]) - _db(x[4800:43200])) < 1
+    t = cleanmic.Tidy(sense=-5.0)                  # over the voice: it stays down
+    y = np.concatenate([t.run(x[i:i + 480]) for i in range(0, len(x), 480)])
+    assert _db(y[4800:43200]) < _db(x[4800:43200]) - 15
+
+
+def test_agc_brings_a_quiet_voice_up_and_holds_between_words():
+    rng = np.random.default_rng(7)
+    t = np.arange(48000 * 3) / 48000
+    words = (np.sin(2 * np.pi * 3 * t) > 0) & (t < 2.0)     # two seconds of words, then none
+    talk = (0.02 * np.sin(2 * np.pi * 200 * t) * words      # quiet: about -37 dB
+            + rng.standard_normal(len(t)) * 0.0005).astype(np.float32)   # and the room
+    tidy, agc, out = cleanmic.Tidy(), cleanmic.Agc(), []
+    for i in range(0, len(talk), 480):
+        c = tidy.run(talk[i:i + 480])
+        out.append(agc.run(c, tidy.talking, tidy.peak_db))
+    y = np.concatenate(out)
+    assert np.all(np.isfinite(y)) and np.max(np.abs(y)) <= cleanmic.Agc.PEAK + 1e-6
+    late = words & (t > 1.5)
+    assert _db(y[late]) > _db(talk[late]) + 8   # the voice: up (a second of words in)
+    assert agc.gain_db <= cleanmic.Agc.MAX_UP
+    # between words the gain holds (and the gate has the room down): never pulled up
+    assert _db(y[-24000:]) < _db(talk[-24000:]) + cleanmic.Agc.MAX_UP + 1
+    loud = np.full(4800, 0.99, np.float32)                          # never over the top
+    assert np.max(np.abs(agc.run(loud, True, -0.1)[-480:])) <= cleanmic.Agc.PEAK + 1e-6
+
+
 def test_light_keeps_the_room_and_each_strength_sets_the_gate():
     x, _talk = _talk_then_room()
     assert _db(_tidied(x, gate=False)[72000:]) > _db(x[72000:]) - 2
@@ -205,8 +274,26 @@ def test_the_cleaner_gates_on_normal_not_light():
         assert not c._tidy.gate
         c.set_strength("normal")
         assert c._tidy.gate
+        c.set_strength("light")
+        c.set_options({"sense": -40})               # a sensitivity set: Light gates too
+        assert c._tidy.gate and c._tidy.sense == -40
     finally:
         c.close()
+
+
+@real
+def test_off_runs_no_network_but_the_volume_and_the_rest():
+    x = _noisy()
+    c = cleanmic.Cleaner(48000, "off", {"volume": 200})
+    try:
+        y = np.concatenate([c.process(x[i:i + 480]) for i in range(0, len(x), 480)])
+        assert c.latency() < cleanmic.DELAY / cleanmic.RATE
+        talk = slice(48000, 96000)
+        lag = c._prime
+        assert abs(_db(y[talk.start + lag:talk.stop]) - _db(x[talk.start:talk.stop - lag]) - 6) < 1
+    finally:
+        c.close()
+    assert len(cleanmic.clean_clip(x, 48000, "off", {"agc": True})) == len(x)
 
 
 # ---------------------------------------------------------------- the card
@@ -230,11 +317,60 @@ def test_clean_mic_is_the_first_tab_and_switches_the_chain(panel):
     c = p.clean
     assert not c.is_on() and not p.chain.clean_on
     c.b_on.click()
-    assert p.chain.clean_on and saved[-1]["clean"] == {"on": True, "strength": "normal"}
+    assert p.chain.clean_on and saved[-1]["clean"] == {
+        "on": True, "strength": "normal", "volume": 100, "auto_sense": True, "sense_db": -50,
+        "agc": False}
     assert c.b_on.text() == "On" and p._tabs["clean"].property("live")
     c.b_strength["light"].click()
     assert p.chain._clean_want == "light" and saved[-1]["clean"]["strength"] == "light"
     assert "Light" in c.lbl_strength.text()
+
+
+def test_the_cog_opens_mic_settings_and_presets_set_them(panel, monkeypatch):
+    p, saved = panel
+    c = p.clean
+    from soundboard.voicefx import deepfilter
+    monkeypatch.setattr(deepfilter, "downloaded", lambda: True)
+    assert c.settings.isHidden()
+    c.b_cog.click()
+    assert not c.settings.isHidden() and c.settings.b_preset["normal"].isChecked()
+    c.b_on.click()
+    c.settings.b_preset["voice"].click()
+    s = saved[-1]["clean"]
+    assert (s["strength"], s["auto_sense"], s["sense_db"], s["agc"]) == ("strong", False,
+                                                                         -40, True)
+    assert p.chain._clean_want == "strong"
+    assert p.chain._clean_opts == {"volume": 100, "sense": -40, "agc": True}
+    assert c.settings.b_preset["voice"].isChecked() and c.settings.sense.isEnabled()
+    c.settings.agc.click()                          # a control touched: Custom
+    assert not any(b.isChecked() for b in c.settings.b_preset.values())
+    assert c.settings.lbl_preset.text().startswith("Custom")
+    assert p.chain._clean_opts["agc"] is False and saved[-1]["clean"]["agc"] is False
+    c.settings.sense.setValue(-30)
+    assert saved[-1]["clean"]["sense_db"] == -30 and p.chain._clean_opts["sense"] == -30
+    c.settings.auto.click()                         # automatic: no handle to drag
+    assert not c.settings.sense.isEnabled() and p.chain._clean_opts["sense"] is None
+    c.settings.volume.slider.setValue(150)
+    assert saved[-1]["clean"]["volume"] == 150 and p.chain._clean_opts["volume"] == 150
+    c.b_strength["off"].click()
+    assert p.chain._clean_want == "off" and "Off" in c.lbl_strength.text()
+    c.settings.b_preset["quiet"].click()
+    assert saved[-1]["clean"] == {"on": True, "strength": "light", "volume": 100,
+                                  "auto_sense": True, "sense_db": -30, "agc": False}
+    c._tick()                                       # the sensitivity bar is fed
+    c.b_cog.click()
+    assert c.settings.isHidden()
+
+
+def test_a_strong_preset_offers_the_download_first(panel, monkeypatch):
+    p, saved = panel
+    c = p.clean
+    from soundboard.voicefx import deepfilter
+    monkeypatch.setattr(deepfilter, "downloaded", lambda: False)
+    c.b_cog.click()
+    c.settings.b_preset["loud"].click()
+    assert c.s["strength"] == "normal" and not c.get_box.isHidden()
+    assert c.s["auto_sense"] is False and c.s["sense_db"] == -50
 
 
 def test_its_chip_shows_and_turns_it_off_and_voices_leave_it_alone(panel):
@@ -254,10 +390,10 @@ def test_it_comes_back_on_from_last_time(qapp, monkeypatch, fake):
     monkeypatch.setattr(cleanmic, "available", lambda: True)
     from soundboard.ui.voice.voicepanel import VoicePanel
     p = VoicePanel(FakeEngine(), {"enabled": False, "effects": {}},
-                   {"clean": {"on": True, "strength": "light"}})
+                   {"clean": {"on": True, "strength": "light", "agc": True}})
     try:
         assert p.clean.is_on() and p.chain._clean_want == "light"
-        assert p.clean.b_strength["light"].isChecked()
+        assert p.clean.b_strength["light"].isChecked() and p.chain._clean_opts["agc"]
     finally:
         p.shutdown()
         p.deleteLater()
@@ -272,6 +408,7 @@ def test_without_rnnoise_it_says_so_and_cant_be_switched_on(qapp, monkeypatch, f
     try:
         assert not p.clean.is_on() and not p.chain.clean_on
         assert not p.clean.b_on.isEnabled() and not p.clean.lbl_missing.isHidden()
+        assert not p.clean.b_cog.isVisibleTo(p.clean)
         assert p.clean.body.isHidden()            # no greyed-out controls under it
     finally:
         p.shutdown()
@@ -300,7 +437,7 @@ def test_hear_the_difference_records_then_plays_before_and_after(panel, monkeypa
             played.append((preview, float(np.max(data)), src_rate))
             return object()
     c.engine = Eng()
-    monkeypatch.setattr(cleanmic, "clean_clip", lambda m, rate, s: m * np.float32(0.5))
+    monkeypatch.setattr(cleanmic, "clean_clip", lambda m, rate, s, o: m * np.float32(0.5))
     c.b_rec.click()
     assert c._take is not None and "Stop" in c.b_rec.text()
     c._stop_record()
