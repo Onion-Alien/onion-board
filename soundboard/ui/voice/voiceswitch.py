@@ -101,8 +101,10 @@ class VoiceSwitch(_Panel):
 
     def back_keys(self) -> list[str]:
         """What Voices ON would turn on: what it turned off, else the voice changer
-        with the voice picked on it (none after Reset: the voice changer is empty)."""
-        return list(self._back) or ([] if self.fx.is_blank() else ["fx"])
+        with the voice picked on it (none after Reset: the voice changer is empty, or
+        after its chip's ✕)."""
+        return list(self._back) or ([] if self.fx.is_blank() or self._fx_forgot
+                                    else ["fx"])
 
     def set_voices(self, on: bool):
         """The Voices switch. Off: every voice goes off, remembered with the grey ones
@@ -182,6 +184,8 @@ class VoiceSwitch(_Panel):
         """A chip's ✕: that one goes off, and Voices ON won't bring it back."""
         if key == "clean":
             self.clean.set_on(False)
+        # (else its chip came straight back as the voice ON turns on: a dead ✕)
+        self._fx_forgot = self._fx_forgot or key == "fx"
         self._back = [k for k in self._back if k != key]
         if key in self.on_keys():
             self.stop_one(key)

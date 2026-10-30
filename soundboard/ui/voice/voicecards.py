@@ -183,6 +183,8 @@ class VoiceCards(_Panel):
         # (not while the switch or a chip turns them on and off one by one)
         if not self._switching:
             self._back = [k for k in self._back if k not in on]
+        if "fx" in on:   # on again (a voice picked): ON may turn it on again
+            self._fx_forgot = False
         click_off = _("Click to turn it off. Right-click to open it.")
         # Clean mic first, as the sound goes through it: it isn't a voice, so the Voices
         # switch leaves it alone and its chip has no grey "comes back" state
@@ -232,8 +234,7 @@ class VoiceCards(_Panel):
             if k == "fx":
                 shown, pic = self._fx_shown()
                 items.append(("fx", shown, "off", "voice" if pic is None else "", pic,
-                              _("Voice changer: {voice}.", voice=shown) + " " + click_on,
-                              bool(self._back)))   # the voice it'd turn on anyway: no ✕
+                              _("Voice changer: {voice}.", voice=shown) + " " + click_on))
             elif k == "ai":
                 title = self.ai.voice_title()
                 items.append(("ai", title, "off", "wave", None,
