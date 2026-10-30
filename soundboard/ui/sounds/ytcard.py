@@ -298,7 +298,8 @@ class ResultRow(HoverCard):
     def resizeEvent(self, e):
         super().resizeEvent(e)
         if self.playlist:   # "Alle hinzufügen" beside "Öffnen" is cut off on a narrow card
-            m = self.layout().contentsMargins() if self.layout() is not None else None
+            lay = self.layout()
+            m = lay.contentsMargins() if lay is not None else None
             room = self.width() - (m.left() + m.right() if m is not None else 0)
             need = (self.btn_play.sizeHint().width() + self.btn_add.sizeHint().width()
                     + self.buttons.spacing())
