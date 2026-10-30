@@ -4673,5 +4673,14 @@
   "Back to no pitch change, no effects and 100 % volume": "Zurück zu keiner Tonhöhenänderung, keinen Effekten und 100 % Lautstärke",
   "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Wie laut sie sind, bis zu 4-mal so laut. Über 100 % werden die lautesten Stellen abgerundet, damit es nicht knackt",
   "{st} st from the speed": "{st} HT durch das Tempo",
-  "{st} st from the speed, {total} st in all": "{st} HT durch das Tempo, {total} HT insgesamt"
+  "{st} st from the speed, {total} st in all": "{st} HT durch das Tempo, {total} HT insgesamt",
+  "Add a sound that's on your board already and it jumps to it, ringed in yellow.": "Füge einen Sound hinzu, der schon auf deinem Board ist, und es springt zu ihm, mit einem gelben Ring darum.",
+  "Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.": "Völkerball, Homerun und Hau den Bun. Er wird schneller, je mehr Punkte du machst.",
+  "Finds a sound you already have": "Findet einen Sound, den du schon hast",
+  "It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass boosted, Chipmunk and more.": "Er geht bis 400 %. Dazu neue Vorlagen: Nightcore, Langsam + Hall, Bass-Boost, Chipmunk und mehr.",
+  "Mic settings for Clean mic": "Mikro-Einstellungen für Mikro säubern",
+  "Mic settings, new presets and new games with Bun": "Mikro-Einstellungen, neue Vorlagen und neue Spiele mit Bun",
+  "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Das Zahnrad neben Mikro säubern im Tab Stimme: Eingangslautstärke, Rauschunterdrückung und Vorlagen wie Lauter Raum. Es filtert auch Stöße gegen den Tisch und tiefes Brummen heraus.",
+  "Three new games with Bun": "Drei neue Spiele mit Bun",
+  "A Volume slider in Live controls": "Ein Lautstärke-Regler in den Live-Reglern"
 }

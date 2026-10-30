@@ -4673,5 +4673,14 @@
   "Back to no pitch change, no effects and 100 % volume": "Perde değişikliği ve efekt olmayan hale, ses düzeyi %100'e dön",
   "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Ne kadar yüksek çaldıkları, 4 katına kadar. %100'ün üstünde en yüksek yerler yuvarlanır, böylece cızırtı olmaz",
   "{st} st from the speed": "Hızdan {st} yarım ton",
-  "{st} st from the speed, {total} st in all": "Hızdan {st} yarım ton, toplam {total} yarım ton"
+  "{st} st from the speed, {total} st in all": "Hızdan {st} yarım ton, toplam {total} yarım ton",
+  "Add a sound that's on your board already and it jumps to it, ringed in yellow.": "Panonda zaten olan bir sesi ekle, oraya atlar ve etrafına sarı bir halka koyar.",
+  "Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.": "Yakan top, Home run ve Bun'a Vur. Sen sayı yaptıkça hızlanır.",
+  "Finds a sound you already have": "Zaten sahip olduğun bir sesi bulur",
+  "It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass boosted, Chipmunk and more.": "%400'e kadar çıkar. Yeni hazır ayarlar da var: Nightcore, Yavaş + reverb, Bas güçlendirilmiş, Sincap ve dahası.",
+  "Mic settings for Clean mic": "Temiz mikrofon için mikrofon ayarları",
+  "Mic settings, new presets and new games with Bun": "Mikrofon ayarları, yeni hazır ayarlar ve Bun ile yeni oyunlar",
+  "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Ses sekmesinde Temiz mikrofon'un yanındaki dişli: giriş ses düzeyi, gürültü bastırma ve Gürültülü oda gibi hazır ayarlar. Masaya vurmaları ve alçak uğultuyu da keser.",
+  "Three new games with Bun": "Bun ile üç yeni oyun",
+  "A Volume slider in Live controls": "Canlı kontrollerde ses düzeyi kaydırıcısı"
 }

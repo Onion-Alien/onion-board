@@ -4673,5 +4673,14 @@
   "Back to no pitch change, no effects and 100 % volume": "Tillbaka till ingen tonhöjdsändring, inga effekter och 100 % volym",
   "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Hur högt de låter, upp till 4 gånger så högt. Över 100 % rundas de högsta topparna av så att det inte sprakar",
   "{st} st from the speed": "{st} st från hastigheten",
-  "{st} st from the speed, {total} st in all": "{st} st från hastigheten, {total} st totalt"
+  "{st} st from the speed, {total} st in all": "{st} st från hastigheten, {total} st totalt",
+  "Add a sound that's on your board already and it jumps to it, ringed in yellow.": "Lägg till ett ljud som redan finns på ditt bord så hoppar det dit, med en gul ring runt.",
+  "Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.": "Spökboll, Homerun och Slå Bun. Han blir snabbare ju mer du gör poäng.",
+  "Finds a sound you already have": "Hittar ett ljud du redan har",
+  "It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass boosted, Chipmunk and more.": "Det går upp till 400 %. Och nya förval: Nightcore, Långsam + reverb, Basboost, Jordekorre och mer.",
+  "Mic settings for Clean mic": "Mikrofoninställningar för Ren mikrofon",
+  "Mic settings, new presets and new games with Bun": "Mikrofoninställningar, nya förval och nya spel med Bun",
+  "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Kugghjulet vid Ren mikrofon på fliken Röst: ingångsvolym, brusreducering och förval som Bullrigt rum. Den tar också bort dunk i bordet och lågt brum.",
+  "Three new games with Bun": "Tre nya spel med Bun",
+  "A Volume slider in Live controls": "Ett volymreglage i Livekontroller"
 }

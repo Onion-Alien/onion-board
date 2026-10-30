@@ -4591,5 +4591,14 @@
   "Back to no pitch change, no effects and 100 % volume": "กลับเป็นไม่เปลี่ยนพิตช์ ไม่มีเอฟเฟกต์ และระดับเสียง 100 %",
   "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "ดังแค่ไหน ได้สูงสุด 4 เท่า เกิน 100 % ส่วนที่ดังที่สุดจะถูกปัดให้มนเพื่อไม่ให้เสียงแตก",
   "{st} st from the speed": "{st} st จากความเร็ว",
-  "{st} st from the speed, {total} st in all": "{st} st จากความเร็ว รวม {total} st"
+  "{st} st from the speed, {total} st in all": "{st} st จากความเร็ว รวม {total} st",
+  "Add a sound that's on your board already and it jumps to it, ringed in yellow.": "เพิ่มเสียงที่อยู่บนบอร์ดแล้ว บอร์ดจะกระโดดไปที่เสียงนั้นพร้อมวงแหวนสีเหลืองรอบๆ",
+  "Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.": "ดอดจ์บอล โฮมรัน และทุบ Bun ยิ่งคุณทำแต้ม เขายิ่งเร็วขึ้น",
+  "Finds a sound you already have": "หาเสียงที่คุณมีอยู่แล้ว",
+  "It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass boosted, Chipmunk and more.": "ปรับได้ถึง 400 % พร้อมพรีเซ็ตใหม่: Nightcore, ช้า + รีเวิร์บ, เบสหนัก, ชิปมังก์ และอื่นๆ",
+  "Mic settings for Clean mic": "ตั้งค่าไมค์สำหรับไมค์ไร้เสียงรบกวน",
+  "Mic settings, new presets and new games with Bun": "ตั้งค่าไมค์ พรีเซ็ตใหม่ และเกมใหม่กับ Bun",
+  "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "ฟันเฟืองข้างไมค์ไร้เสียงรบกวนในแท็บเสียงพูด: ระดับเสียงอินพุต การลดเสียงรบกวน และพรีเซ็ตอย่างห้องเสียงดัง ยังตัดเสียงเคาะโต๊ะและเสียงหึ่งต่ำด้วย",
+  "Three new games with Bun": "เกมใหม่สามเกมกับ Bun",
+  "A Volume slider in Live controls": "แถบเลื่อนระดับเสียงในควบคุมสด"
 }

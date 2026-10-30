@@ -4673,5 +4673,14 @@
   "Back to no pitch change, no effects and 100 % volume": "Πίσω σε χωρίς αλλαγή τόνου, χωρίς εφέ και ένταση 100 %",
   "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Πόσο δυνατά παίζουν, έως 4 φορές πιο δυνατά. Πάνω από 100 % οι πιο δυνατές κορυφές στρογγυλεύονται για να μην τρίζει",
   "{st} st from the speed": "{st} st από την ταχύτητα",
-  "{st} st from the speed, {total} st in all": "{st} st από την ταχύτητα, {total} st συνολικά"
+  "{st} st from the speed, {total} st in all": "{st} st από την ταχύτητα, {total} st συνολικά",
+  "Add a sound that's on your board already and it jumps to it, ringed in yellow.": "Πρόσθεσε έναν ήχο που υπάρχει ήδη στον πίνακά σου και πηγαίνει σε αυτόν, με έναν κίτρινο κύκλο γύρω του.",
+  "Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.": "Μήλα, Home run και Χτύπα τον Bun. Γίνεται πιο γρήγορος όσο σκοράρεις.",
+  "Finds a sound you already have": "Βρίσκει έναν ήχο που ήδη έχεις",
+  "It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass boosted, Chipmunk and more.": "Φτάνει έως 400 %. Και νέες έτοιμες ρυθμίσεις: Nightcore, Αργό + reverb, Ενισχυμένα μπάσα, Σκιουράκι και άλλα.",
+  "Mic settings for Clean mic": "Ρυθμίσεις μικροφώνου για το Καθαρό μικρόφωνο",
+  "Mic settings, new presets and new games with Bun": "Ρυθμίσεις μικροφώνου, νέες έτοιμες ρυθμίσεις και νέα παιχνίδια με τον Bun",
+  "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Το γρανάζι δίπλα στο Καθαρό μικρόφωνο στην καρτέλα Φωνή: ένταση εισόδου, καταστολή θορύβου και έτοιμες ρυθμίσεις όπως Θορυβώδες δωμάτιο. Κόβει επίσης χτυπήματα στο γραφείο και χαμηλό βόμβο.",
+  "Three new games with Bun": "Τρία νέα παιχνίδια με τον Bun",
+  "A Volume slider in Live controls": "Ρυθμιστής έντασης στα Ζωντανά χειριστήρια"
 }

@@ -4591,5 +4591,14 @@
   "Back to no pitch change, no effects and 100 % volume": "回到不變音高、不加效果、音量 100 %",
   "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "聲音多大，最高 4 倍。超過 100 % 時會把最響的部分修圓，不會爆音",
   "{st} st from the speed": "速度帶來 {st} 半音",
-  "{st} st from the speed, {total} st in all": "速度帶來 {st} 半音，共 {total} 半音"
+  "{st} st from the speed, {total} st in all": "速度帶來 {st} 半音，共 {total} 半音",
+  "Add a sound that's on your board already and it jumps to it, ringed in yellow.": "新增一個面板上已有的音效，就會跳到它那裡，並用黃色圓圈標出。",
+  "Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.": "躲避球、全壘打和打地鼠 Bun。你得分越多，他越快。",
+  "Finds a sound you already have": "找到你已有的音效",
+  "It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass boosted, Chipmunk and more.": "最高可到 400 %。還有新預設：Nightcore、慢速 + 殘響、低音增強、花栗鼠等。",
+  "Mic settings for Clean mic": "麥克風降噪的麥克風設定",
+  "Mic settings, new presets and new games with Bun": "麥克風設定、新預設和 Bun 的新遊戲",
+  "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "語音分頁裡麥克風降噪旁邊的齒輪：輸入音量、雜訊抑制，以及吵雜房間等預設。還能去掉敲桌子的聲音和低沉的嗡嗡聲。",
+  "Three new games with Bun": "和 Bun 的三個新遊戲",
+  "A Volume slider in Live controls": "即時控制裡的音量滑桿"
 }

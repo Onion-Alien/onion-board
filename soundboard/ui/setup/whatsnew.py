@@ -36,6 +36,19 @@ def recent() -> tuple[Note, ...]:
     release (tests/test_whats_new.py checks this version has one): what a player
     notices, in their words, never the fixes only a log would show."""
     return (
+        Note("2.7.3", _("Mic settings, new presets and new games with Bun"), (
+            ("mic", _("Mic settings for Clean mic"),
+             _("The cog next to Clean mic on the Voice tab: input volume, noise suppression "
+               "and presets like Loud room. It cuts out desk bumps and low hum too.")),
+            ("play", _("A Volume slider in Live controls"),
+             _("It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass "
+               "boosted, Chipmunk and more.")),
+            ("sounds", _("Finds a sound you already have"),
+             _("Add a sound that's on your board already and it jumps to it, ringed in "
+               "yellow.")),
+            ("bun", _("Three new games with Bun"),
+             _("Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.")),
+        )),
         Note("2.7.0", _("Twitch, Stream Deck and achievements"), (
             ("play", _("Connect Twitch"),
              _("Channel points, cheers, raids and chat commands play your sounds. No bot "

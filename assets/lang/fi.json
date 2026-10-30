@@ -4673,5 +4673,14 @@
   "Back to no pitch change, no effects and 100 % volume": "Takaisin: ei sävelkorkeuden muutosta, ei efektejä ja äänenvoimakkuus 100 %",
   "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Kuinka kovaa ne soivat, jopa 4 kertaa kovempaa. Yli 100 %:ssa kovimmat huiput pyöristetään, jottei ääni rätise",
   "{st} st from the speed": "{st} st nopeudesta",
-  "{st} st from the speed, {total} st in all": "{st} st nopeudesta, yhteensä {total} st"
+  "{st} st from the speed, {total} st in all": "{st} st nopeudesta, yhteensä {total} st",
+  "Add a sound that's on your board already and it jumps to it, ringed in yellow.": "Lisää ääni, joka on jo taulullasi, niin se hyppää sen kohdalle ja näyttää sen ympärillä keltaisen renkaan.",
+  "Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.": "Polttopallo, Kunnari ja Läimi Buniä. Hän nopeutuu sitä mukaa kuin teet pisteitä.",
+  "Finds a sound you already have": "Löytää äänen, joka sinulla jo on",
+  "It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass boosted, Chipmunk and more.": "Se menee 400 %:iin asti. Myös uusia valmiita asetuksia: Nightcore, Hidas + kaiku, Bassot tappiin, Maaorava ja muuta.",
+  "Mic settings for Clean mic": "Mikin asetukset Puhtaalle mikille",
+  "Mic settings, new presets and new games with Bun": "Mikin asetukset, uusia valmiita asetuksia ja uusia pelejä Bunin kanssa",
+  "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Ratas Puhdas mikki -kohdan vieressä Puhe-välilehdellä: sisääntulon äänenvoimakkuus, kohinanvaimennus ja valmiit asetukset kuten Meluisa huone. Se poistaa myös pöydän kolahdukset ja matalan huminan.",
+  "Three new games with Bun": "Kolme uutta peliä Bunin kanssa",
+  "A Volume slider in Live controls": "Äänenvoimakkuuden liukusäädin Live-säätimissä"
 }

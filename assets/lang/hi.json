@@ -4673,5 +4673,14 @@
   "Back to no pitch change, no effects and 100 % volume": "बिना पिच बदलाव, बिना इफ़ेक्ट और 100 % वॉल्यूम पर वापस",
   "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "कितनी तेज़ आवाज़, 4 गुना तक। 100 % से ऊपर सबसे तेज़ हिस्से गोल कर दिए जाते हैं ताकि आवाज़ न फटे",
   "{st} st from the speed": "स्पीड से {st} st",
-  "{st} st from the speed, {total} st in all": "स्पीड से {st} st, कुल {total} st"
+  "{st} st from the speed, {total} st in all": "स्पीड से {st} st, कुल {total} st",
+  "Add a sound that's on your board already and it jumps to it, ringed in yellow.": "जो आवाज़ आपके बोर्ड पर पहले से है उसे जोड़ें, तो यह उस पर पहुँच जाता है और उसके चारों ओर पीला घेरा दिखाता है।",
+  "Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.": "डॉजबॉल, होम रन और Bun को मारो। जितने पॉइंट आप बनाते हैं, वह उतना तेज़ होता जाता है।",
+  "Finds a sound you already have": "पहले से मौजूद आवाज़ ढूँढता है",
+  "It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass boosted, Chipmunk and more.": "यह 400 % तक जाता है। नए प्रीसेट भी: Nightcore, स्लो + रिवर्ब, बास बूस्टेड, चिपमंक और भी बहुत कुछ।",
+  "Mic settings for Clean mic": "साफ़ माइक के लिए माइक सेटिंग्स",
+  "Mic settings, new presets and new games with Bun": "माइक सेटिंग्स, नए प्रीसेट और Bun के साथ नए गेम",
+  "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "वॉइस टैब पर साफ़ माइक के बगल वाला गियर: इनपुट वॉल्यूम, नॉइज़ सप्रेशन और शोर वाला कमरा जैसे प्रीसेट। यह डेस्क की खटखट और धीमी भिनभिनाहट भी हटाता है।",
+  "Three new games with Bun": "Bun के साथ तीन नए गेम",
+  "A Volume slider in Live controls": "लाइव कंट्रोल में वॉल्यूम स्लाइडर"
 }

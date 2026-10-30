@@ -42,13 +42,13 @@ def test_an_upgraded_config_sees_it_once_and_its_button_opens_the_newest_page(wi
     opened = []
     monkeypatch.setattr(window.setctl, "open_settings", lambda page="privacy": opened.append(page))
     window.cfg.whats_new_seen = ""   # as loaded from an older version's config
-    shown.press = "hotkeys"
-    window.updctl.after_update()
     newest = whatsnew.notes()[0]
+    shown.press = newest.page   # a note without a Settings page has only Close
+    window.updctl.after_update()
     assert len(shown) == 1 and newest.headline in shown[0]
     assert all(title in shown[0] for __, title, __ in newest.items)
     assert not any("Privacy & security" in t for t in shown[0])   # years back: left out
-    assert opened == [newest.page]   # the newest note with a Settings page
+    assert opened == ([newest.page] if newest.page else [])
     assert window.cfg.whats_new_seen == __version__
     window.updctl.after_update()   # the next start: nothing new
     assert len(shown) == 1
@@ -83,9 +83,11 @@ def test_notes_for_a_version_after_this_one_wait(monkeypatch):
 
 def test_this_version_has_its_notes():
     """The header's version and the window after an update show this release, not one
-    from months ago: every x.y release gets a note (patch releases may share it)."""
+    from months ago: every release, patch releases too, gets its own note. A 2.7.3 that
+    reused 2.7.0's note showed Twitch and Stream Deck under "What's new in 2.7.3"."""
     newest = whatsnew.notes()[0]
-    assert newest.version.split(".")[:2] == __version__.split(".")[:2]
+    assert newest.version == __version__, (
+        f"no What's new note for {__version__}: add one to ui/setup/whatsnew.py recent()")
     assert [n.version for n in whatsnew.notes()] == sorted(
         (n.version for n in whatsnew.notes()),
         key=lambda v: tuple(int(x) for x in v.split(".")), reverse=True)

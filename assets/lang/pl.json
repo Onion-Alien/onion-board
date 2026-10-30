@@ -4755,5 +4755,14 @@
   "Back to no pitch change, no effects and 100 % volume": "Z powrotem bez zmiany wysokości, bez efektów i głośność 100 %",
   "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Jak głośno grają, do 4 razy głośniej. Powyżej 100 % najgłośniejsze miejsca są zaokrąglane, żeby nie trzeszczało",
   "{st} st from the speed": "{st} półt. z prędkości",
-  "{st} st from the speed, {total} st in all": "{st} półt. z prędkości, razem {total} półt."
+  "{st} st from the speed, {total} st in all": "{st} półt. z prędkości, razem {total} półt.",
+  "Add a sound that's on your board already and it jumps to it, ringed in yellow.": "Dodaj dźwięk, który już jest na twojej tablicy, a przeskoczy do niego i otoczy go żółtym pierścieniem.",
+  "Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.": "Zbijak, Home run i Walnij Buna. Przyspiesza, im więcej punktów zdobywasz.",
+  "Finds a sound you already have": "Znajduje dźwięk, który już masz",
+  "It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass boosted, Chipmunk and more.": "Sięga do 400 %. Do tego nowe ustawienia: Nightcore, Zwolnione + pogłos, Podbity bas, Wiewiórka i więcej.",
+  "Mic settings for Clean mic": "Ustawienia mikrofonu dla Czystego mikrofonu",
+  "Mic settings, new presets and new games with Bun": "Ustawienia mikrofonu, nowe ustawienia i nowe gry z Bunem",
+  "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Zębatka obok Czystego mikrofonu na karcie Głos: głośność wejścia, tłumienie szumów i ustawienia jak Głośny pokój. Usuwa też stuknięcia w biurko i niski szum.",
+  "Three new games with Bun": "Trzy nowe gry z Bunem",
+  "A Volume slider in Live controls": "Suwak głośności w Sterowaniu na żywo"
 }
