@@ -4764,5 +4764,28 @@
   "Mic settings, new presets and new games with Bun": "Налаштування мікрофона, нові пресети й нові ігри з Bun",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Шестірня поруч із «Чистим мікрофоном» на вкладці «Голос»: гучність входу, шумозаглушення й пресети на кшталт «Галасливої кімнати». Ще прибирає стукіт по столу й низький гул.",
   "Three new games with Bun": "Три нові ігри з Bun",
-  "A Volume slider in Live controls": "Повзунок гучності в «Живому керуванні»"
+  "A Volume slider in Live controls": "Повзунок гучності в «Живому керуванні»",
+  "Delete this preset": "Видалити цей пресет",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Зберегти теперішні швидкість, висоту, ефекти й гучність як свій пресет",
+  "Keep these effects as a preset of your own, in this list for every sound": "Зберегти ці ефекти як свій пресет, у цьому списку для кожного звуку",
+  "More ({n})": "Ще ({n})",
+  "My preset": "Мій пресет",
+  "My presets": "Мої пресети",
+  "None saved yet": "Поки нічого не збережено",
+  "Rename preset": "Перейменувати пресет",
+  "Save as preset": "Зберегти як пресет",
+  "Save preset": "Зберегти пресет",
+  "You already have a preset called “{name}”. Replace it?": "Пресет «{name}» у вас уже є. Замінити його?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "У вас {n} пресет, більше не можна. Спочатку видаліть один.",
+    "У вас {n} пресети, більше не можна. Спочатку видаліть один.",
+    "У вас {n} пресетів, більше не можна. Спочатку видаліть один."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: ваш пресет. Правий клік, щоб перейменувати або видалити",
+  "{n} more of your presets": [
+    "Ще {n} ваш пресет",
+    "Ще {n} ваші пресети",
+    "Ще {n} ваших пресетів"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "«{name}» це назва вбудованого пресету. Виберіть іншу."
 }

@@ -4682,5 +4682,26 @@
   "Mic settings, new presets and new games with Bun": "Ajustes del micro, ajustes nuevos y juegos nuevos con Bun",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "El engranaje junto a Micro limpio en la pestaña Voz: volumen de entrada, supresión de ruido y ajustes como Habitación ruidosa. También quita los golpes en la mesa y el zumbido grave.",
   "Three new games with Bun": "Tres juegos nuevos con Bun",
-  "A Volume slider in Live controls": "Un control de volumen en Controles en directo"
+  "A Volume slider in Live controls": "Un control de volumen en Controles en directo",
+  "Delete this preset": "Eliminar este preajuste",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Guarda la velocidad, el tono, los efectos y el volumen que tienes ahora como un preajuste tuyo",
+  "Keep these effects as a preset of your own, in this list for every sound": "Guarda estos efectos como un preajuste tuyo, en esta lista para todos los sonidos",
+  "More ({n})": "Más ({n})",
+  "My preset": "Mi preajuste",
+  "My presets": "Mis preajustes",
+  "None saved yet": "Nada guardado todavía",
+  "Rename preset": "Renombrar preajuste",
+  "Save as preset": "Guardar como preajuste",
+  "Save preset": "Guardar preajuste",
+  "You already have a preset called “{name}”. Replace it?": "Ya tienes un preajuste llamado “{name}”. ¿Reemplazarlo?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "Tienes {n} preajuste, el máximo posible. Elimina uno primero.",
+    "Tienes {n} preajustes, el máximo posible. Elimina uno primero."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: tu preajuste. Clic derecho para renombrarlo o eliminarlo",
+  "{n} more of your presets": [
+    "{n} preajuste tuyo más",
+    "{n} preajustes tuyos más"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” es el nombre de un preajuste incluido. Elige otro."
 }

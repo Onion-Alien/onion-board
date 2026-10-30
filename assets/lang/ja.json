@@ -4600,5 +4600,24 @@
   "Mic settings, new presets and new games with Bun": "マイク設定、新しいプリセット、Bun との新しいゲーム",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "ボイスタブのマイクのノイズ除去の横にある歯車：入力音量、ノイズ抑制、うるさい部屋などのプリセット。机をたたく音や低いうなりもカットします。",
   "Three new games with Bun": "Bun との新しいゲームが 3 つ",
-  "A Volume slider in Live controls": "ライブ操作に音量スライダー"
+  "A Volume slider in Live controls": "ライブ操作に音量スライダー",
+  "Delete this preset": "このプリセットを削除",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "今の速度・ピッチ・エフェクト・音量を自分のプリセットとして保存",
+  "Keep these effects as a preset of your own, in this list for every sound": "このエフェクトを自分のプリセットとして保存し、すべてのサウンドのこの一覧に入れます",
+  "More ({n})": "その他 ({n})",
+  "My preset": "マイプリセット",
+  "My presets": "マイプリセット",
+  "None saved yet": "まだ保存されていません",
+  "Rename preset": "プリセット名を変更",
+  "Save as preset": "プリセットとして保存",
+  "Save preset": "プリセットを保存",
+  "You already have a preset called “{name}”. Replace it?": "「{name}」というプリセットはすでにあります。置き換えますか？",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "プリセットが {n} 個あり、これ以上は作れません。先に1つ削除してください。"
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: 自分のプリセット。右クリックで名前の変更や削除",
+  "{n} more of your presets": [
+    "ほかに {n} 個のプリセット"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "「{name}」は組み込みのプリセットの名前です。別の名前にしてください。"
 }

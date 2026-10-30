@@ -4600,5 +4600,24 @@
   "Mic settings, new presets and new games with Bun": "ตั้งค่าไมค์ พรีเซ็ตใหม่ และเกมใหม่กับ Bun",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "ฟันเฟืองข้างไมค์ไร้เสียงรบกวนในแท็บเสียงพูด: ระดับเสียงอินพุต การลดเสียงรบกวน และพรีเซ็ตอย่างห้องเสียงดัง ยังตัดเสียงเคาะโต๊ะและเสียงหึ่งต่ำด้วย",
   "Three new games with Bun": "เกมใหม่สามเกมกับ Bun",
-  "A Volume slider in Live controls": "แถบเลื่อนระดับเสียงในควบคุมสด"
+  "A Volume slider in Live controls": "แถบเลื่อนระดับเสียงในควบคุมสด",
+  "Delete this preset": "ลบพรีเซ็ตนี้",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "เก็บความเร็ว พิตช์ เอฟเฟกต์ และระดับเสียงตอนนี้เป็นพรีเซ็ตของคุณเอง",
+  "Keep these effects as a preset of your own, in this list for every sound": "เก็บเอฟเฟกต์เหล่านี้เป็นพรีเซ็ตของคุณเอง ในรายการนี้สำหรับทุกเสียง",
+  "More ({n})": "เพิ่มเติม ({n})",
+  "My preset": "พรีเซ็ตของฉัน",
+  "My presets": "พรีเซ็ตของฉัน",
+  "None saved yet": "ยังไม่มีที่บันทึกไว้",
+  "Rename preset": "เปลี่ยนชื่อพรีเซ็ต",
+  "Save as preset": "บันทึกเป็นพรีเซ็ต",
+  "Save preset": "บันทึกพรีเซ็ต",
+  "You already have a preset called “{name}”. Replace it?": "คุณมีพรีเซ็ตชื่อ “{name}” อยู่แล้ว แทนที่เลยไหม?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "คุณมีพรีเซ็ต {n} รายการ ซึ่งมากที่สุดแล้ว ลบออกก่อนหนึ่งรายการ"
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: พรีเซ็ตของคุณ คลิกขวาเพื่อเปลี่ยนชื่อหรือลบ",
+  "{n} more of your presets": [
+    "พรีเซ็ตของคุณอีก {n} รายการ"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” เป็นชื่อของพรีเซ็ตในตัว เลือกชื่ออื่น"
 }

@@ -4682,5 +4682,26 @@
   "Mic settings, new presets and new games with Bun": "Mikrofoninställningar, nya förval och nya spel med Bun",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Kugghjulet vid Ren mikrofon på fliken Röst: ingångsvolym, brusreducering och förval som Bullrigt rum. Den tar också bort dunk i bordet och lågt brum.",
   "Three new games with Bun": "Tre nya spel med Bun",
-  "A Volume slider in Live controls": "Ett volymreglage i Livekontroller"
+  "A Volume slider in Live controls": "Ett volymreglage i Livekontroller",
+  "Delete this preset": "Ta bort den här förinställningen",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Spara hastigheten, tonhöjden, effekterna och volymen du har nu som en egen förinställning",
+  "Keep these effects as a preset of your own, in this list for every sound": "Spara de här effekterna som en egen förinställning, i den här listan för alla ljud",
+  "More ({n})": "Fler ({n})",
+  "My preset": "Min förinställning",
+  "My presets": "Mina förinställningar",
+  "None saved yet": "Inget sparat än",
+  "Rename preset": "Byt namn på förinställning",
+  "Save as preset": "Spara som förinställning",
+  "Save preset": "Spara förinställning",
+  "You already have a preset called “{name}”. Replace it?": "Du har redan en förinställning som heter ”{name}”. Ersätta den?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "Du har {n} förinställning, fler går inte. Ta bort en först.",
+    "Du har {n} förinställningar, fler går inte. Ta bort en först."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: din förinställning. Högerklicka för att byta namn eller ta bort",
+  "{n} more of your presets": [
+    "{n} till av dina förinställningar",
+    "{n} till av dina förinställningar"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "”{name}” är namnet på en inbyggd förinställning. Välj ett annat."
 }
