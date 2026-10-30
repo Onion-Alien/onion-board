@@ -88,6 +88,8 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         # the language that was being spoken in ("lang")
         self._back: list[str] = []
         self._back_lang = ""
+        # the voice changer's ✕: ON won't turn its picked voice on until it's on again
+        self._fx_forgot = False
         self._switching = False          # set_voices / toggle_one at work (_update_bar)
         self.bar.open_card.connect(self._open_card)
         self.bar.master_toggled.connect(self._master_flipped)

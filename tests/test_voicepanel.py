@@ -124,10 +124,28 @@ def test_voices_switch_with_nothing_remembered_says_and_turns_on_the_picked_voic
     p.fx.pick("Robot")
     p.fx.btn_power.setChecked(False)      # off on its card: nothing for the switch to recall
     assert p.bar.texts() == ["Mic unchanged. ON turns on:", "Robot"]
-    assert p.bar.chips["fx"].off.isHidden()   # nothing to forget: no ✕
+    assert not p.bar.chips["fx"].off.isHidden()   # every chip's ✕ works
     assert "Turns on: Robot" in p.bar.master.toolTip()
     p.bar.master.click()
     assert p.fx.btn_power.isChecked() and p.fx.preset == "Robot"
+
+
+def test_voices_off_then_x_on_the_grey_voice_takes_its_chip_away(panel):
+    """OFF, then the grey voice's ✕: its chip goes and ON turns nothing on. (It came
+    straight back as "ON turns on:" the same voice, with no ✕: the ✕ looked dead.)"""
+    p, _eng = panel
+    p.fx.pick("Robot")
+    p.bar.master.click()
+    assert p.bar.texts() == ["Mic unchanged. ON brings back:", "Robot"]
+    p.bar.chips["fx"].off.click()
+    assert p.bar.texts() == ["Mic unchanged"] and p.back_keys() == []
+    p.bar.master.click()
+    assert not p.is_active() and not p.bar.master.isChecked()
+    p.fx.pick("Robot")                    # picked again: on, and ON/OFF work as before
+    assert p.on_keys() == ["fx"]
+    p.bar.master.click()
+    p.bar.master.click()
+    assert p.on_keys() == ["fx"]
 
 
 def test_voices_switch_off_keeps_a_voice_greyed_by_its_chip(panel):
@@ -1919,7 +1937,7 @@ def test_status_bar_chip_x_turns_off_only_that_one(panel):
     assert p.bar.texts() == ["Mic unchanged. ON brings back:", "Computer voice"]
     p.bar.chips["speak"].off.click()             # its ✕ on the grey chip: forgotten
     assert not p.speech.livevoice.b_live.isChecked()
-    assert p.bar.texts() == ["Mic unchanged. ON turns on:", "Robot"]
+    assert p.bar.texts() == ["Mic unchanged"]    # Robot's ✕ earlier: it stays gone
 
 
 def test_status_bar_says_what_others_hear(panel):
