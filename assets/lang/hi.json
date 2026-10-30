@@ -4682,5 +4682,29 @@
   "Mic settings, new presets and new games with Bun": "माइक सेटिंग्स, नए प्रीसेट और Bun के साथ नए गेम",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "वॉइस टैब पर साफ़ माइक के बगल वाला गियर: इनपुट वॉल्यूम, नॉइज़ सप्रेशन और शोर वाला कमरा जैसे प्रीसेट। यह डेस्क की खटखट और धीमी भिनभिनाहट भी हटाता है।",
   "Three new games with Bun": "Bun के साथ तीन नए गेम",
-  "A Volume slider in Live controls": "लाइव कंट्रोल में वॉल्यूम स्लाइडर"
+  "A Volume slider in Live controls": "लाइव कंट्रोल में वॉल्यूम स्लाइडर",
+  "That playlist is empty, or its videos are private.": "यह प्लेलिस्ट खाली है, या इसके वीडियो प्राइवेट हैं।",
+  "{n} of {total} video": [
+    "{total} में से {n} वीडियो",
+    "{total} में से {n} वीडियो"
+  ],
+  "{n} video": [
+    "{n} वीडियो",
+    "{n} वीडियो"
+  ],
+  "Double-click to open": "खोलने के लिए डबल-क्लिक करें",
+  "Playlist": "प्लेलिस्ट",
+  "Playlists": "प्लेलिस्ट",
+  "Show its videos, to add some or all of them": "इसके वीडियो दिखाएँ, कुछ या सभी जोड़ने के लिए",
+  "Show playlists: open one to add its videos": "प्लेलिस्ट दिखाएँ: किसी एक को खोलकर उसके वीडियो जोड़ें",
+  "Show videos": "वीडियो दिखाएँ",
+  "Videos": "वीडियो",
+  "Add all": "सब जोड़ें",
+  "Add all its videos to your sounds, without opening it": "इसे खोले बिना इसके सभी वीडियो अपनी आवाज़ों में जोड़ें",
+  "Couldn't add that playlist: {error}": "यह प्लेलिस्ट नहीं जुड़ी: {error}",
+  "Its videos are on their way to your sounds": "इसके वीडियो आपकी आवाज़ों में आ रहे हैं",
+  "✓ {n} queued": [
+    "✓ {n} कतार में",
+    "✓ {n} कतार में"
+  ]
 }

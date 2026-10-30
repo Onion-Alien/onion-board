@@ -4682,5 +4682,29 @@
   "Mic settings, new presets and new games with Bun": "Mikrofoninnstillinger, nye forhåndsvalg og nye spill med Bun",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Tannhjulet ved Ren mikrofon på fanen Stemme: inndatavolum, støydemping og forhåndsvalg som Bråkete rom. Den fjerner også dunk i bordet og lav brumming.",
   "Three new games with Bun": "Tre nye spill med Bun",
-  "A Volume slider in Live controls": "En volumglidebryter i Live-kontroller"
+  "A Volume slider in Live controls": "En volumglidebryter i Live-kontroller",
+  "That playlist is empty, or its videos are private.": "Den spillelisten er tom, eller videoene i den er private.",
+  "{n} of {total} video": [
+    "{n} av {total} video",
+    "{n} av {total} videoer"
+  ],
+  "{n} video": [
+    "{n} video",
+    "{n} videoer"
+  ],
+  "Double-click to open": "Dobbeltklikk for å åpne",
+  "Playlist": "Spilleliste",
+  "Playlists": "Spillelister",
+  "Show its videos, to add some or all of them": "Vis videoene, så du kan legge til noen eller alle",
+  "Show playlists: open one to add its videos": "Vis spillelister: åpne en for å legge til videoene i den",
+  "Show videos": "Vis videoer",
+  "Videos": "Videoer",
+  "Add all": "Legg til alle",
+  "Add all its videos to your sounds, without opening it": "Legg til alle videoene i lydene dine uten å åpne den",
+  "Couldn't add that playlist: {error}": "Kunne ikke legge til den spillelisten: {error}",
+  "Its videos are on their way to your sounds": "Videoene er på vei til lydene dine",
+  "✓ {n} queued": [
+    "✓ {n} i kø",
+    "✓ {n} i kø"
+  ]
 }

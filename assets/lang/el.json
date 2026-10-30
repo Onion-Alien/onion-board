@@ -4682,5 +4682,29 @@
   "Mic settings, new presets and new games with Bun": "Ρυθμίσεις μικροφώνου, νέες έτοιμες ρυθμίσεις και νέα παιχνίδια με τον Bun",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Το γρανάζι δίπλα στο Καθαρό μικρόφωνο στην καρτέλα Φωνή: ένταση εισόδου, καταστολή θορύβου και έτοιμες ρυθμίσεις όπως Θορυβώδες δωμάτιο. Κόβει επίσης χτυπήματα στο γραφείο και χαμηλό βόμβο.",
   "Three new games with Bun": "Τρία νέα παιχνίδια με τον Bun",
-  "A Volume slider in Live controls": "Ρυθμιστής έντασης στα Ζωντανά χειριστήρια"
+  "A Volume slider in Live controls": "Ρυθμιστής έντασης στα Ζωντανά χειριστήρια",
+  "That playlist is empty, or its videos are private.": "Αυτή η λίστα αναπαραγωγής είναι άδεια ή τα βίντεό της είναι ιδιωτικά.",
+  "{n} of {total} video": [
+    "{n} από {total} βίντεο",
+    "{n} από {total} βίντεο"
+  ],
+  "{n} video": [
+    "{n} βίντεο",
+    "{n} βίντεο"
+  ],
+  "Double-click to open": "Διπλό κλικ για άνοιγμα",
+  "Playlist": "Λίστα",
+  "Playlists": "Λίστες",
+  "Show its videos, to add some or all of them": "Δες τα βίντεό της για να προσθέσεις μερικά ή όλα",
+  "Show playlists: open one to add its videos": "Εμφάνιση λιστών: άνοιξε μία για να προσθέσεις τα βίντεό της",
+  "Show videos": "Εμφάνιση βίντεο",
+  "Videos": "Βίντεο",
+  "Add all": "Προσθήκη όλων",
+  "Add all its videos to your sounds, without opening it": "Πρόσθεσε όλα τα βίντεό της στους ήχους σου χωρίς να την ανοίξεις",
+  "Couldn't add that playlist: {error}": "Δεν προστέθηκε αυτή η λίστα: {error}",
+  "Its videos are on their way to your sounds": "Τα βίντεό της έρχονται στους ήχους σου",
+  "✓ {n} queued": [
+    "✓ {n} σε αναμονή",
+    "✓ {n} σε αναμονή"
+  ]
 }

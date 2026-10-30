@@ -4682,5 +4682,29 @@
   "Mic settings, new presets and new games with Bun": "Mikrofonbeállítások, új előbeállítások és új játékok Bunnal",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "A fogaskerék a Tiszta mikrofon mellett a Beszéd lapon: bemeneti hangerő, zajszűrés és előbeállítások, mint a Hangos szoba. Az asztalra koppanást és a mély zúgást is kiszűri.",
   "Three new games with Bun": "Három új játék Bunnal",
-  "A Volume slider in Live controls": "Hangerőcsúszka az Élő vezérlőkben"
+  "A Volume slider in Live controls": "Hangerőcsúszka az Élő vezérlőkben",
+  "That playlist is empty, or its videos are private.": "Ez a lejátszási lista üres, vagy a videói privátak.",
+  "{n} of {total} video": [
+    "{n} / {total} videó",
+    "{n} / {total} videó"
+  ],
+  "{n} video": [
+    "{n} videó",
+    "{n} videó"
+  ],
+  "Double-click to open": "Dupla kattintás a megnyitáshoz",
+  "Playlist": "Lejátszási lista",
+  "Playlists": "Lejátszási listák",
+  "Show its videos, to add some or all of them": "Mutasd a videóit, hogy hozzáadj néhányat vagy mindet",
+  "Show playlists: open one to add its videos": "Lejátszási listák mutatása: nyiss meg egyet a videói hozzáadásához",
+  "Show videos": "Videók mutatása",
+  "Videos": "Videók",
+  "Add all": "Összes hozzáadása",
+  "Add all its videos to your sounds, without opening it": "Az összes videója hozzáadása a hangjaidhoz megnyitás nélkül",
+  "Couldn't add that playlist: {error}": "Ezt a lejátszási listát nem sikerült hozzáadni: {error}",
+  "Its videos are on their way to your sounds": "A videói úton vannak a hangjaidhoz",
+  "✓ {n} queued": [
+    "✓ {n} sorban áll",
+    "✓ {n} sorban áll"
+  ]
 }

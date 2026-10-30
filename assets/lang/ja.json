@@ -4600,5 +4600,26 @@
   "Mic settings, new presets and new games with Bun": "マイク設定、新しいプリセット、Bun との新しいゲーム",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "ボイスタブのマイクのノイズ除去の横にある歯車：入力音量、ノイズ抑制、うるさい部屋などのプリセット。机をたたく音や低いうなりもカットします。",
   "Three new games with Bun": "Bun との新しいゲームが 3 つ",
-  "A Volume slider in Live controls": "ライブ操作に音量スライダー"
+  "A Volume slider in Live controls": "ライブ操作に音量スライダー",
+  "That playlist is empty, or its videos are private.": "そのプレイリストは空か、動画が非公開です。",
+  "{n} of {total} video": [
+    "{total}本中{n}本の動画"
+  ],
+  "{n} video": [
+    "{n}本の動画"
+  ],
+  "Double-click to open": "ダブルクリックで開く",
+  "Playlist": "プレイリスト",
+  "Playlists": "プレイリスト",
+  "Show its videos, to add some or all of them": "中の動画を表示して、一部またはすべてを追加",
+  "Show playlists: open one to add its videos": "プレイリストを表示：開くと中の動画を追加できます",
+  "Show videos": "動画を表示",
+  "Videos": "動画",
+  "Add all": "すべて追加",
+  "Add all its videos to your sounds, without opening it": "開かずに中の動画をすべてサウンドに追加",
+  "Couldn't add that playlist: {error}": "そのプレイリストを追加できませんでした：{error}",
+  "Its videos are on their way to your sounds": "中の動画をサウンドに追加しています",
+  "✓ {n} queued": [
+    "✓ {n}件を待機中"
+  ]
 }

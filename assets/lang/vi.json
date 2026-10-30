@@ -4600,5 +4600,26 @@
   "Mic settings, new presets and new games with Bun": "Cài đặt mic, cài sẵn mới và trò chơi mới với Bun",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Bánh răng cạnh Mic sạch ở thẻ Giọng nói: âm lượng đầu vào, khử tiếng ồn và cài sẵn như Phòng ồn. Nó cũng lọc tiếng gõ bàn và tiếng ù trầm.",
   "Three new games with Bun": "Ba trò chơi mới với Bun",
-  "A Volume slider in Live controls": "Thanh trượt âm lượng trong Điều khiển trực tiếp"
+  "A Volume slider in Live controls": "Thanh trượt âm lượng trong Điều khiển trực tiếp",
+  "That playlist is empty, or its videos are private.": "Danh sách phát đó trống, hoặc các video trong đó ở chế độ riêng tư.",
+  "{n} of {total} video": [
+    "{n}/{total} video"
+  ],
+  "{n} video": [
+    "{n} video"
+  ],
+  "Double-click to open": "Nhấp đúp để mở",
+  "Playlist": "Danh sách phát",
+  "Playlists": "Danh sách phát",
+  "Show its videos, to add some or all of them": "Hiện các video trong đó để thêm một vài hoặc tất cả",
+  "Show playlists: open one to add its videos": "Hiện danh sách phát: mở một danh sách để thêm video trong đó",
+  "Show videos": "Hiện video",
+  "Videos": "Video",
+  "Add all": "Thêm tất cả",
+  "Add all its videos to your sounds, without opening it": "Thêm tất cả video trong đó vào âm thanh mà không cần mở",
+  "Couldn't add that playlist: {error}": "Không thêm được danh sách phát đó: {error}",
+  "Its videos are on their way to your sounds": "Các video trong đó đang được thêm vào âm thanh của bạn",
+  "✓ {n} queued": [
+    "✓ {n} đang chờ"
+  ]
 }

@@ -5010,5 +5010,41 @@
   "Mic settings, new presets and new games with Bun": "إعدادات الميكروفون، إعدادات جاهزة جديدة وألعاب جديدة مع Bun",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "الترس بجانب ميكروفون نظيف في تبويب الصوت: مستوى صوت الإدخال، كتم الضوضاء وإعدادات جاهزة مثل غرفة صاخبة. ويزيل أيضًا ضربات المكتب والطنين المنخفض.",
   "Three new games with Bun": "ثلاث ألعاب جديدة مع Bun",
-  "A Volume slider in Live controls": "شريط لمستوى الصوت في تحكّم مباشر"
+  "A Volume slider in Live controls": "شريط لمستوى الصوت في تحكّم مباشر",
+  "That playlist is empty, or its videos are private.": "قائمة التشغيل هذه فارغة، أو فيديوهاتها خاصة.",
+  "{n} of {total} video": [
+    "{n} من {total} فيديو",
+    "{n} من {total} فيديو",
+    "{n} من {total} فيديو",
+    "{n} من {total} فيديو",
+    "{n} من {total} فيديو",
+    "{n} من {total} فيديو"
+  ],
+  "{n} video": [
+    "{n} فيديو",
+    "{n} فيديو",
+    "{n} فيديو",
+    "{n} فيديوهات",
+    "{n} فيديو",
+    "{n} فيديو"
+  ],
+  "Double-click to open": "انقر مرتين للفتح",
+  "Playlist": "قائمة تشغيل",
+  "Playlists": "قوائم التشغيل",
+  "Show its videos, to add some or all of them": "اعرض فيديوهاتها لتضيف بعضها أو كلها",
+  "Show playlists: open one to add its videos": "اعرض قوائم التشغيل: افتح واحدة لتضيف فيديوهاتها",
+  "Show videos": "اعرض الفيديوهات",
+  "Videos": "فيديوهات",
+  "Add all": "أضف الكل",
+  "Add all its videos to your sounds, without opening it": "أضف كل فيديوهاتها إلى أصواتك دون فتحها",
+  "Couldn't add that playlist: {error}": "تعذّرت إضافة قائمة التشغيل هذه: {error}",
+  "Its videos are on their way to your sounds": "فيديوهاتها في الطريق إلى أصواتك",
+  "✓ {n} queued": [
+    "✓ {n} في الانتظار",
+    "✓ {n} في الانتظار",
+    "✓ {n} في الانتظار",
+    "✓ {n} في الانتظار",
+    "✓ {n} في الانتظار",
+    "✓ {n} في الانتظار"
+  ]
 }

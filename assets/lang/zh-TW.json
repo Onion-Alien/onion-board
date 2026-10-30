@@ -4600,5 +4600,26 @@
   "Mic settings, new presets and new games with Bun": "麥克風設定、新預設和 Bun 的新遊戲",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "語音分頁裡麥克風降噪旁邊的齒輪：輸入音量、雜訊抑制，以及吵雜房間等預設。還能去掉敲桌子的聲音和低沉的嗡嗡聲。",
   "Three new games with Bun": "和 Bun 的三個新遊戲",
-  "A Volume slider in Live controls": "即時控制裡的音量滑桿"
+  "A Volume slider in Live controls": "即時控制裡的音量滑桿",
+  "That playlist is empty, or its videos are private.": "這個播放清單是空的，或裡面的影片是私人的。",
+  "{n} of {total} video": [
+    "{total}部影片中的{n}部"
+  ],
+  "{n} video": [
+    "{n}部影片"
+  ],
+  "Double-click to open": "按兩下開啟",
+  "Playlist": "播放清單",
+  "Playlists": "播放清單",
+  "Show its videos, to add some or all of them": "顯示裡面的影片，加入部分或全部",
+  "Show playlists: open one to add its videos": "顯示播放清單：打開一個就能加入裡面的影片",
+  "Show videos": "顯示影片",
+  "Videos": "影片",
+  "Add all": "全部加入",
+  "Add all its videos to your sounds, without opening it": "不用打開，把裡面的影片全部加入你的音效",
+  "Couldn't add that playlist: {error}": "無法加入這個播放清單：{error}",
+  "Its videos are on their way to your sounds": "裡面的影片正在加入你的音效",
+  "✓ {n} queued": [
+    "✓ 已排隊 {n} 個"
+  ]
 }

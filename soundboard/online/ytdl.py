@@ -74,7 +74,8 @@ from soundboard.i18n import _  # noqa: F401
 from soundboard.online import ytsites, ytupdate, ytfetch, ytsearch
 from soundboard.online.ytsites import (  # noqa: F401
     blocked_by_site, BROWSER_HEADERS, DownloadError, FEATURE, FetchError, _gate, IMAGE_EXTS, _lock,
-    MAX_BYTES, MYINSTANTS, _over_tor, PROGRESS_EVERY_S, Result, RETRY_CHECK_AFTER, RETRY_CLIENTS,
+    MAX_BYTES, MYINSTANTS, _over_tor, PLAYLIST, PROGRESS_EVERY_S, Result, RETRY_CHECK_AFTER,
+    RETRY_CLIENTS,
     RETRY_PAUSE_S, _SharedLock, silent_over_tor, site_allowed, site_feature, _site_name, site_of,
     SOURCES, SwitchedOff, TIKTOK_SUFFIX, _TOR_BLOCKED, _TOR_SILENT, TOR_TRIES, TorBlocked,
     TRENDING, _TRY_AGAIN, UPDATE_FEATURE, VIDEO_EXTS, VIDEO_MAX_BYTES)
@@ -87,11 +88,12 @@ from soundboard.online.ytupdate import (  # noqa: F401
 from soundboard.online.ytfetch import (  # noqa: F401
     as_link, as_links, _check, clean_title, _count_used, _direct_leaf, _direct_title, _download,
     download_audio, _download_direct, DOWNLOAD_QUIET_S, downloadable, _drop_broken, _extract,
-    _found, lookup, MAX_LINKS, _opts, probe, _readable, _remote, _run, _run_helper, save_video,
-    _sendable,
+    _as_result, _found, lookup, lookup_all, MAX_LINKS, _opts, Playlist, probe, _readable, _remote,
+    _run, _run_helper, save_video, _sendable,
     _went_nowhere, _worth_another_try, _ydl)
 from soundboard.online.ytsearch import (  # noqa: F401
-    _count, _myinstants, _myinstants_page, search, _soundcloud_hit, trending, _youtube_hit)
+    _count, _myinstants, _myinstants_page, _playlist_hit, search, _soundcloud_hit, trending,
+    _youtube_hit)
 
 log = logging.getLogger(__name__)
 

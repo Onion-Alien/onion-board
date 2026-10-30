@@ -4682,5 +4682,29 @@
   "Mic settings, new presets and new games with Bun": "Ajustes del micro, ajustes nuevos y juegos nuevos con Bun",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "El engranaje junto a Micro limpio en la pestaña Voz: volumen de entrada, supresión de ruido y ajustes como Habitación ruidosa. También quita los golpes en la mesa y el zumbido grave.",
   "Three new games with Bun": "Tres juegos nuevos con Bun",
-  "A Volume slider in Live controls": "Un control de volumen en Controles en directo"
+  "A Volume slider in Live controls": "Un control de volumen en Controles en directo",
+  "That playlist is empty, or its videos are private.": "Esa lista está vacía o sus vídeos son privados.",
+  "{n} of {total} video": [
+    "{n} de {total} vídeo",
+    "{n} de {total} vídeos"
+  ],
+  "{n} video": [
+    "{n} vídeo",
+    "{n} vídeos"
+  ],
+  "Double-click to open": "Doble clic para abrir",
+  "Playlist": "Lista",
+  "Playlists": "Listas",
+  "Show its videos, to add some or all of them": "Muestra sus vídeos para añadir algunos o todos",
+  "Show playlists: open one to add its videos": "Mostrar listas: abre una para añadir sus vídeos",
+  "Show videos": "Mostrar vídeos",
+  "Videos": "Vídeos",
+  "Add all": "Añadir todo",
+  "Add all its videos to your sounds, without opening it": "Añade todos sus vídeos a tus sonidos sin abrirla",
+  "Couldn't add that playlist: {error}": "No se pudo añadir esa lista: {error}",
+  "Its videos are on their way to your sounds": "Sus vídeos van de camino a tus sonidos",
+  "✓ {n} queued": [
+    "✓ {n} en cola",
+    "✓ {n} en cola"
+  ]
 }

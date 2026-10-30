@@ -4682,5 +4682,29 @@
   "Mic settings, new presets and new games with Bun": "Definições do microfone, novas predefinições e jogos novos com o Bun",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "A roda dentada ao lado de Microfone limpo no separador Voz: volume de entrada, supressão de ruído e predefinições como Sala barulhenta. Também tira pancadas na secretária e zumbido grave.",
   "Three new games with Bun": "Três jogos novos com o Bun",
-  "A Volume slider in Live controls": "Um controlo de volume nos Controlos em direto"
+  "A Volume slider in Live controls": "Um controlo de volume nos Controlos em direto",
+  "That playlist is empty, or its videos are private.": "Essa playlist está vazia ou os vídeos são privados.",
+  "{n} of {total} video": [
+    "{n} de {total} vídeo",
+    "{n} de {total} vídeos"
+  ],
+  "{n} video": [
+    "{n} vídeo",
+    "{n} vídeos"
+  ],
+  "Double-click to open": "Duplo clique para abrir",
+  "Playlist": "Playlist",
+  "Playlists": "Playlists",
+  "Show its videos, to add some or all of them": "Mostra os vídeos para adicionares alguns ou todos",
+  "Show playlists: open one to add its videos": "Mostrar playlists: abre uma para adicionar os vídeos",
+  "Show videos": "Mostrar vídeos",
+  "Videos": "Vídeos",
+  "Add all": "Adicionar tudo",
+  "Add all its videos to your sounds, without opening it": "Adiciona todos os vídeos aos teus sons sem a abrir",
+  "Couldn't add that playlist: {error}": "Não foi possível adicionar essa playlist: {error}",
+  "Its videos are on their way to your sounds": "Os vídeos estão a caminho dos teus sons",
+  "✓ {n} queued": [
+    "✓ {n} na fila",
+    "✓ {n} na fila"
+  ]
 }

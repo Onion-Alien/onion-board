@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from PySide6.QtCore import QPointF, QRect, QRectF, QSize, Qt, Signal
 from PySide6.QtGui import QColor, QIcon, QPainter, QPainterPath, QPixmap
-from PySide6.QtWidgets import (QBoxLayout, QHBoxLayout, QPushButton, QSizePolicy, QVBoxLayout,
+from PySide6.QtWidgets import (QBoxLayout, QPushButton, QSizePolicy, QVBoxLayout,
                                QWidget)
 
 from soundboard.core import jobprogress
@@ -13,7 +13,7 @@ from soundboard.online import ytdl
 from soundboard.ui.kit import busy, icons
 from soundboard.ui.kit.panel import HoverCard
 from soundboard.ui.kit.widgets import fmt_time, paint_now_playing
-from soundboard.i18n import _
+from soundboard.i18n import _, ngettext
 from soundboard.ui.kit.pixels import snap_to_pixels
 from soundboard.ui.sounds.ytlabels import ClampLabel, StatsLabel
 
@@ -186,10 +186,11 @@ class ResultRow(HoverCard):
         self.title = ClampLabel(r.title)
         if wide:   # the style sheet sets the font: a setFont() would be undone
             self.title.setStyleSheet("font-size:12.5pt; font-weight:700;")
+        self.playlist = r.source == ytdl.PLAYLIST   # Open lists its videos, no Play / Add
         # channel names come from YouTube: painted as plain text
-        self.sub = ClampLabel(" · ".join(x for x in (r.channel, fmt_time(r.seconds)
-                                                       if r.seconds else "") if x),
-                              lines=1, bold=False)
+        self.sub = ClampLabel(" · ".join(x for x in (
+            r.channel, _("Playlist") if self.playlist else
+            fmt_time(r.seconds) if r.seconds else "") if x), lines=1, bold=False)
         self.sub.setObjectName("muted")
         self.stats = StatsLabel()
         self.stats.setObjectName("muted")
@@ -203,6 +204,12 @@ class ResultRow(HoverCard):
         self.btn_add.setToolTip(_("Download its audio and add it to your sounds"))
         icons.set_icon(self.btn_add, "plus", "text_hi", size=14)
         self.btn_add.clicked.connect(lambda: self.add.emit(self.result))
+        if self.playlist:   # (play: SearchResults opens it)
+            self.btn_play.setText(_("Open"))
+            self.btn_play.setToolTip(_("Show its videos, to add some or all of them"))
+            icons.set_icon(self.btn_play, "list", "on_accent", size=14)
+            self.btn_add.setText(_("Add all"))   # (add: SearchResults lists it, then queues)
+            self.btn_add.setToolTip(_("Add all its videos to your sounds, without opening it"))
         for b in (self.btn_play, self.btn_add):
             b.setCursor(Qt.CursorShape.PointingHandCursor)
             if wide:   # as wide as their words (and the download's), not the whole card
@@ -219,7 +226,8 @@ class ResultRow(HoverCard):
         for w in (self.title, self.sub, self.stats):
             self.text_box.addWidget(w)
         self.text_box.addStretch(1)
-        buttons = QHBoxLayout()
+        # side by side; a playlist's Open and Add all stack when their words don't fit
+        buttons = self.buttons = QBoxLayout(QBoxLayout.Direction.LeftToRight)
         buttons.setSpacing(8)
         buttons.addWidget(self.btn_play)
         buttons.addWidget(self.btn_add)
@@ -240,7 +248,7 @@ class ResultRow(HoverCard):
         self.now = ""           # "playing" / "paused": it's the one in the player
         self.setProperty("playing", False)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.setToolTip(_("Double-click to play"))
+        self.setToolTip(_("Double-click to open") if self.playlist else _("Double-click to play"))
 
     def _style(self):
         """The card's two buttons: Play the filled accent, Add a quiet outline; the
@@ -289,6 +297,15 @@ class ResultRow(HoverCard):
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
+        if self.playlist:   # "Alle hinzufügen" beside "Öffnen" is cut off on a narrow card
+            m = self.layout().contentsMargins() if self.layout() is not None else None
+            room = self.width() - (m.left() + m.right() if m is not None else 0)
+            need = (self.btn_play.sizeHint().width() + self.btn_add.sizeHint().width()
+                    + self.buttons.spacing())
+            way = (QBoxLayout.Direction.TopToBottom if need > room
+                   else QBoxLayout.Direction.LeftToRight)
+            if self.buttons.direction() != way:
+                self.buttons.setDirection(way)
         if self.wide:   # beside each other when there's room, stacked when not
             side = self.width() >= self.WIDE_MIN_W
             if side != self._side:
@@ -446,6 +463,15 @@ class ResultRow(HoverCard):
         elif kind == "play":
             now, self.now = self.now, None   # its tooltip again, for what it's doing now
             self.set_now(now or "")   # (only None inside this call)
+        self._style()
+
+    def set_queued_all(self, n: int):
+        """A playlist's Add all: its `n` videos are in the download queue now."""
+        self._added = True
+        self.btn_add.setIcon(QIcon())
+        self.btn_add.setText(ngettext("✓ {n} queued", "✓ {n} queued", n))
+        self.btn_add.setToolTip(_("Its videos are on their way to your sounds"))
+        busy.set_busy(self.btn_add, True)
         self._style()
 
     def set_thumb(self, pm: QPixmap):

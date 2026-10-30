@@ -4764,5 +4764,32 @@
   "Mic settings, new presets and new games with Bun": "Налаштування мікрофона, нові пресети й нові ігри з Bun",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Шестірня поруч із «Чистим мікрофоном» на вкладці «Голос»: гучність входу, шумозаглушення й пресети на кшталт «Галасливої кімнати». Ще прибирає стукіт по столу й низький гул.",
   "Three new games with Bun": "Три нові ігри з Bun",
-  "A Volume slider in Live controls": "Повзунок гучності в «Живому керуванні»"
+  "A Volume slider in Live controls": "Повзунок гучності в «Живому керуванні»",
+  "That playlist is empty, or its videos are private.": "Цей плейлист порожній, або його відео приховані.",
+  "{n} of {total} video": [
+    "{n} з {total} відео",
+    "{n} з {total} відео",
+    "{n} з {total} відео"
+  ],
+  "{n} video": [
+    "{n} відео",
+    "{n} відео",
+    "{n} відео"
+  ],
+  "Double-click to open": "Двічі клацни, щоб відкрити",
+  "Playlist": "Плейлист",
+  "Playlists": "Плейлисти",
+  "Show its videos, to add some or all of them": "Показати його відео, щоб додати деякі або всі",
+  "Show playlists: open one to add its videos": "Показати плейлисти: відкрий один, щоб додати його відео",
+  "Show videos": "Показати відео",
+  "Videos": "Відео",
+  "Add all": "Додати всі",
+  "Add all its videos to your sounds, without opening it": "Додати всі його відео до звуків, не відкриваючи",
+  "Couldn't add that playlist: {error}": "Не вдалося додати цей плейлист: {error}",
+  "Its videos are on their way to your sounds": "Його відео вже додаються до твоїх звуків",
+  "✓ {n} queued": [
+    "✓ {n} у черзі",
+    "✓ {n} у черзі",
+    "✓ {n} у черзі"
+  ]
 }

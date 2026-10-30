@@ -4600,5 +4600,26 @@
   "Mic settings, new presets and new games with Bun": "ตั้งค่าไมค์ พรีเซ็ตใหม่ และเกมใหม่กับ Bun",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "ฟันเฟืองข้างไมค์ไร้เสียงรบกวนในแท็บเสียงพูด: ระดับเสียงอินพุต การลดเสียงรบกวน และพรีเซ็ตอย่างห้องเสียงดัง ยังตัดเสียงเคาะโต๊ะและเสียงหึ่งต่ำด้วย",
   "Three new games with Bun": "เกมใหม่สามเกมกับ Bun",
-  "A Volume slider in Live controls": "แถบเลื่อนระดับเสียงในควบคุมสด"
+  "A Volume slider in Live controls": "แถบเลื่อนระดับเสียงในควบคุมสด",
+  "That playlist is empty, or its videos are private.": "เพลย์ลิสต์นั้นว่างเปล่า หรือวิดีโอในนั้นเป็นแบบส่วนตัว",
+  "{n} of {total} video": [
+    "{n} จาก {total} วิดีโอ"
+  ],
+  "{n} video": [
+    "{n} วิดีโอ"
+  ],
+  "Double-click to open": "ดับเบิลคลิกเพื่อเปิด",
+  "Playlist": "เพลย์ลิสต์",
+  "Playlists": "เพลย์ลิสต์",
+  "Show its videos, to add some or all of them": "แสดงวิดีโอในนั้น เพื่อเพิ่มบางส่วนหรือทั้งหมด",
+  "Show playlists: open one to add its videos": "แสดงเพลย์ลิสต์: เปิดสักอันเพื่อเพิ่มวิดีโอในนั้น",
+  "Show videos": "แสดงวิดีโอ",
+  "Videos": "วิดีโอ",
+  "Add all": "เพิ่มทั้งหมด",
+  "Add all its videos to your sounds, without opening it": "เพิ่มวิดีโอทั้งหมดในนั้นไปที่เสียงของคุณโดยไม่ต้องเปิด",
+  "Couldn't add that playlist: {error}": "เพิ่มเพลย์ลิสต์นั้นไม่ได้: {error}",
+  "Its videos are on their way to your sounds": "วิดีโอในนั้นกำลังเพิ่มเข้าเสียงของคุณ",
+  "✓ {n} queued": [
+    "✓ รอคิว {n}"
+  ]
 }

@@ -4682,5 +4682,29 @@
   "Mic settings, new presets and new games with Bun": "Micinstellingen, nieuwe voorinstellingen en nieuwe spellen met Bun",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Het tandwiel naast Schone mic op het tabblad Stem: invoervolume, ruisonderdrukking en voorinstellingen zoals Luide kamer. Het haalt ook tikken tegen het bureau en laag gebrom weg.",
   "Three new games with Bun": "Drie nieuwe spellen met Bun",
-  "A Volume slider in Live controls": "Een volumeschuif in Live-bediening"
+  "A Volume slider in Live controls": "Een volumeschuif in Live-bediening",
+  "That playlist is empty, or its videos are private.": "Die playlist is leeg, of de video's erin zijn privé.",
+  "{n} of {total} video": [
+    "{n} van {total} video",
+    "{n} van {total} video's"
+  ],
+  "{n} video": [
+    "{n} video",
+    "{n} video's"
+  ],
+  "Double-click to open": "Dubbelklik om te openen",
+  "Playlist": "Playlist",
+  "Playlists": "Playlists",
+  "Show its videos, to add some or all of them": "Toon de video's om er een paar of allemaal toe te voegen",
+  "Show playlists: open one to add its videos": "Playlists tonen: open er een om de video's toe te voegen",
+  "Show videos": "Video's tonen",
+  "Videos": "Video's",
+  "Add all": "Alles toevoegen",
+  "Add all its videos to your sounds, without opening it": "Voeg al de video's toe aan je geluiden zonder hem te openen",
+  "Couldn't add that playlist: {error}": "Die playlist kon niet worden toegevoegd: {error}",
+  "Its videos are on their way to your sounds": "De video's komen eraan in je geluiden",
+  "✓ {n} queued": [
+    "✓ {n} in de wachtrij",
+    "✓ {n} in de wachtrij"
+  ]
 }

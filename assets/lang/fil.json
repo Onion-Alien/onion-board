@@ -4682,5 +4682,29 @@
   "Mic settings, new presets and new games with Bun": "Settings ng mic, mga bagong preset at bagong laro kasama si Bun",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Ang gear sa tabi ng Malinis na mic sa Voice tab: volume ng input, noise suppression at mga preset tulad ng Maingay na kuwarto. Tinatanggal din nito ang kalabog sa mesa at mababang ugong.",
   "Three new games with Bun": "Tatlong bagong laro kasama si Bun",
-  "A Volume slider in Live controls": "Isang Volume slider sa Live controls"
+  "A Volume slider in Live controls": "Isang Volume slider sa Live controls",
+  "That playlist is empty, or its videos are private.": "Walang laman ang playlist na 'yan, o private ang mga video nito.",
+  "{n} of {total} video": [
+    "{n} sa {total} video",
+    "{n} sa {total} na video"
+  ],
+  "{n} video": [
+    "{n} video",
+    "{n} na video"
+  ],
+  "Double-click to open": "I-double click para buksan",
+  "Playlist": "Playlist",
+  "Playlists": "Mga playlist",
+  "Show its videos, to add some or all of them": "Ipakita ang mga video nito para idagdag ang ilan o lahat",
+  "Show playlists: open one to add its videos": "Ipakita ang mga playlist: buksan ang isa para idagdag ang mga video nito",
+  "Show videos": "Ipakita ang mga video",
+  "Videos": "Mga video",
+  "Add all": "Idagdag lahat",
+  "Add all its videos to your sounds, without opening it": "Idagdag lahat ng video nito sa mga sound mo nang hindi binubuksan",
+  "Couldn't add that playlist: {error}": "Hindi naidagdag ang playlist na 'yan: {error}",
+  "Its videos are on their way to your sounds": "Papunta na ang mga video nito sa mga sound mo",
+  "✓ {n} queued": [
+    "✓ {n} naka-queue",
+    "✓ {n} naka-queue"
+  ]
 }

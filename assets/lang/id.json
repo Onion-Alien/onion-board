@@ -4600,5 +4600,26 @@
   "Mic settings, new presets and new games with Bun": "Pengaturan mic, preset baru dan game baru dengan Bun",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Roda gigi di samping Mic bersih di tab Vokal: volume input, peredam bising, dan preset seperti Ruangan bising. Ini juga menghilangkan ketukan meja dan dengung rendah.",
   "Three new games with Bun": "Tiga game baru dengan Bun",
-  "A Volume slider in Live controls": "Slider Volume di Kontrol live"
+  "A Volume slider in Live controls": "Slider Volume di Kontrol live",
+  "That playlist is empty, or its videos are private.": "Playlist itu kosong, atau videonya privat.",
+  "{n} of {total} video": [
+    "{n} dari {total} video"
+  ],
+  "{n} video": [
+    "{n} video"
+  ],
+  "Double-click to open": "Klik dua kali untuk membuka",
+  "Playlist": "Playlist",
+  "Playlists": "Playlist",
+  "Show its videos, to add some or all of them": "Tampilkan videonya untuk menambahkan sebagian atau semuanya",
+  "Show playlists: open one to add its videos": "Tampilkan playlist: buka satu untuk menambahkan videonya",
+  "Show videos": "Tampilkan video",
+  "Videos": "Video",
+  "Add all": "Tambah semua",
+  "Add all its videos to your sounds, without opening it": "Tambahkan semua videonya ke suaramu tanpa membukanya",
+  "Couldn't add that playlist: {error}": "Playlist itu tidak bisa ditambahkan: {error}",
+  "Its videos are on their way to your sounds": "Videonya sedang menuju suaramu",
+  "✓ {n} queued": [
+    "✓ {n} dalam antrean"
+  ]
 }
