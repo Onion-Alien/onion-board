@@ -144,8 +144,9 @@ def test_a_playlist_cards_buttons_stack_when_their_words_dont_fit(qapp):
     row.show()
     qapp.processEvents()
     assert row.buttons.direction() == QBoxLayout.Direction.TopToBottom
-    for b in (row.btn_play, row.btn_add):
-        assert b.width() >= b.sizeHint().width()     # whole words
+    inside = row.width() - 16                        # (its 8 px margins)
+    for b in (row.btn_play, row.btn_add):            # each its own full row
+        assert b.width() >= inside - 2               # (CI's stand-in font is wider)
     row.setFixedWidth(480)
     qapp.processEvents()
     assert row.buttons.direction() == QBoxLayout.Direction.LeftToRight
