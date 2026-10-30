@@ -2,6 +2,89 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.7.3 — 2026-10-30
+
+- Adding a sound you already have now shows you where it is: the board jumps to a tab that
+  has it (All, when it isn't on the one showing) and a yellow ring pulses round it for a few
+  seconds.
+- Live controls: with *Keep pitch* off, a note under Pitch says how much the speed moves the pitch (Nightcore: +4.5 st), and the total with your own pitch on top. The Pitch slider only holds the shift on top, so it read 0 st.
+- A Voice tab that's switched on (Clean mic, the voice changer, an AI voice, another
+  language) shows a small green dot after its name instead of blue words, and the card at
+  the foot of the sidebar lists each one in green under *On* and *Stop all*, one click to
+  its tab. The lines there (Tor, a proxy, Lite mode) now sit centred between the buttons.
+- The laser duel between the two logos on the Triggers page looks like one now: each logo
+  charges up, fires a glowing bolt that knocks the other one into a wobble with a
+  shower of sparks, and in the last round the beams clash in the middle.
+- Live controls: a Volume slider (0 to 400 %) with quick buttons, on the Sounds, Radio and Apps tabs. Over 100 % the loudest bits are rounded off instead of crackling. Presets leave it where it is; Reset puts it back to 100 %. *Save as new pad* keeps it.
+- Fixed: "Make your own voice" (and other windows opened from a card on the Voice tab) drew a black background with unreadable words in light themes like Retro 98.
+- Changing the theme no longer freezes the window for half a second or more on a full
+  board: only what's on screen is restyled at once, the hidden tabs and closed windows
+  just after.
+- The Apps tab no longer re-reads the running programs every 5 seconds after you leave it
+  when no program there is remembered, sent, recorded or clipped. Cards that went quiet are
+  tidied up when you open the tab again.
+- Bun's loading screen comes up about twice as fast when you open Onion Board (half a
+  second instead of over a second, and about 1 s instead of 2 s right after installing),
+  so there's no blank wait that makes it look like nothing happened. Opening it a second
+  time meanwhile still just brings the first one up, with no second loading screen.
+- Fix: a sound pressed right after the app opens, while it's still loading, now plays
+  as soon as it's ready instead of being ignored (pads, hotkeys and the control API).
+- The usage count no longer reports a failed start when Onion Board was opened twice at
+  once (the installer's last page and a double-click on the desktop icon): the copy that
+  quit as the second launch was counted as a start that died.
+- Onion Board no longer says your mic or speakers can't be found right after it starts
+  (and keeps trying every few seconds) when Windows lists the sound devices slowly.
+- Clean mic has Mic settings (the cog next to its switch), laid out like a voice chat
+  app's voice settings: Input volume, Input sensitivity (automatic, or your own level on a
+  live bar), Noise suppression (Off, Light, Normal, Strong) and Automatic gain control,
+  plus presets: Normal, Loud room, Just my voice and Quiet room. They only change your
+  voice, before your sounds are added.
+- The window no longer freezes while Windows is slow to list the sound devices (a slow
+  audio driver, or a headset being plugged in or out): it shows the last list it had
+  and picks up the new one when Windows answers.
+- The anonymous usage count says a little more when a download, a web search, getting
+  FFmpeg, the mic effect's set-up or an add-on install fails for a reason it had no word
+  for: the error's type and the line of the app's code, a web status or Windows error
+  number, or which wait ran out. Never the message, a link, a path or a title.
+- Bun's games: quick draw, rock paper scissors and tic-tac-toe are gone. In their place are
+  three harder ones he picks at random along with Pong: Dodgeball (dodge his throws, hit
+  him while he winds up), Home run (bat at the ball's height, swing on time, leave the
+  ones outside the box) and Whack-a-Bun (20 Buns before 5 get away, never the carrots).
+  He gets quicker as the points go in, so winning takes real play. The Grid Master and
+  Rock Solid achievements now go with Whack-a-Bun and Home run.
+- **Clean mic** also filters out deep rumble (desk bumps, low hum), and on Normal and
+  Strong turns your mic down between your words, so a TV or someone talking across the
+  room doesn't come through while you're quiet. Your words aren't touched, and it adds
+  no delay.
+- *Clean up my mic* is gone from *Edit voice*: **Clean mic** on the Voice tab does that
+  job now, for every voice and with no voice on. If you used the voice changer with
+  *Clean up my mic* on, Clean mic is switched on for you (Normal) the first time you
+  start this version. Saved voices and share codes that still have the old effect load
+  as before, without it.
+- When the setup guide's mic test fails (the mic won't open, or nothing is heard for 10
+  seconds), or putting your sounds into your mic doesn't work, a "Didn't work? Send us a
+  report" button shows under the message. It first shows what the form will be filled
+  with (Windows version, the mic's name, direct or cable, a short error code), then opens
+  the feedback form in your browser. Nothing is sent unless you submit it.
+- The anonymous usage count now says how the setup guide's mic test went (heard you, stayed
+  quiet, wouldn't open, no mic, or Windows' privacy settings keeping apps off the mic), so
+  mics that don't work can be found and fixed. Never the mic's name; off with Usage count.
+- The pause sign on a paused sound is now two tight bars; some fonts spaced them far apart.
+- Live controls: new presets people actually use: Nightcore (1.3x, pitch rises with it), Slowed + reverb, Bass boosted, Chipmunk, Deep voice and Underwater. Blown out, Concert hall, Canyon and Phone call are gone. On the Radio and Apps tabs, Nightcore and Slowed + reverb change the pitch instead of the speed.
+- Fix: when Clean mic isn't in your copy, a small empty box no longer flashes up on
+  screen for a moment while the app starts.
+- Fix: a notice from a job that finished after its window or dialog was closed no longer
+  shows an error; it is just skipped.
+- An invite from a name in Cyrillic, Chinese, Korean or another non-Latin script now
+  greets your friend with that name on their first start (the installer used to turn it
+  into question marks, so no greeting showed).
+- New **Clean mic** tab, first on the Voice tab: it takes fans, keyboards and other
+  background noise out of your mic while you talk, free and on your own PC (about 5% of
+  one CPU core, ~30 ms). Light or Normal; it works with or without a voice on, stays on
+  from last time, and its chip in the Voice tab's bottom bar turns it off. *Hear the
+  difference* records 5 seconds and plays them back as they were and cleaned, in your
+  headphones only.
+
 ## 2.7.2 — 2026-10-27
 
 - A big board no longer freezes for seconds when its sounds change with many Onion Watch

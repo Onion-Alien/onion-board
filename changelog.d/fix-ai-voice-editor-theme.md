@@ -1,1 +1,0 @@
-- Fixed: "Make your own voice" (and other windows opened from a card on the Voice tab) drew a black background with unreadable words in light themes like Retro 98.

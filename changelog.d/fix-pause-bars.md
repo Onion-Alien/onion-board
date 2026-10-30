@@ -1,1 +1,0 @@
-- The pause sign on a paused sound is now two tight bars; some fonts spaced them far apart.

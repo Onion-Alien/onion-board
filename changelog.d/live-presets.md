@@ -1,1 +1,0 @@
-- Live controls: new presets people actually use: Nightcore (1.3x, pitch rises with it), Slowed + reverb, Bass boosted, Chipmunk, Deep voice and Underwater. Blown out, Concert hall, Canyon and Phone call are gone. On the Radio and Apps tabs, Nightcore and Slowed + reverb change the pitch instead of the speed.
