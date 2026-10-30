@@ -479,6 +479,25 @@ def test_a_set_up_cut_off_anywhere_can_be_undone(fake_reg, mic):
         assert not _all_ours(fake_reg) and not fake_reg.installed_on()
 
 
+def test_deleting_an_empty_effect_key_reaches_windows(monkeypatch, caplog):
+    """The real RegDeleteKeyW call, on a key that isn't there: HKEY_LOCAL_MACHINE used
+    to overflow ctypes' C int (ArgumentError) and stop the uninstall."""
+    from soundboard.mic import micadmin
+
+    class Empty:
+        h = None
+        def __enter__(self):
+            return self
+        def __exit__(self, *a):
+            pass
+
+    monkeypatch.setattr(micadmin, "_BackupKey", lambda path, create=True: Empty())
+    monkeypatch.setattr(micadmin.winreg, "QueryInfoKey", lambda h: (0, 0, 0))
+    with caplog.at_level("WARNING", logger=dm.log.name):
+        micadmin._delete_if_empty(r"SOFTWARE\OnionBoardTest\NotThere-7f3c\FxProperties")
+    assert "couldn't delete" in caplog.text
+
+
 @pytest.mark.parametrize("mic", MICS)
 def test_an_uninstall_cut_off_anywhere_finishes_on_the_next_run(fake_reg, mic):
     """Taking it off killed part-way (a crash, a reboot): the effect may already be out

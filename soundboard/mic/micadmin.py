@@ -572,8 +572,16 @@ def _delete_if_empty(path: str):
     with _BackupKey(path, create=False) as k:
         n = winreg.QueryInfoKey(k.h)
     if n[0] == 0 and n[1] == 0:
+        from ctypes import wintypes
         advapi = ctypes.WinDLL("advapi32", use_last_error=True)
-        advapi.RegDeleteKeyW(winreg.HKEY_LOCAL_MACHINE, path)
+        fn = advapi.RegDeleteKeyW
+        # without these, ctypes passes HKEY_LOCAL_MACHINE (0x80000002) as a C int:
+        # ArgumentError, and the effect's notes were never cleared
+        fn.argtypes = [wintypes.HKEY, wintypes.LPCWSTR]
+        fn.restype = wintypes.LONG
+        err = fn(winreg.HKEY_LOCAL_MACHINE, path)
+        if err:   # an empty key left behind is harmless
+            log.warning("couldn't delete the empty %s: %s", path, ctypes.FormatError(err))
 
 
 # Who may do what in the data folders. %ProgramData%\OnionBoard: admins only (its logs
