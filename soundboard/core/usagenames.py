@@ -39,7 +39,7 @@ MIC_FAILS = ("unanswered", "no-start", "stuck", "silent", "no-helper", "no-mic",
 MIC_RAISED = ("at-register", "at-mic-settings", "at-ring", "at-files", "at-audio",
               "at-rights", "at-other", "at-unlogged", "denied", "in-use", "missing",
               "type", "value", "key", "attr", "index", "runtime", "assert", "os",
-              "timeout", "memory", "other",
+              "timeout", "memory", "ctypes", "other",
               "err-2", "err-3", "err-5", "err-32", "err-33", "err-87", "err-1224",
               "err-1314", "err-other", "err-none")
 # exit code 6 (Windows' audio wouldn't stop): which of its services was still up, that
@@ -47,8 +47,10 @@ MIC_RAISED = ("at-register", "at-mic-settings", "at-ring", "at-files", "at-audio
 # from the admin log)
 MIC_STUCK = ("audio", "builder", "both", "unknown", "other", "unlogged")
 # exit code 8 (the effect didn't start on its mic): what the effect's own log showed
-# instead, or that the step logged nothing (directmic UNSTARTED_WHY)
-MIC_UNSTARTED = ("silent", "no-init", "unnamed", "other-mics", "other", "unlogged")
+# instead (with nothing in it: its DLL gone, Audio enhancements off, never a log), or
+# that the step logged nothing (directmic UNSTARTED_WHY)
+MIC_UNSTARTED = ("silent", "no-dll", "enh-off", "never-logged", "no-init", "unnamed",
+                 "other-mics", "other", "unlogged")
 # why a download from a link or search failed (errors.download_reason): the kind only
 DL_FAILS = ("private", "age", "bot", "members", "region", "gone", "no-formats", "429",
             "403", "5xx", "stalled", "timeout", "cut-off", "offline", "proxy", "sign-in",

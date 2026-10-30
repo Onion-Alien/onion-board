@@ -1404,9 +1404,48 @@ def test_an_effect_that_didnt_start_logs_what_its_log_showed(monkeypatch, tmp_pa
     now = [0.0]
     monkeypatch.setattr(dm.time, "monotonic", lambda: now[0])
     monkeypatch.setattr(dm, "_mics_open", lambda guids: now.__setitem__(0, now[0] + 3))
+    monkeypatch.setattr(dm, "_silent_how", lambda guids: "silent")
     with caplog.at_level("WARNING"):
         assert not _REAL_EFFECT_RUNS(["{aaaa}"], 0)
     assert f"{dm.UNSTARTED} {how}" in caplog.text
+
+
+@pytest.mark.parametrize("dll, enh_off, log_text, how", [
+    (None, 0, "x", "no-dll"),            # not registered at all
+    ("gone.dll", 0, "x", "no-dll"),      # registered, but the file was taken away
+    ("obmic.dll", 1, "x", "enh-off"),    # "Audio enhancements: off" on the mic again
+    ("obmic.dll", 0, None, "never-logged"),
+    ("obmic.dll", 0, "x", "silent"),
+])
+def test_an_effect_that_logged_nothing_says_why_it_may_have(monkeypatch, tmp_path, dll,
+                                                            enh_off, log_text, how):
+    """Exit code 8 "silent" was most of them and told nothing: an effect file gone (an
+    antivirus), enhancements switched off on the mic, or no log ever written on the PC
+    are told apart now."""
+    (tmp_path / "obmic.dll").write_bytes(b"MZ")
+    if log_text is not None:
+        (tmp_path / dm.APO_LOG).write_text(log_text, encoding="utf-8")
+    monkeypatch.setattr(dm, "data_dir", lambda: tmp_path)
+    values = {rf"SOFTWARE\Classes\CLSID\{dm.CLSID}\InprocServer32".lower():
+              {"": str(tmp_path / dll)} if dll else None,
+              rf"{dm.CAPTURE_KEY}\{{aaaa}}\FxProperties".lower(): {dm.DISABLE_SYSFX: enh_off}}
+
+    class Key:
+        def __init__(self, root, path, *a):
+            if values.get(path.lower()) is None:
+                raise FileNotFoundError(path)
+            self.vals = values[path.lower()]
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            pass
+
+    monkeypatch.setattr(dm.winreg, "OpenKey", Key)
+    monkeypatch.setattr(dm.winreg, "QueryValueEx", lambda k, name: (k.vals[name], 1))
+    assert dm._unstarted_how("", ["{aaaa}"]) == how
+    assert how in dm.UNSTARTED_WHY
 
 
 def test_what_the_effect_showed_is_read_from_the_log(tmp_path, monkeypatch):

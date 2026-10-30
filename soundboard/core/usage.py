@@ -535,7 +535,7 @@ def warned_at(kind: str, where: str = "") -> None:
 
 # the counts that only said "another reason" or "timed out", given a detail by failed()
 FAILED = ("dl-other", "search-other", "search-timeout", "ffmpeg-broken", "ffmpeg-get",
-          "mic-code-1", "mic-code", "addon-other")
+          "mic-code-1", "mic-code", "addon-other", "addon-step")
 # one part of a failed() detail: a word or number we made (`helper`, `http-403`,
 # `err-10013`), or an error's type with the deepest of our own lines
 # (`OSError@soundboard/addons/modules.py:771`); never a message, a path or a link
