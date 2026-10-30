@@ -4700,7 +4700,7 @@
   ],
   "{name}: your preset. Right-click to rename or delete it": "{name}: un tuo preset. Clic destro per rinominarlo o eliminarlo",
   "{n} more of your presets": [
-    "Un altro tuo preset",
+    "Ancora {n} tuo preset",
     "Altri {n} tuoi preset"
   ],
   "“{name}” is a built-in preset's name. Pick another one.": "“{name}” è il nome di un preset integrato. Scegline un altro."
