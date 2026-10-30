@@ -4706,5 +4706,26 @@
   "✓ {n} queued": [
     "✓ {n} na fila",
     "✓ {n} na fila"
-  ]
+  ],
+  "Delete this preset": "Excluir esta predefinição",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Guardar a velocidade, o tom, os efeitos e o volume de agora como uma predefinição sua",
+  "Keep these effects as a preset of your own, in this list for every sound": "Guardar estes efeitos como uma predefinição sua, nesta lista para todos os sons",
+  "More ({n})": "Mais ({n})",
+  "My preset": "Minha predefinição",
+  "My presets": "Minhas predefinições",
+  "None saved yet": "Nada salvo ainda",
+  "Rename preset": "Renomear predefinição",
+  "Save as preset": "Salvar como predefinição",
+  "Save preset": "Salvar predefinição",
+  "You already have a preset called “{name}”. Replace it?": "Você já tem uma predefinição chamada “{name}”. Substituir?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "Você tem {n} predefinição, o máximo possível. Exclua uma primeiro.",
+    "Você tem {n} predefinições, o máximo possível. Exclua uma primeiro."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: sua predefinição. Clique com o botão direito para renomear ou excluir",
+  "{n} more of your presets": [
+    "Mais {n} predefinição sua",
+    "Mais {n} predefinições suas"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” é o nome de uma predefinição embutida. Escolha outro."
 }

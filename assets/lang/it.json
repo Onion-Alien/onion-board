@@ -4706,5 +4706,26 @@
   "✓ {n} queued": [
     "✓ {n} in coda",
     "✓ {n} in coda"
-  ]
+  ],
+  "Delete this preset": "Elimina questo preset",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Tieni velocità, tono, effetti e volume di adesso come un tuo preset",
+  "Keep these effects as a preset of your own, in this list for every sound": "Tieni questi effetti come un tuo preset, in questa lista per ogni suono",
+  "More ({n})": "Altri ({n})",
+  "My preset": "Il mio preset",
+  "My presets": "I miei preset",
+  "None saved yet": "Ancora niente di salvato",
+  "Rename preset": "Rinomina preset",
+  "Save as preset": "Salva come preset",
+  "Save preset": "Salva preset",
+  "You already have a preset called “{name}”. Replace it?": "Hai già un preset chiamato “{name}”. Sostituirlo?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "Hai {n} preset, il massimo possibile. Eliminane prima uno.",
+    "Hai {n} preset, il massimo possibile. Eliminane prima uno."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: un tuo preset. Clic destro per rinominarlo o eliminarlo",
+  "{n} more of your presets": [
+    "Ancora {n} tuo preset",
+    "Altri {n} tuoi preset"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” è il nome di un preset integrato. Scegline un altro."
 }

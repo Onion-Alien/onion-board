@@ -234,3 +234,33 @@ def test_an_install_that_crashes_says_its_type_and_place(tmp_path, seen, monkeyp
     assert event.startswith(f"failed/{__version__}/addon-other/live-voice/KeyError@"
                             "soundboard/addons/modules.py:")
     assert "private" not in event
+
+
+@pytest.mark.parametrize("printed, why", [
+    ("", "silent"),
+    ("ERROR: Could not find a version that satisfies the requirement torch==9", "no-match"),
+    ("WARNING: Retrying ... ReadTimeoutError: Read timed out.", "network"),
+    ("SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED]'))", "ssl"),
+    ("OSError: [Errno 28] No space left on device", "disk"),
+    ("ERROR: Could not install packages due to an OSError: [WinError 5] Access is denied",
+     "denied"),
+    ("OSError: [WinError 206] The filename or extension is too long", "long-path"),
+    ("error: Microsoft Visual C++ 14.0 or greater is required", "build"),
+    ("something nobody has seen", "other"),
+])
+def test_a_failed_step_counts_why_from_what_it_printed(tmp_path, monkeypatch, caplog,
+                                                       printed, why):
+    """"pip failed" told nothing: why it did is read from the end of what it printed, logged
+    with those lines, and counted as a fixed word (never the text)."""
+    got = []
+    monkeypatch.setattr(usage, "used", lambda name: None)
+    monkeypatch.setattr(usage, "failed", lambda what, *d: got.append((what, *d)))
+    code = f"import sys; print({printed!r}) if {printed!r} else None; sys.exit(1)"
+    m = addon(tmp_path / "live-voice", [["{python}", "-c", code, "-m", "pip", "install"]])
+    with caplog.at_level("WARNING"):
+        assert not modules.install(m, lambda line: None)
+    assert got == [("addon-step", "live-voice", "pip", why)]
+    assert why in modules.OUTPUT_WORDS
+    assert f"({why})" in caplog.text
+    if printed:
+        assert printed in caplog.text

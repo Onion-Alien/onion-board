@@ -918,21 +918,54 @@ def _apo_log_capped(text: str) -> bool:
 
 
 # the line logged when the effect didn't start on a mic (directmic.unstarted_why reads
-# it), with what its log showed instead: nothing at all (Windows loaded it nowhere, or it
-# couldn't write its log), lines but no start, starts on a mic it couldn't name, or
-# starts only on other mics
+# it), with what its log showed instead: nothing at all, and then (_silent_how) its DLL
+# gone from where it's registered (an antivirus took it), "Audio enhancements: off" on
+# the mic again, no log ever written on this PC, or none of those; lines but no start,
+# starts on a mic it couldn't name, or starts only on other mics
 UNSTARTED = "effect not started:"
-UNSTARTED_HOW = ("silent", "no-init", "unnamed", "other-mics")
+UNSTARTED_HOW = ("silent", "no-dll", "enh-off", "never-logged", "no-init", "unnamed",
+                 "other-mics")
 
 
-def _unstarted_how(text: str) -> str:
+def _unstarted_how(text: str, guids: Sequence[str] = ()) -> str:
     """An UNSTARTED_HOW word for the effect's log `text` (since a mark, lowercased) when
-    it didn't start on a mic it's on."""
+    it didn't start on the mics `guids` it's on."""
     if not text.strip():
-        return "silent"
+        return _silent_how(guids)
     starts = re.findall(r"initialize: endpoint ([^,\s]*)", text)
     return ("no-init" if not starts else "unnamed" if not all(starts) else
             "other-mics")
+
+
+def _silent_how(guids: Sequence[str]) -> str:
+    """Why the effect logged nothing at all on the mics `guids`, as far as can be told:
+    "no-dll" (the file Windows is told to load isn't there), "enh-off" ("Audio
+    enhancements: off" on one of them: Windows starts no effect there), "never-logged"
+    (its log was never written on this PC), else "silent". A check: never fails."""
+    try:
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                            rf"SOFTWARE\Classes\CLSID\{CLSID}\InprocServer32") as k:
+            dll = winreg.QueryValueEx(k, "")[0]
+        if not Path(dll).is_file():
+            log.warning("the effect's DLL isn't there any more: %s", dll)
+            return "no-dll"
+    except OSError:
+        log.warning("the effect isn't registered")
+        return "no-dll"
+    for g in guids:
+        try:
+            with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                                rf"{CAPTURE_KEY}\{g}\FxProperties") as k:
+                off = winreg.QueryValueEx(k, DISABLE_SYSFX)[0]
+        except OSError:
+            continue
+        if off:
+            log.warning("audio enhancements are off on %s", g)
+            return "enh-off"
+    if _apo_log_size() == 0:
+        log.warning("the effect has never written its log on this PC")
+        return "never-logged"
+    return "silent"
 
 
 def _effect_runs(guids: Sequence[str], mark: int) -> bool:
@@ -958,7 +991,7 @@ def _effect_runs(guids: Sequence[str], mark: int) -> bool:
         if waiting:
             log.warning("the effect didn't start on %s", ", ".join(waiting))
             # what its log showed instead, for the app to count (unstarted_why)
-            log.warning("%s %s", UNSTARTED, _unstarted_how(text))
+            log.warning("%s %s", UNSTARTED, _unstarted_how(text, waiting))
         return not waiting
     except Exception:  # noqa: BLE001
         log.info("couldn't check that the effect started", exc_info=True)

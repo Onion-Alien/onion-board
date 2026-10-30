@@ -4706,5 +4706,26 @@
   "✓ {n} queued": [
     "✓ {n} i kø",
     "✓ {n} i kø"
-  ]
+  ],
+  "Delete this preset": "Slett dette forhåndsvalget",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Lagre hastigheten, tonehøyden, effektene og volumet du har nå som ditt eget forhåndsvalg",
+  "Keep these effects as a preset of your own, in this list for every sound": "Lagre disse effektene som ditt eget forhåndsvalg, i denne listen for alle lyder",
+  "More ({n})": "Flere ({n})",
+  "My preset": "Mitt forhåndsvalg",
+  "My presets": "Mine forhåndsvalg",
+  "None saved yet": "Ingenting lagret ennå",
+  "Rename preset": "Gi nytt navn til forhåndsvalg",
+  "Save as preset": "Lagre som forhåndsvalg",
+  "Save preset": "Lagre forhåndsvalg",
+  "You already have a preset called “{name}”. Replace it?": "Du har allerede et forhåndsvalg som heter «{name}». Bytte det ut?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "Du har {n} forhåndsvalg, det er det meste. Slett ett først.",
+    "Du har {n} forhåndsvalg, det er det meste. Slett ett først."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: ditt forhåndsvalg. Høyreklikk for å gi nytt navn eller slette",
+  "{n} more of your presets": [
+    "{n} til av forhåndsvalgene dine",
+    "{n} til av forhåndsvalgene dine"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "«{name}» er navnet på et innebygd forhåndsvalg. Velg et annet."
 }

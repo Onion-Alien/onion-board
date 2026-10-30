@@ -4706,5 +4706,26 @@
   "✓ {n} queued": [
     "✓ {n} कतार में",
     "✓ {n} कतार में"
-  ]
+  ],
+  "Delete this preset": "यह प्रीसेट हटाएँ",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "अभी की स्पीड, पिच, इफ़ेक्ट और वॉल्यूम को अपने प्रीसेट के रूप में रखें",
+  "Keep these effects as a preset of your own, in this list for every sound": "इन इफ़ेक्ट को अपने प्रीसेट के रूप में रखें, हर साउंड के लिए इस सूची में",
+  "More ({n})": "और ({n})",
+  "My preset": "मेरा प्रीसेट",
+  "My presets": "मेरे प्रीसेट",
+  "None saved yet": "अभी कुछ सेव नहीं है",
+  "Rename preset": "प्रीसेट का नाम बदलें",
+  "Save as preset": "प्रीसेट के रूप में सेव करें",
+  "Save preset": "प्रीसेट सेव करें",
+  "You already have a preset called “{name}”. Replace it?": "“{name}” नाम का प्रीसेट पहले से आपके पास है। उसे बदलें?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "आपके पास {n} प्रीसेट है, इससे ज़्यादा नहीं हो सकते। पहले एक हटाएँ।",
+    "आपके पास {n} प्रीसेट हैं, इससे ज़्यादा नहीं हो सकते। पहले एक हटाएँ।"
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: आपका प्रीसेट। नाम बदलने या हटाने के लिए राइट-क्लिक करें",
+  "{n} more of your presets": [
+    "आपका {n} और प्रीसेट",
+    "आपके {n} और प्रीसेट"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” एक बिल्ट-इन प्रीसेट का नाम है। कोई दूसरा चुनें।"
 }

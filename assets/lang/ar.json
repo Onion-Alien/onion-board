@@ -5046,5 +5046,34 @@
     "✓ {n} في الانتظار",
     "✓ {n} في الانتظار",
     "✓ {n} في الانتظار"
-  ]
+  ],
+  "Delete this preset": "احذف هذا الإعداد",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "احفظ السرعة والحدّة والمؤثرات ومستوى الصوت الحالية كإعداد خاص بك",
+  "Keep these effects as a preset of your own, in this list for every sound": "احفظ هذه المؤثرات كإعداد خاص بك، في هذه القائمة لكل الأصوات",
+  "More ({n})": "المزيد ({n})",
+  "My preset": "إعدادي",
+  "My presets": "إعداداتي",
+  "None saved yet": "لا شيء محفوظ بعد",
+  "Rename preset": "أعد تسمية الإعداد",
+  "Save as preset": "احفظ كإعداد",
+  "Save preset": "احفظ الإعداد",
+  "You already have a preset called “{name}”. Replace it?": "لديك إعداد باسم “{name}” بالفعل. أتستبدله؟",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "لديك {n} إعدادات، وهذا الحد الأقصى. احذف واحدًا أولًا.",
+    "لديك {n} إعداد، وهذا الحد الأقصى. احذفه أولًا.",
+    "لديك {n} إعدادان، وهذا الحد الأقصى. احذف واحدًا أولًا.",
+    "لديك {n} إعدادات، وهذا الحد الأقصى. احذف واحدًا أولًا.",
+    "لديك {n} إعدادًا، وهذا الحد الأقصى. احذف واحدًا أولًا.",
+    "لديك {n} إعداد، وهذا الحد الأقصى. احذف واحدًا أولًا."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: إعدادك. انقر بالزر الأيمن لإعادة تسميته أو حذفه",
+  "{n} more of your presets": [
+    "{n} من إعداداتك",
+    "{n} إعداد آخر من إعداداتك",
+    "{n} إعدادان آخران من إعداداتك",
+    "{n} إعدادات أخرى من إعداداتك",
+    "{n} إعدادًا آخر من إعداداتك",
+    "{n} إعداد آخر من إعداداتك"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” اسم إعداد مدمج. اختر اسمًا آخر."
 }

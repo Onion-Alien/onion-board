@@ -4706,5 +4706,26 @@
   "✓ {n} queued": [
     "✓ {n} in der Warteschlange",
     "✓ {n} in der Warteschlange"
-  ]
+  ],
+  "Delete this preset": "Diese Vorlage löschen",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Tempo, Tonhöhe, Effekte und Lautstärke von jetzt als eigene Vorlage speichern",
+  "Keep these effects as a preset of your own, in this list for every sound": "Diese Effekte als eigene Vorlage speichern, in dieser Liste für jeden Sound",
+  "More ({n})": "Mehr ({n})",
+  "My preset": "Meine Vorlage",
+  "My presets": "Meine Vorlagen",
+  "None saved yet": "Noch nichts gespeichert",
+  "Rename preset": "Vorlage umbenennen",
+  "Save as preset": "Als Vorlage speichern",
+  "Save preset": "Vorlage speichern",
+  "You already have a preset called “{name}”. Replace it?": "Du hast schon eine Vorlage namens „{name}“. Ersetzen?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "Du hast {n} Vorlage, mehr geht nicht. Lösch zuerst eine.",
+    "Du hast {n} Vorlagen, mehr geht nicht. Lösch zuerst eine."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: deine Vorlage. Rechtsklick zum Umbenennen oder Löschen",
+  "{n} more of your presets": [
+    "{n} weitere deiner Vorlagen",
+    "{n} weitere deiner Vorlagen"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "„{name}“ ist der Name einer eingebauten Vorlage. Wähl einen anderen."
 }

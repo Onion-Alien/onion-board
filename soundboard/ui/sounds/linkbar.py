@@ -541,6 +541,7 @@ class LinkBar(QFrame):
         path = got[1] if got else None
         title = ""
         keep = False
+        dup = False
         try:
             if path is None:
                 emit("progress", url, "parsing")
@@ -568,6 +569,7 @@ class LinkBar(QFrame):
             fp = fingerprint(str(path))
             if fp and fp in known:
                 emit("dup", url, fp)   # counted apart from a failed download
+                dup = True
                 raise ytdl.DownloadError(_("It's already in your Sounds as “{name}”.",
                                            name=known[fp]))
             # named after the video, in a folder for the site: YouTube/<title>.flac
@@ -609,7 +611,7 @@ class LinkBar(QFrame):
             log.warning("link %s failed for %s: %s", kind, url, e)
             why = errors.download_reason(e)
             emit("why", url, why)   # for the usage count only
-            if why == "other":   # what's known of it, never its words (usage.failed)
+            if why == "other" and not dup:   # what's known of it, never its words
                 usage.failed("dl-other", *usage.error_detail(e))
             # a bot check or rate limit is about the user's address, not yt-dlp; with
             # auto-update on, download_audio() already tried a newer one

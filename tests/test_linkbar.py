@@ -151,6 +151,24 @@ def test_thumbnail_failure_does_not_fail_successful_import(qapp, monkeypatch, tm
     assert done == [(URL, "add", True)]
 
 
+def test_a_sound_already_had_is_not_counted_as_a_failed_download(qapp, monkeypatch,
+                                                                  tmp_path):
+    from soundboard.ui.sounds import linkbar
+
+    bar, eng = _bar()
+    data = np.zeros((480, 2), np.int16)
+    failed, imported, already = [], [], []
+    monkeypatch.setattr(linkbar, "fingerprint", lambda path: "fp")
+    monkeypatch.setattr(linkbar, "import_file", lambda *a, **kw: imported.append(a))
+    monkeypatch.setattr(linkbar.usage, "failed", lambda *a: failed.append(a))
+    bar.already_have.connect(already.append)
+    bar._busy, bar._busy_url = "add", URL
+    bar._work("add", URL, (URL, tmp_path / "clip.wav", data, 1.0), "#fff",
+              {"fp": "Clip"}, False)
+    assert already == ["fp"] and not imported
+    assert failed == []   # its own count (dl-already-have), not "another reason"
+
+
 OTHER = "https://www.youtube.com/watch?v=other"
 
 

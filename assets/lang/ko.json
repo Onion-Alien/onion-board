@@ -4621,5 +4621,24 @@
   "Its videos are on their way to your sounds": "동영상을 사운드에 추가하는 중이에요",
   "✓ {n} queued": [
     "✓ {n}개 대기 중"
-  ]
+  ],
+  "Delete this preset": "이 프리셋 삭제",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "지금의 속도, 피치, 효과, 볼륨을 내 프리셋으로 저장",
+  "Keep these effects as a preset of your own, in this list for every sound": "이 효과를 내 프리셋으로 저장해 모든 사운드의 이 목록에 넣습니다",
+  "More ({n})": "더 보기 ({n})",
+  "My preset": "내 프리셋",
+  "My presets": "내 프리셋",
+  "None saved yet": "아직 저장된 것이 없습니다",
+  "Rename preset": "프리셋 이름 바꾸기",
+  "Save as preset": "프리셋으로 저장",
+  "Save preset": "프리셋 저장",
+  "You already have a preset called “{name}”. Replace it?": "“{name}”(이)라는 프리셋이 이미 있습니다. 바꾸시겠습니까?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "프리셋이 {n}개로 최대입니다. 먼저 하나를 삭제하세요."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: 내 프리셋. 마우스 오른쪽 버튼으로 이름을 바꾸거나 삭제",
+  "{n} more of your presets": [
+    "내 프리셋 {n}개 더"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}”은(는) 기본 제공 프리셋의 이름입니다. 다른 이름을 고르세요."
 }

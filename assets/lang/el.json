@@ -4706,5 +4706,26 @@
   "✓ {n} queued": [
     "✓ {n} σε αναμονή",
     "✓ {n} σε αναμονή"
-  ]
+  ],
+  "Delete this preset": "Διαγραφή αυτής της προεπιλογής",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Κράτα την ταχύτητα, τον τόνο, τα εφέ και την ένταση που έχεις τώρα ως δική σου προεπιλογή",
+  "Keep these effects as a preset of your own, in this list for every sound": "Κράτα αυτά τα εφέ ως δική σου προεπιλογή, σε αυτή τη λίστα για κάθε ήχο",
+  "More ({n})": "Περισσότερα ({n})",
+  "My preset": "Η προεπιλογή μου",
+  "My presets": "Οι προεπιλογές μου",
+  "None saved yet": "Τίποτα αποθηκευμένο ακόμα",
+  "Rename preset": "Μετονομασία προεπιλογής",
+  "Save as preset": "Αποθήκευση ως προεπιλογή",
+  "Save preset": "Αποθήκευση προεπιλογής",
+  "You already have a preset called “{name}”. Replace it?": "Έχεις ήδη προεπιλογή με όνομα «{name}». Να αντικατασταθεί;",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "Έχεις {n} προεπιλογή, όσες χωράνε. Διάγραψε πρώτα μία.",
+    "Έχεις {n} προεπιλογές, όσες χωράνε. Διάγραψε πρώτα μία."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: δική σου προεπιλογή. Δεξί κλικ για μετονομασία ή διαγραφή",
+  "{n} more of your presets": [
+    "Ακόμα {n} προεπιλογή σου",
+    "Ακόμα {n} προεπιλογές σου"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "Το «{name}» είναι όνομα ενσωματωμένης προεπιλογής. Διάλεξε άλλο."
 }

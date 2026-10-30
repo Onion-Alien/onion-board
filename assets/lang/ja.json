@@ -4621,5 +4621,24 @@
   "Its videos are on their way to your sounds": "中の動画をサウンドに追加しています",
   "✓ {n} queued": [
     "✓ {n}件を待機中"
-  ]
+  ],
+  "Delete this preset": "このプリセットを削除",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "今の速度・ピッチ・エフェクト・音量を自分のプリセットとして保存",
+  "Keep these effects as a preset of your own, in this list for every sound": "このエフェクトを自分のプリセットとして保存し、すべてのサウンドのこの一覧に入れます",
+  "More ({n})": "その他 ({n})",
+  "My preset": "マイプリセット",
+  "My presets": "マイプリセット",
+  "None saved yet": "まだ保存されていません",
+  "Rename preset": "プリセット名を変更",
+  "Save as preset": "プリセットとして保存",
+  "Save preset": "プリセットを保存",
+  "You already have a preset called “{name}”. Replace it?": "「{name}」というプリセットはすでにあります。置き換えますか？",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "プリセットが {n} 個あり、これ以上は作れません。先に1つ削除してください。"
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: 自分のプリセット。右クリックで名前の変更や削除",
+  "{n} more of your presets": [
+    "ほかに {n} 個のプリセット"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "「{name}」は組み込みのプリセットの名前です。別の名前にしてください。"
 }

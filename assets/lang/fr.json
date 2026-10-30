@@ -4706,5 +4706,26 @@
   "✓ {n} queued": [
     "✓ {n} en attente",
     "✓ {n} en attente"
-  ]
+  ],
+  "Delete this preset": "Supprimer ce préréglage",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Garde la vitesse, la hauteur, les effets et le volume actuels comme ton propre préréglage",
+  "Keep these effects as a preset of your own, in this list for every sound": "Garde ces effets comme ton propre préréglage, dans cette liste pour tous les sons",
+  "More ({n})": "Plus ({n})",
+  "My preset": "Mon préréglage",
+  "My presets": "Mes préréglages",
+  "None saved yet": "Rien d'enregistré pour l'instant",
+  "Rename preset": "Renommer le préréglage",
+  "Save as preset": "Enregistrer comme préréglage",
+  "Save preset": "Enregistrer le préréglage",
+  "You already have a preset called “{name}”. Replace it?": "Tu as déjà un préréglage appelé « {name} ». Le remplacer ?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "Tu as {n} préréglage, le maximum possible. Supprimes-en un d'abord.",
+    "Tu as {n} préréglages, le maximum possible. Supprimes-en un d'abord."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name} : ton préréglage. Clic droit pour le renommer ou le supprimer",
+  "{n} more of your presets": [
+    "{n} autre de tes préréglages",
+    "{n} autres de tes préréglages"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "« {name} » est le nom d'un préréglage intégré. Choisis-en un autre."
 }

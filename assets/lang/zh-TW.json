@@ -4621,5 +4621,24 @@
   "Its videos are on their way to your sounds": "裡面的影片正在加入你的音效",
   "✓ {n} queued": [
     "✓ 已排隊 {n} 個"
-  ]
+  ],
+  "Delete this preset": "刪除這個預設集",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "把現在的速度、音高、效果和音量存成你自己的預設集",
+  "Keep these effects as a preset of your own, in this list for every sound": "把這些效果存成你自己的預設集，放進每個音效的這個清單",
+  "More ({n})": "更多 ({n})",
+  "My preset": "我的預設集",
+  "My presets": "我的預設集",
+  "None saved yet": "還沒有儲存的預設集",
+  "Rename preset": "重新命名預設集",
+  "Save as preset": "另存為預設集",
+  "Save preset": "儲存預設集",
+  "You already have a preset called “{name}”. Replace it?": "你已經有名為「{name}」的預設集。要取代它嗎？",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "你已有 {n} 個預設集，已達上限。請先刪除一個。"
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}：你的預設集。按右鍵可重新命名或刪除",
+  "{n} more of your presets": [
+    "另外 {n} 個你的預設集"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "「{name}」是內建預設集的名稱。請換一個。"
 }

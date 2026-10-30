@@ -4621,5 +4621,24 @@
   "Its videos are on their way to your sounds": "里面的视频正在添加到你的声音",
   "✓ {n} queued": [
     "✓ 已排队 {n} 个"
-  ]
+  ],
+  "Delete this preset": "删除此预设",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "把现在的速度、音调、效果和音量存为你自己的预设",
+  "Keep these effects as a preset of your own, in this list for every sound": "把这些效果存为你自己的预设，放进所有声音的这个列表",
+  "More ({n})": "更多 ({n})",
+  "My preset": "我的预设",
+  "My presets": "我的预设",
+  "None saved yet": "还没有保存的预设",
+  "Rename preset": "重命名预设",
+  "Save as preset": "另存为预设",
+  "Save preset": "保存预设",
+  "You already have a preset called “{name}”. Replace it?": "你已经有一个名为“{name}”的预设。要替换它吗？",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "你已有 {n} 个预设，已达上限。请先删除一个。"
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}：你的预设。右键可重命名或删除",
+  "{n} more of your presets": [
+    "另外 {n} 个你的预设"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}”是内置预设的名称。请换一个。"
 }

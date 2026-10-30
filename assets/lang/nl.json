@@ -4706,5 +4706,26 @@
   "✓ {n} queued": [
     "✓ {n} in de wachtrij",
     "✓ {n} in de wachtrij"
-  ]
+  ],
+  "Delete this preset": "Deze voorinstelling verwijderen",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Bewaar de snelheid, toonhoogte, effecten en het volume van nu als je eigen voorinstelling",
+  "Keep these effects as a preset of your own, in this list for every sound": "Bewaar deze effecten als je eigen voorinstelling, in deze lijst voor elk geluid",
+  "More ({n})": "Meer ({n})",
+  "My preset": "Mijn voorinstelling",
+  "My presets": "Mijn voorinstellingen",
+  "None saved yet": "Nog niets opgeslagen",
+  "Rename preset": "Voorinstelling hernoemen",
+  "Save as preset": "Opslaan als voorinstelling",
+  "Save preset": "Voorinstelling opslaan",
+  "You already have a preset called “{name}”. Replace it?": "Je hebt al een voorinstelling met de naam “{name}”. Vervangen?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "Je hebt {n} voorinstelling, meer kan niet. Verwijder er eerst een.",
+    "Je hebt {n} voorinstellingen, meer kan niet. Verwijder er eerst een."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: je eigen voorinstelling. Rechtsklik om te hernoemen of te verwijderen",
+  "{n} more of your presets": [
+    "Nog {n} van je voorinstellingen",
+    "Nog {n} van je voorinstellingen"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” is de naam van een ingebouwde voorinstelling. Kies een andere."
 }
