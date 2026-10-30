@@ -4683,6 +4683,30 @@
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "El engranaje junto a Micrófono limpio en la pestaña Voz: volumen de entrada, supresión de ruido y ajustes como Cuarto ruidoso. También quita los golpes en el escritorio y el zumbido grave.",
   "Three new games with Bun": "Tres juegos nuevos con Bun",
   "A Volume slider in Live controls": "Un control de volumen en Controles en vivo",
+  "That playlist is empty, or its videos are private.": "Esa playlist está vacía o sus videos son privados.",
+  "{n} of {total} video": [
+    "{n} de {total} video",
+    "{n} de {total} videos"
+  ],
+  "{n} video": [
+    "{n} video",
+    "{n} videos"
+  ],
+  "Double-click to open": "Doble clic para abrir",
+  "Playlist": "Playlist",
+  "Playlists": "Playlists",
+  "Show its videos, to add some or all of them": "Muestra sus videos para agregar algunos o todos",
+  "Show playlists: open one to add its videos": "Mostrar playlists: abre una para agregar sus videos",
+  "Show videos": "Mostrar videos",
+  "Videos": "Videos",
+  "Add all": "Agregar todo",
+  "Add all its videos to your sounds, without opening it": "Agrega todos sus videos a tus sonidos sin abrirla",
+  "Couldn't add that playlist: {error}": "No se pudo agregar esa playlist: {error}",
+  "Its videos are on their way to your sounds": "Sus videos van en camino a tus sonidos",
+  "✓ {n} queued": [
+    "✓ {n} en cola",
+    "✓ {n} en cola"
+  ],
   "Delete this preset": "Eliminar este preajuste",
   "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Guarda la velocidad, el tono, los efectos y el volumen que tienes ahora como un preajuste tuyo",
   "Keep these effects as a preset of your own, in this list for every sound": "Guarda estos efectos como un preajuste tuyo, en esta lista para todos los sonidos",

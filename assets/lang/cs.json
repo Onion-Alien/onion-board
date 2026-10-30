@@ -4765,6 +4765,33 @@
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Ozubené kolečko vedle Čistého mikrofonu na kartě Hlas: hlasitost vstupu, potlačení šumu a předvolby jako Hlučná místnost. Odfiltruje i ťukání do stolu a nízký brum.",
   "Three new games with Bun": "Tři nové hry s Bunem",
   "A Volume slider in Live controls": "Posuvník hlasitosti v Živém ovládání",
+  "That playlist is empty, or its videos are private.": "Ten playlist je prázdný, nebo jsou jeho videa soukromá.",
+  "{n} of {total} video": [
+    "{n} z {total} videa",
+    "{n} ze {total} videí",
+    "{n} z {total} videí"
+  ],
+  "{n} video": [
+    "{n} video",
+    "{n} videa",
+    "{n} videí"
+  ],
+  "Double-click to open": "Dvojklikem otevřeš",
+  "Playlist": "Playlist",
+  "Playlists": "Playlisty",
+  "Show its videos, to add some or all of them": "Zobrazit jeho videa a přidat některá nebo všechna",
+  "Show playlists: open one to add its videos": "Zobrazit playlisty: otevři jeden a přidej jeho videa",
+  "Show videos": "Zobrazit videa",
+  "Videos": "Videa",
+  "Add all": "Přidat vše",
+  "Add all its videos to your sounds, without opening it": "Přidat všechna jeho videa do zvuků, bez otevírání",
+  "Couldn't add that playlist: {error}": "Ten playlist se nepodařilo přidat: {error}",
+  "Its videos are on their way to your sounds": "Jeho videa jsou na cestě do tvých zvuků",
+  "✓ {n} queued": [
+    "✓ {n} ve frontě",
+    "✓ {n} ve frontě",
+    "✓ {n} ve frontě"
+  ],
   "Delete this preset": "Smazat tuto předvolbu",
   "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Uložit současnou rychlost, výšku, efekty a hlasitost jako vlastní předvolbu",
   "Keep these effects as a preset of your own, in this list for every sound": "Uložit tyto efekty jako vlastní předvolbu, v tomto seznamu pro každý zvuk",

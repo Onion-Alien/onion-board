@@ -4683,6 +4683,30 @@
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Das Zahnrad neben Mikro säubern im Tab Stimme: Eingangslautstärke, Rauschunterdrückung und Vorlagen wie Lauter Raum. Es filtert auch Stöße gegen den Tisch und tiefes Brummen heraus.",
   "Three new games with Bun": "Drei neue Spiele mit Bun",
   "A Volume slider in Live controls": "Ein Lautstärke-Regler in den Live-Reglern",
+  "That playlist is empty, or its videos are private.": "Diese Playlist ist leer oder ihre Videos sind privat.",
+  "{n} of {total} video": [
+    "{n} von {total} Video",
+    "{n} von {total} Videos"
+  ],
+  "{n} video": [
+    "{n} Video",
+    "{n} Videos"
+  ],
+  "Double-click to open": "Doppelklick zum Öffnen",
+  "Playlist": "Playlist",
+  "Playlists": "Playlists",
+  "Show its videos, to add some or all of them": "Ihre Videos zeigen, um einige oder alle hinzuzufügen",
+  "Show playlists: open one to add its videos": "Playlists zeigen: öffne eine, um ihre Videos hinzuzufügen",
+  "Show videos": "Videos zeigen",
+  "Videos": "Videos",
+  "Add all": "Alle hinzufügen",
+  "Add all its videos to your sounds, without opening it": "Alle Videos zu deinen Sounds hinzufügen, ohne sie zu öffnen",
+  "Couldn't add that playlist: {error}": "Diese Playlist konnte nicht hinzugefügt werden: {error}",
+  "Its videos are on their way to your sounds": "Ihre Videos sind auf dem Weg zu deinen Sounds",
+  "✓ {n} queued": [
+    "✓ {n} in der Warteschlange",
+    "✓ {n} in der Warteschlange"
+  ],
   "Delete this preset": "Diese Vorlage löschen",
   "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Tempo, Tonhöhe, Effekte und Lautstärke von jetzt als eigene Vorlage speichern",
   "Keep these effects as a preset of your own, in this list for every sound": "Diese Effekte als eigene Vorlage speichern, in dieser Liste für jeden Sound",

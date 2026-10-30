@@ -4683,6 +4683,30 @@
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "La roue dentée à côté de Micro propre dans l'onglet Voix : volume d'entrée, suppression du bruit et préréglages comme Pièce bruyante. Elle coupe aussi les coups sur le bureau et le ronflement grave.",
   "Three new games with Bun": "Trois nouveaux jeux avec Bun",
   "A Volume slider in Live controls": "Un curseur de volume dans les Contrôles en direct",
+  "That playlist is empty, or its videos are private.": "Cette playlist est vide, ou ses vidéos sont privées.",
+  "{n} of {total} video": [
+    "{n} sur {total} vidéo",
+    "{n} sur {total} vidéos"
+  ],
+  "{n} video": [
+    "{n} vidéo",
+    "{n} vidéos"
+  ],
+  "Double-click to open": "Double-clic pour ouvrir",
+  "Playlist": "Playlist",
+  "Playlists": "Playlists",
+  "Show its videos, to add some or all of them": "Affiche ses vidéos pour en ajouter quelques-unes ou toutes",
+  "Show playlists: open one to add its videos": "Afficher les playlists : ouvre-en une pour ajouter ses vidéos",
+  "Show videos": "Afficher les vidéos",
+  "Videos": "Vidéos",
+  "Add all": "Tout ajouter",
+  "Add all its videos to your sounds, without opening it": "Ajoute toutes ses vidéos à tes sons sans l'ouvrir",
+  "Couldn't add that playlist: {error}": "Impossible d'ajouter cette playlist : {error}",
+  "Its videos are on their way to your sounds": "Ses vidéos arrivent dans tes sons",
+  "✓ {n} queued": [
+    "✓ {n} en attente",
+    "✓ {n} en attente"
+  ],
   "Delete this preset": "Supprimer ce préréglage",
   "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Garde la vitesse, la hauteur, les effets et le volume actuels comme ton propre préréglage",
   "Keep these effects as a preset of your own, in this list for every sound": "Garde ces effets comme ton propre préréglage, dans cette liste pour tous les sons",

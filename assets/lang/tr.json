@@ -4683,6 +4683,30 @@
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Ses sekmesinde Temiz mikrofon'un yanındaki dişli: giriş ses düzeyi, gürültü bastırma ve Gürültülü oda gibi hazır ayarlar. Masaya vurmaları ve alçak uğultuyu da keser.",
   "Three new games with Bun": "Bun ile üç yeni oyun",
   "A Volume slider in Live controls": "Canlı kontrollerde ses düzeyi kaydırıcısı",
+  "That playlist is empty, or its videos are private.": "Bu oynatma listesi boş ya da videoları gizli.",
+  "{n} of {total} video": [
+    "{n}/{total} video",
+    "{n}/{total} video"
+  ],
+  "{n} video": [
+    "{n} video",
+    "{n} video"
+  ],
+  "Double-click to open": "Açmak için çift tıkla",
+  "Playlist": "Oynatma listesi",
+  "Playlists": "Oynatma listeleri",
+  "Show its videos, to add some or all of them": "Bazılarını veya hepsini eklemek için videolarını göster",
+  "Show playlists: open one to add its videos": "Oynatma listelerini göster: videolarını eklemek için birini aç",
+  "Show videos": "Videoları göster",
+  "Videos": "Videolar",
+  "Add all": "Tümünü ekle",
+  "Add all its videos to your sounds, without opening it": "Açmadan tüm videolarını seslerine ekle",
+  "Couldn't add that playlist: {error}": "Bu oynatma listesi eklenemedi: {error}",
+  "Its videos are on their way to your sounds": "Videoları seslerine ekleniyor",
+  "✓ {n} queued": [
+    "✓ {n} sırada",
+    "✓ {n} sırada"
+  ],
   "Delete this preset": "Bu hazır ayarı sil",
   "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Şu anki hızı, perdeyi, efektleri ve sesi kendi hazır ayarın olarak sakla",
   "Keep these effects as a preset of your own, in this list for every sound": "Bu efektleri kendi hazır ayarın olarak sakla, her ses için bu listede",

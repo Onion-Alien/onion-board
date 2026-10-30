@@ -4601,6 +4601,27 @@
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "음성 탭의 마이크 잡음 제거 옆 톱니바퀴: 입력 볼륨, 잡음 억제, 시끄러운 방 같은 프리셋. 책상 치는 소리와 낮은 웅웅거림도 걸러 줍니다.",
   "Three new games with Bun": "Bun과 하는 새 게임 3가지",
   "A Volume slider in Live controls": "실시간 조절에 볼륨 슬라이더",
+  "That playlist is empty, or its videos are private.": "해당 재생목록이 비어 있거나 동영상이 비공개입니다.",
+  "{n} of {total} video": [
+    "동영상 {total}개 중 {n}개"
+  ],
+  "{n} video": [
+    "동영상 {n}개"
+  ],
+  "Double-click to open": "두 번 클릭해서 열기",
+  "Playlist": "재생목록",
+  "Playlists": "재생목록",
+  "Show its videos, to add some or all of them": "동영상을 보고 일부 또는 전부 추가하기",
+  "Show playlists: open one to add its videos": "재생목록 보기: 하나를 열어 동영상을 추가하세요",
+  "Show videos": "동영상 보기",
+  "Videos": "동영상",
+  "Add all": "모두 추가",
+  "Add all its videos to your sounds, without opening it": "열지 않고 동영상을 모두 사운드에 추가",
+  "Couldn't add that playlist: {error}": "해당 재생목록을 추가하지 못했어요: {error}",
+  "Its videos are on their way to your sounds": "동영상을 사운드에 추가하는 중이에요",
+  "✓ {n} queued": [
+    "✓ {n}개 대기 중"
+  ],
   "Delete this preset": "이 프리셋 삭제",
   "Keep the speed, pitch, effects and volume you have now as a preset of your own": "지금의 속도, 피치, 효과, 볼륨을 내 프리셋으로 저장",
   "Keep these effects as a preset of your own, in this list for every sound": "이 효과를 내 프리셋으로 저장해 모든 사운드의 이 목록에 넣습니다",

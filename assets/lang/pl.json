@@ -4765,6 +4765,33 @@
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Zębatka obok Czystego mikrofonu na karcie Głos: głośność wejścia, tłumienie szumów i ustawienia jak Głośny pokój. Usuwa też stuknięcia w biurko i niski szum.",
   "Three new games with Bun": "Trzy nowe gry z Bunem",
   "A Volume slider in Live controls": "Suwak głośności w Sterowaniu na żywo",
+  "That playlist is empty, or its videos are private.": "Ta playlista jest pusta albo jej filmy są prywatne.",
+  "{n} of {total} video": [
+    "{n} z {total} filmu",
+    "{n} z {total} filmów",
+    "{n} z {total} filmów"
+  ],
+  "{n} video": [
+    "{n} film",
+    "{n} filmy",
+    "{n} filmów"
+  ],
+  "Double-click to open": "Kliknij dwukrotnie, aby otworzyć",
+  "Playlist": "Playlista",
+  "Playlists": "Playlisty",
+  "Show its videos, to add some or all of them": "Pokaż jej filmy, by dodać kilka lub wszystkie",
+  "Show playlists: open one to add its videos": "Pokaż playlisty: otwórz jedną, by dodać jej filmy",
+  "Show videos": "Pokaż filmy",
+  "Videos": "Filmy",
+  "Add all": "Dodaj wszystkie",
+  "Add all its videos to your sounds, without opening it": "Dodaj wszystkie jej filmy do dźwięków bez otwierania",
+  "Couldn't add that playlist: {error}": "Nie udało się dodać tej playlisty: {error}",
+  "Its videos are on their way to your sounds": "Jej filmy są w drodze do twoich dźwięków",
+  "✓ {n} queued": [
+    "✓ {n} w kolejce",
+    "✓ {n} w kolejce",
+    "✓ {n} w kolejce"
+  ],
   "Delete this preset": "Usuń ten preset",
   "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Zachowaj obecną prędkość, wysokość, efekty i głośność jako własny preset",
   "Keep these effects as a preset of your own, in this list for every sound": "Zachowaj te efekty jako własny preset, na tej liście dla każdego dźwięku",

@@ -1788,3 +1788,39 @@ def test_several_links_pasted_show_a_card_each_and_add_all_queues_them(window, q
     assert not res.add_all_btn.isHidden() and res.add_all_btn.text() == "Add all (1)"
     res.close_results()
     assert res.add_all_btn.isHidden() and not res.links
+
+
+def test_a_pasted_playlist_shows_its_videos_with_add_all(window, qapp, monkeypatch):
+    """A playlist link: a card per video (a grid, not the one wide card), its name and
+    how many of its videos are listed over them, and Add all queues them."""
+    from soundboard.online import ytdl
+    from soundboard.online.ytsites import Result
+    url = "https://www.youtube.com/playlist?list=PLabc"
+    vids = [Result(f"vid0000000{i}", f"Song {i}", "Band", 60.0) for i in range(2)]
+    monkeypatch.setattr(ytdl, "lookup_all", lambda u, direct=False: ytdl.Playlist(
+        "Road trip", vids, 40))
+    picked = []
+    monkeypatch.setattr(window.searchctl, "_from_youtube", lambda r, play: (
+        picked.append(r.url), window.ytresults.mark(r.url, "add")))
+    window.show()
+    window.resize(1100, 700)
+    window.fitctl._refit()
+    window.search.setText(url)
+    window.searchctl.on_search_enter()
+    res = window.ytresults
+    for _ in range(200):
+        qapp.processEvents()
+        if res._rows:
+            break
+        time.sleep(0.02)
+    assert [r.result.url for r in res._rows] == [v.url for v in vids]
+    assert all(res.rows.indexOf(r) >= 0 for r in res._rows)   # the grid
+    assert res.heading.text() == "Road trip  ·  2 of 40 videos"
+    assert res.add_all_btn.text() == "Add all (2)" and res.more_btn.isHidden()
+    res.add_all_btn.click()
+    assert picked == [v.url for v in vids] and res.add_all_btn.isHidden()
+    res.playlist.title = "Chill beats for studying and relaxing late at night"
+    res._links_heading()   # a long name is cut short, the count stays
+    assert res.heading.text() == "Chill beats for studying and re…  ·  2 of 40 videos"
+    window.search.clear()   # the playlist's link gone: its cards go too
+    assert res.isHidden() and res.playlist is None

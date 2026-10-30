@@ -4683,6 +4683,30 @@
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Kugghjulet vid Ren mikrofon på fliken Röst: ingångsvolym, brusreducering och förval som Bullrigt rum. Den tar också bort dunk i bordet och lågt brum.",
   "Three new games with Bun": "Tre nya spel med Bun",
   "A Volume slider in Live controls": "Ett volymreglage i Livekontroller",
+  "That playlist is empty, or its videos are private.": "Den spellistan är tom, eller så är dess videor privata.",
+  "{n} of {total} video": [
+    "{n} av {total} video",
+    "{n} av {total} videor"
+  ],
+  "{n} video": [
+    "{n} video",
+    "{n} videor"
+  ],
+  "Double-click to open": "Dubbelklicka för att öppna",
+  "Playlist": "Spellista",
+  "Playlists": "Spellistor",
+  "Show its videos, to add some or all of them": "Visa dess videor för att lägga till några eller alla",
+  "Show playlists: open one to add its videos": "Visa spellistor: öppna en för att lägga till dess videor",
+  "Show videos": "Visa videor",
+  "Videos": "Videor",
+  "Add all": "Lägg till alla",
+  "Add all its videos to your sounds, without opening it": "Lägg till alla dess videor i dina ljud utan att öppna den",
+  "Couldn't add that playlist: {error}": "Kunde inte lägga till den spellistan: {error}",
+  "Its videos are on their way to your sounds": "Dess videor är på väg till dina ljud",
+  "✓ {n} queued": [
+    "✓ {n} i kö",
+    "✓ {n} i kö"
+  ],
   "Delete this preset": "Ta bort den här förinställningen",
   "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Spara hastigheten, tonhöjden, effekterna och volymen du har nu som en egen förinställning",
   "Keep these effects as a preset of your own, in this list for every sound": "Spara de här effekterna som en egen förinställning, i den här listan för alla ljud",

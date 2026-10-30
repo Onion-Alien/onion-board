@@ -4683,6 +4683,30 @@
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Ratas Puhdas mikki -kohdan vieressä Puhe-välilehdellä: sisääntulon äänenvoimakkuus, kohinanvaimennus ja valmiit asetukset kuten Meluisa huone. Se poistaa myös pöydän kolahdukset ja matalan huminan.",
   "Three new games with Bun": "Kolme uutta peliä Bunin kanssa",
   "A Volume slider in Live controls": "Äänenvoimakkuuden liukusäädin Live-säätimissä",
+  "That playlist is empty, or its videos are private.": "Soittolista on tyhjä tai sen videot ovat yksityisiä.",
+  "{n} of {total} video": [
+    "{n}/{total} video",
+    "{n}/{total} videota"
+  ],
+  "{n} video": [
+    "{n} video",
+    "{n} videota"
+  ],
+  "Double-click to open": "Avaa kaksoisnapsautuksella",
+  "Playlist": "Soittolista",
+  "Playlists": "Soittolistat",
+  "Show its videos, to add some or all of them": "Näytä sen videot, niin voit lisätä osan tai kaikki",
+  "Show playlists: open one to add its videos": "Näytä soittolistat: avaa yksi ja lisää sen videot",
+  "Show videos": "Näytä videot",
+  "Videos": "Videot",
+  "Add all": "Lisää kaikki",
+  "Add all its videos to your sounds, without opening it": "Lisää kaikki sen videot ääniisi avaamatta sitä",
+  "Couldn't add that playlist: {error}": "Soittolistaa ei voitu lisätä: {error}",
+  "Its videos are on their way to your sounds": "Sen videot ovat tulossa ääniisi",
+  "✓ {n} queued": [
+    "✓ {n} jonossa",
+    "✓ {n} jonossa"
+  ],
   "Delete this preset": "Poista tämä esiasetus",
   "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Tallenna nykyinen nopeus, sävelkorkeus, efektit ja äänenvoimakkuus omaksi esiasetukseksi",
   "Keep these effects as a preset of your own, in this list for every sound": "Tallenna nämä efektit omaksi esiasetukseksi, tähän listaan jokaiselle äänelle",

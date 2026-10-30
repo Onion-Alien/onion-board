@@ -4765,6 +4765,33 @@
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Шестерёнка рядом с «Чистым микрофоном» на вкладке «Голос»: громкость входа, шумоподавление и пресеты вроде «Шумной комнаты». Ещё убирает стук по столу и низкий гул.",
   "Three new games with Bun": "Три новые игры с Bun",
   "A Volume slider in Live controls": "Ползунок громкости в «Управлении вживую»",
+  "That playlist is empty, or its videos are private.": "Этот плейлист пуст, или его видео скрыты.",
+  "{n} of {total} video": [
+    "{n} из {total} видео",
+    "{n} из {total} видео",
+    "{n} из {total} видео"
+  ],
+  "{n} video": [
+    "{n} видео",
+    "{n} видео",
+    "{n} видео"
+  ],
+  "Double-click to open": "Двойной щелчок, чтобы открыть",
+  "Playlist": "Плейлист",
+  "Playlists": "Плейлисты",
+  "Show its videos, to add some or all of them": "Показать его видео, чтобы добавить некоторые или все",
+  "Show playlists: open one to add its videos": "Показать плейлисты: открой один, чтобы добавить его видео",
+  "Show videos": "Показать видео",
+  "Videos": "Видео",
+  "Add all": "Добавить все",
+  "Add all its videos to your sounds, without opening it": "Добавить все его видео в звуки, не открывая",
+  "Couldn't add that playlist: {error}": "Не удалось добавить этот плейлист: {error}",
+  "Its videos are on their way to your sounds": "Его видео уже добавляются в твои звуки",
+  "✓ {n} queued": [
+    "✓ {n} в очереди",
+    "✓ {n} в очереди",
+    "✓ {n} в очереди"
+  ],
   "Delete this preset": "Удалить этот пресет",
   "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Сохранить нынешние скорость, тон, эффекты и громкость как свой пресет",
   "Keep these effects as a preset of your own, in this list for every sound": "Сохранить эти эффекты как свой пресет, в этом списке для любого звука",
