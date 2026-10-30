@@ -4764,5 +4764,28 @@
   "Mic settings, new presets and new games with Bun": "Nastavení mikrofonu, nové předvolby a nové hry s Bunem",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Ozubené kolečko vedle Čistého mikrofonu na kartě Hlas: hlasitost vstupu, potlačení šumu a předvolby jako Hlučná místnost. Odfiltruje i ťukání do stolu a nízký brum.",
   "Three new games with Bun": "Tři nové hry s Bunem",
-  "A Volume slider in Live controls": "Posuvník hlasitosti v Živém ovládání"
+  "A Volume slider in Live controls": "Posuvník hlasitosti v Živém ovládání",
+  "Delete this preset": "Smazat tuto předvolbu",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Uložit současnou rychlost, výšku, efekty a hlasitost jako vlastní předvolbu",
+  "Keep these effects as a preset of your own, in this list for every sound": "Uložit tyto efekty jako vlastní předvolbu, v tomto seznamu pro každý zvuk",
+  "More ({n})": "Další ({n})",
+  "My preset": "Moje předvolba",
+  "My presets": "Moje předvolby",
+  "None saved yet": "Zatím nic uloženo",
+  "Rename preset": "Přejmenovat předvolbu",
+  "Save as preset": "Uložit jako předvolbu",
+  "Save preset": "Uložit předvolbu",
+  "You already have a preset called “{name}”. Replace it?": "Předvolbu „{name}“ už máš. Nahradit ji?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "Máš {n} předvolbu, víc jich být nemůže. Nejdřív jednu smaž.",
+    "Máš {n} předvolby, víc jich být nemůže. Nejdřív jednu smaž.",
+    "Máš {n} předvoleb, víc jich být nemůže. Nejdřív jednu smaž."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: tvoje předvolba. Pravým tlačítkem ji přejmenuješ nebo smažeš",
+  "{n} more of your presets": [
+    "{n} další tvoje předvolba",
+    "{n} další tvoje předvolby",
+    "{n} dalších tvých předvoleb"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "„{name}“ je název vestavěné předvolby. Vyber jiný."
 }

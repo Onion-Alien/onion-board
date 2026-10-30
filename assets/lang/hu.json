@@ -4682,5 +4682,26 @@
   "Mic settings, new presets and new games with Bun": "Mikrofonbeállítások, új előbeállítások és új játékok Bunnal",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "A fogaskerék a Tiszta mikrofon mellett a Beszéd lapon: bemeneti hangerő, zajszűrés és előbeállítások, mint a Hangos szoba. Az asztalra koppanást és a mély zúgást is kiszűri.",
   "Three new games with Bun": "Három új játék Bunnal",
-  "A Volume slider in Live controls": "Hangerőcsúszka az Élő vezérlőkben"
+  "A Volume slider in Live controls": "Hangerőcsúszka az Élő vezérlőkben",
+  "Delete this preset": "Előbeállítás törlése",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "A mostani sebesség, hangmagasság, effektek és hangerő mentése saját előbeállításként",
+  "Keep these effects as a preset of your own, in this list for every sound": "Ezek az effektek saját előbeállításként, ebben a listában minden hanghoz",
+  "More ({n})": "Még ({n})",
+  "My preset": "Saját előbeállítás",
+  "My presets": "Saját előbeállítások",
+  "None saved yet": "Még nincs mentve semmi",
+  "Rename preset": "Előbeállítás átnevezése",
+  "Save as preset": "Mentés előbeállításként",
+  "Save preset": "Előbeállítás mentése",
+  "You already have a preset called “{name}”. Replace it?": "Már van „{name}” nevű előbeállításod. Lecseréled?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "{n} előbeállításod van, ennél több nem lehet. Előbb törölj egyet.",
+    "{n} előbeállításod van, ennél több nem lehet. Előbb törölj egyet."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: saját előbeállításod. Jobb klikk az átnevezéshez vagy törléshez",
+  "{n} more of your presets": [
+    "Még {n} saját előbeállításod",
+    "Még {n} saját előbeállításod"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "„{name}” egy beépített előbeállítás neve. Válassz másikat."
 }

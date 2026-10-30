@@ -4682,5 +4682,26 @@
   "Mic settings, new presets and new games with Bun": "Настройки на микрофона, нови готови настройки и нови игри с Bun",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Зъбчатото колело до Чист микрофон в раздела Глас: сила на входа, потискане на шума и готови настройки като Шумна стая. Маха и удари по бюрото и нисък бръмчащ шум.",
   "Three new games with Bun": "Три нови игри с Bun",
-  "A Volume slider in Live controls": "Плъзгач за сила на звука в Управление на живо"
+  "A Volume slider in Live controls": "Плъзгач за сила на звука в Управление на живо",
+  "Delete this preset": "Изтрий тази настройка",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Запази сегашните скорост, тон, ефекти и сила като твоя готова настройка",
+  "Keep these effects as a preset of your own, in this list for every sound": "Запази тези ефекти като твоя готова настройка, в този списък за всички звуци",
+  "More ({n})": "Още ({n})",
+  "My preset": "Моя настройка",
+  "My presets": "Моите настройки",
+  "None saved yet": "Още няма запазени",
+  "Rename preset": "Преименувай настройката",
+  "Save as preset": "Запази като настройка",
+  "Save preset": "Запази настройка",
+  "You already have a preset called “{name}”. Replace it?": "Вече имаш настройка с име „{name}“. Да я заменя ли?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "Имаш {n} настройка, повече не може. Първо изтрий една.",
+    "Имаш {n} настройки, повече не може. Първо изтрий една."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: твоя настройка. Десен клик, за да я преименуваш или изтриеш",
+  "{n} more of your presets": [
+    "Още {n} твоя настройка",
+    "Още {n} твои настройки"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "„{name}“ е име на вградена настройка. Избери друго."
 }

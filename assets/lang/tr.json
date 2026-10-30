@@ -4682,5 +4682,26 @@
   "Mic settings, new presets and new games with Bun": "Mikrofon ayarları, yeni hazır ayarlar ve Bun ile yeni oyunlar",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Ses sekmesinde Temiz mikrofon'un yanındaki dişli: giriş ses düzeyi, gürültü bastırma ve Gürültülü oda gibi hazır ayarlar. Masaya vurmaları ve alçak uğultuyu da keser.",
   "Three new games with Bun": "Bun ile üç yeni oyun",
-  "A Volume slider in Live controls": "Canlı kontrollerde ses düzeyi kaydırıcısı"
+  "A Volume slider in Live controls": "Canlı kontrollerde ses düzeyi kaydırıcısı",
+  "Delete this preset": "Bu hazır ayarı sil",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Şu anki hızı, perdeyi, efektleri ve sesi kendi hazır ayarın olarak sakla",
+  "Keep these effects as a preset of your own, in this list for every sound": "Bu efektleri kendi hazır ayarın olarak sakla, her ses için bu listede",
+  "More ({n})": "Daha fazla ({n})",
+  "My preset": "Hazır ayarım",
+  "My presets": "Hazır ayarlarım",
+  "None saved yet": "Henüz kayıtlı bir şey yok",
+  "Rename preset": "Hazır ayarı yeniden adlandır",
+  "Save as preset": "Hazır ayar olarak kaydet",
+  "Save preset": "Hazır ayarı kaydet",
+  "You already have a preset called “{name}”. Replace it?": "Zaten “{name}” adlı bir hazır ayarınız var. Değiştirilsin mi?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "{n} hazır ayarınız var, daha fazlası olamaz. Önce birini silin.",
+    "{n} hazır ayarınız var, daha fazlası olamaz. Önce birini silin."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: hazır ayarınız. Yeniden adlandırmak veya silmek için sağ tıklayın",
+  "{n} more of your presets": [
+    "{n} hazır ayarınız daha",
+    "{n} hazır ayarınız daha"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” yerleşik bir hazır ayarın adı. Başka bir ad seçin."
 }

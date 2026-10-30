@@ -4764,5 +4764,28 @@
   "Mic settings, new presets and new games with Bun": "Ustawienia mikrofonu, nowe ustawienia i nowe gry z Bunem",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Zębatka obok Czystego mikrofonu na karcie Głos: głośność wejścia, tłumienie szumów i ustawienia jak Głośny pokój. Usuwa też stuknięcia w biurko i niski szum.",
   "Three new games with Bun": "Trzy nowe gry z Bunem",
-  "A Volume slider in Live controls": "Suwak głośności w Sterowaniu na żywo"
+  "A Volume slider in Live controls": "Suwak głośności w Sterowaniu na żywo",
+  "Delete this preset": "Usuń ten preset",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Zachowaj obecną prędkość, wysokość, efekty i głośność jako własny preset",
+  "Keep these effects as a preset of your own, in this list for every sound": "Zachowaj te efekty jako własny preset, na tej liście dla każdego dźwięku",
+  "More ({n})": "Więcej ({n})",
+  "My preset": "Mój preset",
+  "My presets": "Moje presety",
+  "None saved yet": "Jeszcze nic nie zapisano",
+  "Rename preset": "Zmień nazwę presetu",
+  "Save as preset": "Zapisz jako preset",
+  "Save preset": "Zapisz preset",
+  "You already have a preset called “{name}”. Replace it?": "Masz już preset o nazwie „{name}”. Zastąpić go?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "Masz {n} preset, więcej się nie da. Najpierw usuń jeden.",
+    "Masz {n} presety, więcej się nie da. Najpierw usuń jeden.",
+    "Masz {n} presetów, więcej się nie da. Najpierw usuń jeden."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: twój preset. Kliknij prawym, aby zmienić nazwę lub usunąć",
+  "{n} more of your presets": [
+    "Jeszcze {n} twój preset",
+    "Jeszcze {n} twoje presety",
+    "Jeszcze {n} twoich presetów"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "„{name}” to nazwa wbudowanego presetu. Wybierz inną."
 }

@@ -4764,5 +4764,28 @@
   "Mic settings, new presets and new games with Bun": "Настройки микрофона, новые пресеты и новые игры с Bun",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Шестерёнка рядом с «Чистым микрофоном» на вкладке «Голос»: громкость входа, шумоподавление и пресеты вроде «Шумной комнаты». Ещё убирает стук по столу и низкий гул.",
   "Three new games with Bun": "Три новые игры с Bun",
-  "A Volume slider in Live controls": "Ползунок громкости в «Управлении вживую»"
+  "A Volume slider in Live controls": "Ползунок громкости в «Управлении вживую»",
+  "Delete this preset": "Удалить этот пресет",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Сохранить нынешние скорость, тон, эффекты и громкость как свой пресет",
+  "Keep these effects as a preset of your own, in this list for every sound": "Сохранить эти эффекты как свой пресет, в этом списке для любого звука",
+  "More ({n})": "Ещё ({n})",
+  "My preset": "Мой пресет",
+  "My presets": "Мои пресеты",
+  "None saved yet": "Пока ничего не сохранено",
+  "Rename preset": "Переименовать пресет",
+  "Save as preset": "Сохранить как пресет",
+  "Save preset": "Сохранить пресет",
+  "You already have a preset called “{name}”. Replace it?": "Пресет «{name}» у тебя уже есть. Заменить его?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "У тебя {n} пресет, больше нельзя. Сначала удали один.",
+    "У тебя {n} пресета, больше нельзя. Сначала удали один.",
+    "У тебя {n} пресетов, больше нельзя. Сначала удали один."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: твой пресет. Правый клик, чтобы переименовать или удалить",
+  "{n} more of your presets": [
+    "Ещё {n} твой пресет",
+    "Ещё {n} твоих пресета",
+    "Ещё {n} твоих пресетов"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "«{name}» уже название встроенного пресета. Выбери другое."
 }
