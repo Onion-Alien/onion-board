@@ -4755,5 +4755,14 @@
   "Back to no pitch change, no effects and 100 % volume": "Вернуть без смены тона, без эффектов и громкость 100 %",
   "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Насколько громко они звучат, до 4 раз громче. Выше 100 % самые громкие места сглаживаются, чтобы не хрипело",
   "{st} st from the speed": "{st} пт от скорости",
-  "{st} st from the speed, {total} st in all": "{st} пт от скорости, всего {total} пт"
+  "{st} st from the speed, {total} st in all": "{st} пт от скорости, всего {total} пт",
+  "Add a sound that's on your board already and it jumps to it, ringed in yellow.": "Добавьте звук, который уже есть на панели, и она перейдёт к нему и обведёт его жёлтым кольцом.",
+  "Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.": "Вышибалы, Хоумран и «Бей Bun». Он ускоряется, когда вы набираете очки.",
+  "Finds a sound you already have": "Находит звук, который у вас уже есть",
+  "It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass boosted, Chipmunk and more.": "До 400 %. И новые пресеты: Nightcore, «Замедленно + реверб», «Бас-буст», «Бурундук» и другие.",
+  "Mic settings for Clean mic": "Настройки микрофона для «Чистого микрофона»",
+  "Mic settings, new presets and new games with Bun": "Настройки микрофона, новые пресеты и новые игры с Bun",
+  "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Шестерёнка рядом с «Чистым микрофоном» на вкладке «Голос»: громкость входа, шумоподавление и пресеты вроде «Шумной комнаты». Ещё убирает стук по столу и низкий гул.",
+  "Three new games with Bun": "Три новые игры с Bun",
+  "A Volume slider in Live controls": "Ползунок громкости в «Управлении вживую»"
 }

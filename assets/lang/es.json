@@ -4673,5 +4673,14 @@
   "Back to no pitch change, no effects and 100 % volume": "Volver a sin cambio de tono, sin efectos y volumen al 100 %",
   "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Lo alto que suenan, hasta 4 veces más. Por encima del 100 % se redondean los picos para que no cruja",
   "{st} st from the speed": "{st} st por la velocidad",
-  "{st} st from the speed, {total} st in all": "{st} st por la velocidad, {total} st en total"
+  "{st} st from the speed, {total} st in all": "{st} st por la velocidad, {total} st en total",
+  "Add a sound that's on your board already and it jumps to it, ringed in yellow.": "Añade un sonido que ya está en tu tablero y salta a él, con un anillo amarillo alrededor.",
+  "Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.": "Balón prisionero, Home run y Golpea a Bun. Se vuelve más rápido según vas marcando.",
+  "Finds a sound you already have": "Encuentra un sonido que ya tienes",
+  "It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass boosted, Chipmunk and more.": "Llega hasta 400 %. Y ajustes nuevos: Nightcore, Lento + reverb, Bajos a tope, Ardilla y más.",
+  "Mic settings for Clean mic": "Ajustes del micro para Micro limpio",
+  "Mic settings, new presets and new games with Bun": "Ajustes del micro, ajustes nuevos y juegos nuevos con Bun",
+  "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "El engranaje junto a Micro limpio en la pestaña Voz: volumen de entrada, supresión de ruido y ajustes como Habitación ruidosa. También quita los golpes en la mesa y el zumbido grave.",
+  "Three new games with Bun": "Tres juegos nuevos con Bun",
+  "A Volume slider in Live controls": "Un control de volumen en Controles en directo"
 }

@@ -4673,5 +4673,14 @@
   "Back to no pitch change, no effects and 100 % volume": "Tilbage til ingen tonehøjdeændring, ingen effekter og 100 % lydstyrke",
   "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Hvor højt de spiller, op til 4 gange så højt. Over 100 % bliver de højeste toppe rundet af, så det ikke knitrer",
   "{st} st from the speed": "{st} st fra hastigheden",
-  "{st} st from the speed, {total} st in all": "{st} st fra hastigheden, {total} st i alt"
+  "{st} st from the speed, {total} st in all": "{st} st fra hastigheden, {total} st i alt",
+  "Add a sound that's on your board already and it jumps to it, ringed in yellow.": "Tilføj en lyd, der allerede er på dit board, og det hopper hen til den med en gul ring om.",
+  "Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.": "Høvdingebold, Homerun og Slå Bun. Han bliver hurtigere, jo mere du scorer.",
+  "Finds a sound you already have": "Finder en lyd, du allerede har",
+  "It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass boosted, Chipmunk and more.": "Den går op til 400 %. Og nye forvalg: Nightcore, Langsom + rumklang, Bas-boost, Jordegern og mere.",
+  "Mic settings for Clean mic": "Mikrofonindstillinger til Ren mikrofon",
+  "Mic settings, new presets and new games with Bun": "Mikrofonindstillinger, nye forvalg og nye spil med Bun",
+  "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Tandhjulet ved Ren mikrofon på fanen Stemme: inputlydstyrke, støjdæmpning og forvalg som Larmende rum. Den fjerner også bump i bordet og lav brummen.",
+  "Three new games with Bun": "Tre nye spil med Bun",
+  "A Volume slider in Live controls": "En lydstyrkeskyder i Live-kontroller"
 }

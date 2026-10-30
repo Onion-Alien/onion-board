@@ -4673,5 +4673,14 @@
   "Back to no pitch change, no effects and 100 % volume": "Balik sa walang pitch change, walang effects at 100 % volume",
   "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Gaano kalakas sila, hanggang 4 na beses. Lampas 100 %, pinapakinis ang pinakamalalakas na bahagi para hindi mag-crackle",
   "{st} st from the speed": "{st} st mula sa bilis",
-  "{st} st from the speed, {total} st in all": "{st} st mula sa bilis, {total} st lahat"
+  "{st} st from the speed, {total} st in all": "{st} st mula sa bilis, {total} st lahat",
+  "Add a sound that's on your board already and it jumps to it, ringed in yellow.": "Magdagdag ng tunog na nasa board mo na at lilipat ito roon, may dilaw na bilog sa paligid nito.",
+  "Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.": "Dodgeball, Home run at Hampasin si Bun. Bumibilis siya habang nakakapuntos ka.",
+  "Finds a sound you already have": "Hinahanap ang tunog na mayroon ka na",
+  "It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass boosted, Chipmunk and more.": "Umaabot ito hanggang 400 %. May mga bagong preset din: Nightcore, Mabagal + reverb, Bass boosted, Chipmunk at iba pa.",
+  "Mic settings for Clean mic": "Settings ng mic para sa Malinis na mic",
+  "Mic settings, new presets and new games with Bun": "Settings ng mic, mga bagong preset at bagong laro kasama si Bun",
+  "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Ang gear sa tabi ng Malinis na mic sa Voice tab: volume ng input, noise suppression at mga preset tulad ng Maingay na kuwarto. Tinatanggal din nito ang kalabog sa mesa at mababang ugong.",
+  "Three new games with Bun": "Tatlong bagong laro kasama si Bun",
+  "A Volume slider in Live controls": "Isang Volume slider sa Live controls"
 }

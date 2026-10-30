@@ -4591,5 +4591,14 @@
   "Back to no pitch change, no effects and 100 % volume": "피치 변경과 효과 없이, 볼륨 100 %로 되돌리기",
   "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "소리 크기, 최대 4배까지. 100 %를 넘으면 소리가 깨지지 않도록 가장 큰 부분을 둥글게 다듬어요",
   "{st} st from the speed": "속도로 {st} 반음",
-  "{st} st from the speed, {total} st in all": "속도로 {st} 반음, 합계 {total} 반음"
+  "{st} st from the speed, {total} st in all": "속도로 {st} 반음, 합계 {total} 반음",
+  "Add a sound that's on your board already and it jumps to it, ringed in yellow.": "보드에 이미 있는 사운드를 추가하면 그 사운드로 이동해 노란 고리로 표시합니다.",
+  "Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.": "피구, 홈런 대결, Bun 두더지 잡기. 점수를 낼수록 Bun이 빨라집니다.",
+  "Finds a sound you already have": "이미 있는 사운드를 찾아 줍니다",
+  "It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass boosted, Chipmunk and more.": "최대 400 %까지 올라갑니다. 새 프리셋도 있어요: Nightcore, 슬로우 + 리버브, 베이스 부스트, 다람쥐 등.",
+  "Mic settings for Clean mic": "마이크 잡음 제거용 마이크 설정",
+  "Mic settings, new presets and new games with Bun": "마이크 설정, 새 프리셋, Bun과의 새 게임",
+  "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "음성 탭의 마이크 잡음 제거 옆 톱니바퀴: 입력 볼륨, 잡음 억제, 시끄러운 방 같은 프리셋. 책상 치는 소리와 낮은 웅웅거림도 걸러 줍니다.",
+  "Three new games with Bun": "Bun과 하는 새 게임 3가지",
+  "A Volume slider in Live controls": "실시간 조절에 볼륨 슬라이더"
 }

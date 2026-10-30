@@ -4591,5 +4591,14 @@
   "Back to no pitch change, no effects and 100 % volume": "Về lại không đổi cao độ, không hiệu ứng và âm lượng 100 %",
   "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Âm thanh to cỡ nào, tối đa gấp 4 lần. Trên 100 %, những chỗ to nhất được làm tròn để không bị rè",
   "{st} st from the speed": "{st} st từ tốc độ",
-  "{st} st from the speed, {total} st in all": "{st} st từ tốc độ, tổng {total} st"
+  "{st} st from the speed, {total} st in all": "{st} st từ tốc độ, tổng {total} st",
+  "Add a sound that's on your board already and it jumps to it, ringed in yellow.": "Thêm một âm thanh đã có trên bảng và bảng sẽ nhảy tới nó, với một vòng vàng bao quanh.",
+  "Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.": "Bóng né, Home run và Đập Bun. Bạn ghi điểm càng nhiều, cậu ấy càng nhanh.",
+  "Finds a sound you already have": "Tìm âm thanh bạn đã có",
+  "It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass boosted, Chipmunk and more.": "Lên đến 400 %. Thêm cài sẵn mới: Nightcore, Chậm + vang, Tăng bass, Sóc chuột và nhiều hơn nữa.",
+  "Mic settings for Clean mic": "Cài đặt mic cho Mic sạch",
+  "Mic settings, new presets and new games with Bun": "Cài đặt mic, cài sẵn mới và trò chơi mới với Bun",
+  "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Bánh răng cạnh Mic sạch ở thẻ Giọng nói: âm lượng đầu vào, khử tiếng ồn và cài sẵn như Phòng ồn. Nó cũng lọc tiếng gõ bàn và tiếng ù trầm.",
+  "Three new games with Bun": "Ba trò chơi mới với Bun",
+  "A Volume slider in Live controls": "Thanh trượt âm lượng trong Điều khiển trực tiếp"
 }

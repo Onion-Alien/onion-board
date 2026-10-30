@@ -4673,5 +4673,14 @@
   "Back to no pitch change, no effects and 100 % volume": "Terug naar geen toonhoogteverandering, geen effecten en 100 % volume",
   "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Hoe hard ze klinken, tot 4 keer zo hard. Boven 100 % worden de hardste pieken afgerond zodat het niet kraakt",
   "{st} st from the speed": "{st} st door de snelheid",
-  "{st} st from the speed, {total} st in all": "{st} st door de snelheid, {total} st in totaal"
+  "{st} st from the speed, {total} st in all": "{st} st door de snelheid, {total} st in totaal",
+  "Add a sound that's on your board already and it jumps to it, ringed in yellow.": "Voeg een geluid toe dat al op je bord staat en het springt ernaartoe, met een gele ring eromheen.",
+  "Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.": "Trefbal, Homerun en Mep de Bun. Hij wordt sneller naarmate je scoort.",
+  "Finds a sound you already have": "Vindt een geluid dat je al hebt",
+  "It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass boosted, Chipmunk and more.": "Hij gaat tot 400 %. Plus nieuwe voorinstellingen: Nightcore, Vertraagd + galm, Bass boosted, Chipmunk en meer.",
+  "Mic settings for Clean mic": "Micinstellingen voor Schone mic",
+  "Mic settings, new presets and new games with Bun": "Micinstellingen, nieuwe voorinstellingen en nieuwe spellen met Bun",
+  "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Het tandwiel naast Schone mic op het tabblad Stem: invoervolume, ruisonderdrukking en voorinstellingen zoals Luide kamer. Het haalt ook tikken tegen het bureau en laag gebrom weg.",
+  "Three new games with Bun": "Drie nieuwe spellen met Bun",
+  "A Volume slider in Live controls": "Een volumeschuif in Live-bediening"
 }

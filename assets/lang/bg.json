@@ -4673,5 +4673,14 @@
   "Back to no pitch change, no effects and 100 % volume": "Обратно без промяна на тона, без ефекти и сила на звука 100 %",
   "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Колко силно звучат, до 4 пъти по-силно. Над 100 % най-силните места се заглаждат, за да не пращи",
   "{st} st from the speed": "{st} пт от скоростта",
-  "{st} st from the speed, {total} st in all": "{st} пт от скоростта, общо {total} пт"
+  "{st} st from the speed, {total} st in all": "{st} пт от скоростта, общо {total} пт",
+  "Add a sound that's on your board already and it jumps to it, ringed in yellow.": "Добави звук, който вече е на таблото ти, и то отива на него с жълт кръг около него.",
+  "Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.": "Народна топка, Хоумрън и Удари Bun. Той става по-бърз, докато вкарваш точки.",
+  "Finds a sound you already have": "Намира звук, който вече имаш",
+  "It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass boosted, Chipmunk and more.": "Стига до 400 %. И нови готови настройки: Nightcore, Бавно + ехо, Усилен бас, Катеричка и още.",
+  "Mic settings for Clean mic": "Настройки на микрофона за Чист микрофон",
+  "Mic settings, new presets and new games with Bun": "Настройки на микрофона, нови готови настройки и нови игри с Bun",
+  "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Зъбчатото колело до Чист микрофон в раздела Глас: сила на входа, потискане на шума и готови настройки като Шумна стая. Маха и удари по бюрото и нисък бръмчащ шум.",
+  "Three new games with Bun": "Три нови игри с Bun",
+  "A Volume slider in Live controls": "Плъзгач за сила на звука в Управление на живо"
 }

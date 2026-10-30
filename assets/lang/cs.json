@@ -4755,5 +4755,14 @@
   "Back to no pitch change, no effects and 100 % volume": "Zpět bez změny výšky, bez efektů a hlasitost 100 %",
   "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Jak nahlas hrají, až 4krát hlasitěji. Nad 100 % se nejhlasitější místa zaoblí, aby to nepraskalo",
   "{st} st from the speed": "{st} půltónů z rychlosti",
-  "{st} st from the speed, {total} st in all": "{st} půltónů z rychlosti, celkem {total}"
+  "{st} st from the speed, {total} st in all": "{st} půltónů z rychlosti, celkem {total}",
+  "Add a sound that's on your board already and it jumps to it, ringed in yellow.": "Přidej zvuk, který už na desce máš, a přeskočí na něj se žlutým kroužkem kolem.",
+  "Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.": "Vybíjená, Homerun a Plácni Buna. Čím víc bodů dáváš, tím je rychlejší.",
+  "Finds a sound you already have": "Najde zvuk, který už máš",
+  "It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass boosted, Chipmunk and more.": "Jde až na 400 %. A nové předvolby: Nightcore, Zpomalené + reverb, Zesílené basy, Chipmunk a další.",
+  "Mic settings for Clean mic": "Nastavení mikrofonu pro Čistý mikrofon",
+  "Mic settings, new presets and new games with Bun": "Nastavení mikrofonu, nové předvolby a nové hry s Bunem",
+  "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Ozubené kolečko vedle Čistého mikrofonu na kartě Hlas: hlasitost vstupu, potlačení šumu a předvolby jako Hlučná místnost. Odfiltruje i ťukání do stolu a nízký brum.",
+  "Three new games with Bun": "Tři nové hry s Bunem",
+  "A Volume slider in Live controls": "Posuvník hlasitosti v Živém ovládání"
 }

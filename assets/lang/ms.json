@@ -4591,5 +4591,14 @@
   "Back to no pitch change, no effects and 100 % volume": "Kembali kepada tiada perubahan pic, tiada kesan dan kelantangan 100 %",
   "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Sekuat mana bunyinya, sehingga 4 kali ganda. Melebihi 100 %, bahagian paling kuat dibulatkan supaya tidak pecah",
   "{st} st from the speed": "{st} st daripada kelajuan",
-  "{st} st from the speed, {total} st in all": "{st} st daripada kelajuan, {total} st semuanya"
+  "{st} st from the speed, {total} st in all": "{st} st daripada kelajuan, {total} st semuanya",
+  "Add a sound that's on your board already and it jumps to it, ringed in yellow.": "Tambah bunyi yang sudah ada pada papan anda dan ia melompat ke situ, dengan cincin kuning di sekelilingnya.",
+  "Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.": "Bola beracun, Home run dan Ketuk Bun. Dia makin laju apabila anda menjaringkan mata.",
+  "Finds a sound you already have": "Menjumpai bunyi yang sudah ada",
+  "It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass boosted, Chipmunk and more.": "Ia boleh naik hingga 400 %. Pratetap baharu juga: Nightcore, Perlahan + reverb, Bass dikuatkan, Chipmunk dan banyak lagi.",
+  "Mic settings for Clean mic": "Tetapan mikrofon untuk Mikrofon bersih",
+  "Mic settings, new presets and new games with Bun": "Tetapan mikrofon, pratetap baharu dan permainan baharu dengan Bun",
+  "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Gear di sebelah Mikrofon bersih pada tab Suara: kelantangan input, penindasan hingar dan pratetap seperti Bilik bising. Ia juga membuang ketukan meja dan dengung rendah.",
+  "Three new games with Bun": "Tiga permainan baharu dengan Bun",
+  "A Volume slider in Live controls": "Peluncur Kelantangan dalam Kawalan langsung"
 }

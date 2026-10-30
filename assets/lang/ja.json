@@ -4591,5 +4591,14 @@
   "Back to no pitch change, no effects and 100 % volume": "ピッチ変更なし、エフェクトなし、音量 100 % に戻す",
   "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "音の大きさ。最大 4 倍まで。100 % を超えると、音割れしないように一番大きな部分を丸めます",
   "{st} st from the speed": "速度で {st} 半音",
-  "{st} st from the speed, {total} st in all": "速度で {st} 半音、合計 {total} 半音"
+  "{st} st from the speed, {total} st in all": "速度で {st} 半音、合計 {total} 半音",
+  "Add a sound that's on your board already and it jumps to it, ringed in yellow.": "ボードにすでにあるサウンドを追加すると、そこへ移動して黄色いリングで囲みます。",
+  "Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.": "ドッジボール、ホームラン勝負、Bun たたき。点を取るほど Bun は速くなります。",
+  "Finds a sound you already have": "もう持っているサウンドを見つけます",
+  "It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass boosted, Chipmunk and more.": "最大 400 % まで上げられます。新しいプリセットも：Nightcore、スロー + リバーブ、低音ブースト、チップマンクなど。",
+  "Mic settings for Clean mic": "マイクのノイズ除去のマイク設定",
+  "Mic settings, new presets and new games with Bun": "マイク設定、新しいプリセット、Bun との新しいゲーム",
+  "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "ボイスタブのマイクのノイズ除去の横にある歯車：入力音量、ノイズ抑制、うるさい部屋などのプリセット。机をたたく音や低いうなりもカットします。",
+  "Three new games with Bun": "Bun との新しいゲームが 3 つ",
+  "A Volume slider in Live controls": "ライブ操作に音量スライダー"
 }

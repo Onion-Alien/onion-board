@@ -4673,5 +4673,14 @@
   "Back to no pitch change, no effects and 100 % volume": "Vissza hangmagasság-változás és effektek nélkül, 100 % hangerővel",
   "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Milyen hangosan szólnak, akár 4-szer hangosabban. 100 % fölött a leghangosabb részek lekerekítve, hogy ne recsegjen",
   "{st} st from the speed": "{st} félhang a sebességtől",
-  "{st} st from the speed, {total} st in all": "{st} félhang a sebességtől, összesen {total}"
+  "{st} st from the speed, {total} st in all": "{st} félhang a sebességtől, összesen {total}",
+  "Add a sound that's on your board already and it jumps to it, ringed in yellow.": "Adj hozzá egy hangot, ami már a tábládon van, és odaugrik hozzá egy sárga gyűrűvel körülötte.",
+  "Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.": "Kidobós, Hazafutás és Csapd le Bunt. Egyre gyorsabb, ahogy pontokat szerzel.",
+  "Finds a sound you already have": "Megtalálja a már meglévő hangot",
+  "It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass boosted, Chipmunk and more.": "400 %-ig megy. Új előbeállítások is: Nightcore, Lassú + reverb, Felturbózott basszus, Mókus és még több.",
+  "Mic settings for Clean mic": "Mikrofonbeállítások a Tiszta mikrofonhoz",
+  "Mic settings, new presets and new games with Bun": "Mikrofonbeállítások, új előbeállítások és új játékok Bunnal",
+  "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "A fogaskerék a Tiszta mikrofon mellett a Beszéd lapon: bemeneti hangerő, zajszűrés és előbeállítások, mint a Hangos szoba. Az asztalra koppanást és a mély zúgást is kiszűri.",
+  "Three new games with Bun": "Három új játék Bunnal",
+  "A Volume slider in Live controls": "Hangerőcsúszka az Élő vezérlőkben"
 }

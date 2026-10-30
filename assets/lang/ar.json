@@ -5001,5 +5001,14 @@
   "Back to no pitch change, no effects and 100 % volume": "العودة إلى بلا تغيير في الحدّة وبلا مؤثرات ومستوى صوت 100 %",
   "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "مدى ارتفاع الصوت، حتى 4 أضعاف. فوق 100 % تُدوَّر أعلى القمم حتى لا يتشوّه الصوت",
   "{st} st from the speed": "{st} st من السرعة",
-  "{st} st from the speed, {total} st in all": "{st} st من السرعة، {total} st في المجموع"
+  "{st} st from the speed, {total} st in all": "{st} st من السرعة، {total} st في المجموع",
+  "Add a sound that's on your board already and it jumps to it, ringed in yellow.": "أضف صوتًا موجودًا في لوحتك وسينتقل إليه، مع حلقة صفراء حوله.",
+  "Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.": "كرة المراوغة، ضربة خارج الملعب واضرب Bun. ويزداد سرعة كلما سجّلت.",
+  "Finds a sound you already have": "يجد صوتًا لديك من قبل",
+  "It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass boosted, Chipmunk and more.": "يصل إلى 400 %. وإعدادات جاهزة جديدة أيضًا: Nightcore وبطيء + صدى وجهير معزّز والسنجاب والمزيد.",
+  "Mic settings for Clean mic": "إعدادات الميكروفون لـ ميكروفون نظيف",
+  "Mic settings, new presets and new games with Bun": "إعدادات الميكروفون، إعدادات جاهزة جديدة وألعاب جديدة مع Bun",
+  "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "الترس بجانب ميكروفون نظيف في تبويب الصوت: مستوى صوت الإدخال، كتم الضوضاء وإعدادات جاهزة مثل غرفة صاخبة. ويزيل أيضًا ضربات المكتب والطنين المنخفض.",
+  "Three new games with Bun": "ثلاث ألعاب جديدة مع Bun",
+  "A Volume slider in Live controls": "شريط لمستوى الصوت في تحكّم مباشر"
 }

@@ -4755,5 +4755,14 @@
   "Back to no pitch change, no effects and 100 % volume": "Înapoi la fără schimbare de ton, fără efecte și volum 100 %",
   "How loud they are, up to 4 times as loud. Over 100 % the loudest bits are rounded off so it doesn't crackle": "Cât de tare sună, până la de 4 ori mai tare. Peste 100 % vârfurile sunt rotunjite ca să nu pârâie",
   "{st} st from the speed": "{st} st din viteză",
-  "{st} st from the speed, {total} st in all": "{st} st din viteză, {total} st în total"
+  "{st} st from the speed, {total} st in all": "{st} st din viteză, {total} st în total",
+  "Add a sound that's on your board already and it jumps to it, ringed in yellow.": "Adaugă un sunet care e deja pe panoul tău și sare la el, cu un cerc galben în jurul lui.",
+  "Dodgeball, Home run and Whack-a-Bun. He gets quicker as you score.": "Țintar, Home run și Lovește-l pe Bun. Devine mai rapid pe măsură ce marchezi.",
+  "Finds a sound you already have": "Găsește un sunet pe care îl ai deja",
+  "It goes up to 400 %. New presets too: Nightcore, Slowed + reverb, Bass boosted, Chipmunk and more.": "Merge până la 400 %. Și presetări noi: Nightcore, Încetinit + reverb, Bas amplificat, Veveriță și altele.",
+  "Mic settings for Clean mic": "Setări microfon pentru Microfon curat",
+  "Mic settings, new presets and new games with Bun": "Setări microfon, presetări noi și jocuri noi cu Bun",
+  "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Rotița de lângă Microfon curat din fila Voce: volumul intrării, eliminarea zgomotului și presetări ca Cameră gălăgioasă. Taie și loviturile în birou și bâzâitul grav.",
+  "Three new games with Bun": "Trei jocuri noi cu Bun",
+  "A Volume slider in Live controls": "Un glisor de volum în Controalele live"
 }
