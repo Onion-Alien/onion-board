@@ -54,6 +54,7 @@ def rescan() -> bool:
 
 
 ASK_WAIT_S = 0.25  # how long a caller waits for PortAudio before using the last answer
+SLOW_S = 5.0       # after a late answer: how long callers use the last one at once
 
 
 class _Asker:
@@ -71,6 +72,11 @@ class _Asker:
         self._q: queue.SimpleQueue = queue.SimpleQueue()
         self._thread: threading.Thread | None = None
         self._open: threading.Event | None = None   # the question being answered
+        # PortAudio slow but answering (a busy or paging PC): each new question waited
+        # ASK_WAIT_S again, and a check asking a few times in a row held the window
+        # for 10-30 s (freeze reports at ask()'s wait). After one late answer, callers
+        # don't wait for SLOW_S: the question still goes out and lands in _seen.
+        self._slow_until = 0.0
 
     def ask(self, fn) -> tuple[bool, Any]:
         """(True, fn()'s result), or (False, None) when PortAudio hasn't answered in
@@ -87,8 +93,12 @@ class _Asker:
                 self._thread = threading.Thread(target=self._loop, daemon=True,
                                                 name="device-list")
                 self._thread.start()
-        if not done.wait(ASK_WAIT_S):
-            log.warning("the device list took over %.2fs: using the last one", ASK_WAIT_S)
+        slow = time.monotonic() < self._slow_until
+        if not done.wait(0 if slow else ASK_WAIT_S):
+            if not slow:
+                log.warning("the device list took over %.2fs: using the last one",
+                            ASK_WAIT_S)
+                self._slow_until = time.monotonic() + SLOW_S
             return False, None
         ok, val = box[0]
         if not ok:
