@@ -11,5 +11,5 @@
     "sha256": "d697224b443d212a04d24eb2ea0b615cb663eb24d4d21b70979673507b4d1e49",
     "bytes": 107585048
   },
-  "credits": "English to Swedish model from the Argos Translate package index: Argos Translate, trained on OPUS data."
+  "credits": "English to Swedish model from the Argos Translate package index: Argos Translate (Argos Open Technologies), released under MIT or CC0 (argos-translate issue #533). Trained on OPUS data; includes a Stanza English tokenizer (Apache-2.0)."
 }
