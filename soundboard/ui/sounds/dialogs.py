@@ -4,6 +4,7 @@ effect, modules' included) and the EQ tab."""
 from __future__ import annotations
 
 import logging
+import threading
 
 from PySide6.QtCore import QObject, Qt, Signal
 from PySide6.QtGui import QFont, QImage
@@ -21,7 +22,7 @@ from soundboard import voicefx
 from soundboard.sounds import thumbs
 from soundboard.audio.eq import PRESETS as EQ_PRESETS
 from soundboard.sounds.library import (MAX_COOLDOWN_S, MAX_DELAY_S, PAD_COLORS,
-                                       SoundMeta, original_peaks)
+                                       SoundMeta, original_length, original_peaks)
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import (EqPanel, hint_label, icon_button, reset_button,
                                      section_label, steady_number)
@@ -66,10 +67,13 @@ class EffectsPanel(QObject):
     `pick_voice(voice)` opens the voice picker (ui.voicepicker) on the sound's voice
     and gives back the new one, or None if it was cancelled. The sound keeps a copy."""
     changed = Signal()
+    peaks_read = Signal(int, object)   # (trim generation, peaks) from the waveform worker
 
     def __init__(self, fx: dict | None, meta: SoundMeta | None = None, pick_voice=None):
         super().__init__()
         self._pick_voice = pick_voice
+        self._trim_gen = 0
+        self.peaks_read.connect(self._on_peaks)
         self._voice: dict = {}
         self._live: list = []
         self.trim_page, tv = _page()
@@ -217,9 +221,17 @@ class EffectsPanel(QObject):
         self._matching_preset()
 
     def _new_trim(self, meta: SoundMeta | None, at: int = -1) -> TrimPanel:
-        """The trim for `meta`'s sound (its waveform is that sound's)."""
-        peaks, length = original_peaks(meta) if meta is not None else ([], 0.0)
-        trim = TrimPanel(peaks, length)
+        """The trim for `meta`'s sound (its waveform is that sound's). Its peaks come
+        from a worker: reading them off a paged-out cache froze Edit for seconds."""
+        length = original_length(meta) if meta is not None else 0.0
+        trim = TrimPanel([], length)
+        self._trim_gen += 1
+        if meta is not None and length > 0:
+            gen = self._trim_gen
+
+            def work():
+                busy.emit(self.peaks_read, gen, original_peaks(meta)[0])
+            threading.Thread(target=work, daemon=True, name="edit-waveform").start()
         if at < 0:
             self._v.addWidget(trim)     # in the layout first: shown with no parent,
         else:
@@ -229,6 +241,10 @@ class EffectsPanel(QObject):
         self.trim_kept.setVisible(length > 0)
         trim.changed.connect(self._edited)
         return trim
+
+    def _on_peaks(self, gen: int, peaks):
+        if gen == self._trim_gen:   # still the same sound's trim
+            self.trim.wave.set_peaks(peaks)
 
     def set_sound(self, meta: SoundMeta):
         """Show another sound (Edit sound reused, EditControl.edit): its trim and fx."""

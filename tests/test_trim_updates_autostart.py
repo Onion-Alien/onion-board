@@ -55,6 +55,37 @@ def test_original_peaks_read_the_cache_without_effects(app_dir):
     assert peaks[:9].max() < 0.01 and peaks[11:].min() > 0.9   # quiet, then loud
 
 
+def test_edit_reads_the_waveform_off_the_ui_thread(qapp, monkeypatch):
+    import threading
+    from soundboard.ui.sounds import dialogs
+    read_on, gate = [], threading.Event()
+
+    def slow_peaks(m):
+        read_on.append(threading.current_thread() is threading.main_thread())
+        gate.wait(5)   # a paged-out cache: the dialog must be up before this answers
+        return np.full(40, 0.5, np.float32), 3.0
+    monkeypatch.setattr(dialogs, "original_length", lambda m: 3.0)
+    monkeypatch.setattr(dialogs, "original_peaks", slow_peaks)
+    p = dialogs.EffectsPanel({}, SoundMeta(id="s1", name="Horn", file=""))
+    assert p.trim.length == 3.0 and len(p.trim.wave.peaks) == 0
+    gate.set()
+    deadline = time.monotonic() + 5
+    while not len(p.trim.wave.peaks) and time.monotonic() < deadline:
+        qapp.processEvents()
+    assert read_on == [False] and len(p.trim.wave.peaks) == 40
+
+
+def test_a_late_waveform_skips_the_next_sound_in_a_reused_edit(qapp, monkeypatch):
+    from soundboard.ui.sounds import dialogs
+    monkeypatch.setattr(dialogs, "original_length", lambda m: 3.0)
+    monkeypatch.setattr(dialogs, "original_peaks", lambda m: (np.zeros(0), 3.0))
+    p = dialogs.EffectsPanel({}, SoundMeta(id="s1", name="Horn", file=""))
+    old = p._trim_gen
+    p.set_sound(SoundMeta(id="s2", name="Bell", file=""))
+    p._on_peaks(old, np.full(40, 0.5, np.float32))    # the first sound's, arriving late
+    assert len(p.trim.wave.peaks) == 0
+
+
 def test_trim_panel_values(qapp):
     from soundboard.ui.sounds.trim import TrimPanel
     p = TrimPanel(np.zeros(10, np.float32), 10.0)
