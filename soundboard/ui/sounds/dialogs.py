@@ -291,6 +291,11 @@ class EffectsPanel(QObject):
         self.trim_layout.removeWidget(old)
         old.hide()
         old.deleteLater()
+        # the window reused: the last sound's deleted preset is gone for good, and the
+        # list has the presets saved since (in another Edit window too)
+        self._deleted = None
+        self.undo_row.hide()
+        self._fill_presets()
         self.load(meta.fx or {})
         self._matching_preset()
         if self.compact:
@@ -861,7 +866,9 @@ class EditDialog(EditDialogParts, QDialog):
         bb.button(QDialogButtonBox.StandardButton.Cancel).setProperty("quiet", True)
         copy = bb.addButton(_("Save a copy"), QDialogButtonBox.ButtonRole.AcceptRole)
         copy.setToolTip(_("Keep this sound as it is and add the edited version as a new pad"))
-        copy.clicked.connect(lambda: setattr(self, "as_copy", True))
+        # (the box's clicked comes before its accepted; the button's own clicked came
+        # after, so Save a copy saved onto the original)
+        bb.clicked.connect(lambda b: setattr(self, "as_copy", b is copy))
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
         # beside Save: every effect off, so a playing sound goes plain again at once

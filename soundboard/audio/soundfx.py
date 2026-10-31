@@ -271,7 +271,7 @@ def summary(fx: dict | None) -> str:
     if is_trimmed(f):
         bits.append(f"trimmed {fmt_s(f['start'])}–{fmt_s(f['end']) if f['end'] else 'end'}")
     if abs(f["speed"] - 1) >= 1e-3:
-        bits.append(f"{f['speed']:.2g}x" + (" tape" if f["tape"] else ""))
+        bits.append(f"{round(f['speed'], 3):g}x" + (" tape" if f["tape"] else ""))
     if abs(f["pitch"]) >= 1e-3:
         bits.append(f"{f['pitch']:+g} st")
     if eq.design(f["eq"], SR) is not None:
