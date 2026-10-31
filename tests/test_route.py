@@ -69,6 +69,17 @@ def test_the_cable_route_still_picks_the_cable(win, opened):
     assert win.statusctl.setup_state == "ok"
 
 
+def test_the_cable_hint_points_to_clean_mic(win, monkeypatch):
+    """Pick the cable, switch the app's noise suppression off: Clean mic does it."""
+    from soundboard.voicefx import cleanmic
+    monkeypatch.setattr(cleanmic, "available", lambda: True)
+    win.statusctl._update_status()
+    assert "noise suppression" in win.step_lbl.text() and "Clean mic" in win.step_lbl.text()
+    monkeypatch.setattr(cleanmic, "available", lambda: False)
+    win.statusctl._update_status()
+    assert "noise suppression" in win.step_lbl.text() and "Clean mic" not in win.step_lbl.text()
+
+
 def test_another_device_is_sent_to_and_the_cable_never_takes_its_place(win, opened, devices):  # noqa: F811
     win.routectl.set_route("device", "Speakers")
     assert opened["main"][-1] == "Speakers"

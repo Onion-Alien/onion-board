@@ -9,6 +9,7 @@ from PySide6.QtCore import QPoint, Qt
 from PySide6.QtWidgets import QDialog, QWidget
 
 from soundboard.i18n import _
+from soundboard.ui.window.alertcontrol import clean_mic_note
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.sounds.dialogs import TabHelpPopup
 
@@ -48,7 +49,8 @@ class TipControl(Controller):
             _("Sounds chopped up?"),
             _("If sounds get chopped up, switch off the voice app's noise suppression "
               "(Discord: <b>Input Profile → Custom</b>, <b>Noise Suppression → None</b>, "
-              "<b>Echo Cancellation</b> off. Not Studio: it skips Onion Board)."),
+              "<b>Echo Cancellation</b> off. Not Studio: it skips Onion Board).")
+            + (f"<br><br>{note}" if (note := clean_mic_note()) else ""),
             parent=mw)
         box.body.setTextFormat(Qt.TextFormat.RichText)   # (the setting names in bold)
         self._show_help(box, mw.btn_mictips)
