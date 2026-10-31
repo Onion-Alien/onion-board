@@ -455,13 +455,14 @@ class SpeedPitchButton(QPushButton):
         self._deleted: tuple[str, int, dict] | None = None
         srow.addWidget(self.undo_row, 1, 1)
 
+        srow.addWidget(self._rule(), 2, 0, 1, 2)   # presets above, combos below
         lab = self._setups_lab = self._row_name(_("My voice combos"))
-        srow.addWidget(lab, 2, 0, Qt.AlignmentFlag.AlignTop)
+        srow.addWidget(lab, 3, 0, Qt.AlignmentFlag.AlignTop)
         self.setups_box = QWidget()
         self.setups_box.setObjectName("spcol")
         self.setups_box.setStyleSheet("QWidget#spcol { background:transparent; }")
         self.setups_flow = Flow(self.setups_box, gap=4)
-        srow.addWidget(self.setups_box, 2, 1)
+        srow.addWidget(self.setups_box, 3, 1)
         srow.setColumnStretch(1, 1)
         self.busy_row = QWidget()
         self.busy_row.setObjectName("spcol")
@@ -481,7 +482,7 @@ class SpeedPitchButton(QPushButton):
         b.addWidget(self.busy_bar, 1)
         b.addWidget(self.busy_cancel)
         self.busy_row.hide()
-        srow.addWidget(self.busy_row, 3, 1)
+        srow.addWidget(self.busy_row, 4, 1)
         v.addLayout(srow)
         v.addWidget(self._rule())
 

@@ -9,7 +9,7 @@ from __future__ import annotations
 import html
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QSize, Qt, QTimer
+from PySide6.QtCore import QEvent, QSize, Qt, QTimer
 from PySide6.QtGui import QColor, QIcon, QPainter, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
@@ -48,6 +48,20 @@ class SnugTabBar(QTabBar):
     def minimumSizeHint(self) -> QSize:
         m = super().minimumSizeHint()
         return QSize(min(m.width(), self.sizeHint().width()), m.height())
+
+    def childEvent(self, e):
+        # A dragged tab is drawn twice: by the bar where it's being dragged to, and by
+        # a picture of it Qt floats on top (a plain QWidget child). Our tabs have no
+        # background, so the picture didn't hide the bar's copy: the name showed doubled.
+        super().childEvent(e)
+        w = e.child()
+        if e.type() == QEvent.Type.ChildAdded and type(w) is QWidget:
+            w.installEventFilter(self)
+
+    def eventFilter(self, obj, e):
+        if e.type() == QEvent.Type.Paint and obj.parent() is self:
+            return True   # the floating picture: the bar's own copy is enough
+        return super().eventFilter(obj, e)
 
 
 class CategoryControl(Controller):

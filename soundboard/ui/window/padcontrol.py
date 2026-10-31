@@ -229,10 +229,10 @@ class PadControl(Controller):
             a.setCheckable(True)
             a.setChecked(c in m.tags)
             cat_acts[a] = c
-            for sub in mw.cfg.subcategories.get(c, []):   # indented under it
+            for sub in mw.cfg.subcategories.get(c, []):   # "Parent › sub", under it
                 tag = library.sub_tag(c, sub)
                 a = cats.addAction(icons.icon("tag", checked_color="accent"),
-                                   "      " + sub.replace("&", "&&"))
+                                   f"{c} › {sub}".replace("&", "&&"))
                 a.setCheckable(True)
                 a.setChecked(tag in m.tags)
                 cat_acts[a] = tag
