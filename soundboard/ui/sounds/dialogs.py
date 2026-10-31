@@ -861,7 +861,9 @@ class EditDialog(EditDialogParts, QDialog):
         bb.button(QDialogButtonBox.StandardButton.Cancel).setProperty("quiet", True)
         copy = bb.addButton(_("Save a copy"), QDialogButtonBox.ButtonRole.AcceptRole)
         copy.setToolTip(_("Keep this sound as it is and add the edited version as a new pad"))
-        copy.clicked.connect(lambda: setattr(self, "as_copy", True))
+        # (the box's clicked comes before its accepted; the button's own clicked came
+        # after, so Save a copy saved onto the original)
+        bb.clicked.connect(lambda b: setattr(self, "as_copy", b is copy))
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
         # beside Save: every effect off, so a playing sound goes plain again at once
