@@ -69,12 +69,20 @@ where it needs admin:
 | The mic helper (a scheduled task that runs only when Onion Board asks, so Windows asks once) | the first mic-effect set-up | yes |
 | The virtual cable (VB-Cable, VB-Audio's own driver) | only if you tick it | it asks you |
 | *Start with Windows* (a start-up entry) | only if you turn it on | yes |
-| Discord's voice clean-up switched off, so sounds get through | you press Discord's set-up button | put back when the app closes, and on uninstall |
+| Discord's voice clean-up switched off, so sounds get through (and a copy of the one Discord settings file it changes, kept on your PC for up to 14 days) | you press Discord's set-up button | put back when the app closes, and on uninstall |
 | A firewall rule for Onion Pocket (phones on your Wi-Fi) | you turn it on; Windows asks | no (the cleanup tool below removes it) |
 | A Windows text-to-speech voice | you press *Install the … voice*; Windows asks | no: it's part of Windows |
 
 How the mic effect works, and what each step writes: [SECURITY.md, *What Straight into
 my mic changes on your PC*](../SECURITY.md#what-straight-into-my-mic-changes-on-your-pc).
+
+## Discord's settings
+
+To see whether Discord's voice clean-up would wipe your sounds out, the app reads
+Discord's settings files on your PC. It looks only at the voice settings in them, never
+at your Discord login (which Discord keeps in the same folder), and sends nothing
+anywhere. Details: [SECURITY.md, *What the app reads and writes in Discord's
+settings*](../SECURITY.md#what-the-app-reads-and-writes-in-discords-settings).
 
 ## What stays on your PC
 
