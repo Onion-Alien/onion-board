@@ -390,8 +390,24 @@ class SpeedPitchButton(QPushButton):
                                           "have now as a preset of your own"))
         self.save_preset_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         icons.set_icon(self.save_preset_btn, "plus", size=18)
-        self.save_preset_btn.clicked.connect(self.save_preset)
-        head.addWidget(self.save_preset_btn)
+        self.save_preset_btn.clicked.connect(self._save_or_update)
+        # your preset picked and then changed: Save preset says Update "name", and the
+        # ▾ right beside it holds Update, Reset (back to how it was saved) and Save as new
+        self.preset_menu_btn = QPushButton()
+        self.preset_menu_btn.setObjectName("primary")
+        self.preset_menu_btn.setFixedSize(30, 36)
+        icons.set_icon(self.preset_menu_btn, "fold_open", "on_accent", size=16)
+        self.preset_menu_btn.setToolTip(_("Update, reset or save as a new preset"))
+        self.preset_menu_btn.setAccessibleName(self.preset_menu_btn.toolTip())
+        self.preset_menu_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.preset_menu_btn.clicked.connect(self._preset_menu)
+        self.preset_menu_btn.hide()
+        self._mine_on = ""   # the preset of yours picked last (Update / Reset are for it)
+        pair = QHBoxLayout()
+        pair.setSpacing(2)
+        pair.addWidget(self.save_preset_btn)
+        pair.addWidget(self.preset_menu_btn)
+        head.addLayout(pair)
         if self.has_speed:   # a stream has no pad to copy
             self.save_btn = QPushButton(_("Save as new pad"))
             self.save_btn.setMinimumHeight(36)
@@ -748,6 +764,7 @@ class SpeedPitchButton(QPushButton):
     def load(self, speed: float, pitch: float, keep: bool, amounts: dict):
         """Show these values without sending them anywhere (`changed` and `fx_changed`
         stay quiet): a pad's own effects with these on top, or these alone again."""
+        self._mine_on = ""   # another sound's knobs: not the preset picked before
         self.blockSignals(True)
         try:
             self.set_values(speed, pitch, keep)
@@ -768,6 +785,7 @@ class SpeedPitchButton(QPushButton):
 
     def reset(self):
         self._count("reset")
+        self._mine_on = ""
         self.set_values(1.0, 0.0, self.keep.isChecked())
         self.set_fx({})
         if self.setup_name:
@@ -877,9 +895,12 @@ class SpeedPitchButton(QPushButton):
         if on:
             self._count(f"preset-{usage.live_preset_tag(name)}")
             before = (self.fx_values(), self.values())
+            self._mine_on = name if name in self.my_presets else ""
             self.apply_preset(name)
             self._before_preset = (name, before)
             return
+        if name == self._mine_on:
+            self._mine_on = ""
         was = getattr(self, "_before_preset", None)
         fx, (speed, pitch, keep) = (was[1] if was and was[0] == name
                                     else ({}, (1.0, 0.0, self.keep.isChecked())))
@@ -893,6 +914,67 @@ class SpeedPitchButton(QPushButton):
             for name, b in (*self.fx_presets.items(), *self.my_chips.items()):
                 b.setChecked(self.preset_on(name))
             self.more_btn.setChecked(any(self.preset_on(n) for n in self._more_names()))
+            edited = self.edited_preset()
+            for name, b in self.my_chips.items():   # changed since it was picked: still
+                b.setText(short(name, 18) + (" •" if name == edited else ""))   # lit, a dot
+                b.setChecked(b.isChecked() or name == edited)
+            self._show_update()
+
+    def edited_preset(self) -> str:
+        """The preset of yours picked last, when the knobs have moved off it since; or ""."""
+        name = self._mine_on
+        return name if name in self.my_presets and not self.preset_on(name) else ""
+
+    def _show_update(self):
+        """Save preset, or Update "name" with its ▾ while your preset is changed."""
+        name = self.edited_preset()
+        b = self.save_preset_btn
+        was = b.objectName() == "primary"
+        if name:
+            b.setText(_("Update “{name}”", name=short(name, 18)))
+            b.setToolTip(_("Save what you have now into “{name}”", name=name))
+            b.setObjectName("primary")
+        else:
+            b.setText(_("Save preset"))
+            b.setToolTip(_("Keep the speed, pitch, effects and volume you "
+                           "have now as a preset of your own"))
+            b.setObjectName("")
+        b.setAccessibleName(b.text())
+        icons.set_icon(b, "check" if name else "plus", "on_accent" if name else None,
+                       size=18)
+        self.preset_menu_btn.setVisible(bool(name))
+        if was != bool(name):
+            b.style().unpolish(b)
+            b.style().polish(b)
+            if self.pop.isVisible():
+                self._open()   # the header's buttons are measured again
+
+    def _save_or_update(self):
+        if name := self.edited_preset():
+            self.update_preset(name)
+        else:
+            self.save_preset()
+
+    def update_preset(self, name: str):
+        """Update "name": what's on now saved into your preset, in its place."""
+        speed, pitch, keep = self.values()
+        mypresets.put("live", name, {"speed": speed, "pitch": pitch, "keep": keep,
+                                     **self.fx_values()})
+        self.fill_my_presets()
+        self._light_presets()   # (a closed pop-up fills its row when it opens)
+
+    def _preset_menu(self):
+        name = self.edited_preset()
+        if not name:
+            return
+        m = QMenu(self.pop)
+        m.addAction(icons.icon("check"), _("Update “{name}”", name=short(name, 24)),
+                    lambda: self.update_preset(name))
+        m.addAction(icons.icon("history"), _("Reset “{name}”", name=short(name, 24)),
+                    lambda: self.apply_preset(name))
+        m.addSeparator()
+        m.addAction(icons.icon("plus"), _("Save as a new preset"), self.save_preset)
+        m.exec(self.save_preset_btn.mapToGlobal(QPoint(0, self.save_preset_btn.height())))
 
     # ---- your own presets (audio/mypresets.py): the My presets row
     @staticmethod
@@ -940,7 +1022,7 @@ class SpeedPitchButton(QPushButton):
         self.more_btn.setText(_("More ({n})", n=len(names)) + "  ▾")
         self.more_btn.ensurePolished()
         for i, name in enumerate(names):
-            b = QPushButton(short(name, 18))
+            b = QPushButton(short(name, 18) + " •")   # room for the changed dot
             b.setObjectName("small")
             b.ensurePolished()
             more = gap + self.more_btn.sizeHint().width() if i < len(names) - 1 else 0
@@ -1025,6 +1107,7 @@ class SpeedPitchButton(QPushButton):
                 speed, pitch, keep = self.values()
                 mypresets.put("live", name, {"speed": speed, "pitch": pitch,
                                              "keep": keep, **self.fx_values()})
+                self._mine_on = name   # changed again later: Update is for this one
         self.fill_my_presets()
         self._open()
 
@@ -1038,8 +1121,9 @@ class SpeedPitchButton(QPushButton):
     def _rename_preset(self, old: str):
         self.pop.hide()
         new = self._ask_preset_name(_("Rename preset"), old, keep=old)
-        if new and new != old:
-            mypresets.rename("live", old, new)
+        if new and new != old and mypresets.rename("live", old, new):
+            if self._mine_on == old:
+                self._mine_on = new
         self.fill_my_presets()
         self._open()
 
@@ -1050,6 +1134,8 @@ class SpeedPitchButton(QPushButton):
         if got is None:
             return
         self._deleted = (name, *got)
+        if self._mine_on == name:
+            self._mine_on = ""
         self.undo_text.setText(_("Deleted “{name}”", name=name))
         self.undo_row.show()
         self.fill_my_presets()
@@ -1129,10 +1215,9 @@ class SpeedPitchButton(QPushButton):
         keeps the size it measured first: built on one monitor and opened on one with
         other scaling, its words came out wider than it ("Save as new pa")."""
         self.pop.setScreen(self.screen())
-        self.save_preset_btn.setText(_("Save preset"))
         self.save_preset_btn.setMinimumWidth(0)
         self.save_preset_btn.setMaximumWidth(16777215)
-        icons.set_icon(self.save_preset_btn, "plus", size=18)   # (the gap before words)
+        self._show_update()   # its words (Save preset, or Update "name") and icon
         for b in self._head_btns:
             text = b.text()   # new words: the button forgets the size it kept
             b.setText("")
@@ -1147,7 +1232,7 @@ class SpeedPitchButton(QPushButton):
         self._head.invalidate()
         if self._head.minimumSize().width() > cols:
             self.save_preset_btn.setText("")
-            icons.set_icon(self.save_preset_btn, "plus", size=18)   # no gap: centred
+            icons.text_gap(self.save_preset_btn)   # no gap: centred
             self.save_preset_btn.setFixedWidth(36)   # square, as tall as it is
         # "All sounds" whole or not at all: squeezed it lost its last letters
         self._head.invalidate()

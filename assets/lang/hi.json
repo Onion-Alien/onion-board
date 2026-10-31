@@ -4762,5 +4762,10 @@
   "The helper is removed. Windows asks for permission each time now.": "हेल्पर हटा दिया गया। अब Windows हर बार अनुमति माँगेगा।",
   "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "हेल्पर अभी भी है, इसलिए कुछ नहीं बदला। फिर से कोशिश करें और Windows पूछे तो <b>हाँ</b> पर क्लिक करें।",
   "Wait until the mic effect is done, then try again.": "माइक इफ़ेक्ट पूरा होने तक रुकें, फिर से कोशिश करें।",
-  "Star Onion Board on GitHub": "GitHub पर Onion Board को स्टार दें"
+  "Star Onion Board on GitHub": "GitHub पर Onion Board को स्टार दें",
+  "Reset “{name}”": "“{name}” रीसेट करें",
+  "Save as a new preset": "नए प्रीसेट के रूप में सेव करें",
+  "Save what you have now into “{name}”": "अभी की सेटिंग “{name}” में सेव करें",
+  "Update “{name}”": "“{name}” अपडेट करें",
+  "Update, reset or save as a new preset": "अपडेट, रीसेट या नए प्रीसेट के रूप में सेव करें"
 }

@@ -74,6 +74,41 @@ def test_live_controls_save_one_and_put_it_back(qapp, monkeypatch):
         b.deleteLater()
 
 
+def test_a_changed_preset_can_be_updated_or_reset(qapp):
+    """Your preset picked and then changed: Save preset turns into Update "name" (with
+    its ▾ menu), which saves the change into it; Reset puts the saved one back."""
+    from soundboard.ui.sounds.speedpitch import SpeedPitchButton
+
+    mypresets.put("live", "Loud", {"bass": 6, "treble": 5})
+    b = SpeedPitchButton("sounds")
+    try:
+        b.show()
+        b._open()
+        _pump()
+        assert b.save_preset_btn.accessibleName() == "Save preset"
+        b.my_chips["Loud"].click()
+        assert b.my_chips["Loud"].isChecked() and not b.preset_menu_btn.isVisibleTo(b.pop)
+        b.set_fx({"bass": 9, "treble": 5})                     # moved Bass
+        assert b.edited_preset() == "Loud"
+        assert b.save_preset_btn.accessibleName() == "Update “Loud”"
+        assert b.preset_menu_btn.isVisibleTo(b.pop)
+        assert b.my_chips["Loud"].text().endswith("•")
+        b.apply_preset("Loud")                                 # the ▾ menu's Reset
+        assert b.fx_values() == {"bass": 6, "treble": 5} and b.edited_preset() == ""
+        b.set_fx({"bass": 9, "treble": 5})
+        b.save_preset_btn.click()                              # Update "Loud"
+        assert mypresets.load("live")["Loud"]["bass"] == 9
+        assert b.my_chips["Loud"].isChecked()
+        assert b.save_preset_btn.accessibleName() == "Save preset"
+        assert not b.preset_menu_btn.isVisibleTo(b.pop)
+        b.reset()                                              # the header's Reset: not
+        b.set_fx({"bass": 2})                                  # about Loud any more
+        assert b.edited_preset() == "" and mypresets.load("live")["Loud"]["bass"] == 9
+    finally:
+        b.pop.close()
+        b.deleteLater()
+
+
 def test_a_built_in_name_is_refused(qapp, monkeypatch):
     from soundboard.ui.sounds.speedpitch import SpeedPitchButton
 

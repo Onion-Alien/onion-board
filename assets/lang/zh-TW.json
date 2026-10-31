@@ -4675,5 +4675,10 @@
   "The helper is removed. Windows asks for permission each time now.": "小幫手已移除。現在 Windows 每次都會要求權限。",
   "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "小幫手還在，所以沒有任何改變。請再試一次，Windows 詢問時請按<b>「是」</b>。",
   "Wait until the mic effect is done, then try again.": "請等麥克風效果完成後再試一次。",
-  "Star Onion Board on GitHub": "在 GitHub 上為 Onion Board 加星"
+  "Star Onion Board on GitHub": "在 GitHub 上為 Onion Board 加星",
+  "Reset “{name}”": "重設「{name}」",
+  "Save as a new preset": "另存為新預設集",
+  "Save what you have now into “{name}”": "把現在的設定存到「{name}」",
+  "Update “{name}”": "更新「{name}」",
+  "Update, reset or save as a new preset": "更新、重設或另存為新預設集"
 }

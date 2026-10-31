@@ -4675,5 +4675,10 @@
   "The helper is removed. Windows asks for permission each time now.": "ลบตัวช่วยแล้ว จากนี้ Windows จะขออนุญาตทุกครั้ง",
   "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "ตัวช่วยยังอยู่ จึงไม่มีอะไรเปลี่ยน ลองอีกครั้งแล้วคลิก <b>ใช่</b> เมื่อ Windows ถาม",
   "Wait until the mic effect is done, then try again.": "รอให้เอฟเฟกต์ไมค์ทำงานเสร็จก่อน แล้วลองอีกครั้ง",
-  "Star Onion Board on GitHub": "ให้ดาว Onion Board บน GitHub"
+  "Star Onion Board on GitHub": "ให้ดาว Onion Board บน GitHub",
+  "Reset “{name}”": "รีเซ็ต “{name}”",
+  "Save as a new preset": "บันทึกเป็นพรีเซ็ตใหม่",
+  "Save what you have now into “{name}”": "บันทึกค่าตอนนี้ลงใน “{name}”",
+  "Update “{name}”": "อัปเดต “{name}”",
+  "Update, reset or save as a new preset": "อัปเดต รีเซ็ต หรือบันทึกเป็นพรีเซ็ตใหม่"
 }

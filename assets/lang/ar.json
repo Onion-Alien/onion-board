@@ -5110,5 +5110,10 @@
   "The helper is removed. Windows asks for permission each time now.": "تمت إزالة المساعد. سيطلب Windows الإذن في كل مرة من الآن.",
   "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "المساعد لا يزال موجودًا، لذلك لم يتغير شيء. حاول مرة أخرى واضغط <b>نعم</b> عندما يسأل Windows.",
   "Wait until the mic effect is done, then try again.": "انتظر حتى ينتهي مؤثر الميكروفون، ثم حاول مرة أخرى.",
-  "Star Onion Board on GitHub": "ضع نجمة لـ Onion Board على GitHub"
+  "Star Onion Board on GitHub": "ضع نجمة لـ Onion Board على GitHub",
+  "Reset “{name}”": "أعد ضبط “{name}”",
+  "Save as a new preset": "احفظ كإعداد جديد",
+  "Save what you have now into “{name}”": "احفظ ما لديك الآن في “{name}”",
+  "Update “{name}”": "حدّث “{name}”",
+  "Update, reset or save as a new preset": "حدّث أو أعد الضبط أو احفظ كإعداد جديد"
 }

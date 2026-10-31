@@ -4849,5 +4849,10 @@
   "The helper is removed. Windows asks for permission each time now.": "Помощник удалён. Теперь Windows будет спрашивать разрешение каждый раз.",
   "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "Помощник всё ещё на месте, поэтому ничего не изменилось. Попробуй ещё раз и нажми <b>«Да»</b>, когда Windows спросит.",
   "Wait until the mic effect is done, then try again.": "Подожди, пока эффект микрофона закончит, и попробуй ещё раз.",
-  "Star Onion Board on GitHub": "Поставить звезду Onion Board на GitHub"
+  "Star Onion Board on GitHub": "Поставить звезду Onion Board на GitHub",
+  "Reset “{name}”": "Сбросить «{name}»",
+  "Save as a new preset": "Сохранить как новый пресет",
+  "Save what you have now into “{name}”": "Сохранить текущие настройки в «{name}»",
+  "Update “{name}”": "Обновить «{name}»",
+  "Update, reset or save as a new preset": "Обновить, сбросить или сохранить как новый пресет"
 }

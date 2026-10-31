@@ -4675,5 +4675,10 @@
   "The helper is removed. Windows asks for permission each time now.": "Đã gỡ trình trợ giúp. Giờ Windows sẽ xin phép mỗi lần.",
   "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "Trình trợ giúp vẫn còn đó, nên chưa có gì thay đổi. Hãy thử lại và nhấn <b>Có</b> khi Windows hỏi.",
   "Wait until the mic effect is done, then try again.": "Đợi hiệu ứng mic xong rồi thử lại.",
-  "Star Onion Board on GitHub": "Gắn sao cho Onion Board trên GitHub"
+  "Star Onion Board on GitHub": "Gắn sao cho Onion Board trên GitHub",
+  "Reset “{name}”": "Đặt lại “{name}”",
+  "Save as a new preset": "Lưu thành mẫu mới",
+  "Save what you have now into “{name}”": "Lưu thiết lập hiện tại vào “{name}”",
+  "Update “{name}”": "Cập nhật “{name}”",
+  "Update, reset or save as a new preset": "Cập nhật, đặt lại hoặc lưu thành mẫu mới"
 }

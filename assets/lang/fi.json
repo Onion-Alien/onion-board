@@ -4762,5 +4762,10 @@
   "The helper is removed. Windows asks for permission each time now.": "Apuri on poistettu. Windows pyytää nyt lupaa joka kerta.",
   "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "Apuri on yhä paikallaan, joten mikään ei muuttunut. Yritä uudelleen ja klikkaa <b>Kyllä</b>, kun Windows kysyy.",
   "Wait until the mic effect is done, then try again.": "Odota, että mikrofonitehoste on valmis, ja yritä sitten uudelleen.",
-  "Star Onion Board on GitHub": "Anna Onion Boardille tähti GitHubissa"
+  "Star Onion Board on GitHub": "Anna Onion Boardille tähti GitHubissa",
+  "Reset “{name}”": "Nollaa “{name}”",
+  "Save as a new preset": "Tallenna uutena esiasetuksena",
+  "Save what you have now into “{name}”": "Tallenna nykyiset asetukset kohteeseen “{name}”",
+  "Update “{name}”": "Päivitä “{name}”",
+  "Update, reset or save as a new preset": "Päivitä, nollaa tai tallenna uutena esiasetuksena"
 }

@@ -4762,5 +4762,10 @@
   "The helper is removed. Windows asks for permission each time now.": "Hjelperen er fjernet. Windows ber nå om tillatelse hver gang.",
   "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "Hjelperen er der fortsatt, så ingenting ble endret. Prøv igjen og klikk <b>Ja</b> når Windows spør.",
   "Wait until the mic effect is done, then try again.": "Vent til mikrofoneffekten er ferdig, og prøv igjen.",
-  "Star Onion Board on GitHub": "Gi Onion Board en stjerne på GitHub"
+  "Star Onion Board on GitHub": "Gi Onion Board en stjerne på GitHub",
+  "Reset “{name}”": "Tilbakestill «{name}»",
+  "Save as a new preset": "Lagre som nytt forhåndsvalg",
+  "Save what you have now into “{name}”": "Lagre det du har nå i «{name}»",
+  "Update “{name}”": "Oppdater «{name}»",
+  "Update, reset or save as a new preset": "Oppdater, tilbakestill eller lagre som nytt forhåndsvalg"
 }
