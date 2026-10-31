@@ -4743,5 +4743,12 @@
   "Open Clean mic": "Άνοιγμα Καθαρού μικροφώνου",
   "They think music is background noise and cut your sounds up.": "Θεωρούν τη μουσική θόρυβο φόντου και κομματιάζουν τους ήχους σου.",
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Θέλεις παρ' όλα αυτά να φύγει ο θόρυβος φόντου; Άνοιξε αντί γι' αυτό το <b>Καθαρό μικρόφωνο</b> στην καρτέλα <b>Φωνή</b> του Onion Board: καθαρίζει τη φωνή σου και δεν αγγίζει ποτέ τους ήχους σου.",
-  "Star Onion Board on GitHub": "Βάλε αστέρι στο Onion Board στο GitHub"
+  "Star Onion Board on GitHub": "Βάλε αστέρι στο Onion Board στο GitHub",
+  "Don't ask for admin each time": "Να μη ζητείται άδεια διαχειριστή κάθε φορά",
+  "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Προσθέτει επίσης έναν μικρό βοηθό ώστε τα Windows να μη ρωτήσουν ξανά: μπορείς να τον κλείσεις στις Ρυθμίσεις > Ήχος.",
+  "Off: Windows asks for permission every time the mic effect is set up or repaired.": "Κλειστό: τα Windows ζητούν άδεια κάθε φορά που το εφέ μικροφώνου ρυθμίζεται ή επιδιορθώνεται.",
+  "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Το Onion Board προσθέτει έναν μικρό βοηθό στα Windows (μια εργασία που τρέχει ως SYSTEM), ώστε να μπορεί να ρυθμίζει και να επιδιορθώνει το εφέ μικροφώνου χωρίς τα Windows να ζητούν άδεια κάθε φορά. Βγάλε το τικ για να τον αφαιρέσεις.",
+  "The helper is removed. Windows asks for permission each time now.": "Ο βοηθός αφαιρέθηκε. Τα Windows θα ζητούν άδεια κάθε φορά από τώρα.",
+  "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "Ο βοηθός είναι ακόμη εκεί, οπότε δεν άλλαξε τίποτα. Δοκίμασε ξανά και πάτα <b>Ναι</b> όταν ρωτήσουν τα Windows.",
+  "Wait until the mic effect is done, then try again.": "Περίμενε να τελειώσει το εφέ μικροφώνου και δοκίμασε ξανά."
 }

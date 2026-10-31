@@ -219,9 +219,9 @@ Type: files; Name: "{app}\{#AppExeName}.exe.old*"
 ; made after install: a module's own Python environment and bytecode
 Type: filesandordirs; Name: "{app}\modules"
 
-; Uninstalling leaves %APPDATA%\OnionBoard (their sounds and settings, and a downloaded
-; Tor in tor\bin) and FFmpeg in place; the cable is offered for removal
-; (CurUninstallStepChanged below).
+; Uninstalling asks before it deletes %APPDATA%\OnionBoard (their sounds and settings,
+; and a downloaded Tor in tor\bin), and offers to remove the cable; it leaves FFmpeg in
+; place (CurUninstallStepChanged below).
 
 [Code]
 const
@@ -1306,7 +1306,7 @@ end;
 // installed). Silent uninstalls leave it alone.
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
-  Setup, Mine: String;
+  Setup, Mine, Params: String;
   Code, Default: Integer;
 begin
   // Done: one optional question, never in a silent uninstall. Only the browser opens
@@ -1344,6 +1344,34 @@ begin
   // sends it only if the count is switched on, and gives up after 15 s offline
   Exec(ExpandConstant('{app}\{#AppExeName}.exe'), '--uninstall-count', '', SW_HIDE,
        ewWaitUntilTerminated, Code);
+  // what the app put outside its folder (soundboard/core/uninstallclean.py): the Onion
+  // Pocket firewall rule (Windows asks, only on a PC that has one) and, on their Yes,
+  // their sounds and settings (to the Recycle Bin) and ProgramData's logs. After the
+  // count, which reads the settings. The mic effect comes off first, so its shared
+  // folder can go too; [UninstallRun]'s step then finds nothing to do.
+  Params := '--uninstall-cleanup';
+  if not UninstallSilent and (MsgBox('Also delete your sounds and settings?' + #13#10#13#10 +
+      'Choose No to keep them, so they''re all still there if you install Onion Board ' +
+      'again. Yes puts them in the Recycle Bin.', mbConfirmation,
+      MB_YESNO or MB_DEFBUTTON2) = IDYES) then
+  begin
+    Params := Params + ' --data';
+    Exec(ExpandConstant('{app}\{#AppExeName}.exe'), '--direct-mic remove', '', SW_HIDE,
+         ewWaitUntilTerminated, Code);
+  end;
+  if Exec(ExpandConstant('{app}\{#AppExeName}.exe'), Params, '', SW_HIDE,
+          ewWaitUntilTerminated, Code) and not UninstallSilent then
+  begin
+    if (Code and 1) <> 0 then
+      MsgBox('Some of your sounds and settings couldn''t be deleted. They''re in ' +
+        ExpandConstant('{userappdata}\OnionBoard') + ': you can delete that folder yourself.',
+        mbInformation, MB_OK);
+    if (Code and 2) <> 0 then
+      MsgBox('Onion Pocket''s firewall rule is still there (Windows'' permission prompt ' +
+        'was turned down). It only lets phones on your Wi-Fi reach Onion Board, which is ' +
+        'gone now. To remove it, run OnionBoardCleanup.exe from Onion Board''s GitHub page.',
+        mbInformation, MB_OK);
+  end;
   Setup := CableSetup;
   Mine := '';
   RegQueryStringValue(HKCU, 'Software\OnionBoard', 'InstalledCable', Mine);

@@ -4656,5 +4656,12 @@
   "Open Clean mic": "เปิดไมค์ไร้เสียงรบกวน",
   "They think music is background noise and cut your sounds up.": "มันคิดว่าเพลงเป็นเสียงรบกวนพื้นหลังและตัดเสียงของคุณเป็นท่อนๆ",
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "ยังอยากให้เสียงรบกวนพื้นหลังหายไปอยู่ไหม? เปิด<b>ไมค์ไร้เสียงรบกวน</b>ในแท็บ<b>เสียงพูด</b>ของ Onion Board แทน: มันทำให้เสียงพูดของคุณสะอาด และไม่แตะต้องเสียงเอฟเฟกต์ของคุณเลย",
-  "Star Onion Board on GitHub": "ให้ดาว Onion Board บน GitHub"
+  "Star Onion Board on GitHub": "ให้ดาว Onion Board บน GitHub",
+  "Don't ask for admin each time": "ไม่ต้องขอสิทธิ์ผู้ดูแลระบบทุกครั้ง",
+  "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "และจะเพิ่มตัวช่วยเล็กๆ เพื่อให้ Windows ไม่ถามอีก: ปิดได้ในการตั้งค่า > เสียง",
+  "Off: Windows asks for permission every time the mic effect is set up or repaired.": "ปิด: Windows จะขออนุญาตทุกครั้งที่ติดตั้งหรือซ่อมแซมเอฟเฟกต์ไมค์",
+  "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Onion Board เพิ่มตัวช่วยเล็กๆ ใน Windows (งานที่ทำงานในฐานะ SYSTEM) เพื่อติดตั้งและซ่อมแซมเอฟเฟกต์ไมค์ได้โดยที่ Windows ไม่ต้องขออนุญาตทุกครั้ง เอาเครื่องหมายออกเพื่อลบตัวช่วยนี้",
+  "The helper is removed. Windows asks for permission each time now.": "ลบตัวช่วยแล้ว จากนี้ Windows จะขออนุญาตทุกครั้ง",
+  "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "ตัวช่วยยังอยู่ จึงไม่มีอะไรเปลี่ยน ลองอีกครั้งแล้วคลิก <b>ใช่</b> เมื่อ Windows ถาม",
+  "Wait until the mic effect is done, then try again.": "รอให้เอฟเฟกต์ไมค์ทำงานเสร็จก่อน แล้วลองอีกครั้ง"
 }

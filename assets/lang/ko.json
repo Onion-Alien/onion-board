@@ -4656,5 +4656,12 @@
   "Open Clean mic": "마이크 잡음 제거 열기",
   "They think music is background noise and cut your sounds up.": "음악을 배경 소음으로 여겨 사운드를 잘라 버립니다.",
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "그래도 배경 소음을 없애고 싶다면? 대신 Onion Board의 <b>음성</b> 탭에서 <b>마이크 잡음 제거</b>를 켜세요: 목소리만 깨끗하게 하고 사운드는 절대 건드리지 않습니다.",
-  "Star Onion Board on GitHub": "GitHub에서 Onion Board에 별 주기"
+  "Star Onion Board on GitHub": "GitHub에서 Onion Board에 별 주기",
+  "Don't ask for admin each time": "매번 관리자 권한을 묻지 않기",
+  "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Windows가 다시 묻지 않도록 작은 도우미도 추가합니다. 설정 > 오디오에서 끌 수 있습니다.",
+  "Off: Windows asks for permission every time the mic effect is set up or repaired.": "끄면: 마이크 효과를 설정하거나 복구할 때마다 Windows가 권한을 요청합니다.",
+  "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Onion Board는 Windows에 작은 도우미(SYSTEM으로 실행되는 작업)를 추가해, Windows가 매번 권한을 묻지 않고도 마이크 효과를 설정하고 복구할 수 있게 합니다. 체크를 해제하면 제거됩니다.",
+  "The helper is removed. Windows asks for permission each time now.": "도우미를 제거했습니다. 이제 Windows가 매번 권한을 요청합니다.",
+  "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "도우미가 아직 있어서 바뀐 것이 없습니다. 다시 시도하고 Windows가 물으면 <b>예</b>를 클릭하세요.",
+  "Wait until the mic effect is done, then try again.": "마이크 효과가 끝날 때까지 기다린 뒤 다시 시도하세요."
 }

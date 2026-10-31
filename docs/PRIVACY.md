@@ -69,8 +69,8 @@ asks for permission first where it needs admin:
 | The mic helper (a scheduled task that runs only when Onion Board asks, so Windows asks once) | the first mic-effect set-up | yes |
 | The virtual cable (VB-Cable, VB-Audio's own driver) | only if you tick it | it asks you |
 | *Start with Windows* (a start-up entry) | only if you turn it on | yes |
-| Discord's voice clean-up switched off, so sounds get through (and a copy of the one Discord settings file it changes, kept on your PC for up to 14 days) | you press Discord's set-up button | put back when the app closes, and on uninstall |
-| A firewall rule for Onion Pocket (phones on your Wi-Fi) | you turn it on; Windows asks | no (the cleanup tool below removes it) |
+| Discord's voice clean-up switched off, so sounds get through (and a copy of the voice settings it replaced, kept on your PC for up to 14 days) | you press Discord's set-up button | put back when the app closes, and on uninstall |
+| A firewall rule for Onion Pocket (phones on your Wi-Fi) | you turn it on; Windows asks | yes (Windows asks once more) |
 | A Windows text-to-speech voice | you press *Install the … voice*; Windows asks | no: it's part of Windows |
 
 How the mic effect works, and what each step writes: [SECURITY.md, *What Straight into
@@ -81,7 +81,8 @@ my mic changes on your PC*](../SECURITY.md#what-straight-into-my-mic-changes-on-
 To see whether Discord's voice clean-up would wipe your sounds out, the app reads
 Discord's settings files on your PC. It looks only at the voice settings in them, never
 at your Discord login (which Discord keeps in the same folder), and sends nothing
-anywhere. Details: [SECURITY.md, *What the app reads and writes in Discord's
+anywhere. Before it changes them, the copy it keeps holds only those voice settings:
+the app never reads, copies or keeps your Discord login token. Details: [SECURITY.md, *What the app reads and writes in Discord's
 settings*](../SECURITY.md#what-the-app-reads-and-writes-in-discords-settings).
 
 ## What stays on your PC
@@ -90,8 +91,10 @@ settings*](../SECURITY.md#what-the-app-reads-and-writes-in-discords-settings).
   logs never leave your PC unless you send them yourself.
 - `%ProgramData%\OnionBoard`: the mic effect's shared file and its logs.
 
-Uninstalling keeps both, so a reinstall still has your board. To remove everything,
-including these folders and anything an unfinished uninstall left behind, run
+Uninstalling asks *Also delete your sounds and settings?*: No (the default) keeps both,
+so a reinstall still has your board; Yes puts the first in the Recycle Bin and deletes
+the second. A silent uninstall keeps them. To remove anything an unfinished uninstall
+left behind, run
 [OnionBoardCleanup.exe](https://github.com/Onion-Alien/onion-board/releases/download/cleanup-tool/OnionBoardCleanup.exe):
 it asks once, and deletes your sounds only if you say so.
 

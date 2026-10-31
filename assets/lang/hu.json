@@ -4743,5 +4743,12 @@
   "Open Clean mic": "Tiszta mikrofon megnyitása",
   "They think music is background noise and cut your sounds up.": "Háttérzajnak veszik a zenét, és szétszaggatják a hangjaidat.",
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Azért eltüntetnéd a háttérzajt? Kapcsold be inkább a <b>Tiszta mikrofont</b> az Onion Board <b>Beszéd</b> lapján: tisztítja a beszédhangodat, és a hangjaidhoz soha nem nyúl.",
-  "Star Onion Board on GitHub": "Adj csillagot az Onion Boardnak a GitHubon"
+  "Star Onion Board on GitHub": "Adj csillagot az Onion Boardnak a GitHubon",
+  "Don't ask for admin each time": "Ne kérjen rendszergazdai engedélyt minden alkalommal",
+  "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Egy kis segédet is hozzáad, hogy a Windows ne kérdezzen újra: kikapcsolhatod itt: Beállítások > Hang.",
+  "Off: Windows asks for permission every time the mic effect is set up or repaired.": "Kikapcsolva: a Windows minden alkalommal engedélyt kér, amikor a mikrofoneffekt beállítása vagy javítása történik.",
+  "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Az Onion Board egy kis segédet ad a Windowshoz (egy SYSTEM-ként futó feladatot), hogy úgy állíthassa be és javíthassa a mikrofoneffektet, hogy a Windows ne kérjen minden alkalommal engedélyt. Vedd ki a pipát az eltávolításához.",
+  "The helper is removed. Windows asks for permission each time now.": "A segéd eltávolítva. Mostantól a Windows minden alkalommal engedélyt kér.",
+  "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "A segéd még mindig ott van, így semmi sem változott. Próbáld újra, és kattints az <b>Igen</b> gombra, amikor a Windows kérdez.",
+  "Wait until the mic effect is done, then try again.": "Várd meg, amíg a mikrofoneffekt végez, aztán próbáld újra."
 }

@@ -4743,5 +4743,12 @@
   "Open Clean mic": "Mikro säubern öffnen",
   "They think music is background noise and cut your sounds up.": "Sie halten Musik für Hintergrundlärm und zerhacken deine Sounds.",
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Willst du die Hintergrundgeräusche trotzdem loswerden? Schalte stattdessen <b>Mikro säubern</b> im Tab <b>Stimme</b> von Onion Board ein: Es säubert deine Stimme und lässt deine Sounds immer in Ruhe.",
-  "Star Onion Board on GitHub": "Onion Board auf GitHub einen Stern geben"
+  "Star Onion Board on GitHub": "Onion Board auf GitHub einen Stern geben",
+  "Don't ask for admin each time": "Nicht jedes Mal nach Admin-Rechten fragen",
+  "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Dabei kommt auch ein kleiner Helfer dazu, damit Windows nicht noch mal fragt: Du kannst ihn unter Einstellungen > Audio ausschalten.",
+  "Off: Windows asks for permission every time the mic effect is set up or repaired.": "Aus: Windows fragt jedes Mal um Erlaubnis, wenn der Mikro-Effekt eingerichtet oder repariert wird.",
+  "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Onion Board fügt Windows einen kleinen Helfer hinzu (eine Aufgabe, die als SYSTEM läuft), damit es den Mikro-Effekt einrichten und reparieren kann, ohne dass Windows jedes Mal um Erlaubnis fragt. Nimm den Haken raus, um ihn zu entfernen.",
+  "The helper is removed. Windows asks for permission each time now.": "Der Helfer ist entfernt. Windows fragt jetzt jedes Mal um Erlaubnis.",
+  "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "Der Helfer ist noch da, also hat sich nichts geändert. Versuch es noch mal und klick auf <b>Ja</b>, wenn Windows fragt.",
+  "Wait until the mic effect is done, then try again.": "Warte, bis der Mikro-Effekt fertig ist, und versuch es dann noch mal."
 }

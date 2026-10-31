@@ -19,8 +19,10 @@ storage). A put is one more record appended to the database's log file, in Level
 own format (32 kB blocks, CRC-32C per fragment, a write batch with a sequence number
 above everything already stored), which LevelDB replays the next time Discord opens
 it. Only while Discord's LOCK file can be locked (no Discord has it open), only if the
-log reads cleanly to its end, after a copy of the folder is kept (BACKUPS of them), and
-checked by reading it back. Anything off: nothing is written.
+log reads cleanly to its end, after the voice settings it replaces are kept (BACKUPS
+of them, the MediaEngineStore JSON alone), and checked by reading it back. Anything
+off: nothing is written. Nothing else in Discord's files is kept, copied or logged:
+the same folder holds its login.
 """
 from __future__ import annotations
 
@@ -28,6 +30,7 @@ import copy
 import json
 import logging
 import os
+import re
 import shutil
 import struct
 import sys
@@ -47,8 +50,11 @@ KEY = b"_https://discord.com\x00\x01MediaEngineStore"   # Chromium: "_" origin \
 BLOCK = 32768        # LevelDB log block
 HEADER = 7           # crc32c (4), length (2), type (1)
 FULL, FIRST, MIDDLE, LAST = 1, 2, 3, 4
-BACKUPS = 3          # copies of each client's log kept from before a write
+BACKUPS = 3          # each client's voice settings kept from before a write
 BACKUP_DAYS = 14     # ...and for this long at most
+# what older versions kept there: a copy of Discord's files (its login among them), in
+# a folder per write named by its time. Removed on sight (drop_old_copies).
+OLD_COPY = re.compile(r"\d{8}-\d{6}")
 HELPER_MAX_S = 12 * 3600
 HELPER_POLL_S = 3.0
 CLOSE_WAIT_S = 10.0   # set_up's Discord closing: how long it may take to go
@@ -344,25 +350,52 @@ def _unlock(f):
     f.close()
 
 
-def _backup(log_path: Path, client_dir: str, backup_root: Path) -> Path:
-    """A copy of the one file a write changes (the log it adds to), for going back by
-    hand. Never the whole folder: that's Discord's Local Storage, its login among it,
-    and copies of it were kept here for good."""
-    dest = backup_root / client_dir / time.strftime("%Y%m%d-%H%M%S")
-    dest.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(log_path, dest / log_path.name)
-    old = sorted(p for p in (backup_root / client_dir).iterdir() if p.is_dir())
+def _backup(store: dict | None, client_dir: str, backup_root: Path) -> Path | None:
+    """The voice settings a write replaces (the MediaEngineStore JSON, nothing else),
+    for going back by hand: `<client>/<time>.json`. Never Discord's files themselves:
+    they hold its login too. The client's folder is made even with nothing to keep: it
+    marks a Discord this app has written to (alertcontrol's quit)."""
+    folder = backup_root / client_dir
+    folder.mkdir(parents=True, exist_ok=True)
+    drop_old_copies(backup_root)
+    if store is None:
+        return None
+    dest = folder / f"{time.strftime('%Y%m%d-%H%M%S')}-{time.time_ns() % 10**9:09d}.json"
+    dest.write_text(json.dumps(store, separators=(",", ":"), ensure_ascii=False), "utf-8")
+    old = sorted(folder.glob("*.json"), key=lambda p: (_mtime(p), p.name))
     stale = time.time() - BACKUP_DAYS * 86400
-    for p in old[:-BACKUPS] + [p for p in old[-BACKUPS:] if p != dest and _older(p, stale)]:
-        shutil.rmtree(p, ignore_errors=True)
+    for p in old[:-BACKUPS] + [p for p in old[-BACKUPS:] if p != dest and _mtime(p) < stale]:
+        p.unlink(missing_ok=True)
     return dest
 
 
-def _older(p: Path, when: float) -> bool:
+def drop_old_copies(backup_root: Path) -> int:
+    """Remove the copies of Discord's files older versions kept here (OLD_COPY folders,
+    its login possibly among them). Only those: nothing else is looked at. Returns how
+    many went."""
+    gone = 0
     try:
-        return p.stat().st_mtime < when
+        clients = [p for p in backup_root.iterdir() if p.is_dir()]
     except OSError:
-        return False
+        return 0
+    for c in clients:
+        try:
+            old = [p for p in c.iterdir() if p.is_dir() and OLD_COPY.fullmatch(p.name)]
+        except OSError:
+            continue
+        for p in old:
+            shutil.rmtree(p, ignore_errors=True)
+            gone += not p.exists()
+    if gone:
+        log.info("removed %d old copies of Discord's files", gone)
+    return gone
+
+
+def _mtime(p: Path) -> float:
+    try:
+        return p.stat().st_mtime
+    except OSError:
+        return 0.0
 
 
 def write_store(client_dir: str, store: dict, backup_root: Path,
@@ -391,7 +424,7 @@ def write_store(client_dir: str, store: dict, backup_root: Path,
             return False
         seq = max(manifest_sequence(edits), log_sequence(records)) + 1
         value = encode_value(json.dumps(store, separators=(",", ":"), ensure_ascii=False))
-        _backup(log_path, client_dir, backup_root)
+        _backup(read_store(client_dir, appdata), client_dir, backup_root)
         with open(log_path, "ab") as f:
             f.write(frame(batch_put(seq, KEY, value), len(data)))
             f.flush()

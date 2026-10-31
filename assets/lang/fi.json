@@ -4743,5 +4743,12 @@
   "Open Clean mic": "Avaa Puhdas mikki",
   "They think music is background noise and cut your sounds up.": "Ne pitävät musiikkia taustamelunä ja pilkkovat äänesi.",
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Haluatko silti eroon taustamelusta? Laita sen sijaan <b>Puhdas mikki</b> päälle Onion Boardin <b>Puhe</b>-välilehdellä: se puhdistaa puheesi eikä koskaan koske ääniisi.",
-  "Star Onion Board on GitHub": "Anna Onion Boardille tähti GitHubissa"
+  "Star Onion Board on GitHub": "Anna Onion Boardille tähti GitHubissa",
+  "Don't ask for admin each time": "Älä kysy järjestelmänvalvojan oikeuksia joka kerta",
+  "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Se lisää myös pienen apurin, jotta Windows ei kysy uudestaan: voit poistaa sen käytöstä kohdassa Asetukset > Ääni.",
+  "Off: Windows asks for permission every time the mic effect is set up or repaired.": "Pois: Windows pyytää lupaa joka kerta, kun mikrofonitehoste otetaan käyttöön tai korjataan.",
+  "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Onion Board lisää Windowsiin pienen apurin (tehtävän, joka toimii SYSTEM-tilillä), jotta se voi ottaa mikrofonitehosteen käyttöön ja korjata sen ilman, että Windows pyytää lupaa joka kerta. Poista valinta, niin apuri poistetaan.",
+  "The helper is removed. Windows asks for permission each time now.": "Apuri on poistettu. Windows pyytää nyt lupaa joka kerta.",
+  "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "Apuri on yhä paikallaan, joten mikään ei muuttunut. Yritä uudelleen ja klikkaa <b>Kyllä</b>, kun Windows kysyy.",
+  "Wait until the mic effect is done, then try again.": "Odota, että mikrofonitehoste on valmis, ja yritä sitten uudelleen."
 }

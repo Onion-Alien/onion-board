@@ -4,7 +4,7 @@ import time
 
 import pytest
 from PySide6.QtCore import QEvent
-from PySide6.QtWidgets import QComboBox, QLabel, QPushButton
+from PySide6.QtWidgets import QCheckBox, QComboBox, QLabel, QPushButton
 
 from soundboard.mic import directmic as dm
 from soundboard.ui.settings.settings import SettingsDialog
@@ -639,4 +639,54 @@ def test_the_mic_in_use_is_listed_first(window, qapp, monkeypatch):  # noqa: F81
     d, card = card_with(window, qapp, monkeypatch, found)
     first = card.list.itemAt(0).widget()
     assert first is card.rows[GUID_B] and first.name.text() == '#2 Headset Mic (USB)'
+    d.close()
+
+
+def _helper_box(d):
+    card = d.findChild(RecoveryCard)
+    return next(c for c in card.findChildren(QCheckBox)
+                if c.text() == "Don't ask for admin each time")
+
+
+def test_helper_switch_off_removes_it_and_on_brings_it_back(window, qapp, monkeypatch):  # noqa: F811
+    from soundboard.mic import michelper as mh
+    there, removed = [True], []
+    monkeypatch.setattr(mh, 'installed', lambda: there[0])
+    monkeypatch.setattr(mh, 'leftover', lambda: there[0])
+    monkeypatch.setattr(dm, 'remove_helper', lambda: removed.append(1) or there.pop() and
+                        there.append(False))
+    monkeypatch.setattr(window.micctl, '_check_helper', lambda via='card': None)
+    d = SettingsDialog(window, 'audio')
+    box = _helper_box(d)
+    assert window.cfg.mic_helper and box.isChecked()   # on by default: nothing changes
+    box.click()
+    wait(qapp, lambda: not window.micctl._helper_switching)
+    assert removed == [1] and not window.cfg.mic_helper and not dm.helper_on
+    assert not box.isChecked() and mh.will_ask()
+    box.click()   # back on: no prompt now, the next set-up puts it back
+    assert window.cfg.mic_helper and dm.helper_on and box.isChecked() and removed == [1]
+    d.close()
+
+
+def test_helper_switch_off_with_a_no_leaves_it_on(window, qapp, monkeypatch):  # noqa: F811
+    from soundboard.mic import michelper as mh
+    monkeypatch.setattr(mh, 'installed', lambda: True)
+    monkeypatch.setattr(dm, 'remove_helper', lambda: None)   # No to Windows' prompt
+    d = SettingsDialog(window, 'audio')
+    box = _helper_box(d)
+    box.click()
+    wait(qapp, lambda: not window.micctl._helper_switching)
+    assert window.cfg.mic_helper and dm.helper_on and box.isChecked()
+    d.close()
+
+
+def test_helper_switch_off_with_no_helper_asks_nothing(window, qapp, monkeypatch):  # noqa: F811
+    from soundboard.mic import michelper as mh
+    monkeypatch.setattr(mh, 'installed', lambda: False)
+    monkeypatch.setattr(mh, 'leftover', lambda: False)
+    monkeypatch.setattr(dm, 'remove_helper', lambda: pytest.fail("asked Windows"))
+    d = SettingsDialog(window, 'audio')
+    _helper_box(d).click()
+    wait(qapp, lambda: not window.micctl._helper_switching)
+    assert not window.cfg.mic_helper and not dm.helper_on
     d.close()

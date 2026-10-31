@@ -4743,5 +4743,12 @@
   "Open Clean mic": "Åpne Ren mikrofon",
   "They think music is background noise and cut your sounds up.": "De tror musikk er bakgrunnsstøy og hakker opp lydene dine.",
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Vil du likevel bli kvitt bakgrunnsstøyen? Slå heller på <b>Ren mikrofon</b> på fanen <b>Stemme</b> i Onion Board: den renser stemmen din og rører aldri lydene dine.",
-  "Star Onion Board on GitHub": "Gi Onion Board en stjerne på GitHub"
+  "Star Onion Board on GitHub": "Gi Onion Board en stjerne på GitHub",
+  "Don't ask for admin each time": "Ikke spør om administrator hver gang",
+  "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Den legger også til en liten hjelper, så Windows ikke spør igjen: du kan slå den av i Innstillinger > Lyd.",
+  "Off: Windows asks for permission every time the mic effect is set up or repaired.": "Av: Windows ber om tillatelse hver gang mikrofoneffekten settes opp eller repareres.",
+  "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Onion Board legger til en liten hjelper i Windows (en oppgave som kjører som SYSTEM), så den kan sette opp og reparere mikrofoneffekten uten at Windows ber om tillatelse hver gang. Fjern haken for å fjerne den.",
+  "The helper is removed. Windows asks for permission each time now.": "Hjelperen er fjernet. Windows ber nå om tillatelse hver gang.",
+  "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "Hjelperen er der fortsatt, så ingenting ble endret. Prøv igjen og klikk <b>Ja</b> når Windows spør.",
+  "Wait until the mic effect is done, then try again.": "Vent til mikrofoneffekten er ferdig, og prøv igjen."
 }
