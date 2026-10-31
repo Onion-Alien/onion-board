@@ -514,6 +514,8 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         self.np_name.setToolTip(plain_tip(text))   # a sound's name: web / board text
         self._name_seek.relayout()
         self.mini_name.setText(text)   # hides itself when it has no room
+        for p in self.editctl.players():
+            p.set_name(text, self.np_name.toolTip())
         if text == _("Pick a sound"):   # nothing picked: no time either
             self._set_np_time("")
 
@@ -522,6 +524,8 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         all the way to the buttons instead of stopping at an empty gap."""
         self.np_time.setText(text)
         self.mini_time.setText(text)
+        for p in self.editctl.players():
+            p.set_time(text)
         self._show_np_time()
 
     def _show_np_time(self, tight: bool | None = None):

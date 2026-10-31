@@ -218,6 +218,7 @@ QPushButton#onair { border-radius:15px; padding:5px 14px; font-weight:700;
 QPushButton#onair:checked { background:$live; border:1px solid transparent; color:$on_live; }
 QPushButton#onair:checked:hover { background:$live_hover; }
 QWidget#decktop { background:transparent; }
+QWidget#editplayerpart { background:transparent; }   /* Edit sound's player: its texture shows */
 QLabel#decktitle { color:$text; font-size:9pt; font-weight:600; }
 QPushButton#pill[state="warn"] { background:$warn_bg; color:$warn_text; }
 QAbstractSpinBox { background:$field; border:1px solid transparent; border-radius:6px; padding:3px 6px; }
