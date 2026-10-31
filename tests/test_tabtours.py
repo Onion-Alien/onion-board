@@ -329,3 +329,13 @@ def test_store_tour_waits_for_an_add_from_the_store(window, qapp, counted):
     window.store.used += 1
     assert process_events(qapp, lambda: tabtours._current is None, 2)
     assert "tour-store-done" in counted
+
+
+def test_open_clean_mic_skips_the_voice_tour_this_visit(window, qapp):
+    from soundboard.ui.setup import chatguide
+    chatguide.open_clean_mic(window)   # (the button in the box after Discord's set up)
+    assert window.tabs.currentWidget() is window.voice
+    assert not open_tab(window, qapp, "voice")
+    window.tabs.setCurrentWidget(window.sounds_page)
+    process_events(qapp, lambda: False, tabtours.START_MS / 1000 + 0.3)
+    assert open_tab(window, qapp, "voice")   # the next visit has it

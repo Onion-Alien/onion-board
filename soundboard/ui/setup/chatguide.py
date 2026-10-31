@@ -29,6 +29,7 @@ from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.kit.crashdialog import free_dialog
 from soundboard.core import errors, usage
 from soundboard.i18n import _
+from soundboard.ui.setup import tabtours
 from soundboard.ui.setup.wizardkit import BUN_H, BUN_PAD, _header, _label, _ok
 
 log = logging.getLogger(__name__)
@@ -93,10 +94,11 @@ def clean_mic_takes_over(mw, before: discordcfg.Settings) -> str:
 
 
 def open_clean_mic(mw):
-    """The Voice tab, on its Clean mic card."""
+    """The Voice tab, on its Clean mic card (its first-visit tour waits for next time)."""
     if not mw.tabctl.tab_on("voice"):
         return
     usage.used("clean-mic-open")
+    tabtours.hold(mw, "voice")
     mw.tabs.setCurrentWidget(mw.voice)
     mw.voice._open_card("clean")
 
