@@ -4727,6 +4727,7 @@
     "{n} muuta esiasetustasi"
   ],
   "“{name}” is a built-in preset's name. Pick another one.": "“{name}” on valmiin esiasetuksen nimi. Valitse toinen.",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Windowsin wingetillä tai muuten FFmpegin omalla latauksella (noin 100 Mt). Voit poistaa tämän käytöstä kohdassa Asetukset → Yksityisyys ja tietoturva.",
   "Onion Board's Clean mic (Voice tab) takes out the noise instead.": "Onion Boardin Puhdas mikki (Puhe-välilehti) poistaa melun sen sijaan.",
   "Onion Board's <b>Clean mic</b> (Voice tab) takes out the noise instead.": "Onion Boardin <b>Puhdas mikki</b> (Puhe-välilehti) poistaa melun sen sijaan.",
   "Clean mic takes over noise removal": "Puhdas mikki hoitaa nyt melunpoiston",

@@ -4727,6 +4727,7 @@
     "{n} autres de tes préréglages"
   ],
   "“{name}” is a built-in preset's name. Pick another one.": "« {name} » est le nom d'un préréglage intégré. Choisis-en un autre.",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Via winget de Windows, sinon par le téléchargement propre de FFmpeg (environ 100 Mo). Tu peux le désactiver dans Paramètres → Confidentialité et sécurité.",
   "Onion Board's Clean mic (Voice tab) takes out the noise instead.": "Micro propre d'Onion Board (onglet Voix) retire le bruit à la place.",
   "Onion Board's <b>Clean mic</b> (Voice tab) takes out the noise instead.": "<b>Micro propre</b> d'Onion Board (onglet Voix) retire le bruit à la place.",
   "Clean mic takes over noise removal": "Micro propre se charge de retirer le bruit",

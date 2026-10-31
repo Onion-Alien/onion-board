@@ -221,7 +221,9 @@ class FfmpegControl(Controller):
                     if self.percent >= 0 else
                     _("Getting FFmpeg, so M4A, AAC and video files play and videos can be "
                       "saved…"))
-            why = ""
+            # what it puts on the PC and how to stop that, said as it starts
+            why = _("Through Windows' winget, or else FFmpeg's own download (about 100 MB). "
+                    "You can switch this off in Settings → Privacy & security.")
         else:
             assert h is not None
             if h.state == ffmpegget.MISSING:

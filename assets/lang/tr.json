@@ -4727,6 +4727,7 @@
     "{n} hazır ayarınız daha"
   ],
   "“{name}” is a built-in preset's name. Pick another one.": "“{name}” yerleşik bir hazır ayarın adı. Başka bir ad seçin.",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Windows'un winget'i ile, olmazsa FFmpeg'in kendi indirmesiyle (yaklaşık 100 MB). Bunu Ayarlar → Gizlilik ve güvenlik'ten kapatabilirsin.",
   "Onion Board's Clean mic (Voice tab) takes out the noise instead.": "Bunun yerine Onion Board'un Temiz mikrofon özelliği (Ses sekmesi) gürültüyü temizler.",
   "Onion Board's <b>Clean mic</b> (Voice tab) takes out the noise instead.": "Bunun yerine Onion Board'un <b>Temiz mikrofon</b> özelliği (Ses sekmesi) gürültüyü temizler.",
   "Clean mic takes over noise removal": "Gürültü temizlemeyi Temiz mikrofon üstleniyor",

@@ -4727,6 +4727,7 @@
     "Ακόμα {n} προεπιλογές σου"
   ],
   "“{name}” is a built-in preset's name. Pick another one.": "Το «{name}» είναι όνομα ενσωματωμένης προεπιλογής. Διάλεξε άλλο.",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Μέσω του winget των Windows, αλλιώς από τη λήψη του ίδιου του FFmpeg (περίπου 100 MB). Μπορείς να το απενεργοποιήσεις στις Ρυθμίσεις → Απόρρητο & ασφάλεια.",
   "Onion Board's Clean mic (Voice tab) takes out the noise instead.": "Το Καθαρό μικρόφωνο του Onion Board (καρτέλα Φωνή) αφαιρεί τον θόρυβο αντί γι' αυτό.",
   "Onion Board's <b>Clean mic</b> (Voice tab) takes out the noise instead.": "Το <b>Καθαρό μικρόφωνο</b> του Onion Board (καρτέλα Φωνή) αφαιρεί τον θόρυβο αντί γι' αυτό.",
   "Clean mic takes over noise removal": "Το Καθαρό μικρόφωνο αναλαμβάνει την αφαίρεση θορύβου",

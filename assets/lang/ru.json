@@ -4814,6 +4814,7 @@
     "Ещё {n} твоих пресетов"
   ],
   "“{name}” is a built-in preset's name. Pick another one.": "«{name}» уже название встроенного пресета. Выбери другое.",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Через winget в Windows или, если не выйдет, собственной загрузкой FFmpeg (около 100 МБ). Это можно выключить в Настройки → Конфиденциальность и безопасность.",
   "Onion Board's Clean mic (Voice tab) takes out the noise instead.": "Вместо этого «Чистый микрофон» в Onion Board (вкладка «Голос») убирает шум.",
   "Onion Board's <b>Clean mic</b> (Voice tab) takes out the noise instead.": "Вместо этого «<b>Чистый микрофон</b>» в Onion Board (вкладка «Голос») убирает шум.",
   "Clean mic takes over noise removal": "Шум теперь убирает «Чистый микрофон»",

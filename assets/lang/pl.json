@@ -4814,6 +4814,7 @@
     "Jeszcze {n} twoich presetów"
   ],
   "“{name}” is a built-in preset's name. Pick another one.": "„{name}” to nazwa wbudowanego presetu. Wybierz inną.",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Przez winget w Windows albo przez własne pobieranie FFmpeg (około 100 MB). Możesz to wyłączyć w Ustawienia → Prywatność i bezpieczeństwo.",
   "Onion Board's Clean mic (Voice tab) takes out the noise instead.": "Zamiast tego Czysty mikrofon w Onion Board (karta Głos) usuwa szum.",
   "Onion Board's <b>Clean mic</b> (Voice tab) takes out the noise instead.": "Zamiast tego <b>Czysty mikrofon</b> w Onion Board (karta Głos) usuwa szum.",
   "Clean mic takes over noise removal": "Czysty mikrofon przejmuje usuwanie szumu",

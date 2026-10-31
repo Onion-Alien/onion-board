@@ -58,13 +58,13 @@ it and submit it yourself.
 
 ## What it changes on your PC
 
-Each of these happens only when you choose it, and Windows asks for permission first
-where it needs admin:
+Each of these happens only when you choose it (FFmpeg: when you install), and Windows
+asks for permission first where it needs admin:
 
 | Change | When | Removed by the uninstaller |
 |---|---|---|
 | The program and its shortcuts (`%LOCALAPPDATA%\Programs\OnionBoard`) | install | yes |
-| FFmpeg, through Windows' `winget` (for M4A, AAC and video files) | install, when it isn't on the PC yet and Offline mode is off | no: it's a normal app in Installed apps |
+| FFmpeg, through Windows' `winget` (for M4A, AAC and video files) | install, when it isn't on the PC yet and Offline mode is off (the installer says so first) | no: it's a normal app in Installed apps |
 | The mic effect for *Straight into my mic* (an audio effect on the mic you pick, under `%ProgramFiles%\Onion Board Mic`) | you set it up; Windows asks | yes, and every mic's settings go back as they were |
 | The mic helper (a scheduled task that runs only when Onion Board asks, so Windows asks once) | the first mic-effect set-up | yes |
 | The virtual cable (VB-Cable, VB-Audio's own driver) | only if you tick it | it asks you |

@@ -4814,6 +4814,7 @@
     "Încă {n} de presetări de-ale tale"
   ],
   "“{name}” is a built-in preset's name. Pick another one.": "„{name}” e numele unei presetări incluse. Alege altul.",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Prin winget din Windows sau, altfel, prin descărcarea proprie a FFmpeg (circa 100 MB). Poți opri asta în Setări → Confidențialitate și securitate.",
   "Onion Board's Clean mic (Voice tab) takes out the noise instead.": "În schimb, Microfon curat din Onion Board (fila Voce) scoate zgomotul.",
   "Onion Board's <b>Clean mic</b> (Voice tab) takes out the noise instead.": "În schimb, <b>Microfon curat</b> din Onion Board (fila Voce) scoate zgomotul.",
   "Clean mic takes over noise removal": "Microfon curat preia eliminarea zgomotului",

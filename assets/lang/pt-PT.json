@@ -4727,6 +4727,7 @@
     "Mais {n} predefinições tuas"
   ],
   "“{name}” is a built-in preset's name. Pick another one.": "“{name}” é o nome de uma predefinição incluída. Escolhe outro.",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Através do winget do Windows ou, se não der, da transferência do próprio FFmpeg (cerca de 100 MB). Podes desligar isto em Definições → Privacidade & segurança.",
   "Onion Board's Clean mic (Voice tab) takes out the noise instead.": "O Microfone limpo do Onion Board (separador Voz) tira o ruído em vez disso.",
   "Onion Board's <b>Clean mic</b> (Voice tab) takes out the noise instead.": "O <b>Microfone limpo</b> do Onion Board (separador Voz) tira o ruído em vez disso.",
   "Clean mic takes over noise removal": "O Microfone limpo assume a remoção de ruído",

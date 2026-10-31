@@ -4640,6 +4640,7 @@
     "{n} lagi pratetap anda"
   ],
   "“{name}” is a built-in preset's name. Pick another one.": "“{name}” ialah nama pratetap terbina dalam. Pilih nama lain.",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Melalui winget Windows, atau muat turun FFmpeg sendiri (kira-kira 100 MB). Anda boleh mematikannya di Tetapan → Privasi & keselamatan.",
   "Onion Board's Clean mic (Voice tab) takes out the noise instead.": "Mikrofon bersih dalam Onion Board (tab Suara) membuang bunyi bising sebagai gantinya.",
   "Onion Board's <b>Clean mic</b> (Voice tab) takes out the noise instead.": "<b>Mikrofon bersih</b> dalam Onion Board (tab Suara) membuang bunyi bising sebagai gantinya.",
   "Clean mic takes over noise removal": "Mikrofon bersih mengambil alih pembuangan bunyi bising",
