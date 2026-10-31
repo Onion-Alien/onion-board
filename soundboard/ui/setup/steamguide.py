@@ -8,6 +8,7 @@ from PySide6.QtWidgets import QApplication, QDialog, QHBoxLayout, QPushButton, Q
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.i18n import _
+from soundboard.ui.setup.chatguide import clean_mic_step
 from soundboard.ui.setup.wizardkit import BUN_H, BUN_PAD, _header, _label, _ok
 
 
@@ -44,6 +45,7 @@ class SteamGuide(QDialog):
               "<b>Echo cancellation</b> and <b>Automatic volume/gain control</b>.")
             + small.format(_("They think music is background noise and cut your sounds up. "
                              "Onion Board already cleans up your voice.")),
+            clean_mic_step(),
             _("Click <b>Start microphone test</b> and play a sound in Onion Board. You should "
               "hear it back."),
             _("On the Setup tab, set <b>Who's listening</b> to <b>Advanced</b>, then <b>Steam "

@@ -47,6 +47,21 @@ def _warn() -> str:
     return theme.status("warn")
 
 
+def clean_mic_tip() -> str:
+    """With Discord's cleanup off the mic's background noise gets through: Clean mic
+    takes it out of the voice only (the sounds are mixed in after it)."""
+    return _("With Discord's noise suppression off, turn on <b>Clean mic</b> on Onion "
+             "Board's <b>Voice</b> tab. It takes fans, keyboards and other background "
+             "noise out of your voice and never touches your sounds.")
+
+
+def clean_mic_step() -> str:
+    """clean_mic_tip for the game, Steam and call guides: their cleanup, not Discord's."""
+    return _("With that cleanup off, turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> "
+             "tab. It takes fans, keyboards and other background noise out of your voice "
+             "and never touches your sounds.")
+
+
 def _steps(*items: str) -> str:
     """A numbered list of guide steps (each one translated whole)."""
     lis = [f"<li style='margin-bottom:8px'>{t}</li>" for t in items[:-1]]
@@ -228,6 +243,9 @@ class DiscordFixed(QDialog):
         col.addWidget(top)
         col.addWidget(panel.hint_label(_(
             "Your sounds reach your friends clean now, not muffled or cut off.")))
+        tip = panel.hint_label(clean_mic_tip())
+        tip.setTextFormat(Qt.TextFormat.RichText)
+        col.addWidget(tip)
         col.addStretch(1)
         head.addLayout(col, 1)
         self.bun = BunnyWidget("star", celebrate=True, height=74, pad=5)
@@ -674,6 +692,7 @@ class DiscordGuide(QDialog):
               "<br><span style='font-size:9pt'>No Input Profile in your Discord? Set "
               "<b>Noise Suppression</b> to <b>None</b> and turn off <b>Echo "
               "Cancellation</b> and <b>Automatic Gain Control</b>.</span>"),
+            clean_mic_tip(),
             _("<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under "
               "Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you "
               "while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically "
@@ -851,6 +870,7 @@ class GameGuide(QDialog):
               "cancellation</b>, <b>denoiser</b>, <b>background sound removal</b>, <b>voice "
               "clarity</b> or <b>automatic gain</b>. The AI denoisers (VRChat, Minecraft's "
               "Simple Voice Chat) wipe out music almost completely."),
+            clean_mic_step(),
             _("<b>Push to talk</b> instead of open mic or voice activation, with the same key "
               "under <b>Settings → Hotkeys → Auto push-to-talk</b>: voice activation cuts the "
               "quiet parts of sounds, and some games send only speech on it, never music. "
@@ -906,6 +926,7 @@ class MeetingGuide(QDialog):
             _("<b>In a browser</b> (Google Meet, Discord or Guilded in a web page): the "
               "call's own settings → Microphone: {mic}, and turn off <b>Noise "
               "cancellation</b> / <b>noise suppression</b> where the site has it.", mic=mic),
+            clean_mic_step(),
             _("On the Setup tab, set <b>Who's listening</b> to <b>Voice chat</b>. It picks "
               "the browser shaping by itself once the call is listening."))))
         row = QHBoxLayout()
