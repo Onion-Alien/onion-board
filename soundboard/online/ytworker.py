@@ -16,6 +16,7 @@ from __future__ import annotations
 import copy
 import logging
 import os
+import re
 import subprocess
 import sys
 import threading
@@ -365,10 +366,13 @@ def extract(yt_dlp, target: str, opts: dict, keep: bool = False):
     """yt-dlp's look-up of `target`. With `keep`, YouTube searches reuse the kept
     settings; if that fails, it's done again the old way, with fresh ones."""
     used: list = []
+    lists = PLAYLIST_FILTER in target
     if keep:
         try:
             with yt_dlp.YoutubeDL(opts) as ydl:
                 _keep_configs(ydl, used)
+                if lists:
+                    _playlist_counts(ydl)
                 return ydl.extract_info(target, download=False)
         except Exception as e:  # noqa: BLE001 - retried below, or raised as it is
             if not used:
@@ -381,7 +385,59 @@ def extract(yt_dlp, target: str, opts: dict, keep: bool = False):
             _keep_configs(ydl, [], fresh=True)
         if target.startswith("scsearch"):
             _listed_art_only(ydl)
+        if lists:
+            _playlist_counts(ydl)
         return ydl.extract_info(target, download=False)
+
+
+PLAYLIST_FILTER = "sp=EgIQAw"   # YouTube's search for playlists (ytsearch.search)
+_VIDEOS = re.compile(r"([\d.,]+)\s*([KM]?)\s+(?:videos?|episodes?)", re.I)
+
+
+def _playlist_counts(ydl):
+    """A YouTube playlist search: each card says how many videos the playlist has
+    (ytsearch._playlist_hit). The page shows it on the picture ("7 videos"), and yt-dlp
+    reads it but keeps only a video's length from there: it goes into the entry as
+    playlist_count. Nothing more is asked of YouTube."""
+    try:
+        ie = ydl.get_info_extractor("YoutubeSearchURL")
+        lockup = ie._extract_lockup_view_model
+    except Exception:  # noqa: BLE001 - another yt-dlp: the cards say "Playlist", as before
+        return
+
+    def counted(view_model):
+        entry = lockup(view_model)
+        if isinstance(entry, dict) and isinstance(view_model, dict) and (
+                view_model.get("contentType") == "LOCKUP_CONTENT_TYPE_PLAYLIST"):
+            n = _badge_count(view_model.get("contentImage"))
+            if n is not None:
+                entry["playlist_count"] = n
+        return entry
+    ie._extract_lockup_view_model = counted
+
+
+def _badge_count(node, depth: int = 0) -> int | None:
+    """The "N videos" text on a playlist's picture, as a number (None: not there)."""
+    if depth > 12:
+        return None
+    if isinstance(node, dict):
+        badge = node.get("thumbnailBadgeViewModel")
+        text = badge.get("text") if isinstance(badge, dict) else None
+        m = _VIDEOS.fullmatch(text.strip()) if isinstance(text, str) else None
+        if m:
+            num = float(m.group(1).replace(",", "")) if m.group(2) else float(
+                m.group(1).replace(",", "").replace(".", ""))
+            return int(num * {"": 1, "K": 1000, "M": 1000000}[m.group(2).upper()])
+        nodes = node.values()
+    elif isinstance(node, list):
+        nodes = node
+    else:
+        return None
+    for v in nodes:
+        n = _badge_count(v, depth + 1)
+        if n is not None:
+            return n
+    return None
 
 
 def _listed_art_only(ydl):

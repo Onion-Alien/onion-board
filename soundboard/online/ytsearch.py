@@ -125,7 +125,7 @@ def _playlist_hit(e: dict) -> Result | None:
                 if t.get("url")), "")
     return Result(str(e.get("id") or link), str(e.get("title") or _("Playlist")),
                   str(e.get("channel") or e.get("uploader") or ""), 0.0,
-                  source=PLAYLIST, link=link, art=art)
+                  source=PLAYLIST, link=link, art=art, videos=_count(e.get("playlist_count")))
 
 
 def _soundcloud_hit(e: dict) -> Result | None:

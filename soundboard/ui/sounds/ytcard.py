@@ -188,9 +188,12 @@ class ResultRow(HoverCard):
             self.title.setStyleSheet("font-size:12.5pt; font-weight:700;")
         self.playlist = r.source == ytdl.PLAYLIST   # Open lists its videos, no Play / Add
         # channel names come from YouTube: painted as plain text
-        self.sub = ClampLabel(" · ".join(x for x in (
-            r.channel, _("Playlist") if self.playlist else
-            fmt_time(r.seconds) if r.seconds else "") if x), lines=1, bold=False)
+        # a playlist's: how many videos it has, first so a long channel name can't cut
+        # it off ("Playlist" when the search didn't say)
+        sub = ((ngettext("{n} video", "{n} videos", r.videos) if r.videos else _("Playlist"),
+                r.channel) if self.playlist else
+               (r.channel, fmt_time(r.seconds) if r.seconds else ""))
+        self.sub = ClampLabel(" · ".join(x for x in sub if x), lines=1, bold=False)
         self.sub.setObjectName("muted")
         self.stats = StatsLabel()
         self.stats.setObjectName("muted")

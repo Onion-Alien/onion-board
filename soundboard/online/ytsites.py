@@ -245,6 +245,7 @@ class Result:
     views: int | None = None      # None: the search entry didn't say
     likes: int | None = None
     comments: int | None = None
+    videos: int | None = None     # a playlist's: how many it has (None: not said)
 
     @property
     def url(self) -> str:
