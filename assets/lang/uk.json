@@ -4829,5 +4829,12 @@
   "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "Замість нього Bun увімкне «Чистий мікрофон» на вкладці «Голос»: він прибирає фоновий шум із вашого голосу й ніколи не чіпає ваші звуки.",
   "Open Clean mic": "Відкрити «Чистий мікрофон»",
   "They think music is background noise and cut your sounds up.": "Вони вважають музику фоновим шумом і кришать ваші звуки.",
-  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Усе одно хочете прибрати фоновий шум? Увімкніть натомість <b>Чистий мікрофон</b> на вкладці <b>Голос</b> в Onion Board: він очищає ваш голос і ніколи не чіпає ваші звуки."
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Усе одно хочете прибрати фоновий шум? Увімкніть натомість <b>Чистий мікрофон</b> на вкладці <b>Голос</b> в Onion Board: він очищає ваш голос і ніколи не чіпає ваші звуки.",
+  "Don't ask for admin each time": "Не питати права адміністратора щоразу",
+  "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Також додається невеликий помічник, щоб Windows більше не питала: його можна вимкнути в Налаштування > Аудіо.",
+  "Off: Windows asks for permission every time the mic effect is set up or repaired.": "Вимкнено: Windows питає дозвіл щоразу, коли ефект мікрофона встановлюється або відновлюється.",
+  "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Onion Board додає до Windows невеликого помічника (завдання, що працює від імені SYSTEM), щоб встановлювати й відновлювати ефект мікрофона без запиту дозволу Windows щоразу. Зніміть позначку, щоб видалити його.",
+  "The helper is removed. Windows asks for permission each time now.": "Помічника видалено. Тепер Windows питатиме дозвіл щоразу.",
+  "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "Помічник досі на місці, тож нічого не змінилося. Спробуйте ще раз і натисніть <b>«Так»</b>, коли Windows запитає.",
+  "Wait until the mic effect is done, then try again.": "Зачекайте, поки ефект мікрофона закінчить, і спробуйте ще раз."
 }

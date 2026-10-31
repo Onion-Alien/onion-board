@@ -4655,5 +4655,12 @@
   "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "Sebagai gantinya, Bun menghidupkan Mikrofon bersih pada tab Suara: ia membuang hingar latar daripada suara anda dan tidak pernah menyentuh bunyi anda.",
   "Open Clean mic": "Buka Mikrofon bersih",
   "They think music is background noise and cut your sounds up.": "Ia menganggap muzik sebagai hingar latar dan memotong bunyi anda.",
-  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Masih mahu hingar latar hilang? Hidupkan sahaja <b>Mikrofon bersih</b> pada tab <b>Suara</b> Onion Board: ia membersihkan suara anda dan tidak pernah menyentuh bunyi anda."
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Masih mahu hingar latar hilang? Hidupkan sahaja <b>Mikrofon bersih</b> pada tab <b>Suara</b> Onion Board: ia membersihkan suara anda dan tidak pernah menyentuh bunyi anda.",
+  "Don't ask for admin each time": "Jangan minta kebenaran pentadbir setiap kali",
+  "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Ia juga menambah pembantu kecil supaya Windows tidak bertanya lagi: anda boleh mematikannya dalam Tetapan > Audio.",
+  "Off: Windows asks for permission every time the mic effect is set up or repaired.": "Mati: Windows meminta kebenaran setiap kali kesan mikrofon dipasang atau dibaiki.",
+  "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Onion Board menambah pembantu kecil pada Windows (tugas yang berjalan sebagai SYSTEM), supaya ia boleh memasang dan membaiki kesan mikrofon tanpa Windows meminta kebenaran setiap kali. Nyahtanda untuk membuangnya.",
+  "The helper is removed. Windows asks for permission each time now.": "Pembantu telah dibuang. Windows kini meminta kebenaran setiap kali.",
+  "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "Pembantu masih ada, jadi tiada apa yang berubah. Cuba lagi dan klik <b>Yes</b> apabila Windows bertanya.",
+  "Wait until the mic effect is done, then try again.": "Tunggu sehingga kesan mikrofon selesai, kemudian cuba lagi."
 }

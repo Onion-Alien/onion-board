@@ -62,7 +62,8 @@ ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4
                30: "acebab9e7257e67c5c98260264c3c5a28d5b9b7cfaa648cbc18e736c4bae25a4",
                31: "833eac929852c4838d3869ec238e99f23dc2067746815520de7839ed51e54b85",
                32: "5fe573c21a645bad90ed641ff87d1686174da445c20b2e5c1179210457ddd33d",
-               33: "764a71a6d5c4dc9e6c69afdf4287b2a18e1bf85580d918d223d57b91dc103c61"}
+               33: "764a71a6d5c4dc9e6c69afdf4287b2a18e1bf85580d918d223d57b91dc103c61",
+               34: "ee19b11a3aa9e4975834a8e67181997441592b476a6d5681d7c235dc2b0c2fd4"}
 
 
 def _queue():
@@ -341,6 +342,65 @@ def test_nothing_left_nothing_to_remove(admin_cli, monkeypatch):
     monkeypatch.setattr(mh, "leftover", lambda: False)
     monkeypatch.setattr(dm, "_elevated", lambda *a, **k: pytest.fail("asked for admin"))
     assert dm.cli(["remove"]) == 0 and admin_cli == []
+
+
+# ------------------------------------------------- switched off in Settings
+
+def test_the_helper_is_on_by_default_and_old_settings_keep_it():
+    from soundboard.sounds.config import Config
+    assert Config().mic_helper is True
+    assert Config.from_raw({}).mic_helper is True   # settings from before the switch
+    assert Config.from_raw({"mic_helper": False}).mic_helper is False
+
+
+def test_switched_off_every_step_asks_windows_and_sets_up_no_helper(monkeypatch):
+    prompted = []
+    monkeypatch.setattr(mh, "ready", lambda *a, **k: pytest.fail("looked for the helper"))
+    monkeypatch.setattr(mh, "ask", lambda *a, **k: pytest.fail("used the helper"))
+    monkeypatch.setattr(dm, "run_elevated",
+                        lambda exe, params, wait_s, **k: prompted.append(params) or 0)
+    monkeypatch.setattr(mh, "_token_sid", lambda: SID)
+    dm.set_helper(False)
+    assert REAL_ELEVATED(["install", GUID]) == 0
+    assert prompted[0].endswith(f"--direct-mic install {GUID} --no-helper")
+    assert mh.will_ask() and mh.will_ask(False)   # the texts say Windows asks
+    assert dm.helper_note() == ""
+
+
+def test_the_admin_copy_sets_up_no_helper_when_told(admin_cli):
+    assert dm.cli(["install", GUID, "--no-helper"]) == 0
+    assert admin_cli == ["install"]
+
+
+def test_switched_on_again_the_next_prompt_puts_it_back(monkeypatch, admin_cli):
+    prompted = []
+    monkeypatch.setattr(mh, "ready", lambda same_dll=True, via="": False)
+    monkeypatch.setattr(dm, "run_elevated",
+                        lambda exe, params, wait_s, **k: prompted.append(params) or 0)
+    monkeypatch.setattr(mh, "_token_sid", lambda: SID)
+    dm.set_helper(False)
+    dm.set_helper(True)
+    assert REAL_ELEVATED(["install", GUID]) == 0
+    assert prompted[0].endswith(f"--direct-mic install {GUID} --for {SID}")
+    assert dm.cli(["install", GUID, "--for", SID]) == 0
+    assert admin_cli == ["install", f"helper for {SID}"]
+    assert "Settings > Audio" in dm.helper_note()
+
+
+def test_removing_the_helper_asks_windows_never_the_helper(monkeypatch):
+    prompted = []
+    monkeypatch.setattr(dm, "_elevated", REAL_ELEVATED)
+    monkeypatch.setattr(mh, "ready", lambda same_dll=True, via="": True)
+    monkeypatch.setattr(mh, "ask", lambda *a, **k: pytest.fail("the helper removed itself"))
+    monkeypatch.setattr(dm, "run_elevated",
+                        lambda exe, params, wait_s, **k: prompted.append(params) or 0)
+    assert dm.remove_helper() == 0
+    assert prompted[0].endswith("--direct-mic remove-helper")
+
+
+def test_the_admin_copy_removes_only_the_helper(admin_cli):
+    assert dm.cli(["remove-helper"]) == 0
+    assert admin_cli == ["helper gone"]
 
 
 def test_any_trace_of_a_helper_is_a_leftover(monkeypatch):

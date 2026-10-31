@@ -4829,5 +4829,12 @@
   "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "În locul lui, Bun pornește Microfon curat din fila Voce: scoate zgomotul de fundal din vocea ta și nu se atinge niciodată de sunetele tale.",
   "Open Clean mic": "Deschide Microfon curat",
   "They think music is background noise and cut your sounds up.": "Tratează muzica drept zgomot de fundal și îți taie sunetele.",
-  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Vrei totuși să scapi de zgomotul de fundal? Pornește în schimb <b>Microfon curat</b> din fila <b>Voce</b> a Onion Board: îți curăță vocea și nu se atinge niciodată de sunetele tale."
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Vrei totuși să scapi de zgomotul de fundal? Pornește în schimb <b>Microfon curat</b> din fila <b>Voce</b> a Onion Board: îți curăță vocea și nu se atinge niciodată de sunetele tale.",
+  "Don't ask for admin each time": "Nu cere drepturi de administrator de fiecare dată",
+  "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Adaugă și un mic ajutor, ca Windows să nu mai întrebe: îl poți opri din Setări > Audio.",
+  "Off: Windows asks for permission every time the mic effect is set up or repaired.": "Oprit: Windows cere permisiunea de fiecare dată când efectul de microfon e instalat sau reparat.",
+  "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Onion Board adaugă în Windows un mic ajutor (o sarcină care rulează ca SYSTEM), ca să poată instala și repara efectul de microfon fără ca Windows să ceară permisiunea de fiecare dată. Debifează ca să-l elimini.",
+  "The helper is removed. Windows asks for permission each time now.": "Ajutorul a fost eliminat. De acum Windows cere permisiunea de fiecare dată.",
+  "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "Ajutorul e încă acolo, deci nu s-a schimbat nimic. Încearcă din nou și apasă <b>Da</b> când întreabă Windows.",
+  "Wait until the mic effect is done, then try again.": "Așteaptă să termine efectul de microfon, apoi încearcă din nou."
 }
