@@ -34,7 +34,7 @@ def test_the_switch_searches_youtube_playlists_and_back_to_videos(qapp, monkeypa
     assert process_events(qapp, lambda: panel._rows and panel._rows[0].playlist)
     row = panel._rows[0]
     assert row.btn_play.text() == "Open" and row.btn_add.text() == "Add all"
-    assert row.sub.full == "Band · Playlist"
+    assert row.sub.full == "Playlist · Band"
     panel.kind_toggle.buttons["playlists"].click()   # the one shown: not searched again
     panel.kind_toggle.buttons["videos"].click()
     assert process_events(qapp, lambda: panel._rows and not panel._rows[0].playlist)
@@ -150,3 +150,53 @@ def test_a_playlist_cards_buttons_stack_when_their_words_dont_fit(qapp):
     row.setFixedWidth(480)
     qapp.processEvents()
     assert row.buttons.direction() == QBoxLayout.Direction.LeftToRight
+
+
+def _lockup(kind, badge):
+    """A search result as YouTube's page lists it, with the text on its picture."""
+    return {"contentId": "PLx", "contentType": kind, "contentImage": {
+        "collectionThumbnailViewModel": {"primaryThumbnail": {"thumbnailViewModel": {
+            "overlays": [{"thumbnailOverlayBadgeViewModel": {"thumbnailBadges": [
+                {"thumbnailBadgeViewModel": {"text": badge}}]}}]}}}}}
+
+
+def test_a_playlist_search_keeps_how_many_videos_each_has():
+    """yt-dlp reads a found playlist's "7 videos" but drops it: the search keeps it."""
+    from soundboard.online import ytworker
+
+    class IE:
+        def _extract_lockup_view_model(self, vm):
+            return {"id": vm["contentId"]}
+    ie = IE()
+
+    class Ydl:
+        def get_info_extractor(self, key):
+            assert key == "YoutubeSearchURL"
+            return ie
+    ytworker._playlist_counts(Ydl())
+    pl = "LOCKUP_CONTENT_TYPE_PLAYLIST"
+    assert ie._extract_lockup_view_model(_lockup(pl, "7 videos"))["playlist_count"] == 7
+    assert ie._extract_lockup_view_model(_lockup(pl, "1 video"))["playlist_count"] == 1
+    assert ie._extract_lockup_view_model(_lockup(pl, "1,204 videos"))["playlist_count"] == 1204
+    assert ie._extract_lockup_view_model(_lockup(pl, "1.2K videos"))["playlist_count"] == 1200
+    assert "playlist_count" not in ie._extract_lockup_view_model(_lockup(pl, "Mix"))
+    assert "playlist_count" not in ie._extract_lockup_view_model(
+        _lockup("LOCKUP_CONTENT_TYPE_VIDEO", "3 videos"))
+    assert ytworker.PLAYLIST_FILTER in "https://www.youtube.com/results?search_query=a&sp=EgIQAw%3D%3D"
+
+
+def test_a_playlist_card_says_how_many_videos(qapp, monkeypatch):
+    """A big playlist and a short one looked the same until opened: the card says."""
+    from soundboard.ui.sounds.ytcard import ResultRow
+
+    def extract(target, opts, keep=False):
+        return {"entries": [{"id": "PLx", "title": "Mix", "channel": "Band",
+                             "url": PL_URL, "playlist_count": 7}]}
+    monkeypatch.setattr(ytdl.ytsearch, "_extract", extract)
+    hit, = ytdl.search("lofi", source="youtube", direct=True, playlists=True)
+    assert hit.videos == 7
+    assert ResultRow(hit).sub.full == "7 videos · Band"
+    one = ytdl.Result("PLx", "Mix", "Band", 0.0, source=ytdl.PLAYLIST, link=PL_URL, videos=1)
+    assert ResultRow(one).sub.full == "1 video · Band"
+    unsaid = ytdl.Result("PLx", "Mix", "Band", 0.0, source=ytdl.PLAYLIST, link=PL_URL)
+    assert ResultRow(unsaid).sub.full == "Playlist · Band"
