@@ -4741,5 +4741,17 @@
   "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "Bun slår på Ren mikrofon på fanen Stemme i stedet: den fjerner bakgrunnsstøy fra stemmen din og rører aldri lydene dine.",
   "Open Clean mic": "Åpne Ren mikrofon",
   "They think music is background noise and cut your sounds up.": "De tror musikk er bakgrunnsstøy og hakker opp lydene dine.",
-  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Vil du likevel bli kvitt bakgrunnsstøyen? Slå heller på <b>Ren mikrofon</b> på fanen <b>Stemme</b> i Onion Board: den renser stemmen din og rører aldri lydene dine."
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Vil du likevel bli kvitt bakgrunnsstøyen? Slå heller på <b>Ren mikrofon</b> på fanen <b>Stemme</b> i Onion Board: den renser stemmen din og rører aldri lydene dine.",
+  "A bigger window: the waveform big, with the effects and the equalizer side by side": "Et større vindu: lydbølgen stor, med effektene og equalizeren side om side",
+  "Add effect": "Legg til effekt",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Dra håndtakene for å kutte av starten og slutten. Ctrl+rulling zoomer, Shift+rulling flytter.",
+  "No effect has that name.": "Ingen effekt heter det.",
+  "No effects on yet.": "Ingen effekter er på ennå.",
+  "Pick an effect to turn on": "Velg en effekt å slå på",
+  "Redo ({keys})": "Gjør om ({keys})",
+  "Search effects": "Søk i effekter",
+  "Show the whole sound": "Vis hele lyden",
+  "Speed & loudness": "Hastighet og lydstyrke",
+  "The usual tabs, one at a time": "De vanlige fanene, én om gangen",
+  "Undo ({keys})": "Angre ({keys})"
 }

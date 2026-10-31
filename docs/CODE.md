@@ -185,6 +185,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/kit/panellayouts.py` | `ShownStack`, keeping focus off a page switched away, `Flow` (wrapping) and `CardGrid` (`panel` re-exports them) |
 | `soundboard/ui/kit/panelcontrols.py` | `VolumeControl` (slider + typed %), `EqPanel` (the equaliser) and `UndoBar` (`panel` re-exports them) |
 | `soundboard/ui/sounds/dialogs.py` | per-sound Edit dialog: the Sound tab (name, volume, hotkey, fades…) and the Effects tab |
+| `soundboard/ui/sounds/editadvanced.py` | Edit sound's Advanced view: the waveform big on top (zoom, ruler, fades), the Trim & speed, Effects and Equalizer pages side by side (tabs when narrow), only the effects that are on plus the Add effect picker, the Simple / Advanced switch |
 | `soundboard/ui/sounds/editdialogparts.py` | part of the Edit dialog: its Source line, the fade cells, the render and live-preview progress, the picture, the pad colour, the name check and the hotkey |
 | `soundboard/ui/sounds/tabhelp.py` | a tab's help pop-up (the ? button), with Bun or Hoot beside it (`dialogs` re-exports it) |
 | `soundboard/ui/window/languagecontrol.py` | the main window's language (`MainWindow.langctl`): offering Windows' language once, turning it down, switching |
@@ -282,7 +283,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/core/tips.py` | is a game (or anything filling a monitor) in front? The top bars and the tours wait until it isn't |
 | `soundboard/ui/sounds/recordmic.py` | the Sounds tab's *Record a sound* window: a mic take (`Engine.start_mic_take`) or what's playing (`Engine.start_play_take`: sounds + radio, no mic), spooled by `recorder.MicTake`, raw or through the voice changer, trimmed and added as a pad; not modal |
 | `soundboard/sounds/catswitch.py` | Switch category when a program is in front: `Switcher.poll()` (one foreground lookup a second, only while a rule exists; back to the old category when the program closes) |
-| `soundboard/ui/sounds/trim.py` | the Effects tab's trim control: waveform with start / end handles and exact-time boxes |
+| `soundboard/ui/sounds/trim.py` | the Effects tab's trim control: waveform with start / end handles and exact-time boxes; big in the Advanced view (ruler, zoom, fades drawn) |
 | `soundboard/core/backup.py` | export / import of the board as a plain zip (JSON + original audio + pictures), sound packs and single sounds; see [BACKUP-FORMAT.md](BACKUP-FORMAT.md) |
 | `soundboard/sounds/packs.py` | free sound packs: the list (`packs/catalog.json` in this repo, with a built-in copy for offline) of ready-made boards in the backup format, added in one click; each pack's preview zip (`samples`) |
 | `soundboard/online/store.py` | the sound store (Store tab): the list, fetching a sound, votes, reports and uploads, talking to the project's own server |

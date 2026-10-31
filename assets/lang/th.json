@@ -4654,5 +4654,17 @@
   "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "Bun จะเปิดไมค์ไร้เสียงรบกวนในแท็บเสียงพูดแทน: มันตัดเสียงรบกวนพื้นหลังออกจากเสียงพูดของคุณ และไม่แตะต้องเสียงเอฟเฟกต์ของคุณเลย",
   "Open Clean mic": "เปิดไมค์ไร้เสียงรบกวน",
   "They think music is background noise and cut your sounds up.": "มันคิดว่าเพลงเป็นเสียงรบกวนพื้นหลังและตัดเสียงของคุณเป็นท่อนๆ",
-  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "ยังอยากให้เสียงรบกวนพื้นหลังหายไปอยู่ไหม? เปิด<b>ไมค์ไร้เสียงรบกวน</b>ในแท็บ<b>เสียงพูด</b>ของ Onion Board แทน: มันทำให้เสียงพูดของคุณสะอาด และไม่แตะต้องเสียงเอฟเฟกต์ของคุณเลย"
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "ยังอยากให้เสียงรบกวนพื้นหลังหายไปอยู่ไหม? เปิด<b>ไมค์ไร้เสียงรบกวน</b>ในแท็บ<b>เสียงพูด</b>ของ Onion Board แทน: มันทำให้เสียงพูดของคุณสะอาด และไม่แตะต้องเสียงเอฟเฟกต์ของคุณเลย",
+  "A bigger window: the waveform big, with the effects and the equalizer side by side": "หน้าต่างใหญ่ขึ้น: รูปคลื่นใหญ่ เอฟเฟกต์กับอีควอไลเซอร์อยู่ข้างกัน",
+  "Add effect": "เพิ่มเอฟเฟกต์",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "ลากที่จับเพื่อตัดต้นและท้าย Ctrl+เลื่อนเพื่อซูม Shift+เลื่อนเพื่อขยับ",
+  "No effect has that name.": "ไม่มีเอฟเฟกต์ชื่อนี้",
+  "No effects on yet.": "ยังไม่มีเอฟเฟกต์ที่เปิดอยู่",
+  "Pick an effect to turn on": "เลือกเอฟเฟกต์ที่จะเปิด",
+  "Redo ({keys})": "ทำซ้ำ ({keys})",
+  "Search effects": "ค้นหาเอฟเฟกต์",
+  "Show the whole sound": "แสดงเสียงทั้งหมด",
+  "Speed & loudness": "ความเร็วและความดัง",
+  "The usual tabs, one at a time": "แท็บแบบเดิม ทีละแท็บ",
+  "Undo ({keys})": "เลิกทำ ({keys})"
 }

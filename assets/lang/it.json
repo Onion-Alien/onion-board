@@ -4741,5 +4741,17 @@
   "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "Al suo posto Bun attiva Microfono pulito nella scheda Voce: toglie il rumore di fondo dalla tua voce e non tocca mai i tuoi suoni.",
   "Open Clean mic": "Apri Microfono pulito",
   "They think music is background noise and cut your sounds up.": "Credono che la musica sia rumore di fondo e fanno a pezzi i tuoi suoni.",
-  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Vuoi comunque eliminare il rumore di fondo? Attiva invece <b>Microfono pulito</b> nella scheda <b>Voce</b> di Onion Board: pulisce la tua voce e non tocca mai i tuoi suoni."
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Vuoi comunque eliminare il rumore di fondo? Attiva invece <b>Microfono pulito</b> nella scheda <b>Voce</b> di Onion Board: pulisce la tua voce e non tocca mai i tuoi suoni.",
+  "A bigger window: the waveform big, with the effects and the equalizer side by side": "Una finestra più grande: la forma d'onda in grande, effetti ed equalizzatore affiancati",
+  "Add effect": "Aggiungi effetto",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Trascina le maniglie per tagliare inizio e fine. Ctrl+rotellina ingrandisce, Maiusc+rotellina scorre.",
+  "No effect has that name.": "Nessun effetto ha questo nome.",
+  "No effects on yet.": "Ancora nessun effetto attivo.",
+  "Pick an effect to turn on": "Scegli un effetto da attivare",
+  "Redo ({keys})": "Ripeti ({keys})",
+  "Search effects": "Cerca effetti",
+  "Show the whole sound": "Mostra tutto il suono",
+  "Speed & loudness": "Velocità e volume",
+  "The usual tabs, one at a time": "Le solite schede, una alla volta",
+  "Undo ({keys})": "Annulla ({keys})"
 }

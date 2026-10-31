@@ -4741,5 +4741,17 @@
   "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "Onun yerine Bun, Ses sekmesindeki Temiz mikrofon'u açar: arka plan gürültüsünü sesinizden çıkarır ve seslerinize asla dokunmaz.",
   "Open Clean mic": "Temiz mikrofon'u aç",
   "They think music is background noise and cut your sounds up.": "Müziği arka plan gürültüsü sanıp seslerinizi doğrarlar.",
-  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Arka plan gürültüsünden yine de kurtulmak mı istiyorsunuz? Bunun yerine Onion Board'un <b>Ses</b> sekmesinde <b>Temiz mikrofon</b>'u açın: sesinizi temizler ve seslerinize asla dokunmaz."
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Arka plan gürültüsünden yine de kurtulmak mı istiyorsunuz? Bunun yerine Onion Board'un <b>Ses</b> sekmesinde <b>Temiz mikrofon</b>'u açın: sesinizi temizler ve seslerinize asla dokunmaz.",
+  "A bigger window: the waveform big, with the effects and the equalizer side by side": "Daha büyük bir pencere: dalga formu büyük, efektler ve ekolayzer yan yana",
+  "Add effect": "Efekt ekle",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Başını ve sonunu kesmek için tutamaçları sürükleyin. Ctrl+kaydırma yakınlaştırır, Shift+kaydırma kaydırır.",
+  "No effect has that name.": "Bu adda bir efekt yok.",
+  "No effects on yet.": "Henüz açık efekt yok.",
+  "Pick an effect to turn on": "Açmak için bir efekt seçin",
+  "Redo ({keys})": "Yinele ({keys})",
+  "Search effects": "Efekt ara",
+  "Show the whole sound": "Sesin tamamını göster",
+  "Speed & loudness": "Hız & ses yüksekliği",
+  "The usual tabs, one at a time": "Alışık olduğunuz sekmeler, tek tek",
+  "Undo ({keys})": "Geri al ({keys})"
 }

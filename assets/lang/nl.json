@@ -4741,5 +4741,17 @@
   "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "In plaats daarvan zet Bun Schone mic aan op het tabblad Stem: die haalt achtergrondgeluid uit je stem en komt nooit aan je geluiden.",
   "Open Clean mic": "Schone mic openen",
   "They think music is background noise and cut your sounds up.": "Ze denken dat muziek achtergrondgeluid is en hakken je geluiden in stukken.",
-  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Wil je het achtergrondgeluid toch kwijt? Zet dan <b>Schone mic</b> aan op het tabblad <b>Stem</b> van Onion Board: die maakt je stem schoon en komt nooit aan je geluiden."
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Wil je het achtergrondgeluid toch kwijt? Zet dan <b>Schone mic</b> aan op het tabblad <b>Stem</b> van Onion Board: die maakt je stem schoon en komt nooit aan je geluiden.",
+  "A bigger window: the waveform big, with the effects and the equalizer side by side": "Een groter venster: de golfvorm groot, met de effecten en de equalizer naast elkaar",
+  "Add effect": "Effect toevoegen",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Sleep de grepen om het begin en einde eraf te knippen. Ctrl+scrollen zoomt, Shift+scrollen schuift.",
+  "No effect has that name.": "Geen effect heet zo.",
+  "No effects on yet.": "Nog geen effecten aan.",
+  "Pick an effect to turn on": "Kies een effect om aan te zetten",
+  "Redo ({keys})": "Opnieuw uitvoeren ({keys})",
+  "Search effects": "Effecten zoeken",
+  "Show the whole sound": "Het hele geluid tonen",
+  "Speed & loudness": "Snelheid & luidheid",
+  "The usual tabs, one at a time": "De gewone tabbladen, één tegelijk",
+  "Undo ({keys})": "Ongedaan maken ({keys})"
 }

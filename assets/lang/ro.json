@@ -4828,5 +4828,17 @@
   "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "În locul lui, Bun pornește Microfon curat din fila Voce: scoate zgomotul de fundal din vocea ta și nu se atinge niciodată de sunetele tale.",
   "Open Clean mic": "Deschide Microfon curat",
   "They think music is background noise and cut your sounds up.": "Tratează muzica drept zgomot de fundal și îți taie sunetele.",
-  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Vrei totuși să scapi de zgomotul de fundal? Pornește în schimb <b>Microfon curat</b> din fila <b>Voce</b> a Onion Board: îți curăță vocea și nu se atinge niciodată de sunetele tale."
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Vrei totuși să scapi de zgomotul de fundal? Pornește în schimb <b>Microfon curat</b> din fila <b>Voce</b> a Onion Board: îți curăță vocea și nu se atinge niciodată de sunetele tale.",
+  "A bigger window: the waveform big, with the effects and the equalizer side by side": "O fereastră mai mare: forma de undă mare, cu efectele și egalizatorul unul lângă altul",
+  "Add effect": "Adaugă efect",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Trage de mânere ca să tai începutul și sfârșitul. Ctrl+rotiță mărește, Shift+rotiță mută.",
+  "No effect has that name.": "Niciun efect nu are numele ăsta.",
+  "No effects on yet.": "Încă nu e pornit niciun efect.",
+  "Pick an effect to turn on": "Alege un efect de pornit",
+  "Redo ({keys})": "Refă ({keys})",
+  "Search effects": "Caută efecte",
+  "Show the whole sound": "Arată tot sunetul",
+  "Speed & loudness": "Viteză și intensitate",
+  "The usual tabs, one at a time": "Filele obișnuite, câte una",
+  "Undo ({keys})": "Anulează ({keys})"
 }

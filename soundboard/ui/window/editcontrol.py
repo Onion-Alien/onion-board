@@ -135,7 +135,7 @@ class EditControl(Controller):
         d = self._editors.get(sid)
         if d is not None and qt_valid(d):
             if tab != "sound":
-                d.tabs.setCurrentIndex(d._tab_index(tab))
+                d.show_tab(tab)
             d.showNormal() if d.isMinimized() else d.show()
             d.raise_()
             d.activateWindow()
@@ -146,6 +146,7 @@ class EditControl(Controller):
         # a closed one shows this sound instead: building one took ~200 ms every time
         d, mw.setctl._spare_editor = mw.setctl._spare_editor, None
         if d is not None and qt_valid(d):
+            d.set_advanced(bool(getattr(mw.cfg, "edit_advanced", False)))   # as picked last
             d.load(m, tab)
         else:
             d = self._new_editor(m, tab)
@@ -236,8 +237,10 @@ class EditControl(Controller):
         mw = self.mw
         d = EditDialog(m, mw.hotkeys, mw.playctl.preview, mw, tab=tab,
                        others=lambda: list(mw._meta.values()), pick_voice=self.pick_voice,
-                       save_hook=self._save_open, stop_render=self.stop_render)
+                       save_hook=self._save_open, stop_render=self.stop_render,
+                       advanced=bool(getattr(mw.cfg, "edit_advanced", False)))
         d.hotkeys_changed.connect(mw.hkctl.register_hotkeys)
+        d.advanced_changed.connect(lambda on: mw.set_option("edit_advanced", on))
         d.source_forgotten.connect(mw._save_now)
         d.finished.connect(lambda ok, d=d: self._edit_done(d.meta.id, d, ok))
         d.effects.changed.connect(lambda d=d: self._fx_edited(d))

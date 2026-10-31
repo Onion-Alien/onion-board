@@ -4828,5 +4828,17 @@
   "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "Вместо него Bun включит «Чистый микрофон» на вкладке «Голос»: он убирает фоновый шум из твоего голоса и никогда не трогает твои звуки.",
   "Open Clean mic": "Открыть «Чистый микрофон»",
   "They think music is background noise and cut your sounds up.": "Они считают музыку фоновым шумом и кромсают твои звуки.",
-  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Всё равно хочешь убрать фоновый шум? Включи вместо этого <b>Чистый микрофон</b> на вкладке <b>Голос</b> в Onion Board: он очищает твой голос и никогда не трогает твои звуки."
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Всё равно хочешь убрать фоновый шум? Включи вместо этого <b>Чистый микрофон</b> на вкладке <b>Голос</b> в Onion Board: он очищает твой голос и никогда не трогает твои звуки.",
+  "A bigger window: the waveform big, with the effects and the equalizer side by side": "Окно побольше: большая волна, а эффекты и эквалайзер рядом",
+  "Add effect": "Добавить эффект",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Перетащи ручки, чтобы отрезать начало и конец. Ctrl+колесо приближает, Shift+колесо сдвигает.",
+  "No effect has that name.": "Нет эффекта с таким названием.",
+  "No effects on yet.": "Пока ни один эффект не включён.",
+  "Pick an effect to turn on": "Выбери эффект, чтобы включить его",
+  "Redo ({keys})": "Повторить ({keys})",
+  "Search effects": "Искать эффекты",
+  "Show the whole sound": "Показать весь звук",
+  "Speed & loudness": "Скорость и громкость",
+  "The usual tabs, one at a time": "Обычные вкладки, по одной",
+  "Undo ({keys})": "Отменить ({keys})"
 }

@@ -608,7 +608,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
     SETTINGS_PRINT_SKIP = ("sounds", "tab", "category", "tip_day", "tips_seen",
                            "update_checked", "update_auto_tried", "whats_new_seen", "load_note",
                            "speech",
-                           "app_setup", "settings_advanced")
+                           "app_setup", "settings_advanced", "edit_advanced")
 
     CUES = {"start": (660, 990), "stop": (990, 660), "saved": (880, 880, 1320), "fail": (330, 247)}
 

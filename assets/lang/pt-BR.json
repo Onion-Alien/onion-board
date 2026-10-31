@@ -4741,5 +4741,17 @@
   "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "No lugar dele, o Bun liga o Microfone limpo na aba Voz: ele tira o ruído de fundo da sua voz e nunca mexe nos seus sons.",
   "Open Clean mic": "Abrir Microfone limpo",
   "They think music is background noise and cut your sounds up.": "Eles acham que música é barulho de fundo e picotam seus sons.",
-  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Quer tirar o ruído de fundo mesmo assim? Ligue o <b>Microfone limpo</b> na aba <b>Voz</b> do Onion Board: ele limpa sua voz e nunca mexe nos seus sons."
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Quer tirar o ruído de fundo mesmo assim? Ligue o <b>Microfone limpo</b> na aba <b>Voz</b> do Onion Board: ele limpa sua voz e nunca mexe nos seus sons.",
+  "A bigger window: the waveform big, with the effects and the equalizer side by side": "Uma janela maior: a forma de onda grande, com os efeitos e o equalizador lado a lado",
+  "Add effect": "Adicionar efeito",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Arraste as alças para cortar o começo e o fim. Ctrl+rolagem dá zoom, Shift+rolagem move.",
+  "No effect has that name.": "Nenhum efeito tem esse nome.",
+  "No effects on yet.": "Nenhum efeito ligado ainda.",
+  "Pick an effect to turn on": "Escolha um efeito para ligar",
+  "Redo ({keys})": "Refazer ({keys})",
+  "Search effects": "Buscar efeitos",
+  "Show the whole sound": "Mostrar o som inteiro",
+  "Speed & loudness": "Velocidade e sonoridade",
+  "The usual tabs, one at a time": "As abas de sempre, uma de cada vez",
+  "Undo ({keys})": "Desfazer ({keys})"
 }

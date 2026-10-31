@@ -4654,5 +4654,17 @@
   "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "代わりに Bun がボイスタブのマイクのノイズ除去をオンにします：声から背景ノイズを取り除き、サウンドには一切手を加えません。",
   "Open Clean mic": "マイクのノイズ除去を開く",
   "They think music is background noise and cut your sounds up.": "音楽を背景ノイズだと判断して、サウンドを途切れさせてしまいます。",
-  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "それでも背景ノイズを消したい場合は、代わりに Onion Board の<b>ボイス</b>タブで<b>マイクのノイズ除去</b>をオンにしてください：声だけをきれいにし、サウンドには一切手を加えません。"
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "それでも背景ノイズを消したい場合は、代わりに Onion Board の<b>ボイス</b>タブで<b>マイクのノイズ除去</b>をオンにしてください：声だけをきれいにし、サウンドには一切手を加えません。",
+  "A bigger window: the waveform big, with the effects and the equalizer side by side": "大きなウィンドウ：波形を大きく、エフェクトとイコライザーを横並びに",
+  "Add effect": "エフェクトを追加",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "ハンドルをドラッグして最初と最後をカットします。Ctrl+スクロールで拡大、Shift+スクロールで移動。",
+  "No effect has that name.": "その名前のエフェクトはありません。",
+  "No effects on yet.": "まだオンのエフェクトはありません。",
+  "Pick an effect to turn on": "オンにするエフェクトを選ぶ",
+  "Redo ({keys})": "やり直す（{keys}）",
+  "Search effects": "エフェクトを検索",
+  "Show the whole sound": "サウンド全体を表示",
+  "Speed & loudness": "速度とラウドネス",
+  "The usual tabs, one at a time": "いつものタブ、1 つずつ",
+  "Undo ({keys})": "元に戻す（{keys}）"
 }

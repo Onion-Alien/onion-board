@@ -4741,5 +4741,17 @@
   "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "Sen tilalle Bun laittaa Puhtaan mikin päälle Puhe-välilehdellä: se poistaa taustamelun puheestasi eikä koskaan koske ääniisi.",
   "Open Clean mic": "Avaa Puhdas mikki",
   "They think music is background noise and cut your sounds up.": "Ne pitävät musiikkia taustamelunä ja pilkkovat äänesi.",
-  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Haluatko silti eroon taustamelusta? Laita sen sijaan <b>Puhdas mikki</b> päälle Onion Boardin <b>Puhe</b>-välilehdellä: se puhdistaa puheesi eikä koskaan koske ääniisi."
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Haluatko silti eroon taustamelusta? Laita sen sijaan <b>Puhdas mikki</b> päälle Onion Boardin <b>Puhe</b>-välilehdellä: se puhdistaa puheesi eikä koskaan koske ääniisi.",
+  "A bigger window: the waveform big, with the effects and the equalizer side by side": "Isompi ikkuna: aaltomuoto isona, efektit ja taajuuskorjain vierekkäin",
+  "Add effect": "Lisää efekti",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Vedä kahvoista leikataksesi alun ja lopun. Ctrl+rulla zoomaa, Shift+rulla siirtää.",
+  "No effect has that name.": "Sen nimistä efektiä ei ole.",
+  "No effects on yet.": "Yhtään efektiä ei ole vielä päällä.",
+  "Pick an effect to turn on": "Valitse efekti, jonka laitat päälle",
+  "Redo ({keys})": "Tee uudelleen ({keys})",
+  "Search effects": "Hae efektejä",
+  "Show the whole sound": "Näytä koko ääni",
+  "Speed & loudness": "Nopeus ja voimakkuus",
+  "The usual tabs, one at a time": "Tutut välilehdet, yksi kerrallaan",
+  "Undo ({keys})": "Kumoa ({keys})"
 }

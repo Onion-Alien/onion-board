@@ -4654,5 +4654,17 @@
   "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "Sebagai gantinya, Bun menyalakan Mic bersih di tab Vokal: ia menghapus kebisingan latar dari suara Anda dan tidak pernah menyentuh suara-suara Anda.",
   "Open Clean mic": "Buka Mic bersih",
   "They think music is background noise and cut your sounds up.": "Mereka mengira musik adalah kebisingan latar belakang dan memotong suara Anda.",
-  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Tetap ingin kebisingan latar hilang? Nyalakan saja <b>Mic bersih</b> di tab <b>Vokal</b> Onion Board: ia membersihkan suara Anda dan tidak pernah menyentuh suara-suara Anda."
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Tetap ingin kebisingan latar hilang? Nyalakan saja <b>Mic bersih</b> di tab <b>Vokal</b> Onion Board: ia membersihkan suara Anda dan tidak pernah menyentuh suara-suara Anda.",
+  "A bigger window: the waveform big, with the effects and the equalizer side by side": "Jendela lebih besar: gelombang suaranya besar, efek dan equalizer berdampingan",
+  "Add effect": "Tambah efek",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Seret pegangannya untuk memotong awal dan akhir. Ctrl+gulir untuk zoom, Shift+gulir untuk menggeser.",
+  "No effect has that name.": "Tidak ada efek dengan nama itu.",
+  "No effects on yet.": "Belum ada efek yang aktif.",
+  "Pick an effect to turn on": "Pilih efek untuk diaktifkan",
+  "Redo ({keys})": "Ulangi ({keys})",
+  "Search effects": "Cari efek",
+  "Show the whole sound": "Tampilkan seluruh suara",
+  "Speed & loudness": "Kecepatan & kenyaringan",
+  "The usual tabs, one at a time": "Tab biasa, satu per satu",
+  "Undo ({keys})": "Urungkan ({keys})"
 }

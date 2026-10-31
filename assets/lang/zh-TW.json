@@ -4654,5 +4654,17 @@
   "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "Bun 會改為開啟語音分頁裡的麥克風降噪：它會去掉你聲音裡的背景噪音，而且從不碰你的音效。",
   "Open Clean mic": "開啟麥克風降噪",
   "They think music is background noise and cut your sounds up.": "它們會把音樂當成背景噪音，把你的音效切碎。",
-  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "還是想去掉背景噪音？改為在 Onion Board 的<b>語音</b>分頁裡開啟<b>麥克風降噪</b>：它只清理你的聲音，從不碰你的音效。"
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "還是想去掉背景噪音？改為在 Onion Board 的<b>語音</b>分頁裡開啟<b>麥克風降噪</b>：它只清理你的聲音，從不碰你的音效。",
+  "A bigger window: the waveform big, with the effects and the equalizer side by side": "更大的視窗：波形放大，效果和等化器並排顯示",
+  "Add effect": "新增效果",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "拖曳把手剪掉開頭和結尾。Ctrl+滾輪縮放，Shift+滾輪平移。",
+  "No effect has that name.": "沒有這個名字的效果。",
+  "No effects on yet.": "還沒有開啟任何效果。",
+  "Pick an effect to turn on": "選擇要開啟的效果",
+  "Redo ({keys})": "重做（{keys}）",
+  "Search effects": "搜尋效果",
+  "Show the whole sound": "顯示整個聲音",
+  "Speed & loudness": "速度 & 響度",
+  "The usual tabs, one at a time": "常用的分頁，一次一個",
+  "Undo ({keys})": "復原（{keys}）"
 }

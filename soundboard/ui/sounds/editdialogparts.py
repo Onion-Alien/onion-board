@@ -59,6 +59,7 @@ class EditDialogParts(_Base):
         _look: Any
         _reset_glow: Any
         _source_at: Any
+        adv: Any
         btn_pic_clear: Any
         btn_preview: Any
         btn_reset: Any
@@ -174,6 +175,8 @@ class EditDialogParts(_Base):
         self.btn_preview.setVisible(not on)
         self._reset_glow.setVisible(not on)
         self.tabs.setEnabled(not on)   # the draft is saved: it waits while it renders
+        if getattr(self, "adv", None) is not None:
+            self.adv.setEnabled(not on)
         self.render_box.setVisible(on)
         if on:
             self.render_close.setDefault(True)
@@ -352,6 +355,8 @@ class EditDialogParts(_Base):
     def _set_hk(self, combo):
         self.hotkey = combo
         self.hk_btn.setText(pretty_key(combo) or _("Click to set"))
+        if getattr(self, "adv", None) is not None:
+            self.adv.hk.setText(self.hk_btn.text())
 
     def _capture(self):
         d = HotkeyDialog(self.hotkeys, self)
