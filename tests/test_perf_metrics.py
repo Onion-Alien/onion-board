@@ -115,6 +115,13 @@ def test_reads_this_process():
     assert os.getpid() not in winproc.descendants(os.getpid())
 
 
+@pytest.mark.skipif(sys.platform != "win32", reason="reads Windows processes")
+def test_descendants_never_loop_back_to_the_root():
+    # a reused pid can make the snapshot's parent links form a loop
+    table = [(11, 10, "a.exe", 1), (12, 11, "b.exe", 1), (10, 12, "c.exe", 1)]
+    assert winproc.descendants(10, table) == [11, 12]
+
+
 def test_scenarios_flag_picks_in_the_tiers_order():
     from perf import runner
     names = ["idle_front", "dialogs", "voice_preset", "idle_end"]
