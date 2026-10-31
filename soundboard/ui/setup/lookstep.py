@@ -288,6 +288,10 @@ class LookStep(WizardStep):
                  "echo cancellation and automatic volume, which chop up your sounds. If "
                  "Discord is open, it closes for a few seconds. Undo it any time: Settings → "
                  "Audio → Mic effect → Put Discord back.")
+        from soundboard.ui.setup.chatguide import clean_mic
+        if clean_mic(self.win) is not None:   # chatguide.clean_mic_takes_over
+            text += " " + _("Bun turns on Clean mic on the Voice tab in its place: it takes "
+                            "background noise out of your voice and never touches your sounds.")
         if self._discord_needed():
             mic = eng.virtual_mic_for(self.win.routectl._main_name()) or "CABLE Output"
             text += " " + _("Then pick {mic} as your mic in Discord: Bun shows you where.",
@@ -331,11 +335,17 @@ class LookStep(WizardStep):
         need = self._discord_needed()
         if not self._discord_touched:
             self.chk_discord.setChecked(need)
+        from soundboard.ui.setup.chatguide import clean_mic
+        clean = clean_mic(self.win) is not None
         if need:
-            why = _("Bun turns off Discord's noise filter, then shows you which mic to "
-                    "pick.")
+            why = (_("Bun swaps Discord's noise filter for Clean mic, then shows you which "
+                     "mic to pick.") if clean else
+                   _("Bun turns off Discord's noise filter, then shows you which mic to "
+                     "pick."))
         else:
-            why = _("Bun turns off Discord's noise filter so your sounds don't get cut off.")
+            why = (_("Bun swaps Discord's noise filter for Clean mic, so your sounds don't "
+                     "get cut off.") if clean else
+                   _("Bun turns off Discord's noise filter so your sounds don't get cut off."))
         self.discord_why.setText(why)
 
     def _pick_language(self, code: str):

@@ -704,6 +704,33 @@ goes online.
   uninstaller (Setup tab → *Remove the virtual cable*, or the uninstaller's question),
   both after Windows' admin prompt.
 
+## What the app reads and writes in Discord's settings
+
+Discord's own noise suppression, echo cancellation and automatic gain wipe sounds out,
+so the app checks them and, when you press the setup guide's Discord button, switches
+them off (`soundboard/mic/discordcfg.py` reads, `soundboard/mic/discordtalk.py` writes).
+None of it ever goes online, and nothing from those files is written to the log.
+
+- **Where:** Discord keeps its settings in its web storage, a LevelDB folder at
+  `%APPDATA%\discord\Local Storage\leveldb` (and the same for Discord PTB, Canary and
+  Development). The same folder also holds Discord's login.
+- **Reading:** the app scans those files for one entry, `MediaEngineStore` (Discord's
+  voice settings, as JSON), and keeps only the voice switches it needs from it. Nothing
+  else in the folder is parsed, kept or shown, the login included.
+- **Writing:** only after you press the Discord button and say Yes to Discord being
+  closed (it ends a call): the app closes Discord, adds one new `MediaEngineStore`
+  record to the end of the folder's log file, reads it back, and undoes it if anything
+  is off. How you had it is saved in `%APPDATA%\OnionBoard\config.json` (the voice
+  switches only), and put back when Onion Board closes (unless you untick *Put Discord back for
+  talking on close* on the Setup tab), by Settings → Audio → *Put
+  Discord back*, and by the uninstaller.
+- **Copies:** before each write, the one log file it changes is copied to
+  `%APPDATA%\OnionBoard\discord-backup\<client>\<time>\`, so it can be put back by hand.
+  That file can hold Discord's login too, like the original next to Discord. At most 3
+  copies per client are kept, none older than 14 days, and only on this PC. Delete the
+  `discord-backup` folder to remove them; the uninstaller's *Also delete your sounds
+  and settings?* removes them with the rest.
+
 ## Anti-cheat
 
 Onion Board never touches a game's process: it doesn't inject code into it, read

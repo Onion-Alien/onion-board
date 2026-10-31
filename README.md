@@ -40,8 +40,8 @@ Version **2.7.3** · Windows 10 / 11 · free, no account, no ads, anonymous usag
 | 🎤 **No virtual cable**<br>Sounds go straight into the mic you already use in Discord and games, with your voice or without it. | 🔎 **One-click sounds**<br>Search YouTube, SoundCloud and Myinstants in the app and add a sound in one click. Or drag in files. |
 | ⌨️ **Hotkeys that work in-game**<br>Plus an in-game overlay, MIDI pads and a [Stream Deck plugin](https://github.com/Onion-Alien/onion-board/releases/latest/download/com.onionalien.onionboard.streamDeckPlugin). Open your game and the board switches to its sounds. | 📦 **Bring your board over**<br>Coming from Soundpad, Resanance, Soundux or EXP Soundboard? Sounds, names and hotkeys come with you in one click. |
 | 🎛️ **Effects on any sound**<br>Trim, speed, pitch, bass boost, reverse. One-click *Deep fried*, *Nightcore*, *Slowed + reverb*. | 🤖 **Voice changer and text-to-speech**<br>Change your voice live, or type and a computer voice says it, in 33 languages. Optional AI voices: 12 characters, or blend your own. |
-| ✅ **Checks Discord for you**<br>Spots the Discord settings that would cut your sounds out and shows how to fix them. | ⏪ **Instant replay**<br>One key turns the last 30 seconds you heard into a pad. Or record with your mic. |
-| 📱 **Your pads on your phone**<br>With the free [Onion Pocket](https://github.com/Onion-Alien/onion-pocket) add-on: scan a QR code, tap a pad, it plays on your PC. | 📻 **And more**<br>Screen triggers, world radio, sharing a program's sound, a clean OBS output, 32 themes, 32 languages. |
+| ✅ **Checks Discord for you**<br>Spots the Discord settings that would cut your sounds out and shows how to fix them. | 🧹 **Clean mic**<br>Takes fans, keyboards and room noise out of your voice before your sounds are mixed in, so they come through whole. |
+| 📱 **Your pads on your phone**<br>With the free [Onion Pocket](https://github.com/Onion-Alien/onion-pocket) add-on: scan a QR code, tap a pad, it plays on your PC. | 📻 **And more**<br>Instant replay (the last 30 seconds as a pad), recording with your mic, screen triggers, world radio, sharing a program's sound, a clean OBS output, 32 themes, 32 languages. |
 
 <div align="center">
 
@@ -55,8 +55,8 @@ Version **2.7.3** · Windows 10 / 11 · free, no account, no ads, anonymous usag
 
 | | |
 |:---:|:---:|
-| ![Voice changer and text-to-speech](site/screenshots/voice.png?v=29e78344) | ![Screen triggers](site/screenshots/triggers.png?v=3389b572) |
-| **Voice** · change your voice live, or type and a computer voice says it | **Triggers** · a sound the moment "YOU DIED" shows up in your game |
+| ![Clean mic, voice changer and text-to-speech](site/screenshots/voice.png?v=29bd0f26) | ![Screen triggers](site/screenshots/triggers.png?v=3389b572) |
+| **Voice** · clean the noise out of your mic, change your voice live, or type and a computer voice says it | **Triggers** · a sound the moment "YOU DIED" shows up in your game |
 | ![Send a program's sound](site/screenshots/apps.png?v=2229b7e5) | ![Setup at a glance](site/screenshots/setup.png?v=a01ddaa5) |
 | **Apps** · send one program's sound (music, a video) to your friends | **Setup** · one look tells you whether others can hear you |
 
@@ -72,6 +72,8 @@ Then drag sounds onto the window, and right-click a pad to give it a hotkey.
 > [!TIP]
 > **In Discord** (*User Settings → Voice & Video*): set *Input Profile* to **Custom**, *Noise Suppression*
 > to **None** and turn *Echo Cancellation* off. Onion Board reads these and warns you if one is in the way.
+> For less background noise, switch on **Clean mic** on the *Voice* tab instead: it cleans your voice before
+> your sounds are added, so they aren't touched.
 
 <details>
 <summary><b>Install with winget instead</b></summary>
