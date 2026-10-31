@@ -317,6 +317,7 @@ class SpeedPitchButton(QPushButton):
     setup_cancelled = Signal()   # Cancel while its AI voice gets ready
     opening = Signal()           # about to pop up: the setups list is brought up to date
     save_new = Signal()          # Save as new pad: the playing sound, these on it (sounds)
+    closed = Signal()            # the pop-up went away
 
     def __init__(self, what: str = "sounds", hint: str = "",
                  redline: tuple[float, float] = REDLINE_SPEED):
@@ -365,6 +366,8 @@ class SpeedPitchButton(QPushButton):
         sub.setObjectName("muted")
         sub.setMinimumWidth(1)   # the first to give way when a language's buttons are long
         self._sub = sub
+        self._sub_all = sub.text()
+        sub.setTextFormat(Qt.TextFormat.PlainText)   # (a pad's name: set_target)
         reset = reset_button(_("Back to 1x, no pitch change, no effects and 100 % volume")
                              if self.has_speed else
                              _("Back to no pitch change, no effects and 100 % volume"))
@@ -741,6 +744,23 @@ class SpeedPitchButton(QPushButton):
         self.keep.blockSignals(False)
         self._edited()
 
+    def load(self, speed: float, pitch: float, keep: bool, amounts: dict):
+        """Show these values without sending them anywhere (`changed` and `fx_changed`
+        stay quiet): a pad's own effects with these on top, or these alone again."""
+        self.blockSignals(True)
+        try:
+            self.set_values(speed, pitch, keep)
+            self.set_fx(amounts)
+        finally:
+            self.blockSignals(False)
+
+    def set_target(self, name: str | None):
+        """The knobs show the sound `name` plays with (its own effects with these on
+        top: its name in the header), or every sound's layer alone again (None)."""
+        self._sub.setText(short(name, 20) if name else self._sub_all)
+        if self.pop.isVisible():
+            self._open()
+
     def _save_new(self):
         self.pop.hide()   # a name box comes up next: the pop-up would sit over it
         self.save_new.emit()
@@ -1057,6 +1077,7 @@ class SpeedPitchButton(QPushButton):
     def eventFilter(self, obj, ev):
         if obj is self.pop and ev.type() == QEvent.Type.Hide:
             self._hidden_at = time.monotonic()
+            self.closed.emit()
             if self._deleted is not None:   # Undo is for while it's open
                 self._deleted = None
                 self.undo_row.hide()

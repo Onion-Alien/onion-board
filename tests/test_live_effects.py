@@ -113,6 +113,19 @@ def test_reset_goes_plain_at_once(live, qapp):
     assert swaps[-1] == ("s0", saved) and d.effects.fx() == {}
 
 
+def test_reset_of_a_saved_effect_goes_plain(live, qapp):
+    """The pad was saved with effects: Reset makes it plain ('' is the plain sound's
+    key, not "nothing to make"), instead of waiting at 0% for ever."""
+    win, d, _saved, made, swaps, _stops = live
+    d.reject()
+    win.meta("s0").fx = {"pitch": -8.0}
+    d = win.editctl.edit("s0", "effects")
+    d.btn_reset.click()
+    qapp.processEvents()
+    assert swaps == [("s0", made)] and win.audio["s0"] is made
+    assert "playing sound has your changes" in d.fx_note.text()
+
+
 def test_nothing_happens_when_it_isnt_playing(live, qapp, monkeypatch):
     win, d, saved, _made, swaps, _stops = live
     monkeypatch.setattr(win.engine, "state", lambda sid: None)
@@ -137,3 +150,86 @@ def test_reset_effects_stands_out_only_with_effects_on(win_only):
 @pytest.fixture
 def win_only(window):  # noqa: F811
     return window
+
+
+def test_trim_shows_where_it_plays(live, qapp):
+    """The trim's playhead follows the playing sound, inside its trim (and from the
+    end when it plays backwards); gone once nothing plays."""
+    win, d, _saved, _made, _swaps, _stops = live
+    trim = d.effects.trim
+    win.editctl._show_playing()
+    assert trim.wave.play == pytest.approx(0.4 * trim.length)   # state(): 40% in
+    n = trim.length / 4   # (a short test sound: a trim off the start only)
+    trim.show_playing(0.5, {"start": n})
+    assert trim.wave.play == pytest.approx(2.5 * n)
+    trim.show_playing(0.25, {"start": n, "reverse": True})
+    assert trim.wave.play == pytest.approx(3.25 * n)
+    trim.show_playing(None)
+    assert trim.wave.play is None
+
+
+@pytest.fixture
+def pad_live(live, monkeypatch):
+    """s0 playing with its own effects (Edit sound: Bass +3, Reverb), its window closed;
+    s1 a plain song."""
+    win, d, *_rest = live
+    d.reject()
+    win.meta("s0").fx = {"pitch": -8.0, "live": [{"bass": 3.0}],
+                         "effects": {"reverb": {"on": True, "mix": 0.3}}}
+    win.meta("s1").fx = {}
+    playing = {"s0": (0.4, False)}
+    monkeypatch.setattr(win.engine, "playing", lambda: playing)
+    monkeypatch.setattr(win.engine, "state", lambda sid: playing.get(sid))
+    win.current = None
+    return (*live, playing)
+
+
+def test_live_controls_show_the_song_plus_their_own_layer(pad_live, qapp):
+    """A song with Bass +3 shows +3; dragged to +5, the layer is +2; the next song,
+    plain, shows +2 (the first song's own +3 went with it)."""
+    win, _d, _saved, _made, swaps, _stops, playing = pad_live
+    sp, e = win.speed_btn, win.engine
+    sp._open()
+    assert sp.values() == (1.0, -8.0, True)
+    assert sp.fx_values() == {"bass": 3.0, "reverb": 0.3}
+    assert sp._sub.text() == win.meta("s0").name
+    sp.fx["bass"].set_value(5.0)
+    sp._fx_edited()
+    sp.pitch.set_value(-6.0)
+    sp._edited()
+    assert e.sound_fx == {"bass": 2.0} and e.sound_pitch == 2.0   # the layer only
+    assert win.meta("s0").fx["live"] == [{"bass": 3.0}] and not swaps   # the pad as it was
+    playing.clear()
+    playing["s1"] = (0.0, False)                 # the next song
+    win.editctl._pad_follow()
+    assert sp.fx_values() == {"bass": 2.0} and sp.values()[:2] == (1.0, 2.0)
+    assert sp._sub.text() == sp._sub_all
+    sp.pop.hide()                                # closed: the layer, as it is
+    assert sp.fx_values() == {"bass": 2.0} and e.sound_fx == {"bass": 2.0}
+
+
+def test_closing_shows_the_layer_alone(pad_live, qapp):
+    win, *_rest = pad_live
+    sp = win.speed_btn
+    sp._open()
+    assert sp.fx_values() == {"bass": 3.0, "reverb": 0.3}
+    sp.pop.hide()
+    assert sp.values()[:2] == (1.0, 0.0) and sp.fx_values() == {}
+    assert sp._sub.text() == sp._sub_all
+
+
+def test_live_merged_adds_db_and_keeps_the_strongest():
+    from soundboard.audio import soundfx
+    stages = [{"bass": 3.0, "reverb": 0.2}, {"bass": 4.0, "reverb": 0.5}]
+    assert soundfx.live_merged(stages) == {"bass": 7.0, "reverb": 0.5}
+    assert soundfx.live_merged([{"bass": 15.0}, {"bass": 15.0}]) == {"bass": 18.0}
+
+
+def test_live_view_reads_the_sounds_own_effects():
+    from soundboard.audio import soundfx
+    assert soundfx.live_view({}) == soundfx.NO_LIVE_VIEW
+    speed, pitch, knobs = soundfx.live_view(
+        {"speed": 1.5, "pitch": 2.0, "effects": {"echo": {"on": True, "mix": 0.4},
+                                                 "distortion": {"on": True, "drive": 18.0},
+                                                 "reverb": {"on": False, "mix": 0.9}}})
+    assert (speed, pitch) == (1.5, 2.0) and knobs == {"echo": 0.4, "crunch": 0.5}

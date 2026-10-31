@@ -167,6 +167,40 @@ def with_live(fx: dict | None, speed: float, pitch: float, keep: bool,
     return clean(f), capped
 
 
+def live_merged(stages: list) -> dict:
+    """A sound's Live controls stages as one set of knobs: the dB ones added up, the
+    others the strongest (each kept in its knob's range)."""
+    out: dict[str, float] = {}
+    for q in livefx.PARAMS:
+        vals = [float(st[q.key]) for st in stages or [] if q.key in st]
+        if vals:
+            v = sum(vals) if q.unit.strip() == "dB" else max(vals)
+            out[q.key] = min(max(v, q.lo), q.hi)
+    return livefx.clean(out)
+
+
+# Edit sound's effects that Live controls have a knob for: (effect, knob, its amount,
+# that amount at the knob's top)
+LIVE_LIKE = (("reverb", "reverb", "mix", 1.0), ("echo", "echo", "mix", 1.0),
+             ("distortion", "crunch", "drive", 36.0))
+NO_LIVE_VIEW: tuple = (1.0, 0.0, {})
+
+
+def live_view(fx: dict | None) -> tuple[float, float, dict]:
+    """What a sound's own effects put on Live controls' knobs: (speed, pitch, knobs),
+    the knobs from its Live controls stages and its Reverb, Echo and Distortion."""
+    f = clean(fx)
+    amounts = live_merged(f["live"])
+    for etype, knob, key, top in LIVE_LIKE:
+        cfg = f["effects"].get(etype)
+        if not cfg or not cfg.get("on") or etype not in voicefx.REGISTRY:
+            continue
+        default = next((q.default for q in voicefx.REGISTRY[etype].params if q.key == key), 0)
+        amount = float(cfg.get(key, default)) / top
+        amounts[knob] = min(1.0, amounts.get(knob, 0.0) + amount)
+    return round(f["speed"], 3), round(f["pitch"], 2), livefx.clean(amounts)
+
+
 def _active_effects(fx: dict) -> list[str]:
     return [t for t, cfg in fx["effects"].items() if cfg.get("on") and t in voicefx.REGISTRY]
 
