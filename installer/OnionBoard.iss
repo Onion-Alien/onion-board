@@ -1371,6 +1371,10 @@ begin
         'was turned down). It only lets phones on your Wi-Fi reach Onion Board, which is ' +
         'gone now. To remove it, run OnionBoardCleanup.exe from Onion Board''s GitHub page.',
         mbInformation, MB_OK);
+    if (Code and 4) <> 0 then
+      MsgBox('Onion Board''s logs couldn''t be deleted. They''re in ' +
+        ExpandConstant('{commonappdata}\OnionBoard') + ': you can delete that folder ' +
+        'yourself.', mbInformation, MB_OK);
   end;
   Setup := CableSetup;
   Mine := '';

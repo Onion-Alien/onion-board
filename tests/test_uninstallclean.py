@@ -72,8 +72,11 @@ def test_yes_deletes_their_folder_and_programdata(pc):
 
 
 def test_programdata_stays_while_the_mic_effect_is_on(pc):
+    """Without a prompt for it, and not said as their sounds staying: the uninstaller
+    says the mic effect stayed."""
     pc["mic"] = True
-    assert uc.cli([uc.DATA]) == uc.DATA_LEFT
+    assert uc.cli([uc.DATA]) == 0
+    assert pc["prompts"] == []
     assert pc["machine"].exists()
     assert not pc["user"].exists()
 
@@ -81,7 +84,7 @@ def test_programdata_stays_while_the_mic_effect_is_on(pc):
 def test_a_turned_down_prompt_says_what_stayed(pc, monkeypatch):
     pc["rules"].add("onion-pocket-firewall")
     monkeypatch.setattr(cleanup, "run_elevated", lambda *a, **k: None)
-    assert uc.cli([uc.DATA]) == uc.DATA_LEFT | uc.RULE_LEFT
+    assert uc.cli([uc.DATA]) == uc.MACHINE_LEFT | uc.RULE_LEFT
     assert not pc["user"].exists()   # that part needs no admin
 
 

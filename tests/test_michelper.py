@@ -63,7 +63,8 @@ ADMIN_DIGEST = {3: "89146326524eb7d36f3526e5f7b561046e846aa1ef2afccecba4c37132f4
                31: "833eac929852c4838d3869ec238e99f23dc2067746815520de7839ed51e54b85",
                32: "5fe573c21a645bad90ed641ff87d1686174da445c20b2e5c1179210457ddd33d",
                33: "764a71a6d5c4dc9e6c69afdf4287b2a18e1bf85580d918d223d57b91dc103c61",
-               34: "ee19b11a3aa9e4975834a8e67181997441592b476a6d5681d7c235dc2b0c2fd4"}
+               34: "ee19b11a3aa9e4975834a8e67181997441592b476a6d5681d7c235dc2b0c2fd4",
+               35: "24568dec9f3b82386c486ad3fbaaa6101b74bca3670c9fa60b95381915418f66"}
 
 
 def _queue():
@@ -417,12 +418,30 @@ def test_any_trace_of_a_helper_is_a_leftover(monkeypatch):
     assert mh.leftover()
 
 
+def test_a_folder_gone_at_the_next_restart_is_no_leftover(monkeypatch):
+    """The helper removing itself runs from its folder, so that goes at the next
+    restart: the uninstaller's later steps don't ask for admin again over it."""
+    monkeypatch.setattr(mh, "_schtasks", lambda *a, **k: 1)
+    mh.helper_dir().mkdir(parents=True)
+    marked = []
+    monkeypatch.setattr(dm, "_marked", lambda p: p in marked)
+    assert mh.leftover()
+    marked.append(mh.helper_dir())
+    assert not mh.leftover()
+
+
 def test_the_uninstaller_asks_the_helper_for_remove_all(monkeypatch):
     asked = []
     monkeypatch.setattr(dm, "anything_installed", lambda: True)
     monkeypatch.setattr(dm, "_is_admin", lambda: False)
     monkeypatch.setattr(dm, "_elevated", lambda args, wait_s=300.0, **k: asked.append(args) or 0)
+    # it removes itself just after answering: waited for, so the uninstaller's next
+    # steps don't find it and ask for admin again (found on a real PC)
+    there = [True, True]
+    monkeypatch.setattr(mh, "leftover", lambda: bool(there) and there.pop())
+    monkeypatch.setattr(mh.time, "sleep", lambda s: None)
     assert dm.cli(["remove"]) == 0 and asked == [["remove-all"]]
+    assert not there
 
 
 def test_task_xml():
@@ -497,6 +516,17 @@ def test_install_helper_keeps_the_first_user(helper_setup):
     assert (mh.helper_dir() / mh.USERS).read_text().split() == [SID, SID2]
     assert mh.task_sddl([SID, SID2]) in registered["xml"]
     assert calls.count("/create") == 2 and "/delete" not in calls
+
+
+def test_install_helper_takes_its_folder_off_the_restart_list(helper_setup, monkeypatch):
+    """Uninstalled (the helper removing itself, so its files go at the next restart),
+    then installed again before that restart: the same build stays where it is, and
+    must come off Windows' list, or that restart deletes the new helper."""
+    unmarked = []
+    monkeypatch.setattr(dm, "_unmark", lambda paths: unmarked.extend(paths))
+    assert mh.install_helper()
+    dest = mh.helper_dir()
+    assert dest in unmarked and dest / mh.EXE_NAME in unmarked
 
 
 def test_install_helper_repairs_a_build_with_the_same_stamp(helper_setup, monkeypatch):

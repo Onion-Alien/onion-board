@@ -3083,10 +3083,12 @@ def test_uninstaller_asks_nothing_when_nothing_is_installed(monkeypatch):
 
 
 def test_uninstaller_takes_it_off_the_mic(monkeypatch):
+    from soundboard.mic import michelper
     asked = []
     monkeypatch.setattr(dm, "anything_installed", lambda: True)
     monkeypatch.setattr(dm, "_is_admin", lambda: False)
     monkeypatch.setattr(dm, "_elevated", lambda args, wait_s=90.0, **k: asked.append(args) or 0)
+    monkeypatch.setattr(michelper, "leftover", lambda: False)
     assert dm.cli(["remove"]) == 0 and asked == [["remove-all"]]
     monkeypatch.setattr(dm, "_elevated", lambda args, wait_s=90.0, **k: None)   # turned down
     assert dm.cli(["remove"]) == 1
