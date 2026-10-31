@@ -10,15 +10,19 @@ name: release
 # line. Nobody gets it until the draft is published by hand, after the headline is
 # written and the draft's installer is installed over a real copy.
 # A tag whose release already exists (made by hand) is left alone. On a PR that
-# changes this file it builds and checks only: no release, no scan.
+# changes this file, or run by hand with no tag (a dry run of any branch), it builds
+# and checks only: no release, no scan.
+# It never sends a usage count: ONIONBOARD_NO_STATS is set for the build, and the
+# built app only ever runs with --selftest (build.ps1).
 on:
   push:
     tags: ["v*"]
   workflow_dispatch:
     inputs:
       tag:
-        description: "Tag to build (vX.Y.Z, must exist)"
-        required: true
+        description: "Tag to build (vX.Y.Z, must exist); empty = dry run of the branch, no release"
+        required: false
+        default: ""
   pull_request:
     paths: [".github/workflows/release.yml"]
 
@@ -63,6 +67,7 @@ jobs:
       sha: ${{ steps.build.outputs.sha }}
     env:
       TAG: ${{ github.event.inputs.tag || (github.event_name == 'push' && github.ref_name) || '' }}
+      ONIONBOARD_NO_STATS: "1"
     steps:
       - uses: actions/checkout@v6
         with:
@@ -115,6 +120,30 @@ jobs:
           if (Test-Path build\michelper\obmichelper\obmichelper.exe) {
             Copy-Item build\michelper\obmichelper\obmichelper.exe out\
           }
+      # Windows (and a code-signing service) names a file by its version info: both the
+      # app and the installer must say "Onion Board" and this version.
+      - name: Version info on the app and the installer
+        shell: pwsh
+        run: |
+          $v = .venv\Scripts\python -c "import soundboard; print(soundboard.__version__)"
+          foreach ($f in "dist\OnionBoard\OnionBoard.exe", "dist\OnionBoardSetup.exe") {
+            $i = (Get-Item $f).VersionInfo
+            "$f`: $($i.ProductName) $($i.ProductVersion)" | Out-File -Append -Encoding utf8 $env:GITHUB_STEP_SUMMARY
+            if ($i.ProductName -ne "Onion Board" -or $i.ProductVersion -ne $v) {
+              throw "$f says '$($i.ProductName) $($i.ProductVersion)', not 'Onion Board $v'"
+            }
+          }
+      # Code signing goes here, once the project is accepted by SignPath Foundation
+      # (free signing for open-source projects): it signs only files built by this
+      # workflow from the public repo, and each release waits for a manual approval
+      # on signpath.io. The signed files then replace the ones in out\ (the SHA-256
+      # above must be taken after signing). Needs SIGNPATH_API_TOKEN and the
+      # organization/project IDs SignPath gives out; none exist yet.
+      - name: Code signing (SignPath, not set up yet)
+        if: ${{ false }}
+        shell: pwsh
+        run: |
+          throw "SignPath signing isn't set up yet"
       - uses: actions/upload-artifact@v7
         with:
           name: release-files
