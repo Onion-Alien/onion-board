@@ -1465,7 +1465,8 @@
   var LANGS = ["English", "Spanish", "French", "German", "Japanese", "Korean", "Portuguese (Brazil)", "Italian", "Dutch", "Polish", "Turkish", "Chinese"];
   function voicePic(name) { return name === "My own mix" ? "custom" : name.toLowerCase().replace(/ /g, "-"); }
   var voiceTab = "changer", pickedVoice = null, voiceGroup = "", voiceFavs = { "Demon": true, "Robot": true }, voiceList = false,
-      voiceWarned = false, voiceOnTop = {}, voiceFold = {}, voiceSaid = [], voiceLang = "Spanish";
+      voiceWarned = false, voiceOnTop = {}, voiceFold = {}, voiceSaid = [], voiceLang = "Spanish",
+      cleanOn = false, cleanCog = false, cleanPreset = "normal", cleanLevel = "normal";
   function voiceCount() { return pickedVoice ? 4 + Object.keys(voiceOnTop).length : Object.keys(voiceOnTop).length; }
   function voicePage() {
     var say = h("input", { placeholder: "Type a line and press Enter", "aria-label": "Text to say" });
@@ -1493,8 +1494,9 @@
     function drawAll() { drawTabs(); drawSetups(); drawBody(); drawPicked(); drawStrip(); }
     function drawTabs() {
       tabs.replaceChildren();
-      [["changer", "Voice changer", "voice"], ["ai", "AI voices", "wave"], ["lang", "Languages", "globe"], ["addons", "Add-ons", "puzzle"]].forEach(function (t) {
-        var b = btn(t[0] === "changer" && pickedVoice && voiceTab !== "changer" ? "lit" : "", t[1], t[2], function () { voiceTab = t[0]; closeLive(); drawAll(); },
+      [["clean", "Clean mic", "mic"], ["changer", "Voice changer", "voice"], ["ai", "AI voices", "wave"], ["lang", "Languages", "globe"], ["addons", "Add-ons", "puzzle"]].forEach(function (t) {
+        var on = t[0] === "changer" ? !!pickedVoice : t[0] === "clean" && cleanOn;
+        var b = btn(on && voiceTab !== t[0] ? "lit" : "", t[1], t[2], function () { voiceTab = t[0]; closeLive(); drawAll(); },
           { "aria-pressed": voiceTab === t[0] ? "true" : "false" });
         tabs.appendChild(b);
       });
@@ -1572,8 +1574,10 @@
       body.append(head("voice", "Voice changer", [h("span", { class: "onoff" }, [sw, h("span", { text: pickedVoice ? "On" : "Off" })])]),
         h("p", { class: "hint", text: "Change your mic live for whoever you send sounds to (Discord, a game, OBS). Pick a voice to turn it on, then use Hear what they hear at the bottom to try it." }));
       if (!voiceWarned) body.appendChild(h("div", { class: "ob-warnbox" }, [h("p", null, [h("span", { text: "⚠ Using Discord or a game's voice chat? Turn its " }),
-          h("b", { text: "noise suppression" }), h("span", { text: " off, or it wipes out most of a changed voice. " }), h("b", { text: "Show me how" }), h("span", { text: " has the steps." })]),
+          h("b", { text: "noise suppression" }), h("span", { text: " off, or it wipes out most of a changed voice. " }), h("b", { text: "Clean mic" }),
+          h("span", { text: " takes the background noise out instead. " }), h("b", { text: "Show me how" }), h("span", { text: " has the steps." })]),
         btn("", "Show me how", null, function () { tryIt("Bun showing you Discord's settings, step by step"); }),
+        btn("", "Clean mic", "mic", function () { voiceTab = "clean"; drawAll(); }),
         btn("", "Got it", null, function () { voiceWarned = true; drawBody(); })]));
       body.appendChild(h("div", { class: "ob-vchips" }, [chips, views]));
       var grids = h("div", { class: "ob-vgroups" + (voiceList ? " list" : "") });
@@ -1622,9 +1626,72 @@
         h("p", { class: "hint", text: "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder. They join the Voice list above." }),
         h("div", { class: "r" }, [btn("", "Add a voice server", "plus", function () { tryIt("Your own voice server"); }), btn("", "Open voices folder", null, function () { tryIt("Your own voice packs"); })]));
     }
+    // Clean mic: noise out of your mic before your sounds are added (the app's cleanmicpanel.py)
+    var CLEAN_PRESETS = { normal: ["Normal", "normal", "Normal: noise cleaned, and the sensitivity set by itself."],
+      loud: ["Loud room", "strong", "Loud room: Strong cleaning and a stricter sensitivity, for loud fans, a TV or people talking nearby."],
+      voice: ["Just my voice", "strong", "Just my voice: Strong cleaning, a strict sensitivity and your voice kept at one loudness. Quiet words can be cut: speak up."],
+      quiet: ["Quiet room", "light", "Quiet room: Light cleaning, and your voice stays most natural."] };
+    var CLEAN_LEVELS = { off: ["Off", "Off: no noise is taken out. Input volume, sensitivity and gain control still work."],
+      light: ["Light", "Light: noise is turned well down, and your voice stays most natural."],
+      normal: ["Normal", "Normal: fans, keyboards and a TV go. Uses about 5% of one CPU core."],
+      strong: ["Strong", "Strong: nearly everything but your voice goes, even loud noise. Uses about twice Normal's CPU."] };
+    function setClean(on) {
+      cleanOn = on;
+      drawTabs(); drawBody(); drawStrip();
+      if (on) toast("Clean mic on", "In the app, fans, keyboards and other noise come out of your voice here, before your sounds are added. Discord's own noise suppression can stay off.", true);
+    }
+    function drawClean() {
+      var sw = h("button", { type: "button", class: "sw", role: "switch", "aria-checked": cleanOn ? "true" : "false", "aria-label": "Clean mic on",
+        onclick: function () { setClean(!cleanOn); } });
+      body.append(head("mic", "Clean mic", [h("span", { class: "onoff" }, [sw, h("span", { text: cleanOn ? "On" : "Off" })])]),
+        h("p", { class: "hint", text: "Takes fans, keyboards and other background noise out of your mic while you talk. It runs on this PC and works with every app and every voice." }),
+        h("div", { class: "r" }, [btn("", "Mic settings", "settings", function () { cleanCog = !cleanCog; drawBody(); },
+          { "aria-pressed": cleanCog ? "true" : "false", title: "Input volume, sensitivity, noise suppression and gain control" })]));
+      if (cleanCog) {
+        function chips(list, cur, fn) {
+          return h("div", { class: "chips" }, Object.keys(list).map(function (k) {
+            return h("button", { type: "button", class: "chip", "aria-pressed": cur === k ? "true" : "false", text: list[k][0], onclick: function () { fn(k); } });
+          }));
+        }
+        var vol = h("input", { type: "range", min: "0", max: "200", value: "100", "aria-label": "Input volume" });
+        setRange(vol);
+        vol.addEventListener("input", function () { setRange(vol); cleanPreset = "custom"; });
+        body.appendChild(h("div", { class: "ob-cleanset" }, [
+          h("b", { text: "Preset" }),
+          chips(CLEAN_PRESETS, cleanPreset, function (k) { cleanPreset = k; cleanLevel = CLEAN_PRESETS[k][1]; drawBody(); }),
+          h("p", { class: "hint", text: cleanPreset === "custom" ? "Custom: your own settings. Pick a preset to start from one again." : CLEAN_PRESETS[cleanPreset][2] }),
+          h("b", { text: "Input volume" }), vol,
+          h("b", { text: "Noise suppression" }),
+          chips(CLEAN_LEVELS, cleanLevel, function (k) {
+            cleanLevel = k; cleanPreset = "custom";
+            Object.keys(CLEAN_PRESETS).forEach(function (p) { if (CLEAN_PRESETS[p][1] === k && p !== "loud" && p !== "voice") cleanPreset = p; });
+            drawBody();
+            if (k === "strong") tryIt("Strong cleaning: a one-time 50 MB download");
+          }),
+          h("p", { class: "hint", text: CLEAN_LEVELS[cleanLevel][1] })]));
+      }
+      var mic = h("span", { class: "ob-meter" }, [h("i")]), clean = h("span", { class: "ob-meter" }, [h("i")]);
+      body.append(h("b", { text: "Right now" }),
+        h("div", { class: "ob-cleanm" }, [h("span", { text: "Your mic" }), mic, h("span", { text: "Cleaned" }), clean]),
+        h("b", { text: "Hear the difference" }),
+        h("div", { class: "r" }, [btn("", "Record 5 seconds", "mic", function () { tryIt("Hear the difference: 5 seconds of your mic, as it was and cleaned"); },
+            { title: "Talk with your usual noise around, then hear it as it was and cleaned." }),
+          btn("", "Before", "play", null, { disabled: true, title: "Your mic as it was" }),
+          btn("", "After", "play", null, { disabled: true, title: "Your mic cleaned" })]),
+        h("p", { class: "hint", text: "Talk with your usual noise around, then play both." }));
+      // a pretend mic: a fan's steady hiss, words on top; the cleaned bar keeps only the words
+      var t = 0, tick = setInterval(function () {
+        if (!mic.isConnected) return clearInterval(tick);
+        t++;
+        var talk = Math.max(0, Math.sin(t / 7) * Math.sin(t / 3.1)), noise = 0.28 + Math.random() * 0.06;
+        mic.firstChild.style.transform = "scaleX(" + Math.min(1, noise + talk * 0.6).toFixed(3) + ")";
+        var left = !cleanOn || cleanLevel === "off" ? 1 : cleanLevel === "light" ? 0.25 : 0;   // of the noise
+        clean.firstChild.style.transform = "scaleX(" + Math.min(1, noise * left + talk * 0.6).toFixed(3) + ")";
+      }, 60);
+    }
     function drawBody() {
       body.replaceChildren();
-      if (voiceTab === "changer") drawChanger(); else if (voiceTab === "ai") drawAi(); else if (voiceTab === "lang") drawLang(); else drawAddons();
+      if (voiceTab === "clean") drawClean(); else if (voiceTab === "changer") drawChanger(); else if (voiceTab === "ai") drawAi(); else if (voiceTab === "lang") drawLang(); else drawAddons();
     }
     // the voice picked, pinned under the cards: Effects, Edit voice, Hear it
     function drawPicked() {
@@ -1693,8 +1760,6 @@
           sl("Pitch", deep ? -6 : 4, -12, 12, " st", ["lower", "higher"]), sl("Natural sound", 100, 0, 100, "%", ["cartoon", "real person"]),
           sl("Voice size", deep ? 5 : -3, -10, 10, "", ["smaller", "bigger"]), sl("Autotune", 0, 0, 100, "%", ["off", "robotic"]),
           sl("Mix", 100, 0, 100, "%", ["", ""]), sl("Gap between voices", 100, 0, 100, "%", ["together", "echo"])]),
-        fxcard("shield", "Clean up my mic", true, "Removes hum, hiss and room noise before the other effects.", [
-          sl("Noise gate", 60, 0, 100, "%", ["off", "strong"]), sl("Hiss removal", 50, 0, 100, "%", ["off", "strong"])]),
         h("b", { text: "All effects" }),
         h("div", { class: "hint", text: "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own." }),
         h("div", { class: "ob-fxgrid" }, [fxcard("music", "Harmony", false), fxcard("wave", "Monster growl", deep), fxcard("headphones", "Echo", !!voiceOnTop.Echo),
@@ -1703,10 +1768,11 @@
       did("voice-edit");
     }
     function drawStrip() {      // the Voice tab's own bar: your mic and what's changing it
-      strip.replaceChildren(btn("danger", "Stop", "stop", function () { pickedVoice = null; voiceOnTop = {}; drawAll(); }, { title: "Turn the voice changer off" }),
+      strip.replaceChildren.apply(strip, [btn("danger", "Stop", "stop", function () { pickedVoice = null; voiceOnTop = {}; drawAll(); }, { title: "Turn the voice changer off" }),
         icon("mic", "s mic"), h("span", { class: "hint ob-hide-s", text: "No mic open" }), h("span", { class: "ob-meter" }, [h("i")]), icon("ear", "s"),
+        cleanOn ? h("button", { type: "button", class: "ob-vchip", title: "Clean mic is on. Click to turn it off", onclick: function () { setClean(false); } }, [icon("mic", "s"), "Clean mic"]) : null,
         pickedVoice ? h("span", { class: "ob-vchip" }, [h("img", { src: "demo/voices/" + voicePic(pickedVoice) + ".webp", alt: "" }), pickedVoice])
-          : h("span", { class: "hint st", text: "Voice effects off: mic unchanged" }));
+          : cleanOn ? null : h("span", { class: "hint st", text: "Voice effects off: mic unchanged" })].filter(Boolean));
     }
     drawAll();
     return h("div", { class: "ob-page" }, [

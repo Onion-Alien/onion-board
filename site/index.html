@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Onion Board: free soundboard for Discord and games (Windows)</title>
-<meta name="description" content="Free Windows soundboard: play sounds into Discord and games through your mic. In-game hotkeys, an overlay, effects, a voice changer, text-to-speech, instant replay, and screen triggers that play a sound when something shows up, like YOU DIED.">
+<meta name="description" content="Free Windows soundboard: play sounds into Discord and games through your mic. In-game hotkeys, an overlay, effects, a voice changer, mic noise removal, text-to-speech, instant replay, and screen triggers that play a sound when something shows up, like YOU DIED.">
 <meta property="og:title" content="Onion Board: free soundboard for Discord and games">
 <meta property="og:description" content="Play sounds through your mic in Discord and games. Voice changer, text-to-speech, and screen triggers that play a sound when you die.">
 <meta property="og:image" content="https://onionalien.com/onionboard/screenshots/sounds.png?v=52563ccb">
@@ -31,7 +31,7 @@
  "downloadUrl": "https://github.com/Onion-Alien/onion-board/releases/latest/download/OnionBoardSetup.exe",
  "image": "https://onionalien.com/onionboard/screenshots/sounds.png?v=52563ccb",
  "screenshot": ["https://onionalien.com/onionboard/screenshots/sounds.png?v=52563ccb",
-  "https://onionalien.com/onionboard/screenshots/voice.png?v=29e78344",
+  "https://onionalien.com/onionboard/screenshots/voice.png?v=29bd0f26",
   "https://onionalien.com/onionboard/screenshots/triggers.png?v=3389b572",
   "https://onionalien.com/onionboard/screenshots/apps.png?v=2229b7e5",
   "https://onionalien.com/onionboard/screenshots/setup.png?v=a01ddaa5"],
@@ -220,7 +220,7 @@
     <section class="sec" id="board-look">
       <h2 class="rv">Your sounds as <em>pads</em></h2>
       <p class="sub rv">Click one, or hit its hotkey mid-game.</p>
-      <div class="showcase" data-demo="board" data-v="2"><div class="frame">
+      <div class="showcase" data-demo="board" data-v="3"><div class="frame">
         <img src="screenshots/sounds.png?v=52563ccb" width="2100" height="1281" alt="Onion Board's sound pads">
       </div></div>
     </section>
@@ -268,11 +268,14 @@
           <p>Coming from Soundpad, Resanance, Soundux or EXP Soundboard? Your sounds and hotkeys come with you in one click.</p></div>
         <div class="tile rv"><div class="ico">🎛️</div><h3>Effects on any sound</h3>
           <p>Trim, speed, pitch, bass boost. One-click Deep fried and Nightcore. Live on the radio and shared programs too.</p></div>
-        <div class="tile w rv"><div class="ico">🤖</div><h3>Voice changer and TTS</h3>
+        <div class="tile rv"><div class="ico">🤖</div><h3>Voice changer and TTS</h3>
           <p>Change your voice live, or type and a computer voice says it, in 33 languages. Optional AI voices: 12 characters, or blend your own.</p>
           <div class="viz wave" aria-hidden="true"><i style="animation-delay:-.1s"></i><i style="animation-delay:-.5s"></i><i style="animation-delay:-.3s"></i><i style="animation-delay:-.8s"></i><i style="animation-delay:-.2s"></i><i style="animation-delay:-.6s"></i><i style="animation-delay:-.9s"></i><i style="animation-delay:-.4s"></i><i style="animation-delay:-.7s"></i><i style="animation-delay:-.15s"></i><i style="animation-delay:-.55s"></i><i style="animation-delay:-.35s"></i><i style="animation-delay:-.85s"></i><i style="animation-delay:-.25s"></i><i style="animation-delay:-.65s"></i><i style="animation-delay:-.45s"></i><i style="animation-delay:-.75s"></i><i style="animation-delay:-.05s"></i></div></div>
-        <div class="tile w rv"><div class="ico">✅</div><h3>Checks Discord for you</h3>
-          <p>Spots the Discord settings that would cut your sounds out and shows how to fix them.</p>
+        <div class="tile rv"><div class="ico">🧹</div><h3>Clean mic</h3>
+          <p>Takes fans, keyboards and room noise out of your voice, before your sounds are mixed in, so they come through whole.</p>
+          <div class="viz checks" aria-hidden="true"><span style="--d:0s">Fans and hum: gone</span><span style="--d:.4s">Keyboard clicks: gone</span><span style="--d:.8s">Your sounds: untouched</span></div></div>
+        <div class="tile rv"><div class="ico">✅</div><h3>Checks Discord for you</h3>
+          <p>Spots the Discord settings that would cut your sounds out and shows how to fix them. Clean mic does the noise removal instead.</p>
           <div class="viz checks" aria-hidden="true"><span style="--d:0s">Input profile: Custom</span><span style="--d:.4s">Noise suppression: None</span><span style="--d:.8s">Echo cancellation: off</span></div></div>
         <div class="tile rv"><div class="ico">🎙️</div><h3>Record a sound</h3>
           <p>With your mic, or a bit of whatever is playing: a pad, a search result, the radio.</p></div>
@@ -292,7 +295,7 @@
     <section class="sec">
       <h2 class="rv">The <em>other tabs</em></h2>
       <div class="shots">
-        <figure class="rv"><img src="screenshots/voice.png?v=29e78344" alt="Onion Board: the Voice tab" loading="lazy"><figcaption><b>Voice</b>Voice changer and text-to-speech</figcaption></figure>
+        <figure class="rv"><img src="screenshots/voice.png?v=29bd0f26" alt="Onion Board: the Voice tab" loading="lazy"><figcaption><b>Voice</b>Voice changer and text-to-speech</figcaption></figure>
         <figure class="rv"><img src="screenshots/triggers.png?v=3389b572" alt="Onion Board: the Triggers tab" loading="lazy"><figcaption><b>Triggers</b>A sound when something shows up in your game</figcaption></figure>
         <figure class="rv"><img src="screenshots/apps.png?v=2229b7e5" alt="Onion Board: the Apps tab" loading="lazy"><figcaption><b>Apps</b>Send one program's sound to your friends</figcaption></figure>
         <figure class="rv"><img src="screenshots/setup.png?v=a01ddaa5" alt="Onion Board: the Setup tab" loading="lazy"><figcaption><b>Setup</b>Setup shows at a glance whether they can hear you</figcaption></figure>
@@ -316,8 +319,9 @@
         <details id="discord-settings"><summary>What do I set in Discord?</summary><div><p>Set <b>Input Profile</b> to
           <b>Custom</b>, <b>Noise Suppression</b> to <b>None</b> and turn <b>Echo Cancellation</b> off, so it
           doesn't filter your sounds out (not Studio: on your mic, Studio skips Onion Board). Onion Board
-          warns you if one of them is in the way.
-          Already use Voicemeeter, a mixer or OBS? Pick it under
+          warns you if one of them is in the way. To still keep fans and keyboards out of your voice, switch on
+          <b>Clean mic</b> on the <b>Voice</b> tab: it cleans your voice before your sounds are added, so they
+          aren't touched. Already use Voicemeeter, a mixer or OBS? Pick it under
           <b>Send my sounds to</b> instead, or add it under <b>Also play on</b>.</p></div></details>
         <details><summary>Why does Windows warn me?</summary><div><p>The app isn't code-signed yet (a certificate costs money
           every year), so Windows doesn't know it. Click <b>More info → Run anyway</b> (or <b>⋯ → Keep</b>
