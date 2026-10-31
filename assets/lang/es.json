@@ -1191,7 +1191,6 @@
   "Theme's colour": "Color del tema",
   "Theme, audio, voice, overlay and privacy options.": "Opciones de tema, audio, voz, superposición y privacidad.",
   "Then Ctrl+click picks a pad without playing it": "Así Ctrl+clic elige un pad sin reproducirlo",
-  "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Creen que la música es ruido de fondo y cortan tus sonidos. Onion Board ya limpia tu voz.",
   "This desktop has no system tray, so closing the window quits.": "Este escritorio no tiene bandeja del sistema, así que cerrar la ventana cierra la app.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Esta es Onion Board {version}. Con la casilla marcada, pregunta a GitHub cada pocas horas si ha salido una versión más nueva y te avisa (con un cartel si es un arreglo importante). Esta copia se ejecuta desde el código fuente, así que solo te avisa: actualízala con git pull.",
   "Through a proxy": "A través de un proxy",
@@ -4727,5 +4726,13 @@
     "{n} preajuste tuyo más",
     "{n} preajustes tuyos más"
   ],
-  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” es el nombre de un preajuste incluido. Elige otro."
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” es el nombre de un preajuste incluido. Elige otro.",
+  "<b>Clean mic</b> is on: it takes background noise out of your voice instead, and never touches your sounds.": "<b>Micro limpio</b> está activado: quita el ruido de fondo de tu voz en su lugar y nunca toca tus sonidos.",
+  "Bun swaps Discord's noise filter for Clean mic, so your sounds don't get cut off.": "Bun cambia el filtro de ruido de Discord por Micro limpio, para que tus sonidos no se corten.",
+  "Bun swaps Discord's noise filter for Clean mic, then shows you which mic to pick.": "Bun cambia el filtro de ruido de Discord por Micro limpio y luego te enseña qué micro elegir.",
+  "Bun turned on <b>Clean mic</b> in place of Discord's noise filter: it takes background noise out of your voice and never touches your sounds.": "Bun ha activado <b>Micro limpio</b> en lugar del filtro de ruido de Discord: quita el ruido de fondo de tu voz y nunca toca tus sonidos.",
+  "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "En su lugar, Bun activa Micro limpio en la pestaña Voz: quita el ruido de fondo de tu voz y nunca toca tus sonidos.",
+  "Open Clean mic": "Abrir Micro limpio",
+  "They think music is background noise and cut your sounds up.": "Creen que la música es ruido de fondo y cortan tus sonidos.",
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "¿Aun así quieres quitar el ruido de fondo? Activa <b>Micro limpio</b> en la pestaña <b>Voz</b> de Onion Board: limpia tu voz y nunca toca tus sonidos."
 }

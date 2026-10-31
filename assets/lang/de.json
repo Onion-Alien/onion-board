@@ -1191,7 +1191,6 @@
   "Theme's colour": "Farbe des Themes",
   "Theme, audio, voice, overlay and privacy options.": "Theme-, Audio-, Stimm-, Overlay- und Privatsphäre-Optionen.",
   "Then Ctrl+click picks a pad without playing it": "Dann wählt Strg+Klick ein Pad aus, ohne es abzuspielen",
-  "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Sie halten Musik für Hintergrundlärm und zerhacken deine Sounds. Onion Board säubert deine Stimme schon.",
   "This desktop has no system tray, so closing the window quits.": "Dieser Desktop hat keinen Infobereich, also beendet das Schließen des Fensters die App.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Das ist Onion Board {version}. Mit dem Haken fragt es alle paar Stunden bei GitHub nach, ob eine neuere Version da ist, und sagt dir Bescheid (mit einem Banner, wenn es eine wichtige Korrektur ist). Diese Kopie läuft aus dem Quellcode, also sagt es nur Bescheid: Aktualisier sie mit git pull.",
   "Through a proxy": "Über einen Proxy",
@@ -4727,5 +4726,13 @@
     "{n} weitere deiner Vorlagen",
     "{n} weitere deiner Vorlagen"
   ],
-  "“{name}” is a built-in preset's name. Pick another one.": "„{name}“ ist der Name einer eingebauten Vorlage. Wähl einen anderen."
+  "“{name}” is a built-in preset's name. Pick another one.": "„{name}“ ist der Name einer eingebauten Vorlage. Wähl einen anderen.",
+  "<b>Clean mic</b> is on: it takes background noise out of your voice instead, and never touches your sounds.": "<b>Mikro säubern</b> ist an: Es nimmt stattdessen Hintergrundgeräusche aus deiner Stimme und lässt deine Sounds immer in Ruhe.",
+  "Bun swaps Discord's noise filter for Clean mic, so your sounds don't get cut off.": "Bun tauscht den Rauschfilter von Discord gegen Mikro säubern, damit deine Sounds nicht abgeschnitten werden.",
+  "Bun swaps Discord's noise filter for Clean mic, then shows you which mic to pick.": "Bun tauscht den Rauschfilter von Discord gegen Mikro säubern und zeigt dir dann, welches Mikro du wählen musst.",
+  "Bun turned on <b>Clean mic</b> in place of Discord's noise filter: it takes background noise out of your voice and never touches your sounds.": "Bun hat <b>Mikro säubern</b> statt des Rauschfilters von Discord eingeschaltet: Es nimmt Hintergrundgeräusche aus deiner Stimme und lässt deine Sounds immer in Ruhe.",
+  "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "Bun schaltet dafür Mikro säubern im Tab Stimme ein: Es nimmt Hintergrundgeräusche aus deiner Stimme und lässt deine Sounds immer in Ruhe.",
+  "Open Clean mic": "Mikro säubern öffnen",
+  "They think music is background noise and cut your sounds up.": "Sie halten Musik für Hintergrundlärm und zerhacken deine Sounds.",
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Willst du die Hintergrundgeräusche trotzdem loswerden? Schalte stattdessen <b>Mikro säubern</b> im Tab <b>Stimme</b> von Onion Board ein: Es säubert deine Stimme und lässt deine Sounds immer in Ruhe."
 }

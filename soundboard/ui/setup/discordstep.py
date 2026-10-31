@@ -75,8 +75,8 @@ class DiscordStep(WizardStep):
         self.discord_tip = _label("", "font-size:10pt;")
         body.addWidget(self.discord_tip)
         # Discord's cleanup off lets the room's noise through: Clean mic takes it out
-        from soundboard.ui.setup.chatguide import clean_mic_tip
-        self.discord_clean = _label(clean_mic_tip(), "font-size:10pt;")
+        # (chatguide.clean_mic_tip, _fill_discord: on or not)
+        self.discord_clean = _label("", "font-size:10pt;")
         body.addWidget(self.discord_clean)
         self.btn_discord = QPushButton(_("Discord: make my sounds come through clean"))
         icons.set_icon(self.btn_discord, "speech", "on_accent")
@@ -158,7 +158,9 @@ class DiscordStep(WizardStep):
         self.discord_body.setVisible(filled and (self._discord_open or not tip))
 
     def _fill_discord(self):
+        from soundboard.ui.setup.chatguide import clean_mic_tip
         self.discord_tip.setText("")
+        self.discord_clean.setText(clean_mic_tip(self.win))
         self._live_kept: bool | None = None   # (_fill_discord_text: Discord's settings count)
         self._fill_discord_text()
         self._show_live()

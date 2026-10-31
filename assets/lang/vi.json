@@ -1172,7 +1172,6 @@
   "Theme's colour": "Màu chủ đề",
   "Theme, audio, voice, overlay and privacy options.": "Tùy chọn chủ đề, âm thanh, giọng nói, lớp phủ và quyền riêng tư.",
   "Then Ctrl+click picks a pad without playing it": "Khi đó Ctrl+click để chọn một nút mà không phát nó",
-  "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Chúng coi nhạc là tiếng ồn nền và cắt vụn âm thanh của bạn. Onion Board đã tự làm sạch giọng của bạn rồi.",
   "This desktop has no system tray, so closing the window quits.": "Màn hình nền này không có khay hệ thống, nên đóng cửa sổ sẽ thoát ứng dụng.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Đây là Onion Board {version}. Với hộp được đánh dấu, cứ sau vài giờ, nó sẽ hỏi GitHub xem có phiên bản mới hơn không và cho bạn biết (kèm biểu ngữ nếu đó là một bản sửa lỗi quan trọng). Bản sao này chạy từ nguồn nên nó chỉ cho bạn biết: cập nhật nó bằng git pull.",
   "Through a proxy": "Thông qua một proxy",
@@ -4640,5 +4639,13 @@
   "{n} more of your presets": [
     "Thêm {n} mẫu của bạn"
   ],
-  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” là tên của một mẫu có sẵn. Hãy chọn tên khác."
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” là tên của một mẫu có sẵn. Hãy chọn tên khác.",
+  "<b>Clean mic</b> is on: it takes background noise out of your voice instead, and never touches your sounds.": "<b>Mic sạch</b> đang bật: nó lọc tiếng ồn nền khỏi giọng của bạn thay vào đó, và không bao giờ đụng vào âm thanh của bạn.",
+  "Bun swaps Discord's noise filter for Clean mic, so your sounds don't get cut off.": "Bun thay bộ lọc tiếng ồn của Discord bằng Mic sạch, để âm thanh của bạn không bị cắt.",
+  "Bun swaps Discord's noise filter for Clean mic, then shows you which mic to pick.": "Bun thay bộ lọc tiếng ồn của Discord bằng Mic sạch, rồi chỉ cho bạn chọn mic nào.",
+  "Bun turned on <b>Clean mic</b> in place of Discord's noise filter: it takes background noise out of your voice and never touches your sounds.": "Bun đã bật <b>Mic sạch</b> thay cho bộ lọc tiếng ồn của Discord: nó lọc tiếng ồn nền khỏi giọng của bạn và không bao giờ đụng vào âm thanh của bạn.",
+  "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "Thay vào đó, Bun bật Mic sạch ở thẻ Giọng nói: nó lọc tiếng ồn nền khỏi giọng của bạn và không bao giờ đụng vào âm thanh của bạn.",
+  "Open Clean mic": "Mở Mic sạch",
+  "They think music is background noise and cut your sounds up.": "Chúng coi nhạc là tiếng ồn nền và cắt vụn âm thanh của bạn.",
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Vẫn muốn bỏ tiếng ồn nền? Hãy bật <b>Mic sạch</b> ở thẻ <b>Giọng nói</b> của Onion Board thay vào đó: nó làm sạch giọng của bạn và không bao giờ đụng vào âm thanh của bạn."
 }

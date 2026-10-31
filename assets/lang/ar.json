@@ -1272,7 +1272,6 @@
   "Theme's colour": "لون السمة",
   "Theme, audio, voice, overlay and privacy options.": "خيارات السمة والصوت ومغيّر الصوت والتراكب والخصوصية.",
   "Then Ctrl+click picks a pad without playing it": "وعندها Ctrl+نقر يختار زرًا دون تشغيله",
-  "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "إنها تعتبر الموسيقى ضجيج خلفية وتقطّع أصواتك. Onion Board ينقّي صوتك بالفعل.",
   "This desktop has no system tray, so closing the window quits.": "سطح المكتب هذا بلا شريط نظام، لذا إغلاق النافذة يُنهي التطبيق.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "هذا Onion Board {version}. مع تحديد المربع يسأل GitHub كل بضع ساعات إن صدر إصدار أحدث ويخبرك (بشريط تنبيه إن كان إصلاحًا مهمًا). هذه النسخة تعمل من الشيفرة المصدرية، لذا يخبرك فقط: حدّثها بـ git pull.",
   "Through a proxy": "من خلال وكيل",
@@ -5075,5 +5074,13 @@
     "{n} إعدادًا آخر من إعداداتك",
     "{n} إعداد آخر من إعداداتك"
   ],
-  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” اسم إعداد مدمج. اختر اسمًا آخر."
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” اسم إعداد مدمج. اختر اسمًا آخر.",
+  "<b>Clean mic</b> is on: it takes background noise out of your voice instead, and never touches your sounds.": "<b>ميكروفون نظيف</b> يعمل: يزيل ضجيج الخلفية من صوتك بدلًا من ذلك، ولا يلمس أصواتك أبدًا.",
+  "Bun swaps Discord's noise filter for Clean mic, so your sounds don't get cut off.": "يستبدل Bun مرشّح الضوضاء في Discord بميكروفون نظيف، كي لا تنقطع أصواتك.",
+  "Bun swaps Discord's noise filter for Clean mic, then shows you which mic to pick.": "يستبدل Bun مرشّح الضوضاء في Discord بميكروفون نظيف، ثم يريك أي ميكروفون تختار.",
+  "Bun turned on <b>Clean mic</b> in place of Discord's noise filter: it takes background noise out of your voice and never touches your sounds.": "شغّل Bun <b>ميكروفون نظيف</b> بدلًا من مرشّح الضوضاء في Discord: يزيل ضجيج الخلفية من صوتك ولا يلمس أصواتك أبدًا.",
+  "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "يشغّل Bun ميكروفون نظيف في تبويب الصوت بدلًا منه: يزيل ضجيج الخلفية من صوتك ولا يلمس أصواتك أبدًا.",
+  "Open Clean mic": "افتح ميكروفون نظيف",
+  "They think music is background noise and cut your sounds up.": "إنها تعتبر الموسيقى ضجيج خلفية وتقطّع أصواتك.",
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "تريد إزالة ضجيج الخلفية رغم ذلك؟ شغّل <b>ميكروفون نظيف</b> في تبويب <b>الصوت</b> في Onion Board بدلًا من ذلك: ينقّي صوتك ولا يلمس أصواتك أبدًا."
 }

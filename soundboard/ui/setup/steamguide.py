@@ -8,7 +8,7 @@ from PySide6.QtWidgets import QApplication, QDialog, QHBoxLayout, QPushButton, Q
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.i18n import _
-from soundboard.ui.setup.chatguide import clean_mic_step
+from soundboard.ui.setup.chatguide import clean_mic_tip
 from soundboard.ui.setup.wizardkit import BUN_H, BUN_PAD, _header, _label, _ok
 
 
@@ -18,7 +18,7 @@ class SteamGuide(QDialog):
     client's Voice settings. And Steam's noise cancellation treats music as noise, so
     left on it chops up the sounds; this walks through all of it."""
 
-    def __init__(self, parent, mic_name: str):
+    def __init__(self, parent, mic_name: str, mw=None):
         super().__init__(parent)
         fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
         self.setWindowTitle(_("Steam games: set your mic"))
@@ -43,9 +43,9 @@ class SteamGuide(QDialog):
                              "by the clock → Exit) and open it again.")),
             _("Under <b>Advanced options</b>, turn <b>OFF</b>: <b>Noise cancellation</b>, "
               "<b>Echo cancellation</b> and <b>Automatic volume/gain control</b>.")
-            + small.format(_("They think music is background noise and cut your sounds up. "
-                             "Onion Board already cleans up your voice.")),
-            clean_mic_step(),
+            + small.format(_("They think music is background noise and cut your sounds "
+                             "up.")),
+            clean_mic_tip(mw),
             _("Click <b>Start microphone test</b> and play a sound in Onion Board. You should "
               "hear it back."),
             _("On the Setup tab, set <b>Who's listening</b> to <b>Advanced</b>, then <b>Steam "

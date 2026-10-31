@@ -27,7 +27,7 @@ from soundboard.ui.kit import busy, fit, icons, panel
 from soundboard.ui.kit import toast as toastmod
 from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.kit.crashdialog import free_dialog
-from soundboard.core import errors
+from soundboard.core import errors, usage
 from soundboard.i18n import _
 from soundboard.ui.setup.wizardkit import BUN_H, BUN_PAD, _header, _label, _ok
 
@@ -47,19 +47,58 @@ def _warn() -> str:
     return theme.status("warn")
 
 
-def clean_mic_tip() -> str:
-    """With Discord's cleanup off the mic's background noise gets through: Clean mic
-    takes it out of the voice only (the sounds are mixed in after it)."""
-    return _("With Discord's noise suppression off, turn on <b>Clean mic</b> on Onion "
-             "Board's <b>Voice</b> tab. It takes fans, keyboards and other background "
-             "noise out of your voice and never touches your sounds.")
+def clean_mic(mw):
+    """The Voice tab's Clean mic (voice.cleanmicpanel), or None: the tab switched off
+    (taboff.VoiceOff) or no Clean mic in this copy."""
+    clean = getattr(getattr(mw, "voice", None), "clean", None)
+    return clean if getattr(clean, "ok", False) else None
 
 
-def clean_mic_step() -> str:
-    """clean_mic_tip for the game, Steam and call guides: their cleanup, not Discord's."""
-    return _("With that cleanup off, turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> "
-             "tab. It takes fans, keyboards and other background noise out of your voice "
-             "and never touches your sounds.")
+def clean_mic_tip(mw=None) -> str:
+    """With a chat app's cleanup off the room's noise gets through: Clean mic takes it
+    out of the voice only (the sounds are mixed in after it)."""
+    clean = clean_mic(mw)
+    if clean is not None and clean.is_on():
+        return _("<b>Clean mic</b> is on: it takes background noise out of your voice "
+                 "instead, and never touches your sounds.")
+    return _("Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion "
+             "Board's <b>Voice</b> tab instead: it cleans your voice and never touches your "
+             "sounds.")
+
+
+def _noise_on(s: discordcfg.Settings) -> bool:
+    """Discord's own noise filter on (Krisp, Standard or Voice Isolation; Studio skips it)."""
+    p = s.profile.upper()
+    if p == "STUDIO":
+        return False
+    return bool(p and p != "CUSTOM") or s.krisp or s.suppression
+
+
+def clean_mic_state(mw) -> str:
+    """'was' Clean mic is on, 'off' it's off, '' there's no Clean mic to switch."""
+    clean = clean_mic(mw)
+    return "" if clean is None else "was" if clean.is_on() else "off"
+
+
+def clean_mic_takes_over(mw, before: discordcfg.Settings) -> str:
+    """Bun turned Discord's noise filter off: Clean mic on in its place (as strong as it
+    was set, Normal by default). 'on' switched on now, else clean_mic_state (left off
+    when Discord's filter was off already)."""
+    clean = clean_mic(mw)
+    if clean is not None and not clean.is_on() and _noise_on(before):
+        clean.set_on(True)
+        if clean.is_on():
+            return "on"
+    return clean_mic_state(mw)
+
+
+def open_clean_mic(mw):
+    """The Voice tab, on its Clean mic card."""
+    if not mw.tabctl.tab_on("voice"):
+        return
+    usage.used("clean-mic-open")
+    mw.tabs.setCurrentWidget(mw.voice)
+    mw.voice._open_card("clean")
 
 
 def _steps(*items: str) -> str:
@@ -219,11 +258,12 @@ def changes_html(changes: list[tuple[str, str, str]]) -> str:
 class DiscordFixed(QDialog):
     """Discord's settings came right while its guide was open: Bun celebrates, and the
     table says exactly which settings changed, from what to what. the Mic effect card's Put
-    Discord back is under it, and works here too."""
+    Discord back is under it, and works here too. `clean`: Clean mic in place of Discord's
+    noise filter (clean_mic_takes_over: 'on', 'was', 'off', '' not mentioned)."""
     discord_back = Signal(list, list)   # (Discord folders to put back, still open)
 
     def __init__(self, parent, client: str, changes: list[tuple[str, str, str]],
-                 restore: bool, show_me=None, mw=None):
+                 restore: bool, show_me=None, mw=None, clean: str = ""):
         super().__init__(parent)
         self.mw = mw if hasattr(mw, "alertctl") else None   # the main window: its toasts
         title = _("{name} is set up for your sounds", name=client)
@@ -243,9 +283,14 @@ class DiscordFixed(QDialog):
         col.addWidget(top)
         col.addWidget(panel.hint_label(_(
             "Your sounds reach your friends clean now, not muffled or cut off.")))
-        tip = panel.hint_label(clean_mic_tip())
-        tip.setTextFormat(Qt.TextFormat.RichText)
-        col.addWidget(tip)
+        self.clean = None
+        if clean:
+            self.clean = panel.hint_label(
+                _("Bun turned on <b>Clean mic</b> in place of Discord's noise filter: it "
+                  "takes background noise out of your voice and never touches your sounds.")
+                if clean == "on" else clean_mic_tip(mw))
+            self.clean.setTextFormat(Qt.TextFormat.RichText)
+            col.addWidget(self.clean)
         col.addStretch(1)
         head.addLayout(col, 1)
         self.bun = BunnyWidget("star", celebrate=True, height=74, pad=5)
@@ -284,6 +329,12 @@ class DiscordFixed(QDialog):
         ok.setDefault(True)
         ok.clicked.connect(self.accept)
         row.addWidget(ok)
+        self.btn_clean = None
+        if clean and self.mw is not None:   # on, to turn it off; off, to turn it on
+            self.btn_clean = QPushButton(_("Open Clean mic"))
+            icons.set_icon(self.btn_clean, "mic")   # the Clean mic card's own
+            self.btn_clean.clicked.connect(lambda: (self.accept(), open_clean_mic(self.mw)))
+            row.addWidget(self.btn_clean)
         if show_me is not None:
             where = QPushButton(_("Show me"))
             where.clicked.connect(lambda: (self.accept(), show_me()))
@@ -607,11 +658,14 @@ class DiscordSetUp(QObject):
             return self._end()
         name, before, after = done[0]
         toastmod.close(self.parent_w, "discord-setup")   # the box says it's done
+        # its noise filter off: Clean mic in its place (left on when Discord is put
+        # back on close: Clean mic is ours, and the next set-up turns Discord's off again)
+        clean = clean_mic_takes_over(mw, before)
         cfg, setctl = mw.cfg, getattr(mw, "setctl", None)
         box = DiscordFixed(self.parent_w, name, setting_changes(before, after),
                            bool(cfg.discord_restore),
                            (lambda: setctl.open_settings("audio")) if setctl else None,
-                           mw=mw)
+                           mw=mw, clean=clean)
         box.exec()
         free_dialog(box)
         self._end()
@@ -692,12 +746,12 @@ class DiscordGuide(QDialog):
               "<br><span style='font-size:9pt'>No Input Profile in your Discord? Set "
               "<b>Noise Suppression</b> to <b>None</b> and turn off <b>Echo "
               "Cancellation</b> and <b>Automatic Gain Control</b>.</span>"),
-            clean_mic_tip(),
             _("<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under "
               "Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you "
               "while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically "
               "determine input sensitivity</b> and set the slider to about -65 dB, "
               "or Discord keeps cutting your sounds out, loud ones too."),
+            clean_mic_tip(mw),
             _("Click <b>Let's Check</b> in Discord, then <b>Check Discord</b> below. Onion "
               "Board plays a short test into your mic and listens to what Discord does "
               "with it."))))
@@ -808,7 +862,7 @@ class DiscordGuide(QDialog):
         self.fixed = DiscordFixed(
             self, client, changes, bool(getattr(cfg, "discord_restore", False)),
             (lambda: setctl.open_settings("audio")) if setctl is not None else None,
-            mw=self.mw)
+            mw=self.mw, clean=clean_mic_state(self.mw))   # they changed it: theirs to turn on
         self.fixed.finished.connect(self.accept)   # nothing left to do in the guide
         self.fixed.open()
 
@@ -870,7 +924,7 @@ class GameGuide(QDialog):
               "cancellation</b>, <b>denoiser</b>, <b>background sound removal</b>, <b>voice "
               "clarity</b> or <b>automatic gain</b>. The AI denoisers (VRChat, Minecraft's "
               "Simple Voice Chat) wipe out music almost completely."),
-            clean_mic_step(),
+            clean_mic_tip(mw),
             _("<b>Push to talk</b> instead of open mic or voice activation, with the same key "
               "under <b>Settings → Hotkeys → Auto push-to-talk</b>: voice activation cuts the "
               "quiet parts of sounds, and some games send only speech on it, never music. "
@@ -926,7 +980,7 @@ class MeetingGuide(QDialog):
             _("<b>In a browser</b> (Google Meet, Discord or Guilded in a web page): the "
               "call's own settings → Microphone: {mic}, and turn off <b>Noise "
               "cancellation</b> / <b>noise suppression</b> where the site has it.", mic=mic),
-            clean_mic_step(),
+            clean_mic_tip(mw),
             _("On the Setup tab, set <b>Who's listening</b> to <b>Voice chat</b>. It picks "
               "the browser shaping by itself once the call is listening."))))
         row = QHBoxLayout()
@@ -947,7 +1001,7 @@ def show_guide(which: str, parent, mw, vm: str):
         vm = mw.cfg.mic_device or _("your mic")
     if which == "steam":
         from soundboard.ui.setup.steamguide import SteamGuide
-        g = SteamGuide(parent, vm)
+        g = SteamGuide(parent, vm, mw)
     elif which == "game":
         g = GameGuide(parent, mw, vm, kept)
     elif which == "meeting":
