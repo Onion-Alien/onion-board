@@ -694,7 +694,11 @@ goes online.
   by hand. Taking the effect off a mic in Setup keeps the helper, so putting it back
   needs no prompt. If Windows already took the effect off (a
   driver update, *Reset sound settings*), what's there now stays. The shared file and
-  the admin log stay in `%ProgramData%\OnionBoard\`.
+  the admin log stay in `%ProgramData%\OnionBoard\`, unless you say Yes to the
+  uninstaller's *Also delete your sounds and settings?*: then, once the effect and the
+  helper are off, that folder goes too (`soundboard/core/uninstallclean.py`, in the
+  same admin step that removes Onion Pocket's firewall rule, which every uninstall
+  does on a PC that has one).
 - **The virtual cable**, the fallback, is VB-Audio's own signed driver: installed by
   `installer/install-vbcable.ps1` only when you ask, and removed by VB-Audio's own
   uninstaller (Setup tab → *Remove the virtual cable*, or the uninstaller's question),

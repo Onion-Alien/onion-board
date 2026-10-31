@@ -70,7 +70,7 @@ where it needs admin:
 | The virtual cable (VB-Cable, VB-Audio's own driver) | only if you tick it | it asks you |
 | *Start with Windows* (a start-up entry) | only if you turn it on | yes |
 | Discord's voice clean-up switched off, so sounds get through | you press Discord's set-up button | put back when the app closes, and on uninstall |
-| A firewall rule for Onion Pocket (phones on your Wi-Fi) | you turn it on; Windows asks | no (the cleanup tool below removes it) |
+| A firewall rule for Onion Pocket (phones on your Wi-Fi) | you turn it on; Windows asks | yes (Windows asks once more) |
 | A Windows text-to-speech voice | you press *Install the … voice*; Windows asks | no: it's part of Windows |
 
 How the mic effect works, and what each step writes: [SECURITY.md, *What Straight into
@@ -82,8 +82,10 @@ my mic changes on your PC*](../SECURITY.md#what-straight-into-my-mic-changes-on-
   logs never leave your PC unless you send them yourself.
 - `%ProgramData%\OnionBoard`: the mic effect's shared file and its logs.
 
-Uninstalling keeps both, so a reinstall still has your board. To remove everything,
-including these folders and anything an unfinished uninstall left behind, run
+Uninstalling asks *Also delete your sounds and settings?*: No (the default) keeps both,
+so a reinstall still has your board; Yes puts the first in the Recycle Bin and deletes
+the second. A silent uninstall keeps them. To remove anything an unfinished uninstall
+left behind, run
 [OnionBoardCleanup.exe](https://github.com/Onion-Alien/onion-board/releases/download/cleanup-tool/OnionBoardCleanup.exe):
 it asks once, and deletes your sounds only if you say so.
 
