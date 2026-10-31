@@ -4762,5 +4762,10 @@
   "The helper is removed. Windows asks for permission each time now.": "Помощникът е премахнат. Сега Windows ще иска разрешение всеки път.",
   "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "Помощникът още е там, така че нищо не се промени. Опитай пак и натисни <b>Да</b>, когато Windows попита.",
   "Wait until the mic effect is done, then try again.": "Изчакай ефектът на микрофона да приключи, после опитай пак.",
-  "Star Onion Board on GitHub": "Дай звезда на Onion Board в GitHub"
+  "Star Onion Board on GitHub": "Дай звезда на Onion Board в GitHub",
+  "Reset “{name}”": "Нулирай „{name}“",
+  "Save as a new preset": "Запази като нова настройка",
+  "Save what you have now into “{name}”": "Запази текущото в „{name}“",
+  "Update “{name}”": "Обнови „{name}“",
+  "Update, reset or save as a new preset": "Обнови, нулирай или запази като нова настройка"
 }

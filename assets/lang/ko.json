@@ -4675,5 +4675,10 @@
   "The helper is removed. Windows asks for permission each time now.": "도우미를 제거했습니다. 이제 Windows가 매번 권한을 요청합니다.",
   "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "도우미가 아직 있어서 바뀐 것이 없습니다. 다시 시도하고 Windows가 물으면 <b>예</b>를 클릭하세요.",
   "Wait until the mic effect is done, then try again.": "마이크 효과가 끝날 때까지 기다린 뒤 다시 시도하세요.",
-  "Star Onion Board on GitHub": "GitHub에서 Onion Board에 별 주기"
+  "Star Onion Board on GitHub": "GitHub에서 Onion Board에 별 주기",
+  "Reset “{name}”": "“{name}” 초기화",
+  "Save as a new preset": "새 프리셋으로 저장",
+  "Save what you have now into “{name}”": "지금 설정을 “{name}”에 저장",
+  "Update “{name}”": "“{name}” 업데이트",
+  "Update, reset or save as a new preset": "업데이트, 초기화 또는 새 프리셋으로 저장"
 }

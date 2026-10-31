@@ -4762,5 +4762,10 @@
   "The helper is removed. Windows asks for permission each time now.": "Der Helfer ist entfernt. Windows fragt jetzt jedes Mal um Erlaubnis.",
   "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "Der Helfer ist noch da, also hat sich nichts geändert. Versuch es noch mal und klick auf <b>Ja</b>, wenn Windows fragt.",
   "Wait until the mic effect is done, then try again.": "Warte, bis der Mikro-Effekt fertig ist, und versuch es dann noch mal.",
-  "Star Onion Board on GitHub": "Onion Board auf GitHub einen Stern geben"
+  "Star Onion Board on GitHub": "Onion Board auf GitHub einen Stern geben",
+  "Reset “{name}”": "„{name}“ zurücksetzen",
+  "Save as a new preset": "Als neue Vorlage speichern",
+  "Save what you have now into “{name}”": "Das, was du gerade eingestellt hast, in „{name}“ speichern",
+  "Update “{name}”": "„{name}“ aktualisieren",
+  "Update, reset or save as a new preset": "Aktualisieren, zurücksetzen oder als neue Vorlage speichern"
 }
