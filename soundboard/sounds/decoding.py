@@ -96,6 +96,11 @@ def _ffmpeg_words(stderr: str) -> str:
 STREAM_S = 60
 
 
+class NeedsFFmpeg(RuntimeError):
+    """The file needs FFmpeg to be read and there's none: not a download gone wrong."""
+    dl_why = "no-ffmpeg"   # errors.download_reason
+
+
 class _SourceError(Exception):
     """libsndfile couldn't open or read the file: ffmpeg gets a go (m4a/aac/video etc.)."""
 
@@ -183,8 +188,8 @@ def _ffmpeg_source(path: str, cause: BaseException | None = None):
     if not ff:
         from soundboard.core import usage  # the name only, never the file
         usage.used("needs-ffmpeg")
-        raise RuntimeError(_("This file needs FFmpeg to play. Get it in "
-                             "Settings > Data & quality.")) from cause
+        raise NeedsFFmpeg(_("This file needs FFmpeg to play. Get it in "
+                            "Settings > Data & quality.")) from cause
     with tempfile.TemporaryFile() as err:
         try:
             p = subprocess.Popen([ff, "-v", "error", "-i", path, "-vn", "-t", str(MAX_SECONDS),

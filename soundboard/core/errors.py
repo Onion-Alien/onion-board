@@ -134,6 +134,8 @@ def _downloader() -> list[tuple[str, str]]:
          _("Couldn't reach the site. Check your internet connection.")),
         (r"sign in|login required|logged.in|cookies",
          _("That needs signing in to the site, which Onion Board doesn't do.")),
+        (r"no space left|\[errno 28\]|\[winerror 112\]",
+         _("The disk is full.")),
     ]
 
 
@@ -165,12 +167,19 @@ _DL_REASONS = (
     (r"sign(?:ing)? in|login required|logged.in|cookies", "sign-in"),
     (r"over \d+ mb|filesize", "too-big"),
     (r"yt-dlp\) isn't installed", "no-downloader"),
+    (r"no space left|\[errno 28\]|\[winerror 112\]", "disk-full"),
 )
 
 
 def download_reason(e: BaseException | str | None) -> str:
     """Why a download failed, as one of usage.DL_FAILS ("other" when it's none of
-    them): read from yt-dlp's own message (`.raw`) and the words shown."""
+    them): read from yt-dlp's own message (`.raw`) and the words shown. Our own
+    errors say it as `.dl_why`: their words are translated, the patterns are English."""
+    known = getattr(e, "dl_why", "")
+    if known:
+        return known
+    if getattr(e, "errno", None) == errno.ENOSPC or getattr(e, "winerror", None) == 112:
+        return "disk-full"
     text = f"{getattr(e, 'raw', '')} {e}" if e is not None else ""
     for pat, key in _DL_REASONS:
         if re.search(pat, text, re.I):

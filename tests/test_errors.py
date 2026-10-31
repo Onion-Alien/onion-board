@@ -164,6 +164,35 @@ def test_download_reasons_read_both_ytdlps_and_our_words(raw, why):
     assert errors.download_reason(raw) == why
 
 
+def test_a_full_disk_is_said_plainly_and_never_counted_as_a_new_problem():
+    """yt-dlp's "[Errno 28]" and our own OSError (writing the cache) both say the disk
+    is full, and count as disk-full, not as a download failure to look into."""
+    from soundboard.core import usage
+    raw = "ERROR: unable to write data: [Errno 28] No space left on device"
+    e = RuntimeError(raw)
+    assert errors.download_reason(e) == "disk-full"
+    assert "disk is full" in errors.describe(DownloadError(raw)).text
+    assert errors.download_reason(OSError(28, "Kein Speicherplatz")) == "disk-full"
+    assert "disk-full" in usage.DL_FAILS
+
+
+def test_our_own_download_errors_keep_their_reason_in_any_language(monkeypatch):
+    """Their words are translated, the reason patterns are English: a missing FFmpeg
+    or a file over the size cap must not count as an unknown failure for a German user."""
+    from soundboard.core import usage
+    from soundboard.online import ytfetch
+    from soundboard.sounds import decoding
+    monkeypatch.setattr(decoding, "_ffmpeg", lambda: None)
+    with pytest.raises(RuntimeError) as got:
+        with decoding._ffmpeg_source("x.webm"):
+            pass
+    assert errors.download_reason(got.value) == "no-ffmpeg"
+    big = ytfetch._too_big(ytfetch.MAX_BYTES)
+    big.args = ("Es ist über 300 MB groß.",)
+    assert errors.download_reason(big) == "too-big"
+    assert {"no-ffmpeg", "too-big"} <= set(usage.DL_FAILS)
+
+
 def test_a_report_link_never_carries_the_home_folder_in_what_it_said(monkeypatch, tmp_path):
     """The message itself can name a path (a downloader error): it goes in the address
     the browser opens, so it's scrubbed like the details are."""

@@ -381,6 +381,23 @@ def download(to: Path, progress=None, stop: threading.Event | None = None) -> No
                             for r in reasons), fault)
 
 
+RENAME_TRIES = 20   # x RENAME_WAIT_S: how long a folder that's in use gets to come free
+RENAME_WAIT_S = 0.5
+
+
+def _rename(src: Path, to: Path) -> None:
+    """src.rename(to), tried again for a few seconds when Windows denies it: an antivirus
+    scanning the new ffmpeg.exe (or a check still running the old one) holds it open."""
+    for n in range(RENAME_TRIES):
+        try:
+            src.rename(to)
+            return
+        except PermissionError:
+            if n == RENAME_TRIES - 1:
+                raise
+            time.sleep(RENAME_WAIT_S)
+
+
 def unpack(zip_path: Path, dest: Path | None = None) -> Path:
     """The kept files from a checked zip into ``dest`` (the bin folder by default),
     replacing what's there. Only the named members are read, each written to a fixed
@@ -401,12 +418,12 @@ def unpack(zip_path: Path, dest: Path | None = None) -> Path:
         old = dest.with_name(dest.name + ".old")
         shutil.rmtree(old, ignore_errors=True)
         if dest.exists():
-            dest.rename(old)   # fails while an ffmpeg.exe in it runs
+            _rename(dest, old)   # fails while an ffmpeg.exe in it runs
         try:
-            tmp.rename(dest)
+            _rename(tmp, dest)
         except OSError:
             if old.exists() and not dest.exists():
-                old.rename(dest)   # put the old copy back
+                _rename(old, dest)   # put the old copy back
             raise
         shutil.rmtree(old, ignore_errors=True)
     except GetError:

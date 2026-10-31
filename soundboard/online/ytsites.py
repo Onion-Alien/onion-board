@@ -76,7 +76,7 @@ _lock = _SharedLock()   # a download and swapping in a new copy never overlap
 
 
 class DownloadError(RuntimeError):
-    pass
+    dl_why: str = ""   # errors.download_reason's key, when it's known where it's raised
 
 
 class FetchError(DownloadError):
