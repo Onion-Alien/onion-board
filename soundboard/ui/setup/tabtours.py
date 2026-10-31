@@ -76,12 +76,21 @@ def hook(win):
         START_MS, w, lambda: maybe_start(w)))
 
 
+def hold(win, tab: str):
+    """`tab` is about to open on one thing (Open Clean mic, from a setup box): no tour
+    on this visit, it comes the next time the tab opens."""
+    win.tour_held = tab
+
+
 def maybe_start(win) -> TabTour | None:
     """Start the open tab's tour, if it hasn't had one and nothing's in the way."""
     global _current
     from soundboard.ui.setup import firsttour
     try:
         tab = _tab_of(win, win.tabs.currentWidget())
+        if tab and tab == getattr(win, "tour_held", ""):
+            return None
+        win.tour_held = ""   # (left the held tab: its tour can come next time)
         if (not tab or _current is not None or firsttour._current is not None
                 or not would_run(win, tab) or _blocked(win)):
             return None
