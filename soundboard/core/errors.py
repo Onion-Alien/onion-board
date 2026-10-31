@@ -135,7 +135,7 @@ def _downloader() -> list[tuple[str, str]]:
         (r"sign in|login required|logged.in|cookies",
          _("That needs signing in to the site, which Onion Board doesn't do.")),
         (r"no space left|\[errno 28\]|\[winerror 112\]",
-         _("The disk is full. Free up some space and try again.")),
+         _("The disk is full.")),
     ]
 
 
