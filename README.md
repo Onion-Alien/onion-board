@@ -14,6 +14,8 @@ No virtual cable, no fiddly setup: Bun the bunny sets it up for you.
 [![Free forever](https://img.shields.io/badge/price-free%20forever-6b8e23)](#free-and-it-stays-free)
 [![Discord](https://img.shields.io/badge/Discord-join%20us-5865f2?logo=discord&logoColor=white)](https://discord.gg/FhKGaWCWHM)
 <img src="https://hits.sh/github.com/Onion-Alien/onion-board.svg?view=total&label=total%20visits&color=6b8e23" alt="total visits">
+<img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FOnion-Alien%2Fonion-board%2Fbadges%2Finstalls.json" alt="app installs">
+<img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FOnion-Alien%2Fonion-board%2Fbadges%2Fpacks.json" alt="sound pack downloads">
 
 ## [⬇️ Download for Windows](../../releases/latest/download/OnionBoardSetup.exe)
 

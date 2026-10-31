@@ -1,0 +1,40 @@
+name: download badges
+
+# Adds up the release download counts once a day and writes them as shields.io
+# endpoint files to the `badges` branch, for the README badges. App updates and the
+# small pack previews the app fetches while you browse are left out.
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  badges:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Count downloads and push the badge files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          gh api --paginate "repos/$GITHUB_REPOSITORY/releases?per_page=100" \
+            --jq '.[].assets[] | [.name, .download_count] | @tsv' > counts.tsv
+          sum() { awk -F'\t' -v re="$1" '$1 ~ re { s += $2 } END { print s + 0 }' counts.tsv; }
+          short() { awk -v n="$1" 'BEGIN { if (n >= 1000) printf "%.1fk", n / 1000; else print n }'; }
+          badge() { printf '{"schemaVersion":1,"label":"%s","message":"%s","color":"6b8e23"}\n' "$2" "$(short "$3")" > "out/$1.json"; }
+          mkdir out
+          badge installs "app installs" "$(sum '^(OnionBoard|Soundboard)Setup[.]exe$')"
+          badge packs "sound pack downloads" "$(sum '^onion-board-.*-pack[.]zip$')"
+          cat out/*.json
+          cd out
+          git init -q -b badges
+          git add .
+          git -c user.name=github-actions -c user.email=github-actions@users.noreply.github.com \
+            commit -q -m "Update download badges"
+          gh auth setup-git
+          git push -f "https://github.com/$GITHUB_REPOSITORY.git" badges
