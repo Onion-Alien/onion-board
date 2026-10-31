@@ -538,6 +538,23 @@ def _selftest_addon_cmd(rest: list[str]) -> int:
         return 1
 
 
+def quit_running() -> int:
+    """`OnionBoard.exe --quit-running`: the uninstaller's first step, before the count.
+    The Onion Board that's open is asked to quit (it saves its settings). 0 once none is
+    running, 1 if one still is (the uninstaller then ends it)."""
+    try:
+        applog.setup(APP_DIR)
+        from PySide6.QtCore import QCoreApplication
+        from soundboard.core import singleinstance
+        _app = QCoreApplication.instance() or QCoreApplication(sys.argv)  # noqa: F841
+        closed = singleinstance.ask_running_to_quit()
+        log.info("--quit-running: %s", "none running" if closed else "still running")
+        return 0 if closed else 1
+    except Exception:  # noqa: BLE001 - the uninstaller ends it instead
+        log.warning("--quit-running failed", exc_info=True)
+        return 1
+
+
 # The one-off commands main() runs and exits; each gets the arguments after its flag.
 # Its keys must be bootmark.ONE_OFF (main.py skips the breadcrumb for those):
 # tests/test_bootmark.py checks both, so add a new one-off command here, never as its
@@ -557,6 +574,7 @@ ONE_OFF_COMMANDS = {
     "--uninstall-count": lambda rest: uninstall_count(),
     "--selftest-addon": _selftest_addon_cmd,
     "--discord-restore": _discord_restore_cmd,
+    "--quit-running": lambda rest: quit_running(),
 }
 
 
