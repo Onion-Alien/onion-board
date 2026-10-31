@@ -4743,6 +4743,7 @@
   "Open Clean mic": "Abrir Microfone limpo",
   "They think music is background noise and cut your sounds up.": "Eles acham que música é barulho de fundo e picotam seus sons.",
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Quer tirar o ruído de fundo mesmo assim? Ligue o <b>Microfone limpo</b> na aba <b>Voz</b> do Onion Board: ele limpa sua voz e nunca mexe nos seus sons.",
+  "Star Onion Board on GitHub": "Dê uma estrela ao Onion Board no GitHub",
   "Don't ask for admin each time": "Não pedir permissão de administrador toda vez",
   "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Ele também adiciona um pequeno ajudante para o Windows não perguntar de novo: você pode desligá-lo em Configurações > Áudio.",
   "Off: Windows asks for permission every time the mic effect is set up or repaired.": "Desligado: o Windows pede permissão toda vez que o efeito do microfone é configurado ou reparado.",

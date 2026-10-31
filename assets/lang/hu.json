@@ -4743,6 +4743,7 @@
   "Open Clean mic": "Tiszta mikrofon megnyitása",
   "They think music is background noise and cut your sounds up.": "Háttérzajnak veszik a zenét, és szétszaggatják a hangjaidat.",
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Azért eltüntetnéd a háttérzajt? Kapcsold be inkább a <b>Tiszta mikrofont</b> az Onion Board <b>Beszéd</b> lapján: tisztítja a beszédhangodat, és a hangjaidhoz soha nem nyúl.",
+  "Star Onion Board on GitHub": "Adj csillagot az Onion Boardnak a GitHubon",
   "Don't ask for admin each time": "Ne kérjen rendszergazdai engedélyt minden alkalommal",
   "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Egy kis segédet is hozzáad, hogy a Windows ne kérdezzen újra: kikapcsolhatod itt: Beállítások > Hang.",
   "Off: Windows asks for permission every time the mic effect is set up or repaired.": "Kikapcsolva: a Windows minden alkalommal engedélyt kér, amikor a mikrofoneffekt beállítása vagy javítása történik.",

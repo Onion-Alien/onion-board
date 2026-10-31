@@ -4656,6 +4656,7 @@
   "Open Clean mic": "開啟麥克風降噪",
   "They think music is background noise and cut your sounds up.": "它們會把音樂當成背景噪音，把你的音效切碎。",
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "還是想去掉背景噪音？改為在 Onion Board 的<b>語音</b>分頁裡開啟<b>麥克風降噪</b>：它只清理你的聲音，從不碰你的音效。",
+  "Star Onion Board on GitHub": "在 GitHub 上為 Onion Board 加星",
   "Don't ask for admin each time": "不要每次都要求系統管理員權限",
   "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "它也會新增一個小幫手，讓 Windows 不再詢問：你可以在 設定 > 音訊 中關閉它。",
   "Off: Windows asks for permission every time the mic effect is set up or repaired.": "關閉：每次設定或修復麥克風效果時，Windows 都會要求權限。",

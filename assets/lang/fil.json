@@ -4743,6 +4743,7 @@
   "Open Clean mic": "Buksan ang Malinis na mic",
   "They think music is background noise and cut your sounds up.": "Akala nila background noise ang music at pinuputol-putol nila ang mga sound mo.",
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Gusto mo pa ring mawala ang ingay sa paligid? I-on na lang ang <b>Malinis na mic</b> sa <b>Voice</b> tab ng Onion Board: nililinis nito ang boses mo at hindi nito ginagalaw ang mga sound mo.",
+  "Star Onion Board on GitHub": "Bigyan ng star ang Onion Board sa GitHub",
   "Don't ask for admin each time": "Huwag humingi ng admin bawat beses",
   "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Nagdadagdag din ito ng maliit na helper para hindi na magtanong ulit ang Windows: puwede mo itong i-off sa Settings > Audio.",
   "Off: Windows asks for permission every time the mic effect is set up or repaired.": "Off: hihingi ng permiso ang Windows tuwing ise-set up o aayusin ang mic effect.",

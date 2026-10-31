@@ -4656,6 +4656,7 @@
   "Open Clean mic": "マイクのノイズ除去を開く",
   "They think music is background noise and cut your sounds up.": "音楽を背景ノイズだと判断して、サウンドを途切れさせてしまいます。",
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "それでも背景ノイズを消したい場合は、代わりに Onion Board の<b>ボイス</b>タブで<b>マイクのノイズ除去</b>をオンにしてください：声だけをきれいにし、サウンドには一切手を加えません。",
+  "Star Onion Board on GitHub": "GitHub で Onion Board にスターを付ける",
   "Don't ask for admin each time": "毎回管理者の許可を求めない",
   "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Windows が再び確認しないよう、小さなヘルパーも追加します。これは 設定 > オーディオ でオフにできます。",
   "Off: Windows asks for permission every time the mic effect is set up or repaired.": "オフ: マイクエフェクトを設定または修復するたびに Windows が許可を求めます。",

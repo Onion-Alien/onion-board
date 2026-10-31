@@ -4830,6 +4830,7 @@
   "Open Clean mic": "Открыть «Чистый микрофон»",
   "They think music is background noise and cut your sounds up.": "Они считают музыку фоновым шумом и кромсают твои звуки.",
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Всё равно хочешь убрать фоновый шум? Включи вместо этого <b>Чистый микрофон</b> на вкладке <b>Голос</b> в Onion Board: он очищает твой голос и никогда не трогает твои звуки.",
+  "Star Onion Board on GitHub": "Поставить звезду Onion Board на GitHub",
   "Don't ask for admin each time": "Не спрашивать права администратора каждый раз",
   "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Заодно добавляется небольшой помощник, чтобы Windows больше не спрашивала: его можно выключить в Настройки > Аудио.",
   "Off: Windows asks for permission every time the mic effect is set up or repaired.": "Выключено: Windows спрашивает разрешение каждый раз, когда эффект микрофона ставится или восстанавливается.",

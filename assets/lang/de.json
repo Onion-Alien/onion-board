@@ -4743,6 +4743,7 @@
   "Open Clean mic": "Mikro säubern öffnen",
   "They think music is background noise and cut your sounds up.": "Sie halten Musik für Hintergrundlärm und zerhacken deine Sounds.",
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Willst du die Hintergrundgeräusche trotzdem loswerden? Schalte stattdessen <b>Mikro säubern</b> im Tab <b>Stimme</b> von Onion Board ein: Es säubert deine Stimme und lässt deine Sounds immer in Ruhe.",
+  "Star Onion Board on GitHub": "Onion Board auf GitHub einen Stern geben",
   "Don't ask for admin each time": "Nicht jedes Mal nach Admin-Rechten fragen",
   "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Dabei kommt auch ein kleiner Helfer dazu, damit Windows nicht noch mal fragt: Du kannst ihn unter Einstellungen > Audio ausschalten.",
   "Off: Windows asks for permission every time the mic effect is set up or repaired.": "Aus: Windows fragt jedes Mal um Erlaubnis, wenn der Mikro-Effekt eingerichtet oder repariert wird.",

@@ -4743,6 +4743,7 @@
   "Open Clean mic": "Öppna Ren mikrofon",
   "They think music is background noise and cut your sounds up.": "De tror att musik är bakgrundsbrus och hackar sönder dina ljud.",
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Vill du ändå bli av med bakgrundsbruset? Slå på <b>Ren mikrofon</b> på fliken <b>Röst</b> i Onion Board i stället: den rensar din röst och rör aldrig dina ljud.",
+  "Star Onion Board on GitHub": "Ge Onion Board en stjärna på GitHub",
   "Don't ask for admin each time": "Fråga inte om administratör varje gång",
   "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Den lägger också till en liten hjälpare så att Windows inte frågar igen: du kan stänga av den i Inställningar > Ljud.",
   "Off: Windows asks for permission every time the mic effect is set up or repaired.": "Av: Windows ber om tillåtelse varje gång mikrofoneffekten installeras eller repareras.",

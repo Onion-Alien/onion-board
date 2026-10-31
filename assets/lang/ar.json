@@ -5091,6 +5091,7 @@
   "Open Clean mic": "افتح ميكروفون نظيف",
   "They think music is background noise and cut your sounds up.": "إنها تعتبر الموسيقى ضجيج خلفية وتقطّع أصواتك.",
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "تريد إزالة ضجيج الخلفية رغم ذلك؟ شغّل <b>ميكروفون نظيف</b> في تبويب <b>الصوت</b> في Onion Board بدلًا من ذلك: ينقّي صوتك ولا يلمس أصواتك أبدًا.",
+  "Star Onion Board on GitHub": "ضع نجمة لـ Onion Board على GitHub",
   "Don't ask for admin each time": "لا تطلب صلاحيات المسؤول في كل مرة",
   "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "ويضيف أيضًا مساعدًا صغيرًا حتى لا يسأل Windows مرة أخرى: يمكنك إيقافه في الإعدادات > الصوت.",
   "Off: Windows asks for permission every time the mic effect is set up or repaired.": "عند الإيقاف: يطلب Windows الإذن في كل مرة يتم فيها إعداد مؤثر الميكروفون أو إصلاحه.",
