@@ -5075,5 +5075,6 @@
     "{n} إعدادًا آخر من إعداداتك",
     "{n} إعداد آخر من إعداداتك"
   ],
-  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” اسم إعداد مدمج. اختر اسمًا آخر."
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” اسم إعداد مدمج. اختر اسمًا آخر.",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "عبر winget في Windows، أو من تنزيل FFmpeg نفسه (حوالي 100 ميغابايت). يمكنك إيقاف ذلك من الإعدادات → الخصوصية والأمان."
 }

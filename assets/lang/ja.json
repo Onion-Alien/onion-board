@@ -4640,5 +4640,6 @@
   "{n} more of your presets": [
     "ほかに {n} 個のプリセット"
   ],
-  "“{name}” is a built-in preset's name. Pick another one.": "「{name}」は組み込みのプリセットの名前です。別の名前にしてください。"
+  "“{name}” is a built-in preset's name. Pick another one.": "「{name}」は組み込みのプリセットの名前です。別の名前にしてください。",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Windows の winget、または FFmpeg 自身のダウンロードで取得します (約 100 MB)。設定 → プライバシーとセキュリティ でオフにできます。"
 }

@@ -4640,5 +4640,6 @@
   "{n} more of your presets": [
     "Thêm {n} mẫu của bạn"
   ],
-  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” là tên của một mẫu có sẵn. Hãy chọn tên khác."
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” là tên của một mẫu có sẵn. Hãy chọn tên khác.",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Qua winget của Windows, hoặc bản tải riêng của FFmpeg (khoảng 100 MB). Bạn có thể tắt việc này trong Cài đặt → Quyền riêng tư & bảo mật."
 }

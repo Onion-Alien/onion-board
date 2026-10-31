@@ -4727,5 +4727,6 @@
     "Още {n} твоя настройка",
     "Още {n} твои настройки"
   ],
-  "“{name}” is a built-in preset's name. Pick another one.": "„{name}“ е име на вградена настройка. Избери друго."
+  "“{name}” is a built-in preset's name. Pick another one.": "„{name}“ е име на вградена настройка. Избери друго.",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Чрез winget на Windows или от собственото изтегляне на FFmpeg (около 100 MB). Можеш да го изключиш от Настройки → Поверителност и сигурност."
 }

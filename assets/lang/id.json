@@ -4640,5 +4640,6 @@
   "{n} more of your presets": [
     "{n} preset Anda lainnya"
   ],
-  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” adalah nama preset bawaan. Pilih yang lain."
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” adalah nama preset bawaan. Pilih yang lain.",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Lewat winget Windows, atau dari unduhan FFmpeg sendiri (sekitar 100 MB). Kamu bisa mematikannya di Pengaturan → Privasi & keamanan."
 }

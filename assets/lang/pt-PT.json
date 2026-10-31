@@ -4727,5 +4727,6 @@
     "Mais {n} predefinição tua",
     "Mais {n} predefinições tuas"
   ],
-  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” é o nome de uma predefinição incluída. Escolhe outro."
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” é o nome de uma predefinição incluída. Escolhe outro.",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Através do winget do Windows ou, se não der, da transferência do próprio FFmpeg (cerca de 100 MB). Podes desligar isto em Definições → Privacidade & segurança."
 }

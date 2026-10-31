@@ -4640,5 +4640,6 @@
   "{n} more of your presets": [
     "내 프리셋 {n}개 더"
   ],
-  "“{name}” is a built-in preset's name. Pick another one.": "“{name}”은(는) 기본 제공 프리셋의 이름입니다. 다른 이름을 고르세요."
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}”은(는) 기본 제공 프리셋의 이름입니다. 다른 이름을 고르세요.",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Windows의 winget으로, 안 되면 FFmpeg 자체 다운로드로 받습니다(약 100MB). 설정 → 개인정보 보호 및 보안에서 끌 수 있습니다."
 }

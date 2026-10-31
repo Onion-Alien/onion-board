@@ -4727,5 +4727,6 @@
     "{n} autre de tes préréglages",
     "{n} autres de tes préréglages"
   ],
-  "“{name}” is a built-in preset's name. Pick another one.": "« {name} » est le nom d'un préréglage intégré. Choisis-en un autre."
+  "“{name}” is a built-in preset's name. Pick another one.": "« {name} » est le nom d'un préréglage intégré. Choisis-en un autre.",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Via winget de Windows, sinon par le téléchargement propre de FFmpeg (environ 100 Mo). Tu peux le désactiver dans Paramètres → Confidentialité et sécurité."
 }

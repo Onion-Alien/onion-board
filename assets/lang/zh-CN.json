@@ -4640,5 +4640,6 @@
   "{n} more of your presets": [
     "另外 {n} 个你的预设"
   ],
-  "“{name}” is a built-in preset's name. Pick another one.": "“{name}”是内置预设的名称。请换一个。"
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}”是内置预设的名称。请换一个。",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "通过 Windows 的 winget，否则使用 FFmpeg 自己的下载（约 100 MB）。可在 设置 → 隐私与安全 中关闭。"
 }

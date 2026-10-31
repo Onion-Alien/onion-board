@@ -119,7 +119,7 @@ Name: "livevoice"; Description: "Live voice-to-speech (about 300 MB)"; Flags: un
 Name: "tor"; Description: "Hide my internet address (Tor), about 22 MB"; Flags: unchecked
 Name: "countme"; Description: "Count me in: anonymous usage stats (features used, crash counts)"
 Name: "desktopicon"; Description: "Put an Onion Board shortcut on my Desktop"
-Name: "vbcable"; Description: "The free virtual cable (VB-Cable): only if you know you need one"; GroupDescription: "Advanced (most people can skip this)"; Flags: unchecked; Check: not CableInstalled
+Name: "vbcable"; Description: "VB-Cable, VB-Audio's free virtual cable (not open source)"; GroupDescription: "Advanced (most people can skip this)"; Flags: unchecked; Check: not CableInstalled
 
 [InstallDelete]
 ; The Python runtime and libraries from the last version: cleared first so files a
@@ -776,6 +776,8 @@ begin
   Bunny.Left := BunnyRight - Bunny.Width;
 end;
 
+function ShouldGetFfmpeg: Boolean; forward;
+
 procedure CurPageChanged(CurPageID: Integer);
 var
   I: Integer;
@@ -818,16 +820,22 @@ begin
       'Tor. Go Back and untick Offline mode to pick it.'
   else
     WizardForm.TasksList.Hint := '';
-  // A line above the boxes only in Offline mode (the heading says the rest), wrapped
-  // to fit, with the list right under it.
+  // A line above the boxes only in Offline mode, or when FFmpeg (which has no box) will
+  // be added, so nothing is put on the PC without a word first (the heading says the
+  // rest), wrapped to fit, with the list right under it.
   Lbl := WizardForm.SelectTasksLabel;
   Bottom := WizardForm.TasksList.Top + WizardForm.TasksList.Height;
-  Lbl.Visible := OfflineChosen;
-  if OfflineChosen then
+  Lbl.Visible := OfflineChosen or ShouldGetFfmpeg;
+  if Lbl.Visible then
   begin
-    Lbl.Caption := 'Offline mode is on, so the boxes that download things are ' +
-      'unticked. Tick one and this installer downloads it; Onion Board itself stays ' +
-      'offline.';
+    if OfflineChosen then
+      Lbl.Caption := 'Offline mode is on, so the boxes that download things are ' +
+        'unticked. Tick one and this installer downloads it; Onion Board itself stays ' +
+        'offline.'
+    else
+      Lbl.Caption := 'This PC doesn''t have FFmpeg yet (Onion Board needs it for M4A ' +
+        'and video files), so this installer also adds it through Windows'' winget. ' +
+        'You can remove it later in Installed apps.';
     Lbl.WordWrap := True;
     Lbl.AdjustHeight;
     WizardForm.TasksList.Top := Lbl.Top + Lbl.Height + ScaleY(8);

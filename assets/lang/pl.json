@@ -4814,5 +4814,6 @@
     "Jeszcze {n} twoje presety",
     "Jeszcze {n} twoich presetów"
   ],
-  "“{name}” is a built-in preset's name. Pick another one.": "„{name}” to nazwa wbudowanego presetu. Wybierz inną."
+  "“{name}” is a built-in preset's name. Pick another one.": "„{name}” to nazwa wbudowanego presetu. Wybierz inną.",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Przez winget w Windows albo przez własne pobieranie FFmpeg (około 100 MB). Możesz to wyłączyć w Ustawienia → Prywatność i bezpieczeństwo."
 }

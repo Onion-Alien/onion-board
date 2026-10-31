@@ -4727,5 +4727,6 @@
     "{n} muu esiasetuksesi",
     "{n} muuta esiasetustasi"
   ],
-  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” on valmiin esiasetuksen nimi. Valitse toinen."
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” on valmiin esiasetuksen nimi. Valitse toinen.",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Windowsin wingetillä tai muuten FFmpegin omalla latauksella (noin 100 Mt). Voit poistaa tämän käytöstä kohdassa Asetukset → Yksityisyys ja tietoturva."
 }

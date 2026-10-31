@@ -4727,5 +4727,6 @@
     "{n} mere af dine forudindstillinger",
     "{n} flere af dine forudindstillinger"
   ],
-  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” er navnet på en indbygget forudindstilling. Vælg et andet."
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” er navnet på en indbygget forudindstilling. Vælg et andet.",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Via Windows' winget, eller ellers FFmpegs egen download (ca. 100 MB). Du kan slå det fra under Indstillinger → Privatliv og sikkerhed."
 }

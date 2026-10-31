@@ -4727,5 +4727,6 @@
     "आपका {n} और प्रीसेट",
     "आपके {n} और प्रीसेट"
   ],
-  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” एक बिल्ट-इन प्रीसेट का नाम है। कोई दूसरा चुनें।"
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” एक बिल्ट-इन प्रीसेट का नाम है। कोई दूसरा चुनें।",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Windows के winget से, नहीं तो FFmpeg के अपने डाउनलोड से (लगभग 100 MB)। इसे सेटिंग्स → प्राइवेसी और सिक्योरिटी में बंद कर सकते हैं।"
 }
