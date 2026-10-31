@@ -237,8 +237,9 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # your own made (never which voice)
             "ai-voice", "ai-voice-group", "ai-voice-favorite", "ai-voice-hear",
             "ai-voice-made",
-            # Clean mic switched on (never how strong), and its Hear the difference played
-            "clean-mic", "clean-mic-test",
+            # Clean mic switched on (never how strong), its Hear the difference played, and
+            # Open Clean mic in the box after Bun set Discord up
+            "clean-mic", "clean-mic-test", "clean-mic-open",
             # Free packs: the window opened, a sample heard, a pack added (PACKS)
             "packs-opened", "pack-heard", *(f"pack-added-{k}" for k in PACKS),
             # a custom colour from the colour wheel (a pad or a group of them)

@@ -5,6 +5,7 @@ import json
 import pytest
 
 from soundboard import __version__
+from soundboard.core import updates
 from soundboard.sounds import library
 from soundboard.online import net
 from soundboard.sounds.library import Config
@@ -42,7 +43,7 @@ def test_an_upgraded_config_sees_it_once_and_its_button_opens_the_newest_page(wi
     opened = []
     monkeypatch.setattr(window.setctl, "open_settings", lambda page="privacy": opened.append(page))
     window.cfg.whats_new_seen = ""   # as loaded from an older version's config
-    newest = whatsnew.notes()[0]
+    newest = whatsnew.unseen("")[0]   # (a next release's note waits)
     shown.press = newest.page   # a note without a Settings page has only Close
     window.updctl.after_update()
     assert len(shown) == 1 and newest.headline in shown[0]
@@ -84,10 +85,12 @@ def test_notes_for_a_version_after_this_one_wait(monkeypatch):
 def test_this_version_has_its_notes():
     """The header's version and the window after an update show this release, not one
     from months ago: every release, patch releases too, gets its own note. A 2.7.3 that
-    reused 2.7.0's note showed Twitch and Stream Deck under "What's new in 2.7.3"."""
-    newest = whatsnew.notes()[0]
-    assert newest.version == __version__, (
+    reused 2.7.0's note showed Twitch and Stream Deck under "What's new in 2.7.3".
+    The next release's note may land before its bump (unseen() keeps it back till then)."""
+    assert any(n.version == __version__ for n in whatsnew.notes()), (
         f"no What's new note for {__version__}: add one to ui/setup/whatsnew.py recent()")
+    assert not any(updates.newer(n.version) for n in whatsnew.notes()[1:]), (
+        "only the newest note may be for a version after this one")
     assert [n.version for n in whatsnew.notes()] == sorted(
         (n.version for n in whatsnew.notes()),
         key=lambda v: tuple(int(x) for x in v.split(".")), reverse=True)

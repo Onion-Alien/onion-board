@@ -1071,7 +1071,6 @@
   "There are no sounds on your {name} board.": "Δεν υπάρχουν ήχοι στον πίνακα {name}.",
   "There are no sounds yet. Export just your settings?": "Δεν υπάρχουν ακόμα ήχοι. Εξαγωγή μόνο των ρυθμίσεών σου;",
   "There's already a “{new}”.": "Υπάρχει ήδη ένα «{new}».",
-  "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Θεωρούν τη μουσική θόρυβο φόντου και κομματιάζουν τους ήχους σου. Το Onion Board ήδη καθαρίζει τη φωνή σου.",
   "This desktop has no system tray, so closing the window quits.": "Αυτή η επιφάνεια εργασίας δεν έχει system tray, οπότε το κλείσιμο του παραθύρου τερματίζει την εφαρμογή.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Αυτό είναι το Onion Board {version}. Με τσεκαρισμένο το κουτάκι ρωτάει το GitHub κάθε λίγες ώρες αν βγήκε νεότερη έκδοση και σου το λέει (με μπάνερ αν είναι σημαντική διόρθωση). Αυτό το αντίγραφο τρέχει από τον πηγαίο κώδικα, οπότε μόνο σου το λέει: ενημέρωσέ το με git pull.",
   "This sound's video isn't there any more": "Το βίντεο αυτού του ήχου δεν υπάρχει πια",
@@ -4728,5 +4727,20 @@
     "Ακόμα {n} προεπιλογές σου"
   ],
   "“{name}” is a built-in preset's name. Pick another one.": "Το «{name}» είναι όνομα ενσωματωμένης προεπιλογής. Διάλεξε άλλο.",
-  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Μέσω του winget των Windows, αλλιώς από τη λήψη του ίδιου του FFmpeg (περίπου 100 MB). Μπορείς να το απενεργοποιήσεις στις Ρυθμίσεις → Απόρρητο & ασφάλεια."
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Μέσω του winget των Windows, αλλιώς από τη λήψη του ίδιου του FFmpeg (περίπου 100 MB). Μπορείς να το απενεργοποιήσεις στις Ρυθμίσεις → Απόρρητο & ασφάλεια.",
+  "Onion Board's Clean mic (Voice tab) takes out the noise instead.": "Το Καθαρό μικρόφωνο του Onion Board (καρτέλα Φωνή) αφαιρεί τον θόρυβο αντί γι' αυτό.",
+  "Onion Board's <b>Clean mic</b> (Voice tab) takes out the noise instead.": "Το <b>Καθαρό μικρόφωνο</b> του Onion Board (καρτέλα Φωνή) αφαιρεί τον θόρυβο αντί γι' αυτό.",
+  "Clean mic takes over noise removal": "Το Καθαρό μικρόφωνο αναλαμβάνει την αφαίρεση θορύβου",
+  "Tips point to Clean mic": "Οι συμβουλές δείχνουν το Καθαρό μικρόφωνο",
+  "Where Onion Board says to switch off an app's noise suppression, it now points to Clean mic on the Voice tab: it takes the noise out of your mic before your sounds are mixed in.": "Όπου το Onion Board λέει να κλείσετε την καταστολή θορύβου μιας εφαρμογής, τώρα δείχνει το Καθαρό μικρόφωνο στην καρτέλα Φωνή: αφαιρεί τον θόρυβο από το μικρόφωνό σας πριν αναμειχθούν οι ήχοι σας.",
+  "Fix Discord turns on Clean mic": "Η Διόρθωση Discord ανοίγει το Καθαρό μικρόφωνο",
+  "It switches Discord's noise suppression off and Clean mic on, so your voice stays clean and your sounds get through.": "Κλείνει την καταστολή θορύβου του Discord και ανοίγει το Καθαρό μικρόφωνο, ώστε η φωνή σας να μένει καθαρή και οι ήχοι σας να περνούν.",
+  "<b>Clean mic</b> is on: it takes background noise out of your voice instead, and never touches your sounds.": "Το <b>Καθαρό μικρόφωνο</b> είναι ανοιχτό: βγάζει αντί γι' αυτό τον θόρυβο φόντου από τη φωνή σου και δεν αγγίζει ποτέ τους ήχους σου.",
+  "Bun swaps Discord's noise filter for Clean mic, so your sounds don't get cut off.": "Ο Bun αλλάζει το φίλτρο θορύβου του Discord με το Καθαρό μικρόφωνο, για να μην κόβονται οι ήχοι σου.",
+  "Bun swaps Discord's noise filter for Clean mic, then shows you which mic to pick.": "Ο Bun αλλάζει το φίλτρο θορύβου του Discord με το Καθαρό μικρόφωνο και μετά σου δείχνει ποιο μικρόφωνο να διαλέξεις.",
+  "Bun turned on <b>Clean mic</b> in place of Discord's noise filter: it takes background noise out of your voice and never touches your sounds.": "Ο Bun άνοιξε το <b>Καθαρό μικρόφωνο</b> στη θέση του φίλτρου θορύβου του Discord: βγάζει τον θόρυβο φόντου από τη φωνή σου και δεν αγγίζει ποτέ τους ήχους σου.",
+  "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "Στη θέση του ο Bun ανοίγει το Καθαρό μικρόφωνο στην καρτέλα Φωνή: βγάζει τον θόρυβο φόντου από τη φωνή σου και δεν αγγίζει ποτέ τους ήχους σου.",
+  "Open Clean mic": "Άνοιγμα Καθαρού μικροφώνου",
+  "They think music is background noise and cut your sounds up.": "Θεωρούν τη μουσική θόρυβο φόντου και κομματιάζουν τους ήχους σου.",
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Θέλεις παρ' όλα αυτά να φύγει ο θόρυβος φόντου; Άνοιξε αντί γι' αυτό το <b>Καθαρό μικρόφωνο</b> στην καρτέλα <b>Φωνή</b> του Onion Board: καθαρίζει τη φωνή σου και δεν αγγίζει ποτέ τους ήχους σου."
 }

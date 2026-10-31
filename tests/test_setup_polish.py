@@ -6,6 +6,7 @@ from conftest import said
 
 from soundboard.mic import directmic as dm
 from soundboard.audio import engine as eng
+from soundboard.voicefx import cleanmic
 
 
 def pump():
@@ -68,6 +69,7 @@ def test_working_mic_card_is_one_line_with_tips_behind_info(window, monkeypatch)
     box, beside = shown[0]
     assert "Noise Suppression" in box.body.text() and beside is b
     assert box.body.textFormat() == Qt.TextFormat.RichText   # bold, not "<b>" shown
+    assert ("Clean mic" in box.body.text()) == cleanmic.available()   # does it instead
     w.cfg.route = "off"   # not on the mic: no mic tips
     w.statusctl._update_status()
     assert b.isHidden()

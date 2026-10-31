@@ -1,5 +1,7 @@
 """The Discord / game guides, the Discord check's plumbing (with a fake Discord
 capture) and the cable-format fix on the Setup tab. Offscreen, fake devices."""
+from types import SimpleNamespace
+
 import numpy as np
 import pytest
 
@@ -416,3 +418,99 @@ def test_the_discord_guide_offers_to_do_it(wizard):
     g = chatguide.DiscordGuide(wiz, w, "CABLE Output")
     assert g.btn_auto.text() == "Set it up for me" and g.btn_auto.toolTip()
     g.done(0)
+
+
+# ---------------------------------------------------------- Clean mic takes over
+
+class _Clean:
+    """The Voice tab's Clean mic stood in: ok (in this copy), and its switch."""
+
+    def __init__(self, on=False, ok=True):
+        self.on, self.ok, self.asked = on, ok, []
+
+    def is_on(self):
+        return self.on
+
+    def set_on(self, on):
+        self.asked.append(on)
+        self.on = on
+
+
+def _boxes(monkeypatch):
+    """Each DiscordFixed shown: (its Clean mic words or None, its Open Clean mic button)."""
+    shown = []
+    monkeypatch.setattr(chatguide.DiscordFixed, "exec", lambda box: shown.append(
+        (box.clean.text() if box.clean else None,
+         box.btn_clean.text() if box.btn_clean else None)) or 0)
+    return shown
+
+
+def _set_up_with(qapp, monkeypatch, w, voice):
+    """Bun sets Discord up with this Voice tab stood in (put back before the window
+    closes: closing it shuts the real one down)."""
+    done = []
+    with monkeypatch.context() as m:
+        m.setattr(w, "voice", voice, raising=False)
+        chatguide.set_up_discord(w, then=lambda: done.append(1))
+        assert process_events(qapp, lambda: done, timeout=5)
+
+
+def test_setting_discord_up_turns_clean_mic_on_in_its_place(qapp, wizard, monkeypatch):
+    """Bun turns Discord's noise filter off: Clean mic goes on instead, and the box says
+    so with a button to it (to turn it off again there)."""
+    w, _wiz = wizard
+    clean = _Clean()
+    fake = _Setup(monkeypatch, {"done": [("Discord", _talking(), _sound())],
+                                "running": [], "failed": [], "talk": {}})
+    shown = _boxes(monkeypatch)
+    _set_up_with(qapp, monkeypatch, w, SimpleNamespace(clean=clean))
+    assert clean.asked == [True] and clean.on
+    words, button = shown[0]
+    assert "Bun turned on" in words and "Clean mic" in words
+    assert button == "Open Clean mic"
+    assert fake.calls
+
+
+@pytest.mark.parametrize("make, noisy, says", [
+    (lambda: _Clean(on=True), True, "is on"),     # already on: left alone
+    (_Clean, False, "Turn on"),                   # Discord's filter was off already
+    (lambda: _Clean(ok=False), True, None),       # no Clean mic in this copy
+    (lambda: None, True, None),                   # the Voice tab switched off
+])
+def test_clean_mic_is_left_alone_when_it_should_be(qapp, wizard, monkeypatch, make,
+                                                   noisy, says):
+    w, _wiz = wizard
+    clean, before = make(), _talking() if noisy else _sound()
+    voice = SimpleNamespace(clean=clean) if clean is not None else SimpleNamespace()
+    _Setup(monkeypatch, {"done": [("Discord", before, _sound())], "running": [],
+                         "failed": [], "talk": {}})
+    shown = _boxes(monkeypatch)
+    _set_up_with(qapp, monkeypatch, w, voice)
+    if clean is not None:
+        assert clean.asked == []
+    words, button = shown[0]
+    if says is None:
+        assert words is None and button is None
+    else:
+        assert says in words and button is not None
+
+
+def test_open_clean_mic_shows_its_card_on_the_voice_tab(monkeypatch):
+    opened, current = [], []
+    mw = SimpleNamespace(tabctl=SimpleNamespace(tab_on=lambda key: key == "voice"),
+                         tabs=SimpleNamespace(setCurrentWidget=current.append),
+                         voice=SimpleNamespace(_open_card=opened.append))
+    monkeypatch.setattr(chatguide.usage, "used", lambda key: None)
+    chatguide.open_clean_mic(mw)
+    assert current == [mw.voice] and opened == ["clean"]
+    mw.tabctl = SimpleNamespace(tab_on=lambda key: False)   # the tab off: nowhere to go
+    chatguide.open_clean_mic(mw)
+    assert opened == ["clean"]
+
+
+def test_the_guides_say_clean_mic_is_on_or_how_to_turn_it_on():
+    on = SimpleNamespace(voice=SimpleNamespace(clean=_Clean(on=True)))
+    assert "is on" in chatguide.clean_mic_tip(on)
+    assert "Turn on" in chatguide.clean_mic_tip(None)
+    assert "Turn on" in chatguide.clean_mic_tip(SimpleNamespace(voice=SimpleNamespace(
+        clean=_Clean())))

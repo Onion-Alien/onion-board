@@ -127,7 +127,8 @@ given back; the compressor columns are on top of the 80 Hz cut.)
   sets the modes apart is the cut (Discord's high-pass sits at 94 Hz, so 90 there)
   and the codec's ceiling (12 kHz for Steam and Photon, 8 kHz for the low-bandwidth
   codecs). Epic Online Services came out the same as Vivox; it stays its own entry
-  so its players find it, with a note to turn its noise suppression off.
+  so its players find it, with a note to turn its noise suppression off (and to use
+  *Clean mic* on the Voice tab for the background noise instead).
 - **The compressor never paid.** Even behind an automatic gain it cost 2-5 dB and
   added distortion. Mumble's AGC levels everything anyway, and there a light
   compressor did pump a little less (6.3 → 5.5 dB), for more distortion and less
@@ -144,7 +145,9 @@ given back; the compressor columns are on top of the 80 Hz cut.)
 - **Noise suppression is what hurts, and no mode fixes it.** On every engine with
   WebRTC's suppressor the mid-band pumping sat at 3-4 dB and the spectral distance at
   ~4 dB whatever was sent (Vivox without it: 0.5 and 2.0). Only turning it off in the
-  game helps; the game voice chat guide says so.
+  game helps; the game voice chat guide says so. *Clean mic* then does the noise
+  removal inside Onion Board, on your voice alone, before the sounds are mixed in, so
+  the sounds never meet a suppressor.
 
 **The modes on all 99 songs** (heard level against the same song played straight into
 the chat, median dB per pitch range: no mode → the engine's mode; each engine's own
@@ -208,6 +211,7 @@ The level comes out right on all three, but Zoom's and Teams' AI noise suppressi
 chops and pumps songs whatever is sent (mid-band pumping ~15 dB with or without the
 mode, against ~4 through a browser). A 16 kHz ceiling, a 60 or 90 Hz cut or a
 compressor changed nothing worth having, so they share the Browser mode ("Browser,
-Zoom, Teams") and the fix is a settings guide for turning their noise suppression down.
+Zoom, Teams") and the fix is a settings guide for turning their noise suppression down,
+with *Clean mic* taking the background noise out of the voice before the sounds are added.
 The Zoom and Teams profiles are estimates: 32 kHz, with RNNoise standing in for their
 own suppressors.

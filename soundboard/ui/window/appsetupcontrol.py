@@ -20,6 +20,7 @@ from soundboard.mic import appsetup, destination, profiles, voicesdk
 from soundboard import i18n
 from soundboard.audio import engine as eng
 from soundboard.i18n import _
+from soundboard.ui.window.alertcontrol import clean_mic_note
 from soundboard.ui.window.controller import Controller
 
 if TYPE_CHECKING:
@@ -229,8 +230,9 @@ class AppSetupControl(Controller):
                 return lines, ""
             return lines, _("Check Discord")
         if guide == "meeting":
-            lines.append(_("{warn} Its noise removal can wipe out music: set it to keep "
-                           "the original sound.", warn=warn))
+            lines.append(" ".join(filter(None, (
+                _("{warn} Its noise removal can wipe out music: set it to keep the original "
+                  "sound.", warn=warn), clean_mic_note()))))
             return lines, _("Show me how")
         return lines, ""
 

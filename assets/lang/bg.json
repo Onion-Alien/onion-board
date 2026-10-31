@@ -1004,7 +1004,6 @@
   "There are no sounds on your {name} board.": "В борда ти в {name} няма звуци.",
   "There are no sounds yet. Export just your settings?": "Още няма звуци. Да експортирам ли само настройките ти?",
   "There's already a “{new}”.": "Вече има „{new}“.",
-  "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Те смятат музиката за фонов шум и накъсват звуците ти. Onion Board вече изчиства гласа ти.",
   "This desktop has no system tray, so closing the window quits.": "Този работен плот няма системен трей, затова затварянето на прозореца излиза от приложението.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Това е Onion Board {version}. С отметнато поле пита GitHub на всеки няколко часа дали има по-нова версия и ти казва (с лента, ако е важна поправка). Това копие върви от изходния код, затова само ти казва: обнови го с git pull.",
   "This sound's video isn't there any more": "Видеото на този звук вече го няма",
@@ -4728,5 +4727,20 @@
     "Още {n} твои настройки"
   ],
   "“{name}” is a built-in preset's name. Pick another one.": "„{name}“ е име на вградена настройка. Избери друго.",
-  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Чрез winget на Windows или от собственото изтегляне на FFmpeg (около 100 MB). Можеш да го изключиш от Настройки → Поверителност и сигурност."
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Чрез winget на Windows или от собственото изтегляне на FFmpeg (около 100 MB). Можеш да го изключиш от Настройки → Поверителност и сигурност.",
+  "Onion Board's Clean mic (Voice tab) takes out the noise instead.": "Чист микрофон в Onion Board (раздел Глас) маха шума вместо това.",
+  "Onion Board's <b>Clean mic</b> (Voice tab) takes out the noise instead.": "<b>Чист микрофон</b> в Onion Board (раздел Глас) маха шума вместо това.",
+  "Clean mic takes over noise removal": "Чист микрофон поема премахването на шума",
+  "Tips point to Clean mic": "Съветите сочат към Чист микрофон",
+  "Where Onion Board says to switch off an app's noise suppression, it now points to Clean mic on the Voice tab: it takes the noise out of your mic before your sounds are mixed in.": "Където Onion Board казва да изключите потискането на шума в някое приложение, сега сочи към Чист микрофон в раздел Глас: той маха шума от микрофона ви, преди звуците ви да се смесят.",
+  "Fix Discord turns on Clean mic": "Оправи Discord включва Чист микрофон",
+  "It switches Discord's noise suppression off and Clean mic on, so your voice stays clean and your sounds get through.": "Изключва потискането на шума в Discord и включва Чист микрофон, така гласът ви остава чист, а звуците ви минават.",
+  "<b>Clean mic</b> is on: it takes background noise out of your voice instead, and never touches your sounds.": "<b>Чист микрофон</b> е включен: той маха фоновия шум от гласа ти вместо това и никога не пипа звуците ти.",
+  "Bun swaps Discord's noise filter for Clean mic, so your sounds don't get cut off.": "Bun сменя шумовия филтър на Discord с Чист микрофон, за да не се накъсват звуците ти.",
+  "Bun swaps Discord's noise filter for Clean mic, then shows you which mic to pick.": "Bun сменя шумовия филтър на Discord с Чист микрофон, после ти показва кой микрофон да избереш.",
+  "Bun turned on <b>Clean mic</b> in place of Discord's noise filter: it takes background noise out of your voice and never touches your sounds.": "Bun включи <b>Чист микрофон</b> на мястото на шумовия филтър на Discord: той маха фоновия шум от гласа ти и никога не пипа звуците ти.",
+  "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "На негово място Bun включва Чист микрофон в раздела Глас: той маха фоновия шум от гласа ти и никога не пипа звуците ти.",
+  "Open Clean mic": "Отвори Чист микрофон",
+  "They think music is background noise and cut your sounds up.": "Те смятат музиката за фонов шум и накъсват звуците ти.",
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Искаш все пак да махнеш фоновия шум? Включи <b>Чист микрофон</b> в раздела <b>Глас</b> на Onion Board: той чисти гласа ти и никога не пипа звуците ти."
 }

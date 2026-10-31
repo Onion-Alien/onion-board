@@ -390,7 +390,10 @@ gitleaks, ruff and pytest:
 (`build.ps1 -Clean`), scans it and the mic helper on VirusTotal (when the `VT_API_KEY`
 secret is set) and makes a **draft** release with all three assets, the SHA-256 and the scan
 line. Write the headline, install the draft's installer over your own copy, then
-publish. A tag that already has a release is left alone.
+publish. A tag that already has a release is left alone. To try the build without
+releasing, run it by hand with no tag (`gh workflow run release.yml --ref <branch>`):
+it builds, runs the self-test and checks the version info, and keeps the files as the
+run's `release-files` artifact for 3 days.
 
 **Other scheduled workflows:** `security` (weekly CodeQL + pip-audit), `links` (weekly
 dead-link check of the README, docs and website) and `packages` (each Monday, bumps

@@ -4,6 +4,7 @@ import pytest
 
 from soundboard.mic import appsetup, profiles
 from soundboard.sounds.library import Config
+from soundboard.voicefx import cleanmic
 from soundboard.ui.settings.settings import SettingsDialog
 from soundboard.ui.kit import toast
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
@@ -155,6 +156,7 @@ def test_meeting_apps_get_a_show_me_how(window, monkeypatch):
     at(window, 0.0)
     window.setup_yes.click()
     assert "noise removal" in window.setup_lbl.text()
+    assert ("Clean mic" in window.setup_lbl.text()) == cleanmic.available()
     opened = []
     monkeypatch.setattr(window.statusctl, "show_chat_guide", opened.append)
     window.setup_yes.click()

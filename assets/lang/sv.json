@@ -1071,7 +1071,6 @@
   "There are no sounds on your {name} board.": "Det finns inga ljud på ditt {name}-board.",
   "There are no sounds yet. Export just your settings?": "Det finns inga ljud än. Exportera bara dina inställningar?",
   "There's already a “{new}”.": "Det finns redan en ”{new}”.",
-  "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "De tror att musik är bakgrundsbrus och hackar sönder dina ljud. Onion Board rensar redan din röst.",
   "This desktop has no system tray, so closing the window quits.": "Det här skrivbordet har inget systemfält, så att stänga fönstret avslutar.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Det här är Onion Board {version}. Med rutan ikryssad frågar den GitHub med några timmars mellanrum om en nyare version är ute och säger till (med en banderoll om det är en viktig fix). Den här kopian körs från källkoden, så den säger bara till: uppdatera den med git pull.",
   "This sound's video isn't there any more": "Det här ljudets video finns inte kvar",
@@ -4728,5 +4727,20 @@
     "{n} till av dina förinställningar"
   ],
   "“{name}” is a built-in preset's name. Pick another one.": "”{name}” är namnet på en inbyggd förinställning. Välj ett annat.",
-  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Via Windows winget, annars FFmpegs egen nedladdning (cirka 100 MB). Du kan stänga av det under Inställningar → Integritet & säkerhet."
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Via Windows winget, annars FFmpegs egen nedladdning (cirka 100 MB). Du kan stänga av det under Inställningar → Integritet & säkerhet.",
+  "Onion Board's Clean mic (Voice tab) takes out the noise instead.": "Onion Boards Ren mikrofon (fliken Röst) tar bort bruset i stället.",
+  "Onion Board's <b>Clean mic</b> (Voice tab) takes out the noise instead.": "Onion Boards <b>Ren mikrofon</b> (fliken Röst) tar bort bruset i stället.",
+  "Clean mic takes over noise removal": "Ren mikrofon tar över brusborttagningen",
+  "Tips point to Clean mic": "Tipsen pekar på Ren mikrofon",
+  "Where Onion Board says to switch off an app's noise suppression, it now points to Clean mic on the Voice tab: it takes the noise out of your mic before your sounds are mixed in.": "Där Onion Board säger att du ska stänga av en apps brusreducering pekar den nu på Ren mikrofon på fliken Röst: den tar bort bruset från mikrofonen innan dina ljud mixas in.",
+  "Fix Discord turns on Clean mic": "Fixa Discord slår på Ren mikrofon",
+  "It switches Discord's noise suppression off and Clean mic on, so your voice stays clean and your sounds get through.": "Den stänger av Discords brusreducering och slår på Ren mikrofon, så din röst förblir ren och dina ljud kommer fram.",
+  "<b>Clean mic</b> is on: it takes background noise out of your voice instead, and never touches your sounds.": "<b>Ren mikrofon</b> är på: den tar bort bakgrundsbrus från din röst i stället, och rör aldrig dina ljud.",
+  "Bun swaps Discord's noise filter for Clean mic, so your sounds don't get cut off.": "Bun byter ut Discords brusfilter mot Ren mikrofon, så att dina ljud inte klipps av.",
+  "Bun swaps Discord's noise filter for Clean mic, then shows you which mic to pick.": "Bun byter ut Discords brusfilter mot Ren mikrofon och visar dig sedan vilken mikrofon du ska välja.",
+  "Bun turned on <b>Clean mic</b> in place of Discord's noise filter: it takes background noise out of your voice and never touches your sounds.": "Bun slog på <b>Ren mikrofon</b> i stället för Discords brusfilter: den tar bort bakgrundsbrus från din röst och rör aldrig dina ljud.",
+  "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "I stället slår Bun på Ren mikrofon på fliken Röst: den tar bort bakgrundsbrus från din röst och rör aldrig dina ljud.",
+  "Open Clean mic": "Öppna Ren mikrofon",
+  "They think music is background noise and cut your sounds up.": "De tror att musik är bakgrundsbrus och hackar sönder dina ljud.",
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Vill du ändå bli av med bakgrundsbruset? Slå på <b>Ren mikrofon</b> på fliken <b>Röst</b> i Onion Board i stället: den rensar din röst och rör aldrig dina ljud."
 }

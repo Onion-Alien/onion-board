@@ -36,6 +36,15 @@ def recent() -> tuple[Note, ...]:
     release (tests/test_whats_new.py checks this version has one): what a player
     notices, in their words, never the fixes only a log would show."""
     return (
+        Note("2.7.4", _("Clean mic takes over noise removal"), (
+            ("mic", _("Tips point to Clean mic"),
+             _("Where Onion Board says to switch off an app's noise suppression, it now "
+               "points to Clean mic on the Voice tab: it takes the noise out of your mic "
+               "before your sounds are mixed in.")),
+            ("check", _("Fix Discord turns on Clean mic"),
+             _("It switches Discord's noise suppression off and Clean mic on, so your "
+               "voice stays clean and your sounds get through.")),
+        )),
         Note("2.7.3", _("Mic settings, new presets and new games with Bun"), (
             ("mic", _("Mic settings for Clean mic"),
              _("The cog next to Clean mic on the Voice tab: input volume, noise suppression "

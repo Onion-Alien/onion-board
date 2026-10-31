@@ -1071,7 +1071,6 @@
   "There are no sounds on your {name} board.": "Nincsenek hangok a(z) {name} boardodon.",
   "There are no sounds yet. Export just your settings?": "Még nincsenek hangok. Csak a beállításaidat exportálod?",
   "There's already a “{new}”.": "Már van ilyen: „{new}”.",
-  "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Háttérzajnak veszik a zenét, és szétszaggatják a hangjaidat. Az Onion Board már tisztítja a beszédhangodat.",
   "This desktop has no system tray, so closing the window quits.": "Ezen az asztalon nincs tálca, így az ablak bezárása kilép.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Ez az Onion Board {version}. Bepipálva néhány óránként megkérdezi a GitHubot, megjelent-e újabb verzió, és szól (sávval, ha fontos javítás). Ez a példány forrásból fut, ezért csak szól: frissítsd git pull-lal.",
   "This sound's video isn't there any more": "Ennek a hangnak a videója már nincs meg",
@@ -4728,5 +4727,20 @@
     "Még {n} saját előbeállításod"
   ],
   "“{name}” is a built-in preset's name. Pick another one.": "„{name}” egy beépített előbeállítás neve. Válassz másikat.",
-  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "A Windows winget segítségével, vagy az FFmpeg saját letöltéséből (kb. 100 MB). Ezt kikapcsolhatod: Beállítások → Adatvédelem & biztonság."
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "A Windows winget segítségével, vagy az FFmpeg saját letöltéséből (kb. 100 MB). Ezt kikapcsolhatod: Beállítások → Adatvédelem & biztonság.",
+  "Onion Board's Clean mic (Voice tab) takes out the noise instead.": "Ehelyett az Onion Board Tiszta mikrofon funkciója (Beszéd lap) szedi ki a zajt.",
+  "Onion Board's <b>Clean mic</b> (Voice tab) takes out the noise instead.": "Ehelyett az Onion Board <b>Tiszta mikrofon</b> funkciója (Beszéd lap) szedi ki a zajt.",
+  "Clean mic takes over noise removal": "A Tiszta mikrofon veszi át a zajszűrést",
+  "Tips point to Clean mic": "A tippek a Tiszta mikrofonra mutatnak",
+  "Where Onion Board says to switch off an app's noise suppression, it now points to Clean mic on the Voice tab: it takes the noise out of your mic before your sounds are mixed in.": "Ahol az Onion Board azt mondja, hogy kapcsold ki egy alkalmazás zajszűrését, most a Beszéd lap Tiszta mikrofon funkciójára mutat: kiszedi a zajt a mikrofonodból, mielőtt a hangjaid hozzákeverődnek.",
+  "Fix Discord turns on Clean mic": "A Discord javítása bekapcsolja a Tiszta mikrofont",
+  "It switches Discord's noise suppression off and Clean mic on, so your voice stays clean and your sounds get through.": "Kikapcsolja a Discord zajszűrését és bekapcsolja a Tiszta mikrofont, így a hangod tiszta marad, a hangjaid pedig átjutnak.",
+  "<b>Clean mic</b> is on: it takes background noise out of your voice instead, and never touches your sounds.": "A <b>Tiszta mikrofon</b> be van kapcsolva: helyette ez veszi ki a háttérzajt a beszédhangodból, és a hangjaidhoz soha nem nyúl.",
+  "Bun swaps Discord's noise filter for Clean mic, so your sounds don't get cut off.": "Bun a Discord zajszűrőjét Tiszta mikrofonra cseréli, hogy a hangjaid ne szakadjanak el.",
+  "Bun swaps Discord's noise filter for Clean mic, then shows you which mic to pick.": "Bun a Discord zajszűrőjét Tiszta mikrofonra cseréli, majd megmutatja, melyik mikrofont válaszd.",
+  "Bun turned on <b>Clean mic</b> in place of Discord's noise filter: it takes background noise out of your voice and never touches your sounds.": "Bun bekapcsolta a <b>Tiszta mikrofont</b> a Discord zajszűrője helyett: kiveszi a háttérzajt a beszédhangodból, és a hangjaidhoz soha nem nyúl.",
+  "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "Helyette Bun bekapcsolja a Tiszta mikrofont a Beszéd lapon: kiveszi a háttérzajt a beszédhangodból, és a hangjaidhoz soha nem nyúl.",
+  "Open Clean mic": "Tiszta mikrofon megnyitása",
+  "They think music is background noise and cut your sounds up.": "Háttérzajnak veszik a zenét, és szétszaggatják a hangjaidat.",
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Azért eltüntetnéd a háttérzajt? Kapcsold be inkább a <b>Tiszta mikrofont</b> az Onion Board <b>Beszéd</b> lapján: tisztítja a beszédhangodat, és a hangjaidhoz soha nem nyúl."
 }
