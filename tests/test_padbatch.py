@@ -69,6 +69,17 @@ def test_bulk_colour_menu_marks_shared_value_and_applies_choice(window, colors):
     assert [a.text() for a in actions if a.isChecked()] == [COLOUR_NAMES[PAD_COLORS[1]]]
 
 
+def test_bulk_category_menu_names_a_subcategory_s_parent(window):
+    # a subcategory reads "Parent › sub", so one called like a category isn't a look-alike
+    window.cfg.categories = ["Memes", "test"]
+    window.cfg.subcategories = {"Memes": ["test"]}
+    window.selection.picked = {"s0"}
+    menu = QMenu(window)
+    window.selection._fill_cats(menu)
+    labels = [a.text() for a in menu.actions() if a.isCheckable()]
+    assert labels == ["Memes", "Memes › test", "test"]
+
+
 def test_bulk_menu_starts_with_its_actions_not_a_blank_section(window, monkeypatch):
     window.selection.picked = {"s0", "s1"}
     seen = []
