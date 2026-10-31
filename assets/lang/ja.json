@@ -1172,7 +1172,6 @@
   "Theme's colour": "テーマの色",
   "Theme, audio, voice, overlay and privacy options.": "テーマ、オーディオ、ボイス、オーバーレイ、プライバシーの設定。",
   "Then Ctrl+click picks a pad without playing it": "そのうえで Ctrl+クリックすると、再生せずにパッドを選べます",
-  "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "音楽を背景ノイズだと判断して、サウンドを途切れさせてしまいます。声のノイズ処理は Onion Board がすでに行っています。",
   "This desktop has no system tray, so closing the window quits.": "このデスクトップにはシステムトレイがないため、ウィンドウを閉じると終了します。",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "これは Onion Board {version} です。チェックを入れると、数時間ごとに GitHub に新しいバージョンがないか問い合わせてお知らせします（重要な修正ならバナーで表示）。このコピーはソースから動いているので、お知らせするだけです: git pull で更新してください。",
   "Through a proxy": "プロキシ経由",
@@ -4654,5 +4653,13 @@
   "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Onion Board は Windows に小さなヘルパー (SYSTEM として動くタスク) を追加し、毎回 Windows に許可を求められずにマイクエフェクトを設定・修復できるようにします。チェックを外すと削除されます。",
   "The helper is removed. Windows asks for permission each time now.": "ヘルパーを削除しました。これからは毎回 Windows が許可を求めます。",
   "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "ヘルパーはまだ残っているため、何も変わっていません。もう一度試して、Windows に聞かれたら<b>はい</b>をクリックしてください。",
-  "Wait until the mic effect is done, then try again.": "マイクエフェクトが終わるまで待ってから、もう一度試してください。"
+  "Wait until the mic effect is done, then try again.": "マイクエフェクトが終わるまで待ってから、もう一度試してください。",
+  "<b>Clean mic</b> is on: it takes background noise out of your voice instead, and never touches your sounds.": "<b>マイクのノイズ除去</b>がオンです：代わりに声から背景ノイズを取り除き、サウンドには一切手を加えません。",
+  "Bun swaps Discord's noise filter for Clean mic, so your sounds don't get cut off.": "Bun が Discord のノイズ除去をマイクのノイズ除去に切り替えて、サウンドが途切れないようにします。",
+  "Bun swaps Discord's noise filter for Clean mic, then shows you which mic to pick.": "Bun が Discord のノイズ除去をマイクのノイズ除去に切り替えてから、選ぶマイクを案内します。",
+  "Bun turned on <b>Clean mic</b> in place of Discord's noise filter: it takes background noise out of your voice and never touches your sounds.": "Bun が Discord のノイズ除去の代わりに<b>マイクのノイズ除去</b>をオンにしました：声から背景ノイズを取り除き、サウンドには一切手を加えません。",
+  "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "代わりに Bun がボイスタブのマイクのノイズ除去をオンにします：声から背景ノイズを取り除き、サウンドには一切手を加えません。",
+  "Open Clean mic": "マイクのノイズ除去を開く",
+  "They think music is background noise and cut your sounds up.": "音楽を背景ノイズだと判断して、サウンドを途切れさせてしまいます。",
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "それでも背景ノイズを消したい場合は、代わりに Onion Board の<b>ボイス</b>タブで<b>マイクのノイズ除去</b>をオンにしてください：声だけをきれいにし、サウンドには一切手を加えません。"
 }

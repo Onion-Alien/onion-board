@@ -1071,7 +1071,6 @@
   "There are no sounds on your {name} board.": "Walang sound sa {name} board mo.",
   "There are no sounds yet. Export just your settings?": "Wala pang sound. Settings mo lang ang i-export?",
   "There's already a “{new}”.": "May “{new}” na.",
-  "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Akala nila background noise ang music at pinuputol-putol nila ang mga sound mo. Nililinis na ng Onion Board ang boses mo.",
   "This desktop has no system tray, so closing the window quits.": "Walang system tray ang desktop na ito, kaya mag-quit ito kapag isinara ang window.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Ito ang Onion Board {version}. Kapag naka-tick ang box, tinatanong nito ang GitHub kada ilang oras kung may bagong version at sinasabihan ka (may banner kung importanteng fix). Tumatakbo ang kopyang ito mula sa source, kaya sinasabihan ka lang nito: i-update gamit ang git pull.",
   "This sound's video isn't there any more": "Wala na ang video ng sound na ito",
@@ -4741,5 +4740,13 @@
   "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Nagdadagdag ang Onion Board ng maliit na helper sa Windows (isang task na tumatakbo bilang SYSTEM), para ma-set up at maayos nito ang mic effect nang hindi humihingi ng permiso ang Windows bawat beses. Alisin ang check para tanggalin ito.",
   "The helper is removed. Windows asks for permission each time now.": "Natanggal na ang helper. Hihingi na ng permiso ang Windows bawat beses.",
   "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "Nandiyan pa ang helper, kaya walang nagbago. Subukan ulit at i-click ang <b>Yes</b> kapag nagtanong ang Windows.",
-  "Wait until the mic effect is done, then try again.": "Hintayin munang matapos ang mic effect, saka subukan ulit."
+  "Wait until the mic effect is done, then try again.": "Hintayin munang matapos ang mic effect, saka subukan ulit.",
+  "<b>Clean mic</b> is on: it takes background noise out of your voice instead, and never touches your sounds.": "Naka-on ang <b>Malinis na mic</b>: ito na ang nag-aalis ng ingay sa paligid sa boses mo, at hindi nito ginagalaw ang mga sound mo.",
+  "Bun swaps Discord's noise filter for Clean mic, so your sounds don't get cut off.": "Pinapalitan ni Bun ang noise filter ng Discord ng Malinis na mic, para hindi maputol ang mga sound mo.",
+  "Bun swaps Discord's noise filter for Clean mic, then shows you which mic to pick.": "Pinapalitan ni Bun ang noise filter ng Discord ng Malinis na mic, tapos ipapakita niya kung aling mic ang pipiliin.",
+  "Bun turned on <b>Clean mic</b> in place of Discord's noise filter: it takes background noise out of your voice and never touches your sounds.": "Inon ni Bun ang <b>Malinis na mic</b> kapalit ng noise filter ng Discord: inaalis nito ang ingay sa paligid sa boses mo at hindi nito ginagalaw ang mga sound mo.",
+  "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "Kapalit nito, ino-on ni Bun ang Malinis na mic sa Voice tab: inaalis nito ang ingay sa paligid sa boses mo at hindi nito ginagalaw ang mga sound mo.",
+  "Open Clean mic": "Buksan ang Malinis na mic",
+  "They think music is background noise and cut your sounds up.": "Akala nila background noise ang music at pinuputol-putol nila ang mga sound mo.",
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Gusto mo pa ring mawala ang ingay sa paligid? I-on na lang ang <b>Malinis na mic</b> sa <b>Voice</b> tab ng Onion Board: nililinis nito ang boses mo at hindi nito ginagalaw ang mga sound mo."
 }

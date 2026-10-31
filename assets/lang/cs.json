@@ -1084,7 +1084,6 @@
   "There are no sounds on your {name} board.": "Na tvém boardu {name} nejsou žádné zvuky.",
   "There are no sounds yet. Export just your settings?": "Zatím tu nejsou žádné zvuky. Exportovat jen nastavení?",
   "There's already a “{new}”.": "„{new}“ už existuje.",
-  "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "Myslí si, že hudba je šum v pozadí, a rozsekají tvoje zvuky. Onion Board už tvůj hlas čistí.",
   "This desktop has no system tray, so closing the window quits.": "Tohle prostředí nemá oznamovací oblast, takže zavření okna aplikaci ukončí.",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "Tohle je Onion Board {version}. Se zaškrtnutým políčkem se každých pár hodin zeptá GitHubu, jestli nevyšla novější verze, a řekne ti to (s bannerem, pokud jde o důležitou opravu). Tahle kopie běží ze zdrojového kódu, takže ti to jen řekne: aktualizuj ji přes git pull.",
   "This sound's video isn't there any more": "Video tohoto zvuku už tu není",
@@ -4828,5 +4827,13 @@
   "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Onion Board přidá do Windows malého pomocníka (úlohu, která běží jako SYSTEM), aby mohl nastavit a opravit efekt mikrofonu, aniž by se Windows pokaždé ptaly na povolení. Zruš zaškrtnutí a pomocník se odstraní.",
   "The helper is removed. Windows asks for permission each time now.": "Pomocník je odstraněn. Windows se teď na povolení zeptají pokaždé.",
   "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "Pomocník tam pořád je, takže se nic nezměnilo. Zkus to znovu a až se Windows zeptají, klikni na <b>Ano</b>.",
-  "Wait until the mic effect is done, then try again.": "Počkej, až efekt mikrofonu doběhne, a pak to zkus znovu."
+  "Wait until the mic effect is done, then try again.": "Počkej, až efekt mikrofonu doběhne, a pak to zkus znovu.",
+  "<b>Clean mic</b> is on: it takes background noise out of your voice instead, and never touches your sounds.": "<b>Čistý mikrofon</b> je zapnutý: místo toho odstraňuje šum v pozadí z tvého hlasu a na tvoje zvuky nikdy nesahá.",
+  "Bun swaps Discord's noise filter for Clean mic, so your sounds don't get cut off.": "Bun vymění filtr šumu v Discordu za Čistý mikrofon, aby se tvoje zvuky neuřezávaly.",
+  "Bun swaps Discord's noise filter for Clean mic, then shows you which mic to pick.": "Bun vymění filtr šumu v Discordu za Čistý mikrofon a pak ti ukáže, jaký mikrofon vybrat.",
+  "Bun turned on <b>Clean mic</b> in place of Discord's noise filter: it takes background noise out of your voice and never touches your sounds.": "Bun zapnul <b>Čistý mikrofon</b> místo filtru šumu v Discordu: odstraňuje šum v pozadí z tvého hlasu a na tvoje zvuky nikdy nesahá.",
+  "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "Místo něj Bun zapne Čistý mikrofon na kartě Hlas: odstraňuje šum v pozadí z tvého hlasu a na tvoje zvuky nikdy nesahá.",
+  "Open Clean mic": "Otevřít Čistý mikrofon",
+  "They think music is background noise and cut your sounds up.": "Myslí si, že hudba je šum v pozadí, a rozsekají tvoje zvuky.",
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Chceš se šumu v pozadí přesto zbavit? Zapni místo toho <b>Čistý mikrofon</b> na kartě <b>Hlas</b> v Onion Board: čistí tvůj hlas a na tvoje zvuky nikdy nesahá."
 }

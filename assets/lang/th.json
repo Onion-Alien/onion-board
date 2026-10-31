@@ -1172,7 +1172,6 @@
   "Theme's colour": "สีของธีม",
   "Theme, audio, voice, overlay and privacy options.": "ตัวเลือกธีม เสียง เสียงพูด โอเวอร์เลย์ และความเป็นส่วนตัว",
   "Then Ctrl+click picks a pad without playing it": "แล้ว Ctrl+คลิก จะเลือกแพดโดยไม่เล่น",
-  "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "มันคิดว่าเพลงเป็นเสียงรบกวนพื้นหลังและตัดเสียงของคุณเป็นท่อนๆ Onion Board ปรับเสียงพูดของคุณให้สะอาดอยู่แล้ว",
   "This desktop has no system tray, so closing the window quits.": "เดสก์ท็อปนี้ไม่มีถาดระบบ การปิดหน้าต่างจึงเป็นการออกจากแอป",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "นี่คือ Onion Board {version} เมื่อติ๊กช่องนี้ แอปจะถาม GitHub ทุกสองสามชั่วโมงว่ามีเวอร์ชันใหม่ออกหรือยัง และแจ้งให้คุณทราบ (พร้อมแบนเนอร์ถ้าเป็นการแก้ไขสำคัญ) สำเนานี้รันจากซอร์สโค้ด จึงทำได้แค่แจ้งคุณ: อัปเดตด้วย git pull",
   "Through a proxy": "ผ่านพร็อกซี",
@@ -4654,5 +4653,13 @@
   "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Onion Board เพิ่มตัวช่วยเล็กๆ ใน Windows (งานที่ทำงานในฐานะ SYSTEM) เพื่อติดตั้งและซ่อมแซมเอฟเฟกต์ไมค์ได้โดยที่ Windows ไม่ต้องขออนุญาตทุกครั้ง เอาเครื่องหมายออกเพื่อลบตัวช่วยนี้",
   "The helper is removed. Windows asks for permission each time now.": "ลบตัวช่วยแล้ว จากนี้ Windows จะขออนุญาตทุกครั้ง",
   "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "ตัวช่วยยังอยู่ จึงไม่มีอะไรเปลี่ยน ลองอีกครั้งแล้วคลิก <b>ใช่</b> เมื่อ Windows ถาม",
-  "Wait until the mic effect is done, then try again.": "รอให้เอฟเฟกต์ไมค์ทำงานเสร็จก่อน แล้วลองอีกครั้ง"
+  "Wait until the mic effect is done, then try again.": "รอให้เอฟเฟกต์ไมค์ทำงานเสร็จก่อน แล้วลองอีกครั้ง",
+  "<b>Clean mic</b> is on: it takes background noise out of your voice instead, and never touches your sounds.": "<b>ไมค์ไร้เสียงรบกวน</b> เปิดอยู่: มันจะตัดเสียงรบกวนพื้นหลังออกจากเสียงพูดของคุณแทน และไม่แตะต้องเสียงเอฟเฟกต์ของคุณเลย",
+  "Bun swaps Discord's noise filter for Clean mic, so your sounds don't get cut off.": "Bun จะเปลี่ยนตัวกรองเสียงรบกวนของ Discord เป็นไมค์ไร้เสียงรบกวน เพื่อให้เสียงของคุณไม่ถูกตัดออก",
+  "Bun swaps Discord's noise filter for Clean mic, then shows you which mic to pick.": "Bun จะเปลี่ยนตัวกรองเสียงรบกวนของ Discord เป็นไมค์ไร้เสียงรบกวน แล้วบอกว่าต้องเลือกไมค์ตัวไหน",
+  "Bun turned on <b>Clean mic</b> in place of Discord's noise filter: it takes background noise out of your voice and never touches your sounds.": "Bun เปิด<b>ไมค์ไร้เสียงรบกวน</b>แทนตัวกรองเสียงรบกวนของ Discord แล้ว: มันตัดเสียงรบกวนพื้นหลังออกจากเสียงพูดของคุณ และไม่แตะต้องเสียงเอฟเฟกต์ของคุณเลย",
+  "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "Bun จะเปิดไมค์ไร้เสียงรบกวนในแท็บเสียงพูดแทน: มันตัดเสียงรบกวนพื้นหลังออกจากเสียงพูดของคุณ และไม่แตะต้องเสียงเอฟเฟกต์ของคุณเลย",
+  "Open Clean mic": "เปิดไมค์ไร้เสียงรบกวน",
+  "They think music is background noise and cut your sounds up.": "มันคิดว่าเพลงเป็นเสียงรบกวนพื้นหลังและตัดเสียงของคุณเป็นท่อนๆ",
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "ยังอยากให้เสียงรบกวนพื้นหลังหายไปอยู่ไหม? เปิด<b>ไมค์ไร้เสียงรบกวน</b>ในแท็บ<b>เสียงพูด</b>ของ Onion Board แทน: มันทำให้เสียงพูดของคุณสะอาด และไม่แตะต้องเสียงเอฟเฟกต์ของคุณเลย"
 }

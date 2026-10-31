@@ -1192,7 +1192,6 @@
   "Theme's colour": "थीम का रंग",
   "Theme, audio, voice, overlay and privacy options.": "थीम, ऑडियो, आवाज़, ओवरले और प्राइवेसी के विकल्प।",
   "Then Ctrl+click picks a pad without playing it": "फिर Ctrl+क्लिक किसी पैड को बिना चलाए चुनता है",
-  "They think music is background noise and cut your sounds up. Onion Board already cleans up your voice.": "वे म्यूज़िक को बैकग्राउंड शोर समझते हैं और आपके साउंड काट देते हैं। Onion Board पहले से आपकी आवाज़ साफ़ करता है।",
   "This desktop has no system tray, so closing the window quits.": "इस डेस्कटॉप में सिस्टम ट्रे नहीं है, इसलिए विंडो बंद करने पर ऐप बंद हो जाता है।",
   "This is Onion Board {version}. With the box ticked it asks GitHub every few hours whether a newer version is out and tells you (with a banner if it's an important fix). This copy runs from source, so it only tells you: update it with git pull.": "यह Onion Board {version} है। बॉक्स पर टिक होने पर यह हर कुछ घंटों में GitHub से पूछता है कि कोई नया वर्शन आया है या नहीं, और आपको बताता है (ज़रूरी फ़िक्स हो तो बैनर के साथ)। यह कॉपी सोर्स से चलती है, इसलिए यह सिर्फ़ बताती है: इसे git pull से अपडेट करें।",
   "Through a proxy": "प्रॉक्सी से",
@@ -4741,5 +4740,13 @@
   "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Onion Board, Windows में एक छोटा हेल्पर जोड़ता है (एक टास्क जो SYSTEM के रूप में चलता है), ताकि वह हर बार Windows की अनुमति के बिना माइक इफ़ेक्ट सेट अप और ठीक कर सके। इसे हटाने के लिए टिक हटाएँ।",
   "The helper is removed. Windows asks for permission each time now.": "हेल्पर हटा दिया गया। अब Windows हर बार अनुमति माँगेगा।",
   "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "हेल्पर अभी भी है, इसलिए कुछ नहीं बदला। फिर से कोशिश करें और Windows पूछे तो <b>हाँ</b> पर क्लिक करें।",
-  "Wait until the mic effect is done, then try again.": "माइक इफ़ेक्ट पूरा होने तक रुकें, फिर से कोशिश करें।"
+  "Wait until the mic effect is done, then try again.": "माइक इफ़ेक्ट पूरा होने तक रुकें, फिर से कोशिश करें।",
+  "<b>Clean mic</b> is on: it takes background noise out of your voice instead, and never touches your sounds.": "<b>साफ़ माइक</b> चालू है: इसकी जगह यह आपकी आवाज़ से बैकग्राउंड शोर हटाता है, और आपके साउंड को कभी नहीं छूता।",
+  "Bun swaps Discord's noise filter for Clean mic, so your sounds don't get cut off.": "Bun, Discord के शोर वाले फ़िल्टर की जगह साफ़ माइक लगाता है, ताकि आपके साउंड कटें नहीं।",
+  "Bun swaps Discord's noise filter for Clean mic, then shows you which mic to pick.": "Bun, Discord के शोर वाले फ़िल्टर की जगह साफ़ माइक लगाता है, फिर दिखाता है कि कौन-सा माइक चुनना है।",
+  "Bun turned on <b>Clean mic</b> in place of Discord's noise filter: it takes background noise out of your voice and never touches your sounds.": "Bun ने Discord के शोर वाले फ़िल्टर की जगह <b>साफ़ माइक</b> चालू किया: यह आपकी आवाज़ से बैकग्राउंड शोर हटाता है और आपके साउंड को कभी नहीं छूता।",
+  "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "उसकी जगह Bun वॉइस टैब पर साफ़ माइक चालू करता है: यह आपकी आवाज़ से बैकग्राउंड शोर हटाता है और आपके साउंड को कभी नहीं छूता।",
+  "Open Clean mic": "साफ़ माइक खोलें",
+  "They think music is background noise and cut your sounds up.": "वे म्यूज़िक को बैकग्राउंड शोर समझते हैं और आपके साउंड काट देते हैं।",
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "फिर भी बैकग्राउंड शोर हटाना है? उसकी जगह Onion Board के <b>वॉइस</b> टैब पर <b>साफ़ माइक</b> चालू करें: यह आपकी आवाज़ साफ़ करता है और आपके साउंड को कभी नहीं छूता।"
 }

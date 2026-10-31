@@ -74,9 +74,10 @@ def test_plan_keeps_what_is_reachable_and_drops_the_rest(tmp_path):
         assert keep not in names, keep
 
 
-def test_only_portaudio_builds_for_other_systems_go(tmp_path):
-    """sounddevice picks its PortAudio by the Python it runs in: the x64 build (and its
-    ASIO twin, for SD_ENABLE_ASIO) must stay, the 32-bit, ARM64 and macOS ones go."""
+def test_only_the_portaudio_build_the_app_loads_stays(tmp_path):
+    """sounddevice picks its PortAudio by the Python it runs in: the plain x64 build
+    must stay; the 32-bit, ARM64 and macOS ones go, and so do the ASIO ones (only
+    loaded with SD_ENABLE_ASIO, which the app never sets)."""
     import platform
     import sysconfig
     app = make_tree(tmp_path)
@@ -90,8 +91,8 @@ def test_only_portaudio_builds_for_other_systems_go(tmp_path):
     # what sounddevice loads in this Python, by its own rule
     plat = sysconfig.get_platform()
     suffix = "arm64" if "arm64" in plat or "aarch64" in plat else platform.architecture()[0]
-    for n in (f"libportaudio{suffix}.dll", f"libportaudio{suffix}-asio.dll"):
-        assert n not in pb.DROP_PORTAUDIO
+    assert f"libportaudio{suffix}.dll" not in pb.DROP_PORTAUDIO
+    assert "libportaudio64bit-asio.dll" in pb.DROP_PORTAUDIO
 
 
 def test_plan_reports_a_kept_file_that_would_lose_an_import(tmp_path):

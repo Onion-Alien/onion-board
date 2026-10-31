@@ -730,6 +730,11 @@
 .ob-vchip { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 12px 0 6px; border-radius: 13px; border: 1px solid var(--accent);
             color: var(--accent_text); font-weight: 600; white-space: nowrap; }
 .ob-vchip img { width: 18px; height: 18px; border-radius: 4px; }
+button.ob-vchip { background: none; cursor: pointer; padding-left: 10px; }
+.ob-cleanset { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 10px; background: var(--card); border: 1px solid var(--border); }
+.ob-cleanset .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.ob-cleanset input[type="range"] { max-width: 420px; }
+.ob-cleanm { display: grid; grid-template-columns: minmax(70px, 130px) minmax(0, 420px); justify-content: start; align-items: center; gap: 10px 12px; }
 .ob-fxpop { width: min(440px, calc(100% - 16px)); gap: 10px; }
 .ob-fxpop .tt { font-size: 14px; }
 .ob-fxpop .fxchips { display: flex; flex-wrap: wrap; gap: 8px; }

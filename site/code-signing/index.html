@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Code signing policy | Onion Board</title>
+<meta name="description" content="How Onion Board's Windows releases are built and signed, who can approve a release, and what the app sends over the network.">
+<meta property="og:title" content="Onion Board code signing policy">
+<meta property="og:description" content="How releases are built and signed, who approves them, and what the app sends.">
+<meta property="og:url" content="https://onionalien.com/onionboard/code-signing/">
+<meta property="og:site_name" content="Onion Board">
+<meta property="og:type" content="article">
+<link rel="icon" href="../favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/png" href="../favicon.png" sizes="192x192">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="theme-color" content="#0f1016">
+<link rel="canonical" href="https://onionalien.com/onionboard/code-signing/">
+<link rel="stylesheet" href="../base.css">
+<link rel="stylesheet" href="../guide.css">
+<script data-goatcounter="https://onionalien.goatcounter.com/count"
+        async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <nav><a href="../">← Onion Board</a></nav>
+
+  <h1>Code signing policy</h1>
+  <p class="lead">How Onion Board's Windows releases are built and signed, who can approve one, and what the app sends over the network.</p>
+
+  <div class="note"><b>Not signed yet.</b> Onion Board has applied for free code signing from SignPath Foundation. Until it's accepted, releases are unsigned, so Windows SmartScreen may warn when you run the installer. This page says how signing will work once it is.</div>
+
+  <h2>Who signs it</h2>
+  <p>Once accepted: free code signing provided by <a href="https://about.signpath.io/">SignPath.io</a>, certificate by <a href="https://signpath.org/">SignPath Foundation</a>.</p>
+  <p>Only Onion Board's own programs are signed: the installer (<code>OnionBoardSetup.exe</code>) and the app inside it. Other projects' files it ships with, such as Python and Qt, aren't signed by this project.</p>
+
+  <h2>How a release is built</h2>
+  <ul>
+    <li>Every release is built by the <a href="https://github.com/Onion-Alien/onion-board/blob/main/.github/workflows/release.yml">release workflow</a> on GitHub Actions, from the <a href="https://github.com/Onion-Alien/onion-board">public source code</a> at that release's tag. Nothing built on a personal PC is signed.</li>
+    <li>The build scripts and the workflow are part of the source, so anyone can see how each file was made.</li>
+    <li>Each signing request is approved by hand by an approver (below) before anything is signed.</li>
+    <li>Every release lists the SHA-256 of its files, so you can check that what you downloaded is what was built.</li>
+  </ul>
+
+  <h2>Team</h2>
+  <table>
+    <tr><th>Role</th><th>Who</th></tr>
+    <tr><td>Committers and reviewers: write the code and review every change from outside the team</td><td style="white-space: nowrap"><a href="https://github.com/Onion-Alien">Onion-Alien</a></td></tr>
+    <tr><td>Approvers: approve each signing request</td><td style="white-space: nowrap"><a href="https://github.com/Onion-Alien">Onion-Alien</a></td></tr>
+  </table>
+  <p>Onion Board has one maintainer. Changes from anyone else come in as pull requests and are reviewed before they're merged. Everyone on the team uses two-factor sign-in for GitHub and SignPath.</p>
+
+  <h2>Privacy</h2>
+  <p>Onion Board only goes online for the things you use that need it, such as searching for and downloading sounds, the radio, update checks and add-ons, plus an anonymous daily count you can switch off (in the installer, or Settings → Privacy &amp; security). The daily count never sends your IP address, your name, or anything about your PC beyond its Windows version.</p>
+  <p>What it sends and when, how to turn it off, what it changes on your PC and what the uninstaller removes: <a href="https://github.com/Onion-Alien/onion-board/blob/main/docs/PRIVACY.md">Privacy policy</a>. Every single connection, with the switch for each: <a href="https://github.com/Onion-Alien/onion-board/blob/main/SECURITY.md#what-the-app-does-on-the-network">What the app does on the network</a>. Settings → Connection → <b>Network activity</b> lists each one live while the app runs, and <b>Offline mode</b> stops them all.</p>
+
+  <footer>
+    <a href="../">Onion Board</a> ·
+    <a href="https://github.com/Onion-Alien/onion-board">Source code</a> ·
+    <a href="https://github.com/Onion-Alien/onion-board/releases">All versions</a> ·
+    <a href="https://discord.gg/FhKGaWCWHM">Join the Discord</a> ·
+    <a href="https://tally.so/r/rjxjyM">Send feedback</a><br>
+    Onion Board sends an anonymous daily count, which you can switch off. It never sends your IP address, your name, or anything about your PC beyond its Windows version. This site counts visits without cookies.
+  </footer>
+</div>
+<script src="../zoom.js" defer></script>
+</body>
+</html>
