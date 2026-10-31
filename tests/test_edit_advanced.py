@@ -28,12 +28,13 @@ def test_switching_keeps_the_draft_and_gives_everything_back(window):  # noqa: F
     d.show()
     before = d.effects.fx()
     d.switch.advanced.click()
-    assert d.advanced() and d.tabs.isHidden() and d.width() > 700
+    assert d.advanced() and d.tabs.isHidden() and not d.adv.isHidden()
     trim = d.effects.trim
     assert d.effects.trim_layout is d.adv.trim_box and trim.wave.big
     assert d.effects.fx() == before                     # nothing lost on the way
     d.adv.switch.simple.click()
-    assert not d.advanced() and not d.tabs.isHidden() and d.width() < 700
+    assert not d.advanced() and not d.tabs.isHidden()
+    assert d.minimumWidth() == d._simple_min_w()       # Simple's own size limits again
     assert d.tabs.currentIndex() == 1                   # back on the tab it left
     assert [d.tabs.tabText(i) for i in range(d.tabs.count())] == [
         "Sound", "Trim && speed", "Effects", "Equalizer"]

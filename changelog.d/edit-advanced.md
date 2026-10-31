@@ -6,3 +6,5 @@
 - Edit sound has Undo and Redo for the trim, effects and fades (Ctrl+Z, and Ctrl+Shift+Z or
   Ctrl+Y).
 - Edit sound's Preset and Voice boxes now line up.
+- Live controls show a playing sound's unsaved Edit sound changes while they're what plays
+  (they showed its saved effects until Save).

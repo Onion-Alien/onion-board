@@ -352,7 +352,7 @@ class EditControl(Controller):
         base = soundfx.NO_LIVE_VIEW
         if (sid is not None and m is not None and sid != LINK_ID
                 and mw.engine.state(sid) is not None):
-            base = soundfx.live_view(m.fx)
+            base = soundfx.live_view(self._playing_fx(sid, m))
         if base == soundfx.NO_LIVE_VIEW:
             sid = None
         if not force and (sid, base) == (self._pad, self._pad_base):
@@ -368,6 +368,16 @@ class EditControl(Controller):
         sp.load(e.sound_speed * speed, e.sound_pitch + pitch, e.sound_keep_pitch,
                 livefx.clean(amounts))
         sp.set_target(m.name if sid is not None and m is not None else None)
+
+    def _playing_fx(self, sid: str, m: SoundMeta) -> dict:
+        """The effects `sid` plays with now: its Edit sound window's unsaved ones while
+        they're what plays (_live_apply swapped them in), else the saved ones."""
+        d, live = self._editors.get(sid), self._live.get(sid)
+        if d is not None and qt_valid(d) and live is not None:
+            draft = d.effects.fx()
+            if soundfx.key(draft) == live.key:
+                return draft
+        return m.fx
 
     def speed_changed(self, speed: float, pitch: float, keep: bool):
         """Live controls' speed or pitch, less what the playing pad has of its own."""
