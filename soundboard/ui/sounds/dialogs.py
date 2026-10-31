@@ -3,12 +3,13 @@
 effect, modules' included) and the EQ tab."""
 from __future__ import annotations
 
+import json
 import logging
 import threading
 
-from PySide6.QtCore import QObject, Qt, Signal
-from PySide6.QtGui import QFont, QImage
-from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox,
+from PySide6.QtCore import QObject, QSize, Qt, QTimer, Signal
+from PySide6.QtGui import QFont, QImage, QKeySequence, QShortcut
+from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QComboBox,
                                QDialog, QDialogButtonBox, QFrame, QGridLayout,
                                QHBoxLayout, QInputDialog, QLabel, QLineEdit,
                                QMessageBox, QProgressBar,
@@ -26,6 +27,7 @@ from soundboard.sounds.library import (MAX_COOLDOWN_S, MAX_DELAY_S, PAD_COLORS,
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import (EqPanel, hint_label, icon_button, reset_button,
                                      section_label, steady_number)
+from soundboard.ui.sounds.editadvanced import WIDE_PX, AdvancedView, ModeSwitch
 from soundboard.ui.sounds.trim import TrimPanel
 from soundboard.ui.voice.voicefxpanel import ADDON_GROUP, GROUPS, EffectRow, ParamSlider
 from soundboard.ui.kit.plaintext import plain_tip
@@ -37,6 +39,10 @@ from soundboard.ui.sounds.editdialogparts import PIC_H, PIC_W  # noqa: F401
 from soundboard.ui.sounds.editdialogparts import EditDialogParts
 
 log = logging.getLogger(__name__)
+HISTORY_MS = 400      # changes this close together are one Undo step (a drag)
+HISTORY_STEPS = 200   # Undo goes this far back
+ADV_W, ADV_H = 1320, 880       # the Advanced window, when the screen has room
+ADV_MIN_W, ADV_MIN_H = 720, 600
 
 CUSTOM = "Custom"   # the preset box's item data when no preset matches
 MINE = "mine:"      # before your own presets' names in the preset box's item data
@@ -68,6 +74,7 @@ class EffectsPanel(QObject):
     and gives back the new one, or None if it was cancelled. The sound keeps a copy."""
     changed = Signal()
     peaks_read = Signal(int, object)   # (trim generation, peaks) from the waveform worker
+    trim_replaced = Signal()           # set_sound made a new `trim` (Advanced re-hooks it)
 
     def __init__(self, fx: dict | None, meta: SoundMeta | None = None, pick_voice=None):
         super().__init__()
@@ -76,12 +83,23 @@ class EffectsPanel(QObject):
         self.peaks_read.connect(self._on_peaks)
         self._voice: dict = {}
         self._live: list = []
+        self.compact = False   # Advanced: only the effects that are on (set_compact)
+        self._folded_here: set = set()   # the cards set_compact folded
         self.trim_page, tv = _page()
         self.fx_page, v = _page()
         self.eq_page, ev = _page()
 
+        # Preset, Voice and Live controls: their names in one column, so the boxes
+        # after them start level whatever the language
+        top = QGridLayout()
+        top.setContentsMargins(0, 0, 0, 0)
+        top.setHorizontalSpacing(8)
+        top.setVerticalSpacing(8)
+        top.setColumnStretch(1, 1)
+        v.addLayout(top)
         prow = QHBoxLayout()
-        prow.addWidget(QLabel(_("Preset")))
+        top.addWidget(QLabel(_("Preset")), 0, 0)
+        top.addLayout(prow, 0, 1)
         self.preset = QComboBox()
         self.mine: dict[str, dict] = {}   # your own presets (audio/mypresets.py)
         self._fill_presets()
@@ -104,7 +122,6 @@ class EffectsPanel(QObject):
         self.delete_preset.hide()
         prow.addWidget(self.delete_preset)
         prow.addStretch(1)
-        v.addLayout(prow)
         # a deleted preset can come back until the dialog closes
         self.undo_row = QWidget()
         urow = QHBoxLayout(self.undo_row)
@@ -120,10 +137,11 @@ class EffectsPanel(QObject):
         urow.addStretch(1)
         self.undo_row.hide()
         self._deleted: tuple[str, int, dict] | None = None
-        v.addWidget(self.undo_row)
+        top.addWidget(self.undo_row, 1, 1)
 
         vrow = QHBoxLayout()
-        vrow.addWidget(QLabel(_("Voice")))
+        top.addWidget(QLabel(_("Voice")), 2, 0)
+        top.addLayout(vrow, 2, 1)
         self.voice = QPushButton()
         self.voice.setToolTip(_("Says this sound in a voice from the Voice tab, the way your "
                                 "mic sounds with it: a voice changer voice, an AI voice or "
@@ -137,14 +155,15 @@ class EffectsPanel(QObject):
         self.voice_off.clicked.connect(lambda: self.set_voice({}))
         vrow.addWidget(self.voice_off)
         vrow.addStretch(1)
-        v.addLayout(vrow)
 
         # Live controls' effects on a pad saved from them (soundfx.with_live): shown
         # here so they can be taken off; their knobs stay in Live controls
         self.live_row = QWidget()
         lrow = QHBoxLayout(self.live_row)
         lrow.setContentsMargins(0, 0, 0, 0)
-        lrow.addWidget(QLabel(_("Live controls")))
+        self.live_name = QLabel(_("Live controls"))
+        top.addWidget(self.live_name, 3, 0)
+        top.addWidget(self.live_row, 3, 1)
         self.live_text = QLabel()
         self.live_text.setObjectName("muted")
         self.live_text.setWordWrap(True)
@@ -153,10 +172,12 @@ class EffectsPanel(QObject):
         live_off.clicked.connect(self._live_off)
         lrow.addWidget(live_off)
         self.live_row.hide()
-        v.addWidget(self.live_row)
+        self.live_name.hide()
 
-        tv.addWidget(section_label(_("Trim")))
+        self.trim_head = section_label(_("Trim"))
+        tv.addWidget(self.trim_head)
         self._v = tv
+        self.trim_layout = tv   # where the trim is: here, or Advanced's editor (it moves it)
         self.trim_hint = hint_label(_("Trimming works once the sound has loaded."))
         # it only picks the part that plays: someone hunted for the cut file
         self.trim_kept = hint_label(_("Your file stays whole: only the part between the "
@@ -200,14 +221,30 @@ class EffectsPanel(QObject):
             self.rows[etype] = row
         # in Edit voice's groups, so the long list reads in parts; add-ons' last
         grouped = {t for _t, types in GROUPS for t in types}
+        self.groups: list[tuple[QLabel, list[EffectRow]]] = []   # (heading, its rows)
         for title, types in (*GROUPS,
                              (ADDON_GROUP, [t for t in self.rows if t not in grouped])):
             rows = [self.rows[t] for t in types if t in self.rows]
             if rows:
-                v.addWidget(section_label(title))
+                head = section_label(title)
+                v.addWidget(head)
+                self.groups.append((head, rows))
             for row in rows:
                 v.addWidget(row)
-        v.addWidget(hint_label(_("Effects from add-on modules show up here too.")))
+        self.addon_hint = hint_label(_("Effects from add-on modules show up here too."))
+        v.addWidget(self.addon_hint)
+        # Advanced: right after the effects that are on, a button to add one more
+        self.none_on = hint_label(_("No effects on yet."))
+        self.none_on.hide()
+        v.addWidget(self.none_on)
+        self.add_effect = QPushButton(_("Add effect"))
+        icons.set_icon(self.add_effect, "plus", size=14)
+        self.add_effect.setToolTip(_("Pick an effect to turn on"))
+        self.add_effect.hide()
+        arow = QHBoxLayout()
+        arow.addWidget(self.add_effect)
+        arow.addStretch(1)
+        v.addLayout(arow)
         v.addStretch(1)
 
         self.load(fx or {})
@@ -233,9 +270,9 @@ class EffectsPanel(QObject):
                 busy.emit(self.peaks_read, gen, original_peaks(meta)[0])
             threading.Thread(target=work, daemon=True, name="edit-waveform").start()
         if at < 0:
-            self._v.addWidget(trim)     # in the layout first: shown with no parent,
+            self.trim_layout.addWidget(trim)   # in the layout first: shown with no parent,
         else:
-            self._v.insertWidget(at, trim)
+            self.trim_layout.insertWidget(at, trim)
         trim.setVisible(length > 0)     # it flashed up as a window of its own
         self.trim_hint.setVisible(length <= 0)
         self.trim_kept.setVisible(length > 0)
@@ -249,12 +286,57 @@ class EffectsPanel(QObject):
     def set_sound(self, meta: SoundMeta):
         """Show another sound (Edit sound reused, EditControl.edit): its trim and fx."""
         old = self.trim
-        self.trim = self._new_trim(meta, self._v.indexOf(old))
-        self._v.removeWidget(old)
+        self.trim = self._new_trim(meta, self.trim_layout.indexOf(old))
+        self.trim_layout.removeWidget(old)
         old.hide()
         old.deleteLater()
         self.load(meta.fx or {})
         self._matching_preset()
+        if self.compact:
+            self.set_compact(True)
+        self.trim_replaced.emit()
+
+    def set_compact(self, on: bool):
+        """Advanced's Effects column: only the effects that are on now (Add effect brings
+        in more), no group headings. One switched off there stays until the next time
+        the list is drawn, so a slip of the mouse doesn't make it vanish."""
+        self.compact = on
+        shown = 0
+        for head, rows in self.groups:
+            for row in rows:
+                row.setVisible(not on or row.chk.isChecked())
+                shown += row.chk.isChecked()
+            head.setVisible(not on)
+        # two or more on: folded to their names, so they and Add effect fit (as they
+        # were, back in Simple)
+        for row in self.rows.values():
+            if on and shown > 1 and row.chk.isChecked() and not row._folded:
+                row.set_folded(True)
+                self._folded_here.add(row)
+            elif not on and row in self._folded_here:
+                row.set_folded(False)
+        if not on:
+            self._folded_here.clear()
+        self.addon_hint.setVisible(not on)
+        self.none_on.setVisible(on and not shown)
+        self.add_effect.setVisible(on)
+
+    def turn_on(self, etype: str, on: bool = True):
+        """Add effect's tile: switch `etype` on (open, in view) or off."""
+        row = self.rows.get(etype)
+        if row is None:
+            return
+        row.chk.setChecked(on)   # (its changed signal edits the fx)
+        if on:
+            row.setVisible(True)
+            row.set_folded(False)
+            self.none_on.hide()
+        elif self.compact:
+            row.setVisible(False)
+            self.none_on.setVisible(not self.on_count())
+
+    def on_count(self) -> int:
+        return sum(r.chk.isChecked() for r in self.rows.values())
 
     def load(self, fx: dict):
         f = soundfx.clean(fx)
@@ -288,6 +370,7 @@ class EffectsPanel(QObject):
             for q in livefx.PARAMS if q.key in st)
             for st in self._live))
         self.live_row.setVisible(bool(self._live))
+        self.live_name.setVisible(bool(self._live))
 
     def _live_off(self):
         self._live = []
@@ -465,12 +548,14 @@ class EditDialog(EditDialogParts, QDialog):
     picture_fetched = Signal(int, object, str)   # (which try, QImage or None, why not)
     source_forgotten = Signal()   # Details → Delete info: saved at once, Save or Cancel
     effects_reset = Signal()      # Reset effects: a playing sound goes plain at once
+    advanced_changed = Signal(bool)   # the Simple | Advanced switch was clicked
 
     def __init__(self, meta: SoundMeta, hotkeys: Hotkeys, preview_cb, parent=None,
                  tab: str = "sound", others=None, pick_voice=None, save_hook=None,
-                 stop_render=None):
+                 stop_render=None, advanced: bool = False):
         """save_hook(dialog) -> True when Save was handled and the window stays open (a
-        slow render, shown here: show_render); stop_render(sid): its ✕."""
+        slow render, shown here: show_render); stop_render(sid): its ✕. `advanced`:
+        open in the Advanced view (ui/sounds/editadvanced.py)."""
         super().__init__(parent)
         self.save_hook, self.stop_cb = save_hook, stop_render
         fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
@@ -481,9 +566,15 @@ class EditDialog(EditDialogParts, QDialog):
         self.hotkey = meta.hotkey
         self.color = meta.color
         self.as_copy = False
-        lay = QVBoxLayout(self)
+        lay = self._lay = QVBoxLayout(self)
         self.tabs = QTabWidget()
         lay.addWidget(self.tabs, 1)
+        self.switch = ModeSwitch(False, slim=True)   # Simple | Advanced, by the tabs
+        self.switch.picked.connect(self._switch_picked)
+        self.tabs.setCornerWidget(self.switch, Qt.Corner.TopRightCorner)
+        self.adv: AdvancedView | None = None   # made the first time Advanced is picked
+        self._simple_size: QSize | None = None
+        self._simple_page = 0   # the tab Simple showed when Advanced was picked
 
         # three cards: how the pad looks, how it plays, its timings. Labels share one
         # column width across the cards so the fields line up down the page.
@@ -705,6 +796,17 @@ class EditDialog(EditDialogParts, QDialog):
         self.tabs.currentChanged.connect(
             lambda i: i >= 1 and usage.used("pad-effects"))   # the name only (usage.py)
         self.tabs.setCurrentIndex(self._tab_index(tab))
+        self.effects.trim_replaced.connect(lambda: self.adv and self.adv.retrim())
+
+        # Undo / Redo (the system's keys: Ctrl+Z, Ctrl+Shift+Z or Ctrl+Y) for the trim,
+        # the effects and the fades; a drag is one step. A text box keeps its own.
+        self._history: list[tuple[str, int, int]] = []
+        self._hpos = 0
+        self._restoring = False
+        self._htimer = QTimer(self)
+        self._htimer.setSingleShot(True)
+        self._htimer.setInterval(HISTORY_MS)
+        self._htimer.timeout.connect(self._record)
 
         # what the effects add up to, on its own line (hidden when there are none)
         self.fx_note = QLabel()
@@ -820,8 +922,16 @@ class EditDialog(EditDialogParts, QDialog):
         rl.addLayout(close_row)
         rend.hide()
         lay.addWidget(rend)
-        self.setMinimumWidth(500)
-        self.resize(540, 640)
+        self.setMinimumWidth(self._simple_min_w())
+        self.resize(max(540, self.minimumWidth()), 640)
+        self.effects.changed.connect(self._note_change)
+        self.fade_in.valueChanged.connect(self._note_change)
+        self.fade_out.valueChanged.connect(self._note_change)
+        QShortcut(QKeySequence.StandardKey.Undo, self, self.undo)
+        QShortcut(QKeySequence.StandardKey.Redo, self, self.redo)
+        self._remember()
+        if advanced:
+            self.set_advanced(True)
 
 
     def load(self, meta: SoundMeta, tab: str = "sound"):
@@ -860,13 +970,153 @@ class EditDialog(EditDialogParts, QDialog):
         self._saying = False
         self._said = getattr(self, "_said", 0) + 1   # a "Playing" still timing out
         self._fx_note()
-        self.tabs.setCurrentIndex(self._tab_index(tab))
+        self.show_tab(tab)
+        self._remember()
 
     TABS = ("sound", "trim", "effects", "eq")
 
     @classmethod
     def _tab_index(cls, tab: str) -> int:
         return cls.TABS.index(tab) if tab in cls.TABS else 0
+
+    def show_tab(self, tab: str):
+        """Bring `tab` ("sound", "trim", "effects", "eq") into view, in either view."""
+        i = self._tab_index(tab)
+        if self.adv is not None and self.advanced():
+            if i:
+                self.adv.show_page(i - 1)
+        else:
+            self.tabs.setCurrentIndex(i)
+
+    # ------------------------------------------------------------------ Advanced
+    def advanced(self) -> bool:
+        return self.adv is not None and not self.adv.isHidden()
+
+    def _switch_picked(self, on: bool):
+        if on != self.advanced():
+            self.set_advanced(on)
+            self.advanced_changed.emit(on)
+
+    def set_advanced(self, on: bool):
+        """The Advanced view (a bigger window, everything at once) or the Simple one
+        (the tabs). The same widgets move between them, so nothing is lost."""
+        if on == self.advanced():
+            return
+        screen = (self.screen() or QApplication.primaryScreen()).availableGeometry()
+        if on:
+            if self.adv is None:
+                self.adv = AdvancedView(self)
+                self.adv.switch.picked.connect(self._switch_picked)
+                self._lay.insertWidget(self._lay.indexOf(self.tabs) + 1, self.adv, 1)
+            self._simple_size = self.size()
+            page = self._simple_page = self.tabs.currentIndex()
+            for scroll in self._fx_scrolls:
+                self.tabs.removeTab(self.tabs.indexOf(scroll))
+            w = min(ADV_W, screen.width() - 48)
+            h = min(ADV_H, screen.height() - 48)
+            self.tabs.hide()
+            self.adv.attach(self._fx_scrolls, w >= WIDE_PX)
+            self.adv.show()
+            self.setMinimumSize(ADV_MIN_W, ADV_MIN_H)
+            self.resize(w, h)
+            if page:
+                self.adv.show_page(page - 1)
+        else:
+            assert self.adv is not None
+            # back on the page in view (narrow), else the one you left
+            page = (self.adv.tabs.currentIndex() + 1 if not self.adv.wide
+                    else getattr(self, "_simple_page", 0))
+            self.adv.detach()
+            self.adv.hide()
+            for scroll, title in zip(self._fx_scrolls, self.page_titles()):
+                self.tabs.addTab(scroll, title)   # (the tabs show one at a time)
+            self.tabs.setCurrentIndex(page)
+            self.tabs.show()
+            self.setMinimumSize(self._simple_min_w(), 0)
+            self.resize(self._simple_size or QSize(max(540, self.minimumWidth()), 640))
+        self.switch.set_advanced(on)
+        if self.adv is not None:
+            self.adv.switch.set_advanced(on)
+        if self.isVisible():   # all of it on the screen
+            g = self.frameGeometry()
+            x = min(max(g.x(), screen.left()), screen.right() - g.width())
+            y = min(max(g.y(), screen.top()), screen.bottom() - g.height())
+            self.move(max(x, screen.left()), max(y, screen.top()))
+
+    def _simple_min_w(self) -> int:
+        """Simple's least width: its four tabs and the switch beside them, whole (long
+        languages too: the tabs got scroll arrows), and never under 500."""
+        m = self._lay.contentsMargins()
+        need = (self.tabs.tabBar().sizeHint().width() + self.switch.sizeHint().width()
+                + 16 + m.left() + m.right())
+        return max(500, need)
+
+    @staticmethod
+    def page_titles() -> tuple[str, str, str]:
+        """The tabs after Sound, as the Simple view names them."""
+        return (_("Trim & speed").replace("&", "&&"), _("Effects"), _("Equalizer"))
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        try:   # (nothing in a Qt override may raise: AGENT-RULES *Async results*)
+            if self.adv is not None and self.advanced():
+                self.adv.set_wide(self.width() >= WIDE_PX)
+        except Exception:  # noqa: BLE001
+            log.debug("Advanced re-layout failed", exc_info=True)
+
+    # ------------------------------------------------------------------ undo / redo
+    def _snap(self) -> tuple[str, int, int]:
+        return (json.dumps(self.effects.fx(), sort_keys=True),
+                self.fade_in.value(), self.fade_out.value())
+
+    def _remember(self):
+        """Start the history afresh (a sound opened): how it is now is the first step."""
+        self._htimer.stop()
+        self._history, self._hpos = [self._snap()], 0
+
+    def _note_change(self, *_a):
+        if not self._restoring:
+            self._htimer.start()   # a drag's many changes: one step when it settles
+
+    def _record(self):
+        snap = self._snap()
+        if snap == self._history[self._hpos]:
+            return
+        del self._history[self._hpos + 1:]
+        self._history.append(snap)
+        del self._history[:-HISTORY_STEPS]
+        self._hpos = len(self._history) - 1
+
+    def _flush(self):
+        if self._htimer.isActive():
+            self._htimer.stop()
+            self._record()
+
+    def undo(self):
+        self._flush()
+        if self._hpos > 0:
+            self._hpos -= 1
+            self._restore(self._history[self._hpos])
+
+    def redo(self):
+        self._flush()
+        if self._hpos < len(self._history) - 1:
+            self._hpos += 1
+            self._restore(self._history[self._hpos])
+
+    def _restore(self, snap: tuple[str, int, int]):
+        fx, fade_in, fade_out = snap
+        self._restoring = True
+        try:
+            self.effects.load(json.loads(fx))
+            self.effects._matching_preset()
+            if self.effects.compact:
+                self.effects.set_compact(True)
+            self.fade_in.setValue(fade_in)
+            self.fade_out.setValue(fade_out)
+            self.effects.changed.emit()   # the summary, Reset's glow, a playing sound
+        finally:
+            self._restoring = False
 
 
     def fades(self) -> tuple[float, float]:

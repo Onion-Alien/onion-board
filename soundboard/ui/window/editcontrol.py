@@ -135,7 +135,7 @@ class EditControl(Controller):
         d = self._editors.get(sid)
         if d is not None and qt_valid(d):
             if tab != "sound":
-                d.tabs.setCurrentIndex(d._tab_index(tab))
+                d.show_tab(tab)
             d.showNormal() if d.isMinimized() else d.show()
             d.raise_()
             d.activateWindow()
@@ -146,6 +146,7 @@ class EditControl(Controller):
         # a closed one shows this sound instead: building one took ~200 ms every time
         d, mw.setctl._spare_editor = mw.setctl._spare_editor, None
         if d is not None and qt_valid(d):
+            d.set_advanced(bool(getattr(mw.cfg, "edit_advanced", False)))   # as picked last
             d.load(m, tab)
         else:
             d = self._new_editor(m, tab)
@@ -236,8 +237,10 @@ class EditControl(Controller):
         mw = self.mw
         d = EditDialog(m, mw.hotkeys, mw.playctl.preview, mw, tab=tab,
                        others=lambda: list(mw._meta.values()), pick_voice=self.pick_voice,
-                       save_hook=self._save_open, stop_render=self.stop_render)
+                       save_hook=self._save_open, stop_render=self.stop_render,
+                       advanced=bool(getattr(mw.cfg, "edit_advanced", False)))
         d.hotkeys_changed.connect(mw.hkctl.register_hotkeys)
+        d.advanced_changed.connect(lambda on: mw.set_option("edit_advanced", on))
         d.source_forgotten.connect(mw._save_now)
         d.finished.connect(lambda ok, d=d: self._edit_done(d.meta.id, d, ok))
         d.effects.changed.connect(lambda d=d: self._fx_edited(d))
@@ -349,7 +352,7 @@ class EditControl(Controller):
         base = soundfx.NO_LIVE_VIEW
         if (sid is not None and m is not None and sid != LINK_ID
                 and mw.engine.state(sid) is not None):
-            base = soundfx.live_view(m.fx)
+            base = soundfx.live_view(self._playing_fx(sid, m))
         if base == soundfx.NO_LIVE_VIEW:
             sid = None
         if not force and (sid, base) == (self._pad, self._pad_base):
@@ -365,6 +368,16 @@ class EditControl(Controller):
         sp.load(e.sound_speed * speed, e.sound_pitch + pitch, e.sound_keep_pitch,
                 livefx.clean(amounts))
         sp.set_target(m.name if sid is not None and m is not None else None)
+
+    def _playing_fx(self, sid: str, m: SoundMeta) -> dict:
+        """The effects `sid` plays with now: its Edit sound window's unsaved ones while
+        they're what plays (_live_apply swapped them in), else the saved ones."""
+        d, live = self._editors.get(sid), self._live.get(sid)
+        if d is not None and qt_valid(d) and live is not None:
+            draft = d.effects.fx()
+            if soundfx.key(draft) == live.key:
+                return draft
+        return m.fx
 
     def speed_changed(self, speed: float, pitch: float, keep: bool):
         """Live controls' speed or pitch, less what the playing pad has of its own."""

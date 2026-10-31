@@ -233,3 +233,41 @@ def test_live_view_reads_the_sounds_own_effects():
                                                  "distortion": {"on": True, "drive": 18.0},
                                                  "reverb": {"on": False, "mix": 0.9}}})
     assert (speed, pitch) == (1.5, 2.0) and knobs == {"echo": 0.4, "crunch": 0.5}
+
+
+def test_live_controls_show_an_advanced_edit_as_it_plays(live, qapp, monkeypatch):
+    """Reverb turned on with Add effect in the Advanced view plays at once; Live controls
+    show it while it plays unsaved, after Save, and the saved sound again after Cancel."""
+    win, d, saved, made, swaps, _stops = live
+    monkeypatch.setattr(win.engine, "playing", lambda: {"s0": (0.4, False)})
+    win.current = None
+    sp = win.speed_btn
+    d.switch.advanced.click()
+    d.effects.turn_on("reverb")                  # (Add effect's tile)
+    win.editctl._live_now()
+    qapp.processEvents()
+    assert swaps[-1] == ("s0", made)             # it plays with it, not saved yet
+    sp._open()
+    assert sp.fx_values().get("reverb", 0) > 0   # the knobs show what plays
+    d.accept()
+    qapp.processEvents()
+    assert win.meta("s0").fx["effects"]["reverb"]["on"]
+    win.editctl._pad_follow(force=True)
+    assert sp.fx_values().get("reverb", 0) > 0
+    sp.pop.hide()
+
+
+def test_live_controls_go_back_with_a_cancelled_edit(live, qapp, monkeypatch):
+    win, d, saved, made, swaps, _stops = live
+    monkeypatch.setattr(win.engine, "playing", lambda: {"s0": (0.4, False)})
+    win.current = None
+    sp = win.speed_btn
+    d.effects.turn_on("reverb")
+    win.editctl._live_now()
+    sp._open()
+    assert sp.fx_values().get("reverb", 0) > 0
+    d.reject()                                   # not saved: back to what was saved
+    qapp.processEvents()
+    win.editctl._pad_follow(force=True)
+    assert "reverb" not in sp.fx_values() and win.audio["s0"] is saved
+    sp.pop.hide()
