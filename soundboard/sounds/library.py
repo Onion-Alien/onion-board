@@ -57,8 +57,8 @@ from soundboard.sounds.cachefiles import (  # noqa: F401
     render_cached, REVERSE_CHUNK, store_cached, unlink_cache)
 from soundboard.sounds.decoding import (  # noqa: F401
     decode, decode_int16, _ffmpeg, _ffmpeg_source, FFMPEG_TIMEOUT, _ffmpeg_words, load_original,
-    load_sound, MAX_SECONDS, MP3_QUALITY, original_frames, original_peaks, PEAK_CHUNK, PEAK_READS,
-    _read, _sf_pieces, stored_ext, _stream, STREAM_S, write_stored)
+    load_sound, MAX_SECONDS, MP3_QUALITY, original_frames, original_length, original_peaks,
+    PEAK_CHUNK, PEAK_READS, _read, _sf_pieces, stored_ext, _stream, STREAM_S, write_stored)
 from soundboard.sounds.files import (  # noqa: F401
     delete_file, discard, DOWNLOADS, duplicate, file_stem, fingerprint, _folder_of, import_file,
     loose_sounds, MY_SOUNDS, new_file, owns, RECORDINGS, recycle, save_clip, site_folder, _SITES,

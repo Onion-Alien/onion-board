@@ -38,6 +38,7 @@ def test_an_app_card_sending_one_way_shows_its_list_inside_the_card(qapp):
 
 
 def test_editing_a_loaded_sound_shows_its_trim_inside_the_dialog(qapp, monkeypatch):
+    monkeypatch.setattr(dialogs, "original_length", lambda m: 3.0)
     monkeypatch.setattr(dialogs, "original_peaks", lambda m: (np.zeros(40), 3.0))
     made = []
     assert windows_shown(qapp, lambda: made.append(dialogs.EffectsPanel(

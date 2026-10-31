@@ -38,6 +38,10 @@ class Waveform(QWidget):
         self.setToolTip(_("Drag the handles to cut off the start and end. Only the part between "
                           "them plays."))
 
+    def set_peaks(self, peaks: np.ndarray | Sequence[float]):
+        self.peaks = peaks
+        self.update()
+
     def set_range(self, start: float, end: float):
         self.start, self.end = start, end
         self.update()
