@@ -49,7 +49,7 @@ log = logging.getLogger(__name__)
 # fails until it is. A newer helper is
 # put in place by the next admin step that asks anyway: only another effect DLL makes
 # the app ask (so the helper never adds a prompt the app wouldn't have had).
-HELPER_VERSION = 34
+HELPER_VERSION = 35
 # The oldest helper the app still uses. Raise it (to HELPER_VERSION) only when the
 # helpers out there have a bug that matters: the app then asks Windows once more, and
 # that prompt puts this version's helper in place.
@@ -171,8 +171,25 @@ def _helper_dirs() -> list[Path]:
 
 def leftover() -> bool:
     """Anything of a helper is there, working or not: a folder (a half-done update's
-    too) or its task. Uninstalling the app takes all of it away."""
-    return any(d.exists() for d in _helper_dirs()) or _schtasks("/query", "/tn", TASK) == 0
+    too) or its task. Uninstalling the app takes all of it away. A folder on Windows'
+    list for the next restart is gone already (the helper removing itself runs from it):
+    asking for admin again can't take it away any sooner."""
+    from soundboard.mic import directmic
+    return any(d.exists() and not directmic._marked(d) for d in _helper_dirs()) \
+        or _schtasks("/query", "/tn", TASK) == 0
+
+
+def wait_gone(timeout: float = 20.0) -> bool:
+    """After a remove-all through the helper: it removes itself just after answering, so
+    the uninstaller's next steps (ProgramData's folder, its own `--direct-mic remove`)
+    would still find it and ask for admin again. True once it's gone."""
+    end = time.monotonic() + timeout
+    while leftover():
+        if time.monotonic() > end:
+            log.warning("mic helper: still there %.0f s after removing everything", timeout)
+            return False
+        time.sleep(0.5)
+    return True
 
 
 def for_user(args: list[str]) -> list[str]:
@@ -912,6 +929,9 @@ def _install_helper(user: str | None) -> bool:
                 os.replace(dest, old)
             os.replace(new, dest)
             shutil.rmtree(old, ignore_errors=True)
+        # an uninstall's removal left it on Windows' list for the next restart (it ran
+        # from it): without this, a reinstall before that restart loses the helper then
+        dm._unmark([dest, *dest.rglob("*")])
         q = queue_dir()
         dm._secure_dir(q, dm._BASE_SDDL)
         dm._secure_dir(results_dir(), dm._BASE_SDDL)

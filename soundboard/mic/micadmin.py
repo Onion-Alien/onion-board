@@ -1767,6 +1767,8 @@ def cli(args: list[str]) -> int:
             return 0
         if not _is_admin():
             code = directmic._elevated(["remove-all"])
+            if code == 0:
+                michelper.wait_gone()
             return 1 if code is None or code < 0 else code
         args = ["remove-all"]
     if args[:1] == ["reinstall"] and len(args) == 2 and _GUID.fullmatch(args[1]):

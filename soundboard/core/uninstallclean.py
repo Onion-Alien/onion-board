@@ -13,7 +13,8 @@
 The admin step is this program again with `--admin` added, and does only that. It runs
 before main.py's breadcrumb and logging, which would write into the folder being
 deleted. The exit code is a set of what stayed, for the uninstaller to say: DATA_LEFT,
-RULE_LEFT; 0 when everything asked for is gone.
+RULE_LEFT, MACHINE_LEFT; 0 when everything asked for is gone. ProgramData's folder kept
+for a mic effect still on a mic isn't one: the uninstaller says the effect stayed.
 """
 from __future__ import annotations
 
@@ -29,8 +30,9 @@ log = logging.getLogger(__name__)
 FLAG = "--uninstall-cleanup"
 DATA = "--data"
 ADMIN = "--admin"
-DATA_LEFT = 1   # some of their sounds and settings, or ProgramData's folder, stayed
+DATA_LEFT = 1   # some of their sounds and settings stayed
 RULE_LEFT = 2   # the firewall rule stayed (Windows' prompt was turned down)
+MACHINE_LEFT = 4   # ProgramData's folder stayed (the prompt was turned down, or in use)
 RULES = ("onion-pocket-firewall",)   # onion_pocket/addon.py, as cleanup.FIREWALL_RULES
 _CREATE_NO_WINDOW = 0x08000000
 
@@ -77,9 +79,8 @@ def admin_part(data: bool) -> int:
     if data and machine_dir().exists():
         if mic_parts_left():
             log.info("the mic effect is still here: %s stays", machine_dir())
-            left |= DATA_LEFT
         elif not cleanup._remove(machine_dir()):
-            left |= DATA_LEFT
+            left |= MACHINE_LEFT
     return left
 
 
@@ -92,7 +93,7 @@ def elevate(data: bool) -> int:
     code = cleanup.run_elevated(args, wait_s=120.0, source=())
     if code is None:   # turned down, or it didn't finish
         return (RULE_LEFT if rules_present() else 0) | \
-            (DATA_LEFT if data and machine_dir().exists() else 0)
+            (MACHINE_LEFT if data and machine_dir().exists() else 0)
     return code
 
 
@@ -114,7 +115,8 @@ def cli(args: list[str]) -> int:
         if ADMIN in args:
             return admin_part(data)
         left = 0
-        if rules_present() or (data and machine_dir().exists()):
+        # ProgramData's folder stays with a mic effect still on a mic: no prompt for it
+        if rules_present() or (data and machine_dir().exists() and not mic_parts_left()):
             left = elevate(data)
         if data and not recycle_user_dir():
             left |= DATA_LEFT
