@@ -694,7 +694,11 @@ goes online.
   by hand. Taking the effect off a mic in Setup keeps the helper, so putting it back
   needs no prompt. If Windows already took the effect off (a
   driver update, *Reset sound settings*), what's there now stays. The shared file and
-  the admin log stay in `%ProgramData%\OnionBoard\`.
+  the admin log stay in `%ProgramData%\OnionBoard\`, unless you say Yes to the
+  uninstaller's *Also delete your sounds and settings?*: then, once the effect and the
+  helper are off, that folder goes too (`soundboard/core/uninstallclean.py`, in the
+  same admin step that removes Onion Pocket's firewall rule, which every uninstall
+  does on a PC that has one).
 - **The virtual cable**, the fallback, is VB-Audio's own signed driver: installed by
   `installer/install-vbcable.ps1` only when you ask, and removed by VB-Audio's own
   uninstaller (Setup tab → *Remove the virtual cable*, or the uninstaller's question),
@@ -725,7 +729,8 @@ None of it ever goes online, and nothing from those files is written to the log.
   so they can be put back by hand. Discord's own files are never copied, and the app
   never reads, copies or keeps Discord's login token. At most 3 per client are kept,
   none older than 14 days, and only on this PC. Delete the `discord-backup` folder to
-  remove them. Older versions copied Discord's log file there instead (which could
+  remove them; the uninstaller's *Also delete your sounds and settings?* removes them
+  with the rest. Older versions copied Discord's log file there instead (which could
   hold the login): the app deletes those copies a few seconds after it starts.
 
 ## Anti-cheat

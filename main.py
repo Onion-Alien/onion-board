@@ -11,6 +11,11 @@ if __name__ == "__main__" and sys.argv[1:2] == ["--firewall-rule"]:
     from soundboard.online.firewall import cli
     sys.exit(cli(sys.argv[2:]))
 
+if __name__ == "__main__" and sys.argv[1:2] == ["--uninstall-cleanup"]:
+    # the uninstaller's tidy-up of what's outside the app's folder (soundboard.core.uninstallclean)
+    from soundboard.core.uninstallclean import cli as uninstall_cleanup_cli
+    sys.exit(uninstall_cleanup_cli(sys.argv[2:]))
+
 if __name__ == "__main__" and sys.argv[1:2] == ["--direct-mic"]:
     # the admin copy that installs / removes the mic effect (soundboard.mic.directmic), no app
     from soundboard.mic.directmic import cli as direct_mic_cli
