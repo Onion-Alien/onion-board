@@ -4,6 +4,11 @@ Changes not released yet are in [changelog.d/](changelog.d/), one file per chang
 
 ## 2.8.0 — 2026-10-31
 
+- Edit sound: clicking Save a copy now adds the edited copy and leaves the original as it
+  was (it saved the edits onto the original and made no copy).
+- Edit sound: a window opened for the next sound no longer shows the last one's
+  "Deleted … Undo" row, and its Preset list has presets saved in another Edit window.
+- Edit sound: the effects line says 1.25x when the speed is 1.25x (it said 1.2x).
 - Fixed: on a busy PC short of memory the window could freeze for 10-30 seconds while
   Windows was slow to list the sound devices, or when settings were saved after a quiet
   spell.
