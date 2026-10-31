@@ -69,7 +69,7 @@ asks for permission first where it needs admin:
 | The mic helper (a scheduled task that runs only when Onion Board asks, so Windows asks once) | the first mic-effect set-up | yes |
 | The virtual cable (VB-Cable, VB-Audio's own driver) | only if you tick it | it asks you |
 | *Start with Windows* (a start-up entry) | only if you turn it on | yes |
-| Discord's voice clean-up switched off, so sounds get through (and a copy of the one Discord settings file it changes, kept on your PC for up to 14 days) | you press Discord's set-up button | put back when the app closes, and on uninstall |
+| Discord's voice clean-up switched off, so sounds get through (and a copy of the voice settings it replaced, kept on your PC for up to 14 days) | you press Discord's set-up button | put back when the app closes, and on uninstall |
 | A firewall rule for Onion Pocket (phones on your Wi-Fi) | you turn it on; Windows asks | yes (Windows asks once more) |
 | A Windows text-to-speech voice | you press *Install the … voice*; Windows asks | no: it's part of Windows |
 
