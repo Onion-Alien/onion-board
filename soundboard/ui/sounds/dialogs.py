@@ -291,6 +291,11 @@ class EffectsPanel(QObject):
         self.trim_layout.removeWidget(old)
         old.hide()
         old.deleteLater()
+        # the window reused: the last sound's deleted preset is gone for good, and the
+        # list has the presets saved since (in another Edit window too)
+        self._deleted = None
+        self.undo_row.hide()
+        self._fill_presets()
         self.load(meta.fx or {})
         self._matching_preset()
         if self.compact:

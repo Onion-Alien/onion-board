@@ -52,6 +52,7 @@ def test_neutral_key_and_summary():
     s = soundfx.summary({"speed": 0.5, "pitch": -3, "gain_db": 12, "reverse": True,
                          "effects": {"reverb": {"on": True}}})
     assert "0.5x" in s and "-3 st" in s and "+12 dB" in s and "Reverb" in s and "reversed" in s
+    assert soundfx.summary({"speed": 1.25}) == "1.25x"   # what the slider says, not 1.2x
 
 
 def test_every_preset_is_valid_and_renders():
@@ -292,7 +293,7 @@ def test_edit_dialog_presets_apply_and_reset(qapp):
     assert "pitch" not in d.effects.rows            # the Pitch slider covers it
     d.effects.preset.setCurrentText("Nightcore")
     assert d.effects.fx() == soundfx.PRESETS["Nightcore"]
-    assert "1.2x" in d.fx_note.text()
+    assert "1.25x" in d.fx_note.text()
     d.effects.pitch.set_value(3)
     d.effects._edited()
     assert d.effects.preset.currentText() == "Custom"
