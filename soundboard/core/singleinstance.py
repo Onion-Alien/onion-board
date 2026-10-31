@@ -4,7 +4,7 @@ A second copy would fight the first over the audio devices and the hotkeys, and
 every extra launch used to leave two more pythonw.exe processes lying around. The
 lock is a named mutex, which Windows frees automatically if the app crashes, so
 a stale lock can't keep it from starting. The second launch asks the first to
-come to the front over a local socket.
+come to the front over a local socket; the uninstaller (--quit-running) asks it to quit.
 """
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ import logging
 import os
 import time
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtNetwork import QLocalServer, QLocalSocket
 
 log = logging.getLogger(__name__)
@@ -21,6 +21,7 @@ log = logging.getLogger(__name__)
 # overridable so a test copy never finds (and pops up) the real, running app
 INSTANCE_NAME = os.environ.get("ONIONBOARD_INSTANCE", "OnionBoard.App")
 CONNECT_SECONDS = 5.0   # how long a second launch waits for the first to answer
+QUIT_SECONDS = 15.0     # how long --quit-running waits for the running one to be gone
 
 
 def take_lock() -> bool:
@@ -125,17 +126,60 @@ def bring_to_front(w):
         log.debug("couldn't bring the window to the front", exc_info=True)
 
 
+def running() -> bool:
+    """Whether an Onion Board holds the lock (in this Windows session)."""
+    k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    k32.OpenMutexW.restype = ctypes.c_void_p
+    handle = k32.OpenMutexW(0x00100000, False, f"Local\\{INSTANCE_NAME}")   # SYNCHRONIZE
+    if handle:
+        k32.CloseHandle(ctypes.c_void_p(handle))
+    return bool(handle)
+
+
+def ask_running_to_quit(seconds: float = QUIT_SECONDS) -> bool:
+    """The uninstaller's `--quit-running`: ask the Onion Board that's open (often hidden
+    in the tray) to quit like the tray's Quit, so it saves its settings, and wait for it
+    to be gone. Left open, it went on running and sending its counts after the uninstall.
+    True once none is running."""
+    if not running():
+        return True
+    sock = QLocalSocket()
+    sock.connectToServer(INSTANCE_NAME)
+    if sock.waitForConnected(2000):   # kept open: hanging up at once can lose it
+        sock.write(b"quit")
+        sock.waitForBytesWritten(500)
+    else:
+        log.warning("the running Onion Board didn't answer: %s", sock.errorString())
+    deadline = time.monotonic() + seconds
+    try:
+        while running():
+            if time.monotonic() >= deadline:
+                return False
+            time.sleep(0.2)
+        return True
+    finally:
+        sock.abort()
+
+
 def listen_for_second_launch(app, get_window) -> InstanceServer:
-    """Bring the window to the front when someone launches Onion Board again."""
+    """Bring the window to the front when someone launches Onion Board again, or quit
+    when the uninstaller asks (ask_running_to_quit)."""
     QLocalServer.removeServer(INSTANCE_NAME)
     server = InstanceServer(app)
 
-    def on_connect():
-        conn = server.nextPendingConnection()
-        if conn is not None:
-            conn.disconnected.connect(conn.deleteLater)
+    def on_message(data: bytes):
         w = get_window()
-        if w is None:   # still starting up: app.main() shows it once it exists
+        if data.startswith(b"quit"):
+            if w is None:   # still starting up: the uninstaller ends it
+                log.info("asked to quit while starting up")
+                return
+            log.info("asked to quit (the uninstaller)")
+            from PySide6.QtWidgets import QApplication, QDialog
+            for d in QApplication.topLevelWidgets():   # an open dialog's own loop
+                if isinstance(d, QDialog) and d.isVisible():
+                    d.reject()
+            QTimer.singleShot(0, w.quit_app)
+        elif w is None:   # still starting up: app.main() shows it once it exists
             server.show_requested = True
         else:
             w.setWindowState((w.windowState() & ~Qt.WindowState.WindowMinimized)
@@ -143,6 +187,23 @@ def listen_for_second_launch(app, get_window) -> InstanceServer:
             w.show()
             w.raise_()
             w.activateWindow()
+
+    def on_connect():
+        conn = server.nextPendingConnection()
+        if conn is None:
+            return
+        done = []
+
+        def read():   # once per connection
+            if not done:
+                done.append(True)
+                on_message(bytes(conn.readAll().data()))
+        conn.readyRead.connect(read)
+        # a second launch's "show" can be lost when it hangs up at once: nothing = show
+        conn.disconnected.connect(read)
+        conn.disconnected.connect(conn.deleteLater)
+        if conn.bytesAvailable():   # sent with the connection: already here
+            read()
 
     server.newConnection.connect(on_connect)
     if not server.listen(INSTANCE_NAME):

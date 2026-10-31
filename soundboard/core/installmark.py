@@ -20,7 +20,8 @@ INSTALLING_STALE_S = 15 * 60
 # the one-off commands app.main() runs and exits (app.ONE_OFF_COMMANDS, the same names);
 # the installer runs some of them itself while the mark is there
 ONE_OFF = ("--selftest", "--get-tor", "--install-addon", "--set-offline", "--keep-netlog",
-           "--usage-count", "--uninstall-count", "--selftest-addon", "--discord-restore")
+           "--usage-count", "--uninstall-count", "--selftest-addon", "--discord-restore",
+           "--quit-running")
 
 
 def installing(exe_dir: str | os.PathLike | None = None, now: float | None = None) -> bool:

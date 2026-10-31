@@ -1,5 +1,6 @@
 """A second launch while the first is still starting up brings the first to the
 front instead of saying "already open, look in the tray"."""
+import ctypes
 import os
 import uuid
 
@@ -66,3 +67,51 @@ def test_bring_to_front_raises_and_activates(qapp, monkeypatch):
     si.bring_to_front(w)   # the Windows part never throws, even for an offscreen window
     assert calls == ["raise", "activate"]
     w.close()
+
+
+def release_lock():
+    ctypes.windll.kernel32.CloseHandle(ctypes.c_void_p(si.take_lock.handle))
+
+
+def test_uninstaller_asks_the_running_one_to_quit(qapp, instance, monkeypatch):
+    """--quit-running: the open board quits like the tray's Quit (settings saved) and
+    the lock is gone, so it can't go on running, and counting, after the uninstall."""
+    assert si.claim_single_instance()
+    quits = []
+
+    class Window:
+        def quit_app(self):   # what the real quit ends in: the lock freed
+            quits.append(1)
+            release_lock()
+    window = Window()
+    server = si.listen_for_second_launch(qapp, lambda: window)
+    own_time(monkeypatch, si, sleep=lambda _s: qapp.processEvents())
+    assert si.running()
+    assert si.ask_running_to_quit(5)
+    assert quits == [1] and not si.running()
+    server.close()
+
+
+def test_quit_gives_up_on_one_that_never_quits(qapp, instance, monkeypatch):
+    assert si.claim_single_instance()
+    server = si.listen_for_second_launch(qapp, lambda: None)   # still starting: no window
+    own_time(monkeypatch, si, sleep=lambda _s: qapp.processEvents())
+    assert not si.ask_running_to_quit(0.5)   # the uninstaller then ends it
+    assert not server.show_requested         # a quit is never taken for "show yourself"
+    release_lock()
+    server.close()
+
+
+def test_nothing_running_is_nothing_to_quit(instance):
+    assert not si.running()
+    assert si.ask_running_to_quit(0.1)
+
+
+def test_uninstaller_closes_the_board_before_it_counts():
+    from pathlib import Path
+    iss = (Path(__file__).resolve().parents[1] / "installer" / "OnionBoard.iss").read_text(
+        "utf-8")
+    unins = iss[iss.index("procedure CurUninstallStepChanged("):]
+    unins = unins[:unins.index("\nend;")]
+    assert unins.index("'--quit-running'") < unins.index("BoardProcesses(True)") \
+        < unins.index("'--uninstall-count'")

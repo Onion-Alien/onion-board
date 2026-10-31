@@ -777,6 +777,7 @@ begin
 end;
 
 function ShouldGetFfmpeg: Boolean; forward;
+function BoardProcesses(Kill: Boolean): Integer; forward;
 
 procedure CurPageChanged(CurPageID: Integer);
 var
@@ -1340,6 +1341,12 @@ begin
       'noisy there.' + #13#10#13#10 + 'To fix it, open Discord''s Voice & Video settings ' +
       'and turn on Noise Suppression, Echo Cancellation and Automatic Gain Control.',
       mbInformation, MB_OK);
+  // an Onion Board still open (hidden in the tray, say) went on running, and sending its
+  // counts, after the uninstall: asked to quit first, which saves its settings
+  // (soundboard/core/singleinstance.py); what's still running 15 s later is ended
+  Exec(ExpandConstant('{app}\{#AppExeName}.exe'), '--quit-running', '', SW_HIDE,
+       ewWaitUntilTerminated, Code);
+  BoardProcesses(True);
   // the anonymous usage count's "uninstall/<version>" (soundboard/core/usage.py): the app
   // sends it only if the count is switched on, and gives up after 15 s offline
   Exec(ExpandConstant('{app}\{#AppExeName}.exe'), '--uninstall-count', '', SW_HIDE,
