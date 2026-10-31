@@ -128,9 +128,11 @@ jobs:
           $v = .venv\Scripts\python -c "import soundboard; print(soundboard.__version__)"
           foreach ($f in "dist\OnionBoard\OnionBoard.exe", "dist\OnionBoardSetup.exe") {
             $i = (Get-Item $f).VersionInfo
-            "$f`: $($i.ProductName) $($i.ProductVersion)" | Out-File -Append -Encoding utf8 $env:GITHUB_STEP_SUMMARY
-            if ($i.ProductName -ne "Onion Board" -or $i.ProductVersion -ne $v) {
-              throw "$f says '$($i.ProductName) $($i.ProductVersion)', not 'Onion Board $v'"
+            # (Inno Setup pads its strings with spaces)
+            $name = "$($i.ProductName)".Trim(); $ver = "$($i.ProductVersion)".Trim()
+            "$f`: $name $ver" | Out-File -Append -Encoding utf8 $env:GITHUB_STEP_SUMMARY
+            if ($name -ne "Onion Board" -or $ver -ne $v) {
+              throw "$f says '$name $ver', not 'Onion Board $v'"
             }
           }
       # Code signing goes here, once the project is accepted by SignPath Foundation
