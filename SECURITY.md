@@ -67,7 +67,8 @@ Out of scope:
 
 ## What the app does on the network
 
-So you know what normal looks like when auditing it:
+The short version, for users: [docs/PRIVACY.md](docs/PRIVACY.md). So you know what
+normal looks like when auditing it:
 
 | When | Where | Why | Switch |
 |---|---|---|---|
