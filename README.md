@@ -196,5 +196,5 @@ Trust only the addresses on `github.com/Onion-Alien/onion-board`.
 Run from source: double-click `scripts\install.bat` (finds Python 3.12+, makes `.venv`, adds shortcuts),
 then `scripts\run.bat`. Start with [docs/DEVELOPING.md](docs/DEVELOPING.md) (setup, checks, build,
 release) and [docs/CODE.md](docs/CODE.md) (code layout, installer, audio). Also:
-[CONTRIBUTING.md](CONTRIBUTING.md) · [SECURITY.md](SECURITY.md) · [docs/BACKUP-FORMAT.md](docs/BACKUP-FORMAT.md) · [docs/CONTROL-API.md](docs/CONTROL-API.md).
+[CONTRIBUTING.md](CONTRIBUTING.md) · [SECURITY.md](SECURITY.md) · [docs/PRIVACY.md](docs/PRIVACY.md) · [docs/BACKUP-FORMAT.md](docs/BACKUP-FORMAT.md) · [docs/CONTROL-API.md](docs/CONTROL-API.md).
 `scripts\docs.py` rebuilds the screenshots and this page's version line.
