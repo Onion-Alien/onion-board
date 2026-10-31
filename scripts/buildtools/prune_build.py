@@ -16,8 +16,8 @@ none of which this app touches. This removes what the app never loads:
 - Qt's translations (the app has its own)
 - `opengl32sw.dll`: the software OpenGL fallback. Widgets draw with the CPU, so it
   never loads.
-- sounddevice's PortAudio builds for other systems (32-bit and ARM64 Windows, macOS):
-  the x64 one (and its ASIO twin) stays
+- sounddevice's PortAudio builds for other systems (32-bit and ARM64 Windows, macOS)
+  and its ASIO builds: only the plain x64 one stays
 
 Usage: python scripts/buildtools/prune_build.py dist/OnionBoard [--dry-run]
 Exit 1 if a kept file imports a DLL that would be missing afterwards, so a change in
@@ -52,10 +52,13 @@ DROP_DIRS = ("resources", "translations/qtwebengine_locales")
 DLL_CANDIDATES = ("qt6", "av", "sw")
 # sounddevice ships PortAudio for every system; on Windows it loads the one for the
 # Python it runs in (sysconfig's platform: win-amd64 here, x64 only), -asio when
-# SD_ENABLE_ASIO is set. The 32-bit, ARM64 and macOS builds never load.
+# SD_ENABLE_ASIO is set. The 32-bit, ARM64 and macOS builds never load, and the app
+# never sets SD_ENABLE_ASIO, so the -asio ones don't either (they are built with
+# Steinberg's ASIO SDK, which isn't open source).
 PORTAUDIO = "_internal/_sounddevice_data/portaudio-binaries"
 DROP_PORTAUDIO = ("libportaudio.dylib", "libportaudio32bit.dll", "libportaudio32bit-asio.dll",
-                  "libportaudioarm64.dll", "libportaudioarm64-asio.dll")
+                  "libportaudioarm64.dll", "libportaudioarm64-asio.dll",
+                  "libportaudio64bit-asio.dll")
 
 
 def _imports_pefile(path: Path) -> list[str]:
