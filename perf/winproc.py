@@ -295,20 +295,44 @@ def processes() -> list[tuple[int, int, str, int]]:
 
 
 def descendants(pid: int, table: list[tuple[int, int, str, int]] | None = None) -> list[int]:
-    """Processes started by `pid`, and by those, and so on."""
+    """Processes started by `pid`, and by those, and so on.
+
+    A process keeps its parent's pid after the parent exits, and Windows hands that
+    pid out again, so the snapshot can name a newer process as the parent of an older
+    one (and loop back to `pid`). A child that started before its parent isn't its."""
     table = processes() if table is None else table
     kids: dict[int, list[int]] = {}
     for p, parent, *_ in table:
         if p != parent:
             kids.setdefault(parent, []).append(p)
-    out, todo = [], list(kids.get(pid, []))
+    out, todo = [], [(pid, k) for k in kids.get(pid, [])]
     while todo:
-        p = todo.pop()
-        if p in out:
+        parent, p = todo.pop()
+        if p == pid or p in out or not _started_after(p, parent):
             continue
         out.append(p)
-        todo.extend(kids.get(p, []))
+        todo.extend((p, k) for k in kids.get(p, []))
     return out
+
+
+def _created(pid: int) -> int | None:
+    """When a process started (FILETIME ticks), or None if it can't be read."""
+    h = k32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+    if not h:
+        return None
+    try:
+        ft = [wt.FILETIME() for _ in range(4)]
+        if not k32.GetProcessTimes(h, *[ctypes.byref(f) for f in ft]):
+            return None
+        return (ft[0].dwHighDateTime << 32) | ft[0].dwLowDateTime
+    finally:
+        k32.CloseHandle(h)
+
+
+def _started_after(child: int, parent: int) -> bool:
+    """False only when both start times are known and the child's is earlier."""
+    c, p = _created(child), _created(parent)
+    return c is None or p is None or c >= p
 
 
 def threads_of(pid: int) -> list[int]:
