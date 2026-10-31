@@ -4753,5 +4753,13 @@
   "Show the whole sound": "Mostra tutto il suono",
   "Speed & loudness": "Velocità e volume",
   "The usual tabs, one at a time": "Le solite schede, una alla volta",
-  "Undo ({keys})": "Annulla ({keys})"
+  "Undo ({keys})": "Annulla ({keys})",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Tramite winget di Windows, altrimenti con il download di FFmpeg stesso (circa 100 MB). Puoi disattivarlo in Impostazioni → Privacy e sicurezza.",
+  "Don't ask for admin each time": "Non chiedere i permessi di amministratore ogni volta",
+  "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Aggiunge anche un piccolo aiutante così Windows non lo chiede più: puoi disattivarlo in Impostazioni > Audio.",
+  "Off: Windows asks for permission every time the mic effect is set up or repaired.": "Disattivato: Windows chiede il permesso ogni volta che l'effetto microfono viene installato o riparato.",
+  "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Onion Board aggiunge a Windows un piccolo aiutante (un'attività che gira come SYSTEM), così può installare e riparare l'effetto microfono senza che Windows chieda il permesso ogni volta. Togli la spunta per rimuoverlo.",
+  "The helper is removed. Windows asks for permission each time now.": "L'aiutante è stato rimosso. Ora Windows chiederà il permesso ogni volta.",
+  "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "L'aiutante è ancora lì, quindi non è cambiato nulla. Riprova e clicca <b>Sì</b> quando Windows lo chiede.",
+  "Wait until the mic effect is done, then try again.": "Aspetta che l'effetto microfono finisca, poi riprova."
 }

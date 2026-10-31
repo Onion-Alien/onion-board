@@ -272,9 +272,11 @@ def duplicate(meta: SoundMeta, name: str) -> SoundMeta:
                      source=dict(meta.source))
 
 
-def recycle(path: Path) -> bool:
-    """Send a file to the Windows Recycle Bin (so it can still be restored from
-    there). False if that isn't possible: the caller deletes it instead."""
+def recycle(path: Path, warn_if_permanent: bool = False) -> bool:
+    """Send a file or folder to the Windows Recycle Bin (so it can still be restored
+    from there). False if that isn't possible: the caller deletes it instead. With
+    `warn_if_permanent`, Windows asks first when it's too big for the bin and would be
+    deleted for good (the uninstaller's "delete your sounds"); otherwise it's quiet."""
     if sys.platform != "win32" or not path.exists():
         return False
     import ctypes
@@ -286,8 +288,11 @@ def recycle(path: Path) -> bool:
                     ("fFlags", ctypes.c_uint16), ("fAnyOperationsAborted", wintypes.BOOL),
                     ("hNameMappings", ctypes.c_void_p), ("lpszProgressTitle", wintypes.LPCWSTR)]
     FO_DELETE, FOF_SILENT, FOF_NOCONFIRMATION, FOF_ALLOWUNDO, FOF_NOERRORUI = 3, 4, 16, 64, 1024
-    op = SHFILEOPSTRUCTW(wFunc=FO_DELETE, pFrom=str(path.resolve()) + chr(0),
-                         fFlags=FOF_SILENT | FOF_NOCONFIRMATION | FOF_ALLOWUNDO | FOF_NOERRORUI)
+    FOF_WANTNUKEWARNING = 0x4000
+    flags = FOF_SILENT | FOF_NOCONFIRMATION | FOF_ALLOWUNDO | FOF_NOERRORUI
+    if warn_if_permanent:
+        flags |= FOF_WANTNUKEWARNING
+    op = SHFILEOPSTRUCTW(wFunc=FO_DELETE, pFrom=str(path.resolve()) + chr(0), fFlags=flags)
     try:
         ok = ctypes.windll.shell32.SHFileOperationW(ctypes.byref(op)) == 0
         return ok and not op.fAnyOperationsAborted and not path.exists()

@@ -119,7 +119,7 @@ Name: "livevoice"; Description: "Live voice-to-speech (about 300 MB)"; Flags: un
 Name: "tor"; Description: "Hide my internet address (Tor), about 22 MB"; Flags: unchecked
 Name: "countme"; Description: "Count me in: anonymous usage stats (features used, crash counts)"
 Name: "desktopicon"; Description: "Put an Onion Board shortcut on my Desktop"
-Name: "vbcable"; Description: "The free virtual cable (VB-Cable): only if you know you need one"; GroupDescription: "Advanced (most people can skip this)"; Flags: unchecked; Check: not CableInstalled
+Name: "vbcable"; Description: "VB-Cable, VB-Audio's free virtual cable (not open source)"; GroupDescription: "Advanced (most people can skip this)"; Flags: unchecked; Check: not CableInstalled
 
 [InstallDelete]
 ; The Python runtime and libraries from the last version: cleared first so files a
@@ -219,9 +219,9 @@ Type: files; Name: "{app}\{#AppExeName}.exe.old*"
 ; made after install: a module's own Python environment and bytecode
 Type: filesandordirs; Name: "{app}\modules"
 
-; Uninstalling leaves %APPDATA%\OnionBoard (their sounds and settings, and a downloaded
-; Tor in tor\bin) and FFmpeg in place; the cable is offered for removal
-; (CurUninstallStepChanged below).
+; Uninstalling asks before it deletes %APPDATA%\OnionBoard (their sounds and settings,
+; and a downloaded Tor in tor\bin), and offers to remove the cable; it leaves FFmpeg in
+; place (CurUninstallStepChanged below).
 
 [Code]
 const
@@ -776,6 +776,8 @@ begin
   Bunny.Left := BunnyRight - Bunny.Width;
 end;
 
+function ShouldGetFfmpeg: Boolean; forward;
+
 procedure CurPageChanged(CurPageID: Integer);
 var
   I: Integer;
@@ -818,16 +820,22 @@ begin
       'Tor. Go Back and untick Offline mode to pick it.'
   else
     WizardForm.TasksList.Hint := '';
-  // A line above the boxes only in Offline mode (the heading says the rest), wrapped
-  // to fit, with the list right under it.
+  // A line above the boxes only in Offline mode, or when FFmpeg (which has no box) will
+  // be added, so nothing is put on the PC without a word first (the heading says the
+  // rest), wrapped to fit, with the list right under it.
   Lbl := WizardForm.SelectTasksLabel;
   Bottom := WizardForm.TasksList.Top + WizardForm.TasksList.Height;
-  Lbl.Visible := OfflineChosen;
-  if OfflineChosen then
+  Lbl.Visible := OfflineChosen or ShouldGetFfmpeg;
+  if Lbl.Visible then
   begin
-    Lbl.Caption := 'Offline mode is on, so the boxes that download things are ' +
-      'unticked. Tick one and this installer downloads it; Onion Board itself stays ' +
-      'offline.';
+    if OfflineChosen then
+      Lbl.Caption := 'Offline mode is on, so the boxes that download things are ' +
+        'unticked. Tick one and this installer downloads it; Onion Board itself stays ' +
+        'offline.'
+    else
+      Lbl.Caption := 'This PC doesn''t have FFmpeg yet (Onion Board needs it for M4A ' +
+        'and video files), so this installer also adds it through Windows'' winget. ' +
+        'You can remove it later in Installed apps.';
     Lbl.WordWrap := True;
     Lbl.AdjustHeight;
     WizardForm.TasksList.Top := Lbl.Top + Lbl.Height + ScaleY(8);
@@ -1298,7 +1306,7 @@ end;
 // installed). Silent uninstalls leave it alone.
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
-  Setup, Mine: String;
+  Setup, Mine, Params: String;
   Code, Default: Integer;
 begin
   // Done: one optional question, never in a silent uninstall. Only the browser opens
@@ -1336,6 +1344,34 @@ begin
   // sends it only if the count is switched on, and gives up after 15 s offline
   Exec(ExpandConstant('{app}\{#AppExeName}.exe'), '--uninstall-count', '', SW_HIDE,
        ewWaitUntilTerminated, Code);
+  // what the app put outside its folder (soundboard/core/uninstallclean.py): the Onion
+  // Pocket firewall rule (Windows asks, only on a PC that has one) and, on their Yes,
+  // their sounds and settings (to the Recycle Bin) and ProgramData's logs. After the
+  // count, which reads the settings. The mic effect comes off first, so its shared
+  // folder can go too; [UninstallRun]'s step then finds nothing to do.
+  Params := '--uninstall-cleanup';
+  if not UninstallSilent and (MsgBox('Also delete your sounds and settings?' + #13#10#13#10 +
+      'Choose No to keep them, so they''re all still there if you install Onion Board ' +
+      'again. Yes puts them in the Recycle Bin.', mbConfirmation,
+      MB_YESNO or MB_DEFBUTTON2) = IDYES) then
+  begin
+    Params := Params + ' --data';
+    Exec(ExpandConstant('{app}\{#AppExeName}.exe'), '--direct-mic remove', '', SW_HIDE,
+         ewWaitUntilTerminated, Code);
+  end;
+  if Exec(ExpandConstant('{app}\{#AppExeName}.exe'), Params, '', SW_HIDE,
+          ewWaitUntilTerminated, Code) and not UninstallSilent then
+  begin
+    if (Code and 1) <> 0 then
+      MsgBox('Some of your sounds and settings couldn''t be deleted. They''re in ' +
+        ExpandConstant('{userappdata}\OnionBoard') + ': you can delete that folder yourself.',
+        mbInformation, MB_OK);
+    if (Code and 2) <> 0 then
+      MsgBox('Onion Pocket''s firewall rule is still there (Windows'' permission prompt ' +
+        'was turned down). It only lets phones on your Wi-Fi reach Onion Board, which is ' +
+        'gone now. To remove it, run OnionBoardCleanup.exe from Onion Board''s GitHub page.',
+        mbInformation, MB_OK);
+  end;
   Setup := CableSetup;
   Mine := '';
   RegQueryStringValue(HKCU, 'Software\OnionBoard', 'InstalledCable', Mine);

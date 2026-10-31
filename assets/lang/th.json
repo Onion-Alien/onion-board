@@ -4666,5 +4666,13 @@
   "Show the whole sound": "แสดงเสียงทั้งหมด",
   "Speed & loudness": "ความเร็วและความดัง",
   "The usual tabs, one at a time": "แท็บแบบเดิม ทีละแท็บ",
-  "Undo ({keys})": "เลิกทำ ({keys})"
+  "Undo ({keys})": "เลิกทำ ({keys})",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "ผ่าน winget ของ Windows หรือดาวน์โหลดของ FFmpeg เอง (ประมาณ 100 MB) ปิดได้ที่ การตั้งค่า → ความเป็นส่วนตัวและความปลอดภัย",
+  "Don't ask for admin each time": "ไม่ต้องขอสิทธิ์ผู้ดูแลระบบทุกครั้ง",
+  "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "และจะเพิ่มตัวช่วยเล็กๆ เพื่อให้ Windows ไม่ถามอีก: ปิดได้ในการตั้งค่า > เสียง",
+  "Off: Windows asks for permission every time the mic effect is set up or repaired.": "ปิด: Windows จะขออนุญาตทุกครั้งที่ติดตั้งหรือซ่อมแซมเอฟเฟกต์ไมค์",
+  "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Onion Board เพิ่มตัวช่วยเล็กๆ ใน Windows (งานที่ทำงานในฐานะ SYSTEM) เพื่อติดตั้งและซ่อมแซมเอฟเฟกต์ไมค์ได้โดยที่ Windows ไม่ต้องขออนุญาตทุกครั้ง เอาเครื่องหมายออกเพื่อลบตัวช่วยนี้",
+  "The helper is removed. Windows asks for permission each time now.": "ลบตัวช่วยแล้ว จากนี้ Windows จะขออนุญาตทุกครั้ง",
+  "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "ตัวช่วยยังอยู่ จึงไม่มีอะไรเปลี่ยน ลองอีกครั้งแล้วคลิก <b>ใช่</b> เมื่อ Windows ถาม",
+  "Wait until the mic effect is done, then try again.": "รอให้เอฟเฟกต์ไมค์ทำงานเสร็จก่อน แล้วลองอีกครั้ง"
 }

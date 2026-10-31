@@ -81,7 +81,7 @@ def test_sound_mode_is_put_back_to_discords_defaults(tmp_path):
     assert len(recs) == 2
     seq = struct.unpack_from("<Q", recs[-1])[0]
     assert seq == 901                                  # above the manifest's 900
-    assert list((tmp_path / "bk" / "discord").iterdir())   # a copy kept first
+    assert list((tmp_path / "bk" / "discord").glob("*.json"))   # the old settings kept first
 
 
 def test_saved_talking_settings_win_over_the_defaults(tmp_path):
@@ -381,17 +381,91 @@ def test_set_up_never_writes_into_a_running_discord(tmp_path):
     assert (f / "000003.log").read_bytes() == before
 
 
-def test_a_write_keeps_only_the_log_it_changes(tmp_path):
-    """Each write kept a copy of Discord's whole Local Storage (its login among it),
-    for good: now only the log the write adds to, and not for long."""
-    import os
-    import time
+TOKEN_KEY = b"_https://discord.com\x00\x01token"
+TOKEN = b"\x01\"mfa.FAKE-LOGIN-TOKEN\""
+
+
+def _with_token(f):
+    """A login entry in the same log, the way Discord keeps it next to the voice settings."""
+    log_path = f / "000003.log"
+    data = log_path.read_bytes()
+    log_path.write_bytes(data + dt.frame(dt.batch_put(501, TOKEN_KEY, TOKEN), len(data)))
+
+
+def test_a_write_keeps_only_the_voice_settings(tmp_path):
+    """Each write used to keep a copy of Discord's log (its login among it): now only
+    the MediaEngineStore JSON it replaces, and nothing else from the folder."""
     f = make_db(SOUND)
+    _with_token(f)
     (f / "000005.ldb").write_bytes(b"someone's login")
-    old = tmp_path / "bk" / "discord" / "20200101-000000"
-    old.mkdir(parents=True)
-    (old / "000005.ldb").write_bytes(b"someone's login")
-    os.utime(old, (time.time() - 30 * 86400,) * 2)
     dt.restore({}, tmp_path / "bk", running=set())
     [kept] = list((tmp_path / "bk" / "discord").iterdir())
-    assert [p.name for p in kept.iterdir()] == ["000003.log"]
+    assert kept.suffix == ".json"
+    raw = kept.read_bytes()
+    assert b"FAKE-LOGIN-TOKEN" not in raw and b"token" not in raw and b"login" not in raw
+    assert json.loads(raw) == {"default": SOUND, "stream": {}}   # as it was before
+    assert b"FAKE-LOGIN-TOKEN" in (f / "000003.log").read_bytes()   # Discord's own: as is
+
+
+def test_the_kept_voice_settings_put_discord_back(tmp_path):
+    make_db(SOUND)
+    dt.restore({}, tmp_path / "bk", running=set())
+    assert dt.talking(settings())
+    [kept] = list((tmp_path / "bk" / "discord").glob("*.json"))
+    assert dt.write_store("discord", json.loads(kept.read_text("utf-8")), tmp_path / "bk")
+    assert dt.read_store("discord") == {"default": SOUND, "stream": {}}
+    assert not dt.talking(settings())
+
+
+def test_only_a_few_recent_voice_settings_are_kept(tmp_path):
+    import os
+    import time
+    make_db(SOUND)
+    bk = tmp_path / "bk" / "discord"
+    bk.mkdir(parents=True)
+    stale = bk / "20200101-000000-000000000.json"
+    stale.write_text("{}", "utf-8")
+    os.utime(stale, (time.time() - 30 * 86400,) * 2)
+    for _ in range(5):
+        dt.write_store("discord", {"default": SOUND}, tmp_path / "bk")
+    kept = list(bk.glob("*.json"))
+    assert len(kept) == dt.BACKUPS and stale not in kept
+
+
+def test_old_copies_of_discords_files_are_removed(tmp_path, caplog):
+    """What older versions kept (a folder per write, the log or the whole Local Storage
+    in it) goes on the first write or the next start; anything else there stays."""
+    import logging
+    bk = tmp_path / "bk"
+    for client, stamp in (("discord", "20261020-101010"), ("discordcanary", "20261021-111111")):
+        old = bk / client / stamp
+        old.mkdir(parents=True)
+        (old / "000003.log").write_bytes(TOKEN)
+        (old / "000005.ldb").write_bytes(TOKEN)
+    (bk / "discord" / "notes").mkdir()                       # not one of ours: left
+    (bk / "discord" / "20261020-101010-000000001.json").write_text("{}", "utf-8")
+    with caplog.at_level(logging.INFO, logger=dt.log.name):
+        assert dt.drop_old_copies(bk) == 2
+    assert sorted(p.name for p in (bk / "discord").iterdir()) == \
+        ["20261020-101010-000000001.json", "notes"]
+    assert list((bk / "discordcanary").iterdir()) == []
+    assert (bk / "discordcanary").is_dir()   # still marks a Discord this app wrote to
+    assert "FAKE" not in caplog.text and "removed 2 old copies" in caplog.text
+    assert dt.drop_old_copies(bk) == 0 and dt.drop_old_copies(tmp_path / "none") == 0
+    old = bk / "discord" / "20261022-121212"                 # ...and on a write
+    old.mkdir()
+    (old / "000003.log").write_bytes(TOKEN)
+    make_db(SOUND)
+    dt.restore({}, bk, running=set())
+    assert not old.exists()
+
+
+def test_the_board_removes_old_copies_once_it_starts(window, monkeypatch):  # noqa: F811
+    from soundboard.sounds.library import APP_DIR
+    old = APP_DIR / "discord-backup" / "discord" / "20261020-101010"
+    old.mkdir(parents=True)
+    (old / "000003.log").write_bytes(TOKEN)
+    monkeypatch.setattr(window.alertctl._discord_poll, "run", lambda fn: fn())
+    monkeypatch.setattr(window.alertctl, "_on_discord", lambda res: None)
+    window.alertctl._discord_tick()
+    assert not old.exists() and (APP_DIR / "discord-backup" / "discord").is_dir()

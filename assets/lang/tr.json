@@ -4753,5 +4753,13 @@
   "Show the whole sound": "Sesin tamamını göster",
   "Speed & loudness": "Hız & ses yüksekliği",
   "The usual tabs, one at a time": "Alışık olduğunuz sekmeler, tek tek",
-  "Undo ({keys})": "Geri al ({keys})"
+  "Undo ({keys})": "Geri al ({keys})",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Windows'un winget'i ile, olmazsa FFmpeg'in kendi indirmesiyle (yaklaşık 100 MB). Bunu Ayarlar → Gizlilik ve güvenlik'ten kapatabilirsin.",
+  "Don't ask for admin each time": "Her seferinde yönetici izni isteme",
+  "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Ayrıca Windows'un tekrar sormaması için küçük bir yardımcı ekler: bunu Ayarlar > Ses'ten kapatabilirsiniz.",
+  "Off: Windows asks for permission every time the mic effect is set up or repaired.": "Kapalı: mikrofon efekti her kurulduğunda veya onarıldığında Windows izin ister.",
+  "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Onion Board, Windows'a küçük bir yardımcı ekler (SYSTEM olarak çalışan bir görev); böylece Windows her seferinde izin istemeden mikrofon efektini kurup onarabilir. Kaldırmak için işareti kaldırın.",
+  "The helper is removed. Windows asks for permission each time now.": "Yardımcı kaldırıldı. Windows artık her seferinde izin isteyecek.",
+  "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "Yardımcı hâlâ orada, bu yüzden hiçbir şey değişmedi. Tekrar deneyin ve Windows sorduğunda <b>Evet</b>'e tıklayın.",
+  "Wait until the mic effect is done, then try again.": "Mikrofon efekti bitene kadar bekleyin, sonra tekrar deneyin."
 }

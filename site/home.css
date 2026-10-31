@@ -14,7 +14,7 @@ html[data-product="watch"] { --a1: #1fb6a6; --a2: #2a6fdb; --a3: #ffc53d; --link
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 84px; overflow-x: clip; }
-body { margin: 0; background: var(--bg); color: var(--text); overflow-x: hidden;
+body { margin: 0; background: var(--bg); color: var(--text); overflow-x: clip;
        font: 17px/1.6 var(--body); -webkit-font-smoothing: antialiased; }
 a { color: var(--link); text-underline-offset: 3px; }
 code { font: 14.5px/1.4 ui-monospace, "Cascadia Code", Consolas, monospace; background: rgba(255,255,255,.06);

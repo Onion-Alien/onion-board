@@ -4666,5 +4666,13 @@
   "Show the whole sound": "Hiện toàn bộ âm thanh",
   "Speed & loudness": "Tốc độ & độ lớn",
   "The usual tabs, one at a time": "Các thẻ quen thuộc, từng thẻ một",
-  "Undo ({keys})": "Hoàn tác ({keys})"
+  "Undo ({keys})": "Hoàn tác ({keys})",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Qua winget của Windows, hoặc bản tải riêng của FFmpeg (khoảng 100 MB). Bạn có thể tắt việc này trong Cài đặt → Quyền riêng tư & bảo mật.",
+  "Don't ask for admin each time": "Không hỏi quyền quản trị mỗi lần",
+  "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Nó cũng thêm một trình trợ giúp nhỏ để Windows không hỏi lại: bạn có thể tắt nó trong Cài đặt > Âm thanh.",
+  "Off: Windows asks for permission every time the mic effect is set up or repaired.": "Tắt: Windows sẽ xin phép mỗi lần cài đặt hoặc sửa hiệu ứng mic.",
+  "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Onion Board thêm một trình trợ giúp nhỏ vào Windows (một tác vụ chạy dưới quyền SYSTEM), để có thể cài đặt và sửa hiệu ứng mic mà Windows không phải xin phép mỗi lần. Bỏ chọn để gỡ nó.",
+  "The helper is removed. Windows asks for permission each time now.": "Đã gỡ trình trợ giúp. Giờ Windows sẽ xin phép mỗi lần.",
+  "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "Trình trợ giúp vẫn còn đó, nên chưa có gì thay đổi. Hãy thử lại và nhấn <b>Có</b> khi Windows hỏi.",
+  "Wait until the mic effect is done, then try again.": "Đợi hiệu ứng mic xong rồi thử lại."
 }

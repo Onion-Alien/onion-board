@@ -464,6 +464,9 @@ class Config:
     clean_moved: bool = False   # Clean up my mic moved to Clean mic once (from_raw)
     mic_gate: bool = False    # mute your mic while a sound plays (only the sound goes out)
     discord_restore: bool = True   # put Discord back for talking on quit (discordtalk)
+    # the mic helper: admin steps of the mic effect without Windows asking each time
+    # (Settings > Audio > Mic effect; off: removed, Windows asks: directmic.set_helper)
+    mic_helper: bool = True
     discord_talk: dict = field(default_factory=dict)   # Discord folder -> how you talk there
     voice_level: bool = True  # keep your voice at one volume (sendfx.VoiceLeveler)
     ptt_key: str = ""           # key held down while sounds play (game push-to-talk)

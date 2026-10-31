@@ -4840,5 +4840,13 @@
   "Show the whole sound": "Ukázat celý zvuk",
   "Speed & loudness": "Rychlost a hlasitost",
   "The usual tabs, one at a time": "Obvyklé karty, jedna po druhé",
-  "Undo ({keys})": "Zpět ({keys})"
+  "Undo ({keys})": "Zpět ({keys})",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Přes winget ve Windows, nebo z vlastního stažení FFmpeg (asi 100 MB). Vypnout to můžeš v Nastavení → Soukromí a zabezpečení.",
+  "Don't ask for admin each time": "Neptat se pokaždé na práva správce",
+  "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Přidá také malého pomocníka, aby se Windows už znovu neptaly: vypnout ho můžeš v Nastavení > Zvuk.",
+  "Off: Windows asks for permission every time the mic effect is set up or repaired.": "Vypnuto: Windows požádají o povolení pokaždé, když se efekt mikrofonu nastavuje nebo opravuje.",
+  "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Onion Board přidá do Windows malého pomocníka (úlohu, která běží jako SYSTEM), aby mohl nastavit a opravit efekt mikrofonu, aniž by se Windows pokaždé ptaly na povolení. Zruš zaškrtnutí a pomocník se odstraní.",
+  "The helper is removed. Windows asks for permission each time now.": "Pomocník je odstraněn. Windows se teď na povolení zeptají pokaždé.",
+  "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "Pomocník tam pořád je, takže se nic nezměnilo. Zkus to znovu a až se Windows zeptají, klikni na <b>Ano</b>.",
+  "Wait until the mic effect is done, then try again.": "Počkej, až efekt mikrofonu doběhne, a pak to zkus znovu."
 }

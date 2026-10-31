@@ -88,7 +88,7 @@ LOCAL_SETTINGS = {"version", "sounds", "categories", "category", "main_device", 
                   # this install's own: the store's vote id, the privacy switches, what
                   # was sent about it, and this PC's Discord as it was
                   "store_id", "netlog_keep", "app_log", "stats_ffmpeg_failed",
-                  "discord_talk", "discord_restore",
+                  "discord_talk", "discord_restore", "mic_helper",
                   # keys the app sends to other programs, and who in Twitch chat may make
                   # it speak or post as you (and what): set here, by hand, never by a file
                   "ptt_key", "hotkeys_share", "api_stream"}

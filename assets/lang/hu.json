@@ -4753,5 +4753,13 @@
   "Show the whole sound": "Az egész hang mutatása",
   "Speed & loudness": "Sebesség és hangerősség",
   "The usual tabs, one at a time": "A megszokott fülek, egyszerre egy",
-  "Undo ({keys})": "Visszavonás ({keys})"
+  "Undo ({keys})": "Visszavonás ({keys})",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "A Windows winget segítségével, vagy az FFmpeg saját letöltéséből (kb. 100 MB). Ezt kikapcsolhatod: Beállítások → Adatvédelem & biztonság.",
+  "Don't ask for admin each time": "Ne kérjen rendszergazdai engedélyt minden alkalommal",
+  "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Egy kis segédet is hozzáad, hogy a Windows ne kérdezzen újra: kikapcsolhatod itt: Beállítások > Hang.",
+  "Off: Windows asks for permission every time the mic effect is set up or repaired.": "Kikapcsolva: a Windows minden alkalommal engedélyt kér, amikor a mikrofoneffekt beállítása vagy javítása történik.",
+  "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Az Onion Board egy kis segédet ad a Windowshoz (egy SYSTEM-ként futó feladatot), hogy úgy állíthassa be és javíthassa a mikrofoneffektet, hogy a Windows ne kérjen minden alkalommal engedélyt. Vedd ki a pipát az eltávolításához.",
+  "The helper is removed. Windows asks for permission each time now.": "A segéd eltávolítva. Mostantól a Windows minden alkalommal engedélyt kér.",
+  "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "A segéd még mindig ott van, így semmi sem változott. Próbáld újra, és kattints az <b>Igen</b> gombra, amikor a Windows kérdez.",
+  "Wait until the mic effect is done, then try again.": "Várd meg, amíg a mikrofoneffekt végez, aztán próbáld újra."
 }

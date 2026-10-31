@@ -4753,5 +4753,13 @@
   "Show the whole sound": "Näytä koko ääni",
   "Speed & loudness": "Nopeus ja voimakkuus",
   "The usual tabs, one at a time": "Tutut välilehdet, yksi kerrallaan",
-  "Undo ({keys})": "Kumoa ({keys})"
+  "Undo ({keys})": "Kumoa ({keys})",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Windowsin wingetillä tai muuten FFmpegin omalla latauksella (noin 100 Mt). Voit poistaa tämän käytöstä kohdassa Asetukset → Yksityisyys ja tietoturva.",
+  "Don't ask for admin each time": "Älä kysy järjestelmänvalvojan oikeuksia joka kerta",
+  "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Se lisää myös pienen apurin, jotta Windows ei kysy uudestaan: voit poistaa sen käytöstä kohdassa Asetukset > Ääni.",
+  "Off: Windows asks for permission every time the mic effect is set up or repaired.": "Pois: Windows pyytää lupaa joka kerta, kun mikrofonitehoste otetaan käyttöön tai korjataan.",
+  "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Onion Board lisää Windowsiin pienen apurin (tehtävän, joka toimii SYSTEM-tilillä), jotta se voi ottaa mikrofonitehosteen käyttöön ja korjata sen ilman, että Windows pyytää lupaa joka kerta. Poista valinta, niin apuri poistetaan.",
+  "The helper is removed. Windows asks for permission each time now.": "Apuri on poistettu. Windows pyytää nyt lupaa joka kerta.",
+  "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "Apuri on yhä paikallaan, joten mikään ei muuttunut. Yritä uudelleen ja klikkaa <b>Kyllä</b>, kun Windows kysyy.",
+  "Wait until the mic effect is done, then try again.": "Odota, että mikrofonitehoste on valmis, ja yritä sitten uudelleen."
 }

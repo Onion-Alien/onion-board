@@ -4753,5 +4753,13 @@
   "Show the whole sound": "Покажи целия звук",
   "Speed & loudness": "Скорост и сила",
   "The usual tabs, one at a time": "Обичайните раздели, един по един",
-  "Undo ({keys})": "Отмени ({keys})"
+  "Undo ({keys})": "Отмени ({keys})",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Чрез winget на Windows или от собственото изтегляне на FFmpeg (около 100 MB). Можеш да го изключиш от Настройки → Поверителност и сигурност.",
+  "Don't ask for admin each time": "Не питай за администраторски права всеки път",
+  "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Добавя и малък помощник, за да не пита Windows отново: можеш да го изключиш в Настройки > Аудио.",
+  "Off: Windows asks for permission every time the mic effect is set up or repaired.": "Изключено: Windows иска разрешение всеки път, когато ефектът на микрофона се настройва или поправя.",
+  "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Onion Board добавя малък помощник в Windows (задача, която работи като SYSTEM), за да може да настройва и поправя ефекта на микрофона, без Windows да иска разрешение всеки път. Махни отметката, за да го премахнеш.",
+  "The helper is removed. Windows asks for permission each time now.": "Помощникът е премахнат. Сега Windows ще иска разрешение всеки път.",
+  "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "Помощникът още е там, така че нищо не се промени. Опитай пак и натисни <b>Да</b>, когато Windows попита.",
+  "Wait until the mic effect is done, then try again.": "Изчакай ефектът на микрофона да приключи, после опитай пак."
 }

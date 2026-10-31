@@ -93,7 +93,7 @@ normal looks like when auditing it:
 | You open the Radio tab (or start the app with Radio as the last tab you used: the app reopens it), or a phone remote / the control API asks for the popular stations or searches them | `*.api.radio-browser.info` | the station directory: the ~3000 most-listened stations with a location (cached for a day), your searches, and — only if you tick *Share play counts* (Settings → Privacy & security, off by default) — a "click" when you start a station (Radio Browser's own popularity count). Nothing else about you is sent. The map's country outlines ship with the app and load from its own folder: no CDN is contacted | `radio` |
 | You play a radio station | that station's stream server (the address listed for it in the directory; its `https` address when the directory lists one, so the network in between can't see which station) | the stream itself, decoded by Qt Multimedia (FFmpeg) and played through the app's audio engine | `radio` |
 | You speak a line with a custom voice server you added (Voice tab → More options → *Custom voices*; a `.json` with a `"url"` in `%APPDATA%\OnionBoard\voices\`) | the address you gave it (normally a TTS server on your own PC, e.g. `127.0.0.1`) | sends the line's text (and the voice / model / API key you entered) and gets the spoken audio back. Nothing is sent until you add one | `voice_servers` |
-| You install the app and FFmpeg isn't on this PC yet (always, no box; not in Offline mode or on the app's own updates) | `winget` (Microsoft's package source, then the FFmpeg build it points to) | installs `Gyan.FFmpeg.Essentials` | — (the installer) |
+| You install the app and FFmpeg isn't on this PC yet (always, no box, but the installer's options page says so first; not in Offline mode or on the app's own updates) | `winget` (Microsoft's package source, then the FFmpeg build it points to) | installs `Gyan.FFmpeg.Essentials` | — (the installer) |
 | FFmpeg is missing or won't start when the app starts (checked behind the loading screen by running `ffmpeg -version` on this PC; the download starts once the window is up and shows on a bar with *Stop*), and not in Offline mode, Low data mode, with this switch off or after *Don't ask again*; or you press *Fix it*, *Get FFmpeg* or *Reinstall* (the bar, or Settings → Data & quality; pressing it while this switch is off switches it back on) | first `winget` (Microsoft's package source, then the FFmpeg build it points to; it goes direct, not through the app's proxy or Tor, so it's skipped when Connection is set to either); if that's missing or doesn't work, `github.com` → GitHub's release download server (`release-assets.githubusercontent.com`), then `www.gyan.dev` (the FFmpeg builder's own site) | winget installs `Gyan.FFmpeg.Essentials` (about 100 MB): a plain install, then `--force`, then `winget uninstall` and a fresh install while it still won't start. Otherwise the app downloads a pinned essentials build's zip (`ffmpeg-9.0.2-essentials_build.zip`, about 115 MB) through the app's connection setting, up to 3 tries on each site, checks it against the SHA-256 pinned in `soundboard/online/ffmpegget.py` (a file that doesn't match is deleted, never unpacked) and keeps only `ffmpeg.exe`, `ffprobe.exe` and the licence, in `%APPDATA%\OnionBoard\ffmpeg\bin` | `ffmpeg_download` |
 | You install the virtual cable (only if you choose to: sounds go straight into your mic by default, so its box in the installer is unticked; also the setup guide's and Setup tab's *Install the free virtual cable* button) | `vb-audio.com` | downloads VB-Cable; the installer's signature is checked before it runs | `setup_downloads` (not the installer's box) |
 | You press *Get Tor* / *Update Tor* (Settings → Connection), or tick *Private connection (Tor)* in the installer (unticked by default) | `dist.torproject.org`, or `archive.torproject.org` once dist no longer has this version (through your proxy if *Connection* is set to one; when updating, through the Tor that's already there if Tor is picked) | downloads the Tor Project's Tor Expert Bundle for Windows (about 22 MB), checks it against the SHA-256 pinned in `soundboard/online/torget.py` (taken from the release's GPG-signed checksum list; a download that doesn't match is thrown away) and unpacks only `tor.exe`, `lyrebird.exe`, `pt_config.json` and their licence texts into `%APPDATA%\OnionBoard\tor\bin\`. The app doesn't ship Tor. Where Tor is blocked, this download often is too | `tor_download` |
@@ -694,7 +694,11 @@ goes online.
   by hand. Taking the effect off a mic in Setup keeps the helper, so putting it back
   needs no prompt. If Windows already took the effect off (a
   driver update, *Reset sound settings*), what's there now stays. The shared file and
-  the admin log stay in `%ProgramData%\OnionBoard\`.
+  the admin log stay in `%ProgramData%\OnionBoard\`, unless you say Yes to the
+  uninstaller's *Also delete your sounds and settings?*: then, once the effect and the
+  helper are off, that folder goes too (`soundboard/core/uninstallclean.py`, in the
+  same admin step that removes Onion Pocket's firewall rule, which every uninstall
+  does on a PC that has one).
 - **The virtual cable**, the fallback, is VB-Audio's own signed driver: installed by
   `installer/install-vbcable.ps1` only when you ask, and removed by VB-Audio's own
   uninstaller (Setup tab → *Remove the virtual cable*, or the uninstaller's question),
@@ -720,11 +724,14 @@ None of it ever goes online, and nothing from those files is written to the log.
   switches only), and put back when Onion Board closes (unless you untick *Put Discord back for
   talking on close* on the Setup tab), by Settings → Audio → *Put
   Discord back*, and by the uninstaller.
-- **Copies:** before each write, the one log file it changes is copied to
-  `%APPDATA%\OnionBoard\discord-backup\<client>\<time>\`, so it can be put back by hand.
-  That file can hold Discord's login too, like the original next to Discord. At most 3
-  copies per client are kept, none older than 14 days, and only on this PC. Delete the
-  `discord-backup` folder to remove them.
+- **Copies:** before each write, the voice settings it replaces (the `MediaEngineStore`
+  JSON, nothing else) are saved to `%APPDATA%\OnionBoard\discord-backup\<client>\<time>.json`,
+  so they can be put back by hand. Discord's own files are never copied, and the app
+  never reads, copies or keeps Discord's login token. At most 3 per client are kept,
+  none older than 14 days, and only on this PC. Delete the `discord-backup` folder to
+  remove them; the uninstaller's *Also delete your sounds and settings?* removes them
+  with the rest. Older versions copied Discord's log file there instead (which could
+  hold the login): the app deletes those copies a few seconds after it starts.
 
 ## Anti-cheat
 

@@ -414,9 +414,11 @@ def is_admin() -> bool:
         return False
 
 
-def run_elevated(args: list[str], wait_s: float = 600.0) -> int | None:
+def run_elevated(args: list[str], wait_s: float = 600.0,
+                 source: tuple[str, ...] = ("-m", "soundboard.core.cleanup")) -> int | None:
     """Run this program again as admin and wait: its exit code, None if Windows' prompt
-    was answered No (or it didn't finish in time)."""
+    was answered No (or it didn't finish in time). From source, Python gets `source`
+    first (the uninstaller's tidy-up passes main.py in `args` instead)."""
     from ctypes import wintypes
 
     class Info(ctypes.Structure):
@@ -432,7 +434,7 @@ def run_elevated(args: list[str], wait_s: float = 600.0) -> int | None:
     if getattr(sys, "frozen", False):
         exe, params = sys.executable, args
     else:   # from source: python -m soundboard.core.cleanup
-        exe, params = sys.executable, ["-m", "soundboard.core.cleanup", *args]
+        exe, params = sys.executable, [*source, *args]
     info = Info(cbSize=ctypes.sizeof(Info), fMask=0x40,   # SEE_MASK_NOCLOSEPROCESS
                 lpVerb="runas", lpFile=exe, lpParameters=subprocess.list2cmdline(params),
                 lpDirectory=str(Path(exe).parent), nShow=0)

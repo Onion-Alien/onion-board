@@ -17,7 +17,7 @@ from soundboard.audio.engine import SR, Engine
 from soundboard.audio.engineparts import LITE_BLOCK_S
 from soundboard.core import exitwatch
 from soundboard.audio import appaudio
-from soundboard.mic import voicesdk
+from soundboard.mic import directmic, voicesdk
 from soundboard.core import achievements, autostart, reset, trash
 from soundboard.sounds import library
 from soundboard import voicefx
@@ -207,6 +207,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         app = QApplication.instance()
         lite.set_on(self.cfg.lite_mode)   # (before anything that animates is built)
         voicefx.set_light(self.light_voice_on())
+        directmic.set_helper(self.cfg.mic_helper)   # (before anything asks for admin)
         # before the UI is built, so everything polishes in-theme
         if isinstance(app, QApplication):
             theme.textures_on = self.cfg.theme_texture and not self.cfg.lite_mode

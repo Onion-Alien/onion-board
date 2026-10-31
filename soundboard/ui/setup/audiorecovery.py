@@ -14,9 +14,9 @@ from __future__ import annotations
 import logging
 import threading
 
-from PySide6.QtCore import QObject, QSize, Qt, QTimer, Signal
-from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QHBoxLayout, QLabel, QPushButton,
-                               QVBoxLayout)
+from PySide6.QtCore import QObject, QSignalBlocker, QSize, Qt, QTimer, Signal
+from PySide6.QtWidgets import (QApplication, QCheckBox, QDialog, QFrame, QHBoxLayout, QLabel,
+                               QPushButton, QVBoxLayout)
 from shiboken6 import isValid as qt_valid
 
 from soundboard.mic import directmic, michelper
@@ -228,6 +228,9 @@ def ask(parent, action, lines, go_on):
         (_("If anything is found, Windows will ask for permission and audio will "
            "briefly stop.") if prompts else
          _("If anything is found, audio will briefly stop.")) if action == "cleanup" else
+        directmic.with_helper_note(_("Windows will ask for permission. Audio will briefly "
+                                     "stop, including calls and games."))
+        if prompts and action in INSTALLS else
         _("Windows will ask for permission. Audio will briefly stop, "
           "including calls and games.") if prompts else
         _("Audio will briefly stop, including calls and games."))
@@ -475,6 +478,21 @@ class RecoveryCard(QFrame):
         from soundboard.mic import discordtalk
         self.discord.setVisible(discordtalk.installed())   # no Discord: nothing to put back
         self.discord_back.connect(self._discord_back)
+        # the mic helper (soundboard/mic/michelper.py): said plainly, and switched off here
+        self.helper = QCheckBox(_("Don't ask for admin each time"), self)
+        self.helper.setToolTip(_("Onion Board adds a small helper to Windows (a task that "
+                                 "runs as SYSTEM), so it can set up and repair the mic "
+                                 "effect without Windows asking for permission each time. "
+                                 "Untick this to remove it."))
+        self.helper.setChecked(mw.cfg.mic_helper)
+        self.helper.toggled.connect(self._switch_helper)
+        mw.micctl.helper_switched.connect(self._helper_switched)
+        v.addWidget(self.helper)
+        self.helper_hint = QLabel(_("Off: Windows asks for permission every time the mic "
+                                    "effect is set up or repaired."), self)
+        self.helper_hint.setObjectName("hint")
+        self.helper_hint.setWordWrap(True)
+        v.addWidget(self.helper_hint)
         # the same job as the setup guide's mic step, so the same show (hides itself)
         self.show_ = SetupShow()
         v.addWidget(self.show_)
@@ -530,6 +548,23 @@ class RecoveryCard(QFrame):
 
     def put_discord_back(self):
         put_discord_back(self.mw, self.discord.button, self.discord_back)
+
+    def _switch_helper(self, on: bool):
+        if on == self.mw.cfg.mic_helper:
+            return
+        if not self.mw.micctl.switch_helper(on):   # a mic step is running: try after it
+            self.mw.toast(_("Wait until the mic effect is done, then try again."), "warn")
+            self._helper_switched(not on)
+            return
+        busy.set_busy(self.helper, not on)   # (Windows asks: the answer moves it)
+
+    def _helper_switched(self, on: bool):
+        if not qt_valid(self):
+            return
+        busy.set_busy(self.helper, False)
+        if self.helper.isChecked() != on:
+            with QSignalBlocker(self.helper):
+                self.helper.setChecked(on)
 
     def _discord_back(self, todo, left):
         if not qt_valid(self):

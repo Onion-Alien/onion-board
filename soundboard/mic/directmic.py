@@ -49,7 +49,8 @@ from the command line, so the admin step can't be pointed at another DLL.
 After that first prompt the admin steps go through the mic helper (soundboard/
 michelper.py: a SYSTEM scheduled task running a frozen copy of the admin part,
 micadmin.py, with its own DLL), with no prompt; `_elevated` tries it first and falls
-back to Windows' prompt.
+back to Windows' prompt. Settings can switch the helper off (set_helper): then every
+step asks Windows.
 """
 from __future__ import annotations
 
@@ -76,7 +77,7 @@ from soundboard.mic.micadmin import *  # noqa: F403
 from soundboard.mic.micbase import FLAG, bundled_dll, data_dir
 from soundboard.mic.micstate import endpoint_for, mic_lookup
 from soundboard.mic.micadmin import AUDIO_STUCK, EFFECT_NOT_STARTED, MIC_SHUT, MIC_SILENT, \
-    UNSTARTED, UNSTARTED_HOW
+    NO_HELPER, UNSTARTED, UNSTARTED_HOW
 
 
 log = logging.getLogger(__name__)
@@ -89,6 +90,40 @@ def relaunch_params(args: list[str]) -> str:
     if not getattr(sys, "frozen", False):
         parts.append(f'"{Path(__file__).resolve().parents[2] / "main.py"}"')
     return " ".join(parts + [FLAG] + args)
+
+
+helper_on = True   # Settings: "Don't ask for admin each time" (set_helper)
+
+
+def set_helper(on: bool):
+    """The mic helper switched on or off (Settings, and the saved setting at start).
+    Off: every admin step asks Windows, and none sets the helper up again (NO_HELPER);
+    taking an installed one away is remove_helper(). On: the next admin step that asks
+    Windows anyway puts it back."""
+    global helper_on
+    helper_on = bool(on)
+    if not helper_on:
+        from soundboard.mic import michelper
+        michelper.state.set({False: False, True: False}, "switched off")
+
+
+def helper_note() -> str:
+    """Said where Windows asks for the first time: that one Yes also sets up the mic
+    helper, and where it's switched off. "" while it is off."""
+    return _("It also adds a small helper so Windows won't ask again: you can switch that "
+             "off in Settings > Audio.") if helper_on else ""
+
+
+def with_helper_note(text: str) -> str:
+    """`text` (a whole sentence that says Windows asks) and helper_note() after it."""
+    note = helper_note()
+    return f"{text} {note}" if note else text
+
+
+def remove_helper() -> int | None:
+    """Take the mic helper away (Windows asks: never through the helper itself). The
+    admin copy's exit code, or None if the prompt was turned down or didn't finish."""
+    return _elevated(["remove-helper"])
 
 
 def _elevated(args: list[str], wait_s: float = 300.0, *,
@@ -113,8 +148,8 @@ def _elevated(args: list[str], wait_s: float = 300.0, *,
             log.warning("the mic helper's step failed (code 1): asking Windows instead")
         elif code is not None or not ask_windows:
             return code
-        asked = run_elevated(sys.executable,
-                             relaunch_params(args + michelper.for_user(args)), wait_s,
+        extra = michelper.for_user(args) if helper_on else [NO_HELPER]
+        asked = run_elevated(sys.executable, relaunch_params(args + extra), wait_s,
                              progress=data_dir().parent / "directmic-admin.log")
         return 1 if asked is None and code == 1 else asked
     finally:
@@ -138,6 +173,9 @@ def _helper_check(via: str = "check") -> bool:
     """michelper.ready() again, so michelper.will_ask() is current (on a worker).
     False if the check itself failed."""
     from soundboard.mic import michelper
+    if not helper_on:
+        set_helper(False)   # (switched off: never used, so no look either)
+        return True
     try:
         michelper.ready(via=via)
         return True
@@ -151,7 +189,7 @@ def _via_helper(args: list[str], wait_s: float) -> int | None:
     helper with this app's effect DLL; taking it off works with any helper."""
     from soundboard.mic import michelper
     try:
-        if not michelper.allowed(args):
+        if not helper_on or not michelper.allowed(args):
             return None
         usable = michelper.ready(same_dll=args[0] in ("install", "reinstall"),
                                  via="before a step")

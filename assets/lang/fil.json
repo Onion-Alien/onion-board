@@ -4753,5 +4753,13 @@
   "Show the whole sound": "Ipakita ang buong sound",
   "Speed & loudness": "Bilis at lakas",
   "The usual tabs, one at a time": "Ang karaniwang mga tab, isa-isa",
-  "Undo ({keys})": "I-undo ({keys})"
+  "Undo ({keys})": "I-undo ({keys})",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Sa winget ng Windows, o kaya sa sariling download ng FFmpeg (mga 100 MB). Puwede mo itong i-off sa Settings → Privacy & security.",
+  "Don't ask for admin each time": "Huwag humingi ng admin bawat beses",
+  "It also adds a small helper so Windows won't ask again: you can switch that off in Settings > Audio.": "Nagdadagdag din ito ng maliit na helper para hindi na magtanong ulit ang Windows: puwede mo itong i-off sa Settings > Audio.",
+  "Off: Windows asks for permission every time the mic effect is set up or repaired.": "Off: hihingi ng permiso ang Windows tuwing ise-set up o aayusin ang mic effect.",
+  "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Nagdadagdag ang Onion Board ng maliit na helper sa Windows (isang task na tumatakbo bilang SYSTEM), para ma-set up at maayos nito ang mic effect nang hindi humihingi ng permiso ang Windows bawat beses. Alisin ang check para tanggalin ito.",
+  "The helper is removed. Windows asks for permission each time now.": "Natanggal na ang helper. Hihingi na ng permiso ang Windows bawat beses.",
+  "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "Nandiyan pa ang helper, kaya walang nagbago. Subukan ulit at i-click ang <b>Yes</b> kapag nagtanong ang Windows.",
+  "Wait until the mic effect is done, then try again.": "Hintayin munang matapos ang mic effect, saka subukan ulit."
 }
