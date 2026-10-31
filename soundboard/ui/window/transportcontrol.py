@@ -127,6 +127,9 @@ class TransportControl(Controller):
         for w in (mw.btn_pp, mw.btn_st, mw.seek, mw.mini_pp, mw.mini_st,
                   mw.mini_seek):
             w.setEnabled(enabled)
+        players = mw.editctl.players()
+        for p in players:
+            p.set_enabled(enabled)
         if not m:
             return
         prog, paused = playing.get(sid, (None, False))
@@ -138,6 +141,8 @@ class TransportControl(Controller):
                 slider.blockSignals(True)
                 slider.setValue(int(frac * 1000))
                 slider.blockSignals(False)
+            for p in players:
+                p.set_seek(int(frac * 1000))
             mw._set_np_time(fmt_pos(frac * m.duration, m.duration))
 
     def _video_of(self, sid: str | None) -> Path | None:

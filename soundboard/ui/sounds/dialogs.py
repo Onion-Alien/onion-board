@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 import logging
 import threading
+from typing import Any
 
 from PySide6.QtCore import QObject, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QFont, QImage, QKeySequence, QShortcut
@@ -886,6 +887,8 @@ class EditDialog(EditDialogParts, QDialog):
         brow.addWidget(self._reset_glow)
         brow.addWidget(bb)
         self._bb = bb
+        self._brow = brow
+        self.player: Any = None   # the board's player, an EditPlayer (set_player)
         lay.addLayout(brow)
 
         # after Save, while a slow render runs: how far it is, ✕ to stop it, and Close
@@ -1042,6 +1045,12 @@ class EditDialog(EditDialogParts, QDialog):
             x = min(max(g.x(), screen.left()), screen.right() - g.width())
             y = min(max(g.y(), screen.top()), screen.bottom() - g.height())
             self.move(max(x, screen.left()), max(y, screen.top()))
+
+    def set_player(self, player: QWidget):
+        """The board's player (ui/sounds/editplayer.py), over the Save row: a big
+        window covers the board's own, and the song had to be paused from somewhere."""
+        self._lay.insertWidget(self._lay.indexOf(self._brow), player)
+        self.player = player
 
     def _simple_min_w(self) -> int:
         """Simple's least width: its four tabs and the switch beside them, whole (long

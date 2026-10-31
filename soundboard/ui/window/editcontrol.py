@@ -33,6 +33,7 @@ from soundboard.ui.kit import worker
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.kit.crashdialog import free_dialog, rehome_crash_reports
 from soundboard.ui.sounds.dialogs import EditDialog
+from soundboard.ui.sounds.editplayer import EditPlayer
 from soundboard.ui.sounds.linkbar import PLAY_ID as LINK_ID
 
 if TYPE_CHECKING:
@@ -151,6 +152,8 @@ class EditControl(Controller):
         else:
             d = self._new_editor(m, tab)
         self._editors[sid] = d
+        if d.player is not None:
+            self._fill_player(d.player)
         self._play_timer.start()
         self._show_playing()
         self._show_render(sid)
@@ -245,7 +248,32 @@ class EditControl(Controller):
         d.finished.connect(lambda ok, d=d: self._edit_done(d.meta.id, d, ok))
         d.effects.changed.connect(lambda d=d: self._fx_edited(d))
         d.effects_reset.connect(lambda d=d: self._live_apply(d.meta.id))   # at once
+        p = EditPlayer(mw, d)
+        mw.vol_sound.changed.connect(p.set_volume)   # (freed with it: bound slots)
+        mw.chk_monitor.toggled.connect(p.set_monitor)
+        d.set_player(p)
         return d
+
+    def players(self) -> list[EditPlayer]:
+        """The players of the Edit sound windows open now (the board's player sets
+        them as it sets its own)."""
+        return [d.player for d in self._editors.values()
+                if qt_valid(d) and d.player is not None]
+
+    def _fill_player(self, p: EditPlayer):
+        """An Edit sound window opened: its player as the board's is now."""
+        mw = self.mw
+        playctl = mw.playctl
+        m = mw.meta(mw.current) if mw.current else None   # (np_name's is cut short)
+        p.set_name(m.name if m else mw.np_name.text(), mw.np_name.toolTip())
+        p.set_time(mw.np_time.text())
+        p.set_icon(mw._pp_icon or "play")
+        p.set_enabled(mw.btn_pp.isEnabled())
+        p.set_seek(mw.seek.value())
+        p.set_volume(mw.vol_sound.value())
+        p.set_monitor(mw.chk_monitor.isChecked())
+        p.set_chips(list(playctl._chip_groups), playctl._chip)
+        p.mark_chip(mw.current)
 
     def voice_catalog(self):
         """What the voice picker shows (ui.voicepicker.Catalog): the voice changer's

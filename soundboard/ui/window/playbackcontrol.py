@@ -65,6 +65,7 @@ class PlaybackControl(Controller):
         self._preview_gen = 0            # newest effects preview (older renders are dropped)
         self._preview_done = None         # its done(ok) callback while it renders
         self._seeking = False
+        self._chip_groups: tuple = ()   # the Now playing row's, for a new Edit sound player
         self._zero_vol_said = False   # the "Sounds volume is at 0%" toast, once per time
         self._muted_said = False      # the "you're muted" one, once per mute
 
@@ -637,27 +638,12 @@ class PlaybackControl(Controller):
                 lbl.setObjectName("muted")
                 mw._chips_hl.addWidget(lbl)
                 for sid in group:
-                    m = mw.meta(sid)
-                    chip = QFrame()
-                    chip.setObjectName("chip")
-                    ch = QHBoxLayout(chip)
-                    ch.setContentsMargins(4, 2, 2, 2)
-                    ch.setSpacing(2)
-                    name = QPushButton(chip.fontMetrics().elidedText(   # && : "R&B" not "RB"
-                        m.name if m else sid, Qt.TextElideMode.ElideRight, 150).replace("&", "&&"))
-                    name.setObjectName("chipname")
-                    name.setToolTip(_("Show this sound in the player (keeps playing)"))
-                    name.clicked.connect(lambda __=False, s=sid: self.select(s))
-                    stop = QPushButton()
-                    stop.setObjectName("chipstop")
-                    stop.setAccessibleName(_("Stop this sound"))
-                    icons.set_icon(stop, "stop", "danger_text", size=12)
-                    stop.setFixedSize(24, 24)
-                    stop.clicked.connect(lambda __=False, s=sid: self._stop_one(s))
-                    ch.addWidget(name)
-                    ch.addWidget(stop)
+                    chip = self._chip(sid)
                     mw._chips_hl.addWidget(chip)
                     mw._chips[sid] = chip
+            self._chip_groups = groups
+            for p in mw.editctl.players():   # Edit sound's players have them too
+                p.set_chips(groups, self._chip)
             # Up next: one chip, "Up next" and how many wait, that opens the whole list
             mw._up_next_chip = None
             waiting = len(queue) + len(links)
@@ -679,12 +665,37 @@ class PlaybackControl(Controller):
             # sound resized and repainted the whole board under it
             mw.playing_row.setMinimumHeight(CHIPS_ROW_H)
             mw.playing_row.setVisible(bool(ids) or bool(queue) or bool(links))
+        for p in mw.editctl.players():
+            p.mark_chip(mw.current)
         for sid, chip in mw._chips.items():
             sel = "true" if sid == mw.current else "false"
             if chip.property("sel") != sel:
                 chip.setProperty("sel", sel)
                 chip.style().unpolish(chip)
                 chip.style().polish(chip)
+
+    def _chip(self, sid: str) -> QFrame:
+        """One sound's chip: its name (into the player) and its own ■."""
+        m = self.mw.meta(sid)
+        chip = QFrame()
+        chip.setObjectName("chip")
+        ch = QHBoxLayout(chip)
+        ch.setContentsMargins(4, 2, 2, 2)
+        ch.setSpacing(2)
+        name = QPushButton(chip.fontMetrics().elidedText(   # && : "R&B" not "RB"
+            m.name if m else sid, Qt.TextElideMode.ElideRight, 150).replace("&", "&&"))
+        name.setObjectName("chipname")
+        name.setToolTip(_("Show this sound in the player (keeps playing)"))
+        name.clicked.connect(lambda __=False, s=sid: self.select(s))
+        stop = QPushButton()
+        stop.setObjectName("chipstop")
+        stop.setAccessibleName(_("Stop this sound"))
+        icons.set_icon(stop, "stop", "danger_text", size=12)
+        stop.setFixedSize(24, 24)
+        stop.clicked.connect(lambda __=False, s=sid: self._stop_one(s))
+        ch.addWidget(name)
+        ch.addWidget(stop)
+        return chip
 
     def _up_next_items(self) -> list[Waiting]:
         """Everything waiting to play, in order: web search / link songs, then the
@@ -817,3 +828,5 @@ class PlaybackControl(Controller):
             for b in (mw.btn_pp, getattr(mw, "mini_pp", None)):
                 if b is not None:
                     icons.set_icon(b, name, "on_accent", size=16)
+            for p in mw.editctl.players():
+                p.set_icon(name)

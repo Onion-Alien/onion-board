@@ -187,6 +187,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/sounds/dialogs.py` | per-sound Edit dialog: the Sound tab (name, volume, hotkey, fades…) and the Effects tab |
 | `soundboard/ui/sounds/editadvanced.py` | Edit sound's Advanced view: the waveform big on top (zoom, ruler, fades), the Trim & speed, Effects and Equalizer pages side by side (tabs when narrow), only the effects that are on plus the Add effect picker, the Simple / Advanced switch |
 | `soundboard/ui/sounds/editdialogparts.py` | part of the Edit dialog: its Source line, the fade cells, the render and live-preview progress, the picture, the pad colour, the name check and the hotkey |
+| `soundboard/ui/sounds/editplayer.py` | the player in Edit sound: the board's player bar again (play / pause, stop, skip, name and seek line, time, Sounds for others, Hear it myself), the Now playing chips and Stop all; the board's player sets it as it sets its own |
 | `soundboard/ui/sounds/tabhelp.py` | a tab's help pop-up (the ? button), with Bun or Hoot beside it (`dialogs` re-exports it) |
 | `soundboard/ui/window/languagecontrol.py` | the main window's language (`MainWindow.langctl`): offering Windows' language once, turning it down, switching |
 | `soundboard/ui/window/miccontrol.py` | straight into the mic and the virtual cable in the main window (`MainWindow.micctl`): the mic effect's status, putting it on the mic (and back by itself), the mic helper, its update offer, falling back to the cable; installing, removing and fixing the cable; Windows' mic settings |
