@@ -13,7 +13,7 @@ import subprocess
 import time
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import QApplication, QMessageBox
 
 from soundboard.mic import directmic, michelper, micprobe, sonarkeep, voicesdk
@@ -58,6 +58,9 @@ class MicControl(Controller):
     _helper_checking = False
     _helper_failed = False  # the last check raised: the next waits HELPER_RETRY_S
     _helper_check_at = 0.0  # when the last check started (time.monotonic())
+    _helper_switching = False   # switch_helper(False) is removing it
+    helper_removed = Signal(bool)    # (that job's answer: it's gone)
+    helper_switched = Signal(bool)   # the helper's switch ended up on (True) or off
     _mic_offered = False    # shown this start (it comes back next start until updated)
     _following_effect = False
     _alive_before: frozenset = frozenset()   # other mics with sound before the set-up
@@ -71,6 +74,7 @@ class MicControl(Controller):
         # SteelSeries Sonar's devices, set back after Windows' audio restarts (keep_sonar)
         self.sonar = sonarkeep.SonarKeep(directmic.sonar_devices, directmic.sonar_set_back)
         self.sonar_poll = PollThread("sonar-keep")
+        self.helper_removed.connect(self._helper_removed)
 
     def keep_sonar(self):
         """About once a second: while the mic is SteelSeries Sonar's, its devices are
@@ -253,10 +257,10 @@ class MicControl(Controller):
             look = ("warn", "mic",
                     _("Your sounds aren't in your mic yet") if direct == "missing"
                     else _("Your sounds are on another mic"),
-                    _("1 step left"), needed(
+                    _("1 step left"), needed(directmic.with_helper_note(
                         _("Others hear your voice, but not your sounds. One click adds Onion "
                           "Board's audio driver to this mic, so Discord and games hear your "
-                          "sounds too. Windows asks once: click <b>Yes</b>.") if ask else
+                          "sounds too. Windows asks once: click <b>Yes</b>.")) if ask else
                         _("Others hear your voice, but not your sounds. One click adds Onion "
                           "Board's audio driver to this mic, so Discord and games hear your "
                           "sounds too.")), _("Put my sounds straight into my mic"))
@@ -442,6 +446,53 @@ class MicControl(Controller):
         mw = self.mw
         self._helper_checking = False
         mw.statusctl._update_flow()
+
+    def switch_helper(self, on: bool) -> bool:
+        """Settings -> Audio -> Mic effect: "Don't ask for admin each time". On: saved,
+        and the next step Windows asks for anyway sets the helper up again. Off: the
+        helper is removed first (Windows asks once, if it's there), then every step
+        asks; a No leaves it on. helper_switched says how it ended. False (nothing
+        done) while a mic step runs."""
+        mw = self.mw
+        if mw._attaching or self._helper_switching:
+            return False
+        if on:
+            self._helper_set(True)
+            michelper.state.forget()   # (a look again: it may still be there)
+            self._helper_failed = False
+            self._check_helper("switched on")
+            return True
+        self._helper_switching = True
+        log.info("switching the mic helper off")
+
+        def work():
+            if michelper.installed() or michelper.leftover():
+                directmic.remove_helper()
+            return not michelper.installed()
+
+        worker.run(work, self.helper_removed, "mic-helper-remove", error=False, owner=mw)
+        return True
+
+    def _helper_removed(self, gone: bool):
+        mw = self.mw
+        self._helper_switching = False
+        if gone:
+            self._helper_set(False)
+            mw.toast(_("The helper is removed. Windows asks for permission each time now."),
+                     "ok")
+        else:
+            log.info("the mic helper is still there: left on")
+            mw.toast(_("The helper is still there, so nothing changed. Try again and click "
+                       "<b>Yes</b> when Windows asks."), "warn")
+            self.helper_switched.emit(True)
+
+    def _helper_set(self, on: bool):
+        mw = self.mw
+        mw.cfg.mic_helper = on
+        directmic.set_helper(on)
+        mw._save_now()
+        self.helper_switched.emit(on)
+        mw.statusctl._update_flow()   # the texts' "click Yes" follow it
 
     def attach_mic(self, clean: bool = False, auto: bool = False):
         """Put the mic effect on the mic in use (Windows asks for admin once; with the

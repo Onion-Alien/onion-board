@@ -473,6 +473,7 @@ def _never_touch_the_real_mic(monkeypatch, tmp_path):
                         michelper.HelperState({True: False, False: False}, "test"))
     monkeypatch.setattr(michelper, "queue_dir", lambda: tmp_path / "guard" / "MicHelper")
     monkeypatch.setattr(michelper, "_schtasks", no_task)
+    monkeypatch.setattr(directmic, "helper_on", True)   # (Settings switches it: set_helper)
     directmic.forget_status()
 
 

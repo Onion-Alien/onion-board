@@ -1737,14 +1737,29 @@ def _is_admin() -> bool:
         return False
 
 
+NO_HELPER = "--no-helper"   # the app has the mic helper switched off: don't set it up
+
+
+def admin_remove_helper() -> int:
+    """Settings switched the mic helper off: its task and files go (the effect stays)."""
+    from soundboard.mic import michelper
+    if michelper.is_helper():
+        return 2
+    michelper.remove_helper()
+    return 0
+
+
 def cli(args: list[str]) -> int:
     """`--direct-mic install <endpoint guid> [sfx|lfx|efx]` /`--direct-mic uninstall`: the
     admin copy. `--direct-mic remove`: the uninstaller's, not admin: runs the admin
     `remove-all` (the mic helper, or Windows asks first) if Onion Board is on a mic or
     its helper (or any of it) is there at all. 0 when done. The app adds `--for <SID>`
-    (the account that asked) to the steps that may set up the helper."""
+    (the account that asked) to the steps that may set up the helper, or NO_HELPER when
+    it has the helper switched off. `--direct-mic remove-helper`: only the helper goes."""
     from soundboard.mic import directmic, michelper
-    user = None
+    user, helper = None, True
+    if args[-1:] == [NO_HELPER]:
+        args, helper = args[:-1], False
     if len(args) >= 2 and args[-2] == michelper.FOR:
         user, args = args[-1], args[:-2]   # (install_helper checks it)
     if args == ["remove"]:
@@ -1769,6 +1784,8 @@ def cli(args: list[str]) -> int:
         step = admin_uninstall
     elif args == ["remove-all"]:
         step = admin_remove_all
+    elif args == ["remove-helper"]:
+        step = admin_remove_helper
     elif args[:1] == ["cleanup"] and len(args) == 2 and _GUID.fullmatch(args[1]):
         guid = args[1].lower()
         step = lambda: admin_cleanup(guid)  # noqa: E731
@@ -1793,7 +1810,7 @@ def cli(args: list[str]) -> int:
             log.exception("mic effect %s failed", args[:1])
             return 1
         if code in DONE_CODES and args[0] in ("install", "reinstall", "cleanup") \
-                and not michelper.is_helper():
+                and helper and not michelper.is_helper():
             # the one prompt also sets up (or updates) the helper: no prompt next time
             michelper.install_helper(user)
         return code
