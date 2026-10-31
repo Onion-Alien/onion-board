@@ -4727,6 +4727,7 @@
     "Nog {n} van je voorinstellingen"
   ],
   "“{name}” is a built-in preset's name. Pick another one.": "“{name}” is de naam van een ingebouwde voorinstelling. Kies een andere.",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Via winget van Windows, anders via de eigen download van FFmpeg (ongeveer 100 MB). Je kunt dit uitzetten in Instellingen → Privacy & beveiliging.",
   "Onion Board's Clean mic (Voice tab) takes out the noise instead.": "Schone mic in Onion Board (tab Stem) haalt de ruis er in plaats daarvan uit.",
   "Onion Board's <b>Clean mic</b> (Voice tab) takes out the noise instead.": "<b>Schone mic</b> in Onion Board (tab Stem) haalt de ruis er in plaats daarvan uit.",
   "Clean mic takes over noise removal": "Schone mic neemt ruisonderdrukking over",

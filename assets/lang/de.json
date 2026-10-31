@@ -4727,6 +4727,7 @@
     "{n} weitere deiner Vorlagen"
   ],
   "“{name}” is a built-in preset's name. Pick another one.": "„{name}“ ist der Name einer eingebauten Vorlage. Wähl einen anderen.",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Über Windows' winget, sonst über FFmpegs eigenen Download (etwa 100 MB). Du kannst das unter Einstellungen → Privatsphäre & Sicherheit ausschalten.",
   "Onion Board's Clean mic (Voice tab) takes out the noise instead.": "Mikro säubern in Onion Board (Tab Stimme) entfernt das Rauschen stattdessen.",
   "Onion Board's <b>Clean mic</b> (Voice tab) takes out the noise instead.": "<b>Mikro säubern</b> in Onion Board (Tab Stimme) entfernt das Rauschen stattdessen.",
   "Clean mic takes over noise removal": "Mikro säubern übernimmt die Rauschentfernung",

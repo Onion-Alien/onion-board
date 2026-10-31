@@ -4814,6 +4814,7 @@
     "{n} dalších tvých předvoleb"
   ],
   "“{name}” is a built-in preset's name. Pick another one.": "„{name}“ je název vestavěné předvolby. Vyber jiný.",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Přes winget ve Windows, nebo z vlastního stažení FFmpeg (asi 100 MB). Vypnout to můžeš v Nastavení → Soukromí a zabezpečení.",
   "Onion Board's Clean mic (Voice tab) takes out the noise instead.": "Čistý mikrofon v Onion Board (karta Hlas) odstraní šum místo toho.",
   "Onion Board's <b>Clean mic</b> (Voice tab) takes out the noise instead.": "<b>Čistý mikrofon</b> v Onion Board (karta Hlas) odstraní šum místo toho.",
   "Clean mic takes over noise removal": "Čistý mikrofon přebírá odstranění šumu",

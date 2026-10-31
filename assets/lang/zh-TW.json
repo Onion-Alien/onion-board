@@ -4640,6 +4640,7 @@
     "另外 {n} 個你的預設集"
   ],
   "“{name}” is a built-in preset's name. Pick another one.": "「{name}」是內建預設集的名稱。請換一個。",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "透過 Windows 的 winget，否則使用 FFmpeg 自己的下載（約 100 MB）。可在 設定 → 隱私與安全性 中關閉。",
   "Onion Board's Clean mic (Voice tab) takes out the noise instead.": "改由 Onion Board 的麥克風降噪（語音分頁）去除雜音。",
   "Onion Board's <b>Clean mic</b> (Voice tab) takes out the noise instead.": "改由 Onion Board 的<b>麥克風降噪</b>（語音分頁）去除雜音。",
   "Clean mic takes over noise removal": "降噪交給麥克風降噪",

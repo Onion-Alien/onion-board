@@ -4640,6 +4640,7 @@
     "Thêm {n} mẫu của bạn"
   ],
   "“{name}” is a built-in preset's name. Pick another one.": "“{name}” là tên của một mẫu có sẵn. Hãy chọn tên khác.",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Qua winget của Windows, hoặc bản tải riêng của FFmpeg (khoảng 100 MB). Bạn có thể tắt việc này trong Cài đặt → Quyền riêng tư & bảo mật.",
   "Onion Board's Clean mic (Voice tab) takes out the noise instead.": "Thay vào đó, Mic sạch của Onion Board (thẻ Giọng nói) sẽ lọc tiếng ồn.",
   "Onion Board's <b>Clean mic</b> (Voice tab) takes out the noise instead.": "Thay vào đó, <b>Mic sạch</b> của Onion Board (thẻ Giọng nói) sẽ lọc tiếng ồn.",
   "Clean mic takes over noise removal": "Mic sạch đảm nhận việc lọc tiếng ồn",

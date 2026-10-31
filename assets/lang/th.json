@@ -4640,6 +4640,7 @@
     "พรีเซ็ตของคุณอีก {n} รายการ"
   ],
   "“{name}” is a built-in preset's name. Pick another one.": "“{name}” เป็นชื่อของพรีเซ็ตในตัว เลือกชื่ออื่น",
+  "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "ผ่าน winget ของ Windows หรือดาวน์โหลดของ FFmpeg เอง (ประมาณ 100 MB) ปิดได้ที่ การตั้งค่า → ความเป็นส่วนตัวและความปลอดภัย",
   "Onion Board's Clean mic (Voice tab) takes out the noise instead.": "ไมค์ไร้เสียงรบกวน ของ Onion Board (แท็บเสียงพูด) จะลบเสียงรบกวนแทน",
   "Onion Board's <b>Clean mic</b> (Voice tab) takes out the noise instead.": "<b>ไมค์ไร้เสียงรบกวน</b> ของ Onion Board (แท็บเสียงพูด) จะลบเสียงรบกวนแทน",
   "Clean mic takes over noise removal": "ไมค์ไร้เสียงรบกวนรับหน้าที่ลบเสียงรบกวน",
