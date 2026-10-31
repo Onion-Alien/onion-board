@@ -146,9 +146,21 @@ The full list. The [README](../README.md) has the short version and how to get s
   doesn't listen or keep anything. A program you removed comes back, settings and
   all, from *Forgotten programs*.
 - **Clean mic** (the Voice tab's first tab): fans, keyboards and other background noise
-  taken out of your mic while you talk (RNNoise, on this PC, about 5% of one CPU core,
-  ~30 ms), Light or Normal, with or without a voice on; *Hear the difference* records
-  5 seconds and plays them as they were and cleaned, in your headphones only.
+  taken out of your mic while you talk, inside Onion Board and before your sounds are
+  mixed in, so the sounds are never touched (that's why Discord's and games' own noise
+  suppression can stay off). On this PC, with or without a voice on, and it stays on from
+  last time; its chip in the Voice tab's bottom bar turns it off. Strength: *Light*
+  (noise turned well down, your voice most natural), *Normal* (RNNoise, about 5% of one
+  CPU core, ~30 ms) or *Strong* (DeepFilterNet: nearly everything but your voice goes,
+  about twice Normal's CPU; a one-time ~50 MB download the first time it's picked, which
+  *Remove Strong's download* takes off again). It also filters out deep rumble (desk
+  bumps, low hum) and, on Normal and Strong, turns your mic down between your words. *Mic
+  settings* (the cog) is laid out like a voice chat app's: presets *Normal*, *Loud room*,
+  *Just my voice* and *Quiet room*, *Input volume*, *Input sensitivity* (automatic, or
+  your own level on a live bar), *Noise suppression* (Off, Light, Normal, Strong) and
+  *Automatic gain control*. *Right now* shows your mic and the cleaned mic side by side;
+  *Hear the difference* records 5 seconds and plays them as they were and cleaned, in
+  your headphones only.
 - **Voice tab:** voice changer (25 ready voices, from Deep, High and Male voice and
   Demon to Autotune, Talkbox, Masked caller, Dark lord, a Dalek and a singing monk; pitch with a natural-sound mode and a
   voice-size control, autotune, monster growl,
@@ -244,7 +256,9 @@ The full list. The [README](../README.md) has the short version and how to get s
   chops up your sounds (Custom profile, noise suppression, echo cancellation, automatic
   gain and sensitivity off). Discord has to be closed while he writes: if it's open, he
   asks first, closes it, and opens it again on its voice settings. A copy of its settings
-  folder is kept first. *Put Discord back* (Settings → Audio → Mic effect) undoes it,
+  folder is kept first. Discord's own noise suppression stays off: *Clean mic* on the
+  Voice tab takes the background noise out of your voice instead, without touching your
+  sounds. *Put Discord back* (Settings → Audio → Mic effect) undoes it,
   and *Put Discord back for talking on close* does it whenever Onion Board closes. On the
   virtual cable you still pick *CABLE Output* as Discord's mic; its guide shows where. With *Straight into my mic*, an app that opens your mic
   in "raw" mode (and so skips your sounds) is named in a warning bar too.
