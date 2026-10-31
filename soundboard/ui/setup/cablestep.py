@@ -493,11 +493,12 @@ class CableStep(WizardStep):
             else:
                 self._say_mic_done()
                 self.status_card.set_state("", "", _("Your sounds aren't in your mic yet"))
-                self.cable_status.setText(_("Others hear your voice, but not your sounds. Press "
+                self.cable_status.setText(directmic.with_helper_note(
+                                          _("Others hear your voice, but not your sounds. Press "
                                             "<b>Put my sounds in my mic</b> below: Onion Board "
                                             "adds its audio driver to your mic. Windows asks "
                                             "once: click <b>Yes</b>. Your sound drops out for a "
-                                            "second while it sets up.") if ask else
+                                            "second while it sets up.")) if ask else
                                           _("Others hear your voice, but not your sounds. Press "
                                             "<b>Put my sounds in my mic</b> below: Onion Board "
                                             "adds its audio driver to your mic. Your sound "
