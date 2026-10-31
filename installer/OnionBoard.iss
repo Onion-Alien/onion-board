@@ -1554,8 +1554,11 @@ begin
   DeleteFile(CountFile);
   Lines :=
     '$app = ' + PsQuote(ExpandConstant('{app}') + '\') + #13#10 +
+    // not the uninstaller's own first half (unins000.exe, in {app} and waiting for the
+    // second): ending it made every uninstall return -1 to whatever started it (winget)
     '$p = @(Get-Process | Where-Object { $_.Path -and ' +
-    '$_.Path.StartsWith($app, [StringComparison]::OrdinalIgnoreCase) })' + #13#10;
+    '$_.Path.StartsWith($app, [StringComparison]::OrdinalIgnoreCase) -and ' +
+    '$_.ProcessName -notlike ''unins*'' })' + #13#10;
   if Kill then
     Lines := Lines +
       'if ($p.Count) {' + #13#10 +

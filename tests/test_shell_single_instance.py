@@ -115,3 +115,14 @@ def test_uninstaller_closes_the_board_before_it_counts():
     unins = unins[:unins.index("\nend;")]
     assert unins.index("'--quit-running'") < unins.index("BoardProcesses(True)") \
         < unins.index("'--uninstall-count'")
+
+
+def test_uninstaller_spares_its_own_first_half():
+    """BoardProcesses ends what runs from {app}: unins000.exe is there too, waiting for
+    the uninstall's second half, and ending it made the uninstall return -1."""
+    from pathlib import Path
+    iss = (Path(__file__).resolve().parents[1] / "installer" / "OnionBoard.iss").read_text(
+        "utf-8")
+    procs = iss[iss.index("function BoardProcesses(Kill: Boolean): Integer;\nvar"):]
+    procs = procs[:procs.index("\nend;")]
+    assert "-notlike ''unins*''" in procs
