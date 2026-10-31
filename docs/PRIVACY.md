@@ -81,7 +81,8 @@ my mic changes on your PC*](../SECURITY.md#what-straight-into-my-mic-changes-on-
 To see whether Discord's voice clean-up would wipe your sounds out, the app reads
 Discord's settings files on your PC. It looks only at the voice settings in them, never
 at your Discord login (which Discord keeps in the same folder), and sends nothing
-anywhere. Details: [SECURITY.md, *What the app reads and writes in Discord's
+anywhere. Before it changes them, the copy it keeps holds only those voice settings:
+the app never reads, copies or keeps your Discord login token. Details: [SECURITY.md, *What the app reads and writes in Discord's
 settings*](../SECURITY.md#what-the-app-reads-and-writes-in-discords-settings).
 
 ## What stays on your PC
