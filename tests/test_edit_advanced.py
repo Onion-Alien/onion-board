@@ -6,7 +6,7 @@ from PySide6.QtGui import QKeySequence, QShortcut, QWheelEvent
 from PySide6.QtWidgets import QApplication, QScrollArea
 
 from soundboard.ui.sounds import editadvanced
-from soundboard.ui.sounds.dialogs import EditDialog
+from soundboard.ui.sounds.dialogs import ADV_MIN_H, EditDialog
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 FX = {"speed": 1.2, "gain_db": 3.0, "effects": {"echo": {"on": True}}}
@@ -50,14 +50,32 @@ def test_switching_keeps_the_draft_and_gives_everything_back(window):  # noqa: F
 def test_wide_has_three_columns_narrow_three_tabs(window):  # noqa: F811
     d = _dialog(window, advanced=True)
     d.show()
-    d.setFixedSize(editadvanced.WIDE_PX + 40, 820)
+    d.setFixedSize(2400, 820)   # (CI's text, without its fonts, is wide boxes)
     assert d.adv.wide and not d.adv.cols.isHidden() and d.adv.tabs.isHidden()
     assert all(isinstance(box.itemAt(box.count() - 1).widget(), QScrollArea)
                for box in d.adv.col_boxes)
+    QApplication.processEvents()
+    # each column as wide as its page: none scrolls sideways, cut off
+    assert all(s.horizontalScrollBar().maximum() == 0 for s in d.adv._scrolls)
+    assert not d.adv.fits(editadvanced.WIDE_PX - 1)
+    need = d.minimumSizeHint().width()
+    assert d.adv.fits(max(need, editadvanced.WIDE_PX)) and not d.adv.fits(need - 40)
     d.setFixedSize(760, 820)
     assert not d.adv.wide and d.adv.cols.isHidden() and d.adv.tabs.count() == 3
     d.show_tab("eq")
     assert d.adv.tabs.currentIndex() == 2
+    d.close()
+
+
+def test_a_short_screen_still_fits(window):  # noqa: F811
+    """The big waveform gives up room on a short screen (1280 x 720): the window's
+    least height holds everything, nothing squeezed over anything else."""
+    d = _dialog(window, advanced=True)
+    d.show()
+    d.setFixedSize(2400, 624)
+    QApplication.processEvents()
+    assert d.minimumSizeHint().height() <= ADV_MIN_H
+    assert all(s.viewport().height() >= 100 for s in d.adv._scrolls)
     d.close()
 
 
