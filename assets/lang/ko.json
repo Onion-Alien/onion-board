@@ -4674,5 +4674,6 @@
   "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Onion Board는 Windows에 작은 도우미(SYSTEM으로 실행되는 작업)를 추가해, Windows가 매번 권한을 묻지 않고도 마이크 효과를 설정하고 복구할 수 있게 합니다. 체크를 해제하면 제거됩니다.",
   "The helper is removed. Windows asks for permission each time now.": "도우미를 제거했습니다. 이제 Windows가 매번 권한을 요청합니다.",
   "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "도우미가 아직 있어서 바뀐 것이 없습니다. 다시 시도하고 Windows가 물으면 <b>예</b>를 클릭하세요.",
-  "Wait until the mic effect is done, then try again.": "마이크 효과가 끝날 때까지 기다린 뒤 다시 시도하세요."
+  "Wait until the mic effect is done, then try again.": "마이크 효과가 끝날 때까지 기다린 뒤 다시 시도하세요.",
+  "Star Onion Board on GitHub": "GitHub에서 Onion Board에 별 주기"
 }

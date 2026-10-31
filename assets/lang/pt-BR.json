@@ -4761,5 +4761,6 @@
   "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "O Onion Board adiciona um pequeno ajudante ao Windows (uma tarefa que roda como SYSTEM), para poder configurar e reparar o efeito do microfone sem o Windows pedir permissão toda vez. Desmarque para removê-lo.",
   "The helper is removed. Windows asks for permission each time now.": "O ajudante foi removido. Agora o Windows pede permissão toda vez.",
   "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "O ajudante ainda está lá, então nada mudou. Tente de novo e clique em <b>Sim</b> quando o Windows perguntar.",
-  "Wait until the mic effect is done, then try again.": "Espere o efeito do microfone terminar e tente de novo."
+  "Wait until the mic effect is done, then try again.": "Espere o efeito do microfone terminar e tente de novo.",
+  "Star Onion Board on GitHub": "Dê uma estrela ao Onion Board no GitHub"
 }

@@ -117,6 +117,7 @@ class Built:
     programs_list: Any
     remote_on: Any
     _save_video_hint: Any
+    star_btn: Any
     _sync_highlight: Any
     texture_off: Any
     texture_on: Any

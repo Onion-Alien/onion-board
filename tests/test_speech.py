@@ -862,6 +862,7 @@ def test_repo_ships_the_translation_addons_not_downloaded():
     assert {m.language for m in infos} == LANGS
     for m in infos:
         assert not m.error and m.language_name and m.credits
+        assert "CC0" in m.credits or "CC BY" in m.credits, m.id   # every model names its licence
         assert m.download["url"].startswith("https://") and m.download["bytes"] > 1e6
         assert not m.installed          # nothing is fetched until the user asks
     assert not list((ROOT / "modules").glob("translate-*/model"))

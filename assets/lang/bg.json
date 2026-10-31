@@ -4761,5 +4761,6 @@
   "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Onion Board добавя малък помощник в Windows (задача, която работи като SYSTEM), за да може да настройва и поправя ефекта на микрофона, без Windows да иска разрешение всеки път. Махни отметката, за да го премахнеш.",
   "The helper is removed. Windows asks for permission each time now.": "Помощникът е премахнат. Сега Windows ще иска разрешение всеки път.",
   "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "Помощникът още е там, така че нищо не се промени. Опитай пак и натисни <b>Да</b>, когато Windows попита.",
-  "Wait until the mic effect is done, then try again.": "Изчакай ефектът на микрофона да приключи, после опитай пак."
+  "Wait until the mic effect is done, then try again.": "Изчакай ефектът на микрофона да приключи, после опитай пак.",
+  "Star Onion Board on GitHub": "Дай звезда на Onion Board в GitHub"
 }

@@ -4761,5 +4761,6 @@
   "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Az Onion Board egy kis segédet ad a Windowshoz (egy SYSTEM-ként futó feladatot), hogy úgy állíthassa be és javíthassa a mikrofoneffektet, hogy a Windows ne kérjen minden alkalommal engedélyt. Vedd ki a pipát az eltávolításához.",
   "The helper is removed. Windows asks for permission each time now.": "A segéd eltávolítva. Mostantól a Windows minden alkalommal engedélyt kér.",
   "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "A segéd még mindig ott van, így semmi sem változott. Próbáld újra, és kattints az <b>Igen</b> gombra, amikor a Windows kérdez.",
-  "Wait until the mic effect is done, then try again.": "Várd meg, amíg a mikrofoneffekt végez, aztán próbáld újra."
+  "Wait until the mic effect is done, then try again.": "Várd meg, amíg a mikrofoneffekt végez, aztán próbáld újra.",
+  "Star Onion Board on GitHub": "Adj csillagot az Onion Boardnak a GitHubon"
 }

@@ -11,5 +11,5 @@
     "sha256": "60470a003a9c7339db8c060ed8eafc7cf999ba90dfa5dceebd8d0a4f75f1d3f0",
     "bytes": 106752178
   },
-  "credits": "English to Hindi model from the Argos Translate package index: Argos Translate, trained on OPUS data."
+  "credits": "English to Hindi model from the Argos Translate package index: Argos Translate (Argos Open Technologies), released under MIT or CC0 (argos-translate issue #533). Trained on OPUS data; includes a Stanza English tokenizer (Apache-2.0)."
 }

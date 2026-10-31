@@ -4761,5 +4761,6 @@
   "Onion Board adds a small helper to Windows (a task that runs as SYSTEM), so it can set up and repair the mic effect without Windows asking for permission each time. Untick this to remove it.": "Nagdadagdag ang Onion Board ng maliit na helper sa Windows (isang task na tumatakbo bilang SYSTEM), para ma-set up at maayos nito ang mic effect nang hindi humihingi ng permiso ang Windows bawat beses. Alisin ang check para tanggalin ito.",
   "The helper is removed. Windows asks for permission each time now.": "Natanggal na ang helper. Hihingi na ng permiso ang Windows bawat beses.",
   "The helper is still there, so nothing changed. Try again and click <b>Yes</b> when Windows asks.": "Nandiyan pa ang helper, kaya walang nagbago. Subukan ulit at i-click ang <b>Yes</b> kapag nagtanong ang Windows.",
-  "Wait until the mic effect is done, then try again.": "Hintayin munang matapos ang mic effect, saka subukan ulit."
+  "Wait until the mic effect is done, then try again.": "Hintayin munang matapos ang mic effect, saka subukan ulit.",
+  "Star Onion Board on GitHub": "Bigyan ng star ang Onion Board sa GitHub"
 }
