@@ -187,3 +187,21 @@ def test_edit_sound_saves_a_preset_for_every_sound(qapp, monkeypatch):
     assert mypresets.load("sound") == {} and other.preset.findData(MINE + "High") < 0
     other._undo_delete()
     assert "High" in mypresets.load("sound")
+
+
+def test_a_reused_edit_window_starts_clean(qapp, monkeypatch):
+    """Edit sound is reused for the next sound: the last one's "Deleted … Undo" row
+    went with it, and presets saved in another window since weren't in the list."""
+    from soundboard.sounds.library import SoundMeta
+    from soundboard.ui.sounds.dialogs import MINE, EffectsPanel
+
+    mypresets.put("sound", "Gone", {"pitch": 2})
+    p = EffectsPanel({"pitch": 2})
+    p._delete_preset()
+    assert not p.undo_row.isHidden()
+    other = EffectsPanel({})                      # another window, open meanwhile
+    monkeypatch.setattr(QInputDialog, "getText", lambda *a, **k: ("New", True))
+    other._save_preset()
+    p.set_sound(SoundMeta(id="x", name="x", file="", fx={"speed": 1.5}))
+    assert p.undo_row.isHidden() and p._deleted is None
+    assert p.preset.findData(MINE + "New") >= 0 and p.preset.findData(MINE + "Gone") < 0
