@@ -2,6 +2,80 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.8.0 — 2026-10-31
+
+- Playlists found by a YouTube search say how many videos they have ("8 videos") on
+  their card, so a short one is easy to tell from a huge one before opening it.
+- Edit sound: clicking Save a copy now adds the edited copy and leaves the original as it
+  was (it saved the edits onto the original and made no copy).
+- Edit sound: a window opened for the next sound no longer shows the last one's
+  "Deleted … Undo" row, and its Preset list has presets saved in another Edit window.
+- Edit sound: the effects line says 1.25x when the speed is 1.25x (it said 1.2x).
+- Fixed: on a busy PC short of memory the window could freeze for 10-30 seconds while
+  Windows was slow to list the sound devices, or when settings were saved after a quiet
+  spell.
+- Live controls: change one of your presets after picking it and Save preset turns into
+  Update, saving the change into it. Its menu also has Reset (back to how it was saved)
+  and Save as a new preset.
+- Edit sound has the player now: play / pause, stop, skip, the seek line, Sounds for
+  others, Hear it myself, the Now playing chips and Stop all, over Save. A big Edit sound
+  window no longer hides the only way to pause the song.
+- Uninstalling no longer asks for Windows' permission a second time over the mic helper's
+  folder, and deleting your data now removes ProgramData's folder too. Installing again
+  before restarting no longer loses the mic helper at that restart.
+- The credits of the Arabic, German, Spanish, Hebrew, Hindi, Italian, Japanese, Korean,
+  Russian, Swedish, Turkish and Ukrainian translation models now say their licence (MIT or
+  CC0, from Argos Translate) and that each includes a Stanza tokenizer (Apache-2.0).
+- Settings → About has a "Star Onion Board on GitHub" button next to Source code.
+- Edit sound has an Advanced view (the Simple | Advanced switch next to its tabs): a bigger
+  window with the waveform big across the top (a time ruler, zoom with the buttons or
+  Ctrl+scroll, the fades drawn where they happen) and Speed & loudness, Effects and the
+  Equalizer side by side. Effects lists only the ones that are on, with Add effect to pick
+  more. It remembers which view you used last.
+- Edit sound has Undo and Redo for the trim, effects and fades (Ctrl+Z, and Ctrl+Shift+Z or
+  Ctrl+Y).
+- Edit sound's Preset and Voice boxes now line up.
+- Live controls show a playing sound's unsaved Edit sound changes while they're what plays
+  (they showed its saved effects until Save).
+- Before it changes Discord's voice settings, the app now keeps only those settings, not
+  a copy of Discord's settings file (which can hold your Discord login). Copies older
+  versions kept are deleted when the app starts.
+- Uninstalling now asks whether to delete your sounds and settings too (No keeps them;
+  Yes puts them in the Recycle Bin), and removes Onion Pocket's firewall rule.
+- The installer now says before it adds FFmpeg through winget, the FFmpeg download bar
+  says where it comes from and how to switch it off, and the VB-Cable box says it's
+  VB-Audio's driver and not open source.
+- The privacy page and SECURITY.md now say exactly what the app reads and writes in
+  Discord's settings, and where the copy it keeps before a change is.
+- When Bun sets Discord up for your sounds and turns its noise filter off, it now turns on
+  Clean mic in its place, so background noise still stays out of your voice. The Discord,
+  game, Zoom/Teams and Steam guides point to Clean mic too.
+- New privacy page (docs/PRIVACY.md): what the app sends, how to turn each part off,
+  what it changes on your PC and how to remove it all.
+- Where Onion Board tells you to switch off Discord's, a game's or a meeting app's noise
+  suppression, it now says Clean mic on the Voice tab takes out the noise instead.
+- Edit sound: Reset effects on a playing pad that was saved with effects no longer gets stuck at "Applying to the playing sound: 0%".
+- Edit sound: the trim's waveform shows where the sound is playing now.
+- Live controls show what's playing: the song's own effects from Edit sound (speed, pitch, bass, reverb, echo…) plus Live controls' own, which stay on for the next song.
+- The Categories menu on a pad now shows a subcategory as "Parent › name", so one with the same name as a category no longer looks like a broken copy of it.
+- When the mic effect can't start on your mic, the log now says what was in the way: its
+  file taken away (often an antivirus), Windows' Audio enhancements switched off, or no
+  log ever written. A failed add-on install logs the last lines its step printed.
+- Save your own presets: Live controls has a Save preset button and a My presets row
+  (one click puts back the speed, pitch, effects and volume; right-click to rename or
+  delete, with Undo), and Edit sound → Effects has Save as preset, with yours in the
+  Preset list for every sound.
+- A pasted playlist link (YouTube, a SoundCloud set and other sites) now shows its videos
+  as cards with Add all, instead of saying "That's a playlist". Up to the first 30 videos.
+- YouTube search results have a Videos / Playlists switch beside Back. Open on a playlist
+  shows its videos with Add all, and Back goes back to the playlists.
+- Playlist cards in YouTube search also have Add all, to add every video without opening
+  the playlist.
+- Taking the mic effect off a mic no longer stops halfway with an error, leaving its notes
+  behind.
+- A link you already have in your Sounds no longer counts as a failed download in the
+  anonymous usage count.
+
 ## 2.7.3 — 2026-10-30
 
 - Adding a sound you already have now shows you where it is: the board jumps to a tab that

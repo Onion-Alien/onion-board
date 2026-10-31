@@ -3,7 +3,7 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://onionalien.com/onionboard/</loc>
-    <lastmod>2026-10-30</lastmod>
+    <lastmod>2026-10-31</lastmod>
     <image:image><image:loc>https://onionalien.com/onionboard/screenshots/apps.png</image:loc></image:image>
     <image:image><image:loc>https://onionalien.com/onionboard/screenshots/setup.png</image:loc></image:image>
     <image:image><image:loc>https://onionalien.com/onionboard/screenshots/sounds.png</image:loc></image:image>
@@ -12,37 +12,37 @@
   </url>
   <url>
     <loc>https://onionalien.com/onionboard/discord-soundboard/</loc>
-    <lastmod>2026-10-30</lastmod>
+    <lastmod>2026-10-31</lastmod>
     <image:image><image:loc>https://onionalien.com/onionboard/screenshots/sounds.png</image:loc></image:image>
   </url>
   <url>
     <loc>https://onionalien.com/onionboard/free-soundpad-alternative/</loc>
-    <lastmod>2026-10-30</lastmod>
+    <lastmod>2026-10-31</lastmod>
     <image:image><image:loc>https://onionalien.com/onionboard/screenshots/triggers.png</image:loc></image:image>
   </url>
   <url>
     <loc>https://onionalien.com/onionboard/soundboard-without-virtual-cable/</loc>
-    <lastmod>2026-10-30</lastmod>
+    <lastmod>2026-10-31</lastmod>
     <image:image><image:loc>https://onionalien.com/onionboard/screenshots/setup.png</image:loc></image:image>
   </url>
   <url>
     <loc>https://onionalien.com/onionboard/voicemod-alternative/</loc>
-    <lastmod>2026-10-30</lastmod>
+    <lastmod>2026-10-31</lastmod>
     <image:image><image:loc>https://onionalien.com/onionboard/screenshots/voice.png</image:loc></image:image>
   </url>
   <url>
     <loc>https://onionalien.com/onionboard/resanance-alternative/</loc>
-    <lastmod>2026-10-30</lastmod>
+    <lastmod>2026-10-31</lastmod>
     <image:image><image:loc>https://onionalien.com/onionboard/screenshots/sounds.png</image:loc></image:image>
   </url>
   <url>
     <loc>https://onionalien.com/onionboard/exp-soundboard-alternative/</loc>
-    <lastmod>2026-10-30</lastmod>
+    <lastmod>2026-10-31</lastmod>
     <image:image><image:loc>https://onionalien.com/onionboard/screenshots/sounds.png</image:loc></image:image>
   </url>
   <url>
     <loc>https://onionalien.com/onionboard/game-voice-chat-soundboard/</loc>
-    <lastmod>2026-10-30</lastmod>
+    <lastmod>2026-10-31</lastmod>
     <image:image><image:loc>https://onionalien.com/onionboard/screenshots/guide/wizard-2.png</image:loc></image:image>
     <image:image><image:loc>https://onionalien.com/onionboard/screenshots/guide/guide-game.png</image:loc></image:image>
     <image:image><image:loc>https://onionalien.com/onionboard/screenshots/guide/guide-steam.png</image:loc></image:image>
@@ -50,16 +50,16 @@
   </url>
   <url>
     <loc>https://onionalien.com/onionboard/play-sounds-through-mic/</loc>
-    <lastmod>2026-10-30</lastmod>
+    <lastmod>2026-10-31</lastmod>
     <image:image><image:loc>https://onionalien.com/onionboard/screenshots/setup.png</image:loc></image:image>
   </url>
   <url>
     <loc>https://onionalien.com/onionboard/discord-text-to-speech-voice-chat/</loc>
-    <lastmod>2026-10-30</lastmod>
+    <lastmod>2026-10-31</lastmod>
     <image:image><image:loc>https://onionalien.com/onionboard/screenshots/voice.png</image:loc></image:image>
   </url>
   <url>
     <loc>https://onionalien.com/onionboard/zoom-google-meet-soundboard/</loc>
-    <lastmod>2026-10-30</lastmod>
+    <lastmod>2026-10-31</lastmod>
   </url>
 </urlset>

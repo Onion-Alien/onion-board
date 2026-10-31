@@ -1,1 +1,0 @@
-- The Categories menu on a pad now shows a subcategory as "Parent › name", so one with the same name as a category no longer looks like a broken copy of it.
