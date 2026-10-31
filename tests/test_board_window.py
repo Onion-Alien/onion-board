@@ -88,6 +88,18 @@ def test_web_results_put_a_back_button_in_place_of_the_category_tabs(window, mon
     assert window.ytresults.isHidden()
 
 
+def test_a_dragged_category_tab_is_drawn_once(window):
+    """Qt floats a picture of a dragged tab over the bar, which draws the tab too; with
+    our see-through tabs both showed and the name looked doubled."""
+    from PySide6.QtCore import QEvent
+    from PySide6.QtWidgets import QWidget
+    from PySide6.QtGui import QPaintEvent
+    tabs = window.catctl.cat_tabs
+    floating = QWidget(tabs)   # the kind of child Qt makes for the dragged tab
+    assert tabs.eventFilter(floating, QPaintEvent(floating.rect()))
+    assert not tabs.eventFilter(floating, QEvent(QEvent.Type.Show))
+
+
 def test_my_sounds_shows_all_the_pads_not_the_ones_matching_the_web_search(
         window, monkeypatch):
     """The search box filters the pads too: back from a web search, the query still in
