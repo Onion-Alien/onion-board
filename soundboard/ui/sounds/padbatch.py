@@ -234,7 +234,7 @@ class PadSelection(QObject):
         sounds = self.sounds()
         cfg = self.mw.cfg
         for c in cfg.categories:
-            for name, label in [(c, c)] + [(library.sub_tag(c, s), "      " + s)
+            for name, label in [(c, c)] + [(library.sub_tag(c, s), f"{c} › {s}")
                                            for s in cfg.subcategories.get(c, [])]:
                 have = sum(1 for m in sounds if name in m.tags)
                 a = menu.addAction(icons.icon("tag", checked_color="text"),
