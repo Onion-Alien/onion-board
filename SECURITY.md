@@ -724,8 +724,7 @@ None of it ever goes online, and nothing from those files is written to the log.
   `%APPDATA%\OnionBoard\discord-backup\<client>\<time>\`, so it can be put back by hand.
   That file can hold Discord's login too, like the original next to Discord. At most 3
   copies per client are kept, none older than 14 days, and only on this PC. Delete the
-  `discord-backup` folder to remove them; the uninstaller's *Also delete your sounds
-  and settings?* removes them with the rest.
+  `discord-backup` folder to remove them.
 
 ## Anti-cheat
 
