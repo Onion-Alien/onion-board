@@ -473,8 +473,10 @@ class SoundsPageBuild:
         mw.speed_btn = SpeedPitchButton(
             "sounds", _("Changes every sound while it plays. Save as new pad keeps it "
                         "as a pad of its own."))
-        mw.speed_btn.changed.connect(mw.playctl.on_live_speed)
-        mw.speed_btn.fx_changed.connect(lambda fx: setattr(mw.engine, "sound_fx", fx))
+        mw.speed_btn.changed.connect(mw.editctl.speed_changed)
+        mw.speed_btn.fx_changed.connect(mw.editctl.fx_changed)
+        mw.speed_btn.opening.connect(mw.editctl.pad_opening)   # the playing pad's own
+        mw.speed_btn.closed.connect(mw.editctl.pad_closed)
         mw.speed_btn.save_new.connect(lambda: mw.editctl.save_live_copy())
         th.addWidget(mw.speed_btn)
         sep = vsep()
