@@ -616,7 +616,7 @@ class LinkBar(QFrame):
             # a bot check or rate limit is about the user's address, not yt-dlp; with
             # auto-update on, download_audio() already tried a newer one
             fixable = (isinstance(e, ytdl.FetchError) and not auto_update
-                       and not getattr(e, "proxy", False)
+                       and why != "disk-full" and not getattr(e, "proxy", False)
                        and net.allowed(ytdl.UPDATE_FEATURE)
                        and not ytdl.blocked_by_site(f"{e} {getattr(e, 'raw', '')}"))
             hint = _(" A newer downloader may fix this.") if fixable else ""

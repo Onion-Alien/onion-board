@@ -354,7 +354,7 @@ def _download_direct(url, dest, progress, direct: bool = False) -> tuple[Path, s
             while chunk := r.read(64 * 1024):
                 got += len(chunk)
                 if got > MAX_BYTES:
-                    raise DownloadError(_("It's over {mb} MB.", mb=MAX_BYTES // 2**20))
+                    raise _too_big(MAX_BYTES)
                 f.write(chunk)
                 if progress and total:
                     progress(min(got / total, 1.0))
@@ -575,7 +575,9 @@ def _run(yt_dlp, url: str, dest: Path, progress, feature: str = FEATURE,
 
 
 def _too_big(cap: int) -> DownloadError:
-    return DownloadError(_("It's over {mb} MB.", mb=cap // 2**20))
+    e = DownloadError(_("It's over {mb} MB.", mb=cap // 2**20))
+    e.dl_why = "too-big"   # errors.download_reason: the words are translated
+    return e
 
 
 DOWNLOAD_QUIET_S = 300   # a helper download that says nothing for this long is stuck
@@ -612,8 +614,10 @@ def _found(url: str, dest: Path, path: Path, info: dict) -> tuple[Path, str]:
         found = [p for p in dest.iterdir() if p.is_file() and not p.name.endswith(".part")
                  and p.suffix.lower() not in IMAGE_EXTS]
         if not found:
-            raise DownloadError(_("Nothing was downloaded (the file may be over {mb} MB).",
-                                  mb=MAX_BYTES // 2**20))
+            e = DownloadError(_("Nothing was downloaded (the file may be over {mb} MB).",
+                                mb=MAX_BYTES // 2**20))
+            e.dl_why = "too-big"   # yt-dlp skips a file over max_filesize
+            raise e
         path = found[0]
     sourceinfo.save_for(path.parent, info, url)   # the pad menu's Open on YouTube
     return path, clean_title(info.get("title") or path.stem)

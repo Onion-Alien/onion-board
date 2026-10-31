@@ -436,6 +436,28 @@ def test_unpack_says_what_is_missing(tmp_path):
     assert not (tmp_path / "bin").exists()
 
 
+def test_unpack_waits_for_an_antivirus_holding_the_new_files(tmp_path, monkeypatch):
+    """Windows denies moving the fresh folder while an antivirus scans its ffmpeg.exe
+    (err-5): unpack tries again for a few seconds instead of failing at once."""
+    z = tmp_path / "z.zip"
+    with zipfile.ZipFile(z, "w") as f:
+        for name in ffmpegget.KEEP:
+            f.writestr(name, b"x")
+    (tmp_path / "bin").mkdir()
+    monkeypatch.setattr(ffmpegget, "RENAME_WAIT_S", 0, raising=False)
+    real, denied = ffmpegget.Path.rename, [3]
+
+    def rename(self, to):
+        if self.name == "bin.partial" and denied[0]:
+            denied[0] -= 1
+            raise PermissionError(13, "Access is denied")
+        return real(self, to)
+    monkeypatch.setattr(ffmpegget.Path, "rename", rename)
+    dest = ffmpegget.unpack(z, tmp_path / "bin")
+    assert sorted(p.name for p in dest.iterdir()) == sorted(ffmpegget.KEEP.values())
+    assert not (tmp_path / "bin.old").exists() and not (tmp_path / "bin.partial").exists()
+
+
 # --------------------------------------------------------------------------- follow the app
 
 def test_the_apps_own_copy_follows_the_app(monkeypatch, tmp_path):
