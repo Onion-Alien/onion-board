@@ -36,7 +36,7 @@ def recent() -> tuple[Note, ...]:
     release (tests/test_whats_new.py checks this version has one): what a player
     notices, in their words, never the fixes only a log would show."""
     return (
-        Note("2.7.4", _("Clean mic takes over noise removal"), (
+        Note("2.8.0", _("Clean mic takes over noise removal"), (
             ("mic", _("Tips point to Clean mic"),
              _("Where Onion Board says to switch off an app's noise suppression, it now "
                "points to Clean mic on the Voice tab: it takes the noise out of your mic "
