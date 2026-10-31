@@ -94,6 +94,7 @@ class AlertControl(Controller):
         self._discord_reading = False
         self._discord_poll = PollThread("discord-settings")
         self._talk_seen: set[str] = set()   # Discord folders looked at for how you talk
+        self._old_copies_dropped = False   # older versions' copies of Discord's files
         # the Mic effect card's Put Discord back, asked while Discord was open: done the
         # moment it closes (it won't take changes while it runs)
         self.discord_pending: set[str] = set()
@@ -222,6 +223,8 @@ class AlertControl(Controller):
         last = self._discord_sig
         seen = set(self._talk_seen)
         pending, saved = set(self.discord_pending), dict(mw.cfg.discord_talk)
+        drop_old = not self._old_copies_dropped
+        self._old_copies_dropped = True
 
         def run():
             found, sig, talk, restored = [], None, {}, []
@@ -229,6 +232,9 @@ class AlertControl(Controller):
                 from soundboard.ui.setup.chatguide import DISCORD_EXES
                 names = {n for _p, n in appaudio._process_table().values()}
                 from soundboard.mic import discordtalk
+                if drop_old:   # once a run: they may hold Discord's login
+                    from soundboard.sounds.library import APP_DIR
+                    discordtalk.drop_old_copies(APP_DIR / "discord-backup")
                 if pending and not names & {discordtalk.EXES[c] for c in pending}:
                     from soundboard.sounds.library import APP_DIR
                     left = discordtalk.restore(saved, APP_DIR / "discord-backup",

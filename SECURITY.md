@@ -720,11 +720,13 @@ None of it ever goes online, and nothing from those files is written to the log.
   switches only), and put back when Onion Board closes (unless you untick *Put Discord back for
   talking on close* on the Setup tab), by Settings → Audio → *Put
   Discord back*, and by the uninstaller.
-- **Copies:** before each write, the one log file it changes is copied to
-  `%APPDATA%\OnionBoard\discord-backup\<client>\<time>\`, so it can be put back by hand.
-  That file can hold Discord's login too, like the original next to Discord. At most 3
-  copies per client are kept, none older than 14 days, and only on this PC. Delete the
-  `discord-backup` folder to remove them.
+- **Copies:** before each write, the voice settings it replaces (the `MediaEngineStore`
+  JSON, nothing else) are saved to `%APPDATA%\OnionBoard\discord-backup\<client>\<time>.json`,
+  so they can be put back by hand. Discord's own files are never copied, and the app
+  never reads, copies or keeps Discord's login token. At most 3 per client are kept,
+  none older than 14 days, and only on this PC. Delete the `discord-backup` folder to
+  remove them. Older versions copied Discord's log file there instead (which could
+  hold the login): the app deletes those copies a few seconds after it starts.
 
 ## Anti-cheat
 
