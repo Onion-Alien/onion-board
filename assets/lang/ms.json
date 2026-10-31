@@ -4600,5 +4600,45 @@
   "Mic settings, new presets and new games with Bun": "Tetapan mikrofon, pratetap baharu dan permainan baharu dengan Bun",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Gear di sebelah Mikrofon bersih pada tab Suara: kelantangan input, penindasan hingar dan pratetap seperti Bilik bising. Ia juga membuang ketukan meja dan dengung rendah.",
   "Three new games with Bun": "Tiga permainan baharu dengan Bun",
-  "A Volume slider in Live controls": "Peluncur Kelantangan dalam Kawalan langsung"
+  "A Volume slider in Live controls": "Peluncur Kelantangan dalam Kawalan langsung",
+  "That playlist is empty, or its videos are private.": "Senarai main itu kosong, atau videonya peribadi.",
+  "{n} of {total} video": [
+    "{n} daripada {total} video"
+  ],
+  "{n} video": [
+    "{n} video"
+  ],
+  "Double-click to open": "Klik dua kali untuk buka",
+  "Playlist": "Senarai main",
+  "Playlists": "Senarai main",
+  "Show its videos, to add some or all of them": "Tunjukkan videonya untuk tambah sebahagian atau semua",
+  "Show playlists: open one to add its videos": "Tunjukkan senarai main: buka satu untuk tambah videonya",
+  "Show videos": "Tunjukkan video",
+  "Videos": "Video",
+  "Add all": "Tambah semua",
+  "Add all its videos to your sounds, without opening it": "Tambah semua videonya ke bunyi anda tanpa membukanya",
+  "Couldn't add that playlist: {error}": "Senarai main itu tidak dapat ditambah: {error}",
+  "Its videos are on their way to your sounds": "Videonya sedang menuju ke bunyi anda",
+  "✓ {n} queued": [
+    "✓ {n} dalam baris gilir"
+  ],
+  "Delete this preset": "Padam pratetap ini",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Simpan kelajuan, pic, kesan dan kelantangan sekarang sebagai pratetap anda sendiri",
+  "Keep these effects as a preset of your own, in this list for every sound": "Simpan kesan ini sebagai pratetap anda sendiri, dalam senarai ini untuk setiap bunyi",
+  "More ({n})": "Lagi ({n})",
+  "My preset": "Pratetap saya",
+  "My presets": "Pratetap saya",
+  "None saved yet": "Belum ada yang disimpan",
+  "Rename preset": "Namakan semula pratetap",
+  "Save as preset": "Simpan sebagai pratetap",
+  "Save preset": "Simpan pratetap",
+  "You already have a preset called “{name}”. Replace it?": "Anda sudah mempunyai pratetap bernama “{name}”. Gantikan?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "Anda ada {n} pratetap, sudah had maksimum. Padam satu dahulu."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: pratetap anda. Klik kanan untuk namakan semula atau padam",
+  "{n} more of your presets": [
+    "{n} lagi pratetap anda"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” ialah nama pratetap terbina dalam. Pilih nama lain."
 }

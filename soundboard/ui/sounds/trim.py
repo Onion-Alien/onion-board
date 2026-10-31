@@ -7,7 +7,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 import numpy as np
-from PySide6.QtCore import QRectF, Qt, Signal
+from PySide6.QtCore import QPointF, QRectF, Qt, Signal
 from PySide6.QtGui import QColor, QPainter, QPen
 from PySide6.QtWidgets import (QDoubleSpinBox, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
                                QWidget)
@@ -31,15 +31,26 @@ class Waveform(QWidget):
         self.peaks = peaks
         self.length = max(length, 0.001)
         self.start, self.end = 0.0, self.length
+        self.play: float | None = None   # where it's playing now (seconds), None: it isn't
         self._drag: str | None = None
         self.setMinimumHeight(70)
         self.setCursor(Qt.CursorShape.SizeHorCursor)
         self.setToolTip(_("Drag the handles to cut off the start and end. Only the part between "
                           "them plays."))
 
+    def set_peaks(self, peaks: np.ndarray | Sequence[float]):
+        self.peaks = peaks
+        self.update()
+
     def set_range(self, start: float, end: float):
         self.start, self.end = start, end
         self.update()
+
+    def set_play(self, t: float | None):
+        t = None if t is None else min(max(t, 0.0), self.length)
+        if t != self.play:
+            self.play = t
+            self.update()
 
     def _x(self, t: float) -> float:
         return 4 + (self.width() - 8) * t / self.length
@@ -110,6 +121,14 @@ class Waveform(QWidget):
             p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(QColor(T["text_hi"]))
             p.drawRoundedRect(QRectF(x - 4, mid - 9, 8, 18), 3, 3)
+        if self.play is not None and n:   # the playhead: thin, no grip (not a handle)
+            x = self._x(self.play)
+            p.setPen(QPen(QColor(T["text_hi"]), 1.5))
+            p.drawLine(QPointF(x, r.top() + 2), QPointF(x, r.bottom() - 2))
+            p.setPen(Qt.PenStyle.NoPen)
+            p.setBrush(QColor(T["text_hi"]))
+            p.drawPolygon([QPointF(x - 4, r.top() + 1), QPointF(x + 4, r.top() + 1),
+                           QPointF(x, r.top() + 6)])
         p.end()
 
 
@@ -151,6 +170,18 @@ class TrimPanel(QWidget):
         row.addWidget(reset)
         v.addLayout(row)
         self._show_info()
+
+    def show_playing(self, frac: float | None, fx: dict | None = None):
+        """The playhead at `frac` (0..1) of what plays, the sound with effects `fx`
+        (its trim and Play backwards say where that is in the file); None hides it."""
+        if frac is None:
+            self.wave.set_play(None)
+            return
+        f = soundfx.clean(fx or {})
+        start = min(max(f["start"], 0.0), self.length)
+        end = f["end"] if 0 < f["end"] <= self.length else self.length
+        self.wave.set_play(end - frac * (end - start) if f["reverse"]
+                           else start + frac * (end - start))
 
     def values(self) -> tuple[float, float]:
         s, e = round(self.wave.start, 3), round(self.wave.end, 3)

@@ -186,8 +186,64 @@ def lookup(url: str, direct: bool = False) -> Result:
 
     def look():
         return _check(_extract(url, _opts(feature=feature, direct=direct)))
-    info = look() if direct else _over_tor(look, url)
+    return _as_result(url, look() if direct else _over_tor(look, url))
 
+
+class Playlist(list):
+    """A pasted playlist's first videos (Results), with its name and how many it has
+    in all (0 when the site didn't say)."""
+    def __init__(self, title: str, hits, total: int = 0):
+        super().__init__(hits)
+        self.title, self.total = title, total
+
+
+def lookup_all(url: str, direct: bool = False) -> Result | Playlist:
+    """lookup(), but a playlist (YouTube, a SoundCloud set…) is no error: its first
+    MAX_LINKS videos (the cards show them to add one by one or all at once). YouTube's
+    come from its list in one request; other sites' are looked up one by one."""
+    feature = _gate(url)
+    if url.startswith(MYINSTANTS + "/media/sounds/"):
+        return lookup(url, direct)
+    opts: dict[str, object] = dict(_opts(feature=feature, direct=direct), playlistend=MAX_LINKS,
+                                   ignoreerrors=True)   # a private or deleted one: left out
+    if feature == f"{FEATURE}.youtube":   # YouTube lists each video's name and length;
+        opts["extract_flat"] = "in_playlist"   # other sites (SoundCloud) only the link
+
+    def look():
+        return _extract(url, opts)
+    info = look() if direct else _over_tor(look, url)
+    if not info:   # ignoreerrors hid why: lookup() raises it, in plain words
+        return lookup(url, direct)
+    if info.get("_type") != "playlist":
+        return _as_result(url, _check(info))
+    from soundboard.online.ytsearch import _soundcloud_hit, _youtube_hit
+    hits: list[Result] = []
+    for e in info.get("entries") or ():
+        if (not e or e.get("live_status") == "is_live"
+                or re.fullmatch(r"\[(Private|Deleted) video\]", str(e.get("title")))):
+            continue   # YouTube's list names them, but they can't be downloaded
+        ie = str(e.get("ie_key") or e.get("extractor_key") or "")
+        if ie.startswith("Youtube"):
+            hit = _youtube_hit(e)
+        elif ie.startswith("Soundcloud"):
+            hit = _soundcloud_hit(e)
+        else:   # another site's list: its link, and the title if it gave one
+            link = str(e.get("webpage_url") or e.get("url") or "")
+            hit = (Result(str(e.get("id") or link), clean_title(str(e.get("title") or ""))
+                          or _("Sound"), str(e.get("uploader") or ""),
+                          float(e.get("duration") or 0), source="link", link=link)
+                   if link.startswith(("https://", "http://")) else None)
+        if hit and all(h.url != hit.url for h in hits):
+            hits.append(hit)
+    if not hits:
+        raise DownloadError(_("That playlist is empty, or its videos are private."))
+    total = info.get("playlist_count")
+    return Playlist(clean_title(str(info.get("title") or "")),
+                    hits[:MAX_LINKS], total if isinstance(total, int) else 0)
+
+
+def _as_result(url: str, info: dict) -> Result:
+    """A looked-up video's info as a search hit (lookup)."""
     def count(key):
         v = info.get(key)
         return int(v) if isinstance(v, (int, float)) else None

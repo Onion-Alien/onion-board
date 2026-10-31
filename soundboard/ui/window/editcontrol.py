@@ -24,7 +24,7 @@ from shiboken6 import isValid as qt_valid
 
 from soundboard.audio.engine import SR
 from soundboard.core import errors
-from soundboard.audio import renderworker, soundfx
+from soundboard.audio import livefx, renderworker, soundfx
 from soundboard import voicefx
 from soundboard.sounds import library, videos
 from soundboard.i18n import _
@@ -45,6 +45,8 @@ ETA_AFTER_S = 3.0      # time left is guessed once it has run this long...
 ETA_AFTER_FRAC = 0.03  # ...and done this much of it
 DONE_TOAST_S = 2.0     # a render that took longer says so when it's ready
 LIVE_WAIT_MS = 450     # a playing sound is made again once its effects stop changing this long
+PAD_FOLLOW_MS = 250    # open Live controls look for the next song this often
+PLAYHEAD_MS = 100      # the trim's playhead moves this often while a sound plays
 
 
 @dataclass
@@ -91,7 +93,7 @@ class Live:
     saved_key: str         # (soundfx.key of those)
     key: str               # the effects of what plays now
     gen: int = 0           # the newest change: an older render's answer is dropped
-    want: str = ""         # the effects being rendered
+    want: str | None = None   # the effects being rendered ("" = plain: a real one)
 
 
 class EditControl(Controller):
@@ -107,12 +109,22 @@ class EditControl(Controller):
         self._live_timer.setSingleShot(True)
         self._live_timer.setInterval(LIVE_WAIT_MS)
         self._live_timer.timeout.connect(self._live_now)
+        self._play_timer = QTimer(self)   # the trim's playhead, while a window is open
+        self._play_timer.setInterval(PLAYHEAD_MS)
+        self._play_timer.timeout.connect(self._show_playing)
         self.live_ready.connect(self._live_ready)
         self.live_progress.connect(self._live_progress)
         self._editors: dict[str, EditDialog] = {}
         self._render_gen: dict[str, int] = {}   # sid -> newest effects render (_rerender)
         self._renders: dict[str, Render] = {}  # sid -> the render in flight, how far it is
         self._setup_store = None   # voicesetups.Store, read the first time the picker opens
+        # Live controls' knobs show every sound's layer plus the playing pad's own
+        # effects (_pad_follow): that pad, and what its own effects put on the knobs
+        self._pad: str | None = None
+        self._pad_base: tuple = soundfx.NO_LIVE_VIEW
+        self._pad_timer = QTimer(self)   # while they're open: the next song is followed
+        self._pad_timer.setInterval(PAD_FOLLOW_MS)
+        self._pad_timer.timeout.connect(self._pad_follow)
 
     def edit(self, sid, tab: str = "sound"):
         """Edit sound beside the board, not over it: sounds, hotkeys and the other
@@ -138,6 +150,8 @@ class EditControl(Controller):
         else:
             d = self._new_editor(m, tab)
         self._editors[sid] = d
+        self._play_timer.start()
+        self._show_playing()
         self._show_render(sid)
         d.show()
         return d
@@ -148,6 +162,9 @@ class EditControl(Controller):
         mw = self.mw
         if self._editors.get(sid) is d:
             del self._editors[sid]
+        d.effects.trim.show_playing(None)
+        if not self._editors:
+            self._play_timer.stop()
         mw.playctl.drop_preview()                        # a preview still rendering
         mw.engine.stop(f"{sid}:preview")         # and the one playing, either kind
         mw.engine.stop(f"{sid}~fx:preview")
@@ -305,6 +322,64 @@ class EditControl(Controller):
         mw.toast(_("✓ Added “{name}”", name=html.escape(new.name)), "ok")
         return new
 
+    # -------------------------------------------- Live controls on the playing pad
+    def pad_opening(self):
+        """Live controls open: their knobs follow the sound playing (_pad_follow)."""
+        self._pad_timer.start()
+        self._pad_follow(force=True)
+
+    def pad_closed(self):
+        """Closed: the knobs are every sound's layer again (the button's label too)."""
+        self._pad_timer.stop()
+        if self._pad is None:
+            return
+        self._pad, self._pad_base = None, soundfx.NO_LIVE_VIEW
+        e = self.mw.engine
+        self.mw.speed_btn.load(e.sound_speed, e.sound_pitch, e.sound_keep_pitch, e.sound_fx)
+        self.mw.speed_btn.set_target(None)
+
+    def _pad_follow(self, force: bool = False):
+        """Live controls are one layer on every sound, kept from song to song; their
+        knobs show it plus the playing pad's own effects (Edit sound), so they read what
+        it sounds like. Bass +3 on the pad and +2 here shows +5; once a plain song
+        plays, +2."""
+        mw = self.mw
+        sid = self.live_sound()
+        m = mw.meta(sid) if sid else None
+        base = soundfx.NO_LIVE_VIEW
+        if (sid is not None and m is not None and sid != LINK_ID
+                and mw.engine.state(sid) is not None):
+            base = soundfx.live_view(m.fx)
+        if base == soundfx.NO_LIVE_VIEW:
+            sid = None
+        if not force and (sid, base) == (self._pad, self._pad_base):
+            return
+        self._pad, self._pad_base = sid, base
+        e = mw.engine
+        speed, pitch, own = base
+        amounts = dict(e.sound_fx)
+        for q in livefx.PARAMS:
+            amounts[q.key] = min(max(amounts.get(q.key, 0.0) + own.get(q.key, 0.0), q.lo),
+                                 q.hi)
+        sp = mw.speed_btn
+        sp.load(e.sound_speed * speed, e.sound_pitch + pitch, e.sound_keep_pitch,
+                livefx.clean(amounts))
+        sp.set_target(m.name if sid is not None and m is not None else None)
+
+    def speed_changed(self, speed: float, pitch: float, keep: bool):
+        """Live controls' speed or pitch, less what the playing pad has of its own."""
+        own_speed, own_pitch, _own = self._pad_base
+        self.mw.playctl.on_live_speed(speed / own_speed, pitch - own_pitch, keep)
+
+    def fx_changed(self, amounts: dict):
+        """Live controls' effects, less what the playing pad has of its own."""
+        own = self._pad_base[2]
+        layer = dict(amounts)
+        for q in livefx.PARAMS:
+            layer[q.key] = min(max(amounts.get(q.key, 0.0) - own.get(q.key, 0.0), q.lo),
+                               q.hi)
+        self.mw.engine.sound_fx = livefx.clean(layer)
+
     def live_sound(self) -> str | None:
         """The sound Live controls' Save as new pad copies: the one in the player
         (a Community or web search song too: it isn't a pad, and the last pad played
@@ -357,7 +432,9 @@ class EditControl(Controller):
         name = self._ask_pad_name(self.new_pad_name(m.name))
         if not name:
             return None
-        fx, capped = soundfx.with_live(m.fx, *sp.values(), sp.fx_values())
+        e = mw.engine   # the layer itself: the knobs may show the pad's own on top
+        fx, capped = soundfx.with_live(m.fx, e.sound_speed, e.sound_pitch,
+                                       e.sound_keep_pitch, e.sound_fx)
         link = m.id == LINK_ID
         try:
             new = self._save_link(m, name) if link else duplicate(m, name)
@@ -524,7 +601,7 @@ class EditControl(Controller):
         live.gen += 1   # a render still going for an older change gives up
         gen = live.gen
         if key == live.key:
-            live.want = ""
+            live.want = None
             d.show_live(None)
             return
         if key == live.saved_key:   # back to the saved effects: their audio is here
@@ -561,14 +638,15 @@ class EditControl(Controller):
 
     def _live_progress(self, sid: str, gen: int, frac: float):
         live, d = self._live.get(sid), self._editors.get(sid)
-        if live is not None and live.gen == gen and live.want and d is not None and qt_valid(d):
+        if (live is not None and live.gen == gen and live.want is not None
+                and d is not None and qt_valid(d)):
             d.show_live(frac)
 
     def _live_ready(self, sid: str, gen: int, data):
         live = self._live.get(sid)
-        if live is None or live.gen != gen or not live.want:
+        if live is None or live.gen != gen or live.want is None:
             return   # saved, cancelled or changed again meanwhile
-        key, live.want = live.want, ""
+        key, live.want = live.want, None
         if data is None:
             d = self._editors.get(sid)
             if d is not None and qt_valid(d):
@@ -579,7 +657,7 @@ class EditControl(Controller):
     def _live_put(self, sid: str, live: Live, data, key: str):
         """What plays (and plays next) becomes `data`, the sound with effects `key`."""
         mw = self.mw
-        live.key, live.want = key, ""
+        live.key, live.want = key, None
         mw.audio[sid] = data
         mw.engine.swap(sid, data)
         d = self._editors.get(sid)
@@ -596,6 +674,23 @@ class EditControl(Controller):
         if live.key != live.saved_key:
             self.mw.audio[sid] = live.saved
             self.mw.engine.swap(sid, live.saved)
+
+    def _show_playing(self):
+        """Each open window's trim shows where its sound is playing: the pad (with the
+        draft's effects once they're swapped in, else the saved ones) or its preview."""
+        mw = self.mw
+        for sid, d in list(self._editors.items()):
+            if not qt_valid(d):
+                continue
+            m = mw.meta(sid)
+            st = mw.engine.state(sid)
+            fx = m.fx if m is not None else {}
+            live = self._live.get(sid)
+            if st is not None and live is not None and live.key != live.saved_key:
+                fx = d.effects.fx()   # what plays follows the draft
+            elif st is None:
+                st = mw.engine.state(f"{sid}:preview")   # the saved sound, to headphones
+            d.effects.trim.show_playing(None if st is None else st[0], fx)
 
     # ------------------------------------------------------------ renders in flight
     def rendering(self, sid: str) -> Render | None:

@@ -229,6 +229,9 @@ BROWSER_HEADERS = {   # Myinstants' Cloudflare turns away urllib's default User-
     "Referer": MYINSTANTS + "/"}
 
 
+PLAYLIST = "ytplaylist"   # a Result's source when it's a YouTube playlist, not a video
+
+
 @dataclass
 class Result:
     """One search hit (see search)."""

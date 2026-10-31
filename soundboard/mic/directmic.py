@@ -335,7 +335,8 @@ RAISED_WHERE = (*dict.fromkeys(RAISED_AT.values()), "other", "unlogged")
 RAISED_KIND = {"TypeError": "type", "ValueError": "value", "KeyError": "key",
                "AttributeError": "attr", "IndexError": "index", "RuntimeError": "runtime",
                "AssertionError": "assert", "OSError": "os", "TimeoutError": "timeout",
-               "TimeoutExpired": "timeout", "MemoryError": "memory"}
+               "TimeoutExpired": "timeout", "MemoryError": "memory",
+               "ArgumentError": "ctypes"}   # (a Windows call given a wrong argument)
 RAISED_WHAT = ("denied", "in-use", "missing", *dict.fromkeys(RAISED_KIND.values()), "other")
 # the Windows error numbers worth telling apart: not found (2, 3), denied (5), in use
 # (32, 33), bad parameter (87), a mapped file (1224), a privilege not held (1314)

@@ -4682,5 +4682,50 @@
   "Mic settings, new presets and new games with Bun": "Settings ng mic, mga bagong preset at bagong laro kasama si Bun",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Ang gear sa tabi ng Malinis na mic sa Voice tab: volume ng input, noise suppression at mga preset tulad ng Maingay na kuwarto. Tinatanggal din nito ang kalabog sa mesa at mababang ugong.",
   "Three new games with Bun": "Tatlong bagong laro kasama si Bun",
-  "A Volume slider in Live controls": "Isang Volume slider sa Live controls"
+  "A Volume slider in Live controls": "Isang Volume slider sa Live controls",
+  "That playlist is empty, or its videos are private.": "Walang laman ang playlist na 'yan, o private ang mga video nito.",
+  "{n} of {total} video": [
+    "{n} sa {total} video",
+    "{n} sa {total} na video"
+  ],
+  "{n} video": [
+    "{n} video",
+    "{n} na video"
+  ],
+  "Double-click to open": "I-double click para buksan",
+  "Playlist": "Playlist",
+  "Playlists": "Mga playlist",
+  "Show its videos, to add some or all of them": "Ipakita ang mga video nito para idagdag ang ilan o lahat",
+  "Show playlists: open one to add its videos": "Ipakita ang mga playlist: buksan ang isa para idagdag ang mga video nito",
+  "Show videos": "Ipakita ang mga video",
+  "Videos": "Mga video",
+  "Add all": "Idagdag lahat",
+  "Add all its videos to your sounds, without opening it": "Idagdag lahat ng video nito sa mga sound mo nang hindi binubuksan",
+  "Couldn't add that playlist: {error}": "Hindi naidagdag ang playlist na 'yan: {error}",
+  "Its videos are on their way to your sounds": "Papunta na ang mga video nito sa mga sound mo",
+  "✓ {n} queued": [
+    "✓ {n} naka-queue",
+    "✓ {n} naka-queue"
+  ],
+  "Delete this preset": "Burahin ang preset na ito",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "I-save ang bilis, pitch, effects at volume mo ngayon bilang sarili mong preset",
+  "Keep these effects as a preset of your own, in this list for every sound": "I-save ang mga effect na ito bilang sarili mong preset, sa listahang ito para sa bawat tunog",
+  "More ({n})": "Higit pa ({n})",
+  "My preset": "Preset ko",
+  "My presets": "Mga preset ko",
+  "None saved yet": "Wala pang naka-save",
+  "Rename preset": "Palitan ang pangalan ng preset",
+  "Save as preset": "I-save bilang preset",
+  "Save preset": "I-save ang preset",
+  "You already have a preset called “{name}”. Replace it?": "May preset ka na na tinatawag na “{name}”. Palitan ito?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "May {n} preset ka, iyan na ang pinakamarami. Magbura muna ng isa.",
+    "May {n} preset ka, iyan na ang pinakamarami. Magbura muna ng isa."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: preset mo. I-right-click para palitan ang pangalan o burahin",
+  "{n} more of your presets": [
+    "{n} pang preset mo",
+    "{n} pang preset mo"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "Pangalan ng built-in na preset ang “{name}”. Pumili ng iba."
 }

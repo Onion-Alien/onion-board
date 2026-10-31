@@ -403,10 +403,16 @@ def original_peaks(meta: SoundMeta, n: int = 400) -> tuple[np.ndarray, float]:
             return _sampled_peaks(data, n), len(data) / SR
     except Exception:  # noqa: BLE001
         log.debug("couldn't read the cache of %s for its waveform", meta.id, exc_info=True)
+    return np.zeros(0, np.float32), original_length(meta)
+
+
+def original_length(meta: SoundMeta) -> float:
+    """original_peaks()'s length without its peaks: the cache's header, no audio read
+    (the Edit dialog opens with this and gets the peaks from a worker)."""
     try:
-        return np.zeros(0, np.float32), original_frames(meta) / SR
+        return original_frames(meta) / SR
     except Exception:  # noqa: BLE001 - the file is gone: nothing to trim
-        return np.zeros(0, np.float32), 0.0
+        return 0.0
 
 
 def _sampled_peaks(data: np.ndarray, n: int) -> np.ndarray:

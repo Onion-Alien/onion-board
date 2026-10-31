@@ -4764,5 +4764,55 @@
   "Mic settings, new presets and new games with Bun": "Setări microfon, presetări noi și jocuri noi cu Bun",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Rotița de lângă Microfon curat din fila Voce: volumul intrării, eliminarea zgomotului și presetări ca Cameră gălăgioasă. Taie și loviturile în birou și bâzâitul grav.",
   "Three new games with Bun": "Trei jocuri noi cu Bun",
-  "A Volume slider in Live controls": "Un glisor de volum în Controalele live"
+  "A Volume slider in Live controls": "Un glisor de volum în Controalele live",
+  "That playlist is empty, or its videos are private.": "Playlistul e gol sau videoclipurile lui sunt private.",
+  "{n} of {total} video": [
+    "{n} din {total} videoclip",
+    "{n} din {total} videoclipuri",
+    "{n} din {total} de videoclipuri"
+  ],
+  "{n} video": [
+    "{n} videoclip",
+    "{n} videoclipuri",
+    "{n} de videoclipuri"
+  ],
+  "Double-click to open": "Dublu clic ca să deschizi",
+  "Playlist": "Playlist",
+  "Playlists": "Playlisturi",
+  "Show its videos, to add some or all of them": "Arată-i videoclipurile, ca să adaugi câteva sau pe toate",
+  "Show playlists: open one to add its videos": "Arată playlisturi: deschide unul ca să-i adaugi videoclipurile",
+  "Show videos": "Arată videoclipuri",
+  "Videos": "Videoclipuri",
+  "Add all": "Adaugă tot",
+  "Add all its videos to your sounds, without opening it": "Adaugă toate videoclipurile la sunetele tale fără să-l deschizi",
+  "Couldn't add that playlist: {error}": "Playlistul nu a putut fi adăugat: {error}",
+  "Its videos are on their way to your sounds": "Videoclipurile lui sunt pe drum spre sunetele tale",
+  "✓ {n} queued": [
+    "✓ {n} în coadă",
+    "✓ {n} în coadă",
+    "✓ {n} în coadă"
+  ],
+  "Delete this preset": "Șterge această presetare",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Păstrează viteza, tonul, efectele și volumul de acum ca presetare proprie",
+  "Keep these effects as a preset of your own, in this list for every sound": "Păstrează aceste efecte ca presetare proprie, în lista asta pentru orice sunet",
+  "More ({n})": "Mai mult ({n})",
+  "My preset": "Presetarea mea",
+  "My presets": "Presetările mele",
+  "None saved yet": "Nimic salvat încă",
+  "Rename preset": "Redenumește presetarea",
+  "Save as preset": "Salvează ca presetare",
+  "Save preset": "Salvează presetarea",
+  "You already have a preset called “{name}”. Replace it?": "Ai deja o presetare numită „{name}”. O înlocuiești?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "Ai {n} presetare, mai multe nu se poate. Șterge una întâi.",
+    "Ai {n} presetări, mai multe nu se poate. Șterge una întâi.",
+    "Ai {n} de presetări, mai multe nu se poate. Șterge una întâi."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: presetarea ta. Clic dreapta ca s-o redenumești sau s-o ștergi",
+  "{n} more of your presets": [
+    "Încă {n} presetare de-a ta",
+    "Încă {n} presetări de-ale tale",
+    "Încă {n} de presetări de-ale tale"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "„{name}” e numele unei presetări incluse. Alege altul."
 }

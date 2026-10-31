@@ -4682,5 +4682,50 @@
   "Mic settings, new presets and new games with Bun": "Mikrofonindstillinger, nye forvalg og nye spil med Bun",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Tandhjulet ved Ren mikrofon på fanen Stemme: inputlydstyrke, støjdæmpning og forvalg som Larmende rum. Den fjerner også bump i bordet og lav brummen.",
   "Three new games with Bun": "Tre nye spil med Bun",
-  "A Volume slider in Live controls": "En lydstyrkeskyder i Live-kontroller"
+  "A Volume slider in Live controls": "En lydstyrkeskyder i Live-kontroller",
+  "That playlist is empty, or its videos are private.": "Den playliste er tom, eller dens videoer er private.",
+  "{n} of {total} video": [
+    "{n} af {total} video",
+    "{n} af {total} videoer"
+  ],
+  "{n} video": [
+    "{n} video",
+    "{n} videoer"
+  ],
+  "Double-click to open": "Dobbeltklik for at åbne",
+  "Playlist": "Playliste",
+  "Playlists": "Playlister",
+  "Show its videos, to add some or all of them": "Vis dens videoer, så du kan tilføje nogle eller alle",
+  "Show playlists: open one to add its videos": "Vis playlister: åbn en for at tilføje dens videoer",
+  "Show videos": "Vis videoer",
+  "Videos": "Videoer",
+  "Add all": "Tilføj alle",
+  "Add all its videos to your sounds, without opening it": "Tilføj alle dens videoer til dine lyde uden at åbne den",
+  "Couldn't add that playlist: {error}": "Kunne ikke tilføje den playliste: {error}",
+  "Its videos are on their way to your sounds": "Dens videoer er på vej til dine lyde",
+  "✓ {n} queued": [
+    "✓ {n} i kø",
+    "✓ {n} i kø"
+  ],
+  "Delete this preset": "Slet denne forudindstilling",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Gem den hastighed, tonehøjde, effekter og lydstyrke, du har nu, som din egen forudindstilling",
+  "Keep these effects as a preset of your own, in this list for every sound": "Gem disse effekter som din egen forudindstilling, i denne liste for alle lyde",
+  "More ({n})": "Flere ({n})",
+  "My preset": "Min forudindstilling",
+  "My presets": "Mine forudindstillinger",
+  "None saved yet": "Intet gemt endnu",
+  "Rename preset": "Omdøb forudindstilling",
+  "Save as preset": "Gem som forudindstilling",
+  "Save preset": "Gem forudindstilling",
+  "You already have a preset called “{name}”. Replace it?": "Du har allerede en forudindstilling, der hedder “{name}”. Erstat den?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "Du har {n} forudindstilling, det er det højeste antal. Slet en først.",
+    "Du har {n} forudindstillinger, det er det højeste antal. Slet en først."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: din forudindstilling. Højreklik for at omdøbe eller slette den",
+  "{n} more of your presets": [
+    "{n} mere af dine forudindstillinger",
+    "{n} flere af dine forudindstillinger"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” er navnet på en indbygget forudindstilling. Vælg et andet."
 }

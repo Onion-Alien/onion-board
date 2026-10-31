@@ -18,11 +18,12 @@ import time
 from PySide6.QtCore import QEvent, QPoint, QPointF, QRectF, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPen, QValidator
 from PySide6.QtWidgets import (QAbstractSpinBox, QApplication, QCheckBox, QDialog,
-                               QDoubleSpinBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
+                               QDoubleSpinBox, QFrame, QGridLayout, QHBoxLayout,
+                               QInputDialog, QLabel, QLineEdit, QMenu, QMessageBox,
                                QProgressBar, QPushButton, QSizePolicy, QVBoxLayout,
                                QWidget)
 
-from soundboard.audio import livefx
+from soundboard.audio import livefx, mypresets
 from soundboard.core import achievements, usage
 from soundboard.ui.kit import theme
 from soundboard import voicefx
@@ -30,9 +31,10 @@ from soundboard.ui.bun import bunskits
 from soundboard.ui.kit import fit, icons
 from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.kit.panel import Flow, hint_label, reset_button, section_label
+from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.ui.voice.voicefxpanel import ParamSlider
 from soundboard.ui.kit.widgets import widget_at
-from soundboard.i18n import _
+from soundboard.i18n import _, ngettext
 from soundboard.ui.kit.pixels import snap_to_pixels
 
 SPEED = voicefx.Param("speed", _("Speed"), 0.25, 2.0, 1.0, "x", 0.05)
@@ -287,6 +289,25 @@ def short(name: str, most: int = 14) -> str:
     return name if len(name) <= most else name[:most - 1].rstrip() + "…"
 
 
+class _MoreMenu(QMenu):
+    """My presets' More list: a right-click on one opens its Rename / Delete menu.
+    A long list scrolls (a hundred presets, on a small screen)."""
+
+    def __init__(self, parent, menu_for):
+        super().__init__(parent)
+        self._menu_for = menu_for
+        self.setStyleSheet("QMenu { menu-scrollable: 1; }")
+
+    def contextMenuEvent(self, e):
+        try:   # nothing in a Qt override may raise (PySide keeps it for later)
+            a = self.actionAt(e.pos())
+            if a is not None and a.data():
+                self.close()
+                self._menu_for(str(a.data()), e.globalPos())
+        except Exception:  # noqa: BLE001
+            pass
+
+
 class SpeedPitchButton(QPushButton):
     """`changed(speed, semitones, keep_pitch)` fires on every speed / pitch edit,
     `fx_changed(amounts)` on every effects edit (livefx.clean: only knobs off 0)."""
@@ -296,6 +317,7 @@ class SpeedPitchButton(QPushButton):
     setup_cancelled = Signal()   # Cancel while its AI voice gets ready
     opening = Signal()           # about to pop up: the setups list is brought up to date
     save_new = Signal()          # Save as new pad: the playing sound, these on it (sounds)
+    closed = Signal()            # the pop-up went away
 
     def __init__(self, what: str = "sounds", hint: str = "",
                  redline: tuple[float, float] = REDLINE_SPEED):
@@ -335,7 +357,7 @@ class SpeedPitchButton(QPushButton):
         v.setSpacing(8)
 
         # header: Bun mixing, the title, Reset where it's easy to find
-        head = QHBoxLayout()
+        head = self._head = QHBoxLayout()
         head.setSpacing(8)
         title = QLabel(_("Live controls"))
         title.setStyleSheet("font-weight:700; font-size:10.5pt;")
@@ -343,6 +365,9 @@ class SpeedPitchButton(QPushButton):
             what, _("All sounds")))
         sub.setObjectName("muted")
         sub.setMinimumWidth(1)   # the first to give way when a language's buttons are long
+        self._sub = sub
+        self._sub_all = sub.text()
+        sub.setTextFormat(Qt.TextFormat.PlainText)   # (a pad's name: set_target)
         reset = reset_button(_("Back to 1x, no pitch change, no effects and 100 % volume")
                              if self.has_speed else
                              _("Back to no pitch change, no effects and 100 % volume"))
@@ -356,6 +381,17 @@ class SpeedPitchButton(QPushButton):
         head.addWidget(title)
         head.addWidget(sub)
         head.addStretch(1)
+        # what's on now, kept as a preset of your own (the My presets row under this)
+        self.save_preset_btn = QPushButton(_("Save preset"))
+        self.save_preset_btn.setAccessibleName(_("Save preset"))   # (its words can go)
+        self.save_preset_btn.setMinimumHeight(36)
+        self.save_preset_btn.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        self.save_preset_btn.setToolTip(_("Keep the speed, pitch, effects and volume you "
+                                          "have now as a preset of your own"))
+        self.save_preset_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        icons.set_icon(self.save_preset_btn, "plus", size=18)
+        self.save_preset_btn.clicked.connect(self.save_preset)
+        head.addWidget(self.save_preset_btn)
         if self.has_speed:   # a stream has no pad to copy
             self.save_btn = QPushButton(_("Save as new pad"))
             self.save_btn.setMinimumHeight(36)
@@ -367,27 +403,66 @@ class SpeedPitchButton(QPushButton):
             self.save_btn.clicked.connect(self._save_new)
             head.addWidget(self.save_btn)
         head.addWidget(reset)
-        self._head_btns = [b for b in (getattr(self, "save_btn", None), reset) if b]
+        self._head_btns = [b for b in (self.save_preset_btn, getattr(self, "save_btn", None),
+                                       reset) if b]
         v.addLayout(head)
         v.addWidget(self._rule())
 
-        # --- a voice setup (the Voice tab's My voice combos) on everything here
+        # --- your own presets (audio/mypresets.py), then a voice setup (the Voice tab's
+        # My voice combos) on everything here: one grid, the names in one column
         self.setup_name = ""
         self._setup_chips: dict[str, QPushButton] = {}
         srow = QGridLayout()   # the name, then its chips with the progress under them
         srow.setHorizontalSpacing(12)
         srow.setVerticalSpacing(6)
-        lab = self._setups_lab = section_label(_("My voice combos"))
-        # on the chips' first row: as tall as a chip, its text centred in that (no
-        # padding above, which pushed it below the chips' words)
-        lab.setProperty("head", True)
-        lab.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-        srow.addWidget(lab, 0, 0, Qt.AlignmentFlag.AlignTop)
+        self._srow = srow
+
+        # your presets: one line of chips whatever the count, the rest under More
+        self.my_presets: dict[str, dict] = {}
+        self.my_chips: dict[str, QPushButton] = {}
+        self._mine_stale = True   # the row's chips not made for what's saved yet
+        self._mine_lab = self._row_name(_("My presets"))
+        srow.addWidget(self._mine_lab, 0, 0, Qt.AlignmentFlag.AlignTop)
+        self.mine_box = QWidget()
+        self.mine_box.setObjectName("spcol")
+        self.mine_box.setStyleSheet("QWidget#spcol { background:transparent; }")
+        self.mine_line = QHBoxLayout(self.mine_box)
+        self.mine_line.setContentsMargins(0, 0, 0, 0)
+        self.mine_line.setSpacing(4)
+        self.more_btn = QPushButton()
+        self.more_btn.setObjectName("small")
+        self.more_btn.setCheckable(True)   # lit when the preset that's on is in there
+        self.more_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.more_btn.clicked.connect(self._more_menu)
+        srow.addWidget(self.mine_box, 0, 1)
+        # a deleted preset can come back while the pop-up is open
+        self.undo_row = QWidget()
+        self.undo_row.setObjectName("spcol")
+        self.undo_row.setStyleSheet("QWidget#spcol { background:transparent; }")
+        u = QHBoxLayout(self.undo_row)
+        u.setContentsMargins(0, 0, 0, 0)
+        u.setSpacing(8)
+        self.undo_text = QLabel()
+        self.undo_text.setObjectName("hint")
+        self.undo_btn = QPushButton(_("Undo"))
+        self.undo_btn.setObjectName("small")
+        self.undo_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.undo_btn.clicked.connect(self._undo_delete)
+        u.addWidget(self.undo_text)
+        u.addWidget(self.undo_btn)
+        u.addStretch(1)
+        self.undo_row.hide()
+        self._deleted: tuple[str, int, dict] | None = None
+        srow.addWidget(self.undo_row, 1, 1)
+
+        srow.addWidget(self._rule(), 2, 0, 1, 2)   # presets above, combos below
+        lab = self._setups_lab = self._row_name(_("My voice combos"))
+        srow.addWidget(lab, 3, 0, Qt.AlignmentFlag.AlignTop)
         self.setups_box = QWidget()
         self.setups_box.setObjectName("spcol")
         self.setups_box.setStyleSheet("QWidget#spcol { background:transparent; }")
         self.setups_flow = Flow(self.setups_box, gap=4)
-        srow.addWidget(self.setups_box, 0, 1)
+        srow.addWidget(self.setups_box, 3, 1)
         srow.setColumnStretch(1, 1)
         self.busy_row = QWidget()
         self.busy_row.setObjectName("spcol")
@@ -407,7 +482,7 @@ class SpeedPitchButton(QPushButton):
         b.addWidget(self.busy_bar, 1)
         b.addWidget(self.busy_cancel)
         self.busy_row.hide()
-        srow.addWidget(self.busy_row, 1, 1)
+        srow.addWidget(self.busy_row, 4, 1)
         v.addLayout(srow)
         v.addWidget(self._rule())
 
@@ -532,6 +607,7 @@ class SpeedPitchButton(QPushButton):
         self.pitch.changed.connect(self._edited)
         self.keep.toggled.connect(lambda _b: self._edited())
         self.clicked.connect(self._toggle)
+        self.fill_my_presets()
         self._label()
 
     def _effects(self, box: QWidget):
@@ -669,6 +745,23 @@ class SpeedPitchButton(QPushButton):
         self.keep.blockSignals(False)
         self._edited()
 
+    def load(self, speed: float, pitch: float, keep: bool, amounts: dict):
+        """Show these values without sending them anywhere (`changed` and `fx_changed`
+        stay quiet): a pad's own effects with these on top, or these alone again."""
+        self.blockSignals(True)
+        try:
+            self.set_values(speed, pitch, keep)
+            self.set_fx(amounts)
+        finally:
+            self.blockSignals(False)
+
+    def set_target(self, name: str | None):
+        """The knobs show the sound `name` plays with (its own effects with these on
+        top: its name in the header), or every sound's layer alone again (None)."""
+        self._sub.setText(short(name, 20) if name else self._sub_all)
+        if self.pop.isVisible():
+            self._open()
+
     def _save_new(self):
         self.pop.hide()   # a name box comes up next: the pop-up would sit over it
         self.save_new.emit()
@@ -747,20 +840,29 @@ class SpeedPitchButton(QPushButton):
         """`amounts` with the volume as it is now: a preset never changes it."""
         return {**amounts, VOLUME.key: self.volume.value()}
 
+    def _preset(self, name: str) -> dict:
+        """A built-in preset, or one of yours."""
+        return livefx.PRESETS.get(name) or self.my_presets.get(name, {})
+
     def apply_preset(self, name: str):
-        """Set a preset's knobs, and its speed and pitch when it has them (Nightcore)."""
-        p = livefx.PRESETS[name]
+        """Set a preset's knobs, and its speed and pitch when it has them (Nightcore).
+        One of yours sets the volume too: it was saved with it."""
+        p = self._preset(name)
         t = livefx.tuning(p, self.has_speed)
         if t is not None:
             self.set_values(t[0], t[1], t[2] if self.has_speed else self.keep.isChecked())
-        self.set_fx(self._keep_volume(p))
+        self.set_fx(p if name in self.my_presets else self._keep_volume(p))
 
     def preset_on(self, name: str) -> bool:
         """The knobs (and the speed and pitch, if it sets them) are the preset's, at
-        any volume."""
-        p = livefx.PRESETS[name]
-        knobs = {k: v for k, v in self.fx_values().items() if k != VOLUME.key}
-        if knobs != livefx.clean(p):
+        any volume (one of yours: at its own)."""
+        p = self._preset(name)
+        mine = name in self.my_presets
+        knobs = {k: v for k, v in self.fx_values().items() if mine or k != VOLUME.key}
+        want = livefx.clean(p)
+        if not mine:
+            want.pop(VOLUME.key, None)
+        if knobs != want:
             return False
         t = livefx.tuning(p, self.has_speed)
         if t is None:
@@ -781,14 +883,188 @@ class SpeedPitchButton(QPushButton):
         was = getattr(self, "_before_preset", None)
         fx, (speed, pitch, keep) = (was[1] if was and was[0] == name
                                     else ({}, (1.0, 0.0, self.keep.isChecked())))
-        if livefx.tuning(livefx.PRESETS[name]) is not None:
+        mine = name in self.my_presets
+        if livefx.tuning(self._preset(name)) is not None:
             self.set_values(speed, pitch, bool(keep))
-        self.set_fx(self._keep_volume(fx))
+        self.set_fx(fx if mine else self._keep_volume(fx))
 
     def _light_presets(self):
         if hasattr(self, "volume"):   # (the effects column is built before the sliders)
-            for name, b in self.fx_presets.items():
+            for name, b in (*self.fx_presets.items(), *self.my_chips.items()):
                 b.setChecked(self.preset_on(name))
+            self.more_btn.setChecked(any(self.preset_on(n) for n in self._more_names()))
+
+    # ---- your own presets (audio/mypresets.py): the My presets row
+    @staticmethod
+    def _row_name(text: str) -> QLabel:
+        """A row's name (My presets, My voice combos) on its chips' line: as tall as a
+        chip, its text centred in that (no padding above, which pushed it below the
+        chips' words)."""
+        lab = section_label(text)
+        lab.setProperty("head", True)
+        lab.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        return lab
+
+    def _more_names(self) -> list[str]:
+        return [n for n in self.my_presets if n not in self.my_chips]
+
+    def _row_width(self) -> int:
+        """What the row's chips have: the two columns under it, less the names' column."""
+        names = max(self._mine_lab.sizeHint().width(), self._setups_lab.sizeHint().width())
+        return 2 * COL_W + 2 * 16 + 1 - names - self._srow.horizontalSpacing()
+
+    def fill_my_presets(self):
+        """Your presets as chips on one line, as many as fit; the rest under More (N).
+        A hundred of them never make the pop-up taller.
+        The chips are measured only while the pop-up is open (_open makes them right
+        after showing it): after a theme switch a closed one is restyled when shown
+        (theme._style_when_shown), and measured before that it kept a stale style."""
+        self.my_presets = mypresets.load("live")
+        self._mine_stale = not self.pop.isVisible()
+        if self._mine_stale:
+            return
+        while self.mine_line.count():
+            it = self.mine_line.takeAt(0)
+            w = it.widget() if it is not None else None
+            if w is not None and w is not self.more_btn:
+                w.hide()   # (deleteLater waits for the event loop: it stayed drawn)
+                w.deleteLater()
+        self.my_chips = {}
+        if not self.my_presets:
+            empty = QLabel(_("None saved yet"))
+            empty.setObjectName("hint")
+            self.mine_line.addWidget(empty)
+        room, gap = self._row_width(), self.mine_line.spacing()
+        names = list(self.my_presets)
+        # the More button as wide as it can get, so the line never overflows
+        self.more_btn.setText(_("More ({n})", n=len(names)) + "  ▾")
+        self.more_btn.ensurePolished()
+        for i, name in enumerate(names):
+            b = QPushButton(short(name, 18))
+            b.setObjectName("small")
+            b.ensurePolished()
+            more = gap + self.more_btn.sizeHint().width() if i < len(names) - 1 else 0
+            if b.sizeHint().width() + gap + more > room:
+                b.deleteLater()
+                break
+            room -= b.sizeHint().width() + gap
+            b.setCheckable(True)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            b.setToolTip(_("{name}: your preset. Right-click to rename or delete it",
+                           name=name))
+            b.setAccessibleName(name)
+            b.clicked.connect(lambda on, n=name: self._preset_clicked(n, on))
+            b.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+            b.customContextMenuRequested.connect(
+                lambda at, n=name, b=b: self._my_menu(n, b.mapToGlobal(at)))
+            self.my_chips[name] = b
+            self.mine_line.addWidget(b)
+        rest = len(self._more_names())
+        self.more_btn.setText(_("More ({n})", n=rest) + "  ▾")
+        self.more_btn.setToolTip(ngettext("{n} more of your presets",
+                                          "{n} more of your presets", rest))
+        self.more_btn.setVisible(rest > 0)
+        if rest:
+            self.mine_line.addWidget(self.more_btn)
+        self.mine_line.addStretch(1)
+        self._mine_lab.setFixedHeight(self.more_btn.sizeHint().height())   # a chip's
+        self._light_presets()
+
+    def _more_menu(self):
+        """The presets that don't fit on the line: pick one (again: off, as a chip
+        does); right-click one to rename or delete it."""
+        self._light_presets()   # (the click toggled it)
+        m = _MoreMenu(self.pop, self._my_menu)
+        for name in self._more_names():
+            a = m.addAction(name)
+            a.setData(name)
+            a.setCheckable(True)
+            a.setChecked(self.preset_on(name))
+            a.triggered.connect(lambda on, n=name: self._preset_clicked(n, on))
+        m.exec(self.more_btn.mapToGlobal(QPoint(0, self.more_btn.height())))
+
+    def _ask_preset_name(self, title: str, text: str, keep: str = "") -> str:
+        """A name for one of your presets, or "" if cancelled. A built-in preset's name
+        is taken; so is another of yours, unless you agree to replace it."""
+        builtin = {n.casefold() for n in livefx.PRESETS}
+        parent = self.window()
+        while True:
+            name, ok = QInputDialog.getText(parent, title, _("Name:"),
+                                            QLineEdit.EchoMode.Normal, text)
+            name = mypresets.clean_name(name) if ok else ""
+            if not name:
+                return ""
+            if name.casefold() in builtin:
+                QMessageBox.information(parent, title, plain_tip(_(
+                    "“{name}” is a built-in preset's name. Pick another one.", name=name)))
+                text = name
+                continue
+            other = mypresets.find("live", name)
+            if other is None or other == keep:
+                return name
+            if QMessageBox.question(parent, title, plain_tip(_(
+                    "You already have a preset called “{name}”. Replace it?", name=other))
+                    ) == QMessageBox.StandardButton.Yes:
+                return other
+            text = name
+
+    def save_preset(self):
+        """+ Save preset: what's on now, under a name, in My presets."""
+        self.pop.hide()   # a name box comes up next: the pop-up would sit over it
+        if mypresets.full("live"):
+            QMessageBox.information(self.window(), _("Save preset"), ngettext(
+                "You have {n} preset, the most there can be. Delete one first.",
+                "You have {n} presets, the most there can be. Delete one first.",
+                mypresets.MAX_PRESETS))
+        else:
+            n, base = 1, _("My preset")
+            while mypresets.find("live", f"{base} {n}"):
+                n += 1
+            name = self._ask_preset_name(_("Save preset"), f"{base} {n}")
+            if name:
+                speed, pitch, keep = self.values()
+                mypresets.put("live", name, {"speed": speed, "pitch": pitch,
+                                             "keep": keep, **self.fx_values()})
+        self.fill_my_presets()
+        self._open()
+
+    def _my_menu(self, name: str, at):
+        m = QMenu(self.pop)
+        m.addAction(icons.icon("edit"), _("Rename"), lambda: self._rename_preset(name))
+        m.addAction(icons.icon("trash", "danger_text"), _("Delete"),
+                    lambda: self.delete_preset(name))
+        m.exec(at)
+
+    def _rename_preset(self, old: str):
+        self.pop.hide()
+        new = self._ask_preset_name(_("Rename preset"), old, keep=old)
+        if new and new != old:
+            mypresets.rename("live", old, new)
+        self.fill_my_presets()
+        self._open()
+
+    def delete_preset(self, name: str):
+        """Take one of your presets out; Undo (under the row) puts it back while the
+        pop-up is open."""
+        got = mypresets.remove("live", name)
+        if got is None:
+            return
+        self._deleted = (name, *got)
+        self.undo_text.setText(_("Deleted “{name}”", name=name))
+        self.undo_row.show()
+        self.fill_my_presets()
+        if self.pop.isVisible():
+            self._open()   # grows for the Undo line
+
+    def _undo_delete(self):
+        if self._deleted is not None:
+            name, at, p = self._deleted
+            mypresets.put("live", name, p, at)
+        self._deleted = None
+        self.undo_row.hide()
+        self.fill_my_presets()
+        if self.pop.isVisible():
+            self._open()
 
     def _fx_edited(self):
         now = self.fx_values()
@@ -802,6 +1078,10 @@ class SpeedPitchButton(QPushButton):
     def eventFilter(self, obj, ev):
         if obj is self.pop and ev.type() == QEvent.Type.Hide:
             self._hidden_at = time.monotonic()
+            self.closed.emit()
+            if self._deleted is not None:   # Undo is for while it's open
+                self._deleted = None
+                self.undo_row.hide()
         return super().eventFilter(obj, ev)
 
     def _toggle(self):
@@ -815,6 +1095,8 @@ class SpeedPitchButton(QPushButton):
         if not self.pop.isVisible():
             usage.used(f"live-opened-{self._what}")   # the tab's name only (usage.py)
             self.opening.emit()
+            self.my_presets = mypresets.load("live")   # (saved from another tab's too)
+            self._mine_stale = True
         self._fit_head()
         # settle the layouts first: right after Redline hides its box, the column's
         # and the popup's size hint (and the popup's minimum) still hold the old,
@@ -838,18 +1120,38 @@ class SpeedPitchButton(QPushButton):
         x = max(area.left(), min(x, area.right() - self.pop.width() + 1))
         self.pop.move(x, y)
         self.pop.show()
+        if self._mine_stale:   # the My presets row, now it's styled: fits and places it
+            self.fill_my_presets()
+            self._open()
 
     def _fit_head(self):
         """Measure the header's buttons on the screen the pop-up opens on. A button
         keeps the size it measured first: built on one monitor and opened on one with
         other scaling, its words came out wider than it ("Save as new pa")."""
         self.pop.setScreen(self.screen())
+        self.save_preset_btn.setText(_("Save preset"))
+        self.save_preset_btn.setMinimumWidth(0)
+        self.save_preset_btn.setMaximumWidth(16777215)
+        icons.set_icon(self.save_preset_btn, "plus", size=18)   # (the gap before words)
         for b in self._head_btns:
             text = b.text()   # new words: the button forgets the size it kept
             b.setText("")
             b.setText(text)
             if b.objectName() == "liveReset":   # whole, never squeezed (see __init__)
                 b.setMinimumWidth(max(96, b.sizeHint().width()))
+        # three buttons wider than the two columns under them (a long language, big
+        # fonts): Save preset gives way to its + alone (the tooltip says it), so the
+        # pop-up never grows for it
+        cols = 2 * COL_W + 2 * 16 + 1
+        self._sub.show()
+        self._head.invalidate()
+        if self._head.minimumSize().width() > cols:
+            self.save_preset_btn.setText("")
+            icons.set_icon(self.save_preset_btn, "plus", size=18)   # no gap: centred
+            self.save_preset_btn.setFixedWidth(36)   # square, as tall as it is
+        # "All sounds" whole or not at all: squeezed it lost its last letters
+        self._head.invalidate()
+        self._sub.setVisible(self._head.sizeHint().width() <= cols)
 
     def _label(self):
         s, p, _k = self.values()

@@ -4600,5 +4600,45 @@
   "Mic settings, new presets and new games with Bun": "麦克风设置、新预设和 Bun 的新游戏",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "变声标签页里麦克风降噪旁边的齿轮：输入音量、噪声抑制，以及嘈杂房间等预设。还能去掉敲桌子的声音和低沉的嗡嗡声。",
   "Three new games with Bun": "和 Bun 的三个新游戏",
-  "A Volume slider in Live controls": "实时控制里的音量滑块"
+  "A Volume slider in Live controls": "实时控制里的音量滑块",
+  "That playlist is empty, or its videos are private.": "这个播放列表是空的，或者里面的视频是私密的。",
+  "{n} of {total} video": [
+    "{total}个视频中的{n}个"
+  ],
+  "{n} video": [
+    "{n}个视频"
+  ],
+  "Double-click to open": "双击打开",
+  "Playlist": "播放列表",
+  "Playlists": "播放列表",
+  "Show its videos, to add some or all of them": "显示里面的视频，添加部分或全部",
+  "Show playlists: open one to add its videos": "显示播放列表：打开一个就能添加里面的视频",
+  "Show videos": "显示视频",
+  "Videos": "视频",
+  "Add all": "全部添加",
+  "Add all its videos to your sounds, without opening it": "不用打开，把里面的视频全部添加到你的声音",
+  "Couldn't add that playlist: {error}": "无法添加这个播放列表：{error}",
+  "Its videos are on their way to your sounds": "里面的视频正在添加到你的声音",
+  "✓ {n} queued": [
+    "✓ 已排队 {n} 个"
+  ],
+  "Delete this preset": "删除此预设",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "把现在的速度、音调、效果和音量存为你自己的预设",
+  "Keep these effects as a preset of your own, in this list for every sound": "把这些效果存为你自己的预设，放进所有声音的这个列表",
+  "More ({n})": "更多 ({n})",
+  "My preset": "我的预设",
+  "My presets": "我的预设",
+  "None saved yet": "还没有保存的预设",
+  "Rename preset": "重命名预设",
+  "Save as preset": "另存为预设",
+  "Save preset": "保存预设",
+  "You already have a preset called “{name}”. Replace it?": "你已经有一个名为“{name}”的预设。要替换它吗？",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "你已有 {n} 个预设，已达上限。请先删除一个。"
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}：你的预设。右键可重命名或删除",
+  "{n} more of your presets": [
+    "另外 {n} 个你的预设"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}”是内置预设的名称。请换一个。"
 }

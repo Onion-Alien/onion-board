@@ -10,17 +10,19 @@ import urllib.request
 from soundboard.online import net
 from soundboard.core import errors
 from soundboard.i18n import _
-from soundboard.online.ytsites import (BROWSER_HEADERS, FEATURE, FetchError, MYINSTANTS, Result,
+from soundboard.online.ytsites import (BROWSER_HEADERS, FEATURE, FetchError, MYINSTANTS, PLAYLIST,
+    Result,
     SOURCES, SwitchedOff, TIKTOK_SUFFIX, TRENDING, _gate, _over_tor)
 from soundboard.online.ytfetch import _extract, _opts
 
 
 def search(query: str, count: int = 20, source: str = "youtube",
-           direct: bool = False, start: int = 1) -> list[Result]:
+           direct: bool = False, start: int = 1, playlists: bool = False) -> list[Result]:
     """Search one of SOURCES (one results page, nothing downloaded): hits `start` to
     `count` (1-based), so Show more asks for the next ones. Live streams and junk
-    entries are left out. Raises DownloadError like probe (TorBlocked when the site
-    turned Tor away; `direct` is the user's "without Tor" click)."""
+    entries are left out. `playlists`: YouTube's playlists instead of its videos (the
+    results' Videos / Playlists switch). Raises DownloadError like probe (TorBlocked
+    when the site turned Tor away; `direct` is the user's "without Tor" click)."""
     query = " ".join(query.split())
     if not query:
         return []
@@ -30,7 +32,10 @@ def search(query: str, count: int = 20, source: str = "youtube",
         if direct:
             return _myinstants(query, count, direct=True)[start - 1:]
         return _over_tor(lambda: _myinstants(query, count), MYINSTANTS)[start - 1:]
-    if kind == "ytmusic":
+    if playlists and source == "youtube":   # YouTube's own "Playlists" search filter
+        target = ("https://www.youtube.com/results?search_query="
+                  f"{urllib.parse.quote_plus(query)}&sp=EgIQAw%3D%3D")
+    elif kind == "ytmusic":
         target = ("https://music.youtube.com/search?q="
                   f"{urllib.parse.quote_plus(query)}#songs")
     else:
@@ -51,7 +56,8 @@ def search(query: str, count: int = 20, source: str = "youtube",
     for e in (info or {}).get("entries") or ():
         if not e or e.get("live_status") == "is_live":
             continue
-        r = _soundcloud_hit(e) if source == "soundcloud" else _youtube_hit(e)
+        r = (_soundcloud_hit(e) if source == "soundcloud" else
+             _playlist_hit(e) if playlists and source == "youtube" else _youtube_hit(e))
         if r:
             out.append(r)
     return out[:count]
@@ -108,6 +114,18 @@ def _youtube_hit(e: dict) -> Result | None:
     return Result(vid, str(e.get("title") or vid),
                   str(e.get("channel") or e.get("uploader") or ""),
                   float(e.get("duration") or 0), views=_count(e.get("view_count")))
+
+
+def _playlist_hit(e: dict) -> Result | None:
+    """A YouTube playlist found by a search: opening its card lists its videos."""
+    link = str(e.get("url") or "")
+    if not re.match(r"https://www\.youtube\.com/playlist\?list=[\w-]+$", link):
+        return None   # a channel or a video, not a playlist
+    art = next((str(t.get("url")) for t in reversed(e.get("thumbnails") or ())
+                if t.get("url")), "")
+    return Result(str(e.get("id") or link), str(e.get("title") or _("Playlist")),
+                  str(e.get("channel") or e.get("uploader") or ""), 0.0,
+                  source=PLAYLIST, link=link, art=art)
 
 
 def _soundcloud_hit(e: dict) -> Result | None:

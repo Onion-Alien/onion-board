@@ -4,31 +4,34 @@ effect, modules' included) and the EQ tab."""
 from __future__ import annotations
 
 import logging
+import threading
 
 from PySide6.QtCore import QObject, Qt, Signal
 from PySide6.QtGui import QFont, QImage
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox,
                                QDialog, QDialogButtonBox, QFrame, QGridLayout,
-                               QHBoxLayout, QLabel, QLineEdit, QProgressBar,
+                               QHBoxLayout, QInputDialog, QLabel, QLineEdit,
+                               QMessageBox, QProgressBar,
                                QPushButton, QScrollArea, QSlider, QTabWidget, QVBoxLayout,
                                QWidget)
 
 from soundboard.core import achievements, usage
-from soundboard.audio import livefx, soundfx
+from soundboard.audio import livefx, mypresets, soundfx
 from soundboard.ui.kit import theme
 from soundboard import voicefx
 from soundboard.sounds import thumbs
 from soundboard.audio.eq import PRESETS as EQ_PRESETS
 from soundboard.sounds.library import (MAX_COOLDOWN_S, MAX_DELAY_S, PAD_COLORS,
-                                       SoundMeta, original_peaks)
+                                       SoundMeta, original_length, original_peaks)
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import (EqPanel, hint_label, icon_button, reset_button,
                                      section_label, steady_number)
 from soundboard.ui.sounds.trim import TrimPanel
 from soundboard.ui.voice.voicefxpanel import ADDON_GROUP, GROUPS, EffectRow, ParamSlider
+from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.control.winkeys import Hotkeys
-from soundboard.i18n import _
+from soundboard.i18n import _, ngettext
 from soundboard.ui.sounds.tabhelp import TabHelpPopup  # noqa: F401
 from soundboard.ui.sounds.editdialogparts import PIC_H, PIC_W  # noqa: F401
 from soundboard.ui.sounds.editdialogparts import EditDialogParts
@@ -36,6 +39,7 @@ from soundboard.ui.sounds.editdialogparts import EditDialogParts
 log = logging.getLogger(__name__)
 
 CUSTOM = "Custom"   # the preset box's item data when no preset matches
+MINE = "mine:"      # before your own presets' names in the preset box's item data
 # what the pad colour swatches are called (tooltip and screen reader)
 COLOUR_NAMES = {"#7c5cff": _("Purple"), "#ff5c8a": _("Pink"), "#1fb6ff": _("Blue"),
                 "#13ce66": _("Green"), "#ffb020": _("Yellow"), "#ff7849": _("Orange"),
@@ -63,10 +67,13 @@ class EffectsPanel(QObject):
     `pick_voice(voice)` opens the voice picker (ui.voicepicker) on the sound's voice
     and gives back the new one, or None if it was cancelled. The sound keeps a copy."""
     changed = Signal()
+    peaks_read = Signal(int, object)   # (trim generation, peaks) from the waveform worker
 
     def __init__(self, fx: dict | None, meta: SoundMeta | None = None, pick_voice=None):
         super().__init__()
         self._pick_voice = pick_voice
+        self._trim_gen = 0
+        self.peaks_read.connect(self._on_peaks)
         self._voice: dict = {}
         self._live: list = []
         self.trim_page, tv = _page()
@@ -76,16 +83,44 @@ class EffectsPanel(QObject):
         prow = QHBoxLayout()
         prow.addWidget(QLabel(_("Preset")))
         self.preset = QComboBox()
-        for name in soundfx.PRESETS:
-            self.preset.addItem(name, name)
-        self.preset.addItem(_("Custom"), CUSTOM)
+        self.mine: dict[str, dict] = {}   # your own presets (audio/mypresets.py)
+        self._fill_presets()
         no_wheel(self.preset)
         prow.addWidget(self.preset)
         reset = reset_button(_("Back to the original sound (the trim stays)"))
         reset.clicked.connect(lambda: self.preset.setCurrentIndex(0))   # the first preset
         prow.addWidget(reset)
+        # Reset's slim look beside it: what's on now, kept as a preset of your own
+        self.save_preset = QPushButton(_("Save as preset"))
+        self.save_preset.setObjectName("reset")
+        self.save_preset.setCursor(Qt.CursorShape.PointingHandCursor)
+        icons.set_icon(self.save_preset, "plus", "muted", size=12)
+        self.save_preset.setToolTip(_("Keep these effects as a preset of your own, in "
+                                      "this list for every sound"))
+        self.save_preset.clicked.connect(self._save_preset)
+        prow.addWidget(self.save_preset)
+        self.delete_preset = icon_button("trash", _("Delete this preset"))
+        self.delete_preset.clicked.connect(self._delete_preset)
+        self.delete_preset.hide()
+        prow.addWidget(self.delete_preset)
         prow.addStretch(1)
         v.addLayout(prow)
+        # a deleted preset can come back until the dialog closes
+        self.undo_row = QWidget()
+        urow = QHBoxLayout(self.undo_row)
+        urow.setContentsMargins(0, 0, 0, 0)
+        self.undo_text = QLabel()
+        self.undo_text.setObjectName("hint")
+        undo = QPushButton(_("Undo"))
+        undo.setObjectName("small")
+        undo.setCursor(Qt.CursorShape.PointingHandCursor)
+        undo.clicked.connect(self._undo_delete)
+        urow.addWidget(self.undo_text)
+        urow.addWidget(undo)
+        urow.addStretch(1)
+        self.undo_row.hide()
+        self._deleted: tuple[str, int, dict] | None = None
+        v.addWidget(self.undo_row)
 
         vrow = QHBoxLayout()
         vrow.addWidget(QLabel(_("Voice")))
@@ -186,9 +221,17 @@ class EffectsPanel(QObject):
         self._matching_preset()
 
     def _new_trim(self, meta: SoundMeta | None, at: int = -1) -> TrimPanel:
-        """The trim for `meta`'s sound (its waveform is that sound's)."""
-        peaks, length = original_peaks(meta) if meta is not None else ([], 0.0)
-        trim = TrimPanel(peaks, length)
+        """The trim for `meta`'s sound (its waveform is that sound's). Its peaks come
+        from a worker: reading them off a paged-out cache froze Edit for seconds."""
+        length = original_length(meta) if meta is not None else 0.0
+        trim = TrimPanel([], length)
+        self._trim_gen += 1
+        if meta is not None and length > 0:
+            gen = self._trim_gen
+
+            def work():
+                busy.emit(self.peaks_read, gen, original_peaks(meta)[0])
+            threading.Thread(target=work, daemon=True, name="edit-waveform").start()
         if at < 0:
             self._v.addWidget(trim)     # in the layout first: shown with no parent,
         else:
@@ -198,6 +241,10 @@ class EffectsPanel(QObject):
         self.trim_kept.setVisible(length > 0)
         trim.changed.connect(self._edited)
         return trim
+
+    def _on_peaks(self, gen: int, peaks):
+        if gen == self._trim_gen:   # still the same sound's trim
+            self.trim.wave.set_peaks(peaks)
 
     def set_sound(self, meta: SoundMeta):
         """Show another sound (Edit sound reused, EditControl.edit): its trim and fx."""
@@ -297,10 +344,96 @@ class EffectsPanel(QObject):
 
     def _matching_preset(self):
         cur = soundfx.key(self._untrimmed())   # a preset never changes the trim
-        name = next((n for n, p in soundfx.PRESETS.items() if soundfx.key(p) == cur), CUSTOM)
+        name = next((n for n, p in soundfx.PRESETS.items() if soundfx.key(p) == cur),
+                    next((MINE + n for n, p in self.mine.items() if soundfx.key(p) == cur),
+                         CUSTOM))
         self.preset.blockSignals(True)
         self.preset.setCurrentIndex(max(0, self.preset.findData(name)))
         self.preset.blockSignals(False)
+        self.delete_preset.setVisible(name.startswith(MINE))
+
+    def _fill_presets(self):
+        """The built-in presets, then yours, then Custom."""
+        self.mine = mypresets.load("sound")
+        self.preset.blockSignals(True)
+        self.preset.clear()
+        for name in soundfx.PRESETS:
+            self.preset.addItem(name, name)
+        if self.mine:
+            self.preset.insertSeparator(self.preset.count())
+            for name in self.mine:
+                self.preset.addItem(name, MINE + name)
+        self.preset.addItem(_("Custom"), CUSTOM)
+        self.preset.blockSignals(False)
+
+    def _ask_preset_name(self, text: str) -> str:
+        """A name for one of your presets, or "" if cancelled. A built-in preset's name
+        is taken; so is another of yours, unless you agree to replace it."""
+        title, parent = _("Save as preset"), self.fx_page.window()
+        builtin = {n.casefold() for n in soundfx.PRESETS}
+        while True:
+            name, ok = QInputDialog.getText(parent, title, _("Name:"),
+                                            QLineEdit.EchoMode.Normal, text)
+            name = mypresets.clean_name(name) if ok else ""
+            if not name:
+                return ""
+            if name.casefold() in builtin:
+                QMessageBox.information(parent, title, plain_tip(_(
+                    "“{name}” is a built-in preset's name. Pick another one.", name=name)))
+                text = name
+                continue
+            other = mypresets.find("sound", name)
+            if other is None:
+                return name
+            if QMessageBox.question(parent, title, plain_tip(_(
+                    "You already have a preset called “{name}”. Replace it?", name=other))
+                    ) == QMessageBox.StandardButton.Yes:
+                return other
+            text = name
+
+    def _save_preset(self):
+        """"Save as preset": these effects (not the trim or the voice) under a name, in
+        the Preset list of every sound from now on."""
+        parent = self.fx_page.window()
+        if mypresets.full("sound"):
+            QMessageBox.information(parent, _("Save as preset"), ngettext(
+                "You have {n} preset, the most there can be. Delete one first.",
+                "You have {n} presets, the most there can be. Delete one first.",
+                mypresets.MAX_PRESETS))
+            return
+        n, base = 1, _("My preset")
+        while mypresets.find("sound", f"{base} {n}"):
+            n += 1
+        name = self._ask_preset_name(f"{base} {n}")
+        if name and mypresets.put("sound", name, self._untrimmed()):
+            self._fill_presets()
+            self._matching_preset()
+            busy.flash(self.save_preset, _("✓ Saved"))
+
+    def _delete_preset(self):
+        """Take the picked preset of yours out; Undo puts it back until the dialog
+        closes."""
+        name = str(self.preset.currentData() or "")
+        if not name.startswith(MINE):
+            return
+        name = name[len(MINE):]
+        got = mypresets.remove("sound", name)
+        if got is None:
+            return
+        self._deleted = (name, *got)
+        self.undo_text.setText(_("Deleted “{name}”", name=name))
+        self.undo_row.show()
+        self._fill_presets()
+        self._matching_preset()
+
+    def _undo_delete(self):
+        if self._deleted is not None:
+            name, at, p = self._deleted
+            mypresets.put("sound", name, p, at)
+        self._deleted = None
+        self.undo_row.hide()
+        self._fill_presets()
+        self._matching_preset()
 
     def reset_all(self):
         """Every effect off, the voice too (the trim stays)."""
@@ -310,11 +443,14 @@ class EffectsPanel(QObject):
         self.changed.emit()
 
     def _on_preset(self, name: str):
-        if name in soundfx.PRESETS:
+        p = soundfx.PRESETS.get(name) or (self.mine.get(name[len(MINE):])
+                                          if name.startswith(MINE) else None)
+        if p:
             start, end = self.trim.values()
-            self.load({**soundfx.PRESETS[name], "start": start, "end": end,
+            self.load({**p, "start": start, "end": end,
                        "voice": self._voice, "live": self._live})
             self.changed.emit()
+        self.delete_preset.setVisible(name.startswith(MINE))
 
 
 class EditDialog(EditDialogParts, QDialog):

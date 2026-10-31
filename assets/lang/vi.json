@@ -4600,5 +4600,45 @@
   "Mic settings, new presets and new games with Bun": "Cài đặt mic, cài sẵn mới và trò chơi mới với Bun",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Bánh răng cạnh Mic sạch ở thẻ Giọng nói: âm lượng đầu vào, khử tiếng ồn và cài sẵn như Phòng ồn. Nó cũng lọc tiếng gõ bàn và tiếng ù trầm.",
   "Three new games with Bun": "Ba trò chơi mới với Bun",
-  "A Volume slider in Live controls": "Thanh trượt âm lượng trong Điều khiển trực tiếp"
+  "A Volume slider in Live controls": "Thanh trượt âm lượng trong Điều khiển trực tiếp",
+  "That playlist is empty, or its videos are private.": "Danh sách phát đó trống, hoặc các video trong đó ở chế độ riêng tư.",
+  "{n} of {total} video": [
+    "{n}/{total} video"
+  ],
+  "{n} video": [
+    "{n} video"
+  ],
+  "Double-click to open": "Nhấp đúp để mở",
+  "Playlist": "Danh sách phát",
+  "Playlists": "Danh sách phát",
+  "Show its videos, to add some or all of them": "Hiện các video trong đó để thêm một vài hoặc tất cả",
+  "Show playlists: open one to add its videos": "Hiện danh sách phát: mở một danh sách để thêm video trong đó",
+  "Show videos": "Hiện video",
+  "Videos": "Video",
+  "Add all": "Thêm tất cả",
+  "Add all its videos to your sounds, without opening it": "Thêm tất cả video trong đó vào âm thanh mà không cần mở",
+  "Couldn't add that playlist: {error}": "Không thêm được danh sách phát đó: {error}",
+  "Its videos are on their way to your sounds": "Các video trong đó đang được thêm vào âm thanh của bạn",
+  "✓ {n} queued": [
+    "✓ {n} đang chờ"
+  ],
+  "Delete this preset": "Xóa mẫu này",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Lưu tốc độ, cao độ, hiệu ứng và âm lượng hiện tại thành mẫu của riêng bạn",
+  "Keep these effects as a preset of your own, in this list for every sound": "Lưu các hiệu ứng này thành mẫu của riêng bạn, trong danh sách này cho mọi âm thanh",
+  "More ({n})": "Thêm ({n})",
+  "My preset": "Mẫu của tôi",
+  "My presets": "Mẫu của tôi",
+  "None saved yet": "Chưa lưu gì",
+  "Rename preset": "Đổi tên mẫu",
+  "Save as preset": "Lưu thành mẫu",
+  "Save preset": "Lưu mẫu",
+  "You already have a preset called “{name}”. Replace it?": "Bạn đã có mẫu tên “{name}”. Thay thế nó?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "Bạn có {n} mẫu, đã là tối đa. Hãy xóa bớt một mẫu trước."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: mẫu của bạn. Nhấp chuột phải để đổi tên hoặc xóa",
+  "{n} more of your presets": [
+    "Thêm {n} mẫu của bạn"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” là tên của một mẫu có sẵn. Hãy chọn tên khác."
 }

@@ -4682,5 +4682,50 @@
   "Mic settings, new presets and new games with Bun": "Impostazioni microfono, nuove preimpostazioni e nuovi giochi con Bun",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "L'ingranaggio accanto a Microfono pulito nella scheda Voce: volume d'ingresso, soppressione del rumore e preimpostazioni come Stanza rumorosa. Toglie anche i colpi sulla scrivania e il ronzio basso.",
   "Three new games with Bun": "Tre nuovi giochi con Bun",
-  "A Volume slider in Live controls": "Un cursore del volume nei Controlli dal vivo"
+  "A Volume slider in Live controls": "Un cursore del volume nei Controlli dal vivo",
+  "That playlist is empty, or its videos are private.": "Quella playlist è vuota, o i suoi video sono privati.",
+  "{n} of {total} video": [
+    "{n} di {total} video",
+    "{n} di {total} video"
+  ],
+  "{n} video": [
+    "{n} video",
+    "{n} video"
+  ],
+  "Double-click to open": "Doppio clic per aprire",
+  "Playlist": "Playlist",
+  "Playlists": "Playlist",
+  "Show its videos, to add some or all of them": "Mostra i suoi video per aggiungerne alcuni o tutti",
+  "Show playlists: open one to add its videos": "Mostra le playlist: aprine una per aggiungere i suoi video",
+  "Show videos": "Mostra i video",
+  "Videos": "Video",
+  "Add all": "Aggiungi tutti",
+  "Add all its videos to your sounds, without opening it": "Aggiungi tutti i suoi video ai tuoi suoni senza aprirla",
+  "Couldn't add that playlist: {error}": "Impossibile aggiungere quella playlist: {error}",
+  "Its videos are on their way to your sounds": "I suoi video stanno arrivando nei tuoi suoni",
+  "✓ {n} queued": [
+    "✓ {n} in coda",
+    "✓ {n} in coda"
+  ],
+  "Delete this preset": "Elimina questo preset",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Tieni velocità, tono, effetti e volume di adesso come un tuo preset",
+  "Keep these effects as a preset of your own, in this list for every sound": "Tieni questi effetti come un tuo preset, in questa lista per ogni suono",
+  "More ({n})": "Altri ({n})",
+  "My preset": "Il mio preset",
+  "My presets": "I miei preset",
+  "None saved yet": "Ancora niente di salvato",
+  "Rename preset": "Rinomina preset",
+  "Save as preset": "Salva come preset",
+  "Save preset": "Salva preset",
+  "You already have a preset called “{name}”. Replace it?": "Hai già un preset chiamato “{name}”. Sostituirlo?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "Hai {n} preset, il massimo possibile. Eliminane prima uno.",
+    "Hai {n} preset, il massimo possibile. Eliminane prima uno."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: un tuo preset. Clic destro per rinominarlo o eliminarlo",
+  "{n} more of your presets": [
+    "Ancora {n} tuo preset",
+    "Altri {n} tuoi preset"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” è il nome di un preset integrato. Scegline un altro."
 }

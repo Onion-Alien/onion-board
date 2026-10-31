@@ -4682,5 +4682,50 @@
   "Mic settings, new presets and new games with Bun": "Mikin asetukset, uusia valmiita asetuksia ja uusia pelejä Bunin kanssa",
   "The cog next to Clean mic on the Voice tab: input volume, noise suppression and presets like Loud room. It cuts out desk bumps and low hum too.": "Ratas Puhdas mikki -kohdan vieressä Puhe-välilehdellä: sisääntulon äänenvoimakkuus, kohinanvaimennus ja valmiit asetukset kuten Meluisa huone. Se poistaa myös pöydän kolahdukset ja matalan huminan.",
   "Three new games with Bun": "Kolme uutta peliä Bunin kanssa",
-  "A Volume slider in Live controls": "Äänenvoimakkuuden liukusäädin Live-säätimissä"
+  "A Volume slider in Live controls": "Äänenvoimakkuuden liukusäädin Live-säätimissä",
+  "That playlist is empty, or its videos are private.": "Soittolista on tyhjä tai sen videot ovat yksityisiä.",
+  "{n} of {total} video": [
+    "{n}/{total} video",
+    "{n}/{total} videota"
+  ],
+  "{n} video": [
+    "{n} video",
+    "{n} videota"
+  ],
+  "Double-click to open": "Avaa kaksoisnapsautuksella",
+  "Playlist": "Soittolista",
+  "Playlists": "Soittolistat",
+  "Show its videos, to add some or all of them": "Näytä sen videot, niin voit lisätä osan tai kaikki",
+  "Show playlists: open one to add its videos": "Näytä soittolistat: avaa yksi ja lisää sen videot",
+  "Show videos": "Näytä videot",
+  "Videos": "Videot",
+  "Add all": "Lisää kaikki",
+  "Add all its videos to your sounds, without opening it": "Lisää kaikki sen videot ääniisi avaamatta sitä",
+  "Couldn't add that playlist: {error}": "Soittolistaa ei voitu lisätä: {error}",
+  "Its videos are on their way to your sounds": "Sen videot ovat tulossa ääniisi",
+  "✓ {n} queued": [
+    "✓ {n} jonossa",
+    "✓ {n} jonossa"
+  ],
+  "Delete this preset": "Poista tämä esiasetus",
+  "Keep the speed, pitch, effects and volume you have now as a preset of your own": "Tallenna nykyinen nopeus, sävelkorkeus, efektit ja äänenvoimakkuus omaksi esiasetukseksi",
+  "Keep these effects as a preset of your own, in this list for every sound": "Tallenna nämä efektit omaksi esiasetukseksi, tähän listaan jokaiselle äänelle",
+  "More ({n})": "Lisää ({n})",
+  "My preset": "Oma esiasetus",
+  "My presets": "Omat esiasetukset",
+  "None saved yet": "Mitään ei ole vielä tallennettu",
+  "Rename preset": "Nimeä esiasetus uudelleen",
+  "Save as preset": "Tallenna esiasetukseksi",
+  "Save preset": "Tallenna esiasetus",
+  "You already have a preset called “{name}”. Replace it?": "Sinulla on jo esiasetus nimeltä “{name}”. Korvataanko se?",
+  "You have {n} preset, the most there can be. Delete one first.": [
+    "Sinulla on {n} esiasetus, enempää ei voi olla. Poista ensin yksi.",
+    "Sinulla on {n} esiasetusta, enempää ei voi olla. Poista ensin yksi."
+  ],
+  "{name}: your preset. Right-click to rename or delete it": "{name}: oma esiasetuksesi. Nimeä uudelleen tai poista hiiren oikealla",
+  "{n} more of your presets": [
+    "{n} muu esiasetuksesi",
+    "{n} muuta esiasetustasi"
+  ],
+  "“{name}” is a built-in preset's name. Pick another one.": "“{name}” on valmiin esiasetuksen nimi. Valitse toinen."
 }

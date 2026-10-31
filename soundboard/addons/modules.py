@@ -62,6 +62,7 @@ import threading
 import time
 import uuid
 import zipfile
+from collections import deque
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
@@ -743,6 +744,54 @@ def _step_word(step: Sequence[str]) -> str:
     return "download" if "--download" in step else "step"
 
 
+# why a failed install step failed, read from the end of what it printed (_output_why):
+# the first of these whose pattern matches, else "other". Counted as these words only
+# (usage.failed "addon-step"), never the output itself.
+OUTPUT_WHY = (
+    ("ssl", r"SSLError|CERTIFICATE_VERIFY_FAILED|SSL: "),
+    ("proxy", r"ProxyError|Cannot connect to proxy"),
+    ("network", r"ConnectionError|ConnectTimeout|ReadTimeout|Max retries exceeded|"
+                r"Could not fetch URL|getaddrinfo failed|Temporary failure in name resolution|"
+                r"No connection could be made|Read timed out|IncompleteRead|"
+                r"Connection (?:reset|aborted|broken)"),
+    ("no-match", r"No matching distribution|Could not find a version that satisfies|"
+                 r"ResolutionImpossible|requires a different Python"),
+    ("hash", r"DO NOT MATCH THE HASHES|hash mismatch"),
+    ("disk", r"No space left on device|\[Errno 28\]|WinError 112\b|not enough space"),
+    ("long-path", r"WinError 206\b|filename or extension is too long|Long Path"),
+    ("in-use", r"WinError 32\b|being used by another process"),
+    ("denied", r"WinError 5\b|Access is denied|PermissionError|\[Errno 13\]"),
+    ("build", r"Failed building wheel|Failed to build|subprocess-exited-with-error|"
+              r"Microsoft Visual C\+\+|metadata-generation-failed"),
+    ("memory", r"MemoryError|out of memory"),
+    ("python", r"No module named|DLL load failed|ImportError"),
+)
+OUTPUT_WORDS = (*(w for w, _ in OUTPUT_WHY), "silent", "other")
+
+
+def _output_why(lines: Sequence[str]) -> str:
+    """Why a step failed, as one of OUTPUT_WORDS, from the last lines it printed:
+    "silent" when it printed nothing."""
+    text = "\n".join(lines)
+    if not text.strip():
+        return "silent"
+    for word, pattern in OUTPUT_WHY:
+        if re.search(pattern, text, re.IGNORECASE):
+            return word
+    return "other"
+
+
+def _step_failed(info: ModuleInfo, argv: Sequence[str], word: str,
+                 lines: Sequence[str], how: str):
+    """Log a failed install step with the end of what it printed (the user's log is what
+    a report carries), and count which step and why (_output_why)."""
+    why = _output_why(lines)
+    log.warning("install of %s %s at: %s (%s); it printed last:\n%s", info.id, how,
+                argv, why, "\n".join(lines[-15:]) or "(nothing)")
+    from soundboard.core import usage
+    usage.failed("addon-step", usage.addon_tag(info.id), word, why)
+
+
 def _install(info: ModuleInfo, on_line: Callable[[str], object],
              on_note: Callable[[str], object] | None = None) -> str:
     """Run the module's "install" steps (module.json), streaming their output to
@@ -792,6 +841,7 @@ def _install(info: ModuleInfo, on_line: Callable[[str], object],
             timed_out.set()
             _kill_tree(p, job)
 
+        last: deque[str] = deque(maxlen=40)   # the end of what it printed, for _step_failed
         timer = threading.Timer(INSTALL_STEP_TIMEOUT_S, watchdog)
         timer.daemon = True
         timer.start()
@@ -800,6 +850,7 @@ def _install(info: ModuleInfo, on_line: Callable[[str], object],
             for line in p.stdout:
                 if line.strip():
                     on_line(line.rstrip())
+                    last.append(line.rstrip())
             p.wait()
         finally:
             timer.cancel()
@@ -814,11 +865,12 @@ def _install(info: ModuleInfo, on_line: Callable[[str], object],
                              "stopped: it took over {n} minutes. Check "
                              "your internet connection and press it again.",
                              INSTALL_STEP_TIMEOUT_S // 60))
-            log.warning("install of %s timed out at: %s", info.id, argv)
+            _step_failed(info, argv, _step_word(step), list(last), "timed out")
             return "download-timeout" if _step_word(step) == "download" else "timeout"
         if p.returncode != 0:
             on_line(_("failed (exit code {code})", code=p.returncode))
-            log.warning("install of %s failed at: %s", info.id, argv)
+            _step_failed(info, argv, _step_word(step), list(last),
+                         f"failed (exit code {p.returncode})")
             return _step_word(step)
     log.info("installed module %s", info.id)
     return ""

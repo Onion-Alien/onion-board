@@ -815,6 +815,7 @@ def fake_link_download(monkeypatch, tmp_path):
     monkeypatch.setattr(ytdl, "probe", lambda url: ("A Tone", 1.0))
     monkeypatch.setattr(ytdl, "lookup", lambda url, direct=False: ytdl.Result(
         "abc", "A Tone", "Tone Channel", 1.0, source="link", link=url))
+    monkeypatch.setattr(ytdl, "lookup_all", ytdl.lookup)   # one video, not a playlist
     monkeypatch.setattr(tempfile, "gettempdir", lambda: str(tmp_path))
     return calls
 
@@ -1559,3 +1560,67 @@ def test_several_links_pasted_together_are_a_list():
     assert ytdl.as_links("https://youtu.be/a funny sound") == []  # words: a search
     many = " ".join(f"https://youtu.be/{i}" for i in range(40))
     assert len(ytdl.as_links(many)) == ytdl.MAX_LINKS
+
+
+def test_a_pasted_playlist_lists_its_videos_instead_of_failing(monkeypatch):
+    """A playlist link is no error: its first MAX_LINKS videos come back as hits, read
+    from YouTube's list (no look-up per video), private or repeated ones left out."""
+    asked = []
+    entries = [{"ie_key": "Youtube", "id": f"vid{i:08d}", "title": f"Song {i}",
+                "channel": "Band", "duration": 60 + i} for i in range(ytdl.MAX_LINKS)]
+    entries[3] = None                                  # a private video
+    entries[4] = dict(entries[5])                      # the same one twice
+    entries[6] = dict(entries[6], title="[Deleted video]", duration=None)
+
+    def extract(target, opts, keep=False):
+        asked.append(opts)
+        return {"_type": "playlist", "title": "Road trip [Official Audio]",
+                "playlist_count": 120, "entries": entries}
+    monkeypatch.setattr(ytdl, "_extract", extract)
+    monkeypatch.setattr(ytdl.net, "mode", lambda: ytdl.net.DIRECT)
+    pl = ytdl.lookup_all("https://www.youtube.com/playlist?list=PLabc", direct=True)
+    assert isinstance(pl, ytdl.Playlist)
+    assert pl.title == "Road trip" and pl.total == 120
+    assert len(pl) == ytdl.MAX_LINKS - 3
+    assert pl[0].url == "https://www.youtube.com/watch?v=vid00000000" and pl[0].seconds == 60
+    assert asked[0]["extract_flat"] == "in_playlist"
+    assert asked[0]["playlistend"] == ytdl.MAX_LINKS and asked[0]["ignoreerrors"]
+
+
+def test_a_soundcloud_set_is_looked_up_track_by_track(monkeypatch):
+    """SoundCloud's quick list has no track names: each track is looked up instead."""
+    asked = []
+
+    def extract(target, opts, keep=False):
+        asked.append(opts)
+        return {"_type": "playlist", "title": "Set", "entries": [
+            {"extractor_key": "Soundcloud", "id": "1", "title": "City ports",
+             "webpage_url": "https://soundcloud.com/a/city-ports", "duration": 142.2}]}
+    monkeypatch.setattr(ytdl, "_extract", extract)
+    pl = ytdl.lookup_all("https://soundcloud.com/a/sets/set", direct=True)
+    assert "extract_flat" not in asked[0]
+    assert [(r.title, r.url) for r in pl] == [("City ports",
+                                               "https://soundcloud.com/a/city-ports")]
+    assert pl.total == 0   # not said: the heading counts the cards
+
+
+def test_a_video_link_still_looks_up_one_video(monkeypatch):
+    monkeypatch.setattr(ytdl, "_extract", lambda target, opts, keep=False: {
+        "id": "abc", "title": "One song (Official Video)", "duration": 9})
+    r = ytdl.lookup_all("https://www.youtube.com/watch?v=abc&list=PLx", direct=True)
+    assert not isinstance(r, ytdl.Playlist) and r.title == "One song" and r.seconds == 9
+
+
+def test_an_empty_playlist_or_a_failed_one_says_why(monkeypatch):
+    monkeypatch.setattr(ytdl, "_extract", lambda target, opts, keep=False: {
+        "_type": "playlist", "title": "Gone", "entries": [None, None]})
+    with pytest.raises(ytdl.DownloadError, match="empty"):
+        ytdl.lookup_all("https://www.youtube.com/playlist?list=PLx", direct=True)
+
+    def extract(target, opts, keep=False):
+        if opts.get("ignoreerrors"):
+            return None   # yt-dlp hid the error
+        raise ytdl.FetchError("That video isn't available any more.")
+    monkeypatch.setattr(ytdl, "_extract", extract)
+    with pytest.raises(ytdl.FetchError, match="available"):
+        ytdl.lookup_all("https://www.youtube.com/playlist?list=PLx", direct=True)
