@@ -21,6 +21,7 @@ from soundboard.audio import engine as eng
 from soundboard.i18n import _, ngettext
 from soundboard.ui.kit import busy, icons, reveal
 from soundboard.ui.window import sidebar
+from soundboard.ui.window.alertcontrol import clean_mic_note
 from soundboard.ui.window.controller import Controller
 
 if TYPE_CHECKING:
@@ -318,6 +319,7 @@ class StatusControl(Controller):
                      "<b style='color:{colour}'>{device}</b> as your <b>microphone</b>, and "
                      "switch off its noise suppression (Discord: <b>Input Profile → "
                      "Studio</b>), or it chops your sounds up.", colour=ok, device=vm)
+            step = " ".join(filter(None, (step, clean_mic_note())))
         else:
             state = "unrouted"
             out = _("Virtual mic  <b style='color:{colour}'>✗ not connected</b>", colour=bad)

@@ -48,6 +48,21 @@ DISCORD_URGENT = {
 }
 
 
+# the Discord problems Clean mic does the job of: its noise removal, switched off
+NOISE = (discordcfg.ISOLATION, discordcfg.KRISP, discordcfg.SUPPRESSION)
+
+
+def clean_mic_note(rich: bool = True) -> str:
+    """The sentence after "turn its noise suppression off": Onion Board's Clean mic
+    does it instead. "" when Clean mic isn't in this copy (no RNNoise)."""
+    from soundboard.voicefx import cleanmic
+    if not cleanmic.available():
+        return ""
+    if rich:
+        return _("Onion Board's <b>Clean mic</b> (Voice tab) takes out the noise instead.")
+    return _("Onion Board's Clean mic (Voice tab) takes out the noise instead.")
+
+
 DISCORD_QUIT_S = 4.0   # the longest quitting waits for Discord's settings to be put back
 
 
@@ -115,8 +130,10 @@ class AlertControl(Controller):
         probs = self.discord_problems()
         key = "discord " + ",".join(probs)
         if probs and key not in self._urgent_hidden:
-            return key, DISCORD_URGENT[probs[0]].format(
-                name=self.discord_found[0].client), _("Fix Discord")
+            text = DISCORD_URGENT[probs[0]].format(name=self.discord_found[0].client)
+            if probs[0] in NOISE:
+                text = " ".join(filter(None, (text, clean_mic_note(rich=False))))
+            return key, text, _("Fix Discord")
         raw = self._raw_culprits()
         key = "rawmic " + ",".join(a.exe.lower() for a in raw)
         if raw and key not in self._urgent_hidden:

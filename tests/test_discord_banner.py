@@ -143,3 +143,18 @@ def test_hiding_a_top_bar_leaves_the_focus_alone(window):
         assert buttons, bar
         for b in buttons:
             assert b.focusPolicy() == Qt.FocusPolicy.TabFocus, (bar, b.objectName())
+
+
+def test_noise_problems_point_to_clean_mic(window, monkeypatch):
+    """Discord's noise removal switched off: Onion Board's Clean mic does it instead
+    (when this copy has it); other problems don't mention it."""
+    from soundboard.voicefx import cleanmic
+    monkeypatch.setattr(chatguide, "on_mic", lambda mw: True)
+    monkeypatch.setattr(cleanmic, "available", lambda: True)
+    window.alertctl._on_discord((found(noiseCancellation=True), ("a",)))
+    assert "Clean mic" in window.urgent_bar.text()
+    window.alertctl._on_discord((found(activeInputProfile="STUDIO"), ("b",)))
+    assert "Clean mic" not in window.urgent_bar.text()
+    monkeypatch.setattr(cleanmic, "available", lambda: False)
+    window.alertctl._on_discord((found(noiseCancellation=True), ("c",)))
+    assert "Krisp" in window.urgent_bar.text() and "Clean mic" not in window.urgent_bar.text()
