@@ -350,6 +350,12 @@ def unseen(seen: str) -> list[Note]:
             if updates.newer(n.version, seen or "0") and not updates.newer(n.version)]
 
 
+def current() -> Note:
+    """This version's note: the newest one not past it (the next release's note may land
+    before its bump), for the header's version."""
+    return next(n for n in notes() if not updates.newer(n.version))
+
+
 def _heading(text: str) -> QLabel:
     lbl = QLabel(text)
     lbl.setStyleSheet("font-size: 15pt; font-weight: 600;")   # the theme sets fonts in QSS

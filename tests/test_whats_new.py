@@ -82,6 +82,20 @@ def test_notes_for_a_version_after_this_one_wait(monkeypatch):
     assert future not in whatsnew.unseen("")
 
 
+def test_the_header_version_shows_this_versions_note_not_the_next_ones(window, shown,
+                                                                      monkeypatch):
+    """A next release's note that landed before its bump stays out of the header's
+    "What's new in <this version>" (it showed 2.7.4's note under 2.7.3)."""
+    future = whatsnew.Note("99.0.0", "Later", (("shield", "Not yet", "y"),))
+    real = whatsnew.recent
+    monkeypatch.setattr(whatsnew, "recent", lambda: (future,) + real())
+    this = whatsnew.current()
+    assert this.version == __version__
+    window.updctl.show_whats_new()
+    assert len(shown) == 1 and this.headline in shown[0]
+    assert "Later" not in shown[0] and "Not yet" not in shown[0]
+
+
 def test_this_version_has_its_notes():
     """The header's version and the window after an update show this release, not one
     from months ago: every release, patch releases too, gets its own note. A 2.7.3 that
