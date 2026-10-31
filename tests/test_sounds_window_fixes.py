@@ -117,6 +117,32 @@ def test_save_as_new_sound_stays_in_the_category(window, monkeypatch, qapp):
     process_events(qapp, lambda: window.pads[new.id].state == "ready", 5)
 
 
+def test_clicking_save_a_copy_keeps_the_original(window, qapp):
+    """A real click on Save a copy: the box's accepted ran before the button's own
+    clicked, so the edits went onto the original and no copy was made."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    from PySide6.QtWidgets import QDialogButtonBox
+    n = len(window.cfg.sounds)
+    d = window.editctl.edit("s0", "trim")
+    d.effects.speed.set_value(2.0)
+    d.effects._edited()
+    copy = next(b for b in d._bb.buttons()
+                if d._bb.buttonRole(b) == QDialogButtonBox.ButtonRole.AcceptRole
+                and b is not d._bb.button(QDialogButtonBox.StandardButton.Save))
+    QTest.mouseClick(copy, Qt.MouseButton.LeftButton)
+    assert window.meta("s0").fx == {}
+    assert len(window.cfg.sounds) == n + 1
+    new = window.cfg.sounds[1]
+    assert new.name == "Boom (edit)" and new.fx["speed"] == 2.0
+    # the same window reused: a plain Save goes onto the sound again
+    d = window.editctl.edit("s1")
+    d.vol.setValue(50)
+    QTest.mouseClick(d._bb.button(QDialogButtonBox.StandardButton.Save),
+                     Qt.MouseButton.LeftButton)
+    assert len(window.cfg.sounds) == n + 1 and window.meta("s1").volume == 0.5
+
+
 def test_the_edit_dialog_does_not_nudge_the_volume(window):
     m = window.meta("s0")
     # the percentages int() used to read one lower (0.29 * 100 = 28.999…)
