@@ -4,6 +4,8 @@ Changes not released yet are in [changelog.d/](changelog.d/), one file per chang
 
 ## 2.8.0 — 2026-10-31
 
+- Playlists found by a YouTube search say how many videos they have ("8 videos") on
+  their card, so a short one is easy to tell from a huge one before opening it.
 - Edit sound: clicking Save a copy now adds the edited copy and leaves the original as it
   was (it saved the edits onto the original and made no copy).
 - Edit sound: a window opened for the next sound no longer shows the last one's
