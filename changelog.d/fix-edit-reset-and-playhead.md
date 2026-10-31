@@ -1,3 +1,0 @@
-- Edit sound: Reset effects on a playing pad that was saved with effects no longer gets stuck at "Applying to the playing sound: 0%".
-- Edit sound: the trim's waveform shows where the sound is playing now.
-- Live controls show what's playing: the song's own effects from Edit sound (speed, pitch, bass, reverb, echo…) plus Live controls' own, which stay on for the next song.
