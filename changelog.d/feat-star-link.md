@@ -1,0 +1,1 @@
+- Settings → About has a "Star Onion Board on GitHub" button next to Source code.

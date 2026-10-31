@@ -4655,5 +4655,6 @@
   "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "Bun 会改为开启变声标签页里的麦克风降噪：它会去掉你声音里的背景噪音，而且从不碰你的音效。",
   "Open Clean mic": "打开麦克风降噪",
   "They think music is background noise and cut your sounds up.": "它们会把音乐当成背景噪音，把你的音效切碎。",
-  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "还是想去掉背景噪音？改为在 Onion Board 的<b>变声</b>标签页里开启<b>麦克风降噪</b>：它只清理你的声音，从不碰你的音效。"
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "还是想去掉背景噪音？改为在 Onion Board 的<b>变声</b>标签页里开启<b>麦克风降噪</b>：它只清理你的声音，从不碰你的音效。",
+  "Star Onion Board on GitHub": "在 GitHub 上为 Onion Board 点星"
 }

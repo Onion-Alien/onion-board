@@ -4742,5 +4742,6 @@
   "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "Onun yerine Bun, Ses sekmesindeki Temiz mikrofon'u açar: arka plan gürültüsünü sesinizden çıkarır ve seslerinize asla dokunmaz.",
   "Open Clean mic": "Temiz mikrofon'u aç",
   "They think music is background noise and cut your sounds up.": "Müziği arka plan gürültüsü sanıp seslerinizi doğrarlar.",
-  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Arka plan gürültüsünden yine de kurtulmak mı istiyorsunuz? Bunun yerine Onion Board'un <b>Ses</b> sekmesinde <b>Temiz mikrofon</b>'u açın: sesinizi temizler ve seslerinize asla dokunmaz."
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Arka plan gürültüsünden yine de kurtulmak mı istiyorsunuz? Bunun yerine Onion Board'un <b>Ses</b> sekmesinde <b>Temiz mikrofon</b>'u açın: sesinizi temizler ve seslerinize asla dokunmaz.",
+  "Star Onion Board on GitHub": "GitHub'da Onion Board'a yıldız ver"
 }

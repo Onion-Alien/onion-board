@@ -125,6 +125,9 @@ class HelpPage(Page):
                                         "browser"))
         row.addWidget(self._link_button(_("Source code"), f"https://github.com/{REPO}"))
         row.addWidget(self._link_button(_("Licenses"), f"https://github.com/{REPO}#license"))
+        star = self.dlg.star_btn = self._link_button(_("Star Onion Board on GitHub"),
+                                                     f"https://github.com/{REPO}", "star")
+        row.addWidget(star)
         cv.addLayout(row)
         return card
 

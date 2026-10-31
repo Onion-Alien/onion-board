@@ -4742,5 +4742,6 @@
   "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "Στη θέση του ο Bun ανοίγει το Καθαρό μικρόφωνο στην καρτέλα Φωνή: βγάζει τον θόρυβο φόντου από τη φωνή σου και δεν αγγίζει ποτέ τους ήχους σου.",
   "Open Clean mic": "Άνοιγμα Καθαρού μικροφώνου",
   "They think music is background noise and cut your sounds up.": "Θεωρούν τη μουσική θόρυβο φόντου και κομματιάζουν τους ήχους σου.",
-  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Θέλεις παρ' όλα αυτά να φύγει ο θόρυβος φόντου; Άνοιξε αντί γι' αυτό το <b>Καθαρό μικρόφωνο</b> στην καρτέλα <b>Φωνή</b> του Onion Board: καθαρίζει τη φωνή σου και δεν αγγίζει ποτέ τους ήχους σου."
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Θέλεις παρ' όλα αυτά να φύγει ο θόρυβος φόντου; Άνοιξε αντί γι' αυτό το <b>Καθαρό μικρόφωνο</b> στην καρτέλα <b>Φωνή</b> του Onion Board: καθαρίζει τη φωνή σου και δεν αγγίζει ποτέ τους ήχους σου.",
+  "Star Onion Board on GitHub": "Βάλε αστέρι στο Onion Board στο GitHub"
 }

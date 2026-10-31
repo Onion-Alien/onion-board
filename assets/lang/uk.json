@@ -4829,5 +4829,6 @@
   "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "Замість нього Bun увімкне «Чистий мікрофон» на вкладці «Голос»: він прибирає фоновий шум із вашого голосу й ніколи не чіпає ваші звуки.",
   "Open Clean mic": "Відкрити «Чистий мікрофон»",
   "They think music is background noise and cut your sounds up.": "Вони вважають музику фоновим шумом і кришать ваші звуки.",
-  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Усе одно хочете прибрати фоновий шум? Увімкніть натомість <b>Чистий мікрофон</b> на вкладці <b>Голос</b> в Onion Board: він очищає ваш голос і ніколи не чіпає ваші звуки."
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Усе одно хочете прибрати фоновий шум? Увімкніть натомість <b>Чистий мікрофон</b> на вкладці <b>Голос</b> в Onion Board: він очищає ваш голос і ніколи не чіпає ваші звуки.",
+  "Star Onion Board on GitHub": "Поставити зірку Onion Board на GitHub"
 }

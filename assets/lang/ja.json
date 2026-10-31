@@ -4655,5 +4655,6 @@
   "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "代わりに Bun がボイスタブのマイクのノイズ除去をオンにします：声から背景ノイズを取り除き、サウンドには一切手を加えません。",
   "Open Clean mic": "マイクのノイズ除去を開く",
   "They think music is background noise and cut your sounds up.": "音楽を背景ノイズだと判断して、サウンドを途切れさせてしまいます。",
-  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "それでも背景ノイズを消したい場合は、代わりに Onion Board の<b>ボイス</b>タブで<b>マイクのノイズ除去</b>をオンにしてください：声だけをきれいにし、サウンドには一切手を加えません。"
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "それでも背景ノイズを消したい場合は、代わりに Onion Board の<b>ボイス</b>タブで<b>マイクのノイズ除去</b>をオンにしてください：声だけをきれいにし、サウンドには一切手を加えません。",
+  "Star Onion Board on GitHub": "GitHub で Onion Board にスターを付ける"
 }

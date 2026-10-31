@@ -4742,5 +4742,6 @@
   "Bun turns on Clean mic on the Voice tab in its place: it takes background noise out of your voice and never touches your sounds.": "Bun slår på Ren mikrofon på fanen Stemme i stedet: den fjerner bakgrunnsstøy fra stemmen din og rører aldri lydene dine.",
   "Open Clean mic": "Åpne Ren mikrofon",
   "They think music is background noise and cut your sounds up.": "De tror musikk er bakgrunnsstøy og hakker opp lydene dine.",
-  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Vil du likevel bli kvitt bakgrunnsstøyen? Slå heller på <b>Ren mikrofon</b> på fanen <b>Stemme</b> i Onion Board: den renser stemmen din og rører aldri lydene dine."
+  "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Vil du likevel bli kvitt bakgrunnsstøyen? Slå heller på <b>Ren mikrofon</b> på fanen <b>Stemme</b> i Onion Board: den renser stemmen din og rører aldri lydene dine.",
+  "Star Onion Board on GitHub": "Gi Onion Board en stjerne på GitHub"
 }
