@@ -49,6 +49,19 @@
   </table>
   <p>Onion Board has one maintainer. Changes from anyone else come in as pull requests and are reviewed before they're merged. Everyone on the team uses two-factor sign-in for GitHub and SignPath.</p>
 
+  <h2>What it does on your PC</h2>
+  <p>Some features work close to Windows. Here is what each one really does.</p>
+  <ul>
+    <li><b>Mic effect</b> (<i>Straight into my mic</i>): a Windows audio effect (an APO) on the mic you pick, the same kind Equalizer APO uses. Setting it up asks Windows for admin and restarts Windows Audio. The uninstaller removes it and puts every mic's settings back.</li>
+    <li><b>Mic helper:</b> the first time Windows asks for admin, a small helper task is added so it doesn't ask again each time you change mics. The app says so when it asks, and you can turn it off in Settings → Audio (<b>Don't ask for admin each time</b>). The uninstaller removes it.</li>
+    <li><b>Tor</b> (optional): the Tor Project's official build, downloaded only when you ask for it. It carries only Onion Board's own traffic, never the rest of your PC's.</li>
+    <li><b>Hotkeys:</b> Windows' own hotkey and raw input features, no keyboard hook. Key presses are only checked against your hotkeys, never saved or sent. Auto push-to-talk presses only the key you picked, only while your sound plays, and is off until you pick one.</li>
+    <li><b>App audio:</b> playing another app's sound into your mic uses Windows' per-app audio capture, the same feature Discord and OBS use. Nothing is injected into the other app.</li>
+    <li><b>Onion Watch</b> (separate add-on): watches the picture of a window you choose and plays a sound when something shows up. It never reads or changes the game's memory or input. It's a separate download, not part of the signed installer.</li>
+    <li><b>Qt:</b> used under the LGPL-3.0, as separate DLLs in the app folder that you can swap for your own build.</li>
+    <li><b>VB-Cable</b> (optional): a virtual audio cable by VB-Audio, a third-party driver that isn't open source. It's never bundled: the installer downloads it from VB-Audio only if you tick its box.</li>
+  </ul>
+
   <h2>Privacy</h2>
   <p>Onion Board only goes online for the things you use that need it, such as searching for and downloading sounds, the radio, update checks and add-ons, plus an anonymous daily count you can switch off (in the installer, or Settings → Privacy &amp; security). The daily count never sends your IP address, your name, or anything about your PC beyond its Windows version.</p>
   <p>What it sends and when, how to turn it off, what it changes on your PC and what the uninstaller removes: <a href="https://github.com/Onion-Alien/onion-board/blob/main/docs/PRIVACY.md">Privacy policy</a>. Every single connection, with the switch for each: <a href="https://github.com/Onion-Alien/onion-board/blob/main/SECURITY.md#what-the-app-does-on-the-network">What the app does on the network</a>. Settings → Connection → <b>Network activity</b> lists each one live while the app runs, and <b>Offline mode</b> stops them all.</p>
