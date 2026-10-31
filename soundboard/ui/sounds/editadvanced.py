@@ -11,7 +11,7 @@ import threading
 from typing import TYPE_CHECKING
 
 import numpy as np
-from PySide6.QtCore import QPoint, Qt, Signal
+from PySide6.QtCore import QEvent, QPoint, Qt, Signal
 from PySide6.QtGui import QKeySequence
 from PySide6.QtWidgets import (QButtonGroup, QFrame, QGridLayout, QHBoxLayout, QLabel,
                                QLineEdit, QPushButton, QScrollArea, QSizePolicy, QSlider,
@@ -29,7 +29,7 @@ from soundboard.ui.voice.effectrow import ADDON_GROUP, FX_ICONS, GROUPS
 if TYPE_CHECKING:
     from soundboard.ui.sounds.dialogs import EditDialog
 
-WIDE_PX = 1180      # from this wide, three columns; narrower, three tabs
+WIDE_PX = 1180      # from this wide, three columns (when they fit: fits()); narrower, tabs
 FINE_PEAKS = 2400   # the big waveform's peaks: enough to zoom in sixteen times
 PICKER_COLS = 3
 EQ_TOP = 5           # px: see attach()
@@ -291,7 +291,7 @@ class AdvancedView(QWidget):
 
         # under the editor: three columns, or (narrow) three tabs
         self.cols = QWidget()
-        ch = QHBoxLayout(self.cols)
+        ch = self._cols_lay = QHBoxLayout(self.cols)
         ch.setContentsMargins(0, 0, 0, 0)
         ch.setSpacing(12)
         self.col_boxes = []
@@ -313,12 +313,15 @@ class AdvancedView(QWidget):
         self.picker: EffectPicker | None = None
 
     # ------------------------------------------------------------------ in and out
-    def attach(self, scrolls: list[QScrollArea], wide: bool):
+    def attach(self, scrolls: list[QScrollArea], width: int):
         """Show the dialog's three pages (their scroll areas, out of its tabs) here, the
-        trim big on top."""
+        trim big on top, as columns or tabs for a window `width` wide."""
         d, eff = self.d, self.d.effects
         self._scrolls = scrolls
-        self.wide = wide
+        for s in scrolls:   # an effect turned on can widen its page: eventFilter()
+            if (page := s.widget()) is not None:
+                page.installEventFilter(self)
+        self.wide = self.fits(width)
         self._place()
         # the trim: out of Trim & speed, into the editor
         self._move_trim(self.trim_box)
@@ -342,6 +345,8 @@ class AdvancedView(QWidget):
         """Give the pages and the trim back to the Simple view."""
         eff = self.d.effects
         for s in self._scrolls:
+            if (page := s.widget()) is not None:
+                page.removeEventFilter(self)
             self._unplace(s)
         tl = eff.trim_page.layout()
         i = tl.indexOf(self.fades)
@@ -394,11 +399,40 @@ class AdvancedView(QWidget):
             self.wide = wide
             self._place()
 
+    @staticmethod
+    def _col_w(s: QScrollArea) -> int:
+        """A column's least width: its page whole, beside its scroll bar."""
+        page = s.widget()
+        return ((page.minimumSizeHint().width() if page is not None else 0)
+                + s.verticalScrollBar().sizeHint().width() + 2 * s.frameWidth())
+
+    def fits(self, width: int) -> bool:
+        """Three columns in a window `width` wide: each as wide as its page needs (the
+        stretch gave the equalizer room Speed & loudness and Effects lacked, and they
+        scrolled sideways, cut off), else three tabs (a long language, too)."""
+        m = self.d._lay.contentsMargins()
+        cv = self.col_boxes[0].contentsMargins()
+        need = (sum(self._col_w(s) + cv.left() + cv.right() + 2 for s in self._scrolls)
+                + 2 * self._cols_lay.spacing() + m.left() + m.right())
+        return width >= max(WIDE_PX, need)
+
+    def eventFilter(self, obj, e):
+        try:   # (nothing in a Qt override may raise: AGENT-RULES *Async results*)
+            if e.type() == QEvent.Type.LayoutRequest and self.wide and self.isVisible():
+                for s in self._scrolls:
+                    if s.widget() is obj:
+                        s.setMinimumWidth(self._col_w(s))
+                self.set_wide(self.fits(self.d.width()))
+        except Exception:  # noqa: BLE001
+            pass
+        return False
+
     def _place(self):
         titles = (_("Speed & loudness"), _("Effects"), _("Equalizer"))
         if self.wide:
             for box, s in zip(self.col_boxes, self._scrolls):
                 box.addWidget(s, 1)
+                s.setMinimumWidth(self._col_w(s))
                 s.show()
         else:
             for s, title in zip(self._scrolls, titles):
@@ -417,6 +451,7 @@ class AdvancedView(QWidget):
             j = box.indexOf(s)
             if j >= 0:
                 take_out(box, j)
+        s.setMinimumWidth(0)
         s.setParent(None)
 
     def show_page(self, page: int):

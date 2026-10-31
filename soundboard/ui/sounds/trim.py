@@ -20,7 +20,8 @@ from soundboard.i18n import _
 from soundboard.ui.kit.pixels import snap_to_pixels
 
 HANDLE_PX = 8   # how close to a handle a press grabs it
-BIG_H = 200     # the big waveform's least height (Advanced); it takes what there is
+BIG_H = 110     # the big waveform's least height (Advanced): on a short screen it gives
+                # the columns under it room (they scroll); taller, it takes its share
 RULER_H = 20    # its time ruler
 MAX_ZOOM = 16   # the big one zooms in to a sixteenth of the sound
 COL_PX = 2      # the big one draws a bar every 2 px

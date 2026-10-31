@@ -28,7 +28,7 @@ from soundboard.sounds.library import (MAX_COOLDOWN_S, MAX_DELAY_S, PAD_COLORS,
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import (EqPanel, hint_label, icon_button, reset_button,
                                      section_label, steady_number)
-from soundboard.ui.sounds.editadvanced import WIDE_PX, AdvancedView, ModeSwitch
+from soundboard.ui.sounds.editadvanced import AdvancedView, ModeSwitch
 from soundboard.ui.sounds.trim import TrimPanel
 from soundboard.ui.voice.voicefxpanel import ADDON_GROUP, GROUPS, EffectRow, ParamSlider
 from soundboard.ui.kit.plaintext import plain_tip
@@ -1025,7 +1025,7 @@ class EditDialog(EditDialogParts, QDialog):
             w = min(ADV_W, screen.width() - 48)
             h = min(ADV_H, screen.height() - 48)
             self.tabs.hide()
-            self.adv.attach(self._fx_scrolls, w >= WIDE_PX)
+            self.adv.attach(self._fx_scrolls, w)
             self.adv.show()
             self.setMinimumSize(ADV_MIN_W, ADV_MIN_H)
             self.resize(w, h)
@@ -1076,7 +1076,7 @@ class EditDialog(EditDialogParts, QDialog):
         super().resizeEvent(e)
         try:   # (nothing in a Qt override may raise: AGENT-RULES *Async results*)
             if self.adv is not None and self.advanced():
-                self.adv.set_wide(self.width() >= WIDE_PX)
+                self.adv.set_wide(self.adv.fits(self.width()))
         except Exception:  # noqa: BLE001
             log.debug("Advanced re-layout failed", exc_info=True)
 
