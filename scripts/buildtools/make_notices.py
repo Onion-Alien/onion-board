@@ -79,6 +79,19 @@ PyInstaller bootloader  --  GPL-2.0-or-later with the PyInstaller exception
 {RULE}
 The exception allows distributing the bundled program under any licence.
 https://github.com/pyinstaller/pyinstaller/blob/develop/COPYING.txt
+
+{RULE}
+MinGW-w64 runtime  --  GCC Runtime Library Exception, ZPL-2.1, MIT and BSD
+{RULE}
+The mic effect (the app's directmic\\obmic.dll), the mic helper (obmichelper.exe) and
+the bootloader of OnionBoard.exe and obmichelper.exe are built with MinGW-w64's GCC
+(the WinLibs build, https://winlibs.com) and statically link its runtime:
+- libstdc++ and libgcc: GPL-3.0 with the GCC Runtime Library Exception 3.1, which
+  allows distributing the compiled program under any licence. https://gcc.gnu.org
+- winpthreads: MIT, with parts under BSD-3-Clause (Lockless Inc.)
+- the MinGW-w64 C runtime: ZPL-2.1, with parts under BSD, MIT and other notices.
+  https://www.mingw-w64.org
+Their licences are reproduced at the end of this file.
 """
 
 
@@ -129,6 +142,7 @@ def main() -> None:
               (backgrounds / "credits.json").read_text("utf-8")]
     parts += [section(d) for d in closure(ROOTS)]
     for name in ("QuickJS-ng-MIT.txt", "RNNoise-BSD-3.txt", "DeepFilterNet-MIT.txt",
+                 "GCC-runtime-exception-3.1.txt", "winpthreads.txt", "MinGW-w64-runtime.txt",
                  "LGPL-3.0.txt", "GPL-3.0.txt"):
         parts += [f"{RULE}\n{name}\n{RULE}\n", (ROOT / "licenses" / name).read_text("utf-8")]
     dest.parent.mkdir(parents=True, exist_ok=True)
