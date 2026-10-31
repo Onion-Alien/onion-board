@@ -28,6 +28,12 @@ def gate():
     g.set()   # never leave the device thread stuck behind a failed test
 
 
+@pytest.fixture(autouse=True)
+def portaudio_not_slow(monkeypatch):
+    """A slow PortAudio left by one test mustn't make the next one's asks not wait."""
+    monkeypatch.setattr(eng.devicelist._asker, "_slow_until", 0.0)
+
+
 def quick(fn, *a):
     t0 = time.monotonic()
     out = fn(*a)
@@ -321,6 +327,29 @@ def test_a_hanging_device_query_gives_the_last_list_not_a_frozen_window(monkeypa
     gate.set()                                     # it answers after all
     answered()
     assert [d["name"] for d in eng.list_devices("output")] == ["Speakers", "Headset"]
+
+
+def test_a_slow_device_query_holds_the_window_once_not_on_every_ask(monkeypatch):
+    """PortAudio slow but answering (a busy PC short of memory): each ask waited its
+    0.25 s again, and a check asking a few times in a row held the window 10-30 s."""
+    gate = threading.Event()
+    gate.set()
+    hanging_portaudio(monkeypatch, gate, ["Speakers"])
+    eng.list_devices("output")   # the last list: Speakers
+    answered()
+    real = eng.sd.query_devices
+
+    def slow(idx=None):
+        time.sleep(0.3)
+        return real(idx)
+    monkeypatch.setattr(eng.sd, "query_devices", slow)
+    t0 = time.monotonic()
+    for _ in range(12):
+        assert [d["name"] for d in eng.list_devices("output")] == ["Speakers"]
+        time.sleep(0.05)   # the window doing other work between asks
+    held = time.monotonic() - t0 - 12 * 0.05
+    assert held < 0.6, f"the window waited {held:.2f}s in all"
+    answered()
 
 
 def test_a_device_query_that_fails_still_raises(monkeypatch):

@@ -174,12 +174,10 @@ class Saver:
         while True:
             with self._cond:
                 while self._pending is None:
-                    # timed out with nothing pending: idle, the next save starts a new
-                    # thread (a save() can take the lock as the wait times out: still
-                    # this thread's to write)
-                    if not self._cond.wait(30) and self._pending is None:
-                        self._thread = None
-                        return
+                    # idle for good, never ended: starting a thread waits for it to
+                    # run, and a new one per save (after 30 s idle) held the window on
+                    # a PC short of memory (freeze reports at save()'s start())
+                    self._cond.wait()
                 snap, n, self._pending, self._busy = self._pending, self._pending_n, None, True
             try:
                 ok = _write(snap)

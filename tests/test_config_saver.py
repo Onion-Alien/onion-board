@@ -127,30 +127,29 @@ def test_a_read_only_config_isnt_written(app_dir):
     assert results == [False] and not library.CONFIG_PATH.exists()
 
 
-def test_a_save_as_the_idle_wait_ends_is_still_written(app_dir):
-    """The saver thread's 30 s idle wait timed out, and a save() took the lock before
-    the wait got it back: the thread saw a timeout, left with that save pending, and
-    it was never written (flush() then gave up on it at quit)."""
+def test_one_saver_thread_writes_every_save_however_long_it_sat_idle(app_dir):
+    """Starting a thread waits for it to run, and save() runs on the UI thread: a new
+    thread after every 30 s idle held the window on a PC short of memory. One thread
+    stays (idle waits never time out), and every save still gets written."""
     cfg = Config()
     s = library.Saver(cfg)
-    raced = []
+    waits = []
 
-    class Racy(threading.Condition):
+    class Watched(threading.Condition):
         def wait(self, timeout=None):
-            if timeout == 30 and not raced:   # the idle wait: time it out, with a save
-                raced.append(1)               # slipping in just as it does
-                cfg.theme = "Paper"
-                s._pending = cfg.snapshot()
-                return False
+            if threading.current_thread().name == "config-save":   # not flush()'s
+                waits.append(timeout)
             return super().wait(timeout)
-    s._cond = Racy()
-    cfg.theme = "Light"
-    s.save()
-    end = time.monotonic() + 10
-    while not raced and time.monotonic() < end:   # the first write done, then idle
-        time.sleep(0.01)
-    assert raced and s.flush(5)
-    assert _on_disk()["theme"] == "Paper"
+    s._cond = Watched()
+    threads = []
+    for theme in ("Light", "Paper", "Synthwave"):
+        cfg.theme = theme
+        s.save()
+        assert s.flush(5)
+        threads.append(s._thread)
+    assert _on_disk()["theme"] == "Synthwave"
+    assert len(set(threads)) == 1 and threads[0].is_alive()
+    assert all(t is None for t in waits)   # never a timed idle wait that ends it
 
 
 def _big_config(n: int) -> Config:
