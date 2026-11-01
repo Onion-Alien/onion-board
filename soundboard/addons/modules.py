@@ -77,6 +77,9 @@ log = logging.getLogger(__name__)
 
 KINDS = ("effects", "service", "translation", "triggers", "remote")
 INSTALL_STEP_TIMEOUT_S = 30 * 60     # one install step (pip) before it's given up on
+# In a service's folder while its install steps run: still there on the next start means
+# the app was closed or crashed mid-install, so its .venv is half made (not installed)
+INSTALLING = ".installing"
 TRIGGERS_API = (1, 1)   # the oldest and newest "triggers" api_version this app can host
 REMOTE_API = (1, 1)     # ...and "remote" api_version
 PACKAGE_KINDS = {"triggers": TRIGGERS_API, "remote": REMOTE_API}   # loaded as packages
@@ -140,7 +143,8 @@ class ModuleInfo:
             return translation.is_downloaded(self)
         if self.kind != "service" or not any("{python}" in a for a in self.command):
             return True
-        return (self.path / ".venv" / "Scripts" / "python.exe").exists() and not self.broken
+        return ((self.path / ".venv" / "Scripts" / "python.exe").exists()
+                and not (self.path / INSTALLING).exists() and not self.broken)
 
     @property
     def broken(self) -> bool:
@@ -713,6 +717,14 @@ def install(info: ModuleInfo, on_line: Callable[[str], object],
     repair = info.broken
     fresh = not info.installed      # (a repair too: its old environment goes first)
     tag = usage.addon_tag(info.id)
+    mark = info.path / INSTALLING
+    if mark.exists():   # the app closed mid-install last time: start that one again clean
+        log.info("module %s: its last install didn't finish; making it again", info.id)
+        shutil.rmtree(info.path / ".venv", ignore_errors=True)
+    try:
+        mark.touch()
+    except OSError as e:
+        log.warning("module %s: can't mark its install as running: %s", info.id, e)
     try:
         why = _install(info, on_line, on_note)
     except Exception as e:
@@ -720,6 +732,8 @@ def install(info: ModuleInfo, on_line: Callable[[str], object],
         usage.used(f"addon-failed-{tag}-other")
         usage.failed("addon-other", tag, *usage.error_detail(e))   # its type and place
         raise
+    finally:   # it ended (either way) with the app still running: no longer half made
+        mark.unlink(missing_ok=True)
     if why:
         usage.used(f"addon-failed-{tag}")
         usage.used(f"addon-failed-{tag}-{why}")
