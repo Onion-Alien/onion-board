@@ -231,7 +231,8 @@ class EffectsPanel(QObject):
         # Live controls' own sliders (ui/sounds/speedpitch.py), with their typed values,
         # words and quick buttons, so the same settings read and sound the same here.
         # The quick buttons and Volume are Advanced's (set_compact)
-        tv.addWidget(section_label(_("Speed & pitch")))
+        self.speed_head = section_label(_("Speed & pitch"))
+        tv.addWidget(self.speed_head)
         self.speed = popup_slider(SPEED, 1.0)
         self.pitch = popup_slider(PITCH, 0.0)
         self.boost = popup_slider(BOOST, 0.0)
@@ -248,21 +249,23 @@ class EffectsPanel(QObject):
             lambda x: self.speed.set_value(x) or self._edited(), narrow=True))
         tv.addWidget(self.speed_quick)
         tv.addWidget(self.pitch)
-        # with keep pitch off the speed moves the pitch too: said under the slider
-        self.pitch_note = QLabel()
-        self.pitch_note.setObjectName("hint")
-        self.pitch_note.setContentsMargins(name_w + GAP, 0, 0, 0)
-        keep_line = self.pitch_note.sizePolicy()   # (kept while hidden: no jump in a drag)
-        keep_line.setRetainSizeWhenHidden(True)
-        self.pitch_note.setSizePolicy(keep_line)
-        self.pitch_note.hide()
-        tv.addWidget(self.pitch_note)
         self.keep = QCheckBox(_("Keep pitch when changing speed"))   # off = "tape"
         self.keep.setChecked(True)
         self.keep.setToolTip(_("Off: slower is also deeper and faster is higher, like a tape"))
-        tv.addWidget(self.keep)
+        # with keep pitch off the speed moves the pitch too: said beside Keep pitch (a line
+        # of its own, kept empty while hidden, left a hole under Pitch)
+        self.pitch_note = QLabel()
+        self.pitch_note.setObjectName("hint")
+        self.pitch_note.setWordWrap(True)
+        self.pitch_note.hide()
+        keep_row = QHBoxLayout()
+        keep_row.setSpacing(12)
+        keep_row.addWidget(self.keep)
+        keep_row.addWidget(self.pitch_note, 1)
+        tv.addLayout(keep_row)
 
-        tv.addWidget(section_label(_("Loudness")))
+        self.loud_head = section_label(_("Loudness"))
+        tv.addWidget(self.loud_head)
         tv.addWidget(self.volume)
         self.volume_quick = QWidget()
         self.volume_quick.setLayout(quick_row(
@@ -397,6 +400,10 @@ class EffectsPanel(QObject):
         self.add_effect.setVisible(on)
         for w in (self.speed_quick, self.volume, self.volume_quick, self.live_box):
             w.setVisible(on)
+        # Advanced's column is titled Speed & loudness already: no headings inside, so
+        # it fits whole on a 1280 x 800 screen with the quick buttons
+        self.speed_head.setVisible(not on)
+        self.loud_head.setVisible(not on)
         self._show_live()
 
     def turn_on(self, etype: str, on: bool = True):
