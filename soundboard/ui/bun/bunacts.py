@@ -529,4 +529,5 @@ OPEN: Act = (2.1, box_open)
 GIFT: Act = (GIFT_LOOP, present)
 IN_BIN = (BIN_ACT, BRING_BACK, BYE)   # the acts he's in the bin for
 # lite mode's still picture of each loop: the moment that shows what he's doing
-STILL = {SNIP: 0.9, MIC: 0.0, RECORDING: 0.3, BIN_ACT: 0.0, PAT: 0.0, RUN: 0.0, GIFT: 2.6}
+STILL: dict[Act, float] = {SNIP: 0.9, MIC: 0.0, RECORDING: 0.3, BIN_ACT: 0.0, PAT: 0.0,
+                           RUN: 0.0, GIFT: 2.6}
