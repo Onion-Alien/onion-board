@@ -1,9 +1,11 @@
 """The header logo, alive: the onion mark from theme.paint_logo with a glow around it.
 
-At rest the glow breathes slowly and a sheen sweeps across the tile every few seconds.
-Feed it the level of whatever is playing (`set_level`, 0..1: sounds, the radio,
-captured programs; not your mic) and it reacts: the glow flares and warms
-towards flame orange, and embers drift up off the onion while sounds play.
+At rest the glow holds still and a sheen sweeps across the tile every few seconds; the
+timer only runs for the sweep (a window left open with nothing playing costs next to
+nothing). Feed it the level of whatever is playing (`set_level`, 0..1: sounds, the
+radio, captured programs; not your mic) and it reacts: the glow breathes, flares and
+warms towards flame orange, and embers drift up off the onion while sounds play; when
+they stop the breathing eases out.
 
 A click gives it a little wobble.
 
@@ -34,7 +36,8 @@ FLAME = QColor("#ff8a2b")
 EMBER_COLORS = ("#ffcf40", "#ff8a2b", "#ff5a36")
 SHEEN_PERIOD = 4.5   # seconds between sheen sweeps
 SHEEN_TIME = 0.9     # how long one sweep takes
-FAST_MS = 1000 // 24  # frame interval, 24 fps (it runs whenever the window is in front)
+FAST_MS = 1000 // 24  # frame interval, 24 fps (while it moves and the window is in front)
+QUIET = 0.003         # a level below this (-50 dB, the meters' floor) is nothing playing
 
 
 def _mix(a: QColor, b: QColor, t: float) -> QColor:
@@ -86,12 +89,16 @@ class LogoWidget(QWidget):
         self.embers: list[list[float]] = []   # [x, y, vx, vy, life, size, colour index]
         self._cache: tuple | None = None      # (key, pixmap)
         self.squish = 0.0         # a click's wobble, 1 just clicked, easing to 0
+        self.life = 0.0           # how much the glow breathes: 1 with a sound, 0 at rest
         self._t0 = time.monotonic()
         self._last = self._t0
         self._timer = QTimer(self)
         self._timer.setTimerType(Qt.TimerType.CoarseTimer)
         self._timer.timeout.connect(self._step)
-        appstate.pause_in_background(self, self._resume, self._timer.stop)
+        self._wake = QTimer(self)   # at rest: the next sheen
+        self._wake.setSingleShot(True)
+        self._wake.timeout.connect(self._resume)
+        appstate.pause_in_background(self, self._resume, self._pause)
 
     def set_mark(self, mark: int):
         """A new size for the onion (the tab rail's, shut or open)."""
@@ -112,7 +119,10 @@ class LogoWidget(QWidget):
 
     # ---- feeding
     def set_level(self, v: float):
-        self._target = max(0.0, min(1.0, float(v)))
+        v = float(v)   # (a level fades out, never quite to 0: below QUIET it's silence)
+        self._target = 0.0 if v < QUIET else min(1.0, v)
+        if self._target > 0 and self._wake.isActive():   # resting: a sound wakes it
+            self._resume()
 
     # ---- lifecycle
     def showEvent(self, e):
@@ -121,13 +131,19 @@ class LogoWidget(QWidget):
         super().showEvent(e)
 
     def _resume(self):
+        self._wake.stop()
         if lite.on():   # (still: one paint, no timer)
             self._timer.stop()
-            self.level, self.embers, self.squish = 0.0, [], 0.0
+            self.level, self.embers, self.squish, self.life = 0.0, [], 0.0, 0.0
             self.update()
             return
         self._last = time.monotonic()
-        self._timer.start(FAST_MS)
+        if not self._timer.isActive():
+            self._timer.start(FAST_MS)
+
+    def _pause(self):
+        self._timer.stop()
+        self._wake.stop()
 
     def lite_changed(self):
         """Lite mode went on or off: still now, or moving again (when it can be seen)."""
@@ -135,8 +151,13 @@ class LogoWidget(QWidget):
             self._resume()
 
     def hideEvent(self, e):
-        self._timer.stop()
+        self._pause()
         super().hideEvent(e)
+
+    def resting(self) -> bool:
+        """Nothing moves but the sheen: no sound, embers, wobble or breathing left."""
+        return (self._target == 0 and self.level < 0.005 and not self.embers
+                and self.squish == 0 and self.life < 0.005)
 
     def _step(self):
         now = time.monotonic()
@@ -144,6 +165,10 @@ class LogoWidget(QWidget):
         self._last = now
         self.advance(dt)
         self.update()
+        t = now - self._t0
+        if self.resting() and (t % SHEEN_PERIOD) / SHEEN_TIME >= 1.0:   # between sweeps
+            self._timer.stop()
+            self._wake.start(max(1, round((SHEEN_PERIOD - t % SHEEN_PERIOD) * 1000)))
 
     def advance(self, dt: float):
         """Move the animation on by dt seconds (separate from the timer for tests)."""
@@ -162,6 +187,11 @@ class LogoWidget(QWidget):
             em[4] -= dt * 1.1
         self.embers = [em for em in self.embers if em[4] > 0][-16:]
         self.squish = max(0.0, self.squish - dt * 4)
+        # the breathing comes in with a sound and eases out over a second or two after it
+        alive = self._target > 0 or self.level > 0.02
+        self.life += (float(alive) - self.life) * min(1.0, dt * (4 if alive else 1.5))
+        if not alive and self.life < 0.005:
+            self.life = 0.0
 
     # ---- painting
     def _mark_pixmap(self, c1: str, c2: str) -> QPixmap:
@@ -190,8 +220,8 @@ class LogoWidget(QWidget):
             p.scale(1 + 0.08 * k, 1 - 0.1 * k)
             p.translate(-c, -(y0 + s))
 
-        # glow: breathes at rest, flares and flickers warm with the sound
-        breathe = 0.5 if still else 0.5 + 0.5 * math.sin(t * 1.6)
+        # glow: still at rest; breathes, flares and flickers warm with the sound
+        breathe = 0.5 if still else 0.5 + 0.5 * math.sin(t * 1.6) * self.life
         flicker = 0.85 + 0.15 * math.sin(t * 23) * math.sin(t * 7.3) if lv > 0.05 else 1.0
         glow = _mix(QColor(c2), FLAME, lv * 1.4)
         alpha = min(255, int((70 + 60 * breathe + 170 * lv) * flicker))
