@@ -162,9 +162,8 @@ QFrame#railoutput QPushButton#railpair { background:$btn; border:1px solid trans
 QFrame#railoutput QPushButton#railpair:hover { background:$btn_hover; }
 QFrame#railoutput QPushButton#railpair[muted="true"] { background:$danger_bg; }
 QFrame#railoutput QPushButton#railpair:focus { border-color:$accent; }
-QFrame#railoutput QFrame#railoutputpanel { background:transparent; border:none; }
-QFrame#railoutput QFrame#railoutputpanel[open="true"] { background:$btn; border-radius:8px; }
-QFrame#railoutputpanel[open="true"] QPushButton#railoutputsetup[action="true"]:hover {
+QFrame#railoutput QFrame#railoutputpanel { background:$btn; border:none; border-radius:8px; }
+QFrame#railoutput QFrame#railoutputpanel QPushButton#railoutputsetup[action="true"]:hover {
     background:$panel; }   /* the card's own: its words' colours are made for it */
 QFrame#railoutput QPushButton#railoutputsetup { background:transparent;
     border:1px solid transparent; border-radius:6px; padding:0; }
