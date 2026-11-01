@@ -539,6 +539,11 @@ def test_key_image_draws_the_pad_as_a_stream_deck_key(qapp, window):
     img = picture(body)
     assert (img.width(), img.height()) == (144, 144)
     assert img.pixelColor(72, 72).alpha() == 255          # the card fills the key
+    # outside the key's curve: the card colour, never the window's darker background
+    from soundboard.ui.kit.widgets import pad_colours
+    card = pad_colours()["card"].name()
+    corners = ((0, 0), (143, 0), (0, 143), (143, 143))
+    assert [img.pixelColor(x, y).name() for x, y in corners] == [card] * 4
     lit = d("key_image", id="s0", playing="1")[1]
     assert lit["image"] != body["image"]                  # lit up while it plays
     assert picture(d("key_image", name="airhorn", size="9999")[1]).width() == 288
