@@ -139,17 +139,6 @@ def test_star_on_github_counts(window, monkeypatch, used):  # noqa: F811
     window.setctl.close_settings()
 
 
-def test_folding_an_on_air_group_counts(window, monkeypatch, used):  # noqa: F811
-    card = window.rail.output
-    monkeypatch.setattr(card, "folds", lambda g: False)
-    card.toggle("voice")
-    assert "on-air-fold" not in used                 # one line: no arrow, no fold
-    monkeypatch.setattr(card, "folds", lambda g: True)
-    card.toggle("voice")
-    assert "on-air-fold" in used
-    card.toggle("voice")
-
-
 def test_the_mic_helper_switched_off_counts_every_day():
     assert "mic-helper-off" in usage.features_now(Config(mic_helper=False))
     assert "mic-helper-off" not in usage.features_now(Config())

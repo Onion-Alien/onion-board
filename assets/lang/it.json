@@ -2497,10 +2497,8 @@
   "Offline mode is on, so the tabs that need the internet are hidden and greyed out here. Switch it off in Privacy & security to use them.": "La modalità offline è attiva, quindi qui le schede che richiedono internet sono nascoste e in grigio. Disattivala in Privacy e sicurezza per usarle.",
   "Offline mode is on: nothing goes online, and what needs the internet is hidden. Click to change it.": "La modalità offline è attiva: niente va online, e ciò che richiede internet è nascosto. Clicca per cambiarla.",
   "Only you hear it. Didn't hear it? Pick another one and try again.": "Solo tu lo senti. Non l'hai sentito? Scegline un altro e riprova.",
-  "Opens the sharing form on GitHub in your browser": "Apre il modulo di condivisione su GitHub nel tuo browser",
   "Other device": "Altro dispositivo",
   "Playing a game or on a call?": "Stai giocando o sei in chiamata?",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Add one and its sounds land on your board, each category as its own tab.": "Board già pronte, libere da usare ovunque: nei giochi, negli stream e nei video. Aggiungine una e i suoi suoni arrivano sulla tua board, ogni categoria nella sua scheda.",
   "Search your sounds": "Cerca i tuoi suoni",
   "Send your sounds to another device instead (Voicemeeter, OBS, a mixer…), or nowhere (only you, and the stream output)": "Invia invece i tuoi suoni a un altro dispositivo (Voicemeeter, OBS, un mixer…), o da nessuna parte (solo tu, e l'uscita stream)",
   "Share a pack": "Condividi un pacchetto",
@@ -2656,7 +2654,6 @@
   ],
   "AI voice off": "Voce IA spenta",
   "AI voice: {voice}, starting.": "Voce IA: {voice}, avvio.",
-  "AI voice: {voice}.": "Voce IA: {voice}.",
   "No mic open": "Nessun microfono aperto",
   "What others hear from your mic": "Ciò che gli altri sentono dal tuo microfono",
   "Getting Python ready…": "Preparazione di Python…",
@@ -3141,7 +3138,6 @@
   "Hear {name}": "Ascolta {name}",
   "Hear {name} (only you hear it)": "Ascolta {name} (lo senti solo tu)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Scegli le tue cuffie in Impostazioni → Audio per ascoltare i campioni.",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Board già pronte, libere da usare ovunque: nei giochi, negli stream e nei video. Premi un suono per sentirlo prima (lo senti solo tu). Aggiungi un pacchetto e i suoi suoni arrivano sulla tua board, ogni categoria nella sua scheda.",
   "Hide the report": "Nascondi il rapporto",
   "Network activity log": "Registro delle attività di rete",
   "No custom modes yet. Fill in the form to make one.": "Ancora nessuna modalità personalizzata. Compila il modulo per crearne una.",
@@ -3978,7 +3974,6 @@
   "The computer voice ({voice}) speaks for you.": "La voce sintetica ({voice}) parla per te.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Spegne ogni voce che cambia il tuo microfono. Riaccenderlo le riporta.",
   "Turns on: {voices}": "Accende: {voices}",
-  "Voice changer: {voice}.": "Modificatore di voce: {voice}.",
   "Voices on or off": "Voci attive o spente",
   "What you say is said in {language}.": "Quello che dici viene detto in {language}.",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board si è chiuso inaspettatamente, quindi è ripartito.",
@@ -4822,5 +4817,31 @@
   "{n} new sound": [
     "{n} suono nuovo",
     "{n} suoni nuovi"
+  ],
+  "Pause this voice (click again to bring it back)": "Metti in pausa questa voce (clicca di nuovo per riaverla)",
+  "Paused: click to turn this voice back on": "In pausa: clicca per riaccendere questa voce",
+  "Turn this voice off (Voices ON won't bring it back)": "Spegni questa voce (Voci ON non la riporterà)",
+  "Couldn't load its sounds to try. Adding it still works.": "Impossibile caricare i suoni da provare. Aggiungerlo funziona comunque.",
+  "Downloads its {n} sound from Myinstants and puts it on your board": [
+    "Scarica il suo {n} suono da Myinstants e lo mette sulla tua board",
+    "Scarica i suoi {n} suoni da Myinstants e li mette sulla tua board, ogni categoria nella sua scheda"
+  ],
+  "Hear a few first": "Ascoltane qualcuno prima",
+  "Hear a few of its sounds first (only you hear them)": "Ascolta prima alcuni dei suoi suoni (solo tu li senti)",
+  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "I suoi suoni vengono scaricati direttamente da Myinstants quando lo aggiungi: Onion Board non ne tiene una copia. Un suono che lì non c'è più viene saltato.",
+  "No packs here yet": "Ancora nessun pacchetto qui",
+  "No packs match “{text}”": "Nessun pacchetto corrisponde a “{text}”",
+  "None of its sounds could be downloaded.": "Non è stato possibile scaricare nessuno dei suoi suoni.",
+  "On my board": "Sulla mia board",
+  "Only you hear these.": "Solo tu li senti.",
+  "Search packs and sounds": "Cerca pacchetti e suoni",
+  "See what's in {name}": "Guarda cosa c'è in {name}",
+  "Show every pack": "Mostra tutti i pacchetti",
+  "Try another word, or show every pack.": "Prova un'altra parola, o mostra tutti i pacchetti.",
+  "from Myinstants": "da Myinstants",
+  "{done} of {total}": "{done} di {total}",
+  "{n} sound is gone from Myinstants, so it was skipped.": [
+    "{n} suono non c'è più su Myinstants, quindi è stato saltato.",
+    "{n} suoni non ci sono più su Myinstants, quindi sono stati saltati."
   ]
 }

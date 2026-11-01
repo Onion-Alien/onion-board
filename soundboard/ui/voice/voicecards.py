@@ -6,7 +6,8 @@ from typing import TYPE_CHECKING, Any
 
 from PySide6.QtCore import QRectF, Qt, QTimer
 from PySide6.QtGui import QColor, QLinearGradient, QPainter
-from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton, QWidget
+from PySide6.QtWidgets import (QFrame, QGraphicsOpacityEffect, QHBoxLayout, QLabel, QPushButton,
+                               QWidget)
 
 from soundboard.core import langnames, usage
 from soundboard.ui.kit import theme
@@ -14,7 +15,7 @@ from soundboard import voicefx
 from soundboard.speech import spoken
 from soundboard.ui.kit import icons
 from soundboard.ui.voice import art
-from soundboard.ui.kit.panel import card, section_label
+from soundboard.ui.kit.panel import card, icon_button, section_label
 from soundboard.ui.voice.voicefxpanel import CUSTOM
 from soundboard.i18n import _
 from soundboard.ui.kit.pixels import snap_to_pixels
@@ -25,6 +26,10 @@ if TYPE_CHECKING:
         def __getattr__(self, name: str) -> Any: ...
 else:
     _Panel = object
+
+
+# the voices with a bar of their own over the status bar (VoicePanel._barred)
+BARRED = ("fx", "ai")
 
 
 class CardBadge(QWidget):
@@ -151,9 +156,12 @@ class VoiceCards(_Panel):
         self._tab = key
         for k, f in self._cards.items():
             f.setVisible(k == key)
-        for k, panel in self._barred():
-            if panel.picked.property("pinned"):   # (in its card when not: shown with it)
-                panel.show_picked_row(key == k)
+        for _k, panel in self._barred():
+            # every voice that's on keeps its bar, whichever tab shows (the voice
+            # changer's and an AI voice's, one over the other); in its card when not
+            # pinned, so shown with it
+            if panel.picked.property("pinned"):
+                panel.show_picked_row(True)
         self._tabs[key].setChecked(True)
         self._update_heads()
         if asked and key in usage.VOICE_TABS:
@@ -170,6 +178,54 @@ class VoiceCards(_Panel):
             f"fx.{t}" for t in types}
         self.speech.s["folded"] = sorted(self._folded)   # kept with the speech settings
         self.speech_changed.emit(dict(self.speech.s))
+
+    def _make_bar_controls(self):
+        """Each voice's bar gets, at its right end, a pause button (that voice off for a
+        while, its bar kept, dimmed, to bring it back with one click) and a ✕ (off, and
+        Voices ON won't bring it back): what the bar's chips used to do."""
+        self._bar_ctl: dict[str, tuple[QPushButton, QPushButton]] = {}
+        for key, panel in self._barred():
+            ctl = QWidget()
+            h = QHBoxLayout(ctl)
+            h.setContentsMargins(0, 0, 0, 0)
+            h.setSpacing(6)
+            pause = icon_button("pause", _("Pause this voice (click again to bring it back)"))
+            pause.clicked.connect(lambda __=False, k=key: (usage.used("voice-bar-pause"),
+                                                          self.toggle_one(k)))
+            close = icon_button("close", _("Turn this voice off (Voices ON won't bring it "
+                                           "back)"))
+            close.clicked.connect(lambda __=False, k=key: (usage.used("voice-chip-off"),
+                                                          self.forget_one(k)))
+            h.addWidget(pause)
+            h.addWidget(close)
+            panel.picked_box.addWidget(ctl, 0, Qt.AlignmentFlag.AlignVCenter
+                                       | Qt.AlignmentFlag.AlignRight)
+            panel.bar_controls = ctl
+            # dimmed while paused: the picture and the name
+            dim = []
+            for w in (panel.picked_pic, panel.picked_name):
+                fx = QGraphicsOpacityEffect(w)
+                fx.setOpacity(1.0)
+                w.setGraphicsEffect(fx)
+                dim.append(fx)
+            self._bar_ctl[key] = (pause, close)
+            self._bar_dim = {**getattr(self, "_bar_dim", {}), key: dim}
+
+    def _show_bar_controls(self, on: list[str], paused: list[str]):
+        """The bars' pause buttons say pause or play; a paused voice's bar stays, dimmed."""
+        for key, panel in self._barred():
+            if key not in getattr(self, "_bar_ctl", {}):
+                continue
+            pause, _close = self._bar_ctl[key]
+            is_paused = key in paused and key not in on
+            icons.set_icon(pause, "play" if is_paused else "pause", size=18)
+            tip = (_("Paused: click to turn this voice back on") if is_paused
+                   else _("Pause this voice (click again to bring it back)"))
+            pause.setToolTip(tip)
+            pause.setAccessibleName(tip)
+            for fx in self._bar_dim[key]:
+                fx.setOpacity(0.45 if is_paused else 1.0)
+            panel.set_paused(is_paused)
 
     def _update_bar(self):
         """The status bar's chips: each thing changing what others hear, in the order
@@ -193,21 +249,15 @@ class VoiceCards(_Panel):
             items.append(("clean", _("Clean mic"), "on", "mic", None,
                           _("Clean mic takes background noise out of your mic.") + " "
                           + click_off))
-        if "fx" in on:
-            shown, pic = self._fx_shown()
-            items.append(("fx", shown, "on", "voice" if pic is None else "", pic,
-                          _("Voice changer: {voice}.", voice=shown) + " " + click_off))
-        if self.ai.is_on():
-            st, title = self.ai.status(), self.ai.voice_title()
-            if st == "failed":
-                items.append(("ai", _("AI voice off"), "warn", "warn", None,
-                              self.ai.failure_text() + " " + click_off))
-            else:
-                items.append(("ai", title + ("…" if st == "starting" else ""), "on", "wave",
-                              None, (_("AI voice: {voice}, starting.", voice=title)
-                                     if st == "starting" else
-                                     _("AI voice: {voice}.", voice=title)) + " "
-                              + click_off))
+        # the voice changer and an AI voice have their own bars over this one (with
+        # pause and ✕), so no chip; an AI voice still starting, or failed, says so here
+        if self.ai.is_on() and self.ai.status() in ("starting", "failed"):
+            title = self.ai.voice_title()
+            items.append(("ai", _("AI voice off"), "warn", "warn", None,
+                          self.ai.failure_text() + " " + click_off)
+                         if self.ai.status() == "failed" else
+                         ("ai", title + "…", "on", "wave", None,
+                          _("AI voice: {voice}, starting.", voice=title) + " " + click_off))
         if "speak" in on:
             who = self._speak_shown()
             items.append(("speak", who, "on", "speech", None,
@@ -222,24 +272,17 @@ class VoiceCards(_Panel):
         # grey: what Voices ON brings back (a click brings just that one back)
         # (with Clean mic's chip there and nothing to bring back, "Mic unchanged" beside
         # it read as if Clean mic did nothing)
-        if not on and not (clean is not None and clean.is_on() and not self._back
-                           and not self.back_keys()):
-            items.append(("none", _("Mic unchanged. ON brings back:") if self._back else
-                          _("Mic unchanged. ON turns on:") if self.back_keys() else
+        paused = self.back_keys() if not on else self._back
+        chipped = [k for k in paused if k not in BARRED]   # the rest show on their bars
+        if not on and not (clean is not None and clean.is_on() and not chipped):
+            items.append(("none", _("Mic unchanged. ON brings back:") if chipped and self._back
+                          else _("Mic unchanged. ON turns on:") if chipped else
                           _("Mic unchanged"), "off", "mic", None,
                           _("Nothing is changing your mic voice. Switch Voices ON, or "
                             "click a grey voice, to turn it on.")))
         click_on = _("Off. Click to turn it back on. Right-click to open it.")
-        for k in (self.back_keys() if not on else self._back):
-            if k == "fx":
-                shown, pic = self._fx_shown()
-                items.append(("fx", shown, "off", "voice" if pic is None else "", pic,
-                              _("Voice changer: {voice}.", voice=shown) + " " + click_on))
-            elif k == "ai":
-                title = self.ai.voice_title()
-                items.append(("ai", title, "off", "wave", None,
-                              _("AI voice: {voice}.", voice=title) + " " + click_on))
-            elif k == "speak":
+        for k in chipped:
+            if k == "speak":
                 who = self._speak_shown()
                 items.append(("speak", who, "off", "speech", None,
                               _("The computer voice ({voice}) speaks for you.", voice=who)
@@ -250,7 +293,11 @@ class VoiceCards(_Panel):
                               _("What you say is said in {language}.", language=lang)
                               + " " + click_on))
         self.bar.set_items(items)
-        names = ", ".join(it[1] for it in items if it[2] == "off" and it[0] != "none")
+        self._show_bar_controls(on, paused)
+        chip_names = {it[0]: it[1] for it in items if it[2] == "off" and it[0] != "none"}
+        names = ", ".join(  # what ON brings back: the paused bars' voices and grey chips
+            self._fx_shown()[0] if k == "fx" else self.ai.voice_title() if k == "ai"
+            else chip_names[k] for k in paused if k in BARRED or k in chip_names)
         self.bar.set_master(bool(on), (
             _("Turns off every voice changing your mic. Switching it on brings them back.")
             if on else _("Turns on: {voices}", voices=names) if names else

@@ -24,7 +24,7 @@ from soundboard.ui.bun.bunshapes import (  # noqa: F401
     _arc, _bean, _ellipse, _glow, _lerp, _navel, _oval, _pads, _poof, _shade, _smooth, _stroke)
 from soundboard.ui.bun.bunprops import (  # noqa: F401
     _draw_prop, _music_note, music_note, _nightcap, _sparkle, sparkle, _star, _survey, SWUNG,
-    tool_paw)
+    tool_arm, ELBOW)
 
 # The shapes that are the same from frame to frame (his ears at a fold, his tail, his
 # markings, his arms in a pose) are built once and reused: building them (QPainterPath
@@ -246,7 +246,8 @@ def _paws(p: QPainter, prop, sad: float, angry: float, paw_fur: QColor, ink: QPe
         if reach[i] is not None:   # out to the prop, which draws the paw holding it
             p.setPen(ink)
             p.setBrush(fur)
-            p.drawPath(_arm_out(i, tuple(reach[i])))
+            p.drawPath(_arm_bent(i, tuple(reach[i])) if prop in SWUNG
+                       else _arm_out(i, tuple(reach[i])))
             continue
         (bx, by), (px, py) = (_lerp(_lerp(ARMS_REST[i][k], ARMS_HOPE[i][k], clasp),
                                     ARMS_CROSS[i][k], cross) for k in (0, 1))
@@ -271,6 +272,15 @@ def _arm_out(i: int, paw: tuple) -> QPainterPath:
     """Arm `i` from his shoulder out to a prop's paw (the prop draws the paw)."""
     line = QPainterPath(QPointF(*SHOULDERS[i]))
     line.quadTo(QPointF(*_prop_bend(i, paw)), QPointF(*paw))
+    return _arm_stroker().createStroke(line).simplified()
+
+
+@_kept
+def _arm_bent(i: int, paw: tuple) -> QPainterPath:
+    """Arm `i` swinging a hammer: straight down to his elbow, straight up to the paw."""
+    line = QPainterPath(QPointF(*SHOULDERS[i]))
+    line.lineTo(QPointF(*ELBOW))
+    line.lineTo(QPointF(*paw))
     return _arm_stroker().createStroke(line).simplified()
 
 
@@ -571,8 +581,8 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     # round his neck goes over his head's chin, after it
     worn = tuple(n for n in body if n not in bunnyfit.NECK)
     bunnyfit.draw(p, worn, "face", ink, hats=not nightcap)
-    if prop in SWUNG:   # his arm goes up and down with the hammer
-        hold = (None, tool_paw(round(swing, 2)))
+    if prop in SWUNG:   # his forearm swings the hammer, about his elbow
+        hold = (None, tool_arm(round(swing, 2))[:2])
     _paws(p, prop, sad, angry, fur, ink, None if robot else bunnyfit.sleeve(fit), waving,
           hold)
     p.save()

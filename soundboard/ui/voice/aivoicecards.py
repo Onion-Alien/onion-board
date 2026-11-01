@@ -254,7 +254,19 @@ class AiVoiceCards(_Panel):
         tab showing)."""
         if room is not None:
             self._picked_room = room
-        self.picked.setVisible(getattr(self, "_picked_room", True) and self.is_on())
+        self.picked.setVisible(getattr(self, "_picked_room", True)
+                               and (self.is_on() or getattr(self, "_paused", False)))
+
+    def set_paused(self, paused: bool):
+        """Paused from its bar (or by the Voices switch): the bar stays, dimmed, with its
+        play button to bring the voice back (VoicePanel._show_bar_controls)."""
+        self._paused = paused
+        self.show_picked_row()
+
+    def _bar_extra(self) -> int:
+        """The width of the bar's pause and ✕ (the Voice tab adds them), and a gap."""
+        ctl = getattr(self, "bar_controls", None)
+        return ctl.sizeHint().width() + self.picked_box.spacing() if ctl is not None else 0
 
     def _fit_picked(self):
         """The buttons beside the voice's name while they fit there, else on a line of
@@ -265,7 +277,7 @@ class AiVoiceCards(_Panel):
         btns = [b for b in self._picked_btns.findChildren(QPushButton) if not b.isHidden()]
         need = (sum(b.sizeHint().width() for b in btns) + 10 * max(0, len(btns) - 1))
         m = box.contentsMargins()
-        line = self.picked.width() - m.left() - m.right()
+        line = self.picked.width() - m.left() - m.right() - self._bar_extra()
         beside = (line - PICKED_ART - min(self.picked_name.sizeHint().width(), 140)
                   - 2 * box.spacing())
         want = (QBoxLayout.Direction.LeftToRight if need <= beside

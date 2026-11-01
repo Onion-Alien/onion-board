@@ -316,9 +316,6 @@ class WindowBuilder(Controller, PlayerBuild, SoundsPageBuild, SetupPageBuild):
         if mw.rail.output is not None:
             mw.rail.output.lineClicked.connect(mw.netctl.open_line)
             mw.rail.output.lineClicked.connect(lambda _p: usage.used("on-air-line"))
-            # Voice and Connection folded down to their headers: kept for the next start
-            mw.rail.output.shut = set(mw.cfg.onair_shut)
-            mw.rail.output.groupToggled.connect(mw.netctl.group_toggled)
         mw.remote_changed.connect(mw.netctl._net_follow, Qt.ConnectionType.QueuedConnection)
         remote.on_change(mw.netctl._remote_watch)
         tabs_live = getattr(getattr(mw, "voice", None), "live_tabs_changed", None)
@@ -335,6 +332,7 @@ class WindowBuilder(Controller, PlayerBuild, SoundsPageBuild, SetupPageBuild):
         # a tab asked for (the rail, Ctrl+1..., a link) while Settings is up: back to the
         # tabs, on that one
         mw.tabs.picked.connect(mw.setctl.close_settings)
+        mw.tabs.picked.connect(mw.impctl.close_packs)
         mw._full_row.insertWidget(0, mw.rail)
         # Tab goes header, rail, page (as it did with the top tabs), not page, rail; the
         # page's box holds the download bar too, so the bar's buttons come just before it

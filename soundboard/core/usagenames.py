@@ -249,6 +249,8 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "voice-roll", "voice-hear",
             # Edit voice's Reset, Mix in a voice, and Edit voice from a card's right-click
             "voice-edit-reset", "voice-mix-in", "voice-edit-menu",
+            # a voice's bar: its pause button
+            "voice-bar-pause",
             # the voice bar's Effects pop-up opened
             "voice-effects",
             # AI voices: switched on, a group picked, a voice starred, Hear it, one of
@@ -373,9 +375,9 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "crash-restarted",
             # the onion on Settings > About: poked, ate the window, given back early
             "egg-onion-poked", "egg-onion-eaten", "egg-onion-please",
-            # Settings > About's Star on GitHub; an On Air card group folded or opened; the
-            # mic helper switched off (Don't ask for admin each time: features_now)
-            "github-star", "on-air-fold", "mic-helper-off")
+            # Settings > About's Star on GitHub; the mic helper switched off (Don't ask for
+            # admin each time: features_now)
+            "github-star", "mic-helper-off")
 STEPS = ("added-sound", "played-sound", "sent-to-others",
          # a tab a new user starts without (+ More tabs, Settings > Tabs)
          "added-radio-tab", "added-apps-tab", "added-triggers-tab")

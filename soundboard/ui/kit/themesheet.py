@@ -162,6 +162,10 @@ QFrame#railoutput QPushButton#railpair { background:$btn; border:1px solid trans
 QFrame#railoutput QPushButton#railpair:hover { background:$btn_hover; }
 QFrame#railoutput QPushButton#railpair[muted="true"] { background:$danger_bg; }
 QFrame#railoutput QPushButton#railpair:focus { border-color:$accent; }
+QFrame#railoutput QFrame#railoutputpanel { background:transparent; border:none; }
+QFrame#railoutput QFrame#railoutputpanel[open="true"] { background:$btn; border-radius:8px; }
+QFrame#railoutputpanel[open="true"] QPushButton#railoutputsetup[action="true"]:hover {
+    background:$panel; }   /* the card's own: its words' colours are made for it */
 QFrame#railoutput QPushButton#railoutputsetup { background:transparent;
     border:1px solid transparent; border-radius:6px; padding:0; }
 QFrame#railoutput QPushButton#railoutputsetup[action="true"]:hover { background:$btn_hover; }
@@ -186,7 +190,14 @@ QWidget#effectchips QPushButton[listen="true"] { padding-right:30px; }
 QPushButton#chipplay { border-radius:10px; background:$accent_tint; border:none; padding:0; }
 QPushButton#chipplay:hover { background:$accent_tint_hi; }
 QPushButton#chipplay[playing="true"] { background:$accent; }
-QDialog#settingspage { background:transparent; }
+QDialog#settingspage, QDialog#packspage { background:transparent; }
+QFrame#card QLabel#packart, QDialog#packspage QLabel#packart { background:$accent_tint;
+    border-radius:12px; }
+QPushButton#filterchip { border-radius:13px; padding:4px 12px; min-height:18px; font-size:8.5pt;
+    background:$btn; border:1px solid transparent; color:$text; }
+QPushButton#filterchip:hover { background:$btn_hover; }
+QPushButton#filterchip:checked { background:$accent; border-color:$accent; color:$on_accent; }
+QPushButton#filterchip:focus { border-color:$accent; }
 QFrame#mixer { background:transparent; }
 QFrame#card QPushButton#primary { background:$accent; color:$on_accent; border:none; padding:9px; }
 QFrame#card QPushButton#primary:hover { background:$accent_hover; }
@@ -691,6 +702,6 @@ OUTLINE_STYLE = Template("""
 QPushButton, QPushButton#danger, QLineEdit, QComboBox, QAbstractSpinBox,
 QFrame#chip, QFrame#card QFrame#chip, QFrame#fxcard, QLabel#pill, QPushButton#vchip,
 QFrame#card QToolButton#voicetile, QFrame#card QPushButton#voicecat,
-QWidget#setupsbar QPushButton#voicecat { border:1px solid $border; }
+QWidget#setupsbar QPushButton#voicecat, QPushButton#filterchip { border:1px solid $border; }
 QFrame#card, QFrame#setcard, QFrame#voicebar, QFrame#picked { border:1px solid $border; }
 """)

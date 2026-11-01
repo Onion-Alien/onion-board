@@ -2444,10 +2444,8 @@
   "Offline mode is on, so the tabs that need the internet are hidden and greyed out here. Switch it off in Privacy & security to use them.": "오프라인 모드가 켜져 있어서 인터넷이 필요한 탭은 숨겨지고 여기서 회색으로 표시됩니다. 쓰려면 개인정보 보호 및 보안에서 끄세요.",
   "Offline mode is on: nothing goes online, and what needs the internet is hidden. Click to change it.": "오프라인 모드가 켜져 있습니다: 아무것도 인터넷에 연결하지 않고, 인터넷이 필요한 것은 숨깁니다. 바꾸려면 클릭하세요.",
   "Only you hear it. Didn't hear it? Pick another one and try again.": "나만 듣습니다. 안 들렸습니까? 다른 것을 고르고 다시 시도하세요.",
-  "Opens the sharing form on GitHub in your browser": "브라우저에서 GitHub 공유 양식을 엽니다",
   "Other device": "다른 장치",
   "Playing a game or on a call?": "게임 중입니까, 통화 중입니까?",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Add one and its sounds land on your board, each category as its own tab.": "게임, 방송, 동영상 어디서나 무료로 쓸 수 있는 완성된 보드입니다. 추가하면 사운드가 보드에 들어오고, 카테고리마다 탭이 따로 생깁니다.",
   "Search your sounds": "내 사운드 검색",
   "Send your sounds to another device instead (Voicemeeter, OBS, a mixer…), or nowhere (only you, and the stream output)": "대신 사운드를 다른 장치(Voicemeeter, OBS, 믹서…)로 보내거나, 아무 데도 보내지 않기(나와 방송 출력에만)",
   "Share a pack": "팩 공유",
@@ -2599,7 +2597,6 @@
   ],
   "AI voice off": "AI 음성 꺼짐",
   "AI voice: {voice}, starting.": "AI 음성: {voice}, 시작하는 중.",
-  "AI voice: {voice}.": "AI 음성: {voice}.",
   "No mic open": "마이크가 열려 있지 않음",
   "What others hear from your mic": "다른 사람에게 들리는 내 마이크 소리",
   "Getting Python ready…": "Python 준비 중…",
@@ -3073,7 +3070,6 @@
   "Hear {name}": "{name} 듣기",
   "Hear {name} (only you hear it)": "{name} 듣기 (나만 들립니다)",
   "Pick your headphones in Settings → Audio to hear the samples.": "샘플을 들으려면 설정 → 오디오에서 헤드폰을 고르세요.",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "게임, 방송, 동영상 어디서나 무료로 쓸 수 있는 완성된 보드입니다. 사운드를 눌러 먼저 들어 보세요(나만 들림). 팩을 추가하면 사운드가 보드에 들어오고, 카테고리마다 탭이 따로 생깁니다.",
   "Hide the report": "보고서 숨기기",
   "Network activity log": "네트워크 활동 로그",
   "No custom modes yet. Fill in the form to make one.": "아직 사용자 지정 모드가 없습니다. 양식을 채워 만드세요.",
@@ -3904,7 +3900,6 @@
   "The computer voice ({voice}) speaks for you.": "컴퓨터 음성({voice})이 대신 말합니다.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "마이크를 바꾸는 모든 목소리를 끕니다. 켜면 다시 돌아옵니다.",
   "Turns on: {voices}": "켜는 것: {voices}",
-  "Voice changer: {voice}.": "보이스 체인저: {voice}.",
   "Voices on or off": "목소리 켬 또는 끔",
   "What you say is said in {language}.": "말한 내용이 {language}(으)로 나갑니다.",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board가 예기치 않게 종료되어 다시 시작했습니다.",
@@ -4732,5 +4727,29 @@
   ],
   "{n} new sound": [
     "새 사운드 {n}개"
+  ],
+  "Pause this voice (click again to bring it back)": "이 목소리 일시정지 (다시 클릭하면 돌아와요)",
+  "Paused: click to turn this voice back on": "일시정지됨: 클릭하면 이 목소리를 다시 켜요",
+  "Turn this voice off (Voices ON won't bring it back)": "이 목소리 끄기 (목소리 켜기로 돌아오지 않아요)",
+  "Couldn't load its sounds to try. Adding it still works.": "미리 들을 사운드를 불러오지 못했어요. 추가는 그대로 할 수 있어요.",
+  "Downloads its {n} sound from Myinstants and puts it on your board": [
+    "사운드 {n}개를 Myinstants에서 내려받아 보드에 넣어요. 카테고리마다 탭이 따로 생겨요"
+  ],
+  "Hear a few first": "먼저 몇 개 들어보기",
+  "Hear a few of its sounds first (only you hear them)": "먼저 사운드 몇 개를 들어보세요 (나만 들려요)",
+  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "사운드는 추가할 때 Myinstants에서 바로 내려받아요. Onion Board는 사본을 보관하지 않아요. 거기서 사라진 사운드는 건너뛰어요.",
+  "No packs here yet": "아직 팩이 없어요",
+  "No packs match “{text}”": "“{text}”와 맞는 팩이 없어요",
+  "None of its sounds could be downloaded.": "사운드를 하나도 내려받지 못했어요.",
+  "On my board": "내 보드에 있음",
+  "Only you hear these.": "나만 들려요.",
+  "Search packs and sounds": "팩과 사운드 검색",
+  "See what's in {name}": "{name}에 뭐가 있는지 보기",
+  "Show every pack": "모든 팩 보기",
+  "Try another word, or show every pack.": "다른 단어로 찾아보거나 모든 팩을 보세요.",
+  "from Myinstants": "Myinstants에서",
+  "{done} of {total}": "{done}/{total}",
+  "{n} sound is gone from Myinstants, so it was skipped.": [
+    "사운드 {n}개가 Myinstants에서 사라져서 건너뛰었어요."
   ]
 }

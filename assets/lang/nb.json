@@ -2497,10 +2497,8 @@
   "Offline mode is on, so the tabs that need the internet are hidden and greyed out here. Switch it off in Privacy & security to use them.": "Frakoblet modus er på, så fanene som trenger internett, er skjult og nedtonet her. Slå den av i Personvern og sikkerhet for å bruke dem.",
   "Offline mode is on: nothing goes online, and what needs the internet is hidden. Click to change it.": "Frakoblet modus er på: ingenting går på nett, og det som trenger internett, er skjult. Klikk for å endre det.",
   "Only you hear it. Didn't hear it? Pick another one and try again.": "Bare du hører den. Hørte du den ikke? Velg en annen og prøv igjen.",
-  "Opens the sharing form on GitHub in your browser": "Åpner delingsskjemaet på GitHub i nettleseren din",
   "Other device": "Annen enhet",
   "Playing a game or on a call?": "Spiller du et spill eller er i en samtale?",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Add one and its sounds land on your board, each category as its own tab.": "Ferdige brett, gratis å bruke hvor som helst: i spill, streamer og videoer. Legg til ett, så havner lydene på brettet ditt, hver kategori som sin egen fane.",
   "Search your sounds": "Søk i lydene dine",
   "Send your sounds to another device instead (Voicemeeter, OBS, a mixer…), or nowhere (only you, and the stream output)": "Send lydene dine til en annen enhet i stedet (Voicemeeter, OBS, en mikser…), eller ingen steder (bare du, og stream-utgangen)",
   "Share a pack": "Del en pakke",
@@ -2656,7 +2654,6 @@
   ],
   "AI voice off": "AI-stemme av",
   "AI voice: {voice}, starting.": "AI-stemme: {voice}, starter.",
-  "AI voice: {voice}.": "AI-stemme: {voice}.",
   "No mic open": "Ingen mikrofon er åpen",
   "What others hear from your mic": "Hva andre hører fra mikrofonen din",
   "Getting Python ready…": "Gjør Python klar…",
@@ -3141,7 +3138,6 @@
   "Hear {name}": "Hør {name}",
   "Hear {name} (only you hear it)": "Hør {name} (bare du hører den)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Velg hodetelefonene dine under Innstillinger → Lyd for å høre prøvene.",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Ferdige brett, gratis å bruke hvor som helst: i spill, streamer og videoer. Trykk på en lyd for å høre den først (bare du hører den). Legg til en pakke, så havner lydene på brettet ditt, hver kategori som sin egen fane.",
   "Hide the report": "Skjul rapporten",
   "Network activity log": "Logg over nettverksaktivitet",
   "No custom modes yet. Fill in the form to make one.": "Ingen egne moduser ennå. Fyll ut skjemaet for å lage en.",
@@ -3978,7 +3974,6 @@
   "The computer voice ({voice}) speaks for you.": "Datamaskinstemmen ({voice}) snakker for deg.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Slår av alle stemmer som endrer mikrofonen din. Når du slår den på, kommer de tilbake.",
   "Turns on: {voices}": "Slår på: {voices}",
-  "Voice changer: {voice}.": "Stemmeforvrenger: {voice}.",
   "Voices on or off": "Stemmer på eller av",
   "What you say is said in {language}.": "Det du sier, blir sagt på {language}.",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board ble lukket uventet, så det startet på nytt.",
@@ -4822,5 +4817,31 @@
   "{n} new sound": [
     "{n} ny lyd",
     "{n} nye lyder"
+  ],
+  "Pause this voice (click again to bring it back)": "Sett denne stemmen på pause (klikk igjen for å få den tilbake)",
+  "Paused: click to turn this voice back on": "På pause: klikk for å slå stemmen på igjen",
+  "Turn this voice off (Voices ON won't bring it back)": "Slå av denne stemmen (Stemmer PÅ henter den ikke tilbake)",
+  "Couldn't load its sounds to try. Adding it still works.": "Kunne ikke laste inn lydene til å prøve. Du kan fortsatt legge den til.",
+  "Downloads its {n} sound from Myinstants and puts it on your board": [
+    "Laster ned {n} lyd fra Myinstants og legger den på brettet ditt",
+    "Laster ned {n} lyder fra Myinstants og legger dem på brettet ditt, hver kategori som egen fane"
+  ],
+  "Hear a few first": "Hør noen først",
+  "Hear a few of its sounds first (only you hear them)": "Hør noen av lydene først (bare du hører dem)",
+  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "Lydene lastes ned rett fra Myinstants når du legger den til: Onion Board beholder ingen kopi. En lyd som er borte derfra, hoppes over.",
+  "No packs here yet": "Ingen pakker her ennå",
+  "No packs match “{text}”": "Ingen pakker passer til «{text}»",
+  "None of its sounds could be downloaded.": "Ingen av lydene kunne lastes ned.",
+  "On my board": "På brettet mitt",
+  "Only you hear these.": "Bare du hører dem.",
+  "Search packs and sounds": "Søk i pakker og lyder",
+  "See what's in {name}": "Se hva som er i {name}",
+  "Show every pack": "Vis alle pakker",
+  "Try another word, or show every pack.": "Prøv et annet ord, eller vis alle pakker.",
+  "from Myinstants": "fra Myinstants",
+  "{done} of {total}": "{done} av {total}",
+  "{n} sound is gone from Myinstants, so it was skipped.": [
+    "{n} lyd er borte fra Myinstants, så den ble hoppet over.",
+    "{n} lyder er borte fra Myinstants, så de ble hoppet over."
   ]
 }

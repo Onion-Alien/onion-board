@@ -8,6 +8,12 @@ in when it can't be read). Every pack is a zip in Onion Board's own backup forma
 only ever fetched from there, over HTTPS, and only kept when its SHA-256 matches the
 one the list gives, so nobody can swap a pack's sounds after it was checked.
 
+A pack can also be only links (a "links" list in place of the zip's url and sha256):
+Myinstants sounds' MP3s, each fetched from that site when Add is pressed, the way a
+pasted Myinstants link is (soundboard.online.ytdl: its own switch, Tor and proxy
+settings), then put in a zip of the same format on this PC (download_links). None of
+it is stored by the project; a link that has gone is skipped and counted.
+
 Anyone can share a pack: packs/README.md says how (a GitHub form; every sound must be
 CC0, so whoever adds it can use it anywhere). The requests carry nothing about the
 user beyond what any HTTPS request does, and they have their own switch in Settings >
@@ -25,7 +31,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from soundboard.core import backup, updates
+from soundboard.core import backup, errors, updates
 from soundboard.sounds import library
 from soundboard.online import net, netlog
 from soundboard.i18n import _
@@ -42,6 +48,39 @@ PREVIEW_MAX = 4 << 20    # a pack's preview: a few short sounds (ours are ~0.4 M
 SAMPLES = 6              # at most this many of a preview's sounds are shown
 CATALOG_LIMIT = 1 << 20  # the list is a few KB
 ID_RE = re.compile(r"[a-z0-9][a-z0-9-]{0,40}")
+MAX_LINKS = 300          # a links pack's sounds
+LINK_WORKERS = 4         # links fetched at once
+
+
+@dataclass(frozen=True)
+class Link:
+    """One sound of a links pack: its name, its Myinstants MP3 and its category."""
+    name: str
+    url: str
+    category: str = ""
+
+
+def _link_ok(url: str) -> bool:
+    """A Myinstants sound's MP3, nothing else (the list is public: no other site, no
+    query, no name that could leave the folder it's saved in)."""
+    from soundboard.online.ytsites import MYINSTANTS
+    leaf = url.removeprefix(MYINSTANTS + "/media/sounds/")
+    return (leaf != url and len(leaf) > 4 and leaf.lower().endswith(".mp3")
+            and not any(c in leaf for c in '/\\?#:') and ".." not in leaf)
+
+
+def _links(raw) -> list[Link]:
+    out, seen = [], set()
+    for d in raw[:MAX_LINKS] if isinstance(raw, list) else []:
+        try:
+            link = Link(str(d["name"]).strip()[:60], str(d["url"]).strip(),
+                        str(d.get("category") or "").strip()[:40])
+        except (KeyError, TypeError, AttributeError):
+            continue
+        if link.name and _link_ok(link.url) and link.url not in seen:
+            seen.add(link.url)
+            out.append(link)
+    return out
 
 
 @dataclass
@@ -57,6 +96,10 @@ class Pack:
     author: str = ""
     emoji: str = "📦"   # the pack's picture in the window
     categories: list[str] = field(default_factory=list)
+    # what kind of pack it is, for the window's filters ("Memes", "Streaming"…)
+    tags: list[str] = field(default_factory=list)
+    # a links pack (no url / sha256): its sounds' Myinstants links, fetched on Add
+    links: list[Link] = field(default_factory=list)
     # a few of its sounds, cut short, with their pictures (a small zip in the backup
     # format next to the pack): "Listen first" in the window. Optional.
     preview_url: str = ""
@@ -89,6 +132,7 @@ BUILT_IN = [{
     "license": "CC0",
     "author": "Onion Board",
     "emoji": "📺",
+    "tags": ["Streaming"],
     "preview": {"url": f"{updates.DOWNLOADS}streamer-pack-1/streamer-preview.zip",
                 "sha256": "4baeb7fe3d9bdbd2a07db071ba89666d9b3a910118cb510325c1adef1478191c",
                 "size": 376595},
@@ -108,6 +152,7 @@ BUILT_IN = [{
     "license": "CC0",
     "author": "Onion Board",
     "emoji": "🏆",
+    "tags": ["Gaming", "Streaming"],
     "preview": {"url": f"{updates.DOWNLOADS}esports-pack-1/esports-preview.zip",
                 "sha256": "81553c247a987ef7dabe7da2b8b4a4555e5fe7e09a9c73f7dd063c491cd8ea4b",
                 "size": 407620},
@@ -126,6 +171,7 @@ BUILT_IN = [{
     "license": "CC0",
     "author": "Onion Board",
     "emoji": "🔊",
+    "tags": ["Everyday", "Memes"],
     "preview": {"url": f"{updates.DOWNLOADS}general-pack-1/general-preview.zip",
                 "sha256": "18a6154703c5a96e868e2b74d0e38ddb4c34cd8deffeddc39f64bbb116312985",
                 "size": 356511},
@@ -146,6 +192,7 @@ BUILT_IN = [{
     "license": "CC0 (applause public domain)",
     "author": "Onion Board",
     "emoji": "🎙️",
+    "tags": ["Podcast"],
     "preview": {"url": f"{updates.DOWNLOADS}podcast-pack-1/podcast-preview.zip",
                 "sha256": "1a427fc256d0152b7e5d2250337971e2660595dad21b7afd5b2f8184f7af4db1",
                 "size": 392570},
@@ -164,6 +211,7 @@ BUILT_IN = [{
     "license": "CC0 + CC BY (credits inside)",
     "author": "Onion Board",
     "emoji": "🎃",
+    "tags": ["Spooky"],
     "preview": {"url": f"{updates.DOWNLOADS}halloween-pack-1/halloween-preview.zip",
                 "sha256": "8014fbf24322b467e09e4a4eaff179aa974f424750d0191393655fe27ae5a090",
                 "size": 480541},
@@ -182,6 +230,7 @@ BUILT_IN = [{
     "license": "CC0 + CC BY (credits inside)",
     "author": "Onion Board",
     "emoji": "🎲",
+    "tags": ["Tabletop", "Music"],
     "preview": {"url": f"{updates.DOWNLOADS}gm-pack-1/gm-starter-preview.zip",
                 "sha256": "287c97df2e05a8b0aefb76381ab8bc91f28546caa0b2a1dbd8e5228b71d611db",
                 "size": 523245},
@@ -197,25 +246,34 @@ def parse(raw) -> list[Pack]:
     out, seen = [], set()
     for d in items if isinstance(items, list) else []:
         try:
+            links = _links(d.get("links"))
             p = Pack(id=str(d["id"]), name=str(d["name"]).strip(),
                      description=str(d.get("description") or "").strip(),
-                     url=str(d["url"]), sha256=str(d["sha256"]).lower(),
+                     url="" if links else str(d["url"]),
+                     sha256="" if links else str(d["sha256"]).lower(),
                      size=int(d.get("size") or 0), sounds=int(d.get("sounds") or 0),
                      license=str(d.get("license") or "CC0").strip(),
                      author=str(d.get("author") or "").strip(),
                      emoji=str(d.get("emoji") or "📦")[:4],
                      categories=[str(c) for c in d.get("categories") or []
-                                 if isinstance(c, str)][:20])
-        except (KeyError, TypeError, ValueError):
+                                 if isinstance(c, str)][:20],
+                     tags=[t.strip()[:24] for t in d.get("tags") or []
+                           if isinstance(t, str) and t.strip()][:4],
+                     links=links)
+        except (KeyError, TypeError, ValueError, AttributeError):
             log.debug("skipped a catalog entry: %r", d)
             continue
         if (not ID_RE.fullmatch(p.id) or p.id in seen or not p.name
-                or not p.url.startswith(updates.DOWNLOADS)
-                or not updates.SHA_RE.fullmatch(p.sha256)
+                or not (p.links or (p.url.startswith(updates.DOWNLOADS)
+                                    and updates.SHA_RE.fullmatch(p.sha256)))
                 or not 0 <= p.size <= MAX_SIZE):
             log.debug("skipped catalog entry %r", p.id)
             continue
         seen.add(p.id)
+        if p.links:
+            p.sounds = len(p.links)
+            p.categories = p.categories or list(dict.fromkeys(
+                k.category for k in p.links if k.category))[:20]
         p.preview_url, p.preview_sha256, p.preview_size = _preview(d.get("preview"))
         out.append(p)
     return out
@@ -238,6 +296,21 @@ def built_in() -> list[Pack]:
     return parse(BUILT_IN)
 
 
+_listed: dict[str, Pack] = {}   # every pack the online list has had, by id
+
+
+def known(pack_id: str) -> Pack | None:
+    """A free pack: from the online list once it was read (a pack added since this
+    version was built), else this version's own; None when neither has it."""
+    return _listed.get(pack_id) or next((p for p in built_in() if p.id == pack_id), None)
+
+
+def name_of(pack_id: str) -> str:
+    """A free pack's name ("Streamer pack"), or ""."""
+    p = known(pack_id)
+    return p.name if p else ""
+
+
 def catalog() -> list[Pack]:
     """The packs on offer now, from the project's list. Raises (net.ProxyError when
     switched off or Offline, OSError / ValueError when it can't be read): the caller
@@ -248,6 +321,7 @@ def catalog() -> list[Pack]:
         packs = parse(json.loads(r.read(CATALOG_LIMIT).decode("utf-8")))
     if not packs:
         raise ValueError("the pack list is empty")
+    _listed.update((p.id, p) for p in packs)
     return packs
 
 
@@ -255,7 +329,9 @@ def download(pack: Pack, progress: Callable[[int, int], object] | None = None,
              cancelled: Callable[[], bool] | None = None) -> Path:
     """Fetch `pack` into the app folder's "packs", checked against its SHA-256; its
     path. Raises updates.UpdateError with a message for the user. Call off the UI
-    thread."""
+    thread. A links pack: download_links (this gives just its path)."""
+    if pack.links:
+        return download_links(pack, progress, cancelled)[0]
     kept = backup.kept_free_pack(pack.id)
     if kept is not None and updates._sha256(kept) == pack.sha256:
         return kept   # added before and still kept: the same file, not fetched again
@@ -272,6 +348,91 @@ def download(pack: Pack, progress: Callable[[int, int], object] | None = None,
         path.unlink(missing_ok=True)
         raise updates.UpdateError(_("the pack's file is damaged, so it wasn't kept"))
     return path
+
+
+def download_links(pack: Pack, progress: Callable[[int, int], object] | None = None,
+                   cancelled: Callable[[], bool] | None = None) -> tuple[Path, int]:
+    """A links pack: each link fetched from Myinstants (LINK_WORKERS at once), then put
+    in a zip of the backup format at pack.path, so it's added, kept, reset and removed
+    like any other pack. (its path, how many links were skipped: gone, or not a sound).
+    `progress` gets (links done, links). Raises updates.UpdateError when none came or
+    it was cancelled. Call off the UI thread."""
+    kept = backup.kept_free_pack(pack.id)
+    if kept is not None:
+        return kept, 0   # added before and still kept: not fetched again
+    import tempfile
+    from concurrent.futures import ThreadPoolExecutor
+
+    from soundboard.online import ytdl
+    netlog.cause(FEATURE, f"You pressed Add on the {netlog.quoted(pack.name)} pack: its "
+                          f"sounds, from Myinstants")
+    tmp = Path(tempfile.mkdtemp(prefix="sb-linkpack-"))
+    got: dict[int, Path] = {}
+    errs: list[str] = []
+    lock = threading.Lock()
+    done = 0
+
+    def one(i: int, link: Link):
+        nonlocal done
+        if cancelled is not None and cancelled():
+            return
+        try:
+            path, _title = ytdl.download_audio(link.url, tmp / str(i), thumbnail=False)
+        except Exception as e:  # noqa: BLE001 - gone, offline, switched off: skipped
+            log.info("pack %s: skipped %s (%s)", pack.id, link.url, e)
+            with lock:
+                errs.append(errors.plain(e))
+        else:
+            with lock:
+                got[i] = Path(path)
+        with lock:
+            done += 1
+            n = done
+        if progress is not None:
+            progress(n, len(pack.links))
+
+    try:
+        for i in range(len(pack.links)):
+            (tmp / str(i)).mkdir()
+        with ThreadPoolExecutor(LINK_WORKERS, thread_name_prefix="pack-link") as pool:
+            list(pool.map(lambda a: one(*a), enumerate(pack.links)))
+        if cancelled is not None and cancelled():
+            raise updates.UpdateError(_("Stopped."))
+        if not got:
+            raise updates.UpdateError(errs[0] if errs else _("None of its sounds could be "
+                                                              "downloaded."))
+        _zip_links(pack, got, pack.path)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    return pack.path, len(pack.links) - len(got)
+
+
+def _zip_links(pack: Pack, got: dict[int, Path], dest: Path):
+    """The fetched sounds as a pack zip (docs/BACKUP-FORMAT.md), in the list's order."""
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    part = dest.with_name(dest.name + ".part")
+    order = sorted(got)
+    folders = []
+    try:
+        with zipfile.ZipFile(part, "w", zipfile.ZIP_STORED) as z:   # MP3s don't shrink
+            for n, i in enumerate(order, 1):
+                link, audio = pack.links[i], got[i]
+                folder = f"sounds/{n:03d}"
+                entry: dict = {"name": link.name, "audio": audio.name}
+                if link.category:
+                    entry["tags"] = [link.category]
+                z.write(audio, f"{folder}/{audio.name}")
+                z.writestr(f"{folder}/sound.json", json.dumps(entry, ensure_ascii=False))
+                folders.append(folder)
+            z.writestr("onionboard.json", json.dumps({
+                "format": "onionboard-board", "format_version": 1,
+                "categories": list(dict.fromkeys(pack.links[i].category for i in order
+                                                 if pack.links[i].category)),
+                "sounds": folders, "settings": None}, ensure_ascii=False))
+        part.replace(dest)
+    except BaseException:
+        part.unlink(missing_ok=True)
+        raise
 
 
 @dataclass
@@ -294,13 +455,49 @@ def previews_dir() -> Path:
 def samples(pack: Pack, cancelled: Callable[[], bool] | None = None) -> list[Sample]:
     """A few of `pack`'s sounds to try before adding it: its preview fetched (once,
     checked against its SHA-256) and unpacked. [] when it has none. Raises
-    updates.UpdateError (switched off, offline, a bad file). Call off the UI thread."""
-    if not pack.preview_url:
+    updates.UpdateError (switched off, offline, a bad file). Call off the UI thread.
+    A links pack's are its first SAMPLES links, fetched from Myinstants (_link_samples)."""
+    if not pack.preview_url and not pack.links:
         return []
     with _sample_locks_lock:
         lock = _sample_locks.setdefault(pack.id, threading.Lock())
     with lock:   # two at once wrote the same .part file: a bad checksum, no samples
-        return _samples(pack, cancelled)
+        return _link_samples(pack, cancelled) if pack.links else _samples(pack, cancelled)
+
+
+def _link_samples(pack: Pack, cancelled: Callable[[], bool] | None) -> list[Sample]:
+    """A links pack's first SAMPLES sounds, each fetched once (then kept with the other
+    previews, under its own name: the list changing fetches only what's new)."""
+    import tempfile
+
+    from soundboard.online import ytdl
+    d = previews_dir() / f"{pack.id}-links"
+    d.mkdir(parents=True, exist_ok=True)
+    found, errs = [], []
+    told = False
+    for link in pack.links[:SAMPLES]:
+        if cancelled is not None and cancelled():
+            raise updates.UpdateError(_("Stopped."))
+        kept = d / link.url.rsplit("/", 1)[-1]
+        if not kept.is_file():
+            if not told:
+                netlog.cause(FEATURE, f"You opened Free packs: a few sounds of "
+                                      f"{netlog.quoted(pack.name)} to try, from Myinstants")
+                told = True
+            tmp = Path(tempfile.mkdtemp(prefix="sb-linkpreview-"))
+            try:
+                got, _title = ytdl.download_audio(link.url, tmp, thumbnail=False)
+                shutil.move(str(got), kept)
+            except Exception as e:  # noqa: BLE001 - gone, offline, switched off
+                log.info("pack %s: no sample from %s (%s)", pack.id, link.url, e)
+                errs.append(errors.plain(e))
+                continue
+            finally:
+                shutil.rmtree(tmp, ignore_errors=True)
+        found.append(Sample(link.name, b"", kept))
+    if not found and errs:
+        raise updates.UpdateError(errs[0])
+    return found
 
 
 def _samples(pack: Pack, cancelled: Callable[[], bool] | None) -> list[Sample]:

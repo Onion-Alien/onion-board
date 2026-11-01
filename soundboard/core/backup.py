@@ -777,7 +777,7 @@ def _free_pack_name(free_id: str) -> str:
     """A free pack's name as the list of packs has it ("Streamer pack"), not its
     file's ("streamer")."""
     from soundboard.sounds import packs as free  # it imports this module
-    return next((p.name for p in free.built_in() if p.id == free_id), free_id)[:60]
+    return (free.name_of(free_id) or free_id)[:60]
 
 
 def kept_free_pack(free_id: str) -> Path | None:

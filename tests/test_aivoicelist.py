@@ -349,7 +349,7 @@ def test_card_makes_changes_and_deletes_your_own_voices(qapp, app_dir, monkeypat
     try:
         p.b_make.click()                                # made, and picked
         assert made["id"] in p._tile and p.current_voice() == made["id"]
-        assert not p.b_edit.isHidden() and not p.b_delete.isHidden()
+        assert p.b_edit.isHidden() and p.b_delete.isHidden()   # on its right-click
         p.bar.choose("mine")
         assert [vid for vid, b in p._tile.items() if not b.isHidden()] == [made["id"]]
         p.b_delete.click()                              # gone: back to the first voice

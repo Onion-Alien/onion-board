@@ -228,9 +228,11 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         rv.addWidget(self.lbl_sample)
         v.addWidget(self.ready_box)
 
-        # ---- the voice that's on: the voice changer's bar (the Voice tab pins it under
-        # its scrolling cards). Its picture and name, then Edit voice (the pitch), Make
-        # your own voice, Hear it (and change or delete it, one of yours)
+        # ---- the voice that's on: a bar like the voice changer's (the Voice tab pins it
+        # under its scrolling cards). Its picture and name, then Edit voice (the pitch),
+        # the same as the voice changer's bar. Make your own voice is the + card under
+        # Mine; Hear it, change and delete are on a card's right-click (kept here,
+        # hidden, for what they do)
         self.picked = QFrame()
         self.picked.setObjectName("picked")
         self.picked_box = QBoxLayout(QBoxLayout.Direction.LeftToRight, self.picked)
@@ -258,23 +260,22 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         self.b_make = QPushButton(_("Make your own voice"))
         icons.set_icon(self.b_make, "plus")
         self.b_make.clicked.connect(lambda: self.edit(None))
-        bflow.addWidget(self.b_make)
         self.b_hear = hear_button()
         self.b_hear.clicked.connect(lambda: (usage.used("ai-voice-hear"), self.previewer.hear(
             self.b_hear, self._voice(), self._sampled, self._say)))
-        bflow.addWidget(self.b_hear)
         self.b_edit = QPushButton()
         icons.set_icon(self.b_edit, "edit")
         self.b_edit.setToolTip(_("Change this voice"))
         self.b_edit.setAccessibleName(_("Change this voice"))
         self.b_edit.clicked.connect(lambda: self.edit(self.s["voice"]))
-        bflow.addWidget(self.b_edit)
         self.b_delete = QPushButton()
         icons.set_icon(self.b_delete, "trash", "danger_text")
         self.b_delete.setToolTip(_("Delete this voice (you can bring it back)"))
         self.b_delete.setAccessibleName(_("Delete this voice (you can bring it back)"))
         self.b_delete.clicked.connect(lambda: self.delete(self.s["voice"]))
-        bflow.addWidget(self.b_delete)
+        for b in (self.b_make, self.b_hear, self.b_edit, self.b_delete):
+            b.setParent(self.picked)   # (a parent: never a window of its own)
+            b.hide()
         self.b_bin = QPushButton("")
         self.b_bin.setObjectName("fold")
         icons.set_icon(self.b_bin, "trash", "muted", "text", size=12)

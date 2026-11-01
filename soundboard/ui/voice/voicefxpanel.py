@@ -275,8 +275,8 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self._sampled.connect(self._sample_done)
         self.btn_sample = hear_button()
         self.btn_sample.clicked.connect(lambda: self.hear(self._preset))
-        self.btn_sample.hide()
-        pb.addWidget(self.btn_sample)
+        self.btn_sample.setParent(self.picked)   # not on the bar (as an AI voice's has
+        self.btn_sample.hide()                   # none): a card's right-click Hear it
         pb.addStretch(1)
         v.addWidget(self.picked)
         self.picked.installEventFilter(self)   # (after its buttons: _fit_picked reads them)
@@ -853,6 +853,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
                     if not self.btn_sample.isHidden() else 0)
             m = self.picked_box.contentsMargins()
             line = self.picked.width() - m.left() - m.right()
+            line -= self._bar_extra()
             beside = (line - PICKED_ART - min(self.picked_name.sizeHint().width(), 140)
                       - 2 * self.picked_box.spacing())
             row, col = QBoxLayout.Direction.LeftToRight, QBoxLayout.Direction.TopToBottom
@@ -971,7 +972,19 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         if room is not None:
             self._picked_room = room
         self.picked.setVisible(getattr(self, "_picked_room", True)
-                               and self.btn_power.isChecked())
+                               and (self.btn_power.isChecked()
+                                    or getattr(self, "_paused", False)))
+
+    def set_paused(self, paused: bool):
+        """Paused from its bar (or by the Voices switch): the bar stays, dimmed, with its
+        play button to bring the voice back (VoicePanel._show_bar_controls)."""
+        self._paused = paused
+        self.show_picked_row()
+
+    def _bar_extra(self) -> int:
+        """The width of the bar's pause and ✕ (the Voice tab adds them), and a gap."""
+        ctl = getattr(self, "bar_controls", None)
+        return ctl.sizeHint().width() + self.picked_box.spacing() if ctl is not None else 0
 
     def _show_picked(self):
         """The bar under the cards: the voice that's on, by name."""
@@ -984,7 +997,6 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
                                                                             PICKED_ART)
         self.picked_pic.setPixmap(pm)
         self.picked_name.setText(shown)
-        self.btn_sample.setVisible(self.play_sample is not None)
 
     def _edited(self, etype: str = ""):
         if etype in KEEP:     # your mic clean-up, the Background: the voice stays picked
