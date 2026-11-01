@@ -10,6 +10,9 @@ import html
 from dataclasses import replace
 from typing import TYPE_CHECKING
 
+from PySide6.QtCore import QPoint
+from PySide6.QtWidgets import QMenu
+
 from soundboard.online import net, tor
 from soundboard.control import remote
 from soundboard.i18n import _
@@ -26,6 +29,10 @@ if TYPE_CHECKING:
 
 
 VOICE_TAB = "voice:"   # a card line's page that's a Voice tab ("voice:clean"), not Settings
+# the Voice tabs a click on their card line switches off and on, and the voices that are
+# (VoiceSwitch's keys; Clean mic isn't a voice): Languages is the computer voice and the
+# translating both. Add-ons isn't one: its line opens its tab
+VOICE_SWITCHES = {"clean": (), "fx": ("fx",), "ai": ("ai",), "speak": ("speak", "lang")}
 
 
 class NetControl(Controller):
@@ -34,6 +41,7 @@ class NetControl(Controller):
     def __init__(self, mw: MainWindow):
         super().__init__(mw)
         self._tor_told = ""             # what the last Tor toast said (one per change)
+        self._clean_off = False         # Clean mic switched off from its card line
 
     def _follow_switches(self):
         """Settings > Privacy & security changed: the parts of the window that go
@@ -124,12 +132,76 @@ class NetControl(Controller):
     def _voice_lines(self) -> list[onaircard.Line]:
         """A line for each Voice tab that's on (Clean mic, the voice changer, an AI voice,
         another language): they change your mic on every tab, so the card says so
-        wherever you are. Shown only while on, as Lite mode: the name in green says it."""
-        live = getattr(getattr(self.mw, "voice", None), "live_tabs", None)
-        if live is None:   # (the Voice tab switched off in Settings)
+        wherever you are, in green. One switched off from here (or paused on the Voice
+        tab) stays, in red, to switch back on with a click, until the app closes."""
+        voice = getattr(self.mw, "voice", None)
+        live = getattr(voice, "live_tabs", None)
+        if voice is None or live is None:   # (the Voice tab switched off in Settings)
             return []
-        return [onaircard.Line(icon, name, "ok", "\n".join((name, _("Click to change it."))),
-                               VOICE_TAB + key, "voice") for key, icon, name in live()]
+        from soundboard.ui.voice.voicecards import CARD_ICONS, TAB_KEYS, TAB_NAMES
+        on = {key for key, _icon, _name in live()}
+        if "clean" in on:   # on again, from anywhere: no longer waiting here
+            self._clean_off = False
+        paused = set(voice.paused_keys())
+        lines = []
+        for key in TAB_KEYS:
+            name = TAB_NAMES[key]()
+            if key in on:
+                tip = (_("Click to turn it off. Right-click to open it.")
+                       if key in VOICE_SWITCHES else _("Click to change it."))
+                tone = "ok"
+            elif (self._clean_off if key == "clean"
+                  else paused & set(VOICE_SWITCHES.get(key, ()))):
+                tip, tone = _("Off. Click to turn it back on. Right-click to open it."), "error"
+            else:
+                continue
+            lines.append(onaircard.Line(CARD_ICONS[key], name, tone, "\n".join((name, tip)),
+                                        VOICE_TAB + key, "voice"))
+        return lines
+
+    def toggle_voice(self, key: str):
+        """A Voice tab's line clicked: on, it goes off (it stays, in red); off, it comes
+        back as it was. The Voice tab's own pause does the same (VoiceSwitch.toggle_one)."""
+        voice = self.mw.voice
+        if key == "clean":
+            was = voice.clean.is_on()
+            voice.clean.set_on(not was)
+            self._clean_off = was and not voice.clean.is_on()
+        else:
+            keys = VOICE_SWITCHES[key]
+            on = [k for k in keys if k in voice.on_keys()]
+            for k in on or [k for k in keys if k in voice.paused_keys()]:
+                voice.toggle_one(k)
+        self._net_follow()
+
+    def remove_voice(self, key: str):
+        """A Voice tab's line's Remove: off, and its line goes (as the Voice tab's close
+        button: the Voices switch won't bring it back either)."""
+        voice = self.mw.voice
+        if key == "clean":
+            voice.clean.set_on(False)
+            self._clean_off = False
+        else:
+            for k in VOICE_SWITCHES[key]:
+                voice.forget_one(k)
+        self._net_follow()
+
+    def line_menu(self, page: str, pos: QPoint):
+        """A Voice tab's line right-clicked: its menu (voice_menu), where it was clicked."""
+        menu = self.voice_menu(page)
+        if menu is not None:
+            menu.exec(pos)
+
+    def voice_menu(self, page: str) -> QMenu | None:
+        """A Voice tab's line's menu: Open it there, or Remove it from the card (None for
+        the other lines)."""
+        key = page[len(VOICE_TAB):] if page.startswith(VOICE_TAB) else ""
+        if key not in VOICE_SWITCHES:
+            return None
+        menu = QMenu(self.mw)
+        menu.addAction(_("Open"), lambda: self.open_page(page))
+        menu.addAction(_("Remove"), lambda: self.remove_voice(key))
+        return menu
 
     @staticmethod
     def _lite_line() -> onaircard.Line | None:
@@ -194,7 +266,16 @@ class NetControl(Controller):
         mw.remote_changed.emit()   # (maybe from the thread that stopped it)
 
     def open_line(self, page: str):
-        """A card line clicked: its Settings page, or its tab on the Voice tab."""
+        """A card line clicked: a Voice tab's line switches it off or back on (toggle_voice);
+        the rest open their page."""
+        key = page[len(VOICE_TAB):] if page.startswith(VOICE_TAB) else ""
+        if key in VOICE_SWITCHES:
+            self.toggle_voice(key)
+        else:
+            self.open_page(page)
+
+    def open_page(self, page: str):
+        """A card line's Settings page, or its tab on the Voice tab."""
         mw = self.mw
         if not page.startswith(VOICE_TAB):
             mw.setctl.open_settings(page)

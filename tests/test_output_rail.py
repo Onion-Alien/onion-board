@@ -437,3 +437,56 @@ def test_card_lines_start_in_one_place_whatever_else_is_on(window, qapp):  # noq
     icon_x = {p[0] for p in places if p[0] != "name"} | {p[1] for p in places if p[0] == "name"}
     words_x = {p[1] for p in places if p[0] != "name"}
     assert len(icon_x) == 1 and len(words_x) == 1, places
+
+
+def test_voice_lines_switch_off_and_back_on_from_the_card(window, qapp, monkeypatch):  # noqa: F811
+    """A Voice tab's line: a click switches it off (the line stays, red) and back on as it
+    was, without leaving the tab you're on; Remove switches it off and drops the line.
+    Add-ons and the rest still open their page."""
+    window.resize(1275, 980)
+    window.show()
+    window.rail.set_open(True)
+    voice, card = window.voice, window.rail.output
+
+    def line(key):
+        for n, ln in zip(card.net, card._lines):
+            if ln.page == "voice:" + key:
+                return n, ln
+        return None, None
+
+    voice.fx.pick("Robot")
+    qapp.processEvents()
+    window.netctl._net_follow()
+    n, ln = line("fx")
+    assert ln.tone == "ok" and "turn it off" in ln.full
+    before = window.tabs.currentWidget()
+    QTest.mouseClick(n, Qt.MouseButton.LeftButton)
+    qapp.processEvents()
+    n, ln = line("fx")
+    assert not voice.fx.btn_power.isChecked()
+    assert ln is not None and ln.tone == "error" and "back on" in ln.full   # stays, red
+    assert window.tabs.currentWidget() is before                          # no jump
+    QTest.mouseClick(n, Qt.MouseButton.LeftButton)
+    qapp.processEvents()
+    assert voice.fx.btn_power.isChecked() and voice.fx.preset == "Robot"
+    assert line("fx")[1].tone == "ok"
+    window.netctl.remove_voice("fx")                 # right-click > Remove
+    qapp.processEvents()
+    assert not voice.fx.btn_power.isChecked() and line("fx")[1] is None
+    assert "fx" not in voice.paused_keys()
+    # Clean mic: as if RNNoise were there (not on a test PC); what it does to the sound
+    # isn't what this is about
+    monkeypatch.setattr(voice.clean, "ok", True)
+    monkeypatch.setattr(voice.clean, "_apply", lambda: None)
+    voice.clean.set_on(True)
+    qapp.processEvents()
+    window.netctl._net_follow()
+    QTest.mouseClick(line("clean")[0], Qt.MouseButton.LeftButton)
+    qapp.processEvents()
+    assert not voice.clean.is_on() and line("clean")[1].tone == "error"
+    QTest.mouseClick(line("clean")[0], Qt.MouseButton.LeftButton)
+    qapp.processEvents()
+    assert voice.clean.is_on() and line("clean")[1].tone == "ok"
+    window.netctl.remove_voice("clean")
+    qapp.processEvents()
+    assert not voice.clean.is_on() and line("clean")[1] is None

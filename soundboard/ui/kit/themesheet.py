@@ -163,6 +163,7 @@ QFrame#railoutput QPushButton#railpair:hover { background:$btn_hover; }
 QFrame#railoutput QPushButton#railpair[muted="true"] { background:$danger_bg; }
 QFrame#railoutput QPushButton#railpair:focus { border-color:$accent; }
 QFrame#railoutput QFrame#railoutputpanel { background:$btn; border:none; border-radius:8px; }
+QFrame#railoutputpanel QLabel[tone="error"] { color:$off_text; }   /* a voice switched off */
 QFrame#railoutput QFrame#railoutputpanel QPushButton#railoutputsetup[action="true"]:hover {
     background:$panel; }   /* the card's own: its words' colours are made for it */
 QFrame#railoutput QPushButton#railoutputsetup { background:transparent;

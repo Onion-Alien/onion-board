@@ -122,6 +122,11 @@ class VoiceSwitch(_Panel):
         """The Voices switch's state: something here is changing your mic."""
         return bool(self.on_keys())
 
+    def paused_keys(self) -> list[str]:
+        """The voices turned off one at a time (a chip, a bar's pause, the On Air card) or
+        by the switch, waiting to be turned back on: "fx", "ai", "speak", "lang"."""
+        return list(self._back)
+
     def back_keys(self) -> list[str]:
         """What Voices ON would turn on: what it turned off, else the voice changer
         with the voice picked on it (none after Reset: the voice changer is empty, or
