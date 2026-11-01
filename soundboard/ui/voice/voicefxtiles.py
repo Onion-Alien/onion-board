@@ -52,6 +52,7 @@ class VoiceFxTiles(_Base):
         _listed: Any
         _parent: Any
         _preset: Any
+        _end_preview: Any
         _refresh: Any
         _sampled: Any
         _saved_tiles: Any
@@ -138,6 +139,7 @@ class VoiceFxTiles(_Base):
     def _tile_clicked(self, name: str):
         """A voice card: that voice, on. The one that's on already: the voice changer
         off (a second click undoes the first, no hunting for the switch)."""
+        self._end_preview()   # (Edit voice showing another voice: back to the one on)
         if self.btn_power.isChecked() and name == self._preset:
             self.btn_power.setChecked(False)   # its toggled handler applies it
             return

@@ -90,9 +90,44 @@ def test_voice_card_menu_edits_that_voice(window):  # noqa: F811
     tile = fx._tile["Hothead"]
     texts = menu_texts(lambda: fx._tile_menu("Hothead", tile.mapToGlobal(QPoint(5, 5))))
     assert "Edit voice…" in texts
+    fx.pick("Robot")
+    fx.edit_voice("Robot")   # the voice that's on: edited live, as the bar's button does
+    assert fx.preset == "Robot" and fx.dlg.isVisible() and fx._preview is None
+    fx.dlg.close()
+
+
+def test_edit_voice_on_a_card_never_turns_that_voice_on(window):  # noqa: F811
+    fx = window.voice.fx
+    fx.btn_power.setChecked(False)
+    sent = []
+    fx.changed.connect(sent.append)
     fx.edit_voice("Hothead")
-    assert fx.preset == "Hothead" and fx.btn_power.isChecked() and fx.dlg.isVisible()
-    assert fx.dlg_name.text() == fx.title_of("Hothead")
+    assert fx.dlg.isVisible() and fx.dlg_name.text() == fx.title_of("Hothead")
+    assert fx.rows["pitch"].chk.isChecked() or fx._count_on() > 0   # Hothead's own
+    assert not fx.btn_power.isChecked() and not fx._tile["Hothead"].isChecked()
+    assert not fx.picked.isVisibleTo(fx)
+    fx.rows["pitch"].chk.setChecked(not fx.rows["pitch"].chk.isChecked())   # an edit
+    assert not fx.btn_power.isChecked()
+    assert sent and all(not s["enabled"] for s in sent)   # the mic never got it
+    fx.dlg.close()
+    assert not fx.btn_power.isChecked() and fx.spec()["enabled"] is False
+
+    # another voice on: it stays on, and comes back to the editor when it closes
+    fx.pick("Robot")
+    robot = fx.spec()["effects"]
+    sent.clear()
+    fx.edit_voice("Hothead")
+    assert fx.btn_power.isChecked() and fx.preset == "Robot"
+    assert fx._tile["Robot"].isChecked() and not fx._tile["Hothead"].isChecked()
+    assert fx.picked_name.text() == fx.title_of("Robot")
+    assert all(s["preset"] == "Robot" and s["effects"] == robot for s in sent)
+    fx.dlg.close()
+    assert fx._preview is None and fx._preset == "Robot" and fx.spec()["effects"] == robot
+
+    # a card clicked while Edit voice shows another: that voice, on, as always
+    fx.edit_voice("Hothead")
+    fx._tile_clicked("Chipmunk")
+    assert fx._preview is None and fx.preset == "Chipmunk" and fx.btn_power.isChecked()
     fx.dlg.close()
 
 

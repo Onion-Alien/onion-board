@@ -32,6 +32,7 @@ class VoiceFxCards(_Base):
         _fx_cols: Any
         _pages: Any
         _placed: Any
+        _preview: Any
         _refresh: Any
         _replace: Any
         _spec_effects: Any
@@ -147,7 +148,7 @@ class VoiceFxCards(_Base):
     def effects_delay(self) -> float:
         """Milliseconds the effects that are on add (worked out from their settings, so
         it's known before the mic has sent anything)."""
-        if not self.btn_power.isChecked():
+        if not self.btn_power.isChecked() and self._preview is None:
             return 0.0
         total = 0.0
         for t, r in self.rows.items():
@@ -168,7 +169,7 @@ class VoiceFxCards(_Base):
         return total * 1000
 
     def _show_delay(self):
-        on = self.btn_power.isChecked()
+        on = self.btn_power.isChecked() or self._preview is not None
         self.delay.setVisible(on)
         if not on:
             return
