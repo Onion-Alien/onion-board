@@ -4855,5 +4855,19 @@
   "Last time Onion Board closed while installing AI voices. Install them again?": "Onion Board geçen sefer yapay zekâ sesleri kurulurken kapandı. Yeniden kurulsun mu?",
   "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Onion Board geçen sefer Onion Pocket kurulurken kapandı. Yeniden kurulsun mu?",
   "Last time Onion Board closed while installing Onion Watch. Install it again?": "Onion Board geçen sefer Onion Watch kurulurken kapandı. Yeniden kurulsun mu?",
-  "Last time Onion Board closed while installing speech recognition. Install it again?": "Onion Board geçen sefer konuşma tanıma kurulurken kapandı. Yeniden kurulsun mu?"
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Onion Board geçen sefer konuşma tanıma kurulurken kapandı. Yeniden kurulsun mu?",
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Parça {n}</b> ({start} - {end}): aşağıdaki ayarlar yalnızca bu kısmı değiştirir.",
+  "A voice is for the whole sound: click outside the splices to get back to it": "Ses tonu tüm ses içindir: geri dönmek için parçaların dışına tıkla",
+  "Back to the whole sound": "Tüm sese dön",
+  "Copy to clipboard": "Panoya kopyala",
+  "Copying splice {n}…": "{n}. parça kopyalanıyor…",
+  "Couldn't copy it: {why}": "Kopyalanamadı: {why}",
+  "Edit its effects": "Efektlerini düzenle",
+  "Play now": "Şimdi çal",
+  "Save as new pad…": "Yeni pad olarak kaydet…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "Aşağıdaki ayarlar yine tüm sesi değiştirir (dalga üzerinde Esc de bunu yapar)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Parçalar birleşik çalınca ve parçanın kendi Şimdi çal, Yeni pad olarak kaydet ve Kopyala seçeneklerinde duyulur (üstüne sağ tıkla)",
+  "{name} (splice {n})": "{name} (parça {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ Kopyalandı: bir sohbete ya da klasöre yapıştır",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Yakınlaştırmak için kaydır. Bir parçanın seviye çizgisindeki noktaları sürükle: köşeleri yana geçiş için, yukarı ya da aşağı ses düzeyi için; uçları yukarı ya da aşağı geçişin nereden başlayacağı için. Kendi efektleri için bir parçaya tıkla, fazlası için sağ tıkla."
 }

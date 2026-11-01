@@ -4947,5 +4947,19 @@
   "Last time Onion Board closed while installing AI voices. Install them again?": "Минулого разу Onion Board закрився під час встановлення ШІ-голосів. Встановити їх знову?",
   "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Минулого разу Onion Board закрився під час встановлення Onion Pocket. Встановити знову?",
   "Last time Onion Board closed while installing Onion Watch. Install it again?": "Минулого разу Onion Board закрився під час встановлення Onion Watch. Встановити знову?",
-  "Last time Onion Board closed while installing speech recognition. Install it again?": "Минулого разу Onion Board закрився під час встановлення розпізнавання мовлення. Встановити знову?"
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Минулого разу Onion Board закрився під час встановлення розпізнавання мовлення. Встановити знову?",
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Фрагмент {n}</b> ({start}–{end}): налаштування нижче змінюють лише цю частину.",
+  "A voice is for the whole sound: click outside the splices to get back to it": "Голос — для всього звуку: клацни поза фрагментами, щоб повернутися",
+  "Back to the whole sound": "Назад до всього звуку",
+  "Copy to clipboard": "Копіювати в буфер обміну",
+  "Copying splice {n}…": "Копіюю фрагмент {n}…",
+  "Couldn't copy it: {why}": "Не вдалося скопіювати: {why}",
+  "Edit its effects": "Змінити його ефекти",
+  "Play now": "Програти зараз",
+  "Save as new pad…": "Зберегти як нову кнопку…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "Налаштування нижче знову змінюють весь звук (Esc на хвилі теж це робить)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Їх чути, коли фрагменти грають склеєними, і в його Програти зараз, Зберегти як нову кнопку та Копіювати (правий клік на ньому)",
+  "{name} (splice {n})": "{name} (фрагмент {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ Скопійовано: встав у чат або теку",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Прокручування наближає. На лінії гучності фрагмента тягни точки: кути вбік — для плавного переходу, вгору чи вниз — для гучності, кінці вгору чи вниз — звідки починається перехід. Клацни фрагмент для власних ефектів, правий клік — більше."
 }

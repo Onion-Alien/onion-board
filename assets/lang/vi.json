@@ -4763,5 +4763,19 @@
   "Last time Onion Board closed while installing AI voices. Install them again?": "Lần trước Onion Board đã đóng khi đang cài đặt giọng AI. Cài đặt lại?",
   "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Lần trước Onion Board đã đóng khi đang cài đặt Onion Pocket. Cài đặt lại?",
   "Last time Onion Board closed while installing Onion Watch. Install it again?": "Lần trước Onion Board đã đóng khi đang cài đặt Onion Watch. Cài đặt lại?",
-  "Last time Onion Board closed while installing speech recognition. Install it again?": "Lần trước Onion Board đã đóng khi đang cài đặt nhận dạng giọng nói. Cài đặt lại?"
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Lần trước Onion Board đã đóng khi đang cài đặt nhận dạng giọng nói. Cài đặt lại?",
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Đoạn {n}</b> ({start} đến {end}): các cài đặt bên dưới chỉ đổi phần này.",
+  "A voice is for the whole sound: click outside the splices to get back to it": "Giọng là cho cả âm thanh: bấm ra ngoài các đoạn để quay lại",
+  "Back to the whole sound": "Quay lại cả âm thanh",
+  "Copy to clipboard": "Sao chép vào bảng nhớ tạm",
+  "Copying splice {n}…": "Đang sao chép đoạn {n}…",
+  "Couldn't copy it: {why}": "Không sao chép được: {why}",
+  "Edit its effects": "Sửa hiệu ứng của nó",
+  "Play now": "Phát ngay",
+  "Save as new pad…": "Lưu thành nút mới…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "Các cài đặt bên dưới lại đổi cả âm thanh (Esc trên dạng sóng cũng vậy)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Bạn nghe chúng khi các đoạn phát ghép lại, và trong Phát ngay, Lưu thành nút mới và Sao chép của đoạn đó (chuột phải vào nó)",
+  "{name} (splice {n})": "{name} (đoạn {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ Đã sao chép: dán vào khung chat hoặc thư mục",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Cuộn để phóng to. Trên đường mức của một đoạn, kéo các chấm: góc sang ngang để làm to dần/nhỏ dần và lên xuống để chỉnh âm lượng, hai đầu lên xuống để chọn mức bắt đầu. Bấm vào một đoạn để có hiệu ứng riêng, chuột phải để xem thêm."
 }

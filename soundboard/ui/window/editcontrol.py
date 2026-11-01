@@ -267,6 +267,7 @@ class EditControl(Controller):
             lambda d=d: d.effects.trim.seek_to.connect(
                 lambda t, done, d=d: self._seek(d, t, done)))
         d.effects_reset.connect(lambda d=d: self._live_apply(d.meta.id))   # at once
+        d.splice_saved.connect(lambda fx, name, d=d: self._save_splice(d, fx, name))
         d.vol.valueChanged.connect(lambda _v, d=d: self._vol_edited(d))
         p = EditPlayer(mw, d)
         mw.vol_sound.changed.connect(p.set_volume)   # (freed with it: bound slots)
@@ -571,6 +572,29 @@ class EditControl(Controller):
         mw.hkctl._clear_dupe_hotkey(new)
         mw.soundctl.add_to_board(new, after=m)
         self._rerender(new, m.fx, mw.audio.get(m.id))
+
+    def _save_splice(self, d: EditDialog, fx: dict, name: str):
+        """A splice's menu, Save as new pad: a copy of the sound placed after it, playing
+        just that splice with effects `fx` (soundfx.splice_alone), and the window's
+        volume and fades. The window stays open; the sound itself is unchanged."""
+        mw = self.mw
+        m = mw.meta(d.meta.id)
+        if m is None:
+            return
+        try:
+            new = duplicate(m, name)
+        except OSError as e:
+            errors.warn(mw, _("Couldn't copy the sound"), e)
+            return
+        videos.copy_link(m.id, new.id)
+        new.fx = fx
+        new.volume = d.vol.value() / 100
+        new.fade_in, new.fade_out = d.fades()
+        new.hotkey = ""
+        mw.soundctl.add_to_board(new, after=m)
+        self._rerender(new)
+        mw._save_now()
+        d._say(_("✓ Added “{name}”", name=new.name), 3000)
 
     def _rerender(self, m: SoundMeta, old_fx: dict | None = None, old_data=None,
                   keep: bool = False):

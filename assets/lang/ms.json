@@ -4763,5 +4763,19 @@
   "Last time Onion Board closed while installing AI voices. Install them again?": "Kali terakhir Onion Board tertutup semasa memasang suara AI. Pasang semula?",
   "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Kali terakhir Onion Board tertutup semasa memasang Onion Pocket. Pasang semula?",
   "Last time Onion Board closed while installing Onion Watch. Install it again?": "Kali terakhir Onion Board tertutup semasa memasang Onion Watch. Pasang semula?",
-  "Last time Onion Board closed while installing speech recognition. Install it again?": "Kali terakhir Onion Board tertutup semasa memasang pengecaman pertuturan. Pasang semula?"
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Kali terakhir Onion Board tertutup semasa memasang pengecaman pertuturan. Pasang semula?",
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Keratan {n}</b> ({start} hingga {end}): tetapan di bawah hanya mengubah bahagian ini.",
+  "A voice is for the whole sound: click outside the splices to get back to it": "Suara adalah untuk seluruh bunyi: klik di luar keratan untuk kembali",
+  "Back to the whole sound": "Kembali ke seluruh bunyi",
+  "Copy to clipboard": "Salin ke papan keratan",
+  "Copying splice {n}…": "Menyalin keratan {n}…",
+  "Couldn't copy it: {why}": "Tidak dapat menyalin: {why}",
+  "Edit its effects": "Edit kesannya",
+  "Play now": "Main sekarang",
+  "Save as new pad…": "Simpan sebagai pad baharu…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "Tetapan di bawah mengubah seluruh bunyi semula (Esc pada gelombang juga begitu)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Ia didengar apabila keratan dimainkan bergabung, dan dalam Main sekarang, Simpan sebagai pad baharu dan Salin keratan itu (klik kanan padanya)",
+  "{name} (splice {n})": "{name} (keratan {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ Disalin: tampal dalam sembang atau folder",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Tatal untuk zum. Pada garis paras keratan, seret titiknya: bucu ke tepi untuk fade dan naik atau turun untuk kelantangan, hujung naik atau turun untuk paras mula fade. Klik keratan untuk kesan sendiri, klik kanan untuk lagi."
 }

@@ -4763,5 +4763,19 @@
   "Last time Onion Board closed while installing AI voices. Install them again?": "上次安装 AI 语音时 Onion Board 关闭了。要重新安装吗？",
   "Last time Onion Board closed while installing Onion Pocket. Install it again?": "上次安装 Onion Pocket 时 Onion Board 关闭了。要重新安装吗？",
   "Last time Onion Board closed while installing Onion Watch. Install it again?": "上次安装 Onion Watch 时 Onion Board 关闭了。要重新安装吗？",
-  "Last time Onion Board closed while installing speech recognition. Install it again?": "上次安装语音识别时 Onion Board 关闭了。要重新安装吗？"
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "上次安装语音识别时 Onion Board 关闭了。要重新安装吗？",
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>片段 {n}</b>（{start} 到 {end}）：下面的设置只改这一段。",
+  "A voice is for the whole sound: click outside the splices to get back to it": "人声作用于整个声音：点片段外面即可返回",
+  "Back to the whole sound": "回到整个声音",
+  "Copy to clipboard": "复制到剪贴板",
+  "Copying splice {n}…": "正在复制片段 {n}…",
+  "Couldn't copy it: {why}": "复制失败：{why}",
+  "Edit its effects": "编辑它的效果",
+  "Play now": "立即播放",
+  "Save as new pad…": "另存为新按钮…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "下面的设置又会改动整个声音（在波形上按 Esc 也可以）",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "片段合并播放时，以及在该片段的立即播放、另存为新按钮和复制中都能听到（右键点击它）",
+  "{name} (splice {n})": "{name}（片段 {n}）",
+  "✓ Copied: paste it into a chat or a folder": "✓ 已复制：可粘贴到聊天或文件夹",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "滚动即可缩放。在片段的音量线上拖动圆点：拐角左右拖动设置淡入淡出，上下拖动设置音量；两端上下拖动设置淡变的起始音量。点击片段可给它单独的效果，右键查看更多。"
 }

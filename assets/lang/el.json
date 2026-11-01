@@ -4855,5 +4855,19 @@
   "Last time Onion Board closed while installing AI voices. Install them again?": "Την προηγούμενη φορά το Onion Board έκλεισε κατά την εγκατάσταση των φωνών AI. Να εγκατασταθούν ξανά;",
   "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Την προηγούμενη φορά το Onion Board έκλεισε κατά την εγκατάσταση του Onion Pocket. Να εγκατασταθεί ξανά;",
   "Last time Onion Board closed while installing Onion Watch. Install it again?": "Την προηγούμενη φορά το Onion Board έκλεισε κατά την εγκατάσταση του Onion Watch. Να εγκατασταθεί ξανά;",
-  "Last time Onion Board closed while installing speech recognition. Install it again?": "Την προηγούμενη φορά το Onion Board έκλεισε κατά την εγκατάσταση της αναγνώρισης ομιλίας. Να εγκατασταθεί ξανά;"
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Την προηγούμενη φορά το Onion Board έκλεισε κατά την εγκατάσταση της αναγνώρισης ομιλίας. Να εγκατασταθεί ξανά;",
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Απόσπασμα {n}</b> ({start} έως {end}): οι ρυθμίσεις από κάτω αλλάζουν μόνο αυτό το κομμάτι.",
+  "A voice is for the whole sound: click outside the splices to get back to it": "Η φωνή είναι για όλο τον ήχο: κάνε κλικ έξω από τα αποσπάσματα για να επιστρέψεις",
+  "Back to the whole sound": "Πίσω σε όλο τον ήχο",
+  "Copy to clipboard": "Αντιγραφή στο πρόχειρο",
+  "Copying splice {n}…": "Αντιγραφή αποσπάσματος {n}…",
+  "Couldn't copy it: {why}": "Δεν έγινε αντιγραφή: {why}",
+  "Edit its effects": "Επεξεργασία των εφέ του",
+  "Play now": "Αναπαραγωγή τώρα",
+  "Save as new pad…": "Αποθήκευση ως νέο κουμπί…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "Οι ρυθμίσεις από κάτω αλλάζουν ξανά όλο τον ήχο (το Esc στην κυματομορφή το κάνει επίσης)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Ακούγονται όταν τα αποσπάσματα παίζουν ενωμένα, και στα δικά του Αναπαραγωγή τώρα, Αποθήκευση ως νέο κουμπί και Αντιγραφή (δεξί κλικ πάνω του)",
+  "{name} (splice {n})": "{name} (απόσπασμα {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ Αντιγράφηκε: επικόλλησέ το σε συνομιλία ή φάκελο",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Κύλισε για ζουμ. Στη γραμμή στάθμης ενός αποσπάσματος σύρε τις κουκκίδες: τις γωνίες στο πλάι για σταδιακή μετάβαση και πάνω ή κάτω για την ένταση, τις άκρες πάνω ή κάτω για το πού ξεκινά η μετάβαση. Κάνε κλικ σε απόσπασμα για δικά του εφέ, δεξί κλικ για περισσότερα."
 }

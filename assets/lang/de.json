@@ -4855,5 +4855,19 @@
   "Last time Onion Board closed while installing AI voices. Install them again?": "Onion Board wurde letztes Mal beim Installieren der KI-Stimmen geschlossen. Erneut installieren?",
   "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Onion Board wurde letztes Mal beim Installieren von Onion Pocket geschlossen. Erneut installieren?",
   "Last time Onion Board closed while installing Onion Watch. Install it again?": "Onion Board wurde letztes Mal beim Installieren von Onion Watch geschlossen. Erneut installieren?",
-  "Last time Onion Board closed while installing speech recognition. Install it again?": "Onion Board wurde letztes Mal beim Installieren der Spracherkennung geschlossen. Erneut installieren?"
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Onion Board wurde letztes Mal beim Installieren der Spracherkennung geschlossen. Erneut installieren?",
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Ausschnitt {n}</b> ({start} bis {end}): Die Einstellungen unten ändern nur diesen Teil.",
+  "A voice is for the whole sound: click outside the splices to get back to it": "Eine Stimme gilt für den ganzen Sound: Klicke neben die Ausschnitte, um zurückzukommen",
+  "Back to the whole sound": "Zurück zum ganzen Sound",
+  "Copy to clipboard": "In die Zwischenablage kopieren",
+  "Copying splice {n}…": "Ausschnitt {n} wird kopiert…",
+  "Couldn't copy it: {why}": "Konnte nicht kopiert werden: {why}",
+  "Edit its effects": "Seine Effekte bearbeiten",
+  "Play now": "Jetzt abspielen",
+  "Save as new pad…": "Als neues Pad speichern…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "Die Einstellungen unten ändern wieder den ganzen Sound (Esc auf der Wellenform tut das auch)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Sie sind zu hören, wenn die Ausschnitte verbunden spielen, und in Jetzt abspielen, Als neues Pad speichern und Kopieren des Ausschnitts (Rechtsklick darauf)",
+  "{name} (splice {n})": "{name} (Ausschnitt {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ Kopiert: Füge es in einen Chat oder Ordner ein",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Scrollen zoomt. Zieh auf der Pegellinie eines Ausschnitts die Punkte: die Ecken seitlich für eine Blende und hoch oder runter für die Lautstärke, die Enden hoch oder runter dafür, wo eine Blende beginnt. Klick auf einen Ausschnitt für eigene Effekte, Rechtsklick für mehr."
 }

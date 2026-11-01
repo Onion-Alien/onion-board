@@ -4855,5 +4855,19 @@
   "Last time Onion Board closed while installing AI voices. Install them again?": "Последния път Onion Board се затвори, докато инсталираше AI гласовете. Да ги инсталирам ли отново?",
   "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Последния път Onion Board се затвори, докато инсталираше Onion Pocket. Да го инсталирам ли отново?",
   "Last time Onion Board closed while installing Onion Watch. Install it again?": "Последния път Onion Board се затвори, докато инсталираше Onion Watch. Да го инсталирам ли отново?",
-  "Last time Onion Board closed while installing speech recognition. Install it again?": "Последния път Onion Board се затвори, докато инсталираше разпознаването на говор. Да го инсталирам ли отново?"
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Последния път Onion Board се затвори, докато инсталираше разпознаването на говор. Да го инсталирам ли отново?",
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Откъс {n}</b> ({start} до {end}): настройките отдолу променят само тази част.",
+  "A voice is for the whole sound: click outside the splices to get back to it": "Гласът е за целия звук: кликни извън откъсите, за да се върнеш",
+  "Back to the whole sound": "Обратно към целия звук",
+  "Copy to clipboard": "Копирай в клипборда",
+  "Copying splice {n}…": "Копиране на откъс {n}…",
+  "Couldn't copy it: {why}": "Не можа да се копира: {why}",
+  "Edit its effects": "Редактирай ефектите му",
+  "Play now": "Пусни сега",
+  "Save as new pad…": "Запази като нов бутон…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "Настройките отдолу пак променят целия звук (Esc върху вълната също го прави)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Чуват се, когато откъсите свирят слети, и в неговите Пусни сега, Запази като нов бутон и Копирай (десен клик върху него)",
+  "{name} (splice {n})": "{name} (откъс {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ Копирано: постави го в чат или папка",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Скролвай за приближаване. По линията на нивото на откъс влачи точките: ъглите встрани за плавен преход и нагоре или надолу за силата, краищата нагоре или надолу за нивото, от което започва преходът. Кликни откъс за собствени ефекти, десен клик за още."
 }

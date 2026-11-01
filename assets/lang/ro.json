@@ -4947,5 +4947,19 @@
   "Last time Onion Board closed while installing AI voices. Install them again?": "Data trecută, Onion Board s-a închis în timp ce instala vocile AI. Le instalezi din nou?",
   "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Data trecută, Onion Board s-a închis în timp ce instala Onion Pocket. Îl instalezi din nou?",
   "Last time Onion Board closed while installing Onion Watch. Install it again?": "Data trecută, Onion Board s-a închis în timp ce instala Onion Watch. Îl instalezi din nou?",
-  "Last time Onion Board closed while installing speech recognition. Install it again?": "Data trecută, Onion Board s-a închis în timp ce instala recunoașterea vorbirii. O instalezi din nou?"
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Data trecută, Onion Board s-a închis în timp ce instala recunoașterea vorbirii. O instalezi din nou?",
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Fragmentul {n}</b> ({start} – {end}): setările de mai jos schimbă doar această parte.",
+  "A voice is for the whole sound: click outside the splices to get back to it": "O voce e pentru tot sunetul: dă clic în afara fragmentelor ca să revii",
+  "Back to the whole sound": "Înapoi la tot sunetul",
+  "Copy to clipboard": "Copiază în clipboard",
+  "Copying splice {n}…": "Se copiază fragmentul {n}…",
+  "Couldn't copy it: {why}": "Nu s-a putut copia: {why}",
+  "Edit its effects": "Editează-i efectele",
+  "Play now": "Redă acum",
+  "Save as new pad…": "Salvează ca pad nou…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "Setările de mai jos schimbă din nou tot sunetul (și Esc pe formă de undă face asta)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Se aud când fragmentele sunt redate unite, și în Redă acum, Salvează ca pad nou și Copiază ale fragmentului (clic dreapta pe el)",
+  "{name} (splice {n})": "{name} (fragmentul {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ Copiat: lipește-l într-un chat sau un dosar",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Derulează ca să mărești. Pe linia de nivel a unui fragment trage punctele: colțurile în lateral pentru o estompare și în sus sau în jos pentru volum, capetele în sus sau în jos pentru nivelul de la care pornește estomparea. Dă clic pe un fragment pentru efecte proprii, clic dreapta pentru mai mult."
 }

@@ -4763,5 +4763,19 @@
   "Last time Onion Board closed while installing AI voices. Install them again?": "Terakhir kali Onion Board tertutup saat menginstal suara AI. Instal lagi?",
   "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Terakhir kali Onion Board tertutup saat menginstal Onion Pocket. Instal lagi?",
   "Last time Onion Board closed while installing Onion Watch. Install it again?": "Terakhir kali Onion Board tertutup saat menginstal Onion Watch. Instal lagi?",
-  "Last time Onion Board closed while installing speech recognition. Install it again?": "Terakhir kali Onion Board tertutup saat menginstal pengenalan ucapan. Instal lagi?"
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Terakhir kali Onion Board tertutup saat menginstal pengenalan ucapan. Instal lagi?",
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Potongan {n}</b> ({start} sampai {end}): pengaturan di bawah hanya mengubah bagian ini.",
+  "A voice is for the whole sound: click outside the splices to get back to it": "Suara berlaku untuk seluruh sound: klik di luar potongan untuk kembali",
+  "Back to the whole sound": "Kembali ke seluruh sound",
+  "Copy to clipboard": "Salin ke papan klip",
+  "Copying splice {n}…": "Menyalin potongan {n}…",
+  "Couldn't copy it: {why}": "Gagal menyalin: {why}",
+  "Edit its effects": "Edit efeknya",
+  "Play now": "Putar sekarang",
+  "Save as new pad…": "Simpan sebagai pad baru…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "Pengaturan di bawah kembali mengubah seluruh sound (Esc di gelombang juga bisa)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Terdengar saat potongan diputar tergabung, dan di Putar sekarang, Simpan sebagai pad baru, dan Salin milik potongan itu (klik kanan padanya)",
+  "{name} (splice {n})": "{name} (potongan {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ Tersalin: tempel di chat atau folder",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Gulir untuk zoom. Di garis level potongan, seret titiknya: sudutnya ke samping untuk fade dan naik atau turun untuk volume, ujungnya naik atau turun untuk titik awal fade. Klik potongan untuk efek sendiri, klik kanan untuk lainnya."
 }

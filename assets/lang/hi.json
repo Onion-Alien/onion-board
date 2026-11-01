@@ -4855,5 +4855,19 @@
   "Last time Onion Board closed while installing AI voices. Install them again?": "पिछली बार AI आवाज़ें इंस्टॉल होते समय Onion Board बंद हो गया था। फिर से इंस्टॉल करें?",
   "Last time Onion Board closed while installing Onion Pocket. Install it again?": "पिछली बार Onion Pocket इंस्टॉल होते समय Onion Board बंद हो गया था। फिर से इंस्टॉल करें?",
   "Last time Onion Board closed while installing Onion Watch. Install it again?": "पिछली बार Onion Watch इंस्टॉल होते समय Onion Board बंद हो गया था। फिर से इंस्टॉल करें?",
-  "Last time Onion Board closed while installing speech recognition. Install it again?": "पिछली बार स्पीच रिकग्निशन इंस्टॉल होते समय Onion Board बंद हो गया था। फिर से इंस्टॉल करें?"
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "पिछली बार स्पीच रिकग्निशन इंस्टॉल होते समय Onion Board बंद हो गया था। फिर से इंस्टॉल करें?",
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>टुकड़ा {n}</b> ({start} से {end}): नीचे की सेटिंग्स सिर्फ़ इस हिस्से को बदलती हैं।",
+  "A voice is for the whole sound: click outside the splices to get back to it": "आवाज़ पूरी साउंड के लिए होती है: वापस जाने के लिए टुकड़ों के बाहर क्लिक करें",
+  "Back to the whole sound": "पूरी साउंड पर वापस",
+  "Copy to clipboard": "क्लिपबोर्ड पर कॉपी करें",
+  "Copying splice {n}…": "टुकड़ा {n} कॉपी हो रहा है…",
+  "Couldn't copy it: {why}": "कॉपी नहीं हो सका: {why}",
+  "Edit its effects": "इसके इफ़ेक्ट बदलें",
+  "Play now": "अभी चलाएँ",
+  "Save as new pad…": "नए पैड के रूप में सेव करें…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "नीचे की सेटिंग्स फिर से पूरी साउंड बदलती हैं (वेवफ़ॉर्म पर Esc भी यही करता है)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "ये तब सुनाई देती हैं जब टुकड़े जोड़कर चलते हैं, और टुकड़े के अपने अभी चलाएँ, नए पैड के रूप में सेव करें और कॉपी में (उस पर राइट-क्लिक करें)",
+  "{name} (splice {n})": "{name} (टुकड़ा {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ कॉपी हो गया: इसे किसी चैट या फ़ोल्डर में पेस्ट करें",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "ज़ूम के लिए स्क्रॉल करें। टुकड़े की लेवल लाइन पर बिंदु खींचें: कोनों को बगल में फ़ेड के लिए और ऊपर-नीचे आवाज़ के लिए, सिरों को ऊपर-नीचे यह तय करने के लिए कि फ़ेड कहाँ से शुरू हो। अपने इफ़ेक्ट के लिए टुकड़े पर क्लिक करें, और के लिए राइट-क्लिक करें।"
 }

@@ -4855,5 +4855,19 @@
   "Last time Onion Board closed while installing AI voices. Install them again?": "Förra gången stängdes Onion Board medan AI-röster installerades. Installera dem igen?",
   "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Förra gången stängdes Onion Board medan Onion Pocket installerades. Installera igen?",
   "Last time Onion Board closed while installing Onion Watch. Install it again?": "Förra gången stängdes Onion Board medan Onion Watch installerades. Installera igen?",
-  "Last time Onion Board closed while installing speech recognition. Install it again?": "Förra gången stängdes Onion Board medan taligenkänning installerades. Installera igen?"
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Förra gången stängdes Onion Board medan taligenkänning installerades. Installera igen?",
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Klipp {n}</b> ({start} till {end}): inställningarna nedan ändrar bara den här delen.",
+  "A voice is for the whole sound: click outside the splices to get back to it": "En röst gäller hela ljudet: klicka utanför klippen för att komma tillbaka",
+  "Back to the whole sound": "Tillbaka till hela ljudet",
+  "Copy to clipboard": "Kopiera till urklipp",
+  "Copying splice {n}…": "Kopierar klipp {n}…",
+  "Couldn't copy it: {why}": "Kunde inte kopiera det: {why}",
+  "Edit its effects": "Redigera dess effekter",
+  "Play now": "Spela nu",
+  "Save as new pad…": "Spara som ny ruta…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "Inställningarna nedan ändrar hela ljudet igen (Esc på vågformen gör det också)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "De hörs när klippen spelas ihop, och i klippets egna Spela nu, Spara som ny ruta och Kopiera (högerklicka på det)",
+  "{name} (splice {n})": "{name} (klipp {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ Kopierat: klistra in det i en chatt eller mapp",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Scrolla för att zooma. Dra prickarna på ett klipps nivålinje: hörnen åt sidan för en toning och upp eller ner för volymen, ändarna upp eller ner för var en toning börjar. Klicka på ett klipp för egna effekter, högerklicka för mer."
 }

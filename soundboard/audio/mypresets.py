@@ -59,7 +59,7 @@ def clean_sound(raw) -> dict:
     stay: Edit sound's Advanced view has them)."""
     f = soundfx.clean(raw if isinstance(raw, dict) else {})
     f["start"] = f["end"] = 0.0
-    f["splices"], f["joined"] = [], False
+    f["splices"], f["parts"], f["joined"] = [], [], False
     f["voice"] = {}
     return f
 

@@ -4763,5 +4763,19 @@
   "Last time Onion Board closed while installing AI voices. Install them again?": "ครั้งที่แล้ว Onion Board ปิดไประหว่างติดตั้งเสียง AI ติดตั้งอีกครั้งไหม?",
   "Last time Onion Board closed while installing Onion Pocket. Install it again?": "ครั้งที่แล้ว Onion Board ปิดไประหว่างติดตั้ง Onion Pocket ติดตั้งอีกครั้งไหม?",
   "Last time Onion Board closed while installing Onion Watch. Install it again?": "ครั้งที่แล้ว Onion Board ปิดไประหว่างติดตั้ง Onion Watch ติดตั้งอีกครั้งไหม?",
-  "Last time Onion Board closed while installing speech recognition. Install it again?": "ครั้งที่แล้ว Onion Board ปิดไประหว่างติดตั้งการรู้จำเสียง ติดตั้งอีกครั้งไหม?"
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "ครั้งที่แล้ว Onion Board ปิดไประหว่างติดตั้งการรู้จำเสียง ติดตั้งอีกครั้งไหม?",
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>ช่วง {n}</b> ({start} ถึง {end}): การตั้งค่าด้านล่างเปลี่ยนแค่ส่วนนี้",
+  "A voice is for the whole sound: click outside the splices to get back to it": "เสียงพากย์ใช้กับทั้งเสียง: คลิกนอกช่วงเพื่อกลับไป",
+  "Back to the whole sound": "กลับไปที่ทั้งเสียง",
+  "Copy to clipboard": "คัดลอกไปคลิปบอร์ด",
+  "Copying splice {n}…": "กำลังคัดลอกช่วง {n}…",
+  "Couldn't copy it: {why}": "คัดลอกไม่ได้: {why}",
+  "Edit its effects": "แก้เอฟเฟกต์ของมัน",
+  "Play now": "เล่นเลย",
+  "Save as new pad…": "บันทึกเป็นแพดใหม่…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "การตั้งค่าด้านล่างกลับมาเปลี่ยนทั้งเสียง (กด Esc บนคลื่นเสียงก็ได้)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "จะได้ยินเมื่อช่วงต่างๆ เล่นต่อกัน และในเล่นเลย บันทึกเป็นแพดใหม่ และคัดลอกของช่วงนั้น (คลิกขวาที่มัน)",
+  "{name} (splice {n})": "{name} (ช่วง {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ คัดลอกแล้ว: วางในแชทหรือโฟลเดอร์ได้เลย",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "เลื่อนลูกกลิ้งเพื่อซูม บนเส้นระดับของช่วง ลากจุด: มุมไปด้านข้างเพื่อเฟด และขึ้นลงเพื่อปรับความดัง ปลายขึ้นลงเพื่อตั้งระดับที่เฟดเริ่ม คลิกช่วงเพื่อใส่เอฟเฟกต์ของมันเอง คลิกขวาเพื่อดูเพิ่ม"
 }

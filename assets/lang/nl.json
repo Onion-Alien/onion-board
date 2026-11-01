@@ -4855,5 +4855,19 @@
   "Last time Onion Board closed while installing AI voices. Install them again?": "Vorige keer sloot Onion Board tijdens het installeren van AI-stemmen. Opnieuw installeren?",
   "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Vorige keer sloot Onion Board tijdens het installeren van Onion Pocket. Opnieuw installeren?",
   "Last time Onion Board closed while installing Onion Watch. Install it again?": "Vorige keer sloot Onion Board tijdens het installeren van Onion Watch. Opnieuw installeren?",
-  "Last time Onion Board closed while installing speech recognition. Install it again?": "Vorige keer sloot Onion Board tijdens het installeren van spraakherkenning. Opnieuw installeren?"
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Vorige keer sloot Onion Board tijdens het installeren van spraakherkenning. Opnieuw installeren?",
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Fragment {n}</b> ({start} tot {end}): de instellingen hieronder veranderen alleen dit deel.",
+  "A voice is for the whole sound: click outside the splices to get back to it": "Een stem is voor het hele geluid: klik naast de fragmenten om terug te gaan",
+  "Back to the whole sound": "Terug naar het hele geluid",
+  "Copy to clipboard": "Naar klembord kopiëren",
+  "Copying splice {n}…": "Fragment {n} kopiëren…",
+  "Couldn't copy it: {why}": "Kopiëren lukte niet: {why}",
+  "Edit its effects": "Effecten bewerken",
+  "Play now": "Nu afspelen",
+  "Save as new pad…": "Opslaan als nieuwe pad…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "De instellingen hieronder veranderen weer het hele geluid (Esc op de golfvorm doet dat ook)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Je hoort ze als de fragmenten samengevoegd spelen, en bij Nu afspelen, Opslaan als nieuwe pad en Kopiëren van het fragment (rechtsklik erop)",
+  "{name} (splice {n})": "{name} (fragment {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ Gekopieerd: plak het in een chat of map",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Scroll om te zoomen. Sleep op de niveaulijn van een fragment de puntjes: de hoeken opzij voor een fade en omhoog of omlaag voor het volume, de uiteinden omhoog of omlaag voor waar een fade begint. Klik op een fragment voor eigen effecten, rechtsklik voor meer."
 }

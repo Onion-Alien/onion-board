@@ -4947,5 +4947,19 @@
   "Last time Onion Board closed while installing AI voices. Install them again?": "Onion Board se minule zavřel během instalace AI hlasů. Nainstalovat je znovu?",
   "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Onion Board se minule zavřel během instalace Onion Pocket. Nainstalovat ho znovu?",
   "Last time Onion Board closed while installing Onion Watch. Install it again?": "Onion Board se minule zavřel během instalace Onion Watch. Nainstalovat ho znovu?",
-  "Last time Onion Board closed while installing speech recognition. Install it again?": "Onion Board se minule zavřel během instalace rozpoznávání řeči. Nainstalovat ho znovu?"
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Onion Board se minule zavřel během instalace rozpoznávání řeči. Nainstalovat ho znovu?",
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Úsek {n}</b> ({start} až {end}): nastavení níže mění jen tuto část.",
+  "A voice is for the whole sound: click outside the splices to get back to it": "Hlas patří celému zvuku: klikni mimo úseky a vrátíš se k němu",
+  "Back to the whole sound": "Zpět na celý zvuk",
+  "Copy to clipboard": "Kopírovat do schránky",
+  "Copying splice {n}…": "Kopíruji úsek {n}…",
+  "Couldn't copy it: {why}": "Nepodařilo se zkopírovat: {why}",
+  "Edit its effects": "Upravit jeho efekty",
+  "Play now": "Přehrát hned",
+  "Save as new pad…": "Uložit jako nový pad…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "Nastavení níže zase mění celý zvuk (Esc na vlně to udělá taky)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Uslyšíš je, když úseky hrají spojené, a v Přehrát hned, Uložit jako nový pad a Kopírovat u úseku (pravé tlačítko na něm)",
+  "{name} (splice {n})": "{name} (úsek {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ Zkopírováno: vlož to do chatu nebo složky",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Kolečkem přibližuješ. Na čáře hlasitosti úseku táhni tečky: rohy do strany pro prolnutí a nahoru či dolů pro hlasitost, konce nahoru či dolů pro úroveň, od které prolnutí začíná. Klikni na úsek pro vlastní efekty, pravým tlačítkem víc."
 }

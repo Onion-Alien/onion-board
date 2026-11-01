@@ -4855,5 +4855,19 @@
   "Last time Onion Board closed while installing AI voices. Install them again?": "L'ultima volta Onion Board si è chiuso durante l'installazione delle voci IA. Installarle di nuovo?",
   "Last time Onion Board closed while installing Onion Pocket. Install it again?": "L'ultima volta Onion Board si è chiuso durante l'installazione di Onion Pocket. Installarlo di nuovo?",
   "Last time Onion Board closed while installing Onion Watch. Install it again?": "L'ultima volta Onion Board si è chiuso durante l'installazione di Onion Watch. Installarlo di nuovo?",
-  "Last time Onion Board closed while installing speech recognition. Install it again?": "L'ultima volta Onion Board si è chiuso durante l'installazione del riconoscimento vocale. Installarlo di nuovo?"
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "L'ultima volta Onion Board si è chiuso durante l'installazione del riconoscimento vocale. Installarlo di nuovo?",
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Spezzone {n}</b> (da {start} a {end}): le impostazioni qui sotto cambiano solo questa parte.",
+  "A voice is for the whole sound: click outside the splices to get back to it": "Una voce vale per tutto il suono: clicca fuori dagli spezzoni per tornarci",
+  "Back to the whole sound": "Torna al suono intero",
+  "Copy to clipboard": "Copia negli appunti",
+  "Copying splice {n}…": "Copio lo spezzone {n}…",
+  "Couldn't copy it: {why}": "Impossibile copiarlo: {why}",
+  "Edit its effects": "Modifica i suoi effetti",
+  "Play now": "Riproduci ora",
+  "Save as new pad…": "Salva come nuovo pad…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "Le impostazioni qui sotto cambiano di nuovo tutto il suono (anche Esc sulla forma d'onda)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Si sentono quando gli spezzoni suonano uniti, e in Riproduci ora, Salva come nuovo pad e Copia dello spezzone (clic destro su di esso)",
+  "{name} (splice {n})": "{name} (spezzone {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ Copiato: incollalo in una chat o in una cartella",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Scorri per lo zoom. Sulla linea di livello di uno spezzone trascina i punti: gli angoli di lato per una dissolvenza e su o giù per il volume, le estremità su o giù per il livello da cui parte una dissolvenza. Clicca uno spezzone per effetti suoi, clic destro per altro."
 }

@@ -4855,5 +4855,19 @@
   "Last time Onion Board closed while installing AI voices. Install them again?": "La dernière fois, Onion Board s'est fermé pendant l'installation des voix IA. Les réinstaller ?",
   "Last time Onion Board closed while installing Onion Pocket. Install it again?": "La dernière fois, Onion Board s'est fermé pendant l'installation d'Onion Pocket. Le réinstaller ?",
   "Last time Onion Board closed while installing Onion Watch. Install it again?": "La dernière fois, Onion Board s'est fermé pendant l'installation d'Onion Watch. Le réinstaller ?",
-  "Last time Onion Board closed while installing speech recognition. Install it again?": "La dernière fois, Onion Board s'est fermé pendant l'installation de la reconnaissance vocale. La réinstaller ?"
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "La dernière fois, Onion Board s'est fermé pendant l'installation de la reconnaissance vocale. La réinstaller ?",
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Extrait {n}</b> ({start} à {end}) : les réglages ci-dessous ne changent que cette partie.",
+  "A voice is for the whole sound: click outside the splices to get back to it": "Une voix vaut pour tout le son : clique hors des extraits pour y revenir",
+  "Back to the whole sound": "Revenir au son entier",
+  "Copy to clipboard": "Copier dans le presse-papiers",
+  "Copying splice {n}…": "Copie de l'extrait {n}…",
+  "Couldn't copy it: {why}": "Impossible de le copier : {why}",
+  "Edit its effects": "Modifier ses effets",
+  "Play now": "Jouer maintenant",
+  "Save as new pad…": "Enregistrer comme nouveau pad…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "Les réglages ci-dessous changent à nouveau tout le son (Échap sur la forme d'onde le fait aussi)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "On les entend quand les extraits sont joués assemblés, et dans Jouer maintenant, Enregistrer comme nouveau pad et Copier de l'extrait (clic droit dessus)",
+  "{name} (splice {n})": "{name} (extrait {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ Copié : colle-le dans un chat ou un dossier",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Fais défiler pour zoomer. Sur la ligne de niveau d'un extrait, fais glisser les points : les coins sur le côté pour un fondu et en haut ou en bas pour son volume, les bouts en haut ou en bas pour le niveau où un fondu commence. Clique sur un extrait pour ses propres effets, clic droit pour plus."
 }

@@ -4763,5 +4763,19 @@
   "Last time Onion Board closed while installing AI voices. Install them again?": "지난번에 AI 음성 설치 중에 Onion Board가 닫혔어요. 다시 설치할까요?",
   "Last time Onion Board closed while installing Onion Pocket. Install it again?": "지난번에 Onion Pocket 설치 중에 Onion Board가 닫혔어요. 다시 설치할까요?",
   "Last time Onion Board closed while installing Onion Watch. Install it again?": "지난번에 Onion Watch 설치 중에 Onion Board가 닫혔어요. 다시 설치할까요?",
-  "Last time Onion Board closed while installing speech recognition. Install it again?": "지난번에 음성 인식 설치 중에 Onion Board가 닫혔어요. 다시 설치할까요?"
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "지난번에 음성 인식 설치 중에 Onion Board가 닫혔어요. 다시 설치할까요?",
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>구간 {n}</b> ({start}~{end}): 아래 설정은 이 부분만 바꿉니다.",
+  "A voice is for the whole sound: click outside the splices to get back to it": "목소리는 소리 전체에 적용돼요: 구간 바깥을 클릭하면 돌아갑니다",
+  "Back to the whole sound": "소리 전체로 돌아가기",
+  "Copy to clipboard": "클립보드에 복사",
+  "Copying splice {n}…": "구간 {n} 복사 중…",
+  "Couldn't copy it: {why}": "복사하지 못했어요: {why}",
+  "Edit its effects": "효과 편집",
+  "Play now": "지금 재생",
+  "Save as new pad…": "새 패드로 저장…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "아래 설정이 다시 소리 전체를 바꿉니다 (파형 위에서 Esc를 눌러도 됨)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "구간을 합쳐 재생할 때, 그리고 그 구간의 지금 재생, 새 패드로 저장, 복사에서 들립니다 (오른쪽 클릭)",
+  "{name} (splice {n})": "{name} (구간 {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ 복사됨: 채팅이나 폴더에 붙여넣으세요",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "스크롤로 확대합니다. 구간의 레벨 선에서 점을 끌어 보세요: 모서리를 옆으로 끌면 페이드, 위아래로 끌면 음량, 끝점을 위아래로 끌면 페이드 시작 레벨입니다. 구간을 클릭하면 따로 효과를, 오른쪽 클릭하면 더 많은 메뉴가 나옵니다."
 }
