@@ -7,6 +7,8 @@ from __future__ import annotations
 
 import html
 import logging
+import shutil
+import tempfile
 import threading
 from collections import deque
 from collections.abc import Callable
@@ -47,9 +49,15 @@ SEARCH_MAX_W = 480
 # and the audio threads wait on the UI thread through all of it: with a few sounds
 # playing, blocks came 10 ms late, a skip.
 STEP_GAP_MS = 4
+# A links pack's sounds go on the board as they come, a few at a time: this long at
+# least between two lots (each one syncs the board's pads)
+CAME_GAP_MS = 1500
 # plays a sample to your headphones only at a gain (None stops it); False when it
 # couldn't (no headphones set)
 Play = Callable[[np.ndarray | None, float], bool]
+# puts some of a links pack's sounds on the board as they come (one zip each), then
+# calls its third argument
+AddSome = Callable[[packs.Pack, list[Path], Callable[[], None]], None]
 ALL, MINE = "", "\0mine"   # the filter chips that aren't a pack tag
 
 
@@ -433,10 +441,13 @@ class PreviewDialog(QDialog):
 class Downloads(QObject):
     """The packs being downloaded, for the whole app (downloads()): a download keeps
     going when the page closes (back to the board, another tab, Settings), its sounds
-    go on the board when it lands, and the page opened again shows it still going."""
+    go on the board when it lands, and the page opened again shows it still going.
+    A links pack's sounds go on the board as they come (`add_some`), not all at the
+    end: the whole pack's import then only makes them its own."""
     _progress = Signal(str, int, int, bool)    # pack id, done, total, counting links
     # pack, path or None, error, skipped, of those only for now (or: none came, for now)
     _fetched = Signal(object, object, str, int, int)
+    _came = Signal(object, object)             # pack, a zip of one of its sounds
     progressed = Signal(str)                   # pack id: its words changed
     ended = Signal(object, object)             # pack, path or None (added after this)
     added = Signal(object)                     # pack: its sounds were put on the board
@@ -448,22 +459,45 @@ class Downloads(QObject):
         self.short: dict[str, str] = {}   # ...and a card's, shorter
         # pack id -> (put it on the board, ask again later, the window to say it on)
         self._jobs: dict[str, tuple] = {}
+        # a links pack's sounds as they come: (put some on the board, where they wait)
+        self._some: dict[str, tuple[AddSome, Path]] = {}
+        self._waiting: dict[str, list[Path]] = {}   # pack id -> come, not on the board yet
+        self._adding: set[str] = set()     # ...some going on the board now
+        self._resting: set[str] = set()    # ...the CAME_GAP_MS after that
+        self._landed: dict[str, tuple] = {}   # ...and the whole pack, once those are on
         self.page: PacksDialog | None = None   # the open page, while it's open
         self._progress.connect(self._on_progress)
         self._fetched.connect(self._on_fetched)
+        self._came.connect(self._on_came)
 
     def start(self, p: packs.Pack, add: Callable[[Path], None],
-              try_later: Callable[[packs.Pack], None] | None, window: QWidget | None):
+              try_later: Callable[[packs.Pack], None] | None, window: QWidget | None,
+              add_some: AddSome | None = None):
         self.words[p.id] = _("Downloading…")
         self._jobs[p.id] = (add, try_later, window)
         stop = QCoreApplication.closingDown   # only the app quitting stops it
+        arrived: Callable[[int, Path], object] | None = None
+        if add_some is not None and p.links:
+            tmp = Path(tempfile.mkdtemp(prefix="sb-packcame-"))
+            self._some[p.id] = (add_some, tmp)
+
+            def came(i: int, audio: Path):
+                z = tmp / f"{i}.zip"
+                try:
+                    packs.zip_one(p, i, audio, z)
+                except OSError:   # (it comes with the whole pack then)
+                    log.info("pack %s: couldn't keep link %d for now", p.id, i,
+                             exc_info=True)
+                    return
+                busy.emit(self._came, p, z)
+            arrived = came
 
         def run():
             try:
                 if p.links:
                     path, skipped, later = packs.download_links(
                         p, lambda done, total: busy.emit(self._progress, p.id, done, total,
-                                                         True), stop)
+                                                         True), stop, arrived=arrived)
                 else:
                     path, skipped, later = packs.download(
                         p, lambda done, total: busy.emit(self._progress, p.id, done, total,
@@ -489,11 +523,49 @@ class Downloads(QObject):
                                _("{pct}%", pct=done * 100 // total) if total else "…")
         self.progressed.emit(pack_id)
 
+    def _on_came(self, p: packs.Pack, z: Path):
+        if p.id not in self._some:   # the whole pack landed first: it brings this one
+            z.unlink(missing_ok=True)
+            return
+        self._waiting.setdefault(p.id, []).append(z)
+        self._add_some(p)
+
+    def _add_some(self, p: packs.Pack):
+        """The sounds come so far onto the board, unless some are going on now or just
+        went (then with the next lot)."""
+        if p.id in self._adding or p.id in self._resting or p.id not in self._some:
+            return
+        zips = self._waiting.pop(p.id, [])
+        if not zips:
+            return
+        self._adding.add(p.id)
+        self._some[p.id][0](p, zips, lambda: self._some_added(p))
+
+    def _some_added(self, p: packs.Pack):
+        self._adding.discard(p.id)
+        landed = self._landed.pop(p.id, None)
+        if landed is not None:   # the whole pack, held back till these were on
+            self._on_fetched(*landed)
+            return
+        self._resting.add(p.id)
+
+        def rested():
+            self._resting.discard(p.id)
+            self._add_some(p)
+        QTimer.singleShot(CAME_GAP_MS, self, rested)
+
     def _open_page(self) -> PacksDialog | None:
         page = self.page
         return page if page is not None and qt_valid(page) and not page._closed else None
 
     def _on_fetched(self, p: packs.Pack, path, err: str, skipped: int, later: int = 0):
+        if p.id in self._adding:   # after the ones going on the board now
+            self._landed[p.id] = (p, path, err, skipped, later)
+            return
+        some = self._some.pop(p.id, None)
+        self._waiting.pop(p.id, None)
+        if some is not None:   # the ones still waiting come with the whole pack
+            shutil.rmtree(some[1], ignore_errors=True)
         add, try_later, window = self._jobs.pop(p.id, (None, None, None))
         self.words.pop(p.id, None)
         self.short.pop(p.id, None)
@@ -547,7 +619,8 @@ class PacksDialog(QDialog):
 
     def __init__(self, add: Callable[[Path], None], parent=None, fetch_list: bool = True,
                  play: Play | None = None,
-                 try_later: Callable[[packs.Pack], None] | None = None):
+                 try_later: Callable[[packs.Pack], None] | None = None,
+                 add_some: AddSome | None = None):
         super().__init__(parent)
         self.setObjectName("packspage")   # (themesheet: in the window, no box of its own)
         fit.watch(self)
@@ -555,6 +628,7 @@ class PacksDialog(QDialog):
         # a links pack's sounds that failed for now: the window asks for them again
         # packs.LINK_TRY_LATER after (this page may be closed by then)
         self._try_later = try_later
+        self._add_some = add_some   # a links pack's sounds onto the board as they come
         self._play = play
         # the downloads: the app's, so they go on with this page closed
         self._jobs = downloads()
@@ -1002,7 +1076,8 @@ class PacksDialog(QDialog):
             busy.toast(self.preview or self, html.escape(why), "error")
             return
         win = self.window()   # (the main window; a page on its own has none)
-        self._jobs.start(p, self._add, self._try_later, None if win is self else win)
+        self._jobs.start(p, self._add, self._try_later, None if win is self else win,
+                         self._add_some)
         self.bun.set_act(bunacts.RUN)   # running with it till it lands
         for b in self._buttons(p.id):
             busy.set_busy(b, True)

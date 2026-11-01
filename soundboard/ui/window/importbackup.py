@@ -48,6 +48,7 @@ class BackupImport(_Ctl):
                          extras: dict[str, otherboards.Entry] | None = ...) -> None: ...
         def _on_worker(self, work, then, name: str) -> None: ...
         def _show_skipped(self, skipped) -> None: ...
+        _pack_early: dict[str, dict[str, str]]
         # (PackImport's)
         def _pack_name(self, pkg) -> str: ...
         def _pack_tab(self, pkg) -> str: ...
@@ -199,6 +200,9 @@ class BackupImport(_Ctl):
                 names.setdefault(m.fingerprint, set()).add(m.name.lower())
         known = set(names) if pkg.is_pack else names
         have = {(m.pack, m.pack_item) for m in mw.cfg.sounds if m.pack}
+        if Path(path).parent.resolve() == backup.packs_dir().resolve():
+            # a free pack's download: its sounds that went on the board as they came
+            pkg.came_first = self._pack_early.pop(Path(path).stem, {})
         start = len(mw.cfg.sounds)
         mw.toast(ngettext("Importing {n} sound…", "Importing {n} sounds…", len(pkg.sounds)))
 
@@ -208,6 +212,7 @@ class BackupImport(_Ctl):
                 before = set(backup.packs())
                 new = backup.keep_pack(pkg)
                 new = "" if new in before else new
+                have.update((pkg.pack_id, f) for f in pkg.came_first.values())
             try:
                 res = backup.install(
                     pkg, known, lambda i: PAD_COLORS[(start + i) % len(PAD_COLORS)], have)
@@ -301,21 +306,27 @@ class BackupImport(_Ctl):
                    mw.cfg.subcategories)
         for m in pkg.restored:
             mw.engine.set_gain(m.id, mw.gain_for(m))
+        early = pkg.came_first
+        if early and pkg.pack_id:   # on the board already: the pack's own now
+            for m in mw.cfg.sounds:
+                if m.id in early and not m.pack:
+                    m.pack, m.pack_item = pkg.pack_id, early[m.id]
         mw._save_now()
         mw._rebuild_pads()
         mw.catctl._fill_categories()
         mw.soundctl._load_all()
         mw.hkctl.register_hotkeys()
-        n = len(res.sounds)
+        n = len(res.sounds) + len(pkg.came_first)
+        skipped_n = max(len(res.skipped) - len(pkg.came_first), 0)
         if pkg.restored:   # Backup → My sound packs → Reset to how it came
             msg = _("“{name}” is back how it came", name=self._pack_name(pkg))
             if n:
                 msg += ngettext(" ({n} removed sound put back)",
                                 " ({n} removed sounds put back)", n)
-        elif res.skipped:
+        elif skipped_n:
             msg = ngettext("Imported {n} sound ({skipped} already in your library)",
                            "Imported {n} sounds ({skipped} already in your library)", n,
-                           skipped=len(res.skipped))
+                           skipped=skipped_n)
         else:
             msg = ngettext("Imported {n} sound", "Imported {n} sounds", n)
         mw.toast(msg, "ok" if n or pkg.restored else "")

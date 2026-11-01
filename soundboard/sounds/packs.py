@@ -936,14 +936,18 @@ def _fetch_link(link: Link, dest: Path, pace: _Pace,
 
 def download_links(pack: Pack, progress: Callable[[int, int], object] | None = None,
                    cancelled: Callable[[], bool] | None = None,
-                   again: bool = False) -> tuple[Path, int, int]:
+                   again: bool = False,
+                   arrived: Callable[[int, Path], object] | None = None
+                   ) -> tuple[Path, int, int]:
     """A links pack: each link fetched from Myinstants (LINK_WORKERS at once), then put
     in a zip of the backup format at pack.path, so it's added, kept, reset and removed
     like any other pack. (its path, how many links were skipped, how many of those only
     failed for now: worth asking for again LINK_TRY_LATER after). `progress` gets
     (links done, links). Raises TryLater when none came and all only for now, else
     updates.UpdateError when none came or it was cancelled. `again`: fetched even though
-    it's kept (to fill in the sounds that failed for now). Call off the UI thread."""
+    it's kept (to fill in the sounds that failed for now). `arrived` gets (link's
+    index, its MP3) as each one comes, so it can go on the board before the rest (the
+    file is deleted once this returns). Call off the UI thread."""
     kept = backup.kept_free_pack(pack.id)
     if kept is not None and not again:
         return kept, 0, 0   # added before and still kept: not fetched again
@@ -979,6 +983,8 @@ def download_links(pack: Pack, progress: Callable[[int, int], object] | None = N
         else:
             with lock:
                 got[i] = Path(path)
+            if arrived is not None:
+                arrived(i, Path(path))
         if last:
             return   # counted the first time round
         with lock:
@@ -1010,6 +1016,17 @@ def download_links(pack: Pack, progress: Callable[[int, int], object] | None = N
     return pack.path, len(pack.links) - len(got), len(still)
 
 
+def link_folder(i: int) -> str:
+    """Link i's folder in its pack's zip: the same whichever others came, so a sound
+    put on the board as it arrived is known again in the whole pack."""
+    return f"sounds/{i + 1:03d}"
+
+
+def zip_one(pack: Pack, i: int, audio: Path, dest: Path):
+    """Link i of a links pack, as it arrived: a zip of just that sound."""
+    _zip_links(pack, {i: audio}, dest)
+
+
 def _zip_links(pack: Pack, got: dict[int, Path], dest: Path):
     """The fetched sounds as a pack zip (docs/BACKUP-FORMAT.md), in the list's order."""
     dest.parent.mkdir(parents=True, exist_ok=True)
@@ -1018,9 +1035,9 @@ def _zip_links(pack: Pack, got: dict[int, Path], dest: Path):
     folders = []
     try:
         with zipfile.ZipFile(part, "w", zipfile.ZIP_STORED) as z:   # MP3s don't shrink
-            for n, i in enumerate(order, 1):
+            for i in order:
                 link, audio = pack.links[i], got[i]
-                folder = f"sounds/{n:03d}"
+                folder = link_folder(i)
                 entry: dict = {"name": link.name, "audio": audio.name}
                 if link.category:
                     entry["tags"] = [link.category]

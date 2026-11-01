@@ -68,12 +68,18 @@ class ImportControl(BackupImport, PackImport, Controller):
     # a links pack asked for again later (PackImport): pack, (path, skipped, later) | None,
     # what it raised | None
     _pack_refetched = Signal(object, object, object)
+    # some of a links pack's sounds, as they came (PackImport): then, [SoundMeta]
+    _pack_came = Signal(object, object)
 
     def __init__(self, mw: MainWindow):
         super().__init__(mw)
         self._loose_checked.connect(self._loose_found)
         self._pack_refetched.connect(self._pack_retried)
         self._pack_retries: set[str] = set()   # links packs waiting to be asked for again
+        self._pack_came.connect(lambda then, got: then(got))
+        # free pack id -> {sound id: its pack folder}: put on the board as they came, made
+        # the pack's own once it all lands (_package_read)
+        self._pack_early: dict[str, dict[str, str]] = {}
         self._packs_removed: set[str] = set()   # sound packs to stop keeping after Undo
         self._packs_page = None   # the Free packs page, while it's in the tabs' place
         self._imported_short = False      # a sound added in this batch is under SHORT_SOUND_S

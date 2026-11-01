@@ -66,7 +66,9 @@ class PackImport(_Ctl):
         _packs_page: QDialog | None
         _packs_watch: object
         _pack_refetched: Signal
+        _pack_came: Signal
         _pack_retries: set[str]
+        _pack_early: dict[str, dict[str, str]]
         # (BackupImport's)
         def _on_unpacked(self, res, pkg, err: str) -> None: ...
 
@@ -87,7 +89,7 @@ class PackImport(_Ctl):
         # lit on the rail, and picking it (or any tab) goes back
         mw.tabs.setCurrentWidget(mw.sounds_page)
         dlg = PacksDialog(self._pack_got, mw, play=self._pack_sample,
-                          try_later=self._pack_try_later)
+                          try_later=self._pack_try_later, add_some=self._pack_some)
         dlg.setWindowFlags(Qt.WindowType.Widget)
         self._packs_page = dlg
         dlg.finished.connect(lambda _r, d=dlg: self._packs_closed(d))
@@ -145,6 +147,66 @@ class PackImport(_Ctl):
         """A free pack downloaded (packs/<its id>.zip): imported like a dropped zip."""
         usage.used(f"pack-added-{usage.pack_tag(Path(path).stem)}")
         self.import_files([str(path)])
+
+    def _pack_some(self, p: packs.Pack, zips: list[Path], done):
+        """Some of links pack `p`'s sounds, as they came (a zip of one sound each): on
+        the board now, in the pack's tab, not when all of it has come. Quiet: the whole
+        pack's import says what came, and makes these its own. done() once they're on."""
+        mw = self.mw
+        start = len(mw.cfg.sounds)
+
+        def run():   # copying them into the library: on its own thread
+            got = []
+            for z in zips:
+                try:
+                    pkg = backup.read(z)
+                    res = backup.install(pkg, set(), lambda _i, n=len(got): PAD_COLORS[
+                        (start + n) % len(PAD_COLORS)])
+                    for m in res.sounds:
+                        m.pack_item = pkg.sounds[0].folder
+                        got.append(m)
+                except Exception:  # noqa: BLE001 - it comes with the whole pack then
+                    log.info("pack %s: couldn't put %s on the board yet", p.id, z.name,
+                             exc_info=True)
+                finally:
+                    z.unlink(missing_ok=True)
+            busy.emit(self._pack_came, lambda found: self._put_early(p, found, done), got,
+                      owner=self)
+        threading.Thread(target=run, daemon=True, name="pack-came").start()
+
+    def _put_early(self, p: packs.Pack, got: list[SoundMeta], done):
+        mw = self.mw
+        try:
+            if not got or mw._shut_down:
+                return
+            from soundboard.sounds.library import merge_tags
+            cats = list(dict.fromkeys(k.category for k in p.links if k.category))
+            tab = pack_tab_name(p.name)
+            # as the whole pack's import does: several categories go in one tab
+            if len({library.split_tag(c)[0].lower() for c in cats}) > 1:
+                library.group_pack_tags(got, tab)
+                cats = [tab] + [library.sub_tag(tab, c) for c in cats
+                                if not library.split_tag(c)[1] and c.lower() != tab.lower()]
+            early = self._pack_early.setdefault(p.id, {})
+            for m in sorted(got, key=lambda m: m.pack_item):
+                m.tags = merge_tags(m.tags, mw.cfg.categories, mw.cfg.subcategories)
+                # in the pack's order: after the last of its sounds before it in the
+                # list, else before the first after it, else on the end
+                came = [(i, early[o.id]) for i, o in enumerate(mw.cfg.sounds)
+                        if o.id in early]
+                before = [i for i, f in came if f < m.pack_item]
+                at = (before[-1] + 1 if before else came[0][0] if came
+                      else len(mw.cfg.sounds))
+                mw.cfg.sounds.insert(at, m)
+                early[m.id] = m.pack_item
+            merge_tags(cats, mw.cfg.categories, mw.cfg.subcategories)
+            mw._save_now()
+            mw._rebuild_pads()
+            mw.catctl._fill_categories()
+            mw.soundctl._load_all()
+            mw.statusctl._update_status()
+        finally:
+            done()
 
     def _pack_try_later(self, p: packs.Pack):
         """Some (or all) of links pack `p`'s sounds failed for now, after all their tries

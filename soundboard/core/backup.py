@@ -281,6 +281,9 @@ class Package:
     is_board: bool = False      # has an onionboard.json (else: a sound or a sound pack)
     pack_id: str = ""           # set by keep_pack(): its sounds remember where they came from
     restored: list = field(default_factory=list)   # reset_pack(): sounds already on the board
+    # a free pack's sounds put on the board as they came, before it all landed: sound id
+    # -> its folder here. The import skips them and makes them the pack's own
+    came_first: dict = field(default_factory=dict)
 
     @property
     def is_pack(self) -> bool:

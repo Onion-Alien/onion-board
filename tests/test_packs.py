@@ -887,6 +887,58 @@ def test_the_page_hands_a_pack_that_failed_for_now_to_the_window(qapp, app_dir, 
         dlg.done(0)
 
 
+def test_a_links_packs_sounds_go_on_the_board_as_they_come_and_stay_one_pack(
+        window, qapp, myinstants, monkeypatch):
+    """Each sound is on the board once it came, not after all of them; the whole pack's
+    import then adds no second copy, makes them its own (one Remove takes them all) and
+    says once how many came."""
+    from conftest import said
+    monkeypatch.setattr(net, "allowed", lambda f: True)
+    monkeypatch.setattr(packsdialog, "CAME_GAP_MS", 0)
+    gate, real = threading.Semaphore(0), packs._fetch_link
+
+    def slow(*a, **k):   # (the page's samples aren't held back)
+        if threading.current_thread().name.startswith("pack-link"):
+            assert gate.acquire(timeout=10)
+        return real(*a, **k)
+    monkeypatch.setattr(packs, "_fetch_link", slow)
+    links = links_entry(6)
+    for i, k in enumerate(links["links"]):
+        k["category"] = ["Memes", "Gaming"][i % 2]   # two categories: one tab for the pack
+    p, = packs.parse([links])
+    before = len(window.cfg.sounds)
+
+    def mine():
+        return [m for m in window.cfg.sounds[before:]]
+    dlg = window.impctl.show_packs()
+    try:
+        dlg._show([p], "")
+        process_events(qapp, lambda: dlg.cards, 3)
+        dlg.add(dlg.cards[0])
+        gate.release()
+        gate.release()
+        assert process_events(qapp, lambda: len(mine()) == 2, 5)   # two came: on the board
+        assert all(not m.pack for m in mine())
+        from soundboard.ui.window.importpacks import pack_tab_name
+        assert all(pack_tab_name(p.name) in m.tags for m in mine()), [m.tags for m in mine()]
+        for _ in range(4):
+            gate.release()
+        assert process_events(qapp, lambda: "Imported 6 sounds" in said(window), 10)
+        got = mine()
+        assert len(got) == 6   # none twice
+        assert [m.name for m in got] == [k.name for k in p.links]   # in the pack's order
+        pid, = {m.pack for m in got}
+        assert pid and sorted(m.pack_item for m in got) == [packs.link_folder(i)
+                                                            for i in range(6)]
+        assert "already" not in said(window)
+        window.impctl.remove_pack(pid, ask=False)
+        assert len(window.cfg.sounds) == before
+    finally:
+        for _ in range(6):
+            gate.release()
+        window.impctl.close_packs()
+
+
 def test_the_window_asks_for_a_pack_again_later_and_adds_it(window, qapp, myinstants,
                                                             monkeypatch):
     """Two hours after a links pack failed for now, the window asks for it again by
