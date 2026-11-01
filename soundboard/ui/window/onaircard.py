@@ -415,8 +415,8 @@ class OutputBlock(QFrame):
                 # left-aligned: icons under the header's arrow, words under its name, in
                 # the same place whatever else is on (centred, they moved with the longest)
                 n.row.setContentsMargins(self.line_x(self._px), pad, self.line_x(self._px), pad)
-            else:   # the icon alone, centred under the switch
-                n.row.setContentsMargins(0, 8, 0, 0)
+            else:   # the icon alone, centred under the switch (and in its line's height)
+                n.row.setContentsMargins(0, 6, 0, 6)
                 n.glyph.setContentsMargins(0, 0, 0, 0)
                 n.glyph.setFixedHeight(self.GLYPH)
 
@@ -722,7 +722,7 @@ class OutputBlock(QFrame):
                 for n in mine:
                     panel.lay.addWidget(n)
                 panel.lines = mine
-            panel.show_panel(expanded, self._px, self._scale)
+            panel.show_panel(expanded, self._px, self._scale, self.tight)
             panel.setVisible(bool(mine))
         for i, n in enumerate(self.net):
             n.setVisible(i < len(self._lines))
@@ -730,12 +730,12 @@ class OutputBlock(QFrame):
     def _line_room(self):
         """Open, the panels are buttons like Mute and Stop all: PAIR_GAP under those and
         between panels, the card's padding under the last. A short window (`tight`, the
-        rail's compact step) halves it."""
+        rail's compact step) halves it. Shut, SHUT_GAP between the boxes."""
         pad = self._px(self.PAD)
         gap = self._px(self.PAIR_GAP // 2 if self.tight else self.PAIR_GAP)
         self.pair_lay.setContentsMargins(pad, pad, pad, gap if self._lines else pad)
         expanded = bool(self.property("expanded"))
-        self.box.setSpacing(gap if expanded else 0)
+        self.box.setSpacing(gap if expanded else 2 if self.tight else _Panel.SHUT_GAP)
         under = self._px(self.PAD // 2 if self.tight else self.PAD) if self._lines else 0
         self.box.setContentsMargins(*(pad, 0, pad, under) if expanded else (0, 4, 0, 0))
         self.strip_lay.setContentsMargins(pad, 0, pad, pad)
@@ -763,10 +763,13 @@ def group_name(group: str) -> str:
 
 class _Panel(QFrame):
     """A group's panel (key "": the lines in no group): its name, small and quiet, over
-    its lines, on a button's fill. Shut (the small card): see-through and untitled."""
+    its lines, on a button's fill. Shut (the small card): untitled, its lines' icons still
+    in its box, so the groups show there too."""
 
     PT = 8.5        # the name's size (the hint text's)
     PAD = 4         # round the lines' hover fill, inside the panel
+    SHUT_PAD = 2    # shut: over and under its icons (a short window: none)...
+    SHUT_GAP = 6    # ...and between the boxes (a short window: 2), so it fits where it did
 
     def __init__(self, key: str):
         super().__init__()
@@ -780,7 +783,7 @@ class _Panel(QFrame):
         self.lay.addWidget(self.title)
         self.hide()
 
-    def show_panel(self, expanded: bool, px, scale: float):
+    def show_panel(self, expanded: bool, px, scale: float, tight: bool = False):
         titled = expanded and bool(self.key)
         self.title.setVisible(titled)
         if titled:
@@ -788,12 +791,12 @@ class _Panel(QFrame):
             self.title.setStyleSheet(f"font-size:{self.PT * scale:.2f}pt;")
             # over the lines' icons; a line's height of room isn't needed over it
             self.title.setContentsMargins(px(_NetLine.SIDE), px(2), 0, 0)
-        pad = px(self.PAD) if expanded else 0
-        self.lay.setContentsMargins(pad, pad, pad, pad)
-        if self.property("open") != expanded:
-            self.setProperty("open", expanded)
-            self.style().unpolish(self)
-            self.style().polish(self)
+        if expanded:
+            pad = px(self.PAD)
+            self.lay.setContentsMargins(pad, pad, pad, pad)
+        else:
+            pad = 0 if tight else self.SHUT_PAD
+            self.lay.setContentsMargins(0, pad, 0, pad)
 
 
 class _NetLine(QPushButton):

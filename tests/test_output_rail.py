@@ -372,7 +372,7 @@ def test_muted_rail_says_only_your_mic_while_the_plain_voice_still_goes(window, 
 def test_card_lines_sit_in_their_group_panels(window, qapp):  # noqa: F811
     """Voice and Connection: each its own panel with its name over its lines, the other
     lines in one more panel, untitled; a panel with no lines hidden. The small card
-    (rail shut) keeps every line's icon, no names."""
+    (rail shut) keeps every line's icon in its group's box, no names."""
     from soundboard.ui.window.onaircard import Line
     window.resize(1275, 980)
     window.show()
@@ -405,6 +405,9 @@ def test_card_lines_sit_in_their_group_panels(window, qapp):  # noqa: F811
     window.rail.set_open(False)
     qapp.processEvents()
     assert not voice.title.isVisible() and card.net[0].isVisible()
+    # shut, the group's icons still sit in its box (the card's width)
+    assert voice.isVisible() and card.net[0].parentWidget() is voice
+    assert voice.width() == card.width()
 
 
 def test_card_lines_start_in_one_place_whatever_else_is_on(window, qapp):  # noqa: F811
