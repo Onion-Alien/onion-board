@@ -2002,7 +2002,7 @@
   "Updated yt-dlp to {version}.": "yt-dlp, {version} olarak güncellendi.",
   "Updating the downloader (yt-dlp) is switched off in Settings > Privacy & security.": "İndiriciyi (yt-dlp) güncelleme Ayarlar > Gizlilik ve güvenlik'te kapalı.",
   "Updating… (a few minutes)": "Güncelleniyor… (birkaç dakika)",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder. They join the Voice list above.": "Bilgisayarınızda çalışan bir TTS sunucusu kullanın (Kokoro, AllTalk, OpenAI tarzı herhangi biri) ya da ses paketlerini (Piper) ses filtreleri klasörüne bırakın. Yukarıdaki ses listesine katılırlar.",
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Bilgisayarınızda çalışan bir TTS sunucusu kullanın (Kokoro, AllTalk, OpenAI tarzı herhangi biri) ya da ses paketlerini (Piper) ses filtreleri klasörüne bırakın.",
   "VB-Cable's own setup program isn't on this PC, so it can't be removed here.": "VB-Cable'ın kendi kurulum programı bu bilgisayarda bulunmadığından buradan kaldırılamaz.",
   "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 and other games on Vivox. Opus 32 kbps mono, full band, nothing under ~80 Hz (measured in a real game). Also suits TeamSpeak and Mumble.": "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 ve Vivox kullanan diğer oyunlar. Opus 32 kbps mono, tam bant, ~80 Hz altı hiçbir şey yok (gerçek bir oyunda ölçüldü). TeamSpeak ve Mumble'a da uyar.",
   "Voice changer is OFF": "Ses değiştirici KAPALI",

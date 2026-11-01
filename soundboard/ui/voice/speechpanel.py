@@ -261,6 +261,10 @@ class SpeechPanel(SpeechSay, SpeechTiles, SpeechLangs, QWidget):
                                        "AllTalk…) or Piper voice packs"))
         self.b_add_voices.clicked.connect(self.show_custom_voices)
         grid.addWidget(self.b_add_voices, 0, 2)
+        # each language speaks with its own voice now: no list of Windows voices on the
+        # card. The list stays as the hidden pick that custom voice switches set
+        for w in (lbl_voice, self.cb_voice, self.b_add_voices):
+            w.hide()
         grid.addWidget(QLabel(_("Speed")), 1, 0)
         self.sl_rate = QSlider(Qt.Orientation.Horizontal)
         self.sl_rate.setMinimumHeight(28)
@@ -374,7 +378,7 @@ class SpeechPanel(SpeechSay, SpeechTiles, SpeechLangs, QWidget):
         self.custom_title = section_label(_("Custom voices"))   # the card's head
         ov.addWidget(hint_label(_("Use a TTS server running on your PC (Kokoro, AllTalk, any "
                                   "OpenAI-style one) or drop voice packs (Piper) into the "
-                                  "voices folder. They join the Voice list above.")))
+                                  "voices folder.")))
         self.servers = ServerList()     # each server: online or not, on / off, settings
         self.servers.switched.connect(self._server_switched)
         self.servers.saved.connect(self.installs._recheck_voices_asked)

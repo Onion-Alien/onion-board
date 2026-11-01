@@ -43,10 +43,10 @@ def test_settings_changed_while_the_voice_list_loads_keep_the_saved_voice(speech
     s._fill_voices([], "speech failed")          # only "Windows default" listed
     s.sl_rate.setValue(5)
     assert s.s["voice"] == "Microsoft Zira Desktop" and s.s["rate"] == 5
-    s._fill_voices(["Microsoft Zira Desktop"], "")   # back: still the one picked
-    assert s.cb_voice.currentData() == "Microsoft Zira Desktop"
-    s.cb_voice.setCurrentIndex(0)                # picking the default yourself does count
-    assert s.s["voice"] == ""
+    s._fill_voices(["Microsoft Zira Desktop", "custom:Kokoro"], "")   # Windows' isn't listed
+    assert s.cb_voice.currentData() == "" and s.s["voice"] == "Microsoft Zira Desktop"
+    s.cb_voice.setCurrentIndex(1)                # a custom voice switched on does count
+    assert s.s["voice"] == "custom:Kokoro"
 
 
 def test_a_reload_asked_for_mid_load_runs_after_it(speech, qapp, monkeypatch):
