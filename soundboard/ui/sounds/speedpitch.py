@@ -170,14 +170,24 @@ class DjBunny(BunnyWidget):
     theme's skit stay off: he's busy. Hidden, his timer stops (BunnyWidget)."""
 
     def __init__(self, parent=None):
-        super().__init__(height=DJ_H, pad=4, parent=parent)
+        # DJ_REST_S after the pop-up opens or an edit, he finishes the round and holds still
+        self._round = 0   # which round of the mix he's on
+        super().__init__(height=DJ_H, pad=4, parent=parent, rest_after_s=DJ_REST_S)
 
     def _step_fidget(self, now: float):
         if self._skit is None:
-            self._skit, self._skit_at = (bunskits.MIX_LOOP, bunskits.mixing), now
+            if now < self._rest_at:
+                self._skit, self._skit_at, self._round = ((bunskits.MIX_LOOP, bunskits.mixing),
+                                                          now, 0)
+            return
+        rnd = int((now - self._skit_at) // bunskits.MIX_LOOP)
+        if now >= self._rest_at and rnd > self._round:   # rested: the round's done
+            self._skit, self._kit = None, None
+        self._round = rnd
 
 
 DJ_H = 72   # Bun's height, left of the Live controls title
+DJ_REST_S = 10.0   # he mixes this long after the pop-up opens or an edit, then holds still
 
 
 def short(name: str, most: int = 14) -> str:
@@ -273,6 +283,8 @@ class SpeedPitchButton(QPushButton):
         reset.setMinimumSize(max(96, reset.sizeHint().width()), 36)
         reset.clicked.connect(self.reset)
         self.dj = DjBunny()   # Bun mixing, left of the title
+        self.changed.connect(lambda *_a: self.dj.stir())   # an edit: he mixes again
+        self.fx_changed.connect(lambda *_a: self.dj.stir())
         head.addWidget(self.dj)
         head.addWidget(title)
         head.addWidget(sub)
