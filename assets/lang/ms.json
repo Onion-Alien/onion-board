@@ -3897,7 +3897,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "Tiada apa yang mengubah suara mikrofon anda. Hidupkan Suara, atau klik suara kelabu, untuk menghidupkannya.",
   "Off. Click to turn it back on. Right-click to open it.": "Mati. Klik untuk menghidupkannya semula. Klik kanan untuk membukanya.",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "Suis Suara di tab Suara: mematikan semua yang mengubah mikrofon anda (penukar suara, suara AI, suara komputer, terjemahan), dan tekanan seterusnya membawa kembali tepat semua itu.",
-  "The computer voice ({voice}) speaks for you.": "Suara komputer ({voice}) bercakap untuk anda.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Mematikan setiap suara yang mengubah mikrofon anda. Menghidupkannya membawa semuanya kembali.",
   "Turns on: {voices}": "Menghidupkan: {voices}",
   "Voices on or off": "Suara hidup atau mati",
@@ -4747,5 +4746,9 @@
     "{n} bunyi sudah tiada di Myinstants, jadi dilangkau."
   ],
   "(AI voice)": "(Suara AI)",
-  "(Voice changer)": "(Penukar suara)"
+  "(Voice changer)": "(Penukar suara)",
+  "(Computer voice)": "(Suara komputer)",
+  "(Custom voice)": "(Suara tersuai)",
+  "(Voice server)": "(Pelayan suara)",
+  "Windows voice": "Suara Windows"
 }

@@ -4045,7 +4045,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "Nic nie zmienia głosu z twojego mikrofonu. Ustaw Głosy na WŁ. albo kliknij szary głos, aby go włączyć.",
   "Off. Click to turn it back on. Right-click to open it.": "Wyłączone. Kliknij, aby włączyć ponownie. Prawy przycisk, aby otworzyć.",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "Przełącznik Głosy na karcie Głos: wyłącza wszystko, co zmienia twój mikrofon (zmieniacz głosu, głos AI, głos komputera, tłumaczenie), a kolejne naciśnięcie przywraca dokładnie to samo.",
-  "The computer voice ({voice}) speaks for you.": "Głos komputera ({voice}) mówi za ciebie.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Wyłącza każdy głos zmieniający twój mikrofon. Włączenie je przywraca.",
   "Turns on: {voices}": "Włącza: {voices}",
   "Voices on or off": "Głosy wł. lub wył.",
@@ -4927,5 +4926,9 @@
     "{n} dźwięków nie ma już na Myinstants, więc zostały pominięte."
   ],
   "(AI voice)": "(Głos AI)",
-  "(Voice changer)": "(Zmieniacz głosu)"
+  "(Voice changer)": "(Zmieniacz głosu)",
+  "(Computer voice)": "(Głos komputerowy)",
+  "(Custom voice)": "(Własny głos)",
+  "(Voice server)": "(Serwer głosu)",
+  "Windows voice": "Głos Windows"
 }

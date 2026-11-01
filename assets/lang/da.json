@@ -3971,7 +3971,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "Intet ændrer din mikrofonstemme. Sæt Stemmer på TIL, eller klik på en grå stemme, for at slå den til.",
   "Off. Click to turn it back on. Right-click to open it.": "Fra. Klik for at slå den til igen. Højreklik for at åbne den.",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "Stemme-fanens Stemmer-kontakt: slår alt fra, der ændrer din mikrofon (stemmeskifteren, AI-stemmen, computerstemmen, oversættelsen), og næste tryk henter præcis dem tilbage.",
-  "The computer voice ({voice}) speaks for you.": "Computerstemmen ({voice}) taler for dig.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Slår alle stemmer fra, der ændrer din mikrofon. Når du slår den til, kommer de tilbage.",
   "Turns on: {voices}": "Slår til: {voices}",
   "Voices on or off": "Stemmer til eller fra",
@@ -4837,5 +4836,9 @@
     "{n} lyde er væk fra Myinstants, så de blev sprunget over."
   ],
   "(AI voice)": "(AI-stemme)",
-  "(Voice changer)": "(Stemmeskifter)"
+  "(Voice changer)": "(Stemmeskifter)",
+  "(Computer voice)": "(Computerstemme)",
+  "(Custom voice)": "(Egen stemme)",
+  "(Voice server)": "(Stemmeserver)",
+  "Windows voice": "Windows-stemme"
 }

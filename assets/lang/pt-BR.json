@@ -3971,7 +3971,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "Nada está mudando a voz do seu microfone. Coloque Vozes em LIGADO, ou clique numa voz cinza, para ligá-la.",
   "Off. Click to turn it back on. Right-click to open it.": "Desligado. Clique para ligar de novo. Clique com o botão direito para abrir.",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "O interruptor Vozes da aba Voz: desliga tudo que muda seu microfone (o modificador de voz, a voz de IA, a voz do computador, a tradução), e o próximo toque traz de volta exatamente isso.",
-  "The computer voice ({voice}) speaks for you.": "A voz do computador ({voice}) fala por você.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Desliga todas as vozes que mudam seu microfone. Ligar traz elas de volta.",
   "Turns on: {voices}": "Liga: {voices}",
   "Voices on or off": "Vozes ligadas ou desligadas",
@@ -4837,5 +4836,9 @@
     "{n} sons sumiram do Myinstants, então foram pulados."
   ],
   "(AI voice)": "(Voz de IA)",
-  "(Voice changer)": "(Modificador de voz)"
+  "(Voice changer)": "(Modificador de voz)",
+  "(Computer voice)": "(Voz de computador)",
+  "(Custom voice)": "(Voz personalizada)",
+  "(Voice server)": "(Servidor de voz)",
+  "Windows voice": "Voz do Windows"
 }

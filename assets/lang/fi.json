@@ -3971,7 +3971,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "Mikään ei muuta mikkisi ääntä. Laita Puheäänet PÄÄLLE tai klikkaa harmaata puheääntä laittaaksesi sen päälle.",
   "Off. Click to turn it back on. Right-click to open it.": "Pois. Klikkaa laittaaksesi sen taas päälle. Avaa hiiren oikealla.",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "Puhe-välilehden Puheäänet-kytkin: laittaa pois kaiken, mikä muuttaa mikkiäsi (äänenmuuntimen, tekoälypuheäänen, tietokoneäänen, kääntämisen), ja seuraava painallus tuo juuri ne takaisin.",
-  "The computer voice ({voice}) speaks for you.": "Tietokoneääni ({voice}) puhuu puolestasi.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Laittaa pois jokaisen mikkiäsi muuttavan puheäänen. Päälle laittaminen tuo ne takaisin.",
   "Turns on: {voices}": "Laittaa päälle: {voices}",
   "Voices on or off": "Puheäänet päällä tai pois",
@@ -4837,5 +4836,9 @@
     "{n} ääntä on poistunut Myinstantsista, joten ne ohitettiin."
   ],
   "(AI voice)": "(Tekoälypuheääni)",
-  "(Voice changer)": "(Äänenmuunnin)"
+  "(Voice changer)": "(Äänenmuunnin)",
+  "(Computer voice)": "(Tietokoneääni)",
+  "(Custom voice)": "(Oma ääni)",
+  "(Voice server)": "(Äänipalvelin)",
+  "Windows voice": "Windowsin ääni"
 }

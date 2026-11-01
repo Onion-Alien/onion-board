@@ -4045,7 +4045,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "Nic nemění hlas tvého mikrofonu. Přepni Hlasy na ZAP. nebo klikni na šedý hlas, abys ho zapnul.",
   "Off. Click to turn it back on. Right-click to open it.": "Vypnuto. Klikni pro opětovné zapnutí. Pravým tlačítkem ho otevřeš.",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "Přepínač Hlasy na kartě Hlas: vypne vše, co mění tvůj mikrofon (měnič hlasu, hlas AI, počítačový hlas, překlad), a další stisk vrátí přesně to samé.",
-  "The computer voice ({voice}) speaks for you.": "Počítačový hlas ({voice}) mluví za tebe.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Vypne každý hlas, který mění tvůj mikrofon. Zapnutí je vrátí.",
   "Turns on: {voices}": "Zapne: {voices}",
   "Voices on or off": "Hlasy zap. nebo vyp.",
@@ -4927,5 +4926,9 @@
     "{n} zvuků už na Myinstants není, takže byly přeskočeny."
   ],
   "(AI voice)": "(AI hlas)",
-  "(Voice changer)": "(Měnič hlasu)"
+  "(Voice changer)": "(Měnič hlasu)",
+  "(Computer voice)": "(Počítačový hlas)",
+  "(Custom voice)": "(Vlastní hlas)",
+  "(Voice server)": "(Hlasový server)",
+  "Windows voice": "Hlas Windows"
 }

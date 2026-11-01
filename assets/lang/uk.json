@@ -4045,7 +4045,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "Ніщо не змінює голос у вашому мікрофоні. Поставте «Голоси» на УВІМК. або клацніть сірий голос, щоб увімкнути його.",
   "Off. Click to turn it back on. Right-click to open it.": "Вимкнено. Клацніть, щоб увімкнути знову. Правий клік відкриває.",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "Перемикач «Голоси» на вкладці «Голос»: вимикає все, що змінює ваш мікрофон (зміну голосу, ШІ-голос, комп'ютерний голос, переклад), а наступне натискання повертає саме це.",
-  "The computer voice ({voice}) speaks for you.": "Комп'ютерний голос ({voice}) говорить за вас.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Вимикає всі голоси, що змінюють ваш мікрофон. Якщо ввімкнути, вони повернуться.",
   "Turns on: {voices}": "Увімкне: {voices}",
   "Voices on or off": "Голоси увімк. або вимк.",
@@ -4927,5 +4926,9 @@
     "{n} звуків більше немає на Myinstants, тож їх пропущено."
   ],
   "(AI voice)": "(ШІ-голос)",
-  "(Voice changer)": "(Зміна голосу)"
+  "(Voice changer)": "(Зміна голосу)",
+  "(Computer voice)": "(Комп'ютерний голос)",
+  "(Custom voice)": "(Власний голос)",
+  "(Voice server)": "(Голосовий сервер)",
+  "Windows voice": "Голос Windows"
 }

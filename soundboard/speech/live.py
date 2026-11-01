@@ -142,6 +142,7 @@ class SpeechController:
         self.live_voice: str | None = None   # voice for live lines (None: the chosen one)
         self.dub: AiVoiceController | None = None   # the AI voice controller saying the lines
         self.fx_always = False  # translating for the voice changer: its effect, always
+        self.on_top = False     # the computer voice is on: the Effects play on its lines
         self._ready = False     # the module said "ready": an error after that isn't fatal
         self._replace = False   # live voice mutes your real voice
 
@@ -156,11 +157,18 @@ class SpeechController:
         mono, rate = self.tts.synth(text, self.speaker.voice, self.speaker.rate)
         if not len(mono):
             raise RuntimeError("this voice can't read that text")
-        if (self.voice_fx or self.fx_always) and self.chain.enabled:
-            mono = self.chain.render(mono, rate)
+        mono = self._effects(mono, rate)
         from soundboard.audio.engine import resample
         mono = resample(np.asarray(mono, np.float32), rate, library.SR)
         return np.ascontiguousarray(np.repeat(mono[:, None], 2, axis=1), np.float32)
+
+    def _effects(self, mono: np.ndarray, rate: int) -> np.ndarray:
+        """A line through the voice changer (when it's on and goes on the computer
+        voice) or else just the Effects on top of the voice (while it's on)."""
+        full = (self.voice_fx or self.fx_always) and self.chain.enabled
+        if not full and not self.on_top:
+            return mono
+        return self.chain.render(mono, rate, top_only=not full)
 
     def stop_speaking(self):
         self.speaker.stop()
@@ -172,8 +180,10 @@ class SpeechController:
         dub = self.dub
         if dub is not None and dub.dub(stereo[:, 0], rate):
             return              # the AI voice says it (the chain adds the voice changer)
-        if (self.voice_fx or self.fx_always) and self.chain.enabled:
-            stereo = np.repeat(self.chain.render(stereo[:, 0], rate)[:, None], 2, axis=1)
+        mono = stereo[:, 0]
+        y = self._effects(mono, rate)
+        if y is not mono:   # changed: on both sides
+            stereo = np.repeat(y[:, None], 2, axis=1)
         # "overlap": the Speaker already spaces lines out; this never cuts one short
         if self.engine.play(TTS_SID, stereo, self.gain, mode="overlap", src_rate=rate) is None:
             # nothing open to play it on: say so rather than "speak" to nobody

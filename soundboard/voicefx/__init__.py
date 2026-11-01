@@ -391,15 +391,20 @@ class VoiceChain:
             self.clean_error = ""
             self._clean_gen += 1
 
-    def render(self, mono: np.ndarray, rate: int, block: int = 1024) -> np.ndarray:
+    def render(self, mono: np.ndarray, rate: int, block: int = 1024,
+               top_only: bool = False) -> np.ndarray:
         """A whole clip (the computer voice's line) through the voice changer, with its
         own fresh effects so the mic's running ones keep their state. Off, or no
-        effect on: the clip as it is. A failing effect is left out, as on the mic."""
-        if not self.enabled:
+        effect on: the clip as it is. A failing effect is left out, as on the mic.
+        `top_only`: just the effects on top of the voice (`on_top`), whether or not
+        the voice changer is on."""
+        if not self.enabled and not top_only:
             return mono
         effects = []
         for etype, cls in REGISTRY.items():
             cfg = self._spec.get("effects", {}).get(etype)
+            if top_only and not on_top(etype):
+                continue
             if cfg and cfg.get("on") and etype not in self.errors:
                 try:
                     effect = cls(rate, cfg)
