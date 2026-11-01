@@ -81,11 +81,12 @@ def test_a_short_screen_still_fits(window):  # noqa: F811
 
 def test_the_waveform_gives_up_room_before_a_column_scrolls(window):  # noqa: F811
     """Speed & loudness and the Equalizer whole, the waveform smaller: split by stretch
-    alone, both scrolled for their last lines on a 1280 x 800 window. The window can
+    alone, both scrolled for their last lines on a 1280 x 800 window. 820 tall here:
+    the editor's button row is as tall as Bun at his desk beside it. The window can
     still be made as short as before."""
     d = _dialog(window, advanced=True)
     d.show()
-    d.setFixedSize(2400, 800)
+    d.setFixedSize(2400, 820)
     QApplication.processEvents()
     trim, _fx, eq = d.adv._scrolls
     assert trim.verticalScrollBar().maximum() == 0 and eq.verticalScrollBar().maximum() == 0

@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QDialog, QDialogButtonBox, QHB
                                QVBoxLayout)
 
 from soundboard.core import achievements, trash
+from soundboard.ui.bun import bunacts
 from soundboard.ui.kit import busy, fit, icons, toast
 from soundboard.ui.kit.panel import EmptyList, hint_label
 from soundboard.i18n import _, ngettext
@@ -62,9 +63,14 @@ class DeletedDialog(QDialog):
         lay = QVBoxLayout(self)
         lay.setContentsMargins(18, 18, 18, 18)
         lay.setSpacing(12)
+        head = QHBoxLayout()
+        head.setSpacing(2)   # (his widget has room round him already)
+        self.bun = bunacts.ActBunny(bunacts.BIN_ACT)   # Bun in the bin, beside the title
+        head.addWidget(self.bun)
         heading = QLabel(title)
         heading.setObjectName("helptitle")   # the dialog Title role (DESIGN.md)
-        lay.addWidget(heading)
+        head.addWidget(heading, 1)
+        lay.addLayout(head)
         self.hint = hint_label(hint)
         lay.addWidget(self.hint)
         self.list = EmptyList(self.empty_text, "trash")
@@ -111,13 +117,16 @@ class DeletedDialog(QDialog):
         self.btn_forget.setEnabled(on)
 
     def bring_back(self):
-        failed = []
+        failed, back = [], False
         for iid in self._picked():
             it = self.source.take(iid)
             if it is None or not self.restore(it):
                 failed.append(it.name if it else _("One of them"))
             else:
                 achievements.bump("restored")
+                back = True
+        if back:
+            self.bun.play(bunacts.BRING_BACK)
         self.fill()
         if failed:
             busy.toast(self, toast.titled(_("Couldn't bring it back"), _(
@@ -137,4 +146,5 @@ class DeletedDialog(QDialog):
             return
         for iid in ids:
             self.source.forget(iid)
+        self.bun.play(bunacts.BYE)
         self.fill()

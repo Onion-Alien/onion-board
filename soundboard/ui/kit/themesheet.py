@@ -463,6 +463,8 @@ QFrame#picked QLabel#pickedname { color:$text_hi; font-size:11pt; font-weight:70
 QFrame#picked QLabel#pickedkind { color:$muted; font-size:11pt; }
 /* Spacious controls only in Voice and Setup cards. */
 QFrame#card[roomy="true"] QPushButton { padding:9px 14px; min-height:18px; }
+/* Edit sound Advanced's button row (ui/sounds/editadvanced.py): a touch bigger */
+QPushButton[roomier="true"], QFrame#card QPushButton[roomier="true"] { padding:8px 13px; }
 /* the reset family (panel.reset_button): a slim muted link with the reset arrow, the
    same beside an effect, the live controls and a sound's effects */
 QPushButton#reset, QFrame#card QPushButton#reset, QFrame#card[roomy="true"] QPushButton#reset { background:transparent; border:none; color:$muted; padding:2px 6px; min-height:0; font-size:8pt; }
@@ -535,7 +537,6 @@ QPushButton#rec:checked { background:#d32f2f; border:1px solid #ff6b6b; color:wh
 /* in a card too (an app row's Record): the card's accent fill had its white icon on Hacker's green */
 QFrame#card QPushButton#rec:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; }
 QDialog#recorddialog QLabel#recordtitle { font-size:19pt; font-weight:700; color:$text_hi; }
-QDialog#recorddialog QPushButton#recordmark { background:$panel; border:1px solid $border; border-radius:14px; padding:0; }
 QDialog#recorddialog QRadioButton#recordsource { background:$panel; border:1px solid $border; border-radius:12px; padding:12px 14px; spacing:8px; font-weight:600; }
 QDialog#recorddialog QRadioButton#recordsource:hover { background:$card_hi; border-color:$border_hi; }
 QDialog#recorddialog QRadioButton#recordsource:checked { background:$card_hi; border-color:$accent; color:$text_hi; }

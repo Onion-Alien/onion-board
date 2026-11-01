@@ -32,6 +32,7 @@ if TYPE_CHECKING:
 WIDE_PX = 1180      # from this wide, three columns (when they fit: fits()); narrower, tabs
 FINE_PEAKS = 2400   # the big waveform's peaks: enough to zoom in sixteen times
 PICKER_COLS = 3
+BUTTON_GROW = 2      # px: the editor's button row, a touch bigger than plain buttons
 EQ_TOP = 5           # px: see attach()
 QWIDGETSIZE_MAX = (1 << 24) - 1   # Qt's "no maximum"
 
@@ -193,7 +194,7 @@ class AdvancedView(QWidget):
         # the top line: the sound's name and hotkey (the same as on the Sound tab, which
         # keeps the rest; its volume is in Speed & loudness), then the Simple | Advanced
         # switch
-        top = QHBoxLayout()
+        top = self.top = QHBoxLayout()
         top.setSpacing(8)
         self.name = QLineEdit(d.name.text())
         self.name.setFont(d.name.font())
@@ -215,7 +216,7 @@ class AdvancedView(QWidget):
 
         # the editor: its buttons, the trim (big), what the handles do
         self.editor, ev = card()
-        bar = QHBoxLayout()
+        bar = self.bar = QHBoxLayout()
         bar.setSpacing(8)
         self.btn_play = QPushButton(_("Preview"))
         icons.set_icon(self.btn_play, "headphones")
@@ -253,6 +254,13 @@ class AdvancedView(QWidget):
         self.btn_in.clicked.connect(lambda: self._zoom(2.0))
         self.btn_fit.clicked.connect(lambda: self._zoom(None))
         ev.addLayout(bar)
+        for b in (self.btn_play, self.btn_undo, self.btn_redo, self.splices.cut,
+                  self.splices.list, self.btn_out, self.btn_in, self.btn_fit):
+            b.setProperty("roomier", True)   # a touch bigger (the theme: 1 px more padding)
+            b.style().unpolish(b)   # (already styled once: its size was asked for)
+            b.style().polish(b)
+        for b in (self.btn_out, self.btn_in, self.btn_fit):
+            b.setFixedWidth(36 + BUTTON_GROW)
         self.trim_box = QVBoxLayout()
         self.trim_box.setContentsMargins(0, 0, 0, 0)
         ev.addLayout(self.trim_box, 1)

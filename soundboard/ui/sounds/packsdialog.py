@@ -23,6 +23,7 @@ from soundboard.core import errors, updates
 from soundboard.sounds import library, packs
 from soundboard.online import net
 from soundboard.audio.engine import SR
+from soundboard.ui.bun import bunacts
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import HoverCard, hint_label, section_label
 from soundboard.ui.kit.panellayouts import CardGrid, Flow
@@ -476,6 +477,8 @@ class PacksDialog(QDialog):
         icons.set_icon(self.btn_done, "nav_back")
         self.btn_done.clicked.connect(self.accept)
         head.addWidget(self.btn_done, 0, Qt.AlignmentFlag.AlignVCenter)
+        self.bun = bunacts.ActBunny(bunacts.PAT)   # Bun with a parcel, beside the title
+        head.addWidget(self.bun, 0, Qt.AlignmentFlag.AlignVCenter)
         title = QLabel(_("Free sound packs"))
         title.setObjectName("helptitle")
         head.addWidget(title, 1, Qt.AlignmentFlag.AlignVCenter)
@@ -879,6 +882,7 @@ class PacksDialog(QDialog):
             busy.toast(self.preview or self, html.escape(why), "error")
             return
         self._busy[p.id] = _("Downloading…")
+        self.bun.set_act(bunacts.RUN)   # running with it till it lands
         for b in self._buttons(p.id):
             busy.set_busy(b, True)
         self._show_progress(p.id)
@@ -929,6 +933,8 @@ class PacksDialog(QDialog):
         self._shown_pct.pop(p.id, None)
         if self._closed:
             return
+        if not self._busy:
+            self.bun.set_act(bunacts.PAT)
         for b in self._buttons(p.id):
             busy.set_busy(b, False)
             _show_add(b, p, short=b.objectName() != "primary")
@@ -939,6 +945,7 @@ class PacksDialog(QDialog):
         self._say("")
         self.close_pack()   # added: the board's own import reports it from here
         self._add(Path(path))
+        self.bun.play(bunacts.OPEN)
         for b in self._buttons(p.id):
             busy.flash(b, _("✓ Added"))
         if skipped:

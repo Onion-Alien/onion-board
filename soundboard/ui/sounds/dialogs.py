@@ -8,7 +8,7 @@ import logging
 import threading
 from typing import Any
 
-from PySide6.QtCore import QObject, QSize, Qt, QTimer, Signal
+from PySide6.QtCore import QObject, QPoint, QSize, Qt, QTimer, Signal
 from shiboken6 import isValid as qt_valid
 from PySide6.QtGui import QFont, QImage, QKeySequence, QShortcut
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QComboBox,
@@ -26,6 +26,7 @@ from soundboard.sounds import thumbs
 from soundboard.audio.eq import PRESETS as EQ_PRESETS
 from soundboard.sounds.library import (MAX_COOLDOWN_S, MAX_DELAY_S, PAD_COLORS,
                                        SoundMeta, original_length, original_peaks)
+from soundboard.ui.bun import bunacts
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import (EqPanel, hint_label, icon_button, reset_button,
                                      section_label)
@@ -47,6 +48,8 @@ log = logging.getLogger(__name__)
 HISTORY_MS = 400      # changes this close together are one Undo step (a drag)
 HISTORY_STEPS = 200   # Undo goes this far back
 ADV_W, ADV_H = 1320, 880       # the Advanced window, when the screen has room
+BUN_GAP = 12   # px above and below Bun in Advanced's editor card (_fit_bun)
+BUN_ROOM = 10  # px more across: his corner's a little wider, him in its middle
 ADV_MIN_W, ADV_MIN_H = 720, 600
 
 CUSTOM = "Custom"   # the preset box's item data when no preset matches
@@ -899,6 +902,8 @@ class EditDialog(EditDialogParts, QDialog):
         # Simple's top: what's on (a chip each, × takes it off), then the switch
         self.summary = Summary(eff)
         self.summary.set_sound(meta)
+        self.bun = bunacts.EditBunny()   # Bun at his DJ desk, at the page's top
+        self._head.addWidget(self.bun, 0, Qt.AlignmentFlag.AlignTop)
         self._head.addWidget(self.summary, 1)
         self._head.addWidget(self.switch, 0, Qt.AlignmentFlag.AlignTop)
 
@@ -961,6 +966,8 @@ class EditDialog(EditDialogParts, QDialog):
         self.live_bar.hide()
         lay.addWidget(self.live_bar)
         self.effects.changed.connect(self._fx_note)
+        self.effects.changed.connect(self._tune_bun)
+        self._tune_bun()
         self._fx_note()
 
         # one row at the bottom: a headphones icon to preview on the left, the
@@ -1079,6 +1086,21 @@ class EditDialog(EditDialogParts, QDialog):
         if advanced:
             self.set_advanced(True)
 
+
+    def _tune_bun(self):
+        """Bun at the top mixes at the sound's speed, stretched up or squashed by its
+        pitch; a change sends him off to snip (the trim) or twist a knob (the rest)."""
+        f = self.effects.fx()
+        self.bun.tune(float(f.get("speed", 1.0)), float(f.get("pitch", 0.0)))
+        trim = self.effects.trim.trim_fx()
+        rest = soundfx.clean({k: v for k, v in f.items() if k not in trim})
+        was, self._bun_was = getattr(self, "_bun_was", None), (trim, rest)
+        if was is None:
+            return
+        if was[0] != trim:
+            self.bun.busy(bunacts.SNIP)
+        elif was[1] != rest:
+            self.bun.busy(bunacts.KNOB)
 
     def load(self, meta: SoundMeta, tab: str = "sound"):
         """Show another sound, as a new window would: EditControl.edit reuses a closed
@@ -1213,6 +1235,7 @@ class EditDialog(EditDialogParts, QDialog):
             self.simple.show()
             self.setMinimumSize(self._simple_min_w(), 0)
             self.resize(self._simple_size or QSize(max(540, self.minimumWidth()), 640))
+        self._move_bun(on)
         self.switch.set_advanced(on)
         if self.adv is not None:
             self.adv.switch.set_advanced(on)
@@ -1222,6 +1245,51 @@ class EditDialog(EditDialogParts, QDialog):
             x = min(max(g.x(), screen.left()), screen.right() - g.width())
             y = min(max(g.y(), screen.top()), screen.bottom() - g.height())
             self.move(max(x, screen.left()), max(y, screen.top()))
+
+    def _move_bun(self, advanced: bool):
+        """Bun goes with the view: the start of Simple's top line, or in Advanced the
+        editor card's top-left corner, the button row beside him made as tall as he needs
+        (_fit_bun)."""
+        i = self._head.indexOf(self.bun)
+        if i >= 0:
+            take_out(self._head, i)
+        adv = self.adv
+        if advanced and adv is not None:
+            self.bun.set_height(bunacts.ADV_H)
+            self.bun.setParent(adv.editor)
+            self._fit_bun()
+            self.bun.raise_()
+        else:
+            if adv is not None:
+                adv.bar.setContentsMargins(0, 0, 0, 0)
+            self.bun.set_height(bunacts.ACT_H)
+            self._head.insertWidget(0, self.bun, 0, Qt.AlignmentFlag.AlignTop)
+        self.bun.show()
+
+    def _fit_bun(self):
+        """Bun in Advanced, centred in his corner of the editor card: left to right between
+        the card's edge and the Preview button, top to bottom between the card's top and
+        the waveform's ruler. The button row is made that tall, its buttons centred on
+        him."""
+        adv = self.adv
+        assert adv is not None
+        card = adv.editor.layout()
+        assert card is not None   # (the card's own layout: always made with it)
+        seen = self.bun.seen()
+        side = BUN_GAP + BUN_ROOM / 2   # the same each side of him (Preview a bit off)
+        self.bun.move(round(side - seen.left()), round(BUN_GAP - seen.top()))
+        m = card.contentsMargins()
+        left = round(2 * side + seen.width()) - m.left()
+        adv.bar.setContentsMargins(left, 0, 0, 0)
+        card.activate()
+        # then measured, not worked out: the ruler a gap under him, the buttons' middle
+        # level with his
+        play, trim = adv.btn_play, self.effects.trim
+        mid = play.mapTo(adv.editor, QPoint(0, 0)).y() + play.height() / 2
+        ruler = trim.mapTo(adv.editor, QPoint(0, 0)).y()
+        top = max(0, round(BUN_GAP + seen.height() / 2 - mid))
+        bottom = max(0, round(2 * BUN_GAP + seen.height() - ruler) - top)
+        adv.bar.setContentsMargins(left, top, 0, bottom)
 
     def set_player(self, player: QWidget):
         """The board's player (ui/sounds/editplayer.py), over the Save row: a big
