@@ -4814,5 +4814,7 @@
   "Speaks your typed lines": "Yazdığın satırları söyler",
   "From a link…": "Bağlantıdan…",
   "Pick one of ours": "Bizimkilerden seç",
-  "Remove server": "Sunucuyu kaldır"
+  "Remove server": "Sunucuyu kaldır",
+  "(AI voice)": "(Yapay zekâ sesi)",
+  "(Voice changer)": "(Ses değiştirici)"
 }

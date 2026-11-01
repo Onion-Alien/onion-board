@@ -4902,5 +4902,7 @@
   "Speaks your typed lines": "Произносит набранные строки",
   "From a link…": "По ссылке…",
   "Pick one of ours": "Выбрать из наших",
-  "Remove server": "Удалить сервер"
+  "Remove server": "Удалить сервер",
+  "(AI voice)": "(ИИ-голос)",
+  "(Voice changer)": "(Смена голоса)"
 }

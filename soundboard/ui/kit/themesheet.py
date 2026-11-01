@@ -454,6 +454,7 @@ QFrame#card QToolButton#voicestar[picked="true"]:hover { background:$btn_hover; 
 QFrame#card QFrame#voicebox { background:$inset; border:1px solid $border; border-radius:8px; }
 QFrame#picked[pinned="true"] { background:$panel; border-radius:12px; }
 QFrame#picked QLabel#pickedname { color:$text_hi; font-size:11pt; font-weight:700; }
+QFrame#picked QLabel#pickedkind { color:$muted; font-size:11pt; }
 /* Spacious controls only in Voice and Setup cards. */
 QFrame#card[roomy="true"] QPushButton { padding:9px 14px; min-height:18px; }
 /* the reset family (panel.reset_button): a slim muted link with the reset arrow, the

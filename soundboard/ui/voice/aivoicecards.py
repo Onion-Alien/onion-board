@@ -267,7 +267,7 @@ class AiVoiceCards(_Panel):
         m = box.contentsMargins()
         line = self.picked.width() - m.left() - m.right()
         beside = (line - PICKED_ART - min(self.picked_name.sizeHint().width(), 140)
-                  - 2 * box.spacing())
+                  - self.picked_kind.sizeHint().width() - 3 * box.spacing())
         want = (QBoxLayout.Direction.LeftToRight if need <= beside
                 else QBoxLayout.Direction.TopToBottom)
         if box.direction() != want:

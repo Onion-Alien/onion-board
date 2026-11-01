@@ -4814,5 +4814,7 @@
   "Speaks your typed lines": "Spreekt je getypte regels uit",
   "From a link…": "Via een link…",
   "Pick one of ours": "Kies een van de onze",
-  "Remove server": "Server verwijderen"
+  "Remove server": "Server verwijderen",
+  "(AI voice)": "(AI-stem)",
+  "(Voice changer)": "(Stemvervormer)"
 }

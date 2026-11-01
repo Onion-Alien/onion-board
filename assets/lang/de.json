@@ -4814,5 +4814,7 @@
   "Speaks your typed lines": "Spricht deine getippten Zeilen",
   "From a link…": "Von einem Link…",
   "Pick one of ours": "Eins von unseren wählen",
-  "Remove server": "Server entfernen"
+  "Remove server": "Server entfernen",
+  "(AI voice)": "(KI-Stimme)",
+  "(Voice changer)": "(Stimmverzerrer)"
 }

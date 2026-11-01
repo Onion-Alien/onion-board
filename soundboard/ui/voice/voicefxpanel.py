@@ -17,7 +17,7 @@ import numpy as np
 from PySide6.QtCore import QEvent, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QGuiApplication, QKeySequence, QShortcut
 from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QDialog, QFrame, QGridLayout, QHBoxLayout,
-                               QLabel, QMenu, QPushButton,
+                               QLabel, QMenu, QPushButton, QSizePolicy,
                                QScrollArea, QTabWidget, QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
 
@@ -251,6 +251,13 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self.picked_name.setWordWrap(True)
         self.picked_name.setMinimumWidth(40)   # a long name gives way in a narrow window
         ph.addWidget(self.picked_name)
+        # which kind of voice it is, after its name (Robot alone didn't say)
+        self.picked_kind = QLabel(_("(Voice changer)"))
+        self.picked_kind.setObjectName("pickedkind")
+        ph.addWidget(self.picked_kind)
+        for lbl in (self.picked_name, self.picked_kind):   # no wider than their words:
+            # the kind stays by the name, on a line of its own too (narrow)
+            lbl.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred)
         # everything for making your own voice opens in a window of its own (on the
         # card it made the tab scroll forever)
         self.btn_tweak = QPushButton(_("Edit voice"))
@@ -854,7 +861,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
             m = self.picked_box.contentsMargins()
             line = self.picked.width() - m.left() - m.right()
             beside = (line - PICKED_ART - min(self.picked_name.sizeHint().width(), 140)
-                      - 2 * self.picked_box.spacing())
+                      - self.picked_kind.sizeHint().width() - 3 * self.picked_box.spacing())
             row, col = QBoxLayout.Direction.LeftToRight, QBoxLayout.Direction.TopToBottom
             tries = ((row, full, bd, beside), (col, full, bd, line), (col, full, "", line),
                      (col, _("Edit voice"), "", line))

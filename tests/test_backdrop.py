@@ -372,6 +372,9 @@ def test_the_effects_pop_up_adds_changes_and_takes_off(qapp, monkeypatch):
     try:
         fx = p.fx
         fx.pick("Robot")
+        fx.picked.resize(1400, 80)   # wide enough for every button beside the name
+        fx._fit_picked()             # (hidden: no resize event lays it out)
+        fx.picked_box.activate()
         fx.btn_effects.click()
         pop = fx.effects_pop
         process_events(qapp, lambda: pop.isVisible(), timeout=5)
@@ -574,14 +577,15 @@ def test_the_voice_bar_puts_its_buttons_under_the_name_when_narrow(qapp):
 
 
 def test_the_voice_bar_buttons_sit_beside_the_name_on_a_wide_bar(qapp):
-    """A wide window leaves the buttons right after the voice's name, not mid-bar."""
+    """A wide window leaves the buttons right after the voice's name (and its kind),
+    not mid-bar."""
     fx, bar = _picked_bar(qapp)
     try:
         bar.resize(2000, 200)
         process_events(qapp, lambda: False, timeout=0.1)
         first = min((b for b in (fx.btn_effects, fx.btn_tweak) if not b.isHidden()),
                     key=lambda b: b.mapTo(bar, b.rect().topLeft()).x())
-        name_end = fx.picked_name.mapTo(bar, fx.picked_name.rect().topRight()).x()
+        name_end = fx.picked_kind.mapTo(bar, fx.picked_kind.rect().topRight()).x()
         assert first.mapTo(bar, first.rect().topLeft()).x() - name_end <= 40
     finally:
         bar.close()

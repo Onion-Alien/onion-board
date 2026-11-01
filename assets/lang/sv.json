@@ -4814,5 +4814,7 @@
   "Speaks your typed lines": "Säger raderna du skriver",
   "From a link…": "Från en länk…",
   "Pick one of ours": "Välj en av våra",
-  "Remove server": "Ta bort server"
+  "Remove server": "Ta bort server",
+  "(AI voice)": "(AI-röst)",
+  "(Voice changer)": "(Röstförvrängare)"
 }

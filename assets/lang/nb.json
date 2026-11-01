@@ -4814,5 +4814,7 @@
   "Speaks your typed lines": "Sier linjene du skriver",
   "From a link…": "Fra en lenke…",
   "Pick one of ours": "Velg et av våre",
-  "Remove server": "Fjern server"
+  "Remove server": "Fjern server",
+  "(AI voice)": "(AI-stemme)",
+  "(Voice changer)": "(Stemmeforvrenger)"
 }
