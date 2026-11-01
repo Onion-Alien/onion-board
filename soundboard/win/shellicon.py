@@ -476,3 +476,57 @@ def paint_background(window, color: str) -> None:
         gdi.DeleteObject.argtypes = [wintypes.HANDLE]
         gdi.DeleteObject(old)   # our previous theme's brush; never the system's own
     _state["brush"] = brush
+
+
+def cloak(window, on: bool) -> None:
+    """Hide the window from the screen while it stays shown to Windows and Qt
+    (DWMWA_CLOAK): a window back from the tray is on screen before Qt has drawn it,
+    and Windows fills it white until then, for a second or more once its memory went
+    back to Windows (memtrim). Cloaked at showEvent, uncloaked once it's drawn."""
+    if not _native() or window.windowHandle() is None:
+        return
+    import ctypes
+    from ctypes import wintypes
+    v = wintypes.BOOL(on)
+    try:
+        ctypes.windll.dwmapi.DwmSetWindowAttribute(
+            wintypes.HWND(int(window.winId())), 13, ctypes.byref(v), ctypes.sizeof(v))
+    except (OSError, AttributeError):
+        log.debug("couldn't cloak the window", exc_info=True)
+
+
+CLOAK_MAX_MS = 3000   # on screen by then even if Qt hasn't drawn it yet
+
+
+def cloak_until_drawn(window) -> None:
+    """showEvent: keep the window off screen until Qt has drawn its first frame (the
+    expose event paints it; uncloaked right after), at most CLOAK_MAX_MS."""
+    if not _native() or (wh := window.windowHandle()) is None:
+        return
+    from PySide6.QtCore import QEvent, QObject, QTimer
+
+    class _Drawn(QObject):
+        def eventFilter(self, obj, e):   # noqa: N802 - Qt API
+            if e.type() == QEvent.Type.Expose and obj.isExposed():
+                QTimer.singleShot(0, self, self.done)   # after the expose has painted
+            return False
+
+        def done(self):
+            if _state.get("drawn") is not self:   # (done already)
+                return
+            del _state["drawn"]
+            wh.removeEventFilter(self)
+            cloak(window, False)
+            self.deleteLater()   # (its CLOAK_MAX_MS timer goes with it)
+
+    old = _state.pop("drawn", None)
+    if old is not None:   # shown again before the last one was drawn
+        try:
+            wh.removeEventFilter(old)
+            old.deleteLater()
+        except RuntimeError:   # already gone
+            pass
+    cloak(window, True)
+    f = _state["drawn"] = _Drawn(wh)
+    wh.installEventFilter(f)
+    QTimer.singleShot(CLOAK_MAX_MS, f, f.done)
