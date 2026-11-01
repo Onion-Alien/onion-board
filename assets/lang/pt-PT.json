@@ -4772,5 +4772,31 @@
   "ooh! aah!": "Ooh! Aah!",
   "ooh, pretty!": "Uau, que bonito!",
   "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Arrasta as pegas para cortar o início e o fim. Ctrl+roda faz zoom. Arrasta com o botão direito do rato, ou usa Shift+roda, para deslocar.",
-  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Abre este separador enquanto o Onion Board está à frente.\nEsc = cancelar."
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Abre este separador enquanto o Onion Board está à frente.\nEsc = cancelar.",
+  "Add splices": "Adicionar excertos",
+  "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Clica onde uma parte começa e depois onde acaba. Cada parte é um excerto. Esc larga um excerto a meio.",
+  "Combine splices": "Juntar excertos",
+  "Combine splices makes the sound play them back to back, 1 first.": "Juntar excertos faz o som tocá-los um a seguir ao outro, o 1 primeiro.",
+  "Combined: the sound plays them back to back, 1 first.": "Juntos: o som toca-os um a seguir ao outro, o 1 primeiro.",
+  "Each splice's times, play or remove one, combine them": "Os tempos de cada excerto, toca ou remove um, junta-os",
+  "No splices yet. Turn on Add splices, then click where a part starts and where it ends.": "Ainda não há excertos. Liga Adicionar excertos e clica onde uma parte começa e onde acaba.",
+  "Play splice {n}": "Tocar excerto {n}",
+  "Play the sound as before: the splices stay marked": "Tocar o som como antes: os excertos continuam marcados",
+  "Remove splice {n}": "Remover excerto {n}",
+  "Splice {n}": "Excerto {n}",
+  "Splice {n}: {start} to {end}": "Excerto {n}: de {start} a {end}",
+  "Splices": "Excertos",
+  "Splices ({n})": "Excertos ({n})",
+  "Split again": "Separar outra vez",
+  "{n} s": "{n} s",
+  "A new pad of just the splices: this pad stays as it is": "Um botão novo só com os excertos: este botão fica como está",
+  "Combine {n} splice": [
+    "Juntar {n} excerto",
+    "Juntar {n} excertos"
+  ],
+  "New pad's name": "Nome do botão novo",
+  "Replace this pad": "Substituir este botão",
+  "They play back to back, 1 first. Your file itself is never cut.": "Tocam um a seguir ao outro, o 1 primeiro. O teu ficheiro nunca é cortado.",
+  "This pad plays just the splices from now on (Split again undoes it)": "Este botão passa a tocar só os excertos (Separar outra vez desfaz)",
+  "{name} (splices)": "{name} (excertos)"
 }

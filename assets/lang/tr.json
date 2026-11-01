@@ -4772,5 +4772,31 @@
   "ooh! aah!": "Ooo! Aaa!",
   "ooh, pretty!": "Ooo, çok güzel!",
   "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Başını ve sonunu kesmek için tutamaçları sürükleyin. Ctrl+kaydırma yakınlaştırır. Kaydırmak için sağ fare tuşuyla sürükleyin ya da Shift+kaydırma kullanın.",
-  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board öndeyken bu sekmeyi açar.\nEsc = iptal."
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board öndeyken bu sekmeyi açar.\nEsc = iptal.",
+  "Add splices": "Parça ekle",
+  "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Bir bölümün başladığı yere, sonra bittiği yere tıkla. Her bölüm bir parçadır. Esc yarım kalanı bırakır.",
+  "Combine splices": "Parçaları birleştir",
+  "Combine splices makes the sound play them back to back, 1 first.": "Parçaları birleştir, sesin onları art arda çalmasını sağlar, önce 1.",
+  "Combined: the sound plays them back to back, 1 first.": "Birleşti: ses onları art arda çalar, önce 1.",
+  "Each splice's times, play or remove one, combine them": "Her parçanın süreleri, birini çal veya kaldır, birleştir",
+  "No splices yet. Turn on Add splices, then click where a part starts and where it ends.": "Henüz parça yok. Parça ekle'yi aç, sonra bir bölümün başladığı ve bittiği yere tıkla.",
+  "Play splice {n}": "{n}. parçayı çal",
+  "Play the sound as before: the splices stay marked": "Sesi eskisi gibi çal: parçalar işaretli kalır",
+  "Remove splice {n}": "{n}. parçayı kaldır",
+  "Splice {n}": "Parça {n}",
+  "Splice {n}: {start} to {end}": "Parça {n}: {start} - {end}",
+  "Splices": "Parçalar",
+  "Splices ({n})": "Parçalar ({n})",
+  "Split again": "Yeniden ayır",
+  "{n} s": "{n} sn",
+  "A new pad of just the splices: this pad stays as it is": "Sadece parçalardan oluşan yeni bir pad: bu pad olduğu gibi kalır",
+  "Combine {n} splice": [
+    "{n} parçayı birleştir",
+    "{n} parçayı birleştir"
+  ],
+  "New pad's name": "Yeni pad'in adı",
+  "Replace this pad": "Bu pad'i değiştir",
+  "They play back to back, 1 first. Your file itself is never cut.": "Art arda çalarlar, önce 1. Dosyanın kendisi asla kesilmez.",
+  "This pad plays just the splices from now on (Split again undoes it)": "Bu pad bundan sonra sadece parçaları çalar (Yeniden ayır bunu geri alır)",
+  "{name} (splices)": "{name} (parçalar)"
 }

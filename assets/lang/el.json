@@ -4772,5 +4772,31 @@
   "ooh! aah!": "Ωωω! Αααα!",
   "ooh, pretty!": "Ωχ, τι ωραίο!",
   "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Σύρε τις λαβές για να κόψεις την αρχή και το τέλος. Ctrl+κύλιση για ζουμ. Σύρε με το δεξί κουμπί του ποντικιού, ή Shift+κύλιση, για μετακίνηση.",
-  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Ανοίγει αυτή την καρτέλα όταν το Onion Board είναι μπροστά.\nEsc = ακύρωση."
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Ανοίγει αυτή την καρτέλα όταν το Onion Board είναι μπροστά.\nEsc = ακύρωση.",
+  "Add splices": "Προσθήκη αποσπασμάτων",
+  "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Κάνε κλικ εκεί που αρχίζει ένα κομμάτι, μετά εκεί που τελειώνει. Κάθε κομμάτι είναι απόσπασμα. Το Esc ακυρώνει ένα μισό.",
+  "Combine splices": "Ένωση αποσπασμάτων",
+  "Combine splices makes the sound play them back to back, 1 first.": "Η ένωση αποσπασμάτων κάνει τον ήχο να τα παίζει το ένα μετά το άλλο, πρώτα το 1.",
+  "Combined: the sound plays them back to back, 1 first.": "Ενωμένα: ο ήχος τα παίζει το ένα μετά το άλλο, πρώτα το 1.",
+  "Each splice's times, play or remove one, combine them": "Οι χρόνοι κάθε αποσπάσματος, παίξε ή αφαίρεσε ένα, ένωσέ τα",
+  "No splices yet. Turn on Add splices, then click where a part starts and where it ends.": "Κανένα απόσπασμα ακόμα. Άνοιξε την Προσθήκη αποσπασμάτων και κάνε κλικ εκεί που αρχίζει και τελειώνει ένα κομμάτι.",
+  "Play splice {n}": "Αναπαραγωγή αποσπάσματος {n}",
+  "Play the sound as before: the splices stay marked": "Παίξε τον ήχο όπως πριν: τα αποσπάσματα μένουν σημειωμένα",
+  "Remove splice {n}": "Αφαίρεση αποσπάσματος {n}",
+  "Splice {n}": "Απόσπασμα {n}",
+  "Splice {n}: {start} to {end}": "Απόσπασμα {n}: {start} έως {end}",
+  "Splices": "Αποσπάσματα",
+  "Splices ({n})": "Αποσπάσματα ({n})",
+  "Split again": "Χωρισμός ξανά",
+  "{n} s": "{n} δ",
+  "A new pad of just the splices: this pad stays as it is": "Νέο κουμπί μόνο με τα αποσπάσματα: αυτό το κουμπί μένει όπως είναι",
+  "Combine {n} splice": [
+    "Ένωση {n} αποσπάσματος",
+    "Ένωση {n} αποσπασμάτων"
+  ],
+  "New pad's name": "Όνομα νέου κουμπιού",
+  "Replace this pad": "Αντικατάσταση αυτού του κουμπιού",
+  "They play back to back, 1 first. Your file itself is never cut.": "Παίζουν το ένα μετά το άλλο, πρώτα το 1. Το ίδιο το αρχείο σου δεν κόβεται ποτέ.",
+  "This pad plays just the splices from now on (Split again undoes it)": "Αυτό το κουμπί παίζει μόνο τα αποσπάσματα από εδώ και πέρα (ο Χωρισμός ξανά το αναιρεί)",
+  "{name} (splices)": "{name} (αποσπάσματα)"
 }

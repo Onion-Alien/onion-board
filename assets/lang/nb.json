@@ -4772,5 +4772,31 @@
   "ooh! aah!": "Ååh! Aah!",
   "ooh, pretty!": "Åh, så fint!",
   "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Dra håndtakene for å kutte av starten og slutten. Ctrl+rulling zoomer. Dra med høyre museknapp, eller bruk Shift+rulling, for å flytte.",
-  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Åpner denne fanen mens Onion Board er foran.\nEsc = avbryt."
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Åpner denne fanen mens Onion Board er foran.\nEsc = avbryt.",
+  "Add splices": "Legg til klipp",
+  "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Klikk der en del starter, så der den slutter. Hver del er et klipp. Esc slipper et halvferdig.",
+  "Combine splices": "Sett sammen klipp",
+  "Combine splices makes the sound play them back to back, 1 first.": "Sett sammen klipp får lyden til å spille dem rett etter hverandre, 1 først.",
+  "Combined: the sound plays them back to back, 1 first.": "Satt sammen: lyden spiller dem rett etter hverandre, 1 først.",
+  "Each splice's times, play or remove one, combine them": "Tidene til hvert klipp, spill eller fjern ett, sett dem sammen",
+  "No splices yet. Turn on Add splices, then click where a part starts and where it ends.": "Ingen klipp ennå. Slå på Legg til klipp, og klikk der en del starter og der den slutter.",
+  "Play splice {n}": "Spill klipp {n}",
+  "Play the sound as before: the splices stay marked": "Spill lyden som før: klippene blir stående merket",
+  "Remove splice {n}": "Fjern klipp {n}",
+  "Splice {n}": "Klipp {n}",
+  "Splice {n}: {start} to {end}": "Klipp {n}: {start} til {end}",
+  "Splices": "Klipp",
+  "Splices ({n})": "Klipp ({n})",
+  "Split again": "Del opp igjen",
+  "{n} s": "{n} s",
+  "A new pad of just the splices: this pad stays as it is": "En ny pad med bare klippene: denne pad blir som den er",
+  "Combine {n} splice": [
+    "Sett sammen {n} klipp",
+    "Sett sammen {n} klipp"
+  ],
+  "New pad's name": "Navnet på den nye pad-en",
+  "Replace this pad": "Erstatt denne pad-en",
+  "They play back to back, 1 first. Your file itself is never cut.": "De spilles rett etter hverandre, 1 først. Selve fila blir aldri klippet.",
+  "This pad plays just the splices from now on (Split again undoes it)": "Denne pad-en spiller bare klippene fra nå av (Del opp igjen angrer det)",
+  "{name} (splices)": "{name} (klipp)"
 }

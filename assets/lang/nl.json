@@ -4772,5 +4772,31 @@
   "ooh! aah!": "Ooh! Aah!",
   "ooh, pretty!": "Ooh, wat mooi!",
   "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Sleep de grepen om het begin en einde eraf te knippen. Ctrl+scrollen zoomt. Sleep met de rechtermuisknop, of gebruik Shift+scrollen, om te schuiven.",
-  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Opent dit tabblad als Onion Board vooraan staat.\nEsc = annuleren."
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Opent dit tabblad als Onion Board vooraan staat.\nEsc = annuleren.",
+  "Add splices": "Fragmenten maken",
+  "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Klik waar een stuk begint, dan waar het eindigt. Elk stuk is een fragment. Esc laat een half fragment los.",
+  "Combine splices": "Fragmenten samenvoegen",
+  "Combine splices makes the sound play them back to back, 1 first.": "Fragmenten samenvoegen laat het geluid ze direct na elkaar spelen, 1 eerst.",
+  "Combined: the sound plays them back to back, 1 first.": "Samengevoegd: het geluid speelt ze direct na elkaar, 1 eerst.",
+  "Each splice's times, play or remove one, combine them": "De tijden van elk fragment, er een afspelen of weghalen, samenvoegen",
+  "No splices yet. Turn on Add splices, then click where a part starts and where it ends.": "Nog geen fragmenten. Zet Fragmenten maken aan en klik waar een stuk begint en waar het eindigt.",
+  "Play splice {n}": "Fragment {n} afspelen",
+  "Play the sound as before: the splices stay marked": "Het geluid speelt zoals eerst: de fragmenten blijven gemarkeerd",
+  "Remove splice {n}": "Fragment {n} weghalen",
+  "Splice {n}": "Fragment {n}",
+  "Splice {n}: {start} to {end}": "Fragment {n}: {start} tot {end}",
+  "Splices": "Fragmenten",
+  "Splices ({n})": "Fragmenten ({n})",
+  "Split again": "Weer splitsen",
+  "{n} s": "{n} s",
+  "A new pad of just the splices: this pad stays as it is": "Een nieuwe pad met alleen de fragmenten: deze pad blijft zoals hij is",
+  "Combine {n} splice": [
+    "{n} fragment samenvoegen",
+    "{n} fragmenten samenvoegen"
+  ],
+  "New pad's name": "Naam van de nieuwe pad",
+  "Replace this pad": "Deze pad vervangen",
+  "They play back to back, 1 first. Your file itself is never cut.": "Ze spelen direct na elkaar, 1 eerst. Je bestand zelf wordt nooit geknipt.",
+  "This pad plays just the splices from now on (Split again undoes it)": "Deze pad speelt vanaf nu alleen de fragmenten (Weer splitsen maakt het ongedaan)",
+  "{name} (splices)": "{name} (fragmenten)"
 }

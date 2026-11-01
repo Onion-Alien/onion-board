@@ -4772,5 +4772,31 @@
   "ooh! aah!": "ओह! आह!",
   "ooh, pretty!": "वाह, कितना सुंदर!",
   "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "शुरू और आख़िर काटने के लिए हैंडल खींचें। Ctrl+स्क्रॉल से ज़ूम। आगे-पीछे जाने के लिए माउस का दायाँ बटन दबाकर खींचें, या Shift+स्क्रॉल करें।",
-  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board सामने होने पर यह टैब खोलती है।\nEsc = रद्द करें।"
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board सामने होने पर यह टैब खोलती है।\nEsc = रद्द करें।",
+  "Add splices": "टुकड़े जोड़ें",
+  "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "जहाँ हिस्सा शुरू हो वहाँ क्लिक करें, फिर जहाँ खत्म हो। हर हिस्सा एक टुकड़ा है। Esc अधूरा टुकड़ा छोड़ देता है।",
+  "Combine splices": "टुकड़े जोड़कर चलाएँ",
+  "Combine splices makes the sound play them back to back, 1 first.": "टुकड़े जोड़कर चलाएँ से साउंड उन्हें एक के बाद एक बजाता है, पहले 1।",
+  "Combined: the sound plays them back to back, 1 first.": "जुड़े हुए: साउंड उन्हें एक के बाद एक बजाता है, पहले 1।",
+  "Each splice's times, play or remove one, combine them": "हर टुकड़े का समय, एक चलाएँ या हटाएँ, उन्हें जोड़ें",
+  "No splices yet. Turn on Add splices, then click where a part starts and where it ends.": "अभी कोई टुकड़ा नहीं। टुकड़े जोड़ें चालू करें, फिर जहाँ हिस्सा शुरू हो और जहाँ खत्म हो वहाँ क्लिक करें।",
+  "Play splice {n}": "टुकड़ा {n} चलाएँ",
+  "Play the sound as before: the splices stay marked": "साउंड पहले की तरह चलाएँ: टुकड़े निशान लगे रहते हैं",
+  "Remove splice {n}": "टुकड़ा {n} हटाएँ",
+  "Splice {n}": "टुकड़ा {n}",
+  "Splice {n}: {start} to {end}": "टुकड़ा {n}: {start} से {end}",
+  "Splices": "टुकड़े",
+  "Splices ({n})": "टुकड़े ({n})",
+  "Split again": "फिर से अलग करें",
+  "{n} s": "{n} से.",
+  "A new pad of just the splices: this pad stays as it is": "सिर्फ़ टुकड़ों वाला नया पैड: यह पैड जैसा है वैसा रहेगा",
+  "Combine {n} splice": [
+    "{n} टुकड़ा जोड़ें",
+    "{n} टुकड़े जोड़ें"
+  ],
+  "New pad's name": "नए पैड का नाम",
+  "Replace this pad": "यह पैड बदलें",
+  "They play back to back, 1 first. Your file itself is never cut.": "ये एक के बाद एक बजते हैं, पहले 1। आपकी फ़ाइल कभी नहीं कटती।",
+  "This pad plays just the splices from now on (Split again undoes it)": "अब से यह पैड सिर्फ़ टुकड़े बजाएगा (फिर से अलग करें इसे वापस करता है)",
+  "{name} (splices)": "{name} (टुकड़े)"
 }

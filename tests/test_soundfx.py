@@ -427,7 +427,7 @@ def test_sounds_without_a_voice_keep_their_cache_keys():
     import json
     fx = {"speed": 1.5, "effects": {"reverb": {"on": True, "mix": 0.3}}}
     f = soundfx.clean(fx)
-    for k in ("start", "end", "voice", "live"):   # (keys added later)
+    for k in ("start", "end", "splices", "joined", "voice", "live"):   # (keys added later)
         del f[k]
     old = hashlib.blake2b(json.dumps(f, sort_keys=True).encode(), digest_size=6).hexdigest()
     assert soundfx.key(fx) == old

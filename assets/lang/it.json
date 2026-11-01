@@ -4772,5 +4772,31 @@
   "ooh! aah!": "Ooh! Aah!",
   "ooh, pretty!": "Oh, che bello!",
   "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Trascina le maniglie per tagliare inizio e fine. Ctrl+rotellina ingrandisce. Trascina con il tasto destro del mouse, o usa Maiusc+rotellina, per scorrere.",
-  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Apre questa scheda quando Onion Board è in primo piano.\nEsc = annulla."
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Apre questa scheda quando Onion Board è in primo piano.\nEsc = annulla.",
+  "Add splices": "Aggiungi spezzoni",
+  "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Clicca dove inizia una parte, poi dove finisce. Ogni parte è uno spezzone. Esc lascia quello a metà.",
+  "Combine splices": "Unisci spezzoni",
+  "Combine splices makes the sound play them back to back, 1 first.": "Unisci spezzoni fa suonare il suono uno dopo l'altro, prima l'1.",
+  "Combined: the sound plays them back to back, 1 first.": "Uniti: il suono li riproduce uno dopo l'altro, prima l'1.",
+  "Each splice's times, play or remove one, combine them": "I tempi di ogni spezzone, riproducine o togline uno, uniscili",
+  "No splices yet. Turn on Add splices, then click where a part starts and where it ends.": "Ancora nessuno spezzone. Attiva Aggiungi spezzoni, poi clicca dove inizia una parte e dove finisce.",
+  "Play splice {n}": "Riproduci spezzone {n}",
+  "Play the sound as before: the splices stay marked": "Riproduci il suono come prima: gli spezzoni restano segnati",
+  "Remove splice {n}": "Togli spezzone {n}",
+  "Splice {n}": "Spezzone {n}",
+  "Splice {n}: {start} to {end}": "Spezzone {n}: da {start} a {end}",
+  "Splices": "Spezzoni",
+  "Splices ({n})": "Spezzoni ({n})",
+  "Split again": "Separa di nuovo",
+  "{n} s": "{n} s",
+  "A new pad of just the splices: this pad stays as it is": "Un nuovo pad con solo gli spezzoni: questo pad resta com'è",
+  "Combine {n} splice": [
+    "Unisci {n} spezzone",
+    "Unisci {n} spezzoni"
+  ],
+  "New pad's name": "Nome del nuovo pad",
+  "Replace this pad": "Sostituisci questo pad",
+  "They play back to back, 1 first. Your file itself is never cut.": "Suonano uno dopo l'altro, prima l'1. Il tuo file non viene mai tagliato.",
+  "This pad plays just the splices from now on (Split again undoes it)": "D'ora in poi questo pad suona solo gli spezzoni (Separa di nuovo lo annulla)",
+  "{name} (splices)": "{name} (spezzoni)"
 }

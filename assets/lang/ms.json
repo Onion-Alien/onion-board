@@ -4685,5 +4685,30 @@
   "ooh! aah!": "Ooh! Aah!",
   "ooh, pretty!": "Wah, cantiknya!",
   "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Seret pemegang untuk memotong permulaan dan penghujung. Ctrl+tatal untuk zum. Seret dengan butang kanan tetikus, atau Shift+tatal, untuk mengalih.",
-  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Membuka tab ini semasa Onion Board di hadapan.\nEsc = batal."
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Membuka tab ini semasa Onion Board di hadapan.\nEsc = batal.",
+  "Add splices": "Tambah keratan",
+  "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Klik di mana bahagian bermula, kemudian di mana ia tamat. Setiap bahagian ialah keratan. Esc lepaskan yang separuh siap.",
+  "Combine splices": "Gabung keratan",
+  "Combine splices makes the sound play them back to back, 1 first.": "Gabung keratan membuat bunyi memainkannya berturut-turut, 1 dahulu.",
+  "Combined: the sound plays them back to back, 1 first.": "Digabung: bunyi memainkannya berturut-turut, 1 dahulu.",
+  "Each splice's times, play or remove one, combine them": "Masa setiap keratan, main atau buang satu, gabungkan",
+  "No splices yet. Turn on Add splices, then click where a part starts and where it ends.": "Belum ada keratan. Hidupkan Tambah keratan, kemudian klik di mana bahagian bermula dan tamat.",
+  "Play splice {n}": "Main keratan {n}",
+  "Play the sound as before: the splices stay marked": "Main bunyi seperti dahulu: keratan kekal ditanda",
+  "Remove splice {n}": "Buang keratan {n}",
+  "Splice {n}": "Keratan {n}",
+  "Splice {n}: {start} to {end}": "Keratan {n}: {start} hingga {end}",
+  "Splices": "Keratan",
+  "Splices ({n})": "Keratan ({n})",
+  "Split again": "Pisahkan semula",
+  "{n} s": "{n} s",
+  "A new pad of just the splices: this pad stays as it is": "Pad baharu dengan keratan sahaja: pad ini kekal seperti sekarang",
+  "Combine {n} splice": [
+    "Gabung {n} keratan"
+  ],
+  "New pad's name": "Nama pad baharu",
+  "Replace this pad": "Ganti pad ini",
+  "They play back to back, 1 first. Your file itself is never cut.": "Dimainkan berturut-turut, 1 dahulu. Fail anda sendiri tidak pernah dipotong.",
+  "This pad plays just the splices from now on (Split again undoes it)": "Pad ini hanya main keratan mulai sekarang (Pisahkan semula membatalkannya)",
+  "{name} (splices)": "{name} (keratan)"
 }

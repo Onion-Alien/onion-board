@@ -4685,5 +4685,30 @@
   "ooh! aah!": "Ooh! Aah!",
   "ooh, pretty!": "Wah, cantik!",
   "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Seret pegangannya untuk memotong awal dan akhir. Ctrl+gulir untuk zoom. Seret dengan tombol kanan mouse, atau Shift+gulir, untuk menggeser.",
-  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Membuka tab ini saat Onion Board ada di depan.\nEsc = batal."
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Membuka tab ini saat Onion Board ada di depan.\nEsc = batal.",
+  "Add splices": "Tambah potongan",
+  "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Klik di mana bagian mulai, lalu di mana berakhir. Tiap bagian adalah potongan. Esc melepas yang setengah jadi.",
+  "Combine splices": "Gabung potongan",
+  "Combine splices makes the sound play them back to back, 1 first.": "Gabung potongan membuat suara memutarnya berurutan, 1 dulu.",
+  "Combined: the sound plays them back to back, 1 first.": "Digabung: suara memutarnya berurutan, 1 dulu.",
+  "Each splice's times, play or remove one, combine them": "Waktu tiap potongan, putar atau hapus satu, gabungkan",
+  "No splices yet. Turn on Add splices, then click where a part starts and where it ends.": "Belum ada potongan. Nyalakan Tambah potongan, lalu klik di mana bagian mulai dan berakhir.",
+  "Play splice {n}": "Putar potongan {n}",
+  "Play the sound as before: the splices stay marked": "Putar suara seperti sebelumnya: potongan tetap ditandai",
+  "Remove splice {n}": "Hapus potongan {n}",
+  "Splice {n}": "Potongan {n}",
+  "Splice {n}: {start} to {end}": "Potongan {n}: {start} sampai {end}",
+  "Splices": "Potongan",
+  "Splices ({n})": "Potongan ({n})",
+  "Split again": "Pisahkan lagi",
+  "{n} s": "{n} dtk",
+  "A new pad of just the splices: this pad stays as it is": "Pad baru berisi potongan saja: pad ini tetap seperti sekarang",
+  "Combine {n} splice": [
+    "Gabung {n} potongan"
+  ],
+  "New pad's name": "Nama pad baru",
+  "Replace this pad": "Ganti pad ini",
+  "They play back to back, 1 first. Your file itself is never cut.": "Diputar berurutan, 1 dulu. File-mu sendiri tidak pernah dipotong.",
+  "This pad plays just the splices from now on (Split again undoes it)": "Pad ini hanya memutar potongan mulai sekarang (Pisahkan lagi membatalkannya)",
+  "{name} (splices)": "{name} (potongan)"
 }

@@ -23,6 +23,7 @@ from soundboard.sounds.library import original_peaks
 from soundboard.ui.kit import busy, icons
 from soundboard.ui.kit.layouts import take_out
 from soundboard.ui.kit.panel import card, hint_label, section_label
+from soundboard.ui.sounds.splicepanel import SpliceBar
 from soundboard.ui.voice.effectrow import ADDON_GROUP, FX_ICONS, GROUPS
 
 if TYPE_CHECKING:
@@ -235,6 +236,10 @@ class AdvancedView(QWidget):
         bar.addWidget(self.btn_undo)
         bar.addWidget(self.btn_redo)
         bar.addStretch(1)
+        self.splices = SpliceBar(d)
+        d.btn_preview.clicked.connect(lambda: self.splices.trim.clear_solo())
+        bar.addWidget(self.splices)
+        bar.addSpacing(8)
         self.btn_out, self.btn_in = QPushButton("−"), QPushButton("+")
         self.btn_fit = QPushButton()
         icons.set_icon(self.btn_fit, "expand")
@@ -376,6 +381,7 @@ class AdvancedView(QWidget):
         """set_sound made a new trim for another sound: it's already where the old one
         was; make it big and get its peaks."""
         eff = self.d.effects
+        self.splices.attach(eff.trim)
         if eff.trim_layout is self.trim_box:
             eff.trim.set_big(True)
             self._fetch_fine()
