@@ -67,6 +67,7 @@ class HoverCard(QFrame):
     def __init__(self):
         super().__init__()
         self.setObjectName("card")
+        theme.vary_texture(self)
         self.setProperty("interactive", True)
         self.setProperty("hovered", False)
 
@@ -200,6 +201,7 @@ def card(title: str = "", hint: str = "", *, roomy: bool = False, icon: str = ""
     card keeps them as `heading_title`, `heading_marks` and `heading_row`."""
     f = Card()
     f.setObjectName("card")
+    theme.vary_texture(f)
     v = QVBoxLayout(f)
     f.setProperty("roomy", roomy)
     # every titled card's heading starts at the same height: its top margin plus 8

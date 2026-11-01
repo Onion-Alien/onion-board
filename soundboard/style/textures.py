@@ -55,6 +55,13 @@ TEXTURES = {
 }
 TEXTURE_TILE = {k: v[0] for k, v in TEXTURES.items()}
 
+# Where each card starts a big tile (a fraction of it across and down), so two cards
+# side by side or one above the other don't show the same bursts or webs lined up:
+# the app gives each card one in turn (its "texshift" property). Small tiles can't
+# line up visibly and keep one.
+SHIFTS = ((0, 0), (0.37, 0.61), (0.71, 0.23), (0.19, 0.83), (0.53, 0.41), (0.88, 0.67))
+SHIFT_MIN_TILE = 160
+
 
 def _webs_image(size: int, ink: str, alpha: float) -> QImage:
     """Halloween's cobweb art (webs_art.py, white silk on black) as a `size` tile in
@@ -212,25 +219,35 @@ _texture_urls: dict[tuple, str] = {}
 
 def texture_style(selector: str, tk: dict[str, str] | None = None) -> str:
     """A stylesheet rule tiling theme `tk`'s texture (default: the current theme's) on
-    `selector`; "" when it has none. Whether Textured is on is the app's to check."""
-    if url := texture_url(hooks.palette() if tk is None else tk):
-        return f'{selector} {{ background-image:url("{url}"); background-repeat:repeat-xy; }}\n'
-    return ""
+    `selector`; "" when it has none. A big tile gets a rule per SHIFTS too, for the
+    widgets whose "texshift" property picks one. Whether Textured is on is the app's to
+    check."""
+    tk = hooks.palette() if tk is None else tk
+    if not (url := texture_url(tk)):
+        return ""
+    css = f'{selector} {{ background-image:url("{url}"); background-repeat:repeat-xy; }}\n'
+    if TEXTURES[tk["texture"]][0] >= SHIFT_MIN_TILE:
+        parts = [s.strip() for s in selector.split(",")]
+        for i in range(1, len(SHIFTS)):
+            if shifted := texture_url(tk, i):
+                sel = ", ".join(f'{s}[texshift="{i}"]' for s in parts)
+                css += f'{sel} {{ background-image:url("{shifted}"); }}\n'
+    return css
 
 
-def texture_url(tk: dict[str, str]) -> str:
-    """Theme `tk`'s texture tile as a file for a stylesheet ("" when it has none): made
-    once, then remembered."""
+def texture_url(tk: dict[str, str], shift: int = 0) -> str:
+    """Theme `tk`'s texture tile as a file for a stylesheet ("" when it has none),
+    started SHIFTS[`shift`] of the way in: made once, then remembered."""
     kind = tk.get("texture", "")
     if kind not in TEXTURES:
         return ""
     key = (kind, tk["panel"], tk["text_hi"], tk["accent"], tk["accent2"],
-           tk.get("texture_ink", ""), tk.get("texture_strength", ""))
+           tk.get("texture_ink", ""), tk.get("texture_strength", ""), shift)
     if url := _texture_urls.get(key):
         return url
     # named after the tile's own pixels, not its colours: a tile redrawn in a new version
     # gets a new file instead of the old drawing left in Temp by an older copy
-    img = texture_image(kind, tk)
+    img = _shifted(texture_image(kind, tk), *SHIFTS[shift])
     pixels = bytes(img.constBits())[:img.sizeInBytes()]
     folder = Path(tempfile.gettempdir()) / "onion-style"
     path = folder / f"tex-{kind}-{hashlib.md5(pixels).hexdigest()[:10]}.png"
@@ -242,6 +259,23 @@ def texture_url(tk: dict[str, str]) -> str:
         return ""
     _texture_urls[key] = url = path.as_posix()
     return url
+
+
+def _shifted(img: QImage, fx: float, fy: float) -> QImage:
+    """Seamless tile `img` started `fx`, `fy` of the way in (it wraps round)."""
+    if not (fx or fy):
+        return img
+    w, h = img.width(), img.height()
+    dx, dy = round(fx * w), round(fy * h)
+    out = QImage(w, h, img.format())
+    out.fill(Qt.GlobalColor.transparent)
+    p = QPainter(out)
+    p.setCompositionMode(QPainter.CompositionMode.CompositionMode_Source)
+    for ox in (-dx, w - dx):
+        for oy in (-dy, h - dy):
+            p.drawImage(ox, oy, img)
+    p.end()
+    return out
 
 
 # The Textured glow: soft blobs of the theme's two accent colours behind the cards,
