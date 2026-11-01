@@ -585,6 +585,8 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         hold = (None, tool_arm(round(swing, 2))[:2])
     _paws(p, prop, sad, angry, fur, ink, None if robot else bunnyfit.sleeve(fit), waving,
           hold)
+    if prop in SWUNG:   # under his head: raised, the hammer's up behind it by his ear
+        _draw_prop(p, prop, ink, swing, fur=fur)
     p.save()
     head()
     bunnyfit.draw(p, fit_head, "back", ink)
@@ -828,7 +830,7 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
             p.restore()
     bunnyfit.draw(p, tuple(n for n in body if n in bunnyfit.NECK), "face", ink,
                   hats=not nightcap)
-    if prop != "headphones":
+    if prop != "headphones" and prop not in SWUNG:
         _draw_prop(p, prop, ink, swing, fur=fur)
     p.restore()
 

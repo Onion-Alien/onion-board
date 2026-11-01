@@ -543,14 +543,14 @@ class BunnyWidget(BunnyBuild, BunnyDance, BunnyPaint, QWidget):
                     self._add_part()
                 if self.robot:        # a spark shower off the bolt
                     self._flash_at = self._act_t
-                    c = self._at(r, 104, 108)
+                    c = self._at(r, 98, 108)
                     for _i in range(6):
                         a = self._rng.uniform(math.pi * 1.1, math.pi * 1.9)
                         v = r.height() * self._rng.uniform(0.7, 1.4)
                         self.sparks.append(_Spark(c.x(), c.y(), math.cos(a) * v,
                                                   math.sin(a) * v, self._rng.uniform(0.25, 0.5)))
                     return
-                x = r.left() + r.width() * 1.04    # where the hammer lands
+                x = r.left() + r.width() * 0.98    # where the hammer lands
                 y = r.top() + r.height() * 0.9
                 for _i in range(3):
                     self._puff(x, y, 26, 4, 0.5)
