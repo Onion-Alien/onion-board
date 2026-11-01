@@ -41,7 +41,7 @@ import protocol
 
 log = logging.getLogger("ai-voices")
 HERE = Path(__file__).resolve().parent
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 OUT_RATE = 24000
 CHUNK = 320                       # 20 ms at 16 kHz (40 ms with the lighter model)
 LIGHT = os.environ.get("ONIONBOARD_LESS_CPU") == "1"   # the app's Use less CPU

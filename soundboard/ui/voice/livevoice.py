@@ -1,19 +1,21 @@
 """The Languages card's live voice (`SpeechPanel.livevoice`).
 
-Its own Start (a computer voice says what you say), and translating in the background
-for the AI voice or the voice changer (`translate_for`, VoicePanel decides who). A
+Translating in the background for the AI voice, the voice changer or the language's
+own voice (`translate_for`, VoicePanel decides who). Its old Start (a computer voice
+saying what you say) is kept but never shown. A
 QObject the panel owns, like ui/window/controller.py's: the helper's events stop with the
 panel. It builds the Start row and the translation note; the panel places them.
 """
 from __future__ import annotations
 
+import threading
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QObject, Qt, Signal
 from PySide6.QtWidgets import QHBoxLayout, QLabel, QProgressBar, QPushButton, QVBoxLayout, QWidget
 
 from soundboard.core import langnames
-from soundboard.speech import live, spoken, translation
+from soundboard.speech import live, piper, spoken, translation
 from soundboard.ui.kit import icons
 from soundboard.ui.kit.panel import hint_label
 from soundboard.ui.voice.voicefxpanel import _enable
@@ -60,7 +62,8 @@ class LiveVoice(QObject):
     def __init__(self, panel: SpeechPanel):
         super().__init__(panel)
         self.p = panel
-        self.bg_for = ""             # translating for the "ai" voice or the "fx" changer
+        self.bg_for = ""             # translating for the "ai" voice, the "fx" changer or
+        # the language's own voice ("read")
         self._bg_key: tuple = ()     # (who, language) the running helper was started for
         self._bg_failed: tuple = ()  # the key it last stopped with an error for
         self._said = ""              # the helper's own last error: "stopped" keeps it
@@ -129,7 +132,9 @@ class LiveVoice(QObject):
                 if lang != "en":   # the translations go from English: Whisper's first
                     args += ["--task", "translate"]
                 args += ["--translate", str(translation.model_dir(m))]
-            p.ctl.live_voice = p._voice_for(m) or None
+            # its own voice, never the Say voice (an English one read Chinese out)
+            p.ctl.live_voice = (piper.voice_id(m.language) if m.voice
+                                else p._voice_for(m) or None)
         return args
 
     def _toggle_live(self, on: bool):
@@ -158,7 +163,8 @@ class LiveVoice(QObject):
     # ---- translating for the AI voice or the voice changer (VoicePanel decides)
     def translate_for(self, who: str):
         """Run speech recognition + translation in the background so the voice that's
-        on ("ai" or "fx") speaks the language picked under Speak in; "" stops it.
+        on ("ai", "fx", or "read": the language's own voice) speaks the language picked
+        under Speak in; "" stops it.
         Text-to-speech's own Start, when on, already does this and wins."""
         p = self.p
         if self.b_live.isChecked():
@@ -174,7 +180,7 @@ class LiveVoice(QObject):
         if key and self.bg_for and p.ctl.live and key[1] == self._bg_key[1]:
             # the other voice took over: same helper, only the real-mic mute changes
             self.bg_for, self._bg_key = who, key
-            p.ctl.set_replace(who == "fx")
+            p.ctl.set_replace(who in ("fx", "read"))
             return
         if self.bg_for:
             self._stop_bg()
@@ -184,12 +190,17 @@ class LiveVoice(QObject):
         module = p.module
         assert module is not None   # start_live needs it (it failed on None before too)
         try:
-            p.ctl.start_live(module, self._live_args(), replace=(who == "fx"))
+            # the voice changer or the language's own voice: your real voice is muted
+            p.ctl.start_live(module, self._live_args(), replace=who in ("fx", "read"))
         except RuntimeError as e:
             self._bg_note(_("⚠ Couldn't start translating: {error}", error=errors.plain(e)),
                           warning=True)
             return
         self.bg_for, self._bg_key = who, key
+        voice, tts = p.ctl.live_voice or "", p.ctl.tts
+        if voice.startswith(piper.PREFIX) and hasattr(tts, "warm_language"):
+            threading.Thread(target=tts.warm_language, args=(voice,),
+                             name="language-voice-warmup", daemon=True).start()
         self._bg_note(_("Starting the translation…"))
         p._refresh_translation()
 

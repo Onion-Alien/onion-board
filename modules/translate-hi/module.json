@@ -3,7 +3,7 @@
   "name": "Translate to Hindi",
   "version": "1.0.0",
   "kind": "translation",
-  "description": "The computer voice speaks what you say in Hindi. Needs live voice-to-speech. Downloads a 107 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "description": "A voice speaks what you say in Hindi. Needs speech recognition and AI voices. Downloads a 170 MB translation model and voice once, when you ask for it; translating then happens on this PC.",
   "language": "hi",
   "language_name": "Hindi",
   "download": {
@@ -11,5 +11,14 @@
     "sha256": "60470a003a9c7339db8c060ed8eafc7cf999ba90dfa5dceebd8d0a4f75f1d3f0",
     "bytes": 106752178
   },
-  "credits": "English to Hindi model from the Argos Translate package index: Argos Translate (Argos Open Technologies), released under MIT or CC0 (argos-translate issue #533). Trained on OPUS data; includes a Stanza English tokenizer (Apache-2.0)."
+  "credits": "English to Hindi model from the Argos Translate package index: Argos Translate (Argos Open Technologies), released under MIT or CC0 (argos-translate issue #533). Trained on OPUS data; includes a Stanza English tokenizer (Apache-2.0). Voice: Piper voice hi_IN-pratham-medium from rhasspy/piper-voices, CC BY-NC-SA 4.0.",
+  "voice": {
+    "name": "Pratham",
+    "url": "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/hi/hi_IN/pratham/medium/hi_IN-pratham-medium.onnx",
+    "sha256": "169964b0871667f6793416d4b35e97357a68ba1ad01df8580c28048989ee7693",
+    "bytes": 63516050,
+    "config_url": "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/hi/hi_IN/pratham/medium/hi_IN-pratham-medium.onnx.json",
+    "config_sha256": "b68edd2cd7950dd436314013b7cd12e9699e5a3f6fe5af5af94294cf6aa7b9fd",
+    "config_bytes": 4970
+  }
 }

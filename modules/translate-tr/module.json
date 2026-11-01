@@ -3,7 +3,7 @@
   "name": "Translate to Turkish",
   "version": "1.0.0",
   "kind": "translation",
-  "description": "The computer voice speaks what you say in Turkish. Needs live voice-to-speech. Downloads a 125 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "description": "A voice speaks what you say in Turkish. Needs speech recognition and AI voices. Downloads a 188 MB translation model and voice once, when you ask for it; translating then happens on this PC.",
   "language": "tr",
   "language_name": "Turkish",
   "download": {
@@ -11,5 +11,14 @@
     "sha256": "2d553a00880a0c21dea5b1c375535659e6bf18c9bf2ce9847c2a2fd2ff50316a",
     "bytes": 124742526
   },
-  "credits": "English to Turkish model from the Argos Translate package index: Argos Translate (Argos Open Technologies), released under MIT or CC0 (argos-translate issue #533). Trained on OPUS data; includes a Stanza English tokenizer (Apache-2.0)."
+  "credits": "English to Turkish model from the Argos Translate package index: Argos Translate (Argos Open Technologies), released under MIT or CC0 (argos-translate issue #533). Trained on OPUS data; includes a Stanza English tokenizer (Apache-2.0). Voice: Piper voice tr_TR-dfki-medium from rhasspy/piper-voices, CC BY-NC-SA 4.0.",
+  "voice": {
+    "name": "Dfki",
+    "url": "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/tr/tr_TR/dfki/medium/tr_TR-dfki-medium.onnx",
+    "sha256": "2844717f524ab965d3fe86e60562cbb601d3e456836efcc2196cc3a14112a8fb",
+    "bytes": 63201294,
+    "config_url": "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/tr/tr_TR/dfki/medium/tr_TR-dfki-medium.onnx.json",
+    "config_sha256": "13ebd7810f1b61b5027583cf3131a0a233b6ea81c38f2200ebc4ff41c3cca039",
+    "config_bytes": 4960
+  }
 }

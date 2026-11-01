@@ -12,12 +12,13 @@ from PySide6.QtWidgets import (QBoxLayout, QDialog, QLabel, QMenu, QPushButton, 
 
 from soundboard.core import usage
 from soundboard.i18n import _
-from soundboard.speech import aivoicelist as avl
+from soundboard.speech import aivoicelist as avl, piper
 from soundboard.ui.voice import art
 from soundboard.ui.kit import fit, icons
 from soundboard.ui.voice.aivoicebrowser import HEAR, mine_icon
 from soundboard.ui.voice.effectspopup import place_over
 from soundboard.ui.voice.groupbar import no_match
+from soundboard.ui.voice.speechtiles import lang_icon
 from soundboard.ui.voice.voicetiles import place_bar_controls
 from soundboard.ui.voice.voicefxpanel import (LIST_MIN_W, MAX_COLS, PICKED_ART, TILE_ART,
                                               TILE_GAP, TILE_MIN_W, VoiceTile)
@@ -34,16 +35,26 @@ else:
 
 # the chips over the voice cards: All shows a heading per kind (avl.who), your own
 # first (under the long ready-made grid, the ones you recorded were out of sight)
-ALL, FAVS, MINE = "", "favs", "mine"
+ALL, FAVS, MINE, LANGS = "", "favs", "mine", "languages"
 MAKE = "+make"   # the Make your own voice card's place among the voice ids
 KINDS = ((MINE, _("Mine")), ("men", _("Men")), ("women", _("Women")),
-         ("other", _("In between & fun")))
-KIND_ICONS = {"men": "voice", "women": "voice", "other": "laugh", MINE: "mic"}
+         ("other", _("In between & fun")), (LANGS, _("Languages")))
+KIND_ICONS = {"men": "voice", "women": "voice", "other": "laugh", MINE: "mic",
+              LANGS: "browser"}
 
 
 def voice_kind(voice: dict) -> str:
-    """The heading a voice card goes under: yours under Mine, else who it sounds like."""
+    """The heading a voice card goes under: yours under Mine, a downloaded language's
+    voice under Languages, else who it sounds like."""
+    if voice.get("language"):
+        return LANGS
     return MINE if avl.is_mine(voice) else avl.who(voice)
+
+
+def is_language_voice(vid: str) -> bool:
+    """A card for a downloaded language's own voice (`piper:xx`), not an AI voice: it
+    reads your translated words, so it's picked on Speak another language."""
+    return vid.startswith(piper.PREFIX)
 
 
 def emoji_icon(emoji: str, size: int = TILE_ART) -> QIcon:
@@ -109,8 +120,10 @@ class AiVoiceCards(_Panel):
 
     def _mark_tile(self):
         """Light up the picked voice's card only while the AI voice is on (like the
-        voice changer's cards): off, no card looks switched on."""
-        vid = self.current_voice() if self.is_on() else None
+        voice changer's cards): off, no card looks switched on. With no AI voice on,
+        the language voice reading your translated words is lit."""
+        vid = (self.current_voice() if self.is_on() else
+               piper.voice_id(self.speaking) if self.speaking else None)
         self.tiles.setExclusive(False)
         for i, b in self._tile.items():
             b.setChecked(i == vid)
@@ -125,12 +138,13 @@ class AiVoiceCards(_Panel):
             b.hide()   # until it's gone it would paint over the regrown grid
             b.deleteLater()
         self._tile = {}
-        for vo in self.voices:
+        for vo in (*self.voices, *self.language_voices):
             vid = vo["id"]
             b = VoiceTile(vo["name"])
             if self._listed:
                 b.set_listed(True)
-            b.setIcon(voice_icon(vo))
+            b.setIcon(lang_icon(vo["language"], True) if vo.get("language")
+                      else voice_icon(vo))
             b.setIconSize(QSize(TILE_ART, TILE_ART))
             b.setCursor(Qt.CursorShape.PointingHandCursor)
             tags = avl.tag_line(vo)
@@ -153,7 +167,8 @@ class AiVoiceCards(_Panel):
         g, cols = self._tile_grid, self._tile_cols
         for w in (*self._tile.values(), *self._heads.values(), self.make_tile):
             g.removeWidget(w)
-        by_id = {vo["id"]: vo for vo in self.voices if vo["id"] in self._tile}
+        by_id = {vo["id"]: vo for vo in (*self.voices, *self.language_voices)
+                 if vo["id"] in self._tile}
         low_first = sorted(by_id.values(), key=lambda vo: vo.get("pitch_hz", 0))
         rows: list[tuple[str, list[str]]]
         if self._group == ALL:
@@ -203,7 +218,8 @@ class AiVoiceCards(_Panel):
 
     def _group_count(self, key: str) -> int:
         """How many voices a group holds (the dropdown's numbers)."""
-        listed = [vo for vo in self.voices if vo["id"] in self._tile]
+        listed = [vo for vo in (*self.voices, *self.language_voices)
+                  if vo["id"] in self._tile]
         if key == ALL:
             return len(listed)
         if key == FAVS:
@@ -304,7 +320,7 @@ class AiVoiceCards(_Panel):
         from soundboard.ui.kit.hotkeypick import pretty_key
         vo = next((v for v in self.voices if v["id"] == vid), None)
         if vo is None:
-            return
+            return   # (a language's voice: nothing to edit or hear on its own)
         m = QMenu(self)
         if self.previewer.available():
             m.addAction(icons.icon("headphones"), HEAR, lambda: (
@@ -333,9 +349,28 @@ class AiVoiceCards(_Panel):
         self.pick(vid)
         self.open_tweak(self._tile.get(vid))
 
+    def set_language_voices(self, voices: list[dict], speaking: str):
+        """The downloaded languages' voices ({"id": "piper:xx", "name", "language",
+        "about"}) as cards under Languages, and the language being spoken now ("":
+        none, or an AI voice says it)."""
+        self.speaking = speaking
+        if voices != self.language_voices:
+            self.language_voices = voices
+            self._fill_tiles()
+        else:
+            self._mark_tile()
+
     def _tile_clicked(self, vid: str):
         """A voice card: that voice, on; the one that's on already: off (as the voice
-        changer's cards)."""
+        changer's cards). A language's voice: speak that language with it (the AI
+        voice goes off, or it would say the lines instead)."""
+        if is_language_voice(vid):
+            usage.used("ai-voice-language")
+            lang = vid[len(piper.PREFIX):]
+            if self.is_on():
+                self.stop()
+            self.language_picked.emit("" if self.speaking == lang else lang)
+            return
         if self.is_on() and vid == self.current_voice():
             self.stop()
             return

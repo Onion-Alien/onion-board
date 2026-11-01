@@ -123,6 +123,11 @@ class VoiceAddons(_Panel):
         self.chain.configure(self.fx.spec())
         self.speech.set_modules(self.modules)
         self.ai.set_modules(self.modules, ai_voices)
+        m = self.ai.module
+        self.speech.voices_need = (
+            "get" if m is None or not m.installed
+            else "update" if not (m.path / "reader.py").is_file() else "")
+        self.speech._refresh_translation()
         self._follow_offline()
         self.addons.show_modules(self.modules)
 

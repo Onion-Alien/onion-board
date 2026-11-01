@@ -3,7 +3,7 @@
   "name": "Translate to Vietnamese",
   "version": "1.0.0",
   "kind": "translation",
-  "description": "The computer voice speaks what you say in Vietnamese. Needs live voice-to-speech. Downloads a 68 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "description": "A voice speaks what you say in Vietnamese. Needs speech recognition and AI voices. Downloads a 131 MB translation model and voice once, when you ask for it; translating then happens on this PC.",
   "language": "vi",
   "language_name": "Vietnamese",
   "download": {
@@ -11,5 +11,14 @@
     "sha256": "86957101aa4099aa9a1a7492e41987d938d3cf0fdaf4fb684c0797a9d567dd16",
     "bytes": 67770159
   },
-  "credits": "English to Vietnamese model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+  "credits": "English to Vietnamese model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0. Voice: Piper voice vi_VN-vais1000-medium from rhasspy/piper-voices, CC BY 4.0.",
+  "voice": {
+    "name": "Vais1000",
+    "url": "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/vi/vi_VN/vais1000/medium/vi_VN-vais1000-medium.onnx",
+    "sha256": "ec7c89e2c85f4d1edc24b6120c18aaf1bda614f06b511567eb9c7c0de15e2dab",
+    "bytes": 63201294,
+    "config_url": "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/vi/vi_VN/vais1000/medium/vi_VN-vais1000-medium.onnx.json",
+    "config_sha256": "fafb9da1354ed4b77c31af228ed41fb41cd825c14cffa105454b25e6ae751ee0",
+    "config_bytes": 4860
+  }
 }

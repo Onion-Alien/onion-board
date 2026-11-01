@@ -1013,6 +1013,75 @@ def test_download_checks_the_sum_and_unpacks_only_the_model(tmp_path):
     assert not info.installed
 
 
+def _voice_files(tmp_path, onnx=b"onnx weights", cfg=b'{"dataset": "huayan"}') -> dict:
+    """A language's "voice" entry, its two files served from disk."""
+    import hashlib
+    (tmp_path / "v.onnx").write_bytes(onnx)
+    (tmp_path / "v.onnx.json").write_bytes(cfg)
+    return {"name": "Huayan", "url": (tmp_path / "v.onnx").as_uri(),
+            "sha256": hashlib.sha256(onnx).hexdigest(), "bytes": len(onnx),
+            "config_url": (tmp_path / "v.onnx.json").as_uri(),
+            "config_sha256": hashlib.sha256(cfg).hexdigest(), "config_bytes": len(cfg)}
+
+
+def test_a_language_downloads_with_its_own_voice(tmp_path):
+    """The voice that reads the translated lines comes with the language, checked and
+    kept beside its model; a language isn't downloaded until both are in."""
+    from soundboard.speech import translation
+    sha, size = model_package(tmp_path / "pkg.argosmodel")
+    info = translation_info(tmp_path, sha, size)
+    info.voice = _voice_files(tmp_path)
+    assert translation.size_mb(info) == max(1, round((size + 12 + 21) / 1e6))
+    seen = []
+    translation.download(info, lambda done, total: seen.append((done, total)))
+    assert info.installed and translation.voice_ready(info)
+    assert translation.voice_file(info).read_bytes() == b"onnx weights"
+    assert seen[-1][0] == seen[-1][1] == size + 12 + 21     # one bar for all of it
+    assert not list(translation.base_dir().rglob("*.part"))
+
+
+def test_a_language_downloaded_before_voices_fetches_just_its_voice(tmp_path, monkeypatch):
+    """Someone who downloaded Chinese before it had a voice: Download again gets only
+    the voice (the model's link isn't touched), and the model stays as it was."""
+    from soundboard.speech import translation
+    sha, size = model_package(tmp_path / "pkg.argosmodel")
+    info = translation_info(tmp_path, sha, size)
+    translation.download(info)                      # the old download: no voice listed
+    model = translation.model_dir(info) / "model" / "model.bin"
+    assert info.installed
+    info.voice = _voice_files(tmp_path)             # the add-on now lists one
+    assert not info.installed and translation.model_ready(info)
+    assert translation.size_mb(info) == 1           # just the voice (a few bytes here)
+    info.download = {**info.download, "url": (tmp_path / "gone.zip").as_uri()}
+    translation.download(info)
+    assert info.installed and model.read_bytes() == b"weights"
+
+
+def test_a_voice_with_the_wrong_sum_is_thrown_away(tmp_path):
+    from soundboard.speech import translation
+    sha, size = model_package(tmp_path / "pkg.argosmodel")
+    info = translation_info(tmp_path, sha, size)
+    info.voice = {**_voice_files(tmp_path), "sha256": "0" * 64}
+    with pytest.raises(RuntimeError, match="checksum"):
+        translation.download(info)
+    assert translation.model_ready(info) and not translation.voice_ready(info)
+    assert not list(translation.base_dir().rglob("*.part"))
+    assert not translation.voice_file(info).exists()
+
+
+def test_a_new_model_download_keeps_the_voice(tmp_path):
+    """Unpacking a model replaces its folder: the voice in it is moved aside and back."""
+    from soundboard.speech import translation
+    sha, size = model_package(tmp_path / "pkg.argosmodel")
+    info = translation_info(tmp_path, sha, size)
+    info.voice = _voice_files(tmp_path)
+    translation.download(info)
+    (translation.model_dir(info) / "sentencepiece.model").unlink()   # the model, broken
+    assert not info.installed and translation.voice_ready(info)
+    translation.download(info)
+    assert info.installed and translation.voice_file(info).read_bytes() == b"onnx weights"
+
+
 def test_download_with_the_wrong_sum_is_thrown_away(tmp_path):
     from soundboard.speech import translation
     _, size = model_package(tmp_path / "pkg.argosmodel")
@@ -1106,7 +1175,7 @@ def test_an_endless_download_is_cut_off_at_the_cap(tmp_path, monkeypatch):
     monkeypatch.setattr(net, "urlopen", lambda *a, **k: reply)
     with pytest.raises(RuntimeError, match="far bigger"):
         translation.download(info)
-    assert reply.read_bytes <= translation.max_bytes(info) + translation.CHUNK
+    assert reply.read_bytes <= translation.max_bytes(100_000) + translation.CHUNK
     assert not info.installed and not list(translation.base_dir().glob("*"))
 
 
@@ -1114,7 +1183,7 @@ def test_a_listed_size_over_the_cap_is_refused_before_reading(tmp_path, monkeypa
     from soundboard.online import net
     from soundboard.speech import translation
     info = translation_info(tmp_path, "0" * 64, 0)          # no size listed: 300 MB cap
-    assert translation.max_bytes(info) == translation.DEFAULT_CAP
+    assert translation.max_bytes(0) == translation.DEFAULT_CAP
     reply = _Endless({"Content-Length": str(translation.DEFAULT_CAP + 1)})
     monkeypatch.setattr(net, "urlopen", lambda *a, **k: reply)
     with pytest.raises(RuntimeError, match="far bigger"):

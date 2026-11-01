@@ -3,7 +3,7 @@
   "name": "Translate to Greek",
   "version": "1.0.0",
   "kind": "translation",
-  "description": "The computer voice speaks what you say in Greek. Needs live voice-to-speech. Downloads a 70 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "description": "A voice speaks what you say in Greek. Needs speech recognition and AI voices. Downloads a 133 MB translation model and voice once, when you ask for it; translating then happens on this PC.",
   "language": "el",
   "language_name": "Greek",
   "download": {
@@ -11,5 +11,14 @@
     "sha256": "ac5a359363b14490a2c6614e6c5ae4a58a8bbbc739b17a4cb3616fe46f2c329b",
     "bytes": 69660890
   },
-  "credits": "English to Greek model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+  "credits": "English to Greek model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0. Voice: Piper voice el_GR-rapunzelina-medium from rhasspy/piper-voices, CC0.",
+  "voice": {
+    "name": "Rapunzelina",
+    "url": "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/el/el_GR/rapunzelina/medium/el_GR-rapunzelina-medium.onnx",
+    "sha256": "3ca9fb3092215ee92edfc019b43feb0115ff4dfe638eb34474833ab1de840952",
+    "bytes": 62950044,
+    "config_url": "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/el/el_GR/rapunzelina/medium/el_GR-rapunzelina-medium.onnx.json",
+    "config_sha256": "3a6182ec7c7550e14ef15e5d9badbb18f973a434086ac9658a1b10991fd192f8",
+    "config_bytes": 4973
+  }
 }

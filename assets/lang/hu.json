@@ -2251,7 +2251,6 @@
   "“{name}” is a built-in voice's name. Pick another one.": "„{name}” egy beépített hang neve. Válassz másikat.",
   "↓ that button!": "↓ azt a gombot!",
   "−{seconds}s": "−{seconds} mp",
-  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice, the voice changer and the computer voice; your real voice is muted meanwhile.": "⏱ Mások pár másodperc késéssel hallanak téged {language} nyelven: minden mondatot leír, lefordít, majd kimond, amint befejezted. Működik az AI hanggal, a hangváltóval és a számítógépes hanggal; a valódi hangod közben némítva van.",
   "● Hearing you…": "● Hallak…",
   "● ON: sending a program's sound": "● BE: egy program hangjának küldése",
   "● ON: sending {programs}": "● BE: {programs} küldése",
@@ -3251,7 +3250,6 @@
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "A letöltő (yt-dlp) nincs telepítve, Beállítások → Frissítések → Segédprogramok → yt-dlp → Újratelepítés.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "A Windows most nem találja ezt: <b>{mic}</b>. Dugd be, vagy kapcsold be, ha vezeték nélküli. Egyáltalán nincs mikrofonod? Használd a lenti <b>virtuális kábelt</b>: mikrofon nélkül is működik.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "A mikrofonod most nem küld hangot (ki van kapcsolva, le van némítva, vagy nincs bedugva mikrofon), így mások csak a hangjaidat hallják. Szeretnéd, hogy téged is halljanak? Kapcsold be, vagy oldd fel a némítást.",
-  "A {language} computer voice, once it's on this PC (below).": "Egy {language} gépi hang, ha már ezen a gépen van (lent).",
   "Delete the {language} download": "A(z) {language} letöltés törlése",
   "Don't translate": "Nincs fordítás",
   "Said by": "Ki mondja",
@@ -3261,8 +3259,6 @@
   "Use the computer voice instead": "Inkább a gépi hangot használom",
   "Your AI voice, {voice}. It's on: just talk.": "Az AI-hangod, {voice}. Be van kapcsolva: csak beszélj.",
   "{voice} with your {effect} voice changer. It's on: just talk.": "{voice} a(z) {effect} hangváltóval. Be van kapcsolva: csak beszélj.",
-  "{voice}, the computer voice, once you press Start.": "{voice}, a gépi hang, ha megnyomod az Indítást.",
-  "{voice}, the computer voice. It's on: just talk.": "{voice}, a gépi hang. Be van kapcsolva: csak beszélj.",
   "Once a day and after a failed download, gets a newer yt-dlp from PyPI, but only a version the app's makers approved that has been out for at least 3 days. Off by default.": "Naponta egyszer és sikertelen letöltés után letölt egy újabb yt-dlp-t a PyPI-ról, de csak olyan verziót, amit az alkalmazás készítői jóváhagytak, és ami legalább 3 napja megjelent. Alapból ki van kapcsolva.",
   "The list of approved yt-dlp versions couldn't be read": "A jóváhagyott yt-dlp-verziók listáját nem sikerült beolvasni",
   "Force update": "Frissítés kényszerítése",
@@ -3995,7 +3991,6 @@
   "Others hear you in {language}.": "A többiek {language} nyelven hallanak.",
   "Pick a language first: click one below.": "Előbb válassz nyelvet: kattints egyre lent.",
   "Talk in your language and others hear another one. Pick a language to turn it on.": "Beszélj a saját nyelveden, és a többiek egy másikat hallanak. Válassz nyelvet a bekapcsolásához.",
-  "{language} isn't downloaded yet. Download and install it now? It's a one-time {size} MB download, and Windows may ask to add its voice too.": "A(z) {language} még nincs letöltve. Letöltöd és telepíted most? Egyszeri, {size} MB-os letöltés, és a Windows a hangja hozzáadását is kérheti.",
   "A random sound": "Egy véletlen hang",
   "Alerts": "Értesítések",
   "Channel points": "Csatornapontok",
@@ -4837,10 +4832,6 @@
   "(AI voice)": "(AI hang)",
   "(Voice changer)": "(Hangváltó)",
   "(Clean mic)": "(Tiszta mikrofon)",
-  "(Computer voice)": "(Számítógépes hang)",
-  "(Custom voice)": "(Saját hang)",
-  "(Voice server)": "(Hangszerver)",
-  "Windows voice": "Windows-hang",
   "{n} new": [
     "{n} új",
     "{n} új"
@@ -4869,5 +4860,13 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Akkor hallod őket, ha a részletek összefűzve szólnak, és a részlet saját Lejátszás most, Mentés új gombként és Másolás parancsában (jobb klikk rajta)",
   "{name} (splice {n})": "{name} ({n}. részlet)",
   "✓ Copied: paste it into a chat or a folder": "✓ Másolva: illeszd be egy chatbe vagy mappába",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Görgetéssel nagyítasz. Egy részlet szintvonalán húzd a pontokat: a sarkokat oldalra az úsztatáshoz, fel vagy le a hangerőhöz, a végeket fel vagy le ahhoz, honnan induljon az úsztatás. Kattints egy részletre saját effektekért, jobb klikk a többihez."
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Görgetéssel nagyítasz. Egy részlet szintvonalán húzd a pontokat: a sarkokat oldalra az úsztatáshoz, fel vagy le a hangerőhöz, a végeket fel vagy le ahhoz, honnan induljon az úsztatás. Kattints egy részletre saját effektekért, jobb klikk a többihez.",
+  "The {language} voice, once {language} is downloaded (below).": "A(z) {language} hang, amint a(z) {language} letöltődik (lent).",
+  "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "A(z) {language} még nincs letöltve. Letöltöd most? Egyszeri {size} MB-os letöltés, egy {language} nyelven beszélő hanggal.",
+  "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice} felolvassa a szavaidat ezen a nyelven: {language}. Válaszd ki, hogy {language} nyelven beszélj.",
+  "{voice}, the {language} voice. It's on: just talk.": "{voice}, a(z) {language} hang. Be van kapcsolva: csak beszélj.",
+  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ Mások pár másodperc késéssel hallanak téged {language} nyelven: minden mondatot leír, lefordít, majd kimond, amint befejezted. Működik az AI hanggal és a hangváltóval is; a valódi hangod közben némítva van.",
+  "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "A(z) {language} hanghoz kell az AI hangok bővítmény: töltsd le az AI hangok fülön.",
+  "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "A(z) {language} hanghoz a legújabb AI hangok kellenek: az AI hangok fülön a További lehetőségek alatt nyomd meg az AI hangok frissítése gombot.",
+  "({language} voice)": "({language} hang)"
 }

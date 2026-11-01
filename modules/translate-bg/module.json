@@ -3,7 +3,7 @@
   "name": "Translate to Bulgarian",
   "version": "1.0.0",
   "kind": "translation",
-  "description": "The computer voice speaks what you say in Bulgarian. Needs live voice-to-speech. Downloads a 72 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "description": "A voice speaks what you say in Bulgarian. Needs speech recognition and AI voices. Downloads a 136 MB translation model and voice once, when you ask for it; translating then happens on this PC.",
   "language": "bg",
   "language_name": "Bulgarian",
   "download": {
@@ -11,5 +11,14 @@
     "sha256": "28401fbb5f94e1ce8a54e3005beea9d5f08767d67e3e0900940e08722cfc275a",
     "bytes": 72324211
   },
-  "credits": "English to Bulgarian model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+  "credits": "English to Bulgarian model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0. Voice: Piper voice bg_BG-dimitar-medium from rhasspy/piper-voices, CC0.",
+  "voice": {
+    "name": "Dimitar",
+    "url": "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/bg/bg_BG/dimitar/medium/bg_BG-dimitar-medium.onnx",
+    "sha256": "4972fe764468e8501416407ad81662de94cc6c9cdc680fcf807daef04e319f13",
+    "bytes": 63221984,
+    "config_url": "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/bg/bg_BG/dimitar/medium/bg_BG-dimitar-medium.onnx.json",
+    "config_sha256": "ec9a9abdd17384d3db225e83085b2f68b790b112f058417c3a8a2ac58b79e7f0",
+    "config_bytes": 5123
+  }
 }

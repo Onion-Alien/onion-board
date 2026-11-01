@@ -381,7 +381,10 @@ class SpeechInstalls(QObject):
         p = self.p
         m = p.module
         self.b_remove.setVisible(
-            (m is not None and m.installed) or any(lang.installed for lang in p.langs)
+            (m is not None and m.installed)
+            # a language, or part of one (its model without the voice that came later)
+            or any(translation.model_ready(lang) or translation.voice_file(lang).is_file()
+                   for lang in p.langs)
             or bool(live.speech_model_dirs()))
 
     # ---- speech recognition (the live-voice add-on)

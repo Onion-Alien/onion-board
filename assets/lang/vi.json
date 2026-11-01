@@ -2206,7 +2206,6 @@
   "“{name}” is a built-in voice's name. Pick another one.": "“{name}” là tên của một giọng có sẵn. Hãy chọn tên khác.",
   "↓ that button!": "↓ nút đó!",
   "−{seconds}s": "−{seconds} giây",
-  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice, the voice changer and the computer voice; your real voice is muted meanwhile.": "⏱ Người khác nghe bạn bằng {language} trễ vài giây: mỗi câu được chép lại, dịch, rồi đọc lên khi bạn nói xong câu đó. Tính năng này hoạt động với giọng AI, bộ đổi giọng và giọng máy tính; trong lúc đó giọng thật của bạn bị tắt tiếng.",
   "● Hearing you…": "● Đang nghe bạn…",
   "● ON: sending a program's sound": "● BẬT: đang gửi âm thanh của chương trình",
   "● ON: sending {programs}": "● BẬT: đang gửi {programs}",
@@ -3183,7 +3182,6 @@
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "Trình tải xuống (yt-dlp) chưa được cài, vào Cài đặt → Cập nhật → Chương trình hỗ trợ → yt-dlp → Cài đặt lại.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows hiện không tìm thấy <b>{mic}</b>. Hãy cắm vào, hoặc bật lên nếu là loại không dây. Không có mic nào cả? Dùng <b>cáp ảo</b> bên dưới: nó chạy được mà không cần mic.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Mic của bạn hiện không gửi âm thanh (đang tắt, đang tắt tiếng hoặc chưa cắm mic), nên người khác chỉ nghe thấy âm thanh của bạn. Muốn họ nghe cả giọng bạn? Bật mic lên hoặc bỏ tắt tiếng.",
-  "A {language} computer voice, once it's on this PC (below).": "Một giọng máy tiếng {language}, khi đã có trên PC này (bên dưới).",
   "Delete the {language} download": "Xóa bản tải tiếng {language}",
   "Don't translate": "Không dịch",
   "Said by": "Người nói",
@@ -3193,8 +3191,6 @@
   "Use the computer voice instead": "Dùng giọng máy thay thế",
   "Your AI voice, {voice}. It's on: just talk.": "Giọng AI của bạn, {voice}. Đang bật: cứ nói thôi.",
   "{voice} with your {effect} voice changer. It's on: just talk.": "{voice} với bộ đổi giọng {effect}. Đang bật: cứ nói thôi.",
-  "{voice}, the computer voice, once you press Start.": "{voice}, giọng máy, khi bạn bấm Bắt đầu.",
-  "{voice}, the computer voice. It's on: just talk.": "{voice}, giọng máy. Đang bật: cứ nói thôi.",
   "Once a day and after a failed download, gets a newer yt-dlp from PyPI, but only a version the app's makers approved that has been out for at least 3 days. Off by default.": "Mỗi ngày một lần và sau khi tải thất bại, tải yt-dlp mới hơn từ PyPI, nhưng chỉ phiên bản mà người làm ứng dụng đã duyệt và đã ra mắt ít nhất 3 ngày. Tắt theo mặc định.",
   "The list of approved yt-dlp versions couldn't be read": "Không đọc được danh sách các phiên bản yt-dlp đã duyệt",
   "Force update": "Buộc cập nhật",
@@ -3921,7 +3917,6 @@
   "Others hear you in {language}.": "Người khác nghe bạn bằng {language}.",
   "Pick a language first: click one below.": "Chọn một ngôn ngữ trước: bấm một cái bên dưới.",
   "Talk in your language and others hear another one. Pick a language to turn it on.": "Nói bằng ngôn ngữ của bạn và người khác nghe một ngôn ngữ khác. Chọn một ngôn ngữ để bật.",
-  "{language} isn't downloaded yet. Download and install it now? It's a one-time {size} MB download, and Windows may ask to add its voice too.": "{language} chưa được tải. Tải và cài ngay bây giờ? Chỉ tải một lần, {size} MB, và Windows có thể hỏi thêm giọng nói của nó.",
   "A random sound": "Một âm thanh ngẫu nhiên",
   "Alerts": "Cảnh báo",
   "Channel points": "Điểm kênh",
@@ -4747,10 +4742,6 @@
   "(AI voice)": "(Giọng AI)",
   "(Voice changer)": "(Bộ đổi giọng)",
   "(Clean mic)": "(Mic sạch)",
-  "(Computer voice)": "(Giọng máy tính)",
-  "(Custom voice)": "(Giọng tùy chỉnh)",
-  "(Voice server)": "(Máy chủ giọng nói)",
-  "Windows voice": "Giọng Windows",
   "{n} new": [
     "{n} mới"
   ],
@@ -4777,5 +4768,13 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Bạn nghe chúng khi các đoạn phát ghép lại, và trong Phát ngay, Lưu thành nút mới và Sao chép của đoạn đó (chuột phải vào nó)",
   "{name} (splice {n})": "{name} (đoạn {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Đã sao chép: dán vào khung chat hoặc thư mục",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Cuộn để phóng to. Trên đường mức của một đoạn, kéo các chấm: góc sang ngang để làm to dần/nhỏ dần và lên xuống để chỉnh âm lượng, hai đầu lên xuống để chọn mức bắt đầu. Bấm vào một đoạn để có hiệu ứng riêng, chuột phải để xem thêm."
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Cuộn để phóng to. Trên đường mức của một đoạn, kéo các chấm: góc sang ngang để làm to dần/nhỏ dần và lên xuống để chỉnh âm lượng, hai đầu lên xuống để chọn mức bắt đầu. Bấm vào một đoạn để có hiệu ứng riêng, chuột phải để xem thêm.",
+  "The {language} voice, once {language} is downloaded (below).": "Giọng {language}, sau khi tải {language} xong (bên dưới).",
+  "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "Chưa tải {language}. Tải ngay bây giờ? Tải một lần {size} MB, kèm giọng nói {language}.",
+  "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice} đọc lời bạn bằng {language}. Chọn để nói {language}.",
+  "{voice}, the {language} voice. It's on: just talk.": "{voice}, giọng {language}. Đang bật: cứ nói thôi.",
+  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ Người khác nghe bạn bằng {language} trễ vài giây: mỗi câu được chép lại, dịch, rồi đọc lên khi bạn nói xong câu đó. Tính năng này hoạt động với cả giọng AI và bộ đổi giọng; trong lúc đó giọng thật của bạn bị tắt tiếng.",
+  "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "Giọng {language} cần tiện ích Giọng AI: tải ở thẻ Giọng AI.",
+  "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "Giọng {language} cần Giọng AI mới nhất: bấm Cập nhật giọng AI trong Nhiều lựa chọn hơn ở thẻ Giọng AI.",
+  "({language} voice)": "(giọng {language})"
 }

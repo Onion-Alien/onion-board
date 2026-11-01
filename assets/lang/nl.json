@@ -2251,7 +2251,6 @@
   "“{name}” is a built-in voice's name. Pick another one.": "“{name}” is de naam van een ingebouwde stem. Kies een andere.",
   "↓ that button!": "↓ die knop!",
   "−{seconds}s": "−{seconds} s",
-  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice, the voice changer and the computer voice; your real voice is muted meanwhile.": "⏱ Anderen horen je in het {language}, een paar seconden later: elke zin wordt uitgeschreven, vertaald en uitgesproken zodra je hem af hebt. Het werkt met de AI-stem, de stemvervormer en de computerstem; je echte stem is ondertussen gedempt.",
   "● Hearing you…": "● Hoort je…",
   "● ON: sending a program's sound": "● AAN: stuurt het geluid van een programma",
   "● ON: sending {programs}": "● AAN: stuurt {programs}",
@@ -3251,7 +3250,6 @@
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "De downloader (yt-dlp) is niet geïnstalleerd, Instellingen → Updates → Hulpprogramma's → yt-dlp → Opnieuw installeren.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows kan <b>{mic}</b> nu niet vinden. Sluit hem aan, of zet hem aan als hij draadloos is. Helemaal geen mic? Gebruik de <b>virtuele kabel</b> hieronder: die werkt zonder.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Je mic stuurt nu geen geluid (uit, gedempt of geen mic aangesloten), dus anderen horen alleen je geluiden. Wil je dat ze jou ook horen? Zet hem aan of zet dempen uit.",
-  "A {language} computer voice, once it's on this PC (below).": "Een computerstem in het {language}, zodra die op deze pc staat (hieronder).",
   "Delete the {language} download": "Download {language} verwijderen",
   "Don't translate": "Niet vertalen",
   "Said by": "Gezegd door",
@@ -3261,8 +3259,6 @@
   "Use the computer voice instead": "In plaats daarvan de computerstem gebruiken",
   "Your AI voice, {voice}. It's on: just talk.": "Je AI-stem, {voice}. Staat aan: gewoon praten.",
   "{voice} with your {effect} voice changer. It's on: just talk.": "{voice} met je stemvervormer {effect}. Staat aan: gewoon praten.",
-  "{voice}, the computer voice, once you press Start.": "{voice}, de computerstem, zodra je op Start drukt.",
-  "{voice}, the computer voice. It's on: just talk.": "{voice}, de computerstem. Staat aan: gewoon praten.",
   "Once a day and after a failed download, gets a newer yt-dlp from PyPI, but only a version the app's makers approved that has been out for at least 3 days. Off by default.": "Eén keer per dag en na een mislukte download haalt hij een nieuwere yt-dlp op van PyPI, maar alleen een versie die de makers van de app hebben goedgekeurd en die al minstens 3 dagen uit is. Standaard uit.",
   "The list of approved yt-dlp versions couldn't be read": "De lijst met goedgekeurde yt-dlp-versies kon niet worden gelezen",
   "Force update": "Update forceren",
@@ -3995,7 +3991,6 @@
   "Others hear you in {language}.": "Anderen horen je in het {language}.",
   "Pick a language first: click one below.": "Kies eerst een taal: klik er hieronder een aan.",
   "Talk in your language and others hear another one. Pick a language to turn it on.": "Praat in je eigen taal en anderen horen een andere. Kies een taal om hem aan te zetten.",
-  "{language} isn't downloaded yet. Download and install it now? It's a one-time {size} MB download, and Windows may ask to add its voice too.": "{language} is nog niet gedownload. Nu downloaden en installeren? Het is een eenmalige download van {size} MB, en Windows vraagt misschien ook om de stem toe te voegen.",
   "A random sound": "Een willekeurig geluid",
   "Alerts": "Meldingen",
   "Channel points": "Kanaalpunten",
@@ -4837,10 +4832,6 @@
   "(AI voice)": "(AI-stem)",
   "(Voice changer)": "(Stemvervormer)",
   "(Clean mic)": "(Schone mic)",
-  "(Computer voice)": "(Computerstem)",
-  "(Custom voice)": "(Eigen stem)",
-  "(Voice server)": "(Stemserver)",
-  "Windows voice": "Windows-stem",
   "{n} new": [
     "{n} nieuw",
     "{n} nieuw"
@@ -4869,5 +4860,13 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Je hoort ze als de fragmenten samengevoegd spelen, en bij Nu afspelen, Opslaan als nieuwe pad en Kopiëren van het fragment (rechtsklik erop)",
   "{name} (splice {n})": "{name} (fragment {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Gekopieerd: plak het in een chat of map",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Scroll om te zoomen. Sleep op de niveaulijn van een fragment de puntjes: de hoeken opzij voor een fade en omhoog of omlaag voor het volume, de uiteinden omhoog of omlaag voor waar een fade begint. Klik op een fragment voor eigen effecten, rechtsklik voor meer."
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Scroll om te zoomen. Sleep op de niveaulijn van een fragment de puntjes: de hoeken opzij voor een fade en omhoog of omlaag voor het volume, de uiteinden omhoog of omlaag voor waar een fade begint. Klik op een fragment voor eigen effecten, rechtsklik voor meer.",
+  "The {language} voice, once {language} is downloaded (below).": "De stem voor {language}, zodra {language} is gedownload (hieronder).",
+  "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "{language} is nog niet gedownload. Nu downloaden? Het is een eenmalige download van {size} MB, met een stem die {language} spreekt.",
+  "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice} leest je woorden voor in het {language}. Kies hem om {language} te spreken.",
+  "{voice}, the {language} voice. It's on: just talk.": "{voice}, de stem voor {language}. Staat aan: gewoon praten.",
+  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ Anderen horen je in het {language}, een paar seconden later: elke zin wordt uitgeschreven, vertaald en uitgesproken zodra je hem af hebt. Het werkt ook met de AI-stem en de stemvervormer; je echte stem is ondertussen gedempt.",
+  "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "De stem voor {language} heeft de add-on AI-stemmen nodig: haal hem op het tabblad AI-stemmen.",
+  "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "De stem voor {language} heeft de nieuwste AI-stemmen nodig: klik op het tabblad AI-stemmen onder Meer opties op AI-stemmen updaten.",
+  "({language} voice)": "(stem voor {language})"
 }

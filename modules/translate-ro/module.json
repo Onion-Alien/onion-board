@@ -3,7 +3,7 @@
   "name": "Translate to Romanian",
   "version": "1.0.0",
   "kind": "translation",
-  "description": "The computer voice speaks what you say in Romanian. Needs live voice-to-speech. Downloads a 71 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "description": "A voice speaks what you say in Romanian. Needs speech recognition and AI voices. Downloads a 134 MB translation model and voice once, when you ask for it; translating then happens on this PC.",
   "language": "ro",
   "language_name": "Romanian",
   "download": {
@@ -11,5 +11,14 @@
     "sha256": "bf8909d2b1e734f73ef4e892fd53c68fa4a96853b5b786b16da596a5ed258003",
     "bytes": 71049078
   },
-  "credits": "English to Romanian model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+  "credits": "English to Romanian model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0. Voice: Piper voice ro_RO-mihai-medium from rhasspy/piper-voices, CC0.",
+  "voice": {
+    "name": "Mihai",
+    "url": "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/ro/ro_RO/mihai/medium/ro_RO-mihai-medium.onnx",
+    "sha256": "e0608bbbd53c80267c09ece681b09f5199f54e792356684c8073738e5f15d29f",
+    "bytes": 63201294,
+    "config_url": "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/ro/ro_RO/mihai/medium/ro_RO-mihai-medium.onnx.json",
+    "config_sha256": "8cc0c9f077dc0cec3c25a6a055ec8046db8e40a2510591582f2c9c869f4bc47e",
+    "config_bytes": 4877
+  }
 }

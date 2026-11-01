@@ -2206,7 +2206,6 @@
   "“{name}” is a built-in voice's name. Pick another one.": "「{name}」は組み込みのボイスの名前です。別の名前にしてください。",
   "↓ that button!": "↓ そのボタン！",
   "−{seconds}s": "−{seconds}秒",
-  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice, the voice changer and the computer voice; your real voice is muted meanwhile.": "⏱ 相手には数秒遅れて{language}であなたの声が聞こえます: 1文話し終えるごとに文字に起こして翻訳し、読み上げます。AI ボイス、ボイスチェンジャー、コンピューター音声のどれでも使えます。その間、本当の声はミュートされます。",
   "● Hearing you…": "● 声を聞いています…",
   "● ON: sending a program's sound": "● オン: プログラムの音を送信中",
   "● ON: sending {programs}": "● オン: {programs} を送信中",
@@ -3183,7 +3182,6 @@
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "ダウンローダー (yt-dlp) がインストールされていません。設定 → アップデート → 補助プログラム → yt-dlp → 再インストール。",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "今は Windows が <b>{mic}</b> を見つけられません。接続するか、ワイヤレスなら電源を入れてください。マイクがまったくない場合は、下の<b>仮想ケーブル</b>を使ってください。マイクなしでも使えます。",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "今マイクから音が届いていません（電源オフ、ミュート、またはマイク未接続）。そのため、ほかの人にはサウンドだけが聞こえます。自分の声も届けたいときは、電源を入れるかミュートを解除してください。",
-  "A {language} computer voice, once it's on this PC (below).": "{language}のコンピューター音声（このPCに入ったら使えます。下を参照）。",
   "Delete the {language} download": "{language}のダウンロードを削除",
   "Don't translate": "翻訳しない",
   "Said by": "話す声",
@@ -3193,8 +3191,6 @@
   "Use the computer voice instead": "代わりにコンピューター音声を使う",
   "Your AI voice, {voice}. It's on: just talk.": "あなたの AI ボイス、{voice}。オンです: 話すだけで OK です。",
   "{voice} with your {effect} voice changer. It's on: just talk.": "{voice}（ボイスチェンジャー{effect}付き）。オンです。話すだけでOK。",
-  "{voice}, the computer voice, once you press Start.": "{voice}（コンピューター音声）。開始を押すと話します。",
-  "{voice}, the computer voice. It's on: just talk.": "{voice}（コンピューター音声）。オンです。話すだけでOK。",
   "Once a day and after a failed download, gets a newer yt-dlp from PyPI, but only a version the app's makers approved that has been out for at least 3 days. Off by default.": "1日1回と、ダウンロードに失敗したあとに、PyPIから新しいyt-dlpを取得します。ただし、アプリの作者が承認し、公開から3日以上たったバージョンだけです。初期設定はオフ。",
   "The list of approved yt-dlp versions couldn't be read": "承認済みのyt-dlpバージョン一覧を読み込めませんでした",
   "Force update": "強制アップデート",
@@ -3921,7 +3917,6 @@
   "Others hear you in {language}.": "相手には{language}で聞こえます。",
   "Pick a language first: click one below.": "まず言語を選んでください: 下のどれかをクリック。",
   "Talk in your language and others hear another one. Pick a language to turn it on.": "自分の言語で話すと、相手には別の言語で聞こえます。言語を選ぶとオンになります。",
-  "{language} isn't downloaded yet. Download and install it now? It's a one-time {size} MB download, and Windows may ask to add its voice too.": "{language}はまだダウンロードされていません。今ダウンロードしてインストールしますか？ 一度だけの {size} MB のダウンロードで、Windows がその言語のボイスの追加を求めることもあります。",
   "A random sound": "ランダムなサウンド",
   "Alerts": "アラート",
   "Channel points": "チャンネルポイント",
@@ -4747,10 +4742,6 @@
   "(AI voice)": "（AI ボイス）",
   "(Voice changer)": "（ボイスチェンジャー）",
   "(Clean mic)": "（マイクのノイズ除去）",
-  "(Computer voice)": "（コンピューター音声）",
-  "(Custom voice)": "（カスタム音声）",
-  "(Voice server)": "（音声サーバー）",
-  "Windows voice": "Windows の音声",
   "{n} new": [
     "新着 {n}"
   ],
@@ -4777,5 +4768,13 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "区間をつないで再生したときと、その区間の「今すぐ再生」「新しいパッドとして保存」「コピー」で聞こえます（右クリック）",
   "{name} (splice {n})": "{name}（区間 {n}）",
   "✓ Copied: paste it into a chat or a folder": "✓ コピーしました：チャットやフォルダーに貼り付けられます",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "スクロールでズーム。区間のレベル線の点をドラッグ：角を横に動かすとフェード、上下で音量、端を上下でフェードの開始レベル。区間をクリックで専用エフェクト、右クリックでその他の操作。"
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "スクロールでズーム。区間のレベル線の点をドラッグ：角を横に動かすとフェード、上下で音量、端を上下でフェードの開始レベル。区間をクリックで専用エフェクト、右クリックでその他の操作。",
+  "The {language} voice, once {language} is downloaded (below).": "{language}の音声（{language}をダウンロードすると使えます。下にあります）。",
+  "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "{language}はまだダウンロードされていません。今ダウンロードしますか？ {size} MB の 1 回だけのダウンロードで、{language}を話す音声も付いています。",
+  "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice}があなたの言葉を{language}で読み上げます。{language}で話すには選んでください。",
+  "{voice}, the {language} voice. It's on: just talk.": "{voice}（{language}の音声）。オンです: 話すだけで OK です。",
+  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ 相手には数秒遅れて{language}であなたの声が聞こえます: 1文話し終えるごとに文字に起こして翻訳し、読み上げます。AI ボイスやボイスチェンジャーとも一緒に使えます。その間、本当の声はミュートされます。",
+  "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "{language}の音声には AI ボイスのアドオンが必要です: AI ボイスのタブから入手してください。",
+  "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "{language}の音声には最新の AI ボイスが必要です: AI ボイスのタブの「その他のオプション」で「AI ボイスを更新」を押してください。",
+  "({language} voice)": "（{language}の音声）"
 }

@@ -3,7 +3,7 @@
   "name": "Translate to Ukrainian",
   "version": "1.0.0",
   "kind": "translation",
-  "description": "The computer voice speaks what you say in Ukrainian. Needs live voice-to-speech. Downloads a 120 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "description": "A voice speaks what you say in Ukrainian. Needs speech recognition and AI voices. Downloads a 197 MB translation model and voice once, when you ask for it; translating then happens on this PC.",
   "language": "uk",
   "language_name": "Ukrainian",
   "download": {
@@ -11,5 +11,14 @@
     "sha256": "037ebc690c0f7287bff01b09006f76707d7089134205a91ef3d823a3c73811e3",
     "bytes": 119889246
   },
-  "credits": "English to Ukrainian model from the Argos Translate package index: Argos Translate (Argos Open Technologies), released under MIT or CC0 (argos-translate issue #533). Trained on OPUS data; includes a Stanza English tokenizer (Apache-2.0)."
+  "credits": "English to Ukrainian model from the Argos Translate package index: Argos Translate (Argos Open Technologies), released under MIT or CC0 (argos-translate issue #533). Trained on OPUS data; includes a Stanza English tokenizer (Apache-2.0). Voice: Piper voice uk_UA-ukrainian_tts-medium from rhasspy/piper-voices, CC0.",
+  "voice": {
+    "name": "Ukrainian Tts",
+    "url": "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/uk/uk_UA/ukrainian_tts/medium/uk_UA-ukrainian_tts-medium.onnx",
+    "sha256": "7920419ac5f6fd8b6450520f24b52ed5a319cb53dd018fbcd71c9e079cbac84f",
+    "bytes": 76735663,
+    "config_url": "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/uk/uk_UA/ukrainian_tts/medium/uk_UA-ukrainian_tts-medium.onnx.json",
+    "config_sha256": "4e96e72917ca9b94edc77d6ccfee03a73f450ba2fc1ca93c2e562bc014e5aa55",
+    "config_bytes": 2002
+  }
 }

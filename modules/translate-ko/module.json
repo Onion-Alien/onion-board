@@ -3,7 +3,7 @@
   "name": "Translate to Korean",
   "version": "1.0.0",
   "kind": "translation",
-  "description": "The computer voice speaks what you say in Korean. Needs live voice-to-speech. Downloads a 121 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "description": "A voice speaks what you say in Korean. Needs speech recognition and AI voices. Downloads a 184 MB translation model and voice once, when you ask for it; translating then happens on this PC.",
   "language": "ko",
   "language_name": "Korean",
   "download": {
@@ -11,5 +11,14 @@
     "sha256": "e03d8e65e6d44525ec5808c3409fcf8728c76c2c76925372b6d3dc3278de17fc",
     "bytes": 120789009
   },
-  "credits": "English to Korean model from the Argos Translate package index: Argos Translate (Argos Open Technologies), released under MIT or CC0 (argos-translate issue #533). Trained on OPUS data; includes a Stanza English tokenizer (Apache-2.0)."
+  "credits": "English to Korean model from the Argos Translate package index: Argos Translate (Argos Open Technologies), released under MIT or CC0 (argos-translate issue #533). Trained on OPUS data; includes a Stanza English tokenizer (Apache-2.0). Voice: Piper voice ko_KR-kss-medium from rhasspy/piper-voices, CC BY-NC-SA 4.0.",
+  "voice": {
+    "name": "Kss",
+    "url": "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/ko/ko_KR/kss/medium/ko_KR-kss-medium.onnx",
+    "sha256": "624fd774e26895f24bebae1bd9a3379e3394baeade4b584924f83e414096e2c9",
+    "bytes": 63221984,
+    "config_url": "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/ko/ko_KR/kss/medium/ko_KR-kss-medium.onnx.json",
+    "config_sha256": "153b5619d0580f824a59108d83ca19434de410eb8e4fe80325b58684fdc8a1df",
+    "config_bytes": 5232
+  }
 }

@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (QFrame, QGraphicsOpacityEffect, QHBoxLayout, QLab
 from soundboard.core import langnames, usage
 from soundboard.ui.kit import theme
 from soundboard import voicefx
-from soundboard.speech import customvoices, spoken
+from soundboard.speech import spoken
 from soundboard.ui.kit import icons
 from soundboard.ui.voice import art
 from soundboard.ui.kit.panel import card, icon_button, section_label
@@ -30,7 +30,7 @@ else:
 
 
 # the voices with a bar of their own over the status bar (VoicePanel._barred)
-BARRED = ("fx", "ai", "speak")
+BARRED = ("fx", "ai")
 
 
 class CardBadge(QWidget):
@@ -66,7 +66,7 @@ class CardBadge(QWidget):
 # Clean mic first: your mic is cleaned before any voice changes it
 CARD_ICONS = {"clean": "mic", "fx": "voice", "ai": "wave", "speak": "browser", "addons": "puzzle"}
 TAB_KEYS = tuple(CARD_ICONS)   # the Voice tab's own tabs, in order
-ORDER = ("fx", "ai", "speak", "lang")   # the status bar's chips, as the sound goes through
+ORDER = ("fx", "ai", "lang")   # the status bar's chips, as the sound goes through
 TAB_NAMES = {"clean": lambda: _("Clean mic"), "fx": lambda: _("Voice changer"),
              "ai": lambda: _("AI voices"), "speak": lambda: _("Languages"),
              "addons": lambda: _("Add-ons")}
@@ -248,7 +248,6 @@ class VoiceCards(_Panel):
         the sound goes through them."""
         if not hasattr(self, "bar"):
             return
-        self._show_speak_bar()
         # short: a picture and a name; the full words are the chip's tip
         items = []
         on = self.on_keys()
@@ -272,7 +271,9 @@ class VoiceCards(_Panel):
                          ("ai", title + "…", "on", "wave", None,
                           _("AI voice: {voice}, starting.", voice=title) + " " + click_off))
         m = self.speech.translating() if "lang" in on else None
-        if m is not None:
+        # its own voice speaking it has a bar of its own (as the AI voice): no chip
+        barred = BARRED + (("lang",) if getattr(self, "_reader", "") == "read" else ())
+        if m is not None and "lang" not in barred:
             lang = langnames.of(m)
             items.append(("lang", lang, "on", "browser", None,
                           _("What you say is said in {language}.", language=lang)
@@ -281,7 +282,7 @@ class VoiceCards(_Panel):
         # (with Clean mic's chip there and nothing to bring back, "Mic unchanged" beside
         # it read as if Clean mic did nothing)
         paused = self.back_keys() if not on else self._back
-        chipped = [k for k in paused if k not in BARRED]   # the rest show on their bars
+        chipped = [k for k in paused if k not in barred]   # the rest show on their bars
         if not on and not (clean is not None and clean.is_on() and not chipped):
             items.append(("none", _("Mic unchanged. ON brings back:") if chipped and self._back
                           else _("Mic unchanged. ON turns on:") if chipped else
@@ -300,8 +301,9 @@ class VoiceCards(_Panel):
         chip_names = {it[0]: it[1] for it in items if it[2] == "off" and it[0] != "none"}
         names = ", ".join(  # what ON brings back: the paused bars' voices and grey chips
             self._fx_shown()[0] if k == "fx" else self.ai.voice_title() if k == "ai"
-            else self._speak_shown() if k == "speak" else chip_names[k]
-            for k in paused if k in BARRED or k in chip_names)
+            else self._lang_bar_name() if k == "lang" and k in barred
+            else chip_names[k]
+            for k in paused if k in barred or k in chip_names)
         self.bar.set_master(bool(on), (
             _("Turns off every voice changing your mic. Switching it on brings them back.")
             if on else _("Turns on: {voices}", voices=names) if names else
@@ -334,45 +336,38 @@ class VoiceCards(_Panel):
         QTimer.singleShot(0, self._scroll, lambda: self._scroll.ensureWidgetVisible(
             self.clean.settings))
 
-    def _show_speak_bar(self):
-        """The computer voice's bar: the voice that speaks (a voice server's, with its
-        picture) and what kind of voice it is."""
-        bar = getattr(self, "speak_bar", None)
-        if bar is None:
-            return
-        vid = self.speech.cb_voice.currentData() or ""
-        cv = getattr(self.speech.ctl.tts, "custom", {}).get(vid)
-        pm = None
-        if cv is not None and cv.url:
-            from soundboard.ui.voice.voiceservers import picture_pixmap
-            pm = picture_pixmap(cv, PICKED_ART)
-        if pm is None:
-            pm = icons.pixmap("speech", 24, theme.T["muted"])
-        win = [n for n in getattr(self.speech.ctl.tts, "voices", [])
-               if not n.startswith(customvoices.PREFIX)]
-        name = (cv.name if cv is not None else customvoices.label(vid or (win or [""])[0])
-                or _("Windows voice"))
-        kind = (_("(Voice server)") if cv is not None and cv.url else
-                _("(Custom voice)") if cv is not None else _("(Computer voice)"))
-        bar.show_voice(name, kind, pm)
+    def _lang_code(self) -> str:
+        """The language spoken (or paused from its bar)."""
+        return self.speech.cb_lang.currentData() or getattr(self, "_back_lang", "") or ""
 
-    def _edit_speak_voice(self):
-        """The computer voice's Edit voice: its settings (which voice, how fast) under
-        the Languages card's More options; a voice server's on the Add-ons tab."""
-        usage.used("voice-tweak")
-        vid = self.speech.cb_voice.currentData() or ""
-        if vid.startswith(customvoices.PREFIX):
-            self.speech.show_custom_voices()
+    def _lang_bar_name(self) -> str:
+        m = self.speech._module(self._lang_code())
+        return str(m.voice.get("name") or "") if m is not None else ""
+
+    def _show_lang_bar(self):
+        """The language's own voice's bar: its name ("Huayan"), "(Chinese voice)" and
+        the language's card picture."""
+        bar = getattr(self, "lang_bar", None)
+        code = self._lang_code()
+        if bar is None or not code:
             return
+        from soundboard.ui.voice.speechtiles import lang_icon
+        m = self.speech._module(code)
+        lang = langnames.of(m) if m is not None else langnames.name(code, code)
+        name = self._lang_bar_name() or lang
+        kind = _("({language} voice)", language=lang)
+        if bar.picked_name.text() != name or bar.picked_kind.text() != kind:
+            bar.show_voice(name, kind, lang_icon(code, True, PICKED_ART).pixmap(
+                PICKED_ART, PICKED_ART))
+
+    def _edit_lang_voice(self):
+        """The language voice's Edit voice: how fast it reads, under the Languages
+        card's More options."""
+        usage.used("voice-tweak")
         self.show_tab("speak", asked=True)
         self.speech.btn_opts.setChecked(True)
         QTimer.singleShot(0, self._scroll, lambda: self._scroll.ensureWidgetVisible(
             self.speech.opts))
-
-    def _speak_shown(self) -> str:
-        # which voice: a custom one may be a voice server on this PC (a web address)
-        cb = self.speech.cb_voice
-        return cb.currentText() if cb.currentData() else _("Computer voice")
 
     def _open_card(self, key: str):
         """A status bar chip: show its tab, from the top."""
@@ -387,19 +382,19 @@ class VoiceCards(_Panel):
         """Each card's head, and its tab, say when it's on (and when it speaks another
         language)."""
         self._update_bar()
+        self._show_lang_bar()
         if "speak" not in self._states:   # still being made
             return
         m = self.speech.translating()
         lang = langnames.of(m) if m is not None else ""
         late = _("in {language}, a few seconds late", language=lang) if lang else ""
-        fx, ai, tts = (self.fx.btn_power.isChecked(), self.ai.is_on(),
-                       self.speech.livevoice.b_live.isChecked())
+        fx, ai = self.fx.btn_power.isChecked(), self.ai.is_on()
         # the switches already say On: their heads only add the language
-        self._set_state("fx", fx, late if fx and not ai and not tts else "")
-        self._set_state("ai", ai, late if ai and not tts else "")
-        # another language spoken for the AI voice or the voice changer is on here too:
-        # its tab lights up beside theirs (it only did while the computer voice spoke)
-        speaking = tts or (m is not None and spoken.heard())
+        self._set_state("fx", fx, late if fx and not ai else "")
+        self._set_state("ai", ai, late if ai else "")
+        # another language spoken (by its own voice, the AI voice or the voice changer)
+        # lights its tab up too
+        speaking = m is not None and spoken.heard()
         # its switch and its lit card already say which: no words beside the switch
         self._set_state("speak", speaking, "")
         self._set_state("clean", self.clean.is_on(), "")

@@ -3,7 +3,7 @@
   "name": "Translate to Finnish",
   "version": "1.0.0",
   "kind": "translation",
-  "description": "The computer voice speaks what you say in Finnish. Needs live voice-to-speech. Downloads a 69 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "description": "A voice speaks what you say in Finnish. Needs speech recognition and AI voices. Downloads a 132 MB translation model and voice once, when you ask for it; translating then happens on this PC.",
   "language": "fi",
   "language_name": "Finnish",
   "download": {
@@ -11,5 +11,14 @@
     "sha256": "172c32485b89233983d1bd4d9e73fc22924ec0cb59bae4c97e299fdd4f083e0e",
     "bytes": 69132412
   },
-  "credits": "English to Finnish model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+  "credits": "English to Finnish model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0. Voice: Piper voice fi_FI-harri-medium from rhasspy/piper-voices, CC0.",
+  "voice": {
+    "name": "Harri",
+    "url": "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/fi/fi_FI/harri/medium/fi_FI-harri-medium.onnx",
+    "sha256": "a44167faa34caed940e4fcad139fcc35922266b2593bcebe77701774c0fb2389",
+    "bytes": 63201294,
+    "config_url": "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/fi/fi_FI/harri/medium/fi_FI-harri-medium.onnx.json",
+    "config_sha256": "3f9c9f76f74adf1fbe7279e41eea17d6610757e45effd6808bbea6be74b8916d",
+    "config_bytes": 4873
+  }
 }

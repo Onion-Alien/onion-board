@@ -1,7 +1,7 @@
 {
   "id": "ai-voices",
   "name": "AI voices",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "kind": "service",
   "description": "Turns your voice into a different character's voice live, on your own PC's CPU. Your words, your timing and your tone, in another voice; nothing you say leaves your PC.",
   "command": ["{python}", "{dir}/helper.py"],

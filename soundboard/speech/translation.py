@@ -1,4 +1,4 @@
-"""Translation models for the live computer voice (the "translation" add-ons).
+"""Translation models and voices for Speak another language (the "translation" add-ons).
 
 Each language is an add-on (modules/translate-xx/module.json) that names one
 model package: an Argos Translate `.argosmodel` zip with a CTranslate2 model and a
@@ -11,6 +11,12 @@ that language. Then:
 Only those files are taken from the zip, under names chosen here, so an archive
 can't write anywhere else. The live-voice helper loads the folder with
 `--translate <folder>` and translates each sentence on this PC.
+
+Its "voice" (a Piper voice that reads the translated lines out loud, through the AI
+voices add-on's reader.py) comes with it, into translation\\xx\\voice\\ (voice.onnx
+and voice.onnx.json, each checked against its sha256). A language downloaded before
+it had a voice isn't counted as downloaded until the voice is in too: Download then
+fetches just the voice.
 """
 from __future__ import annotations
 
@@ -32,6 +38,7 @@ CHUNK = 1 << 16
 TIMEOUT_S = 30
 DEFAULT_CAP = 300_000_000   # when module.json lists no size (the models are ~100 MB)
 MODEL_FILES = ("model.bin", "config.json", "shared_vocabulary.json", "shared_vocabulary.txt")
+VOICE_FILE = "voice.onnx"
 
 
 class Cancelled(Exception):
@@ -47,55 +54,127 @@ def model_dir(info) -> Path:
     return base_dir() / info.language
 
 
-def is_downloaded(info) -> bool:
+def model_ready(info) -> bool:
     d = model_dir(info)
     return (d / "model" / "model.bin").is_file() and (d / "sentencepiece.model").is_file()
 
 
+def voice_file(info) -> Path:
+    """The language's Piper voice (its .onnx.json lies beside it)."""
+    return model_dir(info) / "voice" / VOICE_FILE
+
+
+def voice_ready(info) -> bool:
+    """Its voice is in (or it lists none)."""
+    f = voice_file(info)
+    return not info.voice or (f.is_file() and f.with_name(VOICE_FILE + ".json").is_file())
+
+
+def is_downloaded(info) -> bool:
+    return model_ready(info) and voice_ready(info)
+
+
+def _parts(info) -> list[tuple[str, str, int, Path]]:
+    """What's still to fetch: (url, sha256, bytes, where it goes)."""
+    todo = []
+    if not model_ready(info):
+        d = info.download
+        todo.append((d["url"], d["sha256"], int(d.get("bytes", 0) or 0),
+                     base_dir() / f"{info.language}.part"))
+    v = info.voice
+    if v and not voice_ready(info):
+        f = voice_file(info)
+        todo.append((v["url"], v["sha256"], int(v.get("bytes", 0) or 0), f))
+        todo.append((v["config_url"], v["config_sha256"], int(v.get("config_bytes", 0) or 0),
+                     f.with_name(VOICE_FILE + ".json")))
+    return todo
+
+
 def size_mb(info) -> int:
-    return round(int(info.download.get("bytes", 0) or 0) / 1e6)
+    """What Download still has to fetch: the model and its voice, or just the voice for
+    a language downloaded before it had one."""
+    todo = _parts(info) or _parts_all(info)
+    return max(1, round(sum(n for _u, _s, n, _p in todo) / 1e6))
 
 
-def max_bytes(info) -> int:
-    """The most a language's download may be: half again its listed size, so a bad
-    mirror or an endless reply is cut off instead of filling the disk."""
-    listed = int(info.download.get("bytes", 0) or 0)
+def _parts_all(info) -> list[tuple[str, str, int, Path]]:
+    """Everything a language downloads (for its size once it's all in)."""
+    d, v = info.download, info.voice
+    return [("", "", int(d.get("bytes", 0) or 0), Path())] + (
+        [("", "", int(v.get("bytes", 0) or 0), Path())] if v else [])
+
+
+def max_bytes(listed: int) -> int:
+    """The most a download may be: half again its listed size, so a bad mirror or an
+    endless reply is cut off instead of filling the disk."""
     return listed * 3 // 2 if listed > 0 else DEFAULT_CAP
 
 
 def download(info, on_progress: Callable[[int, int], object] = lambda done, total: None,
              cancelled: Callable[[], bool] = lambda: False) -> None:
-    """Fetch, check and unpack a language's model. Blocking: call from a worker thread.
-    Raises RuntimeError (with a message for the user) or Cancelled."""
-    url, want = info.download["url"], info.download["sha256"].lower()
-    total = int(info.download.get("bytes", 0) or 0)
-    part = base_dir() / f"{info.language}.part"
-    log.info("downloading translation model %s from %s", info.language, url)
-    try:
-        base_dir().mkdir(parents=True, exist_ok=True)
-        req = urllib.request.Request(url, headers={"User-Agent": "OnionBoard"})
-        with (net.urlopen(req, timeout=TIMEOUT_S, feature="voices") as r,
-              open(part, "wb") as f):
-            got = net.read_capped(r, f, max_bytes(info), chunk=CHUNK, total=total,
-                                  progress=on_progress, check=_stop_if(cancelled))
-            length = net.content_length(r.headers)
-        if length and part.stat().st_size < length:
-            # the connection ended part-way (urllib reads that as the end of the file):
-            # say so, not "checksum"
-            raise ConnectionAbortedError("the download stopped part-way")
-        if got != want:
-            raise RuntimeError("the download didn't match its checksum, so it wasn't used")
-        _unpack(part, model_dir(info))
-    except net.TooBig:
-        raise RuntimeError(_("the download is far bigger than it should be")) from None
-    except OSError as e:
-        raise RuntimeError(f"download failed: {errors.plain(e)}") from e
-    finally:
+    """Fetch, check and unpack what a language still lacks: its model, its voice or
+    both. Blocking: call from a worker thread. Raises RuntimeError (with a message for
+    the user) or Cancelled."""
+    todo = _parts(info)
+    total = sum(n for _u, _s, n, _p in todo)
+    before = 0
+    for url, want, size, dest in todo:
+        model = dest.suffix == ".part"
+        tmp = dest if model else dest.with_name(dest.name + ".part")
+        log.info("downloading the %s %s from %s", info.language,
+                 "translation model" if model else "voice", url)
         try:
-            part.unlink(missing_ok=True)
-        except OSError:
-            pass            # a leftover .part is overwritten by the next try
-    log.info("translation model %s ready", info.language)
+            tmp.parent.mkdir(parents=True, exist_ok=True)
+            req = urllib.request.Request(url, headers={"User-Agent": "OnionBoard"})
+            with (net.urlopen(req, timeout=TIMEOUT_S, feature="voices") as r,
+                  open(tmp, "wb") as f):
+                got = net.read_capped(
+                    r, f, max_bytes(size), chunk=CHUNK, total=size,
+                    progress=lambda done, _t, b=before: on_progress(b + done, total),
+                    check=_stop_if(cancelled))
+                length = net.content_length(r.headers)
+            if length and tmp.stat().st_size < length:
+                # the connection ended part-way (urllib reads that as the end of the
+                # file): say so, not "checksum"
+                raise ConnectionAbortedError("the download stopped part-way")
+            if got != want.lower():
+                raise RuntimeError("the download didn't match its checksum, so it wasn't used")
+            if model:
+                keep = _keep_voice(info)   # unpacking replaces the whole folder
+                try:
+                    _unpack(tmp, model_dir(info))
+                finally:
+                    _put_back(info, keep)
+            else:
+                tmp.replace(dest)
+        except net.TooBig:
+            raise RuntimeError(_("the download is far bigger than it should be")) from None
+        except OSError as e:
+            raise RuntimeError(f"download failed: {errors.plain(e)}") from e
+        finally:
+            try:
+                tmp.unlink(missing_ok=True)
+            except OSError:
+                pass            # a leftover .part is overwritten by the next try
+        before += size
+    log.info("translation %s ready", info.language)
+
+
+def _keep_voice(info) -> Path | None:
+    """The voice folder, moved aside while the model is unpacked over its folder."""
+    v = model_dir(info) / "voice"
+    if not v.is_dir():
+        return None
+    keep = base_dir() / f"{info.language}.voice"
+    shutil.rmtree(keep, ignore_errors=True)
+    v.rename(keep)
+    return keep
+
+
+def _put_back(info, keep: Path | None) -> None:
+    if keep is not None and keep.is_dir():
+        model_dir(info).mkdir(parents=True, exist_ok=True)
+        keep.rename(model_dir(info) / "voice")
 
 
 def _stop_if(cancelled: Callable[[], bool]) -> Callable[[], None]:
@@ -143,6 +222,7 @@ def remove(info) -> None:
     d = model_dir(info)
     shutil.rmtree(d, ignore_errors=True)
     shutil.rmtree(d.with_name(d.name + ".new"), ignore_errors=True)
+    shutil.rmtree(base_dir() / f"{info.language}.voice", ignore_errors=True)
     try:
         (base_dir() / f"{info.language}.part").unlink(missing_ok=True)
     except OSError:

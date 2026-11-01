@@ -227,6 +227,9 @@ class SpeechPanel(SpeechSay, SpeechTiles, SpeechLangs, QWidget):
         measured(self.lbl_said_by, heads)
         self._said_row.addLayout(srow)
         self._who = ""   # "ai:name" / "fx:name" / "": who's on elsewhere (said_by)
+        # the language voices read through the AI voices add-on: "get" (it isn't in),
+        # "update" (one from before they came), "" (ready). VoicePanel sets it.
+        self.voices_need = ""
         # the language and who says it, together in one inner area; Start under it
         self.settings_box = QFrame()
         self.settings_box.setObjectName("voicebox")
@@ -311,9 +314,10 @@ class SpeechPanel(SpeechSay, SpeechTiles, SpeechLangs, QWidget):
         ov = QVBoxLayout(self.opts)
         ov.setContentsMargins(0, 0, 0, 0)
         ov.setSpacing(10)
-        # the computer voice's own Start (a language card starts it by itself): to talk
-        # as the computer voice in your own language
+        # (the computer voice's own Start is gone: a language speaks with its own voice
+        # as soon as it's picked; kept, never shown, for the code that asks if it's on)
         ov.addWidget(live.b_live, 0, Qt.AlignmentFlag.AlignLeft)
+        live.b_live.hide()
         grid = voice_grid
         lbl_model = QLabel(_("Recognition"))
         grid.addWidget(lbl_model, 2, 0)
@@ -339,8 +343,8 @@ class SpeechPanel(SpeechSay, SpeechTiles, SpeechLangs, QWidget):
         ov.addWidget(self.chk_mute)
         # what only works with speech recognition in: hidden until it's installed (a
         # Start button above "Install speech recognition" made no sense)
-        self._needs_recognition = (live.b_live, lbl_model, self.cb_model, lbl_spoken,
-                                   self.ed_lang, self.chk_mute)
+        self._needs_recognition = (lbl_model, self.cb_model, lbl_spoken, self.ed_lang)
+        self.chk_mute.hide()   # (only the computer voice's Start used it)
         self.chk_fx = QCheckBox(_("Put the voice changer on the computer voice"))
         self.chk_fx.setToolTip(_("With a voice picked under Voice changer, the computer voice "
                                  "gets the same effect (a chipmunk robot voice, say)."))

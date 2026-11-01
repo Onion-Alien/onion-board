@@ -117,6 +117,7 @@ class ModuleInfo:
     language: str = ""
     language_name: str = ""
     download: dict = field(default_factory=dict)
+    voice: dict = field(default_factory=dict)      # a translation's Piper voice
     credits: str = ""
     api_version: int = 0
     package: str = ""
@@ -197,6 +198,7 @@ def _read(folder: Path) -> ModuleInfo | None:
                           language=str(d.get("language", "")),
                           language_name=str(d.get("language_name", "")),
                           download=dict(d.get("download") or {}),
+                          voice=dict(d.get("voice") or {}),
                           credits=str(d.get("credits", "")),
                           package=str(d.get("package", "")),
                           imports=_strings(d.get("imports", []), "imports"))
@@ -217,6 +219,11 @@ def _read(folder: Path) -> ModuleInfo | None:
             and str(info.download.get("url", "")).startswith("https://")
             and re.fullmatch(r"[0-9a-f]{64}", str(info.download.get("sha256", "")))):
         info.error = "needs a language code and an https download with its sha256"
+    elif info.kind == "translation" and info.voice and not all(
+            str(info.voice.get(u, "")).startswith("https://")
+            and re.fullmatch(r"[0-9a-f]{64}", str(info.voice.get(h, "")))
+            for u, h in (("url", "sha256"), ("config_url", "config_sha256"))):
+        info.error = "its voice needs https downloads with their sha256"
     elif info.kind in PACKAGE_KINDS:
         info.error = _package_error(info)
     return info

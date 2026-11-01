@@ -119,19 +119,9 @@ class SpeechLangs(_Panel):
             self.set_language(code)
 
     def set_language(self, code: str):
-        """Turn `code` on (the AI voice or the voice changer says it, else the computer
-        voice starts), or "" every language off (and the computer voice speaking it)."""
-        lv = self.livevoice.b_live
-        if code:
-            if lv.isChecked():
-                lv.setChecked(False)   # it restarts with the new language below
-            self.cb_lang.setCurrentIndex(max(0, self.cb_lang.findData(code)))
-            if not self._who and self.translating() is not None:
-                lv.setChecked(True)    # nobody else to say it: the computer voice
-        else:
-            if lv.isChecked():
-                lv.setChecked(False)
-            self.cb_lang.setCurrentIndex(0)
+        """Turn `code` on (the AI voice or the voice changer says it, else the
+        language's own voice: VoicePanel decides), or "" every language off."""
+        self.cb_lang.setCurrentIndex(max(0, self.cb_lang.findData(code)) if code else 0)
         self._mark_tiles()
 
     def _switch_clicked(self, on: bool):
@@ -158,7 +148,7 @@ class SpeechLangs(_Panel):
         self.b_on.update()
 
     def _offer_download(self, m: mods.ModuleInfo):
-        """A grey card: download it (and add its Windows voice) after a Yes."""
+        """A grey card: download it (with its voice) after a Yes."""
         name = langnames.of(m)
         if net.offline():
             busy.toast(self, html.escape(_("Offline mode is on, so {language} can't be "
@@ -173,28 +163,24 @@ class SpeechLangs(_Panel):
             return
         if QMessageBox.question(
                 self, _("Download {language}?", language=name),
-                _("{language} isn't downloaded yet. Download and install it now? It's a "
-                  "one-time {size} MB download, and Windows may ask to add its voice too.",
+                _("{language} isn't downloaded yet. Download it now? It's a one-time "
+                  "{size} MB download, with a voice that speaks {language}.",
                   language=name, size=translation.size_mb(m))
         ) != QMessageBox.StandardButton.Yes:
             return
-        if self.livevoice.b_live.isChecked():
-            self.livevoice.b_live.setChecked(False)   # no download while it's talking
         self._wanted = m.language
         self.installs._download(m)
         self._show_settings()
 
     def _after_download(self):
-        """A grey card's language came in: on now, and its Windows voice added when
-        Windows has none (Windows asks first)."""
+        """A language (and its voice) came in: its voice joins the lists, and a grey
+        card's language is on now."""
+        self.installs._recheck_voices()
         code, self._wanted = self._wanted, ""
         m = self._module(code) if code else None
         if m is None or not m.installed:
             return
         self.set_language(code)
-        if (self.ctl.tts.voices and not self._voice_for(m) and not net.offline()
-                and net.allowed("voices")):
-            self.installs._install_voice()
 
     def _fit_lang_list(self):
         """The open list shows every name whole, even past the box's own width."""
@@ -231,21 +217,24 @@ class SpeechLangs(_Panel):
         who, _c, name = self._who.partition(":")
         m = self._lang_on()
         lang = langnames.of(m) if m is not None else ""
-        voice = self._voice_for(m) if m is not None and self.ctl.tts.voices else ""
-        computer = (customvoices.label(voice or self.cb_voice.currentData() or "")
-                    or self.cb_voice.currentText())
-        if m is not None and self.ctl.tts.voices and not voice:
-            text = _("A {language} computer voice, once it's on this PC (below).",
+        voice = self._voice_for(m) if m is not None else ""
+        # the language's own voice by its name ("Huayan"), or the Windows one reading
+        # a language that has none of its own
+        own = (str(m.voice.get("name") or "") or customvoices.label(voice)
+               if m is not None and voice else "")
+        if m is not None and not voice:
+            text = _("The {language} voice, once {language} is downloaded (below).",
                      language=lang)
         elif who == "ai" and m is not None:
             text = _("Your AI voice, {voice}. It's on: just talk.", voice=name)
         elif who == "fx" and m is not None:
             text = _("{voice} with your {effect} voice changer. It's on: just talk.",
-                     voice=computer, effect=name)
-        elif self.livevoice.b_live.isChecked():
-            text = _("{voice}, the computer voice. It's on: just talk.", voice=computer)
+                     voice=own or lang, effect=name)
+        elif m is not None:
+            text = _("{voice}, the {language} voice. It's on: just talk.",
+                     voice=own or lang, language=lang)
         else:
-            text = _("{voice}, the computer voice, once you press Start.", voice=computer)
+            text = ""
         self.lbl_who.setText(text)
         # its height for its width changed: the layouts around keep the old one until told
         self.settings_box.updateGeometry()
@@ -293,8 +282,8 @@ class SpeechLangs(_Panel):
             self.lbl_delay.setText(_(
                 "⏱ Others hear you in {language} a few seconds late: each sentence is "
                 "written down, translated, then spoken once you've finished it. It works "
-                "with the AI voice, the voice changer and the computer voice; your real voice "
-                "is muted meanwhile.", language=name))
+                "with the AI voice and the voice changer too; your real voice is muted "
+                "meanwhile.", language=name))
         self.lbl_delay.setVisible(on is not None)
         downloading = i._dl_busy is not None
         self.tr_box.setVisible(m is not None or downloading)
@@ -332,7 +321,14 @@ class SpeechLangs(_Panel):
             self.lbl_tr.setText(_("Translation is quick but not perfect with slang."))
             return
         voice = self._voice_for(m)
-        if voice:
+        if m.voice and self.voices_need:
+            # its voice reads through the AI voices add-on: say what's missing
+            self.lbl_tr.setText(
+                _("The {language} voice needs the AI voices add-on: get it on the AI "
+                  "voices tab.", language=name) if self.voices_need == "get" else
+                _("The {language} voice needs the newest AI voices: press Update AI voices "
+                  "under More options on the AI voices tab.", language=name))
+        elif voice:
             # (Said by names the voice)
             self.lbl_tr.setText(_("Translation is quick but not perfect with slang."))
         else:
