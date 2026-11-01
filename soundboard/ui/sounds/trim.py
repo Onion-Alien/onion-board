@@ -624,6 +624,7 @@ class TrimPanel(QWidget):
         self.info.setObjectName("muted")
         self.box_start, self.box_end = QDoubleSpinBox(), QDoubleSpinBox()
         self._box_parts: list[QWidget] = []   # the boxes and their labels
+        self._boxes_hidden = False
         for lbl, box in ((_("Start"), self.box_start), (_("End"), self.box_end)):
             box.setDecimals(2)
             box.setSingleStep(0.1)
@@ -746,8 +747,10 @@ class TrimPanel(QWidget):
 
     def _show_info(self):
         joined = self.wave.joined
-        for w in self._box_parts:   # joined, the splices say what plays, not the handles
-            w.setVisible(not joined)
+        if joined != self._boxes_hidden:   # joined, the splices say what plays, not the
+            self._boxes_hidden = joined    # handles (only on a change: shown with no parent
+            for w in self._box_parts:      # yet, each flashed up as a window of its own)
+                w.setVisible(not joined)
         kept = sum(b - a for a, b in self.wave.splices) if joined else \
             self.wave.end - self.wave.start
         self.info.setText(_("plays {kept} of {length}",
