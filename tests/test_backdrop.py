@@ -538,6 +538,62 @@ def test_the_ai_voice_bar_has_the_same_effects_button(qapp, monkeypatch):
         p.deleteLater()
 
 
+def test_the_effects_play_on_the_computer_voices_lines():
+    """The computer voice on, the voice changer off: its lines get the Effects (an
+    echo), not the voice changer's Robot; with neither, the line as it is."""
+    from soundboard.speech.live import SpeechController
+    x = _voice(1.0)
+    effects = {"robot": {"on": True}, "extra_echo": {"on": True, "mix": 0.6}}
+    chain = voicefx.VoiceChain()
+    chain.configure({"enabled": False, "effects": effects})
+    ctl = SpeechController(SimpleNamespace(), chain, lambda ev: None, tts=SimpleNamespace())
+    assert ctl._effects(x, SR) is x                     # nothing on: untouched
+    ctl.on_top = True
+    y = ctl._effects(x, SR)
+    want = voicefx.VoiceChain()
+    want.configure({"enabled": True, "effects": {"extra_echo": effects["extra_echo"]}})
+    assert np.allclose(y, want.render(x, SR), atol=1e-6)   # the echo, and only it
+    assert _rms(y - x) > 0.005
+    chain.configure({"enabled": True, "effects": effects})   # the voice changer on too
+    full = voicefx.VoiceChain()
+    full.configure({"enabled": True, "effects": effects})
+    assert np.allclose(ctl._effects(x, SR), full.render(x, SR), atol=1e-6)   # once each
+
+
+def test_the_computer_voice_has_a_bar_like_the_others(qapp, monkeypatch):
+    """Its bar shows while it speaks for you: its name and kind, the same Effects (one
+    list, the same count) and Edit voice opening its settings; the Background's loops
+    are made for it with the voice changer off."""
+    p = _voice_panel(monkeypatch)
+    try:
+        fx, sb = p.fx, p.speak_bar
+        assert sb.picked.isHidden()
+        made = []
+        monkeypatch.setattr(p.backdrop, "update", lambda cfg, load: made.append(cfg))
+        fx.set_on_top("rain", 0.6)
+        p.speech.livevoice.b_live.setChecked(True)
+        assert not sb.picked.isHidden() and p.controller.on_top
+        assert sb.picked_name.text() == "Zira"
+        assert sb.picked_kind.text() == "(Computer voice)"
+        assert sb.btn_effects.accessibleName() == fx.btn_effects.accessibleName() \
+            == "Effects  ·  1"
+        assert made[-1] and made[-1]["rain"] == 0.6           # loops for the computer voice
+        sb.btn_effects.click()
+        pop = fx.effects_pop
+        process_events(qapp, lambda: pop.isVisible(), timeout=5)
+        assert pop._under is sb.btn_effects
+        pop.close()
+        p.show_tab("fx")
+        sb.btn_tweak.click()                                  # its settings
+        assert p.current_tab() == "speak" and p.speech.btn_opts.isChecked()
+        p.speech.livevoice.b_live.setChecked(False)
+        assert sb.picked.isHidden() and not p.controller.on_top
+        assert made[-1] is None
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
 def _picked_bar(qapp):
     from PySide6.QtWidgets import QLayout
     from soundboard.ui.voice.voicefxpanel import VoiceFxPanel

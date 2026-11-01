@@ -46,7 +46,6 @@ class VoiceBar(QObject):
         self.picked_name = QLabel()
         self.picked_name.setObjectName("pickedname")
         self.picked_name.setTextFormat(Qt.TextFormat.PlainText)
-        self.picked_name.setWordWrap(True)
         self.picked_name.setMinimumWidth(40)   # a long name gives way in a narrow window
         ph.addWidget(self.picked_name)
         self.picked_kind = QLabel()

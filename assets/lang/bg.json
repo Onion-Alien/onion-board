@@ -3971,7 +3971,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "Нищо не променя гласа ти в микрофона. Сложи Гласове на ВКЛ. или щракни сив глас, за да го включиш.",
   "Off. Click to turn it back on. Right-click to open it.": "Изключено. Щракни, за да го включиш пак. Десен клик, за да го отвориш.",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "Превключвателят Гласове в раздела Глас: изключва всичко, което променя микрофона ти (промяната на гласа, AI гласа, компютърния глас, превода), а следващото натискане връща точно тях.",
-  "The computer voice ({voice}) speaks for you.": "Компютърният глас ({voice}) говори вместо теб.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Изключва всеки глас, който променя микрофона ти. Включването го връща.",
   "Turns on: {voices}": "Включва: {voices}",
   "Voices on or off": "Гласове вкл. или изкл.",
@@ -4837,5 +4836,17 @@
   ],
   "(AI voice)": "(AI глас)",
   "(Voice changer)": "(Промяна на гласа)",
-  "(Clean mic)": "(Чист микрофон)"
+  "(Clean mic)": "(Чист микрофон)",
+  "(Computer voice)": "(Компютърен глас)",
+  "(Custom voice)": "(Собствен глас)",
+  "(Voice server)": "(Гласов сървър)",
+  "Windows voice": "Глас на Windows",
+  "{n} new": [
+    "{n} нов",
+    "{n} нови"
+  ],
+  "{n} new sound": [
+    "{n} нов звук",
+    "{n} нови звука"
+  ]
 }

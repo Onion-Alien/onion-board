@@ -179,7 +179,7 @@ class BunnyBuild(_Base):
                 self.sparks.append(_Spark(c.x(), c.y(), math.cos(a) * v, math.sin(a) * v,
                                           self._rng.uniform(0.35, 0.7)))
         else:
-            c = self._at(r, 104, 109)
+            c = self._at(r, 98, 109)
             self.junk.append(_Junk("head", c.x(), c.y(), -r.height() * 0.4,
                                    -r.height() * 2.0, 820, FAIL_END - FAIL_SNAP))
             b = self._at(r, 84, 112)

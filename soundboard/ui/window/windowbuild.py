@@ -401,6 +401,8 @@ class WindowBuilder(Controller, PlayerBuild, SoundsPageBuild, SetupPageBuild):
             lambda i: i == TAB_INDEX["setup"] and mw.statusctl._update_status())
         mw.tabs.currentChanged.connect(mw._focus_sounds_page)
         mw.tabctl.mark_store_new()
+        mw.tabs.currentChanged.connect(mw.newctl.follow)   # new sounds: seen, or counted
+        mw.newctl.follow()
         # an urgent Onion Watch fix's banner shows on the Triggers tab only
         mw.tabs.currentChanged.connect(
             lambda _i: mw.watch_offer is not None and mw.alertctl._show_urgent())

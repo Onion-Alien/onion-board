@@ -3897,7 +3897,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "마이크 목소리를 바꾸는 게 없습니다. 목소리를 켬으로 하거나 회색 목소리를 클릭하면 켜집니다.",
   "Off. Click to turn it back on. Right-click to open it.": "꺼짐. 클릭하면 다시 켜집니다. 우클릭하면 열립니다.",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "음성 탭의 음성 스위치: 마이크 소리를 바꾸는 모든 것(보이스 체인저, AI 음성, 컴퓨터 음성, 번역)을 끄고, 다시 누르면 바로 그것들을 되살립니다.",
-  "The computer voice ({voice}) speaks for you.": "컴퓨터 음성({voice})이 대신 말합니다.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "마이크를 바꾸는 모든 목소리를 끕니다. 켜면 다시 돌아옵니다.",
   "Turns on: {voices}": "켜는 것: {voices}",
   "Voices on or off": "목소리 켬 또는 끔",
@@ -4747,5 +4746,15 @@
   ],
   "(AI voice)": "(AI 음성)",
   "(Voice changer)": "(보이스 체인저)",
-  "(Clean mic)": "(마이크 잡음 제거)"
+  "(Clean mic)": "(마이크 잡음 제거)",
+  "(Computer voice)": "(컴퓨터 음성)",
+  "(Custom voice)": "(사용자 음성)",
+  "(Voice server)": "(음성 서버)",
+  "Windows voice": "Windows 음성",
+  "{n} new": [
+    "새 항목 {n}"
+  ],
+  "{n} new sound": [
+    "새 사운드 {n}개"
+  ]
 }

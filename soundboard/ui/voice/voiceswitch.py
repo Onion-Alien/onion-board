@@ -39,7 +39,8 @@ class VoiceSwitch(_Panel):
         """Have the Background's loops made for these settings (a worker reads the board
         sounds from disk and renders them; nothing when it's off). They play on the AI
         voice too, with the voice changer off."""
-        on = spec.get("enabled") or self.ai.is_on()
+        on = (spec.get("enabled") or self.ai.is_on()
+              or self.speech.livevoice.b_live.isChecked())
         cfg = (spec.get("effects") or {}).get("backdrop") if on else None
         if cfg and cfg.get("on") and cfg.get("sounds"):
             metas = {m.id: m for m in self.board_sounds()}   # read here, on the UI thread
@@ -53,13 +54,14 @@ class VoiceSwitch(_Panel):
         self.backdrop.update(cfg, load)
 
     def _ai_effects_text(self):
-        """The AI voice's bar's Effects says what the voice changer's does (one list)."""
-        b = self.ai.btn_effects
+        """The other bars' Effects say what the voice changer's does (one list)."""
         text = self.fx.btn_effects.accessibleName() or _("Effects")
-        if b.text() != text:
-            b.setText(text)
-            b.setAccessibleName(text)
-            self.ai._fit_picked()
+        for bar in (self.ai, self.speak_bar):
+            b = bar.btn_effects
+            if b.text() != text:
+                b.setText(text)
+                b.setAccessibleName(text)
+                bar._fit_picked()
 
     def board_changed(self):
         """Sounds were added, renamed or deleted: the Background's names and loops again."""
@@ -91,6 +93,8 @@ class VoiceSwitch(_Panel):
     def _speech_live(self, on: bool):
         if on:
             self.ai.stop()
+        self.controller.on_top = on       # the Effects play on the computer voice's lines
+        self._update_backdrop(self.fx.spec())
 
     def stop_all(self):
         """The window's Stop all: the typed line stops and every voice goes off (the

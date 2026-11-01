@@ -3971,7 +3971,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "Ingenting endrer mikrofonstemmen din. Sett Stemmer på PÅ, eller klikk på en grå stemme, for å slå den på.",
   "Off. Click to turn it back on. Right-click to open it.": "Av. Klikk for å slå den på igjen. Høyreklikk for å åpne den.",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "Stemmer-bryteren på Stemme-fanen: slår av alt som endrer mikrofonen din (stemmeforvrengeren, AI-stemmen, datamaskinstemmen, oversettingen), og neste trykk henter akkurat dem tilbake.",
-  "The computer voice ({voice}) speaks for you.": "Datamaskinstemmen ({voice}) snakker for deg.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Slår av alle stemmer som endrer mikrofonen din. Når du slår den på, kommer de tilbake.",
   "Turns on: {voices}": "Slår på: {voices}",
   "Voices on or off": "Stemmer på eller av",
@@ -4837,5 +4836,17 @@
   ],
   "(AI voice)": "(AI-stemme)",
   "(Voice changer)": "(Stemmeforvrenger)",
-  "(Clean mic)": "(Ren mikrofon)"
+  "(Clean mic)": "(Ren mikrofon)",
+  "(Computer voice)": "(Datamaskinstemme)",
+  "(Custom voice)": "(Egen stemme)",
+  "(Voice server)": "(Stemmeserver)",
+  "Windows voice": "Windows-stemme",
+  "{n} new": [
+    "{n} ny",
+    "{n} nye"
+  ],
+  "{n} new sound": [
+    "{n} ny lyd",
+    "{n} nye lyder"
+  ]
 }

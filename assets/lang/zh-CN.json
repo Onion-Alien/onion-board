@@ -3897,7 +3897,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "没有任何东西在改变你的麦克风声音。把变声开关切到“开”，或点一个灰色的声线来开启。",
   "Off. Click to turn it back on. Right-click to open it.": "已关闭。点击重新开启。右键打开。",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "“变声”标签页的变声开关：关闭所有改变你麦克风的东西（变声器、AI 语音、电脑语音、翻译），再按一次就原样恢复它们。",
-  "The computer voice ({voice}) speaks for you.": "电脑语音（{voice}）替你说话。",
   "Turns off every voice changing your mic. Switching it on brings them back.": "关闭所有改变你麦克风的声线和语音。重新打开就会恢复。",
   "Turns on: {voices}": "将开启：{voices}",
   "Voices on or off": "变声开或关",
@@ -4747,5 +4746,15 @@
   ],
   "(AI voice)": "（AI 语音）",
   "(Voice changer)": "（变声器）",
-  "(Clean mic)": "（麦克风降噪）"
+  "(Clean mic)": "（麦克风降噪）",
+  "(Computer voice)": "（电脑语音）",
+  "(Custom voice)": "（自定义语音）",
+  "(Voice server)": "（语音服务器）",
+  "Windows voice": "Windows 语音",
+  "{n} new": [
+    "{n} 个新"
+  ],
+  "{n} new sound": [
+    "{n} 个新声音"
+  ]
 }

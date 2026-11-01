@@ -368,6 +368,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/settings/lite.py` | lite mode (Settings > General): the switch the animations, Bun, the logo and the textures ask, and whether this PC looks slow enough to suggest it |
 | `soundboard/ui/window/livesize.py` | the window's edge being dragged (Windows' WM_ENTERSIZEMOVE / WM_EXITSIZEMOVE): each step fits with Qt's cached sizes, letting go measures it all fresh |
 | `soundboard/ui/window/livedot.py` | marks a tab whose feature is live (a highlight-coloured icon, with the rail's bar beside it, or a small dot), e.g. the Voice tab while your voice is being changed |
+| `soundboard/ui/window/newsounds.py` | new sounds marked like unread mail: a glow on each new card until the mouse goes over it or you leave Sounds, and a count ("3 new", with an arrow while more are coming in) on the Sounds tab while you are elsewhere |
 | `soundboard/ui/kit/glow.py` | `Glow(button)`: a slow accent glow round the one button a step wants pressed (the setup card's mic button) |
 | `soundboard/ui/bun/logowidget.py` | the header logo animated: a breathing glow and sheen, flaring with embers while sounds play |
 | `soundboard/ui/triggers/logoduel.py` | a silent laser exchange between the Board and Watch logos when clicked on the Triggers tab |
@@ -378,6 +379,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/voice/voicecombos.py` | the Voice tab's side of My voice combos: what's on as a setup, turning one back on, its share code, picture and words |
 | `soundboard/ui/voice/voiceswitch.py` | the Voice tab's on / off: each voice (voice changer, AI voice, computer voice) or all together with Undo, and the voice that's on saying the translated lines |
 | `soundboard/ui/voice/voicecards.py` | the Voice tab's cards and tabs: each card's head and badge, switching tabs, the status bar's chips and the cards' on / off states |
+| `soundboard/ui/voice/voicebar.py` | the bar of a voice with no cards of its own (the computer voice, a voice server's, Clean mic): picture, name, kind, Effects (none for Clean mic), Edit |
 | `soundboard/ui/voice/voiceaddons.py` | the Voice tab's add-ons list and finding add-ons again (in the background, going on or offline) |
 | `soundboard/ui/voice/cleanmicpanel.py` | the Voice tab's Clean mic card (its first tab): on / off, the Mic settings button (offering Strong's download when it's picked), your mic and the cleaned mic's meters, and Hear the difference (5 s recorded, played as it was and cleaned, in your headphones) |
 | `soundboard/ui/voice/cleanmicsettings.py` | Clean mic's Mic settings, laid out like a voice chat app's: presets, Input volume, Input sensitivity (automatic or a level on a live bar), Noise suppression (Off, Light, Normal, Strong) and Automatic gain control |
@@ -392,7 +394,6 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/voice/backdroprow.py` | the voice changer's Background card (built-in sounds and board sounds behind your voice) and its Speed and pitch pop-up |
 | `soundboard/ui/voice/effectspopup.py` | the voice bar's Effects pop-up: bundled CC0 background sounds, board sounds and the extra Robot, Radio, Echo and Reverb on top of any voice, one slider and a ✕ each |
 | `soundboard/ui/sounds/voicepicker.py` | Edit sound → Effects → Voice: picture cards of the voice changer's voices, the AI voices and your setups, to lay a voice over a sound |
-| `soundboard/ui/voice/voicebar.py` | a bar under the Voice tab's cards for something on that has no voice cards to carry one (Clean mic): its picture, name and kind, Edit, and Effects when it's a voice |
 | `soundboard/ui/voice/voicesetupsbar.py` | the Voice tab's My voice combos row: save what's on, turn a setup back on, delete with Undo |
 | `soundboard/ui/voice/speechpanel.py` | the Voice tab's Languages card: text-to-speech, live voice-to-speech, translation; its parts are mixins in the three files below |
 | `soundboard/ui/voice/speechsay.py` | the Languages card's text-to-speech: saying a typed line, saving it as a sound, the computer voices and their settings |

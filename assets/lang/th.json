@@ -3897,7 +3897,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "ไม่มีอะไรเปลี่ยนเสียงไมค์ของคุณ เปิดสวิตช์ เสียงพูด หรือคลิกเสียงพูดสีเทาเพื่อเปิด",
   "Off. Click to turn it back on. Right-click to open it.": "ปิดอยู่ คลิกเพื่อเปิดอีกครั้ง คลิกขวาเพื่อเปิดการ์ด",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "สวิตช์ เสียงพูด ในแท็บ เสียงพูด: ปิดทุกอย่างที่เปลี่ยนไมค์ของคุณ (ตัวเปลี่ยนเสียง เสียง AI เสียงคอมพิวเตอร์ การแปล) และกดครั้งถัดไปจะนำกลับมาแบบเดิมทุกอย่าง",
-  "The computer voice ({voice}) speaks for you.": "เสียงคอมพิวเตอร์ ({voice}) พูดแทนคุณ",
   "Turns off every voice changing your mic. Switching it on brings them back.": "ปิดทุกเสียงพูดที่เปลี่ยนไมค์ของคุณ เปิดอีกครั้งจะนำกลับมา",
   "Turns on: {voices}": "จะเปิด: {voices}",
   "Voices on or off": "เสียงพูด เปิด หรือ ปิด",
@@ -4747,5 +4746,15 @@
   ],
   "(AI voice)": "(เสียง AI)",
   "(Voice changer)": "(ตัวเปลี่ยนเสียง)",
-  "(Clean mic)": "(ไมค์ไร้เสียงรบกวน)"
+  "(Clean mic)": "(ไมค์ไร้เสียงรบกวน)",
+  "(Computer voice)": "(เสียงคอมพิวเตอร์)",
+  "(Custom voice)": "(เสียงที่กำหนดเอง)",
+  "(Voice server)": "(เซิร์ฟเวอร์เสียง)",
+  "Windows voice": "เสียงของ Windows",
+  "{n} new": [
+    "ใหม่ {n}"
+  ],
+  "{n} new sound": [
+    "เสียงใหม่ {n} เสียง"
+  ]
 }

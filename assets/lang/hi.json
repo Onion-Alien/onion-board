@@ -3971,7 +3971,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "आपके माइक की आवाज़ को कुछ नहीं बदल रहा। चालू करने के लिए आवाज़ें चालू करें, या किसी धुंधली आवाज़ पर क्लिक करें।",
   "Off. Click to turn it back on. Right-click to open it.": "बंद। फिर से चालू करने के लिए क्लिक करें। खोलने के लिए राइट-क्लिक करें।",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "वॉइस टैब का आवाज़ें स्विच: आपके माइक को बदलने वाली हर चीज़ बंद करता है (वॉइस चेंजर, AI आवाज़, कंप्यूटर वाली आवाज़, अनुवाद), और अगली बार दबाने पर ठीक वही वापस आते हैं।",
-  "The computer voice ({voice}) speaks for you.": "कंप्यूटर वाली आवाज़ ({voice}) आपकी जगह बोलती है।",
   "Turns off every voice changing your mic. Switching it on brings them back.": "आपके माइक को बदलने वाली हर आवाज़ बंद करता है। चालू करने पर वे वापस आ जाती हैं।",
   "Turns on: {voices}": "चालू करता है: {voices}",
   "Voices on or off": "आवाज़ें चालू या बंद",
@@ -4837,5 +4836,17 @@
   ],
   "(AI voice)": "(AI आवाज़)",
   "(Voice changer)": "(वॉइस चेंजर)",
-  "(Clean mic)": "(साफ़ माइक)"
+  "(Clean mic)": "(साफ़ माइक)",
+  "(Computer voice)": "(कंप्यूटर की आवाज़)",
+  "(Custom voice)": "(कस्टम आवाज़)",
+  "(Voice server)": "(वॉइस सर्वर)",
+  "Windows voice": "Windows की आवाज़",
+  "{n} new": [
+    "{n} नया",
+    "{n} नए"
+  ],
+  "{n} new sound": [
+    "{n} नई साउंड",
+    "{n} नई साउंड"
+  ]
 }

@@ -3971,7 +3971,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "Nada está a mudar a voz do teu microfone. Põe Vozes em LIGADO, ou clica numa voz cinzenta, para a ligar.",
   "Off. Click to turn it back on. Right-click to open it.": "Desligado. Clica para voltar a ligar. Clica com o botão direito para abrir.",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "O interruptor Vozes do separador Voz: desliga tudo o que muda o teu microfone (o modificador de voz, a voz de IA, a voz de computador, a tradução), e o clique seguinte traz de volta exatamente isso.",
-  "The computer voice ({voice}) speaks for you.": "A voz do computador ({voice}) fala por ti.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Desliga todas as vozes que mudam o teu microfone. Ligar trá-las de volta.",
   "Turns on: {voices}": "Liga: {voices}",
   "Voices on or off": "Vozes ligadas ou desligadas",
@@ -4837,5 +4836,17 @@
   ],
   "(AI voice)": "(Voz de IA)",
   "(Voice changer)": "(Modificador de voz)",
-  "(Clean mic)": "(Microfone limpo)"
+  "(Clean mic)": "(Microfone limpo)",
+  "(Computer voice)": "(Voz de computador)",
+  "(Custom voice)": "(Voz personalizada)",
+  "(Voice server)": "(Servidor de voz)",
+  "Windows voice": "Voz do Windows",
+  "{n} new": [
+    "{n} novo",
+    "{n} novos"
+  ],
+  "{n} new sound": [
+    "{n} som novo",
+    "{n} sons novos"
+  ]
 }
