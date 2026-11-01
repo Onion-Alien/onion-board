@@ -4556,7 +4556,6 @@
   "Clean mic": "Schone mic",
   "Clean mic isn't in this copy of Onion Board.": "Schone mic zit niet in deze versie van Onion Board.",
   "Clean mic stopped after an error: {error}": "Schone mic is gestopt na een fout: {error}",
-  "Clean mic takes background noise out of your mic.": "Schone mic haalt achtergrondgeluid uit je mic.",
   "Cleaned": "Schoon",
   "Cleaning it…": "Wordt schoongemaakt…",
   "Hear the difference": "Hoor het verschil",
@@ -4837,5 +4836,6 @@
     "{n} geluiden staan niet meer op Myinstants en zijn overgeslagen."
   ],
   "(AI voice)": "(AI-stem)",
-  "(Voice changer)": "(Stemvervormer)"
+  "(Voice changer)": "(Stemvervormer)",
+  "(Clean mic)": "(Schone mic)"
 }

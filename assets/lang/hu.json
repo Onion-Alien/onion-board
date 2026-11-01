@@ -4556,7 +4556,6 @@
   "Clean mic": "Tiszta mikrofon",
   "Clean mic isn't in this copy of Onion Board.": "A Tiszta mikrofon nincs benne az Onion Board ezen példányában.",
   "Clean mic stopped after an error: {error}": "A Tiszta mikrofon hiba miatt leállt: {error}",
-  "Clean mic takes background noise out of your mic.": "A Tiszta mikrofon kiszedi a háttérzajt a mikrofonodból.",
   "Cleaned": "Megtisztítva",
   "Cleaning it…": "Tisztítás…",
   "Hear the difference": "Halld a különbséget",
@@ -4837,5 +4836,6 @@
     "{n} hang már nincs fent a Myinstantsen, ezért kimaradtak."
   ],
   "(AI voice)": "(AI hang)",
-  "(Voice changer)": "(Hangváltó)"
+  "(Voice changer)": "(Hangváltó)",
+  "(Clean mic)": "(Tiszta mikrofon)"
 }

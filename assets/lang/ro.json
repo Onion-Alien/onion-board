@@ -4638,7 +4638,6 @@
   "Clean mic": "Microfon curat",
   "Clean mic isn't in this copy of Onion Board.": "Microfon curat nu e în această copie Onion Board.",
   "Clean mic stopped after an error: {error}": "Microfon curat s-a oprit după o eroare: {error}",
-  "Clean mic takes background noise out of your mic.": "Microfon curat scoate zgomotul de fundal din microfonul tău.",
   "Cleaned": "Curățat",
   "Cleaning it…": "Se curăță…",
   "Hear the difference": "Auzi diferența",
@@ -4927,5 +4926,6 @@
     "{n} de sunete nu mai sunt pe Myinstants, așa că au fost sărite."
   ],
   "(AI voice)": "(Voce AI)",
-  "(Voice changer)": "(Schimbător de voce)"
+  "(Voice changer)": "(Schimbător de voce)",
+  "(Clean mic)": "(Microfon curat)"
 }

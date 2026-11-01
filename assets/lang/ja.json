@@ -4474,7 +4474,6 @@
   "Clean mic": "マイクのノイズ除去",
   "Clean mic isn't in this copy of Onion Board.": "このOnion Boardにはマイクのノイズ除去が入っていません。",
   "Clean mic stopped after an error: {error}": "マイクのノイズ除去がエラーで止まりました: {error}",
-  "Clean mic takes background noise out of your mic.": "マイクのノイズ除去は、マイクから周りの雑音を取り除きます。",
   "Cleaned": "除去後",
   "Cleaning it…": "除去中…",
   "Hear the difference": "違いを聞く",
@@ -4747,5 +4746,6 @@
     "{n}個のサウンドがMyinstantsから消えていたため、スキップしました。"
   ],
   "(AI voice)": "（AI ボイス）",
-  "(Voice changer)": "（ボイスチェンジャー）"
+  "(Voice changer)": "（ボイスチェンジャー）",
+  "(Clean mic)": "（マイクのノイズ除去）"
 }

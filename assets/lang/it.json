@@ -4556,7 +4556,6 @@
   "Clean mic": "Microfono pulito",
   "Clean mic isn't in this copy of Onion Board.": "Microfono pulito non c'è in questa copia di Onion Board.",
   "Clean mic stopped after an error: {error}": "Microfono pulito si è fermato dopo un errore: {error}",
-  "Clean mic takes background noise out of your mic.": "Microfono pulito toglie il rumore di fondo dal tuo microfono.",
   "Cleaned": "Pulito",
   "Cleaning it…": "Pulizia in corso…",
   "Hear the difference": "Senti la differenza",
@@ -4837,5 +4836,6 @@
     "{n} suoni non ci sono più su Myinstants, quindi sono stati saltati."
   ],
   "(AI voice)": "(Voce IA)",
-  "(Voice changer)": "(Modificatore di voce)"
+  "(Voice changer)": "(Modificatore di voce)",
+  "(Clean mic)": "(Microfono pulito)"
 }

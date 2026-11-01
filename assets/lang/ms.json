@@ -4474,7 +4474,6 @@
   "Clean mic": "Mikrofon bersih",
   "Clean mic isn't in this copy of Onion Board.": "Mikrofon bersih tiada dalam salinan Onion Board ini.",
   "Clean mic stopped after an error: {error}": "Mikrofon bersih berhenti selepas ralat: {error}",
-  "Clean mic takes background noise out of your mic.": "Mikrofon bersih membuang bunyi bising latar daripada mikrofon anda.",
   "Cleaned": "Dibersihkan",
   "Cleaning it…": "Membersihkan…",
   "Hear the difference": "Dengar bezanya",
@@ -4747,5 +4746,6 @@
     "{n} bunyi sudah tiada di Myinstants, jadi dilangkau."
   ],
   "(AI voice)": "(Suara AI)",
-  "(Voice changer)": "(Penukar suara)"
+  "(Voice changer)": "(Penukar suara)",
+  "(Clean mic)": "(Mikrofon bersih)"
 }

@@ -4556,7 +4556,6 @@
   "Clean mic": "Чист микрофон",
   "Clean mic isn't in this copy of Onion Board.": "Чист микрофон го няма в това копие на Onion Board.",
   "Clean mic stopped after an error: {error}": "Чист микрофон спря след грешка: {error}",
-  "Clean mic takes background noise out of your mic.": "Чист микрофон маха фоновия шум от микрофона ти.",
   "Cleaned": "Изчистен",
   "Cleaning it…": "Изчистване…",
   "Hear the difference": "Чуй разликата",
@@ -4837,5 +4836,6 @@
     "{n} звука вече ги няма в Myinstants, затова са пропуснати."
   ],
   "(AI voice)": "(AI глас)",
-  "(Voice changer)": "(Промяна на гласа)"
+  "(Voice changer)": "(Промяна на гласа)",
+  "(Clean mic)": "(Чист микрофон)"
 }

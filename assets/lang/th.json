@@ -4474,7 +4474,6 @@
   "Clean mic": "ไมค์ไร้เสียงรบกวน",
   "Clean mic isn't in this copy of Onion Board.": "Onion Board ชุดนี้ไม่มีไมค์ไร้เสียงรบกวน",
   "Clean mic stopped after an error: {error}": "ไมค์ไร้เสียงรบกวนหยุดทำงานหลังเกิดข้อผิดพลาด: {error}",
-  "Clean mic takes background noise out of your mic.": "ไมค์ไร้เสียงรบกวนจะลบเสียงรบกวนรอบตัวออกจากไมค์ของคุณ",
   "Cleaned": "หลังลบเสียง",
   "Cleaning it…": "กำลังลบเสียง…",
   "Hear the difference": "ฟังความต่าง",
@@ -4747,5 +4746,6 @@
     "เสียง {n} เสียงไม่มีใน Myinstants แล้ว จึงถูกข้ามไป"
   ],
   "(AI voice)": "(เสียง AI)",
-  "(Voice changer)": "(ตัวเปลี่ยนเสียง)"
+  "(Voice changer)": "(ตัวเปลี่ยนเสียง)",
+  "(Clean mic)": "(ไมค์ไร้เสียงรบกวน)"
 }

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from PySide6.QtCore import QEvent, QRectF, QSize, Qt
 from PySide6.QtGui import QColor, QFont, QIcon, QPainter
-from PySide6.QtWidgets import QSizePolicy, QToolButton
+from PySide6.QtWidgets import QBoxLayout, QSizePolicy, QToolButton
 
 from soundboard.ui.kit import theme
 from soundboard import voicefx
@@ -22,6 +22,25 @@ LIST_MIN_W = 190  # px: a voice row at its narrowest (the list view)
 LIST_ART = 30     # px: a voice row's picture
 MAX_COLS = 12     # voice cards a row, at most
 PICKED_ART = 32   # px: the picked voice's picture, under the cards
+
+
+def place_bar_controls(bar):
+    """A voice bar's pause and ✕ (VoicePanel._make_bar_controls): at the right end of
+    its one line, or, when its buttons fold under the name, at the end of the name's
+    line. (On a line of their own they made the bar a tall, mostly empty third row.)"""
+    ctl, top = getattr(bar, "bar_controls", None), getattr(bar, "bar_top", None)
+    if ctl is None or top is None:
+        return
+    box = bar.picked_box
+    folded = box.direction() == QBoxLayout.Direction.TopToBottom
+    if (top.indexOf(ctl) >= 0) == folded:
+        return
+    box.removeWidget(ctl)
+    top.removeWidget(ctl)
+    if folded:
+        top.addWidget(ctl, 0, Qt.AlignmentFlag.AlignVCenter)   # (after its stretch)
+    else:
+        box.addWidget(ctl, 0, Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignRight)
 
 
 VOICE_ICONS = {"Walkie-talkie": "radio", "Old telephone": "speech",

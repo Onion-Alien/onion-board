@@ -4474,7 +4474,6 @@
   "Clean mic": "마이크 잡음 제거",
   "Clean mic isn't in this copy of Onion Board.": "이 Onion Board에는 마이크 잡음 제거가 없습니다.",
   "Clean mic stopped after an error: {error}": "마이크 잡음 제거가 오류로 멈췄습니다: {error}",
-  "Clean mic takes background noise out of your mic.": "마이크 잡음 제거는 마이크에서 주변 소음을 없애 줍니다.",
   "Cleaned": "제거 후",
   "Cleaning it…": "제거 중…",
   "Hear the difference": "차이 들어 보기",
@@ -4747,5 +4746,6 @@
     "사운드 {n}개가 Myinstants에서 사라져서 건너뛰었어요."
   ],
   "(AI voice)": "(AI 음성)",
-  "(Voice changer)": "(보이스 체인저)"
+  "(Voice changer)": "(보이스 체인저)",
+  "(Clean mic)": "(마이크 잡음 제거)"
 }

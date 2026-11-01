@@ -2562,3 +2562,25 @@ def test_a_stuck_windows_speech_at_launch_shows_no_toast(qapp, monkeypatch):
     finally:
         p.shutdown()
         p.deleteLater()
+
+
+def test_a_folded_bar_keeps_pause_and_x_on_the_names_line(panel, qapp):
+    """Narrow, a bar's buttons go under the name; its pause and ✕ stay level with the
+    name (on a line of their own they made a tall, mostly empty third row)."""
+    from PySide6.QtWidgets import QBoxLayout
+    p, _eng = panel
+    p.fx.pick("Robot")
+    p.show()
+    bar = p.fx
+    pause, _close = p._bar_ctl["fx"]
+    for width, folded in ((440, True), (1500, False), (440, True)):
+        p.resize(width, 700)
+        for _ in range(5):
+            qapp.processEvents()
+        assert (bar.picked_box.direction() == QBoxLayout.Direction.TopToBottom) == folded
+        name_y = bar.picked_name.mapTo(bar.picked, bar.picked_name.rect().center()).y()
+        ctl_y = pause.mapTo(bar.picked, pause.rect().center()).y()
+        assert abs(name_y - ctl_y) <= 12, (width, name_y, ctl_y)
+        if folded:   # two lines: the name's (with pause and ✕), then the buttons
+            assert pause.mapTo(bar.picked, pause.rect().topLeft()).y() < \
+                bar.btn_tweak.mapTo(bar.picked, bar.btn_tweak.rect().topLeft()).y()

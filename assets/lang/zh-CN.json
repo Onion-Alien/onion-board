@@ -4474,7 +4474,6 @@
   "Clean mic": "麦克风降噪",
   "Clean mic isn't in this copy of Onion Board.": "这个 Onion Board 里没有麦克风降噪。",
   "Clean mic stopped after an error: {error}": "麦克风降噪出错后停止了：{error}",
-  "Clean mic takes background noise out of your mic.": "麦克风降噪会去掉你麦克风里的背景噪音。",
   "Cleaned": "降噪后",
   "Cleaning it…": "正在降噪…",
   "Hear the difference": "听听区别",
@@ -4747,5 +4746,6 @@
     "有 {n} 个音效已从 Myinstants 消失，已跳过。"
   ],
   "(AI voice)": "（AI 语音）",
-  "(Voice changer)": "（变声器）"
+  "(Voice changer)": "（变声器）",
+  "(Clean mic)": "（麦克风降噪）"
 }

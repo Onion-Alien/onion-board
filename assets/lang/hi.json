@@ -4556,7 +4556,6 @@
   "Clean mic": "साफ़ माइक",
   "Clean mic isn't in this copy of Onion Board.": "साफ़ माइक Onion Board की इस कॉपी में नहीं है।",
   "Clean mic stopped after an error: {error}": "साफ़ माइक एक गड़बड़ी के बाद रुक गया: {error}",
-  "Clean mic takes background noise out of your mic.": "साफ़ माइक आपके माइक से पीछे का शोर हटाता है।",
   "Cleaned": "साफ़ किया हुआ",
   "Cleaning it…": "साफ़ हो रहा है…",
   "Hear the difference": "फ़र्क सुनें",
@@ -4837,5 +4836,6 @@
     "{n} साउंड अब Myinstants पर नहीं हैं, इसलिए छोड़ दिए गए।"
   ],
   "(AI voice)": "(AI आवाज़)",
-  "(Voice changer)": "(वॉइस चेंजर)"
+  "(Voice changer)": "(वॉइस चेंजर)",
+  "(Clean mic)": "(साफ़ माइक)"
 }

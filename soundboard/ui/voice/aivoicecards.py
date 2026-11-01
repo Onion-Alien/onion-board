@@ -18,6 +18,7 @@ from soundboard.ui.kit import fit, icons
 from soundboard.ui.voice.aivoicebrowser import HEAR, mine_icon
 from soundboard.ui.voice.effectspopup import place_over
 from soundboard.ui.voice.groupbar import no_match
+from soundboard.ui.voice.voicetiles import place_bar_controls
 from soundboard.ui.voice.voicefxpanel import (LIST_MIN_W, MAX_COLS, PICKED_ART, TILE_ART,
                                               TILE_GAP, TILE_MIN_W, VoiceTile)
 
@@ -284,6 +285,7 @@ class AiVoiceCards(_Panel):
                 else QBoxLayout.Direction.TopToBottom)
         if box.direction() != want:
             box.setDirection(want)
+        place_bar_controls(self)
         # beside the name they keep one line (half the bar was too little for all of
         # them, so they wrapped); under it they wrap when they must
         self._picked_btns.setMinimumWidth(

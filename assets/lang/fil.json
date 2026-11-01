@@ -4556,7 +4556,6 @@
   "Clean mic": "Malinis na mic",
   "Clean mic isn't in this copy of Onion Board.": "Wala ang Malinis na mic sa kopyang ito ng Onion Board.",
   "Clean mic stopped after an error: {error}": "Huminto ang Malinis na mic dahil sa error: {error}",
-  "Clean mic takes background noise out of your mic.": "Inaalis ng Malinis na mic ang ingay sa paligid mula sa mic mo.",
   "Cleaned": "Nilinis",
   "Cleaning it…": "Nililinis…",
   "Hear the difference": "Pakinggan ang pagkakaiba",
@@ -4837,5 +4836,6 @@
     "{n} na sound ang wala na sa Myinstants, kaya nilaktawan."
   ],
   "(AI voice)": "(AI voice)",
-  "(Voice changer)": "(Voice changer)"
+  "(Voice changer)": "(Voice changer)",
+  "(Clean mic)": "(Malinis na mic)"
 }

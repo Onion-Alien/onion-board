@@ -4556,7 +4556,6 @@
   "Clean mic": "Ren mikrofon",
   "Clean mic isn't in this copy of Onion Board.": "Ren mikrofon er ikke med i denne udgave af Onion Board.",
   "Clean mic stopped after an error: {error}": "Ren mikrofon stoppede efter en fejl: {error}",
-  "Clean mic takes background noise out of your mic.": "Ren mikrofon fjerner baggrundsstøj fra din mikrofon.",
   "Cleaned": "Renset",
   "Cleaning it…": "Renser…",
   "Hear the difference": "Hør forskellen",
@@ -4837,5 +4836,6 @@
     "{n} lyde er væk fra Myinstants, så de blev sprunget over."
   ],
   "(AI voice)": "(AI-stemme)",
-  "(Voice changer)": "(Stemmeskifter)"
+  "(Voice changer)": "(Stemmeskifter)",
+  "(Clean mic)": "(Ren mikrofon)"
 }

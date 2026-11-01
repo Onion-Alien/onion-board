@@ -4638,7 +4638,6 @@
   "Clean mic": "Čistý mikrofon",
   "Clean mic isn't in this copy of Onion Board.": "Čistý mikrofon v této verzi Onion Board není.",
   "Clean mic stopped after an error: {error}": "Čistý mikrofon se po chybě zastavil: {error}",
-  "Clean mic takes background noise out of your mic.": "Čistý mikrofon odstraní z tvého mikrofonu hluk v pozadí.",
   "Cleaned": "Vyčištěno",
   "Cleaning it…": "Čistí se…",
   "Hear the difference": "Poslechni si rozdíl",
@@ -4927,5 +4926,6 @@
     "{n} zvuků už na Myinstants není, takže byly přeskočeny."
   ],
   "(AI voice)": "(AI hlas)",
-  "(Voice changer)": "(Měnič hlasu)"
+  "(Voice changer)": "(Měnič hlasu)",
+  "(Clean mic)": "(Čistý mikrofon)"
 }
