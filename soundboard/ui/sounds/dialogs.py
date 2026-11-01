@@ -878,10 +878,13 @@ class EditDialog(EditDialogParts, QDialog):
             meta.fx, meta, (lambda v: pick_voice(v, self)) if pick_voice else None)
         self.effects.setParent(self)
         eff = self.effects
-        # Advanced's three pages (its columns or tabs); Simple doesn't show them
+        # Advanced's three pages (its columns or tabs); Simple doesn't show them. Kept
+        # hidden under the window, never parentless: freeing the window frees them (a
+        # parentless page outlived every spare Edit sound a theme switch dropped)
         self._fx_scrolls = []
         for pg in (eff.trim_page, eff.fx_page, eff.eq_page):
-            scroll = QScrollArea()
+            scroll = QScrollArea(self)
+            scroll.hide()
             scroll.setWidgetResizable(True)
             scroll.setWidget(pg)
             scroll.setFrameShape(QScrollArea.Shape.NoFrame)
