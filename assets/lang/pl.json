@@ -4831,7 +4831,6 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Mimo to chcesz pozbyć się szumu tła? Włącz zamiast tego <b>Czysty mikrofon</b> na karcie <b>Głos</b> w Onion Board: czyści twój głos i nigdy nie rusza twoich dźwięków.",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "Większe okno: duży przebieg, a efekty i korektor obok siebie",
   "Add effect": "Dodaj efekt",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Przeciągnij uchwyty, by odciąć początek i koniec. Ctrl+kółko przybliża, Shift+kółko przesuwa.",
   "No effect has that name.": "Żaden efekt tak się nie nazywa.",
   "No effects on yet.": "Nie ma jeszcze włączonych efektów.",
   "Pick an effect to turn on": "Wybierz efekt do włączenia",
@@ -4861,5 +4860,6 @@
   "light it up!": "Odpalaj!",
   "my sparkler's still going": "Moje zimne ognie wciąż płoną",
   "ooh! aah!": "Oooo! Aaaa!",
-  "ooh, pretty!": "Och, jak pięknie!"
+  "ooh, pretty!": "Och, jak pięknie!",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Przeciągnij uchwyty, by odciąć początek i koniec. Ctrl+kółko przybliża. Przesuwaj, przeciągając prawym przyciskiem myszy albo Shift+kółkiem."
 }

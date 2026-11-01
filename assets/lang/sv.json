@@ -4744,7 +4744,6 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Vill du ändå bli av med bakgrundsbruset? Slå på <b>Ren mikrofon</b> på fliken <b>Röst</b> i Onion Board i stället: den rensar din röst och rör aldrig dina ljud.",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "Ett större fönster: vågformen stor, med effekterna och equalizern sida vid sida",
   "Add effect": "Lägg till effekt",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Dra i handtagen för att klippa bort början och slutet. Ctrl+scroll zoomar, Skift+scroll flyttar.",
   "No effect has that name.": "Ingen effekt heter så.",
   "No effects on yet.": "Inga effekter på än.",
   "Pick an effect to turn on": "Välj en effekt att slå på",
@@ -4774,5 +4773,6 @@
   "light it up!": "Tänd den!",
   "my sparkler's still going": "Mitt tomtebloss brinner fortfarande",
   "ooh! aah!": "Ooh! Aah!",
-  "ooh, pretty!": "Åh, så fint!"
+  "ooh, pretty!": "Åh, så fint!",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Dra i handtagen för att klippa bort början och slutet. Ctrl+scroll zoomar. Dra med höger musknapp, eller använd Skift+scroll, för att flytta."
 }

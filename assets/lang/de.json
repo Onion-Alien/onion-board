@@ -4744,7 +4744,6 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Willst du die Hintergrundgeräusche trotzdem loswerden? Schalte stattdessen <b>Mikro säubern</b> im Tab <b>Stimme</b> von Onion Board ein: Es säubert deine Stimme und lässt deine Sounds immer in Ruhe.",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "Ein größeres Fenster: die Wellenform groß, Effekte und Equalizer nebeneinander",
   "Add effect": "Effekt hinzufügen",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Zieh die Griffe, um Anfang und Ende abzuschneiden. Strg+Scrollen zoomt, Umschalt+Scrollen verschiebt.",
   "No effect has that name.": "Kein Effekt heißt so.",
   "No effects on yet.": "Noch keine Effekte an.",
   "Pick an effect to turn on": "Such dir einen Effekt zum Einschalten aus",
@@ -4774,5 +4773,6 @@
   "light it up!": "Zünd's an!",
   "my sparkler's still going": "Meine Wunderkerze brennt noch",
   "ooh! aah!": "Ooh! Aah!",
-  "ooh, pretty!": "Oh, wie schön!"
+  "ooh, pretty!": "Oh, wie schön!",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Zieh die Griffe, um Anfang und Ende abzuschneiden. Strg+Scrollen zoomt. Zum Verschieben mit der rechten Maustaste ziehen oder Umschalt+Scrollen."
 }

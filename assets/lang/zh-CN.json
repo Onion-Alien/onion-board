@@ -4657,7 +4657,6 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "还是想去掉背景噪音？改为在 Onion Board 的<b>变声</b>标签页里开启<b>麦克风降噪</b>：它只清理你的声音，从不碰你的音效。",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "更大的窗口：波形放大，效果和均衡器并排显示",
   "Add effect": "添加效果",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "拖动手柄裁掉开头和结尾。Ctrl+滚轮缩放，Shift+滚轮平移。",
   "No effect has that name.": "没有这个名字的效果。",
   "No effects on yet.": "还没有开启任何效果。",
   "Pick an effect to turn on": "选择要开启的效果",
@@ -4687,5 +4686,6 @@
   "light it up!": "点燃它！",
   "my sparkler's still going": "我的仙女棒还在烧",
   "ooh! aah!": "哦！啊！",
-  "ooh, pretty!": "哇，好漂亮！"
+  "ooh, pretty!": "哇，好漂亮！",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "拖动手柄裁掉开头和结尾。Ctrl+滚轮缩放。按住鼠标右键拖动，或 Shift+滚轮，即可平移。"
 }

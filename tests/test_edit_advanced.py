@@ -79,6 +79,21 @@ def test_a_short_screen_still_fits(window):  # noqa: F811
     d.close()
 
 
+def test_the_waveform_gives_up_room_before_a_column_scrolls(window):  # noqa: F811
+    """Speed & loudness and the Equalizer whole, the waveform smaller: split by stretch
+    alone, both scrolled for their last lines on a 1280 x 800 window. The window can
+    still be made as short as before."""
+    d = _dialog(window, advanced=True)
+    d.show()
+    d.setFixedSize(2400, 800)
+    QApplication.processEvents()
+    trim, _fx, eq = d.adv._scrolls
+    assert trim.verticalScrollBar().maximum() == 0 and eq.verticalScrollBar().maximum() == 0
+    assert d.adv.editor.height() > d.adv.editor.minimumSizeHint().height()
+    assert d.minimumSizeHint().height() <= ADV_MIN_H
+    d.close()
+
+
 def test_the_choice_is_remembered(window):  # noqa: F811
     d = window.editctl.edit("s0")
     d.switch.advanced.click()
@@ -185,6 +200,33 @@ def test_the_big_waveform_zooms(window):  # noqa: F811
                      Qt.ScrollPhase.NoScrollPhase, False)
     QApplication.sendEvent(wave, ev)
     assert wave.zoomed()
+    d.close()
+
+
+def test_a_zoomed_waveform_drags_along_with_the_right_button(window):  # noqa: F811
+    """Zoomed in, the rest of the sound is off to the sides: the right button drags the
+    view along (the handles stay put); not zoomed, it does nothing."""
+    from PySide6.QtTest import QTest
+    d = _dialog(window, advanced=True)
+    d.show()
+    QApplication.processEvents()
+    wave = d.effects.trim.wave
+    handles = (wave.start, wave.end)
+    y = wave.height() // 2
+    right = Qt.MouseButton.RightButton
+    QTest.mousePress(wave, right, Qt.KeyboardModifier.NoModifier, QPoint(300, y))
+    QTest.mouseMove(wave, QPoint(100, y))
+    QTest.mouseRelease(wave, right, Qt.KeyboardModifier.NoModifier, QPoint(100, y))
+    assert not wave.zoomed() and (wave.start, wave.end) == handles
+    for _ in range(2):
+        d.adv.btn_in.click()
+    before = wave.view
+    QTest.mousePress(wave, right, Qt.KeyboardModifier.NoModifier, QPoint(300, y))
+    QTest.mouseMove(wave, QPoint(100, y))                    # dragged left: on to later
+    QTest.mouseRelease(wave, right, Qt.KeyboardModifier.NoModifier, QPoint(100, y))
+    assert wave.view[0] > before[0]
+    assert abs((wave.view[1] - wave.view[0]) - (before[1] - before[0])) < 1e-6
+    assert (wave.start, wave.end) == handles
     d.close()
 
 

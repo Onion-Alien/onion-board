@@ -4744,7 +4744,6 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Azért eltüntetnéd a háttérzajt? Kapcsold be inkább a <b>Tiszta mikrofont</b> az Onion Board <b>Beszéd</b> lapján: tisztítja a beszédhangodat, és a hangjaidhoz soha nem nyúl.",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "Nagyobb ablak: nagy hullámforma, az effektek és a hangszínszabályzó egymás mellett",
   "Add effect": "Effekt hozzáadása",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Húzd a fogantyúkat az eleje és a vége levágásához. Ctrl+görgetés nagyít, Shift+görgetés mozgat.",
   "No effect has that name.": "Nincs ilyen nevű effekt.",
   "No effects on yet.": "Még nincs bekapcsolt effekt.",
   "Pick an effect to turn on": "Válassz egy effektet a bekapcsoláshoz",
@@ -4774,5 +4773,6 @@
   "light it up!": "Gyújtsd meg!",
   "my sparkler's still going": "A csillagszórom még ég",
   "ooh! aah!": "Ó! Á!",
-  "ooh, pretty!": "Ó, de szép!"
+  "ooh, pretty!": "Ó, de szép!",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Húzd a fogantyúkat az eleje és a vége levágásához. Ctrl+görgetés nagyít. Mozgatáshoz húzd a jobb egérgombbal, vagy használd a Shift+görgetést."
 }

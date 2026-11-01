@@ -4744,7 +4744,6 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Arka plan gürültüsünden yine de kurtulmak mı istiyorsunuz? Bunun yerine Onion Board'un <b>Ses</b> sekmesinde <b>Temiz mikrofon</b>'u açın: sesinizi temizler ve seslerinize asla dokunmaz.",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "Daha büyük bir pencere: dalga formu büyük, efektler ve ekolayzer yan yana",
   "Add effect": "Efekt ekle",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Başını ve sonunu kesmek için tutamaçları sürükleyin. Ctrl+kaydırma yakınlaştırır, Shift+kaydırma kaydırır.",
   "No effect has that name.": "Bu adda bir efekt yok.",
   "No effects on yet.": "Henüz açık efekt yok.",
   "Pick an effect to turn on": "Açmak için bir efekt seçin",
@@ -4774,5 +4773,6 @@
   "light it up!": "Yak gitsin!",
   "my sparkler's still going": "Maytabım hâlâ yanıyor",
   "ooh! aah!": "Ooo! Aaa!",
-  "ooh, pretty!": "Ooo, çok güzel!"
+  "ooh, pretty!": "Ooo, çok güzel!",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Başını ve sonunu kesmek için tutamaçları sürükleyin. Ctrl+kaydırma yakınlaştırır. Kaydırmak için sağ fare tuşuyla sürükleyin ya da Shift+kaydırma kullanın."
 }

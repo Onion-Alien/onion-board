@@ -4744,7 +4744,6 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Gusto mo pa ring mawala ang ingay sa paligid? I-on na lang ang <b>Malinis na mic</b> sa <b>Voice</b> tab ng Onion Board: nililinis nito ang boses mo at hindi nito ginagalaw ang mga sound mo.",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "Mas malaking window: malaki ang waveform, magkatabi ang effects at equalizer",
   "Add effect": "Magdagdag ng effect",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "I-drag ang mga handle para i-cut ang simula at dulo. Ctrl+scroll para mag-zoom, Shift+scroll para gumalaw.",
   "No effect has that name.": "Walang effect na may ganyang pangalan.",
   "No effects on yet.": "Wala pang naka-on na effect.",
   "Pick an effect to turn on": "Pumili ng effect na io-on",
@@ -4774,5 +4773,6 @@
   "light it up!": "Sindihan mo na!",
   "my sparkler's still going": "Umiilaw pa ang sparkler ko",
   "ooh! aah!": "Ooh! Aah!",
-  "ooh, pretty!": "Uy, ang ganda!"
+  "ooh, pretty!": "Uy, ang ganda!",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "I-drag ang mga handle para i-cut ang simula at dulo. Ctrl+scroll para mag-zoom. I-drag gamit ang kanang button ng mouse, o Shift+scroll, para gumalaw."
 }

@@ -4831,7 +4831,6 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Усе одно хочете прибрати фоновий шум? Увімкніть натомість <b>Чистий мікрофон</b> на вкладці <b>Голос</b> в Onion Board: він очищає ваш голос і ніколи не чіпає ваші звуки.",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "Більше вікно: велика хвиля, а ефекти й еквалайзер поруч",
   "Add effect": "Додати ефект",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Перетягніть повзунки, щоб відрізати початок і кінець. Ctrl+коліщатко наближає, Shift+коліщатко зсуває.",
   "No effect has that name.": "Немає ефекту з такою назвою.",
   "No effects on yet.": "Поки жоден ефект не ввімкнено.",
   "Pick an effect to turn on": "Виберіть ефект, щоб увімкнути",
@@ -4861,5 +4860,6 @@
   "light it up!": "Підпалюй!",
   "my sparkler's still going": "Мій бенгальський ще горить",
   "ooh! aah!": "Ооо! Ааа!",
-  "ooh, pretty!": "Ох, яка краса!"
+  "ooh, pretty!": "Ох, яка краса!",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Перетягніть повзунки, щоб відрізати початок і кінець. Ctrl+коліщатко наближає. Щоб зсунути, тягніть правою кнопкою миші або крутіть Shift+коліщатко."
 }

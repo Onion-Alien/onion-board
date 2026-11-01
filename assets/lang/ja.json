@@ -4657,7 +4657,6 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "それでも背景ノイズを消したい場合は、代わりに Onion Board の<b>ボイス</b>タブで<b>マイクのノイズ除去</b>をオンにしてください：声だけをきれいにし、サウンドには一切手を加えません。",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "大きなウィンドウ：波形を大きく、エフェクトとイコライザーを横並びに",
   "Add effect": "エフェクトを追加",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "ハンドルをドラッグして最初と最後をカットします。Ctrl+スクロールで拡大、Shift+スクロールで移動。",
   "No effect has that name.": "その名前のエフェクトはありません。",
   "No effects on yet.": "まだオンのエフェクトはありません。",
   "Pick an effect to turn on": "オンにするエフェクトを選ぶ",
@@ -4687,5 +4686,6 @@
   "light it up!": "点火！",
   "my sparkler's still going": "線香花火、まだ燃えてる",
   "ooh! aah!": "おお！わあ！",
-  "ooh, pretty!": "わあ、きれい！"
+  "ooh, pretty!": "わあ、きれい！",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "ハンドルをドラッグして最初と最後をカットします。Ctrl+スクロールで拡大。右ボタンでドラッグするか、Shift+スクロールで移動。"
 }

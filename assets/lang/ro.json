@@ -4831,7 +4831,6 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Vrei totuși să scapi de zgomotul de fundal? Pornește în schimb <b>Microfon curat</b> din fila <b>Voce</b> a Onion Board: îți curăță vocea și nu se atinge niciodată de sunetele tale.",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "O fereastră mai mare: forma de undă mare, cu efectele și egalizatorul unul lângă altul",
   "Add effect": "Adaugă efect",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Trage de mânere ca să tai începutul și sfârșitul. Ctrl+rotiță mărește, Shift+rotiță mută.",
   "No effect has that name.": "Niciun efect nu are numele ăsta.",
   "No effects on yet.": "Încă nu e pornit niciun efect.",
   "Pick an effect to turn on": "Alege un efect de pornit",
@@ -4861,5 +4860,6 @@
   "light it up!": "Aprinde-o!",
   "my sparkler's still going": "Artificiul meu încă arde",
   "ooh! aah!": "Ooo! Aaa!",
-  "ooh, pretty!": "Ooo, ce frumos!"
+  "ooh, pretty!": "Ooo, ce frumos!",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Trage de mânere ca să tai începutul și sfârșitul. Ctrl+rotiță mărește. Trage cu butonul drept al mouse-ului sau folosește Shift+rotiță ca să muți."
 }

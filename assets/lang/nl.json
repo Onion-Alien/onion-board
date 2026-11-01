@@ -4744,7 +4744,6 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Wil je het achtergrondgeluid toch kwijt? Zet dan <b>Schone mic</b> aan op het tabblad <b>Stem</b> van Onion Board: die maakt je stem schoon en komt nooit aan je geluiden.",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "Een groter venster: de golfvorm groot, met de effecten en de equalizer naast elkaar",
   "Add effect": "Effect toevoegen",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Sleep de grepen om het begin en einde eraf te knippen. Ctrl+scrollen zoomt, Shift+scrollen schuift.",
   "No effect has that name.": "Geen effect heet zo.",
   "No effects on yet.": "Nog geen effecten aan.",
   "Pick an effect to turn on": "Kies een effect om aan te zetten",
@@ -4774,5 +4773,6 @@
   "light it up!": "Steek 'm aan!",
   "my sparkler's still going": "Mijn sterretje brandt nog",
   "ooh! aah!": "Ooh! Aah!",
-  "ooh, pretty!": "Ooh, wat mooi!"
+  "ooh, pretty!": "Ooh, wat mooi!",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Sleep de grepen om het begin en einde eraf te knippen. Ctrl+scrollen zoomt. Sleep met de rechtermuisknop, of gebruik Shift+scrollen, om te schuiven."
 }
