@@ -174,16 +174,31 @@ class DjBunny(BunnyWidget):
         self._round = 0   # which round of the mix he's on
         super().__init__(height=DJ_H, pad=4, parent=parent, rest_after_s=DJ_REST_S)
 
+    # resting: at his desk in the mix's first pose (where a round ends), holding still
+    _HOLD = (math.inf, lambda kit, _t: bunskits.mixing(kit, 0.0))
+
     def _step_fidget(self, now: float):
-        if self._skit is None:
-            if now < self._rest_at:
-                self._skit, self._skit_at, self._round = ((bunskits.MIX_LOOP, bunskits.mixing),
-                                                          now, 0)
+        if self._skit is None or self._skit is self._HOLD:
+            if now < self._rest_at:   # (just shown, or stirred)
+                self._skit, self._skit_at, self._round, self._kit = (
+                    (bunskits.MIX_LOOP, bunskits.mixing), now, 0, None)
+            elif self._skit is None:
+                self._skit, self._kit = self._HOLD, None
             return
         rnd = int((now - self._skit_at) // bunskits.MIX_LOOP)
         if now >= self._rest_at and rnd > self._round:   # rested: the round's done
-            self._skit, self._kit = None, None
+            self._skit, self._kit = self._HOLD, None
         self._round = rnd
+
+    def _calm(self, now: float) -> bool:
+        """Holding still at his desk doesn't keep him moving."""
+        if self._skit is not self._HOLD:
+            return super()._calm(now)
+        self._skit = None
+        try:
+            return super()._calm(now)
+        finally:
+            self._skit = self._HOLD
 
 
 DJ_H = 72   # Bun's height, left of the Live controls title
