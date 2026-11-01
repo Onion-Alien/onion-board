@@ -47,7 +47,6 @@ class SoundRow(HoverCard):
         super().__init__()
         self._build(s, tab, meta_line(s), self.btn_play_tip(s), _("Add it to your Sounds"),
                     _("Report this sound"))
-        self.btn_queue.setVisible(s.is_link)   # (a file of the store's plays to you only)
 
     def _build(self, s, tab, meta: str, play_tip: str, add_tip: str, report_tip: str):
         """The card's parts (a voice's card too: storevoices.VoiceRow)."""
@@ -142,7 +141,7 @@ class SoundRow(HoverCard):
 
     @staticmethod
     def btn_play_tip(s: store.Sound) -> str:
-        return _("Play it now") if s.is_link else _("Hear it (only you)")
+        return _("Play it now")
 
     def _play_word(self) -> str:
         if self.state == "playing":

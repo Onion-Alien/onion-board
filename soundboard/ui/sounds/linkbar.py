@@ -99,6 +99,7 @@ class LinkBar(QFrame):
         # another link was playing: they wait their turn instead of cutting it off
         self._up_next: list[tuple] = []
         self._now = ""                # a link whose Play plays over the one playing (play_now)
+        self._now_solo = False        # ...as a pad's press does: the board's sounds stop
         self.playing_url = ""         # the link the player last started
         # is one of the board's own songs playing? (MainWindow sets it): a Play waits
         # for it too, it never plays over it
@@ -281,15 +282,24 @@ class LinkBar(QFrame):
         self._start("play")
         return True
 
-    def play_now(self) -> bool:
+    def play_now(self, solo: bool = False) -> bool:
         """Play it now: over a link that's playing, not after it (Play once queues). A
-        download already running for another link finishes first, then this one's goes."""
+        download already running for another link finishes first, then this one's goes.
+        `solo`: it plays as a pad's press does (the Community tab), stopping the sounds
+        playing, as a pad's press stops a link."""
         if not self.url:
             return False
-        self._now = self.url
+        self._now, self._now_solo = self.url, solo
         ok = self.play_once()
         self.move_to_front(self.url)
         return ok
+
+    def play_audio(self, data, gain: float, title: str, url: str, now: bool) -> bool:
+        """Audio got elsewhere (a Community upload, `url` its key), played the way a
+        Community link's Play (`now`: play_now(solo=True)) or Play next (play_once) is."""
+        if now:
+            self._now, self._now_solo = url, True
+        return self._play(data, gain, title, url)
 
     def _queue_same(self, kind: str):
         """Add and Play on the link that's downloading: the other one runs after it."""
@@ -453,8 +463,8 @@ class LinkBar(QFrame):
         gain = gain if self.cfg.level_volumes else 1.0
         url = url or self.url
         if url == self._now:   # (play_now) it takes the player's place at once
-            self._now = ""
-            return self._start_playing(data, gain, title, url)
+            solo, self._now, self._now_solo = self._now_solo, "", False
+            return self._start_playing(data, gain, title, url, solo)
         if self._in_player() or self._up_next or self.board_busy():
             # another link or one of your sounds is playing (or paused): never play over
             # it, play this after it
@@ -517,8 +527,9 @@ class LinkBar(QFrame):
             del self._up_next[i]
         self.up_next_changed.emit(self.up_next())
 
-    def _start_playing(self, data, gain: float, title: str, url: str) -> bool:
-        v = self.engine.play(PLAY_ID, data, gain, mode="restart")
+    def _start_playing(self, data, gain: float, title: str, url: str,
+                       solo: bool = False) -> bool:
+        v = self.engine.play(PLAY_ID, data, gain, mode="solo" if solo else "restart")
         if v is None:
             busy.toast(self, html.escape(_("No audio device is open, pick one in Setup.")),
                        "warn")

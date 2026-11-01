@@ -636,7 +636,7 @@ class PlaybackControl(Controller):
         Up next row put back)."""
         mw = self.mw
         if force:
-            mw._chip_ids = ("remake",)   # never equal to a real (ids, queue, links, paused)
+            mw._chip_ids = ("remake",)   # never equal to a real (ids, queue, ..., link)
         ids = tuple(s for s in mw.pads if s in playing)
         if LINK_ID in playing:
             ids += (LINK_ID,)
@@ -645,8 +645,11 @@ class PlaybackControl(Controller):
         paused = tuple(s for s in ids if playing[s][1])
         queue = tuple(self._queue)
         links = tuple(mw.linkbar.up_next())   # web search / link Plays waiting their turn
-        if (ids, queue, links, paused) != mw._chip_ids:
-            mw._chip_ids = (ids, queue, links, paused)
+        # the link's chip says its name: another link (or Community sound) played over
+        # it is the same voice, so its name is part of what's compared
+        link = m.name if LINK_ID in ids and (m := mw.meta(LINK_ID)) is not None else ""
+        if (ids, queue, links, paused, link) != mw._chip_ids:
+            mw._chip_ids = (ids, queue, links, paused, link)
             while mw._chips_hl.count():
                 item = mw._chips_hl.takeAt(0)
                 w = item.widget() if item else None

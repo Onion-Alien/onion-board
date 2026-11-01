@@ -135,8 +135,14 @@ def test_rail_shows_store_before_setup():
 
 
 def _tab(qapp, added, played):
-    t = storetab.StoreTab(Config(), added.append,
-                          lambda data, gain: played.append(data) or True, lambda: None)
+    """`played`: what went to the player, (key, now); `t.states`: the player's state of
+    a key (link_state)."""
+    states: dict[str, str] = {}
+    t = storetab.StoreTab(Config(), added.append, lambda data, gain: True, lambda: None,
+                          link_state=lambda key: states.get(key, ""),
+                          play_file=lambda data, gain, name, key, now:
+                          played.append((key, now)) or True)
+    t.states = states
     t.resize(800, 600)
     t.show()
     return t
@@ -160,10 +166,40 @@ def test_tab_lists_votes_and_adds(qapp, fake):
     a.btn_add.click()
     assert _wait(qapp, lambda: added)
     assert added[0].endswith("Sound 1.wav")
-    a.btn_play.click()
-    assert _wait(qapp, lambda: played and played[0] is not None)
-    t.hide()   # another tab: the sample stops
-    assert played[-1] is None
+    a.btn_play.click()   # an upload plays in the player, as a pad does
+    assert a.btn_play.isChecked()   # (loading)
+    assert _wait(qapp, lambda: played == [("community:000000000001", True)])
+    assert ("000000000001", "now") not in t._busy
+    t.states["community:000000000001"] = "playing"
+    assert _wait(qapp, lambda: a.btn_play.text() == "Pause" and a.btn_stop.isVisibleTo(a))
+    t.hide()   # another tab: it plays on
+    assert played == [("community:000000000001", True)]
+    t.shutdown()
+
+
+def test_an_upload_card_pauses_stops_and_queues_as_a_link_does(qapp, fake):
+    """An upload's card has the link's Play next and Stop, and its Pause / Stop go to
+    the player by its key."""
+    links, played = [], []
+    states: dict[str, str] = {}
+    t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None,
+                          link=lambda key, name, kind: links.append((key, kind)),
+                          link_state=lambda key: states.get(key, ""),
+                          play_file=lambda d, g, name, key, now: played.append((key, now)))
+    t.resize(560, 700)
+    t.show()
+    assert _wait(qapp, lambda: len(t._rows) == 2)
+    r = t._rows[0]
+    key = "community:000000000001"
+    assert r.btn_queue.isVisibleTo(r) and r.btn_play.toolTip() == "Play it now"
+    r.btn_queue.click()
+    assert _wait(qapp, lambda: played == [(key, False)])
+    states[key] = "playing"
+    assert _wait(qapp, lambda: r.btn_stop.isVisibleTo(r))
+    r.btn_play.click()
+    assert links[-1] == (key, "pause")
+    r.btn_stop.click()
+    assert links[-1] == (key, "stop")
     t.shutdown()
 
 
@@ -439,6 +475,54 @@ def test_store_tab_in_the_window(window, qapp, tmp_path):
     assert window.cfg.sounds[-1].name == "Store horn"
 
 
+def _chip_name(window) -> str:
+    from PySide6.QtWidgets import QPushButton
+
+    from soundboard.ui.sounds.linkbar import PLAY_ID
+    chip = window._chips.get(PLAY_ID)
+    return chip.findChild(QPushButton, "chipname").text() if chip is not None else ""
+
+
+def test_community_play_plays_as_a_pad_in_the_window(window, qapp, monkeypatch):
+    """An upload's Play in the real window: the pad playing stops (as a pad's press
+    stops it), the player bar and its Now playing chip show the sound, and another
+    Play swaps it, chip and all."""
+    from soundboard.audio.engine import SR
+    from soundboard.ui.sounds.linkbar import PLAY_ID
+    from soundboard.ui.window.tabcontrol import TAB_INDEX
+    from test_space_and_playing import FakePlayer
+    monkeypatch.setattr(store, "_request", FakeStore([_sound(1, name="Air horn"),
+                                                      _sound(2, name="Gasp")]))
+    player = FakePlayer(window, monkeypatch)
+    plain = window.engine.play
+
+    def play(sid, *a, **k):   # (solo: the other pads stop, as the engine does)
+        if k.get("mode") == "solo":
+            for s in [s for s in player.voices if s != sid and not s.startswith("__")]:
+                player.voices.pop(s)
+        return plain(sid, *a, **k)
+    monkeypatch.setattr(window.engine, "play", play)
+    sid = window.cfg.sounds[0].id
+    window.audio[sid] = np.zeros((SR * 5, 2), dtype=np.float32)
+    window.playctl.play(sid)
+    assert sid in player.voices
+    window.show()
+    window.tabs.setCurrentIndex(TAB_INDEX["store"])
+    t = window.store
+    assert process_events(qapp, lambda: len(t._rows) == 2, timeout=10)
+    a, b = t._rows
+    a.btn_play.click()
+    assert process_events(qapp, lambda: PLAY_ID in player.voices, timeout=10)
+    assert sid not in player.voices and window.meta(PLAY_ID).name == "Air horn"
+    assert process_events(qapp, lambda: window.transport.isVisible()
+                          and a.btn_play.text() == "Pause", timeout=5)
+    assert process_events(qapp, lambda: _chip_name(window).startswith("Air horn"), timeout=5)
+    b.btn_play.click()
+    assert process_events(qapp, lambda: window.meta(PLAY_ID).name == "Gasp", timeout=10)
+    assert process_events(qapp, lambda: _chip_name(window).startswith("Gasp")
+                          and a.btn_play.text() == "Play", timeout=5)
+
+
 def test_links_parse_only_known_sites():
     ok = _sound(7, ext="link", link="https://youtube.com/watch?v=abc")
     bad = [_sound(8, ext="link", link="https://evil.example.com/a.mp3"),
@@ -616,13 +700,14 @@ def test_cards_fill_the_tab_as_many_a_row_as_fit(qapp, fake):
     fake.sounds = {f"{i:012x}": _sound(i, cat="games", created=int(time.time()) - 3 * 86400)
                    for i in range(1, 7)}
     t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
-    t.resize(1800, 700)   # a wide window: the cards use its whole width, 5 a row
+    t.resize(1800, 700)   # a wide window: the cards use its whole width, 3 or more a row
     t.show()
     assert _wait(qapp, lambda: len(t._rows) == 6 and t.stack.currentWidget() is t.list_area)
     process_events(qapp, lambda: False, timeout=0.3)
-    assert len({r.y() for r in t._rows[:5]}) == 1 and t._rows[5].y() > t._rows[0].y()
-    assert t._rows[4].geometry().right() > 1600
-    t.resize(700, 700)
+    row = [r for r in t._rows if r.y() == t._rows[0].y()]
+    assert 3 <= len(row) < 6 and t._rows[5].y() > t._rows[0].y()
+    assert row[-1].geometry().right() > 1600
+    t.resize(1150, 700)
     process_events(qapp, lambda: False, timeout=0.3)
     a, b, c = t._rows[:3]
     assert a.where.text() == "Games · 3 days ago"
@@ -823,8 +908,8 @@ def test_every_sound_gets_a_picture_from_its_name_tags_or_category():
 
 
 def test_a_row_plays_from_its_picture_and_shows_it_playing(qapp, fake):
-    """A click on a card's picture is its play; while the sample plays the picture's
-    bars bounce."""
+    """A click on a card's picture is its play; while it plays the picture's bars
+    bounce."""
     from PySide6.QtCore import QPointF, Qt
     from PySide6.QtGui import QMouseEvent
     added, played = [], []
@@ -835,10 +920,12 @@ def test_a_row_plays_from_its_picture_and_shows_it_playing(qapp, fake):
                         Qt.MouseButton.LeftButton, Qt.MouseButton.LeftButton,
                         Qt.KeyboardModifier.NoModifier)
     r.tile.mousePressEvent(press)
-    assert r.btn_play.isChecked() and r.tile.playing
-    assert _wait(qapp, lambda: played and played[-1] is not None)
-    t._stop_preview()
-    assert not r.tile.playing and not r.btn_play.isChecked()
+    assert r.btn_play.isChecked()
+    assert _wait(qapp, lambda: played)
+    t.states["community:000000000001"] = "playing"
+    assert _wait(qapp, lambda: r.tile.playing)
+    t.states.clear()   # (it ended)
+    assert _wait(qapp, lambda: not r.tile.playing and not r.btn_play.isChecked())
     t.shutdown()
 
 

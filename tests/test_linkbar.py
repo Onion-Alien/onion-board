@@ -25,9 +25,11 @@ URL = "https://www.youtube.com/watch?v=abc"
 class Eng:
     def __init__(self):
         self.played = []
+        self.modes = []
 
     def play(self, sid, data, gain, **kw):
         self.played.append((sid, len(data), gain))
+        self.modes.append(kw.get("mode"))
         return object()
 
     def stop(self, sid):
@@ -396,3 +398,20 @@ def test_play_now_plays_over_a_link_playing_and_play_once_waits(qapp):
     bar.play_now()
     assert eng.played == [("__link__", 480, 1.0)] and bar.up_next() == []
     assert bar.playing_url == URL
+    assert eng.modes == ["restart"]   # (the board's sounds play on)
+
+
+def test_community_play_stops_the_sounds_playing_as_a_pad_does(qapp):
+    """The Community tab's Play (a link, or an upload's audio) plays as a pad's press:
+    the sounds playing stop (engine mode solo), and nothing waits in Up next."""
+    bar, eng = _bar()
+    data = np.zeros((480, 2), np.int16)
+    bar._got = (URL, None, data, 1.0)
+    eng.now = {"pad1": (0.3, False)}   # one of your sounds plays
+    bar.play_now(solo=True)
+    assert eng.modes == ["solo"] and bar.up_next() == []
+    assert bar.play_audio(data, 1.0, "Horn", "community:abc", now=True)
+    assert eng.modes == ["solo", "solo"] and bar.playing_url == "community:abc"
+    eng.now = {"__link__": (0.3, False)}
+    bar.play_audio(data, 1.0, "Horn 2", "community:def", now=False)   # its Play next waits
+    assert bar.up_next() == ["Horn 2"] and len(eng.modes) == 2
