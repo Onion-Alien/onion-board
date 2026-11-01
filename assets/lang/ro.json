@@ -4927,5 +4927,15 @@
     "{n} de sunete nu mai sunt pe Myinstants, așa că au fost sărite."
   ],
   "(AI voice)": "(Voce AI)",
-  "(Voice changer)": "(Schimbător de voce)"
+  "(Voice changer)": "(Schimbător de voce)",
+  "{n} new": [
+    "{n} nou",
+    "{n} noi",
+    "{n} noi"
+  ],
+  "{n} new sound": [
+    "{n} sunet nou",
+    "{n} sunete noi",
+    "{n} de sunete noi"
+  ]
 }

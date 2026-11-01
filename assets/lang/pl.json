@@ -4927,5 +4927,15 @@
     "{n} dźwięków nie ma już na Myinstants, więc zostały pominięte."
   ],
   "(AI voice)": "(Głos AI)",
-  "(Voice changer)": "(Zmieniacz głosu)"
+  "(Voice changer)": "(Zmieniacz głosu)",
+  "{n} new": [
+    "{n} nowy",
+    "{n} nowe",
+    "{n} nowych"
+  ],
+  "{n} new sound": [
+    "{n} nowy dźwięk",
+    "{n} nowe dźwięki",
+    "{n} nowych dźwięków"
+  ]
 }

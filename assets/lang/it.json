@@ -4837,5 +4837,13 @@
     "{n} suoni non ci sono più su Myinstants, quindi sono stati saltati."
   ],
   "(AI voice)": "(Voce IA)",
-  "(Voice changer)": "(Modificatore di voce)"
+  "(Voice changer)": "(Modificatore di voce)",
+  "{n} new": [
+    "{n} nuovo",
+    "{n} nuovi"
+  ],
+  "{n} new sound": [
+    "{n} suono nuovo",
+    "{n} suoni nuovi"
+  ]
 }

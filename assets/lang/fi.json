@@ -4837,5 +4837,13 @@
     "{n} ääntä on poistunut Myinstantsista, joten ne ohitettiin."
   ],
   "(AI voice)": "(Tekoälypuheääni)",
-  "(Voice changer)": "(Äänenmuunnin)"
+  "(Voice changer)": "(Äänenmuunnin)",
+  "{n} new": [
+    "{n} uusi",
+    "{n} uutta"
+  ],
+  "{n} new sound": [
+    "{n} uusi ääni",
+    "{n} uutta ääntä"
+  ]
 }

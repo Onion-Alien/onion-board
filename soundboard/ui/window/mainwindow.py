@@ -82,6 +82,7 @@ from soundboard.ui.bun import splash
 from soundboard.ui.setup import tabtours
 from soundboard.ui.sounds.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.window import konami
+from soundboard.ui.window.newsounds import NewSounds
 from soundboard.ui.window.spacekey import SpaceKey
 from soundboard.ui.window import winwatch
 from soundboard.ui.sounds.overlay import Overlay
@@ -182,6 +183,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         self.catctl = CategoryControl(self)
         self.impctl = ImportControl(self)
         self.updctl = UpdateControl(self)
+        self.newctl = NewSounds(self)
         # shutdown() ran (app.py also calls it on aboutToQuit). Set first: the splash
         # pumps events while the window is built, so its timers can run
         # before the end of __init__
@@ -660,6 +662,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
                 p.rename.connect(self.soundctl.rename_sound)
                 p.edit.connect(self.editctl.edit)
                 p.stop_render.connect(self.editctl.stop_render)
+                p.seen.connect(self.newctl.seen)
                 self.pads[m.id] = p
                 r = self.editctl.rendering(m.id)
                 if r is not None:   # (a new pad for a sound whose effects are rendering)
@@ -667,6 +670,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
             p.state = "ready" if m.id in self.audio else p.state
             p.selected = m.id == self.current
             ordered.append(p)
+        self.newctl.pads_rebuilt()   # (sounds not seen before glow)
         self.grid.set_pads(ordered, layout=False)   # laid out once, by the filter next
         self.searchctl.apply_filter(self.search.text())
         self.statusctl._update_status()

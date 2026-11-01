@@ -4747,5 +4747,11 @@
     "{n} bunyi sudah tiada di Myinstants, jadi dilangkau."
   ],
   "(AI voice)": "(Suara AI)",
-  "(Voice changer)": "(Penukar suara)"
+  "(Voice changer)": "(Penukar suara)",
+  "{n} new": [
+    "{n} baharu"
+  ],
+  "{n} new sound": [
+    "{n} bunyi baharu"
+  ]
 }

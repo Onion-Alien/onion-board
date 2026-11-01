@@ -4837,5 +4837,13 @@
     "{n} ljud finns inte kvar på Myinstants, så de hoppades över."
   ],
   "(AI voice)": "(AI-röst)",
-  "(Voice changer)": "(Röstförvrängare)"
+  "(Voice changer)": "(Röstförvrängare)",
+  "{n} new": [
+    "{n} ny",
+    "{n} nya"
+  ],
+  "{n} new sound": [
+    "{n} nytt ljud",
+    "{n} nya ljud"
+  ]
 }

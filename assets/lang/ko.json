@@ -4747,5 +4747,11 @@
     "사운드 {n}개가 Myinstants에서 사라져서 건너뛰었어요."
   ],
   "(AI voice)": "(AI 음성)",
-  "(Voice changer)": "(보이스 체인저)"
+  "(Voice changer)": "(보이스 체인저)",
+  "{n} new": [
+    "새 항목 {n}"
+  ],
+  "{n} new sound": [
+    "새 사운드 {n}개"
+  ]
 }

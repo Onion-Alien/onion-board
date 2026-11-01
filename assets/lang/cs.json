@@ -4927,5 +4927,15 @@
     "{n} zvuků už na Myinstants není, takže byly přeskočeny."
   ],
   "(AI voice)": "(AI hlas)",
-  "(Voice changer)": "(Měnič hlasu)"
+  "(Voice changer)": "(Měnič hlasu)",
+  "{n} new": [
+    "{n} nový",
+    "{n} nové",
+    "{n} nových"
+  ],
+  "{n} new sound": [
+    "{n} nový zvuk",
+    "{n} nové zvuky",
+    "{n} nových zvuků"
+  ]
 }

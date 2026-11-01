@@ -4747,5 +4747,11 @@
     "{n} âm thanh không còn trên Myinstants nên đã bị bỏ qua."
   ],
   "(AI voice)": "(Giọng AI)",
-  "(Voice changer)": "(Bộ đổi giọng)"
+  "(Voice changer)": "(Bộ đổi giọng)",
+  "{n} new": [
+    "{n} mới"
+  ],
+  "{n} new sound": [
+    "{n} âm thanh mới"
+  ]
 }

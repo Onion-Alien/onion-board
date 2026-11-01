@@ -4747,5 +4747,11 @@
     "有 {n} 個音效已從 Myinstants 消失，已略過。"
   ],
   "(AI voice)": "（AI 聲音）",
-  "(Voice changer)": "（變聲器）"
+  "(Voice changer)": "（變聲器）",
+  "{n} new": [
+    "{n} 個新"
+  ],
+  "{n} new sound": [
+    "{n} 個新聲音"
+  ]
 }

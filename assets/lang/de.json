@@ -4837,5 +4837,13 @@
     "{n} Sounds gibt es auf Myinstants nicht mehr, sie wurden übersprungen."
   ],
   "(AI voice)": "(KI-Stimme)",
-  "(Voice changer)": "(Stimmverzerrer)"
+  "(Voice changer)": "(Stimmverzerrer)",
+  "{n} new": [
+    "{n} neu",
+    "{n} neu"
+  ],
+  "{n} new sound": [
+    "{n} neuer Sound",
+    "{n} neue Sounds"
+  ]
 }
