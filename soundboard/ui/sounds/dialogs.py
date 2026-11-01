@@ -8,7 +8,7 @@ import logging
 import threading
 from typing import Any
 
-from PySide6.QtCore import QObject, QSize, Qt, QTimer, Signal
+from PySide6.QtCore import QObject, QPoint, QSize, Qt, QTimer, Signal
 from shiboken6 import isValid as qt_valid
 from PySide6.QtGui import QFont, QImage, QKeySequence, QShortcut
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QComboBox,
@@ -48,6 +48,8 @@ log = logging.getLogger(__name__)
 HISTORY_MS = 400      # changes this close together are one Undo step (a drag)
 HISTORY_STEPS = 200   # Undo goes this far back
 ADV_W, ADV_H = 1320, 880       # the Advanced window, when the screen has room
+BUN_GAP = 12   # px all round Bun in Advanced's editor card (_fit_bun)
+BUN_ROOM = 10  # px: and this much more between him and the Preview button
 ADV_MIN_W, ADV_MIN_H = 720, 600
 
 CUSTOM = "Custom"   # the preset box's item data when no preset matches
@@ -1242,17 +1244,48 @@ class EditDialog(EditDialogParts, QDialog):
             self.move(max(x, screen.left()), max(y, screen.top()))
 
     def _move_bun(self, advanced: bool):
-        """Bun goes with the view: the start of the editor card's button row in Advanced
-        (the waveform under it gives up the height), or of Simple's top line."""
-        homes = [self._head] + ([self.adv.bar] if self.adv is not None else [])
-        for lay in homes:
-            i = lay.indexOf(self.bun)
-            if i >= 0:
-                take_out(lay, i)
-        self.bun.set_height(bunacts.ADV_H if advanced else bunacts.ACT_H)
-        (homes[-1] if advanced else self._head).insertWidget(0, self.bun, 0,
-                                                             Qt.AlignmentFlag.AlignVCenter)
+        """Bun goes with the view: the start of Simple's top line, or in Advanced the
+        editor card's top-left corner, the button row beside him made as tall as he needs
+        (_fit_bun)."""
+        i = self._head.indexOf(self.bun)
+        if i >= 0:
+            take_out(self._head, i)
+        adv = self.adv
+        if advanced and adv is not None:
+            self.bun.set_height(bunacts.ADV_H)
+            self.bun.setParent(adv.editor)
+            self._fit_bun()
+            self.bun.raise_()
+        else:
+            if adv is not None:
+                adv.bar.setContentsMargins(0, 0, 0, 0)
+            self.bun.set_height(bunacts.ACT_H)
+            self._head.insertWidget(0, self.bun, 0, Qt.AlignmentFlag.AlignTop)
         self.bun.show()
+
+    def _fit_bun(self):
+        """The same gap round what's drawn of Bun in Advanced: the card's edge on his left,
+        its top above him and the waveform's ruler under him (the Preview button a little
+        further off on his right). The button row is made that tall, its buttons centred
+        on him."""
+        adv = self.adv
+        assert adv is not None
+        card = adv.editor.layout()
+        gap = BUN_GAP
+        seen = self.bun.seen()
+        self.bun.move(round(gap - seen.left()), round(gap - seen.top()))
+        m = card.contentsMargins()
+        left = round(gap + seen.width() + gap + BUN_ROOM) - m.left()   # Preview right of him
+        adv.bar.setContentsMargins(left, 0, 0, 0)
+        card.activate()
+        # then measured, not worked out: the ruler a gap under him, the buttons' middle
+        # level with his
+        play, trim = adv.btn_play, self.effects.trim
+        mid = play.mapTo(adv.editor, QPoint(0, 0)).y() + play.height() / 2
+        ruler = trim.mapTo(adv.editor, QPoint(0, 0)).y()
+        top = max(0, round(gap + seen.height() / 2 - mid))
+        bottom = max(0, round(2 * gap + seen.height() - ruler) - top)
+        adv.bar.setContentsMargins(left, top, 0, bottom)
 
     def set_player(self, player: QWidget):
         """The board's player (ui/sounds/editplayer.py), over the Save row: a big

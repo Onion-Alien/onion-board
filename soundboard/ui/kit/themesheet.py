@@ -456,6 +456,8 @@ QFrame#picked[pinned="true"] { background:$panel; border-radius:12px; }
 QFrame#picked QLabel#pickedname { color:$text_hi; font-size:11pt; font-weight:700; }
 /* Spacious controls only in Voice and Setup cards. */
 QFrame#card[roomy="true"] QPushButton { padding:9px 14px; min-height:18px; }
+/* Edit sound Advanced's button row (ui/sounds/editadvanced.py): a touch bigger */
+QPushButton[roomier="true"], QFrame#card QPushButton[roomier="true"] { padding:8px 13px; }
 /* the reset family (panel.reset_button): a slim muted link with the reset arrow, the
    same beside an effect, the live controls and a sound's effects */
 QPushButton#reset, QFrame#card QPushButton#reset, QFrame#card[roomy="true"] QPushButton#reset { background:transparent; border:none; color:$muted; padding:2px 6px; min-height:0; font-size:8pt; }

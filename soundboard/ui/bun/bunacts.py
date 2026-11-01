@@ -35,7 +35,9 @@ from soundboard.ui.settings import lite
 
 Act = tuple[float, Callable[[Kit, float], None]]   # (seconds, act)
 ACT_H = 72   # Bun's height beside a window's title, px (the Live controls DJ's)
-ADV_H = 40   # ... in the button row of Edit sound's Advanced view (no taller than it can give)
+ADV_H = 64   # ... in the button row of Edit sound's Advanced view
+SEEN = (5.0, -6.5, 96.0, 122.0)   # what's drawn of him at his desk, canvas units:
+                                  # left, top (ear tips, his bob's middle), right, bottom (his feet)
 
 STEEL = QColor("#c9ccd8")
 CARD = QColor("#c98a4b")        # the parcel
@@ -556,6 +558,13 @@ class ActBunny(BunnyWidget):
             self.setFixedSize(self.sizeHint())
             self.update()
 
+    def seen(self) -> QRectF:
+        """The part of his widget he's drawn in at his desk (SEEN), in its px."""
+        r = self._bun_rect()
+        u = r.height() / 120
+        x0, y0, x1, y1 = SEEN
+        return QRectF(r.left() + x0 * u, r.top() + y0 * u, (x1 - x0) * u, (y1 - y0) * u)
+
     def set_act(self, act: Act):
         if act is not self.act:
             self.act, self._phase = act, 0.0
@@ -648,9 +657,9 @@ class EditBunny(ActBunny):
     for as long as the changes keep coming, then the desk comes back."""
 
     def __init__(self, parent=None):
-        super().__init__(DESK, parent=parent)
         self.playing = False
         self._task: list | None = None   # [act, started, last change]
+        super().__init__(DESK, parent=parent)   # (draws his first frame: set up first)
 
     def set_playing(self, on: bool):
         if on != self.playing:

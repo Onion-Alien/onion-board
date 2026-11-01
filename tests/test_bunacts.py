@@ -148,9 +148,13 @@ def test_edit_bun_goes_with_the_advanced_view(window):  # noqa: F811
     d = EditDialog(window.meta("s0"), window.hotkeys, lambda *a: None, window)
     assert d._head.indexOf(d.bun) == 0
     d.set_advanced(True)
-    assert d.adv.bar.indexOf(d.bun) == 0 and d._head.indexOf(d.bun) < 0   # in one card
+    assert d.bun.parentWidget() is d.adv.editor and d._head.indexOf(d.bun) < 0   # in one card
+    seen = d.bun.seen().translated(d.bun.pos().x(), d.bun.pos().y())
+    gap = round(seen.left())   # the card's edge to him: the same above him
+    assert abs(round(seen.top()) - gap) <= 1
+    assert d.adv.bar.contentsMargins().left() > 0   # the buttons moved over for him
     d.set_advanced(False)
-    assert d._head.indexOf(d.bun) == 0 and d.adv.bar.indexOf(d.bun) < 0
+    assert d._head.indexOf(d.bun) == 0 and d.adv.bar.contentsMargins().left() == 0
 
 
 
@@ -161,4 +165,4 @@ def test_his_act_is_there_from_the_first_paint(qapp):
         assert b.skit_playing   # before any tick
         assert b._skit_frame(time.monotonic()).world
     e = bunacts.EditBunny()
-    assert e._skit_frame(time.monotonic()).world   # the desk
+    assert e.skit_playing and e._skit_frame(time.monotonic()).world   # the desk
