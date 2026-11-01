@@ -74,6 +74,9 @@ def _page() -> tuple[QWidget, QVBoxLayout]:
     return w, v
 
 
+NO_LAYER: tuple = (1.0, 0.0, None, {})   # Live controls at rest: (speed, pitch, keep, knobs)
+
+
 class EffectsPanel(QObject):
     """Every per-sound effect setting. Advanced shows three pages: `trim_page` (speed &
     pitch, loudness), `fx_page` (preset, voice, the knobs, the effect cards) and `eq_page`;
@@ -102,6 +105,8 @@ class EffectsPanel(QObject):
         self.peaks_read.connect(self._on_peaks)
         self._voice: dict = {}
         self._live: list = []
+        self._layer = NO_LAYER   # Live controls' (set_live_layer)
+        self._shown: tuple | None = None   # (own speed, pitch, tape; shown speed, pitch, keep)
         self.part: int | None = None
         self._whole: dict = {}          # the sound's own settings while a splice's show
         self._pad_volume = 100.0        # ...and the pad's volume
@@ -416,10 +421,14 @@ class EffectsPanel(QObject):
                    *self.rows.values())
         for w in widgets:
             w.blockSignals(True)
-        self.speed.set_value(f["speed"])
-        self.pitch.set_value(f["pitch"])
+        ls, lp, lkeep, _lk = self._layer
+        keep = not f["tape"] if lkeep is None else lkeep
+        self.speed.set_value(f["speed"] * ls)
+        self.pitch.set_value(f["pitch"] + lp)
         self.boost.set_value(f["gain_db"])
-        self.keep.setChecked(not f["tape"])
+        self.keep.setChecked(keep)
+        self._shown = (f["speed"], f["pitch"], f["tape"],
+                       self.speed.value(), self.pitch.value(), keep)
         self.reverse.setChecked(f["reverse"])
         self.eq.set_gains(f["eq"], next((n for n, g in EQ_PRESETS.items() if g == f["eq"]),
                                         CUSTOM))
@@ -437,8 +446,9 @@ class EffectsPanel(QObject):
         """What the speed, pitch, boost, equalizer, effects and knobs say now (soundfx's
         PART_FX: what a splice can have of its own)."""
         gains, on, _t, _p = self.eq.state()
-        return {"speed": round(self.speed.value(), 3), "pitch": round(self.pitch.value(), 2),
-                "tape": not self.keep.isChecked(), "gain_db": round(self.boost.value(), 2),
+        speed, pitch, tape = self._own_tuning()
+        return {"speed": round(speed, 3), "pitch": round(pitch, 2),
+                "tape": tape, "gain_db": round(self.boost.value(), 2),
                 "reverse": self.reverse.isChecked(),
                 "eq": gains if on else [0.0] * len(gains),
                 "effects": {t: r.state() for t, r in self.rows.items() if r.chk.isChecked()},
@@ -508,22 +518,75 @@ class EffectsPanel(QObject):
             **{k: old[k] for k in ("fade_in", "fade_out", "fade_in_from", "fade_out_to")
                if k in old}})
 
+    def set_live_layer(self, speed: float, pitch: float, keep: bool, knobs: dict):
+        """Live controls' speed, pitch and knobs, on every sound as it plays: the sliders
+        show them added to this sound's own, as Live controls show the playing sound's
+        own added to theirs (Nightcore there reads 1.30x and Bass +3 here too). An edit
+        here still goes to this sound's own: Live controls stay as they are."""
+        tuning = abs(speed - 1) >= 1e-3 or abs(pitch) >= 1e-3
+        layer = (float(speed), float(pitch), bool(keep) if tuning else None,
+                 livefx.clean({k: v for k, v in (knobs or {}).items()
+                               if k != livefx.VOLUME.key}))
+        if layer == self._layer:
+            return
+        own = self._knobs()   # read with the old layer
+        self._layer = layer
+        self._show_knobs(soundfx.clean(own))
+
+    def _own_tuning(self) -> tuple[float, float, bool]:
+        """(speed, pitch, tape) of the sound's own: the sliders less Live controls'.
+        A slider not moved since it was shown gives back the value it showed."""
+        ls, lp, _keep, _k = self._layer
+        speed, pitch, keep = self.speed.value(), self.pitch.value(), self.keep.isChecked()
+        sh = self._shown
+        own_speed = sh[0] if sh and abs(speed - sh[3]) < 1e-6 else speed / ls
+        own_pitch = sh[1] if sh and abs(pitch - sh[4]) < 1e-6 else pitch - lp
+        tape = sh[2] if sh and keep == sh[5] else not keep
+        return (min(max(own_speed, soundfx.SPEED_RANGE[0]), soundfx.SPEED_RANGE[1]),
+                min(max(own_pitch, soundfx.PITCH_RANGE[0]), soundfx.PITCH_RANGE[1]), tape)
+
+    def set_own_speed(self, speed: float):
+        """The sound's own speed to `speed` (keep pitch back on), shown with Live
+        controls' on top."""
+        ls, _lp, lkeep, _k = self._layer
+        self._set_tuning(speed * ls, self.pitch.value(),
+                         True if lkeep is None else self.keep.isChecked())
+
+    def set_own_pitch(self, pitch: float):
+        self.pitch.set_value(pitch + self._layer[1])
+
+    def _with_layer(self, amounts: dict, sign: int) -> dict:
+        """Knob `amounts` with Live controls' added (sign 1) or taken off (-1)."""
+        out = dict(amounts)
+        for q in livefx.PARAMS:
+            v = out.get(q.key, 0.0) + sign * self._layer[3].get(q.key, 0.0)
+            out[q.key] = min(max(v, q.lo), q.hi)
+        return livefx.clean(out)
+
     def _show_live(self):
-        """The sound's Live controls stages on the knobs (merged into one set)."""
-        self.panel.set_knobs(soundfx.live_merged(self._live))
+        """The sound's Live controls stages on the knobs (merged into one set), with
+        Live controls' own on top."""
+        self.panel.set_knobs(self._with_layer(soundfx.live_merged(self._live), 1))
         self._light_presets()
 
     def knob_values(self) -> dict[str, float]:
-        """The Live controls knobs that are off 0."""
+        """The Live controls knobs that are off 0 (as shown: Live controls' added)."""
         return self.panel.knob_values()
 
+    def own_knobs(self) -> dict[str, float]:
+        """The knobs the sound has of its own: shown, less Live controls'."""
+        return self._with_layer(self.knob_values(), -1)
+
+    def set_own_knob(self, key: str, value: float):
+        self.knobs[key].set_value(value + self._layer[3].get(key, 0.0))
+
     def _knobs_edited(self):
-        """A knob moved: the sound's Live controls stages become one, these knobs (and
-        the volume they were saved with, which has no slider here)."""
+        """A knob moved: the sound's Live controls stages become one, these knobs less
+        Live controls' (and the volume they were saved with, which has no slider here)."""
         vol = 1.0
         for st in self._live:
             vol *= st.get(livefx.VOLUME.key, livefx.VOLUME.default) / 100
-        stage = livefx.clean({**self.knob_values(), livefx.VOLUME.key: vol * 100})
+        stage = livefx.clean({**self.own_knobs(), livefx.VOLUME.key: vol * 100})
         self._live = [stage] if stage else []
         self._edited()
 
