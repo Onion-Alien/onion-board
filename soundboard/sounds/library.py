@@ -60,9 +60,9 @@ from soundboard.sounds.decoding import (  # noqa: F401
     load_sound, MAX_SECONDS, MP3_QUALITY, original_frames, original_length, original_peaks,
     PEAK_CHUNK, PEAK_READS, _read, _sf_pieces, stored_ext, _stream, STREAM_S, write_stored)
 from soundboard.sounds.files import (  # noqa: F401
-    delete_file, discard, DOWNLOADS, duplicate, file_stem, fingerprint, _folder_of, import_file,
-    loose_sounds, MY_SOUNDS, new_file, owns, RECORDINGS, recycle, save_clip, site_folder, _SITES,
-    tidy_files, _undo_tidy, USE_RECYCLE_BIN)
+    delete_file, discard, DOWNLOADS, drop_unfinished, duplicate, file_stem, fingerprint,
+    _folder_of, import_file, loose_sounds, MY_SOUNDS, new_file, owns, RECORDINGS, recycle,
+    save_clip, site_folder, _SITES, tidy_files, _undo_tidy, USE_RECYCLE_BIN)
 
 log = logging.getLogger(__name__)
 

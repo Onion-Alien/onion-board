@@ -5,6 +5,7 @@ import ctypes
 import gc
 import logging
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -121,14 +122,27 @@ def end_process(code: int):
 
 
 # %TEMP% folders of ours that can be left behind: a download the app was closed (or
-# crashed) in the middle of, and an add-on self-test. Only these exact prefixes.
-TEMP_LEFTOVERS = ("sb-ytdl-", "onionboard-selftest-")
+# crashed) in the middle of (a sound, a links pack, a pack's samples), and an add-on
+# self-test. Only these exact prefixes.
+TEMP_LEFTOVERS = ("sb-ytdl-", "sb-linkpack-", "sb-linkpreview-", "onionboard-selftest-")
 TEMP_MAX_AGE_S = 24 * 3600
+# ytsites.temp_folder: "<prefix><the app's process id>-..."
+_TEMP_OWNER = re.compile(r"(?:sb-ytdl|sb-linkpack|sb-linkpreview)-(\d+)-")
+
+
+def _owner_gone(name: str) -> bool:
+    """The app that made this download folder isn't running any more (a pid reused
+    since by another program counts as running: the folder waits for the day)."""
+    m = _TEMP_OWNER.match(name)
+    if not m or int(m.group(1)) == os.getpid() or sys.platform != "win32":
+        return False
+    from soundboard.audio import appprocs
+    return not appprocs.is_running(int(m.group(1)))
 
 
 def clean_temp_leftovers(now: float | None = None) -> int:
-    """Delete TEMP_LEFTOVERS folders in %TEMP% untouched for a day (a running
-    download's is newer). Returns how many went. Run off the UI thread."""
+    """Delete TEMP_LEFTOVERS folders in %TEMP% whose app is gone or untouched for a day
+    (a running download's is newer). Returns how many went. Run off the UI thread."""
     import shutil
     import tempfile
     import time
@@ -141,7 +155,9 @@ def clean_temp_leftovers(now: float | None = None) -> int:
                 continue
             try:
                 if (p.is_symlink() or getattr(p, "is_junction", lambda: False)()
-                        or not p.is_dir() or now - p.stat().st_mtime < TEMP_MAX_AGE_S):
+                        or not p.is_dir()
+                        or (now - p.stat().st_mtime < TEMP_MAX_AGE_S
+                            and not _owner_gone(p.name))):
                     continue
                 shutil.rmtree(p, ignore_errors=True)
                 gone += not p.exists()

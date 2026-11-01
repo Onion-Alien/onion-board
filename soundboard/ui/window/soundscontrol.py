@@ -47,6 +47,7 @@ class SoundsControl(Controller):
         super().__init__(mw)
         self._load_thread: threading.Thread | None = None
         self._loading: set[str] = set()   # sids a load thread is decoding right now
+        self._tidied = False   # the first load took out unfinished adds' files
 
     def _load_all(self):
         # one still being loaded by an earlier call (a pack import or Undo during a slow
@@ -54,6 +55,10 @@ class SoundsControl(Controller):
         mw = self.mw
         todo = [m for m in mw.cfg.sounds if m.id not in mw.audio and m.id not in self._loading]
         self._loading.update(m.id for m in todo)
+        # once, and only with the settings as they were saved: a backup may not know the
+        # newest sounds (their files aren't leftovers)
+        tidy_adds = not (self._tidied or mw.cfg.read_only or mw.cfg.load_note)
+        self._tidied = True
         prev = self._load_thread
 
         def run():
@@ -72,6 +77,8 @@ class SoundsControl(Controller):
                 prev.join()
             live = self._live_metas()   # as of now, not of the start
             prune_cache(cache_keep(live))
+            if tidy_adds:   # files of adds an earlier run didn't finish (it was closed)
+                library.drop_unfinished([m.file for m in live])
             thumbs.prune({m.image for m in live if m.image})
             trash.prune()   # what's been in Recently deleted for too long
             log.info("loaded %d sounds in %.1fs", len(todo), time.monotonic() - t0)

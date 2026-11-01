@@ -360,13 +360,13 @@ def download_links(pack: Pack, progress: Callable[[int, int], object] | None = N
     kept = backup.kept_free_pack(pack.id)
     if kept is not None:
         return kept, 0   # added before and still kept: not fetched again
-    import tempfile
     from concurrent.futures import ThreadPoolExecutor
 
     from soundboard.online import ytdl
+    from soundboard.online.ytsites import temp_folder
     netlog.cause(FEATURE, f"You pressed Add on the {netlog.quoted(pack.name)} pack: its "
                           f"sounds, from Myinstants")
-    tmp = Path(tempfile.mkdtemp(prefix="sb-linkpack-"))
+    tmp = temp_folder("sb-linkpack-")
     got: dict[int, Path] = {}
     errs: list[str] = []
     lock = threading.Lock()
@@ -468,9 +468,8 @@ def samples(pack: Pack, cancelled: Callable[[], bool] | None = None) -> list[Sam
 def _link_samples(pack: Pack, cancelled: Callable[[], bool] | None) -> list[Sample]:
     """A links pack's first SAMPLES sounds, each fetched once (then kept with the other
     previews, under its own name: the list changing fetches only what's new)."""
-    import tempfile
-
     from soundboard.online import ytdl
+    from soundboard.online.ytsites import temp_folder
     d = previews_dir() / f"{pack.id}-links"
     d.mkdir(parents=True, exist_ok=True)
     found, errs = [], []
@@ -484,7 +483,7 @@ def _link_samples(pack: Pack, cancelled: Callable[[], bool] | None) -> list[Samp
                 netlog.cause(FEATURE, f"You opened Free packs: a few sounds of "
                                       f"{netlog.quoted(pack.name)} to try, from Myinstants")
                 told = True
-            tmp = Path(tempfile.mkdtemp(prefix="sb-linkpreview-"))
+            tmp = temp_folder("sb-linkpreview-")
             try:
                 got, _title = ytdl.download_audio(link.url, tmp, thumbnail=False)
                 shutil.move(str(got), kept)

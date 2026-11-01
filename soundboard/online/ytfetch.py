@@ -24,7 +24,7 @@ from soundboard.i18n import _
 from soundboard.online.ytsites import (BROWSER_HEADERS, DownloadError, FEATURE, FetchError,
     IMAGE_EXTS, MAX_BYTES, MYINSTANTS, PROGRESS_EVERY_S, RETRY_CHECK_AFTER, RETRY_CLIENTS,
     RETRY_PAUSE_S, Result, SwitchedOff, TorBlocked, UPDATE_FEATURE, VIDEO_EXTS, VIDEO_MAX_BYTES,
-    _TRY_AGAIN, _gate, _lock, _over_tor, _site_name)
+    _TRY_AGAIN, _gate, _lock, _over_tor, _site_name, temp_folder)
 from soundboard.online.ytupdate import (_pkg_dir, _purge, _save_state, _state, cache_dir, due,
     install, override_version, root, update)
 
@@ -304,7 +304,7 @@ def _download(url, dest, progress, feature: str = FEATURE,
                         again)
         # Our own temp folder: the caller only learns it on success, so a failed
         # download (up to the size cap) must not be left behind in %TEMP%.
-        tmp = Path(tempfile.mkdtemp(prefix="sb-ytdl-"))
+        tmp = temp_folder()
         try:
             return _run(yt_dlp, url, tmp, progress, feature, direct, video, thumbnail, again)
         except BaseException:
@@ -333,7 +333,7 @@ def _download_direct(url, dest, progress, direct: bool = False) -> tuple[Path, s
     if (parts.netloc != urllib.parse.urlsplit(MYINSTANTS).netloc or parts.query
             or parts.fragment or not leaf.lower().endswith(".mp3")):
         raise DownloadError(_("That isn't a Myinstants sound link."))
-    tmp = Path(dest) if dest else Path(tempfile.mkdtemp(prefix="sb-ytdl-"))
+    tmp = Path(dest) if dest else temp_folder()
     path = tmp / leaf
     if path.resolve().parent != tmp.resolve():
         if not dest:
