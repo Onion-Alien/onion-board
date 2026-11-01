@@ -2656,7 +2656,6 @@
   ],
   "AI voice off": "Tekoälypuheääni pois",
   "AI voice: {voice}, starting.": "Tekoälypuheääni: {voice}, käynnistyy.",
-  "AI voice: {voice}.": "Tekoälypuheääni: {voice}.",
   "No mic open": "Mikkiä ei ole auki",
   "What others hear from your mic": "Mitä muut kuulevat mikistäsi",
   "Getting Python ready…": "Valmistellaan Pythonia…",
@@ -3978,7 +3977,6 @@
   "The computer voice ({voice}) speaks for you.": "Tietokoneääni ({voice}) puhuu puolestasi.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Laittaa pois jokaisen mikkiäsi muuttavan puheäänen. Päälle laittaminen tuo ne takaisin.",
   "Turns on: {voices}": "Laittaa päälle: {voices}",
-  "Voice changer: {voice}.": "Äänenmuunnin: {voice}.",
   "Voices on or off": "Puheäänet päällä tai pois",
   "What you say is said in {language}.": "Mitä sanot, sanotaan kielellä {language}.",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board sulkeutui odottamatta, joten se käynnistyi uudelleen.",
@@ -4816,5 +4814,8 @@
   "Pick one of ours": "Valitse meidän kuvista",
   "Remove server": "Poista palvelin",
   "(AI voice)": "(Tekoälypuheääni)",
-  "(Voice changer)": "(Äänenmuunnin)"
+  "(Voice changer)": "(Äänenmuunnin)",
+  "Pause this voice (click again to bring it back)": "Keskeytä tämä ääni (napsauta uudelleen palauttaaksesi sen)",
+  "Paused: click to turn this voice back on": "Keskeytetty: napsauta kytkeäksesi äänen takaisin päälle",
+  "Turn this voice off (Voices ON won't bring it back)": "Sammuta tämä ääni (Äänet PÄÄLLÄ ei palauta sitä)"
 }

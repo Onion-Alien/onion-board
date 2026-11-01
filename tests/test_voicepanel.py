@@ -62,6 +62,12 @@ def test_hothead_and_autotune_tiles_change_the_engine_mic_and_stop_cleanly(panel
     assert np.all(np.isfinite(eng.voice_chain.process(x[:480], 48000)))
 
 
+def bar(p, key: str) -> str:
+    """A voice's own bar (the voice changer's, the AI voice's): on, paused or hidden."""
+    panel = p.fx if key == "fx" else p.ai
+    return "hidden" if panel.picked.isHidden() else "paused" if panel._paused else "on"
+
+
 @pytest.mark.parametrize("tab", ["fx", "ai", "speak", "addons"])
 def test_voices_switch_is_visible_and_brings_the_same_voice_back(panel, qapp, tab):
     """The bottom bar's Voices switch (it replaced a red Stop that forgot what was on):
@@ -81,11 +87,11 @@ def test_voices_switch_is_visible_and_brings_the_same_voice_back(panel, qapp, ta
     assert not p.is_active() and not button.isChecked()
     assert p.current_tab() == tab
     assert p.fx.spec() == {**before, "enabled": False}
-    assert p.bar.texts() == ["Mic unchanged. ON brings back:", "Robot"]
+    assert p.bar.texts() == ["Mic unchanged"] and bar(p, "fx") == "paused"
     assert "Robot" in button.toolTip()
     button.click()
     assert p.fx.spec() == before and button.isChecked()
-    assert p.bar.texts() == ["Robot"]
+    assert p.bar.texts() == [] and bar(p, "fx") == "on"
     assert eng.voice_chain is p.chain
 
 
@@ -109,8 +115,9 @@ def test_voices_switch_off_remembers_every_voice_and_on_brings_exactly_those(
     p.set_voices(False)
     assert p.on_keys() == [] and not p.speech.cb_lang.currentData()
     assert not p.bar.master.isChecked()
-    assert [k for k in p.bar.chips if k != "none"] == ["fx", "speak", "lang"]
-    assert all(p.bar.chips[k].property("state") == "off" for k in ("fx", "speak", "lang"))
+    assert [k for k in p.bar.chips if k != "none"] == ["speak", "lang"]
+    assert all(p.bar.chips[k].property("state") == "off" for k in ("speak", "lang"))
+    assert bar(p, "fx") == "paused"
     p.set_voices(False)                   # already off: still remembers
     p.set_voices(True)
     assert p.on_keys() == ["fx", "speak", "lang"]
@@ -123,8 +130,8 @@ def test_voices_switch_with_nothing_remembered_says_and_turns_on_the_picked_voic
     p, _eng = panel
     p.fx.pick("Robot")
     p.fx.btn_power.setChecked(False)      # off on its card: nothing for the switch to recall
-    assert p.bar.texts() == ["Mic unchanged. ON turns on:", "Robot"]
-    assert not p.bar.chips["fx"].off.isHidden()   # every chip's ✕ works
+    assert p.bar.texts() == ["Mic unchanged"] and bar(p, "fx") == "paused"
+    assert not p._bar_ctl["fx"][1].isHidden()     # its ✕ works
     assert "Turns on: Robot" in p.bar.master.toolTip()
     p.bar.master.click()
     assert p.fx.btn_power.isChecked() and p.fx.preset == "Robot"
@@ -136,9 +143,10 @@ def test_voices_off_then_x_on_the_grey_voice_takes_its_chip_away(panel):
     p, _eng = panel
     p.fx.pick("Robot")
     p.bar.master.click()
-    assert p.bar.texts() == ["Mic unchanged. ON brings back:", "Robot"]
-    p.bar.chips["fx"].off.click()
+    assert p.bar.texts() == ["Mic unchanged"] and bar(p, "fx") == "paused"
+    p._bar_ctl["fx"][1].click()
     assert p.bar.texts() == ["Mic unchanged"] and p.back_keys() == []
+    assert bar(p, "fx") == "hidden"
     p.bar.master.click()
     assert not p.is_active() and not p.bar.master.isChecked()
     p.fx.pick("Robot")                    # picked again: on, and ON/OFF work as before
@@ -154,9 +162,10 @@ def test_voices_switch_off_keeps_a_voice_greyed_by_its_chip(panel):
     p, _eng = panel
     p.fx.pick("Robot")
     p.speech.livevoice.b_live.setChecked(True)
-    p.bar.chips["fx"].click()             # Robot off, grey
+    p._bar_ctl["fx"][0].click()           # Robot paused from its bar
     p.bar.master.click()                  # everything else off too
-    assert p.bar.texts() == ["Mic unchanged. ON brings back:", "Robot", "Computer voice"]
+    assert p.bar.texts() == ["Mic unchanged. ON brings back:", "Computer voice"]
+    assert bar(p, "fx") == "paused"
     p.bar.master.click()
     assert p.on_keys() == ["fx", "speak"] and p.fx.preset == "Robot"
 
@@ -178,13 +187,13 @@ def test_reset_forgets_every_voice_so_voices_on_brings_none_back(panel):
                   "robot": {"on": True}})
     p.speech.livevoice.b_live.setChecked(True)
     p.bar.master.click()                  # off: both remembered, grey
-    assert p.bar.texts() == ["Mic unchanged. ON brings back:", "My own mix",
-                             "Computer voice"]
+    assert p.bar.texts() == ["Mic unchanged. ON brings back:", "Computer voice"]
+    assert bar(p, "fx") == "paused"
     assert p.bar.reset_button.isVisibleTo(p.bar)
     p.bar.reset_button.click()
     assert not p.is_active() and p.back_keys() == []
     assert p.fx.is_blank() and not eng.voice_chain.enabled
-    assert p.bar.texts() == ["Mic unchanged"]
+    assert p.bar.texts() == ["Mic unchanged"] and bar(p, "fx") == "hidden"
     p.bar.master.click()                  # ON: nothing to bring back, stays off
     assert not p.is_active() and not p.bar.master.isChecked()
     assert p.bar.texts() == ["Mic unchanged"]
@@ -1897,10 +1906,10 @@ def test_status_bar_off_label_cannot_open_a_card(panel):
     QTest.mouseClick(label, Qt.LeftButton)
     p._open_card("none")
     assert not opened and p.current_tab() == "addons"
-    p.fx.pick("Robot")
-    QTest.mouseClick(p.bar.chips["fx"], Qt.RightButton)   # a right-click opens its card
-    assert opened == ["fx"] and p.current_tab() == "fx"
-    assert p.fx.btn_power.isChecked()                       # ...and leaves it on
+    p.speech.livevoice.b_live.setChecked(True)
+    QTest.mouseClick(p.bar.chips["speak"], Qt.RightButton)   # a right-click opens its card
+    assert opened == ["speak"] and p.current_tab() == "speak"
+    assert p.speech.livevoice.b_live.isChecked()               # ...and leaves it on
 
 
 def test_status_bar_chip_click_turns_that_one_off_and_on_again(panel):
@@ -1909,31 +1918,32 @@ def test_status_bar_chip_click_turns_that_one_off_and_on_again(panel):
     p, _ = panel
     p.fx.pick("Robot")
     p.speech.livevoice.b_live.setChecked(True)
-    assert p.bar.texts() == ["Robot", "Computer voice"]
+    assert p.bar.texts() == ["Computer voice"] and bar(p, "fx") == "on"
     p.show_tab("addons")
-    QTest.mouseClick(p.bar.chips["fx"], Qt.LeftButton)   # off: the computer voice stays
+    pause = p._bar_ctl["fx"][0]
+    QTest.mouseClick(pause, Qt.LeftButton)   # its bar's pause: the computer voice stays
     assert not p.fx.btn_power.isChecked() and p.speech.livevoice.b_live.isChecked()
-    assert p.bar.texts() == ["Computer voice", "Robot"]
-    assert p.bar.chips["fx"].property("state") == "off"
-    assert p.current_tab() == "addons"                  # a click no longer jumps tabs
-    QTest.mouseClick(p.bar.chips["fx"], Qt.LeftButton)   # ...and back on, the same voice
+    assert bar(p, "fx") == "paused" and "back on" in pause.toolTip()
+    assert p.current_tab() == "addons"                  # a click doesn't jump tabs
+    QTest.mouseClick(pause, Qt.LeftButton)              # ...and back on, the same voice
     assert p.fx.btn_power.isChecked() and p.fx.preset == "Robot"
-    assert p.bar.texts() == ["Robot", "Computer voice"]
-    assert p.bar.chips["fx"].property("state") == "on"
+    assert bar(p, "fx") == "on" and "Pause" in pause.toolTip()
+    QTest.mouseClick(p.bar.chips["speak"], Qt.LeftButton)   # a chip: the same, off...
+    assert not p.speech.livevoice.b_live.isChecked()
+    assert p.bar.chips["speak"].property("state") == "off"
 
 
 def test_status_bar_chip_x_turns_off_only_that_one(panel):
     p, _ = panel
     p.fx.pick("Robot")
     p.speech.livevoice.b_live.setChecked(True)
-    assert p.bar.texts() == ["Robot", "Computer voice"]
-    chip = p.bar.chips["fx"]
-    assert "Robot" in chip.off.toolTip()
+    assert p.bar.texts() == ["Computer voice"]
     opened = []
     p.bar.open_card.connect(opened.append)
-    chip.off.click()                             # the voice changer goes, the voice stays
+    p._bar_ctl["fx"][1].click()                  # the voice changer goes, the voice stays
     assert not p.fx.btn_power.isChecked() and p.speech.livevoice.b_live.isChecked()
-    assert p.bar.texts() == ["Computer voice"] and not opened   # gone, not greyed
+    assert bar(p, "fx") == "hidden" and not opened   # gone, not paused
+    assert p.bar.texts() == ["Computer voice"]
     p.bar.chips["speak"].click()                 # a click: off, but remembered
     assert p.bar.texts() == ["Mic unchanged. ON brings back:", "Computer voice"]
     p.bar.chips["speak"].off.click()             # its ✕ on the grey chip: forgotten
@@ -1945,9 +1955,8 @@ def test_status_bar_says_what_others_hear(panel):
     p, eng = panel
     assert p.bar.texts() == ["Mic unchanged"]   # an empty mix: nothing for ON to turn on
     p.fx.pick("Robot")
-    assert p.bar.texts() == ["Robot"]          # short; the full words are its tip
-    assert "Voice changer" in p.bar.chips["fx"].toolTip()
-    assert p.bar.chips["fx"].property("state") == "on"
+    assert p.bar.texts() == [] and bar(p, "fx") == "on"   # on its own bar, not a chip
+    assert p.bar.lbl_heard.isHidden()          # no chips: no "what others hear" ear
     p.speech.livevoice.b_live.setChecked(True)
     assert "Computer voice" in p.bar.texts()
     p.speech.livevoice.b_live.setChecked(False)
@@ -1964,10 +1973,13 @@ def test_status_bar_shows_the_ai_voice_starting_on_and_failed(panel, monkeypatch
     ai = p.ai
     monkeypatch.setattr(ai, "is_on", lambda: True)
     monkeypatch.setattr(ai, "voice_title", lambda: "Squeak")
-    for st, words, state in (("starting", "Squeak…", "on"), ("on", "Squeak", "on"),
+    for st, words, state in (("starting", "Squeak…", "on"), ("on", None, None),
                              ("failed", "AI voice off", "warn")):
         monkeypatch.setattr(ai, "status", lambda st=st: st)
         p._update_bar()
+        if words is None:   # on: its own bar says it, no chip
+            assert p.bar.texts() == [] and "ai" not in p.bar.chips
+            continue
         assert p.bar.texts() == [words]
         assert p.bar.chips["ai"].property("state") == state
 
@@ -2155,27 +2167,27 @@ def test_ai_voice_list_keeps_its_height_with_a_long_description(panel, qapp, wid
     assert tile.height() >= tile.sizeHint().height()
 
 
-def test_stop_takes_the_picked_voice_bar_away_too(panel):
-    """Stop turns the voice changer off, and the bar under the voices that names
-    the voice goes with it: left up, it looked as if the voice were still on."""
+def test_voices_off_dims_the_picked_voice_bar_and_x_takes_it_away(panel):
+    """Voices OFF pauses the voice changer: its bar stays, dimmed, with play to bring
+    it back (left looking the same, it seemed still on). Its ✕ takes the bar away."""
     p, _eng = panel
     p.resize(1000, 900)
     p.show()
     p.show_tab("fx")
     name = next(n for n in p.fx._tile if n != "Custom")
     p.fx._tile[name].click()
-    assert p.fx.btn_power.isChecked() and p.fx.picked.isVisible()
+    assert p.fx.btn_power.isChecked() and bar(p, "fx") == "on"
     p.bar.master.click()
-    assert not p.fx.btn_power.isChecked()
-    assert not p.fx.picked.isVisible() and not p.fx._tile[name].isChecked()
+    assert not p.fx.btn_power.isChecked() and not p.fx._tile[name].isChecked()
+    assert bar(p, "fx") == "paused"
+    assert p._bar_dim["fx"][0].opacity() < 1           # dimmed
     p.show_tab("ai")
-    p.show_tab("fx")                    # coming back to the tab doesn't bring it back
-    assert not p.fx.picked.isVisible()
-    p.fx._tile[name].click()            # a voice picked again: it's back
-    assert p.fx.picked.isVisible()
-    p.show_tab("ai")
-    assert p.fx.picked.isVisible()      # on: its bar shows on every tab
-
+    assert bar(p, "fx") == "paused"                    # on every tab
+    p._bar_ctl["fx"][1].click()                        # its ✕: gone
+    assert bar(p, "fx") == "hidden" and not p.fx.btn_power.isChecked()
+    p.show_tab("fx")
+    p.fx._tile[name].click()                           # a voice picked again: it's back
+    assert bar(p, "fx") == "on" and p._bar_dim["fx"][0].opacity() == 1
 
 def test_voice_groups_and_favorites(qapp, monkeypatch):
     """Every voice sits under one group; a starred voice shows under Favorites (in the

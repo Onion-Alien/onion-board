@@ -2711,7 +2711,6 @@
   "✓ Saved “{name}”: loading its voices…": "✓ «{name}» сохранён: загружаю его голоса…",
   "AI voice off": "ИИ-голос выключен",
   "AI voice: {voice}, starting.": "ИИ-голос: {voice}, запускаю.",
-  "AI voice: {voice}.": "ИИ-голос: {voice}.",
   "No mic open": "Микрофон не открыт",
   "What others hear from your mic": "Что другие слышат из твоего микрофона",
   "That's a playlist: open one video and try again.": "Это плейлист: открой одно видео и попробуй снова.",
@@ -4052,7 +4051,6 @@
   "The computer voice ({voice}) speaks for you.": "Компьютерный голос ({voice}) говорит за тебя.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Выключает все голоса, которые меняют твой микрофон. Если включить, они вернутся.",
   "Turns on: {voices}": "Включит: {voices}",
-  "Voice changer: {voice}.": "Смена голоса: {voice}.",
   "Voices on or off": "Голоса вкл. или выкл.",
   "What you say is said in {language}.": "То, что ты говоришь, звучит на языке: {language}.",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board неожиданно закрылся, поэтому запустился снова.",
@@ -4904,5 +4902,8 @@
   "Pick one of ours": "Выбрать из наших",
   "Remove server": "Удалить сервер",
   "(AI voice)": "(ИИ-голос)",
-  "(Voice changer)": "(Смена голоса)"
+  "(Voice changer)": "(Смена голоса)",
+  "Pause this voice (click again to bring it back)": "Поставить этот голос на паузу (щёлкните ещё раз, чтобы вернуть)",
+  "Paused: click to turn this voice back on": "На паузе: щёлкните, чтобы снова включить голос",
+  "Turn this voice off (Voices ON won't bring it back)": "Выключить этот голос (Голоса ВКЛ его не вернёт)"
 }

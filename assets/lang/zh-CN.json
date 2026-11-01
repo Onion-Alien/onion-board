@@ -2599,7 +2599,6 @@
   ],
   "AI voice off": "AI 语音已关闭",
   "AI voice: {voice}, starting.": "AI 语音：{voice}，正在启动。",
-  "AI voice: {voice}.": "AI 语音：{voice}。",
   "No mic open": "麦克风未打开",
   "What others hear from your mic": "别人从你的麦克风听到的声音",
   "Getting Python ready…": "正在准备 Python…",
@@ -3904,7 +3903,6 @@
   "The computer voice ({voice}) speaks for you.": "电脑语音（{voice}）替你说话。",
   "Turns off every voice changing your mic. Switching it on brings them back.": "关闭所有改变你麦克风的声线和语音。重新打开就会恢复。",
   "Turns on: {voices}": "将开启：{voices}",
-  "Voice changer: {voice}.": "变声器：{voice}。",
   "Voices on or off": "变声开或关",
   "What you say is said in {language}.": "你说的话会用{language}说出来。",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board 意外关闭，已重新启动。",
@@ -4728,5 +4726,8 @@
   "Pick one of ours": "从我们的图片中选",
   "Remove server": "移除服务器",
   "(AI voice)": "（AI 语音）",
-  "(Voice changer)": "（变声器）"
+  "(Voice changer)": "（变声器）",
+  "Pause this voice (click again to bring it back)": "暂停这个声音（再点一下恢复）",
+  "Paused: click to turn this voice back on": "已暂停：点击重新打开这个声音",
+  "Turn this voice off (Voices ON won't bring it back)": "关闭这个声音（打开“声音”不会恢复它）"
 }

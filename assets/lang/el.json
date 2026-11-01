@@ -2656,7 +2656,6 @@
   ],
   "AI voice off": "Φωνή AI κλειστή",
   "AI voice: {voice}, starting.": "Φωνή AI: {voice}, ξεκινάει.",
-  "AI voice: {voice}.": "Φωνή AI: {voice}.",
   "No mic open": "Κανένα μικρόφωνο ανοιχτό",
   "What others hear from your mic": "Τι ακούνε οι άλλοι από το μικρόφωνό σου",
   "Getting Python ready…": "Προετοιμασία της Python…",
@@ -3978,7 +3977,6 @@
   "The computer voice ({voice}) speaks for you.": "Η φωνή του υπολογιστή ({voice}) μιλάει για σένα.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Κλείνει κάθε φωνή που αλλάζει το μικρόφωνό σου. Όταν το ανοίξεις, επιστρέφουν.",
   "Turns on: {voices}": "Ανοίγει: {voices}",
-  "Voice changer: {voice}.": "Αλλαγή φωνής: {voice}.",
   "Voices on or off": "Φωνές ανοιχτές ή κλειστές",
   "What you say is said in {language}.": "Ό,τι λες ακούγεται στα {language}.",
   "Onion Board closed unexpectedly, so it started again.": "Το Onion Board έκλεισε απροσδόκητα, οπότε ξεκίνησε ξανά.",
@@ -4816,5 +4814,8 @@
   "Pick one of ours": "Διάλεξε μία από τις δικές μας",
   "Remove server": "Αφαίρεση διακομιστή",
   "(AI voice)": "(Φωνή AI)",
-  "(Voice changer)": "(Αλλαγή φωνής)"
+  "(Voice changer)": "(Αλλαγή φωνής)",
+  "Pause this voice (click again to bring it back)": "Παύση αυτής της φωνής (ξανά κλικ για να επιστρέψει)",
+  "Paused: click to turn this voice back on": "Σε παύση: κάνε κλικ για να ανάψει ξανά η φωνή",
+  "Turn this voice off (Voices ON won't bring it back)": "Σβήσε αυτή τη φωνή (το Φωνές ON δεν θα τη φέρει πίσω)"
 }

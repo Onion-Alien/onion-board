@@ -249,6 +249,8 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "voice-roll", "voice-hear",
             # Edit voice's Reset, Mix in a voice, and Edit voice from a card's right-click
             "voice-edit-reset", "voice-mix-in", "voice-edit-menu",
+            # a voice's bar: its pause button
+            "voice-bar-pause",
             # the voice bar's Effects pop-up opened
             "voice-effects",
             # AI voices: switched on, a group picked, a voice starred, Hear it, one of

@@ -2656,7 +2656,6 @@
   ],
   "AI voice off": "AI-röst avstängd",
   "AI voice: {voice}, starting.": "AI-röst: {voice}, startar.",
-  "AI voice: {voice}.": "AI-röst: {voice}.",
   "No mic open": "Ingen mikrofon öppen",
   "What others hear from your mic": "Vad andra hör från din mikrofon",
   "Getting Python ready…": "Förbereder Python…",
@@ -3978,7 +3977,6 @@
   "The computer voice ({voice}) speaks for you.": "Datorrösten ({voice}) pratar åt dig.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Stänger av alla röster som ändrar din mikrofon. Slår du på den kommer de tillbaka.",
   "Turns on: {voices}": "Slår på: {voices}",
-  "Voice changer: {voice}.": "Röstförvrängare: {voice}.",
   "Voices on or off": "Röster på eller av",
   "What you say is said in {language}.": "Det du säger sägs på {language}.",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board stängdes oväntat, så det startade igen.",
@@ -4816,5 +4814,8 @@
   "Pick one of ours": "Välj en av våra",
   "Remove server": "Ta bort server",
   "(AI voice)": "(AI-röst)",
-  "(Voice changer)": "(Röstförvrängare)"
+  "(Voice changer)": "(Röstförvrängare)",
+  "Pause this voice (click again to bring it back)": "Pausa den här rösten (klicka igen för att få tillbaka den)",
+  "Paused: click to turn this voice back on": "Pausad: klicka för att slå på rösten igen",
+  "Turn this voice off (Voices ON won't bring it back)": "Stäng av den här rösten (Röster PÅ tar inte tillbaka den)"
 }

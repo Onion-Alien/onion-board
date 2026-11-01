@@ -2713,7 +2713,6 @@
   ],
   "AI voice off": "Vocea AI oprită",
   "AI voice: {voice}, starting.": "Voce AI: {voice}, pornește.",
-  "AI voice: {voice}.": "Voce AI: {voice}.",
   "No mic open": "Niciun microfon deschis",
   "What others hear from your mic": "Ce aud ceilalți de la microfonul tău",
   "Getting Python ready…": "Se pregătește Python…",
@@ -4052,7 +4051,6 @@
   "The computer voice ({voice}) speaks for you.": "Vocea calculatorului ({voice}) vorbește în locul tău.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Oprește fiecare voce care îți schimbă microfonul. Pornirea le aduce înapoi.",
   "Turns on: {voices}": "Pornește: {voices}",
-  "Voice changer: {voice}.": "Schimbător de voce: {voice}.",
   "Voices on or off": "Voci pornite sau oprite",
   "What you say is said in {language}.": "Ce spui se spune în {language}.",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board s-a închis neașteptat, așa că a pornit din nou.",
@@ -4904,5 +4902,8 @@
   "Pick one of ours": "Alege una de-a noastră",
   "Remove server": "Elimină serverul",
   "(AI voice)": "(Voce AI)",
-  "(Voice changer)": "(Schimbător de voce)"
+  "(Voice changer)": "(Schimbător de voce)",
+  "Pause this voice (click again to bring it back)": "Pune pe pauză această voce (clic din nou ca s-o readuci)",
+  "Paused: click to turn this voice back on": "Pe pauză: clic ca să pornești din nou vocea",
+  "Turn this voice off (Voices ON won't bring it back)": "Oprește această voce (Voci PORNIT n-o va readuce)"
 }

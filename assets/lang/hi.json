@@ -2656,7 +2656,6 @@
   ],
   "AI voice off": "AI आवाज़ बंद",
   "AI voice: {voice}, starting.": "AI आवाज़: {voice}, शुरू हो रही है।",
-  "AI voice: {voice}.": "AI आवाज़: {voice}।",
   "No mic open": "कोई माइक नहीं खुला",
   "What others hear from your mic": "दूसरे आपके माइक से क्या सुनते हैं",
   "Getting Python ready…": "Python तैयार हो रहा है…",
@@ -3978,7 +3977,6 @@
   "The computer voice ({voice}) speaks for you.": "कंप्यूटर वाली आवाज़ ({voice}) आपकी जगह बोलती है।",
   "Turns off every voice changing your mic. Switching it on brings them back.": "आपके माइक को बदलने वाली हर आवाज़ बंद करता है। चालू करने पर वे वापस आ जाती हैं।",
   "Turns on: {voices}": "चालू करता है: {voices}",
-  "Voice changer: {voice}.": "वॉइस चेंजर: {voice}।",
   "Voices on or off": "आवाज़ें चालू या बंद",
   "What you say is said in {language}.": "आप जो कहते हैं वह {language} में कहा जाता है।",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board अचानक बंद हो गया, इसलिए यह फिर से शुरू हुआ।",
@@ -4816,5 +4814,8 @@
   "Pick one of ours": "हमारी में से चुनें",
   "Remove server": "सर्वर हटाएं",
   "(AI voice)": "(AI आवाज़)",
-  "(Voice changer)": "(वॉइस चेंजर)"
+  "(Voice changer)": "(वॉइस चेंजर)",
+  "Pause this voice (click again to bring it back)": "इस आवाज़ को रोकें (वापस लाने के लिए फिर क्लिक करें)",
+  "Paused: click to turn this voice back on": "रुकी हुई: इस आवाज़ को फिर चालू करने के लिए क्लिक करें",
+  "Turn this voice off (Voices ON won't bring it back)": "इस आवाज़ को बंद करें (आवाज़ें चालू इसे वापस नहीं लाएगा)"
 }

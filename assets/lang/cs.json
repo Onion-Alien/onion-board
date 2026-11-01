@@ -2713,7 +2713,6 @@
   ],
   "AI voice off": "AI hlas vypnutý",
   "AI voice: {voice}, starting.": "AI hlas: {voice}, spouští se.",
-  "AI voice: {voice}.": "AI hlas: {voice}.",
   "No mic open": "Žádný mikrofon otevřený",
   "What others hear from your mic": "Co ostatní slyší z tvého mikrofonu",
   "Getting Python ready…": "Připravuji Python…",
@@ -4052,7 +4051,6 @@
   "The computer voice ({voice}) speaks for you.": "Počítačový hlas ({voice}) mluví za tebe.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Vypne každý hlas, který mění tvůj mikrofon. Zapnutí je vrátí.",
   "Turns on: {voices}": "Zapne: {voices}",
-  "Voice changer: {voice}.": "Měnič hlasu: {voice}.",
   "Voices on or off": "Hlasy zap. nebo vyp.",
   "What you say is said in {language}.": "Co řekneš, zazní v jazyce {language}.",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board se nečekaně zavřel, a tak se znovu spustil.",
@@ -4904,5 +4902,8 @@
   "Pick one of ours": "Vybrat z našich",
   "Remove server": "Odebrat server",
   "(AI voice)": "(AI hlas)",
-  "(Voice changer)": "(Měnič hlasu)"
+  "(Voice changer)": "(Měnič hlasu)",
+  "Pause this voice (click again to bring it back)": "Pozastavit tento hlas (dalším kliknutím se vrátí)",
+  "Paused: click to turn this voice back on": "Pozastaveno: kliknutím hlas znovu zapneš",
+  "Turn this voice off (Voices ON won't bring it back)": "Vypnout tento hlas (Hlasy ZAP ho nevrátí)"
 }

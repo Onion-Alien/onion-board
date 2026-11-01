@@ -2654,7 +2654,6 @@
   "✓ Saved “{name}”: loading its voices…": "✓ „{name}“ е запазен: зареждам гласовете му…",
   "AI voice off": "AI гласът е изключен",
   "AI voice: {voice}, starting.": "AI глас: {voice}, стартира.",
-  "AI voice: {voice}.": "AI глас: {voice}.",
   "No mic open": "Няма отворен микрофон",
   "What others hear from your mic": "Какво чуват другите от микрофона ти",
   "That's a playlist: open one video and try again.": "Това е плейлист: отвори едно видео и опитай пак.",
@@ -3978,7 +3977,6 @@
   "The computer voice ({voice}) speaks for you.": "Компютърният глас ({voice}) говори вместо теб.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Изключва всеки глас, който променя микрофона ти. Включването го връща.",
   "Turns on: {voices}": "Включва: {voices}",
-  "Voice changer: {voice}.": "Промяна на гласа: {voice}.",
   "Voices on or off": "Гласове вкл. или изкл.",
   "What you say is said in {language}.": "Това, което казваш, се казва на {language}.",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board се затвори неочаквано, затова се стартира отново.",
@@ -4816,5 +4814,8 @@
   "Pick one of ours": "Избери от нашите",
   "Remove server": "Премахни сървъра",
   "(AI voice)": "(AI глас)",
-  "(Voice changer)": "(Промяна на гласа)"
+  "(Voice changer)": "(Промяна на гласа)",
+  "Pause this voice (click again to bring it back)": "Пауза на този глас (щракни пак, за да се върне)",
+  "Paused: click to turn this voice back on": "На пауза: щракни, за да включиш гласа отново",
+  "Turn this voice off (Voices ON won't bring it back)": "Изключи този глас (Гласове ВКЛ няма да го върне)"
 }

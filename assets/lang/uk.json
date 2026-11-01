@@ -2713,7 +2713,6 @@
   ],
   "AI voice off": "ШІ-голос вимкнено",
   "AI voice: {voice}, starting.": "ШІ-голос: {voice}, запускаю.",
-  "AI voice: {voice}.": "ШІ-голос: {voice}.",
   "No mic open": "Мікрофон не відкрито",
   "What others hear from your mic": "Що інші чують із вашого мікрофона",
   "Getting Python ready…": "Готую Python…",
@@ -4052,7 +4051,6 @@
   "The computer voice ({voice}) speaks for you.": "Комп'ютерний голос ({voice}) говорить за вас.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Вимикає всі голоси, що змінюють ваш мікрофон. Якщо ввімкнути, вони повернуться.",
   "Turns on: {voices}": "Увімкне: {voices}",
-  "Voice changer: {voice}.": "Зміна голосу: {voice}.",
   "Voices on or off": "Голоси увімк. або вимк.",
   "What you say is said in {language}.": "Те, що ви кажете, звучить мовою {language}.",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board неочікувано закрився, тому запустився знову.",
@@ -4904,5 +4902,8 @@
   "Pick one of ours": "Вибрати з наших",
   "Remove server": "Видалити сервер",
   "(AI voice)": "(ШІ-голос)",
-  "(Voice changer)": "(Зміна голосу)"
+  "(Voice changer)": "(Зміна голосу)",
+  "Pause this voice (click again to bring it back)": "Призупинити цей голос (клацніть ще раз, щоб повернути)",
+  "Paused: click to turn this voice back on": "Призупинено: клацніть, щоб знову ввімкнути голос",
+  "Turn this voice off (Voices ON won't bring it back)": "Вимкнути цей голос (Голоси УВІМК його не повернуть)"
 }

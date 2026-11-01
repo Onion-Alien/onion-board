@@ -2599,7 +2599,6 @@
   ],
   "AI voice off": "AI ボイス オフ",
   "AI voice: {voice}, starting.": "AI ボイス: {voice}、開始中。",
-  "AI voice: {voice}.": "AI ボイス: {voice}。",
   "No mic open": "マイクが開いていません",
   "What others hear from your mic": "マイクから相手に聞こえる音",
   "Getting Python ready…": "Python を準備中…",
@@ -3904,7 +3903,6 @@
   "The computer voice ({voice}) speaks for you.": "コンピューター音声（{voice}）があなたの代わりに話します。",
   "Turns off every voice changing your mic. Switching it on brings them back.": "マイクの声を変えているボイスをすべてオフにします。オンにすると元に戻ります。",
   "Turns on: {voices}": "オンにするもの: {voices}",
-  "Voice changer: {voice}.": "ボイスチェンジャー: {voice}。",
   "Voices on or off": "ボイス オン / オフ",
   "What you say is said in {language}.": "話した内容が{language}で読み上げられます。",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board が予期せず終了したため、再起動しました。",
@@ -4728,5 +4726,8 @@
   "Pick one of ours": "用意された画像から選ぶ",
   "Remove server": "サーバーを削除",
   "(AI voice)": "（AI ボイス）",
-  "(Voice changer)": "（ボイスチェンジャー）"
+  "(Voice changer)": "（ボイスチェンジャー）",
+  "Pause this voice (click again to bring it back)": "このボイスを一時停止（もう一度クリックで再開）",
+  "Paused: click to turn this voice back on": "一時停止中：クリックでこのボイスを再びオン",
+  "Turn this voice off (Voices ON won't bring it back)": "このボイスをオフ（ボイスONでも戻りません）"
 }

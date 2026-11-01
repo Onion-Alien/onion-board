@@ -2656,7 +2656,6 @@
   ],
   "AI voice off": "AI-stem uit",
   "AI voice: {voice}, starting.": "AI-stem: {voice}, start.",
-  "AI voice: {voice}.": "AI-stem: {voice}.",
   "No mic open": "Geen microfoon open",
   "What others hear from your mic": "Wat anderen via je microfoon horen",
   "Getting Python ready…": "Python klaarzetten…",
@@ -3978,7 +3977,6 @@
   "The computer voice ({voice}) speaks for you.": "De computerstem ({voice}) spreekt voor je.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Zet elke stem uit die je microfoon verandert. Aanzetten haalt ze terug.",
   "Turns on: {voices}": "Zet aan: {voices}",
-  "Voice changer: {voice}.": "Stemvervormer: {voice}.",
   "Voices on or off": "Stemmen aan of uit",
   "What you say is said in {language}.": "Wat je zegt, wordt in het {language} gezegd.",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board werd onverwacht gesloten en is daarom opnieuw gestart.",
@@ -4816,5 +4814,8 @@
   "Pick one of ours": "Kies een van de onze",
   "Remove server": "Server verwijderen",
   "(AI voice)": "(AI-stem)",
-  "(Voice changer)": "(Stemvervormer)"
+  "(Voice changer)": "(Stemvervormer)",
+  "Pause this voice (click again to bring it back)": "Deze stem pauzeren (klik nogmaals om hem terug te halen)",
+  "Paused: click to turn this voice back on": "Gepauzeerd: klik om deze stem weer aan te zetten",
+  "Turn this voice off (Voices ON won't bring it back)": "Deze stem uitzetten (Stemmen AAN haalt hem niet terug)"
 }

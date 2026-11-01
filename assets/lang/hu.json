@@ -2656,7 +2656,6 @@
   ],
   "AI voice off": "AI hang kikapcsolva",
   "AI voice: {voice}, starting.": "AI hang: {voice}, indul.",
-  "AI voice: {voice}.": "AI hang: {voice}.",
   "No mic open": "Nincs nyitva mikrofon",
   "What others hear from your mic": "Amit mások hallanak a mikrofonodról",
   "Getting Python ready…": "Python előkészítése…",
@@ -3978,7 +3977,6 @@
   "The computer voice ({voice}) speaks for you.": "A gépi hang ({voice}) beszél helyetted.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Kikapcsol minden hangot, ami a mikrofonodat változtatja. Bekapcsolva visszajönnek.",
   "Turns on: {voices}": "Bekapcsolja: {voices}",
-  "Voice changer: {voice}.": "Hangváltó: {voice}.",
   "Voices on or off": "Beszédhangok be vagy ki",
   "What you say is said in {language}.": "Amit mondasz, {language} nyelven hangzik el.",
   "Onion Board closed unexpectedly, so it started again.": "Az Onion Board váratlanul bezárult, ezért újraindult.",
@@ -4816,5 +4814,8 @@
   "Pick one of ours": "Válassz a mieinkből",
   "Remove server": "Szerver eltávolítása",
   "(AI voice)": "(AI hang)",
-  "(Voice changer)": "(Hangváltó)"
+  "(Voice changer)": "(Hangváltó)",
+  "Pause this voice (click again to bring it back)": "Hang szüneteltetése (kattints újra a visszahozásához)",
+  "Paused: click to turn this voice back on": "Szünetel: kattints a hang visszakapcsolásához",
+  "Turn this voice off (Voices ON won't bring it back)": "Hang kikapcsolása (a Hangok BE nem hozza vissza)"
 }
