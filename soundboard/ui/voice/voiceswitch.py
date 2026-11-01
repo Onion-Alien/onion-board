@@ -312,7 +312,10 @@ class VoiceSwitch(_Panel):
                                     m.language if who in ("read", "fx") and m else "")
 
     def _language_voices(self) -> list[dict]:
-        """The downloaded languages' voices, as cards for the AI voices' Languages."""
+        """The downloaded languages' voices, as cards for the AI voices' Languages;
+        none while the AI voices add-on can't read them (missing or too old)."""
+        if self.speech.voices_need:
+            return []
         langs = getattr(self.speech.ctl.tts, "languages", {})
         return [{"id": vid, "name": langnames.name(code, code), "language": code,
                  "about": _("{voice} reads your words in {language}. Pick it to speak "

@@ -12,7 +12,7 @@ from soundboard.addons import modules as mods
 from soundboard.core import langnames, usage
 from soundboard.sounds import library
 from soundboard.online import net
-from soundboard.speech import customvoices, translation
+from soundboard.speech import customvoices, piper, translation
 from soundboard.ui.kit import busy
 from soundboard.i18n import _
 
@@ -218,11 +218,10 @@ class SpeechLangs(_Panel):
         m = self._lang_on()
         lang = langnames.of(m) if m is not None else ""
         voice = self._voice_for(m) if m is not None else ""
-        # the language's own voice by its name ("Huayan"), or the Windows one reading
-        # a language that has none of its own
-        own = (str(m.voice.get("name") or "") or customvoices.label(voice)
-               if m is not None and voice else "")
-        if m is not None and not voice:
+        own = self.voice_name(m) if m is not None else ""
+        if m is not None and not voice and self._is_ready(m):   # its voice still to get
+            text = _("The {language} voice, once it's downloaded (below).", language=lang)
+        elif m is not None and not voice:
             text = _("The {language} voice, once {language} is downloaded (below).",
                      language=lang)
         elif who == "ai" and m is not None:
@@ -257,7 +256,20 @@ class SpeechLangs(_Panel):
         return self._ready[key]
 
     def _voice_for(self, m: mods.ModuleInfo) -> str:
-        return self.ctl.tts.voice_for(m.language, self.s["voice"])
+        """The voice `m`'s lines are read with: its own voice once it's downloaded and
+        the AI voices add-on can read it, else a Windows voice that speaks it ("": none)."""
+        tts = self.ctl.tts
+        if self.voices_need and hasattr(tts, "windows_voice_for"):
+            return tts.windows_voice_for(m.language, self.s["voice"])
+        return tts.voice_for(m.language, self.s["voice"])
+
+    def voice_name(self, m: mods.ModuleInfo) -> str:
+        """The name of the voice `_voice_for` reads `m` with: the language's own voice
+        ("Huayan") or the Windows one standing in ("Huihui"); "" when there's none."""
+        voice = self._voice_for(m)
+        if voice.startswith(piper.PREFIX):
+            return str(m.voice.get("name") or "") or customvoices.label(voice)
+        return customvoices.label(voice) if voice else ""
 
     def _refresh_translation(self):
         # Computing this state temporarily hides its buttons. Restore focus only
@@ -328,6 +340,20 @@ class SpeechLangs(_Panel):
                   "voices tab.", language=name) if self.voices_need == "get" else
                 _("The {language} voice needs the newest AI voices: press Update AI voices "
                   "under More options on the AI voices tab.", language=name))
+        elif m.voice and not voice.startswith(piper.PREFIX):
+            # downloaded before it had a voice: a Windows one reads it until it's in
+            size = translation.size_mb(m)
+            self.lbl_tr.setText(
+                _("{voice} reads {language} for now. The {language} voice is a {size} MB "
+                  "download.", voice=customvoices.label(voice), language=name, size=size)
+                if voice else
+                _("{language} needs its voice to be heard: a {size} MB download.",
+                  language=name, size=size))
+            i.b_dl.setText(_("Download the {language} voice", language=name))
+            i.b_dl.setVisible(not net.offline())
+            i.b_dl.setEnabled(not live and net.allowed("voices"))
+            i.b_dl.setToolTip(net.off_message("voices") if not net.allowed("voices") else
+                              _("Stop the voice to download this") if live else "")
         elif voice:
             # (Said by names the voice)
             self.lbl_tr.setText(_("Translation is quick but not perfect with slang."))

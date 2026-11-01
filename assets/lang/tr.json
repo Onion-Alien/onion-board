@@ -4868,5 +4868,9 @@
   "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ Diğerleri sizi birkaç saniye gecikmeyle {language} duyar: her cümle yazıya dökülür, çevrilir ve siz bitirince söylenir. Yapay zekâ sesi ve ses değiştiriciyle de çalışır; bu sırada gerçek sesiniz susturulur.",
   "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "{language} sesi için Yapay zekâ sesleri eklentisi gerekir: Yapay zekâ sesleri sekmesinden alın.",
   "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "{language} sesi için en yeni Yapay zekâ sesleri gerekir: Yapay zekâ sesleri sekmesinde Diğer seçenekler altından Yapay zekâ seslerini güncelle'ye basın.",
-  "({language} voice)": "({language} sesi)"
+  "({language} voice)": "({language} sesi)",
+  "Download the {language} voice": "{language} sesini indir",
+  "{language} needs its voice to be heard: a {size} MB download.": "{language} dilinin duyulması için kendi sesi gerekir: {size} MB'lık bir indirme.",
+  "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "Şimdilik {language} dilini {voice} okuyor. {language} sesi {size} MB'lık bir indirme.",
+  "The {language} voice, once it's downloaded (below).": "{language} sesi, indirildiğinde (aşağıda)."
 }

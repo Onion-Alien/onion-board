@@ -14,9 +14,9 @@ can't write anywhere else. The live-voice helper loads the folder with
 
 Its "voice" (a Piper voice that reads the translated lines out loud, through the AI
 voices add-on's reader.py) comes with it, into translation\\xx\\voice\\ (voice.onnx
-and voice.onnx.json, each checked against its sha256). A language downloaded before
-it had a voice isn't counted as downloaded until the voice is in too: Download then
-fetches just the voice.
+and voice.onnx.json, each checked against its sha256). The voice is an extra: a
+language downloaded before it had one still counts as downloaded (a Windows voice reads
+it meanwhile), and Download the voice then fetches just the voice.
 """
 from __future__ import annotations
 
@@ -72,7 +72,8 @@ def voice_ready(info) -> bool:
 
 
 def is_downloaded(info) -> bool:
-    return model_ready(info) and voice_ready(info)
+    """Its model is in: it translates. Its voice may still be missing (voice_ready)."""
+    return model_ready(info)
 
 
 def _parts(info) -> list[tuple[str, str, int, Path]]:

@@ -1041,8 +1041,9 @@ def test_a_language_downloads_with_its_own_voice(tmp_path):
 
 
 def test_a_language_downloaded_before_voices_fetches_just_its_voice(tmp_path, monkeypatch):
-    """Someone who downloaded Chinese before it had a voice: Download again gets only
-    the voice (the model's link isn't touched), and the model stays as it was."""
+    """Someone who downloaded Chinese before it had a voice: it stays downloaded (a
+    Windows voice reads it meanwhile), Download the voice gets only the voice (the
+    model's link isn't touched), and the model stays as it was."""
     from soundboard.speech import translation
     sha, size = model_package(tmp_path / "pkg.argosmodel")
     info = translation_info(tmp_path, sha, size)
@@ -1050,11 +1051,11 @@ def test_a_language_downloaded_before_voices_fetches_just_its_voice(tmp_path, mo
     model = translation.model_dir(info) / "model" / "model.bin"
     assert info.installed
     info.voice = _voice_files(tmp_path)             # the add-on now lists one
-    assert not info.installed and translation.model_ready(info)
+    assert info.installed and not translation.voice_ready(info)
     assert translation.size_mb(info) == 1           # just the voice (a few bytes here)
     info.download = {**info.download, "url": (tmp_path / "gone.zip").as_uri()}
     translation.download(info)
-    assert info.installed and model.read_bytes() == b"weights"
+    assert translation.voice_ready(info) and model.read_bytes() == b"weights"
 
 
 def test_a_voice_with_the_wrong_sum_is_thrown_away(tmp_path):

@@ -4776,5 +4776,9 @@
   "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ 相手には数秒遅れて{language}であなたの声が聞こえます: 1文話し終えるごとに文字に起こして翻訳し、読み上げます。AI ボイスやボイスチェンジャーとも一緒に使えます。その間、本当の声はミュートされます。",
   "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "{language}の音声には AI ボイスのアドオンが必要です: AI ボイスのタブから入手してください。",
   "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "{language}の音声には最新の AI ボイスが必要です: AI ボイスのタブの「その他のオプション」で「AI ボイスを更新」を押してください。",
-  "({language} voice)": "（{language}の音声）"
+  "({language} voice)": "（{language}の音声）",
+  "Download the {language} voice": "{language}の音声をダウンロード",
+  "{language} needs its voice to be heard: a {size} MB download.": "{language}を聞かせるには専用の音声が必要です: {size} MB のダウンロードです。",
+  "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "今は {voice} が{language}を読み上げます。{language}の音声は {size} MB のダウンロードです。",
+  "The {language} voice, once it's downloaded (below).": "{language}の音声（ダウンロード後。下を参照）。"
 }

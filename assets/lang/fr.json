@@ -4868,5 +4868,9 @@
   "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ Les autres t'entendent en {language} avec quelques secondes de retard : chaque phrase est écrite, traduite, puis dite une fois que tu l'as finie. Ça marche aussi avec la voix IA et le changeur de voix ; ta vraie voix est coupée pendant ce temps.",
   "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "La voix en {language} a besoin de l'extension Voix IA : récupère-la dans l'onglet Voix IA.",
   "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "La voix en {language} a besoin des Voix IA les plus récentes : clique sur Mettre à jour les voix IA dans Plus d'options, onglet Voix IA.",
-  "({language} voice)": "(voix en {language})"
+  "({language} voice)": "(voix en {language})",
+  "Download the {language} voice": "Télécharger la voix en {language}",
+  "{language} needs its voice to be heard: a {size} MB download.": "Le {language} a besoin de sa voix pour être entendu : un téléchargement de {size} Mo.",
+  "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "{voice} lit le {language} pour l'instant. La voix en {language} est un téléchargement de {size} Mo.",
+  "The {language} voice, once it's downloaded (below).": "La voix en {language}, une fois téléchargée (ci-dessous)."
 }

@@ -4776,5 +4776,9 @@
   "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ คนอื่นจะได้ยินคุณเป็นภาษา {language} ช้าไปไม่กี่วินาที: แต่ละประโยคจะถูกถอดเป็นข้อความ แปล แล้วพูดเมื่อคุณพูดประโยคนั้นจบ ใช้กับเสียง AI และตัวเปลี่ยนเสียงได้ด้วย ระหว่างนั้นเสียงจริงของคุณจะถูกปิด",
   "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "เสียงภาษา{language}ต้องใช้ส่วนเสริมเสียง AI: ติดตั้งได้ที่แท็บเสียง AI",
   "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "เสียงภาษา{language}ต้องใช้เสียง AI รุ่นล่าสุด: กดอัปเดตเสียง AI ในตัวเลือกเพิ่มเติมของแท็บเสียง AI",
-  "({language} voice)": "(เสียงภาษา{language})"
+  "({language} voice)": "(เสียงภาษา{language})",
+  "Download the {language} voice": "ดาวน์โหลดเสียงภาษา{language}",
+  "{language} needs its voice to be heard: a {size} MB download.": "ภาษา{language}ต้องมีเสียงของตัวเองจึงจะได้ยิน: ดาวน์โหลด {size} MB",
+  "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "ตอนนี้ {voice} อ่านภาษา{language}ไปก่อน เสียงภาษา{language}ต้องดาวน์โหลด {size} MB",
+  "The {language} voice, once it's downloaded (below).": "เสียงภาษา{language} เมื่อดาวน์โหลดแล้ว (ด้านล่าง)"
 }

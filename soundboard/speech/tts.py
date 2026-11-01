@@ -221,11 +221,14 @@ class SapiTTS:
                 return True
             return False
 
-    def voice_for(self, lang: str, prefer: str = "") -> str:
+    def voice_for(self, lang: str, prefer: str = "", among: list[str] | None = None) -> str:
         """A voice that speaks `lang` ("de", "zh", "pt-BR"…): `prefer` if it does,
         else the first one installed; "" when Windows has none. For a language with
         a country, a voice from that country comes first, then any of the language
-        (a zh-CN voice reads Traditional Chinese too)."""
+        (a zh-CN voice reads Traditional Chinese too). `among`: only these voices."""
+        voices = self.voices if among is None else among
+        if among is not None and prefer not in among:
+            prefer = ""
         want = lang.lower()
         base = want.split("-")[0]
 
@@ -240,7 +243,7 @@ class SapiTTS:
         for ok in (exact, speaks):
             if prefer and ok(prefer):
                 return prefer
-            if v := next((v for v in self.voices if ok(v)), ""):
+            if v := next((v for v in voices if ok(v)), ""):
                 return v
         return ""
 

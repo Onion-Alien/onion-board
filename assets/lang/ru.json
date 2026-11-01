@@ -4960,5 +4960,9 @@
   "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ Другие слышат тебя на {language} с задержкой в несколько секунд: каждое предложение записывается, переводится и произносится, когда ты его договоришь. Работает и с ИИ-голосом, и со сменой голоса; твой настоящий голос в это время заглушён.",
   "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "Голосу для языка «{language}» нужно дополнение «ИИ-голоса»: скачай его на вкладке «ИИ-голоса».",
   "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "Голосу для языка «{language}» нужны новейшие ИИ-голоса: на вкладке «ИИ-голоса» в «Больше настроек» нажми «Обновить ИИ-голоса».",
-  "({language} voice)": "(голос для языка «{language}»)"
+  "({language} voice)": "(голос для языка «{language}»)",
+  "Download the {language} voice": "Скачать голос для языка «{language}»",
+  "{language} needs its voice to be heard: a {size} MB download.": "Языку «{language}» нужен свой голос, чтобы его было слышно: загрузка на {size} МБ.",
+  "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "Пока язык «{language}» читает {voice}. Голос для языка «{language}» — загрузка на {size} МБ.",
+  "The {language} voice, once it's downloaded (below).": "Голос для языка «{language}», когда он скачается (ниже)."
 }

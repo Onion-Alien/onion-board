@@ -442,8 +442,8 @@ class VoiceSet(SapiTTS):
 
     def voice_for(self, lang: str, prefer: str = "") -> str:
         """The voice translated lines in `lang` ("de", "zh-TW"…) are read with: that
-        language's own voice, once it's downloaded. Only a language that comes without
-        one (its add-on lists no "voice") falls back to a Windows voice that speaks it."""
+        language's own voice, once it's downloaded; until then (or for a language that
+        has none) a Windows voice that speaks it."""
         want = lang.lower()
         for vid, (_f, code, _n) in self.languages.items():
             if code.lower() == want:
@@ -452,6 +452,13 @@ class VoiceSet(SapiTTS):
         return next((vid for vid, (_f, code, _n) in self.languages.items()
                      if code.lower().split("-")[0] == base), "") \
             or super().voice_for(lang, prefer)
+
+    def windows_voice_for(self, lang: str, prefer: str = "") -> str:
+        """A Windows voice that speaks `lang`, never a custom or a language's own one:
+        for when a language's own voice can't be read (no AI voices add-on, or an old
+        one without reader.py)."""
+        return super().voice_for(lang, prefer, among=[
+            v for v in self.voices if not v.startswith((PREFIX, piper.PREFIX))])
 
     def warm_language(self, voice: str) -> None:
         """Load a language's voice now (a few seconds the first time), so the first

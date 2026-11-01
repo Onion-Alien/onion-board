@@ -4776,5 +4776,9 @@
   "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ Người khác nghe bạn bằng {language} trễ vài giây: mỗi câu được chép lại, dịch, rồi đọc lên khi bạn nói xong câu đó. Tính năng này hoạt động với cả giọng AI và bộ đổi giọng; trong lúc đó giọng thật của bạn bị tắt tiếng.",
   "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "Giọng {language} cần tiện ích Giọng AI: tải ở thẻ Giọng AI.",
   "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "Giọng {language} cần Giọng AI mới nhất: bấm Cập nhật giọng AI trong Nhiều lựa chọn hơn ở thẻ Giọng AI.",
-  "({language} voice)": "(giọng {language})"
+  "({language} voice)": "(giọng {language})",
+  "Download the {language} voice": "Tải giọng {language}",
+  "{language} needs its voice to be heard: a {size} MB download.": "{language} cần giọng riêng để nghe được: tải xuống {size} MB.",
+  "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "Tạm thời {voice} đọc {language}. Giọng {language} cần tải xuống {size} MB.",
+  "The {language} voice, once it's downloaded (below).": "Giọng {language}, sau khi tải xuống (bên dưới)."
 }

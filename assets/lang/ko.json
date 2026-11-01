@@ -4776,5 +4776,9 @@
   "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ 다른 사람에게는 몇 초 늦게 {language}(으)로 들립니다: 한 문장을 마치면 받아 적고, 번역한 다음 말합니다. AI 음성, 보이스 체인저와도 함께 작동하며, 그동안 실제 목소리는 음소거됩니다.",
   "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "{language} 음성에는 AI 음성 애드온이 필요합니다: AI 음성 탭에서 받으세요.",
   "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "{language} 음성에는 최신 AI 음성이 필요합니다: AI 음성 탭의 추가 옵션에서 AI 음성 업데이트를 누르세요.",
-  "({language} voice)": "({language} 음성)"
+  "({language} voice)": "({language} 음성)",
+  "Download the {language} voice": "{language} 음성 다운로드",
+  "{language} needs its voice to be heard: a {size} MB download.": "{language}가 들리려면 음성이 필요합니다: {size}MB 다운로드입니다.",
+  "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "지금은 {voice}이(가) {language}를 읽습니다. {language} 음성은 {size}MB 다운로드입니다.",
+  "The {language} voice, once it's downloaded (below).": "{language} 음성, 다운로드하면 사용됩니다 (아래)."
 }

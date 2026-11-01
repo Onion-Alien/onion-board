@@ -4868,5 +4868,9 @@
   "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ Οι άλλοι σε ακούνε στα {language} με λίγα δευτερόλεπτα καθυστέρηση: κάθε πρόταση γράφεται, μεταφράζεται και λέγεται μόλις την τελειώσεις. Δουλεύει και με τη φωνή AI και την αλλαγή φωνής· η πραγματική σου φωνή είναι σε σίγαση στο μεταξύ.",
   "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "Η φωνή για {language} χρειάζεται το πρόσθετο Φωνές AI: πάρ' το από την καρτέλα Φωνές AI.",
   "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "Η φωνή για {language} χρειάζεται τις πιο πρόσφατες Φωνές AI: πάτα Ενημέρωση φωνών AI στις Περισσότερες επιλογές της καρτέλας Φωνές AI.",
-  "({language} voice)": "(φωνή για {language})"
+  "({language} voice)": "(φωνή για {language})",
+  "Download the {language} voice": "Λήψη της φωνής για {language}",
+  "{language} needs its voice to be heard: a {size} MB download.": "Τα {language} χρειάζονται τη φωνή τους για να ακούγονται: λήψη {size} MB.",
+  "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "Η φωνή {voice} διαβάζει {language} προς το παρόν. Η φωνή για {language} είναι λήψη {size} MB.",
+  "The {language} voice, once it's downloaded (below).": "Η φωνή για {language}, μόλις γίνει λήψη (παρακάτω)."
 }

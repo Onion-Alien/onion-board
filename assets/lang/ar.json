@@ -5236,5 +5236,9 @@
   "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ يسمعك الآخرون بـ{language} متأخرًا بضع ثوانٍ: كل جملة تُكتب ثم تُترجم ثم تُنطق بعد أن تنهيها. يعمل مع صوت الذكاء الاصطناعي ومغيّر الصوت أيضًا؛ وصوتك الحقيقي مكتوم في الأثناء.",
   "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "صوت {language} يحتاج إلى إضافة أصوات الذكاء الاصطناعي: احصل عليها من تبويب أصوات الذكاء الاصطناعي.",
   "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "صوت {language} يحتاج إلى أحدث أصوات الذكاء الاصطناعي: اضغط تحديث أصوات الذكاء الاصطناعي ضمن المزيد من الخيارات في تبويب أصوات الذكاء الاصطناعي.",
-  "({language} voice)": "(صوت {language})"
+  "({language} voice)": "(صوت {language})",
+  "Download the {language} voice": "تنزيل صوت {language}",
+  "{language} needs its voice to be heard: a {size} MB download.": "تحتاج {language} إلى صوتها لتُسمع: تنزيل بحجم {size} ميغابايت.",
+  "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "يقرأ {voice} بلغة {language} حاليًا. صوت {language} تنزيل بحجم {size} ميغابايت.",
+  "The {language} voice, once it's downloaded (below).": "صوت {language}، بعد تنزيله (أدناه)."
 }

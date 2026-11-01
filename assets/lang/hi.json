@@ -4868,5 +4868,9 @@
   "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ दूसरे आपको {language} में कुछ सेकंड देर से सुनते हैं: हर वाक्य लिखा जाता है, अनुवाद होता है, फिर आपके पूरा बोलने के बाद बोला जाता है। यह AI आवाज़ और वॉइस चेंजर के साथ भी काम करता है; तब तक आपकी असली आवाज़ म्यूट रहती है।",
   "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "{language} की आवाज़ को AI आवाज़ें ऐड-ऑन चाहिए: इसे AI आवाज़ें टैब से लें।",
   "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "{language} की आवाज़ को सबसे नई AI आवाज़ें चाहिए: AI आवाज़ें टैब में और विकल्प के अंदर AI आवाज़ें अपडेट करें दबाएँ।",
-  "({language} voice)": "({language} की आवाज़)"
+  "({language} voice)": "({language} की आवाज़)",
+  "Download the {language} voice": "{language} की आवाज़ डाउनलोड करें",
+  "{language} needs its voice to be heard: a {size} MB download.": "{language} को सुनाई देने के लिए अपनी आवाज़ चाहिए: {size} MB का डाउनलोड।",
+  "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "अभी {voice} {language} पढ़ रही है। {language} की आवाज़ {size} MB का डाउनलोड है।",
+  "The {language} voice, once it's downloaded (below).": "{language} की आवाज़, डाउनलोड होने के बाद (नीचे)।"
 }

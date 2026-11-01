@@ -445,6 +445,8 @@ def test_a_language_with_nobody_else_to_say_it_is_read_by_its_own_voice(panel, m
     monkeypatch.setattr("soundboard.speech.spoken.heard", lambda: True)
     s = p.speech
     s.set_modules(p.modules)
+    s.voices_need = ""                             # its voice downloaded, and readable
+    monkeypatch.setattr(s.ctl.tts, "voice_for", lambda lang, prefer="": "piper:" + lang)
     asked = []
     monkeypatch.setattr(s.livevoice, "translate_for", asked.append)
     s.set_language("de")
@@ -1539,6 +1541,78 @@ def test_said_by_names_who_speaks(panel, monkeypatch):
     assert sp_who(sp, "Huayan")
 
 
+
+def _chinese_windows_voice(sp, monkeypatch):
+    """Windows has a Chinese voice, Huihui, beside the language's own one."""
+    monkeypatch.setattr(sp.livevoice, "translate_for", lambda who: None)
+    tts_ = sp.ctl.tts
+    monkeypatch.setattr(tts_, "voices", ["Microsoft Zira Desktop",
+                                         "Microsoft Huihui Desktop", "piper:zh"])
+    monkeypatch.setattr(tts_, "voice_langs", {"Microsoft Zira Desktop": "en-US",
+                                              "Microsoft Huihui Desktop": "zh-CN",
+                                              "piper:zh": "zh"})
+
+
+@pytest.mark.parametrize("need", ["get", "update"])
+def test_a_language_voice_falls_back_to_windows_without_new_ai_voices(panel, monkeypatch,
+                                                                      need):
+    """No AI voices add-on, or one from before the language voices (no reader.py): the
+    language's own voice can't be read, so a Windows voice that speaks it reads the
+    lines, Said by and the bar name that one, and the Languages cards are hidden."""
+    p, _ = panel
+    sp = p.speech
+    _chinese_downloaded(sp)
+    _chinese_windows_voice(sp, monkeypatch)
+    monkeypatch.setattr(sp.ctl.tts, "languages", {"piper:zh": (None, "zh", "Huayan (Chinese)")})
+    sp.voices_need = need
+    sp.cb_lang.setCurrentIndex(sp.cb_lang.findData("zh"))
+    sp._refresh_translation()
+    zh = sp._lang_on()
+    assert sp._voice_for(zh) == "Microsoft Huihui Desktop"
+    assert sp_who(sp, "Huihui")
+    assert p._lang_bar_name() == "Huihui"
+    sp.livevoice._live_args()
+    assert sp.ctl.live_voice == "Microsoft Huihui Desktop"   # never piper:zh
+    assert p._language_voices() == []
+    sp.voices_need = ""                                # the new add-on: its own voice
+    sp._refresh_translation()
+    assert sp._voice_for(zh) == "piper:zh" and sp_who(sp, "Huayan")
+    assert p._lang_bar_name() == "Huayan"
+    assert [v["id"] for v in p._language_voices()] == ["piper:zh"]
+
+
+def test_a_language_downloaded_without_its_voice_still_speaks(panel, monkeypatch):
+    """Chinese downloaded before it came with a voice: it's still downloaded, a Windows
+    voice reads it, and Download the Chinese voice offers the rest."""
+    import shutil
+    from soundboard.speech import translation
+    p, _ = panel
+    sp = p.speech
+    _chinese_downloaded(sp)
+    zh = next(m for m in sp.langs if m.language == "zh")
+    shutil.rmtree(translation.model_dir(zh) / "voice")
+    _chinese_windows_voice(sp, monkeypatch)
+    monkeypatch.setattr(sp.ctl.tts, "languages", {})
+    sp.voices_need = ""
+    assert zh.installed
+    sp.cb_lang.setCurrentIndex(sp.cb_lang.findData("zh"))
+    sp._refresh_translation()
+    assert sp.translating() is zh
+    assert sp._voice_for(zh) == "Microsoft Huihui Desktop" and sp_who(sp, "Huihui")
+    assert sp.lbl_tr.text().startswith("Huihui reads Chinese for now.")
+    monkeypatch.setattr(sp.ctl.tts, "voices", ["Microsoft Zira Desktop"])
+    sp._refresh_translation()                          # no Chinese Windows voice either
+    assert sp.lbl_who.text() == "The Chinese voice, once it's downloaded (below)."
+    assert sp.installs.b_dl.text() == "Download the Chinese voice"
+    monkeypatch.setattr(sp.ctl.tts, "voices", ["Microsoft Zira Desktop",
+                                               "Microsoft Huihui Desktop"])
+    sp._refresh_translation()
+    assert not sp.installs.b_dl.isHidden()
+    assert sp.installs.b_dl.text() == "Download the Chinese voice"
+    assert p._lang_bar_name() == "Huihui"
+    sp.livevoice._live_args()
+    assert sp.ctl.live_voice == "Microsoft Huihui Desktop"
+
 def test_speak_in_starts_off_for_a_language_saved_switched_off(qapp, monkeypatch):
     """A language saved switched off (or from before the switch) shows Don't
     translate, and is still remembered."""
@@ -2624,6 +2698,7 @@ def test_languages_say_when_ai_voices_is_missing_or_too_old(panel, monkeypatch, 
     p.ai.module = None
     p.rescan_modules(p.modules, [])
     assert sp.voices_need == "get" and "needs the AI voices add-on" in sp.lbl_tr.text()
+    assert p.lang_bar.picked_name.text() != "Huayan"   # it can't read: not named
     old = tmp_path / "ai-voices"
     (old / ".venv" / "Scripts").mkdir(parents=True)
     (old / ".venv" / "Scripts" / "python.exe").write_bytes(b"x")
@@ -2636,3 +2711,4 @@ def test_languages_say_when_ai_voices_is_missing_or_too_old(panel, monkeypatch, 
     (old / "reader.py").write_text("")
     p.rescan_modules(found, [])
     assert sp.voices_need == "" and "not perfect with slang" in sp.lbl_tr.text()
+    assert p.lang_bar.picked_name.text() == "Huayan"   # the new add-on: its row follows
