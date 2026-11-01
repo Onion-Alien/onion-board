@@ -12,6 +12,7 @@ from __future__ import annotations
 import html
 import logging
 import threading
+import time
 from collections.abc import Callable
 
 from PySide6.QtCore import QEvent, QPoint, Qt, QTimer, Signal
@@ -39,6 +40,7 @@ log = logging.getLogger(__name__)
 PREVIEW = "__store_preview"   # the store's "hear it first" voice (headphones only)
 SEARCH_WAIT_MS = 400          # typing pauses this long before the store is searched
 LINK_TICK_MS = 250            # how often the cards look at what the player is doing
+KEEP_S = 300                  # a list (and the categories) shown again this long without asking
 # the Sounds dropdown's first two (every sound, in an order): the order -> its key there
 TOPS = {"trending": "@trending", "top": "@top", "new": "@new"}
 # ... then Community uploads (the store's own sounds, store.OURS), then a line and the categories
@@ -96,6 +98,10 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         net.on_change(self._net_changed)   # Settings > Privacy's switch, Offline mode
         self._cat = ""            # the category picked ("" all)
         self._have_cats = False   # the categories came (the dropdown has more than its tops)
+        # the lists already had, by (mode, order, search, category, kind): (when, items,
+        # more), so switching back shows one at once; Refresh asks again
+        self._kept: dict[tuple, tuple[float, list, bool]] = {}
+        self._kept_cats: tuple[float, object] | None = None
 
         # the whole tab's width, as the Sounds tab: a wide window gets more cards a row
         col = QVBoxLayout(self)
@@ -178,7 +184,7 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         self.btn_share.clicked.connect(lambda: self.share_voice() if self._mode == "voices"
                                        else self.share())
         self.btn_reload = icon_button("reload", _("Refresh"))
-        self.btn_reload.clicked.connect(lambda: self.reload())
+        self.btn_reload.clicked.connect(lambda: self.reload(fresh=True))
         # (in a box that only asks for the two rows' width: asking for one row's, a
         # narrow tab could never get narrow enough to switch to two)
         self.toolbar = QWidget()
@@ -439,11 +445,17 @@ class StoreTab(StoreFit, StorePlay, QWidget):
             self._fit_toolbar()
 
     def _fetch_cats(self):
+        kept = self._kept_cats
+        if kept is not None and time.monotonic() - kept[0] < KEEP_S:
+            self._on_cats(kept[1])
+            return
         install = self.install()
 
         def run():
             try:
-                busy.emit(self._cats, store.categories(install))
+                got = store.categories(install)
+                self._kept_cats = (time.monotonic(), got)
+                busy.emit(self._cats, got)
             except Exception as e:  # noqa: BLE001 - the list says why; the chips just wait
                 log.info("couldn't read the store's categories: %s", e)
                 busy.emit(self._cats, None)
@@ -488,7 +500,8 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         the user to do but wait."""
         self.failed = True
         self._fit_buns()
-        self.oops.show_problem(title, html.escape(line, quote=False), self.reload,
+        self.oops.show_problem(title, html.escape(line, quote=False),
+                               lambda: self.reload(fresh=True),
                                fixable=fixable)
         self.stack.setCurrentWidget(self.oops_page)
 
@@ -496,12 +509,21 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         if self._msg_do is not None:
             self._msg_do()
 
-    def reload(self):
+    def reload(self, fresh: bool = False):
         """The list again from the top (the search, the order or the category changed,
-        Refresh)."""
+        Refresh). One had in the last few minutes is shown again as it was; `fresh`
+        (Refresh, Try again) asks the store for everything again."""
         self._search_wait.stop()
         self._offset = 0
+        if fresh:
+            self._kept.clear()
+            self._kept_cats = None
+            if self._have_cats and self._mode == "sounds":   # (their counts too)
+                self._fetch_cats()
         self._fetch_list(replace=True)
+
+    def _list_key(self) -> tuple:
+        return (self._mode, self._sort_key(), self.search.text().strip(), self._cat, self._kind)
 
     def more(self):
         self._fetch_list(replace=False)
@@ -516,6 +538,13 @@ class StoreTab(StoreFit, StorePlay, QWidget):
             self._clear()
             self._say("offline", _("The store is off"), net.off_message(store.FEATURE),
                       _("Privacy && security settings"), self._open_privacy)
+            return
+        key = self._list_key()
+        kept = self._kept.get(key) if replace else None
+        if kept is not None and time.monotonic() - kept[0] < KEEP_S:
+            self._serial += 1
+            busy.set_busy(self.btn_more, False)
+            self._on_listed(self._serial, (True, list(kept[1]), False, None), kept[2], "")
             return
         self._serial += 1
         serial, sort, query, offset, cat = (self._serial, self._sort_key(), self.search.text(),
@@ -535,18 +564,19 @@ class StoreTab(StoreFit, StorePlay, QWidget):
                     found, more = storevoices.browse(install, kind, sort, query, offset)
                 else:
                     found, more = store.browse(install, sort, query, offset, cat)
-                busy.emit(self._listed, serial, (replace, found, False), more, "")
+                busy.emit(self._listed, serial, (replace, found, False, key), more, "")
             except Exception as e:  # noqa: BLE001 - offline, switched off, the server…
                 log.info("couldn't read the store: %s", e)
                 busy.emit(self._listed, serial,
-                          (replace, None, e if isinstance(e, store.StoreDown) else None), False,
+                          (replace, None, e if isinstance(e, store.StoreDown) else None, None),
+                          False,
                           error_text(e))
         threading.Thread(target=run, daemon=True, name="store-list").start()
 
     def _on_listed(self, serial: int, got, more: bool, err: str):
         if self._closed or serial != self._serial:
             return
-        replace, found, down = got
+        replace, found, down, key = got
         busy.set_busy(self.btn_more, False)
         self._share_look()
         if found is None:
@@ -560,6 +590,12 @@ class StoreTab(StoreFit, StorePlay, QWidget):
             else:
                 busy.toast(self.window(), html.escape(err), "error")
             return
+        if key is not None:   # (None: shown from _kept)
+            now = time.monotonic()
+            self._kept = {k: v for k, v in self._kept.items() if now - v[0] < KEEP_S}
+            had = None if replace else self._kept.get(key)
+            self._kept[key] = ((had[0], had[1] + list(found), more) if had
+                               else (now, list(found), more))
         if replace:
             self._clear()
         self._offset += len(found)
@@ -708,6 +744,10 @@ class StoreTab(StoreFit, StorePlay, QWidget):
 
     def _on_voted(self, row: SoundRow, counts, err: str):
         self._busy.discard((row.sound.id, "vote"))
+        for _t, items, _m in self._kept.values():   # the same sound in the other lists kept
+            for s in items:
+                if s.id == row.sound.id and s is not row.sound:
+                    s.up, s.down, s.mine = counts
         if not self._row_alive(row):
             return
         row.sound.up, row.sound.down, row.sound.mine = counts
@@ -775,6 +815,6 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         from soundboard.ui.store.storevoices import open_share
         dlg = open_share(self, self.install(), self.voices, pick)
         if dlg is not None:
-            dlg.accepted.connect(lambda: self._mode == "voices" and self.reload())
+            dlg.accepted.connect(lambda: self._mode == "voices" and self.reload(fresh=True))
 
 

@@ -320,7 +320,7 @@ def test_share_is_greyed_out_while_the_store_is_down(qapp, fake, monkeypatch):
         store._failing.clear()   # (the categories answer again)
         return plain(*a, **k)
     monkeypatch.setattr(store, "_request", fixed)
-    t.reload()
+    t.reload(fresh=True)
     assert _wait(qapp, lambda: t.btn_share.isEnabled())
     assert t.btn_share.toolTip() == ""
     t.shutdown()
@@ -538,16 +538,19 @@ def test_categories_filter_the_list(qapp, fake):
     assert _wait(qapp, lambda: "cat=" not in fake.calls[-1][1])
     # every sound, newest first: the box says Newest
     assert pick.currentData() == "@new"
+    # Trending was had when the tab opened: shown again as it was, the store not asked
+    asked = len(fake.calls)
     pick.activated.emit(pick.findData("@trending"))
-    assert _wait(qapp, lambda: "sort=trending" in fake.calls[-1][1])
-    pick.activated.emit(pick.findData("@new"))     # and picked from the box itself
-    assert _wait(qapp, lambda: "sort=new" in fake.calls[-1][1] and "cat=" not in fake.calls[-1][1])
-    # Most liked: every sound by votes, and back
+    assert _wait(qapp, lambda: len(t._rows) == 2)
+    assert len(fake.calls) == asked and pick.currentData() == "@trending"
+    # Most liked: every sound by votes, not had yet
     pick.activated.emit(pick.findData("@top"))
     assert _wait(qapp, lambda: "sort=top" in fake.calls[-1][1] and "cat=" not in fake.calls[-1][1])
-    t.set_sort("trending")
-    assert _wait(qapp, lambda: "sort=trending" in fake.calls[-1][1])
-    assert pick.currentData() == "@trending"
+    # Refresh asks for the list and the categories again
+    asked = len(fake.calls)
+    t.btn_reload.click()
+    assert _wait(qapp, lambda: sum(c[1] == "/v1/categories" for c in fake.calls) == 2
+                 and any("sort=top" in c[1] for c in fake.calls[asked:]))
     t.shutdown()
 
 
