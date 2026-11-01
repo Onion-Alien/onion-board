@@ -8,6 +8,7 @@ from PySide6.QtGui import QImage, QPainter
 
 from soundboard.ui.bun import bunacts
 from soundboard.ui.bun.bunskitkit import Kit
+from test_mainwindow import window  # noqa: F401
 
 ACTS = (bunacts.SNIP, bunacts.MIC, bunacts.RECORDING, bunacts.BIN_ACT, bunacts.BRING_BACK,
         bunacts.BYE, bunacts.PAT, bunacts.RUN, bunacts.OPEN, bunacts.GIFT)
@@ -141,23 +142,23 @@ def test_edit_bun_sits_at_his_desk_mixes_while_it_plays_and_goes_off_to_work(qap
     assert b._task is None                         # done: back at the desk
 
 
-def test_bin_hand_rips_throws_and_peels_with_the_callbacks_in_order(qapp):
-    from PySide6.QtCore import QPointF, QRect
-    from PySide6.QtGui import QPixmap
-    from PySide6.QtWidgets import QWidget
-    from soundboard.ui.bun import binhand
-    host = QWidget()
-    host.resize(400, 300)
-    hand = binhand.BinHand(host, lambda: QPointF(60, 60))
-    for kind, secs in (("throw", binhand.THROW_S), ("peel", binhand.PEEL_S)):
-        said = []
-        pic = QPixmap(120, 14)
-        getattr(hand, kind)(pic, QRect(20, 150, 120, 14), lambda said=said: said.append("grab"),
-                            lambda said=said: said.append("rip"))
-        for t in [i * secs / 30 for i in range(31)]:
-            hand._at = time.monotonic() - t
-            hand._tick()
-            if hand.playing:
-                hand.grab()   # every frame draws
-        assert said == ["grab", "rip"] and not hand.playing
-    hand.finish()
+
+def test_edit_bun_goes_with_the_advanced_view(window):  # noqa: F811
+    from soundboard.ui.sounds.dialogs import EditDialog
+    d = EditDialog(window.meta("s0"), window.hotkeys, lambda *a: None, window)
+    assert d._head.indexOf(d.bun) == 0
+    d.set_advanced(True)
+    assert d.adv.bar.indexOf(d.bun) == 0 and d._head.indexOf(d.bun) < 0   # in one card
+    d.set_advanced(False)
+    assert d._head.indexOf(d.bun) == 0 and d.adv.bar.indexOf(d.bun) < 0
+
+
+
+def test_his_act_is_there_from_the_first_paint(qapp):
+    """No bare Bun with the bin, desk or parcel popping in a frame later."""
+    for act in (bunacts.BIN_ACT, bunacts.PAT, bunacts.GIFT):
+        b = bunacts.ActBunny(act)
+        assert b.skit_playing   # before any tick
+        assert b._skit_frame(time.monotonic()).world
+    e = bunacts.EditBunny()
+    assert e._skit_frame(time.monotonic()).world   # the desk

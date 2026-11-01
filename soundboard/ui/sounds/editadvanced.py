@@ -193,7 +193,7 @@ class AdvancedView(QWidget):
         # the top line: the sound's name and hotkey (the same as on the Sound tab, which
         # keeps the rest; its volume is in Speed & loudness), then the Simple | Advanced
         # switch
-        top = QHBoxLayout()
+        top = self.top = QHBoxLayout()
         top.setSpacing(8)
         self.name = QLineEdit(d.name.text())
         self.name.setFont(d.name.font())
@@ -215,7 +215,7 @@ class AdvancedView(QWidget):
 
         # the editor: its buttons, the trim (big), what the handles do
         self.editor, ev = card()
-        bar = QHBoxLayout()
+        bar = self.bar = QHBoxLayout()
         bar.setSpacing(8)
         self.btn_play = QPushButton(_("Preview"))
         icons.set_icon(self.btn_play, "headphones")

@@ -1230,6 +1230,7 @@ class EditDialog(EditDialogParts, QDialog):
             self.simple.show()
             self.setMinimumSize(self._simple_min_w(), 0)
             self.resize(self._simple_size or QSize(max(540, self.minimumWidth()), 640))
+        self._move_bun(on)
         self.switch.set_advanced(on)
         if self.adv is not None:
             self.adv.switch.set_advanced(on)
@@ -1239,6 +1240,19 @@ class EditDialog(EditDialogParts, QDialog):
             x = min(max(g.x(), screen.left()), screen.right() - g.width())
             y = min(max(g.y(), screen.top()), screen.bottom() - g.height())
             self.move(max(x, screen.left()), max(y, screen.top()))
+
+    def _move_bun(self, advanced: bool):
+        """Bun goes with the view: the start of the editor card's button row in Advanced
+        (the waveform under it gives up the height), or of Simple's top line."""
+        homes = [self._head] + ([self.adv.bar] if self.adv is not None else [])
+        for lay in homes:
+            i = lay.indexOf(self.bun)
+            if i >= 0:
+                take_out(lay, i)
+        self.bun.set_height(bunacts.ADV_H if advanced else bunacts.ACT_H)
+        (homes[-1] if advanced else self._head).insertWidget(0, self.bun, 0,
+                                                             Qt.AlignmentFlag.AlignVCenter)
+        self.bun.show()
 
     def set_player(self, player: QWidget):
         """The board's player (ui/sounds/editplayer.py), over the Save row: a big

@@ -5,8 +5,8 @@ then a one-off, `play`) the way the Live controls' DJ does (speedpitch.DjBunny).
   faster or slower and its pitch stretches him up or squashes him (`ActBunny.tune`).
 - Record a sound: the mic in his paw (he talks along with the level, BunnyWidget) and
   `rec_light`, a red light blinking on his ear cup while it records; `mic_check` idle.
-- Recently deleted: `in_bin`, peeking out of a bin; `bring_back` / `bye` while his long
-  arm (ui/bun/binhand.py) rips a row out and throws it, or peels it off like a sticker.
+- Recently deleted: `in_bin`, peeking out of a bin; `bring_back` digs the sound out and
+  holds it up with a green tick, `bye` catches it and drops it in the bin with him.
 - Free sound packs: `box_pat` beside a parcel, `box_run` running with it while a pack
   downloads, `box_open` when it lands: notes fly out.
 - What's new: `present`, he unwraps a present and a star pops out.
@@ -35,6 +35,7 @@ from soundboard.ui.settings import lite
 
 Act = tuple[float, Callable[[Kit, float], None]]   # (seconds, act)
 ACT_H = 72   # Bun's height beside a window's title, px (the Live controls DJ's)
+ADV_H = 40   # ... in the button row of Edit sound's Advanced view (no taller than it can give)
 
 STEEL = QColor("#c9ccd8")
 CARD = QColor("#c98a4b")        # the parcel
@@ -277,29 +278,84 @@ def in_bin(kit: Kit, t: float):
 
 
 def bring_back(kit: Kit, t: float):
-    """Recently deleted, Bring back: his arm's out of the bin over the window
-    (ui/bun/binhand.py, which times this). He leans to the list, strains as he rips the
-    row out, and throws it back over his head; a happy blink."""
+    """Recently deleted, Bring back: he ducks into the bin, digs and pops up holding the
+    sound high; a green tick pops on it, then he tosses it back to the board."""
     kit.prop = ""
-    lean = held(t, 0.0, 1.3, 0.3)
-    strain = held(t, 0.62, 1.25, 0.1)
-    throw = bump(t, 1.3, 1.75)
-    kit.add(dy=_IN - 3 * strain, dip=3 * lean, nod=7 * lean - 10 * throw,
-            ears=-8 * strain + 16 * throw)
-    kit.most(mouth=0.6 * strain + 0.8 * throw, blink=held(t, 1.8, 2.25, 0.1))
+    duck = held(t, 0.0, 0.55, 0.15)
+    dig = math.sin(t * 30) * held(t, 0.15, 0.5, 0.05)
+    up = eseg(t, 0.55, 0.85)
+    kit.add(dy=_IN + 16 * duck - 8 * bump(t, 0.55, 0.95), nod=4 * dig, ears=6 * duck)
+    kit.most(blink=duck, mouth=0.6 * held(t, 0.85, 1.6, 0.1))
+    toss = seg(t, 1.6, 2.1)
+    if t < 0.55:   # dust out of the bin while he digs
+        kit.world.append(lambda p: _dig_puffs(p, t))
+    if 0.55 <= t < 1.6:   # held up high: out of the bin, over his head
+        y = lerp(104, 22, up)
+        kit.world.append(lambda p: _tile(p, 76, y, 0.0, 1.0, tick=seg(t, 0.95, 1.15)))
+        kit.world.append(lambda p: paw(p, 76, y + 10, 15))
+    elif toss > 0:   # tossed off to the right, back to the board
+        x, y = lerp(76, 104, toss), 22 - 18 * math.sin(math.pi * toss) + 30 * toss * toss
+        kit.world.append(lambda p: _tile(p, x, y, 300 * toss, 1 - toss, tick=1.0))
     kit.world.append(_bin)
+    kit.world.append(lambda p: _sparkles(p, t - 1.0, 76, 18, n=8, life=0.8, salt=11))
 
 
 def bye(kit: Kit, t: float):
-    """Recently deleted, Delete for good: he leans out, peels the row off like a sticker
-    with his long arm (ui/bun/binhand.py) and drops it in the bin; a smug look."""
+    """Recently deleted, Delete for good: the sound flies in from the list into his paw,
+    he holds it over the bin and drops it in with him; a puff, and a smug look."""
     kit.prop = ""
-    lean = held(t, 0.0, 1.5, 0.3)
-    peel = held(t, 0.62, 1.45, 0.1)
-    drop = bump(t, 1.9, 2.2)
-    kit.add(dy=_IN + 4 * drop, dip=3 * lean, nod=6 * lean + 3 * math.sin(t * 9) * peel)
-    kit.most(mouth=0.3 * peel, smug=held(t, 1.6, 2.3, 0.15))
+    fly = seg(t, 0.0, 0.45)
+    drop = seg(t, 0.95, 1.25)
+    land = bump(t, 1.2, 1.45)
+    kit.add(dy=_IN + 3 * land, nod=-5 * held(t, 0.3, 0.95, 0.15), ears=-6 * bump(t, 0.4, 0.7))
+    kit.most(mouth=0.4 * bump(t, 0.4, 0.7), smug=held(t, 1.35, 1.9, 0.15))
+    if t < 0.45:   # in from the list, on his right, in an arc
+        x, y = lerp(104, 78, fly), 70 - 28 * math.sin(math.pi * fly)
+        kit.world.append(lambda p: _tile(p, x, y, -200 * (1 - fly), 1.0))
+    elif t < 0.95:   # caught: held over the bin
+        kit.world.append(lambda p: _tile(p, 78, 72, 0.0, 1.0))
+        kit.world.append(lambda p: paw(p, 78, 80, 15))
+    elif drop < 1:   # let go: down into the bin (behind its front)
+        kit.world.append(lambda p: _tile(p, 70, lerp(74, 112, drop * drop), 40 * drop, 1.0))
     kit.world.append(_bin)
+    kit.world.append(lambda p: _land_puff(p, seg(t, 1.2, 1.7)))
+
+
+def _dig_puffs(p: QPainter, t: float):
+    for i in range(3):
+        k = (t * 2.5 + i / 3) % 1.0
+        puff(p, 30 + 20 * i + 6 * k, 90 - 12 * k, 3 + 3 * k, 0.7 * (1 - k))
+
+
+def _land_puff(p: QPainter, k: float):
+    if not 0 < k < 1:
+        return
+    for i in range(5):
+        a = math.pi + i * math.pi / 4
+        puff(p, 50 + 30 * math.cos(a) * (0.5 + k), 90 + 6 * math.sin(a) * k - 8 * k,
+             3 + 4 * k, 0.8 * (1 - k))
+
+
+def _tile(p: QPainter, x: float, y: float, turn: float, alpha: float, tick: float = 0.0):
+    """A sound, as a little pad tile with a note on it; `tick` 0..1 pops a green tick on."""
+    if alpha <= 0:
+        return
+    p.save()
+    p.setOpacity(alpha)
+    p.translate(x, y)
+    p.rotate(turn)
+    p.setPen(_ink(1.5))
+    p.setBrush(_accent())
+    p.drawRoundedRect(QRectF(-9, -9, 18, 18), 4.5, 4.5)
+    music_note(p, -5.5, -7.5, 0.9, QColor("#ffffff"))
+    if tick > 0:
+        s = 0.4 + 0.6 * tick + 0.25 * math.sin(math.pi * tick)
+        p.translate(8, -8)
+        p.scale(s, s)
+        _oval(p, 0, 0, 13, 13, QColor("#2fc46b"), _ink(1.3))
+        p.setPen(QPen(QColor("#ffffff"), 2.2, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+        p.drawPolyline([QPointF(-3, 0.2), QPointF(-0.8, 2.6), QPointF(3.4, -2.6)])
+    p.restore()
 
 
 def _bin(p: QPainter):
@@ -487,6 +543,18 @@ class ActBunny(BunnyWidget):
         self._phase = 0.0     # seconds into the loop
         self._once: tuple[Act, float] | None = None   # a one-off and when it started
         self._was = time.monotonic()
+        # his act from the very first paint (not from his first tick: a bare Bun, then
+        # the bin popping in round him)
+        self._skit, self._skit_at = (math.inf, self._frame), self._was
+        self._dy_last = self.pose(self._was)["dy"]   # (already in place: no jolt to settle)
+
+    def set_height(self, height: int):
+        """Bun this many px tall (his widget's size follows)."""
+        if height != self.bun_h:
+            self.bun_h = height
+            self._kept_img = self._kept_pose = None
+            self.setFixedSize(self.sizeHint())
+            self.update()
 
     def set_act(self, act: Act):
         if act is not self.act:
@@ -554,8 +622,8 @@ SNIP: Act = (SNIP_LOOP, snipping)
 MIC: Act = (MIC_LOOP, mic_check)
 RECORDING: Act = (REC_LOOP, rec_light)
 BIN_ACT: Act = (BIN_LOOP, in_bin)
-BRING_BACK: Act = (2.7, bring_back)
-BYE: Act = (2.3, bye)
+BRING_BACK: Act = (2.1, bring_back)
+BYE: Act = (1.9, bye)
 PAT: Act = (PAT_LOOP, box_pat)
 RUN: Act = (RUN_LOOP, box_run)
 OPEN: Act = (2.1, box_open)
