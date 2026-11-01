@@ -477,7 +477,7 @@ class AdvancedView(QWidget):
             if j >= 0:
                 take_out(box, j)
         s.setMinimumWidth(0)
-        s.setParent(None)
+        s.setParent(self.d)   # (hidden, but freed with the window: EditDialog)
 
     def show_page(self, page: int):
         """The Trim & speed (0), Effects (1) or Equalizer (2) page, in view."""
