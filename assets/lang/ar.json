@@ -5175,5 +5175,24 @@
     "{n} أصوات لم تعد موجودة على Myinstants، لذا تم تخطيها.",
     "{n} صوتًا لم يعد موجودًا على Myinstants، لذا تم تخطيها.",
     "{n} صوت لم يعد موجودًا على Myinstants، لذا تم تخطيها."
-  ]
+  ],
+  "Community uploads": "رفعها المجتمع",
+  "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "أضف مؤثرات صوت آخر إلى هذا الصوت (Robot + Demon): تُشغَّل المؤثرات التي لديه وليست في صوتك",
+  "Back to your own mix as it was": "العودة إلى مزيجك كما كان",
+  "Back to “{voice}” as it was when you picked it": "العودة إلى “{voice}” كما كان عند اختياره",
+  "Do the change again (Ctrl+Y)": "أعد التغيير (Ctrl+Y)",
+  "Edit voice…": "تعديل الصوت…",
+  "Mix in a voice": "امزج صوتًا",
+  "Take back the last change (Ctrl+Z)": "تراجع عن آخر تغيير (Ctrl+Z)",
+  "Your voice already has everything “{voice}” has": "صوتك فيه بالفعل كل ما في “{voice}”",
+  "{voice}, changed": "{voice}، مع تغييرات",
+  "Couldn't put it back: {error}": "تعذّرت إعادته: {error}",
+  "Couldn't remove it: {error}": "تعذّرت إزالته: {error}",
+  "Online": "متصل",
+  "Use {name} for typed lines": "استخدم {name} لما تكتبه",
+  "Nothing answers at {address}": "لا شيء يرد على {address}",
+  "Speaks your typed lines": "ينطق ما تكتبه",
+  "From a link…": "من رابط…",
+  "Pick one of ours": "اختر واحدة من صورنا",
+  "Remove server": "إزالة الخادم"
 }

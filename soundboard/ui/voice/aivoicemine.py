@@ -5,8 +5,7 @@ from __future__ import annotations
 import html
 from typing import TYPE_CHECKING, Any
 
-from PySide6.QtCore import QPoint
-from PySide6.QtWidgets import QDialog, QMenu, QWidget
+from PySide6.QtWidgets import QDialog, QWidget
 
 from soundboard.core import usage
 from soundboard.i18n import _, ngettext
@@ -34,13 +33,6 @@ class AiVoiceMine(_Panel):
     def _play_sample(self, data):
         assert self.engine is not None   # only offered with one
         self.engine.play("__ai_voice_sample", data, 1.0, preview=True)
-
-    def _mine_menu(self, vid: str, pos: QPoint):
-        m = QMenu(self)
-        if self.can_make():
-            m.addAction(_("Change this voice"), lambda: self.edit(vid))
-        m.addAction(_("Delete"), lambda: self.delete(vid))
-        m.exec(pos)
 
     def edit(self, vid: str | None):
         """Make one of your own voices (None) or change one."""

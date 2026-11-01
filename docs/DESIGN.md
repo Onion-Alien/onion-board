@@ -482,7 +482,10 @@ works, a short control plus a pop-up beats a long button or a paragraph on the p
   three options.
 - **Multi-step or "are you sure" flows are a dialog**, not extra buttons that appear
   in the card. One question per dialog page (see the Send feedback box).
-- **Pop-ups**: close with Esc and a clear Done/Cancel; as narrow as their content;
+- **Pop-ups**: close with Esc and a clear Done/Cancel; a left click anywhere else in
+  the app closes a modal one too, as Cancel (`ui/kit/modals.py`, app-wide). A dialog
+  that holds work a click would throw away (an editor, a form, a recording, the setup
+  guide) sets `KEEP_OPEN = True` (or `modals.keep_open(dlg)`); as narrow as their content;
   open next to what opened them (modal or not: the kit). Tooltips are short (one line), never the only way to do something, and never
   hold buttons.
 

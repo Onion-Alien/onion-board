@@ -162,6 +162,10 @@ QFrame#railoutput QPushButton#railpair { background:$btn; border:1px solid trans
 QFrame#railoutput QPushButton#railpair:hover { background:$btn_hover; }
 QFrame#railoutput QPushButton#railpair[muted="true"] { background:$danger_bg; }
 QFrame#railoutput QPushButton#railpair:focus { border-color:$accent; }
+QFrame#railoutput QFrame#railoutputpanel { background:transparent; border:none; }
+QFrame#railoutput QFrame#railoutputpanel[open="true"] { background:$btn; border-radius:8px; }
+QFrame#railoutputpanel[open="true"] QPushButton#railoutputsetup[action="true"]:hover {
+    background:$panel; }   /* the card's own: its words' colours are made for it */
 QFrame#railoutput QPushButton#railoutputsetup { background:transparent;
     border:1px solid transparent; border-radius:6px; padding:0; }
 QFrame#railoutput QPushButton#railoutputsetup[action="true"]:hover { background:$btn_hover; }
@@ -294,7 +298,7 @@ QPushButton#transport_stop:disabled { background:$btn; border:1px solid $border;
 QSlider#seek::groove:horizontal { height:6px; border-radius:3px; }
 QSlider#seek::sub-page:horizontal { border-radius:3px; }
 QLineEdit, QComboBox { background:$card_ctl; border:1px solid transparent; border-radius:8px; padding:6px 8px; }
-QLineEdit:hover, QComboBox:hover { background:$card_hi; }
+QLineEdit:hover, QComboBox:hover { background:$card_hi; border-color:$border_hi; }
 QLineEdit:focus, QComboBox:focus, QComboBox:on { border-color:$border_hi; }
 QLineEdit { selection-background-color:$btn_press; selection-color:$text_hi; }
 QLineEdit, QPlainTextEdit, QTextEdit, QComboBox { placeholder-text-color:$muted; }
@@ -306,6 +310,10 @@ QComboBox::down-arrow:on { image:url("$up"); }
 QComboBox::down-arrow:disabled { image:url("$down_off"); }
 QComboBox:disabled, QLineEdit:disabled { color:$muted; background:$inset; }
 QFrame#card QComboBox, QFrame#card QPushButton, QFrame#card QLineEdit { background:$card_ctl; }
+/* the line above outranks plain :hover, so a box in a card never lit up (and card_hi
+   is 1.01:1 on card_ctl in Dark): the edge brightens too, as a spin box's does */
+QFrame#card QComboBox:enabled:hover, QFrame#card QLineEdit:enabled:hover {
+    background:$card_hi; border-color:$border_hi; }
 QFrame#card QPushButton:hover:!checked { background:$btn_hover; }
 QFrame#card QPushButton#primary:hover { background:$accent_hover; }
 QFrame#card QPushButton:focus { border-color:$accent; }
@@ -562,7 +570,7 @@ QFrame#setcard QLineEdit, QFrame#setcard QComboBox { background:$field; }
 QFrame#setcard QAbstractSpinBox { background:$field; }
 QFrame#setcard QSpinBox#pct { background:transparent; }
 QFrame#setcard QSpinBox#pct:hover, QFrame#setcard QSpinBox#pct:focus { background:$field; }
-QFrame#setcard QLineEdit:hover, QFrame#setcard QComboBox:hover { background:$card; }
+QFrame#setcard QLineEdit:hover, QFrame#setcard QComboBox:hover { background:$card; border-color:$border_hi; }
 QTableView, QFrame#setcard QTableView { background:$card; alternate-background-color:$card_hi;
     color:$text; border:1px solid transparent; border-radius:6px;
     selection-background-color:$btn_press; selection-color:$text_hi; }

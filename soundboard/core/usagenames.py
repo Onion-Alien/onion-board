@@ -161,6 +161,12 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "edit-opened", "edit-saved", "edit-advanced-saved", "edit-copy",
             "edit-summary-off", "edit-preset",
             *(f"edit-{k}" for k in EDIT_SETTINGS),
+            # Edit sound: Undo / Redo, its player used (editplayer.py), the waveform's ruler
+            # clicked or dragged to seek, the big one zoomed; a splice marked, one played on
+            # its own, Combine splices into a new pad or this one (splicepanel.py)
+            "edit-undo", "edit-redo", "edit-player", "edit-wave-seek", "edit-wave-zoom",
+            "edit-splice-marked", "edit-splice-play", "edit-splices-new",
+            "edit-splices-replace",
             # the Triggers tab (the Onion Watch add-on) says which of its features were
             # used or are set up (triggershost.BoardHost.count): onionwatch/core/usage.py's
             # FEATURES, keep in step
@@ -241,12 +247,16 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "voice-code-shared", "voice-code-imported",
             # the Random voice card (or its key) and a voice changer voice's Hear it
             "voice-roll", "voice-hear",
+            # Edit voice's Reset, Mix in a voice, and Edit voice from a card's right-click
+            "voice-edit-reset", "voice-mix-in", "voice-edit-menu",
             # the voice bar's Effects pop-up opened
             "voice-effects",
             # AI voices: switched on, a group picked, a voice starred, Hear it, one of
             # your own made (never which voice)
             "ai-voice", "ai-voice-group", "ai-voice-favorite", "ai-voice-hear",
             "ai-voice-made",
+            # an AI voice card's right-click Edit voice
+            "ai-voice-edit-menu",
             # Clean mic switched on (never how strong), its Hear the difference played, and
             # Open Clean mic in the box after Bun set Discord up
             "clean-mic", "clean-mic-test", "clean-mic-open",
@@ -335,6 +345,8 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # (LIVE_CONTROLS) or preset (LIVE_PRESETS): names only, never the values
             *(f"live-opened-{k}" for k in LIVE_TABS), *(f"live-changed-{k}" for k in LIVE_TABS),
             *(f"live-{k}" for k in LIVE_CONTROLS), *(f"live-preset-{k}" for k in LIVE_PRESETS),
+            # a preset of your own changed, then its Update or Reset (never its name)
+            "live-mine-updated", "live-mine-reset",
             # Settings > Achievements: one earned (achieved(): its id, from the fixed list in
             # core/achievements.py), the filters used; pop-ups or their chime on
             # (features_now)
@@ -360,7 +372,10 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # Windows started the app again after it crashed or hung
             "crash-restarted",
             # the onion on Settings > About: poked, ate the window, given back early
-            "egg-onion-poked", "egg-onion-eaten", "egg-onion-please")
+            "egg-onion-poked", "egg-onion-eaten", "egg-onion-please",
+            # Settings > About's Star on GitHub; the mic helper switched off (Don't ask for
+            # admin each time: features_now)
+            "github-star", "mic-helper-off")
 STEPS = ("added-sound", "played-sound", "sent-to-others",
          # a tab a new user starts without (+ More tabs, Settings > Tabs)
          "added-radio-tab", "added-apps-tab", "added-triggers-tab")

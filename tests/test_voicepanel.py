@@ -1699,9 +1699,10 @@ def test_copy_from_a_tile_with_the_window_closed_says_so(panel, monkeypatch):
 def test_make_it_yours_buttons_are_at_the_top(panel):
     fx = panel[0].fx
     tools = fx.btn_random.parentWidget()
-    for b in (fx.btn_save, fx.btn_share, fx.btn_import, fx.btn_bin):
+    for b in (fx.btn_mix, fx.btn_share, fx.btn_import, fx.btn_bin):
         assert b.parentWidget() is tools                     # one row of buttons...
-    assert fx.tweak.layout().indexOf(tools) == 0             # ...first in the window
+    assert fx.tweak.layout().indexOf(tools) == 1             # ...under the voice's name
+    assert fx.btn_save.parentWidget() is fx.btn_undo.parentWidget()   # Save: by Done
 
 
 def test_effect_cards_fold_and_stay_folded(qapp, monkeypatch):
@@ -2173,7 +2174,7 @@ def test_stop_takes_the_picked_voice_bar_away_too(panel):
     p.fx._tile[name].click()            # a voice picked again: it's back
     assert p.fx.picked.isVisible()
     p.show_tab("ai")
-    assert not p.fx.picked.isVisible()  # still only on the voice changer's tab
+    assert p.fx.picked.isVisible()      # on: its bar shows on every tab
 
 
 def test_voice_groups_and_favorites(qapp, monkeypatch):
@@ -2284,7 +2285,7 @@ def test_hear_it_plays_the_voice_in_the_headphones(panel, monkeypatch):
     monkeypatch.setattr(aipreview, "_cache", OrderedDict())
     fx = p.fx
     fx.pick("Chipmunk")
-    assert fx.btn_sample.isVisibleTo(fx.picked)
+    assert fx.btn_sample.isHidden()   # not on the bar: a card's right-click Hear it
     fx.btn_sample.click()
     from PySide6.QtWidgets import QApplication
     assert process_events(QApplication.instance(), lambda: played), "no sample played"
@@ -2392,7 +2393,7 @@ def test_ai_voices_card_has_the_voice_changers_switch_bar_and_view(panel, qapp, 
     assert p.ai.head.isVisibleTo(p) and p._states["ai"].isHidden()
     outer = p.layout()
     assert outer.indexOf(p.ai.picked) >= 0 and outer.indexOf(p.fx.picked) >= 0
-    # turned on (without the add-on's helper): its bar shows, on its tab only
+    # turned on (without the add-on's helper): its bar shows, on every tab
     p.ai.b_start.blockSignals(True)
     p.ai.b_start.setChecked(True)
     p.ai.b_start.blockSignals(False)
@@ -2400,7 +2401,7 @@ def test_ai_voices_card_has_the_voice_changers_switch_bar_and_view(panel, qapp, 
     p._emit_active()
     assert p.ai.picked.isVisibleTo(p) and p._states["ai"].isHidden()
     p.show_tab("fx")
-    assert not p.ai.picked.isVisibleTo(p)
+    assert p.ai.picked.isVisibleTo(p)
     p.show_tab("ai")
     assert p.ai.picked.isVisibleTo(p)
     p.ai.b_start.blockSignals(True)

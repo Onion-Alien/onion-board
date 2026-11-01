@@ -4725,5 +4725,24 @@
   "{done} of {total}": "{done}/{total}",
   "{n} sound is gone from Myinstants, so it was skipped.": [
     "{n} âm thanh không còn trên Myinstants nên đã bị bỏ qua."
-  ]
+  ],
+  "Community uploads": "Cộng đồng tải lên",
+  "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Thêm hiệu ứng của giọng khác vào giọng này (Robot + Demon): những hiệu ứng nó có mà giọng bạn chưa có sẽ được bật",
+  "Back to your own mix as it was": "Quay về bản phối của bạn như cũ",
+  "Back to “{voice}” as it was when you picked it": "Quay về “{voice}” như lúc bạn chọn",
+  "Do the change again (Ctrl+Y)": "Làm lại thay đổi (Ctrl+Y)",
+  "Edit voice…": "Chỉnh giọng…",
+  "Mix in a voice": "Trộn thêm một giọng",
+  "Take back the last change (Ctrl+Z)": "Hoàn tác thay đổi cuối (Ctrl+Z)",
+  "Your voice already has everything “{voice}” has": "Giọng của bạn đã có mọi thứ mà “{voice}” có",
+  "{voice}, changed": "{voice}, đã đổi",
+  "Couldn't put it back: {error}": "Không thể khôi phục: {error}",
+  "Couldn't remove it: {error}": "Không thể gỡ bỏ: {error}",
+  "Online": "Trực tuyến",
+  "Use {name} for typed lines": "Dùng {name} cho các dòng đã gõ",
+  "Nothing answers at {address}": "Không có gì trả lời tại {address}",
+  "Speaks your typed lines": "Đọc các dòng bạn gõ",
+  "From a link…": "Từ liên kết…",
+  "Pick one of ours": "Chọn từ ảnh của chúng tôi",
+  "Remove server": "Gỡ máy chủ"
 }

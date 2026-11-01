@@ -4,7 +4,7 @@ or down, and shared by the people who made them.
 Everything lives on the project's own small server (a Cloudflare Worker). Every sound
 is CC0: whoever uploads one agrees it's theirs and gives it away, and nothing shows in
 the store until it has been checked. The app sends a random id it made itself
-(Config.store_id), so one install gets one vote per sound; the server only keeps a
+(Config.store_id), so one install gets one vote per sound a day; the server only keeps a
 salted hash of it. Nothing else about the user is sent, and the store has its own
 switch in Settings > Privacy & security (FEATURE)."""
 from __future__ import annotations

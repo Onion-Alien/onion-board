@@ -4725,5 +4725,24 @@
   "{done} of {total}": "{done}/{total}",
   "{n} sound is gone from Myinstants, so it was skipped.": [
     "사운드 {n}개가 Myinstants에서 사라져서 건너뛰었어요."
-  ]
+  ],
+  "Community uploads": "커뮤니티 업로드",
+  "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "다른 목소리의 효과를 이 목소리에 더합니다(Robot + Demon): 그 목소리에는 있고 내 목소리에는 없는 효과가 켜집니다",
+  "Back to your own mix as it was": "내 믹스를 원래대로 되돌리기",
+  "Back to “{voice}” as it was when you picked it": "“{voice}”를 골랐을 때 상태로 되돌리기",
+  "Do the change again (Ctrl+Y)": "변경 다시 하기(Ctrl+Y)",
+  "Edit voice…": "목소리 편집…",
+  "Mix in a voice": "목소리 섞기",
+  "Take back the last change (Ctrl+Z)": "마지막 변경 취소(Ctrl+Z)",
+  "Your voice already has everything “{voice}” has": "내 목소리에 이미 “{voice}”의 효과가 모두 있어요",
+  "{voice}, changed": "{voice}, 변경됨",
+  "Couldn't put it back: {error}": "되돌리지 못했어요: {error}",
+  "Couldn't remove it: {error}": "삭제하지 못했어요: {error}",
+  "Online": "온라인",
+  "Use {name} for typed lines": "입력한 문장에 {name} 사용",
+  "Nothing answers at {address}": "{address}에서 응답이 없어요",
+  "Speaks your typed lines": "입력한 문장을 읽어 줘요",
+  "From a link…": "링크에서…",
+  "Pick one of ours": "기본 그림에서 고르기",
+  "Remove server": "서버 삭제"
 }

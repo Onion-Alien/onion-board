@@ -4815,5 +4815,24 @@
   "{n} sound is gone from Myinstants, so it was skipped.": [
     "{n} Sound gibt es auf Myinstants nicht mehr, er wurde übersprungen.",
     "{n} Sounds gibt es auf Myinstants nicht mehr, sie wurden übersprungen."
-  ]
+  ],
+  "Community uploads": "Community-Uploads",
+  "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Die Effekte einer anderen Stimme zu dieser hinzufügen (Robot + Demon): Effekte, die sie hat und deine nicht, werden eingeschaltet",
+  "Back to your own mix as it was": "Zurück zu deinem eigenen Mix, wie er war",
+  "Back to “{voice}” as it was when you picked it": "Zurück zu „{voice}“, wie sie beim Auswählen war",
+  "Do the change again (Ctrl+Y)": "Änderung wiederholen (Strg+Y)",
+  "Edit voice…": "Stimme bearbeiten…",
+  "Mix in a voice": "Stimme dazumischen",
+  "Take back the last change (Ctrl+Z)": "Letzte Änderung zurücknehmen (Strg+Z)",
+  "Your voice already has everything “{voice}” has": "Deine Stimme hat schon alles, was „{voice}“ hat",
+  "{voice}, changed": "{voice}, geändert",
+  "Couldn't put it back: {error}": "Konnte nicht wiederhergestellt werden: {error}",
+  "Couldn't remove it: {error}": "Konnte nicht entfernt werden: {error}",
+  "Online": "Online",
+  "Use {name} for typed lines": "{name} für getippte Zeilen nutzen",
+  "Nothing answers at {address}": "Unter {address} antwortet nichts",
+  "Speaks your typed lines": "Spricht deine getippten Zeilen",
+  "From a link…": "Von einem Link…",
+  "Pick one of ours": "Eins von unseren wählen",
+  "Remove server": "Server entfernen"
 }

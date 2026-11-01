@@ -4815,5 +4815,24 @@
   "{n} sound is gone from Myinstants, so it was skipped.": [
     "{n} lyd er væk fra Myinstants, så den blev sprunget over.",
     "{n} lyde er væk fra Myinstants, så de blev sprunget over."
-  ]
+  ],
+  "Community uploads": "Uploadet af fællesskabet",
+  "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Læg en anden stemmes effekter oven i denne (Robot + Demon): de effekter, den har og din ikke har, slås til",
+  "Back to your own mix as it was": "Tilbage til dit eget mix, som det var",
+  "Back to “{voice}” as it was when you picked it": "Tilbage til “{voice}”, som den var, da du valgte den",
+  "Do the change again (Ctrl+Y)": "Lav ændringen igen (Ctrl+Y)",
+  "Edit voice…": "Rediger stemme…",
+  "Mix in a voice": "Bland en stemme ind",
+  "Take back the last change (Ctrl+Z)": "Fortryd den sidste ændring (Ctrl+Z)",
+  "Your voice already has everything “{voice}” has": "Din stemme har allerede alt, hvad “{voice}” har",
+  "{voice}, changed": "{voice}, ændret",
+  "Couldn't put it back: {error}": "Kunne ikke sætte den tilbage: {error}",
+  "Couldn't remove it: {error}": "Kunne ikke fjerne den: {error}",
+  "Online": "Online",
+  "Use {name} for typed lines": "Brug {name} til skrevne linjer",
+  "Nothing answers at {address}": "Intet svarer på {address}",
+  "Speaks your typed lines": "Siger dine skrevne linjer",
+  "From a link…": "Fra et link…",
+  "Pick one of ours": "Vælg et af vores",
+  "Remove server": "Fjern server"
 }

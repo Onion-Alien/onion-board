@@ -4725,5 +4725,24 @@
   "{done} of {total}": "{done}/{total}",
   "{n} sound is gone from Myinstants, so it was skipped.": [
     "有 {n} 个音效已从 Myinstants 消失，已跳过。"
-  ]
+  ],
+  "Community uploads": "社区上传",
+  "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "把另一个声音的效果加到这个声音上（Robot + Demon）：它有而你的声音没有的效果会被打开",
+  "Back to your own mix as it was": "恢复成你原来的混音",
+  "Back to “{voice}” as it was when you picked it": "恢复成你选择时的“{voice}”",
+  "Do the change again (Ctrl+Y)": "重做更改（Ctrl+Y）",
+  "Edit voice…": "编辑声音…",
+  "Mix in a voice": "混入一个声音",
+  "Take back the last change (Ctrl+Z)": "撤销上一次更改（Ctrl+Z）",
+  "Your voice already has everything “{voice}” has": "你的声音已经包含“{voice}”的全部效果",
+  "{voice}, changed": "{voice}（已更改）",
+  "Couldn't put it back: {error}": "无法恢复：{error}",
+  "Couldn't remove it: {error}": "无法移除：{error}",
+  "Online": "在线",
+  "Use {name} for typed lines": "用 {name} 朗读输入的文字",
+  "Nothing answers at {address}": "{address} 没有响应",
+  "Speaks your typed lines": "朗读你输入的文字",
+  "From a link…": "来自链接…",
+  "Pick one of ours": "从我们的图片中选",
+  "Remove server": "移除服务器"
 }

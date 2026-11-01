@@ -367,3 +367,70 @@ def test_muted_rail_says_only_your_mic_while_the_plain_voice_still_goes(window, 
     window.set_sending(True)
     qapp.processEvents()
     assert output.mute.accessibleName() == "On" and output.caption.text() == "On"
+
+
+def test_card_lines_sit_in_their_group_panels(window, qapp):  # noqa: F811
+    """Voice and Connection: each its own panel with its name over its lines, the other
+    lines in one more panel, untitled; a panel with no lines hidden. The small card
+    (rail shut) keeps every line's icon, no names."""
+    from soundboard.ui.window.onaircard import Line
+    window.resize(1275, 980)
+    window.show()
+    window.rail.set_open(True)
+    card = window.rail.output
+    clean = Line("mic", "Clean mic", "ok", page="voice:clean", group="voice")
+    fx = Line("voice", "Voice changer", "ok", page="voice:fx", group="voice")
+    tor = Line("tor", "Through Tor", "ok", page="privacy", group="connection")
+    lite = Line("leaf", "Lite mode", page="general")
+    card.set_lines([lite, tor, clean, fx])
+    window.rail.refresh_output()
+    qapp.processEvents()
+    voice, conn, rest = (card.panels[k] for k in ("voice", "connection", ""))
+    assert voice.lines == [card.net[2], card.net[3]] and conn.lines == [card.net[1]]
+    assert rest.lines == [card.net[0]]
+    assert voice.title.isVisible() and conn.title.isVisible() and not rest.title.isVisible()
+    # in order, each panel below the last, the title over its lines
+    ys = [p.geometry().top() for p in (voice, conn, rest)]
+    assert ys == sorted(ys) and voice.geometry().bottom() < conn.geometry().top()
+    assert voice.title.geometry().bottom() <= card.net[2].geometry().top()
+    # a click on a line still opens its page
+    pages = []
+    card.lineClicked.connect(pages.append)
+    QTest.mouseClick(card.net[1], Qt.MouseButton.LeftButton)
+    assert pages == ["privacy"]
+    card.set_lines([clean])
+    window.rail.refresh_output()
+    qapp.processEvents()
+    assert voice.isVisible() and not conn.isVisible() and not rest.isVisible()
+    window.rail.set_open(False)
+    qapp.processEvents()
+    assert not voice.title.isVisible() and card.net[0].isVisible()
+
+
+def test_card_lines_start_in_one_place_whatever_else_is_on(window, qapp):  # noqa: F811
+    """Open, the lines are left-aligned: their icons in one column with their panels'
+    names over them, and their words on one keyline, the same with a short line alone or
+    beside a long one (centred, the short ones moved over whenever a long line came on)."""
+    from soundboard.ui.window.onaircard import Line
+    window.resize(1275, 980)
+    window.show()
+    window.rail.set_open(True)
+    card = window.rail.output
+    clean = Line("mic", "Clean mic", "ok", group="voice")
+    places = set()
+    for others in ([], [Line("phone", "Remote control on", group="connection")],
+                   [Line("offline", "Offline", group="connection")]):
+        card.set_lines([clean, *others])
+        window.rail.refresh_output()
+        qapp.processEvents()
+        assert card._scale == 1.0   # (nothing made the card shrink to fit)
+        for n in card.net[:1 + len(others)]:
+            places.add((n.glyph.mapTo(card, QPoint(0, 0)).x(),
+                        n.label.mapTo(card, QPoint(0, 0)).x()))
+        for panel in card.panels.values():
+            if panel.title.isVisible():
+                places.add(("name", panel.title.mapTo(card, QPoint(0, 0)).x()
+                            + panel.title.contentsMargins().left()))
+    icon_x = {p[0] for p in places if p[0] != "name"} | {p[1] for p in places if p[0] == "name"}
+    words_x = {p[1] for p in places if p[0] != "name"}
+    assert len(icon_x) == 1 and len(words_x) == 1, places

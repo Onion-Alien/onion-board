@@ -39,6 +39,7 @@ class ShareDialog(QDialog):
     CC0) or a link to a video or sound site (only the link is kept). Two pages: the
     form, then "Thanks, it'll show once it's checked". `link` (and `name`) open it on
     the link, filled in: a sound of yours downloaded from one."""
+    KEEP_OPEN = True   # a click outside doesn't close it: it would lose work
     _sent = Signal(str)   # worker -> UI: the error, "" when it went
 
     def __init__(self, install: str, parent=None, link: str = "", name: str = ""):

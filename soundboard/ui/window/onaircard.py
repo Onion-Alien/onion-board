@@ -100,7 +100,6 @@ class OutputBlock(QFrame):
     STOP = 28             # Stop all after the switch, open: a normal icon button
     PAIR_H = 34           # open: Mute and Stop all, two halves of one row...
     PAIR_GAP = 8          # ...this far apart, and from the lines under them
-    LINE_GAP = 4          # between the lines (set_lines), so their fills never touch
     PAIR_ICON = 18        # their icons
     INK_DOWN = 1          # the switch's and Stop all's ink this far under their box's
                           # centre: on the title's cap-height centre (measured)
@@ -254,6 +253,10 @@ class OutputBlock(QFrame):
         # the network lines (set_lines), made as they're needed
         self._lines: list[Line] = []
         self.net: list[_NetLine] = []
+        # a panel per group and one for the rest, in order (_arrange fills them)
+        self.panels = {key: _Panel(key) for key in (*GROUPS, "")}
+        for panel in self.panels.values():
+            box.addWidget(panel)
         self.tight = False   # a short window: less room round the lines (_line_room)
         self.refresh()
 
@@ -382,6 +385,11 @@ class OutputBlock(QFrame):
         d, pad = left - right, self._px(self.PAD)
         row.setContentsMargins(pad + max(0, -d), top, pad + max(0, d), bottom)
 
+    @staticmethod
+    def line_x(px) -> int:
+        """Where a line's icon starts in it, open: under its panel's name."""
+        return px(_NetLine.SIDE)
+
     def _pin_all(self):
         # the title's first line is centred on the row's controls (the switch, Stop all),
         # and the mark on that line
@@ -404,7 +412,9 @@ class OutputBlock(QFrame):
         for n in self.net:
             if self.property("expanded"):
                 self._pin(n.glyph, n.label)
-                self._balance(n.row, n.glyph, n.label, None, pad, pad)
+                # left-aligned: icons under the header's arrow, words under its name, in
+                # the same place whatever else is on (centred, they moved with the longest)
+                n.row.setContentsMargins(self.line_x(self._px), pad, self.line_x(self._px), pad)
             else:   # the icon alone, centred under the switch
                 n.row.setContentsMargins(0, 8, 0, 0)
                 n.glyph.setContentsMargins(0, 0, 0, 0)
@@ -440,7 +450,6 @@ class OutputBlock(QFrame):
         and the status line, chevron and all."""
         def px(n: float) -> int:
             return max(1, round(n * scale))
-        text_x = round(self.ICON_X - px(self.GLYPH) / 2) + px(self.GLYPH) + px(self.GAP)
         # the status line: in its own button, the card's padding round it and its own
         # inside it
         status_x = 2 * px(self.PAD) + px(self.GLYPH) + px(self.GAP)
@@ -448,10 +457,16 @@ class OutputBlock(QFrame):
         status = fm.horizontalAdvance(self.status_text.text())
         network = max((fm.horizontalAdvance(line.words) for line in self._lines), default=0)
         halves = 2 if self.stop is not None else 1
+        # a line in its panel: the card's padding, the panel's, the line's own
+        sides = 2 * (px(self.PAD) + px(_Panel.PAD) + self.line_x(px))
+        small = QFont(self.font())
+        small.setPointSizeF(_Panel.PT * scale)
+        title = max((QFontMetrics(small).horizontalAdvance(group_name(line.group))
+                     for line in self._lines if line.group in GROUPS), default=0)
         return max(2 * px(self.PAD) + halves * px(self.PAIR_H) + (halves - 1) * px(self.PAIR_GAP),
                    status_x + status + 1 + px(self.GAP - 2) + px(self.CHEVRON)
                    + 2 * px(self.PAD),
-                   text_x + network + 1 + 2 * px(self.PAD))
+                   sides + px(self.GLYPH) + px(self.GAP) + network + 1, sides + title + 1)
 
     def scale_for(self, width: int) -> float:
         """The biggest scale (up to 1) the card fits `width` at, or 0: not even at
@@ -575,8 +590,7 @@ class OutputBlock(QFrame):
         while len(self.net) < len(lines):
             n = _NetLine(self)
             n.clicked.connect(lambda _c=False, n=n: self.lineClicked.emit(n.page))
-            self.box.addWidget(n)
-            self.net.append(n)
+            self.net.append(n)   # (in the card in its group's place: _arrange)
             n.lay_out(expanded, self._px(self.GLYPH) if expanded else self.GLYPH, self._px)
             n.label.setStyleSheet(self.title.styleSheet())   # (the card's scale)
         self.refresh()
@@ -685,30 +699,44 @@ class OutputBlock(QFrame):
         # every line as wide as the widest, so centred they share one icon column and one
         # text keyline (several lines each centred on its own zigzagged)
         words = tuple(line.words for line in self._lines)
-        for i, n in enumerate(self.net):
-            n.setVisible(i < len(self._lines))
-            if i < len(self._lines):
-                n.label._widest = words
-                n.show_line(self._lines[i], self._px(self.GLYPH) if not small else self.GLYPH)
-                n.label.updateGeometry()
+        for i, n in enumerate(self.net[:len(self._lines)]):
+            n.label._widest = words
+            n.show_line(self._lines[i], self._px(self.GLYPH) if not small else self.GLYPH)
+            n.label.updateGeometry()
+        self._arrange(not small)
         self._line_room()
         if self.stop is not None and self.rail_stop is not None:
             self._words()
         self._pin_all()
 
+    def _arrange(self, expanded: bool):
+        """Each line in its group's panel (the rest in the last, untitled one), in the
+        lines' order; a panel with no lines hidden. Shut (the small card) the panels are
+        see-through and untitled: every line's icon, as before."""
+        for key, panel in self.panels.items():
+            mine = [n for line, n in zip(self._lines, self.net)
+                    if (line.group if line.group in GROUPS else "") == key]
+            if mine != panel.lines:   # (a refresh every few seconds: re-add on a change)
+                for n in panel.lines:
+                    panel.lay.removeWidget(n)
+                for n in mine:
+                    panel.lay.addWidget(n)
+                panel.lines = mine
+            panel.show_panel(expanded, self._px, self._scale)
+            panel.setVisible(bool(mine))
+        for i, n in enumerate(self.net):
+            n.setVisible(i < len(self._lines))
+
     def _line_room(self):
-        """Open, room round the lines' hover fill and focus ring: PAIR_GAP under Mute and
-        Stop all (as between them), LINE_GAP between lines, the card's padding under the
-        last (the fills ran into Mute, Stop all and the card's edge). A short window
-        (`tight`, the rail's compact step) keeps half of it over and under them and none
-        between, so a full card still fits where it did."""
+        """Open, the panels are buttons like Mute and Stop all: PAIR_GAP under those and
+        between panels, the card's padding under the last. A short window (`tight`, the
+        rail's compact step) halves it."""
         pad = self._px(self.PAD)
-        half = self._px(self.PAD // 2)
-        self.pair_lay.setContentsMargins(pad, pad, pad, pad if not self._lines else half
-                                         if self.tight else self._px(self.PAIR_GAP))
+        gap = self._px(self.PAIR_GAP // 2 if self.tight else self.PAIR_GAP)
+        self.pair_lay.setContentsMargins(pad, pad, pad, gap if self._lines else pad)
         expanded = bool(self.property("expanded"))
-        self.box.setSpacing(self._px(self.LINE_GAP) if expanded and not self.tight else 0)
-        under = (half if self.tight else pad) if expanded and self._lines else 0
+        self.box.setSpacing(gap if expanded else 0)
+        under = self._px(self.PAD // 2 if self.tight else self.PAD) if self._lines else 0
         self.box.setContentsMargins(*(pad, 0, pad, under) if expanded else (0, 4, 0, 0))
         self.strip_lay.setContentsMargins(pad, 0, pad, pad)
 
@@ -721,11 +749,58 @@ class Line:
     tone: str = ""   # "ok", "warn" or "" (plain)
     full: str = ""   # the tip: what it says in full
     page: str = ""   # the Settings page a click opens
+    group: str = ""  # a GROUPS key: in that group's panel, else in the last one
+
+
+# the On Air card's groups, in order: each its own panel with its name on top, like Mute
+# and Stop all over them; the other lines in one more panel, untitled
+GROUPS = ("voice", "connection")
+
+
+def group_name(group: str) -> str:
+    return {"voice": _("Voice"), "connection": _("Connection")}.get(group, group)
+
+
+class _Panel(QFrame):
+    """A group's panel (key "": the lines in no group): its name, small and quiet, over
+    its lines, on a button's fill. Shut (the small card): see-through and untitled."""
+
+    PT = 8.5        # the name's size (the hint text's)
+    PAD = 4         # round the lines' hover fill, inside the panel
+
+    def __init__(self, key: str):
+        super().__init__()
+        self.key = key
+        self.setObjectName("railoutputpanel")
+        self.lines: list[_NetLine] = []
+        self.lay = QVBoxLayout(self)
+        self.lay.setSpacing(0)
+        self.title = QLabel(group_name(key))
+        self.title.setObjectName("hint")
+        self.lay.addWidget(self.title)
+        self.hide()
+
+    def show_panel(self, expanded: bool, px, scale: float):
+        titled = expanded and bool(self.key)
+        self.title.setVisible(titled)
+        if titled:
+            self.title.setText(group_name(self.key))
+            self.title.setStyleSheet(f"font-size:{self.PT * scale:.2f}pt;")
+            # over the lines' icons; a line's height of room isn't needed over it
+            self.title.setContentsMargins(px(_NetLine.SIDE), px(2), 0, 0)
+        pad = px(self.PAD) if expanded else 0
+        self.lay.setContentsMargins(pad, pad, pad, pad)
+        if self.property("open") != expanded:
+            self.setProperty("open", expanded)
+            self.style().unpolish(self)
+            self.style().polish(self)
 
 
 class _NetLine(QPushButton):
     """One Line: its glyph and words on the status line's keylines, the whole line
     the button (shut: the icon alone, centred under the switch)."""
+
+    SIDE = 4   # open: the hover fill's room before the icon and after the words
 
     def __init__(self, card: OutputBlock):
         super().__init__()
@@ -738,7 +813,7 @@ class _NetLine(QPushButton):
         self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
         self.row = QHBoxLayout(self)
         self.row.setSpacing(0)
-        self.row.addStretch(1)   # centred in the card, as the status strip's line
+        self.row.addStretch(1)   # the small card: the icon centred (open: lay_out)
         self.glyph = card._glyph()
         self.label = _HugLabel("")
         self.label.setWordWrap(True)
@@ -754,7 +829,9 @@ class _NetLine(QPushButton):
         self.hide()
 
     def lay_out(self, expanded: bool, glyph: int, px):
-        # shut: the icon's box is the card's width, so it sits centred under the switch
+        # shut: the icon's box is the card's width, so it sits centred under the switch;
+        # open, the line starts at the left (OutputBlock.line_x)
+        self.row.setStretch(0, 0 if expanded else 1)
         self.glyph.setFixedWidth(glyph if expanded else BUTTON_W)
         self.label.setVisible(expanded)
         self.setMinimumHeight(px(OutputBlock.ROW_H) if expanded else OutputBlock.GLYPH + 12)

@@ -10,6 +10,7 @@
   var EXTRA = {
     globe: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></g>',
     chev: '<path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
+    chevd: '<path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
     grid: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></g>'
   };
   Object.keys(EXTRA).forEach(function (k) { if (!D.icons[k]) D.icons[k] = EXTRA[k]; });
@@ -49,7 +50,23 @@
     b.insertBefore(h("span", { class: "dotr" }), b.firstChild);
     return b;
   }
-  function dd(b) { b.appendChild(icon("next", "dd")); b.lastChild.style.transform = "rotate(90deg)"; return b; }
+  function dd(b) { b.appendChild(icon("chevd", "dd")); return b; }
+  // the app's mark (ui/kit/logo.py paint_logo): a gradient squircle, a soft highlight on
+  // top, the white onion with its sprout, one layer in the gradient, and roots
+  function logoMark() {
+    var s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    s.setAttribute("viewBox", "0 0 100 100"); s.setAttribute("class", "i"); s.setAttribute("aria-hidden", "true");
+    s.innerHTML = '<defs><linearGradient id="ob-lg1" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="100" y2="100">' +
+      '<stop offset="0" style="stop-color:var(--accent)"/><stop offset="1" style="stop-color:var(--accent2)"/></linearGradient>' +
+      '<linearGradient id="ob-lg2" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="60"><stop offset="0" stop-color="#fff" stop-opacity=".235"/>' +
+      '<stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>' +
+      '<rect x="4" y="4" width="92" height="92" rx="26" fill="url(#ob-lg1)"/><rect x="4" y="4" width="92" height="92" rx="26" fill="url(#ob-lg2)"/>' +
+      '<g style="color:var(--logo_fg)"><path d="M50,29 C50,20 46,15 38,12 M50,27 C51,19 55,14 60,10" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>' +
+      '<path d="M50,27 C57.25,36 79,42 79,59 C79,74 65.95,81 50,81 C34.05,81 21,74 21,59 C21,42 42.75,36 50,27 Z" fill="currentColor"/>' +
+      '<path d="M50,27 C53.25,36 63,42 63,59 C63,74 57.15,81 50,81 C42.85,81 37,74 37,59 C37,42 46.75,36 50,27 Z" fill="none" stroke="url(#ob-lg1)" stroke-width="3.2" stroke-linecap="round"/>' +
+      '<path d="M46.4,81 L44,87 M50,81 L50,87 M53.6,81 L56,87" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></g>';
+    return h("span", { class: "logo mark" }, [s]);
+  }
   function fmt(s) { return s.toFixed(1) + "s"; }
   function did(what) { if (site.did) site.did("demo-" + what); }
   function setRange(r) { r.style.setProperty("--p", ((r.value - r.min) / (r.max - r.min) * 100) + "%"); }
@@ -160,6 +177,7 @@
     var f = it ? Math.min(1, (performance.now() - it.t0) / (it.dur * 1000)) : 0;
     if (it && it.buf) f = (it.off + (performance.now() - it.t0) / 1000 * S.speed) / it.buf.duration;
     if (!R.seek._drag) { R.seek.value = Math.round(Math.min(1, f) * 1000); setRange(R.seek); }
+    R.seek.classList.toggle("idle", !it);
   }
 
   // ------------------------------------------------------------------ the root
@@ -175,7 +193,10 @@
     root.style.setProperty("--glow1", rgba(t.accent, 0.22 * k));
     root.style.setProperty("--glow2", rgba(t.accent2, 0.14 * k));
     root.style.setProperty("--glow3", rgba(t.accent, 0.07 * k));
+    var lum = (luma(t.accent) + luma(t.accent2)) / 2;
+    root.style.setProperty("--logo_fg", lum > 165 ? "#0b1a10" : "#fff");
     root.classList.toggle("tex", S.textured);
+    if (S.page === "sounds" && R.grid) drawGrid();   // (the pads' text follows the theme)
     root.classList.toggle("lantern", t.logo === "lantern");   // Halloween carves the logo into a jack-o'-lantern
     Array.prototype.forEach.call(root.querySelectorAll(".ob-theme"), function (b) { b.setAttribute("aria-pressed", b.dataset.name === S.theme ? "true" : "false"); });
     if (R.repaint) R.repaint();
@@ -183,6 +204,7 @@
 
   function rgb(c) { c = c.replace("#", ""); return [0, 2, 4].map(function (i) { return parseInt(c.substr(i, 2), 16); }); }
   function rgba(c, a) { return "rgba(" + rgb(c).join(",") + "," + a.toFixed(3) + ")"; }
+  function luma(c) { var v = rgb(c); return 0.299 * v[0] + 0.587 * v[1] + 0.114 * v[2]; }
   function light(c) { var v = rgb(c); return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2] > 128; }
 
   // One way of saying "the real app does this": the same toast everywhere.
@@ -305,7 +327,7 @@
     }
     s += '<line x1="' + cx + '" y1="' + cy + '" x2="' + pt(v, r - 16).replace(" ", '" y2="') + '" style="stroke:var(--text_hi);stroke-width:2.5;stroke-linecap:round"/>';
     s += '<circle cx="' + cx + '" cy="' + cy + '" r="4" style="fill:var(--text_hi)"/>';
-    s += '<text x="' + cx + '" y="' + (cy + 24) + '" text-anchor="middle" style="font-size:15px;font-weight:700;fill:var(--text_hi)">' +
+    s += '<text x="' + cx + '" y="' + (cy + 24) + '" text-anchor="middle" style="font-size:15px;font-weight:600;fill:var(--text_hi)">' +
       (pitch ? (v > 0 ? "+" : "") + v + " st" : xs(v)) + "</text>";
     return '<svg viewBox="0 0 200 140" aria-hidden="true">' + s + "</svg>";
   }
@@ -445,6 +467,21 @@
   }
   function padEl(p) { return R.grid && R.grid.querySelector('[data-id="' + p.id + '"]'); }
   var dragging = null;
+  // a pad fades from its colour to the theme's tile colour: its name (at the top) and
+  // its key and length (at the foot) each take white or near-black, whichever reads
+  // better there, so they pass 4.5:1 on every colour in every theme
+  function mixHex(a, b, t) { var x = rgb(a), y = rgb(b); return "#" + x.map(function (v, i) { return ("0" + Math.round(v + (y[i] - v) * t).toString(16)).slice(-2); }).join(""); }
+  function relLum(c) { return rgb(c).map(function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }).reduce(function (s, v, i) { return s + v * [0.2126, 0.7152, 0.0722][i]; }, 0); }
+  function contrast(a, b) { var x = relLum(a), y = relLum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+  function inkOn(bg) { return contrast("#ffffff", bg) >= contrast("#000000", bg) ? "#ffffff" : "#000000"; }
+  function padInk(c) {
+    var t = (D.themes[S.theme] || D.themes.Dark).tile || "#1e1e24";
+    var foot = mixHex(t, c, 0.28), top = mixHex(c, foot, 0.15);
+    var nm = inkOn(top), sub = inkOn(foot);
+    var badge = sub === "#ffffff" ? mixHex(foot, "#000000", 0.45) : mixHex(foot, "#ffffff", 0.6);
+    return "--nm:" + nm + ";--sub:" + sub + ";--badge:" + badge + ";--sh:" + (nm === "#ffffff" ? "rgba(0,0,0,.55)" : "rgba(255,255,255,.35)") +
+      ";--subsh:" + (sub === "#ffffff" ? "rgba(0,0,0,.7)" : "rgba(255,255,255,.4)");
+  }
   function drawGrid() {
     var g = R.grid;
     g.replaceChildren();
@@ -453,7 +490,7 @@
     var list = shown();
     list.forEach(function (p) {
       var el = h("button", {
-        type: "button", class: "ob-pad", "data-id": p.id, style: "--c:" + p.c, draggable: S.sort === "mine" && !S.q ? "true" : null,
+        type: "button", class: "ob-pad", "data-id": p.id, style: "--c:" + p.c + ";" + padInk(p.c), draggable: S.sort === "mine" && !S.q ? "true" : null,
         title: p.name + (p.key ? " (hotkey " + p.key + ")" : "") + "\nRight-click for more",
         onclick: function () { start(p); },
         oncontextmenu: function (e) { e.preventDefault(); padMenu(p, e.clientX, e.clientY); },
@@ -475,7 +512,7 @@
         h("span", { class: "nm", text: p.name }),
         h("span", { class: "art", text: p.art, "aria-hidden": "true" }),
         p.key ? h("span", { class: "key", text: p.key }) : null,
-        h("span", { class: "len" }, [icon("link"), fmt(p.len || 1)]),
+        h("span", { class: "len" }, [p.linked ? icon("link") : null, fmt(p.len || 1)]),
         h("i", { class: "prog" })
       ]);
       g.appendChild(el);
@@ -707,10 +744,10 @@
     R.grid.addEventListener("drop", function (e) { if (dragging) return; e.preventDefault(); R.drop.classList.remove("hot"); addFiles(e.dataTransfer.files); });
     R.drop.addEventListener("click", pickFiles);
     var page = h("div", { class: "ob-page" }, [
-      h("div", { class: "ob-bar" }, [add, h("label", { class: "field", style: "flex:1" }, [icon("search", "s"), search]), srcBtn,
+      h("div", { class: "ob-bar" }, [add, h("label", { class: "field ob-find" }, [icon("search", "s"), search]), srcBtn,
         h("span", { class: "ob-sep ob-hide-m" }), lib, h("span", { class: "ob-sep ob-hide-s" }), sort,
         viewToggle(function () { return S.view === "list"; }, function (l) { S.view = l ? "list" : "pads"; drawGrid(); }),
-        h("span", { class: "hint ob-hide-m", style: "white-space:nowrap;color:var(--text)", text: "Card size" }), h("div", { class: "ob-hide-m", style: "width:120px;display:flex" }, [size])]),
+        h("span", { class: "hint ob-hide-m ob-cslbl", style: "white-space:nowrap;color:var(--text)", text: "Card size" }), h("div", { class: "ob-hide-m ob-csz" }, [size])]),
       R.tabs, R.grid
     ]);
     drawTabs(); drawGrid();
@@ -729,7 +766,7 @@
       start(list[(i + 1) % list.length]);
     }, { "aria-label": "Next sound", title: "Next sound" });
     R.nowName = h("span", { text: "Pick a sound" });
-    R.seek = h("input", { type: "range", min: "0", max: "1000", value: "0", class: "ob-seek", "aria-label": "Position" });
+    R.seek = h("input", { type: "range", min: "0", max: "1000", value: "0", class: "ob-seek idle", "aria-label": "Position" });
     setRange(R.seek);
     R.seek.addEventListener("pointerdown", function () { R.seek._drag = true; });
     R.seek.addEventListener("change", function () {
@@ -741,7 +778,7 @@
       end(it); start(it.pad, at);
     });
     var speed = liveBtn("sounds");
-    var vol = h("input", { type: "range", min: "0", max: "100", value: String(S.vol * 100), "aria-label": "Sounds volume" });
+    var vol = h("input", { type: "range", min: "0", max: "300", value: String(S.vol * 100), "aria-label": "Sounds for others" });
     var volPct = h("span", { class: "pct", text: Math.round(S.vol * 100) + "%" });
     setRange(vol);
     vol.addEventListener("input", function () { S.vol = vol.value / 100; volPct.textContent = vol.value + "%"; setRange(vol); regain(); });
@@ -752,23 +789,23 @@
     });
     R.now = h("div", { class: "now" }, [R.nowName, R.seek, speed]);
     var player = h("div", { class: "ob-bar ob-player" }, [R.playBtn, stop, next, R.now, h("span", { class: "ob-sep ob-hide-s" }),
-      h("span", { class: "ob-hide-s", text: "Sounds", style: "font-weight:600" }), h("div", { class: "ob-hide-s", style: "width:90px;display:flex" }, [vol]), h("span", { class: "ob-hide-s" }, [volPct]),
+      h("span", { class: "ob-hide-s", text: "Sounds for others", style: "white-space:nowrap" }), h("div", { class: "ob-hide-s", style: "width:90px;display:flex" }, [vol]), h("span", { class: "ob-hide-s" }, [volPct]),
       h("label", { class: "chk ob-hide-m" }, [hear, h("span", { text: "Hear it myself" })])]);
 
     var others = h("input", { type: "checkbox", checked: S.live });
     others.addEventListener("change", function () { setLive(others.checked); });
     R.othersChk = others;
-    var mic = h("input", { type: "range", min: "0", max: "100", value: "100", "aria-label": "Mic volume" });
+    var mic = h("input", { type: "range", min: "0", max: "300", value: "100", "aria-label": "Mic volume" });
     var micPct = h("span", { class: "pct", text: "100%" });
     setRange(mic);
     mic.addEventListener("input", function () { micPct.textContent = mic.value + "%"; setRange(mic); });
     R.meter = h("i");
-    var phones = h("input", { type: "range", min: "0", max: "100", value: String(S.phones * 100), "aria-label": "Headphones volume" });
+    var phones = h("input", { type: "range", min: "0", max: "300", value: String(S.phones * 100), "aria-label": "Headphones volume" });
     var phPct = h("span", { class: "pct", text: Math.round(S.phones * 100) + "%" });
     setRange(phones);
     phones.addEventListener("input", function () { S.phones = phones.value / 100; phPct.textContent = phones.value + "%"; setRange(phones); regain(); });
     var mbar = h("div", { class: "ob-bar ob-mic" }, [
-      h("div", { class: "grp vol" }, [icon("mic", "s"), h("span", { class: "ob-hide-s", text: "My mic" }), h("label", { class: "chk", title: "Others hear it" }, [others, h("span", { class: "ob-hide-m", text: "Others hear it" })]), mic, micPct]),
+      h("div", { class: "grp vol" }, [icon("mic", "s"), h("span", { class: "ob-hide-s", text: "My mic" }), h("label", { class: "chk", title: "Others hear it" }, [others, h("span", { class: "ob-hide-m", text: "Others hear it" })]), h("i", { class: "ob-lvdot" }), mic, micPct]),
       h("span", { class: "ob-sep sep2" }),
       h("div", { class: "grp lv" }, [icon("live", "s"), h("span", { class: "lbl2", text: "What others hear" }), h("span", { class: "ob-meter" }, [R.meter]),
         (function () { var b = btn("hear ob-hide-m", "Hear what they hear", "ear", function () { tryIt("Listening to what your friends hear"); }); b.appendChild(h("span", { class: "ts", text: "Listen" })); return b; })()]),
@@ -1183,7 +1220,7 @@
       radio.stars[radio.on.name] = !radio.stars[radio.on.name]; bar(); draw();
     }, { "aria-label": "Favorite", title: "Add to Favorites" });
     var now = h("div", { class: "rnow" });
-    var vol = h("input", { type: "range", min: "0", max: "100", value: "100", "aria-label": "Radio volume" });
+    var vol = h("input", { type: "range", min: "0", max: "300", value: "100", "aria-label": "Radio volume" });
     var volPct = h("span", { class: "pct", text: "100%" });
     setRange(vol);
     vol.addEventListener("input", function () { volPct.textContent = vol.value + "%"; setRange(vol); });
@@ -1238,13 +1275,13 @@
       var grid = h("div", { class: "ob-appgrid" });
       grps[g].forEach(function (a) {
         var lvl = h("i"); bars.push([lvl, a]);
-        var vol = h("input", { type: "range", min: "0", max: "100", value: String(a.vol), "aria-label": a.name + " volume" });
+        var vol = h("input", { type: "range", min: "0", max: "300", value: String(a.vol), "aria-label": a.name + " volume" });
         var pct = h("span", { class: "pct", text: a.vol + "%" });
         setRange(vol);
         vol.addEventListener("input", function () { a.vol = +vol.value; pct.textContent = a.vol + "%"; setRange(vol); });
         var card = h("div", { class: "ob-app" }, [
           h("div", { class: "atop" }, [icon("apps"), h("div", { class: "tx" }, [h("b", { text: a.name }), h("small", { text: a.sub })]),
-            btn("flat icon small", null, "close", function () { card.remove(); }, { "aria-label": "Hide " + a.name })]),
+            btn("icon ob-x", null, "close", function () { card.remove(); }, { "aria-label": "Hide " + a.name, title: "Hide " + a.name })]),
           h("div", { class: "lvl" }, [lvl]),
           h("div", { class: "row" }, [btn("", "Send", "live", function () { tryIt("Sending " + a.name + "'s sound to your friends"); }),
             btn("rec", "Record", null, function () { tryIt("Recording " + a.name + " into a pad"); }, { html: null }),
@@ -1293,7 +1330,7 @@
     var tabs = h("div", { class: "ob-wtabs", role: "tablist" });
     function thumb(t, big) { return h("span", { class: "ob-tpic" + (big ? " big" : ""), style: "--tc:" + t.col, text: t.what }); }
     function drawTabs() {
-      tabs.replaceChildren(h("img", { class: "wlogo", src: "screenshots/watch/icon.png", alt: "Onion Watch", width: "22", height: "22" }));
+      tabs.replaceChildren(h("img", { class: "wlogo", src: "demo/watch-logo.png", alt: "Onion Watch", width: "22", height: "22" }));
       [["triggers", "Triggers", "eye"], ["log", "Log", "history"], ["settings", "Settings", "settings"]].forEach(function (x) {
         var b = h("button", { type: "button", role: "tab", "aria-selected": trig.tab === x[0] ? "true" : "false", onclick: function () { trig.tab = x[0]; drawTabs(); drawBody(); } },
           [icon(x[2], "s"), h("span", { text: x[1] })]);
@@ -1436,7 +1473,8 @@
     drawTabs(); drawBody();
     return h("div", { class: "ob-page ob-watch" }, [tabs, body,
       h("div", { class: "ob-bar ob-wbar" }, [watchB, dd(btn("ob-hide-s", "More", "history", function () { trig.tab = "log"; drawTabs(); drawBody(); })),
-        h("span", { class: "hint ob-hide-m", style: "color:var(--text)", text: "Look in" }), h("span", { class: "ob-hide-m" }, [sel(["Screen 1", "Screen 2", "Your game's window"], "Screen 1", function () {})])]),
+        h("span", { class: "hint ob-hide-m", style: "color:var(--text)", text: "Look in" }), h("span", { class: "ob-hide-m" }, [sel(["Screen 1", "Screen 2", "Your game's window"], "Screen 1", function () {})]),
+        btn("flat icon ob-hide-m", null, "settings", function () { tryIt("Onion Watch's settings: how often it looks, and how sure it must be"); }, { "aria-label": "Watch settings", title: "Watch settings" })]),
       h("div", { class: "ob-bar ob-wbar" }, [nowP, h("span", { class: "sp" }),
         btn("", "Chances", "sliders", function () { tryIt("Chances: how likely each trigger is to fire"); }),
         btn("", "Stop all", "stop", stopAll)])
@@ -1465,8 +1503,14 @@
   var LANGS = ["English", "Spanish", "French", "German", "Japanese", "Korean", "Portuguese (Brazil)", "Italian", "Dutch", "Polish", "Turkish", "Chinese"];
   function voicePic(name) { return name === "My own mix" ? "custom" : name.toLowerCase().replace(/ /g, "-"); }
   var voiceTab = "changer", pickedVoice = null, voiceGroup = "", voiceFavs = { "Demon": true, "Robot": true }, voiceList = false,
-      voiceWarned = false, voiceOnTop = {}, voiceFold = {}, voiceSaid = [], voiceLang = "Spanish",
-      cleanOn = false, cleanCog = false, cleanPreset = "normal", cleanLevel = "normal";
+      voiceOnTop = {}, voiceFold = {}, voiceSaid = [], voiceLang = "Spanish",
+      cleanOn = false, cleanCog = false, cleanPreset = "normal", cleanLevel = "normal", voiceFind = "", voiceLight = false, voicesOn = false;
+  var GROUP_ICONS = { "": "sounds", favs: "star_filled", funny: "laugh", scary: "ghost", scifi: "robot", disguise: "voice", places: "radio", mine: "mic" };
+  // a card's big on/off, next to its name (voicetiles.py BigSwitch): ON or OFF written in it
+  function bigSwitch(on, label, fn, words) {
+    return h("button", { type: "button", class: "ob-big", role: "switch", "aria-checked": on ? "true" : "false", "aria-label": label, onclick: fn },
+      [h("i"), words === false ? null : h("span", { text: on ? "ON" : "OFF" })]);
+  }
   function voiceCount() { return pickedVoice ? 4 + Object.keys(voiceOnTop).length : Object.keys(voiceOnTop).length; }
   function voicePage() {
     var say = h("input", { placeholder: "Type a line and press Enter", "aria-label": "Text to say" });
@@ -1534,9 +1578,10 @@
         setTimeout(function () { name.focus(); name.select(); }, 0);
       }));
       setups.appendChild(chipBtn("Import a code", "download", function () { tryIt("Importing a voice someone shared as a code"); }));
+      setups.appendChild(chipBtn("Share", "upload", function () { tryIt("Sharing a voice combo: to the store for everyone, or as a code for a friend"); }));
     }
     function head(ic, title, extra) {
-      return h("div", { class: "hd" }, [h("span", { class: "ic" }, [icon(ic)]), h("b", { text: title })].concat(extra || []));
+      return h("div", { class: "hd" }, [h("span", { class: "ic" }, [icon(ic)]), h("b", { text: title })].concat(extra || [], [h("span", { class: "sp" })]));
     }
     function fold(key, label, kids) {
       var open = !!voiceFold[key];
@@ -1559,48 +1604,64 @@
         [h("img", { src: "demo/voices/" + voicePic(v) + ".webp", alt: "", loading: "lazy" }), h("span", { text: v }), star]);
     }
     function drawChanger() {
-      var sw = h("button", { type: "button", class: "sw", role: "switch", "aria-checked": pickedVoice ? "true" : "false", "aria-label": "Voice changer on" });
-      sw.addEventListener("click", function () { if (pickedVoice) { pickedVoice = null; drawAll(); } else pick("Demon"); });
-      var chips = h("div", { class: "chips" });
-      [["", "All"], ["favs", "Favorites"]].concat(VGROUPS.map(function (g) { return [g[0], g[1]]; })).forEach(function (g) {
-        var c = h("button", { type: "button", class: "chip", "aria-pressed": voiceGroup === g[0] ? "true" : "false", onclick: function () { voiceGroup = g[0]; drawBody(); } });
-        if (g[0] === "favs") c.appendChild(icon("star_filled", "s"));
-        c.appendChild(document.createTextNode(g[1]));
-        chips.appendChild(c);
+      var sw = bigSwitch(!!pickedVoice, "Voice changer on", function () { if (pickedVoice) { pickedVoice = null; drawAll(); } else pick("Demon"); });
+      // which voices show (voice/groupbar.py): a dropdown of the groups and a search box
+      var names = [["", "All"], ["favs", "Favorites"]].concat(VGROUPS.map(function (g) { return [g[0], g[1]]; }));
+      var cur = names.filter(function (g) { return g[0] === voiceGroup; })[0] || names[0];
+      var pickBtn = dd(btn("ob-vpick", cur[1], GROUP_ICONS[cur[0]], null, { title: "Which voices show", "aria-haspopup": "menu" }));
+      pickBtn.addEventListener("click", function () {
+        menuAt(pickBtn, names.map(function (g) {
+          var n = g[0] === "" ? VGROUPS.reduce(function (s, x) { return s + x[2].length; }, 0) : g[0] === "favs" ? Object.keys(voiceFavs).filter(function (v) { return voiceFavs[v]; }).length
+            : VGROUPS.filter(function (x) { return x[0] === g[0]; })[0][2].length;
+          return { t: g[1] + "  ·  " + n, icon: GROUP_ICONS[g[0]], tick: voiceGroup === g[0], fn: function () { voiceGroup = g[0]; drawBody(); } };
+        }));
+      });
+      var find = h("input", { type: "search", placeholder: "Search voices", "aria-label": "Search voices", value: voiceFind, maxlength: "40" });
+      find.addEventListener("input", function () {
+        voiceFind = find.value;
+        var at = find.selectionStart;
+        drawBody();
+        var f2 = body.querySelector(".ob-vfind input");
+        if (f2) { f2.focus(); f2.setSelectionRange(at, at); }
       });
       var views = h("div", { class: "ob-views" }, [
         h("button", { type: "button", "aria-pressed": voiceList ? "false" : "true", "aria-label": "Show as cards", title: "Show as cards", onclick: function () { voiceList = false; drawBody(); } }, [icon("sounds", "s")]),
         h("button", { type: "button", "aria-pressed": voiceList ? "true" : "false", "aria-label": "Show as a list", title: "Show as a list", onclick: function () { voiceList = true; drawBody(); } }, [icon("list", "s")])]);
-      body.append(head("voice", "Voice changer", [h("span", { class: "onoff" }, [sw, h("span", { text: pickedVoice ? "On" : "Off" })])]),
+      body.append(head("voice", "Voice changer", [sw]),
         h("p", { class: "hint", text: "Change your mic live for whoever you send sounds to (Discord, a game, OBS). Pick a voice to turn it on, then use Hear what they hear at the bottom to try it." }));
-      if (!voiceWarned) body.appendChild(h("div", { class: "ob-warnbox" }, [h("p", null, [h("span", { text: "⚠ Using Discord or a game's voice chat? Turn its " }),
-          h("b", { text: "noise suppression" }), h("span", { text: " off, or it wipes out most of a changed voice. " }), h("b", { text: "Clean mic" }),
-          h("span", { text: " takes the background noise out instead. " }), h("b", { text: "Show me how" }), h("span", { text: " has the steps." })]),
-        btn("", "Show me how", null, function () { tryIt("Bun showing you Discord's settings, step by step"); }),
-        btn("", "Clean mic", "mic", function () { voiceTab = "clean"; drawAll(); }),
-        btn("", "Got it", null, function () { voiceWarned = true; drawBody(); })]));
-      body.appendChild(h("div", { class: "ob-vchips" }, [chips, views]));
-      var grids = h("div", { class: "ob-vgroups" + (voiceList ? " list" : "") });
+      body.appendChild(h("div", { class: "ob-vchips" }, [pickBtn, h("label", { class: "field ob-vfind" }, [icon("search", "s"), find]), views]));
+      var q = voiceFind.trim().toLowerCase();
+      function hit(v) { return !q || v.toLowerCase().indexOf(q) >= 0; }
+      var grids = h("div", { class: "ob-vgroups" + (voiceList ? " list" : "") }), any = false;
       if (voiceGroup === "favs") {
-        var favs = Object.keys(voiceFavs).filter(function (v) { return voiceFavs[v]; });
-        grids.appendChild(favs.length ? h("div", { class: "ob-voices" }, favs.map(card)) : h("div", { class: "ob-none", text: "Star a voice to keep it here." }));
-      } else VGROUPS.forEach(function (g) {
-        if (voiceGroup && voiceGroup !== g[0]) return;
-        if (!voiceGroup) grids.appendChild(h("div", { class: "ob-vgroup", text: g[1] }));
-        grids.appendChild(h("div", { class: "ob-voices" }, g[2].map(card)));
-      });
+        var favs = Object.keys(voiceFavs).filter(function (v) { return voiceFavs[v] && hit(v); });
+        any = favs.length > 0;
+        grids.appendChild(favs.length ? h("div", { class: "ob-voices" }, favs.map(card))
+          : h("div", { class: "ob-none", text: q ? "No favorite voices match “" + voiceFind.trim() + "”." : "No favorites yet. Click the star in a voice's corner to keep it here." }));
+      } else {
+        VGROUPS.forEach(function (g) {
+          if (voiceGroup && voiceGroup !== g[0]) return;
+          var vs = g[2].filter(hit);
+          if (!vs.length) return;
+          any = true;
+          if (!voiceGroup) grids.appendChild(h("div", { class: "ob-vgroup", text: g[1] }));
+          grids.appendChild(h("div", { class: "ob-voices" }, vs.map(card)));
+        });
+        if (!any) grids.appendChild(h("div", { class: "ob-none", text: "No voices match “" + voiceFind.trim() + "”." }));
+      }
       body.appendChild(grids);
     }
     function installBox(pic, text, label, what, folder) {
       return h("div", { class: "ob-install" }, [pic, h("div", null, [h("p", { class: "hint", text: text }),
-        h("div", { class: "r" }, [btn("", label, "plus", function () { tryIt(what); }),
+        h("div", { class: "r" }, [btn("acc ob-glow", label, "plus", function () { tryIt(what); }),
           folder ? btn("flat icon", null, "folder", function () { tryIt(what); }, { "aria-label": "Open the folder", title: "Open the folder" }) : null])])]);
     }
     function drawAi() {
-      body.append(head("wave", "AI voices"), h("p", { class: "hint", text: "Your words and tone, a different voice. Live on this PC." }),
+      body.append(head("wave", "AI voices", [bigSwitch(false, "AI voices on", function () { tryIt("AI voices: a one-time install first"); })]),
+        h("p", { class: "hint", text: "Your words and tone, a different voice. Live on this PC." }),
         installBox(h("img", { class: "bun", src: "demo/ai/bun-robot.webp", alt: "" }), "AI voices need a one-time install first: about 90 MB (the voice model and its runtime).",
           "Install AI voices", "AI voices"));
-      body.append.apply(body, fold("ai", "The voices you get", [h("div", { class: "ob-aivs" }, AI_VOICES.map(function (v) {
+      body.append.apply(body, fold("ai", "More options", [h("div", { class: "ob-aivs" }, AI_VOICES.map(function (v) {
         return h("button", { type: "button", onclick: function () { tryIt("Talking in " + v[1] + "'s voice"); } },
           [h("img", { src: "demo/ai/" + v[0] + ".webp", alt: "", loading: "lazy" }), h("span", null, [h("b", { text: v[1] }), h("small", { text: v[2] })])]);
       }))]));
@@ -1608,19 +1669,22 @@
     function drawLang() {
       var s = h("select", { "aria-label": "Speak in", onchange: function () { voiceLang = s.value; tryIt("Speaking " + s.value + " in your call"); } });
       LANGS.forEach(function (l) { s.appendChild(h("option", { text: l, selected: l === voiceLang })); });
-      body.append(head("globe", "Speak another language"), h("p", { class: "hint", text: "Talk in your language and others hear another one. Pick it under Speak in." }),
-        installBox(null, "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).",
+      body.append(head("globe", "Speak another language"),
+        installBox(h("img", { class: "globe", src: "demo/globe.webp", alt: "" }), "Speaking another language needs speech recognition installed first (runs on this PC; what you say never leaves it).",
           "Install speech recognition", "Speaking another language", true));
       body.append.apply(body, fold("lang", "More options", [h("div", { class: "r" }, [h("span", { text: "Speak in" }), h("span", { class: "sel" }, [s])])]));
       body.append(h("b", { text: "What the voice said" }),
         voiceSaid.length ? h("div", { class: "ob-lines" }, voiceSaid.slice(0, 6).map(function (l) { return h("div", null, [h("small", { text: "You typed" }), l]); }))
           : h("div", { class: "hint", style: "padding:6px 12px", text: "Nothing yet. Lines show up here as they're spoken." }));
     }
+    var ADDON_LANGS = ["Arabic", "Bulgarian", "Catalan", "Czech", "Danish", "German", "Greek", "Spanish", "Finnish", "Filipino", "French", "Hebrew", "Hindi",
+      "Hungarian", "Indonesian", "Italian", "Japanese", "Korean", "Malay", "Norwegian", "Dutch", "Polish", "Portuguese (Brazil)", "Portuguese (Portugal)",
+      "Romanian", "Russian", "Slovak", "Slovenian", "Swedish", "Thai", "Turkish", "Ukrainian", "Vietnamese", "Chinese", "Traditional Chinese"];
     function drawAddons() {
       function ln(name, ver, st) { return h("div", { class: "ln" }, [h("b", { text: name }), h("span", { class: "hint", text: " " + ver + " · " + st })]); }
       body.append(head("puzzle", "Add-ons"),
-        h("div", { class: "ob-addons" }, [ln("AI voices", "0.1.0", "not set up yet"), ln("Live voice-to-speech", "0.4.0", "not set up yet: press Install speech recognition above"),
-          ln("Retro effects", "0.2.0", "on"), ln("Languages", "", "32 of them can be downloaded under Speak in")]),
+        h("div", { class: "ob-addons" }, [ln("AI voices", "0.2.0", "not set up yet"), ln("Live voice-to-speech", "0.4.0", "not set up yet: press Install speech recognition above"),
+          ln("Retro effects", "0.2.0", "on"), h("div", { class: "ln" }, [h("b", { text: "Languages" }), h("span", { class: "hint", text: " · " + ADDON_LANGS.join(", ") + " can be downloaded under Speak in" })])]),
         h("div", { class: "r" }, [btn("", "Refresh", null, function () { tryIt("Add-ons"); }), btn("flat icon", null, "folder", function () { tryIt("Add-ons"); }, { "aria-label": "Open the folder" })]),
         h("b", { text: "Custom voices" }),
         h("p", { class: "hint", text: "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder. They join the Voice list above." }),
@@ -1641,9 +1705,8 @@
       if (on) toast("Clean mic on", "In the app, fans, keyboards and other noise come out of your voice here, before your sounds are added. Discord's own noise suppression can stay off.", true);
     }
     function drawClean() {
-      var sw = h("button", { type: "button", class: "sw", role: "switch", "aria-checked": cleanOn ? "true" : "false", "aria-label": "Clean mic on",
-        onclick: function () { setClean(!cleanOn); } });
-      body.append(head("mic", "Clean mic", [h("span", { class: "onoff" }, [sw, h("span", { text: cleanOn ? "On" : "Off" })])]),
+      var sw = bigSwitch(cleanOn, "Clean mic on", function () { setClean(!cleanOn); });
+      body.append(head("mic", "Clean mic", [sw]),
         h("p", { class: "hint", text: "Takes fans, keyboards and other background noise out of your mic while you talk. It runs on this PC and works with every app and every voice." }),
         h("div", { class: "r" }, [btn("", "Mic settings", "settings", function () { cleanCog = !cleanCog; drawBody(); },
           { "aria-pressed": cleanCog ? "true" : "false", title: "Input volume, sensitivity, noise suppression and gain control" })]));
@@ -1767,12 +1830,21 @@
       ], [{ t: "Done", acc: true, fn: function () {} }]).el.classList.add("wide", "ob-editv");
       did("voice-edit");
     }
-    function drawStrip() {      // the Voice tab's own bar: your mic and what's changing it
-      strip.replaceChildren.apply(strip, [btn("danger", "Stop", "stop", function () { pickedVoice = null; voiceOnTop = {}; drawAll(); }, { title: "Turn the voice changer off" }),
-        icon("mic", "s mic"), h("span", { class: "hint ob-hide-s", text: "No mic open" }), h("span", { class: "ob-meter" }, [h("i")]), icon("ear", "s"),
-        cleanOn ? h("button", { type: "button", class: "ob-vchip", title: "Clean mic is on. Click to turn it off", onclick: function () { setClean(false); } }, [icon("mic", "s"), "Clean mic"]) : null,
-        pickedVoice ? h("span", { class: "ob-vchip" }, [h("img", { src: "demo/voices/" + voicePic(pickedVoice) + ".webp", alt: "" }), pickedVoice])
-          : cleanOn ? null : h("span", { class: "hint st", text: "Voice effects off: mic unchanged" })].filter(Boolean));
+    function drawStrip() {      // the Voice tab's own bar: what's changing your mic, the Voices switch, your mic
+      var items = [];
+      if (cleanOn) items.push(h("button", { type: "button", class: "ob-vchip", title: "Clean mic takes background noise out of your mic. Click to turn it off.", onclick: function () { setClean(false); } }, [icon("mic", "s"), "Clean mic"]));
+      if (pickedVoice) items.push(h("button", { type: "button", class: "ob-vchip", title: "Voice changer: " + pickedVoice + ". Click to turn it off.", onclick: function () { pickedVoice = null; voiceOnTop = {}; drawAll(); } },
+        [h("img", { src: "demo/voices/" + voicePic(pickedVoice) + ".webp", alt: "" }), "Voice changer: " + pickedVoice]));
+      if (!items.length) items.push(h("span", { class: "hint st", title: "Nothing is changing your mic voice." }, [icon("ear", "s"), h("span", { text: "Mic unchanged" })]));
+      var on = !!(pickedVoice || cleanOn);
+      strip.replaceChildren(h("div", { class: "row1" }, items),
+        h("div", { class: "row2" }, [h("span", { class: "vlbl", text: "Voices" }),
+          bigSwitch(on, "Voices on or off", function () {
+            if (on) { pickedVoice = null; voiceOnTop = {}; cleanOn = false; drawAll(); } else tryIt("Voices ON: the voices you had on come back");
+          }, false),
+          btn("ob-recv", "Record", "record", function () { tryIt("Recording your voice as others hear it"); }, { title: "Record your voice as others hear it" }),
+          btn("", "Reset", "reload", function () { pickedVoice = null; voiceOnTop = {}; cleanOn = false; drawAll(); }, { title: "Turn every voice off and forget them, for a fresh start" }),
+          icon("mic", "s mic"), h("span", { class: "hint ob-hide-s", text: "No mic open" }), h("span", { class: "ob-meter" }, [h("i")])]));
     }
     drawAll();
     return h("div", { class: "ob-page" }, [
@@ -1780,7 +1852,9 @@
         h("div", { class: "ob-bar ob-say" }, [icon("speech", "s"), h("label", { class: "field" }, [say]), btn("", "Say", null, speak),
           btn("ob-hide-s", "Save as sound", "plus", function () { tryIt("Saving a spoken line as a pad"); }),
           btn("", "Stop", null, function () { if (window.speechSynthesis) speechSynthesis.cancel(); })]),
-        tabs, h("hr", { class: "ob-vline" }), setups, body]),
+        h("div", { class: "ob-vtabrow" }, [tabs, h("label", { class: "chk ob-light", title: "For slower PCs: the voices use less CPU. The voice changer skips hiss removal and its robot voices and echoes are a little simpler." },
+          [h("input", { type: "checkbox", checked: voiceLight, onchange: function (e) { voiceLight = e.target.checked; } }), h("span", { text: "Use less CPU" })])]),
+        h("hr", { class: "ob-vline" }), setups, body]),
       picked, strip
     ]);
   }
@@ -1814,7 +1888,7 @@
     { name: "Grumpy goblin", by: "Shared by a player", kind: "Voice changer", pic: "goblin", up: 540, down: 9, days: 17 },
     { name: "Cathedral choir", by: "by Onion Board", kind: "A setup", pic: "choir", up: 380, down: 1, days: 30 }
   ];
-  var store = { tab: "sounds", sort: "votes", cat: "", q: "", voted: {}, told: false };
+  var store = { tab: "sounds", pick: "trending", kind: "", q: "", voted: {}, told: false, playing: "" };
   function catHue(cat) { return Math.round(CATS.indexOf(cat) * 360 / CATS.length + 12) % 360; }
   function ago(d) { return d <= 0 ? "today" : d === 1 ? "yesterday" : d < 14 ? d + " days ago" : d < 60 ? Math.round(d / 7) + " weeks ago" : Math.round(d / 30) + " months ago"; }
   function count(n) { return n >= 1000 ? (n / 1000).toFixed(1).replace(".0", "") + "k" : String(n); }
@@ -1831,51 +1905,58 @@
       return [btn("vote", count(s.up + (v === 1 ? 1 : 0)), "like", function () { vote(s, 1); }, { title: "I like it", "aria-pressed": v === 1 ? "true" : "false" }),
         btn("vote", count(s.down + (v === -1 ? 1 : 0)), "dislike", function () { vote(s, -1); }, { title: "Not for me", "aria-pressed": v === -1 ? "true" : "false" })];
     }
-    function head() {
-      function col(key, label) {
-        if (!key) return h("span", { class: "c", text: label });
-        var on = store.sort === key;
-        var b = h("button", { type: "button", class: "c srt" + (on ? " on" : ""), onclick: function () { store.sort = key; draw(); } }, [h("span", { text: label })]);
-        if (on) b.appendChild(icon("chev", "dn"));
-        return b;
-      }
-      return h("div", { class: "ob-shead" }, [col("", store.tab === "voices" ? "Voice" : "Sound"), col("", store.tab === "voices" ? "Kind" : "Category"), col("added", "Added"), col("votes", "Votes"), h("span", { class: "c" })]);
+    // one card: its picture, name and votes, who shared it, its category and when, then Play, Add and Report
+    function cardEl(pic, name, meta, where, s, acts, report) {
+      return h("div", { class: "ob-scard3" }, [pic,
+        h("div", { class: "ob-ct" }, [h("b", { text: name, title: name })].concat(voteBtns(s))),
+        h("div", { class: "ob-cm" }, [h("small", { class: "ob-meta", text: meta, title: meta }), h("small", { class: "ob-where", text: where })]),
+        h("div", { class: "ob-ca" }, acts.concat([h("span", { class: "sp" }), report]))]);
+    }
+    function hot(s) { return s.up / Math.pow(s.days + 2, 0.8); }   // popular right now: votes, newer ones weighed up
+    function trending(a, b) { return hot(b) - hot(a); }
+    function order(rows) {
+      if (store.pick === "new") rows.sort(function (a, b) { return a.days - b.days; });
+      else if (store.pick === "top") rows.sort(function (a, b) { return b.up - a.up; });
+      else rows.sort(trending);
+      return rows;
     }
     function draw() {
-      list.replaceChildren(head());
+      list.replaceChildren();
       var q = store.q.trim().toLowerCase();
       if (store.tab === "voices") {
-        var vs = SHARED_VOICES.filter(function (v) { return !q || (v.name + " " + v.kind).toLowerCase().indexOf(q) >= 0; });
-        vs.sort(store.sort === "added" ? function (a, b) { return a.days - b.days; } : function (a, b) { return b.up - a.up; });
+        var vs = SHARED_VOICES.filter(function (v) { return (!store.kind || v.kind === store.kind) && (!q || (v.name + " " + v.kind).toLowerCase().indexOf(q) >= 0); });
+        vs.sort(function (a, b) { return b.up - a.up; });
         vs.forEach(function (v) {
-          list.appendChild(h("div", { class: "ob-srow" }, [h("img", { class: "tile", src: "demo/voices/" + v.pic + ".webp", alt: "" }),
-            btn("flat icon", null, "headphones", function () { tryIt("Hearing a shared voice"); }, { "aria-label": "Hear it", title: "Hear a line in it (only you)" }),
-            h("div", { class: "tx" }, [h("b", { text: v.name }), h("small", { text: v.by })]),
-            h("span", { class: "cat" }, [icon("voice", "s"), h("span", { text: v.kind })]), h("span", { class: "ago", text: ago(v.days) })]
-            .concat(voteBtns(v), [btn("icon add", null, "plus", function () { tryIt("Adding a shared voice to your Voice tab"); }, { "aria-label": "Add it to your voices", title: "Add it to your voices" }),
-              btn("flat icon", null, "flag", function () { tryIt("Reporting a voice"); }, { "aria-label": "Report it", title: "Report it" })])));
+          list.appendChild(cardEl(h("img", { class: "tile", src: "demo/voices/" + v.pic + ".webp", alt: "" }), v.name, v.by, v.kind + " · " + ago(v.days), v,
+            [btn("", "Hear", "headphones", function () { tryIt("Hearing a shared voice"); }, { title: "Hear a line in it (only you)" }),
+              btn("", "Add", "plus", function () { tryIt("Adding a shared voice to your Voice tab"); }, { title: "Add it to your voices" })],
+            btn("flat icon", null, "flag", function () { tryIt("Reporting a voice"); }, { "aria-label": "Report it", title: "Report it" })));
         });
         if (!vs.length) list.appendChild(h("div", { class: "ob-none", text: "Nothing matches. Try other words." }));
         return;
       }
-      var rows = STORE.filter(function (s) { return (!store.cat || s.cat === store.cat) && (!q || (s.name + " " + s.tags).toLowerCase().indexOf(q) >= 0); });
-      rows.sort(store.sort === "added" ? function (a, b) { return a.days - b.days; } : function (a, b) { return b.up - a.up; });
+      var cat = CATS.indexOf(store.pick) >= 0 ? store.pick : "";
+      var rows = order(STORE.filter(function (s) { return (!cat || s.cat === cat) && (!q || (s.name + " " + s.tags).toLowerCase().indexOf(q) >= 0); }));
       rows.forEach(function (s) {
         var added = PADS.some(function (p) { return p.fromStore === s.name; });
-        function hear() { if (site.play) site.play(s.sfx); did("store-play"); }
-        var add = btn(added ? "icon add done" : "icon add", null, added ? "check" : "plus", function () {
+        var on = store.playing === s.name;
+        function hear() {
+          if (site.play) site.play(s.sfx);
+          did("store-play");
+          store.playing = s.name; draw();
+          setTimeout(function () { if (store.playing === s.name) { store.playing = ""; if (list.isConnected) draw(); } }, (LENS[s.sfx] || 1) * 1000 + 200);
+        }
+        var add = btn(added ? "done" : "", added ? "Added" : "Add", added ? "check" : "plus", function () {
           if (added) return go("sounds");
           PADS.push({ sfx: s.sfx, name: s.name, art: s.art, c: COLOURS[nextId % COLOURS.length], key: "", tabs: [], id: nextId++, len: LENS[s.sfx] || 1, plays: 0, fromStore: s.name });
           did("store-add");
           draw();
           toast("Added “" + s.name + "”", "It's on your Sounds tab now. Shared sounds are free for anyone to use (CC0).");
-        }, { title: added ? "On your Sounds tab" : "Add it to your Sounds", "aria-label": added ? "Added" : "Add it to your Sounds" });
-        list.appendChild(h("div", { class: "ob-srow" }, [
-          h("button", { type: "button", class: "tile", style: "--h:" + catHue(s.cat), "aria-label": "Hear " + s.name, onclick: hear }, [h("span", { text: s.art })]),
-          btn("flat icon", null, "play", hear, { "aria-label": "Hear it (only you)", title: "Hear it (only you)" }),
-          h("div", { class: "tx" }, [h("b", { text: s.name }), h("small", { text: s.by + " · " + s.tags })]),
-          h("span", { class: "cat", text: CAT_NAMES[s.cat] }), h("span", { class: "ago", text: ago(s.days) })]
-          .concat(voteBtns(s), [add, btn("flat icon", null, "flag", function () { tryIt("Reporting a sound"); }, { "aria-label": "Report this sound", title: "Report this sound" })])));
+        }, { title: added ? "On your Sounds tab" : "Add it to your Sounds" });
+        list.appendChild(cardEl(h("button", { type: "button", class: "tile", style: "--h:" + catHue(s.cat), "aria-label": "Hear " + s.name, title: "Hear it (only you)", onclick: hear }, [h("span", { text: s.art })]),
+          s.name, s.by + " · " + s.tags, CAT_NAMES[s.cat] + " · " + ago(s.days), s,
+          [btn(on ? "on" : "", "Play", "play", hear, { title: "Hear it (only you)" }), add],
+          btn("flat icon", null, "flag", function () { tryIt("Reporting a sound"); }, { "aria-label": "Report this sound", title: "Report this sound" })));
       });
       if (!rows.length) list.appendChild(h("div", { class: "ob-none", text: "Nothing matches. Try other words." }));
     }
@@ -1883,18 +1964,35 @@
     function drawSeg() {
       seg.replaceChildren();
       [["sounds", "Sounds", "sounds"], ["voices", "Voices", "voice"]].forEach(function (t) {
-        seg.appendChild(btn("", t[1], t[2], function () { store.tab = t[0]; drawSeg(); find.placeholder = t[0] === "voices" ? "Search voices" : "Search sounds"; catSel.hidden = t[0] === "voices"; share.querySelector(".t").textContent = t[0] === "voices" ? "Share a voice" : "Share a sound"; draw(); },
-          { "aria-pressed": store.tab === t[0] ? "true" : "false" }));
+        seg.appendChild(btn("", t[1], t[2], function () {
+          store.tab = t[0]; drawSeg(); drawPick();
+          find.placeholder = t[0] === "voices" ? "Search voices" : "Search sounds";
+          share.querySelector(".t").textContent = t[0] === "voices" ? "Share a voice" : "Share a sound"; draw();
+        }, { "aria-pressed": store.tab === t[0] ? "true" : "false" }));
       });
     }
     var find = h("input", { type: "search", placeholder: store.tab === "voices" ? "Search voices" : "Search sounds", "aria-label": "Search the store", value: store.q });
     find.addEventListener("input", function () { store.q = find.value; draw(); });
-    var cs = h("select", { "aria-label": "Category", onchange: function () { store.cat = cs.value; draw(); } });
-    [["", "All categories"]].concat(CATS.map(function (c) { return [c, CAT_NAMES[c]]; })).forEach(function (c) { cs.appendChild(h("option", { value: c[0], text: c[1], selected: store.cat === c[0] })); });
-    var catSel = h("span", { class: "sel withic" }, [icon("grid", "s"), cs]);
-    catSel.hidden = store.tab === "voices";
+    // the sounds: Trending, Most liked, Newest, then each category; the voices: each kind
+    var cs = h("select", { "aria-label": "Order and category" });
+    var pickIc = h("span", { class: "pic" });
+    var catSel = h("span", { class: "sel withic" }, [pickIc, cs]);
+    function drawPick() {
+      cs.replaceChildren();
+      if (store.tab === "voices") {
+        [["", "All categories"], ["Voice changer", "Voice changer"], ["A setup", "A setup"]].forEach(function (c) { cs.appendChild(h("option", { value: c[0], text: c[1], selected: store.kind === c[0] })); });
+        pickIc.replaceChildren(icon("grid", "s"));
+        return;
+      }
+      [["trending", "Trending"], ["top", "Most liked"], ["new", "Newest"]].forEach(function (c) { cs.appendChild(h("option", { value: c[0], text: c[1], selected: store.pick === c[0] })); });
+      cs.appendChild(h("option", { disabled: true, text: "──────────" }));
+      CATS.forEach(function (c) { cs.appendChild(h("option", { value: c, text: CAT_NAMES[c], selected: store.pick === c })); });
+      pickIc.replaceChildren(icon({ trending: "flame", top: "like", "new": "history" }[store.pick] || "grid", "s"));
+    }
+    cs.addEventListener("change", function () { if (store.tab === "voices") store.kind = cs.value; else store.pick = cs.value; drawPick(); draw(); });
     var share = btn("acc", store.tab === "voices" ? "Share a voice" : "Share a sound", "upload", function () { tryIt("Sharing your own " + (store.tab === "voices" ? "voice" : "sound") + " with everyone"); });
     drawSeg();
+    drawPick();
     draw();
     var bun = document.getElementById("bun-icon") ? (function () {
       var s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -1940,14 +2038,14 @@
     return h("div", { class: "ob-page ob-scroll" }, [h("div", { class: "ob-setup" }, [
       h("div", { class: "ob-scard" }, [
         h("div", { class: "head" }, [icon("mic"), h("span", { text: "Your mic" }), h("span", { class: "ob-pill", text: "Connected" })]),
-        h("div", { class: "ob-okbox" }, [h("div", { class: "l1" }, [h("span", { class: "ok", style: "display:flex;gap:8px;align-items:center;font-weight:600" }, [icon("check", "s"), "Your sounds go into your mic"]),
+        h("div", { class: "ob-okbox" }, [h("div", { class: "l1" }, [h("span", { class: "ok", style: "display:flex;gap:8px;align-items:center;font-weight:500" }, [icon("check", "s"), "Your sounds go into your mic"]),
           h("span", { class: "hint", text: "Microphone (USB Audio Device)" })]),
           h("div", { class: "l1" }, [btn("flat small", "Change mic", null, function () { tryIt("Picking another mic"); }), btn("flat small", "Reinstall", null, function () { tryIt("Setting up your mic"); }), btn("flat small danger", "Remove", null, function () { tryIt("Setting up your mic"); })])]),
         h("b", { text: "Optional: other ways to send your sounds" }),
         h("div", { class: "ob-twocol" }, [
-          h("div", null, [h("div", { class: "head" }, [icon("cable", "s"), h("span", { text: "Virtual cable" })]), h("p", { text: "For a game that skips your mic: your sounds go out on a cable it can pick." }),
-            btn("small", "Use a cable", "cable", function () { tryIt("Sending through a virtual cable"); })]),
-          h("div", null, [h("div", { class: "head" }, [icon("sliders", "s"), h("span", { text: "Another device" })]), h("p", { text: "For streamers and mixers: send your sounds to Voicemeeter, OBS, a mixer, or to nobody." }),
+          h("div", null, [h("div", { class: "head" }, [icon("cable", "s"), h("span", { text: "Virtual cable" })]), h("p", { text: "No mic, or you'd rather Onion Board didn't touch yours? Use a free virtual cable instead: you pick it as the mic in Discord and games." }),
+            btn("small", "Use the cable", "cable", function () { tryIt("Sending through a virtual cable"); })]),
+          h("div", null, [h("div", { class: "head" }, [icon("sliders", "s"), h("span", { text: "Another device" })]), h("p", { text: "For streamers and mixers: send your sounds to Voicemeeter, OBS, a mixer or a capture card, or to nobody." }),
             btn("small", "Pick a device", "sliders", function () { tryIt("Sending to another device"); })])
         ])
       ]),
@@ -1990,51 +2088,94 @@
   var SET_PAGES = [["Audio", "audio", "volume"], ["Appearance", "appearance", "palette"], ["Hotkeys", "hotkeys", "keyboard"], ["Tabs", "tabs", "sounds"],
     ["General", "general", "settings"], ["About", "about", "star"]];
   var SET_ADV = [["Overlay", "overlay", "gamepad"], ["Privacy & security", "privacy", "shield"], ["Connection", "connection", "radio"],
-    ["Data & quality", "data", "wave"], ["Updates", "updates", "reload"], ["Add-ons", "help", "plus"], ["Remote", "remote", "cable"]];
+    ["Data & quality", "data", "wave"], ["Updates", "updates", "reload"], ["Add-ons", "help", "plus"], ["Remote", "remote", "cable"],
+    ["Achievements", "achievements", "trophy"]];
   function tellSettings() {
     if (S.toldSettings) return;
     S.toldSettings = true;
     toast("Just for show", "Settings change here, but they only change things in the app.");
   }
+  // A Settings card from the app's own layout (board-demo-data.js, dumped from its
+  // Settings pages): parts that overlap top to bottom make one row; in a row, the names
+  // and hints stacked on the left stay together and the controls sit to their right.
+  // Label texts are the app's, already escaped, with only b, i, br, ul and li kept.
+  var HEAD_ICONS = { "Mic effect": "mic", "Theme style": "image" };
   function cardEl(card) {
-    var rows = [], items = card.items.slice().sort(function (a, b) { return (a.y + a.h / 2) - (b.y + b.h / 2) || a.x - b.x; });
+    var rows = [], items = card.items.slice().sort(function (a, b) { return a.y - b.y || a.x - b.x; });
     items.forEach(function (it) {
-      var mid = it.y + it.h / 2, row = rows[rows.length - 1];
-      if (row && Math.abs(row.mid - mid) < 12) row.items.push(it); else rows.push({ mid: mid, items: [it] });
+      var row = rows[rows.length - 1];
+      if (row && it.y < row.bot - 2) { row.items.push(it); row.bot = Math.max(row.bot, it.y + it.h); }
+      else rows.push({ items: [it], bot: it.y + it.h });
     });
     var el = h("div", { class: "ob-scard2" });
-    rows.forEach(function (row, ri) {
-      row.items.sort(function (a, b) { return a.x - b.x; });
-      var r = h("div", { class: "r" });
-      row.items.forEach(function (it) {
-        if (it.k === "label") {
-          if (it.on === "section") r.appendChild(h("div", { class: "head" }, [ri === 0 ? icon(card.icon || "settings", "s") : null, h("span", { class: "t", text: it.t })]));
-          else if (it.on === "hint") r.appendChild(h("div", { class: "h lb", text: it.t }));
-          else r.appendChild(h("div", { class: "lb", text: it.t }));
-        } else if (it.k === "check") {
-          var c = h("input", { type: "checkbox", checked: it.on, onchange: tellSettings });
-          r.appendChild(h("label", { class: "chk lb" }, [c, h("span", { text: it.t })]));
-        } else if (it.k === "radio") {
-          var rb = h("input", { type: "radio", name: "ob-r" + Math.round(row.mid) + card.title.length, checked: it.on, onchange: tellSettings });
-          r.appendChild(h("label", { class: "chk lb" }, [rb, h("span", { text: it.t })]));
-        } else if (it.k === "combo") {
-          var s = h("select", { "aria-label": "Choice", onchange: tellSettings });
-          it.items.forEach(function (o) { s.appendChild(h("option", { text: o, selected: o === it.cur })); });
-          r.appendChild(h("span", { class: "sel" }, [s]));
-        } else if (it.k === "slider") {
-          var sl = h("input", { type: "range", min: String(it.v[0]), max: String(it.v[2]), value: String(it.v[1]), "aria-label": "Amount" });
-          setRange(sl);
-          sl.addEventListener("input", function () { setRange(sl); tellSettings(); });
-          r.appendChild(sl);
-        } else if (it.k === "edit") {
-          r.appendChild(h("label", { class: "field" }, [h("input", { value: it.t || "", placeholder: it.ph || "", "aria-label": "Value", oninput: tellSettings })]));
-        } else if (it.k === "btn") {
-          r.appendChild(btn("small", it.t, null, function () { tryIt("“" + it.t + "”"); }, { title: it.tip || null }));
+    function part(it, ri) {
+      if (it.k === "label") {
+        if (it.on === "section") return h("div", { class: "head" }, [ri === 0 ? icon(card.icon || HEAD_ICONS[card.title] || "settings", "s") : null, h("span", { class: "t", html: it.t })]);
+        var t = /^Version [\d.]+$/.test(it.t) ? "Version " + S.version : it.t;
+        if (it.on === "pill") return h("span", { class: "ob-pill2", html: t });
+        return h("div", { class: (it.on === "hint" || it.on === "muted" ? "h " : "") + "lb", html: t });
+      }
+      if (it.k === "check" && it.dis && card.title === "Tabs") return h("div", { class: "chk lb ob-always", title: it.tip || null }, [h("span", { class: "tk" }), h("span", { text: it.t })]);
+      if (it.k === "check") return h("label", { class: "chk lb", title: it.tip || null }, [h("input", { type: "checkbox", checked: it.on, onchange: tellSettings }), h("span", { text: it.t })]);
+      if (it.k === "radio") return h("label", { class: "chk lb" }, [h("input", { type: "radio", name: "ob-r" + card.title.length + "-" + it.y, checked: it.on, onchange: tellSettings }), h("span", { text: it.t })]);
+      if (it.k === "combo") {
+        var s = h("select", { "aria-label": "Choice", onchange: tellSettings });
+        it.items.forEach(function (o) { s.appendChild(h("option", { text: o, selected: o === it.cur })); });
+        return h("span", { class: "sel" }, [s]);
+      }
+      if (it.k === "slider") {
+        var sl = h("input", { type: "range", min: String(it.v[0]), max: String(it.v[2]), value: String(it.v[1]), "aria-label": "Amount" });
+        setRange(sl);
+        sl.addEventListener("input", function () { setRange(sl); tellSettings(); });
+        return sl;
+      }
+      if (it.k === "edit") return h("label", { class: "field", style: "max-width:" + Math.max(it.w, 160) + "px" }, [h("input", { value: it.t || "", placeholder: it.ph || "", "aria-label": it.ph || "Value", oninput: tellSettings })]);
+      if (it.k === "btn") {
+        if (card.title === "Language") {   // the app's language picker: "Aa", the language, its arrow
+          return dd(h("button", { type: "button", class: "btn ob-langbtn", title: "32 languages", onclick: function () { tryIt("Onion Board in 32 languages"); } },
+            [h("span", { class: "aa", text: "Aa" }), h("span", { class: "t", text: it.t.replace(/\s*▾$/, "") })]));
         }
-      });
+        if (it.only) return btn("icon ob-x", null, it.ic || "close", function () { tellSettings(); }, { "aria-label": it.t, title: it.t });
+        var key = /hotkey|^Click to set$|^Off$|^(Ctrl|Alt|Shift|F\d)|^.$/.test(it.t) && it.w >= 150;
+        return btn("small" + (it.prim ? " acc" : "") + (key ? " ob-key" : ""), it.t, it.ic || null, function () { tryIt("“" + it.t + "”"); },
+          { title: it.tip ? it.tip.replace(/<[^>]+>/g, "") : null, "aria-pressed": it.checked === true ? "true" : null });
+      }
+      if (it.k === "icon") return null;
+      return null;
+    }
+    rows.forEach(function (row, ri) {
+      row.items.sort(function (a, b) { return a.x - b.x || a.y - b.y; });
+      // names and hints stacked on the left with controls beside them (a hotkey's name,
+      // what it does, then its key and ✕)
+      var labels = row.items.filter(function (it) { return it.k === "label" && it.on !== "section" && it.on !== "pill"; });
+      var others = row.items.filter(function (it) { return labels.indexOf(it) < 0; });
+      var stacked = labels.length > 1 && others.length && others.every(function (o) { return labels.every(function (l) { return o.x >= l.x + l.w - 4; }); });
+      var r = h("div", { class: "r" });
+      if (stacked) {
+        labels.sort(function (a, b) { return a.y - b.y; });
+        r.classList.add("stk");
+        r.appendChild(h("div", { class: "lbs" }, labels.map(function (l) { return part(l, ri); })));
+        others.forEach(function (it) { var p = part(it, ri); if (p) r.appendChild(p); });
+      } else {
+        row.items.forEach(function (it) {
+          var p = part(it, ri);
+          if (!p) return;
+          // a name with its control after it: the name keeps the app's width, the control sits right by it
+          if (it.k === "label" && it.on !== "section" && it.on !== "hint" && row.items.some(function (o) { return o !== it && o.x > it.x + it.w - 4 && o.k !== "label"; })) {
+            p.style.flex = "0 0 auto"; p.style.width = Math.min(it.w + 4, 260) + "px";
+          }
+          r.appendChild(p);
+        });
+      }
       if (r.childNodes.length) el.appendChild(r);
     });
+    if (card.title === "A note from me") el.appendChild(alienNote());
     return el;
+  }
+  // "A note from me" (bun/onionalien.py AlienNote): the Onion Alien and his pixel speech bubble
+  function alienNote() {
+    return h("div", { class: "ob-note" }, [h("img", { src: "demo/alien.webp", alt: "", width: "80", height: "96" }),
+      h("div", { class: "bub", text: "No ads, no account, no spying, free forever. Found a bug? Tell me. Have fun.\n\nOnionAlien" })]);
   }
   // Appearance's look box, as the app has it: two tabs, Themes (Textured or Plain, then
   // the theme cards, the app's own previews with Bun dressed for each) and Look
@@ -2094,17 +2235,20 @@
   function settingsPage() {
     var body = h("div", { class: "ob-spage ob-scroll" });
     var nav = h("div", { class: "ob-snav" });
-    var find = h("input", { type: "search", placeholder: "Search settings", "aria-label": "Search settings" });
+    var find = h("input", { type: "search", placeholder: "Search", "aria-label": "Search settings" });
     function show(key) {
       S.setPage = key;
       body.replaceChildren();
       var cards = D.settings[key] || [];
       cards.forEach(function (c) {
         if (key === "appearance" && c.title !== "Language") return;
+        if (c.adv && !S.advanced) return;
         body.appendChild(cardEl(c));
       });
       if (key === "appearance") body.appendChild(themesCard());
-      if (key === "audio") body.appendChild(h("div", null, [btn("", "More audio settings", "sliders", function () { tryIt("More audio settings (your mic, custom voices, buffering)"); })]));
+      if (key === "audio" && !S.advanced) body.appendChild(h("div", null, [btn("", "More audio settings", "sliders", function () {
+        var m = nav.querySelector("[aria-expanded]"); if (m) m.click();
+      }, { title: "Speech voices, buffering and your mic switch (Show advanced)" })]));
       body.scrollTop = 0;
       Array.prototype.forEach.call(nav.querySelectorAll("button.pg[data-k]"), function (b) { b.setAttribute("aria-current", b.dataset.k === key ? "page" : "false"); });
     }
@@ -2123,7 +2267,7 @@
       if (!hits) body.appendChild(h("div", { class: "ob-none", text: "No settings match “" + q + "”." }));
     }
     find.addEventListener("input", function () { search(find.value); });
-    nav.appendChild(h("button", { type: "button", class: "back", onclick: function () { go("sounds"); } }, [icon("nav_back", "g"), h("span", { class: "t", text: "Settings" })]));
+    nav.appendChild(h("button", { type: "button", class: "back", onclick: function () { go("sounds"); } }, [icon("nav_back", "g"), h("span", { class: "t", text: "Settings" }), icon("settings", "cog")]));
     nav.appendChild(h("label", { class: "field" }, [icon("search", "s"), find]));
     function navBtn(p) {
       return h("button", { type: "button", class: "pg", "data-k": p[1], title: p[0], onclick: function () { find.value = ""; show(p[1]); } }, [icon(p[2], "s"), h("span", { class: "t", text: p[0] })]);
@@ -2133,7 +2277,9 @@
     var adv = h("div", { style: "display:contents" });
     var more = h("button", { type: "button", class: "pg", "aria-expanded": S.advanced ? "true" : "false", onclick: function () {
       S.advanced = !S.advanced; more.setAttribute("aria-expanded", S.advanced ? "true" : "false"); adv.hidden = !S.advanced;
-    } }, [icon("next", "more"), h("span", { class: "t", text: "Show advanced" })]);
+      more.querySelector(".t").textContent = S.advanced ? "Hide advanced" : "Show advanced"; more.querySelector(".arr").textContent = S.advanced ? "▾" : "▸";
+      show(S.setPage);
+    } }, [icon("sliders", "s"), h("span", { class: "t", text: S.advanced ? "Hide advanced" : "Show advanced" }), h("span", { class: "arr", text: S.advanced ? "▾" : "▸" })]);
     nav.appendChild(more);
     SET_ADV.forEach(function (p) { adv.appendChild(navBtn(p)); });
     adv.hidden = !S.advanced;
@@ -2157,17 +2303,18 @@
     R.player.hidden = page !== "sounds";        // like the app: the player belongs to Sounds
   }
   function build(version) {
+    S.version = version;
     root = h("div", { class: "ob", tabindex: "-1", role: "application", "aria-label": "A working copy of Onion Board" });
     R.lc = {};
     theme(S.theme);
     var brand = h("button", { type: "button", class: "ob-brand", title: "Onion Board", onclick: function () {
       brand.classList.remove("wob"); void brand.offsetWidth; brand.classList.add("wob");
       if (site.play) site.play("squeak");
-    } }, [h("span", { class: "logo mark" }, [icon("onion")]), h("div", null, [h("b", { text: "Onion Board" }), h("small", { text: "by Onion Alien · v" + version })])]);
+    } }, [logoMark(), h("div", null, [h("b", { text: "Onion Board" }), h("small", { text: "by Onion Alien · v" + version })])]);
     R.nav = h("nav", { class: "ob-nav" });
     [["sounds", "Sounds"], ["radio", "Radio"], ["apps", "Apps"], ["triggers", "Triggers"], ["voice", "Voice"], ["store", "Community"], ["setup", "Setup"]].forEach(function (n) {
       R.nav.appendChild(h("button", { type: "button", "data-p": n[0], title: n[1], "aria-current": n[0] === "sounds" ? "page" : "false", onclick: function () { go(n[0]); } },
-        [icon(n[0] === "voice" ? "voice" : n[0]), h("span", { class: "t", text: n[1] })]));
+        [icon(n[0] === "voice" ? "voice" : n[0]), h("span", { class: "t", text: n[1] }), n[0] === "store" ? h("span", { class: "ob-new", text: "New" }) : null]));
     });
     R.live = h("button", { type: "button", class: "ob-live", title: "Others hear your sounds and mic: click to mute both", "aria-label": "Others hear me", onclick: function () { setLive(!S.live); } }, [icon("live"), h("span", { class: "t", text: "On" })]);
     var stopB = h("button", { type: "button", class: "ob-stopall", title: "Stop all sounds", "aria-label": "Stop all sounds", onclick: stopAll }, [h("span", { class: "sq" }), h("span", { class: "t", text: "Stop all" })]);

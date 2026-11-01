@@ -4815,5 +4815,24 @@
   "{n} sound is gone from Myinstants, so it was skipped.": [
     "{n} साउंड अब Myinstants पर नहीं है, इसलिए छोड़ दिया गया।",
     "{n} साउंड अब Myinstants पर नहीं हैं, इसलिए छोड़ दिए गए।"
-  ]
+  ],
+  "Community uploads": "समुदाय के अपलोड",
+  "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "इस आवाज़ में किसी दूसरी आवाज़ के इफ़ेक्ट जोड़ें (Robot + Demon): जो इफ़ेक्ट उसमें हैं पर आपकी में नहीं, वे चालू हो जाते हैं",
+  "Back to your own mix as it was": "अपने मिक्स पर वापस, जैसा वह था",
+  "Back to “{voice}” as it was when you picked it": "“{voice}” पर वापस, जैसी वह चुनते समय थी",
+  "Do the change again (Ctrl+Y)": "बदलाव फिर से करें (Ctrl+Y)",
+  "Edit voice…": "आवाज़ बदलें…",
+  "Mix in a voice": "एक आवाज़ मिलाएँ",
+  "Take back the last change (Ctrl+Z)": "आख़िरी बदलाव वापस लें (Ctrl+Z)",
+  "Your voice already has everything “{voice}” has": "आपकी आवाज़ में पहले से वह सब है जो “{voice}” में है",
+  "{voice}, changed": "{voice}, बदली हुई",
+  "Couldn't put it back: {error}": "वापस नहीं रख सके: {error}",
+  "Couldn't remove it: {error}": "हटा नहीं सके: {error}",
+  "Online": "ऑनलाइन",
+  "Use {name} for typed lines": "टाइप की गई लाइनों के लिए {name} इस्तेमाल करें",
+  "Nothing answers at {address}": "{address} पर कोई जवाब नहीं देता",
+  "Speaks your typed lines": "आपकी टाइप की गई लाइनें बोलता है",
+  "From a link…": "लिंक से…",
+  "Pick one of ours": "हमारी में से चुनें",
+  "Remove server": "सर्वर हटाएं"
 }

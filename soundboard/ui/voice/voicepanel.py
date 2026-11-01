@@ -224,6 +224,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.speech.custom_wanted.connect(lambda: self.show_tab("addons"))
         self.addons = ModulesList(self.speech.custom_title, self.speech.custom_box)
         self.addons.refresh.connect(self._rescan_in_background)
+        self.addons.refresh.connect(self.speech.servers.check)   # the voice servers, again
         self._scanned.connect(self._apply_scan)
         self._scanning = False
         self.addons.show_modules(self.modules)
@@ -251,15 +252,16 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.oops.hide()
         outer.insertWidget(1, self.oops)
         self._oops_for = ""
-        # the picked voice's bar, pinned under the cards while the voice changer (or AI
-        # voices) shows: its Edit voice and Hear it never scroll out of sight
-        for key, panel in self._barred():
+        # each voice that's on has its bar pinned under the cards, on every tab (the voice
+        # changer's and an AI voice's both, when both are on): its Edit voice and Hear
+        # it never scroll out of sight
+        for _key, panel in self._barred():
             lay = panel.layout()
             assert lay is not None   # made in the panel's __init__
             lay.removeWidget(panel.picked)
             outer.addWidget(panel.picked)
             panel.picked.setProperty("pinned", True)
-            panel.show_picked_row(self._tab == key)
+            panel.show_picked_row(True)
         outer.addWidget(self.bar)
         # cards or a list: one setting for both (the window keeps the voice changer's)
         self.fx.view_toggle.changed.connect(self.ai.set_view)
@@ -317,7 +319,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         voice changer's, AI voices' before More options), scrolling with it."""
         outer = self.layout()
         assert isinstance(outer, QVBoxLayout)
-        for key, panel in self._barred():
+        for _key, panel in self._barred():
             picked = panel.picked
             if bool(picked.property("pinned")) != compact:
                 continue
@@ -333,7 +335,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
             picked.setProperty("pinned", not compact)
             picked.style().unpolish(picked)
             picked.style().polish(picked)
-            panel.show_picked_row(compact or self._tab == key)
+            panel.show_picked_row(True)   # (in its card: shown with it)
 
     def stack_steps(self):
         return []   # one card at a time: nothing to stack when narrow

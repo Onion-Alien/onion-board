@@ -149,7 +149,7 @@ class SetupShow(BunnyWidget):
     act_phase = phase
 
     def _hits(self) -> int:
-        return int((self._t - TOOL_END) / SWING + 0.3) if self._t >= TOOL_END else 0
+        return int((self._t - TOOL_END) / SWING) if self._t >= TOOL_END else 0
 
     def _swing(self) -> float:
         k = ((self._t - TOOL_END) / SWING) % 1.0

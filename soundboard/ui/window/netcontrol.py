@@ -7,6 +7,7 @@ UI thread."""
 from __future__ import annotations
 
 import html
+from dataclasses import replace
 from typing import TYPE_CHECKING
 
 from soundboard.online import net, tor
@@ -115,8 +116,10 @@ class NetControl(Controller):
         """What the On Air card says under its status (OutputBlock.set_lines): how the
         app goes online, a remote control listening, lite mode, and the Voice tabs that
         are on."""
-        return [*self._voice_lines(), *(line for line in (
-            self._network_line(), self._remote_line(), self._lite_line()) if line)]
+        connection = (replace(line, group="connection")
+                      for line in (self._network_line(), self._remote_line()) if line)
+        return [*self._voice_lines(), *connection,
+                *(line for line in (self._lite_line(),) if line)]
 
     def _voice_lines(self) -> list[onaircard.Line]:
         """A line for each Voice tab that's on (Clean mic, the voice changer, an AI voice,
@@ -126,7 +129,7 @@ class NetControl(Controller):
         if live is None:   # (the Voice tab switched off in Settings)
             return []
         return [onaircard.Line(icon, name, "ok", "\n".join((name, _("Click to change it."))),
-                               VOICE_TAB + key) for key, icon, name in live()]
+                               VOICE_TAB + key, "voice") for key, icon, name in live()]
 
     @staticmethod
     def _lite_line() -> onaircard.Line | None:

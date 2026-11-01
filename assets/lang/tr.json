@@ -4815,5 +4815,24 @@
   "{n} sound is gone from Myinstants, so it was skipped.": [
     "{n} ses artık Myinstants'ta yok, bu yüzden atlandı.",
     "{n} ses artık Myinstants'ta yok, bu yüzden atlandı."
-  ]
+  ],
+  "Community uploads": "Topluluk yüklemeleri",
+  "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Başka bir sesin efektlerini buna ekle (Robot + Demon): onda olup seninkinde olmayan efektler açılır",
+  "Back to your own mix as it was": "Kendi karışımına eskisi gibi dön",
+  "Back to “{voice}” as it was when you picked it": "“{voice}” sesine seçtiğin andaki haliyle dön",
+  "Do the change again (Ctrl+Y)": "Değişikliği yinele (Ctrl+Y)",
+  "Edit voice…": "Sesi düzenle…",
+  "Mix in a voice": "Bir ses kat",
+  "Take back the last change (Ctrl+Z)": "Son değişikliği geri al (Ctrl+Z)",
+  "Your voice already has everything “{voice}” has": "Sesinde “{voice}” sesinde olan her şey zaten var",
+  "{voice}, changed": "{voice}, değiştirildi",
+  "Couldn't put it back: {error}": "Geri konulamadı: {error}",
+  "Couldn't remove it: {error}": "Kaldırılamadı: {error}",
+  "Online": "Çevrimiçi",
+  "Use {name} for typed lines": "Yazılan satırlar için {name} kullan",
+  "Nothing answers at {address}": "{address} adresinde yanıt veren yok",
+  "Speaks your typed lines": "Yazdığın satırları söyler",
+  "From a link…": "Bağlantıdan…",
+  "Pick one of ours": "Bizimkilerden seç",
+  "Remove server": "Sunucuyu kaldır"
 }

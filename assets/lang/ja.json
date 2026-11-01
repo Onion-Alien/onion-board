@@ -4725,5 +4725,24 @@
   "{done} of {total}": "{done}/{total}",
   "{n} sound is gone from Myinstants, so it was skipped.": [
     "{n}個のサウンドがMyinstantsから消えていたため、スキップしました。"
-  ]
+  ],
+  "Community uploads": "コミュニティの投稿",
+  "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "別のボイスのエフェクトをこのボイスに加えます（Robot + Demon）：相手にあってあなたのボイスにないエフェクトがオンになります",
+  "Back to your own mix as it was": "自分のミックスを元の状態に戻す",
+  "Back to “{voice}” as it was when you picked it": "「{voice}」を選んだときの状態に戻す",
+  "Do the change again (Ctrl+Y)": "変更をやり直す（Ctrl+Y）",
+  "Edit voice…": "ボイスを編集…",
+  "Mix in a voice": "ボイスを混ぜる",
+  "Take back the last change (Ctrl+Z)": "最後の変更を取り消す（Ctrl+Z）",
+  "Your voice already has everything “{voice}” has": "あなたのボイスには「{voice}」の要素がすべて入っています",
+  "{voice}, changed": "{voice}（変更あり）",
+  "Couldn't put it back: {error}": "元に戻せませんでした: {error}",
+  "Couldn't remove it: {error}": "削除できませんでした: {error}",
+  "Online": "オンライン",
+  "Use {name} for typed lines": "入力した文に {name} を使う",
+  "Nothing answers at {address}": "{address} から応答がありません",
+  "Speaks your typed lines": "入力した文を読み上げます",
+  "From a link…": "リンクから…",
+  "Pick one of ours": "用意された画像から選ぶ",
+  "Remove server": "サーバーを削除"
 }

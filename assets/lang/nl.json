@@ -4815,5 +4815,24 @@
   "{n} sound is gone from Myinstants, so it was skipped.": [
     "{n} geluid staat niet meer op Myinstants en is overgeslagen.",
     "{n} geluiden staan niet meer op Myinstants en zijn overgeslagen."
-  ]
+  ],
+  "Community uploads": "Uploads van de community",
+  "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Voeg de effecten van een andere stem aan deze toe (Robot + Demon): effecten die die stem heeft en de jouwe niet, gaan aan",
+  "Back to your own mix as it was": "Terug naar je eigen mix zoals hij was",
+  "Back to “{voice}” as it was when you picked it": "Terug naar ‘{voice}’ zoals hij was toen je hem koos",
+  "Do the change again (Ctrl+Y)": "Wijziging opnieuw doen (Ctrl+Y)",
+  "Edit voice…": "Stem bewerken…",
+  "Mix in a voice": "Stem erdoor mengen",
+  "Take back the last change (Ctrl+Z)": "Laatste wijziging ongedaan maken (Ctrl+Z)",
+  "Your voice already has everything “{voice}” has": "Je stem heeft al alles wat ‘{voice}’ heeft",
+  "{voice}, changed": "{voice}, gewijzigd",
+  "Couldn't put it back: {error}": "Kon het niet terugzetten: {error}",
+  "Couldn't remove it: {error}": "Kon het niet verwijderen: {error}",
+  "Online": "Online",
+  "Use {name} for typed lines": "{name} gebruiken voor getypte regels",
+  "Nothing answers at {address}": "Niets antwoordt op {address}",
+  "Speaks your typed lines": "Spreekt je getypte regels uit",
+  "From a link…": "Via een link…",
+  "Pick one of ours": "Kies een van de onze",
+  "Remove server": "Server verwijderen"
 }

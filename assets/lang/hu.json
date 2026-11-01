@@ -4815,5 +4815,24 @@
   "{n} sound is gone from Myinstants, so it was skipped.": [
     "{n} hang már nincs fent a Myinstantsen, ezért kimaradt.",
     "{n} hang már nincs fent a Myinstantsen, ezért kimaradtak."
-  ]
+  ],
+  "Community uploads": "Közösségi feltöltések",
+  "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Egy másik hang effektjeinek hozzáadása ehhez (Robot + Demon): bekapcsolnak azok az effektek, amelyek neki megvannak, a tiédnek nem",
+  "Back to your own mix as it was": "Vissza a saját mixedhez, ahogy volt",
+  "Back to “{voice}” as it was when you picked it": "Vissza a(z) „{voice}” hanghoz, ahogy a kiválasztásakor volt",
+  "Do the change again (Ctrl+Y)": "Változtatás újra (Ctrl+Y)",
+  "Edit voice…": "Hang szerkesztése…",
+  "Mix in a voice": "Hang bekeverése",
+  "Take back the last change (Ctrl+Z)": "Utolsó változtatás visszavonása (Ctrl+Z)",
+  "Your voice already has everything “{voice}” has": "A hangodban már minden megvan, ami a(z) „{voice}” hangban",
+  "{voice}, changed": "{voice}, módosítva",
+  "Couldn't put it back: {error}": "Nem sikerült visszatenni: {error}",
+  "Couldn't remove it: {error}": "Nem sikerült eltávolítani: {error}",
+  "Online": "Online",
+  "Use {name} for typed lines": "{name} használata a beírt sorokhoz",
+  "Nothing answers at {address}": "Semmi nem válaszol itt: {address}",
+  "Speaks your typed lines": "Felolvassa a beírt sorokat",
+  "From a link…": "Linkről…",
+  "Pick one of ours": "Válassz a mieinkből",
+  "Remove server": "Szerver eltávolítása"
 }

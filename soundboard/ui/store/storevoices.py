@@ -151,6 +151,7 @@ def _label(text: str) -> QLabel:
 
 class ShareVoiceDialog(QDialog):
     """Share one of your voices: pick it, name it, say what it's for, Share."""
+    KEEP_OPEN = True   # a click outside doesn't close it: it would lose work
     _sent = Signal(str)   # "" when it went, else why not
 
     def __init__(self, install: str, items: list[tuple[str, dict]], parent=None,

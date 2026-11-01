@@ -4815,5 +4815,24 @@
   "{n} sound is gone from Myinstants, so it was skipped.": [
     "{n} sound ang wala na sa Myinstants, kaya nilaktawan.",
     "{n} na sound ang wala na sa Myinstants, kaya nilaktawan."
-  ]
+  ],
+  "Community uploads": "Upload ng komunidad",
+  "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Idagdag ang mga effect ng ibang boses dito (Robot + Demon): bubuksan ang mga effect na mayroon ito at wala sa iyo",
+  "Back to your own mix as it was": "Balik sa sarili mong mix gaya ng dati",
+  "Back to “{voice}” as it was when you picked it": "Balik sa “{voice}” gaya noong pinili mo ito",
+  "Do the change again (Ctrl+Y)": "Gawin ulit ang pagbabago (Ctrl+Y)",
+  "Edit voice…": "I-edit ang boses…",
+  "Mix in a voice": "Ihalo ang isang boses",
+  "Take back the last change (Ctrl+Z)": "Bawiin ang huling pagbabago (Ctrl+Z)",
+  "Your voice already has everything “{voice}” has": "Nasa boses mo na ang lahat ng nasa “{voice}”",
+  "{voice}, changed": "{voice}, binago",
+  "Couldn't put it back: {error}": "Hindi naibalik: {error}",
+  "Couldn't remove it: {error}": "Hindi naalis: {error}",
+  "Online": "Online",
+  "Use {name} for typed lines": "Gamitin ang {name} sa mga tina-type",
+  "Nothing answers at {address}": "Walang sumasagot sa {address}",
+  "Speaks your typed lines": "Binibigkas ang mga tina-type mo",
+  "From a link…": "Mula sa link…",
+  "Pick one of ours": "Pumili sa amin",
+  "Remove server": "Alisin ang server"
 }

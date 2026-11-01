@@ -104,6 +104,7 @@ def hear_button() -> QPushButton:
 class AiVoiceEditor(QDialog):
     """Make or change one of your own voices: start from a voice, mix in another,
     deeper or brighter, how high. `voice`: the one to change (None: a new one)."""
+    KEEP_OPEN = True   # a click outside doesn't close it: it would lose work
     _sampled = Signal(object, object, str)
 
     def __init__(self, built_in: list[dict], voice: dict | None, previewer: Previewer,

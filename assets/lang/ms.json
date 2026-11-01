@@ -4725,5 +4725,24 @@
   "{done} of {total}": "{done} daripada {total}",
   "{n} sound is gone from Myinstants, so it was skipped.": [
     "{n} bunyi sudah tiada di Myinstants, jadi dilangkau."
-  ]
+  ],
+  "Community uploads": "Muat naik komuniti",
+  "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Tambah kesan suara lain pada suara ini (Robot + Demon): kesan yang ada padanya tetapi tiada pada suara anda akan dihidupkan",
+  "Back to your own mix as it was": "Kembali ke campuran anda seperti asal",
+  "Back to “{voice}” as it was when you picked it": "Kembali ke “{voice}” seperti semasa anda memilihnya",
+  "Do the change again (Ctrl+Y)": "Buat semula perubahan (Ctrl+Y)",
+  "Edit voice…": "Edit suara…",
+  "Mix in a voice": "Campurkan suara",
+  "Take back the last change (Ctrl+Z)": "Buat asal perubahan terakhir (Ctrl+Z)",
+  "Your voice already has everything “{voice}” has": "Suara anda sudah ada semua yang ada pada “{voice}”",
+  "{voice}, changed": "{voice}, diubah",
+  "Couldn't put it back: {error}": "Tidak dapat memulihkannya: {error}",
+  "Couldn't remove it: {error}": "Tidak dapat membuangnya: {error}",
+  "Online": "Dalam talian",
+  "Use {name} for typed lines": "Guna {name} untuk baris yang ditaip",
+  "Nothing answers at {address}": "Tiada apa-apa menjawab di {address}",
+  "Speaks your typed lines": "Menyebut baris yang anda taip",
+  "From a link…": "Daripada pautan…",
+  "Pick one of ours": "Pilih daripada kami",
+  "Remove server": "Buang pelayan"
 }

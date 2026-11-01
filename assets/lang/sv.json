@@ -4815,5 +4815,24 @@
   "{n} sound is gone from Myinstants, so it was skipped.": [
     "{n} ljud finns inte kvar på Myinstants, så det hoppades över.",
     "{n} ljud finns inte kvar på Myinstants, så de hoppades över."
-  ]
+  ],
+  "Community uploads": "Uppladdat av gemenskapen",
+  "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Lägg en annan rösts effekter ovanpå den här (Robot + Demon): effekterna den har och din inte har slås på",
+  "Back to your own mix as it was": "Tillbaka till din egen mix som den var",
+  "Back to “{voice}” as it was when you picked it": "Tillbaka till ”{voice}” som den var när du valde den",
+  "Do the change again (Ctrl+Y)": "Gör om ändringen (Ctrl+Y)",
+  "Edit voice…": "Redigera röst…",
+  "Mix in a voice": "Blanda in en röst",
+  "Take back the last change (Ctrl+Z)": "Ångra senaste ändringen (Ctrl+Z)",
+  "Your voice already has everything “{voice}” has": "Din röst har redan allt som ”{voice}” har",
+  "{voice}, changed": "{voice}, ändrad",
+  "Couldn't put it back: {error}": "Kunde inte lägga tillbaka den: {error}",
+  "Couldn't remove it: {error}": "Kunde inte ta bort den: {error}",
+  "Online": "Online",
+  "Use {name} for typed lines": "Använd {name} för skrivna rader",
+  "Nothing answers at {address}": "Inget svarar på {address}",
+  "Speaks your typed lines": "Säger raderna du skriver",
+  "From a link…": "Från en länk…",
+  "Pick one of ours": "Välj en av våra",
+  "Remove server": "Ta bort server"
 }

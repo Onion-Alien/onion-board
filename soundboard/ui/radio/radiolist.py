@@ -380,7 +380,7 @@ QFrame#stations QMenu { background:$card; }
 QFrame#stations QListWidget { border:none; outline:0; }
 QFrame#stations QPushButton#seg { border:none; border-radius:7px; padding:5px 10px;
     min-height:18px; background:transparent; color:$muted; font-weight:600; }
-QFrame#stations QPushButton#seg:hover { color:$text_hi; background:$card_hi; }
+QFrame#stations QPushButton#seg:hover { color:$text_hi; background:$btn_hover; }
 QFrame#stations QPushButton#seg:checked { background:$fill; color:$on_accent; }
 QFrame#stations QWidget#segbox { background:$segbox; border-radius:9px; }
 QFrame#stations QPushButton#genre { border-radius:6px; padding:3px 10px; font-size:8.5pt;
