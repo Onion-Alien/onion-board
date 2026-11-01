@@ -22,8 +22,7 @@ import threading
 
 from PySide6.QtCore import QEvent, QSize, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QCheckBox, QComboBox, QFrame, QGridLayout,
-                               QHBoxLayout, QLabel, QPushButton, QSizePolicy, QSlider, QVBoxLayout,
-                               QWidget)
+                               QHBoxLayout, QLabel, QPushButton, QSlider, QVBoxLayout, QWidget)
 
 from soundboard.addons import aiaddon
 from soundboard.core import applog, errors, updates, usage
@@ -256,9 +255,9 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         self.picked_kind = QLabel(_("(AI voice)"))
         self.picked_kind.setObjectName("pickedkind")
         ph.addWidget(self.picked_kind)
-        for lbl in (self.picked_name, self.picked_kind):   # no wider than their words:
-            # the kind stays by the name, on a line of its own too (narrow)
-            lbl.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred)
+        # picture, name and kind kept together on the left, on a line of their own too
+        # (narrow): no gaps opening up between them
+        self.picked_box.setAlignment(ph, Qt.AlignmentFlag.AlignLeft)
         self._picked_btns = QWidget()
         bflow = Flow(self._picked_btns, gap=10)
         self.picked_box.addWidget(self._picked_btns, 1)   # right after the name

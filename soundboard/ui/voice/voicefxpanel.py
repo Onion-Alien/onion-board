@@ -17,7 +17,7 @@ import numpy as np
 from PySide6.QtCore import QEvent, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QGuiApplication, QKeySequence, QShortcut
 from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QDialog, QFrame, QGridLayout, QHBoxLayout,
-                               QLabel, QMenu, QPushButton, QSizePolicy,
+                               QLabel, QMenu, QPushButton,
                                QScrollArea, QTabWidget, QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
 
@@ -255,9 +255,9 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self.picked_kind = QLabel(_("(Voice changer)"))
         self.picked_kind.setObjectName("pickedkind")
         ph.addWidget(self.picked_kind)
-        for lbl in (self.picked_name, self.picked_kind):   # no wider than their words:
-            # the kind stays by the name, on a line of its own too (narrow)
-            lbl.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred)
+        # picture, name and kind kept together on the left, on a line of their own too
+        # (narrow): no gaps opening up between them
+        self.picked_box.setAlignment(ph, Qt.AlignmentFlag.AlignLeft)
         # everything for making your own voice opens in a window of its own (on the
         # card it made the tab scroll forever)
         self.btn_tweak = QPushButton(_("Edit voice"))
