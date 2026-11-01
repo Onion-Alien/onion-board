@@ -1,0 +1,1 @@
+- The side bar no longer squeezes the On Air card for a moment after the window grows back from a short size.

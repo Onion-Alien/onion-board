@@ -155,6 +155,8 @@ class Flow(QLayout):
             hint = it.sizeHint()
             if hint.width() > rect.width() > 0:   # wider than the whole row: as narrow
                 hint.setWidth(max(rect.width(), it.minimumSize().width()))   # as it goes
+                if it.hasHeightForWidth():   # and as tall as it then needs (WrapButton)
+                    hint.setHeight(it.heightForWidth(hint.width()))
             if line and x + hint.width() > rect.right() + 1:
                 put()
                 x, y, line = rect.x(), y + line + self._gap, 0

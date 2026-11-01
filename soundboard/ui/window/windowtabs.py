@@ -103,6 +103,8 @@ class WindowTabs(WindowParts):
             v.board_changed()
             v.set_view(self.cfg.voice_view)   # both cards: Voice changer and AI voices
             v.fx.view_toggle.changed.connect(lambda view: self.set_option("voice_view", view))
+            v.room_changed.connect(   # (before the window fits the first time: nothing to do)
+                lambda: hasattr(getattr(self, "fitctl", None), "_fit") and self.fitctl._refit())
         elif key == "apps":
             v = AppsTab(self.engine, self.cfg, self._save_later, Meter)
             v.clip_ready.connect(self.soundctl.on_clip)

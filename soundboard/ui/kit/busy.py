@@ -64,7 +64,10 @@ def _keep_width(btn):
     # while it shows (_restore lets go again)
     if btn.property("min_w_before") is None:
         btn.setProperty("min_w_before", btn.minimumWidth())
-    btn.setMinimumWidth(max(btn.minimumWidth(), btn.sizeHint().width()))
+    # (never wider than it is: a WrapButton on two lines would push its page wider)
+    hint = btn.sizeHint().width()
+    btn.setMinimumWidth(max(btn.minimumWidth(), min(hint, btn.width()) if btn.isVisible()
+                            else hint))
 
 
 def _set_label(btn, text: str, serial: int):

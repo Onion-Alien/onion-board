@@ -143,7 +143,8 @@ class TransportControl(Controller):
                 slider.blockSignals(False)
             for p in players:
                 p.set_seek(int(frac * 1000))
-            mw._set_np_time(fmt_pos(frac * m.duration, m.duration))
+            length = mw.playctl.length(m)
+            mw._set_np_time(fmt_pos(frac * length, length))
 
     def _video_of(self, sid: str | None) -> Path | None:
         """The current sound's video, looked up once per selection, on a thread (it

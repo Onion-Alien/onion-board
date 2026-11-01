@@ -13,7 +13,7 @@ import html
 import threading
 from collections.abc import Callable
 
-from PySide6.QtCore import Qt, QTimer, Signal
+from PySide6.QtCore import QEvent, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QFrame, QHBoxLayout, QLabel, QPushButton,
                                QScrollArea, QVBoxLayout, QWidget)
 
@@ -26,7 +26,7 @@ from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController
 from soundboard.ui.kit import a11y, appstate
 from soundboard.ui.kit.panel import Flow, UndoBar
-from soundboard.ui.window.responsive import FitWidth
+from soundboard.ui.window.responsive import FitWidth, touch
 from soundboard.ui.voice.speechpanel import SpeechPanel
 from soundboard.ui.voice.voicefxpanel import EffectRow, VoiceFxPanel
 from soundboard.ui.voice.voicestatus import VoiceStatusBar
@@ -54,6 +54,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
     clip_ready = Signal(object, str)   # a typed line saved as a sound (SpeechPanel)
     share_asked = Signal(str)   # Share to the store: the voice, as the Share window lists it
     light_changed = Signal(bool)   # Use less CPU switched by hand
+    room_changed = Signal()   # the voices' minimum height changed: the window fits again
     live_tabs_changed = Signal()   # a tab's "on" dot came or went (live_tabs)
     _scanned = Signal(object, object)   # the Refresh button's worker: (modules, AI voices)
 
@@ -279,6 +280,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
             lay.removeWidget(panel.picked)
             outer.addWidget(panel.picked)
             panel.picked.setProperty("pinned", True)
+            panel.picked.installEventFilter(self)   # shown / hidden: _voices_room
             panel.show_picked_row(True)
         self._make_bar_controls()
         outer.addWidget(self.bar)
@@ -322,7 +324,8 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         return [(50, "w", r.hide(self.speech.say_stop)),
                 # a short window: the picked voice's bar scrolls with the voices (still
                 # there, under them) rather than the window turning into the mini player
-                (45, "h", self._pin_picked_off)]
+                # before the mixer goes: in their cards the bars are all still there
+                (35, "h", self._pin_picked_off)]
 
     def _barred(self):
         """The cards with a picked voice's bar: (tab key, panel). Clean mic's first, as
@@ -359,6 +362,28 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
             picked.style().unpolish(picked)
             picked.style().polish(picked)
             panel.show_picked_row(True)   # (in its card: shown with it)
+        self._voices_room()
+        touch(self._scroll)   # measured afresh: the fitter checks it fits now
+
+    # what the voices keep while bars are pinned under them: the card's top and two
+    # rows of voices. Three or four bars on took it all on a short window (560x700:
+    # no voices left), so the bars go into their cards (fit_steps) before that
+    VOICES_MIN_H = 440
+
+    def _voices_room(self):
+        """The voices' minimum height: VOICES_MIN_H while a pinned bar shows, else none."""
+        pinned = any(p.picked.property("pinned") and not p.picked.isHidden()
+                     for _key, p in self._barred())
+        h = self.VOICES_MIN_H if pinned else 0
+        if self._scroll.minimumHeight() != h:
+            self._scroll.setMinimumHeight(h)
+            touch(self._scroll)
+            self.room_changed.emit()
+
+    def eventFilter(self, obj, e):
+        if e.type() in (QEvent.Type.Show, QEvent.Type.Hide):
+            self._voices_room()   # a bar came or went
+        return super().eventFilter(obj, e)
 
     def stack_steps(self):
         return []   # one card at a time: nothing to stack when narrow
