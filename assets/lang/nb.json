@@ -2656,7 +2656,6 @@
   ],
   "AI voice off": "AI-stemme av",
   "AI voice: {voice}, starting.": "AI-stemme: {voice}, starter.",
-  "AI voice: {voice}.": "AI-stemme: {voice}.",
   "No mic open": "Ingen mikrofon er åpen",
   "What others hear from your mic": "Hva andre hører fra mikrofonen din",
   "Getting Python ready…": "Gjør Python klar…",
@@ -3978,7 +3977,6 @@
   "The computer voice ({voice}) speaks for you.": "Datamaskinstemmen ({voice}) snakker for deg.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Slår av alle stemmer som endrer mikrofonen din. Når du slår den på, kommer de tilbake.",
   "Turns on: {voices}": "Slår på: {voices}",
-  "Voice changer: {voice}.": "Stemmeforvrenger: {voice}.",
   "Voices on or off": "Stemmer på eller av",
   "What you say is said in {language}.": "Det du sier, blir sagt på {language}.",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board ble lukket uventet, så det startet på nytt.",
@@ -4814,5 +4812,8 @@
   "Speaks your typed lines": "Sier linjene du skriver",
   "From a link…": "Fra en lenke…",
   "Pick one of ours": "Velg et av våre",
-  "Remove server": "Fjern server"
+  "Remove server": "Fjern server",
+  "Pause this voice (click again to bring it back)": "Sett denne stemmen på pause (klikk igjen for å få den tilbake)",
+  "Paused: click to turn this voice back on": "På pause: klikk for å slå stemmen på igjen",
+  "Turn this voice off (Voices ON won't bring it back)": "Slå av denne stemmen (Stemmer PÅ henter den ikke tilbake)"
 }
