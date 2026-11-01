@@ -1,0 +1,2 @@
+- A language download cut off by a dropped connection now says the connection dropped, not that the checksum was wrong; removing a language also deletes what a download stopped by a crash or End task left behind.
+- The speech model: a download stopped by a crash or End task no longer leaves its unfinished part on the disk for good, and when downloading it fails at Start the voice says to check your internet instead of showing a long error and suggesting another model.

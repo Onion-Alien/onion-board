@@ -315,7 +315,7 @@ class SpeechInstalls(QObject):
         elif err and m is not None:
             busy.toast(p, html.escape(_(
                 "⚠ {language}: {error}. Check your internet connection and press "
-                "Download again.", language=langnames.of(m), error=errors.plain(err))
+                "Download again.", language=langnames.of(m), error=errors.plain(err).rstrip("."))
                 .removeprefix("⚠ ")), "error")
         p.downloaded.emit()
 
