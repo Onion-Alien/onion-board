@@ -4680,5 +4680,30 @@
   "Save what you have now into “{name}”": "Lưu thiết lập hiện tại vào “{name}”",
   "Update “{name}”": "Cập nhật “{name}”",
   "Update, reset or save as a new preset": "Cập nhật, đặt lại hoặc lưu thành mẫu mới",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Kéo tay nắm để cắt bỏ đầu và cuối. Ctrl+cuộn để phóng to. Kéo bằng chuột phải, hoặc Shift+cuộn, để di chuyển."
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Kéo tay nắm để cắt bỏ đầu và cuối. Ctrl+cuộn để phóng to. Kéo bằng chuột phải, hoặc Shift+cuộn, để di chuyển.",
+  "Add splices": "Thêm đoạn",
+  "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Bấm chỗ một phần bắt đầu, rồi chỗ nó kết thúc. Mỗi phần là một đoạn. Esc bỏ đoạn đang làm dở.",
+  "Combine splices": "Ghép các đoạn",
+  "Combine splices makes the sound play them back to back, 1 first.": "Ghép các đoạn làm âm thanh phát chúng nối tiếp nhau, đoạn 1 trước.",
+  "Combined: the sound plays them back to back, 1 first.": "Đã ghép: âm thanh phát chúng nối tiếp nhau, đoạn 1 trước.",
+  "Each splice's times, play or remove one, combine them": "Thời gian của từng đoạn, phát hoặc xóa một đoạn, ghép chúng",
+  "No splices yet. Turn on Add splices, then click where a part starts and where it ends.": "Chưa có đoạn nào. Bật Thêm đoạn, rồi bấm chỗ một phần bắt đầu và chỗ nó kết thúc.",
+  "Play splice {n}": "Phát đoạn {n}",
+  "Play the sound as before: the splices stay marked": "Phát âm thanh như trước: các đoạn vẫn được đánh dấu",
+  "Remove splice {n}": "Xóa đoạn {n}",
+  "Splice {n}": "Đoạn {n}",
+  "Splice {n}: {start} to {end}": "Đoạn {n}: {start} đến {end}",
+  "Splices": "Các đoạn",
+  "Splices ({n})": "Các đoạn ({n})",
+  "Split again": "Tách lại",
+  "{n} s": "{n} giây",
+  "A new pad of just the splices: this pad stays as it is": "Nút mới chỉ có các đoạn: nút này vẫn giữ nguyên",
+  "Combine {n} splice": [
+    "Ghép {n} đoạn"
+  ],
+  "New pad's name": "Tên nút mới",
+  "Replace this pad": "Thay nút này",
+  "They play back to back, 1 first. Your file itself is never cut.": "Chúng phát nối tiếp nhau, đoạn 1 trước. Bản thân tệp của bạn không bao giờ bị cắt.",
+  "This pad plays just the splices from now on (Split again undoes it)": "Từ giờ nút này chỉ phát các đoạn (Tách lại để hoàn tác)",
+  "{name} (splices)": "{name} (các đoạn)"
 }

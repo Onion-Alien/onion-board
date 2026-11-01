@@ -4767,5 +4767,31 @@
   "Save what you have now into “{name}”": "Запази текущото в „{name}“",
   "Update “{name}”": "Обнови „{name}“",
   "Update, reset or save as a new preset": "Обнови, нулирай или запази като нова настройка",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Плъзни дръжките, за да отрежеш началото и края. Ctrl+скрол увеличава. Влачи с десния бутон на мишката или Shift+скрол, за да местиш."
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Плъзни дръжките, за да отрежеш началото и края. Ctrl+скрол увеличава. Влачи с десния бутон на мишката или Shift+скрол, за да местиш.",
+  "Add splices": "Добави откъси",
+  "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Щракни където започва част, после където свършва. Всяка част е откъс. Esc отказва недовършен.",
+  "Combine splices": "Слей откъсите",
+  "Combine splices makes the sound play them back to back, 1 first.": "„Слей откъсите“ кара звука да ги пуска един след друг, от 1 нататък.",
+  "Combined: the sound plays them back to back, 1 first.": "Слети: звукът ги пуска един след друг, от 1 нататък.",
+  "Each splice's times, play or remove one, combine them": "Времената на всеки откъс, пусни или махни един, слей ги",
+  "No splices yet. Turn on Add splices, then click where a part starts and where it ends.": "Още няма откъси. Включи „Добави откъси“, после щракни където започва част и където свършва.",
+  "Play splice {n}": "Пусни откъс {n}",
+  "Play the sound as before: the splices stay marked": "Звукът свири както преди: откъсите остават отбелязани",
+  "Remove splice {n}": "Махни откъс {n}",
+  "Splice {n}": "Откъс {n}",
+  "Splice {n}: {start} to {end}": "Откъс {n}: от {start} до {end}",
+  "Splices": "Откъси",
+  "Splices ({n})": "Откъси ({n})",
+  "Split again": "Раздели пак",
+  "{n} s": "{n} с",
+  "A new pad of just the splices: this pad stays as it is": "Нов бутон само с откъсите: този бутон остава какъвто е",
+  "Combine {n} splice": [
+    "Слей {n} откъс",
+    "Слей {n} откъса"
+  ],
+  "New pad's name": "Име на новия бутон",
+  "Replace this pad": "Замени този бутон",
+  "They play back to back, 1 first. Your file itself is never cut.": "Пускат се един след друг, от 1 нататък. Самият файл никога не се реже.",
+  "This pad plays just the splices from now on (Split again undoes it)": "Този бутон отсега пуска само откъсите („Раздели пак“ го връща)",
+  "{name} (splices)": "{name} (откъси)"
 }

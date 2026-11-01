@@ -12,6 +12,10 @@ stays readable and new keys can be added without a migration:
      "reverse": False,
      "start": 0.0,        seconds into the original where the sound starts (trim)
      "end": 0.0,          seconds into the original where it ends; 0 = the very end
+     "splices": [[s, e]], parts of the original marked in Edit sound (seconds), in
+                          the order they were made; [] = none
+     "joined": False,     True: the sound is its splices back to back, and start /
+                          end only span them (what older versions play instead)
      "effects": {type: {"on": bool, param: value, ...}},   any voicefx effect,
                                                             modules' included
      "voice": {"name": str,                     a voice laid over the sound, before
@@ -25,8 +29,8 @@ stays readable and new keys can be added without a migration:
                                                  the rest: a stage each time a pad was
                                                  saved from them (with_live)
 
-The trim is applied first, to the original, so the file itself is never cut and
-the trim can be moved or undone at any time.
+The trim (or the joined splices) is applied first, to the original, so the file
+itself is never cut and the trim can be moved or undone at any time.
 
 Speed and pitch are independent: pitch is a high-quality resample (which also
 changes length), then a phase vocoder stretches the result to the length the
@@ -56,14 +60,16 @@ PITCH_RANGE = (-24.0, 24.0)
 GAIN_RANGE = (-24.0, 36.0)
 MAX_TRIM_S = 24 * 3600.0
 MIN_TRIM_S = 0.05     # the shortest trimmed sound
+MAX_SPLICES = 20      # parts marked on one sound
+JOIN_S = 0.004        # each joined splice ramps in and out over this long (no click)
 TAIL_S = 3.0          # room left for echo / reverb tails (trimmed back to the sound)
 BLOCK = 2048          # effects run in blocks like they do on the mic
 
 
 def neutral() -> dict:
     return {"speed": 1.0, "pitch": 0.0, "tape": False, "eq": [0.0] * len(eq.BANDS),
-            "gain_db": 0.0, "reverse": False, "start": 0.0, "end": 0.0, "effects": {},
-            "voice": {}, "live": []}
+            "gain_db": 0.0, "reverse": False, "start": 0.0, "end": 0.0, "splices": [],
+            "joined": False, "effects": {}, "voice": {}, "live": []}
 
 
 MAX_LIVE = 4   # Live controls stages on one sound (a copy of a copy of a copy…)
@@ -105,6 +111,25 @@ def clean_voice(raw) -> dict:
     return {"name": _line(raw.get("name")), "effects": effects, **out}
 
 
+def clean_splices(raw) -> list[list[float]]:
+    """[[start, end], ...] in range, each at least MIN_TRIM_S long, at most MAX_SPLICES;
+    anything else in the list is dropped."""
+    out: list[list[float]] = []
+    for part in raw if isinstance(raw, list) else []:
+        try:
+            a, b = (float(v) for v in part)
+        except (TypeError, ValueError, OverflowError):
+            continue
+        if not (math.isfinite(a) and math.isfinite(b)):
+            continue
+        a, b = sorted((min(max(a, 0.0), MAX_TRIM_S), min(max(b, 0.0), MAX_TRIM_S)))
+        if b - a >= MIN_TRIM_S:
+            out.append([round(a, 3), round(b, 3)])
+        if len(out) == MAX_SPLICES:
+            break
+    return out
+
+
 def clean(fx: dict | None) -> dict:
     """Settings with every key present, in range, and unknown keys dropped."""
     out = neutral()
@@ -125,6 +150,8 @@ def clean(fx: dict | None) -> dict:
     out["end"] = num("end", 0.0, MAX_TRIM_S)
     if out["end"] and out["end"] <= out["start"] + MIN_TRIM_S:
         out["end"] = 0.0   # nothing (or next to nothing) left: keep the whole sound
+    out["splices"] = clean_splices(fx.get("splices"))
+    out["joined"] = bool(fx.get("joined", False)) and bool(out["splices"])
     out["tape"] = bool(fx.get("tape", False))
     out["reverse"] = bool(fx.get("reverse", False))
     g = fx.get("eq")
@@ -238,7 +265,7 @@ def _say(x: np.ndarray, voice: dict, cancel=None, progress=None) -> np.ndarray:
 
 def is_trimmed(fx: dict | None) -> bool:
     f = clean(fx)
-    return f["start"] >= 1e-3 or f["end"] >= 1e-3
+    return f["start"] >= 1e-3 or f["end"] >= 1e-3 or f["joined"]
 
 
 def is_neutral(fx: dict | None) -> bool:
@@ -255,8 +282,10 @@ def key(fx: dict | None) -> str:
     if is_neutral(fx):
         return ""
     f = clean(fx)
-    for k in ("start", "end", "voice", "live"):   # sounds without these keep the keys (and
-        if not f[k]:                         # caches) they had
+    if not f["joined"]:   # splices only marked change nothing that plays
+        f["splices"] = []
+    for k in ("start", "end", "splices", "joined", "voice", "live"):   # sounds without
+        if not f[k]:                         # these keep the keys (and caches) they had
             del f[k]
     text = json.dumps(f, sort_keys=True)
     return hashlib.blake2b(text.encode(), digest_size=6).hexdigest()
@@ -268,7 +297,9 @@ def summary(fx: dict | None) -> str:
         return ""
     f = clean(fx)
     bits = []
-    if is_trimmed(f):
+    if f["joined"]:
+        bits.append(f"{len(f['splices'])} splices joined")
+    elif is_trimmed(f):
         bits.append(f"trimmed {fmt_s(f['start'])}–{fmt_s(f['end']) if f['end'] else 'end'}")
     if abs(f["speed"] - 1) >= 1e-3:
         bits.append(f"{round(f['speed'], 3):g}x" + (" tape" if f["tape"] else ""))
@@ -296,14 +327,55 @@ def fmt_s(s: float) -> str:
 
 
 def trim(x: np.ndarray, fx: dict | None) -> np.ndarray:
-    """The part of (n, 2) audio at SR that the trim keeps (all of it if untrimmed)."""
+    """The part of (n, 2) audio at SR that the trim keeps (all of it if untrimmed), or
+    its joined splices back to back."""
     f = clean(fx)
+    if f["joined"]:
+        return join(x, f["splices"])
     a = min(int(round(f["start"] * SR)), len(x))
     b = int(round(f["end"] * SR)) if f["end"] else len(x)
     b = min(max(b, a), len(x))
     if b - a < int(MIN_TRIM_S * SR):   # a trim past the end of this sound: ignore it
         return x
     return x[a:b]
+
+
+def join(x: np.ndarray, splices: list[list[float]]) -> np.ndarray:
+    """The parts of (n, 2) audio at SR, back to back in the order given, each ramped in
+    and out over JOIN_S where it meets another (a cut mid-wave clicks). The ends of
+    the whole stay as cut, like a trim's. All of it if no part falls in the sound."""
+    parts = []
+    for a, b in splices:
+        a, b = min(int(round(a * SR)), len(x)), min(int(round(b * SR)), len(x))
+        if b - a >= int(MIN_TRIM_S * SR):
+            parts.append(x[a:b])
+    if not parts:
+        return x
+    if len(parts) == 1:
+        return parts[0]
+    ramp = np.linspace(0.0, 1.0, int(JOIN_S * SR), endpoint=False, dtype=F32)[:, None]
+    n = len(ramp)
+    out = []
+    for i, part in enumerate(parts):
+        y = part.astype(F32) if part.dtype != F32 else part.copy()
+        if i:
+            y[:n] *= ramp[:len(y)]
+        if i < len(parts) - 1:
+            y[-n:] *= ramp[::-1][-len(y[-n:]):]
+        out.append(y)
+    y = np.concatenate(out)
+    if x.dtype == np.int16:
+        return np.round(y).astype(np.int16)
+    return y
+
+
+def played_length(fx: dict | None, length: float) -> float:
+    """How long the part of a `length`-second sound that plays is, before speed."""
+    f = clean(fx)
+    if f["joined"]:
+        return sum(min(b, length) - min(a, length) for a, b in f["splices"])
+    end = f["end"] if 0 < f["end"] <= length else length
+    return max(0.0, end - min(f["start"], end))
 
 
 def preview_part(x: np.ndarray, fx: dict | None, seconds: float) -> tuple[np.ndarray, dict]:
@@ -315,7 +387,7 @@ def preview_part(x: np.ndarray, fx: dict | None, seconds: float) -> tuple[np.nda
     part = trim(x, f)
     n = max(1, int(seconds * f["speed"] * SR))
     part = part[-n:] if f["reverse"] else part[:n]
-    return part, dict(f, start=0.0, end=0.0)
+    return part, dict(f, start=0.0, end=0.0, splices=[], joined=False)
 
 
 # --------------------------------------------------------------------------- streaming

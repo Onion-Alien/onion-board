@@ -4767,5 +4767,31 @@
   "Save what you have now into “{name}”": "Tallenna nykyiset asetukset kohteeseen “{name}”",
   "Update “{name}”": "Päivitä “{name}”",
   "Update, reset or save as a new preset": "Päivitä, nollaa tai tallenna uutena esiasetuksena",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Vedä kahvoista leikataksesi alun ja lopun. Ctrl+rulla zoomaa. Siirrä vetämällä hiiren oikealla painikkeella tai Shift+rullalla."
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Vedä kahvoista leikataksesi alun ja lopun. Ctrl+rulla zoomaa. Siirrä vetämällä hiiren oikealla painikkeella tai Shift+rullalla.",
+  "Add splices": "Lisää pätkiä",
+  "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Klikkaa, mistä osa alkaa, sitten mihin se loppuu. Jokainen osa on pätkä. Esc hylkää keskeneräisen.",
+  "Combine splices": "Yhdistä pätkät",
+  "Combine splices makes the sound play them back to back, 1 first.": "Yhdistä pätkät soittaa ne heti peräkkäin, 1 ensin.",
+  "Combined: the sound plays them back to back, 1 first.": "Yhdistetty: ääni soittaa ne heti peräkkäin, 1 ensin.",
+  "Each splice's times, play or remove one, combine them": "Jokaisen pätkän ajat, soita tai poista yksi, yhdistä ne",
+  "No splices yet. Turn on Add splices, then click where a part starts and where it ends.": "Ei vielä pätkiä. Laita Lisää pätkiä päälle ja klikkaa, mistä osa alkaa ja mihin se loppuu.",
+  "Play splice {n}": "Soita pätkä {n}",
+  "Play the sound as before: the splices stay marked": "Soita ääni kuten ennen: pätkät jäävät merkityiksi",
+  "Remove splice {n}": "Poista pätkä {n}",
+  "Splice {n}": "Pätkä {n}",
+  "Splice {n}: {start} to {end}": "Pätkä {n}: {start}–{end}",
+  "Splices": "Pätkät",
+  "Splices ({n})": "Pätkät ({n})",
+  "Split again": "Erota taas",
+  "{n} s": "{n} s",
+  "A new pad of just the splices: this pad stays as it is": "Uusi nappi pelkillä pätkillä: tämä nappi pysyy ennallaan",
+  "Combine {n} splice": [
+    "Yhdistä {n} pätkä",
+    "Yhdistä {n} pätkää"
+  ],
+  "New pad's name": "Uuden napin nimi",
+  "Replace this pad": "Korvaa tämä nappi",
+  "They play back to back, 1 first. Your file itself is never cut.": "Ne soivat heti peräkkäin, 1 ensin. Itse tiedostoa ei koskaan leikata.",
+  "This pad plays just the splices from now on (Split again undoes it)": "Tämä nappi soittaa tästä lähtien vain pätkät (Erota taas peruu sen)",
+  "{name} (splices)": "{name} (pätkät)"
 }

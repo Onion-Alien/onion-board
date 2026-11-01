@@ -284,7 +284,8 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/core/tips.py` | is a game (or anything filling a monitor) in front? The top bars and the tours wait until it isn't |
 | `soundboard/ui/sounds/recordmic.py` | the Sounds tab's *Record a sound* window: a mic take (`Engine.start_mic_take`) or what's playing (`Engine.start_play_take`: sounds + radio, no mic), spooled by `recorder.MicTake`, raw or through the voice changer, trimmed and added as a pad; not modal |
 | `soundboard/sounds/catswitch.py` | Switch category when a program is in front: `Switcher.poll()` (one foreground lookup a second, only while a rule exists; back to the old category when the program closes) |
-| `soundboard/ui/sounds/trim.py` | the Effects tab's trim control: waveform with start / end handles and exact-time boxes; big in the Advanced view (ruler, zoom, fades drawn) |
+| `soundboard/ui/sounds/splicepanel.py` | Edit sound Advanced's splices: the Add splices switch and the Splices pop-up (each splice's times, play, remove, Combine splices) |
+| `soundboard/ui/sounds/trim.py` | the Effects tab's trim control: waveform with start / end handles and exact-time boxes; big in the Advanced view (ruler, zoom, fades drawn, splices: parts marked with two clicks, numbered, joined to play back to back) |
 | `soundboard/core/backup.py` | export / import of the board as a plain zip (JSON + original audio + pictures), sound packs and single sounds; see [BACKUP-FORMAT.md](BACKUP-FORMAT.md) |
 | `soundboard/sounds/packs.py` | free sound packs: the list (`packs/catalog.json` in this repo, with a built-in copy for offline) of ready-made boards in the backup format, added in one click; each pack's preview zip (`samples`) |
 | `soundboard/online/store.py` | the sound store (Store tab): the list, fetching a sound, votes, reports and uploads, talking to the project's own server |

@@ -56,6 +56,7 @@ def clean_sound(raw) -> dict:
     """A sound's preset: soundfx's settings with no trim, voice or live effects."""
     f = soundfx.clean(raw if isinstance(raw, dict) else {})
     f["start"] = f["end"] = 0.0
+    f["splices"], f["joined"] = [], False
     f["voice"], f["live"] = {}, []
     return f
 

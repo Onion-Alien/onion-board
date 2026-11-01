@@ -4767,5 +4767,31 @@
   "Save what you have now into “{name}”": "I-save ang kasalukuyan mo sa “{name}”",
   "Update “{name}”": "I-update ang “{name}”",
   "Update, reset or save as a new preset": "I-update, i-reset o i-save bilang bagong preset",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "I-drag ang mga handle para i-cut ang simula at dulo. Ctrl+scroll para mag-zoom. I-drag gamit ang kanang button ng mouse, o Shift+scroll, para gumalaw."
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "I-drag ang mga handle para i-cut ang simula at dulo. Ctrl+scroll para mag-zoom. I-drag gamit ang kanang button ng mouse, o Shift+scroll, para gumalaw.",
+  "Add splices": "Magdagdag ng hiwa",
+  "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "I-click kung saan nagsisimula ang isang bahagi, tapos kung saan ito natatapos. Bawat bahagi ay isang hiwa. Pinapakawalan ng Esc ang hindi pa tapos.",
+  "Combine splices": "Pagsamahin ang mga hiwa",
+  "Combine splices makes the sound play them back to back, 1 first.": "Ang Pagsamahin ang mga hiwa ay nagpapatugtog sa kanila nang sunod-sunod, 1 muna.",
+  "Combined: the sound plays them back to back, 1 first.": "Pinagsama: tinutugtog sila ng tunog nang sunod-sunod, 1 muna.",
+  "Each splice's times, play or remove one, combine them": "Mga oras ng bawat hiwa, patugtugin o alisin ang isa, pagsamahin sila",
+  "No splices yet. Turn on Add splices, then click where a part starts and where it ends.": "Wala pang hiwa. I-on ang Magdagdag ng hiwa, tapos i-click kung saan nagsisimula at natatapos ang isang bahagi.",
+  "Play splice {n}": "Patugtugin ang hiwa {n}",
+  "Play the sound as before: the splices stay marked": "Patugtugin ang tunog gaya ng dati: nananatiling may marka ang mga hiwa",
+  "Remove splice {n}": "Alisin ang hiwa {n}",
+  "Splice {n}": "Hiwa {n}",
+  "Splice {n}: {start} to {end}": "Hiwa {n}: {start} hanggang {end}",
+  "Splices": "Mga hiwa",
+  "Splices ({n})": "Mga hiwa ({n})",
+  "Split again": "Paghiwalayin ulit",
+  "{n} s": "{n} s",
+  "A new pad of just the splices: this pad stays as it is": "Bagong pad na mga hiwa lang: mananatili ang pad na ito gaya ng dati",
+  "Combine {n} splice": [
+    "Pagsamahin ang {n} hiwa",
+    "Pagsamahin ang {n} hiwa"
+  ],
+  "New pad's name": "Pangalan ng bagong pad",
+  "Replace this pad": "Palitan ang pad na ito",
+  "They play back to back, 1 first. Your file itself is never cut.": "Sunod-sunod silang tumutugtog, 1 muna. Hindi kailanman pinuputol ang file mo.",
+  "This pad plays just the splices from now on (Split again undoes it)": "Mga hiwa na lang ang tutugtugin ng pad na ito mula ngayon (binabawi ito ng Paghiwalayin ulit)",
+  "{name} (splices)": "{name} (mga hiwa)"
 }
