@@ -5,16 +5,17 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from PySide6.QtCore import QSize, Qt
+from PySide6.QtCore import QPoint, QSize, Qt
 from PySide6.QtGui import QFont, QIcon, QPainter, QPixmap
-from PySide6.QtWidgets import QBoxLayout, QDialog, QLabel, QPushButton, QVBoxLayout, QWidget
+from PySide6.QtWidgets import (QBoxLayout, QDialog, QLabel, QMenu, QPushButton, QVBoxLayout,
+                               QWidget)
 
 from soundboard.core import usage
 from soundboard.i18n import _
 from soundboard.speech import aivoicelist as avl
 from soundboard.ui.voice import art
-from soundboard.ui.kit import fit
-from soundboard.ui.voice.aivoicebrowser import mine_icon
+from soundboard.ui.kit import fit, icons
+from soundboard.ui.voice.aivoicebrowser import HEAR, mine_icon
 from soundboard.ui.voice.effectspopup import place_over
 from soundboard.ui.voice.groupbar import no_match
 from soundboard.ui.voice.voicefxpanel import (LIST_MIN_W, MAX_COLS, PICKED_ART, TILE_ART,
@@ -137,10 +138,9 @@ class AiVoiceCards(_Panel):
             b.clicked.connect(lambda __=False, i=vid: self._tile_clicked(i))
             b.star.setChecked(vid in self._favs)
             b.star.toggled.connect(lambda on, i=vid: self.set_favorite(i, on))
-            if avl.is_mine(vo):
-                b.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-                b.customContextMenuRequested.connect(
-                    lambda pos, i=vid, w=b: self._mine_menu(i, w.mapToGlobal(pos)))
+            b.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+            b.customContextMenuRequested.connect(
+                lambda pos, i=vid, w=b: self._card_menu(i, w.mapToGlobal(pos)))
             self.tiles.addButton(b)
             self._tile[vid] = b
         self._place_tiles()
@@ -277,12 +277,47 @@ class AiVoiceCards(_Panel):
         self._picked_btns.setMinimumWidth(
             need if want == QBoxLayout.Direction.LeftToRight else 0)
 
-    def open_tweak(self):
-        """Edit voice: the pitch, in a pop-up over the bar's button."""
+    def open_tweak(self, under: QWidget | None = None):
+        """Edit voice: the pitch, in a pop-up over the bar's button (or `under`)."""
         if self.tweak_pop is None:
             # self is the AiVoicePanel this mixin is part of
             self.tweak_pop = EditPopup(self)  # pyright: ignore[reportArgumentType]
-        self.tweak_pop.open_for(self.btn_tweak)
+        self.tweak_pop.open_for(under if under is not None else self.btn_tweak)
+
+    def _card_menu(self, vid: str, pos: QPoint):
+        """A voice card's right-click menu, as the voice changer's: Hear it, Edit voice,
+        its hotkey, and for one of your own voices change and delete."""
+        from soundboard.ui.kit.hotkeypick import pretty_key
+        vo = next((v for v in self.voices if v["id"] == vid), None)
+        if vo is None:
+            return
+        m = QMenu(self)
+        if self.previewer.available():
+            m.addAction(icons.icon("headphones"), HEAR, lambda: (
+                usage.used("ai-voice-hear"),
+                self.previewer.hear(self.b_hear, vo, self._sampled, self._say)))
+            m.addSeparator()
+        m.addAction(icons.icon("sliders"), _("Edit voice…"), lambda: self.edit_voice(vid))
+        key = self.keys.get(vid, "")
+        m.addAction(icons.icon("keyboard"),
+                    _("Hotkey: {key}…", key=pretty_key(key)) if key else _("Set a hotkey…"),
+                    lambda: self.hotkey_asked.emit(vid))
+        if key:
+            m.addAction(icons.icon("close"), _("Clear hotkey"),
+                        lambda: self.hotkey_cleared.emit(vid))
+        if avl.is_mine(vo):
+            m.addSeparator()
+            if self.can_make():
+                m.addAction(icons.icon("edit"), _("Change this voice"), lambda: self.edit(vid))
+            m.addAction(icons.icon("trash", "danger_text"), _("Delete"),
+                        lambda: self.delete(vid))
+        m.exec(pos)
+
+    def edit_voice(self, vid: str):
+        """A card's Edit voice: that voice picked, and its pitch pop-up over the card."""
+        usage.used("ai-voice-edit-menu")
+        self.pick(vid)
+        self.open_tweak(self._tile.get(vid))
 
     def _tile_clicked(self, vid: str):
         """A voice card: that voice, on; the one that's on already: off (as the voice

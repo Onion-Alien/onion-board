@@ -5148,5 +5148,14 @@
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "يفتح هذا التبويب عندما تكون Onion Board في المقدمة.\nEsc = إلغاء.",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "اسحب المقبضين لقصّ البداية والنهاية. انقر شريط الوقت أو اسحبه، أو اسحب مؤشر التشغيل، لتغيير مكان التشغيل. Ctrl+التمرير للتكبير. اسحب بزر الفأرة الأيمن، أو Shift+التمرير، للتنقّل.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "مجاني، بلا إعلانات ولا حساب. من صنع OnionAlien. مفتوح المصدر بموجب رخصة GNU GPL v3: استخدمه وعدّله وشاركه، بشرط أن تبقى نسختك مفتوحة المصدر أيضًا.",
-  "Community uploads": "رفعها المجتمع"
+  "Community uploads": "رفعها المجتمع",
+  "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "أضف مؤثرات صوت آخر إلى هذا الصوت (Robot + Demon): تُشغَّل المؤثرات التي لديه وليست في صوتك",
+  "Back to your own mix as it was": "العودة إلى مزيجك كما كان",
+  "Back to “{voice}” as it was when you picked it": "العودة إلى “{voice}” كما كان عند اختياره",
+  "Do the change again (Ctrl+Y)": "أعد التغيير (Ctrl+Y)",
+  "Edit voice…": "تعديل الصوت…",
+  "Mix in a voice": "امزج صوتًا",
+  "Take back the last change (Ctrl+Z)": "تراجع عن آخر تغيير (Ctrl+Z)",
+  "Your voice already has everything “{voice}” has": "صوتك فيه بالفعل كل ما في “{voice}”",
+  "{voice}, changed": "{voice}، مع تغييرات"
 }

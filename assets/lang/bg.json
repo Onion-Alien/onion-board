@@ -4796,5 +4796,14 @@
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Отваря този раздел, докато Onion Board е отпред.\nEsc = отказ.",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Плъзни дръжките, за да отрежеш началото и края. Щракни или влачи линийката с времето, или влачи маркера, за да смениш откъде свири. Ctrl+скрол увеличава. Влачи с десния бутон на мишката или Shift+скрол, за да местиш.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Безплатно, без реклами и без акаунт. Направено от OnionAlien. С отворен код под GNU GPL v3: ползвай го, променяй го и го споделяй, стига твоята версия също да е с отворен код.",
-  "Community uploads": "Качени от общността"
+  "Community uploads": "Качени от общността",
+  "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Добави ефектите на друг глас към този (Robot + Demon): ефектите, които той има, а твоят няма, се включват",
+  "Back to your own mix as it was": "Обратно към твоя микс, както беше",
+  "Back to “{voice}” as it was when you picked it": "Обратно към „{voice}“, както беше, когато го избра",
+  "Do the change again (Ctrl+Y)": "Направи промяната отново (Ctrl+Y)",
+  "Edit voice…": "Редактирай гласа…",
+  "Mix in a voice": "Смеси с глас",
+  "Take back the last change (Ctrl+Z)": "Отмени последната промяна (Ctrl+Z)",
+  "Your voice already has everything “{voice}” has": "Гласът ти вече има всичко, което има „{voice}“",
+  "{voice}, changed": "{voice}, променен"
 }

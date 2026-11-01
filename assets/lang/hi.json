@@ -4796,5 +4796,14 @@
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board सामने होने पर यह टैब खोलती है।\nEsc = रद्द करें।",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "शुरू और आख़िर काटने के लिए हैंडल खींचें। चलने की जगह बदलने के लिए टाइम रूलर पर क्लिक करें या खींचें, या प्लेहेड खींचें। Ctrl+स्क्रॉल से ज़ूम। आगे-पीछे जाने के लिए माउस का दायाँ बटन दबाकर खींचें, या Shift+स्क्रॉल करें।",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "मुफ़्त, बिना विज्ञापन और बिना अकाउंट। OnionAlien ने बनाया। GNU GPL v3 के तहत ओपन सोर्स: इस्तेमाल करें, बदलें और शेयर करें, बस आपका वर्ज़न भी ओपन सोर्स रहना चाहिए।",
-  "Community uploads": "समुदाय के अपलोड"
+  "Community uploads": "समुदाय के अपलोड",
+  "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "इस आवाज़ में किसी दूसरी आवाज़ के इफ़ेक्ट जोड़ें (Robot + Demon): जो इफ़ेक्ट उसमें हैं पर आपकी में नहीं, वे चालू हो जाते हैं",
+  "Back to your own mix as it was": "अपने मिक्स पर वापस, जैसा वह था",
+  "Back to “{voice}” as it was when you picked it": "“{voice}” पर वापस, जैसी वह चुनते समय थी",
+  "Do the change again (Ctrl+Y)": "बदलाव फिर से करें (Ctrl+Y)",
+  "Edit voice…": "आवाज़ बदलें…",
+  "Mix in a voice": "एक आवाज़ मिलाएँ",
+  "Take back the last change (Ctrl+Z)": "आख़िरी बदलाव वापस लें (Ctrl+Z)",
+  "Your voice already has everything “{voice}” has": "आपकी आवाज़ में पहले से वह सब है जो “{voice}” में है",
+  "{voice}, changed": "{voice}, बदली हुई"
 }
