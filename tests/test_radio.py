@@ -201,38 +201,45 @@ def test_flat_map_hovers_clicks_and_follows_the_playing_station(qapp):
 
 
 
+def _covered(m, which=None):
+    """How many of the dots (`which`, else all) another dot covers, on screen."""
+    xs, ys = m._screen()
+    idx = np.arange(len(xs)) if which is None else np.asarray(which)
+    d = np.hypot(xs[idx, None] - xs[None, idx], ys[idx, None] - ys[None, idx])
+    np.fill_diagonal(d, np.inf)
+    return int((d < (m._r[idx, None] + m._r[None, idx])).any(axis=1).sum())
+
+
 def test_flat_map_moves_dots_apart_instead_of_covering(qapp):
-    """A whole city's stations listed at its centre come apart, zoomed out or in,
-    each its own dot to click; the busiest keeps the spot and a dot alone doesn't move."""
+    """A whole city's stations listed at its centre come apart a few wheel steps in,
+    each its own dot to click; the busiest keeps the spot and a dot alone doesn't move.
+    On the whole world they close up into one spot."""
     pts = [{"id": f"s{i}", "la": 50.0, "lo": 10.0, "k": i} for i in range(20)]
     pts.append({"id": "alone", "la": 40.0, "lo": 0.0, "k": 5})
-    from soundboard.ui.radio.flatmap import FlatMap
+    from soundboard.ui.radio.flatmap import SPREAD_S, FlatMap
     m = FlatMap()
     m.resize(400, 300)
     m.set_points(pts)
-    alone = [d["id"] for d in m._points].index("alone")
-    busiest = [d["id"] for d in m._points].index("s19")
-    for zoom in (1.0, 50.0):
+    ids = [d["id"] for d in m._points]
+    assert not m._off[ids.index("alone")].any()
+    assert not m._off[ids.index("s19")].any()      # the busiest keeps the middle
+    city = [ids.index(f"s{i}") for i in range(20)]
+    width = {}
+    for zoom in (1.0, 4.0, 50.0):
         m.zoom, m.cx, m.cy = zoom, 10.0, 50.0
         m._clamp()
-        dx, dy = m._spread(m._scale(), wait=True)
-        xs, ys = m._screen()
-        r = m._r * m._grow()
-        assert (dx[alone], dy[alone]) == (0, 0)
-        assert (dx[busiest], dy[busiest]) == (0, 0)   # the busiest keeps the middle
-        assert np.hypot(dx, dy).max() <= m._room_size()[1] + 1e-6
-        apart = [all(np.hypot(xs[i] - xs[j], ys[i] - ys[j]) >= r[i] + r[j]
-                     for j in range(21) if j != i) for i in range(21)]
-        # zoomed out there's room near the spot for most; zoomed in, for all
-        assert sum(apart) >= (15 if zoom == 1 else 21)
+        xs, _ys = m._screen()
+        width[zoom] = xs[city].max() - xs[city].min()
+        if m._scale() >= SPREAD_S:
+            assert _covered(m, city) == 0
+    assert width[1.0] < width[4.0] < width[50.0]
     m.grab()
-
 
 
 def test_flat_map_city_clump_keeps_coming_apart_zoomed_in(qapp):
     """A big city's stations all listed at its centre, popular ones among them: the
     further in, the further apart they spread (not one clump the same size at every
-    zoom), and all the way in none covers another."""
+    zoom), and none covers another once they're spread."""
     pts = [{"id": f"s{i}", "la": 40.7, "lo": -74.0, "k": (i * 37) % 400}
            for i in range(150)]
     from soundboard.ui.radio.flatmap import ZOOM_MAX, FlatMap
@@ -243,15 +250,24 @@ def test_flat_map_city_clump_keeps_coming_apart_zoomed_in(qapp):
     for zoom in (8.0, 40.0, ZOOM_MAX):
         m.zoom, m.cx, m.cy = zoom, -74.0, 40.7
         m._clamp()
-        m._spread(m._scale(), wait=True)
-        xs, ys = m._screen()
+        xs, _ys = m._screen()
         width[zoom] = xs.max() - xs.min()
-        if zoom == ZOOM_MAX:
-            r = m._r * m._grow()
-            d = np.hypot(xs[:, None] - xs[None], ys[:, None] - ys[None])
-            np.fill_diagonal(d, np.inf)
-            assert (d >= (r[:, None] + r[None]) - 1e-6).all()
+        assert _covered(m) == 0
     assert width[8.0] < width[40.0] < width[ZOOM_MAX]
+
+
+def test_spreading_the_dots_out_is_one_quick_pass():
+    """The dots' places are worked out once, when the stations come, in one numpy pass:
+    not again per zoom step (which ran for seconds and froze the map mid-zoom)."""
+    from soundboard.ui.radio.mapparts import _sizes, _spread_out
+    rng = np.random.default_rng(3)
+    x, y = rng.normal(0, 300, 3000), rng.normal(0, 200, 3000)
+    r, _hot = _sizes(rng.integers(0, 5000, 3000).astype(float))
+    t = time.perf_counter()
+    off = _spread_out(x, y, r)
+    assert time.perf_counter() - t < 0.1
+    assert off.shape == (3000, 2)
+
 
 def test_flat_map_popular_stations_glow_bigger(qapp):
     """The most played stations are big glowing dots, the more plays the bigger; the

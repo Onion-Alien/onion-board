@@ -3,14 +3,21 @@
 A plain map (land outlines, country names, a dot per station and, zoomed in, the
 names of the cities and towns in view that have stations) costs nothing while
 it sits there: it only repaints when you drag, zoom, hover over a different dot or the
-stations change, and it needs no web engine. The world is drawn in tiles (TILE device
-pixels square), each once per zoom: a drag or a repaint only copies the tiles in view,
-at any zoom. Tiles not drawn yet (a new zoom, a drag onto new ground) are drawn a
-slice at a time while the last whole view, put together into one picture and
-stretched, stands in for them (tiles stretched one by one showed their seams, a grid
-over the map); a new zoom shows only once all of it is drawn. Under that, the land of
-the whole world, small. The country names show first, then (NAMES_FIRST_S on) the
-first stations pop in a few at a time (REVEAL_S); Bun waits on the map till they come.
+stations change, and it needs no web engine. The land and the country names are drawn
+in tiles (TILE device pixels square), each once per zoom: a drag or a repaint only
+copies the tiles in view, at any zoom. Tiles not drawn yet (a new zoom, a drag onto new
+ground) are drawn a slice at a time while the last whole view, put together into one
+picture and stretched, stands in for them (tiles stretched one by one showed their
+seams, a grid over the map); a new zoom shows only once all of it is drawn. Under
+that, the land of the whole world, small.
+
+The stations are not on the tiles. They're drawn over them on every paint, each dot a
+picture drawn once and copied (_sprite): all 3000 in view are ~1.5 ms, zoomed in only
+the few in view. So they're sharp and in place at every zoom, mid-zoom too, and the
+same size at every zoom: zooming in only ever moves them further apart. Stations at
+the same spot are fanned out once, when they come (set_points, _spread_out). The
+country names show first, then (NAMES_FIRST_S on) the stations fade in (REVEAL_S);
+Bun waits on the map till they come.
 
 Stations arrive as radio.globe_points() dicts (the name is from the 3D globe this map
 replaced).
@@ -35,14 +42,13 @@ from soundboard.ui.kit import theme
 from soundboard.i18n import _, ngettext
 from soundboard.ui.kit import oops
 from soundboard.ui.kit.pixels import snap_to_pixels
-from soundboard.ui.radio.mapparts import (LAT_BOTTOM, LAT_TOP, QUIET_R, ROOM_GAP_PX, ROOM_PX,
-                                          ROOM_SLICE_S, ROOM_STEPS, ROOM_ZOOM, _fill, _glow_image,
-                                          _Loading, _make_room, _mix, _pop, _sizes)
+from soundboard.ui.radio.mapparts import (LAT_BOTTOM, LAT_TOP, SPREAD_S, _fill, _glow_image,
+                                          _Loading, _mix, _sizes, _spread_out)
 from soundboard.ui.radio.maptiles import SLICE_GAP_MS, MapTiles
 from soundboard.ui.radio.maplabels import MapLabels
 # (callers import these from here too)
 from soundboard.ui.radio.mapparts import (FILL_PX, HOT_MIN, HOT_R, HOT_SHARE,  # noqa: F401
-                                          LOADING_TEXT, ROOM_BATCH)
+                                          LOADING_TEXT, QUIET_R)
 from soundboard.ui.radio.maptiles import BASE_ZOOM, SLICE_S, TILE, TILE_RING  # noqa: F401
 from soundboard.ui.radio.maplabels import LABEL_GROW_MAX  # noqa: F401
 
@@ -58,10 +64,9 @@ SETTLE_MS = 120                     # zooming: the old tiles, stretched, until t
 TOWN_ZOOM = 2.0                     # city and town names show from this zoom in...
 TOWNS_IN_VIEW = 40                  # ...at most this many at once, only those in view
 TOWN_SLICE_S = 0.0015               # new names drawn a paint, then the rest a moment later
-GLOW = 2.8                          # the glow round a popular dot, times its size
+GLOW = 2.2                          # the glow round a popular dot, times its size
 NAMES_FIRST_S = 0.35                # the country names alone, before the dots...
-REVEAL_S = 1.4                      # ...then the first stations pop in over this long...
-POP_S = 0.3                         # ...each growing in over this (a little overshoot)
+REVEAL_S = 0.5                      # ...then the first stations fade in over this long
 CORNER_PX = 12                      # the map's rounded corners (like QFrame#stations)
 
 
@@ -85,17 +90,12 @@ class FlatMap(MapTiles, MapLabels, QWidget):
         self._index: dict[str, int] = {}   # a station's place in _points, by uuid
         self._lon = np.zeros(0)
         self._lat = np.zeros(0)
-        self._r = np.zeros(0)           # dot radius before zoom (_sizes)
+        self._r = np.zeros(0)           # dot radius, pixels (_sizes)
         self._hot = np.zeros(0, bool)   # ...and which glow: the most listened
+        self._off = np.zeros((0, 2))    # pixels each dot is moved by at SPREAD_S (_screen)
         self._buf: QImage | None = None  # the map drawn before its corners are rounded
-        self._room: dict[tuple, np.ndarray] = {}   # dots moved apart, per zoom (_spread)
-        self._room_job: tuple | None = None        # (zoom, its steps): being worked out
-        self._room_shown: np.ndarray | None = None  # ...and what shows meanwhile
-        self._room_timer = QTimer(self)            # works on it a slice more (_room_step)
-        self._room_timer.setSingleShot(True)
-        self._room_timer.setInterval(SLICE_GAP_MS)
-        self._room_timer.timeout.connect(self._room_step)
-        self._look: tuple | None = None  # (accent, quiet, hot, glow picture): _dot_look
+        self._look: tuple | None = None  # (colours, quiet, hot, glow picture): _dot_look
+        self._sprites: dict[tuple, QPixmap] = {}   # each dot size drawn once (_sprite)
         self._current: str | None = None
         self._hover = -1
         self._msg = ""
@@ -103,15 +103,15 @@ class FlatMap(MapTiles, MapLabels, QWidget):
         self.cx, self.cy = 10.0, (LAT_TOP + LAT_BOTTOM) / 2   # the view's centre (lon, lat)
         self._drag: QPointF | None = None
         self._dragged = False
-        self._ver = 0                     # bumped when what's drawn changes
-        self._land_ver = 0                # ...and when the land (or its colours) does
+        self._land_ver = 0                # bumped when the land (or its colours) changes
         self._tiles: dict[tuple, QPixmap] = {}   # (level, i, j): see _level
         # the last view drawn all over: (level, its slots), put together on demand into
         # one picture (_pics) that stands in, stretched, while a new one is drawn
         self._stable: tuple | None = None
         self._pics: dict[tuple, tuple] = {}      # (level, slots): (picture, x, y)
         self._placed: dict[float, list] = {}     # country names' places, per scale
-        self._reveal_t0: float | None = None     # when the first stations pop in (REVEAL_S)
+        self._label_pm: dict[tuple, QPixmap] = {}  # ...and each drawn once (_label_pixmap)
+        self._reveal_t0: float | None = None     # when the first stations fade in (REVEAL_S)
         self._reveal_wait = False                # ...stations came before the land did
         self._land_set = False
         self._rings: deque[list] = deque()          # outlines still to make parts of
@@ -120,13 +120,8 @@ class FlatMap(MapTiles, MapLabels, QWidget):
         self._land_steps.setSingleShot(True)
         self._land_steps.setTimerType(Qt.TimerType.PreciseTimer)
         self._land_steps.timeout.connect(self._land_step)
-        self._names_pic: tuple | None = None     # (view, picture): the names over the pop-in
-        self._names_build: tuple | None = None   # (view, picture, its steps): being drawn
-        self._dots_pic: tuple | None = None      # (view, picture, which are on it): the
-                                                 # dots done popping in, drawn once
-        self._delay = np.zeros(0)                # ...and each one's turn to pop in
         self._reveal = QTimer(self)
-        self._reveal.setInterval(1000 // 24)   # a short pop-in: 24 fps is plenty
+        self._reveal.setInterval(1000 // 30)   # a short fade: 30 fps is plenty
         self._reveal.timeout.connect(self._reveal_step)
         self._settle = QTimer(self)       # running while the wheel is still zooming
         self._settle.setSingleShot(True)
@@ -203,7 +198,7 @@ class FlatMap(MapTiles, MapLabels, QWidget):
         self._land_box = [part.boundingRect() for part in self._land]
         self._land_ver += 1
         self._land_set = True
-        if self._reveal_wait:   # the stations came first: their pop-in waited for this
+        if self._reveal_wait:   # the stations came first: their fade-in waited for this
             self._start_reveal()
         self._redraw()
 
@@ -217,45 +212,32 @@ class FlatMap(MapTiles, MapLabels, QWidget):
         self._lat = np.array([d["la"] for d in pts], float)
         k = np.array([d.get("k", 0) for d in pts], float)
         self._r, self._hot = _sizes(k)
-        self._room = {}
-        self._room_job = None
+        self._off = _spread_out(self._lon * SPREAD_S, -self._lat * SPREAD_S, self._r)
         self._hover = -1
         if pts:
             self._msg = ""
             self.oops.hide()
             self._loading.hide()
         if first:
-            # the map fills up: the most listened first, the rest in a shuffled wave
-            n = len(pts)
-            rank = (n - 1 - np.arange(n)) / max(1, n)
-            # a fixed scatter, not np.random: its first use loads numpy's random DLLs,
-            # and a DLL load here waited out the decoder's (radio.preload_decoder)
-            jitter = (np.arange(n) * 0.6180339887 % 1.0) * 0.25
-            self._delay = (REVEAL_S - POP_S) * np.clip(rank * 0.8 + jitter, 0, 1)
             if self._land_set:
                 self._start_reveal()
             else:   # the land and its names first, then the dots
                 self._reveal_wait = True
-        elif self.revealing():
-            self._delay = np.zeros(len(pts))   # changed mid-way: the rest at once
-        self._redraw()
+        self.update()
 
     def _start_reveal(self):
-        """The country names show on their own for NAMES_FIRST_S, then the dots pop in."""
+        """The country names show on their own for NAMES_FIRST_S, then the dots fade in."""
         self._reveal_wait = False
         self._reveal_t0 = time.monotonic() + NAMES_FIRST_S
         self._reveal.start()
 
     def revealing(self) -> bool:
-        """The first stations still to pop in, or popping in (REVEAL_S)."""
+        """The first stations still to fade in, or fading in (REVEAL_S)."""
         return self._reveal_t0 is not None or self._reveal_wait
 
     def _reveal_step(self):
         if self._reveal_t0 is None or time.monotonic() - self._reveal_t0 >= REVEAL_S:
             self._reveal_t0 = None
-            self._names_pic = None
-            self._drop_names()
-            self._dots_pic = None
             self._reveal.stop()
         self.update()
 
@@ -359,80 +341,21 @@ class FlatMap(MapTiles, MapLabels, QWidget):
                 if self.cx - half < 180 + k and self.cx + half > -180 + k]
 
     def _screen(self) -> tuple[np.ndarray, np.ndarray]:
-        """Each dot's spot on screen: its copy of the world nearest the middle."""
+        """Each dot's spot on screen: its copy of the world nearest the middle, moved
+        off any dot it would cover (_off). Zoomed out from SPREAD_S the move shrinks
+        with the map, so a city's dots close up into one spot on the whole world;
+        zoomed in from it, it grows (slower than the map), so they keep coming apart."""
         s = self._scale()
-        dx, dy = self._spread(s)
-        return (self.width() / 2 + ((self._lon - self.cx + 180) % 360 - 180) * s + dx,
-                self.height() / 2 - (self._lat - self.cy) * s + dy)
-
-    def _spread(self, s: float, wait: bool = False
-                ) -> tuple[np.ndarray | float, np.ndarray | float]:
-        """Pixels to move each dot by at scale `s` so none covers another: stations
-        close together, or listed at the very same spot (often a whole city's, at its
-        centre), move apart so each can be seen and clicked (_make_room). Worked out
-        for the half zoom step at or below `s` and kept: zooming further in only
-        spreads them more. Not worked out yet: it starts (_room_step), and till it's
-        done the dots are where the nearest zoom worked out had them (`wait`: now)."""
-        if not len(self._lon):
-            return 0.0, 0.0
-        base = round(self._scale() / self.zoom, 6)
-        b = math.floor(math.log2(max(1.0, s / base)) * ROOM_STEPS + 1e-9)
-        room = self._room.get((b, base))
-        if room is None:
-            if self._room_job is None or self._room_job[0] != (b, base):
-                zoom = 2 ** (b / ROOM_STEPS)
-                grow = self._grow(zoom)
-                self._room_job = ((b, base), _make_room(
-                    self._lon * base * zoom, -self._lat * base * zoom, self._r * grow,
-                    *self._room_size(zoom)))
-                self._room_timer.start()
-            if wait:
-                self._room_step(math.inf)
-                return self._spread(s)
-            # meanwhile: the nearest zoom out worked out, else the nearest in, else none
-            done = sorted((k[0] for k in self._room if k[1] == base),
-                          key=lambda k: (k > b, abs(k - b)))
-            if not done:
-                self._room_shown = None
-                return 0.0, 0.0
-            room = self._room_shown = self._room[(done[0], base)]
-        return room[:, 0], room[:, 1]
-
-    def _room_size(self, zoom: float | None = None) -> tuple[float, float]:
-        """How far apart moved dots sit and how far from their spot they may go, in
-        pixels, at `zoom` (_make_room)."""
-        zoom = self.zoom if zoom is None else zoom
-        grow = self._grow(zoom)
-        more = max(1.0, zoom / ROOM_ZOOM)
-        return ((2 * QUIET_R * grow + ROOM_GAP_PX) * 1.05 * math.sqrt(more),
-                ROOM_PX * grow * grow * more)
-
-    def _room_step(self, budget: float = ROOM_SLICE_S):
-        """Works on the dots' places (_spread) for `budget` seconds; once they're done,
-        the map is drawn again with them."""
-        if self._room_job is None:
-            return
-        key, steps = self._room_job
-        end = time.perf_counter() + budget
-        try:
-            while time.perf_counter() < end:
-                next(steps)
-        except StopIteration as done:
-            self._room[key] = room = done.value
-            self._room_job = None
-            shown = self._room_shown
-            # drawn again only if they moved: nothing to move (a dot alone) redrew the
-            # whole map for nothing
-            if not (np.array_equal(room, shown) if shown is not None else not room.any()):
-                self._redraw()
-            return
-        self._room_timer.start()
+        f = s / SPREAD_S if s < SPREAD_S else (s / SPREAD_S) ** 0.3
+        return (self.width() / 2 + ((self._lon - self.cx + 180) % 360 - 180) * s
+                + self._off[:, 0] * f,
+                self.height() / 2 - (self._lat - self.cy) * s + self._off[:, 1] * f)
 
     def _redraw(self):
-        """What's drawn changed (stations, land, theme): draw it again (a tile at a
-        time, the old tiles showing till then)."""
-        self._ver += 1
+        """The land, its names or the theme changed: draw it again (a tile at a time,
+        the old tiles showing till then)."""
         self._placed.clear()
+        self._label_pm.clear()
         self._town_pm.clear()
         self._town_box.clear()
         self.update()
@@ -457,14 +380,11 @@ class FlatMap(MapTiles, MapLabels, QWidget):
         self._tiles = {key: pm for key, pm in self._tiles.items() if key[0] == base}
         self._pics = {key: pic for key, pic in self._pics.items() if key[0] == base}
         self._stable = None
+        self._label_pm.clear()
         self._town_pm.clear()
         self._town_box.clear()
 
     # ------------------------------------------------------------------ painting
-    def _grow(self, zoom: float | None = None) -> float:
-        zoom = self.zoom if zoom is None else zoom
-        return min(2.0, 1 + (zoom - 1) * 0.15)   # dots get a little bigger zoomed in
-
     def _dot_look(self) -> tuple[QColor, QColor, QImage]:
         """The dots' colours for the theme: a quiet station's, a popular one's (the
         accent, lit up towards the brightest text: whiter on a dark theme, deeper on
@@ -475,42 +395,66 @@ class FlatMap(MapTiles, MapLabels, QWidget):
             quiet.setAlphaF(0.8)
             self._look = ((accent, hi), quiet, _mix(accent, hi, 0.3),
                           _glow_image(QColor(accent)))
+            self._sprites.clear()
         return self._look[1:]
 
-    def _dots_steps(self, p: QPainter, xs, ys, which: np.ndarray, r: np.ndarray):
-        """Draws dots `which` (in order, most listened last) at `xs`, `ys`, `r` big:
-        the popular ones' glows first, so a glow never hides a dot, then the quiet
-        dots, then the popular ones on top. A step every 200 draws."""
-        quiet, hot, glow = self._dot_look()
-        which = np.asarray(which, int)
-        lit = which[self._hot[which]].tolist()
-        # plain floats for Qt
-        fx, fy, fr = (np.asarray(v, float).tolist() for v in (xs, ys, r))
+    def _sprite(self, hot: bool, r: float, dpr: float) -> QPixmap:
+        """A dot `r` pixels big (a popular one with its glow round it), drawn once
+        for the theme; the map only copies it."""
+        quiet, lit, glow = self._dot_look()
+        key = (hot, r, dpr)
+        pm = self._sprites.get(key)
+        if pm is None:
+            g = r * GLOW if hot else r
+            side = max(1, math.ceil((2 * g + 2) * dpr))
+            pm = QPixmap(side, side)
+            pm.setDevicePixelRatio(dpr)
+            pm.fill(Qt.GlobalColor.transparent)
+            q = QPainter(pm)
+            q.setRenderHint(QPainter.RenderHint.Antialiasing)
+            q.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
+            c = side / dpr / 2
+            if hot:
+                q.drawImage(QRectF(c - g, c - g, 2 * g, 2 * g), glow, QRectF(glow.rect()))
+            q.setPen(Qt.PenStyle.NoPen)
+            q.setBrush(lit if hot else quiet)
+            q.drawEllipse(QPointF(c, c), r, r)
+            q.end()
+            self._sprites[key] = pm
+        return pm
+
+    def _paint_dots(self, p: QPainter, dpr: float):
+        """The stations in view, over the tiles: the quiet ones, then the popular ones
+        (biggest last) on top. A copied picture a dot, on a device pixel."""
+        if not len(self._points) or self._reveal_wait:
+            return
+        fade = 1.0
+        if self._reveal_t0 is not None:   # the first stations fading in
+            fade = min(1.0, (time.monotonic() - self._reveal_t0) / REVEAL_S)
+            if fade <= 0:
+                return
+        xs, ys = self._screen()
+        pad = self._r * np.where(self._hot, GLOW, 1.0) + 2
+        on = ((xs > -pad) & (xs < self.width() + pad)
+              & (ys > -pad) & (ys < self.height() + pad))
+        size = np.round(self._r * 4) / 4   # a picture for every quarter pixel of size
         p.save()
         try:
-            p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
-            p.setPen(Qt.PenStyle.NoPen)
-            n = 0
-            src = QRectF(glow.rect())
-            for i in lit:
-                g = fr[i] * GLOW
-                p.drawImage(QRectF(fx[i] - g, fy[i] - g, 2 * g, 2 * g), glow, src)
-                n += 1
-                if n % 200 == 0:
-                    yield
-            for brush, part in ((quiet, which[~self._hot[which]].tolist()), (hot, lit)):
-                p.setBrush(brush)
-                for i in part:
-                    p.drawEllipse(QPointF(fx[i], fy[i]), fr[i], fr[i])
-                    n += 1
-                    if n % 200 == 0:
-                        yield
+            p.setOpacity(fade)
+            for hot in (False, True):
+                part = on & (self._hot == hot)
+                for r in np.unique(size[part]).tolist():
+                    which = part & (size == r)
+                    pm = self._sprite(hot, r, dpr)
+                    half = pm.width() / dpr / 2
+                    for x, y in zip((np.round((xs[which] - half) * dpr) / dpr).tolist(),
+                                    (np.round((ys[which] - half) * dpr) / dpr).tolist()):
+                        p.drawPixmap(QPointF(x, y), pm)
         finally:
             p.restore()
 
-    def _map_steps(self, p: QPainter, tr: QTransform, s: float, rect: QRectF,
-                   land_only: bool = False):
-        """The sea, grid, land, names and dots (just the sea and land if `land_only`),
+    def _map_steps(self, p: QPainter, tr: QTransform, s: float, rect: QRectF):
+        """The sea and land,
         through `tr` ((lon, -lat) degrees to pixels), a draw call or so per step; only
         what falls in `rect` (pixels) is drawn."""
         t = theme.T
@@ -536,19 +480,6 @@ class FlatMap(MapTiles, MapLabels, QWidget):
                             yield
                 finally:
                     p.restore()
-            if land_only:
-                return
-            if len(self._points):
-                o = tr.map(QPointF(0, 0))
-                dx, dy = self._spread(s)
-                xs, ys = o.x() + self._lon * s + dx, o.y() - self._lat * s + dy
-                r = self._r * self._grow()
-                pad = r * np.where(self._hot, GLOW, 1.0) + 2
-                on = ((xs > rect.left() - pad) & (xs < rect.right() + pad)
-                      & (ys > rect.top() - pad) & (ys < rect.bottom() + pad))
-                yield from self._dots_steps(p, xs, ys, np.flatnonzero(on), r)
-            # country names last, outlined in the land's colour, so the dots don't hide them
-            yield from self._label_steps(p, s, (tr.map(QPointF(-180, -LAT_TOP)),), rect)
         finally:
             p.restore()
 
@@ -646,50 +577,6 @@ class FlatMap(MapTiles, MapLabels, QWidget):
             self._towns_later.start()
         return drawn
 
-    def _paint_reveal(self, p: QPainter):
-        """The first stations popping in, drawn live over the map (the tiles with
-        them on wait till all are in): just the ones in view, each its turn. A dot
-        done growing is drawn once, into a picture kept for the view, so a frame
-        draws only the ones still growing: drawing all ~3000 every frame was 4-7 ms
-        of back-to-back draw calls each 16 ms, the most right as the last ones came
-        in, and the sound playing skipped (the audio threads wait on each call)."""
-        if self._reveal_t0 is None:   # waiting on the land: no dots yet
-            return
-        t = time.monotonic() - self._reveal_t0
-        n = len(self._r)
-        if len(self._delay) == n:
-            x = (t - self._delay) / POP_S
-            size, done = _pop(x), x >= 1.0
-        else:
-            size, done = np.ones(n), np.ones(n, bool)
-        xs, ys = self._screen()
-        r = self._r * self._grow()
-        pad = r * np.where(self._hot, GLOW, 1.0) + 2
-        seen = ((xs > -pad) & (xs < self.width() + pad)
-                & (ys > -pad) & (ys < self.height() + pad))
-        dpr = self.devicePixelRatioF()
-        view = (round(self._scale(), 6), self.cx, self.cy, self.width(), self.height(),
-                dpr, self._ver, n)
-        if self._dots_pic is None or self._dots_pic[0] != view:
-            pic = QImage(max(1, round(self.width() * dpr)), max(1, round(self.height() * dpr)),
-                         QImage.Format.Format_ARGB32_Premultiplied)
-            pic.setDevicePixelRatio(dpr)
-            pic.fill(Qt.GlobalColor.transparent)
-            self._dots_pic = (view, pic, np.zeros(n, bool))
-        _view, pic, drawn = self._dots_pic
-        new = np.flatnonzero(done & seen & ~drawn)
-        if len(new):
-            q = QPainter(pic)
-            q.setRenderHint(QPainter.RenderHint.Antialiasing)
-            for _step in self._dots_steps(q, xs, ys, new, r):
-                pass
-            q.end()
-            drawn[new] = True
-        p.drawImage(0, 0, pic)
-        growing = np.flatnonzero((size > 0.05) & ~done & seen)
-        for _step in self._dots_steps(p, xs, ys, growing, r * size):
-            pass
-
     def paintEvent(self, _e):
         # Rounded like the stations card beside it. A clip path or a widget mask is
         # all-or-nothing per pixel, so its corners come out as stairs: draw the map
@@ -727,31 +614,29 @@ class FlatMap(MapTiles, MapLabels, QWidget):
         shown = [(self._tile_rect(cur, k, i, j), self._tiles.get((cur, i, j)))
                  for k, i, j in slots]
         complete = all(pm is not None for _at, pm in shown)
-        revealing = self.revealing()
-        if complete and not revealing:
+        if complete:
             for at, pm in shown:
                 if pm is not None:   # (all of them: complete)
                     p.drawPixmap(at, pm, QRectF(pm.rect()))
         else:
-            # a new zoom (or new dots) shows all at once when it's all drawn, never a
-            # patchwork of sharp and stretched squares; till then the last view
+            # a new zoom shows all at once when it's all drawn, never a patchwork of
+            # sharp and stretched squares; till then the last view
             self._stand_in(p)
-            if not revealing and self._stable is not None and self._stable[0] == cur:
+            if self._stable is not None and self._stable[0] == cur:
                 for at, pm in shown:   # the same zoom, dragged: the tiles there are
                     if pm is not None:
                         p.drawPixmap(at, pm, QRectF(pm.rect()))
-        self._plan(cur, slots, complete and not revealing)
+        self._plan(cur, slots, complete)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
-        if revealing:
-            self._paint_reveal(p)
-            self._paint_names(p)   # on top, as the tiles have them
+        self._paint_dots(p, dpr)
+        self._paint_labels(p, dpr)
         self._paint_towns(p, dpr)
         cur = self._current
         hover, cur_i = self._hover, self._index.get(cur, -1) if cur is not None else -1
         if (0 <= hover < len(self._points)) or cur_i >= 0:
             xs, ys = self._screen()
             if 0 <= hover < len(self._points):
-                r = self._r[hover] * self._grow() + 2
+                r = self._r[hover] + 2
                 p.setPen(QPen(QColor(t["text_hi"]), 1.5))
                 p.setBrush(Qt.BrushStyle.NoBrush)
                 p.drawEllipse(QPointF(xs[hover], ys[hover]), r, r)
