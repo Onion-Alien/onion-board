@@ -38,7 +38,9 @@ fixed list: how long ago it was installed (`age/days-2-7`), where sounds go
 one (`sounds/11-50`, `played/1-10`), how long the app was open since then
 (`open/1-3h`), how many sounds were fetched from a link or a web search since then
 (`downloads/2-5`), how many times it was started since then (`launches/2-5`), the system
-(`os/win11`, `os/win10`), the app's language (`lang/de`), its theme (`theme/dark`: a
+(`os/win11`, `os/win10`), the language it's showing and whether it was picked
+(`lang/de/picked`, `lang/en/default`), Windows' own language as one the app ships
+(`lang-windows/de`: lang_tags()), its theme (`theme/dark`: a
 built-in theme's name, else `other`), how many achievements were earned
 (`achievements/3-5`) and their score (`ach-score/51-150`), and which features
 were used since then (`used/voice-changer`, `used/more-tabs-added-radio`: the names
@@ -90,7 +92,7 @@ import urllib.request
 import uuid
 from pathlib import Path
 
-from soundboard import __version__
+from soundboard import __version__, i18n
 from soundboard.core import achievements, enjoy
 from soundboard.core.usagereports import (  # noqa: F401  (usage.X keeps working)
     ALL_HELD_MARK, BUSY, GC_SWEEP_MARK, IN_DIALOG_MARK, mark_running, mark_stopped,
@@ -462,8 +464,7 @@ def about(cfg, now: float) -> list[str]:
     out.append(f"played/{bucket(total_plays(cfg) - cfg.stats_plays)}")
     out.append(f"open/{open_bucket(cfg.stats_open_s or 0)}")
     out.append(f"downloads/{download_bucket(cfg.stats_downloads or 0)}")
-    lang = cfg.language if re.fullmatch(LANG_RE, cfg.language or "") else "auto"
-    out.append(f"lang/{lang}")
+    out += lang_tags(cfg)
     out.append(f"theme/{theme_tag(cfg.theme)}")
     out.append(f"os/{os_tag()}")
     out.append(f"launches/{launch_bucket(cfg.stats_launches or 0)}")
@@ -476,6 +477,22 @@ def about(cfg, now: float) -> list[str]:
             | set(features_now(cfg)))
     out += [f"used/{k}" for k in FEATURES if k in have]
     return out
+
+
+def lang_tags(cfg) -> list[str]:
+    """The language the app is showing and where it came from: `lang/de/picked` (picked
+    in Settings), `lang/en/default` (none picked, so English: the board doesn't follow
+    Windows by itself yet) or `lang/de/windows` (once it does). And Windows' own display
+    language as a catalog the app ships (`lang-windows/pt-BR`; `en` when none fits), to
+    see which languages people would like. Language codes only, never the locale."""
+    def code(c: str) -> str:
+        return c if re.fullmatch(LANG_RE, c or "") else "other"
+    if cfg.language:
+        source = "picked"
+    else:
+        source = "windows" if i18n.FOLLOW_WINDOWS else "default"
+    return [f"lang/{code(i18n.current())}/{source}",
+            f"lang-windows/{code(i18n.resolve(i18n.windows_language()))}"]
 
 
 def tab_opened(cfg, key: str) -> None:
