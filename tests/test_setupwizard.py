@@ -1487,12 +1487,17 @@ def test_a_later_guide_has_no_make_it_yours_page(wizard):
         again.deleteLater()
 
 
-def test_the_seasonal_look_gives_way_once_its_over(monkeypatch):
+def test_the_seasonal_look_is_the_one_on_offer(monkeypatch):
+    import datetime
     from soundboard.ui.kit import theme
-    monkeypatch.setattr(theme, "offered", lambda name, today=None: name != "Halloween")
-    looks = lookstep.look_themes()
-    assert "Halloween" not in looks and lookstep.SEASONAL_OFF in looks
-    assert len(looks) == len(set(looks)) == 9
+    for day, seasonal in ((datetime.date(2026, 10, 20), "Halloween"),
+                          (datetime.date(2026, 11, 5), "Fireworks"),
+                          (datetime.date(2026, 12, 5), lookstep.SEASONAL_OFF)):
+        monkeypatch.setattr(theme, "_today", lambda day=day: day)
+        looks = lookstep.look_themes()
+        assert looks[2] == seasonal
+        assert not {"Halloween", "Fireworks"} - {seasonal} & set(looks)
+        assert len(looks) == len(set(looks)) == 9
 
 
 def test_picking_a_look_switches_the_theme(mic_wizard):

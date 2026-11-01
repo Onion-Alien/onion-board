@@ -191,7 +191,7 @@ NECK_AT = (0, -14, 1.0)
 # pieces that need their own place: the frog's eyes and the mint would poke out of the
 # top of his picture (moved a little lower). Tall hats stay full size on purpose: an
 # oversized hat on him is the look.
-OWN_PLACE = {"frog": (0, -10, 1.0), "mint_sprig": (2, -1, 1.0)}
+OWN_PLACE = {"frog": (0, -10, 1.0), "mint_sprig": (2, -1, 1.0), "burst": (0, 1, 0.8)}
 # pieces that don't fit an owl: a hoodie's drawstrings read as a second face on his
 # belly, and a turtleneck's ribbed roll as teeth under his beak
 NOT_ON_OWL = {"strings", "sweater", "turtleneck"}

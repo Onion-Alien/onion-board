@@ -28,6 +28,8 @@ MIXES: dict[str, tuple[tuple[str, str], ...]] = {
                ("leaf", "#d9a441")),
     "Halloween": (("ghost", "#f5f2ff"), ("bat", "#a77ce6"), ("note", "#ff9a2e"),
                   ("bat", "#8b5cd0")),
+    "Fireworks": (("sparkle", "#ffc94d"), ("star", "#ff5fae"), ("note", "#ffb627"),
+                  ("sparkle", "#ff8cc6")),
     "Hacker": (("digit", "#3cff6e"), ("digit", "#28c850"), ("note", "#3cff6e"),
                ("digit", "#9bffb5")),
 }

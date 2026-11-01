@@ -62,7 +62,7 @@ What not to wrap, plurals and per-language notes: [docs/TRANSLATING.md](docs/TRA
 (the only text sizes, button kinds and pop-ups), follow section 0 for controls and
 section 13 (*UI workflow*) for the workflow, and go through its checklist (section 10)
 before showing pictures.
-**The app has 32 themes** (`theme.THEMES`), not two or three: any colour, icon or style
+**The app has 33 themes** (`theme.THEMES`), not two or three: any colour, icon or style
 sheet change has to work and be checked in all of them (DESIGN.md section 6), with Dark
 and Light as the reference look.
 

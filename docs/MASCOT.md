@@ -125,11 +125,11 @@ for an upright ear at the top of his bob gets the difference above him (`_head`)
 
 | Layer | Painted | Pieces |
 | --- | --- | --- |
-| `behind` | first, behind even his ears | moon |
+| `behind` | first, behind even his ears | moon, firework burst |
 | `back` | after his body, before his head | hood, hazmat hood, cape collar |
 | `under` | on his head, under the headphones | beanie, frog hat, snapback, bandana, eye shade |
-| `over` | after the headphones (and nightcap) | crown, hats, horns, flowers, mint sprig, pencil, dizzy stars |
-| `face` | after his face, before the prop in his paw | glasses, spiral eyes, laser eyes, fangs, clown nose, sweater, turtleneck, badge, bow tie, scarf, lei, hood strings |
+| `over` | after the headphones (and nightcap) | crown, hats, horns, flowers, mint sprig, pencil, sparkler, dizzy stars |
+| `face` | after his face, before the prop in his paw | glasses, spiral eyes, laser eyes, fangs, clown nose, sweater, turtleneck, badge, bow tie, scarf, lei, glow stick, hood strings |
 
 Rules the drawing keeps:
 
