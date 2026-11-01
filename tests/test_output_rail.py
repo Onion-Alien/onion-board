@@ -415,3 +415,31 @@ def test_card_lines_sit_under_their_group_headers_and_fold(window, qapp):  # noq
     qapp.processEvents()
     assert card.shut == set() and window.cfg.onair_shut == []
     assert all(n.isVisible() for n in card.net[:4])
+
+
+def test_card_lines_start_in_one_place_whatever_else_is_on(window, qapp):  # noqa: F811
+    """Open, the lines are left-aligned: icons in the group header's arrow column and
+    words under its name, the same with a short line alone or beside a long one (centred,
+    the short ones moved over whenever a long line came on)."""
+    from soundboard.ui.window.onaircard import Line
+    window.resize(1275, 980)
+    window.show()
+    window.rail.set_open(True)
+    card = window.rail.output
+    clean = Line("mic", "Clean mic", "ok", group="voice")
+    places = set()
+    for others in ([], [Line("phone", "Remote control on", group="connection")],
+                   [Line("offline", "Offline", group="connection")]):
+        card.set_lines([clean, *others])
+        window.rail.refresh_output()
+        qapp.processEvents()
+        assert card._scale == 1.0   # (nothing made the card shrink to fit)
+        for n in card.net[:1 + len(others)]:
+            places.add((n.glyph.mapTo(card, QPoint(0, 0)).x(),
+                        n.label.mapTo(card, QPoint(0, 0)).x()))
+        for head in card.heads.values():
+            if head.isVisible():
+                places.add(("name", head.name.mapTo(card, QPoint(0, 0)).x()))
+    icon_x = {p[0] for p in places if p[0] != "name"}
+    words_x = {p[1] for p in places if p[0] != "name"} | {p[1] for p in places if p[0] == "name"}
+    assert len(icon_x) == 1 and len(words_x) == 1, places
