@@ -316,9 +316,6 @@ class WindowBuilder(Controller, PlayerBuild, SoundsPageBuild, SetupPageBuild):
         if mw.rail.output is not None:
             mw.rail.output.lineClicked.connect(mw.netctl.open_line)
             mw.rail.output.lineClicked.connect(lambda _p: usage.used("on-air-line"))
-            # Voice and Connection folded down to their headers: kept for the next start
-            mw.rail.output.shut = set(mw.cfg.onair_shut)
-            mw.rail.output.groupToggled.connect(mw.netctl.group_toggled)
         mw.remote_changed.connect(mw.netctl._net_follow, Qt.ConnectionType.QueuedConnection)
         remote.on_change(mw.netctl._remote_watch)
         tabs_live = getattr(getattr(mw, "voice", None), "live_tabs_changed", None)

@@ -14,7 +14,7 @@ from PySide6.QtWidgets import (QDialog, QDialogButtonBox, QFormLayout, QLineEdit
 from soundboard.core import langnames, usage
 from soundboard.ui.kit import theme
 from soundboard.speech import customvoices, tts
-from soundboard.ui.kit import busy, fit
+from soundboard.ui.kit import busy, fit, modals
 from soundboard.ui.kit.panel import hint_label
 from soundboard.ui.kit.widgets import widget_at
 from soundboard.core import errors
@@ -158,9 +158,12 @@ class SpeechSay(_Panel):
         self._refresh_translation()
         problems = getattr(self.ctl.tts, "problems", [])
         custom = getattr(self.ctl.tts, "custom", {})
+        servers = [v for v in custom.values() if v.url]
+        self.servers.set_servers(servers, self.cb_voice.currentData() or "")
+        others = len(custom) - len(servers)   # the servers have their own rows
         self.lbl_custom.setText("\n".join(f"⚠ {p}" for p in problems) if problems else
                                 ngettext("{n} custom voice loaded.", "{n} custom voices loaded.",
-                                         len(custom)) if custom else "")
+                                         others) if others else "")
         self.lbl_custom.setVisible(bool(self.lbl_custom.text()))
         if error and not quiet:
             self._tts_error(_("Text-to-speech isn't available: {error}",
@@ -179,7 +182,7 @@ class SpeechSay(_Panel):
     def _add_voice_server(self):
         """A small form for a TTS server's address; saved as a .json in the voices folder."""
         dlg = QDialog(self)
-        fit.watch(dlg)
+        fit.watch(modals.keep_open(dlg))   # a form: a click outside keeps it
         dlg.setWindowTitle(_("Add a voice server"))
         form = QFormLayout(dlg)
         form.addRow(hint_label(_("A text-to-speech server running on your PC. Most have an "
@@ -247,6 +250,41 @@ class SpeechSay(_Panel):
     def _voice_picked(self, *_):
         self._voice_standin = False   # the user chose this one
         self._settings_edited()
+        self.servers.sync(self.cb_voice.currentData() or "")
+
+    def _server_switched(self, voice: str, on: bool):
+        """A voice server's switch: on, it's the computer voice; off, Windows' is."""
+        i = self.cb_voice.findData(voice if on else "")
+        if i < 0 or i == self.cb_voice.currentIndex():
+            self.servers.sync(self.cb_voice.currentData() or "")
+            return
+        self.cb_voice.setCurrentIndex(i)   # saves it, and the other switches go off
+
+    def _remove_server(self, cv):
+        """Remove: the .json goes now, Undo puts it back (DESIGN: no "Are you sure?")."""
+        path = cv.file or customvoices.server_path(cv.name)
+        try:
+            kept = path.read_bytes()
+            path.unlink()
+        except OSError as e:
+            self._tts_error(_("Couldn't remove it: {error}", error=errors.plain(e)))
+            return
+        was_on = self.cb_voice.currentData() == cv.id
+
+        def undo():
+            try:
+                path.write_bytes(kept)
+            except OSError as e:
+                self._tts_error(_("Couldn't put it back: {error}", error=errors.plain(e)))
+                return
+            if was_on:
+                self.s["voice"] = cv.id   # picked again once it's loaded
+            self.installs._recheck_voices_asked()
+        if was_on:
+            self.cb_voice.setCurrentIndex(0)   # Windows' voice speaks from now on
+        busy.toast(self, _("Removed “{name}”", name=html.escape(cv.name)), "ok",
+                   action=(_("Undo"), undo))
+        self.installs._recheck_voices_asked()
 
     def _settings_edited(self, *_):
         if not self._voice_standin:

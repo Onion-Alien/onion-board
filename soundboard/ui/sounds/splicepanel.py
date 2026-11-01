@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (QDialog, QGraphicsDropShadowEffect, QHBoxLayout, 
                                QLineEdit, QPushButton, QVBoxLayout, QWidget)
 
 from soundboard.audio import soundfx
+from soundboard.core import usage
 from soundboard.i18n import _, ngettext
 from soundboard.ui.kit import fit, icons, theme
 from soundboard.ui.kit.panel import card, hint_label, icon_button
@@ -243,6 +244,7 @@ class SpliceBar(QWidget):
     def play(self, i: int):
         part = self.trim.play_solo(i)
         if part is not None:   # the draft's effects, on just that part
+            usage.used("edit-splice-play")
             self.d.play_preview(fx={**self.d.effects.fx(), **part})
 
     def ask_combine(self):
@@ -264,6 +266,7 @@ class SpliceBar(QWidget):
         if not choice or not d.isVisible():   # cancelled, or the window closed meanwhile
             return
         self.trim.set_joined(True)
+        usage.used("edit-splices-new" if choice == "new" else "edit-splices-replace")
         if choice == "new":
             if name:
                 d.name.setText(name)   # (Save a copy names the copy; this pad keeps its own)

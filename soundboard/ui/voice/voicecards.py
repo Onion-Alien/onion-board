@@ -151,9 +151,12 @@ class VoiceCards(_Panel):
         self._tab = key
         for k, f in self._cards.items():
             f.setVisible(k == key)
-        for k, panel in self._barred():
-            if panel.picked.property("pinned"):   # (in its card when not: shown with it)
-                panel.show_picked_row(key == k)
+        for _k, panel in self._barred():
+            # every voice that's on keeps its bar, whichever tab shows (the voice
+            # changer's and an AI voice's, one over the other); in its card when not
+            # pinned, so shown with it
+            if panel.picked.property("pinned"):
+                panel.show_picked_row(True)
         self._tabs[key].setChecked(True)
         self._update_heads()
         if asked and key in usage.VOICE_TABS:

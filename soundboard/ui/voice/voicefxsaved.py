@@ -33,6 +33,7 @@ class VoiceFxSaved(_Base):
         _emit: Any
         _favs: Any
         _fill_saved: Any
+        _mark_start: Any
         _mine: Any
         _own: Any
         _preset: Any
@@ -41,6 +42,7 @@ class VoiceFxSaved(_Base):
         btn_save: Any
         btn_share: Any
         dlg: Any
+        edit_voice: Any
         hear: Any
         hotkey_asked: Any
         hotkey_cleared: Any
@@ -99,6 +101,7 @@ class VoiceFxSaved(_Base):
         usage.used("voice-saved")   # the name only (usage.py), never the voice's
         self._preset, self._own, self._based_on = name, False, name
         self._fill_saved()
+        self._mark_start()   # Reset now goes back to the voice as saved
         self._emit()
         busy.flash(self.btn_save, _("✓ Saved"))
         # the flash is gone in a second: the card says it stuck, and under what name
@@ -116,13 +119,14 @@ class VoiceFxSaved(_Base):
         return voicefx.shown(name) if name in voicefx.PRESETS else name
 
     def _tile_menu(self, name: str, at):
-        """A voice card's right-click menu: its hotkey, and for a saved voice rename,
-        share and delete."""
+        """A voice card's right-click menu: Hear it, Edit voice, its hotkey, and for a
+        saved voice rename, share and delete."""
         from soundboard.ui.kit.hotkeypick import pretty_key
         m = QMenu(self)
         if self.play_sample is not None:
             m.addAction(icons.icon("headphones"), HEAR, lambda: self.hear(name))
             m.addSeparator()
+        m.addAction(icons.icon("sliders"), _("Edit voice…"), lambda: self.edit_voice(name))
         key = self.keys.get(name, "")
         m.addAction(icons.icon("keyboard"),
                     _("Hotkey: {key}…", key=pretty_key(key)) if key else _("Set a hotkey…"),

@@ -81,7 +81,6 @@ class OutputBlock(QFrame):
     the switch."""
 
     lineClicked = Signal(str)   # a line's Settings page
-    groupToggled = Signal(str, bool)   # a group (Line.group) folded shut (True) or open
 
     LEAD = 11             # card edge to the icon column: the tab icons' centre line
     TOP = 12              # card padding over the title row (the 12 of settings cards)
@@ -95,15 +94,12 @@ class OutputBlock(QFrame):
     MIN_SCALE = 0.85      # the card scales down to fit, never smaller than this (smaller
                           # looked out of place); past that, the small card instead
     ROW_PAD = 4           # the status line's hover fill past its icon
-    HEAD_H = 24           # a group's header (Line.group): its name over its lines
-    MINI = 12             # a shut group's icons in its header, one per line
     ROW_GAP = 6           # title row to the status line's fill
     ROW_H = 34            # the status line's height, fill and all: Mute's and Stop all's
     CHEVRON = 12          # the status line's chevron: lighter than the icons
     STOP = 28             # Stop all after the switch, open: a normal icon button
     PAIR_H = 34           # open: Mute and Stop all, two halves of one row...
     PAIR_GAP = 8          # ...this far apart, and from the lines under them
-    LINE_GAP = 4          # between the lines (set_lines), so their fills never touch
     PAIR_ICON = 18        # their icons
     INK_DOWN = 1          # the switch's and Stop all's ink this far under their box's
                           # centre: on the title's cap-height centre (measured)
@@ -257,11 +253,10 @@ class OutputBlock(QFrame):
         # the network lines (set_lines), made as they're needed
         self._lines: list[Line] = []
         self.net: list[_NetLine] = []
-        # the groups' headers, made as they're needed; `shut`: the groups folded down to
-        # their header (the window keeps them: groupToggled)
-        self.heads: dict[str, _GroupHead] = {}
-        self.shut: set[str] = set()
-        self._order: list[QWidget] = []
+        # a panel per group and one for the rest, in order (_arrange fills them)
+        self.panels = {key: _Panel(key) for key in (*GROUPS, "")}
+        for panel in self.panels.values():
+            box.addWidget(panel)
         self.tight = False   # a short window: less room round the lines (_line_room)
         self.refresh()
 
@@ -392,8 +387,8 @@ class OutputBlock(QFrame):
 
     @staticmethod
     def line_x(px) -> int:
-        """Where a line's icon starts in it, open: in its header's arrow column."""
-        return px(_GroupHead.SIDE)
+        """Where a line's icon starts in it, open: under its panel's name."""
+        return px(_NetLine.SIDE)
 
     def _pin_all(self):
         # the title's first line is centred on the row's controls (the switch, Stop all),
@@ -462,19 +457,16 @@ class OutputBlock(QFrame):
         status = fm.horizontalAdvance(self.status_text.text())
         network = max((fm.horizontalAdvance(line.words) for line in self._lines), default=0)
         halves = 2 if self.stop is not None else 1
-        # a group's header: its arrow, name and (shut) an icon per line
+        # a line in its panel: the card's padding, the panel's, the line's own
+        sides = 2 * (px(self.PAD) + px(_Panel.PAD) + self.line_x(px))
         small = QFont(self.font())
-        small.setPointSizeF(_GroupHead.PT * scale)
-        head = max((2 * px(self.PAD) + 2 * px(_GroupHead.SIDE) + px(self.GLYPH) + px(self.GAP)
-                    + QFontMetrics(small).horizontalAdvance(group_name(g)) + 1 + px(self.GAP)
-                    + (n * (px(self.MINI) + px(_GroupHead.MINI_GAP))
-                       if g in self.shut and n > 1 else 0)
-                    for g, n in self._groups().items()), default=0)
+        small.setPointSizeF(_Panel.PT * scale)
+        title = max((QFontMetrics(small).horizontalAdvance(group_name(line.group))
+                     for line in self._lines if line.group in GROUPS), default=0)
         return max(2 * px(self.PAD) + halves * px(self.PAIR_H) + (halves - 1) * px(self.PAIR_GAP),
                    status_x + status + 1 + px(self.GAP - 2) + px(self.CHEVRON)
                    + 2 * px(self.PAD),
-                   px(self.PAD) + self.line_x(px) + px(self.GLYPH) + px(self.GAP) + network + 1
-                   + self.line_x(px) + px(self.PAD), head)
+                   sides + px(self.GLYPH) + px(self.GAP) + network + 1, sides + title + 1)
 
     def scale_for(self, width: int) -> float:
         """The biggest scale (up to 1) the card fits `width` at, or 0: not even at
@@ -717,69 +709,34 @@ class OutputBlock(QFrame):
             self._words()
         self._pin_all()
 
-    def _groups(self) -> dict[str, int]:
-        """The groups (GROUPS order) with lines now, and how many lines each has."""
-        count = {g: sum(line.group == g for line in self._lines) for g in GROUPS}
-        return {g: n for g, n in count.items() if n}
-
-    def folds(self, group: str) -> bool:
-        """The group has an open / shut arrow: two lines or more (one line under its
-        header would fold to the same height)."""
-        return self._groups().get(group, 0) > 1
-
-    def toggle(self, group: str):
-        """Fold a group down to its header, or open it again."""
-        if not self.folds(group):
-            return
-        self.shut ^= {group}
-        self.refresh()
-        self.groupToggled.emit(group, group in self.shut)
-
     def _arrange(self, expanded: bool):
-        """The lines in their groups' order, each group under its header (open), the
-        rest after them; a shut group shows its header alone. Shut (the small card):
-        every line's icon, no headers."""
-        groups = self._groups()
-        for g in groups:
-            if g not in self.heads:
-                head = self.heads[g] = _GroupHead(self, g)
-                head.clicked.connect(lambda _c=False, g=g: self.toggle(g))
-        lines = list(zip(self._lines, self.net))
-        order: list[QWidget] = []
-        for g in (*GROUPS, ""):
-            if g in groups:
-                order.append(self.heads[g])
-            order.extend(n for line, n in lines
-                         if line.group == g or (not g and line.group not in GROUPS))
-        if order != self._order:   # (a refresh every few seconds: re-add only on a change)
-            for w in self._order:
-                self.box.removeWidget(w)
-            for w in order:
-                self.box.addWidget(w)
-            self._order = order
-        for g, head in self.heads.items():
-            head.setVisible(expanded and g in groups)
-            if g in groups:
-                head.show_head([line for line in self._lines if line.group == g],
-                               self.folds(g), g in self.shut, self._px)
+        """Each line in its group's panel (the rest in the last, untitled one), in the
+        lines' order; a panel with no lines hidden. Shut (the small card) the panels are
+        see-through and untitled: every line's icon, as before."""
+        for key, panel in self.panels.items():
+            mine = [n for line, n in zip(self._lines, self.net)
+                    if (line.group if line.group in GROUPS else "") == key]
+            if mine != panel.lines:   # (a refresh every few seconds: re-add on a change)
+                for n in panel.lines:
+                    panel.lay.removeWidget(n)
+                for n in mine:
+                    panel.lay.addWidget(n)
+                panel.lines = mine
+            panel.show_panel(expanded, self._px, self._scale)
+            panel.setVisible(bool(mine))
         for i, n in enumerate(self.net):
-            line = self._lines[i] if i < len(self._lines) else None
-            n.setVisible(line is not None and not (
-                expanded and line.group in self.shut and self.folds(line.group)))
+            n.setVisible(i < len(self._lines))
 
     def _line_room(self):
-        """Open, room round the lines' hover fill and focus ring: PAIR_GAP under Mute and
-        Stop all (as between them), LINE_GAP between lines, the card's padding under the
-        last (the fills ran into Mute, Stop all and the card's edge). A short window
-        (`tight`, the rail's compact step) keeps half of it over and under them and none
-        between, so a full card still fits where it did."""
+        """Open, the panels are buttons like Mute and Stop all: PAIR_GAP under those and
+        between panels, the card's padding under the last. A short window (`tight`, the
+        rail's compact step) halves it."""
         pad = self._px(self.PAD)
-        half = self._px(self.PAD // 2)
-        self.pair_lay.setContentsMargins(pad, pad, pad, pad if not self._lines else half
-                                         if self.tight else self._px(self.PAIR_GAP))
+        gap = self._px(self.PAIR_GAP // 2 if self.tight else self.PAIR_GAP)
+        self.pair_lay.setContentsMargins(pad, pad, pad, gap if self._lines else pad)
         expanded = bool(self.property("expanded"))
-        self.box.setSpacing(self._px(self.LINE_GAP) if expanded and not self.tight else 0)
-        under = (half if self.tight else pad) if expanded and self._lines else 0
+        self.box.setSpacing(gap if expanded else 0)
+        under = self._px(self.PAD // 2 if self.tight else self.PAD) if self._lines else 0
         self.box.setContentsMargins(*(pad, 0, pad, under) if expanded else (0, 4, 0, 0))
         self.strip_lay.setContentsMargins(pad, 0, pad, pad)
 
@@ -792,11 +749,11 @@ class Line:
     tone: str = ""   # "ok", "warn" or "" (plain)
     full: str = ""   # the tip: what it says in full
     page: str = ""   # the Settings page a click opens
-    group: str = ""  # a GROUPS key: under that group's header, else after the groups
+    group: str = ""  # a GROUPS key: in that group's panel, else in the last one
 
 
-# the On Air card's groups, in order: each under a header with its name, folded down to
-# it by a click once it has two lines or more
+# the On Air card's groups, in order: each its own panel with its name on top, like Mute
+# and Stop all over them; the other lines in one more panel, untitled
 GROUPS = ("voice", "connection")
 
 
@@ -804,84 +761,46 @@ def group_name(group: str) -> str:
     return {"voice": _("Voice"), "connection": _("Connection")}.get(group, group)
 
 
-class _GroupHead(QPushButton):
-    """A group's header: its name, small and quiet, over its lines; with two lines or
-    more, an arrow before it and a click folds the group down to it (its lines' icons
-    after the name then, so what's on still shows)."""
+class _Panel(QFrame):
+    """A group's panel (key "": the lines in no group): its name, small and quiet, over
+    its lines, on a button's fill. Shut (the small card): see-through and untitled."""
 
     PT = 8.5        # the name's size (the hint text's)
-    SIDE = 4        # padding inside the hover fill
-    MINI_GAP = 3    # between the shut group's icons
+    PAD = 4         # round the lines' hover fill, inside the panel
 
-    def __init__(self, card: OutputBlock, group: str):
+    def __init__(self, key: str):
         super().__init__()
-        self.card, self.key = card, group
-        self.setObjectName("railoutputsetup")
-        self.setProperty("quiet", True)
-        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
-        row = self.row = QHBoxLayout(self)
-        row.setSpacing(0)
-        self.arrow = card._glyph(OutputBlock.GLYPH)
-        self.name = QLabel(group_name(group))
-        self.name.setObjectName("hint")
-        for w in (self.arrow, self.name):
-            w.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
-        row.addWidget(self.arrow, 0, Qt.AlignmentFlag.AlignVCenter)
-        self.arrow_room = QSpacerItem(0, 0, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
-        row.addSpacerItem(self.arrow_room)
-        self.gap = QSpacerItem(0, 0, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
-        row.addSpacerItem(self.gap)
-        row.addWidget(self.name, 0, Qt.AlignmentFlag.AlignVCenter)
-        row.addStretch(1)
-        self.minis_box = QHBoxLayout()
-        self.minis: list[QLabel] = []
-        row.addLayout(self.minis_box)
+        self.key = key
+        self.setObjectName("railoutputpanel")
+        self.lines: list[_NetLine] = []
+        self.lay = QVBoxLayout(self)
+        self.lay.setSpacing(0)
+        self.title = QLabel(group_name(key))
+        self.title.setObjectName("hint")
+        self.lay.addWidget(self.title)
         self.hide()
 
-    def show_head(self, lines: list[Line], folds: bool, shut: bool, px):
-        self.name.setText(group_name(self.key))
-        self.name.setStyleSheet(f"font-size:{self.PT * self.card._scale:.2f}pt;")
-        self.setFixedHeight(px(OutputBlock.HEAD_H))
-        self.row.setContentsMargins(px(self.SIDE), 0, px(self.SIDE), 0)
-        self.minis_box.setSpacing(px(self.MINI_GAP))
-        # no arrow (one line): its room kept, so the name sits where it always does
-        self.arrow.setVisible(folds)
-        self.arrow_room.changeSize(0 if folds else px(OutputBlock.GLYPH), 0,
-                                   QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
-        self.arrow.setFixedWidth(px(OutputBlock.GLYPH))
-        self.gap.changeSize(px(OutputBlock.GAP), 0,
-                            QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
-        if folds:
-            icons.set_label_icon(self.arrow, "fold_open" if not shut else
-                                 "fold_back" if self.isRightToLeft() else "fold",
-                                 "muted", size=px(OutputBlock.CHEVRON))
-        # shut: an icon per line after the name, in its line's colour
-        shown = lines if folds and shut else []
-        while len(self.minis) < len(shown):
-            mini = QLabel()
-            mini.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
-            self.minis_box.addWidget(mini, 0, Qt.AlignmentFlag.AlignVCenter)
-            self.minis.append(mini)
-        for i, mini in enumerate(self.minis):
-            mini.setVisible(i < len(shown))
-            if i < len(shown):
-                icons.set_label_icon(mini, shown[i].icon, {"ok": "ok_text", "warn": "warn_text"}
-                                     .get(shown[i].tone, "muted"), size=px(OutputBlock.MINI))
-        # only a header that folds is a button: the hover, the hand, the Tab order
-        self.setProperty("action", folds)
-        self.setCursor(Qt.CursorShape.PointingHandCursor if folds
-                       else Qt.CursorShape.ArrowCursor)
-        self.setFocusPolicy(Qt.FocusPolicy.TabFocus if folds else Qt.FocusPolicy.NoFocus)
-        self.setAccessibleName(group_name(self.key))
-        self.setAccessibleDescription((_("Show") if shut else _("Hide")) if folds else "")
-        self.setToolTip(", ".join(line.words for line in shown))
-        self.style().unpolish(self)
-        self.style().polish(self)
+    def show_panel(self, expanded: bool, px, scale: float):
+        titled = expanded and bool(self.key)
+        self.title.setVisible(titled)
+        if titled:
+            self.title.setText(group_name(self.key))
+            self.title.setStyleSheet(f"font-size:{self.PT * scale:.2f}pt;")
+            # over the lines' icons; a line's height of room isn't needed over it
+            self.title.setContentsMargins(px(_NetLine.SIDE), px(2), 0, 0)
+        pad = px(self.PAD) if expanded else 0
+        self.lay.setContentsMargins(pad, pad, pad, pad)
+        if self.property("open") != expanded:
+            self.setProperty("open", expanded)
+            self.style().unpolish(self)
+            self.style().polish(self)
 
 
 class _NetLine(QPushButton):
     """One Line: its glyph and words on the status line's keylines, the whole line
     the button (shut: the icon alone, centred under the switch)."""
+
+    SIDE = 4   # open: the hover fill's room before the icon and after the words
 
     def __init__(self, card: OutputBlock):
         super().__init__()

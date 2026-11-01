@@ -755,6 +755,7 @@ class SpeedPitchButton(QPushButton):
 
     def update_preset(self, name: str):
         """Update "name": what's on now saved into your preset, in its place."""
+        usage.used("live-mine-updated")
         speed, pitch, keep = self.values()
         mypresets.put("live", name, {"speed": speed, "pitch": pitch, "keep": keep,
                                      **self.fx_values()})
@@ -769,7 +770,7 @@ class SpeedPitchButton(QPushButton):
         m.addAction(icons.icon("check"), _("Update “{name}”", name=short(name, 24)),
                     lambda: self.update_preset(name))
         m.addAction(icons.icon("history"), _("Reset “{name}”", name=short(name, 24)),
-                    lambda: self.apply_preset(name))
+                    lambda: (usage.used("live-mine-reset"), self.apply_preset(name)))
         m.addSeparator()
         m.addAction(icons.icon("plus"), _("Save as a new preset"), self.save_preset)
         m.exec(self.save_preset_btn.mapToGlobal(QPoint(0, self.save_preset_btn.height())))

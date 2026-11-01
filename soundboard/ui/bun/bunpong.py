@@ -102,6 +102,7 @@ class BunPong(QDialog):
     to play, the court on the theme's card, and Close at the bottom. At the end Bun and
     who won sit side by side, centred together on the court, with Play again and
     Another game."""
+    KEEP_OPEN = True   # a click outside doesn't close it: it would lose work
 
     def __init__(self, parent: QWidget, bun=None, rng: random.Random | None = None,
                  game: str = "pong"):

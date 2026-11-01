@@ -7,15 +7,17 @@ It follows panel.py's pattern: it owns its widgets and emits plain dicts
 """
 from __future__ import annotations
 
+import html
+import json
 import random
 from collections.abc import Callable
 
 import numpy as np
 
 from PySide6.QtCore import QEvent, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QGuiApplication
+from PySide6.QtGui import QGuiApplication, QKeySequence, QShortcut
 from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QDialog, QFrame, QGridLayout, QHBoxLayout,
-                               QLabel, QPushButton,
+                               QLabel, QMenu, QPushButton,
                                QScrollArea, QTabWidget, QVBoxLayout, QWidget)
 from shiboken6 import isValid as qt_valid
 
@@ -23,7 +25,8 @@ from soundboard.core import usage
 from soundboard.mic import savedvoices
 from soundboard import voicefx
 from soundboard.ui.voice import art
-from soundboard.ui.kit import icons
+from soundboard.ui.kit import busy, icons
+from soundboard.ui.kit.glow import Halo
 from soundboard.ui.voice.aivoicebrowser import hear_button
 from soundboard.ui.voice.groupbar import GroupBar
 from soundboard.ui.kit.panel import (Flow, UndoBar, ViewToggle, hint_label, section_label,
@@ -57,6 +60,44 @@ def at_start(spec):
     return {**spec, "preset": CUSTOM, "effects": custom if isinstance(custom, dict) else {}}
 
 
+class Footer(QWidget):
+    """Edit voice's footer: `left` and `right` button groups on one line, or the right
+    one under the left when the window is too narrow for both (so the window can still
+    be made narrow)."""
+
+    def __init__(self):
+        super().__init__()
+        self.box = QBoxLayout(QBoxLayout.Direction.LeftToRight, self)
+        self.box.setContentsMargins(0, 0, 0, 0)
+        self.box.setSpacing(6)
+        self.left, self.right = QHBoxLayout(), QHBoxLayout()
+        for lay in (self.left, self.right):
+            lay.setSpacing(6)
+        self.left.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.right.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.box.addLayout(self.left, 1)
+        self.box.addLayout(self.right, 1)
+
+    def _both(self) -> int:
+        m = self.contentsMargins()
+        return (self.left.sizeHint().width() + self.right.sizeHint().width()
+                + self.box.spacing() + m.left() + m.right())
+
+    def minimumSizeHint(self) -> QSize:
+        m = self.contentsMargins()
+        w = max(self.left.minimumSize().width(), self.right.minimumSize().width())
+        return QSize(w + m.left() + m.right(), super().minimumSizeHint().height())
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        want = (QBoxLayout.Direction.LeftToRight if self._both() <= e.size().width()
+                else QBoxLayout.Direction.TopToBottom)
+        if self.box.direction() != want:
+            self.box.setDirection(want)
+            self.updateGeometry()
+
+
+DLG_ART = 32   # the voice's picture at the top of Edit voice
 POWER_TEXT = {False: _("Voice changer is OFF"), True: _("Voice changer is ON")}
 
 
@@ -234,8 +275,8 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self._sampled.connect(self._sample_done)
         self.btn_sample = hear_button()
         self.btn_sample.clicked.connect(lambda: self.hear(self._preset))
-        self.btn_sample.hide()
-        pb.addWidget(self.btn_sample)
+        self.btn_sample.setParent(self.picked)   # not on the bar (as an AI voice's has
+        self.btn_sample.hide()                   # none): a card's right-click Hear it
         pb.addStretch(1)
         v.addWidget(self.picked)
         self.picked.installEventFilter(self)   # (after its buttons: _fit_picked reads them)
@@ -265,6 +306,18 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         tv = QVBoxLayout(self.tweak)
         tv.setContentsMargins(0, 0, 0, 0)
         tv.setSpacing(10)
+        # which voice you're changing (and whether you have), its delay on the right
+        top = QHBoxLayout()
+        top.setSpacing(10)
+        self.dlg_pic = QLabel()
+        self.dlg_pic.setFixedSize(DLG_ART, DLG_ART)
+        top.addWidget(self.dlg_pic)
+        self.dlg_name = QLabel()
+        self.dlg_name.setObjectName("pickedname")
+        self.dlg_name.setWordWrap(True)
+        self.dlg_name.setMinimumWidth(40)
+        top.addWidget(self.dlg_name, 1)
+        tv.addLayout(top)
         # the window's buttons, all along the top (they wrap when it's narrow); the
         # title bar already says "Edit voice"
         tools = QWidget()
@@ -277,12 +330,18 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
                                      "it changed lights up below. Click again for another."))
         self.btn_random.clicked.connect(lambda: (usage.used("voice-random"), self.randomize()))
         srow.addWidget(self.btn_random)
+        # two voices at once (Robot + Demon): the other one's effects on top of yours
+        self.btn_mix = QPushButton(_("Mix in a voice"))
+        icons.set_icon(self.btn_mix, "shuffle")
+        self.btn_mix.setToolTip(_("Add another voice's effects to this one (Robot + Demon): "
+                                  "the effects it has that yours doesn't get switched on"))
+        self.btn_mix.clicked.connect(self._mix_menu)
+        srow.addWidget(self.btn_mix)
         self.btn_save = QPushButton(_("Save as a voice"))
         icons.set_icon(self.btn_save, "plus")
         self.btn_save.setToolTip(_("Keep these settings as a voice with a name: it gets its "
                                    "own button under “Pick a voice”."))
         self.btn_save.clicked.connect(self.save_voice)
-        srow.addWidget(self.btn_save)
         # saved voices: share one as a line of text, add one a friend sent
         self.btn_share = QPushButton(_("Copy share code"))
         icons.set_icon(self.btn_share, "copy")
@@ -308,7 +367,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self.delay.setObjectName("pill")
         steady_number(self.delay, _("{ms} ms delay", ms="000"))
         self.delay.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        srow.addWidget(self.delay)
+        top.addWidget(self.delay, 0, Qt.AlignmentFlag.AlignVCenter)
         bv.addWidget(self.tweak)
 
         # ---- the effects, a tab a group (one long page was too much to scroll):
@@ -364,14 +423,32 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self._replace.setInterval(0)
         self._replace.timeout.connect(self._place_cards)
         self._folded_fx: set[str] = set()
-        done = QHBoxLayout()
-        done.setContentsMargins(16, 0, 16, 0)
-        done.addStretch(1)
+        # the footer: Undo, Redo and Reset (back to the voice you started from) on the
+        # left; Save as a voice and Done on the right, as in Edit sound
+        footer = Footer()
+        footer.setContentsMargins(16, 0, 16, 0)
+        done = footer.left
+        self.btn_undo = QPushButton(_("Undo"))
+        self.btn_undo.setToolTip(_("Take back the last change (Ctrl+Z)"))
+        self.btn_undo.clicked.connect(self.undo)
+        self.btn_redo = QPushButton(_("Redo"))
+        self.btn_redo.setToolTip(_("Do the change again (Ctrl+Y)"))
+        self.btn_redo.clicked.connect(self.redo)
+        self.btn_reset = QPushButton(_("Reset"))
+        self.btn_reset.setObjectName("resetfx")
+        icons.set_icon(self.btn_reset, "reload", size=14)
+        self.btn_reset.clicked.connect(lambda: (usage.used("voice-edit-reset"),
+                                                self.reset_edits()))
+        self._reset_glow = Halo(self.btn_reset)   # lit while there's anything to reset
+        done.addWidget(self.btn_undo)
+        done.addWidget(self.btn_redo)
+        done.addWidget(self._reset_glow)
+        footer.right.addWidget(self.btn_save)
         btn_done = QPushButton(_("Done"))
         btn_done.setObjectName("primary")
         btn_done.clicked.connect(self.dlg.close)
-        done.addWidget(btn_done)
-        dv.addLayout(done)
+        footer.right.addWidget(btn_done)
+        dv.addWidget(footer)
 
         self.rows: dict[str, EffectRow] = {}
         self._spec_effects = dict(spec.get("effects", {}))
@@ -387,7 +464,17 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self._fresh_timer = QTimer(self)
         self._fresh_timer.setSingleShot(True)
         self._fresh_timer.timeout.connect(self._clear_fresh)
+        # Undo / Redo: each settled change a step (a slider drag is one), and the voice
+        # you started from for Reset (set again when you pick a voice)
+        self._restoring = False
+        self._htimer = QTimer(self)
+        self._htimer.setSingleShot(True)
+        self._htimer.setInterval(400)
+        self._htimer.timeout.connect(self._record)
+        QShortcut(QKeySequence.StandardKey.Undo, self.dlg, self.undo)
+        QShortcut(QKeySequence.StandardKey.Redo, self.dlg, self.redo)
         self._fill_saved()
+        self._mark_start()
         self._refresh()
 
     # ------------------------------------------------------------------ public
@@ -424,6 +511,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self.btn_power.blockSignals(True)
         self.btn_power.setChecked(True)
         self.btn_power.blockSignals(False)
+        self._mark_start()
         self._refresh()
         self._emit()
 
@@ -441,6 +529,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self.btn_power.blockSignals(True)
         self.btn_power.setChecked(True)
         self.btn_power.blockSignals(False)
+        self._mark_start()
         self._refresh()
         self._emit()
 
@@ -482,8 +571,169 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self.btn_power.blockSignals(True)
         self.btn_power.setChecked(False)
         self.btn_power.blockSignals(False)
+        self._mark_start()
         self._refresh()
         self._emit()
+
+    # ------------------------------------------------------------------ undo / reset
+    HISTORY_STEPS = 100
+
+    def _voice_snap(self) -> dict:
+        """The voice itself, for Undo and Reset: its effects (not what's on top of it,
+        which the Effects pop-up owns) and which voice it is."""
+        return {"rows": {t: r.state() for t, r in self.rows.items() if not on_top(t)},
+                "preset": self._preset, "own": self._own, "based_on": self._based_on,
+                "custom": dict(self._custom)}
+
+    @staticmethod
+    def _same(a: dict, b: dict) -> bool:
+        def key(snap: dict) -> str:
+            return json.dumps([snap["rows"], snap["preset"]], sort_keys=True, default=str)
+        return key(a) == key(b)
+
+    def _mark_start(self):
+        """A new voice (picked, saved, cleared): Reset goes back to this, and the
+        history starts again from it."""
+        self._start = self._voice_snap()
+        self._htimer.stop()
+        self._history, self._hpos = [self._start], 0
+
+    def edited_since_start(self) -> bool:
+        return not self._same(self._voice_snap(), self._start)
+
+    def _load_snap(self, snap: dict):
+        self._restoring = True
+        try:
+            for t, r in self.rows.items():
+                if not on_top(t):
+                    r.load(snap["rows"].get(t))
+            self._preset, self._own = snap["preset"], snap["own"]
+            self._based_on, self._custom = snap["based_on"], dict(snap["custom"])
+            self._clear_fresh()
+            self._refresh()
+            self._emit()
+        finally:
+            self._restoring = False
+
+    def reset_edits(self):
+        """Reset: back to the voice as it was when you picked it. It's one more Undo
+        step, so Ctrl+Z brings your changes back."""
+        self._flush()
+        if not self.edited_since_start():
+            return
+        self._load_snap(self._start)
+        self._record()
+
+    def _record(self):
+        snap = self._voice_snap()
+        if not self._same(snap, self._history[self._hpos]):
+            del self._history[self._hpos + 1:]
+            self._history.append(snap)
+            del self._history[:-self.HISTORY_STEPS]
+            self._hpos = len(self._history) - 1
+        self._show_edit_state()
+
+    def _flush(self):
+        if self._htimer.isActive():
+            self._htimer.stop()
+            self._record()
+
+    def undo(self):
+        self._flush()
+        if self._hpos > 0:
+            self._hpos -= 1
+            self._load_snap(self._history[self._hpos])
+
+    def redo(self):
+        self._flush()
+        if self._hpos < len(self._history) - 1:
+            self._hpos += 1
+            self._load_snap(self._history[self._hpos])
+
+    def _mix_menu(self):
+        """Mix in a voice's list: the voices under their groups, then your saved ones."""
+        m = QMenu(self.dlg)
+
+        def add(menu: QMenu, name: str):
+            pic = art.icon(art.voice_key(name)) if name in voicefx.PRESETS else None
+            # (an "&" in a name shows as itself: Qt reads one as a shortcut marker)
+            a = menu.addAction(self.title_of(name).replace("&", "&&"),
+                               lambda: self.mix_in(name))
+            if pic is not None:
+                a.setIcon(pic)
+        for key, title, names in VOICE_GROUPS:
+            sub = m.addMenu(icons.icon(GROUP_ICONS[key]), title.replace("&", "&&"))
+            for name in names:
+                if name in voicefx.PRESETS:
+                    add(sub, name)
+        if self.store.voices:
+            sub = m.addMenu(icons.icon("mic"), _("Mine"))
+            for name in self.store.voices:
+                add(sub, name)
+        m.exec(self.btn_mix.mapToGlobal(self.btn_mix.rect().bottomLeft()))
+
+    def mix_in(self, name: str) -> list[str]:
+        """Mix in a voice: its effects that yours doesn't have yet, switched on with its
+        settings (the ones you have stay yours). They light up like Randomize's.
+        Returns the effects it added."""
+        usage.used("voice-mix-in")
+        added = []
+        for t, cfg in self.effects_of(name).items():
+            r = self.rows.get(t)
+            if r is None or r.chk.isChecked():
+                continue
+            r.load(cfg)
+            added.append(t)
+        if not added:
+            busy.toast(self._parent(), html.escape(
+                _("Your voice already has everything “{voice}” has", voice=self.title_of(name))))
+            return added
+        self._preset = CUSTOM
+        self.btn_power.blockSignals(True)
+        self.btn_power.setChecked(True)
+        self.btn_power.blockSignals(False)
+        self._refresh()
+        self._emit()
+        self._clear_fresh()
+        for t in added:
+            self.rows[t].set_fresh(True)
+        self._fresh_timer.start(self.FRESH_MS)
+        QTimer.singleShot(60, self._scroll_to_fresh)
+        return added
+
+    def edit_voice(self, name: str):
+        """A voice card's right-click Edit voice: that voice on, and its editor open."""
+        usage.used("voice-edit-menu")
+        if not (self.btn_power.isChecked() and self._preset == name):
+            self.pick(name)
+        self.open_tweak()
+
+    def _show_edit_state(self):
+        """Edit voice's top line and footer: the voice you're changing (", changed" once
+        you have), Reset lit while there's anything to put back, Undo and Redo while
+        there's a step to take."""
+        if not hasattr(self, "_start"):
+            return   # (still being made)
+        base = self._start["preset"]
+        shown = _("My own mix") if base == CUSTOM else self.title_of(base)
+        edited = self.edited_since_start()
+        self.dlg_name.setText(_("{voice}, changed", voice=shown) if edited else shown)
+        pm = art.pixmap(art.voice_key(base), DLG_ART) if base != CUSTOM else None
+        if pm is None:
+            pm = icons.icon(VOICE_ICONS.get(base, "wave"), "muted").pixmap(DLG_ART, DLG_ART)
+        self.dlg_pic.setPixmap(pm)
+        tip = (_("Back to “{voice}” as it was when you picked it", voice=shown)
+               if base != CUSTOM else _("Back to your own mix as it was"))
+        self.btn_reset.setToolTip(tip)
+        self.btn_reset.setAccessibleName(tip)
+        self.btn_reset.setEnabled(edited)
+        self._reset_glow.set_on(edited)
+        if bool(self.btn_reset.property("nudge")) != edited:
+            self.btn_reset.setProperty("nudge", edited)
+            self.btn_reset.style().unpolish(self.btn_reset)
+            self.btn_reset.style().polish(self.btn_reset)
+        self.btn_undo.setEnabled(self._hpos > 0 or self._htimer.isActive())
+        self.btn_redo.setEnabled(self._hpos < len(self._history) - 1)
 
     # never ear-splitting: louder settings are capped below their slider's top
     RANDOM_CAPS = {("compressor", "boost"): 9, ("distortion", "drive"): 20,
@@ -734,7 +984,6 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
                                                                             PICKED_ART)
         self.picked_pic.setPixmap(pm)
         self.picked_name.setText(shown)
-        self.btn_sample.setVisible(self.play_sample is not None)
 
     def _edited(self, etype: str = ""):
         if etype in KEEP:     # your mic clean-up, the Background: the voice stays picked
@@ -750,4 +999,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self._emit()
 
     def _emit(self):
+        if hasattr(self, "_history") and not self._restoring:
+            self._htimer.start()   # a drag's many changes: one step when it settles
+        self._show_edit_state()
         self.changed.emit(self.spec())

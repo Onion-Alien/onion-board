@@ -66,6 +66,7 @@ class RecordDialog(QDialog):
     name of what's playing now ("" for nothing), for a recording of it, and
     `playing_picture()` its pad's picture file ("" for none): a recording of a pad
     gets its picture, passed as save()'s third argument."""
+    KEEP_OPEN = True   # a click outside doesn't close it: it would lose work
     last_source = "mic"   # what the window offers first: the last one used
 
     def __init__(self, engine, voice_on: Callable[[], bool], names: Callable[[], list],
