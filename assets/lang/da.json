@@ -4872,5 +4872,10 @@
   "Download the {language} voice": "Hent stemmen til {language}",
   "{language} needs its voice to be heard: a {size} MB download.": "{language} skal have sin stemme for at blive hørt: en download på {size} MB.",
   "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "{voice} læser {language} indtil videre. Stemmen til {language} er en download på {size} MB.",
-  "The {language} voice, once it's downloaded (below).": "Stemmen til {language}, når den er hentet (nedenfor)."
+  "The {language} voice, once it's downloaded (below).": "Stemmen til {language}, når den er hentet (nedenfor).",
+  "Couldn't reach Myinstants. It tries again by itself in 2 hours.": "Kunne ikke nå Myinstants. Den prøver igen af sig selv om 2 timer.",
+  "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
+    "{n} lyd kunne ikke hentes lige nu. Den prøves igen af sig selv om 2 timer.",
+    "{n} lyde kunne ikke hentes lige nu. De prøves igen af sig selv om 2 timer."
+  ]
 }

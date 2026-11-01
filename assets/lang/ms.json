@@ -4780,5 +4780,9 @@
   "Download the {language} voice": "Muat turun suara {language}",
   "{language} needs its voice to be heard: a {size} MB download.": "{language} memerlukan suaranya untuk didengar: muat turun {size} MB.",
   "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "{voice} membaca {language} buat masa ini. Suara {language} ialah muat turun {size} MB.",
-  "The {language} voice, once it's downloaded (below).": "Suara {language}, selepas dimuat turun (di bawah)."
+  "The {language} voice, once it's downloaded (below).": "Suara {language}, selepas dimuat turun (di bawah).",
+  "Couldn't reach Myinstants. It tries again by itself in 2 hours.": "Tidak dapat mencapai Myinstants. Ia akan cuba lagi sendiri dalam 2 jam.",
+  "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
+    "{n} bunyi tidak dapat dimuat turun sekarang. Ia akan dicuba lagi sendiri dalam 2 jam."
+  ]
 }

@@ -1,0 +1,1 @@
+- Free sound packs: a links pack whose sounds still can't be downloaded after all their tries (no connection, Myinstants down or busy) says so, and its missing sounds are asked for again by themselves 2 hours later (and every 2 hours after that while they keep failing, as long as the app runs).

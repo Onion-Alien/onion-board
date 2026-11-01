@@ -4872,5 +4872,10 @@
   "Download the {language} voice": "Télécharger la voix en {language}",
   "{language} needs its voice to be heard: a {size} MB download.": "Le {language} a besoin de sa voix pour être entendu : un téléchargement de {size} Mo.",
   "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "{voice} lit le {language} pour l'instant. La voix en {language} est un téléchargement de {size} Mo.",
-  "The {language} voice, once it's downloaded (below).": "La voix en {language}, une fois téléchargée (ci-dessous)."
+  "The {language} voice, once it's downloaded (below).": "La voix en {language}, une fois téléchargée (ci-dessous).",
+  "Couldn't reach Myinstants. It tries again by itself in 2 hours.": "Impossible de joindre Myinstants. Nouvel essai automatique dans 2 heures.",
+  "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
+    "{n} son n'a pas pu être téléchargé pour l'instant. Nouvel essai automatique dans 2 heures.",
+    "{n} sons n'ont pas pu être téléchargés pour l'instant. Nouvel essai automatique dans 2 heures."
+  ]
 }

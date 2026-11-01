@@ -5240,5 +5240,14 @@
   "Download the {language} voice": "تنزيل صوت {language}",
   "{language} needs its voice to be heard: a {size} MB download.": "تحتاج {language} إلى صوتها لتُسمع: تنزيل بحجم {size} ميغابايت.",
   "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "يقرأ {voice} بلغة {language} حاليًا. صوت {language} تنزيل بحجم {size} ميغابايت.",
-  "The {language} voice, once it's downloaded (below).": "صوت {language}، بعد تنزيله (أدناه)."
+  "The {language} voice, once it's downloaded (below).": "صوت {language}، بعد تنزيله (أدناه).",
+  "Couldn't reach Myinstants. It tries again by itself in 2 hours.": "تعذّر الوصول إلى Myinstants. سيُعاد المحاولة تلقائيًا بعد ساعتين.",
+  "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
+    "تعذّر تنزيل {n} صوت الآن. ستُعاد المحاولة تلقائيًا بعد ساعتين.",
+    "تعذّر تنزيل {n} صوت الآن. ستُعاد المحاولة تلقائيًا بعد ساعتين.",
+    "تعذّر تنزيل {n} صوتين الآن. ستُعاد المحاولة تلقائيًا بعد ساعتين.",
+    "تعذّر تنزيل {n} أصوات الآن. ستُعاد المحاولة تلقائيًا بعد ساعتين.",
+    "تعذّر تنزيل {n} صوتًا الآن. ستُعاد المحاولة تلقائيًا بعد ساعتين.",
+    "تعذّر تنزيل {n} صوت الآن. ستُعاد المحاولة تلقائيًا بعد ساعتين."
+  ]
 }

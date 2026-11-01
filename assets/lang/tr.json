@@ -4872,5 +4872,10 @@
   "Download the {language} voice": "{language} sesini indir",
   "{language} needs its voice to be heard: a {size} MB download.": "{language} dilinin duyulması için kendi sesi gerekir: {size} MB'lık bir indirme.",
   "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "Şimdilik {language} dilini {voice} okuyor. {language} sesi {size} MB'lık bir indirme.",
-  "The {language} voice, once it's downloaded (below).": "{language} sesi, indirildiğinde (aşağıda)."
+  "The {language} voice, once it's downloaded (below).": "{language} sesi, indirildiğinde (aşağıda).",
+  "Couldn't reach Myinstants. It tries again by itself in 2 hours.": "Myinstants'a ulaşılamadı. 2 saat sonra kendiliğinden yeniden dener.",
+  "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
+    "{n} ses şu an indirilemedi. 2 saat sonra kendiliğinden yeniden denenecek.",
+    "{n} ses şu an indirilemedi. 2 saat sonra kendiliğinden yeniden denenecek."
+  ]
 }
