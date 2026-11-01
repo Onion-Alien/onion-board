@@ -1,0 +1,1 @@
+- A first launch that froze the PC for a while no longer closes or skips the setup guide by itself: clicks and keys made while it was stuck are ignored.

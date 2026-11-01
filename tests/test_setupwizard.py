@@ -1821,3 +1821,53 @@ def test_leaving_the_mic_step_counts_how_its_test_went(wizard, monkeypatch, hear
     wiz._dev_since -= setupwizard.MIC_TEST_MIN_S
     wiz.done(0)   # closing the guide on the mic step counts it too
     assert len([c for c in counted if c.startswith("mic-test-")]) == 2
+
+
+def _frozen_then(qapp, events):
+    """The UI thread stuck for a while (a graphics driver hang) with input queued
+    meanwhile, then running again: what the guide sees when the PC wakes up."""
+    import time
+    from PySide6.QtCore import QTimer
+
+    def freeze():
+        for target, ev in events:
+            QApplication.postEvent(target, ev)
+        time.sleep(1.6)
+    QTimer.singleShot(0, freeze)
+    end = time.monotonic() + 2.5
+    while time.monotonic() < end:
+        qapp.processEvents()
+
+
+def _esc():
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QKeyEvent
+    return QKeyEvent(QEvent.Type.KeyPress, Qt.Key.Key_Escape, Qt.KeyboardModifier.NoModifier)
+
+
+def _click(button):
+    from PySide6.QtCore import QPointF, Qt
+    from PySide6.QtGui import QMouseEvent
+    p = QPointF(button.rect().center())
+    g = QPointF(button.mapToGlobal(button.rect().center()))
+    left, none = Qt.MouseButton.LeftButton, Qt.MouseButton.NoButton
+    return [(button, QMouseEvent(QEvent.Type.MouseButtonPress, p, g, left, left,
+                                 Qt.KeyboardModifier.NoModifier)),
+            (button, QMouseEvent(QEvent.Type.MouseButtonRelease, p, g, left, none,
+                                 Qt.KeyboardModifier.NoModifier))]
+
+
+@pytest.mark.parametrize("what", ["esc", "clicks"])
+def test_input_queued_while_frozen_doesnt_close_or_skip_the_guide(qapp, wizard, devices, what):
+    # a first launch froze the PC for a minute; the Esc / clicks made meanwhile all
+    # landed the moment it woke up and closed the guide before it was ever seen
+    w, wiz = wizard
+    wiz.show()
+    start = wiz.stack.currentIndex()
+    clicks = [e for _ in range(3) for e in _click(wiz.btn_next)]   # fresh ones each time
+    _frozen_then(qapp, [(wiz, _esc())] if what == "esc" else clicks)
+    assert wiz.isVisible() and wiz.stack.currentIndex() == start
+    assert not library.Config.load().setup_done
+    # once it's running again, Esc is theirs again
+    QApplication.sendEvent(wiz, _esc())
+    assert library.Config.load().setup_done
