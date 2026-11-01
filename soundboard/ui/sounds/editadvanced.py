@@ -1,8 +1,8 @@
 """Edit sound's Advanced view (ui/sounds/dialogs.py `EditDialog`): a bigger window with
 the sound's waveform big across the top (trim handles, ruler, zoom, the fades drawn on
-it) and the Trim & speed, Effects and Equalizer pages side by side under it (as tabs when
-the screen is too narrow for three columns). It shows the same widgets as the tabs of
-the Simple view, moved here, so both views are always the same draft.
+it) and the Speed & loudness, Effects and Equalizer pages side by side under it (as tabs
+when the screen is too narrow for three columns). It shows the same widgets as the Simple
+view, moved here, so both views are always the same draft.
 
 `ModeSwitch` is the Simple | Advanced switch, `EffectPicker` the Add effect pop-up."""
 from __future__ import annotations
@@ -48,7 +48,7 @@ class ModeSwitch(QWidget):
     picked = Signal(bool)
 
     def __init__(self, advanced: bool = False, slim: bool = False):
-        """`slim`: beside the tabs, as tall as their row (it squeezed the words)."""
+        """`slim`: as tall as a tab row (it squeezed the words)."""
         super().__init__()
         self.setObjectName("segbox")
         h = QHBoxLayout(self)
@@ -57,7 +57,7 @@ class ModeSwitch(QWidget):
         self._group = QButtonGroup(self)
         self.simple = QPushButton(_("Simple"))
         self.advanced = QPushButton(_("Advanced"))
-        self.simple.setToolTip(_("The usual tabs, one at a time"))
+        self.simple.setToolTip(_("The settings most people change, on one page"))
         self.advanced.setToolTip(_("A bigger window: the waveform big, with the effects "
                                    "and the equalizer side by side"))
         for b in (self.simple, self.advanced):
@@ -300,11 +300,6 @@ class AdvancedView(QWidget):
 
         eff.add_effect.clicked.connect(self._pick_effect)
         self.picker: EffectPicker | None = None
-        # Speed & loudness' Volume (Live controls' slider) is the Sound tab's
-        eff.volume.set_value(d.vol.value())
-        eff.volume.changed.connect(lambda: d.vol.setValue(round(eff.volume.value())))
-        d.vol.valueChanged.connect(
-            lambda val: abs(eff.volume.value() - val) > 0.5 and eff.volume.set_value(val))
 
     # ------------------------------------------------------------------ in and out
     def attach(self, scrolls: list[QScrollArea], width: int):
@@ -317,9 +312,8 @@ class AdvancedView(QWidget):
                 page.installEventFilter(self)
         self.wide = self.fits(width)
         self._place()
-        # the trim: out of Trim & speed, into the editor
+        # the trim: out of Simple's Trim card, into the editor
         self._move_trim(self.trim_box)
-        eff.trim_head.hide()
         eff.trim_hint.hide()
         eff.trim_kept.hide()
         tl = eff.trim_page.layout()
@@ -348,8 +342,7 @@ class AdvancedView(QWidget):
             take_out(tl, i)
         self.fades.hide()
         self.fades.setParent(self)
-        self._move_trim(eff.trim_page.layout(), eff.trim_page.layout().indexOf(eff.trim_head) + 1)
-        eff.trim_head.show()
+        self._move_trim(eff.trim_box.layout(), 0)
         eff.trim_kept.setVisible(eff.trim.length > 0)
         eff.trim_hint.setVisible(eff.trim.length <= 0)
         for lab in eff.eq.findChildren(QLabel):

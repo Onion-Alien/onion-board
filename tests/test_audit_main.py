@@ -280,7 +280,7 @@ def test_a_kept_edit_window_shows_the_next_sound_as_a_new_one_would(window, qapp
     d.name.setText("Draft")
     d.vol.setValue(5)
     d.loop.setChecked(True)
-    d.tabs.setCurrentIndex(1)
+    d.more.click()                       # More options open
     d.done(QDialog.Rejected)
     qapp.processEvents()
     m1 = window.meta("s1")
@@ -288,7 +288,7 @@ def test_a_kept_edit_window_shows_the_next_sound_as_a_new_one_would(window, qapp
     assert e is d and e.isVisible() and window.editctl._editors == {"s1": e}
     assert e.meta is m1 and e.name.text() == m1.name and not e.as_copy
     assert e.vol.value() == round(m1.volume * 100) and e.loop.isChecked() == m1.loop
-    assert e.tabs.currentIndex() == 0 and e.effects.fx() == (m1.fx or {})
+    assert e.timing.isHidden() and e.effects.fx() == (m1.fx or {})   # folded again
     e.name.setText("Saved one")
     e.done(QDialog.Accepted)
     qapp.processEvents()

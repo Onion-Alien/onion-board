@@ -2448,7 +2448,6 @@
   "Free sound packs": "Бесплатные наборы звуков",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "«Бесплатные наборы звуков» (вкладка «Звуки» → Копия) читают список наборов с GitHub и скачивают набор оттуда, когда нажимаешь «Добавить».",
   "It's in your sounds now": "Теперь он в твоих звуках",
-  "Loudness": "Громкость",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "Сделал набор? Поделись: каждый звук должен быть CC0 (бесплатно для всех, без указания автора). После проверки он появится здесь для всех.",
   "Needs the internet: Offline mode is on (Privacy & security)": "Нужен интернет: включён офлайн-режим (Конфиденциальность и безопасность)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "В сеть вообще ничего не выходит, а всё, чему нужен интернет, скрыто (вкладка «Радио», поиск в интернете, загрузки, обновления…). Сними галочку, чтобы выбрать, что может выходить в сеть.",
@@ -4396,7 +4395,6 @@
   "Watches your game's window while it's open, even behind others": "Следит за окном твоей игры, пока оно открыто, даже за другими окнами",
   "Your file stays whole: only the part between the handles plays.": "Твой файл остаётся целым: играет только часть между ручками.",
   "Main": "Главное",
-  "Trim & speed": "Обрезка и скорость",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} вкл.",
     "{group}  ·  {n} вкл.",
@@ -4413,7 +4411,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Меняет каждый звук, пока он играет. «Сохранить как новую кнопку» оставит его отдельной кнопкой.",
   "Play a sound first, then save it with your changes": "Сначала включи звук, потом сохрани его со своими изменениями",
   "Save as new pad": "Сохранить как новую кнопку",
-  "Take the Live controls effects off": "Снять эффекты управления вживую",
   "{name} (modified {n})": "{name} (изменён {n})",
   "{name} (modified)": "{name} (изменён)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ «{name}» добавлен, скорость и тон ограничены тем, что может сохранить кнопка",
@@ -4835,7 +4832,6 @@
   "Search effects": "Искать эффекты",
   "Show the whole sound": "Показать весь звук",
   "Speed & loudness": "Скорость и громкость",
-  "The usual tabs, one at a time": "Обычные вкладки, по одной",
   "Undo ({keys})": "Отменить ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Через winget в Windows или, если не выйдет, собственной загрузкой FFmpeg (около 100 МБ). Это можно выключить в Настройки → Конфиденциальность и безопасность.",
   "Don't ask for admin each time": "Не спрашивать права администратора каждый раз",
@@ -4885,5 +4881,6 @@
   "light it up!": "Поджигай!",
   "my sparkler's still going": "Мой бенгальский ещё горит",
   "ooh! aah!": "Ооо! Ааа!",
-  "ooh, pretty!": "Ох, красота!"
+  "ooh, pretty!": "Ох, красота!",
+  "The settings most people change, on one page": "Настройки, которые меняет большинство, на одной странице"
 }

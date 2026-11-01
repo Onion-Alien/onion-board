@@ -2438,7 +2438,6 @@
   "Free sound packs": "Gói âm thanh miễn phí",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "Gói âm thanh miễn phí (thẻ Âm thanh → Sao lưu) đọc danh sách gói từ GitHub, và tải một gói từ đó khi bạn bấm Thêm.",
   "It's in your sounds now": "Nó đã có trong âm thanh của bạn",
-  "Loudness": "Độ lớn",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "Bạn đã làm một gói? Hãy chia sẻ: mọi âm thanh phải là CC0 (ai cũng dùng miễn phí, không cần ghi nguồn). Sau khi được kiểm tra, nó sẽ hiện ở đây cho mọi người.",
   "Needs the internet: Offline mode is on (Privacy & security)": "Cần internet: Chế độ ngoại tuyến đang bật (Quyền riêng tư & bảo mật)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "Hoàn toàn không có gì lên mạng, và mọi thứ cần internet đều bị ẩn (thẻ Radio, tìm kiếm web, tải xuống, cập nhật…). Bỏ chọn để tự chọn những gì được lên mạng.",
@@ -4244,7 +4243,6 @@
   "Watches your game's window while it's open, even behind others": "Theo dõi cửa sổ game của bạn khi nó đang mở, kể cả khi bị che",
   "Your file stays whole: only the part between the handles plays.": "Tệp của bạn vẫn nguyên vẹn: chỉ phần giữa hai tay nắm được phát.",
   "Main": "Chính",
-  "Trim & speed": "Cắt & tốc độ",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} đang bật"
   ],
@@ -4259,7 +4257,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Thay đổi mọi âm thanh khi đang phát. Lưu thành nút mới để giữ nó thành một nút riêng.",
   "Play a sound first, then save it with your changes": "Hãy phát một âm thanh trước, rồi lưu nó với các thay đổi của bạn",
   "Save as new pad": "Lưu thành nút mới",
-  "Take the Live controls effects off": "Bỏ các hiệu ứng của Điều khiển trực tiếp",
   "{name} (modified {n})": "{name} (đã sửa {n})",
   "{name} (modified)": "{name} (đã sửa)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Đã thêm “{name}”, tốc độ và cao độ được giữ trong mức một nút có thể lưu",
@@ -4661,7 +4658,6 @@
   "Search effects": "Tìm hiệu ứng",
   "Show the whole sound": "Hiện toàn bộ âm thanh",
   "Speed & loudness": "Tốc độ & độ lớn",
-  "The usual tabs, one at a time": "Các thẻ quen thuộc, từng thẻ một",
   "Undo ({keys})": "Hoàn tác ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Qua winget của Windows, hoặc bản tải riêng của FFmpeg (khoảng 100 MB). Bạn có thể tắt việc này trong Cài đặt → Quyền riêng tư & bảo mật.",
   "Don't ask for admin each time": "Không hỏi quyền quản trị mỗi lần",
@@ -4709,5 +4705,6 @@
   "light it up!": "Châm lửa nào!",
   "my sparkler's still going": "Que pháo bông vẫn còn cháy",
   "ooh! aah!": "Ồ! À!",
-  "ooh, pretty!": "Ồ, đẹp quá!"
+  "ooh, pretty!": "Ồ, đẹp quá!",
+  "The settings most people change, on one page": "Những cài đặt mọi người hay đổi nhất, gói trong một trang"
 }

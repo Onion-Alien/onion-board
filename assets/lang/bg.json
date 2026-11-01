@@ -2396,7 +2396,6 @@
   "Free sound packs": "Безплатни звукови пакети",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "Безплатните звукови пакети (раздел Звуци → Резервно копие) четат списъка с пакети от GitHub и изтеглят пакет оттам, когато натиснеш „Добави“.",
   "It's in your sounds now": "Вече е в звуците ти",
-  "Loudness": "Сила",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "Направил си пакет? Сподели го: всеки звук трябва да е CC0 (свободен за всички, без нужда от посочване на автор). Щом бъде проверен, ще се появи тук за всички.",
   "Needs the internet: Offline mode is on (Privacy & security)": "Трябва интернет: офлайн режимът е включен (Поверителност и сигурност)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "Изобщо нищо не излиза онлайн и всичко, което иска интернет, е скрито (разделът Радио, търсенето в мрежата, изтеглянията, обновленията…). Махни отметката, за да избереш какво може да излиза онлайн.",
@@ -4320,7 +4319,6 @@
   "Watches your game's window while it's open, even behind others": "Следи прозореца на играта ти, докато е отворен, дори зад други",
   "Your file stays whole: only the part between the handles plays.": "Файлът ти остава цял: звучи само частта между дръжките.",
   "Main": "Основни",
-  "Trim & speed": "Изрязване и скорост",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} включен",
     "{group}  ·  {n} включени"
@@ -4336,7 +4334,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Променя всеки звук, докато звучи. „Запази като нов бутон“ го пази като отделен бутон.",
   "Play a sound first, then save it with your changes": "Първо пусни звук, после го запази с промените си",
   "Save as new pad": "Запази като нов бутон",
-  "Take the Live controls effects off": "Махни ефектите от управлението на живо",
   "{name} (modified {n})": "{name} (променен {n})",
   "{name} (modified)": "{name} (променен)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ „{name}“ е добавен, а скоростта и тонът му са сведени до това, което един бутон може да запази",
@@ -4748,7 +4745,6 @@
   "Search effects": "Търси ефекти",
   "Show the whole sound": "Покажи целия звук",
   "Speed & loudness": "Скорост и сила",
-  "The usual tabs, one at a time": "Обичайните раздели, един по един",
   "Undo ({keys})": "Отмени ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Чрез winget на Windows или от собственото изтегляне на FFmpeg (около 100 MB). Можеш да го изключиш от Настройки → Поверителност и сигурност.",
   "Don't ask for admin each time": "Не питай за администраторски права всеки път",
@@ -4797,5 +4793,6 @@
   "light it up!": "Палете го!",
   "my sparkler's still going": "Бенгалският ми още гори",
   "ooh! aah!": "Ооо! Ааа!",
-  "ooh, pretty!": "Ох, колко красиво!"
+  "ooh, pretty!": "Ох, колко красиво!",
+  "The settings most people change, on one page": "Настройките, които повечето хора променят, на една страница"
 }

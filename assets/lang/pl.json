@@ -2544,7 +2544,6 @@
   "Free sound packs": "Darmowe paczki dźwięków",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "Darmowe paczki dźwięków (karta Dźwięki → Kopia zapasowa) czytają listę paczek z GitHuba i pobierają stamtąd paczkę, gdy naciśniesz Dodaj.",
   "It's in your sounds now": "Jest już w twoich dźwiękach",
-  "Loudness": "Głośność",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "Zrobiłeś paczkę? Udostępnij ją: każdy dźwięk musi być na CC0 (za darmo dla każdego, bez podawania autora). Po sprawdzeniu pojawi się tu dla wszystkich.",
   "Needs the internet: Offline mode is on (Privacy & security)": "Wymaga internetu: tryb offline jest włączony (Prywatność i bezpieczeństwo)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "Nic nie łączy się z internetem, a wszystko, co go wymaga, jest ukryte (karta Radio, wyszukiwanie w sieci, pobieranie, aktualizacje…). Odznacz to, by wybrać, co może łączyć się z internetem.",
@@ -4396,7 +4395,6 @@
   "Watches your game's window while it's open, even behind others": "Obserwuje okno twojej gry, dopóki jest otwarte, nawet za innymi",
   "Your file stays whole: only the part between the handles plays.": "Twój plik zostaje cały: gra tylko część między uchwytami.",
   "Main": "Główne",
-  "Trim & speed": "Przycięcie & prędkość",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} wł.",
     "{group}  ·  {n} wł.",
@@ -4413,7 +4411,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Zmienia każdy dźwięk, gdy gra. Zapisz jako nowy pad zachowuje go jako osobny pad.",
   "Play a sound first, then save it with your changes": "Najpierw odtwórz dźwięk, potem zapisz go ze swoimi zmianami",
   "Save as new pad": "Zapisz jako nowy pad",
-  "Take the Live controls effects off": "Zdejmij efekty sterowania na żywo",
   "{name} (modified {n})": "{name} (zmieniony {n})",
   "{name} (modified)": "{name} (zmieniony)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Dodano „{name}”, prędkość i wysokość w granicach tego, co pad może zapisać",
@@ -4835,7 +4832,6 @@
   "Search effects": "Szukaj efektów",
   "Show the whole sound": "Pokaż cały dźwięk",
   "Speed & loudness": "Prędkość & głośność",
-  "The usual tabs, one at a time": "Zwykłe karty, po jednej",
   "Undo ({keys})": "Cofnij ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Przez winget w Windows albo przez własne pobieranie FFmpeg (około 100 MB). Możesz to wyłączyć w Ustawienia → Prywatność i bezpieczeństwo.",
   "Don't ask for admin each time": "Nie pytaj za każdym razem o uprawnienia administratora",
@@ -4885,5 +4881,6 @@
   "light it up!": "Odpalaj!",
   "my sparkler's still going": "Moje zimne ognie wciąż płoną",
   "ooh! aah!": "Oooo! Aaaa!",
-  "ooh, pretty!": "Och, jak pięknie!"
+  "ooh, pretty!": "Och, jak pięknie!",
+  "The settings most people change, on one page": "Ustawienia, które zmienia większość osób, na jednej stronie"
 }
