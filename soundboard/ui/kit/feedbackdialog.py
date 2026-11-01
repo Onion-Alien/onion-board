@@ -5,8 +5,12 @@ Some picks open a few follow-up ticks under them (More sounds > Memes, ...); Few
 opens a "What bugs did you hit?" line. The picks go out with the anonymous usage count
 (usage.improve: names from fixed lists, and the typed words with anything personal
 taken out), so they're counted only when that's on. They go with a one-off random
-session, never this PC's ID, and the box says so. The form only opens in the browser,
-like before (feedback.py)."""
+session, never this PC's ID, and the box says so, beside Send. The form only opens in
+the browser, like before (feedback.py).
+
+Bun sits at the top left by the heading taking notes (ui/bun/notebun.py): each tick and
+each letter typed, he writes a bit more in his notebook; on Send he shuts it, bows and a
+heart floats up."""
 from __future__ import annotations
 
 from PySide6.QtCore import Qt
@@ -17,7 +21,13 @@ import shiboken6
 from soundboard import __version__
 from soundboard.core import feedback, usage
 from soundboard.i18n import _
+from soundboard.ui.bun.notebun import LETTER, LINE, NoteBunny
 from soundboard.ui.kit import busy, fit, icons
+from soundboard.ui.kit.panellabels import hint_label
+
+
+BUN_ROOM = 16     # px round Bun in the top-left corner, on every side
+TICK_INSET = 0    # px from a tick box's top to where its square is drawn
 
 
 def picks() -> list[tuple[str, str]]:
@@ -58,15 +68,6 @@ def follow_ups() -> dict[str, list[tuple[str, str]]]:
     }
 
 
-def _title(text: str) -> QLabel:
-    lab = QLabel(text)
-    f = lab.font()
-    f.setPointSizeF(f.pointSizeF() * 1.3)
-    f.setBold(True)
-    lab.setFont(f)
-    return lab
-
-
 class FeedbackDialog(QDialog):
     KEEP_OPEN = True   # a click outside doesn't close it: it would lose work
     def __init__(self, cfg, parent=None):
@@ -77,21 +78,38 @@ class FeedbackDialog(QDialog):
         self.setWindowTitle(_("Send feedback"))
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         v = QVBoxLayout(self)
-        v.setContentsMargins(18, 16, 18, 14)
+        # DESIGN.md Dialog anatomy: 18 px margins, 12 between blocks. Bun's box is just
+        # him (notebun.fit), so he gets the same room on all four sides of his corner
+        # (BUN_ROOM): to the dialog's top and left, to the heading and to what's under him
+        v.setContentsMargins(BUN_ROOM, BUN_ROOM, 18, 18)
+        v.setSpacing(0)
+        head = QHBoxLayout()
+        head.setSpacing(BUN_ROOM)
+        self.bun = NoteBunny()
+        words = QVBoxLayout()
+        words.setSpacing(4)
+        self.heading = QLabel(_("What would you improve?"))
+        self.heading.setObjectName("helptitle")   # the Title role
+        self.hint = hint_label(_("Tick all that fit."))
+        words.addStretch(1)
+        words.addWidget(self.heading)
+        words.addWidget(self.hint)
+        words.addStretch(1)
+        head.addWidget(self.bun, 0, Qt.AlignmentFlag.AlignTop)
+        head.addLayout(words, 1)
+        v.addLayout(head)
+        v.addSpacing(BUN_ROOM - TICK_INSET)
         self.pages = QStackedWidget()
+        self.pages.setContentsMargins(18 - BUN_ROOM, 0, 0, 0)   # (the 18 px margin again)
         self.pages.addWidget(self._ask_page())
         self.pages.addWidget(self._thanks_page())
-        v.addWidget(self.pages)
+        v.addWidget(self.pages, 1)
 
     # ------------------------------------------------------------------ page 1
     def _ask_page(self) -> QWidget:
         w = QWidget()
         v = QVBoxLayout(w)
         v.setContentsMargins(0, 0, 0, 0)
-        v.addWidget(_title(_("What would you improve?")))
-        hint = QLabel(_("Tick all that fit."))
-        hint.setObjectName("hint")
-        v.addWidget(hint)
         self.boxes: dict[str, QCheckBox] = {}
         self.more: dict[str, QWidget] = {}        # what opens under a ticked pick
         self.sub_boxes: dict[str, QCheckBox] = {}   # "sounds/memes"
@@ -101,6 +119,7 @@ class FeedbackDialog(QDialog):
         for key, text in picks():
             box = self.boxes[key] = QCheckBox(text)
             box.toggled.connect(self._changed)
+            box.clicked.connect(self._noted)
             v.addWidget(box)
             subs = more.get(key, [])
             line = {"other": self.other, "bugs": self.bugs_text}.get(key)
@@ -112,6 +131,7 @@ class FeedbackDialog(QDialog):
             pv.setSpacing(2)
             for sub, sub_text in subs:
                 sb = self.sub_boxes[f"{key}/{sub}"] = QCheckBox(sub_text)
+                sb.clicked.connect(self._noted)
                 pv.addWidget(sb)
             if line is not None:
                 pv.addWidget(line)
@@ -124,24 +144,20 @@ class FeedbackDialog(QDialog):
         self.send_btn.setObjectName("primary")
         self.send_btn.setDefault(True)
         self.send_btn.clicked.connect(self.send)
-        # bottom-right, the main one first
-        row.addStretch(1)
-        row.addWidget(self.send_btn)
-        row.addWidget(cancel)
-        v.addSpacing(6)
-        v.addLayout(row)
-        # what Send does with the picks (usage.improve): said where people decide
-        note = QHBoxLayout()
-        note.setSpacing(6)
+        # what Send does with the picks (usage.improve): said beside Send, where people
+        # decide; the buttons bottom-right, the main one first
         shield = QLabel()
         icons.set_label_icon(shield, "shield", size=14)
         self.anon_note = QLabel(_("Anonymous: not linked to you or this PC."))
         self.anon_note.setObjectName("hint")
-        self.anon_note.setWordWrap(True)
-        note.addWidget(shield, 0, Qt.AlignmentFlag.AlignTop)
-        note.addWidget(self.anon_note, 1)
-        v.addSpacing(2)
-        v.addLayout(note)
+        row.setSpacing(6)
+        row.addWidget(shield, 0, Qt.AlignmentFlag.AlignVCenter)
+        row.addWidget(self.anon_note, 1)
+        row.addSpacing(6)
+        row.addWidget(self.send_btn)
+        row.addWidget(cancel)
+        v.addSpacing(6)
+        v.addLayout(row)
         self._changed()
         return w
 
@@ -149,7 +165,11 @@ class FeedbackDialog(QDialog):
         line = QLineEdit()
         line.setPlaceholderText(placeholder)
         line.setMaxLength(limit)
+        line.textEdited.connect(lambda _t: self.bun.write(LETTER))
         return line
+
+    def _noted(self, *_args):
+        self.bun.write(LINE)
 
     def chosen(self) -> list[str]:
         """The ticked picks, and the ticked follow-ups of those ("sounds/memes")."""
@@ -197,12 +217,15 @@ class FeedbackDialog(QDialog):
         self.sent = usage.improve(self.cfg, self.chosen(), self.other.text(),
                                   self.bugs_text.text())
         self.not_sent.setVisible(not self.sent)
+        self.bun.finish()
         # the stack is as tall as its tallest page: let the short thanks page shrink it
         form = self.pages.widget(0)
         assert form is not None   # the form, then the thanks
         form.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
+        self.heading.setText(_("Thanks, that helps!"))
+        self.hint.hide()
         self.pages.setCurrentIndex(1)
-        self.resize(self.width(), self.minimumSizeHint().height())
+        self._fit_height()
         self.form_btn.setFocus()
 
     # ------------------------------------------------------------------ page 2
@@ -210,7 +233,6 @@ class FeedbackDialog(QDialog):
         w = QWidget()
         v = QVBoxLayout(w)
         v.setContentsMargins(0, 0, 0, 0)
-        v.addWidget(_title(_("Thanks, that helps!")))
         more = QLabel(_("Want to tell me more, or get a reply? The feedback form takes a "
                         "minute and needs no account."))
         more.setWordWrap(True)

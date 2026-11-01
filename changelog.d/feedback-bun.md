@@ -1,0 +1,1 @@
+- Send feedback has Bun in it now: he takes notes in his notebook as you tick and type, then bows when you send. The "Anonymous" line sits beside Send instead of on its own row.
