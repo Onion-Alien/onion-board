@@ -78,6 +78,11 @@ def download(info, on_progress: Callable[[int, int], object] = lambda done, tota
               open(part, "wb") as f):
             got = net.read_capped(r, f, max_bytes(info), chunk=CHUNK, total=total,
                                   progress=on_progress, check=_stop_if(cancelled))
+            length = net.content_length(r.headers)
+        if length and part.stat().st_size < length:
+            # the connection ended part-way (urllib reads that as the end of the file):
+            # say so, not "checksum"
+            raise ConnectionAbortedError("the download stopped part-way")
         if got != want:
             raise RuntimeError("the download didn't match its checksum, so it wasn't used")
         _unpack(part, model_dir(info))
@@ -133,4 +138,12 @@ def _unpack(zip_path: Path, dest: Path) -> None:
 
 
 def remove(info) -> None:
-    shutil.rmtree(model_dir(info), ignore_errors=True)
+    """The language's model, and what a download cut short by a crash or End task left
+    (its .part, the half-unpacked .new folder)."""
+    d = model_dir(info)
+    shutil.rmtree(d, ignore_errors=True)
+    shutil.rmtree(d.with_name(d.name + ".new"), ignore_errors=True)
+    try:
+        (base_dir() / f"{info.language}.part").unlink(missing_ok=True)
+    except OSError:
+        pass

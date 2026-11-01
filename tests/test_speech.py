@@ -1,5 +1,6 @@
 """Add-on modules, the service-module link, the live-voice helper and text-to-speech."""
 import json
+import os
 import shutil
 import socket
 import subprocess
@@ -629,6 +630,74 @@ def test_helper_exits_when_its_model_cant_load():
         h.stop()
 
 
+def fake_speech_libs(folder: Path, cache: Path):
+    """Stand-ins for faster_whisper and huggingface_hub (not installed for the tests):
+    the model is never on this PC, and downloading it fails as with no internet."""
+    (folder / "faster_whisper").mkdir(parents=True)
+    (folder / "faster_whisper" / "__init__.py").write_text(
+        "class WhisperModel:\n    def __init__(self, *a, **k): pass\n")
+    (folder / "faster_whisper" / "utils.py").write_text(
+        "_MODELS = {'base.en': 'Systran/faster-whisper-base.en'}\n"
+        "def download_model(name, local_files_only=False):\n"
+        "    if local_files_only:\n"
+        "        raise FileNotFoundError(name)\n"
+        "    raise ConnectionError('offline')\n")
+    (folder / "huggingface_hub").mkdir()
+    (folder / "huggingface_hub" / "__init__.py").write_text("")
+    (folder / "huggingface_hub" / "constants.py").write_text(f"HF_HUB_CACHE = {str(cache)!r}\n")
+
+
+@pytest.fixture
+def helper_with_fake_libs(tmp_path, helper_segmenter):
+    fake_speech_libs(tmp_path / "libs", tmp_path / "hub")
+    sys.path.insert(0, str(tmp_path / "libs"))
+    try:
+        yield helper_segmenter, tmp_path / "hub" / "models--Systran--faster-whisper-base.en"
+    finally:
+        sys.path.remove(str(tmp_path / "libs"))
+        for name in ("faster_whisper", "faster_whisper.utils", "huggingface_hub",
+                     "huggingface_hub.constants"):
+            sys.modules.pop(name, None)
+
+
+def test_a_speech_model_download_cut_short_leaves_no_parts_behind(helper_with_fake_libs):
+    # End task / a crash mid-download leaves <file>.<random>.incomplete, which
+    # huggingface_hub never picks up again: the next try deletes it
+    import os
+    h, folder = helper_with_fake_libs
+    blobs = folder / "blobs"
+    blobs.mkdir(parents=True)
+    dead = blobs / "2a16.4bf0da54.incomplete"     # a killed download's part
+    busy = blobs / "2a16.0123abcd.incomplete"     # one still being written
+    old_style = blobs / "2a16.incomplete"         # an older huggingface_hub carries on from it
+    whole = blobs / "2a16"
+    for f in (dead, busy, old_style, whole):
+        f.write_bytes(b"x")
+    hour_ago = time.time() - 3600
+    for f in (dead, old_style, whole):
+        os.utime(f, (hour_ago, hour_ago))
+    with pytest.raises(h.DownloadFailed):          # (offline, so it can't finish)
+        h.fetch_model("base.en", lambda done, total: None)
+    assert not dead.exists()
+    assert busy.exists() and old_style.exists() and whole.exists()
+
+
+def test_a_failed_speech_model_download_says_check_the_internet(tmp_path):
+    # the internet dropped (or was off) while Start fetched the model: not "try another
+    # Recognition model", and not huggingface_hub's own paragraph
+    fake_speech_libs(tmp_path / "libs", tmp_path / "hub")
+    events = []
+    h = ServiceHost([sys.executable, str(LIVE / "helper.py")], events.append, name="live-voice",
+                    env={**os.environ, "PYTHONPATH": str(tmp_path / "libs"), "HF_HUB_OFFLINE": ""})
+    h.start()
+    try:
+        assert wait_for(lambda: any(e["type"] == "stopped" for e in events), 20)
+        err = next(e for e in events if e["type"] == "error")
+        assert err["text"] == ("couldn't download the speech model base.en. Check your "
+                               "internet connection, then Start again")
+    finally:
+        h.stop()
+
 def test_a_line_that_cant_be_played_is_reported_and_the_next_still_plays():
     events = []
     c, eng = controller(events)
@@ -961,6 +1030,54 @@ def test_download_can_be_cancelled(tmp_path):
         translation.download(info, cancelled=lambda: True)
     assert not info.installed and not list(translation.base_dir().glob("*"))
 
+
+
+class _CutShort:
+    """A reply whose connection drops half way: urllib just sees the end of the data."""
+
+    def __init__(self, data: bytes):
+        self.headers = {"Content-Length": str(len(data))}
+        self.left = data[:len(data) // 2]
+
+    def read(self, n):
+        out, self.left = self.left[:n], self.left[n:]
+        return out
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *a):
+        return False
+
+
+def test_a_dropped_connection_is_reported_as_one_not_as_a_bad_checksum(tmp_path, monkeypatch):
+    from soundboard.online import net
+    from soundboard.speech import translation
+    sha, size = model_package(tmp_path / "pkg.argosmodel")
+    info = translation_info(tmp_path, sha, size)
+    reply = _CutShort((tmp_path / "pkg.argosmodel").read_bytes())
+    real = net.urlopen
+    monkeypatch.setattr(net, "urlopen", lambda *a, **k: reply)
+    with pytest.raises(RuntimeError) as e:
+        translation.download(info)
+    assert "checksum" not in str(e.value) and "dropped" in str(e.value)
+    assert not info.installed and not list(translation.base_dir().glob("*"))
+    monkeypatch.setattr(net, "urlopen", real)       # the internet's back: Download again
+    translation.download(info)
+    assert info.installed
+
+
+def test_removing_a_language_takes_what_a_killed_download_left(tmp_path):
+    # End task mid-download leaves xx.part (or, mid-unpack, the xx.new folder)
+    from soundboard.speech import translation
+    info = translation_info(tmp_path, "0" * 64, 1)
+    base = translation.base_dir()
+    (base / "xx.new" / "model").mkdir(parents=True)
+    (base / "xx.new" / "model" / "model.bin").write_bytes(b"half")
+    (base / "xx.part").write_bytes(b"half")
+    assert not info.installed
+    translation.remove(info)
+    assert not list(base.glob("*"))
 
 class _Endless:
     """A reply that never ends (a bad mirror): counts what was read."""

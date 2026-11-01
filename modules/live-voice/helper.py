@@ -162,19 +162,63 @@ def have_model(name: str) -> bool:
         return False
 
 
+class DownloadFailed(Exception):
+    """The speech model isn't on this PC and downloading it failed (no internet, a
+    dropped connection)."""
+
+
+def model_folder(name: str) -> str:
+    """The model's folder in the Hugging Face cache (there or not)."""
+    from faster_whisper.utils import _MODELS
+    from huggingface_hub import constants
+    repo = _MODELS.get(name, name)
+    return os.path.join(constants.HF_HUB_CACHE, "models--" + repo.replace("/", "--"))
+
+
+STALE_PART_S = 300      # a part that hasn't grown for this long isn't being written
+
+
+def clean_parts(name: str) -> int:
+    """Delete what a download cut short by End task, a crash or a power cut left
+    behind: huggingface_hub names each try's part `<file>.<random>.incomplete` and
+    never picks one up again, so they'd sit there for good (up to the model's size,
+    and fetch_model's progress would count them). A part still being written is
+    open (Windows won't delete it) or recent: kept. Returns how many went."""
+    try:
+        blobs = os.path.join(model_folder(name), "blobs")
+        names = os.listdir(blobs)
+    except (ImportError, OSError):     # not installed (the download says so), no parts
+        return 0
+    gone = 0
+    for f in names:
+        # <file>.<random>.incomplete only: an older huggingface_hub's <file>.incomplete
+        # is carried on from, so it stays
+        if not re.fullmatch(r"[^.]+\.[0-9a-f]{8}\.incomplete", f):
+            continue
+        path = os.path.join(blobs, f)
+        try:
+            if time.time() - os.path.getmtime(path) > STALE_PART_S:
+                os.remove(path)
+                gone += 1
+        except OSError:
+            pass
+    if gone:
+        log.info("removed %d unfinished speech model download part(s)", gone)
+    return gone
+
+
 def fetch_model(name: str, progress) -> str:
     """The speech model's folder, downloaded first when it isn't on this PC yet;
     `progress(done, total)` (bytes) every half second meanwhile. The download's own
     progress bars belong to huggingface_hub (unpinned, they change), so this counts
     the model's cache folder instead: its files and the parts still coming in."""
-    from faster_whisper.utils import _MODELS, download_model
+    from faster_whisper.utils import download_model
     try:
         return download_model(name, local_files_only=True)
     except Exception:  # noqa: BLE001  (not there yet, or not whole)
         pass
-    from huggingface_hub import constants
-    repo = _MODELS.get(name, name)
-    folder = os.path.join(constants.HF_HUB_CACHE, "models--" + repo.replace("/", "--"))
+    folder = model_folder(name)
+    clean_parts(name)
     total = MODEL_BYTES.get(name, 0)
     stop = threading.Event()
 
@@ -194,6 +238,11 @@ def fetch_model(name: str, progress) -> str:
     t.start()
     try:
         return download_model(name)
+    except (ValueError, ImportError):   # not a model name, not fully installed
+        raise
+    except Exception as e:  # noqa: BLE001 - no internet, a dropped connection
+        log.warning("speech model download failed: %s", e)
+        raise DownloadFailed(str(e)) from e
     finally:
         stop.set()
         t.join()
@@ -278,6 +327,7 @@ def download(name: str) -> int:
     print(f"Downloading the speech model {name} (about 150 MB)...", flush=True)
     from faster_whisper import WhisperModel
     from faster_whisper.utils import download_model
+    clean_parts(name)
     for attempt in range(DOWNLOAD_TRIES):
         try:
             folder = download_model(name)
@@ -365,6 +415,10 @@ def main(argv=None) -> int:
             return
         except Exception as e:  # noqa: BLE001
             log.exception("model load failed")
+            if isinstance(e, DownloadFailed) and os.environ.get("HF_HUB_OFFLINE") != "1":
+                fail(f"couldn't download the speech model {args.model}. Check your "
+                     "internet connection, then Start again")
+                return
             if os.environ.get("HF_HUB_OFFLINE") == "1":   # the app's voices switch is off
                 fail(f"the speech model {args.model} isn't downloaded, and downloading "
                      "voices and speech models is switched off in Settings > Privacy & "
