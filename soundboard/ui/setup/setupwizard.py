@@ -20,8 +20,10 @@ launch's), built from wizardkit's sizes and wizardparts' widgets.
 """
 from __future__ import annotations
 
+import ctypes
 import logging
 import subprocess
+import sys
 import time
 
 from PySide6.QtCore import (QEasingCurve, QEvent, QEventLoop, QSize, Qt, QTimer,
@@ -57,10 +59,12 @@ DISCORD_READ_MS = 2000  # the last step re-reads Discord's own settings this oft
 # the device steps by name, for the count of where the guide was closed (usage.py)
 PAGE_NAMES = ("mic", "send", "last")   # (the mic and headphones share step 1: "mic")
 MIC_TEST_MIN_S = 3      # on the mic step at least this long before its test is counted
-# a heartbeat: input that lands when it hasn't beaten for STALE_S was made while the
-# window was stuck (a first launch once froze the PC for a minute), so it's dropped:
-# Windows hands over queued clicks and keys before timers, so they all see an old beat
-BEAT_MS, STALE_S = 250, 1.0
+# a click or key that reaches the guide over STALE_MS after it was made was queued while
+# the window was stuck (a first launch once froze the PC for a minute): dropped, or the
+# Esc / X / Next clicks made meanwhile all land at once and close or skip it. Windows
+# stamps each one with when it was made (Qt's event timestamp, GetTickCount's clock).
+# (Not a heartbeat timer: waking up, Qt runs the overdue timers before the input.)
+STALE_MS = 1000
 _INPUT = (QEvent.Type.KeyPress, QEvent.Type.KeyRelease, QEvent.Type.MouseButtonPress,
           QEvent.Type.MouseButtonRelease, QEvent.Type.MouseButtonDblClick)
 # the guide's motion (only with Windows' Animation effects on: toast.animations_on)
@@ -207,11 +211,7 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
         self.timer.start(TICK_MS)
         self.discord_timer = QTimer(self)   # the last step only (go)
         self.discord_timer.timeout.connect(self._read_discord)
-        self._beat = time.monotonic()
-        self._stale_noted = 0.0
-        self.beat_timer = QTimer(self)
-        self.beat_timer.timeout.connect(self._heartbeat)
-        self.beat_timer.start(BEAT_MS)
+        self._stale_noted = False
         if (app := QApplication.instance()) is not None:
             app.installEventFilter(self)
         if self._proc is not None:   # still installing from a guide closed mid-way
@@ -292,7 +292,7 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
         # (the app's too) clicks and keys queued while it was stuck: never close or
         # skip the guide (it's a card inside the window: its own widgets, not window())
         elif ev.type() in _INPUT and isinstance(obj, QWidget) \
-                and (obj is self or self.isAncestorOf(obj)) and self._stale():
+                and (obj is self or self.isAncestorOf(obj)) and self._stale(ev):
             return True
         return False
 
@@ -510,26 +510,25 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
             usage.used("setup-discord")
             QTimer.singleShot(0, win, lambda: set_up_discord(win))
 
-    def _heartbeat(self):
-        self._beat = time.monotonic()
-
-    def _stale(self) -> bool:
-        """The window was stuck until a moment ago: what lands now was queued meanwhile
-        (logged once per stall)."""
-        if time.monotonic() - self._beat <= STALE_S:
+    def _stale(self, ev) -> bool:
+        """`ev` was made over STALE_MS ago: queued while the window was stuck (Windows
+        only: elsewhere the stamp isn't on GetTickCount's clock). Logged once a guide."""
+        made = ev.timestamp()
+        if sys.platform != "win32" or not made:   # (0: made by the app itself)
             return False
-        if self._stale_noted != self._beat:
-            self._stale_noted = self._beat
-            log.info("setup guide: ignored input queued while the window was stuck (%.0f s)",
-                     time.monotonic() - self._beat)
+        age = (ctypes.windll.kernel32.GetTickCount() - made) & 0xFFFFFFFF   # (it wraps)
+        if age <= STALE_MS:
+            return False
+        if not self._stale_noted:
+            self._stale_noted = True
+            log.info("setup guide: ignored input queued while the window was stuck (%.1f s)",
+                     age / 1000)
         return True
 
     def reject(self):
         """Esc / the window's X. Mid-install, check first: the install carries on
         either way, and reopening the guide picks it back up. While the mic is set up,
         the guide stays open (_locked) and says so, so the X doesn't look broken."""
-        if self._stale():   # the X clicked while the window was stuck
-            return
         if self._locked():
             usage.used("setup-wait-note")
             # the app's toast, spinner and all (one at a time: pressed again, it's renewed)
@@ -552,7 +551,6 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
                           QEasingCurve.Type.InCubic, wait=True)
         self.timer.stop()
         self.discord_timer.stop()
-        self.beat_timer.stop()
         if (app := QApplication.instance()) is not None:
             app.removeEventFilter(self)
         self._count_mic_test()
