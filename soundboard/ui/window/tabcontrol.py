@@ -11,15 +11,18 @@ import logging
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QSignalBlocker, Qt, QTimer
+from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtWidgets import QMenu
 
+from soundboard.control import winkeys
 from soundboard.online import net
 from soundboard.core import achievements, usage
 from soundboard.i18n import _
 from soundboard.ui.kit import icons
+from soundboard.ui.kit.crashdialog import free_dialog
+from soundboard.ui.kit.hotkeypick import HotkeyDialog, pretty_key
 from soundboard.ui.window import taboff
 from soundboard.ui.apps.appspanel import AppsTab
-from soundboard.ui.window.buncontrol import BUN_TIP
 from soundboard.ui.window.controller import Controller
 from soundboard.ui.window.livedot import set_tab_live
 from soundboard.ui.window.railtabs import set_tab_new
@@ -63,11 +66,60 @@ def rail_order(saved: list[str]) -> list[str]:
     return keys
 
 
+# a saved key (winkeys' names, by Windows key code) -> Qt's, for a tab's own key;
+# letters, digits, F-keys and the numpad go by their ranges (qt_keys)
+_QT_KEY = {0x20: Qt.Key.Key_Space, 0x0D: Qt.Key.Key_Return, 0x09: Qt.Key.Key_Tab,
+           0x1B: Qt.Key.Key_Escape, 0x08: Qt.Key.Key_Backspace, 0x2D: Qt.Key.Key_Insert,
+           0x2E: Qt.Key.Key_Delete, 0x24: Qt.Key.Key_Home, 0x23: Qt.Key.Key_End,
+           0x21: Qt.Key.Key_PageUp, 0x22: Qt.Key.Key_PageDown, 0x26: Qt.Key.Key_Up,
+           0x28: Qt.Key.Key_Down, 0x25: Qt.Key.Key_Left, 0x27: Qt.Key.Key_Right,
+           0x13: Qt.Key.Key_Pause, 0x2C: Qt.Key.Key_Print, 0x91: Qt.Key.Key_ScrollLock,
+           0x14: Qt.Key.Key_CapsLock, 0x90: Qt.Key.Key_NumLock, 0x5D: Qt.Key.Key_Menu,
+           0xBA: Qt.Key.Key_Semicolon, 0xBB: Qt.Key.Key_Equal, 0xBC: Qt.Key.Key_Comma,
+           0xBD: Qt.Key.Key_Minus, 0xBE: Qt.Key.Key_Period, 0xBF: Qt.Key.Key_Slash,
+           0xC0: Qt.Key.Key_QuoteLeft, 0xDB: Qt.Key.Key_BracketLeft,
+           0xDC: Qt.Key.Key_Backslash, 0xDD: Qt.Key.Key_BracketRight,
+           0xDE: Qt.Key.Key_Apostrophe, 0xB3: Qt.Key.Key_MediaTogglePlayPause,
+           0xB0: Qt.Key.Key_MediaNext, 0xB1: Qt.Key.Key_MediaPrevious,
+           0xAF: Qt.Key.Key_VolumeUp, 0xAE: Qt.Key.Key_VolumeDown, 0xAD: Qt.Key.Key_VolumeMute}
+_QT_PAD = {0x6A: Qt.Key.Key_Asterisk, 0x6B: Qt.Key.Key_Plus, 0x6D: Qt.Key.Key_Minus,
+           0x6E: Qt.Key.Key_Period, 0x6F: Qt.Key.Key_Slash}
+
+
+def qt_keys(combo: str) -> QKeySequence | None:
+    """'ctrl+shift+f5' as Qt's key sequence, or None for a key Qt can't take (a MIDI
+    pad, a mouse button): a tab's key works only while the window is in front."""
+    got = winkeys.parse(combo) if combo else None
+    if got is None:
+        return None
+    mods, vk = got
+    mod = Qt.KeyboardModifier.NoModifier
+    for flag, m in ((winkeys.MOD_CONTROL, Qt.KeyboardModifier.ControlModifier),
+                    (winkeys.MOD_ALT, Qt.KeyboardModifier.AltModifier),
+                    (winkeys.MOD_SHIFT, Qt.KeyboardModifier.ShiftModifier),
+                    (winkeys.MOD_WIN, Qt.KeyboardModifier.MetaModifier)):
+        if mods & flag:
+            mod |= m
+    if 0x30 <= vk <= 0x39 or 0x41 <= vk <= 0x5A:   # digits, letters: the same codes
+        key = Qt.Key(vk)
+    elif 0x70 <= vk <= 0x87:
+        key = Qt.Key(Qt.Key.Key_F1.value + vk - 0x70)
+    elif 0x60 <= vk <= 0x69 or vk in _QT_PAD:
+        mod |= Qt.KeyboardModifier.KeypadModifier
+        key = Qt.Key(Qt.Key.Key_0.value + vk - 0x60) if vk <= 0x69 else _QT_PAD[vk]
+    elif vk in _QT_KEY:
+        key = _QT_KEY[vk]
+    else:
+        return None
+    return QKeySequence(key | mod)
+
+
 class TabControl(Controller):
     """The tabs of one MainWindow (``mw``)."""
 
     def __init__(self, mw: MainWindow):
         super().__init__(mw)
+        self._key_shortcuts: list[QShortcut] = []
 
     def _radio_live(self, on: bool):
         mw = self.mw
@@ -167,12 +219,90 @@ class TabControl(Controller):
         menu.addSeparator()
         menu.addAction(icons.icon("settings"), _("Choose tabs in Settings"),
                        lambda: mw.setctl.open_settings("tabs"))
-        # Bun mode from the full window too (the mini player has its own Bun button)
+        # the key that jumps here: Ctrl+1... clash with pads' keys, so it can be changed
         menu.addSeparator()
-        act = menu.addAction(mw.builder._bun_icon(), _("Turn into Bun"), mw.bunctl.enter_bun_mode)
-        act.setToolTip(BUN_TIP)
-        menu.setToolTipsVisible(True)
+        combo = self.tab_key(key)
+        if combo:
+            hk = menu.addMenu(icons.icon("keyboard"), _("Hotkey: {hotkey}",
+                                                        hotkey=pretty_key(combo)))
+            hk.addAction(icons.icon("keyboard"), _("Change"), lambda: self.set_tab_key(key))
+            hk.addAction(icons.icon("trash"), _("Remove hotkey"),
+                         lambda: self.set_tab_key(key, ""))
+        else:
+            menu.addAction(icons.icon("keyboard"), _("Set hotkey"),
+                           lambda: self.set_tab_key(key))
         return menu
+
+    def _shown_buttons(self) -> list:
+        mw = self.mw
+        return [b for b in mw.rail.buttons
+                if b.index < mw.tabs.count() and mw.tabs.isTabVisible(b.index)]
+
+    def tab_key(self, key: str, n: int | None = None) -> str:
+        """The combo that jumps to tab `key` ("" = none): its own (Config.tab_keys), or
+        Ctrl+its place among the shown tabs on the rail (`n`, from 1) up to 9, unless
+        another tab took that one."""
+        mw = self.mw
+        if key in mw.cfg.tab_keys:
+            return mw.cfg.tab_keys[key]
+        if n is None:
+            n = next((n for n, b in enumerate(self._shown_buttons(), 1)
+                      if b.index == TAB_INDEX[key]), None)
+        combo = f"ctrl+{n}" if n and n <= 9 else ""
+        return "" if combo in mw.cfg.tab_keys.values() else combo
+
+    def bind_tab_keys(self):
+        """Ctrl+1... jump to the tabs by their places on the rail and the tabs' own keys
+        to theirs, while the window is in front; made again when a key changes."""
+        mw = self.mw
+        for sc in self._key_shortcuts:
+            sc.setEnabled(False)
+            sc.deleteLater()
+        self._key_shortcuts = []
+        own = {k: c for k, c in mw.cfg.tab_keys.items() if c and k in TAB_INDEX}
+        for k, combo in own.items():
+            seq = qt_keys(combo)
+            if seq is not None:
+                self._key_shortcuts.append(QShortcut(
+                    seq, mw, activated=lambda k=k: self._open_tab(k)))  # pyright: ignore[reportCallIssue]  # signal keyword
+        for n in range(1, 10):
+            if f"ctrl+{n}" not in own.values():
+                self._key_shortcuts.append(QShortcut(
+                    QKeySequence(f"Ctrl+{n}"), mw,  # pyright: ignore[reportCallIssue]  # signal keyword
+                    activated=lambda n=n: self._ctrl_number(n)))
+        mw.rail.key_for = lambda i, n: pretty_key(self.tab_key(TAB_KEYS[i], n))
+        mw.rail.sync()
+
+    def _ctrl_number(self, n: int):
+        """Ctrl+n: the n-th shown tab, unless it has a key of its own instead."""
+        shown = self._shown_buttons()
+        if n <= len(shown) and TAB_KEYS[shown[n - 1].index] in self.mw.cfg.tab_keys:
+            return
+        self._go_tab(n - 1, absolute=True)
+
+    def _open_tab(self, key: str):
+        b = next((b for b in self._shown_buttons() if b.index == TAB_INDEX[key]), None)
+        if b is not None:
+            usage.used("tab-keys")
+            b.click()
+
+    def set_tab_key(self, key: str, combo: str | None = None):
+        """Tab `key`'s own key (asks for it unless given; "" = none, not even Ctrl+n).
+        One key opens one tab: another tab that had it loses it."""
+        mw = self.mw
+        if combo is None:
+            d = HotkeyDialog(mw.hotkeys, mw, pads=False, in_app=_(
+                "Opens this tab while Onion Board is in front.\nEsc = cancel."))
+            combo = d.result_combo if d.exec() and d.result_combo else None
+            free_dialog(d)
+            mw.hkctl.register_hotkeys()   # the capture paused them
+            if combo is None:
+                return
+        keys = {k: c for k, c in mw.cfg.tab_keys.items() if not combo or c != combo}
+        keys[key] = combo
+        mw.set_option("tab_keys", keys)
+        usage.used("tab-key-set")
+        self.bind_tab_keys()
 
     def hide_tab(self, key: str):
         """Hide a tab from its right-click menu, saying where to get it back."""
