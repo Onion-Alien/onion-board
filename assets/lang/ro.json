@@ -4940,5 +4940,12 @@
     "{n} sunet nou",
     "{n} sunete noi",
     "{n} de sunete noi"
-  ]
+  ],
+  "Download again": "Descarcă din nou",
+  "Install again": "Instalează din nou",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "Data trecută, Onion Board s-a închis în timp ce descărca {language}. Descarci din nou?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "Data trecută, Onion Board s-a închis în timp ce instala vocile AI. Le instalezi din nou?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Data trecută, Onion Board s-a închis în timp ce instala Onion Pocket. Îl instalezi din nou?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "Data trecută, Onion Board s-a închis în timp ce instala Onion Watch. Îl instalezi din nou?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Data trecută, Onion Board s-a închis în timp ce instala recunoașterea vorbirii. O instalezi din nou?"
 }

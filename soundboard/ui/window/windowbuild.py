@@ -207,6 +207,9 @@ class WindowBuilder(Controller, PlayerBuild, SoundsPageBuild, SetupPageBuild):
         mw.ff_bar = mw.ffctl.build_bar()   # FFmpeg (ui/window/ffmpegcontrol.py)
         rv.addWidget(mw.ff_bar)
 
+        mw.addon_bar = mw.addonctl.build_bar()   # a cut-off add-on install (addonnotice.py)
+        rv.addWidget(mw.addon_bar)
+
         # Windows is in a language the board has but isn't showing: offered in that
         # language, so someone who can't read English finds it (_offer_language)
         mw.lang_bar = TopBar("speech")

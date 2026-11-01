@@ -4756,5 +4756,12 @@
   ],
   "{n} new sound": [
     "{n} 个新声音"
-  ]
+  ],
+  "Download again": "重新下载",
+  "Install again": "重新安装",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "上次下载{language}时 Onion Board 关闭了。要重新下载吗？",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "上次安装 AI 语音时 Onion Board 关闭了。要重新安装吗？",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "上次安装 Onion Pocket 时 Onion Board 关闭了。要重新安装吗？",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "上次安装 Onion Watch 时 Onion Board 关闭了。要重新安装吗？",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "上次安装语音识别时 Onion Board 关闭了。要重新安装吗？"
 }

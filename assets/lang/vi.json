@@ -4756,5 +4756,12 @@
   ],
   "{n} new sound": [
     "{n} âm thanh mới"
-  ]
+  ],
+  "Download again": "Tải xuống lại",
+  "Install again": "Cài đặt lại",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "Lần trước Onion Board đã đóng khi đang tải xuống {language}. Tải xuống lại?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "Lần trước Onion Board đã đóng khi đang cài đặt giọng AI. Cài đặt lại?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Lần trước Onion Board đã đóng khi đang cài đặt Onion Pocket. Cài đặt lại?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "Lần trước Onion Board đã đóng khi đang cài đặt Onion Watch. Cài đặt lại?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Lần trước Onion Board đã đóng khi đang cài đặt nhận dạng giọng nói. Cài đặt lại?"
 }

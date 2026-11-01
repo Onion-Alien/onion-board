@@ -4940,5 +4940,12 @@
     "{n} nový zvuk",
     "{n} nové zvuky",
     "{n} nových zvuků"
-  ]
+  ],
+  "Download again": "Stáhnout znovu",
+  "Install again": "Nainstalovat znovu",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "Onion Board se minule zavřel během stahování {language}. Stáhnout znovu?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "Onion Board se minule zavřel během instalace AI hlasů. Nainstalovat je znovu?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Onion Board se minule zavřel během instalace Onion Pocket. Nainstalovat ho znovu?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "Onion Board se minule zavřel během instalace Onion Watch. Nainstalovat ho znovu?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Onion Board se minule zavřel během instalace rozpoznávání řeči. Nainstalovat ho znovu?"
 }

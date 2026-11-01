@@ -4848,5 +4848,12 @@
   "{n} new sound": [
     "{n} yeni ses",
     "{n} yeni ses"
-  ]
+  ],
+  "Download again": "Yeniden indir",
+  "Install again": "Yeniden kur",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "Onion Board geçen sefer {language} indirilirken kapandı. Yeniden indirilsin mi?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "Onion Board geçen sefer yapay zekâ sesleri kurulurken kapandı. Yeniden kurulsun mu?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Onion Board geçen sefer Onion Pocket kurulurken kapandı. Yeniden kurulsun mu?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "Onion Board geçen sefer Onion Watch kurulurken kapandı. Yeniden kurulsun mu?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Onion Board geçen sefer konuşma tanıma kurulurken kapandı. Yeniden kurulsun mu?"
 }

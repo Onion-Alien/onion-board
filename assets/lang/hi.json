@@ -4848,5 +4848,12 @@
   "{n} new sound": [
     "{n} नई साउंड",
     "{n} नई साउंड"
-  ]
+  ],
+  "Download again": "फिर से डाउनलोड करें",
+  "Install again": "फिर से इंस्टॉल करें",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "पिछली बार {language} डाउनलोड होते समय Onion Board बंद हो गया था। फिर से डाउनलोड करें?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "पिछली बार AI आवाज़ें इंस्टॉल होते समय Onion Board बंद हो गया था। फिर से इंस्टॉल करें?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "पिछली बार Onion Pocket इंस्टॉल होते समय Onion Board बंद हो गया था। फिर से इंस्टॉल करें?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "पिछली बार Onion Watch इंस्टॉल होते समय Onion Board बंद हो गया था। फिर से इंस्टॉल करें?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "पिछली बार स्पीच रिकग्निशन इंस्टॉल होते समय Onion Board बंद हो गया था। फिर से इंस्टॉल करें?"
 }

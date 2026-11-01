@@ -4848,5 +4848,12 @@
   "{n} new sound": [
     "{n} нов звук",
     "{n} нови звука"
-  ]
+  ],
+  "Download again": "Изтегли отново",
+  "Install again": "Инсталирай отново",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "Последния път Onion Board се затвори, докато изтегляше {language}. Да го изтегля ли отново?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "Последния път Onion Board се затвори, докато инсталираше AI гласовете. Да ги инсталирам ли отново?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Последния път Onion Board се затвори, докато инсталираше Onion Pocket. Да го инсталирам ли отново?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "Последния път Onion Board се затвори, докато инсталираше Onion Watch. Да го инсталирам ли отново?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Последния път Onion Board се затвори, докато инсталираше разпознаването на говор. Да го инсталирам ли отново?"
 }

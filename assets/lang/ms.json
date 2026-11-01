@@ -4756,5 +4756,12 @@
   ],
   "{n} new sound": [
     "{n} bunyi baharu"
-  ]
+  ],
+  "Download again": "Muat turun semula",
+  "Install again": "Pasang semula",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "Kali terakhir Onion Board tertutup semasa memuat turun {language}. Muat turun semula?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "Kali terakhir Onion Board tertutup semasa memasang suara AI. Pasang semula?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Kali terakhir Onion Board tertutup semasa memasang Onion Pocket. Pasang semula?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "Kali terakhir Onion Board tertutup semasa memasang Onion Watch. Pasang semula?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Kali terakhir Onion Board tertutup semasa memasang pengecaman pertuturan. Pasang semula?"
 }

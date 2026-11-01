@@ -4848,5 +4848,12 @@
   "{n} new sound": [
     "{n} új hang",
     "{n} új hang"
-  ]
+  ],
+  "Download again": "Letöltés újra",
+  "Install again": "Telepítés újra",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "Legutóbb az Onion Board bezárult a(z) {language} letöltése közben. Letöltöd újra?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "Legutóbb az Onion Board bezárult az AI hangok telepítése közben. Telepíted újra?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Legutóbb az Onion Board bezárult az Onion Pocket telepítése közben. Telepíted újra?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "Legutóbb az Onion Board bezárult az Onion Watch telepítése közben. Telepíted újra?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Legutóbb az Onion Board bezárult a beszédfelismerés telepítése közben. Telepíted újra?"
 }

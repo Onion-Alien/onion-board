@@ -4848,5 +4848,12 @@
   "{n} new sound": [
     "{n} som novo",
     "{n} sons novos"
-  ]
+  ],
+  "Download again": "Baixar de novo",
+  "Install again": "Instalar de novo",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "Da última vez, o Onion Board fechou enquanto baixava {language}. Baixar de novo?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "Da última vez, o Onion Board fechou enquanto instalava as vozes de IA. Instalar de novo?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Da última vez, o Onion Board fechou enquanto instalava o Onion Pocket. Instalar de novo?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "Da última vez, o Onion Board fechou enquanto instalava o Onion Watch. Instalar de novo?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Da última vez, o Onion Board fechou enquanto instalava o reconhecimento de fala. Instalar de novo?"
 }

@@ -4848,5 +4848,12 @@
   "{n} new sound": [
     "{n} uusi ääni",
     "{n} uutta ääntä"
-  ]
+  ],
+  "Download again": "Lataa uudelleen",
+  "Install again": "Asenna uudelleen",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "Onion Board sulkeutui viime kerralla, kun kieltä {language} ladattiin. Ladataanko uudelleen?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "Onion Board sulkeutui viime kerralla tekoälypuheäänten asennuksen aikana. Asennetaanko ne uudelleen?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Onion Board sulkeutui viime kerralla Onion Pocketin asennuksen aikana. Asennetaanko se uudelleen?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "Onion Board sulkeutui viime kerralla Onion Watchin asennuksen aikana. Asennetaanko se uudelleen?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Onion Board sulkeutui viime kerralla puheentunnistuksen asennuksen aikana. Asennetaanko se uudelleen?"
 }

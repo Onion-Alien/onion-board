@@ -4940,5 +4940,12 @@
     "{n} nowy dźwięk",
     "{n} nowe dźwięki",
     "{n} nowych dźwięków"
-  ]
+  ],
+  "Download again": "Pobierz ponownie",
+  "Install again": "Zainstaluj ponownie",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "Ostatnio Onion Board zamknął się podczas pobierania języka „{language}”. Pobrać ponownie?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "Ostatnio Onion Board zamknął się podczas instalowania głosów AI. Zainstalować je ponownie?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Ostatnio Onion Board zamknął się podczas instalowania Onion Pocket. Zainstalować ponownie?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "Ostatnio Onion Board zamknął się podczas instalowania Onion Watch. Zainstalować ponownie?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Ostatnio Onion Board zamknął się podczas instalowania rozpoznawania mowy. Zainstalować ponownie?"
 }

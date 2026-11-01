@@ -4940,5 +4940,12 @@
     "{n} новый звук",
     "{n} новых звука",
     "{n} новых звуков"
-  ]
+  ],
+  "Download again": "Скачать снова",
+  "Install again": "Установить снова",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "В прошлый раз Onion Board закрылся, пока скачивался язык «{language}». Скачать снова?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "В прошлый раз Onion Board закрылся во время установки ИИ-голосов. Установить их снова?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "В прошлый раз Onion Board закрылся во время установки Onion Pocket. Установить снова?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "В прошлый раз Onion Board закрылся во время установки Onion Watch. Установить снова?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "В прошлый раз Onion Board закрылся во время установки распознавания речи. Установить снова?"
 }

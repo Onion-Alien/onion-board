@@ -4756,5 +4756,12 @@
   ],
   "{n} new sound": [
     "新しいサウンド {n} 件"
-  ]
+  ],
+  "Download again": "もう一度ダウンロード",
+  "Install again": "もう一度インストール",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "前回、{language}のダウンロード中に Onion Board が閉じました。もう一度ダウンロードしますか？",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "前回、AI ボイスのインストール中に Onion Board が閉じました。もう一度インストールしますか？",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "前回、Onion Pocket のインストール中に Onion Board が閉じました。もう一度インストールしますか？",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "前回、Onion Watch のインストール中に Onion Board が閉じました。もう一度インストールしますか？",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "前回、音声認識のインストール中に Onion Board が閉じました。もう一度インストールしますか？"
 }

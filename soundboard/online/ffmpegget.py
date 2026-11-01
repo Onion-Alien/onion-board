@@ -275,6 +275,38 @@ def _os_fault(step: str, e: BaseException) -> str:
     return f"{head}err-{num}" if isinstance(num, int) else f"{head}{type(e).__name__}"
 
 
+def worth_retrying(e: GetError) -> bool:
+    """Whether getting FFmpeg again in a minute or two may work: a dropped or blocked
+    connection, a busy server, a download cut short. Not when it's switched off, the
+    disk is full, Windows refused the files (an antivirus), the download is the wrong
+    file, or FFmpeg was got but won't start: trying again gets the same answer."""
+    if isinstance(e, (Stopped, SwitchedOff)):
+        return False
+    last = (e.fault.split() or [""])[-1]   # the app's own download: the last step
+    if last == "off" or not last.startswith("own-"):
+        return False
+    if last.startswith(("own-still-", "own-unpack", "own-too-big")):
+        return False
+    if last in ("own-err-28", "own-err-112", "own-err-5", "own-err-13"):   # full, refused
+        return False
+    if last.startswith("own-http-"):
+        code = last.removeprefix("own-http-")
+        return not code.startswith("4") or code in ("408", "429")
+    return True
+
+
+def connected() -> bool:
+    """Whether Windows says this PC is on a network that reaches the internet: its own
+    answer, read locally (nothing is sent). True when it can't be asked."""
+    try:
+        import ctypes
+        from ctypes import wintypes
+        flags = wintypes.DWORD()
+        return bool(ctypes.windll.wininet.InternetGetConnectedState(ctypes.byref(flags), 0))
+    except (AttributeError, OSError):
+        return True
+
+
 def why_not() -> str:
     """Why the app may not go online for FFmpeg (words for the user), or ""."""
     if net.offline() or not net.allowed(FEATURE):

@@ -5216,5 +5216,12 @@
     "{n} أصوات جديدة",
     "{n} صوتًا جديدًا",
     "{n} صوت جديد"
-  ]
+  ],
+  "Download again": "نزّله مرة أخرى",
+  "Install again": "ثبّته مرة أخرى",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "أُغلق Onion Board في المرة الماضية أثناء تنزيل {language}. هل تريد تنزيلها مرة أخرى؟",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "أُغلق Onion Board في المرة الماضية أثناء تثبيت أصوات الذكاء الاصطناعي. هل تريد تثبيتها مرة أخرى؟",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "أُغلق Onion Board في المرة الماضية أثناء تثبيت Onion Pocket. هل تريد تثبيته مرة أخرى؟",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "أُغلق Onion Board في المرة الماضية أثناء تثبيت Onion Watch. هل تريد تثبيته مرة أخرى؟",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "أُغلق Onion Board في المرة الماضية أثناء تثبيت التعرف على الكلام. هل تريد تثبيته مرة أخرى؟"
 }
