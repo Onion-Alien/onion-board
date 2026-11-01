@@ -4699,7 +4699,6 @@
   "ooh, pretty!": "哇，好漂亮！",
   "The settings most people change, on one page": "大多數人會改的設定，都在一頁裡",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board 在最前面時打開這個分頁。\nEsc = 取消。",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "拖曳把手剪掉開頭和結尾。點一下或拖曳時間尺，或拖曳播放線，可以改變播放位置。Ctrl+滾輪縮放。按住滑鼠右鍵拖曳，或 Shift+滾輪，即可平移。",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "免費、沒有廣告、不用帳號。由 OnionAlien 製作。以 GNU GPL v3 開源：可以使用、修改和分享，只要你的版本也維持開源。",
   "Community uploads": "社群上傳",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "把另一個聲音的效果加到這個聲音上（Robot + Demon）：它有而你的聲音沒有的效果會被打開",
@@ -4756,5 +4755,20 @@
   ],
   "{n} new sound": [
     "{n} 個新聲音"
-  ]
+  ],
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>片段 {n}</b>（{start} 到 {end}）：下面的設定只改這一段。",
+  "A voice is for the whole sound: click outside the splices to get back to it": "人聲作用於整個聲音：點片段外面即可返回",
+  "Back to the whole sound": "回到整個聲音",
+  "Copy to clipboard": "複製到剪貼簿",
+  "Copying splice {n}…": "正在複製片段 {n}…",
+  "Couldn't copy it: {why}": "無法複製：{why}",
+  "Edit its effects": "編輯它的效果",
+  "Play now": "立即播放",
+  "Save as new pad…": "另存為新按鈕…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "下面的設定又會改動整個聲音（在波形上按 Esc 也可以）",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "片段合併播放時，以及在該片段的立即播放、另存為新按鈕和複製中都聽得到（按右鍵）",
+  "{name} (splice {n})": "{name}（片段 {n}）",
+  "✓ Copied: paste it into a chat or a folder": "✓ 已複製：可貼到聊天或資料夾",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "拖曳把手剪掉開頭和結尾。點一下或拖曳時間尺，或拖曳播放線，可以改變播放位置。Ctrl+滾輪縮放。按住滑鼠右鍵拖曳，或 Shift+滾輪，即可平移。",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "捲動即可縮放。在片段的音量線上拖曳圓點：轉角左右拖曳設定淡入淡出，上下拖曳設定音量；兩端上下拖曳設定淡變的起始音量。點擊片段可給它專屬的效果，按右鍵看更多。"
 }

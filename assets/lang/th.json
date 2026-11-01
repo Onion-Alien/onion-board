@@ -4699,7 +4699,6 @@
   "ooh, pretty!": "ว้าว สวยจัง!",
   "The settings most people change, on one page": "การตั้งค่าที่คนส่วนใหญ่ปรับ รวมไว้ในหน้าเดียว",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "เปิดแท็บนี้ขณะที่ Onion Board อยู่ด้านหน้า\nEsc = ยกเลิก",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "ลากที่จับเพื่อตัดต้นและท้าย คลิกหรือลากไม้บรรทัดเวลา หรือลากเส้นตำแหน่งเล่น เพื่อย้ายจุดที่เล่น Ctrl+เลื่อนเพื่อซูม ลากด้วยปุ่มขวาของเมาส์ หรือ Shift+เลื่อน เพื่อขยับ",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "ฟรี ไม่มีโฆษณาและไม่ต้องมีบัญชี สร้างโดย OnionAlien โอเพนซอร์สภายใต้ GNU GPL v3: ใช้ แก้ไข และแบ่งปันได้ ตราบใดที่เวอร์ชันของคุณยังเป็นโอเพนซอร์สด้วย",
   "Community uploads": "อัปโหลดจากชุมชน",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "เพิ่มเอฟเฟกต์ของเสียงอื่นลงในเสียงนี้ (Robot + Demon): เอฟเฟกต์ที่เสียงนั้นมีแต่เสียงของคุณไม่มีจะถูกเปิด",
@@ -4756,5 +4755,20 @@
   ],
   "{n} new sound": [
     "เสียงใหม่ {n} เสียง"
-  ]
+  ],
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>ช่วง {n}</b> ({start} ถึง {end}): การตั้งค่าด้านล่างเปลี่ยนแค่ส่วนนี้",
+  "A voice is for the whole sound: click outside the splices to get back to it": "เสียงพากย์ใช้กับทั้งเสียง: คลิกนอกช่วงเพื่อกลับไป",
+  "Back to the whole sound": "กลับไปที่ทั้งเสียง",
+  "Copy to clipboard": "คัดลอกไปคลิปบอร์ด",
+  "Copying splice {n}…": "กำลังคัดลอกช่วง {n}…",
+  "Couldn't copy it: {why}": "คัดลอกไม่ได้: {why}",
+  "Edit its effects": "แก้เอฟเฟกต์ของมัน",
+  "Play now": "เล่นเลย",
+  "Save as new pad…": "บันทึกเป็นแพดใหม่…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "การตั้งค่าด้านล่างกลับมาเปลี่ยนทั้งเสียง (กด Esc บนคลื่นเสียงก็ได้)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "จะได้ยินเมื่อช่วงต่างๆ เล่นต่อกัน และในเล่นเลย บันทึกเป็นแพดใหม่ และคัดลอกของช่วงนั้น (คลิกขวาที่มัน)",
+  "{name} (splice {n})": "{name} (ช่วง {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ คัดลอกแล้ว: วางในแชทหรือโฟลเดอร์ได้เลย",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "ลากที่จับเพื่อตัดต้นและท้าย คลิกหรือลากไม้บรรทัดเวลา หรือลากเส้นตำแหน่งเล่น เพื่อย้ายจุดที่เล่น Ctrl+เลื่อนเพื่อซูม ลากด้วยปุ่มขวาของเมาส์ หรือ Shift+เลื่อน เพื่อขยับ",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "เลื่อนลูกกลิ้งเพื่อซูม บนเส้นระดับของช่วง ลากจุด: มุมไปด้านข้างเพื่อเฟด และขึ้นลงเพื่อปรับความดัง ปลายขึ้นลงเพื่อตั้งระดับที่เฟดเริ่ม คลิกช่วงเพื่อใส่เอฟเฟกต์ของมันเอง คลิกขวาเพื่อดูเพิ่ม"
 }

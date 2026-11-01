@@ -4787,7 +4787,6 @@
   "ooh, pretty!": "Uy, ang ganda!",
   "The settings most people change, on one page": "Ang mga setting na binabago ng karamihan, sa iisang pahina",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Binubuksan ang tab na ito habang nasa harap ang Onion Board.\nEsc = kanselahin.",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "I-drag ang mga handle para i-cut ang simula at dulo. I-click o i-drag ang time ruler, o i-drag ang playhead, para ilipat kung saan ito tumutugtog. Ctrl+scroll para mag-zoom. I-drag gamit ang kanang button ng mouse, o Shift+scroll, para gumalaw.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Libre, walang ads at walang account. Gawa ni OnionAlien. Open source sa ilalim ng GNU GPL v3: gamitin, baguhin at i-share ito, basta open source din ang bersyon mo.",
   "Community uploads": "Upload ng komunidad",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Idagdag ang mga effect ng ibang boses dito (Robot + Demon): bubuksan ang mga effect na mayroon ito at wala sa iyo",
@@ -4848,5 +4847,20 @@
   "{n} new sound": [
     "{n} bagong sound",
     "{n} bagong sound"
-  ]
+  ],
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Hiwa {n}</b> ({start} hanggang {end}): ang mga setting sa ibaba ay bahaging ito lang ang binabago.",
+  "A voice is for the whole sound: click outside the splices to get back to it": "Para sa buong tunog ang boses: mag-click sa labas ng mga hiwa para bumalik",
+  "Back to the whole sound": "Balik sa buong tunog",
+  "Copy to clipboard": "Kopyahin sa clipboard",
+  "Copying splice {n}…": "Kinokopya ang hiwa {n}…",
+  "Couldn't copy it: {why}": "Hindi ito makopya: {why}",
+  "Edit its effects": "I-edit ang effects nito",
+  "Play now": "Patugtugin ngayon",
+  "Save as new pad…": "I-save bilang bagong pad…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "Ang mga setting sa ibaba ay binabago ulit ang buong tunog (ganoon din ang Esc sa waveform)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Naririnig ang mga ito kapag pinagsama ang mga hiwa, at sa sariling Patugtugin ngayon, I-save bilang bagong pad at Kopyahin ng hiwa (i-right-click ito)",
+  "{name} (splice {n})": "{name} (hiwa {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ Nakopya: i-paste ito sa chat o folder",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "I-drag ang mga handle para i-cut ang simula at dulo. I-click o i-drag ang time ruler, o i-drag ang playhead, para ilipat kung saan ito tumutugtog. Ctrl+scroll para mag-zoom. I-drag gamit ang kanang button ng mouse, o Shift+scroll, para gumalaw.",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Mag-scroll para mag-zoom. Sa level line ng hiwa, i-drag ang mga tuldok: ang mga sulok pakanan o pakaliwa para sa fade at pataas o pababa para sa volume, ang mga dulo pataas o pababa para sa simula ng fade. Mag-click sa hiwa para sa sariling effects, right-click para sa iba pa."
 }

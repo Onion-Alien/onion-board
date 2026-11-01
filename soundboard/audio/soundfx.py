@@ -16,6 +16,13 @@ stays readable and new keys can be added without a migration:
                           the order they were made; [] = none
      "joined": False,     True: the sound is its splices back to back, and start /
                           end only span them (what older versions play instead)
+     "parts": [{...}],    each splice's own settings, in the splices' order: any of
+                          speed, pitch, tape, eq, gain_db, reverse, effects, live,
+                          "volume" (0..2), "fade_in" / "fade_out" (seconds) and the
+                          level each fade starts from / ends at ("fade_in_from" /
+                          "fade_out_to", 0..1 of its volume, 0 = silence); {} =
+                          as it is. Used when they're joined (join), before the rest
+                          of the sound's settings; older versions leave them out
      "effects": {type: {"on": bool, param: value, ...}},   any voicefx effect,
                                                             modules' included
      "voice": {"name": str,                     a voice laid over the sound, before
@@ -69,7 +76,7 @@ BLOCK = 2048          # effects run in blocks like they do on the mic
 def neutral() -> dict:
     return {"speed": 1.0, "pitch": 0.0, "tape": False, "eq": [0.0] * len(eq.BANDS),
             "gain_db": 0.0, "reverse": False, "start": 0.0, "end": 0.0, "splices": [],
-            "joined": False, "effects": {}, "voice": {}, "live": []}
+            "joined": False, "parts": [], "effects": {}, "voice": {}, "live": []}
 
 
 MAX_LIVE = 4   # Live controls stages on one sound (a copy of a copy of a copy…)
@@ -130,6 +137,53 @@ def clean_splices(raw) -> list[list[float]]:
     return out
 
 
+# a splice's own settings (parts): the sound's that work on one part, and these
+PART_FX = ("speed", "pitch", "tape", "eq", "gain_db", "reverse", "effects", "live")
+MAX_FADE_S = 10.0     # a splice's fade, as long as a sound's may be (config.MAX_FADE_S)
+VOLUME_RANGE = (0.0, 2.0)
+
+
+def clean_part(raw) -> dict:
+    """One splice's own settings, in range, only the ones that change something
+    ({} = it plays as it is)."""
+    raw = raw if isinstance(raw, dict) else {}
+    base, f = neutral(), clean({k: raw[k] for k in PART_FX if k in raw})
+    out = {k: f[k] for k in PART_FX if f[k] != base[k]}
+    if eq.design(f["eq"], SR) is None:
+        out.pop("eq", None)
+    if not _active_effects(f):
+        out.pop("effects", None)
+    for k, lo, hi, none in (("volume", *VOLUME_RANGE, 1.0), ("fade_in", 0.0, MAX_FADE_S, 0.0),
+                            ("fade_out", 0.0, MAX_FADE_S, 0.0), ("fade_in_from", 0.0, 1.0, 0.0),
+                            ("fade_out_to", 0.0, 1.0, 0.0)):
+        try:
+            v = float(raw.get(k, none))
+        except (TypeError, ValueError, OverflowError):
+            continue
+        v = round(min(max(v, lo), hi), 3) if math.isfinite(v) else none
+        if abs(v - none) >= 1e-3:
+            out[k] = v
+    return out
+
+
+def clean_parts(raw, n: int) -> list[dict]:
+    """`n` splices' own settings (one each, {} where there's none); [] when none has any."""
+    got = raw if isinstance(raw, list) else []
+    out = [clean_part(got[i]) if i < len(got) else {} for i in range(n)]
+    return out if any(out) else []
+
+
+def splice_alone(fx: dict | None, i: int) -> dict:
+    """The sound's settings for just splice `i`, with its own settings and fades: how it
+    plays on its own (and as a pad of its own)."""
+    f = clean(fx)
+    if not 0 <= i < len(f["splices"]):
+        return f
+    a, b = f["splices"][i]
+    part = f["parts"][i] if i < len(f["parts"]) else {}
+    return clean(dict(f, start=a, end=b, splices=[[a, b]], parts=[part], joined=True))
+
+
 def clean(fx: dict | None) -> dict:
     """Settings with every key present, in range, and unknown keys dropped."""
     out = neutral()
@@ -152,6 +206,8 @@ def clean(fx: dict | None) -> dict:
         out["end"] = 0.0   # nothing (or next to nothing) left: keep the whole sound
     out["splices"] = clean_splices(fx.get("splices"))
     out["joined"] = bool(fx.get("joined", False)) and bool(out["splices"])
+    if out["splices"] and fx.get("parts"):
+        out["parts"] = clean_parts(fx.get("parts"), len(out["splices"]))
     out["tape"] = bool(fx.get("tape", False))
     out["reverse"] = bool(fx.get("reverse", False))
     g = fx.get("eq")
@@ -311,8 +367,8 @@ def key(fx: dict | None) -> str:
         return ""
     f = clean(fx)
     if not f["joined"]:   # splices only marked change nothing that plays
-        f["splices"] = []
-    for k in ("start", "end", "splices", "joined", "voice", "live"):   # sounds without
+        f["splices"], f["parts"] = [], []
+    for k in ("start", "end", "splices", "joined", "parts", "voice", "live"):   # sounds without
         if not f[k]:                         # these keep the keys (and caches) they had
             del f[k]
     text = json.dumps(f, sort_keys=True)
@@ -359,7 +415,7 @@ def trim(x: np.ndarray, fx: dict | None) -> np.ndarray:
     its joined splices back to back."""
     f = clean(fx)
     if f["joined"]:
-        return join(x, f["splices"])
+        return join(x, f["splices"], f["parts"])
     a = min(int(round(f["start"] * SR)), len(x))
     b = int(round(f["end"] * SR)) if f["end"] else len(x)
     b = min(max(b, a), len(x))
@@ -368,19 +424,50 @@ def trim(x: np.ndarray, fx: dict | None) -> np.ndarray:
     return x[a:b]
 
 
-def join(x: np.ndarray, splices: list[list[float]]) -> np.ndarray:
-    """The parts of (n, 2) audio at SR, back to back in the order given, each ramped in
-    and out over JOIN_S where it meets another (a cut mid-wave clicks). The ends of
-    the whole stay as cut, like a trim's. All of it if no part falls in the sound."""
+def own(y: np.ndarray, part: dict, scale: float) -> np.ndarray:
+    """A splice's float32 audio (`scale` = full volume) with its own settings: its
+    effects (no longer than its speed makes it: a tail would move what comes after),
+    volume and fades."""
+    f = clean({k: part[k] for k in PART_FX if k in part})
+    if not is_neutral(f):
+        n = max(1, int(round(len(y) / f["speed"])))
+        y = render(y / F32(scale), f)[:n] * F32(scale)
+    vol = float(part.get("volume", 1.0))
+    if abs(vol - 1.0) >= 1e-3:
+        y = y * F32(vol)
+    for key, level, rising in (("fade_in", "fade_in_from", True),
+                               ("fade_out", "fade_out_to", False)):
+        k = min(int(float(part.get(key, 0.0)) * SR), len(y))
+        if k > 0:   # from its level (0: silence) up to full, or back down to it
+            lo = float(part.get(level, 0.0))
+            ramp = np.linspace(lo, 1.0, k, endpoint=False, dtype=F32)[:, None]
+            if rising:
+                y[:k] *= ramp
+            else:
+                y[len(y) - k:] *= ramp[::-1]
+    return y
+
+
+def join(x: np.ndarray, splices: list[list[float]],
+         own_fx: list[dict] | None = None) -> np.ndarray:
+    """The parts of (n, 2) audio at SR, back to back in the order given, each with its
+    own settings (`own_fx`: soundfx's "parts", see own) and ramped in and out over
+    JOIN_S where it meets another (a cut mid-wave clicks). The ends of the whole stay
+    as cut, like a trim's. All of it if no part falls in the sound."""
     parts = []
-    for a, b in splices:
+    scale = 32767.0 if x.dtype == np.int16 else 1.0
+    for i, (a, b) in enumerate(splices):
         a, b = min(int(round(a * SR)), len(x)), min(int(round(b * SR)), len(x))
         if b - a >= int(MIN_TRIM_S * SR):
-            parts.append(x[a:b])
+            part = own_fx[i] if own_fx and i < len(own_fx) else {}
+            parts.append(own(x[a:b].astype(F32), part, scale) if part else x[a:b])
     if not parts:
         return x
     if len(parts) == 1:
-        return parts[0]
+        y = parts[0]
+        if x.dtype == np.int16 and y.dtype != np.int16:
+            return np.round(np.clip(y, -32768, 32767)).astype(np.int16)
+        return y
     ramp = np.linspace(0.0, 1.0, int(JOIN_S * SR), endpoint=False, dtype=F32)[:, None]
     n = len(ramp)
     out = []
@@ -392,8 +479,8 @@ def join(x: np.ndarray, splices: list[list[float]]) -> np.ndarray:
             y[-n:] *= ramp[::-1][-len(y[-n:]):]
         out.append(y)
     y = np.concatenate(out)
-    if x.dtype == np.int16:
-        return np.round(y).astype(np.int16)
+    if x.dtype == np.int16:   # (a splice's own boost can go past full scale)
+        return np.round(np.clip(y, -32768, 32767)).astype(np.int16)
     return y
 
 
@@ -414,13 +501,27 @@ def time_at(fx: dict | None, length: float, frac: float) -> float:
     """Where in the file (seconds) a sound with effects `fx` is when it has played
     `frac` (0..1) of itself (speed stretches it evenly; effect tails aren't counted)."""
     parts = kept_parts(fx, length)
+    rates = _rates(fx, len(parts))
+    heard = [(b - a) / r for (a, b), (r, _back) in zip(parts, rates)]
     frac = min(max(frac, 0.0), 1.0)
-    left = (1.0 - frac if clean(fx)["reverse"] else frac) * sum(b - a for a, b in parts)
-    for i, (a, b) in enumerate(parts):   # (where two meet: the start of the next)
-        if left < b - a or i == len(parts) - 1:
-            return a + min(left, b - a)
-        left -= b - a
+    left = (1.0 - frac if clean(fx)["reverse"] else frac) * sum(heard)
+    for i, ((a, b), (r, back)) in enumerate(zip(parts, rates)):
+        if left < heard[i] or i == len(parts) - 1:   # (where two meet: the next's start)
+            into = min(left * r, b - a)
+            return b - into if back else a + into
+        left -= heard[i]
     return parts[-1][1]
+
+
+def _rates(fx: dict | None, n: int) -> list[tuple[float, bool]]:
+    """(speed, backwards) of each of the `n` parts that play: a joined splice's own."""
+    f = clean(fx)
+    own_fx = f["parts"] if f["joined"] else []
+    out = []
+    for i in range(n):
+        p = own_fx[i] if i < len(own_fx) else {}
+        out.append((float(p.get("speed", 1.0)), bool(p.get("reverse", False))))
+    return out
 
 
 def frac_at(fx: dict | None, length: float, t: float) -> float:
@@ -428,17 +529,19 @@ def frac_at(fx: dict | None, length: float, t: float) -> float:
     the file: the inverse of time_at. A time it doesn't play goes to the start of the
     next part that does (the first, past the last)."""
     parts = kept_parts(fx, length)
-    total = sum(b - a for a, b in parts) or 1.0
+    rates = _rates(fx, len(parts))
+    heard = [(b - a) / r for (a, b), (r, _back) in zip(parts, rates)]
+    total = sum(heard) or 1.0
     before, at = 0.0, None
-    for a, b in parts:
+    for (a, b), (r, back), h in zip(parts, rates, heard):
         if a <= t <= b:
-            at = before + t - a
+            at = before + ((b - t) if back else (t - a)) / r
             break
-        before += b - a
+        before += h
     if at is None:   # not played: from where the next part starts
         later = [(a, i) for i, (a, _b) in enumerate(parts) if a > t]
         i = min(later)[1] if later else 0
-        at = sum(b - a for a, b in parts[:i])
+        at = sum(heard[:i])
     frac = min(max(at / total, 0.0), 1.0)
     return 1.0 - frac if clean(fx)["reverse"] else frac
 
@@ -465,7 +568,7 @@ def preview_part(x: np.ndarray, fx: dict | None, seconds: float,
         part = part[min(int(len(part) * at), max(len(part) - 1, 0)):]
     n = max(1, int(seconds * f["speed"] * SR))
     part = part[-n:] if f["reverse"] else part[:n]
-    return part, dict(f, start=0.0, end=0.0, splices=[], joined=False)
+    return part, dict(f, start=0.0, end=0.0, splices=[], parts=[], joined=False)
 
 
 # --------------------------------------------------------------------------- streaming

@@ -4699,7 +4699,6 @@
   "ooh, pretty!": "우와, 예쁘다!",
   "The settings most people change, on one page": "대부분의 사람이 바꾸는 설정을 한 페이지에",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board가 앞에 있을 때 이 탭을 엽니다.\nEsc = 취소.",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "핸들을 끌어서 앞뒤를 잘라내세요. 시간 눈금자를 클릭하거나 끌거나, 재생 위치 선을 끌면 재생 위치가 바뀌어요. Ctrl+스크롤은 확대입니다. 마우스 오른쪽 버튼으로 끌거나 Shift+스크롤로 이동하세요.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "무료이고 광고도 계정도 없습니다. OnionAlien이 만들었습니다. GNU GPL v3 오픈 소스: 자유롭게 쓰고, 고치고, 공유하세요. 단, 여러분의 버전도 오픈 소스로 유지해야 합니다.",
   "Community uploads": "커뮤니티 업로드",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "다른 목소리의 효과를 이 목소리에 더합니다(Robot + Demon): 그 목소리에는 있고 내 목소리에는 없는 효과가 켜집니다",
@@ -4756,5 +4755,20 @@
   ],
   "{n} new sound": [
     "새 사운드 {n}개"
-  ]
+  ],
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>구간 {n}</b> ({start}~{end}): 아래 설정은 이 부분만 바꿉니다.",
+  "A voice is for the whole sound: click outside the splices to get back to it": "목소리는 소리 전체에 적용돼요: 구간 바깥을 클릭하면 돌아갑니다",
+  "Back to the whole sound": "소리 전체로 돌아가기",
+  "Copy to clipboard": "클립보드에 복사",
+  "Copying splice {n}…": "구간 {n} 복사 중…",
+  "Couldn't copy it: {why}": "복사하지 못했어요: {why}",
+  "Edit its effects": "효과 편집",
+  "Play now": "지금 재생",
+  "Save as new pad…": "새 패드로 저장…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "아래 설정이 다시 소리 전체를 바꿉니다 (파형 위에서 Esc를 눌러도 됨)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "구간을 합쳐 재생할 때, 그리고 그 구간의 지금 재생, 새 패드로 저장, 복사에서 들립니다 (오른쪽 클릭)",
+  "{name} (splice {n})": "{name} (구간 {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ 복사됨: 채팅이나 폴더에 붙여넣으세요",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "핸들을 끌어서 앞뒤를 잘라내세요. 시간 눈금자를 클릭하거나 끌거나, 재생 위치 선을 끌면 재생 위치가 바뀌어요. Ctrl+스크롤은 확대입니다. 마우스 오른쪽 버튼으로 끌거나 Shift+스크롤로 이동하세요.",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "스크롤로 확대합니다. 구간의 레벨 선에서 점을 끌어 보세요: 모서리를 옆으로 끌면 페이드, 위아래로 끌면 음량, 끝점을 위아래로 끌면 페이드 시작 레벨입니다. 구간을 클릭하면 따로 효과를, 오른쪽 클릭하면 더 많은 메뉴가 나옵니다."
 }

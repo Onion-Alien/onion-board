@@ -4787,7 +4787,6 @@
   "ooh, pretty!": "वाह, कितना सुंदर!",
   "The settings most people change, on one page": "वे सेटिंग्स जिन्हें ज़्यादातर लोग बदलते हैं, एक ही पेज पर",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board सामने होने पर यह टैब खोलती है।\nEsc = रद्द करें।",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "शुरू और आख़िर काटने के लिए हैंडल खींचें। चलने की जगह बदलने के लिए टाइम रूलर पर क्लिक करें या खींचें, या प्लेहेड खींचें। Ctrl+स्क्रॉल से ज़ूम। आगे-पीछे जाने के लिए माउस का दायाँ बटन दबाकर खींचें, या Shift+स्क्रॉल करें।",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "मुफ़्त, बिना विज्ञापन और बिना अकाउंट। OnionAlien ने बनाया। GNU GPL v3 के तहत ओपन सोर्स: इस्तेमाल करें, बदलें और शेयर करें, बस आपका वर्ज़न भी ओपन सोर्स रहना चाहिए।",
   "Community uploads": "समुदाय के अपलोड",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "इस आवाज़ में किसी दूसरी आवाज़ के इफ़ेक्ट जोड़ें (Robot + Demon): जो इफ़ेक्ट उसमें हैं पर आपकी में नहीं, वे चालू हो जाते हैं",
@@ -4848,5 +4847,20 @@
   "{n} new sound": [
     "{n} नई साउंड",
     "{n} नई साउंड"
-  ]
+  ],
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>टुकड़ा {n}</b> ({start} से {end}): नीचे की सेटिंग्स सिर्फ़ इस हिस्से को बदलती हैं।",
+  "A voice is for the whole sound: click outside the splices to get back to it": "आवाज़ पूरी साउंड के लिए होती है: वापस जाने के लिए टुकड़ों के बाहर क्लिक करें",
+  "Back to the whole sound": "पूरी साउंड पर वापस",
+  "Copy to clipboard": "क्लिपबोर्ड पर कॉपी करें",
+  "Copying splice {n}…": "टुकड़ा {n} कॉपी हो रहा है…",
+  "Couldn't copy it: {why}": "कॉपी नहीं हो सका: {why}",
+  "Edit its effects": "इसके इफ़ेक्ट बदलें",
+  "Play now": "अभी चलाएँ",
+  "Save as new pad…": "नए पैड के रूप में सेव करें…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "नीचे की सेटिंग्स फिर से पूरी साउंड बदलती हैं (वेवफ़ॉर्म पर Esc भी यही करता है)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "ये तब सुनाई देती हैं जब टुकड़े जोड़कर चलते हैं, और टुकड़े के अपने अभी चलाएँ, नए पैड के रूप में सेव करें और कॉपी में (उस पर राइट-क्लिक करें)",
+  "{name} (splice {n})": "{name} (टुकड़ा {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ कॉपी हो गया: इसे किसी चैट या फ़ोल्डर में पेस्ट करें",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "शुरू और आख़िर काटने के लिए हैंडल खींचें। चलने की जगह बदलने के लिए टाइम रूलर पर क्लिक करें या खींचें, या प्लेहेड खींचें। Ctrl+स्क्रॉल से ज़ूम। आगे-पीछे जाने के लिए माउस का दायाँ बटन दबाकर खींचें, या Shift+स्क्रॉल करें।",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "ज़ूम के लिए स्क्रॉल करें। टुकड़े की लेवल लाइन पर बिंदु खींचें: कोनों को बगल में फ़ेड के लिए और ऊपर-नीचे आवाज़ के लिए, सिरों को ऊपर-नीचे यह तय करने के लिए कि फ़ेड कहाँ से शुरू हो। अपने इफ़ेक्ट के लिए टुकड़े पर क्लिक करें, और के लिए राइट-क्लिक करें।"
 }
