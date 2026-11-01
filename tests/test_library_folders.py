@@ -244,3 +244,44 @@ def test_the_moves_list_leaves_saved_moves_and_drops_unused_names(app_dir):
     assert library.tidy_files(cfg) == 0
     assert Path(cfg.sounds[0].file).is_file() and not claimed.exists()
     assert not (app_dir / "tidy-moves.txt").exists()
+
+
+def test_an_add_cut_off_by_a_crash_is_taken_out_at_the_next_start(app_dir, tmp_path,
+                                                                    monkeypatch):
+    """The app closed (End task, a crash, the power) while a download was converted,
+    or before the settings with its pad were saved: its file stayed in the sounds
+    folder with no pad for good, and adding it again made "Song (2)"."""
+    monkeypatch.setattr(library, "USE_RECYCLE_BIN", False)
+    kept, _ = library.import_file(str(_wav(tmp_path / "a.wav")), "#1", name="Kept",
+                                  folder="YouTube")
+    whole, _ = library.import_file(str(_wav(tmp_path / "b.wav")), "#1", name="Song",
+                                   folder="SoundCloud")   # no pad: its save never came
+    half = library.new_file("Long mix", ".mp3", "SoundCloud")   # cut off while written
+    half.write_bytes(b"ID3" + b"\0" * 100)
+    claimed = library.new_file("Clip", ".mp3", "Recordings")    # cut off before a byte
+    # the next launch: what the earlier run noted
+    from soundboard.sounds import files
+    monkeypatch.setattr(files, "_STARTED", files.time.time() + 5)
+    assert library.drop_unfinished([kept.file]) == 3
+    assert Path(kept.file).is_file()
+    assert not Path(whole.file).exists() and not half.exists() and not claimed.exists()
+    assert not (library.SOUNDS_DIR / "Recordings").exists()   # emptied: gone too
+    assert not list((app_dir / "adding").iterdir())            # the notes are done with
+    again, _ = library.import_file(str(_wav(tmp_path / "b.wav")), "#1", name="Song",
+                                   folder="SoundCloud")
+    assert again.file == whole.file   # its own name again, not "Song (2)"
+
+
+def test_an_add_still_going_is_left_alone(app_dir, tmp_path, monkeypatch):
+    """Only an earlier run's adds are tidied: this run's may still be on their way to a
+    pad, and a file a sound uses (or moved by the start-up tidy) is never touched."""
+    monkeypatch.setattr(library, "USE_RECYCLE_BIN", False)
+    going, _ = library.import_file(str(_wav(tmp_path / "a.wav")), "#1", name="Going",
+                                   folder="YouTube")
+    moved = library.new_file("Old", ".wav", "My sounds", note=False)
+    assert library.drop_unfinished([]) == 0
+    assert Path(going.file).is_file() and moved.is_file()
+    from soundboard.sounds import files
+    monkeypatch.setattr(files, "_STARTED", files.time.time() + 5)
+    assert library.drop_unfinished([going.file]) == 0   # it got its pad
+    assert Path(going.file).is_file() and moved.is_file()

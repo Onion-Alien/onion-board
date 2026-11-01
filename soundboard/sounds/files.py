@@ -109,9 +109,10 @@ def _folder_of(p: Path) -> str:
     return p.parent.relative_to(paths.SOUNDS_DIR).as_posix()
 
 
-def new_file(name: str, ext: str, folder: str) -> Path:
+def new_file(name: str, ext: str, folder: str, note: bool = True) -> Path:
     """A free path for a new sound file named after the sound ("Name (2)" when that's
-    taken), made empty at once so two sounds saved together never get the same one."""
+    taken), made empty at once so two sounds saved together never get the same one.
+    `note`: written down as being added (drop_unfinished), for a new sound's file."""
     where = paths.SOUNDS_DIR / folder
     where.mkdir(parents=True, exist_ok=True)
     stem, ext = file_stem(name), ext.lower()
@@ -120,10 +121,60 @@ def new_file(name: str, ext: str, folder: str) -> Path:
             p = where / (f"{stem}{ext}" if n == 1 else f"{stem} ({n}){ext}")
             try:
                 with open(p, "xb"):
-                    return p
+                    pass
             except FileExistsError:
                 continue
+            if note:
+                _note_adding(p)
+            return p
     raise OSError(f"no free file name for {stem}{ext} in {where}")
+
+
+# A new sound's file is written down in APP_DIR/adding when it's made: an add the app
+# was closed or crashed in the middle of (a long download being converted, or before
+# the settings with its pad were saved) left a half-written file, or a whole one no pad
+# uses, in the sounds folder for good, and adding it again made "Name (2)". The next
+# launch takes those out (drop_unfinished); the notes go then too.
+_STARTED = time.time()   # notes from before this: an earlier run's
+
+
+def _adding_dir() -> Path:
+    return paths.APP_DIR / "adding"
+
+
+def _note_adding(p: Path) -> None:
+    try:
+        d = _adding_dir()
+        d.mkdir(parents=True, exist_ok=True)
+        (d / f"{uuid.uuid4().hex}.txt").write_text(str(p), encoding="utf-8")
+    except OSError:   # only a tidy-up later: never a reason for the add to fail
+        log.debug("couldn't note %s as being added", p, exc_info=True)
+
+
+def drop_unfinished(keep: list[str]) -> int:
+    """Files an earlier run started adding that no sound uses (`keep`: every file a
+    sound, or a removed one that can still be undone, uses): to the Recycle Bin.
+    Returns how many. Call off the UI thread, with settings that loaded as they were
+    saved (not a backup, which may not know the newest sounds)."""
+    try:
+        notes = [n for n in _adding_dir().glob("*.txt") if n.stat().st_mtime < _STARTED]
+    except OSError:
+        return 0
+    used = {os.path.normcase(f) for f in keep}
+    gone = 0
+    for n in notes:
+        try:
+            p = Path(n.read_text(encoding="utf-8").strip())
+            if owns(p) and p.is_file() and os.path.normcase(str(p)) not in used:
+                log.warning("taking out %s: its add didn't finish", p)
+                if not (USE_RECYCLE_BIN and recycle(p)):
+                    p.unlink()
+                discard(p)   # its folder too, when that's empty now
+                gone += 1
+            n.unlink()
+        except (OSError, ValueError):
+            log.debug("couldn't tidy the unfinished add in %s", n, exc_info=True)
+    return gone
 
 
 def discard(p: Path) -> None:
@@ -419,7 +470,7 @@ def tidy_files(cfg: Config) -> int:
             rest = Path(p.name[11:]).stem
             dest = None
             try:
-                dest = new_file(m.name or rest, p.suffix, _old_folder(rest))
+                dest = new_file(m.name or rest, p.suffix, _old_folder(rest), note=False)
                 if journal is None:
                     journal = open(_tidy_journal(), "a", encoding="utf-8")  # noqa: SIM115
                 journal.write(f"{p}\t{dest}\n")

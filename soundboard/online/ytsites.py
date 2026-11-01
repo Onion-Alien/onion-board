@@ -6,11 +6,14 @@ from __future__ import annotations
 
 import contextlib
 import logging
+import os
 import re
+import tempfile
 import threading
 import urllib.parse
 from collections.abc import Callable
 from dataclasses import dataclass
+from pathlib import Path
 
 from soundboard.online import net
 from soundboard.core import errors
@@ -24,6 +27,15 @@ MAX_BYTES = 200 * 1024 * 1024   # an audio stream bigger than this isn't a sound
 PROGRESS_EVERY_S = 0.1          # download progress to the UI: at most 10 a second
 VIDEO_MAX_BYTES = 1024 * 1024 * 1024   # ...and with the video kept (Settings > Data)
 VIDEO_EXTS = {".mp4", ".webm", ".mkv", ".mov"}
+TEMP_PREFIX = "sb-ytdl-"
+
+
+def temp_folder(prefix: str = TEMP_PREFIX) -> Path:
+    """A new folder in %TEMP% for a download, named with this process's id
+    ("sb-ytdl-<pid>-..."): one left behind by an app that was closed or crashed in the
+    middle of it goes at the next launch (app.clean_temp_leftovers), not a day later."""
+    return Path(tempfile.mkdtemp(prefix=f"{prefix}{os.getpid()}-"))
+
 RETRY_CHECK_AFTER = 3600         # a failed download checks again if the last check is older
 RETRY_PAUSE_S = 2.0              # before a failed download's one automatic second try
 # YouTube's players for that second try: a refusal (403, "not a bot", no formats) is

@@ -129,6 +129,7 @@ def test_load_all_skips_sounds_an_earlier_load_is_still_decoding(app_dir, monkey
                           engine=SimpleNamespace(prepare=lambda *a: None),
                           bridge=SimpleNamespace(loaded=SimpleNamespace(emit=lambda *a: None)))
     w = SimpleNamespace(soundctl=SimpleNamespace(mw=win, _loading=set(), _load_thread=None,
+                                                 _tidied=True,
                                                  _live_metas=lambda: list(sounds)))
     mw.SoundsControl._load_all(w.soundctl)
     first = w.soundctl._load_thread
