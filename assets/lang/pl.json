@@ -4883,5 +4883,6 @@
   "The settings most people change, on one page": "Ustawienia, które zmienia większość osób, na jednej stronie",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Otwiera tę kartę, gdy Onion Board jest na wierzchu.\nEsc = anuluj.",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Przeciągnij uchwyty, by odciąć początek i koniec. Kliknij lub przeciągnij linijkę czasu albo przeciągnij znacznik odtwarzania, by zmienić, skąd gra. Ctrl+kółko przybliża. Przesuwaj, przeciągając prawym przyciskiem myszy albo Shift+kółkiem.",
-  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Za darmo, bez reklam i bez konta. Stworzone przez OnionAlien. Open source na licencji GNU GPL v3: używaj, zmieniaj i udostępniaj, o ile twoja wersja też pozostanie open source."
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Za darmo, bez reklam i bez konta. Stworzone przez OnionAlien. Open source na licencji GNU GPL v3: używaj, zmieniaj i udostępniaj, o ile twoja wersja też pozostanie open source.",
+  "Community uploads": "Przesłane przez społeczność"
 }
