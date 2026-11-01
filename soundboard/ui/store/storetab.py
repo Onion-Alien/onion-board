@@ -57,13 +57,16 @@ class StoreTab(StoreFit, StorePlay, QWidget):
     _fetched = Signal(object, object, str)       # (row, (what, path), error): "play" / "add"
     _voted = Signal(object, object, str)         # (row, (up, down, mine) or None, error)
     _decoded = Signal(object, object, float, int)   # (row, data, gain, serial)
+    _loaded_file = Signal(object, object, float, str, str)   # (sound, data, gain, what, error)
     _cats = Signal(object)                       # [(category, how many)], all; None: failed
 
     def __init__(self, cfg, add_file: Callable[[str], None],
                  play: Callable[[object, float], bool], open_privacy: Callable[[], object],
                  save: Callable[[], None] = lambda: None,
                  link: Callable[[str, str, str], None] = lambda url, name, kind: None,
-                 voices=None, link_state: Callable[[str], str] = lambda url: ""):
+                 voices=None, link_state: Callable[[str], str] = lambda url: "",
+                 play_file: Callable[[object, float, str, str, bool], bool]
+                 = lambda data, gain, name, key, now: False):
         super().__init__()
         self.cfg = cfg
         self.voices = voices   # ui.storevoices.VoiceHooks: the Voices list (None: Sounds only)
@@ -74,6 +77,8 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         # a link that's playing, "play" after it, "add"; "pause" (or resume) and "stop"
         self._link = link
         self._link_state = link_state   # a link's state in the player (SoundRow.link_look)
+        # (data, gain, name, key, now): an upload's audio to the same player, as a link's
+        self._play_file = play_file
         self._add_file = add_file
         self.used = 0   # Play or Add pressed here (its first-visit tour waits on it)
         self._play = play
@@ -92,6 +97,7 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         self._fetched.connect(self._on_fetched)
         self._voted.connect(self._on_voted)
         self._decoded.connect(self._on_decoded)
+        self._loaded_file.connect(self._on_loaded_file)
         self._cats.connect(self._on_cats)
         self._link_tick = QTimer(self, interval=LINK_TICK_MS)   # (while the tab shows)
         self._link_tick.timeout.connect(self._follow_links)
@@ -677,14 +683,17 @@ class StoreTab(StoreFit, StorePlay, QWidget):
 
     def _on_fetched(self, row: SoundRow, got, err: str):
         what, path = got
-        self._busy.discard((row.sound.id, what))
+        if what == "add" or not path:   # (a Play is loading till it's decoded)
+            self._busy.discard((row.sound.id, what))
+        if path and what != "add":   # Play / Play next: to the player, even if the list went
+            self._load_file(row.sound, path, what)
+            return
         if not self._row_alive(row):
             return
         if what == "add":
             busy.set_busy(row.btn_add, False)
         if not path:
-            if what == "play":
-                self._stop_preview()
+            self._follow_links()
             busy.toast(self.window(), html.escape(_("Couldn't get “{name}”: {error}",
                                                     name=row.sound.name, error=err)), "error")
             return
@@ -692,8 +701,6 @@ class StoreTab(StoreFit, StorePlay, QWidget):
             usage.used("store-added")
             self.bun.cheer()
             self._add_file(path)   # (the window says "Added …" itself)
-        else:
-            self._decode(row, path)
 
     def add(self, row: SoundRow):
         self.used += 1

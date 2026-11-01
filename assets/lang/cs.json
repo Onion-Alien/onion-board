@@ -2043,7 +2043,6 @@
   "Updated yt-dlp to {version}.": "yt-dlp aktualizován na {version}.",
   "Updating the downloader (yt-dlp) is switched off in Settings > Privacy & security.": "Aktualizace programu pro stahování (yt-dlp) je vypnutá v Nastavení > Soukromí a zabezpečení.",
   "Updating… (a few minutes)": "Aktualizuji… (pár minut)",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder. They join the Voice list above.": "Použij TTS server běžící na tvém PC (Kokoro, AllTalk, jakýkoli ve stylu OpenAI) nebo vlož hlasové balíčky (Piper) do složky hlasů. Přidají se do seznamu hlasů výše.",
   "VB-Cable's own setup program isn't on this PC, so it can't be removed here.": "Vlastní instalační program VB-Cable na tomto PC není, takže ho tady nejde odebrat.",
   "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 and other games on Vivox. Opus 32 kbps mono, full band, nothing under ~80 Hz (measured in a real game). Also suits TeamSpeak and Mumble.": "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 a další hry na Vivoxu. Opus 32 kb/s mono, plné pásmo, nic pod ~80 Hz (naměřeno ve skutečné hře). Hodí se i pro TeamSpeak a Mumble.",
   "Voice changer is OFF": "Měnič hlasu je VYPNUTÝ",
@@ -4971,5 +4970,6 @@
     "{n} zvuky teď nešly stáhnout. Zkusí se to znovu samo za 2 hodiny.",
     "{n} zvuků teď nešlo stáhnout. Zkusí se to znovu samo za 2 hodiny."
   ],
-  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Tvoje zvuky teď nejdou do mikrofonu. Pokud je tam chceš posílat, nastav nahoře <b>{field}</b> na <b>{choice}</b>."
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Tvoje zvuky teď nejdou do mikrofonu. Pokud je tam chceš posílat, nastav nahoře <b>{field}</b> na <b>{choice}</b>.",
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Použij TTS server běžící na tvém PC (Kokoro, AllTalk, jakýkoli ve stylu OpenAI) nebo vlož hlasové balíčky (Piper) do složky hlasů."
 }

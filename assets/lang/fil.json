@@ -2002,7 +2002,6 @@
   "Updated yt-dlp to {version}.": "Na-update ang yt-dlp sa {version}.",
   "Updating the downloader (yt-dlp) is switched off in Settings > Privacy & security.": "Naka-off ang pag-update ng downloader (yt-dlp) sa Settings > Privacy & security.",
   "Updating… (a few minutes)": "Ina-update… (ilang minuto)",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder. They join the Voice list above.": "Gumamit ng TTS server na tumatakbo sa PC mo (Kokoro, AllTalk, kahit anong OpenAI-style) o ilagay ang voice packs (Piper) sa voices folder. Sasama sila sa Voice list sa itaas.",
   "VB-Cable's own setup program isn't on this PC, so it can't be removed here.": "Wala sa PC na ito ang sariling setup program ng VB-Cable, kaya hindi ito maaalis dito.",
   "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 and other games on Vivox. Opus 32 kbps mono, full band, nothing under ~80 Hz (measured in a real game). Also suits TeamSpeak and Mumble.": "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 at iba pang game sa Vivox. Opus 32 kbps mono, full band, walang mas mababa sa ~80 Hz (nasukat sa totoong game). Bagay din sa TeamSpeak at Mumble.",
   "Voice changer is OFF": "NAKA-OFF ang voice changer",
@@ -4878,5 +4877,6 @@
     "Hindi ma-download ngayon ang {n} tunog. Susubukan ulit nang kusa pagkalipas ng 2 oras.",
     "Hindi ma-download ngayon ang {n} tunog. Susubukan ulit nang kusa pagkalipas ng 2 oras."
   ],
-  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Hindi pumapasok ngayon ang mga tunog mo sa mic mo. Para ipadala ang mga ito roon, itakda ang <b>{field}</b> sa <b>{choice}</b> sa itaas."
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Hindi pumapasok ngayon ang mga tunog mo sa mic mo. Para ipadala ang mga ito roon, itakda ang <b>{field}</b> sa <b>{choice}</b> sa itaas.",
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Gumamit ng TTS server na tumatakbo sa PC mo (Kokoro, AllTalk, kahit anong OpenAI-style) o ilagay ang voice packs (Piper) sa voices folder."
 }

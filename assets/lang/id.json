@@ -1961,7 +1961,6 @@
   "Updated yt-dlp to {version}.": "yt-dlp diperbarui ke {version}.",
   "Updating the downloader (yt-dlp) is switched off in Settings > Privacy & security.": "Memperbarui pengunduh (yt-dlp) dimatikan di Pengaturan > Privasi & keamanan.",
   "Updating… (a few minutes)": "Memperbarui… (beberapa menit)",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder. They join the Voice list above.": "Gunakan server TTS yang berjalan di PC Anda (Kokoro, AllTalk, atau yang bergaya OpenAI) atau taruh paket suara (Piper) di folder vokal. Semuanya masuk ke daftar Vokal di atas.",
   "VB-Cable's own setup program isn't on this PC, so it can't be removed here.": "Program setup VB-Cable sendiri tidak ada pada PC ini, jadi tidak dapat dihapus di sini.",
   "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 and other games on Vivox. Opus 32 kbps mono, full band, nothing under ~80 Hz (measured in a real game). Also suits TeamSpeak and Mumble.": "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 dan game lainnya di Vivox. Opus 32 kbps mono, full band, tidak ada yang di bawah ~80 Hz (diukur dalam game nyata). Juga cocok dengan TeamSpeak dan Mumble.",
   "Voice changer is OFF": "Pengubah suara MATI",
@@ -4785,5 +4784,6 @@
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "{n} suara tidak bisa diunduh sekarang. Akan dicoba lagi otomatis dalam 2 jam."
   ],
-  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Suaramu sekarang tidak masuk ke mikmu. Untuk mengirimnya ke sana, atur <b>{field}</b> ke <b>{choice}</b> di atas."
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Suaramu sekarang tidak masuk ke mikmu. Untuk mengirimnya ke sana, atur <b>{field}</b> ke <b>{choice}</b> di atas.",
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Gunakan server TTS yang berjalan di PC Anda (Kokoro, AllTalk, atau yang bergaya OpenAI) atau taruh paket suara (Piper) di folder vokal."
 }

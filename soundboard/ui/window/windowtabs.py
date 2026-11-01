@@ -113,7 +113,7 @@ class WindowTabs(WindowParts):
             v = StoreTab(self.cfg, lambda path: self.impctl.import_files([path]),
                          self._store_sample, lambda: self.setctl.open_settings("privacy"),
                          self._save_later, self._store_link, self._voice_hooks(),
-                         self._store_link_state)
+                         self._store_link_state, self.linkbar.play_audio)
             return v
         else:
             # the Onion Watch add-on, or Hoot and its download button until it's
@@ -159,7 +159,7 @@ class WindowTabs(WindowParts):
             return
         self.linkbar.open(url, name)
         if kind == "now":
-            self.linkbar.play_now()
+            self.linkbar.play_now(solo=True)   # as a pad's press: the sounds playing stop
         elif kind == "play":
             self.linkbar.play_once()
         else:

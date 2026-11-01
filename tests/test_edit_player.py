@@ -10,14 +10,17 @@ def _open(w, sid="s0"):
     return d, d.player
 
 
-def test_the_player_is_over_the_save_row_in_both_views(window):  # noqa: F811
+def test_the_player_is_over_the_save_row_in_advanced_only(window):  # noqa: F811
     d, p = _open(window)
-    assert p is not None and p.isVisibleTo(d)
+    d.set_advanced(False)
+    assert p is not None and not p.isVisibleTo(d)   # Simple: no player
     lay = d._lay
     assert lay.indexOf(p) == lay.indexOf(d._brow) - 1
     assert window.editctl.players() == [p]
     d.switch.advanced.click()
     assert p.isVisibleTo(d)
+    d.adv.switch.simple.click()
+    assert not p.isVisibleTo(d)
     d.reject()
     assert window.editctl.players() == []   # a closed one isn't set any more
 
@@ -65,21 +68,3 @@ def test_a_reopened_window_shows_the_player_as_it_is_now(window):  # noqa: F811
     assert p2.vol.spin.value() == 70
     assert w.meta("s0").name.startswith(p2.name.text().rstrip("…"))
     d2.reject()
-
-
-def test_the_player_keeps_simple_as_narrow_as_before(window):  # noqa: F811
-    """The player never makes Simple wider than it was; a long name is cut with …"""
-    from PySide6.QtWidgets import QApplication
-    w = window
-    w.playctl.select("s0")
-    d, p = _open(w)
-    p.set_name("T-Pain - Im Sprung (Official HD Video) " * 3, "")
-    p.hide()
-    before = d.minimumSizeHint().width()
-    p.show()
-    assert d.minimumSizeHint().width() <= max(before, 540)
-    d.resize(540, 700)
-    QApplication.processEvents()
-    assert p.name.text().endswith("…")
-    assert p.name.fontMetrics().horizontalAdvance(p.name.text()) <= p.name.width()
-    d.reject()

@@ -1961,7 +1961,6 @@
   "Updated yt-dlp to {version}.": "yt-dlp dikemas kini ke {version}.",
   "Updating the downloader (yt-dlp) is switched off in Settings > Privacy & security.": "Mengemas kini pemuat turun (yt-dlp) dimatikan dalam Tetapan > Privasi & keselamatan.",
   "Updating… (a few minutes)": "Mengemas kini… (beberapa minit)",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder. They join the Voice list above.": "Guna pelayan TTS yang berjalan pada PC anda (Kokoro, AllTalk, mana-mana gaya OpenAI) atau letakkan pek suara (Piper) ke dalam folder suara. Ia menyertai senarai Suara di atas.",
   "VB-Cable's own setup program isn't on this PC, so it can't be removed here.": "Program persediaan VB-Cable sendiri tiada pada PC ini, jadi ia tidak boleh dialih keluar di sini.",
   "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 and other games on Vivox. Opus 32 kbps mono, full band, nothing under ~80 Hz (measured in a real game). Also suits TeamSpeak and Mumble.": "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 dan permainan lain di Vivox. Opus 32 kbps mono, jalur penuh, tiada di bawah ~80 Hz (diukur dalam permainan sebenar). Juga sesuai dengan TeamSpeak dan Mumble.",
   "Voice changer is OFF": "Penukar suara DIMATIKAN",
@@ -4785,5 +4784,6 @@
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "{n} bunyi tidak dapat dimuat turun sekarang. Ia akan dicuba lagi sendiri dalam 2 jam."
   ],
-  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Bunyi anda tidak masuk ke mikrofon anda sekarang. Untuk menghantarnya ke situ, tetapkan <b>{field}</b> kepada <b>{choice}</b> di atas."
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Bunyi anda tidak masuk ke mikrofon anda sekarang. Untuk menghantarnya ke situ, tetapkan <b>{field}</b> kepada <b>{choice}</b> di atas.",
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Guna pelayan TTS yang berjalan pada PC anda (Kokoro, AllTalk, mana-mana gaya OpenAI) atau letakkan pek suara (Piper) ke dalam folder suara."
 }

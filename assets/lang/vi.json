@@ -1961,7 +1961,6 @@
   "Updated yt-dlp to {version}.": "Đã cập nhật yt-dlp lên {version}.",
   "Updating the downloader (yt-dlp) is switched off in Settings > Privacy & security.": "Cập nhật trình tải xuống (yt-dlp) bị tắt trong Cài đặt > Quyền riêng tư & bảo mật.",
   "Updating… (a few minutes)": "Đang cập nhật… (vài phút)",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder. They join the Voice list above.": "Dùng một máy chủ TTS chạy trên PC của bạn (Kokoro, AllTalk, bất kỳ máy chủ kiểu OpenAI nào) hoặc thả gói giọng (Piper) vào thư mục giọng. Chúng sẽ xuất hiện trong danh sách Giọng ở trên.",
   "VB-Cable's own setup program isn't on this PC, so it can't be removed here.": "Chương trình thiết lập riêng của VB-Cable không có trên PC này nên không thể xóa nó ở đây.",
   "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 and other games on Vivox. Opus 32 kbps mono, full band, nothing under ~80 Hz (measured in a real game). Also suits TeamSpeak and Mumble.": "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 và các game khác dùng Vivox. Opus 32 kbps mono, toàn dải, không có gì dưới ~80 Hz (đo trong game thật). Cũng hợp với TeamSpeak và Mumble.",
   "Voice changer is OFF": "Bộ đổi giọng đang TẮT",
@@ -4785,5 +4784,6 @@
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "Chưa tải được {n} âm thanh lúc này. Sẽ tự thử lại sau 2 giờ."
   ],
-  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Âm thanh của bạn hiện không đi vào mic. Để gửi vào mic, hãy đặt <b>{field}</b> thành <b>{choice}</b> ở trên."
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Âm thanh của bạn hiện không đi vào mic. Để gửi vào mic, hãy đặt <b>{field}</b> thành <b>{choice}</b> ở trên.",
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Dùng một máy chủ TTS chạy trên PC của bạn (Kokoro, AllTalk, bất kỳ máy chủ kiểu OpenAI nào) hoặc thả gói giọng (Piper) vào thư mục giọng."
 }
