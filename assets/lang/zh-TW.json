@@ -2444,10 +2444,8 @@
   "Offline mode is on, so the tabs that need the internet are hidden and greyed out here. Switch it off in Privacy & security to use them.": "離線模式已開啟，所以需要網路的分頁都被隱藏，在這裡顯示為灰色。要使用它們，請在「隱私與安全性」把離線模式關掉。",
   "Offline mode is on: nothing goes online, and what needs the internet is hidden. Click to change it.": "離線模式已開啟：什麼都不會上網，需要網路的功能都已隱藏。點一下來變更。",
   "Only you hear it. Didn't hear it? Pick another one and try again.": "只有你聽得到。沒聽到？選其他的再試一次。",
-  "Opens the sharing form on GitHub in your browser": "在你的瀏覽器開啟 GitHub 上的分享表單",
   "Other device": "其他裝置",
   "Playing a game or on a call?": "在玩遊戲還是在通話？",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Add one and its sounds land on your board, each category as its own tab.": "現成的音效板，在哪裡都能免費使用：遊戲、直播和影片都可以。加入後它的音效就會出現在你的音效板上，每個分類各自一個分頁。",
   "Search your sounds": "搜尋你的音效",
   "Send your sounds to another device instead (Voicemeeter, OBS, a mixer…), or nowhere (only you, and the stream output)": "改把你的音效送到其他裝置（Voicemeeter、OBS、混音器…），或不傳送（只有你和直播輸出）",
   "Share a pack": "分享音效包",
@@ -3073,7 +3071,6 @@
   "Hear {name}": "試聽 {name}",
   "Hear {name} (only you hear it)": "試聽 {name}（只有你聽得到）",
   "Pick your headphones in Settings → Audio to hear the samples.": "在 設定 → 音訊 裡選好耳機，就能試聽了。",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "現成的音效板，在哪裡都能免費使用：遊戲、直播和影片都可以。按一下音效可以先試聽（只有你聽得到）。加入音效包後，它的音效就會出現在你的音效板上，每個分類各自一個分頁。",
   "Hide the report": "隱藏報告",
   "Network activity log": "網路活動記錄",
   "No custom modes yet. Fill in the form to make one.": "還沒有自訂模式。填寫表單來新增一個。",
@@ -4707,5 +4704,26 @@
   "The settings most people change, on one page": "大多數人會改的設定，都在一頁裡",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board 在最前面時打開這個分頁。\nEsc = 取消。",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "拖曳把手剪掉開頭和結尾。點一下或拖曳時間尺，或拖曳播放線，可以改變播放位置。Ctrl+滾輪縮放。按住滑鼠右鍵拖曳，或 Shift+滾輪，即可平移。",
-  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "免費、沒有廣告、不用帳號。由 OnionAlien 製作。以 GNU GPL v3 開源：可以使用、修改和分享，只要你的版本也維持開源。"
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "免費、沒有廣告、不用帳號。由 OnionAlien 製作。以 GNU GPL v3 開源：可以使用、修改和分享，只要你的版本也維持開源。",
+  "Couldn't load its sounds to try. Adding it still works.": "無法載入試聽音效。仍然可以加入。",
+  "Downloads its {n} sound from Myinstants and puts it on your board": [
+    "從 Myinstants 下載它的 {n} 個音效並放到你的音效板上，每個分類一個分頁"
+  ],
+  "Hear a few first": "先聽幾個",
+  "Hear a few of its sounds first (only you hear them)": "先聽聽它的幾個音效（只有你聽得到）",
+  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "加入時，它的音效會直接從 Myinstants 下載：Onion Board 不保留副本。那裡已經沒有的音效會被略過。",
+  "No packs here yet": "這裡還沒有音效包",
+  "No packs match “{text}”": "沒有符合「{text}」的音效包",
+  "None of its sounds could be downloaded.": "它的音效一個都沒能下載。",
+  "On my board": "已在我的音效板上",
+  "Only you hear these.": "只有你聽得到。",
+  "Search packs and sounds": "搜尋音效包和音效",
+  "See what's in {name}": "看看 {name} 裡有什麼",
+  "Show every pack": "顯示所有音效包",
+  "Try another word, or show every pack.": "換個詞試試，或顯示所有音效包。",
+  "from Myinstants": "來自 Myinstants",
+  "{done} of {total}": "{done}/{total}",
+  "{n} sound is gone from Myinstants, so it was skipped.": [
+    "有 {n} 個音效已從 Myinstants 消失，已略過。"
+  ]
 }

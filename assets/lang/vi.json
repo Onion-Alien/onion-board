@@ -2444,10 +2444,8 @@
   "Offline mode is on, so the tabs that need the internet are hidden and greyed out here. Switch it off in Privacy & security to use them.": "Chế độ ngoại tuyến đang bật, nên các thẻ cần internet bị ẩn và hiện màu xám ở đây. Tắt nó trong Quyền riêng tư & bảo mật để dùng chúng.",
   "Offline mode is on: nothing goes online, and what needs the internet is hidden. Click to change it.": "Chế độ ngoại tuyến đang bật: không có gì lên mạng, và những gì cần internet bị ẩn. Bấm để thay đổi.",
   "Only you hear it. Didn't hear it? Pick another one and try again.": "Chỉ bạn nghe thấy. Không nghe thấy? Hãy chọn cái khác và thử lại.",
-  "Opens the sharing form on GitHub in your browser": "Mở biểu mẫu chia sẻ trên GitHub trong trình duyệt của bạn",
   "Other device": "Thiết bị khác",
   "Playing a game or on a call?": "Đang chơi game hay đang gọi điện?",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Add one and its sounds land on your board, each category as its own tab.": "Bảng làm sẵn, dùng miễn phí ở mọi nơi: trong game, stream và video. Thêm một bảng và các âm thanh của nó sẽ vào bảng của bạn, mỗi danh mục thành một thẻ riêng.",
   "Search your sounds": "Tìm âm thanh của bạn",
   "Send your sounds to another device instead (Voicemeeter, OBS, a mixer…), or nowhere (only you, and the stream output)": "Gửi âm thanh của bạn tới thiết bị khác (Voicemeeter, OBS, bàn mixer…), hoặc không đâu cả (chỉ bạn, và đầu ra stream)",
   "Share a pack": "Chia sẻ một gói",
@@ -3073,7 +3071,6 @@
   "Hear {name}": "Nghe {name}",
   "Hear {name} (only you hear it)": "Nghe {name} (chỉ bạn nghe thấy)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Chọn tai nghe của bạn trong Cài đặt → Âm thanh để nghe thử.",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Bảng làm sẵn, dùng miễn phí ở mọi nơi: trong game, stream và video. Bấm một âm thanh để nghe thử trước (chỉ bạn nghe). Thêm một gói và các âm thanh của nó sẽ vào bảng của bạn, mỗi danh mục thành một thẻ riêng.",
   "Hide the report": "Ẩn báo cáo",
   "Network activity log": "Nhật ký hoạt động mạng",
   "No custom modes yet. Fill in the form to make one.": "Chưa có chế độ tùy chỉnh. Điền biểu mẫu để tạo một chế độ.",
@@ -4707,5 +4704,26 @@
   "The settings most people change, on one page": "Những cài đặt mọi người hay đổi nhất, gói trong một trang",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Mở tab này khi Onion Board đang ở phía trước.\nEsc = hủy.",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Kéo tay nắm để cắt bỏ đầu và cuối. Bấm hoặc kéo thước thời gian, hoặc kéo vạch phát, để đổi chỗ đang phát. Ctrl+cuộn để phóng to. Kéo bằng chuột phải, hoặc Shift+cuộn, để di chuyển.",
-  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Miễn phí, không quảng cáo, không cần tài khoản. Do OnionAlien làm. Mã nguồn mở theo GNU GPL v3: cứ dùng, sửa và chia sẻ, miễn là phiên bản của bạn cũng giữ mã nguồn mở."
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Miễn phí, không quảng cáo, không cần tài khoản. Do OnionAlien làm. Mã nguồn mở theo GNU GPL v3: cứ dùng, sửa và chia sẻ, miễn là phiên bản của bạn cũng giữ mã nguồn mở.",
+  "Couldn't load its sounds to try. Adding it still works.": "Không tải được âm thanh để thử. Vẫn thêm được bình thường.",
+  "Downloads its {n} sound from Myinstants and puts it on your board": [
+    "Tải {n} âm thanh của gói từ Myinstants và đưa lên bảng của bạn, mỗi danh mục một thẻ riêng"
+  ],
+  "Hear a few first": "Nghe thử vài cái trước",
+  "Hear a few of its sounds first (only you hear them)": "Nghe thử vài âm thanh của gói trước (chỉ bạn nghe thấy)",
+  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "Âm thanh được tải thẳng từ Myinstants khi bạn thêm gói: Onion Board không giữ bản sao. Âm thanh nào không còn ở đó sẽ bị bỏ qua.",
+  "No packs here yet": "Chưa có gói nào ở đây",
+  "No packs match “{text}”": "Không có gói nào khớp với “{text}”",
+  "None of its sounds could be downloaded.": "Không tải được âm thanh nào của gói.",
+  "On my board": "Trên bảng của tôi",
+  "Only you hear these.": "Chỉ bạn nghe thấy.",
+  "Search packs and sounds": "Tìm gói và âm thanh",
+  "See what's in {name}": "Xem bên trong {name}",
+  "Show every pack": "Hiện tất cả gói",
+  "Try another word, or show every pack.": "Thử từ khác, hoặc hiện tất cả gói.",
+  "from Myinstants": "từ Myinstants",
+  "{done} of {total}": "{done}/{total}",
+  "{n} sound is gone from Myinstants, so it was skipped.": [
+    "{n} âm thanh không còn trên Myinstants nên đã bị bỏ qua."
+  ]
 }

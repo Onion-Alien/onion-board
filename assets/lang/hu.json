@@ -2497,10 +2497,8 @@
   "Offline mode is on, so the tabs that need the internet are hidden and greyed out here. Switch it off in Privacy & security to use them.": "Az Offline mód be van kapcsolva, így az internetet igénylő lapok rejtve vannak, itt pedig szürkék. Kapcsold ki az Adatvédelem és biztonság alatt, ha használni akarod őket.",
   "Offline mode is on: nothing goes online, and what needs the internet is hidden. Click to change it.": "Az Offline mód be van kapcsolva: semmi nem megy online, és ami internetet igényel, rejtve van. Kattints a módosításhoz.",
   "Only you hear it. Didn't hear it? Pick another one and try again.": "Csak te hallod. Nem hallottad? Válassz másikat, és próbáld újra.",
-  "Opens the sharing form on GitHub in your browser": "Megnyitja a megosztási űrlapot a GitHubon a böngésződben",
   "Other device": "Másik eszköz",
   "Playing a game or on a call?": "Játszol, vagy hívásban vagy?",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Add one and its sounds land on your board, each category as its own tab.": "Kész boardok, bárhol ingyen használhatók: játékokban, streamekben és videókban. Adj hozzá egyet, és a hangjai a boardodra kerülnek, minden kategória külön lapra.",
   "Search your sounds": "Keresés a hangjaid között",
   "Send your sounds to another device instead (Voicemeeter, OBS, a mixer…), or nowhere (only you, and the stream output)": "Küldd inkább egy másik eszközre a hangjaidat (Voicemeeter, OBS, keverő…), vagy sehova (csak te és a stream kimenet)",
   "Share a pack": "Csomag megosztása",
@@ -3141,7 +3139,6 @@
   "Hear {name}": "{name} meghallgatása",
   "Hear {name} (only you hear it)": "{name} meghallgatása (csak te hallod)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Válaszd ki a fejhallgatódat a Beállítások → Hang részben, hogy halld a mintákat.",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Kész boardok, bárhol ingyen használhatók: játékokban, streamekben és videókban. Nyomj meg egy hangot, hogy előbb meghallgasd (csak te hallod). Adj hozzá egy csomagot, és a hangjai a boardodra kerülnek, minden kategória külön lapra.",
   "Hide the report": "Jelentés elrejtése",
   "Network activity log": "Hálózati aktivitás naplója",
   "No custom modes yet. Fill in the form to make one.": "Még nincs egyéni mód. Töltsd ki az űrlapot, hogy készíts egyet.",
@@ -4795,5 +4792,28 @@
   "The settings most people change, on one page": "A legtöbbek által módosított beállítások egy oldalon",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Megnyitja ezt a fület, amíg az Onion Board van elöl.\nEsc = mégse.",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Húzd a fogantyúkat az eleje és a vége levágásához. Kattints vagy húzz az idővonalon, vagy húzd a lejátszási jelet, hogy máshonnan szóljon. Ctrl+görgetés nagyít. Mozgatáshoz húzd a jobb egérgombbal, vagy használd a Shift+görgetést.",
-  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Ingyenes, reklámok és fiók nélkül. Készítette: OnionAlien. Nyílt forráskódú, GNU GPL v3 licenccel: használd, módosítsd és oszd meg, ha a te változatod is nyílt forráskódú marad."
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Ingyenes, reklámok és fiók nélkül. Készítette: OnionAlien. Nyílt forráskódú, GNU GPL v3 licenccel: használd, módosítsd és oszd meg, ha a te változatod is nyílt forráskódú marad.",
+  "Couldn't load its sounds to try. Adding it still works.": "Nem sikerült betölteni a kipróbálható hangokat. A hozzáadás így is működik.",
+  "Downloads its {n} sound from Myinstants and puts it on your board": [
+    "Letölti a(z) {n} hangját a Myinstantsről, és a boardodra teszi",
+    "Letölti a(z) {n} hangját a Myinstantsről, és a boardodra teszi őket, minden kategóriát külön lapon"
+  ],
+  "Hear a few first": "Hallgass bele előbb",
+  "Hear a few of its sounds first (only you hear them)": "Hallgass bele előbb néhány hangjába (csak te hallod)",
+  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "A hangjai hozzáadáskor egyenesen a Myinstantsről töltődnek le: az Onion Board nem tart meg másolatot. Ha egy hang már nincs ott, kimarad.",
+  "No packs here yet": "Itt még nincsenek csomagok",
+  "No packs match “{text}”": "Egy csomag sem illik erre: „{text}”",
+  "None of its sounds could be downloaded.": "Egyik hangját sem sikerült letölteni.",
+  "On my board": "A boardomon",
+  "Only you hear these.": "Csak te hallod őket.",
+  "Search packs and sounds": "Csomagok és hangok keresése",
+  "See what's in {name}": "Nézd meg, mi van ebben: {name}",
+  "Show every pack": "Minden csomag mutatása",
+  "Try another word, or show every pack.": "Próbálj másik szót, vagy mutasd az összes csomagot.",
+  "from Myinstants": "a Myinstantsről",
+  "{done} of {total}": "{done}/{total}",
+  "{n} sound is gone from Myinstants, so it was skipped.": [
+    "{n} hang már nincs fent a Myinstantsen, ezért kimaradt.",
+    "{n} hang már nincs fent a Myinstantsen, ezért kimaradtak."
+  ]
 }

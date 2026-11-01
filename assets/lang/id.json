@@ -2444,10 +2444,8 @@
   "Offline mode is on, so the tabs that need the internet are hidden and greyed out here. Switch it off in Privacy & security to use them.": "Mode luring aktif, jadi tab yang memerlukan internet disembunyikan dan berwarna abu-abu di sini. Matikan di Privasi & keamanan untuk menggunakannya.",
   "Offline mode is on: nothing goes online, and what needs the internet is hidden. Click to change it.": "Mode luring aktif: tidak ada yang terhubung ke internet, dan yang memerlukan internet disembunyikan. Klik untuk mengubahnya.",
   "Only you hear it. Didn't hear it? Pick another one and try again.": "Hanya Anda yang mendengarnya. Tidak mendengarnya? Pilih yang lain dan coba lagi.",
-  "Opens the sharing form on GitHub in your browser": "Membuka formulir berbagi di GitHub di browser Anda",
   "Other device": "Perangkat lain",
   "Playing a game or on a call?": "Sedang main game atau dalam panggilan?",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Add one and its sounds land on your board, each category as its own tab.": "Board siap pakai, bebas dipakai di mana saja: di game, streaming, dan video. Tambahkan satu dan suaranya akan masuk ke board Anda, setiap kategori sebagai tab tersendiri.",
   "Search your sounds": "Cari suara Anda",
   "Send your sounds to another device instead (Voicemeeter, OBS, a mixer…), or nowhere (only you, and the stream output)": "Kirim suara Anda ke perangkat lain (Voicemeeter, OBS, mixer…), atau tidak ke mana-mana (hanya Anda, dan output stream)",
   "Share a pack": "Bagikan satu paket",
@@ -3073,7 +3071,6 @@
   "Hear {name}": "Dengarkan {name}",
   "Hear {name} (only you hear it)": "Dengarkan {name} (hanya Anda yang dengar)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Pilih headphone Anda di Pengaturan → Audio untuk mendengar contohnya.",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Board siap pakai, bebas dipakai di mana saja: di game, streaming, dan video. Tekan suara untuk mendengarnya dulu (hanya Anda yang mendengar). Tambahkan paket dan suaranya akan masuk ke board Anda, setiap kategori sebagai tab tersendiri.",
   "Hide the report": "Sembunyikan laporan",
   "Network activity log": "Log aktivitas jaringan",
   "No custom modes yet. Fill in the form to make one.": "Belum ada mode khusus. Isi formulir untuk membuatnya.",
@@ -4707,5 +4704,26 @@
   "The settings most people change, on one page": "Pengaturan yang paling sering diubah orang, dalam satu halaman",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Membuka tab ini saat Onion Board ada di depan.\nEsc = batal.",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Seret pegangannya untuk memotong awal dan akhir. Klik atau seret penggaris waktu, atau seret penanda putar, untuk memindah posisi putar. Ctrl+gulir untuk zoom. Seret dengan tombol kanan mouse, atau Shift+gulir, untuk menggeser.",
-  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Gratis, tanpa iklan dan tanpa akun. Dibuat oleh OnionAlien. Open source di bawah GNU GPL v3: pakai, ubah, dan bagikan, asalkan versimu juga tetap open source."
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Gratis, tanpa iklan dan tanpa akun. Dibuat oleh OnionAlien. Open source di bawah GNU GPL v3: pakai, ubah, dan bagikan, asalkan versimu juga tetap open source.",
+  "Couldn't load its sounds to try. Adding it still works.": "Suara untuk dicoba tidak bisa dimuat. Menambahkannya tetap bisa.",
+  "Downloads its {n} sound from Myinstants and puts it on your board": [
+    "Mengunduh {n} suaranya dari Myinstants dan menaruhnya di board Anda, tiap kategori di tabnya sendiri"
+  ],
+  "Hear a few first": "Dengarkan beberapa dulu",
+  "Hear a few of its sounds first (only you hear them)": "Dengarkan dulu beberapa suaranya (hanya Anda yang mendengar)",
+  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "Suaranya diunduh langsung dari Myinstants saat Anda menambahkannya: Onion Board tidak menyimpan salinan. Suara yang sudah tidak ada di sana dilewati.",
+  "No packs here yet": "Belum ada paket di sini",
+  "No packs match “{text}”": "Tidak ada paket yang cocok dengan “{text}”",
+  "None of its sounds could be downloaded.": "Tidak ada suaranya yang bisa diunduh.",
+  "On my board": "Di board saya",
+  "Only you hear these.": "Hanya Anda yang mendengarnya.",
+  "Search packs and sounds": "Cari paket dan suara",
+  "See what's in {name}": "Lihat isi {name}",
+  "Show every pack": "Tampilkan semua paket",
+  "Try another word, or show every pack.": "Coba kata lain, atau tampilkan semua paket.",
+  "from Myinstants": "dari Myinstants",
+  "{done} of {total}": "{done} dari {total}",
+  "{n} sound is gone from Myinstants, so it was skipped.": [
+    "{n} suara sudah tidak ada di Myinstants, jadi dilewati."
+  ]
 }

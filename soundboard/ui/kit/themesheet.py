@@ -186,7 +186,14 @@ QWidget#effectchips QPushButton[listen="true"] { padding-right:30px; }
 QPushButton#chipplay { border-radius:10px; background:$accent_tint; border:none; padding:0; }
 QPushButton#chipplay:hover { background:$accent_tint_hi; }
 QPushButton#chipplay[playing="true"] { background:$accent; }
-QDialog#settingspage { background:transparent; }
+QDialog#settingspage, QDialog#packspage { background:transparent; }
+QFrame#card QLabel#packart, QDialog#packspage QLabel#packart { background:$accent_tint;
+    border-radius:12px; }
+QPushButton#filterchip { border-radius:13px; padding:4px 12px; min-height:18px; font-size:8.5pt;
+    background:$btn; border:1px solid transparent; color:$text; }
+QPushButton#filterchip:hover { background:$btn_hover; }
+QPushButton#filterchip:checked { background:$accent; border-color:$accent; color:$on_accent; }
+QPushButton#filterchip:focus { border-color:$accent; }
 QFrame#mixer { background:transparent; }
 QFrame#card QPushButton#primary { background:$accent; color:$on_accent; border:none; padding:9px; }
 QFrame#card QPushButton#primary:hover { background:$accent_hover; }

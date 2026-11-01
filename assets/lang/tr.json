@@ -2497,10 +2497,8 @@
   "Offline mode is on, so the tabs that need the internet are hidden and greyed out here. Switch it off in Privacy & security to use them.": "Çevrimdışı mod açık, bu yüzden internet gerektiren sekmeler burada gizli ve soluk. Kullanmak için Gizlilik ve güvenlik'ten kapatın.",
   "Offline mode is on: nothing goes online, and what needs the internet is hidden. Click to change it.": "Çevrimdışı mod açık: hiçbir şey internete çıkmaz ve internet gerektirenler gizlenir. Değiştirmek için tıklayın.",
   "Only you hear it. Didn't hear it? Pick another one and try again.": "Sadece siz duyarsınız. Duymadınız mı? Başka birini seçip tekrar deneyin.",
-  "Opens the sharing form on GitHub in your browser": "GitHub'daki paylaşım formunu tarayıcınızda açar",
   "Other device": "Başka cihaz",
   "Playing a game or on a call?": "Oyunda ya da bir aramada mısınız?",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Add one and its sounds land on your board, each category as its own tab.": "Oyunlarda, yayınlarda ve videolarda her yerde ücretsiz kullanılabilen hazır paneller. Birini ekleyin, sesleri panelinize gelsin, her kategori kendi sekmesinde.",
   "Search your sounds": "Seslerinizde arayın",
   "Send your sounds to another device instead (Voicemeeter, OBS, a mixer…), or nowhere (only you, and the stream output)": "Onun yerine seslerinizi başka bir cihaza (Voicemeeter, OBS, bir mikser…) ya da hiçbir yere (sadece siz ve yayın çıkışı) gönderin",
   "Share a pack": "Paket paylaş",
@@ -3141,7 +3139,6 @@
   "Hear {name}": "{name} dinle",
   "Hear {name} (only you hear it)": "{name} dinle (sadece siz duyarsınız)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Örnekleri duymak için Ayarlar → Ses'ten kulaklığınızı seçin.",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Oyunlarda, yayınlarda ve videolarda her yerde ücretsiz kullanılabilen hazır paneller. Önce dinlemek için bir sese basın (sadece siz duyarsınız). Bir paket ekleyin, sesleri panelinize gelsin, her kategori kendi sekmesinde.",
   "Hide the report": "Raporu gizle",
   "Network activity log": "Ağ etkinliği günlüğü",
   "No custom modes yet. Fill in the form to make one.": "Henüz özel mod yok. Bir tane yapmak için formu doldurun.",
@@ -4795,5 +4792,28 @@
   "The settings most people change, on one page": "Çoğu kişinin değiştirdiği ayarlar, tek sayfada",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board öndeyken bu sekmeyi açar.\nEsc = iptal.",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Başını ve sonunu kesmek için tutamaçları sürükleyin. Çaldığı yeri değiştirmek için zaman cetveline tıklayın ya da sürükleyin, veya oynatma çizgisini sürükleyin. Ctrl+kaydırma yakınlaştırır. Kaydırmak için sağ fare tuşuyla sürükleyin ya da Shift+kaydırma kullanın.",
-  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Ücretsiz, reklamsız ve hesapsız. OnionAlien tarafından yapıldı. GNU GPL v3 ile açık kaynak: kullanın, değiştirin ve paylaşın; yeter ki sizin sürümünüz de açık kaynak kalsın."
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Ücretsiz, reklamsız ve hesapsız. OnionAlien tarafından yapıldı. GNU GPL v3 ile açık kaynak: kullanın, değiştirin ve paylaşın; yeter ki sizin sürümünüz de açık kaynak kalsın.",
+  "Couldn't load its sounds to try. Adding it still works.": "Denemek için sesler yüklenemedi. Eklemek yine de çalışır.",
+  "Downloads its {n} sound from Myinstants and puts it on your board": [
+    "{n} sesini Myinstants'tan indirip panelinize ekler",
+    "{n} sesini Myinstants'tan indirip panelinize ekler, her kategori kendi sekmesinde"
+  ],
+  "Hear a few first": "Önce birkaçını dinleyin",
+  "Hear a few of its sounds first (only you hear them)": "Önce birkaç sesini dinleyin (yalnızca siz duyarsınız)",
+  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "Sesleri, eklediğinizde doğrudan Myinstants'tan indirilir: Onion Board kopya tutmaz. Orada artık olmayan bir ses atlanır.",
+  "No packs here yet": "Burada henüz paket yok",
+  "No packs match “{text}”": "“{text}” ile eşleşen paket yok",
+  "None of its sounds could be downloaded.": "Seslerinin hiçbiri indirilemedi.",
+  "On my board": "Panelimde",
+  "Only you hear these.": "Yalnızca siz duyarsınız.",
+  "Search packs and sounds": "Paket ve ses arayın",
+  "See what's in {name}": "{name} içinde ne var görün",
+  "Show every pack": "Tüm paketleri göster",
+  "Try another word, or show every pack.": "Başka bir kelime deneyin ya da tüm paketleri gösterin.",
+  "from Myinstants": "Myinstants'tan",
+  "{done} of {total}": "{done}/{total}",
+  "{n} sound is gone from Myinstants, so it was skipped.": [
+    "{n} ses artık Myinstants'ta yok, bu yüzden atlandı.",
+    "{n} ses artık Myinstants'ta yok, bu yüzden atlandı."
+  ]
 }

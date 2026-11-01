@@ -332,6 +332,7 @@ class WindowBuilder(Controller, PlayerBuild, SoundsPageBuild, SetupPageBuild):
         # a tab asked for (the rail, Ctrl+1..., a link) while Settings is up: back to the
         # tabs, on that one
         mw.tabs.picked.connect(mw.setctl.close_settings)
+        mw.tabs.picked.connect(mw.impctl.close_packs)
         mw._full_row.insertWidget(0, mw.rail)
         # Tab goes header, rail, page (as it did with the top tabs), not page, rail; the
         # page's box holds the download bar too, so the bar's buttons come just before it
