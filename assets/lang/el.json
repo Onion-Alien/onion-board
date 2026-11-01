@@ -4872,5 +4872,10 @@
   "Download the {language} voice": "Λήψη της φωνής για {language}",
   "{language} needs its voice to be heard: a {size} MB download.": "Τα {language} χρειάζονται τη φωνή τους για να ακούγονται: λήψη {size} MB.",
   "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "Η φωνή {voice} διαβάζει {language} προς το παρόν. Η φωνή για {language} είναι λήψη {size} MB.",
-  "The {language} voice, once it's downloaded (below).": "Η φωνή για {language}, μόλις γίνει λήψη (παρακάτω)."
+  "The {language} voice, once it's downloaded (below).": "Η φωνή για {language}, μόλις γίνει λήψη (παρακάτω).",
+  "Couldn't reach Myinstants. It tries again by itself in 2 hours.": "Δεν ήταν δυνατή η σύνδεση με το Myinstants. Θα ξαναδοκιμάσει μόνο του σε 2 ώρες.",
+  "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
+    "{n} ήχος δεν κατέβηκε τώρα. Θα ξαναδοκιμαστεί μόνος του σε 2 ώρες.",
+    "{n} ήχοι δεν κατέβηκαν τώρα. Θα ξαναδοκιμαστούν μόνοι τους σε 2 ώρες."
+  ]
 }

@@ -596,8 +596,8 @@ def test_a_links_pack_is_fetched_into_a_pack_zip_and_gone_links_are_skipped(
     p, = packs.parse([links_entry(4)])
     myinstants.gone = {"s1.mp3"}
     seen = []
-    path, skipped = packs.download_links(p, lambda done, total: seen.append((done, total)))
-    assert path == p.path and skipped == 1
+    path, skipped, later = packs.download_links(p, lambda done, total: seen.append((done, total)))
+    assert path == p.path and skipped == 1 and later == 0   # gone: not asked for again
     assert seen[-1] == (4, 4) and len(seen) == 4
     pkg = backup.read(path)
     assert [ps.entry["name"] for ps in pkg.sounds] == ["Vine boom", "Oh no", "Vine boom 3"]
@@ -655,7 +655,7 @@ def test_a_link_that_failed_for_now_is_tried_again_each_wait_longer(
     p, = packs.parse([links_entry(1)])
     failing(monkeypatch, myinstants, {"s0.mp3": [urllib.error.URLError("reset"),
                                                  http(503), TimeoutError("slow")]})
-    path, skipped = packs.download_links(p)
+    path, skipped, later = packs.download_links(p)
     assert skipped == 0 and len(myinstants.fetched) == 4
     # 2, 5 and 15 s (waited in short steps, so Cancel works meanwhile)
     assert sum(myinstants.slept) == pytest.approx(sum(packs.LINK_RETRY_WAITS))
@@ -669,7 +669,7 @@ def test_a_link_that_failed_for_now_gets_one_more_round_at_the_end(app_dir, myin
     p, = packs.parse([links_entry(2)])
     tries = len(packs.LINK_RETRY_WAITS) + 1
     failing(monkeypatch, myinstants, {"s0.mp3": [urllib.error.URLError("reset")] * tries})
-    path, skipped = packs.download_links(p)
+    path, skipped, later = packs.download_links(p)
     assert skipped == 0
     s0 = "https://www.myinstants.com/media/sounds/s0.mp3"
     assert myinstants.fetched.count(s0) == tries + 1 and myinstants.fetched[-1] == s0
@@ -683,15 +683,43 @@ def test_a_link_that_keeps_failing_is_skipped_after_both_rounds(app_dir, myinsta
     tries = len(packs.LINK_RETRY_WAITS) + 1
     failing(monkeypatch, myinstants,
             {"s0.mp3": [urllib.error.URLError("reset")] * (2 * tries)})
-    path, skipped = packs.download_links(p)
-    assert skipped == 1
+    path, skipped, later = packs.download_links(p)
+    assert skipped == 1 and later == 1   # failed for now: asked for again much later
     assert myinstants.fetched.count("https://www.myinstants.com/media/sounds/s0.mp3") == 8
+
+
+def test_a_pack_that_cant_reach_myinstants_is_tried_again_later(app_dir, myinstants,
+                                                                 monkeypatch):
+    """No connection all through both rounds: it gives up with TryLater (the window asks
+    again LINK_TRY_LATER after), keeps nothing, and a later try with the site back
+    fetches it even though nothing's kept."""
+    import urllib.error
+    p, = packs.parse([links_entry(2)])
+    tries = 2 * (len(packs.LINK_RETRY_WAITS) + 1)
+    failing(monkeypatch, myinstants, {f"s{i}.mp3": [urllib.error.URLError("no route")] * tries
+                                      for i in range(2)})
+    with pytest.raises(packs.TryLater, match="tries again by itself in 2 hours"):
+        packs.download_links(p)
+    assert not p.downloaded()
+    path, skipped, later = packs.download_links(p, again=True)   # the site's back
+    assert path == p.path and skipped == later == 0
+
+
+def test_a_kept_links_pack_is_fetched_again_only_when_asked(app_dir, myinstants,
+                                                             monkeypatch):
+    p, = packs.parse([links_entry(2)])
+    kept = app_dir / "kept.zip"
+    kept.write_bytes(b"x")
+    monkeypatch.setattr(packs.backup, "kept_free_pack", lambda pid: kept)
+    assert packs.download_links(p) == (kept, 0, 0) and not myinstants.fetched
+    path, skipped, later = packs.download_links(p, again=True)   # its missing sounds
+    assert path == p.path and len(myinstants.fetched) == 2
 
 
 def test_a_gone_link_is_not_asked_for_again(app_dir, myinstants, monkeypatch):
     p, = packs.parse([links_entry(2)])
     failing(monkeypatch, myinstants, {"s0.mp3": [http(404)]})
-    path, skipped = packs.download_links(p)
+    path, skipped, later = packs.download_links(p)
     assert skipped == 1 and len(myinstants.fetched) == 2
     assert sum(myinstants.slept) == pytest.approx(packs.LINK_GAP)   # no retry wait
 
@@ -714,7 +742,7 @@ def test_too_many_requests_never_makes_a_link_give_up(app_dir, myinstants, monke
     monkeypatch.setattr(packs, "LINK_WORKERS", 1)
     p, = packs.parse([links_entry(2)])
     failing(monkeypatch, myinstants, {"s0.mp3": [http(429)] * 6})
-    path, skipped = packs.download_links(p)
+    path, skipped, later = packs.download_links(p)
     assert skipped == 0
     assert myinstants.fetched.count("https://www.myinstants.com/media/sounds/s0.mp3") == 7
     held = sum(packs.LINK_BUSY_WAITS) + packs.LINK_BUSY_WAITS[-1]
@@ -801,6 +829,56 @@ def test_the_page_shows_a_links_packs_progress_and_skipped_count(qapp, app_dir, 
         assert any("1 sound is gone from Myinstants" in t for t in toasts)
     finally:
         dlg.done(0)
+
+
+def test_the_page_hands_a_pack_that_failed_for_now_to_the_window(qapp, app_dir, myinstants,
+                                                                 monkeypatch):
+    import urllib.error
+    toasts, later = [], []
+    monkeypatch.setattr(packsdialog.busy, "toast", lambda _w, text, *a, **k: toasts.append(text))
+    monkeypatch.setattr(net, "allowed", lambda f: True)
+    tries = 2 * (len(packs.LINK_RETRY_WAITS) + 1)
+    failing(monkeypatch, myinstants, {f"s{i}.mp3": [urllib.error.URLError("no route")] * tries
+                                      for i in range(2)})
+    dlg = packsdialog.PacksDialog(lambda path: None, fetch_list=False, try_later=later.append)
+    try:
+        dlg._show(packs.parse([links_entry(2)]), "")
+        dlg.add(dlg.cards[0])
+        assert process_events(qapp, lambda: later, 5)
+        assert later[0].id == "memes"
+        assert any("tries again by itself in 2 hours" in t for t in toasts)
+    finally:
+        dlg.done(0)
+
+
+def test_the_window_asks_for_a_pack_again_later_and_adds_it(window, qapp, myinstants,
+                                                            monkeypatch):
+    """Two hours after a links pack failed for now, the window asks for it again by
+    itself (once per pack), adds what came, and waits again while it still fails."""
+    import types
+    import urllib.error
+
+    from soundboard.ui.window import importpacks
+    timers = []
+    monkeypatch.setattr(importpacks, "QTimer", types.SimpleNamespace(
+        singleShot=lambda ms, ctx, fn: timers.append((ms, fn))))
+    monkeypatch.setattr(net, "allowed", lambda f: True)
+    ctl = window.impctl
+    p, = packs.parse([links_entry(3)])
+    ctl._pack_try_later(p)
+    ctl._pack_try_later(p)
+    assert [ms for ms, _fn in timers] == [packs.LINK_TRY_LATER * 1000]   # once a pack
+    before = len(window.cfg.sounds)
+    timers[0][1]()                                     # two hours later: the site's back
+    assert process_events(qapp, lambda: len(window.cfg.sounds) == before + 3, 10)
+    assert not ctl._pack_retries
+    q, = packs.parse([links_entry(2, id="other", name="Other")])
+    tries = 2 * (len(packs.LINK_RETRY_WAITS) + 1)
+    failing(monkeypatch, myinstants, {f"s{i}.mp3": [urllib.error.URLError("no route")] * tries
+                                      for i in range(2)})
+    ctl._pack_retry(q)                                 # still no connection: later again
+    assert process_events(qapp, lambda: len(timers) == 2, 10)
+    assert "other" in ctl._pack_retries and len(window.cfg.sounds) == before + 3
 
 
 # ---------------------------------------------------------------- the preview

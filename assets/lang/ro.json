@@ -4964,5 +4964,11 @@
   "Download the {language} voice": "Descarcă vocea pentru {language}",
   "{language} needs its voice to be heard: a {size} MB download.": "{language} are nevoie de vocea sa ca să se audă: {size} MB de descărcat.",
   "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "Deocamdată {voice} citește în {language}. Vocea pentru {language} are {size} MB de descărcat.",
-  "The {language} voice, once it's downloaded (below).": "Vocea pentru {language}, după ce e descărcată (mai jos)."
+  "The {language} voice, once it's downloaded (below).": "Vocea pentru {language}, după ce e descărcată (mai jos).",
+  "Couldn't reach Myinstants. It tries again by itself in 2 hours.": "Myinstants nu a putut fi accesat. Încearcă din nou singur peste 2 ore.",
+  "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
+    "{n} sunet nu a putut fi descărcat acum. Se încearcă din nou singur peste 2 ore.",
+    "{n} sunete nu au putut fi descărcate acum. Se încearcă din nou singur peste 2 ore.",
+    "{n} de sunete nu au putut fi descărcate acum. Se încearcă din nou singur peste 2 ore."
+  ]
 }

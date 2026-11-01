@@ -6,6 +6,7 @@ import copy
 import html
 import logging
 import re
+import threading
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -19,9 +20,11 @@ from soundboard.core import (
     usage,
 )
 from soundboard.audio import soundfx
+from soundboard.online import net
 from soundboard.sounds import (
     catswitch,
     library,
+    packs,
 )
 from soundboard.i18n import _, ngettext
 from soundboard.sounds.library import (
@@ -29,6 +32,7 @@ from soundboard.sounds.library import (
     SoundMeta,
 )
 from soundboard.ui.window.controller import Controller
+from soundboard.ui.kit import busy
 from soundboard.ui.kit.crashdialog import free_dialog
 from soundboard.ui.kit.plaintext import plain_tip   # (pack names come from the pack)
 
@@ -52,6 +56,8 @@ class PackImport(_Ctl):
     """ImportControl's sound packs (a mixin)."""
 
     if TYPE_CHECKING:   # ImportControl's own, for the type checker
+        from PySide6.QtCore import SignalInstance
+
         from soundboard import otherboards
         def import_files(self, files,
                          extras: dict[str, otherboards.Entry] | None = ...) -> None: ...
@@ -59,6 +65,8 @@ class PackImport(_Ctl):
         _packs_removed: set[str]
         _packs_page: QDialog | None
         _packs_watch: object
+        _pack_refetched: SignalInstance
+        _pack_retries: set[str]
         # (BackupImport's)
         def _on_unpacked(self, res, pkg, err: str) -> None: ...
 
@@ -78,7 +86,8 @@ class PackImport(_Ctl):
         # it belongs to the Sounds tab (opened from its Backup menu): that tab is the one
         # lit on the rail, and picking it (or any tab) goes back
         mw.tabs.setCurrentWidget(mw.sounds_page)
-        dlg = PacksDialog(self._pack_got, mw, play=self._pack_sample)
+        dlg = PacksDialog(self._pack_got, mw, play=self._pack_sample,
+                          try_later=self._pack_try_later)
         dlg.setWindowFlags(Qt.WindowType.Widget)
         self._packs_page = dlg
         dlg.finished.connect(lambda _r, d=dlg: self._packs_closed(d))
@@ -136,6 +145,44 @@ class PackImport(_Ctl):
         """A free pack downloaded (packs/<its id>.zip): imported like a dropped zip."""
         usage.used(f"pack-added-{usage.pack_tag(Path(path).stem)}")
         self.import_files([str(path)])
+
+    def _pack_try_later(self, p: packs.Pack):
+        """Some (or all) of links pack `p`'s sounds failed for now, after all their tries
+        (no connection, Myinstants down or busy): asked for again by themselves
+        packs.LINK_TRY_LATER after, and again after that while they keep failing, for as
+        long as the app runs. What's on the board already is skipped by the import."""
+        if p.id in self._pack_retries:
+            return
+        self._pack_retries.add(p.id)
+        log.info("pack %s: asking for its missing sounds again in %d s", p.id,
+                 packs.LINK_TRY_LATER)
+        QTimer.singleShot(packs.LINK_TRY_LATER * 1000, self.mw, lambda: self._pack_retry(p))
+
+    def _pack_retry(self, p: packs.Pack):
+        self._pack_retries.discard(p.id)
+        if not net.allowed(packs.FEATURE):   # Offline mode meanwhile: the next time
+            self._pack_try_later(p)
+            return
+
+        def run():   # quiet, on its own thread: no busy cursor for minutes
+            try:
+                got, err = packs.download_links(p, again=True), None
+            except Exception as e:  # noqa: BLE001 - said (or tried again) on the UI thread
+                got, err = None, e
+            busy.emit(self._pack_refetched, p, got, err, owner=self)
+        threading.Thread(target=run, daemon=True, name="pack-retry").start()
+
+    def _pack_retried(self, p: packs.Pack, got, err):
+        if isinstance(err, packs.TryLater):
+            self._pack_try_later(p)
+            return
+        if err is not None:
+            log.info("pack %s: asked again, still failed: %s", p.id, err)
+            return
+        path, _skipped, later = got
+        self._pack_got(path)   # the board's own import says what came
+        if later:
+            self._pack_try_later(p)
 
     def _pack_sample(self, data, gain: float) -> bool:
         """Free packs' samples: to your headphones only (None stops it). False: no

@@ -65,10 +65,15 @@ LOOSE_EMPTY_LOOKS = 20   # an empty file that long (~30 s) waits for the folder 
 class ImportControl(BackupImport, PackImport, Controller):
     """Importing, exporting and sound packs for one MainWindow (``mw``)."""
     _loose_checked = Signal(object)   # _take_loose's look on a thread: [(Path, sig)] | None
+    # a links pack asked for again later (PackImport): pack, (path, skipped, later) | None,
+    # what it raised | None
+    _pack_refetched = Signal(object, object, object)
 
     def __init__(self, mw: MainWindow):
         super().__init__(mw)
         self._loose_checked.connect(self._loose_found)
+        self._pack_refetched.connect(self._pack_retried)
+        self._pack_retries: set[str] = set()   # links packs waiting to be asked for again
         self._packs_removed: set[str] = set()   # sound packs to stop keeping after Undo
         self._packs_page = None   # the Free packs page, while it's in the tabs' place
         self._imported_short = False      # a sound added in this batch is under SHORT_SOUND_S

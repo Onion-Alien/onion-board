@@ -63,6 +63,7 @@ LINK_MAX_WAIT = 300      # the longest a "too many requests" (its Retry-After) i
 LINK_BUSY_WAITS = (15, 30, 60, 120, 300)
 LINK_BUSY_LIMIT = 30 * 60   # ...unless it kept saying so for this long in all: blocked
 LINK_LAST_ROUND = 30     # seconds before the links that failed for now get one more round
+LINK_TRY_LATER = 2 * 60 * 60   # links that still failed for now: tried again this long after
 
 
 @dataclass(frozen=True)
@@ -825,6 +826,11 @@ def download(pack: Pack, progress: Callable[[int, int], object] | None = None,
     return path
 
 
+class TryLater(updates.UpdateError):
+    """None of a links pack's sounds came, all for now (no connection, the site down or
+    busy): its sounds are asked for again LINK_TRY_LATER after."""
+
+
 def _sleep(seconds: float, cancelled: Callable[[], bool] | None = None):
     """Wait `seconds`, or less once `cancelled` says so."""
     end = time.monotonic() + seconds
@@ -929,15 +935,18 @@ def _fetch_link(link: Link, dest: Path, pace: _Pace,
             return path
 
 def download_links(pack: Pack, progress: Callable[[int, int], object] | None = None,
-                   cancelled: Callable[[], bool] | None = None) -> tuple[Path, int]:
+                   cancelled: Callable[[], bool] | None = None,
+                   again: bool = False) -> tuple[Path, int, int]:
     """A links pack: each link fetched from Myinstants (LINK_WORKERS at once), then put
     in a zip of the backup format at pack.path, so it's added, kept, reset and removed
-    like any other pack. (its path, how many links were skipped: gone, or not a sound).
-    `progress` gets (links done, links). Raises updates.UpdateError when none came or
-    it was cancelled. Call off the UI thread."""
+    like any other pack. (its path, how many links were skipped, how many of those only
+    failed for now: worth asking for again LINK_TRY_LATER after). `progress` gets
+    (links done, links). Raises TryLater when none came and all only for now, else
+    updates.UpdateError when none came or it was cancelled. `again`: fetched even though
+    it's kept (to fill in the sounds that failed for now). Call off the UI thread."""
     kept = backup.kept_free_pack(pack.id)
-    if kept is not None:
-        return kept, 0   # added before and still kept: not fetched again
+    if kept is not None and not again:
+        return kept, 0, 0   # added before and still kept: not fetched again
     from concurrent.futures import ThreadPoolExecutor
 
     from soundboard.online.ytsites import temp_folder
@@ -952,6 +961,7 @@ def download_links(pack: Pack, progress: Callable[[int, int], object] | None = N
     pace = _Pace(cancelled)
 
     later: list[int] = []   # links that failed for now: one more round at the end
+    still: list[int] = []   # ...and failed for now again then: tried again much later
 
     def one(i: int, link: Link, last: bool = False):
         nonlocal done
@@ -962,10 +972,10 @@ def download_links(pack: Pack, progress: Callable[[int, int], object] | None = N
         except Exception as e:  # noqa: BLE001 - gone, offline, switched off: skipped
             log.info("pack %s: skipped %s (%s)", pack.id, link.url, e)
             with lock:
-                if not last and _try_again(e) is not None:
-                    later.append(i)
-                else:
+                if _try_again(e) is None:
                     errs.append(errors.plain(e))
+                else:
+                    (still if last else later).append(i)
         else:
             with lock:
                 got[i] = Path(path)
@@ -988,13 +998,16 @@ def download_links(pack: Pack, progress: Callable[[int, int], object] | None = N
                 one(i, pack.links[i], last=True)
         if cancelled is not None and cancelled():
             raise updates.UpdateError(_("Stopped."))
+        if not got and still and not errs:
+            raise TryLater(_("Couldn't reach Myinstants. It tries again by itself in "
+                             "2 hours."))
         if not got:
             raise updates.UpdateError(errs[0] if errs else _("None of its sounds could be "
                                                               "downloaded."))
         _zip_links(pack, got, pack.path)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
-    return pack.path, len(pack.links) - len(got)
+    return pack.path, len(pack.links) - len(got), len(still)
 
 
 def _zip_links(pack: Pack, got: dict[int, Path], dest: Path):

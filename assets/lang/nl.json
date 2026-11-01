@@ -4872,5 +4872,10 @@
   "Download the {language} voice": "De stem voor {language} downloaden",
   "{language} needs its voice to be heard: a {size} MB download.": "{language} heeft zijn stem nodig om gehoord te worden: een download van {size} MB.",
   "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "{voice} leest {language} voorlopig voor. De stem voor {language} is een download van {size} MB.",
-  "The {language} voice, once it's downloaded (below).": "De stem voor {language}, zodra die gedownload is (hieronder)."
+  "The {language} voice, once it's downloaded (below).": "De stem voor {language}, zodra die gedownload is (hieronder).",
+  "Couldn't reach Myinstants. It tries again by itself in 2 hours.": "Kon Myinstants niet bereiken. Over 2 uur wordt het vanzelf opnieuw geprobeerd.",
+  "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
+    "{n} geluid kon nu niet worden gedownload. Over 2 uur wordt het vanzelf opnieuw geprobeerd.",
+    "{n} geluiden konden nu niet worden gedownload. Over 2 uur wordt het vanzelf opnieuw geprobeerd."
+  ]
 }

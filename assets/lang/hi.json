@@ -4872,5 +4872,10 @@
   "Download the {language} voice": "{language} की आवाज़ डाउनलोड करें",
   "{language} needs its voice to be heard: a {size} MB download.": "{language} को सुनाई देने के लिए अपनी आवाज़ चाहिए: {size} MB का डाउनलोड।",
   "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "अभी {voice} {language} पढ़ रही है। {language} की आवाज़ {size} MB का डाउनलोड है।",
-  "The {language} voice, once it's downloaded (below).": "{language} की आवाज़, डाउनलोड होने के बाद (नीचे)।"
+  "The {language} voice, once it's downloaded (below).": "{language} की आवाज़, डाउनलोड होने के बाद (नीचे)।",
+  "Couldn't reach Myinstants. It tries again by itself in 2 hours.": "Myinstants तक नहीं पहुँच पाए। 2 घंटे बाद यह अपने आप फिर कोशिश करेगा।",
+  "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
+    "{n} साउंड अभी डाउनलोड नहीं हो पाया। 2 घंटे बाद अपने आप फिर कोशिश होगी।",
+    "{n} साउंड अभी डाउनलोड नहीं हो पाए। 2 घंटे बाद अपने आप फिर कोशिश होगी।"
+  ]
 }

@@ -434,16 +434,21 @@ class PacksDialog(QDialog):
     pack's sample to your headphones (see Play); without it the samples don't show."""
     _listed = Signal(object, str)              # packs, why the online list wasn't read
     _progress = Signal(str, int, int, bool)    # pack id, done, total, counting links
-    _fetched = Signal(object, object, str, int)   # pack, path or None, error, skipped
+    # pack, path or None, error, skipped, of those only for now (or: none came, for now)
+    _fetched = Signal(object, object, str, int, int)
     _sampled = Signal(object, object)          # sample_key, its samples (None: failed)
     _decoded = Signal(object, object, float, int)   # button, audio or None, gain, serial
 
     def __init__(self, add: Callable[[Path], None], parent=None, fetch_list: bool = True,
-                 play: Play | None = None):
+                 play: Play | None = None,
+                 try_later: Callable[[packs.Pack], None] | None = None):
         super().__init__(parent)
         self.setObjectName("packspage")   # (themesheet: in the window, no box of its own)
         fit.watch(self)
         self._add = add
+        # a links pack's sounds that failed for now: the window asks for them again
+        # packs.LINK_TRY_LATER after (this page may be closed by then)
+        self._try_later = try_later
         self._play = play
         self._busy: dict[str, str] = {}   # pack id -> its Add button's words while downloading
         self._shown_pct: dict[str, str] = {}   # ...and a card's, shorter
@@ -892,21 +897,23 @@ class PacksDialog(QDialog):
         def run():
             try:
                 if p.links:
-                    path, skipped = packs.download_links(
+                    path, skipped, later = packs.download_links(
                         p, lambda done, total: busy.emit(self._progress, p.id, done, total,
                                                          True),
                         lambda: self._closed)
                 else:
-                    path, skipped = packs.download(
+                    path, skipped, later = packs.download(
                         p, lambda done, total: busy.emit(self._progress, p.id, done, total,
                                                          False),
-                        lambda: self._closed), 0
-                busy.emit(self._fetched, p, path, "", skipped)
+                        lambda: self._closed), 0, 0
+                busy.emit(self._fetched, p, path, "", skipped, later)
+            except packs.TryLater as e:
+                busy.emit(self._fetched, p, None, str(e), 0, len(p.links))
             except updates.UpdateError as e:
-                busy.emit(self._fetched, p, None, str(e), 0)
+                busy.emit(self._fetched, p, None, str(e), 0, 0)
             except Exception as e:  # noqa: BLE001 - never a crash
                 log.exception("pack %s download failed", p.id)
-                busy.emit(self._fetched, p, None, errors.plain(e), 0)
+                busy.emit(self._fetched, p, None, errors.plain(e), 0, 0)
         threading.Thread(target=run, daemon=True, name="pack-download").start()
 
     def _on_progress(self, pack_id: str, done: int, total: int, links: bool):
@@ -930,7 +937,9 @@ class PacksDialog(QDialog):
             except RuntimeError:   # its card was remade meanwhile
                 pass
 
-    def _on_fetched(self, p: packs.Pack, path, err: str, skipped: int):
+    def _on_fetched(self, p: packs.Pack, path, err: str, skipped: int, later: int = 0):
+        if later and self._try_later is not None:
+            self._try_later(p)   # (even with this page closed meanwhile)
         self._busy.pop(p.id, None)
         self._shown_pct.pop(p.id, None)
         if self._closed:
@@ -950,11 +959,17 @@ class PacksDialog(QDialog):
         self.bun.play(bunacts.OPEN)
         for b in self._buttons(p.id):
             busy.flash(b, _("✓ Added"))
-        if skipped:
+        if skipped - later:
             busy.toast(self, html.escape(ngettext(
                 "{n} sound is gone from Myinstants, so it was skipped.",
-                "{n} sounds are gone from Myinstants, so they were skipped.", skipped)),
-                "warn")
+                "{n} sounds are gone from Myinstants, so they were skipped.",
+                skipped - later)), "warn")
+        if later:
+            busy.toast(self, html.escape(ngettext(
+                "{n} sound couldn't be downloaded right now. It's tried again by itself "
+                "in 2 hours.",
+                "{n} sounds couldn't be downloaded right now. They're tried again by "
+                "themselves in 2 hours.", later)), "warn")
         if self._filter == MINE:
             self._apply_filter()
 

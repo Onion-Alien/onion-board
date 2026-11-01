@@ -4964,5 +4964,11 @@
   "Download the {language} voice": "Stáhnout hlas pro jazyk {language}",
   "{language} needs its voice to be heard: a {size} MB download.": "Jazyk {language} potřebuje svůj hlas, aby byl slyšet: stažení {size} MB.",
   "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "{voice} zatím čte jazyk {language}. Hlas pro jazyk {language} je ke stažení ({size} MB).",
-  "The {language} voice, once it's downloaded (below).": "Hlas pro jazyk {language}, jakmile se stáhne (níže)."
+  "The {language} voice, once it's downloaded (below).": "Hlas pro jazyk {language}, jakmile se stáhne (níže).",
+  "Couldn't reach Myinstants. It tries again by itself in 2 hours.": "Nepodařilo se spojit s Myinstants. Zkusí to znovu sám za 2 hodiny.",
+  "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
+    "{n} zvuk teď nešel stáhnout. Zkusí se to znovu samo za 2 hodiny.",
+    "{n} zvuky teď nešly stáhnout. Zkusí se to znovu samo za 2 hodiny.",
+    "{n} zvuků teď nešlo stáhnout. Zkusí se to znovu samo za 2 hodiny."
+  ]
 }

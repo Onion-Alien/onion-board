@@ -4964,5 +4964,11 @@
   "Download the {language} voice": "Pobierz głos dla języka {language}",
   "{language} needs its voice to be heard: a {size} MB download.": "Język {language} potrzebuje swojego głosu, żeby był słyszalny: {size} MB do pobrania.",
   "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "Na razie {voice} czyta w języku {language}. Głos dla języka {language} to {size} MB do pobrania.",
-  "The {language} voice, once it's downloaded (below).": "Głos dla języka {language}, gdy zostanie pobrany (poniżej)."
+  "The {language} voice, once it's downloaded (below).": "Głos dla języka {language}, gdy zostanie pobrany (poniżej).",
+  "Couldn't reach Myinstants. It tries again by itself in 2 hours.": "Nie udało się połączyć z Myinstants. Spróbuje ponownie sam za 2 godziny.",
+  "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
+    "{n} dźwięku nie udało się teraz pobrać. Spróbuje ponownie sam za 2 godziny.",
+    "{n} dźwięków nie udało się teraz pobrać. Spróbuje ponownie sam za 2 godziny.",
+    "{n} dźwięków nie udało się teraz pobrać. Spróbuje ponownie sam za 2 godziny."
+  ]
 }

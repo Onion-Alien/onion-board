@@ -4780,5 +4780,9 @@
   "Download the {language} voice": "下载{language}语音",
   "{language} needs its voice to be heard: a {size} MB download.": "{language}需要自己的语音才能被听到：需下载 {size} MB。",
   "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "目前由 {voice} 朗读{language}。{language}语音需下载 {size} MB。",
-  "The {language} voice, once it's downloaded (below).": "{language}语音，下载后即可使用（见下方）。"
+  "The {language} voice, once it's downloaded (below).": "{language}语音，下载后即可使用（见下方）。",
+  "Couldn't reach Myinstants. It tries again by itself in 2 hours.": "无法连接到 Myinstants。2 小时后会自动重试。",
+  "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
+    "{n} 个声音暂时无法下载。2 小时后会自动重试。"
+  ]
 }
