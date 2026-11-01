@@ -1,6 +1,7 @@
-"""Edit sound's effects on a sound that's playing: it's made again in the background and
-swapped in where it is (Engine.swap); Cancel puts the saved one back, Save keeps it
-playing, and Reset effects goes plain at once."""
+"""Edit sound's effects on a sound that's playing: what can't run live is made again in
+the background and swapped in where it is (Engine.swap); Cancel puts the saved one back,
+Save keeps it playing, and Reset effects goes plain at once. (What can run live:
+test_edit_live_preview.)"""
 import time
 
 import numpy as np
@@ -76,14 +77,14 @@ def live(window, monkeypatch, qapp):  # noqa: F811
     return window, d, saved, made, swaps, stops
 
 
-def faster(d):
-    d.effects.load({"speed": 1.5})
+def backwards(d):
+    d.effects.load({"reverse": True})   # (made again: it can't run live)
     d.effects.changed.emit()
 
 
 def test_a_change_plays_at_once_and_cancel_puts_it_back(live, qapp):
     win, d, saved, made, swaps, _stops = live
-    faster(d)
+    backwards(d)
     win.editctl._live_now()
     qapp.processEvents()
     assert swaps == [("s0", made)] and win.audio["s0"] is made
@@ -96,18 +97,18 @@ def test_a_change_plays_at_once_and_cancel_puts_it_back(live, qapp):
 
 def test_save_keeps_it_playing(live, qapp):
     win, d, _saved, made, swaps, stops = live
-    faster(d)
+    backwards(d)
     win.editctl._live_now()
     d.accept()
     qapp.processEvents()
-    assert win.meta("s0").fx["speed"] == 1.5
+    assert win.meta("s0").fx["reverse"]
     assert "s0" not in stops                       # not stopped, not made a third time
     assert win.audio["s0"] is made and swaps == [("s0", made)]
 
 
 def test_reset_goes_plain_at_once(live, qapp):
     win, d, saved, made, swaps, _stops = live
-    faster(d)
+    backwards(d)
     win.editctl._live_now()
     d.btn_reset.click()                            # no wait: the saved audio is right here
     assert swaps[-1] == ("s0", saved) and d.effects.fx() == {}
@@ -129,7 +130,7 @@ def test_reset_of_a_saved_effect_goes_plain(live, qapp):
 def test_nothing_happens_when_it_isnt_playing(live, qapp, monkeypatch):
     win, d, saved, _made, swaps, _stops = live
     monkeypatch.setattr(win.engine, "state", lambda sid: None)
-    faster(d)
+    backwards(d)
     win.editctl._live_now()
     assert swaps == [] and win.audio["s0"] is saved
 
@@ -137,7 +138,7 @@ def test_nothing_happens_when_it_isnt_playing(live, qapp, monkeypatch):
 def test_reset_effects_stands_out_only_with_effects_on(win_only):
     d = win_only.editctl.edit("s0", "effects")
     assert not d.btn_reset.property("nudge")
-    faster(d)
+    backwards(d)
     assert d.btn_reset.property("nudge") and d._reset_glow.is_on()
     d.btn_reset.click()
     assert not d.btn_reset.property("nudge") and not d._reset_glow.is_on()

@@ -14,7 +14,7 @@ import numpy as np
 from PySide6.QtCore import QEvent, QPoint, Qt, Signal
 from PySide6.QtGui import QKeySequence
 from PySide6.QtWidgets import (QButtonGroup, QFrame, QGridLayout, QHBoxLayout, QLabel,
-                               QLineEdit, QPushButton, QScrollArea, QSizePolicy, QSlider,
+                               QLineEdit, QPushButton, QScrollArea, QSizePolicy,
                                QTabWidget, QVBoxLayout, QWidget)
 
 from soundboard import voicefx
@@ -23,7 +23,7 @@ from soundboard.sounds.library import original_peaks
 from soundboard.ui.kit import busy, icons
 from soundboard.ui.kit.layouts import take_out
 from soundboard.ui.kit.panel import card, hint_label, section_label
-from soundboard.ui.kit.wheelguard import no_wheel
+from soundboard.ui.sounds.splicepanel import SpliceBar
 from soundboard.ui.voice.effectrow import ADDON_GROUP, FX_ICONS, GROUPS
 
 if TYPE_CHECKING:
@@ -190,8 +190,9 @@ class AdvancedView(QWidget):
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(12)
 
-        # the top line: the sound's name, hotkey and volume (the same as on the Sound
-        # tab, which keeps the rest), then the Simple | Advanced switch
+        # the top line: the sound's name and hotkey (the same as on the Sound tab, which
+        # keeps the rest; its volume is in Speed & loudness), then the Simple | Advanced
+        # switch
         top = QHBoxLayout()
         top.setSpacing(8)
         self.name = QLineEdit(d.name.text())
@@ -207,23 +208,6 @@ class AdvancedView(QWidget):
         icons.set_icon(self.hk, "keyboard")
         self.hk.clicked.connect(d._capture)
         top.addWidget(self.hk)
-        self.vol_name = QLabel(_("Volume"))
-        self.vol_name.setObjectName("muted")
-        top.addSpacing(8)
-        top.addWidget(self.vol_name)
-        self.vol = QSlider(Qt.Orientation.Horizontal)
-        self.vol.setRange(d.vol.minimum(), d.vol.maximum())
-        self.vol.setValue(d.vol.value())
-        self.vol.setFixedWidth(150)
-        self.vol.setAccessibleName(_("Volume"))
-        no_wheel(self.vol)
-        self.vol_lbl = QLabel(f"{d.vol.value()}%")
-        self.vol_lbl.setObjectName("muted")
-        self.vol.valueChanged.connect(d.vol.setValue)
-        d.vol.valueChanged.connect(self.vol.setValue)
-        d.vol.valueChanged.connect(lambda val: self.vol_lbl.setText(f"{val}%"))
-        top.addWidget(self.vol)
-        top.addWidget(self.vol_lbl)
         top.addStretch(1)
         self.switch = ModeSwitch(True)
         top.addWidget(self.switch)
@@ -252,6 +236,10 @@ class AdvancedView(QWidget):
         bar.addWidget(self.btn_undo)
         bar.addWidget(self.btn_redo)
         bar.addStretch(1)
+        self.splices = SpliceBar(d)
+        d.btn_preview.clicked.connect(lambda: self.splices.trim.clear_solo())
+        bar.addWidget(self.splices)
+        bar.addSpacing(8)
         self.btn_out, self.btn_in = QPushButton("−"), QPushButton("+")
         self.btn_fit = QPushButton()
         icons.set_icon(self.btn_fit, "expand")
@@ -312,6 +300,11 @@ class AdvancedView(QWidget):
 
         eff.add_effect.clicked.connect(self._pick_effect)
         self.picker: EffectPicker | None = None
+        # Speed & loudness' Volume (Live controls' slider) is the Sound tab's
+        eff.volume.set_value(d.vol.value())
+        eff.volume.changed.connect(lambda: d.vol.setValue(round(eff.volume.value())))
+        d.vol.valueChanged.connect(
+            lambda val: abs(eff.volume.value() - val) > 0.5 and eff.volume.set_value(val))
 
     # ------------------------------------------------------------------ in and out
     def attach(self, scrolls: list[QScrollArea], width: int):
@@ -388,6 +381,7 @@ class AdvancedView(QWidget):
         """set_sound made a new trim for another sound: it's already where the old one
         was; make it big and get its peaks."""
         eff = self.d.effects
+        self.splices.attach(eff.trim)
         if eff.trim_layout is self.trim_box:
             eff.trim.set_big(True)
             self._fetch_fine()
@@ -480,8 +474,6 @@ class AdvancedView(QWidget):
             self.tabs.setCurrentIndex(1)
         self.cols.setVisible(self.wide)
         self.tabs.setVisible(not self.wide)
-        self.vol_name.setVisible(self.wide)   # narrow: the slider alone (it's named)
-        self.vol.setFixedWidth(150 if self.wide else 110)
 
     def _unplace(self, s: QScrollArea):
         i = self.tabs.indexOf(s)

@@ -823,6 +823,13 @@ class Voice:
     cut_at: float = 0.0        # when an output was last cut (see CUT_KEEP_S)
     # out -> the gain its last block ended at (_render glides from there to a new one)
     gnow: dict = field(default_factory=dict)
+    # Edit sound's changes heard at once (a livefx.Stage, Engine.set_sound_live; None:
+    # none): its speed multiplies the live speed, the rest runs per output in `stage`
+    # (out -> livefx.SoundStage). `ring`: out -> frames played on past its end, while
+    # its echo / reverb dies away
+    live: tuple | None = None
+    stage: dict = field(default_factory=dict)
+    ring: dict = field(default_factory=dict)
 
     def __post_init__(self):
         self.pos = {o: 0 for o in self.data}
@@ -869,5 +876,8 @@ class Voice:
             d = self.data[o]
             if len(d):
                 frac = self.seek_to.get(o)   # a seek the callback hasn't taken yet
-                return frac if frac is not None else (self.pos[o] % len(d)) / len(d)
+                if frac is not None:
+                    return frac
+                p = self.pos[o]   # (a one-shot's echo tail goes on at its end)
+                return (p % len(d) if self.loop else min(p, len(d))) / len(d)
         return 1.0
