@@ -159,6 +159,9 @@ class SettingsDialog(QDialog, Built):
         self.categories.setAccessibleName(_("Settings categories"))
         self.categories.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.categories.setFixedWidth(196)
+        # the rows came out 1-4 px taller than the room at every window size (the last
+        # row's padding), and a scroll bar showed for that: only for real overflow
+        self.categories.verticalScrollBar().rangeChanged.connect(self._categories_bar)
         self._unbuilt: dict[int, Callable[[], QWidget]] = {}   # tab index -> its page's builder
         self._builders: dict[int, Callable[[], QWidget]] = {}  # every page's (mark_stale)
         self._page_attrs: dict[int, set[str]] = {}   # what each page keeps on the dialog
@@ -277,6 +280,13 @@ class SettingsDialog(QDialog, Built):
         right.addWidget(self.no_match, 1)
         lay.addLayout(content, 1)
         self._narrow = False
+
+    BAR_SLACK = 8   # px the list may run over before its scroll bar shows
+
+    def _categories_bar(self, _lo: int, hi: int):
+        self.categories.setVerticalScrollBarPolicy(
+            Qt.ScrollBarPolicy.ScrollBarAlwaysOff if hi <= self.BAR_SLACK
+            else Qt.ScrollBarPolicy.ScrollBarAsNeeded)
 
     # ------------------------------------------------------------------ advanced
     def _row_picked(self, row: int):
