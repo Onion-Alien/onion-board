@@ -1,6 +1,8 @@
 """The quick-setup guide, on Qt's offscreen platform with fake devices: picks reach
 the config and engine, the cable page reacts to the cable being there or not, and
 finishing marks setup done (only when the cable exists)."""
+import sys
+
 import pytest
 from PySide6.QtCore import QEvent, QObject, QRect
 from PySide6.QtGui import QScreen
@@ -1823,14 +1825,21 @@ def test_leaving_the_mic_step_counts_how_its_test_went(wizard, monkeypatch, hear
     assert len([c for c in counted if c.startswith("mic-test-")]) == 2
 
 
+def _now_ms():
+    import ctypes
+    return ctypes.windll.kernel32.GetTickCount() & 0xFFFFFFFF
+
+
 def _frozen_then(qapp, events):
-    """The UI thread stuck for a while (a graphics driver hang) with input queued
-    meanwhile, then running again: what the guide sees when the PC wakes up."""
+    """The UI thread stuck for a while (a graphics driver hang) with input made
+    meanwhile, then running again: each click and key is stamped with when it was made,
+    as Windows does, and only reaches the guide once it wakes up."""
     import time
     from PySide6.QtCore import QTimer
 
     def freeze():
         for target, ev in events:
+            ev.setTimestamp(_now_ms())
             QApplication.postEvent(target, ev)
         time.sleep(1.6)
     QTimer.singleShot(0, freeze)
@@ -1857,6 +1866,7 @@ def _click(button):
                                  Qt.KeyboardModifier.NoModifier))]
 
 
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows' input time stamps")
 @pytest.mark.parametrize("what", ["esc", "clicks"])
 def test_input_queued_while_frozen_doesnt_close_or_skip_the_guide(qapp, wizard, devices, what):
     # a first launch froze the PC for a minute; the Esc / clicks made meanwhile all
@@ -1869,5 +1879,7 @@ def test_input_queued_while_frozen_doesnt_close_or_skip_the_guide(qapp, wizard, 
     assert wiz.isVisible() and wiz.stack.currentIndex() == start
     assert not library.Config.load().setup_done
     # once it's running again, Esc is theirs again
-    QApplication.sendEvent(wiz, _esc())
+    esc = _esc()
+    esc.setTimestamp(_now_ms())
+    QApplication.sendEvent(wiz, esc)
     assert library.Config.load().setup_done
