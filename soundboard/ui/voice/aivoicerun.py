@@ -68,10 +68,6 @@ class AiVoiceRun(_Panel):
             art.pixmap(key, PICKED_ART) if key else None
         self.picked_pic.setPixmap(pm or emoji_icon(str(vo.get("emoji") or ""), PICKED_ART)
                                   .pixmap(PICKED_ART, PICKED_ART))
-        mine = avl.is_mine(vo)
-        self.b_edit.setVisible(mine and self.can_make())
-        self.b_delete.setVisible(mine)
-        self.b_hear.setVisible(self.previewer.available())
         n = len(self.store.deleted)
         self.b_bin.setText(_("Recently deleted ({n})", n=n))
         self.b_bin.setVisible(n > 0)
