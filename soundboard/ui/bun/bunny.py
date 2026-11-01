@@ -23,7 +23,8 @@ from soundboard.ui.bun.bunpalette import (  # noqa: F401
 from soundboard.ui.bun.bunshapes import (  # noqa: F401
     _arc, _bean, _ellipse, _glow, _lerp, _navel, _oval, _pads, _poof, _shade, _smooth, _stroke)
 from soundboard.ui.bun.bunprops import (  # noqa: F401
-    _draw_prop, _music_note, music_note, _nightcap, _sparkle, sparkle, _star, _survey)
+    _draw_prop, _music_note, music_note, _nightcap, _sparkle, sparkle, _star, _survey, SWUNG,
+    tool_paw)
 
 # The shapes that are the same from frame to frame (his ears at a fold, his tail, his
 # markings, his arms in a pose) are built once and reused: building them (QPainterPath
@@ -236,8 +237,8 @@ def _paws(p: QPainter, prop, sad: float, angry: float, paw_fur: QColor, ink: QPe
         cross = _smooth((angry - 0.35) / 0.4)
         clasp = _smooth((sad - 0.3) / 0.45) * (1 - cross)
     reach = PROP_PAWS.get(prop or "", (None, None))
-    if hold is not None and prop is None:   # (a skit's paws, holding its things)
-        reach = hold
+    if hold is not None and (prop is None or prop in SWUNG):
+        reach = hold   # (a skit's paws, holding its things; a hammer's, mid-swing)
     fur = sleeve or paw_fur
     for i in (0, 1):
         if prop == "headphones" and reach[i] is not None or (waving and i == 1):
@@ -570,6 +571,8 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     # round his neck goes over his head's chin, after it
     worn = tuple(n for n in body if n not in bunnyfit.NECK)
     bunnyfit.draw(p, worn, "face", ink, hats=not nightcap)
+    if prop in SWUNG:   # his arm goes up and down with the hammer
+        hold = (None, tool_paw(round(swing, 2)))
     _paws(p, prop, sad, angry, fur, ink, None if robot else bunnyfit.sleeve(fit), waving,
           hold)
     p.save()
