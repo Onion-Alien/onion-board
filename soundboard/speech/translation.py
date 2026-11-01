@@ -67,7 +67,8 @@ def voice_file(info) -> Path:
 def voice_ready(info) -> bool:
     """Its voice is in (or it lists none)."""
     f = voice_file(info)
-    return not info.voice or (f.is_file() and f.with_name(VOICE_FILE + ".json").is_file())
+    return not getattr(info, "voice", None) or (
+        f.is_file() and f.with_name(VOICE_FILE + ".json").is_file())
 
 
 def is_downloaded(info) -> bool:
@@ -81,7 +82,7 @@ def _parts(info) -> list[tuple[str, str, int, Path]]:
         d = info.download
         todo.append((d["url"], d["sha256"], int(d.get("bytes", 0) or 0),
                      base_dir() / f"{info.language}.part"))
-    v = info.voice
+    v = getattr(info, "voice", None)
     if v and not voice_ready(info):
         f = voice_file(info)
         todo.append((v["url"], v["sha256"], int(v.get("bytes", 0) or 0), f))
@@ -99,7 +100,7 @@ def size_mb(info) -> int:
 
 def _parts_all(info) -> list[tuple[str, str, int, Path]]:
     """Everything a language downloads (for its size once it's all in)."""
-    d, v = info.download, info.voice
+    d, v = info.download, getattr(info, "voice", None)
     return [("", "", int(d.get("bytes", 0) or 0), Path())] + (
         [("", "", int(v.get("bytes", 0) or 0), Path())] if v else [])
 
