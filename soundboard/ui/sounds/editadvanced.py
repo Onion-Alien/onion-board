@@ -256,8 +256,13 @@ class AdvancedView(QWidget):
         self.btn_in.clicked.connect(lambda: self._zoom(2.0))
         self.btn_fit.clicked.connect(lambda: self._zoom(None))
         ev.addLayout(bar)
+        self._bar_words = [(b, b.text()) for b in (self.btn_play, self.btn_undo,
+                                                   self.btn_redo, self.splices.cut)]
+        self.splices.installEventFilter(self)
+        self.editor.installEventFilter(self)
         for b in (self.btn_play, self.btn_undo, self.btn_redo, self.splices.cut,
-                  self.splices.list, self.btn_out, self.btn_in, self.btn_fit):
+                  self.splices.list, *self.splices.fades.values(), self.btn_out,
+                  self.btn_in, self.btn_fit):
             b.setProperty("roomier", True)   # a touch bigger (the theme: 1 px more padding)
             b.style().unpolish(b)   # (already styled once: its size was asked for)
             b.style().polish(b)
@@ -441,6 +446,10 @@ class AdvancedView(QWidget):
 
     def eventFilter(self, obj, e):
         try:   # (nothing in a Qt override may raise: AGENT-RULES *Async results*)
+            if ((obj is self.splices and e.type() == QEvent.Type.LayoutRequest)
+                    or (obj is self.editor and e.type() == QEvent.Type.Resize)):
+                self._fit_bar()   # (narrower, or a splice's Fade in / Fade out shown)
+                return False
             if e.type() == QEvent.Type.LayoutRequest and self.wide and self.isVisible():
                 for s in self._scrolls:
                     if s.widget() is obj:
@@ -458,6 +467,20 @@ class AdvancedView(QWidget):
         except Exception:  # noqa: BLE001
             pass
 
+    def _fit_bar(self):
+        """Preview, Undo, Redo and Add splices as their icons alone when the editor's
+        button row doesn't fit with their words (their tooltips still say them)."""
+        words = self._bar_words
+        short = not words[0][0].text()
+        need = self.bar.sizeHint().width()
+        if short:   # what it needs with the words back
+            need += sum(b.fontMetrics().horizontalAdvance(t) + 8 for b, t in words)
+        lay = self.editor.layout()
+        m = lay.contentsMargins() if lay is not None else None
+        room = self.editor.width() - (m.left() + m.right() if m is not None else 0)
+        if (need > room) != short:
+            for b, t in words:
+                b.setText("" if need > room else t)
     def _fit_cols(self):
         """The columns tall enough for Speed & loudness and the Equalizer whole: the
         waveform gives up the room first, down to its floor (split by stretch alone, a
