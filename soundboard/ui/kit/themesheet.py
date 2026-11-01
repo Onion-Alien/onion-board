@@ -54,8 +54,6 @@ QFrame#card QFrame#alttile { background:$bg; border-radius:8px; }
 QLabel#wordmark { font-size:13pt; font-weight:700; color:$text_hi; background:transparent; }
 QLabel#tagline { color:$muted; font-size:8.5pt; background:transparent; }
 QPushButton { background:$btn; border:1px solid transparent; border-radius:8px; padding:7px 12px; }
-/* the theme's own ring (the border) marks the keyboard's place: not Qt's box round the text too */
-QPushButton, QToolButton, QCheckBox, QRadioButton { outline:0; }
 QPushButton[quiet="true"] { background:transparent; }
 QPushButton[quiet="true"]:hover { background:$btn_hover; }
 QPushButton[quiet="true"]:pressed { background:$btn_press; }
