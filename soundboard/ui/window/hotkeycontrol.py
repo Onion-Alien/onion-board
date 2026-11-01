@@ -35,6 +35,10 @@ log = logging.getLogger(__name__)
 
 RANDOM = "__random__:"   # hotkey action prefix: a random sound from the category after it
 PICK_VOICE = "__pickvoice__:"   # ...: the voice (Voice tab) named after it
+PICK_AI = "__pickai__:"         # ...: the AI voice with the id after it
+# an AI voice's key sits with the voices' keys under this and its id (older versions
+# skip it: no voice has that name)
+AI_KEY = "ai:"
 # shown when instant replay goes on: it records whoever is talking in a call
 REPLAY_NOTE = _("Instant replay is on: your key keeps the last seconds you heard. In some "
                 "places recording a call needs everyone's OK, so only keep clips of people "
@@ -101,6 +105,14 @@ class HotkeyControl(Controller):
             for name, combo in mw.cfg.voice_hotkeys.items():
                 if combo and name in known:
                     mapping.setdefault(combo, PICK_VOICE + name)
+        ai = self._ai_panel()
+        if ai is not None:
+            ai.keys = {n[len(AI_KEY):]: c for n, c in mw.cfg.voice_hotkeys.items()
+                       if n.startswith(AI_KEY) and c}
+            ids = {vo["id"] for vo in ai.voices}
+            for vid, combo in ai.keys.items():
+                if vid in ids:
+                    mapping.setdefault(combo, PICK_AI + vid)
         layer = mw.overlay.layer()   # its keys, only while it's open
         mapping.update(layer)
         mw.hotkeys.grab = set(layer)   # ...and they never reach the game
@@ -380,6 +392,8 @@ class HotkeyControl(Controller):
             mw.playctl.play_random(action[len(RANDOM):])
         elif action.startswith(PICK_VOICE):
             self.pick_voice(action[len(PICK_VOICE):])
+        elif action.startswith(PICK_AI):
+            self.pick_ai_voice(action[len(PICK_AI):])
         elif action == "__voicerandom__":
             self.random_voice()
         else:
@@ -406,6 +420,64 @@ class HotkeyControl(Controller):
         self._voice_was = None
         fx.pick(name)
         mw.playctl.cue("start")
+
+    def _ai_panel(self):
+        """The Voice tab's AI voices card, or None while the tab is switched off."""
+        mw = self.mw
+        voice = getattr(mw, "voice", None)
+        return (getattr(voice, "ai", None)
+                if voice is not None and mw.tabctl.tab_on("voice") else None)
+
+    def _ai_name(self, vid: str) -> str:
+        ai = self._ai_panel()
+        vo = next((v for v in ai.voices if v["id"] == vid), None) if ai is not None else None
+        return str(vo.get("name") or vid) if vo else vid
+
+    def pick_ai_voice(self, vid: str):
+        """An AI voice's own hotkey: that voice, on (as clicking its card)."""
+        mw = self.mw
+        ai = self._ai_panel()
+        if ai is None or vid not in {vo["id"] for vo in ai.voices}:
+            mw.playctl.cue("fail")
+            return
+        self._voice_was = None
+        ai.use(vid)
+        mw.playctl.cue("start")
+
+    def set_ai_voice_hotkey(self, vid: str, combo: str | None = None):
+        """The hotkey that turns the AI voice `vid` on (asks for it unless given; ""
+        clears it). Kept with the voices' keys, so a key does one voice either way."""
+        mw = self.mw
+        if combo is None:
+            combo = self._ask_combo()
+            if combo is None:
+                self.register_hotkeys()   # the capture paused them
+                return
+        combo = self._valid_hotkey(combo)
+        if combo is None or self.keeps_stop_key(combo):
+            self.register_hotkeys()
+            return
+        name = self._ai_name(vid)
+        if combo:
+            taken_from = self._take_actions(combo) + self._take_sounds(combo)
+            taken_from += [_("a random sound from “{name}”", name=c)
+                           for c in self._clear_category_hotkey(combo)]
+            taken_from += [_("the voice “{name}”", name=n)
+                           for n in self._clear_voice_hotkey(combo, keep=AI_KEY + vid)]
+            taken_from += self._take_ptt(combo)
+            mw.cfg.voice_hotkeys[AI_KEY + vid] = combo
+            msg = (_("✓ {combo} picks the voice “{name}”, it was the key for {lost}",
+                     combo=html.escape(pretty_key(combo)), name=html.escape(name),
+                     lost=html.escape(", ".join(taken_from))) if taken_from
+                   else _("✓ {combo} picks the voice “{name}”",
+                          combo=html.escape(pretty_key(combo)), name=html.escape(name)))
+            mw.toast(msg, "ok")
+            self.everyday_note(combo)
+        else:
+            mw.cfg.voice_hotkeys.pop(AI_KEY + vid, None)
+            mw.toast(_("Hotkey for the voice “{name}” cleared", name=html.escape(name)))
+        mw._save_now()
+        self.register_hotkeys()
 
     def random_voice(self):
         """The Random voice key: the Voice tab's die, from anywhere."""
@@ -624,7 +696,7 @@ class HotkeyControl(Controller):
                 if combo else [])
         for v in gone:
             del mw.cfg.voice_hotkeys[v]
-        return gone
+        return [self._ai_name(n[len(AI_KEY):]) if n.startswith(AI_KEY) else n for n in gone]
 
     def voice_renamed(self, old: str, new: str):
         """A saved voice got a new name: its key goes with it."""

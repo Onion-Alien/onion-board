@@ -4884,5 +4884,14 @@
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Відкриває цю вкладку, коли Onion Board на передньому плані.\nEsc = скасувати.",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Перетягніть повзунки, щоб відрізати початок і кінець. Клацніть або тягніть шкалу часу, або тягніть лінію відтворення, щоб перейти в інше місце. Ctrl+коліщатко наближає. Щоб зсунути, тягніть правою кнопкою миші або крутіть Shift+коліщатко.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Безкоштовно, без реклами й без акаунта. Зробив OnionAlien. Відкритий код за ліцензією GNU GPL v3: використовуйте, змінюйте й діліться, якщо ваша версія теж лишається з відкритим кодом.",
-  "Community uploads": "Завантажено спільнотою"
+  "Community uploads": "Завантажено спільнотою",
+  "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Додати до цього голосу ефекти іншого (Robot + Demon): увімкнуться ефекти, які є в нього, але немає у вашого",
+  "Back to your own mix as it was": "Повернути свій мікс, як був",
+  "Back to “{voice}” as it was when you picked it": "Повернути «{voice}», як було під час вибору",
+  "Do the change again (Ctrl+Y)": "Повторити зміну (Ctrl+Y)",
+  "Edit voice…": "Змінити голос…",
+  "Mix in a voice": "Домішати голос",
+  "Take back the last change (Ctrl+Z)": "Скасувати останню зміну (Ctrl+Z)",
+  "Your voice already has everything “{voice}” has": "У вашому голосі вже є все, що є в «{voice}»",
+  "{voice}, changed": "{voice}, змінено"
 }

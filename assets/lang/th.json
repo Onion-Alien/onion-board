@@ -4708,5 +4708,14 @@
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "เปิดแท็บนี้ขณะที่ Onion Board อยู่ด้านหน้า\nEsc = ยกเลิก",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "ลากที่จับเพื่อตัดต้นและท้าย คลิกหรือลากไม้บรรทัดเวลา หรือลากเส้นตำแหน่งเล่น เพื่อย้ายจุดที่เล่น Ctrl+เลื่อนเพื่อซูม ลากด้วยปุ่มขวาของเมาส์ หรือ Shift+เลื่อน เพื่อขยับ",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "ฟรี ไม่มีโฆษณาและไม่ต้องมีบัญชี สร้างโดย OnionAlien โอเพนซอร์สภายใต้ GNU GPL v3: ใช้ แก้ไข และแบ่งปันได้ ตราบใดที่เวอร์ชันของคุณยังเป็นโอเพนซอร์สด้วย",
-  "Community uploads": "อัปโหลดจากชุมชน"
+  "Community uploads": "อัปโหลดจากชุมชน",
+  "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "เพิ่มเอฟเฟกต์ของเสียงอื่นลงในเสียงนี้ (Robot + Demon): เอฟเฟกต์ที่เสียงนั้นมีแต่เสียงของคุณไม่มีจะถูกเปิด",
+  "Back to your own mix as it was": "กลับไปที่มิกซ์ของคุณแบบเดิม",
+  "Back to “{voice}” as it was when you picked it": "กลับไปที่ “{voice}” แบบตอนที่เลือก",
+  "Do the change again (Ctrl+Y)": "ทำการเปลี่ยนแปลงซ้ำ (Ctrl+Y)",
+  "Edit voice…": "แก้ไขเสียง…",
+  "Mix in a voice": "ผสมเสียง",
+  "Take back the last change (Ctrl+Z)": "ย้อนการเปลี่ยนแปลงล่าสุด (Ctrl+Z)",
+  "Your voice already has everything “{voice}” has": "เสียงของคุณมีทุกอย่างที่ “{voice}” มีอยู่แล้ว",
+  "{voice}, changed": "{voice} (แก้ไขแล้ว)"
 }

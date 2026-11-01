@@ -4796,5 +4796,14 @@
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Abre esta pestaña mientras Onion Board está delante.\nEsc = cancelar.",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Arrastra los tiradores para cortar el principio y el final. Haz clic o arrastra la regla de tiempo, o arrastra el cabezal, para cambiar dónde suena. Ctrl+rueda acerca. Arrastra con el botón derecho del ratón, o usa Mayús+rueda, para desplazarte.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Gratis, sin anuncios y sin cuenta. Hecho por OnionAlien. Código abierto bajo la GNU GPL v3: úsalo, modifícalo y compártelo, siempre que tu versión también siga siendo de código abierto.",
-  "Community uploads": "Subidos por la comunidad"
+  "Community uploads": "Subidos por la comunidad",
+  "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Añade los efectos de otra voz a esta (Robot + Demon): se activan los efectos que tiene y la tuya no",
+  "Back to your own mix as it was": "Volver a tu propia mezcla tal como estaba",
+  "Back to “{voice}” as it was when you picked it": "Volver a «{voice}» tal como estaba al elegirla",
+  "Do the change again (Ctrl+Y)": "Rehacer el cambio (Ctrl+Y)",
+  "Edit voice…": "Editar voz…",
+  "Mix in a voice": "Mezclar una voz",
+  "Take back the last change (Ctrl+Z)": "Deshacer el último cambio (Ctrl+Z)",
+  "Your voice already has everything “{voice}” has": "Tu voz ya tiene todo lo que tiene «{voice}»",
+  "{voice}, changed": "{voice}, con cambios"
 }

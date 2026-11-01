@@ -1699,9 +1699,10 @@ def test_copy_from_a_tile_with_the_window_closed_says_so(panel, monkeypatch):
 def test_make_it_yours_buttons_are_at_the_top(panel):
     fx = panel[0].fx
     tools = fx.btn_random.parentWidget()
-    for b in (fx.btn_save, fx.btn_share, fx.btn_import, fx.btn_bin):
+    for b in (fx.btn_mix, fx.btn_share, fx.btn_import, fx.btn_bin):
         assert b.parentWidget() is tools                     # one row of buttons...
-    assert fx.tweak.layout().indexOf(tools) == 0             # ...first in the window
+    assert fx.tweak.layout().indexOf(tools) == 1             # ...under the voice's name
+    assert fx.btn_save.parentWidget() is fx.btn_undo.parentWidget()   # Save: by Done
 
 
 def test_effect_cards_fold_and_stay_folded(qapp, monkeypatch):

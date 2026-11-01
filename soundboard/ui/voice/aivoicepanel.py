@@ -103,6 +103,9 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
     changed = Signal(dict)
     live_changed = Signal(bool)
     modules_changed = Signal()      # got or removed the add-on: the Voice tab rescans
+    hotkey_asked = Signal(str)      # right-click a card -> Set a hotkey: the voice's id
+    hotkey_cleared = Signal(str)
+    voices_changed = Signal()       # the voices were read again: their hotkeys may be live now
     _event = Signal(dict)
     _install_line = Signal(str)     # a raw line of the install's output
     _install_note = Signal(str)     # our own words for the card, shown as they are
@@ -309,6 +312,7 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         grid.setColumnStretch(1, 1)
         self.pitch_box.hide()
         self.tweak_pop: EditPopup | None = None
+        self.keys: dict[str, str] = {}   # voice id -> its hotkey (the window fills it in)
 
         self.missing = QWidget()
         mv = QVBoxLayout(self.missing)
@@ -419,6 +423,7 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
                             if m.id == aivoice.MODULE_ID and not m.error), None)
         self.voices = read_voices(self.module) if voices is None else voices
         self._fill_tiles()
+        self.voices_changed.emit()
         self.lbl_credits.setText(self.module.credits if self.module else "")
         self._refresh()
 
@@ -493,6 +498,7 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         self.voices = read_voices(self.module, self.store.voices)
         self._favs = [i for i in self._favs if any(vo["id"] == i for vo in self.voices)]
         self._fill_tiles()
+        self.voices_changed.emit()
         if self.current_voice() != old:     # it was deleted: the first one instead
             self.pick(self.current_voice())
         self._emit()
