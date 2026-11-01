@@ -1351,3 +1351,18 @@ def test_narrow_rail_icons_sit_in_the_middle_of_their_highlight(window, qapp):  
         assert abs(min(xs) - (img.width() - 1 - max(xs))) <= 2
     finally:
         d.close()
+
+
+def test_the_category_list_looks_like_the_rails_tabs(window):  # noqa: F811
+    """Settings' list drew bigger, brighter icons and words than the main rail's tabs,
+    a sub-menu louder than the menu: same icon size and weight now, muted till picked."""
+    from PySide6.QtGui import QFontInfo
+    from PySide6.QtWidgets import QToolButton
+
+    from soundboard.ui.window.railsizes import ICON
+    d = window.setctl.open_settings("audio")
+    cats = d.categories
+    tab = next(b for b in window.findChildren(QToolButton) if b.objectName() == "railtab")
+    assert cats.iconSize().width() == tab.iconSize().width() == ICON
+    assert cats.font().weight() == tab.font().weight()
+    assert QFontInfo(cats.font()).pixelSize() == QFontInfo(tab.font()).pixelSize()
