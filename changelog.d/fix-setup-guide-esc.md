@@ -1,0 +1,1 @@
+- Esc no longer closes the setup guide (closing it by accident skipped the whole set-up for good); its X still does.

@@ -1878,8 +1878,24 @@ def test_input_queued_while_frozen_doesnt_close_or_skip_the_guide(qapp, wizard, 
     _frozen_then(qapp, [(wiz, _esc())] if what == "esc" else clicks)
     assert wiz.isVisible() and wiz.stack.currentIndex() == start
     assert not library.Config.load().setup_done
-    # once it's running again, Esc is theirs again
-    esc = _esc()
-    esc.setTimestamp(_now_ms())
-    QApplication.sendEvent(wiz, esc)
+    # once it's running again, its X is theirs again
+    for _target, ev in _click(wiz.btn_close):
+        ev.setTimestamp(_now_ms())
+        QApplication.sendEvent(wiz.btn_close, ev)
+    assert library.Config.load().setup_done
+
+
+def test_esc_never_closes_the_guide(qapp, wizard, devices):
+    # Esc closed it (a dialog's default) and a closed guide never opens by itself again:
+    # one stray key lost the whole set-up. Only its own X closes it.
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    w, wiz = wizard
+    wiz.show()
+    start = wiz.stack.currentIndex()
+    QTest.keyClick(wiz, Qt.Key.Key_Escape)
+    QTest.keyClick(wiz.btn_next, Qt.Key.Key_Escape)   # with a button focused too
+    assert wiz.isVisible() and wiz.stack.currentIndex() == start
+    assert not library.Config.load().setup_done
+    wiz.btn_close.click()
     assert library.Config.load().setup_done
