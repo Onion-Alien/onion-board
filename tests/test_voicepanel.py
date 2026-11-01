@@ -2588,8 +2588,8 @@ def test_clicks_on_the_voice_tab_dont_check_the_disk_each_time(panel, monkeypatc
     asked.clear()
     assert p.speech.translating() is lang and sorted(asked) == ["live", "zh"]
     p.speech._ready[id(lang)] = False          # a language removed: _fill_langs asks again
-    p.speech._fill_langs()
     asked.clear()
+    p.speech._fill_langs()
     assert p.speech.translating() is lang and "zh" in asked
 
 
