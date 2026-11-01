@@ -23,15 +23,16 @@ from soundboard.ui.setup.wizardkit import (BUN_H, BUN_PAD, HEADER_GAP, LOOK_CARD
 
 
 # the first launch's "Make it yours" page: nine looks to start from (the rest: Settings).
-# Row one the plain pair and a seasonal one, then the best three dark and three light.
-SEASONAL, SEASONAL_OFF = "Halloween", "Midnight"   # (Midnight once Halloween's gone)
+# Row one the plain pair and a seasonal one (the limited edition on offer, Midnight when
+# none is), then the best three dark and three light.
+SEASONAL, SEASONAL_OFF = "seasonal", "Midnight"
 LOOK_ROWS = (("Light", "Dark", SEASONAL),
              ("Ocean", "Toxic", "Synthwave"),
              ("Mint", "Paper", "Cherry Blossom"))
 
 
 def look_themes() -> list[str]:
-    seasonal = SEASONAL if theme.offered(SEASONAL) else SEASONAL_OFF
+    seasonal = next((n for n in theme.LIMITED if theme.on_offer(n)), SEASONAL_OFF)
     return [seasonal if n == SEASONAL else n for row in LOOK_ROWS for n in row]
 
 

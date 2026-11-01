@@ -51,6 +51,7 @@ OUTFITS: dict[str, tuple[str, ...]] = {
     "Vaporwave": ("glasses_3d",),
     "Blood Moon": ("moon", "horns"),
     "Halloween": ("witch_hat", "fangs"),
+    "Fireworks": ("burst", "sparkler", "glow_necklace"),
     "Lava": ("bandana",),
     "Amber Terminal": ("eyeshade", "pencil"),
     "Hacker": ("hood", "strings", "shades"),
@@ -65,7 +66,7 @@ OUTFITS: dict[str, tuple[str, ...]] = {
 
 HATS = {"pom_beanie", "wizard", "captain", "beret", "crown", "onion", "horns", "bandana",
         "eyeshade", "pencil", "frog", "snapback", "party", "propeller", "blossom", "leaves",
-        "flower_crown", "mint_sprig", "bow", "dizzy", "santa", "witch_hat"}
+        "flower_crown", "mint_sprig", "bow", "dizzy", "santa", "witch_hat", "sparkler"}
 
 # glasses and visors: off while he sleeps under the nightcap
 EYEWEAR = {"shades", "round_glasses", "heart_glasses", "glasses_3d",
@@ -74,8 +75,8 @@ EYEWEAR = {"shades", "round_glasses", "heart_glasses", "glasses_3d",
 # hide and lifts his brows clear of them
 HIDE_EYES = {"shades", "pixel_shades", "visor", "spirals"}
 
-NECK = {"bowtie", "scarf", "lei", "strings", "turtleneck", "badge"}   # face-layer pieces
-                                                                     # round his neck
+# face-layer pieces round his neck
+NECK = {"bowtie", "scarf", "lei", "strings", "turtleneck", "badge", "glow_necklace"}
 
 GOLD, GOLD_DARK =QColor("#ffcf40"), QColor("#d99a1e")
 WHITE = QColor("#ffffff")
@@ -160,6 +161,8 @@ LOOKS: dict[str, dict] = {
     "Halloween": {"fur": "#3a3140", "ears": "both", "extras": ("chomp",), "tail": "tuft",
                   "iris": "#ff8a1f", "inner": "#a259ff", "nose": "#ff7518",
                   "pattern": ("spots",), "marks": "#5c4a66", "pads": "#a259ff"},
+    "Fireworks": {"fur": "#3a4494", "ears": "up", "tail": "fluffy", "iris": "#ffc94d",
+                  "inner": "#ff7fbe", "nose": "#ff4fa3", "belly": "#5560b4", "pads": "#ff7fbe"},
     "Lava": {"ears": "right",
              "fur": "#f3cdae", "extras": ("bandaid", "chomp"), "tail": "tuft", "iris": "#ff5a1f",
              "inner": "#ff9a6b", "nose": "#e0482a", "pattern": ("patch",), "marks": "#3d2c2c",
@@ -295,6 +298,21 @@ def _moon(p, ink):
     _fill(p, _circle(50, 48, 37), grad, QPen(QColor("#6e170e"), 2))
     for x, y, r in ((27, 34, 5), (73, 28, 4), (80, 52, 5.5), (22, 58, 3.5), (58, 14, 3)):
         _fill(p, _circle(x, y, r), QColor(140, 30, 16, 120), None)
+
+
+def _burst(p, ink):
+    """A firework bursting in the sky over his floppy ear: gold and pink rays with a spark
+    on the end of each."""
+    x, y = 17, 17
+    _fill(p, _circle(x, y, 13), QColor(255, 182, 39, 45), None)       # its glow
+    for i in range(12):
+        a = i * math.pi / 6 + 0.2
+        col = QColor("#ffc94d") if i % 2 else QColor("#ff5fae")
+        r0, r1 = (4, 11) if i % 2 else (5, 13)
+        c, s_ = math.cos(a), math.sin(a)
+        p.setPen(QPen(col, 2.2, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+        p.drawLine(QPointF(x + c * r0, y + s_ * r0), QPointF(x + c * r1, y + s_ * r1))
+        _fill(p, _circle(x + c * (r1 + 3), y + s_ * (r1 + 3), 1.7), col, None)
 
 
 def _collar(p, ink):
@@ -564,6 +582,25 @@ def _pencil(p, ink):
           QPen(INK_COL, 1.3))
     _fill(p, _poly((-15, -0.9), (-17.3, 0), (-15, 0.9)), DARK, None)
     p.restore()
+
+
+def _sparkler(p, ink):
+    """A lit sparkler tucked behind his left ear, fizzing at the tip."""
+    tip = QPointF(90, 14)
+    p.setPen(QPen(QColor("#8d93a8"), 1.6, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+    p.drawLine(QPointF(75, 44), QPointF(82, 30))                        # the bare wire
+    p.setPen(QPen(QColor("#4a4458"), 3.4, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+    p.drawLine(QPointF(82, 30), QPointF(89, 16))                        # the coating
+    glow = QRadialGradient(tip, 11)
+    glow.setColorAt(0, QColor(255, 236, 160, 230))
+    glow.setColorAt(1, QColor(255, 182, 39, 0))
+    _fill(p, _circle(tip.x(), tip.y(), 11), glow, None)
+    p.setPen(QPen(QColor("#ffe27a"), 1.3, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+    for i in range(8):
+        a = i * math.pi / 4 + 0.3
+        p.drawLine(tip + QPointF(4 * math.cos(a), 4 * math.sin(a)),
+                   tip + QPointF(9 * math.cos(a), 9 * math.sin(a)))
+    _star(p, tip.x(), tip.y(), 4.5, QColor("#fff6d0"), QPen(QColor("#ffb627"), 1))
 
 
 def _dizzy(p, ink):
@@ -907,6 +944,21 @@ def _scarf(p, ink):
         p.drawLine(QPointF(60.5, y), QPointF(69, y))
 
 
+def _glow_necklace(p, ink):
+    """A glow stick bent round his neck, glowing pink."""
+    path = QPainterPath(QPointF(29, 89))
+    path.cubicTo(QPointF(37, 99), QPointF(63, 99), QPointF(71, 89))
+    p.setBrush(Qt.BrushStyle.NoBrush)
+    for width, alpha in ((10, 50), (6.5, 110)):                         # its glow
+        p.setPen(QPen(QColor(255, 79, 163, alpha), width, Qt.PenStyle.SolidLine,
+                      Qt.PenCapStyle.RoundCap))
+        p.drawPath(path)
+    p.setPen(QPen(QColor("#ff7fbe"), 3.6, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+    p.drawPath(path)
+    p.setPen(QPen(QColor("#ffe0f0"), 1.3, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+    p.drawPath(path)                                                    # its bright core
+
+
 def _lei(p, ink):
     for i in range(9):
         t = i / 8
@@ -920,6 +972,7 @@ INK_COL = QColor("#2b2340")
 
 PIECES = {
     "moon": ("behind", _moon),
+    "burst": ("behind", _burst),
     "hood": ("back", lambda p, ink: _hood(p, ink, QColor("#2c323e"), _col("accent"))),
     "hazmat": ("back", lambda p, ink: _hood(p, ink, QColor("#f2c230"))),
     "collar": ("back", _collar),
@@ -938,6 +991,7 @@ PIECES = {
     "flower_crown": ("over", _flower_crown),
     "mint_sprig": ("over", _mint_sprig),
     "pencil": ("over", _pencil),
+    "sparkler": ("over", _sparkler),
     "onion": ("over", _onion),
     "party": ("over", _party),
     "propeller": ("over", _propeller),
@@ -958,6 +1012,7 @@ PIECES = {
     "spirals": ("face", _spirals),
     "readers": ("face", _readers),
     "laser": ("face", _laser),
+    "glow_necklace": ("face", _glow_necklace),
     "strings": ("face", _strings),
     "fangs": ("face", _fangs),
     "clown_nose": ("face", _clown_nose),

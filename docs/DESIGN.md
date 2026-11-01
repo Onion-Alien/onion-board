@@ -1,6 +1,6 @@
 ---
 # Onion Board design system: the machine-readable part.
-# Colour values live in soundboard/style/palettes.py (theme.THEMES): 32 themes (not 2 or 3: every
+# Colour values live in soundboard/style/palettes.py (theme.THEMES): 33 themes (not 2 or 3: every
 # one is shipped and picked by real people) share these token NAMES, so code always
 # uses a token, never a hex value. The prose below says how; section 6 says how to check.
 name: Onion Board
@@ -515,7 +515,7 @@ or macOS app? If it looks like a settings form from 2005, it isn't done.
 
 ## 6. Colour
 
-- **There are 32 themes, not three.** Every colour you add has to work in all of
+- **There are 33 themes, not three.** Every colour you add has to work in all of
   `theme.THEMES` (dark, light, true black, High Contrast's outlines, pale accents like
   Flashbang's yellow, loud ones like Deep Fried, other fonts like Retro 98 and Comic
   Sans). Dark and Light are the reference look; the others must look as finished.
