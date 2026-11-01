@@ -85,6 +85,28 @@ def test_a_failed_first_install_leaves_no_half_made_environment(tmp_path, seen):
     assert not m.installed and not (m.path / ".venv").exists()
 
 
+def test_an_install_cut_off_by_the_app_closing_isnt_taken_for_installed(tmp_path, seen):
+    """The app closed or crashed while pip ran: nothing cleaned up, so the half-made
+    .venv\\Scripts\\python.exe used to count as installed, and every voice then failed
+    ("No module named 'numpy'") with no Install button to fix it."""
+    m = addon(tmp_path / "live-voice", [[PY, "-c", MAKE_VENV]])
+    (m.path / ".venv" / "Scripts").mkdir(parents=True)
+    (m.path / ".venv" / "Scripts" / "python.exe").write_bytes(b"")
+    (m.path / ".venv" / "half.txt").write_text("left by the cut-off install")
+    (m.path / modules.INSTALLING).touch()   # what the closed app left behind
+    assert not m.installed
+    assert modules.install(m, print)        # pressing Install again starts it clean
+    assert m.installed and not (m.path / modules.INSTALLING).exists()
+    assert not (m.path / ".venv" / "half.txt").exists()
+
+
+def test_an_install_leaves_no_mark_however_it_ends(tmp_path, seen):
+    for steps in ([[PY, "-c", MAKE_VENV]], [[PY, "-c", MAKE_VENV], [PY, "-c", FAIL]]):
+        m = addon(tmp_path / f"live-voice-{len(steps)}", steps)
+        modules.install(m, print)
+        assert not (m.path / modules.INSTALLING).exists()
+
+
 def test_a_failed_update_keeps_the_working_environment(tmp_path, seen):
     m = addon(tmp_path / "live-voice", [[PY, "-c", FAIL, "-m", "pip"]])
     (m.path / ".venv" / "Scripts").mkdir(parents=True)
