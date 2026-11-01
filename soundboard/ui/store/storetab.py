@@ -15,7 +15,7 @@ import threading
 from collections.abc import Callable
 
 from PySide6.QtCore import QEvent, QPoint, Qt, QTimer, Signal
-from PySide6.QtWidgets import (QComboBox, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QMenu,
+from PySide6.QtWidgets import (QGridLayout, QHBoxLayout, QLabel, QLineEdit, QMenu,
                                QPushButton, QScrollArea, QStackedWidget, QVBoxLayout, QWidget)
 
 from soundboard.core import achievements, usage
@@ -25,7 +25,7 @@ from soundboard.i18n import _
 from soundboard.ui.kit import busy, icons
 from soundboard.ui.store import storelook
 from soundboard.ui.kit.panel import hint_label, icon_button, section_label
-from soundboard.ui.store.storefit import CARD_GAP, LIST_GAP, StoreFit
+from soundboard.ui.store.storefit import CARD_GAP, LIST_GAP, CutCombo, StoreFit
 from soundboard.ui.store.storeplay import StorePlay
 from soundboard.ui.store.storerow import SoundRow, count_text
 from soundboard.ui.store.storeshare import ShareDialog, error_text
@@ -166,7 +166,7 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         self._search_wait.timeout.connect(self.reload)
         self.search.textChanged.connect(lambda _t: self._search_wait.start())
         # the sounds' categories (or the voices' kinds), each with how many
-        self.cat_pick = QComboBox()
+        self.cat_pick = CutCombo()
         self.cat_pick.setAccessibleName(_("Category"))
         self.cat_pick.setToolTip(_("Category"))
         self.cat_pick.setPlaceholderText(_("All categories"))   # every sound, by Added
@@ -192,6 +192,7 @@ class StoreTab(StoreFit, StorePlay, QWidget):
             tv.addLayout(bar)
         hv.addWidget(self.toolbar)
         self._one_row: bool | None = None
+        self._cat_short: list[str] = []   # the dropdown's names it always has room for
         self._lay_toolbar(False)
         col.addWidget(head)
         self._sort = "trending"   # the default (the dropdown picks Most liked)
@@ -419,6 +420,8 @@ class StoreTab(StoreFit, StorePlay, QWidget):
                      *items]
         else:
             items = [("", _("All categories"), storelook.ALL_ICON), *items]
+        # (the voices' kinds are short: room for them all)
+        self._cat_short = [t for _k, t, _i in items[:len(TOPS) if self._mode == "sounds" else None]]
         for key, text, _icon in items:
             self.cat_pick.addItem(text, key)
         names = [i for _k, _t, i in items]
