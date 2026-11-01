@@ -659,15 +659,31 @@ def test_a_link_that_failed_for_now_is_tried_again_each_wait_longer(
     assert sum(myinstants.slept) == pytest.approx(sum(packs.LINK_RETRY_WAITS))
 
 
-def test_a_link_that_keeps_failing_is_skipped_after_its_tries(app_dir, myinstants,
-                                                              monkeypatch):
+def test_a_link_that_failed_for_now_gets_one_more_round_at_the_end(app_dir, myinstants,
+                                                                   monkeypatch):
+    """Nobody presses Add again for a few missing sounds: after the rest, the links that
+    failed for now are tried once more, by themselves."""
     import urllib.error
     p, = packs.parse([links_entry(2)])
+    tries = len(packs.LINK_RETRY_WAITS) + 1
+    failing(monkeypatch, myinstants, {"s0.mp3": [urllib.error.URLError("reset")] * tries})
+    path, skipped = packs.download_links(p)
+    assert skipped == 0
+    s0 = "https://www.myinstants.com/media/sounds/s0.mp3"
+    assert myinstants.fetched.count(s0) == tries + 1 and myinstants.fetched[-1] == s0
+    assert packs.LINK_LAST_ROUND <= sum(myinstants.slept)
+
+
+def test_a_link_that_keeps_failing_is_skipped_after_both_rounds(app_dir, myinstants,
+                                                                monkeypatch):
+    import urllib.error
+    p, = packs.parse([links_entry(2)])
+    tries = len(packs.LINK_RETRY_WAITS) + 1
     failing(monkeypatch, myinstants,
-            {"s0.mp3": [urllib.error.URLError("reset")] * (len(packs.LINK_RETRY_WAITS) + 1)})
+            {"s0.mp3": [urllib.error.URLError("reset")] * (2 * tries)})
     path, skipped = packs.download_links(p)
     assert skipped == 1
-    assert myinstants.fetched.count("https://www.myinstants.com/media/sounds/s0.mp3") == 4
+    assert myinstants.fetched.count("https://www.myinstants.com/media/sounds/s0.mp3") == 8
 
 
 def test_a_gone_link_is_not_asked_for_again(app_dir, myinstants, monkeypatch):
@@ -690,6 +706,28 @@ def test_too_many_requests_holds_every_link_as_long_as_the_site_asks(
     assert packs._try_again(DownloadErrorFrom(http(429, "Wed, 21 Oct"))) == (0.0, True)
 
 
+def test_too_many_requests_never_makes_a_link_give_up(app_dir, myinstants, monkeypatch):
+    """Each "too many requests" waits longer (15 s, 30 s, 1, 2, then 5 minutes) and the
+    link is asked for again: more times than its own tries, and it comes."""
+    monkeypatch.setattr(packs, "LINK_WORKERS", 1)
+    p, = packs.parse([links_entry(2)])
+    failing(monkeypatch, myinstants, {"s0.mp3": [http(429)] * 6})
+    path, skipped = packs.download_links(p)
+    assert skipped == 0
+    assert myinstants.fetched.count("https://www.myinstants.com/media/sounds/s0.mp3") == 7
+    held = sum(packs.LINK_BUSY_WAITS) + packs.LINK_BUSY_WAITS[-1]
+    assert sum(myinstants.slept) == pytest.approx(held, abs=2)
+
+
+def test_a_link_coming_through_starts_the_waits_over(app_dir, myinstants, monkeypatch):
+    monkeypatch.setattr(packs, "LINK_WORKERS", 1)   # one at a time: the waits add up
+    p, = packs.parse([links_entry(2)])
+    failing(monkeypatch, myinstants, {"s0.mp3": [http(429)] * 3, "s1.mp3": [http(429)]})
+    packs.download_links(p)
+    # s0: 15 + 30 + 60, then it came; s1's one "too many" waits 15 s again, not 120
+    assert sum(myinstants.slept) == pytest.approx(15 + 30 + 60 + 15, abs=2)
+
+
 def DownloadErrorFrom(cause):
     from soundboard.online import ytdl
     try:
@@ -698,18 +736,19 @@ def DownloadErrorFrom(cause):
         return e
 
 
-def test_once_myinstants_keeps_refusing_the_rest_isnt_asked_for(app_dir, myinstants,
-                                                                monkeypatch):
-    n = 8
-    p, = packs.parse([links_entry(n)])
-    tries = len(packs.LINK_RETRY_WAITS) + 1
-    failing(monkeypatch, myinstants,
-            {f"s{i}.mp3": [http(429, "1")] * tries for i in range(n)})
+def test_only_half_an_hour_of_too_many_requests_stops_it(app_dir, myinstants,
+                                                         monkeypatch):
+    """A site still saying "too many requests" after LINK_BUSY_LIMIT is blocking us:
+    then (and only then) the links stop being asked for."""
+    monkeypatch.setattr(packs, "LINK_WORKERS", 1)
+    p, = packs.parse([links_entry(3)])
+    failing(monkeypatch, myinstants, {f"s{i}.mp3": [http(429)] * 1000 for i in range(3)})
     with pytest.raises(updates.UpdateError):
         packs.download_links(p)
-    # LINK_GIVE_UP links refused after all their tries (a few more were already going)
-    assert len(myinstants.fetched) < n * tries
-    assert len(myinstants.fetched) <= (packs.LINK_GIVE_UP + packs.LINK_WORKERS) * tries
+    assert packs.LINK_BUSY_LIMIT <= sum(myinstants.slept)
+    most = packs.LINK_BUSY_LIMIT + 2 * packs.LINK_MAX_WAIT + packs.LINK_LAST_ROUND + 60
+    assert sum(myinstants.slept) <= most
+    assert len(myinstants.fetched) < 60
 
 
 def test_switched_off_or_turned_away_over_tor_isnt_tried_again():

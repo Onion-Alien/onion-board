@@ -57,8 +57,12 @@ MAX_LINKS = 300          # a links pack's sounds
 LINK_WORKERS = 2         # links fetched at once
 LINK_GAP = 0.5           # seconds between two links starting
 LINK_RETRY_WAITS = (2, 5, 15)   # the waits before each new try of a link that failed for now
-LINK_MAX_WAIT = 60       # the longest a "too many requests" (its Retry-After) is waited for
-LINK_GIVE_UP = 3         # links refused with "too many requests" after every try: stop there
+LINK_MAX_WAIT = 300      # the longest a "too many requests" (its Retry-After) is waited for
+# "too many requests" never makes a link give up: every link waits, longer each time the
+# site says it again (back to the first after a link comes through), and carries on
+LINK_BUSY_WAITS = (15, 30, 60, 120, 300)
+LINK_BUSY_LIMIT = 30 * 60   # ...unless it kept saying so for this long in all: blocked
+LINK_LAST_ROUND = 30     # seconds before the links that failed for now get one more round
 
 
 @dataclass(frozen=True)
@@ -832,13 +836,14 @@ def _sleep(seconds: float, cancelled: Callable[[], bool] | None = None):
 
 class _Pace:
     """Spaces a links pack's downloads out: one starts every LINK_GAP seconds at most,
-    and after Myinstants says "too many requests" every link waits as long as it asked."""
+    and after Myinstants says "too many requests" every link waits (busy())."""
 
     def __init__(self, cancelled: Callable[[], bool] | None = None):
         self.lock = threading.Lock()
         self.cancelled = cancelled
         self.next = 0.0              # the earliest the next link may start
-        self.refused: list[Exception] = []   # links refused for good: "too many requests"
+        self.level = 0               # "too many requests" since a link last came through
+        self.held = 0.0              # seconds held for it in all
 
     def wait(self):
         while not (self.cancelled is not None and self.cancelled()):
@@ -849,10 +854,23 @@ class _Pace:
                     return
             _sleep(left, self.cancelled)
 
-    def hold(self, seconds: float):
-        """No link starts for `seconds`: the site asked to slow down."""
+    def busy(self, asked: float) -> bool:
+        """The site said "too many requests": no link starts for the next of
+        LINK_BUSY_WAITS (or as long as it `asked`, if longer). False once it was held
+        LINK_BUSY_LIMIT in all: the site is blocking us, not just busy."""
         with self.lock:
-            self.next = max(self.next, time.monotonic() + seconds)
+            if self.held >= LINK_BUSY_LIMIT:
+                return False
+            wait = max(asked, LINK_BUSY_WAITS[min(self.level, len(LINK_BUSY_WAITS) - 1)])
+            self.level += 1
+            self.held += wait
+            self.next = max(self.next, time.monotonic() + wait)
+            return True
+
+    def came(self):
+        """A link came through: the next "too many requests" starts at the first wait."""
+        with self.lock:
+            self.level = 0
 
 
 def _try_again(e: Exception) -> tuple[float, bool] | None:
@@ -879,36 +897,36 @@ def _try_again(e: Exception) -> tuple[float, bool] | None:
 def _fetch_link(link: Link, dest: Path, pace: _Pace,
                 cancelled: Callable[[], bool] | None = None) -> Path:
     """One link's MP3 into `dest`, when `pace` lets it start. A failure for now (a dropped
-    connection, a busy server, "too many requests") gets up to len(LINK_RETRY_WAITS)
-    more tries, each after a longer wait; after LINK_GIVE_UP links were refused for
-    good the rest aren't asked for at all."""
+    connection, a server error) gets up to len(LINK_RETRY_WAITS) more tries, each after
+    a longer wait; "too many requests" doesn't use those up: every link waits
+    (_Pace.busy) and this one is asked for again."""
     from soundboard.online import ytdl
-    tries = len(LINK_RETRY_WAITS)
-    for attempt in range(tries + 1):
-        if len(pace.refused) >= LINK_GIVE_UP:
-            raise pace.refused[0]
+    attempt = 0
+    while True:
         pace.wait()
         if cancelled is not None and cancelled():
             raise updates.UpdateError(_("Stopped."))
         try:
-            return Path(ytdl.download_audio(link.url, dest, thumbnail=False)[0])
+            path = Path(ytdl.download_audio(link.url, dest, thumbnail=False)[0])
         except Exception as e:  # noqa: BLE001 - sorted below: tried again or given up
             again = _try_again(e)
             if again is None:
                 raise
             asked, busy = again
-            if attempt == tries:
-                if busy:
-                    with pace.lock:
-                        pace.refused.append(e)
+            if busy:
+                if not pace.busy(asked):
+                    raise
+                log.info("pack link %s: Myinstants asked to slow down", link.url)
+                continue   # pace.wait() holds it
+            if attempt == len(LINK_RETRY_WAITS):
                 raise
             wait = max(LINK_RETRY_WAITS[attempt], asked)
-            if busy:
-                pace.hold(wait)   # every link waits, not just this one
+            attempt += 1
             log.info("pack link %s failed (%s): trying again in %s s", link.url, e, wait)
             _sleep(wait, cancelled)
-    raise AssertionError("every try returns or raises")
-
+        else:
+            pace.came()
+            return path
 
 def download_links(pack: Pack, progress: Callable[[int, int], object] | None = None,
                    cancelled: Callable[[], bool] | None = None) -> tuple[Path, int]:
@@ -933,7 +951,9 @@ def download_links(pack: Pack, progress: Callable[[int, int], object] | None = N
 
     pace = _Pace(cancelled)
 
-    def one(i: int, link: Link):
+    later: list[int] = []   # links that failed for now: one more round at the end
+
+    def one(i: int, link: Link, last: bool = False):
         nonlocal done
         if cancelled is not None and cancelled():
             return
@@ -942,10 +962,15 @@ def download_links(pack: Pack, progress: Callable[[int, int], object] | None = N
         except Exception as e:  # noqa: BLE001 - gone, offline, switched off: skipped
             log.info("pack %s: skipped %s (%s)", pack.id, link.url, e)
             with lock:
-                errs.append(errors.plain(e))
+                if not last and _try_again(e) is not None:
+                    later.append(i)
+                else:
+                    errs.append(errors.plain(e))
         else:
             with lock:
                 got[i] = Path(path)
+        if last:
+            return   # counted the first time round
         with lock:
             done += 1
             n = done
@@ -957,6 +982,10 @@ def download_links(pack: Pack, progress: Callable[[int, int], object] | None = N
             (tmp / str(i)).mkdir()
         with ThreadPoolExecutor(LINK_WORKERS, thread_name_prefix="pack-link") as pool:
             list(pool.map(lambda a: one(*a), enumerate(pack.links)))
+        if later:   # nobody presses Add again for a few missing sounds: one more round
+            _sleep(LINK_LAST_ROUND, cancelled)
+            for i in sorted(later):
+                one(i, pack.links[i], last=True)
         if cancelled is not None and cancelled():
             raise updates.UpdateError(_("Stopped."))
         if not got:
