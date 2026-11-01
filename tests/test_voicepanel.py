@@ -1463,6 +1463,7 @@ def test_the_voice_thats_on_speaks_the_language_picked(panel, monkeypatch):
     monkeypatch.setattr(sp, "translating", lambda: de)
     monkeypatch.setattr(sp, "_lang_on", lambda: de)
     monkeypatch.setattr(sp.ctl.tts, "voice_for", lambda lang, prefer="": "piper:de")
+    sp.voices_need = ""                              # the AI voices add-on can read it
     p._sync_translate()
     assert asked[-1] == "read" and sp.ctl.dub is None
     assert sp.lbl_who.text() == "Thorsten, the German voice. It's on: just talk."
@@ -1493,6 +1494,7 @@ def _chinese_downloaded(sp):
     (d / "voice" / translation.VOICE_FILE).write_bytes(b"x")
     (d / "voice" / (translation.VOICE_FILE + ".json")).write_text('{"dataset": "huayan"}')
     assert zh.installed
+    sp.voices_need = ""                                # and the AI voices add-on reads it
 
 
 def test_speak_in_is_one_list_a_voice_never_turns_it_back_on(panel, monkeypatch):
@@ -2683,6 +2685,16 @@ def test_a_folded_bar_keeps_pause_and_x_on_the_names_line(panel, qapp):
         if folded:   # two lines: the name's (with pause and ✕), then the buttons
             assert pause.mapTo(bar.picked, pause.rect().topLeft()).y() < \
                 bar.btn_tweak.mapTo(bar.picked, bar.btn_tweak.rect().topLeft()).y()
+
+
+def test_languages_know_at_start_whether_their_voice_can_read(panel):
+    """Not only after a rescan: at start, with no AI voices add-on (or one without
+    reader.py), a language named its own voice and said nothing."""
+    p, _ = panel
+    m = p.ai.module
+    want = ("get" if m is None or not m.installed
+            else "update" if not (m.path / "reader.py").is_file() else "")
+    assert p.speech.voices_need == want
 
 
 def test_languages_say_when_ai_voices_is_missing_or_too_old(panel, monkeypatch, tmp_path):

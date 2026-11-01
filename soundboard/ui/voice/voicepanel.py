@@ -221,6 +221,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.ai_controller = AiVoiceController(self.chain, lambda ev: None)
         saved = speech.get("ai") if isinstance(speech, dict) else None   # may be damaged
         self.ai = AiVoicePanel(self.ai_controller, saved, self.modules, engine)
+        self._check_voices_need()
         self.ai.changed.connect(self._ai_changed)
         self.ai.changed.connect(lambda _s: self._update_bar())   # the chip names the voice
         self.ai.live_changed.connect(self._ai_live)

@@ -681,7 +681,9 @@ class PacksDialog(QDialog):
             b.deleteLater()
         self.chip_btns = {}
         for k in keys:
-            b = QPushButton(_("All") if k == ALL else _("On my board") if k == MINE else k)
+            # "TV & movies": a lone & is a shortcut marker in a button's text
+            b = QPushButton(_("All") if k == ALL else _("On my board") if k == MINE
+                            else k.replace("&", "&&"))
             b.setObjectName("filterchip")
             b.setCheckable(True)
             b.setCursor(Qt.CursorShape.PointingHandCursor)
