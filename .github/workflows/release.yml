@@ -247,6 +247,7 @@ jobs:
 
           SHA-256 (OnionBoardSetup.exe): \`$SHA\`
           $vt
+          Code signing: free certificate from SignPath Foundation (applied for; until then, Windows may warn): [code signing policy](https://onionalien.com/onionboard/code-signing/)
           EOF
           gh release create "$TAG" out/OnionBoardSetup.exe out/OnionBoardSetup-update.exe \
             out/com.onionalien.onionboard.streamDeckPlugin \
