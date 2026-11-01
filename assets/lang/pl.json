@@ -4851,7 +4851,6 @@
   "Save what you have now into “{name}”": "Zapisz obecne ustawienia w „{name}”",
   "Update “{name}”": "Aktualizuj „{name}”",
   "Update, reset or save as a new preset": "Aktualizuj, resetuj lub zapisz jako nowy preset",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Przeciągnij uchwyty, by odciąć początek i koniec. Ctrl+kółko przybliża. Przesuwaj, przeciągając prawym przyciskiem myszy albo Shift+kółkiem.",
   "Add splices": "Dodaj fragmenty",
   "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Kliknij, gdzie część się zaczyna, potem gdzie się kończy. Każda część to fragment. Esc porzuca niedokończony.",
   "Combine splices": "Połącz fragmenty",
@@ -4885,5 +4884,6 @@
   "light it up!": "Odpalaj!",
   "my sparkler's still going": "Moje zimne ognie wciąż płoną",
   "ooh! aah!": "Oooo! Aaaa!",
-  "ooh, pretty!": "Och, jak pięknie!"
+  "ooh, pretty!": "Och, jak pięknie!",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Przeciągnij uchwyty, by odciąć początek i koniec. Kliknij lub przeciągnij linijkę czasu albo przeciągnij znacznik odtwarzania, by zmienić, skąd gra. Ctrl+kółko przybliża. Przesuwaj, przeciągając prawym przyciskiem myszy albo Shift+kółkiem."
 }

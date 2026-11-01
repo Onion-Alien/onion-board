@@ -4677,7 +4677,6 @@
   "Save what you have now into “{name}”": "지금 설정을 “{name}”에 저장",
   "Update “{name}”": "“{name}” 업데이트",
   "Update, reset or save as a new preset": "업데이트, 초기화 또는 새 프리셋으로 저장",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "핸들을 끌어서 앞뒤를 잘라내세요. Ctrl+스크롤은 확대입니다. 마우스 오른쪽 버튼으로 끌거나 Shift+스크롤로 이동하세요.",
   "Add splices": "구간 추가",
   "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "부분이 시작하는 곳을 클릭한 다음 끝나는 곳을 클릭하세요. 각 부분이 구간이 돼요. Esc로 만들다 만 구간을 취소해요.",
   "Combine splices": "구간 합치기",
@@ -4709,5 +4708,6 @@
   "light it up!": "불 붙여!",
   "my sparkler's still going": "내 불꽃 막대 아직 타는 중",
   "ooh! aah!": "오오! 아아!",
-  "ooh, pretty!": "우와, 예쁘다!"
+  "ooh, pretty!": "우와, 예쁘다!",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "핸들을 끌어서 앞뒤를 잘라내세요. 시간 눈금자를 클릭하거나 끌거나, 재생 위치 선을 끌면 재생 위치가 바뀌어요. Ctrl+스크롤은 확대입니다. 마우스 오른쪽 버튼으로 끌거나 Shift+스크롤로 이동하세요."
 }

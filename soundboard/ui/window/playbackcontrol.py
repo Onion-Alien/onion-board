@@ -64,6 +64,10 @@ class PlaybackControl(Controller):
         self._wanted: dict[str, float] = {}   # sid -> when it was pressed while still loading
         self._preview_gen = 0            # newest effects preview (older renders are dropped)
         self._preview_done = None         # its done(ok) callback while it renders
+        # what each sound's preview plays: (its effects, the share of the whole it starts
+        # at and the share it covers: a long sound's is only its first part)
+        self.preview_of: dict[str, tuple[dict, float, float]] = {}
+        self._preview_info: tuple | None = None   # (gen, preview_of entry, start) of a render
         self._seeking = False
         self._chip_groups: tuple = ()   # the Now playing row's, for a new Edit sound player
         self._zero_vol_said = False   # the "Sounds volume is at 0%" toast, once per time
@@ -426,11 +430,14 @@ class PlaybackControl(Controller):
         if not mw.engine.seek(mw.current, frac):
             mw.start_frac = frac   # not playing: ▶ will start from here
 
-    def preview(self, sid, volume=None, fx=None, fades=None, done=None) -> str:
+    def preview(self, sid, volume=None, fx=None, fades=None, done=None, at: float = 0.0,
+                quiet: bool = False) -> str:
         """Play a sound to your headphones only. With `fx` (the Edit dialog's unsaved
         effects) it's rendered with those first, in the background; `fades` is the
         dialog's unsaved (fade in, fade out). Returns "playing", "rendering" (then
-        `done(ok)` is called when it plays or fails) or "missing" (not loaded)."""
+        `done(ok)` is called when it plays or fails) or "missing" (not loaded).
+        `at`: from that share (0..1) of the way through; `quiet`: no toast while it
+        renders (it follows an edit, or a drag on the waveform)."""
         mw = self.mw
         m = mw.meta(sid)
         data = mw.audio.get(sid)
@@ -441,13 +448,15 @@ class PlaybackControl(Controller):
         self._preview_fades: dict[str, Any] = {"fade_in": fade_in, "fade_out": fade_out}
         if fx is None or soundfx.key(fx) == soundfx.key(m.fx):
             self.drop_preview()   # an effects render still going mustn't play over it
+            self.preview_of[sid] = (m.fx, 0.0, 1.0)
             mw.engine.play(sid + ":preview", data, gain, mode="restart", preview=True,
-                             **self._preview_fades)
+                           start=min(max(at, 0.0), 0.999), **self._preview_fades)
             return "playing"
         self.drop_preview()
         gen = self._preview_gen
         self._preview_done = done
-        mw.toast(_("Rendering the preview…"), "busy", key="preview")
+        if not quiet:
+            mw.toast(_("Rendering the preview…"), "busy", key="preview")
 
         def answer(out):
             return (sid, out, gain, gen) if gen == self._preview_gen else worker.SKIP
@@ -456,13 +465,17 @@ class PlaybackControl(Controller):
             try:
                 src = load_original(m)
                 if len(src) > PREVIEW_WHOLE_S * SR:   # long: only what plays first
-                    part, pfx = soundfx.preview_part(src, fx, PREVIEW_S)
+                    part, pfx = soundfx.preview_part(src, fx, PREVIEW_S, at)
                     out = soundfx.render(part, pfx)
+                    kept = len(soundfx.trim(src, fx)) or 1
+                    # (one assignment: read on the UI thread with its answer)
+                    self._preview_info = (gen, (fx, at, min(1.0, len(part) / kept)), 0.0)
                 else:
                     # into the cache file for these effects: saving them afterwards
                     # finds it rendered
                     out = library.render_cached(m.id, src, fx,
                                                 cancel=lambda: gen != self._preview_gen)
+                    self._preview_info = (gen, (fx, 0.0, 1.0), at)
             except library.Cancelled:
                 return worker.SKIP   # a newer preview (or the dialog closed): nothing to play
             return answer(out)
@@ -491,9 +504,14 @@ class PlaybackControl(Controller):
         if data is None:
             mw.toast(_("Couldn't render the preview with these effects (see the log)."), "warn")
             return
+        start = 0.0
+        info = self._preview_info
+        if info is not None and info[0] == gen:
+            self.preview_of[sid], start = info[1], info[2]
         # its own id: it mustn't share the pad's resample cache or its preview voice
+        mw.engine.stop(sid + ":preview")   # (the saved one, when it moved on from that)
         mw.engine.play(sid + "~fx:preview", data, gain, mode="restart", preview=True,
-                         **getattr(self, "_preview_fades", {}))
+                       start=min(max(start, 0.0), 0.999), **getattr(self, "_preview_fades", {}))
 
     def on_live_speed(self, speed: float, pitch: float, keep: bool):
         mw = self.mw

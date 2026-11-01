@@ -397,22 +397,72 @@ def join(x: np.ndarray, splices: list[list[float]]) -> np.ndarray:
     return y
 
 
-def played_length(fx: dict | None, length: float) -> float:
-    """How long the part of a `length`-second sound that plays is, before speed."""
+def kept_parts(fx: dict | None, length: float) -> list[tuple[float, float]]:
+    """The parts of a `length`-second sound that play (seconds into the file), in the
+    order they play before Play backwards: the joined splices, or the trim."""
     f = clean(fx)
     if f["joined"]:
-        return sum(min(b, length) - min(a, length) for a, b in f["splices"])
+        parts = [(min(a, length), min(b, length)) for a, b in f["splices"]]
+        parts = [(a, b) for a, b in parts if b > a]
+        if parts:
+            return parts
     end = f["end"] if 0 < f["end"] <= length else length
-    return max(0.0, end - min(f["start"], end))
+    return [(min(max(f["start"], 0.0), end), end)]
 
 
-def preview_part(x: np.ndarray, fx: dict | None, seconds: float) -> tuple[np.ndarray, dict]:
+def time_at(fx: dict | None, length: float, frac: float) -> float:
+    """Where in the file (seconds) a sound with effects `fx` is when it has played
+    `frac` (0..1) of itself (speed stretches it evenly; effect tails aren't counted)."""
+    parts = kept_parts(fx, length)
+    frac = min(max(frac, 0.0), 1.0)
+    left = (1.0 - frac if clean(fx)["reverse"] else frac) * sum(b - a for a, b in parts)
+    for i, (a, b) in enumerate(parts):   # (where two meet: the start of the next)
+        if left < b - a or i == len(parts) - 1:
+            return a + min(left, b - a)
+        left -= b - a
+    return parts[-1][1]
+
+
+def frac_at(fx: dict | None, length: float, t: float) -> float:
+    """The share (0..1) of a sound with effects `fx` played when it's at `t` seconds into
+    the file: the inverse of time_at. A time it doesn't play goes to the start of the
+    next part that does (the first, past the last)."""
+    parts = kept_parts(fx, length)
+    total = sum(b - a for a, b in parts) or 1.0
+    before, at = 0.0, None
+    for a, b in parts:
+        if a <= t <= b:
+            at = before + t - a
+            break
+        before += b - a
+    if at is None:   # not played: from where the next part starts
+        later = [(a, i) for i, (a, _b) in enumerate(parts) if a > t]
+        i = min(later)[1] if later else 0
+        at = sum(b - a for a, b in parts[:i])
+    frac = min(max(at / total, 0.0), 1.0)
+    return 1.0 - frac if clean(fx)["reverse"] else frac
+
+
+def moved_frac(old_fx: dict | None, new_fx: dict | None, length: float, frac: float) -> float:
+    """A sound playing with `old_fx`, `frac` of the way through, goes on with `new_fx`:
+    from the same spot in the file when that still plays, else from the start of the
+    next part that does (Edit sound changed its trim or splices while it played)."""
+    return frac_at(new_fx, length, time_at(old_fx, length, frac))
+
+
+def preview_part(x: np.ndarray, fx: dict | None, seconds: float,
+                 at: float = 0.0) -> tuple[np.ndarray, dict]:
     """(the part of `x` that plays first with these effects, about `seconds` of it as
     heard, the effects to render that part with): a long sound's preview renders just
     this, not the whole sound (a 2-hour song's pitch shift took minutes before the
-    preview played). Reversed, the end plays first."""
+    preview played). Reversed, the end plays first. `at`: from that share (0..1) of
+    the way through instead of the start (the preview moved there)."""
     f = clean(fx)
     part = trim(x, f)
+    if f["reverse"]:
+        part = part[:max(1, int(round(len(part) * (1.0 - at))))]
+    else:
+        part = part[min(int(len(part) * at), max(len(part) - 1, 0)):]
     n = max(1, int(seconds * f["speed"] * SR))
     part = part[-n:] if f["reverse"] else part[:n]
     return part, dict(f, start=0.0, end=0.0, splices=[], joined=False)

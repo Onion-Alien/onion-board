@@ -4764,7 +4764,6 @@
   "Save what you have now into “{name}”": "A mostani beállítások mentése ide: „{name}”",
   "Update “{name}”": "„{name}” frissítése",
   "Update, reset or save as a new preset": "Frissítés, visszaállítás vagy mentés új előbeállításként",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Húzd a fogantyúkat az eleje és a vége levágásához. Ctrl+görgetés nagyít. Mozgatáshoz húzd a jobb egérgombbal, vagy használd a Shift+görgetést.",
   "Add splices": "Részletek kijelölése",
   "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Kattints, ahol egy rész kezdődik, aztán ahol véget ér. Minden rész egy részlet. Az Esc elengedi a félkészet.",
   "Combine splices": "Részletek összefűzése",
@@ -4797,5 +4796,6 @@
   "light it up!": "Gyújtsd meg!",
   "my sparkler's still going": "A csillagszórom még ég",
   "ooh! aah!": "Ó! Á!",
-  "ooh, pretty!": "Ó, de szép!"
+  "ooh, pretty!": "Ó, de szép!",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Húzd a fogantyúkat az eleje és a vége levágásához. Kattints vagy húzz az idővonalon, vagy húzd a lejátszási jelet, hogy máshonnan szóljon. Ctrl+görgetés nagyít. Mozgatáshoz húzd a jobb egérgombbal, vagy használd a Shift+görgetést."
 }

@@ -4764,7 +4764,6 @@
   "Save what you have now into “{name}”": "अभी की सेटिंग “{name}” में सेव करें",
   "Update “{name}”": "“{name}” अपडेट करें",
   "Update, reset or save as a new preset": "अपडेट, रीसेट या नए प्रीसेट के रूप में सेव करें",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "शुरू और आख़िर काटने के लिए हैंडल खींचें। Ctrl+स्क्रॉल से ज़ूम। आगे-पीछे जाने के लिए माउस का दायाँ बटन दबाकर खींचें, या Shift+स्क्रॉल करें।",
   "Add splices": "टुकड़े जोड़ें",
   "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "जहाँ हिस्सा शुरू हो वहाँ क्लिक करें, फिर जहाँ खत्म हो। हर हिस्सा एक टुकड़ा है। Esc अधूरा टुकड़ा छोड़ देता है।",
   "Combine splices": "टुकड़े जोड़कर चलाएँ",
@@ -4797,5 +4796,6 @@
   "light it up!": "जला दो!",
   "my sparkler's still going": "मेरी फुलझड़ी अभी जल रही है",
   "ooh! aah!": "ओह! आह!",
-  "ooh, pretty!": "वाह, कितना सुंदर!"
+  "ooh, pretty!": "वाह, कितना सुंदर!",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "शुरू और आख़िर काटने के लिए हैंडल खींचें। चलने की जगह बदलने के लिए टाइम रूलर पर क्लिक करें या खींचें, या प्लेहेड खींचें। Ctrl+स्क्रॉल से ज़ूम। आगे-पीछे जाने के लिए माउस का दायाँ बटन दबाकर खींचें, या Shift+स्क्रॉल करें।"
 }
