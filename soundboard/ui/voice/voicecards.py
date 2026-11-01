@@ -17,6 +17,7 @@ from soundboard.ui.kit import icons
 from soundboard.ui.voice import art
 from soundboard.ui.kit.panel import card, icon_button, section_label
 from soundboard.ui.voice.voicefxpanel import CUSTOM, PICKED_ART
+from soundboard.ui.voice.voicetiles import place_bar_controls
 from soundboard.i18n import _
 from soundboard.ui.kit.pixels import snap_to_pixels
 
@@ -198,9 +199,23 @@ class VoiceCards(_Panel):
                                                           self.forget_one(k)))
             h.addWidget(pause)
             h.addWidget(close)
-            panel.picked_box.addWidget(ctl, 0, Qt.AlignmentFlag.AlignVCenter
-                                       | Qt.AlignmentFlag.AlignRight)
+            # the picture, name and kind on a line of their own, which takes the pause
+            # and ✕ too when the bar folds (place_bar_controls)
+            box = panel.picked_box
+            item = box.itemAt(0)
+            name_line = item.layout() if item is not None else None
+            assert isinstance(name_line, QHBoxLayout)
+            box.removeItem(name_line)
+            name_line.setParent(None)
+            top = QHBoxLayout()
+            top.setSpacing(10)
+            top.addLayout(name_line)
+            top.addStretch(1)
+            box.insertLayout(0, top)
+            box.addWidget(ctl, 0, Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignRight)
+            panel.bar_top = top
             panel.bar_controls = ctl
+            place_bar_controls(panel)
             # dimmed while paused: the picture and the name
             dim = []
             for w in (panel.picked_pic, panel.picked_name):
@@ -217,7 +232,8 @@ class VoiceCards(_Panel):
             if key not in getattr(self, "_bar_ctl", {}):
                 continue
             pause, _close = self._bar_ctl[key]
-            is_paused = key in paused and key not in on
+            is_paused = ((self._clean_paused and not self.clean.is_on()) if key == "clean"
+                         else key in paused and key not in on)
             icons.set_icon(pause, "play" if is_paused else "pause", size=18)
             tip = (_("Paused: click to turn this voice back on") if is_paused
                    else _("Pause this voice (click again to bring it back)"))
@@ -243,13 +259,9 @@ class VoiceCards(_Panel):
         if "fx" in on:   # on again (a voice picked): ON may turn it on again
             self._fx_forgot = False
         click_off = _("Click to turn it off. Right-click to open it.")
-        # Clean mic first, as the sound goes through it: it isn't a voice, so the Voices
-        # switch leaves it alone and its chip has no grey "comes back" state
+        # Clean mic has its own bar over this one too (it isn't a voice, so the Voices
+        # switch leaves it alone)
         clean = getattr(self, "clean", None)
-        if clean is not None and clean.is_on():
-            items.append(("clean", _("Clean mic"), "on", "mic", None,
-                          _("Clean mic takes background noise out of your mic.") + " "
-                          + click_off))
         # the voice changer and an AI voice have their own bars over this one (with
         # pause and ✕), so no chip; an AI voice still starting, or failed, says so here
         if self.ai.is_on() and self.ai.status() in ("starting", "failed"):
@@ -300,6 +312,27 @@ class VoiceCards(_Panel):
         name = self.fx.preset
         shown = _("My own mix") if name == CUSTOM else voicefx.shown(name)
         return shown, art.icon(art.voice_key(name)) if name != CUSTOM else None
+
+    def _show_clean_bar(self):
+        """Clean mic's bar: its preset by name, as a voice's (Loud room (Clean mic))."""
+        from soundboard.ui.voice.cleanmicsettings import preset_names
+        from soundboard.voicefx import cleanmic
+        bar = self.clean_bar
+        preset = cleanmic.preset_of(self.clean.s)
+        name = preset_names().get(preset) or _("Custom")
+        if bar.picked_pic.pixmap().isNull():   # (it follows the theme from here)
+            icons.set_label_icon(bar.picked_pic, "mic", "text", 24)
+            bar.picked_kind.setText(_("(Clean mic)"))
+        if bar.picked_name.text() != name:
+            bar.picked_name.setText(name)
+            bar._fit_picked()
+
+    def _edit_clean(self):
+        """Clean mic's Edit: its Mic settings, open on its tab."""
+        self.show_tab("clean", asked=True)
+        self.clean.b_cog.setChecked(True)
+        QTimer.singleShot(0, self._scroll, lambda: self._scroll.ensureWidgetVisible(
+            self.clean.settings))
 
     def _show_speak_bar(self):
         """The computer voice's bar: the voice that speaks (a voice server's, with its

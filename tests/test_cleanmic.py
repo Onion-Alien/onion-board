@@ -373,16 +373,50 @@ def test_a_strong_preset_offers_the_download_first(panel, monkeypatch):
     assert c.s["auto_sense"] is False and c.s["sense_db"] == -50
 
 
-def test_its_chip_shows_and_turns_it_off_and_voices_leave_it_alone(panel):
+def test_its_bar_shows_pauses_and_goes_and_voices_leave_it_alone(panel):
+    """Clean mic has a bar as a voice does (its preset by name, "(Clean mic)", Edit, a
+    pause and a ✕), not a chip; the Voices switch leaves it alone."""
     p, _saved = panel
+    b = p.clean_bar
+    p.resize(1000, 600)
+    p.show()
+    p.show_tab("fx")
+    assert b.picked.isHidden()
     p.clean.b_on.click()
-    assert "Clean mic" in p.bar.texts()
+    assert not b.picked.isHidden() and "clean" not in p.bar.chips   # a bar, no chip
+    assert (b.picked_name.text(), b.picked_kind.text()) == ("Normal", "(Clean mic)")
+    assert b.btn_tweak.text() == "Edit" and b.btn_effects.isHidden()   # not a voice
+    assert not b.picked_pic.pixmap().isNull()
     p.set_voices(False)                       # the Voices switch: a voice thing only
     p.set_voices(True)
-    assert p.clean.is_on()
-    p.toggle_one("clean")                     # its chip clicked
+    assert p.clean.is_on() and not b.picked.isHidden()
+    pause, close = p._bar_ctl["clean"]
+    pause.click()                             # off, its bar kept, dimmed
     assert not p.clean.is_on() and not p.chain.clean_on
-    assert "Clean mic" not in p.bar.texts()
+    assert not b.picked.isHidden() and "back on" in pause.toolTip()
+    assert p._bar_dim["clean"][0].opacity() < 1
+    assert p.current_tab() == "fx"            # a click doesn't jump tabs
+    pause.click()                             # ...and back on
+    assert p.clean.is_on() and p._bar_dim["clean"][0].opacity() == 1
+    close.click()                             # its ✕: off, and its bar goes
+    assert not p.clean.is_on() and b.picked.isHidden()
+    p.clean.b_on.click()                      # on, off again on its card: no paused bar
+    p.clean.b_on.click()
+    assert b.picked.isHidden()
+    p.clean.b_on.click()
+    p.clean.settings.agc.click()              # its own settings: Custom, by name
+    assert b.picked_name.text() == "Custom"
+
+
+def test_its_bar_edit_opens_mic_settings_on_its_tab(panel):
+    p, _saved = panel
+    p.resize(1000, 600)
+    p.show()
+    p.show_tab("ai")
+    p.clean.b_on.click()
+    assert p.clean.settings.isHidden()
+    p.clean_bar.btn_tweak.click()
+    assert p.current_tab() == "clean" and not p.clean.settings.isHidden()
 
 
 def test_it_comes_back_on_from_last_time(qapp, monkeypatch, fake):

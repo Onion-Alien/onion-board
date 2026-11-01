@@ -182,8 +182,18 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.clean = CleanMicPanel(self.chain, engine,
                                    speech.get("clean") if isinstance(speech, dict) else None)
         self.clean.changed.connect(self._clean_changed)
-        self.clean.live_changed.connect(lambda _on: self._update_heads())
+        self.clean.live_changed.connect(self._clean_live)
         self._section("clean", self.clean, self.clean.title, self.clean.head)
+        # its bar, as a voice's: its preset by name, and Edit for its Mic settings (no
+        # Effects: it isn't a voice). Its pause turns it off with the bar kept, dimmed
+        from soundboard.ui.voice.voicebar import VoiceBar
+        self.clean_bar = VoiceBar(self.clean, self.clean.is_on, effects=False)
+        self.clean_bar.btn_tweak.setText(_("Edit"))   # (not a voice: "Edit voice" was wrong)
+        self.clean_bar.btn_tweak.setToolTip(_("Input volume, sensitivity, noise suppression "
+                                              "and gain control"))
+        self.clean_bar.edit_wanted.connect(self._edit_clean)
+        self._clean_paused = False
+        self._show_clean_bar()
 
         # the voice changer. It always starts off (the voice you picked is kept):
         # left on from last time, it changed your mic the moment the app opened.
@@ -315,8 +325,9 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
                 (45, "h", self._pin_picked_off)]
 
     def _barred(self):
-        """The cards with a picked voice's bar: (tab key, panel)."""
-        bars = (("fx", self.fx), ("ai", self.ai))
+        """The cards with a picked voice's bar: (tab key, panel). Clean mic's first, as
+        the sound goes through it."""
+        bars = (("clean", self.clean_bar), ("fx", self.fx), ("ai", self.ai))
         speak = getattr(self, "speak_bar", None)   # (made after the other cards)
         return bars + (("speak", speak),) if speak is not None else bars
 

@@ -73,6 +73,12 @@ class VoiceSwitch(_Panel):
     def _clean_changed(self, s: dict):
         self.speech.s["clean"] = s         # kept with the speech settings
         self.speech_changed.emit(dict(self.speech.s))
+        self._show_clean_bar()             # (its preset's name)
+
+    def _clean_live(self, on: bool):
+        if on:                             # on again, from its card: no longer paused
+            self._clean_paused = False
+        self._update_heads()
 
     def _ai_changed(self, s: dict):
         self.speech.s["ai"] = s            # kept with the speech settings
@@ -175,8 +181,10 @@ class VoiceSwitch(_Panel):
         """A status bar chip clicked: that one goes off (remembered, its chip stays
         grey), or a grey one comes back on."""
         usage.used("voice-chip-toggle")
-        if key == "clean":   # not a voice: just off (its chip goes, as with ✕)
-            self.clean.set_on(False)
+        if key == "clean":   # not a voice: Voices ON leaves it alone. Its bar's pause: off,
+            on = not self.clean.is_on()   # the bar kept, dimmed, to turn it back on
+            self._clean_paused = not on
+            self.clean.set_on(on)
             self._update_heads()
             return
         before = self.on_keys()
@@ -200,6 +208,7 @@ class VoiceSwitch(_Panel):
     def forget_one(self, key: str):
         """A chip's ✕: that one goes off, and Voices ON won't bring it back."""
         if key == "clean":
+            self._clean_paused = False   # (its bar goes too)
             self.clean.set_on(False)
         # (else its chip came straight back as the voice ON turns on: a dead ✕)
         self._fx_forgot = self._fx_forgot or key == "fx"

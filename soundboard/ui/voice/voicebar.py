@@ -1,8 +1,9 @@
 """A voice's bar for a voice without a cards panel of its own to carry one (the
-computer voice): the same as the voice changer's and the AI voice's bars, pinned under
-the Voice tab's cards while it's on. Its picture, its name and what kind of voice it
-is, Effects (the voice changer's pop-up: one list for every bar) and Edit voice; the
-Voice tab adds the pause and ✕ (VoicePanel._make_bar_controls).
+computer voice, Clean mic): the same as the voice changer's and the AI voice's bars,
+pinned under the Voice tab's cards while it's on. Its picture, its name and what kind of
+voice it is, Effects (the voice changer's pop-up: one list for every bar; none for Clean
+mic, which isn't a voice) and Edit voice; the Voice tab adds the pause and ✕
+(VoicePanel._make_bar_controls).
 
 It has what VoicePanel reads from a barred panel (`picked`, `picked_box`,
 `picked_pic`, `picked_name`, `show_picked_row`, `set_paused`, `layout()`: the card it
@@ -19,13 +20,14 @@ from soundboard.i18n import _
 from soundboard.ui.kit import icons
 from soundboard.ui.kit.panel import Flow
 from soundboard.ui.voice.voicefxpanel import PICKED_ART
+from soundboard.ui.voice.voicetiles import place_bar_controls
 
 
 class VoiceBar(QObject):
     effects_wanted = Signal()
     edit_wanted = Signal()
 
-    def __init__(self, home: QWidget, is_on: Callable[[], bool]):
+    def __init__(self, home: QWidget, is_on: Callable[[], bool], effects: bool = True):
         super().__init__(home)
         self.home, self._is_on = home, is_on
         self._paused = False
@@ -59,7 +61,11 @@ class VoiceBar(QObject):
         self.btn_effects.setToolTip(_("Rain, a crowd, an echo or sounds from your board, on "
                                       "top of any voice"))
         self.btn_effects.clicked.connect(lambda: self.effects_wanted.emit())
-        bflow.addWidget(self.btn_effects)
+        if effects:
+            bflow.addWidget(self.btn_effects)
+        else:
+            self.btn_effects.setParent(self.picked)   # (a parent: never a window of its own)
+            self.btn_effects.hide()
         self.btn_tweak = QPushButton(_("Edit voice"))
         icons.set_icon(self.btn_tweak, "sliders")
         self.btn_tweak.clicked.connect(lambda: self.edit_wanted.emit())
@@ -103,12 +109,20 @@ class VoiceBar(QObject):
         need = (sum(b.sizeHint().width() for b in btns) + 10 * max(0, len(btns) - 1))
         m = box.contentsMargins()
         line = self.picked.width() - m.left() - m.right() - self._bar_extra()
-        beside = (line - PICKED_ART - min(self.picked_name.sizeHint().width(), 140)
+        # the name on one line ("Quiet room" wrapped onto two beside the buttons: a
+        # wrapping label asks for less than its words)
+        name = self.picked_name
+        one_line = min(name.fontMetrics().horizontalAdvance(name.text()) + 2, 140)
+        beside = (line - PICKED_ART - one_line
                   - self.picked_kind.sizeHint().width() - 3 * box.spacing())
         want = (QBoxLayout.Direction.LeftToRight if need <= beside
                 else QBoxLayout.Direction.TopToBottom)
         if box.direction() != want:
             box.setDirection(want)
+        place_bar_controls(self)
+        name.setMinimumWidth(max(40, min(one_line, line - PICKED_ART
+                                         - self.picked_kind.sizeHint().width()
+                                         - 2 * box.spacing())))
         self._picked_btns.setMinimumWidth(
             need if want == QBoxLayout.Direction.LeftToRight else 0)
 

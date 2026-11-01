@@ -37,7 +37,8 @@ from soundboard.ui.voice.fxcontrols import _enable
 from soundboard.ui.voice.fxcontrols import ParamSlider, Switch, param_text  # noqa: F401
 from soundboard.ui.voice.voicetiles import (ALL, CUSTOM, FAVS, GROUP_ICONS, LIST_MIN_W, MAX_COLS,
                                             MINE, PICKED_ART, TILE_ART, TILE_GAP, TILE_MIN_W,
-                                            VOICE_GROUPS, VOICE_ICONS, BigSwitch, VoiceTile)
+                                            VOICE_GROUPS, VOICE_ICONS, BigSwitch, VoiceTile,
+                                            place_bar_controls)
 from soundboard.ui.voice.voicetiles import voice_group  # noqa: F401  (the tests import it from here)
 from soundboard.ui.voice.effectrow import (ADDON_GROUP, GROUPS, HERO, KEEP, MAIN_TAB, EffectRow,
                                            on_top)
@@ -872,6 +873,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
                 tries[-1])
             if self.picked_box.direction() != want:
                 self.picked_box.setDirection(want)
+            place_bar_controls(self)
             for b, text in ((tw, t_text), (tb, b_text)):
                 if b.text() != text:
                     b.setText(text)
