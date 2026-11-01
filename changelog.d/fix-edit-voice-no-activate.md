@@ -1,0 +1,1 @@
+- Voice changer: Edit voice on a voice card opens the editor for that voice without turning it on; the voice you had on (or none) stays as it was.

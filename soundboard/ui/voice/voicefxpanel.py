@@ -142,6 +142,9 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         # Fine-tune holds your own mix, not a preset you nudged (that shows as Custom
         # too, but mustn't replace the mix you made)
         self._own = self._preset == CUSTOM and self._custom == effects
+        # Edit voice on a card that isn't on: the editor shows that voice while the
+        # mic keeps what was on (or nothing). What was on, kept here till it closes.
+        self._preview: dict | None = None
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(12)
@@ -488,11 +491,16 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
     # ------------------------------------------------------------------ public
     @property
     def preset(self) -> str:
-        return self._preset
+        """The voice the mic has (not one Edit voice is only showing)."""
+        return self._live()[1]
 
     def pick(self, name: str):
         """Choose a voice (a preset name or CUSTOM) and turn the changer on. Your own
         mix is kept aside while a preset is on, and comes back with "My own mix"."""
+        self._end_preview()
+        self._load_voice(name)
+
+    def _load_voice(self, name: str):
         mine = self._mine()
         if mine and name != CUSTOM:
             self._custom = {t: r.state() for t, r in self.rows.items()}
@@ -526,6 +534,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
     def use_mix(self, effects: dict):
         """Turn the changer on with these effects as your own mix (a setup made from a
         voice that's gone since), without opening Edit voice."""
+        self._end_preview()
         rows = {t: r for t, r in self.rows.items() if t not in KEEP}
         for t, r in rows.items():
             r.load(effects.get(t))
@@ -543,11 +552,17 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
 
     def is_blank(self) -> bool:
         """No voice at all to turn on: your own mix with nothing in it (`clear_mix`)."""
+        if self._preview is not None:   # (the mic's voice, not the one being edited)
+            snap = self._live_snap()
+            return (snap["preset"] == CUSTOM and not snap["extras"] and not any(
+                isinstance(e, dict) and e.get("on") for e in snap["rows"].values()))
         return (self._preset == CUSTOM and not self._extras and not any(
             r.chk.isChecked() for r in self.rows.values()))
 
     def snapshot(self) -> dict:
         """Everything `clear_mix` throws away, for `restore` (its Undo)."""
+        if self._preview is not None:
+            return self._live_snap()
         return {"rows": {t: r.state() for t, r in self.rows.items()},
                 "extras": {t: dict(c) for t, c in self._extras.items()},
                 "custom": dict(self._custom), "preset": self._preset, "own": self._own,
@@ -568,6 +583,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
     def clear_mix(self):
         """A fresh start: off, with no effects at all (your own mix emptied too, and
         what's on top of the voice)."""
+        self._end_preview()
         for r in self.rows.values():
             r.load(None)
         self._extras = {}
@@ -710,11 +726,42 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         return added
 
     def edit_voice(self, name: str):
-        """A voice card's right-click Edit voice: that voice on, and its editor open."""
+        """A voice card's right-click Edit voice: its editor open on that voice. The
+        voice that's on stays on (none on: none), until you pick one yourself."""
         usage.used("voice-edit-menu")
-        if not (self.btn_power.isChecked() and self._preset == name):
-            self.pick(name)
+        if self._live() == (True, name):
+            self._end_preview()   # the voice that's on: edit it live, as Edit voice does
+        else:
+            if self._preview is None:
+                self._preview = {"snap": self.snapshot(), "spec": self.spec()}
+            self._load_voice(name)
         self.open_tweak()
+
+    def _live(self) -> tuple[bool, str]:
+        """What the mic has: the changer on or off, and its voice."""
+        if self._preview is not None:
+            return self._preview["snap"]["on"], self._preview["snap"]["preset"]
+        return self.btn_power.isChecked(), self._preset
+
+    def _live_snap(self) -> dict:
+        """The voice the mic has while Edit voice shows another, with your mic clean-up
+        and what's on top as they are now (those aren't the voice: they apply live)."""
+        assert self._preview is not None
+        snap = dict(self._preview["snap"])
+        snap["rows"] = {**snap["rows"], **{t: r.state() for t, r in self.rows.items()
+                                           if t in KEEP}}
+        snap["extras"] = {t: dict(c) for t, c in self._extras.items()}
+        return snap
+
+    def _end_preview(self):
+        """Back to the voice the mic has: Edit voice closed, or a voice picked."""
+        if self._preview is None:
+            return
+        snap = self._live_snap()
+        self._preview = None
+        self._clear_fresh()
+        self.restore(snap)
+        self._mark_start()
 
     def _show_edit_state(self):
         """Edit voice's top line and footer: the voice you're changing (", changed" once
@@ -825,6 +872,9 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
 
     def _tweak_closed(self, _result=0):
         self._clear_fresh()
+        if self._preview is not None:
+            self._end_preview()
+            return
         self._emit()   # its size goes into the settings, for next time
 
     def hideEvent(self, e):
@@ -904,12 +954,21 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         return self._preset == CUSTOM and (self._own or not made)
 
     def spec(self) -> dict:
+        if self._preview is not None:   # the mic keeps what it had, not the editor's
+            live, snap = self._preview["spec"], self._live_snap()
+            effects = {**snap["rows"], **snap["extras"]}
+            custom = effects if live["custom"] is live["effects"] else live["custom"]
+            return {**live, "enabled": snap["on"], "effects": effects, "custom": custom,
+                    **self._view_spec()}
         effects = {t: r.state() for t, r in self.rows.items()}
         effects.update({t: dict(c) for t, c in self._extras.items()})
         return {"enabled": self.btn_power.isChecked(), "preset": self._preset,
                 "effects": effects,
                 "custom": effects if self._mine() else self._custom,
-                **({"favorites": list(self._favs)} if self._favs else {}),
+                **self._view_spec()}
+
+    def _view_spec(self) -> dict:
+        return {**({"favorites": list(self._favs)} if self._favs else {}),
                 **({"panel_size": [self._dlg_size.width(), self._dlg_size.height()]}
                    if self._dlg_size else {})}
 
@@ -919,11 +978,16 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
 
     # ------------------------------------------------------------------ internals
     def _on_power(self, on: bool):
+        if self._preview is not None:
+            self._preview["snap"]["on"] = on
         self._refresh()
         self._emit()
 
-    def _count_on(self) -> int:
+    def _count_on(self, rows: dict | None = None) -> int:
         # the voice's own effects: what's on top of it is Effects' count
+        if rows is not None:   # (a snapshot's)
+            return sum(bool(isinstance(e, dict) and e.get("on")) for t, e in rows.items()
+                       if t in self.rows and t not in HERO and not on_top(t))
         return sum(r.chk.isChecked() for t, r in self.rows.items()
                    if t not in HERO and not on_top(t))
 
@@ -948,16 +1012,21 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
             lay.activate()
 
     def _refresh(self):
-        on = self.btn_power.isChecked()
+        on, live = self._live()
+        if self.btn_power.isChecked() != on:   # (Edit voice's own picks don't turn it on)
+            self.btn_power.blockSignals(True)
+            self.btn_power.setChecked(on)
+            self.btn_power.blockSignals(False)
         self.btn_power.setText(_("On") if on else _("Off"))
         self.btn_power.setAccessibleName(POWER_TEXT[on])
         self._show_picked()
         # only a voice that's actually in use is highlighted
         self.tiles.setExclusive(False)
         for name, b in self._tile.items():
-            b.setChecked(on and name == self._preset)
+            b.setChecked(on and name == live)
         self.tiles.setExclusive(True)
-        n = self._count_on()
+        n = self._count_on(self._preview["snap"]["rows"] if self._preview is not None
+                           else None)
         self._tweak_text = (ngettext("Edit voice  ·  {n} on", "Edit voice  ·  {n} on", n)
                             if n else _("Edit voice"))
         self.btn_tweak.setText(self._tweak_text)   # (_fit_picked may shorten it)
@@ -981,7 +1050,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         if room is not None:
             self._picked_room = room
         self.picked.setVisible(getattr(self, "_picked_room", True)
-                               and (self.btn_power.isChecked()
+                               and (self._live()[0]
                                     or getattr(self, "_paused", False)))
 
     def set_paused(self, paused: bool):
@@ -998,7 +1067,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
     def _show_picked(self):
         """The bar under the cards: the voice that's on, by name."""
         self.show_picked_row()
-        name = self._preset
+        name = self._live()[1]
         shown = _("My own mix") if name == CUSTOM else voicefx.shown(name)
         pm = art.pixmap(art.voice_key(name), PICKED_ART) if name != CUSTOM else None
         if pm is None:
@@ -1013,7 +1082,8 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
             self._emit()
             return
         self._preset = CUSTOM
-        if not self.btn_power.isChecked() and any(r.chk.isChecked() for r in self.rows.values()):
+        if (self._preview is None and not self.btn_power.isChecked()
+                and any(r.chk.isChecked() for r in self.rows.values())):
             self.btn_power.blockSignals(True)
             self.btn_power.setChecked(True)   # touching an effect means you want it on
             self.btn_power.blockSignals(False)
