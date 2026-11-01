@@ -899,6 +899,7 @@ class EditControl(Controller):
                 now = self._preview_playing(sid)
                 frac, fx = (None, {}) if now is None else (now[1], now[2][0])
             d.effects.trim.show_playing(frac, fx)
+            d.bun.set_playing(frac is not None)   # Bun mixes along while it plays
 
     # ------------------------------------------------------------ renders in flight
     def rendering(self, sid: str) -> Render | None:

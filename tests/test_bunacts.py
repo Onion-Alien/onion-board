@@ -117,3 +117,47 @@ def test_in_the_bin_nothing_of_him_is_drawn_below_the_rim(qapp, monkeypatch):
             assert clips[-1] is not None and clips[-1].bottom() <= rim + 0.5
         else:
             assert clips[-1] is None or clips[-1].bottom() >= r.bottom()
+
+
+def test_edit_bun_sits_at_his_desk_mixes_while_it_plays_and_goes_off_to_work(qapp):
+    from soundboard.ui.bun import bunskits
+    b = bunacts.EditBunny()
+    b._step_fidget(time.monotonic())
+    kit = Kit()
+    b._frame(kit, 0.0)
+    assert kit.world and not kit.pose.get("nod")   # at the desk, still
+    b.set_playing(True)
+    b._phase = 0.25
+    kit, mix = Kit(), Kit()
+    b._frame(kit, 0.0)
+    bunskits.mixing(mix, 0.25)
+    assert kit.pose == mix.pose                    # mixing along
+    b.busy(bunacts.SNIP)
+    assert b._task is not None and b._task[0] is bunacts.SNIP
+    b.busy(bunacts.KNOB)                           # (the desk still going down)
+    assert b._task[0] is bunacts.KNOB
+    task = b._task
+    b._step_fidget(b._task_end(task) + bunacts.AWAY + 0.01)
+    assert b._task is None                         # done: back at the desk
+
+
+def test_bin_hand_rips_throws_and_peels_with_the_callbacks_in_order(qapp):
+    from PySide6.QtCore import QPointF, QRect
+    from PySide6.QtGui import QPixmap
+    from PySide6.QtWidgets import QWidget
+    from soundboard.ui.bun import binhand
+    host = QWidget()
+    host.resize(400, 300)
+    hand = binhand.BinHand(host, lambda: QPointF(60, 60))
+    for kind, secs in (("throw", binhand.THROW_S), ("peel", binhand.PEEL_S)):
+        said = []
+        pic = QPixmap(120, 14)
+        getattr(hand, kind)(pic, QRect(20, 150, 120, 14), lambda said=said: said.append("grab"),
+                            lambda said=said: said.append("rip"))
+        for t in [i * secs / 30 for i in range(31)]:
+            hand._at = time.monotonic() - t
+            hand._tick()
+            if hand.playing:
+                hand.grab()   # every frame draws
+        assert said == ["grab", "rip"] and not hand.playing
+    hand.finish()

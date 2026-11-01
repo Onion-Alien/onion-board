@@ -5,8 +5,8 @@ then a one-off, `play`) the way the Live controls' DJ does (speedpitch.DjBunny).
   faster or slower and its pitch stretches him up or squashes him (`ActBunny.tune`).
 - Record a sound: the mic in his paw (he talks along with the level, BunnyWidget) and
   `rec_light`, a red light blinking on his ear cup while it records; `mic_check` idle.
-- Recently deleted: `in_bin`, peeking out of a bin; `bring_back` throws a sound tile up
-  out of it, `bye` waves one off for good.
+- Recently deleted: `in_bin`, peeking out of a bin; `bring_back` / `bye` while his long
+  arm (ui/bun/binhand.py) rips a row out and throws it, or peels it off like a sticker.
 - Free sound packs: `box_pat` beside a parcel, `box_run` running with it while a pack
   downloads, `box_open` when it lands: notes fly out.
 - What's new: `present`, he unwraps a present and a star pops out.
@@ -24,11 +24,12 @@ from collections.abc import Callable
 from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import QColor, QPainter, QPainterPath, QPen
 
+from soundboard.ui.bun import bunskits
 from soundboard.ui.bun.bunny import music_note
 from soundboard.ui.bun.bunnywidget import BunnyWidget
 from soundboard.ui.bun.bunprops import _star
 from soundboard.ui.bun.bunskitkit import (Kit, _ink, _oval, _sparkles, bump, burst, eseg,
-                                          held, lerp, mark, paw, puff, seg)
+                                          held, lerp, paw, puff, seg)
 from soundboard.ui.kit import theme
 from soundboard.ui.settings import lite
 
@@ -152,19 +153,76 @@ def _scissors(p: QPainter, x: float, y: float, open_: float, k: float):
     paw(p, x + 8, y + 7, 15)
 
 
+def desk(kit: Kit, t: float, away: float = 0.0):
+    """Edit sound with nothing playing: Bun sits still behind the Live controls' DJ desk
+    (bunskits.mixing's), paws on it. `away` 0..1: the desk going down out of the way."""
+    kit.prop = ""
+    kit.world.append(lambda p: _desk_at(p, away))
+    if away < 0.5:
+        kit.world.append(lambda p: paw(p, 27, 100 + 10 * away, -10))
+        kit.world.append(lambda p: paw(p, 66, 101 + 10 * away, 10))
+
+
+def _desk_at(p: QPainter, away: float):
+    if away >= 1:
+        return
+    p.save()
+    p.translate(0, 24 * away)
+    p.setOpacity(1 - away)
+    bunskits._desk(p, 0.0, -1, 0.0, 0.0)
+    p.restore()
+
+
+KNOB_LOOP = 1.6
+
+
+def tweak(kit: Kit, t: float):
+    """Edit sound, a speed / pitch / effect change: he twists a big knob with both paws."""
+    t %= KNOB_LOOP
+    kit.prop = ""
+    turn = 50 * math.sin(t / KNOB_LOOP * 2 * math.pi)
+    kit.world.append(lambda p: _knob(p, turn))
+    a = math.radians(turn)
+    kit.world.append(lambda p: paw(p, 50 - 13 * math.cos(a), 103 - 13 * math.sin(a), -20))
+    kit.world.append(lambda p: paw(p, 50 + 13 * math.cos(a), 103 + 13 * math.sin(a), 20))
+    kit.add(nod=turn / 12, dip=1.5)
+    kit.world.append(lambda p: _sparkles(p, t - 0.7, 70, 92, n=4, life=0.6, salt=21))
+
+
+def _knob(p: QPainter, turn: float):
+    p.save()
+    p.setPen(_ink(1.6))
+    p.setBrush(QColor("#3a3452"))
+    p.drawRoundedRect(QRectF(30, 110, 40, 9), 3, 3)   # its little stand
+    _oval(p, 50, 103, 26, 26, _accent(), _ink(1.6))
+    _oval(p, 50, 103, 18, 18, QColor("#2b2340"))
+    p.translate(50, 103)
+    p.rotate(turn)
+    p.setPen(QPen(QColor("#ffcf40"), 2.6, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+    p.drawLine(QPointF(0, -2), QPointF(0, -8))   # the pointer
+    p.restore()
+
+
 # ---------------------------------------------------------------------- Record a sound
 MIC_LOOP = 4.5
 
 
 def mic_check(kit: Kit, t: float):
-    """Record a sound, waiting: now and then he leans to the mic and taps it."""
+    """Record a sound, waiting: a mic check. He leans in and mouths "one, two... one,
+    two" into the mic (his mouth is the main thing moving), a ring off the mic on each
+    word, then sits back and listens."""
     t %= MIC_LOOP
-    lean = held(t, 2.2, 3.4, 0.25)
-    kit.add(nod=7 * lean, dip=1.5 * lean)
-    for at in (2.6, 2.9):   # two taps: a little jolt and a ring off the mic
-        kit.add(dy=-1.2 * bump(t, at, at + 0.12))
-        kit.world.append(lambda p, at=at: _ring(p, seg(t, at, at + 0.5)))
-    kit.world.append(lambda p: mark(p, 88, 22, "?", held(t, 3.0, 3.9, 0.15)))
+    lean = held(t, 0.3, 3.3, 0.3)
+    kit.add(nod=6 * lean, dip=1.5 * lean)
+    for at in _WORDS:   # each word: the mouth opens and shuts, a little nod with it
+        say = bump(t, at, at + 0.32)
+        kit.most(mouth=0.9 * say)
+        kit.add(dy=-1.0 * say, nod=2 * say)
+        kit.world.append(lambda p, at=at: _ring(p, seg(t, at + 0.05, at + 0.6)))
+    kit.most(blink=held(t, 3.6, 4.1, 0.1))   # listening back, eyes shut
+
+
+_WORDS = (0.6, 1.05, 1.9, 2.35)   # "one, two ... one, two"
 
 
 def _ring(p: QPainter, k: float):
@@ -186,7 +244,7 @@ def rec_light(kit: Kit, t: float):
     t %= REC_LOOP
     on = held(t, 0.0, 0.7, 0.08)
     kit.add(ears=-5)
-    kit.front.append(lambda p: _rec(p, on))
+    kit.front.append(lambda p: _rec(p, on))   # (his mouth: the mic level, BunnyWidget)
 
 
 def _rec(p: QPainter, on: float):
@@ -219,40 +277,29 @@ def in_bin(kit: Kit, t: float):
 
 
 def bring_back(kit: Kit, t: float):
-    """Recently deleted, Bring back: he pops up and throws a sound tile up out of the bin."""
+    """Recently deleted, Bring back: his arm's out of the bin over the window
+    (ui/bun/binhand.py, which times this). He leans to the list, strains as he rips the
+    row out, and throws it back over his head; a happy blink."""
     kit.prop = ""
-    pop = bump(t, 0.0, 0.7)
-    kit.add(dy=_IN - 10 * pop, ears=-10 * pop)
-    kit.most(mouth=0.5 * held(t, 0.1, 0.9, 0.1), blink=held(t, 0.9, 1.4, 0.1))
-    k = seg(t, 0.3, 1.4)
-    if 0 < k < 1:
-        x, y = lerp(80, 96, k), 90 - 80 * k + 50 * k * k
-        kit.world.append(lambda p: _tile(p, x, y, k * 200, 1 - eseg(k, 0.75, 1)))
-    throw = held(t, 0.05, 0.5, 0.1)
-    if throw:
-        kit.world.append(lambda p: paw(p, lerp(72, 84, throw), lerp(94, 80, throw), 20))
+    lean = held(t, 0.0, 1.3, 0.3)
+    strain = held(t, 0.62, 1.25, 0.1)
+    throw = bump(t, 1.3, 1.75)
+    kit.add(dy=_IN - 3 * strain, dip=3 * lean, nod=7 * lean - 10 * throw,
+            ears=-8 * strain + 16 * throw)
+    kit.most(mouth=0.6 * strain + 0.8 * throw, blink=held(t, 1.8, 2.25, 0.1))
     kit.world.append(_bin)
-    kit.world.append(lambda p: _sparkles(p, t - 0.9, 90, 60, n=7, life=0.7, salt=11))
 
 
 def bye(kit: Kit, t: float):
-    """Recently deleted, Delete for good: a puff over the bin and he waves it off."""
+    """Recently deleted, Delete for good: he leans out, peels the row off like a sticker
+    with his long arm (ui/bun/binhand.py) and drops it in the bin; a smug look."""
     kit.prop = ""
-    kit.add(dy=_IN)
-    wave = held(t, 0.3, 1.8, 0.2)
-    if wave:
-        swing = 14 * math.sin(t * 11) * wave
-        kit.world.append(lambda p: paw(p, 76 + 0.2 * swing, lerp(96, 66, wave), swing))
-    kit.most(blink=held(t, 0.5, 1.6, 0.15))
-    kit.add(nod=-4 * wave)
+    lean = held(t, 0.0, 1.5, 0.3)
+    peel = held(t, 0.62, 1.45, 0.1)
+    drop = bump(t, 1.9, 2.2)
+    kit.add(dy=_IN + 4 * drop, dip=3 * lean, nod=6 * lean + 3 * math.sin(t * 9) * peel)
+    kit.most(mouth=0.3 * peel, smug=held(t, 1.6, 2.3, 0.15))
     kit.world.append(_bin)
-    for i in range(5):   # the puff it goes up in
-        a = i * 1.26
-        k = seg(t, 0.0, 0.9)
-        if 0 < k < 1:
-            kit.world.append(lambda p, a=a, k=k: puff(
-                p, 82 + 12 * math.cos(a) * k, 34 + 8 * math.sin(a) * k - 10 * k,
-                4 + 5 * k, 1 - k))
 
 
 def _bin(p: QPainter):
@@ -271,20 +318,6 @@ def _bin(p: QPainter):
     p.setPen(_ink(1.8))
     p.setBrush(BIN_HI)
     p.drawRoundedRect(QRectF(5, 90, 90, 8), 4, 4)   # the rim
-
-
-def _tile(p: QPainter, x: float, y: float, turn: float, alpha: float):
-    if alpha <= 0:
-        return
-    p.save()
-    p.setOpacity(alpha)
-    p.translate(x, y)
-    p.rotate(turn)
-    p.setPen(_ink(1.3))
-    p.setBrush(_accent())
-    p.drawRoundedRect(QRectF(-7, -7, 14, 14), 3.5, 3.5)
-    music_note(p, -4.5, -6, 0.75, QColor("#ffffff"))
-    p.restore()
 
 
 # ---------------------------------------------------------------------- Free sound packs
@@ -521,13 +554,78 @@ SNIP: Act = (SNIP_LOOP, snipping)
 MIC: Act = (MIC_LOOP, mic_check)
 RECORDING: Act = (REC_LOOP, rec_light)
 BIN_ACT: Act = (BIN_LOOP, in_bin)
-BRING_BACK: Act = (1.6, bring_back)
-BYE: Act = (1.9, bye)
+BRING_BACK: Act = (2.7, bring_back)
+BYE: Act = (2.3, bye)
 PAT: Act = (PAT_LOOP, box_pat)
 RUN: Act = (RUN_LOOP, box_run)
 OPEN: Act = (2.1, box_open)
 GIFT: Act = (GIFT_LOOP, present)
+DESK: Act = (bunskits.MIX_LOOP, desk)
+KNOB: Act = (KNOB_LOOP, tweak)
 IN_BIN = (BIN_ACT, BRING_BACK, BYE)   # the acts he's in the bin for
 # lite mode's still picture of each loop: the moment that shows what he's doing
-STILL: dict[Act, float] = {SNIP: 0.9, MIC: 0.0, RECORDING: 0.3, BIN_ACT: 0.0, PAT: 0.0,
+STILL: dict[Act, float] = {DESK: 0.0, SNIP: 0.9, MIC: 0.0, RECORDING: 0.3, BIN_ACT: 0.0, PAT: 0.0,
                            RUN: 0.0, GIFT: 2.6}
+
+
+AWAY = 0.35   # seconds: the desk going down out of his way, or coming back up
+LONGEST = {SNIP: 2.4, KNOB: 1.6}   # an action plays at least this long (one cut, a twist)
+LINGER = 0.7  # ... and this long after the last change (a drag keeps him at it)
+
+
+class EditBunny(ActBunny):
+    """Edit sound's Bun, behind the Live controls' DJ desk: mixing to the beat while the
+    sound plays (`set_playing`), sitting still behind it while it doesn't. A change
+    (`busy`): he puts the desk away, snips (the trim) or twists a knob (anything else)
+    for as long as the changes keep coming, then the desk comes back."""
+
+    def __init__(self, parent=None):
+        super().__init__(DESK, parent=parent)
+        self.playing = False
+        self._task: list | None = None   # [act, started, last change]
+
+    def set_playing(self, on: bool):
+        if on != self.playing:
+            self.playing = on
+            self.stir()
+
+    def busy(self, act: Act):
+        now = time.monotonic()
+        task = self._task
+        if task is not None and now - task[1] >= AWAY and now < self._task_end(task):
+            task[0], task[2] = act, now   # still at it: keep going (the newest change's act)
+        elif task is not None and now - task[1] < AWAY:
+            task[0], task[2] = act, now   # the desk is still going down
+        else:
+            self._task = [act, now, now]
+        self.stir()
+
+    @staticmethod
+    def _task_end(task: list) -> float:
+        """When the action itself stops (then the desk takes AWAY to come back)."""
+        act, start, last = task
+        return max(start + AWAY + LONGEST.get(act, 1.6), last + LINGER)
+
+    def _step_fidget(self, now: float):
+        super()._step_fidget(now)
+        if self._task is not None and now >= self._task_end(self._task) + AWAY:
+            self._task = None
+
+    def _frame(self, kit: Kit, t: float):
+        task = None if lite.on() else self._task
+        if task is not None:
+            now = time.monotonic()
+            act, start, _last = task
+            end = self._task_end(task)
+            if now - start < AWAY:   # the desk going down
+                desk(kit, 0, eseg(now - start, 0, AWAY))
+            elif now < end:          # at it
+                act[1](kit, now - start - AWAY)
+            else:                    # the desk coming back up
+                desk(kit, 0, 1 - eseg(now - end, 0, AWAY))
+        elif self.playing and not lite.on():
+            bunskits.mixing(kit, self._phase)   # the sound plays: he mixes along
+        else:
+            desk(kit, 0)
+        if self.stretch:
+            kit.add(sy=0.06 * self.stretch, sx=-0.03 * self.stretch, ears=-10 * self.stretch)

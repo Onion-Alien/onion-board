@@ -896,7 +896,7 @@ class EditDialog(EditDialogParts, QDialog):
         # Simple's top: what's on (a chip each, × takes it off), then the switch
         self.summary = Summary(eff)
         self.summary.set_sound(meta)
-        self.bun = bunacts.ActBunny(bunacts.SNIP)   # Bun snipping, at the page's top
+        self.bun = bunacts.EditBunny()   # Bun at his DJ desk, at the page's top
         self._head.addWidget(self.bun, 0, Qt.AlignmentFlag.AlignTop)
         self._head.addWidget(self.summary, 1)
         self._head.addWidget(self.switch, 0, Qt.AlignmentFlag.AlignTop)
@@ -1082,9 +1082,19 @@ class EditDialog(EditDialogParts, QDialog):
 
 
     def _tune_bun(self):
-        """Bun at the top snips at the sound's speed, stretched up or squashed by its pitch."""
+        """Bun at the top mixes at the sound's speed, stretched up or squashed by its
+        pitch; a change sends him off to snip (the trim) or twist a knob (the rest)."""
         f = self.effects.fx()
         self.bun.tune(float(f.get("speed", 1.0)), float(f.get("pitch", 0.0)))
+        trim = self.effects.trim.trim_fx()
+        rest = soundfx.clean({k: v for k, v in f.items() if k not in trim})
+        was, self._bun_was = getattr(self, "_bun_was", None), (trim, rest)
+        if was is None:
+            return
+        if was[0] != trim:
+            self.bun.busy(bunacts.SNIP)
+        elif was[1] != rest:
+            self.bun.busy(bunacts.KNOB)
 
     def load(self, meta: SoundMeta, tab: str = "sound"):
         """Show another sound, as a new window would: EditControl.edit reuses a closed

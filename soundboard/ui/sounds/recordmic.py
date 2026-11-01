@@ -360,7 +360,7 @@ class RecordDialog(QDialog):
         self.meter.set_level(level)
         if take is None:
             return
-        self.bun.set_level(level)   # he talks along while it records
+        self.bun.set_level(min(1.0, level * 1.6))   # he talks along: his mouth, mostly
         if take.playing and not self._taken_name:
             self._taken_name = self._playing_name()   # started after Record was pressed
             self._taken_pic = self._playing_picture()
