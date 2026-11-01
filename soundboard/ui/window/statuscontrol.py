@@ -464,7 +464,12 @@ class StatusControl(Controller):
         # fourth button about a thing they hadn't done
         mw.btn_rescan.setVisible(state == "missing" and route != "mic"
                                  and getattr(mw, "_cable_started", False))
-        mw.btn_attach.setVisible(route == "cable" and not mw._attaching)
+        # the cable isn't a mic the mic part goes on: no "into my mic" button there; the
+        # switch on top changes the way instead, once the cable is installed
+        mw.btn_attach.setVisible(route == "cable" and not mw._attaching and not any_cable)
+        mw.route_switch.setVisible(any_cable and route in ("cable", "mic"))
+        (mw.seg_mic if route == "mic" else mw.seg_cable).setChecked(True)
+        mw.route_switch.setEnabled(not mic_busy)
         mw.ways_or.setVisible(not mw.btn_attach.isHidden() and not mw.btn_install.isHidden())
         if route == "mic":
             mw.micctl._cable_tip()
