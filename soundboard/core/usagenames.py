@@ -241,12 +241,16 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "voice-code-shared", "voice-code-imported",
             # the Random voice card (or its key) and a voice changer voice's Hear it
             "voice-roll", "voice-hear",
+            # Edit voice's Reset, Mix in a voice, and Edit voice from a card's right-click
+            "voice-edit-reset", "voice-mix-in", "voice-edit-menu",
             # the voice bar's Effects pop-up opened
             "voice-effects",
             # AI voices: switched on, a group picked, a voice starred, Hear it, one of
             # your own made (never which voice)
             "ai-voice", "ai-voice-group", "ai-voice-favorite", "ai-voice-hear",
             "ai-voice-made",
+            # an AI voice card's right-click Edit voice
+            "ai-voice-edit-menu",
             # Clean mic switched on (never how strong), its Hear the difference played, and
             # Open Clean mic in the box after Bun set Discord up
             "clean-mic", "clean-mic-test", "clean-mic-open",
