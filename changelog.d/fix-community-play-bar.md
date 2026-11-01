@@ -1,0 +1,2 @@
+- Community: Play on any sound (an upload or a link) plays it like a pad on the Sounds tab: in the player bar where you can pause, seek and stop it, heard by others, and stopping the sound that was playing. Uploads used to play only in your headphones, and links played over your sounds.
+- The Now playing chip shows the new name when one Community sound or link plays over another.
