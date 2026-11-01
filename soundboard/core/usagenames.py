@@ -152,9 +152,9 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # the side rail: Ctrl+1-9 / Ctrl+Tab, a tab given its own key, the version
             # clicked for What's new, kept shut (features_now)
             "tab-keys", "tab-key-set", "whats-new", "rail-shut",
-            # Show more under web search results, Trending on Myinstants opened; a pad's
+            # Show more under web search results; a pad's
             # Edit: Effects tab, a picture from a file or a link
-            "search-show-more", "search-trending", "pad-effects", "pad-picture-file",
+            "search-show-more", "pad-effects", "pad-picture-file",
             "pad-picture-link",
             # Edit sound: opened, saved (from Simple or Advanced, or as a copy), a chip
             # of its summary's ×, a preset picked; and on Save, which of its settings

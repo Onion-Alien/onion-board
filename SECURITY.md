@@ -235,7 +235,7 @@ account or anything else about you.
     already in your Sounds (`used/dl-already-have`), the sites a download failed on
     (`used/dl-failed-youtube`…), the download bar's Cancel, Retry and one-line view
     (`used/dl-cancel`, `dl-retry`, `dl-bar-small`), *Show more* under search results
-    (`used/search-show-more`), *Trending on Myinstants* opened (`used/search-trending`), and a downloaded sound's *Open on…*, *Copy link*,
+    (`used/search-show-more`), and a downloaded sound's *Open on…*, *Copy link*,
     *Details* and its info deleted (`used/source-open`, `source-copy-link`,
     `source-details`, `source-deleted`): never the link, its title or what you searched;
   - FFmpeg: *Get FFmpeg* clicked or failed, got by itself or that failing, a file that

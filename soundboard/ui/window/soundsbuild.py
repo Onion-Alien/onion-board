@@ -375,7 +375,6 @@ class SoundsPageBuild:
         mw.ytresults.closed.connect(mw.searchctl._results_closed)
         mw.ytresults.fill_site_menu(mw._site_menu)
         mw.ytresults.source_changed.connect(mw.searchctl._on_site_picked)
-        mw.ytresults.trend_asked.connect(mw.searchctl.show_trending)
         mw._pads_scroll = scroll
         # ---- "3 selected · Colour · Volume · Delete": Ctrl / Shift+click picks pads
         mw.selection = PadSelection(mw, scroll)
