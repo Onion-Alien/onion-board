@@ -4744,7 +4744,6 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Queres tirar o ruído de fundo na mesma? Liga antes o <b>Microfone limpo</b> no separador <b>Voz</b> do Onion Board: limpa a tua voz e nunca mexe nos teus sons.",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "Uma janela maior: a forma de onda grande, com os efeitos e o equalizador lado a lado",
   "Add effect": "Adicionar efeito",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Arrasta as pegas para cortar o início e o fim. Ctrl+roda faz zoom, Shift+roda desloca.",
   "No effect has that name.": "Nenhum efeito tem esse nome.",
   "No effects on yet.": "Ainda não há efeitos ligados.",
   "Pick an effect to turn on": "Escolhe um efeito para ligar",
@@ -4767,5 +4766,6 @@
   "Save as a new preset": "Guardar como nova predefinição",
   "Save what you have now into “{name}”": "Guardar o que tens agora em “{name}”",
   "Update “{name}”": "Atualizar “{name}”",
-  "Update, reset or save as a new preset": "Atualizar, repor ou guardar como nova predefinição"
+  "Update, reset or save as a new preset": "Atualizar, repor ou guardar como nova predefinição",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Arrasta as pegas para cortar o início e o fim. Ctrl+roda faz zoom. Arrasta com o botão direito do rato, ou usa Shift+roda, para deslocar."
 }

@@ -5092,7 +5092,6 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "تريد إزالة ضجيج الخلفية رغم ذلك؟ شغّل <b>ميكروفون نظيف</b> في تبويب <b>الصوت</b> في Onion Board بدلًا من ذلك: ينقّي صوتك ولا يلمس أصواتك أبدًا.",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "نافذة أكبر: الموجة كبيرة، والمؤثرات والمعادل جنبًا إلى جنب",
   "Add effect": "إضافة مؤثر",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "اسحب المقبضين لقصّ البداية والنهاية. Ctrl+التمرير للتكبير، وShift+التمرير للتنقّل.",
   "No effect has that name.": "لا يوجد مؤثر بهذا الاسم.",
   "No effects on yet.": "لا مؤثرات مفعّلة بعد.",
   "Pick an effect to turn on": "اختر مؤثرًا لتفعيله",
@@ -5115,5 +5114,6 @@
   "Save as a new preset": "احفظ كإعداد جديد",
   "Save what you have now into “{name}”": "احفظ ما لديك الآن في “{name}”",
   "Update “{name}”": "حدّث “{name}”",
-  "Update, reset or save as a new preset": "حدّث أو أعد الضبط أو احفظ كإعداد جديد"
+  "Update, reset or save as a new preset": "حدّث أو أعد الضبط أو احفظ كإعداد جديد",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "اسحب المقبضين لقصّ البداية والنهاية. Ctrl+التمرير للتكبير. اسحب بزر الفأرة الأيمن، أو Shift+التمرير، للتنقّل."
 }

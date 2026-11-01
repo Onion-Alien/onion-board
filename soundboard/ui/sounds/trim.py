@@ -50,6 +50,7 @@ class Waveform(QWidget):
         self.start, self.end = 0.0, self.length
         self.play: float | None = None   # where it's playing now (seconds), None: it isn't
         self._drag: str | None = None
+        self._grab: tuple[float, float] | None = None   # (x, view start): dragging it along
         self.big = False
         self.fine: np.ndarray | None = None   # more peaks, for the big one (set_fine)
         self.view = (0.0, self.length)        # the part the big one shows (zoom)
@@ -79,7 +80,8 @@ class Waveform(QWidget):
         self.view = (0.0, self.length)
         self.setMinimumHeight(BIG_H if on else 70)
         self.setToolTip(_("Drag the handles to cut off the start and end. Ctrl+scroll "
-                          "zooms, Shift+scroll moves along.") if on else
+                          "zooms. Drag with the right mouse button, or Shift+scroll, to "
+                          "move along.") if on else
                         _("Drag the handles to cut off the start and end. Only the part "
                           "between them plays."))
         self.update()
@@ -140,17 +142,29 @@ class Waveform(QWidget):
             return
         d = e.angleDelta().y() or e.angleDelta().x()
         mods = e.modifiers()
+        side = e.angleDelta().x()
         if d and mods & Qt.KeyboardModifier.ControlModifier:
             self.zoom(1.25 if d > 0 else 0.8, self._t(e.position().x()))
         elif d and mods & Qt.KeyboardModifier.ShiftModifier:
             v0, v1 = self.view
             self.pan(-(v1 - v0) * 0.1 * (1 if d > 0 else -1))
+        elif side and not e.angleDelta().y() and self.zoomed():   # a touchpad's sideways swipe
+            v0, v1 = self.view
+            self.pan(-(v1 - v0) * 0.1 * side / 120)
         else:
             e.ignore()
             return
         e.accept()
 
     def mousePressEvent(self, e):
+        if self.big and e.button() in (Qt.MouseButton.RightButton, Qt.MouseButton.MiddleButton):
+            # zoomed in, the rest of the sound is off to the sides: the right (or middle)
+            # button drags it along, like a map; the left one keeps the handles
+            if self.zoomed():
+                self._grab = (e.position().x(), self.view[0])
+                self.setCursor(Qt.CursorShape.ClosedHandCursor)
+            e.accept()
+            return
         x = e.position().x()
         ds, de = abs(x - self._x(self.start)), abs(x - self._x(self.end))
         if min(ds, de) <= HANDLE_PX:
@@ -160,10 +174,18 @@ class Waveform(QWidget):
             self._move(x)
 
     def mouseMoveEvent(self, e):
-        if self._drag:
+        if self._grab is not None:
+            x0, at = self._grab
+            v0, v1 = self.view
+            self._set_view(at - (e.position().x() - x0) / self._area()[1] * (v1 - v0), v1 - v0)
+        elif self._drag:
             self._move(e.position().x())
 
     def mouseReleaseEvent(self, e):
+        if self._grab is not None:
+            self._grab = None
+            self.setCursor(Qt.CursorShape.SizeHorCursor)
+            return
         self._drag = None
 
     def _move(self, x: float):
