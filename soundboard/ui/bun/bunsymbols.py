@@ -32,7 +32,7 @@ MIXES: dict[str, tuple[tuple[str, str], ...]] = {
     "Halloween": (("ghost", "#f5f2ff"), ("bat", "#a77ce6"), ("note", "#ff9a2e"),
                   ("bat", "#8b5cd0")),
     "Fireworks": (("sparkle", "#ffc94d"), ("star", "#ff5fae"), ("note", "#ffb627"),
-                  ("sparkle", "#ff8cc6")),
+                  ("sparkle", "#ff8cc6"), ("burst", "#ffc94d"), ("burst", "#6fd3ff")),
     "Hacker": (("digit", "#3cff6e"), ("digit", "#28c850"), ("note", "#3cff6e"),
                ("digit", "#9bffb5")),
     "Dark": (("wave", "#7859f7"), ("wave", "#ff4d8d"), ("note", "#7859f7"),
@@ -99,7 +99,7 @@ TEXT: dict[str, tuple[str, tuple[str, ...]]] = {
 # (these get their colour pushed to stand out like a note's; the rest keep theirs and an
 # outline does that)
 LIKE_NOTES = {"note", "digit", "snowflake", "bubble", "sparkle", "wave", "peace", "text",
-              "triangle", "check"}
+              "triangle", "check", "burst"}
 
 
 def pick(rng: random.Random) -> tuple[str, QColor] | None:
@@ -624,6 +624,21 @@ def _skull(p, r, col, pen, _seed):
         p.drawLine(QPointF(r * x, r * 0.6), QPointF(r * x, r * 0.88))
 
 
+def _burst(p, r, col, _pen, seed):
+    """A firework going off: streaks out from the middle, a bright dot on each end."""
+    rng = random.Random(seed)
+    a0 = rng.uniform(0, math.pi)
+    w = max(1.2, r * 0.14)
+    for i in range(10):
+        a = a0 + i * math.pi / 5
+        c, s = math.cos(a), math.sin(a)
+        p.setPen(QPen(col, w, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+        p.drawLine(QPointF(c * r * 0.3, s * r * 0.3), QPointF(c * r * 0.8, s * r * 0.8))
+        p.setPen(Qt.PenStyle.NoPen)
+        p.setBrush(QColor(255, 255, 255, 230) if i % 2 else col)
+        p.drawEllipse(QPointF(c * r, s * r), w * 0.9, w * 0.9)
+
+
 def _floppy(p, r, col, pen, _seed):
     """A floppy disk: its label and metal shutter."""
     path = QPainterPath(QPointF(-r * 0.85, -r * 0.85))
@@ -679,4 +694,4 @@ _KINDS = {"heart": _heart, "star": _star, "sparkle": _sparkle, "petal": _petal,
           "triangle": _triangle, "bolt": _bolt, "cd": _cd, "pitchfork": _pitchfork,
           "flame": _flame, "check": _check, "spiral": _spiral, "fly": _fly,
           "flare": _flare, "confetti": _confetti, "balloon": _balloon, "skull": _skull,
-          "floppy": _floppy, "cursor": _cursor}
+          "floppy": _floppy, "cursor": _cursor, "burst": _burst}
