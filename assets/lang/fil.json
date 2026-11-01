@@ -4796,5 +4796,14 @@
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Binubuksan ang tab na ito habang nasa harap ang Onion Board.\nEsc = kanselahin.",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "I-drag ang mga handle para i-cut ang simula at dulo. I-click o i-drag ang time ruler, o i-drag ang playhead, para ilipat kung saan ito tumutugtog. Ctrl+scroll para mag-zoom. I-drag gamit ang kanang button ng mouse, o Shift+scroll, para gumalaw.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Libre, walang ads at walang account. Gawa ni OnionAlien. Open source sa ilalim ng GNU GPL v3: gamitin, baguhin at i-share ito, basta open source din ang bersyon mo.",
-  "Community uploads": "Upload ng komunidad"
+  "Community uploads": "Upload ng komunidad",
+  "Couldn't put it back: {error}": "Hindi naibalik: {error}",
+  "Couldn't remove it: {error}": "Hindi naalis: {error}",
+  "Online": "Online",
+  "Use {name} for typed lines": "Gamitin ang {name} sa mga tina-type",
+  "Nothing answers at {address}": "Walang sumasagot sa {address}",
+  "Speaks your typed lines": "Binibigkas ang mga tina-type mo",
+  "From a link…": "Mula sa link…",
+  "Pick one of ours": "Pumili sa amin",
+  "Remove server": "Alisin ang server"
 }

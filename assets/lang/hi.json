@@ -4796,5 +4796,14 @@
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board सामने होने पर यह टैब खोलती है।\nEsc = रद्द करें।",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "शुरू और आख़िर काटने के लिए हैंडल खींचें। चलने की जगह बदलने के लिए टाइम रूलर पर क्लिक करें या खींचें, या प्लेहेड खींचें। Ctrl+स्क्रॉल से ज़ूम। आगे-पीछे जाने के लिए माउस का दायाँ बटन दबाकर खींचें, या Shift+स्क्रॉल करें।",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "मुफ़्त, बिना विज्ञापन और बिना अकाउंट। OnionAlien ने बनाया। GNU GPL v3 के तहत ओपन सोर्स: इस्तेमाल करें, बदलें और शेयर करें, बस आपका वर्ज़न भी ओपन सोर्स रहना चाहिए।",
-  "Community uploads": "समुदाय के अपलोड"
+  "Community uploads": "समुदाय के अपलोड",
+  "Couldn't put it back: {error}": "वापस नहीं रख सके: {error}",
+  "Couldn't remove it: {error}": "हटा नहीं सके: {error}",
+  "Online": "ऑनलाइन",
+  "Use {name} for typed lines": "टाइप की गई लाइनों के लिए {name} इस्तेमाल करें",
+  "Nothing answers at {address}": "{address} पर कोई जवाब नहीं देता",
+  "Speaks your typed lines": "आपकी टाइप की गई लाइनें बोलता है",
+  "From a link…": "लिंक से…",
+  "Pick one of ours": "हमारी में से चुनें",
+  "Remove server": "सर्वर हटाएं"
 }

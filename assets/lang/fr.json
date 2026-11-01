@@ -4796,5 +4796,14 @@
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Ouvre cet onglet quand Onion Board est au premier plan.\nÉchap = annuler.",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Fais glisser les poignées pour couper le début et la fin. Clique ou fais glisser sur la règle du temps, ou fais glisser la tête de lecture, pour changer où ça joue. Ctrl+molette zoome. Fais glisser avec le bouton droit de la souris, ou Maj+molette, pour te déplacer.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Gratuit, sans pub et sans compte. Fait par OnionAlien. Open source sous licence GNU GPL v3 : utilise-le, modifie-le et partage-le, tant que ta version reste open source elle aussi.",
-  "Community uploads": "Envois de la communauté"
+  "Community uploads": "Envois de la communauté",
+  "Couldn't put it back: {error}": "Impossible de le remettre : {error}",
+  "Couldn't remove it: {error}": "Impossible de le retirer : {error}",
+  "Online": "En ligne",
+  "Use {name} for typed lines": "Utiliser {name} pour les phrases tapées",
+  "Nothing answers at {address}": "Rien ne répond à {address}",
+  "Speaks your typed lines": "Dit les phrases que tu tapes",
+  "From a link…": "Depuis un lien…",
+  "Pick one of ours": "Choisir une des nôtres",
+  "Remove server": "Retirer le serveur"
 }

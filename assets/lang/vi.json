@@ -4708,5 +4708,14 @@
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Mở tab này khi Onion Board đang ở phía trước.\nEsc = hủy.",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Kéo tay nắm để cắt bỏ đầu và cuối. Bấm hoặc kéo thước thời gian, hoặc kéo vạch phát, để đổi chỗ đang phát. Ctrl+cuộn để phóng to. Kéo bằng chuột phải, hoặc Shift+cuộn, để di chuyển.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Miễn phí, không quảng cáo, không cần tài khoản. Do OnionAlien làm. Mã nguồn mở theo GNU GPL v3: cứ dùng, sửa và chia sẻ, miễn là phiên bản của bạn cũng giữ mã nguồn mở.",
-  "Community uploads": "Cộng đồng tải lên"
+  "Community uploads": "Cộng đồng tải lên",
+  "Couldn't put it back: {error}": "Không thể khôi phục: {error}",
+  "Couldn't remove it: {error}": "Không thể gỡ bỏ: {error}",
+  "Online": "Trực tuyến",
+  "Use {name} for typed lines": "Dùng {name} cho các dòng đã gõ",
+  "Nothing answers at {address}": "Không có gì trả lời tại {address}",
+  "Speaks your typed lines": "Đọc các dòng bạn gõ",
+  "From a link…": "Từ liên kết…",
+  "Pick one of ours": "Chọn từ ảnh của chúng tôi",
+  "Remove server": "Gỡ máy chủ"
 }

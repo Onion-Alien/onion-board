@@ -4708,5 +4708,14 @@
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board が前面にあるとき、このタブを開きます。\nEsc = キャンセル。",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "ハンドルをドラッグして最初と最後をカットします。時間のルーラーをクリックかドラッグ、または再生位置の線をドラッグすると、再生する位置が変わります。Ctrl+スクロールで拡大。右ボタンでドラッグするか、Shift+スクロールで移動。",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "無料、広告なし、アカウント不要。OnionAlien 作。GNU GPL v3 のオープンソース: 自由に使って、改変して、共有できます。ただし、あなたの版もオープンソースのままにしてください。",
-  "Community uploads": "コミュニティの投稿"
+  "Community uploads": "コミュニティの投稿",
+  "Couldn't put it back: {error}": "元に戻せませんでした: {error}",
+  "Couldn't remove it: {error}": "削除できませんでした: {error}",
+  "Online": "オンライン",
+  "Use {name} for typed lines": "入力した文に {name} を使う",
+  "Nothing answers at {address}": "{address} から応答がありません",
+  "Speaks your typed lines": "入力した文を読み上げます",
+  "From a link…": "リンクから…",
+  "Pick one of ours": "用意された画像から選ぶ",
+  "Remove server": "サーバーを削除"
 }

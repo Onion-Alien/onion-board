@@ -4708,5 +4708,14 @@
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Membuka tab ini semasa Onion Board di hadapan.\nEsc = batal.",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Seret pemegang untuk memotong permulaan dan penghujung. Klik atau seret pembaris masa, atau seret penanda main, untuk alih kedudukan main. Ctrl+tatal untuk zum. Seret dengan butang kanan tetikus, atau Shift+tatal, untuk mengalih.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Percuma, tanpa iklan dan tanpa akaun. Dibuat oleh OnionAlien. Sumber terbuka di bawah GNU GPL v3: gunakan, ubah dan kongsi, asalkan versi anda juga kekal sumber terbuka.",
-  "Community uploads": "Muat naik komuniti"
+  "Community uploads": "Muat naik komuniti",
+  "Couldn't put it back: {error}": "Tidak dapat memulihkannya: {error}",
+  "Couldn't remove it: {error}": "Tidak dapat membuangnya: {error}",
+  "Online": "Dalam talian",
+  "Use {name} for typed lines": "Guna {name} untuk baris yang ditaip",
+  "Nothing answers at {address}": "Tiada apa-apa menjawab di {address}",
+  "Speaks your typed lines": "Menyebut baris yang anda taip",
+  "From a link…": "Daripada pautan…",
+  "Pick one of ours": "Pilih daripada kami",
+  "Remove server": "Buang pelayan"
 }

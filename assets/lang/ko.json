@@ -4708,5 +4708,14 @@
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board가 앞에 있을 때 이 탭을 엽니다.\nEsc = 취소.",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "핸들을 끌어서 앞뒤를 잘라내세요. 시간 눈금자를 클릭하거나 끌거나, 재생 위치 선을 끌면 재생 위치가 바뀌어요. Ctrl+스크롤은 확대입니다. 마우스 오른쪽 버튼으로 끌거나 Shift+스크롤로 이동하세요.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "무료이고 광고도 계정도 없습니다. OnionAlien이 만들었습니다. GNU GPL v3 오픈 소스: 자유롭게 쓰고, 고치고, 공유하세요. 단, 여러분의 버전도 오픈 소스로 유지해야 합니다.",
-  "Community uploads": "커뮤니티 업로드"
+  "Community uploads": "커뮤니티 업로드",
+  "Couldn't put it back: {error}": "되돌리지 못했어요: {error}",
+  "Couldn't remove it: {error}": "삭제하지 못했어요: {error}",
+  "Online": "온라인",
+  "Use {name} for typed lines": "입력한 문장에 {name} 사용",
+  "Nothing answers at {address}": "{address}에서 응답이 없어요",
+  "Speaks your typed lines": "입력한 문장을 읽어 줘요",
+  "From a link…": "링크에서…",
+  "Pick one of ours": "기본 그림에서 고르기",
+  "Remove server": "서버 삭제"
 }

@@ -4796,5 +4796,14 @@
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Ανοίγει αυτή την καρτέλα όταν το Onion Board είναι μπροστά.\nEsc = ακύρωση.",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Σύρε τις λαβές για να κόψεις την αρχή και το τέλος. Κάνε κλικ ή σύρε τη χρονογραμμή, ή σύρε τη γραμμή αναπαραγωγής, για να αλλάξεις από πού παίζει. Ctrl+κύλιση για ζουμ. Σύρε με το δεξί κουμπί του ποντικιού, ή Shift+κύλιση, για μετακίνηση.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Δωρεάν, χωρίς διαφημίσεις και χωρίς λογαριασμό. Από τον OnionAlien. Ανοιχτού κώδικα με άδεια GNU GPL v3: χρησιμοποίησέ το, άλλαξέ το και μοιράσου το, αρκεί και η δική σου έκδοση να μείνει ανοιχτού κώδικα.",
-  "Community uploads": "Ανεβάσματα κοινότητας"
+  "Community uploads": "Ανεβάσματα κοινότητας",
+  "Couldn't put it back: {error}": "Δεν ήταν δυνατή η επαναφορά: {error}",
+  "Couldn't remove it: {error}": "Δεν ήταν δυνατή η αφαίρεση: {error}",
+  "Online": "Σε σύνδεση",
+  "Use {name} for typed lines": "Χρήση του {name} για όσα πληκτρολογείς",
+  "Nothing answers at {address}": "Τίποτα δεν απαντά στο {address}",
+  "Speaks your typed lines": "Λέει όσα πληκτρολογείς",
+  "From a link…": "Από σύνδεσμο…",
+  "Pick one of ours": "Διάλεξε μία από τις δικές μας",
+  "Remove server": "Αφαίρεση διακομιστή"
 }

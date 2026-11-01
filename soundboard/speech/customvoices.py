@@ -104,6 +104,8 @@ class CustomVoice:
     api_key: str = ""
     language: str = ""
     cwd: Path | None = None
+    file: Path | None = None     # its .json (none for a Piper voice pack)
+    picture: str = ""            # one of the app's pictures ("voice-robot") or a file here
 
     @property
     def id(self) -> str:
@@ -261,7 +263,7 @@ def load(d: Path | None = None) -> tuple[list[CustomVoice], list[str]]:
                 name=str(raw.get("name") or f.stem).strip(), url=url, command=cmd,
                 voice=str(raw.get("voice", "")), model=str(raw.get("model", "")),
                 api_key=str(raw.get("api_key", "")), language=_lang(raw.get("language")),
-                cwd=d))
+                cwd=d, file=f, picture=str(raw.get("picture", "")).strip()))
         except (OSError, ValueError) as e:
             problems.append(f"{f.name}: {errors.plain(e)}")
     onnx = sorted(d.glob("*.onnx"))
@@ -307,6 +309,61 @@ def save_server(name: str, url: str, voice: str = "", model: str = "",
     path = server_path(name)
     path.write_text(json.dumps(raw, indent=2), encoding="utf-8")
     return path
+
+
+def update_server(path: Path, url: str, voice: str = "", model: str = "",
+                  api_key: str = "") -> None:
+    """Change a server voice's .json, keeping what else is in it (its name, "language")."""
+    raw = json.loads(path.read_text(encoding="utf-8-sig"))
+    if not isinstance(raw, dict):
+        raise ValueError("not a {...} object")
+    raw["url"] = url
+    for k, v in (("voice", voice), ("model", model), ("api_key", api_key)):
+        if v:
+            raw[k] = v
+        else:
+            raw.pop(k, None)
+    path.write_text(json.dumps(raw, indent=2), encoding="utf-8")
+
+
+def picture_file(cv: CustomVoice) -> Path | None:
+    """A server's own picture file (one from a link), or None when it has none or uses
+    one of the app's pictures. Only a plain file name in the voices folder counts."""
+    name = cv.picture
+    if not name or Path(name).name != name or not Path(name).suffix:
+        return None
+    return (cv.cwd or folder()) / name
+
+
+def set_picture(path: Path, picture: str) -> None:
+    """A server's picture in its .json: an app picture's key, a file name here, or ""."""
+    raw = json.loads(path.read_text(encoding="utf-8-sig"))
+    if not isinstance(raw, dict):
+        raise ValueError("not a {...} object")
+    old = str(raw.get("picture", "")).strip()
+    if picture:
+        raw["picture"] = picture
+    else:
+        raw.pop("picture", None)
+    path.write_text(json.dumps(raw, indent=2), encoding="utf-8")
+    if old and old != picture and Path(old).name == old and Path(old).suffix:
+        (path.parent / old).unlink(missing_ok=True)   # its old picture from a link
+
+
+def answers(url: str, timeout: float = 2.0) -> bool:
+    """Something answers at a server voice's address: any HTTP answer counts (most say
+    404 or 405 to a plain GET of their root). Blocks: call it off the UI thread."""
+    parts = urllib.parse.urlsplit(url.replace("{text}", "").replace("{voice}", ""))
+    if parts.scheme not in ("http", "https") or not parts.netloc:
+        return False
+    req = urllib.request.Request(f"{parts.scheme}://{parts.netloc}/")
+    try:
+        with net.urlopen(req, timeout=timeout, feature="voice_servers"):
+            return True
+    except urllib.error.HTTPError:
+        return True
+    except (urllib.error.URLError, OSError, ValueError, net.FeatureOff):
+        return False
 
 
 def label(name: str) -> str:

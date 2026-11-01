@@ -4708,5 +4708,14 @@
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "เปิดแท็บนี้ขณะที่ Onion Board อยู่ด้านหน้า\nEsc = ยกเลิก",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "ลากที่จับเพื่อตัดต้นและท้าย คลิกหรือลากไม้บรรทัดเวลา หรือลากเส้นตำแหน่งเล่น เพื่อย้ายจุดที่เล่น Ctrl+เลื่อนเพื่อซูม ลากด้วยปุ่มขวาของเมาส์ หรือ Shift+เลื่อน เพื่อขยับ",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "ฟรี ไม่มีโฆษณาและไม่ต้องมีบัญชี สร้างโดย OnionAlien โอเพนซอร์สภายใต้ GNU GPL v3: ใช้ แก้ไข และแบ่งปันได้ ตราบใดที่เวอร์ชันของคุณยังเป็นโอเพนซอร์สด้วย",
-  "Community uploads": "อัปโหลดจากชุมชน"
+  "Community uploads": "อัปโหลดจากชุมชน",
+  "Couldn't put it back: {error}": "นำกลับมาไม่ได้: {error}",
+  "Couldn't remove it: {error}": "ลบไม่ได้: {error}",
+  "Online": "ออนไลน์",
+  "Use {name} for typed lines": "ใช้ {name} กับข้อความที่พิมพ์",
+  "Nothing answers at {address}": "ไม่มีอะไรตอบที่ {address}",
+  "Speaks your typed lines": "พูดข้อความที่คุณพิมพ์",
+  "From a link…": "จากลิงก์…",
+  "Pick one of ours": "เลือกจากของเรา",
+  "Remove server": "ลบเซิร์ฟเวอร์"
 }

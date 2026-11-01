@@ -4884,5 +4884,14 @@
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Открывает эту вкладку, когда Onion Board на переднем плане.\nEsc = отмена.",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Перетащи ручки, чтобы отрезать начало и конец. Нажми или тяни по шкале времени, или тяни линию воспроизведения, чтобы перейти к другому месту. Ctrl+колесо приближает. Чтобы сдвинуть, тяни правой кнопкой мыши или крути Shift+колесо.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Бесплатно, без рекламы и без аккаунта. Сделал OnionAlien. Открытый код под лицензией GNU GPL v3: используй, изменяй и делись, если твоя версия тоже остаётся с открытым кодом.",
-  "Community uploads": "Загружено сообществом"
+  "Community uploads": "Загружено сообществом",
+  "Couldn't put it back: {error}": "Не удалось вернуть: {error}",
+  "Couldn't remove it: {error}": "Не удалось удалить: {error}",
+  "Online": "В сети",
+  "Use {name} for typed lines": "Использовать {name} для набранных строк",
+  "Nothing answers at {address}": "По адресу {address} никто не отвечает",
+  "Speaks your typed lines": "Произносит набранные строки",
+  "From a link…": "По ссылке…",
+  "Pick one of ours": "Выбрать из наших",
+  "Remove server": "Удалить сервер"
 }

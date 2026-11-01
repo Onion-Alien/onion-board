@@ -4708,5 +4708,14 @@
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board 在最前面時打開這個分頁。\nEsc = 取消。",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "拖曳把手剪掉開頭和結尾。點一下或拖曳時間尺，或拖曳播放線，可以改變播放位置。Ctrl+滾輪縮放。按住滑鼠右鍵拖曳，或 Shift+滾輪，即可平移。",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "免費、沒有廣告、不用帳號。由 OnionAlien 製作。以 GNU GPL v3 開源：可以使用、修改和分享，只要你的版本也維持開源。",
-  "Community uploads": "社群上傳"
+  "Community uploads": "社群上傳",
+  "Couldn't put it back: {error}": "無法還原：{error}",
+  "Couldn't remove it: {error}": "無法移除：{error}",
+  "Online": "上線",
+  "Use {name} for typed lines": "用 {name} 朗讀輸入的文字",
+  "Nothing answers at {address}": "{address} 沒有回應",
+  "Speaks your typed lines": "朗讀你輸入的文字",
+  "From a link…": "來自連結…",
+  "Pick one of ours": "從我們的圖片中選",
+  "Remove server": "移除伺服器"
 }

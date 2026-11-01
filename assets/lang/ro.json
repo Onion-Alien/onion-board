@@ -4884,5 +4884,14 @@
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Deschide această filă cât timp Onion Board e în față.\nEsc = anulează.",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Trage de mânere ca să tai începutul și sfârșitul. Dă clic sau trage pe rigla de timp, ori trage cursorul de redare, ca să muți locul unde cântă. Ctrl+rotiță mărește. Trage cu butonul drept al mouse-ului sau folosește Shift+rotiță ca să muți.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Gratuit, fără reclame și fără cont. Făcut de OnionAlien. Open source sub licența GNU GPL v3: folosește-l, modifică-l și partajează-l, atâta timp cât și versiunea ta rămâne open source.",
-  "Community uploads": "Încărcate de comunitate"
+  "Community uploads": "Încărcate de comunitate",
+  "Couldn't put it back: {error}": "Nu s-a putut pune înapoi: {error}",
+  "Couldn't remove it: {error}": "Nu s-a putut elimina: {error}",
+  "Online": "Online",
+  "Use {name} for typed lines": "Folosește {name} pentru rândurile scrise",
+  "Nothing answers at {address}": "Nimic nu răspunde la {address}",
+  "Speaks your typed lines": "Rostește rândurile pe care le scrii",
+  "From a link…": "Dintr-un link…",
+  "Pick one of ours": "Alege una de-a noastră",
+  "Remove server": "Elimină serverul"
 }
