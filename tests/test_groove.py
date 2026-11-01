@@ -78,6 +78,36 @@ def test_tells_someone_talking_from_a_beat():
     assert club.style in STYLES and club.style != "speech"
 
 
+def test_a_soundbite_or_someone_talking_is_not_music_from_the_first_moment():
+    rng = np.random.default_rng(11)
+    clip = Groove()
+    clip.feed(_club(128, 3, rng), 0.0)      # 3 s: a soundbite, beat or not
+    assert clip.music is False
+    talk = Groove()
+    talk.feed(_talk(25, rng), 0.0)          # its first seconds read ahead: talking
+    assert talk.music is False and talk.style == ""
+    song = Groove()
+    song.feed(_club(128, 25, rng), 0.0)
+    assert song.music is True
+    radio = Groove()                        # a stream can't be read ahead
+    radio.feed_live(_club(128, 1, rng)[:SR // 30].astype(np.float32) / 32768, now=0.0)
+    assert radio.music is None
+
+
+def test_talking_over_music_is_still_talking():
+    # a talk video: a soft bass hum fills the gaps between the words, so they're never
+    # silent
+    rng = np.random.default_rng(12)
+    talk = _talk(25, rng).astype(np.float32)
+    t = np.arange(len(talk)) / SR
+    pad = np.sin(2 * np.pi * 70 * t) * 32767 * 0.04
+    data = np.clip(talk + pad[:, None], -32768, 32767).astype(np.int16)
+    g = Groove()
+    _play(g, data)
+    assert g.features()["gaps"] < 0.25   # (the first speech rule can't hear it)
+    assert g.style == "speech" and g.music is False
+
+
 def test_reads_only_whats_been_played_and_copes_with_seeks():
     data = _club(120, 60, np.random.default_rng(4))
     g = Groove()

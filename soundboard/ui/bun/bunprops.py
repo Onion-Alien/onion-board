@@ -217,11 +217,32 @@ def _nightcap(p: QPainter, ink: QPen):
     _stroke(p, _arc(88.5, 48, 90, 46, 92.5, 46.5), FUR_LINE, 1.1)
 
 
-def _music_note(p: QPainter, x, y, k, col: QColor | None = None):
+NOTE_SHAPES = 4   # an eighth note, a quarter note, two eighths and two sixteenths
+                  # (♪ ♩ ♫ ♬)
+
+
+def _music_note(p: QPainter, x, y, k, col: QColor | None = None, shape: int = 0):
+    """A note in the 9 x 15 box at (x, y) (`k`: its size); shapes 2 and 3 are a beamed
+    pair, 15 wide."""
     col = col or QColor(theme.T["accent"])
-    p.setPen(QPen(col, 2.2 * k, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+    pen = QPen(col, 2.2 * k, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap)
+    p.setPen(pen)
     p.drawLine(QPointF(x + 4 * k, y), QPointF(x + 4 * k, y + 12 * k))
-    p.drawLine(QPointF(x + 4 * k, y), QPointF(x + 9 * k, y + 3 * k))
+    if shape == 0:   # its flag
+        p.drawLine(QPointF(x + 4 * k, y), QPointF(x + 9 * k, y + 3 * k))
+    elif shape >= 2:   # the second note, a little higher, and the beam over both
+        p.drawLine(QPointF(x + 13 * k, y - 2 * k), QPointF(x + 13 * k, y + 10 * k))
+        for i in range(shape - 1):
+            d = i * 4.6 * k
+            beam = QPainterPath(QPointF(x + 3 * k, y + d - 1.2 * k))
+            beam.lineTo(x + 14 * k, y + d - 3.2 * k)
+            beam.lineTo(x + 14 * k, y + d - 0.6 * k)
+            beam.lineTo(x + 3 * k, y + d + 1.4 * k)
+            beam.closeSubpath()
+            p.setPen(Qt.PenStyle.NoPen)
+            p.setBrush(col)
+            p.drawPath(beam)
+        _ellipse(p, x + 10.5 * k, y + 10.5 * k, 6 * k, 4.5 * k, col, None, -20)
     _ellipse(p, x + 1.5 * k, y + 12.5 * k, 6 * k, 4.5 * k, col, None, -20)
 
 
