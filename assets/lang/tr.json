@@ -4840,5 +4840,13 @@
   "(Computer voice)": "(Bilgisayar sesi)",
   "(Custom voice)": "(Özel ses)",
   "(Voice server)": "(Ses sunucusu)",
-  "Windows voice": "Windows sesi"
+  "Windows voice": "Windows sesi",
+  "{n} new": [
+    "{n} yeni",
+    "{n} yeni"
+  ],
+  "{n} new sound": [
+    "{n} yeni ses",
+    "{n} yeni ses"
+  ]
 }

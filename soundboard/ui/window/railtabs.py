@@ -1,16 +1,17 @@
 """The tabs on the rail (ui/window/sidebar.py): the tab widget whose own bar is hidden
-(SideTabs), one rail button per tab (RailTab), and the "New" pill on a tab."""
+(SideTabs), one rail button per tab (RailTab), and the "New" pill on a tab or its
+count of new things ("3 new", with an arrow while more are coming in: newsounds.py)."""
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QEvent, QObject, QRectF, QSize, Qt, Signal
+from PySide6.QtCore import QEvent, QObject, QPointF, QRectF, QSize, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QFontMetrics, QPainter, QPen
 from PySide6.QtWidgets import (QApplication, QSizePolicy, QStyle, QStyleOptionTabWidgetFrame,
                                QTabWidget, QToolButton)
 
 from soundboard.ui.kit import theme
-from soundboard.i18n import _
+from soundboard.i18n import _, ngettext
 from soundboard.ui.kit.panel import keep_focus_off
 from soundboard.ui.kit.pixels import snap_to_pixels
 from soundboard.ui.window.railsizes import ICON
@@ -134,6 +135,8 @@ class RailTab(QToolButton):
         super().paintEvent(e)
         if self.is_new():
             self._paint_new()
+        elif self.new_count() or self.is_coming():
+            self._paint_count()
         if self.hasFocus() and self._kbd_focus:
             p = QPainter(self)
             snap_to_pixels(p)
@@ -234,6 +237,99 @@ class RailTab(QToolButton):
         p.drawText(r, Qt.AlignmentFlag.AlignCenter, text)
         p.end()
 
+    def new_count(self) -> int:
+        return int(self.rail.tabs.tabBar().property(f"_count{self.index}") or 0)
+
+    def is_coming(self) -> bool:
+        return bool(self.rail.tabs.tabBar().property(f"_coming{self.index}"))
+
+    def _paint_count(self):
+        """How many new things (set_tab_count), and an arrow while more are coming in.
+        Open: a pill at the end of the row ("3 new"). Shut: the number in a bubble on
+        the icon's top corner, the arrow in one on its foot."""
+        p = QPainter(self)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        n, coming, shut = self.new_count(), self.is_coming(), not self.rail.is_open()
+        rtl = self.isRightToLeft()
+        f = QFont(self.font())
+        f.setBold(True)
+        f.setPixelSize(9 if shut else 10)
+        p.setFont(f)
+        fm = QFontMetrics(f)
+        h = fm.height() + 1
+        arrow = h - 4   # the arrow's size in its pill / bubble
+        edge = QPen(QColor(theme.T["bg"]), 1.5)   # a thin gap from the icon under it
+
+        def pill(x: float, y: float, w: float) -> QRectF:
+            r = QRectF(x, y, w, h)
+            p.setPen(edge)
+            p.setBrush(QColor(theme.T["accent"]))
+            p.drawRoundedRect(r, h / 2, h / 2)
+            return r
+
+        def draw_arrow(x: float, y: float):
+            """A bold down arrow over a line (the icon's thin one vanished this small)."""
+            pen = QPen(QColor(theme.T["on_accent"]), 1.6)
+            pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+            pen.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
+            p.setPen(pen)
+            p.setBrush(Qt.BrushStyle.NoBrush)
+            cx, s = x + arrow / 2, arrow
+            if shut:   # (the bubble's too small for the line under it: just the arrow)
+                p.drawLine(QPointF(cx, y + 0.5), QPointF(cx, y + s - 1))
+                p.drawPolyline([QPointF(cx - s * 0.36, y + s * 0.45), QPointF(cx, y + s - 1),
+                                QPointF(cx + s * 0.36, y + s * 0.45)])
+                return
+            p.drawLine(QPointF(cx, y + 0.5), QPointF(cx, y + s * 0.62))
+            p.drawPolyline([QPointF(cx - s * 0.3, y + s * 0.36), QPointF(cx, y + s * 0.66),
+                            QPointF(cx + s * 0.3, y + s * 0.36)])
+            p.drawLine(QPointF(x + 1, y + s - 0.5), QPointF(x + s - 1, y + s - 0.5))
+
+        if shut:
+            mid = self.width() / 2 + (-1 if rtl else 1) * ICON / 2   # the icon's corner
+            if n:
+                text = "99+" if n > 99 else str(n)
+                w = max(h, fm.horizontalAdvance(text) + 6)
+                # its start edge stays put and a longer number grows it towards the end,
+                # placed so the widest ("99+") still fits inside the button
+                widest = max(h, fm.horizontalAdvance("99+") + 6)
+                if rtl:
+                    end = max(mid + h / 2, widest + 1)
+                    x = end - w
+                else:
+                    x = min(mid - h / 2, self.width() - widest - 1)
+                r = pill(x, (self.height() - ICON) / 2 - h / 2 + 1, w)
+                p.setPen(QColor(theme.T["on_accent"]))
+                p.drawText(r, Qt.AlignmentFlag.AlignCenter, text)
+            if coming:
+                r = pill(min(mid - h / 2, self.width() - h - 1),
+                         min((self.height() + ICON) / 2 - h / 2, self.height() - h - 1), h)
+                draw_arrow(r.left() + 2, r.top() + 2)
+            p.end()
+            return
+        # past 99, "99+ new" (as the shut rail's bubble): 99,000 ran over the tab's name
+        text = ngettext("{n} new", "{n} new", min(n, 100), n="99+" if n > 99 else n) if n else ""
+        tw = fm.horizontalAdvance(text)
+        pad = 8 if text else 2
+        w = pad + (arrow + (4 if text else 0) if coming else 0) + tw + (8 if text else 2)
+        # its start edge stays put, just after the tab's name, and a bigger number grows
+        # it towards the end (pushed back only if it would run off the row)
+        after_icon = 1 + 6 + ICON + 4   # (border, padding, icon, gap)
+        if rtl:   # mirrored, the name sits at the far side: it's beside the icon instead
+            x = max(4, self.width() - after_icon - 8 - w)
+        else:
+            name_end = after_icon + self.fontMetrics().horizontalAdvance(self.text())
+            x = min(name_end + 8, self.width() - 4 - w)
+        r = pill(x, (self.height() - h) / 2, w)
+        x = r.left() + pad
+        if coming:
+            draw_arrow(x, r.top() + 2)
+            x += arrow + 4
+        if text:
+            p.setPen(QColor(theme.T["on_accent"]))
+            p.drawText(QRectF(x, r.top(), tw + 1, h), Qt.AlignmentFlag.AlignCenter, text)
+        p.end()
+
     def is_live(self) -> bool:
         return bool(self.rail.tabs.tabBar().property(f"_live{self.index}"))
 
@@ -250,6 +346,21 @@ class RailTab(QToolButton):
 def set_tab_new(tabs: QTabWidget, index: int, on: bool):
     """Mark tab `index` on the rail with a small "New" pill (or take it off)."""
     tabs.tabBar().setProperty(f"_new{index}", bool(on))
+    changed = getattr(tabs, "changed", None)
+    if changed is not None:
+        changed.emit()
+
+
+def set_tab_count(tabs: QTabWidget, index: int, n: int, coming: bool = False, words: str = ""):
+    """Show how many new things tab `index` has (0: none) and whether more are coming
+    in; `words` says it to a screen reader."""
+    bar = tabs.tabBar()
+    if ([bar.property(f"_count{index}"), bar.property(f"_coming{index}")]
+            == [n, coming] and bar.property(f"_countwords{index}") == words):
+        return
+    bar.setProperty(f"_count{index}", n)
+    bar.setProperty(f"_coming{index}", coming)
+    bar.setProperty(f"_countwords{index}", words)
     changed = getattr(tabs, "changed", None)
     if changed is not None:
         changed.emit()

@@ -4840,5 +4840,13 @@
   "(Computer voice)": "(Számítógépes hang)",
   "(Custom voice)": "(Saját hang)",
   "(Voice server)": "(Hangszerver)",
-  "Windows voice": "Windows-hang"
+  "Windows voice": "Windows-hang",
+  "{n} new": [
+    "{n} új",
+    "{n} új"
+  ],
+  "{n} new sound": [
+    "{n} új hang",
+    "{n} új hang"
+  ]
 }

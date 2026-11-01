@@ -4840,5 +4840,13 @@
   "(Computer voice)": "(कंप्यूटर की आवाज़)",
   "(Custom voice)": "(कस्टम आवाज़)",
   "(Voice server)": "(वॉइस सर्वर)",
-  "Windows voice": "Windows की आवाज़"
+  "Windows voice": "Windows की आवाज़",
+  "{n} new": [
+    "{n} नया",
+    "{n} नए"
+  ],
+  "{n} new sound": [
+    "{n} नई साउंड",
+    "{n} नई साउंड"
+  ]
 }

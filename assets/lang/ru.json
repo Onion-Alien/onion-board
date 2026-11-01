@@ -4930,5 +4930,15 @@
   "(Computer voice)": "(Компьютерный голос)",
   "(Custom voice)": "(Свой голос)",
   "(Voice server)": "(Голосовой сервер)",
-  "Windows voice": "Голос Windows"
+  "Windows voice": "Голос Windows",
+  "{n} new": [
+    "{n} новый",
+    "{n} новых",
+    "{n} новых"
+  ],
+  "{n} new sound": [
+    "{n} новый звук",
+    "{n} новых звука",
+    "{n} новых звуков"
+  ]
 }

@@ -4750,5 +4750,11 @@
   "(Computer voice)": "（コンピューター音声）",
   "(Custom voice)": "（カスタム音声）",
   "(Voice server)": "（音声サーバー）",
-  "Windows voice": "Windows の音声"
+  "Windows voice": "Windows の音声",
+  "{n} new": [
+    "新着 {n}"
+  ],
+  "{n} new sound": [
+    "新しいサウンド {n} 件"
+  ]
 }

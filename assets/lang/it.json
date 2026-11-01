@@ -4840,5 +4840,13 @@
   "(Computer voice)": "(Voce sintetica)",
   "(Custom voice)": "(Voce personalizzata)",
   "(Voice server)": "(Server vocale)",
-  "Windows voice": "Voce di Windows"
+  "Windows voice": "Voce di Windows",
+  "{n} new": [
+    "{n} nuovo",
+    "{n} nuovi"
+  ],
+  "{n} new sound": [
+    "{n} suono nuovo",
+    "{n} suoni nuovi"
+  ]
 }

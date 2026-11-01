@@ -4840,5 +4840,13 @@
   "(Computer voice)": "(Boses ng computer)",
   "(Custom voice)": "(Sariling boses)",
   "(Voice server)": "(Voice server)",
-  "Windows voice": "Boses ng Windows"
+  "Windows voice": "Boses ng Windows",
+  "{n} new": [
+    "{n} bago",
+    "{n} bago"
+  ],
+  "{n} new sound": [
+    "{n} bagong sound",
+    "{n} bagong sound"
+  ]
 }

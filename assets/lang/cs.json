@@ -4930,5 +4930,15 @@
   "(Computer voice)": "(Počítačový hlas)",
   "(Custom voice)": "(Vlastní hlas)",
   "(Voice server)": "(Hlasový server)",
-  "Windows voice": "Hlas Windows"
+  "Windows voice": "Hlas Windows",
+  "{n} new": [
+    "{n} nový",
+    "{n} nové",
+    "{n} nových"
+  ],
+  "{n} new sound": [
+    "{n} nový zvuk",
+    "{n} nové zvuky",
+    "{n} nových zvuků"
+  ]
 }

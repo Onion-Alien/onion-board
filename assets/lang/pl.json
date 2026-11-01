@@ -4930,5 +4930,15 @@
   "(Computer voice)": "(Głos komputerowy)",
   "(Custom voice)": "(Własny głos)",
   "(Voice server)": "(Serwer głosu)",
-  "Windows voice": "Głos Windows"
+  "Windows voice": "Głos Windows",
+  "{n} new": [
+    "{n} nowy",
+    "{n} nowe",
+    "{n} nowych"
+  ],
+  "{n} new sound": [
+    "{n} nowy dźwięk",
+    "{n} nowe dźwięki",
+    "{n} nowych dźwięków"
+  ]
 }

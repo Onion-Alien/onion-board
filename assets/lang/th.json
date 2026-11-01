@@ -4750,5 +4750,11 @@
   "(Computer voice)": "(เสียงคอมพิวเตอร์)",
   "(Custom voice)": "(เสียงที่กำหนดเอง)",
   "(Voice server)": "(เซิร์ฟเวอร์เสียง)",
-  "Windows voice": "เสียงของ Windows"
+  "Windows voice": "เสียงของ Windows",
+  "{n} new": [
+    "ใหม่ {n}"
+  ],
+  "{n} new sound": [
+    "เสียงใหม่ {n} เสียง"
+  ]
 }

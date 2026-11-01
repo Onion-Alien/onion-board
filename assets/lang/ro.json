@@ -4930,5 +4930,15 @@
   "(Computer voice)": "(Voce de computer)",
   "(Custom voice)": "(Voce proprie)",
   "(Voice server)": "(Server de voce)",
-  "Windows voice": "Vocea Windows"
+  "Windows voice": "Vocea Windows",
+  "{n} new": [
+    "{n} nou",
+    "{n} noi",
+    "{n} noi"
+  ],
+  "{n} new sound": [
+    "{n} sunet nou",
+    "{n} sunete noi",
+    "{n} de sunete noi"
+  ]
 }

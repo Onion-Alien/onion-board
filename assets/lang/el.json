@@ -4840,5 +4840,13 @@
   "(Computer voice)": "(Φωνή υπολογιστή)",
   "(Custom voice)": "(Προσαρμοσμένη φωνή)",
   "(Voice server)": "(Διακομιστής φωνής)",
-  "Windows voice": "Φωνή των Windows"
+  "Windows voice": "Φωνή των Windows",
+  "{n} new": [
+    "{n} νέο",
+    "{n} νέα"
+  ],
+  "{n} new sound": [
+    "{n} νέος ήχος",
+    "{n} νέοι ήχοι"
+  ]
 }

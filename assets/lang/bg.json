@@ -4840,5 +4840,13 @@
   "(Computer voice)": "(Компютърен глас)",
   "(Custom voice)": "(Собствен глас)",
   "(Voice server)": "(Гласов сървър)",
-  "Windows voice": "Глас на Windows"
+  "Windows voice": "Глас на Windows",
+  "{n} new": [
+    "{n} нов",
+    "{n} нови"
+  ],
+  "{n} new sound": [
+    "{n} нов звук",
+    "{n} нови звука"
+  ]
 }

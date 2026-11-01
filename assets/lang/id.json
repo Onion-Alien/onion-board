@@ -4750,5 +4750,11 @@
   "(Computer voice)": "(Suara komputer)",
   "(Custom voice)": "(Suara kustom)",
   "(Voice server)": "(Server suara)",
-  "Windows voice": "Suara Windows"
+  "Windows voice": "Suara Windows",
+  "{n} new": [
+    "{n} baru"
+  ],
+  "{n} new sound": [
+    "{n} suara baru"
+  ]
 }

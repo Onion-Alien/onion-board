@@ -4840,5 +4840,13 @@
   "(Computer voice)": "(Datamaskinstemme)",
   "(Custom voice)": "(Egen stemme)",
   "(Voice server)": "(Stemmeserver)",
-  "Windows voice": "Windows-stemme"
+  "Windows voice": "Windows-stemme",
+  "{n} new": [
+    "{n} ny",
+    "{n} nye"
+  ],
+  "{n} new sound": [
+    "{n} ny lyd",
+    "{n} nye lyder"
+  ]
 }

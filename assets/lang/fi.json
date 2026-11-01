@@ -4840,5 +4840,13 @@
   "(Computer voice)": "(Tietokoneääni)",
   "(Custom voice)": "(Oma ääni)",
   "(Voice server)": "(Äänipalvelin)",
-  "Windows voice": "Windowsin ääni"
+  "Windows voice": "Windowsin ääni",
+  "{n} new": [
+    "{n} uusi",
+    "{n} uutta"
+  ],
+  "{n} new sound": [
+    "{n} uusi ääni",
+    "{n} uutta ääntä"
+  ]
 }
