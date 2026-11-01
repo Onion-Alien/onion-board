@@ -790,6 +790,7 @@ class SideRail(QFrame):
     def refresh_output(self):
         if self.output:
             shown = self.is_open() and not self._mid()   # mid: the small one, in the column
+            self.output.tight = self._compact
             self.output.refresh()   # (its status words first: the scale fits them)
             # narrower than it fits at full size: the same card, smaller
             self.output.set_scale((self.output.scale_for(self._inner_width()) or 1.0)
