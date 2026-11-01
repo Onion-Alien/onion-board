@@ -3971,7 +3971,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "Semmi sem változtatja a mikrofonod hangját. Kapcsold BE a Beszédhangokat, vagy kattints egy szürke hangra a bekapcsolásához.",
   "Off. Click to turn it back on. Right-click to open it.": "Ki. Kattints az újbóli bekapcsoláshoz. Jobb kattintással megnyílik.",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "A Hang lap Beszédhangok kapcsolója: kikapcsol mindent, ami a mikrofonodat változtatja (a hangváltót, az AI hangot, a gépi hangot, a fordítást), és a következő nyomás pontosan ezeket hozza vissza.",
-  "The computer voice ({voice}) speaks for you.": "A gépi hang ({voice}) beszél helyetted.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Kikapcsol minden hangot, ami a mikrofonodat változtatja. Bekapcsolva visszajönnek.",
   "Turns on: {voices}": "Bekapcsolja: {voices}",
   "Voices on or off": "Beszédhangok be vagy ki",
@@ -4838,6 +4837,10 @@
   ],
   "(AI voice)": "(AI hang)",
   "(Voice changer)": "(Hangváltó)",
+  "(Computer voice)": "(Számítógépes hang)",
+  "(Custom voice)": "(Saját hang)",
+  "(Voice server)": "(Hangszerver)",
+  "Windows voice": "Windows-hang",
   "{n} new": [
     "{n} új",
     "{n} új"

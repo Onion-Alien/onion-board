@@ -3971,7 +3971,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "Mikrofon sesinizi değiştiren bir şey yok. Açmak için Sesler'i AÇIK yapın ya da gri bir sese tıklayın.",
   "Off. Click to turn it back on. Right-click to open it.": "Kapalı. Tekrar açmak için tıklayın. Sekmesini açmak için sağ tıklayın.",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "Ses sekmesindeki Sesler anahtarı: mikrofonunuzu değiştiren her şeyi kapatır (ses değiştirici, yapay zekâ sesi, bilgisayar sesi, çeviri) ve bir sonraki basış tam olarak onları geri getirir.",
-  "The computer voice ({voice}) speaks for you.": "Bilgisayar sesi ({voice}) sizin yerinize konuşur.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Mikrofonunuzu değiştiren her sesi kapatır. Açmak onları geri getirir.",
   "Turns on: {voices}": "Açar: {voices}",
   "Voices on or off": "Sesler açık ya da kapalı",
@@ -4838,6 +4837,10 @@
   ],
   "(AI voice)": "(Yapay zekâ sesi)",
   "(Voice changer)": "(Ses değiştirici)",
+  "(Computer voice)": "(Bilgisayar sesi)",
+  "(Custom voice)": "(Özel ses)",
+  "(Voice server)": "(Ses sunucusu)",
+  "Windows voice": "Windows sesi",
   "{n} new": [
     "{n} yeni",
     "{n} yeni"

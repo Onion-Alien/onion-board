@@ -3971,7 +3971,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "Τίποτα δεν αλλάζει τη φωνή του μικροφώνου σου. Βάλε τις Φωνές σε ΑΝΟΙΧΤΟ ή κάνε κλικ σε μια γκρι φωνή για να την ανοίξεις.",
   "Off. Click to turn it back on. Right-click to open it.": "Κλειστό. Κάνε κλικ για να το ανοίξεις ξανά. Δεξί κλικ για να το ανοίξεις.",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "Ο διακόπτης Φωνές στην καρτέλα Φωνή: κλείνει ό,τι αλλάζει το μικρόφωνό σου (την αλλαγή φωνής, τη φωνή AI, τη φωνή του υπολογιστή, τη μετάφραση) και το επόμενο πάτημα φέρνει πίσω ακριβώς αυτά.",
-  "The computer voice ({voice}) speaks for you.": "Η φωνή του υπολογιστή ({voice}) μιλάει για σένα.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Κλείνει κάθε φωνή που αλλάζει το μικρόφωνό σου. Όταν το ανοίξεις, επιστρέφουν.",
   "Turns on: {voices}": "Ανοίγει: {voices}",
   "Voices on or off": "Φωνές ανοιχτές ή κλειστές",
@@ -4838,6 +4837,10 @@
   ],
   "(AI voice)": "(Φωνή AI)",
   "(Voice changer)": "(Αλλαγή φωνής)",
+  "(Computer voice)": "(Φωνή υπολογιστή)",
+  "(Custom voice)": "(Προσαρμοσμένη φωνή)",
+  "(Voice server)": "(Διακομιστής φωνής)",
+  "Windows voice": "Φωνή των Windows",
   "{n} new": [
     "{n} νέο",
     "{n} νέα"

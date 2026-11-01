@@ -4267,7 +4267,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "لا شيء يغيّر صوت ميكروفونك. شغّل «أصوات الشخصيات»، أو انقر صوتًا رماديًا، لتشغيله.",
   "Off. Click to turn it back on. Right-click to open it.": "متوقف. انقر لإعادة تشغيله. انقر بالزر الأيمن لفتحه.",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "مفتاح «أصوات الشخصيات» في تبويب صوتك: يوقف كل ما يغيّر ميكروفونك (مغيّر الصوت، صوت الذكاء الاصطناعي، الصوت الحاسوبي، الترجمة)، والضغطة التالية تعيدها هي بالضبط.",
-  "The computer voice ({voice}) speaks for you.": "صوت الكمبيوتر ({voice}) يتكلم عنك.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "يوقف كل صوت يغيّر الميكروفون. تشغيله يعيدها.",
   "Turns on: {voices}": "يشغّل: {voices}",
   "Voices on or off": "الأصوات تشغيل أو إيقاف",
@@ -5198,6 +5197,10 @@
   ],
   "(AI voice)": "(صوت ذكاء اصطناعي)",
   "(Voice changer)": "(مغيّر الصوت)",
+  "(Computer voice)": "(صوت حاسوبي)",
+  "(Custom voice)": "(صوت مخصص)",
+  "(Voice server)": "(خادم صوت)",
+  "Windows voice": "صوت ويندوز",
   "{n} new": [
     "{n} جديد",
     "{n} جديد",

@@ -63,8 +63,9 @@ def test_hothead_and_autotune_tiles_change_the_engine_mic_and_stop_cleanly(panel
 
 
 def bar(p, key: str) -> str:
-    """A voice's own bar (the voice changer's, the AI voice's): on, paused or hidden."""
-    panel = p.fx if key == "fx" else p.ai
+    """A voice's own bar (the voice changer's, the AI voice's, the computer voice's):
+    on, paused or hidden."""
+    panel = {"fx": p.fx, "ai": p.ai, "speak": p.speak_bar}[key]
     return "hidden" if panel.picked.isHidden() else "paused" if panel._paused else "on"
 
 
@@ -115,9 +116,9 @@ def test_voices_switch_off_remembers_every_voice_and_on_brings_exactly_those(
     p.set_voices(False)
     assert p.on_keys() == [] and not p.speech.cb_lang.currentData()
     assert not p.bar.master.isChecked()
-    assert [k for k in p.bar.chips if k != "none"] == ["speak", "lang"]
-    assert all(p.bar.chips[k].property("state") == "off" for k in ("speak", "lang"))
-    assert bar(p, "fx") == "paused"
+    assert [k for k in p.bar.chips if k != "none"] == ["lang"]
+    assert p.bar.chips["lang"].property("state") == "off"
+    assert bar(p, "fx") == "paused" and bar(p, "speak") == "paused"
     p.set_voices(False)                   # already off: still remembers
     p.set_voices(True)
     assert p.on_keys() == ["fx", "speak", "lang"]
@@ -164,8 +165,8 @@ def test_voices_switch_off_keeps_a_voice_greyed_by_its_chip(panel):
     p.speech.livevoice.b_live.setChecked(True)
     p._bar_ctl["fx"][0].click()           # Robot paused from its bar
     p.bar.master.click()                  # everything else off too
-    assert p.bar.texts() == ["Mic unchanged. ON brings back:", "Computer voice"]
-    assert bar(p, "fx") == "paused"
+    assert p.bar.texts() == ["Mic unchanged"]
+    assert bar(p, "fx") == "paused" and bar(p, "speak") == "paused"
     p.bar.master.click()
     assert p.on_keys() == ["fx", "speak"] and p.fx.preset == "Robot"
 
@@ -186,14 +187,15 @@ def test_reset_forgets_every_voice_so_voices_on_brings_none_back(panel):
     p.fx.use_mix({"pitch": {"on": True, "semitones": 5.0, "mix": 1.0},
                   "robot": {"on": True}})
     p.speech.livevoice.b_live.setChecked(True)
-    p.bar.master.click()                  # off: both remembered, grey
-    assert p.bar.texts() == ["Mic unchanged. ON brings back:", "Computer voice"]
-    assert bar(p, "fx") == "paused"
+    p.bar.master.click()                  # off: both remembered, their bars dimmed
+    assert p.bar.texts() == ["Mic unchanged"]
+    assert bar(p, "fx") == "paused" and bar(p, "speak") == "paused"
     assert p.bar.reset_button.isVisibleTo(p.bar)
     p.bar.reset_button.click()
     assert not p.is_active() and p.back_keys() == []
     assert p.fx.is_blank() and not eng.voice_chain.enabled
     assert p.bar.texts() == ["Mic unchanged"] and bar(p, "fx") == "hidden"
+    assert bar(p, "speak") == "hidden"
     p.bar.master.click()                  # ON: nothing to bring back, stays off
     assert not p.is_active() and not p.bar.master.isChecked()
     assert p.bar.texts() == ["Mic unchanged"]
@@ -1891,7 +1893,7 @@ def test_remembered_voices_only_count_for_the_same_voices_and_a_sound_entry():
 
 # ---------------------------------------------------------------- the status bar
 
-def test_status_bar_off_label_cannot_open_a_card(panel):
+def test_status_bar_off_label_cannot_open_a_card(panel, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
     from PySide6.QtWidgets import QLabel
@@ -1906,10 +1908,17 @@ def test_status_bar_off_label_cannot_open_a_card(panel):
     QTest.mouseClick(label, Qt.LeftButton)
     p._open_card("none")
     assert not opened and p.current_tab() == "addons"
-    p.speech.livevoice.b_live.setChecked(True)
-    QTest.mouseClick(p.bar.chips["speak"], Qt.RightButton)   # a right-click opens its card
-    assert opened == ["speak"] and p.current_tab() == "speak"
-    assert p.speech.livevoice.b_live.isChecked()               # ...and leaves it on
+    monkeypatch.setattr("soundboard.speech.spoken.heard", lambda: True)
+    monkeypatch.setattr(type(p.speech), "translating",
+                        lambda self: object() if self.cb_lang.currentData() else None)
+    monkeypatch.setattr("soundboard.core.langnames.of", lambda m: "Chinese")
+    p.speech.cb_lang.blockSignals(True)
+    p.speech.cb_lang.setCurrentIndex(p.speech.cb_lang.findData("zh"))
+    p.speech.cb_lang.blockSignals(False)
+    p._update_bar()
+    QTest.mouseClick(p.bar.chips["lang"], Qt.RightButton)   # a right-click opens its card
+    assert opened == ["lang"] and p.current_tab() == "speak"
+    assert p.speech.cb_lang.currentData() == "zh"              # ...and leaves it on
 
 
 def test_status_bar_chip_click_turns_that_one_off_and_on_again(panel):
@@ -1918,7 +1927,7 @@ def test_status_bar_chip_click_turns_that_one_off_and_on_again(panel):
     p, _ = panel
     p.fx.pick("Robot")
     p.speech.livevoice.b_live.setChecked(True)
-    assert p.bar.texts() == ["Computer voice"] and bar(p, "fx") == "on"
+    assert p.bar.texts() == [] and bar(p, "fx") == "on" and bar(p, "speak") == "on"
     p.show_tab("addons")
     pause = p._bar_ctl["fx"][0]
     QTest.mouseClick(pause, Qt.LeftButton)   # its bar's pause: the computer voice stays
@@ -1928,26 +1937,26 @@ def test_status_bar_chip_click_turns_that_one_off_and_on_again(panel):
     QTest.mouseClick(pause, Qt.LeftButton)              # ...and back on, the same voice
     assert p.fx.btn_power.isChecked() and p.fx.preset == "Robot"
     assert bar(p, "fx") == "on" and "Pause" in pause.toolTip()
-    QTest.mouseClick(p.bar.chips["speak"], Qt.LeftButton)   # a chip: the same, off...
-    assert not p.speech.livevoice.b_live.isChecked()
-    assert p.bar.chips["speak"].property("state") == "off"
+    QTest.mouseClick(p._bar_ctl["speak"][0], Qt.LeftButton)   # the computer voice's too
+    assert not p.speech.livevoice.b_live.isChecked() and p.fx.btn_power.isChecked()
+    assert bar(p, "speak") == "paused" and "speak" not in p.bar.chips
 
 
 def test_status_bar_chip_x_turns_off_only_that_one(panel):
     p, _ = panel
     p.fx.pick("Robot")
     p.speech.livevoice.b_live.setChecked(True)
-    assert p.bar.texts() == ["Computer voice"]
+    assert p.bar.texts() == [] and bar(p, "speak") == "on"
     opened = []
     p.bar.open_card.connect(opened.append)
     p._bar_ctl["fx"][1].click()                  # the voice changer goes, the voice stays
     assert not p.fx.btn_power.isChecked() and p.speech.livevoice.b_live.isChecked()
     assert bar(p, "fx") == "hidden" and not opened   # gone, not paused
-    assert p.bar.texts() == ["Computer voice"]
-    p.bar.chips["speak"].click()                 # a click: off, but remembered
-    assert p.bar.texts() == ["Mic unchanged. ON brings back:", "Computer voice"]
-    p.bar.chips["speak"].off.click()             # its ✕ on the grey chip: forgotten
-    assert not p.speech.livevoice.b_live.isChecked()
+    assert bar(p, "speak") == "on"
+    p._bar_ctl["speak"][0].click()               # its pause: off, but remembered
+    assert bar(p, "speak") == "paused" and p.back_keys() == ["speak"]
+    p._bar_ctl["speak"][1].click()               # its ✕: forgotten
+    assert not p.speech.livevoice.b_live.isChecked() and bar(p, "speak") == "hidden"
     assert p.bar.texts() == ["Mic unchanged"]    # Robot's ✕ earlier: it stays gone
 
 
@@ -1958,8 +1967,11 @@ def test_status_bar_says_what_others_hear(panel):
     assert p.bar.texts() == [] and bar(p, "fx") == "on"   # on its own bar, not a chip
     assert p.bar.lbl_heard.isHidden()          # no chips: no "what others hear" ear
     p.speech.livevoice.b_live.setChecked(True)
-    assert "Computer voice" in p.bar.texts()
+    assert p.bar.texts() == [] and bar(p, "speak") == "on"   # its own bar too
+    assert p.speak_bar.picked_name.text() == "Zira"     # Windows' voice, by its name
+    assert p.speak_bar.picked_kind.text() == "(Computer voice)"
     p.speech.livevoice.b_live.setChecked(False)
+    assert bar(p, "speak") == "hidden"
     # the mic: its level, or that none is open
     p.bar.set_level(None)
     assert not p.bar.lbl_mic.isHidden() and p.bar.lbl_mic.text() == "No mic open"

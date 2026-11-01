@@ -3971,7 +3971,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "Inget ändrar din mikrofonröst. Slå PÅ Röster, eller klicka på en grå röst, för att slå på den.",
   "Off. Click to turn it back on. Right-click to open it.": "Av. Klicka för att slå på den igen. Högerklicka för att öppna den.",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "Röster-brytaren på fliken Röst: stänger av allt som ändrar din mikrofon (röstförvrängaren, AI-rösten, datorrösten, översättningen), och nästa tryck tar tillbaka exakt dem.",
-  "The computer voice ({voice}) speaks for you.": "Datorrösten ({voice}) pratar åt dig.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Stänger av alla röster som ändrar din mikrofon. Slår du på den kommer de tillbaka.",
   "Turns on: {voices}": "Slår på: {voices}",
   "Voices on or off": "Röster på eller av",
@@ -4838,6 +4837,10 @@
   ],
   "(AI voice)": "(AI-röst)",
   "(Voice changer)": "(Röstförvrängare)",
+  "(Computer voice)": "(Datorröst)",
+  "(Custom voice)": "(Egen röst)",
+  "(Voice server)": "(Röstserver)",
+  "Windows voice": "Windows-röst",
   "{n} new": [
     "{n} ny",
     "{n} nya"

@@ -4045,7 +4045,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "Nimic nu schimbă vocea microfonului tău. Pune Voci pe PORNIT sau dă clic pe o voce gri ca s-o pornești.",
   "Off. Click to turn it back on. Right-click to open it.": "Oprit. Dă clic ca să-l pornești din nou. Clic dreapta ca să-l deschizi.",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "Comutatorul Voci din fila Voce: oprește tot ce îți schimbă microfonul (schimbătorul de voce, vocea AI, vocea calculatorului, traducerea), iar următoarea apăsare aduce înapoi exact acelea.",
-  "The computer voice ({voice}) speaks for you.": "Vocea calculatorului ({voice}) vorbește în locul tău.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Oprește fiecare voce care îți schimbă microfonul. Pornirea le aduce înapoi.",
   "Turns on: {voices}": "Pornește: {voices}",
   "Voices on or off": "Voci pornite sau oprite",
@@ -4928,6 +4927,10 @@
   ],
   "(AI voice)": "(Voce AI)",
   "(Voice changer)": "(Schimbător de voce)",
+  "(Computer voice)": "(Voce de computer)",
+  "(Custom voice)": "(Voce proprie)",
+  "(Voice server)": "(Server de voce)",
+  "Windows voice": "Vocea Windows",
   "{n} new": [
     "{n} nou",
     "{n} noi",

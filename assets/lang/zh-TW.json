@@ -3897,7 +3897,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "目前沒有任何東西在改變你的麥克風聲音。把「語音」切到開啟，或點一下灰色的聲音來開啟它。",
   "Off. Click to turn it back on. Right-click to open it.": "已關閉。點一下重新開啟。按右鍵打開它。",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "「語音」分頁的「語音」開關：關閉所有改變你麥克風的東西（變聲器、AI 聲音、電腦語音、翻譯），再按一次就會恢復完全相同的那些。",
-  "The computer voice ({voice}) speaks for you.": "電腦語音（{voice}）替你說話。",
   "Turns off every voice changing your mic. Switching it on brings them back.": "關閉所有改變你麥克風的聲音。重新開啟就會恢復它們。",
   "Turns on: {voices}": "會開啟：{voices}",
   "Voices on or off": "聲音開啟或關閉",
@@ -4748,6 +4747,10 @@
   ],
   "(AI voice)": "（AI 聲音）",
   "(Voice changer)": "（變聲器）",
+  "(Computer voice)": "（電腦語音）",
+  "(Custom voice)": "（自訂語音）",
+  "(Voice server)": "（語音伺服器）",
+  "Windows voice": "Windows 語音",
   "{n} new": [
     "{n} 個新"
   ],

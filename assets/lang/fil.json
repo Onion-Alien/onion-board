@@ -3971,7 +3971,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "Walang nagbabago sa boses ng mic mo. I-ON ang Mga voice, o i-click ang kulay-abong voice para buksan ito.",
   "Off. Click to turn it back on. Right-click to open it.": "Naka-off. I-click para i-on ulit. I-right-click para buksan ito.",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "Ang Mga voice switch sa Voice tab: ino-off ang lahat ng nagbabago sa mic mo (ang voice changer, ang AI voice, ang computer voice, ang translation), at ibabalik ng susunod na pindot ang mismong mga 'yon.",
-  "The computer voice ({voice}) speaks for you.": "Ang computer voice ({voice}) ang nagsasalita para sa iyo.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Ino-off ang bawat voice na nagbabago sa mic mo. Ibabalik sila kapag in-on ito.",
   "Turns on: {voices}": "Bubuksan: {voices}",
   "Voices on or off": "Mga voice on o off",
@@ -4838,6 +4837,10 @@
   ],
   "(AI voice)": "(AI voice)",
   "(Voice changer)": "(Voice changer)",
+  "(Computer voice)": "(Boses ng computer)",
+  "(Custom voice)": "(Sariling boses)",
+  "(Voice server)": "(Voice server)",
+  "Windows voice": "Boses ng Windows",
   "{n} new": [
     "{n} bago",
     "{n} bago"

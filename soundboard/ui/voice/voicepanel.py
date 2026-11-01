@@ -222,6 +222,12 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.speech.live_changed.connect(self._speech_live)
         self.speech.lang_changed.connect(self._emit_active)
         self._section("speak", self.speech, self.speech.title, self.speech.head)
+        # the computer voice's bar (a voice server's voice too): it has no voice cards
+        from soundboard.ui.voice.voicebar import VoiceBar
+        self.speak_bar = VoiceBar(self.speech, self.speech.livevoice.b_live.isChecked)
+        self.speak_bar.effects_wanted.connect(lambda: (
+            usage.used("voice-effects"), self.fx.open_effects(self.speak_bar.btn_effects)))
+        self.speak_bar.edit_wanted.connect(self._edit_speak_voice)
         self._follow_offline()
         self.speech.custom_wanted.connect(lambda: self.show_tab("addons"))
         self.addons = ModulesList(self.speech.custom_title, self.speech.custom_box)
@@ -310,7 +316,9 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
 
     def _barred(self):
         """The cards with a picked voice's bar: (tab key, panel)."""
-        return (("fx", self.fx), ("ai", self.ai))
+        bars = (("fx", self.fx), ("ai", self.ai))
+        speak = getattr(self, "speak_bar", None)   # (made after the other cards)
+        return bars + (("speak", speak),) if speak is not None else bars
 
     def set_view(self, view: str):
         """The voices as picture cards or a list, in both cards."""

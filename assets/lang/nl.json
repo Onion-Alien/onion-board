@@ -3971,7 +3971,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "Niets verandert je microfoonstem. Zet Stemmen op AAN, of klik op een grijze stem, om hem aan te zetten.",
   "Off. Click to turn it back on. Right-click to open it.": "Uit. Klik om hem weer aan te zetten. Rechtsklik om hem te openen.",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "De Stemmen-schakelaar op het tabblad Stem: zet alles uit wat je microfoon verandert (de stemvervormer, de AI-stem, de computerstem, het vertalen), en de volgende druk haalt precies die terug.",
-  "The computer voice ({voice}) speaks for you.": "De computerstem ({voice}) spreekt voor je.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Zet elke stem uit die je microfoon verandert. Aanzetten haalt ze terug.",
   "Turns on: {voices}": "Zet aan: {voices}",
   "Voices on or off": "Stemmen aan of uit",
@@ -4838,6 +4837,10 @@
   ],
   "(AI voice)": "(AI-stem)",
   "(Voice changer)": "(Stemvervormer)",
+  "(Computer voice)": "(Computerstem)",
+  "(Custom voice)": "(Eigen stem)",
+  "(Voice server)": "(Stemserver)",
+  "Windows voice": "Windows-stem",
   "{n} new": [
     "{n} nieuw",
     "{n} nieuw"

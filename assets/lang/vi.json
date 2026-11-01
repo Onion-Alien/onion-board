@@ -3897,7 +3897,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "Không có gì đang đổi giọng mic của bạn. Gạt Giọng sang BẬT, hoặc bấm vào một giọng màu xám để bật nó.",
   "Off. Click to turn it back on. Right-click to open it.": "Đang tắt. Bấm để bật lại. Bấm chuột phải để mở.",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "Công tắc Giọng trên thẻ Giọng nói: tắt mọi thứ đang đổi mic của bạn (bộ đổi giọng, giọng AI, giọng máy tính, dịch), và lần bấm sau sẽ bật lại đúng những thứ đó.",
-  "The computer voice ({voice}) speaks for you.": "Giọng máy tính ({voice}) nói thay bạn.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Tắt mọi giọng đang đổi mic của bạn. Bật lại sẽ mang chúng trở lại.",
   "Turns on: {voices}": "Sẽ bật: {voices}",
   "Voices on or off": "Bật hoặc tắt giọng",
@@ -4748,6 +4747,10 @@
   ],
   "(AI voice)": "(Giọng AI)",
   "(Voice changer)": "(Bộ đổi giọng)",
+  "(Computer voice)": "(Giọng máy tính)",
+  "(Custom voice)": "(Giọng tùy chỉnh)",
+  "(Voice server)": "(Máy chủ giọng nói)",
+  "Windows voice": "Giọng Windows",
   "{n} new": [
     "{n} mới"
   ],

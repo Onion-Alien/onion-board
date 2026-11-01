@@ -3971,7 +3971,6 @@
   "Nothing is changing your mic voice. Switch Voices ON, or click a grey voice, to turn it on.": "Niente sta cambiando la voce del tuo microfono. Metti Voci su ATTIVO, o clicca una voce grigia, per accenderla.",
   "Off. Click to turn it back on. Right-click to open it.": "Spento. Clicca per riaccenderlo. Clic destro per aprirlo.",
   "The Voice tab's Voices switch: turns off everything changing your mic (the voice changer, the AI voice, the computer voice, translating), and the next press brings exactly those back.": "L'interruttore Voci della scheda Voce: spegne tutto ciò che cambia il tuo microfono (il modificatore di voce, la voce IA, la voce sintetica, la traduzione), e la pressione successiva riporta esattamente quelli.",
-  "The computer voice ({voice}) speaks for you.": "La voce sintetica ({voice}) parla per te.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Spegne ogni voce che cambia il tuo microfono. Riaccenderlo le riporta.",
   "Turns on: {voices}": "Accende: {voices}",
   "Voices on or off": "Voci attive o spente",
@@ -4838,6 +4837,10 @@
   ],
   "(AI voice)": "(Voce IA)",
   "(Voice changer)": "(Modificatore di voce)",
+  "(Computer voice)": "(Voce sintetica)",
+  "(Custom voice)": "(Voce personalizzata)",
+  "(Voice server)": "(Server vocale)",
+  "Windows voice": "Voce di Windows",
   "{n} new": [
     "{n} nuovo",
     "{n} nuovi"
