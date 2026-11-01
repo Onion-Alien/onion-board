@@ -2884,7 +2884,6 @@
   ],
   "AI voice off": "صوت الذكاء الاصطناعي متوقف",
   "AI voice: {voice}, starting.": "صوت الذكاء الاصطناعي: {voice}، جارٍ البدء.",
-  "AI voice: {voice}.": "صوت الذكاء الاصطناعي: {voice}.",
   "No mic open": "لا يوجد ميكروفون مفتوح",
   "What others hear from your mic": "ما يسمعه الآخرون من ميكروفونك",
   "Getting Python ready…": "جارٍ تجهيز Python…",
@@ -4274,7 +4273,6 @@
   "The computer voice ({voice}) speaks for you.": "صوت الكمبيوتر ({voice}) يتكلم عنك.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "يوقف كل صوت يغيّر الميكروفون. تشغيله يعيدها.",
   "Turns on: {voices}": "يشغّل: {voices}",
-  "Voice changer: {voice}.": "مغير الصوت: {voice}.",
   "Voices on or off": "الأصوات تشغيل أو إيقاف",
   "What you say is said in {language}.": "ما تقوله يُقال بـ{language}.",
   "Onion Board closed unexpectedly, so it started again.": "أُغلق Onion Board بشكل غير متوقع، لذا فُتح من جديد.",
@@ -5166,5 +5164,8 @@
   "Speaks your typed lines": "ينطق ما تكتبه",
   "From a link…": "من رابط…",
   "Pick one of ours": "اختر واحدة من صورنا",
-  "Remove server": "إزالة الخادم"
+  "Remove server": "إزالة الخادم",
+  "Pause this voice (click again to bring it back)": "أوقف هذا الصوت مؤقتًا (انقر مجددًا لإعادته)",
+  "Paused: click to turn this voice back on": "متوقف مؤقتًا: انقر لتشغيل هذا الصوت مجددًا",
+  "Turn this voice off (Voices ON won't bring it back)": "أطفئ هذا الصوت (لن يعيده تشغيل الأصوات)"
 }

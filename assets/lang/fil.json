@@ -2656,7 +2656,6 @@
   ],
   "AI voice off": "Naka-off ang AI voice",
   "AI voice: {voice}, starting.": "AI voice: {voice}, nagsisimula.",
-  "AI voice: {voice}.": "AI voice: {voice}.",
   "No mic open": "Walang bukas na mic",
   "What others hear from your mic": "Ang naririnig ng iba mula sa mic mo",
   "Getting Python ready…": "Inihahanda ang Python…",
@@ -3978,7 +3977,6 @@
   "The computer voice ({voice}) speaks for you.": "Ang computer voice ({voice}) ang nagsasalita para sa iyo.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Ino-off ang bawat voice na nagbabago sa mic mo. Ibabalik sila kapag in-on ito.",
   "Turns on: {voices}": "Bubuksan: {voices}",
-  "Voice changer: {voice}.": "Voice changer: {voice}.",
   "Voices on or off": "Mga voice on o off",
   "What you say is said in {language}.": "Ang sinasabi mo ay sinasabi sa {language}.",
   "Onion Board closed unexpectedly, so it started again.": "Hindi inaasahang nagsara ang Onion Board, kaya nagsimula itong muli.",
@@ -4814,5 +4812,8 @@
   "Speaks your typed lines": "Binibigkas ang mga tina-type mo",
   "From a link…": "Mula sa link…",
   "Pick one of ours": "Pumili sa amin",
-  "Remove server": "Alisin ang server"
+  "Remove server": "Alisin ang server",
+  "Pause this voice (click again to bring it back)": "I-pause ang boses na ito (i-click ulit para ibalik)",
+  "Paused: click to turn this voice back on": "Naka-pause: i-click para buksan ulit ang boses na ito",
+  "Turn this voice off (Voices ON won't bring it back)": "Patayin ang boses na ito (hindi ito ibabalik ng Mga boses ON)"
 }

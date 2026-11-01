@@ -2599,7 +2599,6 @@
   ],
   "AI voice off": "Suara AI mati",
   "AI voice: {voice}, starting.": "Suara AI: {voice}, sedang dimulai.",
-  "AI voice: {voice}.": "Suara AI: {voice}.",
   "No mic open": "Tidak ada mikrofon yang terbuka",
   "What others hear from your mic": "Apa yang didengar orang lain dari mikrofon Anda",
   "Getting Python ready…": "Menyiapkan Python…",
@@ -3904,7 +3903,6 @@
   "The computer voice ({voice}) speaks for you.": "Suara komputer ({voice}) berbicara untuk Anda.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Mematikan setiap suara yang mengubah mic Anda. Menyalakannya mengembalikan semuanya.",
   "Turns on: {voices}": "Menyalakan: {voices}",
-  "Voice changer: {voice}.": "Pengubah suara: {voice}.",
   "Voices on or off": "Suara nyala atau mati",
   "What you say is said in {language}.": "Yang Anda katakan diucapkan dalam {language}.",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board tertutup tiba-tiba, jadi dimulai lagi.",
@@ -4726,5 +4724,8 @@
   "Speaks your typed lines": "Mengucapkan baris yang kamu ketik",
   "From a link…": "Dari tautan…",
   "Pick one of ours": "Pilih dari punya kami",
-  "Remove server": "Hapus server"
+  "Remove server": "Hapus server",
+  "Pause this voice (click again to bring it back)": "Jeda suara ini (klik lagi untuk mengembalikannya)",
+  "Paused: click to turn this voice back on": "Dijeda: klik untuk menyalakan suara ini lagi",
+  "Turn this voice off (Voices ON won't bring it back)": "Matikan suara ini (Suara ON tidak akan mengembalikannya)"
 }

@@ -2599,7 +2599,6 @@
   ],
   "AI voice off": "เสียง AI ปิดอยู่",
   "AI voice: {voice}, starting.": "เสียง AI: {voice} กำลังเริ่ม",
-  "AI voice: {voice}.": "เสียง AI: {voice}",
   "No mic open": "ไม่มีไมค์ที่เปิดอยู่",
   "What others hear from your mic": "สิ่งที่คนอื่นได้ยินจากไมค์ของคุณ",
   "Getting Python ready…": "กำลังเตรียม Python…",
@@ -3904,7 +3903,6 @@
   "The computer voice ({voice}) speaks for you.": "เสียงคอมพิวเตอร์ ({voice}) พูดแทนคุณ",
   "Turns off every voice changing your mic. Switching it on brings them back.": "ปิดทุกเสียงพูดที่เปลี่ยนไมค์ของคุณ เปิดอีกครั้งจะนำกลับมา",
   "Turns on: {voices}": "จะเปิด: {voices}",
-  "Voice changer: {voice}.": "ตัวเปลี่ยนเสียง: {voice}",
   "Voices on or off": "เสียงพูด เปิด หรือ ปิด",
   "What you say is said in {language}.": "สิ่งที่คุณพูดจะพูดเป็นภาษา{language}",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board ปิดไปโดยไม่คาดคิด จึงเริ่มทำงานใหม่อีกครั้ง",
@@ -4726,5 +4724,8 @@
   "Speaks your typed lines": "พูดข้อความที่คุณพิมพ์",
   "From a link…": "จากลิงก์…",
   "Pick one of ours": "เลือกจากของเรา",
-  "Remove server": "ลบเซิร์ฟเวอร์"
+  "Remove server": "ลบเซิร์ฟเวอร์",
+  "Pause this voice (click again to bring it back)": "หยุดเสียงนี้ชั่วคราว (คลิกอีกครั้งเพื่อเอากลับมา)",
+  "Paused: click to turn this voice back on": "หยุดชั่วคราว: คลิกเพื่อเปิดเสียงนี้อีกครั้ง",
+  "Turn this voice off (Voices ON won't bring it back)": "ปิดเสียงนี้ (เปิดเสียงจะไม่เอากลับมา)"
 }
