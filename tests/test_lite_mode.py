@@ -261,9 +261,10 @@ def test_use_less_cpu_follows_lite_mode_until_switched_by_hand(window):  # noqa:
 
 def test_the_mic_alone_keeps_the_tick_quiet_in_lite_mode(window, monkeypatch):  # noqa: F811
     """Most mics hear the room above the meters' floor: that kept the window's tick at
-    full pace for as long as it was open. In lite mode the mic meters follow at the
-    lite quiet pace (5 a second); a sound playing gets lite's busy pace (15 a second,
-    not 24)."""
+    full pace for as long as it was open. Now the room's level ticks at the quiet pace
+    and only a voice gets the full pace; in lite mode the mic meters follow at the lite
+    quiet pace (5 a second) even then, and a sound playing gets lite's busy pace (15 a
+    second, not 24)."""
     from soundboard.ui.window import tickcontrol
     e = window.engine
     playing = {}
@@ -279,8 +280,14 @@ def test_the_mic_alone_keeps_the_tick_quiet_in_lite_mode(window, monkeypatch):  
         window.tickctl.tick()
         return window.timer.interval()
 
-    assert tick_with_room_noise() == tickcontrol.TICK_MS            # lite mode off
+    assert tick_with_room_noise() == tickcontrol.TICK_QUIET_MS      # lite mode off
+    e.level_mic = e.level_main = 0.1                                 # -20 dB: someone talking
+    window.tickctl.tick()
+    assert window.timer.interval() == tickcontrol.TICK_MS
     lite.set_on(True)
+    e.level_mic = e.level_main = 0.1                                 # (lite: not even a voice)
+    window.tickctl.tick()
+    assert window.timer.interval() == tickcontrol.TICK_LITE_QUIET_MS
     assert tick_with_room_noise() == tickcontrol.TICK_LITE_QUIET_MS  # 5 a second
     assert window.mic_meter.level == pytest.approx(0.01)             # (still followed)
     playing["s0"] = (0.5, False)                                     # a sound plays
@@ -290,7 +297,7 @@ def test_the_mic_alone_keeps_the_tick_quiet_in_lite_mode(window, monkeypatch):  
     window.tickctl.tick()
     assert window.timer.interval() == tickcontrol.TICK_LITE_MS
     lite.set_on(False)
-    assert tick_with_room_noise() == tickcontrol.TICK_MS
+    assert tick_with_room_noise() == tickcontrol.TICK_QUIET_MS
     assert tickcontrol.TICK_LITE_QUIET_MS > tickcontrol.TICK_QUIET_MS
     assert tickcontrol.TICK_LITE_MS > tickcontrol.TICK_MS
 
