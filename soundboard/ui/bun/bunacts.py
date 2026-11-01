@@ -440,8 +440,9 @@ def _gift(p: QPainter, show: float, lid: float, shake: float):
 class ActBunny(BunnyWidget):
     """Bun beside a window's title, playing `act` on a loop. `play(act)` is a one-off
     (the act's own seconds), then he's back to the loop; `set_act` changes the loop.
-    His fidgets and his theme's skit stay off: he's busy. Hidden, his timer stops; in
-    lite mode he holds still (BunnyWidget)."""
+    His fidgets and his theme's skit stay off: he's busy. Hidden, his timer stops. In
+    lite mode he's a still picture of his act (STILL: the bin, the parcel, the present
+    still there), with no one-offs."""
 
     def __init__(self, act: Act, prop: str | None = None, height: int = ACT_H,
                  parent=None):
@@ -457,6 +458,7 @@ class ActBunny(BunnyWidget):
     def set_act(self, act: Act):
         if act is not self.act:
             self.act, self._phase = act, 0.0
+            self.update()   # (resting in lite mode: the new still picture)
 
     def play(self, act: Act):
         self._once = (act, time.monotonic())
@@ -474,9 +476,9 @@ class ActBunny(BunnyWidget):
         self._phase = (self._phase + dt * self.rate) % self.act[0]
         if self._once is not None and now - self._once[1] >= self._once[0][0]:
             self._once = None
-        if lite.on():   # a still picture
-            self._skit = self._kit = None
-        elif self._skit is None:
+        if lite.on():   # a still picture of the act, no one-offs
+            self._once = None
+        if self._skit is None:
             self._skit, self._skit_at = (math.inf, self._frame), now
 
     def _draw_bun(self, p: QPainter, pose: dict, body: QRectF):
@@ -493,8 +495,20 @@ class ActBunny(BunnyWidget):
         super()._draw_bun(p, pose, body)
         p.restore()
 
+    def _calm(self, now: float) -> bool:
+        """In lite mode his act is a still picture, so it doesn't keep him moving."""
+        if not lite.on():
+            return super()._calm(now)
+        skit, self._skit = self._skit, None
+        try:
+            return super()._calm(now)
+        finally:
+            self._skit = skit
+
     def _frame(self, kit: Kit, t: float):
-        if self._once is not None:
+        if lite.on():
+            self.act[1](kit, STILL.get(self.act, 0.0))
+        elif self._once is not None:
             act, at = self._once
             act[1](kit, time.monotonic() - at)
         else:
@@ -514,3 +528,5 @@ RUN: Act = (RUN_LOOP, box_run)
 OPEN: Act = (2.1, box_open)
 GIFT: Act = (GIFT_LOOP, present)
 IN_BIN = (BIN_ACT, BRING_BACK, BYE)   # the acts he's in the bin for
+# lite mode's still picture of each loop: the moment that shows what he's doing
+STILL = {SNIP: 0.9, MIC: 0.0, RECORDING: 0.3, BIN_ACT: 0.0, PAT: 0.0, RUN: 0.0, GIFT: 2.6}

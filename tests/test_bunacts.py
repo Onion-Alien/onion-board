@@ -53,12 +53,26 @@ def test_speed_hurries_him_and_pitch_stretches_him(qapp):
     assert kit.pose["sy"] < 0
 
 
-def test_lite_mode_holds_him_still(qapp, monkeypatch):
+def test_lite_mode_is_a_still_picture_of_his_act(qapp, monkeypatch):
+    """Lite mode: no animation, but still the bin / parcel / present (not a bare Bun),
+    no one-offs, and he settles so his timer stops."""
     from soundboard.ui.settings import lite
     monkeypatch.setattr(lite, "on", lambda: True)
-    b = bunacts.ActBunny(bunacts.GIFT)
-    b._step_fidget(time.monotonic())
-    assert not b.skit_playing
+    for act in (bunacts.GIFT, bunacts.BIN_ACT, bunacts.PAT):
+        b = bunacts.ActBunny(act)
+        b._step_fidget(time.monotonic())
+        b.play(bunacts.BRING_BACK)
+        b._step_fidget(time.monotonic())
+        assert b._once is None
+        frames = []
+        for t in (0.0, 1.3, 3.1):   # the same picture whenever it's drawn
+            kit = Kit()
+            b._phase = t
+            b._frame(kit, t)
+            frames.append((len(kit.world), sorted(kit.pose.items())))
+            assert kit.world   # his act's things are drawn
+        assert frames[0] == frames[1] == frames[2]
+        assert b._calm(time.monotonic() + 60)
 
 
 def test_he_keeps_his_size_in_a_short_window(qapp):
