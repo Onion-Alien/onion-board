@@ -1,0 +1,1 @@
+- AI voices: the "Others now hear …" line after the AI voice stops now shows in the language you picked, not the one that was on when the app started.

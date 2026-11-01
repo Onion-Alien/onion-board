@@ -47,7 +47,7 @@ from soundboard.ui.voice.aivoicecards import (ALL, FAVS, KINDS, KIND_ICONS, MAKE
                                               art_key, emoji_icon, voice_icon,
                                               voice_kind)
 from soundboard.ui.voice.aivoicemine import AiVoiceMine
-from soundboard.ui.voice.aivoicerun import BACKUP_HEARD, LOAD_TIMEOUT_MS, AiVoiceRun  # noqa: F401
+from soundboard.ui.voice.aivoicerun import LOAD_TIMEOUT_MS, AiVoiceRun  # noqa: F401
 
 log = logging.getLogger(__name__)
 
