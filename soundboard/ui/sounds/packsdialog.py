@@ -400,6 +400,7 @@ class PreviewDialog(QDialog):
         foot.addWidget(self.btn_close)
         v.addLayout(foot)
         _show_add(self.btn, p)
+        fit.watch(self)   # a long translation grows it
         self.fit_height()
 
     def fit_height(self):
