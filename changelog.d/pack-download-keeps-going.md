@@ -1,0 +1,1 @@
+- Free sound packs: a pack you press Add on keeps downloading when you go back to your sounds, switch tabs or open Settings, and its sounds still land on your board. Opening the packs page again shows it still going.
