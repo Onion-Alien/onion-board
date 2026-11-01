@@ -62,6 +62,7 @@ LEAVE_MS, SINK = 180, 12                         # out: fades, sinking a little
 
 
 class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
+    KEEP_OPEN = True   # a click outside doesn't close it: it would lose work
     PAGES = 3
     _discord_read = Signal(object, object)   # worker -> UI: (files' signature, settings)
 

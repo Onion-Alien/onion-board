@@ -1,0 +1,2 @@
+- Small pop-ups (rename, save preset, yes/no questions…) no longer flash white for a moment when they open.
+- A left click anywhere else in the app now closes a small pop-up, the same as Cancel, instead of playing the Windows error sound. Pop-ups holding work you'd lose (editing a sound, forms, recording, the setup guide) still stay open.

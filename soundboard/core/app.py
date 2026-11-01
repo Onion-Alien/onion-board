@@ -627,6 +627,8 @@ def main():
     i18n.translate_qt_buttons(app)   # OK, Cancel, Yes… in Qt's own dialogs
     from soundboard.ui.kit import quietbox
     quietbox.install(app)   # no Windows ding from tips and warnings
+    from soundboard.ui.kit import modals
+    modals.install(app)   # dialogs: no white flash, a click outside closes them
     from soundboard.ui.kit.widgets import install_click_focus
     install_click_focus(app)   # a click leaves no focus ring: that's for the keyboard
     from soundboard.ui.kit import weblinks

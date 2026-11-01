@@ -238,6 +238,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/kit/a11y.py` | screen-reader names for icon-only controls, taken from their tooltips as the focus moves |
 | `soundboard/ui/kit/numberbox.py` | every number box takes a typed value on a pause or a click away, and Enter in one presses no window button |
 | `soundboard/ui/kit/quietbox.py` | no Windows "ding" from information/warning message boxes (same picture, shown as a pixmap); only critical errors keep their sound |
+| `soundboard/ui/kit/modals.py` | every dialog stays see-through until its first paint (no white flash on Windows); a left click on a window a modal dialog blocks closes that dialog as Cancel, unless it has `KEEP_OPEN` |
 | `soundboard/ui/kit/weblinks.py` | web links (http/https/mailto) open through a helper started with the user's own environment, so a browser the app starts doesn't inherit the relay's proxy variables |
 | `soundboard/audio/shuffle.py` | the random-sound hotkeys' shuffle bag (every sound once before repeats, never twice in a row) |
 | `soundboard/control/remote.py` | opt-in local control API for Stream Deck / scripts: HTTP on `127.0.0.1`, token-guarded, answered on the UI thread (the endpoints, the server, `RemoteControl`, `apply`). With `lan=True` it's the server "remote" add-ons (Onion Pocket) get: local-network peers only, wrong keys locked out, never on a network Windows calls Public. It re-exports the app side below, so older imports keep working |

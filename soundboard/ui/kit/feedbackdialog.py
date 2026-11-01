@@ -68,6 +68,7 @@ def _title(text: str) -> QLabel:
 
 
 class FeedbackDialog(QDialog):
+    KEEP_OPEN = True   # a click outside doesn't close it: it would lose work
     def __init__(self, cfg, parent=None):
         super().__init__(parent)
         fit.watch(self)   # grows to fit its text (ui/kit/fit.py)

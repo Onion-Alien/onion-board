@@ -642,6 +642,7 @@ class EditDialog(EditDialogParts, QDialog):
 
     preview_cb(sid, volume, fx, (fade_in, fade_out), done) plays the sound, with these
     (unsaved) effects and fades, to your headphones only."""
+    KEEP_OPEN = True   # a click outside doesn't close it: it would lose work
     hotkeys_changed = Signal()
     picture_fetched = Signal(int, object, str)   # (which try, QImage or None, why not)
     source_forgotten = Signal()   # Details → Delete info: saved at once, Save or Cancel

@@ -485,6 +485,7 @@ class DestPanel(QWidget):
 class CustomDestDialog(QDialog):
     """Add / edit / remove custom destination modes. Edits land in the config (and
     on the engine, if the edited mode is the one in use) as they're made."""
+    KEEP_OPEN = True   # a click outside doesn't close it: it would lose work
     changed = Signal()
 
     def __init__(self, mw, parent=None):
