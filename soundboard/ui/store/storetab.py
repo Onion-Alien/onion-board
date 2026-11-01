@@ -15,7 +15,7 @@ import threading
 from collections.abc import Callable
 
 from PySide6.QtCore import QEvent, QPoint, Qt, QTimer, Signal
-from PySide6.QtWidgets import (QComboBox, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QMenu,
+from PySide6.QtWidgets import (QGridLayout, QHBoxLayout, QLabel, QLineEdit, QMenu,
                                QPushButton, QScrollArea, QStackedWidget, QVBoxLayout, QWidget)
 
 from soundboard.core import achievements, usage
@@ -25,7 +25,7 @@ from soundboard.i18n import _
 from soundboard.ui.kit import busy, icons
 from soundboard.ui.store import storelook
 from soundboard.ui.kit.panel import hint_label, icon_button, section_label
-from soundboard.ui.store.storefit import CARD_GAP, LIST_GAP, StoreFit
+from soundboard.ui.store.storefit import CARD_GAP, LIST_GAP, CutCombo, StoreFit
 from soundboard.ui.store.storeplay import StorePlay
 from soundboard.ui.store.storerow import SoundRow, count_text
 from soundboard.ui.store.storeshare import ShareDialog, error_text
@@ -41,6 +41,8 @@ SEARCH_WAIT_MS = 400          # typing pauses this long before the store is sear
 LINK_TICK_MS = 250            # how often the cards look at what the player is doing
 # the Sounds dropdown's first two (every sound, in an order): the order -> its key there
 TOPS = {"trending": "@trending", "top": "@top", "new": "@new"}
+# ... then Community uploads (the store's own sounds, store.OURS), then a line and the categories
+TOP_ROWS = len(TOPS) + 1
 
 
 class StoreTab(StoreFit, StorePlay, QWidget):
@@ -164,7 +166,7 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         self._search_wait.timeout.connect(self.reload)
         self.search.textChanged.connect(lambda _t: self._search_wait.start())
         # the sounds' categories (or the voices' kinds), each with how many
-        self.cat_pick = QComboBox()
+        self.cat_pick = CutCombo()
         self.cat_pick.setAccessibleName(_("Category"))
         self.cat_pick.setToolTip(_("Category"))
         self.cat_pick.setPlaceholderText(_("All categories"))   # every sound, by Added
@@ -190,6 +192,7 @@ class StoreTab(StoreFit, StorePlay, QWidget):
             tv.addLayout(bar)
         hv.addWidget(self.toolbar)
         self._one_row: bool | None = None
+        self._cat_short: list[str] = []   # the dropdown's names it always has room for
         self._lay_toolbar(False)
         col.addWidget(head)
         self._sort = "trending"   # the default (the dropdown picks Most liked)
@@ -405,22 +408,27 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         self._show_picked(self._kind)
 
     def _fill_cats(self, items: list[tuple[str, str, str]]):
-        """The sounds: Trending, Most liked and Newest (every sound), then (key, text, icon name)
+        """The sounds: Trending, Most liked and Newest (every sound), Community uploads (only
+        the sounds shared here, none brought in from other sites), then (key, text, icon name)
         for each category. The voices: "All categories", then each kind."""
         self.cat_pick.clear()
         if self._mode == "sounds":
             items = [(TOPS["trending"], _("Trending"), "flame"),
                      (TOPS["top"], _("Most liked"), "like"),
-                     (TOPS["new"], _("Newest"), "history"), *items]
+                     (TOPS["new"], _("Newest"), "history"),
+                     (store.OURS, _("Community uploads"), storelook.CAT_ICON[store.OURS]),
+                     *items]
         else:
             items = [("", _("All categories"), storelook.ALL_ICON), *items]
+        # (the voices' kinds are short: room for them all)
+        self._cat_short = [t for _k, t, _i in items[:len(TOPS) if self._mode == "sounds" else None]]
         for key, text, _icon in items:
             self.cat_pick.addItem(text, key)
         names = [i for _k, _t, i in items]
-        if self._mode == "sounds" and len(items) > len(TOPS):
+        if self._mode == "sounds" and len(items) > TOP_ROWS:
             # a line under the orders: "Most liked" read like one more category
-            self.cat_pick.insertSeparator(len(TOPS))
-            names.insert(len(TOPS), "")
+            self.cat_pick.insertSeparator(TOP_ROWS)
+            names.insert(TOP_ROWS, "")
         icons.set_item_icons(self.cat_pick, names)
         self._show_picked(self._kind if self._mode == "voices" else self._cat)
         wheelguard.snug_combo(self.cat_pick)
@@ -453,7 +461,8 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         # the name read as part of it: "Memes 7")
         self._fill_cats([(key, f"{store.cat_name(key)} ({count_text(n)})",
                           storelook.CAT_ICON.get(key, storelook.ALL_ICON))
-                         for key, n in sorted(cats, key=lambda c: -c[1])])
+                         for key, n in sorted(cats, key=lambda c: -c[1])
+                         if key != store.OURS])   # (it's up with the orders)
         self._show_picked(self._cat)
 
     def _say(self, icon: str, title: str, text: str, button: str = "",

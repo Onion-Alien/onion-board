@@ -16,6 +16,18 @@ from soundboard.ui.bun.bunshapes import _arc, _ellipse, _glow, _stroke
 from soundboard.style.owldraw import sparkle as _sparkle
 
 
+SWUNG = ("hammer", "hammer_broken", "wrench")   # props his arm swings with
+
+
+def tool_paw(swing: float) -> tuple[float, float]:
+    """His paw on a hammer or wrench as `swing` goes 0 (raised) .. 1 (on the plank):
+    lifted out beside his head, then in and down to the plank (in close by mid-swing,
+    so the hammer clears what he builds beside him), so his
+    arm swings the tool instead of the tool turning in a still paw."""
+    s = max(0.0, min(1.0, swing))
+    return (round(80 + 9 * (1 - s) ** 2, 1), round(81 + 11 * s, 1))
+
+
 def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0,
                fur: QColor = FUR):
     if prop == "mic":           # holding a mic up in the right paw
@@ -77,8 +89,9 @@ def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0,
             p.drawLine(QPointF(92, 111.5), QPointF(106, 111.5))
         # the hammer pivots at the other paw, on his right so it never crosses his
         # face: up beside his head at 0, down on the plank at 1
+        px, py = tool_paw(swing)
         p.save()
-        p.translate(80, 92)
+        p.translate(px, py)
         p.rotate(25 + 98 * max(0.0, min(1.0, swing)))
         p.setPen(ink)
         p.setBrush(WOOD)
@@ -91,7 +104,7 @@ def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0,
             p.setBrush(STEEL)
             p.drawRoundedRect(QRectF(-10, -38, 20, 10), 2.5, 2.5)
         p.restore()
-        _ellipse(p, 80, 92, 12, 10, fur, ink)
+        _ellipse(p, px, py, 12, 10, fur, ink)
     elif prop == "bat":         # a baseball bat in his right paw: over his shoulder at
         # 0, swung down and out to his right at 1 (never across his face)
         p.save()
@@ -130,8 +143,9 @@ def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0,
         _ellipse(p, 104, 108.5, 6, 6, ROBOT_BOLT, ink)        # the bolt he's tightening
         p.setPen(QPen(ROBOT_INK, 1))
         p.drawLine(QPointF(102.3, 108.5), QPointF(105.7, 108.5))
+        px, py = tool_paw(swing)
         p.save()
-        p.translate(80, 92)
+        p.translate(px, py)
         p.rotate(25 + 98 * max(0.0, min(1.0, swing)))
         p.setPen(ink)
         p.setBrush(QColor("#9aa3b5"))
@@ -140,7 +154,7 @@ def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0,
         p.setBrush(fur)
         p.drawRect(QRectF(-3, -37, 6, 6))
         p.restore()
-        _ellipse(p, 80, 92, 12, 10, fur, ink)
+        _ellipse(p, px, py, 12, 10, fur, ink)
 
 
 def _survey(p: QPainter, ink: QPen, fur: QColor):

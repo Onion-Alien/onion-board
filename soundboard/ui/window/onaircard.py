@@ -390,6 +390,11 @@ class OutputBlock(QFrame):
         d, pad = left - right, self._px(self.PAD)
         row.setContentsMargins(pad + max(0, -d), top, pad + max(0, d), bottom)
 
+    @staticmethod
+    def line_x(px) -> int:
+        """Where a line's icon starts in it, open: in its header's arrow column."""
+        return px(_GroupHead.SIDE)
+
     def _pin_all(self):
         # the title's first line is centred on the row's controls (the switch, Stop all),
         # and the mark on that line
@@ -412,7 +417,9 @@ class OutputBlock(QFrame):
         for n in self.net:
             if self.property("expanded"):
                 self._pin(n.glyph, n.label)
-                self._balance(n.row, n.glyph, n.label, None, pad, pad)
+                # left-aligned: icons under the header's arrow, words under its name, in
+                # the same place whatever else is on (centred, they moved with the longest)
+                n.row.setContentsMargins(self.line_x(self._px), pad, self.line_x(self._px), pad)
             else:   # the icon alone, centred under the switch
                 n.row.setContentsMargins(0, 8, 0, 0)
                 n.glyph.setContentsMargins(0, 0, 0, 0)
@@ -448,7 +455,6 @@ class OutputBlock(QFrame):
         and the status line, chevron and all."""
         def px(n: float) -> int:
             return max(1, round(n * scale))
-        text_x = round(self.ICON_X - px(self.GLYPH) / 2) + px(self.GLYPH) + px(self.GAP)
         # the status line: in its own button, the card's padding round it and its own
         # inside it
         status_x = 2 * px(self.PAD) + px(self.GLYPH) + px(self.GAP)
@@ -459,7 +465,7 @@ class OutputBlock(QFrame):
         # a group's header: its arrow, name and (shut) an icon per line
         small = QFont(self.font())
         small.setPointSizeF(_GroupHead.PT * scale)
-        head = max((2 * px(self.PAD) + 2 * px(_GroupHead.SIDE) + px(self.CHEVRON) + px(self.GAP)
+        head = max((2 * px(self.PAD) + 2 * px(_GroupHead.SIDE) + px(self.GLYPH) + px(self.GAP)
                     + QFontMetrics(small).horizontalAdvance(group_name(g)) + 1 + px(self.GAP)
                     + (n * (px(self.MINI) + px(_GroupHead.MINI_GAP))
                        if g in self.shut and n > 1 else 0)
@@ -467,7 +473,8 @@ class OutputBlock(QFrame):
         return max(2 * px(self.PAD) + halves * px(self.PAIR_H) + (halves - 1) * px(self.PAIR_GAP),
                    status_x + status + 1 + px(self.GAP - 2) + px(self.CHEVRON)
                    + 2 * px(self.PAD),
-                   text_x + network + 1 + 2 * px(self.PAD), head)
+                   px(self.PAD) + self.line_x(px) + px(self.GLYPH) + px(self.GAP) + network + 1
+                   + self.line_x(px) + px(self.PAD), head)
 
     def scale_for(self, width: int) -> float:
         """The biggest scale (up to 1) the card fits `width` at, or 0: not even at
@@ -815,12 +822,14 @@ class _GroupHead(QPushButton):
         self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         row = self.row = QHBoxLayout(self)
         row.setSpacing(0)
-        self.arrow = card._glyph(OutputBlock.CHEVRON)
+        self.arrow = card._glyph(OutputBlock.GLYPH)
         self.name = QLabel(group_name(group))
         self.name.setObjectName("hint")
         for w in (self.arrow, self.name):
             w.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         row.addWidget(self.arrow, 0, Qt.AlignmentFlag.AlignVCenter)
+        self.arrow_room = QSpacerItem(0, 0, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+        row.addSpacerItem(self.arrow_room)
         self.gap = QSpacerItem(0, 0, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
         row.addSpacerItem(self.gap)
         row.addWidget(self.name, 0, Qt.AlignmentFlag.AlignVCenter)
@@ -836,9 +845,12 @@ class _GroupHead(QPushButton):
         self.setFixedHeight(px(OutputBlock.HEAD_H))
         self.row.setContentsMargins(px(self.SIDE), 0, px(self.SIDE), 0)
         self.minis_box.setSpacing(px(self.MINI_GAP))
+        # no arrow (one line): its room kept, so the name sits where it always does
         self.arrow.setVisible(folds)
-        self.arrow.setFixedWidth(px(OutputBlock.CHEVRON))
-        self.gap.changeSize(px(OutputBlock.GAP) if folds else 0, 0,
+        self.arrow_room.changeSize(0 if folds else px(OutputBlock.GLYPH), 0,
+                                   QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+        self.arrow.setFixedWidth(px(OutputBlock.GLYPH))
+        self.gap.changeSize(px(OutputBlock.GAP), 0,
                             QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
         if folds:
             icons.set_label_icon(self.arrow, "fold_open" if not shut else
@@ -883,7 +895,7 @@ class _NetLine(QPushButton):
         self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
         self.row = QHBoxLayout(self)
         self.row.setSpacing(0)
-        self.row.addStretch(1)   # centred in the card, as the status strip's line
+        self.row.addStretch(1)   # the small card: the icon centred (open: lay_out)
         self.glyph = card._glyph()
         self.label = _HugLabel("")
         self.label.setWordWrap(True)
@@ -899,7 +911,9 @@ class _NetLine(QPushButton):
         self.hide()
 
     def lay_out(self, expanded: bool, glyph: int, px):
-        # shut: the icon's box is the card's width, so it sits centred under the switch
+        # shut: the icon's box is the card's width, so it sits centred under the switch;
+        # open, the line starts at the left (OutputBlock.line_x)
+        self.row.setStretch(0, 0 if expanded else 1)
         self.glyph.setFixedWidth(glyph if expanded else BUTTON_W)
         self.label.setVisible(expanded)
         self.setMinimumHeight(px(OutputBlock.ROW_H) if expanded else OutputBlock.GLYPH + 12)
