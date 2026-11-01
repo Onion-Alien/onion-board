@@ -1,0 +1,2 @@
+- Speak another language: right after start, a language whose own voice can't be read yet (no AI voices add-on, or an older one) is read by a Windows voice, instead of naming its own voice and saying nothing until the add-ons were refreshed.
+- Free sound packs: the "TV & movies" filter button no longer reads "TV _movies".

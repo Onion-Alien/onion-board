@@ -123,11 +123,7 @@ class VoiceAddons(_Panel):
         self.chain.configure(self.fx.spec())
         self.speech.set_modules(self.modules)
         self.ai.set_modules(self.modules, ai_voices)
-        m = self.ai.module
-        self.speech.voices_need = (
-            "get" if m is None or not m.installed
-            else "update" if not (m.path / "reader.py").is_file() else "")
-        self.speech._refresh_translation()
+        self._check_voices_need()
         sp = self.speech
         t = sp.translating()
         if t is not None and sp.ctl.live:   # talking already: the right voice from the next line
@@ -135,6 +131,16 @@ class VoiceAddons(_Panel):
         self._emit_active()   # the language's bar row and the AI voices' Languages cards
         self._follow_offline()
         self.addons.show_modules(self.modules)
+
+    def _check_voices_need(self):
+        """Whether the languages' own voices can be read yet (no AI voices add-on, or
+        one from before reader.py: a Windows voice reads meanwhile). At start too, not
+        only on a rescan: else a language named its own voice and said nothing."""
+        m = self.ai.module
+        self.speech.voices_need = (
+            "get" if m is None or not m.installed
+            else "update" if not (m.path / "reader.py").is_file() else "")
+        self.speech._refresh_translation()
 
     def _rescan_in_background(self):
         """The add-ons' Refresh button: the folder scan and voices.json read on a

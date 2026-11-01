@@ -490,6 +490,8 @@ def test_search_and_chips_filter_the_cards(qapp, monkeypatch):
         assert list(dlg.chip_btns) == ["", "Memes", "Gaming", "Streaming", "Anime",
                                        "Everyday", "Music", "Podcast", "Spooky", "Sports",
                                        "Tabletop", "TV & movies", packsdialog.MINE]
+        # a lone & would be a shortcut marker: the chip read "TV _movies"
+        assert dlg.chip_btns["TV & movies"].text() == "TV && movies"
         dlg.search.setText("bruh")   # a links pack's sound names are searched too
         assert shown() == ["test-links", "memes", "general"]
         dlg.search.setText("")
