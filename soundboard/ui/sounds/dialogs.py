@@ -427,7 +427,7 @@ class EffectsPanel(QObject):
                    self.trim, *self.rows.values())
         for w in widgets:
             w.blockSignals(True)
-        self.trim.set_values(f["start"], f["end"])
+        self.trim.load(f)
         self.speed.set_value(f["speed"])
         self.pitch.set_value(f["pitch"])
         self.boost.set_value(f["gain_db"])
@@ -545,15 +545,15 @@ class EffectsPanel(QObject):
 
     def fx(self) -> dict:
         gains, on, _t, _p = self.eq.state()
-        start, end = self.trim.values()
-        f = {"start": start, "end": end,
+        f = {**self.trim.trim_fx(),
              "speed": round(self.speed.value(), 3), "pitch": round(self.pitch.value(), 2),
              "tape": not self.keep.isChecked(), "gain_db": round(self.boost.value(), 2),
              "reverse": self.reverse.isChecked(),
              "eq": gains if on else [0.0] * len(gains),
              "effects": {t: r.state() for t, r in self.rows.items() if r.chk.isChecked()},
              "voice": self._voice, "live": self._live}
-        return {} if soundfx.is_neutral(f) else soundfx.clean(f)
+        # (splices only marked change nothing, but stay with the sound)
+        return {} if soundfx.is_neutral(f) and not f["splices"] else soundfx.clean(f)
 
     def _boost_hint(self):
         db = self.boost.value()
@@ -587,6 +587,7 @@ class EffectsPanel(QObject):
     def _untrimmed(self) -> dict:
         f = soundfx.clean(self.fx())
         f["start"] = f["end"] = 0.0
+        f["splices"], f["joined"] = [], False
         f["voice"] = {}   # the voice is a layer of its own: presets don't set it
         return f          # (Live controls' knobs are effects: Advanced's Effects column)
 
@@ -685,8 +686,7 @@ class EffectsPanel(QObject):
 
     def reset_all(self):
         """Every effect off, the voice too (the trim stays)."""
-        start, end = self.trim.values()
-        self.load({"start": start, "end": end})
+        self.load(self.trim.trim_fx())
         self._matching_preset()
         self.changed.emit()
 
@@ -694,8 +694,7 @@ class EffectsPanel(QObject):
         p = soundfx.PRESETS.get(name) or (self.mine.get(name[len(MINE):])
                                           if name.startswith(MINE) else None)
         if p:
-            start, end = self.trim.values()
-            self.load({**p, "start": start, "end": end, "voice": self._voice})
+            self.load({**p, **self.trim.trim_fx(), "voice": self._voice})
             self.changed.emit()
         self.delete_preset.setVisible(name.startswith(MINE))
 
@@ -1003,7 +1002,8 @@ class EditDialog(EditDialogParts, QDialog):
         prev.setToolTip(_("Preview (only you hear it)"))
         prev.setAccessibleName(_("Preview (only you hear it)"))
 
-        def play_preview():
+        def play_preview(_checked=False, fx: dict | None = None):
+            """With `fx`: the sound with those effects (one splice), not the draft's."""
             busy.set_busy(prev, True)
             self._say(_("Rendering the effects…"), 0)
 
@@ -1014,13 +1014,14 @@ class EditDialog(EditDialogParts, QDialog):
                 else:   # the window's corner card says why: the summary comes back
                     self._saying = False
                     self._fx_note()
-            got = preview_cb(self.meta.id, self.vol.value() / 100, self.effects.fx(),
-                             self.fades(), done)
+            got = preview_cb(self.meta.id, self.vol.value() / 100,
+                             self.effects.fx() if fx is None else fx, self.fades(), done)
             if got != "rendering":
                 busy.set_busy(prev, False)
                 self._say(_("Not loaded yet: try again in a moment") if got == "missing"
                           else _("▶  Playing"), 1500)
         prev.clicked.connect(play_preview)
+        self.play_preview = play_preview
 
         bb = QDialogButtonBox(QDialogButtonBox.StandardButton.Save
                               | QDialogButtonBox.StandardButton.Cancel)
@@ -1032,6 +1033,7 @@ class EditDialog(EditDialogParts, QDialog):
         # (the box's clicked comes before its accepted; the button's own clicked came
         # after, so Save a copy saved onto the original)
         bb.clicked.connect(lambda b: setattr(self, "as_copy", b is copy))
+        self.btn_save, self.btn_copy = bb.button(QDialogButtonBox.StandardButton.Save), copy
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
         # beside Save: every effect off, so a playing sound goes plain again at once
