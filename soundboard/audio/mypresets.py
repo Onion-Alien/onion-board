@@ -53,10 +53,11 @@ def clean_live(raw) -> dict:
 
 
 def clean_sound(raw) -> dict:
-    """A sound's preset: soundfx's settings with no trim, voice or live effects."""
+    """A sound's preset: soundfx's settings with no trim or voice (Live controls' knobs
+    stay: Edit sound's Advanced view has them)."""
     f = soundfx.clean(raw if isinstance(raw, dict) else {})
     f["start"] = f["end"] = 0.0
-    f["voice"], f["live"] = {}, []
+    f["voice"] = {}
     return f
 
 
