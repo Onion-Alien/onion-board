@@ -407,7 +407,6 @@
   "Forgets Apps tab volumes and hidden programs.": "Glömmer volymer och dolda program i fliken Appar.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Glömmer din mikrofon, dina hörlurar, vart dina ljud skickas och streamutgången; snabbinställningen körs igen.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Gratis tillägg från GitHub. Att ta bort eller installera om ett behåller dina triggers och parkopplade telefoner.",
-  "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Gratis, utan reklam och utan konto. Gjord av OnionAlien. MIT-licens med Commons Clause: använd den till vad som helst, dela den gratis, sälj den aldrig.",
   "Frequencies": "Frekvenser",
   "From the category showing (All = any sound), never the same one twice in a row. A category can have its own: right-click its tab.": "Från kategorin som visas (Alla = vilket ljud som helst), aldrig samma två gånger i rad. En kategori kan ha en egen: högerklicka på dess flik.",
   "Full release notes": "Fullständiga versionsanteckningar",
@@ -4795,5 +4794,6 @@
   "ooh, pretty!": "Åh, så fint!",
   "The settings most people change, on one page": "Inställningarna de flesta ändrar, på en sida",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Öppnar den här fliken när Onion Board är längst fram.\nEsc = avbryt.",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Dra i handtagen för att klippa bort början och slutet. Klicka eller dra i tidslinjalen, eller dra uppspelningsstrecket, för att flytta var den spelar. Ctrl+scroll zoomar. Dra med höger musknapp, eller använd Skift+scroll, för att flytta."
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Dra i handtagen för att klippa bort början och slutet. Klicka eller dra i tidslinjalen, eller dra uppspelningsstrecket, för att flytta var den spelar. Ctrl+scroll zoomar. Dra med höger musknapp, eller använd Skift+scroll, för att flytta.",
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Gratis, utan reklam och utan konto. Gjord av OnionAlien. Öppen källkod under GNU GPL v3: använd den, ändra den och dela den, så länge din version också förblir öppen källkod."
 }

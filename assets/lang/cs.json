@@ -413,7 +413,6 @@
   "Forgets Apps tab volumes and hidden programs.": "Zapomene hlasitosti a skryté programy karty Aplikace.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Zapomene tvůj mikrofon, sluchátka, kam se posílají zvuky a výstup pro stream; rychlé nastavení proběhne znovu.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Doplňky zdarma z GitHubu. Odebrání nebo přeinstalování doplňku zachová tvoje spouštěče a spárované telefony.",
-  "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Zdarma, bez reklam a bez účtu. Vytvořil OnionAlien. Licence MIT s Commons Clause: použij na cokoli, sdílej zdarma, nikdy neprodávej.",
   "Frequencies": "Frekvence",
   "From the category showing (All = any sound), never the same one twice in a row. A category can have its own: right-click its tab.": "Ze zobrazené kategorie (Vše = jakýkoli zvuk), nikdy stejný dvakrát po sobě. Kategorie může mít vlastní: pravý klik na její kartu.",
   "Full release notes": "Úplné poznámky k verzi",
@@ -4883,5 +4882,6 @@
   "ooh, pretty!": "Páni, to je krása!",
   "The settings most people change, on one page": "Nastavení, která mění většina lidí, na jedné stránce",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Otevře tuhle kartu, když je Onion Board vepředu.\nEsc = zrušit.",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Tažením úchytů ořízneš začátek a konec. Kliknutím nebo tažením časové osy, nebo tažením ukazatele přehrávání, změníš, kde hraje. Ctrl+kolečko přibližuje. Posouvej tažením pravým tlačítkem myši nebo Shift+kolečkem."
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Tažením úchytů ořízneš začátek a konec. Kliknutím nebo tažením časové osy, nebo tažením ukazatele přehrávání, změníš, kde hraje. Ctrl+kolečko přibližuje. Posouvej tažením pravým tlačítkem myši nebo Shift+kolečkem.",
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Zdarma, bez reklam a bez účtu. Vytvořil OnionAlien. Open source pod licencí GNU GPL v3: používej, upravuj a sdílej, pokud tvoje verze zůstane také open source."
 }

@@ -375,7 +375,6 @@
   "Forgets Apps tab volumes and hidden programs.": "Забравя силата на звука и скритите програми в раздела Приложения.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Забравя микрофона, слушалките, къде се пращат звуците ти и изхода за стрийма; бързата настройка се пуска отново.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Безплатни добавки от GitHub. Махането или преинсталирането на някоя пази тригерите ти и сдвоените телефони.",
-  "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Безплатно, без реклами и без акаунт. Направено от OnionAlien. Лиценз MIT с Commons Clause: ползвай го за каквото искаш, споделяй го безплатно, никога не го продавай.",
   "Frequencies": "Честоти",
   "From the category showing (All = any sound), never the same one twice in a row. A category can have its own: right-click its tab.": "От показаната категория (Всички = всеки звук), никога един и същ два пъти подред. Категорията може да има свой: десен клик върху раздела ѝ.",
   "Full release notes": "Пълни бележки по версията",
@@ -4795,5 +4794,6 @@
   "ooh, pretty!": "Ох, колко красиво!",
   "The settings most people change, on one page": "Настройките, които повечето хора променят, на една страница",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Отваря този раздел, докато Onion Board е отпред.\nEsc = отказ.",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Плъзни дръжките, за да отрежеш началото и края. Щракни или влачи линийката с времето, или влачи маркера, за да смениш откъде свири. Ctrl+скрол увеличава. Влачи с десния бутон на мишката или Shift+скрол, за да местиш."
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Плъзни дръжките, за да отрежеш началото и края. Щракни или влачи линийката с времето, или влачи маркера, за да смениш откъде свири. Ctrl+скрол увеличава. Влачи с десния бутон на мишката или Shift+скрол, за да местиш.",
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Безплатно, без реклами и без акаунт. Направено от OnionAlien. С отворен код под GNU GPL v3: ползвай го, променяй го и го споделяй, стига твоята версия също да е с отворен код."
 }

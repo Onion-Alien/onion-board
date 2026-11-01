@@ -780,7 +780,6 @@
   "Forgets Apps tab volumes and hidden programs.": "Melupakan volume tab Aplikasi dan program yang disembunyikan.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Melupakan mikrofon, headphone, ke mana suara Anda dikirim, dan output stream; pengaturan cepat berjalan lagi.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Add-on gratis dari GitHub. Menghapus atau menginstal ulang add-on tetap menyimpan pemicu dan ponsel yang sudah dipasangkan.",
-  "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Gratis, tanpa iklan dan tanpa akun. Dibuat oleh OnionAlien. Lisensi MIT dengan Commons Clause: pakai untuk apa saja, bagikan gratis, jangan pernah dijual.",
   "Frequencies": "Frekuensi",
   "From the category showing (All = any sound), never the same one twice in a row. A category can have its own: right-click its tab.": "Dari kategori yang sedang tampil (Semua = suara apa saja), tidak pernah sama dua kali berturut-turut. Kategori bisa punya hotkey sendiri: klik kanan tabnya.",
   "Game voice chat": "Voice chat game",
@@ -4707,5 +4706,6 @@
   "ooh, pretty!": "Wah, cantik!",
   "The settings most people change, on one page": "Pengaturan yang paling sering diubah orang, dalam satu halaman",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Membuka tab ini saat Onion Board ada di depan.\nEsc = batal.",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Seret pegangannya untuk memotong awal dan akhir. Klik atau seret penggaris waktu, atau seret penanda putar, untuk memindah posisi putar. Ctrl+gulir untuk zoom. Seret dengan tombol kanan mouse, atau Shift+gulir, untuk menggeser."
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Seret pegangannya untuk memotong awal dan akhir. Klik atau seret penggaris waktu, atau seret penanda putar, untuk memindah posisi putar. Ctrl+gulir untuk zoom. Seret dengan tombol kanan mouse, atau Shift+gulir, untuk menggeser.",
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Gratis, tanpa iklan dan tanpa akun. Dibuat oleh OnionAlien. Open source di bawah GNU GPL v3: pakai, ubah, dan bagikan, asalkan versimu juga tetap open source."
 }

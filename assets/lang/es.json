@@ -797,7 +797,6 @@
   "Forgets Apps tab volumes and hidden programs.": "Olvida los volúmenes de la pestaña Apps y los programas ocultos.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Olvida tu micro, tus auriculares, adónde se envían tus sonidos y la salida para stream; la configuración rápida se vuelve a ejecutar.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Complementos gratuitos de GitHub. Quitar o reinstalar uno conserva tus disparadores y los móviles emparejados.",
-  "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Gratis, sin anuncios y sin cuenta. Hecho por OnionAlien. Licencia MIT con la Commons Clause: úsalo para lo que sea, compártelo gratis, nunca lo vendas.",
   "Frequencies": "Frecuencias",
   "From the category showing (All = any sound), never the same one twice in a row. A category can have its own: right-click its tab.": "De la categoría que se muestra (Todo = cualquier sonido), nunca el mismo dos veces seguidas. Una categoría puede tener el suyo: clic derecho en su pestaña.",
   "Game voice chat": "Chat de voz del juego",
@@ -4795,5 +4794,6 @@
   "ooh, pretty!": "¡Uy, qué bonito!",
   "The settings most people change, on one page": "Los ajustes que más gente cambia, en una sola página",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Abre esta pestaña mientras Onion Board está delante.\nEsc = cancelar.",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Arrastra los tiradores para cortar el principio y el final. Haz clic o arrastra la regla de tiempo, o arrastra el cabezal, para cambiar dónde suena. Ctrl+rueda acerca. Arrastra con el botón derecho del ratón, o usa Mayús+rueda, para desplazarte."
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Arrastra los tiradores para cortar el principio y el final. Haz clic o arrastra la regla de tiempo, o arrastra el cabezal, para cambiar dónde suena. Ctrl+rueda acerca. Arrastra con el botón derecho del ratón, o usa Mayús+rueda, para desplazarte.",
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Gratis, sin anuncios y sin cuenta. Hecho por OnionAlien. Código abierto bajo la GNU GPL v3: úsalo, modifícalo y compártelo, siempre que tu versión también siga siendo de código abierto."
 }

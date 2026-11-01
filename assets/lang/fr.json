@@ -797,7 +797,6 @@
   "Forgets Apps tab volumes and hidden programs.": "Oublie les volumes de l'onglet Applis et les programmes masqués.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Oublie ton micro, ton casque, où tes sons sont envoyés et la sortie stream ; la config rapide se relance.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Des extensions gratuites depuis GitHub. En retirer ou en réinstaller une garde tes déclencheurs et tes téléphones associés.",
-  "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Gratuit, sans pub et sans compte. Fait par OnionAlien. Licence MIT avec la Commons Clause : utilise-le pour ce que tu veux, partage-le gratuitement, ne le vends jamais.",
   "Frequencies": "Fréquences",
   "From the category showing (All = any sound), never the same one twice in a row. A category can have its own: right-click its tab.": "Depuis la catégorie affichée (Tous = n'importe quel son), jamais le même deux fois de suite. Une catégorie peut avoir le sien : clic droit sur son onglet.",
   "Game voice chat": "Chat vocal des jeux",
@@ -4795,5 +4794,6 @@
   "ooh, pretty!": "Oh, trop beau !",
   "The settings most people change, on one page": "Les réglages que la plupart des gens modifient, sur une seule page",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Ouvre cet onglet quand Onion Board est au premier plan.\nÉchap = annuler.",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Fais glisser les poignées pour couper le début et la fin. Clique ou fais glisser sur la règle du temps, ou fais glisser la tête de lecture, pour changer où ça joue. Ctrl+molette zoome. Fais glisser avec le bouton droit de la souris, ou Maj+molette, pour te déplacer."
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Fais glisser les poignées pour couper le début et la fin. Clique ou fais glisser sur la règle du temps, ou fais glisser la tête de lecture, pour changer où ça joue. Ctrl+molette zoome. Fais glisser avec le bouton droit de la souris, ou Maj+molette, pour te déplacer.",
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Gratuit, sans pub et sans compte. Fait par OnionAlien. Open source sous licence GNU GPL v3 : utilise-le, modifie-le et partage-le, tant que ta version reste open source elle aussi."
 }

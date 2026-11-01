@@ -758,7 +758,6 @@
   "Forgets Apps tab volumes and hidden programs.": "Забывает громкость на вкладке «Программы» и скрытые программы.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Забывает микрофон, наушники, то, куда отправляются звуки, и выход для стрима; быстрая настройка запустится снова.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Бесплатные дополнения с GitHub. Удаление или переустановка дополнения сохраняет твои триггеры и привязанные телефоны.",
-  "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Бесплатно, без рекламы и без аккаунта. Сделал OnionAlien. Лицензия MIT с Commons Clause: используй как хочешь, делись бесплатно, никогда не продавай.",
   "Frequencies": "Частоты",
   "From the category showing (All = any sound), never the same one twice in a row. A category can have its own: right-click its tab.": "Из показанной категории («Все» = любой звук), никогда один и тот же два раза подряд. У категории может быть своя: ПКМ по её вкладке.",
   "Game voice chat": "Голосовой чат в игре",
@@ -4883,5 +4882,6 @@
   "ooh, pretty!": "Ох, красота!",
   "The settings most people change, on one page": "Настройки, которые меняет большинство, на одной странице",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Открывает эту вкладку, когда Onion Board на переднем плане.\nEsc = отмена.",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Перетащи ручки, чтобы отрезать начало и конец. Нажми или тяни по шкале времени, или тяни линию воспроизведения, чтобы перейти к другому месту. Ctrl+колесо приближает. Чтобы сдвинуть, тяни правой кнопкой мыши или крути Shift+колесо."
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Перетащи ручки, чтобы отрезать начало и конец. Нажми или тяни по шкале времени, или тяни линию воспроизведения, чтобы перейти к другому месту. Ctrl+колесо приближает. Чтобы сдвинуть, тяни правой кнопкой мыши или крути Shift+колесо.",
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Бесплатно, без рекламы и без аккаунта. Сделал OnionAlien. Открытый код под лицензией GNU GPL v3: используй, изменяй и делись, если твоя версия тоже остаётся с открытым кодом."
 }

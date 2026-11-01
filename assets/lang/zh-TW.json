@@ -780,7 +780,6 @@
   "Forgets Apps tab volumes and hidden programs.": "忘掉「應用程式」分頁的音量和隱藏的程式。",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "忘掉你的麥克風、耳機、音效傳送到哪裡以及直播輸出；快速設置會重新執行。",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "來自 GitHub 的免費附加元件。移除或重新安裝附加元件時，你的觸發器和配對的手機都會保留。",
-  "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "免費、沒有廣告、不用帳號。由 OnionAlien 製作。MIT 授權加上 Commons Clause：可以用在任何地方、免費分享，但絕對不能販售。",
   "Frequencies": "頻率",
   "From the category showing (All = any sound), never the same one twice in a row. A category can have its own: right-click its tab.": "從目前顯示的分類（全部 = 任何音效）裡選，不會連續兩次播同一個。分類也可以有自己的快速鍵：在它的分頁上按右鍵。",
   "Game voice chat": "遊戲語音聊天",
@@ -4707,5 +4706,6 @@
   "ooh, pretty!": "哇，好漂亮！",
   "The settings most people change, on one page": "大多數人會改的設定，都在一頁裡",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board 在最前面時打開這個分頁。\nEsc = 取消。",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "拖曳把手剪掉開頭和結尾。點一下或拖曳時間尺，或拖曳播放線，可以改變播放位置。Ctrl+滾輪縮放。按住滑鼠右鍵拖曳，或 Shift+滾輪，即可平移。"
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "拖曳把手剪掉開頭和結尾。點一下或拖曳時間尺，或拖曳播放線，可以改變播放位置。Ctrl+滾輪縮放。按住滑鼠右鍵拖曳，或 Shift+滾輪，即可平移。",
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "免費、沒有廣告、不用帳號。由 OnionAlien 製作。以 GNU GPL v3 開源：可以使用、修改和分享，只要你的版本也維持開源。"
 }
