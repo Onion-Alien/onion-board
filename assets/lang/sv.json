@@ -4805,5 +4805,14 @@
   "Mix in a voice": "Blanda in en röst",
   "Take back the last change (Ctrl+Z)": "Ångra senaste ändringen (Ctrl+Z)",
   "Your voice already has everything “{voice}” has": "Din röst har redan allt som ”{voice}” har",
-  "{voice}, changed": "{voice}, ändrad"
+  "{voice}, changed": "{voice}, ändrad",
+  "Couldn't put it back: {error}": "Kunde inte lägga tillbaka den: {error}",
+  "Couldn't remove it: {error}": "Kunde inte ta bort den: {error}",
+  "Online": "Online",
+  "Use {name} for typed lines": "Använd {name} för skrivna rader",
+  "Nothing answers at {address}": "Inget svarar på {address}",
+  "Speaks your typed lines": "Säger raderna du skriver",
+  "From a link…": "Från en länk…",
+  "Pick one of ours": "Välj en av våra",
+  "Remove server": "Ta bort server"
 }

@@ -4717,5 +4717,14 @@
   "Mix in a voice": "Campurkan suara",
   "Take back the last change (Ctrl+Z)": "Buat asal perubahan terakhir (Ctrl+Z)",
   "Your voice already has everything “{voice}” has": "Suara anda sudah ada semua yang ada pada “{voice}”",
-  "{voice}, changed": "{voice}, diubah"
+  "{voice}, changed": "{voice}, diubah",
+  "Couldn't put it back: {error}": "Tidak dapat memulihkannya: {error}",
+  "Couldn't remove it: {error}": "Tidak dapat membuangnya: {error}",
+  "Online": "Dalam talian",
+  "Use {name} for typed lines": "Guna {name} untuk baris yang ditaip",
+  "Nothing answers at {address}": "Tiada apa-apa menjawab di {address}",
+  "Speaks your typed lines": "Menyebut baris yang anda taip",
+  "From a link…": "Daripada pautan…",
+  "Pick one of ours": "Pilih daripada kami",
+  "Remove server": "Buang pelayan"
 }

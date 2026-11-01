@@ -4717,5 +4717,14 @@
   "Mix in a voice": "混入一个声音",
   "Take back the last change (Ctrl+Z)": "撤销上一次更改（Ctrl+Z）",
   "Your voice already has everything “{voice}” has": "你的声音已经包含“{voice}”的全部效果",
-  "{voice}, changed": "{voice}（已更改）"
+  "{voice}, changed": "{voice}（已更改）",
+  "Couldn't put it back: {error}": "无法恢复：{error}",
+  "Couldn't remove it: {error}": "无法移除：{error}",
+  "Online": "在线",
+  "Use {name} for typed lines": "用 {name} 朗读输入的文字",
+  "Nothing answers at {address}": "{address} 没有响应",
+  "Speaks your typed lines": "朗读你输入的文字",
+  "From a link…": "来自链接…",
+  "Pick one of ours": "从我们的图片中选",
+  "Remove server": "移除服务器"
 }

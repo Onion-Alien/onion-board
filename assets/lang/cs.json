@@ -4893,5 +4893,14 @@
   "Mix in a voice": "Přimíchat hlas",
   "Take back the last change (Ctrl+Z)": "Vrátit poslední změnu (Ctrl+Z)",
   "Your voice already has everything “{voice}” has": "Tvůj hlas už má všechno, co má „{voice}“",
-  "{voice}, changed": "{voice}, změněno"
+  "{voice}, changed": "{voice}, změněno",
+  "Couldn't put it back: {error}": "Nepodařilo se to vrátit: {error}",
+  "Couldn't remove it: {error}": "Nepodařilo se to odebrat: {error}",
+  "Online": "Online",
+  "Use {name} for typed lines": "Použít {name} pro napsané řádky",
+  "Nothing answers at {address}": "Na {address} nic neodpovídá",
+  "Speaks your typed lines": "Říká tvé napsané řádky",
+  "From a link…": "Z odkazu…",
+  "Pick one of ours": "Vybrat z našich",
+  "Remove server": "Odebrat server"
 }

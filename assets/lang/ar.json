@@ -5157,5 +5157,14 @@
   "Mix in a voice": "امزج صوتًا",
   "Take back the last change (Ctrl+Z)": "تراجع عن آخر تغيير (Ctrl+Z)",
   "Your voice already has everything “{voice}” has": "صوتك فيه بالفعل كل ما في “{voice}”",
-  "{voice}, changed": "{voice}، مع تغييرات"
+  "{voice}, changed": "{voice}، مع تغييرات",
+  "Couldn't put it back: {error}": "تعذّرت إعادته: {error}",
+  "Couldn't remove it: {error}": "تعذّرت إزالته: {error}",
+  "Online": "متصل",
+  "Use {name} for typed lines": "استخدم {name} لما تكتبه",
+  "Nothing answers at {address}": "لا شيء يرد على {address}",
+  "Speaks your typed lines": "ينطق ما تكتبه",
+  "From a link…": "من رابط…",
+  "Pick one of ours": "اختر واحدة من صورنا",
+  "Remove server": "إزالة الخادم"
 }

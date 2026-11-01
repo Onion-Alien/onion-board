@@ -4805,5 +4805,14 @@
   "Mix in a voice": "Bir ses kat",
   "Take back the last change (Ctrl+Z)": "Son değişikliği geri al (Ctrl+Z)",
   "Your voice already has everything “{voice}” has": "Sesinde “{voice}” sesinde olan her şey zaten var",
-  "{voice}, changed": "{voice}, değiştirildi"
+  "{voice}, changed": "{voice}, değiştirildi",
+  "Couldn't put it back: {error}": "Geri konulamadı: {error}",
+  "Couldn't remove it: {error}": "Kaldırılamadı: {error}",
+  "Online": "Çevrimiçi",
+  "Use {name} for typed lines": "Yazılan satırlar için {name} kullan",
+  "Nothing answers at {address}": "{address} adresinde yanıt veren yok",
+  "Speaks your typed lines": "Yazdığın satırları söyler",
+  "From a link…": "Bağlantıdan…",
+  "Pick one of ours": "Bizimkilerden seç",
+  "Remove server": "Sunucuyu kaldır"
 }

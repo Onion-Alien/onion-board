@@ -4717,5 +4717,14 @@
   "Mix in a voice": "Trộn thêm một giọng",
   "Take back the last change (Ctrl+Z)": "Hoàn tác thay đổi cuối (Ctrl+Z)",
   "Your voice already has everything “{voice}” has": "Giọng của bạn đã có mọi thứ mà “{voice}” có",
-  "{voice}, changed": "{voice}, đã đổi"
+  "{voice}, changed": "{voice}, đã đổi",
+  "Couldn't put it back: {error}": "Không thể khôi phục: {error}",
+  "Couldn't remove it: {error}": "Không thể gỡ bỏ: {error}",
+  "Online": "Trực tuyến",
+  "Use {name} for typed lines": "Dùng {name} cho các dòng đã gõ",
+  "Nothing answers at {address}": "Không có gì trả lời tại {address}",
+  "Speaks your typed lines": "Đọc các dòng bạn gõ",
+  "From a link…": "Từ liên kết…",
+  "Pick one of ours": "Chọn từ ảnh của chúng tôi",
+  "Remove server": "Gỡ máy chủ"
 }

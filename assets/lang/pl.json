@@ -4893,5 +4893,14 @@
   "Mix in a voice": "Domieszaj głos",
   "Take back the last change (Ctrl+Z)": "Cofnij ostatnią zmianę (Ctrl+Z)",
   "Your voice already has everything “{voice}” has": "Twój głos ma już wszystko, co ma „{voice}”",
-  "{voice}, changed": "{voice}, zmieniony"
+  "{voice}, changed": "{voice}, zmieniony",
+  "Couldn't put it back: {error}": "Nie udało się przywrócić: {error}",
+  "Couldn't remove it: {error}": "Nie udało się usunąć: {error}",
+  "Online": "Online",
+  "Use {name} for typed lines": "Używaj {name} do wpisanych linii",
+  "Nothing answers at {address}": "Nic nie odpowiada pod {address}",
+  "Speaks your typed lines": "Czyta wpisane przez ciebie linie",
+  "From a link…": "Z linku…",
+  "Pick one of ours": "Wybierz z naszych",
+  "Remove server": "Usuń serwer"
 }

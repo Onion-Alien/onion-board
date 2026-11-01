@@ -4805,5 +4805,14 @@
   "Mix in a voice": "Mélanger une voix",
   "Take back the last change (Ctrl+Z)": "Annuler la dernière modification (Ctrl+Z)",
   "Your voice already has everything “{voice}” has": "Ta voix a déjà tout ce qu'a « {voice} »",
-  "{voice}, changed": "{voice}, modifiée"
+  "{voice}, changed": "{voice}, modifiée",
+  "Couldn't put it back: {error}": "Impossible de le remettre : {error}",
+  "Couldn't remove it: {error}": "Impossible de le retirer : {error}",
+  "Online": "En ligne",
+  "Use {name} for typed lines": "Utiliser {name} pour les phrases tapées",
+  "Nothing answers at {address}": "Rien ne répond à {address}",
+  "Speaks your typed lines": "Dit les phrases que tu tapes",
+  "From a link…": "Depuis un lien…",
+  "Pick one of ours": "Choisir une des nôtres",
+  "Remove server": "Retirer le serveur"
 }

@@ -224,6 +224,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.speech.custom_wanted.connect(lambda: self.show_tab("addons"))
         self.addons = ModulesList(self.speech.custom_title, self.speech.custom_box)
         self.addons.refresh.connect(self._rescan_in_background)
+        self.addons.refresh.connect(self.speech.servers.check)   # the voice servers, again
         self._scanned.connect(self._apply_scan)
         self._scanning = False
         self.addons.show_modules(self.modules)

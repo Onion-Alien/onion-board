@@ -4893,5 +4893,14 @@
   "Mix in a voice": "Домішати голос",
   "Take back the last change (Ctrl+Z)": "Скасувати останню зміну (Ctrl+Z)",
   "Your voice already has everything “{voice}” has": "У вашому голосі вже є все, що є в «{voice}»",
-  "{voice}, changed": "{voice}, змінено"
+  "{voice}, changed": "{voice}, змінено",
+  "Couldn't put it back: {error}": "Не вдалося повернути: {error}",
+  "Couldn't remove it: {error}": "Не вдалося видалити: {error}",
+  "Online": "У мережі",
+  "Use {name} for typed lines": "Використовувати {name} для набраних рядків",
+  "Nothing answers at {address}": "За адресою {address} ніхто не відповідає",
+  "Speaks your typed lines": "Промовляє набрані рядки",
+  "From a link…": "За посиланням…",
+  "Pick one of ours": "Вибрати з наших",
+  "Remove server": "Видалити сервер"
 }

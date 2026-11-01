@@ -4893,5 +4893,14 @@
   "Mix in a voice": "Подмешать голос",
   "Take back the last change (Ctrl+Z)": "Отменить последнее изменение (Ctrl+Z)",
   "Your voice already has everything “{voice}” has": "В вашем голосе уже есть всё, что есть в «{voice}»",
-  "{voice}, changed": "{voice}, изменён"
+  "{voice}, changed": "{voice}, изменён",
+  "Couldn't put it back: {error}": "Не удалось вернуть: {error}",
+  "Couldn't remove it: {error}": "Не удалось удалить: {error}",
+  "Online": "В сети",
+  "Use {name} for typed lines": "Использовать {name} для набранных строк",
+  "Nothing answers at {address}": "По адресу {address} никто не отвечает",
+  "Speaks your typed lines": "Произносит набранные строки",
+  "From a link…": "По ссылке…",
+  "Pick one of ours": "Выбрать из наших",
+  "Remove server": "Удалить сервер"
 }

@@ -4893,5 +4893,14 @@
   "Mix in a voice": "Amestecă o voce",
   "Take back the last change (Ctrl+Z)": "Anulează ultima schimbare (Ctrl+Z)",
   "Your voice already has everything “{voice}” has": "Vocea ta are deja tot ce are „{voice}”",
-  "{voice}, changed": "{voice}, modificată"
+  "{voice}, changed": "{voice}, modificată",
+  "Couldn't put it back: {error}": "Nu s-a putut pune înapoi: {error}",
+  "Couldn't remove it: {error}": "Nu s-a putut elimina: {error}",
+  "Online": "Online",
+  "Use {name} for typed lines": "Folosește {name} pentru rândurile scrise",
+  "Nothing answers at {address}": "Nimic nu răspunde la {address}",
+  "Speaks your typed lines": "Rostește rândurile pe care le scrii",
+  "From a link…": "Dintr-un link…",
+  "Pick one of ours": "Alege una de-a noastră",
+  "Remove server": "Elimină serverul"
 }

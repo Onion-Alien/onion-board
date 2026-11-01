@@ -39,6 +39,7 @@ from soundboard.ui.voice.livevoice import MODELS, LiveVoice
 from soundboard.ui.voice.speechinstall import SpeechInstalls
 from soundboard.ui.voice.groupbar import GroupBar
 from soundboard.ui.voice.voicefxpanel import TILE_GAP, BigSwitch, VoiceTile
+from soundboard.ui.voice.voiceservers import ServerList
 from soundboard.ui.kit.widgets import fit_placeholder
 from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.i18n import _
@@ -370,6 +371,11 @@ class SpeechPanel(SpeechSay, SpeechTiles, SpeechLangs, QWidget):
         ov.addWidget(hint_label(_("Use a TTS server running on your PC (Kokoro, AllTalk, any "
                                   "OpenAI-style one) or drop voice packs (Piper) into the "
                                   "voices folder. They join the Voice list above.")))
+        self.servers = ServerList()     # each server: online or not, on / off, settings
+        self.servers.switched.connect(self._server_switched)
+        self.servers.saved.connect(self.installs._recheck_voices_asked)
+        self.servers.remove_asked.connect(self._remove_server)
+        ov.addWidget(self.servers)
         crow = QHBoxLayout()
         b_server = QPushButton(_("Add a voice server"))
         icons.set_icon(b_server, "plus")

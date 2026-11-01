@@ -4717,5 +4717,14 @@
   "Mix in a voice": "Campurkan suara",
   "Take back the last change (Ctrl+Z)": "Batalkan perubahan terakhir (Ctrl+Z)",
   "Your voice already has everything “{voice}” has": "Suaramu sudah punya semua yang dimiliki “{voice}”",
-  "{voice}, changed": "{voice}, diubah"
+  "{voice}, changed": "{voice}, diubah",
+  "Couldn't put it back: {error}": "Tidak bisa mengembalikannya: {error}",
+  "Couldn't remove it: {error}": "Tidak bisa menghapusnya: {error}",
+  "Online": "Online",
+  "Use {name} for typed lines": "Pakai {name} untuk baris yang diketik",
+  "Nothing answers at {address}": "Tidak ada yang menjawab di {address}",
+  "Speaks your typed lines": "Mengucapkan baris yang kamu ketik",
+  "From a link…": "Dari tautan…",
+  "Pick one of ours": "Pilih dari punya kami",
+  "Remove server": "Hapus server"
 }

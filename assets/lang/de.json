@@ -4805,5 +4805,14 @@
   "Mix in a voice": "Stimme dazumischen",
   "Take back the last change (Ctrl+Z)": "Letzte Änderung zurücknehmen (Strg+Z)",
   "Your voice already has everything “{voice}” has": "Deine Stimme hat schon alles, was „{voice}“ hat",
-  "{voice}, changed": "{voice}, geändert"
+  "{voice}, changed": "{voice}, geändert",
+  "Couldn't put it back: {error}": "Konnte nicht wiederhergestellt werden: {error}",
+  "Couldn't remove it: {error}": "Konnte nicht entfernt werden: {error}",
+  "Online": "Online",
+  "Use {name} for typed lines": "{name} für getippte Zeilen nutzen",
+  "Nothing answers at {address}": "Unter {address} antwortet nichts",
+  "Speaks your typed lines": "Spricht deine getippten Zeilen",
+  "From a link…": "Von einem Link…",
+  "Pick one of ours": "Eins von unseren wählen",
+  "Remove server": "Server entfernen"
 }

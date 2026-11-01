@@ -209,6 +209,143 @@ def test_voice_tab_lists_custom_voices_and_bad_files(vdir, qapp, monkeypatch):
         p.deleteLater()
 
 
+def test_answers_and_update_server(vdir, server):
+    """A server counts as online when anything answers at its address (a 404 too);
+    saving its settings keeps what else its file says."""
+    url, _seen = server
+    assert customvoices.answers(url + "/v1/audio/speech")
+    assert customvoices.answers(url + "/api/tts?text={text}")
+    assert not customvoices.answers(f"http://127.0.0.1:{closed_port()}/v1/audio/speech")
+    assert not customvoices.answers("not an address")
+    path = vdir / "hans.json"
+    path.write_text(json.dumps({"name": "Hans", "url": url, "voice": "a", "language": "de"}),
+                    encoding="utf-8")
+    customvoices.update_server(path, url + "/v2", model="m")
+    assert json.loads(path.read_text(encoding="utf-8")) == {
+        "name": "Hans", "url": url + "/v2", "model": "m", "language": "de"}
+    assert customvoices.load()[0][0].file == path
+
+
+def test_voice_servers_list_switches_and_removes(vdir, server, qapp, monkeypatch):
+    """Add-ons lists each voice server: online or not, its switch makes it the computer
+    voice (one at a time), Settings saves its address, Remove has Undo."""
+    from tests.conftest import process_events
+    from tests.test_voicepanel import FakeEngine
+    from soundboard.ui.kit import busy
+    from soundboard.ui.voice.voicepanel import VoicePanel
+    url, _seen = server
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
+    customvoices.save_server("Kokoro", url + "/v1/audio/speech", "af_bella")
+    customvoices.save_server("Gone", f"http://127.0.0.1:{closed_port()}/v1/audio/speech")
+    (vdir / "prog.json").write_text(json.dumps({"command": "tts.exe"}), encoding="utf-8")
+    toasts = []
+    monkeypatch.setattr(busy, "toast", lambda w, text, kind="", *a, **k: toasts.append(
+        (text, k.get("action"))))
+    p = VoicePanel(FakeEngine(), {"enabled": False, "effects": {}}, {"voice": ""})
+    try:
+        s = p.speech
+        assert process_events(qapp, lambda: not s.installs._loading())
+        rows = s.servers.rows
+        assert list(rows) == ["custom:Gone", "custom:Kokoro"]   # not the program voice
+        assert s.lbl_custom.text() == "1 custom voice loaded."
+        assert process_events(qapp, lambda: all(r.online is not None for r in rows.values()))
+        k, g = rows["custom:Kokoro"], rows["custom:Gone"]
+        assert k.online and k.pill.text() == "Online" and k.pill.property("tone") == "ok"
+        assert k.state.text() == ""
+        assert not g.online and g.pill.text() == "Offline"
+        assert g.state.text().startswith("Nothing answers at 127.0.0.1:")
+        # asked once, then only when Refresh is pressed: never on a timer
+        asked = []
+        real = customvoices.answers
+        monkeypatch.setattr(customvoices, "answers", lambda url: (asked.append(url), real(url))[1])
+        p.show()
+        p.show_tab("addons")
+        process_events(qapp, lambda: False, timeout=1.5)
+        assert asked == []
+        p.addons.b_refresh.click()
+        assert process_events(qapp, lambda: len(asked) == 2)
+        k.switch.click()
+        assert s.cb_voice.currentData() == "custom:Kokoro" == s.ctl.speaker.voice
+        assert k.state.text() == "Speaks your typed lines"
+        g.switch.click()                                   # one at a time
+        assert s.ctl.speaker.voice == "custom:Gone"
+        assert not k.switch.isChecked() and g.switch.isChecked()
+        g.switch.click()                                   # off: Windows' voice
+        assert s.cb_voice.currentData() == "" and not g.switch.isChecked()
+        s.cb_voice.setCurrentIndex(s.cb_voice.findData("custom:Kokoro"))   # the Voice list
+        assert k.switch.isChecked()
+        # Settings: a bad address is refused, a good one saved
+        k.fold.click()
+        assert k.ed_url.isVisibleTo(k)
+        k.ed_url.setText("127.0.0.1/x")
+        k.b_save.click()
+        assert not k.err.isHidden()
+        k.ed_url.setText(url + "/v1/speech")
+        k.b_save.click()
+        assert json.loads((vdir / "Kokoro.json").read_text("utf-8"))["url"] == url + "/v1/speech"
+        assert process_events(qapp, lambda: s.ctl.tts.custom["custom:Kokoro"].url.endswith(
+            "/v1/speech") and not s.installs._loading())
+        # Remove, then Undo: back, and switched on again
+        s.servers.rows["custom:Kokoro"].b_remove.click()
+        assert not (vdir / "Kokoro.json").exists() and s.ctl.speaker.voice == ""
+        text, (label, undo) = toasts[-1]
+        assert "Kokoro" in text and label == "Undo"
+        assert process_events(qapp, lambda: "custom:Kokoro" not in s.servers.rows
+                              and not s.installs._loading())
+        undo()
+        assert process_events(qapp, lambda: "custom:Kokoro" in s.servers.rows
+                              and not s.installs._loading())
+        assert s.ctl.speaker.voice == "custom:Kokoro"
+        assert s.servers.rows["custom:Kokoro"].switch.isChecked()
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_voice_server_picture(vdir, qapp, monkeypatch):
+    """A server's picture: one of the app's voice pictures, or one from a link (kept
+    beside its .json as a square PNG); both saved at once, and Remove picture clears it."""
+    from PySide6.QtGui import QColor, QImage
+    from PySide6.QtWidgets import QInputDialog
+    from tests.conftest import process_events
+    from soundboard.sounds import thumbs
+    from soundboard.ui.voice import voiceservers
+    path = customvoices.save_server("Kokoro", "http://127.0.0.1:8880/v1/audio/speech")
+    cv = customvoices.load()[0][0]
+    row = voiceservers.ServerRow(cv)
+    try:
+        assert voiceservers.picture_pixmap(cv, 30) is None
+        assert row.b_pic_clear.isHidden()
+        assert "voice-robot" in voiceservers.app_pictures()
+        assert "voice-random" not in voiceservers.app_pictures()
+
+        def pick(dlg):
+            dlg._pick("voice-robot")
+            return dlg.result()
+        monkeypatch.setattr(voiceservers.PicturePicker, "exec", pick)
+        row.b_pic_ours.click()
+        assert json.loads(path.read_text("utf-8"))["picture"] == "voice-robot"
+        assert cv.picture == "voice-robot" and not row.b_pic_clear.isHidden()
+        assert voiceservers.picture_pixmap(cv, 30) is not None
+
+        img = QImage(400, 200, QImage.Format.Format_RGB32)
+        img.fill(QColor("orange"))
+        monkeypatch.setattr(thumbs, "fetch", lambda url: img)
+        monkeypatch.setattr(QInputDialog, "getText",
+                            staticmethod(lambda *a, **k: ("https://example.com/a.png", True)))
+        row.b_pic_link.click()
+        assert process_events(qapp, lambda: cv.picture == "Kokoro.png")
+        kept = QImage(str(vdir / "Kokoro.png"))
+        assert (kept.width(), kept.height()) == (256, 256)
+        assert customvoices.load()[0][0].picture == "Kokoro.png"
+
+        row.b_pic_clear.click()   # its file from the link goes too
+        assert "picture" not in json.loads(path.read_text("utf-8"))
+        assert not (vdir / "Kokoro.png").exists() and row.b_pic_clear.isHidden()
+    finally:
+        row.deleteLater()
+
+
 def test_custom_voices_are_found_from_the_voice_list_and_from_settings(window):  # noqa: F811
     """Custom voices are in the Voice tab's Add-ons tab (no Custom tab of their own).
     Add voices beside the Voice list, and Settings → Audio's card, both open it (from

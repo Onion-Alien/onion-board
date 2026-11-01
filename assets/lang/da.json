@@ -4805,5 +4805,14 @@
   "Mix in a voice": "Bland en stemme ind",
   "Take back the last change (Ctrl+Z)": "Fortryd den sidste ændring (Ctrl+Z)",
   "Your voice already has everything “{voice}” has": "Din stemme har allerede alt, hvad “{voice}” har",
-  "{voice}, changed": "{voice}, ændret"
+  "{voice}, changed": "{voice}, ændret",
+  "Couldn't put it back: {error}": "Kunne ikke sætte den tilbage: {error}",
+  "Couldn't remove it: {error}": "Kunne ikke fjerne den: {error}",
+  "Online": "Online",
+  "Use {name} for typed lines": "Brug {name} til skrevne linjer",
+  "Nothing answers at {address}": "Intet svarer på {address}",
+  "Speaks your typed lines": "Siger dine skrevne linjer",
+  "From a link…": "Fra et link…",
+  "Pick one of ours": "Vælg et af vores",
+  "Remove server": "Fjern server"
 }

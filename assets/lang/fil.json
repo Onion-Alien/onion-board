@@ -4805,5 +4805,14 @@
   "Mix in a voice": "Ihalo ang isang boses",
   "Take back the last change (Ctrl+Z)": "Bawiin ang huling pagbabago (Ctrl+Z)",
   "Your voice already has everything “{voice}” has": "Nasa boses mo na ang lahat ng nasa “{voice}”",
-  "{voice}, changed": "{voice}, binago"
+  "{voice}, changed": "{voice}, binago",
+  "Couldn't put it back: {error}": "Hindi naibalik: {error}",
+  "Couldn't remove it: {error}": "Hindi naalis: {error}",
+  "Online": "Online",
+  "Use {name} for typed lines": "Gamitin ang {name} sa mga tina-type",
+  "Nothing answers at {address}": "Walang sumasagot sa {address}",
+  "Speaks your typed lines": "Binibigkas ang mga tina-type mo",
+  "From a link…": "Mula sa link…",
+  "Pick one of ours": "Pumili sa amin",
+  "Remove server": "Alisin ang server"
 }

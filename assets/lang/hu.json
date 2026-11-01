@@ -4805,5 +4805,14 @@
   "Mix in a voice": "Hang bekeverése",
   "Take back the last change (Ctrl+Z)": "Utolsó változtatás visszavonása (Ctrl+Z)",
   "Your voice already has everything “{voice}” has": "A hangodban már minden megvan, ami a(z) „{voice}” hangban",
-  "{voice}, changed": "{voice}, módosítva"
+  "{voice}, changed": "{voice}, módosítva",
+  "Couldn't put it back: {error}": "Nem sikerült visszatenni: {error}",
+  "Couldn't remove it: {error}": "Nem sikerült eltávolítani: {error}",
+  "Online": "Online",
+  "Use {name} for typed lines": "{name} használata a beírt sorokhoz",
+  "Nothing answers at {address}": "Semmi nem válaszol itt: {address}",
+  "Speaks your typed lines": "Felolvassa a beírt sorokat",
+  "From a link…": "Linkről…",
+  "Pick one of ours": "Válassz a mieinkből",
+  "Remove server": "Szerver eltávolítása"
 }

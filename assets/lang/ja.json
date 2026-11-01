@@ -4717,5 +4717,14 @@
   "Mix in a voice": "ボイスを混ぜる",
   "Take back the last change (Ctrl+Z)": "最後の変更を取り消す（Ctrl+Z）",
   "Your voice already has everything “{voice}” has": "あなたのボイスには「{voice}」の要素がすべて入っています",
-  "{voice}, changed": "{voice}（変更あり）"
+  "{voice}, changed": "{voice}（変更あり）",
+  "Couldn't put it back: {error}": "元に戻せませんでした: {error}",
+  "Couldn't remove it: {error}": "削除できませんでした: {error}",
+  "Online": "オンライン",
+  "Use {name} for typed lines": "入力した文に {name} を使う",
+  "Nothing answers at {address}": "{address} から応答がありません",
+  "Speaks your typed lines": "入力した文を読み上げます",
+  "From a link…": "リンクから…",
+  "Pick one of ours": "用意された画像から選ぶ",
+  "Remove server": "サーバーを削除"
 }
