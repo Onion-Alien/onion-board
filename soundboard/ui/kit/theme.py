@@ -326,10 +326,35 @@ def stylesheet(name: str | None = None) -> str:
         css += POLISH_STYLE.substitute(polish_tokens(tk, is_light(name)))
     css += texture_style("QFrame#card, QFrame#setcard, QFrame#fxcard, QFrame#transport, "
                          "QDialog#transport, QFrame#deck", tk)
-    return css + held_rings(css)
+    return key_focus_only(css) + held_rings(css)
 
 
 _FOCUS_RULE = re.compile(r"([^{}]*:focus[^{}]*)\{([^{}]*)\}")
+_COMMENT = re.compile(r"/\*.*?\*/", re.S)
+_BUTTONS = ("QPushButton", "QToolButton", "QCheckBox", "QRadioButton")
+
+
+def key_focus_only(css: str) -> str:
+    """A button's :focus ring only while its focus came from the keyboard
+    (widgets.key_focus_rings sets [keyfocus]): `QFrame#card QPushButton#primary:focus`
+    becomes `QFrame#card QPushButton#primary[keyfocus="true"]:focus`. Every ring rule
+    gains the same one attribute, so they still rank among themselves as before."""
+    def one(sel: str) -> str:
+        if ":focus" not in sel:
+            return sel
+        head, _, last = sel.rpartition(" ")
+        if not any(last.startswith(b) for b in _BUTTONS):
+            return sel
+        cut = last.index(":")
+        return (head + " " if head else "") + last[:cut] + '[keyfocus="true"]' + last[cut:]
+
+    def rule(m: re.Match) -> str:
+        lead = m.group(1)[:len(m.group(1)) - len(m.group(1).lstrip())]
+        sels = ", ".join(one(s.strip()) for s in m.group(1).split(","))
+        return lead + sels + " {" + m.group(2) + "}"
+    # (comments out first: some name a :focus selector, and a rule's selector text
+    # runs from the last } to its {)
+    return _FOCUS_RULE.sub(rule, _COMMENT.sub("", css))
 _HELD = (("QPushButton", ":pressed"), ("QToolButton", ":pressed"), ("QComboBox", ":on"),
          ("QSlider", ":pressed"), ("QCheckBox", ":pressed"), ("QRadioButton", ":pressed"))
 
@@ -340,7 +365,9 @@ def held_rings(css: str) -> str:
     the control down (a drop-down or a button's menu: while it's open), gone as it
     lets go: every :focus rule again as :pressed (:on for a drop-down)."""
     out = []
-    for m in _FOCUS_RULE.finditer(css):
+    # (comments out first: a comma in one before a :focus rule split it open, and the
+    # unclosed comment swallowed the rules after it)
+    for m in _FOCUS_RULE.finditer(_COMMENT.sub("", css)):
         sels = []
         for sel in m.group(1).split(","):
             sel = sel.strip()
