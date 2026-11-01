@@ -1,0 +1,1 @@
+- Free sound packs: a Myinstants pack's sounds now go on your board one by one as they download, not all at the end. It still counts as one pack, so removing or resetting it takes them all.
