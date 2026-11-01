@@ -135,8 +135,8 @@ def section(dist: md.Distribution) -> str:
 def main() -> None:
     dest = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "dist" / "THIRD-PARTY-NOTICES.txt"
     parts = ["Onion Board includes the following third-party software.\n",
-             "Onion Board itself is MIT licensed with the Commons Clause (free to use\n"
-             "and share, not to sell); see LICENSE.txt.\n", EXTRA]
+             "Onion Board itself is open source under the GNU GPL version 3 or later;\n"
+             "see LICENSE.txt.\n", EXTRA]
     backgrounds = ROOT / "assets" / "backgrounds"
     parts += ["CC0 voice backgrounds\n", (backgrounds / "README.md").read_text("utf-8"),
               (backgrounds / "credits.json").read_text("utf-8")]
