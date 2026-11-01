@@ -362,6 +362,7 @@ class AppearancePage(Page):
         search it is one card; a search lands on the tab with the words."""
         box = QFrame()
         box.setObjectName("setcard")
+        theme.vary_texture(box)
         bv = QVBoxLayout(box)
         bv.setContentsMargins(14, 12, 14, 14)
         bv.setSpacing(10)

@@ -219,6 +219,10 @@ def clean_setting(k: str, v):
         return {c: key for c, key in v.items()
                 if isinstance(c, str) and isinstance(key, str)
                 and clean_hotkey(key, f"category {c!r}")}
+    if k == "tab_keys":   # {tab: its key}; "" = none, so it has no Ctrl+number either
+        return {t: key for t, key in v.items()
+                if isinstance(t, str) and isinstance(key, str)
+                and (not key or clean_hotkey(key, f"tab {t!r}"))}
     if k in SETTING_RANGES:
         lo, hi = SETTING_RANGES[k]
         return min(max(v, lo), hi)
@@ -228,7 +232,8 @@ def clean_setting(k: str, v):
         return clean_programs(v)
     if k == "net_mode":   # a mode this version doesn't know (a newer one's): fail
         return v if v in NET_MODES else "proxy"   # closed, never quietly direct
-    if k in ("net_off", "tabs_off", "tips_seen", "sidebar_order"):   # keys; unknown ones kept
+    if k in ("net_off", "tabs_off", "tips_seen", "sidebar_order",
+             "onair_shut"):   # keys; unknown ones kept
         # newer version's switch stays off after a downgrade and an upgrade
         return list(dict.fromkeys(x for x in v if isinstance(x, str) and x))
     if k == "route":   # a newer version's route: back to the cable, the safe default
@@ -490,6 +495,10 @@ class Config:
     voice_clips_expanded: bool = True   # ...folded down to their header or not
     sidebar_open: bool = True   # the tab rail opened out to show the tabs' names
     sidebar_order: list[str] = field(default_factory=list)   # stable tab keys, visual order
+    onair_shut: list[str] = field(default_factory=list)   # On Air card groups folded shut
+    # a tab's own key to jump to it (tab key -> combo, "" = none); a tab not in it has
+    # Ctrl+1... by its place on the rail
+    tab_keys: dict = field(default_factory=dict)
     # 0 = sounds, 1 = radio, 2 = apps, 3 = triggers, 4 = voice, 5 = setup, 6 = store, 7 = chat
     tab: int = 0
     # Settings > Tabs: the tabs switched off ("radio", "apps", "triggers", "voice"), gone

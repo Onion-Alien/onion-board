@@ -185,7 +185,8 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/kit/panellayouts.py` | `ShownStack`, keeping focus off a page switched away, `Flow` (wrapping) and `CardGrid` (`panel` re-exports them) |
 | `soundboard/ui/kit/panelcontrols.py` | `VolumeControl` (slider + typed %), `EqPanel` (the equaliser) and `UndoBar` (`panel` re-exports them) |
 | `soundboard/ui/sounds/dialogs.py` | per-sound Edit dialog: the Sound tab (name, volume, hotkey, fades…) and the Effects tab |
-| `soundboard/ui/sounds/editadvanced.py` | Edit sound's Advanced view: the waveform big on top (zoom, ruler, fades), the Trim & speed, Effects and Equalizer pages side by side (tabs when narrow), only the effects that are on plus the Add effect picker, the Simple / Advanced switch |
+| `soundboard/ui/sounds/editadvanced.py` | Edit sound's Advanced view: the waveform big on top (zoom, ruler, fades), the Speed & loudness, Effects and Equalizer pages side by side (tabs when narrow), only the effects that are on plus the Add effect picker, the Simple / Advanced switch |
+| `soundboard/ui/sounds/editsummary.py` | the top of Edit sound's Simple view: the sound's length and a chip with an × for everything on it |
 | `soundboard/ui/sounds/editdialogparts.py` | part of the Edit dialog: its Source line, the fade cells, the render and live-preview progress, the picture, the pad colour, the name check and the hotkey |
 | `soundboard/ui/sounds/editplayer.py` | the player in Edit sound: the board's player bar again (play / pause, stop, skip, name and seek line, time, Sounds for others, Hear it myself), the Now playing chips and Stop all; the board's player sets it as it sets its own |
 | `soundboard/ui/sounds/tabhelp.py` | a tab's help pop-up (the ? button), with Bun or Hoot beside it (`dialogs` re-exports it) |
@@ -274,6 +275,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/window/konami.py` | The Konami code typed in the main window: every Bun on screen cheers, a toast, and the Old School achievement |
 | `soundboard/ui/window/winwatch.py` | one event filter on the main window's own native window, for what watches the whole window (Space, the drop veil); no app-wide Python filter |
 | `soundboard/ui/sounds/speedpitch.py` | live controls pop-ups: speed, pitch and effects for Sounds, and pitch and effects for Radio and Apps; the speed gauge turns red at 8x |
+| `soundboard/ui/sounds/soundpanel.py` | Live controls' speed, pitch, volume and effect knobs with their typed values, quick buttons and presets: one set of widgets for the Live controls pop-up and Edit sound |
 | `soundboard/audio/livefx.py` | live effects on every playing sound (the speed & pitch popup): bass, treble, muffle, reverb, echo, distortion and presets; not saved |
 | `soundboard/mic/livesetup.py` | a voice setup from Live controls on a live stream (the radio, a captured program): its voice changer at once, its AI voice once its helper is ready |
 | `soundboard/audio/mypresets.py` | your own presets: Live controls' (speed, pitch, effects, volume) and Edit sound's (a sound's effects) under a name, in `%APPDATA%\OnionBoard\my-presets.json` |

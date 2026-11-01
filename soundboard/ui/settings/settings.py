@@ -34,6 +34,7 @@ from soundboard.ui.settings.privacy import PrivacyPage
 from soundboard.ui.settings.achievements import AchievementsPage
 from soundboard.ui.settings.addons import AddonsPage
 from soundboard.ui.settings.heading import Heading, _BackArrow, _Mark
+from soundboard.ui.window.railsizes import ICON as RAIL_ICON
 
 log = logging.getLogger(__name__)
 
@@ -159,6 +160,7 @@ class SettingsDialog(QDialog, Built):
         self.categories.setAccessibleName(_("Settings categories"))
         self.categories.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.categories.setFixedWidth(196)
+        self.categories.setIconSize(QSize(RAIL_ICON, RAIL_ICON))   # as the rail's tabs
         # the rows came out 1-4 px taller than the room at every window size (the last
         # row's padding), and a scroll bar showed for that: only for real overflow
         self.categories.verticalScrollBar().rangeChanged.connect(self._categories_bar)
@@ -517,7 +519,7 @@ class SettingsDialog(QDialog, Built):
         for i in range(self.categories.count()):
             item = self.categories.item(i)
             name = item.data(Qt.ItemDataRole.UserRole)
-            item.setIcon(icons.icon(name, selected="text_hi"))
+            item.setIcon(icons.icon(name, "muted", selected="text_hi"))   # (as the rail's)
         if getattr(self, "title_cog", None) is not None:
             self._title_cog()
             QTimer.singleShot(0, self.heading._level_with_rail)   # (a new theme: maybe a new font)
@@ -617,6 +619,7 @@ class SettingsDialog(QDialog, Built):
         its cap height), `end` at the far end of it (a status pill), the hint under it."""
         card = QFrame()
         card.setObjectName("setcard")
+        theme.vary_texture(card)
         v = QVBoxLayout(card)
         v.setContentsMargins(14, 12, 14, 14)
         v.setSpacing(8)

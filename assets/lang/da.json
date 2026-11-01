@@ -407,7 +407,6 @@
   "Forgets Apps tab volumes and hidden programs.": "Glemmer lydstyrker på fanen Apps og skjulte programmer.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Glemmer din mikrofon, dine hovedtelefoner, hvor dine lyde bliver sendt hen og stream-udgangen; den hurtige opsætning kører igen.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Gratis add-ons fra GitHub. Hvis du fjerner eller geninstallerer en, beholder du dine triggere og parrede telefoner.",
-  "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Gratis, uden reklamer og uden konto. Lavet af OnionAlien. MIT-licens med Commons Clause: brug den til hvad som helst, del den gratis, sælg den aldrig.",
   "Frequencies": "Frekvenser",
   "From the category showing (All = any sound), never the same one twice in a row. A category can have its own: right-click its tab.": "Fra den viste kategori (Alle = enhver lyd), aldrig den samme to gange i træk. En kategori kan have sin egen: højreklik på dens fane.",
   "Full release notes": "Alle udgivelsesnoter",
@@ -2491,7 +2490,6 @@
   "Free sound packs": "Gratis lydpakker",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "Gratis lydpakker (fanen Lyde → Backup) læser listen over pakker fra GitHub og henter en derfra, når du trykker på Tilføj.",
   "It's in your sounds now": "Den er i dine lyde nu",
-  "Loudness": "Loudness",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "Har du lavet en pakke? Del den: hver lyd skal være CC0 (gratis for alle, ingen kreditering nødvendig). Når den er tjekket, vises den her for alle.",
   "Needs the internet: Offline mode is on (Privacy & security)": "Kræver internet: Offline-tilstand er slået til (Privatliv og sikkerhed)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "Intet går overhovedet online, og alt, hvad der kræver internet, er skjult (fanen Radio, websøgning, downloads, opdateringer…). Fjern fluebenet for at vælge, hvad der må gå online.",
@@ -4320,7 +4318,6 @@
   "Watches your game's window while it's open, even behind others": "Holder øje med dit spils vindue, mens det er åbent, også bag andre",
   "Your file stays whole: only the part between the handles plays.": "Din fil forbliver hel: kun delen mellem håndtagene bliver afspillet.",
   "Main": "Generelt",
-  "Trim & speed": "Beskær og hastighed",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} slået til",
     "{group}  ·  {n} slået til"
@@ -4336,7 +4333,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Ændrer hver lyd, mens den spiller. Gem som ny pad gemmer den som sin egen pad.",
   "Play a sound first, then save it with your changes": "Afspil en lyd først, og gem den så med dine ændringer",
   "Save as new pad": "Gem som ny pad",
-  "Take the Live controls effects off": "Fjern effekterne fra Live-kontroller",
   "{name} (modified {n})": "{name} (ændret {n})",
   "{name} (modified)": "{name} (ændret)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Tilføjede “{name}”, med hastighed og tonehøjde holdt inden for, hvad en pad kan gemme",
@@ -4748,7 +4744,6 @@
   "Search effects": "Søg i effekter",
   "Show the whole sound": "Vis hele lyden",
   "Speed & loudness": "Hastighed og loudness",
-  "The usual tabs, one at a time": "De sædvanlige faner, én ad gangen",
   "Undo ({keys})": "Fortryd ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Via Windows' winget, eller ellers FFmpegs egen download (ca. 100 MB). Du kan slå det fra under Indstillinger → Privatliv og sikkerhed.",
   "Don't ask for admin each time": "Spørg ikke om administrator hver gang",
@@ -4764,7 +4759,6 @@
   "Save what you have now into “{name}”": "Gem det, du har nu, i \"{name}\"",
   "Update “{name}”": "Opdater \"{name}\"",
   "Update, reset or save as a new preset": "Opdater, nulstil eller gem som ny forudindstilling",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Træk i håndtagene for at skære starten og slutningen væk. Ctrl+scroll zoomer. Træk med højre museknap, eller brug Shift+scroll, for at flytte.",
   "Add splices": "Tilføj klip",
   "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Klik hvor en del starter, og så hvor den slutter. Hver del er et klip. Esc slipper et halvfærdigt.",
   "Combine splices": "Sæt klip sammen",
@@ -4797,5 +4791,10 @@
   "light it up!": "Tænd den!",
   "my sparkler's still going": "Mit stjernekaster brænder stadig",
   "ooh! aah!": "Uuh! Aah!",
-  "ooh, pretty!": "Uh, hvor flot!"
+  "ooh, pretty!": "Uh, hvor flot!",
+  "The settings most people change, on one page": "De indstillinger, de fleste ændrer, på én side",
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Åbner denne fane, mens Onion Board er forrest.\nEsc = annuller.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Træk i håndtagene for at skære starten og slutningen væk. Klik eller træk i tidslinjen, eller træk afspilningslinjen, for at flytte hvor den spiller. Ctrl+scroll zoomer. Træk med højre museknap, eller brug Shift+scroll, for at flytte.",
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Gratis, uden reklamer og uden konto. Lavet af OnionAlien. Open source under GNU GPL v3: brug den, ret i den og del den, så længe din version også forbliver open source.",
+  "Community uploads": "Uploadet af fællesskabet"
 }

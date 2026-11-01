@@ -230,6 +230,17 @@ def paint_window_bg(p: QPainter, rect, origin: QPointF, width: float, height: fl
     textures.paint_glow(p, rect, origin, width, height, tk)
 
 
+_shift_turn = 0
+
+
+def vary_texture(card) -> None:
+    """Start `card`'s texture somewhere else than the card made before it
+    (textures.SHIFTS), so cards next to each other don't show it lined up."""
+    global _shift_turn
+    _shift_turn = (_shift_turn + 1) % len(textures.SHIFTS)
+    card.setProperty("texshift", _shift_turn)
+
+
 def texture_style(selector: str, tk: dict[str, str] | None = None) -> str:
     """Apply the active tiling texture to a surface, including locally styled panels
     ("" with Textured off)."""

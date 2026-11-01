@@ -513,10 +513,11 @@ def test_categories_filter_the_list(qapp, fake):
     t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
     t.show()
     pick = t.cat_pick
-    assert _wait(qapp, lambda: len(t._rows) == 2 and pick.count() == 6)
-    # Trending (picked), Most liked and Newest: every sound; a line under them (an order
-    # read as one more category beside "Games (3)"); then the categories
-    assert [pick.itemText(i) for i in range(6)] == ["Trending", "Most liked", "Newest", "",
+    assert _wait(qapp, lambda: len(t._rows) == 2 and pick.count() == 7)
+    # Trending (picked), Most liked and Newest: every sound; Community uploads; a line under
+    # them (an order read as one more category beside "Games (3)"); then the categories
+    assert [pick.itemText(i) for i in range(7)] == ["Trending", "Most liked", "Newest",
+                                                    "Community uploads", "",
                                                     "Games (3)", "Memes (1)"]
     assert pick.currentIndex() == 0
     # it opens on Trending: what's popular right now
@@ -579,17 +580,20 @@ def test_switched_back_on_the_store_says_so(qapp, fake):
         t.shutdown()
 
 
-def test_onion_board_category_lists_the_stores_own_sounds(qapp, fake):
-    # the biggest first, after the three tops; picking it asks for the store's own sounds only
+def test_community_uploads_lists_the_stores_own_sounds(qapp, fake):
+    # up with the orders, not among the categories; picking it asks for the store's own
+    # sounds only, and the box shows it picked
     fake.cats = [("onionboard", 2), ("games", 3)]
     fake.sounds["000000000002"]["cat"] = "onionboard"   # never a sound's own category
     t = storetab.StoreTab(Config(), [].append, lambda d, g: True, lambda: None)
     t.show()
     pick = t.cat_pick
     assert _wait(qapp, lambda: len(t._rows) == 2 and pick.count() == 6)
-    assert [pick.itemText(i) for i in range(4, 6)] == ["Games (3)", "Onion Board (2)"]
+    assert pick.itemText(3) == "Community uploads" and pick.itemData(3) == "onionboard"
+    assert [pick.itemText(i) for i in range(5, 6)] == ["Games (3)"]
     pick.activated.emit(pick.findData("onionboard"))
     assert _wait(qapp, lambda: "cat=onionboard" in fake.calls[-1][1])
+    assert pick.currentText() == "Community uploads"
     assert _wait(qapp, lambda: len(t._rows) == 2)
     assert [s.cat for s in store.parse({"sounds": list(fake.sounds.values())})[0]] == ["", ""]
     t.shutdown()
@@ -601,7 +605,7 @@ def test_no_categories_only_all(qapp, fake):
     t.show()
     assert _wait(qapp, lambda: len(t._rows) == 2)
     qapp.processEvents()
-    assert t.cat_pick.count() == 3 and t.cat_pick.currentData() == "@trending"
+    assert t.cat_pick.count() == 4 and t.cat_pick.currentData() == "@trending"
     t.shutdown()
 
 

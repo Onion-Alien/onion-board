@@ -99,9 +99,11 @@ def pretty_key(combo: str) -> str:
 
 class HotkeyDialog(QDialog):
     """Asks for a key combo, or (with `pads`) a hit on a MIDI pad controller, or (with
-    `mouse`) a click of a mouse side button on it."""
+    `mouse`) a click of a mouse side button on it. `in_app`: a key only this window
+    reads (a tab's), said as the hint; any key will do, it takes nothing from games."""
 
-    def __init__(self, hotkeys: Hotkeys, parent=None, pads: bool = True, mouse: bool = False):
+    def __init__(self, hotkeys: Hotkeys, parent=None, pads: bool = True, mouse: bool = False,
+                 in_app: str = ""):
         super().__init__(parent)
         fit.watch(self)   # grows to fit its text (ui/kit/fit.py)
         self.setWindowTitle(_("Set hotkey"))
@@ -112,9 +114,9 @@ class HotkeyDialog(QDialog):
         t.setStyleSheet("font-size:16px; font-weight:600;")
         lay.addWidget(t)
         self._mouse = mouse
-        self.hint = QLabel(_("…or click a mouse side button (Mouse 4 / 5) in this window. "
-                             "Esc = cancel.") if mouse
-                           else _("Works globally, even while in-game.  Esc = cancel."))
+        self.hint = QLabel(in_app or (
+            _("…or click a mouse side button (Mouse 4 / 5) in this window. Esc = cancel.")
+            if mouse else _("Works globally, even while in-game.  Esc = cancel.")))
         self.hint.setWordWrap(True)
         lay.addWidget(self.hint)
         self.pads_note = QLabel()
@@ -132,7 +134,7 @@ class HotkeyDialog(QDialog):
         row.addWidget(cancel)
         lay.addLayout(row)
         self._warned_vk = None
-        self._takes_keys = not hotkeys.share   # read before pause() below
+        self._takes_keys = not hotkeys.share and not in_app   # read before pause() below
         self.setMinimumWidth(340)
         hotkeys.pause()   # so pressing an existing hotkey here doesn't trigger it
         if self._midi is not None:

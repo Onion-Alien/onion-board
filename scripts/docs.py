@@ -57,7 +57,9 @@ def site_block(r: dict) -> str:
     return (f'    <p class="small">Version {r["version"]} · Windows 10 / 11 · free, no account, '
             f'no ads, anonymous usage count you can switch off<br>\n'
             f'      <a href="{vt_link(r)}">{vt}</a> ·\n'
-            f'      <a href="{REPO}/releases/latest">what\'s new</a></p>')
+            f'      <a href="{REPO}/releases/latest">what\'s new</a>&nbsp;·\n'
+            f'      <a class="gh-star" href="{REPO}" data-goatcounter-click="github-home-star">'
+            f'★ Star on GitHub</a></p>')
 
 
 def stamp(path: Path, block: str):

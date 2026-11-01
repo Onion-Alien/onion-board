@@ -101,6 +101,8 @@ class Live:
     stage: tuple | None = None   # the live stage on it now (Engine.set_sound_live)
     gen: int = 0           # the newest render: an older one's answer is dropped
     want: str | None = None   # the base being rendered ("" = plain: a real one)
+    fx: dict = field(default_factory=dict)   # the effects baked into its audio: its trim
+                                              # says where in the file it is
 
 
 class EditControl(Controller):
@@ -112,6 +114,7 @@ class EditControl(Controller):
         super().__init__(mw)
         self._live: dict[str, Live] = {}   # sid -> its playing draft (_live_apply)
         self._live_due: set[str] = set()    # sids whose effects changed: made again soon
+        self._preview_due: set[str] = set()   # ...and whose preview follows them, then
         self._live_timer = QTimer(self)
         self._live_timer.setSingleShot(True)
         self._live_timer.setInterval(LIVE_WAIT_MS)
@@ -182,6 +185,7 @@ class EditControl(Controller):
         # save it onto), or the same sound in a new object (Undo put it back)
         m = mw.meta(sid)
         self._live_due.discard(sid)
+        self._preview_due.discard(sid)
         try:
             if ok and m is not None and d.as_copy:
                 self._save_copy(m, d)
@@ -258,6 +262,10 @@ class EditControl(Controller):
         d.source_forgotten.connect(mw._save_now)
         d.finished.connect(lambda ok, d=d: self._edit_done(d.meta.id, d, ok))
         d.effects.changed.connect(lambda d=d: self._fx_edited(d))
+        d.effects.trim.seek_to.connect(lambda t, done, d=d: self._seek(d, t, done))
+        d.effects.trim_replaced.connect(   # (another sound: a new trim)
+            lambda d=d: d.effects.trim.seek_to.connect(
+                lambda t, done, d=d: self._seek(d, t, done)))
         d.effects_reset.connect(lambda d=d: self._live_apply(d.meta.id))   # at once
         d.vol.valueChanged.connect(lambda _v, d=d: self._vol_edited(d))
         p = EditPlayer(mw, d)
@@ -626,8 +634,13 @@ class EditControl(Controller):
         when it can run live (speed, pitch, Live controls' knobs, boost); what has to be
         baked in is made again once the changes stop for a moment (_live_apply)."""
         sid = d.meta.id
-        if self._editors.get(sid) is d and self._live_apply(sid, render=False):
+        if self._editors.get(sid) is not d:
+            return
+        if self._live_apply(sid, render=False):
             self._live_due.add(sid)
+            self._live_timer.start()
+        if self._preview_playing(sid) is not None:   # the preview follows them too
+            self._preview_due.add(sid)
             self._live_timer.start()
 
     def _vol_edited(self, d: EditDialog):
@@ -641,6 +654,70 @@ class EditControl(Controller):
         due, self._live_due = self._live_due, set()
         for sid in due:
             self._live_apply(sid)
+        due, self._preview_due = self._preview_due, set()
+        for sid in due:
+            self._preview_follow(sid)
+
+    def _preview_playing(self, sid: str) -> tuple[str, float, tuple] | None:
+        """(its preview voice, how far through the whole sound it is, what it plays:
+        playctl.preview_of) while the sound's preview plays, else None."""
+        mw = self.mw
+        of = mw.playctl.preview_of.get(sid)
+        for psid in (f"{sid}~fx:preview", f"{sid}:preview"):
+            st = mw.engine.state(psid)
+            if st is not None and of is not None:
+                return psid, of[1] + st[0] * of[2], of
+        return None
+
+    def _preview_follow(self, sid: str):
+        """The window's effects changed while its preview played: it plays them from the
+        same spot in the file (the start of what's kept, when that's been cut)."""
+        d = self._editors.get(sid)
+        now = self._preview_playing(sid)
+        if d is None or not qt_valid(d) or now is None:
+            return
+        _psid, frac, (old_fx, _at, _span) = now
+        fx = d.effects.fx()
+        if soundfx.key(fx) == soundfx.key(old_fx):
+            return
+        at = soundfx.moved_frac(old_fx, fx, d.effects.trim.length, frac)
+        self.mw.playctl.preview(sid, d.vol.value() / 100, fx, d.fades(), at=at, quiet=True)
+
+    def _seek(self, d: EditDialog, t: float, done: bool):
+        """Its waveform's ruler or playhead was dragged to `t` seconds into the file: the
+        playing pad or preview goes on from there (or the start of the next part that
+        plays). A long sound's preview, which holds only a part, is made again from
+        there once the drag lets go."""
+        mw = self.mw
+        sid = d.meta.id
+        m = mw.meta(sid)
+        if self._editors.get(sid) is not d or m is None:
+            return
+        trim = d.effects.trim
+        if mw.engine.state(sid) is not None:
+            live = self._live.get(sid)
+            mw.engine.seek(sid, trim.frac_of(t, live.fx if live is not None else m.fx))
+            return
+        now = self._preview_playing(sid)
+        if now is None:
+            return
+        psid, _frac, (fx, _at, span) = now
+        frac = trim.frac_of(t, fx)
+        if span >= 1.0:
+            mw.engine.seek(psid, frac)
+        elif done:
+            mw.playctl.preview(sid, d.vol.value() / 100, fx, d.fades(), at=frac, quiet=True)
+
+    def _moved(self, sid: str, old_fx: dict, new_fx: dict):
+        """For Engine.swap: where audio with `new_fx` goes on from, for how far through
+        the one with `old_fx` is, when the trim or splices changed; None when they didn't."""
+        d = self._editors.get(sid)
+        length = d.effects.trim.length if d is not None and qt_valid(d) else 0.0
+        same = (soundfx.kept_parts(old_fx, length) == soundfx.kept_parts(new_fx, length)
+                and soundfx.clean(old_fx)["reverse"] == soundfx.clean(new_fx)["reverse"])
+        if length <= 0 or same:
+            return None
+        return lambda frac: soundfx.moved_frac(old_fx, new_fx, length, frac)
 
     def _live_apply(self, sid: str, render: bool = True) -> bool:
         """The sound plays with its Edit sound window's effects. What can run live is
@@ -663,7 +740,8 @@ class EditControl(Controller):
                 return False   # not playing: Save applies them, as it always did
             k = soundfx.key(m.fx)
             live = self._live[sid] = Live(saved, k, k, base=k,
-                                          clean=soundfx.live_split(m.fx)[1] is None)
+                                          clean=soundfx.live_split(m.fx)[1] is None,
+                                          fx=m.fx)
         if key == live.key:
             if live.want is not None:   # changed back while a render was on its way
                 live.gen += 1
@@ -771,7 +849,12 @@ class EditControl(Controller):
             live.base, live.clean = base, clean
             mw.audio[sid] = data
             mw.engine.set_sound_live(sid, stage, now=False)   # the old copy keeps its own
-            mw.engine.swap(sid, data)
+            m = mw.meta(sid)
+            d = self._editors.get(sid)
+            new_fx = (m.fx if m is not None else {}) if data is live.saved else (
+                d.effects.fx() if d is not None and qt_valid(d) else live.fx)
+            mw.engine.swap(sid, data, self._moved(sid, live.fx, new_fx))
+            live.fx = new_fx
         else:
             mw.engine.set_sound_live(sid, stage)
         self._live_told(sid, live)
@@ -794,7 +877,9 @@ class EditControl(Controller):
         if mw.audio.get(sid) is not live.saved:
             mw.audio[sid] = live.saved
             mw.engine.set_sound_live(sid, None, now=False)
-            mw.engine.swap(sid, live.saved)
+            m = mw.meta(sid)
+            mw.engine.swap(sid, live.saved,
+                           self._moved(sid, live.fx, m.fx) if m is not None else None)
         elif live.stage is not None:
             mw.engine.set_sound_live(sid, None)   # its live stage fades out
 
@@ -807,13 +892,13 @@ class EditControl(Controller):
                 continue
             m = mw.meta(sid)
             st = mw.engine.state(sid)
-            fx = m.fx if m is not None else {}
             live = self._live.get(sid)
-            if st is not None and live is not None and live.key != live.saved_key:
-                fx = d.effects.fx()   # what plays follows the draft
-            elif st is None:
-                st = mw.engine.state(f"{sid}:preview")   # the saved sound, to headphones
-            d.effects.trim.show_playing(None if st is None else st[0], fx)
+            if st is not None:   # the pad: what plays follows the draft once it's put on
+                frac, fx = st[0], live.fx if live is not None else (m.fx if m else {})
+            else:   # its preview, to headphones (a long sound's: a part of it)
+                now = self._preview_playing(sid)
+                frac, fx = (None, {}) if now is None else (now[1], now[2][0])
+            d.effects.trim.show_playing(frac, fx)
 
     # ------------------------------------------------------------ renders in flight
     def rendering(self, sid: str) -> Render | None:

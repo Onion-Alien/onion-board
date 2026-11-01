@@ -8,7 +8,7 @@ dynamic = ["version"]
 description = "Gaming soundboard: mic + sounds + web search, sent to your friends through a virtual cable or any output"
 readme = "README.md"
 requires-python = ">=3.12"
-license = "LicenseRef-MIT-Commons-Clause"
+license = "GPL-3.0-or-later"
 license-files = ["LICENSE"]
 keywords = ["soundboard", "discord", "virtual microphone", "voice changer", "gaming"]
 classifiers = [

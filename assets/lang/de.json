@@ -797,7 +797,6 @@
   "Forgets Apps tab volumes and hidden programs.": "Vergisst Lautstärken im Apps-Tab und ausgeblendete Programme.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Vergisst dein Mikro, deine Kopfhörer, wohin deine Sounds gesendet werden und den Stream-Ausgang; die Schnelleinrichtung läuft nochmal.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Kostenlose Add-ons von GitHub. Beim Entfernen oder Neuinstallieren bleiben deine Trigger und gekoppelten Handys erhalten.",
-  "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Kostenlos, ohne Werbung und ohne Konto. Gemacht von OnionAlien. MIT-Lizenz mit Commons Clause: Nutz es für alles, teil es kostenlos, verkauf es nie.",
   "Frequencies": "Frequenzen",
   "From the category showing (All = any sound), never the same one twice in a row. A category can have its own: right-click its tab.": "Aus der angezeigten Kategorie (Alle = jeder Sound), nie zweimal hintereinander derselbe. Eine Kategorie kann ihren eigenen haben: Rechtsklick auf ihren Tab.",
   "Game voice chat": "Spiel-Voice-Chat",
@@ -2491,7 +2490,6 @@
   "Free sound packs": "Kostenlose Soundpakete",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "Kostenlose Soundpakete (Sounds-Tab → Backup) liest die Liste der Pakete von GitHub und lädt eins von dort herunter, wenn du Hinzufügen drückst.",
   "It's in your sounds now": "Es ist jetzt in deinen Sounds",
-  "Loudness": "Lautheit",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "Ein Paket gemacht? Teil es: Jeder Sound muss CC0 sein (frei für alle, keine Namensnennung nötig). Sobald es geprüft ist, erscheint es hier für alle.",
   "Needs the internet: Offline mode is on (Privacy & security)": "Braucht Internet: Der Offline-Modus ist an (Privatsphäre & Sicherheit)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "Gar nichts geht online, und alles, was Internet braucht, ist ausgeblendet (der Radio-Tab, Websuche, Downloads, Updates…). Nimm den Haken raus, um zu wählen, was online darf.",
@@ -4320,7 +4318,6 @@
   "Watches your game's window while it's open, even behind others": "Beobachtet das Fenster deines Spiels, solange es offen ist, auch hinter anderen",
   "Your file stays whole: only the part between the handles plays.": "Deine Datei bleibt ganz: Nur der Teil zwischen den Griffen spielt.",
   "Main": "Haupt",
-  "Trim & speed": "Schnitt & Tempo",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} an",
     "{group}  ·  {n} an"
@@ -4336,7 +4333,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Ändert jeden Sound, während er spielt. „Als neues Pad speichern“ behält ihn als eigenes Pad.",
   "Play a sound first, then save it with your changes": "Spiel zuerst einen Sound ab und speichere ihn dann mit deinen Änderungen",
   "Save as new pad": "Als neues Pad speichern",
-  "Take the Live controls effects off": "Effekte der Live-Regler entfernen",
   "{name} (modified {n})": "{name} (geändert {n})",
   "{name} (modified)": "{name} (geändert)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ „{name}“ hinzugefügt, Tempo und Tonhöhe auf das begrenzt, was ein Pad speichern kann",
@@ -4748,7 +4744,6 @@
   "Search effects": "Effekte suchen",
   "Show the whole sound": "Ganzen Sound zeigen",
   "Speed & loudness": "Tempo & Lautheit",
-  "The usual tabs, one at a time": "Die üblichen Tabs, einer nach dem anderen",
   "Undo ({keys})": "Rückgängig ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Über Windows' winget, sonst über FFmpegs eigenen Download (etwa 100 MB). Du kannst das unter Einstellungen → Privatsphäre & Sicherheit ausschalten.",
   "Don't ask for admin each time": "Nicht jedes Mal nach Admin-Rechten fragen",
@@ -4764,7 +4759,6 @@
   "Save what you have now into “{name}”": "Das, was du gerade eingestellt hast, in „{name}“ speichern",
   "Update “{name}”": "„{name}“ aktualisieren",
   "Update, reset or save as a new preset": "Aktualisieren, zurücksetzen oder als neue Vorlage speichern",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Zieh die Griffe, um Anfang und Ende abzuschneiden. Strg+Scrollen zoomt. Zum Verschieben mit der rechten Maustaste ziehen oder Umschalt+Scrollen.",
   "Add splices": "Ausschnitte setzen",
   "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Klick, wo ein Teil anfängt, dann wo er endet. Jeder Teil ist ein Ausschnitt. Esc verwirft einen halben.",
   "Combine splices": "Ausschnitte verbinden",
@@ -4797,5 +4791,10 @@
   "light it up!": "Zünd's an!",
   "my sparkler's still going": "Meine Wunderkerze brennt noch",
   "ooh! aah!": "Ooh! Aah!",
-  "ooh, pretty!": "Oh, wie schön!"
+  "ooh, pretty!": "Oh, wie schön!",
+  "The settings most people change, on one page": "Die Einstellungen, die die meisten ändern, auf einer Seite",
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Öffnet diesen Tab, während Onion Board im Vordergrund ist.\nEsc = abbrechen.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Zieh die Griffe, um Anfang und Ende abzuschneiden. Klick oder zieh auf der Zeitleiste, oder zieh den Abspielstrich, um zu ändern, wo er spielt. Strg+Scrollen zoomt. Zum Verschieben mit der rechten Maustaste ziehen oder Umschalt+Scrollen.",
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Kostenlos, ohne Werbung und ohne Konto. Gemacht von OnionAlien. Open Source unter der GNU GPL v3: Nutz es, änder es und teil es, solange deine Version auch Open Source bleibt.",
+  "Community uploads": "Community-Uploads"
 }

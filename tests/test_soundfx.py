@@ -286,19 +286,19 @@ def test_edit_dialog_presets_apply_and_reset(qapp):
     from soundboard.control.winkeys import Hotkeys
     m = SoundMeta(id="a", name="Boom", file="x.wav")
     previews = []
-    d = EditDialog(m, Hotkeys(), lambda *a: previews.append(a), tab="effects")
-    assert d.tabs.tabText(d.tabs.currentIndex()) == "Effects" and d.effects.fx() == {}
-    assert [d.tabs.tabText(i) for i in range(d.tabs.count())] == [
-        "Sound", "Trim && speed", "Effects", "Equalizer"]   # one long page was too much
+    d = EditDialog(m, Hotkeys(), lambda *a: previews.append(a), advanced=True)
+    assert d.effects.fx() == {}
     assert "pitch" not in d.effects.rows            # the Pitch slider covers it
     d.effects.preset.setCurrentText("Nightcore")
     assert d.effects.fx() == soundfx.PRESETS["Nightcore"]
-    assert "1.25x" in d.fx_note.text()
+    assert d.effects.fx_presets["Nightcore"].isChecked()   # one Nightcore: Live controls'
+    assert "1.3x" in d.fx_note.text()
     d.effects.pitch.set_value(3)
     d.effects._edited()
     assert d.effects.preset.currentText() == "Custom"
     d.apply()
-    assert m.fx["pitch"] == 3 and m.fx["speed"] == 1.25 and m.fx["tape"]
+    assert m.fx["pitch"] == 3 and m.fx["speed"] == 1.3 and m.fx["tape"]
+    assert m.fx["live"] == [{"bass": 3.0}]
     d2 = EditDialog(m, Hotkeys(), lambda *a: None)   # opens with what was saved
     assert d2.effects.fx() == m.fx
     d2.effects.preset.setCurrentText("None (original)")

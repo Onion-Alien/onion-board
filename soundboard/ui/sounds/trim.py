@@ -4,7 +4,8 @@ the file itself is never cut (the trim is part of the sound's effects, see
 soundfx.trim). Edit sound's Advanced view shows the same control big (`set_big`):
 a time ruler, zoom, and the fades drawn where they happen, and splices: parts marked
 with two clicks each while Cut is on, numbered, that can be joined to play back to
-back (soundfx.join)."""
+back (soundfx.join). On the big one the time ruler is a seek bar (a click or a drag
+moves the playing sound there) and the playhead can be dragged along too."""
 from __future__ import annotations
 
 from collections.abc import Sequence
@@ -22,6 +23,7 @@ from soundboard.i18n import _
 from soundboard.ui.kit.pixels import snap_to_pixels
 
 HANDLE_PX = 8   # how close to a handle a press grabs it
+PLAY_PX = 14    # ...and to the playhead: it moves while the pointer aims at it
 BIG_H = 110     # the big waveform's least height (Advanced): on a short screen it gives
                 # the columns under it room (they scroll); taller, it takes its share
 RULER_H = 20    # its time ruler
@@ -49,9 +51,11 @@ def splice_tip(i: int, a: float, b: float) -> str:
 class Waveform(QWidget):
     """Peaks with two handles. `moved(start, end)` in seconds (end = length for 'the
     end') while a handle is dragged. The big one also has splices: `spliced()` when
-    one is made, moved or removed."""
+    one is made, moved or removed; and `scrubbed(t, done)` while its ruler or playhead
+    is dragged to `t` seconds (`done` on letting go)."""
     moved = Signal(float, float)
     spliced = Signal()
+    scrubbed = Signal(float, bool)
 
     def __init__(self, peaks: np.ndarray | Sequence[float], length: float):
         super().__init__()
@@ -59,7 +63,8 @@ class Waveform(QWidget):
         self.length = max(length, 0.001)
         self.start, self.end = 0.0, self.length
         self.play: float | None = None   # where it's playing now (seconds), None: it isn't
-        self._drag: str | tuple[int, int] | None = None   # a handle, or (splice, side)
+        # a handle, (splice, side) or "play": the ruler or the playhead
+        self._drag: str | tuple[int, int] | None = None
         self._grab: tuple[float, float] | None = None   # (x, view start): dragging it along
         self.big = False
         self.fine: np.ndarray | None = None   # more peaks, for the big one (set_fine)
@@ -85,6 +90,8 @@ class Waveform(QWidget):
         self.update()
 
     def set_play(self, t: float | None):
+        if self._drag == "play":
+            return   # it's being dragged: where the pointer is, not where it plays
         t = None if t is None else min(max(t, 0.0), self.length)
         if t != self.play:
             self.play = t
@@ -95,11 +102,13 @@ class Waveform(QWidget):
         self.big = on
         if not on:
             self.set_cutting(False)
+        self.setMouseTracking(on or bool(self.splices))   # (the ruler's and playhead's pointer)
         self.view = (0.0, self.length)
         self.setMinimumHeight(BIG_H if on else 70)
-        self.setToolTip(_("Drag the handles to cut off the start and end. Ctrl+scroll "
-                          "zooms. Drag with the right mouse button, or Shift+scroll, to "
-                          "move along.") if on else
+        self.setToolTip(_("Drag the handles to cut off the start and end. Click or drag "
+                          "the time ruler, or drag the playhead, to move where it plays. "
+                          "Ctrl+scroll zooms. Drag with the right mouse button, or "
+                          "Shift+scroll, to move along.") if on else
                         _("Drag the handles to cut off the start and end. Only the part "
                           "between them plays."))
         self.update()
@@ -118,7 +127,7 @@ class Waveform(QWidget):
         """Cut on: a click marks where a splice starts, the next where it ends."""
         self.cutting = on
         self._first = None
-        self.setMouseTracking(on or bool(self.splices))
+        self.setMouseTracking(on or self.big or bool(self.splices))
         self.setCursor(Qt.CursorShape.IBeamCursor if on else Qt.CursorShape.SizeHorCursor)
         self.update()
 
@@ -126,7 +135,7 @@ class Waveform(QWidget):
         self.splices = [list(sp) for sp in splices]
         self.joined = joined and bool(self.splices)
         self._hover = None
-        self.setMouseTracking(self.cutting or bool(self.splices))
+        self.setMouseTracking(self.cutting or self.big or bool(self.splices))
         self.update()
         self.spliced.emit()
 
@@ -261,6 +270,10 @@ class Waveform(QWidget):
             e.accept()
             return
         x = e.position().x()
+        if self._grabs_play(x, e.position().y()):   # the ruler, or the playhead itself
+            self._drag = "play"
+            self._scrub(x, False)
+            return
         if self._on_splices() or (not self.big and self.joined):
             self._press_splices(x)
             return
@@ -270,6 +283,30 @@ class Waveform(QWidget):
         else:   # a click elsewhere moves the nearer handle there
             self._drag = "start" if ds < de else "end"
             self._move(x)
+
+    def _in_ruler(self, y: float) -> bool:
+        return self.big and y < RULER_H + 1
+
+    def _near_play(self, x: float) -> bool:
+        """The playhead is under `x`, nearer than any handle or splice edge (where they
+        meet, the handle wins: it can't be reached any other way)."""
+        if not self.big or self.play is None or self._first is not None:
+            return False
+        d = abs(x - self._x(self.play))
+        others = [abs(x - self._x(t)) for t in (self.start, self.end)] if not self.joined else []
+        others += [abs(x - self._x(t)) for sp in self.splices for t in sp]
+        return d <= PLAY_PX and all(d < o for o in others)
+
+    def _grabs_play(self, x: float, y: float) -> bool:
+        """A left press here moves where it plays: anywhere on the ruler, or on the
+        playhead while it shows."""
+        return self._in_ruler(y) or self._near_play(x)
+
+    def _scrub(self, x: float, done: bool):
+        t = self._t(x)
+        self.play = t
+        self.update()
+        self.scrubbed.emit(t, done)
 
     def _press_splices(self, x: float):
         if not self.big:   # the small one shows joined splices, the big one edits them
@@ -333,10 +370,21 @@ class Waveform(QWidget):
             x0, at = self._grab
             v0, v1 = self.view
             self._set_view(at - (e.position().x() - x0) / self._area()[1] * (v1 - v0), v1 - v0)
+        elif self._drag == "play":
+            self._scrub(e.position().x(), False)
+            return
         elif self._drag:
             self._move(e.position().x())
         if self.big and self._grab is None:
             x = e.position().x()
+            if not self._drag and self._grabs_play(x, e.position().y()):
+                self.setCursor(Qt.CursorShape.PointingHandCursor
+                               if self._in_ruler(e.position().y())
+                               else Qt.CursorShape.SizeHorCursor)
+                self._set_hover(None, None)
+                return
+            if not self._drag and not self._on_splices():
+                self.setCursor(Qt.CursorShape.SizeHorCursor)
             if self.cutting:
                 self._at = self._t(x)
                 if self._first is not None:
@@ -356,6 +404,10 @@ class Waveform(QWidget):
             self._grab = None
             self.setCursor(Qt.CursorShape.IBeamCursor if self.cutting
                            else Qt.CursorShape.SizeHorCursor)
+            return
+        if self._drag == "play":
+            self._drag = None
+            self._scrub(e.position().x(), True)
             return
         self._drag = None
 
@@ -606,6 +658,7 @@ class TrimPanel(QWidget):
     or they're joined or split again."""
     changed = Signal()
     splices_changed = Signal()
+    seek_to = Signal(float, bool)   # the ruler or playhead dragged: (seconds, let go)
 
     def __init__(self, peaks: np.ndarray | Sequence[float], length: float):
         super().__init__()
@@ -616,6 +669,7 @@ class TrimPanel(QWidget):
         self.wave = Waveform(peaks, self.length)
         self.wave.moved.connect(self._from_wave)
         self.wave.spliced.connect(self._from_splices)
+        self.wave.scrubbed.connect(self.seek_to)
         self._solo: tuple[float, float] | None = None   # one splice playing on its own
         v.addWidget(self.wave)
         row = QHBoxLayout()
@@ -660,22 +714,20 @@ class TrimPanel(QWidget):
             self._solo = None
             self.wave.set_play(None)
             return
+        self.wave.set_play(soundfx.time_at(self.as_played(fx), self.length, frac))
+
+    def as_played(self, fx: dict | None) -> dict:
+        """Effects `fx` as what plays has them: one splice's ▶ plays just that part."""
         f = soundfx.clean(fx or {})
-        if self._solo is not None:   # one splice's ▶: that part, as it is
+        if self._solo is not None:
             f = {**f, "joined": False}
             f["start"], f["end"] = self._solo
-        frac = 1.0 - frac if f["reverse"] else frac
-        if f["joined"]:
-            parts = [(min(a, self.length), min(b, self.length)) for a, b in f["splices"]]
-        else:
-            end = f["end"] if 0 < f["end"] <= self.length else self.length
-            parts = [(min(max(f["start"], 0.0), end), end)]
-        left = frac * sum(b - a for a, b in parts)
-        for a, b in parts:   # that far into the parts back to back
-            if left <= b - a or (a, b) == parts[-1]:
-                self.wave.set_play(a + min(left, b - a))
-                return
-            left -= b - a
+        return f
+
+    def frac_of(self, t: float, fx: dict | None) -> float:
+        """How far through (0..1) the sound with effects `fx` is at `t` seconds into
+        the file (a part that doesn't play: the next one that does)."""
+        return soundfx.frac_at(self.as_played(fx), self.length, t)
 
     def play_solo(self, i: int) -> dict | None:
         """Splice `i` on its own: the effects to preview it with (the playhead shows it

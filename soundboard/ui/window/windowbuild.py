@@ -316,17 +316,18 @@ class WindowBuilder(Controller, PlayerBuild, SoundsPageBuild, SetupPageBuild):
         if mw.rail.output is not None:
             mw.rail.output.lineClicked.connect(mw.netctl.open_line)
             mw.rail.output.lineClicked.connect(lambda _p: usage.used("on-air-line"))
+            # Voice and Connection folded down to their headers: kept for the next start
+            mw.rail.output.shut = set(mw.cfg.onair_shut)
+            mw.rail.output.groupToggled.connect(mw.netctl.group_toggled)
         mw.remote_changed.connect(mw.netctl._net_follow, Qt.ConnectionType.QueuedConnection)
         remote.on_change(mw.netctl._remote_watch)
         tabs_live = getattr(getattr(mw, "voice", None), "live_tabs_changed", None)
         if tabs_live is not None:   # a Voice tab on: a line in the card too (_voice_lines)
             tabs_live.connect(mw.netctl._net_follow)
         mw.netctl._net_follow()
-        # Ctrl+1... jump to the tabs in the rail's order, Ctrl+Tab / Ctrl+Shift+Tab step
+        # Ctrl+1... (or a tab's own key) jump to the tabs, Ctrl+Tab / Ctrl+Shift+Tab step
         # through them (the tab widget does that only while it has the focus)
-        for n in range(1, 10):
-            QShortcut(QKeySequence(f"Ctrl+{n}"), mw,   # pyright: ignore[reportCallIssue]  # signal keyword
-                      activated=lambda n=n: mw.tabctl._go_tab(n - 1, absolute=True))
+        mw.tabctl.bind_tab_keys()
         QShortcut(QKeySequence("Ctrl+Tab"), mw, activated=lambda: mw.tabctl._go_tab(1))   # pyright: ignore[reportCallIssue]
         QShortcut(QKeySequence("Ctrl+Shift+Tab"), mw, activated=lambda: mw.tabctl._go_tab(-1))   # pyright: ignore[reportCallIssue]
         mw.rail.orderChanged.connect(

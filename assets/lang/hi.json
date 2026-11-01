@@ -797,7 +797,6 @@
   "Forgets Apps tab volumes and hidden programs.": "ऐप्स टैब के वॉल्यूम और छिपाए गए प्रोग्राम भुला देता है।",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "आपका माइक, हेडफ़ोन, आपके साउंड कहाँ भेजे जाते हैं और स्ट्रीम आउटपुट भुला देता है; क्विक सेटअप फिर से चलता है।",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "GitHub से मुफ़्त ऐड-ऑन। किसी को हटाने या दोबारा इंस्टॉल करने पर आपके ट्रिगर और जोड़े गए फ़ोन बने रहते हैं।",
-  "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "मुफ़्त, बिना विज्ञापन और बिना अकाउंट। OnionAlien ने बनाया। Commons Clause के साथ MIT लाइसेंस: किसी भी काम के लिए इस्तेमाल करें, मुफ़्त में शेयर करें, कभी बेचें नहीं।",
   "Frequencies": "फ़्रीक्वेंसी",
   "From the category showing (All = any sound), never the same one twice in a row. A category can have its own: right-click its tab.": "दिख रही कैटेगरी से (सभी = कोई भी साउंड), कभी लगातार दो बार वही नहीं। किसी कैटेगरी की अपनी भी हो सकती है: उसके टैब पर राइट-क्लिक करें।",
   "Game voice chat": "गेम वॉइस चैट",
@@ -2491,7 +2490,6 @@
   "Free sound packs": "मुफ़्त साउंड पैक",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "मुफ़्त साउंड पैक (साउंड टैब → बैकअप) पैक की लिस्ट GitHub से पढ़ता है, और जोड़ें दबाने पर वहीं से एक डाउनलोड करता है।",
   "It's in your sounds now": "यह अब आपके साउंड में है",
-  "Loudness": "लाउडनेस",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "पैक बनाया है? शेयर करें: हर साउंड CC0 होना चाहिए (सबके लिए मुफ़्त, क्रेडिट की ज़रूरत नहीं)। जाँच होते ही यह यहाँ सबके लिए दिखेगा।",
   "Needs the internet: Offline mode is on (Privacy & security)": "इंटरनेट चाहिए: ऑफ़लाइन मोड चालू है (प्राइवेसी और सिक्योरिटी)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "कुछ भी ऑनलाइन नहीं जाता, और इंटरनेट वाली हर चीज़ छिपा दी जाती है (रेडियो टैब, वेब सर्च, डाउनलोड, अपडेट…)। क्या ऑनलाइन जा सकता है यह चुनने के लिए टिक हटाएँ।",
@@ -4320,7 +4318,6 @@
   "Watches your game's window while it's open, even behind others": "आपके गेम की विंडो खुली रहने तक उस पर नज़र रखता है, दूसरी विंडो के पीछे भी",
   "Your file stays whole: only the part between the handles plays.": "आपकी फ़ाइल पूरी रहती है: सिर्फ़ हैंडल के बीच का हिस्सा चलता है।",
   "Main": "मुख्य",
-  "Trim & speed": "ट्रिम और स्पीड",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} चालू",
     "{group}  ·  {n} चालू"
@@ -4336,7 +4333,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "हर साउंड को चलते समय बदलता है। नए पैड के रूप में सेव करें उसे अलग पैड के रूप में रख लेता है।",
   "Play a sound first, then save it with your changes": "पहले कोई साउंड चलाएँ, फिर अपने बदलावों के साथ सेव करें",
   "Save as new pad": "नए पैड के रूप में सेव करें",
-  "Take the Live controls effects off": "लाइव कंट्रोल के इफ़ेक्ट हटाएँ",
   "{name} (modified {n})": "{name} (बदला गया {n})",
   "{name} (modified)": "{name} (बदला गया)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” जोड़ा, इसकी स्पीड और पिच उतनी रखी जितनी पैड सेव कर सकता है",
@@ -4748,7 +4744,6 @@
   "Search effects": "इफ़ेक्ट खोजें",
   "Show the whole sound": "पूरी साउंड दिखाएँ",
   "Speed & loudness": "स्पीड और लाउडनेस",
-  "The usual tabs, one at a time": "वही टैब, एक बार में एक",
   "Undo ({keys})": "अनडू ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Windows के winget से, नहीं तो FFmpeg के अपने डाउनलोड से (लगभग 100 MB)। इसे सेटिंग्स → प्राइवेसी और सिक्योरिटी में बंद कर सकते हैं।",
   "Don't ask for admin each time": "हर बार एडमिन की अनुमति न माँगें",
@@ -4764,7 +4759,6 @@
   "Save what you have now into “{name}”": "अभी की सेटिंग “{name}” में सेव करें",
   "Update “{name}”": "“{name}” अपडेट करें",
   "Update, reset or save as a new preset": "अपडेट, रीसेट या नए प्रीसेट के रूप में सेव करें",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "शुरू और आख़िर काटने के लिए हैंडल खींचें। Ctrl+स्क्रॉल से ज़ूम। आगे-पीछे जाने के लिए माउस का दायाँ बटन दबाकर खींचें, या Shift+स्क्रॉल करें।",
   "Add splices": "टुकड़े जोड़ें",
   "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "जहाँ हिस्सा शुरू हो वहाँ क्लिक करें, फिर जहाँ खत्म हो। हर हिस्सा एक टुकड़ा है। Esc अधूरा टुकड़ा छोड़ देता है।",
   "Combine splices": "टुकड़े जोड़कर चलाएँ",
@@ -4797,5 +4791,10 @@
   "light it up!": "जला दो!",
   "my sparkler's still going": "मेरी फुलझड़ी अभी जल रही है",
   "ooh! aah!": "ओह! आह!",
-  "ooh, pretty!": "वाह, कितना सुंदर!"
+  "ooh, pretty!": "वाह, कितना सुंदर!",
+  "The settings most people change, on one page": "वे सेटिंग्स जिन्हें ज़्यादातर लोग बदलते हैं, एक ही पेज पर",
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board सामने होने पर यह टैब खोलती है।\nEsc = रद्द करें।",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "शुरू और आख़िर काटने के लिए हैंडल खींचें। चलने की जगह बदलने के लिए टाइम रूलर पर क्लिक करें या खींचें, या प्लेहेड खींचें। Ctrl+स्क्रॉल से ज़ूम। आगे-पीछे जाने के लिए माउस का दायाँ बटन दबाकर खींचें, या Shift+स्क्रॉल करें।",
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "मुफ़्त, बिना विज्ञापन और बिना अकाउंट। OnionAlien ने बनाया। GNU GPL v3 के तहत ओपन सोर्स: इस्तेमाल करें, बदलें और शेयर करें, बस आपका वर्ज़न भी ओपन सोर्स रहना चाहिए।",
+  "Community uploads": "समुदाय के अपलोड"
 }

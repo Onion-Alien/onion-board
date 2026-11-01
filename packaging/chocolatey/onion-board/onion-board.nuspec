@@ -43,7 +43,7 @@ Example: `choco install onion-board --params "'/NoDesktopIcon /Offline'"`
 * Onion Board installs **per user**, into `%LOCALAPPDATA%\Programs\OnionBoard` of the account that runs the install, and needs no admin rights. Install it from your own account (an elevated prompt of your own account is fine), not as SYSTEM or another admin account.
 * The app can update itself (Settings > Updates). Updates it installs land in the same folder; `choco upgrade onion-board` works either way.
 * Uninstalling keeps your sounds and settings in `%APPDATA%\OnionBoard`, and leaves VB-Cable installed.
-* License: MIT with the Commons Clause (free to use, share and change; selling it is not allowed). The source is on GitHub.
+* License: GNU GPL v3 or later (free and open source). The source is on GitHub.
 ]]></description>
     <releaseNotes>https://github.com/Onion-Alien/onion-board/releases/tag/v1.9.27</releaseNotes>
   </metadata>
