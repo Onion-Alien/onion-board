@@ -148,9 +148,9 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # the mini player's mic mute switch; the setup guide opened from Setup; the
             # mini player turned into Bun (ui/bun/bunmode.py)
             "mini-mic-mute", "setup-guide-opened", "bun-mode",
-            # the side rail: Ctrl+1-9 / Ctrl+Tab, the version clicked for What's new,
-            # kept shut (features_now)
-            "tab-keys", "whats-new", "rail-shut",
+            # the side rail: Ctrl+1-9 / Ctrl+Tab, a tab given its own key, the version
+            # clicked for What's new, kept shut (features_now)
+            "tab-keys", "tab-key-set", "whats-new", "rail-shut",
             # Show more under web search results, Trending on Myinstants opened; a pad's
             # Edit: Effects tab, a picture from a file or a link
             "search-show-more", "search-trending", "pad-effects", "pad-picture-file",

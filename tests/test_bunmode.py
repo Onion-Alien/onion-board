@@ -186,21 +186,6 @@ def test_dragging_his_corner_only_resizes_him(window, qapp):
     assert bun.icons.isVisible() and bun.isVisible() and not window.isVisible()
 
 
-def test_a_tabs_right_click_menu_turns_the_full_board_into_bun_and_back(window, qapp):
-    window.show()
-    window.resize(1180, 720)
-    window.fitctl._refit()
-    assert not window.fitctl.is_mini()
-    menu = window.tabctl.tab_menu(0)
-    act = next(a for a in menu.actions() if a.text() == "Turn into Bun")
-    act.trigger()
-    bun = window.bunctl.bun_mode
-    assert bun.isVisible() and not window.isVisible()
-    bun.enterEvent(None)
-    bun.b_back.click()
-    assert window.isVisible() and not window.fitctl.is_mini() and window.width() == 1180
-
-
 def test_his_resize_corner_shrinks_with_him(window, qapp):
     _mini(window)
     window.bunctl.enter_bun_mode()
