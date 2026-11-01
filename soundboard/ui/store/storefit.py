@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QPoint
+from PySide6.QtCore import QPoint, Qt
 from PySide6.QtWidgets import (QComboBox, QGridLayout, QHBoxLayout, QLayout, QLineEdit, QPushButton,
-                               QScrollArea, QWidget)
+                               QScrollArea, QStyle, QStyleOptionComboBox, QStylePainter, QWidget)
 
 from soundboard.online import store
 from soundboard.i18n import _
@@ -17,6 +17,25 @@ CARD_GAP = 8                  # between the cards
 LIST_GAP = 8                  # between the cards and the scroll bar (DESIGN.md, *Breathing room*)
 ONE_ROW = 720                 # a narrower tab puts the toolbar on two rows
 
+
+class CutCombo(QComboBox):
+    """The category dropdown: squeezed below its words (a narrow tab), its choice ends
+    in "…" instead of a letter cut in half."""
+
+    def paintEvent(self, e):
+        p = QStylePainter(self)
+        opt = QStyleOptionComboBox()
+        self.initStyleOption(opt)
+        p.drawComplexControl(QStyle.ComplexControl.CC_ComboBox, opt)
+        room = self.style().subControlRect(QStyle.ComplexControl.CC_ComboBox, opt,
+                                           QStyle.SubControl.SC_ComboBoxEditField, self).width()
+        if not opt.currentIcon.isNull():
+            room -= opt.iconSize.width() + 4   # (the style's gap after the icon)
+        opt.currentText = self.fontMetrics().elidedText(opt.currentText,
+                                                        Qt.TextElideMode.ElideRight, room)
+        p.drawControl(QStyle.ControlElement.CE_ComboBoxLabel, opt)
+
+
 # what the mixin gets from StoreTab, for the type checker only: at run time
 # it is a plain class (StoreTab itself is the widget)
 _Base = QWidget if TYPE_CHECKING else object
@@ -26,6 +45,7 @@ class StoreFit(_Base):
     """StoreTab's toolbar and card grid, as the tab's width changes."""
     if TYPE_CHECKING:
         _bars: tuple[QHBoxLayout, QHBoxLayout]
+        _cat_short: list[str]
         _cols: int
         _grid: QGridLayout
         _list_top: int | None
@@ -102,12 +122,29 @@ class StoreFit(_Base):
     def _modes_w(self) -> int:
         return self.modes_box.sizeHint().width() * (not self.modes_box.isHidden())
 
+    def _cat_floor(self) -> int:
+        """The category dropdown's narrowest: room for the names in _cat_short (the
+        orders: Trending, Most liked, Newest). A longer one (Community uploads, a
+        category) is cut short in a narrow tab: counted whole, it made the window go
+        mini at 480 px."""
+        cb = self.cat_pick
+        whole = cb.sizeHint().width()
+        names = [cb.itemText(i) for i in range(cb.count())]
+        if not self._cat_short or not names:
+            return whole
+        fm = cb.fontMetrics()
+        longest = max(fm.horizontalAdvance(t) for t in names)
+        short = max(fm.horizontalAdvance(t) for t in self._cat_short)
+        return whole - max(0, longest - short)
+
     def _lay_toolbar(self, one: bool):
         """The toolbar in one row (a wide tab), or two: Sounds / Voices and Share, then
         the search, the category and Refresh."""
+        floor = self._cat_floor()
+        self.cat_pick.setMinimumWidth(floor)
         # the box asks for the two rows' width, whichever is shown
         rows = (self._modes_w() + 8 + self._share_w(""),
-                self.search.minimumSizeHint().width() + self.cat_pick.sizeHint().width()
+                self.search.minimumSizeHint().width() + floor
                 + self.btn_reload.sizeHint().width() + 16)
         self.toolbar.setMinimumWidth(max(rows))
         if one == self._one_row:
