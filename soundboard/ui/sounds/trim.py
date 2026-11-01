@@ -12,7 +12,7 @@ from collections.abc import Sequence
 
 import numpy as np
 from PySide6.QtCore import QEvent, QPoint, QPointF, QRectF, Qt, Signal
-from PySide6.QtGui import QBrush, QColor, QPainter, QPen, QRegion
+from PySide6.QtGui import QBrush, QColor, QPainter, QPen, QRegion, QValidator
 from PySide6.QtWidgets import (QDoubleSpinBox, QHBoxLayout, QLabel, QPushButton, QToolTip,
                                QVBoxLayout, QWidget)
 
@@ -904,6 +904,39 @@ class Waveform(QWidget):
         p.restore()
 
 
+class TimeBox(QDoubleSpinBox):
+    """Start / End in minutes and seconds (2:14.70), as the ruler and "plays" say it.
+    Typed as 2:14.7 or as seconds (134.7)."""
+
+    def textFromValue(self, v: float) -> str:
+        m, sec = divmod(round(max(v, 0.0), 2), 60)
+        return f"{int(m)}:{sec:05.2f}"
+
+    def valueFromText(self, text: str) -> float:
+        v = self._seconds(text)
+        return self.minimum() if v is None else v
+
+    def validate(self, text: str, pos: int):
+        v = self._seconds(text)
+        if v is not None and self.minimum() <= v <= self.maximum():
+            return QValidator.State.Acceptable, text, pos
+        typing = all(c.isdigit() or c in ":., " for c in text) and text.count(":") <= 1
+        return (QValidator.State.Intermediate if typing else QValidator.State.Invalid,
+                text, pos)
+
+    @staticmethod
+    def _seconds(text: str) -> float | None:
+        """2:14.7 or 134,7 as seconds; None if it isn't a time (yet)."""
+        parts = text.strip().replace(",", ".").split(":")
+        try:
+            nums = [float(x) for x in parts]
+        except ValueError:
+            return None
+        if len(nums) > 2 or any(n < 0 for n in nums) or (len(nums) == 2 and nums[1] >= 60):
+            return None
+        return nums[0] * 60 + nums[1] if len(nums) == 2 else nums[0]
+
+
 class TrimPanel(QWidget):
     """Waveform + Start / End boxes + Reset. `changed` on every edit; `values()` is
     (start, end) as soundfx wants them (end 0 = the end of the sound), `trim_fx()`
@@ -929,13 +962,12 @@ class TrimPanel(QWidget):
         row.setSpacing(6)
         self.info = QLabel()   # before the boxes: setting their values updates it
         self.info.setObjectName("muted")
-        self.box_start, self.box_end = QDoubleSpinBox(), QDoubleSpinBox()
+        self.box_start, self.box_end = TimeBox(), TimeBox()
         self._box_parts: list[QWidget] = []   # the boxes and their labels
         self._boxes_hidden = False
         for lbl, box in ((_("Start"), self.box_start), (_("End"), self.box_end)):
             box.setDecimals(2)
             box.setSingleStep(0.1)
-            box.setSuffix(" s")
             box.setRange(0.0, max(self.length, 0.01))
             box.setKeyboardTracking(False)
             box.valueChanged.connect(self._from_boxes)

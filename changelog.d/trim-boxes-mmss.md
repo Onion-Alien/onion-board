@@ -1,0 +1,1 @@
+- Edit sound: the Start and End boxes show minutes and seconds (2:14.70) like the timeline, instead of 134.70 s. Type either way.
