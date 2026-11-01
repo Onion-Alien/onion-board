@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QLineEdit, QPu
 from soundboard.core import usage
 from soundboard.i18n import _, ngettext
 from soundboard.ui.kit import busy, icons
+from soundboard.ui.kit.wrapbutton import WrapButton
 from soundboard.ui.settings import Page, _button_row
 
 
@@ -148,7 +149,7 @@ class HelpPage(Page):
         discord = self._link_button(_("Join the Discord"), feedback.DISCORD_URL, "speech")
         discord.setObjectName("primary")
         row.addWidget(discord)
-        send = QPushButton(_("Send feedback"))
+        send = WrapButton(_("Send feedback"))
         icons.set_icon(send, "edit")
         send.clicked.connect(self._ask_feedback)
         row.addWidget(send)
@@ -187,7 +188,7 @@ class HelpPage(Page):
             self.mw.set_option("invite_name", invite.clean(text))
             shown.setText(invite.link(text))
         name.textChanged.connect(typed)
-        copy = self.dlg.invite_copy = QPushButton(_("Copy invite link"))
+        copy = self.dlg.invite_copy = WrapButton(_("Copy invite link"))
         icons.set_icon(copy, "link")
 
         def copied():

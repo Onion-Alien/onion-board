@@ -20,6 +20,7 @@ from shiboken6 import isValid as qt_valid
 from soundboard.ui.kit import busy, icons
 from soundboard.ui.bun import onionalien
 from soundboard.ui.kit import theme
+from soundboard.ui.kit.wrapbutton import WrapButton
 from soundboard.core import usage
 from soundboard.i18n import _
 from soundboard.ui.settings import Built, _button_row as _button_row
@@ -716,7 +717,7 @@ class SettingsDialog(QDialog, Built):
                 "adv_card")))
 
     def _link_button(self, text: str, url: str, icon: str = "") -> QPushButton:
-        btn = QPushButton(text)
+        btn = WrapButton(text)   # a long translation wraps rather than widen the page
         if icon:
             icons.set_icon(btn, icon)
         btn.clicked.connect(lambda: busy.open_url(
