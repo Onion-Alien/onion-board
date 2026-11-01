@@ -24,7 +24,7 @@ from PySide6.QtCore import QEvent, QSize, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QBoxLayout, QButtonGroup, QCheckBox, QComboBox, QFrame, QGridLayout,
                                QHBoxLayout, QLabel, QPushButton, QSlider, QVBoxLayout, QWidget)
 
-from soundboard.addons import aiaddon
+from soundboard.addons import aiaddon, addonmarks
 from soundboard.core import applog, errors, updates, usage
 from soundboard.online import net
 from soundboard.addons import modules as mods
@@ -559,7 +559,8 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
                     applog.report(where="AI voices download")
                 busy.emit(self._install_done, False, aiaddon.friendly(e))
 
-        threading.Thread(target=work, name="ai-voices-get", daemon=True).start()
+        threading.Thread(target=addonmarks.marked(addonmarks.AI_VOICES, work),
+                         name="ai-voices-get", daemon=True).start()
 
     def _remove(self):
         m = self.module
@@ -602,7 +603,8 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
                     applog.report(where="module install")
                 busy.emit(self._install_done, False, errors.plain(e))
 
-        threading.Thread(target=work, name="ai-voices-install", daemon=True).start()
+        threading.Thread(target=addonmarks.marked(addonmarks.AI_VOICES, work),
+                         name="ai-voices-install", daemon=True).start()
 
     def _on_install_line(self, t: str):
         """Robo-Bun does the work on screen: the card shows the stage, not pip's output,

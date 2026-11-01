@@ -4787,6 +4787,7 @@
   "ooh, pretty!": "¡Uy, qué bonito!",
   "The settings most people change, on one page": "Los ajustes que más gente cambia, en una sola página",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Abre esta pestaña mientras Onion Board está al frente.\nEsc = cancelar.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Arrastra los controles para cortar el principio y el final. Haz clic o arrastra la regla de tiempo, o arrastra el cabezal, para cambiar dónde suena. Ctrl+rueda acerca. Arrastra con el botón derecho del mouse, o usa Shift+rueda, para desplazarte.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Gratis, sin anuncios y sin cuenta. Hecho por OnionAlien. Código abierto bajo la GNU GPL v3: úsalo, modifícalo y compártelo, siempre que tu versión también siga siendo de código abierto.",
   "Community uploads": "Subidos por la comunidad",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Suma los efectos de otra voz a esta (Robot + Demon): se activan los efectos que tiene y la tuya no",
@@ -4848,6 +4849,13 @@
     "{n} sonido nuevo",
     "{n} sonidos nuevos"
   ],
+  "Download again": "Descargar de nuevo",
+  "Install again": "Instalar de nuevo",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "La última vez, Onion Board se cerró mientras descargaba {language}. ¿Descargarlo de nuevo?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "La última vez, Onion Board se cerró mientras instalaba las voces con IA. ¿Instalarlas de nuevo?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "La última vez, Onion Board se cerró mientras instalaba Onion Pocket. ¿Instalarlo de nuevo?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "La última vez, Onion Board se cerró mientras instalaba Onion Watch. ¿Instalarlo de nuevo?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "La última vez, Onion Board se cerró mientras instalaba el reconocimiento de voz. ¿Instalarlo de nuevo?",
   "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Fragmento {n}</b> ({start} a {end}): los ajustes de abajo solo cambian esta parte.",
   "A voice is for the whole sound: click outside the splices to get back to it": "Una voz es para todo el sonido: haz clic fuera de los fragmentos para volver",
   "Back to the whole sound": "Volver al sonido completo",
@@ -4861,6 +4869,5 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Se oyen cuando los fragmentos suenan unidos, y en Reproducir ahora, Guardar como nuevo pad y Copiar del fragmento (clic derecho en él)",
   "{name} (splice {n})": "{name} (fragmento {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Copiado: pégalo en un chat o una carpeta",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Arrastra los controles para cortar el principio y el final. Haz clic o arrastra la regla de tiempo, o arrastra el cabezal, para cambiar dónde suena. Ctrl+rueda acerca. Arrastra con el botón derecho del mouse, o usa Shift+rueda, para desplazarte.",
   "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Desplaza para hacer zoom. En la línea de nivel de un fragmento, arrastra los puntos: las esquinas a los lados para un fundido y arriba o abajo para su volumen, los extremos arriba o abajo para dónde empieza un fundido. Haz clic en un fragmento para darle sus propios efectos; clic derecho para más."
 }

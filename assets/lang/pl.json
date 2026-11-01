@@ -4875,6 +4875,7 @@
   "ooh, pretty!": "Och, jak pięknie!",
   "The settings most people change, on one page": "Ustawienia, które zmienia większość osób, na jednej stronie",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Otwiera tę kartę, gdy Onion Board jest na wierzchu.\nEsc = anuluj.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Przeciągnij uchwyty, by odciąć początek i koniec. Kliknij lub przeciągnij linijkę czasu albo przeciągnij znacznik odtwarzania, by zmienić, skąd gra. Ctrl+kółko przybliża. Przesuwaj, przeciągając prawym przyciskiem myszy albo Shift+kółkiem.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Za darmo, bez reklam i bez konta. Stworzone przez OnionAlien. Open source na licencji GNU GPL v3: używaj, zmieniaj i udostępniaj, o ile twoja wersja też pozostanie open source.",
   "Community uploads": "Przesłane przez społeczność",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Dodaj do tego głosu efekty innego głosu (Robot + Demon): włączą się efekty, które ma on, a twój nie",
@@ -4940,6 +4941,13 @@
     "{n} nowe dźwięki",
     "{n} nowych dźwięków"
   ],
+  "Download again": "Pobierz ponownie",
+  "Install again": "Zainstaluj ponownie",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "Ostatnio Onion Board zamknął się podczas pobierania języka „{language}”. Pobrać ponownie?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "Ostatnio Onion Board zamknął się podczas instalowania głosów AI. Zainstalować je ponownie?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Ostatnio Onion Board zamknął się podczas instalowania Onion Pocket. Zainstalować ponownie?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "Ostatnio Onion Board zamknął się podczas instalowania Onion Watch. Zainstalować ponownie?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Ostatnio Onion Board zamknął się podczas instalowania rozpoznawania mowy. Zainstalować ponownie?",
   "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Fragment {n}</b> ({start}–{end}): ustawienia poniżej zmieniają tylko tę część.",
   "A voice is for the whole sound: click outside the splices to get back to it": "Głos dotyczy całego dźwięku: kliknij poza fragmentami, żeby wrócić",
   "Back to the whole sound": "Wróć do całego dźwięku",
@@ -4953,6 +4961,5 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Słychać je, gdy fragmenty grają połączone, oraz w Odtwórz teraz, Zapisz jako nowy pad i Kopiuj tego fragmentu (prawy przycisk na nim)",
   "{name} (splice {n})": "{name} (fragment {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Skopiowano: wklej na czat lub do folderu",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Przeciągnij uchwyty, by odciąć początek i koniec. Kliknij lub przeciągnij linijkę czasu albo przeciągnij znacznik odtwarzania, by zmienić, skąd gra. Ctrl+kółko przybliża. Przesuwaj, przeciągając prawym przyciskiem myszy albo Shift+kółkiem.",
   "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Przewijaj, żeby przybliżyć. Na linii poziomu fragmentu przeciągaj kropki: rogi w bok dla wyciszenia i w górę lub w dół dla głośności, końce w górę lub w dół dla poziomu, od którego zaczyna się wyciszenie. Kliknij fragment, żeby dać mu własne efekty, prawy przycisk – więcej."
 }

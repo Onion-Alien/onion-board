@@ -4787,6 +4787,7 @@
   "ooh, pretty!": "Uh, hvor flot!",
   "The settings most people change, on one page": "De indstillinger, de fleste ændrer, på én side",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Åbner denne fane, mens Onion Board er forrest.\nEsc = annuller.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Træk i håndtagene for at skære starten og slutningen væk. Klik eller træk i tidslinjen, eller træk afspilningslinjen, for at flytte hvor den spiller. Ctrl+scroll zoomer. Træk med højre museknap, eller brug Shift+scroll, for at flytte.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Gratis, uden reklamer og uden konto. Lavet af OnionAlien. Open source under GNU GPL v3: brug den, ret i den og del den, så længe din version også forbliver open source.",
   "Community uploads": "Uploadet af fællesskabet",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Læg en anden stemmes effekter oven i denne (Robot + Demon): de effekter, den har og din ikke har, slås til",
@@ -4848,6 +4849,13 @@
     "{n} ny lyd",
     "{n} nye lyde"
   ],
+  "Download again": "Hent igen",
+  "Install again": "Installér igen",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "Sidst lukkede Onion Board, mens {language} blev hentet. Vil du hente det igen?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "Sidst lukkede Onion Board, mens AI-stemmer blev installeret. Vil du installere dem igen?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Sidst lukkede Onion Board, mens Onion Pocket blev installeret. Vil du installere det igen?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "Sidst lukkede Onion Board, mens Onion Watch blev installeret. Vil du installere det igen?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Sidst lukkede Onion Board, mens talegenkendelse blev installeret. Vil du installere det igen?",
   "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Klip {n}</b> ({start} til {end}): indstillingerne nedenfor ændrer kun denne del.",
   "A voice is for the whole sound: click outside the splices to get back to it": "En stemme gælder hele lyden: klik uden for klippene for at komme tilbage",
   "Back to the whole sound": "Tilbage til hele lyden",
@@ -4861,6 +4869,5 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "De høres, når klippene spilles samlet, og i klippets egen Afspil nu, Gem som ny pad og Kopiér (højreklik på det)",
   "{name} (splice {n})": "{name} (klip {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Kopieret: indsæt det i en chat eller mappe",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Træk i håndtagene for at skære starten og slutningen væk. Klik eller træk i tidslinjen, eller træk afspilningslinjen, for at flytte hvor den spiller. Ctrl+scroll zoomer. Træk med højre museknap, eller brug Shift+scroll, for at flytte.",
   "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Rul for at zoome. Træk prikkerne på et klips niveaulinje: hjørnerne til siden for en fade og op eller ned for lydstyrken, enderne op eller ned for hvor en fade starter. Klik på et klip for egne effekter, højreklik for mere."
 }

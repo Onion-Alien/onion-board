@@ -4787,6 +4787,7 @@
   "ooh, pretty!": "Uau, que lindo!",
   "The settings most people change, on one page": "As configurações que a maioria das pessoas muda, em uma página",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Abre esta aba enquanto o Onion Board está na frente.\nEsc = cancelar.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Arraste as alças para cortar o começo e o fim. Clique ou arraste a régua de tempo, ou arraste o cursor de reprodução, para mudar onde toca. Ctrl+rolagem dá zoom. Arraste com o botão direito do mouse, ou use Shift+rolagem, para mover.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Grátis, sem anúncios e sem conta. Feito por OnionAlien. Código aberto sob a GNU GPL v3: use, modifique e compartilhe, desde que a sua versão também continue de código aberto.",
   "Community uploads": "Enviados pela comunidade",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Some os efeitos de outra voz a esta (Robot + Demon): os efeitos que ela tem e a sua não são ligados",
@@ -4848,6 +4849,13 @@
     "{n} som novo",
     "{n} sons novos"
   ],
+  "Download again": "Baixar de novo",
+  "Install again": "Instalar de novo",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "Da última vez, o Onion Board fechou enquanto baixava {language}. Baixar de novo?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "Da última vez, o Onion Board fechou enquanto instalava as vozes de IA. Instalar de novo?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Da última vez, o Onion Board fechou enquanto instalava o Onion Pocket. Instalar de novo?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "Da última vez, o Onion Board fechou enquanto instalava o Onion Watch. Instalar de novo?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Da última vez, o Onion Board fechou enquanto instalava o reconhecimento de fala. Instalar de novo?",
   "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Trecho {n}</b> ({start} a {end}): os ajustes abaixo mudam só esta parte.",
   "A voice is for the whole sound: click outside the splices to get back to it": "Uma voz vale para o som inteiro: clique fora dos trechos para voltar",
   "Back to the whole sound": "Voltar ao som inteiro",
@@ -4861,6 +4869,5 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Eles tocam quando os trechos são juntados, e no Tocar agora, Salvar como novo botão e Copiar do trecho (clique direito nele)",
   "{name} (splice {n})": "{name} (trecho {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Copiado: cole num chat ou numa pasta",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Arraste as alças para cortar o começo e o fim. Clique ou arraste a régua de tempo, ou arraste o cursor de reprodução, para mudar onde toca. Ctrl+rolagem dá zoom. Arraste com o botão direito do mouse, ou use Shift+rolagem, para mover.",
   "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Role para dar zoom. Na linha de nível de um trecho, arraste os pontos: os cantos para o lado para um fade e para cima ou baixo para o volume, as pontas para cima ou baixo para onde um fade começa. Clique num trecho para efeitos próprios, clique direito para mais."
 }

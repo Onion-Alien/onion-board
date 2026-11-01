@@ -4875,6 +4875,7 @@
   "ooh, pretty!": "Páni, to je krása!",
   "The settings most people change, on one page": "Nastavení, která mění většina lidí, na jedné stránce",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Otevře tuhle kartu, když je Onion Board vepředu.\nEsc = zrušit.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Tažením úchytů ořízneš začátek a konec. Kliknutím nebo tažením časové osy, nebo tažením ukazatele přehrávání, změníš, kde hraje. Ctrl+kolečko přibližuje. Posouvej tažením pravým tlačítkem myši nebo Shift+kolečkem.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Zdarma, bez reklam a bez účtu. Vytvořil OnionAlien. Open source pod licencí GNU GPL v3: používej, upravuj a sdílej, pokud tvoje verze zůstane také open source.",
   "Community uploads": "Nahrané komunitou",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Přidej k tomuto hlasu efekty jiného hlasu (Robot + Demon): zapnou se efekty, které má on a tvůj ne",
@@ -4940,6 +4941,13 @@
     "{n} nové zvuky",
     "{n} nových zvuků"
   ],
+  "Download again": "Stáhnout znovu",
+  "Install again": "Nainstalovat znovu",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "Onion Board se minule zavřel během stahování {language}. Stáhnout znovu?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "Onion Board se minule zavřel během instalace AI hlasů. Nainstalovat je znovu?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Onion Board se minule zavřel během instalace Onion Pocket. Nainstalovat ho znovu?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "Onion Board se minule zavřel během instalace Onion Watch. Nainstalovat ho znovu?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Onion Board se minule zavřel během instalace rozpoznávání řeči. Nainstalovat ho znovu?",
   "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Úsek {n}</b> ({start} až {end}): nastavení níže mění jen tuto část.",
   "A voice is for the whole sound: click outside the splices to get back to it": "Hlas patří celému zvuku: klikni mimo úseky a vrátíš se k němu",
   "Back to the whole sound": "Zpět na celý zvuk",
@@ -4953,6 +4961,5 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Uslyšíš je, když úseky hrají spojené, a v Přehrát hned, Uložit jako nový pad a Kopírovat u úseku (pravé tlačítko na něm)",
   "{name} (splice {n})": "{name} (úsek {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Zkopírováno: vlož to do chatu nebo složky",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Tažením úchytů ořízneš začátek a konec. Kliknutím nebo tažením časové osy, nebo tažením ukazatele přehrávání, změníš, kde hraje. Ctrl+kolečko přibližuje. Posouvej tažením pravým tlačítkem myši nebo Shift+kolečkem.",
   "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Kolečkem přibližuješ. Na čáře hlasitosti úseku táhni tečky: rohy do strany pro prolnutí a nahoru či dolů pro hlasitost, konce nahoru či dolů pro úroveň, od které prolnutí začíná. Klikni na úsek pro vlastní efekty, pravým tlačítkem víc."
 }

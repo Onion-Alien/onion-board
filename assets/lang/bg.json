@@ -4787,6 +4787,7 @@
   "ooh, pretty!": "Ох, колко красиво!",
   "The settings most people change, on one page": "Настройките, които повечето хора променят, на една страница",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Отваря този раздел, докато Onion Board е отпред.\nEsc = отказ.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Плъзни дръжките, за да отрежеш началото и края. Щракни или влачи линийката с времето, или влачи маркера, за да смениш откъде свири. Ctrl+скрол увеличава. Влачи с десния бутон на мишката или Shift+скрол, за да местиш.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Безплатно, без реклами и без акаунт. Направено от OnionAlien. С отворен код под GNU GPL v3: ползвай го, променяй го и го споделяй, стига твоята версия също да е с отворен код.",
   "Community uploads": "Качени от общността",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Добави ефектите на друг глас към този (Robot + Demon): ефектите, които той има, а твоят няма, се включват",
@@ -4848,6 +4849,13 @@
     "{n} нов звук",
     "{n} нови звука"
   ],
+  "Download again": "Изтегли отново",
+  "Install again": "Инсталирай отново",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "Последния път Onion Board се затвори, докато изтегляше {language}. Да го изтегля ли отново?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "Последния път Onion Board се затвори, докато инсталираше AI гласовете. Да ги инсталирам ли отново?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Последния път Onion Board се затвори, докато инсталираше Onion Pocket. Да го инсталирам ли отново?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "Последния път Onion Board се затвори, докато инсталираше Onion Watch. Да го инсталирам ли отново?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Последния път Onion Board се затвори, докато инсталираше разпознаването на говор. Да го инсталирам ли отново?",
   "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Откъс {n}</b> ({start} до {end}): настройките отдолу променят само тази част.",
   "A voice is for the whole sound: click outside the splices to get back to it": "Гласът е за целия звук: кликни извън откъсите, за да се върнеш",
   "Back to the whole sound": "Обратно към целия звук",
@@ -4861,6 +4869,5 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Чуват се, когато откъсите свирят слети, и в неговите Пусни сега, Запази като нов бутон и Копирай (десен клик върху него)",
   "{name} (splice {n})": "{name} (откъс {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Копирано: постави го в чат или папка",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Плъзни дръжките, за да отрежеш началото и края. Щракни или влачи линийката с времето, или влачи маркера, за да смениш откъде свири. Ctrl+скрол увеличава. Влачи с десния бутон на мишката или Shift+скрол, за да местиш.",
   "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Скролвай за приближаване. По линията на нивото на откъс влачи точките: ъглите встрани за плавен преход и нагоре или надолу за силата, краищата нагоре или надолу за нивото, от което започва преходът. Кликни откъс за собствени ефекти, десен клик за още."
 }

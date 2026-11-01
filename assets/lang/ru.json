@@ -4875,6 +4875,7 @@
   "ooh, pretty!": "Ох, красота!",
   "The settings most people change, on one page": "Настройки, которые меняет большинство, на одной странице",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Открывает эту вкладку, когда Onion Board на переднем плане.\nEsc = отмена.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Перетащи ручки, чтобы отрезать начало и конец. Нажми или тяни по шкале времени, или тяни линию воспроизведения, чтобы перейти к другому месту. Ctrl+колесо приближает. Чтобы сдвинуть, тяни правой кнопкой мыши или крути Shift+колесо.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Бесплатно, без рекламы и без аккаунта. Сделал OnionAlien. Открытый код под лицензией GNU GPL v3: используй, изменяй и делись, если твоя версия тоже остаётся с открытым кодом.",
   "Community uploads": "Загружено сообществом",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Добавить к этому голосу эффекты другого (Robot + Demon): включатся эффекты, которые есть у него, но нет у вашего",
@@ -4940,6 +4941,13 @@
     "{n} новых звука",
     "{n} новых звуков"
   ],
+  "Download again": "Скачать снова",
+  "Install again": "Установить снова",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "В прошлый раз Onion Board закрылся, пока скачивался язык «{language}». Скачать снова?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "В прошлый раз Onion Board закрылся во время установки ИИ-голосов. Установить их снова?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "В прошлый раз Onion Board закрылся во время установки Onion Pocket. Установить снова?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "В прошлый раз Onion Board закрылся во время установки Onion Watch. Установить снова?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "В прошлый раз Onion Board закрылся во время установки распознавания речи. Установить снова?",
   "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Фрагмент {n}</b> ({start}–{end}): настройки ниже меняют только эту часть.",
   "A voice is for the whole sound: click outside the splices to get back to it": "Голос — для всего звука: кликни вне фрагментов, чтобы вернуться",
   "Back to the whole sound": "Назад ко всему звуку",
@@ -4953,6 +4961,5 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Они слышны, когда фрагменты играют склеенными, и в его Проиграть сейчас, Сохранить как новую кнопку и Копировать (правый клик по нему)",
   "{name} (splice {n})": "{name} (фрагмент {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Скопировано: вставь в чат или папку",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Перетащи ручки, чтобы отрезать начало и конец. Нажми или тяни по шкале времени, или тяни линию воспроизведения, чтобы перейти к другому месту. Ctrl+колесо приближает. Чтобы сдвинуть, тяни правой кнопкой мыши или крути Shift+колесо.",
   "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Прокрутка приближает. На линии громкости фрагмента тяни точки: углы в сторону — для плавного перехода, вверх или вниз — для громкости, концы вверх или вниз — откуда начинается переход. Кликни фрагмент для своих эффектов, правый клик — ещё."
 }

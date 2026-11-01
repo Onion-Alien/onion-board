@@ -4699,6 +4699,7 @@
   "ooh, pretty!": "わあ、きれい！",
   "The settings most people change, on one page": "多くの人が変える設定を1ページに",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board が前面にあるとき、このタブを開きます。\nEsc = キャンセル。",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "ハンドルをドラッグして最初と最後をカットします。時間のルーラーをクリックかドラッグ、または再生位置の線をドラッグすると、再生する位置が変わります。Ctrl+スクロールで拡大。右ボタンでドラッグするか、Shift+スクロールで移動。",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "無料、広告なし、アカウント不要。OnionAlien 作。GNU GPL v3 のオープンソース: 自由に使って、改変して、共有できます。ただし、あなたの版もオープンソースのままにしてください。",
   "Community uploads": "コミュニティの投稿",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "別のボイスのエフェクトをこのボイスに加えます（Robot + Demon）：相手にあってあなたのボイスにないエフェクトがオンになります",
@@ -4756,6 +4757,13 @@
   "{n} new sound": [
     "新しいサウンド {n} 件"
   ],
+  "Download again": "もう一度ダウンロード",
+  "Install again": "もう一度インストール",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "前回、{language}のダウンロード中に Onion Board が閉じました。もう一度ダウンロードしますか？",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "前回、AI ボイスのインストール中に Onion Board が閉じました。もう一度インストールしますか？",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "前回、Onion Pocket のインストール中に Onion Board が閉じました。もう一度インストールしますか？",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "前回、Onion Watch のインストール中に Onion Board が閉じました。もう一度インストールしますか？",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "前回、音声認識のインストール中に Onion Board が閉じました。もう一度インストールしますか？",
   "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>区間 {n}</b>（{start}〜{end}）：下の設定はこの部分だけを変えます。",
   "A voice is for the whole sound: click outside the splices to get back to it": "ボイスはサウンド全体のものです：区間の外をクリックすると戻ります",
   "Back to the whole sound": "サウンド全体に戻る",
@@ -4769,6 +4777,5 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "区間をつないで再生したときと、その区間の「今すぐ再生」「新しいパッドとして保存」「コピー」で聞こえます（右クリック）",
   "{name} (splice {n})": "{name}（区間 {n}）",
   "✓ Copied: paste it into a chat or a folder": "✓ コピーしました：チャットやフォルダーに貼り付けられます",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "ハンドルをドラッグして最初と最後をカットします。時間のルーラーをクリックかドラッグ、または再生位置の線をドラッグすると、再生する位置が変わります。Ctrl+スクロールで拡大。右ボタンでドラッグするか、Shift+スクロールで移動。",
   "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "スクロールでズーム。区間のレベル線の点をドラッグ：角を横に動かすとフェード、上下で音量、端を上下でフェードの開始レベル。区間をクリックで専用エフェクト、右クリックでその他の操作。"
 }

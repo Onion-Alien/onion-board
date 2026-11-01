@@ -4787,6 +4787,7 @@
   "ooh, pretty!": "Ωχ, τι ωραίο!",
   "The settings most people change, on one page": "Οι ρυθμίσεις που αλλάζουν οι περισσότεροι, σε μία σελίδα",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Ανοίγει αυτή την καρτέλα όταν το Onion Board είναι μπροστά.\nEsc = ακύρωση.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Σύρε τις λαβές για να κόψεις την αρχή και το τέλος. Κάνε κλικ ή σύρε τη χρονογραμμή, ή σύρε τη γραμμή αναπαραγωγής, για να αλλάξεις από πού παίζει. Ctrl+κύλιση για ζουμ. Σύρε με το δεξί κουμπί του ποντικιού, ή Shift+κύλιση, για μετακίνηση.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Δωρεάν, χωρίς διαφημίσεις και χωρίς λογαριασμό. Από τον OnionAlien. Ανοιχτού κώδικα με άδεια GNU GPL v3: χρησιμοποίησέ το, άλλαξέ το και μοιράσου το, αρκεί και η δική σου έκδοση να μείνει ανοιχτού κώδικα.",
   "Community uploads": "Ανεβάσματα κοινότητας",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Πρόσθεσε τα εφέ μιας άλλης φωνής σε αυτή (Robot + Demon): ανάβουν τα εφέ που έχει εκείνη και όχι η δική σου",
@@ -4848,6 +4849,13 @@
     "{n} νέος ήχος",
     "{n} νέοι ήχοι"
   ],
+  "Download again": "Λήψη ξανά",
+  "Install again": "Εγκατάσταση ξανά",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "Την προηγούμενη φορά το Onion Board έκλεισε κατά τη λήψη της γλώσσας «{language}». Να γίνει λήψη ξανά;",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "Την προηγούμενη φορά το Onion Board έκλεισε κατά την εγκατάσταση των φωνών AI. Να εγκατασταθούν ξανά;",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Την προηγούμενη φορά το Onion Board έκλεισε κατά την εγκατάσταση του Onion Pocket. Να εγκατασταθεί ξανά;",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "Την προηγούμενη φορά το Onion Board έκλεισε κατά την εγκατάσταση του Onion Watch. Να εγκατασταθεί ξανά;",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Την προηγούμενη φορά το Onion Board έκλεισε κατά την εγκατάσταση της αναγνώρισης ομιλίας. Να εγκατασταθεί ξανά;",
   "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Απόσπασμα {n}</b> ({start} έως {end}): οι ρυθμίσεις από κάτω αλλάζουν μόνο αυτό το κομμάτι.",
   "A voice is for the whole sound: click outside the splices to get back to it": "Η φωνή είναι για όλο τον ήχο: κάνε κλικ έξω από τα αποσπάσματα για να επιστρέψεις",
   "Back to the whole sound": "Πίσω σε όλο τον ήχο",
@@ -4861,6 +4869,5 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Ακούγονται όταν τα αποσπάσματα παίζουν ενωμένα, και στα δικά του Αναπαραγωγή τώρα, Αποθήκευση ως νέο κουμπί και Αντιγραφή (δεξί κλικ πάνω του)",
   "{name} (splice {n})": "{name} (απόσπασμα {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Αντιγράφηκε: επικόλλησέ το σε συνομιλία ή φάκελο",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Σύρε τις λαβές για να κόψεις την αρχή και το τέλος. Κάνε κλικ ή σύρε τη χρονογραμμή, ή σύρε τη γραμμή αναπαραγωγής, για να αλλάξεις από πού παίζει. Ctrl+κύλιση για ζουμ. Σύρε με το δεξί κουμπί του ποντικιού, ή Shift+κύλιση, για μετακίνηση.",
   "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Κύλισε για ζουμ. Στη γραμμή στάθμης ενός αποσπάσματος σύρε τις κουκκίδες: τις γωνίες στο πλάι για σταδιακή μετάβαση και πάνω ή κάτω για την ένταση, τις άκρες πάνω ή κάτω για το πού ξεκινά η μετάβαση. Κάνε κλικ σε απόσπασμα για δικά του εφέ, δεξί κλικ για περισσότερα."
 }

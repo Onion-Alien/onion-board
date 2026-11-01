@@ -235,3 +235,94 @@ def test_ffmpeg_lives_in_its_own_controller(window):  # noqa: F811
                  "_may_get_ffmpeg", "_ffmpeg_never"):
         assert not hasattr(mainwindow.MainWindow, gone), gone
     assert window.ffmpeg is window.ffctl.health
+
+
+def _flaky(monkeypatch, faults: list[str]):
+    """ffmpegget.fix: fails with each of ``faults`` in turn (a GetError's fault), then works."""
+    calls = []
+
+    def fix(force=False, progress=None, stop=None):
+        calls.append(force)
+        if len(calls) <= len(faults):
+            raise ffmpegget.GetError("Couldn't reach github.com (timed out).",
+                                     faults[len(calls) - 1])
+        monkeypatch.setattr(ffmpegget, "_last", OK)
+        return OK
+    monkeypatch.setattr(ffmpegget, "fix", fix)
+    return calls
+
+
+@pytest.fixture
+def quick_retries(monkeypatch):
+    monkeypatch.setattr(ffmpegcontrol, "RETRY_WAITS_S", (0.05, 0.05, 0.05))
+    monkeypatch.setattr(ffmpegget, "connected", lambda: True)
+
+
+def test_a_dropped_connection_is_tried_again_quietly(window, qapp, monkeypatch,  # noqa: F811
+                                                     quick_retries):
+    calls = _flaky(monkeypatch, ["own-URLError", "winget-exit-1 own-err-10054"])
+    shown = []
+    monkeypatch.setattr(window.ffctl.bar, "show", lambda: shown.append(1))
+    _found(window, ffmpegget.MISSING)
+    process_events(qapp, lambda: len(calls) == 3 and not window.ffctl.getting)
+    assert len(calls) == 3 and shown == [1]   # the first try's progress only: none after
+    assert "github.com" not in said(window) and "FFmpeg works now" in said(window)
+
+
+def test_the_bar_shows_once_the_tries_again_are_used_up(window, qapp, monkeypatch,  # noqa: F811
+                                                        quick_retries):
+    calls = _flaky(monkeypatch, ["own-URLError"] * 9)
+    _found(window, ffmpegget.MISSING)
+    process_events(qapp, lambda: _up(window.ffctl.fix_btn))
+    assert len(calls) == 1 + len(ffmpegcontrol.RETRY_WAITS_S)
+    assert _up(window.ff_bar) and "github.com" in window.ffctl.lbl.text()
+    assert said(window).count("github.com") == 1          # one toast, at the end
+
+
+@pytest.mark.parametrize("fault", ["own-err-112", "own-still-err-193", "off",
+                                   "own-http-404", "own-too-big"])
+def test_what_waiting_cant_fix_isnt_tried_again(window, qapp, monkeypatch,  # noqa: F811
+                                                quick_retries, fault):
+    calls = _flaky(monkeypatch, [fault] * 9)
+    _found(window, ffmpegget.MISSING)
+    process_events(qapp, lambda: _up(window.ffctl.fix_btn))
+    assert calls == [False] and _up(window.ff_bar)
+
+
+def test_back_online_tries_again_at_once(window, qapp, monkeypatch):  # noqa: F811
+    monkeypatch.setattr(ffmpegcontrol, "RETRY_WAITS_S", (600,))
+    monkeypatch.setattr(ffmpegcontrol, "ONLINE_POLL_MS", 20)
+    window.ffctl.online_timer.setInterval(20)
+    online = [False]
+    monkeypatch.setattr(ffmpegget, "connected", lambda: online[0])
+    calls = _flaky(monkeypatch, ["own-err-11001"])
+    _found(window, ffmpegget.MISSING)
+    process_events(qapp, lambda: window.ffctl.retry_timer.isActive())
+    assert len(calls) == 1 and window.ffctl.retrying() and not _up(window.ff_bar)
+    online[0] = True                                       # the Wi-Fi came back
+    process_events(qapp, lambda: len(calls) == 2 and not window.ffctl.getting)
+    assert len(calls) == 2 and "FFmpeg works now" in said(window)
+
+
+def test_fix_it_during_a_wait_goes_at_once(window, qapp, monkeypatch):  # noqa: F811
+    monkeypatch.setattr(ffmpegcontrol, "RETRY_WAITS_S", (600,))
+    monkeypatch.setattr(ffmpegget, "connected", lambda: True)
+    calls = _flaky(monkeypatch, ["own-URLError"])
+    _found(window, ffmpegget.MISSING)
+    process_events(qapp, lambda: window.ffctl.retry_timer.isActive())
+    window.click_ffmpeg_fix(window.ffctl.fix_btn) if hasattr(window, "click_ffmpeg_fix") \
+        else window.ffctl.fix_clicked(window.ffctl.fix_btn)
+    process_events(qapp, lambda: len(calls) == 2 and not window.ffctl.getting)
+    assert len(calls) == 2 and not window.ffctl.retry_timer.isActive()
+
+
+@pytest.mark.parametrize("fault, again", [
+    ("own-URLError", True), ("own-err-10060", True), ("own-checksum", True),
+    ("own-http-503", True), ("own-http-429", True), ("own-proxy", True),
+    ("winget-exit-5 own-TimeoutError", True),
+    ("off", False), ("own-err-112", False), ("own-err-28", False), ("own-err-5", False),
+    ("own-http-404", False), ("own-too-big", False), ("own-still-err-193", False),
+    ("own-unpack-err-5", False), ("", False)])
+def test_worth_retrying(fault, again):
+    assert ffmpegget.worth_retrying(ffmpegget.GetError("x", fault)) is again
+    assert not ffmpegget.worth_retrying(ffmpegget.Stopped("x", fault))

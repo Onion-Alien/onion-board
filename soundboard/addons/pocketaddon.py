@@ -27,7 +27,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from soundboard.addons import modules
+from soundboard.addons import addonmarks, modules
 from soundboard.online import net
 from soundboard.core import updates
 from soundboard.addons.modules import ModuleInfo
@@ -126,7 +126,8 @@ def get(base: Path | None = None, progress: Callable[[int, int], None] | None = 
         offer = offer or latest(cancelled)
         if offer is None:
             raise updates.UpdateError("no Onion Pocket release the app can check")
-        return install(fetch(offer, progress, cancelled), base)
+        with addonmarks.running(addonmarks.POCKET):
+            return install(fetch(offer, progress, cancelled), base)
     except Exception as e:  # noqa: BLE001 - optional: any failure just means no card
         log.info("getting Onion Pocket failed: %s", e)
         return None

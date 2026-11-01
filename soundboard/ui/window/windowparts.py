@@ -123,6 +123,7 @@ class WindowParts(_Window):
     eq: EqPanel
     eq_card: Any
     ff_bar: TopBar
+    addon_bar: TopBar
     _fit_tab: Any
     flow_mic: QLabel
     flow_out: QLabel

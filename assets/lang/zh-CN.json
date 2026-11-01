@@ -4699,6 +4699,7 @@
   "ooh, pretty!": "哇，好漂亮！",
   "The settings most people change, on one page": "大多数人会改的设置，都在一页里",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board 在最前面时打开这个标签页。\nEsc = 取消。",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "拖动手柄裁掉开头和结尾。点击或拖动时间标尺，或拖动播放线，可以改变播放位置。Ctrl+滚轮缩放。按住鼠标右键拖动，或 Shift+滚轮，即可平移。",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "免费，无广告，无需账号。由 OnionAlien 制作。基于 GNU GPL v3 开源：可以使用、修改和分享，只要你的版本也保持开源。",
   "Community uploads": "社区上传",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "把另一个声音的效果加到这个声音上（Robot + Demon）：它有而你的声音没有的效果会被打开",
@@ -4756,6 +4757,13 @@
   "{n} new sound": [
     "{n} 个新声音"
   ],
+  "Download again": "重新下载",
+  "Install again": "重新安装",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "上次下载{language}时 Onion Board 关闭了。要重新下载吗？",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "上次安装 AI 语音时 Onion Board 关闭了。要重新安装吗？",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "上次安装 Onion Pocket 时 Onion Board 关闭了。要重新安装吗？",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "上次安装 Onion Watch 时 Onion Board 关闭了。要重新安装吗？",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "上次安装语音识别时 Onion Board 关闭了。要重新安装吗？",
   "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>片段 {n}</b>（{start} 到 {end}）：下面的设置只改这一段。",
   "A voice is for the whole sound: click outside the splices to get back to it": "人声作用于整个声音：点片段外面即可返回",
   "Back to the whole sound": "回到整个声音",
@@ -4769,6 +4777,5 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "片段合并播放时，以及在该片段的立即播放、另存为新按钮和复制中都能听到（右键点击它）",
   "{name} (splice {n})": "{name}（片段 {n}）",
   "✓ Copied: paste it into a chat or a folder": "✓ 已复制：可粘贴到聊天或文件夹",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "拖动手柄裁掉开头和结尾。点击或拖动时间标尺，或拖动播放线，可以改变播放位置。Ctrl+滚轮缩放。按住鼠标右键拖动，或 Shift+滚轮，即可平移。",
   "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "滚动即可缩放。在片段的音量线上拖动圆点：拐角左右拖动设置淡入淡出，上下拖动设置音量；两端上下拖动设置淡变的起始音量。点击片段可给它单独的效果，右键查看更多。"
 }

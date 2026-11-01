@@ -4787,6 +4787,7 @@
   "ooh, pretty!": "Oh, wie schön!",
   "The settings most people change, on one page": "Die Einstellungen, die die meisten ändern, auf einer Seite",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Öffnet diesen Tab, während Onion Board im Vordergrund ist.\nEsc = abbrechen.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Zieh die Griffe, um Anfang und Ende abzuschneiden. Klick oder zieh auf der Zeitleiste, oder zieh den Abspielstrich, um zu ändern, wo er spielt. Strg+Scrollen zoomt. Zum Verschieben mit der rechten Maustaste ziehen oder Umschalt+Scrollen.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Kostenlos, ohne Werbung und ohne Konto. Gemacht von OnionAlien. Open Source unter der GNU GPL v3: Nutz es, änder es und teil es, solange deine Version auch Open Source bleibt.",
   "Community uploads": "Community-Uploads",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Die Effekte einer anderen Stimme zu dieser hinzufügen (Robot + Demon): Effekte, die sie hat und deine nicht, werden eingeschaltet",
@@ -4848,6 +4849,13 @@
     "{n} neuer Sound",
     "{n} neue Sounds"
   ],
+  "Download again": "Erneut herunterladen",
+  "Install again": "Erneut installieren",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "Onion Board wurde letztes Mal beim Herunterladen von {language} geschlossen. Erneut herunterladen?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "Onion Board wurde letztes Mal beim Installieren der KI-Stimmen geschlossen. Erneut installieren?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Onion Board wurde letztes Mal beim Installieren von Onion Pocket geschlossen. Erneut installieren?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "Onion Board wurde letztes Mal beim Installieren von Onion Watch geschlossen. Erneut installieren?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Onion Board wurde letztes Mal beim Installieren der Spracherkennung geschlossen. Erneut installieren?",
   "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Ausschnitt {n}</b> ({start} bis {end}): Die Einstellungen unten ändern nur diesen Teil.",
   "A voice is for the whole sound: click outside the splices to get back to it": "Eine Stimme gilt für den ganzen Sound: Klicke neben die Ausschnitte, um zurückzukommen",
   "Back to the whole sound": "Zurück zum ganzen Sound",
@@ -4861,6 +4869,5 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Sie sind zu hören, wenn die Ausschnitte verbunden spielen, und in Jetzt abspielen, Als neues Pad speichern und Kopieren des Ausschnitts (Rechtsklick darauf)",
   "{name} (splice {n})": "{name} (Ausschnitt {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Kopiert: Füge es in einen Chat oder Ordner ein",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Zieh die Griffe, um Anfang und Ende abzuschneiden. Klick oder zieh auf der Zeitleiste, oder zieh den Abspielstrich, um zu ändern, wo er spielt. Strg+Scrollen zoomt. Zum Verschieben mit der rechten Maustaste ziehen oder Umschalt+Scrollen.",
   "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Scrollen zoomt. Zieh auf der Pegellinie eines Ausschnitts die Punkte: die Ecken seitlich für eine Blende und hoch oder runter für die Lautstärke, die Enden hoch oder runter dafür, wo eine Blende beginnt. Klick auf einen Ausschnitt für eigene Effekte, Rechtsklick für mehr."
 }

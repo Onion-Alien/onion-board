@@ -4699,6 +4699,7 @@
   "ooh, pretty!": "Wah, cantik!",
   "The settings most people change, on one page": "Pengaturan yang paling sering diubah orang, dalam satu halaman",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Membuka tab ini saat Onion Board ada di depan.\nEsc = batal.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Seret pegangannya untuk memotong awal dan akhir. Klik atau seret penggaris waktu, atau seret penanda putar, untuk memindah posisi putar. Ctrl+gulir untuk zoom. Seret dengan tombol kanan mouse, atau Shift+gulir, untuk menggeser.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Gratis, tanpa iklan dan tanpa akun. Dibuat oleh OnionAlien. Open source di bawah GNU GPL v3: pakai, ubah, dan bagikan, asalkan versimu juga tetap open source.",
   "Community uploads": "Unggahan komunitas",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Tambahkan efek suara lain ke suara ini (Robot + Demon): efek yang dimilikinya tapi tidak ada di suaramu akan dinyalakan",
@@ -4756,6 +4757,13 @@
   "{n} new sound": [
     "{n} suara baru"
   ],
+  "Download again": "Unduh lagi",
+  "Install again": "Instal lagi",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "Terakhir kali Onion Board tertutup saat mengunduh {language}. Unduh lagi?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "Terakhir kali Onion Board tertutup saat menginstal suara AI. Instal lagi?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Terakhir kali Onion Board tertutup saat menginstal Onion Pocket. Instal lagi?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "Terakhir kali Onion Board tertutup saat menginstal Onion Watch. Instal lagi?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Terakhir kali Onion Board tertutup saat menginstal pengenalan ucapan. Instal lagi?",
   "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Potongan {n}</b> ({start} sampai {end}): pengaturan di bawah hanya mengubah bagian ini.",
   "A voice is for the whole sound: click outside the splices to get back to it": "Suara berlaku untuk seluruh sound: klik di luar potongan untuk kembali",
   "Back to the whole sound": "Kembali ke seluruh sound",
@@ -4769,6 +4777,5 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Terdengar saat potongan diputar tergabung, dan di Putar sekarang, Simpan sebagai pad baru, dan Salin milik potongan itu (klik kanan padanya)",
   "{name} (splice {n})": "{name} (potongan {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Tersalin: tempel di chat atau folder",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Seret pegangannya untuk memotong awal dan akhir. Klik atau seret penggaris waktu, atau seret penanda putar, untuk memindah posisi putar. Ctrl+gulir untuk zoom. Seret dengan tombol kanan mouse, atau Shift+gulir, untuk menggeser.",
   "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Gulir untuk zoom. Di garis level potongan, seret titiknya: sudutnya ke samping untuk fade dan naik atau turun untuk volume, ujungnya naik atau turun untuk titik awal fade. Klik potongan untuk efek sendiri, klik kanan untuk lainnya."
 }

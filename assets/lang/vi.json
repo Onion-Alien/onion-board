@@ -4699,6 +4699,7 @@
   "ooh, pretty!": "Ồ, đẹp quá!",
   "The settings most people change, on one page": "Những cài đặt mọi người hay đổi nhất, gói trong một trang",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Mở tab này khi Onion Board đang ở phía trước.\nEsc = hủy.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Kéo tay nắm để cắt bỏ đầu và cuối. Bấm hoặc kéo thước thời gian, hoặc kéo vạch phát, để đổi chỗ đang phát. Ctrl+cuộn để phóng to. Kéo bằng chuột phải, hoặc Shift+cuộn, để di chuyển.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Miễn phí, không quảng cáo, không cần tài khoản. Do OnionAlien làm. Mã nguồn mở theo GNU GPL v3: cứ dùng, sửa và chia sẻ, miễn là phiên bản của bạn cũng giữ mã nguồn mở.",
   "Community uploads": "Cộng đồng tải lên",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Thêm hiệu ứng của giọng khác vào giọng này (Robot + Demon): những hiệu ứng nó có mà giọng bạn chưa có sẽ được bật",
@@ -4756,6 +4757,13 @@
   "{n} new sound": [
     "{n} âm thanh mới"
   ],
+  "Download again": "Tải xuống lại",
+  "Install again": "Cài đặt lại",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "Lần trước Onion Board đã đóng khi đang tải xuống {language}. Tải xuống lại?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "Lần trước Onion Board đã đóng khi đang cài đặt giọng AI. Cài đặt lại?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Lần trước Onion Board đã đóng khi đang cài đặt Onion Pocket. Cài đặt lại?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "Lần trước Onion Board đã đóng khi đang cài đặt Onion Watch. Cài đặt lại?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Lần trước Onion Board đã đóng khi đang cài đặt nhận dạng giọng nói. Cài đặt lại?",
   "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Đoạn {n}</b> ({start} đến {end}): các cài đặt bên dưới chỉ đổi phần này.",
   "A voice is for the whole sound: click outside the splices to get back to it": "Giọng là cho cả âm thanh: bấm ra ngoài các đoạn để quay lại",
   "Back to the whole sound": "Quay lại cả âm thanh",
@@ -4769,6 +4777,5 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Bạn nghe chúng khi các đoạn phát ghép lại, và trong Phát ngay, Lưu thành nút mới và Sao chép của đoạn đó (chuột phải vào nó)",
   "{name} (splice {n})": "{name} (đoạn {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Đã sao chép: dán vào khung chat hoặc thư mục",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Kéo tay nắm để cắt bỏ đầu và cuối. Bấm hoặc kéo thước thời gian, hoặc kéo vạch phát, để đổi chỗ đang phát. Ctrl+cuộn để phóng to. Kéo bằng chuột phải, hoặc Shift+cuộn, để di chuyển.",
   "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Cuộn để phóng to. Trên đường mức của một đoạn, kéo các chấm: góc sang ngang để làm to dần/nhỏ dần và lên xuống để chỉnh âm lượng, hai đầu lên xuống để chọn mức bắt đầu. Bấm vào một đoạn để có hiệu ứng riêng, chuột phải để xem thêm."
 }

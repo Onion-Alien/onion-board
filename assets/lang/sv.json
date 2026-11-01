@@ -4787,6 +4787,7 @@
   "ooh, pretty!": "Åh, så fint!",
   "The settings most people change, on one page": "Inställningarna de flesta ändrar, på en sida",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Öppnar den här fliken när Onion Board är längst fram.\nEsc = avbryt.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Dra i handtagen för att klippa bort början och slutet. Klicka eller dra i tidslinjalen, eller dra uppspelningsstrecket, för att flytta var den spelar. Ctrl+scroll zoomar. Dra med höger musknapp, eller använd Skift+scroll, för att flytta.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Gratis, utan reklam och utan konto. Gjord av OnionAlien. Öppen källkod under GNU GPL v3: använd den, ändra den och dela den, så länge din version också förblir öppen källkod.",
   "Community uploads": "Uppladdat av gemenskapen",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Lägg en annan rösts effekter ovanpå den här (Robot + Demon): effekterna den har och din inte har slås på",
@@ -4848,6 +4849,13 @@
     "{n} nytt ljud",
     "{n} nya ljud"
   ],
+  "Download again": "Ladda ner igen",
+  "Install again": "Installera igen",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "Förra gången stängdes Onion Board medan {language} laddades ner. Ladda ner igen?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "Förra gången stängdes Onion Board medan AI-röster installerades. Installera dem igen?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Förra gången stängdes Onion Board medan Onion Pocket installerades. Installera igen?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "Förra gången stängdes Onion Board medan Onion Watch installerades. Installera igen?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Förra gången stängdes Onion Board medan taligenkänning installerades. Installera igen?",
   "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Klipp {n}</b> ({start} till {end}): inställningarna nedan ändrar bara den här delen.",
   "A voice is for the whole sound: click outside the splices to get back to it": "En röst gäller hela ljudet: klicka utanför klippen för att komma tillbaka",
   "Back to the whole sound": "Tillbaka till hela ljudet",
@@ -4861,6 +4869,5 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "De hörs när klippen spelas ihop, och i klippets egna Spela nu, Spara som ny ruta och Kopiera (högerklicka på det)",
   "{name} (splice {n})": "{name} (klipp {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Kopierat: klistra in det i en chatt eller mapp",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Dra i handtagen för att klippa bort början och slutet. Klicka eller dra i tidslinjalen, eller dra uppspelningsstrecket, för att flytta var den spelar. Ctrl+scroll zoomar. Dra med höger musknapp, eller använd Skift+scroll, för att flytta.",
   "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Scrolla för att zooma. Dra prickarna på ett klipps nivålinje: hörnen åt sidan för en toning och upp eller ner för volymen, ändarna upp eller ner för var en toning börjar. Klicka på ett klipp för egna effekter, högerklicka för mer."
 }

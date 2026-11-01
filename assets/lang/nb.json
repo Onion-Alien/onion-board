@@ -4787,6 +4787,7 @@
   "ooh, pretty!": "Åh, så fint!",
   "The settings most people change, on one page": "Innstillingene folk oftest endrer, på én side",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Åpner denne fanen mens Onion Board er foran.\nEsc = avbryt.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Dra håndtakene for å kutte av starten og slutten. Klikk eller dra i tidslinjalen, eller dra avspillingsstreken, for å flytte hvor den spiller. Ctrl+rulling zoomer. Dra med høyre museknapp, eller bruk Shift+rulling, for å flytte.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Gratis, uten reklame og uten konto. Laget av OnionAlien. Åpen kildekode under GNU GPL v3: bruk den, endre den og del den, så lenge din versjon også forblir åpen kildekode.",
   "Community uploads": "Lastet opp av fellesskapet",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Legg en annen stemmes effekter oppå denne (Robot + Demon): effektene den har og din ikke har, slås på",
@@ -4848,6 +4849,13 @@
     "{n} ny lyd",
     "{n} nye lyder"
   ],
+  "Download again": "Last ned på nytt",
+  "Install again": "Installer på nytt",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "Sist ble Onion Board lukket mens {language} ble lastet ned. Vil du laste det ned på nytt?",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "Sist ble Onion Board lukket mens AI-stemmer ble installert. Vil du installere dem på nytt?",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "Sist ble Onion Board lukket mens Onion Pocket ble installert. Vil du installere det på nytt?",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "Sist ble Onion Board lukket mens Onion Watch ble installert. Vil du installere det på nytt?",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "Sist ble Onion Board lukket mens talegjenkjenning ble installert. Vil du installere det på nytt?",
   "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Klipp {n}</b> ({start} til {end}): innstillingene under endrer bare denne delen.",
   "A voice is for the whole sound: click outside the splices to get back to it": "En stemme gjelder hele lyden: klikk utenfor klippene for å komme tilbake",
   "Back to the whole sound": "Tilbake til hele lyden",
@@ -4861,6 +4869,5 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "De høres når klippene spilles sammen, og i klippets egen Spill nå, Lagre som ny pad og Kopier (høyreklikk på det)",
   "{name} (splice {n})": "{name} (klipp {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Kopiert: lim det inn i en chat eller mappe",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Dra håndtakene for å kutte av starten og slutten. Klikk eller dra i tidslinjalen, eller dra avspillingsstreken, for å flytte hvor den spiller. Ctrl+rulling zoomer. Dra med høyre museknapp, eller bruk Shift+rulling, for å flytte.",
   "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Rull for å zoome. Dra prikkene på et klipps nivålinje: hjørnene sidelengs for en fade og opp eller ned for volumet, endene opp eller ned for hvor en fade starter. Klikk på et klipp for egne effekter, høyreklikk for mer."
 }

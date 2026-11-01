@@ -5139,6 +5139,7 @@
   "ooh, pretty!": "أوه، جميل!",
   "The settings most people change, on one page": "الإعدادات التي يغيّرها معظم الناس، في صفحة واحدة",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "يفتح هذا التبويب عندما تكون Onion Board في المقدمة.\nEsc = إلغاء.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "اسحب المقبضين لقصّ البداية والنهاية. انقر شريط الوقت أو اسحبه، أو اسحب مؤشر التشغيل، لتغيير مكان التشغيل. Ctrl+التمرير للتكبير. اسحب بزر الفأرة الأيمن، أو Shift+التمرير، للتنقّل.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "مجاني، بلا إعلانات ولا حساب. من صنع OnionAlien. مفتوح المصدر بموجب رخصة GNU GPL v3: استخدمه وعدّله وشاركه، بشرط أن تبقى نسختك مفتوحة المصدر أيضًا.",
   "Community uploads": "رفعها المجتمع",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "أضف مؤثرات صوت آخر إلى هذا الصوت (Robot + Demon): تُشغَّل المؤثرات التي لديه وليست في صوتك",
@@ -5216,6 +5217,13 @@
     "{n} صوتًا جديدًا",
     "{n} صوت جديد"
   ],
+  "Download again": "نزّله مرة أخرى",
+  "Install again": "ثبّته مرة أخرى",
+  "Last time Onion Board closed while downloading {language}. Download it again?": "أُغلق Onion Board في المرة الماضية أثناء تنزيل {language}. هل تريد تنزيلها مرة أخرى؟",
+  "Last time Onion Board closed while installing AI voices. Install them again?": "أُغلق Onion Board في المرة الماضية أثناء تثبيت أصوات الذكاء الاصطناعي. هل تريد تثبيتها مرة أخرى؟",
+  "Last time Onion Board closed while installing Onion Pocket. Install it again?": "أُغلق Onion Board في المرة الماضية أثناء تثبيت Onion Pocket. هل تريد تثبيته مرة أخرى؟",
+  "Last time Onion Board closed while installing Onion Watch. Install it again?": "أُغلق Onion Board في المرة الماضية أثناء تثبيت Onion Watch. هل تريد تثبيته مرة أخرى؟",
+  "Last time Onion Board closed while installing speech recognition. Install it again?": "أُغلق Onion Board في المرة الماضية أثناء تثبيت التعرف على الكلام. هل تريد تثبيته مرة أخرى؟",
   "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>المقطع {n}</b> ({start} إلى {end}): الإعدادات بالأسفل تغيّر هذا الجزء فقط.",
   "A voice is for the whole sound: click outside the splices to get back to it": "الصوت المختار للصوت كله: انقر خارج المقاطع للعودة إليه",
   "Back to the whole sound": "العودة إلى الصوت كله",
@@ -5229,6 +5237,5 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "تُسمع عندما تُشغَّل المقاطع مدموجة، وفي تشغيل الآن واحفظ كزر جديد والنسخ الخاصة بالمقطع (انقر عليه بالزر الأيمن)",
   "{name} (splice {n})": "{name} (المقطع {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ تم النسخ: الصقه في محادثة أو مجلد",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "اسحب المقبضين لقصّ البداية والنهاية. انقر شريط الوقت أو اسحبه، أو اسحب مؤشر التشغيل، لتغيير مكان التشغيل. Ctrl+التمرير للتكبير. اسحب بزر الفأرة الأيمن، أو Shift+التمرير، للتنقّل.",
   "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "مرّر للتكبير. على خط مستوى المقطع اسحب النقاط: الزوايا جانبيًا للتلاشي ولأعلى أو لأسفل لمستوى الصوت، والأطراف لأعلى أو لأسفل للمستوى الذي يبدأ منه التلاشي. انقر على مقطع لمؤثرات خاصة به، وبالزر الأيمن للمزيد."
 }

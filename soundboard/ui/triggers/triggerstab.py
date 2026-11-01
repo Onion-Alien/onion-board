@@ -29,7 +29,7 @@ from PySide6.QtCore import QEvent, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QBoxLayout, QHBoxLayout, QLabel, QMessageBox, QProgressBar,
                                QPushButton, QVBoxLayout, QWidget)
 
-from soundboard.addons import modules, watchaddon
+from soundboard.addons import addonmarks, modules, watchaddon
 from soundboard.online import net, netlog
 from soundboard.ui.kit import theme
 from soundboard.core import updates, usage
@@ -488,7 +488,8 @@ class TriggersTab(QWidget):
             except Exception as e:  # noqa: BLE001 - offline, 404, bad zip…
                 log.info("getting Onion Watch failed: %s", e)
                 busy.emit(self._finished, None, watchaddon.friendly(e), update)
-        threading.Thread(target=run, daemon=True, name="onion-watch").start()
+        threading.Thread(target=addonmarks.marked(addonmarks.WATCH, run), daemon=True,
+                         name="onion-watch").start()
 
     def cancel(self):
         self._cancel = True

@@ -11,6 +11,7 @@ import html
 import threading
 from typing import TYPE_CHECKING
 
+from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QProgressBar, QPushButton
 from shiboken6 import isValid as qt_valid
 
@@ -27,6 +28,11 @@ if TYPE_CHECKING:
     from soundboard.ui.window.mainwindow import MainWindow
 
 ASK_OFF = "ffmpeg-offer"   # in Config.tips_seen: the FFmpeg bar's Don't ask again
+# when getting it by itself fails on a dropped connection or a busy server: quiet
+# tries again after these waits (about 5 minutes in all), and at once when Windows
+# says the PC is back online. The bar shows only once they're used up.
+RETRY_WAITS_S = (15, 30, 60, 90, 120)
+ONLINE_POLL_MS = 3000   # how often a wait asks Windows whether the PC is online
 
 
 class FfmpegControl(Controller):
@@ -45,6 +51,15 @@ class FfmpegControl(Controller):
         self.auto_tried = False   # got by itself once this start (not again)
         self.auto_now = False     # the get running now is that one (for the count)
         self.done = False         # the last fix worked (Settings says so)
+        self.retries = 0          # quiet tries again so far this start
+        self.quiet = False        # the get running now is one of them (no bar, no toast)
+        self.retry_timer = QTimer(self)
+        self.retry_timer.setSingleShot(True)
+        self.retry_timer.timeout.connect(self._retry)
+        self.online_timer = QTimer(self)   # while a retry waits: back online? go at once
+        self.online_timer.setInterval(ONLINE_POLL_MS)
+        self.online_timer.timeout.connect(self._online_check)
+        self.was_online = True
 
     def build_bar(self) -> TopBar:
         """Its download's progress with Stop, or, when the app couldn't get it by itself,
@@ -89,8 +104,7 @@ class FfmpegControl(Controller):
     def may_get(self) -> bool:
         """Get FFmpeg without asking: unless the user said not to go online for it
         (Offline mode, its switch, Low data mode) or not to ask about it again."""
-        return (not self.auto_tried and ASK_OFF not in self.mw.cfg.tips_seen
-                and not ffmpegget.why_not() and not quality.current.low_data)
+        return not self.auto_tried and self.may_get_again()
 
     def fix_clicked(self, btn: QPushButton, force: bool = False):
         """Fix it / Get FFmpeg / Reinstall (the bar or Settings): pressing it is a yes,
@@ -116,8 +130,15 @@ class FfmpegControl(Controller):
         shows how far it is, with Stop; ``btn`` shows it's busy and then whether it
         worked; the bar and Settings show the new state."""
         if self.getting:
+            if btn is not None and self.quiet:   # clicked during a quiet try: show it
+                self.quiet = False
+                self.waiting.append((btn, busy.hold(btn, _("Getting FFmpeg…"))))
+                self.news()
             return
-        usage.used("get-ffmpeg-auto" if auto else "get-ffmpeg")
+        self._stop_retrying()
+        self.quiet = auto and self.retries > 0
+        if not self.quiet:   # a quiet try again isn't counted again
+            usage.used("get-ffmpeg-auto" if auto else "get-ffmpeg")
         self.getting, self.percent, self.error = True, -1, ""
         self.auto_now = auto
         self.auto_tried = self.auto_tried or auto
@@ -175,6 +196,11 @@ class FfmpegControl(Controller):
         else:
             self.getting, self.stop_flag = False, None
             stopped = isinstance(err, ffmpegget.Stopped)
+            if (err and self.auto_now and not self.waiting and self.may_retry(err)):
+                self._retry_later()   # quiet: counted and shown only when they're used up
+                self.news()
+                return
+            self.quiet = False
             if err and not stopped:
                 usage.used("get-ffmpeg-auto-failed" if self.auto_now
                            else "get-ffmpeg-failed")
@@ -199,6 +225,49 @@ class FfmpegControl(Controller):
                 mw.toast(_("FFmpeg works now."), "ok")
         self.news()
 
+    def may_retry(self, err) -> bool:
+        return (self.retries < len(RETRY_WAITS_S) and ffmpegget.worth_retrying(err)
+                and self.may_get_again())
+
+    def may_get_again(self) -> bool:
+        """may_get, but for a quiet try again after the first one."""
+        return (ASK_OFF not in self.mw.cfg.tips_seen and not ffmpegget.why_not()
+                and not quality.current.low_data)
+
+    def _retry_later(self):
+        wait = RETRY_WAITS_S[self.retries]
+        self.retries += 1
+        self.quiet = True   # the bar stays hidden while it waits
+        self.was_online = ffmpegget.connected()
+        self.retry_timer.start(int(wait * 1000))
+        self.online_timer.start()
+
+    def _online_check(self):
+        online = ffmpegget.connected()
+        if online and not self.was_online:   # the connection came back: don't wait
+            self.retry_timer.stop()
+            self._retry()
+            return
+        self.was_online = online
+
+    def _retry(self):
+        self.online_timer.stop()
+        if self.getting:
+            return
+        if not self.may_get_again():   # switched off or Offline mode meanwhile
+            self.quiet = False
+            self.news()
+            return
+        self.fix(auto=True)
+
+    def _stop_retrying(self):
+        self.retry_timer.stop()
+        self.online_timer.stop()
+
+    def retrying(self) -> bool:
+        """A quiet try again is waiting or running: nothing is shown meanwhile."""
+        return self.quiet and (self.getting or self.retry_timer.isActive())
+
     def news(self):
         """The bar, and Settings' FFmpeg row if it's built, show the current state."""
         self.show_bar()
@@ -211,7 +280,7 @@ class FfmpegControl(Controller):
         and the app couldn't get it by itself: what stops working, and Fix it. Hidden by
         ✕ until the next start, and for good by Don't ask again."""
         h = self.health
-        if self.not_now or (not self.getting and (
+        if self.retrying() or self.not_now or (not self.getting and (
                 h is None or h.state == ffmpegget.OK or ASK_OFF in self.mw.cfg.tips_seen)):
             self.bar.hide()
             return

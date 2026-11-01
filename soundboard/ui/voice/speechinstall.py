@@ -16,7 +16,7 @@ from PySide6.QtCore import QObject, Qt, QTimer, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QMessageBox, QPushButton, QVBoxLayout
 
 from soundboard.core import applog
-from soundboard.addons import modules as mods
+from soundboard.addons import addonmarks, modules as mods
 from soundboard.core import langnames
 from soundboard.online import net, netlog
 from soundboard.speech import live, translation, winvoices
@@ -284,7 +284,8 @@ class SpeechInstalls(QObject):
                 applog.report(where="translation download")
                 busy.emit(self._dl_done, errors.plain(e))
 
-        threading.Thread(target=work, name="translation-download", daemon=True).start()
+        threading.Thread(target=addonmarks.marked(addonmarks.TRANSLATION + m.id, work),
+                         name="translation-download", daemon=True).start()
 
     def _cancel_download(self):
         self._dl_cancel = True
@@ -444,7 +445,8 @@ class SpeechInstalls(QObject):
                     applog.report(where="module install")
                 busy.emit(self._install_done, False, errors.plain(e))
 
-        threading.Thread(target=work, name="module-install", daemon=True).start()
+        threading.Thread(target=addonmarks.marked(addonmarks.LIVE_VOICE, work),
+                         name="module-install", daemon=True).start()
 
     def _on_install_done(self, ok: bool, err: str = ""):
         p = self.p
