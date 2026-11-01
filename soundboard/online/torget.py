@@ -25,6 +25,7 @@ import io
 import logging
 import shutil
 import tarfile
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -92,6 +93,33 @@ def installed(dest: Path | None = None) -> bool:
     except OSError:
         return False
     return ok and all((dest / rel).is_file() for rel in KEEP.values())
+
+
+TIDY_AFTER_S = 600   # an unpack swaps in seconds: older leftovers are a past one's
+
+
+def tidy(dest: Path | None = None) -> None:
+    """Clear what an unpack cut short (the app ended mid-way: End task, a crash, the
+    power) left beside the bin folder: a half-written bin.partial, and bin.old, put
+    back first when the swap stopped before the new copy was in place (else Tor would
+    be gone, and with Connection set to Tor nothing could fetch it again). Only ones
+    older than TIDY_AFTER_S: a fresh one is an unpack still going (--get-tor)."""
+    dest = dest or bin_dir()
+    cutoff = time.time() - TIDY_AFTER_S
+    old = dest.with_name(dest.name + ".old")
+    tmp = dest.with_name(dest.name + ".partial")
+    try:
+        if old.is_dir() and old.stat().st_mtime < cutoff:
+            if not dest.exists():
+                old.rename(dest)
+                log.info("put back the Tor an update had moved aside")
+            else:
+                shutil.rmtree(old, ignore_errors=True)
+        if tmp.is_dir() and tmp.stat().st_mtime < cutoff:
+            log.info("removing a half-unpacked Tor")
+            shutil.rmtree(tmp, ignore_errors=True)
+    except OSError:
+        log.warning("couldn't tidy the tor folder", exc_info=True)
 
 
 def outdated() -> bool:

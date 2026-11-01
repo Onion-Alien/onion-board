@@ -529,3 +529,45 @@ def test_download_once_names_the_status(monkeypatch, tmp_path):
     with pytest.raises(ffmpegget.GetError) as e:
         ffmpegget._download_once("https://example.com/f.zip", tmp_path / "f", None, None)
     assert e.value.fault == "own-http-403"
+
+
+def _aged(path, seconds=ffmpegget.TIDY_AFTER_S + 60):
+    import os
+    import time
+    t = time.time() - seconds
+    os.utime(path, (t, t))
+
+
+def test_start_up_clears_what_a_fix_cut_short_left(app_dir):
+    """The app ended mid-download / mid-unpack: the zip part and bin.partial go, even
+    when FFmpeg is found elsewhere and no new fix ever replaces them."""
+    folder = ffmpegget.own_dir().parent
+    (folder / "bin.partial").mkdir(parents=True)
+    (folder / "bin.partial" / "ffmpeg.exe").write_bytes(b"half")
+    (folder / (ffmpegget.ZIP + ".partial")).write_bytes(b"half a zip")
+    _aged(folder / "bin.partial")
+    _aged(folder / (ffmpegget.ZIP + ".partial"))
+    ffmpegget.tidy()
+    assert not any(folder.iterdir())
+
+
+def test_start_up_puts_back_a_copy_a_cut_short_swap_moved_aside(app_dir):
+    folder = ffmpegget.own_dir().parent
+    (folder / "bin.old").mkdir(parents=True)
+    (folder / "bin.old" / "ffmpeg.exe").write_bytes(b"works")
+    _aged(folder / "bin.old")
+    ffmpegget.tidy()
+    assert (ffmpegget.own_dir() / "ffmpeg.exe").read_bytes() == b"works"
+    assert not (folder / "bin.old").exists()
+
+
+def test_start_up_leaves_a_fix_that_is_still_going_alone(app_dir):
+    folder = ffmpegget.own_dir().parent
+    (folder / "bin.partial").mkdir(parents=True)
+    (folder / (ffmpegget.ZIP + ".partial")).write_bytes(b"arriving")   # fresh: in use
+    ffmpegget.tidy()
+    assert (folder / "bin.partial").is_dir() and (folder / (ffmpegget.ZIP + ".partial")).is_file()
+    _aged(folder / "bin.partial")
+    with ffmpegget._fixing:   # a fix is going: nothing is touched
+        ffmpegget.tidy()
+    assert (folder / "bin.partial").is_dir()
