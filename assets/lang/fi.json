@@ -4835,5 +4835,7 @@
   "{n} sound is gone from Myinstants, so it was skipped.": [
     "{n} ääni on poistunut Myinstantsista, joten se ohitettiin.",
     "{n} ääntä on poistunut Myinstantsista, joten ne ohitettiin."
-  ]
+  ],
+  "(AI voice)": "(Tekoälypuheääni)",
+  "(Voice changer)": "(Äänenmuunnin)"
 }

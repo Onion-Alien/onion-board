@@ -4835,5 +4835,7 @@
   "{n} sound is gone from Myinstants, so it was skipped.": [
     "{n} som sumiu do Myinstants, então foi pulado.",
     "{n} sons sumiram do Myinstants, então foram pulados."
-  ]
+  ],
+  "(AI voice)": "(Voz de IA)",
+  "(Voice changer)": "(Modificador de voz)"
 }

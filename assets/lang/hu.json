@@ -4835,5 +4835,7 @@
   "{n} sound is gone from Myinstants, so it was skipped.": [
     "{n} hang már nincs fent a Myinstantsen, ezért kimaradt.",
     "{n} hang már nincs fent a Myinstantsen, ezért kimaradtak."
-  ]
+  ],
+  "(AI voice)": "(AI hang)",
+  "(Voice changer)": "(Hangváltó)"
 }

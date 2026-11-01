@@ -180,6 +180,17 @@ def clean_spec(raw) -> dict:
     return out
 
 
+# the Background's sounds: yours, not the voice's (kept when you pick another voice)
+KEEP = frozenset({"backdrop"})
+
+
+def on_top(etype: str) -> bool:
+    """On top of the voice, not part of it: the Background and the Effects pop-up's
+    extras. They also play on the AI voice with the voice changer off."""
+    cls = REGISTRY.get(etype)
+    return etype in KEEP or bool(getattr(cls, "extra", False))
+
+
 def defaults(etype: str) -> dict:
     return {q.key: q.default for q in REGISTRY[etype].params}
 
@@ -197,7 +208,8 @@ class VoiceChain:
 
     `source` (optional, the AI voice: soundboard.speech.aivoice.VoiceSource) has
     `process(mono, rate) -> mono` and `latency()`: its output replaces your voice,
-    and the effects that are on then run on that.
+    and the effects that are on then run on that. With the voice changer off, the ones
+    on top of the voice (`on_top`: rain, an echo) still do.
 
     Clean mic (`set_clean`, voicefx.cleanmic) runs before all of it, whether or not a
     voice is on: noise out of your mic, the voices and the tap get the cleaned one."""
@@ -206,6 +218,7 @@ class VoiceChain:
         self.enabled = False
         self._spec: dict = {}
         self._effects: tuple[Effect, ...] = ()
+        self._top: tuple[Effect, ...] = ()   # those of _effects on top of the voice
         self._rate = 0
         # Only the audio thread builds the effects (process). The UI thread posts a new
         # spec and bumps _gen; process() rebuilds when _gen moved past _built. (Built on
@@ -277,7 +290,7 @@ class VoiceChain:
     def _rebuild(self, rate: int):
         """(Audio thread, in process.) The effects the spec asks for, made for `rate`."""
         if not rate:
-            self._effects = ()
+            self._set_effects(())
             return
         wanted = self._spec.get("effects", {})
         old = {e.type: e for e in self._effects}
@@ -301,7 +314,7 @@ class VoiceChain:
             if hasattr(e, "beds"):
                 e.beds = self.beds  # pyright: ignore[reportAttributeAccessIssue] - the Background's
             new.append(e)
-        self._effects = tuple(new)
+        self._set_effects(tuple(new))
         self._light = _light
         self._tell_light()
 
@@ -316,9 +329,23 @@ class VoiceChain:
                 tell(self._light)
             except Exception as ex:  # noqa: BLE001
                 self.errors[e.type] = errors.plain(ex)
-                self._effects = tuple(f for f in self._effects if f is not e)
+                self._drop(e)
                 log.error("voice effect %r failed to switch Use less CPU; bypassed", e.type,
                           exc_info=ex)
+
+    def _set_effects(self, effects: tuple[Effect, ...]):
+        """(Audio thread.) The effects to run, and which of them are on top."""
+        self._effects = effects
+        self._top = tuple(e for e in effects if on_top(e.type))
+
+    def _drop(self, e: Effect):
+        """(Audio thread.) A broken effect left out."""
+        self._set_effects(tuple(f for f in self._effects if f is not e))
+
+    def _running(self) -> tuple[Effect, ...]:
+        """The effects that run now: all of them while the voice changer is on, only
+        the ones on top of the voice for the AI voice alone."""
+        return self._effects if self.enabled else self._top if self.source is not None else ()
 
     def set_beds(self, beds):
         """(Any thread.) The Background's loops, made by voicefx.backdrop.Maker: handed
@@ -350,9 +377,7 @@ class VoiceChain:
                 total += max(0.0, float(src.latency()))
             except Exception:  # noqa: BLE001
                 pass
-        if not self.enabled:
-            return total
-        for e in self._effects:
+        for e in self._running():
             try:
                 total += max(0.0, float(e.latency()))
             except Exception:  # noqa: BLE001 - an add-on's: just not counted
@@ -437,7 +462,7 @@ class VoiceChain:
             self._clean_built = cgen
             self._rebuild_clean(rate)
         tap, replace, src, cleaner = self.tap, self.replace, self.source, self.cleaner
-        effects = self._effects if self.enabled else ()
+        effects = self._effects if self.enabled else self._top if src is not None else ()
         if not effects and tap is None and not replace and src is None and cleaner is None:
             return x
         m = x[:, 0] if x.shape[1] == 1 else (x[:, 0] + x[:, 1]) * np.float32(0.5)
@@ -482,7 +507,7 @@ class VoiceChain:
             except Exception as ex:  # noqa: BLE001
                 # a broken effect is bypassed, never allowed to kill the mic stream
                 self.errors[e.type] = errors.plain(ex)
-                self._effects = tuple(f for f in self._effects if f is not e)
+                self._drop(e)
                 log.error("voice effect %r failed; bypassed", e.type, exc_info=ex)
         out = np.empty((len(m), 2), np.float32)
         out[:, 0] = m
@@ -508,5 +533,5 @@ def shown(text: str) -> str:
     return _shown[1].get(text, text)
 
 
-__all__ = ["Param", "Effect", "REGISTRY", "register", "defaults", "clean_spec", "VoiceChain",
-           "PRESETS", "PRESET_ICONS", "shown"]
+__all__ = ["Param", "Effect", "REGISTRY", "register", "defaults", "clean_spec", "on_top",
+           "VoiceChain", "PRESETS", "PRESET_ICONS", "shown"]

@@ -4745,5 +4745,7 @@
   "{done} of {total}": "{done} daripada {total}",
   "{n} sound is gone from Myinstants, so it was skipped.": [
     "{n} bunyi sudah tiada di Myinstants, jadi dilangkau."
-  ]
+  ],
+  "(AI voice)": "(Suara AI)",
+  "(Voice changer)": "(Penukar suara)"
 }

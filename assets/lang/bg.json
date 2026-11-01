@@ -4835,5 +4835,7 @@
   "{n} sound is gone from Myinstants, so it was skipped.": [
     "{n} звук вече го няма в Myinstants, затова е пропуснат.",
     "{n} звука вече ги няма в Myinstants, затова са пропуснати."
-  ]
+  ],
+  "(AI voice)": "(AI глас)",
+  "(Voice changer)": "(Промяна на гласа)"
 }

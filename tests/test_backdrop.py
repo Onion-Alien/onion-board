@@ -372,6 +372,9 @@ def test_the_effects_pop_up_adds_changes_and_takes_off(qapp, monkeypatch):
     try:
         fx = p.fx
         fx.pick("Robot")
+        fx.picked.resize(1400, 80)   # wide enough for every button beside the name
+        fx._fit_picked()             # (hidden: no resize event lays it out)
+        fx.picked_box.activate()
         fx.btn_effects.click()
         pop = fx.effects_pop
         process_events(qapp, lambda: pop.isVisible(), timeout=5)
@@ -462,6 +465,79 @@ def test_the_extras_run_on_the_mic_after_the_voice():
     assert "extra_echo" not in {c.type for c in voicefx.REGISTRY.values() if not c.extra}
 
 
+class _PassSource:
+    """The AI voice in the chain, as a stand-in: hands your voice back as it is."""
+    def process(self, mono, rate):
+        return mono.copy()
+
+    def latency(self):
+        return 0.0
+
+
+def _through(chain, x, block=480):
+    """Mono `x` through the chain's mic path, block by block: the mono out."""
+    st = np.stack([x, x], axis=1)
+    return np.concatenate([chain.process(st[i:i + block], SR)[:, 0]
+                           for i in range(0, len(x) - block + 1, block)])
+
+
+def test_the_effects_play_on_the_ai_voice_with_the_voice_changer_off():
+    """Only an AI voice on: Rain and Echo from the Effects pop-up are heard on it, the
+    voice changer's own voice (Robot) isn't, and with both on they run once."""
+    x = _voice(1.5)
+    effects = {"robot": {"on": True}, "extra_echo": {"on": True, "mix": 0.6},
+               "backdrop": {"on": True, "rain": 1.0}}
+
+    def chain(enabled, effects, src=True):
+        c = voicefx.VoiceChain()
+        c.set_beds(backdrop.Beds({"rain": backdrop.recording("rain")}))
+        c.configure({"enabled": enabled, "effects": effects})
+        c.source = _PassSource() if src else None
+        return c
+
+    ai_only = _through(chain(False, effects), x)
+    assert _rms(ai_only - x[:len(ai_only)]) > 0.005          # rain and echo are heard
+    on_top = {t: v for t, v in effects.items() if t != "robot"}
+    want = _through(chain(True, on_top), x)                # just those two, once each
+    assert np.allclose(ai_only, want, atol=1e-6)            # (no Robot on the AI voice)
+    both = _through(chain(True, effects), x)                 # the voice changer on too
+    assert np.allclose(both, _through(chain(True, effects), x), atol=1e-6)
+    assert not np.allclose(both, want, atol=1e-3)             # its Robot as well
+    off = _through(chain(False, effects, src=False), x)     # nothing on: your voice
+    assert np.array_equal(off, x[:len(off)])
+
+
+def test_the_ai_voice_bar_has_the_same_effects_button(qapp, monkeypatch):
+    """The AI voice's bar opens the same Effects pop-up, both say the same count, and
+    the Background's loops are made for the AI voice with the voice changer off."""
+    p = _voice_panel(monkeypatch)
+    try:
+        fx, ai = p.fx, p.ai
+        assert ai.btn_effects.text() == "Effects"
+        fx.set_on_top("rain", 0.6)
+        fx.set_on_top("extra_echo", 0.4)
+        assert not fx.btn_power.isChecked()                  # the voice changer stays off
+        assert fx.btn_effects.accessibleName() == "Effects  ·  2"
+        assert ai.btn_effects.accessibleName() == fx.btn_effects.accessibleName()
+        ai.btn_effects.click()
+        pop = fx.effects_pop
+        process_events(qapp, lambda: pop.isVisible(), timeout=5)
+        assert pop._under is ai.btn_effects                   # over the AI bar's button
+        pop.removes["extra_echo"].click()
+        assert ai.btn_effects.text() == "Effects  ·  1"
+        pop.close()
+        made = []
+        monkeypatch.setattr(p.backdrop, "update", lambda cfg, load: made.append(cfg))
+        p._update_backdrop(fx.spec())
+        assert made[-1] is None                               # nothing is on: no loops
+        monkeypatch.setattr(ai, "is_on", lambda: True)
+        p._ai_live(True)
+        assert made[-1] and made[-1]["rain"] == 0.6           # the AI voice gets them
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
 def _picked_bar(qapp):
     from PySide6.QtWidgets import QLayout
     from soundboard.ui.voice.voicefxpanel import VoiceFxPanel
@@ -501,14 +577,15 @@ def test_the_voice_bar_puts_its_buttons_under_the_name_when_narrow(qapp):
 
 
 def test_the_voice_bar_buttons_sit_beside_the_name_on_a_wide_bar(qapp):
-    """A wide window leaves the buttons right after the voice's name, not mid-bar."""
+    """A wide window leaves the buttons right after the voice's name (and its kind),
+    not mid-bar."""
     fx, bar = _picked_bar(qapp)
     try:
         bar.resize(2000, 200)
         process_events(qapp, lambda: False, timeout=0.1)
         first = min((b for b in (fx.btn_effects, fx.btn_tweak) if not b.isHidden()),
                     key=lambda b: b.mapTo(bar, b.rect().topLeft()).x())
-        name_end = fx.picked_name.mapTo(bar, fx.picked_name.rect().topRight()).x()
+        name_end = fx.picked_kind.mapTo(bar, fx.picked_kind.rect().topRight()).x()
         assert first.mapTo(bar, first.rect().topLeft()).x() - name_end <= 40
     finally:
         bar.close()

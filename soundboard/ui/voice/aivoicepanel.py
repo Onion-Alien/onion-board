@@ -103,6 +103,7 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
     changed = Signal(dict)
     live_changed = Signal(bool)
     modules_changed = Signal()      # got or removed the add-on: the Voice tab rescans
+    effects_wanted = Signal()       # the bar's Effects: the Voice tab opens the pop-up
     hotkey_asked = Signal(str)      # right-click a card -> Set a hotkey: the voice's id
     hotkey_cleared = Signal(str)
     voices_changed = Signal()       # the voices were read again: their hotkeys may be live now
@@ -250,9 +251,24 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         self.picked_name.setWordWrap(True)
         self.picked_name.setMinimumWidth(40)   # a long name gives way in a narrow window
         ph.addWidget(self.picked_name)
+        # which kind of voice it is, after its name (Robot alone didn't say)
+        self.picked_kind = QLabel(_("(AI voice)"))
+        self.picked_kind.setObjectName("pickedkind")
+        ph.addWidget(self.picked_kind)
+        # picture, name and kind kept together on the left, on a line of their own too
+        # (narrow): no gaps opening up between them
+        self.picked_box.setAlignment(ph, Qt.AlignmentFlag.AlignLeft)
         self._picked_btns = QWidget()
         bflow = Flow(self._picked_btns, gap=10)
         self.picked_box.addWidget(self._picked_btns, 1)   # right after the name
+        # what's on top of the voice: the voice changer's Effects pop-up, the same
+        # things (one list for both bars; they play on the AI voice too)
+        self.btn_effects = QPushButton(_("Effects"))
+        icons.set_icon(self.btn_effects, "sounds")
+        self.btn_effects.setToolTip(_("Rain, a crowd, an echo or sounds from your board, on "
+                                      "top of any voice"))
+        self.btn_effects.clicked.connect(lambda: self.effects_wanted.emit())
+        bflow.addWidget(self.btn_effects)   # first, as on the voice changer's bar
         self.btn_tweak = QPushButton(_("Edit voice"))
         icons.set_icon(self.btn_tweak, "sliders")
         self.btn_tweak.clicked.connect(lambda: self.open_tweak())

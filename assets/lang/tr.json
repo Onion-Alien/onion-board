@@ -4835,5 +4835,7 @@
   "{n} sound is gone from Myinstants, so it was skipped.": [
     "{n} ses artık Myinstants'ta yok, bu yüzden atlandı.",
     "{n} ses artık Myinstants'ta yok, bu yüzden atlandı."
-  ]
+  ],
+  "(AI voice)": "(Yapay zekâ sesi)",
+  "(Voice changer)": "(Ses değiştirici)"
 }

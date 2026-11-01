@@ -4745,5 +4745,7 @@
   "{done} of {total}": "{done}/{total}",
   "{n} sound is gone from Myinstants, so it was skipped.": [
     "เสียง {n} เสียงไม่มีใน Myinstants แล้ว จึงถูกข้ามไป"
-  ]
+  ],
+  "(AI voice)": "(เสียง AI)",
+  "(Voice changer)": "(ตัวเปลี่ยนเสียง)"
 }

@@ -4745,5 +4745,7 @@
   "{done} of {total}": "{done}/{total}",
   "{n} sound is gone from Myinstants, so it was skipped.": [
     "{n}個のサウンドがMyinstantsから消えていたため、スキップしました。"
-  ]
+  ],
+  "(AI voice)": "（AI ボイス）",
+  "(Voice changer)": "（ボイスチェンジャー）"
 }
