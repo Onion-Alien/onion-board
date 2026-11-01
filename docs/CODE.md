@@ -427,7 +427,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/online/ytsites.py` | what ytdl's parts share: the sites and their switches (`site_of`, `site_allowed`), the errors, the lock that keeps a new yt-dlp from being swapped in mid-download, a search result (`Result`), and trying again when a site turns Tor away |
 | `soundboard/online/ytupdate.py` | updating yt-dlp on request or opt-in: only versions listed in `pins/yt-dlp.json`, which `scripts/pinbump/ytdlp.py` adds after checking their PyPI attestations; wheels checked against the list's SHA-256 into `%APPDATA%`, loaded ahead of the bundled copy by an import hook; Force update, Reinstall, the daily check |
 | `soundboard/online/ytfetch.py` | downloading one link's audio (yt-dlp in its helper process, or a Myinstants file directly), looking a link up, yt-dlp's options and its errors in plain words, keeping the video |
-| `soundboard/online/ytsearch.py` | web search: YouTube / SoundCloud through yt-dlp, Myinstants' search and trending pages |
+| `soundboard/online/ytsearch.py` | web search: YouTube / SoundCloud through yt-dlp, Myinstants' search page |
 | `soundboard/core/jobprogress.py` | one download job's progress as one bar that only goes forward: looking the link up, the download (in parts too) and converting are stretches of it; `batch()` for the download bar's whole list |
 | `soundboard/online/jsengine.py` | the JavaScript engine yt-dlp gets for YouTube's player challenge: Deno, Node or Bun if installed and new enough, else the bundled QuickJS (`scripts/buildtools/fetch_qjs.py`); none is fine |
 | `soundboard/online/ytworker.py` | yt-dlp's look-ups and downloads in a helper process, so its long GIL-holding parsing never makes a sound stutter |

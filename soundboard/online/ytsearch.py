@@ -1,5 +1,5 @@
 """Web search for soundboard.online.ytdl: YouTube / SoundCloud through yt-dlp, and
-Myinstants' search and trending pages."""
+Myinstants' search page."""
 from __future__ import annotations
 
 import html
@@ -12,7 +12,7 @@ from soundboard.core import errors
 from soundboard.i18n import _
 from soundboard.online.ytsites import (BROWSER_HEADERS, FEATURE, FetchError, MYINSTANTS, PLAYLIST,
     Result,
-    SOURCES, SwitchedOff, TIKTOK_SUFFIX, TRENDING, _gate, _over_tor)
+    SOURCES, SwitchedOff, TIKTOK_SUFFIX, _gate, _over_tor)
 from soundboard.online.ytfetch import _extract, _opts
 
 
@@ -63,18 +63,6 @@ def search(query: str, count: int = 20, source: str = "youtube",
     return out[:count]
 
 
-def trending(count: int = 20, direct: bool = False, start: int = 1) -> list[Result]:
-    """What's trending on Myinstants right now (the search button's *Trending on
-    Myinstants*): hits `start` to `count` of its trending page, the one for the
-    visitor's country (the site picks it from the address it sees, so a Tor exit's in
-    Tor mode). Raises like search."""
-    _gate("myinstants")
-    url = TRENDING
-    if direct:
-        return _myinstants_page(url, count, direct=True)[start - 1:]
-    return _over_tor(lambda: _myinstants_page(url, count), MYINSTANTS)[start - 1:]
-
-
 def _myinstants(query: str, count: int, direct: bool = False) -> list[Result]:
     """Myinstants' search page, read for its sound buttons (title + MP3 path)."""
     return _myinstants_page(f"{MYINSTANTS}/en/search/?name={urllib.parse.quote_plus(query)}",
@@ -82,7 +70,7 @@ def _myinstants(query: str, count: int, direct: bool = False) -> list[Result]:
 
 
 def _myinstants_page(url: str, count: int, direct: bool = False) -> list[Result]:
-    """A Myinstants page of sound buttons (search or trending), read for each one's
+    """A Myinstants page of sound buttons (its search), read for each one's
     title and MP3 path."""
     try:
         req = urllib.request.Request(url, headers=BROWSER_HEADERS)

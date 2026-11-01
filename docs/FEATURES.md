@@ -235,8 +235,6 @@ The full list. The [README](../README.md) has the short version and how to get s
   audio is downloaded, via [yt-dlp](https://github.com/yt-dlp/yt-dlp)). Instagram
   and most other sites have no search without an account, so paste a link to the
   video instead.
-  The Search button's menu also has **Trending on Myinstants**: the meme sounds people
-  play most there right now (the ones for your country), with nothing to type.
   YouTube's m4a/webm audio needs FFmpeg, like a dropped m4a file does. Settings →
   Updates → *Helper programs* lists FFmpeg, yt-dlp, the JavaScript engine and Tor,
   with *Update now* and *Reinstall* for when downloads start failing, and an

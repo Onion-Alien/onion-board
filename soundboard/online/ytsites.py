@@ -232,8 +232,6 @@ SOURCES = {"youtube": ("YouTube", "ytsearch"),
            "myinstants": ("Myinstants", "myinstants")}
 TIKTOK_SUFFIX = " tiktok sound"
 MYINSTANTS = "https://www.myinstants.com"
-# redirects to the trending page of the visitor's country (/en/trending/us/…)
-TRENDING = MYINSTANTS + "/en/trending/"
 BROWSER_HEADERS = {   # Myinstants' Cloudflare turns away urllib's default User-Agent
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                   "(KHTML, like Gecko) Chrome/140.0 Safari/537.36",

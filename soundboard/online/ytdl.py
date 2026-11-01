@@ -78,7 +78,7 @@ from soundboard.online.ytsites import (  # noqa: F401
     RETRY_CLIENTS,
     RETRY_PAUSE_S, _SharedLock, silent_over_tor, site_allowed, site_feature, _site_name, site_of,
     SOURCES, SwitchedOff, TIKTOK_SUFFIX, _TOR_BLOCKED, _TOR_SILENT, TOR_TRIES, TorBlocked,
-    TRENDING, _TRY_AGAIN, UPDATE_FEATURE, VIDEO_EXTS, VIDEO_MAX_BYTES)
+    _TRY_AGAIN, UPDATE_FEATURE, VIDEO_EXTS, VIDEO_MAX_BYTES)
 from soundboard.online.ytupdate import (  # noqa: F401
     active_version, Approved, approved, _approved_entry, APPROVED_MAX, APPROVED_URL, auto_update,
     bundled_version, cache_dir, CHECK_EVERY, due, _Finder, _finder, force_newest, _get, _install,
@@ -92,7 +92,7 @@ from soundboard.online.ytfetch import (  # noqa: F401
     _run, _run_helper, save_video, _sendable,
     _went_nowhere, _worth_another_try, _ydl)
 from soundboard.online.ytsearch import (  # noqa: F401
-    _count, _myinstants, _myinstants_page, _playlist_hit, search, _soundcloud_hit, trending,
+    _count, _myinstants, _myinstants_page, _playlist_hit, search, _soundcloud_hit,
     _youtube_hit)
 
 log = logging.getLogger(__name__)

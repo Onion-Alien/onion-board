@@ -130,7 +130,6 @@ class SearchResults(RoundedFrame):
     closed = Signal()
     thumb_ready = Signal(str, object)
     source_changed = Signal(str)
-    trend_asked = Signal()   # *Trending on Myinstants* picked in the search button's menu
     _done = Signal(int, object, str)   # worker -> UI: (search number, results, error)
     _thumb_decoded = Signal(int, str, object)   # worker -> UI: (search number, url, QImage)
     _listed = Signal(str, object, str)   # worker -> UI: (playlist url, its videos, error)
@@ -139,7 +138,6 @@ class SearchResults(RoundedFrame):
         super().__init__()
         self.query = ""
         self.link = ""          # a pasted link shown as its own card (show_link), not a search
-        self.trending = False   # Myinstants' trending sounds (show_trending), not a search
         self.source = "youtube"
         self._gen = 0
         self.failed = False   # the last search came back with an error (firsttour.py)
@@ -180,7 +178,7 @@ class SearchResults(RoundedFrame):
         self.kind_toggle.hide()
         head.addWidget(self.kind_toggle)
         self._opened_from = ""   # the search a playlist was opened from: Back goes there
-        # what the cards are when no search words say it: "Trending on Myinstants"
+        # what the cards are when no search words say it: "5 links"
         self.heading = QLabel()
         self.heading.setObjectName("section")
         self.heading.setProperty("head", True)   # no space above: in line with Back
@@ -205,11 +203,6 @@ class SearchResults(RoundedFrame):
             a.triggered.connect(lambda _c=False, k=key: self.set_source(k))
             group.addAction(a)
             self.site_actions[key] = a
-        # the search button's menu, under the sites: Myinstants' trending sounds, no
-        # words needed (show_trending)
-        self.trend_action = QAction(_("Trending on Myinstants"), self)
-        icons.set_icon(self.trend_action, "myinstants", "accent", "accent")
-        self.trend_action.triggered.connect(lambda: self.trend_asked.emit())
         v.addWidget(header)
         # "No results", "Can't use this link…", "Couldn't search…": in the middle of the
         # results area, where "Searching…" was, not in a corner under Back
@@ -286,13 +279,6 @@ class SearchResults(RoundedFrame):
             a.setEnabled(ok)
             a.setToolTip(TIPS.get(key, f"Search {ytdl.SOURCES[key][0]}") if ok
                          else net.off_message(ytdl.site_feature(key)))
-        ok = ytdl.site_allowed("myinstants")
-        self.trend_action.setEnabled(ok)
-        self.trend_action.setToolTip(_("The meme sounds people play most on Myinstants "
-                                       "right now") if ok else
-                                     net.off_message(ytdl.site_feature("myinstants")))
-        if self.trending and not ok and not self.isHidden():
-            self.close_results()
         if not ytdl.site_allowed(self.source):
             on = [k for k in self.site_actions if ytdl.site_allowed(k)]
             if on:
@@ -329,7 +315,7 @@ class SearchResults(RoundedFrame):
     def _sync_kind(self):
         """The Videos / Playlists switch shows over a YouTube search's results only."""
         self.kind_toggle.setVisible(self.source == "youtube" and bool(self.query)
-                                    and not (self.link or self.links or self.trending))
+                                    and not (self.link or self.links))
 
     def _set_kind(self, kind: str):
         """Videos or Playlists clicked: the same words searched again for those."""
@@ -404,8 +390,6 @@ class SearchResults(RoundedFrame):
         """The search button's menu: one line per site, the one searched ticked."""
         menu.setToolTipsVisible(True)
         menu.addActions(list(self.site_actions.values()))
-        menu.addSeparator()
-        menu.addAction(self.trend_action)
 
     def search(self, query: str, direct: bool = False) -> bool:
         query = " ".join(query.split())
@@ -422,7 +406,6 @@ class SearchResults(RoundedFrame):
         self._set_links([])
         self.query = query
         self.link = ""
-        self._set_trending(False)
         self._gen += 1
         self._clear()
         self._asked = PAGE
@@ -455,7 +438,6 @@ class SearchResults(RoundedFrame):
         self._running = None
         self._set_links([])
         self.failed = False
-        self._set_trending(False)
         self._gen += 1
         self._clear()
         netlog.cause(ytdl.FEATURE, "You pasted a link: looking up its name, picture and "
@@ -483,7 +465,6 @@ class SearchResults(RoundedFrame):
         self.query, self.link = " ".join(urls), ""
         self._running = None
         self.failed = False
-        self._set_trending(False)
         self._set_links(urls)
         self._gen += 1
         self._clear()
@@ -507,8 +488,7 @@ class SearchResults(RoundedFrame):
         self.playlist = None
         if not urls:
             self.add_all_btn.hide()
-            if not self.trending:
-                self.heading.hide()
+            self.heading.hide()
 
     def _to_add(self) -> list:
         """The pasted links' cards Add all would still add: not added, not on their way."""
@@ -549,46 +529,8 @@ class SearchResults(RoundedFrame):
             self.add_all.emit(results)
         self._links_heading()
 
-    def show_trending(self, direct: bool = False) -> bool:
-        """Myinstants' trending sounds as cards, to play or add like search hits (the
-        search box's words, if any, stay as they are). False when Myinstants is
-        switched off."""
-        if not ytdl.site_allowed("myinstants"):
-            return False
-        usage.used("search-trending")
-        if (not direct and self.trending and not self.isHidden()
-                and (self._rows or self.loading.running())):
-            return True   # picked again while it shows (or is still on its way)
-        self.query = self.link = ""
-        self._running = None
-        self._set_links([])
-        self.failed = False
-        self._set_trending(True)
-        self._gen += 1
-        self._clear()
-        self._asked = PAGE
-        netlog.cause(ytdl.FEATURE, "You opened Trending on Myinstants"
-                     + (" (without Tor)" if direct else ""))
-        text = _("Loading what's trending on Myinstants…")
-        self.title.setText(text)
-        self._loading(True, text)
-        self.show()
-        self.direct_btn.hide()
-        threading.Thread(target=self._work, args=(self._gen, None, "myinstants", direct),
-                         daemon=True, name="web-search").start()
-        self._opened_from = ""
-        self._sync_kind()
-        return True
-
-    def _set_trending(self, on: bool):
-        self.trending = on
-        self.heading.setText(_("Trending on Myinstants") if on else "")
-        self.heading.setVisible(on)
-
     def _without_tor(self):
-        if self.trending:
-            self.show_trending(direct=True)
-        elif self.link:   # (a playlist's too: its videos are self.links)
+        if self.link:   # (a playlist's too: its videos are self.links)
             self.show_link(self.link, direct=True)
         elif self.links:
             self.show_links(self.links, direct=True)
@@ -602,7 +544,6 @@ class SearchResults(RoundedFrame):
         self._clear()
         self.link = ""
         self._set_links([])
-        self._set_trending(False)
         self._opened_from = ""
         self.kind_toggle.hide()
         self.hide()
@@ -626,7 +567,7 @@ class SearchResults(RoundedFrame):
         self.message.show()
 
     def _fail(self, title: str, err: str):
-        """The search (or the trending list, or a link) didn't work: the red card in the
+        """The search (or a link) didn't work: the red card in the
         middle of the results area, Try again runs it once more. The site being down
         isn't something closing the app fixes: no advice to (`errors.site_side`)."""
         self.title.hide()
@@ -645,10 +586,8 @@ class SearchResults(RoundedFrame):
         self.message.show()
 
     def try_again(self):
-        """The same search (trending list, link) once more, the same way."""
-        if self.trending:
-            self.show_trending()
-        elif self.link:
+        """The same search (link) once more, the same way."""
+        if self.link:
             self.show_link(self.link)
         elif self.links:
             self.show_links(self.links)
@@ -723,25 +662,21 @@ class SearchResults(RoundedFrame):
 
     def _more(self):
         """Show more: the next PAGE hits of the same search, added under the cards."""
-        if (self._more_release is not None or not (self.query or self.trending) or self.link
+        if (self._more_release is not None or not self.query or self.link
                 or self.links):
             return
         start, self._asked = self._asked + 1, min(self._asked + PAGE, MAX_RESULTS)
         self._more_release = busy.hold(self.more_btn, _("Loading…"))
-        netlog.cause(ytdl.FEATURE, "You asked for more trending Myinstants sounds"
-                     if self.trending else f"You asked for more {self.site} results for "
-                                           f"{netlog.quoted(self.query)}")
-        query = None if self.trending else self.query
-        threading.Thread(target=self._work, args=(self._gen, query, self.source),
+        netlog.cause(ytdl.FEATURE, f"You asked for more {self.site} results for "
+                                   f"{netlog.quoted(self.query)}")
+        threading.Thread(target=self._work, args=(self._gen, self.query, self.source),
                          kwargs={"start": start, "count": self._asked,
-                                 "playlists": query is not None and self._playlists()},
+                                 "playlists": self._playlists()},
                          daemon=True, name="web-search-more").start()
 
-    def _work(self, gen: int, query: str | None, source: str, direct: bool = False,
+    def _work(self, gen: int, query: str, source: str, direct: bool = False,
               start: int = 1, count: int = PAGE, playlists: bool = False):
-        """One page of hits for `query` on `source`; query None: Myinstants' trending."""
-        if query is None:
-            source = "myinstants"
+        """One page of hits for `query` on `source`."""
         try:
             # the user's "without Tor" click
             more: dict[str, Any] = {"direct": True} if direct else {}
@@ -749,8 +684,7 @@ class SearchResults(RoundedFrame):
                 more.update(start=start, count=count)
             if playlists:   # (fakes in tests take no such argument)
                 more["playlists"] = True
-            hits = (ytdl.trending(**more) if query is None
-                    else ytdl.search(query, source=source, **more))
+            hits = ytdl.search(query, source=source, **more)
             busy.emit(self._done, gen, hits, "")
         except ytdl.TorBlocked as e:   # offered without Tor, never done unasked
             log.info("%s search turned away over Tor", source)
@@ -827,15 +761,12 @@ class SearchResults(RoundedFrame):
                 self._fail(_("Can't use this link"), err)
                 busy.toast(self.window(), _("Can't use this link: {error}", error=err),
                            "error", 8000)   # not only in the panel
-            elif self.trending:
-                self._fail(_("Couldn't load what's trending on Myinstants"), err)
             else:
                 self._fail(_("Couldn't search {site}", site=self.site), err)  # from _work
             self.direct_btn.setVisible(results == "blocked")
             return
         if not results:
-            self._say(_("Nothing is trending on Myinstants right now.") if self.trending
-                      else _("No {site} results for <b>{q}</b>.", site=self.site, q=q))
+            self._say(_("No {site} results for <b>{q}</b>.", site=self.site, q=q))
             return
         if isinstance(results, ytdl.Playlist):   # a pasted playlist: a card per video
             self._set_links([r.url for r in results])
