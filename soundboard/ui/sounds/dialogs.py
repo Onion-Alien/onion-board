@@ -1401,12 +1401,16 @@ class EditDialog(EditDialogParts, QDialog):
             self._place(True)
             self.adv.attach(self._fx_scrolls, w)
             self.adv.show()
+            if self.player is not None:
+                self.player.show()
             self.setMinimumSize(ADV_MIN_W, ADV_MIN_H)
             self.resize(w, h)
         else:
             assert self.adv is not None
             self.adv.detach()
             self.adv.hide()
+            if self.player is not None:
+                self.player.hide()
             self._place(False)
             self.simple.show()
             self.setMinimumSize(self._simple_min_w(), 0)
@@ -1469,8 +1473,10 @@ class EditDialog(EditDialogParts, QDialog):
 
     def set_player(self, player: QWidget):
         """The board's player (ui/sounds/editplayer.py), over the Save row: a big
-        window covers the board's own, and the song had to be paused from somewhere."""
+        window covers the board's own, and the song had to be paused from somewhere.
+        Advanced only: Simple stays the small window it was."""
         self._lay.insertWidget(self._lay.indexOf(self._brow), player)
+        player.setVisible(self.advanced())
         self.player = player
 
     def _simple_min_w(self) -> int:
