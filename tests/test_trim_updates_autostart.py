@@ -99,6 +99,24 @@ def test_trim_panel_values(qapp):
     assert s < 10.0 and e == 0.0                     # never an empty sound
 
 
+def test_trim_boxes_say_minutes_and_seconds(qapp):
+    """Start / End read like the ruler (2:14.70, not 134.70 s); typed either way."""
+    from PySide6.QtGui import QValidator
+    from soundboard.ui.sounds.trim import TrimPanel
+    p = TrimPanel(np.zeros(10, np.float32), 134.7)
+    assert p.box_end.text() == "2:14.70" and p.box_start.text() == "0:00.00"
+    for typed, want in (("1:05.5", 65.5), ("90", 90.0), ("0:07,25", 7.25)):
+        p.box_start.lineEdit().setText(typed)
+        p.box_start.interpretText()
+        assert p.values()[0] == want
+    assert p.box_start.text() == "0:07.25"
+    ok = QValidator.State.Acceptable
+    assert p.box_end.validate("2:", 2)[0] == QValidator.State.Intermediate   # still typing
+    assert p.box_end.validate("1:75", 4)[0] != ok      # no 75th second
+    assert p.box_end.validate("3:00", 4)[0] != ok      # past the end of the sound
+    assert p.box_end.validate("abc", 3)[0] == QValidator.State.Invalid
+
+
 # --------------------------------------------------------------------------- updates
 
 @pytest.mark.parametrize("latest, current, want", [
