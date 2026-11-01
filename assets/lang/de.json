@@ -2002,7 +2002,6 @@
   "Updated yt-dlp to {version}.": "yt-dlp auf {version} aktualisiert.",
   "Updating the downloader (yt-dlp) is switched off in Settings > Privacy & security.": "Den Downloader (yt-dlp) zu aktualisieren ist unter Einstellungen > Privatsphäre & Sicherheit ausgeschaltet.",
   "Updating… (a few minutes)": "Wird aktualisiert… (ein paar Minuten)",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Nutz einen TTS-Server auf deinem PC (Kokoro, AllTalk, jeden im OpenAI-Stil) oder leg Stimmpakete (Piper) in den Stimmen-Ordner.",
   "VB-Cable's own setup program isn't on this PC, so it can't be removed here.": "Das eigene Setup-Programm von VB-Cable ist nicht auf diesem PC, also lässt es sich hier nicht entfernen.",
   "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 and other games on Vivox. Opus 32 kbps mono, full band, nothing under ~80 Hz (measured in a real game). Also suits TeamSpeak and Mumble.": "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 und andere Spiele mit Vivox. Opus 32 kbps Mono, volles Band, nichts unter ~80 Hz (in einem echten Spiel gemessen). Passt auch zu TeamSpeak und Mumble.",
   "Voice changer is OFF": "Stimmverzerrer ist AUS",
@@ -4877,5 +4876,7 @@
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "{n} Sound konnte gerade nicht geladen werden. In 2 Stunden wird es von selbst noch mal versucht.",
     "{n} Sounds konnten gerade nicht geladen werden. In 2 Stunden wird es von selbst noch mal versucht."
-  ]
+  ],
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Deine Sounds gehen gerade nicht in dein Mikro. Um sie hineinzuschicken, stell oben <b>{field}</b> auf <b>{choice}</b>.",
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Nutz einen TTS-Server auf deinem PC (Kokoro, AllTalk, jeden im OpenAI-Stil) oder leg Stimmpakete (Piper) in den Stimmen-Ordner."
 }

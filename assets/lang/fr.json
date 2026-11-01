@@ -2002,7 +2002,6 @@
   "Updated yt-dlp to {version}.": "yt-dlp mis à jour en {version}.",
   "Updating the downloader (yt-dlp) is switched off in Settings > Privacy & security.": "La mise à jour du téléchargeur (yt-dlp) est coupée dans Paramètres > Confidentialité et sécurité.",
   "Updating… (a few minutes)": "Mise à jour… (quelques minutes)",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Utilise un serveur TTS qui tourne sur ton PC (Kokoro, AllTalk, n'importe lequel de style OpenAI) ou dépose des packs de voix (Piper) dans le dossier des voix.",
   "VB-Cable's own setup program isn't on this PC, so it can't be removed here.": "Le programme d'installation de VB-Cable n'est pas sur ce PC, donc il ne peut pas être retiré ici.",
   "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 and other games on Vivox. Opus 32 kbps mono, full band, nothing under ~80 Hz (measured in a real game). Also suits TeamSpeak and Mumble.": "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 et les autres jeux sur Vivox. Opus 32 kbps mono, bande complète, rien sous ~80 Hz (mesuré dans une vraie partie). Convient aussi à TeamSpeak et Mumble.",
   "Voice changer is OFF": "Le changeur de voix est COUPÉ",
@@ -4877,5 +4876,7 @@
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "{n} son n'a pas pu être téléchargé pour l'instant. Nouvel essai automatique dans 2 heures.",
     "{n} sons n'ont pas pu être téléchargés pour l'instant. Nouvel essai automatique dans 2 heures."
-  ]
+  ],
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Tes sons ne vont pas dans ton micro pour le moment. Pour les y envoyer, règle <b>{field}</b> sur <b>{choice}</b> plus haut.",
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Utilise un serveur TTS qui tourne sur ton PC (Kokoro, AllTalk, n'importe lequel de style OpenAI) ou dépose des packs de voix (Piper) dans le dossier des voix."
 }

@@ -2002,7 +2002,6 @@
   "Updated yt-dlp to {version}.": "yt-dlp को {version} पर अपडेट किया।",
   "Updating the downloader (yt-dlp) is switched off in Settings > Privacy & security.": "डाउनलोडर (yt-dlp) अपडेट करना सेटिंग्स > प्राइवेसी और सिक्योरिटी में बंद है।",
   "Updating… (a few minutes)": "अपडेट हो रहा है… (कुछ मिनट)",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "अपने PC पर चलता TTS सर्वर इस्तेमाल करें (Kokoro, AllTalk, कोई भी OpenAI जैसा) या वॉइस पैक (Piper) voices फ़ोल्डर में डालें।",
   "VB-Cable's own setup program isn't on this PC, so it can't be removed here.": "VB-Cable का अपना सेटअप प्रोग्राम इस PC पर नहीं है, इसलिए इसे यहाँ से नहीं हटाया जा सकता।",
   "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 and other games on Vivox. Opus 32 kbps mono, full band, nothing under ~80 Hz (measured in a real game). Also suits TeamSpeak and Mumble.": "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 और Vivox वाले दूसरे गेम। Opus 32 kbps मोनो, पूरा बैंड, ~80 Hz से नीचे कुछ नहीं (असली गेम में मापा गया)। TeamSpeak और Mumble के लिए भी ठीक है।",
   "Voice changer is OFF": "वॉइस चेंजर बंद है",
@@ -4877,5 +4876,7 @@
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "{n} साउंड अभी डाउनलोड नहीं हो पाया। 2 घंटे बाद अपने आप फिर कोशिश होगी।",
     "{n} साउंड अभी डाउनलोड नहीं हो पाए। 2 घंटे बाद अपने आप फिर कोशिश होगी।"
-  ]
+  ],
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "अभी तुम्हारी आवाज़ें तुम्हारे माइक में नहीं जातीं। उन्हें उसमें भेजने के लिए, ऊपर <b>{field}</b> को <b>{choice}</b> पर सेट करो।",
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "अपने PC पर चलता TTS सर्वर इस्तेमाल करें (Kokoro, AllTalk, कोई भी OpenAI जैसा) या वॉइस पैक (Piper) voices फ़ोल्डर में डालें।"
 }

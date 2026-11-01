@@ -244,6 +244,7 @@ def test_clean_reinstall_uses_one_admin_prompt(monkeypatch, tmp_path):
 ])
 def test_card_offers_the_fix_each_state_needs(window, qapp, monkeypatch, state, pill, buttons):  # noqa: F811
     monkeypatch.setattr(dm, 'status', lambda mic=None: state)
+    window.cfg.route = 'mic'   # (the rows are about the mic sent into)
     window.resize(1180, 720)
     window.show()
     d = window.setctl.open_settings('audio')   # a page in the window, as the cog opens it
@@ -261,6 +262,13 @@ def test_card_offers_the_fix_each_state_needs(window, qapp, monkeypatch, state, 
     filled = [b for b in row.buttons.values() if b.objectName() == 'primary']
     assert len(filled) <= 1 and all(b.graphicsEffect() is None for b in filled)
     assert not [b for b in card.findChildren(QPushButton) if b.objectName() == 'small']
+    # sent through the cable: a mic without the effect isn't listed (nothing to do there)
+    window.cfg.route = 'cable'
+    card._rebuild()
+    on_mic = state in ('ready', 'outdated', 'wiped')
+    assert bool(card.rows) == on_mic
+    assert card.not_mic.isVisibleTo(card) != on_mic   # how to switch, instead
+    assert card.new_mic.isVisibleTo(card) == on_mic
     d.close()
 
 

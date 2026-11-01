@@ -2002,7 +2002,6 @@
   "Updated yt-dlp to {version}.": "Oppdaterte yt-dlp til {version}.",
   "Updating the downloader (yt-dlp) is switched off in Settings > Privacy & security.": "Oppdatering av nedlasteren (yt-dlp) er slått av i Innstillinger > Personvern og sikkerhet.",
   "Updating… (a few minutes)": "Oppdaterer… (noen minutter)",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Bruk en TTS-server som kjører på PC-en din (Kokoro, AllTalk, hvilken som helst i OpenAI-stil), eller legg stemmepakker (Piper) i stemmemappen.",
   "VB-Cable's own setup program isn't on this PC, so it can't be removed here.": "VB-Cables eget installasjonsprogram er ikke på denne PC-en, så den kan ikke fjernes her.",
   "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 and other games on Vivox. Opus 32 kbps mono, full band, nothing under ~80 Hz (measured in a real game). Also suits TeamSpeak and Mumble.": "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 og andre spill med Vivox. Opus 32 kbps mono, fullt bånd, ingenting under ~80 Hz (målt i et ekte spill). Passer også for TeamSpeak og Mumble.",
   "Voice changer is OFF": "Stemmeforvrengeren er AV",
@@ -4877,5 +4876,7 @@
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "{n} lyd kunne ikke lastes ned nå. Den prøves igjen av seg selv om 2 timer.",
     "{n} lyder kunne ikke lastes ned nå. De prøves igjen av seg selv om 2 timer."
-  ]
+  ],
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Lydene dine går ikke inn i mikrofonen din nå. For å sende dem inn i den, sett <b>{field}</b> til <b>{choice}</b> over.",
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Bruk en TTS-server som kjører på PC-en din (Kokoro, AllTalk, hvilken som helst i OpenAI-stil), eller legg stemmepakker (Piper) i stemmemappen."
 }

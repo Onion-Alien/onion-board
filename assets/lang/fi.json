@@ -2002,7 +2002,6 @@
   "Updated yt-dlp to {version}.": "yt-dlp päivitettiin versioon {version}.",
   "Updating the downloader (yt-dlp) is switched off in Settings > Privacy & security.": "Lataajan (yt-dlp) päivitys on pois kohdassa Asetukset > Yksityisyys ja tietoturva.",
   "Updating… (a few minutes)": "Päivitetään… (muutama minuutti)",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Käytä PC:lläsi pyörivää TTS-palvelinta (Kokoro, AllTalk, mikä tahansa OpenAI-tyylinen) tai pudota puheäänipaketteja (Piper) puheäänikansioon.",
   "VB-Cable's own setup program isn't on this PC, so it can't be removed here.": "VB-Cablen omaa asennusohjelmaa ei ole tällä tietokoneella, joten sitä ei voi poistaa täältä.",
   "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 and other games on Vivox. Opus 32 kbps mono, full band, nothing under ~80 Hz (measured in a real game). Also suits TeamSpeak and Mumble.": "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 ja muut Vivoxia käyttävät pelit. Opus 32 kbps mono, koko kaista, ei mitään alle ~80 Hz (mitattu oikeassa pelissä). Sopii myös TeamSpeakille ja Mumblelle.",
   "Voice changer is OFF": "Äänenmuunnin on POIS",
@@ -4877,5 +4876,7 @@
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "{n} ääntä ei voitu ladata nyt. Sitä yritetään itse uudelleen 2 tunnin päästä.",
     "{n} ääntä ei voitu ladata nyt. Niitä yritetään itse uudelleen 2 tunnin päästä."
-  ]
+  ],
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Äänesi eivät nyt mene mikkiisi. Jos haluat lähettää ne siihen, aseta yllä <b>{field}</b> arvoon <b>{choice}</b>.",
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Käytä PC:lläsi pyörivää TTS-palvelinta (Kokoro, AllTalk, mikä tahansa OpenAI-tyylinen) tai pudota puheäänipaketteja (Piper) puheäänikansioon."
 }

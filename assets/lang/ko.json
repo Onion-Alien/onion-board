@@ -1961,7 +1961,6 @@
   "Updated yt-dlp to {version}.": "yt-dlp를 {version}(으)로 업데이트했습니다.",
   "Updating the downloader (yt-dlp) is switched off in Settings > Privacy & security.": "다운로더(yt-dlp) 업데이트가 설정 > 개인정보 보호 및 보안에서 꺼져 있습니다.",
   "Updating… (a few minutes)": "업데이트 중…(몇 분)",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "PC에서 실행 중인 TTS 서버(Kokoro, AllTalk, OpenAI 방식 서버)를 쓰거나 음성 팩(Piper)을 음성 폴더에 넣으세요.",
   "VB-Cable's own setup program isn't on this PC, so it can't be removed here.": "이 PC에 VB-Cable 자체 설치 프로그램이 없어서 여기서 제거할 수 없습니다.",
   "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 and other games on Vivox. Opus 32 kbps mono, full band, nothing under ~80 Hz (measured in a real game). Also suits TeamSpeak and Mumble.": "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 등 Vivox를 쓰는 게임. Opus 32 kbps 모노, 전 대역, ~80 Hz 아래는 없음(실제 게임에서 측정). TeamSpeak과 Mumble에도 맞습니다.",
   "Voice changer is OFF": "보이스 체인저 꺼짐",
@@ -4784,5 +4783,7 @@
   "Couldn't reach Myinstants. It tries again by itself in 2 hours.": "Myinstants에 연결할 수 없어요. 2시간 뒤에 자동으로 다시 시도해요.",
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "사운드 {n}개를 지금은 다운로드할 수 없었어요. 2시간 뒤에 자동으로 다시 시도해요."
-  ]
+  ],
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "지금은 사운드가 마이크로 들어가지 않아요. 마이크로 보내려면 위에서 <b>{field}</b>을(를) <b>{choice}</b>(으)로 바꾸세요.",
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "PC에서 실행 중인 TTS 서버(Kokoro, AllTalk, OpenAI 방식 서버)를 쓰거나 음성 팩(Piper)을 음성 폴더에 넣으세요."
 }

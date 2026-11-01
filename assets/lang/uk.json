@@ -2043,7 +2043,6 @@
   "Updated yt-dlp to {version}.": "yt-dlp оновлено до {version}.",
   "Updating the downloader (yt-dlp) is switched off in Settings > Privacy & security.": "Оновлення завантажувача (yt-dlp) вимкнено в Налаштування > Конфіденційність і безпека.",
   "Updating… (a few minutes)": "Оновлюю… (кілька хвилин)",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Використовуйте TTS-сервер на своєму ПК (Kokoro, AllTalk, будь-який у стилі OpenAI) або покладіть набори голосів (Piper) у папку голосів.",
   "VB-Cable's own setup program isn't on this PC, so it can't be removed here.": "Інсталятора самого VB-Cable на цьому ПК немає, тож видалити його звідси не можна.",
   "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 and other games on Vivox. Opus 32 kbps mono, full band, nothing under ~80 Hz (measured in a real game). Also suits TeamSpeak and Mumble.": "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 та інші ігри на Vivox. Opus 32 кбіт/с, моно, уся смуга, нічого нижче ~80 Гц (виміряно в справжній грі). Підходить і для TeamSpeak та Mumble.",
   "Voice changer is OFF": "Зміна голосу ВИМК.",
@@ -4970,5 +4969,7 @@
     "{n} звук зараз не завантажився. Через 2 години спробуємо знову автоматично.",
     "{n} звуки зараз не завантажилися. Через 2 години спробуємо знову автоматично.",
     "{n} звуків зараз не завантажилися. Через 2 години спробуємо знову автоматично."
-  ]
+  ],
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Зараз твої звуки не йдуть у мікрофон. Щоб надсилати їх туди, вибери вище в <b>{field}</b> пункт <b>{choice}</b>.",
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Використовуйте TTS-сервер на своєму ПК (Kokoro, AllTalk, будь-який у стилі OpenAI) або покладіть набори голосів (Piper) у папку голосів."
 }

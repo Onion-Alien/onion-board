@@ -2002,7 +2002,6 @@
   "Updated yt-dlp to {version}.": "A yt-dlp frissítve erre: {version}.",
   "Updating the downloader (yt-dlp) is switched off in Settings > Privacy & security.": "A letöltő (yt-dlp) frissítése ki van kapcsolva itt: Beállítások > Adatvédelem és biztonság.",
   "Updating… (a few minutes)": "Frissítés… (néhány perc)",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Használj a gépeden futó TTS-szervert (Kokoro, AllTalk, bármilyen OpenAI-stílusú), vagy dobj hangcsomagokat (Piper) a hangok mappájába.",
   "VB-Cable's own setup program isn't on this PC, so it can't be removed here.": "A VB-Cable saját telepítője nincs ezen a gépen, így itt nem távolítható el.",
   "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 and other games on Vivox. Opus 32 kbps mono, full band, nothing under ~80 Hz (measured in a real game). Also suits TeamSpeak and Mumble.": "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 és más játékok Vivoxon. Opus 32 kbps mono, teljes sáv, ~80 Hz alatt semmi (valódi játékban mérve). TeamSpeakhez és Mumble-höz is jó.",
   "Voice changer is OFF": "A hangváltó KI",
@@ -4877,5 +4876,7 @@
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "{n} hangot most nem sikerült letölteni. 2 óra múlva magától újra próbálja.",
     "{n} hangot most nem sikerült letölteni. 2 óra múlva magától újra próbálja."
-  ]
+  ],
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "A hangjaid most nem mennek a mikrofonodba. Ha oda akarod küldeni őket, fent állítsd a(z) <b>{field}</b> mezőt erre: <b>{choice}</b>.",
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Használj a gépeden futó TTS-szervert (Kokoro, AllTalk, bármilyen OpenAI-stílusú), vagy dobj hangcsomagokat (Piper) a hangok mappájába."
 }

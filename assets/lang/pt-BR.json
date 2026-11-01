@@ -2002,7 +2002,6 @@
   "Updated yt-dlp to {version}.": "yt-dlp atualizado para {version}.",
   "Updating the downloader (yt-dlp) is switched off in Settings > Privacy & security.": "Atualizar o baixador (yt-dlp) está desligado em Configurações > Privacidade e segurança.",
   "Updating… (a few minutes)": "Atualizando… (alguns minutos)",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Use um servidor de TTS rodando no seu PC (Kokoro, AllTalk, qualquer um no estilo OpenAI) ou solte pacotes de voz (Piper) na pasta de vozes.",
   "VB-Cable's own setup program isn't on this PC, so it can't be removed here.": "O programa de instalação do próprio VB-Cable não está neste PC, então não dá para removê-lo daqui.",
   "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 and other games on Vivox. Opus 32 kbps mono, full band, nothing under ~80 Hz (measured in a real game). Also suits TeamSpeak and Mumble.": "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 e outros jogos com Vivox. Opus 32 kbps mono, banda completa, nada abaixo de ~80 Hz (medido num jogo de verdade). Também serve para TeamSpeak e Mumble.",
   "Voice changer is OFF": "O modificador de voz está DESLIGADO",
@@ -4877,5 +4876,7 @@
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "{n} som não pôde ser baixado agora. Ele tenta de novo sozinho em 2 horas.",
     "{n} sons não puderam ser baixados agora. Ele tenta de novo sozinho em 2 horas."
-  ]
+  ],
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Seus sons não vão para o seu microfone agora. Para mandá-los para ele, defina <b>{field}</b> como <b>{choice}</b> acima.",
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Use um servidor de TTS rodando no seu PC (Kokoro, AllTalk, qualquer um no estilo OpenAI) ou solte pacotes de voz (Piper) na pasta de vozes."
 }
