@@ -702,6 +702,6 @@ OUTLINE_STYLE = Template("""
 QPushButton, QPushButton#danger, QLineEdit, QComboBox, QAbstractSpinBox,
 QFrame#chip, QFrame#card QFrame#chip, QFrame#fxcard, QLabel#pill, QPushButton#vchip,
 QFrame#card QToolButton#voicetile, QFrame#card QPushButton#voicecat,
-QWidget#setupsbar QPushButton#voicecat { border:1px solid $border; }
+QWidget#setupsbar QPushButton#voicecat, QPushButton#filterchip { border:1px solid $border; }
 QFrame#card, QFrame#setcard, QFrame#voicebar, QFrame#picked { border:1px solid $border; }
 """)
