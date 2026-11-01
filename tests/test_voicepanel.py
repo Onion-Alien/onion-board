@@ -319,10 +319,12 @@ def test_saved_spec_loads_back(qapp, monkeypatch):
     assert not got["effects"]["robot"]["on"]
 
 
-def test_voice_list_arrives_and_selection_is_kept(panel, qapp):
+def test_a_saved_windows_voice_is_no_longer_used(panel, qapp):
     p, _ = panel
     assert process_events(qapp, lambda: p.speech.cb_voice.isEnabled())
-    assert p.speech.cb_voice.currentData() == "Microsoft Zira Desktop"
+    assert p.speech.cb_voice.currentData() == ""            # each language's own voice
+    assert p.controller.speaker.voice == ""
+    assert not p.speech.cb_voice.isVisibleTo(p)              # and no list of them on the card
     assert p.controller.speaker.rate == 2
 
 
@@ -1938,9 +1940,8 @@ def test_a_launch_with_the_same_windows_voices_starts_no_speech_helper(qapp, mon
                                       tts.VOICE_CACHE: known})
     sp = p.speech
     try:
-        assert process_events(qapp, lambda: sp.cb_voice.count() == 3, timeout=5)
+        assert process_events(qapp, lambda: sp.cb_voice.isEnabled(), timeout=5)
         assert not started and not sp.ctl.tts.running
-        assert sp.cb_voice.currentData() == "Microsoft Hedda Desktop"
         assert sp.ctl.tts.voice_for("de") == "Microsoft Hedda Desktop"
         sp.ctl.speaker.voice = "Microsoft Hedda Desktop"
         sp.ed.textEdited.emit("Hel")                 # typing a line: start it now

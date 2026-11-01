@@ -1961,7 +1961,7 @@
   "Updated yt-dlp to {version}.": "已把 yt-dlp 更新到 {version}。",
   "Updating the downloader (yt-dlp) is switched off in Settings > Privacy & security.": "更新下载器（yt-dlp）已在 设置 > 隐私与安全 中关闭。",
   "Updating… (a few minutes)": "正在更新…（需要几分钟）",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder. They join the Voice list above.": "使用在你电脑上运行的 TTS 服务器（Kokoro、AllTalk、任何 OpenAI 风格的），或把语音包（Piper）放进语音文件夹。它们会加入上面的语音列表。",
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "使用在你电脑上运行的 TTS 服务器（Kokoro、AllTalk、任何 OpenAI 风格的），或把语音包（Piper）放进语音文件夹。",
   "VB-Cable's own setup program isn't on this PC, so it can't be removed here.": "这台电脑上没有 VB-Cable 自己的安装程序，所以无法在这里卸载。",
   "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 and other games on Vivox. Opus 32 kbps mono, full band, nothing under ~80 Hz (measured in a real game). Also suits TeamSpeak and Mumble.": "Valorant、League of Legends、Rainbow Six Siege、Overwatch 2 等使用 Vivox 的游戏。Opus 32 kbps 单声道，全频段，约 80 Hz 以下全没了（在真实游戏中实测）。也适合 TeamSpeak 和 Mumble。",
   "Voice changer is OFF": "变声器已关闭",

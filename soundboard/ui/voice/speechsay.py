@@ -133,8 +133,9 @@ class SpeechSay(_Panel):
         self.cb_voice.blockSignals(True)
         self.cb_voice.clear()
         self.cb_voice.addItem(_("Windows default"), "")
-        for name in voices:
-            self.cb_voice.addItem(customvoices.label(name), name)
+        for name in voices:   # custom and language voices only, never Windows' own
+            if name.startswith((customvoices.PREFIX, customvoices.piper.PREFIX)):
+                self.cb_voice.addItem(customvoices.label(name), name)
         found = self.cb_voice.findData(self.s["voice"])
         self._voice_standin = found < 0
         self.cb_voice.setCurrentIndex(max(0, found))

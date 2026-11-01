@@ -1961,7 +1961,7 @@
   "Updated yt-dlp to {version}.": "อัปเดต yt-dlp เป็น {version}",
   "Updating the downloader (yt-dlp) is switched off in Settings > Privacy & security.": "การอัปเดตตัวดาวน์โหลด (yt-dlp) ปิดอยู่ในการตั้งค่า > ความเป็นส่วนตัวและความปลอดภัย",
   "Updating… (a few minutes)": "กำลังอัปเดต… (ไม่กี่นาที)",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder. They join the Voice list above.": "ใช้เซิร์ฟเวอร์ TTS ที่รันบนพีซีของคุณ (Kokoro, AllTalk หรือแบบ OpenAI ใดก็ได้) หรือใส่แพ็กเสียงพูด (Piper) ลงในโฟลเดอร์เสียงพูด เสียงเหล่านี้จะไปอยู่ในรายการ เสียงพูด ด้านบน",
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "ใช้เซิร์ฟเวอร์ TTS ที่รันบนพีซีของคุณ (Kokoro, AllTalk หรือแบบ OpenAI ใดก็ได้) หรือใส่แพ็กเสียงพูด (Piper) ลงในโฟลเดอร์เสียงพูด",
   "VB-Cable's own setup program isn't on this PC, so it can't be removed here.": "ไม่มีโปรแกรมติดตั้งของ VB-Cable เองบนพีซีเครื่องนี้ จึงลบที่นี่ไม่ได้",
   "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 and other games on Vivox. Opus 32 kbps mono, full band, nothing under ~80 Hz (measured in a real game). Also suits TeamSpeak and Mumble.": "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 และเกมอื่นๆ บน Vivox Opus 32 kbps โมโน ฟูลแบนด์ ไม่มีอะไรต่ำกว่า ~80 Hz (วัดในเกมจริง) เหมาะกับ TeamSpeak และ Mumble ด้วย",
   "Voice changer is OFF": "ตัวเปลี่ยนเสียงปิดอยู่",

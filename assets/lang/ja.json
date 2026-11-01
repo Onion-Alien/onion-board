@@ -1961,7 +1961,7 @@
   "Updated yt-dlp to {version}.": "yt-dlp を{version}に更新しました。",
   "Updating the downloader (yt-dlp) is switched off in Settings > Privacy & security.": "ダウンローダー（yt-dlp）の更新は 設定 > プライバシーとセキュリティ でオフになっています。",
   "Updating… (a few minutes)": "更新中…（数分かかります）",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder. They join the Voice list above.": "PC で動く TTS サーバー（Kokoro、AllTalk、OpenAI 互換のもの）を使うか、ボイスパック（Piper）をボイスフォルダーに入れてください。上のボイス一覧に追加されます。",
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "PC で動く TTS サーバー（Kokoro、AllTalk、OpenAI 互換のもの）を使うか、ボイスパック（Piper）をボイスフォルダーに入れてください。",
   "VB-Cable's own setup program isn't on this PC, so it can't be removed here.": "VB-Cable 自体のセットアッププログラムがこの PC にないため、ここでは削除できません。",
   "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 and other games on Vivox. Opus 32 kbps mono, full band, nothing under ~80 Hz (measured in a real game). Also suits TeamSpeak and Mumble.": "Valorant、League of Legends、Rainbow Six Siege、Overwatch 2 など、Vivox を使うゲーム。Opus 32 kbps モノラル、全帯域で、約 80 Hz 未満は出ません（実際のゲームで測定）。TeamSpeak や Mumble にも合います。",
   "Voice changer is OFF": "ボイスチェンジャーはオフです",

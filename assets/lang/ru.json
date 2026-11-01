@@ -1961,7 +1961,7 @@
   "Updated yt-dlp to {version}.": "yt-dlp обновлён до {version}.",
   "Updating the downloader (yt-dlp) is switched off in Settings > Privacy & security.": "Обновление загрузчика (yt-dlp) выключено в Настройки > Конфиденциальность и безопасность.",
   "Updating… (a few minutes)": "Обновляю… (несколько минут)",
-  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder. They join the Voice list above.": "Используй TTS-сервер на своём ПК (Kokoro, AllTalk, любой в стиле OpenAI) или положи наборы голосов (Piper) в папку голосов. Они появятся в списке голосов выше.",
+  "Use a TTS server running on your PC (Kokoro, AllTalk, any OpenAI-style one) or drop voice packs (Piper) into the voices folder.": "Используй TTS-сервер на своём ПК (Kokoro, AllTalk, любой в стиле OpenAI) или положи наборы голосов (Piper) в папку голосов.",
   "VB-Cable's own setup program isn't on this PC, so it can't be removed here.": "Установщика самого VB-Cable на этом ПК нет, поэтому удалить его отсюда нельзя.",
   "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 and other games on Vivox. Opus 32 kbps mono, full band, nothing under ~80 Hz (measured in a real game). Also suits TeamSpeak and Mumble.": "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 и другие игры на Vivox. Opus 32 кбит/с, моно, вся полоса, ничего ниже ~80 Гц (измерено в настоящей игре). Подходит и для TeamSpeak и Mumble.",
   "Voice changer is OFF": "Смена голоса ВЫКЛ.",
