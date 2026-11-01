@@ -131,17 +131,6 @@ class NetControl(Controller):
         return [onaircard.Line(icon, name, "ok", "\n".join((name, _("Click to change it."))),
                                VOICE_TAB + key, "voice") for key, icon, name in live()]
 
-    def group_toggled(self, _group: str, _shut: bool):
-        """A group of the On Air card folded shut or opened: kept for the next start, and
-        the window fitted again (open, the card is taller)."""
-        mw = self.mw
-        output = mw.rail.output
-        if output is None:
-            return
-        mw.set_option("onair_shut", sorted(output.shut))
-        mw.rail.refresh_output()
-        mw.fitctl._refit()
-
     @staticmethod
     def _lite_line() -> onaircard.Line | None:
         """Lite mode on (Settings > General), else None."""
