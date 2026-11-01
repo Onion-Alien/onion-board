@@ -75,7 +75,7 @@ ADDONS = ("ai-voices", "live-voice", "other")
 ADDON_FAILS = ("off", "python", "run", "venv", "pip", "download", "step", "timeout",
                "download-timeout", "other")
 # the free sound packs (soundboard.sounds.packs BUILT_IN ids); any other is "other"
-PACKS = ("streamer", "esports", "general", "podcast", "halloween", "gm-starter", "other")
+PACKS = ("memes", "streamer", "esports", "general", "podcast", "halloween", "gm-starter", "other")
 # the Live controls' tabs (ui/voice/livesetups.py)
 LIVE_TABS = ("sounds", "radio", "apps")
 # the Live controls' sliders and switches (ui/sounds/speedpitch.py; the effects by their

@@ -82,12 +82,21 @@ def served(monkeypatch, app_dir):
 
 def test_the_built_in_list_has_our_packs_from_our_own_releases():
     built = packs.built_in()
-    assert [(p.id, p.sounds) for p in built] == [("streamer", 57), ("esports", 51),
-                                                 ("general", 483), ("podcast", 51),
-                                                 ("halloween", 49),
+    assert [(p.id, p.sounds) for p in built] == [("memes", 104), ("streamer", 57),
+                                                 ("esports", 51), ("general", 483),
+                                                 ("podcast", 51), ("halloween", 49),
                                                  ("gm-starter", 67)]
     for p in built:
-        assert p.url.startswith(updates.DOWNLOADS) and len(p.sha256) == 64
+        assert p.links or (p.url.startswith(updates.DOWNLOADS) and len(p.sha256) == 64)
+
+
+def test_the_meme_pack_is_all_myinstants_links():
+    memes = packs.built_in()[0]
+    assert memes.links and not memes.url
+    assert len({k.url for k in memes.links}) == len({k.name for k in memes.links}) == 104
+    assert all(k.category for k in memes.links)
+    # short file names: a long one went past Windows' path limit in the temp folder
+    assert max(len(k.url.rsplit("/", 1)[1]) for k in memes.links) <= 60
 
 
 def test_the_repo_catalog_matches_what_the_app_ships():
@@ -158,8 +167,8 @@ def test_dialog_keeps_the_built_in_list_when_offline(qapp, served):
     net.configure_features(offline=True)
     dlg = packsdialog.PacksDialog(lambda p: None)
     try:
-        assert process_events(qapp, lambda: len(dlg.cards) == 6, 5)
-        assert [c.pack.id for c in dlg.cards] == ["streamer", "esports", "general",
+        assert process_events(qapp, lambda: len(dlg.cards) == 7, 5)
+        assert [c.pack.id for c in dlg.cards] == ["memes", "streamer", "esports", "general",
                                                 "podcast", "halloween", "gm-starter"]
         assert dlg.note.isVisibleTo(dlg) and dlg.note.text()
         assert served.calls == []
@@ -310,6 +319,8 @@ def with_preview(data: bytes, preview: bytes, **kw) -> dict:
 
 def test_our_packs_each_have_a_preview_on_their_own_release():
     for p in packs.built_in():
+        if p.links:   # its preview is its first links
+            continue
         assert p.preview_url.startswith(p.url.rsplit("/", 1)[0] + "/")
         assert len(p.preview_sha256) == 64 and 0 < p.preview_size <= packs.PREVIEW_MAX
 
@@ -361,17 +372,17 @@ def test_the_online_list_keeps_the_cards_of_packs_that_didnt_change(qapp):
     keep their cards now; only a new or changed pack gets a new one."""
     dlg = packsdialog.PacksDialog(lambda path: None, fetch_list=False)
     try:
-        assert process_events(qapp, lambda: len(dlg.cards) == 6, 5)
+        assert process_events(qapp, lambda: len(dlg.cards) == 7, 5)
         before = list(dlg.cards)
         dlg._show(packs.built_in(), "")
         assert dlg.cards == before and all(a is b for a, b in zip(dlg.cards, before))
         changed = packs.built_in()
         changed[1].description = "Something new"
         dlg._show(changed, "")
-        assert process_events(qapp, lambda: len(dlg.cards) == 6, 5)
+        assert process_events(qapp, lambda: len(dlg.cards) == 7, 5)
         assert [c.pack for c in dlg.cards] == changed
         assert dlg.cards[1] is not before[1]
-        assert all(dlg.cards[i] is before[i] for i in (0, 2, 3, 4, 5))
+        assert all(dlg.cards[i] is before[i] for i in (0, 2, 3, 4, 5, 6))
         assert [dlg.list.itemAt(i).widget() for i in range(len(changed))] == dlg.cards
     finally:
         dlg.done(0)
@@ -462,14 +473,14 @@ def test_free_packs_is_a_page_on_the_sounds_tab(window, qapp, monkeypatch, tmp_p
 def test_search_and_chips_filter_the_cards(qapp, monkeypatch):
     dlg = packsdialog.PacksDialog(lambda p: None, fetch_list=False)
     try:
-        dlg._show(packs.parse([links_entry()]) + packs.built_in(), "")
-        assert process_events(qapp, lambda: len(dlg.cards) == 7, 5)
+        dlg._show(packs.parse([links_entry(id="test-links")]) + packs.built_in(), "")
+        assert process_events(qapp, lambda: len(dlg.cards) == 8, 5)
         shown = lambda: [c.pack.id for c in dlg.cards if not c.isHidden()]  # noqa: E731
         assert list(dlg.chip_btns) == ["", "Memes", "Streaming", "Everyday", "Gaming",
                                        "Music", "Podcast", "Spooky", "Tabletop",
                                        packsdialog.MINE]
         dlg.search.setText("bruh")   # a links pack's sound names are searched too
-        assert shown() == ["memes", "general"]
+        assert shown() == ["test-links", "memes", "general"]
         dlg.search.setText("")
         dlg.set_filter("Streaming")
         assert shown() == ["streamer", "esports"]
@@ -479,7 +490,7 @@ def test_search_and_chips_filter_the_cards(qapp, monkeypatch):
         assert dlg.views.currentWidget() is dlg.empty and "zzzz" in dlg.empty_title.text()
         dlg.btn_clear.click()
         assert dlg.search.text() == "" and dlg._filter == packsdialog.ALL
-        assert dlg.views.currentIndex() == 0 and len(shown()) == 7
+        assert dlg.views.currentIndex() == 0 and len(shown()) == 8
         dlg.set_filter(packsdialog.MINE)   # nothing added yet
         assert shown() == [] and dlg.views.currentWidget() is dlg.empty
     finally:
@@ -723,12 +734,12 @@ def test_every_packs_samples_are_preloaded_one_pack_at_a_time(qapp, monkeypatch)
     dlg = packsdialog.PacksDialog(lambda path: None, fetch_list=False,
                                   play=lambda d, g: True)
     try:
-        dlg._show(packs.parse([links_entry()]) + packs.built_in(), "")
-        assert process_events(qapp, lambda: len(fetched) == 7 and not dlg._sampling
-                              and len(dlg.cards) == 7, 5)
+        dlg._show(packs.parse([links_entry(id="test-links")]) + packs.built_in(), "")
+        assert process_events(qapp, lambda: len(fetched) == 8 and not dlg._sampling
+                              and len(dlg.cards) == 8, 5)
         assert sorted(fetched) == sorted(p.id for p in dlg.shown()) and max(at_once) == 1
         dlg.open_pack(dlg.cards[2].pack)
-        assert _preview_ready(qapp, dlg) and len(fetched) == 7
+        assert _preview_ready(qapp, dlg) and len(fetched) == 8
         assert dlg.preview.samples[0].text() == "Door"
     finally:
         dlg.done(0)
@@ -838,7 +849,7 @@ def test_a_cards_buttons_split_its_row_evenly(qapp):
     try:
         dlg.resize(1000, 700)
         dlg.show()
-        assert process_events(qapp, lambda: len(dlg.cards) == 6 and not dlg._stepper.isActive(), 5)
+        assert process_events(qapp, lambda: len(dlg.cards) == 7 and not dlg._stepper.isActive(), 5)
         qapp.processEvents()
         for c in dlg.cards:
             assert abs(c.btn.width() - c.btn_preview.width()) <= 1
