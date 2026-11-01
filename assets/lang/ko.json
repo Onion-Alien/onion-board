@@ -4705,5 +4705,12 @@
   "Replace this pad": "이 패드 바꾸기",
   "They play back to back, 1 first. Your file itself is never cut.": "1부터 차례로 이어서 재생돼요. 파일 자체는 절대 잘리지 않아요.",
   "This pad plays just the splices from now on (Split again undoes it)": "이 패드는 이제 구간만 재생해요 (다시 나누기로 되돌릴 수 있어요)",
-  "{name} (splices)": "{name} (구간)"
+  "{name} (splices)": "{name} (구간)",
+  "best seat in the sky": "하늘 최고의 명당",
+  "boom goes the night!": "펑! 밤이 밝아진다!",
+  "cover your ears!": "귀 막아!",
+  "light it up!": "불 붙여!",
+  "my sparkler's still going": "내 불꽃 막대 아직 타는 중",
+  "ooh! aah!": "오오! 아아!",
+  "ooh, pretty!": "우와, 예쁘다!"
 }

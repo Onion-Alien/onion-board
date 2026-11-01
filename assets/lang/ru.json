@@ -4881,5 +4881,12 @@
   "Replace this pad": "Заменить эту кнопку",
   "They play back to back, 1 first. Your file itself is never cut.": "Играют подряд, начиная с 1. Сам файл никогда не обрезается.",
   "This pad plays just the splices from now on (Split again undoes it)": "Эта кнопка теперь играет только фрагменты («Разделить снова» отменяет)",
-  "{name} (splices)": "{name} (фрагменты)"
+  "{name} (splices)": "{name} (фрагменты)",
+  "best seat in the sky": "Лучшее место в небе",
+  "boom goes the night!": "Бум, ночь загорелась!",
+  "cover your ears!": "Закрой уши!",
+  "light it up!": "Поджигай!",
+  "my sparkler's still going": "Мой бенгальский ещё горит",
+  "ooh! aah!": "Ооо! Ааа!",
+  "ooh, pretty!": "Ох, красота!"
 }

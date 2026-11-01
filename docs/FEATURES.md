@@ -284,7 +284,8 @@ The full list. The [README](../README.md) has the short version and how to get s
     starting with Windows, backups and *Start over* (*Reset* just the parts you pick,
     with a restore point first; *Restore points* undoes it).
   - **Tabs:** switch the Radio, Apps, Triggers or Voice tab off so it doesn't load at all.
-  - **Appearance:** 32 themes in four groups, switched live, Halloween first: Classic (Dark, Light,
+  - **Appearance:** 33 themes in four groups, switched live, the season's limited edition first (Halloween in
+    October, Fireworks in November): Classic (Dark, Light,
     true-black Midnight, High Contrast…), Colourful, Wild (Synthwave, Hacker, Amber
     Terminal…) and Meme (Flashbang, Deep Fried, Retro 98, Comic Sans…); your own
     highlight colour, how live tabs show (a tint or a dot), the language, the

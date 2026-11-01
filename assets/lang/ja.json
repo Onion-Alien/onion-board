@@ -4705,5 +4705,12 @@
   "Replace this pad": "このパッドを置き換える",
   "They play back to back, 1 first. Your file itself is never cut.": "1 から順に続けて再生します。ファイル自体は切られません。",
   "This pad plays just the splices from now on (Split again undoes it)": "このパッドは今後区間だけを再生します（「分け直す」で元に戻せます）",
-  "{name} (splices)": "{name}（区間）"
+  "{name} (splices)": "{name}（区間）",
+  "best seat in the sky": "空の特等席",
+  "boom goes the night!": "ドーン！夜が光る！",
+  "cover your ears!": "耳をふさいで！",
+  "light it up!": "点火！",
+  "my sparkler's still going": "線香花火、まだ燃えてる",
+  "ooh! aah!": "おお！わあ！",
+  "ooh, pretty!": "わあ、きれい！"
 }

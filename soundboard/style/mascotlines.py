@@ -74,6 +74,8 @@ def _bun() -> dict[str, tuple[str, ...]]:
                        _("very serious bunny")),
         "Halloween": (_("trick or treat!"), _("boo! scared you?"), _("got any candy?"),
                       _("my broom's parked outside")),
+        "Fireworks": (_("ooh, pretty!"), _("light it up!"), _("cover your ears!"),
+                      _("my sparkler's still going")),
         "Brainrot": (_("no cap!"), _("this is so real"), _("bro is clicking me"),
                      _("rent free!")),
     }
@@ -117,6 +119,7 @@ def _hoot() -> dict[str, tuple[str, ...]]:
         "Retro 98": (_("buffering…"), _("now loading"), _("please be kind, rewind")),
         "Comic Sans": (_("hoo's there?"), _("owl be watching!"), _("whooo's laughing?")),
         "Halloween": (_("hoo goes there?!"), _("I saw a ghost!"), _("spooky season, hoo!")),
+        "Fireworks": (_("ooh! aah!"), _("best seat in the sky"), _("boom goes the night!")),
         "Brainrot": (_("watching brainrot"), _("ok that's crazy"), _("no thoughts, just eyes")),
     }
 

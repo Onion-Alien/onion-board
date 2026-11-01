@@ -5145,5 +5145,12 @@
   "Replace this pad": "استبدال هذا الزر",
   "They play back to back, 1 first. Your file itself is never cut.": "تُشغَّل واحدًا تلو الآخر، بدءًا بالمقطع 1. ملفك نفسه لا يُقص أبدًا.",
   "This pad plays just the splices from now on (Split again undoes it)": "هذا الزر يشغّل المقاطع فقط من الآن (فصل مجددًا يتراجع عن ذلك)",
-  "{name} (splices)": "{name} (مقاطع)"
+  "{name} (splices)": "{name} (مقاطع)",
+  "best seat in the sky": "أفضل مقعد في السماء",
+  "boom goes the night!": "بوم! الليل يضيء!",
+  "cover your ears!": "غطِّ أذنيك!",
+  "light it up!": "أشعلها!",
+  "my sparkler's still going": "شرارتي ما زالت تلمع",
+  "ooh! aah!": "أوه! آه!",
+  "ooh, pretty!": "أوه، جميل!"
 }

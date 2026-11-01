@@ -4793,5 +4793,12 @@
   "Replace this pad": "Korvaa tämä nappi",
   "They play back to back, 1 first. Your file itself is never cut.": "Ne soivat heti peräkkäin, 1 ensin. Itse tiedostoa ei koskaan leikata.",
   "This pad plays just the splices from now on (Split again undoes it)": "Tämä nappi soittaa tästä lähtien vain pätkät (Erota taas peruu sen)",
-  "{name} (splices)": "{name} (pätkät)"
+  "{name} (splices)": "{name} (pätkät)",
+  "best seat in the sky": "Paras paikka taivaalla",
+  "boom goes the night!": "Pum, yö syttyy!",
+  "cover your ears!": "Peitä korvasi!",
+  "light it up!": "Sytytä se!",
+  "my sparkler's still going": "Tähtisädetikkuni palaa yhä",
+  "ooh! aah!": "Ooh! Aah!",
+  "ooh, pretty!": "Oi, miten kaunista!"
 }

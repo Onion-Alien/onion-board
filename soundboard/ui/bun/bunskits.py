@@ -170,6 +170,39 @@ def _confetti(p, x, y, fade, i):
     p.restore()
 
 
+def fireworks(kit: Kit, t: float):
+    """Fireworks: two rockets go up beside him and burst, gold then pink; he goes "ooh",
+    then hops."""
+    kit.hide.add("burst")   # (his own burst steps aside for the show)
+    for at, x, y, col in ((0.3, 10, 26, "#ffc94d"), (1.3, 14, 8, "#ff5fae")):
+        kit.behind.append(lambda p, at=at, x=x, y=y, col=col: _rocket(p, t - at, x, y, col))
+    kit.most(mouth=0.7 * (held(t, 0.95, 1.5, 0.15) + held(t, 1.95, 2.5, 0.15)),
+             blink=held(t, 2.7, 3.2, 0.05))
+    kit.add(dy=-7 * bump(t, 2.65, 3.05), ears=6 * bump(t, 2.65, 3.05))
+
+
+def _rocket(p: QPainter, t, x, top, col):
+    """One rocket: a streak up from behind him to (x, top), then a burst of sparks in
+    `col` with a few white ones."""
+    rise = 0.6
+    if 0 < t < rise:
+        y = lerp(100, top, ease(t / rise))
+        for i in range(5):   # its trail, fading behind it
+            c = QColor("#ffe27a")
+            c.setAlphaF(0.9 - i * 0.17)
+            _oval(p, x, y + i * 5, 4 - i * 0.5, 4 - i * 0.5, c, None)
+
+    def spark(p, px, py, fade, i):   # a streak pointing out from the middle
+        c = QColor(col if i % 4 else "#fff6d0")
+        c.setAlphaF(min(1.0, 1.6 * fade))
+        dx, dy = px - x, py - top
+        d = math.hypot(dx, dy) or 1.0
+        tail = min(d, 6.0)
+        p.setPen(QPen(c, 2.4, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+        p.drawLine(QPointF(px, py), QPointF(px - dx / d * tail, py - dy / d * tail))
+    burst(p, t - rise, x, top, 22, 26, 0.95, spark, gravity=14, salt=int(x) + 7, up=0.0)
+
+
 def bow(kit: Kit, t: float):
     """Light: he straightens his bow tie, then takes a bow."""
     fix = held(t, 0.3, 1.3, 0.15)
@@ -503,6 +536,7 @@ SKITS: dict[str, tuple[float, Callable[[Kit, float], None]]] = {
     "Slate": (4.0, reading),
     "Paper": (4.3, paper_plane),
     "Dark": (3.9, dj),
+    "Fireworks": (3.4, fireworks),
 }
 GENERIC = (4.0, juggle)
 
