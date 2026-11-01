@@ -701,6 +701,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
     def showEvent(self, ev):
         shellicon.on_show(self)   # the Jump List icon, before the taskbar button exists
         shellicon.paint_background(self, theme.T["bg"])
+        shellicon.cloak_until_drawn(self)   # back from the tray: never a white window first
         winwatch.watch(self).attach()   # Space and the drop veil: a new QWindow after Always on top
         super().showEvent(ev)
         if not getattr(self, "_start_focus_set", False):
