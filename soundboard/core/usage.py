@@ -422,6 +422,8 @@ def features_now(cfg) -> list[str]:
     from soundboard.mic import michelper
     if cfg.route == "mic" and michelper.known():   # its last check's answer, no new one
         out.append("mic-helper")
+    if not cfg.mic_helper:
+        out.append("mic-helper-off")
     return out
 
 

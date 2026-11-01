@@ -731,6 +731,7 @@ class OutputBlock(QFrame):
         """Fold a group down to its header, or open it again."""
         if not self.folds(group):
             return
+        usage.used("on-air-fold")
         self.shut ^= {group}
         self.refresh()
         self.groupToggled.emit(group, group in self.shut)

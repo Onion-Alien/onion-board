@@ -295,9 +295,14 @@ account or anything else about you.
     sound opened, saved (`edit-opened`, `edit-saved`, `edit-advanced-saved`, `edit-copy`),
     its summary's × or a preset used (`edit-summary-off`, `edit-preset`) and which of its
     settings a save changed, by name only (`edit-name`, `edit-hotkey`, `edit-trim`,
-    `edit-speed`, `edit-knobs`, `edit-eq`... the list in `usagenames.EDIT_SETTINGS`), *On
-    Air* switched off or on and a line of its card clicked (`used/on-air-off`,
-    `on-air-on`, `on-air-line`), a file import stopped or one that skipped files
+    `edit-speed`, `edit-knobs`, `edit-eq`... the list in `usagenames.EDIT_SETTINGS`), its
+    Undo / Redo, its player, the waveform clicked to seek or zoomed, a splice marked,
+    played on its own or splices combined into a new pad or this one (`edit-undo`,
+    `edit-redo`, `edit-player`, `edit-wave-seek`, `edit-wave-zoom`, `edit-splice-marked`,
+    `edit-splice-play`, `edit-splices-new`, `edit-splices-replace`: never the times or
+    the sound), *On Air* switched off or on, a line of its card clicked and one of its
+    groups folded or opened (`used/on-air-off`, `on-air-on`, `on-air-line`,
+    `on-air-fold`), a file import stopped or one that skipped files
     (`used/import-stopped`, `import-skipped`), *Pause*, *Stop all* and the taskbar
     preview's buttons (`used/pause`, `stop-all`, `taskbar-buttons`), the pop-up saying
     unticking *Others hear it* can't mute your mic yet and its *Set it up*
@@ -362,7 +367,9 @@ account or anything else about you.
     or the programs (`used/live-opened-sounds`, `live-changed-radio`…), which of its
     controls or presets (`used/live-speed`, `live-pitch`, `live-keep-pitch`,
     `live-redline`, `live-reset`, `live-fx-bass`, `live-fx-reverb`…,
-    `live-preset-canyon`…: never the values); an achievement earned, by its name in the
+    `live-preset-canyon`…: never the values), and a preset of your own updated or put
+    back after a change (`live-mine-updated`, `live-mine-reset`: never its name); an
+    achievement earned, by its name in the
     fixed list (`used/ach-first-blood`, `ach-golden-bun`…) and the page's filters used
     (`used/achievements-filter`); Connect Twitch clicked or failing, and a chat line or
     another event coming in from Twitch (`used/twitch-login`, `twitch-login-failed`,
@@ -376,14 +383,15 @@ account or anything else about you.
     (`store-play-next`); *Reset effects* in Edit sound (`pad-effects-reset`); the app
     started again by Windows after it crashed or hung (`crash-restarted`); the onion on
     Settings > About poked, eating the window, or given back early (`egg-onion-poked`,
-    `egg-onion-eaten`, `egg-onion-please`);
+    `egg-onion-eaten`, `egg-onion-please`); *Star Onion Board on GitHub* in Settings >
+    About (`github-star`);
   - and every day they're set: *Remember where it came from* off, own Apps categories,
     the side menu kept shut, a proxy, Tor or Offline mode, the playing sound's picture
-    behind the board, the mic helper set up, and any sound set to play other than one at
-    a time (`used/source-off`, `apps-own-categories`, `rail-shut`, `net-proxy`,
-    `net-tor`, `net-offline`, `playing-bg`, `mic-helper`, `press-overlap`,
-    `press-toggle`, `press-solo`, `press-queue`: never the proxy's address or which
-    sounds); the Sounds, Apps or Voice tab shown as a list, hotkeys set not to reach the
+    behind the board, the mic helper set up or switched off, and any sound set to play
+    other than one at a time (`used/source-off`, `apps-own-categories`, `rail-shut`,
+    `net-proxy`, `net-tor`, `net-offline`, `playing-bg`, `mic-helper`, `mic-helper-off`,
+    `press-overlap`, `press-toggle`, `press-solo`, `press-queue`: never the proxy's
+    address or which sounds); the Sounds, Apps or Voice tab shown as a list, hotkeys set not to reach the
     game, a key for a voice, an auto push-to-talk key, the voice leveler off, and a sound
     with a voice (or an AI voice) laid over it (`used/view-list-sounds`,
     `view-list-apps`, `view-list-voice`, `hotkeys-share-off`, `voice-hotkeys`,

@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from soundboard.core import usage
 from soundboard.i18n import _
 from soundboard.ui.kit import icons
 from soundboard.ui.kit.panel import CONTROL_H, Flow, VolumeControl, vsep
@@ -35,6 +36,11 @@ log = logging.getLogger(__name__)
 
 CHIPS_GAP = 6   # as the main window's Now playing row
 NAME_MIN = 60   # the name, at the least: cut short before the window is made wider
+
+
+def _count(*_a):
+    """This player was used, not the board's own bar (usage.py: the name only)."""
+    usage.used("edit-player")
 
 
 class _NameAndSeek(NameAndSeek):
@@ -107,6 +113,7 @@ class EditPlayer(QFrame):
         self.btn_skip.clicked.connect(playctl.skip_next)
         icons.set_icon(self.btn_skip, "next", size=16)
         for b in (self.btn_pp, self.btn_st, self.btn_skip):
+            b.clicked.connect(_count)
             b.setFixedSize(CONTROL_H, CONTROL_H)
             lh.addWidget(b)
         self.name = QLabel()
@@ -118,6 +125,7 @@ class EditPlayer(QFrame):
         self.seek.setObjectName("seek")
         self.seek.sliderPressed.connect(lambda: setattr(playctl, "_seeking", True))
         self.seek.sliderReleased.connect(lambda: playctl.do_seek(self.seek))
+        self.seek.sliderReleased.connect(_count)
         self.seek.valueChanged.connect(playctl._seek_preview)
         no_wheel(self.seek)
         self._name_seek = _NameAndSeek(self.name, self.seek, 190)
@@ -156,6 +164,7 @@ class EditPlayer(QFrame):
         self.btn_stop_all.setProperty("quiet", True)
         self.btn_stop_all.setToolTip(mw.stop_btn.toolTip())
         self.btn_stop_all.clicked.connect(playctl._stop_all_clicked)
+        self.btn_stop_all.clicked.connect(_count)
         icons.set_icon(self.btn_stop_all, "stop", "danger_text", size=14)
         rh.addWidget(self.btn_stop_all)
         self._rows.addWidget(right)

@@ -6,6 +6,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QLineEdit, QPushButton,
                                QVBoxLayout, QWidget)
 
+from soundboard.core import usage
 from soundboard.i18n import _, ngettext
 from soundboard.ui.kit import busy, icons
 from soundboard.ui.settings import Page, _button_row
@@ -127,6 +128,7 @@ class HelpPage(Page):
         row.addWidget(self._link_button(_("Licenses"), f"https://github.com/{REPO}#license"))
         star = self.dlg.star_btn = self._link_button(_("Star Onion Board on GitHub"),
                                                      f"https://github.com/{REPO}", "star")
+        star.clicked.connect(lambda: usage.used("github-star"))
         row.addWidget(star)
         cv.addLayout(row)
         return card
