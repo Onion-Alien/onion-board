@@ -2285,7 +2285,7 @@ def test_hear_it_plays_the_voice_in_the_headphones(panel, monkeypatch):
     monkeypatch.setattr(aipreview, "_cache", OrderedDict())
     fx = p.fx
     fx.pick("Chipmunk")
-    assert fx.btn_sample.isVisibleTo(fx.picked)
+    assert fx.btn_sample.isHidden()   # not on the bar: a card's right-click Hear it
     fx.btn_sample.click()
     from PySide6.QtWidgets import QApplication
     assert process_events(QApplication.instance(), lambda: played), "no sample played"

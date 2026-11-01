@@ -275,8 +275,8 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self._sampled.connect(self._sample_done)
         self.btn_sample = hear_button()
         self.btn_sample.clicked.connect(lambda: self.hear(self._preset))
-        self.btn_sample.hide()
-        pb.addWidget(self.btn_sample)
+        self.btn_sample.setParent(self.picked)   # not on the bar (as an AI voice's has
+        self.btn_sample.hide()                   # none): a card's right-click Hear it
         pb.addStretch(1)
         v.addWidget(self.picked)
         self.picked.installEventFilter(self)   # (after its buttons: _fit_picked reads them)
@@ -984,7 +984,6 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
                                                                             PICKED_ART)
         self.picked_pic.setPixmap(pm)
         self.picked_name.setText(shown)
-        self.btn_sample.setVisible(self.play_sample is not None)
 
     def _edited(self, etype: str = ""):
         if etype in KEEP:     # your mic clean-up, the Background: the voice stays picked
