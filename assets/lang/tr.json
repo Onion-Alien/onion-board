@@ -4814,5 +4814,13 @@
   "Speaks your typed lines": "Yazdığın satırları söyler",
   "From a link…": "Bağlantıdan…",
   "Pick one of ours": "Bizimkilerden seç",
-  "Remove server": "Sunucuyu kaldır"
+  "Remove server": "Sunucuyu kaldır",
+  "{n} new": [
+    "{n} yeni",
+    "{n} yeni"
+  ],
+  "{n} new sound": [
+    "{n} yeni ses",
+    "{n} yeni ses"
+  ]
 }

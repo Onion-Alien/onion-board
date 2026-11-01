@@ -4726,5 +4726,11 @@
   "Speaks your typed lines": "입력한 문장을 읽어 줘요",
   "From a link…": "링크에서…",
   "Pick one of ours": "기본 그림에서 고르기",
-  "Remove server": "서버 삭제"
+  "Remove server": "서버 삭제",
+  "{n} new": [
+    "새 항목 {n}"
+  ],
+  "{n} new sound": [
+    "새 사운드 {n}개"
+  ]
 }

@@ -4726,5 +4726,11 @@
   "Speaks your typed lines": "朗讀你輸入的文字",
   "From a link…": "來自連結…",
   "Pick one of ours": "從我們的圖片中選",
-  "Remove server": "移除伺服器"
+  "Remove server": "移除伺服器",
+  "{n} new": [
+    "{n} 個新"
+  ],
+  "{n} new sound": [
+    "{n} 個新聲音"
+  ]
 }

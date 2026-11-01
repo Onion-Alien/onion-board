@@ -4902,5 +4902,15 @@
   "Speaks your typed lines": "Říká tvé napsané řádky",
   "From a link…": "Z odkazu…",
   "Pick one of ours": "Vybrat z našich",
-  "Remove server": "Odebrat server"
+  "Remove server": "Odebrat server",
+  "{n} new": [
+    "{n} nový",
+    "{n} nové",
+    "{n} nových"
+  ],
+  "{n} new sound": [
+    "{n} nový zvuk",
+    "{n} nové zvuky",
+    "{n} nových zvuků"
+  ]
 }

@@ -470,7 +470,9 @@ class SideRail(QFrame):
             n = shown_idx.get(b)
             key = "" if n is None else self.key_for(i, n)
             b.setToolTip("" if shown or not key else f"{name}  ({key})")
-            b.setAccessibleDescription(tip)
+            # ("3 new sounds": the count on it, newsounds.py)
+            b.setAccessibleDescription("\n".join(filter(None, (
+                bar.property(f"_countwords{i}") or "", tip))))
             b.setChecked(i == cur and self.foot_selected is None)
             b.update()
         self.update()   # the live bars

@@ -4814,5 +4814,13 @@
   "Speaks your typed lines": "Säger raderna du skriver",
   "From a link…": "Från en länk…",
   "Pick one of ours": "Välj en av våra",
-  "Remove server": "Ta bort server"
+  "Remove server": "Ta bort server",
+  "{n} new": [
+    "{n} ny",
+    "{n} nya"
+  ],
+  "{n} new sound": [
+    "{n} nytt ljud",
+    "{n} nya ljud"
+  ]
 }

@@ -157,6 +157,7 @@ class Pad(QAbstractButton):
     step = Signal(object, int, int)   # arrow key: this pad, columns, rows to move focus
     nudge = Signal(str, int)    # Ctrl+wheel: its volume this many steps up (+) or down (-)
     stop_render = Signal(str)   # the ✕ on its effects render: stop it, keep the old effects
+    seen = Signal(str)          # a new sound's card had the mouse over it (newsounds.py)
     single_click = True         # Settings: a click plays it (activated) instead of selecting
 
     def __init__(self, meta: SoundMeta, width: int):
@@ -172,6 +173,7 @@ class Pad(QAbstractButton):
         self.meter_peak = 0.0    # the meter's peak mark, falling slowly
         self.selected = False    # the sound in the transport bar
         self.picked = False      # one of several picked for a batch change (ui.padbatch)
+        self.fresh = False       # new on the board, not looked at yet: it glows
         self.state = "loading"   # loading | rendering | ready | error
         self.error = ""
         self.render_frac: float | None = None   # rendering: how far, 0..1 (EditControl)
@@ -205,6 +207,11 @@ class Pad(QAbstractButton):
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.clicked.connect(lambda: self.activated.emit(self.meta.id))   # keyboard / a11y
         self.describe()
+
+    def set_fresh(self, on: bool):
+        if on != self.fresh:
+            self.fresh = on
+            self.update()
 
     def set_picked(self, on: bool):
         self.picked = on
@@ -426,6 +433,9 @@ class Pad(QAbstractButton):
 
     def enterEvent(self, e):
         self._fade_hover(True)
+        if self.fresh:   # looked at: not new any more
+            self.set_fresh(False)
+            self.seen.emit(self.meta.id)
 
     def leaveEvent(self, e):
         self._down = False
@@ -597,6 +607,16 @@ class Pad(QAbstractButton):
             p.setPen(pen)
         elif self.picked:
             p.setPen(QPen(C["accent"], 2.4))
+        elif self.fresh:   # new: a soft glow of the highlight colour inside its edge
+            p.save()
+            p.setClipPath(path)
+            for width, alpha in ((12, 40), (7, 70)):
+                halo = QColor(C["accent"])
+                halo.setAlpha(alpha)
+                p.setPen(QPen(halo, width))
+                p.drawPath(path)
+            p.restore()
+            p.setPen(QPen(C["accent"], 2.2))
         elif self.selected:
             p.setPen(QPen(C["border_hi"], 1.6))
         else:   # at rest: no outline, the card's own shade is enough
@@ -715,7 +735,7 @@ class Pad(QAbstractButton):
             if self.paused:   # paused: the same line, faded
                 ink.setAlpha(110)
             pen = QPen(ink, 1.8)
-        elif self.picked:
+        elif self.picked or self.fresh:   # (new: its glow, as a line)
             pen = QPen(C["accent"], 2)
         elif self.selected:
             pen = QPen(C["border_hi"], 1.4)

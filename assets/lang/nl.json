@@ -4814,5 +4814,13 @@
   "Speaks your typed lines": "Spreekt je getypte regels uit",
   "From a link…": "Via een link…",
   "Pick one of ours": "Kies een van de onze",
-  "Remove server": "Server verwijderen"
+  "Remove server": "Server verwijderen",
+  "{n} new": [
+    "{n} nieuw",
+    "{n} nieuw"
+  ],
+  "{n} new sound": [
+    "{n} nieuw geluid",
+    "{n} nieuwe geluiden"
+  ]
 }

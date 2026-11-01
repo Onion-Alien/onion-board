@@ -4726,5 +4726,11 @@
   "Speaks your typed lines": "Đọc các dòng bạn gõ",
   "From a link…": "Từ liên kết…",
   "Pick one of ours": "Chọn từ ảnh của chúng tôi",
-  "Remove server": "Gỡ máy chủ"
+  "Remove server": "Gỡ máy chủ",
+  "{n} new": [
+    "{n} mới"
+  ],
+  "{n} new sound": [
+    "{n} âm thanh mới"
+  ]
 }

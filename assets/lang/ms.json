@@ -4726,5 +4726,11 @@
   "Speaks your typed lines": "Menyebut baris yang anda taip",
   "From a link…": "Daripada pautan…",
   "Pick one of ours": "Pilih daripada kami",
-  "Remove server": "Buang pelayan"
+  "Remove server": "Buang pelayan",
+  "{n} new": [
+    "{n} baharu"
+  ],
+  "{n} new sound": [
+    "{n} bunyi baharu"
+  ]
 }

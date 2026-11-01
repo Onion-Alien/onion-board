@@ -4814,5 +4814,13 @@
   "Speaks your typed lines": "Dice las frases que escribes",
   "From a link…": "Desde un enlace…",
   "Pick one of ours": "Elegir una de las nuestras",
-  "Remove server": "Quitar servidor"
+  "Remove server": "Quitar servidor",
+  "{n} new": [
+    "{n} nuevo",
+    "{n} nuevos"
+  ],
+  "{n} new sound": [
+    "{n} sonido nuevo",
+    "{n} sonidos nuevos"
+  ]
 }

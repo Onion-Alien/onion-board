@@ -4726,5 +4726,11 @@
   "Speaks your typed lines": "朗读你输入的文字",
   "From a link…": "来自链接…",
   "Pick one of ours": "从我们的图片中选",
-  "Remove server": "移除服务器"
+  "Remove server": "移除服务器",
+  "{n} new": [
+    "{n} 个新"
+  ],
+  "{n} new sound": [
+    "{n} 个新声音"
+  ]
 }

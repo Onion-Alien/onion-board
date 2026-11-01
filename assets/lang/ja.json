@@ -4726,5 +4726,11 @@
   "Speaks your typed lines": "入力した文を読み上げます",
   "From a link…": "リンクから…",
   "Pick one of ours": "用意された画像から選ぶ",
-  "Remove server": "サーバーを削除"
+  "Remove server": "サーバーを削除",
+  "{n} new": [
+    "新着 {n}"
+  ],
+  "{n} new sound": [
+    "新しいサウンド {n} 件"
+  ]
 }

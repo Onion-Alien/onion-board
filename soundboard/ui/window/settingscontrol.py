@@ -103,6 +103,7 @@ class SettingsControl(Controller):
         finally:
             self._opening_settings = False
         mw.rail.select_foot(mw.gear)
+        mw.newctl.follow()   # (Sounds out of sight, or back)
         mw.transctl._show_transport()
         # (Escape is for it now; fresh, not the back arrow: the mini player's swap
         # handed the focus on to it, ringed)
@@ -158,6 +159,7 @@ class SettingsControl(Controller):
         mw.fitctl._fit_body_top()
         self._board_counts(True)
         mw.rail.select_foot(None)
+        mw.newctl.follow()   # (Sounds out of sight, or back)
         mw.transctl._show_transport()
         if had_focus:   # (not left on a page that's gone)
             mw._focus_sounds_page(mw.tabs.currentIndex())

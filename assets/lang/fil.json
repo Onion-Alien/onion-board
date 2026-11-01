@@ -4814,5 +4814,13 @@
   "Speaks your typed lines": "Binibigkas ang mga tina-type mo",
   "From a link…": "Mula sa link…",
   "Pick one of ours": "Pumili sa amin",
-  "Remove server": "Alisin ang server"
+  "Remove server": "Alisin ang server",
+  "{n} new": [
+    "{n} bago",
+    "{n} bago"
+  ],
+  "{n} new sound": [
+    "{n} bagong sound",
+    "{n} bagong sound"
+  ]
 }

@@ -4726,5 +4726,11 @@
   "Speaks your typed lines": "พูดข้อความที่คุณพิมพ์",
   "From a link…": "จากลิงก์…",
   "Pick one of ours": "เลือกจากของเรา",
-  "Remove server": "ลบเซิร์ฟเวอร์"
+  "Remove server": "ลบเซิร์ฟเวอร์",
+  "{n} new": [
+    "ใหม่ {n}"
+  ],
+  "{n} new sound": [
+    "เสียงใหม่ {n} เสียง"
+  ]
 }

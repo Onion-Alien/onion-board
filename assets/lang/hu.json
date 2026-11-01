@@ -4814,5 +4814,13 @@
   "Speaks your typed lines": "Felolvassa a beírt sorokat",
   "From a link…": "Linkről…",
   "Pick one of ours": "Válassz a mieinkből",
-  "Remove server": "Szerver eltávolítása"
+  "Remove server": "Szerver eltávolítása",
+  "{n} new": [
+    "{n} új",
+    "{n} új"
+  ],
+  "{n} new sound": [
+    "{n} új hang",
+    "{n} új hang"
+  ]
 }

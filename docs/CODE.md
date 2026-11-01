@@ -367,6 +367,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/settings/lite.py` | lite mode (Settings > General): the switch the animations, Bun, the logo and the textures ask, and whether this PC looks slow enough to suggest it |
 | `soundboard/ui/window/livesize.py` | the window's edge being dragged (Windows' WM_ENTERSIZEMOVE / WM_EXITSIZEMOVE): each step fits with Qt's cached sizes, letting go measures it all fresh |
 | `soundboard/ui/window/livedot.py` | marks a tab whose feature is live (a highlight-coloured icon, with the rail's bar beside it, or a small dot), e.g. the Voice tab while your voice is being changed |
+| `soundboard/ui/window/newsounds.py` | new sounds marked like unread mail: a glow on each new card until the mouse goes over it or you leave Sounds, and a count ("3 new", with an arrow while more are coming in) on the Sounds tab while you are elsewhere |
 | `soundboard/ui/kit/glow.py` | `Glow(button)`: a slow accent glow round the one button a step wants pressed (the setup card's mic button) |
 | `soundboard/ui/bun/logowidget.py` | the header logo animated: a breathing glow and sheen, flaring with embers while sounds play |
 | `soundboard/ui/triggers/logoduel.py` | a silent laser exchange between the Board and Watch logos when clicked on the Triggers tab |

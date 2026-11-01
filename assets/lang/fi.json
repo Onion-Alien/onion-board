@@ -4814,5 +4814,13 @@
   "Speaks your typed lines": "Lukee kirjoittamasi rivit",
   "From a link…": "Linkistä…",
   "Pick one of ours": "Valitse meidän kuvista",
-  "Remove server": "Poista palvelin"
+  "Remove server": "Poista palvelin",
+  "{n} new": [
+    "{n} uusi",
+    "{n} uutta"
+  ],
+  "{n} new sound": [
+    "{n} uusi ääni",
+    "{n} uutta ääntä"
+  ]
 }
