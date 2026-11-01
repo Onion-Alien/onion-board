@@ -506,6 +506,14 @@ def _add_accent_text_token(t: dict[str, str]) -> None:
         t["accent_link"] = _readable_text(t["accent"], t, 4.5, TEXT_ON + ("item_hover",))
 
 
+def _add_off_text_token(t: dict[str, str]) -> None:
+    """off_text: the On Air card's red for a voice switched off there (its words and
+    icon), on its panel (btn) and hovered (panel): error_text was 4.1:1 on Arctic's
+    buttons. Moved towards the text colour only as far as 4.5:1 needs."""
+    if "off_text" not in t:
+        t["off_text"] = _readable_text(t["error_text"], t, 4.5, ("btn", "panel"))
+
+
 SECONDARY_ON = ("bg", "panel", "card", "card_hi", "btn", "btn_hover", "inset")
 
 
@@ -585,6 +593,7 @@ def finish(t: dict[str, str]) -> dict[str, str]:
     _add_hover_token(t)
     _add_item_hover_token(t)
     _add_accent_text_token(t)
+    _add_off_text_token(t)
     return t
 
 

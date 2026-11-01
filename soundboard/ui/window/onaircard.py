@@ -8,7 +8,7 @@ import time
 from dataclasses import dataclass
 
 import numpy as np
-from PySide6.QtCore import QEvent, QObject, QRectF, QSize, Qt, QTimer, Signal
+from PySide6.QtCore import QEvent, QObject, QPoint, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QFont, QFontMetrics, QImage, QMouseEvent, QPainter, QPen
 from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QPushButton, QSizePolicy,
                                QSpacerItem, QVBoxLayout, QWidget)
@@ -81,6 +81,7 @@ class OutputBlock(QFrame):
     the switch."""
 
     lineClicked = Signal(str)   # a line's Settings page
+    lineMenu = Signal(str, QPoint)   # a line right-clicked: its page, where
 
     LEAD = 11             # card edge to the icon column: the tab icons' centre line
     TOP = 12              # card padding over the title row (the 12 of settings cards)
@@ -590,6 +591,8 @@ class OutputBlock(QFrame):
         while len(self.net) < len(lines):
             n = _NetLine(self)
             n.clicked.connect(lambda _c=False, n=n: self.lineClicked.emit(n.page))
+            n.customContextMenuRequested.connect(
+                lambda pos, n=n: self.lineMenu.emit(n.page, n.mapToGlobal(pos)))
             self.net.append(n)   # (in the card in its group's place: _arrange)
             n.lay_out(expanded, self._px(self.GLYPH) if expanded else self.GLYPH, self._px)
             n.label.setStyleSheet(self.title.styleSheet())   # (the card's scale)
@@ -746,7 +749,7 @@ class Line:
     """A line in the On Air card under its status (OutputBlock.set_lines)."""
     icon: str
     words: str
-    tone: str = ""   # "ok", "warn" or "" (plain)
+    tone: str = ""   # "ok", "warn", "error" (switched off, there to switch back on) or ""
     full: str = ""   # the tip: what it says in full
     page: str = ""   # the Settings page a click opens
     group: str = ""  # a GROUPS key: in that group's panel, else in the last one
@@ -813,6 +816,7 @@ class _NetLine(QPushButton):
         self.setProperty("action", True)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setFocusPolicy(Qt.FocusPolicy.TabFocus)
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
         self.row = QHBoxLayout(self)
         self.row.setSpacing(0)
@@ -849,7 +853,8 @@ class _NetLine(QPushButton):
         self.setToolTip(line.full)
         self.setAccessibleName(line.words)
         self.setAccessibleDescription(line.full)
-        icons.set_label_icon(self.glyph, line.icon, {"ok": "ok_text", "warn": "warn_text"}
+        icons.set_label_icon(self.glyph, line.icon, {"ok": "ok_text", "warn": "warn_text",
+                                                     "error": "off_text"}
                              .get(line.tone, "muted"), size=size)
         self.style().unpolish(self)
         self.style().polish(self)
