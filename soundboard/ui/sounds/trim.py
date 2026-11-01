@@ -148,7 +148,8 @@ class Waveform(QWidget):
             self.update()
 
     def set_cutting(self, on: bool):
-        """Cut on: a click marks where a splice starts, the next where it ends."""
+        """Cut on: a click marks where a splice starts, the next where it ends (a click
+        inside a splice still picks it, and its level dots still drag)."""
         self.cutting = on
         self._first = None
         self.setMouseTracking(on or self.big or bool(self.splices))
@@ -198,6 +199,19 @@ class Waveform(QWidget):
     def part_fades(self, i: int) -> tuple[float, float]:
         p = self.parts[i] if 0 <= i < len(self.parts) else {}
         return float(p.get("fade_in", 0.0)), float(p.get("fade_out", 0.0))
+
+    def set_part_fade(self, i: int, key: str, seconds: float):
+        """Splice `i`'s "fade_in" or "fade_out" set to `seconds` (0: off), kept inside
+        the splice beside its other fade."""
+        if not 0 <= i < len(self.splices):
+            return
+        (a, b), p = self.splices[i], dict(self.parts[i])
+        other = float(p.get("fade_out" if key == "fade_in" else "fade_in", 0.0))
+        p[key] = round(min(max(seconds, 0.0), b - a - other, soundfx.MAX_FADE_S), 2)
+        self.parts[i] = soundfx.clean_part(p)
+        self.update()
+        self.level_moved.emit(i)
+        self.spliced.emit()
 
     def _level_y(self, level: float) -> float:
         """Where a level (0 silence .. 1 full volume) is drawn: the middle line up to
@@ -251,7 +265,7 @@ class Waveform(QWidget):
 
     def _env_at(self, x: float, y: float) -> tuple | None:
         """The level point under (x, y), the nearest; None: none."""
-        if not self.big or self.cutting or self._in_ruler(y):
+        if not self.big or self._first is not None or self._in_ruler(y):
             return None
         best, near = None, POINT_GRAB
         for pt, what in self._env_points():
@@ -489,10 +503,14 @@ class Waveform(QWidget):
         if edge is not None and self._first is None:
             self._drag = edge
             return
-        if not self.cutting:   # (joined) a click on one picks it
-            self.pick(self._splice_at(self._t(x)))
-            return
         t = self._t(x)
+        inside = self._splice_at(t)
+        if not self.cutting or (self._first is None and inside is not None):
+            # (joined, or Cut on and inside a splice) a click on one picks it
+            self.pick(inside)
+            if inside is not None:
+                self.setFocus(Qt.FocusReason.MouseFocusReason)   # Esc: the whole sound
+            return
         if self._first is None:
             self._first = t
             self.setFocus(Qt.FocusReason.MouseFocusReason)   # Esc lets go of it
@@ -583,8 +601,9 @@ class Waveform(QWidget):
             self._set_hover(i, e.globalPosition().toPoint())
             if self._on_splices() and not self._drag:
                 edge = self._first is None and self._splice_edge(x) is not None
+                making = self.cutting and (self._first is not None or i is None)
                 self.setCursor(Qt.CursorShape.SizeHorCursor if edge else
-                               Qt.CursorShape.IBeamCursor if self.cutting
+                               Qt.CursorShape.IBeamCursor if making
                                else Qt.CursorShape.ArrowCursor)
 
     def mouseReleaseEvent(self, e):
@@ -835,9 +854,9 @@ class Waveform(QWidget):
         """Each splice's level line over its waveform (and the sound's, while its
         handles play): full volume near the top, sloping to the level each fade starts
         from or ends at; a dot on each point that can be dragged, the fade's length
-        beside its corner. Hidden while Add splices is on (clicks make splices then)."""
-        if self.cutting or (self.fine is None and not len(self.peaks)):   # (not loaded)
-            return
+        beside its corner. Hidden while a splice is half made (its end click next)."""
+        if self._first is not None or (self.fine is None and not len(self.peaks)):
+            return   # (or not loaded)
         T = theme.T
         p.save()
         p.setClipRect(r)

@@ -1,0 +1,2 @@
+- Edit sound: with Add splices on, a click inside a splice now selects it instead of starting a new splice, and its fade dots stay visible.
+- Edit sound: a selected splice gets Fade in and Fade out buttons in the top row (one click adds a fade, another takes it off).

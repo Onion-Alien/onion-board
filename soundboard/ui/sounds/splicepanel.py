@@ -231,6 +231,15 @@ class SpliceBar(QWidget):
         self.list.clicked.connect(self._open)
         h.addWidget(self.cut)
         h.addWidget(self.list)
+        # the picked splice's fades: one click on, one click off (its dots drag the length)
+        self.fades = {}
+        for key, text in (("fade_in", _("Fade in")), ("fade_out", _("Fade out"))):
+            b = QPushButton(text)
+            b.setCheckable(True)
+            b.toggled.connect(lambda on, k=key: self._fade(k, on))
+            b.hide()
+            h.addWidget(b)
+            self.fades[key] = b
         self.popup: SplicePopup | None = None
         self.dlg: CombineDialog | None = None
         self.trim = trim
@@ -241,6 +250,7 @@ class SpliceBar(QWidget):
         if self.trim is not trim:
             for sig, slot in ((self.trim.splices_changed, self._sync),
                               (self.trim.wave.spliced, self._sync),
+                              (self.trim.wave.picked, self._sync),
                               (self.trim.wave.menu_asked, self.menu)):
                 try:
                     sig.disconnect(slot)
@@ -249,6 +259,7 @@ class SpliceBar(QWidget):
         self.trim = trim
         trim.splices_changed.connect(self._sync)
         trim.wave.spliced.connect(self._sync)   # (also when loaded: the panel's are held)
+        trim.wave.picked.connect(self._sync)
         trim.wave.menu_asked.connect(self.menu)
         trim.wave.set_cutting(self.cut.isChecked())
         self._sync()
@@ -256,9 +267,29 @@ class SpliceBar(QWidget):
     def _cutting(self, on: bool):
         self.trim.wave.set_cutting(on)
 
-    def _sync(self):
-        n = len(self.trim.wave.splices)
+    def _fade(self, key: str, on: bool):
+        """Fade in / Fade out clicked: the picked splice's fade on (1 s, or a third of
+        a short splice) or off."""
+        wave = self.trim.wave
+        i = wave.selected
+        if i is None or not 0 <= i < len(wave.splices):
+            return
+        a, b = wave.splices[i]
+        wave.set_part_fade(i, key, min(1.0, (b - a) / 3) if on else 0.0)
+        usage.used("edit-wave-fade")
+
+    def _sync(self, *_a):
+        wave = self.trim.wave
+        n = len(wave.splices)
         self.list.setText(_("Splices ({n})", n=n))
+        i = wave.selected
+        picked = i is not None and 0 <= i < n
+        fades = wave.part_fades(i) if picked else (0.0, 0.0)
+        for b, s in zip(self.fades.values(), fades):
+            b.blockSignals(True)   # (shows the splice's own: not a click)
+            b.setChecked(s > 0)
+            b.blockSignals(False)
+            b.setVisible(picked)
         if self.popup is not None and self.popup.isVisible():
             self.popup.fill()
 

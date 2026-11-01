@@ -260,3 +260,30 @@ def test_scrolling_zooms_the_big_waveform(window, monkeypatch):  # noqa: F811
     QApplication.sendEvent(wave, ev)
     assert wave.view[1] - wave.view[0] < span
     d.close()
+
+
+def test_add_splices_on_a_click_in_a_splice_picks_it_and_fade_buttons_fade_it(
+        window, monkeypatch):  # noqa: F811
+    d = _dialog(window, monkeypatch)
+    eff, bar = d.effects, d.adv.splices
+    wave = eff.trim.wave
+    L = wave.length
+    eff.trim.load(soundfx.clean({"splices": [[L * 0.2, L * 0.6]]}))
+    bar.cut.setChecked(True)                         # Add splices stays on
+    assert all(b.isHidden() for b in bar.fades.values())
+    QTest.mouseClick(wave, LEFT, NO, _at(wave, L * 0.4))
+    assert wave.selected == 0 and wave._first is None   # picked, not a new splice
+    assert len(wave.splices) == 1 and wave._env_points()  # its dots show
+    fade_in, fade_out = bar.fades["fade_in"], bar.fades["fade_out"]
+    assert fade_in.isVisible() and not fade_in.isChecked()
+    fade_in.click()
+    assert wave.part_fades(0) == (1.0, 0.0)
+    fade_out.click()
+    assert eff.fx()["parts"] == [{"fade_in": 1.0, "fade_out": 1.0}]
+    fade_in.click()                                  # off again
+    assert wave.part_fades(0) == (0.0, 1.0)
+    QTest.keyClick(wave, Qt.Key.Key_Escape)          # the whole sound: buttons go
+    assert fade_in.isHidden()
+    QTest.mouseClick(wave, LEFT, NO, _at(wave, L * 0.8))   # outside: a new one starts
+    assert wave._first is not None
+    d.close()
