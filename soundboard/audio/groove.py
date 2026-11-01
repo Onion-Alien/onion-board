@@ -14,6 +14,10 @@ the tempo and style are worked out again from the last few seconds now and then.
     g = Groove()
     g.feed(data, frac)          # each tick: the playing sound's samples and position
     g.style, g.bpm, g.beat(now) # "rock", 128.0, 41.27 (beats since it started)
+    g.music                     # False: a soundbite or someone talking, not a song
+
+A new sound is also read ahead once, its first PEEK_S seconds at once (it's all there,
+decoded), so whether it's a song is known the moment it starts, not seconds in.
 """
 from __future__ import annotations
 
@@ -42,6 +46,11 @@ ON_BEAT_STICK = 0.1      # (and the dance stays while that share is this near th
 BREAK_CONF = 0.6         # electronic stays it through a breakdown this sure of the beat
 BPM_LO, BPM_HI = 60.0, 185.0
 STYLES = ("pop", "electronic", "rock", "hiphop", "chill", "speech")
+CLIP_S = 6.0             # a sound shorter than this is a soundbite, never a song
+PEEK_S = 8.0             # seconds of a new sound read ahead at once (music or not)
+# a talk video (speech with music under it): this share of voice-range dips and quiet
+# frames (features "dips", "quiet"), and a beat this unsure at most
+DIPS, QUIET, TALK_CONF = 0.25, 0.4, 0.55
 
 _HANN = np.hanning(WIN).astype(np.float32)
 _HZ = SR / WIN
@@ -65,6 +74,22 @@ def _db(x):
     return 10 * np.log10(np.maximum(x, 1e-12))
 
 
+def _peek(data: np.ndarray, frac: float) -> str:
+    """The style the next PEEK_S seconds of a sound (from `frac` through it) sound like,
+    read all at once ("" if too little is left to tell)."""
+    a = int(min(max(frac, 0.0), 1.0) * len(data))
+    seg = data[a:a + int(PEEK_S * SR)]
+    mono = seg.mean(axis=1, dtype=np.float32)
+    if data.dtype == np.int16:
+        mono /= 32768.0
+    g = Groove()
+    starts = HOP * np.arange(max(0, (len(mono) - WIN) // HOP))
+    if len(starts) < STYLE_MIN:
+        return ""
+    g._read(mono[starts[:, None] + np.arange(WIN)], starts / SR)   # (one tempo check)
+    return g.guess()
+
+
 class Groove:
     """The beat and style of one playing sound (`feed` it each tick)."""
 
@@ -73,6 +98,8 @@ class Groove:
 
     def reset(self):
         self.style = ""        # "" until it's heard enough to guess
+        self._clip = False     # a sound shorter than CLIP_S (a soundbite)
+        self._peeked = ""      # the style its first seconds sound like, read ahead
         self.bpm = 0.0
         self.confidence = 0.0  # how sure of the beat (0..1)
         self._conf_slow = 0.0  # ...averaged over a few seconds (what the style goes by)
@@ -118,6 +145,9 @@ class Groove:
         if id(data) != self._data_id:   # another sound
             self.reset()
             self._data_id = id(data)
+            self._clip = len(data) < CLIP_S * SR
+            if not self._clip:
+                self._peeked = _peek(data, frac)
         play = int(min(max(frac, 0.0), 1.0) * len(data))   # the sample playing now
         end = max(0, min(len(data), play + int(LOOK * SR)) - WIN)   # (a little ahead)
         if self._pos < 0 or end < self._pos or end - self._pos > BACKFILL * HOP:
@@ -383,6 +413,17 @@ class Groove:
         return float(np.mean(np.abs(beats[:, None] - hits[None, :]).min(axis=1) < ON_BEAT_NEAR))
 
     # ------------------------------------------------------------------ style
+    @property
+    def music(self) -> bool | None:
+        """Whether a song is playing: False for a soundbite (shorter than CLIP_S) or
+        someone talking, None while it's too soon to tell (the radio's first seconds).
+        Before the style is settled a sound goes by what its first seconds sounded like
+        when they were read ahead."""
+        if self._clip:
+            return False
+        style = self.style or self._peeked
+        return (style != "speech") if style else None
+
     def features(self) -> dict:
         """The last few seconds, summed up: what guess() goes by."""
         n = min(self._n, KEEP)
@@ -392,6 +433,14 @@ class Groove:
         med = float(np.median(db[live])) if live.any() else float(db.max())
         rel = lambda row: float(np.mean((row - db)[live])) if live.any() else -99.0  # noqa: E731
         sm = np.convolve(db, np.ones(25) / 25, "valid")   # 1/4 s steps: phrasing, not hits
+        # talking: the voice range keeps dropping 20 dB under its peak (the gaps between
+        # words), and many frames are quiet next to the second round them. Music under
+        # the words fills the gaps; a beat with no singer fills the quiet.
+        pw = 10 ** (db / 10)
+        near = np.convolve(pw, np.ones(100) / 100, "same")
+        v = r[3]
+        top = np.max(np.lib.stride_tricks.sliding_window_view(
+            np.pad(v, 50, mode="edge"), 101), axis=1)[:len(v)] if len(v) else v
         return {"bpm": self.bpm, "conf": self._conf_slow, "four": self._four,
                 "on_beat": self._on_beat(),
                 "gaps": float(np.mean(db < med - 15)),
@@ -400,7 +449,9 @@ class Groove:
                 "cent": float(np.mean(r[7][live])) if live.any() else 0.0,
                 "dyn": float(np.std(sm)) if len(sm) else 0.0,
                 "onsets": float(np.mean(r[0] > np.percentile(r[0], 90) * 0.6)),
-                "loud": med}
+                "loud": med,
+                "dips": float(np.mean(v < top - 20)) if len(v) else 0.0,
+                "quiet": float(np.mean(pw < 0.5 * near)) if len(pw) else 0.0}
 
     def guess(self) -> str:
         """The style the last few seconds sound like (one of STYLES). Rules of thumb
@@ -431,6 +482,8 @@ class Groove:
         bpm, conf = f["bpm"], f["conf"]
         if f["gaps"] > 0.25 and f["dyn"] > 9 and f["onsets"] < 0.45 and conf < 0.5:
             return "speech"
+        if f.get("dips", 0.0) > DIPS and f.get("quiet", 0.0) > QUIET and conf < TALK_CONF:
+            return "speech"   # (a talk video: music under it, so the first rule misses it)
         if f["loud"] < -22:
             return "chill"
         if (f["flat"] > 0.37 and f["high"] > -15) or (
