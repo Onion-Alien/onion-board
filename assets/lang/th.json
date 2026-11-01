@@ -4657,7 +4657,6 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "ยังอยากให้เสียงรบกวนพื้นหลังหายไปอยู่ไหม? เปิด<b>ไมค์ไร้เสียงรบกวน</b>ในแท็บ<b>เสียงพูด</b>ของ Onion Board แทน: มันทำให้เสียงพูดของคุณสะอาด และไม่แตะต้องเสียงเอฟเฟกต์ของคุณเลย",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "หน้าต่างใหญ่ขึ้น: รูปคลื่นใหญ่ เอฟเฟกต์กับอีควอไลเซอร์อยู่ข้างกัน",
   "Add effect": "เพิ่มเอฟเฟกต์",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "ลากที่จับเพื่อตัดต้นและท้าย Ctrl+เลื่อนเพื่อซูม Shift+เลื่อนเพื่อขยับ",
   "No effect has that name.": "ไม่มีเอฟเฟกต์ชื่อนี้",
   "No effects on yet.": "ยังไม่มีเอฟเฟกต์ที่เปิดอยู่",
   "Pick an effect to turn on": "เลือกเอฟเฟกต์ที่จะเปิด",
@@ -4680,5 +4679,6 @@
   "Save as a new preset": "บันทึกเป็นพรีเซ็ตใหม่",
   "Save what you have now into “{name}”": "บันทึกค่าตอนนี้ลงใน “{name}”",
   "Update “{name}”": "อัปเดต “{name}”",
-  "Update, reset or save as a new preset": "อัปเดต รีเซ็ต หรือบันทึกเป็นพรีเซ็ตใหม่"
+  "Update, reset or save as a new preset": "อัปเดต รีเซ็ต หรือบันทึกเป็นพรีเซ็ตใหม่",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "ลากที่จับเพื่อตัดต้นและท้าย Ctrl+เลื่อนเพื่อซูม ลากด้วยปุ่มขวาของเมาส์ หรือ Shift+เลื่อน เพื่อขยับ"
 }

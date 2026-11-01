@@ -4744,7 +4744,6 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Θέλεις παρ' όλα αυτά να φύγει ο θόρυβος φόντου; Άνοιξε αντί γι' αυτό το <b>Καθαρό μικρόφωνο</b> στην καρτέλα <b>Φωνή</b> του Onion Board: καθαρίζει τη φωνή σου και δεν αγγίζει ποτέ τους ήχους σου.",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "Μεγαλύτερο παράθυρο: η κυματομορφή μεγάλη, τα εφέ και ο ισοσταθμιστής δίπλα δίπλα",
   "Add effect": "Προσθήκη εφέ",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Σύρε τις λαβές για να κόψεις την αρχή και το τέλος. Ctrl+κύλιση για ζουμ, Shift+κύλιση για μετακίνηση.",
   "No effect has that name.": "Κανένα εφέ δεν έχει αυτό το όνομα.",
   "No effects on yet.": "Κανένα εφέ ενεργό ακόμα.",
   "Pick an effect to turn on": "Διάλεξε ένα εφέ για να το ενεργοποιήσεις",
@@ -4767,5 +4766,6 @@
   "Save as a new preset": "Αποθήκευση ως νέα προεπιλογή",
   "Save what you have now into “{name}”": "Αποθήκευση των τωρινών ρυθμίσεων στο «{name}»",
   "Update “{name}”": "Ενημέρωση «{name}»",
-  "Update, reset or save as a new preset": "Ενημέρωση, επαναφορά ή αποθήκευση ως νέα προεπιλογή"
+  "Update, reset or save as a new preset": "Ενημέρωση, επαναφορά ή αποθήκευση ως νέα προεπιλογή",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Σύρε τις λαβές για να κόψεις την αρχή και το τέλος. Ctrl+κύλιση για ζουμ. Σύρε με το δεξί κουμπί του ποντικιού, ή Shift+κύλιση, για μετακίνηση."
 }
