@@ -262,6 +262,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
             outer.addWidget(panel.picked)
             panel.picked.setProperty("pinned", True)
             panel.show_picked_row(True)
+        self._make_bar_controls()
         outer.addWidget(self.bar)
         # cards or a list: one setting for both (the window keeps the voice changer's)
         self.fx.view_toggle.changed.connect(self.ai.set_view)

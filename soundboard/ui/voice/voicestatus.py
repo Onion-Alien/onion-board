@@ -205,6 +205,9 @@ class VoiceStatusBar(QFrame):
             for w in order:
                 row.addWidget(w)
                 w.show()
+        # the ear says "what others hear:" before the chips; with none, it said nothing
+        self.lbl_heard.setVisible(bool(items))
+        self._right.setVisible(bool(items))
         row.invalidate()
         self._fit()
 

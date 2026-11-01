@@ -2656,7 +2656,6 @@
   ],
   "AI voice off": "Yapay zekâ sesi kapalı",
   "AI voice: {voice}, starting.": "Yapay zekâ sesi: {voice}, başlıyor.",
-  "AI voice: {voice}.": "Yapay zekâ sesi: {voice}.",
   "No mic open": "Mikrofon açık değil",
   "What others hear from your mic": "Diğerlerinin mikrofonunuzdan duyduğu",
   "Getting Python ready…": "Python hazırlanıyor…",
@@ -3978,7 +3977,6 @@
   "The computer voice ({voice}) speaks for you.": "Bilgisayar sesi ({voice}) sizin yerinize konuşur.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Mikrofonunuzu değiştiren her sesi kapatır. Açmak onları geri getirir.",
   "Turns on: {voices}": "Açar: {voices}",
-  "Voice changer: {voice}.": "Ses değiştirici: {voice}.",
   "Voices on or off": "Sesler açık ya da kapalı",
   "What you say is said in {language}.": "Söylediğiniz şey {language} söylenir.",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board beklenmedik şekilde kapandı, bu yüzden yeniden başladı.",
@@ -4814,5 +4812,8 @@
   "Speaks your typed lines": "Yazdığın satırları söyler",
   "From a link…": "Bağlantıdan…",
   "Pick one of ours": "Bizimkilerden seç",
-  "Remove server": "Sunucuyu kaldır"
+  "Remove server": "Sunucuyu kaldır",
+  "Pause this voice (click again to bring it back)": "Bu sesi duraklat (geri getirmek için yine tıkla)",
+  "Paused: click to turn this voice back on": "Duraklatıldı: bu sesi yeniden açmak için tıkla",
+  "Turn this voice off (Voices ON won't bring it back)": "Bu sesi kapat (Sesler AÇIK onu geri getirmez)"
 }

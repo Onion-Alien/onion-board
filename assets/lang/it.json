@@ -2656,7 +2656,6 @@
   ],
   "AI voice off": "Voce IA spenta",
   "AI voice: {voice}, starting.": "Voce IA: {voice}, avvio.",
-  "AI voice: {voice}.": "Voce IA: {voice}.",
   "No mic open": "Nessun microfono aperto",
   "What others hear from your mic": "Ciò che gli altri sentono dal tuo microfono",
   "Getting Python ready…": "Preparazione di Python…",
@@ -3978,7 +3977,6 @@
   "The computer voice ({voice}) speaks for you.": "La voce sintetica ({voice}) parla per te.",
   "Turns off every voice changing your mic. Switching it on brings them back.": "Spegne ogni voce che cambia il tuo microfono. Riaccenderlo le riporta.",
   "Turns on: {voices}": "Accende: {voices}",
-  "Voice changer: {voice}.": "Modificatore di voce: {voice}.",
   "Voices on or off": "Voci attive o spente",
   "What you say is said in {language}.": "Quello che dici viene detto in {language}.",
   "Onion Board closed unexpectedly, so it started again.": "Onion Board si è chiuso inaspettatamente, quindi è ripartito.",
@@ -4814,5 +4812,8 @@
   "Speaks your typed lines": "Dice le frasi che scrivi",
   "From a link…": "Da un link…",
   "Pick one of ours": "Scegli una delle nostre",
-  "Remove server": "Rimuovi server"
+  "Remove server": "Rimuovi server",
+  "Pause this voice (click again to bring it back)": "Metti in pausa questa voce (clicca di nuovo per riaverla)",
+  "Paused: click to turn this voice back on": "In pausa: clicca per riaccendere questa voce",
+  "Turn this voice off (Voices ON won't bring it back)": "Spegni questa voce (Voci ON non la riporterà)"
 }
