@@ -4877,5 +4877,6 @@
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "{n} звук не можа да се изтегли сега. Ще се опита отново сам след 2 часа.",
     "{n} звука не можаха да се изтеглят сега. Ще се опита отново сам след 2 часа."
-  ]
+  ],
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Звуците ти сега не отиват в микрофона. За да ги пращаш в него, задай <b>{field}</b> на <b>{choice}</b> по-горе."
 }

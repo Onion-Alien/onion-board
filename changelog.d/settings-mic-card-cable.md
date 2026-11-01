@@ -1,0 +1,1 @@
+- Settings: on the virtual cable, the Mic effect card no longer lists a mic it isn't on ("Not installed, In use"); one line says how to send your sounds into your mic instead.

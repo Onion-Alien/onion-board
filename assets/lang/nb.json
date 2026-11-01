@@ -4877,5 +4877,6 @@
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "{n} lyd kunne ikke lastes ned nå. Den prøves igjen av seg selv om 2 timer.",
     "{n} lyder kunne ikke lastes ned nå. De prøves igjen av seg selv om 2 timer."
-  ]
+  ],
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Lydene dine går ikke inn i mikrofonen din nå. For å sende dem inn i den, sett <b>{field}</b> til <b>{choice}</b> over."
 }

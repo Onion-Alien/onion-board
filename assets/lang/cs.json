@@ -4970,5 +4970,6 @@
     "{n} zvuk teď nešel stáhnout. Zkusí se to znovu samo za 2 hodiny.",
     "{n} zvuky teď nešly stáhnout. Zkusí se to znovu samo za 2 hodiny.",
     "{n} zvuků teď nešlo stáhnout. Zkusí se to znovu samo za 2 hodiny."
-  ]
+  ],
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Tvoje zvuky teď nejdou do mikrofonu. Pokud je tam chceš posílat, nastav nahoře <b>{field}</b> na <b>{choice}</b>."
 }

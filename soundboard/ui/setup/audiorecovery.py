@@ -469,6 +469,13 @@ class RecoveryCard(QFrame):
                                 "won't hear your sounds."))
         self.new_mic.setWordWrap(True)
         v.addWidget(self.new_mic)
+        # sent elsewhere (the cable): no mic row, so say how to send into the mic instead
+        self.not_mic = QLabel(_("Your sounds don't go into your mic now. To send them into "
+                                "it, set <b>{field}</b> to <b>{choice}</b> above.",
+                                field=_("Send my sounds to"), choice=_("My mic (normal)")))
+        self.not_mic.setWordWrap(True)
+        self.not_mic.hide()
+        v.addWidget(self.not_mic)
         self.list = QVBoxLayout()
         self.list.setSpacing(6)
         v.addLayout(self.list)
@@ -603,6 +610,10 @@ class RecoveryCard(QFrame):
 
     def _rebuild(self):
         mics = self.shown()
+        if self.mw.cfg.route != "mic" and not any(has_effect(m["state"]) for m in mics):
+            mics = []   # sent elsewhere (the cable) and on no mic: no mic to talk about
+        self.new_mic.setVisible(bool(mics))
+        self.not_mic.setVisible(not mics)
         sig = (tuple((m["guid"], m["name"], m["active"], m["state"], m["pa"]) for m in mics),
                self.mw.cfg.mic_device)
         if sig == self._shown:

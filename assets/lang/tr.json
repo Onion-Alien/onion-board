@@ -4877,5 +4877,6 @@
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "{n} ses şu an indirilemedi. 2 saat sonra kendiliğinden yeniden denenecek.",
     "{n} ses şu an indirilemedi. 2 saat sonra kendiliğinden yeniden denenecek."
-  ]
+  ],
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Seslerin şu an mikrofonuna gitmiyor. Onları mikrofona göndermek için yukarıda <b>{field}</b> ayarını <b>{choice}</b> yap."
 }

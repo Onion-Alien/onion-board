@@ -4877,5 +4877,6 @@
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "{n} ήχος δεν κατέβηκε τώρα. Θα ξαναδοκιμαστεί μόνος του σε 2 ώρες.",
     "{n} ήχοι δεν κατέβηκαν τώρα. Θα ξαναδοκιμαστούν μόνοι τους σε 2 ώρες."
-  ]
+  ],
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Οι ήχοι σου δεν πηγαίνουν τώρα στο μικρόφωνό σου. Για να τους στέλνεις εκεί, βάλε το <b>{field}</b> σε <b>{choice}</b> παραπάνω."
 }

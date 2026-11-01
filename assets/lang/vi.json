@@ -4784,5 +4784,6 @@
   "Couldn't reach Myinstants. It tries again by itself in 2 hours.": "Không kết nối được tới Myinstants. Sẽ tự thử lại sau 2 giờ.",
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "Chưa tải được {n} âm thanh lúc này. Sẽ tự thử lại sau 2 giờ."
-  ]
+  ],
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Âm thanh của bạn hiện không đi vào mic. Để gửi vào mic, hãy đặt <b>{field}</b> thành <b>{choice}</b> ở trên."
 }

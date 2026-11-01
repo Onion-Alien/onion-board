@@ -4877,5 +4877,6 @@
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "{n} hangot most nem sikerült letölteni. 2 óra múlva magától újra próbálja.",
     "{n} hangot most nem sikerült letölteni. 2 óra múlva magától újra próbálja."
-  ]
+  ],
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "A hangjaid most nem mennek a mikrofonodba. Ha oda akarod küldeni őket, fent állítsd a(z) <b>{field}</b> mezőt erre: <b>{choice}</b>."
 }

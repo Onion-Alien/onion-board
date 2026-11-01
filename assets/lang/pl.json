@@ -4970,5 +4970,6 @@
     "{n} dźwięku nie udało się teraz pobrać. Spróbuje ponownie sam za 2 godziny.",
     "{n} dźwięków nie udało się teraz pobrać. Spróbuje ponownie sam za 2 godziny.",
     "{n} dźwięków nie udało się teraz pobrać. Spróbuje ponownie sam za 2 godziny."
-  ]
+  ],
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Twoje dźwięki nie trafiają teraz do mikrofonu. Aby je tam wysyłać, ustaw powyżej <b>{field}</b> na <b>{choice}</b>."
 }

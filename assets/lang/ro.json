@@ -4970,5 +4970,6 @@
     "{n} sunet nu a putut fi descărcat acum. Se încearcă din nou singur peste 2 ore.",
     "{n} sunete nu au putut fi descărcate acum. Se încearcă din nou singur peste 2 ore.",
     "{n} de sunete nu au putut fi descărcate acum. Se încearcă din nou singur peste 2 ore."
-  ]
+  ],
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Sunetele tale nu ajung acum în microfon. Ca să le trimiți acolo, setează mai sus <b>{field}</b> la <b>{choice}</b>."
 }

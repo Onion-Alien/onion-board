@@ -4784,5 +4784,6 @@
   "Couldn't reach Myinstants. It tries again by itself in 2 hours.": "Tidak bisa menjangkau Myinstants. Akan dicoba lagi otomatis dalam 2 jam.",
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "{n} suara tidak bisa diunduh sekarang. Akan dicoba lagi otomatis dalam 2 jam."
-  ]
+  ],
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Suaramu sekarang tidak masuk ke mikmu. Untuk mengirimnya ke sana, atur <b>{field}</b> ke <b>{choice}</b> di atas."
 }

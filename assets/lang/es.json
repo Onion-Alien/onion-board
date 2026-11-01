@@ -4877,5 +4877,6 @@
   "{n} sound couldn't be downloaded right now. It's tried again by itself in 2 hours.": [
     "{n} sonido no se pudo descargar ahora. Se volverá a intentar solo en 2 horas.",
     "{n} sonidos no se pudieron descargar ahora. Se volverá a intentar solo en 2 horas."
-  ]
+  ],
+  "Your sounds don't go into your mic now. To send them into it, set <b>{field}</b> to <b>{choice}</b> above.": "Tus sonidos no van a tu micrófono ahora. Para enviarlos ahí, pon <b>{field}</b> en <b>{choice}</b> arriba."
 }
