@@ -329,12 +329,13 @@ def test_a_new_zoom_shows_all_at_once_never_tile_by_tile(qapp):
     """While a new zoom was drawn, its tiles showed one by one over the old ones
     stretched tile by tile, and each stretched tile blurred into the background at
     its edges: a grid of squares over the map. Now the last view stands in as one
-    picture, and the new zoom shows when all of it is drawn."""
-    rings, labels = outlines()
-    m = world_map(rings, labels, zoom=2.0)
+    picture, and the new zoom shows when all of it is drawn. (No country names: they're
+    drawn over the tiles, not on them.)"""
+    rings, _labels = outlines()
+    m = world_map(rings, [], zoom=2.0)
     m.set_points([{"id": f"s{i}", "la": -40.0 + i, "lo": -100.0 + 2 * i, "k": i}
                   for i in range(80)])
-    m._reveal_t0 = None                        # (the first stations' pop-in: not here)
+    m._reveal_t0 = None                        # (the first stations' fade-in: not here)
     m.show()
 
     def done():
@@ -377,7 +378,7 @@ def test_a_new_zoom_shows_all_at_once_never_tile_by_tile(qapp):
     m.close()
 
 
-def test_bun_waits_on_the_map_and_the_first_stations_pop_in(qapp):
+def test_bun_waits_on_the_map_and_the_first_stations_fade_in(qapp):
     from soundboard.ui.radio import flatmap
     m = FlatMap()
     m.resize(600, 400)
@@ -387,12 +388,8 @@ def test_bun_waits_on_the_map_and_the_first_stations_pop_in(qapp):
     m.set_land([], [])
     m.set_points([{"id": f"s{i}", "la": 0.0, "lo": float(i), "k": i} for i in range(50)])
     assert not m._loading.isVisible() and m.revealing()
-    t = time.monotonic() - m._reveal_t0
-    shown = flatmap._pop((t - m._delay) / flatmap.POP_S)
-    assert (shown < 0.05).sum() > 40           # not all at once...
-    assert m._delay[-10:].mean() < m._delay[:10].mean()   # ...the most listened first
-    m.repaint()                                # (drawn live till they're all in)
-    end = time.monotonic() + flatmap.REVEAL_S + 2
+    m.repaint()
+    end = time.monotonic() + flatmap.NAMES_FIRST_S + flatmap.REVEAL_S + 2
     while m.revealing() and time.monotonic() < end:
         qapp.processEvents()
         time.sleep(0.005)
@@ -407,9 +404,8 @@ def test_bun_waits_on_the_map_and_the_first_stations_pop_in(qapp):
 
 
 def test_the_country_names_show_before_the_dots(qapp):
-    """The dots popped in over a map with no names, and the names came only once
-    they were all in. Now the names come first (even when the stations beat the land
-    in), and the dots after."""
+    """The names come first (even when the stations beat the land in), and the dots
+    fade in after."""
     from soundboard.ui.radio import flatmap
     rings, labels = outlines()
     m = FlatMap()
@@ -420,50 +416,38 @@ def test_the_country_names_show_before_the_dots(qapp):
     m.set_land(rings, labels)
     assert process_events(qapp, lambda: m._land_set, 5)   # (made a part a step)
     assert m._reveal_t0 > time.monotonic() + flatmap.NAMES_FIRST_S / 2
-    end = time.monotonic() + 2
-    while m._names_pic is None and time.monotonic() < end:   # (drawn a slice a paint)
-        m.grab()
-        qapp.processEvents()
-    assert m._names_pic is not None                 # the names are on the map...
-    t = time.monotonic() - m._reveal_t0
-    assert (flatmap._pop((t - m._delay) / flatmap.POP_S) < 0.05).all()   # ...no dots yet
+    drawn = []
+    real = m._sprite
+    m._sprite = lambda *a: drawn.append(a) or real(*a)
+    m.grab()
+    assert m._label_pm and not drawn                # the names are on the map, no dots yet
     end = time.monotonic() + flatmap.NAMES_FIRST_S + flatmap.REVEAL_S + 2
     while m.revealing() and time.monotonic() < end:
         qapp.processEvents()
         time.sleep(0.005)
-    assert not m.revealing() and m._names_pic is None
+    assert not m.revealing()
+    m.grab()
+    assert drawn
     m.close()
 
 
-def test_the_dots_done_popping_in_are_drawn_once(qapp):
-    """Every frame of the pop-in drew all ~3000 dots again (4-7 ms of draw calls each
-    16 ms, the most as the last ones came in) and the sound playing skipped. A dot
-    done growing goes into a picture kept for the view, drawn once."""
-    from soundboard.ui.radio import flatmap
+def test_new_stations_dont_draw_the_map_again(qapp):
+    """The dots aren't on the map's tiles (drawn over them every paint, ~1.5 ms for
+    3000): a new station list, a filter, leaves the drawn land as it is."""
     m = FlatMap()
     m.resize(600, 400)
     m.show()
-    m.set_land([], [])
+    m.set_land(*outlines())
+    landed(m)
     m.set_points([{"id": f"s{i}", "la": (i % 50) - 25.0, "lo": i * 1.1 - 165, "k": i}
                   for i in range(300)])
-    m._delay[:] = 0                                # all in, still revealing
-    m._reveal_t0 = time.monotonic() - flatmap.POP_S - 0.1
+    assert process_events(qapp, lambda: (m.grab(), not m.busy())[1], 10)
+    level, tiles = m._level(), dict(m._tiles)
+    m.set_points([{"id": f"t{i}", "la": (i % 40) - 20.0, "lo": i * 1.3 - 160, "k": i}
+                  for i in range(200)])
     m.grab()
-    view, pic, drawn = m._dots_pic
-    xs, ys = m._screen()
-    pad = m._r * m._grow() * np.where(m._hot, flatmap.GLOW, 1.0) + 2   # a glow counts
-    seen = (xs > -pad) & (xs < m.width() + pad) & (ys > -pad) & (ys < m.height() + pad)
-    assert drawn.sum() == seen.sum() > 100
-    m.grab()
-    assert m._dots_pic[1] is pic                  # the same picture, nothing drawn again
-    m.zoom = 2.0                                  # a new view: a new picture
-    m.grab()
-    assert m._dots_pic[0] != view
-    end = time.monotonic() + 2
-    while m.revealing() and time.monotonic() < end:
-        qapp.processEvents()
-        time.sleep(0.005)
-    assert m._dots_pic is None                    # let go once they're all in
+    assert m._level() == level and not m.busy()
+    assert all(m._tiles.get(k) is pm for k, pm in tiles.items())
     m.close()
 
 

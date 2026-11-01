@@ -20,7 +20,7 @@ from soundboard.ui.radio.mapparts import LAT_BOTTOM, LAT_TOP, _mix
 TILE = 512                          # device pixels a side
 TILE_RING = 1                       # tiles drawn ahead (and kept) round the view
 BASE_ZOOM = 1.0                     # the whole world's land, zoomed out: under everything
-# New tiles (zoom, new dots, theme, a drag onto new ground) are drawn a slice at a time
+# New tiles (zoom, theme, a drag onto new ground) are drawn a slice at a time
 # while stand-ins show: Qt keeps Python's lock through each draw call, and the audio
 # threads wait out one call per numpy step, so 20-40 ms of drawing in one go made the
 # cable 10-20 ms late (a skip) even with every call under 1 ms. A slice, then a break.
@@ -39,20 +39,18 @@ class MapTiles(_Base):
         _land_ver: int
         _pics: dict[tuple, tuple]
         _queue: list[tuple]
-        _room_job: tuple | None
         _settle: QTimer
         _slice: QTimer
         _stable: tuple | None
         _tiles: dict[tuple, QPixmap]
-        _ver: int
         cx: float
         cy: float
         zoom: float
 
         def _copies(self) -> list[int]: ...
         def _scale(self) -> float: ...
-        def _map_steps(self, p: QPainter, tr: QTransform, s: float, rect: QRectF,
-                       land_only: bool = False) -> Iterator[object]: ...
+        def _map_steps(self, p: QPainter, tr: QTransform, s: float,
+                       rect: QRectF) -> Iterator[object]: ...
 
     # ------------------------------------------------------------------ the tiles
     def _origin(self, k: int = 0, s: float | None = None) -> QPointF:
@@ -63,9 +61,11 @@ class MapTiles(_Base):
 
     def _level(self, zoom: float | None = None) -> tuple:
         """What tiles are drawn for: the scale (pixels per degree; at `zoom`, or the
-        view's), the screen's pixel ratio, and what's on the map (_ver)."""
+        view's), the screen's pixel ratio, and the land on them (_land_ver). The
+        stations and names aren't on the tiles: they're drawn over them every paint,
+        so new stations never draw the tiles again."""
         s = self._scale() if zoom is None else self._scale() / self.zoom * zoom
-        return (round(s, 6), self.devicePixelRatioF(), self._ver)
+        return (round(s, 6), self.devicePixelRatioF(), self._land_ver)
 
     def _base_level(self) -> tuple:
         """The whole world's land, small (BASE_ZOOM): the last stand-in, under all."""
@@ -130,8 +130,7 @@ class MapTiles(_Base):
                 tr = QTransform()
                 tr.translate(180 * s - i * TILE / dpr, LAT_TOP * s - j * TILE / dpr)
                 tr.scale(s, s)
-                yield from self._map_steps(p, tr, s, QRectF(0, 0, w / dpr, h / dpr),
-                                           land_only=len(level) > 3)
+                yield from self._map_steps(p, tr, s, QRectF(0, 0, w / dpr, h / dpr))
             finally:
                 p.end()
         return pm, steps()
@@ -282,5 +281,5 @@ class MapTiles(_Base):
         self._slice.stop()
 
     def busy(self) -> bool:
-        """Tiles still to draw, or the dots' places still to work out (tests, benches)."""
-        return self._build is not None or bool(self._queue) or self._room_job is not None
+        """Tiles still to draw (tests, benches)."""
+        return self._build is not None or bool(self._queue)
