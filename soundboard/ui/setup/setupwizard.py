@@ -525,8 +525,14 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
                      age / 1000)
         return True
 
+    def keyPressEvent(self, ev):
+        if ev.key() == Qt.Key.Key_Escape:   # one stray Esc mustn't lose the whole set-up:
+            ev.accept()                     # only the guide's own X closes it
+            return
+        super().keyPressEvent(ev)
+
     def reject(self):
-        """Esc / the window's X. Mid-install, check first: the install carries on
+        """The guide's X. Mid-install, check first: the install carries on
         either way, and reopening the guide picks it back up. While the mic is set up,
         the guide stays open (_locked) and says so, so the X doesn't look broken."""
         if self._locked():
