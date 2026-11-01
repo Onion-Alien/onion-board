@@ -1,0 +1,2 @@
+- Setup: with the virtual cable installed, a "Virtual cable | My mic" switch sits on top of Send your sounds, and the cable view no longer offers "Put my sounds into my mic".
+- Setup: the icons in Send your sounds line up with their text.

@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QSize, Qt
 from PySide6.QtWidgets import (
+    QButtonGroup,
     QCheckBox,
     QComboBox,
     QFrame,
@@ -18,6 +19,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QPushButton,
     QScrollArea,
+    QSizePolicy,
     QVBoxLayout,
     QWidget,
 )
@@ -47,6 +49,7 @@ from soundboard.ui.window.sidebar import SHUT_W
 from soundboard.ui.setup import cableconfirm
 from soundboard.ui.kit.failreport import FailReport
 from soundboard.ui.kit.glow import Glow
+from soundboard.ui.kit.iconrow import CapIcon
 from soundboard.ui.kit.widgets import Meter
 from soundboard.ui.kit.wheelguard import AppStyle, no_wheel
 
@@ -141,6 +144,33 @@ class SetupPageBuild:
                            beside=mw.btn_mictips, end=(mw.mic_pill,))
         assert howcard.heading_title is not None   # (titled)
         mw.how_title = howcard.heading_title   # renamed for the other routes
+        # the cable is installed: Virtual cable | My mic on top, the way the sound
+        # editor's Simple | Advanced looks (one track, the picked side lit)
+        sw = mw.route_switch = QWidget()
+        sw.setObjectName("modeswitch")
+        sw.setAttribute(Qt.WidgetAttribute.WA_StyledBackground)
+        sh = QHBoxLayout(sw)
+        sh.setContentsMargins(3, 3, 3, 3)
+        sh.setSpacing(2)
+        group = QButtonGroup(sw)
+        mw.seg_cable = QPushButton(_("Virtual cable"))
+        mw.seg_cable.setToolTip(_("Use a free virtual cable instead: you pick it as the "
+                                    "mic in Discord and games"))
+        mw.seg_mic = QPushButton(_("My mic"))
+        mw.seg_mic.setToolTip(_("Onion Board puts your sounds into your real mic, so "
+                                  "Discord and games need no virtual cable and nothing picked"))
+        for b in (mw.seg_cable, mw.seg_mic):
+            b.setObjectName("seg")
+            b.setCheckable(True)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            group.addButton(b)
+            sh.addWidget(b)
+        mw.seg_cable.clicked.connect(lambda: mw.cfg.route != "cable"
+                                     and mw.micctl.use_cable_instead())
+        mw.seg_mic.clicked.connect(lambda: mw.cfg.route != "mic" and mw.micctl.attach_mic())
+        sw.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
+        sw.hide()
+        cv.addWidget(sw, 0, Qt.AlignmentFlag.AlignLeft)
         flow = mw.mic_flow = QFrame()
         flow.setObjectName("micflow")
         fv = QVBoxLayout(flow)
@@ -157,8 +187,8 @@ class SetupPageBuild:
             w.setWordWrap(True)
             row = QHBoxLayout()
             row.setSpacing(8)
-            if ic:
-                row.addWidget(icon_label(ic))
+            if ic:   # on the words' capitals, not the line box (the ticks made it taller)
+                row.addWidget(CapIcon(w, ic))
             else:
                 row.addSpacing(26)
             row.addWidget(w, 1)

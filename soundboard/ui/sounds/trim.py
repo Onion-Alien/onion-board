@@ -189,7 +189,8 @@ class Waveform(QWidget):
             self.update()
             self.picked.emit(i)
 
-    FADE_KEYS = ("fade_in", "fade_out", "fade_in_from", "fade_out_to", "volume")
+    FADE_KEYS = ("fade_in", "fade_out", "fade_in_from", "fade_out_to", "fade_in_to",
+                 "fade_out_from", "volume")
 
     def has_own(self, i: int) -> bool:
         """Splice `i` has settings of its own, beyond its level line (fades, volume)."""
@@ -207,7 +208,7 @@ class Waveform(QWidget):
             return
         (a, b), p = self.splices[i], dict(self.parts[i])
         other = float(p.get("fade_out" if key == "fade_in" else "fade_in", 0.0))
-        p[key] = round(min(max(seconds, 0.0), b - a - other, soundfx.MAX_FADE_S), 2)
+        p[key] = round(min(max(seconds, 0.0), b - a - other, soundfx.PART_FADE_S), 2)
         self.parts[i] = soundfx.clean_part(p)
         self.update()
         self.level_moved.emit(i)
@@ -237,9 +238,11 @@ class Waveform(QWidget):
         (a, b), p = self.splices[i], self.parts[i] if i < len(self.parts) else {}
         fi, fo = self.part_fades(i)
         vol = min(float(p.get("volume", 1.0)), 1.0)
-        lo_in = float(p.get("fade_in_from", 0.0)) if fi > 0 else 1.0
-        lo_out = float(p.get("fade_out_to", 0.0)) if fo > 0 else 1.0
-        return [(a, lo_in * vol), (a + fi, vol), (b - fo, vol), (b, lo_out * vol)]
+        top_in, top_out = float(p.get("fade_in_to", 1.0)), float(p.get("fade_out_from", 1.0))
+        lo_in = float(p.get("fade_in_from", 0.0)) if fi > 0 else top_in
+        lo_out = float(p.get("fade_out_to", 0.0)) if fo > 0 else top_out
+        return [(a, lo_in * vol), (a + fi, top_in * vol), (b - fo, top_out * vol),
+                (b, lo_out * vol)]
 
     def _env_lines(self) -> list[int]:
         """Which level lines show: each splice's, and the sound's while its handles
@@ -276,8 +279,8 @@ class Waveform(QWidget):
 
     def _drag_env(self, what: tuple, x: float, y: float):
         """A level point dragged to (x, y): the fade's corners sideways set its length
-        and up and down the splice's volume; its start / end point up and down set the
-        level that fade starts from / ends at."""
+        and up and down that corner's own level; its start / end point up and down set
+        the level that fade starts from / ends at. Each point moves alone."""
         _e, i, k = what
         t = self._t(x)
         if i < 0:
@@ -297,15 +300,15 @@ class Waveform(QWidget):
             self.faded.emit(*self.fades)
             return
         p = self.parts[i]
-        level = round(self._level_of(y), 2)
+        vol = min(float(p.get("volume", 1.0)), 1.0) or 1.0
+        level = round(min(self._level_of(y) / vol, 1.0), 2)
         if k in (1, 2):   # (sideways only, until it's dragged clearly up or down)
             if self._press is not None and abs(y - self._press.y()) >= LEVEL_SLACK:
-                p["volume"] = level
+                p["fade_in_to" if k == 1 else "fade_out_from"] = level
         else:
-            vol = min(float(p.get("volume", 1.0)), 1.0) or 1.0
-            p["fade_in_from" if k == 0 else "fade_out_to"] = round(min(level / vol, 1.0), 2)
+            p["fade_in_from" if k == 0 else "fade_out_to"] = level
         for key, v in (("fade_in", fi), ("fade_out", fo)):
-            p[key] = min(v, soundfx.MAX_FADE_S)
+            p[key] = min(v, soundfx.PART_FADE_S)
         self.parts[i] = soundfx.clean_part(p)
         self.update()
         self.level_moved.emit(i)
@@ -885,7 +888,15 @@ class Waveform(QWidget):
                     continue
                 words = f"{text} {fade:.1f} s"
                 tw = fm.horizontalAdvance(words) + 10
-                box = QRectF(at.x() + 8 if right else at.x() - 8 - tw, at.y() + 6, tw, 16)
+                bx = at.x() + 8 if right else at.x() - 8 - tw
+                lo, hi = pts[0].x() + POINT_R + 4, pts[3].x() - POINT_R - 4 - tw
+                if hi >= lo:   # (inside its line's ends: a long fade's isn't on a dot)
+                    bx = min(max(bx, lo), hi)
+                box = QRectF(bx, at.y() + 6, tw, 16)
+                for o in boxes:   # on the other one: beside it, while there's room
+                    if box.intersects(o.adjusted(-2, -2, 2, 2)) and \
+                            o.right() + 6 + tw <= pts[3].x() - POINT_R - 4:
+                        box.moveLeft(o.right() + 6)
                 while any(box.intersects(o.adjusted(-2, -2, 2, 2)) for o in boxes):
                     box.translate(0, 20)   # (a short splice: one under the other)
                 boxes.append(box)

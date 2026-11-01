@@ -1,4 +1,4 @@
-"""Several voices on (Clean mic, the voice changer, a computer voice): their bars pinned
+"""Several voices on (Clean mic, the voice changer, an AI voice): their bars pinned
 under the voices must not take all the room on a smaller window. The bars go into their
 cards instead (scrolling with the voices), and come back when the window grows."""
 from PySide6.QtWidgets import QApplication
@@ -24,13 +24,16 @@ def test_three_voices_on_leave_the_voices_room(window, monkeypatch):  # noqa: F8
     monkeypatch.setattr(v, "_show_problem", lambda why: None)   # no mic on a test PC
     v.fx._tile["Robot"].click()
     v.clean.set_on(True)
-    b = v.speech.livevoice.b_live
+    b = v.ai.b_start   # on without the add-on's helper
     b.blockSignals(True)
     b.setChecked(True)
     b.blockSignals(False)
+    v.ai.show_picked_row()
+    v._emit_active()
     v._update_bar()
     _settle()
-    bars = [p.picked for k, p in v._barred() if k in ("clean", "fx", "speak")]
+    bars = [p.picked for k, p in v._barred() if k in ("clean", "fx", "ai")]
+    assert len(bars) == 3
     assert all(p.isVisible() and p.property("pinned") for p in bars)   # room: pinned
     for size in ((1100, 800), (560, 900), (560, 700)):
         w.resize(*size)
@@ -43,7 +46,7 @@ def test_three_voices_on_leave_the_voices_room(window, monkeypatch):  # noqa: F8
     _settle()
     assert all(p.isVisible() and p.property("pinned") for p in bars)
     # all off with their ✕: no room kept for bars that aren't there
-    for key in ("clean", "fx", "speak"):
+    for key in ("clean", "fx", "ai"):
         v._bar_ctl[key][1].click()
     _settle()
     assert not any(p.isVisible() for p in bars)

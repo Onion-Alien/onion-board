@@ -515,7 +515,8 @@ class EffectsPanel(QObject):
         old = wave.parts[i]
         wave.parts[i] = soundfx.clean_part({
             **self._knobs(), "volume": self.volume.value() / 100,
-            **{k: old[k] for k in ("fade_in", "fade_out", "fade_in_from", "fade_out_to")
+            **{k: old[k] for k in ("fade_in", "fade_out", "fade_in_from", "fade_out_to",
+                                   "fade_in_to", "fade_out_from")
                if k in old}})
 
     def set_live_layer(self, speed: float, pitch: float, keep: bool, knobs: dict):

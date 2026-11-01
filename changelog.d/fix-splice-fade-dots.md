@@ -1,0 +1,1 @@
+- Edit sound: each of a splice's fade dots moves on its own (dragging the fade-out's top dot no longer moves the fade-in's), and a splice's fades can be as long as the splice, not just 10 s.
