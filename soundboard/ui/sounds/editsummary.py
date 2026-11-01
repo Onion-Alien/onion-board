@@ -17,6 +17,7 @@ from soundboard.core import usage
 from soundboard.i18n import _
 from soundboard.sounds.library import original_length
 from soundboard.ui.kit.panel import Flow
+from soundboard.ui.voice.fxcontrols import param_text
 
 if TYPE_CHECKING:
     from soundboard.ui.sounds.dialogs import EffectsPanel
@@ -33,17 +34,18 @@ def items(eff: EffectsPanel) -> list[tuple[str, Callable[[], object]]]:
         end = soundfx.fmt_s(f["end"]) if f["end"] else soundfx.fmt_s(eff.trim.length)
         out.append((f"{_('Trim')} {soundfx.fmt_s(f['start'])}–{end}",
                     lambda: eff.trim.set_values(0.0, 0.0, emit=True)))
+    # the sound's own only: the sliders show Live controls' on top (set_live_layer)
     if abs(f["speed"] - 1) >= 1e-3:
-        out.append((eff.speed.text(), lambda: (eff._set_tuning(1.0, eff.pitch.value(), True),
-                                               eff._edited())))
+        out.append((param_text(eff.speed.q, f["speed"]),
+                    lambda: (eff.set_own_speed(1.0), eff._edited())))
     if abs(f["pitch"]) >= 1e-3:
-        out.append((f"{voicefx.shown(eff.pitch.q.label)} {eff.pitch.text()}",
-                    lambda: (eff.pitch.set_value(0.0), eff._edited())))
+        out.append((f"{voicefx.shown(eff.pitch.q.label)} {param_text(eff.pitch.q, f['pitch'])}",
+                    lambda: (eff.set_own_pitch(0.0), eff._edited())))
+    own = eff.own_knobs()
     for q in livefx.PARAMS:
-        k = eff.knobs[q.key]
-        if q.key in eff.knob_values():
-            out.append((f"{voicefx.shown(q.label)} {k.text()}",
-                        lambda k=k: (k.set_value(0.0), eff._knobs_edited())))
+        if q.key in own:
+            out.append((f"{voicefx.shown(q.label)} {param_text(q, own[q.key])}",
+                        lambda q=q: (eff.set_own_knob(q.key, 0.0), eff._knobs_edited())))
     if abs(f["gain_db"]) >= 1e-3:
         out.append((f"{voicefx.shown(eff.boost.q.label)} {eff.boost.text()}",
                     lambda: (eff.boost.set_value(0.0), eff._edited())))

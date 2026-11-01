@@ -161,6 +161,7 @@ class EditControl(Controller):
         else:
             d = self._new_editor(m, tab)
         self._editors[sid] = d
+        self._layer_to(d)
         if d.player is not None:
             self._fill_player(d.player)
         self._play_timer.start()
@@ -432,6 +433,7 @@ class EditControl(Controller):
         """Live controls' speed or pitch, less what the playing pad has of its own."""
         own_speed, own_pitch, _own = self._pad_base
         self.mw.playctl.on_live_speed(speed / own_speed, pitch - own_pitch, keep)
+        self._layer_to_editors()
 
     def fx_changed(self, amounts: dict):
         """Live controls' effects, less what the playing pad has of its own."""
@@ -441,6 +443,19 @@ class EditControl(Controller):
             layer[q.key] = min(max(amounts.get(q.key, 0.0) - own.get(q.key, 0.0), q.lo),
                                q.hi)
         self.mw.engine.sound_fx = livefx.clean(layer)
+        self._layer_to_editors()
+
+    def _layer_to(self, d: EditDialog):
+        """Edit sound shows Live controls' speed, pitch and knobs on top of the
+        sound's own (EffectsPanel.set_live_layer)."""
+        e = self.mw.engine
+        d.effects.set_live_layer(e.sound_speed, e.sound_pitch, e.sound_keep_pitch,
+                                 e.sound_fx)
+
+    def _layer_to_editors(self):
+        for d in list(self._editors.values()):
+            if qt_valid(d):
+                self._layer_to(d)
 
     def live_sound(self) -> str | None:
         """The sound Live controls' Save as new pad copies: the one in the player
