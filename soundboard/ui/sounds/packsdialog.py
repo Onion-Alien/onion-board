@@ -13,7 +13,8 @@ from collections.abc import Callable
 from pathlib import Path
 
 import numpy as np
-from PySide6.QtCore import QEvent, QRectF, QSize, Qt, QTimer, QUrl, Signal
+from PySide6.QtCore import (QCoreApplication, QEvent, QObject, QRectF, QSize, Qt, QTimer,
+                            QUrl, Signal)
 from PySide6.QtGui import (QDesktopServices, QFont, QIcon, QPainter, QPainterPath, QPixmap)
 from PySide6.QtWidgets import (QButtonGroup, QDialog, QFrame, QGridLayout, QHBoxLayout,
                                QLabel, QLineEdit, QPushButton, QScrollArea, QSizePolicy,
@@ -29,6 +30,7 @@ from soundboard.ui.kit.panel import HoverCard, hint_label, section_label
 from soundboard.ui.kit.panellayouts import CardGrid, Flow
 from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.i18n import _, ngettext
+from shiboken6 import isValid as qt_valid
 
 log = logging.getLogger(__name__)
 
@@ -428,14 +430,118 @@ class PreviewDialog(QDialog):
         b.setVisible(i < len(found))
 
 
+class Downloads(QObject):
+    """The packs being downloaded, for the whole app (downloads()): a download keeps
+    going when the page closes (back to the board, another tab, Settings), its sounds
+    go on the board when it lands, and the page opened again shows it still going."""
+    _progress = Signal(str, int, int, bool)    # pack id, done, total, counting links
+    # pack, path or None, error, skipped, of those only for now (or: none came, for now)
+    _fetched = Signal(object, object, str, int, int)
+    progressed = Signal(str)                   # pack id: its words changed
+    ended = Signal(object, object)             # pack, path or None (added after this)
+    added = Signal(object)                     # pack: its sounds were put on the board
+
+    def __init__(self):
+        super().__init__()
+        # (the page shares these two: never replaced, only changed)
+        self.words: dict[str, str] = {}   # pack id -> its Add button's words while downloading
+        self.short: dict[str, str] = {}   # ...and a card's, shorter
+        # pack id -> (put it on the board, ask again later, the window to say it on)
+        self._jobs: dict[str, tuple] = {}
+        self.page: PacksDialog | None = None   # the open page, while it's open
+        self._progress.connect(self._on_progress)
+        self._fetched.connect(self._on_fetched)
+
+    def start(self, p: packs.Pack, add: Callable[[Path], None],
+              try_later: Callable[[packs.Pack], None] | None, window: QWidget | None):
+        self.words[p.id] = _("Downloading…")
+        self._jobs[p.id] = (add, try_later, window)
+        stop = QCoreApplication.closingDown   # only the app quitting stops it
+
+        def run():
+            try:
+                if p.links:
+                    path, skipped, later = packs.download_links(
+                        p, lambda done, total: busy.emit(self._progress, p.id, done, total,
+                                                         True), stop)
+                else:
+                    path, skipped, later = packs.download(
+                        p, lambda done, total: busy.emit(self._progress, p.id, done, total,
+                                                         False), stop), 0, 0
+                busy.emit(self._fetched, p, path, "", skipped, later)
+            except packs.TryLater as e:
+                busy.emit(self._fetched, p, None, str(e), 0, len(p.links))
+            except updates.UpdateError as e:
+                busy.emit(self._fetched, p, None, str(e), 0, 0)
+            except Exception as e:  # noqa: BLE001 - never a crash
+                log.exception("pack %s download failed", p.id)
+                busy.emit(self._fetched, p, None, errors.plain(e), 0, 0)
+        threading.Thread(target=run, daemon=True, name="pack-download").start()
+
+    def _on_progress(self, pack_id: str, done: int, total: int, links: bool):
+        if pack_id not in self.words:
+            return
+        self.words[pack_id] = (
+            _("{done} of {total}", done=done, total=total) if links and total else
+            _("Downloading {pct}%", pct=done * 100 // total) if total else _("Downloading…"))
+        self.short[pack_id] = (_("{done} of {total}", done=done, total=total)
+                               if links and total else
+                               _("{pct}%", pct=done * 100 // total) if total else "…")
+        self.progressed.emit(pack_id)
+
+    def _open_page(self) -> PacksDialog | None:
+        page = self.page
+        return page if page is not None and qt_valid(page) and not page._closed else None
+
+    def _on_fetched(self, p: packs.Pack, path, err: str, skipped: int, later: int = 0):
+        add, try_later, window = self._jobs.pop(p.id, (None, None, None))
+        self.words.pop(p.id, None)
+        self.short.pop(p.id, None)
+        if later and try_later is not None:
+            try_later(p)   # (even with the page closed meanwhile)
+        self.ended.emit(p, path)
+        page = self._open_page()
+        # said on the page while it's open, else on the window
+        where = page or (window if window is not None and qt_valid(window) else None)
+        if path is None:
+            if where is not None:
+                busy.toast(page.preview or page if page else where, html.escape(_(
+                    "Couldn't download {name}: {error}", name=p.name, error=err)), "error")
+            return
+        if add is not None:
+            add(Path(path))   # the board's own import reports it from here
+        self.added.emit(p)
+        if where is None:
+            return
+        if skipped - later:
+            busy.toast(where, html.escape(ngettext(
+                "{n} sound is gone from Myinstants, so it was skipped.",
+                "{n} sounds are gone from Myinstants, so they were skipped.",
+                skipped - later)), "warn")
+        if later:
+            busy.toast(where, html.escape(ngettext(
+                "{n} sound couldn't be downloaded right now. It's tried again by itself "
+                "in 2 hours.",
+                "{n} sounds couldn't be downloaded right now. They're tried again by "
+                "themselves in 2 hours.", later)), "warn")
+
+
+_downloads: Downloads | None = None
+
+
+def downloads() -> Downloads:
+    """The app's one Downloads."""
+    global _downloads
+    if _downloads is None or not qt_valid(_downloads):
+        _downloads = Downloads()
+    return _downloads
+
+
 class PacksDialog(QDialog):
     """`add(path)` puts a downloaded pack's sounds on the board (the window's own
     import, so it asks and reports the way dropping the zip does). `play` plays a
     pack's sample to your headphones (see Play); without it the samples don't show."""
     _listed = Signal(object, str)              # packs, why the online list wasn't read
-    _progress = Signal(str, int, int, bool)    # pack id, done, total, counting links
-    # pack, path or None, error, skipped, of those only for now (or: none came, for now)
-    _fetched = Signal(object, object, str, int, int)
     _sampled = Signal(object, object)          # sample_key, its samples (None: failed)
     _decoded = Signal(object, object, float, int)   # button, audio or None, gain, serial
 
@@ -450,8 +556,11 @@ class PacksDialog(QDialog):
         # packs.LINK_TRY_LATER after (this page may be closed by then)
         self._try_later = try_later
         self._play = play
-        self._busy: dict[str, str] = {}   # pack id -> its Add button's words while downloading
-        self._shown_pct: dict[str, str] = {}   # ...and a card's, shorter
+        # the downloads: the app's, so they go on with this page closed
+        self._jobs = downloads()
+        self._jobs.page = self
+        self._busy = self._jobs.words   # pack id -> its Add button's words while downloading
+        self._shown_pct = self._jobs.short   # ...and a card's, shorter
         self._samples: dict[tuple, list | None] = {}   # sample_key -> its samples (None: failed)
         self._sampling: set[tuple] = set()      # ...being fetched now
         self._preloads: deque[packs.Pack] = deque()   # previews still to fetch, in order
@@ -482,7 +591,8 @@ class PacksDialog(QDialog):
         icons.set_icon(self.btn_done, "nav_back")
         self.btn_done.clicked.connect(self.accept)
         head.addWidget(self.btn_done, 0, Qt.AlignmentFlag.AlignVCenter)
-        self.bun = bunacts.ActBunny(bunacts.PAT)   # Bun with a parcel, beside the title
+        # Bun with a parcel, beside the title (running while a download is going)
+        self.bun = bunacts.ActBunny(bunacts.RUN if self._busy else bunacts.PAT)
         head.addWidget(self.bun, 0, Qt.AlignmentFlag.AlignVCenter)
         title = QLabel(_("Free sound packs"))
         title.setObjectName("helptitle")
@@ -556,8 +666,9 @@ class PacksDialog(QDialog):
         self.views.addWidget(self.empty)
         lay.addWidget(self.views, 1)
         self._listed.connect(self._show)
-        self._progress.connect(self._on_progress)
-        self._fetched.connect(self._on_fetched)
+        self._jobs.progressed.connect(self._on_progress)
+        self._jobs.ended.connect(self._on_ended)
+        self._jobs.added.connect(self._on_added)
         self._sampled.connect(self._on_sampled)
         self._decoded.connect(self._on_decoded)
         self._show(packs.built_in(), "")
@@ -591,7 +702,9 @@ class PacksDialog(QDialog):
             busy.toast(self, html.escape(_(
                 "Couldn't get the newest list of packs ({error}), so these are the ones "
                 "this version knows.", error=err)), "warn")
-        if found is None or self._busy:   # don't pull a card out from under a download
+        # don't pull a card out from under a download (a page opened while one is going
+        # still gets its cards)
+        if found is None or (self._busy and self._slots):
             return
         if found == [s.pack if isinstance(s, PackCard) else s for s in self._slots]:
             return   # the online list is the one shown (it usually is): nothing to redo
@@ -888,44 +1001,16 @@ class PacksDialog(QDialog):
             # the note above may already say it: the press itself gets an answer too
             busy.toast(self.preview or self, html.escape(why), "error")
             return
-        self._busy[p.id] = _("Downloading…")
+        win = self.window()   # (the main window; a page on its own has none)
+        self._jobs.start(p, self._add, self._try_later, None if win is self else win)
         self.bun.set_act(bunacts.RUN)   # running with it till it lands
         for b in self._buttons(p.id):
             busy.set_busy(b, True)
         self._show_progress(p.id)
 
-        def run():
-            try:
-                if p.links:
-                    path, skipped, later = packs.download_links(
-                        p, lambda done, total: busy.emit(self._progress, p.id, done, total,
-                                                         True),
-                        lambda: self._closed)
-                else:
-                    path, skipped, later = packs.download(
-                        p, lambda done, total: busy.emit(self._progress, p.id, done, total,
-                                                         False),
-                        lambda: self._closed), 0, 0
-                busy.emit(self._fetched, p, path, "", skipped, later)
-            except packs.TryLater as e:
-                busy.emit(self._fetched, p, None, str(e), 0, len(p.links))
-            except updates.UpdateError as e:
-                busy.emit(self._fetched, p, None, str(e), 0, 0)
-            except Exception as e:  # noqa: BLE001 - never a crash
-                log.exception("pack %s download failed", p.id)
-                busy.emit(self._fetched, p, None, errors.plain(e), 0, 0)
-        threading.Thread(target=run, daemon=True, name="pack-download").start()
-
-    def _on_progress(self, pack_id: str, done: int, total: int, links: bool):
-        if self._closed or pack_id not in self._busy:
-            return
-        self._busy[pack_id] = (
-            _("{done} of {total}", done=done, total=total) if links and total else
-            _("Downloading {pct}%", pct=done * 100 // total) if total else _("Downloading…"))
-        self._shown_pct[pack_id] = (_("{done} of {total}", done=done, total=total)
-                                    if links and total else
-                                    _("{pct}%", pct=done * 100 // total) if total else "…")
-        self._show_progress(pack_id)
+    def _on_progress(self, pack_id: str):
+        if not self._closed and pack_id in self._busy:
+            self._show_progress(pack_id)
 
     def _show_progress(self, pack_id: str):
         """A download's progress on its Add buttons: the preview's in words, a card's
@@ -937,11 +1022,8 @@ class PacksDialog(QDialog):
             except RuntimeError:   # its card was remade meanwhile
                 pass
 
-    def _on_fetched(self, p: packs.Pack, path, err: str, skipped: int, later: int = 0):
-        if later and self._try_later is not None:
-            self._try_later(p)   # (even with this page closed meanwhile)
-        self._busy.pop(p.id, None)
-        self._shown_pct.pop(p.id, None)
+    def _on_ended(self, p: packs.Pack, path):
+        """A download landed (Downloads says how it went, then adds it)."""
         if self._closed:
             return
         if not self._busy:
@@ -949,27 +1031,16 @@ class PacksDialog(QDialog):
         for b in self._buttons(p.id):
             busy.set_busy(b, False)
             _show_add(b, p, short=b.objectName() != "primary")
-        if path is None:
-            busy.toast(self.preview or self, html.escape(_(
-                "Couldn't download {name}: {error}", name=p.name, error=err)), "error")
+        if path is not None:
+            self._say("")
+            self.close_pack()   # added: the board's own import reports it from here
+
+    def _on_added(self, p: packs.Pack):
+        if self._closed:
             return
-        self._say("")
-        self.close_pack()   # added: the board's own import reports it from here
-        self._add(Path(path))
         self.bun.play(bunacts.OPEN)
         for b in self._buttons(p.id):
             busy.flash(b, _("✓ Added"))
-        if skipped - later:
-            busy.toast(self, html.escape(ngettext(
-                "{n} sound is gone from Myinstants, so it was skipped.",
-                "{n} sounds are gone from Myinstants, so they were skipped.",
-                skipped - later)), "warn")
-        if later:
-            busy.toast(self, html.escape(ngettext(
-                "{n} sound couldn't be downloaded right now. It's tried again by itself "
-                "in 2 hours.",
-                "{n} sounds couldn't be downloaded right now. They're tried again by "
-                "themselves in 2 hours.", later)), "warn")
         if self._filter == MINE:
             self._apply_filter()
 
@@ -983,5 +1054,7 @@ class PacksDialog(QDialog):
         self.close_pack()
         self._stop()
         self._stepper.stop()
-        self._closed = True   # a download still going stops at its next chunk
+        self._closed = True   # (a download still going goes on: Downloads)
+        if self._jobs.page is self:
+            self._jobs.page = None
         super().done(r)

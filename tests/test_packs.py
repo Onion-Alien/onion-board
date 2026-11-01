@@ -831,6 +831,42 @@ def test_the_page_shows_a_links_packs_progress_and_skipped_count(qapp, app_dir, 
         dlg.done(0)
 
 
+def test_a_download_goes_on_with_the_page_closed_and_shows_when_it_opens_again(
+        qapp, app_dir, myinstants, monkeypatch):
+    """Back to my sounds (or another tab) mid-download: it isn't stopped, its sounds
+    still go on the board, and the page opened again shows it still going."""
+    monkeypatch.setattr(packsdialog.busy, "toast", lambda *a, **k: None)
+    monkeypatch.setattr(net, "allowed", lambda f: True)
+    go, got = threading.Event(), []
+    real = packs._fetch_link
+
+    def slow(*a, **k):
+        assert go.wait(10)
+        return real(*a, **k)
+    monkeypatch.setattr(packs, "_fetch_link", slow)
+    dlg = packsdialog.PacksDialog(got.append, fetch_list=False)
+    dlg._show(packs.parse([links_entry(3)]), "")
+    dlg.add(dlg.cards[0])
+    dlg.done(0)   # left the page
+    again = packsdialog.PacksDialog(lambda path: None, fetch_list=False)
+    try:
+        again._show(packs.parse([links_entry(3)]), "")
+        process_events(qapp, lambda: again.cards and again.cards[0].btn.text() != "Add", 2)
+        assert busy_btn(again.cards[0].btn)   # still downloading
+        again.add(again.cards[0])   # pressed again meanwhile: not a second download
+        go.set()
+        assert process_events(qapp, lambda: got, 5)
+        assert got == [packs.parse([links_entry(3)])[0].path]
+        assert not packsdialog.downloads().words
+    finally:
+        go.set()
+        again.done(0)
+
+
+def busy_btn(b) -> bool:
+    return packsdialog.busy.is_busy(b)
+
+
 def test_the_page_hands_a_pack_that_failed_for_now_to_the_window(qapp, app_dir, myinstants,
                                                                  monkeypatch):
     import urllib.error
