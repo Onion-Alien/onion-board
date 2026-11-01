@@ -213,6 +213,8 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.ai.changed.connect(self._ai_changed)
         self.ai.changed.connect(lambda _s: self._update_bar())   # the chip names the voice
         self.ai.live_changed.connect(self._ai_live)
+        self.ai.effects_wanted.connect(lambda: (usage.used("voice-effects"),
+                                                self.fx.open_effects(self.ai.btn_effects)))
         self.ai.modules_changed.connect(self.rescan_modules)
         self.ai._event.connect(lambda _ev: self._update_bar())   # starting -> on / failed
         self._ai_card = self._section("ai", self.ai, self.ai.title, self.ai.head)
@@ -271,6 +273,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.fx.sound_list = lambda: [(m.id, m.name, list(m.tags)) for m in self.board_sounds()]
         self.chain.configure(self.fx.spec())
         self._update_backdrop(self.fx.spec())
+        self._ai_effects_text()
         self._emit_active()
 
         # the voice changer's mic meter (only while the tab is showing)

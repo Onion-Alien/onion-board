@@ -54,12 +54,12 @@ class VoiceFxCards(_Base):
         row = self.rows.get("backdrop")
         return row if isinstance(row, BackdropRow) else None
 
-    def open_effects(self):
-        """The Effects pop-up, over the voice bar's button."""
+    def open_effects(self, under: QWidget | None = None):
+        """The Effects pop-up, over the voice bar's button (or `under`: the AI voice's)."""
         if self.effects_pop is None:
             from soundboard.ui.voice.effectspopup import EffectsPopup
             self.effects_pop = EffectsPopup(self)  # pyright: ignore[reportArgumentType]  (a VoiceFxPanel)
-        self.effects_pop.open_for(self.btn_effects)
+        self.effects_pop.open_for(under or self.btn_effects)
 
     def on_top_state(self) -> dict:
         """What the Effects pop-up shows: {"layers": {layer: level}, "sounds": [(id,

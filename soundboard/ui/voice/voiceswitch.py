@@ -30,14 +30,17 @@ class VoiceSwitch(_Panel):
             self.chain.errors.clear()      # (configure rebuilds; clear_errors() would twice)
         self.chain.configure(spec)
         self._update_backdrop(spec)
+        self._ai_effects_text()
         self.fx.show_errors({})
         self.fx_changed.emit(spec)
         self._emit_active()
 
     def _update_backdrop(self, spec: dict):
         """Have the Background's loops made for these settings (a worker reads the board
-        sounds from disk and renders them; nothing when it's off)."""
-        cfg = (spec.get("effects") or {}).get("backdrop") if spec.get("enabled") else None
+        sounds from disk and renders them; nothing when it's off). They play on the AI
+        voice too, with the voice changer off."""
+        on = spec.get("enabled") or self.ai.is_on()
+        cfg = (spec.get("effects") or {}).get("backdrop") if on else None
         if cfg and cfg.get("on") and cfg.get("sounds"):
             metas = {m.id: m for m in self.board_sounds()}   # read here, on the UI thread
         else:
@@ -48,6 +51,15 @@ class VoiceSwitch(_Panel):
             m = metas.get(sid)
             return library.load_sound(m) if m is not None else None
         self.backdrop.update(cfg, load)
+
+    def _ai_effects_text(self):
+        """The AI voice's bar's Effects says what the voice changer's does (one list)."""
+        b = self.ai.btn_effects
+        text = self.fx.btn_effects.accessibleName() or _("Effects")
+        if b.text() != text:
+            b.setText(text)
+            b.setAccessibleName(text)
+            self.ai._fit_picked()
 
     def board_changed(self):
         """Sounds were added, renamed or deleted: the Background's names and loops again."""
@@ -67,6 +79,7 @@ class VoiceSwitch(_Panel):
     def _ai_live(self, on: bool):
         if on:                             # one replacement for your voice at a time
             self.speech.livevoice.b_live.setChecked(False)
+        self._update_backdrop(self.fx.spec())   # the Background plays on it too
         self._emit_active()
 
     def _speech_live(self, on: bool):
