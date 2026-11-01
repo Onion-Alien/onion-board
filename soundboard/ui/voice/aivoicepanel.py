@@ -43,7 +43,7 @@ from soundboard.ui.kit.widgets import LoadingBar
 from soundboard.ui.kit.wheelguard import no_wheel
 # the card's parts (callers import their names from here too)
 from soundboard.ui.voice.aivoicecards import (ALL, FAVS, KINDS, KIND_ICONS, MAKE,  # noqa: F401
-                                              MINE, AiVoiceCards, EditPopup,
+                                              LANGS, MINE, AiVoiceCards, EditPopup,
                                               art_key, emoji_icon, voice_icon,
                                               voice_kind)
 from soundboard.ui.voice.aivoicemine import AiVoiceMine
@@ -107,6 +107,7 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
     hotkey_asked = Signal(str)      # right-click a card -> Set a hotkey: the voice's id
     hotkey_cleared = Signal(str)
     voices_changed = Signal()       # the voices were read again: their hotkeys may be live now
+    language_picked = Signal(str)   # a language voice's card: speak that language ("": stop)
     _event = Signal(dict)
     _install_line = Signal(str)     # a raw line of the install's output
     _install_note = Signal(str)     # our own words for the card, shown as they are
@@ -210,6 +211,8 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         self.tiles = QButtonGroup(self)
         self.tiles.setExclusive(True)
         self._tile: dict[str, VoiceTile] = {}
+        self.language_voices: list[dict] = []   # set_language_voices
+        self.speaking = ""       # the language a language voice speaks now
         mt = self.make_tile = VoiceTile(_("Make your own voice"))
         mt.setCheckable(False)
         mt.star.hide()

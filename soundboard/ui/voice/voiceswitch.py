@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 from PySide6.QtWidgets import QWidget
 
-from soundboard.core import usage
+from soundboard.core import langnames, usage
 from soundboard import voicefx
 from soundboard.speech import spoken
 from soundboard.ui.voice.voicefxpanel import CUSTOM
@@ -40,7 +40,7 @@ class VoiceSwitch(_Panel):
         sounds from disk and renders them; nothing when it's off). They play on the AI
         voice too, with the voice changer off."""
         on = (spec.get("enabled") or self.ai.is_on()
-              or self.speech.livevoice.b_live.isChecked())
+              or getattr(self, "_reader", "") == "read")
         cfg = (spec.get("effects") or {}).get("backdrop") if on else None
         if cfg and cfg.get("on") and cfg.get("sounds"):
             metas = {m.id: m for m in self.board_sounds()}   # read here, on the UI thread
@@ -56,7 +56,7 @@ class VoiceSwitch(_Panel):
     def _ai_effects_text(self):
         """The other bars' Effects say what the voice changer's does (one list)."""
         text = self.fx.btn_effects.accessibleName() or _("Effects")
-        for bar in (self.ai, self.speak_bar):
+        for bar in (self.ai,):
             b = bar.btn_effects
             if b.text() != text:
                 b.setText(text)
@@ -105,15 +105,12 @@ class VoiceSwitch(_Panel):
         self.speech.stop_translating()   # a language picked but not ready yet goes too
 
     def on_keys(self) -> list[str]:
-        """What's changing your mic now, in the bar's order: "fx", "ai", "speak",
-        "lang"."""
+        """What's changing your mic now, in the bar's order: "fx", "ai", "lang"."""
         keys = []
         if self.fx.btn_power.isChecked():
             keys.append("fx")
         if self.ai.is_on():
             keys.append("ai")
-        if self.speech.livevoice.b_live.isChecked():
-            keys.append("speak")
         if spoken.heard() and self.speech.translating() is not None:   # else no Languages tab
             keys.append("lang")
         return keys
@@ -124,7 +121,7 @@ class VoiceSwitch(_Panel):
 
     def paused_keys(self) -> list[str]:
         """The voices turned off one at a time (a chip, a bar's pause, the On Air card) or
-        by the switch, waiting to be turned back on: "fx", "ai", "speak", "lang"."""
+        by the switch, waiting to be turned back on: "fx", "ai", "lang"."""
         return list(self._back)
 
     def back_keys(self) -> list[str]:
@@ -143,14 +140,13 @@ class VoiceSwitch(_Panel):
             if not on:
                 keys = self.on_keys()
                 if keys:                 # already all off: keep what's remembered
-                    # the grey ones stay too (they were shown as coming back), except
-                    # a replacement for your voice the one that's on would push off
-                    other = {"ai": "speak", "speak": "ai"}
-                    self._back = [k for k in ORDER if k in keys or (
-                        k in self._back and other.get(k) not in keys)]
+                    # the grey ones stay too (they were shown as coming back)
+                    self._back = [k for k in ORDER if k in keys or k in self._back]
                     if "lang" in keys:
                         self._back_lang = self.speech.cb_lang.currentData() or ""
-                for k in keys:
+                # the language first: with the voice changer gone first, the language's
+                # own voice took over for a moment and kept a (paused) bar
+                for k in reversed(keys):
                     self.stop_one(k)
             elif not self.voices_on():
                 keys = self.back_keys()
@@ -175,8 +171,6 @@ class VoiceSwitch(_Panel):
             self.fx.btn_power.setChecked(True)   # its toggled handler applies it
         elif key == "ai":
             self.ai.b_start.setChecked(True)
-        elif key == "speak":
-            self.speech.livevoice.b_live.setChecked(True)
         elif key == "lang" and self._back_lang:
             i = self.speech.cb_lang.findData(self._back_lang)
             if i > 0:                    # (its language may have been removed since)
@@ -261,16 +255,14 @@ class VoiceSwitch(_Panel):
             self.fx.btn_power.setChecked(False)   # its toggled handler applies it
         elif key == "ai":
             self.ai.stop()
-        elif key == "speak":
-            self.controller.stop_speaking()
-            self.speech.livevoice.b_live.setChecked(False)
         elif key == "lang":
             self.speech.stop_translating()
 
     def is_active(self) -> bool:
-        """Something here is changing what others hear from your mic."""
-        return (self.fx.btn_power.isChecked() or self.speech.livevoice.b_live.isChecked()
-                or self.ai.is_on())
+        """Something here is changing what others hear from your mic (a language on by
+        itself too: its voice speaks for you)."""
+        return (self.fx.btn_power.isChecked() or self.ai.is_on()
+                or self.speech.translating() is not None)
 
     def _emit_active(self):
         self._sync_translate()
@@ -293,6 +285,13 @@ class VoiceSwitch(_Panel):
                 who = "ai"
             elif self.fx.btn_power.isChecked():
                 who = "fx"
+            else:
+                who = "read"           # nobody else: the language's own voice says it
+        if who:
+            self._reader = who      # (kept while it's paused: its bar stays, dimmed)
+        elif m is None and "lang" not in self._back:
+            self._reader = ""
+        self.controller.on_top = who == "read"   # the Effects play on its lines
         self.ai_controller.set_dub(who == "ai")
         sp.ctl.dub = self.ai_controller if who == "ai" else None   # (typed in live.py)
         sp.ctl.fx_always = who == "fx"
@@ -300,7 +299,7 @@ class VoiceSwitch(_Panel):
             lv._bg_note("")               # "turn on a voice": one is on now
         lv.translate_for(who)
         if not lv.bg_for and not lv._bg_warning:
-            lv._bg_note("")               # Said by says who speaks (or that Start does)
+            lv._bg_note("")               # Said by says who speaks
         fx = self.fx.preset
         if self.ai.is_on():
             on = ("ai", self.ai.voice_title())
@@ -309,3 +308,15 @@ class VoiceSwitch(_Panel):
         else:
             on = ("", "")
         sp.said_by(*on)
+        self.ai.set_language_voices(self._language_voices(),
+                                    m.language if who in ("read", "fx") and m else "")
+
+    def _language_voices(self) -> list[dict]:
+        """The downloaded languages' voices, as cards for the AI voices' Languages."""
+        langs = getattr(self.speech.ctl.tts, "languages", {})
+        return [{"id": vid, "name": langnames.name(code, code), "language": code,
+                 "about": _("{voice} reads your words in {language}. Pick it to speak "
+                            "{language}.", voice=name.split(" (")[0],
+                            language=langnames.name(code, code))}
+                for vid, (_f, code, name) in sorted(langs.items(),
+                                                    key=lambda kv: langnames.name(kv[1][1]))]

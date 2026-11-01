@@ -1,6 +1,7 @@
 """Custom voices: a local TTS server, a TTS program, Piper packs, next to Windows'."""
 import io
 import json
+from pathlib import Path
 import sys
 import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -185,6 +186,101 @@ def test_voice_set_lists_and_routes_custom_voices(vdir, server, monkeypatch):
         s.synth("hello", "custom:Gone")
     assert customvoices.label("custom:Hans") == "Hans (custom)"
     assert customvoices.label("Microsoft Zira Desktop") == "Zira"
+
+
+FAKE_READER = r'''
+import json, sys, wave
+print(json.dumps({"ready": True}), flush=True)
+for line in sys.stdin:
+    req = json.loads(line)
+    if "fail" in req["text"]:
+        print(json.dumps({"error": "can't read that"}), flush=True)
+        continue
+    with wave.open(req["out"], "wb") as w:
+        w.setnchannels(1); w.setsampwidth(2); w.setframerate(22050)
+        w.writeframes(b"\x00\x10" * int(2205 * len(req["text"]) * float(req["speed"])))
+    print(json.dumps({"ok": True}), flush=True)
+'''
+
+
+def _language_voice(lang: str, dataset: str):
+    from soundboard.speech import translation
+    d = translation.base_dir() / lang / "voice"
+    d.mkdir(parents=True)
+    (d / translation.VOICE_FILE).write_bytes(b"x")
+    (d / (translation.VOICE_FILE + ".json")).write_text(json.dumps({"dataset": dataset}),
+                                                        encoding="utf-8")
+
+
+def test_a_language_is_read_by_its_own_voice_never_the_say_voice(vdir, tmp_path, monkeypatch):
+    """The bug: Chinese turned on, and David (an English Windows voice) read it out.
+    A downloaded language's voice is in the list as `piper:xx`, is the one voice_for
+    gives, and reads through the AI voices add-on's reader."""
+    import sys
+    from soundboard.speech import piper
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft David Desktop"])
+    monkeypatch.setattr(tts.SapiTTS, "voice_for", lambda self, lang, prefer="": "")
+    _language_voice("zh", "huayan")
+    script = tmp_path / "reader.py"
+    script.write_text(FAKE_READER, encoding="utf-8")
+    s = VoiceSet()
+    s.reader = piper.PiperReader(lambda: ([sys.executable, str(script)], tmp_path))
+    try:
+        assert s.warm_up() == ["Microsoft David Desktop", "piper:zh"]
+        assert s.voice_for("zh") == s.voice_for("zh-TW") == "piper:zh"
+        assert s.voice_for("de") == ""            # not downloaded: no stand-in voice
+        assert customvoices.label("piper:zh") == "Huayan (Chinese)"
+        mono, sr = s.synth("你好", "piper:zh")
+        assert sr == 22050 and len(mono) == 2 * 2205
+        with pytest.raises(RuntimeError, match="can't read that"):
+            s.synth("fail", "piper:zh")
+        mono, _sr = s.synth("hi", "piper:zh", rate=10)      # faster: twice the speed
+        assert len(mono) == 2 * 2 * 2205
+        _language_voice("de", "thorsten")                    # downloaded since
+        assert len(s.synth("hallo", "piper:de")[0])
+    finally:
+        s.reader.close()
+
+
+def test_language_voices_need_ai_voices():
+    from soundboard.speech import piper
+    r = piper.PiperReader(lambda: None)
+    with pytest.raises(RuntimeError, match="install AI voices"):
+        r.synth("hola", Path("es.onnx"))
+
+
+def test_the_reader_answers_each_line_and_survives_a_bad_one(tmp_path, monkeypatch):
+    """modules/ai-voices/reader.py's own loop, with Piper stood in for."""
+    import importlib.util
+    import io
+    spec = importlib.util.spec_from_file_location(
+        "ai_reader", Path(__file__).parents[1] / "modules" / "ai-voices" / "reader.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    said = []
+
+    class Fake:
+        def say(self, text, model, out, speed=1.0):
+            if model == "bad.onnx":
+                raise FileNotFoundError("no voice file bad.onnx")
+            said.append((text, model, speed))
+
+    monkeypatch.setattr(mod, "Reader", Fake)
+    out = io.StringIO()
+    lines = [json.dumps({"text": "hej", "model": "da.onnx", "out": "a.wav", "speed": 1.5}),
+             json.dumps({"text": "x", "model": "bad.onnx", "out": "b.wav"}), "not json"]
+    assert mod.serve(io.StringIO("\n".join(lines) + "\n"), out) == 0
+    answers = [json.loads(a) for a in out.getvalue().splitlines()]
+    assert answers[0] == {"ready": True} and answers[1] == {"ok": True}
+    assert "bad.onnx" in answers[2]["error"] and "error" in answers[3]
+    assert said == [("hej", "da.onnx", 1.5)]
+
+    def no_piper():
+        raise ImportError("piper")
+    monkeypatch.setattr(mod, "Reader", no_piper)
+    out = io.StringIO()
+    assert mod.serve(io.StringIO(""), out) == 1
+    assert "press Update" in json.loads(out.getvalue())["error"]
 
 
 def test_voice_tab_lists_custom_voices_and_bad_files(vdir, qapp, monkeypatch):
@@ -381,3 +477,19 @@ def test_a_saved_custom_tab_opens_add_ons(qapp):
         assert vp.current_tab() == "addons"
     finally:
         vp.deleteLater()
+
+
+def test_language_voice_lines_are_as_loud_as_windows_ones():
+    """Piper's lines come out at full scale (up to 7 dB louder than a Windows voice's);
+    they're levelled to about -20 dBFS, with the peaks kept under 0.9."""
+    import numpy as np
+    from soundboard.speech import piper
+    t = np.arange(22050) / 22050
+    loud = (0.999 * np.sin(2 * np.pi * 200 * t)).astype(np.float32)
+    y = piper.level(loud)
+    assert abs(20 * np.log10(np.sqrt(np.mean(y ** 2))) + 20) < 0.5
+    assert np.abs(y).max() <= 0.9 + 1e-6
+    spiky = np.zeros(22050, np.float32)
+    spiky[100] = 1.0
+    assert np.abs(piper.level(spiky)).max() <= 0.9 + 1e-6       # a peak never clips
+    assert not piper.level(np.zeros(10, np.float32)).any()

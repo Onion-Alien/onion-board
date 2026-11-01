@@ -2,3 +2,6 @@
 # so an unpinned line would pull whatever version is newest that day.
 onnxruntime==1.30.0
 numpy==2.5.3
+# the language voices (reader.py): Piper reads translated lines out loud
+piper-tts==1.8.0
+pathvalidate==3.3.1

@@ -2206,7 +2206,6 @@
   "“{name}” is a built-in voice's name. Pick another one.": "“{name}”是内置声线的名称。请换一个。",
   "↓ that button!": "↓ 那个按钮！",
   "−{seconds}s": "−{seconds} 秒",
-  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice, the voice changer and the computer voice; your real voice is muted meanwhile.": "⏱ 别人会晚几秒听到你说{language}：每句话在你说完后会被转成文字、翻译，然后再读出来。可以和 AI 语音、变声器和电脑语音一起使用；在此期间你的真实声音会被静音。",
   "● Hearing you…": "● 正在听你说话…",
   "● ON: sending a program's sound": "● 开启：正在发送程序的声音",
   "● ON: sending {programs}": "● 开启：正在发送 {programs}",
@@ -3183,7 +3182,6 @@
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "下载器（yt-dlp）没有安装，请前往 设置 → 更新 → 辅助程序 → yt-dlp → 重新安装。",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows 现在找不到 <b>{mic}</b>。请插上，如果是无线的就打开它。根本没有麦克风？用下面的<b>虚拟音频线</b>：没有麦克风也能用。",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "你的麦克风现在没有发出任何声音（已关闭、已静音或没插麦克风），所以别人只听得到你的音效。想让他们也听到你？打开它或取消静音。",
-  "A {language} computer voice, once it's on this PC (below).": "{language}电脑语音（装到这台电脑上之后，见下方）。",
   "Delete the {language} download": "删除{language}下载",
   "Don't translate": "不翻译",
   "Said by": "由谁说",
@@ -3193,8 +3191,6 @@
   "Use the computer voice instead": "改用电脑语音",
   "Your AI voice, {voice}. It's on: just talk.": "你的 AI 语音，{voice}。已开启：直接说话就行。",
   "{voice} with your {effect} voice changer. It's on: just talk.": "{voice}，加上你的{effect}变声器。已开启：直接说话就行。",
-  "{voice}, the computer voice, once you press Start.": "{voice}，电脑语音，按下开始后说话。",
-  "{voice}, the computer voice. It's on: just talk.": "{voice}，电脑语音。已开启：直接说话就行。",
   "Once a day and after a failed download, gets a newer yt-dlp from PyPI, but only a version the app's makers approved that has been out for at least 3 days. Off by default.": "每天一次，以及下载失败后，从 PyPI 获取更新的 yt-dlp，但只取应用作者批准过、且已发布至少 3 天的版本。默认关闭。",
   "The list of approved yt-dlp versions couldn't be read": "无法读取已批准的 yt-dlp 版本列表",
   "Force update": "强制更新",
@@ -3921,7 +3917,6 @@
   "Others hear you in {language}.": "别人听到的是{language}。",
   "Pick a language first: click one below.": "先选一种语言：点下面的一个。",
   "Talk in your language and others hear another one. Pick a language to turn it on.": "你说自己的语言，别人听到的是另一种语言。选一种语言来开启。",
-  "{language} isn't downloaded yet. Download and install it now? It's a one-time {size} MB download, and Windows may ask to add its voice too.": "{language}还没下载。现在下载并安装吗？只需下载一次，{size} MB，Windows 可能还会询问是否添加它的语音。",
   "A random sound": "随机音效",
   "Alerts": "提醒",
   "Channel points": "频道积分",
@@ -4747,10 +4742,6 @@
   "(AI voice)": "（AI 语音）",
   "(Voice changer)": "（变声器）",
   "(Clean mic)": "（麦克风降噪）",
-  "(Computer voice)": "（电脑语音）",
-  "(Custom voice)": "（自定义语音）",
-  "(Voice server)": "（语音服务器）",
-  "Windows voice": "Windows 语音",
   "{n} new": [
     "{n} 个新"
   ],
@@ -4777,5 +4768,13 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "片段合并播放时，以及在该片段的立即播放、另存为新按钮和复制中都能听到（右键点击它）",
   "{name} (splice {n})": "{name}（片段 {n}）",
   "✓ Copied: paste it into a chat or a folder": "✓ 已复制：可粘贴到聊天或文件夹",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "滚动即可缩放。在片段的音量线上拖动圆点：拐角左右拖动设置淡入淡出，上下拖动设置音量；两端上下拖动设置淡变的起始音量。点击片段可给它单独的效果，右键查看更多。"
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "滚动即可缩放。在片段的音量线上拖动圆点：拐角左右拖动设置淡入淡出，上下拖动设置音量；两端上下拖动设置淡变的起始音量。点击片段可给它单独的效果，右键查看更多。",
+  "The {language} voice, once {language} is downloaded (below).": "{language}语音，下载{language}后即可使用（见下方）。",
+  "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "{language}还没有下载。现在下载吗？只需下载一次，共 {size} MB，附带说{language}的语音。",
+  "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice}用{language}读出你说的话。选它就能说{language}。",
+  "{voice}, the {language} voice. It's on: just talk.": "{voice}，{language}语音。已开启：直接说话就行。",
+  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ 别人会晚几秒听到你说{language}：每句话在你说完后会被转成文字、翻译，然后再读出来。也可以和 AI 语音、变声器一起使用；在此期间你的真实声音会被静音。",
+  "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "{language}语音需要 AI 语音插件：请在 AI 语音标签页获取。",
+  "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "{language}语音需要最新的 AI 语音：请在 AI 语音标签页的“更多选项”里点“更新 AI 语音”。",
+  "({language} voice)": "（{language}语音）"
 }

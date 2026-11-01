@@ -2168,7 +2168,6 @@
   "“{name}” is a built-in voice's name. Pick another one.": "„{name}“ е име на вграден глас. Избери друго.",
   "↓ that button!": "↓ този бутон!",
   "−{seconds}s": "− {seconds} s",
-  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice, the voice changer and the computer voice; your real voice is muted meanwhile.": "⏱ Другите те чуват на {language} с няколко секунди закъснение: всяко изречение се записва, превежда и изговаря, след като го довършиш. Работи с AI гласа, промяната на гласа и компютърния глас; истинският ти глас е заглушен през това време.",
   "● Hearing you…": "● Чувам те…",
   "● ON: sending a program's sound": "● ВКЛ.: пращам звука на програма",
   "● ON: sending {programs}": "● ВКЛ.: пращам {programs}",
@@ -3251,7 +3250,6 @@
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "Програмата за изтегляне (yt-dlp) не е инсталирана: Настройки → Обновления → Помощни програми → yt-dlp → Преинсталирай.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows не намира <b>{mic}</b> в момента. Включи го в компютъра или го пусни, ако е безжичен. Нямаш микрофон изобщо? Ползвай <b>виртуалния кабел</b> по-долу: работи и без микрофон.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Микрофонът ти не праща звук в момента (изключен, заглушен или не е включен микрофон), затова другите чуват само звуците ти. Искаш да чуват и теб? Включи го или махни заглушаването.",
-  "A {language} computer voice, once it's on this PC (below).": "Компютърен глас на {language}, щом го има на този компютър (отдолу).",
   "Delete the {language} download": "Изтрий изтеглянето за {language}",
   "Don't translate": "Без превод",
   "Said by": "Казва го",
@@ -3261,8 +3259,6 @@
   "Use the computer voice instead": "Ползвай компютърния глас вместо това",
   "Your AI voice, {voice}. It's on: just talk.": "Твоят AI глас, {voice}. Включен е: просто говори.",
   "{voice} with your {effect} voice changer. It's on: just talk.": "{voice} с промяна на гласа „{effect}“. Включено е: просто говори.",
-  "{voice}, the computer voice, once you press Start.": "{voice}, компютърният глас, щом натиснеш Старт.",
-  "{voice}, the computer voice. It's on: just talk.": "{voice}, компютърният глас. Включен е: просто говори.",
   "Once a day and after a failed download, gets a newer yt-dlp from PyPI, but only a version the app's makers approved that has been out for at least 3 days. Off by default.": "Веднъж на ден и след неуспешно изтегляне изтегля по-нов yt-dlp от PyPI, но само версия, която създателите на приложението са одобрили и която е излязла преди поне 3 дни. Изключено по подразбиране.",
   "The list of approved yt-dlp versions couldn't be read": "Списъкът с одобрени версии на yt-dlp не можа да се прочете",
   "Force update": "Принудително обновяване",
@@ -3995,7 +3991,6 @@
   "Others hear you in {language}.": "Другите те чуват на {language}.",
   "Pick a language first: click one below.": "Първо избери език: щракни един отдолу.",
   "Talk in your language and others hear another one. Pick a language to turn it on.": "Говори на своя език, а другите чуват друг. Избери език, за да го включиш.",
-  "{language} isn't downloaded yet. Download and install it now? It's a one-time {size} MB download, and Windows may ask to add its voice too.": "{language} още не е изтеглен. Да го изтегля и инсталирам ли сега? Това е еднократно изтегляне от {size} MB и Windows може да поиска да добави и гласа му.",
   "A random sound": "Случаен звук",
   "Alerts": "Известия",
   "Channel points": "Точки на канала",
@@ -4837,10 +4832,6 @@
   "(AI voice)": "(AI глас)",
   "(Voice changer)": "(Промяна на гласа)",
   "(Clean mic)": "(Чист микрофон)",
-  "(Computer voice)": "(Компютърен глас)",
-  "(Custom voice)": "(Собствен глас)",
-  "(Voice server)": "(Гласов сървър)",
-  "Windows voice": "Глас на Windows",
   "{n} new": [
     "{n} нов",
     "{n} нови"
@@ -4869,5 +4860,13 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Чуват се, когато откъсите свирят слети, и в неговите Пусни сега, Запази като нов бутон и Копирай (десен клик върху него)",
   "{name} (splice {n})": "{name} (откъс {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Копирано: постави го в чат или папка",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Скролвай за приближаване. По линията на нивото на откъс влачи точките: ъглите встрани за плавен преход и нагоре или надолу за силата, краищата нагоре или надолу за нивото, от което започва преходът. Кликни откъс за собствени ефекти, десен клик за още."
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Скролвай за приближаване. По линията на нивото на откъс влачи точките: ъглите встрани за плавен преход и нагоре или надолу за силата, краищата нагоре или надолу за нивото, от което започва преходът. Кликни откъс за собствени ефекти, десен клик за още.",
+  "The {language} voice, once {language} is downloaded (below).": "Гласът за {language}, след като {language} се изтегли (по-долу).",
+  "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "{language} още не е изтеглен. Да се изтегли ли сега? Еднократно изтегляне от {size} MB, с глас, който говори на {language}.",
+  "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice} чете думите ти на {language}. Избери го, за да говориш на {language}.",
+  "{voice}, the {language} voice. It's on: just talk.": "{voice}, гласът за {language}. Включен е: просто говори.",
+  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ Другите те чуват на {language} с няколко секунди закъснение: всяко изречение се записва, превежда и изговаря, след като го довършиш. Работи и с AI гласа и промяната на гласа; истинският ти глас е заглушен през това време.",
+  "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "Гласът за {language} има нужда от добавката AI гласове: вземи я от раздела AI гласове.",
+  "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "Гласът за {language} има нужда от най-новите AI гласове: натисни „Обнови AI гласовете“ под „Още настройки“ в раздела AI гласове.",
+  "({language} voice)": "(глас за {language})"
 }

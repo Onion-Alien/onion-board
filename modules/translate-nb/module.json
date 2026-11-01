@@ -3,7 +3,7 @@
   "name": "Translate to Norwegian",
   "version": "1.0.0",
   "kind": "translation",
-  "description": "The computer voice speaks what you say in Norwegian. Needs live voice-to-speech. Downloads a 66 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "description": "A voice speaks what you say in Norwegian. Needs speech recognition and AI voices. Downloads a 129 MB translation model and voice once, when you ask for it; translating then happens on this PC.",
   "language": "nb",
   "language_name": "Norwegian",
   "download": {
@@ -11,5 +11,14 @@
     "sha256": "57968230195e64e07ed44f3becc9222b9c7f23e88b6cebaeba3d4b56d3d140fc",
     "bytes": 66218935
   },
-  "credits": "English to Norwegian model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+  "credits": "English to Norwegian model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0. Voice: Piper voice no_NO-talesyntese-medium from rhasspy/piper-voices, CC0.",
+  "voice": {
+    "name": "Talesyntese",
+    "url": "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/no/no_NO/talesyntese/medium/no_NO-talesyntese-medium.onnx",
+    "sha256": "b763aebe02e72c4628c4074c4b8b448f05ffe523b975bfcd58e2c5d531270c13",
+    "bytes": 63201294,
+    "config_url": "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/no/no_NO/talesyntese/medium/no_NO-talesyntese-medium.onnx.json",
+    "config_sha256": "b0eb0491fc8bf9843d2beac8acf8773b6cf59274316406b36ff579ae8a1909d5",
+    "config_bytes": 4880
+  }
 }

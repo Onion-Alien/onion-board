@@ -263,6 +263,8 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "ai-voice-made",
             # an AI voice card's right-click Edit voice
             "ai-voice-edit-menu",
+            # a downloaded language's voice card picked on AI voices (never which one)
+            "ai-voice-language",
             # Clean mic switched on (never how strong), its Hear the difference played, and
             # Open Clean mic in the box after Bun set Discord up
             "clean-mic", "clean-mic-test", "clean-mic-open",

@@ -2251,7 +2251,6 @@
   "“{name}” is a built-in voice's name. Pick another one.": "“{name}” on valmiin puheäänen nimi. Valitse toinen.",
   "↓ that button!": "↓ se painike!",
   "−{seconds}s": "−{seconds} s",
-  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice, the voice changer and the computer voice; your real voice is muted meanwhile.": "⏱ Muut kuulevat sinut kielellä {language} muutaman sekunnin viiveellä: jokainen lause kirjoitetaan muistiin, käännetään ja puhutaan, kun olet sanonut sen loppuun. Se toimii tekoälypuheäänen, äänenmuuntimen ja tietokoneäänen kanssa; oikea puheesi on sillä välin mykistetty.",
   "● Hearing you…": "● Kuulee sinut…",
   "● ON: sending a program's sound": "● PÄÄLLÄ: lähettää ohjelman ääntä",
   "● ON: sending {programs}": "● PÄÄLLÄ: lähettää: {programs}",
@@ -3251,7 +3250,6 @@
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "Lataajaa (yt-dlp) ei ole asennettu, Asetukset → Päivitykset → Apuohjelmat → yt-dlp → Asenna uudelleen.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows ei löydä laitetta <b>{mic}</b> juuri nyt. Kytke se kiinni, tai laita se päälle, jos se on langaton. Eikö mikkiä ole ollenkaan? Käytä alla olevaa <b>virtuaalikaapelia</b>: se toimii ilman mikkiä.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Mikkisi ei lähetä ääntä juuri nyt (pois päältä, mykistetty tai mikkiä ei ole kytketty), joten muut kuulevat vain äänesi. Haluatko, että sinutkin kuullaan? Laita se päälle tai poista mykistys.",
-  "A {language} computer voice, once it's on this PC (below).": "Tietokoneääni kielelle {language}, kun se on tällä PC:llä (alla).",
   "Delete the {language} download": "Poista kielen {language} lataus",
   "Don't translate": "Älä käännä",
   "Said by": "Sanoo",
@@ -3261,8 +3259,6 @@
   "Use the computer voice instead": "Käytä tietokoneääntä sen sijaan",
   "Your AI voice, {voice}. It's on: just talk.": "Tekoälypuheäänesi, {voice}. Se on päällä: puhu vain.",
   "{voice} with your {effect} voice changer. It's on: just talk.": "{voice} äänenmuuntimella {effect}. Se on päällä: puhu vain.",
-  "{voice}, the computer voice, once you press Start.": "{voice}, tietokoneääni, kun painat Aloita.",
-  "{voice}, the computer voice. It's on: just talk.": "{voice}, tietokoneääni. Se on päällä: puhu vain.",
   "Once a day and after a failed download, gets a newer yt-dlp from PyPI, but only a version the app's makers approved that has been out for at least 3 days. Off by default.": "Kerran päivässä ja epäonnistuneen latauksen jälkeen hakee uudemman yt-dlp:n PyPI:stä, mutta vain version, jonka sovelluksen tekijät ovat hyväksyneet ja joka on ollut julki vähintään 3 päivää. Oletuksena pois.",
   "The list of approved yt-dlp versions couldn't be read": "Hyväksyttyjen yt-dlp-versioiden listaa ei voitu lukea",
   "Force update": "Pakota päivitys",
@@ -3995,7 +3991,6 @@
   "Others hear you in {language}.": "Muut kuulevat sinut kielellä {language}.",
   "Pick a language first: click one below.": "Valitse ensin kieli: klikkaa yhtä alta.",
   "Talk in your language and others hear another one. Pick a language to turn it on.": "Puhu omalla kielelläsi ja muut kuulevat toisen. Valitse kieli laittaaksesi sen päälle.",
-  "{language} isn't downloaded yet. Download and install it now? It's a one-time {size} MB download, and Windows may ask to add its voice too.": "Kieltä {language} ei ole vielä ladattu. Ladataanko ja asennetaanko se nyt? Se on kertalataus, {size} Mt, ja Windows voi kysyä myös sen puheäänen lisäämistä.",
   "A random sound": "Satunnainen ääni",
   "Alerts": "Hälytykset",
   "Channel points": "Kanavapisteet",
@@ -4837,10 +4832,6 @@
   "(AI voice)": "(Tekoälypuheääni)",
   "(Voice changer)": "(Äänenmuunnin)",
   "(Clean mic)": "(Puhdas mikki)",
-  "(Computer voice)": "(Tietokoneääni)",
-  "(Custom voice)": "(Oma ääni)",
-  "(Voice server)": "(Äänipalvelin)",
-  "Windows voice": "Windowsin ääni",
   "{n} new": [
     "{n} uusi",
     "{n} uutta"
@@ -4869,5 +4860,13 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Ne kuuluvat, kun pätkät soivat yhdessä, ja pätkän omissa Soita nyt-, Tallenna uutena nappina- ja Kopioi-toiminnoissa (oikea klikkaus)",
   "{name} (splice {n})": "{name} (pätkä {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Kopioitu: liitä se chattiin tai kansioon",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Vieritä zoomataksesi. Vedä pätkän tasoviivan pisteitä: kulmia sivulle häivytystä varten ja ylös tai alas äänenvoimakkuutta varten, päitä ylös tai alas sille, mistä häivytys alkaa. Klikkaa pätkää omia efektejä varten, oikea klikkaus näyttää lisää."
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Vieritä zoomataksesi. Vedä pätkän tasoviivan pisteitä: kulmia sivulle häivytystä varten ja ylös tai alas äänenvoimakkuutta varten, päitä ylös tai alas sille, mistä häivytys alkaa. Klikkaa pätkää omia efektejä varten, oikea klikkaus näyttää lisää.",
+  "The {language} voice, once {language} is downloaded (below).": "Kielen {language} ääni, kun {language} on ladattu (alla).",
+  "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "Kieltä {language} ei ole vielä ladattu. Ladataanko se nyt? Kertalataus on {size} Mt, ja mukana on ääni, joka puhuu kieltä {language}.",
+  "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice} lukee sanasi kielellä {language}. Valitse se puhuaksesi kieltä {language}.",
+  "{voice}, the {language} voice. It's on: just talk.": "{voice}, kielen {language} ääni. Se on päällä: puhu vain.",
+  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ Muut kuulevat sinut kielellä {language} muutaman sekunnin viiveellä: jokainen lause kirjoitetaan muistiin, käännetään ja puhutaan, kun olet sanonut sen loppuun. Se toimii myös tekoälypuheäänen ja äänenmuuntimen kanssa; oikea puheesi on sillä välin mykistetty.",
+  "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "Kielen {language} ääni tarvitsee Tekoälypuheäänet-lisäosan: hae se Tekoälypuheäänet-välilehdeltä.",
+  "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "Kielen {language} ääni tarvitsee uusimmat tekoälypuheäänet: paina Tekoälypuheäänet-välilehden Lisää vaihtoehtoja -kohdasta Päivitä tekoälypuheäänet.",
+  "({language} voice)": "(kielen {language} ääni)"
 }

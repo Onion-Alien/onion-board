@@ -122,9 +122,15 @@ def test_voice_panel_reports_when_it_is_changing_your_voice(panel):
     assert seen[-1] is True and panel.is_active()
     panel.fx.btn_power.setChecked(False)
     assert seen[-1] is False and not panel.is_active()
-    panel.speech.livevoice._set_live_ui(True, "starting…")  # the computer voice counts too
-    assert seen[-1] is True
-    panel.speech.livevoice._set_live_ui(False, "")
+    from types import SimpleNamespace
+    # a language on by itself counts too: its voice speaks for you
+    speaking = [SimpleNamespace(language="de", language_name="German", voice={})]
+    panel.speech.translating = lambda: speaking[0]
+    panel.speech.livevoice.translate_for = lambda who: None
+    panel._emit_active()
+    assert seen[-1] is True and panel.is_active()
+    speaking[0] = None
+    panel._emit_active()
     assert seen[-1] is False
 
 

@@ -754,3 +754,41 @@ def test_a_load_that_ran_out_of_memory_says_so(addon_code):
     assert helper._out_of_memory(RuntimeError("[ONNXRuntimeError] : 6 : bad allocation"))
     assert helper._out_of_memory(ImportError("DLL load failed: The paging file is too small"))
     assert not helper._out_of_memory(ImportError("No module named 'onnxruntime'"))
+
+
+def test_downloaded_languages_voices_are_cards_on_ai_voices(qapp, tmp_path):
+    """Each downloaded language's own voice is a card under Languages: clicking one
+    speaks that language with it (the AI voice goes off); it's lit while it speaks."""
+    from soundboard.ui.voice.aivoicepanel import LANGS, AiVoicePanel
+    folder = tmp_path / "ai-voices"
+    folder.mkdir()
+    for f in ("module.json", "voices.json"):
+        (folder / f).write_bytes((ADDON / f).read_bytes())
+    (info,) = modules.discover([tmp_path])
+    p = AiVoicePanel(AiVoiceController(VoiceChain(), lambda e: None), {}, [info])
+    try:
+        langs = [{"id": "piper:de", "name": "German", "language": "de", "about": "Thorsten"},
+                 {"id": "piper:zh", "name": "Chinese", "language": "zh", "about": "Huayan"}]
+        p.set_language_voices(langs, "")
+        assert {"piper:de", "piper:zh"} <= set(p._tile)
+        p.show_group("")   # All: under their own heading, last
+        g = p._tile_grid
+
+        def row(w):
+            return g.getItemPosition(g.indexOf(w))[0]
+        assert row(p._heads[LANGS]) > max(row(b) for i, b in p._tile.items()
+                                          if not i.startswith("piper:"))
+        assert row(p._tile["piper:zh"]) > row(p._heads[LANGS])
+        picked = []
+        p.language_picked.connect(picked.append)
+        p._tile["piper:zh"].click()
+        assert picked == ["zh"] and not p.is_on()
+        p.set_language_voices(langs, "zh")                  # it speaks Chinese now: lit
+        assert p._tile["piper:zh"].isChecked() and not p._tile["piper:de"].isChecked()
+        p._tile["piper:zh"].click()                         # the lit one again: off
+        assert picked == ["zh", ""]
+        p.set_language_voices(langs[:1], "")                # Chinese deleted: its card goes
+        assert "piper:zh" not in p._tile and "piper:de" in p._tile
+    finally:
+        p.shutdown()
+        p.deleteLater()

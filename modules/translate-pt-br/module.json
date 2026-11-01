@@ -3,7 +3,7 @@
   "name": "Translate to Portuguese (Brazil)",
   "version": "1.0.0",
   "kind": "translation",
-  "description": "The computer voice speaks what you say in Portuguese (Brazil). Needs live voice-to-speech. Downloads a 66 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "description": "A voice speaks what you say in Portuguese (Brazil). Needs speech recognition and AI voices. Downloads a 129 MB translation model and voice once, when you ask for it; translating then happens on this PC.",
   "language": "pt-BR",
   "language_name": "Portuguese (Brazil)",
   "download": {
@@ -11,5 +11,14 @@
     "sha256": "1d1cd5e9540c6b38c258bed002a42d3b311b8a189acb74feaa311ef30d175c5b",
     "bytes": 66179201
   },
-  "credits": "English to Portuguese (Brazil) model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+  "credits": "English to Portuguese (Brazil) model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0. Voice: Piper voice pt_BR-faber-medium from rhasspy/piper-voices, CC0.",
+  "voice": {
+    "name": "Faber",
+    "url": "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/pt/pt_BR/faber/medium/pt_BR-faber-medium.onnx",
+    "sha256": "858555e3a064209c57088fe6bd70c4c3dc54d03eaa00c45d5ecaf43a33f95aa7",
+    "bytes": 63201294,
+    "config_url": "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/pt/pt_BR/faber/medium/pt_BR-faber-medium.onnx.json",
+    "config_sha256": "7e694de195ae3fc36dd732c445eb04fb49b649854893cb5506b978f0d50a1d6f",
+    "config_bytes": 4855
+  }
 }

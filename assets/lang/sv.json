@@ -2251,7 +2251,6 @@
   "“{name}” is a built-in voice's name. Pick another one.": "”{name}” är namnet på en inbyggd röst. Välj ett annat.",
   "↓ that button!": "↓ den knappen!",
   "−{seconds}s": "−{seconds} s",
-  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice, the voice changer and the computer voice; your real voice is muted meanwhile.": "⏱ Andra hör dig på {language} några sekunder senare: varje mening skrivs ner, översätts och läses sedan upp när du är klar med den. Det funkar med AI-rösten, röstförvrängaren och datorrösten; din riktiga röst är tystad under tiden.",
   "● Hearing you…": "● Hör dig…",
   "● ON: sending a program's sound": "● PÅ: skickar ett programs ljud",
   "● ON: sending {programs}": "● PÅ: skickar {programs}",
@@ -3251,7 +3250,6 @@
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "Nedladdaren (yt-dlp) är inte installerad, Inställningar → Uppdateringar → Hjälpprogram → yt-dlp → Installera om.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows hittar inte <b>{mic}</b> just nu. Anslut det, eller slå på det om det är trådlöst. Ingen mikrofon alls? Använd den <b>virtuella kabeln</b> nedan: den fungerar utan.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Din mikrofon skickar inget ljud just nu (avstängd, tystad eller ingen mikrofon ansluten), så andra hör bara dina ljud. Vill du att de hör dig också? Slå på den eller slå på ljudet.",
-  "A {language} computer voice, once it's on this PC (below).": "En datorröst på {language}, när den finns på den här datorn (nedan).",
   "Delete the {language} download": "Ta bort nedladdningen för {language}",
   "Don't translate": "Översätt inte",
   "Said by": "Sägs av",
@@ -3261,8 +3259,6 @@
   "Use the computer voice instead": "Använd datorrösten i stället",
   "Your AI voice, {voice}. It's on: just talk.": "Din AI-röst, {voice}. Den är på: prata bara.",
   "{voice} with your {effect} voice changer. It's on: just talk.": "{voice} med din röstförvrängare {effect}. Den är på: prata bara.",
-  "{voice}, the computer voice, once you press Start.": "{voice}, datorrösten, när du trycker på Start.",
-  "{voice}, the computer voice. It's on: just talk.": "{voice}, datorrösten. Den är på: prata bara.",
   "Once a day and after a failed download, gets a newer yt-dlp from PyPI, but only a version the app's makers approved that has been out for at least 3 days. Off by default.": "En gång om dagen och efter en misslyckad nedladdning hämtar den en nyare yt-dlp från PyPI, men bara en version som appens skapare har godkänt och som har varit ute i minst 3 dagar. Av som standard.",
   "The list of approved yt-dlp versions couldn't be read": "Listan över godkända yt-dlp-versioner gick inte att läsa",
   "Force update": "Tvinga uppdatering",
@@ -3995,7 +3991,6 @@
   "Others hear you in {language}.": "Andra hör dig på {language}.",
   "Pick a language first: click one below.": "Välj ett språk först: klicka på ett nedan.",
   "Talk in your language and others hear another one. Pick a language to turn it on.": "Prata på ditt språk så hör andra ett annat. Välj ett språk för att slå på det.",
-  "{language} isn't downloaded yet. Download and install it now? It's a one-time {size} MB download, and Windows may ask to add its voice too.": "{language} är inte nedladdat än. Ladda ner och installera det nu? Det är en engångsnedladdning på {size} MB, och Windows kan be om att lägga till rösten också.",
   "A random sound": "Ett slumpat ljud",
   "Alerts": "Aviseringar",
   "Channel points": "Kanalpoäng",
@@ -4837,10 +4832,6 @@
   "(AI voice)": "(AI-röst)",
   "(Voice changer)": "(Röstförvrängare)",
   "(Clean mic)": "(Ren mikrofon)",
-  "(Computer voice)": "(Datorröst)",
-  "(Custom voice)": "(Egen röst)",
-  "(Voice server)": "(Röstserver)",
-  "Windows voice": "Windows-röst",
   "{n} new": [
     "{n} ny",
     "{n} nya"
@@ -4869,5 +4860,13 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "De hörs när klippen spelas ihop, och i klippets egna Spela nu, Spara som ny ruta och Kopiera (högerklicka på det)",
   "{name} (splice {n})": "{name} (klipp {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Kopierat: klistra in det i en chatt eller mapp",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Scrolla för att zooma. Dra prickarna på ett klipps nivålinje: hörnen åt sidan för en toning och upp eller ner för volymen, ändarna upp eller ner för var en toning börjar. Klicka på ett klipp för egna effekter, högerklicka för mer."
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Scrolla för att zooma. Dra prickarna på ett klipps nivålinje: hörnen åt sidan för en toning och upp eller ner för volymen, ändarna upp eller ner för var en toning börjar. Klicka på ett klipp för egna effekter, högerklicka för mer.",
+  "The {language} voice, once {language} is downloaded (below).": "Rösten för {language}, när {language} har laddats ned (nedan).",
+  "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "{language} är inte nedladdat än. Ladda ned nu? Det är en engångsnedladdning på {size} MB, med en röst som talar {language}.",
+  "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice} läser upp dina ord på {language}. Välj den för att tala {language}.",
+  "{voice}, the {language} voice. It's on: just talk.": "{voice}, rösten för {language}. Den är på: prata bara.",
+  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ Andra hör dig på {language} några sekunder senare: varje mening skrivs ner, översätts och läses sedan upp när du är klar med den. Det funkar även med AI-rösten och röstförvrängaren; din riktiga röst är tystad under tiden.",
+  "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "Rösten för {language} behöver tillägget AI-röster: hämta det på fliken AI-röster.",
+  "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "Rösten för {language} behöver de senaste AI-rösterna: tryck på Uppdatera AI-röster under Fler alternativ på fliken AI-röster.",
+  "({language} voice)": "(röst för {language})"
 }

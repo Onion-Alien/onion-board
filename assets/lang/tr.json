@@ -2251,7 +2251,6 @@
   "“{name}” is a built-in voice's name. Pick another one.": "“{name}” yerleşik bir ses filtresinin adı. Başka bir ad seçin.",
   "↓ that button!": "↓ o düğme!",
   "−{seconds}s": "−{seconds} sn",
-  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice, the voice changer and the computer voice; your real voice is muted meanwhile.": "⏱ Diğerleri sizi birkaç saniye gecikmeyle {language} duyar: her cümle yazıya dökülür, çevrilir ve siz bitirince söylenir. Yapay zekâ sesi, ses değiştirici ve bilgisayar sesiyle çalışır; bu sırada gerçek sesiniz susturulur.",
   "● Hearing you…": "● Sizi duyuyor…",
   "● ON: sending a program's sound": "● AÇIK: bir programın sesi gönderiliyor",
   "● ON: sending {programs}": "● AÇIK: {programs} gönderiliyor",
@@ -3251,7 +3250,6 @@
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "İndirici (yt-dlp) kurulu değil: Ayarlar → Güncellemeler → Yardımcı programlar → yt-dlp → Yeniden kur.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows şu anda <b>{mic}</b> cihazını bulamıyor. Takın ya da kablosuzsa açın. Hiç mikrofonunuz yok mu? Aşağıdaki <b>sanal kabloyu</b> kullanın: mikrofonsuz da çalışır.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Mikrofonunuz şu anda ses göndermiyor (kapalı, susturulmuş ya da takılı mikrofon yok), bu yüzden diğerleri sadece seslerinizi duyuyor. Sizi de duysunlar mı? Açın ya da susturmayı kaldırın.",
-  "A {language} computer voice, once it's on this PC (below).": "Bir {language} bilgisayar sesi, bu bilgisayara kurulduğunda (aşağıda).",
   "Delete the {language} download": "{language} indirmesini sil",
   "Don't translate": "Çevirme",
   "Said by": "Söyleyen",
@@ -3261,8 +3259,6 @@
   "Use the computer voice instead": "Bunun yerine bilgisayar sesini kullan",
   "Your AI voice, {voice}. It's on: just talk.": "Yapay zekâ sesiniz, {voice}. Açık: sadece konuşun.",
   "{voice} with your {effect} voice changer. It's on: just talk.": "{voice}, {effect} ses değiştiricinizle. Açık: sadece konuşun.",
-  "{voice}, the computer voice, once you press Start.": "{voice}, bilgisayar sesi, Başlat'a bastığınızda.",
-  "{voice}, the computer voice. It's on: just talk.": "{voice}, bilgisayar sesi. Açık: sadece konuşun.",
   "Once a day and after a failed download, gets a newer yt-dlp from PyPI, but only a version the app's makers approved that has been out for at least 3 days. Off by default.": "Günde bir kez ve başarısız bir indirmeden sonra PyPI'dan daha yeni bir yt-dlp alır, ama sadece uygulamanın yapımcılarının onayladığı ve en az 3 gündür yayında olan bir sürümü. Varsayılan olarak kapalı.",
   "The list of approved yt-dlp versions couldn't be read": "Onaylı yt-dlp sürümlerinin listesi okunamadı",
   "Force update": "Zorla güncelle",
@@ -3995,7 +3991,6 @@
   "Others hear you in {language}.": "Diğerleri sizi {language} duyar.",
   "Pick a language first: click one below.": "Önce bir dil seçin: aşağıdan birine tıklayın.",
   "Talk in your language and others hear another one. Pick a language to turn it on.": "Kendi dilinizde konuşun, diğerleri başka bir dil duysun. Açmak için bir dil seçin.",
-  "{language} isn't downloaded yet. Download and install it now? It's a one-time {size} MB download, and Windows may ask to add its voice too.": "{language} henüz indirilmedi. Şimdi indirilip kurulsun mu? Bir kerelik {size} MB'lık bir indirmedir ve Windows sesini de eklemek isteyebilir.",
   "A random sound": "Rastgele bir ses",
   "Alerts": "Uyarılar",
   "Channel points": "Kanal puanları",
@@ -4837,10 +4832,6 @@
   "(AI voice)": "(Yapay zekâ sesi)",
   "(Voice changer)": "(Ses değiştirici)",
   "(Clean mic)": "(Temiz mikrofon)",
-  "(Computer voice)": "(Bilgisayar sesi)",
-  "(Custom voice)": "(Özel ses)",
-  "(Voice server)": "(Ses sunucusu)",
-  "Windows voice": "Windows sesi",
   "{n} new": [
     "{n} yeni",
     "{n} yeni"
@@ -4869,5 +4860,13 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Parçalar birleşik çalınca ve parçanın kendi Şimdi çal, Yeni pad olarak kaydet ve Kopyala seçeneklerinde duyulur (üstüne sağ tıkla)",
   "{name} (splice {n})": "{name} (parça {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Kopyalandı: bir sohbete ya da klasöre yapıştır",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Yakınlaştırmak için kaydır. Bir parçanın seviye çizgisindeki noktaları sürükle: köşeleri yana geçiş için, yukarı ya da aşağı ses düzeyi için; uçları yukarı ya da aşağı geçişin nereden başlayacağı için. Kendi efektleri için bir parçaya tıkla, fazlası için sağ tıkla."
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Yakınlaştırmak için kaydır. Bir parçanın seviye çizgisindeki noktaları sürükle: köşeleri yana geçiş için, yukarı ya da aşağı ses düzeyi için; uçları yukarı ya da aşağı geçişin nereden başlayacağı için. Kendi efektleri için bir parçaya tıkla, fazlası için sağ tıkla.",
+  "The {language} voice, once {language} is downloaded (below).": "{language} sesi, {language} indirildiğinde (aşağıda).",
+  "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "{language} henüz indirilmedi. Şimdi indirilsin mi? {size} MB'lık tek seferlik bir indirme; {language} konuşan bir sesle birlikte.",
+  "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice}, sözlerinizi {language} olarak okur. {language} konuşmak için seçin.",
+  "{voice}, the {language} voice. It's on: just talk.": "{voice}, {language} sesi. Açık: sadece konuşun.",
+  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ Diğerleri sizi birkaç saniye gecikmeyle {language} duyar: her cümle yazıya dökülür, çevrilir ve siz bitirince söylenir. Yapay zekâ sesi ve ses değiştiriciyle de çalışır; bu sırada gerçek sesiniz susturulur.",
+  "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "{language} sesi için Yapay zekâ sesleri eklentisi gerekir: Yapay zekâ sesleri sekmesinden alın.",
+  "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "{language} sesi için en yeni Yapay zekâ sesleri gerekir: Yapay zekâ sesleri sekmesinde Diğer seçenekler altından Yapay zekâ seslerini güncelle'ye basın.",
+  "({language} voice)": "({language} sesi)"
 }

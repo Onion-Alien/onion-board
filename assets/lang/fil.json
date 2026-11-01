@@ -2251,7 +2251,6 @@
   "“{name}” is a built-in voice's name. Pick another one.": "Pangalan ng built-in na voice ang “{name}”. Pumili ng iba.",
   "↓ that button!": "↓ 'yang button na 'yan!",
   "−{seconds}s": "−{seconds}s",
-  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice, the voice changer and the computer voice; your real voice is muted meanwhile.": "⏱ Naririnig ka ng iba sa {language} nang ilang segundong huli: isinusulat, tina-translate, tapos binibigkas ang bawat pangungusap kapag tapos mo na ito. Gumagana ito sa AI voice, sa voice changer at sa computer voice; naka-mute ang totoong boses mo habang ganito.",
   "● Hearing you…": "● Naririnig ka…",
   "● ON: sending a program's sound": "● ON: nagpapadala ng sound ng program",
   "● ON: sending {programs}": "● ON: ipinapadala ang {programs}",
@@ -3251,7 +3250,6 @@
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "Hindi naka-install ang downloader (yt-dlp), Settings → Mga update → Mga helper program → yt-dlp → I-reinstall.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Hindi mahanap ng Windows ang <b>{mic}</b> ngayon. Isaksak ito, o i-on kung wireless ito. Walang mic talaga? Gamitin ang <b>virtual cable</b> sa ibaba: gumagana ito kahit walang mic.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Walang sound na ipinapadala ang mic mo ngayon (naka-off, naka-mute o walang nakasaksak na mic), kaya mga sound mo lang ang naririnig ng iba. Gusto mong marinig ka rin nila? I-on o i-unmute ito.",
-  "A {language} computer voice, once it's on this PC (below).": "Isang computer voice sa {language}, kapag nasa PC na ito (sa ibaba).",
   "Delete the {language} download": "Burahin ang download ng {language}",
   "Don't translate": "Huwag isalin",
   "Said by": "Sinasabi ni",
@@ -3261,8 +3259,6 @@
   "Use the computer voice instead": "Gamitin na lang ang computer voice",
   "Your AI voice, {voice}. It's on: just talk.": "Ang AI voice mo, si {voice}. Naka-on ito: magsalita ka lang.",
   "{voice} with your {effect} voice changer. It's on: just talk.": "{voice} na may voice changer mong {effect}. Naka-on ito: magsalita ka lang.",
-  "{voice}, the computer voice, once you press Start.": "{voice}, ang computer voice, kapag pinindot mo ang Simulan.",
-  "{voice}, the computer voice. It's on: just talk.": "{voice}, ang computer voice. Naka-on ito: magsalita ka lang.",
   "Once a day and after a failed download, gets a newer yt-dlp from PyPI, but only a version the app's makers approved that has been out for at least 3 days. Off by default.": "Isang beses kada araw at pagkatapos ng pumalyang download, kumukuha ng mas bagong yt-dlp mula sa PyPI, pero version lang na inaprubahan ng mga gumawa ng app at labas na nang hindi bababa sa 3 araw. Naka-off bilang default.",
   "The list of approved yt-dlp versions couldn't be read": "Hindi mabasa ang listahan ng mga inaprubahang version ng yt-dlp",
   "Force update": "Pilitin ang update",
@@ -3995,7 +3991,6 @@
   "Others hear you in {language}.": "Naririnig ka ng iba sa {language}.",
   "Pick a language first: click one below.": "Pumili muna ng wika: i-click ang isa sa ibaba.",
   "Talk in your language and others hear another one. Pick a language to turn it on.": "Magsalita sa sarili mong wika at iba ang naririnig ng iba. Pumili ng wika para i-on ito.",
-  "{language} isn't downloaded yet. Download and install it now? It's a one-time {size} MB download, and Windows may ask to add its voice too.": "Hindi pa na-download ang {language}. I-download at i-install na ngayon? Isang beses lang na download ito na {size} MB, at baka hilingin din ng Windows na idagdag ang voice nito.",
   "A random sound": "Random na sound",
   "Alerts": "Mga alerto",
   "Channel points": "Channel points",
@@ -4837,10 +4832,6 @@
   "(AI voice)": "(AI voice)",
   "(Voice changer)": "(Voice changer)",
   "(Clean mic)": "(Malinis na mic)",
-  "(Computer voice)": "(Boses ng computer)",
-  "(Custom voice)": "(Sariling boses)",
-  "(Voice server)": "(Voice server)",
-  "Windows voice": "Boses ng Windows",
   "{n} new": [
     "{n} bago",
     "{n} bago"
@@ -4869,5 +4860,13 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Naririnig ang mga ito kapag pinagsama ang mga hiwa, at sa sariling Patugtugin ngayon, I-save bilang bagong pad at Kopyahin ng hiwa (i-right-click ito)",
   "{name} (splice {n})": "{name} (hiwa {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Nakopya: i-paste ito sa chat o folder",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Mag-scroll para mag-zoom. Sa level line ng hiwa, i-drag ang mga tuldok: ang mga sulok pakanan o pakaliwa para sa fade at pataas o pababa para sa volume, ang mga dulo pataas o pababa para sa simula ng fade. Mag-click sa hiwa para sa sariling effects, right-click para sa iba pa."
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Mag-scroll para mag-zoom. Sa level line ng hiwa, i-drag ang mga tuldok: ang mga sulok pakanan o pakaliwa para sa fade at pataas o pababa para sa volume, ang mga dulo pataas o pababa para sa simula ng fade. Mag-click sa hiwa para sa sariling effects, right-click para sa iba pa.",
+  "The {language} voice, once {language} is downloaded (below).": "Ang boses ng {language}, kapag na-download na ang {language} (sa ibaba).",
+  "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "Hindi pa na-download ang {language}. I-download na ngayon? Isang beses na {size} MB na download ito, kasama ang boses na nagsasalita ng {language}.",
+  "{voice} reads your words in {language}. Pick it to speak {language}.": "Binabasa ni {voice} ang mga salita mo sa {language}. Piliin ito para magsalita ng {language}.",
+  "{voice}, the {language} voice. It's on: just talk.": "{voice}, ang boses ng {language}. Naka-on ito: magsalita ka lang.",
+  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ Naririnig ka ng iba sa {language} nang ilang segundong huli: isinusulat, tina-translate, tapos binibigkas ang bawat pangungusap kapag tapos mo na ito. Gumagana ito din sa AI voice at sa voice changer; naka-mute ang totoong boses mo habang ganito.",
+  "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "Kailangan ng boses ng {language} ang add-on na Mga AI voice: kunin ito sa tab na Mga AI voice.",
+  "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "Kailangan ng boses ng {language} ang pinakabagong mga AI voice: pindutin ang I-update ang mga AI voice sa Iba pang option ng tab na Mga AI voice.",
+  "({language} voice)": "(boses ng {language})"
 }

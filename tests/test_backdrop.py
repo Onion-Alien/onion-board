@@ -560,40 +560,6 @@ def test_the_effects_play_on_the_computer_voices_lines():
     assert np.allclose(ctl._effects(x, SR), full.render(x, SR), atol=1e-6)   # once each
 
 
-def test_the_computer_voice_has_a_bar_like_the_others(qapp, monkeypatch):
-    """Its bar shows while it speaks for you: its name and kind, the same Effects (one
-    list, the same count) and Edit voice opening its settings; the Background's loops
-    are made for it with the voice changer off."""
-    p = _voice_panel(monkeypatch)
-    try:
-        fx, sb = p.fx, p.speak_bar
-        assert sb.picked.isHidden()
-        made = []
-        monkeypatch.setattr(p.backdrop, "update", lambda cfg, load: made.append(cfg))
-        fx.set_on_top("rain", 0.6)
-        p.speech.livevoice.b_live.setChecked(True)
-        assert not sb.picked.isHidden() and p.controller.on_top
-        assert sb.picked_name.text() == "Zira"
-        assert sb.picked_kind.text() == "(Computer voice)"
-        assert sb.btn_effects.accessibleName() == fx.btn_effects.accessibleName() \
-            == "Effects  ·  1"
-        assert made[-1] and made[-1]["rain"] == 0.6           # loops for the computer voice
-        sb.btn_effects.click()
-        pop = fx.effects_pop
-        process_events(qapp, lambda: pop.isVisible(), timeout=5)
-        assert pop._under is sb.btn_effects
-        pop.close()
-        p.show_tab("fx")
-        sb.btn_tweak.click()                                  # its settings
-        assert p.current_tab() == "speak" and p.speech.btn_opts.isChecked()
-        p.speech.livevoice.b_live.setChecked(False)
-        assert sb.picked.isHidden() and not p.controller.on_top
-        assert made[-1] is None
-    finally:
-        p.shutdown()
-        p.deleteLater()
-
-
 def _picked_bar(qapp):
     from PySide6.QtWidgets import QLayout
     from soundboard.ui.voice.voicefxpanel import VoiceFxPanel

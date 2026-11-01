@@ -2206,7 +2206,6 @@
   "“{name}” is a built-in voice's name. Pick another one.": "“{name}” เป็นชื่อของเสียงพูดในตัว เลือกชื่ออื่น",
   "↓ that button!": "↓ ปุ่มนั่น!",
   "−{seconds}s": "−{seconds} วิ",
-  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice, the voice changer and the computer voice; your real voice is muted meanwhile.": "⏱ คนอื่นจะได้ยินคุณเป็นภาษา {language} ช้าไปไม่กี่วินาที: แต่ละประโยคจะถูกถอดเป็นข้อความ แปล แล้วพูดเมื่อคุณพูดประโยคนั้นจบ ใช้ได้กับเสียง AI ตัวเปลี่ยนเสียง และเสียงคอมพิวเตอร์ ระหว่างนั้นเสียงจริงของคุณจะถูกปิด",
   "● Hearing you…": "● ได้ยินคุณ…",
   "● ON: sending a program's sound": "● เปิด: กำลังส่งเสียงของโปรแกรม",
   "● ON: sending {programs}": "● เปิด: กำลังส่ง {programs}",
@@ -3183,7 +3182,6 @@
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "ไม่ได้ติดตั้งตัวดาวน์โหลด (yt-dlp) ไปที่ การตั้งค่า → อัปเดต → โปรแกรมช่วยเหลือ → yt-dlp → ติดตั้งใหม่",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "ตอนนี้ Windows หา <b>{mic}</b> ไม่เจอ เสียบมัน หรือเปิดมันถ้าเป็นแบบไร้สาย ไม่มีไมค์เลยเหรอ? ใช้ <b>สายเสมือน</b> ด้านล่าง: ใช้ได้แม้ไม่มีไมค์",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "ตอนนี้ไมค์ของคุณไม่ส่งเสียงเลย (ปิดอยู่ ปิดเสียงอยู่ หรือไม่ได้เสียบไมค์) คนอื่นจึงได้ยินแค่เสียงเอฟเฟกต์ของคุณ อยากให้เขาได้ยินคุณด้วยไหม? เปิดไมค์หรือเลิกปิดเสียง",
-  "A {language} computer voice, once it's on this PC (below).": "เสียงคอมพิวเตอร์ภาษา{language} เมื่อมีในพีซีนี้แล้ว (ด้านล่าง)",
   "Delete the {language} download": "ลบไฟล์ดาวน์โหลดภาษา{language}",
   "Don't translate": "ไม่แปล",
   "Said by": "ผู้พูด",
@@ -3193,8 +3191,6 @@
   "Use the computer voice instead": "ใช้เสียงคอมพิวเตอร์แทน",
   "Your AI voice, {voice}. It's on: just talk.": "เสียง AI ของคุณ {voice} เปิดอยู่: พูดได้เลย",
   "{voice} with your {effect} voice changer. It's on: just talk.": "{voice} กับตัวเปลี่ยนเสียง {effect} เปิดอยู่: พูดได้เลย",
-  "{voice}, the computer voice, once you press Start.": "{voice} เสียงคอมพิวเตอร์ เมื่อคุณกดเริ่ม",
-  "{voice}, the computer voice. It's on: just talk.": "{voice} เสียงคอมพิวเตอร์ เปิดอยู่: พูดได้เลย",
   "Once a day and after a failed download, gets a newer yt-dlp from PyPI, but only a version the app's makers approved that has been out for at least 3 days. Off by default.": "วันละครั้งและหลังการดาวน์โหลดล้มเหลว จะดาวน์โหลด yt-dlp ที่ใหม่กว่าจาก PyPI แต่เฉพาะเวอร์ชันที่ผู้สร้างแอปอนุมัติแล้วและออกมาแล้วอย่างน้อย 3 วัน ปิดไว้เป็นค่าเริ่มต้น",
   "The list of approved yt-dlp versions couldn't be read": "อ่านรายการเวอร์ชัน yt-dlp ที่อนุมัติแล้วไม่ได้",
   "Force update": "บังคับอัปเดต",
@@ -3921,7 +3917,6 @@
   "Others hear you in {language}.": "คนอื่นได้ยินคุณเป็นภาษา{language}",
   "Pick a language first: click one below.": "เลือกภาษาก่อน: คลิกหนึ่งภาษาด้านล่าง",
   "Talk in your language and others hear another one. Pick a language to turn it on.": "พูดภาษาของคุณ แล้วคนอื่นจะได้ยินอีกภาษา เลือกภาษาเพื่อเปิด",
-  "{language} isn't downloaded yet. Download and install it now? It's a one-time {size} MB download, and Windows may ask to add its voice too.": "ยังไม่ได้ดาวน์โหลด{language} ดาวน์โหลดและติดตั้งตอนนี้ไหม เป็นการดาวน์โหลดครั้งเดียว {size} MB และ Windows อาจขอเพิ่มเสียงของภาษานั้นด้วย",
   "A random sound": "เสียงสุ่ม",
   "Alerts": "การแจ้งเตือน",
   "Channel points": "แต้มช่อง",
@@ -4747,10 +4742,6 @@
   "(AI voice)": "(เสียง AI)",
   "(Voice changer)": "(ตัวเปลี่ยนเสียง)",
   "(Clean mic)": "(ไมค์ไร้เสียงรบกวน)",
-  "(Computer voice)": "(เสียงคอมพิวเตอร์)",
-  "(Custom voice)": "(เสียงที่กำหนดเอง)",
-  "(Voice server)": "(เซิร์ฟเวอร์เสียง)",
-  "Windows voice": "เสียงของ Windows",
   "{n} new": [
     "ใหม่ {n}"
   ],
@@ -4777,5 +4768,13 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "จะได้ยินเมื่อช่วงต่างๆ เล่นต่อกัน และในเล่นเลย บันทึกเป็นแพดใหม่ และคัดลอกของช่วงนั้น (คลิกขวาที่มัน)",
   "{name} (splice {n})": "{name} (ช่วง {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ คัดลอกแล้ว: วางในแชทหรือโฟลเดอร์ได้เลย",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "เลื่อนลูกกลิ้งเพื่อซูม บนเส้นระดับของช่วง ลากจุด: มุมไปด้านข้างเพื่อเฟด และขึ้นลงเพื่อปรับความดัง ปลายขึ้นลงเพื่อตั้งระดับที่เฟดเริ่ม คลิกช่วงเพื่อใส่เอฟเฟกต์ของมันเอง คลิกขวาเพื่อดูเพิ่ม"
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "เลื่อนลูกกลิ้งเพื่อซูม บนเส้นระดับของช่วง ลากจุด: มุมไปด้านข้างเพื่อเฟด และขึ้นลงเพื่อปรับความดัง ปลายขึ้นลงเพื่อตั้งระดับที่เฟดเริ่ม คลิกช่วงเพื่อใส่เอฟเฟกต์ของมันเอง คลิกขวาเพื่อดูเพิ่ม",
+  "The {language} voice, once {language} is downloaded (below).": "เสียงภาษา{language} เมื่อดาวน์โหลด{language}แล้ว (ด้านล่าง)",
+  "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "ยังไม่ได้ดาวน์โหลด{language} ดาวน์โหลดตอนนี้ไหม? ดาวน์โหลดครั้งเดียว {size} MB พร้อมเสียงที่พูด{language}",
+  "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice} อ่านคำพูดของคุณเป็น{language} เลือกเพื่อพูด{language}",
+  "{voice}, the {language} voice. It's on: just talk.": "{voice} เสียงภาษา{language} เปิดอยู่: พูดได้เลย",
+  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ คนอื่นจะได้ยินคุณเป็นภาษา {language} ช้าไปไม่กี่วินาที: แต่ละประโยคจะถูกถอดเป็นข้อความ แปล แล้วพูดเมื่อคุณพูดประโยคนั้นจบ ใช้กับเสียง AI และตัวเปลี่ยนเสียงได้ด้วย ระหว่างนั้นเสียงจริงของคุณจะถูกปิด",
+  "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "เสียงภาษา{language}ต้องใช้ส่วนเสริมเสียง AI: ติดตั้งได้ที่แท็บเสียง AI",
+  "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "เสียงภาษา{language}ต้องใช้เสียง AI รุ่นล่าสุด: กดอัปเดตเสียง AI ในตัวเลือกเพิ่มเติมของแท็บเสียง AI",
+  "({language} voice)": "(เสียงภาษา{language})"
 }

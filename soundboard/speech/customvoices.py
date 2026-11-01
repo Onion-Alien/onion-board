@@ -39,6 +39,7 @@ import soundfile as sf
 
 from soundboard.sounds import library
 from soundboard.online import net, netlog
+from soundboard.speech import piper
 from soundboard.speech.tts import TTS_RATE, SapiTTS
 from soundboard.core import errors
 
@@ -366,30 +367,64 @@ def answers(url: str, timeout: float = 2.0) -> bool:
         return False
 
 
+_language_voices: dict[str, str] = {}   # "piper:xx" -> its name, as label() shows it
+
+
 def label(name: str) -> str:
-    """How a voice (Windows or custom) reads in the UI."""
+    """How a voice (Windows, custom or a language's) reads in the UI."""
     if name.startswith(PREFIX):
         return f"{name[len(PREFIX):]} (custom)"
+    if name.startswith(piper.PREFIX):
+        return _language_voices.get(name, name[len(piper.PREFIX):])
     return name.replace("Microsoft ", "").replace(" Desktop", "")
 
 
+def language_voices() -> dict[str, tuple[Path, str, str]]:
+    """The downloaded languages' voices: {"piper:xx": (voice.onnx, language, name)},
+    found in the translation folder (translation/xx/voice/), named from the voice's
+    own settings file ("huayan" -> "Huayan"). Reads the disk: off the UI thread."""
+    from soundboard.core import langnames
+    from soundboard.speech import translation
+    found = {}
+    try:
+        folders = sorted(d for d in translation.base_dir().iterdir() if d.is_dir())
+    except OSError:
+        return found
+    for d in folders:
+        f = d / "voice" / translation.VOICE_FILE
+        try:
+            cfg = json.loads(f.with_name(f.name + ".json").read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if not f.is_file() or not isinstance(cfg, dict):
+            continue
+        lang = d.name
+        name = str(cfg.get("dataset") or lang).replace("_", " ").title()
+        found[piper.voice_id(lang)] = (f, lang, f"{name} ({langnames.name(lang, lang)})")
+    return found
+
+
 class VoiceSet(SapiTTS):
-    """The Windows voices plus the custom ones, as one TTS for the Speaker: the
-    custom ones are added to `voices` / `voice_langs` as `custom:<name>`."""
+    """The Windows voices plus the custom ones and the languages' own voices, as one
+    TTS for the Speaker: the custom ones are added to `voices` / `voice_langs` as
+    `custom:<name>`, the language voices as `piper:<language>`."""
 
     def __init__(self):
         super().__init__()
         self.custom: dict[str, CustomVoice] = {}
         self.problems: list[str] = []
+        self.languages: dict[str, tuple[Path, str, str]] = {}
+        self.reader = piper.PiperReader()
 
     def _merge(self):
-        win = [v for v in self.voices if not v.startswith(PREFIX)]
-        self.voices = win + list(self.custom)
+        win = [v for v in self.voices if not v.startswith((PREFIX, piper.PREFIX))]
+        self.voices = win + list(self.custom) + list(self.languages)
         self.voice_langs = {k: v for k, v in self.voice_langs.items()
-                            if not k.startswith(PREFIX)}
+                            if not k.startswith((PREFIX, piper.PREFIX))}
         self.voice_langs.update({k: v.language for k, v in self.custom.items()})
-        if self.custom:
-            self.error = ""     # Windows speech failing doesn't stop the custom voices
+        self.voice_langs.update({k: v[1] for k, v in self.languages.items()})
+        if self.custom or self.languages:
+            self.error = ""     # Windows speech failing doesn't stop the others
 
     def _load_custom(self):
         voices, problems = load()
@@ -397,6 +432,39 @@ class VoiceSet(SapiTTS):
         self.problems = problems
         for p in problems:
             log.warning("custom voice: %s", p)
+        try:
+            self.languages = language_voices()
+        except Exception:  # noqa: BLE001 - a bad add-on folder must not cost the others
+            log.exception("couldn't list the language voices")
+            self.languages = {}
+        _language_voices.clear()
+        _language_voices.update({k: v[2] for k, v in self.languages.items()})
+
+    def voice_for(self, lang: str, prefer: str = "") -> str:
+        """The voice translated lines in `lang` ("de", "zh-TW"…) are read with: that
+        language's own voice, once it's downloaded. Only a language that comes without
+        one (its add-on lists no "voice") falls back to a Windows voice that speaks it."""
+        want = lang.lower()
+        for vid, (_f, code, _n) in self.languages.items():
+            if code.lower() == want:
+                return vid
+        base = want.split("-")[0]
+        return next((vid for vid, (_f, code, _n) in self.languages.items()
+                     if code.lower().split("-")[0] == base), "") \
+            or super().voice_for(lang, prefer)
+
+    def warm_language(self, voice: str) -> None:
+        """Load a language's voice now (a few seconds the first time), so the first
+        translated line isn't late by that much too. Blocks: call it off the UI thread."""
+        if voice.startswith(piper.PREFIX):
+            try:
+                self.synth(".", voice)
+            except RuntimeError as e:   # the line itself will say why
+                log.info("couldn't load the language voice yet: %s", e)
+
+    def close(self):
+        super().close()
+        self.reader.close()
 
     def _start(self):
         super()._start()        # a restarted Windows engine relists only its own voices
@@ -421,6 +489,14 @@ class VoiceSet(SapiTTS):
         return self.voices
 
     def synth(self, text: str, voice: str = "", rate: int = 0) -> tuple[np.ndarray, int]:
+        if voice.startswith(piper.PREFIX):
+            lv = self.languages.get(voice)
+            if lv is None:   # downloaded since the list was made (this is a worker)
+                self.languages.update(language_voices())
+                lv = self.languages.get(voice)
+            if lv is None:
+                raise RuntimeError("that language's voice isn't downloaded")
+            return self.reader.synth(text, lv[0], rate)
         if not voice.startswith(PREFIX):
             return super().synth(text, voice, rate)
         cv = self.custom.get(voice)

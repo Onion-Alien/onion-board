@@ -233,12 +233,18 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         self.speech.live_changed.connect(self._speech_live)
         self.speech.lang_changed.connect(self._emit_active)
         self._section("speak", self.speech, self.speech.title, self.speech.head)
-        # the computer voice's bar (a voice server's voice too): it has no voice cards
+        # the language's own voice, speaking for you: a bar like the AI voice's (with
+        # the AI voice or the voice changer speaking it, theirs says who speaks)
         from soundboard.ui.voice.voicebar import VoiceBar
-        self.speak_bar = VoiceBar(self.speech, self.speech.livevoice.b_live.isChecked)
-        self.speak_bar.effects_wanted.connect(lambda: (
-            usage.used("voice-effects"), self.fx.open_effects(self.speak_bar.btn_effects)))
-        self.speak_bar.edit_wanted.connect(self._edit_speak_voice)
+        self._reader = ""          # who speaks the language: "read", "ai", "fx" or ""
+        self.lang_bar = VoiceBar(self.speech, lambda: self._reader == "read")
+        self.lang_bar.effects_wanted.connect(lambda: (
+            usage.used("voice-effects"), self.fx.open_effects(self.lang_bar.btn_effects)))
+        self.lang_bar.edit_wanted.connect(self._edit_lang_voice)
+        # a language's voice card on AI voices: speak that language ("": stop)
+        self.ai.language_picked.connect(
+            lambda code: self.speech.set_language(code) if code
+            else self.speech.stop_translating())
         self._follow_offline()
         self.speech.custom_wanted.connect(lambda: self.show_tab("addons"))
         self.addons = ModulesList(self.speech.custom_title, self.speech.custom_box)
@@ -331,8 +337,8 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         """The cards with a picked voice's bar: (tab key, panel). Clean mic's first, as
         the sound goes through it."""
         bars = (("clean", self.clean_bar), ("fx", self.fx), ("ai", self.ai))
-        speak = getattr(self, "speak_bar", None)   # (made after the other cards)
-        return bars + (("speak", speak),) if speak is not None else bars
+        lang = getattr(self, "lang_bar", None)   # (made after the other cards)
+        return bars + (("lang", lang),) if lang is not None else bars
 
     def set_view(self, view: str):
         """The voices as picture cards or a list, in both cards."""

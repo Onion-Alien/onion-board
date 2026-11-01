@@ -2251,7 +2251,6 @@
   "“{name}” is a built-in voice's name. Pick another one.": "“{name}” एक बिल्ट-इन आवाज़ का नाम है। कोई दूसरा चुनें।",
   "↓ that button!": "↓ वह बटन!",
   "−{seconds}s": "−{seconds}s",
-  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice, the voice changer and the computer voice; your real voice is muted meanwhile.": "⏱ दूसरे आपको {language} में कुछ सेकंड देर से सुनते हैं: हर वाक्य लिखा जाता है, अनुवाद होता है, फिर आपके पूरा बोलने के बाद बोला जाता है। यह AI आवाज़, वॉइस चेंजर और कंप्यूटर वाली आवाज़ के साथ काम करता है; तब तक आपकी असली आवाज़ म्यूट रहती है।",
   "● Hearing you…": "● आपको सुन रहे हैं…",
   "● ON: sending a program's sound": "● चालू: किसी प्रोग्राम का साउंड भेज रहे हैं",
   "● ON: sending {programs}": "● चालू: {programs} भेज रहे हैं",
@@ -3251,7 +3250,6 @@
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "डाउनलोडर (yt-dlp) इंस्टॉल नहीं है, सेटिंग्स → अपडेट → सहायक प्रोग्राम → yt-dlp → दोबारा इंस्टॉल करें।",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows को अभी <b>{mic}</b> नहीं मिल रहा। उसे लगाएँ, या वायरलेस हो तो चालू करें। माइक है ही नहीं? नीचे वाला <b>वर्चुअल केबल</b> इस्तेमाल करें: वह बिना माइक के भी चलता है।",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "आपका माइक अभी कोई आवाज़ नहीं भेज रहा (बंद है, म्यूट है या कोई माइक लगा नहीं है), इसलिए दूसरों को सिर्फ़ आपके साउंड सुनाई देते हैं। चाहते हैं कि वे आपको भी सुनें? उसे चालू करें या अनम्यूट करें।",
-  "A {language} computer voice, once it's on this PC (below).": "{language} की कंप्यूटर आवाज़, जब वह इस PC पर आ जाए (नीचे)।",
   "Delete the {language} download": "{language} का डाउनलोड डिलीट करें",
   "Don't translate": "अनुवाद न करें",
   "Said by": "कौन बोलेगा",
@@ -3261,8 +3259,6 @@
   "Use the computer voice instead": "इसकी जगह कंप्यूटर आवाज़ इस्तेमाल करें",
   "Your AI voice, {voice}. It's on: just talk.": "आपकी AI आवाज़, {voice}। चालू है: बस बोलिए।",
   "{voice} with your {effect} voice changer. It's on: just talk.": "{voice}, आपके {effect} वॉइस चेंजर के साथ। चालू है: बस बोलिए।",
-  "{voice}, the computer voice, once you press Start.": "{voice}, कंप्यूटर आवाज़, जब आप शुरू करें दबाएँ।",
-  "{voice}, the computer voice. It's on: just talk.": "{voice}, कंप्यूटर आवाज़। चालू है: बस बोलिए।",
   "Once a day and after a failed download, gets a newer yt-dlp from PyPI, but only a version the app's makers approved that has been out for at least 3 days. Off by default.": "दिन में एक बार और डाउनलोड नाकाम होने के बाद, PyPI से नया yt-dlp लाता है, पर सिर्फ़ वही वर्शन जिसे ऐप बनाने वालों ने मंज़ूर किया है और जिसे आए कम से कम 3 दिन हो गए हैं। डिफ़ॉल्ट रूप से बंद।",
   "The list of approved yt-dlp versions couldn't be read": "मंज़ूर किए गए yt-dlp वर्शन की लिस्ट पढ़ी नहीं जा सकी",
   "Force update": "ज़बरदस्ती अपडेट करें",
@@ -3995,7 +3991,6 @@
   "Others hear you in {language}.": "दूसरे आपको {language} में सुनते हैं।",
   "Pick a language first: click one below.": "पहले कोई भाषा चुनें: नीचे से एक पर क्लिक करें।",
   "Talk in your language and others hear another one. Pick a language to turn it on.": "अपनी भाषा में बोलें और दूसरे कोई और भाषा सुनें। चालू करने के लिए कोई भाषा चुनें।",
-  "{language} isn't downloaded yet. Download and install it now? It's a one-time {size} MB download, and Windows may ask to add its voice too.": "{language} अभी डाउनलोड नहीं हुई है। अभी डाउनलोड और इंस्टॉल करें? यह एक बार का {size} MB का डाउनलोड है, और Windows इसकी आवाज़ जोड़ने के लिए भी पूछ सकता है।",
   "A random sound": "कोई रैंडम साउंड",
   "Alerts": "अलर्ट",
   "Channel points": "चैनल पॉइंट",
@@ -4837,10 +4832,6 @@
   "(AI voice)": "(AI आवाज़)",
   "(Voice changer)": "(वॉइस चेंजर)",
   "(Clean mic)": "(साफ़ माइक)",
-  "(Computer voice)": "(कंप्यूटर की आवाज़)",
-  "(Custom voice)": "(कस्टम आवाज़)",
-  "(Voice server)": "(वॉइस सर्वर)",
-  "Windows voice": "Windows की आवाज़",
   "{n} new": [
     "{n} नया",
     "{n} नए"
@@ -4869,5 +4860,13 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "ये तब सुनाई देती हैं जब टुकड़े जोड़कर चलते हैं, और टुकड़े के अपने अभी चलाएँ, नए पैड के रूप में सेव करें और कॉपी में (उस पर राइट-क्लिक करें)",
   "{name} (splice {n})": "{name} (टुकड़ा {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ कॉपी हो गया: इसे किसी चैट या फ़ोल्डर में पेस्ट करें",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "ज़ूम के लिए स्क्रॉल करें। टुकड़े की लेवल लाइन पर बिंदु खींचें: कोनों को बगल में फ़ेड के लिए और ऊपर-नीचे आवाज़ के लिए, सिरों को ऊपर-नीचे यह तय करने के लिए कि फ़ेड कहाँ से शुरू हो। अपने इफ़ेक्ट के लिए टुकड़े पर क्लिक करें, और के लिए राइट-क्लिक करें।"
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "ज़ूम के लिए स्क्रॉल करें। टुकड़े की लेवल लाइन पर बिंदु खींचें: कोनों को बगल में फ़ेड के लिए और ऊपर-नीचे आवाज़ के लिए, सिरों को ऊपर-नीचे यह तय करने के लिए कि फ़ेड कहाँ से शुरू हो। अपने इफ़ेक्ट के लिए टुकड़े पर क्लिक करें, और के लिए राइट-क्लिक करें।",
+  "The {language} voice, once {language} is downloaded (below).": "{language} की आवाज़, जब {language} डाउनलोड हो जाए (नीचे)।",
+  "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "{language} अभी डाउनलोड नहीं हुई है। अभी डाउनलोड करें? यह {size} MB का एक बार का डाउनलोड है, साथ में {language} बोलने वाली आवाज़।",
+  "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice} आपके शब्द {language} में पढ़ती है। {language} बोलने के लिए इसे चुनें।",
+  "{voice}, the {language} voice. It's on: just talk.": "{voice}, {language} की आवाज़। चालू है: बस बोलिए।",
+  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ दूसरे आपको {language} में कुछ सेकंड देर से सुनते हैं: हर वाक्य लिखा जाता है, अनुवाद होता है, फिर आपके पूरा बोलने के बाद बोला जाता है। यह AI आवाज़ और वॉइस चेंजर के साथ भी काम करता है; तब तक आपकी असली आवाज़ म्यूट रहती है।",
+  "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "{language} की आवाज़ को AI आवाज़ें ऐड-ऑन चाहिए: इसे AI आवाज़ें टैब से लें।",
+  "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "{language} की आवाज़ को सबसे नई AI आवाज़ें चाहिए: AI आवाज़ें टैब में और विकल्प के अंदर AI आवाज़ें अपडेट करें दबाएँ।",
+  "({language} voice)": "({language} की आवाज़)"
 }

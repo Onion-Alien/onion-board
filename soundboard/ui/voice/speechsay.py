@@ -168,6 +168,7 @@ class SpeechSay(_Panel):
         if error and not quiet:
             self._tts_error(_("Text-to-speech isn't available: {error}",
                               error=errors.plain(error)))
+        self.lang_changed.emit()   # the AI voices' Languages cards follow the voices
 
     def show_custom_voices(self):
         """Open the Add-ons tab (VoicePanel shows it) and bring custom voices into view."""

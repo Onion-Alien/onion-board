@@ -2251,7 +2251,6 @@
   "“{name}” is a built-in voice's name. Pick another one.": "“{name}” é o nome de uma voz embutida. Escolha outro.",
   "↓ that button!": "↓ esse botão!",
   "−{seconds}s": "−{seconds} s",
-  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice, the voice changer and the computer voice; your real voice is muted meanwhile.": "⏱ Os outros ouvem você em {language} com alguns segundos de atraso: cada frase é transcrita, traduzida e falada quando você termina. Funciona com a voz de IA, o modificador de voz e a voz de computador; enquanto isso, sua voz real fica silenciada.",
   "● Hearing you…": "● Ouvindo você…",
   "● ON: sending a program's sound": "● LIGADO: enviando o som de um programa",
   "● ON: sending {programs}": "● LIGADO: enviando {programs}",
@@ -3251,7 +3250,6 @@
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "O baixador (yt-dlp) não está instalado, Configurações → Atualizações → Programas auxiliares → yt-dlp → Reinstalar.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "O Windows não encontra <b>{mic}</b> agora. Conecte, ou ligue se for sem fio. Não tem microfone nenhum? Use o <b>cabo virtual</b> abaixo: ele funciona sem microfone.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Seu microfone não está mandando som agora (desligado, mudo ou nenhum microfone conectado), então os outros ouvem só os seus sons. Quer que ouçam você também? Ligue ou tire do mudo.",
-  "A {language} computer voice, once it's on this PC (below).": "Uma voz de computador em {language}, quando estiver neste PC (abaixo).",
   "Delete the {language} download": "Excluir o download de {language}",
   "Don't translate": "Não traduzir",
   "Said by": "Falado por",
@@ -3261,8 +3259,6 @@
   "Use the computer voice instead": "Usar a voz de computador",
   "Your AI voice, {voice}. It's on: just talk.": "Sua voz de IA, {voice}. Está ligada: é só falar.",
   "{voice} with your {effect} voice changer. It's on: just talk.": "{voice} com seu modificador de voz {effect}. Está ligado: é só falar.",
-  "{voice}, the computer voice, once you press Start.": "{voice}, a voz de computador, quando você clicar em Iniciar.",
-  "{voice}, the computer voice. It's on: just talk.": "{voice}, a voz de computador. Está ligada: é só falar.",
   "Once a day and after a failed download, gets a newer yt-dlp from PyPI, but only a version the app's makers approved that has been out for at least 3 days. Off by default.": "Uma vez por dia e depois de um download que falhou, baixa um yt-dlp mais novo do PyPI, mas só uma versão que os criadores do app aprovaram e que saiu há pelo menos 3 dias. Desligado por padrão.",
   "The list of approved yt-dlp versions couldn't be read": "Não foi possível ler a lista de versões aprovadas do yt-dlp",
   "Force update": "Forçar atualização",
@@ -3995,7 +3991,6 @@
   "Others hear you in {language}.": "Os outros ouvem você em {language}.",
   "Pick a language first: click one below.": "Escolha um idioma primeiro: clique num abaixo.",
   "Talk in your language and others hear another one. Pick a language to turn it on.": "Fale no seu idioma e os outros ouvem outro. Escolha um idioma para ligá-lo.",
-  "{language} isn't downloaded yet. Download and install it now? It's a one-time {size} MB download, and Windows may ask to add its voice too.": "{language} ainda não foi baixado. Baixar e instalar agora? É um download único de {size} MB, e o Windows pode pedir para adicionar a voz também.",
   "A random sound": "Um som aleatório",
   "Alerts": "Alertas",
   "Channel points": "Pontos do canal",
@@ -4837,10 +4832,6 @@
   "(AI voice)": "(Voz de IA)",
   "(Voice changer)": "(Modificador de voz)",
   "(Clean mic)": "(Microfone limpo)",
-  "(Computer voice)": "(Voz de computador)",
-  "(Custom voice)": "(Voz personalizada)",
-  "(Voice server)": "(Servidor de voz)",
-  "Windows voice": "Voz do Windows",
   "{n} new": [
     "{n} novo",
     "{n} novos"
@@ -4869,5 +4860,13 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Eles tocam quando os trechos são juntados, e no Tocar agora, Salvar como novo botão e Copiar do trecho (clique direito nele)",
   "{name} (splice {n})": "{name} (trecho {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Copiado: cole num chat ou numa pasta",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Role para dar zoom. Na linha de nível de um trecho, arraste os pontos: os cantos para o lado para um fade e para cima ou baixo para o volume, as pontas para cima ou baixo para onde um fade começa. Clique num trecho para efeitos próprios, clique direito para mais."
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Role para dar zoom. Na linha de nível de um trecho, arraste os pontos: os cantos para o lado para um fade e para cima ou baixo para o volume, as pontas para cima ou baixo para onde um fade começa. Clique num trecho para efeitos próprios, clique direito para mais.",
+  "The {language} voice, once {language} is downloaded (below).": "A voz em {language}, assim que {language} for baixado (abaixo).",
+  "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "{language} ainda não foi baixado. Baixar agora? É um download único de {size} MB, com uma voz que fala {language}.",
+  "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice} lê suas palavras em {language}. Escolha para falar {language}.",
+  "{voice}, the {language} voice. It's on: just talk.": "{voice}, a voz em {language}. Está ligada: é só falar.",
+  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ Os outros ouvem você em {language} com alguns segundos de atraso: cada frase é transcrita, traduzida e falada quando você termina. Funciona também com a voz de IA e o modificador de voz; enquanto isso, sua voz real fica silenciada.",
+  "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "A voz em {language} precisa do complemento Vozes de IA: pegue-o na aba Vozes de IA.",
+  "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "A voz em {language} precisa das Vozes de IA mais novas: clique em Atualizar vozes de IA em Mais opções, na aba Vozes de IA.",
+  "({language} voice)": "(voz em {language})"
 }

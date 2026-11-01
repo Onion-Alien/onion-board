@@ -2206,7 +2206,6 @@
   "“{name}” is a built-in voice's name. Pick another one.": "“{name}” adalah nama suara bawaan. Pilih yang lain.",
   "↓ that button!": "↓ tombol itu!",
   "−{seconds}s": "−{seconds} dtk",
-  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice, the voice changer and the computer voice; your real voice is muted meanwhile.": "⏱ Orang lain mendengar Anda dalam {language} dengan jeda beberapa detik: setiap kalimat ditulis, diterjemahkan, lalu diucapkan setelah Anda selesai mengucapkannya. Ini bekerja dengan suara AI, pengubah suara, dan suara komputer; sementara itu, suara asli Anda dibisukan.",
   "● Hearing you…": "● Mendengar Anda…",
   "● ON: sending a program's sound": "● NYALA: mengirim suara program",
   "● ON: sending {programs}": "● NYALA: mengirim {programs}",
@@ -3183,7 +3182,6 @@
   "The downloader (yt-dlp) isn't installed, Settings → Updates → Helper programs → yt-dlp → Reinstall.": "Pengunduh (yt-dlp) belum terpasang, Pengaturan → Pembaruan → Program pembantu → yt-dlp → Instal ulang.",
   "Windows can't find <b>{mic}</b> right now. Plug it in, or switch it on if it's wireless. No mic at all? Use the <b>virtual cable</b> below: it works without one.": "Windows tidak menemukan <b>{mic}</b> sekarang. Sambungkan, atau nyalakan kalau nirkabel. Tidak punya mic sama sekali? Pakai <b>kabel virtual</b> di bawah: bisa tanpa mic.",
   "Your mic sends no sound right now (switched off, muted or no mic plugged in), so others hear only your sounds. Want them to hear you too? Turn it on or unmute it.": "Mic Anda tidak mengirim suara sekarang (mati, dibisukan, atau tidak ada mic yang terpasang), jadi orang lain hanya mendengar suara-suara Anda. Mau mereka juga mendengar Anda? Nyalakan atau aktifkan suaranya.",
-  "A {language} computer voice, once it's on this PC (below).": "Suara komputer {language}, setelah ada di PC ini (di bawah).",
   "Delete the {language} download": "Hapus unduhan {language}",
   "Don't translate": "Jangan terjemahkan",
   "Said by": "Diucapkan oleh",
@@ -3193,8 +3191,6 @@
   "Use the computer voice instead": "Pakai suara komputer saja",
   "Your AI voice, {voice}. It's on: just talk.": "Suara AI Anda, {voice}. Sudah nyala: bicara saja.",
   "{voice} with your {effect} voice changer. It's on: just talk.": "{voice} dengan pengubah suara {effect}. Sudah nyala: bicara saja.",
-  "{voice}, the computer voice, once you press Start.": "{voice}, suara komputer, setelah Anda tekan Mulai.",
-  "{voice}, the computer voice. It's on: just talk.": "{voice}, suara komputer. Sudah nyala: bicara saja.",
   "Once a day and after a failed download, gets a newer yt-dlp from PyPI, but only a version the app's makers approved that has been out for at least 3 days. Off by default.": "Sekali sehari dan setelah unduhan gagal, mengambil yt-dlp yang lebih baru dari PyPI, tapi hanya versi yang sudah disetujui pembuat aplikasi dan sudah keluar minimal 3 hari. Mati secara bawaan.",
   "The list of approved yt-dlp versions couldn't be read": "Daftar versi yt-dlp yang disetujui tidak bisa dibaca",
   "Force update": "Paksa pembaruan",
@@ -3921,7 +3917,6 @@
   "Others hear you in {language}.": "Orang lain mendengar Anda dalam {language}.",
   "Pick a language first: click one below.": "Pilih bahasa dulu: klik salah satu di bawah.",
   "Talk in your language and others hear another one. Pick a language to turn it on.": "Bicara dalam bahasa Anda dan orang lain mendengar bahasa lain. Pilih bahasa untuk menyalakannya.",
-  "{language} isn't downloaded yet. Download and install it now? It's a one-time {size} MB download, and Windows may ask to add its voice too.": "{language} belum diunduh. Unduh dan pasang sekarang? Ini unduhan sekali saja sebesar {size} MB, dan Windows mungkin juga meminta untuk menambahkan suaranya.",
   "A random sound": "Suara acak",
   "Alerts": "Peringatan",
   "Channel points": "Poin channel",
@@ -4747,10 +4742,6 @@
   "(AI voice)": "(Suara AI)",
   "(Voice changer)": "(Pengubah suara)",
   "(Clean mic)": "(Mic bersih)",
-  "(Computer voice)": "(Suara komputer)",
-  "(Custom voice)": "(Suara kustom)",
-  "(Voice server)": "(Server suara)",
-  "Windows voice": "Suara Windows",
   "{n} new": [
     "{n} baru"
   ],
@@ -4777,5 +4768,13 @@
   "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Terdengar saat potongan diputar tergabung, dan di Putar sekarang, Simpan sebagai pad baru, dan Salin milik potongan itu (klik kanan padanya)",
   "{name} (splice {n})": "{name} (potongan {n})",
   "✓ Copied: paste it into a chat or a folder": "✓ Tersalin: tempel di chat atau folder",
-  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Gulir untuk zoom. Di garis level potongan, seret titiknya: sudutnya ke samping untuk fade dan naik atau turun untuk volume, ujungnya naik atau turun untuk titik awal fade. Klik potongan untuk efek sendiri, klik kanan untuk lainnya."
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Gulir untuk zoom. Di garis level potongan, seret titiknya: sudutnya ke samping untuk fade dan naik atau turun untuk volume, ujungnya naik atau turun untuk titik awal fade. Klik potongan untuk efek sendiri, klik kanan untuk lainnya.",
+  "The {language} voice, once {language} is downloaded (below).": "Suara {language}, setelah {language} diunduh (di bawah).",
+  "{language} isn't downloaded yet. Download it now? It's a one-time {size} MB download, with a voice that speaks {language}.": "{language} belum diunduh. Unduh sekarang? Ini unduhan sekali sebesar {size} MB, dengan suara yang berbicara {language}.",
+  "{voice} reads your words in {language}. Pick it to speak {language}.": "{voice} membacakan kata-kata Anda dalam {language}. Pilih untuk berbicara {language}.",
+  "{voice}, the {language} voice. It's on: just talk.": "{voice}, suara {language}. Sudah nyala: bicara saja.",
+  "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ Orang lain mendengar Anda dalam {language} dengan jeda beberapa detik: setiap kalimat ditulis, diterjemahkan, lalu diucapkan setelah Anda selesai mengucapkannya. Ini bekerja juga dengan suara AI dan pengubah suara; sementara itu, suara asli Anda dibisukan.",
+  "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "Suara {language} memerlukan add-on Suara AI: ambil di tab Suara AI.",
+  "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "Suara {language} memerlukan Suara AI terbaru: tekan Perbarui suara AI di Opsi lainnya pada tab Suara AI.",
+  "({language} voice)": "(suara {language})"
 }
