@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (QDoubleSpinBox, QHBoxLayout, QLabel, QPushButton,
                                QVBoxLayout, QWidget)
 
 from soundboard.audio import soundfx
+from soundboard.core import usage
 from soundboard.ui.kit import theme
 from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.i18n import _
@@ -202,6 +203,7 @@ class Waveform(QWidget):
 
     # the big one's zoom: `view` is the part of the sound shown, in seconds
     def zoom(self, factor: float, around: float | None = None):
+        usage.used("edit-wave-zoom")
         v0, v1 = self.view
         span = min(max((v1 - v0) / factor, self.length / MAX_ZOOM), self.length)
         at = (v0 + v1) / 2 if around is None else around
@@ -306,6 +308,8 @@ class Waveform(QWidget):
         t = self._t(x)
         self.play = t
         self.update()
+        if done:
+            usage.used("edit-wave-seek")
         self.scrubbed.emit(t, done)
 
     def _press_splices(self, x: float):
@@ -328,6 +332,7 @@ class Waveform(QWidget):
             elif len(self.splices) < soundfx.MAX_SPLICES:
                 self._first = None
                 self.splices.append([round(a, 3), round(b, 3)])
+                usage.used("edit-splice-marked")
                 self._hover = len(self.splices) - 1
                 self.setMouseTracking(True)
                 self.spliced.emit()
