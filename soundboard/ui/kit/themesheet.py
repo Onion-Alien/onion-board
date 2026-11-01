@@ -348,9 +348,10 @@ QRadioButton::indicator:checked:hover { image:url("$radio_on_hover"); }
 QRadioButton::indicator:disabled { image:url("$radio_off"); }
 QRadioButton::indicator:checked:disabled { image:url("$radio_on_off"); }
 QListWidget#settingscategories { background:transparent; border:none; outline:0; }
-QListWidget#settingscategories::item { padding:4px; border-radius:8px; }
+QListWidget#settingscategories { font-weight:600; }   /* as the rail's tabs */
+QListWidget#settingscategories::item { padding:4px; border-radius:8px; color:$muted; }
 QListWidget#settingscategories::item:selected { background:$nav_sel; color:$text_hi; }
-QListWidget#settingscategories::item:hover:!selected { background:$inset; }
+QListWidget#settingscategories::item:hover:!selected { background:$inset; color:$text; }
 QListWidget#pointlist { background:$inset; border:1px solid $border; border-radius:12px; padding:6px; outline:0; }
 QListWidget#pointlist::item { background:transparent; border:none; border-radius:8px; margin:2px 0; color:$muted; }
 QListWidget#pointlist::item:selected { background:$btn_press; }
