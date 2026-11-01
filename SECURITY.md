@@ -194,8 +194,12 @@ account or anything else about you.
   `6-20` or `21-plus`) and how many times you started it (`launches/0`, `1`, `2-5` or
   `6-plus`) since then;
 - the system (`os/win11`, `os/win10`, `os/win-older`, `os/linux` or `os/other`: never
-  the exact version), the app's language (`lang/de`) and theme (`theme/dark`: a
-  built-in theme's name, else `other`);
+  the exact version) and the app's theme (`theme/dark`: a built-in theme's name, else
+  `other`);
+- the language the app is showing and whether you picked it in Settings
+  (`lang/de/picked`; `lang/en/default` when you haven't picked one) and Windows' own
+  display language, as one of the languages the app comes in (`lang-windows/de`, `en`
+  when none fits): language codes only, never your region or other locale settings;
 - how many of Settings > Achievements you've earned (`achievements/0`, `1-2`, `3-5`,
   `6-10`, `11-20` or `21-plus`) and their score (`ach-score/0`, `1-50`, `51-150`,
   `151-400`, `401-1000`, `1001-2000` or `2001-plus`);

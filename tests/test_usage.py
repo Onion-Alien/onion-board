@@ -10,7 +10,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from soundboard import __version__
+from soundboard import __version__, i18n
 from soundboard.core import app, applog, reset, usage
 from soundboard.sounds import library
 from soundboard.online import net
@@ -58,8 +58,8 @@ class _Inline:
         pass
 
 
-ABOUT = ("age/", "route/", "sounds/", "played/", "open/", "lang/", "used/", "os/",
-         "launches/", "downloads/", "theme/", "achievements/",
+ABOUT = ("age/", "route/", "sounds/", "played/", "open/", "lang/", "lang-windows/",
+         "used/", "os/", "launches/", "downloads/", "theme/", "achievements/",
          "ach-score/")
 
 
@@ -838,7 +838,7 @@ def test_the_daily_count_says_roughly_how_its_used(sent):
     paths = _paths(sent[0][0])
     # 24 plays already: not a new install, so it's aged from its folder
     assert [p for p in paths if p.startswith(("route/", "sounds/", "played/", "lang/"))] == [
-        "route/mic", "sounds/11-50", "played/0", "lang/de"]
+        "route/mic", "sounds/11-50", "played/0", f"lang/{i18n.current()}/picked"]
     assert {p for p in paths if p.startswith("used/")} == {"used/voice-changer", "used/hotkeys"}
     assert sum(p.startswith("age/") for p in paths) == 1
     body = sent[0][0].data.decode("utf-8")
@@ -869,7 +869,32 @@ def test_an_odd_language_or_route_isnt_sent_as_typed(sent):
     cfg = Config(route="somewhere-new", language="<script>")
     usage.maybe_send(cfg)
     paths = _paths(sent[0][0])
-    assert "lang/auto" in paths and not any(p.startswith("route/") for p in paths)
+    assert f"lang/{i18n.current()}/picked" in paths
+    assert not any(p.startswith("route/") for p in paths)
+    assert "<script>" not in sent[0][0].data.decode("utf-8")
+
+
+def test_the_daily_count_says_the_language_showing_and_windows_own(sent, monkeypatch):
+    monkeypatch.setattr(i18n, "windows_language", lambda: "de-AT")
+    i18n.in_language("de", lambda: usage.maybe_send(Config(language="de")))
+    paths = _paths(sent[0][0])
+    assert "lang/de/picked" in paths and "lang-windows/de" in paths
+    # none picked: English, as the board doesn't follow Windows by itself yet
+    assert usage.lang_tags(Config()) == ["lang/en/default", "lang-windows/de"]
+    monkeypatch.setattr(i18n, "FOLLOW_WINDOWS", True)
+    assert i18n.in_language("pt-BR", lambda: usage.lang_tags(Config()))[0] == (
+        "lang/pt-BR/windows")
+    # a Windows language the app doesn't come in, or a full locale: a shipped code only
+    monkeypatch.setattr(i18n, "windows_language", lambda: "en-NZ")
+    assert usage.lang_tags(Config())[1] == "lang-windows/en"
+    monkeypatch.setattr(i18n, "windows_language", lambda: "kl-GL")
+    assert usage.lang_tags(Config())[1] == "lang-windows/en"
+
+
+def test_the_language_isnt_sent_with_the_count_off(sent, monkeypatch):
+    monkeypatch.setenv("ONIONBOARD_NO_STATS", "1")
+    usage.maybe_send(Config(language="de"))
+    assert not sent
 
 
 def test_a_new_install_sends_its_first_steps_once_each(sent):
