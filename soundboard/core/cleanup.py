@@ -42,7 +42,7 @@ RUN_KEYS = (r"Software\Microsoft\Windows\CurrentVersion\Run",
             r"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run")
 RUN_NAMES = ("OnionBoard", "OnionBoardResumeSetup")   # autostart.py, ui/setup/cablestep.py
 APP_EXES = ("onionboard.exe", "soundboard.exe", "obmichelper.exe")
-FIREWALL_RULES = ("onion-pocket-firewall",)           # onion_pocket/addon.py
+FIREWALL_RULES = ("OnionPocket",)                     # onion_pocket/lan.py FIREWALL_RULE
 STATE_ROOT = r"SOFTWARE\OnionBoard"
 _CREATE_NO_WINDOW = 0x08000000
 RESTART = 10       # ADMIN_PART's exit code: done, but something goes at the next restart

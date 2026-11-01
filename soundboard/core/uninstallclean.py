@@ -33,7 +33,7 @@ ADMIN = "--admin"
 DATA_LEFT = 1   # some of their sounds and settings stayed
 RULE_LEFT = 2   # the firewall rule stayed (Windows' prompt was turned down)
 MACHINE_LEFT = 4   # ProgramData's folder stayed (the prompt was turned down, or in use)
-RULES = ("onion-pocket-firewall",)   # onion_pocket/addon.py, as cleanup.FIREWALL_RULES
+RULES = ("OnionPocket",)   # onion_pocket/lan.py FIREWALL_RULE, as cleanup.FIREWALL_RULES
 _CREATE_NO_WINDOW = 0x08000000
 
 
