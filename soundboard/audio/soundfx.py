@@ -201,6 +201,34 @@ def live_view(fx: dict | None) -> tuple[float, float, dict]:
     return round(f["speed"], 3), round(f["pitch"], 2), livefx.clean(amounts)
 
 
+def live_split(fx: dict | None) -> tuple[dict, tuple | None]:
+    """A sound's settings as (what has to be baked in, what can run live on the
+    playing sound: a livefx.Stage, None when there's nothing). Live: the speed and
+    pitch (read faster and shifted, as Live controls do), its Live controls stages,
+    the boost; baked: the rest, the trim, reverse, EQ, voice effects and voice."""
+    f = clean(fx)
+    speed = f["speed"]
+    semis = f["pitch"] if f["tape"] else f["pitch"] - 12.0 * math.log2(speed)
+    stage = (speed, round(semis, 4), tuple(f["live"]), 10 ** (f["gain_db"] / 20))
+    base = dict(f, speed=1.0, pitch=0.0, tape=False, live=[], gain_db=0.0)
+    if (abs(speed - 1) < 1e-3 and abs(semis) < 1e-3 and not f["live"]
+            and abs(f["gain_db"]) < 1e-3):
+        return base, None
+    return base, stage
+
+
+def live_delta(saved: dict | None, fx: dict | None) -> tuple | None:
+    """The live stage that turns a sound baked with `saved` into one that sounds like
+    `fx`, when they differ only in speed, pitch and boost (a Nightcore pad sped up a
+    bit more); else None. Bakes like `fx` would for those."""
+    a, b = clean(saved), clean(fx)
+    (ab, sa), (bb, sb) = live_split(a), live_split(b)
+    if key(ab) != key(bb) or a["live"] != b["live"]:
+        return None
+    sa, sb = sa or livefx.NO_STAGE, sb or livefx.NO_STAGE
+    return (sb[0] / sa[0], round(sb[1] - sa[1], 4), (), sb[3] / sa[3])
+
+
 def _active_effects(fx: dict) -> list[str]:
     return [t for t, cfg in fx["effects"].items() if cfg.get("on") and t in voicefx.REGISTRY]
 
@@ -564,7 +592,7 @@ def _effects(pieces, fx: dict, skip: set):
     if not spec and not fx["live"]:
         yield from pieces
         return
-    stages = [(livefx.LiveFx(SR), st) for st in fx["live"]]
+    stages = [(livefx.LiveFx(SR, st), st) for st in fx["live"]]
     chain = []
     for kind, t, cfg in spec:
         cls = voicefx.REGISTRY[t]
