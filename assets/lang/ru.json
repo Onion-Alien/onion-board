@@ -4829,7 +4829,6 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Всё равно хочешь убрать фоновый шум? Включи вместо этого <b>Чистый микрофон</b> на вкладке <b>Голос</b> в Onion Board: он очищает твой голос и никогда не трогает твои звуки.",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "Окно побольше: большая волна, а эффекты и эквалайзер рядом",
   "Add effect": "Добавить эффект",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Перетащи ручки, чтобы отрезать начало и конец. Ctrl+колесо приближает, Shift+колесо сдвигает.",
   "No effect has that name.": "Нет эффекта с таким названием.",
   "Pick an effect to turn on": "Выбери эффект, чтобы включить его",
   "Redo ({keys})": "Повторить ({keys})",
@@ -4851,5 +4850,6 @@
   "Save as a new preset": "Сохранить как новый пресет",
   "Save what you have now into “{name}”": "Сохранить текущие настройки в «{name}»",
   "Update “{name}”": "Обновить «{name}»",
-  "Update, reset or save as a new preset": "Обновить, сбросить или сохранить как новый пресет"
+  "Update, reset or save as a new preset": "Обновить, сбросить или сохранить как новый пресет",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Перетащи ручки, чтобы отрезать начало и конец. Ctrl+колесо приближает. Чтобы сдвинуть, тяни правой кнопкой мыши или крути Shift+колесо."
 }

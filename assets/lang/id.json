@@ -4655,7 +4655,6 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Tetap ingin kebisingan latar hilang? Nyalakan saja <b>Mic bersih</b> di tab <b>Vokal</b> Onion Board: ia membersihkan suara Anda dan tidak pernah menyentuh suara-suara Anda.",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "Jendela lebih besar: gelombang suaranya besar, efek dan equalizer berdampingan",
   "Add effect": "Tambah efek",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Seret pegangannya untuk memotong awal dan akhir. Ctrl+gulir untuk zoom, Shift+gulir untuk menggeser.",
   "No effect has that name.": "Tidak ada efek dengan nama itu.",
   "Pick an effect to turn on": "Pilih efek untuk diaktifkan",
   "Redo ({keys})": "Ulangi ({keys})",
@@ -4677,5 +4676,6 @@
   "Save as a new preset": "Simpan sebagai preset baru",
   "Save what you have now into “{name}”": "Simpan pengaturan sekarang ke “{name}”",
   "Update “{name}”": "Perbarui “{name}”",
-  "Update, reset or save as a new preset": "Perbarui, reset, atau simpan sebagai preset baru"
+  "Update, reset or save as a new preset": "Perbarui, reset, atau simpan sebagai preset baru",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Seret pegangannya untuk memotong awal dan akhir. Ctrl+gulir untuk zoom. Seret dengan tombol kanan mouse, atau Shift+gulir, untuk menggeser."
 }

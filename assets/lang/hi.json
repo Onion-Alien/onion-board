@@ -4742,7 +4742,6 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "फिर भी बैकग्राउंड शोर हटाना है? उसकी जगह Onion Board के <b>वॉइस</b> टैब पर <b>साफ़ माइक</b> चालू करें: यह आपकी आवाज़ साफ़ करता है और आपके साउंड को कभी नहीं छूता।",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "बड़ी विंडो: वेवफ़ॉर्म बड़ा, इफ़ेक्ट और इक्वलाइज़र साथ-साथ",
   "Add effect": "इफ़ेक्ट जोड़ें",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "शुरू और आख़िर काटने के लिए हैंडल खींचें। Ctrl+स्क्रॉल से ज़ूम, Shift+स्क्रॉल से आगे-पीछे।",
   "No effect has that name.": "इस नाम का कोई इफ़ेक्ट नहीं है।",
   "Pick an effect to turn on": "चालू करने के लिए इफ़ेक्ट चुनें",
   "Redo ({keys})": "रीडू ({keys})",
@@ -4764,5 +4763,6 @@
   "Save as a new preset": "नए प्रीसेट के रूप में सेव करें",
   "Save what you have now into “{name}”": "अभी की सेटिंग “{name}” में सेव करें",
   "Update “{name}”": "“{name}” अपडेट करें",
-  "Update, reset or save as a new preset": "अपडेट, रीसेट या नए प्रीसेट के रूप में सेव करें"
+  "Update, reset or save as a new preset": "अपडेट, रीसेट या नए प्रीसेट के रूप में सेव करें",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "शुरू और आख़िर काटने के लिए हैंडल खींचें। Ctrl+स्क्रॉल से ज़ूम। आगे-पीछे जाने के लिए माउस का दायाँ बटन दबाकर खींचें, या Shift+स्क्रॉल करें।"
 }

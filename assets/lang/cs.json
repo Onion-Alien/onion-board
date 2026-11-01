@@ -4829,7 +4829,6 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Chceš se šumu v pozadí přesto zbavit? Zapni místo toho <b>Čistý mikrofon</b> na kartě <b>Hlas</b> v Onion Board: čistí tvůj hlas a na tvoje zvuky nikdy nesahá.",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "Větší okno: velká vlna a efekty s ekvalizérem vedle sebe",
   "Add effect": "Přidat efekt",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Tažením úchytů ořízneš začátek a konec. Ctrl+kolečko přibližuje, Shift+kolečko posouvá.",
   "No effect has that name.": "Žádný efekt se tak nejmenuje.",
   "Pick an effect to turn on": "Vyber efekt, který zapneš",
   "Redo ({keys})": "Znovu ({keys})",
@@ -4851,5 +4850,6 @@
   "Save as a new preset": "Uložit jako novou předvolbu",
   "Save what you have now into “{name}”": "Uložit současné nastavení do „{name}“",
   "Update “{name}”": "Aktualizovat „{name}“",
-  "Update, reset or save as a new preset": "Aktualizovat, resetovat nebo uložit jako novou předvolbu"
+  "Update, reset or save as a new preset": "Aktualizovat, resetovat nebo uložit jako novou předvolbu",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Tažením úchytů ořízneš začátek a konec. Ctrl+kolečko přibližuje. Posouvej tažením pravým tlačítkem myši nebo Shift+kolečkem."
 }
