@@ -28,6 +28,10 @@ if TYPE_CHECKING:
 
 
 FADE_S = 0.010  # fade when a sound is stopped early (no clicks)
+# a sound's own live stage rings on past its end while louder than this, at most
+# TAIL_S (as the bake keeps its echo / reverb tail: soundfx)
+RING_FLOOR = 1e-3
+TAIL_S = 3.0
 
 
 class EngineRender:
@@ -89,9 +93,11 @@ class EngineRender:
             data = v.data[out]
             n = len(data)
             p = v.pos[out]
+            stage = v.live   # (read once: the UI swaps it whole)
             # int16 library audio is scaled here (one multiply that already happens
             # for the gain); float32 is used by cues, previews of test recordings…
-            g = np.float32(v.gain) * (I16_SCALE if data.dtype == np.int16 else np.float32(1))
+            scale = I16_SCALE if data.dtype == np.int16 else np.float32(1)
+            g = np.float32(v.gain) * scale
             dest = self.dest
             if makeup and dest is not None and dest.lowcut:
                 g = g * np.float32(v.makeup(dest.lowcut))
@@ -99,6 +105,8 @@ class EngineRender:
             rate = self.rates[out]
             st = v.step.get(out, 1.0)
             vspeed = speed * st   # source frames per output frame
+            if stage is not None:
+                vspeed *= stage[0]
             if v.stopping:  # fade out (10 ms, or the sound's own fade-out), then done
                 if g0 <= 0.0 or v.paused or not n:
                     v.done.add(out)
@@ -127,7 +135,10 @@ class EngineRender:
                     g_env = np.linspace(g_was / g_top, g / g_top, frames + 1,
                                         dtype=np.float32)[1:]
                     g = g_top
-            shaped = g0 != target or near_end or glide
+            # its own live stage runs on the sound as it is (as the bake would), so it's
+            # read at unity and given its gain after
+            shaped = g0 != target or near_end or glide or stage is not None
+            gr = scale if stage is not None else g
             if shaped:
                 dst_final = dst
                 dst = np.zeros((frames, CH), np.float32)
@@ -135,15 +146,23 @@ class EngineRender:
             if abs(vspeed - 1.0) < 1e-4:
                 p = int(p)
                 if v.loop:
-                    dst += span(data, p, p + frames, True, xf) * g
+                    dst += span(data, p, p + frames, True, xf) * gr
                     p = loop_wrap(p + frames, n, xf)
                 elif p < n:
                     take = min(frames, n - p)
-                    dst[:take] += data[p:p + take] * g
+                    dst[:take] += data[p:p + take] * gr
                     p += take
             else:
-                p = self._render_speed(dst, data, float(p), vspeed, g, v.loop, xf)
+                p = self._render_speed(dst, data, float(p), vspeed, gr, v.loop, xf)
             v.pos[out] = p
+            rings = False
+            if stage is not None:
+                dst = self._voice_stage(v, out, dst, stage, p_start == 0)
+                if p >= n and not v.loop:   # past its end: its echo / reverb dies away
+                    v.ring[out] = v.ring.get(out, 0) + frames
+                    rings = (v.ring[out] < TAIL_S * rate
+                             and float(np.abs(dst).max()) >= RING_FLOOR)
+                dst *= g / scale
             if shaped:
                 if g0 != target:   # a straight line from g0 towards target, `ramp` long
                     step = np.float32(1.0 / max(ramp, 1)) * (1 if target > g0 else -1)
@@ -162,9 +181,18 @@ class EngineRender:
                 dst_final += dst * env[:, None]
                 if v.stopping and v.gate[out] <= 0.0:
                     v.done.add(out)
-            if p >= n and not v.loop:
+            if p >= n and not v.loop and not rings:
                 v.done.add(out)
         return buf
+
+    def _voice_stage(self, v, out: str, x: np.ndarray, stage: tuple,
+                     start: bool) -> np.ndarray:
+        """A sound's own live stage on `out` (Voice.live), made at the output's rate
+        (`start`: as the sound starts, else it came on mid-way)."""
+        f = v.stage.get(out)
+        if f is None or f.rate != self.rates[out]:
+            f = v.stage[out] = livefx.SoundStage(self.rates[out], fresh=start)
+        return f.process(x, stage)
 
     @staticmethod
     def _render_speed(dst, data, p: float, speed: float, g, loop: bool, xf: int = 0):

@@ -51,6 +51,7 @@ TEXTURES = {
     "crosshatch": (8, "lift"), "diamond": (20, "accent"), "scales": (24, "accent"),
     "embers": (96, "accent2"), "petals": (64, "accent2"), "dither": (2, "shade"),
     "halftone": (10, "shade"), "frost": (64, "lift"), "webs": (320, "lift"),
+    "fireworks": (600, "accent"),
 }
 TEXTURE_TILE = {k: v[0] for k, v in TEXTURES.items()}
 
@@ -67,6 +68,35 @@ def _webs_image(size: int, ink: str, alpha: float) -> QImage:
                              Qt.TransformationMode.SmoothTransformation)
     img = QImage(size, size, QImage.Format.Format_ARGB32)
     img.fill(_ink(ink, 1.0))
+    img.setAlphaChannel(shape.convertToFormat(QImage.Format.Format_Grayscale8))
+    out = QImage(size, size, QImage.Format.Format_ARGB32)
+    out.fill(Qt.GlobalColor.transparent)
+    p = QPainter(out)
+    p.setOpacity(alpha)
+    p.drawImage(0, 0, img)
+    p.end()
+    return out
+
+
+def _fireworks_image(size: int, tk: dict[str, str], alpha: float) -> QImage:
+    """Fireworks' bursts (fireworks_art.py, white sparks on black) as a `size` tile,
+    swept from the theme's accent to its accent2 and back across the diagonal (once per
+    tile, so it still meets itself), its brightest sparks at `alpha`."""
+    import base64
+
+    from .fireworks_art import FIREWORKS_PNG
+    shape = QImage.fromData(base64.b64decode("".join(FIREWORKS_PNG)))
+    if shape.width() != size:
+        shape = shape.scaled(size, size, Qt.AspectRatioMode.IgnoreAspectRatio,
+                             Qt.TransformationMode.SmoothTransformation)
+    sweep = QLinearGradient(QPointF(0, 0), QPointF(size / 4, size / 4))
+    sweep.setSpread(QLinearGradient.Spread.ReflectSpread)
+    sweep.setColorAt(0, QColor(tk["accent"]))
+    sweep.setColorAt(1, QColor(tk["accent2"]))
+    img = QImage(size, size, QImage.Format.Format_ARGB32)
+    p = QPainter(img)
+    p.fillRect(img.rect(), sweep)
+    p.end()
     img.setAlphaChannel(shape.convertToFormat(QImage.Format.Format_Grayscale8))
     out = QImage(size, size, QImage.Format.Format_ARGB32)
     out.fill(Qt.GlobalColor.transparent)
@@ -168,6 +198,8 @@ def texture_image(kind: str, tk: dict[str, str] | None = None, size: int | None 
             p.drawEllipse(QPointF(x, y), r * 1.3, r)
     elif kind == "webs":        # cobwebs over the whole tile (webs_art.py), tinted
         p.drawImage(0, 0, _webs_image(size, ink, 0.11 * k))
+    elif kind == "fireworks":   # bursts in both accents (fireworks_art.py)
+        p.drawImage(0, 0, _fireworks_image(size, tk, 0.2 * k))
     elif kind == "dither":      # a 1-pixel checkerboard, like 256-colour dithering
         img.setPixelColor(0, 0, a(0.10))
         img.setPixelColor(1, 1, a(0.10))

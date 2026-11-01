@@ -21,11 +21,13 @@ def test_saved_presets_keep_their_order_names_and_values(tmp_path):
     # the same name in another case replaces it, in its place
     mypresets.put("live", "party MODE", {"bass": 3})
     assert list(mypresets.load("live")) == ["party MODE", "Radio host"]
-    # a sound's presets are a list of their own, without the trim, voice or live effects
+    # a sound's presets are a list of their own, without the trim or voice (Live
+    # controls' knobs stay: Edit sound's Advanced view sets them)
     mypresets.put("sound", "Echoey", {"start": 1.0, "pitch": 3, "voice": {"fx": "Robot"},
                                       "live": [{"bass": 4}]})
     f = mypresets.load("sound")["Echoey"]
-    assert f["pitch"] == 3 and f["start"] == 0 and f["voice"] == {} and f["live"] == []
+    assert f["pitch"] == 3 and f["start"] == 0 and f["voice"] == {}
+    assert f["live"] == [{"bass": 4.0}]
     assert "Echoey" not in mypresets.load("live")
 
 

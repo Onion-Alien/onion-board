@@ -284,7 +284,8 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/core/tips.py` | is a game (or anything filling a monitor) in front? The top bars and the tours wait until it isn't |
 | `soundboard/ui/sounds/recordmic.py` | the Sounds tab's *Record a sound* window: a mic take (`Engine.start_mic_take`) or what's playing (`Engine.start_play_take`: sounds + radio, no mic), spooled by `recorder.MicTake`, raw or through the voice changer, trimmed and added as a pad; not modal |
 | `soundboard/sounds/catswitch.py` | Switch category when a program is in front: `Switcher.poll()` (one foreground lookup a second, only while a rule exists; back to the old category when the program closes) |
-| `soundboard/ui/sounds/trim.py` | the Effects tab's trim control: waveform with start / end handles and exact-time boxes; big in the Advanced view (ruler, zoom, fades drawn) |
+| `soundboard/ui/sounds/splicepanel.py` | Edit sound Advanced's splices: the Add splices switch and the Splices pop-up (each splice's times, play, remove, Combine splices) |
+| `soundboard/ui/sounds/trim.py` | the Effects tab's trim control: waveform with start / end handles and exact-time boxes; big in the Advanced view (ruler, zoom, fades drawn, splices: parts marked with two clicks, numbered, joined to play back to back) |
 | `soundboard/core/backup.py` | export / import of the board as a plain zip (JSON + original audio + pictures), sound packs and single sounds; see [BACKUP-FORMAT.md](BACKUP-FORMAT.md) |
 | `soundboard/sounds/packs.py` | free sound packs: the list (`packs/catalog.json` in this repo, with a built-in copy for offline) of ready-made boards in the backup format, added in one click; each pack's preview zip (`samples`) |
 | `soundboard/online/store.py` | the sound store (Store tab): the list, fetching a sound, votes, reports and uploads, talking to the project's own server |
@@ -651,6 +652,13 @@ backup is used, so the pad list is never silently reset.
   stretches it to the length the speed asks for. *Tape mode* with no extra pitch is
   a pure resample. Voice effects run per channel in 2048-frame blocks, with room
   for echo / reverb tails, and a module effect that throws is skipped.
+- **Edit sound on a playing sound** is heard at once instead: what can run live
+  (`soundfx.live_split`: the speed, pitch, Live controls stages and boost) goes on that
+  one sound (`Engine.set_sound_live`), read faster like the live speed and run through
+  its own `livefx.SoundStage`, over a copy with the rest baked in (only a trim, reverse,
+  EQ or voice change makes a new one). Save bakes it all in as above and swaps it in
+  under it. The stages and boost are the bake's own `LiveFx` code and match it to the
+  sample; the speed and pitch match its length and pitch, not its exact waveform.
 - **Live speed / pitch** (the `1x` buttons) works differently, because it has to be
   instant. Sounds are read at a fractional rate with cubic interpolation (like a
   tape). A pitch shifter on the sounds bus (the voice changer's WSOLA pitch effect,

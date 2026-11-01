@@ -40,7 +40,7 @@ from typing import Any
 import numpy as np
 
 from soundboard.mic import destination, directmic
-from soundboard.audio import mapped
+from soundboard.audio import livefx, mapped
 from soundboard.audio.howl import HowlGuard
 from soundboard.audio.eq import EQ
 from soundboard.audio.sendfx import Limiter, VoiceLeveler
@@ -154,6 +154,7 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
         self.sound_pitch = 0.0        # live pitch of every sound, semitones
         self.sound_keep_pitch = True  # speed changes leave the pitch alone
         self.sound_fx: dict = {}      # live effects on every sound (livefx), {} = none
+        self.sound_live: dict[str, tuple] = {}   # sid -> its own livefx.Stage (set_sound_live)
         self._spitch: dict[str, LivePitch] = {}
         self._sfx: dict = {}          # out or (out, bus) -> livefx.LiveFx
         self._fx_gen: dict[str, int] = {}   # bus -> flushes asked for (stop_all, stop_radio)
@@ -496,7 +497,7 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
         v = Voice(sid, per_out, gain, loop, preview=preview, rates=rates_used,
                   fade_in=max(0.0, float(fade_in)), fade_out=max(0.0, float(fade_out)),
                   fixed=is_fixed(sid), cut_share=self.cut_shares(sid, data, src_rate),
-                  step=step)
+                  step=step, live=None if preview else self.sound_live.get(sid))
         if start > 0:
             v.seek(start)
             for o in v.data:     # not shared yet: apply it now, so progress() is right
@@ -589,6 +590,24 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
         with self.lock:
             new.paused = paused
         return True
+
+    def set_sound_live(self, sid: str, stage: tuple | None, now: bool = True):
+        """`sid` plays with its own live stage (livefx.Stage: Edit sound's speed, pitch,
+        Live controls stages and boost, heard at once instead of baked in first), None
+        for none. It's kept for its next press too. `now`: the copies playing take it
+        at once (one taken off fades out: NO_STAGE); else only the next ones, so a
+        render that bakes it in can swap in under the old one (Save)."""
+        if stage is None:
+            self.sound_live.pop(sid, None)
+        else:
+            self.sound_live[sid] = stage
+        if not now:
+            return
+        with self.lock:
+            for v in self.voices:
+                if v.sid == sid and not v.preview and not v.stopping:
+                    v.live = stage if stage is not None else (
+                        livefx.NO_STAGE if v.live is not None else None)
 
     def stop_all(self):
         """Stop everything now: the panic button skips the sounds' own fade-outs, and

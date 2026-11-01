@@ -16,7 +16,7 @@ import math
 import numpy as np
 
 from soundboard.audio.dsp import SmoothSos, butter, matched_biquad
-from soundboard.audio.engineparts import soft_limit
+from soundboard.audio.engineparts import LivePitch, soft_limit
 from soundboard.voicefx import Param
 from soundboard.voicefx.builtin import Distortion, Echo, Reverb
 
@@ -120,7 +120,9 @@ class _Shelf:
 class LiveFx:
     """The live effects for one output (stereo blocks at its rate)."""
 
-    def __init__(self, rate: int):
+    def __init__(self, rate: int, fx: dict | None = None):
+        """`fx`: a sound's own knobs it starts with (a sound starting, not a knob
+        moved mid-stream): its volume is there from the first sample, not glided to."""
         self.rate = rate
         self.shelf = _Shelf(rate)
         self._fx: dict[str, tuple] = {}      # key -> one effect per channel
@@ -128,7 +130,8 @@ class LiveFx:
         self._gone: dict[str, int] = {}      # key -> samples into its fade-out
         self._flush: int | None = None       # samples into a flush() fade, or None
         self.gen = 0                         # the engine's flush count it last saw
-        self._gain = 1.0                     # the volume the last block ended at
+        # the volume the last block ended at
+        self._gain = float((fx or {}).get(VOLUME.key, VOLUME.default)) / 100.0
 
     @property
     def idle(self) -> bool:
@@ -230,3 +233,49 @@ class LiveFx:
         else:
             self._flush = pos + n
         return y
+
+
+
+# One sound's own live stage (Engine.set_sound_live): what Edit sound changes, heard
+# at once on the playing sound instead of baked in first. (speed, pitch in semitones,
+# its Live controls stages, boost as a gain): the speed is how fast the engine reads
+# the sound (like Live controls' speed), the rest runs here. A stage {} is knobs at
+# 0; NO_STAGE fades a stage that was on back out.
+Stage = tuple[float, float, tuple[dict, ...], float]
+NO_STAGE: Stage = (1.0, 0.0, (), 1.0)
+
+
+class SoundStage:
+    """A playing sound's live stage on one output: its pitch shift (Live controls'
+    shifter), each Live controls stage (a LiveFx, as the bake runs them), then the
+    boost and the clip to [-1, 1] the bake ends with. A stage taken off fades out (its
+    knobs to 0) before it's dropped. The shifter is there from the start, as on the
+    sounds bus: at 0 st it only keeps its history, so turning it on crossfades."""
+
+    def __init__(self, rate: int, fresh: bool = False):
+        """`fresh`: the sound is starting with it (else it came on mid-way): its
+        volume and boost are there from the first sample, not glided to."""
+        self.rate = rate
+        self._pitch = LivePitch(rate)
+        self._fx: list[LiveFx] = []
+        self._gain = 1.0
+        self._fresh = fresh
+
+    def process(self, x: np.ndarray, stage: Stage) -> np.ndarray:
+        _speed, st, stages, gain = stage
+        fresh, self._fresh = self._fresh, False
+        if fresh:
+            self._gain = gain
+        x = self._pitch.process(x, float(st))
+        while len(self._fx) < len(stages):
+            self._fx.append(LiveFx(self.rate, stages[len(self._fx)] if fresh else None))
+        for i, f in enumerate(self._fx):
+            x = f.process(x, stages[i] if i < len(stages) else {})
+        while len(self._fx) > len(stages) and self._fx[-1].idle:
+            self._fx.pop()
+        was, self._gain = self._gain, gain
+        if was != gain and len(x):   # glided over the block, like the volume
+            x = x * np.linspace(was, gain, len(x) + 1, dtype=F32)[1:, None]
+        elif gain != 1.0:
+            x = x * F32(gain)
+        return np.clip(x, -1.0, 1.0).astype(F32, copy=False)
