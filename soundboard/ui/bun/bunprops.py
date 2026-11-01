@@ -19,13 +19,22 @@ from soundboard.style.owldraw import sparkle as _sparkle
 SWUNG = ("hammer", "hammer_broken", "wrench")   # props his arm swings with
 
 
-def tool_paw(swing: float) -> tuple[float, float]:
-    """His paw on a hammer or wrench as `swing` goes 0 (raised) .. 1 (on the plank):
-    lifted out beside his head, then in and down to the plank (in close by mid-swing,
-    so the hammer clears what he builds beside him), so his
-    arm swings the tool instead of the tool turning in a still paw."""
+# His hammer arm is a V: the upper arm from his shoulder down to a still elbow, the
+# forearm up from it to the paw. Only the forearm turns, about the elbow.
+ELBOW = (75.0, 103.0)
+FOREARM = 15.0
+ARM_TURN = (20.0, 60.0)   # the forearm's lean right of straight up: raised .. on the plank
+TOOL_TURN = (66.0, 135.0)   # the tool's: up beside his head .. down on the plank
+
+
+def tool_arm(swing: float) -> tuple[float, float, float]:
+    """His paw (x, y) and the tool's turn (degrees) as `swing` goes 0 (raised) .. 1
+    (on the plank)."""
     s = max(0.0, min(1.0, swing))
-    return (round(80 + 9 * (1 - s) ** 2, 1), round(81 + 11 * s, 1))
+    a = math.radians(ARM_TURN[0] + (ARM_TURN[1] - ARM_TURN[0]) * s)
+    return (round(ELBOW[0] + FOREARM * math.sin(a), 1),
+            round(ELBOW[1] - FOREARM * math.cos(a), 1),
+            TOOL_TURN[0] + (TOOL_TURN[1] - TOOL_TURN[0]) * s)
 
 
 def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0,
@@ -89,20 +98,20 @@ def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0,
             p.drawLine(QPointF(92, 111.5), QPointF(106, 111.5))
         # the hammer pivots at the other paw, on his right so it never crosses his
         # face: up beside his head at 0, down on the plank at 1
-        px, py = tool_paw(swing)
+        px, py, turn = tool_arm(swing)
         p.save()
         p.translate(px, py)
-        p.rotate(25 + 98 * max(0.0, min(1.0, swing)))
+        p.rotate(turn)
         p.setPen(ink)
         p.setBrush(WOOD)
-        p.drawRoundedRect(QRectF(-3, -30, 6, 34), 2.5, 2.5)
+        p.drawRoundedRect(QRectF(-3, -19, 6, 23), 2.5, 2.5)
         if broken:   # a splintered stub where the head was
             p.setPen(QPen(WOOD_DARK, 1.2, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
-            p.drawLine(QPointF(-2, -30), QPointF(-0.5, -33))
-            p.drawLine(QPointF(1.5, -30), QPointF(2.5, -32.5))
+            p.drawLine(QPointF(-2, -19), QPointF(-0.5, -22))
+            p.drawLine(QPointF(1.5, -19), QPointF(2.5, -21.5))
         else:
             p.setBrush(STEEL)
-            p.drawRoundedRect(QRectF(-10, -38, 20, 10), 2.5, 2.5)
+            p.drawRoundedRect(QRectF(-10, -27, 20, 10), 2.5, 2.5)
         p.restore()
         _ellipse(p, px, py, 12, 10, fur, ink)
     elif prop == "bat":         # a baseball bat in his right paw: over his shoulder at
@@ -143,16 +152,16 @@ def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0,
         _ellipse(p, 104, 108.5, 6, 6, ROBOT_BOLT, ink)        # the bolt he's tightening
         p.setPen(QPen(ROBOT_INK, 1))
         p.drawLine(QPointF(102.3, 108.5), QPointF(105.7, 108.5))
-        px, py = tool_paw(swing)
+        px, py, turn = tool_arm(swing)
         p.save()
         p.translate(px, py)
-        p.rotate(25 + 98 * max(0.0, min(1.0, swing)))
+        p.rotate(turn)
         p.setPen(ink)
         p.setBrush(QColor("#9aa3b5"))
-        p.drawRoundedRect(QRectF(-3, -28, 6, 32), 2, 2)
-        p.drawRoundedRect(QRectF(-8, -36, 16, 10), 2, 2)
+        p.drawRoundedRect(QRectF(-3, -17, 6, 21), 2, 2)
+        p.drawRoundedRect(QRectF(-8, -25, 16, 10), 2, 2)
         p.setBrush(fur)
-        p.drawRect(QRectF(-3, -37, 6, 6))
+        p.drawRect(QRectF(-3, -26, 6, 6))
         p.restore()
         _ellipse(p, px, py, 12, 10, fur, ink)
 

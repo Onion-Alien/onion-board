@@ -1,0 +1,1 @@
+- Bun's hammer arm now bends at the elbow: his upper arm stays put and his forearm swings the hammer or wrench.
