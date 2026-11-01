@@ -284,7 +284,7 @@ class SpliceBar(QWidget):
         self.list.setText(_("Splices ({n})", n=n))
         i = wave.selected
         picked = i is not None and 0 <= i < n
-        fades = wave.part_fades(i) if picked else (0.0, 0.0)
+        fades = wave.part_fades(i) if i is not None and picked else (0.0, 0.0)
         for b, s in zip(self.fades.values(), fades):
             b.blockSignals(True)   # (shows the splice's own: not a click)
             b.setChecked(s > 0)

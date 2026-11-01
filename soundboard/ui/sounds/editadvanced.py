@@ -475,8 +475,9 @@ class AdvancedView(QWidget):
         need = self.bar.sizeHint().width()
         if short:   # what it needs with the words back
             need += sum(b.fontMetrics().horizontalAdvance(t) + 8 for b, t in words)
-        m = self.editor.layout().contentsMargins()
-        room = self.editor.width() - m.left() - m.right()
+        lay = self.editor.layout()
+        m = lay.contentsMargins() if lay is not None else None
+        room = self.editor.width() - (m.left() + m.right() if m is not None else 0)
         if (need > room) != short:
             for b, t in words:
                 b.setText("" if need > room else t)
