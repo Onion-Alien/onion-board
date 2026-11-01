@@ -607,6 +607,7 @@ class SettingsDialog(QDialog, Built):
         its cap height), `end` at the far end of it (a status pill), the hint under it."""
         card = QFrame()
         card.setObjectName("setcard")
+        theme.vary_texture(card)
         v = QVBoxLayout(card)
         v.setContentsMargins(14, 12, 14, 14)
         v.setSpacing(8)

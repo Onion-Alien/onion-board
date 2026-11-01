@@ -92,3 +92,25 @@ def test_redrawn_texture_never_reuses_an_old_tile_file(qapp, monkeypatch, tmp_pa
     new = textures.texture_url(tk)
     assert new and new != old
     assert QImage(new).size().width() == 8
+
+
+def test_cards_side_by_side_start_a_big_texture_in_different_places(qapp):
+    """Every card started its texture at its own corner, so cards above or beside each
+    other showed the same fireworks lined up: a big tile gets a rule per shift, and the
+    cards made one after another pick different ones."""
+    from PySide6.QtWidgets import QFrame
+
+    from soundboard.style import textures
+    fireworks = dict(theme.THEMES["Fireworks"])
+    css = textures.texture_style("QFrame#card, QFrame#setcard", fireworks)
+    assert css.count("background-image") == len(textures.SHIFTS)
+    assert 'QFrame#setcard[texshift="3"]' in css
+    scanlines = dict(theme.THEMES["Amber Terminal"])   # a 3 px tile can't line up
+    assert textures.texture_style("QFrame#card", scanlines).count("background-image") == 1
+    a, b = QFrame(), QFrame()
+    theme.vary_texture(a)
+    theme.vary_texture(b)
+    assert a.property("texshift") != b.property("texshift")
+    tile = textures.texture_image("fireworks", fireworks)
+    moved = textures._shifted(tile, 0.5, 0.25)   # the same tile, started further in
+    assert moved.pixel(0, 0) == tile.pixel(tile.width() // 2, tile.height() // 4)
