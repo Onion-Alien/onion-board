@@ -4673,7 +4673,6 @@
   "Save what you have now into “{name}”": "Simpan pengaturan sekarang ke “{name}”",
   "Update “{name}”": "Perbarui “{name}”",
   "Update, reset or save as a new preset": "Perbarui, reset, atau simpan sebagai preset baru",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Seret pegangannya untuk memotong awal dan akhir. Ctrl+gulir untuk zoom. Seret dengan tombol kanan mouse, atau Shift+gulir, untuk menggeser.",
   "Add splices": "Tambah potongan",
   "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Klik di mana bagian mulai, lalu di mana berakhir. Tiap bagian adalah potongan. Esc melepas yang setengah jadi.",
   "Combine splices": "Gabung potongan",
@@ -4707,5 +4706,6 @@
   "ooh! aah!": "Ooh! Aah!",
   "ooh, pretty!": "Wah, cantik!",
   "The settings most people change, on one page": "Pengaturan yang paling sering diubah orang, dalam satu halaman",
-  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Membuka tab ini saat Onion Board ada di depan.\nEsc = batal."
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Membuka tab ini saat Onion Board ada di depan.\nEsc = batal.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Seret pegangannya untuk memotong awal dan akhir. Klik atau seret penggaris waktu, atau seret penanda putar, untuk memindah posisi putar. Ctrl+gulir untuk zoom. Seret dengan tombol kanan mouse, atau Shift+gulir, untuk menggeser."
 }

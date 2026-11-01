@@ -5108,7 +5108,6 @@
   "Save what you have now into “{name}”": "احفظ ما لديك الآن في “{name}”",
   "Update “{name}”": "حدّث “{name}”",
   "Update, reset or save as a new preset": "حدّث أو أعد الضبط أو احفظ كإعداد جديد",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "اسحب المقبضين لقصّ البداية والنهاية. Ctrl+التمرير للتكبير. اسحب بزر الفأرة الأيمن، أو Shift+التمرير، للتنقّل.",
   "Add splices": "إضافة مقاطع",
   "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "انقر حيث يبدأ الجزء، ثم حيث ينتهي. كل جزء مقطع. Esc يلغي مقطعًا لم يكتمل.",
   "Combine splices": "دمج المقاطع",
@@ -5147,5 +5146,6 @@
   "ooh! aah!": "أوه! آه!",
   "ooh, pretty!": "أوه، جميل!",
   "The settings most people change, on one page": "الإعدادات التي يغيّرها معظم الناس، في صفحة واحدة",
-  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "يفتح هذا التبويب عندما تكون Onion Board في المقدمة.\nEsc = إلغاء."
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "يفتح هذا التبويب عندما تكون Onion Board في المقدمة.\nEsc = إلغاء.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "اسحب المقبضين لقصّ البداية والنهاية. انقر شريط الوقت أو اسحبه، أو اسحب مؤشر التشغيل، لتغيير مكان التشغيل. Ctrl+التمرير للتكبير. اسحب بزر الفأرة الأيمن، أو Shift+التمرير، للتنقّل."
 }

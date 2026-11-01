@@ -4673,7 +4673,6 @@
   "Save what you have now into “{name}”": "บันทึกค่าตอนนี้ลงใน “{name}”",
   "Update “{name}”": "อัปเดต “{name}”",
   "Update, reset or save as a new preset": "อัปเดต รีเซ็ต หรือบันทึกเป็นพรีเซ็ตใหม่",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "ลากที่จับเพื่อตัดต้นและท้าย Ctrl+เลื่อนเพื่อซูม ลากด้วยปุ่มขวาของเมาส์ หรือ Shift+เลื่อน เพื่อขยับ",
   "Add splices": "เพิ่มช่วง",
   "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "คลิกตรงที่ส่วนหนึ่งเริ่ม แล้วคลิกตรงที่มันจบ แต่ละส่วนคือหนึ่งช่วง กด Esc เพื่อยกเลิกช่วงที่ทำค้างไว้",
   "Combine splices": "รวมช่วง",
@@ -4707,5 +4706,6 @@
   "ooh! aah!": "โอ้! อ้า!",
   "ooh, pretty!": "ว้าว สวยจัง!",
   "The settings most people change, on one page": "การตั้งค่าที่คนส่วนใหญ่ปรับ รวมไว้ในหน้าเดียว",
-  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "เปิดแท็บนี้ขณะที่ Onion Board อยู่ด้านหน้า\nEsc = ยกเลิก"
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "เปิดแท็บนี้ขณะที่ Onion Board อยู่ด้านหน้า\nEsc = ยกเลิก",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "ลากที่จับเพื่อตัดต้นและท้าย คลิกหรือลากไม้บรรทัดเวลา หรือลากเส้นตำแหน่งเล่น เพื่อย้ายจุดที่เล่น Ctrl+เลื่อนเพื่อซูม ลากด้วยปุ่มขวาของเมาส์ หรือ Shift+เลื่อน เพื่อขยับ"
 }

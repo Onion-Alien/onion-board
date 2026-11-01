@@ -4847,7 +4847,6 @@
   "Save what you have now into “{name}”": "Salvează setările de acum în „{name}”",
   "Update “{name}”": "Actualizează „{name}”",
   "Update, reset or save as a new preset": "Actualizează, resetează sau salvează ca presetare nouă",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Trage de mânere ca să tai începutul și sfârșitul. Ctrl+rotiță mărește. Trage cu butonul drept al mouse-ului sau folosește Shift+rotiță ca să muți.",
   "Add splices": "Adaugă fragmente",
   "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Dă clic unde începe o parte, apoi unde se termină. Fiecare parte e un fragment. Esc renunță la unul neterminat.",
   "Combine splices": "Unește fragmentele",
@@ -4883,5 +4882,6 @@
   "ooh! aah!": "Ooo! Aaa!",
   "ooh, pretty!": "Ooo, ce frumos!",
   "The settings most people change, on one page": "Setările pe care le schimbă cei mai mulți, pe o singură pagină",
-  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Deschide această filă cât timp Onion Board e în față.\nEsc = anulează."
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Deschide această filă cât timp Onion Board e în față.\nEsc = anulează.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Trage de mânere ca să tai începutul și sfârșitul. Dă clic sau trage pe rigla de timp, ori trage cursorul de redare, ca să muți locul unde cântă. Ctrl+rotiță mărește. Trage cu butonul drept al mouse-ului sau folosește Shift+rotiță ca să muți."
 }

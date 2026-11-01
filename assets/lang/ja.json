@@ -4673,7 +4673,6 @@
   "Save what you have now into “{name}”": "今の設定を「{name}」に保存",
   "Update “{name}”": "「{name}」を更新",
   "Update, reset or save as a new preset": "更新、リセット、または新しいプリセットとして保存",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "ハンドルをドラッグして最初と最後をカットします。Ctrl+スクロールで拡大。右ボタンでドラッグするか、Shift+スクロールで移動。",
   "Add splices": "区間を追加",
   "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "パートの始まりをクリックし、次に終わりをクリック。それぞれのパートが区間になります。Esc で作りかけを取り消し。",
   "Combine splices": "区間をつなぐ",
@@ -4707,5 +4706,6 @@
   "ooh! aah!": "おお！わあ！",
   "ooh, pretty!": "わあ、きれい！",
   "The settings most people change, on one page": "多くの人が変える設定を1ページに",
-  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board が前面にあるとき、このタブを開きます。\nEsc = キャンセル。"
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board が前面にあるとき、このタブを開きます。\nEsc = キャンセル。",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "ハンドルをドラッグして最初と最後をカットします。時間のルーラーをクリックかドラッグ、または再生位置の線をドラッグすると、再生する位置が変わります。Ctrl+スクロールで拡大。右ボタンでドラッグするか、Shift+スクロールで移動。"
 }

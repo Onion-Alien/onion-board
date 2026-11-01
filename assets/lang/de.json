@@ -4760,7 +4760,6 @@
   "Save what you have now into “{name}”": "Das, was du gerade eingestellt hast, in „{name}“ speichern",
   "Update “{name}”": "„{name}“ aktualisieren",
   "Update, reset or save as a new preset": "Aktualisieren, zurücksetzen oder als neue Vorlage speichern",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Zieh die Griffe, um Anfang und Ende abzuschneiden. Strg+Scrollen zoomt. Zum Verschieben mit der rechten Maustaste ziehen oder Umschalt+Scrollen.",
   "Add splices": "Ausschnitte setzen",
   "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Klick, wo ein Teil anfängt, dann wo er endet. Jeder Teil ist ein Ausschnitt. Esc verwirft einen halben.",
   "Combine splices": "Ausschnitte verbinden",
@@ -4795,5 +4794,6 @@
   "ooh! aah!": "Ooh! Aah!",
   "ooh, pretty!": "Oh, wie schön!",
   "The settings most people change, on one page": "Die Einstellungen, die die meisten ändern, auf einer Seite",
-  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Öffnet diesen Tab, während Onion Board im Vordergrund ist.\nEsc = abbrechen."
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Öffnet diesen Tab, während Onion Board im Vordergrund ist.\nEsc = abbrechen.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Zieh die Griffe, um Anfang und Ende abzuschneiden. Klick oder zieh auf der Zeitleiste, oder zieh den Abspielstrich, um zu ändern, wo er spielt. Strg+Scrollen zoomt. Zum Verschieben mit der rechten Maustaste ziehen oder Umschalt+Scrollen."
 }

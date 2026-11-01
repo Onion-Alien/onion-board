@@ -66,7 +66,8 @@ def live(window, monkeypatch, qapp):  # noqa: F811
     window.audio["s0"] = saved
     monkeypatch.setattr(window.engine, "state", lambda sid: (0.4, False) if sid == "s0" else None)
     swaps, stops = [], []
-    monkeypatch.setattr(window.engine, "swap", lambda sid, data: swaps.append((sid, data)) or True)
+    monkeypatch.setattr(window.engine, "swap",
+                        lambda sid, data, at=None: swaps.append((sid, data)) or True)
     real_stop = window.engine.stop
     monkeypatch.setattr(window.engine, "stop", lambda sid: (stops.append(sid), real_stop(sid)))
     made = song(0.7, 0.5)
