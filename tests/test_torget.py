@@ -265,3 +265,33 @@ def test_a_tor_from_an_older_app_follows_the_app_update(served, app_dir, monkeyp
     monkeypatch.setattr(tor, "shutdown", lambda: None)
     app.helpers_follow_app()
     assert len(served.calls) == 1 and torget.installed() and not torget.outdated()
+
+
+def _aged(path):
+    import os
+    import time
+    t = time.time() - torget.TIDY_AFTER_S - 60
+    os.utime(path, (t, t))
+
+
+def test_start_up_clears_a_half_unpacked_tor(app_dir):
+    """The app ended mid-unpack: bin.partial goes; a fresh one (an unpack still going,
+    the installer's --get-tor) stays."""
+    tmp = torget.bin_dir().with_name("bin.partial")
+    (tmp / "pluggable_transports").mkdir(parents=True)
+    (tmp / "tor.exe").write_bytes(b"half")
+    torget.tidy()
+    assert tmp.is_dir()
+    _aged(tmp)
+    torget.tidy()
+    assert not tmp.exists() and not torget.installed()
+
+
+def test_start_up_puts_back_a_tor_a_cut_short_swap_moved_aside(served, app_dir):
+    torget.get()
+    old = torget.bin_dir().with_name("bin.old")
+    torget.bin_dir().rename(old)   # stopped between the two renames
+    _aged(old)
+    assert not tor.available()
+    torget.tidy()
+    assert torget.installed() and tor.available() and not old.exists()

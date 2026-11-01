@@ -199,6 +199,7 @@ def helpers_follow_app():
             log.info("FFmpeg after following the app: %s %s", h.state, h.version)
     except Exception as e:  # noqa: BLE001 - offline etc.: try again next start
         log.info("couldn't update the app's FFmpeg: %s", e)
+    torget.tidy()   # before outdated(): a swap cut short put back first
     try:
         if (torget.outdated() and net.allowed(torget.FEATURE)
                 and net.mode() != net.TOR):

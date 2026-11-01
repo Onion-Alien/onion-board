@@ -206,3 +206,13 @@ def test_the_voice_cards_offer_repair_for_a_broken_addon(qapp, tmp_path):
     finally:
         p.shutdown()
         p.deleteLater()
+
+
+def test_an_install_clears_what_a_cut_short_download_left(tmp_path, frozen, monkeypatch):
+    """The app ended mid-download / mid-unpack, and the next install takes the PC's own
+    Python: the half package and .python.partial still go."""
+    (tmp_path / f"python-{pyget.VERSION}.nupkg.partial").write_bytes(b"half")
+    (tmp_path / ".python.partial" / "Lib").mkdir(parents=True)
+    monkeypatch.setattr(pyget, "pc_python", lambda: r"C:\Windows\py.exe")
+    assert pyget.for_module(tmp_path, print) == r"C:\Windows\py.exe"
+    assert not any(tmp_path.iterdir())

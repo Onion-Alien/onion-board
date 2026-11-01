@@ -196,11 +196,26 @@ def get(module_dir: Path, on_line: Callable[[str], object]) -> str:
     return str(exe)
 
 
+def tidy(module_dir: Path) -> None:
+    """Remove what a get() cut short (the app ended mid-download or mid-unpack: End
+    task, a crash, the power) left in the add-on's folder: the half-downloaded package
+    and a half-unpacked .python.partial. A new get() replaces them, but an install that
+    takes the PC's own Python instead never would."""
+    shutil.rmtree(module_dir / (FOLDER + ".partial"), ignore_errors=True)
+    for part in module_dir.glob("python-*.nupkg.partial"):
+        try:
+            part.unlink()
+            log.info("removed %s, left by a download that was cut short", part.name)
+        except OSError:
+            pass
+
+
 def for_module(module_dir: Path, on_line: Callable[[str], object]) -> str:
     """The Python to make an add-on's environment from (see the module docstring for the
     order). Raises GetError. Blocking: never on the UI thread."""
     if not getattr(sys, "frozen", False):
         return sys.executable              # from source: the one running the app
+    tidy(module_dir)
     own = private_python(module_dir)
     if own.is_file() and _version(str(own)) is not None:
         return str(own)

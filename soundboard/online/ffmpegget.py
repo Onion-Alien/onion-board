@@ -181,11 +181,52 @@ _early: threading.Thread | None = None   # start_check's, behind the loading scr
 
 
 def start_check() -> None:
-    """Check FFmpeg on a worker while the loading screen is up (app.py): its answer is
-    ready when the window is, and nothing waits for it."""
+    """Tidy up after a fix cut short, then check FFmpeg, on a worker while the loading
+    screen is up (app.py): its answer is ready when the window is, and nothing waits
+    for it."""
     global _early
-    _early = threading.Thread(target=check, daemon=True, name="ffmpeg-early-check")
+
+    def run():
+        tidy()
+        check()
+
+    _early = threading.Thread(target=run, daemon=True, name="ffmpeg-early-check")
     _early.start()
+
+
+TIDY_AFTER_S = 600   # a fix unpacks and swaps in seconds: older leftovers are a past one's
+
+
+def tidy() -> None:
+    """Clear what the app's own download left when it was cut short (the app ended
+    mid-fix: End task, a crash, the power): the half-downloaded zip, a half-unpacked
+    bin.partial, and bin.old, put back first when the swap stopped before the new copy
+    was in place. Left alone, they stay for good once FFmpeg is found elsewhere
+    (winget, PATH): the zip is up to 115 MB. Skipped while a fix is going; only ones
+    older than TIDY_AFTER_S."""
+    if not _fixing.acquire(blocking=False):
+        return
+    try:
+        dest = own_dir()
+        cutoff = time.time() - TIDY_AFTER_S
+        old = dest.with_name(dest.name + ".old")
+        if old.is_dir() and old.stat().st_mtime < cutoff:
+            if not dest.exists():
+                old.rename(dest)
+                log.info("put back the FFmpeg a fix had moved aside")
+            else:
+                shutil.rmtree(old, ignore_errors=True)
+        for left in (dest.with_name(dest.name + ".partial"), dest.parent / (ZIP + ".partial")):
+            if left.exists() and left.stat().st_mtime < cutoff:
+                log.info("removing %s, left by a fix that was cut short", left.name)
+                if left.is_dir():
+                    shutil.rmtree(left, ignore_errors=True)
+                else:
+                    left.unlink()
+    except OSError:
+        log.warning("couldn't tidy the ffmpeg folder", exc_info=True)
+    finally:
+        _fixing.release()
 
 
 def answer() -> Health:
