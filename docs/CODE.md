@@ -180,6 +180,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/kit/restyled.py` | sizes worked out from a widget's text (`measured`, `on_restyle`), worked out again when its style or font changes: the window is built with the app's style sheet off (`theme.styled_after`) and `again()` re-runs them all once it's back on |
 | `soundboard/ui/kit/iconrow.py` | label icons aligned to the first line's capital ink using the current font metrics |
 | `soundboard/ui/kit/glowbutton.py` | `GlowButton`: a primary button with a soft accent glow, for the install a card needs before it works (AI voices, speech recognition) |
+| `soundboard/ui/kit/wrapbutton.py` | `WrapButton`: a push button whose words go onto a second line when its row is too narrow for one (Settings > About's link buttons in long translations) |
 | `soundboard/ui/kit/panel.py` | the bar, card and heading helpers every tab is built from, icon, info, fold and reset buttons, tiles, the view toggle and the empty list's picture; the volume boxes, the equalizer, `Flow` and `CardGrid` live in the `panel*` modules below (still importable from here) |
 | `soundboard/ui/kit/panellabels.py` | a section's title, a number label as wide as its widest value, a hint's muted words (`panel` re-exports them) |
 | `soundboard/ui/kit/panellayouts.py` | `ShownStack`, keeping focus off a page switched away, `Flow` (wrapping) and `CardGrid` (`panel` re-exports them) |
