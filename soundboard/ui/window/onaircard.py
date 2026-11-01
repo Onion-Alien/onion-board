@@ -99,7 +99,8 @@ class OutputBlock(QFrame):
     CHEVRON = 12          # the status line's chevron: lighter than the icons
     STOP = 28             # Stop all after the switch, open: a normal icon button
     PAIR_H = 34           # open: Mute and Stop all, two halves of one row...
-    PAIR_GAP = 8          # ...this far apart
+    PAIR_GAP = 8          # ...this far apart, and from the lines under them
+    LINE_GAP = 4          # between the lines (set_lines), so their fills never touch
     PAIR_ICON = 18        # their icons
     INK_DOWN = 1          # the switch's and Stop all's ink this far under their box's
                           # centre: on the title's cap-height centre (measured)
@@ -253,6 +254,7 @@ class OutputBlock(QFrame):
         # the network lines (set_lines), made as they're needed
         self._lines: list[Line] = []
         self.net: list[_NetLine] = []
+        self.tight = False   # a short window: less room round the lines (_line_room)
         self.refresh()
 
     def _muted_changed(self, on: bool):
@@ -494,7 +496,7 @@ class OutputBlock(QFrame):
                            size=px(self.PAIR_ICON))
         self._words()
         self.pair.setVisible(expanded)
-        self.box.setContentsMargins(*(pad, 0, pad, 0) if expanded else (0, 4, 0, 0))
+        self._line_room()
         self.top.setContentsMargins(0, 0, 0, 0)
         self.top.setDirection(QBoxLayout.Direction.TopToBottom)
         self.title.hide()   # open, Mute says it (its tip: Live or Muted, in full)
@@ -689,16 +691,26 @@ class OutputBlock(QFrame):
                 n.label._widest = words
                 n.show_line(self._lines[i], self._px(self.GLYPH) if not small else self.GLYPH)
                 n.label.updateGeometry()
-        # a network line under Mute and Stop all brings its own padding: the same room
-        # over its words as under them
-        pad = self._px(self.PAD)
-        self.pair_lay.setContentsMargins(pad, pad, pad, 0 if self._lines else pad)
-        # (and under them: the strip adds none of its own, or the words sat 7 px nearer
-        # Mute and Stop all than the strip)
-        self.strip_lay.setContentsMargins(pad, 0, pad, pad)
+        self._line_room()
         if self.stop is not None and self.rail_stop is not None:
             self._words()
         self._pin_all()
+
+    def _line_room(self):
+        """Open, room round the lines' hover fill and focus ring: PAIR_GAP under Mute and
+        Stop all (as between them), LINE_GAP between lines, the card's padding under the
+        last (the fills ran into Mute, Stop all and the card's edge). A short window
+        (`tight`, the rail's compact step) keeps half of it over and under them and none
+        between, so a full card still fits where it did."""
+        pad = self._px(self.PAD)
+        half = self._px(self.PAD // 2)
+        self.pair_lay.setContentsMargins(pad, pad, pad, pad if not self._lines else half
+                                         if self.tight else self._px(self.PAIR_GAP))
+        expanded = bool(self.property("expanded"))
+        self.box.setSpacing(self._px(self.LINE_GAP) if expanded and not self.tight else 0)
+        under = (half if self.tight else pad) if expanded and self._lines else 0
+        self.box.setContentsMargins(*(pad, 0, pad, under) if expanded else (0, 4, 0, 0))
+        self.strip_lay.setContentsMargins(pad, 0, pad, pad)
 
 
 @dataclass(frozen=True)
