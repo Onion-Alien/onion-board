@@ -28,10 +28,6 @@ else:
 log = logging.getLogger("soundboard.ui.voice.aivoicepanel")   # the card's own logger, as before
 
 
-# what others hear once the AI voice has stopped, by backup key ("Others now hear …")
-BACKUP_HEARD = {"voice": _("a built-in voice (still hides yours)"),
-                "mic": _("your real voice"), "mute": _("silence")}
-
 # the helper loads in about a second; one still loading after this is stuck (it once
 # sat for half a minute, the backup voice on, while the cards seemed to switch)
 LOAD_TIMEOUT_MS = 20_000
@@ -127,7 +123,11 @@ class AiVoiceRun(_Panel):
         return self._voice_name or self._voice().get("name", "")
 
     def backup_heard(self) -> str:
-        return BACKUP_HEARD.get(self.cb_backup.currentData() or "voice", BACKUP_HEARD["voice"])
+        """What others hear once the AI voice has stopped ("Others now hear …"),
+        translated now: a table made at import kept the language of that moment."""
+        heard = {"voice": _("a built-in voice (still hides yours)"),
+                 "mic": _("your real voice"), "mute": _("silence")}
+        return heard.get(self.cb_backup.currentData() or "voice", heard["voice"])
 
     def _starting_text(self, retry: bool = False) -> str:
         return (_("starting again…") if retry else _("starting…")) + " " + _(

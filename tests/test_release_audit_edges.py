@@ -225,3 +225,17 @@ def test_ai_failure_text_has_one_full_stop_after_the_error(window):
     # a dropped connection's message ends in its own "." and used to show "dropped.."
     text = window.voice.ai.failure_text("The connection was dropped.")
     assert "dropped." in text and ".." not in text
+
+
+def test_ai_fallback_text_follows_the_language_now(window):
+    """The backup's words come in the language that's on now, not the one on when the
+    module was first loaded."""
+    from soundboard import i18n
+    ai = window.voice.ai
+    ai.cb_backup.setCurrentIndex(ai.cb_backup.findData("mic"))
+    i18n.set_language("de")
+    try:
+        assert ai.backup_heard() == "deine echte Stimme"
+    finally:
+        i18n.set_language("en")
+    assert ai.backup_heard() == "your real voice"
