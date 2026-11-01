@@ -4796,5 +4796,14 @@
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Opent dit tabblad als Onion Board vooraan staat.\nEsc = annuleren.",
   "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Sleep de grepen om het begin en einde eraf te knippen. Klik of sleep op de tijdlijn, of sleep de afspeelstreep, om te verplaatsen waar hij speelt. Ctrl+scrollen zoomt. Sleep met de rechtermuisknop, of gebruik Shift+scrollen, om te schuiven.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Gratis, zonder advertenties en zonder account. Gemaakt door OnionAlien. Open source onder de GNU GPL v3: gebruik het, pas het aan en deel het, zolang jouw versie ook open source blijft.",
-  "Community uploads": "Uploads van de community"
+  "Community uploads": "Uploads van de community",
+  "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Voeg de effecten van een andere stem aan deze toe (Robot + Demon): effecten die die stem heeft en de jouwe niet, gaan aan",
+  "Back to your own mix as it was": "Terug naar je eigen mix zoals hij was",
+  "Back to “{voice}” as it was when you picked it": "Terug naar ‘{voice}’ zoals hij was toen je hem koos",
+  "Do the change again (Ctrl+Y)": "Wijziging opnieuw doen (Ctrl+Y)",
+  "Edit voice…": "Stem bewerken…",
+  "Mix in a voice": "Stem erdoor mengen",
+  "Take back the last change (Ctrl+Z)": "Laatste wijziging ongedaan maken (Ctrl+Z)",
+  "Your voice already has everything “{voice}” has": "Je stem heeft al alles wat ‘{voice}’ heeft",
+  "{voice}, changed": "{voice}, gewijzigd"
 }

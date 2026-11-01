@@ -26,6 +26,9 @@ Version **2.7.3** · Windows 10 / 11 · free, no account, no ads, anonymous usag
 [what's new](CHANGELOG.md)
 <!-- /release -->
 
+Code signing: free certificate from SignPath Foundation (applied for; until then, Windows may warn) ·
+[code signing policy](https://onionalien.com/onionboard/code-signing/)
+
 **[Website](https://onionalien.com/onionboard/)** · **[Discord](https://discord.gg/FhKGaWCWHM)** · **[Report a problem](../../issues/new/choose)**
 
 If it helps you, a star helps other people find it. ⭐

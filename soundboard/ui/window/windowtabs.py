@@ -88,6 +88,13 @@ class WindowTabs(WindowParts):
             v.bar.record_button.clicked.connect(
                 lambda: self.soundctl.record_dialog(quick=True))
             v.fx.hotkey_cleared.connect(lambda n: self.hkctl.set_voice_hotkey(n, ""))
+            v.ai.hotkey_asked.connect(self.hkctl.set_ai_voice_hotkey)
+            v.ai.hotkey_cleared.connect(lambda i: self.hkctl.set_ai_voice_hotkey(i, ""))
+            v.ai.keys = {n[3:]: c for n, c in self.cfg.voice_hotkeys.items()
+                         if n.startswith("ai:") and c}   # (hotkeycontrol.AI_KEY)
+            v.ai.voices_changed.connect(lambda: any(
+                n.startswith("ai:") for n in self.cfg.voice_hotkeys)
+                and self.hkctl.register_hotkeys())
             v.set_light(self.light_voice_on())
             v.light_changed.connect(self.set_light_voice)
             v.fx.renamed.connect(self.hkctl.voice_renamed)

@@ -59,7 +59,7 @@ def test_keeping_their_sounds_asks_nothing_and_deletes_nothing(pc):
 
 
 def test_the_firewall_rule_goes_after_one_prompt(pc):
-    pc["rules"].add("onion-pocket-firewall")
+    pc["rules"].add("OnionPocket")
     assert uc.cli([]) == 0
     assert len(pc["prompts"]) == 1 and uc.ADMIN in pc["prompts"][0]
     assert not pc["rules"]
@@ -82,7 +82,7 @@ def test_programdata_stays_while_the_mic_effect_is_on(pc):
 
 
 def test_a_turned_down_prompt_says_what_stayed(pc, monkeypatch):
-    pc["rules"].add("onion-pocket-firewall")
+    pc["rules"].add("OnionPocket")
     monkeypatch.setattr(cleanup, "run_elevated", lambda *a, **k: None)
     assert uc.cli([uc.DATA]) == uc.MACHINE_LEFT | uc.RULE_LEFT
     assert not pc["user"].exists()   # that part needs no admin

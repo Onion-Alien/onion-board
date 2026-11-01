@@ -165,11 +165,36 @@ def click_focus(w) -> None:
             w.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
 
+KEY_FOCUS = "keyfocus"   # dynamic property: the focus came from the keyboard (ringed)
+
+
+def _set_key_focus(w, on: bool) -> None:
+    if bool(w.property(KEY_FOCUS)) != on:
+        w.setProperty(KEY_FOCUS, on)
+        w.style().unpolish(w)   # the style sheet's [keyfocus="true"]:focus rules
+        w.style().polish(w)
+        w.update()
+
+
+def key_focus_rings(old, new) -> None:
+    """A dialog that opens hands its first button the focus by itself, and the theme's
+    :focus rule ringed it before anyone pressed Tab: it looked picked while the mouse
+    was elsewhere, and hovering it barely showed. A button's ring follows the keyboard
+    only: Qt marks a window whose focus moved by Tab or the arrows
+    (WA_KeyboardFocusChange), and theme.key_focus_only() makes the rings need it."""
+    if isinstance(old, QAbstractButton):
+        _set_key_focus(old, False)
+    if isinstance(new, QAbstractButton):
+        _set_key_focus(new, new.window().testAttribute(Qt.WidgetAttribute.WA_KeyboardFocusChange))
+
+
 def install_click_focus(app: QApplication) -> None:
     """click_focus() on every widget the app shows from now on, as the app style
-    polishes it (wheelguard.on_polish: no application-wide event filter)."""
+    polishes it (wheelguard.on_polish: no application-wide event filter), and a
+    button's ring for the keyboard's focus only (key_focus_rings)."""
     from soundboard.ui.kit import wheelguard
     wheelguard.on_polish(click_focus)
+    app.focusChanged.connect(key_focus_rings)
 
 
 class SteadyTabs(QObject):

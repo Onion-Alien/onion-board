@@ -1276,12 +1276,14 @@ class EditDialog(EditDialogParts, QDialog):
     def undo(self):
         self._flush()
         if self._hpos > 0:
+            usage.used("edit-undo")
             self._hpos -= 1
             self._restore(self._history[self._hpos])
 
     def redo(self):
         self._flush()
         if self._hpos < len(self._history) - 1:
+            usage.used("edit-redo")
             self._hpos += 1
             self._restore(self._history[self._hpos])
 
