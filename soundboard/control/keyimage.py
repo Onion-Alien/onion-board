@@ -13,6 +13,7 @@ import time
 
 from PySide6.QtCore import QBuffer, QByteArray, QIODevice, QPoint, QRectF, Qt
 from PySide6.QtGui import QColor, QFont, QFontMetrics, QPainter, QPen, QPixmap
+from PySide6.QtWidgets import QWidget
 
 from soundboard.i18n import _
 from soundboard.sounds.library import SoundMeta
@@ -147,7 +148,9 @@ def _card(meta: SoundMeta, lit: bool, size: int,
         pm = QPixmap(size, size)
         pm.setDevicePixelRatio(size / CARD)
         pm.fill(widgets.pad_colours()["card"])
-        pad.render(pm, QPoint(-EDGE, -EDGE))
+        # no window background: a widget of its own paints the theme's behind it, and
+        # the corners outside the curve came out that dark instead of the card colour
+        pad.render(pm, QPoint(-EDGE, -EDGE), renderFlags=QWidget.RenderFlag.DrawChildren)
     finally:
         widgets.PAD_RADIUS = radius
         pad.deleteLater()
