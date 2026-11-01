@@ -536,7 +536,7 @@ class BunnyWidget(BunnyBuild, BunnyDance, BunnyPaint, QWidget):
                 self._dared = True
                 self.challenge.emit()
         elif phase == "hammer":
-            blows = int((self._act_t - BACK_END) / SWING + 0.3)   # strikes at k = 0.7
+            blows = int((self._act_t - BACK_END) / SWING)   # lands as k wraps to 0 (swing = 1)
             if blows > self._blows:   # just hit: something gets built
                 self._blows = blows
                 if self._parts < (SCREEN_BARS if self.robot else PARTS) - 1:
