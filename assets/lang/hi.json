@@ -2497,10 +2497,8 @@
   "Offline mode is on, so the tabs that need the internet are hidden and greyed out here. Switch it off in Privacy & security to use them.": "ऑफ़लाइन मोड चालू है, इसलिए इंटरनेट वाले टैब छिपे हैं और यहाँ धुंधले दिख रहे हैं। उन्हें इस्तेमाल करने के लिए प्राइवेसी और सिक्योरिटी में इसे बंद करें।",
   "Offline mode is on: nothing goes online, and what needs the internet is hidden. Click to change it.": "ऑफ़लाइन मोड चालू है: कुछ भी ऑनलाइन नहीं जाता, और इंटरनेट वाली चीज़ें छिपी हैं। बदलने के लिए क्लिक करें।",
   "Only you hear it. Didn't hear it? Pick another one and try again.": "सिर्फ़ आप सुनते हैं। सुनाई नहीं दिया? कोई दूसरा चुनकर फिर कोशिश करें।",
-  "Opens the sharing form on GitHub in your browser": "आपके ब्राउज़र में GitHub पर शेयर करने का फ़ॉर्म खोलता है",
   "Other device": "दूसरा डिवाइस",
   "Playing a game or on a call?": "गेम खेल रहे हैं या कॉल पर?",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Add one and its sounds land on your board, each category as its own tab.": "तैयार बोर्ड, कहीं भी इस्तेमाल के लिए मुफ़्त: गेम, स्ट्रीम और वीडियो में। एक जोड़ें और उसके साउंड आपके बोर्ड पर आ जाएँगे, हर कैटेगरी अपने अलग टैब में।",
   "Search your sounds": "अपने साउंड में ढूँढें",
   "Send your sounds to another device instead (Voicemeeter, OBS, a mixer…), or nowhere (only you, and the stream output)": "इसकी जगह अपने साउंड किसी दूसरे डिवाइस पर भेजें (Voicemeeter, OBS, मिक्सर…), या कहीं नहीं (सिर्फ़ आप, और स्ट्रीम आउटपुट)",
   "Share a pack": "पैक शेयर करें",
@@ -3140,7 +3138,6 @@
   "Hear {name}": "{name} सुनें",
   "Hear {name} (only you hear it)": "{name} सुनें (सिर्फ़ आप सुनेंगे)",
   "Pick your headphones in Settings → Audio to hear the samples.": "नमूने सुनने के लिए सेटिंग्स → ऑडियो में अपने हेडफ़ोन चुनें।",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "तैयार बोर्ड, कहीं भी इस्तेमाल के लिए मुफ़्त: गेम, स्ट्रीम और वीडियो में। पहले सुनने के लिए किसी साउंड को दबाएँ (सिर्फ़ आप सुनेंगे)। एक पैक जोड़ें और उसके साउंड आपके बोर्ड पर आ जाएँगे, हर कैटेगरी अपने अलग टैब में।",
   "Hide the report": "रिपोर्ट छिपाएँ",
   "Network activity log": "नेटवर्क गतिविधि लॉग",
   "No custom modes yet. Fill in the form to make one.": "अभी कोई कस्टम मोड नहीं। एक बनाने के लिए फ़ॉर्म भरें।",
@@ -4815,5 +4812,28 @@
   "Remove server": "सर्वर हटाएं",
   "Pause this voice (click again to bring it back)": "इस आवाज़ को रोकें (वापस लाने के लिए फिर क्लिक करें)",
   "Paused: click to turn this voice back on": "रुकी हुई: इस आवाज़ को फिर चालू करने के लिए क्लिक करें",
-  "Turn this voice off (Voices ON won't bring it back)": "इस आवाज़ को बंद करें (आवाज़ें चालू इसे वापस नहीं लाएगा)"
+  "Turn this voice off (Voices ON won't bring it back)": "इस आवाज़ को बंद करें (आवाज़ें चालू इसे वापस नहीं लाएगा)",
+  "Couldn't load its sounds to try. Adding it still works.": "आज़माने के लिए साउंड लोड नहीं हो सके। जोड़ना फिर भी काम करता है।",
+  "Downloads its {n} sound from Myinstants and puts it on your board": [
+    "इसका {n} साउंड Myinstants से डाउनलोड करके आपके बोर्ड पर लगाता है",
+    "इसके {n} साउंड Myinstants से डाउनलोड करके आपके बोर्ड पर लगाता है, हर कैटेगरी अपने टैब में"
+  ],
+  "Hear a few first": "पहले कुछ सुनें",
+  "Hear a few of its sounds first (only you hear them)": "पहले इसके कुछ साउंड सुनें (सिर्फ़ आप सुनते हैं)",
+  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "जोड़ने पर इसके साउंड सीधे Myinstants से डाउनलोड होते हैं: Onion Board कोई कॉपी नहीं रखता। जो साउंड वहाँ अब नहीं है, उसे छोड़ दिया जाता है।",
+  "No packs here yet": "यहाँ अभी कोई पैक नहीं है",
+  "No packs match “{text}”": "“{text}” से कोई पैक नहीं मिला",
+  "None of its sounds could be downloaded.": "इसका कोई भी साउंड डाउनलोड नहीं हो सका।",
+  "On my board": "मेरे बोर्ड पर",
+  "Only you hear these.": "सिर्फ़ आप इन्हें सुनते हैं।",
+  "Search packs and sounds": "पैक और साउंड ढूँढें",
+  "See what's in {name}": "देखें {name} में क्या है",
+  "Show every pack": "सभी पैक दिखाएँ",
+  "Try another word, or show every pack.": "कोई और शब्द आज़माएँ, या सभी पैक दिखाएँ।",
+  "from Myinstants": "Myinstants से",
+  "{done} of {total}": "{total} में से {done}",
+  "{n} sound is gone from Myinstants, so it was skipped.": [
+    "{n} साउंड अब Myinstants पर नहीं है, इसलिए छोड़ दिया गया।",
+    "{n} साउंड अब Myinstants पर नहीं हैं, इसलिए छोड़ दिए गए।"
+  ]
 }

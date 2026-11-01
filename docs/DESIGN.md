@@ -144,6 +144,8 @@ spacing 8, buttons at their own width, then `addStretch(1)`.
 | Choice tile | `choicetile.ChoiceTile(name, icon, w, h)` in a `QGridLayout` (spacing 12) | picking one of a few things that have a picture (devices, what the app is for): fixed-width tiles as tall as the longest name needs (`setupwizard.tile_h`: no empty band round a short name), the picked one tinted, ringed and ticked (same name weight: picking never rewraps it); never full-width radio rows |
 | Fold pill | `choicetile.FoldPill(words, icon)` + a `QFrame#card` under it, shown when checked | a tip most people don't need: as wide as its words, chevron right after them |
 | Status card | `setupwizard.StatusCard`: badge, bold line, words, pill | "is it working?" in a guide: tinted ok / warn / busy, never a coloured word at the start of a sentence |
+| Filter chip | `QPushButton#filterchip`, checkable, in a `Flow(gap=8)` and an exclusive `QButtonGroup` | narrowing a grid by kind (Free packs): round pill, the picked one in the accent; "All" first |
+| Emoji tile | `QLabel#packart` with `packsdialog.emoji_art()` | an emoji standing for a thing (a pack): drawn as a picture on a soft accent square, 44 px on a card |
 
 Keep a page's cards and tiles on the dialog's own edges (no extra page inset): their
 left edge is the button row's left, their right edge its right. A card in a page's column

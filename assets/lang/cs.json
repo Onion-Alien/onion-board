@@ -2550,10 +2550,8 @@
   "Offline mode is on, so the tabs that need the internet are hidden and greyed out here. Switch it off in Privacy & security to use them.": "Offline režim je zapnutý, takže karty, které potřebují internet, jsou skryté a tady zašedlé. Pokud je chceš používat, vypni ho v Soukromí a zabezpečení.",
   "Offline mode is on: nothing goes online, and what needs the internet is hidden. Click to change it.": "Offline režim je zapnutý: nic nejde online a to, co potřebuje internet, je skryté. Kliknutím to změníš.",
   "Only you hear it. Didn't hear it? Pick another one and try again.": "Slyšíš to jen ty. Neslyšel jsi to? Vyber jiná a zkus to znovu.",
-  "Opens the sharing form on GitHub in your browser": "Otevře v prohlížeči formulář pro sdílení na GitHubu",
   "Other device": "Jiné zařízení",
   "Playing a game or on a call?": "Hraješ hru nebo jsi v hovoru?",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Add one and its sounds land on your board, each category as its own tab.": "Hotové boardy, zdarma k použití kdekoli: ve hrách, streamech i videích. Přidej jeden a jeho zvuky se objeví na tvém boardu, každá kategorie jako vlastní karta.",
   "Search your sounds": "Hledat ve tvých zvucích",
   "Send your sounds to another device instead (Voicemeeter, OBS, a mixer…), or nowhere (only you, and the stream output)": "Posílat zvuky místo toho do jiného zařízení (Voicemeeter, OBS, mixpult…), nebo nikam (jen ty a výstup pro stream)",
   "Share a pack": "Sdílet balíček",
@@ -3208,7 +3206,6 @@
   "Hear {name}": "Poslechnout {name}",
   "Hear {name} (only you hear it)": "Poslechnout {name} (slyšíš to jen ty)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Vyber sluchátka v Nastavení → Zvuk, abys slyšel ukázky.",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Hotové boardy, zdarma k použití kdekoli: ve hrách, streamech i videích. Klikni na zvuk a nejdřív si ho poslechni (slyšíš ho jen ty). Přidej balíček a jeho zvuky se objeví na tvém boardu, každá kategorie jako vlastní karta.",
   "Hide the report": "Skrýt hlášení",
   "Network activity log": "Záznam síťové aktivity",
   "No custom modes yet. Fill in the form to make one.": "Zatím žádné vlastní režimy. Vyplň formulář a jeden vytvoř.",
@@ -4903,5 +4900,30 @@
   "Remove server": "Odebrat server",
   "Pause this voice (click again to bring it back)": "Pozastavit tento hlas (dalším kliknutím se vrátí)",
   "Paused: click to turn this voice back on": "Pozastaveno: kliknutím hlas znovu zapneš",
-  "Turn this voice off (Voices ON won't bring it back)": "Vypnout tento hlas (Hlasy ZAP ho nevrátí)"
+  "Turn this voice off (Voices ON won't bring it back)": "Vypnout tento hlas (Hlasy ZAP ho nevrátí)",
+  "Couldn't load its sounds to try. Adding it still works.": "Zvuky na vyzkoušení se nepodařilo načíst. Přidání pořád funguje.",
+  "Downloads its {n} sound from Myinstants and puts it on your board": [
+    "Stáhne jeho {n} zvuk z Myinstants a dá ho na tvůj board",
+    "Stáhne jeho {n} zvuky z Myinstants a dá je na tvůj board, každou kategorii jako vlastní kartu",
+    "Stáhne jeho {n} zvuků z Myinstants a dá je na tvůj board, každou kategorii jako vlastní kartu"
+  ],
+  "Hear a few first": "Nejdřív si pár poslechni",
+  "Hear a few of its sounds first (only you hear them)": "Nejdřív si poslechni pár jeho zvuků (slyšíš je jen ty)",
+  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "Jeho zvuky se při přidání stáhnou přímo z Myinstants: Onion Board si nenechává kopii. Zvuk, který tam už není, se přeskočí.",
+  "No packs here yet": "Zatím tu nejsou žádné balíčky",
+  "No packs match “{text}”": "Hledání „{text}“ neodpovídá žádný balíček",
+  "None of its sounds could be downloaded.": "Nepodařilo se stáhnout žádný z jeho zvuků.",
+  "On my board": "Na mém boardu",
+  "Only you hear these.": "Slyšíš je jen ty.",
+  "Search packs and sounds": "Hledat balíčky a zvuky",
+  "See what's in {name}": "Podívej se, co je v {name}",
+  "Show every pack": "Zobrazit všechny balíčky",
+  "Try another word, or show every pack.": "Zkus jiné slovo, nebo zobraz všechny balíčky.",
+  "from Myinstants": "z Myinstants",
+  "{done} of {total}": "{done} z {total}",
+  "{n} sound is gone from Myinstants, so it was skipped.": [
+    "{n} zvuk už na Myinstants není, takže byl přeskočen.",
+    "{n} zvuky už na Myinstants nejsou, takže byly přeskočeny.",
+    "{n} zvuků už na Myinstants není, takže byly přeskočeny."
+  ]
 }

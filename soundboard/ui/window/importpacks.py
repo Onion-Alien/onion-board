@@ -9,7 +9,9 @@ import re
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from PySide6.QtWidgets import QMenu, QMessageBox
+from PySide6.QtCore import Qt, QTimer
+from PySide6.QtWidgets import QDialog, QMenu, QMessageBox
+from shiboken6 import isValid as qt_valid
 
 from soundboard.core import (
     backup,
@@ -55,18 +57,80 @@ class PackImport(_Ctl):
                          extras: dict[str, otherboards.Entry] | None = ...) -> None: ...
         def _on_worker(self, work, then, name: str) -> None: ...
         _packs_removed: set[str]
+        _packs_page: QDialog | None
+        _packs_watch: object
         # (BackupImport's)
         def _on_unpacked(self, res, pkg, err: str) -> None: ...
 
     def show_packs(self):
-        """The Free packs window (soundboard.sounds.packs): a pack it downloads is imported the
-        way dropping its zip on the window is."""
+        """The Free packs page (soundboard.sounds.packs), in the tabs' place as Settings
+        is (the rail, player and mixer stay): a pack it downloads is imported the way
+        dropping its zip on the window is. [Done], Escape, a tab on the rail or Settings
+        go back."""
         mw = self.mw
         from soundboard.ui.sounds.packsdialog import PacksDialog
+        if self.packs_open():
+            return
         usage.used("packs-opened")
+        if mw.bunctl.bun_up():   # the window comes back first (as Settings does)
+            mw.bunctl.leave_bun_mode(False)
+        mw.setctl.close_settings()
+        # it belongs to the Sounds tab (opened from its Backup menu): that tab is the one
+        # lit on the rail, and picking it (or any tab) goes back
+        mw.tabs.setCurrentWidget(mw.sounds_page)
         dlg = PacksDialog(self._pack_got, mw, play=self._pack_sample)
-        dlg.exec()
-        free_dialog(dlg)
+        dlg.setWindowFlags(Qt.WindowType.Widget)
+        self._packs_page = dlg
+        dlg.finished.connect(lambda _r, d=dlg: self._packs_closed(d))
+        mw._content.addWidget(dlg)
+        mw._content.setCurrentWidget(dlg)
+        # anything else put in its place (Settings): it closes
+        self._packs_watch = mw._content.currentChanged.connect(
+            lambda _i, d=dlg: self._packs_left(d))
+        mw.fitctl._fit_body_top()
+        setctl = mw.setctl
+        setctl._opening_settings = True   # (fitcontrol: not closed again for being small)
+        try:
+            setctl._board_counts(False)
+            if mw.fitctl.is_mini():
+                setctl._grow_for_settings()
+        finally:
+            setctl._opening_settings = False
+        mw.transctl._show_transport()
+        dlg.search.setFocus(Qt.FocusReason.OtherFocusReason)
+        return dlg
+
+    def packs_open(self) -> bool:
+        dlg = self._packs_page
+        return dlg is not None and qt_valid(dlg)
+
+    def close_packs(self):
+        """Back from Free packs to the tabs, as [Done] does."""
+        dlg = self._packs_page
+        if dlg is not None and qt_valid(dlg):
+            dlg.accept()
+
+    def _packs_left(self, dlg):
+        if qt_valid(dlg) and self.mw._content.currentWidget() is not dlg and not dlg._closed:
+            dlg.reject()
+
+    def _packs_closed(self, dlg):
+        mw = self.mw
+        if self._packs_page is dlg:
+            self._packs_page = None
+            mw._content.currentChanged.disconnect(self._packs_watch)
+        had_focus = dlg.isAncestorOf(mw.focusWidget()) if mw.focusWidget() else False
+        if mw._content.currentWidget() is dlg:
+            mw._content.setCurrentWidget(mw._tabs_area)
+        mw._content.removeWidget(dlg)
+        mw.fitctl._fit_body_top()
+        if not mw.setctl.settings_open():
+            mw.setctl._board_counts(True)
+        mw.transctl._show_transport()
+        if had_focus and not mw.setctl.settings_open():
+            mw._focus_sounds_page(mw.tabs.currentIndex())
+        # freed once its finished signal is over (deleting it inside that crashed)
+        QTimer.singleShot(0, lambda: free_dialog(dlg))
 
     def _pack_got(self, path):
         """A free pack downloaded (packs/<its id>.zip): imported like a dropped zip."""
@@ -127,7 +191,8 @@ class PackImport(_Ctl):
     def _pack_own_categories(pid: str) -> set[str]:
         """The categories a free pack comes with (lower case); {} for any other pack."""
         from soundboard.sounds import packs
-        return {c.lower() for p in packs.built_in() if p.id == pid for c in p.categories}
+        p = packs.known(pid)
+        return {c.lower() for c in p.categories} if p else set()
 
     def _ungrouped_pack_sounds(self, pid: str) -> list[SoundMeta]:
         """Sounds of pack `pid` still in its categories as tabs of their own."""

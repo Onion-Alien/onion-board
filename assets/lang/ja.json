@@ -2444,10 +2444,8 @@
   "Offline mode is on, so the tabs that need the internet are hidden and greyed out here. Switch it off in Privacy & security to use them.": "オフラインモードがオンなので、インターネットが必要なタブは隠され、ここではグレー表示になっています。使うにはプライバシーとセキュリティでオフにしてください。",
   "Offline mode is on: nothing goes online, and what needs the internet is hidden. Click to change it.": "オフラインモードがオンです: オンライン通信を行わず、インターネットが必要なものは隠しています。クリックで変更できます。",
   "Only you hear it. Didn't hear it? Pick another one and try again.": "自分にだけ聞こえます。聞こえなかったら、別のものを選んでもう一度試してください。",
-  "Opens the sharing form on GitHub in your browser": "GitHub の共有フォームをブラウザで開きます",
   "Other device": "別のデバイス",
   "Playing a game or on a call?": "ゲーム中ですか、通話中ですか？",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Add one and its sounds land on your board, each category as its own tab.": "ゲーム、配信、動画など、どこでも無料で使える既製のボード。追加するとサウンドがボードに入り、カテゴリごとに専用のタブになります。",
   "Search your sounds": "自分のサウンドを検索",
   "Send your sounds to another device instead (Voicemeeter, OBS, a mixer…), or nowhere (only you, and the stream output)": "代わりにサウンドを別のデバイス（Voicemeeter、OBS、ミキサー…）に送るか、どこにも送らない（自分と配信出力だけ）",
   "Share a pack": "パックを共有",
@@ -3072,7 +3070,6 @@
   "Hear {name}": "{name} を聴く",
   "Hear {name} (only you hear it)": "{name} を聴く（聞こえるのはあなただけ）",
   "Pick your headphones in Settings → Audio to hear the samples.": "サンプルを聴くには、設定 → オーディオでヘッドホンを選んでください。",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "ゲーム、配信、動画など、どこでも無料で使える既製のボード。サウンドを押すと先に試聴できます（聞こえるのは自分だけ）。パックを追加するとサウンドがボードに入り、カテゴリごとに専用のタブになります。",
   "Hide the report": "レポートを隠す",
   "Network activity log": "ネットワークの動きのログ",
   "No custom modes yet. Fill in the form to make one.": "カスタムモードはまだありません。フォームに入力して作成してください。",
@@ -4727,5 +4724,26 @@
   "Remove server": "サーバーを削除",
   "Pause this voice (click again to bring it back)": "このボイスを一時停止（もう一度クリックで再開）",
   "Paused: click to turn this voice back on": "一時停止中：クリックでこのボイスを再びオン",
-  "Turn this voice off (Voices ON won't bring it back)": "このボイスをオフ（ボイスONでも戻りません）"
+  "Turn this voice off (Voices ON won't bring it back)": "このボイスをオフ（ボイスONでも戻りません）",
+  "Couldn't load its sounds to try. Adding it still works.": "試聴用のサウンドを読み込めませんでした。追加はそのままできます。",
+  "Downloads its {n} sound from Myinstants and puts it on your board": [
+    "{n}個のサウンドをMyinstantsからダウンロードしてボードに追加します。カテゴリごとにタブを作ります"
+  ],
+  "Hear a few first": "まず少し聴いてみる",
+  "Hear a few of its sounds first (only you hear them)": "まずいくつかのサウンドを聴く (聞こえるのは自分だけ)",
+  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "サウンドは追加したときにMyinstantsから直接ダウンロードされます。Onion Boardはコピーを保存しません。向こうで消えたサウンドはスキップされます。",
+  "No packs here yet": "まだパックがありません",
+  "No packs match “{text}”": "「{text}」に一致するパックはありません",
+  "None of its sounds could be downloaded.": "サウンドを1つもダウンロードできませんでした。",
+  "On my board": "ボードにあるもの",
+  "Only you hear these.": "聞こえるのは自分だけです。",
+  "Search packs and sounds": "パックとサウンドを検索",
+  "See what's in {name}": "{name}の中身を見る",
+  "Show every pack": "すべてのパックを表示",
+  "Try another word, or show every pack.": "別の言葉で試すか、すべてのパックを表示してください。",
+  "from Myinstants": "Myinstantsから",
+  "{done} of {total}": "{done}/{total}",
+  "{n} sound is gone from Myinstants, so it was skipped.": [
+    "{n}個のサウンドがMyinstantsから消えていたため、スキップしました。"
+  ]
 }

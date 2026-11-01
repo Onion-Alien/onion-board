@@ -70,6 +70,7 @@ class ImportControl(BackupImport, PackImport, Controller):
         super().__init__(mw)
         self._loose_checked.connect(self._loose_found)
         self._packs_removed: set[str] = set()   # sound packs to stop keeping after Undo
+        self._packs_page = None   # the Free packs page, while it's in the tabs' place
         self._imported_short = False      # a sound added in this batch is under SHORT_SOUND_S
         self._pending_imports = 0
         self._imported_ok = 0
