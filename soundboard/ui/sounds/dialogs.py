@@ -26,6 +26,7 @@ from soundboard.sounds import thumbs
 from soundboard.audio.eq import PRESETS as EQ_PRESETS
 from soundboard.sounds.library import (MAX_COOLDOWN_S, MAX_DELAY_S, PAD_COLORS,
                                        SoundMeta, original_length, original_peaks)
+from soundboard.ui.bun import bunacts
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import (EqPanel, hint_label, icon_button, reset_button,
                                      section_label)
@@ -895,6 +896,8 @@ class EditDialog(EditDialogParts, QDialog):
         # Simple's top: what's on (a chip each, × takes it off), then the switch
         self.summary = Summary(eff)
         self.summary.set_sound(meta)
+        self.bun = bunacts.ActBunny(bunacts.SNIP)   # Bun snipping, at the page's top
+        self._head.addWidget(self.bun, 0, Qt.AlignmentFlag.AlignTop)
         self._head.addWidget(self.summary, 1)
         self._head.addWidget(self.switch, 0, Qt.AlignmentFlag.AlignTop)
 
@@ -957,6 +960,8 @@ class EditDialog(EditDialogParts, QDialog):
         self.live_bar.hide()
         lay.addWidget(self.live_bar)
         self.effects.changed.connect(self._fx_note)
+        self.effects.changed.connect(self._tune_bun)
+        self._tune_bun()
         self._fx_note()
 
         # one row at the bottom: a headphones icon to preview on the left, the
@@ -1075,6 +1080,11 @@ class EditDialog(EditDialogParts, QDialog):
         if advanced:
             self.set_advanced(True)
 
+
+    def _tune_bun(self):
+        """Bun at the top snips at the sound's speed, stretched up or squashed by its pitch."""
+        f = self.effects.fx()
+        self.bun.tune(float(f.get("speed", 1.0)), float(f.get("pitch", 0.0)))
 
     def load(self, meta: SoundMeta, tab: str = "sound"):
         """Show another sound, as a new window would: EditControl.edit reuses a closed

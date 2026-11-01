@@ -11,7 +11,7 @@ import re
 from collections.abc import Callable
 
 import numpy as np
-from PySide6.QtCore import QSize, Qt, QTimer
+from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import (QButtonGroup, QDialog, QFrame, QHBoxLayout, QLabel, QLineEdit,
                                QMessageBox, QPushButton, QRadioButton, QVBoxLayout, QWidget)
 
@@ -19,6 +19,7 @@ from soundboard.sounds import library
 from soundboard.audio.engine import SR
 from soundboard.sounds.library import MAX_SECONDS
 from soundboard.audio.recorder import BothTake, MicTake
+from soundboard.ui.bun import bunacts
 from soundboard.ui.kit import fit, icons
 from soundboard.ui.kit.panel import hint_label
 from soundboard.ui.sounds.trim import TrimPanel
@@ -89,14 +90,9 @@ class RecordDialog(QDialog):
         lay.setContentsMargins(24, 22, 24, 20)
         lay.setSpacing(16)
         heading = QHBoxLayout()
-        mark = QPushButton()
-        mark.setObjectName("recordmark")
-        mark.setFixedSize(44, 44)
-        mark.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
-        mark.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        icons.set_icon(mark, "wave", "accent", size=24)
-        mark.setIconSize(QSize(24, 24))
-        heading.addWidget(mark)
+        heading.setSpacing(2)   # (his widget has room round him already)
+        self.bun = bunacts.ActBunny(bunacts.MIC, prop="mic")   # Bun at the mic
+        heading.addWidget(self.bun)
         title = QLabel(_("Record a sound"))
         title.setObjectName("recordtitle")
         heading.addWidget(title, 1)
@@ -309,6 +305,7 @@ class RecordDialog(QDialog):
         self._quiet_s = 0.0
         self._taken_name = self._playing_name() if playing else ""
         self._taken_pic = self._playing_picture() if playing else ""
+        self.bun.set_act(bunacts.RECORDING)
         self.status.setText(_("Recording what's playing… play a sound, a search result or "
                               "the radio now, then click Stop.") if playing else
                             _("Recording your voice and what's playing… talk, play a sound, "
@@ -321,6 +318,8 @@ class RecordDialog(QDialog):
         take, self.take = self.take, None
         if take is None:
             return
+        self.bun.set_act(bunacts.MIC)
+        self.bun.set_level(0.0)
         data = take.stop()
         if (take.playing or take.both) and len(data) and not np.any(data):   # silence
             data = data[:0]
@@ -356,11 +355,12 @@ class RecordDialog(QDialog):
     def _tick(self):
         take = self.take
         e = self.engine
-        self.meter.set_level(e.level_play if self.from_playing() else
-                             max(e.level_play, e.level_mic) if self.from_both() else
-                             e.level_mic)
+        level = (e.level_play if self.from_playing() else
+                 max(e.level_play, e.level_mic) if self.from_both() else e.level_mic)
+        self.meter.set_level(level)
         if take is None:
             return
+        self.bun.set_level(level)   # he talks along while it records
         if take.playing and not self._taken_name:
             self._taken_name = self._playing_name()   # started after Record was pressed
             self._taken_pic = self._playing_picture()

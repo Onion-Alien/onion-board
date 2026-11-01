@@ -437,6 +437,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/ui/bun/bunshapes.py` | the small painting helpers Bun is drawn with: ellipses, glows, shading, strokes, arcs, his paw pads |
 | `soundboard/ui/bun/bunprops.py` | what Bun holds and wears on top: his props, the nightcap, the music notes, stars and sparkles |
 | `soundboard/ui/bun/bunskits.py` | Bun's idle skits, one per theme outfit (Blood Moon's cheese moon, Retro 98's "deal with it" shades, ...) and juggling for the rest: functions of time that pose him and queue drawings, played by `BunnyWidget` now and then while he's idle |
+| `soundboard/ui/bun/bunacts.py` | Bun at work beside a window's title (`ActBunny`, an act on a loop and one-offs): snipping a waveform in Edit sound, the mic and a REC light in Record a sound, a bin in Recently deleted, a parcel in Free sound packs, a present in What's new |
 | `soundboard/ui/bun/bunskitkit.py` | what Bun's skits are made of: the `Kit` a skit fills in for a frame, the timing curves and the small drawings they share (`bunskits` re-exports them) |
 | `soundboard/ui/bun/bunskitsprops.py` | the theme skits from Blood Moon to Toxic: the cheese moon, the shades, the propeller, the frog's fly, ... the Geiger counter |
 | `soundboard/ui/bun/bunskitsmoves.py` | the theme skits from Forest to Flashbang: the falling leaf, coffee, the coconut, ... the laptop and the flashbang |

@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (QDialog, QFrame, QHBoxLayout, QLabel, QPushButton
 from soundboard import __version__
 from soundboard.ui.kit import theme
 from soundboard.core import feedback, updates
+from soundboard.ui.bun import bunacts
 from soundboard.ui.kit import fit
 from soundboard.ui.kit.panel import hint_label, icon_label
 from soundboard.i18n import _
@@ -384,7 +385,12 @@ class WhatsNewDialog(QDialog):
             shown.append(note)
             rows += len(note.items)
         notes = shown
-        lay.addWidget(_heading(notes[0].headline))
+        head = QHBoxLayout()
+        head.setSpacing(2)   # (his widget has room round him already)
+        self.bun = bunacts.ActBunny(bunacts.GIFT)   # Bun unwrapping a present
+        head.addWidget(self.bun)
+        head.addWidget(_heading(notes[0].headline), 1)
+        lay.addLayout(head)
         lay.addWidget(hint_label(
             _("Updated to Onion Board {version}. Here's what's new.", version=__version__)
             if updated else _("What's new in Onion Board {version}.", version=__version__)))

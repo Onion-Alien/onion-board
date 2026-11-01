@@ -21,6 +21,7 @@ from soundboard.core import errors, updates
 from soundboard.sounds import library, packs
 from soundboard.online import net
 from soundboard.audio.engine import SR
+from soundboard.ui.bun import bunacts
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import hint_label
 from soundboard.ui.kit.widgets import take_out
@@ -245,9 +246,14 @@ class PacksDialog(QDialog):
         lay = QVBoxLayout(self)
         lay.setContentsMargins(18, 18, 18, 18)
         lay.setSpacing(12)
+        head = QHBoxLayout()
+        head.setSpacing(2)   # (his widget has room round him already)
+        self.bun = bunacts.ActBunny(bunacts.PAT)   # Bun with a parcel, beside the title
+        head.addWidget(self.bun)
         title = QLabel(_("Free sound packs"))
         title.setObjectName("helptitle")
-        lay.addWidget(title)
+        head.addWidget(title, 1)
+        lay.addLayout(head)
         lay.addWidget(hint_label(_(
             "Ready-made boards, free to use anywhere: in games, streams and videos. Press a "
             "sound to hear it first (only you hear it). Add a pack and its sounds land on "
@@ -489,6 +495,7 @@ class PacksDialog(QDialog):
             busy.toast(self, html.escape(why), "error")
             return
         self._busy.add(p.id)
+        self.bun.set_act(bunacts.RUN)   # running with it till it lands
         busy.set_busy(card.btn, True)
         card.btn.setText(_("Downloading…"))
 
@@ -516,6 +523,8 @@ class PacksDialog(QDialog):
         self._busy.discard(card.pack.id)
         if self._closed:
             return
+        if not self._busy:
+            self.bun.set_act(bunacts.PAT)
         busy.set_busy(card.btn, False)
         card.show_idle()
         if path is None:
@@ -524,6 +533,7 @@ class PacksDialog(QDialog):
             return
         self._say("")
         self._add(Path(path))
+        self.bun.play(bunacts.OPEN)
         busy.flash(card.btn, _("✓ Added"))
 
     def done(self, r: int):
