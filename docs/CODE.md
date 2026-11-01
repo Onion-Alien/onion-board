@@ -652,6 +652,13 @@ backup is used, so the pad list is never silently reset.
   stretches it to the length the speed asks for. *Tape mode* with no extra pitch is
   a pure resample. Voice effects run per channel in 2048-frame blocks, with room
   for echo / reverb tails, and a module effect that throws is skipped.
+- **Edit sound on a playing sound** is heard at once instead: what can run live
+  (`soundfx.live_split`: the speed, pitch, Live controls stages and boost) goes on that
+  one sound (`Engine.set_sound_live`), read faster like the live speed and run through
+  its own `livefx.SoundStage`, over a copy with the rest baked in (only a trim, reverse,
+  EQ or voice change makes a new one). Save bakes it all in as above and swaps it in
+  under it. The stages and boost are the bake's own `LiveFx` code and match it to the
+  sample; the speed and pitch match its length and pitch, not its exact waveform.
 - **Live speed / pitch** (the `1x` buttons) works differently, because it has to be
   instant. Sounds are read at a fractional rate with cubic interpolation (like a
   tape). A pitch shifter on the sounds bus (the voice changer's WSOLA pitch effect,
