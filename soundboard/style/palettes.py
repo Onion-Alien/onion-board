@@ -266,6 +266,16 @@ THEMES: dict[str, dict[str, str]] = {
         off="#4f3a56", badge="#312336", badge_text="#f3dcc8",
         **_DARK_STATUS | dict(ok_text="#8cff5a", ok_border="#3f7a2a", error_text="#ff7a7c"),
     ),
+    "Fireworks": dict(   # a night sky lit gold and pink, bursts on the panels
+        bg="#0a0c1a", panel="#10132a", card="#161a35", card_hi="#1d2241",
+        btn="#1a1e3b", btn_hover="#242948", btn_press="#2e3456",
+        border="#2a305c", border_hi="#4d5596", groove="#262c52", inset="#070815",
+        text="#eef0ff", text_hi="#ffffff", muted="#a3a8d0", faint="#6c7199", section="#ffc94d",
+        accent="#ffb627", accent_hi="#ffc855", accent2="#ff4fa3", on_accent="#1a1000",
+        texture="fireworks",
+        off="#3a3f6a", badge="#242948", badge_text="#e6e8ff",
+        **_DARK_STATUS | dict(error_text="#ff7a7c"),
+    ),
     "Lava": dict(   # molten orange and yellow
         bg="#150805", panel="#1f0c07", card="#2a1109", card_hi="#35160b",
         btn="#2e130a", btn_hover="#3b180c", btn_press="#4a1e0f",
@@ -584,8 +594,8 @@ for _t in THEMES.values():
 DEFAULT = "Dark"
 # How the Settings window groups the theme cards. Every theme is in exactly one group.
 GROUPS: list[tuple[str, list[str]]] = [
-    ("Classic", ["Halloween", "Dark", "Light", "Midnight", "Carbon", "Slate", "Arctic", "Paper",
-                 "High Contrast"]),
+    ("Classic", ["Fireworks", "Halloween", "Dark", "Light", "Midnight", "Carbon", "Slate",
+                 "Arctic", "Paper", "High Contrast"]),
     ("Colourful", ["Ocean", "Toxic", "Vampire", "Forest", "Mocha", "Sunset", "Royal", "Onion",
                    "Lilac", "Mint", "Cherry Blossom"]),
     ("Wild", ["Synthwave", "Vaporwave", "Blood Moon", "Lava", "Amber Terminal", "Hacker"]),
@@ -595,7 +605,8 @@ GROUPS: list[tuple[str, list[str]]] = [
 
 # Limited-edition themes: each one's last day on offer (the PC's own date). Pick it by
 # then and it's yours for good (the app's `kept` list); after it, nobody else sees it.
-LIMITED: dict[str, datetime.date] = {"Halloween": datetime.date(2026, 10, 31)}
+LIMITED: dict[str, datetime.date] = {"Halloween": datetime.date(2026, 10, 31),
+                                     "Fireworks": datetime.date(2026, 11, 30)}
 
 
 FONT = "Bahnschrift"   # ships with Windows 10+; a theme can swap it with a `font` token

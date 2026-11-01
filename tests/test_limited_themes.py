@@ -1,4 +1,4 @@
-"""Limited-edition themes (Halloween): on offer until their last day, kept for good by
+"""Limited-edition themes (Halloween, Fireworks): on offer until their last day, kept for good by
 whoever used one in time, gone for everyone else after; their tag and lantern logo."""
 import datetime
 
@@ -13,9 +13,19 @@ def _last():
     return theme.LIMITED["Halloween"]
 
 
-def test_halloween_is_the_first_card_and_limited():
-    assert theme.GROUPS[0][1][0] == "Halloween"
-    assert "Halloween" in theme.LIMITED
+def test_the_limited_ones_are_the_first_cards():
+    assert theme.GROUPS[0][1][:2] == ["Fireworks", "Halloween"]
+    assert {"Fireworks", "Halloween"} <= set(theme.LIMITED)
+
+
+def test_fireworks_is_on_all_november_then_gone(monkeypatch):
+    monkeypatch.setattr(theme, "kept", set())
+    nov1, nov30 = datetime.date(2026, 11, 1), datetime.date(2026, 11, 30)
+    assert theme.LIMITED["Fireworks"] == nov30
+    assert theme.offered("Fireworks", nov1) and theme.offered("Fireworks", nov30)
+    assert not theme.offered("Fireworks", nov30 + DAY)
+    assert not theme.offered("Halloween", nov1)   # one season gives way to the next
+    assert theme.keep("Fireworks", nov30) and theme.offered("Fireworks", nov30 + 365 * DAY)
 
 
 def test_on_offer_until_its_last_day_then_gone(monkeypatch):
