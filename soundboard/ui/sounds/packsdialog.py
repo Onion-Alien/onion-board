@@ -476,12 +476,12 @@ class Downloads(QObject):
         self.words[p.id] = _("Downloading…")
         self._jobs[p.id] = (add, try_later, window)
         stop = QCoreApplication.closingDown   # only the app quitting stops it
-        arrived = None
+        arrived: Callable[[int, Path], object] | None = None
         if add_some is not None and p.links:
             tmp = Path(tempfile.mkdtemp(prefix="sb-packcame-"))
             self._some[p.id] = (add_some, tmp)
 
-            def arrived(i: int, audio: Path):
+            def came(i: int, audio: Path):
                 z = tmp / f"{i}.zip"
                 try:
                     packs.zip_one(p, i, audio, z)
@@ -490,6 +490,7 @@ class Downloads(QObject):
                              exc_info=True)
                     return
                 busy.emit(self._came, p, z)
+            arrived = came
 
         def run():
             try:
