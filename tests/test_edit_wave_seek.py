@@ -12,6 +12,7 @@ from PySide6.QtWidgets import QApplication
 
 from soundboard.audio import soundfx
 from soundboard.ui.kit import worker
+from soundboard.ui.kit.widgets import fmt_pos
 from soundboard.ui.sounds import dialogs
 from soundboard.ui.sounds.trim import RULER_H, Waveform
 from soundboard.ui.window import editcontrol
@@ -174,5 +175,28 @@ def test_a_trim_past_the_spot_swaps_in_from_its_start(playing):
     assert swaps[-1][1](0.25) == pytest.approx(0.0)   # 0:30 -> the start of what's kept
     win.editctl._show_playing()                    # and the playhead says the same
     assert d.effects.trim.wave.play == pytest.approx(60.0 + 0.25 * 60.0)
+    d.close()
+    QApplication.processEvents()
+
+
+def test_the_players_time_is_of_the_kept_part_once_its_swapped_in(playing):
+    """A 1 s sound cut to its last half while it plays: the board's player and the
+    window's say 0.1s / 0.5s, not a quarter of the saved length racing on."""
+    win, d, _seeks, _swaps = playing
+    m = win.meta("s0")
+    m.duration = 1.0                               # (window.audio["s0"] is 1 s)
+    win.current = "s0"
+    win.transctl._update_transport({"s0": (0.25, False)})
+    assert win.np_time.text() == fmt_pos(0.25, 1.0)
+    d.effects.trim.set_values(0.5, 0.0, emit=True)
+    win.editctl._live_now()                        # the cut 0.5 s plays now
+    assert m.duration == 1.0                       # (not saved)
+    win.transctl._update_transport({"s0": (0.25, False)})
+    want = fmt_pos(0.125, 0.5)
+    assert win.np_time.text() == want and d.player.time.text() == want
+    win.playctl._seeking = True                    # dragging the seek bar says the same
+    win.playctl._seek_preview(500)
+    assert win.np_time.text() == fmt_pos(0.25, 0.5)
+    win.playctl._seeking = False
     d.close()
     QApplication.processEvents()

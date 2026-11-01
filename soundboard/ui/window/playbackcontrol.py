@@ -419,7 +419,15 @@ class PlaybackControl(Controller):
         if self._seeking:
             m = mw.meta(mw.current) if mw.current else None
             if m:
-                mw._set_np_time(fmt_pos(v / 1000 * m.duration, m.duration))
+                length = self.length(m)
+                mw._set_np_time(fmt_pos(v / 1000 * length, length))
+
+    def length(self, m) -> float:
+        """How long what the sound plays is, in seconds: its audio as it is now, which
+        an open Edit sound window's unsaved trim has cut already (m.duration is the
+        saved length until Save)."""
+        data = self.mw.audio.get(m.id)
+        return len(data) / SR if data is not None and len(data) else m.duration
 
     def do_seek(self, slider=None):
         mw = self.mw
