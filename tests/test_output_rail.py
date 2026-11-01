@@ -490,3 +490,26 @@ def test_voice_lines_switch_off_and_back_on_from_the_card(window, qapp, monkeypa
     window.netctl.remove_voice("clean")
     qapp.processEvents()
     assert not voice.clean.is_on() and line("clean")[1] is None
+
+
+def test_rail_compact_step_measures_the_buttons_after_their_padding(window, qapp):  # noqa: F811
+    """The rail's compact step (a short window) sized its buttons before their padding
+    changed, so they kept the other step's height: undone, the window's fit judged the
+    rail too short and squeezed the shut On Air card (its boxes over the On switch)."""
+    window.resize(1200, 900)
+    window.show()
+    window.rail.set_open(False)
+    qapp.processEvents()
+    rail, card = window.rail, window.rail.output
+    full = rail.minimumSizeHint().height()
+    for tight in (True, False):
+        rail.compact(tight)
+        measured = (rail.minimumSizeHint().height(), rail.buttons[0].height())
+        rail._apply()   # a refresh with nothing changed: the same sizes
+        assert measured == (rail.minimumSizeHint().height(), rail.buttons[0].height())
+    assert rail.minimumSizeHint().height() == full
+    qapp.processEvents()
+    assert card.height() >= card.minimumSizeHint().height()
+    panels = [p for p in card.panels.values() if p.isVisible()]
+    for p in panels:
+        assert p.geometry().top() >= card.switch.geometry().bottom()

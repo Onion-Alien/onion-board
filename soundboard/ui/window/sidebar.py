@@ -778,15 +778,18 @@ class SideRail(QFrame):
         for w in everything:
             w.setMinimumHeight(0)
             w.setMaximumHeight(16777215)
-        short = self._compact and self.window().height() < 520
-        h = COMPACT_H if short else max(34, *(w.sizeHint().height() for w in everything))
-        self._button_h = h   # (the update's height, shut: _size_update)
-        self._lay.setSpacing(1 if short else 4)
         if self.property("compact") != self._compact:   # less padding: the icons stay whole
             self.setProperty("compact", self._compact)
             for w in everything:
                 w.style().unpolish(w)
                 w.style().polish(w)
+        # (measured after the padding changed: before, the buttons kept the other step's
+        # height until the next refresh, so the window's fit judged the rail by it and
+        # squeezed the On Air card)
+        short = self._compact and self.window().height() < 520
+        h = COMPACT_H if short else max(34, *(w.sizeHint().height() for w in everything))
+        self._button_h = h   # (the update's height, shut: _size_update)
+        self._lay.setSpacing(1 if short else 4)
         for w in everything:
             w.setFixedHeight(h)
         self.refresh_output()
