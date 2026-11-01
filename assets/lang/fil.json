@@ -639,7 +639,6 @@
   "Off": "Off",
   "Off.": "Off.",
   "Off: slower is also deeper and faster is higher, like a tape": "Off: mas mabagal ay mas malalim din at mas mabilis ay mas mataas, parang tape",
-  "Off: speed and pitch are independent. On: like a record player, faster is also higher; Pitch adds on top.": "Off: hiwalay ang bilis at pitch. On: parang record player, mas mabilis ay mas mataas din; idinadagdag ang Pitch sa ibabaw nito.",
   "Offline mode": "Offline mode",
   "On": "On",
   "On press": "Sa pagpindot",
@@ -1032,7 +1031,6 @@
   "Take it out of the queue": "Alisin ito sa queue",
   "Takes the add-on out of Onion Board: phones can't play your pads any more. Paired phones are kept for when you get it again.": "Inaalis ang add-on sa Onion Board: hindi na mape-play ng mga phone ang mga pad mo. Nananatili ang mga naka-pair na phone para sa susunod na kunin mo ulit ito.",
   "Tap to open, tap again to close": "I-tap para buksan, i-tap ulit para isara",
-  "Tape mode: speed changes the pitch too (nightcore / slowed)": "Tape mode: binabago rin ng bilis ang pitch (nightcore / slowed)",
   "Teal": "Teal",
   "Test": "Subukan",
   "Testing…": "Sinusubukan…",
@@ -4744,9 +4742,7 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Gusto mo pa ring mawala ang ingay sa paligid? I-on na lang ang <b>Malinis na mic</b> sa <b>Voice</b> tab ng Onion Board: nililinis nito ang boses mo at hindi nito ginagalaw ang mga sound mo.",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "Mas malaking window: malaki ang waveform, magkatabi ang effects at equalizer",
   "Add effect": "Magdagdag ng effect",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "I-drag ang mga handle para i-cut ang simula at dulo. Ctrl+scroll para mag-zoom, Shift+scroll para gumalaw.",
   "No effect has that name.": "Walang effect na may ganyang pangalan.",
-  "No effects on yet.": "Wala pang naka-on na effect.",
   "Pick an effect to turn on": "Pumili ng effect na io-on",
   "Redo ({keys})": "I-redo ({keys})",
   "Search effects": "Maghanap ng effect",
@@ -4767,5 +4763,6 @@
   "Save as a new preset": "I-save bilang bagong preset",
   "Save what you have now into “{name}”": "I-save ang kasalukuyan mo sa “{name}”",
   "Update “{name}”": "I-update ang “{name}”",
-  "Update, reset or save as a new preset": "I-update, i-reset o i-save bilang bagong preset"
+  "Update, reset or save as a new preset": "I-update, i-reset o i-save bilang bagong preset",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "I-drag ang mga handle para i-cut ang simula at dulo. Ctrl+scroll para mag-zoom. I-drag gamit ang kanang button ng mouse, o Shift+scroll, para gumalaw."
 }

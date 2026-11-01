@@ -222,7 +222,6 @@
   "Number row 1–9  (Q / E flip pages, R category)": "數字列 1–9  （Q / E 翻頁，R 切換分類）",
   "Numpad  (− / + flip pages, * category)": "數字鍵台  （− / + 翻頁，* 切換分類）",
   "Off: slower is also deeper and faster is higher, like a tape": "關閉：越慢越低沉、越快越高，就像錄音帶",
-  "Off: speed and pitch are independent. On: like a record player, faster is also higher; Pitch adds on top.": "關閉：速度和音高互不影響。開啟：像唱盤一樣，越快也越高；「音高」會再額外疊加。",
   "On": "開啟",
   "One click needed: repair your mic": "需要按一下：修復你的麥克風",
   "One of them": "其中一個",
@@ -366,7 +365,6 @@
   "Stop this sound": "停止這個音效",
   "Switched to “{shown}” ({exe} is in front)": "已切換到「{shown}」（{exe} 在最前面）",
   "Tap to open, tap again to close": "點一下開啟，再點一下關閉",
-  "Tape mode: speed changes the pitch too (nightcore / slowed)": "錄音帶模式：速度也會改變音高（nightcore／降速）",
   "Test": "測試",
   "The Voice tab is switched off (Settings > Tabs).": "「語音」分頁已關閉（設定 > 分頁）。",
   "The device changed mid-way, so the recording stopped there.": "裝置在中途變更了，所以錄音停在那裡。",
@@ -4657,9 +4655,7 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "還是想去掉背景噪音？改為在 Onion Board 的<b>語音</b>分頁裡開啟<b>麥克風降噪</b>：它只清理你的聲音，從不碰你的音效。",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "更大的視窗：波形放大，效果和等化器並排顯示",
   "Add effect": "新增效果",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "拖曳把手剪掉開頭和結尾。Ctrl+滾輪縮放，Shift+滾輪平移。",
   "No effect has that name.": "沒有這個名字的效果。",
-  "No effects on yet.": "還沒有開啟任何效果。",
   "Pick an effect to turn on": "選擇要開啟的效果",
   "Redo ({keys})": "重做（{keys}）",
   "Search effects": "搜尋效果",
@@ -4680,5 +4676,6 @@
   "Save as a new preset": "另存為新預設集",
   "Save what you have now into “{name}”": "把現在的設定存到「{name}」",
   "Update “{name}”": "更新「{name}」",
-  "Update, reset or save as a new preset": "更新、重設或另存為新預設集"
+  "Update, reset or save as a new preset": "更新、重設或另存為新預設集",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "拖曳把手剪掉開頭和結尾。Ctrl+滾輪縮放。按住滑鼠右鍵拖曳，或 Shift+滾輪，即可平移。"
 }

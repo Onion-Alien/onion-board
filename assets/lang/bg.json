@@ -594,7 +594,6 @@
   "Off": "Изкл.",
   "Off.": "Изключено.",
   "Off: slower is also deeper and faster is higher, like a tape": "Изкл.: по-бавно е и по-ниско, а по-бързо е по-високо, като касета",
-  "Off: speed and pitch are independent. On: like a record player, faster is also higher; Pitch adds on top.": "Изкл.: скоростта и тонът са независими. Вкл.: като грамофон, по-бързо е и по-високо; Тонът се добавя отгоре.",
   "Offline mode": "Офлайн режим",
   "On": "Вкл.",
   "On press": "При натискане",
@@ -965,7 +964,6 @@
   "Take it out of the queue": "Махни го от опашката",
   "Takes the add-on out of Onion Board: phones can't play your pads any more. Paired phones are kept for when you get it again.": "Маха добавката от Onion Board: телефоните вече не могат да пускат бутоните ти. Сдвоените телефони се пазят за когато я вземеш пак.",
   "Tap to open, tap again to close": "Докосни, за да отвориш, докосни пак, за да затвориш",
-  "Tape mode: speed changes the pitch too (nightcore / slowed)": "Режим касета: скоростта променя и тона (nightcore / slowed)",
   "Teal": "Синьозелено",
   "Test": "Тествай",
   "Testing…": "Тествам…",
@@ -4744,9 +4742,7 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Искаш все пак да махнеш фоновия шум? Включи <b>Чист микрофон</b> в раздела <b>Глас</b> на Onion Board: той чисти гласа ти и никога не пипа звуците ти.",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "По-голям прозорец: вълната голяма, ефектите и еквалайзерът един до друг",
   "Add effect": "Добави ефект",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Плъзни дръжките, за да отрежеш началото и края. Ctrl+скрол увеличава, Shift+скрол мести.",
   "No effect has that name.": "Няма ефект с това име.",
-  "No effects on yet.": "Още няма включени ефекти.",
   "Pick an effect to turn on": "Избери ефект, който да включиш",
   "Redo ({keys})": "Върни отново ({keys})",
   "Search effects": "Търси ефекти",
@@ -4767,5 +4763,6 @@
   "Save as a new preset": "Запази като нова настройка",
   "Save what you have now into “{name}”": "Запази текущото в „{name}“",
   "Update “{name}”": "Обнови „{name}“",
-  "Update, reset or save as a new preset": "Обнови, нулирай или запази като нова настройка"
+  "Update, reset or save as a new preset": "Обнови, нулирай или запази като нова настройка",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Плъзни дръжките, за да отрежеш началото и края. Ctrl+скрол увеличава. Влачи с десния бутон на мишката или Shift+скрол, за да местиш."
 }

@@ -228,7 +228,6 @@
   "Number row 1–9  (Q / E flip pages, R category)": "Zahlenreihe 1–9  (Q / E blättern, R Kategorie)",
   "Numpad  (− / + flip pages, * category)": "Ziffernblock  (− / + blättern, * Kategorie)",
   "Off: slower is also deeper and faster is higher, like a tape": "Aus: langsamer ist auch tiefer und schneller höher, wie ein Tonband",
-  "Off: speed and pitch are independent. On: like a record player, faster is also higher; Pitch adds on top.": "Aus: Tempo und Tonhöhe sind unabhängig. An: wie ein Plattenspieler, schneller ist auch höher; Tonhöhe kommt obendrauf.",
   "On": "An",
   "One click needed: repair your mic": "Ein Klick nötig: Mikro reparieren",
   "One of them": "Eins davon",
@@ -372,7 +371,6 @@
   "Stop this sound": "Diesen Sound stoppen",
   "Switched to “{shown}” ({exe} is in front)": "Zu „{shown}“ gewechselt ({exe} ist vorne)",
   "Tap to open, tap again to close": "Tippen zum Öffnen, nochmal tippen zum Schließen",
-  "Tape mode: speed changes the pitch too (nightcore / slowed)": "Tonband-Modus: Das Tempo ändert auch die Tonhöhe (Nightcore / Slowed)",
   "Test": "Testen",
   "The Voice tab is switched off (Settings > Tabs).": "Der Stimme-Tab ist ausgeschaltet (Einstellungen > Tabs).",
   "The device changed mid-way, so the recording stopped there.": "Das Gerät hat sich mittendrin geändert, also hat die Aufnahme dort aufgehört.",
@@ -4744,9 +4742,7 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Willst du die Hintergrundgeräusche trotzdem loswerden? Schalte stattdessen <b>Mikro säubern</b> im Tab <b>Stimme</b> von Onion Board ein: Es säubert deine Stimme und lässt deine Sounds immer in Ruhe.",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "Ein größeres Fenster: die Wellenform groß, Effekte und Equalizer nebeneinander",
   "Add effect": "Effekt hinzufügen",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Zieh die Griffe, um Anfang und Ende abzuschneiden. Strg+Scrollen zoomt, Umschalt+Scrollen verschiebt.",
   "No effect has that name.": "Kein Effekt heißt so.",
-  "No effects on yet.": "Noch keine Effekte an.",
   "Pick an effect to turn on": "Such dir einen Effekt zum Einschalten aus",
   "Redo ({keys})": "Wiederholen ({keys})",
   "Search effects": "Effekte suchen",
@@ -4767,5 +4763,6 @@
   "Save as a new preset": "Als neue Vorlage speichern",
   "Save what you have now into “{name}”": "Das, was du gerade eingestellt hast, in „{name}“ speichern",
   "Update “{name}”": "„{name}“ aktualisieren",
-  "Update, reset or save as a new preset": "Aktualisieren, zurücksetzen oder als neue Vorlage speichern"
+  "Update, reset or save as a new preset": "Aktualisieren, zurücksetzen oder als neue Vorlage speichern",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Zieh die Griffe, um Anfang und Ende abzuschneiden. Strg+Scrollen zoomt. Zum Verschieben mit der rechten Maustaste ziehen oder Umschalt+Scrollen."
 }

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import logging
+import math
 import threading
 from typing import Any
 
@@ -29,6 +30,9 @@ from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import (EqPanel, hint_label, icon_button, reset_button,
                                      section_label, steady_number)
 from soundboard.ui.sounds.editadvanced import AdvancedView, ModeSwitch
+from soundboard.ui.sounds.speedpitch import (FX_NAME_W, GAP, NAME_W, QUICK, QUICK_SLACK,
+                                             VOLUME_QUICK, name_of, popup_slider,
+                                             preset_name, quick_row)
 from soundboard.ui.sounds.trim import TrimPanel
 from soundboard.ui.voice.voicefxpanel import ADDON_GROUP, GROUPS, EffectRow, ParamSlider
 from soundboard.ui.kit.plaintext import plain_tip
@@ -55,6 +59,7 @@ COLOUR_NAMES = {"#7c5cff": _("Purple"), "#ff5c8a": _("Pink"), "#1fb6ff": _("Blue
 SPEED = voicefx.Param("speed", _("Speed"), *soundfx.SPEED_RANGE, 1.0, "x", 0.05)
 PITCH = voicefx.Param("pitch", _("Pitch"), *soundfx.PITCH_RANGE, 0.0, " st", 1)
 BOOST = voicefx.Param("gain_db", _("Boost"), *soundfx.GAIN_RANGE, 0.0, " dB", 1)
+VOLUME = voicefx.Param("volume", _("Volume"), 0, 200, 100, "%", 1)   # the pad's (meta.volume)
 
 
 def _page() -> tuple[QWidget, QVBoxLayout]:
@@ -175,6 +180,42 @@ class EffectsPanel(QObject):
         self.live_row.hide()
         self.live_name.hide()
 
+        # Advanced: Live controls' effect knobs and presets themselves (in place of the
+        # row above), kept on the sound as its Live controls stage, so they sound the
+        # same as in Live controls (soundfx.with_live, livefx.LiveFx)
+        self.live_box = QWidget()
+        lv = QVBoxLayout(self.live_box)
+        lv.setContentsMargins(0, 4, 0, 4)
+        lv.setSpacing(8)
+        self.knobs: dict[str, ParamSlider] = {}
+        for q in livefx.PARAMS:
+            k = self.knobs[q.key] = popup_slider(q, q.default)
+            k.changed.connect(self._knobs_edited)
+            lv.addWidget(k)
+        knob_w = max(FX_NAME_W, *(name_of(k).sizeHint().width() for k in self.knobs.values()))
+        for k in self.knobs.values():
+            name_of(k).setFixedWidth(knob_w)
+        grid = QGridLayout()
+        grid.setContentsMargins(0, 4, 0, 0)
+        grid.setHorizontalSpacing(4)
+        grid.setVerticalSpacing(4)
+        self.fx_presets: dict[str, QPushButton] = {}
+        for i, pname in enumerate(livefx.PRESETS):
+            b = QPushButton(preset_name(pname))
+            b.setObjectName("small")
+            b.setCheckable(True)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            b.clicked.connect(lambda on, n=pname: self._fx_preset_clicked(n, on))
+            self.fx_presets[pname] = b
+            grid.addWidget(b, i // 3, i % 3)
+        grid.setColumnStretch(3, 1)   # as wide as their words, on the left
+        lv.addLayout(grid)
+        self._before_preset: tuple[str, dict, tuple[float, float, bool]] | None = None
+        lv.addWidget(hint_label(_("A voice chat's noise suppression can wipe these out, "
+                                  "deep bass too. Discord: Input Profile → Studio.")))
+        self.live_box.hide()
+        v.addWidget(self.live_box)
+
         self.trim_head = section_label(_("Trim"))
         tv.addWidget(self.trim_head)
         self._v = tv
@@ -187,18 +228,53 @@ class EffectsPanel(QObject):
         tv.addWidget(self.trim_kept)
         self.trim = self._new_trim(meta, tv.indexOf(self.trim_hint))   # above them
 
-        tv.addWidget(section_label(_("Speed & pitch")))
-        self.speed = ParamSlider(SPEED, 1.0, centred=True)
-        self.pitch = ParamSlider(PITCH, 0.0, centred=True)
-        self.tape = QCheckBox(_("Tape mode: speed changes the pitch too (nightcore / slowed)"))
-        self.tape.setToolTip(_("Off: speed and pitch are independent. On: like a record player, "
-                               "faster is also higher; Pitch adds on top."))
-        for w in (self.speed, self.pitch, self.tape):
-            tv.addWidget(w)
+        # Live controls' own sliders (ui/sounds/speedpitch.py), with their typed values,
+        # words and quick buttons, so the same settings read and sound the same here.
+        # The quick buttons and Volume are Advanced's (set_compact)
+        self.speed_head = section_label(_("Speed & pitch"))
+        tv.addWidget(self.speed_head)
+        self.speed = popup_slider(SPEED, 1.0)
+        self.pitch = popup_slider(PITCH, 0.0)
+        self.boost = popup_slider(BOOST, 0.0)
+        self.volume = popup_slider(VOLUME, VOLUME.default)   # the Sound tab's, mirrored
+        name_w = max(NAME_W, *(name_of(s).sizeHint().width()
+                               for s in (self.speed, self.pitch, self.boost, self.volume)))
+        for s in (self.speed, self.pitch, self.boost, self.volume):
+            name_of(s).setFixedWidth(name_w)
+        indent = min(name_w, NAME_W + QUICK_SLACK) + GAP
+        tv.addWidget(self.speed)
+        self.speed_quick = QWidget()
+        self.speed_quick.setLayout(quick_row(
+            [(f"{x:g}x", x) for x in QUICK], indent,
+            lambda x: self.speed.set_value(x) or self._edited(), narrow=True))
+        tv.addWidget(self.speed_quick)
+        tv.addWidget(self.pitch)
+        self.keep = QCheckBox(_("Keep pitch when changing speed"))   # off = "tape"
+        self.keep.setChecked(True)
+        self.keep.setToolTip(_("Off: slower is also deeper and faster is higher, like a tape"))
+        # with keep pitch off the speed moves the pitch too: said beside Keep pitch (a line
+        # of its own, kept empty while hidden, left a hole under Pitch)
+        self.pitch_note = QLabel()
+        self.pitch_note.setObjectName("hint")
+        self.pitch_note.setWordWrap(True)
+        self.pitch_note.hide()
+        keep_row = QHBoxLayout()
+        keep_row.setSpacing(12)
+        keep_row.addWidget(self.keep)
+        keep_row.addWidget(self.pitch_note, 1)
+        tv.addLayout(keep_row)
 
-        tv.addWidget(section_label(_("Loudness")))
-        self.boost = ParamSlider(BOOST, 0.0, centred=True)
+        self.loud_head = section_label(_("Loudness"))
+        tv.addWidget(self.loud_head)
+        tv.addWidget(self.volume)
+        self.volume_quick = QWidget()
+        self.volume_quick.setLayout(quick_row(
+            [(f"{lv:g}%", lv) for lv in VOLUME_QUICK if lv <= VOLUME.hi], indent,
+            lambda lv: self.volume.set_value(lv) or self.volume.changed.emit(), narrow=True))
+        tv.addWidget(self.volume_quick)
         tv.addWidget(self.boost)
+        for w in (self.speed_quick, self.volume, self.volume_quick):
+            w.hide()   # Advanced's (Simple has the volume on the Sound tab)
         self.boost_hint = hint_label("")
         tv.addWidget(self.boost_hint)
         self.reverse = QCheckBox(_("Play backwards"))
@@ -235,9 +311,6 @@ class EffectsPanel(QObject):
         self.addon_hint = hint_label(_("Effects from add-on modules show up here too."))
         v.addWidget(self.addon_hint)
         # Advanced: right after the effects that are on, a button to add one more
-        self.none_on = hint_label(_("No effects on yet."))
-        self.none_on.hide()
-        v.addWidget(self.none_on)
         self.add_effect = QPushButton(_("Add effect"))
         icons.set_icon(self.add_effect, "plus", size=14)
         self.add_effect.setToolTip(_("Pick an effect to turn on"))
@@ -251,7 +324,7 @@ class EffectsPanel(QObject):
         self.load(fx or {})
         for s in (self.speed, self.pitch, self.boost):
             s.changed.connect(self._edited)
-        self.tape.toggled.connect(self._edited)
+        self.keep.toggled.connect(self._edited)
         self.reverse.toggled.connect(self._edited)
         self.eq.changed.connect(lambda *__: self._edited())
         self.preset.currentIndexChanged.connect(
@@ -324,8 +397,14 @@ class EffectsPanel(QObject):
         if not on:
             self._folded_here.clear()
         self.addon_hint.setVisible(not on)
-        self.none_on.setVisible(on and not shown)
         self.add_effect.setVisible(on)
+        for w in (self.speed_quick, self.volume, self.volume_quick, self.live_box):
+            w.setVisible(on)
+        # Advanced's column is titled Speed & loudness already: no headings inside, so
+        # it fits whole on a 1280 x 800 screen with the quick buttons
+        self.speed_head.setVisible(not on)
+        self.loud_head.setVisible(not on)
+        self._show_live()
 
     def turn_on(self, etype: str, on: bool = True):
         """Add effect's tile: switch `etype` on (open, in view) or off."""
@@ -336,17 +415,15 @@ class EffectsPanel(QObject):
         if on:
             row.setVisible(True)
             row.set_folded(False)
-            self.none_on.hide()
         elif self.compact:
             row.setVisible(False)
-            self.none_on.setVisible(not self.on_count())
 
     def on_count(self) -> int:
         return sum(r.chk.isChecked() for r in self.rows.values())
 
     def load(self, fx: dict):
         f = soundfx.clean(fx)
-        widgets = (self.speed, self.pitch, self.boost, self.tape, self.reverse, self.eq,
+        widgets = (self.speed, self.pitch, self.boost, self.keep, self.reverse, self.eq,
                    self.trim, *self.rows.values())
         for w in widgets:
             w.blockSignals(True)
@@ -354,7 +431,7 @@ class EffectsPanel(QObject):
         self.speed.set_value(f["speed"])
         self.pitch.set_value(f["pitch"])
         self.boost.set_value(f["gain_db"])
-        self.tape.setChecked(f["tape"])
+        self.keep.setChecked(not f["tape"])
         self.reverse.setChecked(f["reverse"])
         self.eq.set_gains(f["eq"], next((n for n, g in EQ_PRESETS.items() if g == f["eq"]),
                                         CUSTOM))
@@ -368,6 +445,7 @@ class EffectsPanel(QObject):
         self._live = f["live"]
         self._show_live()
         self._boost_hint()
+        self._pitch_note()
 
     def _show_live(self):
         self.live_text.setText("; ".join(", ".join(
@@ -375,8 +453,72 @@ class EffectsPanel(QObject):
                                              else f"{round(st[q.key] * 100)}%")
             for q in livefx.PARAMS if q.key in st)
             for st in self._live))
-        self.live_row.setVisible(bool(self._live))
-        self.live_name.setVisible(bool(self._live))
+        self.live_row.setVisible(bool(self._live) and not self.compact)
+        self.live_name.setVisible(bool(self._live) and not self.compact)
+        merged = soundfx.live_merged(self._live)
+        for key, k in self.knobs.items():
+            k.set_value(merged.get(key, 0.0))
+        self._light_presets()
+
+    def knob_values(self) -> dict[str, float]:
+        """Advanced's Live controls knobs that are off 0."""
+        return livefx.clean({key: k.value() for key, k in self.knobs.items()})
+
+    def _knobs_edited(self):
+        """A knob moved: the sound's Live controls stages become one, these knobs (and
+        the volume they were saved with, which has no slider here)."""
+        vol = 1.0
+        for st in self._live:
+            vol *= st.get(livefx.VOLUME.key, livefx.VOLUME.default) / 100
+        stage = livefx.clean({**self.knob_values(), livefx.VOLUME.key: vol * 100})
+        self._live = [stage] if stage else []
+        self._edited()
+
+    def _fx_preset_on(self, name: str) -> bool:
+        """The knobs (and the speed and pitch, if it sets them) are the preset's, as
+        Live controls lights it."""
+        p = livefx.PRESETS[name]
+        want = livefx.clean(p)
+        want.pop(livefx.VOLUME.key, None)
+        if self.knob_values() != want:
+            return False
+        t = livefx.tuning(p)
+        return t is None or (abs(self.speed.value() - t[0]) < 1e-3
+                             and abs(self.pitch.value() - t[1]) < 1e-3
+                             and self.keep.isChecked() == t[2])
+
+    def _light_presets(self):
+        for name, b in self.fx_presets.items():
+            b.setChecked(self._fx_preset_on(name))
+
+    def _set_tuning(self, speed: float, pitch: float, keep: bool):
+        self.speed.set_value(speed)
+        self.pitch.set_value(pitch)
+        self.keep.blockSignals(True)
+        self.keep.setChecked(keep)
+        self.keep.blockSignals(False)
+
+    def _fx_preset_clicked(self, name: str, on: bool):
+        """Live controls' preset: sets its knobs, and its speed and pitch when it has
+        them; clicked again (lit), back to how they were before it."""
+        p = livefx.PRESETS[name]
+        t = livefx.tuning(p)
+        if on:
+            self._before_preset = (name, self.knob_values(),
+                                   (self.speed.value(), self.pitch.value(),
+                                    self.keep.isChecked()))
+            knobs = p
+            if t is not None:
+                self._set_tuning(*t)
+        else:
+            was = self._before_preset
+            knobs, (speed, pitch, keep) = ((was[1], was[2]) if was and was[0] == name
+                                           else ({}, (1.0, 0.0, self.keep.isChecked())))
+            if t is not None:
+                self._set_tuning(speed, pitch, bool(keep))
+        for key, k in self.knobs.items():
+            k.set_value(knobs.get(key, 0.0))
+        self._knobs_edited()
 
     def _live_off(self):
         self._live = []
@@ -406,7 +548,7 @@ class EffectsPanel(QObject):
         start, end = self.trim.values()
         f = {"start": start, "end": end,
              "speed": round(self.speed.value(), 3), "pitch": round(self.pitch.value(), 2),
-             "tape": self.tape.isChecked(), "gain_db": round(self.boost.value(), 2),
+             "tape": not self.keep.isChecked(), "gain_db": round(self.boost.value(), 2),
              "reverse": self.reverse.isChecked(),
              "eq": gains if on else [0.0] * len(gains),
              "effects": {t: r.state() for t, r in self.rows.items() if r.chk.isChecked()},
@@ -421,15 +563,32 @@ class EffectsPanel(QObject):
 
     def _edited(self):
         self._boost_hint()
+        self._pitch_note()
+        self._light_presets()
         self._matching_preset()
         self.changed.emit()
+
+    def _pitch_note(self):
+        """How far the speed moves the pitch while keep pitch is off, and the total with
+        the slider's shift (Live controls' note)."""
+        st = 0.0 if self.keep.isChecked() else round(12 * math.log2(self.speed.value()), 1)
+        shift = self.pitch.value()
+        if abs(st) < 0.05:
+            self.pitch_note.hide()
+            return
+        if abs(shift) < 1e-3:
+            text = _("{st} st from the speed", st=f"{st:+g}")
+        else:
+            text = _("{st} st from the speed, {total} st in all", st=f"{st:+g}",
+                     total=f"{round(st + shift, 1):+g}")
+        self.pitch_note.setText(text)
+        self.pitch_note.show()
 
     def _untrimmed(self) -> dict:
         f = soundfx.clean(self.fx())
         f["start"] = f["end"] = 0.0
         f["voice"] = {}   # the voice is a layer of its own: presets don't set it
-        f["live"] = []    # (and Live controls' effects)
-        return f
+        return f          # (Live controls' knobs are effects: Advanced's Effects column)
 
     def _matching_preset(self):
         cur = soundfx.key(self._untrimmed())   # a preset never changes the trim
@@ -536,8 +695,7 @@ class EffectsPanel(QObject):
                                           if name.startswith(MINE) else None)
         if p:
             start, end = self.trim.values()
-            self.load({**p, "start": start, "end": end,
-                       "voice": self._voice, "live": self._live})
+            self.load({**p, "start": start, "end": end, "voice": self._voice})
             self.changed.emit()
         self.delete_preset.setVisible(name.startswith(MINE))
 
@@ -818,6 +976,11 @@ class EditDialog(EditDialogParts, QDialog):
         self.fx_note = QLabel()
         self.fx_note.setObjectName("muted")
         self.fx_note.setWordWrap(True)
+        # its line kept while it's empty: an effect switched on showed it, the pages
+        # above lost its height and their scroll bars flashed on and off
+        keep_line = self.fx_note.sizePolicy()
+        keep_line.setRetainSizeWhenHidden(True)
+        self.fx_note.setSizePolicy(keep_line)
         lay.addWidget(self.fx_note)
         # while the playing sound is made again with the changed effects (show_live)
         self.live_bar = QProgressBar()

@@ -228,7 +228,6 @@
   "Number row 1–9  (Q / E flip pages, R category)": "Cijferrij 1–9  (Q / E bladeren, R categorie)",
   "Numpad  (− / + flip pages, * category)": "Numpad  (− / + bladeren, * categorie)",
   "Off: slower is also deeper and faster is higher, like a tape": "Uit: langzamer is ook lager en sneller is hoger, zoals een cassette",
-  "Off: speed and pitch are independent. On: like a record player, faster is also higher; Pitch adds on top.": "Uit: snelheid en toonhoogte staan los van elkaar. Aan: zoals een platenspeler, sneller is ook hoger; Toonhoogte komt er bovenop.",
   "On": "Aan",
   "One click needed: repair your mic": "Eén klik nodig: repareer je mic",
   "One of them": "Een ervan",
@@ -372,7 +371,6 @@
   "Stop this sound": "Dit geluid stoppen",
   "Switched to “{shown}” ({exe} is in front)": "Overgeschakeld naar “{shown}” ({exe} staat vooraan)",
   "Tap to open, tap again to close": "Tik om te openen, tik nog eens om te sluiten",
-  "Tape mode: speed changes the pitch too (nightcore / slowed)": "Cassettemodus: snelheid verandert ook de toonhoogte (nightcore / slowed)",
   "Test": "Test",
   "The Voice tab is switched off (Settings > Tabs).": "Het tabblad Stem staat uit (Instellingen > Tabbladen).",
   "The device changed mid-way, so the recording stopped there.": "Het apparaat veranderde halverwege, dus de opname stopte daar.",
@@ -4744,9 +4742,7 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Wil je het achtergrondgeluid toch kwijt? Zet dan <b>Schone mic</b> aan op het tabblad <b>Stem</b> van Onion Board: die maakt je stem schoon en komt nooit aan je geluiden.",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "Een groter venster: de golfvorm groot, met de effecten en de equalizer naast elkaar",
   "Add effect": "Effect toevoegen",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Sleep de grepen om het begin en einde eraf te knippen. Ctrl+scrollen zoomt, Shift+scrollen schuift.",
   "No effect has that name.": "Geen effect heet zo.",
-  "No effects on yet.": "Nog geen effecten aan.",
   "Pick an effect to turn on": "Kies een effect om aan te zetten",
   "Redo ({keys})": "Opnieuw uitvoeren ({keys})",
   "Search effects": "Effecten zoeken",
@@ -4767,5 +4763,6 @@
   "Save as a new preset": "Opslaan als nieuwe voorinstelling",
   "Save what you have now into “{name}”": "Sla je huidige instellingen op in “{name}”",
   "Update “{name}”": "“{name}” bijwerken",
-  "Update, reset or save as a new preset": "Bijwerken, resetten of opslaan als nieuwe voorinstelling"
+  "Update, reset or save as a new preset": "Bijwerken, resetten of opslaan als nieuwe voorinstelling",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Sleep de grepen om het begin en einde eraf te knippen. Ctrl+scrollen zoomt. Sleep met de rechtermuisknop, of gebruik Shift+scrollen, om te schuiven."
 }

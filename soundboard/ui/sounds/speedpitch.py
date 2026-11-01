@@ -284,6 +284,52 @@ def name_of(s: ParamSlider) -> QWidget:
     return w
 
 
+def popup_slider(q: voicefx.Param, value: float, name_w: int = NAME_W) -> ParamSlider:
+    """A ParamSlider laid out for the popup: no effect-row indent, a fixed name column
+    so the sliders (and the quick buttons) line up, a value you can type (ValueBox).
+    Edit sound's Advanced view uses the same ones (ui/sounds/dialogs.py)."""
+    s = ParamSlider(q, value, centred=True)
+    h = s.layout()
+    assert h is not None   # name, slider, value
+    h.setContentsMargins(0, 0, 0, 0)
+    h.setSpacing(GAP)
+    name_label = widget_at(h, 0)
+    assert name_label is not None
+    name_label.setFixedWidth(name_w)
+    box = ValueBox(s)
+    box.setFixedWidth(VAL_W)
+    h.replaceWidget(s.val, box)
+    s.val.deleteLater()
+    s.val = box  # pyright: ignore[reportAttributeAccessIssue] - it stands in for the label (setText)
+    s._label()
+    return s
+
+
+def quick_row(items, indent: int, pick, narrow: bool = False) -> QHBoxLayout:
+    """Small buttons under a slider's track, so they read as part of it: `items` are
+    (text, value) pairs, `pick(value)` runs on a click. `narrow`: each as wide as its
+    words (a wide column), not spread across the track."""
+    q = QHBoxLayout()
+    q.setContentsMargins(indent, 0, 0, 0)
+    q.setSpacing(4)
+    for text, val in items:
+        b = QPushButton(text)
+        b.setObjectName("small")
+        b.setCursor(Qt.CursorShape.PointingHandCursor)
+        b.clicked.connect(lambda __=False, val=val: pick(val))
+        q.addWidget(b)
+    if narrow:
+        q.addStretch(1)
+    return q
+
+
+def preset_name(name: str) -> str:
+    """A built-in live effects preset's name (livefx.PRESETS), as shown."""
+    return {"Nightcore": _("Nightcore"), "Slowed + reverb": _("Slowed + reverb"),
+            "Bass boosted": _("Bass boosted"), "Chipmunk": _("Chipmunk"),
+            "Deep voice": _("Deep voice"), "Underwater": _("Underwater")}.get(name, name)
+
+
 def short(name: str, most: int = 14) -> str:
     """A setup's name on the transport bar's button: long ones cut with "…"."""
     return name if len(name) <= most else name[:most - 1].rstrip() + "…"
@@ -522,9 +568,9 @@ class SpeedPitchButton(QPushButton):
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(8)
         v.addWidget(section_label(_("Speed & pitch") if self.has_speed else _("Pitch")))
-        self.speed = self._slider(SPEED, 1.0)
-        self.pitch = self._slider(PITCH, 0.0)
-        self.volume = self._slider(VOLUME, VOLUME.default)
+        self.speed = popup_slider(SPEED, 1.0)
+        self.pitch = popup_slider(PITCH, 0.0)
+        self.volume = popup_slider(VOLUME, VOLUME.default)
         # the names' column fits the longest (Lautstärke), the quick rows under it too
         self._name_w = max(NAME_W, *(name_of(s).sizeHint().width()
                                      for s in (self.speed, self.pitch, self.volume)))
@@ -634,7 +680,7 @@ class SpeedPitchButton(QPushButton):
         v.addWidget(section_label(_("Effects")))
         self.fx = {}
         for q in livefx.PARAMS:
-            s = self._slider(q, q.default, FX_NAME_W)
+            s = popup_slider(q, q.default, FX_NAME_W)
             s.changed.connect(self._fx_edited)
             self.fx[q.key] = s
             v.addWidget(s)
@@ -643,11 +689,8 @@ class SpeedPitchButton(QPushButton):
         grid.setHorizontalSpacing(4)
         grid.setVerticalSpacing(4)
         self.fx_presets = {}
-        shown = {"Nightcore": _("Nightcore"), "Slowed + reverb": _("Slowed + reverb"),
-                 "Bass boosted": _("Bass boosted"), "Chipmunk": _("Chipmunk"),
-                 "Deep voice": _("Deep voice"), "Underwater": _("Underwater")}
         for i, name in enumerate(livefx.PRESETS):
-            b = QPushButton(shown.get(name, name))
+            b = QPushButton(preset_name(name))
             b.setObjectName("small")
             b.setCheckable(True)
             b.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -662,26 +705,6 @@ class SpeedPitchButton(QPushButton):
         v.addWidget(self.fx_note)
 
     @staticmethod
-    def _slider(q: voicefx.Param, value: float, name_w: int = NAME_W) -> ParamSlider:
-        """A ParamSlider laid out for the popup: no effect-row indent, a fixed name
-        column so both sliders (and the quick buttons) line up, a readable value."""
-        s = ParamSlider(q, value, centred=True)
-        h = s.layout()
-        assert h is not None   # name, slider, value
-        h.setContentsMargins(0, 0, 0, 0)
-        h.setSpacing(GAP)
-        name_label = widget_at(h, 0)
-        assert name_label is not None
-        name_label.setFixedWidth(name_w)
-        box = ValueBox(s)
-        box.setFixedWidth(VAL_W)
-        h.replaceWidget(s.val, box)
-        s.val.deleteLater()
-        s.val = box  # pyright: ignore[reportAttributeAccessIssue] - it stands in for the label (setText)
-        s._label()
-        return s
-
-    @staticmethod
     def _rule() -> QFrame:
         line = QFrame()
         line.setObjectName("vsep")       # the bar divider's colour, laid flat
@@ -690,43 +713,18 @@ class SpeedPitchButton(QPushButton):
 
     def _quick_row(self, speeds) -> QHBoxLayout:
         """Preset speeds, under the slider track so they read as part of it."""
-        q = QHBoxLayout()
-        q.setContentsMargins(self._quick_x, 0, 0, 0)
-        q.setSpacing(4)
-        for s in speeds:
-            b = QPushButton(f"{s:g}x")
-            b.setObjectName("small")
-            b.setCursor(Qt.CursorShape.PointingHandCursor)
-            b.clicked.connect(lambda __=False, s=s: self.speed.set_value(s) or self._edited())
-            q.addWidget(b)
-        return q
+        return quick_row([(f"{s:g}x", s) for s in speeds], self._quick_x,
+                         lambda s: self.speed.set_value(s) or self._edited())
 
     def _volume_row(self, levels) -> QHBoxLayout:
         """Preset volumes, under the volume slider like the speeds are."""
-        q = QHBoxLayout()
-        q.setContentsMargins(self._quick_x, 0, 0, 0)
-        q.setSpacing(4)
-        for lv in levels:
-            b = QPushButton(f"{lv:g}%")
-            b.setObjectName("small")
-            b.setCursor(Qt.CursorShape.PointingHandCursor)
-            b.clicked.connect(lambda __=False, lv=lv: self.volume.set_value(lv)
-                              or self._fx_edited())
-            q.addWidget(b)
-        return q
+        return quick_row([(f"{lv:g}%", lv) for lv in levels], self._quick_x,
+                         lambda lv: self.volume.set_value(lv) or self._fx_edited())
 
     def _pitch_row(self, steps) -> QHBoxLayout:
         """A stream's Redline pitches, under its meter like the speeds are."""
-        q = QHBoxLayout()
-        q.setContentsMargins(self._quick_x, 0, 0, 0)
-        q.setSpacing(4)
-        for st in steps:
-            b = QPushButton(f"{st:+g}")
-            b.setObjectName("small")
-            b.setCursor(Qt.CursorShape.PointingHandCursor)
-            b.clicked.connect(lambda __=False, st=st: self.pitch.set_value(st) or self._edited())
-            q.addWidget(b)
-        return q
+        return quick_row([(f"{st:+g}", st) for st in steps], self._quick_x,
+                         lambda st: self.pitch.set_value(st) or self._edited())
 
     def set_redline(self, on: bool):
         """Unlock (or lock again) the silly range. Locking pulls the values back in."""

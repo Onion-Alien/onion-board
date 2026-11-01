@@ -639,7 +639,6 @@
   "Off": "Av",
   "Off.": "Av.",
   "Off: slower is also deeper and faster is higher, like a tape": "Av: tregere er også dypere og raskere er lysere, som et kassettbånd",
-  "Off: speed and pitch are independent. On: like a record player, faster is also higher; Pitch adds on top.": "Av: hastighet og tonehøyde er uavhengige. På: som en platespiller, raskere er også lysere; Tonehøyde legges oppå.",
   "Offline mode": "Frakoblet modus",
   "On": "På",
   "On press": "Ved trykk",
@@ -1032,7 +1031,6 @@
   "Take it out of the queue": "Ta den ut av køen",
   "Takes the add-on out of Onion Board: phones can't play your pads any more. Paired phones are kept for when you get it again.": "Tar tillegget ut av Onion Board: telefoner kan ikke lenger spille padene dine. Sammenkoblede telefoner beholdes til du henter det igjen.",
   "Tap to open, tap again to close": "Trykk for å åpne, trykk igjen for å lukke",
-  "Tape mode: speed changes the pitch too (nightcore / slowed)": "Kassettmodus: hastigheten endrer tonehøyden også (nightcore / slowed)",
   "Teal": "Blågrønn",
   "Test": "Test",
   "Testing…": "Tester…",
@@ -4744,9 +4742,7 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Vil du likevel bli kvitt bakgrunnsstøyen? Slå heller på <b>Ren mikrofon</b> på fanen <b>Stemme</b> i Onion Board: den renser stemmen din og rører aldri lydene dine.",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "Et større vindu: lydbølgen stor, med effektene og equalizeren side om side",
   "Add effect": "Legg til effekt",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Dra håndtakene for å kutte av starten og slutten. Ctrl+rulling zoomer, Shift+rulling flytter.",
   "No effect has that name.": "Ingen effekt heter det.",
-  "No effects on yet.": "Ingen effekter er på ennå.",
   "Pick an effect to turn on": "Velg en effekt å slå på",
   "Redo ({keys})": "Gjør om ({keys})",
   "Search effects": "Søk i effekter",
@@ -4767,5 +4763,6 @@
   "Save as a new preset": "Lagre som nytt forhåndsvalg",
   "Save what you have now into “{name}”": "Lagre det du har nå i «{name}»",
   "Update “{name}”": "Oppdater «{name}»",
-  "Update, reset or save as a new preset": "Oppdater, tilbakestill eller lagre som nytt forhåndsvalg"
+  "Update, reset or save as a new preset": "Oppdater, tilbakestill eller lagre som nytt forhåndsvalg",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Dra håndtakene for å kutte av starten og slutten. Ctrl+rulling zoomer. Dra med høyre museknapp, eller bruk Shift+rulling, for å flytte."
 }

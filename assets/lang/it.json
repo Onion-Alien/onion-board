@@ -228,7 +228,6 @@
   "Number row 1–9  (Q / E flip pages, R category)": "Fila numeri 1–9  (Q / E cambiano pagina, R categoria)",
   "Numpad  (− / + flip pages, * category)": "Tastierino  (− / + cambiano pagina, * categoria)",
   "Off: slower is also deeper and faster is higher, like a tape": "Spento: più lento è anche più grave e più veloce è più acuto, come un nastro",
-  "Off: speed and pitch are independent. On: like a record player, faster is also higher; Pitch adds on top.": "Spento: velocità e tono sono indipendenti. Acceso: come un giradischi, più veloce è anche più acuto; Tono si aggiunge sopra.",
   "On": "Attivo",
   "One click needed: repair your mic": "Serve un clic: ripara il microfono",
   "One of them": "Uno di questi",
@@ -372,7 +371,6 @@
   "Stop this sound": "Ferma questo suono",
   "Switched to “{shown}” ({exe} is in front)": "Passato a “{shown}” ({exe} è in primo piano)",
   "Tap to open, tap again to close": "Tocca per aprire, tocca di nuovo per chiudere",
-  "Tape mode: speed changes the pitch too (nightcore / slowed)": "Modalità nastro: la velocità cambia anche il tono (nightcore / slowed)",
   "Test": "Test",
   "The Voice tab is switched off (Settings > Tabs).": "La scheda Voce è spenta (Impostazioni > Schede).",
   "The device changed mid-way, so the recording stopped there.": "Il dispositivo è cambiato a metà, quindi la registrazione si è fermata lì.",
@@ -4744,9 +4742,7 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Vuoi comunque eliminare il rumore di fondo? Attiva invece <b>Microfono pulito</b> nella scheda <b>Voce</b> di Onion Board: pulisce la tua voce e non tocca mai i tuoi suoni.",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "Una finestra più grande: la forma d'onda in grande, effetti ed equalizzatore affiancati",
   "Add effect": "Aggiungi effetto",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Trascina le maniglie per tagliare inizio e fine. Ctrl+rotellina ingrandisce, Maiusc+rotellina scorre.",
   "No effect has that name.": "Nessun effetto ha questo nome.",
-  "No effects on yet.": "Ancora nessun effetto attivo.",
   "Pick an effect to turn on": "Scegli un effetto da attivare",
   "Redo ({keys})": "Ripeti ({keys})",
   "Search effects": "Cerca effetti",
@@ -4767,5 +4763,6 @@
   "Save as a new preset": "Salva come nuovo preset",
   "Save what you have now into “{name}”": "Salva le impostazioni attuali in “{name}”",
   "Update “{name}”": "Aggiorna “{name}”",
-  "Update, reset or save as a new preset": "Aggiorna, azzera o salva come nuovo preset"
+  "Update, reset or save as a new preset": "Aggiorna, azzera o salva come nuovo preset",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Trascina le maniglie per tagliare inizio e fine. Ctrl+rotellina ingrandisce. Trascina con il tasto destro del mouse, o usa Maiusc+rotellina, per scorrere."
 }

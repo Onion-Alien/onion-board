@@ -639,7 +639,6 @@
   "Off": "Ki",
   "Off.": "Ki.",
   "Off: slower is also deeper and faster is higher, like a tape": "Ki: a lassabb mélyebb is, a gyorsabb magasabb, mint egy kazettán",
-  "Off: speed and pitch are independent. On: like a record player, faster is also higher; Pitch adds on top.": "Ki: a sebesség és a hangmagasság független. Be: mint egy lemezjátszón, a gyorsabb magasabb is; a Hangmagasság erre jön rá.",
   "Offline mode": "Offline mód",
   "On": "Be",
   "On press": "Nyomásra",
@@ -1032,7 +1031,6 @@
   "Take it out of the queue": "Kivétel a sorból",
   "Takes the add-on out of Onion Board: phones can't play your pads any more. Paired phones are kept for when you get it again.": "Kiveszi a bővítményt az Onion Boardból: a telefonok többé nem tudják lejátszani a gombjaidat. A párosított telefonok megmaradnak arra az esetre, ha újra beszerzed.",
   "Tap to open, tap again to close": "Koppints a megnyitáshoz, újra a bezáráshoz",
-  "Tape mode: speed changes the pitch too (nightcore / slowed)": "Kazetta mód: a sebesség a hangmagasságot is változtatja (nightcore / slowed)",
   "Teal": "Kékeszöld",
   "Test": "Teszt",
   "Testing…": "Tesztelés…",
@@ -4744,9 +4742,7 @@
   "Want the background noise gone anyway? Turn on <b>Clean mic</b> on Onion Board's <b>Voice</b> tab instead: it cleans your voice and never touches your sounds.": "Azért eltüntetnéd a háttérzajt? Kapcsold be inkább a <b>Tiszta mikrofont</b> az Onion Board <b>Beszéd</b> lapján: tisztítja a beszédhangodat, és a hangjaidhoz soha nem nyúl.",
   "A bigger window: the waveform big, with the effects and the equalizer side by side": "Nagyobb ablak: nagy hullámforma, az effektek és a hangszínszabályzó egymás mellett",
   "Add effect": "Effekt hozzáadása",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms, Shift+scroll moves along.": "Húzd a fogantyúkat az eleje és a vége levágásához. Ctrl+görgetés nagyít, Shift+görgetés mozgat.",
   "No effect has that name.": "Nincs ilyen nevű effekt.",
-  "No effects on yet.": "Még nincs bekapcsolt effekt.",
   "Pick an effect to turn on": "Válassz egy effektet a bekapcsoláshoz",
   "Redo ({keys})": "Mégis ({keys})",
   "Search effects": "Effektek keresése",
@@ -4767,5 +4763,6 @@
   "Save as a new preset": "Mentés új előbeállításként",
   "Save what you have now into “{name}”": "A mostani beállítások mentése ide: „{name}”",
   "Update “{name}”": "„{name}” frissítése",
-  "Update, reset or save as a new preset": "Frissítés, visszaállítás vagy mentés új előbeállításként"
+  "Update, reset or save as a new preset": "Frissítés, visszaállítás vagy mentés új előbeállításként",
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Húzd a fogantyúkat az eleje és a vége levágásához. Ctrl+görgetés nagyít. Mozgatáshoz húzd a jobb egérgombbal, vagy használd a Shift+görgetést."
 }
