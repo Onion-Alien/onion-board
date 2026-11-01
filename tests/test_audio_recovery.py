@@ -450,6 +450,29 @@ def test_mic_list_by_endpoint(monkeypatch, tmp_path):
     assert dm.status_on(GUID_B) == 'ready' and dm.status_on(GUID_A) == 'other'
 
 
+def test_mic_list_leaves_out_virtual_cables(monkeypatch, tmp_path):
+    cable, vm = '{cable}', '{voicemeeter}'
+    monkeypatch.setattr(dm, 'capture_endpoints', lambda: [
+        {'guid': GUID_A, 'name': 'Microphone (Logitech G733 Gaming Headset)', 'active': True},
+        {'guid': cable, 'name': 'CABLE Output (VB-Audio Virtual Cable)', 'active': True},
+        {'guid': vm, 'name': 'VoiceMeeter Output (VB-Audio VoiceMeeter VAIO)',
+         'active': True}])
+    on = []
+    monkeypatch.setattr(dm, 'installed_on', lambda: list(on))
+    monkeypatch.setattr(dm, 'effect_in_place', lambda guid: True)
+    monkeypatch.setattr(dm, 'make_ring', lambda: True)
+    monkeypatch.setattr(dm, 'same_dll', lambda *a: True)
+    dll = tmp_path / 'obmic-1.dll'
+    dll.write_bytes(b'dll')
+    monkeypatch.setattr(dm, 'registered_dll', lambda: dll)
+    monkeypatch.setattr(dm, 'installed_slot', lambda guid: None)
+    # a cable's end records our own sounds: never offered the effect
+    assert [m['guid'] for m in dm.mics()] == [GUID_A]
+    # one that already has it (an older version put it there) stays, to take it off
+    on.append(cable)
+    assert [(m['guid'], m['state']) for m in dm.mics()] == [(cable, 'ready'), (GUID_A, 'other')]
+
+
 def test_uninstall_one_mic_keeps_the_rest(monkeypatch):
     on = [GUID_A, GUID_B]
     gone, steps = [], []

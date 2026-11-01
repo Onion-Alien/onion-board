@@ -385,12 +385,15 @@ def status_on(guid: str) -> str:
 
 def mics(names: Sequence[str] = ()) -> list[dict]:
     """The mics the recovery card offers, each by its endpoint GUID (two mics can share
-    a name): every plugged-in one, plus an unplugged one the effect is still on.
+    a name): every plugged-in one, plus an unplugged one the effect is still on. Never a
+    virtual cable's end (CABLE Output): it records our own sounds, so the effect has no
+    place on it, unless it's already on one (then it's listed, to take it off).
     {"guid", "name", "active", "state" (as status()), "pa": the name in `names` (the
     app's device list) that is this mic, or None}. Reads the registry: not on the UI
     thread."""
-    found = capture_endpoints()
+    from soundboard.audio.devicelist import is_virtual
     on = installed_on()
+    found = [e for e in capture_endpoints() if e["guid"] in on or not is_virtual(e["name"])]
     active = [e for e in found if e["active"]]
     pa = {}
     for n in names:
