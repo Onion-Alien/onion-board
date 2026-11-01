@@ -5119,5 +5119,6 @@
   "my sparkler's still going": "شرارتي ما زالت تلمع",
   "ooh! aah!": "أوه! آه!",
   "ooh, pretty!": "أوه، جميل!",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "اسحب المقبضين لقصّ البداية والنهاية. Ctrl+التمرير للتكبير. اسحب بزر الفأرة الأيمن، أو Shift+التمرير، للتنقّل."
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "اسحب المقبضين لقصّ البداية والنهاية. Ctrl+التمرير للتكبير. اسحب بزر الفأرة الأيمن، أو Shift+التمرير، للتنقّل.",
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "يفتح هذا التبويب عندما تكون Onion Board في المقدمة.\nEsc = إلغاء."
 }

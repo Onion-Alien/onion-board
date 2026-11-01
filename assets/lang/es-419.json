@@ -4771,5 +4771,6 @@
   "my sparkler's still going": "Mi bengala sigue prendida",
   "ooh! aah!": "¡Ooh! ¡Aah!",
   "ooh, pretty!": "¡Uy, qué bonito!",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Arrastra los controles para cortar el principio y el final. Ctrl+rueda acerca. Arrastra con el botón derecho del mouse, o usa Shift+rueda, para desplazarte."
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Arrastra los controles para cortar el principio y el final. Ctrl+rueda acerca. Arrastra con el botón derecho del mouse, o usa Shift+rueda, para desplazarte.",
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Abre esta pestaña mientras Onion Board está al frente.\nEsc = cancelar."
 }

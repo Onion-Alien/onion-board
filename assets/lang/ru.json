@@ -4858,5 +4858,6 @@
   "my sparkler's still going": "Мой бенгальский ещё горит",
   "ooh! aah!": "Ооо! Ааа!",
   "ooh, pretty!": "Ох, красота!",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Перетащи ручки, чтобы отрезать начало и конец. Ctrl+колесо приближает. Чтобы сдвинуть, тяни правой кнопкой мыши или крути Shift+колесо."
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Перетащи ручки, чтобы отрезать начало и конец. Ctrl+колесо приближает. Чтобы сдвинуть, тяни правой кнопкой мыши или крути Shift+колесо.",
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Открывает эту вкладку, когда Onion Board на переднем плане.\nEsc = отмена."
 }

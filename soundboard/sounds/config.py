@@ -219,6 +219,10 @@ def clean_setting(k: str, v):
         return {c: key for c, key in v.items()
                 if isinstance(c, str) and isinstance(key, str)
                 and clean_hotkey(key, f"category {c!r}")}
+    if k == "tab_keys":   # {tab: its key}; "" = none, so it has no Ctrl+number either
+        return {t: key for t, key in v.items()
+                if isinstance(t, str) and isinstance(key, str)
+                and (not key or clean_hotkey(key, f"tab {t!r}"))}
     if k in SETTING_RANGES:
         lo, hi = SETTING_RANGES[k]
         return min(max(v, lo), hi)
@@ -490,6 +494,9 @@ class Config:
     voice_clips_expanded: bool = True   # ...folded down to their header or not
     sidebar_open: bool = True   # the tab rail opened out to show the tabs' names
     sidebar_order: list[str] = field(default_factory=list)   # stable tab keys, visual order
+    # a tab's own key to jump to it (tab key -> combo, "" = none); a tab not in it has
+    # Ctrl+1... by its place on the rail
+    tab_keys: dict = field(default_factory=dict)
     # 0 = sounds, 1 = radio, 2 = apps, 3 = triggers, 4 = voice, 5 = setup, 6 = store, 7 = chat
     tab: int = 0
     # Settings > Tabs: the tabs switched off ("radio", "apps", "triggers", "voice"), gone

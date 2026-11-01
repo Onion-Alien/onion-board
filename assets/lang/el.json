@@ -4771,5 +4771,6 @@
   "my sparkler's still going": "Το βεγγαλικό μου καίει ακόμα",
   "ooh! aah!": "Ωωω! Αααα!",
   "ooh, pretty!": "Ωχ, τι ωραίο!",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Σύρε τις λαβές για να κόψεις την αρχή και το τέλος. Ctrl+κύλιση για ζουμ. Σύρε με το δεξί κουμπί του ποντικιού, ή Shift+κύλιση, για μετακίνηση."
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Σύρε τις λαβές για να κόψεις την αρχή και το τέλος. Ctrl+κύλιση για ζουμ. Σύρε με το δεξί κουμπί του ποντικιού, ή Shift+κύλιση, για μετακίνηση.",
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Ανοίγει αυτή την καρτέλα όταν το Onion Board είναι μπροστά.\nEsc = ακύρωση."
 }

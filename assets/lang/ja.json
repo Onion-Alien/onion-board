@@ -4684,5 +4684,6 @@
   "my sparkler's still going": "線香花火、まだ燃えてる",
   "ooh! aah!": "おお！わあ！",
   "ooh, pretty!": "わあ、きれい！",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "ハンドルをドラッグして最初と最後をカットします。Ctrl+スクロールで拡大。右ボタンでドラッグするか、Shift+スクロールで移動。"
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "ハンドルをドラッグして最初と最後をカットします。Ctrl+スクロールで拡大。右ボタンでドラッグするか、Shift+スクロールで移動。",
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board が前面にあるとき、このタブを開きます。\nEsc = キャンセル。"
 }

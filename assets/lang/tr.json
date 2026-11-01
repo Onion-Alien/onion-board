@@ -4771,5 +4771,6 @@
   "my sparkler's still going": "Maytabım hâlâ yanıyor",
   "ooh! aah!": "Ooo! Aaa!",
   "ooh, pretty!": "Ooo, çok güzel!",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Başını ve sonunu kesmek için tutamaçları sürükleyin. Ctrl+kaydırma yakınlaştırır. Kaydırmak için sağ fare tuşuyla sürükleyin ya da Shift+kaydırma kullanın."
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Başını ve sonunu kesmek için tutamaçları sürükleyin. Ctrl+kaydırma yakınlaştırır. Kaydırmak için sağ fare tuşuyla sürükleyin ya da Shift+kaydırma kullanın.",
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board öndeyken bu sekmeyi açar.\nEsc = iptal."
 }

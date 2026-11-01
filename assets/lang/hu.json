@@ -4771,5 +4771,6 @@
   "my sparkler's still going": "A csillagszórom még ég",
   "ooh! aah!": "Ó! Á!",
   "ooh, pretty!": "Ó, de szép!",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Húzd a fogantyúkat az eleje és a vége levágásához. Ctrl+görgetés nagyít. Mozgatáshoz húzd a jobb egérgombbal, vagy használd a Shift+görgetést."
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Húzd a fogantyúkat az eleje és a vége levágásához. Ctrl+görgetés nagyít. Mozgatáshoz húzd a jobb egérgombbal, vagy használd a Shift+görgetést.",
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Megnyitja ezt a fület, amíg az Onion Board van elöl.\nEsc = mégse."
 }

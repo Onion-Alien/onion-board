@@ -4771,5 +4771,6 @@
   "my sparkler's still going": "Tähtisädetikkuni palaa yhä",
   "ooh! aah!": "Ooh! Aah!",
   "ooh, pretty!": "Oi, miten kaunista!",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Vedä kahvoista leikataksesi alun ja lopun. Ctrl+rulla zoomaa. Siirrä vetämällä hiiren oikealla painikkeella tai Shift+rullalla."
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Vedä kahvoista leikataksesi alun ja lopun. Ctrl+rulla zoomaa. Siirrä vetämällä hiiren oikealla painikkeella tai Shift+rullalla.",
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Avaa tämän välilehden, kun Onion Board on edessä.\nEsc = peruuta."
 }

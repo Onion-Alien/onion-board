@@ -4684,5 +4684,6 @@
   "my sparkler's still going": "내 불꽃 막대 아직 타는 중",
   "ooh! aah!": "오오! 아아!",
   "ooh, pretty!": "우와, 예쁘다!",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "핸들을 끌어서 앞뒤를 잘라내세요. Ctrl+스크롤은 확대입니다. 마우스 오른쪽 버튼으로 끌거나 Shift+스크롤로 이동하세요."
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "핸들을 끌어서 앞뒤를 잘라내세요. Ctrl+스크롤은 확대입니다. 마우스 오른쪽 버튼으로 끌거나 Shift+스크롤로 이동하세요.",
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board가 앞에 있을 때 이 탭을 엽니다.\nEsc = 취소."
 }

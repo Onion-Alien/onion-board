@@ -142,6 +142,9 @@ class SideRail(QFrame):
         self._on_open = on_open
         self._drop_y = None
         self._drag_width = None
+        # the key that jumps to tab index i, n-th shown on the rail, as its hover shows
+        # it ("" = none); the window swaps in the tabs' own keys (TabControl.tab_key)
+        self.key_for = lambda i, n: f"Ctrl+{n}" if n <= 9 else ""
         self.resize_handle = ResizeHandle(self)
         lay = self._lay = QVBoxLayout(self)
         lay.setSpacing(4)
@@ -465,7 +468,8 @@ class SideRail(QFrame):
             # open: the name is on the button, no tip. Shut, it's all there is: the name
             # and the key that jumps to it. (A live tab's "● ON" line is for a screen reader.)
             n = shown_idx.get(b)
-            b.setToolTip("" if shown or n is None or n > 9 else f"{name}  (Ctrl+{n})")
+            key = "" if n is None else self.key_for(i, n)
+            b.setToolTip("" if shown or not key else f"{name}  ({key})")
             b.setAccessibleDescription(tip)
             b.setChecked(i == cur and self.foot_selected is None)
             b.update()

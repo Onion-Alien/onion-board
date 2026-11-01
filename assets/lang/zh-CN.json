@@ -4684,5 +4684,6 @@
   "my sparkler's still going": "我的仙女棒还在烧",
   "ooh! aah!": "哦！啊！",
   "ooh, pretty!": "哇，好漂亮！",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "拖动手柄裁掉开头和结尾。Ctrl+滚轮缩放。按住鼠标右键拖动，或 Shift+滚轮，即可平移。"
+  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "拖动手柄裁掉开头和结尾。Ctrl+滚轮缩放。按住鼠标右键拖动，或 Shift+滚轮，即可平移。",
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board 在最前面时打开这个标签页。\nEsc = 取消。"
 }
