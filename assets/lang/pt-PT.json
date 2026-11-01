@@ -2491,7 +2491,6 @@
   "Free sound packs": "Pacotes de sons gratuitos",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "Pacotes de sons gratuitos (separador Sons → Cópia de segurança) lê a lista de pacotes do GitHub, e transfere um de lá quando carregas em Adicionar.",
   "It's in your sounds now": "Já está nos teus sons",
-  "Loudness": "Intensidade",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "Fizeste um pacote? Partilha-o: todos os sons têm de ser CC0 (livres para qualquer pessoa, sem precisar de créditos). Depois de verificado, aparece aqui para todos.",
   "Needs the internet: Offline mode is on (Privacy & security)": "Precisa de internet: o Modo offline está ligado (Privacidade e segurança)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "Nada vai à internet, e tudo o que precisa de internet fica oculto (o separador Rádio, a pesquisa web, as transferências, as atualizações…). Desmarca para escolheres o que pode ir à internet.",
@@ -4320,7 +4319,6 @@
   "Watches your game's window while it's open, even behind others": "Vigia a janela do teu jogo enquanto está aberta, mesmo atrás de outras",
   "Your file stays whole: only the part between the handles plays.": "O teu ficheiro fica inteiro: só toca a parte entre as pegas.",
   "Main": "Principal",
-  "Trim & speed": "Corte e velocidade",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} ativado",
     "{group}  ·  {n} ativados"
@@ -4336,7 +4334,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Muda cada som enquanto toca. Guardar como novo botão guarda-o como um botão próprio.",
   "Play a sound first, then save it with your changes": "Toca primeiro um som e depois guarda-o com as tuas alterações",
   "Save as new pad": "Guardar como novo botão",
-  "Take the Live controls effects off": "Tirar os efeitos dos controlos em direto",
   "{name} (modified {n})": "{name} (modificado {n})",
   "{name} (modified)": "{name} (modificado)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” adicionado, com velocidade e tom dentro do que um botão consegue guardar",
@@ -4748,7 +4745,6 @@
   "Search effects": "Procurar efeitos",
   "Show the whole sound": "Mostrar o som todo",
   "Speed & loudness": "Velocidade e intensidade",
-  "The usual tabs, one at a time": "Os separadores de sempre, um de cada vez",
   "Undo ({keys})": "Anular ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Através do winget do Windows ou, se não der, da transferência do próprio FFmpeg (cerca de 100 MB). Podes desligar isto em Definições → Privacidade & segurança.",
   "Don't ask for admin each time": "Não pedir permissão de administrador sempre",
@@ -4797,5 +4793,6 @@
   "light it up!": "Acende isso!",
   "my sparkler's still going": "O meu fogo de vista ainda brilha",
   "ooh! aah!": "Ooh! Aah!",
-  "ooh, pretty!": "Uau, que bonito!"
+  "ooh, pretty!": "Uau, que bonito!",
+  "The settings most people change, on one page": "As definições que a maioria das pessoas altera, numa só página"
 }

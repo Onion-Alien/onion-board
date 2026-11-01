@@ -92,6 +92,10 @@ CLIP_ACTIONS = ("play", "mic", "add", "copy", "delete")
 BUN_GAMES = ("pong", "dodge", "homerun", "whack", "other")
 # the rare loading screens (ui/bun/splashacts.py RARES' keys)
 SPLASH_RARES = ("gold", "ice", "galaxy", "rainbow")
+# Edit sound's settings, as counted when a save changed them (EditDialog._count_saved)
+EDIT_SETTINGS = ("name", "colour", "picture", "hotkey", "press", "loop", "hold", "only-them",
+                 "volume", "trim", "speed", "pitch", "keep-pitch", "knobs", "boost",
+                 "reverse", "eq", "effects", "voice", "fades", "wait", "cooldown")
 # Settings' pages (settings.SettingsDialog's page keys, without Show advanced)
 SETTINGS_PAGES = ("audio", "appearance", "hotkeys", "tabs", "general", "about",
                   "overlay", "privacy", "connection", "data", "updates", "help",
@@ -151,6 +155,12 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             # Edit: Effects tab, a picture from a file or a link
             "search-show-more", "search-trending", "pad-effects", "pad-picture-file",
             "pad-picture-link",
+            # Edit sound: opened, saved (from Simple or Advanced, or as a copy), a chip
+            # of its summary's ×, a preset picked; and on Save, which of its settings
+            # were changed (EditDialog._count_saved): what Simple should show
+            "edit-opened", "edit-saved", "edit-advanced-saved", "edit-copy",
+            "edit-summary-off", "edit-preset",
+            *(f"edit-{k}" for k in EDIT_SETTINGS),
             # the Triggers tab (the Onion Watch add-on) says which of its features were
             # used or are set up (triggershost.BoardHost.count): onionwatch/core/usage.py's
             # FEATURES, keep in step

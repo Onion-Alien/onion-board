@@ -2438,7 +2438,6 @@
   "Free sound packs": "แพ็กเสียงฟรี",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "แพ็กเสียงฟรี (แท็บ เสียง → สำรอง) อ่านรายการแพ็กจาก GitHub และดาวน์โหลดแพ็กจากที่นั่นเมื่อคุณกด เพิ่ม",
   "It's in your sounds now": "มันอยู่ในเสียงของคุณแล้ว",
-  "Loudness": "ความดัง",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "ทำแพ็กเองเหรอ? แชร์เลย: ทุกเสียงต้องเป็น CC0 (ใช้ได้ฟรีทุกคน ไม่ต้องให้เครดิต) เมื่อตรวจสอบแล้ว มันจะแสดงที่นี่ให้ทุกคน",
   "Needs the internet: Offline mode is on (Privacy & security)": "ต้องใช้อินเทอร์เน็ต: โหมดออฟไลน์เปิดอยู่ (ความเป็นส่วนตัวและความปลอดภัย)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "ไม่มีอะไรออนไลน์เลย และทุกอย่างที่ต้องใช้อินเทอร์เน็ตจะถูกซ่อน (แท็บ วิทยุ ค้นหาเว็บ ดาวน์โหลด อัปเดต…) เอาติ๊กออกเพื่อเลือกว่าอะไรออนไลน์ได้บ้าง",
@@ -4244,7 +4243,6 @@
   "Watches your game's window while it's open, even behind others": "เฝ้าดูหน้าต่างเกมของคุณขณะที่เปิดอยู่ แม้อยู่หลังหน้าต่างอื่น",
   "Your file stays whole: only the part between the handles plays.": "ไฟล์ของคุณยังอยู่ครบ: เล่นแค่ส่วนที่อยู่ระหว่างที่จับ",
   "Main": "หลัก",
-  "Trim & speed": "ตัดเสียงและความเร็ว",
   "{group}  ·  {n} on": [
     "{group}  ·  เปิด {n}"
   ],
@@ -4259,7 +4257,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "เปลี่ยนทุกเสียงขณะเล่น บันทึกเป็นแพดใหม่จะเก็บไว้เป็นแพดของตัวเอง",
   "Play a sound first, then save it with your changes": "เล่นเสียงก่อน แล้วค่อยบันทึกพร้อมสิ่งที่เปลี่ยน",
   "Save as new pad": "บันทึกเป็นแพดใหม่",
-  "Take the Live controls effects off": "เอาเอฟเฟกต์ของ ควบคุมสด ออก",
   "{name} (modified {n})": "{name} (แก้ไข {n})",
   "{name} (modified)": "{name} (แก้ไข)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ เพิ่ม “{name}” แล้ว ความเร็วและพิตช์อยู่ในขอบเขตที่แพดบันทึกได้",
@@ -4661,7 +4658,6 @@
   "Search effects": "ค้นหาเอฟเฟกต์",
   "Show the whole sound": "แสดงเสียงทั้งหมด",
   "Speed & loudness": "ความเร็วและความดัง",
-  "The usual tabs, one at a time": "แท็บแบบเดิม ทีละแท็บ",
   "Undo ({keys})": "เลิกทำ ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "ผ่าน winget ของ Windows หรือดาวน์โหลดของ FFmpeg เอง (ประมาณ 100 MB) ปิดได้ที่ การตั้งค่า → ความเป็นส่วนตัวและความปลอดภัย",
   "Don't ask for admin each time": "ไม่ต้องขอสิทธิ์ผู้ดูแลระบบทุกครั้ง",
@@ -4709,5 +4705,6 @@
   "light it up!": "จุดเลย!",
   "my sparkler's still going": "ไฟเย็นของฉันยังไม่ดับ",
   "ooh! aah!": "โอ้! อ้า!",
-  "ooh, pretty!": "ว้าว สวยจัง!"
+  "ooh, pretty!": "ว้าว สวยจัง!",
+  "The settings most people change, on one page": "การตั้งค่าที่คนส่วนใหญ่ปรับ รวมไว้ในหน้าเดียว"
 }

@@ -2438,7 +2438,6 @@
   "Free sound packs": "免费音效包",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "免费音效包（“音效”标签页 → 备份）会从 GitHub 读取音效包列表，并在你按“添加”时从那里下载。",
   "It's in your sounds now": "已经在你的音效里了",
-  "Loudness": "响度",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "做了一个音效包？分享出来吧：每个音效都必须是 CC0（任何人都能免费用，无需署名）。审核通过后，它就会出现在这里，所有人都能看到。",
   "Needs the internet: Offline mode is on (Privacy & security)": "需要联网：离线模式已开启（隐私与安全）",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "完全不联网，所有需要联网的功能都会隐藏（“电台”标签页、网络搜索、下载、更新…）。取消勾选后可以自己选哪些允许联网。",
@@ -4244,7 +4243,6 @@
   "Watches your game's window while it's open, even behind others": "在你的游戏窗口打开时盯着它，即使被其他窗口挡住",
   "Your file stays whole: only the part between the handles plays.": "你的文件保持完整：只播放两个手柄之间的部分。",
   "Main": "主要",
-  "Trim & speed": "裁剪和速度",
   "{group}  ·  {n} on": [
     "{group}  ·  已开 {n} 项"
   ],
@@ -4259,7 +4257,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "在播放时改变每个音效。“另存为新按钮”可以把它保存成单独的按钮。",
   "Play a sound first, then save it with your changes": "先播放一个音效，再连同你的改动一起保存",
   "Save as new pad": "另存为新按钮",
-  "Take the Live controls effects off": "去掉实时控制的效果",
   "{name} (modified {n})": "{name}（已修改 {n}）",
   "{name} (modified)": "{name}（已修改）",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ 已添加“{name}”，速度和音调已限制在按钮能保存的范围内",
@@ -4661,7 +4658,6 @@
   "Search effects": "搜索效果",
   "Show the whole sound": "显示整个声音",
   "Speed & loudness": "速度和响度",
-  "The usual tabs, one at a time": "常用的标签页，一次一个",
   "Undo ({keys})": "撤销（{keys}）",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "通过 Windows 的 winget，否则使用 FFmpeg 自己的下载（约 100 MB）。可在 设置 → 隐私与安全 中关闭。",
   "Don't ask for admin each time": "不要每次都请求管理员权限",
@@ -4709,5 +4705,6 @@
   "light it up!": "点燃它！",
   "my sparkler's still going": "我的仙女棒还在烧",
   "ooh! aah!": "哦！啊！",
-  "ooh, pretty!": "哇，好漂亮！"
+  "ooh, pretty!": "哇，好漂亮！",
+  "The settings most people change, on one page": "大多数人会改的设置，都在一页里"
 }

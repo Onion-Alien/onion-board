@@ -287,7 +287,11 @@ account or anything else about you.
     `apps-category-added`…), Settings' search used and one that found nothing
     (`used/settings-search`, `settings-search-nothing`: never what was typed), the mini
     player's mic switch (`used/mini-mic-mute`), a pad's Effects tab and a picture from a
-    file or a link (`used/pad-effects`, `pad-picture-file`, `pad-picture-link`), *On
+    file or a link (`used/pad-effects`, `pad-picture-file`, `pad-picture-link`), Edit
+    sound opened, saved (`edit-opened`, `edit-saved`, `edit-advanced-saved`, `edit-copy`),
+    its summary's × or a preset used (`edit-summary-off`, `edit-preset`) and which of its
+    settings a save changed, by name only (`edit-name`, `edit-hotkey`, `edit-trim`,
+    `edit-speed`, `edit-knobs`, `edit-eq`... the list in `usagenames.EDIT_SETTINGS`), *On
     Air* switched off or on and a line of its card clicked (`used/on-air-off`,
     `on-air-on`, `on-air-line`), a file import stopped or one that skipped files
     (`used/import-stopped`, `import-skipped`), *Pause*, *Stop all* and the taskbar

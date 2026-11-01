@@ -1,6 +1,8 @@
 """Your own presets: what Live controls or Edit sound → Effects has on now, saved under
 a name, so one click puts it all back. Live controls' show as chips after its built-in
-ones (livefx.PRESETS), a sound's in the Effects tab's Preset box (soundfx.PRESETS).
+ones (livefx.PRESETS) and in Edit sound's Preset box too (soundfx.from_live); a sound's
+only in the Preset box (soundfx.PRESETS). Edit sound saves a "live" one when Live
+controls can play it (soundfx.to_live), so it shows in both.
 
 They live in %APPDATA%\\OnionBoard\\my-presets.json, a file older versions never open:
 

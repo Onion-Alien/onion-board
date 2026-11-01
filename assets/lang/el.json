@@ -2491,7 +2491,6 @@
   "Free sound packs": "Δωρεάν πακέτα ήχων",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "Τα Δωρεάν πακέτα ήχων (καρτέλα Ήχοι → Αντίγραφο ασφαλείας) διαβάζουν τη λίστα πακέτων από το GitHub και κατεβάζουν ένα από εκεί όταν πατάς Προσθήκη.",
   "It's in your sounds now": "Είναι στους ήχους σου τώρα",
-  "Loudness": "Ένταση",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "Έφτιαξες πακέτο; Μοιράσου το: κάθε ήχος πρέπει να είναι CC0 (δωρεάν για όλους, χωρίς αναφορά δημιουργού). Μόλις ελεγχθεί, εμφανίζεται εδώ για όλους.",
   "Needs the internet: Offline mode is on (Privacy & security)": "Θέλει internet: η λειτουργία εκτός σύνδεσης είναι ανοιχτή (Απόρρητο & ασφάλεια)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "Τίποτα δεν βγαίνει online, και ό,τι θέλει internet κρύβεται (η καρτέλα Ραδιόφωνο, η αναζήτηση στο web, οι λήψεις, οι ενημερώσεις…). Ξετσέκαρέ το για να διαλέξεις τι μπορεί να βγαίνει online.",
@@ -4320,7 +4319,6 @@
   "Watches your game's window while it's open, even behind others": "Παρακολουθεί το παράθυρο του παιχνιδιού σου όσο είναι ανοιχτό, ακόμα και πίσω από άλλα",
   "Your file stays whole: only the part between the handles plays.": "Το αρχείο σου μένει ολόκληρο: παίζει μόνο το κομμάτι ανάμεσα στις λαβές.",
   "Main": "Βασικά",
-  "Trim & speed": "Κόψιμο & ταχύτητα",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} ενεργό",
     "{group}  ·  {n} ενεργά"
@@ -4336,7 +4334,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Αλλάζει κάθε ήχο όσο παίζει. Το «Αποθήκευση ως νέο κουμπί» τον κρατάει ως δικό του κουμπί.",
   "Play a sound first, then save it with your changes": "Παίξε πρώτα έναν ήχο και μετά αποθήκευσέ τον με τις αλλαγές σου",
   "Save as new pad": "Αποθήκευση ως νέο κουμπί",
-  "Take the Live controls effects off": "Βγάλε τα εφέ από τα ζωντανά χειριστήρια",
   "{name} (modified {n})": "{name} (τροποποιημένο {n})",
   "{name} (modified)": "{name} (τροποποιημένο)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Προστέθηκε το «{name}», με ταχύτητα και τόνο όσο μπορεί να αποθηκεύσει ένα κουμπί",
@@ -4748,7 +4745,6 @@
   "Search effects": "Αναζήτηση εφέ",
   "Show the whole sound": "Δείξε όλο τον ήχο",
   "Speed & loudness": "Ταχύτητα & ένταση",
-  "The usual tabs, one at a time": "Οι συνηθισμένες καρτέλες, μία τη φορά",
   "Undo ({keys})": "Αναίρεση ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Μέσω του winget των Windows, αλλιώς από τη λήψη του ίδιου του FFmpeg (περίπου 100 MB). Μπορείς να το απενεργοποιήσεις στις Ρυθμίσεις → Απόρρητο & ασφάλεια.",
   "Don't ask for admin each time": "Να μη ζητείται άδεια διαχειριστή κάθε φορά",
@@ -4797,5 +4793,6 @@
   "light it up!": "Άναψέ το!",
   "my sparkler's still going": "Το βεγγαλικό μου καίει ακόμα",
   "ooh! aah!": "Ωωω! Αααα!",
-  "ooh, pretty!": "Ωχ, τι ωραίο!"
+  "ooh, pretty!": "Ωχ, τι ωραίο!",
+  "The settings most people change, on one page": "Οι ρυθμίσεις που αλλάζουν οι περισσότεροι, σε μία σελίδα"
 }
