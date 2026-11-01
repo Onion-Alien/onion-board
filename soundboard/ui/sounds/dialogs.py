@@ -8,7 +8,7 @@ import logging
 import threading
 from typing import Any
 
-from PySide6.QtCore import QObject, QPoint, QSize, Qt, QTimer, Signal
+from PySide6.QtCore import QEvent, QObject, QPoint, QSize, Qt, QTimer, Signal
 from shiboken6 import isValid as qt_valid
 from PySide6.QtGui import QFont, QImage, QKeySequence, QShortcut
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QComboBox,
@@ -84,11 +84,16 @@ class EffectsPanel(QObject):
     `fx()` is the settings dict for SoundMeta.fx ({} when nothing is changed).
 
     `pick_voice(voice)` opens the voice picker (ui.voicepicker) on the sound's voice
-    and gives back the new one, or None if it was cancelled. The sound keeps a copy."""
+    and gives back the new one, or None if it was cancelled. The sound keeps a copy.
+
+    A splice clicked on the big waveform (`part`, its number from 0; None: the whole
+    sound) turns the speed, pitch, volume, knobs, effects and equalizer into that
+    splice's own (soundfx "parts"); the whole sound's wait in `_whole` meanwhile."""
     changed = Signal()
     peaks_read = Signal(int, object)   # (trim generation, peaks) from the waveform worker
     trim_replaced = Signal()           # set_sound made a new `trim` (Advanced re-hooks it)
     volume_edited = Signal()           # the Volume slider (the pad's, EditDialog keeps it)
+    part_picked = Signal(object)       # the panels show splice `part` now (None: the sound)
 
     def __init__(self, fx: dict | None, meta: SoundMeta | None = None, pick_voice=None):
         super().__init__()
@@ -97,6 +102,10 @@ class EffectsPanel(QObject):
         self.peaks_read.connect(self._on_peaks)
         self._voice: dict = {}
         self._live: list = []
+        self.part: int | None = None
+        self._whole: dict = {}          # the sound's own settings while a splice's show
+        self._pad_volume = 100.0        # ...and the pad's volume
+        self._loading = False
         self.compact = False   # Advanced: only the effects that are on (set_compact)
         self._folded_here: set = set()   # the cards set_compact folded
         self.trim_page, tv = _page()
@@ -267,7 +276,7 @@ class EffectsPanel(QObject):
         self.load(fx or {})
         p.tuning_edited.connect(self._edited)
         p.knobs_edited.connect(self._knobs_edited)
-        p.volume_edited.connect(self.volume_edited)
+        p.volume_edited.connect(self._volume_moved)
         p.preset_clicked.connect(self._fx_preset_clicked)
         self.boost.changed.connect(self._edited)
         self.reverse.toggled.connect(self._edited)
@@ -307,6 +316,8 @@ class EffectsPanel(QObject):
         self.trim_hint.setVisible(length <= 0)
         self.trim_kept.setVisible(length > 0)
         trim.changed.connect(self._edited)
+        trim.wave.picked.connect(self._pick_part)
+        trim.wave.level_moved.connect(self._level_moved)
         return trim
 
     def _on_peaks(self, gen: int, peaks):
@@ -315,6 +326,11 @@ class EffectsPanel(QObject):
 
     def set_sound(self, meta: SoundMeta):
         """Show another sound (Edit sound reused, EditControl.edit): its trim and fx."""
+        if self.part is not None:   # (the last sound's splice: back to a whole sound)
+            self.part = None
+            self.volume.set_value(self._pad_volume)
+            self._show_part_mode()
+            self.part_picked.emit(None)
         old = self.trim
         self.trim = self._new_trim(meta, self.trim_layout.indexOf(old))
         self.trim_layout.removeWidget(old)
@@ -376,12 +392,30 @@ class EffectsPanel(QObject):
         return sum(r.chk.isChecked() for r in self.rows.values())
 
     def load(self, fx: dict):
+        """Show settings `fx` (the trim too); a splice picked keeps showing its own."""
         f = soundfx.clean(fx)
+        self._whole = {k: f[k] for k in soundfx.PART_FX}
+        self._loading = True
+        try:
+            self.trim.blockSignals(True)
+            self.trim.load(f)   # (a splice still picked shows its own: _pick_part)
+            self.trim.blockSignals(False)
+        finally:
+            self._loading = False
+        self._voice = f["voice"]
+        self._show_voice()
+        if self.part is None:
+            self._show_knobs(f)
+        else:
+            self._show_part(self.part)
+
+    def _show_knobs(self, f: dict):
+        """The speed, pitch, boost, Play backwards, equalizer, effects and knobs as in
+        (cleaned) settings `f`, without `changed`."""
         widgets = (self.speed, self.pitch, self.boost, self.keep, self.reverse, self.eq,
-                   self.trim, *self.rows.values())
+                   *self.rows.values())
         for w in widgets:
             w.blockSignals(True)
-        self.trim.load(f)
         self.speed.set_value(f["speed"])
         self.pitch.set_value(f["pitch"])
         self.boost.set_value(f["gain_db"])
@@ -394,12 +428,85 @@ class EffectsPanel(QObject):
             row.load(cfg if cfg and cfg.get("on") else {"on": False})
         for w in widgets:
             w.blockSignals(False)
-        self._voice = f["voice"]
-        self._show_voice()
         self._live = f["live"]
         self._show_live()
         self._boost_hint()
         self._pitch_note()
+
+    def _knobs(self) -> dict:
+        """What the speed, pitch, boost, equalizer, effects and knobs say now (soundfx's
+        PART_FX: what a splice can have of its own)."""
+        gains, on, _t, _p = self.eq.state()
+        return {"speed": round(self.speed.value(), 3), "pitch": round(self.pitch.value(), 2),
+                "tape": not self.keep.isChecked(), "gain_db": round(self.boost.value(), 2),
+                "reverse": self.reverse.isChecked(),
+                "eq": gains if on else [0.0] * len(gains),
+                "effects": {t: r.state() for t, r in self.rows.items() if r.chk.isChecked()},
+                "live": self._live}
+
+    # ------------------------------------------------------------------ a splice's own
+    def _pick_part(self, i):
+        """The waveform picked splice `i` (None: the whole sound): the panels show its
+        own settings, and edits go to it."""
+        wave = self.trim.wave
+        i = i if i is not None and 0 <= i < len(wave.splices) else None
+        if i is not None and i != self.part:
+            usage.used("edit-splice-own")
+        if self.part is None and i is not None:   # the whole sound's, kept till it's back
+            self._whole = self._knobs()
+            self._pad_volume = self.volume.value()
+        self.part = i
+        if i is None:
+            if not self._loading:   # (load shows the sound's own next)
+                self._show_knobs(soundfx.clean(self._whole))
+            self.volume.set_value(self._pad_volume)
+        else:
+            self._show_part(i)
+        self._show_part_mode()
+        self._light_presets()
+        self._matching_preset()
+        self.part_picked.emit(i)
+
+    def _show_part(self, i: int):
+        p = self.trim.wave.parts[i] if i < len(self.trim.wave.parts) else {}
+        self._show_knobs(soundfx.clean({k: p[k] for k in soundfx.PART_FX if k in p}))
+        self.volume.set_value(float(p.get("volume", 1.0)) * 100)
+
+    def _show_part_mode(self):
+        """A splice's own settings have no voice: that's the whole sound's."""
+        on = self.part is None
+        self.voice.setEnabled(on and self._pick_voice is not None)
+        self.voice_off.setEnabled(on)
+        self.voice.setToolTip(_("Says this sound in a voice from the Voice tab, the way your "
+                                "mic sounds with it: a voice changer voice, an AI voice or "
+                                "your own voice combo") if on else
+                              _("A voice is for the whole sound: click outside the splices "
+                                "to get back to it"))
+
+    def _level_moved(self, i: int):
+        """A splice's level line dragged on the waveform: its Volume slider shows it."""
+        if i == self.part:
+            p = self.trim.wave.parts[i] if i < len(self.trim.wave.parts) else {}
+            self.volume.blockSignals(True)
+            self.volume.set_value(float(p.get("volume", 1.0)) * 100)
+            self.volume.blockSignals(False)
+
+    def _volume_moved(self):
+        if self.part is None:
+            self.volume_edited.emit()   # the pad's
+        else:
+            self._edited()              # the splice's own
+
+    def _save_part(self):
+        """The panels' settings into the picked splice's (its fades kept)."""
+        wave, i = self.trim.wave, self.part
+        if i is None or i >= len(wave.parts):
+            return
+        old = wave.parts[i]
+        wave.parts[i] = soundfx.clean_part({
+            **self._knobs(), "volume": self.volume.value() / 100,
+            **{k: old[k] for k in ("fade_in", "fade_out", "fade_in_from", "fade_out_to")
+               if k in old}})
 
     def _show_live(self):
         """The sound's Live controls stages on the knobs (merged into one set)."""
@@ -480,14 +587,8 @@ class EffectsPanel(QObject):
             self.set_voice(got)
 
     def fx(self) -> dict:
-        gains, on, _t, _p = self.eq.state()
-        f = {**self.trim.trim_fx(),
-             "speed": round(self.speed.value(), 3), "pitch": round(self.pitch.value(), 2),
-             "tape": not self.keep.isChecked(), "gain_db": round(self.boost.value(), 2),
-             "reverse": self.reverse.isChecked(),
-             "eq": gains if on else [0.0] * len(gains),
-             "effects": {t: r.state() for t, r in self.rows.items() if r.chk.isChecked()},
-             "voice": self._voice, "live": self._live}
+        knobs = self._knobs() if self.part is None else self._whole
+        f = {**self.trim.trim_fx(), **knobs, "voice": self._voice}
         # (splices only marked change nothing, but stay with the sound)
         return {} if soundfx.is_neutral(f) and not f["splices"] else soundfx.clean(f)
 
@@ -498,6 +599,8 @@ class EffectsPanel(QObject):
                                 _("Above 0 dB the sound gets louder until it clips."))
 
     def _edited(self):
+        if self.part is not None and not self._loading:
+            self._save_part()
         self._boost_hint()
         self._pitch_note()
         self._light_presets()
@@ -508,11 +611,10 @@ class EffectsPanel(QObject):
         self.panel.show_pitch_note()
 
     def _untrimmed(self) -> dict:
-        f = soundfx.clean(self.fx())
-        f["start"] = f["end"] = 0.0
-        f["splices"], f["joined"] = [], False
-        f["voice"] = {}   # the voice is a layer of its own: presets don't set it
-        return f          # (Live controls' knobs are effects: Advanced's Effects column)
+        """What the panels show (the sound's, or a picked splice's): no trim, no voice
+        (a layer of its own: presets don't set it). Live controls' knobs are effects:
+        Advanced's Effects column."""
+        return soundfx.clean(self._knobs())
 
     def _matching_preset(self):
         cur = soundfx.key(self._untrimmed())   # a preset never changes the trim
@@ -622,7 +724,12 @@ class EffectsPanel(QObject):
         self._matching_preset()
 
     def reset_all(self):
-        """Every effect off, the voice too (the trim stays)."""
+        """Every effect off, the voice too (the trim stays). A splice picked: its own."""
+        if self.part is not None:
+            self._show_knobs(soundfx.neutral())
+            self.volume.set_value(100)
+            self._edited()
+            return
         self.load(self.trim.trim_fx())
         self._matching_preset()
         self.changed.emit()
@@ -631,7 +738,10 @@ class EffectsPanel(QObject):
         usage.used("edit-preset")
         p = soundfx.PRESETS.get(name) or (self.mine.get(name[len(MINE):])
                                           if name.startswith(MINE) else None)
-        if p:
+        if p and self.part is not None:   # on the picked splice only
+            self._show_knobs(soundfx.clean(p))
+            self._edited()
+        elif p:
             self.load({**p, **self.trim.trim_fx(), "voice": self._voice})
             self.changed.emit()
         self.delete_preset.setVisible(name.startswith(MINE))
@@ -651,6 +761,7 @@ class EditDialog(EditDialogParts, QDialog):
     source_forgotten = Signal()   # Details → Delete info: saved at once, Save or Cancel
     effects_reset = Signal()      # Reset effects: a playing sound goes plain at once
     advanced_changed = Signal(bool)   # the Simple | Advanced switch was clicked
+    splice_saved = Signal(object, str)   # a splice's menu: (its effects, name) as a new pad
 
     def __init__(self, meta: SoundMeta, hotkeys: Hotkeys, preview_cb, parent=None,
                  tab: str = "sound", others=None, pick_voice=None, save_hook=None,
@@ -896,8 +1007,9 @@ class EditDialog(EditDialogParts, QDialog):
         # the Volume slider is the pad's
         eff.volume.set_value(self.vol.value())
         eff.volume_edited.connect(lambda: self.vol.setValue(round(eff.volume.value())))
-        self.vol.valueChanged.connect(
-            lambda val: abs(eff.volume.value() - val) > 0.5 and eff.volume.set_value(val))
+        self.vol.valueChanged.connect(   # (a splice picked: the slider is its own then)
+            lambda val: eff.part is None and abs(eff.volume.value() - val) > 0.5
+            and eff.volume.set_value(val))
 
         # Simple's top: what's on (a chip each, × takes it off), then the switch
         self.summary = Summary(eff)
@@ -1308,6 +1420,18 @@ class EditDialog(EditDialogParts, QDialog):
         # player under it then can't make Simple wider than it was)
         self.simple.setMinimumWidth(whole)
         return max(500, whole + m.left() + m.right())
+
+    def showEvent(self, e):
+        super().showEvent(e)
+        try:   # (nothing in a Qt override may raise: AGENT-RULES *Async results*)
+            # the page grows once its cards are shown, and the scroll area makes it that
+            # tall only one pass later: till then every row was squeezed into the old
+            # height (the name box half shut, Start over the waveform) for the first
+            # ~0.3 s on screen. Settled here, before the first paint.
+            for _i in range(4):
+                QApplication.sendPostedEvents(None, QEvent.Type.LayoutRequest)
+        except Exception:  # noqa: BLE001
+            log.debug("Edit sound's first layout failed", exc_info=True)
 
     def resizeEvent(self, e):
         super().resizeEvent(e)

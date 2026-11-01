@@ -406,3 +406,21 @@ def test_joined_splices_show_in_the_summary(window):  # noqa: F811
     f = d.effects.fx()
     assert not f.get("joined") and len(f["splices"]) == 2
     d.close()
+
+
+def test_edit_sound_is_laid_out_before_its_first_paint(window):  # noqa: F811
+    """The page grows once its cards show; the scroll area used to catch up a pass
+    later, and the first frames on screen had every row squeezed (the name box half
+    shut, the trim's Start row over the waveform)."""
+    window.themectl.apply_theme("Light")   # (the app's style sheet, as the app has it)
+    for _ in range(20):
+        QApplication.processEvents()
+    d = EditDialog(window.meta("s0"), window.hotkeys, lambda *a: None, window)
+    d.resize(560, 640)
+    d.show()
+    QApplication.processEvents()   # one pass: what the first paint gets
+    page = d.simple.widget()
+    assert page.height() >= page.minimumSizeHint().height()
+    assert d.name.height() >= d.name.minimumSizeHint().height()
+    assert d.hk_btn.height() >= d.hk_btn.minimumSizeHint().height()
+    d.close()

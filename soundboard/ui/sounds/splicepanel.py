@@ -6,19 +6,37 @@ sound, and saves. The splices themselves live on the waveform (trim.Waveform) an
 the sound's effects (soundfx)."""
 from __future__ import annotations
 
-from PySide6.QtCore import QPoint, QRectF, QSize, Qt
+import logging
+import re
+import tempfile
+import threading
+from pathlib import Path
+
+import numpy as np
+import soundfile as sf
+from PySide6.QtCore import QMimeData, QPoint, QRectF, QSize, Qt, QUrl, Signal
 from PySide6.QtGui import QColor, QPainter
-from PySide6.QtWidgets import (QDialog, QGraphicsDropShadowEffect, QHBoxLayout, QLabel,
-                               QLineEdit, QPushButton, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QDialog, QGraphicsDropShadowEffect, QHBoxLayout,
+                               QInputDialog, QLabel, QLineEdit, QMenu, QPushButton,
+                               QVBoxLayout, QWidget)
+from shiboken6 import isValid as qt_valid
 
 from soundboard.audio import soundfx
+from soundboard.audio.engine import SR
 from soundboard.core import usage
 from soundboard.i18n import _, ngettext
-from soundboard.ui.kit import fit, icons, theme
+from soundboard.sounds.library import load_original
+from soundboard.ui.kit import busy, fit, icons, theme
 from soundboard.ui.kit.panel import card, hint_label, icon_button
 from soundboard.ui.sounds.trim import BADGE_H, TrimPanel
 
+log = logging.getLogger(__name__)
 SHADOW = 14   # room round the pop-up's card for its shadow (it floats over the editor)
+
+
+def safe_name(name: str) -> str:
+    """`name` as a file name Windows takes (no \\ / : * ? " < > |)."""
+    return re.sub(r'[<>:"/\\|?*\x00-\x1f]', "_", name).strip(" .")[:60] or "splice"
 
 
 class Badge(QWidget):
@@ -188,11 +206,16 @@ class CombineDialog(QDialog):
 
 
 class SpliceBar(QWidget):
-    """[Add splices] [Splices (n)] for Edit sound `d`'s editor button row (Advanced)."""
+    """[Add splices] [Splices (n)] for Edit sound `d`'s editor button row (Advanced),
+    and a splice's right-click menu on the waveform (menu)."""
+    copied = Signal(int, str, str)   # (which copy, its file or "", why not) from the worker
 
     def __init__(self, d):
         super().__init__()
         self.d = d
+        self._copy_gen = 0
+        self._menu: QMenu | None = None
+        self.copied.connect(self._copied)
         trim: TrimPanel = d.effects.trim
         h = QHBoxLayout(self)
         h.setContentsMargins(0, 0, 0, 0)
@@ -216,14 +239,17 @@ class SpliceBar(QWidget):
     def attach(self, trim: TrimPanel):
         """Work on `trim` (Edit sound made a new one for another sound)."""
         if self.trim is not trim:
-            for sig in (self.trim.splices_changed, self.trim.wave.spliced):
+            for sig, slot in ((self.trim.splices_changed, self._sync),
+                              (self.trim.wave.spliced, self._sync),
+                              (self.trim.wave.menu_asked, self.menu)):
                 try:
-                    sig.disconnect(self._sync)
+                    sig.disconnect(slot)
                 except (RuntimeError, TypeError):
                     pass
         self.trim = trim
         trim.splices_changed.connect(self._sync)
         trim.wave.spliced.connect(self._sync)   # (also when loaded: the panel's are held)
+        trim.wave.menu_asked.connect(self.menu)
         trim.wave.set_cutting(self.cut.isChecked())
         self._sync()
 
@@ -242,10 +268,95 @@ class SpliceBar(QWidget):
         self.popup.show_under(self.list)
 
     def play(self, i: int):
-        part = self.trim.play_solo(i)
-        if part is not None:   # the draft's effects, on just that part
+        fx = self.trim.play_solo(i, self.d.effects.fx())
+        if fx is not None:   # the draft's effects, and its own, on just that part
             usage.used("edit-splice-play")
-            self.d.play_preview(fx={**self.d.effects.fx(), **part})
+            self.d.play_preview(fx=fx)
+
+    # ------------------------------------------------------------------ its menu
+    def menu(self, i: int, at: QPoint):
+        """A splice's right-click menu: play it, edit it on its own, save it as a pad of
+        its own, copy it (a sound file to paste in a chat or a folder), remove it."""
+        if not 0 <= i < len(self.trim.wave.splices):
+            return
+        n = i + 1
+        m = QMenu(self)
+        icons.set_icon(m.addAction(_("Play now")), "play")
+        m.actions()[-1].triggered.connect(lambda: self.play(i))
+        icons.set_icon(m.addAction(_("Edit its effects")), "sliders")
+        m.actions()[-1].triggered.connect(lambda: self.trim.wave.pick(i))
+        m.addSeparator()
+        icons.set_icon(m.addAction(_("Save as new pad…")), "plus")
+        m.actions()[-1].triggered.connect(lambda: self.save_as_pad(i))
+        icons.set_icon(m.addAction(_("Copy to clipboard")), "copy")
+        m.actions()[-1].triggered.connect(lambda: self.copy(i))
+        m.addSeparator()
+        icons.set_icon(m.addAction(_("Remove splice {n}", n=n)), "trash")
+        m.actions()[-1].triggered.connect(lambda: self.trim.remove_splice(i))
+        self._menu = m   # (kept: tests and screenshots look at it)
+        m.popup(at)
+
+    def save_as_pad(self, i: int):
+        """Splice `i` as a new pad of its own (named here), with its own effects and the
+        sound's: this pad stays as it is."""
+        d = self.d
+        default = _("{name} (splice {n})", name=d.name.text().strip() or d.meta.name,
+                    n=i + 1)[:40]
+        name, ok = QInputDialog.getText(d, _("Save as new pad"), _("New pad's name"),
+                                        text=default)
+        name = name.strip()[:40]
+        if ok and name and 0 <= i < len(self.trim.wave.splices):
+            usage.used("edit-splice-pad")
+            d.splice_saved.emit(soundfx.splice_alone(d.effects.fx(), i), name)
+
+    def copy(self, i: int):
+        """Splice `i`, with its effects, as a WAV file on the clipboard: paste it into a
+        chat, a folder or another app. Made on a worker (effects take a moment)."""
+        d = self.d
+        if not 0 <= i < len(self.trim.wave.splices):
+            return
+        usage.used("edit-splice-copy")
+        fx, meta = soundfx.splice_alone(d.effects.fx(), i), d.meta
+        fi, fo = d.fades()
+        gain = d.vol.value() / 100
+        name = f"{d.name.text().strip() or meta.name} {i + 1}"
+        d._say(_("Copying splice {n}…", n=i + 1), 0)
+        self._copy_gen += 1
+        gen = self._copy_gen
+
+        def work():
+            try:
+                x = soundfx.render(load_original(meta), fx) * gain
+                ends = np.ones(len(x), np.float32)   # the sound's fades, as it plays
+                for k, rising in ((min(int(fi * SR), len(x)), True),
+                                  (min(int(fo * SR), len(x)), False)):
+                    if k > 0:
+                        ramp = np.linspace(0, 1, k, dtype=np.float32)
+                        if rising:
+                            ends[:k] = ramp
+                        else:
+                            ends[len(x) - k:] = np.minimum(ends[len(x) - k:], ramp[::-1])
+                x = np.clip(x * ends[:, None], -1.0, 1.0)
+                folder = Path(tempfile.gettempdir()) / "OnionBoard clips"
+                folder.mkdir(exist_ok=True)
+                path = folder / f"{safe_name(name)}.wav"
+                sf.write(str(path), x, SR, subtype="PCM_16")
+                busy.emit(self.copied, gen, str(path), "")
+            except Exception as e:  # noqa: BLE001 - said in the window, not a crash
+                log.warning("couldn't copy splice %d: %s", i + 1, e)
+                busy.emit(self.copied, gen, "", str(e))
+        threading.Thread(target=work, daemon=True, name="splice-copy").start()
+
+    def _copied(self, gen: int, path: str, err: str):
+        if gen != self._copy_gen or not qt_valid(self.d):
+            return
+        if not path:
+            self.d._say(_("Couldn't copy it: {why}", why=err), 4000)
+            return
+        data = QMimeData()
+        data.setUrls([QUrl.fromLocalFile(path)])
+        QApplication.clipboard().setMimeData(data)
+        self.d._say(_("✓ Copied: paste it into a chat or a folder"), 3000)
 
     def ask_combine(self):
         """Combine splices: ask new pad or this one, then join them and save that way."""

@@ -4787,7 +4787,6 @@
   "ooh, pretty!": "Ó, de szép!",
   "The settings most people change, on one page": "A legtöbbek által módosított beállítások egy oldalon",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Megnyitja ezt a fület, amíg az Onion Board van elöl.\nEsc = mégse.",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Húzd a fogantyúkat az eleje és a vége levágásához. Kattints vagy húzz az idővonalon, vagy húzd a lejátszási jelet, hogy máshonnan szóljon. Ctrl+görgetés nagyít. Mozgatáshoz húzd a jobb egérgombbal, vagy használd a Shift+görgetést.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Ingyenes, reklámok és fiók nélkül. Készítette: OnionAlien. Nyílt forráskódú, GNU GPL v3 licenccel: használd, módosítsd és oszd meg, ha a te változatod is nyílt forráskódú marad.",
   "Community uploads": "Közösségi feltöltések",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Egy másik hang effektjeinek hozzáadása ehhez (Robot + Demon): bekapcsolnak azok az effektek, amelyek neki megvannak, a tiédnek nem",
@@ -4848,5 +4847,20 @@
   "{n} new sound": [
     "{n} új hang",
     "{n} új hang"
-  ]
+  ],
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>{n}. részlet</b> ({start}–{end}): a lenti beállítások csak ezt a részt változtatják.",
+  "A voice is for the whole sound: click outside the splices to get back to it": "A hang az egész hangra vonatkozik: kattints a részleteken kívül a visszatéréshez",
+  "Back to the whole sound": "Vissza az egész hanghoz",
+  "Copy to clipboard": "Másolás a vágólapra",
+  "Copying splice {n}…": "{n}. részlet másolása…",
+  "Couldn't copy it: {why}": "Nem sikerült másolni: {why}",
+  "Edit its effects": "Effektjei szerkesztése",
+  "Play now": "Lejátszás most",
+  "Save as new pad…": "Mentés új gombként…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "A lenti beállítások újra az egész hangot változtatják (az Esc a hullámformán is ezt teszi)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Akkor hallod őket, ha a részletek összefűzve szólnak, és a részlet saját Lejátszás most, Mentés új gombként és Másolás parancsában (jobb klikk rajta)",
+  "{name} (splice {n})": "{name} ({n}. részlet)",
+  "✓ Copied: paste it into a chat or a folder": "✓ Másolva: illeszd be egy chatbe vagy mappába",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Húzd a fogantyúkat az eleje és a vége levágásához. Kattints vagy húzz az idővonalon, vagy húzd a lejátszási jelet, hogy máshonnan szóljon. Ctrl+görgetés nagyít. Mozgatáshoz húzd a jobb egérgombbal, vagy használd a Shift+görgetést.",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Görgetéssel nagyítasz. Egy részlet szintvonalán húzd a pontokat: a sarkokat oldalra az úsztatáshoz, fel vagy le a hangerőhöz, a végeket fel vagy le ahhoz, honnan induljon az úsztatás. Kattints egy részletre saját effektekért, jobb klikk a többihez."
 }

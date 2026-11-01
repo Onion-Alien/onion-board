@@ -18,6 +18,7 @@ from PySide6.QtWidgets import (QButtonGroup, QFrame, QGridLayout, QHBoxLayout, Q
                                QTabWidget, QVBoxLayout, QWidget)
 
 from soundboard import voicefx
+from soundboard.audio import soundfx
 from soundboard.i18n import _
 from soundboard.sounds.library import original_peaks
 from soundboard.ui.kit import busy, icons
@@ -51,7 +52,8 @@ class ModeSwitch(QWidget):
     def __init__(self, advanced: bool = False, slim: bool = False):
         """`slim`: as tall as a tab row (it squeezed the words)."""
         super().__init__()
-        self.setObjectName("segbox")
+        self.setObjectName("modeswitch")   # (themesheet: one track, the picked side lit)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground)
         h = QHBoxLayout(self)
         h.setContentsMargins(*((2, 1, 2, 1) if slim else (3, 3, 3, 3)))
         h.setSpacing(2)
@@ -267,6 +269,30 @@ class AdvancedView(QWidget):
         ev.addWidget(hint_label(eff.trim_kept.text()))
         v.addWidget(self.editor, 5)
 
+        # a splice clicked: the columns under it are that splice's own now (EffectsPanel)
+        self.part_bar = QFrame()
+        self.part_bar.setObjectName("partbar")
+        pb = QHBoxLayout(self.part_bar)
+        pb.setContentsMargins(12, 6, 6, 6)
+        pb.setSpacing(10)
+        self.part_icon = QLabel()
+        pb.addWidget(self.part_icon)
+        self.part_text = QLabel()
+        self.part_text.setWordWrap(True)
+        self.part_text.setToolTip(_("They're heard when the splices play combined, and in "
+                                    "the splice's own Play now, Save as new pad and Copy "
+                                    "(right-click it)"))
+        pb.addWidget(self.part_text, 1)
+        self.part_whole = QPushButton(_("Back to the whole sound"))
+        self.part_whole.setToolTip(_("The settings below change the whole sound again (Esc "
+                                     "on the waveform does it too)"))
+        self.part_whole.clicked.connect(lambda: self.d.effects.trim.wave.pick(None))
+        pb.addWidget(self.part_whole)
+        self.part_bar.hide()
+        v.addWidget(self.part_bar)
+        eff.part_picked.connect(self._show_part)
+        eff.trim.wave.faded.connect(self._faded)
+
         # fades, under Speed & loudness: the Sound tab's own, mirrored, and drawn on
         # the waveform
         self.fades = QWidget()
@@ -383,6 +409,7 @@ class AdvancedView(QWidget):
         was; make it big and get its peaks."""
         eff = self.d.effects
         self.splices.attach(eff.trim)
+        eff.trim.wave.faded.connect(self._faded)
         if eff.trim_layout is self.trim_box:
             eff.trim.set_big(True)
             self._fetch_fine()
@@ -501,6 +528,11 @@ class AdvancedView(QWidget):
         fi, fo = self.d.fades()
         self.d.effects.trim.wave.set_fades(fi, fo)
 
+    def _faded(self, fade_in: float, fade_out: float):
+        """The sound's fade grips dragged on the waveform: the Fades sliders follow."""
+        self.d.fade_in.setValue(round(fade_in * 10))
+        self.d.fade_out.setValue(round(fade_out * 10))
+
     def _fetch_fine(self):
         """The waveform's fine peaks, read on a worker (a big file's cache is slow)."""
         self._gen += 1
@@ -517,6 +549,19 @@ class AdvancedView(QWidget):
     def _on_fine(self, gen: int, peaks):
         if gen == self._gen and peaks is not None and len(peaks):
             self.d.effects.trim.wave.set_fine(np.asarray(peaks, np.float32))
+
+    def _show_part(self, i):
+        """The banner over the columns while splice `i` is picked (None: hidden)."""
+        wave = self.d.effects.trim.wave
+        if i is None or not 0 <= i < len(wave.splices):
+            self.part_bar.hide()
+            return
+        self.part_icon.setPixmap(icons.pixmap("scissors", 16, icons.resolve("accent_hi")))
+        a, b = wave.splices[i]
+        self.part_text.setText(_(
+            "<b>Splice {n}</b> ({start} to {end}): the settings below change only this "
+            "part.", n=i + 1, start=soundfx.fmt_s(a), end=soundfx.fmt_s(b)))
+        self.part_bar.show()
 
     # ------------------------------------------------------------------ effects
     def _pick_effect(self):

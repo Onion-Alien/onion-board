@@ -4787,7 +4787,6 @@
   "ooh, pretty!": "Oi, miten kaunista!",
   "The settings most people change, on one page": "Useimpien muuttamat asetukset yhdellä sivulla",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Avaa tämän välilehden, kun Onion Board on edessä.\nEsc = peruuta.",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Vedä kahvoista leikataksesi alun ja lopun. Klikkaa tai vedä aikajanaa, tai vedä toistokohtaa, siirtääksesi kohtaa, jota soitetaan. Ctrl+rulla zoomaa. Siirrä vetämällä hiiren oikealla painikkeella tai Shift+rullalla.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Ilmainen, ei mainoksia eikä tiliä. Tekijä OnionAlien. Avointa lähdekoodia GNU GPL v3 -lisenssillä: käytä, muokkaa ja jaa, kunhan oma versiosi pysyy myös avoimena.",
   "Community uploads": "Yhteisön lataamat",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Lisää toisen äänen efektit tähän (Robot + Demon): sen efektit, joita sinun äänessäsi ei ole, kytketään päälle",
@@ -4848,5 +4847,20 @@
   "{n} new sound": [
     "{n} uusi ääni",
     "{n} uutta ääntä"
-  ]
+  ],
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Pätkä {n}</b> ({start}–{end}): alla olevat asetukset muuttavat vain tätä osaa.",
+  "A voice is for the whole sound: click outside the splices to get back to it": "Ääni koskee koko äänitettä: palaa siihen klikkaamalla pätkien ulkopuolelta",
+  "Back to the whole sound": "Takaisin koko ääneen",
+  "Copy to clipboard": "Kopioi leikepöydälle",
+  "Copying splice {n}…": "Kopioidaan pätkää {n}…",
+  "Couldn't copy it: {why}": "Kopiointi ei onnistunut: {why}",
+  "Edit its effects": "Muokkaa sen efektejä",
+  "Play now": "Soita nyt",
+  "Save as new pad…": "Tallenna uutena nappina…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "Alla olevat asetukset muuttavat taas koko ääntä (myös Esc aaltomuodon päällä)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Ne kuuluvat, kun pätkät soivat yhdessä, ja pätkän omissa Soita nyt-, Tallenna uutena nappina- ja Kopioi-toiminnoissa (oikea klikkaus)",
+  "{name} (splice {n})": "{name} (pätkä {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ Kopioitu: liitä se chattiin tai kansioon",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Vedä kahvoista leikataksesi alun ja lopun. Klikkaa tai vedä aikajanaa, tai vedä toistokohtaa, siirtääksesi kohtaa, jota soitetaan. Ctrl+rulla zoomaa. Siirrä vetämällä hiiren oikealla painikkeella tai Shift+rullalla.",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Vieritä zoomataksesi. Vedä pätkän tasoviivan pisteitä: kulmia sivulle häivytystä varten ja ylös tai alas äänenvoimakkuutta varten, päitä ylös tai alas sille, mistä häivytys alkaa. Klikkaa pätkää omia efektejä varten, oikea klikkaus näyttää lisää."
 }

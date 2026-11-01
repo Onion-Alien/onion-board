@@ -163,10 +163,13 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             *(f"edit-{k}" for k in EDIT_SETTINGS),
             # Edit sound: Undo / Redo, its player used (editplayer.py), the waveform's ruler
             # clicked or dragged to seek, the big one zoomed; a splice marked, one played on
-            # its own, Combine splices into a new pad or this one (splicepanel.py)
+            # its own, Combine splices into a new pad or this one (splicepanel.py); a
+            # splice clicked to give it effects of its own, saved as a pad of its own or
+            # copied from its menu; a fade dragged by its grip on the waveform
             "edit-undo", "edit-redo", "edit-player", "edit-wave-seek", "edit-wave-zoom",
             "edit-splice-marked", "edit-splice-play", "edit-splices-new",
-            "edit-splices-replace",
+            "edit-splices-replace", "edit-splice-own", "edit-splice-pad",
+            "edit-splice-copy", "edit-wave-fade",
             # the Triggers tab (the Onion Watch add-on) says which of its features were
             # used or are set up (triggershost.BoardHost.count): onionwatch/core/usage.py's
             # FEATURES, keep in step

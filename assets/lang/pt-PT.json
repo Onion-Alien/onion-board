@@ -4787,7 +4787,6 @@
   "ooh, pretty!": "Uau, que bonito!",
   "The settings most people change, on one page": "As definições que a maioria das pessoas altera, numa só página",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Abre este separador enquanto o Onion Board está à frente.\nEsc = cancelar.",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Arrasta as pegas para cortar o início e o fim. Clica ou arrasta a régua do tempo, ou arrasta o cursor de reprodução, para mudar onde toca. Ctrl+roda faz zoom. Arrasta com o botão direito do rato, ou usa Shift+roda, para deslocar.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Gratuito, sem anúncios e sem conta. Feito por OnionAlien. Código aberto sob a GNU GPL v3: usa-o, altera-o e partilha-o, desde que a tua versão também continue de código aberto.",
   "Community uploads": "Carregados pela comunidade",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Junta os efeitos de outra voz a esta (Robot + Demon): os efeitos que ela tem e a tua não são ligados",
@@ -4848,5 +4847,20 @@
   "{n} new sound": [
     "{n} som novo",
     "{n} sons novos"
-  ]
+  ],
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Excerto {n}</b> ({start} a {end}): as definições abaixo só mudam esta parte.",
+  "A voice is for the whole sound: click outside the splices to get back to it": "Uma voz é para o som inteiro: clica fora dos excertos para voltar",
+  "Back to the whole sound": "Voltar ao som inteiro",
+  "Copy to clipboard": "Copiar para a área de transferência",
+  "Copying splice {n}…": "A copiar o excerto {n}…",
+  "Couldn't copy it: {why}": "Não foi possível copiar: {why}",
+  "Edit its effects": "Editar os seus efeitos",
+  "Play now": "Tocar agora",
+  "Save as new pad…": "Guardar como novo botão…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "As definições abaixo voltam a mudar o som inteiro (Esc na forma de onda também o faz)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Ouvem-se quando os excertos tocam juntos, e no Tocar agora, Guardar como novo botão e Copiar do excerto (clique direito nele)",
+  "{name} (splice {n})": "{name} (excerto {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ Copiado: cola-o num chat ou numa pasta",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Arrasta as pegas para cortar o início e o fim. Clica ou arrasta a régua do tempo, ou arrasta o cursor de reprodução, para mudar onde toca. Ctrl+roda faz zoom. Arrasta com o botão direito do rato, ou usa Shift+roda, para deslocar.",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Desliza para fazer zoom. Na linha de nível de um excerto, arrasta os pontos: os cantos para o lado para um fade e para cima ou baixo para o volume, as pontas para cima ou baixo para onde um fade começa. Clica num excerto para efeitos próprios, clique direito para mais."
 }

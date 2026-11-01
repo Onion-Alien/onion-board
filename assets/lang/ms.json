@@ -4699,7 +4699,6 @@
   "ooh, pretty!": "Wah, cantiknya!",
   "The settings most people change, on one page": "Tetapan yang paling kerap diubah orang, dalam satu halaman",
   "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Membuka tab ini semasa Onion Board di hadapan.\nEsc = batal.",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Seret pemegang untuk memotong permulaan dan penghujung. Klik atau seret pembaris masa, atau seret penanda main, untuk alih kedudukan main. Ctrl+tatal untuk zum. Seret dengan butang kanan tetikus, atau Shift+tatal, untuk mengalih.",
   "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Percuma, tanpa iklan dan tanpa akaun. Dibuat oleh OnionAlien. Sumber terbuka di bawah GNU GPL v3: gunakan, ubah dan kongsi, asalkan versi anda juga kekal sumber terbuka.",
   "Community uploads": "Muat naik komuniti",
   "Add another voice's effects to this one (Robot + Demon): the effects it has that yours doesn't get switched on": "Tambah kesan suara lain pada suara ini (Robot + Demon): kesan yang ada padanya tetapi tiada pada suara anda akan dihidupkan",
@@ -4756,5 +4755,20 @@
   ],
   "{n} new sound": [
     "{n} bunyi baharu"
-  ]
+  ],
+  "<b>Splice {n}</b> ({start} to {end}): the settings below change only this part.": "<b>Keratan {n}</b> ({start} hingga {end}): tetapan di bawah hanya mengubah bahagian ini.",
+  "A voice is for the whole sound: click outside the splices to get back to it": "Suara adalah untuk seluruh bunyi: klik di luar keratan untuk kembali",
+  "Back to the whole sound": "Kembali ke seluruh bunyi",
+  "Copy to clipboard": "Salin ke papan keratan",
+  "Copying splice {n}…": "Menyalin keratan {n}…",
+  "Couldn't copy it: {why}": "Tidak dapat menyalin: {why}",
+  "Edit its effects": "Edit kesannya",
+  "Play now": "Main sekarang",
+  "Save as new pad…": "Simpan sebagai pad baharu…",
+  "The settings below change the whole sound again (Esc on the waveform does it too)": "Tetapan di bawah mengubah seluruh bunyi semula (Esc pada gelombang juga begitu)",
+  "They're heard when the splices play combined, and in the splice's own Play now, Save as new pad and Copy (right-click it)": "Ia didengar apabila keratan dimainkan bergabung, dan dalam Main sekarang, Simpan sebagai pad baharu dan Salin keratan itu (klik kanan padanya)",
+  "{name} (splice {n})": "{name} (keratan {n})",
+  "✓ Copied: paste it into a chat or a folder": "✓ Disalin: tampal dalam sembang atau folder",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Seret pemegang untuk memotong permulaan dan penghujung. Klik atau seret pembaris masa, atau seret penanda main, untuk alih kedudukan main. Ctrl+tatal untuk zum. Seret dengan butang kanan tetikus, atau Shift+tatal, untuk mengalih.",
+  "Scroll to zoom. On a splice's level line, drag the dots: the corners sideways for a fade and up or down for its volume, the ends up or down for where a fade starts. Click a splice for effects of its own, right-click it for more.": "Tatal untuk zum. Pada garis paras keratan, seret titiknya: bucu ke tepi untuk fade dan naik atau turun untuk kelantangan, hujung naik atau turun untuk paras mula fade. Klik keratan untuk kesan sendiri, klik kanan untuk lagi."
 }

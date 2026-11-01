@@ -166,7 +166,7 @@ def test_the_pop_up_plays_removes_and_combines(window, monkeypatch):  # noqa: F8
     play.click()                                     # splice 2, on its own
     got = soundfx.clean(played[-1])
     assert abs(got["start"] - L * 0.5) < L * 0.01 and abs(got["end"] - L * 0.6) < L * 0.01
-    assert not got["joined"]
+    assert got["joined"] and len(got["splices"]) == 1   # (with its own settings)
     trim.show_playing(0.5, {})                       # its playhead: inside splice 2
     assert L * 0.5 < wave.play < L * 0.6
     pop.combine.click()                              # asks: a new pad, or this one
