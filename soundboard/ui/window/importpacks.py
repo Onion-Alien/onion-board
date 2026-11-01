@@ -56,7 +56,7 @@ class PackImport(_Ctl):
     """ImportControl's sound packs (a mixin)."""
 
     if TYPE_CHECKING:   # ImportControl's own, for the type checker
-        from PySide6.QtCore import SignalInstance
+        from PySide6.QtCore import Signal
 
         from soundboard import otherboards
         def import_files(self, files,
@@ -65,7 +65,7 @@ class PackImport(_Ctl):
         _packs_removed: set[str]
         _packs_page: QDialog | None
         _packs_watch: object
-        _pack_refetched: SignalInstance
+        _pack_refetched: Signal
         _pack_retries: set[str]
         # (BackupImport's)
         def _on_unpacked(self, res, pkg, err: str) -> None: ...
