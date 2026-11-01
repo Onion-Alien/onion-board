@@ -758,7 +758,6 @@
   "Forgets Apps tab volumes and hidden programs.": "Забывает громкость на вкладке «Программы» и скрытые программы.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Забывает микрофон, наушники, то, куда отправляются звуки, и выход для стрима; быстрая настройка запустится снова.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Бесплатные дополнения с GitHub. Удаление или переустановка дополнения сохраняет твои триггеры и привязанные телефоны.",
-  "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Бесплатно, без рекламы и без аккаунта. Сделал OnionAlien. Лицензия MIT с Commons Clause: используй как хочешь, делись бесплатно, никогда не продавай.",
   "Frequencies": "Частоты",
   "From the category showing (All = any sound), never the same one twice in a row. A category can have its own: right-click its tab.": "Из показанной категории («Все» = любой звук), никогда один и тот же два раза подряд. У категории может быть своя: ПКМ по её вкладке.",
   "Game voice chat": "Голосовой чат в игре",
@@ -2448,7 +2447,6 @@
   "Free sound packs": "Бесплатные наборы звуков",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "«Бесплатные наборы звуков» (вкладка «Звуки» → Копия) читают список наборов с GitHub и скачивают набор оттуда, когда нажимаешь «Добавить».",
   "It's in your sounds now": "Теперь он в твоих звуках",
-  "Loudness": "Громкость",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "Сделал набор? Поделись: каждый звук должен быть CC0 (бесплатно для всех, без указания автора). После проверки он появится здесь для всех.",
   "Needs the internet: Offline mode is on (Privacy & security)": "Нужен интернет: включён офлайн-режим (Конфиденциальность и безопасность)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "В сеть вообще ничего не выходит, а всё, чему нужен интернет, скрыто (вкладка «Радио», поиск в интернете, загрузки, обновления…). Сними галочку, чтобы выбрать, что может выходить в сеть.",
@@ -4396,7 +4394,6 @@
   "Watches your game's window while it's open, even behind others": "Следит за окном твоей игры, пока оно открыто, даже за другими окнами",
   "Your file stays whole: only the part between the handles plays.": "Твой файл остаётся целым: играет только часть между ручками.",
   "Main": "Главное",
-  "Trim & speed": "Обрезка и скорость",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} вкл.",
     "{group}  ·  {n} вкл.",
@@ -4413,7 +4410,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Меняет каждый звук, пока он играет. «Сохранить как новую кнопку» оставит его отдельной кнопкой.",
   "Play a sound first, then save it with your changes": "Сначала включи звук, потом сохрани его со своими изменениями",
   "Save as new pad": "Сохранить как новую кнопку",
-  "Take the Live controls effects off": "Снять эффекты управления вживую",
   "{name} (modified {n})": "{name} (изменён {n})",
   "{name} (modified)": "{name} (изменён)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ «{name}» добавлен, скорость и тон ограничены тем, что может сохранить кнопка",
@@ -4835,7 +4831,6 @@
   "Search effects": "Искать эффекты",
   "Show the whole sound": "Показать весь звук",
   "Speed & loudness": "Скорость и громкость",
-  "The usual tabs, one at a time": "Обычные вкладки, по одной",
   "Undo ({keys})": "Отменить ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Через winget в Windows или, если не выйдет, собственной загрузкой FFmpeg (около 100 МБ). Это можно выключить в Настройки → Конфиденциальность и безопасность.",
   "Don't ask for admin each time": "Не спрашивать права администратора каждый раз",
@@ -4851,7 +4846,6 @@
   "Save what you have now into “{name}”": "Сохранить текущие настройки в «{name}»",
   "Update “{name}”": "Обновить «{name}»",
   "Update, reset or save as a new preset": "Обновить, сбросить или сохранить как новый пресет",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Перетащи ручки, чтобы отрезать начало и конец. Ctrl+колесо приближает. Чтобы сдвинуть, тяни правой кнопкой мыши или крути Shift+колесо.",
   "Add splices": "Добавить фрагменты",
   "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Нажми, где часть начинается, потом где заканчивается. Каждая часть — фрагмент. Esc отменяет недоделанный.",
   "Combine splices": "Склеить фрагменты",
@@ -4885,5 +4879,9 @@
   "light it up!": "Поджигай!",
   "my sparkler's still going": "Мой бенгальский ещё горит",
   "ooh! aah!": "Ооо! Ааа!",
-  "ooh, pretty!": "Ох, красота!"
+  "ooh, pretty!": "Ох, красота!",
+  "The settings most people change, on one page": "Настройки, которые меняет большинство, на одной странице",
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Открывает эту вкладку, когда Onion Board на переднем плане.\nEsc = отмена.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Перетащи ручки, чтобы отрезать начало и конец. Нажми или тяни по шкале времени, или тяни линию воспроизведения, чтобы перейти к другому месту. Ctrl+колесо приближает. Чтобы сдвинуть, тяни правой кнопкой мыши или крути Shift+колесо.",
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Бесплатно, без рекламы и без аккаунта. Сделал OnionAlien. Открытый код под лицензией GNU GPL v3: используй, изменяй и делись, если твоя версия тоже остаётся с открытым кодом."
 }

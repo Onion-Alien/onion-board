@@ -114,9 +114,9 @@ class HelpPage(Page):
         ver = self.dlg.about_version = QLabel(_("Version {version}", version=version_text()))
         ver.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         cv.addWidget(ver)
-        hint = QLabel(_("Free, with no ads and no account. Made by OnionAlien. MIT license with "
-                        "the Commons Clause: use it for anything, share it for free, never sell "
-                        "it."))
+        hint = QLabel(_("Free, with no ads and no account. Made by OnionAlien. Open source under "
+                        "the GNU GPL v3: use it, change it and share it, as long as your version "
+                        "stays open source too."))
         hint.setObjectName("hint")
         hint.setWordWrap(True)
         cv.addWidget(hint)

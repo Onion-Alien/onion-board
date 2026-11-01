@@ -407,7 +407,6 @@
   "Forgets Apps tab volumes and hidden programs.": "Ξεχνάει τις εντάσεις της καρτέλας Εφαρμογές και τα κρυμμένα προγράμματα.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Ξεχνάει το μικρόφωνο, τα ακουστικά, πού στέλνονται οι ήχοι σου και την έξοδο stream· η γρήγορη ρύθμιση τρέχει ξανά.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Δωρεάν πρόσθετα από το GitHub. Η αφαίρεση ή επανεγκατάσταση ενός κρατάει τα εναύσματα και τα συζευγμένα κινητά σου.",
-  "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Δωρεάν, χωρίς διαφημίσεις και χωρίς λογαριασμό. Από τον OnionAlien. Άδεια MIT με Commons Clause: χρησιμοποίησέ το για οτιδήποτε, μοιράσου το δωρεάν, μην το πουλήσεις ποτέ.",
   "Frequencies": "Συχνότητες",
   "From the category showing (All = any sound), never the same one twice in a row. A category can have its own: right-click its tab.": "Από την κατηγορία που φαίνεται (Όλα = οποιοσδήποτε ήχος), ποτέ ο ίδιος δύο φορές στη σειρά. Μια κατηγορία μπορεί να έχει δική της: δεξί κλικ στην καρτέλα της.",
   "Full release notes": "Όλες οι σημειώσεις έκδοσης",
@@ -2491,7 +2490,6 @@
   "Free sound packs": "Δωρεάν πακέτα ήχων",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "Τα Δωρεάν πακέτα ήχων (καρτέλα Ήχοι → Αντίγραφο ασφαλείας) διαβάζουν τη λίστα πακέτων από το GitHub και κατεβάζουν ένα από εκεί όταν πατάς Προσθήκη.",
   "It's in your sounds now": "Είναι στους ήχους σου τώρα",
-  "Loudness": "Ένταση",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "Έφτιαξες πακέτο; Μοιράσου το: κάθε ήχος πρέπει να είναι CC0 (δωρεάν για όλους, χωρίς αναφορά δημιουργού). Μόλις ελεγχθεί, εμφανίζεται εδώ για όλους.",
   "Needs the internet: Offline mode is on (Privacy & security)": "Θέλει internet: η λειτουργία εκτός σύνδεσης είναι ανοιχτή (Απόρρητο & ασφάλεια)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "Τίποτα δεν βγαίνει online, και ό,τι θέλει internet κρύβεται (η καρτέλα Ραδιόφωνο, η αναζήτηση στο web, οι λήψεις, οι ενημερώσεις…). Ξετσέκαρέ το για να διαλέξεις τι μπορεί να βγαίνει online.",
@@ -4320,7 +4318,6 @@
   "Watches your game's window while it's open, even behind others": "Παρακολουθεί το παράθυρο του παιχνιδιού σου όσο είναι ανοιχτό, ακόμα και πίσω από άλλα",
   "Your file stays whole: only the part between the handles plays.": "Το αρχείο σου μένει ολόκληρο: παίζει μόνο το κομμάτι ανάμεσα στις λαβές.",
   "Main": "Βασικά",
-  "Trim & speed": "Κόψιμο & ταχύτητα",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} ενεργό",
     "{group}  ·  {n} ενεργά"
@@ -4336,7 +4333,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Αλλάζει κάθε ήχο όσο παίζει. Το «Αποθήκευση ως νέο κουμπί» τον κρατάει ως δικό του κουμπί.",
   "Play a sound first, then save it with your changes": "Παίξε πρώτα έναν ήχο και μετά αποθήκευσέ τον με τις αλλαγές σου",
   "Save as new pad": "Αποθήκευση ως νέο κουμπί",
-  "Take the Live controls effects off": "Βγάλε τα εφέ από τα ζωντανά χειριστήρια",
   "{name} (modified {n})": "{name} (τροποποιημένο {n})",
   "{name} (modified)": "{name} (τροποποιημένο)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Προστέθηκε το «{name}», με ταχύτητα και τόνο όσο μπορεί να αποθηκεύσει ένα κουμπί",
@@ -4748,7 +4744,6 @@
   "Search effects": "Αναζήτηση εφέ",
   "Show the whole sound": "Δείξε όλο τον ήχο",
   "Speed & loudness": "Ταχύτητα & ένταση",
-  "The usual tabs, one at a time": "Οι συνηθισμένες καρτέλες, μία τη φορά",
   "Undo ({keys})": "Αναίρεση ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Μέσω του winget των Windows, αλλιώς από τη λήψη του ίδιου του FFmpeg (περίπου 100 MB). Μπορείς να το απενεργοποιήσεις στις Ρυθμίσεις → Απόρρητο & ασφάλεια.",
   "Don't ask for admin each time": "Να μη ζητείται άδεια διαχειριστή κάθε φορά",
@@ -4764,7 +4759,6 @@
   "Save what you have now into “{name}”": "Αποθήκευση των τωρινών ρυθμίσεων στο «{name}»",
   "Update “{name}”": "Ενημέρωση «{name}»",
   "Update, reset or save as a new preset": "Ενημέρωση, επαναφορά ή αποθήκευση ως νέα προεπιλογή",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Σύρε τις λαβές για να κόψεις την αρχή και το τέλος. Ctrl+κύλιση για ζουμ. Σύρε με το δεξί κουμπί του ποντικιού, ή Shift+κύλιση, για μετακίνηση.",
   "Add splices": "Προσθήκη αποσπασμάτων",
   "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Κάνε κλικ εκεί που αρχίζει ένα κομμάτι, μετά εκεί που τελειώνει. Κάθε κομμάτι είναι απόσπασμα. Το Esc ακυρώνει ένα μισό.",
   "Combine splices": "Ένωση αποσπασμάτων",
@@ -4797,5 +4791,9 @@
   "light it up!": "Άναψέ το!",
   "my sparkler's still going": "Το βεγγαλικό μου καίει ακόμα",
   "ooh! aah!": "Ωωω! Αααα!",
-  "ooh, pretty!": "Ωχ, τι ωραίο!"
+  "ooh, pretty!": "Ωχ, τι ωραίο!",
+  "The settings most people change, on one page": "Οι ρυθμίσεις που αλλάζουν οι περισσότεροι, σε μία σελίδα",
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Ανοίγει αυτή την καρτέλα όταν το Onion Board είναι μπροστά.\nEsc = ακύρωση.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Σύρε τις λαβές για να κόψεις την αρχή και το τέλος. Κάνε κλικ ή σύρε τη χρονογραμμή, ή σύρε τη γραμμή αναπαραγωγής, για να αλλάξεις από πού παίζει. Ctrl+κύλιση για ζουμ. Σύρε με το δεξί κουμπί του ποντικιού, ή Shift+κύλιση, για μετακίνηση.",
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Δωρεάν, χωρίς διαφημίσεις και χωρίς λογαριασμό. Από τον OnionAlien. Ανοιχτού κώδικα με άδεια GNU GPL v3: χρησιμοποίησέ το, άλλαξέ το και μοιράσου το, αρκεί και η δική σου έκδοση να μείνει ανοιχτού κώδικα."
 }

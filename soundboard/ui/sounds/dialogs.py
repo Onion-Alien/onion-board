@@ -5,17 +5,17 @@ from __future__ import annotations
 
 import json
 import logging
-import math
 import threading
 from typing import Any
 
 from PySide6.QtCore import QObject, QSize, Qt, QTimer, Signal
+from shiboken6 import isValid as qt_valid
 from PySide6.QtGui import QFont, QImage, QKeySequence, QShortcut
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QComboBox,
                                QDialog, QDialogButtonBox, QFrame, QGridLayout,
                                QHBoxLayout, QInputDialog, QLabel, QLineEdit,
                                QMessageBox, QProgressBar,
-                               QPushButton, QScrollArea, QSlider, QTabWidget, QVBoxLayout,
+                               QPushButton, QScrollArea, QSlider, QVBoxLayout,
                                QWidget)
 
 from soundboard.core import achievements, usage
@@ -28,13 +28,13 @@ from soundboard.sounds.library import (MAX_COOLDOWN_S, MAX_DELAY_S, PAD_COLORS,
                                        SoundMeta, original_length, original_peaks)
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import (EqPanel, hint_label, icon_button, reset_button,
-                                     section_label, steady_number)
+                                     section_label)
+from soundboard.ui.kit.layouts import take_out
 from soundboard.ui.sounds.editadvanced import AdvancedView, ModeSwitch
-from soundboard.ui.sounds.speedpitch import (FX_NAME_W, GAP, NAME_W, QUICK, QUICK_SLACK,
-                                             VOLUME_QUICK, name_of, popup_slider,
-                                             preset_name, quick_row)
+from soundboard.ui.sounds.editsummary import Summary
+from soundboard.ui.sounds.soundpanel import SoundPanel, name_of, popup_slider, preset_name
 from soundboard.ui.sounds.trim import TrimPanel
-from soundboard.ui.voice.voicefxpanel import ADDON_GROUP, GROUPS, EffectRow, ParamSlider
+from soundboard.ui.voice.voicefxpanel import ADDON_GROUP, GROUPS, EffectRow
 from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.ui.kit.wheelguard import no_wheel
 from soundboard.control.winkeys import Hotkeys
@@ -60,6 +60,7 @@ SPEED = voicefx.Param("speed", _("Speed"), *soundfx.SPEED_RANGE, 1.0, "x", 0.05)
 PITCH = voicefx.Param("pitch", _("Pitch"), *soundfx.PITCH_RANGE, 0.0, " st", 1)
 BOOST = voicefx.Param("gain_db", _("Boost"), *soundfx.GAIN_RANGE, 0.0, " dB", 1)
 VOLUME = voicefx.Param("volume", _("Volume"), 0, 200, 100, "%", 1)   # the pad's (meta.volume)
+VOLUME_QUICK = (50, 100, 150, 200)
 
 
 def _page() -> tuple[QWidget, QVBoxLayout]:
@@ -71,16 +72,20 @@ def _page() -> tuple[QWidget, QVBoxLayout]:
 
 
 class EffectsPanel(QObject):
-    """Every per-sound effect setting, on three pages for the dialog's tabs: `trim_page`
-    (trim, speed & pitch, loudness), `fx_page` (preset, voice, effects) and `eq_page`
-    (one long page was too much to scroll). `changed` fires on any edit; `fx()` is the settings
-    dict for SoundMeta.fx ({} when nothing is changed).
+    """Every per-sound effect setting. Advanced shows three pages: `trim_page` (speed &
+    pitch, loudness), `fx_page` (preset, voice, the knobs, the effect cards) and `eq_page`;
+    the trim (`trim_box`) goes big above them. Simple shows the trim small, and moves the
+    `speed_slot`, `volume_slot` and `knob_slot` into its own cards (EditDialog._place).
+    The speed, pitch, volume and knobs are Live controls' own widgets (soundpanel), so
+    the same settings read and sound the same in both. `changed` fires on any edit;
+    `fx()` is the settings dict for SoundMeta.fx ({} when nothing is changed).
 
     `pick_voice(voice)` opens the voice picker (ui.voicepicker) on the sound's voice
     and gives back the new one, or None if it was cancelled. The sound keeps a copy."""
     changed = Signal()
     peaks_read = Signal(int, object)   # (trim generation, peaks) from the waveform worker
     trim_replaced = Signal()           # set_sound made a new `trim` (Advanced re-hooks it)
+    volume_edited = Signal()           # the Volume slider (the pad's, EditDialog keeps it)
 
     def __init__(self, fx: dict | None, meta: SoundMeta | None = None, pick_voice=None):
         super().__init__()
@@ -142,7 +147,7 @@ class EffectsPanel(QObject):
         urow.addWidget(undo)
         urow.addStretch(1)
         self.undo_row.hide()
-        self._deleted: tuple[str, int, dict] | None = None
+        self._deleted: tuple[str, str, int, dict] | None = None   # (kind, name, at, it)
         top.addWidget(self.undo_row, 1, 1)
 
         vrow = QHBoxLayout()
@@ -162,124 +167,59 @@ class EffectsPanel(QObject):
         vrow.addWidget(self.voice_off)
         vrow.addStretch(1)
 
-        # Live controls' effects on a pad saved from them (soundfx.with_live): shown
-        # here so they can be taken off; their knobs stay in Live controls
-        self.live_row = QWidget()
-        lrow = QHBoxLayout(self.live_row)
-        lrow.setContentsMargins(0, 0, 0, 0)
-        self.live_name = QLabel(_("Live controls"))
-        top.addWidget(self.live_name, 3, 0)
-        top.addWidget(self.live_row, 3, 1)
-        self.live_text = QLabel()
-        self.live_text.setObjectName("muted")
-        self.live_text.setWordWrap(True)
-        lrow.addWidget(self.live_text, 1)
-        live_off = icon_button("close", _("Take the Live controls effects off"))
-        live_off.clicked.connect(self._live_off)
-        lrow.addWidget(live_off)
-        self.live_row.hide()
-        self.live_name.hide()
-
-        # Advanced: Live controls' effect knobs and presets themselves (in place of the
-        # row above), kept on the sound as its Live controls stage, so they sound the
-        # same as in Live controls (soundfx.with_live, livefx.LiveFx)
-        self.live_box = QWidget()
-        lv = QVBoxLayout(self.live_box)
-        lv.setContentsMargins(0, 4, 0, 4)
-        lv.setSpacing(8)
-        self.knobs: dict[str, ParamSlider] = {}
-        for q in livefx.PARAMS:
-            k = self.knobs[q.key] = popup_slider(q, q.default)
-            k.changed.connect(self._knobs_edited)
-            lv.addWidget(k)
-        knob_w = max(FX_NAME_W, *(name_of(k).sizeHint().width() for k in self.knobs.values()))
-        for k in self.knobs.values():
-            name_of(k).setFixedWidth(knob_w)
-        grid = QGridLayout()
-        grid.setContentsMargins(0, 4, 0, 0)
-        grid.setHorizontalSpacing(4)
-        grid.setVerticalSpacing(4)
-        self.fx_presets: dict[str, QPushButton] = {}
-        for i, pname in enumerate(livefx.PRESETS):
-            b = QPushButton(preset_name(pname))
-            b.setObjectName("small")
-            b.setCheckable(True)
-            b.setCursor(Qt.CursorShape.PointingHandCursor)
-            b.clicked.connect(lambda on, n=pname: self._fx_preset_clicked(n, on))
-            self.fx_presets[pname] = b
-            grid.addWidget(b, i // 3, i % 3)
-        grid.setColumnStretch(3, 1)   # as wide as their words, on the left
-        lv.addLayout(grid)
-        self._before_preset: tuple[str, dict, tuple[float, float, bool]] | None = None
-        lv.addWidget(hint_label(_("A voice chat's noise suppression can wipe these out, "
-                                  "deep bass too. Discord: Input Profile → Studio.")))
-        self.live_box.hide()
-        v.addWidget(self.live_box)
-
-        self.trim_head = section_label(_("Trim"))
-        tv.addWidget(self.trim_head)
-        self._v = tv
-        self.trim_layout = tv   # where the trim is: here, or Advanced's editor (it moves it)
+        # the trim: small in Simple's Trim card, big in Advanced's editor (it moves it)
+        self.trim_box = QWidget()
+        tb = QVBoxLayout(self.trim_box)
+        tb.setContentsMargins(0, 0, 0, 0)
+        tb.setSpacing(8)
+        self.trim_layout = tb   # where the trim is: here, or Advanced's editor
         self.trim_hint = hint_label(_("Trimming works once the sound has loaded."))
         # it only picks the part that plays: someone hunted for the cut file
         self.trim_kept = hint_label(_("Your file stays whole: only the part between the "
                                       "handles plays."))
-        tv.addWidget(self.trim_hint)
-        tv.addWidget(self.trim_kept)
-        self.trim = self._new_trim(meta, tv.indexOf(self.trim_hint))   # above them
+        tb.addWidget(self.trim_hint)
+        tb.addWidget(self.trim_kept)
+        self.trim = self._new_trim(meta, tb.indexOf(self.trim_hint))   # above them
 
-        # Live controls' own sliders (ui/sounds/speedpitch.py), with their typed values,
-        # words and quick buttons, so the same settings read and sound the same here.
-        # The quick buttons and Volume are Advanced's (set_compact)
-        self.speed_head = section_label(_("Speed & pitch"))
-        tv.addWidget(self.speed_head)
-        self.speed = popup_slider(SPEED, 1.0)
-        self.pitch = popup_slider(PITCH, 0.0)
+        # Live controls' own sliders, knobs and presets (soundpanel)
+        p = self.panel = SoundPanel(SPEED, PITCH, VOLUME, VOLUME_QUICK, narrow=True)
+        self.speed, self.pitch, self.keep, self.volume = p.speed, p.pitch, p.keep, p.volume
+        self.pitch_note, self.knobs, self.fx_presets = p.pitch_note, p.knobs, p.presets
         self.boost = popup_slider(BOOST, 0.0)
-        self.volume = popup_slider(VOLUME, VOLUME.default)   # the Sound tab's, mirrored
-        name_w = max(NAME_W, *(name_of(s).sizeHint().width()
-                               for s in (self.speed, self.pitch, self.boost, self.volume)))
-        for s in (self.speed, self.pitch, self.boost, self.volume):
-            name_of(s).setFixedWidth(name_w)
-        indent = min(name_w, NAME_W + QUICK_SLACK) + GAP
-        tv.addWidget(self.speed)
-        self.speed_quick = QWidget()
-        self.speed_quick.setLayout(quick_row(
-            [(f"{x:g}x", x) for x in QUICK], indent,
-            lambda x: self.speed.set_value(x) or self._edited(), narrow=True))
-        tv.addWidget(self.speed_quick)
+        name_w = max(p.name_w, name_of(self.boost).sizeHint().width())
+        p.set_name_width(name_w)
+        name_of(self.boost).setFixedWidth(name_w)
+        self.speed_slot = self._slot(self.speed, p.speed_quick)
+        self.volume_slot = self._slot(self.volume, p.volume_quick)
+        self.knob_slot = self._slot(*self.knobs.values())
+        self._before_preset: tuple[str, dict, tuple[float, float, bool]] | None = None
+
+        # (Advanced's column, titled Speed & loudness: no headings inside, so it fits
+        # whole on a 1280 x 800 screen)
+        tv.setContentsMargins(0, 14, 8, 0)   # (its first row level with the others')
+        tv.addWidget(self.speed_slot)
         tv.addWidget(self.pitch)
-        self.keep = QCheckBox(_("Keep pitch when changing speed"))   # off = "tape"
-        self.keep.setChecked(True)
-        self.keep.setToolTip(_("Off: slower is also deeper and faster is higher, like a tape"))
-        # with keep pitch off the speed moves the pitch too: said beside Keep pitch (a line
-        # of its own, kept empty while hidden, left a hole under Pitch)
-        self.pitch_note = QLabel()
-        self.pitch_note.setObjectName("hint")
-        self.pitch_note.setWordWrap(True)
-        self.pitch_note.hide()
+        # "+4.5 st from the speed" beside Keep pitch, not on a line of its own under
+        # Pitch (kept empty while hidden, it left a hole in the column)
         keep_row = QHBoxLayout()
         keep_row.setSpacing(12)
         keep_row.addWidget(self.keep)
         keep_row.addWidget(self.pitch_note, 1)
+        self.pitch_note.setContentsMargins(0, 0, 0, 0)
+        self.pitch_note.setWordWrap(True)
         tv.addLayout(keep_row)
-
-        self.loud_head = section_label(_("Loudness"))
-        tv.addWidget(self.loud_head)
-        tv.addWidget(self.volume)
-        self.volume_quick = QWidget()
-        self.volume_quick.setLayout(quick_row(
-            [(f"{lv:g}%", lv) for lv in VOLUME_QUICK if lv <= VOLUME.hi], indent,
-            lambda lv: self.volume.set_value(lv) or self.volume.changed.emit(), narrow=True))
-        tv.addWidget(self.volume_quick)
+        tv.addSpacing(8)
+        tv.addWidget(self.volume_slot)
         tv.addWidget(self.boost)
-        for w in (self.speed_quick, self.volume, self.volume_quick):
-            w.hide()   # Advanced's (Simple has the volume on the Sound tab)
         self.boost_hint = hint_label("")
         tv.addWidget(self.boost_hint)
         self.reverse = QCheckBox(_("Play backwards"))
         tv.addWidget(self.reverse)
         tv.addStretch(1)
+
+        v.addWidget(self.knob_slot)
+        v.addWidget(p.preset_box)
+        v.addWidget(p.fx_note)
 
         self.eq = EqPanel(False, "sounds", "Flat (off)", [0.0] * 7)
         self.eq.lbl_for.hide()
@@ -322,14 +262,27 @@ class EffectsPanel(QObject):
         v.addStretch(1)
 
         self.load(fx or {})
-        for s in (self.speed, self.pitch, self.boost):
-            s.changed.connect(self._edited)
-        self.keep.toggled.connect(self._edited)
+        p.tuning_edited.connect(self._edited)
+        p.knobs_edited.connect(self._knobs_edited)
+        p.volume_edited.connect(self.volume_edited)
+        p.preset_clicked.connect(self._fx_preset_clicked)
+        self.boost.changed.connect(self._edited)
         self.reverse.toggled.connect(self._edited)
         self.eq.changed.connect(lambda *__: self._edited())
         self.preset.currentIndexChanged.connect(
             lambda __: self._on_preset(self.preset.currentData()))
         self._matching_preset()
+
+    @staticmethod
+    def _slot(*widgets: QWidget) -> QWidget:
+        """Widgets that move together between Simple's cards and Advanced's pages."""
+        w = QWidget()
+        lay = QVBoxLayout(w)
+        lay.setContentsMargins(0, 0, 0, 0)
+        lay.setSpacing(8)
+        for x in widgets:
+            lay.addWidget(x)
+        return w
 
     def _new_trim(self, meta: SoundMeta | None, at: int = -1) -> TrimPanel:
         """The trim for `meta`'s sound (its waveform is that sound's). Its peaks come
@@ -398,13 +351,6 @@ class EffectsPanel(QObject):
             self._folded_here.clear()
         self.addon_hint.setVisible(not on)
         self.add_effect.setVisible(on)
-        for w in (self.speed_quick, self.volume, self.volume_quick, self.live_box):
-            w.setVisible(on)
-        # Advanced's column is titled Speed & loudness already: no headings inside, so
-        # it fits whole on a 1280 x 800 screen with the quick buttons
-        self.speed_head.setVisible(not on)
-        self.loud_head.setVisible(not on)
-        self._show_live()
 
     def turn_on(self, etype: str, on: bool = True):
         """Add effect's tile: switch `etype` on (open, in view) or off."""
@@ -417,6 +363,11 @@ class EffectsPanel(QObject):
             row.set_folded(False)
         elif self.compact:
             row.setVisible(False)
+
+    def eq_off(self):
+        """The equalizer flat and off (the summary's ×)."""
+        self.eq.set_gains([0.0] * len(self.eq.gains()), "Flat (off)")
+        self._edited()
 
     def on_count(self) -> int:
         return sum(r.chk.isChecked() for r in self.rows.values())
@@ -448,21 +399,13 @@ class EffectsPanel(QObject):
         self._pitch_note()
 
     def _show_live(self):
-        self.live_text.setText("; ".join(", ".join(
-            f"{voicefx.shown(q.label)} " + (f"{st[q.key]:+g}{q.unit}" if q.unit
-                                             else f"{round(st[q.key] * 100)}%")
-            for q in livefx.PARAMS if q.key in st)
-            for st in self._live))
-        self.live_row.setVisible(bool(self._live) and not self.compact)
-        self.live_name.setVisible(bool(self._live) and not self.compact)
-        merged = soundfx.live_merged(self._live)
-        for key, k in self.knobs.items():
-            k.set_value(merged.get(key, 0.0))
+        """The sound's Live controls stages on the knobs (merged into one set)."""
+        self.panel.set_knobs(soundfx.live_merged(self._live))
         self._light_presets()
 
     def knob_values(self) -> dict[str, float]:
-        """Advanced's Live controls knobs that are off 0."""
-        return livefx.clean({key: k.value() for key, k in self.knobs.items()})
+        """The Live controls knobs that are off 0."""
+        return self.panel.knob_values()
 
     def _knobs_edited(self):
         """A knob moved: the sound's Live controls stages become one, these knobs (and
@@ -488,19 +431,15 @@ class EffectsPanel(QObject):
                              and self.keep.isChecked() == t[2])
 
     def _light_presets(self):
-        for name, b in self.fx_presets.items():
-            b.setChecked(self._fx_preset_on(name))
+        self.panel.light(self._fx_preset_on)
 
     def _set_tuning(self, speed: float, pitch: float, keep: bool):
-        self.speed.set_value(speed)
-        self.pitch.set_value(pitch)
-        self.keep.blockSignals(True)
-        self.keep.setChecked(keep)
-        self.keep.blockSignals(False)
+        self.panel.set_tuning(speed, pitch, keep)
 
     def _fx_preset_clicked(self, name: str, on: bool):
         """Live controls' preset: sets its knobs, and its speed and pitch when it has
         them; clicked again (lit), back to how they were before it."""
+        usage.used("edit-preset")
         p = livefx.PRESETS[name]
         t = livefx.tuning(p)
         if on:
@@ -516,14 +455,8 @@ class EffectsPanel(QObject):
                                            else ({}, (1.0, 0.0, self.keep.isChecked())))
             if t is not None:
                 self._set_tuning(speed, pitch, bool(keep))
-        for key, k in self.knobs.items():
-            k.set_value(knobs.get(key, 0.0))
+        self.panel.set_knobs(knobs)
         self._knobs_edited()
-
-    def _live_off(self):
-        self._live = []
-        self._show_live()
-        self._edited()
 
     def _show_voice(self):
         from soundboard.ui.sounds.voicepicker import describe
@@ -569,20 +502,7 @@ class EffectsPanel(QObject):
         self.changed.emit()
 
     def _pitch_note(self):
-        """How far the speed moves the pitch while keep pitch is off, and the total with
-        the slider's shift (Live controls' note)."""
-        st = 0.0 if self.keep.isChecked() else round(12 * math.log2(self.speed.value()), 1)
-        shift = self.pitch.value()
-        if abs(st) < 0.05:
-            self.pitch_note.hide()
-            return
-        if abs(shift) < 1e-3:
-            text = _("{st} st from the speed", st=f"{st:+g}")
-        else:
-            text = _("{st} st from the speed, {total} st in all", st=f"{st:+g}",
-                     total=f"{round(st + shift, 1):+g}")
-        self.pitch_note.setText(text)
-        self.pitch_note.show()
+        self.panel.show_pitch_note()
 
     def _untrimmed(self) -> dict:
         f = soundfx.clean(self.fx())
@@ -602,12 +522,18 @@ class EffectsPanel(QObject):
         self.delete_preset.setVisible(name.startswith(MINE))
 
     def _fill_presets(self):
-        """The built-in presets, then yours, then Custom."""
+        """The built-in presets (Live controls' first, by their shown names), then yours
+        (Live controls' too: the same list), then Custom."""
         self.mine = mypresets.load("sound")
+        self._mine_live = set()   # yours that are Live controls' (saved as "live")
+        for name, p in mypresets.load("live").items():
+            if mypresets.find("sound", name) is None:
+                self.mine[name] = soundfx.from_live(p)
+                self._mine_live.add(name)
         self.preset.blockSignals(True)
         self.preset.clear()
         for name in soundfx.PRESETS:
-            self.preset.addItem(name, name)
+            self.preset.addItem(preset_name(name), name)
         if self.mine:
             self.preset.insertSeparator(self.preset.count())
             for name in self.mine:
@@ -619,7 +545,7 @@ class EffectsPanel(QObject):
         """A name for one of your presets, or "" if cancelled. A built-in preset's name
         is taken; so is another of yours, unless you agree to replace it."""
         title, parent = _("Save as preset"), self.fx_page.window()
-        builtin = {n.casefold() for n in soundfx.PRESETS}
+        builtin = {n.casefold() for n in (*soundfx.PRESETS, *map(preset_name, soundfx.PRESETS))}
         while True:
             name, ok = QInputDialog.getText(parent, title, _("Name:"),
                                             QLineEdit.EchoMode.Normal, text)
@@ -631,7 +557,7 @@ class EffectsPanel(QObject):
                     "“{name}” is a built-in preset's name. Pick another one.", name=name)))
                 text = name
                 continue
-            other = mypresets.find("sound", name)
+            other = mypresets.find("sound", name) or mypresets.find("live", name)
             if other is None:
                 return name
             if QMessageBox.question(parent, title, plain_tip(_(
@@ -642,9 +568,11 @@ class EffectsPanel(QObject):
 
     def _save_preset(self):
         """"Save as preset": these effects (not the trim or the voice) under a name, in
-        the Preset list of every sound from now on."""
+        the Preset list of every sound from now on, and in Live controls' My presets
+        too when it can play them (speed, pitch and the knobs only)."""
         parent = self.fx_page.window()
-        if mypresets.full("sound"):
+        live = soundfx.to_live(self._untrimmed())
+        if mypresets.full("live" if live is not None else "sound"):
             QMessageBox.information(parent, _("Save as preset"), ngettext(
                 "You have {n} preset, the most there can be. Delete one first.",
                 "You have {n} presets, the most there can be. Delete one first.",
@@ -654,7 +582,12 @@ class EffectsPanel(QObject):
         while mypresets.find("sound", f"{base} {n}"):
             n += 1
         name = self._ask_preset_name(f"{base} {n}")
-        if name and mypresets.put("sound", name, self._untrimmed()):
+        if name:   # (one name, one kind: an old one of the other kind goes)
+            for kind in mypresets.KINDS:
+                if mypresets.find(kind, name) is not None:
+                    mypresets.remove(kind, mypresets.find(kind, name) or name)
+        if name and (mypresets.put("live", name, live) if live is not None
+                     else mypresets.put("sound", name, self._untrimmed())):
             self._fill_presets()
             self._matching_preset()
             busy.flash(self.save_preset, _("✓ Saved"))
@@ -666,10 +599,11 @@ class EffectsPanel(QObject):
         if not name.startswith(MINE):
             return
         name = name[len(MINE):]
-        got = mypresets.remove("sound", name)
+        kind = "live" if name in self._mine_live else "sound"
+        got = mypresets.remove(kind, name)
         if got is None:
             return
-        self._deleted = (name, *got)
+        self._deleted = (kind, name, *got)
         self.undo_text.setText(_("Deleted “{name}”", name=name))
         self.undo_row.show()
         self._fill_presets()
@@ -677,8 +611,8 @@ class EffectsPanel(QObject):
 
     def _undo_delete(self):
         if self._deleted is not None:
-            name, at, p = self._deleted
-            mypresets.put("sound", name, p, at)
+            kind, name, at, p = self._deleted
+            mypresets.put(kind, name, p, at)
         self._deleted = None
         self.undo_row.hide()
         self._fill_presets()
@@ -691,6 +625,7 @@ class EffectsPanel(QObject):
         self.changed.emit()
 
     def _on_preset(self, name: str):
+        usage.used("edit-preset")
         p = soundfx.PRESETS.get(name) or (self.mine.get(name[len(MINE):])
                                           if name.startswith(MINE) else None)
         if p:
@@ -730,21 +665,27 @@ class EditDialog(EditDialogParts, QDialog):
         self.color = meta.color
         self.as_copy = False
         lay = self._lay = QVBoxLayout(self)
-        self.tabs = QTabWidget()
-        lay.addWidget(self.tabs, 1)
-        self.switch = ModeSwitch(False, slim=True)   # Simple | Advanced, by the tabs
+        # Simple: one page that scrolls, no tabs (the few controls people use; the
+        # rest is in Advanced, and the summary at its top shows whatever is on)
+        self.simple = QScrollArea()
+        self.simple.setWidgetResizable(True)
+        self.simple.setFrameShape(QScrollArea.Shape.NoFrame)
+        lay.addWidget(self.simple, 1)
+        self.switch = ModeSwitch(False)   # Simple | Advanced, at the page's top
         self.switch.picked.connect(self._switch_picked)
-        self.tabs.setCornerWidget(self.switch, Qt.Corner.TopRightCorner)
         self.adv: AdvancedView | None = None   # made the first time Advanced is picked
         self._simple_size: QSize | None = None
-        self._simple_page = 0   # the tab Simple showed when Advanced was picked
 
-        # three cards: how the pad looks, how it plays, its timings. Labels share one
-        # column width across the cards so the fields line up down the page.
+        # cards: how the pad looks, how it plays, its trim, speed and effects, and its
+        # timings (folded). Labels share one column width across the cards so the
+        # fields line up down the page.
         basics = QWidget()
-        page = QVBoxLayout(basics)
-        page.setContentsMargins(2, 14, 2, 2)   # room under the tabs
+        page = self._page = QVBoxLayout(basics)
+        page.setContentsMargins(2, 2, 8, 2)   # (room for the scroll bar)
         page.setSpacing(10)
+        self._head = QHBoxLayout()   # the summary (once there are effects), the switch
+        self._head.setSpacing(8)
+        page.addLayout(self._head)
         labels = [_("Name"), _("Colour"), _("Picture"), _("Volume"), _("Hotkey"),
                   _("On press")]
         label_w = max(self.fontMetrics().horizontalAdvance(t) for t in labels) + 12
@@ -856,21 +797,12 @@ class EditDialog(EditDialogParts, QDialog):
 
         # how it plays: the hotkey is what most people open this for
         g = card(_("Playback"))
-        vrow = QHBoxLayout()
-        vrow.setSpacing(10)
-        self.vol = QSlider(Qt.Orientation.Horizontal)
+        # the pad's volume: shown as Live controls' slider in the Speed & loudness card
+        # (effects.volume, with its typed value and quick buttons); kept here
+        self.vol = QSlider(Qt.Orientation.Horizontal, self)
         self.vol.setRange(0, 200)
         self.vol.setValue(round(meta.volume * 100))   # int() made 0.29 read as 28 %
-        self.vol.setAccessibleName(_("Volume"))
-        no_wheel(self.vol)
-        self.vol_lbl = QLabel()
-        self.vol_lbl.setObjectName("muted")
-        self.vol.valueChanged.connect(lambda v: self.vol_lbl.setText(f"{v}%"))
-        self.vol_lbl.setText(f"{self.vol.value()}%")
-        steady_number(self.vol_lbl, "200%")
-        vrow.addWidget(self.vol, 1)
-        vrow.addWidget(self.vol_lbl)
-        row(g, _("Volume"), vrow)
+        self.vol.hide()
 
         hrow = QHBoxLayout()
         hrow.setSpacing(8)
@@ -924,7 +856,7 @@ class EditDialog(EditDialogParts, QDialog):
         tg.setHorizontalSpacing(24)
         tg.setVerticalSpacing(12)
         tv.addLayout(tg)
-        page.addWidget(c)
+        self.timing = c   # behind More options (page's end)
         self.fade_in = self._fade_cell(tg, 0, 0, _("Fade in"), meta.fade_in,
                                        _("Starts silent and rises to full volume over this long"))
         self.fade_out = self._fade_cell(tg, 0, 1, _("Fade out"), meta.fade_out,
@@ -939,27 +871,61 @@ class EditDialog(EditDialogParts, QDialog):
         self.cooldown = self._fade_cell(tg, 1, 1, _("Cooldown"), meta.cooldown,
                                         _("After it starts, presses are ignored for this long, "
                                           "so nobody can spam it"), MAX_COOLDOWN_S)
-        page.addStretch(1)
         self._set_color(self.color)
-        self.tabs.addTab(basics, _("Sound"))
 
         self.effects = EffectsPanel(
             meta.fx, meta, (lambda v: pick_voice(v, self)) if pick_voice else None)
         self.effects.setParent(self)
+        eff = self.effects
+        # Advanced's three pages (its columns or tabs); Simple doesn't show them
         self._fx_scrolls = []
-        for pg, title in ((self.effects.trim_page, _("Trim & speed").replace("&", "&&")),
-                          (self.effects.fx_page, _("Effects")),
-                          (self.effects.eq_page, _("Equalizer"))):
+        for pg in (eff.trim_page, eff.fx_page, eff.eq_page):
             scroll = QScrollArea()
             scroll.setWidgetResizable(True)
             scroll.setWidget(pg)
             scroll.setFrameShape(QScrollArea.Shape.NoFrame)
             self._fx_scrolls.append(scroll)
-            self.tabs.addTab(scroll, title)
-        self.tabs.currentChanged.connect(
-            lambda i: i >= 1 and usage.used("pad-effects"))   # the name only (usage.py)
-        self.tabs.setCurrentIndex(self._tab_index(tab))
         self.effects.trim_replaced.connect(lambda: self.adv and self.adv.retrim())
+        # the Volume slider is the pad's
+        eff.volume.set_value(self.vol.value())
+        eff.volume_edited.connect(lambda: self.vol.setValue(round(eff.volume.value())))
+        self.vol.valueChanged.connect(
+            lambda val: abs(eff.volume.value() - val) > 0.5 and eff.volume.set_value(val))
+
+        # Simple's top: what's on (a chip each, × takes it off), then the switch
+        self.summary = Summary(eff)
+        self.summary.set_sound(meta)
+        self._head.addWidget(self.summary, 1)
+        self._head.addWidget(self.switch, 0, Qt.AlignmentFlag.AlignTop)
+
+        def simple_card(title: str) -> QVBoxLayout:
+            c = QFrame()
+            c.setObjectName("setcard")
+            v = QVBoxLayout(c)
+            v.setContentsMargins(14, 10, 14, 12)
+            v.setSpacing(8)
+            v.addWidget(section_label(title))
+            page.addWidget(c)
+            return v
+        self.simple_trim = simple_card(_("Trim"))
+        self.simple_trim.addWidget(eff.trim_box)
+        self.simple_speed = simple_card(_("Speed & loudness"))
+        self.simple_fx = simple_card(_("Effects"))
+        # the rare ones, folded: fades, wait first, cooldown
+        self.more = QPushButton(_("More options"))
+        self.more.setProperty("quiet", True)
+        self.more.setCursor(Qt.CursorShape.PointingHandCursor)
+        icons.set_icon(self.more, "fold", "muted", size=14)
+        self.more.clicked.connect(lambda: self._show_more(self.timing.isHidden()))
+        mrow = QHBoxLayout()
+        mrow.addWidget(self.more)
+        mrow.addStretch(1)
+        page.addLayout(mrow)
+        page.addWidget(self.timing)
+        self.timing.hide()
+        page.addStretch(1)
+        self.simple.setWidget(basics)
+        self._place(False)
 
         # Undo / Redo (the system's keys: Ctrl+Z, Ctrl+Shift+Z or Ctrl+Y) for the trim,
         # the effects and the fades; a drag is one step. A text box keeps its own.
@@ -1105,6 +1071,7 @@ class EditDialog(EditDialogParts, QDialog):
         QShortcut(QKeySequence.StandardKey.Undo, self, self.undo)
         QShortcut(QKeySequence.StandardKey.Redo, self, self.redo)
         self._remember()
+        usage.used("edit-opened")
         if advanced:
             self.set_advanced(True)
 
@@ -1136,32 +1103,73 @@ class EditDialog(EditDialogParts, QDialog):
             sl.setValue(int(round(min(max(value, 0.0), sl.maximum() / 10) * 10)))
         self._set_color(meta.color)
         self.effects.set_sound(meta)
+        self.summary.set_sound(meta)
         self.show_render(None)   # (EditControl.edit shows this sound's, if it has one)
         self.live_bar.hide()
         self._light_reset()   # (set_sound loads without the changed signal)
-        for scroll in self._fx_scrolls:
+        for scroll in (self.simple, *self._fx_scrolls):
             scroll.verticalScrollBar().setValue(0)
+        self._show_more(False)
         busy.set_busy(self.btn_preview, False)
         self._saying = False
         self._said = getattr(self, "_said", 0) + 1   # a "Playing" still timing out
         self._fx_note()
         self.show_tab(tab)
         self._remember()
+        usage.used("edit-opened")
 
     TABS = ("sound", "trim", "effects", "eq")
 
-    @classmethod
-    def _tab_index(cls, tab: str) -> int:
-        return cls.TABS.index(tab) if tab in cls.TABS else 0
-
     def show_tab(self, tab: str):
-        """Bring `tab` ("sound", "trim", "effects", "eq") into view, in either view."""
-        i = self._tab_index(tab)
-        if self.adv is not None and self.advanced():
+        """Bring `tab` ("sound", "trim", "effects", "eq") into view, in either view:
+        Simple scrolls to its card (it has no equalizer: that's Advanced's)."""
+        i = self.TABS.index(tab) if tab in self.TABS else 0
+        if self.advanced():
+            assert self.adv is not None
             if i:
                 self.adv.show_page(i - 1)
+            return
+        if tab == "eq":
+            self.set_advanced(True)
+            assert self.adv is not None
+            self.adv.show_page(2)
+            return
+        lay = (None, self.simple_trim, self.simple_fx, None)[i]
+        card = lay.parentWidget() if lay is not None else None
+        if card is None:
+            self.simple.verticalScrollBar().setValue(0)
         else:
-            self.tabs.setCurrentIndex(i)
+            self._page.activate()
+            self.simple.ensureWidgetVisible(card, 0, 12)
+
+    def _show_more(self, on: bool):
+        """More options: the Timing card, folded or open."""
+        self.timing.setVisible(on)
+        icons.set_icon(self.more, "fold_open" if on else "fold", "muted", size=14)
+        if on:   # once it's laid out (shown just now, it has no height yet)
+            QTimer.singleShot(0, lambda: qt_valid(self) and self.simple.ensureWidgetVisible(
+                self.timing, 0, 12))
+
+    def _place(self, advanced: bool):
+        """Put the sliders that both views show where this one has them: the speed,
+        volume and knobs in Simple's cards, or back on Advanced's pages."""
+        eff = self.effects
+        moves = ((eff.speed_slot, self.simple_speed, eff.trim_page.layout(), eff.pitch),
+                 (eff.volume_slot, self.simple_speed, eff.trim_page.layout(), eff.boost),
+                 (eff.knob_slot, self.simple_fx, eff.fx_page.layout(), eff.panel.preset_box))
+        for slot, simple, page, before in moves:
+            parent = slot.parentWidget()
+            old = parent.layout() if parent is not None else None
+            for lay in (old, *(old.findChildren(QVBoxLayout) if old is not None else ())):
+                i = lay.indexOf(slot) if lay is not None else -1
+                if i >= 0:
+                    take_out(lay, i)
+                    break
+            if advanced:
+                page.insertWidget(page.indexOf(before), slot)
+            else:
+                simple.addWidget(slot)
+            slot.show()
 
     # ------------------------------------------------------------------ Advanced
     def advanced(self) -> bool:
@@ -1174,7 +1182,7 @@ class EditDialog(EditDialogParts, QDialog):
 
     def set_advanced(self, on: bool):
         """The Advanced view (a bigger window, everything at once) or the Simple one
-        (the tabs). The same widgets move between them, so nothing is lost."""
+        (one page). The same widgets move between them, so nothing is lost."""
         if on == self.advanced():
             return
         screen = (self.screen() or QApplication.primaryScreen()).availableGeometry()
@@ -1182,36 +1190,29 @@ class EditDialog(EditDialogParts, QDialog):
             if self.adv is None:
                 self.adv = AdvancedView(self)
                 self.adv.switch.picked.connect(self._switch_picked)
-                self._lay.insertWidget(self._lay.indexOf(self.tabs) + 1, self.adv, 1)
+                self._lay.insertWidget(self._lay.indexOf(self.simple) + 1, self.adv, 1)
             self._simple_size = self.size()
-            page = self._simple_page = self.tabs.currentIndex()
-            for scroll in self._fx_scrolls:
-                self.tabs.removeTab(self.tabs.indexOf(scroll))
+            usage.used("pad-effects")   # (the name only: usage.py) the effects editor
             w = min(ADV_W, screen.width() - 48)
             h = min(ADV_H, screen.height() - 48)
-            self.tabs.hide()
+            self.simple.hide()
+            self._place(True)
             self.adv.attach(self._fx_scrolls, w)
             self.adv.show()
             self.setMinimumSize(ADV_MIN_W, ADV_MIN_H)
             self.resize(w, h)
-            if page:
-                self.adv.show_page(page - 1)
         else:
             assert self.adv is not None
-            # back on the page in view (narrow), else the one you left
-            page = (self.adv.tabs.currentIndex() + 1 if not self.adv.wide
-                    else getattr(self, "_simple_page", 0))
             self.adv.detach()
             self.adv.hide()
-            for scroll, title in zip(self._fx_scrolls, self.page_titles()):
-                self.tabs.addTab(scroll, title)   # (the tabs show one at a time)
-            self.tabs.setCurrentIndex(page)
-            self.tabs.show()
+            self._place(False)
+            self.simple.show()
             self.setMinimumSize(self._simple_min_w(), 0)
             self.resize(self._simple_size or QSize(max(540, self.minimumWidth()), 640))
         self.switch.set_advanced(on)
         if self.adv is not None:
             self.adv.switch.set_advanced(on)
+        self._fx_note()   # (Advanced's effects line; Simple has its summary)
         if self.isVisible():   # all of it on the screen
             g = self.frameGeometry()
             x = min(max(g.x(), screen.left()), screen.right() - g.width())
@@ -1225,17 +1226,16 @@ class EditDialog(EditDialogParts, QDialog):
         self.player = player
 
     def _simple_min_w(self) -> int:
-        """Simple's least width: its four tabs and the switch beside them, whole (long
-        languages too: the tabs got scroll arrows), and never under 500."""
+        """Simple's least width: its page whole beside its scroll bar (long languages
+        too), and never under 500."""
         m = self._lay.contentsMargins()
-        need = (self.tabs.tabBar().sizeHint().width() + self.switch.sizeHint().width()
-                + 16 + m.left() + m.right())
-        return max(500, need)
-
-    @staticmethod
-    def page_titles() -> tuple[str, str, str]:
-        """The tabs after Sound, as the Simple view names them."""
-        return (_("Trim & speed").replace("&", "&&"), _("Effects"), _("Equalizer"))
+        page = self.simple.widget()
+        whole = ((page.minimumSizeHint().width() if page is not None else 0)
+                 + self.simple.verticalScrollBar().sizeHint().width())
+        # (on the scroll area too, so the window's size hint counts the page: a wide
+        # player under it then can't make Simple wider than it was)
+        self.simple.setMinimumWidth(whole)
+        return max(500, whole + m.left() + m.right())
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
@@ -1310,7 +1310,35 @@ class EditDialog(EditDialogParts, QDialog):
         super().accept()
 
 
+    def _count_saved(self):
+        """Which settings this save changed, by name only (usage.py), so Simple can show
+        the ones people use."""
+        m = self.meta
+        was, now = soundfx.clean(m.fx), soundfx.clean(self.effects.fx())
+        knobs = ("speed", "pitch", "tape", "live", "gain_db", "reverse", "eq", "effects",
+                 "voice")
+        changed: dict[str, bool] = dict(zip(
+            ("speed", "pitch", "keep-pitch", "knobs", "boost", "reverse", "eq", "effects",
+             "voice"), (was[k] != now[k] for k in knobs)))
+        changed.update({
+            "name": self.name.text().strip() not in ("", m.name),
+            "colour": self.color != m.color, "picture": self.picture is not None,
+            "hotkey": self.hotkey != m.hotkey, "press": self.mode.currentData() != m.mode,
+            "loop": self.loop.isChecked() != m.loop, "hold": self.hold.isChecked() != m.hold,
+            "only-them": self.only_them.isChecked() != m.only_them,
+            "volume": self.vol.value() != round(m.volume * 100),
+            "trim": (was["start"], was["end"]) != (now["start"], now["end"]),
+            "fades": self.fades() != (m.fade_in, m.fade_out),
+            "wait": self.delay.value() != round(m.delay * 10),
+            "cooldown": self.cooldown.value() != round(m.cooldown * 10)})
+        for k, on in changed.items():
+            if on:
+                usage.used(f"edit-{k}")
+        usage.used("edit-copy" if self.as_copy else
+                   "edit-advanced-saved" if self.advanced() else "edit-saved")
+
     def apply(self, target: SoundMeta | None = None):
+        self._count_saved()
         m = target or self.meta
         if not self.as_copy:   # (Name Tag, Painter)
             if self.name.text().strip() not in ("", m.name):

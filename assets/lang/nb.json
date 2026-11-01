@@ -407,7 +407,6 @@
   "Forgets Apps tab volumes and hidden programs.": "Glemmer volum i Apper-fanen og skjulte programmer.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Glemmer mikrofonen, hodetelefonene, hvor lydene dine sendes og stream-utgangen; hurtigoppsettet kjører igjen.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Gratis tillegg fra GitHub. Hvis du fjerner eller installerer et på nytt, beholdes triggerne og de sammenkoblede telefonene dine.",
-  "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Gratis, uten reklame og uten konto. Laget av OnionAlien. MIT-lisens med Commons Clause: bruk den til hva som helst, del den gratis, aldri selg den.",
   "Frequencies": "Frekvenser",
   "From the category showing (All = any sound), never the same one twice in a row. A category can have its own: right-click its tab.": "Fra kategorien som vises (Alle = hvilken som helst lyd), aldri den samme to ganger på rad. En kategori kan ha sin egen: høyreklikk fanen.",
   "Full release notes": "Alle versjonsnotater",
@@ -2491,7 +2490,6 @@
   "Free sound packs": "Gratis lydpakker",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "Gratis lydpakker (Lyder-fanen → Sikkerhetskopi) leser listen over pakker fra GitHub, og laster ned en derfra når du trykker Legg til.",
   "It's in your sounds now": "Den er i Lyder nå",
-  "Loudness": "Lydstyrke",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "Laget en pakke? Del den: alle lydene må være CC0 (fritt for alle, ingen kreditering nødvendig). Når den er sjekket, dukker den opp her for alle.",
   "Needs the internet: Offline mode is on (Privacy & security)": "Trenger internett: frakoblet modus er på (Personvern og sikkerhet)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "Ingenting går på nett i det hele tatt, og alt som trenger internett, er skjult (Radio-fanen, nettsøk, nedlastinger, oppdateringer…). Fjern haken for å velge hva som får gå på nett.",
@@ -4320,7 +4318,6 @@
   "Watches your game's window while it's open, even behind others": "Følger med på spillvinduet ditt mens det er åpent, også bak andre",
   "Your file stays whole: only the part between the handles plays.": "Filen din forblir hel: bare delen mellom håndtakene spilles.",
   "Main": "Hoved",
-  "Trim & speed": "Trim og hastighet",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} på",
     "{group}  ·  {n} på"
@@ -4336,7 +4333,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Endrer hver lyd mens den spilles. Lagre som ny pad tar vare på den som egen pad.",
   "Play a sound first, then save it with your changes": "Spill av en lyd først, og lagre den så med endringene dine",
   "Save as new pad": "Lagre som ny pad",
-  "Take the Live controls effects off": "Ta av effektene fra live-kontrollene",
   "{name} (modified {n})": "{name} (endret {n})",
   "{name} (modified)": "{name} (endret)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ La til «{name}», med hastighet og tonehøyde innenfor det en pad kan lagre",
@@ -4748,7 +4744,6 @@
   "Search effects": "Søk i effekter",
   "Show the whole sound": "Vis hele lyden",
   "Speed & loudness": "Hastighet og lydstyrke",
-  "The usual tabs, one at a time": "De vanlige fanene, én om gangen",
   "Undo ({keys})": "Angre ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Via Windows' winget, ellers FFmpegs egen nedlasting (omtrent 100 MB). Du kan slå det av under Innstillinger → Personvern og sikkerhet.",
   "Don't ask for admin each time": "Ikke spør om administrator hver gang",
@@ -4764,7 +4759,6 @@
   "Save what you have now into “{name}”": "Lagre det du har nå i «{name}»",
   "Update “{name}”": "Oppdater «{name}»",
   "Update, reset or save as a new preset": "Oppdater, tilbakestill eller lagre som nytt forhåndsvalg",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Dra håndtakene for å kutte av starten og slutten. Ctrl+rulling zoomer. Dra med høyre museknapp, eller bruk Shift+rulling, for å flytte.",
   "Add splices": "Legg til klipp",
   "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Klikk der en del starter, så der den slutter. Hver del er et klipp. Esc slipper et halvferdig.",
   "Combine splices": "Sett sammen klipp",
@@ -4797,5 +4791,9 @@
   "light it up!": "Tenn den!",
   "my sparkler's still going": "Stjerneskuddet mitt brenner fortsatt",
   "ooh! aah!": "Ååh! Aah!",
-  "ooh, pretty!": "Åh, så fint!"
+  "ooh, pretty!": "Åh, så fint!",
+  "The settings most people change, on one page": "Innstillingene folk oftest endrer, på én side",
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Åpner denne fanen mens Onion Board er foran.\nEsc = avbryt.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Dra håndtakene for å kutte av starten og slutten. Klikk eller dra i tidslinjalen, eller dra avspillingsstreken, for å flytte hvor den spiller. Ctrl+rulling zoomer. Dra med høyre museknapp, eller bruk Shift+rulling, for å flytte.",
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Gratis, uten reklame og uten konto. Laget av OnionAlien. Åpen kildekode under GNU GPL v3: bruk den, endre den og del den, så lenge din versjon også forblir åpen kildekode."
 }

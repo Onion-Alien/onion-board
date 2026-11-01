@@ -18,11 +18,15 @@ def _dialog(w, sid="s0"):
     return EditDialog(w.meta(sid), w.hotkeys, lambda *a: None, w)
 
 
-def test_the_cards_are_look_playing_and_timing(window):  # noqa: F811
+def test_the_cards_are_look_playing_trim_speed_effects_and_timing(window):  # noqa: F811
+    """Simple is one page: the few things people change, the rest in Advanced."""
     d = _dialog(window)
-    heads = [lab.text() for lab in d.tabs.widget(0).findChildren(QLabel)
+    heads = [lab.text() for lab in d.simple.widget().findChildren(QLabel)
              if lab.objectName() == "section"]
-    assert heads == ["Look", "Playback", "Timing"]
+    assert heads == ["Look", "Playback", "Trim", "Speed & loudness", "Effects", "Timing"]
+    assert d.timing.isHidden()                  # behind More options
+    d.more.click()
+    assert not d.timing.isHidden()
     assert d.btn_source is None              # a sound from a file: no "From" line
     assert not d.btn_pic_clear.isVisibleTo(d)   # no picture: nothing to remove
     d.deleteLater()

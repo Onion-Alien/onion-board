@@ -26,24 +26,24 @@ def _visible_pages(d):
 def test_switching_keeps_the_draft_and_gives_everything_back(window):  # noqa: F811
     d = _dialog(window, tab="trim")
     d.show()
-    before = d.effects.fx()
+    eff = d.effects
+    before = eff.fx()
     d.switch.advanced.click()
-    assert d.advanced() and d.tabs.isHidden() and not d.adv.isHidden()
-    trim = d.effects.trim
-    assert d.effects.trim_layout is d.adv.trim_box and trim.wave.big
-    assert d.effects.fx() == before                     # nothing lost on the way
+    assert d.advanced() and d.simple.isHidden() and not d.adv.isHidden()
+    trim = eff.trim
+    assert eff.trim_layout is d.adv.trim_box and trim.wave.big
+    assert eff.trim_page.layout().indexOf(eff.speed_slot) >= 0     # on Advanced's page
+    assert eff.fx() == before                     # nothing lost on the way
     d.adv.switch.simple.click()
-    assert not d.advanced() and not d.tabs.isHidden()
+    assert not d.advanced() and not d.simple.isHidden()
     assert d.minimumWidth() == d._simple_min_w()       # Simple's own size limits again
-    assert d.tabs.currentIndex() == 1                   # back on the tab it left
-    assert [d.tabs.tabText(i) for i in range(d.tabs.count())] == [
-        "Sound", "Trim && speed", "Effects", "Equalizer"]
-    assert d.effects.trim_layout is d.effects._v and not trim.wave.big
-    assert d.effects.trim_page.layout().indexOf(trim) >= 0
-    d.tabs.setCurrentIndex(1)
-    assert _visible_pages(d) == [d.tabs.widget(1)]     # not three pages over each other
-    assert all(r.isVisibleTo(d.effects.fx_page) for r in d.effects.rows.values())
-    assert d.effects.fx() == before
+    assert eff.trim_layout is eff.trim_box.layout() and not trim.wave.big
+    assert eff.trim_box.layout().indexOf(trim) >= 0
+    # Simple's cards hold the speed, volume and knobs again; the rest waits in Advanced
+    assert d.simple_speed.indexOf(eff.speed_slot) >= 0
+    assert d.simple_fx.indexOf(eff.knob_slot) >= 0
+    assert not eff.pitch.isVisibleTo(d) and not eff.eq.isVisibleTo(d)
+    assert eff.fx() == before
     d.close()
 
 
@@ -238,7 +238,7 @@ def test_another_sound_in_advanced_keeps_the_big_trim(window):  # noqa: F811
     trim = d.effects.trim
     assert d.adv.trim_box.indexOf(trim) >= 0 and trim.wave.big
     d.adv.switch.simple.click()
-    assert d.effects.trim_page.layout().indexOf(trim) >= 0 and not trim.wave.big
+    assert d.effects.trim_box.layout().indexOf(trim) >= 0 and not trim.wave.big
     d.close()
 
 
@@ -268,14 +268,12 @@ def test_live_controls_knobs_show_and_edit_the_sounds_live_stage(window):  # noq
     eff = d.effects
     before = eff.fx()
     assert eff.knobs["bass"].value() == 9.0 and abs(eff.knobs["reverb"].value() - 0.4) < 1e-6
-    assert not eff.live_row.isVisibleTo(eff.fx_page)   # the knobs stand in for it
     assert eff.fx() == before
     eff.knobs["echo"].set_value(0.5)
     eff.knobs["echo"].changed.emit()
     assert eff.fx()["live"] == [{"bass": 9.0, "reverb": 0.4, "echo": 0.5, "volume": 200.0}]
     d.adv.switch.simple.click()
-    assert eff.live_row.isVisibleTo(eff.fx_page)        # Simple: the row, as before
-    assert not eff.live_box.isVisibleTo(eff.fx_page)
+    assert eff.knobs["echo"].isVisibleTo(d)             # Simple: the same knobs
     d.close()
 
 
@@ -308,23 +306,23 @@ def test_a_preset_saves_what_live_controls_saves(window):  # noqa: F811
 
 def test_speed_and_volume_quick_buttons(window):  # noqa: F811
     """Live controls' quick buttons: speeds under Speed, volumes under Volume (the
-    Sound tab's, moved here from the top line). Simple keeps its own volume."""
+    pad's volume), in both views."""
     d = _dialog(window, advanced=True)
     d.show()
     eff = d.effects
-    speeds = {b.text(): b for b in eff.speed_quick.findChildren(QPushButton)}
+    speeds = {b.text(): b for b in eff.panel.speed_quick.findChildren(QPushButton)}
     speeds["0.75x"].click()
     assert eff.fx()["speed"] == 0.75
-    vols = {b.text(): b for b in eff.volume_quick.findChildren(QPushButton)}
+    vols = {b.text(): b for b in eff.panel.volume_quick.findChildren(QPushButton)}
     vols["150%"].click()
     assert d.vol.value() == 150
     d.vol.setValue(80)
     assert eff.volume.value() == 80
     eff.keep.setChecked(False)
     assert eff.fx()["tape"] is True                     # keep pitch off = tape
-    d.adv.switch.simple.click()
-    assert not any(w.isVisibleTo(eff.trim_page)
-                   for w in (eff.speed_quick, eff.volume, eff.volume_quick))
+    d.adv.switch.simple.click()   # Simple shows them too, in its Speed & loudness card
+    assert all(w.isVisibleTo(d) for w in (eff.panel.speed_quick, eff.volume,
+                                            eff.panel.volume_quick))
     d.close()
 
 
@@ -362,4 +360,48 @@ def test_an_effect_on_doesnt_move_the_columns(window):  # noqa: F811
     QApplication.processEvents()
     assert bars() == before
     assert all(abs(s.viewport().height() - h) <= 1 for s, h in zip(d.adv._scrolls, high))
+    d.close()
+
+
+def test_simple_shows_whats_on_and_takes_it_off(window):  # noqa: F811
+    """Simple's summary: a chip for each thing on, set here, in Advanced or by Live
+    controls; its × takes just that off. Nothing on says so."""
+    m = window.meta("s0")
+    m.fx = {"speed": 1.2, "gain_db": 3.0, "effects": {"echo": {"on": True}},
+            "live": [{"bass": 6.0}]}
+    d = EditDialog(m, window.hotkeys, lambda *a: None, window)
+    d.show()
+    chips = {b.text().rsplit("  ", 1)[0]: b for b in d.summary.chips}
+    assert set(chips) == {"1.2x", "Bass +6 dB", "Boost +3 dB", "Echo"}
+    chips["Echo"].click()
+    assert "echo" not in d.effects.fx()["effects"] and d.effects.fx()["gain_db"] == 3.0
+    for _ in range(len(d.summary.chips)):
+        d.summary.chips[0].click()
+    assert d.effects.fx() == {} and not d.summary.chips and d.summary.none.isVisibleTo(d)
+    d.close()
+
+
+def test_live_controls_and_edit_sound_build_the_same_panel(window):  # noqa: F811
+    """One set of sliders, knobs and presets for both (soundpanel): they can't drift."""
+    from soundboard.ui.sounds.soundpanel import SoundPanel
+    d = _dialog(window)
+    assert isinstance(d.effects.panel, SoundPanel)
+    assert isinstance(window.speed_btn.panel, SoundPanel)
+    assert list(d.effects.knobs) == list(window.speed_btn.fx)
+    assert list(d.effects.fx_presets) == list(window.speed_btn.fx_presets)
+    d.close()
+
+
+def test_joined_splices_show_in_the_summary(window):  # noqa: F811
+    """Splices played back to back are on the sound too: a chip, whose × plays it whole
+    again and keeps them marked."""
+    m = window.meta("s0")
+    m.fx = {"splices": [[0.0, 0.05], [0.05, 0.1]], "joined": True}   # (0.05 s at least)
+    d = EditDialog(m, window.hotkeys, lambda *a: None, window)
+    d.show()
+    chips = {b.text().rsplit("  ", 1)[0]: b for b in d.summary.chips}
+    assert "Splices 2" in chips
+    chips["Splices 2"].click()
+    f = d.effects.fx()
+    assert not f.get("joined") and len(f["splices"]) == 2
     d.close()

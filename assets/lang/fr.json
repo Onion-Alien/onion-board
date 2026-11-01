@@ -797,7 +797,6 @@
   "Forgets Apps tab volumes and hidden programs.": "Oublie les volumes de l'onglet Applis et les programmes masqués.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Oublie ton micro, ton casque, où tes sons sont envoyés et la sortie stream ; la config rapide se relance.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Des extensions gratuites depuis GitHub. En retirer ou en réinstaller une garde tes déclencheurs et tes téléphones associés.",
-  "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Gratuit, sans pub et sans compte. Fait par OnionAlien. Licence MIT avec la Commons Clause : utilise-le pour ce que tu veux, partage-le gratuitement, ne le vends jamais.",
   "Frequencies": "Fréquences",
   "From the category showing (All = any sound), never the same one twice in a row. A category can have its own: right-click its tab.": "Depuis la catégorie affichée (Tous = n'importe quel son), jamais le même deux fois de suite. Une catégorie peut avoir le sien : clic droit sur son onglet.",
   "Game voice chat": "Chat vocal des jeux",
@@ -2491,7 +2490,6 @@
   "Free sound packs": "Packs de sons gratuits",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "Packs de sons gratuits (onglet Sons → Sauvegarde) lit la liste des packs sur GitHub, et en télécharge un depuis là quand tu appuies sur Ajouter.",
   "It's in your sounds now": "C'est dans tes sons maintenant",
-  "Loudness": "Volume perçu",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "Tu as fait un pack ? Partage-le : chaque son doit être en CC0 (libre pour tous, sans mention requise). Une fois vérifié, il apparaît ici pour tout le monde.",
   "Needs the internet: Offline mode is on (Privacy & security)": "Demande internet : le mode hors ligne est actif (Confidentialité et sécurité)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "Rien ne va en ligne, et tout ce qui demande internet est masqué (l'onglet Radio, la recherche web, les téléchargements, les mises à jour…). Décoche pour choisir ce qui peut aller en ligne.",
@@ -4320,7 +4318,6 @@
   "Watches your game's window while it's open, even behind others": "Surveille la fenêtre de ton jeu tant qu'elle est ouverte, même derrière d'autres",
   "Your file stays whole: only the part between the handles plays.": "Ton fichier reste entier : seule la partie entre les poignées est jouée.",
   "Main": "Principal",
-  "Trim & speed": "Coupe et vitesse",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} activé",
     "{group}  ·  {n} activés"
@@ -4336,7 +4333,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Change chaque son pendant qu'il joue. Enregistrer comme nouveau pad le garde en pad à part.",
   "Play a sound first, then save it with your changes": "Joue d'abord un son, puis enregistre-le avec tes changements",
   "Save as new pad": "Enregistrer comme nouveau pad",
-  "Take the Live controls effects off": "Enlever les effets des contrôles en direct",
   "{name} (modified {n})": "{name} (modifié {n})",
   "{name} (modified)": "{name} (modifié)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ « {name} » ajouté, sa vitesse et sa hauteur ramenées à ce qu'un pad peut enregistrer",
@@ -4748,7 +4744,6 @@
   "Search effects": "Chercher un effet",
   "Show the whole sound": "Afficher tout le son",
   "Speed & loudness": "Vitesse et volume",
-  "The usual tabs, one at a time": "Les onglets habituels, un à la fois",
   "Undo ({keys})": "Annuler ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Via winget de Windows, sinon par le téléchargement propre de FFmpeg (environ 100 Mo). Tu peux le désactiver dans Paramètres → Confidentialité et sécurité.",
   "Don't ask for admin each time": "Ne pas demander les droits admin à chaque fois",
@@ -4764,7 +4759,6 @@
   "Save what you have now into “{name}”": "Enregistrer vos réglages actuels dans « {name} »",
   "Update “{name}”": "Mettre à jour « {name} »",
   "Update, reset or save as a new preset": "Mettre à jour, réinitialiser ou enregistrer comme nouveau préréglage",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Fais glisser les poignées pour couper le début et la fin. Ctrl+molette zoome. Fais glisser avec le bouton droit de la souris, ou Maj+molette, pour te déplacer.",
   "Add splices": "Ajouter des extraits",
   "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Clique où une partie commence, puis où elle finit. Chaque partie est un extrait. Échap lâche un extrait à moitié fait.",
   "Combine splices": "Assembler les extraits",
@@ -4797,5 +4791,9 @@
   "light it up!": "Allume-le !",
   "my sparkler's still going": "Mon cierge magique brille encore",
   "ooh! aah!": "Oooh ! Aaah !",
-  "ooh, pretty!": "Oh, trop beau !"
+  "ooh, pretty!": "Oh, trop beau !",
+  "The settings most people change, on one page": "Les réglages que la plupart des gens modifient, sur une seule page",
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Ouvre cet onglet quand Onion Board est au premier plan.\nÉchap = annuler.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Fais glisser les poignées pour couper le début et la fin. Clique ou fais glisser sur la règle du temps, ou fais glisser la tête de lecture, pour changer où ça joue. Ctrl+molette zoome. Fais glisser avec le bouton droit de la souris, ou Maj+molette, pour te déplacer.",
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Gratuit, sans pub et sans compte. Fait par OnionAlien. Open source sous licence GNU GPL v3 : utilise-le, modifie-le et partage-le, tant que ta version reste open source elle aussi."
 }

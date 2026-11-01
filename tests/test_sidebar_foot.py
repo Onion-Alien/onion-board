@@ -155,6 +155,46 @@ def test_ctrl_numbers_and_ctrl_tab_move_between_tabs(window):  # noqa: F811
     assert shown[-1].isChecked()
 
 
+def test_a_tabs_right_click_menu_sets_its_own_key_instead_of_ctrl_number(window, monkeypatch):  # noqa: F811
+    """Ctrl+1... clash with pads' keys: a tab's menu gives it another key, and its
+    Ctrl+number then does nothing (the pad's key plays only the pad)."""
+    from soundboard.ui.window import tabcontrol
+    window.show()
+    QApplication.processEvents()
+    tabctl = window.tabctl
+    shown = tabctl._shown_buttons()
+    first, second = (tabcontrol.TAB_KEYS[b.index] for b in shown[:2])
+    assert tabctl.tab_key(first) == "ctrl+1"
+    menu = tabctl.tab_menu(shown[0].index)
+    assert "Turn into Bun" not in [a.text() for a in menu.actions()]
+    hk = menu.actions()[-1].menu()
+    assert menu.actions()[-1].text() == "Hotkey: Ctrl+1"
+    assert [a.text() for a in hk.actions()] == ["Change", "Remove hotkey"]
+    monkeypatch.setattr(tabcontrol.HotkeyDialog, "exec", lambda d: setattr(
+        d, "result_combo", "alt+f5") or True)
+    hk.actions()[0].trigger()                       # Change: asks, Alt+F5 picked
+    assert window.cfg.tab_keys == {first: "alt+f5"}
+    assert tabctl.tab_key(first) == "alt+f5" and tabctl.tab_key(second) == "ctrl+2"
+    shown[1].click()
+    tabctl._ctrl_number(1)                          # Ctrl+1: no longer this tab's key
+    assert shown[1].isChecked()
+    keys = {sc.key().toString() for sc in tabctl._key_shortcuts}
+    assert "Alt+F5" in keys and "Ctrl+1" in keys
+    tabctl._open_tab(first)                         # what Alt+F5 does
+    assert shown[0].isChecked()
+    window.rail.set_open(False)
+    window.rail.sync()
+    assert shown[0].toolTip().endswith("(Alt+F5)")
+    tabctl.set_tab_key(second, "alt+f5")            # one key, one tab
+    assert window.cfg.tab_keys == {second: "alt+f5"}
+    tabctl.set_tab_key(second, "")                  # removed: no key at all
+    assert tabctl.tab_key(second) == ""
+    menu = tabctl.tab_menu(shown[1].index)
+    assert menu.actions()[-1].text() == "Set hotkey"
+    assert tabcontrol.qt_keys("ctrl+shift+num 3").toString() == "Ctrl+Shift+Num+3"
+    assert tabcontrol.qt_keys("midi:note 36:LPD8") is None
+
+
 def test_the_header_version_opens_whats_new_and_stop_all_has_its_own_icon(window, monkeypatch):  # noqa: F811
     from soundboard.ui.setup import whatsnew
     shown = []

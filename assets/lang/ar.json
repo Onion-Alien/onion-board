@@ -865,7 +865,6 @@
   "Forgets Apps tab volumes and hidden programs.": "ينسى مستويات الصوت في تبويب التطبيقات والبرامج المخفية.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "ينسى ميكروفونك وسماعاتك ووجهة أصواتك ومخرج البث؛ ويعمل الإعداد السريع مجددًا.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "إضافات مجانية من GitHub. إزالة إحداها أو إعادة تثبيتها تُبقي محفّزاتك وهواتفك المقترنة.",
-  "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "مجاني، بلا إعلانات ولا حساب. من صنع OnionAlien. رخصة MIT مع Commons Clause: استخدمه لأي شيء، وشاركه مجانًا، ولا تبعه أبدًا.",
   "Frequencies": "الترددات",
   "From the category showing (All = any sound), never the same one twice in a row. A category can have its own: right-click its tab.": "من الفئة المعروضة (الكل = أي صوت)، ولا يتكرر الصوت نفسه مرتين متتاليتين. يمكن أن يكون لكل فئة اختصارها: انقر بالزر الأيمن على تبويبها.",
   "Game voice chat": "الدردشة الصوتية في الألعاب",
@@ -2703,7 +2702,6 @@
   "Free sound packs": "حزم أصوات مجانية",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "حزم الأصوات المجانية (تبويب الأصوات → النسخ الاحتياطي) تقرأ قائمة الحزم من GitHub، وتنزّل حزمة من هناك عندما تضغط «إضافة».",
   "It's in your sounds now": "إنه في أصواتك الآن",
-  "Loudness": "علوّ الصوت",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "صنعت حزمة؟ شاركها: كل صوت يجب أن يكون CC0 (مجاني للجميع، بلا حاجة لذكر المصدر). بعد مراجعتها تظهر هنا للجميع.",
   "Needs the internet: Offline mode is on (Privacy & security)": "يحتاج إلى الإنترنت: وضع عدم الاتصال مفعّل (الخصوصية والأمان)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "لا شيء يتصل بالإنترنت إطلاقًا، وكل ما يحتاج إلى الإنترنت مخفي (تبويب الراديو، البحث في الويب، التنزيلات، التحديثات…). ألغِ التحديد لتختار ما يُسمح له بالاتصال.",
@@ -4624,7 +4622,6 @@
   "Watches your game's window while it's open, even behind others": "يراقب نافذة لعبتك ما دامت مفتوحة، حتى خلف النوافذ الأخرى",
   "Your file stays whole: only the part between the handles plays.": "يبقى ملفك كاملًا: لا يُشغَّل إلا الجزء الذي بين المقبضين.",
   "Main": "الأساسي",
-  "Trim & speed": "القصّ والسرعة",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} مفعّل",
     "{group}  ·  {n} مفعّل",
@@ -4644,7 +4641,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "يغيّر كل صوت أثناء تشغيله. «احفظ كزر جديد» يحفظه كزر مستقل.",
   "Play a sound first, then save it with your changes": "شغّل صوتًا أولًا، ثم احفظه بتغييراتك",
   "Save as new pad": "احفظ كزر جديد",
-  "Take the Live controls effects off": "أزل مؤثرات التحكّم المباشر",
   "{name} (modified {n})": "{name} (معدّل {n})",
   "{name} (modified)": "{name} (معدّل)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ أُضيف “{name}”، مع حصر سرعته وحدّته فيما يستطيع الزر حفظه",
@@ -5096,7 +5092,6 @@
   "Search effects": "ابحث في المؤثرات",
   "Show the whole sound": "عرض الصوت كاملًا",
   "Speed & loudness": "السرعة وعلوّ الصوت",
-  "The usual tabs, one at a time": "التبويبات المعتادة، واحد في كل مرة",
   "Undo ({keys})": "تراجع ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "عبر winget في Windows، أو من تنزيل FFmpeg نفسه (حوالي 100 ميغابايت). يمكنك إيقاف ذلك من الإعدادات → الخصوصية والأمان.",
   "Don't ask for admin each time": "لا تطلب صلاحيات المسؤول في كل مرة",
@@ -5112,7 +5107,6 @@
   "Save what you have now into “{name}”": "احفظ ما لديك الآن في “{name}”",
   "Update “{name}”": "حدّث “{name}”",
   "Update, reset or save as a new preset": "حدّث أو أعد الضبط أو احفظ كإعداد جديد",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "اسحب المقبضين لقصّ البداية والنهاية. Ctrl+التمرير للتكبير. اسحب بزر الفأرة الأيمن، أو Shift+التمرير، للتنقّل.",
   "Add splices": "إضافة مقاطع",
   "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "انقر حيث يبدأ الجزء، ثم حيث ينتهي. كل جزء مقطع. Esc يلغي مقطعًا لم يكتمل.",
   "Combine splices": "دمج المقاطع",
@@ -5149,5 +5143,9 @@
   "light it up!": "أشعلها!",
   "my sparkler's still going": "شرارتي ما زالت تلمع",
   "ooh! aah!": "أوه! آه!",
-  "ooh, pretty!": "أوه، جميل!"
+  "ooh, pretty!": "أوه، جميل!",
+  "The settings most people change, on one page": "الإعدادات التي يغيّرها معظم الناس، في صفحة واحدة",
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "يفتح هذا التبويب عندما تكون Onion Board في المقدمة.\nEsc = إلغاء.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "اسحب المقبضين لقصّ البداية والنهاية. انقر شريط الوقت أو اسحبه، أو اسحب مؤشر التشغيل، لتغيير مكان التشغيل. Ctrl+التمرير للتكبير. اسحب بزر الفأرة الأيمن، أو Shift+التمرير، للتنقّل.",
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "مجاني، بلا إعلانات ولا حساب. من صنع OnionAlien. مفتوح المصدر بموجب رخصة GNU GPL v3: استخدمه وعدّله وشاركه، بشرط أن تبقى نسختك مفتوحة المصدر أيضًا."
 }

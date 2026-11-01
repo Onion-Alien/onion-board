@@ -12,6 +12,7 @@ from PySide6.QtGui import QColor, QPainter
 from soundboard.ui.kit import theme
 from soundboard.ui.bun import bunsymbols
 from soundboard.ui.bun.bunny import INK, music_note, sparkle
+from soundboard.ui.bun.bunprops import NOTE_SHAPES
 
 NOTE_COLORS = ("#7c5cff", "#a48bff", "#1fb6ff", "#ff8fae", "#13ce66")
 SPARKLE_COLORS = ("#ffcf40", "#ff8fae", "#1fb6ff", "#a48bff")
@@ -104,6 +105,7 @@ WOKEN_S = 30.0     # how long a click keeps him awake
 ZZZ_EVERY = 1.1    # seconds between Zs
 NOTE_H = 110       # notes come out their usual size at this Bun height (bigger Bun, bigger)
 DANCE_FADE = 3.0   # how fast he gets into a dance or out of it (1/s)
+TALK_FADE = 14.0   # ... or into saying a soundbite along with it
 STYLE_BLEND = 0.6  # seconds to change from one style of dance to another
 # his happy faces while he bounces to a song, (blink, mouth): eyes shut in a ^^ and
 # grinning, ^^ with his little smile, eyes open and grinning. He keeps one for a random
@@ -203,7 +205,7 @@ class _Spring:
 
 class _Note:
     __slots__ = ("x", "y", "vx", "vy", "age", "life", "size", "col", "spin", "calm", "k",
-                 "kind", "seed")
+                 "kind", "seed", "shape")
 
     def __init__(self, x, y, rng: random.Random, strength: float = 1.0, k: float = 1.0):
         self.x, self.y = x, y
@@ -216,7 +218,8 @@ class _Note:
         self.spin = rng.uniform(-25, 25)
         self.calm = False   # the headphones' slow trickle: fine at the idle frame rate
         self.kind = ""      # or the theme's symbol instead of a note (bunsymbols)
-        self.seed = rng.randrange(2)
+        self.seed = rng.randrange(1 << 16)   # (which 0 or 1, letter, ... a symbol is)
+        self.shape = rng.randrange(NOTE_SHAPES)   # ♪ ♩ ♫ or ♬
 
 
 class _Puff:
@@ -296,7 +299,9 @@ def paint_note(p: QPainter, n) -> None:
         sparkle(p, 0, 0, 5 * k, col)
     else:
         s, o = n.size * k, min(1.6, max(1.0, 0.5 * k))   # (a thin rim at any size)
+        shape = getattr(n, "shape", 0)
+        x = (-8 if shape >= 2 else -5) * k   # (a beamed pair is wider)
         for ox, oy in ((-o, 0), (o, 0), (0, -o), (0, o)):   # a soft rim so it reads
-            music_note(p, -5 * k + ox, -8 * k + oy, s, rim)
-        music_note(p, -5 * k, -8 * k, s, col)
+            music_note(p, x + ox, -8 * k + oy, s, rim, shape)
+        music_note(p, x, -8 * k, s, col, shape)
     p.restore()

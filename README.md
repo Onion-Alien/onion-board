@@ -172,9 +172,12 @@ It's also Onion Board's *Triggers* tab.
 
 ## Free, and it stays free
 
-[MIT with the Commons Clause](LICENSE): use it anywhere, monetized streams included, change it and share
-your version for free. Nobody may sell it; if you paid for Onion Board, you were ripped off. The name
-and logo aren't covered, so your own version needs its own name. Forking it?
+Open source under the [GNU GPL v3 or later](LICENSE): use it anywhere, monetized streams included,
+change it and share your version. Anyone who shares a version, free or paid, has to publish its full
+source under the same license, so nobody can make a closed copy. Onion Board itself is always free:
+if someone charged you for it, get it from [onionalien.com](https://onionalien.com/onionboard/).
+The name "Onion Board" and the onion logo aren't covered by the license, so your own version needs its
+own name and logo. Forking it?
 [docs/FORKING.md](docs/FORKING.md) lists what to swap for your own (usage counts, the sound store,
 update checks, links, name and logo).
 

@@ -407,7 +407,6 @@
   "Forgets Apps tab volumes and hidden programs.": "Kinakalimutan ang mga volume at nakatagong program sa Apps tab.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Kinakalimutan ang mic, headphones mo, kung saan ipinapadala ang mga sound mo at ang stream output; tatakbo ulit ang mabilis na setup.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Libreng add-ons mula sa GitHub. Kapag inalis o ni-reinstall ang isa, nananatili ang mga trigger mo at mga naka-pair na phone.",
-  "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Libre, walang ads at walang account. Gawa ni OnionAlien. MIT license na may Commons Clause: gamitin sa kahit ano, i-share nang libre, 'wag kailanman ibenta.",
   "Frequencies": "Mga frequency",
   "From the category showing (All = any sound), never the same one twice in a row. A category can have its own: right-click its tab.": "Mula sa kategoryang nakapakita (Lahat = kahit anong sound), hindi kailanman pareho nang dalawang beses sunod. Pwedeng may sariling key ang kategorya: i-right-click ang tab nito.",
   "Full release notes": "Buong release notes",
@@ -2491,7 +2490,6 @@
   "Free sound packs": "Libreng sound pack",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "Binabasa ng Libreng sound pack (Sounds tab → Backup) ang listahan ng mga pack mula sa GitHub, at nagda-download ng isa mula doon kapag pinindot mo ang Magdagdag.",
   "It's in your sounds now": "Nasa mga sound mo na ito",
-  "Loudness": "Lakas",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "May ginawa kang pack? I-share ito: dapat CC0 ang bawat sound (libre para sa lahat, walang kailangang credit). Kapag na-check na, lalabas ito dito para sa lahat.",
   "Needs the internet: Offline mode is on (Privacy & security)": "Kailangan ng internet: naka-on ang Offline mode (Privacy & security)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "Walang anumang nag-o-online, at nakatago ang lahat ng nangangailangan ng internet (ang Radio tab, web search, download, update…). I-untick ito para piliin kung ano ang pwedeng mag-online.",
@@ -4320,7 +4318,6 @@
   "Watches your game's window while it's open, even behind others": "Binabantayan ang window ng game mo habang bukas ito, kahit nasa likod ng iba",
   "Your file stays whole: only the part between the handles plays.": "Buo pa rin ang file mo: ang bahagi lang sa pagitan ng mga handle ang magpe-play.",
   "Main": "Pangunahin",
-  "Trim & speed": "Trim at bilis",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} naka-on",
     "{group}  ·  {n} naka-on"
@@ -4336,7 +4333,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Binabago ang bawat sound habang nagpe-play. Itinatago ito ng I-save bilang bagong pad bilang sariling pad.",
   "Play a sound first, then save it with your changes": "Mag-play muna ng sound, tapos i-save ito kasama ang mga binago mo",
   "Save as new pad": "I-save bilang bagong pad",
-  "Take the Live controls effects off": "Alisin ang mga effect ng Live controls",
   "{name} (modified {n})": "{name} (binago {n})",
   "{name} (modified)": "{name} (binago)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Naidagdag ang “{name}”, ang bilis at pitch nito ay hanggang sa kayang i-save ng pad",
@@ -4748,7 +4744,6 @@
   "Search effects": "Maghanap ng effect",
   "Show the whole sound": "Ipakita ang buong sound",
   "Speed & loudness": "Bilis at lakas",
-  "The usual tabs, one at a time": "Ang karaniwang mga tab, isa-isa",
   "Undo ({keys})": "I-undo ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Sa winget ng Windows, o kaya sa sariling download ng FFmpeg (mga 100 MB). Puwede mo itong i-off sa Settings → Privacy & security.",
   "Don't ask for admin each time": "Huwag humingi ng admin bawat beses",
@@ -4764,7 +4759,6 @@
   "Save what you have now into “{name}”": "I-save ang kasalukuyan mo sa “{name}”",
   "Update “{name}”": "I-update ang “{name}”",
   "Update, reset or save as a new preset": "I-update, i-reset o i-save bilang bagong preset",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "I-drag ang mga handle para i-cut ang simula at dulo. Ctrl+scroll para mag-zoom. I-drag gamit ang kanang button ng mouse, o Shift+scroll, para gumalaw.",
   "Add splices": "Magdagdag ng hiwa",
   "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "I-click kung saan nagsisimula ang isang bahagi, tapos kung saan ito natatapos. Bawat bahagi ay isang hiwa. Pinapakawalan ng Esc ang hindi pa tapos.",
   "Combine splices": "Pagsamahin ang mga hiwa",
@@ -4797,5 +4791,9 @@
   "light it up!": "Sindihan mo na!",
   "my sparkler's still going": "Umiilaw pa ang sparkler ko",
   "ooh! aah!": "Ooh! Aah!",
-  "ooh, pretty!": "Uy, ang ganda!"
+  "ooh, pretty!": "Uy, ang ganda!",
+  "The settings most people change, on one page": "Ang mga setting na binabago ng karamihan, sa iisang pahina",
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Binubuksan ang tab na ito habang nasa harap ang Onion Board.\nEsc = kanselahin.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "I-drag ang mga handle para i-cut ang simula at dulo. I-click o i-drag ang time ruler, o i-drag ang playhead, para ilipat kung saan ito tumutugtog. Ctrl+scroll para mag-zoom. I-drag gamit ang kanang button ng mouse, o Shift+scroll, para gumalaw.",
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Libre, walang ads at walang account. Gawa ni OnionAlien. Open source sa ilalim ng GNU GPL v3: gamitin, baguhin at i-share ito, basta open source din ang bersyon mo."
 }

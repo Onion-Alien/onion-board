@@ -13,10 +13,10 @@ for new installs and only runs in the installed app (never from source).
 - **What:** the app's version, a random ID made on your PC (not tied to your name,
   account, PC or any other ID), and names from a fixed list: which tabs and features you
   used that day (yes or no, never what you did with them), rough buckets (how many
-  sounds, how long the app was open, Windows 10 or 11, the app's language and theme)
-  and the names of problems it hit (a crash, a failed download). Never your sounds,
-  file names, searches, links, mic names, error messages or anything you typed. The
-  full list: [SECURITY.md, *The anonymous usage count*](../SECURITY.md#the-anonymous-usage-count-count-me-in).
+  sounds, how long the app was open, Windows 10 or 11, the app's language and Windows'
+  language, the theme) and the names of problems it hit (a crash, a failed download).
+  Never your sounds, file names, searches, links, mic names, error messages or anything
+  you typed. The full list: [SECURITY.md, *The anonymous usage count*](../SECURITY.md#the-anonymous-usage-count-count-me-in).
 - **When:** once a day, on closing the app if something waits for the next count, and
   once when you uninstall it.
 - **Where:** [GoatCounter](https://www.goatcounter.com/) (`onionalien.goatcounter.com`),

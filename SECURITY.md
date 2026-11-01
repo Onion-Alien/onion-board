@@ -194,8 +194,12 @@ account or anything else about you.
   `6-20` or `21-plus`) and how many times you started it (`launches/0`, `1`, `2-5` or
   `6-plus`) since then;
 - the system (`os/win11`, `os/win10`, `os/win-older`, `os/linux` or `os/other`: never
-  the exact version), the app's language (`lang/de`) and theme (`theme/dark`: a
-  built-in theme's name, else `other`);
+  the exact version) and the app's theme (`theme/dark`: a built-in theme's name, else
+  `other`);
+- the language the app is showing and whether you picked it in Settings
+  (`lang/de/picked`; `lang/en/default` when you haven't picked one) and Windows' own
+  display language, as one of the languages the app comes in (`lang-windows/de`, `en`
+  when none fits): language codes only, never your region or other locale settings;
 - how many of Settings > Achievements you've earned (`achievements/0`, `1-2`, `3-5`,
   `6-10`, `11-20` or `21-plus`) and their score (`ach-score/0`, `1-50`, `51-150`,
   `151-400`, `401-1000`, `1001-2000` or `2001-plus`);
@@ -287,7 +291,11 @@ account or anything else about you.
     `apps-category-added`…), Settings' search used and one that found nothing
     (`used/settings-search`, `settings-search-nothing`: never what was typed), the mini
     player's mic switch (`used/mini-mic-mute`), a pad's Effects tab and a picture from a
-    file or a link (`used/pad-effects`, `pad-picture-file`, `pad-picture-link`), *On
+    file or a link (`used/pad-effects`, `pad-picture-file`, `pad-picture-link`), Edit
+    sound opened, saved (`edit-opened`, `edit-saved`, `edit-advanced-saved`, `edit-copy`),
+    its summary's × or a preset used (`edit-summary-off`, `edit-preset`) and which of its
+    settings a save changed, by name only (`edit-name`, `edit-hotkey`, `edit-trim`,
+    `edit-speed`, `edit-knobs`, `edit-eq`... the list in `usagenames.EDIT_SETTINGS`), *On
     Air* switched off or on and a line of its card clicked (`used/on-air-off`,
     `on-air-on`, `on-air-line`), a file import stopped or one that skipped files
     (`used/import-stopped`, `import-skipped`), *Pause*, *Stop all* and the taskbar

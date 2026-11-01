@@ -1,6 +1,7 @@
 """Bun's animated widget: talking opens his mouth and throws notes, silence closes
 it again, and the plain drawing still works with every pose."""
 
+import random
 import time
 
 from PySide6.QtCore import QRectF
@@ -1006,3 +1007,54 @@ def test_his_bubble_wraps_a_long_line_onto_even_lines_beside_him(qapp):
     lines = wrap(fm, long, fm.horizontalAdvance("Ich habe gerade"))
     assert len(lines) == 3 and " ".join(lines) == long
     assert wrap(fm, "Wortwortwort", 5) == ["Wortwortwort"]   # (one word: never split)
+
+
+def test_a_soundbite_is_said_along_with_not_danced_to(qapp, monkeypatch):
+    b, clock = _dance(monkeypatch, "pop", voice=0.9)
+    b.groove.music = False                  # (groove.Groove: a soundbite or talking)
+    _beats(b, clock, 0.3)                   # a one-second "bruh" is said at once
+    assert b.pose()["mouth"] > 0.5
+    _beats(b, clock, 2.0)
+    assert not b.notes and abs(b.pose()["dy"]) < 3   # no notes, no bouncing
+    b.set_groove(None)
+    _beats(b, clock, 0.3)
+    assert b.pose()["mouth"] < 0.1          # it's over: mouth shut
+
+
+def test_notes_come_in_every_shape(qapp):
+    b = BunnyWidget("headphones")
+    b.resize(b.sizeHint())
+    b._rng = random.Random(4)
+    b.burst(80)
+    assert {n.shape for n in b.notes if not n.kind} == {0, 1, 2, 3}   # ♪ ♩ ♫ ♬
+    assert not b.grab().isNull()
+
+
+def test_every_theme_throws_its_own_things(qapp):
+    from soundboard.ui.bun import bunsymbols
+    from soundboard.ui.bun.bunbits import _Note, paint_note
+    from soundboard.ui.kit import theme
+    assert set(theme.THEMES) <= set(bunsymbols.MIXES)
+    sets = [frozenset(k for k, _c in mix if k != "note") for mix in bunsymbols.MIXES.values()]
+    assert len(set(sets)) == len(sets) and all(sets)   # no two themes throw the same
+    was = theme.current_name
+    try:
+        for name, mix in bunsymbols.MIXES.items():
+            if name not in theme.THEMES:
+                continue
+            theme.apply(qapp, name)
+            for kind, col in mix:
+                if kind == "note":
+                    continue
+                img = QImage(40, 40, QImage.Format.Format_ARGB32)
+                img.fill(0)
+                p = QPainter(img)
+                n = _Note(20, 20, random.Random(1))
+                n.age, n.life, n.kind, n.col = 0.5, 10.0, kind, QColor(col)
+                paint_note(p, n)
+                p.end()
+                inked = sum(img.pixelColor(x, y).alpha() > 128
+                            for x in range(40) for y in range(40))
+                assert inked > 25, (name, kind)   # it drew something you can see
+    finally:
+        theme.apply(qapp, was)

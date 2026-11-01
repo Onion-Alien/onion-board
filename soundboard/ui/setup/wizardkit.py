@@ -111,6 +111,7 @@ def _card(margins: int = 16, spacing: int = 12,
     them the theme's bigger padding."""
     card = QFrame()
     card.setObjectName("card")
+    theme.vary_texture(card)
     card.setProperty("roomy", roomy)
     lay = QVBoxLayout(card)
     lay.setContentsMargins(margins, margins, margins, margins)

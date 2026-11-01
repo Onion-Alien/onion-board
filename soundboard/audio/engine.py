@@ -570,15 +570,18 @@ class Engine(EngineBus, EngineRender, EngineTakes, EngineDevices, SoundCache):
                 if v.sid == sid:
                     v.stopping = True
 
-    def swap(self, sid: str, data: np.ndarray) -> bool:
+    def swap(self, sid: str, data: np.ndarray, at=None) -> bool:
         """The sound playing as `sid` goes on with `data` (it with other effects) from
         the same share of the way through, on the same outputs, paused or not: a quick
-        crossfade, not a restart. False: it isn't playing."""
+        crossfade, not a restart. `at(frac)`: where in `data` to go on from instead,
+        for how far through the old one is (a trim moved). False: it isn't playing."""
         with self.lock:
             v = self._current(sid)
             if v is None or v.preview:
                 return False
             frac, paused, outs = v.progress(), v.paused, tuple(v.data)
+            if at is not None:
+                frac = at(frac)
             gain, loop, fade_out = v.gain, v.loop, v.fade_out
             for old in self.voices:
                 if old.sid == sid and not old.stopping:

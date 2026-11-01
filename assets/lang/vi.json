@@ -780,7 +780,6 @@
   "Forgets Apps tab volumes and hidden programs.": "Quên âm lượng trong thẻ Ứng dụng và các chương trình đã ẩn.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Quên mic, tai nghe, nơi gửi âm thanh và đầu ra stream của bạn; thiết lập nhanh sẽ chạy lại.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Tiện ích bổ sung miễn phí từ GitHub. Gỡ hoặc cài lại một tiện ích vẫn giữ các kích hoạt và điện thoại đã ghép nối của bạn.",
-  "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Miễn phí, không quảng cáo, không cần tài khoản. Do OnionAlien làm. Giấy phép MIT kèm Commons Clause: dùng cho mọi việc, chia sẻ miễn phí, không bao giờ được bán.",
   "Frequencies": "Tần số",
   "From the category showing (All = any sound), never the same one twice in a row. A category can have its own: right-click its tab.": "Từ danh mục đang hiện (Tất cả = bất kỳ âm thanh nào), không bao giờ trùng một âm thanh hai lần liên tiếp. Mỗi danh mục có thể có phím riêng: nhấp chuột phải vào thẻ của nó.",
   "Game voice chat": "Voice chat trong game",
@@ -2438,7 +2437,6 @@
   "Free sound packs": "Gói âm thanh miễn phí",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "Gói âm thanh miễn phí (thẻ Âm thanh → Sao lưu) đọc danh sách gói từ GitHub, và tải một gói từ đó khi bạn bấm Thêm.",
   "It's in your sounds now": "Nó đã có trong âm thanh của bạn",
-  "Loudness": "Độ lớn",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "Bạn đã làm một gói? Hãy chia sẻ: mọi âm thanh phải là CC0 (ai cũng dùng miễn phí, không cần ghi nguồn). Sau khi được kiểm tra, nó sẽ hiện ở đây cho mọi người.",
   "Needs the internet: Offline mode is on (Privacy & security)": "Cần internet: Chế độ ngoại tuyến đang bật (Quyền riêng tư & bảo mật)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "Hoàn toàn không có gì lên mạng, và mọi thứ cần internet đều bị ẩn (thẻ Radio, tìm kiếm web, tải xuống, cập nhật…). Bỏ chọn để tự chọn những gì được lên mạng.",
@@ -4244,7 +4242,6 @@
   "Watches your game's window while it's open, even behind others": "Theo dõi cửa sổ game của bạn khi nó đang mở, kể cả khi bị che",
   "Your file stays whole: only the part between the handles plays.": "Tệp của bạn vẫn nguyên vẹn: chỉ phần giữa hai tay nắm được phát.",
   "Main": "Chính",
-  "Trim & speed": "Cắt & tốc độ",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} đang bật"
   ],
@@ -4259,7 +4256,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Thay đổi mọi âm thanh khi đang phát. Lưu thành nút mới để giữ nó thành một nút riêng.",
   "Play a sound first, then save it with your changes": "Hãy phát một âm thanh trước, rồi lưu nó với các thay đổi của bạn",
   "Save as new pad": "Lưu thành nút mới",
-  "Take the Live controls effects off": "Bỏ các hiệu ứng của Điều khiển trực tiếp",
   "{name} (modified {n})": "{name} (đã sửa {n})",
   "{name} (modified)": "{name} (đã sửa)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Đã thêm “{name}”, tốc độ và cao độ được giữ trong mức một nút có thể lưu",
@@ -4661,7 +4657,6 @@
   "Search effects": "Tìm hiệu ứng",
   "Show the whole sound": "Hiện toàn bộ âm thanh",
   "Speed & loudness": "Tốc độ & độ lớn",
-  "The usual tabs, one at a time": "Các thẻ quen thuộc, từng thẻ một",
   "Undo ({keys})": "Hoàn tác ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Qua winget của Windows, hoặc bản tải riêng của FFmpeg (khoảng 100 MB). Bạn có thể tắt việc này trong Cài đặt → Quyền riêng tư & bảo mật.",
   "Don't ask for admin each time": "Không hỏi quyền quản trị mỗi lần",
@@ -4677,7 +4672,6 @@
   "Save what you have now into “{name}”": "Lưu thiết lập hiện tại vào “{name}”",
   "Update “{name}”": "Cập nhật “{name}”",
   "Update, reset or save as a new preset": "Cập nhật, đặt lại hoặc lưu thành mẫu mới",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Kéo tay nắm để cắt bỏ đầu và cuối. Ctrl+cuộn để phóng to. Kéo bằng chuột phải, hoặc Shift+cuộn, để di chuyển.",
   "Add splices": "Thêm đoạn",
   "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Bấm chỗ một phần bắt đầu, rồi chỗ nó kết thúc. Mỗi phần là một đoạn. Esc bỏ đoạn đang làm dở.",
   "Combine splices": "Ghép các đoạn",
@@ -4709,5 +4703,9 @@
   "light it up!": "Châm lửa nào!",
   "my sparkler's still going": "Que pháo bông vẫn còn cháy",
   "ooh! aah!": "Ồ! À!",
-  "ooh, pretty!": "Ồ, đẹp quá!"
+  "ooh, pretty!": "Ồ, đẹp quá!",
+  "The settings most people change, on one page": "Những cài đặt mọi người hay đổi nhất, gói trong một trang",
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Mở tab này khi Onion Board đang ở phía trước.\nEsc = hủy.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Kéo tay nắm để cắt bỏ đầu và cuối. Bấm hoặc kéo thước thời gian, hoặc kéo vạch phát, để đổi chỗ đang phát. Ctrl+cuộn để phóng to. Kéo bằng chuột phải, hoặc Shift+cuộn, để di chuyển.",
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Miễn phí, không quảng cáo, không cần tài khoản. Do OnionAlien làm. Mã nguồn mở theo GNU GPL v3: cứ dùng, sửa và chia sẻ, miễn là phiên bản của bạn cũng giữ mã nguồn mở."
 }

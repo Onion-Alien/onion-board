@@ -780,7 +780,6 @@
   "Forgets Apps tab volumes and hidden programs.": "忘掉「應用程式」分頁的音量和隱藏的程式。",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "忘掉你的麥克風、耳機、音效傳送到哪裡以及直播輸出；快速設置會重新執行。",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "來自 GitHub 的免費附加元件。移除或重新安裝附加元件時，你的觸發器和配對的手機都會保留。",
-  "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "免費、沒有廣告、不用帳號。由 OnionAlien 製作。MIT 授權加上 Commons Clause：可以用在任何地方、免費分享，但絕對不能販售。",
   "Frequencies": "頻率",
   "From the category showing (All = any sound), never the same one twice in a row. A category can have its own: right-click its tab.": "從目前顯示的分類（全部 = 任何音效）裡選，不會連續兩次播同一個。分類也可以有自己的快速鍵：在它的分頁上按右鍵。",
   "Game voice chat": "遊戲語音聊天",
@@ -2438,7 +2437,6 @@
   "Free sound packs": "免費音效包",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "免費音效包（「音效」分頁 → 備份）會從 GitHub 讀取音效包清單，按「加入」時從那裡下載。",
   "It's in your sounds now": "它現在已經在你的音效裡了",
-  "Loudness": "響度",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "做了音效包？分享出來吧：每個音效都必須是 CC0（任何人都能免費使用，不用標示出處）。審核通過後，就會在這裡顯示給所有人。",
   "Needs the internet: Offline mode is on (Privacy & security)": "需要網路：離線模式已開啟（隱私與安全性）",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "完全不會上網，所有需要網路的功能都會隱藏（「電台」分頁、網路搜尋、下載、更新…）。取消勾選就能選擇哪些可以上網。",
@@ -4244,7 +4242,6 @@
   "Watches your game's window while it's open, even behind others": "在你的遊戲視窗開著時盯著它，即使被其他視窗擋住",
   "Your file stays whole: only the part between the handles plays.": "你的檔案保持完整：只會播放兩個把手之間的部分。",
   "Main": "主要",
-  "Trim & speed": "修剪與速度",
   "{group}  ·  {n} on": [
     "{group}  ·  已開啟 {n} 項"
   ],
@@ -4259,7 +4256,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "播放時改變每個音效。「另存為新按鈕」可以把它存成獨立的按鈕。",
   "Play a sound first, then save it with your changes": "請先播放一個音效，再連同你的變更一起儲存",
   "Save as new pad": "另存為新按鈕",
-  "Take the Live controls effects off": "拿掉即時控制的效果",
   "{name} (modified {n})": "{name}（已修改 {n}）",
   "{name} (modified)": "{name}（已修改）",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ 已加入「{name}」，速度和音高已限制在按鈕能儲存的範圍內",
@@ -4661,7 +4657,6 @@
   "Search effects": "搜尋效果",
   "Show the whole sound": "顯示整個聲音",
   "Speed & loudness": "速度 & 響度",
-  "The usual tabs, one at a time": "常用的分頁，一次一個",
   "Undo ({keys})": "復原（{keys}）",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "透過 Windows 的 winget，否則使用 FFmpeg 自己的下載（約 100 MB）。可在 設定 → 隱私與安全性 中關閉。",
   "Don't ask for admin each time": "不要每次都要求系統管理員權限",
@@ -4677,7 +4672,6 @@
   "Save what you have now into “{name}”": "把現在的設定存到「{name}」",
   "Update “{name}”": "更新「{name}」",
   "Update, reset or save as a new preset": "更新、重設或另存為新預設集",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "拖曳把手剪掉開頭和結尾。Ctrl+滾輪縮放。按住滑鼠右鍵拖曳，或 Shift+滾輪，即可平移。",
   "Add splices": "新增片段",
   "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "點一下某段開始的地方，再點它結束的地方。每一段就是一個片段。按 Esc 放棄做到一半的片段。",
   "Combine splices": "合併片段",
@@ -4709,5 +4703,9 @@
   "light it up!": "點燃它！",
   "my sparkler's still going": "我的仙女棒還在燒",
   "ooh! aah!": "哦！啊！",
-  "ooh, pretty!": "哇，好漂亮！"
+  "ooh, pretty!": "哇，好漂亮！",
+  "The settings most people change, on one page": "大多數人會改的設定，都在一頁裡",
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Onion Board 在最前面時打開這個分頁。\nEsc = 取消。",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "拖曳把手剪掉開頭和結尾。點一下或拖曳時間尺，或拖曳播放線，可以改變播放位置。Ctrl+滾輪縮放。按住滑鼠右鍵拖曳，或 Shift+滾輪，即可平移。",
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "免費、沒有廣告、不用帳號。由 OnionAlien 製作。以 GNU GPL v3 開源：可以使用、修改和分享，只要你的版本也維持開源。"
 }

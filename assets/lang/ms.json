@@ -401,7 +401,6 @@
   "Forgets Apps tab volumes and hidden programs.": "Melupakan kelantangan dan program tersembunyi tab Aplikasi.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Melupakan mikrofon, fon kepala anda, ke mana bunyi anda dihantar dan output strim; persediaan pantas berjalan semula.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Add-on percuma dari GitHub. Membuang atau memasang semula satu add-on mengekalkan pencetus dan telefon yang dipasangkan.",
-  "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Percuma, tanpa iklan dan tanpa akaun. Dibuat oleh OnionAlien. Lesen MIT dengan Commons Clause: gunakan untuk apa sahaja, kongsi secara percuma, jangan sesekali jual.",
   "Frequencies": "Frekuensi",
   "From the category showing (All = any sound), never the same one twice in a row. A category can have its own: right-click its tab.": "Dari kategori yang ditunjukkan (Semua = mana-mana bunyi), tidak pernah yang sama dua kali berturut-turut. Kategori boleh ada hotkey sendiri: klik kanan tabnya.",
   "Full release notes": "Nota keluaran penuh",
@@ -2438,7 +2437,6 @@
   "Free sound packs": "Pek bunyi percuma",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "Pek bunyi percuma (tab Bunyi → Sandaran) membaca senarai pek daripada GitHub dan memuat turun satu daripada sana apabila anda menekan Tambah.",
   "It's in your sounds now": "Ia dalam bunyi anda sekarang",
-  "Loudness": "Kekuatan bunyi",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "Ada pek sendiri? Kongsikannya: setiap bunyi mestilah CC0 (percuma untuk sesiapa sahaja, tiada kredit diperlukan). Sebaik sahaja ia disemak, ia dipaparkan di sini untuk semua orang.",
   "Needs the internet: Offline mode is on (Privacy & security)": "Memerlukan internet: Mod luar talian dihidupkan (Privasi & keselamatan)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "Tiada apa-apa yang masuk dalam talian sama sekali, dan semua yang memerlukan Internet disembunyikan (tab Radio, carian web, muat turun, kemas kini…). Nyahtandanya untuk memilih apa yang boleh masuk dalam talian.",
@@ -4244,7 +4242,6 @@
   "Watches your game's window while it's open, even behind others": "Memerhati tetingkap permainan anda selagi ia terbuka, walaupun di belakang yang lain",
   "Your file stays whole: only the part between the handles plays.": "Fail anda kekal penuh: hanya bahagian di antara pemegang dimainkan.",
   "Main": "Utama",
-  "Trim & speed": "Potong & kelajuan",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} hidup"
   ],
@@ -4259,7 +4256,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Mengubah setiap bunyi semasa dimainkan. Simpan sebagai pad baharu menyimpannya sebagai pad tersendiri.",
   "Play a sound first, then save it with your changes": "Mainkan bunyi dahulu, kemudian simpan dengan perubahan anda",
   "Save as new pad": "Simpan sebagai pad baharu",
-  "Take the Live controls effects off": "Tanggalkan kesan kawalan langsung",
   "{name} (modified {n})": "{name} (diubah {n})",
   "{name} (modified)": "{name} (diubah)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” ditambah, kelajuan dan picnya dihadkan kepada apa yang boleh disimpan pad",
@@ -4661,7 +4657,6 @@
   "Search effects": "Cari kesan",
   "Show the whole sound": "Tunjukkan seluruh bunyi",
   "Speed & loudness": "Kelajuan & kekuatan bunyi",
-  "The usual tabs, one at a time": "Tab biasa, satu demi satu",
   "Undo ({keys})": "Buat asal ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Melalui winget Windows, atau muat turun FFmpeg sendiri (kira-kira 100 MB). Anda boleh mematikannya di Tetapan → Privasi & keselamatan.",
   "Don't ask for admin each time": "Jangan minta kebenaran pentadbir setiap kali",
@@ -4677,7 +4672,6 @@
   "Save what you have now into “{name}”": "Simpan tetapan sekarang ke dalam “{name}”",
   "Update “{name}”": "Kemas kini “{name}”",
   "Update, reset or save as a new preset": "Kemas kini, tetapkan semula atau simpan sebagai pratetap baharu",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Seret pemegang untuk memotong permulaan dan penghujung. Ctrl+tatal untuk zum. Seret dengan butang kanan tetikus, atau Shift+tatal, untuk mengalih.",
   "Add splices": "Tambah keratan",
   "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "Klik di mana bahagian bermula, kemudian di mana ia tamat. Setiap bahagian ialah keratan. Esc lepaskan yang separuh siap.",
   "Combine splices": "Gabung keratan",
@@ -4709,5 +4703,9 @@
   "light it up!": "Nyalakan!",
   "my sparkler's still going": "Bunga api saya masih menyala",
   "ooh! aah!": "Ooh! Aah!",
-  "ooh, pretty!": "Wah, cantiknya!"
+  "ooh, pretty!": "Wah, cantiknya!",
+  "The settings most people change, on one page": "Tetapan yang paling kerap diubah orang, dalam satu halaman",
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "Membuka tab ini semasa Onion Board di hadapan.\nEsc = batal.",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Seret pemegang untuk memotong permulaan dan penghujung. Klik atau seret pembaris masa, atau seret penanda main, untuk alih kedudukan main. Ctrl+tatal untuk zum. Seret dengan butang kanan tetikus, atau Shift+tatal, untuk mengalih.",
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "Percuma, tanpa iklan dan tanpa akaun. Dibuat oleh OnionAlien. Sumber terbuka di bawah GNU GPL v3: gunakan, ubah dan kongsi, asalkan versi anda juga kekal sumber terbuka."
 }

@@ -780,7 +780,6 @@
   "Forgets Apps tab volumes and hidden programs.": "ลืมระดับเสียงในแท็บ แอป และโปรแกรมที่ซ่อนไว้",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "ลืมไมค์ หูฟัง ที่ที่เสียงของคุณถูกส่งไป และเอาต์พุตสตรีม การตั้งค่าด่วนจะเริ่มใหม่อีกครั้ง",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "ส่วนเสริมฟรีจาก GitHub การถอดหรือติดตั้งใหม่จะทำให้ทริกเกอร์และโทรศัพท์ที่จับคู่ของคุณยังคงอยู่",
-  "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "ฟรี ไม่มีโฆษณาและไม่ต้องมีบัญชี สร้างโดย OnionAlien ใบอนุญาต MIT พร้อม Commons Clause: ใช้ทำอะไรก็ได้ แบ่งปันได้ฟรี ห้ามขาย",
   "Frequencies": "ความถี่",
   "From the category showing (All = any sound), never the same one twice in a row. A category can have its own: right-click its tab.": "จากหมวดหมู่ที่แสดงอยู่ (ทั้งหมด = เสียงใดก็ได้) ไม่ซ้ำเสียงเดิมสองครั้งติดกัน หมวดหมู่ตั้งปุ่มของตัวเองได้: คลิกขวาที่แท็บของมัน",
   "Game voice chat": "แชทเสียงในเกม",
@@ -2438,7 +2437,6 @@
   "Free sound packs": "แพ็กเสียงฟรี",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "แพ็กเสียงฟรี (แท็บ เสียง → สำรอง) อ่านรายการแพ็กจาก GitHub และดาวน์โหลดแพ็กจากที่นั่นเมื่อคุณกด เพิ่ม",
   "It's in your sounds now": "มันอยู่ในเสียงของคุณแล้ว",
-  "Loudness": "ความดัง",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "ทำแพ็กเองเหรอ? แชร์เลย: ทุกเสียงต้องเป็น CC0 (ใช้ได้ฟรีทุกคน ไม่ต้องให้เครดิต) เมื่อตรวจสอบแล้ว มันจะแสดงที่นี่ให้ทุกคน",
   "Needs the internet: Offline mode is on (Privacy & security)": "ต้องใช้อินเทอร์เน็ต: โหมดออฟไลน์เปิดอยู่ (ความเป็นส่วนตัวและความปลอดภัย)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "ไม่มีอะไรออนไลน์เลย และทุกอย่างที่ต้องใช้อินเทอร์เน็ตจะถูกซ่อน (แท็บ วิทยุ ค้นหาเว็บ ดาวน์โหลด อัปเดต…) เอาติ๊กออกเพื่อเลือกว่าอะไรออนไลน์ได้บ้าง",
@@ -4244,7 +4242,6 @@
   "Watches your game's window while it's open, even behind others": "เฝ้าดูหน้าต่างเกมของคุณขณะที่เปิดอยู่ แม้อยู่หลังหน้าต่างอื่น",
   "Your file stays whole: only the part between the handles plays.": "ไฟล์ของคุณยังอยู่ครบ: เล่นแค่ส่วนที่อยู่ระหว่างที่จับ",
   "Main": "หลัก",
-  "Trim & speed": "ตัดเสียงและความเร็ว",
   "{group}  ·  {n} on": [
     "{group}  ·  เปิด {n}"
   ],
@@ -4259,7 +4256,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "เปลี่ยนทุกเสียงขณะเล่น บันทึกเป็นแพดใหม่จะเก็บไว้เป็นแพดของตัวเอง",
   "Play a sound first, then save it with your changes": "เล่นเสียงก่อน แล้วค่อยบันทึกพร้อมสิ่งที่เปลี่ยน",
   "Save as new pad": "บันทึกเป็นแพดใหม่",
-  "Take the Live controls effects off": "เอาเอฟเฟกต์ของ ควบคุมสด ออก",
   "{name} (modified {n})": "{name} (แก้ไข {n})",
   "{name} (modified)": "{name} (แก้ไข)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ เพิ่ม “{name}” แล้ว ความเร็วและพิตช์อยู่ในขอบเขตที่แพดบันทึกได้",
@@ -4661,7 +4657,6 @@
   "Search effects": "ค้นหาเอฟเฟกต์",
   "Show the whole sound": "แสดงเสียงทั้งหมด",
   "Speed & loudness": "ความเร็วและความดัง",
-  "The usual tabs, one at a time": "แท็บแบบเดิม ทีละแท็บ",
   "Undo ({keys})": "เลิกทำ ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "ผ่าน winget ของ Windows หรือดาวน์โหลดของ FFmpeg เอง (ประมาณ 100 MB) ปิดได้ที่ การตั้งค่า → ความเป็นส่วนตัวและความปลอดภัย",
   "Don't ask for admin each time": "ไม่ต้องขอสิทธิ์ผู้ดูแลระบบทุกครั้ง",
@@ -4677,7 +4672,6 @@
   "Save what you have now into “{name}”": "บันทึกค่าตอนนี้ลงใน “{name}”",
   "Update “{name}”": "อัปเดต “{name}”",
   "Update, reset or save as a new preset": "อัปเดต รีเซ็ต หรือบันทึกเป็นพรีเซ็ตใหม่",
-  "Drag the handles to cut off the start and end. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "ลากที่จับเพื่อตัดต้นและท้าย Ctrl+เลื่อนเพื่อซูม ลากด้วยปุ่มขวาของเมาส์ หรือ Shift+เลื่อน เพื่อขยับ",
   "Add splices": "เพิ่มช่วง",
   "Click where a part starts, then where it ends. Each part is a splice. Esc lets go of a half-made one.": "คลิกตรงที่ส่วนหนึ่งเริ่ม แล้วคลิกตรงที่มันจบ แต่ละส่วนคือหนึ่งช่วง กด Esc เพื่อยกเลิกช่วงที่ทำค้างไว้",
   "Combine splices": "รวมช่วง",
@@ -4709,5 +4703,9 @@
   "light it up!": "จุดเลย!",
   "my sparkler's still going": "ไฟเย็นของฉันยังไม่ดับ",
   "ooh! aah!": "โอ้! อ้า!",
-  "ooh, pretty!": "ว้าว สวยจัง!"
+  "ooh, pretty!": "ว้าว สวยจัง!",
+  "The settings most people change, on one page": "การตั้งค่าที่คนส่วนใหญ่ปรับ รวมไว้ในหน้าเดียว",
+  "Opens this tab while Onion Board is in front.\nEsc = cancel.": "เปิดแท็บนี้ขณะที่ Onion Board อยู่ด้านหน้า\nEsc = ยกเลิก",
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "ลากที่จับเพื่อตัดต้นและท้าย คลิกหรือลากไม้บรรทัดเวลา หรือลากเส้นตำแหน่งเล่น เพื่อย้ายจุดที่เล่น Ctrl+เลื่อนเพื่อซูม ลากด้วยปุ่มขวาของเมาส์ หรือ Shift+เลื่อน เพื่อขยับ",
+  "Free, with no ads and no account. Made by OnionAlien. Open source under the GNU GPL v3: use it, change it and share it, as long as your version stays open source too.": "ฟรี ไม่มีโฆษณาและไม่ต้องมีบัญชี สร้างโดย OnionAlien โอเพนซอร์สภายใต้ GNU GPL v3: ใช้ แก้ไข และแบ่งปันได้ ตราบใดที่เวอร์ชันของคุณยังเป็นโอเพนซอร์สด้วย"
 }
