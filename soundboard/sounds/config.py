@@ -228,7 +228,8 @@ def clean_setting(k: str, v):
         return clean_programs(v)
     if k == "net_mode":   # a mode this version doesn't know (a newer one's): fail
         return v if v in NET_MODES else "proxy"   # closed, never quietly direct
-    if k in ("net_off", "tabs_off", "tips_seen", "sidebar_order"):   # keys; unknown ones kept
+    if k in ("net_off", "tabs_off", "tips_seen", "sidebar_order",
+             "onair_shut"):   # keys; unknown ones kept
         # newer version's switch stays off after a downgrade and an upgrade
         return list(dict.fromkeys(x for x in v if isinstance(x, str) and x))
     if k == "route":   # a newer version's route: back to the cable, the safe default
@@ -490,6 +491,7 @@ class Config:
     voice_clips_expanded: bool = True   # ...folded down to their header or not
     sidebar_open: bool = True   # the tab rail opened out to show the tabs' names
     sidebar_order: list[str] = field(default_factory=list)   # stable tab keys, visual order
+    onair_shut: list[str] = field(default_factory=list)   # On Air card groups folded shut
     # 0 = sounds, 1 = radio, 2 = apps, 3 = triggers, 4 = voice, 5 = setup, 6 = store, 7 = chat
     tab: int = 0
     # Settings > Tabs: the tabs switched off ("radio", "apps", "triggers", "voice"), gone

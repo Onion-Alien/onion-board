@@ -81,6 +81,7 @@ class OutputBlock(QFrame):
     the switch."""
 
     lineClicked = Signal(str)   # a line's Settings page
+    groupToggled = Signal(str, bool)   # a group (Line.group) folded shut (True) or open
 
     LEAD = 11             # card edge to the icon column: the tab icons' centre line
     TOP = 12              # card padding over the title row (the 12 of settings cards)
@@ -94,6 +95,8 @@ class OutputBlock(QFrame):
     MIN_SCALE = 0.85      # the card scales down to fit, never smaller than this (smaller
                           # looked out of place); past that, the small card instead
     ROW_PAD = 4           # the status line's hover fill past its icon
+    HEAD_H = 24           # a group's header (Line.group): its name over its lines
+    MINI = 12             # a shut group's icons in its header, one per line
     ROW_GAP = 6           # title row to the status line's fill
     ROW_H = 34            # the status line's height, fill and all: Mute's and Stop all's
     CHEVRON = 12          # the status line's chevron: lighter than the icons
@@ -254,6 +257,11 @@ class OutputBlock(QFrame):
         # the network lines (set_lines), made as they're needed
         self._lines: list[Line] = []
         self.net: list[_NetLine] = []
+        # the groups' headers, made as they're needed; `shut`: the groups folded down to
+        # their header (the window keeps them: groupToggled)
+        self.heads: dict[str, _GroupHead] = {}
+        self.shut: set[str] = set()
+        self._order: list[QWidget] = []
         self.tight = False   # a short window: less room round the lines (_line_room)
         self.refresh()
 
@@ -448,10 +456,18 @@ class OutputBlock(QFrame):
         status = fm.horizontalAdvance(self.status_text.text())
         network = max((fm.horizontalAdvance(line.words) for line in self._lines), default=0)
         halves = 2 if self.stop is not None else 1
+        # a group's header: its arrow, name and (shut) an icon per line
+        small = QFont(self.font())
+        small.setPointSizeF(_GroupHead.PT * scale)
+        head = max((2 * px(self.PAD) + 2 * px(_GroupHead.SIDE) + px(self.CHEVRON) + px(self.GAP)
+                    + QFontMetrics(small).horizontalAdvance(group_name(g)) + 1 + px(self.GAP)
+                    + (n * (px(self.MINI) + px(_GroupHead.MINI_GAP))
+                       if g in self.shut and n > 1 else 0)
+                    for g, n in self._groups().items()), default=0)
         return max(2 * px(self.PAD) + halves * px(self.PAIR_H) + (halves - 1) * px(self.PAIR_GAP),
                    status_x + status + 1 + px(self.GAP - 2) + px(self.CHEVRON)
                    + 2 * px(self.PAD),
-                   text_x + network + 1 + 2 * px(self.PAD))
+                   text_x + network + 1 + 2 * px(self.PAD), head)
 
     def scale_for(self, width: int) -> float:
         """The biggest scale (up to 1) the card fits `width` at, or 0: not even at
@@ -575,8 +591,7 @@ class OutputBlock(QFrame):
         while len(self.net) < len(lines):
             n = _NetLine(self)
             n.clicked.connect(lambda _c=False, n=n: self.lineClicked.emit(n.page))
-            self.box.addWidget(n)
-            self.net.append(n)
+            self.net.append(n)   # (in the card in its group's place: _arrange)
             n.lay_out(expanded, self._px(self.GLYPH) if expanded else self.GLYPH, self._px)
             n.label.setStyleSheet(self.title.styleSheet())   # (the card's scale)
         self.refresh()
@@ -685,16 +700,65 @@ class OutputBlock(QFrame):
         # every line as wide as the widest, so centred they share one icon column and one
         # text keyline (several lines each centred on its own zigzagged)
         words = tuple(line.words for line in self._lines)
-        for i, n in enumerate(self.net):
-            n.setVisible(i < len(self._lines))
-            if i < len(self._lines):
-                n.label._widest = words
-                n.show_line(self._lines[i], self._px(self.GLYPH) if not small else self.GLYPH)
-                n.label.updateGeometry()
+        for i, n in enumerate(self.net[:len(self._lines)]):
+            n.label._widest = words
+            n.show_line(self._lines[i], self._px(self.GLYPH) if not small else self.GLYPH)
+            n.label.updateGeometry()
+        self._arrange(not small)
         self._line_room()
         if self.stop is not None and self.rail_stop is not None:
             self._words()
         self._pin_all()
+
+    def _groups(self) -> dict[str, int]:
+        """The groups (GROUPS order) with lines now, and how many lines each has."""
+        count = {g: sum(line.group == g for line in self._lines) for g in GROUPS}
+        return {g: n for g, n in count.items() if n}
+
+    def folds(self, group: str) -> bool:
+        """The group has an open / shut arrow: two lines or more (one line under its
+        header would fold to the same height)."""
+        return self._groups().get(group, 0) > 1
+
+    def toggle(self, group: str):
+        """Fold a group down to its header, or open it again."""
+        if not self.folds(group):
+            return
+        self.shut ^= {group}
+        self.refresh()
+        self.groupToggled.emit(group, group in self.shut)
+
+    def _arrange(self, expanded: bool):
+        """The lines in their groups' order, each group under its header (open), the
+        rest after them; a shut group shows its header alone. Shut (the small card):
+        every line's icon, no headers."""
+        groups = self._groups()
+        for g in groups:
+            if g not in self.heads:
+                head = self.heads[g] = _GroupHead(self, g)
+                head.clicked.connect(lambda _c=False, g=g: self.toggle(g))
+        lines = list(zip(self._lines, self.net))
+        order: list[QWidget] = []
+        for g in (*GROUPS, ""):
+            if g in groups:
+                order.append(self.heads[g])
+            order.extend(n for line, n in lines
+                         if line.group == g or (not g and line.group not in GROUPS))
+        if order != self._order:   # (a refresh every few seconds: re-add only on a change)
+            for w in self._order:
+                self.box.removeWidget(w)
+            for w in order:
+                self.box.addWidget(w)
+            self._order = order
+        for g, head in self.heads.items():
+            head.setVisible(expanded and g in groups)
+            if g in groups:
+                head.show_head([line for line in self._lines if line.group == g],
+                               self.folds(g), g in self.shut, self._px)
+        for i, n in enumerate(self.net):
+            line = self._lines[i] if i < len(self._lines) else None
+            n.setVisible(line is not None and not (
+                expanded and line.group in self.shut and self.folds(line.group)))
 
     def _line_room(self):
         """Open, room round the lines' hover fill and focus ring: PAIR_GAP under Mute and
@@ -721,6 +785,86 @@ class Line:
     tone: str = ""   # "ok", "warn" or "" (plain)
     full: str = ""   # the tip: what it says in full
     page: str = ""   # the Settings page a click opens
+    group: str = ""  # a GROUPS key: under that group's header, else after the groups
+
+
+# the On Air card's groups, in order: each under a header with its name, folded down to
+# it by a click once it has two lines or more
+GROUPS = ("voice", "connection")
+
+
+def group_name(group: str) -> str:
+    return {"voice": _("Voice"), "connection": _("Connection")}.get(group, group)
+
+
+class _GroupHead(QPushButton):
+    """A group's header: its name, small and quiet, over its lines; with two lines or
+    more, an arrow before it and a click folds the group down to it (its lines' icons
+    after the name then, so what's on still shows)."""
+
+    PT = 8.5        # the name's size (the hint text's)
+    SIDE = 4        # padding inside the hover fill
+    MINI_GAP = 3    # between the shut group's icons
+
+    def __init__(self, card: OutputBlock, group: str):
+        super().__init__()
+        self.card, self.key = card, group
+        self.setObjectName("railoutputsetup")
+        self.setProperty("quiet", True)
+        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        row = self.row = QHBoxLayout(self)
+        row.setSpacing(0)
+        self.arrow = card._glyph(OutputBlock.CHEVRON)
+        self.name = QLabel(group_name(group))
+        self.name.setObjectName("hint")
+        for w in (self.arrow, self.name):
+            w.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        row.addWidget(self.arrow, 0, Qt.AlignmentFlag.AlignVCenter)
+        self.gap = QSpacerItem(0, 0, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+        row.addSpacerItem(self.gap)
+        row.addWidget(self.name, 0, Qt.AlignmentFlag.AlignVCenter)
+        row.addStretch(1)
+        self.minis_box = QHBoxLayout()
+        self.minis: list[QLabel] = []
+        row.addLayout(self.minis_box)
+        self.hide()
+
+    def show_head(self, lines: list[Line], folds: bool, shut: bool, px):
+        self.name.setText(group_name(self.key))
+        self.name.setStyleSheet(f"font-size:{self.PT * self.card._scale:.2f}pt;")
+        self.setFixedHeight(px(OutputBlock.HEAD_H))
+        self.row.setContentsMargins(px(self.SIDE), 0, px(self.SIDE), 0)
+        self.minis_box.setSpacing(px(self.MINI_GAP))
+        self.arrow.setVisible(folds)
+        self.arrow.setFixedWidth(px(OutputBlock.CHEVRON))
+        self.gap.changeSize(px(OutputBlock.GAP) if folds else 0, 0,
+                            QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+        if folds:
+            icons.set_label_icon(self.arrow, "fold_open" if not shut else
+                                 "fold_back" if self.isRightToLeft() else "fold",
+                                 "muted", size=px(OutputBlock.CHEVRON))
+        # shut: an icon per line after the name, in its line's colour
+        shown = lines if folds and shut else []
+        while len(self.minis) < len(shown):
+            mini = QLabel()
+            mini.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+            self.minis_box.addWidget(mini, 0, Qt.AlignmentFlag.AlignVCenter)
+            self.minis.append(mini)
+        for i, mini in enumerate(self.minis):
+            mini.setVisible(i < len(shown))
+            if i < len(shown):
+                icons.set_label_icon(mini, shown[i].icon, {"ok": "ok_text", "warn": "warn_text"}
+                                     .get(shown[i].tone, "muted"), size=px(OutputBlock.MINI))
+        # only a header that folds is a button: the hover, the hand, the Tab order
+        self.setProperty("action", folds)
+        self.setCursor(Qt.CursorShape.PointingHandCursor if folds
+                       else Qt.CursorShape.ArrowCursor)
+        self.setFocusPolicy(Qt.FocusPolicy.TabFocus if folds else Qt.FocusPolicy.NoFocus)
+        self.setAccessibleName(group_name(self.key))
+        self.setAccessibleDescription((_("Show") if shut else _("Hide")) if folds else "")
+        self.setToolTip(", ".join(line.words for line in shown))
+        self.style().unpolish(self)
+        self.style().polish(self)
 
 
 class _NetLine(QPushButton):
