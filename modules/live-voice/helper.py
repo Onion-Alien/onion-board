@@ -184,12 +184,12 @@ def clean_parts(name: str) -> int:
     never picks one up again, so they'd sit there for good (up to the model's size,
     and fetch_model's progress would count them). A part still being written is
     open (Windows won't delete it) or recent: kept. Returns how many went."""
-    blobs = os.path.join(model_folder(name), "blobs")
-    gone = 0
     try:
+        blobs = os.path.join(model_folder(name), "blobs")
         names = os.listdir(blobs)
-    except OSError:
+    except (ImportError, OSError):     # not installed (the download says so), no parts
         return 0
+    gone = 0
     for f in names:
         # <file>.<random>.incomplete only: an older huggingface_hub's <file>.incomplete
         # is carried on from, so it stays

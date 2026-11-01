@@ -1056,12 +1056,13 @@ def test_a_dropped_connection_is_reported_as_one_not_as_a_bad_checksum(tmp_path,
     sha, size = model_package(tmp_path / "pkg.argosmodel")
     info = translation_info(tmp_path, sha, size)
     reply = _CutShort((tmp_path / "pkg.argosmodel").read_bytes())
+    real = net.urlopen
     monkeypatch.setattr(net, "urlopen", lambda *a, **k: reply)
     with pytest.raises(RuntimeError) as e:
         translation.download(info)
     assert "checksum" not in str(e.value) and "dropped" in str(e.value)
     assert not info.installed and not list(translation.base_dir().glob("*"))
-    monkeypatch.undo()                              # the internet's back: Download again
+    monkeypatch.setattr(net, "urlopen", real)       # the internet's back: Download again
     translation.download(info)
     assert info.installed
 
