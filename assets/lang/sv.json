@@ -4868,5 +4868,9 @@
   "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ Andra hör dig på {language} några sekunder senare: varje mening skrivs ner, översätts och läses sedan upp när du är klar med den. Det funkar även med AI-rösten och röstförvrängaren; din riktiga röst är tystad under tiden.",
   "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "Rösten för {language} behöver tillägget AI-röster: hämta det på fliken AI-röster.",
   "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "Rösten för {language} behöver de senaste AI-rösterna: tryck på Uppdatera AI-röster under Fler alternativ på fliken AI-röster.",
-  "({language} voice)": "(röst för {language})"
+  "({language} voice)": "(röst för {language})",
+  "Download the {language} voice": "Ladda ner rösten för {language}",
+  "{language} needs its voice to be heard: a {size} MB download.": "{language} behöver sin röst för att höras: en nedladdning på {size} MB.",
+  "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "{voice} läser {language} så länge. Rösten för {language} är en nedladdning på {size} MB.",
+  "The {language} voice, once it's downloaded (below).": "Rösten för {language}, när den är nedladdad (nedan)."
 }

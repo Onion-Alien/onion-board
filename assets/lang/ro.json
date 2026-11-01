@@ -4960,5 +4960,9 @@
   "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ Ceilalți te aud în {language} cu câteva secunde întârziere: fiecare propoziție e transcrisă, tradusă, apoi rostită după ce ai terminat-o. Merge și cu vocea AI și schimbătorul de voce; între timp vocea ta reală e pe mut.",
   "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "Vocea pentru {language} are nevoie de suplimentul Voci AI: ia-l din fila Voci AI.",
   "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "Vocea pentru {language} are nevoie de cele mai noi Voci AI: apasă Actualizează vocile AI la Mai multe opțiuni, în fila Voci AI.",
-  "({language} voice)": "(voce pentru {language})"
+  "({language} voice)": "(voce pentru {language})",
+  "Download the {language} voice": "Descarcă vocea pentru {language}",
+  "{language} needs its voice to be heard: a {size} MB download.": "{language} are nevoie de vocea sa ca să se audă: {size} MB de descărcat.",
+  "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "Deocamdată {voice} citește în {language}. Vocea pentru {language} are {size} MB de descărcat.",
+  "The {language} voice, once it's downloaded (below).": "Vocea pentru {language}, după ce e descărcată (mai jos)."
 }

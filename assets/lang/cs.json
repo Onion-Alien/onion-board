@@ -4960,5 +4960,9 @@
   "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ Ostatní tě slyší v jazyce {language} o pár sekund později: každá věta se zapíše, přeloží a vysloví, jakmile ji dořekneš. Funguje i s AI hlasem a měničem hlasu; tvůj skutečný hlas je mezitím ztlumený.",
   "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "Hlas pro jazyk {language} potřebuje doplněk AI hlasy: získej ho na kartě AI hlasy.",
   "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "Hlas pro jazyk {language} potřebuje nejnovější AI hlasy: na kartě AI hlasy stiskni pod Více možností Aktualizovat AI hlasy.",
-  "({language} voice)": "(hlas pro jazyk {language})"
+  "({language} voice)": "(hlas pro jazyk {language})",
+  "Download the {language} voice": "Stáhnout hlas pro jazyk {language}",
+  "{language} needs its voice to be heard: a {size} MB download.": "Jazyk {language} potřebuje svůj hlas, aby byl slyšet: stažení {size} MB.",
+  "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "{voice} zatím čte jazyk {language}. Hlas pro jazyk {language} je ke stažení ({size} MB).",
+  "The {language} voice, once it's downloaded (below).": "Hlas pro jazyk {language}, jakmile se stáhne (níže)."
 }

@@ -4868,5 +4868,9 @@
   "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ Naririnig ka ng iba sa {language} nang ilang segundong huli: isinusulat, tina-translate, tapos binibigkas ang bawat pangungusap kapag tapos mo na ito. Gumagana ito din sa AI voice at sa voice changer; naka-mute ang totoong boses mo habang ganito.",
   "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "Kailangan ng boses ng {language} ang add-on na Mga AI voice: kunin ito sa tab na Mga AI voice.",
   "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "Kailangan ng boses ng {language} ang pinakabagong mga AI voice: pindutin ang I-update ang mga AI voice sa Iba pang option ng tab na Mga AI voice.",
-  "({language} voice)": "(boses ng {language})"
+  "({language} voice)": "(boses ng {language})",
+  "Download the {language} voice": "I-download ang boses ng {language}",
+  "{language} needs its voice to be heard: a {size} MB download.": "Kailangan ng {language} ang boses nito para marinig: {size} MB na download.",
+  "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "Si {voice} muna ang nagbabasa ng {language}. Ang boses ng {language} ay {size} MB na download.",
+  "The {language} voice, once it's downloaded (below).": "Ang boses ng {language}, kapag na-download na ito (sa ibaba)."
 }

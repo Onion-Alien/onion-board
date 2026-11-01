@@ -4868,5 +4868,9 @@
   "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ Andre hører deg på {language} noen sekunder forsinket: hver setning skrives ned, oversettes og sies så snart du er ferdig med den. Det virker også med AI-stemmen og stemmeforvrengeren; den ekte stemmen din er dempet så lenge.",
   "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "Stemmen for {language} trenger tillegget AI-stemmer: hent det i fanen AI-stemmer.",
   "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "Stemmen for {language} trenger de nyeste AI-stemmene: trykk Oppdater AI-stemmer under Flere alternativer i fanen AI-stemmer.",
-  "({language} voice)": "(stemme for {language})"
+  "({language} voice)": "(stemme for {language})",
+  "Download the {language} voice": "Last ned stemmen for {language}",
+  "{language} needs its voice to be heard: a {size} MB download.": "{language} trenger stemmen sin for å bli hørt: en nedlasting på {size} MB.",
+  "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "{voice} leser {language} inntil videre. Stemmen for {language} er en nedlasting på {size} MB.",
+  "The {language} voice, once it's downloaded (below).": "Stemmen for {language}, når den er lastet ned (nedenfor)."
 }

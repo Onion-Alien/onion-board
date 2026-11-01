@@ -132,9 +132,9 @@ class LiveVoice(QObject):
                 if lang != "en":   # the translations go from English: Whisper's first
                     args += ["--task", "translate"]
                 args += ["--translate", str(translation.model_dir(m))]
-            # its own voice, never the Say voice (an English one read Chinese out)
-            p.ctl.live_voice = (piper.voice_id(m.language) if m.voice
-                                else p._voice_for(m) or None)
+            # its own voice (or a Windows one while it can't be read), never the Say
+            # voice: an English one read Chinese out
+            p.ctl.live_voice = p._voice_for(m) or None
         return args
 
     def _toggle_live(self, on: bool):

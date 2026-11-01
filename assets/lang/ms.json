@@ -4776,5 +4776,9 @@
   "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ Orang lain mendengar anda dalam {language} lewat beberapa saat: setiap ayat ditulis, diterjemahkan, kemudian dituturkan sebaik sahaja anda menghabiskannya. Ia berfungsi juga dengan suara AI dan penukar suara; suara sebenar anda disenyapkan sementara itu.",
   "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "Suara {language} memerlukan tambahan Suara AI: dapatkannya di tab Suara AI.",
   "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "Suara {language} memerlukan Suara AI terbaharu: tekan Kemas kini suara AI di bawah Lebih banyak pilihan pada tab Suara AI.",
-  "({language} voice)": "(suara {language})"
+  "({language} voice)": "(suara {language})",
+  "Download the {language} voice": "Muat turun suara {language}",
+  "{language} needs its voice to be heard: a {size} MB download.": "{language} memerlukan suaranya untuk didengar: muat turun {size} MB.",
+  "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "{voice} membaca {language} buat masa ini. Suara {language} ialah muat turun {size} MB.",
+  "The {language} voice, once it's downloaded (below).": "Suara {language}, selepas dimuat turun (di bawah)."
 }

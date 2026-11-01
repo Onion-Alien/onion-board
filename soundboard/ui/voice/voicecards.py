@@ -341,8 +341,9 @@ class VoiceCards(_Panel):
         return self.speech.cb_lang.currentData() or getattr(self, "_back_lang", "") or ""
 
     def _lang_bar_name(self) -> str:
+        """The voice actually reading the language: its own, or a Windows one."""
         m = self.speech._module(self._lang_code())
-        return str(m.voice.get("name") or "") if m is not None else ""
+        return self.speech.voice_name(m) if m is not None else ""
 
     def _show_lang_bar(self):
         """The language's own voice's bar: its name ("Huayan"), "(Chinese voice)" and

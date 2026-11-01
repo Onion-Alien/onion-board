@@ -4868,5 +4868,9 @@
   "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ Muut kuulevat sinut kielellä {language} muutaman sekunnin viiveellä: jokainen lause kirjoitetaan muistiin, käännetään ja puhutaan, kun olet sanonut sen loppuun. Se toimii myös tekoälypuheäänen ja äänenmuuntimen kanssa; oikea puheesi on sillä välin mykistetty.",
   "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "Kielen {language} ääni tarvitsee Tekoälypuheäänet-lisäosan: hae se Tekoälypuheäänet-välilehdeltä.",
   "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "Kielen {language} ääni tarvitsee uusimmat tekoälypuheäänet: paina Tekoälypuheäänet-välilehden Lisää vaihtoehtoja -kohdasta Päivitä tekoälypuheäänet.",
-  "({language} voice)": "(kielen {language} ääni)"
+  "({language} voice)": "(kielen {language} ääni)",
+  "Download the {language} voice": "Lataa kielen {language} ääni",
+  "{language} needs its voice to be heard: a {size} MB download.": "Kieli {language} tarvitsee äänensä, jotta se kuuluu: {size} Mt:n lataus.",
+  "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "{voice} lukee kieltä {language} toistaiseksi. Kielen {language} ääni on {size} Mt:n lataus.",
+  "The {language} voice, once it's downloaded (below).": "Kielen {language} ääni, kun se on ladattu (alla)."
 }

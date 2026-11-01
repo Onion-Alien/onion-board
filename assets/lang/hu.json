@@ -4868,5 +4868,9 @@
   "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ Mások pár másodperc késéssel hallanak téged {language} nyelven: minden mondatot leír, lefordít, majd kimond, amint befejezted. Működik az AI hanggal és a hangváltóval is; a valódi hangod közben némítva van.",
   "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "A(z) {language} hanghoz kell az AI hangok bővítmény: töltsd le az AI hangok fülön.",
   "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "A(z) {language} hanghoz a legújabb AI hangok kellenek: az AI hangok fülön a További lehetőségek alatt nyomd meg az AI hangok frissítése gombot.",
-  "({language} voice)": "({language} hang)"
+  "({language} voice)": "({language} hang)",
+  "Download the {language} voice": "A(z) {language} hang letöltése",
+  "{language} needs its voice to be heard: a {size} MB download.": "A(z) {language} nyelvhez kell a hangja, hogy hallani lehessen: {size} MB letöltés.",
+  "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "Egyelőre {voice} olvassa a(z) {language} szöveget. A(z) {language} hang {size} MB letöltés.",
+  "The {language} voice, once it's downloaded (below).": "A(z) {language} hang, ha letöltötted (lent)."
 }

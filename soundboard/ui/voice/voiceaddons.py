@@ -128,6 +128,11 @@ class VoiceAddons(_Panel):
             "get" if m is None or not m.installed
             else "update" if not (m.path / "reader.py").is_file() else "")
         self.speech._refresh_translation()
+        sp = self.speech
+        t = sp.translating()
+        if t is not None and sp.ctl.live:   # talking already: the right voice from the next line
+            sp.ctl.live_voice = sp._voice_for(t) or None
+        self._emit_active()   # the language's bar row and the AI voices' Languages cards
         self._follow_offline()
         self.addons.show_modules(self.modules)
 

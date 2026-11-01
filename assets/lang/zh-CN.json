@@ -4776,5 +4776,9 @@
   "⏱ Others hear you in {language} a few seconds late: each sentence is written down, translated, then spoken once you've finished it. It works with the AI voice and the voice changer too; your real voice is muted meanwhile.": "⏱ 别人会晚几秒听到你说{language}：每句话在你说完后会被转成文字、翻译，然后再读出来。也可以和 AI 语音、变声器一起使用；在此期间你的真实声音会被静音。",
   "The {language} voice needs the AI voices add-on: get it on the AI voices tab.": "{language}语音需要 AI 语音插件：请在 AI 语音标签页获取。",
   "The {language} voice needs the newest AI voices: press Update AI voices under More options on the AI voices tab.": "{language}语音需要最新的 AI 语音：请在 AI 语音标签页的“更多选项”里点“更新 AI 语音”。",
-  "({language} voice)": "（{language}语音）"
+  "({language} voice)": "（{language}语音）",
+  "Download the {language} voice": "下载{language}语音",
+  "{language} needs its voice to be heard: a {size} MB download.": "{language}需要自己的语音才能被听到：需下载 {size} MB。",
+  "{voice} reads {language} for now. The {language} voice is a {size} MB download.": "目前由 {voice} 朗读{language}。{language}语音需下载 {size} MB。",
+  "The {language} voice, once it's downloaded (below).": "{language}语音，下载后即可使用（见下方）。"
 }
