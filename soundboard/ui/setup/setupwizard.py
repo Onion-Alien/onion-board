@@ -212,7 +212,8 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
         self.beat_timer = QTimer(self)
         self.beat_timer.timeout.connect(self._heartbeat)
         self.beat_timer.start(BEAT_MS)
-        QApplication.instance().installEventFilter(self)
+        if (app := QApplication.instance()) is not None:
+            app.installEventFilter(self)
         if self._proc is not None:   # still installing from a guide closed mid-way
             self.bun_cable.build()
         if win._attaching:
@@ -552,7 +553,8 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
         self.timer.stop()
         self.discord_timer.stop()
         self.beat_timer.stop()
-        QApplication.instance().removeEventFilter(self)
+        if (app := QApplication.instance()) is not None:
+            app.removeEventFilter(self)
         self._count_mic_test()
         if self.setup_show.on:
             self.setup_show._stop()
