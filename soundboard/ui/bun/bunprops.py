@@ -19,22 +19,24 @@ from soundboard.style.owldraw import sparkle as _sparkle
 SWUNG = ("hammer", "hammer_broken", "wrench")   # props his arm swings with
 
 
-# His hammer arm is a V: the upper arm from his shoulder down to a still elbow, the
-# forearm up from it to the paw. Only the forearm turns, about the elbow.
-ELBOW = (75.0, 103.0)
-FOREARM = 15.0
-ARM_TURN = (20.0, 60.0)   # the forearm's lean right of straight up: raised .. on the plank
-TOOL_TURN = (66.0, 135.0)   # the tool's: up beside his head .. down on the plank
+# His hammer arm: from his shoulder down to a still elbow, then a short forearm on down
+# to his fist at the bottom of the arm. Only the forearm turns, about the elbow, and the
+# handle comes up out of his fist at a fixed angle to it (a handshake grip), so at the
+# blow the handle lies level and the head comes down flat on the plank.
+ELBOW = (69.0, 96.0)
+FOREARM = 8.5
+ARM_TURN = (75.0, 110.0)   # the forearm's turn from straight up: raised .. the blow
+GRIP_TURN = -20.0         # the handle's turn from the forearm's
 
 
 def tool_arm(swing: float) -> tuple[float, float, float]:
     """His paw (x, y) and the tool's turn (degrees) as `swing` goes 0 (raised) .. 1
     (on the plank)."""
     s = max(0.0, min(1.0, swing))
-    a = math.radians(ARM_TURN[0] + (ARM_TURN[1] - ARM_TURN[0]) * s)
+    turn = ARM_TURN[0] + (ARM_TURN[1] - ARM_TURN[0]) * s
+    a = math.radians(turn)
     return (round(ELBOW[0] + FOREARM * math.sin(a), 1),
-            round(ELBOW[1] - FOREARM * math.cos(a), 1),
-            TOOL_TURN[0] + (TOOL_TURN[1] - TOOL_TURN[0]) * s)
+            round(ELBOW[1] - FOREARM * math.cos(a), 1), turn + GRIP_TURN)
 
 
 def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0,
@@ -148,10 +150,10 @@ def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0,
         p.setPen(QPen(ROBOT_CYAN, 1.2))
         p.setBrush(QColor("#181e2b"))
         p.drawRoundedRect(GADGET_SCREEN, 1.5, 1.5)
-        _ellipse(p, 98, 113.5, 3.2, 3.2, QColor("#13ce66"), QPen(ROBOT_INK, 0.8))   # power
-        _ellipse(p, 104, 108.5, 6, 6, ROBOT_BOLT, ink)        # the bolt he's tightening
+        _ellipse(p, 105, 113.5, 3.2, 3.2, QColor("#13ce66"), QPen(ROBOT_INK, 0.8))   # power
+        _ellipse(p, 98, 108.5, 6, 6, ROBOT_BOLT, ink)        # the bolt he's tightening
         p.setPen(QPen(ROBOT_INK, 1))
-        p.drawLine(QPointF(102.3, 108.5), QPointF(105.7, 108.5))
+        p.drawLine(QPointF(96.3, 108.5), QPointF(99.7, 108.5))
         px, py, turn = tool_arm(swing)
         p.save()
         p.translate(px, py)
