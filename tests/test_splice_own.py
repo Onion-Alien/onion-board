@@ -223,16 +223,22 @@ def test_level_points_drag_a_splices_fades_volume_and_the_sounds(
     _drag(wave, _pt(wave, a, 1.0), _pt(wave, a + L * 0.05, 1.0))
     part = eff.fx()["parts"][0]
     assert abs(part["fade_in"] - L * 0.05) < L * 0.01 and "volume" not in part
-    # ...then down to half: the splice's volume
+    # ...then down to half: that corner's own level, nothing else
     _drag(wave, _pt(wave, a + L * 0.05, 1.0), _pt(wave, a + L * 0.05, 0.5))
     part = eff.fx()["parts"][0]
-    assert abs(part["volume"] - 0.5) < 0.03 and abs(part["fade_in"] - L * 0.05) < L * 0.01
-    # the fade's start point (shown now, at silence) up: it starts from half its volume
+    assert abs(part["fade_in_to"] - 0.5) < 0.03 and abs(part["fade_in"] - L * 0.05) < L * 0.01
+    assert "volume" not in part and "fade_out_from" not in part
+    # the fade's start point (shown now, at silence) up: it starts from a quarter
     _drag(wave, _pt(wave, a, 0.0), _pt(wave, a, 0.25))
-    assert abs(eff.fx()["parts"][0]["fade_in_from"] - 0.5) < 0.05
-    # the fade-out corner, sideways from the end
-    _drag(wave, _pt(wave, b, 0.5), _pt(wave, b - L * 0.1, 0.5))
+    assert abs(eff.fx()["parts"][0]["fade_in_from"] - 0.25) < 0.05
+    # the fade-out corner, sideways from the end (still at full: the in corner's
+    # level didn't move it)
+    _drag(wave, _pt(wave, b, 1.0), _pt(wave, b - L * 0.1, 1.0))
     assert abs(eff.fx()["parts"][0]["fade_out"] - L * 0.1) < L * 0.01
+    # ...then down to a fifth: the fade-in corner stays at half
+    _drag(wave, _pt(wave, b - L * 0.1, 1.0), _pt(wave, b - L * 0.1, 0.2))
+    part = eff.fx()["parts"][0]
+    assert abs(part["fade_out_from"] - 0.2) < 0.03 and abs(part["fade_in_to"] - 0.5) < 0.03
     # the sound's own line: its fade in, sideways only (the Fades sliders follow)
     _drag(wave, _pt(wave, 0.0, 1.0), _pt(wave, 1.5, 1.0))
     assert abs(d.fades()[0] - 1.5) < 0.11
@@ -245,6 +251,21 @@ def test_a_splices_fade_start_level_is_heard():
     y = soundfx.trim(x, {"splices": [[0, 1], [1, 2]], "joined": True,
                          "parts": [{"fade_in": 0.5, "fade_in_from": 0.5}, {}]})
     assert abs(abs(y[0]).max() - 0.5) < 0.02 and abs(abs(y[int(0.6 * SR)]).max() - 1) < 0.02
+
+
+def test_a_splices_corners_have_their_own_levels_and_fades_can_meet():
+    x = np.ones((30 * SR, 2), np.float32)
+    part = {"fade_in": 12.0, "fade_out": 18.0, "fade_in_to": 0.5, "fade_out_from": 0.5}
+    assert soundfx.clean_part(part) == part        # longer than a sound.s 10 s, kept
+    y = soundfx.trim(x, {"splices": [[0, 30]], "joined": True, "parts": [part]})
+    assert abs(y[0]).max() < 0.02                  # from silence
+    assert abs(abs(y[12 * SR]).max() - 0.5) < 0.02  # up to the in corner's half
+    assert abs(abs(y[12 * SR + 1]).max() - 0.5) < 0.02   # (they meet: no flat middle)
+    assert abs(abs(y[-1]).max()) < 0.02            # down to silence at the end
+    # no fades but a sloped middle: from the in corner's level to the out corner's
+    y = soundfx.trim(x, {"splices": [[0, 30]], "joined": True,
+                         "parts": [{"fade_in_to": 0.2, "fade_out_from": 1.0}]})
+    assert abs(abs(y[0]).max() - 0.2) < 0.02 and abs(abs(y[-1]).max() - 1.0) < 0.02
 
 
 def test_scrolling_zooms_the_big_waveform(window, monkeypatch):  # noqa: F811

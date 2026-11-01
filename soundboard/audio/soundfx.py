@@ -20,7 +20,10 @@ stays readable and new keys can be added without a migration:
                           speed, pitch, tape, eq, gain_db, reverse, effects, live,
                           "volume" (0..2), "fade_in" / "fade_out" (seconds) and the
                           level each fade starts from / ends at ("fade_in_from" /
-                          "fade_out_to", 0..1 of its volume, 0 = silence); {} =
+                          "fade_out_to", 0..1 of its volume, 0 = silence) and the
+                          level at each fade's top corner ("fade_in_to" /
+                          "fade_out_from", 0..1 of its volume, 1 = full; the
+                          middle slopes from one to the other); {} =
                           as it is. Used when they're joined (join), before the rest
                           of the sound's settings; older versions leave them out
      "effects": {type: {"on": bool, param: value, ...}},   any voicefx effect,
@@ -139,7 +142,8 @@ def clean_splices(raw) -> list[list[float]]:
 
 # a splice's own settings (parts): the sound's that work on one part, and these
 PART_FX = ("speed", "pitch", "tape", "eq", "gain_db", "reverse", "effects", "live")
-MAX_FADE_S = 10.0     # a splice's fade, as long as a sound's may be (config.MAX_FADE_S)
+MAX_FADE_S = 10.0     # a sound's fade (config.MAX_FADE_S)
+PART_FADE_S = 3600.0  # a splice's: as long as the splice (this only keeps it a number)
 VOLUME_RANGE = (0.0, 2.0)
 
 
@@ -153,9 +157,10 @@ def clean_part(raw) -> dict:
         out.pop("eq", None)
     if not _active_effects(f):
         out.pop("effects", None)
-    for k, lo, hi, none in (("volume", *VOLUME_RANGE, 1.0), ("fade_in", 0.0, MAX_FADE_S, 0.0),
-                            ("fade_out", 0.0, MAX_FADE_S, 0.0), ("fade_in_from", 0.0, 1.0, 0.0),
-                            ("fade_out_to", 0.0, 1.0, 0.0)):
+    for k, lo, hi, none in (("volume", *VOLUME_RANGE, 1.0), ("fade_in", 0.0, PART_FADE_S, 0.0),
+                            ("fade_out", 0.0, PART_FADE_S, 0.0), ("fade_in_from", 0.0, 1.0, 0.0),
+                            ("fade_out_to", 0.0, 1.0, 0.0), ("fade_in_to", 0.0, 1.0, 1.0),
+                            ("fade_out_from", 0.0, 1.0, 1.0)):
         try:
             v = float(raw.get(k, none))
         except (TypeError, ValueError, OverflowError):
@@ -435,16 +440,20 @@ def own(y: np.ndarray, part: dict, scale: float) -> np.ndarray:
     vol = float(part.get("volume", 1.0))
     if abs(vol - 1.0) >= 1e-3:
         y = y * F32(vol)
-    for key, level, rising in (("fade_in", "fade_in_from", True),
-                               ("fade_out", "fade_out_to", False)):
-        k = min(int(float(part.get(key, 0.0)) * SR), len(y))
-        if k > 0:   # from its level (0: silence) up to full, or back down to it
-            lo = float(part.get(level, 0.0))
-            ramp = np.linspace(lo, 1.0, k, endpoint=False, dtype=F32)[:, None]
-            if rising:
-                y[:k] *= ramp
-            else:
-                y[len(y) - k:] *= ramp[::-1]
+    # its level line: the fade in from its start level up to its corner's, a slope to
+    # the fade out's corner, down to its end level (each corner its own level)
+    n = len(y)
+    fi = min(int(float(part.get("fade_in", 0.0)) * SR), n)
+    fo = min(int(float(part.get("fade_out", 0.0)) * SR), n - fi)
+    top_in, top_out = float(part.get("fade_in_to", 1.0)), float(part.get("fade_out_from", 1.0))
+    lo_in = float(part.get("fade_in_from", 0.0)) if fi else top_in
+    lo_out = float(part.get("fade_out_to", 0.0)) if fo else top_out
+    for s, e, v0, v1 in ((0, fi, lo_in, top_in), (fi, n - fo, top_in, top_out),
+                         (n - fo, n, top_out, lo_out)):
+        if e > s and (abs(v0 - 1.0) >= 1e-3 or abs(v1 - 1.0) >= 1e-3):
+            if not y.flags.writeable:
+                y = y.copy()
+            y[s:e] *= np.linspace(v0, v1, e - s, endpoint=False, dtype=F32)[:, None]
     return y
 
 
