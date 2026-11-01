@@ -82,7 +82,9 @@ def served(monkeypatch, app_dir):
 
 def test_the_built_in_list_has_our_packs_from_our_own_releases():
     built = packs.built_in()
-    assert [(p.id, p.sounds) for p in built] == [("memes", 104), ("streamer", 57),
+    assert [(p.id, p.sounds) for p in built] == [("memes", 104), ("gaming", 110),
+                                                 ("tv-movies", 71), ("anime", 38),
+                                                 ("sports", 40), ("streamer", 57),
                                                  ("esports", 51), ("general", 483),
                                                  ("podcast", 51), ("halloween", 49),
                                                  ("gm-starter", 67)]
@@ -90,13 +92,21 @@ def test_the_built_in_list_has_our_packs_from_our_own_releases():
         assert p.links or (p.url.startswith(updates.DOWNLOADS) and len(p.sha256) == 64)
 
 
-def test_the_meme_pack_is_all_myinstants_links():
-    memes = packs.built_in()[0]
-    assert memes.links and not memes.url
-    assert len({k.url for k in memes.links}) == len({k.name for k in memes.links}) == 104
-    assert all(k.category for k in memes.links)
-    # short file names: a long one went past Windows' path limit in the temp folder
-    assert max(len(k.url.rsplit("/", 1)[1]) for k in memes.links) <= 60
+def test_the_links_packs_are_all_myinstants_links():
+    built = {p.id: p for p in packs.built_in()}
+    seen = set()
+    for pid in ("memes", "gaming", "tv-movies", "anime", "sports"):
+        p = built[pid]
+        assert p.links and not p.url
+        assert len({k.url for k in p.links}) == len({k.name for k in p.links}) == p.sounds
+        assert all(k.category for k in p.links)
+        assert set(p.categories) == {k.category for k in p.links}
+        # short file names: a long one went past Windows' path limit in the temp folder
+        assert max(len(k.url.rsplit("/", 1)[1]) for k in p.links) <= 60
+        # no sound in two packs: adding both doesn't give it twice
+        assert not seen & {k.url for k in p.links}
+        seen |= {k.url for k in p.links}
+    assert built["memes"].sounds == 104
 
 
 def test_the_repo_catalog_matches_what_the_app_ships():
@@ -167,8 +177,9 @@ def test_dialog_keeps_the_built_in_list_when_offline(qapp, served):
     net.configure_features(offline=True)
     dlg = packsdialog.PacksDialog(lambda p: None)
     try:
-        assert process_events(qapp, lambda: len(dlg.cards) == 7, 5)
-        assert [c.pack.id for c in dlg.cards] == ["memes", "streamer", "esports", "general",
+        assert process_events(qapp, lambda: len(dlg.cards) == 11, 5)
+        assert [c.pack.id for c in dlg.cards] == ["memes", "gaming", "tv-movies", "anime",
+                                                "sports", "streamer", "esports", "general",
                                                 "podcast", "halloween", "gm-starter"]
         assert dlg.note.isVisibleTo(dlg) and dlg.note.text()
         assert served.calls == []
@@ -372,17 +383,17 @@ def test_the_online_list_keeps_the_cards_of_packs_that_didnt_change(qapp):
     keep their cards now; only a new or changed pack gets a new one."""
     dlg = packsdialog.PacksDialog(lambda path: None, fetch_list=False)
     try:
-        assert process_events(qapp, lambda: len(dlg.cards) == 7, 5)
+        assert process_events(qapp, lambda: len(dlg.cards) == 11, 5)
         before = list(dlg.cards)
         dlg._show(packs.built_in(), "")
         assert dlg.cards == before and all(a is b for a, b in zip(dlg.cards, before))
         changed = packs.built_in()
         changed[1].description = "Something new"
         dlg._show(changed, "")
-        assert process_events(qapp, lambda: len(dlg.cards) == 7, 5)
+        assert process_events(qapp, lambda: len(dlg.cards) == 11, 5)
         assert [c.pack for c in dlg.cards] == changed
         assert dlg.cards[1] is not before[1]
-        assert all(dlg.cards[i] is before[i] for i in (0, 2, 3, 4, 5, 6))
+        assert all(dlg.cards[i] is before[i] for i in (0, *range(2, 11)))
         assert [dlg.list.itemAt(i).widget() for i in range(len(changed))] == dlg.cards
     finally:
         dlg.done(0)
@@ -474,11 +485,11 @@ def test_search_and_chips_filter_the_cards(qapp, monkeypatch):
     dlg = packsdialog.PacksDialog(lambda p: None, fetch_list=False)
     try:
         dlg._show(packs.parse([links_entry(id="test-links")]) + packs.built_in(), "")
-        assert process_events(qapp, lambda: len(dlg.cards) == 8, 5)
+        assert process_events(qapp, lambda: len(dlg.cards) == 12, 5)
         shown = lambda: [c.pack.id for c in dlg.cards if not c.isHidden()]  # noqa: E731
-        assert list(dlg.chip_btns) == ["", "Memes", "Streaming", "Everyday", "Gaming",
-                                       "Music", "Podcast", "Spooky", "Tabletop",
-                                       packsdialog.MINE]
+        assert list(dlg.chip_btns) == ["", "Memes", "Gaming", "Streaming", "Anime",
+                                       "Everyday", "Music", "Podcast", "Spooky", "Sports",
+                                       "Tabletop", "TV & movies", packsdialog.MINE]
         dlg.search.setText("bruh")   # a links pack's sound names are searched too
         assert shown() == ["test-links", "memes", "general"]
         dlg.search.setText("")
@@ -490,7 +501,7 @@ def test_search_and_chips_filter_the_cards(qapp, monkeypatch):
         assert dlg.views.currentWidget() is dlg.empty and "zzzz" in dlg.empty_title.text()
         dlg.btn_clear.click()
         assert dlg.search.text() == "" and dlg._filter == packsdialog.ALL
-        assert dlg.views.currentIndex() == 0 and len(shown()) == 8
+        assert dlg.views.currentIndex() == 0 and len(shown()) == 12
         dlg.set_filter(packsdialog.MINE)   # nothing added yet
         assert shown() == [] and dlg.views.currentWidget() is dlg.empty
     finally:
@@ -545,10 +556,24 @@ def myinstants(monkeypatch):
     class Site:
         gone: set = set()
         fetched: list = []
+        slept: list = []   # every wait, on a fake clock: the tests don't really wait
+        started: list = []   # the clock at each fetch
+        now = 1000.0
+
+    class Clock:
+        @staticmethod
+        def monotonic():
+            return Site.now
+
+        @staticmethod
+        def sleep(s):
+            Site.slept.append(s)
+            Site.now += s
 
     def fake(url, dest=None, progress=None, auto_update=True, direct=False, video=False,
              thumbnail=True):
         Site.fetched.append(url)
+        Site.started.append(Site.now)
         leaf = url.rsplit("/", 1)[-1]
         if leaf in Site.gone:
             raise ytdl.DownloadError("Not found")
@@ -556,9 +581,12 @@ def myinstants(monkeypatch):
         path.write_bytes(b"ID3" + bytes(200))
         return path, leaf
     monkeypatch.setattr(ytdl, "download_audio", fake)
+    monkeypatch.setattr(packs, "time", Clock)
     yield Site
     Site.gone.clear()
     Site.fetched.clear()
+    Site.slept.clear()
+    Site.started.clear()
 
 
 def test_a_links_pack_is_fetched_into_a_pack_zip_and_gone_links_are_skipped(
@@ -582,6 +610,113 @@ def test_a_links_pack_with_no_link_left_says_so_and_keeps_nothing(app_dir, myins
         packs.download_links(p)
     assert not p.path.exists() and not p.downloaded()
 
+
+
+def failing(monkeypatch, myinstants, errors: dict):
+    """download_audio raising, for each leaf, the errors listed (one per try, then fine),
+    each from `cause` like the real one (its HTTP status kept on __cause__)."""
+    from soundboard.online import ytdl
+    real = ytdl.download_audio
+
+    def fake(url, dest=None, **kw):
+        todo = errors.get(url.rsplit("/", 1)[-1])
+        if todo:
+            cause = todo.pop(0)
+            myinstants.fetched.append(url)
+            raise ytdl.DownloadError(f"Download failed ({cause})") from cause
+        return real(url, dest, **kw)
+    monkeypatch.setattr(ytdl, "download_audio", fake)
+
+
+def http(code: int, retry_after: str | None = None):
+    import email.message
+    import urllib.error
+    h = email.message.Message()
+    if retry_after is not None:
+        h["Retry-After"] = retry_after
+    return urllib.error.HTTPError("https://www.myinstants.com/x.mp3", code, "x", h, None)
+
+
+def test_a_links_packs_downloads_are_spaced_out(app_dir, myinstants):
+    p, = packs.parse([links_entry(6)])
+    packs.download_links(p)
+    assert len(myinstants.fetched) == 6
+    # six starts, each at least LINK_GAP after the one before, whichever worker took it
+    at = sorted(myinstants.started)
+    assert all(b - a >= packs.LINK_GAP - 1e-9 for a, b in zip(at, at[1:]))
+    assert packs.LINK_WORKERS <= 2
+
+
+def test_a_link_that_failed_for_now_is_tried_again_each_wait_longer(
+        app_dir, myinstants, monkeypatch):
+    import urllib.error
+    p, = packs.parse([links_entry(1)])
+    failing(monkeypatch, myinstants, {"s0.mp3": [urllib.error.URLError("reset"),
+                                                 http(503), TimeoutError("slow")]})
+    path, skipped = packs.download_links(p)
+    assert skipped == 0 and len(myinstants.fetched) == 4
+    # 2, 5 and 15 s (waited in short steps, so Cancel works meanwhile)
+    assert sum(myinstants.slept) == pytest.approx(sum(packs.LINK_RETRY_WAITS))
+
+
+def test_a_link_that_keeps_failing_is_skipped_after_its_tries(app_dir, myinstants,
+                                                              monkeypatch):
+    import urllib.error
+    p, = packs.parse([links_entry(2)])
+    failing(monkeypatch, myinstants,
+            {"s0.mp3": [urllib.error.URLError("reset")] * (len(packs.LINK_RETRY_WAITS) + 1)})
+    path, skipped = packs.download_links(p)
+    assert skipped == 1
+    assert myinstants.fetched.count("https://www.myinstants.com/media/sounds/s0.mp3") == 4
+
+
+def test_a_gone_link_is_not_asked_for_again(app_dir, myinstants, monkeypatch):
+    p, = packs.parse([links_entry(2)])
+    failing(monkeypatch, myinstants, {"s0.mp3": [http(404)]})
+    path, skipped = packs.download_links(p)
+    assert skipped == 1 and len(myinstants.fetched) == 2
+    assert sum(myinstants.slept) == pytest.approx(packs.LINK_GAP)   # no retry wait
+
+
+def test_too_many_requests_holds_every_link_as_long_as_the_site_asks(
+        app_dir, myinstants, monkeypatch):
+    p, = packs.parse([links_entry(1)])
+    failing(monkeypatch, myinstants, {"s0.mp3": [http(429, "40")]})
+    packs.download_links(p)
+    assert len(myinstants.fetched) == 2 and sum(myinstants.slept) == pytest.approx(40)
+    # a silly Retry-After is capped, a date or nonsense falls back to our own waits
+    assert packs._try_again(DownloadErrorFrom(http(429, "99999"))) == (packs.LINK_MAX_WAIT,
+                                                                       True)
+    assert packs._try_again(DownloadErrorFrom(http(429, "Wed, 21 Oct"))) == (0.0, True)
+
+
+def DownloadErrorFrom(cause):
+    from soundboard.online import ytdl
+    try:
+        raise ytdl.DownloadError("Download failed") from cause
+    except ytdl.DownloadError as e:
+        return e
+
+
+def test_once_myinstants_keeps_refusing_the_rest_isnt_asked_for(app_dir, myinstants,
+                                                                monkeypatch):
+    n = 8
+    p, = packs.parse([links_entry(n)])
+    tries = len(packs.LINK_RETRY_WAITS) + 1
+    failing(monkeypatch, myinstants,
+            {f"s{i}.mp3": [http(429, "1")] * tries for i in range(n)})
+    with pytest.raises(updates.UpdateError):
+        packs.download_links(p)
+    # LINK_GIVE_UP links refused after all their tries (a few more were already going)
+    assert len(myinstants.fetched) < n * tries
+    assert len(myinstants.fetched) <= (packs.LINK_GIVE_UP + packs.LINK_WORKERS) * tries
+
+
+def test_switched_off_or_turned_away_over_tor_isnt_tried_again():
+    from soundboard.online import ytsites
+    assert packs._try_again(ytsites.SwitchedOff("off")) is None
+    assert packs._try_again(ytsites.TorBlocked("no")) is None
+    assert packs._try_again(ytsites.DownloadError("That isn't a Myinstants sound link.")) is None
 
 def test_a_links_pack_lands_on_the_board_as_one_pack(window, qapp, myinstants):
     p, = packs.parse([links_entry(3)])
@@ -735,11 +870,11 @@ def test_every_packs_samples_are_preloaded_one_pack_at_a_time(qapp, monkeypatch)
                                   play=lambda d, g: True)
     try:
         dlg._show(packs.parse([links_entry(id="test-links")]) + packs.built_in(), "")
-        assert process_events(qapp, lambda: len(fetched) == 8 and not dlg._sampling
-                              and len(dlg.cards) == 8, 5)
+        assert process_events(qapp, lambda: len(fetched) == 12 and not dlg._sampling
+                              and len(dlg.cards) == 12, 5)
         assert sorted(fetched) == sorted(p.id for p in dlg.shown()) and max(at_once) == 1
         dlg.open_pack(dlg.cards[2].pack)
-        assert _preview_ready(qapp, dlg) and len(fetched) == 8
+        assert _preview_ready(qapp, dlg) and len(fetched) == 12
         assert dlg.preview.samples[0].text() == "Door"
     finally:
         dlg.done(0)
@@ -849,7 +984,7 @@ def test_a_cards_buttons_split_its_row_evenly(qapp):
     try:
         dlg.resize(1000, 700)
         dlg.show()
-        assert process_events(qapp, lambda: len(dlg.cards) == 7 and not dlg._stepper.isActive(), 5)
+        assert process_events(qapp, lambda: len(dlg.cards) == 11 and not dlg._stepper.isActive(), 5)
         qapp.processEvents()
         for c in dlg.cards:
             assert abs(c.btn.width() - c.btn_preview.width()) <= 1
