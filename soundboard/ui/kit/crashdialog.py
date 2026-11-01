@@ -33,6 +33,7 @@ def issue_url(title: str) -> str:
 
 
 class CrashDialog(QDialog):
+    KEEP_OPEN = True   # a click outside doesn't close it: it would lose work
     def __init__(self, rep, log_path: Path | None, parent=None):
         super().__init__(parent)
         fit.watch(self)   # grows to fit its text (ui/kit/fit.py)

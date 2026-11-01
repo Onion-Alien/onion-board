@@ -14,7 +14,7 @@ from PySide6.QtWidgets import (QDialog, QDialogButtonBox, QFormLayout, QLineEdit
 from soundboard.core import langnames, usage
 from soundboard.ui.kit import theme
 from soundboard.speech import customvoices, tts
-from soundboard.ui.kit import busy, fit
+from soundboard.ui.kit import busy, fit, modals
 from soundboard.ui.kit.panel import hint_label
 from soundboard.ui.kit.widgets import widget_at
 from soundboard.core import errors
@@ -179,7 +179,7 @@ class SpeechSay(_Panel):
     def _add_voice_server(self):
         """A small form for a TTS server's address; saved as a .json in the voices folder."""
         dlg = QDialog(self)
-        fit.watch(dlg)
+        fit.watch(modals.keep_open(dlg))   # a form: a click outside keeps it
         dlg.setWindowTitle(_("Add a voice server"))
         form = QFormLayout(dlg)
         form.addRow(hint_label(_("A text-to-speech server running on your PC. Most have an "

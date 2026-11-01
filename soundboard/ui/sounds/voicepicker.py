@@ -52,6 +52,7 @@ def describe(voice: dict) -> str:
 class VoicePicker(QDialog):
     """`save_setup(name, voice)` keeps a mix as a setup and returns its name ("" if
     it couldn't). After exec(), `voice` is the pick."""
+    KEEP_OPEN = True   # a click outside doesn't close it: it would lose work
 
     def __init__(self, cat: Catalog, current: dict, save_setup=None, parent=None):
         super().__init__(parent)
