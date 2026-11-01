@@ -367,3 +367,51 @@ def test_muted_rail_says_only_your_mic_while_the_plain_voice_still_goes(window, 
     window.set_sending(True)
     qapp.processEvents()
     assert output.mute.accessibleName() == "On" and output.caption.text() == "On"
+
+
+def test_card_lines_sit_under_their_group_headers_and_fold(window, qapp):  # noqa: F811
+    """Voice and Connection: a header over their lines always; the arrow, the click and
+    the Tab stop only with two lines or more. Shut, the lines go and the header shows
+    an icon each; it's kept in the settings."""
+    from soundboard.ui.window.onaircard import Line
+    window.resize(1275, 980)
+    window.show()
+    window.rail.set_open(True)
+    card = window.rail.output
+    clean = Line("mic", "Clean mic", "ok", page="voice:clean", group="voice")
+    fx = Line("voice", "Voice changer", "ok", page="voice:fx", group="voice")
+    tor = Line("tor", "Through Tor", "ok", page="privacy", group="connection")
+    lite = Line("leaf", "Lite mode", page="general")
+    card.set_lines([lite, tor, clean])
+    window.rail.refresh_output()
+    qapp.processEvents()
+    voice, conn = card.heads["voice"], card.heads["connection"]
+    assert voice.isVisible() and conn.isVisible()
+    # one line each: words only, never a button
+    assert not voice.arrow.isVisible() and voice.focusPolicy() == Qt.FocusPolicy.NoFocus
+    QTest.mouseClick(voice, Qt.MouseButton.LeftButton)
+    assert card.shut == set()
+    # in order: Voice and its line, Connection and its line, then the rest
+    ys = [w.geometry().top() for w in (voice, card.net[2], conn, card.net[1], card.net[0])]
+    assert ys == sorted(ys)
+    card.set_lines([clean, fx, tor, lite])
+    window.rail.refresh_output()
+    qapp.processEvents()
+    assert voice.arrow.isVisible() and voice.focusPolicy() == Qt.FocusPolicy.TabFocus
+    assert not conn.arrow.isVisible()
+    tall = card.height()
+    QTest.mouseClick(voice, Qt.MouseButton.LeftButton)
+    qapp.processEvents()
+    assert card.shut == {"voice"} and window.cfg.onair_shut == ["voice"]
+    assert not card.net[0].isVisible() and not card.net[1].isVisible()
+    assert card.net[2].isVisible() and card.net[3].isVisible()
+    assert sum(m.isVisible() for m in voice.minis) == 2 and card.height() < tall
+    # the small card (rail shut) keeps every line's icon
+    window.rail.set_open(False)
+    qapp.processEvents()
+    assert not voice.isVisible() and all(n.isVisible() for n in card.net[:4])
+    window.rail.set_open(True)
+    QTest.mouseClick(voice, Qt.MouseButton.LeftButton)
+    qapp.processEvents()
+    assert card.shut == set() and window.cfg.onair_shut == []
+    assert all(n.isVisible() for n in card.net[:4])
