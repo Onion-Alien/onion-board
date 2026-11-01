@@ -33,6 +33,7 @@ WIDE_PX = 1180      # from this wide, three columns (when they fit: fits()); nar
 FINE_PEAKS = 2400   # the big waveform's peaks: enough to zoom in sixteen times
 PICKER_COLS = 3
 EQ_TOP = 5           # px: see attach()
+QWIDGETSIZE_MAX = (1 << 24) - 1   # Qt's "no maximum"
 
 
 def key_names(key: QKeySequence.StandardKey) -> str:
@@ -423,9 +424,48 @@ class AdvancedView(QWidget):
                     if s.widget() is obj:
                         s.setMinimumWidth(self._col_w(s))
                 self.set_wide(self.fits(self.d.width()))
+                self._fit_cols()
         except Exception:  # noqa: BLE001
             pass
         return False
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        try:   # (nothing in a Qt override may raise: AGENT-RULES *Async results*)
+            self._fit_cols()
+        except Exception:  # noqa: BLE001
+            pass
+
+    def _fit_cols(self):
+        """The columns tall enough for Speed & loudness and the Equalizer whole: the
+        waveform gives up the room first, down to its floor (split by stretch alone, a
+        1320 x 880 window scrolled the equalizer for its last lines). A ceiling on the
+        waveform, not a floor under the columns: that would raise the window's least
+        size. Effects isn't counted: with effects on it grows long and scrolls, and the
+        waveform shouldn't jump with each one."""
+        top = self.editor.maximumHeight()
+        if not self.wide or len(self._scrolls) < 3 or not self.cols.isVisible():
+            if top != QWIDGETSIZE_MAX:
+                self.editor.setMaximumHeight(QWIDGETSIZE_MAX)
+            return
+        need = 0
+        for s in (self._scrolls[0], self._scrolls[2]):
+            page = s.widget()
+            if page is None or s.height() <= 0:
+                continue
+            h = page.minimumSizeHint().height()
+            if page.hasHeightForWidth():
+                h = max(h, page.heightForWidth(s.viewport().width()))
+            chrome = self.cols.height() - s.height()   # the card's title and margins
+            need = max(need, h + 2 * s.frameWidth() + chrome)
+        lay = self.layout()
+        first = lay.itemAt(0) if lay is not None else None
+        if lay is None or first is None:
+            return
+        both = self.height() - first.sizeHint().height() - 2 * lay.spacing()
+        cap = max(self.editor.minimumSizeHint().height(), both - need)
+        if cap != top:
+            self.editor.setMaximumHeight(cap)
 
     def _place(self):
         titles = (_("Speed & loudness"), _("Effects"), _("Equalizer"))
