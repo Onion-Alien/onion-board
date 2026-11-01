@@ -251,6 +251,13 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
         self.picked_name.setWordWrap(True)
         self.picked_name.setMinimumWidth(40)   # a long name gives way in a narrow window
         ph.addWidget(self.picked_name)
+        # which kind of voice it is, after its name (Robot alone didn't say)
+        self.picked_kind = QLabel(_("(Voice changer)"))
+        self.picked_kind.setObjectName("pickedkind")
+        ph.addWidget(self.picked_kind)
+        # picture, name and kind kept together on the left, on a line of their own too
+        # (narrow): no gaps opening up between them
+        self.picked_box.setAlignment(ph, Qt.AlignmentFlag.AlignLeft)
         # everything for making your own voice opens in a window of its own (on the
         # card it made the tab scroll forever)
         self.btn_tweak = QPushButton(_("Edit voice"))
@@ -855,7 +862,7 @@ class VoiceFxPanel(VoiceFxTiles, VoiceFxSaved, VoiceFxCards, QWidget):
             line = self.picked.width() - m.left() - m.right()
             line -= self._bar_extra()
             beside = (line - PICKED_ART - min(self.picked_name.sizeHint().width(), 140)
-                      - 2 * self.picked_box.spacing())
+                      - self.picked_kind.sizeHint().width() - 3 * self.picked_box.spacing())
             row, col = QBoxLayout.Direction.LeftToRight, QBoxLayout.Direction.TopToBottom
             tries = ((row, full, bd, beside), (col, full, bd, line), (col, full, "", line),
                      (col, _("Edit voice"), "", line))

@@ -1,4 +1,4 @@
-"""Free sound packs (soundboard.sounds.packs, the Free packs window): the list, the checked
+"""Free sound packs (soundboard.sounds.packs, the Free packs page): the list, the checked
 download, its switch, and a pack landing on the board. No real network: net.urlopen
 is a stand-in."""
 import hashlib
@@ -72,6 +72,7 @@ def served(monkeypatch, app_dir):
             raise OSError("no such file")
         return Response(Served.files[url])
     monkeypatch.setattr(net, "urlopen", fake_urlopen)
+    monkeypatch.setattr(packs, "_listed", {})   # (no pack names left from another test's list)
     # conftest keeps updates offline; the packs' downloads go through its fetch()
     monkeypatch.setattr(updates, "_open", lambda url, feature: fake_urlopen(
         urllib.request.Request(url), feature=feature))
@@ -142,19 +143,6 @@ def test_a_damaged_pack_zip_with_a_matching_checksum_isnt_kept(served):
     assert not p.downloaded() and not p.path.exists()
 
 
-def test_add_with_offline_mode_on_answers_the_press(qapp, served, monkeypatch):
-    toasts = []
-    monkeypatch.setattr(packsdialog.busy, "toast", lambda _w, text, *a, **k: toasts.append(text))
-    net.configure_features(offline=True)
-    dlg = packsdialog.PacksDialog(lambda p: None)
-    try:
-        dlg.add(dlg.cards[0])
-        assert toasts and "Offline mode" in toasts[0]
-        assert dlg.cards[0].btn.text() == "Add to my board" and served.calls == []
-    finally:
-        dlg.done(0)
-
-
 def test_switched_off_nothing_is_fetched(served):
     data = make_pack()
     p, = packs.parse([entry(data)])
@@ -164,25 +152,6 @@ def test_switched_off_nothing_is_fetched(served):
         packs.download(p)
     with pytest.raises(net.FeatureOff):
         packs.catalog()
-
-
-def test_dialog_lists_downloads_and_hands_the_zip_over(qapp, served):
-    data = make_pack()
-    served.files[packs.CATALOG_URL] = json.dumps({"packs": [entry(data)]}).encode()
-    served.files[entry(data)["url"]] = data
-    got = []
-    dlg = packsdialog.PacksDialog(got.append)
-    try:
-        assert process_events(qapp, lambda: [c.pack.id for c in dlg.cards] == ["horror"], 5)
-        card = dlg.cards[0]
-        assert card.btn.text() == "Add to my board"
-        assert "2 sounds" in card.meta.text() and "CC0" in card.meta.text()
-        dlg.add(card)
-        assert process_events(qapp, lambda: got, 5)
-        assert got[0].read_bytes() == data
-        assert card.pack.downloaded()
-    finally:
-        dlg.done(0)
 
 
 def test_dialog_keeps_the_built_in_list_when_offline(qapp, served):
@@ -303,19 +272,6 @@ def test_free_packs_an_older_version_stored_twice_are_cleaned_up(served):
     assert backup.drop_duplicate_packs() == 0
 
 
-def test_free_packs_hands_a_download_to_the_windows_import(window, monkeypatch, tmp_path):
-    got = []
-    monkeypatch.setattr(window.impctl, "import_files", got.append)
-
-    def fake_exec(dlg):
-        dlg._add(tmp_path / "horror.zip")   # as a finished download does
-        return 0
-    monkeypatch.setattr(packsdialog.PacksDialog, "exec", fake_exec)
-    monkeypatch.setattr(net, "allowed", lambda f: False)   # no list fetch
-    window.impctl.show_packs()
-    assert got == [[str(tmp_path / "horror.zip")]]
-
-
 # ---------------------------------------------------------------- hear it first
 
 def png_bytes() -> bytes:
@@ -386,93 +342,6 @@ def test_samples_are_fetched_once_checked_and_unpacked(served):
     assert packs.samples(packs.parse([entry(b"x")])[0]) == []   # a pack with none
 
 
-def test_the_window_plays_a_sample_to_the_headphones_and_stops_it(qapp, served):
-    data, preview = make_pack(), make_preview()
-    p = with_preview(data, preview)
-    served.files[p["preview"]["url"]] = preview
-    played = []
-    dlg = packsdialog.PacksDialog(lambda path: None, fetch_list=False,
-                                  play=lambda d, g: played.append(d is not None) or True)
-    try:
-        dlg._show(packs.parse([p]), "")
-        card = dlg.cards[0]
-        assert process_events(
-            qapp, lambda: card.samples[0].sample is not None and not dlg._fills, 5)
-        assert [b.isVisibleTo(dlg) for b in card.samples].count(True) == 2
-        assert card.samples[0].isEnabled() and card.samples[1].text() == "Dragon"
-        card.samples[0].click()
-        assert process_events(qapp, lambda: played == [True], 5)
-        assert card.samples[0].isChecked()
-        card.samples[1].click()   # another one: the first stops, this one plays
-        assert process_events(qapp, lambda: played == [True, False, True], 5)
-        assert not card.samples[0].isChecked() and card.samples[1].isChecked()
-        card.samples[1].click()   # pressed again: stopped
-        assert played[-1] is False and not card.samples[1].isChecked()
-    finally:
-        dlg.done(0)
-
-
-def test_no_headphones_says_where_to_set_them(qapp, served):
-    preview = make_preview()
-    p = with_preview(make_pack(), preview)
-    served.files[p["preview"]["url"]] = preview
-    dlg = packsdialog.PacksDialog(lambda path: None, fetch_list=False,
-                                  play=lambda d, g: d is None)   # nowhere to play it
-    try:
-        dlg._show(packs.parse([p]), "")
-        card = dlg.cards[0]
-        assert process_events(
-            qapp, lambda: card.samples[0].sample is not None and not dlg._fills, 5)
-        card.samples[0].click()
-        assert process_events(qapp, lambda: dlg.note.isVisibleTo(dlg), 5)
-        assert "headphones" in dlg.note.text() and not card.samples[0].isChecked()
-    finally:
-        dlg.done(0)
-
-
-def test_samples_that_cant_be_fetched_take_their_row_away(qapp, served):
-    p = with_preview(make_pack(), make_preview())   # nothing served: the fetch fails
-    dlg = packsdialog.PacksDialog(lambda path: None, fetch_list=False,
-                                  play=lambda d, g: True)
-    try:
-        dlg._show(packs.parse([p]), "")
-        card = dlg.cards[0]
-        assert card.listen.isVisibleTo(dlg)   # placeholders while it's fetched
-        assert process_events(qapp, lambda: not card.listen.isVisibleTo(dlg), 5)
-    finally:
-        dlg.done(0)
-
-
-def test_samples_still_land_when_the_online_list_remakes_the_cards(qapp, served, monkeypatch):
-    """The online list arriving mid-fetch remakes the cards: the samples land on the new
-    ones, from one fetch (two at once wrote the same .part file and broke both)."""
-    preview = make_preview()
-    p = with_preview(make_pack(), preview)
-    served.files[p["preview"]["url"]] = preview
-    gate, real = threading.Event(), packs.samples
-    fetched = []
-
-    def slow(pack, cancelled=None):
-        fetched.append(pack.id)
-        gate.wait(5)
-        return real(pack, cancelled)
-    monkeypatch.setattr(packs, "samples", slow)
-    dlg = packsdialog.PacksDialog(lambda path: None, fetch_list=False,
-                                  play=lambda d, g: True)
-    try:
-        dlg._show(packs.parse([p]), "")
-        dlg._show(packs.parse([p]), "")   # the online list, while it's still fetching
-        gate.set()
-        card = dlg.cards[0]
-        assert process_events(
-            qapp, lambda: card.samples[0].sample is not None and not dlg._fills, 5)
-        assert card.listen.isVisibleTo(dlg) and fetched.count("horror") == 1
-        dlg._show(packs.parse([p]), "")   # once more: shown at once, not fetched again
-        assert dlg.cards[0].samples[0].sample is not None and fetched.count("horror") == 1
-    finally:
-        dlg.done(0)
-
-
 def test_two_fetches_of_one_preview_at_once_both_get_its_samples(served):
     preview = make_preview(("Door", "Dragon"))
     p, = packs.parse([with_preview(b"x", preview)])
@@ -530,11 +399,393 @@ def test_a_pack_card_never_shows_a_window_of_its_own(qapp):
     assert shown == []
 
 
-def test_the_window_is_filled_a_piece_at_a_time(qapp, served):
-    """Built in one go (every card, then every sample's tile) it was ~80 ms of Qt work
-    back to back, and the sound playing came 10 ms late (a skip): the audio threads
-    wait on the UI thread. One card at once, then a card or a tile a step, with a rest
-    between for the audio."""
+def test_add_with_offline_mode_on_answers_the_press(qapp, served, monkeypatch):
+    toasts = []
+    monkeypatch.setattr(packsdialog.busy, "toast", lambda _w, text, *a, **k: toasts.append(text))
+    net.configure_features(offline=True)
+    dlg = packsdialog.PacksDialog(lambda p: None)
+    try:
+        dlg.add(dlg.cards[0])
+        assert toasts and "Offline mode" in toasts[0]
+        assert dlg.cards[0].btn.text() == "Add" and served.calls == []
+    finally:
+        dlg.done(0)
+
+
+def test_dialog_lists_downloads_and_hands_the_zip_over(qapp, served):
+    data = make_pack()
+    served.files[packs.CATALOG_URL] = json.dumps({"packs": [entry(data)]}).encode()
+    served.files[entry(data)["url"]] = data
+    got = []
+    dlg = packsdialog.PacksDialog(got.append)
+    try:
+        assert process_events(qapp, lambda: [c.pack.id for c in dlg.cards] == ["horror"], 5)
+        card = dlg.cards[0]
+        assert card.btn.text() == "Add" and card.btn_preview.text() == "Preview"
+        assert "2 sounds" in card.meta.text()
+        dlg.add(card)
+        assert process_events(qapp, lambda: got, 5)
+        assert got[0].read_bytes() == data
+        assert card.pack.downloaded() and card.btn.text() in ("✓ Added", "Add again")
+    finally:
+        dlg.done(0)
+
+
+def test_free_packs_is_a_page_on_the_sounds_tab(window, qapp, monkeypatch, tmp_path):
+    """Free packs takes the tabs' place (as Settings does) with the Sounds tab lit: a
+    finished download goes to the window's own import, and Back, a tab on the rail or
+    Settings go back to the board."""
+    got = []
+    monkeypatch.setattr(window.impctl, "import_files", got.append)
+    monkeypatch.setattr(net, "allowed", lambda f: False)   # no list fetch
+    window.tabs.setCurrentWidget(window.setup_page)
+    dlg = window.impctl.show_packs()
+    assert window._content.currentWidget() is dlg and window.impctl.packs_open()
+    assert window.tabs.currentWidget() is window.sounds_page
+    dlg._add(tmp_path / "horror.zip")   # as a finished download does
+    assert got == [[str(tmp_path / "horror.zip")]]
+    dlg.btn_done.click()
+    assert process_events(qapp, lambda: not window.impctl.packs_open(), 5)
+    assert window._content.currentWidget() is window._tabs_area
+    window.impctl.show_packs()
+    window.tabs.setCurrentWidget(window.radio_page)   # a tab picked on the rail
+    assert process_events(qapp, lambda: not window.impctl.packs_open(), 5)
+    window.impctl.show_packs()
+    window.setctl.open_settings("audio")
+    assert process_events(qapp, lambda: not window.impctl.packs_open(), 5)
+    assert window.setctl.settings_open()
+    window.setctl.close_settings()
+
+
+# ---------------------------------------------------------------- search and filters
+
+def test_search_and_chips_filter_the_cards(qapp, monkeypatch):
+    dlg = packsdialog.PacksDialog(lambda p: None, fetch_list=False)
+    try:
+        dlg._show(packs.parse([links_entry()]) + packs.built_in(), "")
+        assert process_events(qapp, lambda: len(dlg.cards) == 7, 5)
+        shown = lambda: [c.pack.id for c in dlg.cards if not c.isHidden()]  # noqa: E731
+        assert list(dlg.chip_btns) == ["", "Memes", "Streaming", "Everyday", "Gaming",
+                                       "Music", "Podcast", "Spooky", "Tabletop",
+                                       packsdialog.MINE]
+        dlg.search.setText("bruh")   # a links pack's sound names are searched too
+        assert shown() == ["memes", "general"]
+        dlg.search.setText("")
+        dlg.set_filter("Streaming")
+        assert shown() == ["streamer", "esports"]
+        dlg.search.setText("arena crowd")   # every word, anywhere in the pack
+        assert shown() == ["esports"]
+        dlg.search.setText("zzzz")
+        assert dlg.views.currentWidget() is dlg.empty and "zzzz" in dlg.empty_title.text()
+        dlg.btn_clear.click()
+        assert dlg.search.text() == "" and dlg._filter == packsdialog.ALL
+        assert dlg.views.currentIndex() == 0 and len(shown()) == 7
+        dlg.set_filter(packsdialog.MINE)   # nothing added yet
+        assert shown() == [] and dlg.views.currentWidget() is dlg.empty
+    finally:
+        dlg.done(0)
+
+
+# ---------------------------------------------------------------- links packs
+
+def links_entry(n: int = 3, **kw) -> dict:
+    d = {"id": "memes", "name": "Meme sounds", "tags": ["Memes"],
+         "description": "Meme sounds.",
+         "links": [{"name": ["Vine boom", "Bruh", "Oh no"][i % 3] + ("" if i < 3 else f" {i}"),
+                    "category": "Memes",
+                    "url": f"https://www.myinstants.com/media/sounds/s{i}.mp3"}
+                   for i in range(n)]}
+    d.update(kw)
+    return d
+
+
+def test_a_links_pack_keeps_only_myinstants_mp3s():
+    mi = "https://www.myinstants.com/media/sounds/"
+    good = {"name": "Bruh", "url": mi + "bruh.mp3", "category": "Memes"}
+    bad = [{"name": "Evil", "url": "https://evil.example/media/sounds/x.mp3"},
+           {"name": "Page", "url": "https://www.myinstants.com/en/instant/bruh/"},
+           {"name": "Query", "url": mi + "x.mp3?a=1"},
+           {"name": "Up", "url": mi + "..%2f..%2fx.mp3"},
+           {"name": "Deep", "url": mi + "a/b.mp3"},
+           {"name": "Stream", "url": mi + "x.mp3:evil"},
+           {"name": "", "url": mi + "noname.mp3"},
+           {"url": mi + "missing-name.mp3"}, "not a dict",
+           good]   # twice: kept once
+    p, = packs.parse([links_entry(0, links=[good, *bad])])
+    assert [(k.name, k.url) for k in p.links] == [("Bruh", mi + "bruh.mp3")]
+    assert p.sounds == 1 and p.categories == ["Memes"] and p.url == "" and p.sha256 == ""
+    # no links that count and no zip: not a pack
+    assert packs.parse([links_entry(0, links=bad[:3])]) == []
+
+
+def test_older_versions_skip_a_links_pack():
+    """An older version reads "url" and "sha256" straight off each entry: a links pack
+    has neither, so it was left out there (not shown broken)."""
+    raw = links_entry()
+    assert "url" not in raw and "sha256" not in raw
+
+
+@pytest.fixture
+def myinstants(monkeypatch):
+    """ytdl.download_audio stands in for Myinstants: links whose leaf is in `gone`
+    fail, the rest come back as a small MP3. Records every link fetched."""
+    from soundboard.online import ytdl
+
+    class Site:
+        gone: set = set()
+        fetched: list = []
+
+    def fake(url, dest=None, progress=None, auto_update=True, direct=False, video=False,
+             thumbnail=True):
+        Site.fetched.append(url)
+        leaf = url.rsplit("/", 1)[-1]
+        if leaf in Site.gone:
+            raise ytdl.DownloadError("Not found")
+        path = dest / leaf
+        path.write_bytes(b"ID3" + bytes(200))
+        return path, leaf
+    monkeypatch.setattr(ytdl, "download_audio", fake)
+    yield Site
+    Site.gone.clear()
+    Site.fetched.clear()
+
+
+def test_a_links_pack_is_fetched_into_a_pack_zip_and_gone_links_are_skipped(
+        app_dir, myinstants):
+    p, = packs.parse([links_entry(4)])
+    myinstants.gone = {"s1.mp3"}
+    seen = []
+    path, skipped = packs.download_links(p, lambda done, total: seen.append((done, total)))
+    assert path == p.path and skipped == 1
+    assert seen[-1] == (4, 4) and len(seen) == 4
+    pkg = backup.read(path)
+    assert [ps.entry["name"] for ps in pkg.sounds] == ["Vine boom", "Oh no", "Vine boom 3"]
+    assert all(ps.entry["tags"] == ["Memes"] for ps in pkg.sounds)
+    assert not list(path.parent.glob("*.part"))
+
+
+def test_a_links_pack_with_no_link_left_says_so_and_keeps_nothing(app_dir, myinstants):
+    p, = packs.parse([links_entry(2)])
+    myinstants.gone = {"s0.mp3", "s1.mp3"}
+    with pytest.raises(updates.UpdateError, match="Not found"):
+        packs.download_links(p)
+    assert not p.path.exists() and not p.downloaded()
+
+
+def test_a_links_pack_lands_on_the_board_as_one_pack(window, qapp, myinstants):
+    p, = packs.parse([links_entry(3)])
+    path = packs.download(p)
+    before = len(window.cfg.sounds)
+    window.impctl.import_files([str(path)])
+    assert process_events(qapp, lambda: len(window.cfg.sounds) == before + 3, 10)
+    added = window.cfg.sounds[before:]
+    assert [m.name for m in added] == ["Vine boom", "Bruh", "Oh no"]
+    assert len({m.pack for m in added}) == 1 and added[0].pack
+    assert "Memes" in window.cfg.categories
+
+
+def test_a_links_packs_samples_are_its_first_links_fetched_once(app_dir, myinstants):
+    p, = packs.parse([links_entry(packs.SAMPLES + 3)])
+    found = packs.samples(p)
+    assert [s.name for s in found] == [k.name for k in p.links[:packs.SAMPLES]]
+    assert all(s.audio.is_file() and s.picture == b"" for s in found)
+    assert len(myinstants.fetched) == packs.SAMPLES
+    assert [s.name for s in packs.samples(p)] == [s.name for s in found]
+    assert len(myinstants.fetched) == packs.SAMPLES   # kept: not fetched again
+
+
+def test_the_page_shows_a_links_packs_progress_and_skipped_count(qapp, app_dir, myinstants,
+                                                               monkeypatch):
+    toasts, got = [], []
+    monkeypatch.setattr(packsdialog.busy, "toast", lambda _w, text, *a, **k: toasts.append(text))
+    monkeypatch.setattr(net, "allowed", lambda f: True)
+    myinstants.gone = {"s2.mp3"}
+    dlg = packsdialog.PacksDialog(got.append, fetch_list=False)
+    try:
+        dlg._show(packs.parse([links_entry(3)]), "")
+        card = dlg.cards[0]
+        texts = []
+        real = dlg._show_progress
+        monkeypatch.setattr(dlg, "_show_progress",
+                            lambda pid: (real(pid), texts.append(card.btn.text())))
+        dlg.add(card)
+        assert process_events(qapp, lambda: got, 5)
+        assert "3 of 3" in texts
+        assert any("1 sound is gone from Myinstants" in t for t in toasts)
+    finally:
+        dlg.done(0)
+
+
+# ---------------------------------------------------------------- the preview
+
+
+def _preview_ready(qapp, dlg):
+    return process_events(qapp, lambda: dlg.preview is not None
+                          and dlg.preview.samples[0].sample is not None and not dlg._fills, 5)
+
+
+def test_the_preview_plays_a_sample_to_the_headphones_and_stops_it(qapp, served):
+    data, preview = make_pack(), make_preview()
+    p = with_preview(data, preview)
+    served.files[p["preview"]["url"]] = preview
+    played = []
+    dlg = packsdialog.PacksDialog(lambda path: None, fetch_list=False,
+                                  play=lambda d, g: played.append(d is not None) or True)
+    try:
+        dlg._show(packs.parse([p]), "")
+        dlg.cards[0].btn_preview.click()
+        assert _preview_ready(qapp, dlg)
+        pads = dlg.preview.samples
+        assert [b.isVisibleTo(dlg.preview) for b in pads].count(True) == 2
+        assert pads[0].isEnabled() and pads[1].text() == "Dragon"
+        pads[0].click()
+        assert process_events(qapp, lambda: played == [True], 5)
+        assert pads[0].isChecked()
+        pads[1].click()   # another one: the first stops, this one plays
+        assert process_events(qapp, lambda: played == [True, False, True], 5)
+        assert not pads[0].isChecked() and pads[1].isChecked()
+        pads[1].click()   # pressed again: stopped
+        assert played[-1] is False and not pads[1].isChecked()
+        pads[0].click()
+        assert process_events(qapp, lambda: played[-1] is True, 5)
+        dlg.preview.btn_close.click()   # closed while one plays: it stops
+        assert dlg.preview is None and played[-1] is False
+    finally:
+        dlg.done(0)
+
+
+def test_the_preview_adds_the_pack(qapp, served):
+    data = make_pack()
+    served.files[entry(data)["url"]] = data
+    got = []
+    dlg = packsdialog.PacksDialog(got.append, fetch_list=False)
+    try:
+        dlg._show(packs.parse([entry(data)]), "")
+        dlg.open_pack(dlg.cards[0].pack)
+        assert dlg.preview.btn.text() == "Add to my board"
+        dlg.preview.btn.click()
+        assert process_events(qapp, lambda: got, 5)
+        assert dlg.preview is None   # added: the board's import reports it from here
+        assert dlg.cards[0].btn.text() in ("✓ Added", "Add again")
+    finally:
+        dlg.done(0)
+
+
+def test_no_headphones_says_where_to_set_them(qapp, served):
+    preview = make_preview()
+    p = with_preview(make_pack(), preview)
+    served.files[p["preview"]["url"]] = preview
+    dlg = packsdialog.PacksDialog(lambda path: None, fetch_list=False,
+                                  play=lambda d, g: d is None)   # nowhere to play it
+    try:
+        dlg._show(packs.parse([p]), "")
+        dlg.open_pack(dlg.cards[0].pack)
+        assert _preview_ready(qapp, dlg)
+        dlg.preview.samples[0].click()
+        assert process_events(qapp, lambda: dlg.note.isVisibleTo(dlg), 5)
+        assert "headphones" in dlg.note.text() and not dlg.preview.samples[0].isChecked()
+    finally:
+        dlg.done(0)
+
+
+def test_samples_that_cant_be_fetched_say_so_and_add_still_works(qapp, served):
+    p = with_preview(make_pack(), make_preview())   # nothing served: the fetch fails
+    dlg = packsdialog.PacksDialog(lambda path: None, fetch_list=False,
+                                  play=lambda d, g: True)
+    try:
+        dlg._show(packs.parse([p]), "")
+        dlg.open_pack(dlg.cards[0].pack)
+        pads = dlg.preview.samples
+        assert pads[0].isVisibleTo(dlg.preview)   # placeholders while it's fetched
+        assert process_events(qapp, lambda: not pads[0].isVisibleTo(dlg.preview), 5)
+        assert "Couldn't load" in dlg.preview.listen_hint.text()
+        assert dlg.preview.btn.isEnabled()
+    finally:
+        dlg.done(0)
+
+
+def test_every_packs_samples_are_preloaded_one_pack_at_a_time(qapp, monkeypatch):
+    """The page fetches each pack's samples in the background as soon as it's up (one
+    pack at a time): a preview opened later has its pads at once, nothing fetched."""
+    fetched, at_once, busy_now = [], [], [0]
+    gate = threading.Lock()
+
+    def slow(pack, cancelled=None):
+        with gate:
+            busy_now[0] += 1
+            at_once.append(busy_now[0])
+        fetched.append(pack.id)
+        threading.Event().wait(0.02)
+        with gate:
+            busy_now[0] -= 1
+        return [packs.Sample("Door", b"", packs.previews_dir() / "x.wav")]
+    monkeypatch.setattr(packs, "samples", slow)
+    dlg = packsdialog.PacksDialog(lambda path: None, fetch_list=False,
+                                  play=lambda d, g: True)
+    try:
+        dlg._show(packs.parse([links_entry()]) + packs.built_in(), "")
+        assert process_events(qapp, lambda: len(fetched) == 7 and not dlg._sampling
+                              and len(dlg.cards) == 7, 5)
+        assert sorted(fetched) == sorted(p.id for p in dlg.shown()) and max(at_once) == 1
+        dlg.open_pack(dlg.cards[2].pack)
+        assert _preview_ready(qapp, dlg) and len(fetched) == 7
+        assert dlg.preview.samples[0].text() == "Door"
+    finally:
+        dlg.done(0)
+
+
+def test_samples_still_land_when_the_online_list_remakes_the_cards(qapp, served, monkeypatch):
+    """The online list arriving mid-fetch remakes the cards: the samples still land on
+    the open preview, from one fetch (two at once wrote the same .part file and broke
+    both)."""
+    preview = make_preview()
+    p = with_preview(make_pack(), preview)
+    served.files[p["preview"]["url"]] = preview
+    gate, real = threading.Event(), packs.samples
+    fetched = []
+
+    def slow(pack, cancelled=None):
+        fetched.append(pack.id)
+        gate.wait(5)
+        return real(pack, cancelled)
+    monkeypatch.setattr(packs, "samples", slow)
+    dlg = packsdialog.PacksDialog(lambda path: None, fetch_list=False,
+                                  play=lambda d, g: True)
+    try:
+        dlg._show(packs.parse([p]), "")
+        dlg.open_pack(dlg.cards[0].pack)
+        changed = packs.parse([p])
+        changed[0].description = "New words"
+        dlg._show(changed, "")   # the online list, while it's still fetching
+        gate.set()
+        assert _preview_ready(qapp, dlg) and fetched.count("horror") == 1
+        dlg.close_pack()
+        dlg.open_pack(dlg.cards[0].pack)   # again: at once, not fetched again
+        assert _preview_ready(qapp, dlg) and fetched.count("horror") == 1
+    finally:
+        dlg.done(0)
+
+
+def test_escape_closes_the_preview_first_then_the_page(qapp):
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    dlg = packsdialog.PacksDialog(lambda path: None, fetch_list=False)
+    try:
+        dlg.open_pack(dlg.cards[0].pack)
+        assert dlg.preview is not None
+        QTest.keyClick(dlg, Qt.Key.Key_Escape)
+        assert dlg.preview is None and not dlg._closed
+        QTest.keyClick(dlg, Qt.Key.Key_Escape)
+        assert dlg._closed
+    finally:
+        dlg.done(0)
+
+
+def test_the_page_is_filled_a_piece_at_a_time(qapp, served):
+    """Built in one go (every card, then every pad) it was ~80 ms of Qt work back to
+    back, and the sound playing came 10 ms late (a skip): the audio threads wait on
+    the UI thread. One card at once, then a card or a pad a step, with a rest between
+    for the audio."""
     preview = make_preview(("Door", "Dragon"))
     served.files[with_preview(b"x", preview)["preview"]["url"]] = preview
     shown = [with_preview(make_pack(), preview, id=f"p{i}", name=f"Pack {i}")
@@ -543,24 +794,26 @@ def test_the_window_is_filled_a_piece_at_a_time(qapp, served):
                                   play=lambda d, g: True)
     try:
         dlg._show(packs.parse(shown), "")
-        assert len(dlg.cards) == 1   # the rest wait their turn: the window isn't empty
+        assert len(dlg.cards) == 1   # the rest wait their turn: the page isn't empty
+        dlg.open_pack(packs.parse(shown)[0])
         steps = []
         real = dlg._step
 
+        def count():
+            pads = dlg.preview.samples if dlg.preview else []
+            return len(dlg.cards) + sum(b.sample is not None for b in pads)
+
         def step():
-            before = (len(dlg.cards), sum(b.sample is not None
-                                          for c in dlg.cards for b in c.samples))
+            before = count()
             real()
-            after = (len(dlg.cards), sum(b.sample is not None
-                                         for c in dlg.cards for b in c.samples))
-            steps.append((after[0] - before[0]) + (after[1] - before[1]))
+            steps.append(count() - before)
         dlg._stepper.timeout.disconnect()
         dlg._stepper.timeout.connect(step)
-        assert process_events(qapp, lambda: len(dlg.cards) == 3 and all(
-            c.samples[1].sample is not None for c in dlg.cards), 5)
+        assert process_events(qapp, lambda: len(dlg.cards) == 3
+                              and dlg.preview.samples[1].sample is not None, 5)
         assert [c.pack.id for c in dlg.cards] == ["p0", "p1", "p2"]
         assert [dlg.list.itemAt(i).widget() for i in range(3)] == dlg.cards
-        assert steps and max(steps) == 1   # one card or one tile a step, never more
+        assert steps and max(steps) == 1   # one card or one pad a step, never more
     finally:
         dlg.done(0)
 
@@ -570,12 +823,25 @@ def test_the_pack_cards_keep_clear_of_the_scroll_bar(qapp):
     try:
         dlg.resize(780, 500)
         dlg.show()
-        dlg._show(packs.built_in(), "")
         bar = dlg.scroll_area.verticalScrollBar()
         assert process_events(qapp, lambda: bar.maximum() > 0, 5)
-        assert dlg.list.contentsMargins().right() == 10
-        dlg.resize(780, 4000)   # everything fits: no bar, cards line up with the share card
+        assert dlg.body.layout().contentsMargins().right() == 10
+        dlg.resize(780, 4000)   # everything fits: no bar, cards to the page's edge
         assert process_events(qapp, lambda: bar.maximum() == 0, 5)
-        assert dlg.list.contentsMargins().right() == 0
+        assert dlg.body.layout().contentsMargins().right() == 0
+    finally:
+        dlg.close()
+
+
+def test_a_cards_buttons_split_its_row_evenly(qapp):
+    dlg = packsdialog.PacksDialog(lambda p: None, fetch_list=False)
+    try:
+        dlg.resize(1000, 700)
+        dlg.show()
+        assert process_events(qapp, lambda: len(dlg.cards) == 6 and not dlg._stepper.isActive(), 5)
+        qapp.processEvents()
+        for c in dlg.cards:
+            assert abs(c.btn.width() - c.btn_preview.width()) <= 1
+            assert c.btn.x() < c.btn_preview.x()
     finally:
         dlg.close()

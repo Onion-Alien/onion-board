@@ -1,6 +1,8 @@
-"""The *Free sound packs* window (Sounds tab → Backup): ready-made boards anyone can
-add in one click (soundboard.sounds.packs), a few of each pack's sounds to try first (to your
-headphones only), and where to share one of your own."""
+"""The *Free sound packs* page (Sounds tab → Backup; in the tabs' place, like Settings):
+ready-made boards anyone can add in one click (soundboard.sounds.packs). A search box and
+filter chips over a grid of small cards; a card (or its Preview) opens a small window with
+what's in it and a few of its sounds as pads to try first (to your headphones only). Every
+pack's samples are fetched in the background once the page is up, so they're ready."""
 from __future__ import annotations
 
 import html
@@ -11,11 +13,11 @@ from collections.abc import Callable
 from pathlib import Path
 
 import numpy as np
-from PySide6.QtCore import QRectF, QSize, Qt, QTimer, QUrl, Signal
-from PySide6.QtGui import QDesktopServices, QIcon, QPainter, QPainterPath, QPixmap
-from PySide6.QtWidgets import (QDialog, QDialogButtonBox, QFrame, QGridLayout, QHBoxLayout,
-                               QLabel, QPushButton, QScrollArea, QSizePolicy, QVBoxLayout,
-                               QWidget)
+from PySide6.QtCore import QEvent, QRectF, QSize, Qt, QTimer, QUrl, Signal
+from PySide6.QtGui import (QDesktopServices, QFont, QIcon, QPainter, QPainterPath, QPixmap)
+from PySide6.QtWidgets import (QButtonGroup, QDialog, QFrame, QGridLayout, QHBoxLayout,
+                               QLabel, QLineEdit, QPushButton, QScrollArea, QSizePolicy,
+                               QStackedWidget, QVBoxLayout, QWidget)
 
 from soundboard.core import errors, updates
 from soundboard.sounds import library, packs
@@ -23,8 +25,8 @@ from soundboard.online import net
 from soundboard.audio.engine import SR
 from soundboard.ui.bun import bunacts
 from soundboard.ui.kit import busy, fit, icons
-from soundboard.ui.kit.panel import hint_label
-from soundboard.ui.kit.widgets import take_out
+from soundboard.ui.kit.panel import HoverCard, hint_label, section_label
+from soundboard.ui.kit.panellayouts import CardGrid, Flow
 from soundboard.ui.kit.plaintext import plain_tip
 from soundboard.i18n import _, ngettext
 
@@ -32,8 +34,13 @@ log = logging.getLogger(__name__)
 
 PIC = 32          # px: a sample's picture on its button
 SAMPLE_COLS = 3   # sample buttons a row
-WIDTH = 620       # the window: DESIGN's widest dialog
-# The window is filled a piece at a time (a pack's card, one sample's tile) with this
+ART = 44          # px: a pack's emoji tile on its card (the pack's own view: ART_BIG)
+ART_BIG = 64
+PAD_H = 56        # px: a preview's pads
+CARD_MIN_W = 250  # the cards: as many a row as fit at this width
+CARD_GAP = 12
+SEARCH_MAX_W = 480
+# The page is filled a piece at a time (a pack's card, one sample's tile) with this
 # long a rest between pieces. Built in one go it was ~80 ms of back-to-back Qt work,
 # and the audio threads wait on the UI thread through all of it: with a few sounds
 # playing, blocks came 10 ms late, a skip.
@@ -41,18 +48,59 @@ STEP_GAP_MS = 4
 # plays a sample to your headphones only at a gain (None stops it); False when it
 # couldn't (no headphones set)
 Play = Callable[[np.ndarray | None, float], bool]
+ALL, MINE = "", "\0mine"   # the filter chips that aren't a pack tag
 
 
 def size_text(n: int) -> str:
     return _("{n} MB", n=max(1, round(n / 1e6))) if n else ""
 
 
-def meta_line(p: packs.Pack) -> str:
-    """"67 sounds · 28 MB · CC0 · by Onion Board"."""
-    bits = [ngettext("{n} sound", "{n} sounds", p.sounds) if p.sounds else "",
-            size_text(p.size), p.license,
-            _("by {name}", name=p.author) if p.author else ""]
+def meta_line(p: packs.Pack, licence: bool = True) -> str:
+    """"67 sounds · 28 MB · CC0 · by Onion Board"; a links pack "100 sounds · from
+    Myinstants"."""
+    bits = [ngettext("{n} sound", "{n} sounds", p.sounds) if p.sounds else ""]
+    if p.links:
+        bits.append(_("from Myinstants"))
+    else:
+        bits.append(size_text(p.size))
+        if licence:
+            bits.append(p.license)
+    if licence and p.author:
+        bits.append(_("by {name}", name=p.author))
     return " · ".join(b for b in bits if b)
+
+
+def matches(p: packs.Pack, words: list[str]) -> bool:
+    """Every word of a search is somewhere in the pack: its name, words, categories,
+    kind or (a links pack) its sounds' names."""
+    hay = " ".join([p.name, p.description, p.author, *p.categories, *p.tags,
+                    *(k.name for k in p.links)]).casefold()
+    return all(w in hay for w in words)
+
+
+def emoji_art(emoji: str, size: int, dpr: float = 1.0) -> QPixmap:
+    """A pack's emoji drawn as a picture `size` px square (a picture, not text: it
+    doesn't follow the text size)."""
+    pm = QPixmap(round(size * dpr), round(size * dpr))
+    pm.setDevicePixelRatio(dpr)
+    pm.fill(Qt.GlobalColor.transparent)
+    p = QPainter(pm)
+    f = QFont("Segoe UI Emoji")
+    f.setPixelSize(round(size * 0.62))
+    p.setFont(f)
+    p.drawText(QRectF(0, 0, size, size), Qt.AlignmentFlag.AlignCenter, emoji)
+    p.end()
+    return pm
+
+
+def art_label(emoji: str, size: int) -> QLabel:
+    lbl = QLabel()
+    lbl.setObjectName("packart")   # a soft accent tile (themesheet.py)
+    lbl.setFixedSize(size, size)
+    lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    lbl.setPixmap(emoji_art(emoji, size, lbl.devicePixelRatioF()))
+    lbl.setAccessibleName("")
+    return lbl
 
 
 def rounded(png: bytes, size: int) -> QIcon | None:
@@ -72,6 +120,57 @@ def rounded(png: bytes, size: int) -> QIcon | None:
     p.drawPixmap((size - src.width()) // 2, (size - src.height()) // 2, src)
     p.end()
     return QIcon(out)
+
+
+class ClampedLabel(QLabel):
+    """Hint text cut to `lines` lines with "…" (a card's description)."""
+
+    def __init__(self, text: str, lines: int = 2):
+        super().__init__()
+        self.setObjectName("hint")
+        self.setTextFormat(Qt.TextFormat.PlainText)
+        self.setWordWrap(True)
+        self.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        self.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
+        self._full, self._lines = text, lines
+        self.setToolTip("")
+        self._clamp()
+
+    def _clamp(self):
+        fm = self.fontMetrics()
+        self.setFixedHeight(fm.lineSpacing() * self._lines + 2)
+        w = self.width() if self.isVisible() else CARD_MIN_W - 28
+        if w <= 0:
+            return
+        flags = int(Qt.TextFlag.TextWordWrap)
+        room = fm.lineSpacing() * self._lines + 1
+        text = self._full
+        if fm.boundingRect(0, 0, w, 10_000, flags, text).height() > room:
+            lo, hi = 0, len(text)
+            while lo < hi:   # the longest start that fits with "…" after it
+                mid = (lo + hi + 1) // 2
+                if fm.boundingRect(0, 0, w, 10_000, flags,
+                                   text[:mid].rstrip() + "…").height() <= room:
+                    lo = mid
+                else:
+                    hi = mid - 1
+            text = text[:lo].rstrip(" ,.;:") + "…"
+        self.setText(text)
+
+    def changeEvent(self, e):
+        super().changeEvent(e)
+        if e.type() in (QEvent.Type.FontChange, QEvent.Type.StyleChange):
+            try:
+                self._clamp()
+            except Exception:  # noqa: BLE001 - never raise from a Qt override
+                log.debug("couldn't fit a pack's words", exc_info=True)
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        try:
+            self._clamp()
+        except Exception:  # noqa: BLE001 - never raise from a Qt override
+            log.debug("couldn't fit a pack's words", exc_info=True)
 
 
 class SampleButton(QPushButton):
@@ -117,97 +216,216 @@ class SampleButton(QPushButton):
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
-        self._fit_name()
+        try:
+            self._fit_name()
+        except Exception:  # noqa: BLE001 - never raise from a Qt override
+            log.debug("couldn't fit a sample's name", exc_info=True)
 
 
-class PackCard(QFrame):
+def _add_button(primary: bool) -> QPushButton:
+    b = QPushButton()
+    if primary:
+        b.setObjectName("primary")
+    return b
+
+
+def _show_add(btn: QPushButton, pack: packs.Pack, short: bool = False):
+    """A pack's Add button, idle: Add (to my board), or (added before) Add again. `short`:
+    a card's, one word (the rest in its tooltip)."""
+    added = pack.downloaded()
+    btn.setText(_("Add again") if added else _("Add") if short else _("Add to my board"))
+    btn.setToolTip(
+        _("Adds its sounds again; ones already on your board are skipped") if added else
+        ngettext("Downloads its {n} sound from Myinstants and puts it on your board",
+                 "Downloads its {n} sounds from Myinstants and puts them on your board, "
+                 "each category as its own tab", len(pack.links)) if pack.links else
+        _("Downloads the pack ({size}) and puts its sounds on your board, each "
+          "category as its own tab", size=size_text(pack.size) or "?"))
+    icons.set_icon(btn, "check" if added else "download",
+                   "on_accent" if btn.objectName() == "primary" else None)
+
+
+def has_preview(p: packs.Pack) -> bool:
+    """A few of its sounds can be tried: its preview zip, or a links pack's first links."""
+    return bool(p.preview_url or p.links)
+
+
+def sample_key(p: packs.Pack) -> tuple:
+    """Which samples a pack's are (a changed preview, or first links, are new ones)."""
+    return (p.id, p.preview_sha256, tuple(k.url for k in p.links[:packs.SAMPLES]))
+
+
+class PackCard(HoverCard):
+    """A pack in the grid: its picture, name, size and a line of what it's for, then
+    Preview and Add. A click anywhere else opens its preview too."""
+    opened = Signal(object)   # the card
+
     def __init__(self, pack: packs.Pack):
         super().__init__()
         self.pack = pack
-        self.setObjectName("card")
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.setFocusPolicy(Qt.FocusPolicy.TabFocus)
+        self.setAccessibleName(pack.name)
+        self.setToolTip(plain_tip(_("See what's in {name}", name=pack.name)))
         v = QVBoxLayout(self)
         v.setContentsMargins(14, 12, 14, 14)
-        v.setSpacing(6)
+        v.setSpacing(8)
         top = QHBoxLayout()
-        top.setSpacing(10)
-        emoji = QLabel(pack.emoji)
-        emoji.setStyleSheet("font-size: 22pt; background: transparent;")
-        top.addWidget(emoji, 0, Qt.AlignmentFlag.AlignTop)
+        top.setSpacing(12)
+        top.addWidget(art_label(pack.emoji, ART), 0, Qt.AlignmentFlag.AlignTop)
         names = QVBoxLayout()
-        names.setSpacing(0)
+        names.setSpacing(2)
         self.name = QLabel(pack.name)
+        self.name.setObjectName("tabcardtitle")
         self.name.setTextFormat(Qt.TextFormat.PlainText)
-        self.name.setStyleSheet("font-weight: 600; font-size: 11pt; background: transparent;")
         names.addWidget(self.name)
-        self.meta = QLabel(meta_line(pack))
-        self.meta.setObjectName("muted")
+        self.meta = QLabel(meta_line(pack, licence=False))
+        self.meta.setObjectName("hint")
         self.meta.setTextFormat(Qt.TextFormat.PlainText)
         self.meta.setWordWrap(True)
         names.addWidget(self.meta)
+        names.addStretch(1)
         top.addLayout(names, 1)
-        self.btn = QPushButton()
-        self.btn.setObjectName("primary")
-        self.btn.clicked.connect(self._add)
-        top.addWidget(self.btn, 0, Qt.AlignmentFlag.AlignTop)
         v.addLayout(top)
-        if pack.description:
-            about = hint_label(pack.description)
-            about.setTextFormat(Qt.TextFormat.PlainText)
-            v.addWidget(about)
-        if pack.categories:
-            cats = hint_label(_("Categories: {names}", names=", ".join(pack.categories)))
-            cats.setTextFormat(Qt.TextFormat.PlainText)
-            v.addWidget(cats)
-        # a few of its sounds to try before adding it (packs.samples): placeholders
-        # until they arrive, so the card doesn't grow under the mouse
-        self.samples: list[SampleButton] = []
-        self.listen = QWidget()
-        grid = QGridLayout(self.listen)
-        grid.setContentsMargins(0, 6, 0, 0)
-        grid.setSpacing(8)
-        for i in range(packs.SAMPLES):
-            b = SampleButton()
-            b.clicked.connect(lambda on, b=b: self._hear(b, on))
-            grid.addWidget(b, i // SAMPLE_COLS, i % SAMPLE_COLS)
-            self.samples.append(b)
-        # into the card first: shown while it has no parent, it's a window of its own
-        # for a moment (made and pulled back in: ~30 ms the sound playing waits on)
-        v.addWidget(self.listen)
-        self.listen.setVisible(bool(pack.preview_url))
+        self.about = ClampedLabel(pack.description or "")
+        v.addWidget(self.about)
+        v.addStretch(1)
+        foot = QHBoxLayout()   # (its kinds are the chips over the grid: not here too)
+        foot.setSpacing(8)
+        self.btn_preview = QPushButton(_("Preview"))
+        self.btn_preview.setProperty("quiet", True)
+        icons.set_icon(self.btn_preview, "play")
+        self.btn_preview.setToolTip(_("Hear a few of its sounds first (only you hear them)"))
+        self.btn_preview.clicked.connect(lambda: self.opened.emit(self))
+        self.btn = _add_button(False)   # (a grid of accent buttons shouts: the preview's is)
+        self.btn.clicked.connect(self._add)
+        for b in (self.btn, self.btn_preview):   # the row split in two, evenly
+            b.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
+            foot.addWidget(b, 1)
+        v.addLayout(foot)
         self.show_idle()
 
     def show_idle(self):
-        added = self.pack.downloaded()
-        self.btn.setText(_("Add again") if added else _("Add to my board"))
-        self.btn.setToolTip(
-            _("Adds its sounds again; ones already on your board are skipped") if added else
-            _("Downloads the pack ({size}) and puts its sounds on your board, each "
-              "category as its own tab", size=size_text(self.pack.size) or "?"))
-        icons.set_icon(self.btn, "check" if added else "download", "on_accent")
+        _show_add(self.btn, self.pack, short=True)
 
-    def show_samples(self, found: list[packs.Sample] | None):
-        """Its samples arrived (none: they couldn't be fetched, so the row goes)."""
-        for i in range(len(self.samples) if found else 1):
-            self.show_sample(found, i)
+    def _add(self, _checked: bool = False):
+        w = self.parentWidget()
+        while w is not None and not isinstance(w, PacksDialog):
+            w = w.parentWidget()
+        if w is not None:
+            w.add(self.pack)
+
+    def mouseReleaseEvent(self, e):
+        super().mouseReleaseEvent(e)
+        if e.button() == Qt.MouseButton.LeftButton and self.rect().contains(e.position().toPoint()):
+            self.opened.emit(self)
+
+    def keyPressEvent(self, e):
+        if e.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter, Qt.Key.Key_Space):
+            self.opened.emit(self)
+            return
+        super().keyPressEvent(e)
+
+
+class PreviewDialog(QDialog):
+    """A pack's preview, over the page: what's in it, a few of its sounds as pads to
+    press (to your headphones only) and Add."""
+
+    def __init__(self, p: packs.Pack, can_hear: bool, parent=None):
+        super().__init__(parent)
+        self.pack = p
+        self.setWindowTitle(p.name)
+        self.setMaximumWidth(620)
+        self.setMinimumWidth(560)   # three pads a row with room for a meme's name
+        v = QVBoxLayout(self)
+        v.setContentsMargins(18, 18, 18, 18)
+        v.setSpacing(12)
+        head = QHBoxLayout()
+        head.setSpacing(12)
+        art = art_label(p.emoji, ART_BIG)
+        head.addWidget(art, 0, Qt.AlignmentFlag.AlignTop)
+        names = QVBoxLayout()
+        names.setSpacing(2)
+        self.name = QLabel(p.name)
+        self.name.setObjectName("helptitle")
+        self.name.setTextFormat(Qt.TextFormat.PlainText)
+        self.name.setWordWrap(True)
+        names.addWidget(self.name)
+        self.meta = hint_label(meta_line(p))
+        self.meta.setTextFormat(Qt.TextFormat.PlainText)
+        names.addWidget(self.meta)
+        names.addStretch(1)
+        head.addLayout(names, 1)
+        v.addLayout(head)
+        if p.description:
+            about = QLabel(p.description)
+            about.setTextFormat(Qt.TextFormat.PlainText)
+            about.setWordWrap(True)
+            v.addWidget(about)
+        if p.categories:
+            cats = hint_label(_("Categories: {names}", names=", ".join(p.categories)))
+            cats.setTextFormat(Qt.TextFormat.PlainText)
+            v.addWidget(cats)
+        if p.links:
+            v.addWidget(hint_label(_(
+                "Its sounds are downloaded straight from Myinstants when you add it: Onion "
+                "Board doesn't keep a copy. A sound that's gone from there is skipped.")))
+        # a few of its sounds as pads (packs.samples): placeholders until they arrive,
+        # so nothing grows under the mouse
+        self.listen = QWidget()
+        lv = QVBoxLayout(self.listen)
+        lv.setContentsMargins(0, 4, 0, 0)
+        lv.setSpacing(8)
+        lv.addWidget(section_label(_("Hear a few first")))
+        self.listen_hint = hint_label(_("Only you hear these."))
+        lv.addWidget(self.listen_hint)
+        grid = QGridLayout()
+        grid.setSpacing(8)
+        self.samples: list[SampleButton] = []
+        for i in range(packs.SAMPLES):
+            b = SampleButton()
+            b.setMinimumHeight(PAD_H)
+            grid.addWidget(b, i // SAMPLE_COLS, i % SAMPLE_COLS)
+            self.samples.append(b)
+        lv.addLayout(grid)
+        v.addWidget(self.listen)
+        self.listen.setVisible(can_hear and has_preview(p))
+        foot = QHBoxLayout()
+        foot.setSpacing(8)
+        foot.addStretch(1)
+        self.btn = _add_button(True)
+        self.btn.setDefault(True)
+        foot.addWidget(self.btn)
+        self.btn_close = QPushButton(_("Close"))
+        self.btn_close.clicked.connect(self.reject)
+        foot.addWidget(self.btn_close)
+        v.addLayout(foot)
+        _show_add(self.btn, p)
+        fit.watch(self)   # a long translation grows it
+        self.fit_height()
+
+    def fit_height(self):
+        """As tall as what's in it, at its width (wrapped words included): no gap."""
+        lay = self.layout()
+        if lay is None:
+            return
+        lay.activate()
+        w = max(self.width(), self.minimumWidth())
+        h = lay.totalHeightForWidth(w) if lay.hasHeightForWidth() else lay.sizeHint().height()
+        self.resize(w, max(h, lay.minimumSize().height()))
 
     def show_sample(self, found: list[packs.Sample] | None, i: int):
-        """show_samples for its i-th button alone (the window fills them one at a time)."""
+        """Its i-th sample's pad (none found: the pads go, and it says so)."""
         if not found:
-            self.listen.hide()
+            for b in self.samples:
+                b.hide()
+            self.listen_hint.setText(_("Couldn't load its sounds to try. Adding it still "
+                                       "works."))
+            QTimer.singleShot(0, self, self.fit_height)   # no gap where the pads were
             return
         b = self.samples[i]
         b.set_sample(found[i] if i < len(found) else None)
         b.setVisible(i < len(found))
-
-    def _hear(self, b: SampleButton, on: bool):
-        dialog = self.window()
-        assert isinstance(dialog, PacksDialog)
-        dialog.hear(b, on)
-
-    def _add(self, _checked: bool = False):
-        dialog = self.window()
-        assert isinstance(dialog, PacksDialog)   # the cards are in one
-        dialog.add(self)
 
 
 class PacksDialog(QDialog):
@@ -215,21 +433,26 @@ class PacksDialog(QDialog):
     import, so it asks and reports the way dropping the zip does). `play` plays a
     pack's sample to your headphones (see Play); without it the samples don't show."""
     _listed = Signal(object, str)              # packs, why the online list wasn't read
-    _progress = Signal(object, int, int)       # card, done, total
-    _fetched = Signal(object, object, str)     # card, path or None, error
-    _sampled = Signal(object, object)          # (pack id, preview sha), its samples
+    _progress = Signal(str, int, int, bool)    # pack id, done, total, counting links
+    _fetched = Signal(object, object, str, int)   # pack, path or None, error, skipped
+    _sampled = Signal(object, object)          # sample_key, its samples (None: failed)
     _decoded = Signal(object, object, float, int)   # button, audio or None, gain, serial
 
     def __init__(self, add: Callable[[Path], None], parent=None, fetch_list: bool = True,
                  play: Play | None = None):
         super().__init__(parent)
+        self.setObjectName("packspage")   # (themesheet: in the window, no box of its own)
         fit.watch(self)
         self._add = add
         self._play = play
-        self._busy: set[str] = set()   # pack ids downloading now
-        self._samples: dict[tuple, list] = {}   # (pack id, preview sha) -> its samples
+        self._busy: dict[str, str] = {}   # pack id -> its Add button's words while downloading
+        self._shown_pct: dict[str, str] = {}   # ...and a card's, shorter
+        self._samples: dict[tuple, list | None] = {}   # sample_key -> its samples (None: failed)
         self._sampling: set[tuple] = set()      # ...being fetched now
+        self._preloads: deque[packs.Pack] = deque()   # previews still to fetch, in order
+        self._preload_key: tuple | None = None   # the one being fetched now
         self._closed = False
+        self.preview: PreviewDialog | None = None   # the open preview
         self._playing: SampleButton | None = None
         self._serial = 0               # the newest sample pressed: an older one never plays
         self._ends = QTimer(self)      # un-lights a sample once it has played out
@@ -237,77 +460,109 @@ class PacksDialog(QDialog):
         self._ends.timeout.connect(self._stop)
         # the packs shown, in order: a card, or a pack whose card isn't made yet (_step)
         self._slots: list[PackCard | packs.Pack] = []
-        self._fills: deque[tuple[PackCard, list | None, int]] = deque()   # tiles to fill
+        self._fills: deque[tuple[PreviewDialog, list | None, int]] = deque()   # pads to fill
         self._stepper = QTimer(self)
         self._stepper.setSingleShot(True)
         self._stepper.setTimerType(Qt.TimerType.PreciseTimer)
         self._stepper.timeout.connect(self._step)
+        self._filter = ALL
         self.setWindowTitle(_("Free sound packs"))
         lay = QVBoxLayout(self)
         lay.setContentsMargins(18, 18, 18, 18)
         lay.setSpacing(12)
         head = QHBoxLayout()
-        head.setSpacing(2)   # (his widget has room round him already)
+        head.setSpacing(12)
+        # back to the board: the way out, first thing on the page (Escape does it too)
+        self.btn_done = QPushButton(_("Back to my sounds"))
+        icons.set_icon(self.btn_done, "nav_back")
+        self.btn_done.clicked.connect(self.accept)
+        head.addWidget(self.btn_done, 0, Qt.AlignmentFlag.AlignVCenter)
         self.bun = bunacts.ActBunny(bunacts.PAT)   # Bun with a parcel, beside the title
-        head.addWidget(self.bun)
+        head.addWidget(self.bun, 0, Qt.AlignmentFlag.AlignVCenter)
         title = QLabel(_("Free sound packs"))
         title.setObjectName("helptitle")
-        head.addWidget(title, 1)
+        head.addWidget(title, 1, Qt.AlignmentFlag.AlignVCenter)
+        self.btn_share = QPushButton(_("Share a pack"))
+        self.btn_share.setProperty("quiet", True)
+        icons.set_icon(self.btn_share, "browser")
+        self.btn_share.setToolTip(plain_tip(_(
+            "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit "
+            "needed). Once it's checked, it shows up here for everyone.")))
+        self.btn_share.clicked.connect(lambda: QDesktopServices.openUrl(QUrl(packs.SHARE_URL)))
+        head.addWidget(self.btn_share, 0, Qt.AlignmentFlag.AlignVCenter)
         lay.addLayout(head)
-        lay.addWidget(hint_label(_(
-            "Ready-made boards, free to use anywhere: in games, streams and videos. Press a "
-            "sound to hear it first (only you hear it). Add a pack and its sounds land on "
-            "your board, each category as its own tab.") if play is not None else _(
-            "Ready-made boards, free to use anywhere: in games, streams and videos. Add one "
-            "and its sounds land on your board, each category as its own tab.")))
+        self.search = QLineEdit()
+        self.search.setPlaceholderText(_("Search packs and sounds"))
+        self.search.setAccessibleName(_("Search packs and sounds"))
+        self.search.setClearButtonEnabled(True)
+        self.search.addAction(icons.icon("search", "muted"),
+                              QLineEdit.ActionPosition.LeadingPosition)
+        self.search.setMaximumWidth(SEARCH_MAX_W)
+        self.search.textChanged.connect(lambda _t: self._apply_filter())
+        lay.addWidget(self.search)
+        self.chips_box = QWidget()
+        self.chips = Flow(self.chips_box, gap=8)
+        self.chip_group = QButtonGroup(self)
+        self.chip_group.setExclusive(True)
+        self.chip_btns: dict[str, QPushButton] = {}
+        lay.addWidget(self.chips_box)
         self.note = hint_label("")
         self.note.hide()
         lay.addWidget(self.note)
+        # the grid, or "nothing found" in its place
+        self.views = QStackedWidget()
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setFrameShape(QFrame.Shape.NoFrame)
         self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.body = QWidget()
-        self.list = QVBoxLayout(self.body)
-        self.list.setContentsMargins(0, 0, 0, 0)
-        self.list.setSpacing(12)
+        bv = QVBoxLayout(self.body)
+        bv.setContentsMargins(0, 0, 0, 0)
+        bv.setSpacing(0)
+        self.grid_box = QWidget()
+        self.list = CardGrid(self.grid_box, min_w=CARD_MIN_W, gap=CARD_GAP)
+        bv.addWidget(self.grid_box)
+        bv.addStretch(1)
         self.scroll_area.setWidget(self.body)
-        self.scroll_area.setMinimumSize(440, 260)
-        # Keep the cards off the scroll bar; with no bar they line up with the share card.
+        self.scroll_area.setMinimumSize(280, 200)
+        # Keep the cards off the scroll bar
         self.scroll_area.verticalScrollBar().rangeChanged.connect(
-            lambda _lo, hi: self.list.setContentsMargins(0, 0, 10 if hi > 0 else 0, 0))
-        lay.addWidget(self.scroll_area, 1)
-        share = QFrame()
-        share.setObjectName("card")
-        sv = QHBoxLayout(share)
-        sv.setContentsMargins(14, 10, 14, 10)
-        sv.setSpacing(10)
-        sv.addWidget(hint_label(_(
-            "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit "
-            "needed). Once it's checked, it shows up here for everyone.")), 1)
-        self.btn_share = QPushButton(_("Share a pack"))
-        icons.set_icon(self.btn_share, "browser")
-        self.btn_share.setToolTip(_("Opens the sharing form on GitHub in your browser"))
-        self.btn_share.clicked.connect(lambda: QDesktopServices.openUrl(QUrl(packs.SHARE_URL)))
-        sv.addWidget(self.btn_share, 0, Qt.AlignmentFlag.AlignVCenter)
-        lay.addWidget(share)
-        box = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
-        box.rejected.connect(self.reject)
-        lay.addWidget(box)
+            lambda _lo, hi: bv.setContentsMargins(0, 0, 10 if hi > 0 else 0, 0))
+        self.views.addWidget(self.scroll_area)
+        self.empty = QWidget()
+        ev = QVBoxLayout(self.empty)
+        ev.setContentsMargins(12, 24, 12, 24)
+        ev.setSpacing(8)
+        self.empty_title = section_label("")
+        self.empty_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.empty_title.setTextFormat(Qt.TextFormat.PlainText)
+        ev.addWidget(self.empty_title)
+        empty_hint = hint_label(_("Try another word, or show every pack."))
+        empty_hint.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        ev.addWidget(empty_hint)
+        er = QHBoxLayout()
+        er.addStretch(1)
+        self.btn_clear = QPushButton(_("Show every pack"))
+        self.btn_clear.clicked.connect(self.clear_filter)
+        er.addWidget(self.btn_clear)
+        er.addStretch(1)
+        ev.addLayout(er)
+        ev.addStretch(1)
+        self.views.addWidget(self.empty)
+        lay.addWidget(self.views, 1)
         self._listed.connect(self._show)
         self._progress.connect(self._on_progress)
         self._fetched.connect(self._on_fetched)
         self._sampled.connect(self._on_sampled)
         self._decoded.connect(self._on_decoded)
         self._show(packs.built_in(), "")
-        self.resize(WIDTH, self._tall())
+        self.resize(780, self._tall())
         if fetch_list and net.allowed(packs.FEATURE):
             threading.Thread(target=self._read_list, daemon=True, name="pack-list").start()
         elif fetch_list:
             self._say(net.off_message(packs.FEATURE))
 
     def _tall(self) -> int:
-        """Room for about two packs with their samples, never past the screen."""
         screen = (self.parentWidget() or self).screen()
         room = screen.availableGeometry().height() if screen is not None else 900
         return max(480, min(760, int(room * 0.85)))
@@ -323,6 +578,7 @@ class PacksDialog(QDialog):
             log.info("couldn't read the pack list: %s", e)
             busy.emit(self._listed, None, errors.plain(e))
 
+    # ------------------------------------------------------------------ the list
     def _show(self, found, err: str):
         if self._closed:
             return
@@ -346,34 +602,38 @@ class PacksDialog(QDialog):
                 slots.append(c)
             else:
                 slots.append(p)   # its card is made by _step
-        if self._playing_card() in old.values():   # its card goes: stop its sample
-            self._stop()
         while self.list.count():
-            take_out(self.list)
+            self.list.takeAt(0)
         for c in old.values():   # packs no longer on offer (or changed)
+            c.hide()
             c.deleteLater()
         self._slots = slots
         for c in self.cards:
             self.list.addWidget(c)
-        self.list.addStretch(1)
-        self._make_next()   # the first new card at once: the window never opens empty
+        self._fill_chips(found)
+        self._make_next()   # the first new card at once: the page never opens empty
+        self._apply_filter()
         self._stepper.start(STEP_GAP_MS)
+        self._preload(found)
 
     @property
     def cards(self) -> list[PackCard]:
         """The packs' cards made so far, in order."""
         return [s for s in self._slots if isinstance(s, PackCard)]
 
+    def card_for(self, pack_id: str) -> PackCard | None:
+        return next((c for c in self.cards if c.pack.id == pack_id), None)
+
     def _step(self):
-        """One piece of filling the window: the next pack's card, else one sample's
-        tile; then a rest (STEP_GAP_MS) for the audio threads before the next one."""
+        """One piece of filling the page: the next pack's card, else one preview pad;
+        then a rest (STEP_GAP_MS) for the audio threads before the next one."""
         if self._closed:
             return
         if not self._make_next():
             while self._fills:
-                card, found, i = self._fills.popleft()
-                if card in self.cards:   # not remade meanwhile (the new one gets them)
-                    card.show_sample(found, i)
+                dlg, found, i = self._fills.popleft()
+                if dlg is self.preview:   # not closed meanwhile
+                    dlg.show_sample(found, i)
                     break
         if self._fills or any(not isinstance(s, PackCard) for s in self._slots):
             self._stepper.start(STEP_GAP_MS)
@@ -386,36 +646,152 @@ class PacksDialog(QDialog):
         p = self._slots[i]
         assert isinstance(p, packs.Pack)
         c = PackCard(p)
-        if self._play is None:
-            c.listen.hide()
-        self.list.insertWidget(sum(isinstance(s, PackCard) for s in self._slots[:i]), c)
+        c.opened.connect(lambda card: self.open_pack(card.pack))
+        self._insert(sum(isinstance(s, PackCard) for s in self._slots[:i]), c)
         self._slots[i] = c
-        if self._play is not None and p.preview_url:
-            key = (p.id, p.preview_sha256)
-            if key in self._samples:   # fetched for the card this replaced
-                self._fill(c, self._samples[key])
-            elif key not in self._sampling:
-                self._fetch_samples(c)
+        if p.id in self._busy:
+            busy.set_busy(c.btn, True)
+            c.btn.setText(self._shown_pct.get(p.id, "…"))
+        c.setVisible(self._shows(p))
         return True
 
-    def _fill(self, card: PackCard, found: list | None):
-        """Its samples onto `card`, a tile a step (_step)."""
-        for i in range(len(card.samples) if found else 1):
-            self._fills.append((card, found, i))
+    def _insert(self, at: int, w: QWidget):
+        """`w` into the grid at `at` (CardGrid only appends: the rest go after it)."""
+        rest = []
+        while self.list.count() > at:
+            rest.append(self.list.takeAt(at))
+        self.list.addWidget(w)
+        for item in rest:
+            self.list.addItem(item)
+
+    # ------------------------------------------------------------------ filtering
+    def _fill_chips(self, found: list[packs.Pack]):
+        """All, each kind of pack (most packs first), On my board."""
+        tags: dict[str, int] = {}
+        for p in found:
+            for t in p.tags:
+                tags[t] = tags.get(t, 0) + 1
+        keys = [ALL, *sorted(tags, key=lambda t: (-tags[t], t.casefold())), MINE]
+        if keys == list(self.chip_btns):
+            return
+        for b in self.chip_btns.values():
+            self.chip_group.removeButton(b)
+            self.chips.removeWidget(b)
+            b.hide()
+            b.deleteLater()
+        self.chip_btns = {}
+        for k in keys:
+            b = QPushButton(_("All") if k == ALL else _("On my board") if k == MINE else k)
+            b.setObjectName("filterchip")
+            b.setCheckable(True)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            b.clicked.connect(lambda _c=False, k=k: self.set_filter(k))
+            self.chip_group.addButton(b)
+            self.chips.addWidget(b)
+            self.chip_btns[k] = b
+        if self._filter not in self.chip_btns:
+            self._filter = ALL
+        self.chip_btns[self._filter].setChecked(True)
+        self.chips.invalidate()
+
+    def set_filter(self, key: str):
+        self._filter = key if key in self.chip_btns else ALL
+        self.chip_btns[self._filter].setChecked(True)
+        self._apply_filter()
+
+    def clear_filter(self):
+        self.search.clear()
+        self.set_filter(ALL)
+
+    def _words(self) -> list[str]:
+        return self.search.text().casefold().split()
+
+    def _shows(self, p: packs.Pack) -> bool:
+        if self._filter == MINE and not p.downloaded():
+            return False
+        if self._filter not in (ALL, MINE) and self._filter not in p.tags:
+            return False
+        return matches(p, self._words())
+
+    def shown(self) -> list[packs.Pack]:
+        """The packs the search and chip leave, made or not."""
+        return [s.pack if isinstance(s, PackCard) else s for s in self._slots
+                if self._shows(s.pack if isinstance(s, PackCard) else s)]
+
+    def _apply_filter(self):
+        for c in self.cards:
+            c.setVisible(self._shows(c.pack))
+        any_shown = bool(self.shown())
+        if not any_shown:
+            q = self.search.text().strip()
+            self.empty_title.setText(_("No packs match “{text}”", text=q) if q
+                                     else _("No packs here yet"))
+        self.views.setCurrentIndex(0 if any_shown else 1)
+
+    # ------------------------------------------------------------------ the preview
+    def open_pack(self, p: packs.Pack):
+        """A pack's preview, over the page (a card's Preview, or the card itself)."""
+        self.close_pack()
+        dlg = PreviewDialog(p, self._play is not None, self)
+        self.preview = dlg
+        if p.id in self._busy:
+            busy.set_busy(dlg.btn, True)
+            dlg.btn.setText(self._busy[p.id])
+        dlg.btn.clicked.connect(lambda: self.add(p))
+        for b in dlg.samples:
+            b.clicked.connect(lambda on, b=b: self.hear(b, on))
+        dlg.finished.connect(lambda _r, d=dlg: self._preview_closed(d))
+        dlg.open()
+        if self._play is not None and has_preview(p):
+            key = sample_key(p)
+            if key in self._samples:
+                self._fill(dlg, self._samples[key])
+            elif key not in self._sampling:
+                self._fetch_samples(p)
+
+    def close_pack(self):
+        if self.preview is not None:
+            self.preview.reject()
+
+    def _preview_closed(self, dlg: PreviewDialog):
+        if self.preview is dlg:
+            self.preview = None
+            self._stop()
+        self._fills = deque(f for f in self._fills if f[0] is not dlg)
+        dlg.deleteLater()
+
+    def _fill(self, dlg: PreviewDialog, found: list | None):
+        """Its samples onto the preview's pads, a pad a step (_step)."""
+        for i in range(len(dlg.samples) if found else 1):
+            self._fills.append((dlg, found, i))
         if not self._stepper.isActive():
             self._stepper.start(STEP_GAP_MS)
 
-    def _playing_card(self) -> PackCard | None:
-        """The card whose sample is playing, if one is."""
-        b = self._playing
-        return next((c for c in self.cards if b is not None and b in c.samples), None)
-
     # ------------------------------------------------------------------ samples
-    def _fetch_samples(self, card: PackCard):
-        """A pack's samples, fetched once (then kept on disk: the online list arriving
-        remakes the cards, and asking again is free)."""
-        p = card.pack
-        key = (p.id, p.preview_sha256)
+    def _preload(self, found: list[packs.Pack]):
+        """Every pack's samples fetched in the background, one pack at a time, as soon
+        as the page is up: a preview then opens with its pads ready, not loading. Each
+        is fetched once ever (kept on disk), and a failure just waits for the preview."""
+        if self._play is None:
+            return
+        self._preloads = deque(p for p in found if has_preview(p)
+                               and sample_key(p) not in self._samples)
+        if self._preload_key is None:
+            self._preload_next()
+
+    def _preload_next(self):
+        self._preload_key = None
+        while self._preloads and not self._closed:
+            p = self._preloads.popleft()
+            key = sample_key(p)
+            if key not in self._samples and key not in self._sampling:
+                self._preload_key = key
+                self._fetch_samples(p)
+                return
+
+    def _fetch_samples(self, p: packs.Pack):
+        """A pack's samples, fetched once (kept on disk: asking again is free)."""
+        key = sample_key(p)
         self._sampling.add(key)
 
         def run():
@@ -428,16 +804,16 @@ class PacksDialog(QDialog):
         threading.Thread(target=run, daemon=True, name="pack-samples").start()
 
     def _on_sampled(self, key, found):
-        """A pack's samples arrived: on its card now, even when the online list remade
-        the cards while they were on their way."""
+        """A pack's samples arrived: onto its preview now, if it's open."""
         self._sampling.discard(key)
-        if found:
-            self._samples[key] = found
+        self._samples[key] = found or None
         if self._closed:
             return
-        for c in self.cards:
-            if (c.pack.id, c.pack.preview_sha256) == key:
-                self._fill(c, found)
+        dlg = self.preview
+        if dlg is not None and sample_key(dlg.pack) == key:
+            self._fill(dlg, found)
+        if key == self._preload_key:   # the next pack's, now this one's are in
+            self._preload_next()
 
     def hear(self, b: SampleButton, on: bool):
         """A sample pressed: play it (decoded off the UI thread), or stop it."""
@@ -466,7 +842,10 @@ class PacksDialog(QDialog):
         if data is None or not self._play(data, gain):
             self._stop()
             if data is not None:
-                self._say(_("Pick your headphones in Settings → Audio to hear the samples."))
+                msg = _("Pick your headphones in Settings → Audio to hear the samples.")
+                self._say(msg)
+                if self.preview is not None:
+                    busy.toast(self.preview, html.escape(msg), "warn")
             return
         self._ends.start(int(len(data) / SR * 1000) + 150)
 
@@ -478,65 +857,113 @@ class PacksDialog(QDialog):
             return
         try:
             b.setChecked(False)
-        except RuntimeError:   # its card was remade meanwhile
+        except RuntimeError:   # its preview was closed meanwhile
             pass
         if self._play is not None:
             self._play(None, 1.0)
 
     # ------------------------------------------------------------------ adding
-    def add(self, card: PackCard):
-        p = card.pack
+    def _buttons(self, pack_id: str) -> list[QPushButton]:
+        """The Add buttons of a pack: its card's, and its preview's while it's open."""
+        out = [c.btn for c in self.cards if c.pack.id == pack_id]
+        if self.preview is not None and self.preview.pack.id == pack_id:
+            out.append(self.preview.btn)
+        return out
+
+    def add(self, p: packs.Pack | PackCard):
+        if isinstance(p, PackCard):
+            p = p.pack
         if p.id in self._busy:
             return
         if not net.allowed(packs.FEATURE) and not p.downloaded():
             why = net.off_message(packs.FEATURE)
             self._say(why)
             # the note above may already say it: the press itself gets an answer too
-            busy.toast(self, html.escape(why), "error")
+            busy.toast(self.preview or self, html.escape(why), "error")
             return
-        self._busy.add(p.id)
+        self._busy[p.id] = _("Downloading…")
         self.bun.set_act(bunacts.RUN)   # running with it till it lands
-        busy.set_busy(card.btn, True)
-        card.btn.setText(_("Downloading…"))
+        for b in self._buttons(p.id):
+            busy.set_busy(b, True)
+        self._show_progress(p.id)
 
         def run():
             try:
-                path = packs.download(
-                    p, lambda done, total: busy.emit(self._progress, card, done, total),
-                    lambda: self._closed)
-                busy.emit(self._fetched, card, path, "")
+                if p.links:
+                    path, skipped = packs.download_links(
+                        p, lambda done, total: busy.emit(self._progress, p.id, done, total,
+                                                         True),
+                        lambda: self._closed)
+                else:
+                    path, skipped = packs.download(
+                        p, lambda done, total: busy.emit(self._progress, p.id, done, total,
+                                                         False),
+                        lambda: self._closed), 0
+                busy.emit(self._fetched, p, path, "", skipped)
             except updates.UpdateError as e:
-                busy.emit(self._fetched, card, None, str(e))
+                busy.emit(self._fetched, p, None, str(e), 0)
             except Exception as e:  # noqa: BLE001 - never a crash
                 log.exception("pack %s download failed", p.id)
-                busy.emit(self._fetched, card, None, errors.plain(e))
+                busy.emit(self._fetched, p, None, errors.plain(e), 0)
         threading.Thread(target=run, daemon=True, name="pack-download").start()
 
-    def _on_progress(self, card: PackCard, done: int, total: int):
-        try:
-            card.btn.setText(_("Downloading {pct}%", pct=done * 100 // total) if total
-                             else _("Downloading…"))
-        except RuntimeError:   # the window closed meanwhile
-            pass
+    def _on_progress(self, pack_id: str, done: int, total: int, links: bool):
+        if self._closed or pack_id not in self._busy:
+            return
+        self._busy[pack_id] = (
+            _("{done} of {total}", done=done, total=total) if links and total else
+            _("Downloading {pct}%", pct=done * 100 // total) if total else _("Downloading…"))
+        self._shown_pct[pack_id] = (_("{done} of {total}", done=done, total=total)
+                                    if links and total else
+                                    _("{pct}%", pct=done * 100 // total) if total else "…")
+        self._show_progress(pack_id)
 
-    def _on_fetched(self, card: PackCard, path, err: str):
-        self._busy.discard(card.pack.id)
+    def _show_progress(self, pack_id: str):
+        """A download's progress on its Add buttons: the preview's in words, a card's
+        (half a card wide) just the number."""
+        for b in self._buttons(pack_id):
+            try:
+                b.setText(self._busy[pack_id] if b.objectName() == "primary"
+                          else self._shown_pct.get(pack_id, "…"))
+            except RuntimeError:   # its card was remade meanwhile
+                pass
+
+    def _on_fetched(self, p: packs.Pack, path, err: str, skipped: int):
+        self._busy.pop(p.id, None)
+        self._shown_pct.pop(p.id, None)
         if self._closed:
             return
         if not self._busy:
             self.bun.set_act(bunacts.PAT)
-        busy.set_busy(card.btn, False)
-        card.show_idle()
+        for b in self._buttons(p.id):
+            busy.set_busy(b, False)
+            _show_add(b, p, short=b.objectName() != "primary")
         if path is None:
-            busy.toast(self, html.escape(_("Couldn't download {name}: {error}",
-                                           name=card.pack.name, error=err)), "error")
+            busy.toast(self.preview or self, html.escape(_(
+                "Couldn't download {name}: {error}", name=p.name, error=err)), "error")
             return
         self._say("")
+        self.close_pack()   # added: the board's own import reports it from here
         self._add(Path(path))
         self.bun.play(bunacts.OPEN)
-        busy.flash(card.btn, _("✓ Added"))
+        for b in self._buttons(p.id):
+            busy.flash(b, _("✓ Added"))
+        if skipped:
+            busy.toast(self, html.escape(ngettext(
+                "{n} sound is gone from Myinstants, so it was skipped.",
+                "{n} sounds are gone from Myinstants, so they were skipped.", skipped)),
+                "warn")
+        if self._filter == MINE:
+            self._apply_filter()
+
+    def keyPressEvent(self, e):
+        if e.key() == Qt.Key.Key_Escape and self.preview is not None:
+            self.close_pack()
+            return
+        super().keyPressEvent(e)
 
     def done(self, r: int):
+        self.close_pack()
         self._stop()
         self._stepper.stop()
         self._closed = True   # a download still going stops at its next chunk

@@ -144,14 +144,19 @@ def test_edit_bun_sits_at_his_desk_mixes_while_it_plays_and_goes_off_to_work(qap
 
 
 def test_edit_bun_goes_with_the_advanced_view(window):  # noqa: F811
+    from PySide6.QtCore import QPoint
+    from PySide6.QtWidgets import QApplication
     from soundboard.ui.sounds.dialogs import EditDialog
     d = EditDialog(window.meta("s0"), window.hotkeys, lambda *a: None, window)
     assert d._head.indexOf(d.bun) == 0
     d.set_advanced(True)
     assert d.bun.parentWidget() is d.adv.editor and d._head.indexOf(d.bun) < 0   # in one card
+    QApplication.processEvents()
     seen = d.bun.seen().translated(d.bun.pos().x(), d.bun.pos().y())
-    gap = round(seen.left())   # the card's edge to him: the same above him
-    assert abs(round(seen.top()) - gap) <= 1
+    preview = d.adv.btn_play.mapTo(d.adv.editor, QPoint(0, 0)).x()
+    ruler = d.effects.trim.mapTo(d.adv.editor, QPoint(0, 0)).y()
+    assert abs(seen.left() - (preview - seen.right())) <= 1.5   # centred across
+    assert abs(seen.top() - (ruler - seen.bottom())) <= 1.5     # ... and up and down
     assert d.adv.bar.contentsMargins().left() > 0   # the buttons moved over for him
     d.set_advanced(False)
     assert d._head.indexOf(d.bun) == 0 and d.adv.bar.contentsMargins().left() == 0

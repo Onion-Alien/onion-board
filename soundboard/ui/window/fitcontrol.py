@@ -260,6 +260,11 @@ class FitControl(Controller):
                          size.width(), size.height(), need.width(), need.height(),
                          type(mw.tabs.currentWidget()).__name__)
         opening = getattr(mw.setctl, "_opening_settings", False)
+        impctl = getattr(mw, "impctl", None)
+        if mini and impctl is not None and impctl.packs_open() and not opening:
+            impctl.close_packs()   # made too small for Free packs: as Settings
+            self._refit_layout()
+            return
         if mini and mw.setctl.settings_open() and not opening:
             # made too small for Settings: they close (as Done does), the mini player shows
             mw.setctl.close_settings()

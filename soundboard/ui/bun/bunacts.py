@@ -21,8 +21,11 @@ import math
 import time
 from collections.abc import Callable
 
-from PySide6.QtCore import QPointF, QRectF, Qt
-from PySide6.QtGui import QColor, QPainter, QPainterPath, QPen
+import numpy as np
+
+from PySide6.QtCore import QPoint, QPointF, QRectF, Qt
+from PySide6.QtGui import QColor, QImage, QPainter, QPainterPath, QPen, QRegion
+from PySide6.QtWidgets import QWidget
 
 from soundboard.ui.bun import bunskits
 from soundboard.ui.bun.bunny import music_note
@@ -36,8 +39,7 @@ from soundboard.ui.settings import lite
 Act = tuple[float, Callable[[Kit, float], None]]   # (seconds, act)
 ACT_H = 72   # Bun's height beside a window's title, px (the Live controls DJ's)
 ADV_H = 64   # ... in the button row of Edit sound's Advanced view
-SEEN = (5.0, -6.5, 96.0, 122.0)   # what's drawn of him at his desk, canvas units:
-                                  # left, top (ear tips, his bob's middle), right, bottom (his feet)
+SEEN_FRAMES = 8   # pictures of him seen() averages over
 
 STEEL = QColor("#c9ccd8")
 CARD = QColor("#c98a4b")        # the parcel
@@ -559,11 +561,27 @@ class ActBunny(BunnyWidget):
             self.update()
 
     def seen(self) -> QRectF:
-        """The part of his widget he's drawn in at his desk (SEEN), in its px."""
-        r = self._bun_rect()
-        u = r.height() / 120
-        x0, y0, x1, y1 = SEEN
-        return QRectF(r.left() + x0 * u, r.top() + y0 * u, (x1 - x0) * u, (y1 - y0) * u)
+        """The part of his widget he's drawn in (each theme's look has its own ears),
+        found by drawing him: edges averaged over his bob, in his widget's px."""
+        boxes = []
+        t0 = self._t0
+        try:
+            for k in range(SEEN_FRAMES):   # (round one bob: about 2.9 s)
+                self._t0 = t0 - k * 2.9 / SEEN_FRAMES
+                img = QImage(self.size(), QImage.Format.Format_ARGB32)
+                img.fill(0)
+                self.render(img, QPoint(), QRegion(), QWidget.RenderFlag.DrawChildren)
+                a = np.frombuffer(img.constBits(), np.uint8).reshape(
+                    img.height(), img.bytesPerLine() // 4, 4)[:, :img.width(), 3]
+                ys, xs = np.nonzero(a > 120)
+                if len(xs):
+                    boxes.append((xs.min(), ys.min(), xs.max() + 1, ys.max() + 1))
+        finally:
+            self._t0 = t0
+        if not boxes:
+            return QRectF(self.rect())
+        x0, y0, x1, y1 = (sum(b[i] for b in boxes) / len(boxes) for i in range(4))
+        return QRectF(x0, y0, x1 - x0, y1 - y0)
 
     def set_act(self, act: Act):
         if act is not self.act:

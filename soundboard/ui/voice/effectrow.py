@@ -33,13 +33,12 @@ GROUPS = ((_("Change the voice"), ("harmony", "growl", "robot", "ringmod", "monk
 ADDON_GROUP = _("Add-ons")
 # yours, not the voice's: picking a voice leaves it as it is (the Background's
 # sounds); with the Effects pop-up's extras, they're "on top"
-KEEP = frozenset({"backdrop"})
+KEEP = voicefx.KEEP
 
 
 def on_top(etype: str) -> bool:
     """Not part of the voice: kept when you pick another one, never saved with it."""
-    cls = voicefx.REGISTRY.get(etype)
-    return etype in KEEP or bool(cls is not None and cls.extra)
+    return voicefx.on_top(etype)
 
 
 class EffectRow(QFrame):

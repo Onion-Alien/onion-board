@@ -217,6 +217,7 @@ class ParamSlider(QWidget):
             h.addWidget(self.name)
             h.addStretch(1)
             h.addWidget(self.switch)
+            self.val.setParent(self)   # (unused, but never a window of its own)
             self.val.hide()
             self.set_value(value)
             self.switch.toggled.connect(self._moved)

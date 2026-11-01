@@ -48,8 +48,8 @@ log = logging.getLogger(__name__)
 HISTORY_MS = 400      # changes this close together are one Undo step (a drag)
 HISTORY_STEPS = 200   # Undo goes this far back
 ADV_W, ADV_H = 1320, 880       # the Advanced window, when the screen has room
-BUN_GAP = 12   # px all round Bun in Advanced's editor card (_fit_bun)
-BUN_ROOM = 10  # px: and this much more between him and the Preview button
+BUN_GAP = 12   # px above and below Bun in Advanced's editor card (_fit_bun)
+BUN_ROOM = 10  # px more across: his corner's a little wider, him in its middle
 ADV_MIN_W, ADV_MIN_H = 720, 600
 
 CUSTOM = "Custom"   # the preset box's item data when no preset matches
@@ -881,10 +881,13 @@ class EditDialog(EditDialogParts, QDialog):
             meta.fx, meta, (lambda v: pick_voice(v, self)) if pick_voice else None)
         self.effects.setParent(self)
         eff = self.effects
-        # Advanced's three pages (its columns or tabs); Simple doesn't show them
+        # Advanced's three pages (its columns or tabs); Simple doesn't show them. Kept
+        # hidden under the window, never parentless: freeing the window frees them (a
+        # parentless page outlived every spare Edit sound a theme switch dropped)
         self._fx_scrolls = []
         for pg in (eff.trim_page, eff.fx_page, eff.eq_page):
-            scroll = QScrollArea()
+            scroll = QScrollArea(self)
+            scroll.hide()
             scroll.setWidgetResizable(True)
             scroll.setWidget(pg)
             scroll.setFrameShape(QScrollArea.Shape.NoFrame)
@@ -1264,18 +1267,19 @@ class EditDialog(EditDialogParts, QDialog):
         self.bun.show()
 
     def _fit_bun(self):
-        """The same gap round what's drawn of Bun in Advanced: the card's edge on his left,
-        its top above him and the waveform's ruler under him (the Preview button a little
-        further off on his right). The button row is made that tall, its buttons centred
-        on him."""
+        """Bun in Advanced, centred in his corner of the editor card: left to right between
+        the card's edge and the Preview button, top to bottom between the card's top and
+        the waveform's ruler. The button row is made that tall, its buttons centred on
+        him."""
         adv = self.adv
         assert adv is not None
         card = adv.editor.layout()
-        gap = BUN_GAP
+        assert card is not None   # (the card's own layout: always made with it)
         seen = self.bun.seen()
-        self.bun.move(round(gap - seen.left()), round(gap - seen.top()))
+        side = BUN_GAP + BUN_ROOM / 2   # the same each side of him (Preview a bit off)
+        self.bun.move(round(side - seen.left()), round(BUN_GAP - seen.top()))
         m = card.contentsMargins()
-        left = round(gap + seen.width() + gap + BUN_ROOM) - m.left()   # Preview right of him
+        left = round(2 * side + seen.width()) - m.left()
         adv.bar.setContentsMargins(left, 0, 0, 0)
         card.activate()
         # then measured, not worked out: the ruler a gap under him, the buttons' middle
@@ -1283,8 +1287,8 @@ class EditDialog(EditDialogParts, QDialog):
         play, trim = adv.btn_play, self.effects.trim
         mid = play.mapTo(adv.editor, QPoint(0, 0)).y() + play.height() / 2
         ruler = trim.mapTo(adv.editor, QPoint(0, 0)).y()
-        top = max(0, round(gap + seen.height() / 2 - mid))
-        bottom = max(0, round(2 * gap + seen.height() - ruler) - top)
+        top = max(0, round(BUN_GAP + seen.height() / 2 - mid))
+        bottom = max(0, round(2 * BUN_GAP + seen.height() - ruler) - top)
         adv.bar.setContentsMargins(left, top, 0, bottom)
 
     def set_player(self, player: QWidget):

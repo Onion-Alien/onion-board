@@ -2497,10 +2497,8 @@
   "Offline mode is on, so the tabs that need the internet are hidden and greyed out here. Switch it off in Privacy & security to use them.": "Offline-tila on päällä, joten internetiä tarvitsevat välilehdet on piilotettu ja näkyvät täällä harmaina. Laita se pois kohdassa Yksityisyys ja tietoturva käyttääksesi niitä.",
   "Offline mode is on: nothing goes online, and what needs the internet is hidden. Click to change it.": "Offline-tila on päällä: mitään ei mene verkkoon, ja internetiä tarvitseva on piilotettu. Klikkaa muuttaaksesi.",
   "Only you hear it. Didn't hear it? Pick another one and try again.": "Vain sinä kuulet sen. Etkö kuullut sitä? Valitse toinen ja yritä uudelleen.",
-  "Opens the sharing form on GitHub in your browser": "Avaa jakamislomakkeen GitHubissa selaimessasi",
   "Other device": "Muu laite",
   "Playing a game or on a call?": "Pelaatko vai oletko puhelussa?",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Add one and its sounds land on your board, each category as its own tab.": "Valmiita boardeja, vapaasti käytettäviä missä tahansa: peleissä, streameissa ja videoissa. Lisää yksi, niin sen äänet tulevat boardillesi, jokainen kategoria omana välilehtenään.",
   "Search your sounds": "Hae ääniäsi",
   "Send your sounds to another device instead (Voicemeeter, OBS, a mixer…), or nowhere (only you, and the stream output)": "Lähetä äänesi sen sijaan toiseen laitteeseen (Voicemeeter, OBS, mikseri…) tai ei minnekään (vain sinulle ja stream-ulostuloon)",
   "Share a pack": "Jaa paketti",
@@ -3140,7 +3138,6 @@
   "Hear {name}": "Kuuntele {name}",
   "Hear {name} (only you hear it)": "Kuuntele {name} (vain sinä kuulet sen)",
   "Pick your headphones in Settings → Audio to hear the samples.": "Valitse kuulokkeesi kohdassa Asetukset → Ääni kuullaksesi näytteet.",
-  "Ready-made boards, free to use anywhere: in games, streams and videos. Press a sound to hear it first (only you hear it). Add a pack and its sounds land on your board, each category as its own tab.": "Valmiita boardeja, vapaasti käytettäviä missä tahansa: peleissä, streameissa ja videoissa. Paina ääntä kuullaksesi sen ensin (vain sinä kuulet sen). Lisää paketti, niin sen äänet tulevat boardillesi, jokainen kategoria omana välilehtenään.",
   "Hide the report": "Piilota raportti",
   "Network activity log": "Verkkotoiminnan loki",
   "No custom modes yet. Fill in the form to make one.": "Ei vielä omia tiloja. Täytä lomake tehdäksesi sellaisen.",
@@ -4815,5 +4812,38 @@
   "Remove server": "Poista palvelin",
   "Pause this voice (click again to bring it back)": "Keskeytä tämä ääni (napsauta uudelleen palauttaaksesi sen)",
   "Paused: click to turn this voice back on": "Keskeytetty: napsauta kytkeäksesi äänen takaisin päälle",
-  "Turn this voice off (Voices ON won't bring it back)": "Sammuta tämä ääni (Äänet PÄÄLLÄ ei palauta sitä)"
+  "Turn this voice off (Voices ON won't bring it back)": "Sammuta tämä ääni (Äänet PÄÄLLÄ ei palauta sitä)",
+  "Couldn't load its sounds to try. Adding it still works.": "Kokeiltavia ääniä ei voitu ladata. Lisääminen toimii silti.",
+  "Downloads its {n} sound from Myinstants and puts it on your board": [
+    "Lataa sen {n} äänen Myinstantsista ja lisää sen boardillesi",
+    "Lataa sen {n} ääntä Myinstantsista ja lisää ne boardillesi, jokainen kategoria omana välilehtenään"
+  ],
+  "Hear a few first": "Kuuntele ensin muutama",
+  "Hear a few of its sounds first (only you hear them)": "Kuuntele ensin muutama sen äänistä (vain sinä kuulet ne)",
+  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "Äänet ladataan suoraan Myinstantsista, kun lisäät sen: Onion Board ei säilytä kopiota. Ääni, joka on poistunut sieltä, ohitetaan.",
+  "No packs here yet": "Täällä ei ole vielä paketteja",
+  "No packs match “{text}”": "Mikään paketti ei vastaa hakua ”{text}”",
+  "None of its sounds could be downloaded.": "Yhtään sen äänistä ei voitu ladata.",
+  "On my board": "Boardillani",
+  "Only you hear these.": "Vain sinä kuulet ne.",
+  "Search packs and sounds": "Hae paketteja ja ääniä",
+  "See what's in {name}": "Katso, mitä {name} sisältää",
+  "Show every pack": "Näytä kaikki paketit",
+  "Try another word, or show every pack.": "Kokeile toista sanaa tai näytä kaikki paketit.",
+  "from Myinstants": "Myinstantsista",
+  "{done} of {total}": "{done}/{total}",
+  "{n} sound is gone from Myinstants, so it was skipped.": [
+    "{n} ääni on poistunut Myinstantsista, joten se ohitettiin.",
+    "{n} ääntä on poistunut Myinstantsista, joten ne ohitettiin."
+  ],
+  "(AI voice)": "(Tekoälypuheääni)",
+  "(Voice changer)": "(Äänenmuunnin)",
+  "{n} new": [
+    "{n} uusi",
+    "{n} uutta"
+  ],
+  "{n} new sound": [
+    "{n} uusi ääni",
+    "{n} uutta ääntä"
+  ]
 }
