@@ -862,18 +862,37 @@ def _preset(**kw) -> dict:
     return f
 
 
-# name -> full settings (applied over everything in the Edit dialog)
+def from_live(p: dict) -> dict:
+    """A Live controls preset (livefx.PRESETS or one of yours) as a sound's settings, the
+    way a pad saved from Live controls with it on plays: its speed and pitch (record-style
+    as tape), its knobs as the sound's Live controls stage."""
+    t = livefx.tuning(p)
+    speed, pitch, keep = t if t is not None else (1.0, 0.0, True)
+    stage = livefx.clean(p)
+    return clean(_preset(speed=speed, pitch=pitch, tape=not keep and abs(speed - 1) > 1e-3,
+                         live=[stage] if stage else []))
+
+
+def to_live(fx: dict | None) -> dict | None:
+    """A sound's settings as a Live controls preset ({speed, pitch, keep, knobs}), or None
+    when they hold what Live controls can't play (the trim, the equalizer, a boost,
+    backwards, an effect card, a voice, more than one stage)."""
+    f = clean(fx)
+    if (is_trimmed(f) or eq.design(f["eq"], SR) is not None or abs(f["gain_db"]) >= 1e-3
+            or f["reverse"] or _active_effects(f) or f["voice"] or len(f["live"]) > 1):
+        return None
+    return {"speed": round(f["speed"], 3), "pitch": round(f["pitch"], 2),
+            "keep": 0 if f["tape"] else 1, **(f["live"][0] if f["live"] else {})}
+
+
+# name -> full settings (applied over everything in the Edit dialog). Live controls'
+# presets first, the same settings as theirs (from_live): one Nightcore, not two
 PRESETS: dict[str, dict] = {
     "None (original)": neutral(),
+    **{name: from_live(p) for name, p in livefx.PRESETS.items()},
     "Deep fried 🔊":     _preset(gain_db=24, eq=[12, 12, 8, 6, 10, 10, 6],
                                 effects={"distortion": {"on": True, "drive": 30,
                                                         "tone": 9000, "level": 1}}),
-    "Bass boosted":      _preset(gain_db=6, eq=[12, 10, 3, 0, 0, 0, 0]),
-    "Slowed + reverb":   _preset(speed=0.8, tape=True,
-                                effects={"reverb": {"on": True, "size": 0.85,
-                                                    "tone": 5000, "mix": 0.35}}),
-    "Nightcore":         _preset(speed=1.25, tape=True),
-    "Chipmunk":          _preset(pitch=8),
     "Demon":             _preset(pitch=-8, effects={"reverb": {"on": True, "size": 0.6,
                                                                "tone": 3000, "mix": 0.25}}),
     "Fast (same pitch)": _preset(speed=1.5),

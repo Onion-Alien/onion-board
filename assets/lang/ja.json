@@ -2438,7 +2438,6 @@
   "Free sound packs": "無料のサウンドパック",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "無料のサウンドパック（サウンドタブ → バックアップ）は GitHub からパックの一覧を読み込み、「追加」を押すとそこからダウンロードします。",
   "It's in your sounds now": "サウンドに追加されました",
-  "Loudness": "ラウドネス",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "パックを作りましたか？ 共有してください: サウンドはすべて CC0（誰でも無料、クレジット不要）である必要があります。確認が済むと、ここに全員向けに表示されます。",
   "Needs the internet: Offline mode is on (Privacy & security)": "インターネットが必要です: オフラインモードがオンです（プライバシーとセキュリティ）",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "オンライン通信を一切行わず、インターネットが必要なものはすべて隠します（ラジオタブ、ウェブ検索、ダウンロード、更新…）。オンラインにしてよいものを選ぶには、チェックを外してください。",
@@ -4244,7 +4243,6 @@
   "Watches your game's window while it's open, even behind others": "ゲームのウィンドウが開いている間見張ります（他のウィンドウの裏でも）",
   "Your file stays whole: only the part between the handles plays.": "ファイルはそのまま残ります。ハンドルの間の部分だけが再生されます。",
   "Main": "メイン",
-  "Trim & speed": "トリミングと速度",
   "{group}  ·  {n} on": [
     "{group}  ·  {n}個オン"
   ],
@@ -4259,7 +4257,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "再生中のすべてのサウンドを変えます。「新しいパッドとして保存」で別のパッドとして残せます。",
   "Play a sound first, then save it with your changes": "まずサウンドを再生してから、変更ごと保存してください",
   "Save as new pad": "新しいパッドとして保存",
-  "Take the Live controls effects off": "ライブ操作のエフェクトを外す",
   "{name} (modified {n})": "{name}（変更 {n}）",
   "{name} (modified)": "{name}（変更）",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ 「{name}」を追加しました。速度とピッチはパッドに保存できる範囲に収めました",
@@ -4661,7 +4658,6 @@
   "Search effects": "エフェクトを検索",
   "Show the whole sound": "サウンド全体を表示",
   "Speed & loudness": "速度とラウドネス",
-  "The usual tabs, one at a time": "いつものタブ、1 つずつ",
   "Undo ({keys})": "元に戻す（{keys}）",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Windows の winget、または FFmpeg 自身のダウンロードで取得します (約 100 MB)。設定 → プライバシーとセキュリティ でオフにできます。",
   "Don't ask for admin each time": "毎回管理者の許可を求めない",
@@ -4709,5 +4705,6 @@
   "my sparkler's still going": "線香花火、まだ燃えてる",
   "ooh! aah!": "おお！わあ！",
   "ooh, pretty!": "わあ、きれい！",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "ハンドルをドラッグして最初と最後をカットします。時間のルーラーをクリックかドラッグ、または再生位置の線をドラッグすると、再生する位置が変わります。Ctrl+スクロールで拡大。右ボタンでドラッグするか、Shift+スクロールで移動。"
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "ハンドルをドラッグして最初と最後をカットします。時間のルーラーをクリックかドラッグ、または再生位置の線をドラッグすると、再生する位置が変わります。Ctrl+スクロールで拡大。右ボタンでドラッグするか、Shift+スクロールで移動。",
+  "The settings most people change, on one page": "多くの人が変える設定を1ページに"
 }

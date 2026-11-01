@@ -67,6 +67,7 @@ class EditDialogParts(_Base):
         effects: Any
         fx_note: Any
         hk_btn: Any
+        advanced: Any
         hotkeys: Any
         hotkeys_changed: Any
         live_bar: Any
@@ -84,7 +85,7 @@ class EditDialogParts(_Base):
         render_words: Any
         source_forgotten: Any
         swatches: Any
-        tabs: Any
+        simple: Any
 
     def _fill_source(self):
         """The "From YouTube: channel  [Details]" row, for the sound shown (none: no row)."""
@@ -174,7 +175,7 @@ class EditDialogParts(_Base):
         self._bb.setVisible(not on)
         self.btn_preview.setVisible(not on)
         self._reset_glow.setVisible(not on)
-        self.tabs.setEnabled(not on)   # the draft is saved: it waits while it renders
+        self.simple.setEnabled(not on)   # the draft is saved: it waits while it renders
         if getattr(self, "adv", None) is not None:
             self.adv.setEnabled(not on)
         self.render_box.setVisible(on)
@@ -220,7 +221,8 @@ class EditDialogParts(_Base):
     def _fx_note(self):
         if getattr(self, "_saying", False):
             return   # a preview message is up: it puts the summary back when it's done
-        s = soundfx.summary(self.effects.fx())
+        # (Simple has its summary's chips at the top instead)
+        s = soundfx.summary(self.effects.fx()) if self.advanced() else ""
         self.fx_note.setText(_("Effects: {s}", s=s) if s else "")
         self.fx_note.setVisible(bool(s))
 

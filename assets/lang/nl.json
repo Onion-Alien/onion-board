@@ -2491,7 +2491,6 @@
   "Free sound packs": "Gratis geluidspakketten",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "Gratis geluidspakketten (tabblad Geluiden → Back-up) leest de lijst met pakketten van GitHub en downloadt er daar een als je op Toevoegen drukt.",
   "It's in your sounds now": "Het staat nu in je geluiden",
-  "Loudness": "Luidheid",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "Een pakket gemaakt? Deel het: elk geluid moet CC0 zijn (vrij voor iedereen, geen naamsvermelding nodig). Zodra het gecontroleerd is, verschijnt het hier voor iedereen.",
   "Needs the internet: Offline mode is on (Privacy & security)": "Heeft internet nodig: de Offline-modus staat aan (Privacy & beveiliging)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "Er gaat helemaal niets online, en alles wat internet nodig heeft is verborgen (het tabblad Radio, zoeken op internet, downloads, updates…). Vink het uit om te kiezen wat online mag.",
@@ -4320,7 +4319,6 @@
   "Watches your game's window while it's open, even behind others": "Houdt het venster van je game in de gaten zolang het open is, ook achter andere",
   "Your file stays whole: only the part between the handles plays.": "Je bestand blijft heel: alleen het deel tussen de grepen speelt af.",
   "Main": "Hoofd",
-  "Trim & speed": "Trim & snelheid",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} aan",
     "{group}  ·  {n} aan"
@@ -4336,7 +4334,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Verandert elk geluid terwijl het speelt. Opslaan als nieuwe pad bewaart het als eigen pad.",
   "Play a sound first, then save it with your changes": "Speel eerst een geluid af en sla het dan op met je wijzigingen",
   "Save as new pad": "Opslaan als nieuwe pad",
-  "Take the Live controls effects off": "Effecten van de live-bediening eraf halen",
   "{name} (modified {n})": "{name} (aangepast {n})",
   "{name} (modified)": "{name} (aangepast)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” toegevoegd, snelheid en toonhoogte binnen wat een pad kan opslaan",
@@ -4748,7 +4745,6 @@
   "Search effects": "Effecten zoeken",
   "Show the whole sound": "Het hele geluid tonen",
   "Speed & loudness": "Snelheid & luidheid",
-  "The usual tabs, one at a time": "De gewone tabbladen, één tegelijk",
   "Undo ({keys})": "Ongedaan maken ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Via winget van Windows, anders via de eigen download van FFmpeg (ongeveer 100 MB). Je kunt dit uitzetten in Instellingen → Privacy & beveiliging.",
   "Don't ask for admin each time": "Niet elke keer om beheerdersrechten vragen",
@@ -4797,5 +4793,6 @@
   "my sparkler's still going": "Mijn sterretje brandt nog",
   "ooh! aah!": "Ooh! Aah!",
   "ooh, pretty!": "Ooh, wat mooi!",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Sleep de grepen om het begin en einde eraf te knippen. Klik of sleep op de tijdlijn, of sleep de afspeelstreep, om te verplaatsen waar hij speelt. Ctrl+scrollen zoomt. Sleep met de rechtermuisknop, of gebruik Shift+scrollen, om te schuiven."
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Sleep de grepen om het begin en einde eraf te knippen. Klik of sleep op de tijdlijn, of sleep de afspeelstreep, om te verplaatsen waar hij speelt. Ctrl+scrollen zoomt. Sleep met de rechtermuisknop, of gebruik Shift+scrollen, om te schuiven.",
+  "The settings most people change, on one page": "De instellingen die de meeste mensen aanpassen, op één pagina"
 }

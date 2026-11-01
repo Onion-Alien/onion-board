@@ -2544,7 +2544,6 @@
   "Free sound packs": "Zvukové balíčky zdarma",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "Zvukové balíčky zdarma (karta Zvuky → Záloha) načítají seznam balíčků z GitHubu a odtamtud jeden stáhnou, když stiskneš Přidat.",
   "It's in your sounds now": "Teď je ve tvých zvucích",
-  "Loudness": "Hlasitost",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "Udělal jsi balíček? Sdílej ho: každý zvuk musí být CC0 (zdarma pro každého, bez nutnosti uvádět autora). Po kontrole se tu ukáže všem.",
   "Needs the internet: Offline mode is on (Privacy & security)": "Potřebuje internet: Offline režim je zapnutý (Soukromí a zabezpečení)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "Nic vůbec nejde online a všechno, co potřebuje internet, je skryté (karta Rádio, hledání na webu, stahování, aktualizace…). Odškrtni to a vyber, co smí online.",
@@ -4396,7 +4395,6 @@
   "Watches your game's window while it's open, even behind others": "Sleduje okno tvé hry, dokud je otevřené, i když je za jinými",
   "Your file stays whole: only the part between the handles plays.": "Tvůj soubor zůstane celý: hraje jen část mezi úchyty.",
   "Main": "Hlavní",
-  "Trim & speed": "Ořez a rychlost",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} zapnuto",
     "{group}  ·  {n} zapnuto",
@@ -4413,7 +4411,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Mění každý zvuk, zatímco hraje. Uložit jako nový pad ho uchová jako samostatný pad.",
   "Play a sound first, then save it with your changes": "Nejdřív pusť zvuk, pak ho ulož se svými změnami",
   "Save as new pad": "Uložit jako nový pad",
-  "Take the Live controls effects off": "Sundat efekty živého ovládání",
   "{name} (modified {n})": "{name} (upraveno {n})",
   "{name} (modified)": "{name} (upraveno)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ „{name}“ přidáno, rychlost a výška omezené na to, co pad uloží",
@@ -4835,7 +4832,6 @@
   "Search effects": "Hledat efekty",
   "Show the whole sound": "Ukázat celý zvuk",
   "Speed & loudness": "Rychlost a hlasitost",
-  "The usual tabs, one at a time": "Obvyklé karty, jedna po druhé",
   "Undo ({keys})": "Zpět ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Přes winget ve Windows, nebo z vlastního stažení FFmpeg (asi 100 MB). Vypnout to můžeš v Nastavení → Soukromí a zabezpečení.",
   "Don't ask for admin each time": "Neptat se pokaždé na práva správce",
@@ -4885,5 +4881,6 @@
   "my sparkler's still going": "Prskavka mi pořád hoří",
   "ooh! aah!": "Óóó! Ááá!",
   "ooh, pretty!": "Páni, to je krása!",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Tažením úchytů ořízneš začátek a konec. Kliknutím nebo tažením časové osy, nebo tažením ukazatele přehrávání, změníš, kde hraje. Ctrl+kolečko přibližuje. Posouvej tažením pravým tlačítkem myši nebo Shift+kolečkem."
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Tažením úchytů ořízneš začátek a konec. Kliknutím nebo tažením časové osy, nebo tažením ukazatele přehrávání, změníš, kde hraje. Ctrl+kolečko přibližuje. Posouvej tažením pravým tlačítkem myši nebo Shift+kolečkem.",
+  "The settings most people change, on one page": "Nastavení, která mění většina lidí, na jedné stránce"
 }

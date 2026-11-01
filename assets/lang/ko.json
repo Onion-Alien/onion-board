@@ -2438,7 +2438,6 @@
   "Free sound packs": "무료 사운드 팩",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "무료 사운드 팩(사운드 탭 → 백업)은 GitHub에서 팩 목록을 읽고, 추가를 누르면 거기서 팩을 다운로드합니다.",
   "It's in your sounds now": "이제 사운드에 들어갔습니다",
-  "Loudness": "음량",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "팩을 만들었습니까? 공유하세요: 모든 사운드가 CC0(누구나 무료, 출처 표시 불필요)여야 합니다. 확인을 거치면 여기에 모두에게 나타납니다.",
   "Needs the internet: Offline mode is on (Privacy & security)": "인터넷이 필요합니다: 오프라인 모드가 켜져 있습니다(개인정보 보호 및 보안)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "아무것도 인터넷에 연결하지 않고, 인터넷이 필요한 것은 모두 숨깁니다(라디오 탭, 웹 검색, 다운로드, 업데이트…). 인터넷에 연결해도 되는 것을 고르려면 체크를 해제하세요.",
@@ -4244,7 +4243,6 @@
   "Watches your game's window while it's open, even behind others": "게임 창이 열려 있는 동안, 다른 창 뒤에 있어도 지켜봅니다",
   "Your file stays whole: only the part between the handles plays.": "파일은 그대로 남습니다. 핸들 사이 부분만 재생됩니다.",
   "Main": "기본",
-  "Trim & speed": "자르기 및 속도",
   "{group}  ·  {n} on": [
     "{group}  ·  {n}개 켜짐"
   ],
@@ -4259,7 +4257,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "재생 중인 모든 사운드를 바꿉니다. 새 패드로 저장하면 별도 패드로 남습니다.",
   "Play a sound first, then save it with your changes": "먼저 사운드를 재생한 뒤 변경 사항과 함께 저장하세요",
   "Save as new pad": "새 패드로 저장",
-  "Take the Live controls effects off": "실시간 조절 효과 빼기",
   "{name} (modified {n})": "{name} (수정 {n})",
   "{name} (modified)": "{name} (수정)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” 추가함, 속도와 피치는 패드가 저장할 수 있는 범위로 맞춤",
@@ -4661,7 +4658,6 @@
   "Search effects": "효과 검색",
   "Show the whole sound": "사운드 전체 보기",
   "Speed & loudness": "속도 및 음량",
-  "The usual tabs, one at a time": "평소의 탭, 한 번에 하나씩",
   "Undo ({keys})": "실행 취소 ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Windows의 winget으로, 안 되면 FFmpeg 자체 다운로드로 받습니다(약 100MB). 설정 → 개인정보 보호 및 보안에서 끌 수 있습니다.",
   "Don't ask for admin each time": "매번 관리자 권한을 묻지 않기",
@@ -4709,5 +4705,6 @@
   "my sparkler's still going": "내 불꽃 막대 아직 타는 중",
   "ooh! aah!": "오오! 아아!",
   "ooh, pretty!": "우와, 예쁘다!",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "핸들을 끌어서 앞뒤를 잘라내세요. 시간 눈금자를 클릭하거나 끌거나, 재생 위치 선을 끌면 재생 위치가 바뀌어요. Ctrl+스크롤은 확대입니다. 마우스 오른쪽 버튼으로 끌거나 Shift+스크롤로 이동하세요."
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "핸들을 끌어서 앞뒤를 잘라내세요. 시간 눈금자를 클릭하거나 끌거나, 재생 위치 선을 끌면 재생 위치가 바뀌어요. Ctrl+스크롤은 확대입니다. 마우스 오른쪽 버튼으로 끌거나 Shift+스크롤로 이동하세요.",
+  "The settings most people change, on one page": "대부분의 사람이 바꾸는 설정을 한 페이지에"
 }

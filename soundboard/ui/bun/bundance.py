@@ -11,7 +11,7 @@ from soundboard.ui.bun.bunny import H, PLANK_SPOT, ROOM_TOP
 from soundboard.ui.bun.bunbits import (
     accent, DANCE_FACES, DANCE_FADE, EAR_DRAG, EAR_SPRING, FACE_HOLD, FAIL_DROP, FAIL_END,
     FAIL_POOF, FAIL_SNAP, FINALE, HIT_BAND, hit_curve, _Note, POP, SQUASH, SQUASH_SPRING,
-    STRETCH, STYLE_BLEND)
+    STRETCH, STYLE_BLEND, TALK_FADE)
 
 if TYPE_CHECKING:
     from typing import Any
@@ -65,16 +65,21 @@ class BunnyDance(_Base):
         song's style and throws notes on the beat. True while a song is playing."""
         g = self.groove
         if g is None or self.building or self._fail_t >= 0:
-            self._dance -= self._dance * min(1.0, dt * DANCE_FADE)
+            fade = TALK_FADE if self._style == "speech" else DANCE_FADE   # (mouth shut)
+            self._dance -= self._dance * min(1.0, dt * fade)
             self._last_beat = None
             if self._dance < 0.01:
                 self._style = ""
             return False
-        on = bool(g.style) and bool(g.bpm)
+        # not a song (a soundbite, someone talking): he says it along with it, no notes
+        talk = getattr(g, "music", None) is False
+        style = "speech" if talk else g.style
+        on = talk or (bool(style) and bool(g.bpm))
         if now >= self._face_until:   # time for a new face (maybe the same one again)
             self._face = self._rng.randrange(len(DANCE_FACES))
             self._face_until = now + self._rng.triangular(*FACE_HOLD)
-        self._dance += (float(on) - self._dance) * min(1.0, dt * DANCE_FADE)
+        fade = TALK_FADE if talk else DANCE_FADE   # (a one-second "bruh" is said at once)
+        self._dance += (float(on) - self._dance) * min(1.0, dt * fade)
         self._g_energy += (g.energy - self._g_energy) * min(1.0, dt * 8)
         # the mouth: the voice as it's heard right now, opening at once and shutting a
         # touch slower
@@ -87,10 +92,12 @@ class BunnyDance(_Base):
                 self._kick_at = now - age
                 self._spawn(0.9)
             return True
-        if g.style != self._style:
-            self._style_was, self._style, self._blend = self._style, g.style, 0.0
+        if style != self._style:
+            self._style_was, self._style, self._blend = self._style, style, 0.0
         self._blend = min(1.0, self._blend + dt / STYLE_BLEND)
-        bands = HIT_BAND.get(g.style)
+        if talk:
+            return True
+        bands = HIT_BAND.get(style)
         if bands:   # notes on the hits he moves to
             age, s = min(g.last_hit(b, now) for b in bands)
             if age < 0.1 and s > 0.45 and now - age - self._note_hit > 0.22:

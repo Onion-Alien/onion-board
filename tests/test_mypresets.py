@@ -176,7 +176,7 @@ def test_delete_and_undo_while_open(qapp):
 def test_edit_sound_saves_a_preset_for_every_sound(qapp, monkeypatch):
     from soundboard.ui.sounds.dialogs import MINE, EffectsPanel
 
-    p = EffectsPanel({"pitch": 4, "start": 1.0})
+    p = EffectsPanel({"pitch": 4, "gain_db": 2, "start": 1.0})
     monkeypatch.setattr(QInputDialog, "getText", lambda *a, **k: ("High", True))
     p._save_preset()
     assert p.preset.currentData() == MINE + "High" and p.delete_preset.isVisibleTo(p.fx_page)
@@ -189,6 +189,27 @@ def test_edit_sound_saves_a_preset_for_every_sound(qapp, monkeypatch):
     assert mypresets.load("sound") == {} and other.preset.findData(MINE + "High") < 0
     other._undo_delete()
     assert "High" in mypresets.load("sound")
+
+
+def test_one_live_controls_can_play_is_in_both_lists(qapp, monkeypatch):
+    """Edit sound's preset of only a speed, pitch and knobs is saved as Live controls'
+    (it shows in its My presets too), and Live controls' show in Edit sound's box."""
+    from soundboard.ui.sounds.dialogs import MINE, EffectsPanel
+
+    p = EffectsPanel({"speed": 1.2, "tape": True, "live": [{"bass": 6}]})
+    monkeypatch.setattr(QInputDialog, "getText", lambda *a, **k: ("Party", True))
+    p._save_preset()
+    assert mypresets.load("live")["Party"] == {"speed": 1.2, "pitch": 0.0, "keep": 0,
+                                               "bass": 6.0}
+    assert "Party" not in mypresets.load("sound")
+    mypresets.put("live", "Radio host", {"pitch": -2, "treble": 4})
+    other = EffectsPanel({})
+    other.preset.setCurrentIndex(other.preset.findData(MINE + "Radio host"))
+    assert other.fx()["pitch"] == -2 and other.fx()["live"] == [{"treble": 4.0}]
+    other._delete_preset()                                          # from Live's list
+    assert "Radio host" not in mypresets.load("live")
+    other._undo_delete()
+    assert "Radio host" in mypresets.load("live")
 
 
 def test_a_reused_edit_window_starts_clean(qapp, monkeypatch):

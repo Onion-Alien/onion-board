@@ -2438,7 +2438,6 @@
   "Free sound packs": "Paket suara gratis",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "Paket suara gratis (tab Suara → Cadangan) membaca daftar paket dari GitHub, dan mengunduhnya dari sana saat Anda menekan Tambah.",
   "It's in your sounds now": "Sekarang sudah ada di suara Anda",
-  "Loudness": "Kenyaringan",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "Membuat paket? Bagikan: setiap suara harus CC0 (gratis untuk siapa pun, tidak perlu kredit). Setelah diperiksa, paket itu akan muncul di sini untuk semua orang.",
   "Needs the internet: Offline mode is on (Privacy & security)": "Perlu internet: Mode luring aktif (Privasi & keamanan)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "Tidak ada yang terhubung ke internet sama sekali, dan semua yang memerlukan internet disembunyikan (tab Radio, pencarian web, unduhan, pembaruan…). Hapus centang untuk memilih apa saja yang boleh terhubung ke internet.",
@@ -4244,7 +4243,6 @@
   "Watches your game's window while it's open, even behind others": "Mengawasi jendela game Anda selama terbuka, bahkan di balik jendela lain",
   "Your file stays whole: only the part between the handles plays.": "File Anda tetap utuh: hanya bagian di antara pegangan yang diputar.",
   "Main": "Utama",
-  "Trim & speed": "Pangkas & kecepatan",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} aktif"
   ],
@@ -4259,7 +4257,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Mengubah setiap suara saat diputar. Simpan sebagai pad baru menyimpannya sebagai pad tersendiri.",
   "Play a sound first, then save it with your changes": "Putar suara dulu, lalu simpan dengan perubahan Anda",
   "Save as new pad": "Simpan sebagai pad baru",
-  "Take the Live controls effects off": "Lepas efek kontrol live",
   "{name} (modified {n})": "{name} (diubah {n})",
   "{name} (modified)": "{name} (diubah)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” ditambahkan, kecepatan dan nadanya dibatasi sesuai yang bisa disimpan pad",
@@ -4661,7 +4658,6 @@
   "Search effects": "Cari efek",
   "Show the whole sound": "Tampilkan seluruh suara",
   "Speed & loudness": "Kecepatan & kenyaringan",
-  "The usual tabs, one at a time": "Tab biasa, satu per satu",
   "Undo ({keys})": "Urungkan ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Lewat winget Windows, atau dari unduhan FFmpeg sendiri (sekitar 100 MB). Kamu bisa mematikannya di Pengaturan → Privasi & keamanan.",
   "Don't ask for admin each time": "Jangan minta izin admin setiap kali",
@@ -4709,5 +4705,6 @@
   "my sparkler's still going": "Kembang apiku masih menyala",
   "ooh! aah!": "Ooh! Aah!",
   "ooh, pretty!": "Wah, cantik!",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Seret pegangannya untuk memotong awal dan akhir. Klik atau seret penggaris waktu, atau seret penanda putar, untuk memindah posisi putar. Ctrl+gulir untuk zoom. Seret dengan tombol kanan mouse, atau Shift+gulir, untuk menggeser."
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Seret pegangannya untuk memotong awal dan akhir. Klik atau seret penggaris waktu, atau seret penanda putar, untuk memindah posisi putar. Ctrl+gulir untuk zoom. Seret dengan tombol kanan mouse, atau Shift+gulir, untuk menggeser.",
+  "The settings most people change, on one page": "Pengaturan yang paling sering diubah orang, dalam satu halaman"
 }

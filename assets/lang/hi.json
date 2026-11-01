@@ -2491,7 +2491,6 @@
   "Free sound packs": "मुफ़्त साउंड पैक",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "मुफ़्त साउंड पैक (साउंड टैब → बैकअप) पैक की लिस्ट GitHub से पढ़ता है, और जोड़ें दबाने पर वहीं से एक डाउनलोड करता है।",
   "It's in your sounds now": "यह अब आपके साउंड में है",
-  "Loudness": "लाउडनेस",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "पैक बनाया है? शेयर करें: हर साउंड CC0 होना चाहिए (सबके लिए मुफ़्त, क्रेडिट की ज़रूरत नहीं)। जाँच होते ही यह यहाँ सबके लिए दिखेगा।",
   "Needs the internet: Offline mode is on (Privacy & security)": "इंटरनेट चाहिए: ऑफ़लाइन मोड चालू है (प्राइवेसी और सिक्योरिटी)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "कुछ भी ऑनलाइन नहीं जाता, और इंटरनेट वाली हर चीज़ छिपा दी जाती है (रेडियो टैब, वेब सर्च, डाउनलोड, अपडेट…)। क्या ऑनलाइन जा सकता है यह चुनने के लिए टिक हटाएँ।",
@@ -4320,7 +4319,6 @@
   "Watches your game's window while it's open, even behind others": "आपके गेम की विंडो खुली रहने तक उस पर नज़र रखता है, दूसरी विंडो के पीछे भी",
   "Your file stays whole: only the part between the handles plays.": "आपकी फ़ाइल पूरी रहती है: सिर्फ़ हैंडल के बीच का हिस्सा चलता है।",
   "Main": "मुख्य",
-  "Trim & speed": "ट्रिम और स्पीड",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} चालू",
     "{group}  ·  {n} चालू"
@@ -4336,7 +4334,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "हर साउंड को चलते समय बदलता है। नए पैड के रूप में सेव करें उसे अलग पैड के रूप में रख लेता है।",
   "Play a sound first, then save it with your changes": "पहले कोई साउंड चलाएँ, फिर अपने बदलावों के साथ सेव करें",
   "Save as new pad": "नए पैड के रूप में सेव करें",
-  "Take the Live controls effects off": "लाइव कंट्रोल के इफ़ेक्ट हटाएँ",
   "{name} (modified {n})": "{name} (बदला गया {n})",
   "{name} (modified)": "{name} (बदला गया)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ “{name}” जोड़ा, इसकी स्पीड और पिच उतनी रखी जितनी पैड सेव कर सकता है",
@@ -4748,7 +4745,6 @@
   "Search effects": "इफ़ेक्ट खोजें",
   "Show the whole sound": "पूरी साउंड दिखाएँ",
   "Speed & loudness": "स्पीड और लाउडनेस",
-  "The usual tabs, one at a time": "वही टैब, एक बार में एक",
   "Undo ({keys})": "अनडू ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Windows के winget से, नहीं तो FFmpeg के अपने डाउनलोड से (लगभग 100 MB)। इसे सेटिंग्स → प्राइवेसी और सिक्योरिटी में बंद कर सकते हैं।",
   "Don't ask for admin each time": "हर बार एडमिन की अनुमति न माँगें",
@@ -4797,5 +4793,6 @@
   "my sparkler's still going": "मेरी फुलझड़ी अभी जल रही है",
   "ooh! aah!": "ओह! आह!",
   "ooh, pretty!": "वाह, कितना सुंदर!",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "शुरू और आख़िर काटने के लिए हैंडल खींचें। चलने की जगह बदलने के लिए टाइम रूलर पर क्लिक करें या खींचें, या प्लेहेड खींचें। Ctrl+स्क्रॉल से ज़ूम। आगे-पीछे जाने के लिए माउस का दायाँ बटन दबाकर खींचें, या Shift+स्क्रॉल करें।"
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "शुरू और आख़िर काटने के लिए हैंडल खींचें। चलने की जगह बदलने के लिए टाइम रूलर पर क्लिक करें या खींचें, या प्लेहेड खींचें। Ctrl+स्क्रॉल से ज़ूम। आगे-पीछे जाने के लिए माउस का दायाँ बटन दबाकर खींचें, या Shift+स्क्रॉल करें।",
+  "The settings most people change, on one page": "वे सेटिंग्स जिन्हें ज़्यादातर लोग बदलते हैं, एक ही पेज पर"
 }

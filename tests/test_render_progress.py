@@ -136,7 +136,7 @@ def test_save_with_a_voice_keeps_the_edit_window_open_with_its_progress(qapp, wi
     d.accept()   # Save
     assert d.isVisible() and d.render_shown()            # stays open, showing the render
     assert soundfx.key(m.fx) == soundfx.key(VOICE)        # saved straight away
-    assert d._bb.isHidden() and not d.tabs.isEnabled()
+    assert d._bb.isHidden() and not d.simple.isEnabled()
     slow.frac = [0.5]
     assert process_events(qapp, lambda: d.render_bar.value() == 500, 5)
     assert "50%" in d.render_words.text()
@@ -177,7 +177,7 @@ def test_the_edit_windows_x_stops_it_and_goes_back_to_editing(qapp, window,  # n
     assert slow.running.wait(5)
     d.render_stop.click()
     assert d.isVisible() and not d.render_shown()          # back to the draft
-    assert not d._bb.isHidden() and d.tabs.isEnabled()
+    assert not d._bb.isHidden() and d.simple.isEnabled()
     assert m.fx == old
     assert process_events(qapp, lambda: w.pads["s0"].state == "ready" and slow.cancelled, 10)
     d.reject()

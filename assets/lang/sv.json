@@ -2491,7 +2491,6 @@
   "Free sound packs": "Gratis ljudpaket",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "Gratis ljudpaket (fliken Ljud → Säkerhetskopia) läser listan med paket från GitHub och laddar ner ett därifrån när du trycker på Lägg till.",
   "It's in your sounds now": "Det finns i dina ljud nu",
-  "Loudness": "Ljudnivå",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "Gjort ett paket? Dela det: varje ljud måste vara CC0 (fritt för alla, inget omnämnande krävs). När det har granskats visas det här för alla.",
   "Needs the internet: Offline mode is on (Privacy & security)": "Kräver internet: offlineläget är på (Integritet & säkerhet)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "Inget går ut på nätet alls, och allt som kräver internet döljs (fliken Radio, webbsökning, nedladdningar, uppdateringar…). Kryssa ur det för att välja vad som får gå ut på nätet.",
@@ -4320,7 +4319,6 @@
   "Watches your game's window while it's open, even behind others": "Håller koll på ditt spels fönster medan det är öppet, även bakom andra",
   "Your file stays whole: only the part between the handles plays.": "Din fil förblir hel: bara delen mellan handtagen spelas.",
   "Main": "Grundläggande",
-  "Trim & speed": "Trimma & hastighet",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} på",
     "{group}  ·  {n} på"
@@ -4336,7 +4334,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Ändrar varje ljud medan det spelas. Spara som ny ruta sparar det som en egen ruta.",
   "Play a sound first, then save it with your changes": "Spela ett ljud först och spara det sedan med dina ändringar",
   "Save as new pad": "Spara som ny ruta",
-  "Take the Live controls effects off": "Ta bort livekontrollernas effekter",
   "{name} (modified {n})": "{name} (ändrad {n})",
   "{name} (modified)": "{name} (ändrad)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ La till ”{name}”, med hastighet och tonhöjd begränsade till vad en ruta kan spara",
@@ -4748,7 +4745,6 @@
   "Search effects": "Sök effekter",
   "Show the whole sound": "Visa hela ljudet",
   "Speed & loudness": "Hastighet & ljudnivå",
-  "The usual tabs, one at a time": "De vanliga flikarna, en i taget",
   "Undo ({keys})": "Ångra ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Via Windows winget, annars FFmpegs egen nedladdning (cirka 100 MB). Du kan stänga av det under Inställningar → Integritet & säkerhet.",
   "Don't ask for admin each time": "Fråga inte om administratör varje gång",
@@ -4797,5 +4793,6 @@
   "my sparkler's still going": "Mitt tomtebloss brinner fortfarande",
   "ooh! aah!": "Ooh! Aah!",
   "ooh, pretty!": "Åh, så fint!",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Dra i handtagen för att klippa bort början och slutet. Klicka eller dra i tidslinjalen, eller dra uppspelningsstrecket, för att flytta var den spelar. Ctrl+scroll zoomar. Dra med höger musknapp, eller använd Skift+scroll, för att flytta."
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Dra i handtagen för att klippa bort början och slutet. Klicka eller dra i tidslinjalen, eller dra uppspelningsstrecket, för att flytta var den spelar. Ctrl+scroll zoomar. Dra med höger musknapp, eller använd Skift+scroll, för att flytta.",
+  "The settings most people change, on one page": "Inställningarna de flesta ändrar, på en sida"
 }

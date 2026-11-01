@@ -2491,7 +2491,6 @@
   "Free sound packs": "Ilmaiset äänipaketit",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "Ilmaiset äänipaketit (Äänet-välilehti → Varmuuskopio) lukee pakettilistan GitHubista ja lataa paketin sieltä, kun painat Lisää.",
   "It's in your sounds now": "Se on nyt äänissäsi",
-  "Loudness": "Voimakkuus",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "Teitkö paketin? Jaa se: jokaisen äänen pitää olla CC0 (vapaa kaikille, tekijää ei tarvitse mainita). Kun se on tarkistettu, se näkyy täällä kaikille.",
   "Needs the internet: Offline mode is on (Privacy & security)": "Tarvitsee internetin: offline-tila on päällä (Yksityisyys ja tietoturva)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "Mitään ei mene verkkoon, ja kaikki internetiä tarvitseva piilotetaan (Radio-välilehti, verkkohaku, lataukset, päivitykset…). Poista ruksi valitaksesi, mikä saa mennä verkkoon.",
@@ -4320,7 +4319,6 @@
   "Watches your game's window while it's open, even behind others": "Tarkkailee pelisi ikkunaa, kun se on auki, myös muiden takana",
   "Your file stays whole: only the part between the handles plays.": "Tiedostosi pysyy kokonaisena: vain kahvojen välinen osa soi.",
   "Main": "Tärkeimmät",
-  "Trim & speed": "Rajaus & nopeus",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} päällä",
     "{group}  ·  {n} päällä"
@@ -4336,7 +4334,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Muuttaa jokaista ääntä sen soidessa. Tallenna uutena nappina säilyttää sen omana nappinaan.",
   "Play a sound first, then save it with your changes": "Soita ensin ääni ja tallenna se sitten muutoksinesi",
   "Save as new pad": "Tallenna uutena nappina",
-  "Take the Live controls effects off": "Poista Live-säätimien efektit",
   "{name} (modified {n})": "{name} (muokattu {n})",
   "{name} (modified)": "{name} (muokattu)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ Lisättiin “{name}”, nopeus ja sävelkorkeus rajattu siihen, minkä nappi voi tallentaa",
@@ -4748,7 +4745,6 @@
   "Search effects": "Hae efektejä",
   "Show the whole sound": "Näytä koko ääni",
   "Speed & loudness": "Nopeus ja voimakkuus",
-  "The usual tabs, one at a time": "Tutut välilehdet, yksi kerrallaan",
   "Undo ({keys})": "Kumoa ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "Windowsin wingetillä tai muuten FFmpegin omalla latauksella (noin 100 Mt). Voit poistaa tämän käytöstä kohdassa Asetukset → Yksityisyys ja tietoturva.",
   "Don't ask for admin each time": "Älä kysy järjestelmänvalvojan oikeuksia joka kerta",
@@ -4797,5 +4793,6 @@
   "my sparkler's still going": "Tähtisädetikkuni palaa yhä",
   "ooh! aah!": "Ooh! Aah!",
   "ooh, pretty!": "Oi, miten kaunista!",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Vedä kahvoista leikataksesi alun ja lopun. Klikkaa tai vedä aikajanaa, tai vedä toistokohtaa, siirtääksesi kohtaa, jota soitetaan. Ctrl+rulla zoomaa. Siirrä vetämällä hiiren oikealla painikkeella tai Shift+rullalla."
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Vedä kahvoista leikataksesi alun ja lopun. Klikkaa tai vedä aikajanaa, tai vedä toistokohtaa, siirtääksesi kohtaa, jota soitetaan. Ctrl+rulla zoomaa. Siirrä vetämällä hiiren oikealla painikkeella tai Shift+rullalla.",
+  "The settings most people change, on one page": "Useimpien muuttamat asetukset yhdellä sivulla"
 }

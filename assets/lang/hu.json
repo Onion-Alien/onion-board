@@ -2491,7 +2491,6 @@
   "Free sound packs": "Ingyenes hangcsomagok",
   "Free sound packs (Sounds tab → Backup) reads the list of packs from GitHub, and downloads one from there when you press Add.": "Az Ingyenes hangcsomagok (Hangok lap → Biztonsági mentés) a GitHubról olvassa be a csomagok listáját, és onnan tölt le egyet, amikor megnyomod a Hozzáadás gombot.",
   "It's in your sounds now": "Most már a hangjaid között van",
-  "Loudness": "Hangerősség",
   "Made a pack? Share it: every sound must be CC0 (free for anyone, no credit needed). Once it's checked, it shows up here for everyone.": "Készítettél csomagot? Oszd meg: minden hangnak CC0-snak kell lennie (bárkinek ingyenes, nem kell feltüntetni a szerzőt). Ellenőrzés után itt mindenkinek megjelenik.",
   "Needs the internet: Offline mode is on (Privacy & security)": "Internet kell hozzá: az Offline mód be van kapcsolva (Adatvédelem és biztonság)",
   "Nothing goes online at all, and everything that needs the internet is hidden (the Radio tab, web search, downloads, updates…). Untick it to pick what may go online.": "Semmi nem megy online, és minden, ami internetet igényel, el van rejtve (a Rádió lap, a webes keresés, a letöltések, a frissítések…). Vedd ki a pipát, ha választani akarsz, mi mehet online.",
@@ -4320,7 +4319,6 @@
   "Watches your game's window while it's open, even behind others": "Figyeli a játékod ablakát, amíg nyitva van, mások mögött is",
   "Your file stays whole: only the part between the handles plays.": "A fájlod egészben marad: csak a fogantyúk közötti rész szól.",
   "Main": "Fő",
-  "Trim & speed": "Vágás és sebesség",
   "{group}  ·  {n} on": [
     "{group}  ·  {n} bekapcsolva",
     "{group}  ·  {n} bekapcsolva"
@@ -4336,7 +4334,6 @@
   "Changes every sound while it plays. Save as new pad keeps it as a pad of its own.": "Minden hangot megváltoztat, amíg szól. A Mentés új gombként külön gombként megtartja.",
   "Play a sound first, then save it with your changes": "Előbb játssz le egy hangot, aztán mentsd a változtatásaiddal",
   "Save as new pad": "Mentés új gombként",
-  "Take the Live controls effects off": "Élő vezérlők effektjeinek levétele",
   "{name} (modified {n})": "{name} (módosított {n})",
   "{name} (modified)": "{name} (módosított)",
   "✓ Added “{name}”, its speed and pitch kept to what a pad can save": "✓ „{name}” hozzáadva, a sebességét és hangmagasságát annyira korlátozva, amennyit egy gomb el tud menteni",
@@ -4748,7 +4745,6 @@
   "Search effects": "Effektek keresése",
   "Show the whole sound": "Az egész hang mutatása",
   "Speed & loudness": "Sebesség és hangerősség",
-  "The usual tabs, one at a time": "A megszokott fülek, egyszerre egy",
   "Undo ({keys})": "Visszavonás ({keys})",
   "Through Windows' winget, or else FFmpeg's own download (about 100 MB). You can switch this off in Settings → Privacy & security.": "A Windows winget segítségével, vagy az FFmpeg saját letöltéséből (kb. 100 MB). Ezt kikapcsolhatod: Beállítások → Adatvédelem & biztonság.",
   "Don't ask for admin each time": "Ne kérjen rendszergazdai engedélyt minden alkalommal",
@@ -4797,5 +4793,6 @@
   "my sparkler's still going": "A csillagszórom még ég",
   "ooh! aah!": "Ó! Á!",
   "ooh, pretty!": "Ó, de szép!",
-  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Húzd a fogantyúkat az eleje és a vége levágásához. Kattints vagy húzz az idővonalon, vagy húzd a lejátszási jelet, hogy máshonnan szóljon. Ctrl+görgetés nagyít. Mozgatáshoz húzd a jobb egérgombbal, vagy használd a Shift+görgetést."
+  "Drag the handles to cut off the start and end. Click or drag the time ruler, or drag the playhead, to move where it plays. Ctrl+scroll zooms. Drag with the right mouse button, or Shift+scroll, to move along.": "Húzd a fogantyúkat az eleje és a vége levágásához. Kattints vagy húzz az idővonalon, vagy húzd a lejátszási jelet, hogy máshonnan szóljon. Ctrl+görgetés nagyít. Mozgatáshoz húzd a jobb egérgombbal, vagy használd a Shift+görgetést.",
+  "The settings most people change, on one page": "A legtöbbek által módosított beállítások egy oldalon"
 }
