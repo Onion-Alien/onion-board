@@ -165,9 +165,9 @@ class SetupPageBuild:
             b.setCursor(Qt.CursorShape.PointingHandCursor)
             group.addButton(b)
             sh.addWidget(b)
-        mw.seg_cable.clicked.connect(lambda: mw.cfg.route != "cable"
-                                     and mw.micctl.use_cable_instead())
-        mw.seg_mic.clicked.connect(lambda: mw.cfg.route != "mic" and mw.micctl.attach_mic())
+        mw.seg_cable.clicked.connect(mw.routectl.use_cable)
+        mw.seg_mic.clicked.connect(mw.routectl.use_mic)
+        mw.mic_found.connect(mw.routectl._mic_found)
         sw.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
         sw.hide()
         cv.addWidget(sw, 0, Qt.AlignmentFlag.AlignLeft)
@@ -494,8 +494,7 @@ class SetupPageBuild:
         mw.cb_route = QComboBox()
         mw.cb_route.setToolTip(_("Normally your sounds go into your mic, so everyone who hears "
                                    "your mic hears them. Only pick something else to send them "
-                                   "somewhere instead: Voicemeeter, a mixer, a device OBS "
-                                   "captures, or a virtual cable."))
+                                   "somewhere instead: a virtual cable or Voicemeeter."))
         for r, (ic, text, cb) in enumerate((
                 ("headphones", _("My headphones"), mw.cb_mon),
                 ("mic", _("My mic"), mw.cb_mic),

@@ -38,6 +38,8 @@ class RouteControl(Controller):
 
     def __init__(self, mw: MainWindow):
         super().__init__(mw)
+        self.finding_mic = False   # use_mic: asking which mic Onion Board is on already
+        self._find_id = 0          # ...that ask's number: an answer to an older one is dropped
 
     def _fill_combo(self, cb, names, current):
         cb.blockSignals(True)
@@ -54,6 +56,9 @@ class RouteControl(Controller):
         mw = self.mw
         name = cb.currentData()
         if attr == "route":
+            if name == "mic":
+                self.use_mic()
+                return
             if name and name.startswith(ROUTE_DEVICE):   # a device by name
                 dev = name[len(ROUTE_DEVICE):] or None
                 self.set_route("cable" if dev is None or is_virtual_cable(dev) else "device",
@@ -142,33 +147,113 @@ class RouteControl(Controller):
         self._prepare_all()
 
     def _show_route(self):
-        """The Setup tab follows the route: "Send my sounds to" lists your mic, nobody
-        and every output but the headphones, with the current one picked."""
+        """The Setup tab follows the route: "Send my sounds to" lists your mic, the
+        virtual cables and nobody, with the current one picked. Switching to the mic
+        (use_mic, attach_mic) shows the mic at once: the box never says the cable while
+        the switch above it says My mic."""
         mw = self.mw
         c, cb = mw.cfg, mw.cb_route
         route = c.route
+        to_mic = mw._attaching or self.finding_mic
         cb.blockSignals(True)
         cb.clear()
-        for text, key in ROUTE_CHOICES:
-            cb.addItem(text, key)
+        cb.addItem(*ROUTE_CHOICES[0])
         names = [d["name"] for d in eng.list_devices("output")]
         target = c.main_device if route in ("cable", "device") else None
-        if route in ("cable", "device") and target not in names:
-            names.append(target)   # unplugged, or no cable yet: still shown as picked
+        # only what others can hear you through: a virtual cable, one entry each ("CABLE
+        # Input" and "CABLE In 16ch" are the same cable). Speakers and screens aren't
+        # (Also play on copies sounds there); one picked before stays listed, unplugged
+        # too, so a mixer sent to that way keeps working
+        shown = [target] if target else []
         for n in names:
-            if n is None:
-                cb.addItem(_("A virtual cable (not installed yet)"), ROUTE_DEVICE)
-            elif n != c.mon_device or n == target:
-                cb.addItem(n, ROUTE_DEVICE + n)
-        key = route if route in ("mic", "off") else ROUTE_DEVICE + (target or "")
+            if n not in shown and n != c.mon_device and is_virtual_cable(n) \
+                    and not any(eng.same_cable(n, s) for s in shown):
+                shown.append(n)
+        shown.sort(key=lambda n: names.index(n) if n in names else len(names))
+        if route in ("cable", "device") and target is None:
+            cb.addItem(_("A virtual cable (not installed yet)"), ROUTE_DEVICE)
+        for n in shown:
+            cb.addItem(n, ROUTE_DEVICE + n)
+        cb.addItem(*ROUTE_CHOICES[1])
+        key = "mic" if to_mic else route if route in ("mic", "off") \
+            else ROUTE_DEVICE + (target or "")
         cb.setCurrentIndex(max(0, cb.findData(key)))
         cb.view().setMinimumWidth(cb.view().sizeHintForColumn(0) + 32)   # whole names
         cb.blockSignals(False)
         for v in list(getattr(mw, "also_views", ())):   # (not built yet at start)
             v.rebuild()
         # (not "Your virtual mic": a name for a thing a new user doesn't have yet)
-        mw.how_title.setText(_("Send your sounds") if route == "cable" else
-                               _("Your mic") if route == "mic" else _("Where your sounds go"))
+        mw.how_title.setText(_("Send your sounds") if route == "cable" and not to_mic else
+                               _("Your mic") if route == "mic" or to_mic else
+                               _("Where your sounds go"))
+
+    def use_mic(self):
+        """The Your mic card's My mic switch, and "My mic" under Send my sounds to:
+        sounds go into the mic. A mic Onion Board is on already is used as it is, with
+        no admin prompt (My mic moves to it too); otherwise the picked mic, or Windows'
+        default one, is set up. Which mic it's on is read from the registry on a thread
+        (_mic_found); the switch and both boxes say My mic meanwhile."""
+        mw = self.mw
+        if mw.cfg.route == "mic" or mw._attaching or self.finding_mic:
+            self._show_route()
+            mw.statusctl._update_flow()
+            return
+        self.finding_mic = True
+        self._find_id += 1
+        self._show_route()
+        mw.statusctl._update_flow()
+        ins = [n for n in (mw.cb_mic.itemData(i) for i in range(mw.cb_mic.count())) if n]
+        worker.run(self._mic_with_effect, mw.mic_found, "mic-find", error=(self._find_id, None),
+                   owner=mw, args=(self._find_id, ins, mw.cfg.mic_device))
+
+    def use_cable(self):
+        """The Your mic card's Virtual cable switch. A My mic click still being looked
+        up (use_mic) is dropped."""
+        mw = self.mw
+        self.finding_mic = False
+        self._find_id += 1
+        if mw.cfg.route != "cable":
+            mw.micctl.use_cable_instead()
+        else:
+            self._show_route()
+            mw.statusctl._update_flow()
+
+    @staticmethod
+    def _mic_with_effect(find_id: int, ins: list[str],
+                         picked: str | None) -> tuple[int, str | None]:
+        """(a thread) The mic in `ins` Onion Board is on and working: `picked` if it's
+        one, else the first. None when it isn't on any of them."""
+        on = [m["pa"] for m in directmic.mics(ins)
+              if m["active"] and m["pa"] and directmic.works(m["state"])]
+        return find_id, picked if picked in on else next(iter(on), None)
+
+    def _mic_found(self, find_id: int, name: str | None):
+        mw = self.mw
+        if find_id != self._find_id:   # Virtual cable clicked (or asked again) meanwhile
+            return
+        self.finding_mic = False
+        c = mw.cfg
+        if c.route == "mic" or mw._attaching:   # (got there another way meanwhile)
+            self._show_route()
+            mw.statusctl._update_status()
+            return
+        ins = [n for n in (mw.cb_mic.itemData(i) for i in range(mw.cb_mic.count())) if n]
+        dflt = eng.default_device_name("input")
+        mic = name or (c.mic_device if c.mic_device in ins else None) \
+            or (dflt if dflt in ins else next(iter(ins), None))
+        if not mic:   # no mic at all: the switch goes back to the cable
+            mw.toast(_("Pick your mic first (Setup tab → Devices)."), "warn", aside=True)
+            self._show_route()
+            mw.statusctl._update_status()
+            return
+        if mic != c.mic_device:
+            mw.cb_mic.setCurrentIndex(mw.cb_mic.findData(mic))
+            self.on_device(mw.cb_mic, "mic_device")
+        if name:   # on it already: no set-up, no prompt
+            log.info("sending into the mic Onion Board is on already")
+            self.set_route("mic", by_hand=True, attached=True)
+        else:
+            mw.micctl.attach_mic()
 
     def _main_name(self) -> str | None:
         """The device that gets what others hear: none when sending nowhere, and

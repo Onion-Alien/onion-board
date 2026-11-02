@@ -210,7 +210,7 @@
   "No sounds to play yet": "अभी चलाने को कोई साउंड नहीं",
   "No {site} results for <b>{q}</b>.": "<b>{q}</b> के लिए {site} पर कोई नतीजा नहीं।",
   "Nobody: only I hear them": "कोई नहीं: सिर्फ़ मैं सुनूँ",
-  "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "आम तौर पर आपके साउंड आपके माइक में जाते हैं, इसलिए जो भी आपका माइक सुनता है, वह उन्हें भी सुनता है। कुछ और तभी चुनें जब उन्हें कहीं और भेजना हो: Voicemeeter, मिक्सर, OBS जिस डिवाइस को कैप्चर करता है, या वर्चुअल केबल।",
+  "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: a virtual cable or Voicemeeter.": "आम तौर पर आपके साउंड आपके माइक में जाते हैं, इसलिए जो भी आपका माइक सुनता है, वह उन्हें भी सुनता है। कुछ और तभी चुनें जब उन्हें कहीं और भेजना हो: वर्चुअल केबल या Voicemeeter।",
   "Not reaching your mic, click to fix": "आपके माइक तक नहीं पहुँच रहा, ठीक करने के लिए क्लिक करें",
   "Not sending to others (only you hear sounds)": "दूसरों को नहीं भेज रहे (साउंड सिर्फ़ आप सुनते हैं)",
   "Not sending: pick a device on the Setup tab": "नहीं भेज रहे: सेटअप टैब पर डिवाइस चुनें",

@@ -487,7 +487,10 @@ class StatusControl(Controller):
         # switch on top changes the way instead, once the cable is installed
         mw.btn_attach.setVisible(route == "cable" and not mw._attaching and not any_cable)
         mw.route_switch.setVisible(any_cable and route in ("cable", "mic"))
-        (mw.seg_mic if route == "mic" else mw.seg_cable).setChecked(True)
+        # on its way to the mic (asking which mic, or setting it up): My mic already, and
+        # back to the cable when that doesn't happen (no mic, a No, a failure)
+        to_mic = route == "mic" or mw._attaching or mw.routectl.finding_mic
+        (mw.seg_mic if to_mic else mw.seg_cable).setChecked(True)
         mw.route_switch.setEnabled(not mic_busy)
         mw.ways_or.setVisible(not mw.btn_attach.isHidden() and not mw.btn_install.isHidden())
         if route == "mic":

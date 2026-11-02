@@ -234,7 +234,7 @@
   "No sounds to play yet": "لا أصوات لتشغيلها بعد",
   "No {site} results for <b>{q}</b>.": "لا نتائج في {site} لـ <b>{q}</b>.",
   "Nobody: only I hear them": "لا أحد: أنا فقط أسمعها",
-  "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "عادةً تدخل أصواتك في الميكروفون، فيسمعها كل من يسمع ميكروفونك. لا تختر شيئًا آخر إلا إن أردت إرسالها إلى مكان آخر: Voicemeeter، أو جهاز مزج، أو جهاز يلتقطه OBS، أو كابل افتراضي.",
+  "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: a virtual cable or Voicemeeter.": "عادةً تدخل أصواتك في الميكروفون، فيسمعها كل من يسمع ميكروفونك. لا تختر شيئًا آخر إلا إن أردت إرسالها إلى مكان آخر: كابل افتراضي أو Voicemeeter.",
   "Not reaching your mic, click to fix": "لا يصل إلى الميكروفون، انقر للإصلاح",
   "Not sending to others (only you hear sounds)": "لا إرسال إلى الآخرين (أنت فقط تسمع الأصوات)",
   "Not sending: pick a device on the Setup tab": "لا إرسال: اختر جهازًا في تبويب التهيئة",
