@@ -24,8 +24,10 @@ def voice_names(mw: MainWindow) -> list[str]:
     """The voices a request can pick: the built-in ones, then the saved ones ("My own
     mix" isn't one: picking it opens a window to make it)."""
     from soundboard import voicefx
-    return list(voicefx.PRESETS) + [n for n in _voice_tab(mw).fx.store.voices
-                                    if n not in voicefx.PRESETS]
+    fx = _voice_tab(mw).fx
+    return [n for n in (*voicefx.PRESETS, *(n for n in fx.store.voices
+                                            if n not in voicefx.PRESETS))
+            if fx.offered(n)]
 
 
 def _voice_tab(mw: MainWindow):

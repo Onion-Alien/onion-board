@@ -37,6 +37,7 @@ class _Critter(Effect):
               Param("follow", "Follow my tune", 0, 1, 0.7, "", 0, ("one note", "my tune")),
               Param("mix", "Mix", 0, 1, 1))
 
+    needs_download = True   # the recordings (offline: only the made-up call)
     BASE_HZ = 500.0
     MOUTHS: np.ndarray = np.zeros((1, 1, 3), F32)   # [row][peak] = (Hz, width Hz, gain)
     BREATH = 0.05          # breath noise, of the call's loudness
