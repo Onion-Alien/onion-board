@@ -424,3 +424,21 @@ def test_edit_sound_is_laid_out_before_its_first_paint(window):  # noqa: F811
     assert d.name.height() >= d.name.minimumSizeHint().height()
     assert d.hk_btn.height() >= d.hk_btn.minimumSizeHint().height()
     d.close()
+
+
+def test_applying_the_effects_grows_the_window_for_its_bar(window):  # noqa: F811
+    """After Save, the bar's box (taller than the buttons it stands in for) squeezed a
+    short window below what it needs: the Start / End row sat on the
+    waveform's bottom edge. The window grows for it, and gives the room back after."""
+    d = _dialog(window, advanced=True)
+    d.show()
+    d.resize(d.width(), ADV_MIN_H)
+    QApplication.processEvents()
+    h = d.height()
+    d.show_render(0.4, "40%", True)
+    QApplication.processEvents()
+    assert d.height() >= d.minimumSizeHint().height() and d.height() > h
+    d.show_render(None)
+    QApplication.processEvents()
+    assert d.height() == h
+    d.close()

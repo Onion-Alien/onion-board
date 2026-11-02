@@ -125,6 +125,19 @@ class Bridge(QObject):
     ffmpeg_progress = Signal(int)              # percent of FFmpeg downloaded (-1: not known)
 
 
+START_W, START_H = 1180, 720   # the window's first size, on a screen with room for it
+FRAME_ROOM = 48   # the title bar and borders, which the size doesn't count
+
+
+def start_size(screen) -> tuple[int, int]:
+    """START_W x START_H, less high on a screen without room for it: on a 768 px high
+    screen, 720 and the title bar put the bottom strip under the taskbar. (The width
+    the window's fitter handles: it folds the bars on a narrow window.)"""
+    if screen is None:
+        return START_W, START_H
+    return START_W, max(1, min(START_H, screen.availableGeometry().height() - FRAME_ROOM))
+
+
 class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
                  QMainWindow):
     update_done = Signal(object, str)   # an update check finished: Release|None, error
@@ -377,7 +390,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         if sys.platform == "win32":
             self._default_timer.start(DEFAULT_POLL_MS)
         self.fitctl._init_fit()
-        self.resize(1180, 720)
+        self.resize(*start_size(QApplication.primaryScreen()))
         if self.cfg.window_maximized:   # shows maximised, as it was when it closed
             self.setWindowState(Qt.WindowState.WindowMaximized)
         if self.cfg.always_on_top:
