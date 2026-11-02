@@ -22,6 +22,7 @@ FX_ICONS = {"pitch": "mic", "growl": "wave", "robot": "keyboard",
             "backdrop": "sounds",
             "flanger": "reload", "wobble": "ear", "cat": "wink", "dog": "laugh",
             "goat": "leaf", "duck": "speech", "pig": "wow", "sheep": "ghost", "cow": "ear",
+            "farm": "leaf",
             "glitch": "tv", "bitcrush": "gamepad"}
 # the Voice tab's "Edit voice" window's tabs: Main (these), then one a group;
 # an effect from an add-on goes under Add-ons (a tab only when there is one)
@@ -29,14 +30,15 @@ HERO = ("pitch",)
 HERO_TITLES = {"pitch": _("Pitch & voice")}
 MAIN_TAB = _("Main")
 GROUPS = ((_("Change the voice"), ("harmony", "growl", "robot", "ringmod", "monk", "cat",
-                                         "dog", "goat", "duck", "pig", "sheep", "cow")),
+                                         "dog", "goat", "duck", "pig", "sheep", "cow",
+                                         "farm")),
           (_("Character"), ("compressor", "tone", "radio", "distortion", "shout", "helmet",
                             "glitch", "bitcrush", "polish")),
           (_("Room"), ("chorus", "flanger", "wobble", "echo", "reverb", "backdrop")))
 ADDON_GROUP = _("Add-ons")
 # the animals are voices, not something to put on another voice: a card shows only
 # while its animal is on (its own voice: Pitch and the rest), and Randomize skips them
-CALLERS = ("cat", "dog", "goat", "duck", "pig", "sheep", "cow")
+CALLERS = ("cat", "dog", "goat", "duck", "pig", "sheep", "cow", "farm")
 # yours, not the voice's: picking a voice leaves it as it is (the Background's
 # sounds); with the Effects pop-up's extras, they're "on top"
 KEEP = voicefx.KEEP

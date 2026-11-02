@@ -1,5 +1,5 @@
 """The real calls the animal voices play (voicefx.builtin.animals): the meows,
-barks, bleats, quacks, oinks and moos.
+barks, bleats, quacks, oinks and moos (and the Farm voice's cowbell).
 
 They're public-domain (CC0) recordings, downloaded the first time a voice is
 used and kept in the app's cache: the app ships no audio of its own. Each file is
@@ -151,6 +151,13 @@ SOURCES: dict[str, tuple[Source, ...]] = {
         Source(_BSB + "2386.ogg",
                "e48806d1ddc3858e5856bda3df62dcff9caf1190bb3ad192af3c3ea42ae7c450",
                ((0.44, 2.20),)),
+    ),
+    # the Farm voice's odd cowbell: Wikimedia Commons, public domain: "Cowbell.ogg"
+    "cowbell": (
+        Source(_COMMONS + "a/ab/Cowbell.ogg",
+               "a888c638bbd2872fb830592faf4e55a834b6d57e1be2b8469546c8f7dadb12a6",
+               ((0.00, 0.34), (1.94, 2.32), (2.34, 2.72), (3.98, 4.36), (6.34, 6.72),
+                (7.98, 8.40))),
     ),
 }
 
