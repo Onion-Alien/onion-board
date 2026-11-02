@@ -174,7 +174,7 @@ class CategoryControl(Controller):
         add.setProperty("add", True)
         add.setCursor(Qt.CursorShape.PointingHandCursor)
         # the name is typed where the new chip will show
-        box = self.sub_name_box = InlineNameBox(add, _("New subcategory"), width=150)
+        box = self.sub_name_box = InlineNameBox(add, _("New subcategory"), width=None)
         box.named.connect(lambda text: self.new_subcategory(cat, name=text))
         flow.addWidget(box)
         flow.addWidget(add)
