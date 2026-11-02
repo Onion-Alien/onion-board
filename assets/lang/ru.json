@@ -4986,5 +4986,15 @@
   "Bits": "Биты",
   "Fewer bits and a lower sample rate: an old game console.": "Меньше бит и ниже частота дискретизации: старая игровая приставка.",
   "Sample rate": "Частота дискретизации",
-  "Virtual idol": "Виртуальный идол"
+  "Virtual idol": "Виртуальный идол",
+  "Cow": "Корова",
+  "Duck": "Утка",
+  "Every syllable you say comes out as a baa.": "Каждый слог, который ты говоришь, звучит как бее.",
+  "Every syllable you say comes out as a bleat.": "Каждый слог, который ты говоришь, звучит как мее.",
+  "Every syllable you say comes out as a moo.": "Каждый слог, который ты говоришь, звучит как муу.",
+  "Every syllable you say comes out as a quack.": "Каждый слог, который ты говоришь, звучит как кря.",
+  "Every syllable you say comes out as an oink.": "Каждый слог, который ты говоришь, звучит как хрю.",
+  "Goat": "Коза",
+  "Pig": "Свинья",
+  "Sheep": "Овца"
 }

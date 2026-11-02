@@ -4800,5 +4800,15 @@
   "Bits": "บิต",
   "Fewer bits and a lower sample rate: an old game console.": "บิตน้อยลงและอัตราสุ่มต่ำลง: เครื่องเกมยุคเก่า",
   "Sample rate": "อัตราสุ่มตัวอย่าง",
-  "Virtual idol": "ไอดอลเสมือน"
+  "Virtual idol": "ไอดอลเสมือน",
+  "Cow": "วัว",
+  "Duck": "เป็ด",
+  "Every syllable you say comes out as a baa.": "ทุกพยางค์ที่คุณพูดจะกลายเป็นเสียงแบะ",
+  "Every syllable you say comes out as a bleat.": "ทุกพยางค์ที่คุณพูดจะกลายเป็นเสียงแพะร้อง",
+  "Every syllable you say comes out as a moo.": "ทุกพยางค์ที่คุณพูดจะกลายเป็นเสียงมอ",
+  "Every syllable you say comes out as a quack.": "ทุกพยางค์ที่คุณพูดจะกลายเป็นเสียงก๊าบ",
+  "Every syllable you say comes out as an oink.": "ทุกพยางค์ที่คุณพูดจะกลายเป็นเสียงอู๊ด",
+  "Goat": "แพะ",
+  "Pig": "หมู",
+  "Sheep": "แกะ"
 }

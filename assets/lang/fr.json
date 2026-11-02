@@ -4893,5 +4893,15 @@
   "Bits": "Bits",
   "Fewer bits and a lower sample rate: an old game console.": "Moins de bits et une fréquence d'échantillonnage plus basse : une vieille console.",
   "Sample rate": "Fréquence d'échantillonnage",
-  "Virtual idol": "Idole virtuelle"
+  "Virtual idol": "Idole virtuelle",
+  "Cow": "Vache",
+  "Duck": "Canard",
+  "Every syllable you say comes out as a baa.": "Chaque syllabe que tu dis devient un bêê.",
+  "Every syllable you say comes out as a bleat.": "Chaque syllabe que tu dis devient un bêlement de chèvre.",
+  "Every syllable you say comes out as a moo.": "Chaque syllabe que tu dis devient un meuh.",
+  "Every syllable you say comes out as a quack.": "Chaque syllabe que tu dis devient un coin-coin.",
+  "Every syllable you say comes out as an oink.": "Chaque syllabe que tu dis devient un groin-groin.",
+  "Goat": "Chèvre",
+  "Pig": "Cochon",
+  "Sheep": "Mouton"
 }

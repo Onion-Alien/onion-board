@@ -69,6 +69,21 @@ def shown_texts() -> dict[str, str]:
         "Dog": _("Dog"),
         "Every syllable you say comes out as a bark.":
             _("Every syllable you say comes out as a bark."),
+        "Goat": _("Goat"),
+        "Every syllable you say comes out as a bleat.":
+            _("Every syllable you say comes out as a bleat."),
+        "Duck": _("Duck"),
+        "Every syllable you say comes out as a quack.":
+            _("Every syllable you say comes out as a quack."),
+        "Pig": _("Pig"),
+        "Every syllable you say comes out as an oink.":
+            _("Every syllable you say comes out as an oink."),
+        "Sheep": _("Sheep"),
+        "Every syllable you say comes out as a baa.":
+            _("Every syllable you say comes out as a baa."),
+        "Cow": _("Cow"),
+        "Every syllable you say comes out as a moo.":
+            _("Every syllable you say comes out as a moo."),
         "Glitch": _("Glitch"),
         "Your voice stutters, skips and cuts out like a broken stream.":
             _("Your voice stutters, skips and cuts out like a broken stream."),

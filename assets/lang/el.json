@@ -4893,5 +4893,15 @@
   "Bits": "Bit",
   "Fewer bits and a lower sample rate: an old game console.": "Λιγότερα bit και χαμηλότερος ρυθμός δειγματοληψίας: μια παλιά κονσόλα.",
   "Sample rate": "Ρυθμός δειγματοληψίας",
-  "Virtual idol": "Εικονικό είδωλο"
+  "Virtual idol": "Εικονικό είδωλο",
+  "Cow": "Αγελάδα",
+  "Duck": "Πάπια",
+  "Every syllable you say comes out as a baa.": "Κάθε συλλαβή που λες βγαίνει μπεε.",
+  "Every syllable you say comes out as a bleat.": "Κάθε συλλαβή που λες βγαίνει βέλασμα κατσίκας.",
+  "Every syllable you say comes out as a moo.": "Κάθε συλλαβή που λες βγαίνει μουγκανητό.",
+  "Every syllable you say comes out as a quack.": "Κάθε συλλαβή που λες βγαίνει πα-πα.",
+  "Every syllable you say comes out as an oink.": "Κάθε συλλαβή που λες βγαίνει γρύλισμα γουρουνιού.",
+  "Goat": "Κατσίκα",
+  "Pig": "Γουρούνι",
+  "Sheep": "Πρόβατο"
 }

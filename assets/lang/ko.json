@@ -4800,5 +4800,15 @@
   "Bits": "비트",
   "Fewer bits and a lower sample rate: an old game console.": "비트 수와 샘플 레이트를 낮춰 옛날 게임기 소리로.",
   "Sample rate": "샘플 레이트",
-  "Virtual idol": "버추얼 아이돌"
+  "Virtual idol": "버추얼 아이돌",
+  "Cow": "소",
+  "Duck": "오리",
+  "Every syllable you say comes out as a baa.": "말하는 음절마다 매에 소리가 나요.",
+  "Every syllable you say comes out as a bleat.": "말하는 음절마다 염소 울음소리가 나요.",
+  "Every syllable you say comes out as a moo.": "말하는 음절마다 음매 소리가 나요.",
+  "Every syllable you say comes out as a quack.": "말하는 음절마다 꽥꽥 소리가 나요.",
+  "Every syllable you say comes out as an oink.": "말하는 음절마다 꿀꿀 소리가 나요.",
+  "Goat": "염소",
+  "Pig": "돼지",
+  "Sheep": "양"
 }

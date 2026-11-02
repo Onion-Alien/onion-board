@@ -203,6 +203,24 @@ PRESETS: dict[str, dict[str, dict]] = {
     "Dog": {"dog": {"note": 0, "follow": 0.7, "mix": 1},
             "compressor": {"threshold": -24, "ratio": 3, "boost": 8},
             "reverb": {"size": 0.25, "tone": 5000, "mix": 0.1}},
+    # the farm: a bleat, a quack, an oink, a baa, a moo
+    "Goat": {"goat": {"note": 0, "follow": 0.7, "mix": 1},
+             "compressor": {"threshold": -24, "ratio": 3, "boost": 6},
+             "reverb": {"size": 0.3, "tone": 6000, "mix": 0.1}},
+    "Duck": {"duck": {"note": 0, "follow": 0.7, "mix": 1},
+             "compressor": {"threshold": -24, "ratio": 3, "boost": 6},
+             "reverb": {"size": 0.2, "tone": 7000, "mix": 0.08}},
+    "Pig": {"pig": {"note": 0, "follow": 0.7, "mix": 1},
+            "compressor": {"threshold": -24, "ratio": 3, "boost": 6},
+            "reverb": {"size": 0.2, "tone": 5000, "mix": 0.08},
+            # (a grunt is spiky: its tops are held under full scale)
+            "polish": {"deess": 0, "warmth": 0, "ceiling": -1}},
+    "Sheep": {"sheep": {"note": 0, "follow": 0.7, "mix": 1},
+              "compressor": {"threshold": -24, "ratio": 3, "boost": 4},
+              "reverb": {"size": 0.3, "tone": 6000, "mix": 0.1}},
+    "Cow": {"cow": {"note": 0, "follow": 0.7, "mix": 1},
+            "compressor": {"threshold": -24, "ratio": 3, "boost": 4},
+            "reverb": {"size": 0.35, "tone": 5000, "mix": 0.12}},
     # the meme mic: driven flat out (no compressor: the drive alone makes it as loud
     # as it goes, and the talk gate hears your real mic), bass and bite boosted,
     # pinned to the ceiling (the limiter keeps it there, never past it); silent
@@ -251,5 +269,6 @@ PRESET_ICONS = {"Chipmunk": "🐿️", "Deep voice": "🐻", "High voice": "🎵
                 "Cave": "🦇", "Singing monk": "🧘", "Dalek": "🤖", "Haunted radio": "📻",
                 "Underwater": "🐠", "Podcast voice": "🎙️",
                 "Nightcore": "🎶", "Slowed + reverb": "🌙", "Cat": "🐱", "Dog": "🐶",
+                "Goat": "🐐", "Duck": "🦆", "Pig": "🐷", "Sheep": "🐑", "Cow": "🐮",
                 "Ear destroyer": "💥", "Glitch": "👾", "8-bit": "🕹️", "Virtual idol": "🎧",
                 "80s robot": "📼"}

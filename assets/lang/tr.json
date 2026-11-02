@@ -4893,5 +4893,15 @@
   "Bits": "Bit",
   "Fewer bits and a lower sample rate: an old game console.": "Daha az bit ve daha düşük örnekleme hızı: eski bir oyun konsolu.",
   "Sample rate": "Örnekleme hızı",
-  "Virtual idol": "Sanal idol"
+  "Virtual idol": "Sanal idol",
+  "Cow": "İnek",
+  "Duck": "Ördek",
+  "Every syllable you say comes out as a baa.": "Söylediğin her hece mee olarak çıkar.",
+  "Every syllable you say comes out as a bleat.": "Söylediğin her hece keçi melemesi olarak çıkar.",
+  "Every syllable you say comes out as a moo.": "Söylediğin her hece möö olarak çıkar.",
+  "Every syllable you say comes out as a quack.": "Söylediğin her hece vak olarak çıkar.",
+  "Every syllable you say comes out as an oink.": "Söylediğin her hece hönk olarak çıkar.",
+  "Goat": "Keçi",
+  "Pig": "Domuz",
+  "Sheep": "Koyun"
 }

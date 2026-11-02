@@ -4893,5 +4893,15 @@
   "Bits": "Bitit",
   "Fewer bits and a lower sample rate: an old game console.": "Vähemmän bittejä ja matalampi näytteenottotaajuus: vanha pelikonsoli.",
   "Sample rate": "Näytteenottotaajuus",
-  "Virtual idol": "Virtuaalinen idoli"
+  "Virtual idol": "Virtuaalinen idoli",
+  "Cow": "Lehmä",
+  "Duck": "Ankka",
+  "Every syllable you say comes out as a baa.": "Jokainen sanomasi tavu kuuluu bääkimisenä.",
+  "Every syllable you say comes out as a bleat.": "Jokainen sanomasi tavu kuuluu vuohen määkimisenä.",
+  "Every syllable you say comes out as a moo.": "Jokainen sanomasi tavu kuuluu ammumisena.",
+  "Every syllable you say comes out as a quack.": "Jokainen sanomasi tavu kuuluu kvaakkina.",
+  "Every syllable you say comes out as an oink.": "Jokainen sanomasi tavu kuuluu röhkimisenä.",
+  "Goat": "Vuohi",
+  "Pig": "Possu",
+  "Sheep": "Lammas"
 }

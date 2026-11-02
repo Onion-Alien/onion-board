@@ -4800,5 +4800,15 @@
   "Bits": "ビット数",
   "Fewer bits and a lower sample rate: an old game console.": "ビット数とサンプルレートを下げて、昔のゲーム機の音に。",
   "Sample rate": "サンプルレート",
-  "Virtual idol": "バーチャルアイドル"
+  "Virtual idol": "バーチャルアイドル",
+  "Cow": "ウシ",
+  "Duck": "アヒル",
+  "Every syllable you say comes out as a baa.": "話した音節がすべてメェになります。",
+  "Every syllable you say comes out as a bleat.": "話した音節がすべてヤギのメェーになります。",
+  "Every syllable you say comes out as a moo.": "話した音節がすべてモーになります。",
+  "Every syllable you say comes out as a quack.": "話した音節がすべてガーガーになります。",
+  "Every syllable you say comes out as an oink.": "話した音節がすべてブーブーになります。",
+  "Goat": "ヤギ",
+  "Pig": "ブタ",
+  "Sheep": "ヒツジ"
 }
