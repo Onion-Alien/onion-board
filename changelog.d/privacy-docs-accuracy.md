@@ -1,0 +1,1 @@
+- The privacy page now says the usage count includes where in the app an error happened, and the website no longer makes a promise about IP addresses that any web request can't keep.

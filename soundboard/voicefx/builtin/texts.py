@@ -56,6 +56,11 @@ def shown_texts() -> dict[str, str]:
         "A monk sings your words: your talking becomes his chant.":
             _("A monk sings your words: your talking becomes his chant."),
         "Follow my tune": _("Follow my tune"),
+        "How many calls": _("How many calls"),
+        "How many notes": _("How many notes"),
+        "every syllable": _("every syllable"),
+        "one a sentence": _("one a sentence"),
+        "Call length": _("Call length"),
         "one note": _("one note"),
         "my tune": _("my tune"),
         "Words": _("Words"),

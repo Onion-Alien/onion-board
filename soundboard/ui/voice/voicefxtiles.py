@@ -14,6 +14,7 @@ from PySide6.QtWidgets import QWidget
 from soundboard import voicefx
 from soundboard.core import errors, usage
 from soundboard.i18n import _
+from soundboard.online import net
 from soundboard.speech import aipreview
 from soundboard.ui.kit import busy, icons
 from soundboard.ui.voice import art
@@ -77,6 +78,21 @@ class VoiceFxTiles(_Base):
         width: Any
 
     # ------------------------------------------------------------------ saved voices
+    def offered(self, name: str) -> bool:
+        """Is a voice shown (cards, Mix in a voice, Random voice, the remote's list)? Not
+        one that needs a download (the animals) while voices can't be downloaded
+        (Offline mode, or Settings > Privacy's switch): it would only make its made-up
+        call. One that's on stays on."""
+        if name == CUSTOM or net.allowed("voices"):
+            return True
+        if name in voicefx.PRESETS:
+            return not voicefx.needs_download(voicefx.PRESETS[name])
+        return not voicefx.needs_download(self.store.voices.get(name) or {})
+
+    def _net_changed(self):
+        """Offline mode / the voices switch flipped: the animals go or come back."""
+        self._place_tiles()
+
     def _roll_pool(self, on: str | None = None) -> list[str]:
         """The voices Random voice picks from: the cards shown, without your own mix
         and without the voice that's on now (`on`; None: the one that's on)."""
@@ -191,8 +207,9 @@ class VoiceFxTiles(_Base):
         """The cards the picked chip shows: All under a heading per group, else one
         group (or your favorites, in the order you starred them) without headings."""
         g, cols = self._tile_grid, self._tile_cols
-        names = list(voicefx.PRESETS) + [CUSTOM] + [n for n in self.store.voices
-                                                    if n in self._tile]
+        names = [n for n in (*voicefx.PRESETS, CUSTOM, *(n for n in self.store.voices
+                                                           if n in self._tile))
+                 if self.offered(n)]
         for w in (*self._tile.values(), *self._heads.values(), self.random_tile):
             g.removeWidget(w)
         rows: list[tuple[str, list[str]]]
@@ -200,7 +217,7 @@ class VoiceFxTiles(_Base):
             rows = [(k, [n for n in names if voice_group(n) == k])
                     for k in (*(k for k, _t, _n in VOICE_GROUPS), MINE)]
         elif self._group == FAVS:
-            rows = [("", [n for n in self._favs if n in self._tile])]
+            rows = [("", [n for n in self._favs if n in self._tile and self.offered(n)])]
         else:
             rows = [("", [n for n in names if voice_group(n) == self._group])]
         found = self.bar.text()
@@ -253,11 +270,13 @@ class VoiceFxTiles(_Base):
 
     def _group_count(self, key: str) -> int:
         """How many voices a group holds (the dropdown's numbers)."""
-        names = [*voicefx.PRESETS, CUSTOM, *(n for n in self.store.voices if n in self._tile)]
+        names = [n for n in (*voicefx.PRESETS, CUSTOM,
+                             *(n for n in self.store.voices if n in self._tile))
+                 if self.offered(n)]
         if key == ALL:
             return len(names)
         if key == FAVS:
-            return sum(n in self._tile for n in self._favs)
+            return sum(n in self._tile and self.offered(n) for n in self._favs)
         return sum(voice_group(n) == key for n in names)
 
     @property

@@ -208,3 +208,8 @@ def test_new_voices_are_grouped_and_have_icons_and_texts():
         assert preset in funny and preset in voicefx.PRESETS
         assert kind in in_groups and FX_ICONS[kind] in SHAPES
         assert REGISTRY[kind].name in texts and REGISTRY[kind].description in texts
+
+
+def test_only_the_recorded_ones_need_a_download():
+    # offline, a voice that needs a download isn't offered: the made-in-code ones are
+    assert {k for k in NEW if REGISTRY[k].needs_download} == {"fart", "drums"}

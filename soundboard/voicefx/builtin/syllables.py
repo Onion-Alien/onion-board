@@ -78,6 +78,7 @@ class Chatter(_Critter):
     type = "chatter"
     name = "Critter chatter"
     description = "Every syllable you say comes out as cute gibberish blips."
+    needs_download = False  # (made in code)
     params = (Param("note", "Pitch", -12, 12, 0, " st", 1, ("lower", "higher")),
               Param("follow", "Follow my tune", 0, 1, 0.7, "", 0, ("one note", "my tune")),
               Param("mix", "Mix", 0, 1, 1))
@@ -104,6 +105,10 @@ class Chatter(_Critter):
         self.last_start = -1e9
         self.free_at = 0.0     # when the blip playing now has ended
         self.pending = False   # a new syllable waiting for its first blip
+
+    @classmethod
+    def prepare(cls, cfg):
+        pass                # nothing to download
 
     def _blip(self, rate: int) -> tuple[np.ndarray, float]:
         """A new blip: its samples (rms 1) and its length in seconds."""
@@ -159,15 +164,13 @@ class Chatter(_Critter):
 @register
 class Fart(_Critter):
     """Every syllable a fart, picked at random. The farts are real public-domain
-    recordings (voicefx.critters, downloaded the first time the voice is used).
+    recordings (voicefx.critters, downloaded the first time the voice is used), with
+    the animals' sliders (how many, how long).
     Until they're in (or offline) it makes one up: a low, rough, flapping buzz."""
 
     type = "fart"
     name = "Fart"
     description = "Every syllable you say comes out as a fart."
-    params = (Param("note", "Pitch", -12, 12, 0, " st", 1, ("lower", "higher")),
-              Param("follow", "Follow my tune", 0, 1, 0.4, "", 0, ("one note", "my tune")),
-              Param("mix", "Mix", 0, 1, 1))
 
     BASE_HZ = 75.0
     HOLD_S = 0.14

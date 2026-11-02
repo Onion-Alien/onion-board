@@ -188,10 +188,11 @@ _K = (EYES[1] - EYES[0]) / (bunnyfit.EYES[1] - bunnyfit.EYES[0])
 HEAD = (0, -12, 1.0)
 EYES_AT = (50 - 50 * _K, EYE_Y - bunnyfit.EYE_Y * _K, _K)
 NECK_AT = (0, -14, 1.0)
-# pieces that need their own place: the frog's eyes and the mint would poke out of the
-# top of his picture (moved a little lower). Tall hats stay full size on purpose: an
-# oversized hat on him is the look.
-OWN_PLACE = {"frog": (0, -10, 1.0), "mint_sprig": (2, -1, 1.0), "burst": (0, 1, 0.8)}
+# pieces that need their own place: the frog's eyes, the mint, the firework burst and
+# the sparkler's lit tip would poke out of his picture (moved in, the sparkler smaller).
+# Tall hats stay full size on purpose: an oversized hat on him is the look.
+OWN_PLACE = {"frog": (0, -10, 1.0), "mint_sprig": (2, -1, 1.0), "burst": (3, 2, 0.8),
+             "sparkler": (25, 3, 0.7)}
 # pieces that don't fit an owl: a hoodie's drawstrings read as a second face on his
 # belly, and a turtleneck's ribbed roll as teeth under his beak
 NOT_ON_OWL = {"strings", "sweater", "turtleneck"}
@@ -305,6 +306,9 @@ def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=None, dark=No
         g.setColorAt(1, QColor(255, 128, 160, 0))
         p.fillRect(QRectF(x - 7, 56.5, 14, 14), g)
     p.restore()
+    # what he wears round his neck goes under the wings, which clasp in front of it
+    neck = tuple(n for n in fit if n in bunnyfit.NECK)
+    _fit(p, neck, "face", ink)
     # wings: at his sides, clasped in front of the belly, or flung up
     for sx in (-1, 1):
         if sx == -1 and wave is not None:   # waving hello, turned about his shoulder
@@ -426,7 +430,7 @@ def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=None, dark=No
         p.setBrush(c)
         p.drawPath(drop)
     _fit(p, fit, "over", ink)
-    _fit(p, fit, "face", ink, shut=shut)
+    _fit(p, tuple(n for n in fit if n not in bunnyfit.NECK), "face", ink, shut=shut)
     p.restore()
 
 

@@ -1,0 +1,1 @@
+- Voices that need a download to work (Cat, Dog, Goat, Duck, Pig, Sheep, Cow and Farm) are no longer offered while the app can't download voices (Offline mode, or the voices switch in Settings > Privacy): not as cards, in search, in Mix in a voice, in Random voice or to the remote control. They come back as soon as downloads are allowed again; a voice that's already on stays on.

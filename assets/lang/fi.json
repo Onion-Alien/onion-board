@@ -4917,5 +4917,10 @@
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Kun laitat puheäänen päälle, Puhdas mikki menee myös päälle, joten puheääni kuuluu ilman taustamelua. Puheäänen laittaminen pois jättää Puhtaan mikin ennalleen.",
   "Every syllable you say is a different farm animal, with the odd cowbell and donkey.": "Jokainen sanomasi tavu on eri maatilan eläin, ja välillä lehmänkello tai aasi.",
   "80s robot": "80-luvun robotti",
-  "Virtual idol": "Virtuaalinen idoli"
+  "Virtual idol": "Virtuaalinen idoli",
+  "Call length": "Äänen pituus",
+  "How many calls": "Kuinka monta ääntä",
+  "How many notes": "Kuinka monta säveltä",
+  "every syllable": "joka tavu",
+  "one a sentence": "yksi lauseessa"
 }

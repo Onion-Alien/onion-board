@@ -4824,5 +4824,10 @@
   "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "목소리를 켜면 마이크 잡음 제거도 함께 켜져서, 주변 잡음 없이 목소리가 나갑니다. 목소리를 꺼도 마이크 잡음 제거는 그대로 둡니다.",
   "Every syllable you say is a different farm animal, with the odd cowbell and donkey.": "말하는 음절마다 다른 농장 동물 소리가 나고, 가끔 카우벨이나 당나귀 소리도 나요.",
   "80s robot": "80년대 로봇",
-  "Virtual idol": "버추얼 아이돌"
+  "Virtual idol": "버추얼 아이돌",
+  "Call length": "소리 길이",
+  "How many calls": "소리 횟수",
+  "How many notes": "음 개수",
+  "every syllable": "음절마다",
+  "one a sentence": "문장마다 한 번"
 }

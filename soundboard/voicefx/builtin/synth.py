@@ -203,6 +203,8 @@ class Monk(Effect):
     params = (Param("note", "Pitch", -12, 12, 0, " st", 1, ("lower", "higher")),
               Param("follow", "Follow my tune", 0, 1, 0.55, "", 0, ("one note", "my tune")),
               Param("words", "Words", 0, 1, 0.3, "", 0, ("only singing", "clear words")),
+              Param("calls", "How many notes", 0, 1, 0, "", 0,
+                    ("every syllable", "one a sentence")),
               Param("mix", "Mix", 0, 1, 1))
 
     BASE_HZ = 130.81            # his note with Pitch at 0 (C3)
@@ -215,6 +217,12 @@ class Monk(Effect):
     YA_S = 0.05                 # ... slides from "y" to "a" in this long,
                                 # and closes to "i" as he lets go
     MOUTH_S = 0.06              # his mouth moves from vowel to vowel this slowly
+    # How many notes at "one a sentence": a new one only after a pause this long, or
+    # once his note has had this long; a held note moves only after LONG_HOLD_S
+    PAUSE_S = 0.4
+    PHRASE_S = 4.0
+    LONG_HOLD_S = 1.0
+    KNEE = F32(0.9)             # his voice is rounded off above this, never past 1
 
     def __init__(self, rate, values=None):
         super().__init__(rate, values)
@@ -238,6 +246,7 @@ class Monk(Effect):
         self.vowel = self.AA
         self.peak = self.dip = 0.0  # loudness since the last syllable (finds the next)
         self.since = 0.0            # seconds into this syllable
+        self.quiet = 1e9            # seconds you've been quiet (huge: not yet talked)
         self.pitched = False        # this syllable's note came from your pitch
         self.amps = None            # last block's harmonic levels (glided across)
 
@@ -283,9 +292,14 @@ class Monk(Effect):
         self.peak = max(self.peak, level)
         self.dip = min(self.dip, level)
         self.since += n / rate
-        fresh = loud and (self.amp < self.GATE
-                          or (self.since > self.GAP_S and self.dip < 0.5 * self.peak
-                              and level > 2 * self.dip))
+        # How many notes: every syllable, or towards one a sentence (a new note only
+        # after a pause, or once his note has had a long while)
+        c = self.p["calls"]
+        gap = self.quiet
+        self.quiet = 0.0 if loud else self.quiet + n / rate
+        fresh = loud and ((self.amp < self.GATE and (gap >= c * self.PAUSE_S or self.f == 0))
+                          or (self.since > self.GAP_S + c * (self.PHRASE_S - self.GAP_S)
+                              and self.dip < 0.5 * self.peak and level > 2 * self.dip))
         if fresh or not loud:
             self.peak = self.dip = level
         if fresh:
@@ -303,7 +317,7 @@ class Monk(Effect):
                 self.cand, self.cand_n = note, n / rate
             elif note != self.target:
                 self.cand_n += n / rate
-                if self.cand_n >= self.HOLD_S:
+                if self.cand_n >= self.HOLD_S + c * (self.LONG_HOLD_S - self.HOLD_S):
                     self.target = note
         elif fresh and (self.f == 0 or self.amp < self.GATE):
             # sound with no pitch (a whisper, an "s"): he starts on his own note
@@ -356,8 +370,15 @@ class Monk(Effect):
             hiss = self.hiss.run(x, ("hp", rate),
                                  lambda: butter(2, 2500, btype="high", fs=rate).astype(F32))
             wet = wet + hiss * (2.5 * words)
-        mix = F32(self.p["mix"])
+        # a held "a" on a loud mic can pass full scale: its tops rounded off above
+        # KNEE (nothing below it changes)
         wet = wet.astype(F32)
+        over = np.abs(wet) > self.KNEE
+        if over.any():
+            a = np.abs(wet[over])
+            wet[over] = np.sign(wet[over]) * (self.KNEE + (1 - self.KNEE)
+                                             * np.tanh((a - self.KNEE) / (1 - self.KNEE)))
+        mix = F32(self.p["mix"])
         return wet if mix >= 1 else (x * (1 - mix) + wet * mix).astype(F32)
 
 

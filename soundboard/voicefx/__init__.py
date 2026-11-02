@@ -62,6 +62,9 @@ class Effect:
     params: tuple[Param, ...] = ()
     # one of the Effects pop-up's copies, on top of the voice (no card in Edit voice)
     extra: bool = False
+    # works only with something downloaded (the animals' recordings): a voice with it
+    # isn't offered while the app can't download voices (needs_download below)
+    needs_download: bool = False
 
     def __init__(self, rate: int, values: dict | None = None):
         self.rate = rate
@@ -133,6 +136,14 @@ def register[E: Effect](cls: type[E]) -> type[E]:
         log.warning("effect type %r registered twice; keeping the newer one", cls.type)
     REGISTRY[cls.type] = cls
     return cls
+
+
+def needs_download(spec: dict) -> bool:
+    """Does a voice ({type: settings}, a preset's or a saved one's) use an effect that
+    needs a download? A saved voice's effect switched off ({"on": False}) doesn't count."""
+    return any(getattr(REGISTRY.get(t), "needs_download", False)
+               and not (isinstance(cfg, dict) and cfg.get("on") is False)
+               for t, cfg in (spec or {}).items())
 
 
 # built-in voices that were renamed: old saved name -> new name (an older version
@@ -552,4 +563,5 @@ def shown(text: str) -> str:
 
 
 __all__ = ["Param", "Effect", "REGISTRY", "register", "defaults", "clean_spec", "on_top",
-           "VoiceChain", "PRESETS", "PRESET_ICONS", "shown"]
+           "VoiceChain", "PRESETS", "PRESET_ICONS", "shown",
+           "needs_download"]

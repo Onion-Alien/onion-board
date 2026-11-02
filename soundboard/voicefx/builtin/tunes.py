@@ -17,6 +17,7 @@ class _Tune(_Critter):
     Follow my tune), a little vibrato. Quieter on sounds with no pitch ("s", "f"). A
     subclass makes the sound from the phase it's given (`_sound`)."""
 
+    needs_download = False  # (made in code)
     GLIDE_S = 0.03         # the pitch slides to a new note this fast
     UNVOICED = 0.3         # how loud it stays on a sound with no pitch
     LEVEL = 1.4            # its loudness against yours
@@ -27,6 +28,10 @@ class _Tune(_Critter):
         self.st = None         # the pitch now (semitones from BASE_HZ, glided)
         self.voiced = 0.0
         self.words = _Filter()
+
+    @classmethod
+    def prepare(cls, cfg):
+        pass                # nothing to download
 
     def _base_st(self) -> float:
         """The tune's middle (semitones from BASE_HZ)."""
