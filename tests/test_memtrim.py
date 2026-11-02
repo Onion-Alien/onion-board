@@ -117,3 +117,13 @@ def test_minimised_gives_memory_back_too(window, monkeypatch):  # noqa: F811
     window.tickctl._tray_since = time.monotonic() - memtrim.AFTER_S - 1
     window.tickctl.tick()
     assert calls == [1]
+
+
+@pytest.mark.parametrize("load, collects", [(50, True), (None, True), (85, False)])
+def test_no_collection_on_a_pc_short_of_memory(monkeypatch, load, collects):
+    from soundboard.core import hangwatch
+    calls = []
+    monkeypatch.setattr(hangwatch, "memory_load", lambda: load)
+    monkeypatch.setattr(memtrim.gc, "collect", lambda *a: calls.append(1) or 0)
+    memtrim.release()
+    assert bool(calls) == collects   # (it would read the paged-out objects back)

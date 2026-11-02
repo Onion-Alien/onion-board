@@ -1,0 +1,2 @@
+- Fix: the window could freeze for seconds to minutes when Windows changed a setting (the taskbar preview buttons were redrawn each time).
+- Fix: on a PC short of memory, the app no longer freezes when it gives memory back from the tray.
