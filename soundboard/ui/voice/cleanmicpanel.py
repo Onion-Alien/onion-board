@@ -48,6 +48,7 @@ class CleanMicPanel(QWidget):
         super().__init__()
         self.chain, self.engine = chain, engine
         self.s = cleanmic.clean_settings(saved)
+        self._by_voice_next = False   # set_on(by_voice=True) switching it now
         self.ok = cleanmic.available()
         if not self.ok:
             self.s["on"] = False
@@ -249,13 +250,22 @@ class CleanMicPanel(QWidget):
     def is_on(self) -> bool:
         return self.b_on.isChecked()
 
-    def set_on(self, on: bool):
-        """Switched from elsewhere (the status bar's chip): as if the switch was flipped."""
+    def set_on(self, on: bool, by_voice: bool = False):
+        """Switched from elsewhere (the status bar's chip): as if the switch was flipped.
+        `by_voice`: a voice going on switched it on (VoicePanel._clean_with_voice), so it
+        goes off again with the voice; switched any other way, it's yours and stays."""
         if self.ok and on != self.is_on():
+            self._by_voice_next = by_voice
             self.b_on.setChecked(on)
+
+    def by_voice(self) -> bool:
+        """On only because a voice went on (nobody switched it since)."""
+        return self.is_on() and self.s["by_voice"]
 
     def _toggle(self, on: bool):
         self.s["on"] = on
+        self.s["by_voice"] = on and self._by_voice_next
+        self._by_voice_next = False
         self._apply()
         if on:
             usage.used("clean-mic")   # switched on (never how strong)

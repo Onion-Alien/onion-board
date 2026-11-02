@@ -233,8 +233,9 @@ class Agc:
 def clean_settings(raw) -> dict:
     """The saved settings, damaged values replaced: {"on": bool, "strength": "off" |
     "light" | "normal" | "strong", "volume": 0-200 (%), "auto_sense": bool, "sense_db":
-    -100-0, "agc": bool}. (Versions before the ⚙ saved only on and strength, and drop
-    the rest; "off" there reads as Normal.)"""
+    -100-0, "agc": bool, "by_voice": bool (a voice going on switched it on: it goes off
+    with the voice)}. (Versions before the ⚙ saved only on and strength, and drop the
+    rest; "off" there reads as Normal.)"""
     raw = raw if isinstance(raw, dict) else {}
     s = raw.get("strength")
 
@@ -247,7 +248,8 @@ def clean_settings(raw) -> dict:
             "volume": num("volume", 0, VOLUME_MAX, 100),
             "auto_sense": raw.get("auto_sense") is not False,
             "sense_db": num("sense_db", SENSE_LO, 0, SENSE_DEFAULT),
-            "agc": raw.get("agc") is True}
+            "agc": raw.get("agc") is True,
+            "by_voice": raw.get("on") is True and raw.get("by_voice") is True}
 
 
 def preset_of(s: dict) -> str:

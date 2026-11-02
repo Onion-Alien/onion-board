@@ -4914,7 +4914,6 @@
   "Sample rate": "Sample rate",
   "Farm": "Bukid",
   "Turn on Clean mic with a voice": "I-on ang Malinis na mic kasama ng voice",
-  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Kapag nag-on ka ng voice, mao-on din ang Malinis na mic, kaya lalabas ang voice nang walang ingay sa paligid mo. Kapag in-off ang voice, hindi gagalawin ang Malinis na mic.",
   "Every syllable you say is a different farm animal, with the odd cowbell and donkey.": "Bawat pantig na sinasabi mo ay ibang hayop sa bukid, at paminsan-minsan ay kampanilya ng baka o asno.",
   "80s robot": "Robot ng 80s",
   "Virtual idol": "Virtual idol",
@@ -4922,5 +4921,6 @@
   "How many calls": "Ilang tunog",
   "How many notes": "Ilang nota",
   "every syllable": "bawat pantig",
-  "one a sentence": "isa bawat pangungusap"
+  "one a sentence": "isa bawat pangungusap",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Kapag nag-on ka ng voice, mao-on din ang Malinis na mic, kaya lalabas ang voice nang walang ingay sa paligid mo. Mao-off ito ulit kasama ng voice, maliban kung ikaw mismo ang nag-on nito."
 }

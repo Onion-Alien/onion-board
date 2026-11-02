@@ -4914,7 +4914,6 @@
   "Sample rate": "Frecuencia de muestreo",
   "Farm": "Granja",
   "Turn on Clean mic with a voice": "Encender Micrófono limpio con una voz",
-  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. Turning the voice off leaves Clean mic as it is.": "Cuando enciendes una voz, Micrófono limpio también se enciende, así la voz sale sin tu ruido de fondo. Apagar la voz deja Micrófono limpio como está.",
   "Every syllable you say is a different farm animal, with the odd cowbell and donkey.": "Cada sílaba que dices es un animal de granja distinto, y de vez en cuando un cencerro o un burro.",
   "80s robot": "Robot ochentero",
   "Virtual idol": "Ídolo virtual",
@@ -4922,5 +4921,6 @@
   "How many calls": "Cuántos sonidos",
   "How many notes": "Cuántas notas",
   "every syllable": "cada sílaba",
-  "one a sentence": "uno por frase"
+  "one a sentence": "uno por frase",
+  "When you turn on a voice, Clean mic goes on too, so the voice comes out without your background noise. It goes off again with the voice, unless you turned it on yourself.": "Cuando enciendes una voz, Micrófono limpio también se enciende, así la voz sale sin tu ruido de fondo. Se apaga junto con la voz, salvo que lo hayas encendido tú."
 }
