@@ -4797,7 +4797,6 @@
   ],
   "Hear a few first": "Чуй няколко първо",
   "Hear a few of its sounds first (only you hear them)": "Чуй първо няколко от звуците му (само ти ги чуваш)",
-  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "Звуците му се изтеглят направо от Myinstants, когато го добавиш: Onion Board не пази копие. Звук, който вече го няма там, се пропуска.",
   "No packs here yet": "Тук още няма пакети",
   "No packs match “{text}”": "Няма пакети за „{text}“",
   "None of its sounds could be downloaded.": "Не се изтегли нито един от звуците му.",
@@ -4886,5 +4885,6 @@
   "Search YouTube Music": "Търси в YouTube Music",
   "Try airhorn, applause or vine boom.": "Пробвай клаксон, аплодисменти или vine boom.",
   "Type a sound you want, then press Enter": "Напиши звук, който искаш, и натисни Enter",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Звуците ти, резултат от търсене или радиото, както ги чуваш (не микрофонът ти): натисни Запис, после го пусни, или запиши нещо, което вече звучи"
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Звуците ти, резултат от търсене или радиото, както ги чуваш (не микрофонът ти): натисни Запис, после го пусни, или запиши нещо, което вече звучи",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Изтегля се от {site}, когато го добавиш: Onion Board не пази копие. Звуците са на собствениците си. Звук, който вече го няма там, се пропуска."
 }

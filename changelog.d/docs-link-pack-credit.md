@@ -1,0 +1,1 @@
+- Free sound packs: a links pack now says its sounds belong to their owners, and the pack rules say what a links pack is (the project stores none of its sounds; an owner can ask for a link to be removed).

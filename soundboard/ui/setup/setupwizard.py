@@ -34,6 +34,7 @@ from PySide6.QtWidgets import (QApplication, QDialog, QGraphicsOpacityEffect, QH
 from soundboard.core import autostart
 from soundboard.mic import directmic, micstate, mictest
 from soundboard.core import usage
+from soundboard.ui.window import mouseback
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.bun.bunnywidget import TALK
 from soundboard.ui.kit.choicetile import ChoiceTile
@@ -175,6 +176,7 @@ class SetupWizard(LookStep, DeviceStep, CableStep, DiscordStep, QDialog):
         rtl = QApplication.isRightToLeft()
         icons.set_icon(self.btn_back, "nav_next" if rtl else "nav_back")   # painted: bolder
         self.btn_back.clicked.connect(self.back_clicked)
+        mouseback.mark(self.btn_back)
         nav.addWidget(self.btn_back)
         nav.addStretch(1)
         # the send step, not set up: Next does the setting up, so leaving it without is

@@ -17,6 +17,7 @@ import shiboken6
 from shiboken6 import isValid as qt_valid
 
 
+from soundboard.ui.window import mouseback
 from soundboard.ui.kit import busy, icons
 from soundboard.ui.bun import onionalien
 from soundboard.ui.kit import theme
@@ -244,6 +245,7 @@ class SettingsDialog(QDialog, Built):
         back.setAccessibleName(_("Back"))
         back.setAutoDefault(False)
         back.clicked.connect(self.accept)
+        mouseback.mark(back)
         # the page's name in the rail's "Onion Board" size, with a cog after it in the
         # theme's colour (decoration, not a button)
         self.page_title = QLabel(_("Settings"))

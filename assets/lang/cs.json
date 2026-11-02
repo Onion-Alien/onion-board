@@ -4886,7 +4886,6 @@
   ],
   "Hear a few first": "Nejdřív si pár poslechni",
   "Hear a few of its sounds first (only you hear them)": "Nejdřív si poslechni pár jeho zvuků (slyšíš je jen ty)",
-  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "Jeho zvuky se při přidání stáhnou přímo z Myinstants: Onion Board si nenechává kopii. Zvuk, který tam už není, se přeskočí.",
   "No packs here yet": "Zatím tu nejsou žádné balíčky",
   "No packs match “{text}”": "Hledání „{text}“ neodpovídá žádný balíček",
   "None of its sounds could be downloaded.": "Nepodařilo se stáhnout žádný z jeho zvuků.",
@@ -4979,5 +4978,6 @@
   "Search YouTube Music": "Hledat na YouTube Music",
   "Try airhorn, applause or vine boom.": "Zkus klakson, potlesk nebo vine boom.",
   "Type a sound you want, then press Enter": "Napiš zvuk, který chceš, a stiskni Enter",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Tvoje zvuky, výsledek hledání na webu nebo rádio tak, jak je slyšíš (ne tvůj mikrofon): stiskni Nahrát a pak to pusť, nebo nahraj něco, co už hraje"
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Tvoje zvuky, výsledek hledání na webu nebo rádio tak, jak je slyšíš (ne tvůj mikrofon): stiskni Nahrát a pak to pusť, nebo nahraj něco, co už hraje",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Při přidání se stáhne z {site}: Onion Board si nenechává kopii. Zvuky patří svým majitelům. Zvuk, který tam už není, se přeskočí."
 }

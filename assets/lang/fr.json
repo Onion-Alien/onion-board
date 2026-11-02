@@ -4797,7 +4797,6 @@
   ],
   "Hear a few first": "Écoute-en quelques-uns",
   "Hear a few of its sounds first (only you hear them)": "Écoute d'abord quelques-uns de ses sons (toi seul les entends)",
-  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "Ses sons sont téléchargés directement depuis Myinstants quand tu l'ajoutes : Onion Board n'en garde pas de copie. Un son qui n'y est plus est sauté.",
   "No packs here yet": "Pas encore de packs ici",
   "No packs match “{text}”": "Aucun pack ne correspond à « {text} »",
   "None of its sounds could be downloaded.": "Aucun de ses sons n'a pu être téléchargé.",
@@ -4886,5 +4885,6 @@
   "Search YouTube Music": "Chercher sur YouTube Music",
   "Try airhorn, applause or vine boom.": "Essaie klaxon, applaudissements ou vine boom.",
   "Type a sound you want, then press Enter": "Tape un son que tu veux, puis appuie sur Entrée",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Tes sons, un résultat de recherche web ou la radio tels que tu les entends (pas ton micro) : appuie sur Enregistrer, puis joue-le, ou enregistre quelque chose qui joue déjà"
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Tes sons, un résultat de recherche web ou la radio tels que tu les entends (pas ton micro) : appuie sur Enregistrer, puis joue-le, ou enregistre quelque chose qui joue déjà",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Téléchargé depuis {site} quand tu l'ajoutes : Onion Board n'en garde pas de copie. Les sons appartiennent à leurs propriétaires. Un son qui n'y est plus est sauté."
 }

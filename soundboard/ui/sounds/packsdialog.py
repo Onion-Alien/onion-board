@@ -27,6 +27,7 @@ from soundboard.sounds import library, packs
 from soundboard.online import net
 from soundboard.audio.engine import SR
 from soundboard.ui.bun import bunacts
+from soundboard.ui.window import mouseback
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import HoverCard, hint_label, section_label
 from soundboard.ui.kit.panellayouts import CardGrid, Flow
@@ -354,8 +355,9 @@ class PreviewDialog(QDialog):
         head.setSpacing(12)
         art = art_label(p.emoji, ART_BIG)
         head.addWidget(art, 0, Qt.AlignmentFlag.AlignTop)
-        names = QVBoxLayout()
+        names = QVBoxLayout()   # centred on the emoji, not hanging off its top edge
         names.setSpacing(2)
+        names.addStretch(1)
         self.name = QLabel(p.name)
         self.name.setObjectName("helptitle")
         self.name.setTextFormat(Qt.TextFormat.PlainText)
@@ -378,8 +380,9 @@ class PreviewDialog(QDialog):
             v.addWidget(cats)
         if p.links:
             v.addWidget(hint_label(_(
-                "Its sounds are downloaded straight from Myinstants when you add it: Onion "
-                "Board doesn't keep a copy. A sound that's gone from there is skipped.")))
+                "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. "
+                "The sounds belong to their owners. One that's gone from there is "
+                "skipped.", site="Myinstants")))
         # a few of its sounds as pads (packs.samples): placeholders until they arrive,
         # so nothing grows under the mouse
         self.listen = QWidget()
@@ -663,6 +666,7 @@ class PacksDialog(QDialog):
         # back to the board: the way out, first thing on the page (Escape does it too)
         self.btn_done = QPushButton(_("Back to my sounds"))
         icons.set_icon(self.btn_done, "nav_back")
+        mouseback.mark(self.btn_done)
         self.btn_done.clicked.connect(self.accept)
         head.addWidget(self.btn_done, 0, Qt.AlignmentFlag.AlignVCenter)
         # Bun with a parcel, beside the title (running while a download is going)

@@ -4708,7 +4708,6 @@
   ],
   "Hear a few first": "まず少し聴いてみる",
   "Hear a few of its sounds first (only you hear them)": "まずいくつかのサウンドを聴く (聞こえるのは自分だけ)",
-  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "サウンドは追加したときにMyinstantsから直接ダウンロードされます。Onion Boardはコピーを保存しません。向こうで消えたサウンドはスキップされます。",
   "No packs here yet": "まだパックがありません",
   "No packs match “{text}”": "「{text}」に一致するパックはありません",
   "None of its sounds could be downloaded.": "サウンドを1つもダウンロードできませんでした。",
@@ -4793,5 +4792,6 @@
   "Search YouTube Music": "YouTube Music を検索",
   "Try airhorn, applause or vine boom.": "エアホーン、拍手、vine boom などを試してみて。",
   "Type a sound you want, then press Enter": "欲しいサウンドを入力して Enter を押してね",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "聞こえているとおりのサウンド、ウェブ検索結果、ラジオ（マイクは含まない）: 録音を押してから再生するか、再生中のものを録音します"
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "聞こえているとおりのサウンド、ウェブ検索結果、ラジオ（マイクは含まない）: 録音を押してから再生するか、再生中のものを録音します",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "追加したときに{site}からダウンロードされます。Onion Boardはコピーを保存しません。サウンドの権利は各所有者にあります。向こうで消えたサウンドはスキップされます。"
 }

@@ -4708,7 +4708,6 @@
   ],
   "Hear a few first": "先聽幾個",
   "Hear a few of its sounds first (only you hear them)": "先聽聽它的幾個音效（只有你聽得到）",
-  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "加入時，它的音效會直接從 Myinstants 下載：Onion Board 不保留副本。那裡已經沒有的音效會被略過。",
   "No packs here yet": "這裡還沒有音效包",
   "No packs match “{text}”": "沒有符合「{text}」的音效包",
   "None of its sounds could be downloaded.": "它的音效一個都沒能下載。",
@@ -4793,5 +4792,6 @@
   "Search YouTube Music": "搜尋 YouTube Music",
   "Try airhorn, applause or vine boom.": "試試氣笛、掌聲或 vine boom。",
   "Type a sound you want, then press Enter": "輸入你想要的音效，然後按 Enter",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "你聽到的音效、網路搜尋結果或電台（不含你的麥克風）：按「錄音」再播放，或錄下正在播放的內容"
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "你聽到的音效、網路搜尋結果或電台（不含你的麥克風）：按「錄音」再播放，或錄下正在播放的內容",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "加入時從 {site} 下載：Onion Board 不保留副本。音效歸其所有者所有。那裡已經沒有的音效會被略過。"
 }

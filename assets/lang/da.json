@@ -4797,7 +4797,6 @@
   ],
   "Hear a few first": "Hør nogle først",
   "Hear a few of its sounds first (only you hear them)": "Hør nogle af dens lyde først (kun du hører dem)",
-  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "Lydene hentes direkte fra Myinstants, når du tilføjer den: Onion Board gemmer ingen kopi. En lyd, der er væk derfra, springes over.",
   "No packs here yet": "Ingen pakker her endnu",
   "No packs match “{text}”": "Ingen pakker passer til “{text}”",
   "None of its sounds could be downloaded.": "Ingen af lydene kunne hentes.",
@@ -4886,5 +4885,6 @@
   "Search YouTube Music": "Søg på YouTube Music",
   "Try airhorn, applause or vine boom.": "Prøv lufthorn, klapsalver eller vine boom.",
   "Type a sound you want, then press Enter": "Skriv en lyd, du vil have, og tryk på Enter",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Dine lyde, et websøgeresultat eller radioen, som du hører dem (ikke din mikrofon): tryk Optag, og afspil det så, eller optag noget, der allerede spiller"
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Dine lyde, et websøgeresultat eller radioen, som du hører dem (ikke din mikrofon): tryk Optag, og afspil det så, eller optag noget, der allerede spiller",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Hentes fra {site}, når du tilføjer den: Onion Board gemmer ingen kopi. Lydene tilhører deres ejere. En lyd, der er væk derfra, springes over."
 }

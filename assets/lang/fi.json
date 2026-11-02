@@ -4797,7 +4797,6 @@
   ],
   "Hear a few first": "Kuuntele ensin muutama",
   "Hear a few of its sounds first (only you hear them)": "Kuuntele ensin muutama sen äänistä (vain sinä kuulet ne)",
-  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "Äänet ladataan suoraan Myinstantsista, kun lisäät sen: Onion Board ei säilytä kopiota. Ääni, joka on poistunut sieltä, ohitetaan.",
   "No packs here yet": "Täällä ei ole vielä paketteja",
   "No packs match “{text}”": "Mikään paketti ei vastaa hakua ”{text}”",
   "None of its sounds could be downloaded.": "Yhtään sen äänistä ei voitu ladata.",
@@ -4886,5 +4885,6 @@
   "Search YouTube Music": "Hae YouTube Musicsta",
   "Try airhorn, applause or vine boom.": "Kokeile ilmatorvea, aplodeja tai vine boomia.",
   "Type a sound you want, then press Enter": "Kirjoita haluamasi ääni ja paina Enter",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Äänesi, verkkohaun tulos tai radio niin kuin kuulet ne (ei mikkiäsi): paina Nauhoita ja soita se sitten, tai nauhoita jotain jo soivaa"
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Äänesi, verkkohaun tulos tai radio niin kuin kuulet ne (ei mikkiäsi): paina Nauhoita ja soita se sitten, tai nauhoita jotain jo soivaa",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Ladataan palvelusta {site}, kun lisäät sen: Onion Board ei säilytä kopiota. Äänet kuuluvat omistajilleen. Ääni, joka on poistunut sieltä, ohitetaan."
 }

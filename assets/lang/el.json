@@ -4797,7 +4797,6 @@
   ],
   "Hear a few first": "Άκου μερικούς πρώτα",
   "Hear a few of its sounds first (only you hear them)": "Άκου πρώτα μερικούς από τους ήχους του (μόνο εσύ τους ακούς)",
-  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "Οι ήχοι του κατεβαίνουν απευθείας από το Myinstants όταν το προσθέτεις: το Onion Board δεν κρατά αντίγραφο. Ένας ήχος που δεν υπάρχει πια εκεί παραλείπεται.",
   "No packs here yet": "Δεν υπάρχουν ακόμα πακέτα εδώ",
   "No packs match “{text}”": "Κανένα πακέτο δεν ταιριάζει με «{text}»",
   "None of its sounds could be downloaded.": "Δεν κατέβηκε κανένας από τους ήχους του.",
@@ -4886,5 +4885,6 @@
   "Search YouTube Music": "Αναζήτηση στο YouTube Music",
   "Try airhorn, applause or vine boom.": "Δοκίμασε κόρνα, χειροκρότημα ή vine boom.",
   "Type a sound you want, then press Enter": "Γράψε έναν ήχο που θέλεις και πάτα Enter",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Οι ήχοι σου, ένα αποτέλεσμα αναζήτησης ή το ραδιόφωνο όπως τα ακούς (όχι το μικρόφωνό σου): πάτα Εγγραφή, μετά παίξ' το, ή ηχογράφησε κάτι που ήδη παίζει"
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Οι ήχοι σου, ένα αποτέλεσμα αναζήτησης ή το ραδιόφωνο όπως τα ακούς (όχι το μικρόφωνό σου): πάτα Εγγραφή, μετά παίξ' το, ή ηχογράφησε κάτι που ήδη παίζει",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Κατεβαίνει από το {site} όταν το προσθέτεις: το Onion Board δεν κρατά αντίγραφο. Οι ήχοι ανήκουν στους κατόχους τους. Ένας ήχος που δεν υπάρχει πια εκεί παραλείπεται."
 }

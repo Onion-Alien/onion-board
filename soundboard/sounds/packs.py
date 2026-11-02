@@ -17,8 +17,10 @@ is a free site: its links are fetched gently (_Pace: two at a time, spaced out, 
 link waiting when it says "too many requests"), and one that failed for now is tried
 again a few times, each wait longer (_fetch_link).
 
-Anyone can share a pack: packs/README.md says how (a GitHub form; every sound must be
-CC0, so whoever adds it can use it anywhere). The requests carry nothing about the
+Anyone can share a pack: packs/README.md says how (a GitHub form; every sound in a pack
+stored here must be CC0, or CC BY with credits, so whoever adds it can use it anywhere).
+A links pack's sounds stay on their site and belong to their owners, and the window
+says so. The requests carry nothing about the
 user beyond what any HTTPS request does, and they have their own switch in Settings >
 Privacy & security (FEATURE)."""
 from __future__ import annotations
@@ -225,46 +227,10 @@ _MEMES = [
 # the packs known when this version was built: shown when the list can't be read
 # the gaming sounds pack, the same way (Myinstants' most-played)
 _GAMING = [
-    ("Mario coin", "Nintendo", "super-mario-coin-sound.mp3"),
-    ("Zelda chest opening", "Nintendo", "zelda-chest-opening-and-item-catch.mp3"),
     ("Emergency meeting (Among Us)", "Mobile games", "emergency-meeting-sound-among-us.mp3"),
     ("Finish him!", "Fighting games", "finish-him.mp3"),
     ("Minecraft XP", "Minecraft & Roblox", "orb.mp3"),
     ("Bomb has been planted (CS)", "Shooters", "bomb-has-been-planted-sound-effect-cs-go.mp3"),
-    ("Hey, listen! (Zelda)", "Nintendo", "hey_listen.mp3"),
-    ("Pikmin!", "Nintendo", "pikmin-gcn.mp3"),
-    ("Objection! (Ace Attorney)", "Nintendo", "phoenix-objection.mp3"),
-    ("It's-a me, Mario!", "Nintendo", "its-me-mario.mp3"),
-    ("Mario 1-up", "Nintendo", "mario-1-up.mp3"),
-    ("Waluigi wah", "Nintendo", "waluigi_wahring2mob.mp3"),
-    ("Nintendo Switch click", "Nintendo", "switch-sound.mp3"),
-    ("Pokemon level up", "Nintendo", "12_3.mp3"),
-    ("Mii Channel music", "Nintendo", "mii-channel-music.mp3"),
-    ("Beedle: thank you!", "Nintendo", "ww_beedle_thankyou.mp3"),
-    ("Pikachu thunderbolt", "Nintendo", "pikachu-thunderbolt.mp3"),
-    ("Pokemon battle", "Nintendo", "pokemon-battle.mp3"),
-    ("Mario star power", "Nintendo", "super-mario-bros-nes-music-star-theme-cut-mp3.mp3"),
-    ("Mario pipe", "Nintendo", "super-mario-bros.mp3"),
-    ("Thwomp (Mario 64)", "Nintendo", "super-mario-64-thwomp-sound-online-audio-converter.mp3"),
-    ("Mario oof", "Nintendo", "sm64_mario_oof.mp3"),
-    ("Mario power-up", "Nintendo", "01-power-up-mario.mp3"),
-    ("Mario Kart race start", "Nintendo", "mariostart.mp3"),
-    ("Pokemon heal", "Nintendo", "111-pokemon-recovery.mp3"),
-    ("Mario yahoo", "Nintendo", "super-mario-64-yahoo-sound.mp3"),
-    ("Who's that Pokemon?", "Nintendo", "whos-that-pokemon_.mp3"),
-    ("Zelda secret", "Nintendo", "ringtones-zelda-1.mp3"),
-    ("Kirby falling", "Nintendo", "kirby-falling.mp3"),
-    ("Nice shot! (Wii Sports)", "Nintendo", "nice-shot-wii-sports_DJJ0VOz.mp3"),
-    ("Majora's Mask bell", "Nintendo", "mm_clocktower_bell.mp3"),
-    ("Mario mushroom", "Nintendo", "super_mario_bros_mushroom_sound_effect_58k.mp3"),
-    ("Caught a Pokemon!", "Nintendo", "06-caught-a-pokemon.mp3"),
-    ("Poyo! (Kirby)", "Nintendo", "kirby-poyo.mp3"),
-    ("Pokemon item found", "Nintendo", "pokemon-red_blue_yellow-item-found-sound-effect.mp3"),
-    ("Mario game over", "Nintendo", "super-mario-bros_2.mp3"),
-    ("Oh, banana! (Donkey Kong)", "Nintendo", "donkey-kong-64-oh-banana.mp3"),
-    ("Let's-a go! (Mario 64)", "Nintendo", "sm64_mario_lets_go.mp3"),
-    ("Zelda rupee", "Nintendo", "rupee-collect.mp3"),
-    ("Hai! (Kirby)", "Nintendo", "kirby009.mp3"),
     ("Roblox explosion", "Minecraft & Roblox", "roblox-explosion-sound.mp3"),
     ("Roblox bye", "Minecraft & Roblox", "roblox-bye.mp3"),
     ("Roblox hi", "Minecraft & Roblox", "roblox-hi-sound.mp3"),
@@ -294,7 +260,6 @@ _GAMING = [
     ("Fortnite chest", "Shooters", "fortnite.mp3"),
     ("Valorant ace", "Shooters", "valorant-ace-sound.mp3"),
     ("Enemy spotted", "Shooters", "counter-strike-jingle-cs-radio-enemy-spotted.mp3"),
-    ("Falcon Punch!", "Fighting games", "falconpunch.swf.mp3"),
     ("Get over here! (Scorpion)", "Fighting games", "scorpion-get_over_here.mp3"),
     ("Round one, fight!", "Fighting games", "mortal-kombat-9-sound-drop-round-1-fight.mp3"),
     ("Perfect! (Street Fighter)", "Fighting games", "perfect-street-fighter-sound-effect.mp3"),
@@ -302,8 +267,6 @@ _GAMING = [
     ("K.O. (Street Fighter)", "Fighting games", "mlg-resource-street-fighter-ko-greenscreen.mp3"),
     ("Toasty! (Mortal Kombat)", "Fighting games", "toasty_tfCWsU6.mp3"),
     ("Round two (Mortal Kombat)", "Fighting games", "round-2-fight-mortal-kombat-sound-effect.mp3"),
-    ("A new challenger approaches", "Fighting games",
-     "challenger-approaching-super-smash-bros.mp3"),
     ("Hadouken!", "Fighting games", "hadouken.mp3"),
     ("Hog Rider", "Mobile games", "hog-rider.mp3"),
     ("Mega Knight (Clash Royale)", "Mobile games", "evolution-mega-knight.mp3"),
@@ -326,11 +289,8 @@ _GAMING = [
      "gta-san-andreas-mission-complete-sound-hq.mp3"),
     ("Sonic spin dash", "Classic games", "sonic-spindash.mp3"),
     ("Sonic spring", "Classic games", "sonic-spring.mp3"),
-    ("Game Boy startup", "Classic games", "nintendo-game-boy-startup.mp3"),
     ("Sonic jump", "Classic games", "jump.mp3"),
-    ("GameCube startup", "Classic games", "gamecube-startup.mp3"),
     ("You're too slow! (Sonic)", "Classic games", "sonic-youre-too-slow.mp3"),
-    ("Low health beep", "Classic games", "low-health-critical-health-pokemon.mp3"),
     ("Sans talking (Undertale)", "Indie games", "just-sans-talking.mp3"),
     ("Megalovania (Undertale)", "Indie games", "megalovania.mp3"),
     ("Pizza Tower taunt", "Indie games", "sfx_taunt.mp3"),
@@ -522,15 +482,15 @@ BUILT_IN = [{
 }, {
     "id": "gaming",
     "name": "Gaming sounds",
-    "description": "The 110 most-played video game sounds: Mario coin and 1-up, Zelda chest, "
-                   "Pokemon level up, Minecraft XP and creeper, Among Us emergency meeting, "
-                   "Finish him!, bomb has been planted, Victory Royale and many more.",
+    "description": "The 69 most-played video game sounds: Minecraft XP and creeper, Among "
+                   "Us emergency meeting, Finish him!, bomb has been planted, Victory Royale "
+                   "and many more.",
     "license": "As on Myinstants",
     "author": "Onion Board",
     "emoji": "🎮",
     "tags": ["Gaming"],
-    "categories": ["Nintendo", "Minecraft & Roblox", "Shooters", "Fighting games",
-                   "Mobile games", "Classic games", "Indie games"],
+    "categories": ["Minecraft & Roblox", "Shooters", "Fighting games", "Mobile games",
+                   "Classic games", "Indie games"],
     "links": [{"name": n, "category": c,
                "url": f"https://www.myinstants.com/media/sounds/{f}"}
               for n, c, f in _GAMING],

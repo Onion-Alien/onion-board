@@ -4708,7 +4708,6 @@
   ],
   "Hear a few first": "ลองฟังสักหน่อยก่อน",
   "Hear a few of its sounds first (only you hear them)": "ลองฟังเสียงบางส่วนก่อน (คุณได้ยินคนเดียว)",
-  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "เสียงจะถูกดาวน์โหลดจาก Myinstants โดยตรงตอนที่คุณเพิ่ม: Onion Board ไม่เก็บสำเนาไว้ เสียงที่ไม่มีอยู่ที่นั่นแล้วจะถูกข้ามไป",
   "No packs here yet": "ยังไม่มีแพ็กที่นี่",
   "No packs match “{text}”": "ไม่มีแพ็กที่ตรงกับ “{text}”",
   "None of its sounds could be downloaded.": "ดาวน์โหลดเสียงไม่ได้เลยสักเสียง",
@@ -4793,5 +4792,6 @@
   "Search YouTube Music": "ค้นหา YouTube Music",
   "Try airhorn, applause or vine boom.": "ลองแตรลม เสียงปรบมือ หรือ vine boom",
   "Type a sound you want, then press Enter": "พิมพ์เสียงที่คุณอยากได้ แล้วกด Enter",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "เสียงของคุณ ผลค้นหาจากเว็บ หรือวิทยุ ตามที่คุณได้ยิน (ไม่ใช่ไมค์): กด อัด แล้วเล่น หรืออัดสิ่งที่กำลังเล่นอยู่"
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "เสียงของคุณ ผลค้นหาจากเว็บ หรือวิทยุ ตามที่คุณได้ยิน (ไม่ใช่ไมค์): กด อัด แล้วเล่น หรืออัดสิ่งที่กำลังเล่นอยู่",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "ดาวน์โหลดจาก {site} ตอนที่คุณเพิ่ม: Onion Board ไม่เก็บสำเนาไว้ เสียงเป็นของเจ้าของแต่ละคน เสียงที่ไม่มีอยู่ที่นั่นแล้วจะถูกข้ามไป"
 }

@@ -4886,7 +4886,6 @@
   ],
   "Hear a few first": "Сначала послушай несколько",
   "Hear a few of its sounds first (only you hear them)": "Сначала послушай несколько его звуков (слышишь только ты)",
-  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "Его звуки скачиваются прямо с Myinstants, когда ты его добавляешь: Onion Board не хранит копию. Звук, которого там больше нет, пропускается.",
   "No packs here yet": "Здесь пока нет наборов",
   "No packs match “{text}”": "Нет наборов по запросу «{text}»",
   "None of its sounds could be downloaded.": "Не удалось скачать ни одного его звука.",
@@ -4979,5 +4978,6 @@
   "Search YouTube Music": "Искать на YouTube Music",
   "Try airhorn, applause or vine boom.": "Попробуй: гудок, аплодисменты или vine boom.",
   "Type a sound you want, then press Enter": "Напиши, какой звук хочешь, и нажми Enter",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Твои звуки, результат поиска или радио так, как их слышишь ты (без микрофона): нажми «Запись» и включи звук или запиши что-то, что уже играет"
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Твои звуки, результат поиска или радио так, как их слышишь ты (без микрофона): нажми «Запись» и включи звук или запиши что-то, что уже играет",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Скачивается с {site}, когда ты его добавляешь: Onion Board не хранит копию. Звуки принадлежат их владельцам. Звук, которого там больше нет, пропускается."
 }

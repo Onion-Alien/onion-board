@@ -4708,7 +4708,6 @@
   ],
   "Hear a few first": "먼저 몇 개 들어보기",
   "Hear a few of its sounds first (only you hear them)": "먼저 사운드 몇 개를 들어보세요 (나만 들려요)",
-  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "사운드는 추가할 때 Myinstants에서 바로 내려받아요. Onion Board는 사본을 보관하지 않아요. 거기서 사라진 사운드는 건너뛰어요.",
   "No packs here yet": "아직 팩이 없어요",
   "No packs match “{text}”": "“{text}”와 맞는 팩이 없어요",
   "None of its sounds could be downloaded.": "사운드를 하나도 내려받지 못했어요.",
@@ -4793,5 +4792,6 @@
   "Search YouTube Music": "YouTube Music 검색",
   "Try airhorn, applause or vine boom.": "에어혼, 박수, vine boom 같은 걸 검색해 보세요.",
   "Type a sound you want, then press Enter": "원하는 사운드를 입력하고 Enter를 누르세요",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "내가 듣는 그대로의 사운드, 웹 검색 결과, 라디오(마이크 제외): 녹음을 누르고 재생하거나, 이미 재생 중인 것을 녹음하세요"
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "내가 듣는 그대로의 사운드, 웹 검색 결과, 라디오(마이크 제외): 녹음을 누르고 재생하거나, 이미 재생 중인 것을 녹음하세요",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "추가할 때 {site}에서 내려받아요. Onion Board는 사본을 보관하지 않아요. 사운드는 각 주인의 것이에요. 거기서 사라진 사운드는 건너뛰어요."
 }

@@ -4708,7 +4708,6 @@
   ],
   "Hear a few first": "Nghe thử vài cái trước",
   "Hear a few of its sounds first (only you hear them)": "Nghe thử vài âm thanh của gói trước (chỉ bạn nghe thấy)",
-  "Its sounds are downloaded straight from Myinstants when you add it: Onion Board doesn't keep a copy. A sound that's gone from there is skipped.": "Âm thanh được tải thẳng từ Myinstants khi bạn thêm gói: Onion Board không giữ bản sao. Âm thanh nào không còn ở đó sẽ bị bỏ qua.",
   "No packs here yet": "Chưa có gói nào ở đây",
   "No packs match “{text}”": "Không có gói nào khớp với “{text}”",
   "None of its sounds could be downloaded.": "Không tải được âm thanh nào của gói.",
@@ -4793,5 +4792,6 @@
   "Search YouTube Music": "Tìm YouTube Music",
   "Try airhorn, applause or vine boom.": "Thử còi hơi, tiếng vỗ tay hoặc vine boom.",
   "Type a sound you want, then press Enter": "Gõ âm thanh bạn muốn rồi nhấn Enter",
-  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Âm thanh của bạn, kết quả tìm trên web hoặc radio đúng như bạn nghe (không có mic): bấm Ghi rồi phát nó, hoặc ghi thứ gì đang phát"
+  "Your sounds, a web search result or the radio as you hear them (not your mic): press Record, then play it, or record something that's already playing": "Âm thanh của bạn, kết quả tìm trên web hoặc radio đúng như bạn nghe (không có mic): bấm Ghi rồi phát nó, hoặc ghi thứ gì đang phát",
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Được tải từ {site} khi bạn thêm gói: Onion Board không giữ bản sao. Âm thanh thuộc về chủ sở hữu của chúng. Âm thanh nào không còn ở đó sẽ bị bỏ qua."
 }
