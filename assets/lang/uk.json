@@ -216,7 +216,6 @@
   "No sounds to play yet": "Ще немає звуків",
   "No {site} results for <b>{q}</b>.": "На {site} нічого не знайдено за запитом <b>{q}</b>.",
   "Nobody: only I hear them": "Нікому: чую лише я",
-  "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "Зазвичай ваші звуки йдуть у мікрофон, тож їх чують усі, хто чує ваш мікрофон. Вибирайте щось інше, лише якщо хочете надсилати їх кудись ще: Voicemeeter, мікшер, пристрій, який захоплює OBS, або віртуальний кабель.",
   "Not reaching your mic, click to fix": "Не доходить до мікрофона: клацніть, щоб виправити",
   "Not sending to others (only you hear sounds)": "Не надсилається іншим (звуки чуєте лише ви)",
   "Not sending: pick a device on the Setup tab": "Не надсилається: виберіть пристрій на вкладці «Підключення»",
@@ -5080,5 +5079,6 @@
     "на {n} півтон нижче",
     "на {n} півтони нижче",
     "на {n} півтонів нижче"
-  ]
+  ],
+  "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: a virtual cable or Voicemeeter.": "Зазвичай ваші звуки йдуть у мікрофон, тож їх чують усі, хто чує ваш мікрофон. Вибирайте щось інше, лише якщо хочете надсилати їх кудись ще: віртуальний кабель або Voicemeeter."
 }

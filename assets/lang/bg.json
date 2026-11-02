@@ -562,7 +562,6 @@
   "Noise Suppression is <b>Krisp</b>: it wipes out music after a second: set <b>Noise Suppression</b> to <b>None</b>.": "Noise Suppression е <b>Krisp</b>: изтрива музиката след секунда: задай <b>Noise Suppression</b> на <b>None</b>.",
   "Noise Suppression is <b>Standard</b>: it eats steady sounds: set <b>Noise Suppression</b> to <b>None</b>.": "Noise Suppression е <b>Standard</b>: изяжда постоянните звуци: задай <b>Noise Suppression</b> на <b>None</b>.",
   "Normally others hear your voice and your sounds together. Untick this for sounds only: they hear the sounds but not your mic. (Same as the “Others hear it” box under My mic.)": "Обикновено другите чуват гласа и звуците ти заедно. Махни отметката за само звуци: те чуват звуците, но не и микрофона ти. (Същото като полето „Другите го чуват“ в Моят микрофон.)",
-  "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "Обикновено звуците ти отиват в микрофона ти, така че всеки, който чува микрофона ти, ги чува. Избери нещо друго само ако искаш да ги пращаш другаде: Voicemeeter, миксер, устройство, което OBS хваща, или виртуален кабел.",
   "Not covered by these: links you open in your own browser (Support, Report a problem, release pages) and the installer's own downloads.": "Не се покриват от тези: линкове, които отваряш в собствения си браузър (Поддръжка, Докладвай проблем, страници на версиите), и изтеглянията на самия инсталатор.",
   "Not in the list? Close Steam completely (right-click its icon by the clock → Exit) and open it again.": "Не е в списъка? Затвори Steam напълно (десен клик върху иконата му до часовника → Exit) и го отвори пак.",
   "Not sending to others (only you hear sounds)": "Не се праща към другите (само ти чуваш звуците)",
@@ -4985,5 +4984,6 @@
   "{n} note lower": [
     "{n} полутон по-ниско",
     "{n} полутона по-ниско"
-  ]
+  ],
+  "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: a virtual cable or Voicemeeter.": "Обикновено звуците ти отиват в микрофона ти, така че всеки, който чува микрофона ти, ги чува. Избери нещо друго само ако искаш да ги пращаш другаде: виртуален кабел или Voicemeeter."
 }

@@ -204,7 +204,6 @@
   "No sounds to play yet": "まだ再生できるサウンドがありません",
   "No {site} results for <b>{q}</b>.": "<b>{q}</b> の {site} 検索結果はありません。",
   "Nobody: only I hear them": "なし: 自分だけに聞こえる",
-  "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "通常、サウンドはマイクに入るので、マイクを聞いている全員に聞こえます。別の場所に送りたいときだけ、ほかのもの（Voicemeeter、ミキサー、OBS が取り込むデバイス、仮想ケーブル）を選んでください。",
   "Not reaching your mic, click to fix": "マイクに届いていません。クリックで修正",
   "Not sending to others (only you hear sounds)": "相手に送信していません（サウンドは自分だけに聞こえます）",
   "Not sending: pick a device on the Setup tab": "送信していません：セットアップタブでデバイスを選んでください",
@@ -4890,5 +4889,6 @@
   ],
   "{n} note lower": [
     "{n} 半音低く"
-  ]
+  ],
+  "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: a virtual cable or Voicemeeter.": "通常、サウンドはマイクに入るので、マイクを聞いている全員に聞こえます。別の場所に送りたいときだけ、ほかのもの（仮想ケーブルや Voicemeeter）を選んでください。"
 }

@@ -204,7 +204,6 @@
   "No sounds to play yet": "Belum ada suara untuk diputar",
   "No {site} results for <b>{q}</b>.": "Tidak ada hasil {site} untuk <b>{q}</b>.",
   "Nobody: only I hear them": "Tidak ada: hanya saya yang mendengar",
-  "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "Biasanya suara Anda masuk ke mic Anda, jadi semua yang mendengar mic Anda juga mendengarnya. Pilih yang lain hanya jika mau mengirimnya ke tempat lain: Voicemeeter, mixer, perangkat yang direkam OBS, atau kabel virtual.",
   "Not reaching your mic, click to fix": "Tidak sampai ke mic Anda, klik untuk memperbaiki",
   "Not sending to others (only you hear sounds)": "Tidak dikirim ke orang lain (hanya Anda yang dengar suaranya)",
   "Not sending: pick a device on the Setup tab": "Tidak mengirim: pilih perangkat di tab Penyiapan",
@@ -4890,5 +4889,6 @@
   ],
   "{n} note lower": [
     "{n} seminada lebih rendah"
-  ]
+  ],
+  "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: a virtual cable or Voicemeeter.": "Biasanya suara Anda masuk ke mic Anda, jadi semua yang mendengar mic Anda juga mendengarnya. Pilih yang lain hanya jika mau mengirimnya ke tempat lain: kabel virtual atau Voicemeeter."
 }

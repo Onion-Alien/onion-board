@@ -210,7 +210,6 @@
   "No sounds to play yet": "Henüz çalınacak ses yok",
   "No {site} results for <b>{q}</b>.": "<b>{q}</b> için {site} sonucu yok.",
   "Nobody: only I hear them": "Hiç kimse: sadece ben duyarım",
-  "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "Normalde sesleriniz mikrofonunuza gider, yani mikrofonunuzu duyan herkes onları da duyar. Başka bir şeyi sadece onları başka bir yere göndermek istiyorsanız seçin: Voicemeeter, bir mikser, OBS'nin yakaladığı bir cihaz ya da sanal kablo.",
   "Not reaching your mic, click to fix": "Mikrofonunuza ulaşmıyor, düzeltmek için tıklayın",
   "Not sending to others (only you hear sounds)": "Diğerlerine gönderilmiyor (sesleri sadece siz duyuyorsunuz)",
   "Not sending: pick a device on the Setup tab": "Gönderilmiyor: Kurulum sekmesinden bir cihaz seçin",
@@ -4985,5 +4984,6 @@
   "{n} note lower": [
     "{n} yarım ton daha kalın",
     "{n} yarım ton daha kalın"
-  ]
+  ],
+  "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: a virtual cable or Voicemeeter.": "Normalde sesleriniz mikrofonunuza gider, yani mikrofonunuzu duyan herkes onları da duyar. Başka bir şeyi sadece onları başka bir yere göndermek istiyorsanız seçin: sanal kablo ya da Voicemeeter."
 }

@@ -604,7 +604,6 @@
   "Noise Suppression is <b>Krisp</b>: it wipes out music after a second: set <b>Noise Suppression</b> to <b>None</b>.": "La Supresión de ruido está en <b>Krisp</b>: borra la música después de un segundo: pon <b>Supresión de ruido</b> en <b>Ninguna</b>.",
   "Noise Suppression is <b>Standard</b>: it eats steady sounds: set <b>Noise Suppression</b> to <b>None</b>.": "La Supresión de ruido está en <b>Estándar</b>: se come los sonidos constantes: pon <b>Supresión de ruido</b> en <b>Ninguna</b>.",
   "Normally others hear your voice and your sounds together. Untick this for sounds only: they hear the sounds but not your mic. (Same as the “Others hear it” box under My mic.)": "Normalmente los demás oyen tu voz y tus sonidos juntos. Desmarca esto para solo sonidos: oyen los sonidos pero no tu micrófono. (Es lo mismo que la casilla “Los demás lo oyen” en Mi micrófono.)",
-  "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "Normalmente tus sonidos van a tu micrófono, así que todos los que oyen tu micrófono los oyen. Elige otra cosa solo para enviarlos a otro lado: Voicemeeter, un mezclador, un dispositivo que capture OBS o un cable virtual.",
   "Not covered by these: links you open in your own browser (Support, Report a problem, release pages) and the installer's own downloads.": "Esto no cubre: los enlaces que abres en tu propio navegador (Soporte, Reportar un problema, páginas de versiones) ni las descargas del propio instalador.",
   "Not in the list? Close Steam completely (right-click its icon by the clock → Exit) and open it again.": "¿No está en la lista? Cierra Steam por completo (clic derecho en su ícono junto al reloj → Salir) y vuelve a abrirlo.",
   "Not loaded yet: try again in a moment": "Todavía no se cargó: vuelve a intentarlo en un momento",
@@ -4985,5 +4984,6 @@
   "{n} note lower": [
     "{n} semitono más grave",
     "{n} semitonos más grave"
-  ]
+  ],
+  "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: a virtual cable or Voicemeeter.": "Normalmente tus sonidos van a tu micrófono, así que todos los que oyen tu micrófono los oyen. Elige otra cosa solo para enviarlos a otro lado: un cable virtual o Voicemeeter."
 }

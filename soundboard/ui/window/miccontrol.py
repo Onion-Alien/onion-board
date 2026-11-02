@@ -13,8 +13,8 @@ import subprocess
 import time
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import Qt, QTimer, Signal
-from PySide6.QtWidgets import QApplication, QMessageBox
+from PySide6.QtCore import QPoint, Qt, QTimer, Signal
+from PySide6.QtWidgets import QApplication, QMenu, QMessageBox
 
 from soundboard.mic import directmic, michelper, micprobe, sonarkeep, voicesdk
 from soundboard.ui.kit import theme
@@ -26,6 +26,7 @@ from soundboard.i18n import _
 from soundboard.sounds.library import RESOURCE_DIR
 from soundboard.ui.kit import busy, icons, reveal, worker
 from soundboard.ui.window.controller import Controller
+from soundboard.ui.window.routecontrol import MIC_FAILED
 
 if TYPE_CHECKING:
     from soundboard.ui.window.mainwindow import MainWindow
@@ -522,8 +523,10 @@ class MicControl(Controller):
         if not mic:
             if not auto:
                 mw.toast(_("Pick your mic first (Setup tab → Devices)."), "warn", aside=True)
+            mw.statusctl._update_flow()   # (the switch, clicked to My mic, goes back)
             return
         mw._attaching = True
+        mw.routectl._show_route()   # Send my sounds to says My mic while it's set up
         self._autofixing = auto
         self._probe_missing = False   # (checked again once this one works)
         self._declined = False   # (whatever happens now is what the card says)
@@ -638,9 +641,11 @@ class MicControl(Controller):
                 # got "Try again" tried again (the same failure) and uninstalled
                 err = _("{error}\n\nTry again any time from the Setup tab.", error=err)
                 mw.tell(_("Couldn't put Onion Board on your mic"), err, "error",
-                        action=(_("Use the cable"), mw.btn_usecable.click), aside=True)
+                        action=(_("Use the cable"), mw.btn_usecable.click), aside=True,
+                        key=MIC_FAILED)
         else:
             log.info("on the mic now: %s", mic)
+            mw.unsay(MIC_FAILED)   # (an earlier try's error is over)
             usage.used("mic-effect-updated" if updating else
                        "mic-effect-fixed" if auto else "mic-effect-on")
             if mic != mw.cfg.mic_device:
@@ -710,11 +715,28 @@ class MicControl(Controller):
             action, mw.cfg.mic_device or None)], go_on)
 
     def _pick_send_device(self):
-        """Setup tab -> Another device: Devices' "Send my sounds to", opened."""
+        """Setup tab -> Another device: every output but the headphones, and nobody.
+        Send my sounds to lists only the cables, so a mixer or a capture card (OBS) is
+        picked here (or in the setup guide); once picked, that box shows it too."""
         mw = self.mw
-        mw.setup_page.ensureWidgetVisible(mw.cb_route)
-        mw.cb_route.setFocus()
-        mw.cb_route.showPopup()
+        c = mw.cfg
+        cur = None if c.route in ("mic", "off") else c.main_device
+        menu = QMenu(mw.btn_pickdev)
+        menu.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+        for n in [d["name"] for d in eng.list_devices("output")]:
+            if n == c.mon_device:
+                continue
+            a = menu.addAction(n)
+            a.setCheckable(True)
+            a.setChecked(n == cur)
+            a.triggered.connect(lambda _on=False, n=n: mw.routectl.set_route(
+                "cable" if eng.is_virtual(n) else "device", n, by_hand=True))
+        menu.addSeparator()
+        off = menu.addAction(_("Nobody: only I hear them"))
+        off.setCheckable(True)
+        off.setChecked(c.route == "off")
+        off.triggered.connect(lambda: mw.routectl.set_route("off", by_hand=True))
+        menu.popup(mw.btn_pickdev.mapToGlobal(QPoint(0, mw.btn_pickdev.height())))
 
     def _pick_mic(self):
         """Your mic -> Change mic: Devices' "My mic", opened (the effect follows the mic
@@ -733,6 +755,7 @@ class MicControl(Controller):
             # open (sending into it lost the mic until it was set up again)
             mw.toast(_("The virtual cable was removed. Restart your PC before you "
                          "install it again."), "warn")
+            mw.statusctl._update_flow()   # (the switch, clicked to Virtual cable, goes back)
             return
         if eng.virtual_outputs():
             mw.routectl.set_route("cable")

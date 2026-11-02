@@ -143,6 +143,7 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
     update_done = Signal(object, str)   # an update check finished: Release|None, error
     update_state = Signal()             # the update card changed (Settings > Updates follows)
     mic_attached = Signal(str, str)     # attach_mic finished: the mic, error ("" = done)
+    mic_found = Signal(int, object)     # use_mic: its number, the mic Onion Board is on (str|None)
     mic_probed = Signal(object)         # probe_mic finished: micprobe.Result | None
     helper_checked = Signal()           # michelper.ready() asked again (on a thread)
     cable_removed = Signal(str)         # remove_cable finished: error ("" = done)

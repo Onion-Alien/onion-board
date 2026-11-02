@@ -54,6 +54,8 @@ class StatusControl(Controller):
                      "another device, or pick <b>Nobody</b>: your sounds "
                      "already play in your headphones, where OBS's Desktop "
                      "Audio picks them up.</span>", status=theme.status('warn'))
+        elif c.route == "mic" and not directmic.works(directmic.status(c.mic_device)):
+            hint = ""   # not in it yet: the card above says so, with its button
         elif c.route == "mic":
             hint = _("Your sounds go straight into <b>My mic</b>, so Discord "
                      "and games hear them through the mic they already use.")
@@ -487,7 +489,10 @@ class StatusControl(Controller):
         # switch on top changes the way instead, once the cable is installed
         mw.btn_attach.setVisible(route == "cable" and not mw._attaching and not any_cable)
         mw.route_switch.setVisible(any_cable and route in ("cable", "mic"))
-        (mw.seg_mic if route == "mic" else mw.seg_cable).setChecked(True)
+        # on its way to the mic (asking which mic, or setting it up): My mic already, and
+        # back to the cable when that doesn't happen (no mic, a No, a failure)
+        to_mic = route == "mic" or mw._attaching or mw.routectl.finding_mic
+        (mw.seg_mic if to_mic else mw.seg_cable).setChecked(True)
         mw.route_switch.setEnabled(not mic_busy)
         mw.ways_or.setVisible(not mw.btn_attach.isHidden() and not mw.btn_install.isHidden())
         if route == "mic":

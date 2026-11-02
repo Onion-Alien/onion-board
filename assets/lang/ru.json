@@ -198,7 +198,6 @@
   "No sounds to play yet": "Пока нет звуков",
   "No {site} results for <b>{q}</b>.": "На {site} ничего не найдено по запросу <b>{q}</b>.",
   "Nobody: only I hear them": "Никуда: слышу только я",
-  "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: Voicemeeter, a mixer, a device OBS captures, or a virtual cable.": "Обычно твои звуки идут в микрофон, так что их слышат все, кто слышит твой микрофон. Выбирай что-то другое, только чтобы отправлять их в другое место: Voicemeeter, микшер, устройство, которое захватывает OBS, или виртуальный кабель.",
   "Not sending to others (only you hear sounds)": "Не отправляется другим (звуки слышишь только ты)",
   "Not working": "Не работает",
   "Nothing goes out to others, only to the stream output. Click to mute that too (you still hear everything)": "К другим ничего не уходит, только на выход для стрима. Нажми, чтобы заглушить и его (ты по-прежнему слышишь всё)",
@@ -5080,5 +5079,6 @@
     "на {n} полутон ниже",
     "на {n} полутона ниже",
     "на {n} полутонов ниже"
-  ]
+  ],
+  "Normally your sounds go into your mic, so everyone who hears your mic hears them. Only pick something else to send them somewhere instead: a virtual cable or Voicemeeter.": "Обычно твои звуки идут в микрофон, так что их слышат все, кто слышит твой микрофон. Выбирай что-то другое, только чтобы отправлять их в другое место: виртуальный кабель или Voicemeeter."
 }
