@@ -187,10 +187,36 @@ def test_the_installers_box_imports_on_first_start_with_no_questions(
     monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: pytest.fail("asked"))
     monkeypatch.setattr(QMessageBox, "exec", lambda box: pytest.fail("asked to keep"))
     w.impctl.import_queued()
-    assert not note.exists()
+    assert note.exists()                    # kept until they're in: closing now resumes
+    w.impctl.import_queued()                # called again meanwhile: not a second import
     assert process_events(qapp, lambda: not w.impctl._pending_imports and len(w.cfg.sounds) == 5)
+    assert process_events(qapp, lambda: not note.exists())
     w.impctl.import_queued()                            # no note: nothing happens
     assert not w.impctl._pending_imports and len(w.cfg.sounds) == 5
+
+
+@pytest.mark.windows   # Windows paths
+def test_closing_halfway_through_the_installers_import_carries_on_next_start(
+        main_window, qapp, tmp_path, monkeypatch):  # noqa: F811
+    """The app closed with only some of the board in: the note is still there, and the
+    next start brings in the rest, without the ones already in twice."""
+    w = main_window
+    monkeypatch.setenv("APPDATA", str(tmp_path))
+    _board(tmp_path)
+    note = library.APP_DIR / otherboards.QUEUED_NAME
+    note.parent.mkdir(parents=True, exist_ok=True)
+    note.write_text("soundpad", encoding="utf-8")
+    monkeypatch.setattr(QMessageBox, "exec", lambda box: 0)
+    w.impctl.import_queued()
+    assert process_events(qapp, lambda: not w.impctl._pending_imports and len(w.cfg.sounds) == 5)
+    # as if it had closed after the first: two never came in, and the note was left
+    del w.cfg.sounds[3:]
+    note.write_text("soundpad", encoding="utf-8")
+    w.impctl.import_queued()
+    assert process_events(qapp, lambda: not w.impctl._pending_imports and not note.exists()
+                          and len(w.cfg.sounds) == 5)
+    fps = [m.fingerprint for m in w.cfg.sounds[2:]]   # the board's three
+    assert len(fps) == len(set(fps))     # none twice
 
 
 @pytest.mark.windows   # Windows paths
@@ -310,7 +336,7 @@ def test_the_installers_box_waits_for_the_setup_guide_and_says_where_from(
 
 
 def test_a_queued_import_with_soundpad_gone_does_nothing(
-        main_window, tmp_path, monkeypatch):  # noqa: F811
+        main_window, qapp, tmp_path, monkeypatch):  # noqa: F811
     monkeypatch.setenv("APPDATA", str(tmp_path))
     note = library.APP_DIR / otherboards.QUEUED_NAME
     note.parent.mkdir(parents=True, exist_ok=True)
@@ -318,7 +344,8 @@ def test_a_queued_import_with_soundpad_gone_does_nothing(
     monkeypatch.setattr("PySide6.QtWidgets.QFileDialog.getOpenFileName",
                         lambda *a, **k: pytest.fail("opened a file picker"))
     main_window.impctl.import_queued()
-    assert not note.exists() and len(main_window.cfg.sounds) == 2
+    assert process_events(qapp, lambda: not note.exists())   # read on a thread
+    assert len(main_window.cfg.sounds) == 2
 
 
 def test_the_installer_offers_it_only_when_soundpad_is_there():

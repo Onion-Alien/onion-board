@@ -88,6 +88,10 @@ class ImportControl(BackupImport, PackImport, Controller):
         # other soundboards on their way in: each has its own category, named on the card
         self._boards: list[str] = []
         self._made_boards: set[str] = set()   # ...the categories made for them (not yours)
+        # the installer's boards still to come in: its note stays until each is done, so
+        # closing the app halfway carries on at the next start (ones in are skipped)
+        self._queued: set[str] = set()
+        self._queued_running: set[str] = set()   # ...of those, the ones importing now
         self._exporting = False
         self._import_errors: list[importreport.Skipped] = []
         self._import_total = 0      # this batch, for the toast's "3 of 12"
@@ -450,6 +454,8 @@ class ImportControl(BackupImport, PackImport, Controller):
         self._import_total = 0
         busy.set_busy(mw.btn_add, False)
         mw.triggers.import_done()   # a trigger's sound that failed to import
+        for key in list(self._queued_running):
+            self._queued_done(key)
         boards = list(self._boards)
         self._drop_empty_boards()
         if not n and not skipped:
@@ -527,16 +533,36 @@ class ImportControl(BackupImport, PackImport, Controller):
         """The installer's "Bring my sounds over from …" boxes, ticked: they left a
         note for this start. The tick was their yes, so nothing is asked again."""
         note = library.APP_DIR / otherboards.QUEUED_NAME
-        if not note.is_file():
-            return
+        if self._queued or not note.is_file():
+            return   # already on their way (the setup guide closed again), or none
         try:
             keys = note.read_text(encoding="utf-8", errors="replace").split()
         except OSError:
             keys = []
-        note.unlink(missing_ok=True)
+        self._queued = {k for k in keys if otherboards.by_key(k) is not None}
+        self._queued_running.clear()
+        self._save_queued()
         for key in dict.fromkeys(keys):
-            if (src := otherboards.by_key(key)) is not None:
+            if key in self._queued and (src := otherboards.by_key(key)) is not None:
                 self.import_other(src, ask=False)
+
+    def _save_queued(self):
+        """The installer's note, down to the boards not in yet (gone once they all are)."""
+        note = library.APP_DIR / otherboards.QUEUED_NAME
+        try:
+            if self._queued:
+                note.write_text(" ".join(sorted(self._queued)), encoding="utf-8")
+            else:
+                note.unlink(missing_ok=True)
+        except OSError:
+            log.warning("couldn't update %s", note, exc_info=True)
+
+    def _queued_done(self, key: str):
+        """One of the installer's boards is in (or can't be): off its note."""
+        if key in self._queued:
+            self._queued.discard(key)
+            self._queued_running.discard(key)
+            self._save_queued()
 
     def import_other(self, src: otherboards.Source, path: str = "", ask: bool = True):
         """Bring another soundboard's board over: its sound files (copied, it keeps its
@@ -575,6 +601,7 @@ class ImportControl(BackupImport, PackImport, Controller):
             return
         title = _("Import from {name}", name=src.name)
         if not path and not ask:
+            self._queued_done(src.key)
             return   # its board went away since the install
         if not path:
             path, __ = QFileDialog.getOpenFileName(
@@ -587,6 +614,7 @@ class ImportControl(BackupImport, PackImport, Controller):
         if isinstance(result, Exception):
             e = result
             if not ask:
+                self._queued_done(src.key)
                 log.warning("can't read %s's board: %s", src.name, e)
                 mw.toast(_("Couldn't bring your {name} sounds over: {e}",
                              name=src.name, e=errors.plain(e)),
@@ -600,6 +628,7 @@ class ImportControl(BackupImport, PackImport, Controller):
                      "or deleted.", name=src.name) if entries else
                    _("There are no sounds on your {name} board.", name=src.name))
             mw.toast(html.escape(msg), "warn")
+            self._queued_done(src.key)
             return
         for e in ok:   # all in a category named after it too, so they're easy to find
             e.tags = [src.name, *(t for t in e.tags if t != src.name)]
@@ -612,6 +641,8 @@ class ImportControl(BackupImport, PackImport, Controller):
                 names=html.escape(", ".join(e.name for e in bad[:5]))
                 + ("…" if len(bad) > 5 else "")), "warn")
         self._show_board(src.name)
+        if src.key in self._queued:
+            self._queued_running.add(src.key)
         self.import_files([e.path for e in ok], {e.path: e for e in ok})
 
     def _on_worker(self, work, then, name: str):
