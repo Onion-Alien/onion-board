@@ -15,7 +15,7 @@ from PySide6.QtCore import QEvent, QPoint, Qt, Signal
 from PySide6.QtGui import QKeySequence
 from PySide6.QtWidgets import (QButtonGroup, QFrame, QGridLayout, QHBoxLayout, QLabel,
                                QLineEdit, QPushButton, QScrollArea, QSizePolicy,
-                               QTabWidget, QVBoxLayout, QWidget)
+                               QTabBar, QVBoxLayout, QWidget)
 
 from soundboard import voicefx
 from soundboard.audio import soundfx
@@ -317,23 +317,35 @@ class AdvancedView(QWidget):
             theirs.valueChanged.connect(mine.setValue)
             theirs.valueChanged.connect(self._show_fades)
 
-        # under the editor: three columns, or (narrow) three tabs
+        # under the editor: three columns, or (narrow) tabs over one of them. The pages
+        # stay in their columns either way: moving one restyles every control on it
+        # (0.15 s on a fast PC, so a resize across the line froze a slow one for seconds)
         self.cols = QWidget()
         ch = self._cols_lay = QHBoxLayout(self.cols)
         ch.setContentsMargins(0, 0, 0, 0)
         ch.setSpacing(12)
-        self.col_boxes = []
-        for title, stretch in ((_("Speed & loudness"), 12), (_("Effects"), 13),
-                               (_("Equalizer"), 11)):
+        self.col_cards, self.col_boxes = [], []
+        titles = (_("Speed & loudness"), _("Effects"), _("Equalizer"))
+        for title, stretch in zip(titles, (12, 13, 11)):
             c, cv = card(title)
             cv.setContentsMargins(14, 16, 4, 8)   # the page's scroll bar at the edge
             ch.addWidget(c, stretch)
+            self.col_cards.append(c)
             self.col_boxes.append(cv)
-        self.tabs = QTabWidget()
+        self.tabs = QTabBar()
         self.tabs.setDocumentMode(True)
-        v.addWidget(self.cols, 6)
-        v.addWidget(self.tabs, 6)
+        self.tabs.setExpanding(False)
+        for title in titles:
+            self.tabs.addTab(title.replace("&", "&&"))
+        self.tabs.currentChanged.connect(lambda _i: self._show_cols())
         self.tabs.hide()
+        under = QWidget()   # (the tabs close over their card, as a tab page was)
+        ul = QVBoxLayout(under)
+        ul.setContentsMargins(0, 0, 0, 0)
+        ul.setSpacing(4)
+        ul.addWidget(self.tabs)
+        ul.addWidget(self.cols, 1)
+        v.addWidget(under, 6)
         self.wide = True
         self._scrolls: list[QScrollArea] = []
 
@@ -422,8 +434,6 @@ class AdvancedView(QWidget):
 
     def set_wide(self, wide: bool):
         if wide != self.wide:
-            for s in self._scrolls:
-                self._unplace(s)
             self.wide = wide
             self._place()
 
@@ -513,23 +523,28 @@ class AdvancedView(QWidget):
             self.editor.setMaximumHeight(cap)
 
     def _place(self):
-        titles = (_("Speed & loudness"), _("Effects"), _("Equalizer"))
-        if self.wide:
-            for box, s in zip(self.col_boxes, self._scrolls):
+        for box, s in zip(self.col_boxes, self._scrolls):
+            if box.indexOf(s) < 0:   # (only on attach: set_wide never moves them)
                 box.addWidget(s, 1)
-                s.setMinimumWidth(self._col_w(s))
                 s.show()
-        else:
-            for s, title in zip(self._scrolls, titles):
-                self.tabs.addTab(s, title.replace("&", "&&"))
+        if not self.wide:
             self.tabs.setCurrentIndex(1)
-        self.cols.setVisible(self.wide)
+        self._show_cols()
+
+    def _show_cols(self):
+        """Wide: the three columns, each with its title. Narrow: the tabs over the one
+        picked (the tab says its title)."""
+        cur = self.tabs.currentIndex()
+        for i, (c, s) in enumerate(zip(self.col_cards, self._scrolls)):
+            c.setVisible(self.wide or i == cur)
+            if c.heading_title is not None:
+                c.heading_title.setVisible(self.wide)
+            # (no title to start level with under the tabs: not its room on top)
+            self.col_boxes[i].setContentsMargins(14, 16 if self.wide else 8, 4, 8)
+            s.setMinimumWidth(self._col_w(s) if self.wide else 0)
         self.tabs.setVisible(not self.wide)
 
     def _unplace(self, s: QScrollArea):
-        i = self.tabs.indexOf(s)
-        if i >= 0:
-            self.tabs.removeTab(i)
         for box in self.col_boxes:
             j = box.indexOf(s)
             if j >= 0:

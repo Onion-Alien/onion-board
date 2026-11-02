@@ -61,9 +61,28 @@ def test_wide_has_three_columns_narrow_three_tabs(window):  # noqa: F811
     need = d.minimumSizeHint().width()
     assert d.adv.fits(max(need, editadvanced.WIDE_PX)) and not d.adv.fits(need - 40)
     d.setFixedSize(760, 820)
-    assert not d.adv.wide and d.adv.cols.isHidden() and d.adv.tabs.count() == 3
+    assert not d.adv.wide and not d.adv.tabs.isHidden() and d.adv.tabs.count() == 3
+    shown = [i for i, c in enumerate(d.adv.col_cards) if not c.isHidden()]
+    assert shown == [1] and d.adv.col_cards[1].heading_title.isHidden()   # Effects
     d.show_tab("eq")
     assert d.adv.tabs.currentIndex() == 2
+    assert [i for i, c in enumerate(d.adv.col_cards) if not c.isHidden()] == [2]
+    d.close()
+
+
+def test_a_resize_across_the_line_moves_no_page(window):  # noqa: F811
+    """Moving a page restyles every control on it: a resize from columns to tabs and
+    back froze a slow PC for seconds. They stay in their columns; only shown or hidden."""
+    d = _dialog(window, advanced=True)
+    d.show()
+    d.setFixedSize(2400, 820)
+    parents = [s.parentWidget() for s in d.adv._scrolls]
+    d.setFixedSize(760, 820)
+    assert not d.adv.wide
+    assert [s.parentWidget() for s in d.adv._scrolls] == parents
+    d.setFixedSize(2400, 820)
+    assert d.adv.wide and all(not c.isHidden() for c in d.adv.col_cards)
+    assert [s.parentWidget() for s in d.adv._scrolls] == parents
     d.close()
 
 

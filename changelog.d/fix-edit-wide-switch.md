@@ -1,0 +1,1 @@
+- Fix: resizing Edit sound's Advanced view between three columns and tabs froze slower PCs for seconds. It now only shows and hides the pages (about 70 times faster), and the tabs sit over a card like the columns.
