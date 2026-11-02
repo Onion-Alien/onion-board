@@ -296,7 +296,8 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
             panel.show_picked_row(True)
         self._make_bar_controls()
         outer.addWidget(self.bar)
-        # cards or a list: one setting for both (the window keeps the voice changer's)
+        # Simple or Advanced cards: one setting for all three (the window keeps the voice
+        # changer's)
         self.fx.view_toggle.changed.connect(self.ai.set_view)
         self.fx.view_toggle.changed.connect(self.speech.set_view)
         self.ai.view_toggle.changed.connect(self.fx.view_toggle.changed)
@@ -348,7 +349,7 @@ class VoicePanel(VoiceCombos, VoiceSwitch, VoiceCards, VoiceAddons, QWidget):
         return bars + (("lang", lang),) if lang is not None else bars
 
     def set_view(self, view: str):
-        """The voices as picture cards or a list, in both cards."""
+        """Simple or Advanced voice cards, in all three cards."""
         self.fx.set_view(view)
         self.ai.set_view(view)
         self.speech.set_view(view)

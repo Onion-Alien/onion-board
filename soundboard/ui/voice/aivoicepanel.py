@@ -39,6 +39,7 @@ from soundboard.ui.kit.panel import (Flow, UndoBar, ViewToggle, fold_button, hin
                                      section_label)
 from soundboard.ui.voice.groupbar import GroupBar
 from soundboard.ui.voice.voicefxpanel import PICKED_ART, TILE_ART, TILE_GAP, BigSwitch, VoiceTile
+from soundboard.ui.voice.voicetiles import SIMPLE, view_choices
 from soundboard.ui.kit.widgets import LoadingBar
 from soundboard.ui.kit.wheelguard import no_wheel
 # the card's parts (callers import their names from here too)
@@ -176,12 +177,13 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         rv.setSpacing(12)
 
         # ---- which voices show: All (a heading per kind), your favorites, one kind;
-        # cards or a list at the right (the voice changer's switch, the same setting)
+        # Simple or Advanced cards at the right (the voice changer's switch, the same
+        # setting)
         favs = self.s.pop("favorites", None)   # kept here, added back by _emit
         self._favs: list[str] = list(favs) if isinstance(favs, list) else []
         self._group = ALL
-        self._listed = False
-        self.view_toggle = ViewToggle("grid", _("Voices"))
+        self._detailed = False
+        self.view_toggle = ViewToggle(SIMPLE, _("Voices"), view_choices())
         self.view_toggle.changed.connect(self.set_view)
         self.bar = GroupBar(
             [(ALL, _("All"), "sounds"), (FAVS, _("Favorites"), "star_filled"),
@@ -217,6 +219,7 @@ class AiVoicePanel(AiVoiceCards, AiVoiceMine, AiVoiceRun, QWidget):
         mt.setCheckable(False)
         mt.star.hide()
         mt.setIcon(icons.icon("plus", "muted"))
+        mt.set_detail(_("From your voice or a mix"))
         mt.setIconSize(QSize(TILE_ART, TILE_ART))
         mt.setCursor(Qt.CursorShape.PointingHandCursor)
         mt.clicked.connect(lambda: self.edit(None))

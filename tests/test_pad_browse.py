@@ -183,9 +183,16 @@ def test_list_view_swaps_card_size_for_row_size(window):
 
 
 def test_a_newer_view_loads_as_cards():
-    for key in ("pad_view", "app_view", "voice_view"):
+    for key in ("pad_view", "app_view"):
         assert library.clean_setting(key, "gallery") == "grid"
         assert library.clean_setting(key, "list") == "list"
+
+
+def test_the_voice_tabs_old_cards_or_list_load_as_simple_or_advanced():
+    clean = library.clean_setting
+    assert clean("voice_view", "grid") == "simple" and clean("voice_view", "list") == "advanced"
+    assert clean("voice_view", "advanced") == "advanced"
+    assert clean("voice_view", "gallery") == "simple" and clean("voice_view", 3) == "simple"
 
 
 def test_a_newer_row_size_loads_as_medium():

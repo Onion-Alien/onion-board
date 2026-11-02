@@ -12,8 +12,9 @@ from soundboard.core import langnames
 from soundboard.ui.kit import theme
 from soundboard.speech import translation
 from soundboard.ui.voice.groupbar import no_match
-from soundboard.ui.voice.voicefxpanel import (LIST_MIN_W, MAX_COLS, TILE_ART, TILE_GAP,
+from soundboard.ui.voice.voicefxpanel import (DETAIL_MIN_W, MAX_COLS, TILE_ART, TILE_GAP,
                                               TILE_MIN_W, VoiceTile)
+from soundboard.ui.voice.voicetiles import ADVANCED, SIMPLE, is_advanced
 from soundboard.i18n import _
 
 if TYPE_CHECKING:
@@ -65,12 +66,14 @@ class SpeechTiles(_Panel):
         for m in self.langs:
             code, name = m.language, langnames.of(m)
             b = VoiceTile(name)
-            if self._listed:
-                b.set_listed(True)
+            if self._detailed:
+                b.set_detailed(True)
             b.setIcon(lang_icon(code, m.installed))
             b.setIconSize(QSize(TILE_ART, TILE_ART))
             b.setCursor(Qt.CursorShape.PointingHandCursor)
             b.setProperty("missing", not m.installed)
+            b.set_detail(_("Downloaded") if m.installed else
+                         _("{size} MB to download", size=translation.size_mb(m)))
             b.setToolTip(_("Others hear you in {language}.", language=name) if m.installed
                          else _("Not downloaded yet ({size} MB). Click to download it.",
                                 size=translation.size_mb(m)))
@@ -164,17 +167,18 @@ class SpeechTiles(_Panel):
 
     def _fit_width(self, width: int):
         """As many language cards a row as the width holds, at least one."""
-        least = LIST_MIN_W if self._listed else TILE_MIN_W
+        least = DETAIL_MIN_W if self._detailed else TILE_MIN_W
         cols = max(1, min(MAX_COLS, (width + TILE_GAP) // (least + TILE_GAP)))
         if cols != self._tile_cols:
             self._tile_cols = cols
             self._place_tiles()
 
     def set_view(self, view: str):
-        """Picture cards, or a list (the Voice tab keeps all three cards the same)."""
-        self._listed = view == "list"
-        self.view_toggle.set_view(view)
+        """Simple cards, or Advanced: bigger ones that say whether each language is in
+        (the Voice tab keeps all three cards the same)."""
+        self._detailed = is_advanced(view)
+        self.view_toggle.set_view(ADVANCED if self._detailed else SIMPLE)
         for b in self._tile.values():
-            b.set_listed(self._listed)
+            b.set_detailed(self._detailed)
         self._tile_cols = 0
         self._fit_width(self.width())

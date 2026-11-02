@@ -102,6 +102,8 @@ QFrame#viewtoggle QPushButton#viewbtn:checked,
 QFrame#soundstoolbar QFrame#viewtoggle QPushButton#viewbtn:checked { background:$accent; }
 QFrame#viewtoggle QPushButton#viewbtn:focus,
 QFrame#soundstoolbar QFrame#viewtoggle QPushButton#viewbtn:focus { border:1px solid $text_hi; }
+QFrame#viewtoggle QPushButton#viewbtn[words="true"] { padding:0 10px; color:$muted; }
+QFrame#viewtoggle QPushButton#viewbtn[words="true"]:checked { color:$on_accent; }
 QLineEdit#soundssearch { background:$field; border:1px solid $border; border-radius:10px;
     padding:0 10px 0 4px; }
 QLineEdit#soundssearch:hover { border-color:$border_hi; }
