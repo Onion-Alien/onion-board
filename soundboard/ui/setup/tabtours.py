@@ -105,9 +105,12 @@ def hook(win):
     """Watch the window's tab changes: a tab opened for the first time gets its tour."""
     clicks = win._tour_clicks = _Clicks(win)
 
-    def opened(_i):
-        # (deferred: the click that switched the tab is still being handled)
-        QTimer.singleShot(0, win, clicks.watch)
+    def opened(i):
+        tab = _tab_of(win, win.tabs.widget(i))
+        if tab and would_run(win, tab):   # (a tab with no tour to come: nothing watched)
+            # (deferred: the click that switched the tab is still being handled)
+            QTimer.singleShot(0, win, clicks.watch)
+            QTimer.singleShot(START_MS + 100, win, clicks.unwatch)   # (whatever happens)
         QTimer.singleShot(START_MS, win, lambda: maybe_start(win))
     win.tabs.currentChanged.connect(opened)
 

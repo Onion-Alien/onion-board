@@ -130,13 +130,12 @@ FRAME_ROOM = 48   # the title bar and borders, which the size doesn't count
 
 
 def start_size(screen) -> tuple[int, int]:
-    """START_W x START_H, smaller on a screen without room for it: on a 768 px high
-    screen, 720 and the title bar put the bottom strip under the taskbar."""
+    """START_W x START_H, less high on a screen without room for it: on a 768 px high
+    screen, 720 and the title bar put the bottom strip under the taskbar. (The width
+    the window's fitter handles: it folds the bars on a narrow window.)"""
     if screen is None:
         return START_W, START_H
-    room = screen.availableGeometry()
-    return (max(1, min(START_W, room.width() - FRAME_ROOM)),
-            max(1, min(START_H, room.height() - FRAME_ROOM)))
+    return START_W, max(1, min(START_H, screen.availableGeometry().height() - FRAME_ROOM))
 
 
 class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
