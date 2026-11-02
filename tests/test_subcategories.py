@@ -111,9 +111,11 @@ def test_plus_subcategory_opens_a_name_box_in_the_chip_row(window):
     w.catctl.new_category(name="Memes")
     w.catctl.new_subcategory("Memes", "s0", "Vine")
     box = w.catctl.sub_name_box
+    size, pad_y = box.button.size(), w.pads["s0"].y()
     box.button.click()
     QApplication.processEvents()
     assert box.isVisible() and not box.button.isVisible()
+    assert box.size() == size and w.pads["s0"].y() == pad_y   # nothing moves
     QTest.keyClicks(box, "Old")
     QTest.keyClick(box, Qt.Key.Key_Escape)
     assert w.cfg.subcategories == {"Memes": ["Vine"]} and box.button.isVisible()

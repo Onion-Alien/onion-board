@@ -532,6 +532,8 @@ QLabel#pill[tone="beta"] { color:$bg; background:$ok_text; border-color:$ok_text
 QPushButton#subchip { border-radius:11px; padding:2px 11px; min-height:18px; font-size:8.5pt;
     background:transparent; border:1px solid $border; color:$muted; }
 QPushButton#subchip:hover { color:$text; background:$btn_hover; }
+QLineEdit#inlinename { padding:0px 8px; font-size:8pt; }   /* kit/widgets.py InlineNameBox: the size of its button */
+QLineEdit#inlinename[chip="true"] { padding:0px 11px; font-size:8.5pt; border-radius:11px; }
 QPushButton#subchip:checked { background:$accent; border-color:$accent; color:$on_accent; }
 QPushButton#fold { background:transparent; border:none; color:$muted; padding:3px 6px; font-size:8.5pt; font-weight:600; }
 QPushButton#fold:hover, QPushButton#fold:checked { color:$text; background:transparent; }
