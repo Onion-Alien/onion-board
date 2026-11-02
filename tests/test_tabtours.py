@@ -83,6 +83,27 @@ def test_the_rail_takes_no_click_meanwhile(window, qapp):
     assert tabtours._current is not None and window.tabs.currentWidget() is window.store
 
 
+def test_a_tour_sitting_still_repaints_only_its_ring(window, qapp, monkeypatch):
+    """Each tick re-raised the layer and repainted all of it, so the whole window under it
+    redrew ~8 times a second: ~90% of a core on a slower PC with the tip just sitting
+    there. Still, a tick only redraws the breathing ring's band."""
+    monkeypatch.setattr(coach.toast, "animations_on", lambda: True)   # (the ring breathes)
+    assert open_tab(window, qapp, "voice")
+    tour = tabtours._current
+    tour._tick()
+    asked = []
+    monkeypatch.setattr(tour, "update", lambda *a: asked.append(a))
+    monkeypatch.setattr(tour, "raise_", lambda: asked.append("raise"))
+    for _ in range(3):
+        tour._tick()
+    assert asked and all(len(a) == 1 for a in asked)   # never the whole layer, never a raise
+    band = asked[0][0].boundingRect()
+    assert band.width() < window.width() and band.height() < window.height()
+    window.resize(window.width() - 40, window.height())   # something did change: all of it
+    tour._tick()
+    assert () in asked
+
+
 def test_leaving_the_tab_brings_it_back_next_time(window, qapp):
     assert open_tab(window, qapp, "voice")
     window.tabs.setCurrentWidget(window.sounds_page)   # (a key, or the app itself)

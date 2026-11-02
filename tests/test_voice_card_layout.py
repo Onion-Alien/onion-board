@@ -258,11 +258,24 @@ def test_speech_install_has_pilot_bun_and_the_glowing_button(qapp, monkeypatch):
     inst = panel.speech.installs
     try:
         panel.show()
+        panel.resize(900, panel.height())   # (room for him beside the whole button)
         qapp.processEvents()
         bun = inst.bun_pilot
         assert isinstance(inst.b_install, GlowButton)
         assert bun.isVisibleTo(inst.missing)
         assert at(bun, inst.missing).right() < at(inst.lbl_missing, inst.missing).left()
+        # narrow (a 640 px window): he steps aside rather than the button losing words
+        # ("Install speech recog"), and comes back with the room. The width is just short
+        # of both side by side, from the parts' own sizes (fonts differ by machine)
+        sv, m = inst._sv, inst._sv.contentsMargins()
+        both = m.left() + bun.width() + sv.spacing() + inst._mrow.sizeHint().width() + m.right()
+        panel.resize(panel.width() - inst.missing.width() + both - 10, panel.height())
+        qapp.processEvents()
+        assert not bun.isVisibleTo(inst.missing)
+        assert inst.b_install.width() >= inst.b_install.sizeHint().width()
+        panel.resize(900, panel.height())
+        qapp.processEvents()
+        assert bun.isVisibleTo(inst.missing)
         assert bun._timer.isActive() and not bun.resting()   # just shown: flying
         bun._rest_at = 0.0
         bun._tick()

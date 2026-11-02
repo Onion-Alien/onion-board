@@ -1,0 +1,2 @@
+- A tab's first-visit tip no longer keeps the window redrawing while it sits there (it used a lot of CPU on slower PCs)
+- Voice > Languages: the Install speech recognition button keeps all its words in a narrow window
