@@ -4979,5 +4979,10 @@
   "long": "довго",
   "rarely": "рідко",
   "short": "коротко",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Завантажується з {site}, коли ти його додаєш: Onion Board не зберігає копії. Звуки належать їхнім власникам. Звук, якого там уже немає, пропускається."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Завантажується з {site}, коли ти його додаєш: Onion Board не зберігає копії. Звуки належать їхнім власникам. Звук, якого там уже немає, пропускається.",
+  "8-bit": "8 біт",
+  "Bit crusher": "Біткрашер",
+  "Bits": "Біти",
+  "Fewer bits and a lower sample rate: an old game console.": "Менше біт і нижча частота дискретизації: стара ігрова приставка.",
+  "Sample rate": "Частота дискретизації"
 }

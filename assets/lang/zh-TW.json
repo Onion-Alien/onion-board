@@ -4793,5 +4793,10 @@
   "long": "長",
   "rarely": "很少",
   "short": "短",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "加入時從 {site} 下載：Onion Board 不保留副本。音效歸其所有者所有。那裡已經沒有的音效會被略過。"
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "加入時從 {site} 下載：Onion Board 不保留副本。音效歸其所有者所有。那裡已經沒有的音效會被略過。",
+  "8-bit": "8 位元",
+  "Bit crusher": "位元粉碎",
+  "Bits": "位元數",
+  "Fewer bits and a lower sample rate: an old game console.": "更少的位元與更低的取樣率：老式遊戲機的聲音。",
+  "Sample rate": "取樣率"
 }

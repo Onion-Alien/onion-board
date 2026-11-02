@@ -4793,5 +4793,10 @@
   "long": "길게",
   "rarely": "가끔",
   "short": "짧게",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "추가할 때 {site}에서 내려받아요. Onion Board는 사본을 보관하지 않아요. 사운드는 각 주인의 것이에요. 거기서 사라진 사운드는 건너뛰어요."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "추가할 때 {site}에서 내려받아요. Onion Board는 사본을 보관하지 않아요. 사운드는 각 주인의 것이에요. 거기서 사라진 사운드는 건너뛰어요.",
+  "8-bit": "8비트",
+  "Bit crusher": "비트 크러셔",
+  "Bits": "비트",
+  "Fewer bits and a lower sample rate: an old game console.": "비트 수와 샘플 레이트를 낮춰 옛날 게임기 소리로.",
+  "Sample rate": "샘플 레이트"
 }

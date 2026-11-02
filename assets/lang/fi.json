@@ -4886,5 +4886,10 @@
   "long": "pitkä",
   "rarely": "harvoin",
   "short": "lyhyt",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Ladataan palvelusta {site}, kun lisäät sen: Onion Board ei säilytä kopiota. Äänet kuuluvat omistajilleen. Ääni, joka on poistunut sieltä, ohitetaan."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Ladataan palvelusta {site}, kun lisäät sen: Onion Board ei säilytä kopiota. Äänet kuuluvat omistajilleen. Ääni, joka on poistunut sieltä, ohitetaan.",
+  "8-bit": "8-bittinen",
+  "Bit crusher": "Bittimurskain",
+  "Bits": "Bitit",
+  "Fewer bits and a lower sample rate: an old game console.": "Vähemmän bittejä ja matalampi näytteenottotaajuus: vanha pelikonsoli.",
+  "Sample rate": "Näytteenottotaajuus"
 }

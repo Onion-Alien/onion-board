@@ -4886,5 +4886,10 @@
   "long": "long",
   "rarely": "rarement",
   "short": "court",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Téléchargé depuis {site} quand tu l'ajoutes : Onion Board n'en garde pas de copie. Les sons appartiennent à leurs propriétaires. Un son qui n'y est plus est sauté."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Téléchargé depuis {site} quand tu l'ajoutes : Onion Board n'en garde pas de copie. Les sons appartiennent à leurs propriétaires. Un son qui n'y est plus est sauté.",
+  "8-bit": "8 bits",
+  "Bit crusher": "Broyeur de bits",
+  "Bits": "Bits",
+  "Fewer bits and a lower sample rate: an old game console.": "Moins de bits et une fréquence d'échantillonnage plus basse : une vieille console.",
+  "Sample rate": "Fréquence d'échantillonnage"
 }

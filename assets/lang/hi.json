@@ -4886,5 +4886,10 @@
   "long": "लंबा",
   "rarely": "कभी-कभार",
   "short": "छोटा",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "जोड़ने पर यह {site} से डाउनलोड होता है: Onion Board कोई कॉपी नहीं रखता। साउंड उनके मालिकों के हैं। जो साउंड वहाँ अब नहीं है, उसे छोड़ दिया जाता है।"
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "जोड़ने पर यह {site} से डाउनलोड होता है: Onion Board कोई कॉपी नहीं रखता। साउंड उनके मालिकों के हैं। जो साउंड वहाँ अब नहीं है, उसे छोड़ दिया जाता है।",
+  "8-bit": "8-बिट",
+  "Bit crusher": "बिट क्रशर",
+  "Bits": "बिट्स",
+  "Fewer bits and a lower sample rate: an old game console.": "कम बिट्स और कम सैंपल रेट: एक पुराना गेम कंसोल।",
+  "Sample rate": "सैंपल रेट"
 }

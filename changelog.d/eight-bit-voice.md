@@ -1,0 +1,3 @@
+- New voice: 8-bit, an old game console (a little higher, snapped to notes, a chip buzz under your words, crushed to a few bits).
+- New effect in Edit voice: Bit crusher (Bits, Sample rate, Mix), under Character.
+- The Effects pop-up can add Autotune and Bit crusher on top of any voice.

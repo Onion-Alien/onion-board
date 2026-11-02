@@ -4886,5 +4886,10 @@
   "long": "hosszú",
   "rarely": "ritkán",
   "short": "rövid",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Hozzáadáskor innen töltődik le: {site}. Az Onion Board nem tart meg másolatot. A hangok a tulajdonosaiké. Ha egy hang már nincs ott, kimarad."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Hozzáadáskor innen töltődik le: {site}. Az Onion Board nem tart meg másolatot. A hangok a tulajdonosaiké. Ha egy hang már nincs ott, kimarad.",
+  "8-bit": "8 bites",
+  "Bit crusher": "Bitzúzó",
+  "Bits": "Bitek",
+  "Fewer bits and a lower sample rate: an old game console.": "Kevesebb bit és alacsonyabb mintavétel: egy régi játékkonzol.",
+  "Sample rate": "Mintavételi frekvencia"
 }

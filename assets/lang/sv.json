@@ -4886,5 +4886,10 @@
   "long": "lång",
   "rarely": "sällan",
   "short": "kort",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Laddas ner från {site} när du lägger till paketet: Onion Board sparar ingen kopia. Ljuden tillhör sina ägare. Ett ljud som inte finns kvar där hoppas över."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Laddas ner från {site} när du lägger till paketet: Onion Board sparar ingen kopia. Ljuden tillhör sina ägare. Ett ljud som inte finns kvar där hoppas över.",
+  "8-bit": "8-bit",
+  "Bit crusher": "Bitkrossare",
+  "Bits": "Bitar",
+  "Fewer bits and a lower sample rate: an old game console.": "Färre bitar och lägre samplingsfrekvens: en gammal spelkonsol.",
+  "Sample rate": "Samplingsfrekvens"
 }

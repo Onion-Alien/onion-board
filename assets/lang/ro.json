@@ -4979,5 +4979,10 @@
   "long": "lung",
   "rarely": "rar",
   "short": "scurt",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Se descarcă de pe {site} când îl adaugi: Onion Board nu păstrează o copie. Sunetele aparțin proprietarilor lor. Un sunet care nu mai e acolo e sărit."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Se descarcă de pe {site} când îl adaugi: Onion Board nu păstrează o copie. Sunetele aparțin proprietarilor lor. Un sunet care nu mai e acolo e sărit.",
+  "8-bit": "8 biți",
+  "Bit crusher": "Zdrobitor de biți",
+  "Bits": "Biți",
+  "Fewer bits and a lower sample rate: an old game console.": "Mai puțini biți și o rată de eșantionare mai mică: o consolă veche.",
+  "Sample rate": "Rată de eșantionare"
 }

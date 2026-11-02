@@ -4793,5 +4793,10 @@
   "long": "panjang",
   "rarely": "jarang",
   "short": "pendek",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Diunduh dari {site} saat Anda menambahkannya: Onion Board tidak menyimpan salinan. Suaranya milik pemiliknya masing-masing. Suara yang sudah tidak ada di sana dilewati."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Diunduh dari {site} saat Anda menambahkannya: Onion Board tidak menyimpan salinan. Suaranya milik pemiliknya masing-masing. Suara yang sudah tidak ada di sana dilewati.",
+  "8-bit": "8-bit",
+  "Bit crusher": "Penghancur bit",
+  "Bits": "Bit",
+  "Fewer bits and a lower sample rate: an old game console.": "Lebih sedikit bit dan sample rate lebih rendah: konsol game lawas.",
+  "Sample rate": "Sample rate"
 }

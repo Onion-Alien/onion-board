@@ -4979,5 +4979,10 @@
   "long": "dlouhé",
   "rarely": "zřídka",
   "short": "krátké",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Při přidání se stáhne z {site}: Onion Board si nenechává kopii. Zvuky patří svým majitelům. Zvuk, který tam už není, se přeskočí."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Při přidání se stáhne z {site}: Onion Board si nenechává kopii. Zvuky patří svým majitelům. Zvuk, který tam už není, se přeskočí.",
+  "8-bit": "8bitový",
+  "Bit crusher": "Drtič bitů",
+  "Bits": "Bity",
+  "Fewer bits and a lower sample rate: an old game console.": "Méně bitů a nižší vzorkovací frekvence: stará herní konzole.",
+  "Sample rate": "Vzorkovací frekvence"
 }

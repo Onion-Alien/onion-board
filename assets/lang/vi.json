@@ -4793,5 +4793,10 @@
   "long": "dài",
   "rarely": "hiếm khi",
   "short": "ngắn",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Được tải từ {site} khi bạn thêm gói: Onion Board không giữ bản sao. Âm thanh thuộc về chủ sở hữu của chúng. Âm thanh nào không còn ở đó sẽ bị bỏ qua."
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "Được tải từ {site} khi bạn thêm gói: Onion Board không giữ bản sao. Âm thanh thuộc về chủ sở hữu của chúng. Âm thanh nào không còn ở đó sẽ bị bỏ qua.",
+  "8-bit": "8-bit",
+  "Bit crusher": "Nghiền bit",
+  "Bits": "Số bit",
+  "Fewer bits and a lower sample rate: an old game console.": "Ít bit hơn và tần số lấy mẫu thấp hơn: máy chơi game đời cũ.",
+  "Sample rate": "Tần số lấy mẫu"
 }

@@ -4793,5 +4793,10 @@
   "long": "長い",
   "rarely": "まれに",
   "short": "短い",
-  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "追加したときに{site}からダウンロードされます。Onion Boardはコピーを保存しません。サウンドの権利は各所有者にあります。向こうで消えたサウンドはスキップされます。"
+  "Downloaded from {site} when you add it: Onion Board doesn't keep a copy. The sounds belong to their owners. One that's gone from there is skipped.": "追加したときに{site}からダウンロードされます。Onion Boardはコピーを保存しません。サウンドの権利は各所有者にあります。向こうで消えたサウンドはスキップされます。",
+  "8-bit": "8ビット",
+  "Bit crusher": "ビットクラッシャー",
+  "Bits": "ビット数",
+  "Fewer bits and a lower sample rate: an old game console.": "ビット数とサンプルレートを下げて、昔のゲーム機の音に。",
+  "Sample rate": "サンプルレート"
 }
