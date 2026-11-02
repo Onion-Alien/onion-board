@@ -39,6 +39,12 @@ COLOURS = {"plain": ("#1f1f1f", "#e8e8e8"), "stop": ("#c42b1c", "#ff6b6b"),
 CLSID_TaskbarList = "{56FDF344-FD6D-11d0-958A-006097C9A090}"
 IID_ITaskbarList3 = "{ea1afb91-9e28-4b86-90e9-9e9f8a5eefaf}"
 SLOT_HRINIT, SLOT_ADD, SLOT_UPDATE = 3, 15, 16
+# Windows sends WM_SETTINGCHANGE to every window for any setting (several in a row is
+# common) while Explorer handles the same broadcast: the buttons are looked at this
+# long after the last one, and only pushed when they'd look different. Pushing on each
+# one, inside the message, held the window for seconds to minutes on a busy PC (freeze
+# reports in ThumbBarUpdate and the icons drawn for it).
+SETTLE_MS = 500
 
 
 _MSG_ID = wintypes.MSG.message.offset
@@ -95,6 +101,8 @@ class ThumbBar:
         self._hwnd = 0
         self._added = False
         self._icons: list[int] = []
+        self._shown: tuple | None = None   # the look last pushed (_look)
+        self._settling = False             # a settings change waits for SETTLE_MS
         self._created = 0
         if _native():
             user = ctypes.windll.user32
@@ -120,8 +128,23 @@ class ThumbBar:
                 self.click(msg.wParam & 0xFFFF)
                 return True
         else:
-            self.refresh()
+            self._settle()
         return False
+
+    def _settle(self):
+        """A setting or the scale changed: refresh() once things settle (SETTLE_MS)."""
+        if self._settling:
+            return
+        from PySide6.QtCore import QObject, QTimer
+        self._settling = True
+        if isinstance(self.window, QObject):   # (gone with the window)
+            QTimer.singleShot(SETTLE_MS, self.window, self._settled)
+        else:
+            QTimer.singleShot(SETTLE_MS, self._settled)
+
+    def _settled(self):
+        self._settling = False
+        self.refresh()
 
     def click(self, bid: int):
         act = self.actions.get(bid)
@@ -158,17 +181,20 @@ class ThumbBar:
         self.refresh()
 
     def refresh(self):
-        """Repaint the buttons (the state changed, Windows' light / dark mode)."""
+        """Repaint the buttons (the state changed, Windows' light / dark mode), when
+        they'd look different from what Windows has."""
         if not self._added:
             return
         try:
-            self._push(SLOT_UPDATE)
+            if self._look() != self._shown:
+                self._push(SLOT_UPDATE)
         except Exception:  # noqa: BLE001
             log.warning("taskbar buttons not updated", exc_info=True)
 
     def _push(self, slot: int):
         from soundboard.audio.appaudio import Com
-        btns, old = self.buttons(), self._icons
+        look = self._look()
+        btns, old = self.buttons(look), self._icons
         self._icons = [b.hIcon for b in btns]
         arr = (THUMBBUTTON * len(btns))(*btns)
         Com(self._tb).call(slot, (wintypes.HWND, c_uint, POINTER(THUMBBUTTON)),
@@ -176,15 +202,21 @@ class ThumbBar:
                            what="ThumbBarAddButtons" if slot == SLOT_ADD else "ThumbBarUpdate")
         for h in old:   # Windows keeps its own copy of each icon
             ctypes.windll.user32.DestroyIcon(wintypes.HICON(h))
+        self._shown = look
 
-    def buttons(self) -> list[THUMBBUTTON]:
-        from soundboard.ui.kit import icons
-        light = light_windows()
-        size = max(16, round(16 * self.window.devicePixelRatioF()))
+    def _look(self) -> tuple:
+        """Everything the buttons show: (light Windows, icon size, tips, live, paused)."""
         text = {**tips(), LIVE: live_tip(self.live)}
         if self.paused:
             from soundboard.i18n import _
             text[PAUSE] = _("Resume")
+        size = max(16, round(16 * self.window.devicePixelRatioF()))
+        return light_windows(), size, tuple(text.items()), self.live, self.paused
+
+    def buttons(self, look: tuple | None = None) -> list[THUMBBUTTON]:
+        from soundboard.ui.kit import icons
+        light, size, items, _live, _paused = look or self._look()
+        text = dict(items)
         out = []
         for bid in ORDER:
             kind = ("live" if self.live else "muted") if bid == LIVE else (
