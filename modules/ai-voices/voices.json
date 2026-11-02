@@ -84,6 +84,50 @@
       "pitch_hz": 128
     },
     {
+      "id": "moose",
+      "name": "Moose",
+      "emoji": "🦌",
+      "description": "A huge, booming voice.",
+      "about": "A giant of a man with a big, open, booming voice, deeper than Bear. Good for a friendly giant, a lumberjack or a big boss.",
+      "tags": ["Man"],
+      "mix": [[189, 0.5], [151, 0.5]],
+      "formant": 0.0,
+      "pitch_hz": 74
+    },
+    {
+      "id": "bjorn",
+      "name": "Bjorn",
+      "emoji": "🪓",
+      "description": "Deep and rugged.",
+      "about": "A deep, rugged man's voice with a lot of chest. Good for a Viking, a warrior or a tough captain.",
+      "tags": ["Man"],
+      "mix": [[24, 0.5], [118, 0.5]],
+      "formant": -0.5,
+      "pitch_hz": 80
+    },
+    {
+      "id": "hank",
+      "name": "Hank",
+      "emoji": "🤠",
+      "description": "Low and laid-back.",
+      "about": "A low, relaxed man's voice with some weight to it. Good for a cowboy, a trucker or a calm old pro.",
+      "tags": ["Man"],
+      "mix": [[109, 0.5], [147, 0.25], [22, 0.25]],
+      "formant": -1.0,
+      "pitch_hz": 113
+    },
+    {
+      "id": "finn",
+      "name": "Finn",
+      "emoji": "⚓",
+      "description": "Bold with a rough edge.",
+      "about": "A strong man's voice with a rough edge, a little higher than Hank. Good for a pirate, a sailor or a loud adventurer.",
+      "tags": ["Man"],
+      "mix": [[96, 0.5], [188, 0.5]],
+      "formant": -1.0,
+      "pitch_hz": 137
+    },
+    {
       "id": "river",
       "name": "River",
       "emoji": "🌊",
@@ -172,6 +216,72 @@
       "pitch_hz": 135
     },
     {
+      "id": "luna",
+      "name": "Luna",
+      "emoji": "🚀",
+      "description": "Bright and clear.",
+      "about": "A clear, lively young woman's voice. Good for a pilot, a hero or a friendly guide.",
+      "tags": ["Woman"],
+      "mix": [[112, 0.5], [128, 0.5]],
+      "formant": 1.0,
+      "pitch_hz": 199
+    },
+    {
+      "id": "vera",
+      "name": "Vera",
+      "emoji": "🎷",
+      "description": "Warm and rich.",
+      "about": "A warm, full woman's voice with some depth to it. Good for a singer, a host or a confident boss.",
+      "tags": ["Woman"],
+      "mix": [[51, 0.5], [170, 0.5]],
+      "formant": -1.0,
+      "pitch_hz": 200
+    },
+    {
+      "id": "poppy",
+      "name": "Poppy",
+      "emoji": "🎈",
+      "description": "Bubbly and upbeat.",
+      "about": "A cheerful, bouncy young woman's voice. Good for an excited friend, a streamer or a cheerful sidekick.",
+      "tags": ["Woman"],
+      "mix": [[93, 0.5], [17, 0.25], [3, 0.25]],
+      "formant": 1.0,
+      "pitch_hz": 229
+    },
+    {
+      "id": "willow",
+      "name": "Willow",
+      "emoji": "🍃",
+      "description": "Soft and gentle.",
+      "about": "A soft, gentle woman's voice. Good for an elf, a healer or a calm storyteller.",
+      "tags": ["Woman"],
+      "mix": [[196, 0.5], [120, 0.5]],
+      "formant": -0.5,
+      "pitch_hz": 230
+    },
+    {
+      "id": "hazel",
+      "name": "Hazel",
+      "emoji": "🧹",
+      "description": "High but full.",
+      "about": "A higher woman's voice with an older, fuller tone. Good for a witch, a teacher or a fussy aunt.",
+      "tags": ["Woman"],
+      "mix": [[68, 0.5], [184, 0.5]],
+      "formant": -1.0,
+      "pitch_hz": 244
+    },
+    {
+      "id": "daisy",
+      "name": "Daisy",
+      "emoji": "🌻",
+      "description": "Sweet and sunny.",
+      "about": "A sweet, friendly young woman's voice. Good for a farm girl, a shopkeeper or a kind neighbour.",
+      "tags": ["Woman"],
+      "mix": [[18, 0.5], [2, 0.25], [133, 0.25]],
+      "formant": 0.0,
+      "pitch_hz": 251
+    },
+    {
       "id": "squeak",
       "name": "Squeak",
       "emoji": "🐿️",
@@ -192,6 +302,28 @@
       "mix": [[110, 0.5], [18, 0.25], [5, 0.25]],
       "formant": 1.5,
       "pitch_hz": 300
+    },
+    {
+      "id": "milo",
+      "name": "Milo",
+      "emoji": "🧸",
+      "description": "A small, soft kid.",
+      "about": "A high, young voice like a kid, a bit softer and rounder than Bean.",
+      "tags": ["Cartoon"],
+      "mix": [[196, 0.5], [167, 0.5]],
+      "formant": 0.5,
+      "pitch_hz": 287
+    },
+    {
+      "id": "kiwi",
+      "name": "Kiwi",
+      "emoji": "🦜",
+      "description": "Chirpy and high.",
+      "about": "A very high, chirpy voice, a step below Squeak. Good for a parrot, a sprite or a cartoon pet.",
+      "tags": ["Cartoon"],
+      "mix": [[196, 0.5], [193, 0.25], [174, 0.25]],
+      "formant": -0.5,
+      "pitch_hz": 298
     },
     {
       "id": "titan",
