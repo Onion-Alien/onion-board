@@ -1,1 +1,0 @@
-- The setup guide now really ignores clicks and keys made while a first launch had the PC frozen (the earlier fix let the Esc through on a real PC).

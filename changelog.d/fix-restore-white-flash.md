@@ -1,1 +1,0 @@
-- Opening Onion Board from the tray icon no longer shows a white window for a moment before the board appears.

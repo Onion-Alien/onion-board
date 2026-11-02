@@ -1,1 +1,0 @@
-- The mouse's back side button goes back, as in a browser: out of Free sound packs, Settings and search results, and a step back in the setup guide.

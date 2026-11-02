@@ -2,6 +2,395 @@
 
 Changes not released yet are in [changelog.d/](changelog.d/), one file per change.
 
+## 2.8.0 — 2026-11-02
+
+- A tab's first-visit tip no longer keeps the window redrawing while it sits there (it used a lot of CPU on slower PCs)
+- Voice > Languages: the Install speech recognition button keeps all its words in a narrow window
+- The Voice tab's cards-or-list switch is now Simple / Advanced. Advanced shows bigger
+  cards that say what each voice does: a voice changer voice's pitch shift and main
+  effects, an AI voice's kind, pitch in Hz and how much deeper or brighter it is, and a
+  language's download size. A list view chosen before opens as Advanced.
+- Setup's Virtual cable | My mic switch now always switches, never with Windows' admin
+  prompt, and moves both boxes with it. My mic goes straight onto the mic Onion Board is
+  already on. When it isn't on your mic yet, the card says so and its button sets it up.
+  Before, the switch ran the set-up every time and could bounce back to the cable with
+  "Couldn't put Onion Board on your mic", or show My mic while your sounds still went
+  into the cable.
+- Send my sounds to lists only what others hear you through: your mic, each virtual
+  cable once, and Nobody. Speakers, mixers and capture cards are picked from Setup's
+  Another device instead, which lists every device; one you picked before stays.
+- AI voices no longer show voices the downloaded voice model can't play. Picking one used to
+  keep the voice you had before while saying you sounded like the new one.
+- Clean mic turned on by a voice goes off again when the voice goes off; one you turned on yourself stays on.
+- Voices that need a download (Cat, Dog, Farm, Fart, Drum kit and the other animals) now download first and only then go on, from every way of picking one (a click, Random voice, hotkeys, the remote, combos, switching on). Until then the voice you had stays on and the card shows how far the download got; clicking it again cancels, and a failed download changes nothing and says why.
+- My mic set to (none) no longer shows "Your sounds go into your mic": the card says no mic is picked, with a button to pick one.
+- Closing Onion Board while it was still bringing your sounds over from another soundboard (the installer's box) no longer loses the rest: the next start carries on where it stopped.
+- The player bar no longer stays stripped to play, stop and skip after the window was made small (or went to the mini player) and back: the sound name, speed and volume come back when there is room.
+- A free Myinstants pack's sounds stay in the pack's order on the board when some of them came early.
+- Settings > Audio starts with the Send your sounds card from Setup (Virtual cable or My
+  mic, whether your mic and the virtual mic are connected, the step-by-step guide).
+- The *Virtual mic* line on the Setup tab no longer sits in a box of its own, and the
+  box around it has even space above and below.
+- In a short window the side bar keeps its open / shut arrow and its drag edge: shut, it couldn't be opened again.
+- Clicking a voice that needs a download (Cat, Farm, Fart, Drum kit...) now waits for it, showing "Downloading…", instead of playing a stand-in sound until it came.
+- With Voicemeeter installed, ticking VB-Cable in the installer (or "Use the cable" in Setup) now really installs it: Voicemeeter's devices were taken for the cable, so nothing was installed
+- *Count me in* no longer says it never sends your IP address: any web request carries one, so the line now says it never sends your name or device info.
+- The privacy page now says the usage count includes where in the app an error happened, and the website no longer makes a promise about IP addresses that any web request can't keep.
+- Animal voices and the Singing monk get a *How many calls* (notes) slider: a call every syllable, or just one a sentence. The animals also get *Call length*: a call stretched up to 4 times as long at the same pitch.
+- Voices that need a download to work (Cat, Dog, Goat, Duck, Pig, Sheep, Cow and Farm) are no longer offered while the app can't download voices (Offline mode, or the voices switch in Settings > Privacy): not as cards, in search, in Mix in a voice, in Random voice or to the remote control. They come back as soon as downloads are allowed again; a voice that's already on stays on.
+- Hoot's wings now go in front of what he wears round his neck when he begs, and his firework burst and sparkler fit inside his picture.
+- Five new voices: Critter chatter (every syllable a cute gibberish blip), Fart (every
+  syllable a real fart), Drum kit (every syllable a real drum hit, picked by how you say
+  it, and a crash cymbal when you stop), Whistle and Kazoo (your tune, whistled or buzzed
+  through a kazoo). Fart and Drum kit download their public-domain recordings (about
+  1 MB and 0.5 MB) the first time you pick them.
+- Goat, Duck, Pig, Sheep, Cow and Farm get their tile pictures.
+- Setup guide: when your mic finishes setting up, the status card no longer shrinks a little and nudges the animation under it.
+- New voice: Farm. Every syllable you say is a different farm animal (goat, duck, pig, sheep or cow), with the odd cowbell and braying donkey.
+- The pink theme is now called Bubblegum.
+- New voices: Virtual idol (a bright, glassy virtual pop singer snapped onto the notes) and 80s robot (synth-pop vocoder singing with a wide chorus, an echo and a hall), in Robots & sci-fi.
+- Turning on a voice (the voice changer, an AI voice or a language) now switches Clean mic on too, so the voice comes out without background noise. Turning the voice off leaves Clean mic as it is, and Clean mic switched off by hand stays off until the next voice. Settings > Audio > Clean mic turns this off.
+- The 8-bit voice has its own picture.
+- The TV, anime, sports and gaming sound packs are smaller.
+- Five new voices: Goat, Duck, Pig, Sheep and Cow. Every syllable you say comes out as a real bleat, quack, oink, baa or moo (public-domain recordings, downloaded the first time you pick one).
+- Animal voices are voices, not add-ons: Edit voice shows an animal's card only while that animal is the voice, and Randomize never adds one.
+- New voice: 8-bit, an old game console (a little higher, snapped to notes, a chip buzz under your words, crushed to a few bits).
+- New effect in Edit voice: Bit crusher (Bits, Sample rate, Mix), under Character.
+- The Effects pop-up can add Autotune and Bit crusher on top of any voice.
+- Fix: the window could freeze for seconds to minutes when Windows changed a setting (the taskbar preview buttons were redrawn each time).
+- Fix: on a PC short of memory, the app no longer freezes when it gives memory back from the tray.
+- The first-run tour now suggests sound effects (airhorn, applause, vine boom) instead of your favourite song.
+- Settings > About says to use only sounds you are allowed to use, and that free packs linking to a site download from it, with the sounds belonging to their owners.
+- The gaming sounds pack now has 69 sounds.
+- Free sound packs: a links pack now says its sounds belong to their owners, and the pack rules say what a links pack is (the project stores none of its sounds; an owner can ask for a link to be removed).
+- The meme sounds pack now has 87 sounds.
+- Importing another soundboard again with nothing new no longer deletes an empty category of yours that has the board's name.
+- The box for naming a new category or subcategory opens at its button's size, so the row and the pads below no longer jump.
+- The mouse's back side button goes back, as in a browser: out of Free sound packs, Settings and search results, and a step back in the setup guide.
+- Community opens at once, and so does every category and order in it: the first page of every list comes in one small download as the app starts and is kept for the next launch. Only Play, Add, a search, Show more and Refresh still wait on the store.
+- Setup: picking Voicemeeter (or another virtual device without its own mic end) under "Send my sounds to" now shows "sending" instead of "Virtual mic not connected" and a wrong "that's a normal speaker" warning.
+- Setup: picking "My mic" from another device now says to click Yes on Windows' prompt while it's set up, and says so when the prompt got a No, instead of quietly going back to the old device.
+- Fixed: starting Voicemeeter while Onion Board was open could freeze its window for seconds (every virtual device read the whole device list again).
+- Six new voices: Nightcore (a full-on squeaker, far higher than Chipmunk), Slowed + reverb,
+  Cat and Dog (every syllable you say comes out as a real meow or bark), Ear destroyer
+  (blown out as loud as it goes, and silent between your words) and Glitch (stutters, skips
+  and cut-outs). Cat and Dog download their public-domain recordings (about 1.4 MB) the
+  first time you pick them.
+- New effects in Edit voice: Cat, Dog and Glitch, and Distortion's new "Only while I talk"
+  switch. The Pitch slider now goes up to +24.
+- Community: picking another category or order keeps the cards on screen, faded, until the new list comes, instead of the whole list flashing to a loading page.
+- The twelve new AI voices (Moose, Bjorn, Hank, Finn, Luna, Vera, Poppy, Willow, Hazel,
+  Daisy, Milo and Kiwi) have their own pictures on the AI voices card.
+- Twelve new AI voices: Moose, Bjorn, Hank, Finn, Luna, Vera, Poppy, Willow, Hazel,
+  Daisy, Milo and Kiwi. They use speakers the voice model didn't carry before, so they
+  show up once AI voices is updated to 0.3.0 (the Voice tab offers the update).
+- A tab's first-time tip no longer starts on a tab you've already clicked around in:
+  the Voice tab's switched you back to Voice changer and your click on Clean mic
+  was lost. It comes the next time you open the tab.
+- The window's first size fits smaller screens: on a 768 px high screen its bottom
+  row (Settings, My mic) was under the taskbar.
+- Edit sound: after Save, the window grows for the "Applying the effects" bar instead
+  of squashing the waveform under the Start / End row.
+- The player bar's song name now ends in "…" when the window is narrower, instead of
+  being cut off mid-letter.
+- Settings > Audio no longer shows an "Also play on" label with nothing next to it
+  when there's no other device to add.
+- Searching Settings for "CPU" now finds Lite mode.
+- Less CPU with the window open and nothing playing: Bun in the Edit sound window and
+  the Live controls pop-up stops mixing 10 seconds after your last change (any change
+  wakes him), the header logo's glow holds still at rest and only breathes with a sound,
+  and a quiet room no longer keeps the meters updating at full speed.
+- Opening Onion Board from the tray icon no longer shows a white window for a moment before the board appears.
+- Free sound packs: a Myinstants pack's sounds now go on your board one by one as they download, not all at the end. It still counts as one pack, so removing or resetting it takes them all.
+- Free sound packs: a pack you press Add on keeps downloading when you go back to your sounds, switch tabs or open Settings, and its sounds still land on your board. Opening the packs page again shows it still going.
+- *Trending on Myinstants* is gone from the Search online menu: the Community tab already shows popular sounds.
+- Settings: on the virtual cable, the Mic effect card no longer lists a mic it isn't on ("Not installed, In use"); one line says how to send your sounds into your mic instead.
+- Edit sound: the player bar shows in the Advanced view only; Simple is back to its old size.
+- Languages: the Computer voice list of Windows voices is gone. Each language speaks
+  with its own voice, and a Windows voice picked there before isn't used any more.
+- Community: Play on any sound (an upload or a link) plays it like a pad on the Sounds tab: in the player bar where you can pause, seek and stop it, heard by others, and stopping the sound that was playing. Uploads used to play only in your headphones, and links played over your sounds.
+- The Now playing chip shows the new name when one Community sound or link plays over another.
+- Voice changer: Edit voice on a voice card opens the editor for that voice without turning it on; the voice you had on (or none) stays as it was.
+- Edit sound: the Start and End boxes show minutes and seconds (2:14.70) like the timeline, instead of 134.70 s. Type either way.
+- Edit sound shows Live controls' speed, pitch and effects: with Nightcore on in Live
+  controls, Edit sound reads 1.30x and Bass +3 with Nightcore lit, the same as Live
+  controls. A change there still goes to that sound only, and Save keeps only the
+  sound's own settings.
+- AI voices: the "Others now hear …" line after the AI voice stops now shows in the language you picked, not the one that was on when the app started.
+- Edit sound: each of a splice's fade dots moves on its own (dragging the fade-out's top dot no longer moves the fade-in's), and a splice's fades can be as long as the splice, not just 10 s.
+- Setup: with the virtual cable installed, a "Virtual cable | My mic" switch sits on top of Send your sounds, and the cable view no longer offers "Put my sounds into my mic".
+- Setup: the icons in Send your sounds line up with their text.
+- Edit sound: with Add splices on, a click inside a splice now selects it instead of starting a new splice, and its fade dots stay visible.
+- Edit sound: a selected splice gets Fade in and Fade out buttons in the top row (one click adds a fade, another takes it off).
+- Esc no longer closes the setup guide (closing it by accident skipped the whole set-up for good); its X still does.
+- The setup guide now really ignores clicks and keys made while a first launch had the PC frozen (the earlier fix let the Esc through on a real PC).
+- A first launch that froze the PC for a while no longer closes or skips the setup guide by itself: clicks and keys made while it was stuck are ignored.
+- Free sound packs: a links pack whose sounds still can't be downloaded after all their tries (no connection, Myinstants down or busy) says so, and its missing sounds are asked for again by themselves 2 hours later (and every 2 hours after that while they keep failing, as long as the app runs).
+- Speak another language: right after start, a language whose own voice can't be read yet (no AI voices add-on, or an older one) is read by a Windows voice, instead of naming its own voice and saying nothing until the add-ons were refreshed.
+- Free sound packs: the "TV & movies" filter button no longer reads "TV _movies".
+- Speak another language: each language now comes with its own voice (a Piper voice that
+  speaks it properly), downloaded with the language; an English Windows voice used to read
+  Chinese out. A language you downloaded before keeps working with a Windows voice that
+  speaks it, until you press Download the voice. The language voices need the newest AI
+  voices add-on: without it, a Windows voice reads them, and Said by names it.
+- Picking a language is all it takes: its voice speaks for you straight away. The extra
+  "Computer voice" row and its Start button are gone.
+- AI voices lists each downloaded language's voice under Languages: click one to speak
+  that language with it.
+- Settings > About fits a narrow window in every language again: a long button label
+  (German's "Onion Board auf GitHub einen Stern geben") goes onto two lines instead of
+  pushing the cards under the scroll bar.
+- The side bar no longer squeezes the On Air card for a moment after the window grows back from a short size.
+- With several voices on (Clean mic, the voice changer, a computer voice), their bars
+  no longer take the whole Voice tab on a smaller window: they move to the end of their
+  cards instead, so the voice list keeps room for at least two rows of voices.
+- Edit sound: with an unsaved trim, the player's time and seek bar now count through the
+  part that plays (0.6s / 1.0s) instead of racing through the whole file's length.
+- Settings > Audio > Mic effect no longer offers to put the mic effect on a virtual
+  cable's end (CABLE Output, Voicemeeter): it records your own sounds, so the effect
+  has no place there. One that already has it is still listed, to take it off.
+- When FFmpeg can't be downloaded at start-up because the connection dropped or a server
+  was busy, Onion Board now tries again quietly for a few minutes, and at once when the PC
+  is back online, before showing the FFmpeg bar.
+- When Onion Board was closed in the middle of installing an add-on (AI voices, speech
+  recognition, a translation language, Onion Watch or Onion Pocket), the next start asks
+  whether to install it again.
+- Edit sound (Advanced): click a splice and the Speed & loudness, Effects and Equalizer
+  columns change just that part (a banner says which; Back to the whole sound returns).
+  Its own settings are heard when the splices play combined. Each splice also has a level
+  line over its waveform: drag its dots for a fade in or out, the splice's volume, and the
+  level a fade starts from. Right-click a splice to play it, edit its effects, save it as
+  a new pad or copy it to the clipboard as a sound file. Scrolling over the waveform
+  zooms.
+- The Simple | Advanced switch looks like one switch now.
+- Edit sound no longer shows a squashed layout for a moment when it opens.
+- The Radio map zooms smoothly: it no longer freezes for up to a second while you scroll
+  in. Stations piled on one spot fan out a few scroll steps in, so you don't have to zoom
+  all the way to click one, and the dots stay a small fixed size instead of growing into
+  blobs. Country names sit on top of the dots, so they stay readable.
+- A sound being added from the internet when Onion Board was closed, crashed or lost power
+  no longer leaves a half-written or unused file in your sounds folder: the next start
+  takes it out, so adding it again gets its own name back (not "Name (2)").
+- A download cut off that way no longer leaves its half-downloaded file in the temp folder
+  for a day: the next start removes it.
+- A language download cut off by a dropped connection now says the connection dropped, not that the checksum was wrong; removing a language also deletes what a download stopped by a crash or End task left behind.
+- The speech model: a download stopped by a crash or End task no longer leaves its unfinished part on the disk for good, and when downloading it fails at Start the voice says to check your internet instead of showing a long error and suggesting another model.
+- When the app closed (End task, a crash, the power) while it was getting FFmpeg, Tor or
+  an add-on's Python, the half-downloaded files stayed on disk for good once that helper
+  came from somewhere else (up to 115 MB for FFmpeg). The next start clears them, and a
+  copy an update had moved aside is put back instead of being lost.
+- In the side bar's On Air card, a click on Clean mic, the voice changer, AI voices or
+  Languages switches it off without leaving the tab you're on: its line stays, in red,
+  and another click switches it back on as it was. Right-click it to open it on the
+  Voice tab, or Remove it.
+- Clean mic now has a bar on the Voice tab while it's on, like a voice's: its preset by
+  name ("Quiet room (Clean mic)"), Edit for its Mic settings, and a pause and a ✕. Pause
+  turns it off with the bar kept, so one click brings it back.
+- The computer voice (a Windows voice, or a voice from a voice server) has its own bar
+  on the Voice tab like the voice changer's and the AI voice's: its name and kind,
+  Effects, Edit voice, pause and ✕. The Effects (rain, an echo, board sounds) now play
+  on its lines too, with the voice changer off.
+- Bun swings his hammer and wrench from a short arm with his fist at the end, and the head lands flat on the board.
+- On the shut side bar, the On Air card's icons sit in a small box per group (Voice,
+  Connection, the rest), as the open card's panels do.
+- New sounds are easy to find: sounds that land on the board while you're on another tab
+  (a download, a queue, an import) show as "3 new" on the Sounds tab, with a small arrow
+  while more are still coming in, and each new card glows until the mouse goes over it
+  or you leave Sounds.
+- Bun's hammer arm now bends at the elbow: his upper arm stays put and his forearm swings the hammer or wrench.
+- Send feedback has Bun in it now: he takes notes in his notebook as you tick and type, then bows when you send. The "Anonymous" line sits beside Send instead of on its own row.
+- Each voice's bar on the Voice tab has a pause button and an X. Pause turns just that
+  voice off and keeps its bar, dimmed, with a play button to bring it back; X turns it
+  off for good. The voices' chips beside the Voices switch are gone (their bars show
+  them); Clean mic, the language and an AI voice that's still starting keep a chip.
+- The Effects on top of your voice (rain, wind, a crowd, an echo, sounds from your
+  board) now play on an AI voice too, with the voice changer on or off, and the AI
+  voice's bar has the same Effects button as the voice changer's. Both buttons open one
+  list and show the same count.
+- Each voice bar says what kind of voice it is after the name: "Robot (Voice changer)",
+  "Atlas (AI voice)".
+- Free sound packs is a page on the Sounds tab now, with a search box (it searches the
+  sounds inside each pack too), filter chips and smaller cards. *Preview* opens a small
+  window of pads to hear a few of a pack's sounds first; they load in the background as
+  soon as the page opens, so they play at once.
+- A pack can be a list of Myinstants links: *Add* downloads each sound from there and
+  says how many were skipped because they're gone.
+- With a voice changer voice and an AI voice both on, the Voice tab shows both their
+  bars, one over the other, on every tab, instead of only the bar of the tab you're on.
+  Both bars have the same buttons: the voice's picture, name and Edit voice. Hear it,
+  Make your own voice, and changing or deleting your own AI voice are on a voice card's
+  right-click (and the + card under Mine).
+- Small pop-ups (rename, save preset, yes/no questions…) no longer flash white for a moment when they open.
+- A left click anywhere else in the app now closes a small pop-up, the same as Cancel, instead of playing the Windows error sound. Pop-ups holding work you'd lose (editing a sound, forms, recording, the setup guide) still stay open.
+- Voice servers you added (Voice tab → Add-ons → Custom voices) each get a row: whether
+  the server answers (Online / Offline), an on / off switch that makes it the voice for
+  your typed lines, its settings in a fold, and a picture: one of the app's voice
+  pictures or one from a link. Servers are checked once when the voices load and again
+  when you press Refresh, never on a timer.
+- Bun shows up in more windows. In Edit sound he sits at his DJ desk (mixing along while
+  the sound plays) and puts it away to snip when you trim or twist a knob when you change
+  an effect, in both views. He mouths into the mic while you record, with a red light on.
+  In Recently deleted he digs a sound you bring back out of his bin and holds it up with a
+  tick, and drops one you delete for good in the bin with him. He runs with a parcel
+  while a sound pack downloads, and unwraps a present in What's new. In Lite mode he's a
+  still picture.
+- Edit voice has Reset, Undo and Redo: Reset takes the voice back to how it was when you
+  picked it, and Undo (Ctrl+Z) brings your changes back. The top says which voice you're
+  changing ("Robot, changed"), and Save as a voice sits next to Done.
+- Mix in a voice, in Edit voice, puts two voices together (Robot + Demon): the other
+  voice's effects that yours doesn't have get switched on.
+- Right-click a voice card for Edit voice. The AI voices' cards get a right-click menu
+  too: Hear it, Edit voice, and a hotkey that turns that AI voice on.
+- The On Air card's lines are left-aligned now, in the same place whatever else is
+  on: before, a long line pushed the short ones over.
+- Bun's arm now swings up and down with his hammer and wrench instead of staying still while the tool turns.
+- Bun's hammer and wrench now throw their sparks and sawdust when they hit, not when they're raised.
+- The anonymous usage count (*Count me in*) also says which of the newer parts are used:
+  Edit sound's Undo / Redo, its player, the waveform's seek and zoom and splices, Update
+  or Reset on your own Live controls preset, Star on GitHub, an On Air group folded, and
+  the mic helper switched off. Names only, never what you edited.
+- Community: you can now vote on every sound once a day, and your votes add up over the days, so
+  a sound you keep liking keeps climbing. *Community uploads* (only the sounds people shared
+  here, none brought in from other sites) moved up next to Trending, Most liked and Newest.
+- A dialog no longer opens with its first button ringed as if it was already picked:
+  the focus ring shows only when you move with Tab or the arrow keys, and hovering a
+  button in a dialog now shows clearly.
+- Drop-downs and text boxes in cards light up their edge when the mouse is on them
+  (they didn't change at all before).
+- The radio's Popular / Favorites / Recent switches show the mouse in the light themes
+  (hovering turned them the page's own white).
+- Settings' page list no longer shows a scroll bar for a few pixels.
+- The side bar's On Air card puts its lines in panels, like the On and Stop all
+  buttons over them: Voice (Clean mic, the voice changer, AI voices, Languages,
+  Add-ons), Connection (Offline, a proxy or Tor, a phone remote) and one for the rest
+  (Lite mode). Each line is still one click to its page.
+- The anonymous usage count (*Count me in*) now says which language the app is showing
+  and whether you picked it, plus Windows' own language as one of the 32 the app comes
+  in, so we can see which translations people need. Language codes only.
+- Onion Board is now fully open source, under the GNU GPL v3 or later (it was MIT with the
+  Commons Clause). Releases made before this keep their old license.
+- The Settings menu's icons and words are the same size, weight and colour as the main
+  sidebar's, instead of bigger and brighter.
+- Edit sound's big waveform works like a seek bar: click or drag its time ruler, or drag the
+  pink playhead, to move the playing sound (or its preview) there.
+- Changing the trim or splices while a sound plays now carries on from the same spot when
+  that's still kept, and jumps to the start of what's kept (the next splice) when it was cut,
+  instead of going on from a random spot. The preview follows the changes too.
+- Fireworks' texture mixes big, medium and small bursts, and cards next to each other no
+  longer show the same part of a big texture (fireworks, cobwebs) lined up.
+- Edit sound's Simple view is one page instead of four tabs: at the top, everything on the
+  sound as a chip with an x that takes it off (whatever was set, in Advanced or Live
+  controls too), then the name, colour and picture, the hotkey and how it plays, the trim,
+  speed, volume and Live controls' effect sliders. Fades, wait first and cooldown are under
+  More options; the pitch, presets, voices, effect cards and equalizer are in Advanced.
+- Live controls and Edit sound share one set of speed, pitch, volume and effect sliders and
+  presets, so they work and read the same. Edit sound's Preset list has Live controls'
+  presets (one Nightcore, not two), and a preset you save in Edit sound shows in Live
+  controls' My presets too when Live controls can play it.
+- Each tab can have its own hotkey: right-click a tab, then Hotkey > Change (or Set hotkey).
+  Ctrl+1... still jump to the tabs by default, but a tab you give another key stops using its
+  Ctrl+number, so it no longer clashes with a pad on the same key. Turn into Bun left that
+  menu (it's still under Bun at the rail's foot, in the tray and on the mini player).
+- Changing a playing sound in Edit sound is heard at once: speed, pitch, volume, boost and
+  the Live controls effects no longer wait on "Applying to the playing sound". Save still
+  makes the finished version. A trim, Play backwards, the EQ and voice effects are still
+  applied first.
+- The lines in the side bar's On Air card (Clean mic, the voice changer, Tor, Lite
+  mode…) have room round them now: hovering or Tab-focusing one no longer runs its
+  highlight into On / Stop all, the line next to it or the card's edge.
+- Edit sound's Advanced view has Live controls' options: speed, pitch, volume and boost
+  sliders you can type a value into, quick speed and volume buttons, and the Bass, Treble,
+  Muffle, Reverb, Echo and Distortion sliders with the Nightcore, Slowed + reverb, Bass
+  boosted, Chipmunk, Deep voice and Underwater presets. They sound the same as in Live
+  controls.
+- "Tape mode" is now "Keep pitch when changing speed", the same words as Live controls.
+- The scroll bars in Edit sound no longer flash on and off when an effect is turned on.
+- New limited-edition Fireworks theme for November: a night sky in gold and pink with
+  fireworks across the panels. Bun turns night-blue with a sparkler and a glow-stick
+  collar (Hoot too), and now and then puts on a little firework show. Use it before the
+  end of November and it's yours to keep.
+- Edit sound's Advanced view can cut a sound into splices: turn on Add splices, click where a
+  part starts and where it ends, and it's splice 1; click twice again for splice 2, and so on.
+  Each one is numbered on the waveform and names itself when you point at it. The Splices
+  button lists every splice's times with a button to play it on its own and one to remove it,
+  and Combine splices makes the sound play them back to back (cutting out everything else).
+  Save keeps it, Save a copy makes it a new pad, and your file itself is never cut.
+- Fixed: a download that failed because the disk is full now says so ("The disk is full.")
+  instead of "the downloader ran into a problem", and doesn't suggest a newer downloader.
+- Fixed: getting FFmpeg failed with "access denied" when an antivirus was still scanning the
+  new ffmpeg.exe; it now waits a few seconds for it.
+- Playlists found by a YouTube search say how many videos they have ("8 videos") on
+  their card, so a short one is easy to tell from a huge one before opening it.
+- Edit sound: a window opened for the next sound no longer shows the last one's
+  "Deleted … Undo" row, and its Preset list has presets saved in another Edit window.
+- Edit sound: the effects line says 1.25x when the speed is 1.25x (it said 1.2x).
+- Edit sound: clicking Save a copy now adds the edited copy and leaves the original as it
+  was (it saved the edits onto the original and made no copy).
+- Fixed: on a busy PC short of memory the window could freeze for 10-30 seconds while
+  Windows was slow to list the sound devices, or when settings were saved after a quiet
+  spell.
+- Live controls: change one of your presets after picking it and Save preset turns into
+  Update, saving the change into it. Its menu also has Reset (back to how it was saved)
+  and Save as a new preset.
+- Edit sound has the player now: play / pause, stop, skip, the seek line, Sounds for
+  others, Hear it myself, the Now playing chips and Stop all, over Save. A big Edit sound
+  window no longer hides the only way to pause the song.
+- Uninstalling no longer asks for Windows' permission a second time over the mic helper's
+  folder, and deleting your data now removes ProgramData's folder too. Installing again
+  before restarting no longer loses the mic helper at that restart.
+- The credits of the Arabic, German, Spanish, Hebrew, Hindi, Italian, Japanese, Korean,
+  Russian, Swedish, Turkish and Ukrainian translation models now say their licence (MIT or
+  CC0, from Argos Translate) and that each includes a Stanza tokenizer (Apache-2.0).
+- Settings → About has a "Star Onion Board on GitHub" button next to Source code.
+- Edit sound has an Advanced view (the Simple | Advanced switch next to its tabs): a bigger
+  window with the waveform big across the top (a time ruler, zoom with the buttons or
+  Ctrl+scroll, the fades drawn where they happen) and Speed & loudness, Effects and the
+  Equalizer side by side. Effects lists only the ones that are on, with Add effect to pick
+  more. It remembers which view you used last.
+- Edit sound has Undo and Redo for the trim, effects and fades (Ctrl+Z, and Ctrl+Shift+Z or
+  Ctrl+Y).
+- Edit sound's Preset and Voice boxes now line up.
+- Live controls show a playing sound's unsaved Edit sound changes while they're what plays
+  (they showed its saved effects until Save).
+- Before it changes Discord's voice settings, the app now keeps only those settings, not
+  a copy of Discord's settings file (which can hold your Discord login). Copies older
+  versions kept are deleted when the app starts.
+- Uninstalling now asks whether to delete your sounds and settings too (No keeps them;
+  Yes puts them in the Recycle Bin), and removes Onion Pocket's firewall rule.
+- The installer now says before it adds FFmpeg through winget, the FFmpeg download bar
+  says where it comes from and how to switch it off, and the VB-Cable box says it's
+  VB-Audio's driver and not open source.
+- The privacy page and SECURITY.md now say exactly what the app reads and writes in
+  Discord's settings, and where the copy it keeps before a change is.
+- When Bun sets Discord up for your sounds and turns its noise filter off, it now turns on
+  Clean mic in its place, so background noise still stays out of your voice. The Discord,
+  game, Zoom/Teams and Steam guides point to Clean mic too.
+- New privacy page (docs/PRIVACY.md): what the app sends, how to turn each part off,
+  what it changes on your PC and how to remove it all.
+- Where Onion Board tells you to switch off Discord's, a game's or a meeting app's noise
+  suppression, it now says Clean mic on the Voice tab takes out the noise instead.
+- Edit sound: Reset effects on a playing pad that was saved with effects no longer gets stuck at "Applying to the playing sound: 0%".
+- Edit sound: the trim's waveform shows where the sound is playing now.
+- Live controls show what's playing: the song's own effects from Edit sound (speed, pitch, bass, reverb, echo…) plus Live controls' own, which stay on for the next song.
+- The Categories menu on a pad now shows a subcategory as "Parent › name", so one with the same name as a category no longer looks like a broken copy of it.
+- When the mic effect can't start on your mic, the log now says what was in the way: its
+  file taken away (often an antivirus), Windows' Audio enhancements switched off, or no
+  log ever written. A failed add-on install logs the last lines its step printed.
+- Save your own presets: Live controls has a Save preset button and a My presets row
+  (one click puts back the speed, pitch, effects and volume; right-click to rename or
+  delete, with Undo), and Edit sound → Effects has Save as preset, with yours in the
+  Preset list for every sound.
+- A pasted playlist link (YouTube, a SoundCloud set and other sites) now shows its videos
+  as cards with Add all, instead of saying "That's a playlist". Up to the first 30 videos.
+- YouTube search results have a Videos / Playlists switch beside Back. Open on a playlist
+  shows its videos with Add all, and Back goes back to the playlists.
+- Playlist cards in YouTube search also have Add all, to add every video without opening
+  the playlist.
+- Taking the mic effect off a mic no longer stops halfway with an error, leaving its notes
+  behind.
+- A link you already have in your Sounds no longer counts as a failed download in the
+  anonymous usage count.
+
 ## 2.7.3 — 2026-10-30
 
 - Adding a sound you already have now shows you where it is: the board jumps to a tab that

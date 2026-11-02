@@ -1,1 +1,0 @@
-- In a short window the side bar keeps its open / shut arrow and its drag edge: shut, it couldn't be opened again.

@@ -1,1 +1,0 @@
-- With Voicemeeter installed, ticking VB-Cable in the installer (or "Use the cable" in Setup) now really installs it: Voicemeeter's devices were taken for the cable, so nothing was installed
