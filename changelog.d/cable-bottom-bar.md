@@ -1,0 +1,1 @@
+- The player bar no longer stays stripped to play, stop and skip after the window was made small (or went to the mini player) and back: the sound name, speed and volume come back when there is room.

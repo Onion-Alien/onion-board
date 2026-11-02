@@ -166,6 +166,8 @@ class Fitter:
         # steps that help only their own axis (by apply function): never tried for the
         # other one in fit's diagonal pass
         self._own_axis: set[int] = set()
+        # the next fit tries every applied step again, grown or not (retry_all)
+        self._retry_all = False
 
     def add(self, priority: int, axis: str, apply: Callable[[bool], object],
             cross: bool = True):
@@ -199,6 +201,14 @@ class Fitter:
                 self.steps[i][2](False)
                 del self._at[i]
         self._known = None
+
+    def retry_all(self):
+        """The next fit tries every applied step again, even at a size no bigger than
+        the one it went at: what else needed the room then (the Voice tab while the
+        window was the mini player) may have shrunk since, and the player bar's name,
+        speed and volume stayed hidden at a size they fit. Not on every fit: undoing
+        and redoing steps on each resize step made them flash."""
+        self._retry_all = True
 
     def reset(self):
         """Undo every step (everything shows again)."""
@@ -308,8 +318,9 @@ class Fitter:
                     grown = dim[axis] > (w if axis == "w" else h)
                     if cross:   # hidden for the other axis: that one growing counts too
                         grown = grown or (dim["h"] > h if axis == "w" else dim["w"] > w)
-                    if not grown:
-                        continue   # no bigger than when it had to go
+                    # no bigger than when it had to go (unless retry_all() asked)
+                    if not grown and (not self._retry_all or i in new):
+                        continue
                     self._apply(i, False)
                     if self._fits(size):
                         del self._at[i]
@@ -337,6 +348,7 @@ class Fitter:
                     self._apply(i, True)
                     self._at[i] = (max(dim["w"], need.width() - 1),
                                    max(dim["h"], need.height() - 1), cross)
+        self._retry_all = False
         try:
             return self.need()
         finally:
