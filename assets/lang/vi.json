@@ -4829,5 +4829,10 @@
   "How many calls": "Bao nhiêu tiếng kêu",
   "How many notes": "Bao nhiêu nốt",
   "every syllable": "mỗi âm tiết",
-  "one a sentence": "mỗi câu một lần"
+  "one a sentence": "mỗi câu một lần",
+  "Downloading {voice}…": "Đang tải xuống {voice}…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Đang tải xuống “{name}”: {percent}%. Sẽ bật khi tải xong; bấm lần nữa để hủy.",
+  "its sounds couldn't be downloaded": "không tải xuống được âm thanh của nó",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} cần tải xuống một lần, và việc tải giọng đang tắt (Chế độ ngoại tuyến hoặc Cài đặt > Quyền riêng tư).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Không tải xuống được {voice}: {error}. Giọng của bạn không đổi; chọn lại để thử lại."
 }

@@ -4829,5 +4829,10 @@
   "How many calls": "Berapa banyak suara",
   "How many notes": "Berapa banyak nada",
   "every syllable": "setiap suku kata",
-  "one a sentence": "satu per kalimat"
+  "one a sentence": "satu per kalimat",
+  "Downloading {voice}…": "Mengunduh {voice}…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Mengunduh “{name}”: {percent}%. Akan aktif setelah selesai; klik lagi untuk membatalkan.",
+  "its sounds couldn't be downloaded": "suaranya tidak bisa diunduh",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} perlu diunduh sekali, dan mengunduh suara sedang dimatikan (Mode luring atau Pengaturan > Privasi).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Tidak bisa mengunduh {voice}: {error}. Suaramu tidak berubah; pilih lagi untuk mencoba lagi."
 }

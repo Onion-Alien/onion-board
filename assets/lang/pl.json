@@ -5015,5 +5015,10 @@
   "How many calls": "Ile odgłosów",
   "How many notes": "Ile nut",
   "every syllable": "każda sylaba",
-  "one a sentence": "jeden na zdanie"
+  "one a sentence": "jeden na zdanie",
+  "Downloading {voice}…": "Pobieranie: {voice}…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Pobieranie „{name}”: {percent}%. Włączy się po pobraniu; kliknij ponownie, aby anulować.",
+  "its sounds couldn't be downloaded": "nie udało się pobrać jego dźwięków",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} wymaga jednorazowego pobrania, a pobieranie głosów jest wyłączone (Tryb offline lub Ustawienia > Prywatność).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Nie udało się pobrać: {voice}: {error}. Twój głos się nie zmienił; wybierz go ponownie, aby spróbować jeszcze raz."
 }

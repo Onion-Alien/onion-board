@@ -99,6 +99,12 @@ class Effect:
         in the background. Most effects need nothing."""
 
     @classmethod
+    def downloads(cls, cfg: dict) -> tuple[str, ...]:
+        """The voicefx.critters kinds it plays (what `prepare` fetches): the voice goes
+        on only once they're in. Most effects need none."""
+        return ()
+
+    @classmethod
     def clean_extra(cls, cfg: dict) -> dict:
         """Settings of this effect that aren't numbers (lists, names), cleaned from a
         saved one (`clean_spec`). Most effects have none: {}."""
@@ -144,6 +150,16 @@ def needs_download(spec: dict) -> bool:
     return any(getattr(REGISTRY.get(t), "needs_download", False)
                and not (isinstance(cfg, dict) and cfg.get("on") is False)
                for t, cfg in (spec or {}).items())
+
+
+def downloads(effects: dict) -> list[str]:
+    """Every voicefx.critters kind the effects switched on ({type: {"on", ...}}) play."""
+    out: list[str] = []
+    for t, cfg in (effects or {}).items():
+        cls = REGISTRY.get(t)
+        if cls is not None and isinstance(cfg, dict) and cfg.get("on", True):
+            out += [k for k in cls.downloads(cfg) if k not in out]
+    return out
 
 
 # built-in voices that were renamed: old saved name -> new name (an older version
@@ -564,4 +580,4 @@ def shown(text: str) -> str:
 
 __all__ = ["Param", "Effect", "REGISTRY", "register", "defaults", "clean_spec", "on_top",
            "VoiceChain", "PRESETS", "PRESET_ICONS", "shown",
-           "needs_download"]
+           "needs_download", "downloads"]

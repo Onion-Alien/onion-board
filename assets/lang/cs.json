@@ -5015,5 +5015,10 @@
   "How many calls": "Kolik zvuků",
   "How many notes": "Kolik tónů",
   "every syllable": "každá slabika",
-  "one a sentence": "jeden na větu"
+  "one a sentence": "jeden na větu",
+  "Downloading {voice}…": "Stahuji {voice}…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Stahuji „{name}“: {percent} %. Zapne se, jakmile bude stažený; dalším kliknutím zrušíš.",
+  "its sounds couldn't be downloaded": "jeho zvuky se nepodařilo stáhnout",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} potřebuje jednorázové stažení a stahování hlasů je vypnuté (Offline režim nebo Nastavení > Soukromí).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "{voice} se nepodařilo stáhnout: {error}. Tvůj hlas se nezměnil; vyber ho znovu a zkus to znovu."
 }

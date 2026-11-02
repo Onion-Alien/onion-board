@@ -4829,5 +4829,10 @@
   "How many calls": "소리 횟수",
   "How many notes": "음 개수",
   "every syllable": "음절마다",
-  "one a sentence": "문장마다 한 번"
+  "one a sentence": "문장마다 한 번",
+  "Downloading {voice}…": "{voice} 다운로드 중…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "“{name}” 다운로드 중: {percent}%. 다 받으면 켜져요. 취소하려면 다시 클릭하세요.",
+  "its sounds couldn't be downloaded": "소리를 다운로드하지 못했어요",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice}은(는) 한 번 다운로드해야 하는데, 음성 다운로드가 꺼져 있어요(오프라인 모드 또는 설정 > 개인정보).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "{voice}을(를) 다운로드하지 못했어요: {error}. 목소리는 그대로예요. 다시 선택하면 다시 시도해요."
 }

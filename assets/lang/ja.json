@@ -4829,5 +4829,10 @@
   "How many calls": "鳴き声の数",
   "How many notes": "音の数",
   "every syllable": "音節ごと",
-  "one a sentence": "1文に1回"
+  "one a sentence": "1文に1回",
+  "Downloading {voice}…": "{voice}をダウンロード中…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "「{name}」をダウンロード中: {percent}%。終わるとオンになります。もう一度クリックでキャンセル。",
+  "its sounds couldn't be downloaded": "サウンドをダウンロードできませんでした",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice}には一度だけダウンロードが必要ですが、ボイスのダウンロードがオフになっています（オフラインモードまたは設定 > プライバシーとセキュリティ）。",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "{voice}をダウンロードできませんでした: {error}。声は変わっていません。もう一度選ぶと再試行します。"
 }

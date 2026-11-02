@@ -4922,5 +4922,10 @@
   "How many calls": "Cuántos sonidos",
   "How many notes": "Cuántas notas",
   "every syllable": "cada sílaba",
-  "one a sentence": "uno por frase"
+  "one a sentence": "uno por frase",
+  "Downloading {voice}…": "Descargando {voice}…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Descargando “{name}”: {percent} %. Se activa cuando termine; haz clic de nuevo para cancelar.",
+  "its sounds couldn't be downloaded": "no se pudieron descargar sus sonidos",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} necesita una descarga única, y la descarga de voces está desactivada (Modo sin conexión o Configuración > Privacidad).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "No se pudo descargar {voice}: {error}. Tu voz no cambió; elígela otra vez para volver a intentarlo."
 }

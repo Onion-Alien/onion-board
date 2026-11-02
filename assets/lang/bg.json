@@ -4922,5 +4922,10 @@
   "How many calls": "Колко звука",
   "How many notes": "Колко ноти",
   "every syllable": "всяка сричка",
-  "one a sentence": "един на изречение"
+  "one a sentence": "един на изречение",
+  "Downloading {voice}…": "Изтегляне на {voice}…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Изтегляне на „{name}“: {percent}%. Включва се, щом се изтегли; щракни пак, за да отмениш.",
+  "its sounds couldn't be downloaded": "звуците му не можаха да се изтеглят",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} има нужда от еднократно изтегляне, а изтеглянето на гласове е изключено (Офлайн режим или Настройки > Поверителност).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "{voice} не можа да се изтегли: {error}. Гласът ти не се промени; избери го пак, за да опиташ отново."
 }

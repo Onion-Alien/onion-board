@@ -5015,5 +5015,10 @@
   "How many calls": "Сколько звуков",
   "How many notes": "Сколько нот",
   "every syllable": "каждый слог",
-  "one a sentence": "один на фразу"
+  "one a sentence": "один на фразу",
+  "Downloading {voice}…": "Скачиваю {voice}…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Скачиваю «{name}»: {percent}%. Включится, как только скачается; нажми ещё раз, чтобы отменить.",
+  "its sounds couldn't be downloaded": "не удалось скачать её звуки",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "{voice} нужно один раз скачать, а скачивание голосов выключено (Офлайн-режим или Настройки > Конфиденциальность).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Не удалось скачать {voice}: {error}. Твой голос не изменился; выбери его снова, чтобы попробовать ещё раз."
 }

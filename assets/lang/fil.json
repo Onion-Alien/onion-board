@@ -4922,5 +4922,10 @@
   "How many calls": "Ilang tunog",
   "How many notes": "Ilang nota",
   "every syllable": "bawat pantig",
-  "one a sentence": "isa bawat pangungusap"
+  "one a sentence": "isa bawat pangungusap",
+  "Downloading {voice}…": "Dina-download ang {voice}…",
+  "Downloading “{name}”: {percent}%. It goes on once it's in; click again to cancel.": "Dina-download ang “{name}”: {percent}%. Bubukas ito kapag tapos na; i-click ulit para i-cancel.",
+  "its sounds couldn't be downloaded": "hindi ma-download ang mga tunog nito",
+  "{voice} needs a one-time download, and downloading voices is switched off (Offline mode or Settings > Privacy).": "Kailangan ng {voice} ng isang beses na download, at naka-off ang pag-download ng mga boses (Offline mode o Settings > Privacy).",
+  "Couldn't download {voice}: {error}. Your voice didn't change; pick it again to try again.": "Hindi ma-download ang {voice}: {error}. Hindi nagbago ang boses mo; piliin ulit para subukan ulit."
 }
