@@ -85,8 +85,9 @@ def shown_texts() -> dict[str, str]:
         "Every syllable you say comes out as a moo.":
             _("Every syllable you say comes out as a moo."),
         "Farm": _("Farm"),
-        "Every syllable you say is a different farm animal, with the odd cowbell.":
-            _("Every syllable you say is a different farm animal, with the odd cowbell."),
+        "Every syllable you say is a different farm animal, with the odd cowbell and donkey.":
+            _("Every syllable you say is a different farm animal, with the odd cowbell "
+              "and donkey."),
         "Glitch": _("Glitch"),
         "Your voice stutters, skips and cuts out like a broken stream.":
             _("Your voice stutters, skips and cuts out like a broken stream."),
