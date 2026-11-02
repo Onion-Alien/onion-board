@@ -27,6 +27,7 @@ from soundboard.sounds import library, packs
 from soundboard.online import net
 from soundboard.audio.engine import SR
 from soundboard.ui.bun import bunacts
+from soundboard.ui.window import mouseback
 from soundboard.ui.kit import busy, fit, icons
 from soundboard.ui.kit.panel import HoverCard, hint_label, section_label
 from soundboard.ui.kit.panellayouts import CardGrid, Flow
@@ -663,6 +664,7 @@ class PacksDialog(QDialog):
         # back to the board: the way out, first thing on the page (Escape does it too)
         self.btn_done = QPushButton(_("Back to my sounds"))
         icons.set_icon(self.btn_done, "nav_back")
+        mouseback.mark(self.btn_done)
         self.btn_done.clicked.connect(self.accept)
         head.addWidget(self.btn_done, 0, Qt.AlignmentFlag.AlignVCenter)
         # Bun with a parcel, beside the title (running while a download is going)

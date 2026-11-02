@@ -82,7 +82,7 @@ from soundboard.ui.window import sidebar  # noqa: F401  (tests read it here)
 from soundboard.ui.bun import splash
 from soundboard.ui.setup import tabtours
 from soundboard.ui.sounds.linkbar import PLAY_ID as LINK_ID
-from soundboard.ui.window import konami
+from soundboard.ui.window import konami, mouseback
 from soundboard.ui.window.newsounds import NewSounds
 from soundboard.ui.window.spacekey import SpaceKey
 from soundboard.ui.window import winwatch
@@ -360,6 +360,8 @@ class MainWindow(WindowToasts, WindowTabs, WindowLife, WindowOptions, HearCheck,
         # Space plays / pauses on the Sounds and Radio tabs, wherever the focus is
         self._space = SpaceKey(self, self.playctl._space_action)
         self._konami = konami.KonamiCode(self, lambda: konami.react(self))
+        # the mouse's back side button presses the page's Back, as in a browser
+        self._mouse_back = mouseback.MouseBack(self)
         # which voice chat the game you're playing uses: a hint by Who's listening
         self.voice_suggestion: str | None = None
         self.voice_why = ""   # why it's suggested, for the hint ("Discord is listening…")

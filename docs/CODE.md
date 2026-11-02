@@ -274,6 +274,7 @@ Problem reports count a file as ours up to two folders below `soundboard/`
 | `soundboard/sounds/sourceinfo.py` | where a sound added from a web link came from: link, channel, upload date, length and views picked from the download's own yt-dlp reply, kept as `SoundMeta.source` and as a text file next to its audio |
 | `soundboard/ui/sounds/sourcedialog.py` | the pad menu's *Details* for a downloaded sound: its picture, title, channel and dates, with *Open on YouTube*, *Copy link* and *Delete info* |
 | `soundboard/ui/window/spacekey.py` | Space plays / pauses on the Sounds and Radio tabs wherever the focus is (not in text boxes, or on a button reached with Tab) |
+| `soundboard/ui/window/mouseback.py` | the mouse's back side button presses the page's Back (`mark(button)`), as in a browser: Free sound packs, Settings, search results, the setup guide |
 | `soundboard/ui/window/konami.py` | The Konami code typed in the main window: every Bun on screen cheers, a toast, and the Old School achievement |
 | `soundboard/ui/window/winwatch.py` | one event filter on the main window's own native window, for what watches the whole window (Space, the drop veil); no app-wide Python filter |
 | `soundboard/ui/sounds/speedpitch.py` | live controls pop-ups: speed, pitch and effects for Sounds, and pitch and effects for Radio and Apps; the speed gauge turns red at 8x |
