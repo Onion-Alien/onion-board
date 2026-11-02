@@ -16,9 +16,9 @@ import time
 from collections.abc import Callable
 
 from PySide6.QtCore import QEvent, QPoint, Qt, QTimer, Signal
-from PySide6.QtWidgets import (QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QLabel,
-                               QLineEdit, QMenu, QPushButton, QScrollArea, QStackedWidget,
-                               QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QGraphicsOpacityEffect, QGridLayout, QHBoxLayout,
+                               QLabel, QLineEdit, QMenu, QPushButton, QScrollArea,
+                               QStackedWidget, QVBoxLayout, QWidget)
 
 from soundboard.core import achievements, usage
 from soundboard.ui.kit import wheelguard
@@ -61,6 +61,7 @@ class StoreTab(StoreFit, StorePlay, QWidget):
     _decoded = Signal(object, object, float, int)   # (row, data, gain, serial)
     _loaded_file = Signal(object, object, float, str, str)   # (sound, data, gain, what, error)
     _cats = Signal(object)                       # [(category, how many)], all; None: failed
+    _catalog_got = Signal(object)                # store.Catalog
 
     def __init__(self, cfg, add_file: Callable[[str], None],
                  play: Callable[[object, float], bool], open_privacy: Callable[[], object],
@@ -110,6 +111,11 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         # more), so switching back shows one at once; Refresh asks again
         self._kept: dict[tuple, tuple[float, list, bool]] = {}
         self._kept_cats: tuple[float, object] | None = None
+        # every list's first page (store.Catalog): the copy on disk at once, then the
+        # store's newest, got as the app starts, so the tab and its categories show at once
+        self._catalog: store.Catalog | None = None
+        self._catalog_got.connect(self._on_catalog)
+        QTimer.singleShot(0, self, self._get_catalog)
 
         # the whole tab's width, as the Sounds tab: a wide window gets more cards a row
         col = QVBoxLayout(self)
@@ -352,6 +358,37 @@ class StoreTab(StoreFit, StorePlay, QWidget):
     def _sort_key(self) -> str:
         return self._sort
 
+    def _get_catalog(self):
+        def run():
+            saved = store.saved_catalog()
+            if saved is not None:
+                busy.emit(self._catalog_got, saved)
+            if self._closed or not net.allowed(store.FEATURE):
+                return
+            try:
+                busy.emit(self._catalog_got, store.fetch_catalog())
+            except Exception as e:  # noqa: BLE001 - the lists are asked for one by one then
+                log.info("couldn't read the store's catalog: %s", e)
+        threading.Thread(target=run, daemon=True, name="store-catalog").start()
+
+    def _on_catalog(self, got: store.Catalog):
+        if self._closed or (self._catalog is not None and got.built < self._catalog.built):
+            return
+        self._catalog = got
+        if not self._have_cats and self._mode == "sounds":
+            self._on_cats((got.cats, got.total))
+        # opened before it came, the list still loading or couldn't be had: it's here now
+        if (self._loaded and self.stack.currentWidget() is not self.list_area
+                and self._from_catalog() is not None):
+            self.reload()
+
+    def _from_catalog(self) -> tuple[list, bool] | None:
+        """The list asked for, from the catalog: the first page of an order, of the
+        store's own or of a category (not a search, nor the voices)."""
+        if self._catalog is None or self._mode != "sounds" or self.search.text().strip():
+            return None
+        return self._catalog.get(self._sort_key(), self._cat)
+
     def set_sort(self, key: str):
         """Trending (popular right now, the default), Votes (the best voted first, "top")
         or Added (the newest first, "new")."""
@@ -452,10 +489,13 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         if self._one_row is not None:   # (its width changed: still room for one row?)
             self._fit_toolbar()
 
-    def _fetch_cats(self):
+    def _fetch_cats(self, fresh: bool = False):
         kept = self._kept_cats
         if kept is not None and time.monotonic() - kept[0] < KEEP_S:
             self._on_cats(kept[1])
+            return
+        if self._catalog is not None and not fresh:
+            self._on_cats((self._catalog.cats, self._catalog.total))
             return
         install = self.install()
 
@@ -527,8 +567,8 @@ class StoreTab(StoreFit, StorePlay, QWidget):
             self._kept.clear()
             self._kept_cats = None
             if self._have_cats and self._mode == "sounds":   # (their counts too)
-                self._fetch_cats()
-        self._fetch_list(replace=True)
+                self._fetch_cats(fresh=True)
+        self._fetch_list(replace=True, fresh=fresh)
 
     def _list_key(self) -> tuple:
         return (self._mode, self._sort_key(), self.search.text().strip(), self._cat, self._kind)
@@ -536,7 +576,7 @@ class StoreTab(StoreFit, StorePlay, QWidget):
     def more(self):
         self._fetch_list(replace=False)
 
-    def _fetch_list(self, replace: bool):
+    def _fetch_list(self, replace: bool, fresh: bool = False):
         if self._closed:
             return
         self._off = not net.allowed(store.FEATURE)
@@ -554,6 +594,12 @@ class StoreTab(StoreFit, StorePlay, QWidget):
             self._serial += 1
             busy.set_busy(self.btn_more, False)
             self._on_listed(self._serial, (True, list(kept[1]), False, None), kept[2], "")
+            return
+        listed = self._from_catalog() if replace and not fresh else None
+        if listed is not None:
+            self._serial += 1
+            busy.set_busy(self.btn_more, False)
+            self._on_listed(self._serial, (True, listed[0], False, None), listed[1], "")
             return
         self._serial += 1
         serial, sort, query, offset, cat = (self._serial, self._sort_key(), self.search.text(),
@@ -652,10 +698,28 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         self._fit_buns()
         self.stack.setCurrentWidget(self.list_area)
         self._fit_columns(force=True)
+        self._settle()
         self._follow_links()
         if replace:   # a new list starts at its top (_hold_rows may have moved it)
             self.list_area.verticalScrollBar().setValue(0)   # (never drawn where the old one was)
             QTimer.singleShot(0, self, self._to_top)
+
+    def _settle(self):
+        """The new cards shown and laid out before anything's drawn: left to Qt, the first
+        frame or two drew them squashed on top of each other (or not yet at all)."""
+        for r in self._rows:
+            if r.isHidden():
+                r.show()
+            lay = r.layout()
+            if lay is not None:
+                lay.activate()
+        body = self.list_area.widget().layout()
+        if body is not None:
+            body.activate()
+            # the list as tall as its cards at once (the first list was squeezed into the
+            # empty list's height until the scroll area caught up)
+            QApplication.sendEvent(self.list_area, QEvent(QEvent.Type.LayoutRequest))
+            body.activate()
 
     def _fade(self, on: bool):
         """The cards faded while the next list loads (or back)."""
@@ -677,6 +741,7 @@ class StoreTab(StoreFit, StorePlay, QWidget):
         self._stop_preview()
         for r in self._rows:
             self._grid.removeWidget(r)
+            r.hide()   # (gone now: deleteLater left bits of it under the new cards)
             r.deleteLater()
         self._rows.clear()
         self._cols = 0

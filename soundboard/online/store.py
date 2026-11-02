@@ -11,15 +11,18 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 import secrets
+import threading
 import time
+import zlib
 import urllib.error
 import urllib.parse
 import urllib.request
 import uuid
 from collections.abc import Callable
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 from soundboard.sounds import library
@@ -36,6 +39,8 @@ CONTACT = "onionboard.contact@proton.me"   # copyright and takedown requests
 MAX_BYTES = 4 << 20         # the biggest sound the store takes
 EXTS = (".mp3", ".ogg", ".wav", ".flac")   # what it takes (checked from the bytes there)
 LIST_LIMIT = 1 << 20        # a page of the list is a few KB
+CATALOG_LIMIT = 8 << 20     # every list's first page at once (/v1/catalog): a few hundred KB
+ORDERS = ("trending", "top", "new")
 REASONS = ("copyright", "offensive", "broken", "other")
 # the store's categories (the server's CATS), then OURS; the dropdown shows them in the
 # server's order (OURS first, then the biggest)
@@ -191,11 +196,13 @@ def link_ok(url: str) -> bool:
 
 def _request(method: str, path: str, install: str = "", body: bytes | None = None,
              ctype: str = "", limit: int = LIST_LIMIT, timeout: float = 15,
-             why: Callable[[int, str], str] | None = None) -> bytes:
+             why: Callable[[int, str], str] | None = None, packed: bool = False) -> bytes:
     """One call to the store; its answer. Raises StoreError (or net.ProxyError when the
     store is switched off or Offline), saying why in `why(status, error)`'s words (the
     sounds' by default). Call off the UI thread."""
     headers = {"User-Agent": "OnionBoard (sound store)"}
+    if packed:   # (gzipped on the way: a fifth of the size)
+        headers["Accept-Encoding"] = "gzip"
     if install:
         headers["X-Onion-Install"] = install
     if ctype:
@@ -205,6 +212,7 @@ def _request(method: str, path: str, install: str = "", body: bytes | None = Non
     try:
         with net.urlopen(req, timeout=timeout, feature=FEATURE) as r:
             data = r.read(limit + 1)
+            gzipped = packed and r.headers.get("Content-Encoding", "").lower() == "gzip"
     except urllib.error.HTTPError as e:
         try:
             said = json.loads(e.read(4096) or b"{}")
@@ -225,6 +233,11 @@ def _request(method: str, path: str, install: str = "", body: bytes | None = Non
         raise StoreError(_("Couldn't reach the sound store. Check your internet and try "
                            "again.")) from None
     _failing.discard(key)
+    if packed and gzipped:
+        try:
+            data = zlib.decompressobj(16 + zlib.MAX_WBITS).decompress(data, limit + 1)
+        except zlib.error:
+            raise StoreError(_("The sound store had a problem. Try again in a bit.")) from None
     if len(data) > limit:
         raise StoreError(_("The sound store sent more than it should, so it was left."))
     return data
@@ -275,12 +288,150 @@ def categories(install: str) -> tuple[list[tuple[str, int]], int]:
     netlog.cause(FEATURE, "You opened the Store tab: reading its categories")
     data = _request("GET", "/v1/categories", install)
     try:
-        raw = json.loads(data.decode("utf-8"))
-        cats = [(str(c["cat"]), max(0, int(c["n"]))) for c in raw.get("categories") or ()
-                if isinstance(c, dict) and c.get("cat") in CATS]
-        return cats, max(0, int(raw.get("total") or 0))
+        return _cats(json.loads(data.decode("utf-8")))
     except (ValueError, TypeError, KeyError, AttributeError):
         raise StoreError(_("The sound store had a problem. Try again in a bit.")) from None
+
+
+def _cats(raw) -> tuple[list[tuple[str, int]], int]:
+    cats = [(str(c["cat"]), max(0, int(c["n"]))) for c in raw.get("categories") or ()
+            if isinstance(c, dict) and c.get("cat") in CATS]
+    return cats, max(0, int(raw.get("total") or 0))
+
+
+# ------------------------------------------------------------------ every list at once
+@dataclass
+class Catalog:
+    """Every list the tab opens on, as the store last built it (every 30 minutes): the
+    first page of each order of every sound, of the store's own and of each category,
+    and the categories with how many. Got once a launch and kept on disk, so the tab and
+    every category show at once; Show more, a search and Refresh still ask the store.
+    It's the same for everyone, so it has no one's own votes: `with_my_votes` puts them on."""
+    built: int                                              # when (the server's time.time())
+    lists: dict[tuple[str, str], tuple[list[Sound], bool]]   # (order, category): (sounds, more)
+    cats: list[tuple[str, int]]
+    total: int
+
+    def get(self, sort: str, cat: str) -> tuple[list[Sound], bool] | None:
+        """A list's first page (copies: votes change them), None when it isn't in it."""
+        got = self.lists.get((sort, cat))
+        if got is None:
+            return None
+        return with_my_votes([replace(s, tags=list(s.tags)) for s in got[0]], self.built), got[1]
+
+
+def parse_catalog(data: bytes) -> Catalog | None:
+    """/v1/catalog's answer (or the copy kept on disk); None when it isn't one."""
+    try:
+        raw = json.loads(data.decode("utf-8"))
+        sounds, lists = raw["sounds"], raw["lists"]
+        built = int(raw.get("built") or 0)
+        cats, total = _cats(raw.get("categories") or {})
+    except (ValueError, TypeError, KeyError, AttributeError):
+        return None
+    if not isinstance(sounds, dict) or not isinstance(lists, dict):
+        return None
+    known = {s.id: s for s in parse({"sounds": list(sounds.values())})[0]}
+    got: dict[tuple[str, str], tuple[list[Sound], bool]] = {}
+    for key, v in lists.items():
+        sort, _sep, cat = str(key).partition(":")
+        ids = v.get("ids") if isinstance(v, dict) else None
+        if sort in ORDERS and (not cat or cat in CATS) and isinstance(ids, list):
+            got[(sort, cat)] = ([known[i] for i in ids if isinstance(i, str) and i in known],
+                                bool(v.get("more")))
+    return Catalog(built, got, cats, total)
+
+
+def _catalog_file() -> Path:
+    return library.APP_DIR / "store" / "catalog.json"
+
+
+def saved_catalog() -> Catalog | None:
+    """The catalog got last time (None: none yet). Call off the UI thread."""
+    try:
+        return parse_catalog(_catalog_file().read_bytes())
+    except OSError:
+        return None
+
+
+def fetch_catalog() -> Catalog:
+    """Every list's first page from the store, kept on disk for the next launch. No
+    install id: it's the same for everyone. Call off the UI thread."""
+    netlog.cause(FEATURE, "Onion Board started: reading the sound store's lists")
+    data = _request("GET", "/v1/catalog", limit=CATALOG_LIMIT, timeout=30, packed=True)
+    got = parse_catalog(data)
+    if got is None:
+        raise StoreError(_("The sound store had a problem. Try again in a bit."))
+    _write(_catalog_file(), data)
+    return got
+
+
+def _write(path: Path, data: bytes):
+    """(Whole or not at all: a crash halfway never leaves half a file.)"""
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = path.with_suffix(".tmp")
+        tmp.write_bytes(data)
+        os.replace(tmp, path)
+    except OSError as e:
+        log.info("couldn't keep %s: %s", path.name, e)
+
+
+# this install's own votes, kept on disk: (value, day, up, down, when) by sound id. The
+# catalog is the same for everyone, so these show which thumb is yours (one vote a day,
+# as the server counts them) and the counts your vote made until it's built again.
+_votes: tuple[Path, dict[str, tuple[int, int, int, int, float]]] | None = None   # (its file, them)
+_votes_lock = threading.Lock()
+VOTES_KEEP_S = 2 * 86400
+
+
+def _votes_file() -> Path:
+    return library.APP_DIR / "store" / "votes.json"
+
+
+def _my_votes() -> dict[str, tuple[int, int, int, int, float]]:
+    global _votes
+    path = _votes_file()
+    with _votes_lock:
+        if _votes is None or _votes[0] != path:
+            got: dict[str, tuple[int, int, int, int, float]] = {}
+            try:
+                raw = json.loads(path.read_text("utf-8"))
+                for sid, v in raw.items() if isinstance(raw, dict) else ():
+                    value, day, up, down, at = v
+                    got[str(sid)] = (int(value), int(day), int(up), int(down), float(at))
+            except (OSError, ValueError, TypeError):
+                pass
+            _votes = (path, got)
+        return _votes[1]
+
+
+def keep_vote(sound_id: str, up: int, down: int, mine: int):
+    """A vote the store took (its new counts and this install's vote). Call off the UI
+    thread."""
+    votes = _my_votes()
+    now = time.time()
+    with _votes_lock:
+        votes[sound_id] = (mine, int(now // 86400), up, down, now)
+        for sid in [k for k, v in votes.items() if now - v[4] > VOTES_KEEP_S]:
+            del votes[sid]
+        data = json.dumps(votes).encode("utf-8")
+    _write(_votes_file(), data)
+
+
+def with_my_votes(sounds: list[Sound], built: float) -> list[Sound]:
+    """`sounds` from a list built at `built` with this install's votes on them."""
+    votes = _my_votes()
+    today = int(time.time() // 86400)
+    for s in sounds:
+        v = votes.get(s.id)
+        if v is None:
+            continue
+        if v[1] == today:
+            s.mine = v[0]
+        if v[4] > built:   # (voted after it was built: the counts it got then)
+            s.up, s.down = v[2], v[3]
+    return sounds
 
 
 def looks_like(data: bytes, ext: str) -> bool:
@@ -323,9 +474,11 @@ def vote(install: str, sound_id: str, value: int) -> tuple[int, int, int]:
                     json.dumps({"value": value}).encode(), "application/json")
     try:
         d = json.loads(data.decode("utf-8"))
-        return int(d["up"]), int(d["down"]), int(d["mine"])
+        got = int(d["up"]), int(d["down"]), int(d["mine"])
     except (ValueError, KeyError, TypeError):
         raise StoreError(_("The sound store had a problem. Try again in a bit.")) from None
+    keep_vote(sound_id, *got)
+    return got
 
 
 def report(install: str, sound_id: str, reason: str) -> None:

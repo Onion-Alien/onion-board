@@ -43,8 +43,15 @@ class FakeStore:
         self.fail = ""
         self.cats = []          # [(category, how many)] for /v1/categories
         self.fail_cats = False
+        self.catalog = None     # /v1/catalog's answer (a dict); None: an older store without
+        self.catalog_calls = 0
 
-    def __call__(self, method, path, install="", body=None, ctype="", limit=0, timeout=0):
+    def __call__(self, method, path, install="", body=None, ctype="", limit=0, timeout=0, **kw):
+        if path == "/v1/catalog":   # (asked as the tab is made: not in `calls`)
+            self.catalog_calls += 1
+            if self.catalog is None:
+                raise store.StoreError("not found")
+            return json.dumps(self.catalog).encode()
         self.calls.append((method, path, install, body))
         if self.fail:
             raise store.StoreError(self.fail)
